@@ -1603,3 +1603,26 @@ body.ltc-revamp .ltc-valid-val, body.ltc-revamp .ltc-tier-num {
     font-variant-numeric: tabular-nums;
 }
 body.ltc-revamp .page-background { display: none; }
+
+/* ---- v3.17.0 overview on the shared plant (RZDiagram) ---- */
+.ltc-schematic { overflow-x: auto; }   /* the diagram tokens are defined in the page head (diagram gate T3) */
+.ltc-schematic svg { display: block; margin: 0 auto; background: var(--bg1); }
+.ltc-schematic .rzd-hit { cursor: pointer; }
+.ltc-schematic svg path[data-rzd-state="flow"]:not([stroke-dasharray]) { stroke-dasharray: 9 3; animation: ltcl-flow 0.9s linear infinite; }
+.ltc-schematic svg path[data-rzd-state="flow"][stroke-dasharray="6,4"] { animation: ltcl-flow10 0.8s linear infinite; }
+.ltc-schematic svg path[data-rzd-state="flow"][stroke-dasharray="8,3,1.5,3"] { animation: ltcl-flow31 1.6s linear infinite; }
+@keyframes ltcl-flow { to { stroke-dashoffset: -12; } }
+@keyframes ltcl-flow10 { to { stroke-dashoffset: -10; } }
+@keyframes ltcl-flow31 { to { stroke-dashoffset: -31; } }
+@media (prefers-reduced-motion: reduce) { .ltc-schematic svg path[data-rzd-state="flow"] { animation: none; } }
+.ltc-schematic svg path[data-rzd-edge], .ltc-schematic svg rect[data-rzd-node] { transition: opacity 150ms ease; }
+.ltc-schematic svg.is-tracing path[data-rzd-edge]:not([data-trace]) { opacity: .12; }
+.ltc-schematic svg.is-tracing rect[data-rzd-node]:not([data-trace]) { opacity: .4; }
+.ltc-tip { position: fixed; z-index: 2000; max-width: 300px; padding: 10px 12px; background: #111827; border: 1px solid rgba(255,255,255,.2); border-radius: 4px; font-size: 12.5px; color: #A0AEC0; pointer-events: none; }
+.ltc-tip-h { font-weight: 600; color: #E8EDF5; margin-bottom: 6px; }
+.ltc-tip dl { display: grid; grid-template-columns: auto auto; gap: 3px 12px; margin: 0; }
+.ltc-tip dd { margin: 0; text-align: right; font-family: 'JetBrains Mono', monospace; color: #E8EDF5; }
+.ltc-tip-f { margin: 8px 0 0; padding-top: 6px; border-top: 1px solid rgba(255,255,255,.1); font: 400 11.5px/1.4 'JetBrains Mono', monospace; color: #8190a6; }
+.ltc-engine-pick { display: flex; gap: 6px; align-items: flex-start; margin-top: 10px; font-size: 12px; color: var(--text-secondary, #A0AEC0); line-height: 1.4; cursor: pointer; }
+.ltc-engine-pick span { color: var(--text-muted, #8190a6); }
+.ltc-engine-pick input { margin-top: 2px; accent-color: #FFAA00; }

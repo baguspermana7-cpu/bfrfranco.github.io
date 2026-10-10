@@ -131,7 +131,8 @@
         // Other params
         var otherParams = el('div', { className: 'ltc-other-params' });
         var collapseBtn = el('button', { className: 'ltc-collapse-btn', id: 'ltcOtherParamsBtn' });
-        collapseBtn.innerHTML = 'OTHER PARAMETERS <span id="ltcOtherParamsCount"></span> <span class="ltc-chevron">▾</span>';
+        collapseBtn.innerHTML = 'ADVANCED · AUTO <span id="ltcOtherParamsCount"></span> <span class="ltc-chevron">▾</span>';
+        collapseBtn.title = 'Every setting here starts at the shared plant’s value (or the lab default); change one only to test it.';
         var otherBody = el('div', { id: 'ltcOtherParamsBody', className: 'ltc-other-params-body' });
         otherBody.style.display = 'none';
         otherParams.appendChild(collapseBtn);
@@ -150,6 +151,15 @@
         var lastRun = el('div', { className: 'ltc-last-run', id: 'ltcLastRun', textContent: 'Last run: —' });
         runSection.appendChild(runBtn);
         runSection.appendChild(lastRun);
+        /* v3.17.0 — the physical numbers come from the shared plant engine; the old lab model stays one
+         * click away for comparison, labelled for what it is */
+        var eng = el('label', { className: 'ltc-engine-pick' });
+        eng.innerHTML = '<input type="checkbox" id="ltcLegacyEngine"> Legacy screening model <span>(comparison: heuristic multipliers, not a closed heat balance)</span>';
+        runSection.appendChild(eng);
+        eng.querySelector('input').addEventListener('change', function (e) {
+            window.__ltcLegacy = e.target.checked;
+            var rb = document.getElementById('ltcRunBtn'); if (rb) rb.click();
+        });
         leftCard.appendChild(runSection);
 
         leftRail.appendChild(leftCard);
@@ -415,7 +425,7 @@
                 var h3 = inPanel.querySelector('h3');
                 if (h3) h3.style.display = 'none';
                 var cnt = document.getElementById('ltcOtherParamsCount');
-                if (cnt) cnt.textContent = inPanel.querySelectorAll('input, select').length + ' settings';
+                if (cnt) cnt.textContent = inPanel.querySelectorAll('input, select').length + ' settings, change only to test one';
             }
 
             // FLOW: lead with the visual Energy + Loss Breakdown, not the raw
@@ -1070,6 +1080,14 @@
     // renderSchematic
     // ════════════════════════════════════════════════════════
     function renderSchematic(model) {
+        /* v3.17.0 — the overview is the shared plant on RZDiagram (liquid, air and electrical paths) */
+        if (model && model.plant && window.LTCLabPlant && window.RZDiagram) {
+            var host = document.getElementById('ltcSchematic');
+            if (host) { try { window.LTCLabPlant.overview(host, model.plant); return; } catch (e) { console.error('[ltc-lab-plant]', e); } }
+        }
+        /* legacy model selected: put the legacy schematic back, its numbers belong to it */
+        var lh = document.getElementById('ltcSchematic');
+        if (lh && !document.getElementById('schFlowLpm')) lh.innerHTML = buildSystemOverviewSVG();
         setText2('schSupplyT', 'Supply ' + fmt(model.input.supplyTemp, 1) + ' °C');
         setText2('schReturnT', 'Return ' + fmt(model.input.returnTemp, 1) + ' °C');
         setText2('schFlowLpm', _fmtNum(model.flowLpm, 0, true) + ' LPM');

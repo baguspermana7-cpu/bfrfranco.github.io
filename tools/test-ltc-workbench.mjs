@@ -15,6 +15,7 @@
  *   W3  NFPA 2001 flooding equations against the published per-m³ figures
  *   W4  TIA fiber budget, copper channel, TIA-607 conductor sizing
  *   W5  ISO/IEC 30134 KPIs and the ISO 50006 regression recovering a known model
+ *   W10 model lab on the plant engine: load order, computeModel delegation, adapter parity, screening passthrough
  *   W9  Tier groups (IT AND mechanical power; liquid AND air sinks), ≤ 9 blocks per Tier layout, DH01 on the hub
  *   W8  every page loads the plant + strip; ISO defaults to the plant; derived inputs are bound
  *   W7  hub: the full plant (air path, CHW, electrical rooms), ≤ 9 blocks per view,
@@ -217,6 +218,32 @@ for (const [page, mod] of Object.entries(PAGES)) {
   }
   const hubH = readFileSync(join(root, 'standards-ltc-lab.html'), 'utf8');
   ok('W9g', hubH.includes('id="ltcDh01"') && hubH.indexOf('js/ltc-dh01.js') > 0 && hubH.indexOf('js/ltc-dh01.js') < hubH.indexOf('js/ltc-hub.js'), 'the hub carries the DH01 thermal view');
+}
+
+{
+  /* W10 (v3.17.0) — the model lab on the shared plant engine */
+  const html = readFileSync(join(root, 'ltc-system-modelling-lab.html'), 'utf8');
+  const at = (x) => html.indexOf(x);
+  ok('W10a', at('js/ltc-plant.js') > 0 && at('js/ltc-lab-plant.js') > at('js/ltc-plant.js') && at('js/ltc-lab-plant.js') < at('js/ltc-system-modelling-lab.js'),
+     'the lab loads the plant engine and its adapter before the lab model');
+  const labJs = readFileSync(join(root, 'js/ltc-system-modelling-lab.js'), 'utf8');
+  ok('W10b', /window\.LTCLabPlant && !window\.__ltcLegacy[\s\S]{0,80}LTCLabPlant\.compute\(input, legacy\)/.test(labJs), 'computeModel returns the plant-based model unless the legacy toggle is on');
+  const sb = { console, Math, JSON, localStorage: { getItem() { return null; }, setItem() {} } };
+  sb.window = sb; sb.globalThis = sb;
+  vm.createContext(sb);
+  vm.runInContext(readFileSync(join(root, 'js/ltc-plant.js'), 'utf8'), sb);
+  vm.runInContext(readFileSync(join(root, 'js/ltc-lab-plant.js'), 'utf8'), sb);
+  const lab = { itLoadMw: 40, liquidCapture: 80, supplyTemp: 32, returnTemp: 42, pumpHead: 25, pumpEff: 75, cduUnit: 1500, redundancy: 'N1', upsEff: 97, distLoss: 0.5,
+                rackDensityTarget: 120, climate: 'temperate', elecPrice: 0.1, waterTariff: 1.5, carbonIntensity: 0.4, heatReuse: 0, targetPue: 1.2, targetCop: 8 };
+  const pre = sb.LTCLabPlant.compute(lab, {});
+  ok('W10g', pre.itKw === 100000, 'before the lab has read the plant it shows the plant, not its own defaults');
+  sb.LTCLabPlant.ready();
+  const m = sb.LTCLabPlant.compute(lab, { scores: { total: 77 }, riskIndex: 12 });
+  const r = sb.LTCPlant.compute(sb.LTCLabPlant.toPlant(lab));
+  near('W10c', m.pue, r.totals.pueAnnual, 1e-9, 'lab PUE equals the plant annual PUE for the same inputs');
+  near('W10d', m.itKw, 40000, 1e-6, 'lab IT kW equals the plant IT');
+  ok('W10e', m.scores.total === 77 && m.riskIndex === 12, 'the screening layer (scores, risk) passes through from the lab model');
+  near('W10f', m.pueGap, m.pue - 1.2, 1e-12, 'PUE gap is recomputed against the plant PUE, not the legacy one');
 }
 
 const total = pass + fails.length;

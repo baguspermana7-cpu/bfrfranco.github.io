@@ -2694,7 +2694,17 @@
                 return 'Grade E';
             }
 
+            /* v3.17.0 — physical numbers come from the shared plant engine (js/ltc-plant.js) through
+             * js/ltc-lab-plant.js; the lab's own model still supplies the screening layer (scores,
+             * risk, confidence). window.__ltcLegacy = true returns the legacy model unchanged. */
             function computeModel(input) {
+                var legacy = computeModelLegacy(input);
+                if (window.LTCLabPlant && !window.__ltcLegacy) {
+                    try { return window.LTCLabPlant.compute(input, legacy); } catch (e) { console.error('[ltc-lab-plant]', e); }
+                }
+                return legacy;
+            }
+            function computeModelLegacy(input) {
                 /* Delegate to shared engine when available; inline tables are fallback. */
                 if (window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc) {
                     return window.RZEngine.models.ltc.compute(input);
@@ -8836,6 +8846,7 @@
                 setCoolingArchitectureNote(document.getElementById('inCoolingArchitecture').value);
                 var input = gatherInputs();
                 baselineModel = computeModel(input);
+                if (window.LTCLabPlant && !window.__ltcLegacy) { try { window.LTCLabPlant.sync(input); } catch (e) { console.error('[ltc-lab-plant]', e); } }
                 if (resetOptimization) {
                     optimizedModel = null;
                     latestPareto = [];

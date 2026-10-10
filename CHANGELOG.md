@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v3.17.0 — 2026-10-11
+
+### The model lab computes on the same plant as the rest of the workbench
+
+Owner decision: the lab moves onto the shared plant engine ("yang terbaik walaupun ultra effort").
+
+**Changed — physical numbers from `js/ltc-plant.js`** through a new adapter, `js/ltc-lab-plant.js`, that keeps
+the lab's output schema so every dashboard, chart and export keeps working: IT, liquid and air heat, ΔT,
+flow, pump power, CDU count, PUE (annual, with the design-day figure alongside), system COP, WUE, annual
+energy, energy and water cost, carbon, facility kW and the cooling breakdown. The lab's screening layer —
+design scores, risk index, confidence — is still its own and labelled so. At 100 MW the lab now reports
+PUE 1.188 (plant, closed heat balance); the legacy model said 1.243 for the same inputs.
+
+**Added — one plant, both directions.** The lab opens on the shared plant (100 MW by default, or whatever
+the workbench strip holds) and every run writes its inputs back, so the strip and every workbench page
+follow; nothing is written until the lab has read the plant, so its own defaults can no longer overwrite a
+plant chosen elsewhere (the first cut did exactly that — 12 MW over 100 MW).
+
+**Changed — overview** is the plant's nine-block diagram on RZDiagram (power, liquid heat, air heat,
+electrical losses) with hover trace, replacing the four-block static drawing. The 61-setting drawer is
+labelled *Advanced · auto*. **Legacy screening model** (one checkbox under Run Model) returns the old model
+and its schematic for comparison.
+
+**Gates.** `test-ltc-workbench.mjs` W10 (+7): load order, delegation, lab PUE = plant annual PUE for the same
+inputs, screening pass-through, PUE gap against the plant PUE, plant-first before the lab has read it.
+`test-ltc-parity`, `test-ltc-data`, `test-ltc-calibration` unchanged and green (the legacy model is intact).
+
 ## v3.16.0 — 2026-10-11
 
 ### LTC Workbench: Tier on the plant's topology, and DH01 when something fails
