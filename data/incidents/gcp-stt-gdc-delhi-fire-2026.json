@@ -329,5 +329,408 @@
   "confidence": "High on the network-layer mechanism, timeline and affected products (byte-verified from Google's primary status record); Low on ignition source, tenant data-loss reconciliation, and quantitative impact (unverified third-party reporting; WebSearch budget exhausted this session). Reference note: the 6 reference entries resolve to 3 unique URLs (references 1-4 all cite the same Google status incident)."
  },
  "lastUpdated": "2026-07-31",
- "operatorShort": "Google Cloud"
+ "operatorShort": "Google Cloud",
+ "fmea": {
+  "scope": "Two linked systems: the physical chain in a third-party New Delhi colocation facility (a tenant-owned lithium battery installation, in-facility fire detection, fixed and manual suppression, shared-hall compartmentation, protective de-energisation, and safety-cleared re-entry) and the Google Cloud edge that depended on it (a non-compute Delhi POP whose loss degraded ingress across Delhi, Chennai and Mumbai). Only the network layer is confirmed by Google's own Service Health record: the POP isolation, the three metros, the affected products, safety-clearance gating and resolution. The ignition source, battery-room location, tenant ownership, rack counts and firefighter injuries rest on secondary reporting the dossier marks as unverified, the injury report is contradicted by a later DCD report, and the exact failure mechanism is undetermined pending an independent RCA that was not public at review. No facility-side corrective action has a disclosed status, and Google's durable topology fix is not confirmed, so no revised score is claimed: every mode is shown as residual risk.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Tenant-owned lithium battery units, third-floor battery room",
+    "function": "Store energy for a tenant installation without becoming an ignition source inside a shared facility",
+    "failureMode": "Battery units fail, reportedly through a suspected short circuit consistent with lithium-ion thermal runaway, and start a fire",
+    "effect": "Fire on the third floor reportedly destroys server racks, ceiling panels and electrical infrastructure, affects about 50 Google racks and damages other tenants' equipment; two firefighters are reported injured, a figure a later report contradicts",
+    "cause": "Undetermined. A short circuit is cited only as a preliminary cause under investigation; chemistry, BMS design, charging regime, age and maintenance status are all undisclosed",
+    "prevention": "None recorded; the battery maintenance, BMS and charging regime are undisclosed",
+    "detection": "None recorded for the batteries themselves; the first documented signal is the emergency call to the fire service at ~02:45 IST",
+    "S": 10,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "Rubric 10, hazard to people: the fire reportedly injured two firefighters and destroyed equipment across a floor. Scored on reported, unverified accounts, and a later DCD report of 'no injuries' leaves the people-hazard element disputed.",
+     "O": "A battery-origin fire needs a cell or string fault that the dossier cannot explain, since the mechanism and maintenance record are unknown: 'infrequent'. Not scored higher because no maintenance lapse is evidenced.",
+     "D": "No BMS alarm, off-gas sensing or thermal monitoring is recorded; the fault became known only as a fire reported by a phone call. Held at 9 rather than 10 because the battery telemetry is undisclosed, not shown to be absent."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0,
+      "quote": "preliminary cause cited as a suspected short circuit"
+     },
+     {
+      "src": "rootCause",
+      "quote": "EXACT FAILURE MECHANISM — NOT CONCLUSIVELY ESTABLISHED"
+     },
+     {
+      "src": "factor",
+      "i": 6
+     },
+     {
+      "src": "metric",
+      "i": 7
+     },
+     {
+      "src": "soe",
+      "i": 8
+     }
+    ],
+    "actions": [
+     {
+      "text": "Contractual colo safety SLA covering tenant battery maintenance, BMS telemetry and inspection cadence (status: not evidenced)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "text": "Governed battery-health programme for all batteries in shared halls, including tenant-owned ones (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "text": "Complete and publish the independent root-cause analysis of the ignition source and battery chemistry/BMS (commissioned; findings not public)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "In-facility fire detection for the battery room",
+    "function": "Detect a battery fault or early fire automatically, before open flame, and raise a timed alarm",
+    "failureMode": "No automated detection or sensed-alarm time is documented; the only detection event is a human emergency call",
+    "effect": "No evidence of warning before the fire was established; the firefighting response starts from the ~02:45 IST call",
+    "cause": "Detection either absent, ineffective, or undisclosed; no public source names a VESDA, spot smoke or heat system",
+    "prevention": "None recorded",
+    "detection": "Human emergency call to the Delhi Fire Service at ~02:45 IST",
+    "S": 7,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "This mode sets how early the fire could be fought rather than whether it started, so it is scored below FM-01 to avoid counting the same fire twice; losing the early-warning window on a battery fire in a shared hall is still a major degradation of the facility's protection.",
+     "O": "The dossier treats the silence on detection as a standing gap, a weakly guarded condition: 'occasional'. Not higher because absence is not proven, only undocumented.",
+     "D": "The only recorded detection came after the fire was burning, from people rather than a system: 'detected after impact'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 1,
+      "quote": "the only documented detection event"
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 3
+     },
+     {
+      "src": "rootCause",
+      "quote": "the only detection datapoint is the human emergency call to the Delhi Fire Service at ~02:45 IST"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Review battery-room fire detection (VESDA/off-gas) adequacy (status: unknown, pending RCA)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "text": "Mandatory early multi-modal detection with lithium off-gas sensing and logged alarm timestamps (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Battery-room fixed suppression and manual firefighting",
+    "function": "Contain a battery fire in its room before it damages the hall around it",
+    "failureMode": "No fixed suppression discharge is evidenced; the fire is fought manually by the fire service for several hours",
+    "effect": "Ten fire tenders work for several hours; the fire is confined to the third floor but that floor's racks and electrical infrastructure are reported destroyed",
+    "cause": "Undetermined: a fixed system may have been absent, ineffective against lithium runaway, or undisclosed; the dossier's view that a gaseous agent would plausibly fail is inference, not fact",
+    "prevention": "None recorded",
+    "detection": "None recorded for the suppression system's state",
+    "S": 8,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "Sets the extent of the fire, loss of a floor's equipment, while the people hazard is carried by FM-01; scored 8 so the single fire is not counted at 10 twice.",
+     "O": "The dossier records no lithium-appropriate suppression and argues gas agents cannot arrest runaway, a foreseeable condition weakly guarded: 'occasional'. Held at 6 because the gas-agent argument is the dossier's inference.",
+     "D": "No record shows the suppression state was known before or during the fire; the gap is visible only in the outcome, after impact."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2,
+      "quote": "no source describes the battery room's fixed suppression"
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 4
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 11
+     }
+    ],
+    "actions": [
+     {
+      "text": "Review lithium-appropriate suppression adequacy (status: unknown, pending RCA)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "text": "Cell/module-level runaway isolation, fire-rated barriers and lithium-rated suppression (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "text": "Periodic suppression discharge/functional testing and battery-room drills (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "Shared-hall compartmentation and tenant energy-storage governance",
+    "function": "Keep a fault in one tenant's equipment from reaching other tenants' equipment",
+    "failureMode": "A tenant's lithium battery installation shares a floor with Google's peering hardware and other tenants' equipment without enough segregation",
+    "effect": "One tenant's battery fire damages Google racks, Netflix and NCR ISP routers, and places about 20 years of Matrix Cellular data at risk",
+    "cause": "Tenant-controlled energy storage placed inside a shared hall with insufficient compartmentation (reported, unverified at review)",
+    "prevention": "Damage was confined to the third floor; no compartmentation within that floor is recorded",
+    "detection": "None recorded; the coupling became visible only in the fire",
+    "S": 8,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "Spreads one tenant's fault to several unrelated parties' equipment on the floor, a major loss, but it is the same fire as FM-01 so it is not scored at 10 again.",
+     "O": "The co-location is a standing condition, but it only causes harm once a battery fails: 'infrequent'.",
+     "D": "No inspection or control is recorded that would reveal inadequate segregation before a fire tested it."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "rootCause",
+      "quote": "with insufficient compartmentation"
+     },
+     {
+      "src": "soe",
+      "i": 9
+     },
+     {
+      "src": "soe",
+      "i": 0,
+      "quote": "Batteries reportedly belonged to a tenant leasing space at the site."
+     }
+    ],
+    "actions": [
+     {
+      "text": "Review battery-room compartmentation and segregate tenant-owned energy storage from shared IT/peering halls (status: unknown, pending RCA)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "text": "Prohibit tenant-owned lithium storage in shared IT halls without dedicated fire-rated rooms (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Google Cloud non-compute Delhi POP (edge peering and ingress)",
+    "function": "Carry Delhi-metro ingress into Google Cloud so that losing one facility does not degrade traffic across metros",
+    "failureMode": "The emergency power shutdown of networking equipment isolates one POP, and its loss reduces capacity enough to degrade ingress across three metros",
+    "effect": "Traffic from Delhi, Chennai and Mumbai sees elevated latency, intermittent packet loss and non-optimal routing for Hybrid Connectivity, VPC and Media CDN, with no workaround, for about three weeks",
+    "cause": "Edge topology in which one non-compute POP carried enough peering capacity that rerouted demand exceeded regional capacity (officially confirmed)",
+    "prevention": "Rerouting over other paths, which proved insufficient for the rerouted demand",
+    "detection": "Google identified the shutdown and capacity loss; customer impact was first publicly disclosed on 9 June",
+    "S": 6,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "Rubric 6: a degradation confined to one metro edge and three network products, with no compute or data loss on Google's side. Not 7 because Google describes the latency as 'slightly elevated', though there was no workaround for about three weeks.",
+     "O": "The POP fails this way only when its host facility loses power to the networking equipment, which needs an unusual event such as a fire: 'infrequent'.",
+     "D": "The capacity loss was known as it happened, but nothing contained the degradation to Delhi: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "ref",
+      "i": 2,
+      "quote": "isolating a non-compute local Point of Presence (POP) in Delhi"
+     },
+     {
+      "src": "metric",
+      "i": 2
+     }
+    ],
+    "actions": [
+     {
+      "text": "Restore and diversify Delhi peering and augment out-of-region Chennai capacity (capacity restored; durable topology fix not confirmed)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Distribute Delhi peering across physically diverse POPs and pre-provision out-of-region failover peering (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-06",
+    "item": "Post-fire re-entry and capacity restoration",
+    "function": "Return the lost edge capacity to service quickly after the fire is out",
+    "failureMode": "Full restoration waits on fire and structural safety clearance before Google can re-access and re-energise its equipment",
+    "effect": "Degraded ingress persists until all lost capacity is restored on 26 June; site access is reported around 22 June",
+    "cause": "Physical hazard lockout of the damaged floor; out-of-region capacity augmentation was the only interim path",
+    "prevention": "Interim augmentation of Delhi backbone and Chennai peering capacity",
+    "detection": "Known at onset: the safety-clearance gate was stated in Google's status updates",
+    "S": 5,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "This mode sets the duration of FM-05's degradation rather than causing it, so it is scored one step lower at customer-visible degradation.",
+     "O": "A multi-week lockout follows only from a fire serious enough to damage the structure: 'infrequent'.",
+     "D": "The gating was known and published while the incident ran, but no recorded plan shortened it: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 13
+     },
+     {
+      "src": "factor",
+      "i": 5
+     },
+     {
+      "src": "soe",
+      "i": 17
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "teams obtained access to the damaged site"
+     },
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "augmenting out-of-region Internet Edge regional peering capacity in Chennai"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Augment out-of-region (Chennai) capacity (restored during the incident; durable fix not confirmed)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Pre-provision out-of-region failover peering for Delhi, Chennai and Mumbai (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-07",
+    "item": "Root-cause investigation and public disclosure",
+    "function": "Establish and publish the ignition cause and the performance of detection and suppression so tenants can assess residual risk",
+    "failureMode": "Ignition mechanism, battery specification, detection and suppression performance remain undisclosed; the RCA is not public and the event is framed as force majeure",
+    "effect": "Tenants and Google customers cannot verify whether the facility-side causes have been addressed; every facility action in this dossier carries an unknown status",
+    "cause": "RCA commissioned by STT Global with findings not public at review; Google never named the facility, operator or ignition source",
+    "prevention": "None recorded",
+    "detection": "Visible only as the absence of a published report",
+    "S": 4,
+    "O": 8,
+    "D": 9,
+    "rationale": {
+     "S": "The missing report does not itself stop a service; it limits what customers can do to protect themselves: 'limited customer impact'.",
+     "O": "Non-disclosure covers every part of the physical record the dossier lists, not one omitted detail, so the condition is routine: 'frequent'.",
+     "D": "Nothing surfaces the gap except its absence: detected only through the customer's own inability to find the facts."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 16
+     },
+     {
+      "src": "coe",
+      "i": 0
+     },
+     {
+      "src": "rootCause",
+      "quote": "Any maintenance root cause is therefore UNKNOWN pending the RCA"
+     },
+     {
+      "src": "metric",
+      "i": 8
+     }
+    ],
+    "actions": [
+     {
+      "text": "Complete and publish the independent RCA (commissioned; findings not public at review)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -283,5 +283,210 @@
   "officialPostmortem": false,
   "lastVerified": "2026-08-02 (seed — pending deep research)"
  },
- "lastUpdated": "2026-08-02"
+ "lastUpdated": "2026-08-02",
+ "fmea": {
+  "scope": "The Azure China North 3 region as a customer sees it — the regional facility infrastructure whose failure is claimed, its recovery, single-region customer deployments, and the incident notification and post-incident record. This dossier holds no operator post-mortem: the root cause is recorded as undetermined, and the date, the ~50-hour duration and even the occurrence of the outage rest on an unverified task lead. Every score below is therefore a judgement about a claimed event, not a reconstruction of a documented one. The physical chain (initiating equipment, detection, suppression, isolation) is not scored mode by mode because the dossier records no physical event of any kind; inventing one would be fabrication. The corrective items in this dossier are recommendations, none evidenced as done.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Regional facility infrastructure (power or cooling chain — trigger undetermined)",
+    "function": "Keep the China North 3 region's scale units powered, cooled and serving",
+    "failureMode": "An undetermined infrastructure failure takes regional services down",
+    "effect": "Claimed regional outage of about 50 hours for enterprise customers; which services, availability zones and customers were affected is unknown",
+    "cause": "Undetermined. The dossier names power-chain, cooling-loss and network/control-plane/storage failures only as plausible classes and asserts none",
+    "prevention": "None recorded; no maintenance, inspection or testing record is public",
+    "detection": "None recorded; no alarm, ticket or first-alert timestamp survives",
+    "S": 8,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "Taken at face value, a ~50-hour outage of regional services is at least the rubric's 8 (full outage of a major service for hours). Not scored 9 because the dossier cannot say which services or zones were down, so 'region-wide, no workaround' is not established.",
+     "O": "No basis exists to score occurrence: the trigger, the equipment and any maintenance lapse are all unknown. 5 is an analyst midpoint between 'infrequent' and 'occasional', stated as a placeholder, not a finding.",
+     "D": "No detection event of any kind is on record, so the only detection the evidence supports is customer impact."
+    },
+    "evidence": [
+     {
+      "src": "rootCause",
+      "quote": "ROOT CAUSE IS UNDETERMINED AND UNDOCUMENTED"
+     },
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "metric",
+      "i": 0
+     },
+     {
+      "src": "factor",
+      "i": 3
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-02",
+    "item": "Regional recovery and restoration",
+    "function": "Return regional services to customers within a bounded time after an infrastructure failure",
+    "failureMode": "Restoration takes about 50 hours (claimed, unverified)",
+    "effect": "Enterprise customers without another region are down for roughly two days",
+    "cause": "Undocumented; no restoration steps, phased service-return log or reason for the duration is recorded anywhere accessible",
+    "prevention": "None recorded",
+    "detection": "None recorded",
+    "S": 8,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "This mode sets the length rather than the existence of the outage; two days of full outage is well inside the rubric's 8. Not raised further because scope is unknown.",
+     "O": "A two-day restoration needs the initiating failure in FM-01 plus a slow recovery path, so 'infrequent'; kept below FM-01 so the same event is not counted twice at full weight.",
+     "D": "No record shows the recovery time was known or forecast in advance; on the evidence it was experienced by customers."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 11
+     },
+     {
+      "src": "soe",
+      "i": 10
+     },
+     {
+      "src": "metric",
+      "i": 0
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-03",
+    "item": "Customer deployment confined to China North 3",
+    "function": "Keep a customer's workload available when its region fails",
+    "failureMode": "No in-country failover, so the customer absorbs the full regional outage",
+    "effect": "Whatever the trigger, a customer deployed only in China North 3 is down for the whole outage; availability zones do not cover a whole-region event",
+    "cause": "Single-region deployment; the paired region, China East 3, is access-restricted to specific scenarios such as in-country disaster recovery",
+    "prevention": "Availability-zone support within China North 3, which does not protect against a whole-region event",
+    "detection": "Customer impact",
+    "S": 8,
+    "O": 3,
+    "D": 9,
+    "rationale": {
+     "S": "For the affected customer this is a full outage measured in hours to days — the rubric's 8.",
+     "O": "The condition is standing for every single-region customer, but it bites only when the region itself fails, which is infrequent; kept low so it does not re-count FM-01.",
+     "D": "The customer learns of it through its own outage."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 9
+     },
+     {
+      "src": "metric",
+      "i": 3
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "This region is access restricted to support specific customer scenarios, such as in-country disaster recovery."
+     }
+    ],
+    "actions": [
+     {
+      "text": "Deploy across the paired regions (China North 3 and China East 3) and validate cross-region failover",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 3,
+     "D": 9
+    },
+    "revisedRationale": "A validated failover to the paired region turns a whole-region loss into a partial, time-bounded disruption for that customer (S 8→6). This is a recommended customer action, not an operator commitment, and China East 3 is access-restricted, so whether a given customer can adopt it is not established; the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-04",
+    "item": "Sovereign-cloud incident notification channel",
+    "function": "Tell customers and the wider record that the region is impaired, while it is impaired",
+    "failureMode": "Notices sit only on China-only endpoints outside the standard global-Azure discovery path",
+    "effect": "No first notice, tracking ID or status entry for the claimed outage can now be found; whether customers were informed in time is unknown",
+    "cause": "Azure operated by 21Vianet is a physically separated instance with its own status endpoints, since folded by 301 redirect into the global status page",
+    "prevention": "None recorded",
+    "detection": "None recorded",
+    "S": 4,
+    "O": 8,
+    "D": 9,
+    "rationale": {
+     "S": "It fails the communication, not the service; the dossier cannot show that customers in the region were left uninformed, only that the notice is not discoverable, so 'limited customer impact'.",
+     "O": "The separation is the normal operating design of the sovereign cloud, so routine operation exercises it — 'frequent'.",
+     "D": "No control is recorded that would show a notice was missing; the gap was found by a researcher years later."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "metric",
+      "i": 7
+     },
+     {
+      "src": "tech",
+      "quote": "a physically separated instance of cloud services located in China"
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-05",
+    "item": "Post-incident review publication and retention",
+    "function": "Keep a durable public record of root cause, scope and timeline after a regional outage",
+    "failureMode": "No post-incident review for the event survives in public hosting",
+    "effect": "Root cause, impact scope, duration and any maintenance or protection-system lapse cannot be confirmed or excluded; customers cannot use the event to judge the region's risk",
+    "cause": "Short PIR retention on the status-history page, the redirected China dashboard, and no regulator-published cloud RCA",
+    "prevention": "None recorded",
+    "detection": "None recorded; the absence was found by this dossier's research",
+    "S": 4,
+    "O": 8,
+    "D": 9,
+    "rationale": {
+     "S": "No service effect; the impact is on customers' ability to assess risk and on the industry's ability to learn from the event — 'limited customer impact'.",
+     "O": "Short retention ages out every PIR in normal operation, so the cause is exercised routinely — 'frequent'. Whether a PIR was ever published for this event is itself unknown.",
+     "D": "Nothing flags a missing or expired PIR; it surfaces only when someone looks for it."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "metric",
+      "i": 6
+     },
+     {
+      "src": "factor",
+      "i": 3
+     }
+    ],
+    "actions": []
+   }
+  ]
+ }
 }

@@ -305,5 +305,357 @@
   "confidence": "high"
  },
  "lastUpdated": "2026-07-31",
- "operatorShort": "Meta"
+ "operatorShort": "Meta",
+ "fmea": {
+  "scope": "Meta's global backbone and the controls around a backbone maintenance command — the change-audit tool, the health-check that withdraws DNS BGP advertisements, the internal tooling and remote access that depended on the same network and DNS, physical access to hardened data centers, the staged power-up during recovery — and the public DNS resolvers that absorbed the retry storm. Analysed retrospectively from Meta's two official engineering posts, Cloudflare's external analysis and Wikipedia's timeline. Meta published no enumerated corrective-action list: its only stated commitment is a general one to strengthen testing, drills and resilience, and every specific fix in this dossier is an analyst recommendation derived from the root cause and not publicly confirmed. The general commitment cannot be mapped to a specific score change, so no revised score is claimed for any mode and all are shown as residual risk.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Backbone maintenance command (capacity assessment)",
+    "function": "Assess the availability of global backbone capacity during routine maintenance without changing it",
+    "failureMode": "The command unintentionally takes down every connection in the backbone",
+    "effect": "All of Meta's data centers are disconnected from each other and from the internet; Facebook, Messenger, Instagram, WhatsApp, Mapillary and Oculus fail worldwide for about six to seven hours",
+    "cause": "An erroneous command with backbone-wide reach issued during a routine maintenance job, with no blast-radius limit or staged execution",
+    "prevention": "A change-audit tool designed to stop commands like this (failed: see FM-02)",
+    "detection": "None before execution inside Meta; Cloudflare saw the peak of routing changes at about 15:40 UTC",
+    "S": 9,
+    "O": 6,
+    "D": 9,
+    "rationale": {
+     "S": "Provider-wide outage of every Meta product with no workaround: the rubric's 9. Not 10: no hazard to people and no facility lost; the data centers were disconnected, not destroyed.",
+     "O": "Backbone maintenance is routine work, and a command whose actual reach exceeds its intent is a foreseeable slip that only the (buggy) audit tool guarded: 'occasional, weakly guarded'.",
+     "D": "Nothing stopped or flagged the command before it ran, and the loss of DNS then broke Meta's own investigation tools, so the event was recognised through its impact."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "unintentionally took down all the connections in our backbone network"
+     },
+     {
+      "src": "metric",
+      "i": 7
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "metric",
+      "i": 9
+     }
+    ],
+    "actions": [
+     {
+      "text": "Strengthen overall testing, drills and resilience for backbone maintenance — committed by Meta in general terms; no specific fix itemized",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "text": "Staged, blast-radius-limited execution with a mandatory dry-run for capacity-assessment commands (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Change-audit tool",
+    "function": "Audit backbone commands before execution and stop ones that would cause an outage",
+    "failureMode": "A bug in the audit tool prevents it from stopping the command",
+    "effect": "The erroneous command reaches production unchecked and the backbone is removed from operation",
+    "cause": "Latent defect in the guardrail itself; no test that the tool blocks whole-backbone withdrawal is recorded",
+    "prevention": "None recorded for the tool itself",
+    "detection": "None; the bug was found only through the outage",
+    "S": 9,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "The guardrail's failure is the route by which a mistaken command became a provider-wide outage, so it carries the same severity as FM-01.",
+     "O": "The bug was a standing condition, but it only mattered when a dangerous command was issued; placed between 'infrequent' and 'occasional' and kept below FM-01 so the event is not counted twice at full weight.",
+     "D": "No control is recorded that exercised the guardrail against this class of command, so the defect could be found only through the failure it allowed."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "rootCause",
+      "quote": "a bug in that audit tool prevented it from properly stopping the command"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Fix the change-audit tool bug and add regression tests that block global-scope withdrawal commands — status 'Recommended', specific fix not publicly itemized",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "text": "Fix and independently test the change-audit tool (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "DNS health-check and BGP advertisement withdrawal",
+    "function": "Route traffic around one unhealthy DNS location by withdrawing that location's BGP advertisements",
+    "failureMode": "With the whole backbone gone, every DNS location declares itself unhealthy and withdraws at once, removing authoritative DNS from the internet",
+    "effect": "facebook.com stops resolving on public resolvers at about 15:50 UTC; DNS prefixes are no longer announced from 15:58 UTC; every Meta property fails at once instead of degrading",
+    "cause": "Health-check scope is unbounded: unreachability of the data centers is treated as a local fault even when it is global",
+    "prevention": "None recorded; no minimum-anycast floor or global-scope guard",
+    "detection": "Cloudflare observed the withdrawal externally; no Meta-side control distinguished a global from a local fault",
+    "S": 9,
+    "O": 3,
+    "D": 8,
+    "rationale": {
+     "S": "This is what turned a backbone fault into the disappearance of Meta's DNS from the whole internet; it carries the provider-wide severity of the event.",
+     "O": "The mechanism worked as designed and only fails this way when the entire backbone is lost, which is infrequent; scored low so the single event is not triple-counted with FM-01 and FM-02.",
+     "D": "The withdrawal was visible from outside at onset, but Meta's own tools were broken by it and nothing flagged that the trigger was global: detected after impact."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "rootCause",
+      "quote": "the safety mechanism amplified rather than contained the failure"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Add a global-scope guard or minimum-anycast floor to the DNS BGP health-check — status 'Recommended (derived from root cause; not publicly confirmed)'",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Redesign the DNS-to-backbone health-check coupling (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "Internal diagnostic and operations tooling",
+    "function": "Let engineers investigate and resolve a production outage",
+    "failureMode": "The tools depend on the production DNS that failed, so they break with it",
+    "effect": "Many of the internal tools normally used to investigate and resolve outages are unavailable, slowing diagnosis",
+    "cause": "Internal tooling shares the failure domain of the production DNS and backbone; no out-of-band control plane is recorded",
+    "prevention": "None recorded",
+    "detection": "Found during the incident",
+    "S": 7,
+    "O": 4,
+    "D": 8,
+    "rationale": {
+     "S": "It lengthens the outage rather than causing it: a major degradation of the response, scored below the outage modes so the event is not counted twice.",
+     "O": "It needs a total loss of production DNS first, which is infrequent.",
+     "D": "The dependency surfaced when engineers tried to use the tools during the outage."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 9
+     },
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "rootCause",
+      "quote": "The total loss of DNS broke many of the internal tools we'd normally use to investigate and resolve outages like this"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Establish an out-of-band control plane so diagnostic, access and comms tooling survive a total production-DNS loss — status 'Recommended', not publicly confirmed",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "text": "Decouple internal tooling from the production DNS (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Remote and physical access to hardened data centers",
+    "function": "Let engineers reach and reset backbone equipment quickly when the network is down",
+    "failureMode": "Remote access is impossible and on-site access is slowed by secure-access protocols and hardware designed to be hard to modify",
+    "effect": "Engineers have to be dispatched on-site; it takes extra time to activate secure access, and renewed BGP activity is seen only from about 21:00 UTC, more than five hours after onset",
+    "cause": "Remote management rides the same network that failed; physical and system security hardening was not paired with a rehearsed break-glass path",
+    "prevention": "None recorded",
+    "detection": "Found during the incident",
+    "S": 8,
+    "O": 5,
+    "D": 8,
+    "rationale": {
+     "S": "This mode sets most of the outage's duration: hours of full outage of major services is the rubric's 8.",
+     "O": "Any network loss that takes remote access with it exercises the condition; the security design was deliberate and standing, so more than an unusual combination.",
+     "D": "No rehearsal of on-site recovery under a total network loss is recorded; the delay was learned during the event."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 10
+     },
+     {
+      "src": "soe",
+      "i": 11
+     },
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "rootCause",
+      "quote": "it took extra time to activate the secure access protocols needed to get people onsite"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Pre-stage and rehearse break-glass physical-access procedures — status 'Recommended', not publicly confirmed",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "text": "Pre-stage and rehearse emergency physical-access procedures (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-06",
+    "item": "Data-center electrical systems and caches during mass restart",
+    "function": "Return tens of megawatts of load without stressing electrical systems or caches",
+    "failureMode": "A sudden reversal of the power dips could put electrical systems and caches at risk, so restoration has to be staged",
+    "effect": "Backbone and services are brought back in controlled steps, lengthening the tail of the restoration; no damage is recorded",
+    "cause": "Data centers reported power dips in the range of tens of megawatts while disconnected",
+    "prevention": "Operators chose a deliberate staged power-up",
+    "detection": "The power dips were reported by the data centers during the outage",
+    "S": 5,
+    "O": 4,
+    "D": 4,
+    "rationale": {
+     "S": "The staging adds time to an outage already under way and is customer-visible only as a slower return: customer-visible degradation.",
+     "O": "It needs a global disconnection that drops load across many sites at once, which is infrequent.",
+     "D": "The risk was recognised before restoration and acted on, so 'detected before impact with time to act'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 13
+     },
+     {
+      "src": "factor",
+      "i": 5
+     },
+     {
+      "src": "tech",
+      "quote": "suddenly reversing such a dip in power consumption could put everything from electrical systems to caches at risk"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Codify and drill a staged power-up runbook — status 'Recommended', not publicly confirmed",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-07",
+    "item": "Public recursive resolvers (third-party collateral)",
+    "function": "Absorb failed lookups for an unreachable domain without overload",
+    "failureMode": "Resolvers issue and cache SERVFAIL while clients worldwide retry relentlessly",
+    "effect": "DNS resolvers worldwide handle about 30x more queries than usual, a load spike on infrastructure Meta does not own",
+    "cause": "Apps, browsers and clients retry in a loop when Meta's authoritative nameservers are unreachable",
+    "prevention": "None recorded",
+    "detection": "Seen at onset by resolver operators such as Cloudflare",
+    "S": 4,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "The dossier records extra load, not a resolver outage: limited impact on third parties.",
+     "O": "It needs a large domain's authoritative DNS to vanish, which is infrequent.",
+     "D": "Resolver operators saw the storm as it formed but nothing on Meta's side could stop clients retrying: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "tech",
+      "quote": "DNS resolvers worldwide handling 30x more queries than usual"
+     }
+    ],
+    "actions": []
+   }
+  ]
+ }
 }

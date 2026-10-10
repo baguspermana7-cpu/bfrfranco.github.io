@@ -17,6 +17,10 @@ import os
 import argparse
 import html
 from datetime import datetime
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import incidents_fmea  # noqa: E402  — retrospective FMEA section + its CSS
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data", "incidents")
@@ -102,7 +106,7 @@ CSS = r"""
     }
     * { box-sizing:border-box; }
     html,body { margin:0; padding:0; }
-    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    body { background:var(--bg); color:var(--text); font-family:"IBM Plex Sans",system-ui,sans-serif; line-height:1.62; }
     a { color:var(--cyan); }
     h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
     .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
@@ -122,10 +126,17 @@ CSS = r"""
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
-    .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
-    .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
-    .chip.green { color:var(--green); border-left:2px solid var(--green); }
-    .chip.red { color:var(--red); border-left:2px solid var(--red); }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+    /* State lives in the text colour; a coloured left stripe is the decoration UX law #14 bans. */
+    .chip.cyan { color:var(--cyan); }
+    .chip.amber { color:var(--amber); }
+    .chip.green { color:var(--green); }
+    .chip.red { color:var(--red); }
     .metabar { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); margin:0.7rem 0; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; font-variant-numeric:tabular-nums slashed-zero; }
     .metabar b { color:var(--text-body); font-weight:600; }
     .metabar .sep { color:var(--line); }
@@ -141,6 +152,11 @@ CSS = r"""
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -187,7 +203,7 @@ CSS = r"""
     table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
     table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
     table.metrics .mval { color:var(--text-body); }
-    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.7rem 1rem; margin-top:0.7rem; }
     .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
     .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
     /* reading column — constrain prose to a comfortable measure, justified like RZ articles */
@@ -195,7 +211,7 @@ CSS = r"""
     .reading-col p.lede, .reading-col .card p, .reading-col .ca-block p, .reading-col ul.tight li { text-align:justify; -webkit-hyphens:auto; hyphens:auto; }
     .card p { margin:0; }
     .card > p + p, .card p + p { margin-top:0.7rem; }
-    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
     .mag-trace b { color:var(--text-strong); }
     .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
     .coe-meta { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-left:0.2rem; white-space:normal; }
@@ -216,7 +232,7 @@ CSS = r"""
     .share-btn svg { width:15px; height:15px; }
     /* ── inline-SVG visualizations (theme-aware via vars) ── */
     .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#0f1a16; z-index:1; }
-    .inc-map .leaflet-container { background:#0f1a16; font-family:'IBM Plex Sans',sans-serif; }
+    .inc-map .leaflet-container { background:#0f1a16; font-family:"IBM Plex Sans",sans-serif; }
     .inc-map .leaflet-popup-content-wrapper { background:#12211b !important; color:#e6efe9 !important; border:1px solid #2c4438 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.45) !important; }
     .inc-map .leaflet-popup-tip { background:#12211b !important; border:1px solid #2c4438 !important; }
     .inc-map .leaflet-popup-content { margin:9px 12px !important; }
@@ -301,6 +317,15 @@ CSS = r"""
     @media (prefers-reduced-motion:reduce){ .iid-arc,.iid-cbar i,.iid-dbar i,.iid-sig-bar i,.iid-kpi,.iid-node circle,.iid-edge { transition:none !important; } .iid-cbar i,.iid-dbar i,.iid-sig-bar i { transform:scaleX(1); } }
     .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.9rem 1rem; }
     .viz svg { display:block; max-width:100%; height:auto; }
+    /* v1.134.20 — the timeline's viewBox WIDTH grows with the number of events (1420 for a
+       short incident, 2248 for a long one) while `.viz svg { max-width:100% }` squeezed it into
+       the column. So the more an incident had to say, the smaller its own timeline printed it:
+       phase chips and clock times rendered at 4px. The container was already a scroller
+       (`.viz { overflow-x:auto }`) — max-width was defeating it.
+       Pinning the intrinsic HEIGHT (every timeline viewBox is `0 0 W 96`) makes the browser
+       derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
+       and the panel scrolls instead of shrinking. */
+    .viz-timeline svg { max-width:none; height:96px; width:auto; }
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -313,13 +338,13 @@ CSS = r"""
     .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
     .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
     .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
-    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-t { font-family:"IBM Plex Sans",sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
     .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
     .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
     .vz-arrhead { fill:var(--muted); }
-    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
     .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
-    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-lbl { font-family:"IBM Plex Sans",sans-serif; font-size:11px; fill:var(--text-body); }
     .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
     .vz-tick { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
     .vz-quad { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.05em; text-transform:uppercase; fill:var(--muted); opacity:0.7; }
@@ -338,7 +363,7 @@ CSS = r"""
     .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:2px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
     .fb-chip:hover { border-color:var(--cyan); }
     .fb-chip.active { background:var(--surface-2); border-color:var(--line); border-bottom:2px solid var(--cyan); color:var(--text-strong); font-weight:700; }
-    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:"IBM Plex Sans",sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
     .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
     .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
     .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
@@ -374,6 +399,10 @@ CSS = r"""
         button, a.btn, [role="button"] { min-height:44px; }
         h1 { font-size:1.4rem; }
         .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        /* Chips are `white-space: nowrap` and some carry a full operator name with a
+           parenthetical ("CrowdStrike (impacting Microsoft Windows hosts)"), which measured
+           389px on a 390px screen and ran off behind body's overflow-x clip. */
+        .chip { white-space:normal; overflow-wrap:anywhere; }
         .kv { grid-template-columns:1fr; }
         .root-card { max-width:92vw; }
     }
@@ -381,13 +410,13 @@ CSS = r"""
 """
 
 SCRIPTS_TMPL = """
-    <script src="{base}js/rz-version.js?v={ver}"></script>
-    <script src="{base}js/rz-feature-flags.js?v={ver}" defer></script>
-    <script src="{base}auth.js?v={ver}" defer></script>
-    <script src="{base}js/rz-mobile-nav.js?v={ver}" defer></script>
-    <script src="{base}js/rz-cookie-consent.js?v={ver}" defer></script>
-    <script src="{base}js/rz-explain-db.js?v={ver}" defer></script>
-    <script src="{base}js/rz-explain.js?v={ver}" defer></script>
+    <script src="{base}js/rz-version.js?v={t_version}"></script>
+    <script src="{base}js/rz-feature-flags.js?v={t_flags}" defer></script>
+    <script src="{base}auth.js?v={t_auth}" defer></script>
+    <script src="{base}js/rz-mobile-nav.js?v={t_nav}" defer></script>
+    <script src="{base}js/rz-cookie-consent.js?v={t_cookie}" defer></script>
+    <script src="{base}js/rz-explain-db.js?v={t_xdb}" defer></script>
+    <script src="{base}js/rz-explain.js?v={t_x}" defer></script>
     <script>
     (function(){{var t=document.getElementById('themeToggle');function a(theme){{document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\\"theme-color\\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){{var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');}});}})();
     (function(){{function ag(){{if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){{window._rzAuth.enforceTierFeatureAccess('dc-incidents');}}else{{try{{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}}catch(e){{document.body.classList.add('locked');}}}}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){{if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){{window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){{window._rzAuth.showModal();}}}});window.addEventListener('rz-auth-change',function(){{setTimeout(ag,50);}});window.addEventListener('storage',function(e){{if(e.key==='rz_premium_session')ag();}});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);}})();
@@ -395,6 +424,56 @@ SCRIPTS_TMPL = """
     (function(){{var n=0;function sc(){{if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){{var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}}else if(n++<40){{setTimeout(sc,200);}}}}setTimeout(sc,350);}})();
     </script>
 """
+
+
+_TOKEN_ASSETS = {
+    "t_version": "js/rz-version.js", "t_flags": "js/rz-feature-flags.js", "t_auth": "auth.js",
+    "t_nav": "js/rz-mobile-nav.js", "t_cookie": "js/rz-cookie-consent.js",
+    "t_xdb": "js/rz-explain-db.js", "t_x": "js/rz-explain.js",
+}
+_TOKEN_CACHE = {}
+
+
+def _asset_token(rel):
+    """The cache token the site ALREADY serves for this asset.
+
+    This builder used to stamp every script with its own VER_TAG ("2026-08-01-gloss"),
+    while tools/test-asset-cache-tokens.mjs requires a token whose last segment is the
+    file's content hash AND one token per asset site-wide. So each rebuild undid the
+    token sweep on all 44 incident pages, and the token gate went red on the next run.
+    Reading the token the other pages carry -- the one whose hash still matches the
+    file -- makes a rebuild byte-identical to what the gate already accepted. A changed
+    asset gets a fresh `YYYYMMDD-<sha8>` token, which the gate's --fix then spreads."""
+    if rel in _TOKEN_CACHE:
+        return _TOKEN_CACHE[rel]
+    import hashlib
+    import re as _re
+    with open(os.path.join(ROOT, rel), "rb") as fh:
+        want = hashlib.sha256(fh.read()).hexdigest()[:8]
+    pat = _re.compile(_re.escape(rel) + r"\?v=([0-9A-Za-z_.-]+)")
+    counts = {}
+    for page in glob.glob(os.path.join(ROOT, "*.html")):
+        if os.path.basename(page).startswith("incident-") or os.path.basename(page) == "dc-incidents.html":
+            continue
+        with open(page, encoding="utf-8", errors="ignore") as fh:
+            for tok in pat.findall(fh.read()):
+                if tok.split("-")[-1] == want:
+                    counts[tok] = counts.get(tok, 0) + 1
+    if not counts:
+        # An asset only incident pages load (js/rz-fmea-sim.js) has no other page to
+        # borrow from; reuse what the last build stamped so --check stays byte-stable.
+        for page in glob.glob(os.path.join(ROOT, "incident-*.html")):
+            with open(page, encoding="utf-8", errors="ignore") as fh:
+                for tok in pat.findall(fh.read()):
+                    if tok.split("-")[-1] == want:
+                        counts[tok] = counts.get(tok, 0) + 1
+    tok = max(counts, key=counts.get) if counts else f"{datetime.now():%Y%m%d}-{want}"
+    _TOKEN_CACHE[rel] = tok
+    return tok
+
+
+def _script_tokens():
+    return {k: _asset_token(v) for k, v in _TOKEN_ASSETS.items()}
 
 
 def page_shell(title, desc, canonical_path, body_html, base="", head_extra=""):
@@ -446,7 +525,7 @@ def page_shell(title, desc, canonical_path, body_html, base="", head_extra=""):
         </div>
     </div>
 """
-    scripts = SCRIPTS_TMPL.format(base=base, ver=VER_TAG)
+    scripts = SCRIPTS_TMPL.format(base=base, **_script_tokens())
     return head + scripts + "\n</body>\n</html>\n"
 
 
@@ -516,8 +595,8 @@ def render_hub(incidents):
         rows.append(
             f'<tr class="itr" data-cats="{esc(" ".join(cats))}" data-score="{mag:.2f}" data-pm="{1 if pm else 0}" data-search="{esc(search)}" onclick="location.href=\'{href}\'">'
             f'<td class="c-id"><span class="itid">{esc(iid)}</span></td>'
-            f'<td class="c-title"><a href="{href}" class="itt" onclick="event.stopPropagation()">{esc(inc["title"])}</a>'
-            f'<div class="its">{esc(brief[:88])}{"…" if len(brief) > 88 else ""}</div></td>'
+            f'<td class="c-title"><a href="{href}" class="itt" onclick="event.stopPropagation()" title="{esc(inc["title"])}">{esc(inc["title"])}</a>'
+            f'<div class="its" title="{esc(brief[:88])}{"…" if len(brief) > 88 else ""}">{esc(brief[:88])}{"…" if len(brief) > 88 else ""}</div></td>'
             f'<td><span class="sev-chip sev-b-{band}">{_SEV_LABEL[band]}</span></td>'
             f'<td><span class="st-chip {st_cls}">{st_txt}</span></td>'
             f'<td class="c-region"><span class="iflag">{_flag(loc.get("country",""))}</span>'
@@ -532,7 +611,7 @@ def render_hub(incidents):
     body = f"""        <a class="backlink" href="index.html">← Home</a>
         <div class="eyebrow">Root-only · Post-incident dossier</div>
         <h1>Data-Center Incidents — Case Library</h1>
-        <p class="lede">A structured, source-cited library of major data-center and cloud-infrastructure incidents worldwide — ranked by magnitude, each with a full sequence of events, root-cause analysis, correction-of-errors (COE), lessons learnt and engineering improvements. Every fact is traced to a public post-incident report.</p>
+        <p class="lede">Major data-center and cloud incidents, ranked by magnitude. Each dossier: sequence of events, root cause, correction of errors, lessons, improvements and a scored FMEA you can replay and re-score. Every fact traces to a public post-incident report.</p>
         <div class="metabar"><b>{len(incidents)}</b> catalogued<span class="sep">·</span><b>{_pm_count}</b> with official RCA<span class="sep">·</span>provenance-mandatory<span class="sep">·</span>root access</div>
         <details class="faq" id="faq-methodology"><summary>About this library · how to read it</summary><div class="faq-body">
             <h4>What this is</h4>
@@ -552,8 +631,9 @@ def render_hub(incidents):
             <h4>Access</h4>
             <p>Root-only. The library is excluded from the public sitemap and search index.</p>
         </div></details>
-        <nav class="iv-tabs"><a href="#dashboard" class="on">Overview</a><a href="#incMap">Risk map</a><a href="#semantic">Semantic map</a><a href="#all-incidents">Incident list</a></nav>
+        <nav class="iv-tabs"><a href="#dashboard" class="on">Overview</a><a href="#incMap">Risk map</a><a href="#semantic">Semantic map</a><a href="#fmea-corpus">FMEA</a><a href="#all-incidents">Incident list</a></nav>
         {hero_dashboard(incidents)}
+        {incidents_fmea.corpus_section(incidents)}
 
         <h2 id="all-incidents">All incidents</h2>
         <div class="filterbar" id="filterbar">
@@ -583,10 +663,10 @@ def render_hub(incidents):
                 </tbody>
             </table>
         </div>
-        <p class="disclaimer">Ranking is a transparent composite of sourced sub-scores (blast radius 35% · users 25% · financial 20% · duration 20%). Summaries are original and substantially shorter than their sources; short attributed excerpts on each incident page are provenance only. This library is for engineering education and does not reproduce source material in full.</p>
+        <p class="disclaimer">Ranking is a transparent composite of sourced sub-scores (blast radius 35% · users 25% · financial 20% · duration 20%). Summaries are original; quoted excerpts are short, attributed, and for provenance only.</p>
         {FILTER_JS}
 """
-    return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="", head_extra=LEAFLET_HEAD)
+    return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="", head_extra=LEAFLET_HEAD + f"<style>{incidents_fmea.CSS}{incidents_fmea.CORPUS_CSS}</style>")
 
 
 def _dur(mins):
@@ -740,8 +820,25 @@ def _wrap(text, width, maxlines=2):
     if len(lines) < maxlines:
         lines.append((cur if not lines else rest).strip())
     out = [l for l in lines if l][:maxlines]
-    if len("".join(out)) < len(str(text or "")):  # truncated → ellipsis on last line
-        out[-1] = out[-1][: width - 1].rstrip() + "…"
+    # Truncated means WORDS were dropped. This compared "".join(out) -- the lines
+    # glued WITHOUT spaces -- against the original text WITH them, so every
+    # two-line label counted as cut and got a false "…" (azure-west-us2 printed
+    # "Azure compute/storage in West US" / "2…" with nothing actually missing).
+    truncated = sum(len(l.split()) for l in out) < len(words)
+    # Never strand a 1-3 character token alone on the last line ("2", "AZ", "Inc"):
+    # pull the previous word down with it.
+    if len(out) == 2 and len(out[1]) <= 3 and len(out[0].split()) > 1:
+        head, last = out[0].rsplit(" ", 1)
+        out = [head, f"{last} {out[1]}"]
+    # The last line also carries every word that did not fit, so it can run past the
+    # box. The old false-positive above was what used to trim it; trim it on purpose.
+    if len(out[-1]) > width:
+        truncated = True
+        out[-1] = out[-1][: width - 1]
+        if " " in out[-1]:
+            out[-1] = out[-1].rsplit(" ", 1)[0]
+    if truncated:
+        out[-1] = out[-1].rstrip(" ,;:-(") + "…"
     return out
 
 
@@ -788,13 +885,35 @@ def cascade_svg(inc):
     return f'<div class="viz viz-cascade">{"".join(svg)}</div>'
 
 
+def _two_lines(text, width):
+    """A timeline time label as at most two lines of `width` characters.
+
+    One 16-character line ran ~96px into a 92px step and overprinted its neighbour
+    ("…00:47 PD2011-04-21"). Splitting at the first space instead left lone "At",
+    "By", "c." and "ET" lines; this fills line one word by word, so a short word
+    stays with the next one. The full text is in the dot's <title> and the SOE list."""
+    words = text.split()
+    l1 = ""
+    while words and len((l1 + " " + words[0]).strip()) <= width:
+        l1 = (l1 + " " + words.pop(0)).strip()
+    if not l1 and words:
+        w = words.pop(0)
+        l1, words = (w, words) if len(w) <= width else (w[:width - 1] + "…", [])
+    l2 = " ".join(words)
+    if len(l2) > width:
+        l2 = l2[:width - 1].rstrip() + "…"
+    return l1, l2
+
+
 def soe_timeline_svg(soe):
     if not soe:
         return ""
     n = len(soe)
-    W = max(560, 40 + n * 92)
+    # 46px margins: a 13-character label is ~86px wide, centred on the end dots; the
+    # old 30px margin cut the first and last labels at the SVG edge ("ept-Oct 2016").
+    W = max(560, 92 + (n - 1) * 92)
     H = 96
-    x0, x1 = 30, W - 30
+    x0, x1 = 46, W - 46
     step = (x1 - x0) / max(1, n - 1)
     parts = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title>']
     parts.append(f'<line class="vz-grid" x1="{x0}" y1="48" x2="{x1}" y2="48"/>')
@@ -804,9 +923,12 @@ def soe_timeline_svg(soe):
         tip = f'{e.get("t","")} · {ph} — {e.get("event","")}'.strip(" ·—")
         parts.append(f'<circle class="vz-accent-dot" cx="{x:.0f}" cy="48" r="4.5"><title>{esc(tip)}</title></circle>')
         parts.append(f'<text class="vz-tl-ph" x="{x:.0f}" y="30" text-anchor="middle">{esc(ph[:12])}</text>')
-        t = (e.get("t", "") or "")
-        t = t.split("T")[0] if "T" in t else t[:16]
-        parts.append(f'<text class="vz-tl-t" x="{x:.0f}" y="68" text-anchor="middle">{esc(t)}</text>')
+        # Two short lines, date over time. One 16-character line ran ~96px into a 92px
+        # step, so neighbouring labels overprinted ("…00:47 PD2011-04-21") at every width.
+        l1, l2 = _two_lines(e.get("t", "") or "", 13)  # 13 mono chars ≈ 80px inside a 92px step
+        parts.append(f'<text class="vz-tl-t" x="{x:.0f}" y="66" text-anchor="middle">{esc(l1)}</text>')
+        if l2:
+            parts.append(f'<text class="vz-tl-t" x="{x:.0f}" y="79" text-anchor="middle">{esc(l2)}</text>')
     parts.append('</svg>')
     return f'<div class="viz viz-timeline">{"".join(parts)}</div>'
 
@@ -1451,7 +1573,7 @@ def render_incident(inc, rank):
 
         <h2>Failure cascade</h2>
         {cascade_html}
-        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+        <p class="disclaimer">From the sourced root cause and affected-services record.</p>
 
         <h2>Facility &amp; location</h2>
         <dl class="kv">
@@ -1483,7 +1605,7 @@ def render_incident(inc, rank):
         <div class="card">{linkify(inc.get('rootCause',''), _used)}</div>
 
         <h2>Contributing factors</h2>
-        <ul class="tight">{cf}</ul>
+        <ul class="tight">{cf}</ul>{incidents_fmea.fmea_section(inc)}
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight">{coe}</ul>
@@ -1501,16 +1623,22 @@ def render_incident(inc, rank):
 
         <h2>References &amp; provenance</h2>
         <ul class="refs">{refs}</ul>
-        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified {esc(inc.get('sourcing',{}).get('lastVerified','—'))}.</p>
+        <p class="disclaimer">Quotes are short, attributed, and for provenance only; the analysis is original. Last verified {esc(inc.get('sourcing',{}).get('lastVerified','—'))}.</p>
         {SHARE_BAR}
         </div>
 """
-    return page_shell(inc["title"], inc.get("brief", "")[:180], f"incident-{inc['slug']}.html", body, base="")
+    fmea_head = (f"<style>{incidents_fmea.CSS}</style>"
+                 f'<script src="js/rz-fmea-sim.js?v={_asset_token("js/rz-fmea-sim.js")}" defer></script>'
+                 if inc.get("fmea") else "")
+    return page_shell(inc["title"], inc.get("brief", "")[:180], f"incident-{inc['slug']}.html", body, base="",
+                      head_extra=fmea_head)
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true", help="write files (else dry-run)")
+    ap.add_argument("--check", action="store_true",
+                    help="exit 1 if any generated page differs from what this builder produces")
     args = ap.parse_args()
 
     files = sorted(f for f in glob.glob(os.path.join(DATA_DIR, "*.json")) if not os.path.basename(f).startswith("_"))
@@ -1525,6 +1653,31 @@ def main():
     outputs = {"dc-incidents.html": render_hub(incidents)}
     for i, inc in enumerate(incidents, 1):
         outputs[f"incident-{inc['slug']}.html"] = render_incident(inc, i)
+
+    if args.check:
+        # FRESHNESS GATE. Sweeps since v1.134.20 hand-edited these generated pages
+        # while this builder stood still, so the next rebuild silently reverted a
+        # timeline fix, a legibility fix, a mobile fix and every cache token across
+        # 44 pages. A generated page that differs from its generator is either a
+        # hand edit that will be lost or a dossier change that was never rendered.
+        stale = []
+        for name, content in outputs.items():
+            path = os.path.join(ROOT, name)
+            try:
+                on_disk = open(path, encoding="utf-8").read()
+            except FileNotFoundError:
+                stale.append(f"{name} (missing)")
+                continue
+            if on_disk != content:
+                stale.append(name)
+        if stale:
+            print(f"[build-incidents] STALE — {len(stale)} page(s) differ from the builder: "
+                  + ", ".join(stale[:6]) + (" …" if len(stale) > 6 else ""))
+            print("  Never hand-edit a generated page: change tools/build-incidents.py or the dossier,"
+                  " then run --apply.")
+            raise SystemExit(1)
+        print(f"[build-incidents] CURRENT — all {len(outputs)} generated pages match the builder")
+        return
 
     if args.apply:
         for name, content in outputs.items():

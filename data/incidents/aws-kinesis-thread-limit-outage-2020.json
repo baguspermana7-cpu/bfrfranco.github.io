@@ -286,5 +286,292 @@
   "confidence": "High for root cause, timeline anchors, and action items (all single-sourced and directly quoted from the official AWS post-event summary). Lower / unknown for magnitude: AWS publishes no per-service failed-request counts, dollar cost, or affected-user figures for this event, and no independent third-party monitoring timeline was retrievable to corroborate AWS's start/end times."
  },
  "lastUpdated": "2026-07-31",
- "operatorShort": "AWS"
+ "operatorShort": "AWS",
+ "fmea": {
+  "scope": "The Amazon Kinesis Data Streams front-end fleet in US-EAST-1 — its shard-map coordination design and OS thread limit, the capacity-addition change that triggered the breach, the alarming on that fleet, its fault-domain boundary and cold-restart path, and the AWS services that buffer data through Kinesis. Analysed retrospectively from the official AWS post-event summary held in this dossier. Every corrective action is recorded as committed by AWS; none is recorded as completed, so each revised score is a claim about the action, not a confirmed outcome.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Front-end shard-map coordination and OS thread limit",
+    "function": "Build each front-end server's shard-map so it can authenticate, throttle and route requests to the right back-end shards",
+    "failureMode": "Per-server thread demand crosses the OS-configured maximum on every server at once after a small capacity addition, and shard-map construction fails",
+    "effect": "Front-end servers end up with useless shard-maps and cannot route; Kinesis errors and slows across US-EAST-1 for about 18.5 hours from the breach",
+    "cause": "Each front-end server creates one OS thread per peer, so thread count grows in proportion to fleet size, against an OS thread limit not dimensioned for that growth",
+    "prevention": "None recorded; the limit had never been checked against the fleet's growth",
+    "detection": "None at the breach; the first alarm was on Kinesis error rates about 88 minutes later",
+    "S": 9,
+    "O": 7,
+    "D": 8,
+    "rationale": {
+     "S": "Region-wide outage of a foundational data service that at least six other AWS services depend on, with no customer workaround: the rubric's 9. Not 10: one region, no hazard to people.",
+     "O": "Adding capacity is routine work, and with thread count tied to fleet size every addition moved the fleet toward the ceiling; scored just under 'frequent' because the ceiling is only crossed once the fleet is large enough.",
+     "D": "Nothing checked thread headroom before or during the capacity addition; the breach was seen only through Kinesis error-rate alarms after impact, 'detected after impact by internal monitoring'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 1
+     },
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "metric",
+      "i": 6
+     },
+     {
+      "src": "rootCause",
+      "quote": "the total threads each server must maintain is directly proportional to the number of servers in the fleet"
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "exceed the maximum number of threads allowed by an operating system configuration"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Move the front-end fleet to larger CPU and memory servers, cutting the number of servers and so the per-server thread count",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Raise the OS thread-count limit once it has been load tested",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 3,
+     "D": 8
+    },
+    "revisedRationale": "Fewer, larger servers shrink the fleet size that drives thread count, and a tested higher limit adds headroom, so a routine capacity addition should no longer reach the ceiling (O 7→3). The O(N) coupling itself remains, so severity and detection are unchanged. Both actions are recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-02",
+    "item": "Front-end fleet alarming",
+    "function": "Warn operators before the fleet runs out of the resource it is about to exhaust",
+    "failureMode": "No alarm exists on thread consumption, so the first signal is downstream error rates and the cause takes hours to identify",
+    "effect": "First alarm 1 h 28 min after the breach; root cause confirmed 5 h 52 min after the breach, delaying the start of recovery",
+    "cause": "Monitoring covered the symptom (Kinesis error rates) but not the limiting resource (thread count against the OS limit)",
+    "prevention": "None recorded",
+    "detection": "Automated alarms on elevated Kinesis error rates at 05:15 AM PST",
+    "S": 7,
+    "O": 7,
+    "D": 8,
+    "rationale": {
+     "S": "This mode lengthens the outage by delaying diagnosis rather than causing it; hours of added delay on a major service is scored as 'major degradation', below FM-01 so the same outage is not counted twice at full weight.",
+     "O": "The missing alarm was a standing condition, present for any approach to the thread limit.",
+     "D": "Internal monitoring did fire, but only on the symptom and after impact: the rubric's 8."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "metric",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "factor",
+      "i": 1
+     }
+    ],
+    "actions": [
+     {
+      "text": "Add fine-grained alarming for thread consumption",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 7,
+     "D": 4
+    },
+    "revisedRationale": "An alarm on the limiting resource would show the fleet approaching the ceiling with time to act (D 8→4). It does not remove the condition, so O is unchanged. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-03",
+    "item": "Front-end fleet fault domain",
+    "function": "Confine a resource exhaustion to part of the fleet",
+    "failureMode": "The front-end fleet is not cellularized, so the thread-limit breach reaches every server at the same moment",
+    "effect": "Routing fails fleet-wide rather than for a fraction of streams",
+    "cause": "Front-end fleet not partitioned into cells, unlike the back-end",
+    "prevention": "None recorded for the front end; the back end was already cellularized",
+    "detection": "Error-rate alarms at onset of customer impact",
+    "S": 9,
+    "O": 3,
+    "D": 6,
+    "rationale": {
+     "S": "The single fault domain is what makes the breach region-wide for Kinesis, so it carries FM-01's severity.",
+     "O": "Losing the whole fleet needs a fleet-wide trigger such as FM-01's breach first, an unusual combination; held low so the event is not double-counted.",
+     "D": "The fleet-wide failure was visible to monitoring once impact began, but nothing in the architecture contained it: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "rootCause",
+      "quote": "the front-end fleet was not cellularized"
+     },
+     {
+      "src": "tech",
+      "quote": "cellularization \"to isolate the effects of failure within a service,\""
+     }
+    ],
+    "actions": [
+     {
+      "text": "Greatly accelerate cellularization of the front-end fleet to match the back-end",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 3,
+     "D": 6
+    },
+    "revisedRationale": "With cells, a breach of this kind would stop one cell rather than the fleet (S 9→6). Recorded as committed (medium-term), not completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-04",
+    "item": "Front-end cold-restart path",
+    "function": "Bring the whole front-end fleet back into service quickly after a fleet-wide failure",
+    "failureMode": "Restart throughput is capped at a few hundred servers per hour, because shard-map rebuild is metadata-heavy and a faster restart would re-trigger the failure",
+    "effect": "Recovery span of 12 h 16 min from first restart (10:07 AM) to full Kinesis recovery (10:23 PM PST)",
+    "cause": "Expensive shard-map construction at fleet scale, membership propagation of up to an hour, and an OS limit that could not be raised mid-incident without further testing",
+    "prevention": "None recorded",
+    "detection": "None before the incident; the restart rate was learned during it",
+    "S": 8,
+    "O": 7,
+    "D": 9,
+    "rationale": {
+     "S": "This mode sets the duration of the outage: hours of full outage of a major service is the rubric's 8.",
+     "O": "Whenever a fleet-wide restart is needed the cap applies; the condition was present the whole time.",
+     "D": "Nothing in the dossier shows the restart rate had been measured before the incident needed it."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "metric",
+      "i": 3
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "factor",
+      "i": 4
+     }
+    ],
+    "actions": [
+     {
+      "text": "Radically improve cold-start time for the front-end fleet",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 4,
+     "D": 9
+    },
+    "revisedRationale": "A faster cold start makes a throttled, hours-long restart less likely to set the outage duration (O 7→4). Severity is held at 8 because the dossier gives no target restart time. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-05",
+    "item": "AWS services that buffer data through Kinesis (Cognito, Lambda, CloudWatch, EventBridge)",
+    "function": "Keep serving their own requests while Kinesis is impaired",
+    "failureMode": "Buffers toward Kinesis back up with no back-pressure ceiling, so dependents block or exhaust host memory and fail in turn",
+    "effect": "Cognito authentication fails until 2:18 PM; Lambda error rates rise from host memory contention; CloudWatch PutMetricData and PutLogEvents error until 10:31 PM; EventBridge delays stall ECS and EKS cluster provisioning and scaling",
+    "cause": "Unbounded buffering toward Kinesis in dependent services, with no recorded degraded mode",
+    "prevention": "None recorded",
+    "detection": "Error rates in each dependent service after Kinesis impact began",
+    "S": 8,
+    "O": 3,
+    "D": 8,
+    "rationale": {
+     "S": "Turns one service's outage into a multi-service regional outage lasting hours: the rubric's 8. Not 9, because the region-wide Kinesis outage itself is scored in FM-01.",
+     "O": "Needs Kinesis to be impaired first, which is infrequent.",
+     "D": "The dependent failures were seen and mitigated by AWS engineers only after they produced error rates: 'detected after impact by internal monitoring'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "soe",
+      "i": 9
+     },
+     {
+      "src": "metric",
+      "i": 7
+     },
+     {
+      "src": "factor",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "Add back-pressure and graceful degradation so a Kinesis backlog no longer blocks webservers or exhausts host memory",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "text": "Cognito webservers tolerate Kinesis errors without exhausting buffers; CloudWatch persists 3 hours of metrics locally",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 3,
+     "D": 8
+    },
+    "revisedRationale": "If dependents degrade instead of failing, a Kinesis outage stays confined to Kinesis and its direct users (S 8→6). The COE item is recorded as 'Committed / implied by remediation' and the improvement names only Cognito and CloudWatch, not Lambda or EventBridge, so the reduction is a claim about the action, not a confirmed outcome."
+   }
+  ]
+ }
 }

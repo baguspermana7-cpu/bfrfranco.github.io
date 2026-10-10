@@ -284,5 +284,261 @@
   "officialPostmortem": true,
   "lastVerified": "2026-08-02 (seed — pending deep research)"
  },
- "lastUpdated": "2026-08-02"
+ "lastUpdated": "2026-08-02",
+ "fmea": {
+  "scope": "AT&T Mobility's production wireless core during a capacity-expansion change: the change-approval and peer-review gate, lab and post-installation testing, the downstream elements' mitigating controls and the automated Protection Mode shutdown, the device re-registration path on recovery, and the 911, Wireless Priority Service and FirstNet public-safety paths. Analysed retrospectively from the FCC Public Safety and Homeland Security Bureau report (DOC-404150A1) as quoted in this dossier; the dossier's sourcing is marked as a seed pending deep research, and no element make, vendor or function is disclosed. Several corrective items are FCC recommendations that the dossier does not record AT&T adopting; those modes carry no revised score.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Change-approval and peer-review gate",
+    "function": "Stop a production change to the wireless core from being loaded until the required peer review is complete",
+    "failureMode": "A new network element whose configuration did not conform to procedure is loaded into production without the required peer review",
+    "effect": "The misconfiguration propagates downstream and triggers a nationwide Protection Mode shutdown three minutes later; more than 125 million devices lose voice and 5G data for at least twelve hours",
+    "cause": "Peer review was required by procedure but was not enforced as a gate, so maintenance could proceed without confirmation that it had happened",
+    "prevention": "Design and installment procedures requiring peer review (not enforced)",
+    "detection": "None before load; the error was found through the automated shutdown it caused",
+    "S": 10,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "More than 25,000 calls to 911/PSAPs were blocked and no 911 call from an AT&T-served device could be routed while voice was down: a hazard to people, the rubric's 10.",
+     "O": "A capacity change in a routine night maintenance window, governed by a procedure that nothing enforced: 'occasional, weakly guarded'.",
+     "D": "Nothing caught the missing review before the element went live; the fault was seen only as the automated protective trip that took the network down, which is detection after impact."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "which require peer review"
+     },
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "rootCause",
+      "quote": "Adequate peer review should have prevented the network change from being approved"
+     },
+     {
+      "src": "metric",
+      "i": 0
+     }
+    ],
+    "actions": [
+     {
+      "text": "Add peer-review steps and procedures so maintenance cannot proceed without confirmation that required peer reviews are complete",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 10,
+     "O": 3,
+     "D": 8
+    },
+    "revisedRationale": "Maintenance can no longer start without confirmed peer review, so an unreviewed change can no longer reach production (O 6→3). It is not 2: a reviewed change can still carry a misconfiguration that review misses, as lab testing also missed this one. Detection is unchanged because a misconfiguration that passes review would still be found by the protective trip. Severity is unchanged. The FCC report records this action as implemented."
+   },
+   {
+    "id": "FM-02",
+    "item": "Lab and post-installation testing",
+    "function": "Detect a misconfigured element, and its network-wide impact, before and immediately after it is committed",
+    "failureMode": "Lab testing and post-installation testing in the maintenance window do not reveal the improper configuration or its potential impact",
+    "effect": "The misconfigured element reaches production and runs until it trips Protection Mode",
+    "cause": "Testing that the FCC found inadequate, contrary to CSRIC Best Practice 13-10-0615",
+    "prevention": "Lab testing and post-installation testing as practised at the time",
+    "detection": "None effective; the improper configuration was not discovered by testing",
+    "S": 10,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "This is the second barrier on the same path to the 911 hazard, so it carries the same severity.",
+     "O": "A testing gap present for this class of change, but it only matters once a misconfiguration has also passed the review stage, so scored below FM-01 to avoid counting the event twice at full weight.",
+     "D": "The testing that existed did not find the fault; it surfaced only through the outage."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "rootCause",
+      "quote": "Lab testing by AT&T did not discover the improper configuration of the network element that caused the outage"
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-03",
+    "item": "Downstream elements' mitigating controls and Protection Mode",
+    "function": "Contain a propagating configuration error to the element that caused it",
+    "failureMode": "Downstream elements lack controls specific to the error, so the only available containment is an automated shutdown of all network connections",
+    "effect": "Protection Mode isolates all voice and 5G data processing elements from towers and switching, disconnecting every registered device, including FirstNet, across all 50 states, DC, Puerto Rico and the US Virgin Islands",
+    "cause": "All-or-nothing containment design with no ability to quarantine a single bad element",
+    "prevention": "Protection Mode (stopped propagation, at the cost of all service)",
+    "detection": "Automated and immediate: the protective trip fired three minutes after insertion",
+    "S": 10,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "This is the step that turned one bad element into a nationwide loss of voice, including 911 routing: hazard to people.",
+     "O": "A standing design condition that needs a propagating error to exercise it, which is an unusual combination: 'infrequent'.",
+     "D": "The automated response detected the propagation at onset and stopped it, but the stopping was itself the outage: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "soe",
+      "i": 4
+     },
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "rootCause",
+      "quote": "the downstream network element lacked controls specific to mitigating this error and therefore was unable to mitigate the effects"
+     },
+     {
+      "src": "metric",
+      "i": 8
+     }
+    ],
+    "actions": [
+     {
+      "text": "Scan the production network for elements lacking mitigating controls and add element-specific controls so a bad element can be quarantined instead of forcing a nationwide shutdown",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 4,
+     "D": 6
+    },
+    "revisedRationale": "With element-specific controls in place, the same class of error is meant to be quarantined at the element rather than disconnecting the country (S 10→6). The FCC report records the scan and controls as completed within 48 hours; the dossier records no later event that tested them, so the reduction is a claim about the controls, not an observed outcome. O and D are unchanged."
+   },
+   {
+    "id": "FM-04",
+    "item": "Device re-registration and network management capacity",
+    "function": "Let devices re-attach to the network in a controlled way after Protection Mode is lifted",
+    "failureMode": "All devices try to re-register simultaneously and the registration attempts far exceed what network management systems can handle",
+    "effect": "Widespread congestion delays device registration and prolongs the outage; full remediation of the congestion takes more than 10 hours after restoration",
+    "cause": "No plan or capacity for the re-registration storm that a Protection Mode recovery produces",
+    "prevention": "None recorded",
+    "detection": "None before the incident; the congestion was met during recovery",
+    "S": 9,
+    "O": 7,
+    "D": 8,
+    "rationale": {
+     "S": "This mode sets the duration of a nationwide outage of a foundational service rather than its start; scored 9 rather than 10 because the 911 hazard is carried by FM-01 and FM-03 and FirstNet infrastructure was restored first, by 05:00 CT.",
+     "O": "Whenever Protection Mode is lifted every device will retry at once; the condition was present the whole time.",
+     "D": "The FCC finds AT&T failed to prepare for the congestion; it was seen by AT&T's own systems as it happened, after impact."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 11
+     },
+     {
+      "src": "metric",
+      "i": 10
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "tech",
+      "quote": "failed to prepare for the registration congestion associated with the network recovering from Protection Mode"
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-05",
+    "item": "911 and priority public-safety calling path",
+    "function": "Route emergency and Wireless Priority Service calls while the core is impaired",
+    "failureMode": "No 911 call from an AT&T Mobility-served device can be routed to its PSAP while voice is disconnected, and priority calls also fail",
+    "effect": "More than 25,000 calls to 911/PSAPs blocked; Wireless Priority Service volume below two thirds of typical",
+    "cause": "911 calls could not be routed while voice services were disconnected; the dossier records no emergency path that survived the shutdown",
+    "prevention": "None recorded",
+    "detection": "Through blocked calls",
+    "S": 10,
+    "O": 3,
+    "D": 9,
+    "rationale": {
+     "S": "Blocked emergency calls are the direct hazard to people.",
+     "O": "Needs a loss of core voice first, which is infrequent; kept low so the single shutdown is not counted again at full weight.",
+     "D": "Seen only through calls that failed."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "metric",
+      "i": 9
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-06",
+    "item": "FirstNet and public-safety outage notification",
+    "function": "Tell public-safety users promptly that their network is down",
+    "failureMode": "FirstNet customer notification begins more than three hours after the outage started and nearly an hour after FirstNet was restored",
+    "effect": "Public-safety users operate for over three hours without notice from the carrier; the first public statement follows at 07:05 CT",
+    "cause": "Not stated in the dossier beyond the FCC's finding of a three-hour notification delay",
+    "prevention": "None recorded",
+    "detection": "None recorded",
+    "S": 7,
+    "O": 6,
+    "D": 9,
+    "rationale": {
+     "S": "It fails the communication rather than the service, but the audience is public safety during an outage that blocked 911 calls, so it is scored above the 6 used for a status-page failure.",
+     "O": "Present for any outage handled this way; no control recorded that would make it unusual: 'occasional'.",
+     "D": "No internal check on notification time is recorded; the delay was established afterwards by the regulator."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "metric",
+      "i": 7
+     },
+     {
+      "src": "soe",
+      "i": 13
+     }
+    ],
+    "actions": []
+   }
+  ]
+ }
 }

@@ -254,5 +254,337 @@
   "officialPostmortem": true,
   "lastVerified": "2026-08-02 (seed — pending deep research)"
  },
- "lastUpdated": "2026-08-02"
+ "lastUpdated": "2026-08-02",
+ "fmea": {
+  "scope": "The network-change path for Cloudflare's 19 Multi-Colo PoP (MCP) core data centers: the AGGREGATES-OUT BGP export policy on the MCP spine routers, the staggered rollout and pre-deploy validation around it, the site-local prefixes that carry both reachability and internal load balancing (Multimog), and the rollback and recovery path. Analysed retrospectively from Cloudflare's official post-mortem held in this dossier. The router vendor is not stated by Cloudflare (Juniper is only inferred from config syntax) and plays no part in the scoring. The monitoring signal that first flagged impact is not named in the source. Four corrective actions are recorded as committed with completion not confirmed; the single-controller reversion item is inferred, and the out-of-band access item carries no stated status.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "AGGREGATES-OUT BGP export policy (MCP spines)",
+    "function": "Advertise the site-local prefixes of each MCP location and reject everything else",
+    "failureMode": "A reorder moves the site-local advertisement terms below the REJECT-THE-REST catch-all, so first-match evaluation rejects and withdraws the site-local prefixes",
+    "effect": "All 19 MCP data centers go offline at 06:27 UTC; about 50% of Cloudflare's total requests cannot be served for about 75 minutes",
+    "cause": "Policy behaviour depends on implicit term order plus an explicit catch-all reject, so an edit that only changes order inverts what the policy does",
+    "prevention": "None recorded in the policy design",
+    "detection": "Incident declared at 06:32 UTC, about 5 minutes after onset; no pre-commit check is recorded",
+    "S": 8,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "Half of global request volume failed for over an hour. Scored 8: more than a degradation, but not 9 because the other 96% of sites kept serving and the outage lasted about 75 minutes rather than many hours.",
+     "O": "The change was part of routine resilience-upgrade work, and nothing in the policy guarded against a reorder: 'occasional, weakly guarded'.",
+     "D": "No validation caught the inverted policy before commit; the fault was recognised through its impact, with an incident declared five minutes in."
+    },
+    "evidence": [
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "the 4-ADV-SITE-LOCALS and 6-ADV-SITE-LOCALS terms moved from the top to the bottom"
+     },
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "factor",
+      "i": 4
+     }
+    ],
+    "actions": [
+     {
+      "text": "Redesign AGGREGATES-OUT so site-local advertisement no longer depends on term order relative to REJECT-THE-REST",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 2,
+     "D": 8
+    },
+    "revisedRationale": "If the policy no longer depends on order, a reorder can no longer withdraw the site-locals (O 6→2). Severity and detection are unchanged for any other policy error. Recorded as committed in the post-mortem, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-02",
+    "item": "Staggered rollout of network-configuration changes",
+    "function": "Expose a change to a small, representative set of sites first so a fault is caught at minimal blast radius",
+    "failureMode": "The stagger includes no MCP data center until the final step, so the change reaches all MCP spines at once",
+    "effect": "Two earlier stages (03:56 and 06:17 UTC) pass with zero impact and give false confidence; the final step takes down all 19 MCP sites together",
+    "cause": "Stagger scoped by site list rather than by architecture class; steps too coarse",
+    "prevention": "A stagger procedure existed",
+    "detection": "Earlier stages could not detect the fault because they did not exercise the MCP configuration",
+    "S": 8,
+    "O": 5,
+    "D": 8,
+    "rationale": {
+     "S": "The stagger gap is what let one error reach all 19 sites rather than one, so it carries the outage's severity.",
+     "O": "Present in every rollout that touches MCP spines, but it only matters when the change is faulty; between 'infrequent' and 'occasional'. Scored below FM-01 so the one event is not counted twice at full weight.",
+     "D": "The canary stages were blind to the MCP tier; the fault was seen only after the final step caused impact."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 0,
+      "quote": "the stagger policy did not include an MCP data center until the final step"
+     },
+     {
+      "src": "factor",
+      "i": 1,
+      "quote": "the steps weren't small enough to catch the error before it hit all of our spines"
+     },
+     {
+      "src": "metric",
+      "i": 8
+     },
+     {
+      "src": "soe",
+      "i": 1
+     }
+    ],
+    "actions": [
+     {
+      "text": "Automate an improved stagger policy that exercises an MCP data center early rather than only in the final step",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 5,
+     "O": 5,
+     "D": 4
+    },
+    "revisedRationale": "An MCP site early in the stagger would expose a fault of this class at one location with time to stop the rollout (D 8→4), bounding the effect to customer-visible degradation at that site (S 8→5); Cloudflare says this 'would have significantly lessened the overall impact'. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-03",
+    "item": "Pre-deploy validation for MCP-tier changes",
+    "function": "Test a network change against the MCP architecture before it is deployed there",
+    "failureMode": "The change pipeline has no MCP-specific test, so an edit that is inert elsewhere is not checked on the tier where it is destructive",
+    "effect": "The inverted export policy reaches production MCP spines unvalidated",
+    "cause": "Change procedures and automation without MCP-aware safeguards, although MCP spines shared one policy across the busiest sites",
+    "prevention": "None recorded",
+    "detection": "None before deployment",
+    "S": 8,
+    "O": 4,
+    "D": 8,
+    "rationale": {
+     "S": "Another route to the same outage; carried at the outage's severity.",
+     "O": "Kept at 'infrequent' because it overlaps FM-01 and FM-02: the missing test only matters for a faulty MCP-only change.",
+     "D": "No check existed between authoring and production; detection came through impact."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 2,
+      "quote": "need to include MCP-specific test and deploy procedures to ensure there are no unintended consequences"
+     },
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "rootCause",
+      "quote": "a single unvalidated edit to a shared policy could withdraw the busiest half of the network with no automatic backstop"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Add MCP-specific test and deploy procedures to change procedures and automation",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 4,
+     "D": 4
+    },
+    "revisedRationale": "An MCP-specific test would show the withdrawal before production (D 8→4). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-04",
+    "item": "Site-local prefixes and Multimog load balancing in MCP sites",
+    "function": "Keep each MCP site reachable from outside, able to reach origins, and able to forward requests between its servers",
+    "failureMode": "One prefix withdrawal removes inbound reachability, outbound reachability to origins and east-west forwarding together",
+    "effect": "Sites that are about 4% of the network carry about 50% of requests and lose all three paths at once; even surviving servers inside a site cannot be reached",
+    "cause": "Concentration of traffic on the MCP tier, and Multimog depending on the same site-local prefixes as external reachability",
+    "prevention": "None recorded",
+    "detection": "Seen through impact",
+    "S": 8,
+    "O": 3,
+    "D": 9,
+    "rationale": {
+     "S": "This coupling is why the withdrawal became a total loss of service at each site rather than a partial one.",
+     "O": "Needs the site-local prefixes to be withdrawn first, which is infrequent.",
+     "D": "No control is recorded that would show the coupling before an outage; it became visible as customer impact."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "tech",
+      "quote": "could no longer forward requests between the servers"
+     },
+     {
+      "src": "factor",
+      "i": 7,
+      "quote": "only 4% of our total network"
+     },
+     {
+      "src": "metric",
+      "i": 1
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-05",
+    "item": "Automated rollback of network configuration",
+    "function": "Revert a bad commit automatically if it is not confirmed",
+    "failureMode": "No commit-confirm auto-revert exists, so recovery is fully manual",
+    "effect": "Root cause is found at 06:58 UTC, about 31 minutes in, but final reverts complete only at 07:42 UTC",
+    "cause": "No timed auto-revert on network configuration commits",
+    "prevention": "None recorded",
+    "detection": "Not applicable before the incident; the gap mattered during recovery",
+    "S": 7,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "This mode sets the duration of the outage rather than its existence; about 75 minutes of a half-network outage is scored 7 so the outage is not counted again at FM-01's weight.",
+     "O": "The gap applies to every network configuration change, and no automated safeguard covered it: 'occasional'.",
+     "D": "Nothing recorded flagged the missing safety net before it was needed."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 3,
+      "quote": "would have greatly reduced the Time-to-Resolve"
+     },
+     {
+      "src": "metric",
+      "i": 7
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 12
+     }
+    ],
+    "actions": [
+     {
+      "text": "Implement automated commit-confirm rollback for network configuration changes",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 5,
+     "O": 6,
+     "D": 8
+    },
+    "revisedRationale": "A timed auto-revert would undo a bad commit without engineer access to the site, shortening a repeat of this outage to the revert timer (S 7→5). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-06",
+    "item": "Engineer access path to affected sites",
+    "function": "Let engineers reach the routers they must fix during a reachability failure",
+    "failureMode": "Direct access depends on the site-local prefixes the fault withdrew, so engineers are locked out of the sites they need to fix",
+    "effect": "Engineers fall back to backup take-control procedures, slowing reversion",
+    "cause": "Recovery access shares a failure domain with the routes being changed",
+    "prevention": "Backup take-control procedures",
+    "detection": "Found during the incident",
+    "S": 6,
+    "O": 4,
+    "D": 8,
+    "rationale": {
+     "S": "It lengthens recovery rather than causing the outage, and backup procedures still worked; scored 6 to avoid counting the same minutes again at FM-05's weight.",
+     "O": "Needs a reachability-removing change first, which is infrequent.",
+     "D": "The dependency was found when engineers tried to reach the sites, after impact."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 6,
+      "quote": "removed our direct access to all the impacted locations"
+     },
+     {
+      "src": "soe",
+      "i": 10
+     }
+    ],
+    "actions": [
+     {
+      "text": "Preserve an out-of-band management and recovery path that does not depend on site-local prefixes being advertised",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-07",
+    "item": "Manual emergency reversion",
+    "function": "Revert the change on all affected spines in one coordinated pass",
+    "failureMode": "Engineers overwrite each other's changes and revert previous reverts",
+    "effect": "The fault re-appears intermittently during reversion; final reverts slip to 07:42 UTC",
+    "cause": "No single controller for emergency changes",
+    "prevention": "None recorded",
+    "detection": "Seen during recovery as the fault re-appearing",
+    "S": 6,
+    "O": 5,
+    "D": 6,
+    "rationale": {
+     "S": "Extends a partial outage that is already scored elsewhere; confined to part of the recovery window.",
+     "O": "Several engineers working the same devices under pressure is a foreseeable condition with no recorded guard, between 'infrequent' and 'occasional'.",
+     "D": "The regression showed at once as the fault re-appearing, but nothing prevented it: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 5,
+      "quote": "network engineers walked over each other's changes, reverting the previous reverts"
+     },
+     {
+      "src": "soe",
+      "i": 11
+     }
+    ],
+    "actions": [
+     {
+      "text": "Single-controller coordination for emergency reversions (inferred remediation, not a formal commitment)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ]
+   }
+  ]
+ }
 }

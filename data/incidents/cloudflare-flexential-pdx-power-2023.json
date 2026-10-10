@@ -310,5 +310,388 @@
   "confidence": "high"
  },
  "lastUpdated": "2026-08-01",
- "operatorShort": "Cloudflare"
+ "operatorShort": "Cloudflare",
+ "fmea": {
+  "scope": "Two linked systems: the power chain at Flexential PDX-04 (utility feeds, ground-fault protection and generator coordination, UPS ride-through, manual generator restart, tenant circuit breakers, facility-to-tenant notification) and Cloudflare's control plane and analytics that depended on it (single-site Kafka and ClickHouse, failover to other sites). Analysed retrospectively from Cloudflare's official post-mortem, which is one party's account: Cloudflare could not get Flexential or PGE confirmation on the faulted transformer, does not know whether its breakers were faulty before the event, inferred UPS depletion from its own failing equipment, and labels the staffing account unconfirmed. Facility-side corrective actions are not independently verified, so no revised score is claimed for the facility modes; only Cloudflare's own committed actions carry one.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "12,470 V ground-fault protection and generator coordination",
+    "function": "Clear a utility-side transformer fault while the on-site generators keep carrying the facility",
+    "failureMode": "The protective trip that clears the ground fault also shuts down all ten generators",
+    "effect": "With one utility feed already lost since 08:50 UTC, PDX-04 loses its remaining feed and all on-site generation together and runs on UPS batteries alone",
+    "cause": "Protection not selective enough to isolate the faulted section without de-energising standby generation (an engineering interpretation of Cloudflare's facts, not a Flexential admission), acting on a facility already degraded to generators plus one feed",
+    "prevention": "Two independent utility feeds; 10 generators rated to carry the facility at full load",
+    "detection": "Grid protection relays detected the fault; nothing recorded flagged that the trip would take the generators with it",
+    "S": 9,
+    "O": 4,
+    "D": 8,
+    "rationale": {
+     "S": "This step takes the whole facility to battery and, within minutes, to total power loss for every customer: the rubric's 9 for a facility-wide outage. Not 10: the facility was re-energised the same day and no hazard to people is recorded.",
+     "O": "It needed an unusual combination, a utility feed already out for maintenance and then a ground fault on the remaining feed's transformer: 'infrequent'.",
+     "D": "The relays saw the fault at once, but the generator trip was not anticipated by any recorded check; Cloudflare learned of it when its routers went offline, so 'detected after impact'."
+    },
+    "evidence": [
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "the protective measure also shut down all of PDX-04's generators"
+     },
+     {
+      "src": "soe",
+      "i": 4
+     },
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "metric",
+      "i": 3
+     },
+     {
+      "src": "factor",
+      "i": 1,
+      "quote": "engineering interpretation of Cloudflare's facts"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Review protection coordination and selectivity so a utility-side ground fault cannot trip all on-site generators",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "text": "Facility remediation including review of generator protection coordination (Flexential; not independently verified)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "UPS battery bank",
+    "function": "Bridge the facility for about 10 minutes until generators restart",
+    "failureMode": "Batteries begin failing after about 4 minutes instead of the rated 10",
+    "effect": "Between 11:44 and 12:01 UTC the batteries run out and all customers of the data center lose power; no time is left for a manual generator restart",
+    "cause": "Not diagnosed in the source; the dossier notes a 4-minute result against a 10-minute rating is consistent with a degraded or under-capacity string",
+    "prevention": "A bank 'supposedly sufficient' for about 10 minutes",
+    "detection": "None recorded; depletion was inferred from Cloudflare's own equipment failing",
+    "S": 8,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "The ride-through collapse turns a generator trip into total facility power loss, but FM-01 already carries that event at 9; scored at 8 so it is not counted twice at full weight.",
+     "O": "A bank delivering 40% of its rating points to a degraded condition that no recorded test caught: between 'infrequent' and 'occasional'. Held at 5 because the cause is not diagnosed.",
+     "D": "The shortfall was discovered only by equipment going dark, which is detection through impact."
+    },
+    "evidence": [
+     {
+      "src": "rootCause",
+      "quote": "started to fail after only 4 minutes"
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "factor",
+      "i": 2,
+      "quote": "though Cloudflare does not diagnose the cause"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Routine UPS battery capacity and load testing with proactive replacement",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "text": "Verify UPS battery capacity as part of facility remediation (Flexential; not independently verified)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Manual generator restart (access control and overnight staffing)",
+    "function": "Restart the generators by hand quickly when automatic restart does not occur",
+    "failureMode": "Restart is delayed because the access-control system is off battery backup and, per unconfirmed employee accounts, the overnight shift lacks an experienced electrical operator",
+    "effect": "Generators restart at 12:48 UTC, about 1 h 04 min after Cloudflare's routers dropped, so the facility stays dark for most of an hour",
+    "cause": "Access control not on UPS; overnight shift of 'security and an unaccompanied technician who had only been on the job for a week' (unconfirmed by Flexential)",
+    "prevention": "None recorded",
+    "detection": "Found during the incident",
+    "S": 7,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "This mode sets how long total power loss lasts rather than whether it happens; about an hour of facility blackout is a major degradation of the service.",
+     "O": "Access control off backup power is a standing condition, and thin overnight staffing is a foreseeable condition weakly guarded: 'occasional'. The staffing part rests on unconfirmed testimony.",
+     "D": "Nothing is recorded that tested a manual restart under a full outage; the obstacles surfaced while responders were trying to reach the generators."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "factor",
+      "i": 6,
+      "quote": "unconfirmed, per employee accounts Cloudflare could not officially verify"
+     },
+     {
+      "src": "metric",
+      "i": 5
+     },
+     {
+      "src": "tech",
+      "quote": "Manual generator restart was the only path (automatic restart did not occur)"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Power the access-control system from UPS or battery backup",
+      "evidence": {
+       "src": "improvement",
+       "i": 6
+      }
+     },
+     {
+      "text": "Guarantee qualified electrical or operations personnel on every overnight shift",
+      "evidence": {
+       "src": "improvement",
+       "i": 7
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "Cloudflare circuit breakers at PDX-04",
+    "function": "Re-energise Cloudflare's circuits once facility power returns",
+    "failureMode": "Breakers are found faulty on re-energisation",
+    "effect": "Partial facility power at 12:48 UTC does not reach Cloudflare; clean power is confirmed only at 22:48 UTC after the breakers are replaced, about 11 hours after the fault",
+    "cause": "Undetermined: the ground fault, a surge from the incident, or a pre-existing defect",
+    "prevention": "None recorded",
+    "detection": "None recorded before re-energisation",
+    "S": 7,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "It extends Cloudflare's loss of PDX-04 by about ten hours, a major degradation; the control-plane consequence is scored separately in FM-06.",
+     "O": "Breaker failure on re-energisation needs an unusual combination (a high-voltage fault event or an uninspected latent defect): 'infrequent'. The cause is undetermined.",
+     "D": "No inspection is recorded; the defect was found only when power was applied, after impact."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 14
+     },
+     {
+      "src": "rootCause",
+      "quote": "We don't know if the breakers failed due to the ground fault or some other surge as a result of the incident, or if they'd been bad before"
+     },
+     {
+      "src": "soe",
+      "i": 16
+     }
+    ],
+    "actions": [
+     {
+      "text": "Periodic protective-device and circuit-breaker inspection and testing on tenant circuits",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Power-state observability and facility-to-tenant notification",
+    "function": "Tell Cloudflare when PDX-04 is running on generators or in an abnormal power state",
+    "failureMode": "Flexential does not notify Cloudflare of the generator failover, and Cloudflare's monitoring cannot see the power source",
+    "effect": "Cloudflare has no warning during the 2 h 50 min on degraded power; its first signal is its routers going offline at 11:44 UTC, and Flexential's first notice arrives 44 minutes later",
+    "cause": "No tenant-notification requirement observed by the facility; no power-source telemetry in Cloudflare's tools",
+    "prevention": "None recorded",
+    "detection": "None; the gap became visible when hardware died",
+    "S": 5,
+    "O": 6,
+    "D": 9,
+    "rationale": {
+     "S": "It does not cause the power loss; it forfeits Cloudflare's reaction window before the power loss, which is limited but customer-relevant degradation.",
+     "O": "The dossier records the omission as counter to best practice with no control requiring notification, so the condition is present in any power event: 'occasional'.",
+     "D": "Nothing in Cloudflare's observability could see the condition; it was found through impact."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 4,
+      "quote": "did not inform Cloudflare that they had failed over to generator power"
+     },
+     {
+      "src": "factor",
+      "i": 8
+     },
+     {
+      "src": "metric",
+      "i": 6
+     },
+     {
+      "src": "soe",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "Detect facility power-source changes and abnormal power states, and require immediate tenant notification on generator failover",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 5,
+     "O": 6,
+     "D": 4
+    },
+    "revisedRationale": "Power-source monitoring on Cloudflare's side would show a generator failover hours before a fault of this kind (D 9→4). O is unchanged because the facility-side notification is not publicly verified. Cloudflare's part is recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-06",
+    "item": "Cloudflare control-plane and analytics backends (Kafka, ClickHouse)",
+    "function": "Keep the dashboard, API, analytics and logs running through the loss of any one Hillsboro-area data center",
+    "failureMode": "Kafka and ClickHouse exist only in PDX-04, with dependents in the high-availability cluster, so one site's power loss breaks the control plane",
+    "effect": "Dashboard and API configuration changes, analytics, Stream, Magic WAN and Logpush fail for Cloudflare customers globally; the data plane keeps serving traffic",
+    "cause": "Hidden single-site dependency; products reached general availability without a formal requirement to use redundant backends",
+    "prevention": "Three-facility high-availability design, assumed to survive one site's loss",
+    "detection": "None before the incident; the dependency was never tested by taking PDX-04 fully offline",
+    "S": 8,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "Full outage of a major service, the global control plane and analytics, for many hours. Not 9: the data plane, Cloudflare's foundational service, kept running.",
+     "O": "A standing design condition exercised by any loss of PDX-04, which is more than an unusual combination but not routine work.",
+     "D": "Cloudflare states it had never tested taking the whole facility offline, so no control could reveal the dependency before a real outage."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 9
+     },
+     {
+      "src": "metric",
+      "i": 7
+     },
+     {
+      "src": "metric",
+      "i": 8
+     },
+     {
+      "src": "rootCause",
+      "quote": "we had never tested fully taking the entire PDX-04 facility offline"
+     },
+     {
+      "src": "factor",
+      "i": 9
+     },
+     {
+      "src": "soe",
+      "i": 10
+     }
+    ],
+    "actions": [
+     {
+      "text": "Make the control plane and analytics survive the loss of any single data center; remove PDX-04 as a single point of failure for Kafka, ClickHouse and dependent services",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "text": "Require redundant, multi-region backends before any product goes generally available",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 4,
+     "O": 2,
+     "D": 9
+    },
+    "revisedRationale": "With no single-site backend, losing one facility should cost capacity rather than the control plane (S 8→4), and the GA gate stops new single-site dependencies being shipped (O 5→2). Both are recorded as committed in the post-mortem, not as completed, so the reduction is a claim about the actions, not a confirmed outcome."
+   },
+   {
+    "id": "FM-07",
+    "item": "Failover and cold-start recovery of control-plane and analytics services",
+    "function": "Move services to surviving sites and bring them back within hours of a facility loss",
+    "failureMode": "Failover is slow and recovery runs into a second day",
+    "effect": "Full restoration only at 04:25 UTC on 4 November, about 40 h 41 min after the routers dropped; raw logs down for most customers for the whole incident and some Logpush logs dropped unrecoverably",
+    "cause": "Recovery path not rehearsed against a full-facility loss",
+    "prevention": "None recorded",
+    "detection": "None before the incident; the slowness was learned during it",
+    "S": 7,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "This mode sets the duration of the control-plane outage; scored 7 rather than 8 because the outage itself is carried by FM-06, but the 40-hour tail and lost logs are a major degradation.",
+     "O": "The unrehearsed path is exercised whenever a site is lost, so the condition is present though rarely triggered.",
+     "D": "With no full-site drill, nothing could reveal recovery time before it was needed."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 15
+     },
+     {
+      "src": "soe",
+      "i": 17
+     },
+     {
+      "src": "metric",
+      "i": 9
+     },
+     {
+      "src": "metric",
+      "i": 10
+     }
+    ],
+    "actions": [
+     {
+      "text": "Test failover by fully taking core data-center facilities offline",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 5,
+     "D": 4
+    },
+    "revisedRationale": "Full-site drills would reveal failover and cold-start time before an incident does (D 9→4). Recorded as committed in the post-mortem, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+   }
+  ]
+ }
 }

@@ -274,5 +274,320 @@
   "officialPostmortem": false,
   "lastVerified": "2026-08-02 (seed — pending deep research)"
  },
- "lastUpdated": "2026-08-02"
+ "lastUpdated": "2026-08-02",
+ "fmea": {
+  "scope": "The fire chain in the Colo 3 and Colo 4 colocation suites at Digital Realty LAX12, El Segundo: the originating rack in Colo 4 row 4, fire detection, the water sprinkler and its effect on live IT, fire-response power shutdown across suites, recovery of Colo 4, and the operator's customer communication and root-cause disclosure. No official post-mortem exists: the record is two press accounts (DatacenterDynamics, Dgtl Infra) and a tenant's Reddit posts relayed by DCD. The ignition cause is officially undetermined, the sprinkler sub-type is not disclosed, no detection system or alarm time is named (an absence of evidence, not a confirmed absence), server losses and dollar figures are unknown, and the record is silent on injuries. Every corrective action in the dossier has 'no public evidence of remediation' or is unpublished, so no revised score is claimed: all seven modes are residual risk.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Customer rack in Colo 4, row 4 (originating equipment)",
+    "function": "Carry IT load without igniting",
+    "failureMode": "Equipment in a specific rack ignites at 01:40 on 21 May 2023",
+    "effect": "The fire department closes two suites; Colo 4 is out of commission for several days and an unknown number of servers is lost",
+    "cause": "Officially undetermined. No device, chemistry or failure mechanism is named; no source links the facility's UPS or batteries to the ignition",
+    "prevention": "None recorded",
+    "detection": "No rack-level monitoring or alarm is recorded before the sprinkler activated",
+    "S": 7,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "A fire in a colocation suite that destroyed customer equipment and kept one suite dark for days exceeds the rubric's 6 for a zone-confined outage, so 7. Not 9 or 10: it was confined to one suite of one facility, the facility was not lost, and no injuries are reported (the record is silent rather than stating zero).",
+     "O": "With the cause undetermined, the dossier gives no basis for a frequency beyond 'infrequent: needs an unusual combination'.",
+     "D": "No control that could have seen the rack failing before ignition is recorded; the first recorded response is the heat-activated sprinkler."
+    },
+    "evidence": [
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "The fire, which originated in a specific rack"
+     },
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "rootCause",
+      "quote": "the exact cause of the fire remains undetermined"
+     },
+     {
+      "src": "metric",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 3
+     }
+    ],
+    "actions": [
+     {
+      "text": "In-cabinet fire detection and early suppression with rack-level current and arc monitoring",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Fire detection in the colocation hall",
+    "function": "Detect an incipient rack fire before significant heat builds, in time to de-energise or knock it down",
+    "failureMode": "No early (aspirating or smoke) detection or first-alarm time is on record; the first recorded response is a heat-activated sprinkler",
+    "effect": "Heat and smoke had already built up in the cabinet before any response on record, ruling out an incipient-stage intervention",
+    "cause": "Detection design not evidenced in any source",
+    "prevention": "Unknown",
+    "detection": "Unknown; no alarm time is recorded",
+    "S": 6,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "Late detection let the event progress to a sprinkler discharge, which shaped the loss within the suite; scored 6 because the outage itself is carried by FM-01.",
+     "O": "If early detection is absent, the condition is present for any rack fire; held at 5 because its absence is not confirmed.",
+     "D": "These scores reflect the absence of any documented early-detection control, not an observed failure of one."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 1,
+      "quote": "no smoke/VESDA aspirating detection system and no first-alarm time appear in any public source"
+     },
+     {
+      "src": "soe",
+      "i": 1,
+      "quote": "the earliest recorded protection response is the heat-activated sprinkler"
+     },
+     {
+      "src": "tech",
+      "quote": "that is an absence of evidence, not a confirmed absence of the systems"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Add VESDA with clean-agent suppression, or convert to double-interlock pre-action (no public evidence of remediation)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Very-early aspirating smoke detection cross-zoned to clean-agent suppression in live colo halls",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Water sprinkler over live IT in the colocation hall",
+    "function": "Stop fire spread without destroying the IT equipment it protects",
+    "failureMode": "The sprinkler contains the fire but discharges water onto energised servers in row 4 and adjacent rows",
+    "effect": "Water damage to many servers; damage was particularly severe for Evocative (operating as Krypt), and the loss mode shifts from thermal to water",
+    "cause": "Water-based suppression over live IT; whether wet-pipe or pre-action is not disclosed",
+    "prevention": "Sprinkler confined the fire to row 4 with some exposure to adjacent rows",
+    "detection": "The discharge is evident at onset",
+    "S": 6,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "The water drove much of the equipment loss within the suite, but the damage stayed in one zone and the suite outage is carried by FM-01: 'partial outage confined to one zone'.",
+     "O": "Water reaches the racks whenever the sprinkler operates, but it needs a fire first: 'infrequent'.",
+     "D": "The discharge is obvious once it starts, but nothing prevents water reaching energised IT: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "The fire sprinkler system was activated in the Colo space above row 4 and was limited to row 4 with some exposure to adjacent rows"
+     },
+     {
+      "src": "soe",
+      "i": 4,
+      "quote": "result[ed] in water damage to many servers"
+     },
+     {
+      "src": "soe",
+      "i": 11
+     },
+     {
+      "src": "metric",
+      "i": 9
+     }
+    ],
+    "actions": [
+     {
+      "text": "Add VESDA with clean-agent suppression, or convert to double-interlock pre-action to keep water off live IT (no public evidence of remediation)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "Fire-response power shutdown zoning between suites",
+    "function": "De-energise only the fire-origin suite during the fire response",
+    "failureMode": "Power is cut to both Colo 3 and Colo 4, including Colo 3 which a tenant reported 'appears to be safe'",
+    "effect": "Customers in the unburned Colo 3 lose power for about an hour",
+    "cause": "Electrical or life-safety shutdown coupling between suites (adjacency of the suites is inferred, not stated)",
+    "prevention": "None recorded",
+    "detection": "Evident at onset",
+    "S": 5,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "About an hour of outage for tenants of a suite that did not burn: customer-visible degradation.",
+     "O": "Needs a fire response in a neighbouring suite first: 'infrequent'.",
+     "D": "The outage is immediate and visible, but nothing kept the second suite powered: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 6,
+      "quote": "Power was cut off to the Colo 3 and 4 spaces"
+     },
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "rootCause",
+      "quote": "Physical adjacency of the two suites is inferred, not stated."
+     }
+    ],
+    "actions": [
+     {
+      "text": "Re-zone life-safety power shutdown so an unburned neighbouring suite is not de-energised (no public evidence of remediation)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Recovery of Colo 4",
+    "function": "Return the fire-origin suite to service once the fire is out",
+    "failureMode": "Colo 4 stays de-energised for several days",
+    "effect": "Colo 4 is still without power about three days after the fire; tenants are locked out a day later",
+    "cause": "Recovery bounded by water-damage remediation and equipment replacement rather than fire repair",
+    "prevention": "None recorded",
+    "detection": "Not applicable before the incident; recovery time was learned during it",
+    "S": 7,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "This mode sets the length of the suite outage, several days for every tenant in Colo 4; scored 7 alongside FM-01 because duration is what lifts this event above a zone-confined outage.",
+     "O": "Needs a fire with water discharge first: 'infrequent'.",
+     "D": "No recovery plan or rehearsal is recorded that would have shown the multi-day recovery in advance."
+    },
+    "evidence": [
+     {
+      "src": "metric",
+      "i": 5
+     },
+     {
+      "src": "soe",
+      "i": 13,
+      "quote": "recovery bounded by water-damage remediation and equipment replacement rather than fire repair"
+     },
+     {
+      "src": "soe",
+      "i": 10
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-06",
+    "item": "Customer incident communication",
+    "function": "Give affected tenants status updates and recovery ETAs during the outage",
+    "failureMode": "The operator gives no substantive statement or recovery ETA through a multi-day outage",
+    "effect": "Tenants cannot plan recovery; one describes the operator as 'tight-lipped, only responding with empty words'",
+    "cause": "No incident-communication protocol is evidenced",
+    "prevention": "None recorded",
+    "detection": "Visible to customers only",
+    "S": 4,
+    "O": 6,
+    "D": 9,
+    "rationale": {
+     "S": "It does not extend the outage; it adds business disruption for tenants: 'limited customer impact'.",
+     "O": "Absent a protocol, the condition is present in any incident: 'occasional'. Based on one tenant's account relayed by DCD.",
+     "D": "Only customers experience it."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "factor",
+      "i": 4,
+      "quote": "tight-lipped, only responding with empty words"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Publish a customer incident-communication SLA with status-page updates and recovery ETAs (no public evidence of remediation)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-07",
+    "item": "Root-cause investigation and disclosure",
+    "function": "Establish and publish the ignition source so the initiating fault can be prevented",
+    "failureMode": "No operator or fire-authority root-cause analysis is published and the cause stays 'undetermined'",
+    "effect": "No corrective action can target the initiating fault; this FMEA cannot score the ignition beyond 'undetermined', and maintenance history can be neither confirmed nor excluded",
+    "cause": "No RCA commissioned or disclosed; fire-department report not located",
+    "prevention": "None recorded",
+    "detection": "Visible only as the absence of a report",
+    "S": 4,
+    "O": 8,
+    "D": 9,
+    "rationale": {
+     "S": "The missing report stops no service; it limits prevention for the operator and the industry: 'limited impact'.",
+     "O": "The dossier records the absence as the standing state of the record.",
+     "D": "Nothing surfaces the gap except the missing document."
+    },
+    "evidence": [
+     {
+      "src": "metric",
+      "i": 11
+     },
+     {
+      "src": "soe",
+      "i": 14
+     },
+     {
+      "src": "factor",
+      "i": 5
+     },
+     {
+      "src": "coe",
+      "i": 4
+     }
+    ],
+    "actions": [
+     {
+      "text": "Commission and disclose an independent root-cause analysis (not published as of the sources)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ]
+   }
+  ]
+ }
 }

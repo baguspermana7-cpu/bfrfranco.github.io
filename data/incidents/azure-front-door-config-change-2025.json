@@ -319,5 +319,369 @@
   "confidence": "high"
  },
  "lastUpdated": "2026-07-31",
- "operatorShort": "Azure Front Door"
+ "operatorShort": "Azure Front Door",
+ "fmea": {
+  "scope": "The Azure Front Door customer-configuration path from control plane to global edge — metadata generation across coexisting control-plane builds, pre-production validation, the health-gated propagation safeguard, data-plane processing on edge servers, global propagation, data-plane recovery, and the Azure Portal as a first-party dependant. Analysed retrospectively from Microsoft's post-incident review (YKYN-BWZ) and the third-party analyses held in this dossier. The PIR does not disclose the code-level nature of the latent bug, so no mode depends on it. Several corrective actions were dated plans at the time of the PIR; where so, the revised score is a claim about the action.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "AFD control plane during a rolling build deployment",
+    "function": "Compile customer configuration changes into consistent metadata, whichever build version processes them",
+    "failureMode": "A valid sequence of changes processed across two coexisting build versions emits incompatible metadata",
+    "effect": "Metadata that neither build alone would produce enters the propagation pipeline and arms a latent data-plane bug fleet-wide",
+    "cause": "Version skew during a normal rolling deployment, with no validation of features across build versions",
+    "prevention": "Structural validation of configuration metadata, which the incompatible metadata passed",
+    "detection": "None before impact; the escape was named as a gap in pre-production validation",
+    "S": 9,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "It is the start of a provider-wide outage of the edge layer in front of the Azure Portal, Microsoft 365 and many customer sites — the rubric's 9. Not 10: no hazard to people and no facility loss.",
+     "O": "Two coexisting builds is a normal state during every rolling deployment, but it takes a specific sequence of customer changes to produce bad metadata — 'occasional: a foreseeable condition, weakly guarded'.",
+     "D": "Nothing in pre-production tested cross-build compatibility; the fault was found through secondary impact alerts about 7 minutes after customers were hit."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "metric",
+      "i": 9
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "rootCause",
+      "quote": "escaped detection due to a gap in our pre-production validation, since not all features are validated across different control plane build versions"
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "Not all features are validated across different control plane build versions."
+     }
+    ],
+    "actions": [
+     {
+      "text": "Enhance the testing and validation framework to ensure backwards compatibility of configurations generated across control-plane build versions",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 6,
+     "D": 4
+    },
+    "revisedRationale": "Cross-build compatibility testing would catch incompatible metadata in pre-production, before customers are exposed (D 8→4). The dossier records this as planned for February 2026 with no confirmation of completion, so the reduction is a claim about the action, not a confirmed outcome. Version skew itself remains, so occurrence is unchanged."
+   },
+   {
+    "id": "FM-02",
+    "item": "AFD data-plane configuration processing",
+    "function": "Apply a customer configuration on edge servers, or reject it, without crashing",
+    "failureMode": "A latent bug crashes data-plane instances during asynchronous processing of the incompatible metadata",
+    "effect": "Connection timeouts and DNS resolution failures for AFD and Azure CDN customers worldwide from 15:41 UTC",
+    "cause": "A dormant data-plane defect, plus asynchronous processing that faults only after the configuration has been accepted (about 5 minutes later here)",
+    "prevention": "None recorded for the bug itself",
+    "detection": "Secondary impact alerts after customer impact",
+    "S": 9,
+    "O": 3,
+    "D": 8,
+    "rationale": {
+     "S": "This is the mechanism of the provider-wide edge outage itself.",
+     "O": "The bug fires only on the cross-build metadata of FM-01, so 'infrequent'; kept low so the same event is not counted twice at full weight.",
+     "D": "The crash surfaced asynchronously after acceptance and was noticed through impact alerts, not by any pre-promotion check."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "exposed a latent bug in the data plane ... triggered a crash during asynchronous processing."
+     }
+    ],
+    "actions": [
+     {
+      "text": "Remove asynchronous processing from the data plane; process each configuration synchronously before it advances to production stages",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 3,
+     "D": 4
+    },
+    "revisedRationale": "With synchronous processing a bad configuration faults at the stage that receives it, before promotion, so the crash is seen with time to stop it (D 8→4). Recorded as completed. No fix to the latent bug itself is recorded, so occurrence is unchanged."
+   },
+   {
+    "id": "FM-03",
+    "item": "Health-gated configuration protection system",
+    "function": "Halt propagation when a configuration makes pre-production or canary instances unhealthy",
+    "failureMode": "Judges health before the asynchronous crash registers and lets the corrupt configuration advance",
+    "effect": "The safeguard activates at 15:43 UTC, after the metadata had reached most edge sites; monitoring had reported healthy signals throughout",
+    "cause": "Bake time and health checks shorter than the crash latency; the safety model assumed bad configurations fail fast and synchronously",
+    "prevention": "Staged propagation with health monitoring",
+    "detection": "The safeguard itself reported healthy; investigation began from secondary alerts at 15:48 UTC",
+    "S": 9,
+    "O": 4,
+    "D": 8,
+    "rationale": {
+     "S": "A safeguard that passes the bad configuration leaves the full global outage in place.",
+     "O": "Any fault that surfaces later than the bake time defeats it; that needs an asynchronous failure, which is 'infrequent', but the gap was designed in rather than incidental.",
+     "D": "The control that should have detected the fault reported healthy; the team learned of it from separate impact alerts after customers were affected."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "tech",
+      "quote": "configuration-propagation monitoring continued to receive healthy signals"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Add rollout stages and extend bake time per stage so a delayed crash registers before promotion",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 2,
+     "D": 8
+    },
+    "revisedRationale": "Longer bake time and extra stages mean a fault must be slower than the new bake time to slip through (O 4→2). Recorded as completed. Detection is unchanged: if a fault did outlast the bake time, the safeguard would still report healthy."
+   },
+   {
+    "id": "FM-04",
+    "item": "Global configuration propagation",
+    "function": "Deliver one customer configuration to every edge site for a consistent experience",
+    "failureMode": "Propagates the corrupt configuration to the whole fleet with no cell boundary",
+    "effect": "Metadata reaches most edge sites by 15:39 UTC and all edge sites by 15:45 UTC; impact spans at least 13 named Azure services plus Microsoft 365, Dynamics 365, Entra ID and Copilot for Security",
+    "cause": "Global-consistency deployment by design, with no segmentation into cells",
+    "prevention": "None recorded for blast radius",
+    "detection": "None recorded; spread was complete before investigation began",
+    "S": 9,
+    "O": 3,
+    "D": 8,
+    "rationale": {
+     "S": "This is what made the fault provider-wide rather than local.",
+     "O": "The design is always present but needs a bad configuration to get past FM-01 to FM-03 first, so 'infrequent'; kept low to avoid re-counting.",
+     "D": "Nothing reported or limited the spread; it was known after the fleet was down."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "metric",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 8
+     },
+     {
+      "src": "factor",
+      "i": 3
+     }
+    ],
+    "actions": [
+     {
+      "text": "Introduce micro-cell segmentation to bound the blast radius of a bad configuration",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 3,
+     "D": 8
+    },
+    "revisedRationale": "Cells confine a bad configuration to a fraction of the fleet, so the same fault becomes a partial outage (S 9→6). The dossier records this as planned for June 2026 with no confirmation, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-05",
+    "item": "Edge server process layout",
+    "function": "Keep traffic-serving instances up when configuration processing fails",
+    "failureMode": "Configuration processing runs on the same instances that serve live traffic, so a configuration crash takes serving down",
+    "effect": "The serving fleet crash-loops directly instead of losing only a sacrificial worker",
+    "cause": "Configuration processing not isolated from active traffic-serving instances",
+    "prevention": "None recorded",
+    "detection": "Customer-facing errors and impact alerts",
+    "S": 9,
+    "O": 3,
+    "D": 8,
+    "rationale": {
+     "S": "Without isolation the configuration crash is a serving outage everywhere the configuration lands.",
+     "O": "Matters only when a configuration crashes the processor, which is infrequent; scored with FM-02 so as not to double-count.",
+     "D": "Seen through the serving outage after it began."
+    },
+    "evidence": [
+     {
+      "src": "rootCause",
+      "quote": "configuration processing was not isolated from active traffic-serving instances"
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 3
+     }
+    ],
+    "actions": [
+     {
+      "text": "Decouple configuration processing from traffic-serving instances into isolated worker processes",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 5,
+     "O": 3,
+     "D": 8
+    },
+    "revisedRationale": "If a bad configuration crashes an isolated worker, serving continues on the previous configuration and customers see at most degraded configuration updates (S 9→5). Recorded as planned for January 2026, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-06",
+    "item": "Data-plane recovery path (Last Known Good reload)",
+    "function": "Return the edge fleet to a good configuration quickly once the fault is identified",
+    "failureMode": "Recovery takes about 4.5 hours and dominates the impact window",
+    "effect": "Manual LKG update begins 17:10 UTC; DNS recovers 18:30, traffic management 20:20, full mitigation 00:05 UTC on 30 October — about 8 h 24 min of impact",
+    "cause": "Manual LKG correction, the need to block all customer changes first, and a deliberately phased reload of a crashed fleet",
+    "prevention": "None recorded for recovery time",
+    "detection": "The recovery time was experienced during the incident",
+    "S": 8,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "Sets the length of the outage: hours of full outage of a major service is the rubric's 8.",
+     "O": "Any fleet-wide configuration fault would have gone through the same slow path; the condition was present in the design, so 'occasional' rather than tied to this one trigger.",
+     "D": "The dossier records no prior measurement of fleet-wide recovery time; it was learned in the incident."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 10
+     },
+     {
+      "src": "soe",
+      "i": 14
+     },
+     {
+      "src": "soe",
+      "i": 17
+     },
+     {
+      "src": "metric",
+      "i": 0
+     },
+     {
+      "src": "metric",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "Cut data-plane recovery from about 4.5 hours to about 1 hour (done), targeting about 10 minutes",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 6,
+     "D": 8
+    },
+    "revisedRationale": "Recovery of about an hour is recorded as achieved, so a repeat is a shorter major degradation rather than hours of outage (S 8→7). The 10-minute target was dated March 2026 and is not confirmed in the dossier, so no further reduction is claimed."
+   },
+   {
+    "id": "FM-07",
+    "item": "Azure Portal fronted by AFD",
+    "function": "Keep the management plane available to operators and customers during an AFD outage",
+    "failureMode": "The Portal depends on AFD and goes down with it until manually failed away",
+    "effect": "Portal impaired from 15:41 UTC until failed away from AFD at 17:26 UTC",
+    "cause": "Critical first-party control surface behind the failing edge layer with no active-active alternative path",
+    "prevention": "Alternate infrastructure available for a manual fail-away",
+    "detection": "Impact on Portal users",
+    "S": 7,
+    "O": 3,
+    "D": 8,
+    "rationale": {
+     "S": "Major degradation of a major service — the management plane — for about 1 h 45 min, softened by the manual fail-away.",
+     "O": "Needs AFD itself to fail first, which is infrequent.",
+     "D": "Recognised after impact; the fail-away came well into the incident."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 11
+     },
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "tech",
+      "quote": "Azure Portal \"failed away from Azure Front Door\" at 17:26 UTC"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Migrate critical dependent infrastructure such as the Azure Portal to active-active failover",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     }
+    ],
+    "revised": {
+     "S": 4,
+     "O": 3,
+     "D": 8
+    },
+    "revisedRationale": "With active-active failover the Portal stays reachable during an AFD failure, leaving limited impact (S 7→4). Recorded as completed."
+   }
+  ]
+ }
 }

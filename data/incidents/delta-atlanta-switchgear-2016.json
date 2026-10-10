@@ -355,5 +355,357 @@
   "confidence": "Medium-high on impact, timeline, and cost (corroborated across Availability Digest and Data Center Knowledge, both re-fetched and confirmed this pass, though both ultimately trace to Delta's own estimate); medium on the physical failure mechanism, which is analytic reconstruction from secondary sources with no equipment-level RCA. No official Delta engineering post-mortem exists; primary sources (BBC article body, ECN Magazine technical piece, SEC filings) were unreachable this pass. Feed-count wording ('both feeds' vs 'one of two') is reconciled at the shared transfer node and is a terminology difference, not a contradiction in the causal chain. Note: the cited Availability Digest source gives the Ponemon average as ~$730,000 only; a previously stated '$740K / $2.4M max' range was not in the cited references and has been corrected."
  },
  "lastUpdated": "2026-08-01",
- "operatorShort": "Delta Air Lines"
+ "operatorShort": "Delta Air Lines",
+ "fmea": {
+  "scope": "The power chain at Delta's Atlanta headquarters data center and the operations platform it carried: the scheduled transfer to the backup generator and the power-control-room equipment it ignited, fire detection and suppression in that room, the transformer and transfer path between the two utility feeds and the generators, dual-cord power to servers, coupling between servers, recovery of the platform including the Deltamatic legacy system, and the root-cause disclosure. No official post-mortem exists. The verified spine is Availability Digest and Data Center Knowledge; the component names ('power control module', 'switchgear'), the surge mechanism and the claim that the failure locked Delta out of both generators and utility are reported but could not be re-verified, and detection and suppression are undocumented. No corrective action in the dossier has a confirmed status: the dual-cord fix is acknowledged but not verified, the IT-resilience investment is a general commitment of unverified scope, and the rest are undocumented or analyst recommendations. No revised score is claimed: all seven modes are residual risk.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Power-control-room equipment during the generator test transfer",
+    "function": "Transfer load to the backup generator for a scheduled test without damaging the gear",
+    "failureMode": "The routine test transfer ignites a fire in the power-control room",
+    "effect": "A fire at 02:30 EST destroys a transformer and kills one of two power feeds, starting the chain that took Delta's entire system down",
+    "cause": "Undetermined. Delta reportedly named a 'power control module' and Georgia Power reportedly named switchgear that failed 'for reasons that were not immediately clear'; no make, model, age or failure mechanism was ever published",
+    "prevention": "None recorded",
+    "detection": "None recorded before the transfer; the dossier has no record of pre-test checks on the gear",
+    "S": 9,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "It initiated a worldwide outage of an airline's operations platform with no workaround, grounding the fleet: provider-wide outage of a foundational service, the rubric's 9. Not 10: the fire stayed small and confined to the room and no injuries are reported.",
+     "O": "A scheduled test transfer is routine work that exercised the cause, but the equipment-level cause is undetermined, so it is held at 5 rather than 6 or 8.",
+     "D": "No pre-transfer inspection or condition check is recorded; the failure announced itself as a fire."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0,
+      "quote": "was the result of a routine scheduled switch for testing purposes to the backup generator"
+     },
+     {
+      "src": "soe",
+      "i": 1
+     },
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "Bastian said a power control module at the airline's technology command center failed and caught fire."
+     },
+     {
+      "src": "rootCause",
+      "quote": "for reasons that were not immediately clear"
+     },
+     {
+      "src": "factor",
+      "i": 1,
+      "quote": "The resilience test itself ignited the gear"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Review switchgear and transfer maintenance and de-risk live generator-test transfers (not publicly documented)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "text": "Pre-test thermography and insulation checks, and staged transfers under controlled conditions",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Fire detection and suppression in the power-control room",
+    "function": "Detect an electrical fire early and suppress it before it damages adjacent power equipment",
+    "failureMode": "The fire destroys a transformer before it is controlled; no detection or fixed suppression system is documented",
+    "effect": "One utility feed is lost; the fire itself stays confined to the room",
+    "cause": "Fire-protection design and performance for the room are undocumented in any verifiable source",
+    "prevention": "Unknown; no fixed suppression system is named and no discharge is confirmed",
+    "detection": "Unknown; no detection system or detection time is recorded, only the 02:30 origin time",
+    "S": 7,
+    "O": 4,
+    "D": 8,
+    "rationale": {
+     "S": "Losing a feed to the fire is a major degradation of the facility's power supply; the system-wide collapse that followed is scored in FM-04 and FM-05. The fire's confinement to the room limits this score.",
+     "O": "Needs an electrical fire first, which is infrequent.",
+     "D": "These scores reflect the absence of any documented control, not an observed failure: the dossier cannot say when the fire was detected, and a secondary claim that it was 'quickly extinguished' is not certified."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 7,
+      "quote": "no detection or fixed-suppression system is named in any verifiable source and no discharge is confirmed"
+     },
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 8,
+      "quote": "a small fire that was quickly extinguished"
+     },
+     {
+      "src": "rootCause",
+      "quote": "which was small and confined to the power-control room"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Validate power-control-room fire detection and fixed suppression design and performance (no public evidence of any review)",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "text": "Very-early smoke detection, fixed suppression, arc-fault mitigation and auto de-energisation in power rooms",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Transformer, transfer path and protective coordination between utility feeds and generators",
+    "function": "Isolate a fault in one device so the other utility feed and the generators keep carrying the load",
+    "failureMode": "One event in the power-control room kills a feed and leaves backups unpowered, so failover fails",
+    "effect": "Despite two utilities entering opposite sides of the building, power to part of the IT load is lost; Delta said some critical systems and network equipment did not switch over to backup systems",
+    "cause": "A concentrated transfer node without selective isolation. The reported surge to the transformer and the claim that switchgear locked Delta out of both generators and Georgia Power are not re-verified",
+    "prevention": "Two separate utility feeds entering opposite sides of the building",
+    "detection": "None recorded",
+    "S": 8,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "This is where the dual-feed design was defeated; scored 8 rather than 9 because the airline-wide outage is already carried by FM-01 and required the server-level defect in FM-04 as well.",
+     "O": "Needs a fault at the shared node, an unusual combination: 'infrequent'.",
+     "D": "No study or test of the node's selectivity is recorded; the weakness showed only when backups did not take the load."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 4,
+      "quote": "The fire caused a transformer to fail, killing one of the two power feeds to the data center."
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "some critical systems and network equipment didn't switch over to Delta's backup systems"
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "Selective breaker coordination and surge or fault isolation",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "text": "Audit the topology so no single switchgear, transfer switch or transformer can sever a feed and defeat generator failover",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "Server dual-cord (A+B) power wiring",
+    "function": "Keep every server powered from an independent second source if one feed is lost",
+    "failureMode": "About 300 of 7,000 servers are not linked to an alternate power source, and their backups are unpowered too",
+    "effect": "The single-fed servers go dark and cannot fail over to their backups",
+    "cause": "As-built wiring diverged from the A+B design intent and no commissioning audit or failover test caught it",
+    "prevention": "Design intent of redundant power supplies on different power strips",
+    "detection": "None; the defect is reported to have gone undetected until the live fault",
+    "S": 9,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "This verified defect is what turned the loss of one feed into dead servers and, through FM-05, the airline-wide outage.",
+     "O": "A standing latent defect that only matters when a feed is lost, an unusual combination: 'infrequent'. Kept at 4 so the single event is not scored at full weight again.",
+     "D": "No audit or drill had found it; it was revealed through the outage."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "metric",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 0,
+      "quote": "No commissioning audit or failover test had caught the design-vs-installation gap"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Correct the ~300 single-fed servers and audit dual-cord integrity across all 7,000 (acknowledged by the CEO; completion not publicly verified)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Independent commissioning, periodic A/B integrity audits and recurring pull-the-plug failover drills",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Coupling between servers in the operations platform",
+    "function": "Keep the platform running in degraded form when a minority of servers is lost",
+    "failureMode": "Surviving servers cannot communicate with the failed ones and the whole system goes down",
+    "effect": "Check-in, baggage, websites, kiosks and airport displays go dark; Delta grounds its global fleet",
+    "cause": "Tight interdependency with no recorded fault isolation or degraded mode",
+    "prevention": "None recorded",
+    "detection": "Customer-visible impact",
+    "S": 9,
+    "O": 3,
+    "D": 9,
+    "rationale": {
+     "S": "Losing about 4% of servers collapsed 100% of the platform; this coupling is what made the outage airline-wide.",
+     "O": "Needs a loss of servers first, which is infrequent.",
+     "D": "Seen through the outage itself."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 7,
+      "quote": "could not communicate with the servers that failed. This took down Delta's entire system."
+     },
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "metric",
+      "i": 1
+     }
+    ],
+    "actions": [
+     {
+      "text": "Re-architect for partition tolerance, bulkheading and degraded-mode operation",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-06",
+    "item": "Platform recovery and the Deltamatic legacy reservation system",
+    "function": "Return the operations platform to full service quickly once power is restored",
+    "failureMode": "Recovery needs about 500 manual server reboots, and the 52-year-old Deltamatic returns with only its green-screen interface working",
+    "effect": "Systems operational only at 08:30 EST, six hours after the fire; manual check-in and handwritten boarding passes; 2,100 flights cancelled over three days and about 2,400 delayed",
+    "cause": "Manual restart dependence and legacy-platform fragility",
+    "prevention": "None recorded",
+    "detection": "Not applicable before the incident; recovery time was learned during it",
+    "S": 8,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "This mode sets how long and how deep the outage ran rather than whether it happened: hours of full outage and a three-day operational tail are scored 8 so the outage is not counted again at 9.",
+     "O": "The recovery path applies to any platform-wide loss; present as a standing condition though rarely exercised.",
+     "D": "No recovery drill is recorded that would have shown the restart time or the green-screen-only state in advance."
+    },
+    "evidence": [
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 13
+     },
+     {
+      "src": "metric",
+      "i": 7
+     },
+     {
+      "src": "factor",
+      "i": 4
+     }
+    ],
+    "actions": [
+     {
+      "text": "Invest in IT resilience and modernise reservation and passenger-service platforms (publicly committed in general terms; scope and completion not verified)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "text": "Geographically redundant reservation platform with tested automated failover to a second site",
+      "evidence": {
+       "src": "improvement",
+       "i": 6
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-07",
+    "item": "Post-incident root-cause analysis and disclosure",
+    "function": "Identify the failed component and mechanism so recurrence can be prevented and assessed",
+    "failureMode": "No root-cause analysis naming the failed component, its age or its failure mechanism is ever published",
+    "effect": "The physical failure mode remains officially unverified; this FMEA cannot score the initiating equipment or the fire protection beyond 'undetermined'",
+    "cause": "Delta did not publish an RCA, and no regulatory or vendor document exists",
+    "prevention": "None recorded",
+    "detection": "Visible only as the absence of a report",
+    "S": 4,
+    "O": 8,
+    "D": 9,
+    "rationale": {
+     "S": "The missing report stops no service; it limits what others can learn and verify, which is 'limited impact'.",
+     "O": "The dossier records the absence as the standing state of the record, not a one-off delay.",
+     "D": "Nothing surfaces the gap except the missing document."
+    },
+    "evidence": [
+     {
+      "src": "coe",
+      "i": 0
+     },
+     {
+      "src": "factor",
+      "i": 6
+     },
+     {
+      "src": "rootCause",
+      "quote": "The physical failure mode is therefore officially unverified."
+     }
+    ],
+    "actions": []
+   }
+  ]
+ }
 }

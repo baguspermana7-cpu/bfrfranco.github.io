@@ -294,5 +294,252 @@
   "officialPostmortem": false,
   "referenceCount": 3
  },
- "lastUpdated": "2026-08-08"
+ "lastUpdated": "2026-08-08",
+ "fmea": {
+  "scope": "The shared authentication/authorization (Auth) control plane that Alibaba Cloud's console, OpenAPI and HTTP-API services (OSS, OTS, SLS, MNS) verify every request against, the change process around it, its recovery path, and the dependent services and consumer apps. Alibaba published no root-cause post-mortem and acknowledged only an 'anomaly' in console and API access: the Auth mechanism is an independent inference (Vonng) from which services failed and which survived, and the Auth-to-OSS deadlock is an unconfirmed reconstruction. Every corrective action in this dossier other than SLA vouchers is an analyst recommendation with status 'not disclosed', so no revised score is claimed for any mode: all six are shown as residual risk.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Auth/IAM control plane (global)",
+    "function": "Verify request signatures and operator permissions for every region without letting one fault reach all of them",
+    "failureMode": "Runs as one globally-shared failure domain, so its failure stops Auth-gated services in every region at the same instant",
+    "effect": "Console, OpenAPI, OSS, OTS, SLS and MNS fail in all global regions at once for about 3.5 hours",
+    "cause": "No regional or cell isolation of the shared Auth component (inferred from the simultaneous all-region failure; not confirmed by Alibaba)",
+    "prevention": "None recorded",
+    "detection": "Alibaba monitoring detected an 'anomaly' in console access and API calls at onset",
+    "S": 9,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "Provider-wide outage of the foundational access layer across every region with no customer workaround for the gated services: the rubric's 9. Not 10: no hazard to people, and the ECS/RDS/network data planes kept running.",
+     "O": "Losing the whole global domain needs a fault in Auth itself first, an unusual event, so 'infrequent'. Scored below FM-02 so the same event is not counted twice at full weight.",
+     "D": "Monitoring saw the anomaly at onset, but nothing in the architecture contained it to one region: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "rootCause",
+      "quote": "every global region failed at the same instant"
+     },
+     {
+      "src": "metric",
+      "i": 1
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-02",
+    "item": "Change process for the shared Auth/permission service",
+    "function": "Apply changes to the shared control plane in a way that limits how far a bad change can reach",
+    "failureMode": "A change to the shared control plane takes effect everywhere at once, with no staged rollout or blast-radius cap recorded",
+    "effect": "One change (or fault) fails every region simultaneously; the outage begins one day after the Singles Day (Double 11) peak",
+    "cause": "Not officially disclosed. The dossier's latent-cause analysis names change management around a high-risk shared component the day after Double 11; the specific change (a pushed permission/blacklist rule) is unconfirmed",
+    "prevention": "None recorded",
+    "detection": "None recorded before the change took effect; the failure was seen through the console/API anomaly",
+    "S": 9,
+    "O": 5,
+    "D": 8,
+    "rationale": {
+     "S": "This is the route by which the provider-wide outage started, so it carries the same severity as FM-01.",
+     "O": "Between 'infrequent' and 'occasional': changes to a shared control plane are routine, and the dossier records no staged-rollout guard. Held at 5 rather than 6 because the triggering change is not confirmed by the operator.",
+     "D": "No canary or pre-impact check is recorded; internal monitoring saw the anomaly only once it was already global, so 'detected after impact by internal monitoring'."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "rootCause",
+      "quote": "change management around a high-risk shared component the day after the Double 11 peak"
+     },
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "one day after the Singles Day shopping event concluded"
+     },
+     {
+      "src": "soe",
+      "i": 8
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-03",
+    "item": "Auth bootstrap and recovery path",
+    "function": "Restore the permission service quickly without depending on a service it gates",
+    "failureMode": "Recovery is slow because the permission service may depend on OSS, which itself needs a permission check (reconstructed deadlock, unconfirmed)",
+    "effect": "Hangzhou and Beijing recover in about one hour; other availability zones take about three hours; full restoration at 21:11 CST, 207 minutes after onset",
+    "cause": "Reported circular dependency between the permission service and the object store it protects, with no break-glass path independent of that store. Flagged as rumor by Vonng and never confirmed by Alibaba",
+    "prevention": "None recorded",
+    "detection": "None recorded; the dependency, if real, was found during recovery",
+    "S": 8,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "This mode sets the duration rather than the existence of the outage: hours of full outage of major services is the rubric's 8.",
+     "O": "If the reconstruction is right, the condition is present whenever Auth has to recover, which is more than an unusual combination. Held at 5 because the mechanism is unconfirmed.",
+     "D": "No control is recorded that would reveal the dependency before an incident needed the recovery path; the dossier itself only infers it after the fact."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "rootCause",
+      "quote": "Reconstructed circular-dependency (unconfirmed, flagged as rumor by Vonng)"
+     },
+     {
+      "src": "tech",
+      "quote": "a circular dependency with no bootstrap path independent of the gated store"
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "Hangzhou (East China 1) and Beijing (North China 2) recovered in one hour while other AZs took three hours"
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-04",
+    "item": "Console and OpenAPI management plane",
+    "function": "Let customers and operators view and manage resources during a control-plane fault",
+    "failureMode": "Authenticates every operator action through the same failed Auth layer, so management is lost along with the gated services",
+    "effect": "Customers worldwide cannot log in, view or manage resources even where data planes still run; operators lose the tools needed to diagnose and remediate",
+    "cause": "No out-of-band management path that bypasses the shared Auth layer",
+    "prevention": "None recorded",
+    "detection": "Monitoring detected the console/API anomaly at onset",
+    "S": 7,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "Major degradation of a major service: management is gone, but running ECS and RDS instances kept serving traffic, so it is not a full outage of every workload.",
+     "O": "Needs Auth itself to fail first, which is infrequent.",
+     "D": "The console/API anomaly is the one thing Alibaba says its monitoring detected, at onset; nothing prevented the loss."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "Alibaba Cloud attributed the incident to an \"anomaly\" in the cloud product console access and API calls"
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-05",
+    "item": "Auth-gated HTTP-API services and the apps built on them",
+    "function": "Serve OSS, OTS, SLS and MNS requests, and the consumer apps that use them, while Auth is impaired",
+    "failureMode": "Every request needs live AK/SK/IAM signature verification against central Auth, so the services fail with it",
+    "effect": "OSS, OTS, SLS and MNS down globally; Taobao, Xianyu and DingTalk crash; payment, messaging and logistics systems degrade; affected products fall to 99.5% monthly availability",
+    "cause": "Per-request hard dependency on the central Auth service with no recorded degraded mode",
+    "prevention": "None recorded",
+    "detection": "Customer-visible impact",
+    "S": 9,
+    "O": 3,
+    "D": 9,
+    "rationale": {
+     "S": "Turns an Auth fault into a global outage of object storage, table, log and messaging services and of consumer apps with large user bases.",
+     "O": "Needs Auth to be impaired first, which is infrequent; kept low so the single event is not triple-counted with FM-01 and FM-02.",
+     "D": "Seen through the failure of customer requests and apps."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "metric",
+      "i": 3
+     },
+     {
+      "src": "tech",
+      "quote": "signature verification failed everywhere at once"
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-06",
+    "item": "Post-incident review and disclosure",
+    "function": "Establish and publish the root cause and safeguards so customers can assess residual risk",
+    "failureMode": "No root-cause post-mortem is published, so the triggering change and any safeguards remain unverified",
+    "effect": "Customers cannot assess residual risk; a second console/OpenAPI failure hits database products in eight regions 15 days later, and the dossier cannot say whether it shared a cause",
+    "cause": "Alibaba acknowledged only an 'anomaly' and did not release a post-mortem",
+    "prevention": "None recorded",
+    "detection": "Visible to customers only as the absence of a report",
+    "S": 4,
+    "O": 8,
+    "D": 9,
+    "rationale": {
+     "S": "The missing report does not itself stop a service; it limits what customers can do to protect themselves, which is 'limited customer impact'. The 27 Nov outage is not scored here because no cause links it to this one.",
+     "O": "The dossier records the refusal to publish as a stance rather than a one-off slip, so the condition is present as routine.",
+     "D": "Nothing inside the provider surfaces the gap; customers learn of it only by its absence."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 13
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "Alibaba Cloud refuses to publish a post-mortem report"
+     },
+     {
+      "src": "soe",
+      "i": 15
+     },
+     {
+      "src": "coe",
+      "i": 0
+     }
+    ],
+    "actions": []
+   }
+  ]
+ }
 }
