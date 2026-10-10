@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v3.17.1 — 2026-10-11
+
+### LTC Workbench v2 after two independent reviews
+
+A code/physics review (it ran the engine in node) and a UI review of v3.14–v3.17. Physics, units, the energy
+balance and XSS came back clean; the defects below did not. Each code defect has a test in
+`test-ltc-plant.mjs` P8 or `test-ltc-workbench.mjs` W10 that failed before its fix.
+
+**Fixed — engine and state**
+- The four-plant comparison showed the same plant on every row once a preset had been chosen (the stored
+  preset overrode the one being compared). A preset now supplies defaults under explicit keys;
+  `comparePresets()` drops it.
+- "CDU feeder A lost" removed the feeder-B CDUs, and with an odd CDU count one index out of range.
+- Liquid-cooler count jumped 37 → 44 → 22 → 1 as the design dry bulb crossed the cooler's limit (the
+  log-mean temperature difference collapsed). The outlet is now capped, and — the deeper fault — coolers
+  are sized for the condition that loads them most across the climate bins, not only the design day: a
+  dry cooler past its limit on the design day still carries most of the liquid heat on cooler hours.
+- An unknown value in a `#p=` link (e.g. `liquidRejection:'x'`) turned every number into NaN; enums are
+  validated and degenerate inputs clamped. The link scenario is applied once per page load, not on every read.
+- Saving dropped an explicit design dry bulb that equalled the global default on a non-tropical site.
+- CHW pump heat now loads the chillers; the FWS fault uses the loop-volume and throttle inputs.
+- Model lab: a plant on a custom (EPW) climate was relabelled "tropical" by the lab's climate select; 2N
+  was never shared with the plant.
+
+**Fixed — interface**
+- DH01 thermal map: colour is no longer the only channel — racks above 27 °C are outlined, above 32 °C
+  hatched, out-of-service CDUs/CRAHs struck through; the legend names both limits. The map is reachable by
+  keyboard (arrow keys move a rack cursor, Esc closes) and by touch, colours come from the theme tokens.
+- Hover trace no longer flickers on every pointer move. ISO's "auto" marks are buttons that reveal the
+  derivation (hover-only help shut out touch and keyboard). 44 px touch targets and 16 px inputs on phones
+  (no iOS focus zoom). Eyebrow tracking .18em per the design standard.
+
 ## v3.17.0 — 2026-10-11
 
 ### The model lab computes on the same plant as the rest of the workbench

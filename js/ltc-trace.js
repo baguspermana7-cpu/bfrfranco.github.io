@@ -41,7 +41,9 @@
   function attach(el, getTips) {
     if (!el) return;
     function svg() { return el.querySelector('svg'); }
+    var lastId = null;
     function clear() {
+      lastId = null;
       var s = svg(); if (!s) return;
       s.classList.remove('is-tracing');
       [].forEach.call(s.querySelectorAll('[data-trace]'), function (n) { n.removeAttribute('data-trace'); });
@@ -49,7 +51,11 @@
     }
     function trace(id, x, y) {
       var s = svg(); if (!s) return;
+      var tips0 = getTips ? getTips() : {};
+      // same block as last move: only follow the pointer, do not restart the fade (it flickered)
+      if (id === lastId) { if (tips0[id]) show(tips0[id], x, y); return; }
       clear();
+      lastId = id;
       var near = {}; near[id] = 1;
       [].forEach.call(s.querySelectorAll('path[data-rzd-edge]'), function (p) {
         var ends = (p.getAttribute('data-rzd-edge') || '').split('>');
@@ -82,5 +88,5 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') clear(); });
   }
 
-  root.LTCTrace = { attach: attach, hide: hide };
+  root.LTCTrace = { attach: attach, hide: hide, show: show };
 })(window);

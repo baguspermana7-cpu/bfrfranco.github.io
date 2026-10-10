@@ -11,6 +11,8 @@
  *   P4  faults: losing CDU feeder A on single-fed CDUs drops half of them and pushes the
  *       shortfall into the hall air; dual-fed CDUs lose none; one CDU out is covered by N+1;
  *       FWS loss gives minutes, flow loss gives seconds.
+ *   P8  review defects: compare presets, feeder-A indices, smooth cooler count, enum and range
+ *       validation, CHW pump heat, FWS fault inputs, climate-aware save.
  *   P7  DH01 thermal view: normal in envelope, CRAH loss warms the aisles it fed, CDU feeder loss
  *       sheds IT on the dead loops, the running worst case overheats, CHW loss raises supply air.
  *   P6  engine v2: metering order M0>M1>M2>M3, PUE1<2<3, CUE/REF/ERF identities, sizing by hand,
@@ -36,9 +38,11 @@ for (const mode of ['drycooler', 'tower']) {
 let seed = 7;
 const rnd = (lo, hi) => { seed = (seed * 16807) % 2147483647; return lo + (hi - lo) * (seed / 2147483647); };
 for (let i = 0; i < 200; i++) {
+  const kinds = ['drycooler', 'adiabatic', 'fluidcooler', 'tower'];
   const inp = { itMw: rnd(5, 300), halls: Math.round(rnd(1, 12)), capturePct: rnd(50, 98), tcsSupplyC: rnd(25, 45),
-    designDbC: rnd(15, 45), meanDbC: rnd(5, 30), chillerCop: rnd(4, 9), upsEff: rnd(0.93, 0.99),
-    liquidRejection: rnd(0, 1) < 0.5 ? 'tower' : 'drycooler', elecRoomShare: rnd(0, 1) };
+    designDbC: rnd(15, 45), designWbC: rnd(10, 30), chillerCopRated: rnd(4, 9), upsEff: rnd(0.93, 0.99),
+    liquidRejection: kinds[Math.floor(rnd(0, 4))], chillerType: rnd(0, 1) < 0.5 ? 'air' : 'water', elecRoomShare: rnd(0, 1) };
+  inp.designWbC = Math.min(inp.designWbC, inp.designDbC);
   inp.tcsReturnC = inp.tcsSupplyC + rnd(5, 15);
   const r = P.compute(inp);
   ok(r.totals.balanceErr < 0.005, `P1 random #${i}: balance off by ${(r.totals.balanceErr * 100).toFixed(3)} % for ${JSON.stringify(inp)}`);
@@ -174,6 +178,42 @@ for (let i = 0; i < 200; i++) {
   ok(run.maxInlet > per.maxInlet + 5, 'P7 if those racks kept running on air the room would overheat');
   const chw = DH.solveHall(r, 'chw', 'common', 10, 'throttled');
   ok(chw.supply > n.supply, 'P7 chilled water lost: supply air rises with the CHW transient');
+}
+
+// P8 — defects found by review (v3.17.1); each assertion failed before its fix
+{
+  // compare table: a stored preset must not override the preset being compared
+  const rows = P.comparePresets({ preset: 'baseline', chillerType: 'air', liquidRejection: 'drycooler' });
+  const pues = rows.map((x) => x.r.totals.pueAnnual.toFixed(4));
+  ok(new Set(pues).size === 4 && rows.every((x) => x.r.input.liquidRejection === P.PRESETS[x.k].liquidRejection), `P8 compare shows four different plants (got ${pues.join(', ')})`);
+  ok(P.compute({ preset: 'baseline', liquidRejection: 'fluidcooler' }).input.liquidRejection === 'fluidcooler', 'P8 an explicit key wins over the stored preset');
+  // feeder A loses the feeder-A CDUs, by valid index, odd counts included
+  for (const cduUnitKw of [2000, 1900]) {
+    const r = P.compute({ cduUnitKw }), f = P.compute({ cduUnitKw }, { kind: 'cdu-feeder' }).fault, n = r.liquid.cduPerHall;
+    ok(f.lostCdu.every((i) => i >= 0 && i < n && i % 2 === 0), `P8 feeder A takes even (feeder-A) CDUs in range: ${f.lostCdu.join(',')} of ${n}`);
+    const geo = r.hall.cdus;
+    ok(f.lostCdu.every((i) => geo[i] && geo[i].feeder === 'A'), 'P8 the CDUs lost are the ones the hall geometry puts on feeder A');
+  }
+  // cooler count has no jumps as the design dry bulb crosses the cooler limit
+  const us = [];
+  for (let db = 30; db <= 40; db += 0.5) us.push(P.compute({ designDbC: db }).liquid.coolerUnits);
+  const top = Math.max(...us), worst = Math.max(...us.slice(1).map((u, i) => Math.abs(u - us[i]))) / top;
+  ok(worst < 0.15, `P8 cooler count changes smoothly with design dry bulb (largest step ${(worst * 100).toFixed(0)} % of ${top})`);
+  ok(Math.min(...us) >= 0.5 * top, `P8 a hotter design day does not shrink the cooler plant that still carries the cooler hours (min ${Math.min(...us)} of ${top})`);
+  // a bad enum from a URL hash cannot turn the plant into NaN
+  for (const bad of [{ liquidRejection: 'x' }, { chillerType: 'magic' }, { upsTopology: '3N' }, { cduFeed: 'none' }, { climate: 'mars' }]) {
+    ok(isFinite(P.compute(bad).totals.pue), `P8 invalid ${JSON.stringify(bad)} falls back to a valid value`);
+  }
+  ok(isFinite(P.compute({ cyclesOfConc: 1 }).totals.wueAnnual) && isFinite(P.compute({ airDeltaK: 0.5 }).totals.pue) && isFinite(P.compute({ fwsDeltaK: 0 }).totals.pue), 'P8 degenerate physical inputs are clamped');
+  // CHW pump heat lands on the chillers
+  const r = P.compute({});
+  ok(r.air.chillerEvapKw > r.air.hallLoadKw * r.input.halls + r.elec.roomLoadKw + r.elec.roomFanKw, 'P8 chiller load includes the CHW pump heat');
+  // FWS fault honours the advanced inputs
+  const a = P.compute({}, { kind: 'fws-pump' }).fault.rideThroughS, b = P.compute({ tcsLoopM3PerCdu: 12, throttleC: 60 }, { kind: 'fws-pump' }).fault.rideThroughS;
+  ok(Math.abs(b / a - 2) < 0.01, 'P8 the FWS fault uses tcsLoopM3PerCdu (double the volume, double the ride-through)');
+  // save keeps an explicit value that equals the global default but not the climate's default
+  const kept = P.saveDiff({ climate: 'temperate', designDbC: 35 });
+  ok(kept.designDbC === 35, 'P8 save keeps a design dry bulb that differs from the climate preset');
 }
 
 if (fails.length) {

@@ -483,10 +483,7 @@
   function compare() {
     var host = document.getElementById('ltcCompare');
     if (!host) return;
-    var rows = Object.keys(P.PRESETS).map(function (k) {
-      var r = P.compute(Object.assign({}, state, P.PRESETS[k]));
-      return { k: k, label: P.PRESETS[k].label, r: r };
-    });
+    var rows = P.comparePresets(state);   // drops a stored preset so each row really is its own plant
     var cur = R.input;
     host.innerHTML = '<table class="ltc-table"><thead><tr><th>Plant</th><th class="n">PUE design</th><th class="n">PUE annual</th>' +
       '<th class="n">WUE L/kWh</th><th class="n">Water m³/yr</th><th class="n">Liquid coolers</th><th class="n">Trim h/yr</th><th class="n">Chiller COP</th></tr></thead><tbody>' +

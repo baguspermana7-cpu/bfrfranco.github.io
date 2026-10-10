@@ -171,6 +171,16 @@
             else o[k] = v != null ? String(v) : d;
         });
         o.halls = Math.max(1, Math.round(o.halls));
+        // enums from a URL hash or old storage: an unknown value falls back, never turns the plant into NaN
+        var ENUM = { liquidRejection: ['drycooler', 'adiabatic', 'fluidcooler', 'tower'], chillerType: ['water', 'air'],
+                     upsTopology: ['N+1', '2N'], cduFeed: ['single', 'dual'], climate: Object.keys(CLIMATES).concat(['custom']) };
+        Object.keys(ENUM).forEach(function (k) { if (ENUM[k].indexOf(o[k]) < 0) o[k] = DEFAULTS[k]; });
+        // physical floors: a zero ΔT or one cycle of concentration has no meaning here
+        o.cyclesOfConc = Math.max(1.5, o.cyclesOfConc);
+        o.fwsDeltaK = Math.max(1, o.fwsDeltaK); o.chwDeltaK = Math.max(1, o.chwDeltaK);
+        o.airDeltaK = Math.max(4, o.airDeltaK); o.sfpKwPerM3s = clamp(o.sfpKwPerM3s, 0.1, 4);
+        o.tcsReturnC = Math.max(o.tcsReturnC, o.tcsSupplyC + 1);
+        o.upsEff = clamp(o.upsEff, 0.8, 0.999); o.txEff = clamp(o.txEff, 0.9, 0.999);
         o.capturePct = clamp(o.capturePct, 0, 99);
         o.itUtil = clamp(o.itUtil, 0.1, 1);
         if (!PRESETS[o.preset] && input && PRESETS[input.preset]) o.preset = input.preset;
@@ -240,7 +250,11 @@
         var evaporative = mode === 'fluidcooler' || mode === 'tower';
         var rise = evaporative ? 0 : p.coolerAirRiseK;
         var ratedL = lmtd(fwsR - (fwsS - app + rise), app);
-        var actualL = lmtd(fwsR - (c.sinkC + rise), Math.max(c.leaving - c.sinkC, 0.05));
+        // the air (or wet-bulb side) leaves no hotter than the water it meets: cap the outlet so the hot-end
+        // difference never collapses while the cooler still carries duty (the count jumped 37 → 44 → 22 → 1)
+        var minApp = p.coolerMinApproachK[mode];
+        var airOut = Math.min(c.sinkC + rise, fwsR - minApp);
+        var actualL = lmtd(Math.max(fwsR - airOut, minApp), Math.max(c.leaving - c.sinkC, minApp));
         var derate = clamp(actualL / ratedL, 0.05, 1.5);
         // the trim chiller covers what the cooler cannot reach; count units for the cooler's share
         var unitKw = p.coolerUnitKw[mode] * derate;
@@ -301,15 +315,16 @@
         for (var i = 0; i < 6; i++) {                               // transformer loss depends on load: iterate
             erLoad = (upsLoss + distLoss + txLoss) * p.elecRoomShare;
             erFans = erLoad * fanFrac / (1 - fanFrac);
-            evap = crahLoad + erLoad + erFans;
+            // the CHW pumps' work ends up in the water the chillers cool
+            chwPump = pumpKw((crahLoad + erLoad + erFans) / (CP_W * p.chwDeltaK) / RHO_W, p.chwHeadM, p.pumpEff);
+            evap = crahLoad + erLoad + erFans + chwPump;
             var running = sized ? (p.chillerStageAll ? sized.chillersTotal : Math.max(1, Math.ceil(evap / p.chillerUnitKw))) : Math.ceil(evap / p.chillerUnitKw);
             plr = evap / (running * p.chillerUnitKw);
             cop = chillerCop(p, plr, dbC, wbC);
             chillerKwe = evap / cop;
-            chwPump = pumpKw(evap / (CP_W * p.chwDeltaK) / RHO_W, p.chwHeadM, p.pumpEff);
             // condenser heat: to towers (water-cooled) or to air through the chiller's own fans (air-cooled)
             // an air-cooled plant has an air-cooled trim chiller too: no tower unless the liquid path is one
-            towerRej = airChillers ? 0 : evap + chillerKwe + chwPump + trimKw + trimKwe;
+            towerRej = airChillers ? 0 : evap + chillerKwe + trimKw + trimKwe;
             if (p.liquidRejection === 'tower') towerRej += c.qCooler;
             var cwKgS = towerRej / (CP_W * 5.5);                    // 5.5 K condenser water ΔT
             cwPump = towerRej > 0 ? pumpKw(cwKgS / RHO_W, p.cwHeadM, p.pumpEff) : 0;
@@ -326,7 +341,7 @@
 
         // energy balance: every kW of electricity in leaves as heat somewhere
         var heatOut = (p.liquidRejection === 'tower' ? 0 : c.qCooler) + towerRej + cwPump + towerFans + coolerFans + auxKw
-            + (airChillers ? evap + chillerKwe + chwPump + trimKw + trimKwe : 0)
+            + (airChillers ? evap + chillerKwe + trimKw + trimKwe : 0)
             + (txLoss + upsLoss + distLoss) * (1 - p.elecRoomShare);
 
         return {
@@ -343,7 +358,8 @@
     }
 
     function compute(input, fault) {
-        var p = normalise(input && input.preset && PRESETS[input.preset] ? Object.assign({}, input, PRESETS[input.preset]) : input);
+        // a stored preset supplies defaults; explicit keys in the input win (the compare table relies on it)
+        var p = normalise(input && input.preset && PRESETS[input.preset] ? Object.assign({}, PRESETS[input.preset], input) : input);
         var f = fault || {};
         var d = solve(p, 1, p.designDbC, p.designWbC, null);         // design day sizes the plant
         var hallIt = d.it / p.halls;
@@ -354,7 +370,14 @@
         var crahN = Math.ceil(crahLoadHall / p.crahUnitKw);
         var crahPerHall = crahN + p.crahRedundancy;
         var chillersN = Math.ceil(d.evap / p.chillerUnitKw);
+        /* Coolers are sized for the condition that loads them most, not only the design day: past the
+           cooler's limit the trim chiller carries the design day, but the cooler still carries most of the
+           liquid heat on cooler hours. So the count is the largest over the design day and every bin. */
         var cc = coolerCount(p, d.toFws + d.fwsPump, d.cooler);
+        p.climateBins.forEach(function (b) {
+            var sb = solve(p, 1, b[0], b[1], null), cb = coolerCount(p, sb.toFws + sb.fwsPump, sb.cooler);
+            if (cb.n > cc.n) cc = cb;
+        });
         var sized = { chillersTotal: chillersN + p.chillerRedundancy };
         d = solve(p, 1, p.designDbC, p.designWbC, sized);           // design day on the installed plant
 
@@ -536,7 +559,8 @@
         if (f.kind === 'cdu-feeder') {
             // single-fed CDUs alternate A/B; losing a feeder drops every other CDU
             var lost = p.cduFeed === 'dual' ? 0 : Math.ceil(cdu / 2);
-            for (var i = 0; i < lost; i++) out.lostCdu.push(2 * i + 1);
+            // feeder A carries the even-numbered CDUs (hallGeometry: c % 2 ? 'B' : 'A')
+            for (var i = 0; i < lost && 2 * i < cdu; i++) out.lostCdu.push(2 * i);
             var left = cdu - lost;
             out.liquidShortKw = Math.max(0, hallLiquid - left * p.cduUnitKw);
             out.flowLost = out.liquidShortKw > 0;
@@ -552,8 +576,8 @@
             out.airCapKw = (r.air.crahPerHall - out.lostCrah) * p.crahUnitKw;
             out.note = out.lostCrah + ' CRAHs out of ' + r.air.crahPerHall + '.';
         } else if (f.kind === 'fws-pump') {
-            var loopM3 = num(f.loopM3, 6) * r.liquid.cduPerHall;           // ASSUMED ~6 m³ TCS volume per CDU
-            var margin = 60 - p.tcsReturnC;                                  // ASSUMED throttle at ~60 °C return
+            var loopM3 = num(f.loopM3, p.tcsLoopM3PerCdu) * r.liquid.cduPerHall;
+            var margin = p.throttleC - p.tcsReturnC;
             out.rideThroughS = loopM3 * RHO_W * CP_W * Math.max(margin, 1) / hallLiquid;
             out.note = 'FWS lost to ' + hall + ': TCS loop water absorbs the heat for ≈' + Math.round(out.rideThroughS / 60) + ' min.';
         } else if (f.kind === 'chiller') {
@@ -572,20 +596,38 @@
     /* Shared state: one plant for every page. localStorage + #p= hash (hash wins, so a link
        carries the scenario). */
     var KEY = 'ltc_plant_v1';
+    // The #p= link scenario is applied ONCE, at the first load of the page; afterwards edits made in the
+    // strip win, and the shared storage is not silently rewritten from the URL on every read.
+    var hashState = null;
     function load() {
         var s = {};
         try { s = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { s = {}; }
-        try {
-            var m = /[#&]p=([^&]+)/.exec(location.hash || '');
-            if (m) s = Object.assign(s, JSON.parse(decodeURIComponent(m[1])));
-        } catch (e) { /* malformed hash: keep stored state */ }
+        if (hashState === null) {
+            hashState = {};
+            try {
+                var m = /[#&]p=([^&]+)/.exec((typeof location !== 'undefined' && location.hash) || '');
+                if (m) hashState = JSON.parse(decodeURIComponent(m[1])) || {};
+            } catch (e) { hashState = {}; }
+            s = Object.assign(s, hashState);
+        }
         return s;
     }
-    function save(input) {
-        var diff = {};
+    /* What to store: every key that differs from the default IT WOULD OTHERWISE GET — climate-aware, so a
+       design dry bulb of 35 °C chosen on a temperate site is kept, not dropped for equalling the global default. */
+    function saveDiff(input) {
+        var diff = {}, base = normalise({ climate: input && input.climate });
         Object.keys(input || {}).forEach(function (k) {
-            if (k === 'preset' || (k in DEFAULTS && JSON.stringify(input[k]) !== JSON.stringify(DEFAULTS[k]))) diff[k] = input[k];
+            if (k === 'preset' || (k in DEFAULTS && JSON.stringify(input[k]) !== JSON.stringify(base[k]))) diff[k] = input[k];
         });
+        if (input && input.climate && input.climate !== DEFAULTS.climate) diff.climate = input.climate;
+        return diff;
+    }
+    function comparePresets(state) {
+        var s = Object.assign({}, state); delete s.preset;
+        return Object.keys(PRESETS).map(function (k) { return { k: k, label: PRESETS[k].label, r: compute(Object.assign({}, s, PRESETS[k])) }; });
+    }
+    function save(input) {
+        var diff = saveDiff(input);
         try { localStorage.setItem(KEY, JSON.stringify(diff)); } catch (e) { /* private mode */ }
         try { root.dispatchEvent(new CustomEvent('ltc-plant-change', { detail: diff })); } catch (e) { /* node */ }
         return diff;
@@ -594,7 +636,7 @@
     var api = { DEFAULTS: DEFAULTS, PRESETS: PRESETS, TROPICAL_BINS: TROPICAL_BINS, PLR_CURVE: PLR_CURVE, CLIMATES: CLIMATES,
                 parseBins: parseBins, transient: transient, hallGeometry: hallGeometry,
                 compute: compute, solve: solve, normalise: normalise, plrFactor: plrFactor, chillerCop: chillerCop,
-                lmtd: lmtd, load: load, save: save, KEY: KEY,
+                lmtd: lmtd, load: load, save: save, saveDiff: saveDiff, comparePresets: comparePresets, KEY: KEY,
                 CONST: { CP_W: CP_W, RHO_W: RHO_W, CP_A: CP_A, RHO_A: RHO_A, H_FG: H_FG, KWRT: KWRT } };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
     root.LTCPlant = api;

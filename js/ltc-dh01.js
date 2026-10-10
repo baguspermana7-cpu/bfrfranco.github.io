@@ -100,7 +100,8 @@
   }
   function rgb(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + (a == null ? 1 : a) + ')'; }
 
-  function draw(cv, r, s) {
+  function tok(el, name, fallback) { var v = getComputedStyle(el).getPropertyValue(name).trim(); return v || fallback; }
+  function draw(cv, r, s, cursor) {
     var h = r.hall, p = r.input, dpr = root.devicePixelRatio || 1;
     var W = cv.clientWidth || 600, scale = W / h.lengthM, H = Math.round(h.widthM * scale);
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.height = H + 'px';
@@ -117,21 +118,32 @@
       g.fillStyle = rgb(ramp(Math.min(k.exhaust, 45)), 0.9); g.fillRect(k.x * scale, (hy - p.hotAisleM / 2) * scale, p.rackPitchM * scale + 1, p.hotAisleM * scale + 1);
     });
     g.restore();
-    // racks, crisp, coloured by inlet; a rack whose CDU is down is outlined
-    s.racks.forEach(function (k) {
-      g.fillStyle = rgb(ramp(k.inlet)); g.fillRect(k.x * scale + 0.5, k.y * scale + 0.5, p.rackPitchM * scale - 1, p.rackDepthM * scale - 1);
-      if (s.lostCdu[k.cdu] && ST.header === 'per-cdu') { g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 1; g.strokeRect(k.x * scale + 0.5, k.y * scale + 0.5, p.rackPitchM * scale - 1, p.rackDepthM * scale - 1); }
+    // racks, crisp, coloured by inlet. Colour is not the only channel (a reader with colour-vision
+    // deficiency loses green vs amber): above 27 °C a rack gets an outline, above 32 °C a hatch too.
+    var ink = tok(cv, '--t1', '#E8EDF5'), bg = tok(cv, '--bg1', '#0a0e1a'), cy = tok(cv, '--c', '#00DDFF'), red = tok(cv, '--r', '#FF5050'), sky = tok(cv, '--t2', '#A0AEC0');
+    s.racks.forEach(function (k, idx) {
+      var x = k.x * scale + 0.5, y = k.y * scale + 0.5, w = p.rackPitchM * scale - 1, hh = p.rackDepthM * scale - 1;
+      g.fillStyle = rgb(ramp(k.inlet)); g.fillRect(x, y, w, hh);
+      if (k.inlet > 32) {
+        g.save(); g.beginPath(); g.rect(x, y, w, hh); g.clip(); g.strokeStyle = bg; g.lineWidth = 1;
+        for (var t = -hh; t < w; t += 4) { g.beginPath(); g.moveTo(x + t, y + hh); g.lineTo(x + t + hh, y); g.stroke(); }
+        g.restore();
+      }
+      if (k.inlet > 27 || (s.lostCdu[k.cdu] && ST.header === 'per-cdu')) { g.strokeStyle = ink; g.lineWidth = 1; g.strokeRect(x, y, w, hh); }
+      if (cursor === idx) { g.strokeStyle = cy; g.lineWidth = 2; g.strokeRect(x - 1.5, y - 1.5, w + 3, hh + 3); }
     });
     // CDUs and CRAHs
     h.cdus.forEach(function (c) {
       var dead = s.lostCdu[c.i];
-      g.fillStyle = dead ? '#3a0f14' : '#0f2a33'; g.strokeStyle = dead ? '#ff5050' : '#00ddff'; g.lineWidth = 1.2;
+      g.fillStyle = bg; g.strokeStyle = dead ? red : cy; g.lineWidth = 1.4;
       g.fillRect(c.x * scale - 6, c.y * scale - 5, 12, 10); g.strokeRect(c.x * scale - 6, c.y * scale - 5, 12, 10);
+      if (dead) { g.beginPath(); g.moveTo(c.x * scale - 6, c.y * scale - 5); g.lineTo(c.x * scale + 6, c.y * scale + 5); g.stroke(); }
     });
     h.crahs.forEach(function (c) {
       var dead = s.crahOut[c.i];
-      g.fillStyle = dead ? '#ff5050' : '#9fd8ff';
+      g.fillStyle = dead ? red : sky;
       g.fillRect(c.x * scale - 3, c.y * scale - 7, 6, 14);
+      if (dead) { g.strokeStyle = bg; g.lineWidth = 1.2; g.beginPath(); g.moveTo(c.x * scale - 3, c.y * scale - 7); g.lineTo(c.x * scale + 3, c.y * scale + 7); g.stroke(); }
     });
     return { scale: scale };
   }
@@ -166,15 +178,16 @@
       '<div class="ltc-dh-wrap"><canvas id="dhCv" role="img" aria-label="DH01 plan coloured by rack inlet temperature"></canvas></div>' +
       '<div class="ltc-dh-legend" id="dhLeg"></div><p class="ltc-note" id="dhNote"></p><div id="dhChart"></div>' +
       '<p class="ltc-note"><b>Thermal approximation for training — not CFD.</b> Supply air per cold aisle from the CRAH fan walls at its ends, rack airflow demand at the design ΔT, deficit made up by recirculated exhaust, weighted toward the aisle middle. It shows where a fault bites and by how much in this plant’s numbers; plumes, under-floor flow and containment leakage need a CFD study.</p>';
-    var cv = host.querySelector('#dhCv'), tip = null, last = null;
+    var cv = host.querySelector('#dhCv'), last = null, cursor = -1;
     function legend() {
       var c = [18, 21, 24, 27, 30, 32, 35, 40, 45];
-      host.querySelector('#dhLeg').innerHTML = '<span>Rack inlet</span>' + c.map(function (t) { return '<i style="background:' + rgb(ramp(t)) + '"></i><b>' + t + (t === 27 ? ' rec.' : t === 32 ? ' A1' : '') + '</b>'; }).join('') +
-        '<span class="ltc-dh-k"><i class="cdu"></i>CDU</span><span class="ltc-dh-k"><i class="crah"></i>CRAH</span>';
+      host.querySelector('#dhLeg').innerHTML = '<span>Rack inlet °C</span>' + c.map(function (t) { return '<i style="background:' + rgb(ramp(t)) + '"></i><b>' + t + '</b>'; }).join('') +
+        '<span class="ltc-dh-k"><i class="ol"></i>&gt; 27 recommended limit</span><span class="ltc-dh-k"><i class="ht"></i>&gt; 32 A1 allowable</span>' +
+        '<span class="ltc-dh-k"><i class="cdu"></i>CDU</span><span class="ltc-dh-k"><i class="crah"></i>CRAH</span><span class="ltc-dh-k">struck through: out of service</span>';
     }
     function paint() {
       var r = root.LTCPlantStrip.get().result, s = solveHall(r, ST.fault, ST.header, ST.minute, ST.phase);
-      last = { r: r, s: s, geo: draw(cv, r, s) };
+      last = { r: r, s: s, geo: draw(cv, r, s, typeof cursor === 'number' ? cursor : -1) };
       host.querySelector('#dhRead').innerHTML = '<span>DH01 <b>' + fmt(r.it.hallKw / 1000, 1) + ' MW</b> · ' + r.hall.racks.length + ' racks · ' + fmt(r.hall.lengthM, 1) + ' × ' + fmt(r.hall.widthM, 1) + ' m</span><span class="sep">/</span>' +
         '<span>supply <b>' + fmt(s.supply, 1) + ' °C</b></span><span class="sep">/</span><span>hottest inlet <b>' + fmt(s.maxInlet, 1) + ' °C</b></span><span class="sep">/</span>' +
         '<span>racks &gt; 27 °C <b>' + s.over27 + '</b> · &gt; 32 °C <b>' + s.over32 + '</b></span><span class="sep">/</span>' +
@@ -194,17 +207,36 @@
       var ph = e.target.closest('[data-ph]'); if (ph) { ST.phase = ph.getAttribute('data-ph'); paint(); }
     });
     host.querySelector('#dhMin').addEventListener('input', function (e) { ST.minute = +e.target.value; host.querySelector('#dhMinO').textContent = ST.minute; paint(); });
-    cv.addEventListener('pointermove', function (e) {
-      if (!last) return;
+    /* one tooltip path for mouse, touch and keyboard (LTCTrace.show clamps to the viewport) */
+    function rackAt(e) {
       var b = cv.getBoundingClientRect(), x = (e.clientX - b.left) / last.geo.scale, y = (e.clientY - b.top) / last.geo.scale, p = last.r.input;
-      var k = last.s.racks.filter(function (q) { return x >= q.x && x <= q.x + p.rackPitchM && y >= q.y && y <= q.y + p.rackDepthM; })[0];
-      if (!k) { if (root.LTCTrace) root.LTCTrace.hide(); return; }
+      for (var i = 0; i < last.s.racks.length; i++) { var q = last.s.racks[i]; if (x >= q.x && x <= q.x + p.rackPitchM && y >= q.y && y <= q.y + p.rackDepthM) return i; }
+      return -1;
+    }
+    function showRack(i, cx, cy2) {
+      if (!last || i < 0) { if (root.LTCTrace) root.LTCTrace.hide(); return; }
+      var k = last.s.racks[i];
       var band = k.inlet <= 27 ? 'inside recommended (18–27 °C)' : k.inlet <= 32 ? 'allowable A1 only (≤ 32 °C)' : 'beyond A1 allowable';
-      if (!tip) { tip = document.createElement('div'); tip.className = 'ltc-tip'; document.body.appendChild(tip); }
-      tip.innerHTML = '<div class="ltc-tip-h">Rack ' + (k.i + 1) + ' · row ' + (k.row + 1) + '</div><dl><dt>Inlet</dt><dd>' + fmt(k.inlet, 1) + ' °C</dd><dt>Air heat</dt><dd>' + fmt(k.q, 1) + ' kW</dd><dt>CDU</dt><dd>' + (k.cdu + 1) + ' (feeder ' + (k.cdu % 2 ? 'B' : 'A') + ')</dd><dt>Aisle air</dt><dd>' + fmt(k.f * 100) + ' % of demand</dd></dl><div class="ltc-tip-n">' + band + '</div>';
-      tip.hidden = false; tip.style.left = Math.min(e.clientX + 14, innerWidth - 260) + 'px'; tip.style.top = (e.clientY + 14) + 'px';
+      if (root.LTCTrace && root.LTCTrace.show) root.LTCTrace.show({ title: 'Rack ' + (k.i + 1) + ' · row ' + (k.row + 1),
+        rows: [['Inlet', fmt(k.inlet, 1) + ' °C'], ['Air heat', fmt(k.q, 1) + ' kW'], ['CDU', (k.cdu + 1) + ' (feeder ' + (k.cdu % 2 ? 'B' : 'A') + ')'], ['Aisle air', fmt(k.f * 100) + ' % of demand']], note: band }, cx, cy2);
+      cv.setAttribute('aria-label', 'DH01 plan. Rack ' + (k.i + 1) + ', row ' + (k.row + 1) + ': inlet ' + fmt(k.inlet, 1) + ' °C, ' + band + '. Arrow keys move between racks.');
+    }
+    function at(i) { var b = cv.getBoundingClientRect(), k = last.s.racks[i], sc = last.geo.scale, p = last.r.input; return [b.left + (k.x + p.rackPitchM) * sc, b.top + k.y * sc]; }
+    cv.tabIndex = 0;
+    cv.addEventListener('pointermove', function (e) { if (!last) return; var i = rackAt(e); showRack(i, e.clientX, e.clientY); });
+    cv.addEventListener('pointerdown', function (e) { if (!last) return; var i = rackAt(e); if (i >= 0) { cursor = i; paint(); showRack(i, e.clientX, e.clientY); } });
+    cv.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && root.LTCTrace) root.LTCTrace.hide(); });
+    cv.addEventListener('keydown', function (e) {
+      if (!last) return;
+      var n = last.s.racks.length, perRow = last.r.hall.racksPerRow, step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: perRow, ArrowUp: -perRow }[e.key];
+      if (e.key === 'Escape') { cursor = -1; paint(); if (root.LTCTrace) root.LTCTrace.hide(); return; }
+      if (!step) return;
+      e.preventDefault();
+      cursor = cursor < 0 ? 0 : Math.max(0, Math.min(n - 1, cursor + step));
+      paint(); var xy = at(cursor); showRack(cursor, xy[0], xy[1]);
     });
-    cv.addEventListener('pointerleave', function () { if (tip) tip.hidden = true; });
+    cv.addEventListener('focus', function () { if (cursor < 0) { cursor = 0; paint(); var xy = at(0); showRack(0, xy[0], xy[1]); } });
+    cv.addEventListener('blur', function () { if (root.LTCTrace) root.LTCTrace.hide(); });
     legend(); paint();
     root.LTCPlantStrip.onChange(paint);
     if (root.ResizeObserver) new ResizeObserver(function () { if (cv.clientWidth) paint(); }).observe(cv);

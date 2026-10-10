@@ -244,6 +244,22 @@ for (const [page, mod] of Object.entries(PAGES)) {
   near('W10d', m.itKw, 40000, 1e-6, 'lab IT kW equals the plant IT');
   ok('W10e', m.scores.total === 77 && m.riskIndex === 12, 'the screening layer (scores, risk) passes through from the lab model');
   near('W10f', m.pueGap, m.pue - 1.2, 1e-12, 'PUE gap is recomputed against the plant PUE, not the legacy one');
+  /* review defects: 2N persists as a number the lab can read back; a custom climate is not relabelled */
+  const store = {};
+  sb.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = v; } };
+  sb.LTCLabPlant.sync(Object.assign({}, lab, { redundancy: '2N' }));
+  const saved = JSON.parse(store[sb.LTCPlant.KEY] || '{}');
+  ok('W10h', saved.cduRedundancy >= 2, `2N is stored as a resolved spare count (got ${saved.cduRedundancy})`);
+  store[sb.LTCPlant.KEY] = JSON.stringify({ climate: 'custom', climateBins: [[30, 26, 8760]], designDbC: 30, designWbC: 26 });
+  // the select shows 'tropical' because it cannot show 'custom'; the reader did not choose it
+  sb.LTCLabPlant.ready('tropical');
+  sb.LTCLabPlant.sync(Object.assign({}, lab, { climate: 'tropical' }));
+  const kept = JSON.parse(store[sb.LTCPlant.KEY]);
+  ok('W10i', kept.climate === 'custom' && Array.isArray(kept.climateBins), `a custom climate survives a lab run (got ${kept.climate})`);
+  // the reader picks another climate in the lab: it is written and the old bins go with it
+  sb.LTCLabPlant.sync(Object.assign({}, lab, { climate: 'dry' }));
+  const moved = JSON.parse(store[sb.LTCPlant.KEY]);
+  ok('W10j', moved.climate === 'arid' && !moved.climateBins, 'a climate the reader picks in the lab replaces the custom bins');
 }
 
 const total = pass + fails.length;

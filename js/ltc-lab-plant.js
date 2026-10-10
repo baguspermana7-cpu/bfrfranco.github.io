@@ -36,7 +36,9 @@
     if (isFinite(li.upsEff)) o.upsEff = Math.min(0.995, +li.upsEff / 100);
     if (isFinite(li.distLoss)) o.distLossPct = +li.distLoss;
     if (isFinite(li.rackDensityTarget)) o.rackKw = +li.rackDensityTarget;
-    if (li.climate && CLIMATE[li.climate]) o.climate = CLIMATE[li.climate];
+    // the lab's climate select speaks only when the reader changed it: a plant on a custom (pasted EPW)
+    // climate must not be relabelled 'tropical' by a select that cannot show 'custom'
+    if (li.climate && CLIMATE[li.climate] && li.climate !== pulledClimate) o.climate = CLIMATE[li.climate];
     if (isFinite(li.elecPrice)) o.elecPrice = +li.elecPrice;
     if (isFinite(li.waterTariff)) o.waterTariff = +li.waterTariff;
     if (isFinite(li.carbonIntensity)) o.gridEfKgPerKwh = +li.carbonIntensity;
@@ -44,13 +46,19 @@
     return o;
   }
 
+  var pulledClimate = null;
+  function resolve2N(st) {          // 2N = a second full set: N spares, where N comes from the plant itself
+    if (st.cduRedundancy !== 99) return st;
+    var probe = Object.assign({}, st, { cduRedundancy: 1 });
+    st.cduRedundancy = Math.max(2, P.compute(probe).liquid.cduDutyN);
+    return st;
+  }
   function compute(li, legacy) {
     // before the first pull the shared plant wins for the keys it has saved, so the very first
     // render already shows the plant chosen elsewhere
     // until the lab has read the shared plant, the plant is what it shows: one default source
     var base = pulled ? Object.assign({}, P.load(), toPlant(li)) : P.load();
-    var r = P.compute(base);
-    if (base.cduRedundancy === 99) { base.cduRedundancy = r.liquid.cduDutyN; r = P.compute(base); }   // 2N
+    var r = P.compute(resolve2N(base));
     var A = r.annual, d = r.design, L = r.liquid, Ai = r.air, E = r.elec;
     var out = Object.assign({}, legacy || {});
     var coolingKw = L.fwsPumpKw + L.coolerFanKw + L.trimKwe + L.tcsPumpKw + Ai.chillerKwe + Ai.chwPumpKw + Ai.cwPumpKw + Ai.towerFanKw + Ai.fanKw + E.roomFanKw;
@@ -83,9 +91,9 @@
   var pulled = false;
   function sync(li) {
     if (!pulled) return;
-    var st = Object.assign({}, P.load(), toPlant(li));
-    if (st.cduRedundancy === 99) delete st.cduRedundancy;
-    P.save(st);
+    var mine = toPlant(li), st = Object.assign({}, P.load(), mine);
+    if (mine.climate) { delete st.climateBins; delete st.designDbC; delete st.designWbC; pulledClimate = li.climate; }   // a new climate brings its own bins
+    P.save(resolve2N(st));
   }
 
   /* ---- overview: the same nine-block plant as the hub, on RZDiagram, with hover trace ---- */
@@ -178,6 +186,7 @@
     if (red && red.value !== want) { red.value = want; changed = red; }
     var cl = document.getElementById('inClimate'), back = { tropical: 'tropical', temperate: 'temperate', arid: 'dry' }[n.climate];
     if (cl && back && cl.value !== back && [].some.call(cl.options, function (o) { return o.value === back; })) { cl.value = back; changed = cl; }
+    if (cl) pulledClimate = cl.value;                                // what the select shows now is the plant's, not a reader's choice
     if (changed) changed.dispatchEvent(new Event(changed.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true }));
     return !!changed;
   }
@@ -188,6 +197,6 @@
 
   root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE,
     /* after the first read of the plant the lab's inputs win; tests state it explicitly */
-    ready: function () { pulled = true; } };
+    ready: function (climateShown) { pulled = true; if (climateShown) pulledClimate = climateShown; } };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCLabPlant;
 })(typeof window !== 'undefined' ? window : globalThis);

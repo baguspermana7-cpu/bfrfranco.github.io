@@ -91,7 +91,8 @@
   function autoPanel(o) {
     var host = document.getElementById('kAuto'); if (!host) return;
     if (!o) { host.innerHTML = '<p class="ltc-note">Plant model not loaded.</p>'; return; }
-    var row = function (k, v, u, f) { return '<div class="ltc-auto-row"><span>' + k + '</span><b>' + v + '</b><small>' + u + '</small><i title="' + L.esc(f) + '">auto</i></div>'; };
+    /* "auto" is a button: tap or Enter shows how the value is derived (hover-only help shut out touch and keyboard) */
+    var row = function (k, v, u, f) { return '<div class="ltc-auto-row"><span>' + k + '</span><b>' + v + '</b><small>' + u + '</small><button type="button" class="ltc-auto-info" aria-expanded="false" aria-label="How ' + L.esc(k) + ' is derived">auto</button><p class="ltc-auto-why" hidden>' + L.esc(f) + '</p></div>'; };
     host.innerHTML = '<div class="ltc-auto">' +
       row('Total facility (M0)', L.fmt(o.e, 0), 'MWh', 'Σ over climate bins of facility kW × hours') +
       row('UPS output (M1)', L.fmt(o.it1, 0), 'MWh', 'IT + cord + PDU losses (+ CDU pumps on UPS)') +
@@ -300,6 +301,11 @@
   function boot() {
     L.init({ module: 'iso' });
     document.getElementById('p-kpi').addEventListener('input', runKpi);
+    document.getElementById('kAuto').addEventListener('click', function (e) {
+      var b = e.target.closest('.ltc-auto-info'); if (!b) return;
+      var why = b.nextElementSibling, open = why.hidden;
+      why.hidden = !open; b.setAttribute('aria-expanded', String(open));
+    });
     document.getElementById('kSrc').addEventListener('click', function (e) {
       var b = e.target.closest('[data-src]'); if (!b) return;
       src = b.getAttribute('data-src');
