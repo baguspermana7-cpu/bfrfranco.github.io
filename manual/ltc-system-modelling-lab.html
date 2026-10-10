@@ -85,7 +85,7 @@
   },
   "about": "Steady-state liquid-to-chip cooling solver methodology for AI/HPC data centers",
   "articleSection": "Thermal Lab",
-  "dependencies": "ASHRAE Liquid Cooling Design Guide, HX Institute, ISO 14644, pump affinity laws",
+  "dependencies": "ASHRAE Liquid Cooling Design Guide, HX Institute, ISO/IEC 30134, pump affinity laws",
   "proficiencyLevel": "Expert",
   "datePublished": "2026-07-20"
 }
@@ -330,7 +330,7 @@
             <p>Every input, equation, constant, output, and reference behind the LTC steady-state solver. All math is executed by the deterministic engine <code class="mn-mono">js/ltc-system-modelling-lab.js</code> (function <code class="mn-mono">computeModel</code>) — no back-solved constants, no random values. This is a <strong>SIMULATED / educational</strong> model; it is not a substitute for site-specific hydraulic or thermal commissioning data.</p>
             <div class="mn-meta">
                 <span class="mn-chip">Solver <strong>computeModel (inline)</strong></span>
-                <span class="mn-chip">Basis <strong>ASHRAE / HX Institute / ISO 14644</strong></span>
+                <span class="mn-chip">Basis <strong>ASHRAE / HX Institute / ISO/IEC 30134</strong></span>
                 <span class="mn-chip">Sliders <strong>5 primary</strong></span>
                 <span class="mn-chip">Outputs <strong>12+</strong></span>
                 <span class="mn-chip">Status <strong>SIMULATED — educational</strong></span>
@@ -439,7 +439,7 @@
                 <span class="mn-eq">WUE = baseWUE × (1 − economizerFraction × 0.43) × (1 − effectiveCapture/100 × 0.32) × (1 − (futureFactor−1) × 0.18)</span>
                 <span class="mn-eq">annualKWh = totalFacilityKw × 8 760</span>
                 <span class="mn-eq">annualGWh = annualKWh / 1 000 000</span>
-                <span class="mn-where">baseWUE is climate-specific. Economizer use and high liquid-capture reduce water consumption. WUE clamped to ≥ 0.04 L/kWh.<span class="mn-src">ISO 14644 / Green Grid · inline computeModel</span></span>
+                <span class="mn-where">baseWUE is climate-specific. Economizer use and high liquid-capture reduce water consumption. WUE clamped to ≥ 0.04 L/kWh.<span class="mn-src">ISO/IEC 30134-9 / Green Grid · inline computeModel</span></span>
             </div>
         </section>
 
@@ -524,7 +524,7 @@
                 <li><b>ASHRAE TC9.9 Liquid Cooling Design Guide</b> — Liquid cooling system design, coolant selection, temperature ranges, flow sizing methodology for data centers.</li>
                 <li><b>HX Institute Standards</b> — Heat exchanger thermal performance, approach temperature, effectiveness-NTU method, and hydraulic sizing.</li>
                 <li><b>Pump affinity laws (centrifugal)</b> — Flow ∝ speed; head ∝ speed²; power ∝ speed³. Used in fan-power modelling (fanKw ∝ flow³ scaling with control reduction).</li>
-                <li><b>ISO 14644 / ISO 30134-2</b> — Cleanroom and data center classification; WUE metric definition; energy efficiency governance.</li>
+                <li><b>ISO/IEC 30134-2 / 30134-9</b> — PUE and WUE metric definitions for data centres. (ISO 14644, cited here before v3.12.2, is the cleanroom air-cleanliness standard and defines neither.)</li>
                 <li><b>ANSI/BICSI 002</b> — Data center design and implementation best practices; redundancy configurations.</li>
                 <li><b>Uptime Institute Tier Standard</b> — Availability tiers (N, N+1, 2N) and their concurrently-maintainable requirements.</li>
                 <li><b>ASHRAE 90.4 / Green Grid</b> — PUE and system COP definitions and reporting methodology.</li>
@@ -591,7 +591,7 @@
         });
     })();
     </script>
-    <script src="../js/rz-version.js?v=20261010-5342abab" defer></script>
+    <script src="../js/rz-version.js?v=20261010-3fa3299d" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="../js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
     <script src="../js/rz-command-palette.js?v=20260920-cf005f60" defer></script>

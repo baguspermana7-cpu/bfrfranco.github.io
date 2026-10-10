@@ -31,9 +31,8 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20261009-bfaeb6db">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="js/rz-version.js?v=20261010-5342abab" defer></script>
+    <script src="js/rz-version.js?v=20261010-3fa3299d" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
-    <script src="js/rz-toast.js?v=20261003-b0abd919" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
     <script src="js/cdu-model.js?v=20260920-13afdfe3" defer></script>
     <script src="js/cdu-engine.js?v=20260920-f5abd3c1" defer></script>
@@ -732,23 +731,9 @@
             Object.keys(o).forEach(function(k){ if(typeof o[k]==='number'||typeof o[k]==='string') meta.push(['Input \u2014 '+k, String(o[k])]); });
             return meta;
         }
-        /* Feedback, in the register the motion standard gives it. RZToast is a
-           transition-driven toast (js/rz-toast.js) -- it does not block the page
-           the way window.alert does, and an alert in an automated browser stops
-           every later command, which is why the browser rules here forbid
-           triggering one. The alert stays as the last resort: a failure message
-           that itself fails to appear is worse than an ugly one. */
-        function ccNotify(message, kind){
-            if (window.RZToast && typeof window.RZToast.show === 'function') {
-                window.RZToast.show(message, { kind: kind || 'info', duration: 6000 });
-                return;
-            }
-            try { window.alert(message); } catch (e) {}
-        }
-
         function exportPDF(issue){
             var api=window.RZPdfExport;
-            if(!api){ ccNotify('The export module did not load \u2014 reload the page and retry.', 'fault'); return; }
+            if(!api){ try{ window.alert('The export module did not load \u2014 reload the page and retry.'); }catch(e){} return; }
             var built=ccReportSections(), byId={};
             built.forEach(function(sec){ byId[sec.id]=sec; });
             var chosen=(issue&&issue.sections&&issue.sections.length)?issue.sections:built;
@@ -763,7 +748,7 @@
                     return { id:c.id, label:c.label||(src?src.label:c.id), html:src?api.escapeScript(src.html):'' }; }),
                 omitted:(issue&&issue.omittedSections)||[],
                 footerNote:'Educational estimate \u2014 not a vendor selection'
-            }), { onBlocked:function(){ ccNotify('Pop-up blocked \u2014 allow pop-ups for this site to export the PDF.', 'warn'); } });
+            }), { onBlocked:function(){ try{ window.alert('Pop-up blocked \u2014 allow pop-ups for this site to export the PDF.'); }catch(e){} } });
         }
 
         function init(){

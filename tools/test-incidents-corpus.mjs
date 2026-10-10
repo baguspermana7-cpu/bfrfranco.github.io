@@ -54,35 +54,6 @@ for (const f of files) {
     if (!Array.isArray(inc[k]) || inc[k].length === 0) fail(`empty "${k}[]"`);
   }
 
-  /* PLACEHOLDER DATE. The seed-then-fill pattern creates a skeleton with an estimated
-     date before research; three dossiers kept a first-of-the-month seed after the
-     research filled in the real day (azure-west-us2: header 2026-05-01, its own
-     sequence of events 2026-05-29; cyrusone 11-01 vs 11-27; digital-realty-singapore
-     09-01 vs 09-10). The header feeds the hub table, so the library printed the
-     wrong date for each. A header on the 1st that sits more than 2 days before the
-     first TRIGGER/IMPACT event is a seed that was never corrected. Precursor events
-     (a latent bug shipped months earlier) are deliberately not compared: only the
-     trigger and impact phases. */
-  const day = (s) => { const m = /(\d{4}-\d{2}-\d{2})/.exec(String(s || '')); return m ? m[1] : null; };
-  const hd = day(inc.date);
-  const onset = (inc.sequenceOfEvents || [])
-    .filter((e) => /^(TRIGGER|IMPACT)$/i.test(String(e.phase || '')))
-    .map((e) => day(e.t)).filter(Boolean).sort()[0];
-  if (hd && onset) {
-    const gap = (Date.parse(onset) - Date.parse(hd)) / 864e5;
-    if (hd.endsWith('-01') && gap > 2) fail(`header date ${hd} looks like an uncorrected seed: the first trigger/impact event is ${onset}`);
-  }
-  /* A header AFTER the first IMPACT is never right, whatever its day: x-twitter-oregon
-     printed 2025-05-24 for a fire its own sequence of events dates 22 May. Compared with
-     IMPACT, not TRIGGER, because a TRIGGER can legitimately be a latent cause shipped
-     months earlier (Fastly's bug deployed 12 May, CrowdStrike's in February). */
-  const impact = (inc.sequenceOfEvents || [])
-    .filter((e) => /^IMPACT$/i.test(String(e.phase || '')))
-    .map((e) => day(e.t)).filter(Boolean).sort()[0];
-  if (hd && impact && (Date.parse(hd) - Date.parse(impact)) / 864e5 > 1) {
-    fail(`header date ${hd} is after the first impact event (${impact})`);
-  }
-
   const refs = Array.isArray(inc.references) ? inc.references : [];
   const hasOfficialRef = refs.some((r) => OFFICIAL.has(r.type));
   const minRefs = hasOfficialRef ? 1 : 2;

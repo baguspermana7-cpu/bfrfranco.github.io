@@ -71214,7 +71214,7 @@ Parameter-driven and standards-linked engineering labs.
 
 
  LTC Modelling Lab Liquid-to-chip steady-state solver, HX effectiveness, affinity laws. ManualTool
- Standards + LTC Lab 5 standards engines + compliance scoring workbench. ManualTool
+ LTC Workbench Equations, sources and limits behind the ASHRAE, Tier, TIA, NFPA and ISO tools. ManualTool
  AI Engineering Maintenance FMECA + Weibull + knowledge-graph predictive-maintenance concept. ManualTool
  Network Visualization Hub Industrial protocol frame timing & topology (Modbus, BACnet, OPC-UA…). ManualTool
 
@@ -71305,7 +71305,7 @@ Every input, equation, constant, output, and reference behind the LTC steady-sta
 
 
  Solver **computeModel (inline)**
- Basis **ASHRAE / HX Institute / ISO 14644**
+ Basis **ASHRAE / HX Institute / ISO/IEC 30134**
  Sliders **5 primary**
  Outputs **12+**
  Status **SIMULATED — educational**
@@ -71460,7 +71460,7 @@ The solver runs in one deterministic pass with no iteration loops. Function name
  WUE = baseWUE × (1 − economizerFraction × 0.43) × (1 − effectiveCapture/100 × 0.32) × (1 − (futureFactor−1) × 0.18)
  annualKWh = totalFacilityKw × 8 760
  annualGWh = annualKWh / 1 000 000
- baseWUE is climate-specific. Economizer use and high liquid-capture reduce water consumption. WUE clamped to ≥ 0.04 L/kWh. ISO 14644 / Green Grid · inline computeModel
+ baseWUE is climate-specific. Economizer use and high liquid-capture reduce water consumption. WUE clamped to ≥ 0.04 L/kWh. ISO/IEC 30134-9 / Green Grid · inline computeModel
 
 
 
@@ -71614,7 +71614,7 @@ Default scenario: 12 MW IT load, direct-liquid architecture (85% capture), water
 
 - **Pump affinity laws (centrifugal)** — Flow ∝ speed; head ∝ speed²; power ∝ speed³. Used in fan-power modelling (fanKw ∝ flow³ scaling with control reduction).
 
-- **ISO 14644 / ISO 30134-2** — Cleanroom and data center classification; WUE metric definition; energy efficiency governance.
+- **ISO/IEC 30134-2 / 30134-9** — PUE and WUE metric definitions for data centres. (ISO 14644, cited here before v3.12.2, is the cleanroom air-cleanliness standard and defines neither.)
 
 - **ANSI/BICSI 002** — Data center design and implementation best practices; redundancy configurations.
 
@@ -75871,31 +75871,30 @@ DMSMS last-time-buy economics are deterministic; they do not model inventory car
 
 
 ======================================================================
-# Standards + Liquid-to-Chip Lab — Methodology & Compliance Scoring | ResistanceZero — https://resistancezero.com/manual/standards-ltc-lab.html
+# LTC Workbench — Methods, Equations and Limits | ResistanceZero — https://resistancezero.com/manual/standards-ltc-lab.html
 
-> Methodology for the Standards LTC Lab: five standards engines (ASHRAE, ANSI/TIA, ISO, NFPA, Uptime), compliance scoring and acceptance criteria.
+> Equations, sources and limits behind the LTC Workbench: ASHRAE psychrometrics, Tier tests, TIA fiber budgets, NFPA 2001 agent sizing, ISO/IEC 30134 KPIs.
 
-Home / DC Solutions / Technical Manuals / Standards LTC Lab
-
-
+Home / DC Solutions / Technical Manuals / LTC Workbench
 
 
-Technical Manual · Standards Engines
 
 
-# Standards + Liquid-to-Chip Lab — Methodology & Compliance Scoring
+Technical Manual · LTC Workbench
 
 
-Compliance scoring formula, 5-engine acceptance-criteria structure, evidence checkpoints, and worked example behind the Standards LTC Lab — a reference and pre-audit checklist workbench covering ASHRAE, ANSI/TIA, ISO, NFPA, and Uptime Institute frameworks.
+# LTC Workbench — Methods, Equations and Limits
 
 
- Standards Engines **5**
- Scoring **items_passed / total × 100**
- Band Basic **≥ 70% PASS**
- Band Advanced **≥ 90% CERTIFIED**
+What every tool in the LTC Workbench computes, the equation it uses, the document the limits come from, and where the arithmetic stops being valid. The workbench is a hub and five standards modules (ASHRAE, Tier, TIA, NFPA, ISO) beside the liquid-to-chip system model.
 
- ▶ Open the live Standards LTC Lab
 
+ Modules **6 + model**
+ Tools **22**
+ Gate **75 assertions**
+ Status **educational**
+
+ ▶ Open the LTC Workbench
 
 
 
@@ -75903,408 +75902,175 @@ Compliance scoring formula, 5-engine acceptance-criteria structure, evidence che
 ## 01 Purpose & scope
 
 
-The Standards LTC Lab is a **reference and compliance-scoring workbench**, not a physics simulator. It answers one governing question: *how many evidence checkpoints does a design or installation pass against each standard, and what band does the total score achieve?* There are no thermal or hydraulic equations executed at runtime — acceptance criteria are derived from the published standards text and evaluated against user-supplied checkbox evidence.
+The workbench answers concrete engineering questions — *is this inlet condition inside A1 at 1,200 m, can this UPS be taken out without dropping the load, how much agent does this room need, does this link fit its optics budget* — with the equation shown and the source named. It replaced six long-form articles in v3.12.0.
 
 
-The workbench covers five standards domains that routinely govern data-center and liquid-to-chip cooling infrastructure: ASHRAE TC 9.9 thermal envelopes, ANSI/TIA-942 topology readiness, ISO 50001/14644 energy governance, NFPA 75/76 fire risk, and Uptime Institute Tier alignment. Each domain is a separate deep-dive module page; this landing hub is the index and the methodology reference.
-
- **Disclaimer:** Outputs are for educational planning and pre-audit preparation only — not a substitute for a certified third-party audit, a professional engineering stamp, or a compliance declaration under any regulatory regime. Always validate final decisions with licensed professionals and the authority having jurisdiction.
-
-
-
-
-
-## 02 Inputs — evidence checkboxes per standard
-
-
-Each standards engine presents a fixed checklist of pass/fail evidence items. The user marks each item based on available design documentation, measurements, or configuration records. There are no numeric fields in the compliance scoring path — only checkbox status (pass / fail / not applicable).
-
-
+It does **not** issue compliance findings. Limits are summarised from the cited documents; the governing edition adopted by the jurisdiction, the listed manufacturer's manual and the authority having jurisdiction decide.
 
 
  |
- Engine | Evidence category | Example checkpoint items | Typical checklist depth |
+ Module | Tools | Governing documents |
 
 
-
-
- | ASHRAE TC 9.9 | Thermal environment | Inlet temperature in recommended/allowable band; supply delta-T documented; mixed cooling ratio declared | 10–18 items |
-
- | ANSI/TIA-942 | Topology & redundancy | Tier classification declared; concurrently maintainable path verified; single-point-of-failure list produced | 12–20 items |
-
- | ISO 50001 / 14644 | Energy & governance | EnMS scope documented; PUE measurement in place; improvement objectives set; cleanroom classification (if applicable) | 10–16 items |
-
- | NFPA 75 / 76 | Fire risk | Suppression strategy selected; detection coverage meets NFPA 72; response posture documented; Li-ion off-gas risk assessed | 8–14 items |
-
- | Uptime Institute Tier | Tier alignment | Target Tier declared; redundancy level verified per subsystem; fault-containment analysis on record | 10–16 items |
+ | Plant (hub) | Standards map · coverage matrix · commissioning lifecycle · question index | All of the below |
+ | ASHRAE | Air envelope · liquid classes · condensation · sensor log · rate of change | TC 9.9 Thermal Guidelines, 5th ed. (2021); Standard 90.4; ANSI/ISA-71.04 |
+ | Tier | Power and cooling path simulator · availability | Uptime Institute Tier Standard: Topology |
+ | TIA | Spaces · fiber budget · copper channel · port count · bonding | TIA-942-B, TIA-568.2-D / 568.3-D, TIA-607-C, IEEE 802.3 |
+ | NFPA | Agent quantity · detection plan · release sequence | NFPA 2001, 72, 75, 76, 13, 70 Art. 645 |
+ | ISO | KPIs · energy Sankey · EnPI baseline · monthly PUE | ISO/IEC 30134 series, ISO 50001 / 50006 / 50015, ASHRAE Guideline 14 |
 
 
 
 
 
-
-Items marked *not applicable* are excluded from the denominator. Only pass and fail items count toward the score. This prevents a narrow-scope assessment from being penalised for standards clauses that do not apply to the installation type.
-
+## 02 ASHRAE — psychrometrics and envelopes
 
 
+Every humidity quantity is derived from dry-bulb, dew point and site pressure. Nothing is read off a printed chart.
+
+ e s (T) = 0.6112 · exp(17.62·T / (243.12 + T)) [kPa] p(z) = 101.325 · (1 − 2.25577×10⁻⁵ · z) 5.25588 [kPa] W = 622 · p v / (p − p v ) [g/kg] · RH = e s (DP) / e s (DB) Magnus form with Sonntag coefficients, within about 0.3 % of the steam tables between −45 and 60 °C (2.333 vs 2.339 kPa at 20 °C). Standard-atmosphere pressure at site altitude z in metres.
+ |
+ Class | Dry-bulb | Low humidity | High humidity | Max DB derating above 900 m |
 
 
-
-## 03 Compliance scoring methodology
-
-
-One formula governs all five engines. The score is a simple pass-rate percentage; the two achievement bands derive from the industry-consensus pre-audit thresholds commonly applied in data-center certification programmes.
-
-
-
- Score (%) = items_passed / total_applicable × 100
- Band BASIC : Score ≥ 70% → PASS
- Band ADVANCED : Score ≥ 90% → CERTIFIED
- total_applicable = items_passed + items_failed (not-applicable items excluded from denominator). WORKBENCH · SCORING
+ | Recommended (A1–A4) | 18–27 °C | −9 °C DP | 15 °C DP and 70 % RH | 1 °C / 300 m above 1,800 m |
+ | A1 | 15–32 °C | −12 °C DP and 8 % RH | 17 °C DP and 80 % RH | 1 °C / 300 m |
+ | A2 | 10–35 °C | −12 °C DP and 8 % RH | 21 °C DP and 80 % RH | 1 °C / 300 m |
+ | A3 | 5–40 °C | −12 °C DP and 8 % RH | 24 °C DP and 85 % RH | 1 °C / 175 m |
+ | A4 | 5–45 °C | −12 °C DP and 8 % RH | 24 °C DP and 90 % RH | 1 °C / 125 m |
+ | H1 | 5–25 °C (rec. 18–22 °C) | −12 °C DP and 8 % RH | 17 °C DP and 80 % RH | not modelled |
 
 
 
-Each standards engine also tracks a **critical-item flag**: certain checklist items are tagged critical (e.g., fire detection coverage, Tier redundancy path, ISO EnMS scope declaration). If any critical item is failed the engine reports `CRITICAL GAP` regardless of overall score band, because a failed critical item typically blocks a formal audit submission even at high overall scores.
+**Binding limit.** For each class the tool computes the signed margin to all six boundaries (dry-bulb high/low, dew point high/low, RH high/low) and reports the smallest — the limit the condition would break first. Above 3,050 m every class is outside the envelope.
+
+
+**Liquid classes** are set by the maximum facility-water supply temperature: W17, W27, W32, W40, W45, W+ (above 45 °C). The free-cooling check compares the required supply with what a dry cooler delivers at the design dry-bulb: *leaving water = ambient + approach*; a negative margin means trim cooling for those hours.
+
+
+**Condensation.** Room dew point from dry-bulb and RH; the coolant supply must exceed it by the chosen control margin. The tool also inverts the problem: the highest room RH a given supply tolerates is e s (supply − margin) / e s (DB).
+
+
+**Sensor log.** Each reading is classified against the chosen class; time in each region is weighted by the interval to the next reading. Rate of change is the largest swing between any two readings inside a 60-minute and a 15-minute window, compared with 5 °C/h (tape media present) or 20 °C/h and 5 °C in 15 min, and 5 % RH per hour. A coarse log can miss a fast step — log at 5 minutes or faster to prove the 15-minute limit.
 
 
 
-### Per-engine acceptance criteria structure
+
+## 03 Tier — maintainability and fault tolerance by test
 
 
-Each engine's checklist is structured in three columns: item, acceptance criterion, and evidence requirement. The evidence requirement states what documentation or measurement satisfies the criterion.
+The Tier Standard: Topology defines Tiers by objective. The simulator tests the objective directly on a simplified path: every removable element (each single component, and each unit of an N-of-M group) is taken out one at a time, in two modes.
+
+ group available ⇔ units in service ≥ N path conducts ⇔ every stage available (a source stage needs any one member) load carried (failure) ⇔ an *active* path conducts load carried (maintenance) ⇔ *any* path conducts — an alternate is switched in first Concurrently maintainable = every element passes the maintenance test. Fault tolerant (single failure) = every element passes the failure test. The sweep lists each element that fails either.
+ |
+ Tier | Power path modelled | Cooling path modelled | Expected result |
+
+
+ | I | Utility or N generators → board → N UPS → PDU → single-corded load | N plant → N pumps → one loop → N CRAH | neither |
+ | II | N+1 generators and UPS, single path | N+1 plant, pumps, CRAH; one loop | neither (the path is not redundant) |
+ | III | N+1 generator plant → board A (active) / B (alternate) → UPS → PDU → dual-corded load | N+1 plant and pumps → loop A (active) / B (valved alternate) → N+1 CRAH | maintainable, not fault tolerant |
+ | IV | Two independent active systems | Two independent active systems | both |
 
 
 
+The gate asserts these four outcomes for both power and cooling, so an edit that breaks a Tier fails the build. Utility appears only for Tier I/II: for III/IV the Standard treats on-site generation as the primary source. Compartmentalisation and continuous cooling (Tier IV) are not modelled.
+
+ A = MTBF / (MTBF + MTTR) A k-of-n = Σ i=k..n C(n,i) · A i · (1 − A) n−i A series = Π A block · A parallel paths = 1 − Π(1 − A path ) Steady state, independent failures only. Common-cause events dominate real outages and are not in this arithmetic; the default MTBF/MTTR values are placeholders to replace. The per-Tier percentages often quoted (99.671 … 99.995 %) are not part of the Tier Standard.
+
+
+
+## 04 TIA — cabling, spaces, bonding
+
+
+**Fiber budget.** Loss is built from TIA-568.3-D maximum component values and compared with the IEEE 802.3 channel insertion-loss limit and reach of the application.
+
+ IL = L km · α + n pairs · 0.75 dB + n splices · 0.3 dB α = 3.0 dB/km multimode @ 850 nm · 0.5 dB/km single-mode The loss profile draws the same sum along the link: a step at each connector pair and splice, a ramp for attenuation, under the budget line.
+ |
+ Application | Fiber | Reach | Channel IL |
+
+
+ | 10GBASE-SR | OM3 / OM4 | 300 / 400 m | 2.6 / 2.9 dB |
+ | 25GBASE-SR | OM3 / OM4 | 70 / 100 m | 1.8 / 1.9 dB |
+ | 40GBASE-SR4 | OM3 / OM4 | 100 / 150 m | 1.9 / 1.5 dB |
+ | 100GBASE-SR4 | OM3 / OM4 | 70 / 100 m | 1.8 / 1.9 dB |
+ | 400GBASE-DR4 | OS2 | 500 m | 3.0 dB |
+ | 10GBASE-LR / 100GBASE-LR4 | OS2 | 10 km | 6.2 / 6.3 dB |
+
+
+
+**Copper channel.** 90 m permanent link plus 10 m of cords (Category 8: 24 m + 6 m, 30 m channel). 10GBASE-T runs 55 m on Category 6 and 100 m on 6A.
+
+
+**Port count.** Ports = racks × ports per rack × (1 + spare), rounded up; panels = ports ÷ ports per 1U; MPO trunks = duplex ports ÷ (fibers per MPO ÷ 2). Every horizontal link ends on a panel at both ends, so the HDA carries the sum of all racks.
 
 
  |
- Engine | Governing standard(s) | Score computation scope | Critical-item category |
+ TBB / BC run | < 4 m | 4–6 | 6–8 | 8–10 | 10–13 | 13–16 | 16–20 | > 20 m |
+
+
+ | Minimum size | 6 AWG | 4 AWG | 3 AWG | 2 AWG | 1 AWG | 1/0 AWG | 2/0 AWG | 3/0 AWG |
+
+
+
+TIA-607-B/C sizes the backbone bonding conductor at 2 kcmil per linear foot and caps it at 3/0 AWG; the larger sizes some references list come from the superseded J-STD-607-A. Local electrical code may require more.
 
 
 
 
+## 05 NFPA — agent, detection, sequence
 
- | ASHRAE TC 9.9
- | ASHRAE TC 9.9 2021 Thermal Guidelines for Data Processing Environments
- | Thermal environment, air/liquid separation, delta-T validation
- | Inlet temperature outside allowable envelope
+
+**Agent quantity** uses the NFPA 2001 total-flooding equations at the minimum design temperature; the concentration the same quantity produces at the maximum room temperature is checked against the agent's NOAEL, which decides whether the space may be occupied.
+
+ halocarbon: W = (V / S) · C / (100 − C) [kg] inert gas: X = 2.303 · (V s / S) · log 10 (100 / (100 − C)) [m³/m³ at 21 °C] S = k 1 + k 2 · T · altitude: quantity × p(z)/p 0 C at T max : halocarbon x = W·S max /V, C = 100x/(1+x); inert C = 100(1 − 10 −X·S max /(2.303·V s ) ). Check: HFC-227ea at 7 % and 21 °C is 0.547 kg/m³; IG-541 at 38 % is 0.478 m³/m³.
  |
+ Agent | k 1 | k 2 | NOAEL | Discharge |
 
 
- | ANSI/TIA-942
- | ANSI/TIA-942-C (2021) Telecommunications Infrastructure Standard for Data Centers
- | Topology, redundancy N+1/2N, structured wiring readiness
- | Unresolved single point of failure at the declared Tier
- |
+ | HFC-227ea | 0.1269 | 0.000513 | 9.0 % | 10 s |
+ | FK-5-1-12 | 0.0664 | 0.0002741 | 10.0 % | 10 s |
+ | IG-541 | 0.65799 | 0.00239 | 43 % | 60 s Class B · 120 s Class A/C |
+ | IG-100 | 0.7997 | 0.00293 | 43 % | 60 s Class B · 120 s Class A/C |
 
 
- | ISO 50001 / 14644
- | ISO 50001:2018 Energy Management Systems; ISO 14644-1 Cleanrooms (where applicable)
- | EnMS scope, PUE/WUE measurement, continual improvement, classification evidence
- | Absent EnMS scope or missing PUE measurement baseline
- |
 
+Design concentration defaults are editable starting points: the real value is the listed system's minimum extinguishing concentration × 1.2 (Class A and C) or 1.3 (Class B). Container counts use the listed container size, also an input.
 
- | NFPA 75 / 76
- | NFPA 75 (2023) Standard for the Protection of IT Equipment; NFPA 76 (2020) Telecom Facilities
- | Detection strategy, suppression selection, response posture, battery risk screening
- | No fire detection coverage; no suppression strategy declared
- |
 
+**Detection.** High air movement reduces the area each spot smoke detector may cover (NFPA 72 high-airflow table: 60 ACH → 125 ft², 30 → 250, 20 → 375, 15 → 500, 12 → 625, 10 → 750, 8.6 → 875, ≤ 7.5 → 900). Between rows the higher-airflow row is used. Detectors are laid on a square grid of that area; cross-zoned release doubles the count, each zone meeting spacing on its own. Aspirating sampling holes are treated as spot detectors for spacing.
 
- | Uptime Tier
- | Uptime Institute Tier Standard: Topology (2022); Operational Sustainability (2022)
- | Tier topology criteria, concurrent maintainability, fault containment
- | Fault propagation path crosses Tier boundary without mitigation
- |
 
+**Release sequence.** A state machine — normal, alert, fire 1, pre-discharge, abort held, discharge — driven event by event. Delays, which outputs trip at which stage and whether an abort switch is fitted are site programming approved by the AHJ, not fixed by NFPA 2001.
 
 
 
 
+## 06 ISO — KPIs, Sankey, baseline
 
 
+KPIs use 12-month energies. PUE is reported per ISO/IEC 30134-2 category, because the metering point moves losses between IT and overhead.
 
+ PUE cat = E DC / E IT,cat (cat 1 UPS output · cat 2 PDU output · cat 3 IT input) REF = E ren / E DC · ERF = E reuse / E DC · WUE = water L / E IT kWh CUE = (E DC − E ren ) · EF / E IT CUE here is a market-based simplification; report the accounting basis with the number. The Sankey splits E DC by the meters only — overhead above M1 (cooling, UPS loss, lighting) stays one band without sub-metering. E facility = b 0 + b 1 ·E IT + b 2 ·CDD (OLS, monthly) CV(RMSE) = √(SSR/(n−p)) / ȳ ≤ 15 % · |NMBE| = |Σ(y−ŷ)| / ((n−p)·ȳ) ≤ 5 % avoided energy = Σ(ŷ reporting − y reporting ) · CUSUM = running sum Baseline per ISO 50006, verification per ISO 50015 / IPMVP Option C, calibration limits from ASHRAE Guideline 14. Annual PUE is energy-weighted (ΣE ÷ ΣIT), not the mean of monthly PUEs; the tool shows both.
 
 
-## 04 Engine acceptance criteria — detail tables
 
+## 07 Diagrams and symbols
 
-Each table below lists the acceptance criteria and evidence requirements for one engine. Items marked **CRITICAL** trigger the critical-gap flag if failed.
 
+Every block diagram is drawn by the RZ diagram engine (`js/rz-diagram.js`): nodes sized from their own text, orthogonal connectors routed around boxes, labels placed by search, legend derived from what was drawn. Equipment glyphs are the IEC 60617 / ISA-5.1 symbols DCMOC uses (`assets/engineering/`, emitted as `js/rz-eng-symbols.js`), plus twelve web-only symbols for detectors, sprinklers, agent containers, EPO, meters, patch panels, transmitters and valves.
 
 
-### Engine 1 — ASHRAE TC 9.9 (Thermal)
+Connectors carrying load move; each dash pattern advances by exactly one of its own periods per cycle, so the loop never snaps back, and reduced-motion settings stop it. Data charts (psychrometric, loss profile, Sankey, CUSUM, PUE bars) are computed from their scales, not hand-placed.
 
 
 
 
- |
- Item | Acceptance criterion | Evidence requirement | Flag |
+## 08 Verification and limits
 
 
+`tools/test-ltc-workbench.mjs` (75 assertions, in the ship gate) pins each module's arithmetic to hand-checkable values, requires every Tier topology — power and cooling — to meet its own objective, and holds each page's frame: script order, diagram tokens in both themes, cache tokens on every asset, and the fail-closed access gate.
 
-
- | A1 — Inlet temperature | IT inlet within A1 recommended (18–27 °C) or at minimum within A2 allowable (10–35 °C) | Measured or designed supply-air temperature at IT equipment inlet | CRITICAL |
-
- | A2 — Inlet humidity | Relative humidity within allowable envelope (8–80% RH, no condensation) | Humidity measurement or design specification at IT inlet | |
-
- | A3 — Liquid supply temperature | Coolant supply temp ≥ minimum allowable for the deployed CDU/manifold | CDU supply temperature setpoint in design or operations record | |
-
- | A4 — Delta-T documented | Supply-to-return delta-T documented for liquid loop | Measured or design delta-T with units | |
-
- | A5 — Air-liquid interaction | Mixed cooling ratio (liquid fraction of total IT heat removal) declared | Design calculation or measured split | |
-
- | A6 — Containment strategy | Hot-aisle or cold-aisle containment strategy defined (or in-row / rear-door declared) | Airflow management design document or installation photo | |
-
- | A7 — Re-circulation risk | No known hot-air recirculation path unmitigated | CFD study or blanking-panel survey | |
-
- | A8 — ASHRAE class alignment | IT equipment ASHRAE class matches the operating envelope | Equipment datasheets referencing ASHRAE class | |
-
-
-
-
-
-
-
-### Engine 2 — ANSI/TIA-942 (Topology)
-
-
-
-
- |
- Item | Acceptance criterion | Evidence requirement | Flag |
-
-
-
-
- | T1 — Tier declaration | Target Tier (I–IV) declared in design basis | Design basis of design (BOD) document | CRITICAL |
-
- | T2 — Power redundancy | UPS and generator topology meets declared Tier redundancy level | Single-line diagram (SLD) with redundancy annotation | CRITICAL |
-
- | T3 — Cooling redundancy | Cooling loop redundancy meets declared Tier (N, N+1, 2N) | P&ID or cooling SLD with redundancy annotation | CRITICAL |
-
- | T4 — Concurrent maintainability | For Tier III+: maintenance path exists without IT service impact | Maintenance scenarios analysis document | |
-
- | T5 — Single-point-of-failure register | SPOF register produced and mitigations documented | SPOF analysis report or design review checklist | |
-
- | T6 — Structured cabling compliance | TIA-942 cabling topology followed (MDA, HDA, EDA zones) | Floor plan with zone delineation | |
-
- | T7 — Physical security zones | Security zones defined per TIA-942 Annex B | Security zone layout drawing | |
-
-
-
-
-
-
-
-### Engine 3 — ISO 50001 / 14644 (Energy & Governance)
-
-
-
-
- |
- Item | Acceptance criterion | Evidence requirement | Flag |
-
-
-
-
- | E1 — EnMS scope | Energy management system scope documented covering the data hall | ISO 50001 scope statement | CRITICAL |
-
- | E2 — PUE baseline | PUE measurement methodology and baseline value on record | PUE calculation sheet with measurement points | CRITICAL |
-
- | E3 — WUE measured | Water Usage Effectiveness measured or declared not applicable | WUE calculation or N/A declaration | |
-
- | E4 — Energy objectives | Quantified energy improvement objectives set with target dates | Energy objectives register | |
-
- | E5 — Metering coverage | Sub-metering covers IT load, cooling, and lighting as minimum | Metering diagram or BMS point list | |
-
- | E6 — Management review | Energy performance reviewed at planned intervals by management | Meeting minutes or management review record | |
-
- | E7 — Cleanroom classification (if applicable) | ISO 14644-1 classification number declared with particle count evidence | Particle count test report | |
-
- | E8 — Continual improvement | At least one completed improvement action documented in the review period | Action tracking log | |
-
-
-
-
-
-
-
-### Engine 4 — NFPA 75 / 76 (Fire Risk)
-
-
-
-
- |
- Item | Acceptance criterion | Evidence requirement | Flag |
-
-
-
-
- | F1 — Suppression strategy | Suppression strategy selected and documented (clean agent, sprinkler, or combination) | Fire protection narrative or system design summary | CRITICAL |
-
- | F2 — Detection coverage | Smoke detection meets NFPA 72 coverage requirements for the protected area | Detector layout drawing with coverage annotation | CRITICAL |
-
- | F3 — Early warning detection | VESDA or equivalent aspirating smoke detection (ASD) present for early warning | ASD system specification or installed equipment record | |
-
- | F4 — Discharge time | For clean-agent systems: halocarbon discharge ≤ 10 s; inert ≤ 60 s | System design certificate or discharge time test record | |
-
- | F5 — Hold time | Agent hold time ≥ 10 minutes post-discharge | Room integrity test report (door fan test) | |
-
- | F6 — Li-ion battery risk | Li-ion off-gas hazard screened; mitigation strategy documented if batteries present | NFPA 855 / UL 9540A risk assessment or N/A declaration | |
-
- | F7 — Emergency response plan | Emergency response plan (ERP) covers fire scenarios for the data hall | ERP document with data-hall-specific section | |
-
- | F8 — Alarm integration | Fire alarm integrated with access control and HVAC shutdown per NFPA 72 / 75 | Sequence of operations or system integration drawing | |
-
-
-
-
-
-
-
-### Engine 5 — Uptime Institute Tier Alignment
-
-
-
-
- |
- Item | Acceptance criterion | Evidence requirement | Flag |
-
-
-
-
- | U1 — Tier target declared | Target Tier (I–IV) formally declared in project charter or BOD | Project BOD or design basis with Tier statement | CRITICAL |
-
- | U2 — Non-redundant path (Tier I) | For Tier I: single non-redundant path to all IT equipment confirmed | SLD confirming Tier I topology | |
-
- | U3 — Redundant components (Tier II) | For Tier II+: redundant components in power and cooling capacity paths | Capacity analysis with N+1 or better annotation | |
-
- | U4 — Concurrently maintainable (Tier III) | For Tier III+: any component or distribution element can be removed without IT service impact | Maintenance procedure demonstrating concurrent maintainability | CRITICAL |
-
- | U5 — Fault tolerant (Tier IV) | For Tier IV: any single fault does not interrupt IT service; active-active delivery paths proven | Fault tolerance analysis or simulation record | CRITICAL |
-
- | U6 — Fault containment | Faults in one system do not propagate to redundant system | Fault containment analysis document | |
-
- | U7 — Operational sustainability | Staffing, preventive maintenance, and training meet Uptime Institute OS criteria | Operations management review documentation | |
-
-
-
-
-
-
-
-
-
-
-## 05 Score bands & outputs
-
-
-The workbench produces one score per engine and one aggregate score across all enabled engines. Band thresholds reflect typical pre-audit acceptance levels; they are not the certification authority's own thresholds (which vary by body and standard edition).
-
-
-
-
- |
- Output | Formula | Interpretation |
-
-
-
-
- | Per-engine score | `items_passed / (items_passed + items_failed) × 100` | Percentage of applicable items passed for that standard. |
-
- | Band BASIC | `Score ≥ 70%` | PASS — adequate coverage for a preliminary design review. |
-
- | Band ADVANCED | `Score ≥ 90%` | CERTIFIED — high-confidence coverage; suitable as pre-audit baseline. |
-
- | Band BELOW BASIC | `Score < 70%` | FAIL — significant gaps; not ready for audit submission. |
-
- | CRITICAL GAP flag | Any critical item failed | Reported independently of score band; must be resolved before any audit. |
-
- | Aggregate score | `sum(passed across engines) / sum(applicable across engines) × 100` | Cross-engine compliance posture; weighted by checklist depth. |
-
- | Gap list | Failed items per engine | Ordered list of items to address; critical items sort to top. |
-
-
-
-
-
-
-
-
-
-
-## 06 Worked example
-
-
-A design team runs the workbench against a new Tier III data hall with a liquid-cooled high-density zone. They enable all five engines. The following checklist results are recorded:
-
-
-
-
-
-- **ASHRAE (8 items):** A1–A6 pass, A7 fail (no CFD, blanking panels incomplete), A8 pass. Passed 7 / 8 = 87.5% → Band BASIC PASS. No critical gap.
-
-- **ANSI/TIA-942 (7 items):** T1–T5 pass, T6 fail (floor plan lacking zone delineation), T7 pass. Passed 6 / 7 = 85.7% → Band BASIC PASS. No critical gap.
-
-- **ISO 50001 / 14644 (8 items):** E1, E2 pass; E3 N/A (no water cooling); E4 fail (no improvement targets set); E5, E6 pass; E7 N/A (not a cleanroom); E8 fail. Applicable = 6. Passed 4 / 6 = 66.7% → Band BELOW BASIC. No critical gap (E1/E2 pass).
-
-- **NFPA 75/76 (8 items):** F1–F6 pass; F7 fail (ERP does not cover data hall); F8 pass. Passed 7 / 8 = 87.5% → Band BASIC PASS. No critical gap.
-
-- **Uptime Tier III (7 items):** U1–U6 pass; U7 fail (staffing records incomplete). Passed 6 / 7 = 85.7% → Band BASIC PASS. No critical gap.
-
-- Aggregate: passed 30 / 36 = 83.3% → Band BASIC PASS across all engines.
-
-- Gap list (4 items): A7 blanking panels, T6 cabling zone drawing, E4 energy targets, E8 improvement action, F7 ERP data-hall section, U7 staffing records. → Address E4 and E8 first to lift ISO above 70%. No CRITICAL GAP flags raised.
-
-
-
- **Engineering reading:** the design is audit-ready on ASHRAE, ANSI/TIA, NFPA, and Uptime, but the ISO energy-management module falls below the Basic band. Closing E4 (set improvement objectives) and E8 (log one completed action) lifts ISO to 6/6 = 100% at the next review cycle, removing the only Below-Basic finding before a formal audit engagement.
-
-
-
-
-
-## 07 References & standards
-
-
-
-
-- **ASHRAE TC 9.9 (2021)** — Thermal Guidelines for Data Processing Environments (4th ed.): thermal envelopes A1–A4, allowable ranges, liquid cooling delta-T guidance.
-
-- **ANSI/TIA-942-C (2021)** — Telecommunications Infrastructure Standard for Data Centers: Tier I–IV topology criteria, structured cabling zones, redundancy classification.
-
-- **ISO 50001:2018** — Energy Management Systems: scope, baseline, objectives, measurement, continual improvement framework.
-
-- **ISO 14644-1:2015** — Cleanrooms and associated controlled environments — Classification of air cleanliness by particle concentration (where applicable to ultra-clean liquid-cooled zones).
-
-- **NFPA 75 (2023)** — Standard for the Protection of Information Technology Equipment.
-
-- **NFPA 76 (2020)** — Standard for the Fire Protection of Telecommunications Facilities.
-
-- **NFPA 72** — National Fire Alarm and Signaling Code: detector coverage and alarm integration.
-
-- **Uptime Institute Tier Standard: Topology (2022)** — Tier I–IV infrastructure criteria, concurrent maintainability, fault containment.
-
-- **Uptime Institute Operational Sustainability (2022)** — Staffing, preventive maintenance, and training criteria for Tier III–IV.
-
-- **NFPA 855 / UL 9540A** — Li-ion battery energy storage fire-risk screening (Engine 4 item F6).
-
-
-
-
-
-
-
-## 08 Assumptions & limitations
-
-
-The workbench is a **checklist reference tool**. It does not execute thermal or hydraulic simulations, does not verify measurement data numerically, and does not issue compliance certificates. Checklist item counts and band thresholds are workbench defaults; the published standards may introduce additional requirements in future editions or through interpretive guidance. The ANSI/TIA Tier scale in this workbench follows TIA-942-C Annex H (Rated 1–4) which is broadly aligned with but distinct from the Uptime Institute Tier Standard — users should review both if seeking dual recognition. This manual and the workbench are an engineering education and pre-audit preparation aid; formal compliance determination must be carried out by accredited third-party auditors against the current edition of each standard, under the authority having jurisdiction.
-
-
-
- ▶ Open the live Standards LTC Lab
+ **Limits.** Educational tools. Limits are summaries of the cited editions; check the edition your jurisdiction adopted and the IT and equipment manufacturers' own limits, which may be tighter. Tier results are for a simplified path, not a design review; Tier certification is issued by Uptime Institute only. Clean-agent systems are designed from the listed manufacturer's manual and approved by the AHJ. Reliability arithmetic ignores common-cause failure.
 
 
 ======================================================================
