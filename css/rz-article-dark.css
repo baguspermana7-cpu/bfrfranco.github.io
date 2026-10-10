@@ -14,6 +14,44 @@
    Requires the page to load: Fraunces + IBM Plex Sans + IBM Plex Mono.
    ============================================================================ */
 
+/* ============================================================================
+   MOTION TOKENS + THE FEEL FLOOR (v3.12.2)
+   ----------------------------------------------------------------------------
+   Measured across css/*.css + styles*.css + the 29 article pages before writing
+   any of this: **825 duration declarations and zero `--ease-*` tokens.** Every
+   curve on the site was hand-written or a browser default, so there was nothing
+   to extend -- these are new rather than a fork.
+
+   The built-in CSS easings are too weak to read as deliberate. These three are
+   taken from published curves, not invented:
+     --rz-ease-out     strong ease-out for UI entering or exiting
+     --rz-ease-in-out  strong ease-in-out for something moving on screen
+     --rz-ease-drawer  the iOS-like drawer curve (Ionic)
+
+   `ease-in` is absent on purpose. It starts slow, which delays the exact moment
+   the user is watching: ease-out at 200ms FEELS faster than ease-in at 200ms.
+
+   Durations are a ladder, not a free number. UI motion stays under 300ms -- a
+   180ms dropdown reads as more responsive than a 400ms one. Marketing and
+   explanatory motion may be longer and has its own token.
+   Measured: of 220 declarations over 300ms, 102 are constant or decorative
+   motion that is allowed to be long (aurora 22s, marquee 60s, the documented
+   0.9s card shine sweep) and only **9 are UI-interaction transitions** -- the
+   shine sweeps plus a 600ms hover image zoom. The ceiling is a real rule with a
+   small backlog, not a sweep.
+   ============================================================================ */
+:root{
+  --rz-ease-out:cubic-bezier(.23,1,.32,1);
+  --rz-ease-in-out:cubic-bezier(.77,0,.175,1);
+  --rz-ease-drawer:cubic-bezier(.32,.72,0,1);
+
+  --rz-dur-press:120ms;     /* button press feedback */
+  --rz-dur-tip:160ms;       /* tooltips, small popovers */
+  --rz-dur-menu:200ms;      /* dropdowns, selects */
+  --rz-dur-panel:280ms;     /* modals, drawers, sheets -- still under 300 */
+  --rz-dur-explain:600ms;   /* marketing / explanatory only */
+}
+
 html[data-rz-register="editorial"][data-theme="dark"]{
   --rz-art-accent:#E8B563;        /* default editorial amber; override per series */
   --rz-art-accent2:#6FBF9A;
@@ -1152,4 +1190,37 @@ html[data-rz-register="editorial"] [data-rz-toc] > [hidden]{
     text-align:left;
     hyphens:manual;
   }
+}
+
+
+/* ============================================================================
+   REDUCED MOTION -- THE FLOOR (v3.12.2)
+   ----------------------------------------------------------------------------
+   The targeted rules earlier in this file cover the SHARED components by name:
+   [data-rz-enter], .rz-read-prog, .dg-pipe, .rz-scrolly .st-layer. Measured:
+   **24 of the 29 article pages carry inline `transition:`/`animation:` on their
+   own page-local classes and no prefers-reduced-motion handling at all**, so a
+   reader who asked the operating system for less motion still got all of it.
+
+   This is a floor, not a kill switch. Reduced motion means fewer and gentler,
+   not zero: a transition that aids comprehension stays, movement goes. So
+   instead of zeroing durations, it narrows `transition-property` to the
+   non-moving properties -- opacity and colour still animate, transform, width,
+   height and position do not.
+
+   Three namespaces are exempt BY NAME because their motion carries data rather
+   than decorating it, and removing it would remove information:
+     .rz-diagram / [data-rz-diagram]  living schematics -- flow direction and
+                                      fault state are animated
+     [data-rz-chart]                  sourced charts
+     .rz-scrolly                      pinned scrollytelling; already has its own
+                                      targeted rule above
+   An exemption that is not named here does not exist.
+   ============================================================================ */
+@media (prefers-reduced-motion:reduce){
+  html[data-rz-register="editorial"] *:not(.rz-diagram):not(.rz-diagram *):not([data-rz-diagram]):not([data-rz-diagram] *):not([data-rz-chart]):not([data-rz-chart] *):not(.rz-scrolly):not(.rz-scrolly *){
+    transition-property:opacity,color,background-color,border-color,box-shadow,fill,stroke !important;
+    animation:none !important;
+  }
+  html[data-rz-register="editorial"]{ scroll-behavior:auto !important; }
 }

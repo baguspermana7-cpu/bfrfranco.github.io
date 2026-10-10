@@ -11,6 +11,123 @@ release sections rather than semver.
 
 ---
 
+## v3.12.2 — 2026-10-06
+
+### Motion gets a standard, two components, and a gate that has been seen to fail
+
+Phase 4 of the UI/UX plan, and the part the owner named directly ("terkait repos
+emil kowalsky — sonner, vaul dan dll"). Measured on this codebase before any of
+it was written down:
+
+| measured | value |
+|---|---|
+| duration declarations across `css/*.css`, `styles*.css`, the 29 article pages | **825** |
+| `--ease-*` tokens that existed | **0** — every curve hand-written or a browser default |
+| declarations over 300ms | 220 |
+| …constant or decorative motion allowed to be long (aurora 22s, marquee 60s, the documented 0.9s shine sweep) | 102 |
+| …**UI-interaction transitions over 300ms, which is what the ceiling is about** | **9** |
+| article pages with inline motion and no `prefers-reduced-motion` of their own | **24 of 29** |
+
+**220 is not 220 defects.** The ceiling is a real rule with a small backlog.
+
+New `standarization/MOTION_STANDARD.md` states the rules as numbers a reviewer
+can check: the frequency gate (a keyboard-initiated action gets **no animation,
+ever** — `rz-command-palette.js` is opened by shortcut hundreds of times a day
+and must stay instant), the token scale, `transform`/`opacity` only, never
+`scale(0)`, transitions rather than keyframes for anything rapidly triggered,
+exit along the entrance path, and velocity rather than distance deciding a
+dismissal.
+
+`--rz-ease-out` / `--rz-ease-in-out` / `--rz-ease-drawer` and
+`--rz-dur-press|tip|menu|panel|explain` now live on `:root` in
+`css/rz-article-dark.css`. There is deliberately **no `--rz-ease-in`**: it starts
+slow, delaying the exact moment the user is watching.
+
+### A reduced-motion floor, because 24 of 29 article pages had none
+
+The existing rules cover the shared components by name — `[data-rz-enter]`,
+`.rz-read-prog`, `.dg-pipe`, `.rz-scrolly .st-layer`. Page-local inline motion
+was untouched, so a reader who asked their operating system for less motion
+still got all of it.
+
+The floor narrows `transition-property` to the non-moving properties rather than
+zeroing durations, because reduced motion means **fewer and gentler, not zero** —
+a toast that appears with no transition at all reads as a glitch. Measured on
+`article-18.html`: transitions that move something fall from **1180 to 9**.
+
+Three namespaces are exempt by name because their motion carries data rather
+than decorating it: `.rz-diagram`/`[data-rz-diagram]`, `[data-rz-chart]`,
+`.rz-scrolly`. That exemption is proven with a **seeded element**, not with
+current content — the living diagrams' own flow animation is already disabled
+under reduced motion by an older targeted rule, so nothing in the corpus
+exercises it. An exemption nothing exercises is a claim, not a guarantee.
+
+### `js/rz-toast.js` and `js/rz-sheet.js`
+
+sonner and vaul are the references and the right answer in React. This site is
+zero-build vanilla, so the principles are ported rather than the packages.
+
+The toast is transition-driven, never keyframes — fire two inside a second and
+keyframes restart from zero, so the second visibly jumps. The stack of three is
+expressed as transforms rather than margins, dwell pauses on hover and focus, and
+the message goes through `textContent` and never `innerHTML`.
+
+The sheet's drag is **1:1 with `transition: none` while a finger is down** — a
+transition during a drag is what makes a sheet feel like it is arguing with you —
+and the transition returns on release (280ms, drawer curve). Dismissal is decided
+by velocity (a flick over 0.55 px/ms, from anywhere) **or** 40% of the height,
+because distance alone makes a quick flick feel ignored. Upward overdrag
+rubber-bands. Focus moves in, is trapped, and returns to the opener; Escape
+closes.
+
+### The gate has been seen to fail
+
+`tools/test-rz-motion.mjs --strict` — **39 assertions**, every one reading a
+computed value out of a real browser after a real interaction, including a
+pointer-driven drag, across both components and both motion preferences.
+
+Then it was broken on purpose: seeding `transition: all 500ms ease-in`, a
+`scale(0)` entrance, and removing the sheet's `rz-dragging` class produced **12
+failures naming each defect**. A gate nobody has watched fail is a gate nobody
+should believe — this repo has the receipts on that.
+
+### Adopted somewhere real, not left as dead code
+
+`cdu-calculator.html`'s two `window.alert()` sites — "the export module did not
+load" and "pop-up blocked" — now go through `RZToast`, with `window.alert` kept
+as the last resort, because a failure message that itself fails to appear is
+worse than an ugly one. An alert also blocks every later script and freezes an
+automated browser, which is why the browser rules here forbid triggering one.
+
+Verified by driving the real flow in a browser with the export module forced
+absent: with `RZToast` present a `data-kind="fault"` toast appears at opacity 1
+with `animationName: none` and **no browser dialog**; with `RZToast` forced
+absent the same message arrives via the alert fallback.
+
+### New gate: CSS the browser silently throws away
+
+`tools/audit-css-structure.mjs` — selectorless rules, unbalanced braces, empty
+selector-list slots, and declarations stranded outside any rule. None of these
+throws, logs, or fails a 200; the declarations are simply not there, so only a
+parser can find them. It exists because v3.11.12 found
+`{ --accent-purple:…; }` in `cx-calculator.html` **by hand** — a rule with no
+selector, seven tokens never defined, and no gate in the suite able to see it.
+
+**Its first version reported 83 findings, every one an artifact.** It matched
+`<style>` inside JavaScript template literals that build PDF exports, then
+parsed JavaScript as CSS — `refreshAuthority()` and FAQ prose arrived as "stray
+declarations", and it counted 1,728 inline `<style>` blocks, which should have
+been the tell on its own. Script bodies are now blanked first (newlines kept, so
+line numbers stay true): 1,460 blocks across 417 files, **0 live defects**.
+
+Proven three ways: seeded defects fail; seeded look-alikes pass (a `}` inside
+`content:"}"`, a brace in a comment); and run against **the pre-fix tree**,
+`git show a5a45c51:cx-calculator.html`, it reports the exact historical bug at
+line 631. A gate that cannot find the bug that justified it is decoration.
+
+- A raw `&mdash;` inside a `window.alert()` string in `dc-conventional.html` —
+  a dialog renders text, not HTML, so it printed the entity to the reader.
+
 ## v3.12.1 — 2026-10-10
 
 ### The LTC Workbench goes deeper: more tools, live diagrams, and the model lab in the same system
