@@ -62,6 +62,13 @@ for (const f of files) {
       ? [[1, 3], [4, 4], [12, 5], [24, 6], [72, 7], [168, 8], [720, 9]].find(([lim]) => h < lim)?.[1] ?? 10 : null;
     const got = (inc.magnitude || {}).durationScore;
     if (want != null && got !== want) fail(`magnitude.durationScore ${got} but the duration band gives ${want}`);
+    // a magnitude note may quote the duration score; it must be the derived one (15 notes still argued
+    // for the judged scores the band rule replaced in v3.13.6)
+    const note = String((inc.magnitude || {}).note || '');
+    for (const m of note.matchAll(/\b[Dd]uration(?: score)?(?:,)?\s*\(?(\d{1,2})\)?(?=[\s:,)])/g)) {
+      if (Number(m[1]) !== got) fail(`magnitude note says duration ${m[1]} but magnitude.durationScore is ${got}`);
+    }
+    for (const m of note.matchAll(/durationScore (\d{1,2})/g)) if (Number(m[1]) !== got) fail(`magnitude note says durationScore ${m[1]} but it is ${got}`);
   }
   for (const k of ['title', 'operator', 'dcName', 'date', 'brief', 'rootCause', 'technicalDeepDive']) {
     if (!inc[k] || String(inc[k]).trim() === '') fail(`missing/empty "${k}"`);

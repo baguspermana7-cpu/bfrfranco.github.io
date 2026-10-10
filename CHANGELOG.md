@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v3.17.3 — 2026-10-11
+
+### Incident magnitude notes agree with the measured durations
+
+Since v3.13.6 the duration sub-score is derived from the measured duration by fixed bands, but the
+magnitude notes on the incident pages still argued for the judged scores they replaced and quoted
+withdrawn durations — Rogers "down ~15h" (the dossier itself withdrew that figure; the measured window is
+~26 h), CrowdStrike "Duration is scored 8" (it is 9, ~10.8 days to 99 % of sensors), Dyn "Duration (7) …
+~11 hours" (5, ~5.8 h to the second wave's mitigation), Optus "~14h", Flexential "duration (8)".
+
+**Fixed** — 15 notes rewritten clause by clause: each duration statement now matches the measured
+duration and its derived score; other measures (full-restoration tails, end-to-end windows) stay where the
+dossier supports them, named as what they are. The Virginia note written in v3.13.5 said duration 2; the
+band rule gives 1.
+
+**Gate** `test-incidents-corpus.mjs`: a magnitude note that states a duration score different from
+`magnitude.durationScore` fails (it found 6 in the old notes and the Virginia slip in the new one).
+
 ## v3.17.2 — 2026-10-11
 
 ### The LTC manuals describe the engine the tools run

@@ -41,9 +41,11 @@ wrong. `tools/test-incidents-corpus.mjs` now fails both classes.
   downtime 1; `not-established` keeps its judged score. 30 scores changed; gated by
   `tools/test-incidents-corpus.mjs`.
 
-### Still open
-- Magnitude `note` text on ~20 dossiers quotes the hour figure it was written against (e.g. Rogers
-  "~15h"); the header and sub-score are now right, the prose is not. Rewrite when each is next touched.
+### Done in v3.17.3
+- Magnitude notes that argued for the old judged duration scores or quoted withdrawn durations were
+  corrected on 15 dossiers (e.g. Rogers "~15h" → "~26 h (CRTC window)", CrowdStrike "scored 8" → "(9) …
+  ~10.8 days"); other measures are kept where the dossier supports them and named as what they are.
+  `tools/test-incidents-corpus.mjs` now fails a note whose stated duration score differs from the derived one.
 
 ### Internal contradictions between fields or sources
 - **nirs-daejeon-battery-fire-2025** — first report ~20:15 (SOE 3) before ~20:20 ignition
