@@ -32,7 +32,8 @@
        job of "one more colour"; a categorical palette that runs out of hues should extend by
        LIGHTNESS inside the hues it already has, not by borrowing a family the site bans. Slate is
        the site's neutral and reads as the remainder slice it usually is. */
-    var DONUT_COLORS = ['#0b5fea','#337eea','#e5484d','#f59e0b','#12a150','#64748b'];
+    /* v3.12.1: theme tokens, so the donut follows the workbench palette in both themes */
+    var DONUT_COLORS = ['var(--ltc-link)','var(--ltc-green)','var(--ltc-accent)','var(--ltc-text)','var(--ltc-pipe-return)','var(--ltc-muted)'];
 
     // ── Init ─────────────────────────────────────────────────
     function init() {
@@ -293,7 +294,7 @@
             '</svg>',
             '</div>',
             '<div class="ltc-design-meta">',
-            '<div class="ltc-design-scorelbl">Design Score</div>',
+            '<div class="ltc-design-scorelbl">Weighted screen · 0–100</div>',
             '<div class="ltc-design-grade" id="ltcDesignGrade">—</div>',
             '</div>',
             '</div>',
@@ -1470,10 +1471,11 @@
     }
 
     function gradeWord(s) {
-        if (s >= 85) return 'Excellent';
-        if (s >= 70) return 'Good';
-        if (s >= 55) return 'Fair';
-        return 'Needs Work';
+        /* bands, not praise: the score is a weighted heuristic screen */
+        if (s >= 85) return 'Strong';
+        if (s >= 70) return 'Adequate';
+        if (s >= 55) return 'Marginal';
+        return 'Weak';
     }
 
     // ════════════════════════════════════════════════════════
@@ -1815,8 +1817,8 @@
             var ry = fy(rt);
             supPts.push(fx(i).toFixed(1) + ',' + sy.toFixed(1));
             retPts.push(fx(i).toFixed(1) + ',' + ry.toFixed(1));
-            dots += '<circle cx="' + fx(i).toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="3.4" fill="#e5484d"/>' +
-                    '<circle cx="' + fx(i).toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="3.4" fill="#337eea"/>';
+            dots += '<circle cx="' + fx(i).toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="3.4" fill="var(--ltc-pipe-return)"/>' +
+                    '<circle cx="' + fx(i).toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="3.4" fill="var(--ltc-pipe-supply)"/>';
         }
 
         var grid = '', yl = '';
@@ -1838,9 +1840,9 @@
 
         var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" class="ltc-temp-profile-svg">' +
             grid + yl + xl +
-            '<polyline points="' + retPts.join(' ') + '" fill="none" stroke="#e5484d" stroke-width="2.2" stroke-linejoin="round"/>' +
-            '<polyline points="' + supPts.join(' ') + '" fill="none" stroke="#337eea" stroke-width="2.2" stroke-linejoin="round"/>' +
-            dots + pill(returnT, '#e5484d') + pill(supplyT, '#337eea') +
+            '<polyline points="' + retPts.join(' ') + '" fill="none" stroke="var(--ltc-pipe-return)" stroke-width="2.2" stroke-linejoin="round"/>' +
+            '<polyline points="' + supPts.join(' ') + '" fill="none" stroke="var(--ltc-pipe-supply)" stroke-width="2.2" stroke-linejoin="round"/>' +
+            dots + pill(returnT, 'var(--ltc-pipe-return)') + pill(supplyT, 'var(--ltc-pipe-supply)') +
             '</svg>';
 
         return '<div class="ltc-temp-profile-card">' +

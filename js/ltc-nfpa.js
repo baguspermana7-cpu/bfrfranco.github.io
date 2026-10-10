@@ -79,6 +79,9 @@
       return;
     }
     var r = agentCalc(o);
+    var per = val(r.kind === 'halo' ? 'fPerKg' : 'fPerM3');
+    document.getElementById('fPerKgRow').hidden = r.kind !== 'halo';
+    document.getElementById('fPerM3Row').hidden = r.kind === 'halo';
     var occ = r.cMax <= r.a.noael;
     out.innerHTML =
       '<div class="ltc-verdict" data-state="' + (occ ? 'ok' : 'fail') + '"><b>' + (occ ? 'Within NOAEL' : 'Above NOAEL') + '</b><span>' +
@@ -90,7 +93,8 @@
       ro('Specific volume S', L.fmt(r.S, 4), 'm³/kg') +
       ro('Altitude factor', L.fmt(r.acf, 3), '') +
       ro('Conc. at max temp', L.fmt(r.cMax, 2), '%', occ ? 'ok' : 'fail') +
-      ro('Discharge time', r.a.td, '') + '</dl>' +
+      ro('Discharge time', r.a.td, '') +
+      (per > 0 ? ro('Containers', String(Math.ceil(r.qty / per)), '× ' + L.fmt(per, r.kind === 'halo' ? 0 : 1) + (r.kind === 'halo' ? ' kg' : ' m³')) : '') + '</dl>' +
       '<p class="ltc-src">' + (r.kind === 'halo'
         ? 'W = (V/S)·C/(100−C) × ' + L.fmt(r.acf, 3) + ' = (' + L.fmt(o.v, 1) + '/' + L.fmt(r.S, 4) + ')·' + o.c + '/' + L.fmt(100 - o.c, 1) + ' × ' + L.fmt(r.acf, 3) + ' = ' + L.fmt(r.qty, 1) + ' kg'
         : 'X = 2.303·(Vs/S)·log10(100/(100−C)) = 2.303·(' + L.fmt(r.Vs, 4) + '/' + L.fmt(r.S, 4) + ')·log10(100/' + L.fmt(100 - o.c, 1) + ') = ' + L.fmt(r.X, 4) + ' m³/m³') + '</p>';
@@ -102,6 +106,9 @@
 
   function runDet() {
     var o = { l: val('dL'), w: val('dW'), ach: val('dAch'), cross: document.getElementById('dCross').getAttribute('aria-pressed') === 'true' };
+    if (![o.l, o.w, o.ach].every(isFinite) || o.l <= 0 || o.w <= 0 || o.ach <= 0) {
+      document.getElementById('dOut').innerHTML = '<div class="ltc-verdict" data-state="fail"><b>Input</b><span>Length, width and air changes must be numbers above 0.</span></div>'; return;
+    }
     var r = detCalc(o);
     var area = o.l * o.w;
     document.getElementById('dOut').innerHTML = '<dl class="ltc-readouts">' +
@@ -110,8 +117,41 @@
       ro('Total points', String(r.grid * r.zones), '') + ro('Room area', L.fmt(area, 0), 'm²') + '</dl>' +
       '<p class="ltc-note">Spot smoke detectors on a smooth ceiling: ' + L.fmt(o.ach, 1) + ' air changes per hour allows ' + r.ft2 + ' ft² per detector, laid on a ' + r.nx + ' × ' + r.ny + ' grid. ' +
       'Each aspirating-system sampling hole is treated as a spot detector for spacing. ' +
-      (o.cross ? 'Cross-zoned: two interleaved zones, each meeting spacing on its own, so release needs two independent alarms.' : '') +
-      ' Beams, joists, raised-floor and ceiling-void spaces need their own detection.</p>';
+      (o.cross ? 'Cross-zoned: two zones, each meeting spacing on its own (heads installed in pairs), so release needs two independent alarms.' : '') +
+      ' Beams, joists, raised-floor and ceiling-void spaces need their own detection.</p>' +
+      '<div class="ltc-canvas">' + plan(o, r) + '</div>';
+  }
+
+  /* Plan view: the room to scale, each zone's detectors on its own grid. Each zone
+   * meets spacing on its own, so zone B sits at the same grid points as zone A,
+   * paired beside it — how cross-zoned heads are usually installed. Zone is carried by SHAPE as well as hue. */
+  function plan(o, r) {
+    var W = 640, pad = 28, sc = Math.min((W - 2 * pad) / o.l, 360 / o.w);
+    var H = Math.round(o.w * sc + 2 * pad + 28);
+    var X = function (m) { return pad + m * sc; }, Y = function (m) { return pad + m * sc; };
+    var g = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-labelledby="dp-t dp-d" style="width:100%;max-width:' + W + 'px;min-width:340px">',
+      '<title id="dp-t">Detector layout plan</title><desc id="dp-d">The room to scale with ' + r.grid + ' detectors per zone on a ' + L.fmt(r.s, 2) + ' m grid' + (o.cross ? ', two cross-zoned zones' : '') + '.</desc>',
+      '<rect width="100%" height="100%" fill="var(--bg1)"/>',
+      '<rect x="' + X(0) + '" y="' + Y(0) + '" width="' + (o.l * sc) + '" height="' + (o.w * sc) + '" fill="none" stroke="var(--t2)" stroke-width="1.4"/>'];
+    function grid(off, shape) {
+      var sx = o.l / r.nx, sy = o.w / r.ny;
+      for (var i = 0; i < r.nx; i++) for (var j = 0; j < r.ny; j++) {
+        /* zone B pairs with zone A at the same grid point, 9 px apart on the drawing */
+        var cx = X(sx * (i + 0.5)) + off * 9, cy = Y(sy * (j + 0.5));
+        g.push(shape === 'a' ? '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="4" fill="var(--c)"/>'
+                             : '<rect x="' + (cx - 4).toFixed(1) + '" y="' + (cy - 4).toFixed(1) + '" width="8" height="8" fill="none" stroke="var(--o)" stroke-width="1.4"/>');
+      }
+    }
+    grid(0, 'a');
+    if (o.cross) grid(1, 'b');
+    /* scale bar: one detector pitch */
+    var y0 = Y(o.w) + 20;
+    g.push('<line x1="' + X(0) + '" y1="' + y0 + '" x2="' + X(r.s) + '" y2="' + y0 + '" stroke="var(--t2)" stroke-width="1.4"/>',
+      '<text x="' + (X(r.s) + 8) + '" y="' + (y0 + 4) + '" fill="var(--t3)" font-size="11" font-family="JetBrains Mono, monospace">' + L.fmt(r.s, 2) + ' m pitch · ' + L.fmt(o.l, 0) + ' × ' + L.fmt(o.w, 0) + ' m</text>',
+      '<circle cx="' + (W - 196) + '" cy="' + (y0) + '" r="4" fill="var(--c)"/><text x="' + (W - 186) + '" y="' + (y0 + 4) + '" fill="var(--t2)" font-size="11" font-family="IBM Plex Sans, sans-serif">Zone A</text>');
+    if (o.cross) g.push('<rect x="' + (W - 120) + '" y="' + (y0 - 4) + '" width="8" height="8" fill="none" stroke="var(--o)" stroke-width="1.4"/><text x="' + (W - 106) + '" y="' + (y0 + 4) + '" fill="var(--t2)" font-size="11" font-family="IBM Plex Sans, sans-serif">Zone B</text>');
+    g.push('</svg>');
+    return g.join('');
   }
 
   /* ---- release sequence (state machine) ---------------------------------- */

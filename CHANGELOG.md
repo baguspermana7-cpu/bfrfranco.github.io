@@ -11,6 +11,48 @@ release sections rather than semver.
 
 ---
 
+## v3.12.1 — 2026-10-10
+
+### The LTC Workbench goes deeper: more tools, live diagrams, and the model lab in the same system
+
+Owner follow-up on v3.12.0: more detail, more comprehensive, more immersive.
+
+**New tools**
+- **ASHRAE — Condensation.** Coolant supply against the dew point of the room around the manifolds,
+  with a control margin: the minimum supply, the highest room RH the supply tolerates, a temperature
+  gauge and an RH sweep table.
+- **ASHRAE — Sensor log.** Paste minute / dry-bulb / RH readings: time-weighted share recommended,
+  allowable and outside, the worst reading and its binding limit, the largest 1 h and 15 min swings
+  against the rate-of-change limits, and every reading plotted on the psychrometric chart.
+- **ASHRAE — chart readout.** Pointing at either psychrometric chart reads back dry-bulb, dew point,
+  RH and humidity ratio at the cursor, inverted from the chart scales at the site pressure.
+- **Tier — cooling paths.** A Power / Cooling switch: chiller plant, pumps, piping loop and CRAH
+  units for Tier I–IV, through the same maintenance and failure sweep. Connectors carrying load
+  animate; an alternate path switched in for maintenance starts moving.
+- **NFPA — detector plan.** The room to scale with each zone's detectors on its own grid (zone A
+  dot, zone B square — shape, not hue alone), and a container count from the listed container size.
+- **TIA — loss profile and port count.** The fiber budget now draws cumulative loss along the link
+  (connector and splice steps, attenuation ramp) under the budget line; a new tab sizes copper and
+  fiber ports, panel rack units at the rack and at the HDA, and MPO-12/24 trunks with spare capacity.
+- **ISO — energy Sankey and monthly PUE.** The four meters split facility energy into IT and three
+  overhead bands (grid and renewable in); the EnPI tab plots PUE by month against the energy-weighted
+  annual PUE and states how far the average of monthly PUEs is from it.
+- **Hub — lifecycle.** Commissioning levels L1–L5 then operation, each opening the tests the standards
+  ask for there (cabling certification, NFPA 72 acceptance, door-fan integrity, TCCF, ISO 50001 audits).
+  Power and heat connectors on the plant map now move.
+
+**Model lab restyled into the workbench system**: amber active state instead of the default blue,
+4px radius, no resting shadows, JetBrains Mono tabular figures for every number, donut and
+temperature chart on theme tokens. The design score reads as a weighted screen with neutral bands
+(Strong / Adequate / Marginal / Weak), not praise.
+
+**Flow animation rule.** Each line pattern animates by exactly one of its own dash periods per cycle
+(12, 10, 9 or 31 units), so no loop snaps back, and a dashed or dotted line keeps its pattern while it
+moves. Reduced motion stops every animation and returns solid lines to solid.
+
+**Gate.** `tools/test-ltc-workbench.mjs` adds W2g: the cooling topologies must reach the same Tier
+objectives as the power ones (III maintainable but not fault tolerant, IV both).
+
 ## v3.12.0 — 2026-10-10
 
 ### The standards lab becomes a workbench: tools instead of articles

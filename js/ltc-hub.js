@@ -87,15 +87,26 @@
   SYSTEMS.forEach(function (s) { BY_ID[s.id] = s; });
 
   /* ---- figure ------------------------------------------------------------ */
+  /* power and heat are always moving in a running plant: animate those
+   * connectors; the dotted monitoring link stays still */
+  function flowing(d) {
+    var edge0 = d.edge;
+    d.edge = function (a, b, o) {
+      o = o || {};
+      if (o.pattern !== 'dotted' && !o.state) o.state = 'flow';
+      return edge0(a, b, o);
+    };
+    return d;
+  }
   var GAP = 40;
   function build(D, o) {
-    var d = D.create({
+    var d = flowing(D.create({
       slug: 'ltcmap', width: 1200, height: 600,
       title: 'Liquid-to-chip plant — standards map',
       desc: 'Power flows from the utility and engine generators through switchgear, UPS and PDUs to the IT racks; ' +
             'heat leaves the racks through the CDU to dry coolers; fire protection watches the IT space. ' +
             'Each block opens the standards that govern it.'
-    });
+    }));
     var box = {};
     function n(id, x, y, extra) {
       var s = BY_ID[id];
@@ -224,10 +235,65 @@
     });
   }
 
+  /* ---- lifecycle: commissioning levels and the tests standards ask for ----- */
+  var LIFE = [
+    { id: 'l1', name: 'L1 · Factory', sub: 'FAT at the vendor', sym: 'ups', tests: [
+      ['Vendor', 'Factory acceptance of UPS, switchgear, generators, chillers, CDUs against the submittal'],
+      ['NFPA 2001', 'Listed agent containers and valves arrive with their listing; quantities checked against the design'] ] },
+    { id: 'l2', name: 'L2 · Delivered', sub: 'site acceptance', sym: 'switchgear', tests: [
+      ['Site', 'Receipt inspection: nameplates, ratings, damage, documentation'],
+      ['TIA-568', 'Installed cabling certified: copper permanent links and fiber links tested (Tier 1 loss, Tier 2 OTDR where specified)'] ] },
+    { id: 'l3', name: 'L3 · Started', sub: 'install + start-up', sym: 'pump', tests: [
+      ['Vendor', 'Start-up of each unit by the manufacturer; settings recorded'],
+      ['NFPA 72', 'Detection devices installed and tested; aspirating transport time verified'] ] },
+    { id: 'l4', name: 'L4 · Functional', sub: 'each system, all modes', sym: 'cdu', focal: true, tests: [
+      ['NFPA 72', 'Acceptance testing of the fire alarm system and its interfaces'],
+      ['NFPA 2001', 'Enclosure integrity (door-fan) test proves the hold time; release sequence verified without discharge'],
+      ['ASHRAE', 'Cooling sequences verified at load; rack inlet and facility-water supply inside the design envelope'] ] },
+    { id: 'l5', name: 'L5 · Integrated', sub: 'IST · load banks', sym: 'rack', tests: [
+      ['Uptime', 'Tier Certification of Constructed Facility demonstrates maintainability (and fault tolerance for IV) under load'],
+      ['Site', 'Utility failure, generator transfer, UPS and cooling failover with load banks at design IT load'] ] },
+    { id: 'ops', name: 'Operate', sub: 'measure · improve', sym: 'meter', tests: [
+      ['ISO/IEC 30134', '12 months of PUE, WUE, CUE at a stated category'],
+      ['ISO 50001', 'Certification: stage 1 and 2 audits, annual surveillance, recertification in year 3'],
+      ['Uptime', 'Operational Sustainability (staffing, maintenance, management) assessed separately from topology'] ] }
+  ];
+  var LBY = {}; LIFE.forEach(function (x) { LBY[x.id] = x; });
+  function lifeBuild(D, o) {
+    var d = flowing(D.create({ slug: 'ltclife', title: 'Commissioning levels to operation',
+      desc: 'Factory, delivery, start-up, functional and integrated systems testing, then operation; each level opens the tests the standards ask for there.' }));
+    var x = 16, y = 16, G = o.narrow ? 28 : 36, prev = null, box = {};
+    LIFE.forEach(function (s, i) {
+      /* snake: the second row runs right to left, so L3 drops straight onto L4 */
+      if (!o.narrow && i === 3) { x = box.l3.x; y = box.l1.y + box.l1.h + 56; }
+      box[s.id] = d.node(x, y, { id: s.id, name: s.name, sublabel: s.sub, symbol: s.sym, interactive: true, focal: !!s.focal,
+        fill: s.focal ? 'paper-2' : 'paper', tier: s.focal ? 1 : 2, w: 152, legend: s.focal ? 'Where most defects surface' : 'Stage' });
+      if (prev) {
+        var A = box[prev], B = box[s.id];
+        if (o.narrow) d.edge({ x: A.x + A.w / 2, y: A.y + A.h }, { x: B.x + B.w / 2, y: B.y }, { fromId: prev, toId: s.id, legend: i === 1 ? 'Gate to next stage' : undefined });
+        else if (B.y === A.y && B.x > A.x) d.edge({ x: A.x + A.w, y: A.y + A.h / 2 }, { x: B.x, y: B.y + B.h / 2 }, { fromId: prev, toId: s.id, legend: i === 1 ? 'Gate to next stage' : undefined });
+        else if (B.y === A.y) d.edge({ x: A.x, y: A.y + A.h / 2 }, { x: B.x + B.w, y: B.y + B.h / 2 }, { fromId: prev, toId: s.id });
+        else d.edge({ x: A.x + A.w / 2, y: A.y + A.h }, { x: B.x + B.w / 2, y: B.y }, { fromId: prev, toId: s.id });
+      }
+      if (o.narrow) y = box[s.id].y + box[s.id].h + G; else if (i < 3) x = box[s.id].x + box[s.id].w + G; else x = box[s.id].x - G - 152;
+      prev = s.id;
+    });
+    d.legend();
+    return d;
+  }
+  function openLife(id) {
+    var s = LBY[id]; if (!s) return;
+    if (lifeFig) LIFE.forEach(function (x) { lifeFig.mark(x.id, x.id === id ? 'selected' : null); });
+    L.inspect({ sym: s.sym, eyebrow: 'Commissioning', title: s.name, html: '<ul class="ltc-refs">' + s.tests.map(function (t) {
+      return '<li><code>' + L.esc(t[0]) + '</code><p>' + L.esc(t[1]) + '</p></li>'; }).join('') + '</ul>' });
+  }
+  var lifeFig = null;
+
   var fig = null;
   function boot() {
     L.init({ module: 'hub' });
     fig = L.draw(document.getElementById('ltcMap'), build, open);
+    lifeFig = L.draw(document.getElementById('ltcLife'), lifeBuild, openLife);
     matrix();
     /* the inspector is a persistent column only on wide screens; elsewhere it is a
      * drawer, and opening a drawer nobody asked for hides the plant */

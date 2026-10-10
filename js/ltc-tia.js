@@ -106,9 +106,12 @@
   function verdict(state, word, text) { return '<div class="ltc-verdict" data-state="' + state + '"><b>' + word + '</b><span>' + text + '</span></div>'; }
 
   function runFiber() {
-    var o = { fiber: sval('xFiber'), app: sval('xApp'), len: val('xLen'), pairs: val('xPairs'), splices: val('xSpl') };
-    var r = fiberCalc(o);
+    var o = { fiber: sval('xFiber'), app: sval('xApp'), len: val('xLen'), pairs: Math.round(val('xPairs')), splices: Math.round(val('xSpl')) };
     var out = document.getElementById('xOut');
+    if (![o.len, o.pairs, o.splices].every(isFinite) || o.len <= 0 || o.pairs < 0 || o.splices < 0) {
+      out.innerHTML = verdict('fail', 'Input', 'Length above 0; connector pairs and splices as whole numbers, 0 or more.'); return;
+    }
+    var r = fiberCalc(o);
     if (!r.supported) { out.innerHTML = verdict('fail', 'Not supported', o.app + ' is not specified over ' + o.fiber + '.'); return; }
     var ok = r.lossOk && r.reachOk;
     out.innerHTML = verdict(ok ? 'ok' : 'fail', ok ? 'Link fits' : 'Link fails',
@@ -119,8 +122,68 @@
       ro('Margin', L.fmt(r.margin, 2), 'dB', r.margin >= 0 ? 'ok' : 'fail') + ro('Max reach', L.fmt(r.reach, 0), 'm', r.reachOk ? 'ok' : 'fail') + '</dl>' +
       '<div class="ltc-table-wrap"><table class="ltc-table"><thead><tr><th>Loss term</th><th class="n">dB</th><th class="n">Share of budget</th></tr></thead><tbody>' +
       r.parts.map(function (p) { return '<tr><td>' + p[0] + '</td><td class="n">' + L.fmt(p[1], 2) + '</td><td class="n">' + L.fmt(100 * p[1] / r.budget, 0) + ' %</td></tr>'; }).join('') +
-      '</tbody></table></div><p class="ltc-src">TIA-568.3-D maximum losses: ' + FIBER[o.fiber].atten + ' dB/km · 0.75 dB per connector pair · 0.3 dB per splice. Budget and reach: IEEE 802.3 for ' + o.app + '. MPO connectors on short-reach parallel optics often need low-loss parts to fit two pairs.</p>';
+      '</tbody></table></div>' + lossProfile(o, r) + '<p class="ltc-src">TIA-568.3-D maximum losses: ' + FIBER[o.fiber].atten + ' dB/km · 0.75 dB per connector pair · 0.3 dB per splice. Budget and reach: IEEE 802.3 for ' + o.app + '. MPO connectors on short-reach parallel optics often need low-loss parts to fit two pairs.</p>';
   }
+  /* Cumulative loss along the link: a connector pair at each end (extra pairs
+   * spread along the run), splices in between, attenuation as a ramp. The budget
+   * is the horizontal line the staircase must stay under. */
+  function lossProfile(o, r) {
+    var f = FIBER[o.fiber], Lm = Math.max(1, o.len);
+    var ev = [];
+    var pairs = o.pairs, sp = o.splices;
+    for (var i = 0; i < pairs; i++) ev.push({ at: pairs === 1 ? 0 : Lm * i / (pairs - 1), dB: CONN, kind: 'c' });
+    for (var j = 0; j < sp; j++) ev.push({ at: Lm * (j + 1) / (sp + 1), dB: SPLICE, kind: 's' });
+    ev.sort(function (a, b) { return a.at - b.at; });
+    var W = 640, H = 220, l = 48, rr = 16, t = 16, b = 36;
+    var top = Math.max(r.budget || 0, r.loss) * 1.15;
+    var X = function (m) { return l + m / Lm * (W - l - rr); }, Y = function (d) { return H - b - d / top * (H - t - b); };
+    var pts = [[0, 0]], acc = 0, pos = 0;
+    ev.forEach(function (e) {
+      acc += (e.at - pos) / 1000 * f.atten; pos = e.at; pts.push([pos, acc]);
+      acc += e.dB; pts.push([pos, acc]);
+    });
+    acc += (Lm - pos) / 1000 * f.atten; pts.push([Lm, acc]);
+    var g = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-labelledby="lp-t lp-d" style="width:100%;max-width:' + W + 'px;min-width:340px">',
+      '<title id="lp-t">Cumulative insertion loss along the link</title><desc id="lp-d">Loss rises in steps at each connector pair and splice and as a ramp along the fiber, against the application channel budget.</desc>',
+      '<rect width="100%" height="100%" fill="var(--bg1)"/>'];
+    for (var k = 0; k <= 4; k++) {
+      var dv = top * k / 4;
+      g.push('<line x1="' + l + '" y1="' + Y(dv) + '" x2="' + (W - rr) + '" y2="' + Y(dv) + '" stroke="var(--bd)" stroke-width="0.6"/>',
+        '<text x="' + (l - 6) + '" y="' + (Y(dv) + 4) + '" fill="var(--t3)" font-size="11" text-anchor="end" font-family="JetBrains Mono, monospace">' + dv.toFixed(1) + '</text>');
+    }
+    g.push('<text x="' + l + '" y="' + (H - 8) + '" fill="var(--t3)" font-size="11" font-family="JetBrains Mono, monospace">0 m</text>',
+      '<text x="' + (W - rr) + '" y="' + (H - 8) + '" fill="var(--t3)" font-size="11" text-anchor="end" font-family="JetBrains Mono, monospace">' + L.fmt(Lm, 0) + ' m</text>');
+    if (r.budget) g.push('<line x1="' + l + '" y1="' + Y(r.budget) + '" x2="' + (W - rr) + '" y2="' + Y(r.budget) + '" stroke="var(--r)" stroke-width="1.2" stroke-dasharray="6 3"/>',
+      '<text x="' + (W - rr) + '" y="' + (Y(r.budget) - 6) + '" fill="var(--r)" font-size="11" text-anchor="end" font-family="JetBrains Mono, monospace">budget ' + r.budget + ' dB</text>');
+    g.push('<path d="M' + pts.map(function (q) { return X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1); }).join(' L') + '" fill="none" stroke="var(' + (r.lossOk ? '--g' : '--r') + ')" stroke-width="1.8"/>');
+    ev.forEach(function (e) {
+      var x = X(e.at);
+      g.push(e.kind === 'c' ? '<rect x="' + (x - 3.5) + '" y="' + (H - b + 6) + '" width="7" height="7" fill="var(--c)"/>'
+                            : '<circle cx="' + x + '" cy="' + (H - b + 9.5) + '" r="3.5" fill="none" stroke="var(--o)" stroke-width="1.4"/>');
+    });
+    g.push('</svg>');
+    return '<div class="ltc-canvas">' + g.join('') + '</div><p class="ltc-src">■ mated connector pair (0.75 dB) · ○ splice (0.3 dB) · ramp = ' + f.atten + ' dB/km</p>';
+  }
+
+  /* ---- port & panel count ------------------------------------------------- */
+  function runPorts() {
+    var racks = val('pRacks'), cu = val('pCu'), fx = val('pFx'), cuU = val('pCuU'), fxU = val('pFxU'), spare = val('pSpare') / 100;
+    var mpo = +document.getElementById('pMpo').value;
+    if (![racks, cu, fx, cuU, fxU, spare].every(isFinite) || cuU <= 0 || fxU <= 0) return;
+    var cuPorts = Math.ceil(racks * cu * (1 + spare)), fxPorts = Math.ceil(racks * fx * (1 + spare));
+    var strands = fxPorts * 2, perTrunk = mpo / 2;                   /* duplex LC per MPO trunk */
+    var trunks = Math.ceil(fxPorts / perTrunk);
+    var cuRU = Math.ceil(cuPorts / cuU), fxRU = Math.ceil(fxPorts / fxU);
+    var perRackCuRU = Math.ceil(cu * (1 + spare) / cuU), perRackFxRU = Math.ceil(fx * (1 + spare) / fxU);
+    document.getElementById('pOut').innerHTML = '<dl class="ltc-readouts">' +
+      ro('Copper ports', L.fmt(cuPorts, 0), '') + ro('Fiber duplex ports', L.fmt(fxPorts, 0), '') + ro('Fiber strands', L.fmt(strands, 0), '') +
+      ro('MPO-' + mpo + ' trunks', L.fmt(trunks, 0), '', 'ok') + ro('Panel RU at the HDA', L.fmt(cuRU + fxRU, 0), 'U') + ro('Panel RU per rack', L.fmt(perRackCuRU + perRackFxRU, 0), 'U') + '</dl>' +
+      '<div class="ltc-table-wrap"><table class="ltc-table"><thead><tr><th>End</th><th class="n">Copper panels</th><th class="n">Fiber panels</th><th class="n">Rack units</th></tr></thead><tbody>' +
+      '<tr><td>Each EDA rack</td><td class="n">' + perRackCuRU + '</td><td class="n">' + perRackFxRU + '</td><td class="n">' + (perRackCuRU + perRackFxRU) + ' U</td></tr>' +
+      '<tr><td>HDA (all ' + racks + ' racks)</td><td class="n">' + cuRU + '</td><td class="n">' + fxRU + '</td><td class="n">' + (cuRU + fxRU) + ' U</td></tr></tbody></table></div>' +
+      '<p class="ltc-note">Every horizontal link ends on a panel at both ends, so the HDA carries the sum of all racks. MPO-' + mpo + ' carries ' + perTrunk + ' duplex LC ports through a cassette. Spare capacity applies before rounding to whole panels.</p>';
+  }
+
   function fillApps() {
     var f = sval('xFiber'), sel = document.getElementById('xApp'), cur = sel.value;
     sel.innerHTML = Object.keys(APPS).filter(function (a) { return APPS[a][f]; }).map(function (a) { return '<option' + (a === cur ? ' selected' : '') + '>' + a + '</option>'; }).join('');
@@ -162,7 +225,9 @@
     document.getElementById('p-copper').addEventListener('input', runCopper);
     document.getElementById('p-copper').addEventListener('change', runCopper);
     document.getElementById('p-bonding').addEventListener('input', runBond);
-    fillApps(); runFiber(); runCopper(); runBond();
+    document.getElementById('p-ports').addEventListener('input', runPorts);
+    document.getElementById('p-ports').addEventListener('change', runPorts);
+    fillApps(); runFiber(); runCopper(); runBond(); runPorts();
     if (window.matchMedia('(min-width: 1280px)').matches) {
       L.inspect({ sym: SPACES.mda.sym, eyebrow: 'TIA-942-B space', title: SPACES.mda.name, html: '<p>' + L.esc(SPACES.mda.body) + '</p>' });
       fig.mark('mda', 'selected');

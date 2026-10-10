@@ -75,6 +75,12 @@ function load(rel) {
   ok('W2d', t4.cm && t4.ft, `Tier IV must be maintainable and fault tolerant: cm=${t4.cm} ft=${t4.ft}`);
   ok('W2e', T.powered(2, { 'ups#1': 1 }, false) && !T.powered(1, { 'ups#1': 1 }, false), 'an N+1 UPS survives one unit out, an N UPS does not');
   near('W2f', T.kOfN(0.9, 3, 2), 0.972, 1e-12, '2-of-3 availability at A = 0.9');
+  /* the cooling topologies must reach the same objectives as the power ones */
+  T.system('cooling');
+  const c1 = v(1), c2 = v(2), c3 = v(3), c4 = v(4);
+  ok('W2g', !c1.cm && !c2.cm && c3.cm && !c3.ft && c4.cm && c4.ft,
+     `cooling Tier objectives: I ${c1.cm}/${c1.ft} II ${c2.cm}/${c2.ft} III ${c3.cm}/${c3.ft} IV ${c4.cm}/${c4.ft}`);
+  T.system('power');
 }
 
 /* ---- W3 NFPA 2001 -------------------------------------------------------- */
@@ -140,6 +146,10 @@ for (const [page, mod] of Object.entries(PAGES)) {
   ok(`W6d:${page}`, h.includes(`enforceTierFeatureAccess('${key}')`) && h.includes('id="rootLoginBtn"') && /<body class="locked">/.test(h),
      'fail-closed access gate with its own page key');
   ok(`W6e:${page}`, !/Interview Prep|TPM Decision Framework|Microsoft TPM/i.test(h), 'no interview-prep filler');
+  /* v3.12.0 shipped these pages with bare asset URLs: a returning visitor could run the
+   * previous release's JS against new markup. Every local script and stylesheet carries a token. */
+  const bare = [...h.matchAll(/(?:src|href)="((?:js|css)\/[^"]+\.(?:js|css))"/g)].map(m => m[1]);
+  ok(`W6g:${page}`, bare.length === 0, `local assets without a ?v= cache token: ${bare.join(', ')}`);
 }
 {
   /* comments may NAME the old defect; only code may not reintroduce it */

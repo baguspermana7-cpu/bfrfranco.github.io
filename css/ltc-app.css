@@ -204,6 +204,21 @@ button, input, select { font: inherit; color: inherit; }
 .ltc-canvas [data-rzd-state="fail"] { stroke: var(--r); stroke-dasharray: 2 3; }
 .ltc-canvas [data-rzd-state="dead"] { opacity: .35; }
 .ltc-canvas [data-rzd-state="live"] { stroke: var(--g); }
+/* A connector carrying load moves. A solid line becomes 9-3 dashes; a line that
+   already has a pattern keeps it, so the legend still reads. Each pattern moves by
+   exactly one of its own periods per cycle, so the loop never snaps back. */
+.ltc-canvas path[data-rzd-state="flow"]:not([stroke-dasharray]) { stroke-dasharray: 9 3; animation: ltc-flow-12 0.9s linear infinite; }
+.ltc-canvas path[data-rzd-state="flow"][stroke-dasharray="6,4"] { animation: ltc-flow-10 0.8s linear infinite; }
+.ltc-canvas path[data-rzd-state="flow"][stroke-dasharray="1.5,3"] { animation: ltc-flow-9 0.8s linear infinite; }
+.ltc-canvas path[data-rzd-state="flow"][stroke-dasharray="8,3,1.5,3"] { animation: ltc-flow-31 1.6s linear infinite; }
+@keyframes ltc-flow-12 { to { stroke-dashoffset: -12; } }
+@keyframes ltc-flow-10 { to { stroke-dashoffset: -10; } }
+@keyframes ltc-flow-9 { to { stroke-dashoffset: -9; } }
+@keyframes ltc-flow-31 { to { stroke-dashoffset: -31; } }
+@media (prefers-reduced-motion: reduce) {
+  .ltc-canvas path[data-rzd-state="flow"] { animation: none; }
+  .ltc-canvas path[data-rzd-state="flow"]:not([stroke-dasharray]) { stroke-dasharray: none; }
+}
 
 /* ---- inspector ------------------------------------------------------------- */
 .ltc-insp {

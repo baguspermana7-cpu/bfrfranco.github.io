@@ -65,13 +65,13 @@
   }
 
   /* Synthetic example data — a stated formula, not a facility's meter data:
-   *   facility = 520 + 1.18·IT + 0.62·CDD  (MWh) ± a fixed ±1.5 % pattern */
+   *   facility = 150 + 1.12·IT + 0.35·CDD  (MWh) ± a fixed ±1.5 % pattern — PUE near 1.35 */
   var CDD = [160, 150, 175, 180, 190, 185, 190, 195, 185, 180, 170, 165];
   var NOISE = [0.6, -1.1, 0.9, -0.4, 1.4, -0.8, 0.2, -1.5, 1.0, -0.3, 0.7, -0.7];
   function synth(itBase, factor) {
     return CDD.map(function (c, i) {
       var it = itBase + 40 * Math.sin(i / 2);
-      var fac = (520 + 1.18 * it + 0.62 * c) * factor * (1 + NOISE[i] / 100);
+      var fac = (150 + 1.12 * it + 0.35 * c) * factor * (1 + NOISE[i] / 100);
       return (i + 1) + ', ' + it.toFixed(0) + ', ' + c + ', ' + fac.toFixed(0);
     }).join('\n');
   }
@@ -90,8 +90,76 @@
       ro('REF', L.fmt(k.ref, 2), '') + ro('ERF', L.fmt(k.erf, 2), '') + ro('WUE', L.fmt(k.wue, 2), 'L/kWh') + ro('CUE', L.fmt(k.cue, 3), 'kgCO₂/kWh') + '</dl>' +
       '<div class="ltc-verdict" data-state="warn"><b>Category gap</b><span>The same facility reports PUE ' + L.fmt(k.pue1, 3) + ' at category 1 and ' + L.fmt(k.pue3, 3) +
       ' at category 3: ' + L.fmt(o.it1 - o.it3, 0) + ' MWh of transformer, PDU and cord losses moves from “IT” to overhead. A PUE without its category is not comparable.</span></div>' +
+      sankey(o) +
       '<p class="ltc-note">ISO/IEC 30134-2 requires PUE over a 12-month period with the category stated. CUE here = (facility − renewable) × grid factor ÷ IT energy, a market-based simplification; report the accounting basis with the number.</p>';
     if (mFig) mFig.redraw();
+  }
+
+  /* Energy Sankey from the four meters. Without sub-metering the overhead above
+   * M1 (cooling, UPS loss, lighting) cannot be split, so it stays one band and
+   * says so — the drawing shows what the meters can prove, not more. */
+  function sankey(o) {
+    var W = 640, H = 340, x0 = 24, x1 = 220, x2 = 430, bw = 14, gap = 10;
+    var sinks = [['IT equipment (M3)', o.it3, 'g'], ['Rack PDU / cords (M2−M3)', o.it2 - o.it3, 'o'],
+                 ['Transformer + PDU (M1−M2)', o.it1 - o.it2, 'o'], ['Cooling, UPS loss, other (M0−M1)', o.e - o.it1, 'r']];
+    var srcs = [['Grid', Math.max(0, o.e - o.ren), 't3'], ['Renewable', Math.min(o.ren, o.e), 'c']];
+    /* small bands get padded to a readable height, so reserve room for that padding */
+    var usable = H - 40 - gap * (sinks.length - 1) - 26 * 3, k = usable / o.e;
+    var g = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-labelledby="sk-t sk-d" style="width:100%;max-width:' + W + 'px;min-width:340px">',
+      '<title id="sk-t">Facility energy by metering point</title><desc id="sk-d">Grid and renewable supply into the facility, split by the four meters into IT energy and three overhead bands.</desc>',
+      '<rect width="100%" height="100%" fill="var(--bg1)"/>'];
+    function band(ax, ay, bx, by, h, col) {
+      var c = (ax + bx) / 2;
+      g.push('<path d="M' + ax + ' ' + ay + ' C' + c + ' ' + ay + ' ' + c + ' ' + by + ' ' + bx + ' ' + by +
+        ' L' + bx + ' ' + (by + h) + ' C' + c + ' ' + (by + h) + ' ' + c + ' ' + (ay + h) + ' ' + ax + ' ' + (ay + h) + ' Z" fill="var(--' + col + ')" fill-opacity="0.22"/>');
+    }
+    var fy = 20 + (usable + gap * (sinks.length - 1) - o.e * k) / 2, sy = fy;
+    srcs.forEach(function (sr) {
+      var h = sr[1] * k; if (h <= 0) return;
+      g.push('<rect x="' + x0 + '" y="' + sy + '" width="' + bw + '" height="' + h + '" fill="var(--' + sr[2] + ')"/>');
+      g.push('<text x="' + (x0 + bw + 6) + '" y="' + (sy + 14) + '" fill="var(--t2)" font-size="11" font-family="IBM Plex Sans, sans-serif">' + sr[0] + ' ' + L.fmt(100 * sr[1] / o.e, 0) + ' %</text>');
+      band(x0 + bw, sy, x1, sy, h, sr[2]); sy += h;
+    });
+    g.push('<rect x="' + x1 + '" y="' + fy + '" width="' + bw + '" height="' + (o.e * k) + '" fill="var(--t1)"/>',
+      '<text x="' + (x1 + bw / 2) + '" y="' + (fy - 6) + '" fill="var(--t1)" font-size="11" text-anchor="middle" font-family="JetBrains Mono, monospace">M0 ' + L.fmt(o.e, 0) + ' MWh</text>');
+    var ay = fy, by = 20;
+    sinks.forEach(function (sk) {
+      var h = Math.max(0, sk[1] * k);
+      band(x1 + bw, ay, x2, by, h, sk[2]);
+      g.push('<rect x="' + x2 + '" y="' + by + '" width="' + bw + '" height="' + Math.max(1, h) + '" fill="var(--' + sk[2] + ')"/>',
+        '<text x="' + (x2 + bw + 6) + '" y="' + (by + Math.max(h, 12) / 2 + 4) + '" fill="var(--t2)" font-size="11" font-family="IBM Plex Sans, sans-serif">' + sk[0] + '</text>',
+        '<text x="' + (x2 + bw + 6) + '" y="' + (by + Math.max(h, 12) / 2 + 17) + '" fill="var(--t3)" font-size="10.5" font-family="JetBrains Mono, monospace">' + L.fmt(sk[1], 0) + ' MWh · ' + L.fmt(100 * sk[1] / o.e, 1) + ' %</text>');
+      ay += h; by += h + gap + (h < 26 ? 26 - h : 0);
+    });
+    g.push('</svg>');
+    return '<div class="ltc-canvas">' + g.join('') + '</div>';
+  }
+
+  /* Monthly PUE: the annual figure is energy-weighted (ΣE ÷ ΣIT), which is not
+   * the average of twelve monthly PUEs — a common reporting error. */
+  function pueTrend(rows) {
+    rows = rows.filter(function (q) { return q.it > 0 && q.fac > 0; });
+    if (rows.length < 2) return { svg: '<p class="ltc-note">Need two or more months with IT and facility energy above 0.</p>', annual: NaN, mean: NaN };
+    var W = 640, H = 200, l = 48, r = 16, t = 16, b = 30;
+    var p = rows.map(function (q) { return q.fac / q.it; });
+    var sE = rows.reduce(function (a, q) { return a + q.fac; }, 0), sI = rows.reduce(function (a, q) { return a + q.it; }, 0);
+    var annual = sE / sI, mean = p.reduce(function (a, v) { return a + v; }, 0) / p.length;
+    var lo = Math.min.apply(null, p.concat([annual])) - 0.02, hi = Math.max.apply(null, p.concat([annual])) + 0.02;
+    var X = function (i) { return l + (i + 0.5) / p.length * (W - l - r); }, Y = function (v) { return t + (1 - (v - lo) / (hi - lo)) * (H - t - b); };
+    var bw = (W - l - r) / p.length * 0.6;
+    var g = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-labelledby="pt-t pt-d" style="width:100%;max-width:' + W + 'px;min-width:340px">',
+      '<title id="pt-t">Monthly PUE</title><desc id="pt-d">PUE for each month with the energy-weighted annual PUE as a line.</desc>',
+      '<rect width="100%" height="100%" fill="var(--bg1)"/>'];
+    [lo, (lo + hi) / 2, hi].forEach(function (v) {
+      g.push('<line x1="' + l + '" y1="' + Y(v) + '" x2="' + (W - r) + '" y2="' + Y(v) + '" stroke="var(--bd)" stroke-width="0.6"/><text x="' + (l - 6) + '" y="' + (Y(v) + 4) + '" fill="var(--t3)" font-size="11" text-anchor="end" font-family="JetBrains Mono, monospace">' + v.toFixed(3) + '</text>');
+    });
+    p.forEach(function (v, i) {
+      g.push('<rect x="' + (X(i) - bw / 2) + '" y="' + Y(v) + '" width="' + bw + '" height="' + (H - b - Y(v)) + '" fill="var(--c)" fill-opacity="0.35" stroke="var(--c)" stroke-width="0.8"/>',
+        '<text x="' + X(i) + '" y="' + (H - 10) + '" fill="var(--t3)" font-size="11" text-anchor="middle" font-family="JetBrains Mono, monospace">' + rows[i].m + '</text>');
+    });
+    g.push('<line x1="' + l + '" y1="' + Y(annual) + '" x2="' + (W - r) + '" y2="' + Y(annual) + '" stroke="var(--o)" stroke-width="1.6"/>',
+      '<text x="' + (W - r) + '" y="' + (Y(annual) - 6) + '" fill="var(--o)" font-size="11" text-anchor="end" font-family="JetBrains Mono, monospace">annual ' + annual.toFixed(3) + '</text></svg>');
+    return { svg: '<div class="ltc-canvas">' + g.join('') + '</div>', annual: annual, mean: mean };
   }
 
   /* metering points */
@@ -176,6 +244,13 @@
     out.innerHTML = '<div class="ltc-verdict" data-state="' + (okFit ? 'ok' : 'warn') + '"><b>' + (okFit ? 'Baseline usable' : 'Baseline weak') + '</b><span>CV(RMSE) ' + L.fmt(m.cvrmse, 1) + ' % (limit 15 %), NMBE ' + L.fmt(m.nmbe, 2) + ' % (limit ±5 %), R² ' + L.fmt(m.r2, 3) + '.</span></div>' +
       '<dl class="ltc-readouts">' + ro('Fixed load b0', L.fmt(m.b[0], 1), 'MWh/mo') + ro('Per MWh IT b1', L.fmt(m.b[1], 3), '') + ro('Per CDD b2', L.fmt(m.b[2], 3), 'MWh') +
       ro('Avoided energy', L.fmt(save, 0), 'MWh', save >= 0 ? 'ok' : 'fail') + ro('Savings', act ? L.fmt(100 * save / (act + save), 1) : '—', '%', save >= 0 ? 'ok' : 'fail') + '</dl>' +
+      (function () {
+        var pt = pueTrend(rep.length ? rep : base);
+        if (!isFinite(pt.annual)) return pt.svg;
+        return '<div class="ltc-box"><div class="ltc-box-h">PUE by month · ' + (rep.length ? 'reporting' : 'baseline') + ' period</div><div class="ltc-box-b">' + pt.svg +
+          '<p class="ltc-note">Annual PUE is energy-weighted: ΣE ÷ ΣIT = <b>' + pt.annual.toFixed(3) + '</b>. The average of the monthly PUEs is ' + pt.mean.toFixed(3) +
+          ' — a different number (' + (pt.mean - pt.annual >= 0 ? '+' : '') + (pt.mean - pt.annual).toFixed(4) + '). Report the weighted one.</p></div></div>';
+      })() +
       (rep.length ? '<div class="ltc-canvas">' + cusumChart(cus) + '</div><div class="ltc-table-wrap"><table class="ltc-table"><thead><tr><th>Month</th><th class="n">IT MWh</th><th class="n">CDD</th><th class="n">Predicted</th><th class="n">Actual</th><th class="n">Avoided</th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>' : '');
   }
 

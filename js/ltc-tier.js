@@ -66,8 +66,57 @@
               { id: 'B', active: true, stages: ['genB', 'swbB', 'upsB', 'pduB'] }] }
   };
 
+  /* Cooling, the same two tests. The chiller plant node includes its heat
+   * rejection (they always travel together); the piping loop is the
+   * distribution path; CRAH units are the terminal capacity. Tier IV adds
+   * continuous cooling (thermal storage) in the Standard — not modelled. */
+  var COOL = {
+    1: { label: 'Tier I — basic capacity',
+      nodes: [
+        { id: 'plant', name: 'Chiller plant', sym: 'chiller', units: 2, need: 2 },
+        { id: 'pmp', name: 'Pumps', sym: 'pump', units: 2, need: 2 },
+        { id: 'loop', name: 'Piping loop', sym: 'valve', sub: 'single path' },
+        { id: 'crah', name: 'CRAH units', sym: 'crah', units: 4, need: 4 },
+        { id: 'rack', name: 'IT heat load', sym: 'rack', sub: 'single path', load: true }],
+      paths: [{ id: 'A', active: true, stages: ['plant', 'pmp', 'loop', 'crah'] }] },
+    2: { label: 'Tier II — redundant capacity components',
+      nodes: [
+        { id: 'plant', name: 'Chiller plant', sym: 'chiller', units: 3, need: 2 },
+        { id: 'pmp', name: 'Pumps', sym: 'pump', units: 3, need: 2 },
+        { id: 'loop', name: 'Piping loop', sym: 'valve', sub: 'single path' },
+        { id: 'crah', name: 'CRAH units', sym: 'crah', units: 5, need: 4 },
+        { id: 'rack', name: 'IT heat load', sym: 'rack', sub: 'single path', load: true }],
+      paths: [{ id: 'A', active: true, stages: ['plant', 'pmp', 'loop', 'crah'] }] },
+    3: { label: 'Tier III — concurrently maintainable',
+      nodes: [
+        { id: 'plant', name: 'Chiller plant', sym: 'chiller', units: 3, need: 2 },
+        { id: 'pmp', name: 'Pumps', sym: 'pump', units: 3, need: 2 },
+        { id: 'loopA', name: 'Loop A', sym: 'valve', sub: 'active' },
+        { id: 'loopB', name: 'Loop B', sym: 'valve', sub: 'alternate, valved' },
+        { id: 'crah', name: 'CRAH units', sym: 'crah', units: 5, need: 4 },
+        { id: 'rack', name: 'IT heat load', sym: 'rack', sub: 'either loop', load: true }],
+      paths: [{ id: 'A', active: true, stages: ['plant', 'pmp', 'loopA', 'crah'] },
+              { id: 'B', active: false, stages: ['plant', 'pmp', 'loopB', 'crah'] }] },
+    4: { label: 'Tier IV — fault tolerant',
+      nodes: [
+        { id: 'plantA', name: 'Plant A', sym: 'chiller', units: 2, need: 2 },
+        { id: 'plantB', name: 'Plant B', sym: 'chiller', units: 2, need: 2 },
+        { id: 'pmpA', name: 'Pumps A', sym: 'pump', units: 2, need: 2 },
+        { id: 'pmpB', name: 'Pumps B', sym: 'pump', units: 2, need: 2 },
+        { id: 'loopA', name: 'Loop A', sym: 'valve', sub: 'active' },
+        { id: 'loopB', name: 'Loop B', sym: 'valve', sub: 'active' },
+        { id: 'crahA', name: 'CRAH A', sym: 'crah', units: 4, need: 4 },
+        { id: 'crahB', name: 'CRAH B', sym: 'crah', units: 4, need: 4 },
+        { id: 'rack', name: 'IT heat load', sym: 'rack', sub: 'two systems', load: true }],
+      paths: [{ id: 'A', active: true, stages: ['plantA', 'pmpA', 'loopA', 'crahA'] },
+              { id: 'B', active: true, stages: ['plantB', 'pmpB', 'loopB', 'crahB'] }] }
+  };
+  var SYS = { power: TOPO, cooling: COOL };
+  var sysName = 'power';
+  function T_(t) { return SYS[sysName][t]; }
+
   /* ---- the model (pure: topology + outage map in, verdict out) ----------- */
-  function nodeOf(t, id) { return TOPO[t].nodes.filter(function (n) { return n.id === id; })[0]; }
+  function nodeOf(t, id) { return T_(t).nodes.filter(function (n) { return n.id === id; })[0]; }
   /** out: { 'ups#2': 'maint', 'swbA': 'fail' } — unit keys are id#k (1-based). */
   function available(t, id, out) {
     var n = nodeOf(t, id);
@@ -85,12 +134,12 @@
   }
   /** Is the IT load powered? `planned` lets an alternate path be switched in first. */
   function powered(t, out, planned) {
-    return TOPO[t].paths.some(function (p) { return (p.active || planned) && pathOk(t, p, out); });
+    return T_(t).paths.some(function (p) { return (p.active || planned) && pathOk(t, p, out); });
   }
   /** Every removable element: single components, and each unit of a group. */
   function elements(t) {
     var list = [];
-    TOPO[t].nodes.forEach(function (n) {
+    T_(t).nodes.forEach(function (n) {
       if (n.load) return;
       if (n.units) for (var k = 1; k <= n.units; k++) list.push({ key: n.id + '#' + k, node: n, label: n.name + ' unit ' + k });
       else list.push({ key: n.id, node: n, label: n.name });
@@ -125,10 +174,98 @@
   function outMap() { var o = {}; for (var k in st.out) o[k] = 1; return o; }
   function plannedOnly() { for (var k in st.out) if (st.out[k] === 'fail') return false; return true; }
 
+  /* Which nodes are carrying the load right now: every available node on each
+   * path that counts (active paths; or, with only planned outages, an alternate
+   * that has been switched in). Connectors between two live nodes animate. */
+  function liveSet() {
+    var t = st.tier, out = outMap(), T = T_(t), live = {};
+    var counting = T.paths.filter(function (p) { return p.active && pathOk(t, p, out); });
+    if (!counting.length && plannedOnly()) counting = T.paths.filter(function (p) { return pathOk(t, p, out); });
+    counting.forEach(function (p) {
+      p.stages.forEach(function (sg) {
+        (Array.isArray(sg) ? sg : [sg]).forEach(function (id) { if (available(t, id, out)) live[id] = 1; });
+      });
+    });
+    if (counting.length) T.nodes.forEach(function (n) { if (n.load) live[n.id] = 1; });
+    return live;
+  }
+  function withFlow(d) {
+    var live = liveSet(), edge0 = d.edge;
+    d.edge = function (a, b, o) {
+      o = o || {};
+      if (!o.state && live[o.fromId] && live[o.toId]) o.state = 'flow';
+      return edge0(a, b, o);
+    };
+    return d;
+  }
+
+  /* Generic layout for any topology: shared stages before the paths split, a
+   * row per path, shared stages after they rejoin, then the load. */
+  function buildChain(D, o, T) {
+    var d = withFlow(D.create({ slug: 'cool' + st.tier, title: T.label + ' — cooling path',
+      desc: 'Simplified cooling path for ' + T.label + ': chiller plant, pumps, piping loop and CRAH units to the IT heat load. Select a block to take it out.' }));
+    var P = T.paths, n0 = P[0].stages.length, pre = 0, suf = 0;
+    while (pre < n0 && P.every(function (p) { return p.stages[pre] === P[0].stages[pre]; })) pre++;
+    while (suf < n0 - pre && P.every(function (p) { return p.stages[n0 - 1 - suf] === P[0].stages[n0 - 1 - suf]; })) suf++;
+    var load = T.nodes.filter(function (n) { return n.load; })[0];
+    var box = {}, G = 40, RG = 32;
+    function N(id, x, y, extra) {
+      var n = nodeOf(st.tier, id);
+      box[id] = d.node(x, y, Object.assign({ id: id, name: n.name, sublabel: nodeSub(n), symbol: n.sym, interactive: true,
+        state: nodeState(n) || undefined, focal: !!n.load, fill: n.load ? 'paper-2' : 'paper', tier: n.load ? 1 : 2,
+        legend: n.load ? 'IT heat load' : 'Cooling component' }, extra || {}));
+      return box[id];
+    }
+    var V = o.narrow;                       /* narrow: everything flows downward */
+    function next(b) { return V ? { x: b.x, y: b.y + b.h + G } : { x: b.x + b.w + G, y: b.y }; }
+    function E(a, b, extra) {
+      var A = box[a], B = box[b];
+      d.edge(V ? { x: A.x + A.w / 2, y: A.y + A.h } : { x: A.x + A.w, y: A.y + A.h / 2 },
+             V ? { x: B.x + B.w / 2, y: B.y } : { x: B.x, y: B.y + B.h / 2 },
+             Object.assign({ fromId: a, toId: b, tier: 1, stroke: 'link', legend: 'Chilled water' }, extra || {}));
+    }
+    var lanes = P.length, laneSpan = V ? 168 : 132;
+    var mid = 16 + (lanes - 1) * laneSpan / 2;
+    var cur = V ? { x: mid, y: 16 } : { x: 16, y: mid };
+    var last = null;
+    for (var i = 0; i < pre; i++) { var id = P[0].stages[i]; N(id, cur.x, cur.y); if (last) E(last, id); last = id; cur = next(box[id]); }
+    var tails = [];
+    P.forEach(function (p, k) {
+      var c = V ? { x: 16 + k * laneSpan, y: cur.y } : { x: cur.x, y: 16 + k * laneSpan };
+      var prev = last;
+      for (var j = pre; j < n0 - suf; j++) {
+        var sid = p.stages[j];
+        N(sid, c.x, c.y);
+        if (prev) E(prev, sid, p.active ? {} : { tier: 2, stroke: 'muted', pattern: 'dashed', legend: 'Alternate path' });
+        prev = sid; c = next(box[sid]);
+      }
+      tails.push({ id: prev, active: p.active, end: c });
+    });
+    var far = tails.reduce(function (m, t) { return V ? Math.max(m, t.end.y) : Math.max(m, t.end.x); }, 0);
+    cur = V ? { x: mid, y: far } : { x: far, y: mid };
+    var join = suf ? P[0].stages[n0 - suf] : load.id;
+    /* the load spans every lane: in the narrow layout it starts at the first lane, decided BEFORE it is drawn */
+    N(join, join === load.id && V ? 16 : cur.x, cur.y, join === load.id ? (V ? { w: 2 * laneSpan - 40 + 16 } : { h: 132 * (lanes - 1) + 88 }) : {});
+    /* the paths rejoin on one edge of the join node: fan the attach points (rule 4) */
+    var ports = d.ports(box[join], tails.length, V ? 'top' : 'left', { id: join });
+    tails.forEach(function (t, k) {
+      var A = box[t.id];
+      var ex = t.active ? {} : { tier: 2, stroke: 'muted', pattern: 'dashed' };
+      d.edge(V ? { x: A.x + A.w / 2, y: A.y + A.h } : { x: A.x + A.w, y: A.y + A.h / 2 }, ports[k],
+             Object.assign({ fromId: t.id, toId: join, tier: 1, stroke: 'link' }, ex));
+    });
+    last = join;
+    for (var q = n0 - suf + 1; q < n0; q++) { var qid = P[0].stages[q]; N(qid, next(box[last]).x, next(box[last]).y); E(last, qid); last = qid; }
+    if (join !== load.id) { N(load.id, next(box[last]).x, next(box[last]).y); E(last, load.id); }
+    d.legend();
+    return d;
+  }
+
   function build(D, o) {
-    var T = TOPO[st.tier];
-    var d = D.create({ slug: 'tier' + st.tier, title: T.label + ' — power path',
-      desc: 'Simplified power path for ' + T.label + '. Select a block to take it out for maintenance or fail it; the IT load shows whether it stays powered.' });
+    var T = T_(st.tier);
+    if (sysName === 'cooling') return buildChain(D, o, T);
+    var d = withFlow(D.create({ slug: 'tier' + st.tier, title: T.label + ' — power path',
+      desc: 'Simplified power path for ' + T.label + '. Select a block to take it out for maintenance or fail it; the IT load shows whether it stays powered.' }));
     var box = {};
     var G = o.narrow ? 24 : 40;
     function N(id, x, y, extra) {
@@ -242,8 +379,8 @@
     var v = document.getElementById('tVerdict');
     v.setAttribute('data-state', live ? (n ? 'warn' : 'ok') : 'fail');
     v.innerHTML = live
-      ? '<b>' + (n ? 'Load carried' : 'Normal') + '</b><span>' + (n ? n + ' element(s) out; the IT load stays powered.' : 'All components in service. Select a block to take part of it out.') + '</span>'
-      : '<b>Load lost</b><span>' + (transferable ? 'The alternate path is healthy but not carrying load: the IT load drops until it is switched in.' : 'No path can carry the IT load.') + '</span>';
+      ? '<b>' + (n ? 'Load carried' : 'Normal') + '</b><span>' + (n ? n + ' element(s) out; the IT load stays ' + (sysName === 'cooling' ? 'cooled.' : 'powered.') : 'All components in service. Select a block to take part of it out.') + '</span>'
+      : '<b>Load lost</b><span>' + (transferable ? 'The alternate path is healthy but not carrying load: the IT load drops until it is switched in.' : (sysName === 'cooling' ? 'No path can remove the IT heat.' : 'No path can carry the IT load.')) + '</span>';
     var sw = sweep(st.tier);
     var cm = sw.every(function (r) { return r.maint; }), ft = sw.every(function (r) { return r.fault; });
     document.getElementById('tSummary').innerHTML = '<dl class="ltc-readouts">' +
@@ -263,7 +400,7 @@
     var n = nodeOf(st.tier, id);
     if (!n) return;
     if (n.load) {
-      L.inspect({ sym: n.sym, eyebrow: TOPO[st.tier].label, title: n.name, html:
+      L.inspect({ sym: n.sym, eyebrow: T_(st.tier).label, title: n.name, html:
         '<p>' + (powered(st.tier, outMap(), plannedOnly()) ? 'Powered.' : 'Not powered.') + ' ' + (n.sub === 'dual-corded'
           ? 'Dual-corded: either cord can carry the load, which is what lets a path be removed.'
           : 'Single-corded: the single path is the load’s only supply.') + '</p>' });
@@ -278,7 +415,7 @@
             return '<button type="button" data-k="' + kv[0] + '" data-s="' + s[0] + '" aria-pressed="' + (cur === s[0]) + '">' + s[1] + '</button>';
           }).join('') + '</div></div>';
       }).join('');
-    L.inspect({ sym: n.sym, eyebrow: TOPO[st.tier].label, title: n.name, html: html });
+    L.inspect({ sym: n.sym, eyebrow: T_(st.tier).label, title: n.name, html: html });
     document.querySelector('#ltcInsp .ltc-insp-b').onclick = function (e) {
       var b = e.target.closest('[data-k]');
       if (!b) return;
@@ -335,12 +472,19 @@
       b.addEventListener('click', function () { st.tier = +b.getAttribute('data-tier'); st.out = {}; render(); L.closeInspector(); });
     });
     document.getElementById('tReset').addEventListener('click', function () { st.out = {}; render(); });
+    document.querySelectorAll('[data-sys]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        sysName = b.getAttribute('data-sys'); st.out = {};
+        document.querySelectorAll('[data-sys]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        render(); L.closeInspector();
+      });
+    });
     fig = L.draw(document.getElementById('tFig'), build, inspectNode);
     render();
     availTable();
     document.getElementById('p-availability').addEventListener('input', availCalc);
     availCalc();
   }
-  window.LTCTier = { TOPO: TOPO, powered: powered, sweep: sweep, kOfN: kOfN };
+  window.LTCTier = { TOPO: TOPO, COOL: COOL, powered: powered, sweep: sweep, kOfN: kOfN, system: function (n) { sysName = n; } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

@@ -85,10 +85,10 @@
     var pts = bot.concat(top.reverse());
     return 'M' + pts.map(function (q) { return q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join(' L') + ' Z';
   }
-  function chart(db, dp, z, sel) {
+  function chart(db, dp, z, sel, cloud) {
     var p = pAlt(z);
     var s = [];
-    s.push('<svg viewBox="0 0 ' + CH.W + ' ' + CH.H + '" role="img" aria-labelledby="psy-t psy-d" style="width:100%;max-width:' + CH.W + 'px;min-width:360px">');
+    s.push('<svg data-psy="' + z + '" viewBox="0 0 ' + CH.W + ' ' + CH.H + '" role="img" aria-labelledby="psy-t psy-d" style="width:100%;max-width:' + CH.W + 'px;min-width:360px">');
     s.push('<title id="psy-t">Psychrometric chart with ASHRAE envelopes</title><desc id="psy-d">Dry-bulb temperature against humidity ratio at ' +
       Math.round(z) + ' m, showing the recommended envelope, the selected allowable class and the inlet condition.</desc>');
     s.push('<rect width="100%" height="100%" fill="var(--bg1)"/>');
@@ -119,9 +119,16 @@
     var c = CLASSES.filter(function (k) { return k.id === sel; })[0];
     s.push('<path d="' + regionPath(c, derated(c, z), p) + '" fill="var(--c)" fill-opacity="0.07" stroke="var(--c)" stroke-width="1" stroke-dasharray="5 3"/>');
     s.push('<path d="' + regionPath(REC, c.recHi ? Math.min(c.recHi, recHi(z)) : recHi(z), p) + '" fill="var(--g)" fill-opacity="0.10" stroke="var(--g)" stroke-width="1.4"/>');
+    /* a sensor log: every reading as a small dot, coloured by its own verdict */
+    (cloud || []).forEach(function (q) {
+      var qw = wOf(es(q.dp), p);
+      if (qw > 30 || q.db < 0 || q.db > 50) return;
+      s.push('<circle cx="' + sx(q.db).toFixed(1) + '" cy="' + sy(qw).toFixed(1) + '" r="2.6" fill="var(--' +
+        (q.state === 'rec' ? 'g' : q.state === 'allow' ? 'o' : 'r') + ')" fill-opacity="0.75"/>');
+    });
     /* the point */
     var pw = wOf(es(dp), p);
-    if (pw <= 30 && db >= 0 && db <= 50) {
+    if (db != null && pw <= 30 && db >= 0 && db <= 50) {
       s.push('<circle cx="' + sx(db) + '" cy="' + sy(pw) + '" r="5" fill="var(--o)" stroke="var(--bg1)" stroke-width="1.5"/>');
       s.push('<line x1="' + sx(db) + '" y1="' + (sy(pw) + 6) + '" x2="' + sx(db) + '" y2="' + sy(0) + '" stroke="var(--o)" stroke-width="0.6" stroke-dasharray="2 2"/>');
     }
@@ -132,7 +139,7 @@
       '<rect x="' + (CH.l + 120) + '" y="' + (CH.t + 6) + '" width="14" height="9" fill="var(--c)" fill-opacity="0.07" stroke="var(--c)" stroke-dasharray="5 3"/>' +
       '<text x="' + (CH.l + 140) + '" y="' + (CH.t + 14) + '">' + sel + ' allowable</text>' +
       '<circle cx="' + (CH.l + 236) + '" cy="' + (CH.t + 10.5) + '" r="4.5" fill="var(--o)"/>' +
-      '<text x="' + (CH.l + 246) + '" y="' + (CH.t + 14) + '">Inlet</text></g>');
+      '<text x="' + (CH.l + 246) + '" y="' + (CH.t + 14) + '">' + (cloud ? 'Readings (green rec. · amber allow. · red out)' : 'Inlet') + '</text></g>');
     s.push('</svg>');
     return s.join('');
   }
@@ -166,12 +173,30 @@
       ro('Humidity ratio', L.fmt(wOf(es(st.dp), p), 2), 'g/kg') + ro('Site pressure', L.fmt(p, 1), 'kPa') +
       ro(st.sel + ' max DB here', L.fmt(sel.hi, 1), '°C') + ro('Rec. max DB here', L.fmt(sel.c.recHi ? Math.min(sel.c.recHi, recHi(st.z)) : recHi(st.z), 1), '°C') +
       '</dl>' +
-      '<div class="ltc-canvas">' + chart(st.db, st.dp, st.z, st.sel) + '</div>' +
+      '<div class="ltc-canvas">' + chart(st.db, st.dp, st.z, st.sel) + '</div><p class="ltc-src" id="aHover">Move over the chart for a reading.</p>' +
       '<div class="ltc-table-wrap"><table class="ltc-table"><thead><tr><th>Class</th><th class="n">Max DB at site</th><th>Recommended</th><th>Allowable</th><th>Binding limit</th><th class="n">Margin</th></tr></thead><tbody>' +
       r.rows.map(function (x) {
         return '<tr' + (x.c.id === st.sel ? ' data-hit' : '') + ' data-cls="' + x.c.id + '" style="cursor:pointer"><td class="mono">' + x.c.id + '</td><td class="n">' + L.fmt(x.hi, 1) + ' °C</td>' +
           '<td>' + yn(x.rec) + '</td><td>' + yn(x.allow) + '</td><td>' + x.bind[0] + '</td><td class="n">' + L.fmt(x.bind[1], 1) + ' ' + x.bind[2] + '</td></tr>';
       }).join('') + '</tbody></table></div>';
+  }
+  /** Pointer readout over any psychrometric chart: invert the scales and the psychrometrics. */
+  function hover(host, out) {
+    host.addEventListener('pointermove', function (e) {
+      var svg = e.target.closest ? e.target.closest('svg[data-psy]') : null;
+      if (!svg) return;
+      var r = svg.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width * CH.W, y = (e.clientY - r.top) / r.height * CH.H;
+      var t = CH.x0 + (x - CH.l) / (CH.W - CH.l - CH.r) * (CH.x1 - CH.x0);
+      var w = CH.y0 + (CH.H - CH.b - y) / (CH.H - CH.t - CH.b) * (CH.y1 - CH.y0);
+      var o = document.getElementById(out);
+      if (!o) return;
+      if (t < 0 || t > 50 || w <= 0 || w > 30) { o.textContent = 'Move over the chart for a reading.'; return; }
+      var p = pAlt(+svg.getAttribute('data-psy'));
+      var pv = w * p / (622 + w), dp = dpFromPv(pv), rh = 100 * pv / es(t);
+      o.textContent = rh > 100 ? 'Above saturation — fog region.' :
+        'Cursor: ' + L.fmt(t, 1) + ' °C DB · ' + L.fmt(dp, 1) + ' °C DP · ' + L.fmt(rh, 0) + ' % RH · ' + L.fmt(w, 2) + ' g/kg';
+    });
   }
   function ro(k, v, u, s) { return '<div class="ltc-ro"' + (s ? ' data-state="' + s + '"' : '') + '><dt>' + k + '</dt><dd>' + v + (u ? '<small>' + u + '</small>' : '') + '</dd></div>'; }
   function yn(b) { return b ? '<span style="color:var(--g)">yes</span>' : '<span style="color:var(--t3)">no</span>'; }
@@ -243,6 +268,103 @@
       ro('ΔRH in 1 h', L.fmt(rh, 1), '%', okRh ? 'ok' : 'fail') + '</dl>';
   }
 
+  /* ---- condensation: liquid loop vs room dew point ----------------------- */
+  /* Any wetted surface below the room dew point condenses. For liquid cooling the
+   * coldest surface is the coolant supply — at the CDU, the manifolds and the cold
+   * plates — so the supply must stay above the dew point of the air around it, with
+   * a control margin for sensor error and transients. */
+  function runCond() {
+    var db = val('cDb'), rh = val('cRh'), sup = val('cSup'), m = val('cMargin');
+    var out = document.getElementById('cOut');
+    if (![db, rh, sup, m].every(isFinite) || rh <= 0 || rh > 100 || m < 0) { out.innerHTML = '<div class="ltc-verdict" data-state="fail"><b>Input</b><span>Every field needs a number; RH between 0 and 100 %, margin 0 or more.</span></div>'; return; }
+    var dp = dpFromPv(es(db) * rh / 100);
+    var margin = sup - dp, minSup = dp + m;
+    var state = margin >= m ? 'ok' : margin > 0 ? 'warn' : 'fail';
+    /* a temperature axis gauge: dew point, required minimum, actual supply */
+    var lo = Math.floor(Math.min(dp, sup) - 4), hi = Math.ceil(Math.max(db, sup, minSup) + 2);
+    var W = 600, H = 92, X = function (t) { return 24 + (t - lo) / (hi - lo) * (W - 48); };
+    var g = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-labelledby="cg-t cg-d" style="width:100%;max-width:' + W + 'px;min-width:340px">',
+      '<title id="cg-t">Coolant supply against room dew point</title><desc id="cg-d">Temperature axis showing the room dew point, the minimum allowed supply with margin, and the actual coolant supply.</desc>',
+      '<rect width="100%" height="100%" fill="var(--bg1)"/>',
+      '<rect x="' + X(lo) + '" y="34" width="' + (X(dp) - X(lo)) + '" height="10" fill="var(--r)" fill-opacity="0.18"/>',
+      '<rect x="' + X(dp) + '" y="34" width="' + (X(minSup) - X(dp)) + '" height="10" fill="var(--o)" fill-opacity="0.22"/>',
+      '<rect x="' + X(minSup) + '" y="34" width="' + (X(hi) - X(minSup)) + '" height="10" fill="var(--g)" fill-opacity="0.16"/>',
+      '<line x1="' + X(lo) + '" y1="44" x2="' + X(hi) + '" y2="44" stroke="var(--bd2)"/>'];
+    for (var t = lo; t <= hi; t += 2) {
+      g.push('<line x1="' + X(t) + '" y1="44" x2="' + X(t) + '" y2="49" stroke="var(--t3)"/><text x="' + X(t) + '" y="62" fill="var(--t3)" font-size="11" text-anchor="middle" font-family="JetBrains Mono, monospace">' + t + '</text>');
+    }
+    g.push('<path d="M' + X(sup) + ' 30 l-6 -10 h12 z" fill="var(--c)"/><text x="' + X(sup) + '" y="14" fill="var(--c)" font-size="11" text-anchor="middle" font-family="JetBrains Mono, monospace">supply ' + L.fmt(sup, 1) + '</text>');
+    g.push('<line x1="' + X(dp) + '" y1="30" x2="' + X(dp) + '" y2="48" stroke="var(--r)" stroke-width="1.4"/><text x="' + X(dp) + '" y="80" fill="var(--r)" font-size="11" text-anchor="middle" font-family="JetBrains Mono, monospace">DP ' + L.fmt(dp, 1) + '</text>');
+    g.push('</svg>');
+    out.innerHTML = '<div class="ltc-verdict" data-state="' + state + '"><b>' + (state === 'ok' ? 'No condensation' : state === 'warn' ? 'Inside margin' : 'Condensing') + '</b><span>' +
+      (state === 'fail' ? 'Supply is ' + L.fmt(-margin, 1) + ' K below the room dew point: every wetted surface at supply temperature will sweat.'
+                        : 'Supply sits ' + L.fmt(margin, 1) + ' K above the room dew point' + (state === 'warn' ? ', less than the ' + L.fmt(m, 1) + ' K control margin.' : '.')) +
+      '</span></div><dl class="ltc-readouts">' + ro('Room dew point', L.fmt(dp, 1), '°C') + ro('Supply margin', L.fmt(margin, 1), 'K', state) +
+      ro('Minimum supply', L.fmt(minSup, 1), '°C') + ro('Max room RH at this supply', L.fmt(Math.min(100, 100 * es(sup - m) / es(db)), 0), '%') + '</dl>' +
+      '<div class="ltc-canvas">' + g.join('') + '</div>' +
+      '<div class="ltc-table-wrap"><table class="ltc-table"><thead><tr><th class="n">Room RH at ' + L.fmt(db, 1) + ' °C</th><th class="n">Dew point</th><th class="n">Min. supply (+' + L.fmt(m, 1) + ' K)</th><th>This supply</th></tr></thead><tbody>' +
+      [30, 40, 50, 60, 70, 80].map(function (r) {
+        var d = dpFromPv(es(db) * r / 100), ok = sup >= d + m;
+        return '<tr' + (Math.abs(r - rh) <= 5 && (r - rh) < 5 && Math.abs(r - rh) === Math.min.apply(null, [30, 40, 50, 60, 70, 80].map(function (k) { return Math.abs(k - rh); })) ? ' data-hit' : '') + '><td class="n">' + r + ' %</td><td class="n">' + L.fmt(d, 1) + ' °C</td><td class="n">' + L.fmt(d + m, 1) + ' °C</td><td>' +
+          (ok ? '<span style="color:var(--g)">dry</span>' : '<b style="color:var(--r)">below margin</b>') + '</td></tr>';
+      }).join('') + '</tbody></table></div>' +
+      '<p class="ltc-note">Use the dew point of the air around the coldest wetted part (CDU room, row manifolds), not the cold-aisle average. A room that cannot hold its dew point needs a raised supply set point or dew-point-tracking control on the CDU.</p>';
+  }
+
+  /* ---- sensor log -------------------------------------------------------- */
+  function sampleLog() {
+    /* Synthetic, clearly labelled: a 24 h day at 30-minute steps with an afternoon
+     * excursion and one fast step — not any facility's data. */
+    var rows = ['# minute, dry-bulb °C, RH %   (synthetic example — paste your own)'];
+    for (var i = 0; i <= 48; i++) {
+      var t = i * 30, h = t / 60;
+      var db = 23 + 4.5 * Math.max(0, Math.sin((h - 9) / 10 * Math.PI)) + (i === 30 ? 3 : 0);
+      var rh = 48 - 10 * Math.max(0, Math.sin((h - 9) / 10 * Math.PI)) + (h > 20 ? 12 : 0);
+      rows.push(t + ', ' + db.toFixed(1) + ', ' + rh.toFixed(0));
+    }
+    return rows.join('\n');
+  }
+  function runLog() {
+    var z = val('gAlt'); z = isFinite(z) ? Math.max(0, z) : 0;
+    var sel = document.getElementById('gCls').value;
+    var tape = document.getElementById('gTape').getAttribute('aria-pressed') === 'true';
+    var rows = document.getElementById('gData').value.split(/\n/).map(function (l) { return l.trim(); })
+      .filter(function (l) { return l && l.charAt(0) !== '#'; })
+      .map(function (l) { var q = l.split(/[,;\t ]+/).map(Number); return { t: q[0], db: q[1], rh: q[2] }; })
+      .filter(function (q) { return [q.t, q.db, q.rh].every(isFinite) && q.rh > 0 && q.rh <= 100; })
+      .sort(function (a, b) { return a.t - b.t; });
+    var out = document.getElementById('gOut');
+    if (rows.length < 2) { out.innerHTML = '<div class="ltc-verdict" data-state="fail"><b>Data</b><span>Paste at least two rows: minute, dry-bulb °C, RH %.</span></div>'; return; }
+    var cnt = { rec: 0, allow: 0, out: 0 }, dur = { rec: 0, allow: 0, out: 0 }, worst = null;
+    rows.forEach(function (q, i) {
+      q.dp = dpFromPv(es(q.db) * q.rh / 100);
+      var r = check(q.db, q.dp, z), c = r.rows.filter(function (x) { return x.c.id === sel; })[0];
+      q.state = c.rec ? 'rec' : c.allow ? 'allow' : 'out';
+      q.bind = c.bind;
+      var dt = i < rows.length - 1 ? rows[i + 1].t - q.t : (rows.length > 1 ? q.t - rows[i - 1].t : 0);
+      cnt[q.state]++; dur[q.state] += dt;
+      if (!worst || c.bind[1] < worst.bind[1]) worst = q;
+    });
+    /* rate of change: the largest swing inside any 60-minute and any 15-minute window */
+    function maxSwing(win, key) {
+      var m = 0;
+      for (var i = 0; i < rows.length; i++) for (var j = i + 1; j < rows.length && rows[j].t - rows[i].t <= win; j++)
+        m = Math.max(m, Math.abs(rows[j][key] - rows[i][key]));
+      return m;
+    }
+    var h1 = maxSwing(60, 'db'), q15 = maxSwing(15, 'db'), rh1 = maxSwing(60, 'rh');
+    var limH = tape ? 5 : 20, okH = h1 <= limH, okQ = tape || q15 <= 5, okRh = rh1 <= 5;
+    var total = dur.rec + dur.allow + dur.out || 1;
+    function pct(k) { return L.fmt(100 * dur[k] / total, 1); }
+    out.innerHTML = '<div class="ltc-verdict" data-state="' + (dur.out ? 'fail' : dur.allow ? 'warn' : 'ok') + '"><b>' + (dur.out ? 'Excursion' : dur.allow ? 'Allowable time' : 'All recommended') + '</b><span>' +
+      pct('rec') + ' % of logged time recommended, ' + pct('allow') + ' % in ' + sel + ' allowable, ' + pct('out') + ' % outside. Worst reading at minute ' + worst.t + ': ' + worst.bind[0] + ' margin ' + L.fmt(worst.bind[1], 1) + ' ' + worst.bind[2] + '.</span></div>' +
+      '<dl class="ltc-readouts">' + ro('Readings', String(rows.length), '') + ro('Recommended', pct('rec'), '%', 'ok') + ro(sel + ' allowable', pct('allow'), '%', dur.allow ? 'warn' : null) +
+      ro('Outside', pct('out'), '%', dur.out ? 'fail' : null) + ro('Max ΔT in 1 h', L.fmt(h1, 1), '°C', okH ? 'ok' : 'fail') +
+      (tape ? '' : ro('Max ΔT in 15 min', L.fmt(q15, 1), '°C', okQ ? 'ok' : 'fail')) + ro('Max ΔRH in 1 h', L.fmt(rh1, 1), '%', okRh ? 'ok' : 'fail') + '</dl>' +
+      '<div class="ltc-canvas">' + chart(null, 0, z, sel, rows) + '</div><p class="ltc-src" id="gHover">Move over the chart for a reading.</p>' +
+      '<p class="ltc-note">Time in each region is weighted by the interval to the next reading. Rate of change uses the largest swing between any two readings inside the window, so a coarse log can miss a fast step — log at 5 minutes or faster to prove the 15-minute limit.</p>';
+  }
+
   /* ---- wiring ----------------------------------------------------------- */
   function bind(ids, fn) { ids.forEach(function (id) { var e = document.getElementById(id); if (e) e.addEventListener('input', fn); }); }
   function boot() {
@@ -278,6 +400,15 @@
     });
     runLiquid();
     runRate();
+    bind(['cDb', 'cRh', 'cSup', 'cMargin'], runCond); runCond();
+    document.getElementById('gData').value = sampleLog();
+    bind(['gData', 'gAlt'], runLog);
+    document.getElementById('gCls').addEventListener('change', runLog);
+    var gt = document.getElementById('gTape');
+    gt.addEventListener('click', function () { gt.setAttribute('aria-pressed', gt.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); runLog(); });
+    runLog();
+    hover(document.getElementById('aOut'), 'aHover');
+    hover(document.getElementById('gOut'), 'gHover');
     if (window.matchMedia('(min-width: 1280px)').matches) inspectClass(st.sel);
   }
   /* exposed for the gate: the arithmetic, not the DOM */
