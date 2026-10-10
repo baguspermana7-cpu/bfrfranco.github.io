@@ -15,6 +15,7 @@
  *   W3  NFPA 2001 flooding equations against the published per-m³ figures
  *   W4  TIA fiber budget, copper channel, TIA-607 conductor sizing
  *   W5  ISO/IEC 30134 KPIs and the ISO 50006 regression recovering a known model
+ *   W11 manuals: the lab manual's worked example equals the engine output; the hub manual covers the plant
  *   W10 model lab on the plant engine: load order, computeModel delegation, adapter parity, screening passthrough
  *   W9  Tier groups (IT AND mechanical power; liquid AND air sinks), ≤ 9 blocks per Tier layout, DH01 on the hub
  *   W8  every page loads the plant + strip; ISO defaults to the plant; derived inputs are bound
@@ -260,6 +261,23 @@ for (const [page, mod] of Object.entries(PAGES)) {
   sb.LTCLabPlant.sync(Object.assign({}, lab, { climate: 'dry' }));
   const moved = JSON.parse(store[sb.LTCPlant.KEY]);
   ok('W10j', moved.climate === 'arid' && !moved.climateBins, 'a climate the reader picks in the lab replaces the custom bins');
+}
+
+{
+  /* W11 (v3.17.2) — the manuals describe the engine the tools run. The lab manual explained the
+   * retired computeModel with a 12 MW example for a release after the lab had moved to the plant
+   * engine; its worked example is now checked against the engine's own output. */
+  const man = readFileSync(join(root, 'manual/ltc-system-modelling-lab.html'), 'utf8');
+  const sb2 = { console, Math, JSON }; sb2.window = sb2; sb2.globalThis = sb2; vm.createContext(sb2);
+  vm.runInContext(readFileSync(join(root, 'js/ltc-plant.js'), 'utf8'), sb2);
+  const r = sb2.LTCPlant.compute({}), f = (x) => Math.round(x).toLocaleString('en-US');
+  const want = [['design PUE', r.totals.pue.toFixed(3)], ['annual PUE', r.totals.pueAnnual.toFixed(3)], ['TCS pumps', f(r.liquid.tcsPumpKw) + ' kW'],
+                ['coolers', r.liquid.coolerUnitsTotal + ' coolers'], ['CRAHs per hall', r.air.crahPerHall + ' CRAHs'], ['facility', f(r.totals.facilityKw) + ' kW'],
+                ['M0', f(r.annual.m0MWh)], ['WUE', r.annual.wue.toFixed(2) + ' L/kWh'], ['chiller COP', 'COP ' + r.air.chillerCop.toFixed(2)]];
+  for (const [what, v] of want) ok('W11a:' + what, man.includes(v), `lab manual worked example states the engine's ${what} (${v})`);
+  ok('W11b', /js\/ltc-plant\.js/.test(man) && /Legacy screening model/.test(man), 'lab manual names the plant engine and labels the legacy model');
+  const hubMan = readFileSync(join(root, 'manual/standards-ltc-lab.html'), 'utf8');
+  ok('W11c', /One plant behind every tool/.test(hubMan) && /heat load test/i.test(hubMan) && /DH01 thermal map/.test(hubMan), 'hub manual covers the plant, the HLT and the DH01 map');
 }
 
 const total = pass + fails.length;

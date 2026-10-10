@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v3.17.2 — 2026-10-11
+
+### The LTC manuals describe the engine the tools run
+
+The model-lab manual still explained the retired `computeModel` (heuristic multipliers, a 12 MW example)
+a release after the lab moved to the shared plant engine; the workbench manual did not mention the plant,
+the plant strip, the heat load test or the DH01 map.
+
+**Changed — `manual/ltc-system-modelling-lab.html`.** Purpose, inputs (Design · Site · Advanced), methodology
+(liquid path, the air path liquid does not capture, the electrical chain with ISO/IEC 30134-2 metering points,
+annual figures over climate bins), constants, outputs and a 100 MW worked example whose every number is the
+engine's. The old methodology is kept as Appendix A, *Legacy screening model (comparison only)*.
+
+**Changed — `manual/standards-ltc-lab.html`.** New sections: *One plant behind every tool* and *Commissioning
+lifecycle and the DH01 thermal map* (HLT steps and acceptance; the map's model and its limits). Tier now
+describes the plant-generated topology, the IT-and-mechanical / liquid-and-air groups and whole-loop sweeps;
+ISO and NFPA note their derived inputs.
+
+**Gate** `test-ltc-workbench.mjs` W11 (+11): the lab manual's worked example must state the engine's own
+numbers (PUE design/annual, pumps, coolers, CRAHs, facility, M0, WUE, chiller COP), so the manual cannot
+drift from the engine unseen again.
+
 ## v3.17.1 — 2026-10-11
 
 ### LTC Workbench v2 after two independent reviews
