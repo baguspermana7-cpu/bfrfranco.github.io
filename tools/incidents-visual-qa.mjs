@@ -56,13 +56,18 @@ const CHECKS = () => {
     const s = (t.textContent || '').trim();
     // cascade downstream boxes legitimately wrap + ellipsis and carry a full-text <title>;
     // the corruption class we hunt is clipped radar/scatter/axis labels, not those.
-    const inCascade = t.closest && t.closest('.viz-cascade');
+    // SOE timeline time labels are cut to 11 characters on purpose: the full time is in
+    // the dot's <title> and in the SOE list printed directly below the strip.
+    const inCascade = t.closest && t.closest('.viz-cascade, .viz-timeline');
     if ((s.endsWith('…') || s.endsWith('...')) && !inCascade) out.truncatedLabels.push(s);
     // a lone 1-2 char label that is not a pure axis number is suspicious
     // Exempt BY NAME, with the reason: "X" is the operator's actual name (X Corp, the
     // x-twitter-oregon-fire-2025 dossier), not a label cut down to one character.
     const REAL_SHORT_NAMES = new Set(['X']);
-    if (s.length && s.length <= 2 && !/^\d+$/.test(s) && !REAL_SHORT_NAMES.has(s)) out.tinyLabels.push(s);
+    // A timeline time label wraps at word boundaries (_two_lines), so a short second
+    // line ("ET" after "~07:10–07:30") is a whole word of the source, never a cut.
+    const wrappedWord = t.closest && t.closest('.viz-timeline');
+    if (s.length && s.length <= 2 && !/^\d+$/.test(s) && !REAL_SHORT_NAMES.has(s) && !wrappedWord) out.tinyLabels.push(s);
   });
   out.hOverflow = document.documentElement.scrollWidth > document.documentElement.clientWidth + 1;
   // FMEA criticality matrix: a label may not overlap another label or another
@@ -84,6 +89,18 @@ const CHECKS = () => {
       dots.forEach((d, j) => { if (j !== i && hit(boxes[i].r, d.r)) out.fmeaCollisions.push(`${boxes[i].k} × ${d.k}`); });
     }
   }
+  // SOE timeline: no two labels in the strip may overprint. One 16-character time
+  // label ran ~96px into a 92px step and printed "…00:47 PD2011-04-21" on every page.
+  out.timelineCollisions = [];
+  const tl = document.querySelector('.viz-timeline svg');
+  if (tl) {
+    const ts = [...tl.querySelectorAll('text')].map((e) => ({ k: e.textContent, r: e.getBoundingClientRect() }));
+    const hit = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+    for (let i = 0; i < ts.length; i++) for (let j = i + 1; j < ts.length; j++) if (hit(ts[i].r, ts[j].r)) out.timelineCollisions.push(`"${ts[i].k}" × "${ts[j].k}"`);
+    // ...and none may run past the SVG's own edge, where it is cut ("ept-Oct 2016").
+    const box = tl.getBoundingClientRect();
+    ts.forEach((t) => { if (t.r.left < box.left - 1 || t.r.right > box.right + 1) out.timelineCollisions.push(`"${t.k}" cut at the SVG edge`); });
+  }
   return out;
 };
 
@@ -97,7 +114,7 @@ async function run(file, prefix, regions, vp) {
   await new Promise((r) => setTimeout(r, 700));
   const shots = await shotRegions(page, prefix, regions);
   const c = await page.evaluate(CHECKS);
-  const bad = c.truncatedLabels.length || c.tinyLabels.length || c.hOverflow || c.fmeaCollisions.length;
+  const bad = c.truncatedLabels.length || c.tinyLabels.length || c.hOverflow || c.fmeaCollisions.length || c.timelineCollisions.length;
   if (bad) problems++;
   console.log(`\n[${prefix}] ${file}`);
   console.log('  shots: ' + shots.join(' · '));
@@ -105,6 +122,7 @@ async function run(file, prefix, regions, vp) {
   console.log('  suspicious 1-2char labels: ' + (c.tinyLabels.join(', ') || 'none'));
   console.log('  horizontal overflow: ' + (c.hOverflow ? 'YES ⚠' : 'no'));
   console.log('  FMEA matrix label collisions: ' + (c.fmeaCollisions.join(', ') || 'none'));
+  console.log('  SOE timeline label collisions: ' + (c.timelineCollisions.slice(0, 3).join(', ') || 'none'));
   await page.close();
 }
 

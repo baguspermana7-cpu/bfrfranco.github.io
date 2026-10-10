@@ -21,8 +21,10 @@ import { fileURLToPath } from 'url';
 import puppeteer from 'puppeteer';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const STRICT = process.argv.includes('--strict');
+// Any finding exits 1. `--strict` is accepted for symmetry with the other gates; a
+// gate that prints FAIL and exits 0 is green in every script that forgets the flag.
 const pages = fs.readdirSync(ROOT).filter((f) => /^incident-.*\.html$/.test(f)).sort();
+if (!pages.length) { console.log('FAIL — no incident-*.html pages found'); process.exit(1); }
 const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
 const bad = [];
 
@@ -48,14 +50,34 @@ for (const f of pages) {
       seg(1).click();
       if (meta && total() !== Number(meta[2])) out.push(`published-actions total ${total()} ≠ metabar ${meta[2]}`);
       seg(2).click(); seg(3).click(); seg(0).click();
+      // Priority: the JS colour of every bar must equal the builder's priority for that mode.
+      const PRIO = { high: 'var(--red)', medium: 'var(--amber)', low: 'var(--green)' };
+      for (const row of sim.querySelectorAll('.fm-pb-row')) {
+        const got = row.querySelector('.fm-pb-bar').style.background;
+        if (got !== PRIO[row.dataset.prio]) out.push(`${row.dataset.id}: JS priority colour ${got} ≠ builder ${row.dataset.prio}`);
+      }
+      // Matrix: one marker per occupied (S,O) cell as found.
+      const data = JSON.parse(document.getElementById('fmea-sim-data').textContent);
+      const cells = new Set(data.modes.map((m) => m.S + ':' + m.O)).size;
+      const dots = sim.querySelectorAll('.fm-matrix .fm-pt').length;
+      if (dots !== cells) out.push(`matrix shows ${dots} marker(s) for ${cells} occupied cell(s)`);
+      // Replay: "in play" at the first and the last event must match the data.
       const rg = sim.querySelector('.fm-rp-range');
-      if (rg) for (let k = 0; k <= Number(rg.max); k++) { rg.value = k; rg.dispatchEvent(new Event('input')); }
+      const inPlay = () => Number((sim.querySelector('.fm-rp-count').textContent.match(/In play:\s*(\d+)/) || [])[1]);
+      if (rg) {
+        const at0 = data.modes.filter((m) => m.soe.length && m.soe[0] <= 0).length;
+        for (let k = 0; k <= Number(rg.max); k++) { rg.value = k; rg.dispatchEvent(new Event('input')); if (k === 0 && inPlay() !== at0) out.push(`replay step 1 lights ${inPlay()} mode(s), data says ${at0}`); }
+        if (inPlay() !== data.modes.length) out.push(`replay end lights ${inPlay()} of ${data.modes.length} modes`);
+      }
+      // What-if: move D to a value it does not already have, and the RPN must change.
       for (const row of sim.querySelectorAll('.fm-pb-row')) {
         row.click();
         const i = document.getElementById('fmwi-D');
         if (!i) { out.push(`${row.dataset.id}: what-if did not open`); continue; }
-        i.value = 1; i.dispatchEvent(new Event('input'));
+        const before = sim.querySelector('.fm-wi-out b').textContent;
+        i.value = Number(i.value) === 1 ? 2 : 1; i.dispatchEvent(new Event('input'));
         if (document.getElementById('fmwi-D') !== i) out.push(`${row.dataset.id}: slider rebuilt during drag`);
+        if (sim.querySelector('.fm-wi-out b').textContent === before) out.push(`${row.dataset.id}: what-if drag did not change the RPN`);
       }
       const vw = document.documentElement.clientWidth;
       const over = [...sim.querySelectorAll('*')].filter((e) => e.getBoundingClientRect().right > vw + 1);
@@ -107,7 +129,7 @@ await browser.close();
 if (bad.length) {
   console.log(bad.join('\n'));
   console.log(`FAIL — ${bad.length} finding(s) across ${pages.length} page(s)`);
-  if (STRICT) process.exit(1);
+  process.exit(1);
 } else {
   console.log(`PASS — FMEA simulator live and consistent on ${pages.length} page(s) at 390 and 1440px; hub view agrees (${pageModes} modes).`);
 }

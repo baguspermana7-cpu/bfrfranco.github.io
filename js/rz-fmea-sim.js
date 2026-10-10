@@ -74,7 +74,7 @@
   ];
   var scnBox = sim.querySelector('.fm-scn');
   var seg = el('div', 'fm-seg');
-  seg.setAttribute('role', 'radiogroup');
+  seg.setAttribute('role', 'group');
   seg.setAttribute('aria-label', 'Scoring scenario');
   var scnNote = el('p', 'fm-scn-note');
   var readout = el('p', 'metabar fm-readout');
@@ -82,7 +82,6 @@
   SCN.forEach(function (s) {
     var b = el('button', null, s[1]);
     b.type = 'button';
-    b.setAttribute('role', 'radio');
     b.dataset.scn = s[0];
     b.addEventListener('click', function () { state.scn = s[0]; state.over = {}; render(); });
     seg.appendChild(b);
@@ -93,7 +92,7 @@
   scnBox.hidden = false;
 
   function renderScenario() {
-    [].forEach.call(seg.children, function (b) { b.setAttribute('aria-checked', String(b.dataset.scn === state.scn)); });
+    [].forEach.call(seg.children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.scn === state.scn)); });
     var meta = SCN.filter(function (s) { return s[0] === state.scn; })[0];
     var edited = Object.keys(state.over).length;
     scnNote.textContent = meta[2] + (edited ? ' Plus your edit to ' + Object.keys(state.over).join(', ') + '.' : '');
@@ -121,6 +120,9 @@
   var scale = Number(pb && pb.dataset.scale) || 1000;
   var cap = sim.querySelector('.fm-pb-cap');
   var rows = pb ? [].slice.call(pb.querySelectorAll('.fm-pb-row')) : [];
+  var ticksEl = pb ? [].slice.call(pb.querySelectorAll('.fm-pb-ticks span')) : [];
+  // Rows become buttons, so the container stops claiming to be a list of items.
+  if (pb) pb.setAttribute('role', 'group');
   rows.forEach(function (r) {
     var m = byId[r.dataset.id];
     if (!m) return;
@@ -134,20 +136,25 @@
     ghost.classList.add('fm-pb-ref');
     track.appendChild(ghost);
     r.addEventListener('click', function () { select(m.id); });
-    r.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(m.id); } });
+    r.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(m.id, false, true); } });
   });
 
   function renderBars() {
     var changed = state.scn !== 'found' || Object.keys(state.over).length;
-    if (cap) cap.textContent = changed ? 'RPN under this scenario. Thin bar: as found.' : 'RPN = S × O × D, worst first. Select a row to test it.';
+    if (cap) cap.textContent = changed ? 'RPN under this scenario, in as-found order. Thin bar: as found.' : 'RPN = S × O × D, worst first. Select a row to test it.';
+    // A what-if can push an RPN past the as-found axis; widen the axis rather than clip.
+    var top = 0;
+    rows.forEach(function (r) { var m = byId[r.dataset.id]; if (m) top = Math.max(top, rpn(score(m))); });
+    var sc = Math.max(scale, Math.ceil(top / 100) * 100);
+    if (ticksEl.length === 3) { ticksEl[1].textContent = String(sc / 2); ticksEl[2].textContent = String(sc); }
     rows.forEach(function (r) {
       var m = byId[r.dataset.id];
       if (!m) return;
       var s = score(m), r1 = rpn(s), r0 = rpn(base(m));
       var bar = r.querySelector('.fm-pb-bar'), ghost = r.querySelector('.fm-pb-ref');
-      bar.style.transform = 'scaleX(' + Math.min(1, r1 / scale) + ')';
+      bar.style.transform = 'scaleX(' + r1 / sc + ')';
       bar.style.background = PRIO_VAR[priority(s)];
-      ghost.style.transform = 'scaleX(' + Math.min(1, r0 / scale) + ')';
+      ghost.style.transform = 'scaleX(' + r0 / sc + ')';
       ghost.style.opacity = r1 === r0 ? '0' : '';
       r.querySelector('.fm-pb-val').textContent = r1 === r0 ? String(r0) : r0 + ' → ' + r1;
       r.classList.toggle('is-dim', !inPlay(m));
@@ -197,7 +204,7 @@
       tip.textContent = ms.map(function (m) { var s = score(m); return m.id + ' ' + m.fm + ' (S' + s.S + ' O' + s.O + ' D' + s.D + ')'; }).join('; ');
       dot.appendChild(tip);
       dot.addEventListener('click', function () { cycle(ms); });
-      dot.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cycle(ms); } });
+      dot.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cycle(ms, true); } });
       pts.appendChild(dot);
       var w = 6 * ids.length + 2;
       var slots = [
@@ -212,11 +219,15 @@
       t.textContent = ids;
       pts.appendChild(t);
     });
-    if (keep) { var back = pts.querySelector('[data-ids="' + keep + '"]'); if (back) back.focus(); }
+    if (keep) {
+      // A drag can move the selected mode to another cell, changing its data-ids.
+      var back = pts.querySelector('[data-ids="' + keep + '"]') || pts.querySelector('.fm-pt.is-sel');
+      if (back) back.focus();
+    }
   }
-  function cycle(ms) {
+  function cycle(ms, byKey) {
     var i = ms.map(function (m) { return m.id; }).indexOf(state.sel);
-    select(ms[(i + 1) % ms.length].id);
+    select(ms[(i + 1) % ms.length].id, false, byKey);
   }
 
   /* ── what-if inspector ──────────────────────────────────────────────────── */
@@ -228,12 +239,15 @@
     if (exact) return exact[1];
     return 'Between ' + (lo ? lo[0] : 1) + ' and ' + (hi ? hi[0] : 10) + ': ' + (lo ? lo[1] : '');
   }
-  function select(id, noScroll) {
+  function select(id, noScroll, byKey) {
     state.sel = id;
     render();
-    if (!noScroll && wi.getBoundingClientRect().top > window.innerHeight || wi.getBoundingClientRect().bottom < 0) {
+    var r = wi.getBoundingClientRect();
+    if (!noScroll && (r.top > window.innerHeight || r.bottom < 0)) {
       wi.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
+    // From the keyboard the panel opens somewhere else; take focus there so it is announced.
+    if (byKey && ui) ui.head.focus({ preventScroll: !!noScroll });
   }
   // Built once per selection and updated in place: rebuilding on every `input`
   // would replace the range under the pointer and end the drag.
@@ -242,6 +256,9 @@
     wi.innerHTML = '';
     ui = { id: m.id, rows: {} };
     var head = el('div', 'fm-wi-head');
+    head.tabIndex = -1;
+    head.setAttribute('role', 'group');
+    head.setAttribute('aria-label', 'What-if for ' + m.id);
     head.appendChild(el('span', 'fm-wi-id', m.id));
     head.appendChild(el('span', 'fm-wi-title', m.fm));
     var close = el('button', 'fm-wi-x', 'Close');
@@ -249,6 +266,7 @@
     close.addEventListener('click', function () { delete state.over[m.id]; state.sel = null; render(); });
     head.appendChild(close);
     wi.appendChild(head);
+    ui.head = head;
     ui.out = el('p', 'fm-wi-out');
     ui.out.setAttribute('aria-live', 'polite');
     wi.appendChild(ui.out);
@@ -264,11 +282,13 @@
         state.over[m.id] = next;
         render();
       });
+      var val = el('output', 'fm-wi-v');
+      val.htmlFor = 'fmwi-' + k;
       var rub = el('p', 'fm-wi-rub');
-      row.appendChild(lab); row.appendChild(inp); row.appendChild(rub);
+      row.appendChild(lab); row.appendChild(inp); row.appendChild(val); row.appendChild(rub);
       row.appendChild(el('p', 'fm-wi-why', 'Analyst, at ' + m[k] + ': ' + (m.why[k] || '')));
       wi.appendChild(row);
-      ui.rows[k] = { lab: lab, inp: inp, rub: rub };
+      ui.rows[k] = { lab: lab, inp: inp, rub: rub, val: val };
     });
     var acts = el('div', 'fm-wi-acts');
     if (m.rev) {
@@ -301,8 +321,8 @@
     ui.out.appendChild(document.createTextNode(PRIO_LABEL[p] + ' priority'));
     ['S', 'O', 'D'].forEach(function (k) {
       var r = ui.rows[k];
-      r.lab.textContent = LEVER[k] + ' ';
-      r.lab.appendChild(el('b', null, String(s[k])));
+      r.lab.textContent = LEVER[k];
+      r.val.textContent = String(s[k]);
       if (s[k] !== m[k]) r.lab.appendChild(el('span', 'fm-wi-was', 'scored ' + m[k]));
       if (Number(r.inp.value) !== s[k]) r.inp.value = s[k];
       r.rub.textContent = rubricText(k, s[k]);
@@ -345,7 +365,12 @@
     rp.hidden = false;
 
     var go = function (k) { state.step = Math.max(0, Math.min(lastStep, k)); render(); };
-    var stop = function () { clearInterval(state.timer); state.timer = null; play.textContent = state.step >= lastStep ? 'Replay' : 'Resume'; };
+    // 'Resume' only after a pause; stepping by hand without ever playing reads 'Play'.
+    var stop = function () {
+      var was = !!state.timer;
+      clearInterval(state.timer); state.timer = null;
+      play.textContent = state.step >= lastStep ? 'Replay' : was || play.textContent === 'Resume' ? 'Resume' : 'Play';
+    };
     play.addEventListener('click', function () {
       if (state.timer) { stop(); return; }
       if (state.step >= lastStep) state.step = 0;
@@ -376,7 +401,7 @@
         b.type = 'button';
         b.appendChild(el('span', 'fm-rp-id', m.id + (m.soe.length ? '' : ' · latent')));
         b.appendChild(document.createTextNode(m.fm));
-        b.addEventListener('click', function () { stop(); select(m.id); });
+        b.addEventListener('click', function (e) { stop(); select(m.id, false, e.detail === 0); });
         li.appendChild(b);
         news.appendChild(li);
       });
@@ -391,7 +416,7 @@
   /* ── worksheet hooks ────────────────────────────────────────────────────── */
   [].forEach.call(document.querySelectorAll('.fm-wi-open'), function (b) {
     b.hidden = false;
-    b.addEventListener('click', function () { select(b.dataset.id); });
+    b.addEventListener('click', function (e) { select(b.dataset.id, false, e.detail === 0); });
   });
 
   function render() {
@@ -407,7 +432,8 @@
   // Deep link from the library-wide view: #FM-03 opens that worksheet row, scrolls
   // to it, and loads the mode in the what-if without stealing the scroll.
   function fromHash() {
-    var id = decodeURIComponent(location.hash.slice(1));
+    var id;
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch (e) { return; }
     if (!byId[id]) return;
     var row = document.getElementById(id);
     if (row && row.tagName === 'DETAILS') { row.open = true; row.scrollIntoView({ block: 'start' }); }

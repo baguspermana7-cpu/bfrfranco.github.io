@@ -132,10 +132,11 @@ CSS = r"""
        1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
        only engages when a chip would not fit its row. */
     .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
-    .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
-    .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
-    .chip.green { color:var(--green); border-left:2px solid var(--green); }
-    .chip.red { color:var(--red); border-left:2px solid var(--red); }
+    /* State lives in the text colour; a coloured left stripe is the decoration UX law #14 bans. */
+    .chip.cyan { color:var(--cyan); }
+    .chip.amber { color:var(--amber); }
+    .chip.green { color:var(--green); }
+    .chip.red { color:var(--red); }
     .metabar { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); margin:0.7rem 0; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; font-variant-numeric:tabular-nums slashed-zero; }
     .metabar b { color:var(--text-body); font-weight:600; }
     .metabar .sep { color:var(--line); }
@@ -202,7 +203,7 @@ CSS = r"""
     table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
     table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
     table.metrics .mval { color:var(--text-body); }
-    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.7rem 1rem; margin-top:0.7rem; }
     .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
     .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
     /* reading column — constrain prose to a comfortable measure, justified like RZ articles */
@@ -210,7 +211,7 @@ CSS = r"""
     .reading-col p.lede, .reading-col .card p, .reading-col .ca-block p, .reading-col ul.tight li { text-align:justify; -webkit-hyphens:auto; hyphens:auto; }
     .card p { margin:0; }
     .card > p + p, .card p + p { margin-top:0.7rem; }
-    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
     .mag-trace b { color:var(--text-strong); }
     .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
     .coe-meta { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-left:0.2rem; white-space:normal; }
@@ -884,13 +885,35 @@ def cascade_svg(inc):
     return f'<div class="viz viz-cascade">{"".join(svg)}</div>'
 
 
+def _two_lines(text, width):
+    """A timeline time label as at most two lines of `width` characters.
+
+    One 16-character line ran ~96px into a 92px step and overprinted its neighbour
+    ("…00:47 PD2011-04-21"). Splitting at the first space instead left lone "At",
+    "By", "c." and "ET" lines; this fills line one word by word, so a short word
+    stays with the next one. The full text is in the dot's <title> and the SOE list."""
+    words = text.split()
+    l1 = ""
+    while words and len((l1 + " " + words[0]).strip()) <= width:
+        l1 = (l1 + " " + words.pop(0)).strip()
+    if not l1 and words:
+        w = words.pop(0)
+        l1, words = (w, words) if len(w) <= width else (w[:width - 1] + "…", [])
+    l2 = " ".join(words)
+    if len(l2) > width:
+        l2 = l2[:width - 1].rstrip() + "…"
+    return l1, l2
+
+
 def soe_timeline_svg(soe):
     if not soe:
         return ""
     n = len(soe)
-    W = max(560, 40 + n * 92)
+    # 46px margins: a 13-character label is ~86px wide, centred on the end dots; the
+    # old 30px margin cut the first and last labels at the SVG edge ("ept-Oct 2016").
+    W = max(560, 92 + (n - 1) * 92)
     H = 96
-    x0, x1 = 30, W - 30
+    x0, x1 = 46, W - 46
     step = (x1 - x0) / max(1, n - 1)
     parts = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title>']
     parts.append(f'<line class="vz-grid" x1="{x0}" y1="48" x2="{x1}" y2="48"/>')
@@ -900,9 +923,12 @@ def soe_timeline_svg(soe):
         tip = f'{e.get("t","")} · {ph} — {e.get("event","")}'.strip(" ·—")
         parts.append(f'<circle class="vz-accent-dot" cx="{x:.0f}" cy="48" r="4.5"><title>{esc(tip)}</title></circle>')
         parts.append(f'<text class="vz-tl-ph" x="{x:.0f}" y="30" text-anchor="middle">{esc(ph[:12])}</text>')
-        t = (e.get("t", "") or "")
-        t = t.split("T")[0] if "T" in t else t[:16]
-        parts.append(f'<text class="vz-tl-t" x="{x:.0f}" y="68" text-anchor="middle">{esc(t)}</text>')
+        # Two short lines, date over time. One 16-character line ran ~96px into a 92px
+        # step, so neighbouring labels overprinted ("…00:47 PD2011-04-21") at every width.
+        l1, l2 = _two_lines(e.get("t", "") or "", 13)  # 13 mono chars ≈ 80px inside a 92px step
+        parts.append(f'<text class="vz-tl-t" x="{x:.0f}" y="66" text-anchor="middle">{esc(l1)}</text>')
+        if l2:
+            parts.append(f'<text class="vz-tl-t" x="{x:.0f}" y="79" text-anchor="middle">{esc(l2)}</text>')
     parts.append('</svg>')
     return f'<div class="viz viz-timeline">{"".join(parts)}</div>'
 

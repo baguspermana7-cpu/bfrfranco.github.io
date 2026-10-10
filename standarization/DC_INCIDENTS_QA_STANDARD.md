@@ -140,6 +140,13 @@ incident page (worksheet rows carry `id`). A score between rubric anchors is lab
 y" — borrowing the lower anchor's words mislabelled D 7 as "detected at onset". The category table
 drops Incidents and Median RPN below 640 px rather than scrolling sideways.
 
+**After two reviews (v3.13.3).** Criticality zones are hairline boundaries, never a tinted wash.
+No coloured left stripe anywhere on an incident page (`.chip`, `.ca-block`, `.mag-trace` were
+the last). SOE timeline labels wrap by word into two lines of ≤ 13 characters inside 46 px end
+margins; `incidents-visual-qa.mjs` fails any overprint or edge cut. Run it over ALL pages
+(`node tools/incidents-visual-qa.mjs <out> $(slugs)`) — the default is a five-page sample, which
+is how 28 overprinting timelines went unseen.
+
 **The generator was stale, and fixing it was a precondition.** Sweeps since v1.134.20 had edited
 the 44 generated pages directly (timeline 1:1 fix, `.vz-tl-ph` 10 px, mobile `.chip` wrap, hub title
 attributes, content-hash cache tokens) while `tools/build-incidents.py` was last changed 2026-08-02.

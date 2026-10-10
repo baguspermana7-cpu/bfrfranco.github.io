@@ -11,6 +11,49 @@ release sections rather than semver.
 
 ---
 
+## v3.13.3 — 2026-10-10
+
+### Two independent reviews of the FMEA layer, and every finding acted on
+
+A UI review against the anti-vibe standard and a code review (XSS, a11y, state) were run on
+v3.13.1–v3.13.2. 23 of 24 findings fixed; one declined (below).
+
+**Fixed — design (UX law #14, one accent per view)**
+- Criticality matrix: the amber/red cell wash is gone; zones are 1px hairline boundaries drawn
+  wherever two neighbouring cells fall in different zones.
+- Coloured left stripes removed from every incident page: `.chip` (4 variants), `.ca-block`,
+  `.mag-trace` — state stays in the text colour, grouping is the panel and its hairline.
+- "Most risk still standing" bars neutral, not amber. Facts list drops the residual row that
+  repeated the metabar. Dimmed (not-yet-in-play) rows at 0.45, readable.
+- Type scale collapsed from 12 one-off sizes to five steps. Slider value sits beside its thumb.
+  Tap targets 44px under 640px. Replay ticks mark new modes by height, not a decorative dot.
+- SOE timeline (every incident page): one 16-character time label ran ~96px into a 92px step
+  and overprinted its neighbour on 28 pages. Labels now wrap by word into two ≤13-character
+  lines, and the strip has 46px margins so the end labels are not cut at the SVG edge.
+
+**Fixed — code**
+- `select(id, noScroll)` scrolled anyway (`a && b || c` precedence) — deep links jumped back up.
+- A malformed `#hash` threw `URIError` on load and on every hashchange.
+- Bars inside `role=list` became `role=button`; the container is now a group. The scenario
+  control used `role=radio` without roving focus; now `aria-pressed` toggle buttons.
+- Keyboard selection moves focus to the what-if panel; focus survives a drag that moves the
+  marker to another cell. "Resume" only after a pause.
+- A what-if above the as-found axis clipped at full width; the axis now widens.
+- Dossier URLs: only `http(s)` becomes a link. Embedded JSON escapes every `<`, closing the
+  `<!--<script` parser state as well as `</script>`.
+
+**Gates**
+- `test-fmea-sim.mjs` exits 1 on any finding (it printed FAIL and exited 0 without
+  `--strict`). New checks: JS priority colour equals the builder's for every mode, matrix markers
+  equal occupied cells, replay lights the data's count at the first and last event, a what-if drag
+  must change the RPN, zero pages fails. Seen to fail: a perturbed threshold and replay offset gave
+  88 + 64 findings.
+- `incidents-visual-qa.mjs`: SOE timeline labels may not overprint or run past the SVG edge.
+  Against the v3.13.2 pages it flags 28 of 43.
+
+**Declined** — "the metabar is a hero-metric strip": it is one sentence-line, the form the
+standard prescribes in place of stat tiles.
+
 ## v3.13.2 — 2026-10-10
 
 ### FMEA across the library: what 43 retrospectives say together
