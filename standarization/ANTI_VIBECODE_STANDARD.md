@@ -125,6 +125,12 @@ Consistent with the audit contract above: **do not label an unimplemented heuris
   `audit-mobile-responsive.py --strict` asserts `min-height: 44px` on `button|a.btn|[role="button"]`;
   **#12** radii — rule `large-radius`; **#14** rails and resting shadows — rules `colored-left-stripe`
   and `shadow-sole-affordance` (all three registered in `DECORATIVE_RULES`, `tools/audit-vibecode.mjs`).
+  **#14 on cards, from the render (v3.12.3):** `tools/test-flatten-ratchet.mjs` counts every
+  `-card` whose left border differs from its other borders AND carries visible alpha and real
+  chroma — the 2px, inline-style and light-theme-only stripes the static rule (>= 3px in CSS text)
+  cannot see. Ratcheted at 0 after removing 105. A coloured stripe is not an acceptable way to put
+  STATE on a card either: the stat-tile component carries state as a 7px status dot, mapped by
+  exact class token, never by substring.
 - **Human design review only:** #1, #3, #4, #5, #7, #8, #9, #10, #11, #13, #15, #16, #17, #18, #19.
   These are review criteria for any visual/IA change — not something the static scan can decide. Claiming
   otherwise would be exactly the false-assurance this document warns against.

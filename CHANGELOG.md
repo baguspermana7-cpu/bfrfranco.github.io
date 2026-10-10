@@ -11,6 +11,81 @@ release sections rather than semver.
 
 ---
 
+## v3.12.3 — 2026-10-09
+
+### The stat tile was AI design slop, and my first fix made it worse
+
+Owner: *"kartu ini kok AI design slop — kamu sudah tahu ada aturan anti-vibe
+dan UX law yang harus dipatuhi."* Correct on both counts.
+
+**What the card was.** The `.comparison-card` stat tile is the hero-metric
+template: an uppercase tracked eyebrow, a giant bold value, a muted caption,
+boxed four-up in identical bordered cards. On geopolitics-1 the giant values
+were the *words* "Weeks" and "Limited", set as if they were measurements.
+
+**What my first fix did.** Measuring the editorial runtime showed that
+flattening translucent card washes had erased state — threat and safe cards
+rendered identically. My answer was a red/green 2px rail on every flattened
+card: 14 red and 2 green on one page. That breaks the site's own
+`ANTI_VIBECODE_STANDARD` **UX law #14** — *"group with a panel + 1px hairline,
+never with a decorative wash or a coloured stripe"* — and **#7**, one accent per
+view. Withdrawn before it shipped.
+
+**What it is now.** The content is two to four labelled facts, often a direct
+comparison — article-14: water demand 808 M vs supply 142 M L/day. That is a
+list of rows, so it is drawn as one: **one panel, one hairline, rows divided by
+hairlines**, label left in prose type, value right in mono with tabular figures,
+qualifier under the label. Proximity (#4) and similarity (#13) do the grouping.
+State, where the author tagged one, is a **7px status dot** — the instrument
+idiom this site already uses — mapped by **exact class token**: the first
+version matched `[class*="risk"]` as bad news and painted article-16's
+`.risk-low` revenue rows (+36% YoY) red. `strong`, `dc` and `household` are
+categories, not states, and get no dot. Scoped by `:has()` to the stat-tile
+shape only; the icon-header variants that share the class name are untouched.
+Screenshot-checked on geopolitics-1, article-11 (390px), 12, 14, 16 and 17.
+
+### 105 coloured stripes on cards were already live
+
+Turning the gate's second half around — from "state must have a rail" to "no
+card may have a coloured stripe" — found **105** of them, measured from the
+render:
+
+- `article-13` ×8 and `article-8` ×3: inline `border-left: 4px solid #…` — on
+  article-13 the **brand colours** of AWS, Google and Microsoft; on article-8 a
+  red/amber/green paint job on the Westrum typology, with the headings dyed to
+  match (A9, rainbow text). Removed in source.
+- `article-27 .ws-strat-card` ×20: an amber rail kept deliberately by an
+  exception in `css/rz-article-dark.css` itself. Exception removed; hairline.
+- `.step-card` / `.counter-card` / `.failure-card` / `.philosophy-card` ×19:
+  coloured in the **light theme only** — the dark theme already drew the same
+  rule as a neutral 10%-white line, so the two themes disagreed about whether
+  the stripe meant anything. Now neutral in both.
+
+The first version of the counter also flagged those neutral dark-theme lines;
+it now counts only stripes with visible alpha **and** real chroma, which is what
+the law says.
+
+**105 → 0.** And translucent washes repaired in the browser: **114 → 52**.
+
+### Justified text in a 300px column
+
+`.article-body li { text-align: justify }` reached lists inside cards, where a
+line holds too few words to spread: article-8 rendered *"Responsibilities
+          are"*. Justification is now scoped to the reading column's own lists.
+
+### New gate: `tools/test-flatten-ratchet.mjs`
+
+A ratchet on two numbers per page and theme — translucent washes repaired by
+`flattenWashes()` (52) and coloured stripes on cards (0). Either may fall; a rise
+fails. Proven both ways: a seeded wash in article-10 rises 1 → 2 and exits 1; a
+seeded `border-left: 4px solid #ef4444` on an article-8 card rises 0 → 1 in both
+themes and exits 1.
+
+The gate's history is part of the record: its first version **enforced** the
+red/green rails. A gate can enshrine a mistake as easily as prevent one.
+
+Ledger row E closed (14).
+
 ## v3.12.2 — 2026-10-06
 
 ### Motion gets a standard, two components, and a gate that has been seen to fail
