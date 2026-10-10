@@ -630,8 +630,9 @@ def render_hub(incidents):
             <h4>Access</h4>
             <p>Root-only. The library is excluded from the public sitemap and search index.</p>
         </div></details>
-        <nav class="iv-tabs"><a href="#dashboard" class="on">Overview</a><a href="#incMap">Risk map</a><a href="#semantic">Semantic map</a><a href="#all-incidents">Incident list</a></nav>
+        <nav class="iv-tabs"><a href="#dashboard" class="on">Overview</a><a href="#incMap">Risk map</a><a href="#semantic">Semantic map</a><a href="#fmea-corpus">FMEA</a><a href="#all-incidents">Incident list</a></nav>
         {hero_dashboard(incidents)}
+        {incidents_fmea.corpus_section(incidents)}
 
         <h2 id="all-incidents">All incidents</h2>
         <div class="filterbar" id="filterbar">
@@ -664,7 +665,7 @@ def render_hub(incidents):
         <p class="disclaimer">Ranking is a transparent composite of sourced sub-scores (blast radius 35% · users 25% · financial 20% · duration 20%). Summaries are original; quoted excerpts are short, attributed, and for provenance only.</p>
         {FILTER_JS}
 """
-    return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="", head_extra=LEAFLET_HEAD)
+    return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="", head_extra=LEAFLET_HEAD + f"<style>{incidents_fmea.CSS}{incidents_fmea.CORPUS_CSS}</style>")
 
 
 def _dur(mins):

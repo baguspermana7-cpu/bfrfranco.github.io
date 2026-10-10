@@ -31,6 +31,7 @@ analyst assessment, not an operator document.
 """
 import html
 import math
+import statistics
 
 RUBRIC = {
     "S": [
@@ -350,7 +351,7 @@ def worksheet_html(inc):
         rev_line = (f'<p class="fm-revline">After action: S{rev["S"]} · O{rev["O"]} · D{rev["D"]} → RPN {rpn(rev)}. '
                     f'{esc(m.get("revisedRationale", ""))}</p>') if rev else ""
         ev = "".join(_ev_html(inc, e) for e in m.get("evidence", []))
-        rows.append(f"""<details class="fm-row" data-id="{esc(m["id"])}">
+        rows.append(f"""<details class="fm-row" id="{esc(m["id"])}" data-id="{esc(m["id"])}">
   <summary>
     <span class="fm-id-cell">{esc(m["id"])}</span>
     <span class="fm-mode">{esc(m["failureMode"])}<span class="fm-item">{esc(m["item"])}</span></span>
@@ -485,6 +486,159 @@ def fmea_section(inc):
 """
 
 
+def _cat(inc):
+    c = inc.get("category")
+    return (c[0] if isinstance(c, list) and c else c) or "other"
+
+
+def _short(inc):
+    return f'{inc.get("operatorShort") or inc.get("operator", "")} {str(inc.get("date", ""))[:4]}'.strip()
+
+
+def corpus_section(incidents):
+    """The library-wide FMEA: what 43 retrospectives say together.
+
+    Every number is summed from the per-incident FMEAs; nothing is scored here.
+    Three views: where detection sat (each D row opens to the modes behind it),
+    the published-action record by incident category, and the incidents with the
+    most risk still standing after every published action."""
+    incs = [x for x in incidents if x.get("fmea") and not validate_fmea(x)]
+    if not incs:
+        return ""
+    modes = [(x, m) for x in incs for m in x["fmea"]["modes"]]
+    n = len(modes)
+    late = sum(1 for _, m in modes if m["D"] >= 8)
+    resid = sum(1 for _, m in modes if not m.get("revised"))
+    t0 = sum(rpn(m) for _, m in modes)
+    t1 = sum(rpn(m["revised"]) if m.get("revised") else rpn(m) for _, m in modes)
+    acted = [m for _, m in modes if m.get("revised")]
+    lever = {k: sum(1 for m in acted if m["revised"][k] < m[k]) for k in "SOD"}
+
+    # Detection histogram; each row is a disclosure listing its modes.
+    dlab = dict(RUBRIC["D"])
+    top = max(sum(1 for _, m in modes if m["D"] == d) for d in range(1, 11)) or 1
+    hist = []
+    for d in range(10, 0, -1):
+        at = sorted([(x, m) for x, m in modes if m["D"] == d], key=lambda xm: -rpn(xm[1]))
+        if not at:
+            continue
+        items = "".join(
+            f'<li><a href="incident-{esc(x["slug"])}.html#{esc(m["id"])}"><span class="fc-who">{esc(_short(x))} · {esc(m["id"])}</span>'
+            f'{esc(m["failureMode"])}</a><span class="fc-r">{rpn(m)}</span></li>' for x, m in at)
+        if d in dlab:
+            label = dlab[d]
+        else:  # the rubric defines anchors only; an in-between score says so instead of borrowing a neighbour's words
+            lo = max(v for v in dlab if v < d)
+            hi = min(v for v in dlab if v > d)
+            label = f"Between {lo} and {hi}"
+        hist.append(
+            f'<details class="fc-h"><summary><span class="fc-d">D {d}</span>'
+            f'<span class="fc-track"><i style="transform:scaleX({len(at) / top:.3f})"{" class=late" if d >= 8 else ""}></i></span>'
+            f'<span class="fc-n">{len(at)}</span><span class="fc-lab">{esc(label)}</span></summary><ol class="fc-list">{items}</ol></details>')
+
+    # By category.
+    cats = {}
+    for x in incs:
+        cats.setdefault(_cat(x), []).append(x)
+    crow = []
+    for c, xs in sorted(cats.items(), key=lambda kv: -len(kv[1])):
+        ms = [m for x in xs for m in x["fmea"]["modes"]]
+        a0 = sum(rpn(m) for m in ms)
+        a1 = sum(rpn(m["revised"]) if m.get("revised") else rpn(m) for m in ms)
+        crow.append(
+            f'<tr><th scope="row">{esc(c.capitalize())}</th><td class="fc-opt">{len(xs)}</td><td>{len(ms)}</td>'
+            f'<td class="fc-opt">{round(statistics.median(rpn(m) for m in ms))}</td>'
+            f'<td>{round(100 * sum(1 for m in ms if m["D"] >= 8) / len(ms))}%</td>'
+            f'<td>{round(100 * sum(1 for m in ms if not m.get("revised")) / len(ms))}%</td>'
+            f'<td>{round(100 * (a0 - a1) / a0) if a0 else 0}%</td></tr>')
+
+    # Most risk left standing.
+    left = sorted(incs, key=lambda x: -sum(rpn(m["revised"]) if m.get("revised") else rpn(m) for m in x["fmea"]["modes"]))[:10]
+    lmax = max(sum(rpn(m) for m in x["fmea"]["modes"]) for x in left) or 1
+    lrow = []
+    for x in left:
+        ms = x["fmea"]["modes"]
+        a0 = sum(rpn(m) for m in ms)
+        a1 = sum(rpn(m["revised"]) if m.get("revised") else rpn(m) for m in ms)
+        lrow.append(
+            f'<li><a href="incident-{esc(x["slug"])}.html#fmea">{esc(x["title"])}</a>'
+            f'<span class="fc-track"><i class="fc-ref" style="transform:scaleX({a0 / lmax:.3f})"></i>'
+            f'<i style="transform:scaleX({a1 / lmax:.3f})"></i></span>'
+            f'<span class="fc-n">{a1}<small> of {a0} · {sum(1 for m in ms if not m.get("revised"))}/{len(ms)} residual</small></span></li>')
+
+    return f"""
+        <h2 id="fmea-corpus">FMEA across the library</h2>
+        <p class="metabar fc-meta"><span><b>{n}</b> failure modes in <b>{len(incs)}</b> incidents</span><span class="sep">/</span><span><b>{late}</b> ({round(100 * late / n)}%) caught only after impact</span><span class="sep">/</span><span><b>{resid}</b> ({round(100 * resid / n)}%) with no published action</span><span class="sep">/</span><span>published actions cut total RPN <b>{round(100 * (t0 - t1) / t0)}%</b></span></p>
+        <div class="fc-grid">
+          <section>
+            <h3 class="fc-h3">Where detection sat</h3>
+            <p class="fc-cap">Modes per detection score. Open a row for the modes behind it, worst RPN first.</p>
+            <div class="fc-hist">{"".join(hist)}</div>
+          </section>
+          <section>
+            <h3 class="fc-h3">What the published actions moved</h3>
+            <dl class="fm-facts fc-lever">
+              <div><dt>Modes with a published action<small>revised score allowed</small></dt><dd>{len(acted)} of {n}</dd></div>
+              <div><dt>Action lowers occurrence<small>O</small></dt><dd>{lever["O"]}</dd></div>
+              <div><dt>Action lowers detection<small>D</small></dt><dd>{lever["D"]}</dd></div>
+              <div><dt>Action lowers severity<small>S — blast radius</small></dt><dd>{lever["S"]}</dd></div>
+            </dl>
+          </section>
+        </div>
+        <h3 class="fc-h3">By incident category</h3>
+        <div class="table-wrap"><table class="fc-tbl"><thead><tr><th scope="col">Category</th><th scope="col" class="fc-opt">Incidents</th><th scope="col">Modes</th><th scope="col" class="fc-opt">Median RPN</th><th scope="col" title="D ≥ 8">After impact</th><th scope="col">No action</th><th scope="col">RPN cut</th></tr></thead>
+        <tbody>{"".join(crow)}</tbody></table></div>
+        <h3 class="fc-h3">Most risk still standing</h3>
+        <p class="fc-cap">Total RPN after every published action. Thin bar: as found.</p>
+        <ol class="fc-left">{"".join(lrow)}</ol>
+"""
+
+
+CORPUS_CSS = r"""
+    .fc-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fc-grid { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:2rem; align-items:start; margin-top:1rem; }
+    @media (max-width:860px){ .fc-grid { grid-template-columns:1fr; } }
+    .fc-h3 { font-size:1rem; color:var(--text-strong); margin:1.4rem 0 0.3rem; }
+    .fc-grid .fc-h3 { margin-top:0; }
+    .fc-cap { font-size:0.8rem; color:var(--muted); margin:0 0 0.5rem; }
+    .fc-hist { border-top:1px solid var(--line); }
+    .fc-h { border-bottom:1px solid var(--line); }
+    .fc-h > summary { display:grid; grid-template-columns:3rem minmax(0,1fr) 2.6rem; grid-template-areas:"d t n" ". l l"; gap:0.1rem 0.6rem; align-items:center; padding:0.45rem 0.2rem; cursor:pointer; list-style:none; }
+    .fc-h > summary::-webkit-details-marker { display:none; }
+    @media (hover:hover) and (pointer:fine){ .fc-h > summary:hover { background:var(--surface-2); } }
+    .fc-h > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fc-d { grid-area:d; font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--muted); }
+    .fc-h .fc-track { grid-area:t; }
+    .fc-h .fc-n { grid-area:n; text-align:right; }
+    .fc-lab { grid-area:l; font-size:0.78rem; color:var(--muted); }
+    .fc-track { display:flex; flex-direction:column; gap:3px; }
+    .fc-track i { display:block; height:10px; width:100%; transform-origin:left center; background:var(--muted); }
+    .fc-track i.late { background:var(--red); }
+    .fc-track i.fc-ref { height:3px; background:var(--text-body); opacity:0.45; }
+    .fc-n { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; color:var(--text-strong); white-space:nowrap; }
+    .fc-n small { color:var(--muted); font-size:0.72rem; }
+    .fc-list { margin:0 0 0.6rem; padding:0 0 0 3.6rem; font-size:0.84rem; max-height:22rem; overflow:auto; }
+    .fc-list li { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:0.8rem; padding:0.3rem 0; border-top:1px solid var(--line); }
+    .fc-list a { color:var(--text-body); text-decoration:none; }
+    .fc-list a:hover { color:var(--text-strong); text-decoration:underline; }
+    .fc-who { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fc-r { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; color:var(--text-strong); }
+    @media (max-width:640px){ .fc-list { padding-left:0; } }
+    .fc-tbl { width:100%; border-collapse:collapse; font-size:0.86rem; }
+    .fc-tbl th, .fc-tbl td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap; }
+    .fc-tbl th:first-child { text-align:left; }
+    .fc-tbl thead th { font-size:0.74rem; color:var(--muted); font-weight:500; }
+    .fc-tbl td { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; color:var(--text-strong); }
+    @media (max-width:640px){ .fc-tbl .fc-opt { display:none; } .fc-tbl th, .fc-tbl td { padding:0.4rem 0.35rem; } }
+    .fc-left { list-style:none; margin:0; padding:0; border-top:1px solid var(--line); counter-reset:fc; }
+    .fc-left li { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 12rem; gap:0.8rem; align-items:center; padding:0.5rem 0; border-bottom:1px solid var(--line); font-size:0.88rem; }
+    .fc-left a { color:var(--text-strong); text-decoration:none; }
+    .fc-left a:hover { text-decoration:underline; }
+    .fc-left .fc-track i:not(.fc-ref) { background:var(--amber); }
+    @media (max-width:640px){ .fc-left li { grid-template-columns:1fr; gap:0.3rem; } }
+"""
+
+
 CSS = r"""
     /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
        No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
@@ -520,6 +674,7 @@ CSS = r"""
     .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
     .fm-row { border-top:1px solid var(--line); }
     .fm-row:first-of-type { border-top:0; }
+    .fm-row { scroll-margin-top:4.5rem; }
     .fm-row > summary { cursor:pointer; list-style:none; }
     .fm-row > summary::-webkit-details-marker { display:none; }
     .fm-row > summary:hover { background:var(--surface-2); }

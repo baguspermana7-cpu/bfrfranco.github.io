@@ -10,6 +10,9 @@
  *      on `input` ends the drag on a real device).
  *   4. Nothing inside the simulator runs past the viewport.
  *
+ *   5. The hub's library-wide FMEA agrees with the pages (mode count), every mode link
+ *      resolves to a worksheet row, and the section fits 390px with no sideways table.
+ *
  * Run: node tools/test-fmea-sim.mjs [--strict]     (--strict exits 1 on any finding)
  */
 import fs from 'fs';
@@ -63,11 +66,48 @@ for (const f of pages) {
     await p.close();
   }
 }
+// The library-wide view on the hub: its mode count must equal the sum over the
+// incident pages, every histogram link must land on a real worksheet row, and the
+// section must fit a phone without a sideways scroll (the category table included).
+let pageModes = 0;
+for (const f of pages) pageModes += (fs.readFileSync(path.join(ROOT, f), 'utf8').match(/<details class="fm-row"/g) || []).length;
+const hubIds = new Map();
+for (const f of pages) hubIds.set(f, new Set([...fs.readFileSync(path.join(ROOT, f), 'utf8').matchAll(/<details class="fm-row" id="([^"]+)"/g)].map((m) => m[1])));
+for (const w of [390, 1440]) {
+  const p = await browser.newPage();
+  const errs = [];
+  p.on('pageerror', (e) => errs.push(e.message));
+  await p.setViewport({ width: w, height: 900 });
+  await p.goto('file://' + path.join(ROOT, 'dc-incidents.html'), { waitUntil: 'networkidle2', timeout: 30000 });
+  const h = await p.evaluate(() => {
+    const sec = document.getElementById('fmea-corpus');
+    if (!sec) return { missing: true };
+    const meta = document.querySelector('.fc-meta');
+    const vw = document.documentElement.clientWidth;
+    const scope = [...document.querySelectorAll('.fc-meta, .fc-grid, .fc-tbl, .fc-left')];
+    const wrap = document.querySelector('.fc-tbl').closest('.table-wrap');
+    return {
+      modes: Number((meta.textContent.match(/(\d+)\s*failure modes/) || [])[1]),
+      over: scope.flatMap((e) => [e, ...e.querySelectorAll('*')]).filter((e) => e.getBoundingClientRect().right > vw + 1).length,
+      tableScroll: wrap ? wrap.scrollWidth - wrap.clientWidth : 0,
+      links: [...document.querySelectorAll('.fc-list a')].map((a) => a.getAttribute('href')),
+    };
+  });
+  if (h.missing) { bad.push(`dc-incidents.html @${w}: no #fmea-corpus section`); await p.close(); continue; }
+  if (h.modes !== pageModes) bad.push(`dc-incidents.html: hub says ${h.modes} modes, incident pages carry ${pageModes}`);
+  if (h.over) bad.push(`dc-incidents.html @${w}: ${h.over} FMEA element(s) past the viewport`);
+  if (h.tableScroll > 1) bad.push(`dc-incidents.html @${w}: category table scrolls sideways by ${h.tableScroll}px`);
+  const dead = h.links.filter((href) => { const [f, id] = href.split('#'); return !(hubIds.get(f) || new Set()).has(id); });
+  if (dead.length) bad.push(`dc-incidents.html: ${dead.length} mode link(s) land nowhere, first ${dead[0]}`);
+  for (const e of errs) bad.push(`dc-incidents.html @${w}: page error: ${e}`);
+  await p.close();
+}
+
 await browser.close();
 if (bad.length) {
   console.log(bad.join('\n'));
   console.log(`FAIL — ${bad.length} finding(s) across ${pages.length} page(s)`);
   if (STRICT) process.exit(1);
 } else {
-  console.log(`PASS — FMEA simulator live and consistent on ${pages.length} page(s) at 390 and 1440px.`);
+  console.log(`PASS — FMEA simulator live and consistent on ${pages.length} page(s) at 390 and 1440px; hub view agrees (${pageModes} modes).`);
 }

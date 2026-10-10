@@ -134,6 +134,12 @@ emitted by `incidents_fmea.sim_data`); it types no fact of its own.
 - Gate: `node tools/test-fmea-sim.mjs --strict` — also cross-checks the simulator's totals against
   the builder's metabar, so the JS and Python scoring cannot drift apart unseen.
 
+**Library-wide view (v3.13.2, `incidents_fmea.corpus_section`).** Summed from the per-incident
+FMEAs, never re-scored. Detection histogram rows open to their modes and link to `#FM-nn` on the
+incident page (worksheet rows carry `id`). A score between rubric anchors is labelled "Between x and
+y" — borrowing the lower anchor's words mislabelled D 7 as "detected at onset". The category table
+drops Incidents and Median RPN below 640 px rather than scrolling sideways.
+
 **The generator was stale, and fixing it was a precondition.** Sweeps since v1.134.20 had edited
 the 44 generated pages directly (timeline 1:1 fix, `.vz-tl-ph` 10 px, mobile `.chip` wrap, hub title
 attributes, content-hash cache tokens) while `tools/build-incidents.py` was last changed 2026-08-02.

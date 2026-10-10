@@ -228,10 +228,10 @@
     if (exact) return exact[1];
     return 'Between ' + (lo ? lo[0] : 1) + ' and ' + (hi ? hi[0] : 10) + ': ' + (lo ? lo[1] : '');
   }
-  function select(id) {
+  function select(id, noScroll) {
     state.sel = id;
     render();
-    if (wi.getBoundingClientRect().top > window.innerHeight || wi.getBoundingClientRect().bottom < 0) {
+    if (!noScroll && wi.getBoundingClientRect().top > window.innerHeight || wi.getBoundingClientRect().bottom < 0) {
       wi.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
   }
@@ -403,4 +403,16 @@
   }
   sim.classList.add('is-live');
   render();
+
+  // Deep link from the library-wide view: #FM-03 opens that worksheet row, scrolls
+  // to it, and loads the mode in the what-if without stealing the scroll.
+  function fromHash() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    if (!byId[id]) return;
+    var row = document.getElementById(id);
+    if (row && row.tagName === 'DETAILS') { row.open = true; row.scrollIntoView({ block: 'start' }); }
+    select(id, true);
+  }
+  fromHash();
+  window.addEventListener('hashchange', fromHash);
 })();

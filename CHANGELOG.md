@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v3.13.2 — 2026-10-10
+
+### FMEA across the library: what 43 retrospectives say together
+
+The incident hub (`dc-incidents.html`) gets a library-wide FMEA view, summed from the per-incident
+FMEAs — nothing is scored at hub level.
+
+**Added**
+- Headline line: 284 failure modes in 43 incidents; **213 (75%) caught only after impact** (D ≥ 8);
+  197 (69%) with no published action; published actions cut total RPN by 17%.
+- **Where detection sat** — modes per detection score; each row opens to the modes behind it, worst
+  RPN first, each linking straight to that mode on its incident page. Scores between rubric anchors
+  now read "Between 6 and 8" instead of borrowing a neighbour's description.
+- **What the published actions moved** — 87 of 284 modes have one; 46 lower occurrence, 29 detection,
+  27 severity.
+- **By incident category** — the split the corpus had never shown: fire incidents have 96% of modes
+  with no published action and actions cut 2% of their RPN; software 39% and 34%; network 72% and 15%.
+- **Most risk still standing** — the ten incidents with the highest RPN left after every published
+  action (NIRS Daejeon 2025 first: 2,906 of 2,906, all 8 modes residual).
+- Deep links: `incident-…html#FM-03` opens that worksheet row and loads the mode into the what-if.
+
+**Gate** `tools/test-fmea-sim.mjs` now also checks the hub: its mode count equals the sum over the
+incident pages, every mode link resolves to a worksheet row (seen to fail on a renamed anchor), and
+the section fits 390 px with no sideways table.
+
 ## v3.13.1 — 2026-10-10
 
 ### The FMEA becomes something you can run: replay, scenarios, what-if
