@@ -70,6 +70,11 @@ holds every page's frame: script order, diagram tokens in both themes, and the f
 Proven red against the previous tree. `tools/test-rz-diagram-engine.mjs` gained five symbol
 assertions, proven red against the previous engine.
 
+**Fixed — deploys had stopped.** v3.11.14 committed a `node_modules` symlink from a git worktree
+(`.gitignore` had `node_modules/`, which matches a directory, not a symlink). The Pages artifact
+step failed on it (`tar: ./node_modules: File removed before we read it`), so v3.11.14 never went
+live and the site stayed on v3.11.13. The symlink is untracked and `.gitignore` now matches it.
+
 **Boundary.** Educational tools, labelled as such on every page. A clean-agent system is designed from
 the listed manufacturer's manual and approved by the AHJ; a Tier is certified by Uptime Institute only.
 The model lab keeps its own visual system for now; its restyle is a separate change.
