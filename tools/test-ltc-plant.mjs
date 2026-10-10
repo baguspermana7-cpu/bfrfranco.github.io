@@ -11,6 +11,8 @@
  *   P4  faults: losing CDU feeder A on single-fed CDUs drops half of them and pushes the
  *       shortfall into the hall air; dual-fed CDUs lose none; one CDU out is covered by N+1;
  *       FWS loss gives minutes, flow loss gives seconds.
+ *   P7  DH01 thermal view: normal in envelope, CRAH loss warms the aisles it fed, CDU feeder loss
+ *       sheds IT on the dead loops, the running worst case overheats, CHW loss raises supply air.
  *   P6  engine v2: metering order M0>M1>M2>M3, PUE1<2<3, CUE/REF/ERF identities, sizing by hand,
  *       hall geometry, transients against the analytic first-order solution, climate presets.
  *   P5  practitioner claims recomputed: the VSD part-load points, the 5.4 MW adiabatic-vs-fluid
@@ -151,6 +153,27 @@ for (let i = 0; i < 200; i++) {
   }
   ok(P.compute({ climate: 'temperate' }).totals.pueAnnual < P.compute({ climate: 'tropical' }).totals.pueAnnual, 'P6 a temperate site runs a lower annual PUE than a tropical one');
   ok(JSON.stringify(P.parseBins('30,26,4000\n24 22 4760\nbad line')) === JSON.stringify([[30, 26, 4000], [24, 22, 4760]]), 'P6 parseBins reads db, wb, hours lines and skips the rest');
+}
+
+// P7 — DH01 thermal view (js/ltc-dh01.js): the approximation behaves like the hall it draws
+{
+  globalThis.LTCPlant = P;
+  const DH = require('../js/ltc-dh01.js');
+  const r = P.compute({});
+  const n = DH.solveHall(r, 'none', 'common', 0, 'throttled');
+  ok(n.racks.length === r.it.racksPerHall && n.over27 === 0, `P7 normal: every rack inside the recommended envelope (hottest ${n.maxInlet.toFixed(1)} °C)`);
+  ok(n.airSupply >= n.airDemand, 'P7 normal: installed CRAH airflow covers rack demand');
+  const c4 = DH.solveHall(r, 'crah4', 'common', 0, 'throttled');
+  ok(c4.over27 > 0 && c4.airSupply < n.airSupply, 'P7 four CRAHs out: the aisles they fed run warm');
+  const west = c4.racks.filter((k) => k.x < r.hall.lengthM / 2 && k.inlet > 27).length, east = c4.racks.filter((k) => k.x >= r.hall.lengthM / 2 && k.inlet > 27).length;
+  ok(west >= east, `P7 the west-wall loss bites hardest nearest the west wall (west ${west}, east ${east})`);
+  const per = DH.solveHall(r, 'cdu-feeder', 'per-cdu', 0, 'throttled');
+  const lost = Object.keys(per.lostCdu).length, share = lost / r.liquid.cduPerHall;
+  ok(Math.abs(per.itLostKw / r.it.hallKw - share) < 0.06 && per.over27 === 0, `P7 feeder A, one loop per CDU: the racks on dead CDUs shed their load (${(per.itLostKw / 1000).toFixed(1)} MW) and the room stays in envelope`);
+  const run = DH.solveHall(r, 'cdu-feeder', 'per-cdu', 0, 'running');
+  ok(run.maxInlet > per.maxInlet + 5, 'P7 if those racks kept running on air the room would overheat');
+  const chw = DH.solveHall(r, 'chw', 'common', 10, 'throttled');
+  ok(chw.supply > n.supply, 'P7 chilled water lost: supply air rises with the CHW transient');
 }
 
 if (fails.length) {

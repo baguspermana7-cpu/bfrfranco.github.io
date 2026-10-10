@@ -15,6 +15,7 @@
  *   W3  NFPA 2001 flooding equations against the published per-m³ figures
  *   W4  TIA fiber budget, copper channel, TIA-607 conductor sizing
  *   W5  ISO/IEC 30134 KPIs and the ISO 50006 regression recovering a known model
+ *   W9  Tier groups (IT AND mechanical power; liquid AND air sinks), ≤ 9 blocks per Tier layout, DH01 on the hub
  *   W8  every page loads the plant + strip; ISO defaults to the plant; derived inputs are bound
  *   W7  hub: the full plant (air path, CHW, electrical rooms), ≤ 9 blocks per view,
  *       traceable connector ids, a script at every commissioning gate, HLT at L4
@@ -196,6 +197,26 @@ for (const [page, mod] of Object.entries(PAGES)) {
   }
   const hubH = readFileSync(join(root, 'standards-ltc-lab.html'), 'utf8');
   ok('W8d', !/Tier, ASHRAE and model pages read the same plant/.test(hubH), 'the hub does not claim pages read the plant before they do');
+}
+
+{
+  /* W9 (v3.16.0) — Tier on the plant topology; DH01 on the hub */
+  const T = load('js/ltc-tier.js').LTCTier;
+  T.system('power');
+  ok('W9a', !T.powered(3, { 'mcc#1': 1, 'mcc#2': 1 }, true), 'IT is lost when the mechanical power group is lost, even with both IT paths healthy');
+  ok('W9b', T.powered(3, { 'mcc#1': 1 }, false), 'one MCC of a dual-fed pair out: mechanical power holds');
+  ok('W9c', T.lostGroups(3, { mcc: 1 }, false).includes('mech'), 'the sweep names the group that failed');
+  T.system('cooling');
+  ok('W9d', !T.powered(4, { chwA: 1, chwB: 1 }, true) && T.powered(4, { chwA: 1 }, false), 'cooling needs both sinks: both CHW loops out loses the air sink; one is tolerated at Tier IV');
+  ok('W9e', !T.powered(2, { fws: 1 }, true), 'Tier II: the single FWS loop is a component the sweep must take out whole');
+  T.system('power');
+  const tier = readFileSync(join(root, 'js/ltc-tier.js'), 'utf8');
+  for (const m of tier.matchAll(/(power[12]|cool[12]): \{ nodes: \[([\s\S]*?)\],\s*edges:/g)) {
+    const n = (m[2].match(/\['\w+', \d/g) || []).length;
+    ok('W9f:' + m[1], n <= 9, `Tier layout ${m[1]} has ${n} blocks; the engine budget is 9`);
+  }
+  const hubH = readFileSync(join(root, 'standards-ltc-lab.html'), 'utf8');
+  ok('W9g', hubH.includes('id="ltcDh01"') && hubH.indexOf('js/ltc-dh01.js') > 0 && hubH.indexOf('js/ltc-dh01.js') < hubH.indexOf('js/ltc-hub.js'), 'the hub carries the DH01 thermal view');
 }
 
 const total = pass + fails.length;

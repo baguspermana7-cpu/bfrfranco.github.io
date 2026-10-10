@@ -145,7 +145,8 @@
         // ── thermal mass for the transient view ──
         tcsLoopM3PerCdu: 6,       // ASSUMED TCS water volume per CDU (piping, manifolds, cold plates)
         throttleC: 60,            // ASSUMED TCS return at which GPUs throttle
-        chwLoopLPerKw: 15         // ASSUMED CHW system volume per kW of evaporator duty
+        chwLoopLPerKw: 15,        // ASSUMED CHW system volume per kW of evaporator duty
+        supplyAirC: 24            // CRAH supply air into the cold aisles (inside the ASHRAE recommended 18–27 °C)
     };
 
     /* Four plant presets — the comparison practitioners actually run. */
@@ -450,24 +451,37 @@
         var racks = r.it.racksPerHall, perRow = p.racksPerRow, rows = Math.ceil(racks / perRow);
         if (rows % 2) rows++;                                          // racks face each other across a hot aisle
         var pairs = rows / 2, pairW = 2 * p.rackDepthM + p.hotAisleM;
-        var length = perRow * p.rackPitchM + 2 * p.endZoneM;
-        var width = pairs * pairW + (pairs + 1) * p.coldAisleM + 2 * 1.5;   // 1.5 m to the fan walls
-        var rowsOut = [], k = 0;
-        for (var i = 0; i < pairs; i++) {
-            var y0 = 1.5 + p.coldAisleM + i * (pairW + p.coldAisleM);
-            rowsOut.push({ y: y0, face: 'south', hotAisleY: y0 + p.rackDepthM });
-            rowsOut.push({ y: y0 + p.rackDepthM + p.hotAisleM, face: 'north', hotAisleY: y0 + p.rackDepthM });
+        var length = perRow * p.rackPitchM + 2 * p.endZoneM;           // x: along the rows
+        var width = pairs * pairW + (pairs + 1) * p.coldAisleM;        // y: across the rows
+        var rowsOut = [], aisles = [], k = 0;
+        for (var i = 0; i <= pairs; i++) aisles.push({ i: i, y0: i * (pairW + p.coldAisleM), y1: i * (pairW + p.coldAisleM) + p.coldAisleM });
+        for (i = 0; i < pairs; i++) {
+            var y0 = p.coldAisleM + i * (pairW + p.coldAisleM);
+            rowsOut.push({ y: y0, aisle: i, hotY0: y0 + p.rackDepthM });           // inlet faces the cold aisle below
+            rowsOut.push({ y: y0 + p.rackDepthM + p.hotAisleM, aisle: i + 1, hotY0: y0 + p.rackDepthM });
         }
-        var rackList = [];
+        // each CDU serves a contiguous block of racks (one secondary loop), feeders alternate A / B
+        var nC = r.liquid.cduPerHall, perCdu = Math.ceil(racks / nC), rackList = [];
         rowsOut.forEach(function (row, ri) {
-            for (var j = 0; j < perRow && k < racks; j++, k++) rackList.push({ i: k, row: ri, x: p.endZoneM + j * p.rackPitchM, y: row.y, cdu: (k % r.liquid.cduPerHall) });
+            for (var j = 0; j < perRow && k < racks; j++, k++) rackList.push({ i: k, row: ri, aisle: row.aisle, x: p.endZoneM + j * p.rackPitchM, y: row.y, cdu: Math.floor(k / perCdu) });
         });
-        var cdus = [], nC = r.liquid.cduPerHall;
-        for (var c = 0; c < nC; c++) cdus.push({ i: c, x: c % 2 ? length - p.endZoneM + 1 : 1, y: 1.5 + (c >> 1) * (width - 3) / Math.max(1, Math.ceil(nC / 2)), feeder: c % 2 ? 'B' : 'A' });
-        var crahs = [], nA = r.air.crahPerHall;
-        for (var a = 0; a < nA; a++) crahs.push({ i: a, x: (a >> 1) * length / Math.ceil(nA / 2) + length / Math.ceil(nA / 2) / 2, y: a % 2 ? width - 0.6 : 0.6, wall: a % 2 ? 'north' : 'south' });
+        var cdus = [];
+        for (var c = 0; c < nC; c++) {
+            var first = rackList[c * perCdu];
+            if (!first) break;
+            var west = Math.floor(first.i / perRow) % 2 === 0;
+            cdus.push({ i: c, x: west ? p.endZoneM / 2 : length - p.endZoneM / 2, y: first.y + p.rackDepthM / 2, feeder: c % 2 ? 'B' : 'A' });
+        }
+        // CRAH fan walls on the two end walls, blowing down the cold aisles; each unit feeds its nearest aisle
+        var crahs = [], nA = r.air.crahPerHall, perWall = Math.ceil(nA / 2);
+        for (var a = 0; a < nA; a++) {
+            var east = a >= perWall, idx = east ? a - perWall : a, n = east ? nA - perWall : perWall;
+            var y = width * (idx + 0.5) / n, near = 0, best = 1e9;
+            aisles.forEach(function (ai) { var dy = Math.abs((ai.y0 + ai.y1) / 2 - y); if (dy < best) { best = dy; near = ai.i; } });
+            crahs.push({ i: a, x: east ? length - 0.4 : 0.4, y: y, wall: east ? 'east' : 'west', aisle: near });
+        }
         return { lengthM: length, widthM: width, heightM: p.hallHeightM, areaM2: length * width, volumeM3: length * width * p.hallHeightM,
-                 rows: rowsOut.length, racksPerRow: perRow, rowsY: rowsOut, racks: rackList, cdus: cdus, crahs: crahs,
+                 rows: rowsOut.length, racksPerRow: perRow, rowsY: rowsOut, aisles: aisles, racks: rackList, cdus: cdus, crahs: crahs,
                  airChangesPerHour: r.air.airflowHallM3s * 3600 / (length * width * p.hallHeightM) };
     }
 

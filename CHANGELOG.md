@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v3.16.0 — 2026-10-11
+
+### LTC Workbench: Tier on the plant's topology, and DH01 when something fails
+
+**Changed — Tier simulator draws DH01 from the shared plant.**
+- Unit counts come from the plant (DH01's share of generators, transformers and UPS modules; its CDUs and
+  CRAHs; the central chiller plant and liquid coolers), the Tier sets the spares and the paths.
+- Power: generators → transformers with their LV boards → UPS → PDU → IT, **and** the MCC that runs the
+  cooling. Cooling: the **liquid** heat sink (CDUs → facility water → liquid coolers) **and** the **air** sink
+  (CRAHs → chilled water → chiller plant). The old cooling view was an air-only chain with no CDU.
+- A load survives only if every group it needs has a working path (IT power and mechanical power; liquid
+  and air sinks). A bus, a UPS output board or a pipe loop is swept as ONE component however many units hang
+  on it — the first cut swept units only and called Tier II cooling fault tolerant; the W2 gate caught it.
+- The sweep gains a *What fails* column in the plant's numbers (e.g. "Liquid sink: 17.1 MW with nowhere to go;
+  TCS reaches 60 °C in ≈3.7 min"). Every layout stays within the nine-block budget; hover traces the paths.
+
+**Added — DH01 thermal map** (hub tab *DH01 thermal*, `js/ltc-dh01.js`). Plan of the hall from the plant's
+geometry: 152 racks in 8 rows, CDUs at the row ends, CRAH fan walls at the aisle ends. Rack inlets from the
+supply/demand balance of each cold aisle, the deficit made up by recirculated exhaust. Faults: CDU feeder A,
+one CDU, 2 or 4 CRAHs, facility water, chiller trip, chilled water (with a minute slider and the transient
+chart). A rack that loses cold-plate flow throttles within seconds, so the default shows the lasting
+consequence — IT shed (feeder A, one loop per CDU: 9.5 MW on 72 racks) — with "if they kept running" as
+the worst case. Labelled a thermal approximation for training, not CFD.
+
+**Gates.** `test-ltc-plant.mjs` P7 (DH01 behaviour). `test-ltc-workbench.mjs` W9 (+10): the group
+combinator, whole-loop sweep, ≤ 9 blocks per Tier layout, DH01 on the hub.
+
 ## v3.15.0 — 2026-10-11
 
 ### LTC Workbench: edit the plant once; the tools stop asking for what it already knows

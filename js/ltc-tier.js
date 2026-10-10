@@ -19,98 +19,85 @@
   'use strict';
   var L = window.LTC;
 
-  /* units: n installed, need k. A node without units is a single component. */
-  var TOPO = {
-    1: { label: 'Tier I — basic capacity',
-      nodes: [
-        { id: 'util', name: 'Utility', sym: 'utility', sub: 'single feed' },
-        { id: 'gen', name: 'Generators', sym: 'genset', units: 2, need: 2 },
-        { id: 'msb', name: 'Main board', sym: 'switchgear', sub: 'ATS + MSB' },
-        { id: 'ups', name: 'UPS', sym: 'ups', units: 2, need: 2 },
-        { id: 'pdu', name: 'PDU', sym: 'pdu', sub: 'single path' },
-        { id: 'rack', name: 'IT load', sym: 'rack', sub: 'single-corded', load: true }],
-      paths: [{ id: 'A', active: true, stages: [['util', 'gen'], 'msb', 'ups', 'pdu'] }] },
-    2: { label: 'Tier II — redundant capacity components',
-      nodes: [
-        { id: 'util', name: 'Utility', sym: 'utility', sub: 'single feed' },
-        { id: 'gen', name: 'Generators', sym: 'genset', units: 3, need: 2 },
-        { id: 'msb', name: 'Main board', sym: 'switchgear', sub: 'ATS + MSB' },
-        { id: 'ups', name: 'UPS', sym: 'ups', units: 3, need: 2 },
-        { id: 'pdu', name: 'PDU', sym: 'pdu', sub: 'single path' },
-        { id: 'rack', name: 'IT load', sym: 'rack', sub: 'single-corded', load: true }],
-      paths: [{ id: 'A', active: true, stages: [['util', 'gen'], 'msb', 'ups', 'pdu'] }] },
-    3: { label: 'Tier III — concurrently maintainable',
-      nodes: [
-        { id: 'gen', name: 'Generator plant', sym: 'genset', units: 3, need: 2 },
-        { id: 'swbA', name: 'Board A', sym: 'switchgear', sub: 'path A · active' },
-        { id: 'swbB', name: 'Board B', sym: 'switchgear', sub: 'path B · alternate' },
-        { id: 'upsA', name: 'UPS A', sym: 'ups', units: 3, need: 2 },
-        { id: 'upsB', name: 'UPS B', sym: 'ups', units: 2, need: 2 },
-        { id: 'pduA', name: 'PDU A', sym: 'pdu', sub: 'active' },
-        { id: 'pduB', name: 'PDU B', sym: 'pdu', sub: 'alternate' },
-        { id: 'rack', name: 'IT load', sym: 'rack', sub: 'dual-corded', load: true }],
-      paths: [{ id: 'A', active: true, stages: ['gen', 'swbA', 'upsA', 'pduA'] },
-              { id: 'B', active: false, stages: ['gen', 'swbB', 'upsB', 'pduB'] }] },
-    4: { label: 'Tier IV — fault tolerant',
-      nodes: [
-        { id: 'genA', name: 'Generators A', sym: 'genset', units: 2, need: 2 },
-        { id: 'genB', name: 'Generators B', sym: 'genset', units: 2, need: 2 },
-        { id: 'swbA', name: 'Board A', sym: 'switchgear', sub: 'system A · active' },
-        { id: 'swbB', name: 'Board B', sym: 'switchgear', sub: 'system B · active' },
-        { id: 'upsA', name: 'UPS A', sym: 'ups', units: 3, need: 2 },
-        { id: 'upsB', name: 'UPS B', sym: 'ups', units: 3, need: 2 },
-        { id: 'pduA', name: 'PDU A', sym: 'pdu', sub: 'active' },
-        { id: 'pduB', name: 'PDU B', sym: 'pdu', sub: 'active' },
-        { id: 'rack', name: 'IT load', sym: 'rack', sub: 'dual-corded', load: true }],
-      paths: [{ id: 'A', active: true, stages: ['genA', 'swbA', 'upsA', 'pduA'] },
-              { id: 'B', active: true, stages: ['genB', 'swbB', 'upsB', 'pduB'] }] }
-  };
-
-  /* Cooling, the same two tests. The chiller plant node includes its heat
-   * rejection (they always travel together); the piping loop is the
-   * distribution path; CRAH units are the terminal capacity. Tier IV adds
-   * continuous cooling (thermal storage) in the Standard — not modelled. */
-  var COOL = {
-    1: { label: 'Tier I — basic capacity',
-      nodes: [
-        { id: 'plant', name: 'Chiller plant', sym: 'chiller', units: 2, need: 2 },
-        { id: 'pmp', name: 'Pumps', sym: 'pump', units: 2, need: 2 },
-        { id: 'loop', name: 'Piping loop', sym: 'valve', sub: 'single path' },
-        { id: 'crah', name: 'CRAH units', sym: 'crah', units: 4, need: 4 },
-        { id: 'rack', name: 'IT heat load', sym: 'rack', sub: 'single path', load: true }],
-      paths: [{ id: 'A', active: true, stages: ['plant', 'pmp', 'loop', 'crah'] }] },
-    2: { label: 'Tier II — redundant capacity components',
-      nodes: [
-        { id: 'plant', name: 'Chiller plant', sym: 'chiller', units: 3, need: 2 },
-        { id: 'pmp', name: 'Pumps', sym: 'pump', units: 3, need: 2 },
-        { id: 'loop', name: 'Piping loop', sym: 'valve', sub: 'single path' },
-        { id: 'crah', name: 'CRAH units', sym: 'crah', units: 5, need: 4 },
-        { id: 'rack', name: 'IT heat load', sym: 'rack', sub: 'single path', load: true }],
-      paths: [{ id: 'A', active: true, stages: ['plant', 'pmp', 'loop', 'crah'] }] },
-    3: { label: 'Tier III — concurrently maintainable',
-      nodes: [
-        { id: 'plant', name: 'Chiller plant', sym: 'chiller', units: 3, need: 2 },
-        { id: 'pmp', name: 'Pumps', sym: 'pump', units: 3, need: 2 },
-        { id: 'loopA', name: 'Loop A', sym: 'valve', sub: 'active' },
-        { id: 'loopB', name: 'Loop B', sym: 'valve', sub: 'alternate, valved' },
-        { id: 'crah', name: 'CRAH units', sym: 'crah', units: 5, need: 4 },
-        { id: 'rack', name: 'IT heat load', sym: 'rack', sub: 'either loop', load: true }],
-      paths: [{ id: 'A', active: true, stages: ['plant', 'pmp', 'loopA', 'crah'] },
-              { id: 'B', active: false, stages: ['plant', 'pmp', 'loopB', 'crah'] }] },
-    4: { label: 'Tier IV — fault tolerant',
-      nodes: [
-        { id: 'plantA', name: 'Plant A', sym: 'chiller', units: 2, need: 2 },
-        { id: 'plantB', name: 'Plant B', sym: 'chiller', units: 2, need: 2 },
-        { id: 'pmpA', name: 'Pumps A', sym: 'pump', units: 2, need: 2 },
-        { id: 'pmpB', name: 'Pumps B', sym: 'pump', units: 2, need: 2 },
-        { id: 'loopA', name: 'Loop A', sym: 'valve', sub: 'active' },
-        { id: 'loopB', name: 'Loop B', sym: 'valve', sub: 'active' },
-        { id: 'crahA', name: 'CRAH A', sym: 'crah', units: 4, need: 4 },
-        { id: 'crahB', name: 'CRAH B', sym: 'crah', units: 4, need: 4 },
-        { id: 'rack', name: 'IT heat load', sym: 'rack', sub: 'two systems', load: true }],
-      paths: [{ id: 'A', active: true, stages: ['plantA', 'pmpA', 'loopA', 'crahA'] },
-              { id: 'B', active: true, stages: ['plantB', 'pmpB', 'loopB', 'crahB'] }] }
-  };
+  /* ---- topology, generated from the shared plant (js/ltc-plant.js) ---------------------
+   * Unit counts are DH01's: the hall's share of generators, transformers and UPS modules, and
+   * the hall's own CDUs and CRAHs; the central chiller plant and liquid coolers at campus size.
+   * The Tier sets the redundancy and the paths, the plant sets N:
+   *   I   N everywhere, one path            II  N+1 capacity, one path
+   *   III N+1, a second (alternate) path    IV  N+N generators, two active paths
+   * A load survives only if EVERY group it needs has a working path: the IT power path AND the
+   * mechanical power path (no power to the pumps is an IT outage a few seconds later); in the
+   * cooling view the liquid heat sink AND the air heat sink. Each view stays within the diagram
+   * engine's nine blocks: LV boards ride with their transformers, towers with their chillers. */
+  function plantN() {
+    var S = window.LTCPlantStrip, r = S ? S.get().result : null;
+    if (!r) return { gen: 9, tx: 9, ups: 17, mcc: 1, cdu: 9, cooler: 41, crah: 16, chiller: 6, fwsPump: 4, chwPump: 3, hall: 'DH01', r: null };
+    var halls = r.input.halls, d = r.design;
+    return {
+      gen: Math.ceil(d.facility / halls / r.input.genUnitKw), tx: Math.ceil((d.upsIn + d.distLoss + d.mcc) / halls / r.input.txUnitKw),
+      ups: Math.ceil(d.upsOut / halls / r.input.upsModuleKw), cdu: r.liquid.cduDutyN, crah: r.air.crahDutyN,
+      cooler: r.liquid.coolerUnits, chiller: r.air.chillersN, fwsPump: Math.max(1, Math.ceil(r.liquid.fwsLps / halls / 400)),
+      chwPump: Math.max(1, Math.ceil(r.air.chwLps / 300)), hall: 'DH01', r: r
+    };
+  }
+  function U(n, extra) { return { units: n + extra, need: n }; }
+  function makeTopo() {
+    var N = plantN(), T = {}, C = {};
+    [1, 2, 3, 4].forEach(function (t) {
+      var x = t === 1 ? 0 : 1;                                   // spare units from Tier II up
+      var gen = t === 4 ? { units: 2 * N.gen, need: N.gen } : U(N.gen, x);
+      var dual = t >= 3, active2 = t === 4;
+      var nodes = [];
+      if (t <= 2) nodes.push({ id: 'util', name: 'Utility', sym: 'utility', sub: 'MV service' });
+      nodes.push(Object.assign({ id: 'gen', name: t === 4 ? 'Generators N+N' : 'Generators', sym: 'genset', unitKw: N.r && N.r.input.genUnitKw }, gen));
+      if (!dual) {
+        nodes.push(Object.assign({ id: 'tx', name: 'TX + LV board', sym: 'transformer', path: true, unitKw: N.r && N.r.input.txUnitKw }, U(N.tx, x)));
+        nodes.push(Object.assign({ id: 'ups', name: 'UPS modules', sym: 'ups', path: true, unitKw: N.r && N.r.input.upsModuleKw }, U(N.ups, x)));
+        nodes.push({ id: 'pdu', name: 'PDU', sym: 'pdu', sub: 'single path' });
+        nodes.push({ id: 'mcc', name: 'MCC', sym: 'breaker', sub: 'mechanical, single' });
+        nodes.push({ id: 'rack', name: 'IT load', sym: 'rack', sub: 'single-corded', load: true });
+        var src = t <= 2 ? [['util', 'gen']] : ['gen'];
+        T[t] = { label: ['', 'Tier I — basic capacity', 'Tier II — redundant capacity components'][t], nodes: nodes,
+          paths: [{ id: 'A', active: true, stages: src.concat(['tx', 'ups', 'pdu']) }],
+          groups: [{ id: 'mech', name: 'mechanical power', paths: [{ id: 'M', active: true, stages: src.concat(['tx', 'mcc']) }] }] };
+      } else {
+        ['A', 'B'].forEach(function (P) {
+          nodes.push(Object.assign({ id: 'tx' + P, name: 'TX + LV ' + P, sym: 'transformer', path: true, unitKw: N.r && N.r.input.txUnitKw }, U(N.tx, 1)));
+        });
+        ['A', 'B'].forEach(function (P) {
+          nodes.push(Object.assign({ id: 'ups' + P, name: 'UPS ' + P, sym: 'ups', path: true, unitKw: N.r && N.r.input.upsModuleKw }, U(N.ups, 1)));
+        });
+        nodes.push({ id: 'pduA', name: 'PDU A', sym: 'pdu', sub: 'active' });
+        nodes.push({ id: 'pduB', name: 'PDU B', sym: 'pdu', sub: active2 ? 'active' : 'alternate' });
+        nodes.push({ id: 'mcc', name: 'MCC A / B', sym: 'breaker', units: 2, need: 1, sub: 'dual-fed mechanical' });
+        nodes.push({ id: 'rack', name: 'IT load', sym: 'rack', sub: 'dual-corded', load: true });
+        T[t] = { label: t === 3 ? 'Tier III — concurrently maintainable' : 'Tier IV — fault tolerant', nodes: nodes,
+          paths: [{ id: 'A', active: true, stages: ['gen', 'txA', 'upsA', 'pduA'] }, { id: 'B', active: active2, stages: ['gen', 'txB', 'upsB', 'pduB'] }],
+          groups: [{ id: 'mech', name: 'mechanical power', paths: [{ id: 'M', active: true, stages: ['gen', ['txA', 'txB'], 'mcc'] }] }] };
+      }
+      /* cooling: two heat sinks, both needed */
+      var cn = [];
+      cn.push(Object.assign({ id: 'cdu', name: 'CDUs', sym: 'cdu', unitKw: N.r && N.r.input.cduUnitKw }, U(N.cdu, x)));
+      if (!dual) cn.push(Object.assign({ id: 'fws', name: 'FWS pumps + loop', sym: 'pump', path: true }, U(N.fwsPump, x)));
+      else { cn.push(Object.assign({ id: 'fwsA', name: 'FWS loop A', sym: 'pump', sub: 'active', path: true }, U(N.fwsPump, 1)));
+             cn.push(Object.assign({ id: 'fwsB', name: 'FWS loop B', sym: 'pump', sub: active2 ? 'active' : 'alternate, valved', path: true }, U(N.fwsPump, 1))); }
+      cn.push(Object.assign({ id: 'cooler', name: 'Liquid coolers', sym: 'dryCooler' }, U(N.cooler, x)));
+      cn.push(Object.assign({ id: 'crah', name: 'CRAHs', sym: 'crah', unitKw: N.r && N.r.input.crahUnitKw }, U(N.crah, x)));
+      if (!dual) cn.push(Object.assign({ id: 'chw', name: 'CHW pumps + loop', sym: 'pump', path: true }, U(N.chwPump, x)));
+      else { cn.push(Object.assign({ id: 'chwA', name: 'CHW loop A', sym: 'pump', sub: 'active', path: true }, U(N.chwPump, 1)));
+             cn.push(Object.assign({ id: 'chwB', name: 'CHW loop B', sym: 'pump', sub: active2 ? 'active' : 'alternate, valved', path: true }, U(N.chwPump, 1))); }
+      cn.push(Object.assign({ id: 'chiller', name: 'Chiller plant', sym: 'chiller', sub: 'with its towers', unitKw: N.r && N.r.input.chillerUnitKw },
+        t === 4 ? { units: 2 * N.chiller, need: N.chiller } : U(N.chiller, x)));
+      cn.push({ id: 'rack', name: 'IT heat load', sym: 'rack', sub: 'liquid + air', load: true });
+      var lp = dual ? [{ id: 'A', active: true, stages: ['cdu', 'fwsA', 'cooler'] }, { id: 'B', active: active2, stages: ['cdu', 'fwsB', 'cooler'] }]
+                    : [{ id: 'A', active: true, stages: ['cdu', 'fws', 'cooler'] }];
+      var ap = dual ? [{ id: 'A', active: true, stages: ['crah', 'chwA', 'chiller'] }, { id: 'B', active: active2, stages: ['crah', 'chwB', 'chiller'] }]
+                    : [{ id: 'A', active: true, stages: ['crah', 'chw', 'chiller'] }];
+      C[t] = { label: T[t].label, nodes: cn, paths: lp, groups: [{ id: 'air', name: 'air heat sink', paths: ap }] };
+    });
+    return { power: T, cooling: C, N: N };
+  }
+  var GEN = makeTopo(), TOPO = GEN.power, COOL = GEN.cooling;
   var SYS = { power: TOPO, cooling: COOL };
   var sysName = 'power';
   function T_(t) { return SYS[sysName][t]; }
@@ -133,23 +120,34 @@
     });
   }
   /** Is the IT load powered? `planned` lets an alternate path be switched in first. */
+  function groupsOf(t) { var T = T_(t); return [{ id: 'main', paths: T.paths }].concat(T.groups || []); }
+  function groupOk(t, g, out, planned) { return g.paths.some(function (p) { return (p.active || planned) && pathOk(t, p, out); }); }
+  /** Is the load carried? Every group it needs must have a working path (IT power AND mechanical
+   *  power; liquid sink AND air sink). `planned` lets an alternate path be switched in first. */
   function powered(t, out, planned) {
-    return T_(t).paths.some(function (p) { return (p.active || planned) && pathOk(t, p, out); });
+    return groupsOf(t).every(function (g) { return groupOk(t, g, out, planned); });
+  }
+  /** Which groups failed — the consequence column of the sweep. */
+  function lostGroups(t, out, planned) {
+    return groupsOf(t).filter(function (g) { return !groupOk(t, g, out, planned); }).map(function (g) { return g.id; });
   }
   /** Every removable element: single components, and each unit of a group. */
   function elements(t) {
     var list = [];
     T_(t).nodes.forEach(function (n) {
       if (n.load) return;
-      if (n.units) for (var k = 1; k <= n.units; k++) list.push({ key: n.id + '#' + k, node: n, label: n.name + ' unit ' + k });
+      // identical units are symmetric: one unit out stands for any one of them
+      if (n.units) list.push({ key: n.id + '#1', node: n, label: n.name + ' — any 1 of ' + n.units });
       else list.push({ key: n.id, node: n, label: n.name });
+      // a bus, a UPS output board, a pipe loop is ONE component however many units hang on it
+      if (n.units && n.path) list.push({ key: n.id, node: n, label: n.name + ' — the whole ' + (/loop/i.test(n.name) ? 'loop' : 'board') });
     });
     return list;
   }
   function sweep(t) {
     return elements(t).map(function (e) {
       var o = {}; o[e.key] = 1;
-      return { e: e, maint: powered(t, o, true), fault: powered(t, o, false) };
+      return { e: e, maint: powered(t, o, true), fault: powered(t, o, false), lost: lostGroups(t, o, false) };
     });
   }
 
@@ -179,8 +177,12 @@
    * that has been switched in). Connectors between two live nodes animate. */
   function liveSet() {
     var t = st.tier, out = outMap(), T = T_(t), live = {};
-    var counting = T.paths.filter(function (p) { return p.active && pathOk(t, p, out); });
-    if (!counting.length && plannedOnly()) counting = T.paths.filter(function (p) { return pathOk(t, p, out); });
+    var counting = [];
+    groupsOf(t).forEach(function (g) {
+      var c = g.paths.filter(function (p) { return p.active && pathOk(t, p, out); });
+      if (!c.length && plannedOnly()) c = g.paths.filter(function (p) { return pathOk(t, p, out); }).slice(0, 1);
+      counting = counting.concat(c);
+    });
     counting.forEach(function (p) {
       p.stages.forEach(function (sg) {
         (Array.isArray(sg) ? sg : [sg]).forEach(function (id) { if (available(t, id, out)) live[id] = 1; });
@@ -199,173 +201,83 @@
     return d;
   }
 
-  /* Generic layout for any topology: shared stages before the paths split, a
-   * row per path, shared stages after they rejoin, then the load. */
-  function buildChain(D, o, T) {
-    var d = withFlow(D.create({ slug: 'cool' + st.tier, title: T.label + ' — cooling path',
-      desc: 'Simplified cooling path for ' + T.label + ': chiller plant, pumps, piping loop and CRAH units to the IT heat load. Select a block to take it out.' }));
-    var P = T.paths, n0 = P[0].stages.length, pre = 0, suf = 0;
-    while (pre < n0 && P.every(function (p) { return p.stages[pre] === P[0].stages[pre]; })) pre++;
-    while (suf < n0 - pre && P.every(function (p) { return p.stages[n0 - 1 - suf] === P[0].stages[n0 - 1 - suf]; })) suf++;
-    var load = T.nodes.filter(function (n) { return n.load; })[0];
-    var box = {}, G = 40, RG = 32;
-    function N(id, x, y, extra) {
-      var n = nodeOf(st.tier, id);
-      box[id] = d.node(x, y, Object.assign({ id: id, name: n.name, sublabel: nodeSub(n), symbol: n.sym, interactive: true,
-        state: nodeState(n) || undefined, focal: !!n.load, fill: n.load ? 'paper-2' : 'paper', tier: n.load ? 1 : 2,
-        legend: n.load ? 'IT heat load' : 'Cooling component' }, extra || {}));
-      return box[id];
+  /* ---- figure: one grid spec per (system, single/dual path) ---------------------------
+   * [id, col, row, {rows: span}] and edges [from, side, to, side, style]. Sides l r t b, or
+   * l1/l2, b1/b2 … for two connectors sharing an edge (fanned at thirds). Narrow panes stack
+   * the blocks in one column; a connector that skips a block runs down a side channel. */
+  var LAY = {
+    power1: { nodes: [['util', 0, 0], ['gen', 0, 1], ['tx', 1, 0], ['ups', 2, 0], ['pdu', 3, 0], ['rack', 4, 0, { rows: 2 }], ['mcc', 2, 1]],
+      edges: [['util', 'r', 'tx', 'l', 'P'], ['gen', 'r', 'tx', 'b1', 'P'], ['tx', 'r', 'ups', 'l', 'P'], ['ups', 'r', 'pdu', 'l', 'P'],
+              ['pdu', 'r', 'rack', 'l', 'P'], ['tx', 'b2', 'mcc', 'l', 'P'], ['mcc', 'r', 'rack', 'l', 'M']] },
+    power2: { nodes: [['gen', 0, 1], ['txA', 1, 0], ['upsA', 2, 0], ['pduA', 3, 0], ['mcc', 2, 1], ['txB', 1, 2], ['upsB', 2, 2], ['pduB', 3, 2], ['rack', 4, 0, { rows: 3 }]],
+      edges: [['gen', 't', 'txA', 'l', 'P'], ['gen', 'b', 'txB', 'l', 'B'], ['txA', 'r', 'upsA', 'l', 'P'], ['upsA', 'r', 'pduA', 'l', 'P'], ['pduA', 'r', 'rack', 'l', 'P'],
+              ['txB', 'r', 'upsB', 'l', 'B'], ['upsB', 'r', 'pduB', 'l', 'B'], ['pduB', 'r', 'rack', 'l', 'B'],
+              ['txA', 'b', 'mcc', 'l1', 'P'], ['txB', 't', 'mcc', 'l2', 'B'], ['mcc', 'r', 'rack', 'l', 'M']] },
+    cool1: { nodes: [['rack', 0, 0, { rows: 2 }], ['cdu', 1, 0], ['fws', 2, 0], ['cooler', 3, 0], ['crah', 1, 1], ['chw', 2, 1], ['chiller', 3, 1]],
+      edges: [['rack', 'r', 'cdu', 'l', 'Q'], ['cdu', 'r', 'fws', 'l', 'Q'], ['fws', 'r', 'cooler', 'l', 'Q'],
+              ['rack', 'r', 'crah', 'l', 'A'], ['crah', 'r', 'chw', 'l', 'A'], ['chw', 'r', 'chiller', 'l', 'A']] },
+    cool2: { nodes: [['rack', 0, 0, { rows: 4 }], ['cdu', 1, 0], ['fwsA', 2, 0], ['fwsB', 2, 1], ['cooler', 3, 0], ['crah', 1, 2], ['chwA', 2, 2], ['chwB', 2, 3], ['chiller', 3, 2]],
+      edges: [['rack', 'r', 'cdu', 'l', 'Q'], ['cdu', 'r', 'fwsA', 'l', 'Q'], ['cdu', 'b', 'fwsB', 'l', 'QB'], ['fwsA', 'r', 'cooler', 'l', 'Q'], ['fwsB', 'r', 'cooler', 'b', 'QB'],
+              ['rack', 'r', 'crah', 'l', 'A'], ['crah', 'r', 'chwA', 'l', 'A'], ['crah', 'b', 'chwB', 'l', 'AB'], ['chwA', 'r', 'chiller', 'l', 'A'], ['chwB', 'r', 'chiller', 'b', 'AB']] }
+  };
+  function build(D, o) {
+    var T = T_(st.tier), cool = sysName === 'cooling', dual = T.paths.length === 2, altActive = dual && T.paths[1].active;
+    var spec = LAY[(cool ? 'cool' : 'power') + (dual ? 2 : 1)];
+    var d = withFlow(D.create({ slug: (cool ? 'cool' : 'tier') + st.tier, title: T.label + (cool ? ' — liquid and air heat sinks' : ' — IT and mechanical power'),
+      desc: (cool ? 'DH01 cooling for ' + T.label + ': the liquid sink (CDUs, facility water, liquid coolers) and the air sink (CRAHs, chilled water, chiller plant); the IT heat load needs both.'
+                  : 'DH01 power for ' + T.label + ': generators, transformers with their LV boards, UPS and PDUs to the IT load, and the MCC that keeps the cooling running.') +
+            ' Select a block to take it out.' }));
+    var NW = 168, NH = 88, CG = 44, RG = 40, box = {};
+    var order = spec.nodes.slice().sort(function (a, b) { return a[1] - b[1] || a[2] - b[2]; }).map(function (x) { return x[0]; });
+    spec.nodes.forEach(function (sp) {
+      var n = nodeOf(st.tier, sp[0]), ex = sp[3] || {};
+      if (!n) return;
+      var x = o.narrow ? 24 : 24 + sp[1] * (NW + CG), y = o.narrow ? 16 + order.indexOf(sp[0]) * (NH + 36) : 24 + sp[2] * (NH + RG);
+      var h = !o.narrow && ex.rows ? NH + (ex.rows - 1) * (NH + RG) : NH;
+      box[sp[0]] = d.node(x, y, { id: n.id, name: n.name, sublabel: nodeSub(n), symbol: n.sym, interactive: true,
+        state: nodeState(n) || undefined, focal: !!n.load, fill: n.load ? 'paper-2' : 'paper', tier: n.load ? 1 : 2, w: o.narrow ? 220 : NW, h: h,
+        legend: n.load ? (cool ? 'IT heat load' : 'IT load') : (cool ? 'Cooling component' : 'Power component') });
+    });
+    var STY = { P: { tier: 1, stroke: 'ink', legend: 'Active path' }, B: altActive ? { tier: 1, stroke: 'ink' } : { tier: 2, stroke: 'muted', pattern: 'dashed', legend: 'Alternate path' },
+                M: { tier: 2, stroke: 'soft', pattern: 'dotted', legend: 'Keeps the cooling running' },
+                Q: { tier: 1, stroke: 'link', pattern: 'dashed', legend: 'Liquid heat sink' }, QB: altActive ? { tier: 1, stroke: 'link', pattern: 'dashed' } : { tier: 2, stroke: 'muted', pattern: 'dotted', legend: 'Alternate loop' },
+                A: { tier: 1, stroke: 'accent', pattern: 'dash-dot', legend: 'Air heat sink' }, AB: altActive ? { tier: 1, stroke: 'accent', pattern: 'dash-dot' } : { tier: 2, stroke: 'muted', pattern: 'dotted', legend: 'Alternate loop' } };
+    function at(bx, side) {
+      var k = side.charAt(1) ? +side.charAt(1) : 0, f = k ? k / 3 : 0.5, s0 = side.charAt(0);
+      return s0 === 'l' ? { x: bx.x, y: bx.y + bx.h * f } : s0 === 'r' ? { x: bx.x + bx.w, y: bx.y + bx.h * f }
+           : s0 === 't' ? { x: bx.x + bx.w * f, y: bx.y } : { x: bx.x + bx.w * f, y: bx.y + bx.h };
     }
-    var V = o.narrow;                       /* narrow: everything flows downward */
-    function next(b) { return V ? { x: b.x, y: b.y + b.h + G } : { x: b.x + b.w + G, y: b.y }; }
-    function E(a, b, extra) {
-      var A = box[a], B = box[b];
-      d.edge(V ? { x: A.x + A.w / 2, y: A.y + A.h } : { x: A.x + A.w, y: A.y + A.h / 2 },
-             V ? { x: B.x + B.w / 2, y: B.y } : { x: B.x, y: B.y + B.h / 2 },
-             Object.assign({ fromId: a, toId: b, tier: 1, stroke: 'link', legend: 'Chilled water' }, extra || {}));
-    }
-    var lanes = P.length, laneSpan = V ? 168 : 132;
-    var mid = 16 + (lanes - 1) * laneSpan / 2;
-    var cur = V ? { x: mid, y: 16 } : { x: 16, y: mid };
-    var last = null;
-    for (var i = 0; i < pre; i++) { var id = P[0].stages[i]; N(id, cur.x, cur.y); if (last) E(last, id); last = id; cur = next(box[id]); }
-    var tails = [];
-    P.forEach(function (p, k) {
-      var c = V ? { x: 16 + k * laneSpan, y: cur.y } : { x: cur.x, y: 16 + k * laneSpan };
-      var prev = last;
-      for (var j = pre; j < n0 - suf; j++) {
-        var sid = p.stages[j];
-        N(sid, c.x, c.y);
-        if (prev) E(prev, sid, p.active ? {} : { tier: 2, stroke: 'muted', pattern: 'dashed', legend: 'Alternate path' });
-        prev = sid; c = next(box[sid]);
+    var skip = 0;
+    spec.edges.forEach(function (e) {
+      var A = box[e[0]], B = box[e[2]]; if (!A || !B) return;
+      var p1 = at(A, e[1]), p2 = at(B, e[3]);
+      if (!o.narrow) {   // a connector into or out of a tall block stays level with its other end
+        if (B.h > NH && e[3].charAt(0) === 'l') p2 = { x: B.x, y: p1.y };
+        if (A.h > NH && e[1].charAt(0) === 'r') p1 = { x: A.x + A.w, y: p2.y };
+      } else {
+        var ia = order.indexOf(e[0]), ib = order.indexOf(e[2]);
+        if (Math.abs(ia - ib) === 1) { var dn = A.y < B.y; p1 = { x: A.x + A.w / 2, y: dn ? A.y + A.h : A.y }; p2 = { x: B.x + B.w / 2, y: dn ? B.y : B.y + B.h }; }
+        else { skip++; var off = -10 + (skip % 3) * 10; p1 = { x: A.x + A.w, y: A.y + A.h / 2 + off }; p2 = { x: B.x + B.w, y: B.y + B.h / 2 + off }; }
       }
-      tails.push({ id: prev, active: p.active, end: c });
+      d.edge(p1, p2, Object.assign({ fromId: e[0], toId: e[2], id: e[0] + '>' + e[2] }, STY[e[4]]));
     });
-    var far = tails.reduce(function (m, t) { return V ? Math.max(m, t.end.y) : Math.max(m, t.end.x); }, 0);
-    cur = V ? { x: mid, y: far } : { x: far, y: mid };
-    var join = suf ? P[0].stages[n0 - suf] : load.id;
-    /* the load spans every lane: in the narrow layout it starts at the first lane, decided BEFORE it is drawn */
-    N(join, join === load.id && V ? 16 : cur.x, cur.y, join === load.id ? (V ? { w: 2 * laneSpan - 40 + 16 } : { h: 132 * (lanes - 1) + 88 }) : {});
-    /* the paths rejoin on one edge of the join node: fan the attach points (rule 4) */
-    var ports = d.ports(box[join], tails.length, V ? 'top' : 'left', { id: join });
-    tails.forEach(function (t, k) {
-      var A = box[t.id];
-      var ex = t.active ? {} : { tier: 2, stroke: 'muted', pattern: 'dashed' };
-      d.edge(V ? { x: A.x + A.w / 2, y: A.y + A.h } : { x: A.x + A.w, y: A.y + A.h / 2 }, ports[k],
-             Object.assign({ fromId: t.id, toId: join, tier: 1, stroke: 'link' }, ex));
-    });
-    last = join;
-    for (var q = n0 - suf + 1; q < n0; q++) { var qid = P[0].stages[q]; N(qid, next(box[last]).x, next(box[last]).y); E(last, qid); last = qid; }
-    if (join !== load.id) { N(load.id, next(box[last]).x, next(box[last]).y); E(last, load.id); }
     d.legend();
     return d;
   }
 
-  function build(D, o) {
-    var T = T_(st.tier);
-    if (sysName === 'cooling') return buildChain(D, o, T);
-    var d = withFlow(D.create({ slug: 'tier' + st.tier, title: T.label + ' — power path',
-      desc: 'Simplified power path for ' + T.label + '. Select a block to take it out for maintenance or fail it; the IT load shows whether it stays powered.' }));
-    var box = {};
-    var G = o.narrow ? 24 : 40;
-    function N(id, x, y, extra) {
-      var n = nodeOf(st.tier, id);
-      box[id] = d.node(x, y, Object.assign({ id: id, name: n.name, sublabel: nodeSub(n), symbol: n.sym, interactive: true,
-        state: nodeState(n) || undefined, focal: !!n.load, fill: n.load ? 'paper-2' : 'paper', tier: n.load ? 1 : 2,
-        legend: n.load ? 'IT load' : 'Power component' }, extra || {}));
-      return box[id];
-    }
-    function link(a, b, dir, extra) {
-      var A = box[a], B = box[b];
-      var p1 = dir === 'v' ? { x: A.x + A.w / 2, y: A.y + A.h } : { x: A.x + A.w, y: A.y + A.h / 2 };
-      var p2 = dir === 'v' ? { x: B.x + B.w / 2, y: B.y } : { x: B.x, y: B.y + B.h / 2 };
-      d.edge(p1, p2, Object.assign({ fromId: a, toId: b, tier: 1, stroke: 'ink' }, extra || {}));
-    }
-    var dual = T.paths.length === 2;
-    if (!dual) {
-      var dir = o.narrow ? 'v' : 'h';
-      var x = 16, y = 16;
-      N('util', x, y);
-      N('gen', o.narrow ? box.util.x + box.util.w + G : x, o.narrow ? y : y + box.util.h + G);
-      var mx = o.narrow ? x : Math.max(box.util.x + box.util.w, box.gen.x + box.gen.w) + G;
-      var my = o.narrow ? Math.max(box.util.h, box.gen.h) + y + G : y + (box.util.h + G) / 2;
-      N('msb', mx, my);
-      var seq = ['msb', 'ups', 'pdu', 'rack'];
-      for (var i = 1; i < seq.length; i++) {
-        var prev = box[seq[i - 1]];
-        if (o.narrow) N(seq[i], x, prev.y + prev.h + G); else N(seq[i], prev.x + prev.w + G, my);
-      }
-      if (o.narrow) {
-        var tp = d.ports(box.msb, 2, 'top', { id: 'msb' });
-        d.edge({ x: tp[0].x, y: box.util.y + box.util.h }, tp[0], { fromId: 'util', toId: 'msb', tier: 1, stroke: 'ink', legend: 'Power' });
-        d.edge({ x: box.gen.x + box.gen.w / 2, y: box.gen.y + box.gen.h }, tp[1], { fromId: 'gen', toId: 'msb', tier: 1, stroke: 'ink' });
-      } else {
-        var lp = d.ports(box.msb, 2, 'left', { id: 'msb' });
-        d.edge({ x: box.util.x + box.util.w, y: box.util.y + box.util.h / 2 }, lp[0], { fromId: 'util', toId: 'msb', tier: 1, stroke: 'ink', legend: 'Power' });
-        d.edge({ x: box.gen.x + box.gen.w, y: box.gen.y + box.gen.h / 2 }, lp[1], { fromId: 'gen', toId: 'msb', tier: 1, stroke: 'ink' });
-      }
-      for (var j = 1; j < seq.length; j++) link(seq[j - 1], seq[j], dir);
-    } else {
-      /* two paths: A on top, B below (wide) or A left, B right (narrow) */
-      var shared = st.tier === 3;
-      var cols = ['sw', 'ups', 'pdu'];
-      if (!o.narrow) {
-        var x0 = 16, yA = 16;
-        if (shared) N('gen', x0, yA + 60); else { N('genA', x0, yA); N('genB', x0, yA + 150); }
-        var gx = (shared ? box.gen : box.genA);
-        var cx = gx.x + gx.w + G + 16;
-        ['A', 'B'].forEach(function (P, pi) {
-          var yy = yA + pi * 150;
-          N('swb' + P, cx, yy); N('ups' + P, box['swb' + P].x + box['swb' + P].w + G, yy);
-          N('pdu' + P, box['ups' + P].x + box['ups' + P].w + G, yy);
-        });
-        var rx = Math.max(box.pduA.x + box.pduA.w, box.pduB.x + box.pduB.w) + G + 8;
-        N('rack', rx, yA + 20, { h: 150 + box.pduB.h - 40 });
-        if (shared) {
-          var gp = d.ports(box.gen, 2, 'right', { id: 'gen' });
-          d.edge(gp[0], { x: box.swbA.x, y: box.swbA.y + box.swbA.h / 2 }, { fromId: 'gen', toId: 'swbA', tier: 1, stroke: 'ink', legend: 'Active path' });
-          d.edge(gp[1], { x: box.swbB.x, y: box.swbB.y + box.swbB.h / 2 }, { fromId: 'gen', toId: 'swbB', tier: 2, stroke: 'muted', pattern: 'dashed', legend: 'Alternate path' });
-        } else {
-          link('genA', 'swbA', 'h', { legend: 'Active path' }); link('genB', 'swbB', 'h');
-        }
-        ['A', 'B'].forEach(function (P) {
-          var alt = shared && P === 'B';
-          var ex = alt ? { tier: 2, stroke: 'muted', pattern: 'dashed' } : {};
-          link('swb' + P, 'ups' + P, 'h', ex); link('ups' + P, 'pdu' + P, 'h', ex);
-        });
-        var rp = d.ports(box.rack, 2, 'left', { id: 'rack' });
-        d.edge({ x: box.pduA.x + box.pduA.w, y: rp[0].y }, rp[0], { fromId: 'pduA', toId: 'rack', tier: 1, stroke: 'ink' });
-        d.edge({ x: box.pduB.x + box.pduB.w, y: rp[1].y }, rp[1], Object.assign({ fromId: 'pduB', toId: 'rack' }, shared ? { tier: 2, stroke: 'muted', pattern: 'dashed' } : { tier: 1, stroke: 'ink' }));
-      } else {
-        var xa = 16, xb;
-        if (shared) N('gen', xa, 16, {}); else N('genA', xa, 16);
-        if (!shared) N('genB', box.genA.x + box.genA.w + G, 16);
-        var top = shared ? box.gen : box.genA;
-        var y1 = top.y + top.h + G;
-        N('swbA', xa, y1);
-        xb = Math.max(box.swbA.x + box.swbA.w + G, shared ? 0 : box.genB.x);
-        N('swbB', xb, y1);
-        N('upsA', xa, box.swbA.y + box.swbA.h + G); N('upsB', xb, box.swbB.y + box.swbB.h + G);
-        N('pduA', xa, box.upsA.y + box.upsA.h + G); N('pduB', xb, box.upsB.y + box.upsB.h + G);
-        N('rack', xa, Math.max(box.pduA.y + box.pduA.h, box.pduB.y + box.pduB.h) + G,
-          { w: box.pduB.x + box.pduB.w - xa });
-        if (shared) {
-          var bp = d.ports(box.gen, 2, 'bottom', { id: 'gen' });
-          d.edge(bp[0], { x: box.swbA.x + box.swbA.w / 2, y: box.swbA.y }, { fromId: 'gen', toId: 'swbA', tier: 1, stroke: 'ink', legend: 'Active path' });
-          d.edge(bp[1], { x: box.swbB.x + box.swbB.w / 2, y: box.swbB.y }, { fromId: 'gen', toId: 'swbB', tier: 2, stroke: 'muted', pattern: 'dashed', legend: 'Alternate path' });
-        } else { link('genA', 'swbA', 'v', { legend: 'Active path' }); link('genB', 'swbB', 'v'); }
-        ['A', 'B'].forEach(function (P) {
-          var ex = shared && P === 'B' ? { tier: 2, stroke: 'muted', pattern: 'dashed' } : {};
-          link('swb' + P, 'ups' + P, 'v', ex); link('ups' + P, 'pdu' + P, 'v', ex);
-        });
-        var tpp = d.ports(box.rack, 2, 'top', { id: 'rack' });
-        d.edge({ x: tpp[0].x, y: box.pduA.y + box.pduA.h }, tpp[0], { fromId: 'pduA', toId: 'rack', tier: 1, stroke: 'ink' });
-        d.edge({ x: box.pduB.x + box.pduB.w / 2, y: box.pduB.y + box.pduB.h }, tpp[1],
-          Object.assign({ fromId: 'pduB', toId: 'rack' }, shared ? { tier: 2, stroke: 'muted', pattern: 'dashed' } : { tier: 1, stroke: 'ink' }));
-      }
-    }
-    d.legend();
-    return d;
+  /* live numbers for the hover tooltip: units, unit size, capacity against the hall's need */
+  function tierTips() {
+    var t = {}, N = plantN(), r = N.r;
+    T_(st.tier).nodes.forEach(function (n) {
+      var rows = [];
+      if (n.units) {
+        rows.push(['Installed', String(n.units)], ['Needed (N)', String(n.need)], ['Redundancy', n.units > n.need ? (n.units >= 2 * n.need ? '2N / N+N' : 'N+' + (n.units - n.need)) : 'none']);
+        if (n.unitKw) rows.push(['Unit size', L.fmt(n.unitKw, 0) + ' kW'], ['Capacity at N', L.fmt(n.need * n.unitKw / 1000, 1) + ' MW']);
+      } else if (!n.load) rows.push(['Component', n.sub || 'single']);
+      if (n.load && r) rows.push(['Hall IT', L.fmt(r.it.hallKw / 1000, 1) + ' MW'], ['Liquid / air', L.fmt(r.liquid.dutyKw / r.input.halls / 1000, 1) + ' / ' + L.fmt(r.air.hallLoadKw / 1000, 1) + ' MW']);
+      t[n.id] = { title: n.name, rows: rows, formula: n.units ? 'N = ceil(DH01 load / unit size); spares by Tier' : '' };
+    });
+    return t;
   }
 
   /* ---- verdicts ---------------------------------------------------------- */
@@ -386,13 +298,27 @@
     document.getElementById('tSummary').innerHTML = '<dl class="ltc-readouts">' +
       ro('Concurrently maintainable', cm ? 'yes' : 'no — ' + sw.filter(function (r) { return !r.maint; }).length + ' blockers', cm ? 'ok' : 'fail') +
       ro('Fault tolerant (single failure)', ft ? 'yes' : 'no — ' + sw.filter(function (r) { return !r.fault; }).length + ' SPOF', ft ? 'ok' : 'fail') +
-      ro('Elements tested', String(sw.length)) + '</dl>';
-    document.getElementById('tSweep').innerHTML = '<table class="ltc-table"><thead><tr><th>Element taken out</th><th>Planned maintenance</th><th>Unplanned failure</th></tr></thead><tbody>' +
+      ro('Elements tested', String(sw.length)) + '</dl>' +
+      '<p class="ltc-note">Counts are DH01’s, from the shared plant (edit it in the strip above). See what each cooling fault does to the hall on the <a href="standards-ltc-lab.html#thermal">DH01 thermal map →</a></p>';
+    document.getElementById('tSweep').innerHTML = '<table class="ltc-table"><thead><tr><th>Element taken out</th><th>Planned maintenance</th><th>Unplanned failure</th><th>What fails</th></tr></thead><tbody>' +
       sw.map(function (r) {
         function c(ok) { return ok ? '<span style="color:var(--g)">load carried</span>' : '<b style="color:var(--r)">load lost</b>'; }
-        return '<tr><td>' + L.esc(r.e.label) + '</td><td>' + c(r.maint) + '</td><td>' + c(r.fault) + '</td></tr>';
+        return '<tr><td>' + L.esc(r.e.label) + '</td><td>' + c(r.maint) + '</td><td>' + c(r.fault) + '</td><td>' + consequence(r) + '</td></tr>';
       }).join('') + '</tbody></table>';
     document.querySelectorAll('[data-tier]').forEach(function (b) { b.setAttribute('aria-pressed', +b.getAttribute('data-tier') === st.tier ? 'true' : 'false'); });
+  }
+
+  /* What an unplanned loss of this element takes down, in the plant's own numbers. */
+  function consequence(r) {
+    if (!r.lost.length) return '<span style="color:var(--t3)">—</span>';
+    var N = plantN(), x = N.r, hall = x ? x.it.hallKw / 1000 : 0, mw = function (v) { return L.fmt(v, 1) + ' MW'; };
+    return r.lost.map(function (g) {
+      if (g === 'main' && sysName === 'power') return 'IT power: ' + mw(hall) + ' of IT drops';
+      if (g === 'mech') return 'Mechanical power: pumps and fans stop; cold plates throttle in seconds';
+      if (g === 'main') return 'Liquid sink: ' + (x ? mw(x.liquid.dutyKw / x.input.halls / 1000) : '') + ' with nowhere to go; TCS reaches ' + (x ? x.input.throttleC : 60) + ' °C in ≈' + (x ? Math.round(window.LTCPlant.transient(x, 'fws-pump').secondsToLimit / 60 * 10) / 10 : '') + ' min';
+      if (g === 'air') return 'Air sink: ' + (x ? mw(x.air.hallLoadKw / 1000) : '') + ' of air heat unremoved; CHW warms past the coil limit in ≈' + (x ? Math.round((window.LTCPlant.transient(x, 'chw').secondsToLimit || 0) / 60 * 10) / 10 : '') + ' min';
+      return g;
+    }).join('; ');
   }
 
   /* inspector: per-unit controls for the selected block */
@@ -480,11 +406,16 @@
       });
     });
     fig = L.draw(document.getElementById('tFig'), build, inspectNode);
+    if (window.LTCTrace) LTCTrace.attach(document.getElementById('tFig'), tierTips);
+    /* the plant changes N: regenerate the four Tiers from it */
+    if (window.LTCPlantStrip) window.LTCPlantStrip.onChange(function () {
+      GEN = makeTopo(); TOPO = GEN.power; COOL = GEN.cooling; SYS = { power: TOPO, cooling: COOL }; st.out = {}; render();
+    });
     render();
     availTable();
     document.getElementById('p-availability').addEventListener('input', availCalc);
     availCalc();
   }
-  window.LTCTier = { TOPO: TOPO, COOL: COOL, powered: powered, sweep: sweep, kOfN: kOfN, system: function (n) { sysName = n; } };
+  window.LTCTier = { get TOPO() { return TOPO; }, get COOL() { return COOL; }, powered: powered, sweep: sweep, kOfN: kOfN, lostGroups: lostGroups, system: function (n) { sysName = n; } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
