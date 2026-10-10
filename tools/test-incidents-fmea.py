@@ -61,7 +61,7 @@ def main():
         if 'id="fmea"' not in html:
             problems.append(f"{slug}: page has no FMEA section — rebuild with tools/build-incidents.py --apply, "
                             f"or the block was omitted as invalid (see the errors above)")
-        elif len(re.findall(r'<details class="fm-row">', html)) != len(modes):
+        elif len(re.findall(r'<details class="fm-row"[ >]', html)) != len(modes):
             problems.append(f"{slug}: page shows {len(re.findall(r'<details class=\"fm-row\">', html))} "
                             f"rows for {len(modes)} modes — page is stale; rebuild")
 

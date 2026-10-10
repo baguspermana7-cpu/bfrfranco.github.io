@@ -233,18 +233,18 @@ def pareto_html(modes):
     rows = sorted(modes, key=lambda m: -rpn(m))
     top = max(rpn(m) for m in rows)
     scale = max(100, int(math.ceil(top / 100.0)) * 100)
-    out = ['<div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action">']
+    out = [f'<div class="fm-pb" role="list" data-scale="{scale}" aria-label="Risk priority number per failure mode, before and after corrective action">']
     for m in rows:
         r0 = rpn(m)
         p = priority(m)
         rev = m.get("revised")
-        rev_bar = (f'<i class="fm-pb-rev" style="width:{100 * rpn(rev) / scale:.1f}%"></i>' if rev
+        rev_bar = (f'<i class="fm-pb-rev" style="transform:scaleX({rpn(rev) / scale:.3f})"></i>' if rev
                    else '<i class="fm-pb-none">no published action</i>')
         val = f'{r0} → {rpn(rev)}' if rev else f'{r0}'
         out.append(
-            f'<div class="fm-pb-row" role="listitem" title="{esc(m["id"])} {esc(m["failureMode"])}">'
+            f'<div class="fm-pb-row" role="listitem" data-id="{esc(m["id"])}" title="{esc(m["id"])} {esc(m["failureMode"])}">'
             f'<span class="fm-pb-id">{esc(m["id"])}</span>'
-            f'<span class="fm-pb-track"><i class="fm-pb-bar" style="width:{100 * r0 / scale:.1f}%;background:{_PRIO_VAR[p]}"></i>{rev_bar}</span>'
+            f'<span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX({r0 / scale:.3f});background:{_PRIO_VAR[p]}"></i>{rev_bar}</span>'
             f'<span class="fm-pb-val">{val}</span></div>')
     out.append(f'<div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span>'
                f'<span>{scale // 2}</span><span>{scale}</span></span><span></span></div>')
@@ -289,6 +289,7 @@ def matrix_svg(modes):
     # is estimated from the mono advance (0.6 em at 10px) -- tools/incidents-visual-qa.mjs
     # measures the real rendered boxes and fails on any overlap this misses.
     CH, LH, R = 6.0, 10.0, 6.0
+    out.append('<g class="fm-pts">')
     markers = []
     for (s, o), ms in sorted(cells.items()):
         markers.append((gx(o), gy(s)))
@@ -302,7 +303,7 @@ def matrix_svg(modes):
         ids = ", ".join(m["id"].replace("FM-", "") for m in sorted(ms, key=lambda m: m["id"]))
         tip = "; ".join(f'{m["id"]} {m["failureMode"]} (S{m["S"]} O{m["O"]} D{m["D"]})' for m in ms)
         cx, cy = gx(o), gy(s)
-        out.append(f'<circle class="fm-pt" cx="{cx:.1f}" cy="{cy:.1f}" r="6" fill="{_PRIO_VAR[priority(worst)]}">'
+        out.append(f'<circle class="fm-pt" data-ids="{esc(" ".join(m["id"] for m in ms))}" cx="{cx:.1f}" cy="{cy:.1f}" r="6" fill="{_PRIO_VAR[priority(worst)]}">'
                    f'<title>{esc(tip)}</title></circle>')
         w = CH * len(ids) + 2
         slots = [
@@ -314,7 +315,7 @@ def matrix_svg(modes):
         lx, ly, anchor, box = next((sl for sl in slots if not clash(sl[3])), slots[0])
         placed.append(box)
         out.append(f'<text class="fm-pt-l" x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}">{esc(ids)}</text>')
-    out.append("</svg>")
+    out.append("</g></svg>")
     return "".join(out)
 
 
@@ -345,11 +346,11 @@ def worksheet_html(inc):
         acts = "".join(
             f'<li>{esc(a["text"])} <span class="fm-ev-src">{esc(resolve_evidence(inc, a["evidence"])["label"])}</span></li>'
             for a in (m.get("actions") or [])
-        ) or '<li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li>'
+        ) or '<li class="fm-residual">None published — residual risk.</li>'
         rev_line = (f'<p class="fm-revline">After action: S{rev["S"]} · O{rev["O"]} · D{rev["D"]} → RPN {rpn(rev)}. '
                     f'{esc(m.get("revisedRationale", ""))}</p>') if rev else ""
         ev = "".join(_ev_html(inc, e) for e in m.get("evidence", []))
-        rows.append(f"""<details class="fm-row">
+        rows.append(f"""<details class="fm-row" data-id="{esc(m["id"])}">
   <summary>
     <span class="fm-id-cell">{esc(m["id"])}</span>
     <span class="fm-mode">{esc(m["failureMode"])}<span class="fm-item">{esc(m["item"])}</span></span>
@@ -370,12 +371,12 @@ def worksheet_html(inc):
       {_score_cell("O", m["O"], m["rationale"]["O"])}
       {_score_cell("D", m["D"], m["rationale"]["D"])}
     </dl>
-    <p class="fm-sub">Priority: <b>{_PRIO_LABEL[p]}</b> · RPN {r0}</p>
     <p class="fm-sub">Corrective action</p>
     <ul class="fm-acts">{acts}</ul>
     {rev_line}
     <p class="fm-sub">Evidence</p>
     <ul class="fm-ev">{ev}</ul>
+    <button type="button" class="fm-wi-open" data-id="{esc(m["id"])}" hidden>Open in what-if</button>
   </div>
 </details>""")
     return "".join(rows)
@@ -387,17 +388,60 @@ def _rubric_html():
         return f'<div><p class="fm-sub">{title}</p><table class="fm-rubric"><tbody>{rows}</tbody></table></div>'
     return (f'<details class="fm-method"><summary>Scoring rubric and method</summary>'
             f'<div class="fm-method-body">'
-            f'<p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the '
-            f'cause was given the controls in place at the time, and how likely those controls were to catch it before '
-            f'customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the '
-            f'AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; '
-            f'Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by '
-            f'small O and D can hide a region-wide outage nothing would catch.</p>'
-            f'<p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by '
-            f'<code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. '
-            f'This is an RZ analyst assessment, not an operator document.</p>'
+            f'<p>Scales adapted from IEC 60812:2018 and AIAG-VDA. RPN = S × O × D. High: S ≥ 9 with O ≥ 4 or D ≥ 7, '
+            f'or RPN ≥ 300. Medium: RPN ≥ 120 or S ≥ 7. Severity overrides the product: 9 × 2 × 9 = 162 would otherwise '
+            f'hide a region-wide outage nothing could catch. Quotes are checked verbatim against this dossier; a revised '
+            f'score needs a published action. RZ analyst assessment, not an operator document.</p>'
             f'<div class="fm-rubrics">{table("S", "Severity")}{table("O", "Occurrence")}{table("D", "Detection")}</div>'
             f'</div></details>')
+
+
+def sim_data(inc):
+    """What the in-page simulator needs, and nothing the page does not already show.
+
+    Each mode carries the SOE indices its evidence cites, so the replay can light a
+    mode at the first event that shows it; a mode citing no SOE entry is "latent" and
+    lights at the end. Rubric text travels with the data so a dragged score reads as
+    words, not a bare number."""
+    f = inc["fmea"]
+    soe = inc.get("sequenceOfEvents") or []
+    modes = []
+    for m in f["modes"]:
+        idx = sorted({e["i"] for e in m.get("evidence", []) if e.get("src") == "soe" and isinstance(e.get("i"), int)})
+        rev = m.get("revised")
+        modes.append({
+            "id": m["id"], "fm": m["failureMode"], "item": m["item"],
+            "S": m["S"], "O": m["O"], "D": m["D"],
+            "rev": {k: rev[k] for k in "SOD"} if rev else None,
+            "why": m["rationale"], "soe": idx,
+        })
+    return {
+        "modes": modes,
+        "soe": [{"t": e.get("t", ""), "ph": (e.get("phase") or "").upper(), "ev": e.get("event", "")} for e in soe],
+        "rubric": {k: [[v, t] for v, t in RUBRIC[k]] for k in "SOD"},
+    }
+
+
+def _json_script(obj, el_id):
+    import json
+    body = json.dumps(obj, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    return f'<script type="application/json" id="{el_id}">{body}</script>'
+
+
+def _facts_html(modes):
+    """The numbers a reader would otherwise have to count off the worksheet."""
+    acted = [m for m in modes if m.get("revised")]
+    lever = {k: sum(1 for m in acted if m["revised"][k] < m[k]) for k in "SOD"}
+    late = sum(1 for m in modes if m["D"] >= 8)
+    rows = [
+        ("Caught only after impact", f"{late} of {len(modes)}", "D ≥ 8"),
+        ("Actions that cut occurrence", f"{lever['O']}", "O lowered"),
+        ("Actions that cut detection", f"{lever['D']}", "D lowered"),
+        ("Actions that cut severity", f"{lever['S']}", "S lowered" if lever["S"] else "blast radius unchanged"),
+        ("Residual (no published action)", f"{len(modes) - len(acted)}", "score stays"),
+    ]
+    return '<dl class="fm-facts">' + "".join(
+        f'<div><dt>{esc(a)}<small>{esc(c)}</small></dt><dd>{esc(b)}</dd></div>' for a, b, c in rows) + "</dl>"
 
 
 def fmea_section(inc):
@@ -422,10 +466,17 @@ def fmea_section(inc):
         <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
         <p class="fm-scope">{esc(f["scope"])}</p>
         <p class="metabar fm-meta"><span><b>{len(modes)}</b> failure modes</span><span class="sep">/</span><span><b>{high}</b> high priority</span><span class="sep">/</span><span><b>{acted} of {len(modes)}</b> with a published action</span><span class="sep">/</span><span>total RPN <b>{total0} → {total1}</b> (−{cut}%)</span></p>
-        <div class="fm-viz">
-            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption>{pareto_html(modes)}</figure>
-            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption>{matrix_svg(modes)}</figure>
+        <div class="fm-sim" data-fm-sim>
+            <div class="fm-replay" hidden></div>
+            <div class="fm-scn" hidden></div>
+            <div class="fm-viz">
+                <figure class="fm-fig"><figcaption class="fm-pb-cap">RPN = S × O × D, worst first. Thin bar: after the published action.</figcaption>{pareto_html(modes)}</figure>
+                <figure class="fm-fig fm-fig-m"><figcaption>Severity × occurrence</figcaption>{matrix_svg(modes)}</figure>
+            </div>
+            <div class="fm-wi" hidden></div>
+            {_facts_html(modes)}
         </div>
+        {_json_script(sim_data(inc), "fmea-sim-data")}
         <div class="fm-sheet">
             <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
             {worksheet_html(inc)}
@@ -447,8 +498,9 @@ CSS = r"""
     .fm-pb-id { color:var(--muted); }
     .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
     .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
-    .fm-pb-bar { display:block; height:12px; }
-    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-bar, .fm-pb-rev { display:block; width:100%; transform-origin:left center; }
+    .fm-pb-bar { height:12px; }
+    .fm-pb-rev { height:4px; background:var(--text-body); opacity:0.55; }
     .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
     .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
     .fm-pb-ticks { display:flex; justify-content:space-between; }
@@ -513,4 +565,79 @@ CSS = r"""
     .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
     .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
     .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+
+    /* ── simulator (js/rz-fmea-sim.js). Hidden without JS; the static figures stand alone. ── */
+    .fm-sim { --fm-ease:cubic-bezier(.77,0,.175,1); }
+    .fm-replay, .fm-wi { border:1px solid var(--line); border-radius:4px; padding:0.8rem 0.9rem; margin:1rem 0; }
+    .fm-rp-bar { display:flex; align-items:center; gap:0.5rem; }
+    .fm-sim button { font:inherit; font-size:0.84rem; color:var(--text-strong); background:transparent;
+      border:1px solid var(--line); border-radius:4px; padding:0.35rem 0.7rem; cursor:pointer; }
+    .fm-sim button:focus-visible, .fm-sim input:focus-visible, .fm-pb-row:focus-visible, .fm-matrix .fm-pt:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
+    .fm-sim button:disabled { opacity:0.45; cursor:default; }
+    .fm-sim button:active:not(:disabled) { transform:scale(0.97); transition:transform 120ms var(--fm-ease); }
+    @media (hover:hover) and (pointer:fine){ .fm-sim button:hover:not(:disabled) { background:var(--surface-2); } }
+    .fm-rp-play { min-width:5.6rem; }
+    .fm-rp-step { min-width:2.2rem; font-family:'JetBrains Mono',monospace; }
+    .fm-rp-track { flex:1; min-width:0; }
+    @media (max-width:640px){ .fm-rp-bar { flex-wrap:wrap; } .fm-rp-track { flex-basis:100%; order:-1; margin-bottom:0.5rem; } }
+    .fm-sim input[type=range] { width:100%; accent-color:var(--cyan); margin:0; }
+    .fm-rp-ticks { display:flex; gap:2px; margin-top:4px; }
+    .fm-rp-ticks i { flex:1; height:3px; background:var(--line); position:relative; transition:background-color 150ms ease; }
+    .fm-rp-ticks i.is-past { background:var(--muted); }
+    .fm-rp-ticks i.has-new::after { content:""; position:absolute; left:50%; top:5px; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background:var(--text-strong); }
+    .fm-rp-meta { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); margin:1rem 0 0.25rem; }
+    .fm-rp-ev { color:var(--text-strong); font-size:0.95rem; line-height:1.5; margin:0; min-height:4.5em; }
+    .fm-rp-new { list-style:none; margin:0.6rem 0 0; padding:0; display:grid; gap:0.35rem; }
+    .fm-rp-new button { display:block; width:100%; text-align:left; line-height:1.4; color:var(--text-body); }
+    .fm-rp-id { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); margin-right:0.55rem; }
+    .fm-rp-none { font-size:0.84rem; color:var(--muted); }
+    .fm-rp-count { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; color:var(--text-body); margin:0.7rem 0 0; padding-top:0.55rem; border-top:1px solid var(--line); }
+    .fm-scn { margin:1rem 0 0; }
+    .fm-seg { display:inline-flex; flex-wrap:wrap; border:1px solid var(--line); border-radius:4px; overflow:hidden; }
+    .fm-sim .fm-seg button { border:0; border-radius:0; border-right:1px solid var(--line); color:var(--muted); }
+    .fm-sim .fm-seg button:last-child { border-right:0; }
+    .fm-sim .fm-seg button[aria-checked=true] { color:var(--text-strong); background:var(--surface-2); font-weight:600; }
+    .fm-scn-note { font-size:0.82rem; color:var(--muted); margin:0.45rem 0 0.6rem; }
+    .fm-readout { flex-wrap:wrap; row-gap:0.25rem; margin:0; }
+    @media (max-width:640px){
+      .fm-seg { display:grid; grid-template-columns:1fr 1fr; }
+      .fm-sim .fm-seg button:nth-child(2n) { border-right:0; }
+      .fm-sim .fm-seg button:nth-child(-n+2) { border-bottom:1px solid var(--line); }
+    }
+    .fm-sim.is-live .fm-pb-bar, .fm-sim.is-live .fm-pb-rev { transition:transform 200ms var(--fm-ease), opacity 150ms ease; }
+    .fm-sim.is-live .fm-pb-row { cursor:pointer; padding-left:0.3rem; padding-right:0.3rem; margin:0 -0.3rem; transition:opacity 150ms ease; }
+    @media (hover:hover) and (pointer:fine){ .fm-sim.is-live .fm-pb-row:hover { background:var(--surface-2); } }
+    .fm-pb-row[aria-current=true] { background:var(--surface-2); }
+    .fm-pb-row[aria-current=true] .fm-pb-id { color:var(--cyan); }
+    .fm-pb-ref { height:4px; background:var(--text-body); opacity:0.55; }
+    .is-dim { opacity:0.25; }
+    .fm-matrix .fm-pt { cursor:pointer; transition:opacity 150ms ease; }
+    .fm-matrix .fm-pt-l { transition:opacity 150ms ease; pointer-events:none; }
+    .fm-matrix .fm-pt.is-sel { stroke:var(--cyan); stroke-width:2.5; }
+    .fm-matrix .fm-wi-from { fill:none; stroke:var(--muted); stroke-width:1; stroke-dasharray:2 2; }
+    .fm-matrix .fm-wi-path { stroke:var(--cyan); stroke-width:1; stroke-dasharray:3 3; }
+    .fm-wi-head { display:flex; gap:0.7rem; align-items:baseline; }
+    .fm-wi-id { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--cyan); }
+    .fm-wi-title { flex:1; color:var(--text-strong); font-size:0.95rem; line-height:1.4; }
+    .fm-wi-out { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.9rem; color:var(--text-body); margin:0.5rem 0 0.3rem; }
+    .fm-wi-out b { color:var(--text-strong); font-size:1.05rem; }
+    .fm-wi-row { display:grid; grid-template-columns:9rem minmax(0,1fr); gap:0.2rem 0.9rem; align-items:center; padding:0.6rem 0; border-top:1px solid var(--line); }
+    .fm-wi-k { font-size:0.86rem; color:var(--muted); }
+    .fm-wi-k b { font-family:'JetBrains Mono',monospace; color:var(--text-strong); margin-left:0.2rem; }
+    .fm-wi-was { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-wi-rub, .fm-wi-why { grid-column:2; margin:0; font-size:0.84rem; line-height:1.45; }
+    .fm-wi-rub { color:var(--text-strong); }
+    .fm-wi-why { color:var(--muted); }
+    @media (max-width:640px){ .fm-wi-row { grid-template-columns:1fr; } .fm-wi-rub, .fm-wi-why { grid-column:1; } }
+    .fm-wi-acts { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .fm-wi-open { margin-top:0.8rem; font:inherit; font-size:0.84rem; color:var(--text-strong); background:transparent; border:1px solid var(--line); border-radius:4px; padding:0.35rem 0.7rem; cursor:pointer; }
+    .fm-facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(13rem,1fr)); gap:0 1.6rem; margin:1rem 0 0; }
+    .fm-facts > div { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:0.8rem; align-items:baseline; padding:0.45rem 0; border-top:1px solid var(--line); }
+    .fm-facts dt { font-size:0.86rem; color:var(--text-body); }
+    .fm-facts dt small { display:block; font-size:0.72rem; color:var(--muted); }
+    .fm-facts dd { margin:0; font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; color:var(--text-strong); }
+    @media (prefers-reduced-motion:reduce){
+      .fm-sim.is-live .fm-pb-bar, .fm-sim.is-live .fm-pb-rev { transition:opacity 150ms ease; }
+      .fm-sim button:active:not(:disabled) { transform:none; }
+    }
 """

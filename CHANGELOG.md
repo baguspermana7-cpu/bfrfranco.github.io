@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v3.13.1 — 2026-10-10
+
+### The FMEA becomes something you can run: replay, scenarios, what-if
+
+Owner: *"buat lebih detail dg data2 dan simulasi dan sangat intuitive dan immersive. Filler2
+hilangkan."* Every one of the 43 incident FMEAs now carries an interactive layer
+(`js/rz-fmea-sim.js`) over the static bars, matrix and worksheet, which still stand alone without JS.
+
+**Added**
+- **Replay** — step or play through the sequence of events; each failure mode lights at the first
+  event its evidence cites, with a running "in play: n of N modes · RPN x of y". 257 of 284 modes cite a
+  timed event; the other 27 are labelled *latent* and light at the end rather than at a guessed time.
+- **Scenarios** — As found · Published actions · *What-if: detect at onset* (every D capped at 6) ·
+  *What-if: guard the cause* (every O capped at 2). The two what-ifs are labelled hypothetical; they
+  show which lever carries an incident's risk. On AWS EBS 2011: actions −37%, detection −25%,
+  guarding the cause −56%.
+- **What-if per mode** — select any bar, matrix marker or worksheet row; drag S, O and D. Under each
+  slider: the rubric line for the dragged value and the analyst's written rationale at the scored
+  value. The matrix draws the selected mode's move; priority recomputes with the same rule as the
+  builder.
+- **Facts list** per incident: modes caught only after impact (D ≥ 8), how many published actions cut
+  occurrence / detection / severity, residual count.
+- Gate `tools/test-fmea-sim.mjs --strict`: 43 pages × 390/1440 px; the simulator's As-found and
+  Published-actions totals must equal the builder's metabar. Seen to fail: a perturbed scenario rule
+  produced 12 findings.
+
+**Removed (filler)**
+- FMEA method text cut from two paragraphs to four sentences; residual-risk line, figure captions and
+  the duplicate "Priority · RPN" line in every worksheet row trimmed.
+- Hub lede and the provenance / cascade disclaimers on every incident page shortened to what they
+  actually assert.
+
 ## v3.13.0 — 2026-10-10
 
 ### Every incident dossier now carries a retrospective FMEA

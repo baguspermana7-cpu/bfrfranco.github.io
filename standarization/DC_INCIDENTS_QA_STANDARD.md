@@ -114,6 +114,26 @@ matrix and worksheet and fails on any matrix label overlapping another label or 
 its own — ownership by DOM identity, not by position (the first version exempted any marker sharing a
 label's x, so a label stacked on a neighbour passed).
 
+**Simulator (v3.13.1, `js/rz-fmea-sim.js`).** An upgrade over the static figures, which stand
+alone without JS. Everything it shows is computed from the dossier's own scores (`#fmea-sim-data`,
+emitted by `incidents_fmea.sim_data`); it types no fact of its own.
+- *Replay* steps through the SOE and lights each mode at the first SOE entry its evidence cites. A
+  mode citing no SOE entry is labelled **latent** and lights at the last step — never placed at a
+  guessed time.
+- *Scenarios*: As found · Published actions · two what-ifs labelled **Hypothetical** (D capped at 6,
+  detected at onset; O capped at 2, cause guarded by design). The what-ifs show which lever carries
+  the risk; they are not claims about the operator.
+- *What-if* on one mode: S/O/D sliders with the rubric line for the dragged value and the analyst's
+  written rationale at the scored value. The matrix draws ONE dashed path for the selected mode only —
+  the v3.13.0 rule against movement lines stands for the whole set.
+- Readout is a `.metabar` line, not a stat strip. The facts list (caught only after impact, which
+  lever each action cuts, residual count) is a hairline fact list.
+- Motion: bar length is `transform: scaleX` with a 200 ms transition, dimming is opacity 150 ms;
+  reduced motion keeps opacity only. The inspector is built once per selection and updated in place:
+  rebuilding it on `input` replaces the slider under the pointer and ends the drag.
+- Gate: `node tools/test-fmea-sim.mjs --strict` — also cross-checks the simulator's totals against
+  the builder's metabar, so the JS and Python scoring cannot drift apart unseen.
+
 **The generator was stale, and fixing it was a precondition.** Sweeps since v1.134.20 had edited
 the 44 generated pages directly (timeline 1:1 fix, `.vz-tl-ph` 10 px, mobile `.chip` wrap, hub title
 attributes, content-hash cache tokens) while `tools/build-incidents.py` was last changed 2026-08-02.

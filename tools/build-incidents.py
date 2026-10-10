@@ -458,6 +458,14 @@ def _asset_token(rel):
             for tok in pat.findall(fh.read()):
                 if tok.split("-")[-1] == want:
                     counts[tok] = counts.get(tok, 0) + 1
+    if not counts:
+        # An asset only incident pages load (js/rz-fmea-sim.js) has no other page to
+        # borrow from; reuse what the last build stamped so --check stays byte-stable.
+        for page in glob.glob(os.path.join(ROOT, "incident-*.html")):
+            with open(page, encoding="utf-8", errors="ignore") as fh:
+                for tok in pat.findall(fh.read()):
+                    if tok.split("-")[-1] == want:
+                        counts[tok] = counts.get(tok, 0) + 1
     tok = max(counts, key=counts.get) if counts else f"{datetime.now():%Y%m%d}-{want}"
     _TOKEN_CACHE[rel] = tok
     return tok
@@ -602,7 +610,7 @@ def render_hub(incidents):
     body = f"""        <a class="backlink" href="index.html">← Home</a>
         <div class="eyebrow">Root-only · Post-incident dossier</div>
         <h1>Data-Center Incidents — Case Library</h1>
-        <p class="lede">A structured, source-cited library of major data-center and cloud-infrastructure incidents worldwide — ranked by magnitude, each with a full sequence of events, root-cause analysis, correction-of-errors (COE), lessons learnt and engineering improvements. Every fact is traced to a public post-incident report.</p>
+        <p class="lede">Major data-center and cloud incidents, ranked by magnitude. Each dossier: sequence of events, root cause, correction of errors, lessons, improvements and a scored FMEA you can replay and re-score. Every fact traces to a public post-incident report.</p>
         <div class="metabar"><b>{len(incidents)}</b> catalogued<span class="sep">·</span><b>{_pm_count}</b> with official RCA<span class="sep">·</span>provenance-mandatory<span class="sep">·</span>root access</div>
         <details class="faq" id="faq-methodology"><summary>About this library · how to read it</summary><div class="faq-body">
             <h4>What this is</h4>
@@ -653,7 +661,7 @@ def render_hub(incidents):
                 </tbody>
             </table>
         </div>
-        <p class="disclaimer">Ranking is a transparent composite of sourced sub-scores (blast radius 35% · users 25% · financial 20% · duration 20%). Summaries are original and substantially shorter than their sources; short attributed excerpts on each incident page are provenance only. This library is for engineering education and does not reproduce source material in full.</p>
+        <p class="disclaimer">Ranking is a transparent composite of sourced sub-scores (blast radius 35% · users 25% · financial 20% · duration 20%). Summaries are original; quoted excerpts are short, attributed, and for provenance only.</p>
         {FILTER_JS}
 """
     return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="", head_extra=LEAFLET_HEAD)
@@ -1538,7 +1546,7 @@ def render_incident(inc, rank):
 
         <h2>Failure cascade</h2>
         {cascade_html}
-        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+        <p class="disclaimer">From the sourced root cause and affected-services record.</p>
 
         <h2>Facility &amp; location</h2>
         <dl class="kv">
@@ -1588,11 +1596,13 @@ def render_incident(inc, rank):
 
         <h2>References &amp; provenance</h2>
         <ul class="refs">{refs}</ul>
-        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified {esc(inc.get('sourcing',{}).get('lastVerified','—'))}.</p>
+        <p class="disclaimer">Quotes are short, attributed, and for provenance only; the analysis is original. Last verified {esc(inc.get('sourcing',{}).get('lastVerified','—'))}.</p>
         {SHARE_BAR}
         </div>
 """
-    fmea_head = f"<style>{incidents_fmea.CSS}</style>" if inc.get("fmea") else ""
+    fmea_head = (f"<style>{incidents_fmea.CSS}</style>"
+                 f'<script src="js/rz-fmea-sim.js?v={_asset_token("js/rz-fmea-sim.js")}" defer></script>'
+                 if inc.get("fmea") else "")
     return page_shell(inc["title"], inc.get("brief", "")[:180], f"incident-{inc['slug']}.html", body, base="",
                       head_extra=fmea_head)
 
