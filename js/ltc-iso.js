@@ -79,8 +79,42 @@
   function val(id) { return parseFloat(document.getElementById(id).value); }
   function ro(k, v, u, s) { return '<div class="ltc-ro"' + (s ? ' data-state="' + s + '"' : '') + '><dt>' + k + '</dt><dd>' + v + (u ? '<small>' + u + '</small>' : '') + '</dd></div>'; }
 
+  /* Source of the twelve-month energies. Default: the shared plant model (js/ltc-plant.js), so
+   * the page asks for nothing the plant already knows. "Metered data" reopens the inputs,
+   * prefilled with the model, and reports each meter against it. */
+  var src = 'plant';
+  function plantO() {
+    var S = window.LTCPlantStrip; if (!S) return null;
+    var r = S.get().result, A = r.annual;
+    return { e: A.m0MWh, it1: A.m1MWh, it2: A.m2MWh, it3: A.m3MWh, ren: A.renewableMWh, reuse: A.reuseMWh, water: A.waterM3, ef: r.input.gridEfKgPerKwh, r: r };
+  }
+  function autoPanel(o) {
+    var host = document.getElementById('kAuto'); if (!host) return;
+    if (!o) { host.innerHTML = '<p class="ltc-note">Plant model not loaded.</p>'; return; }
+    var row = function (k, v, u, f) { return '<div class="ltc-auto-row"><span>' + k + '</span><b>' + v + '</b><small>' + u + '</small><i title="' + L.esc(f) + '">auto</i></div>'; };
+    host.innerHTML = '<div class="ltc-auto">' +
+      row('Total facility (M0)', L.fmt(o.e, 0), 'MWh', 'Σ over climate bins of facility kW × hours') +
+      row('UPS output (M1)', L.fmt(o.it1, 0), 'MWh', 'IT + cord + PDU losses (+ CDU pumps on UPS)') +
+      row('PDU output (M2)', L.fmt(o.it2, 0), 'MWh', 'IT + rack PDU / cord losses') +
+      row('IT input (M3)', L.fmt(o.it3, 0), 'MWh', 'IT MW × utilisation × 8,760 h') +
+      row('Renewable', L.fmt(o.ren, 0), 'MWh', 'M0 × renewable share (site)') +
+      row('Reused outside', L.fmt(o.reuse, 0), 'MWh', 'liquid heat × reuse share (site)') +
+      row('Site water', L.fmt(o.water, 0), 'm³', 'tower + cooler evaporation × C/(C−1), over the bins') +
+      row('Grid factor', L.fmt(o.ef, 2), 'kg/kWh', 'site layer') +
+      '</div><p class="ltc-note">From the plant: ' + L.esc(o.r.input.itMw + ' MW IT, ' + (window.LTCPlant.CLIMATES[o.r.input.climate] || { label: 'custom climate' }).label) +
+      '. Change the plant or the site in the strip above; switch to <b>Metered data</b> to enter real meter totals.</p>';
+  }
+  function prefill(o) {
+    if (!o) return;
+    [['kE', o.e], ['kI1', o.it1], ['kI2', o.it2], ['kI3', o.it3], ['kRen', o.ren], ['kReuse', o.reuse], ['kW', o.water], ['kEf', o.ef]].forEach(function (x) {
+      var el = document.getElementById(x[0]); if (el) el.value = x[0] === 'kEf' ? x[1] : Math.round(x[1]);
+    });
+  }
   function runKpi() {
-    var o = { e: val('kE'), it1: val('kI1'), it2: val('kI2'), it3: val('kI3'), ren: val('kRen'), reuse: val('kReuse'), water: val('kW'), ef: val('kEf') };
+    var po = plantO();
+    autoPanel(po);
+    var o = src === 'plant' && po ? po
+      : { e: val('kE'), it1: val('kI1'), it2: val('kI2'), it3: val('kI3'), ren: val('kRen'), reuse: val('kReuse'), water: val('kW'), ef: val('kEf') };
     var out = document.getElementById('kOut');
     var bad = !(o.e > 0 && o.it1 > 0 && o.it2 > 0 && o.it3 > 0) || o.it3 > o.it2 || o.it2 > o.it1 || o.it1 > o.e;
     if (bad) { out.innerHTML = '<div class="ltc-verdict" data-state="fail"><b>Input</b><span>Energies must satisfy facility ≥ UPS output ≥ PDU output ≥ IT input &gt; 0.</span></div>'; return; }
@@ -90,9 +124,18 @@
       ro('REF', L.fmt(k.ref, 2), '') + ro('ERF', L.fmt(k.erf, 2), '') + ro('WUE', L.fmt(k.wue, 2), 'L/kWh') + ro('CUE', L.fmt(k.cue, 3), 'kgCO₂/kWh') + '</dl>' +
       '<div class="ltc-verdict" data-state="warn"><b>Category gap</b><span>The same facility reports PUE ' + L.fmt(k.pue1, 3) + ' at category 1 and ' + L.fmt(k.pue3, 3) +
       ' at category 3: ' + L.fmt(o.it1 - o.it3, 0) + ' MWh of transformer, PDU and cord losses moves from “IT” to overhead. A PUE without its category is not comparable.</span></div>' +
-      sankey(o) +
+      (src === 'meter' && po ? meterVsModel(o, po) : '') + sankey(o) +
       '<p class="ltc-note">ISO/IEC 30134-2 requires PUE over a 12-month period with the category stated. CUE here = (facility − renewable) × grid factor ÷ IT energy, a market-based simplification; report the accounting basis with the number.</p>';
     if (mFig) mFig.redraw();
+  }
+
+  /* Metered against modelled: a gap is either a meter problem or a model problem, and either is
+   * worth knowing before the number is reported. */
+  function meterVsModel(o, m) {
+    var rows = [['M0 facility', o.e, m.e], ['M1 UPS output', o.it1, m.it1], ['M2 PDU output', o.it2, m.it2], ['M3 IT input', o.it3, m.it3], ['Water m³', o.water, m.water]];
+    return '<div class="ltc-table-wrap" style="margin:12px 0"><table class="ltc-table"><thead><tr><th>Meter</th><th class="n">Metered</th><th class="n">Model</th><th class="n">Δ</th></tr></thead><tbody>' +
+      rows.map(function (r) { var d = r[2] ? (r[1] - r[2]) / r[2] * 100 : 0; return '<tr' + (Math.abs(d) > 10 ? ' data-hit' : '') + '><td>' + r[0] + '</td><td class="n">' + L.fmt(r[1], 0) + '</td><td class="n">' + L.fmt(r[2], 0) + '</td><td class="n">' + (d >= 0 ? '+' : '−') + L.fmt(Math.abs(d), 1) + ' %</td></tr>'; }).join('') +
+      '</tbody></table></div>';
   }
 
   /* Energy Sankey from the four meters. Without sub-metering the overhead above
@@ -257,6 +300,16 @@
   function boot() {
     L.init({ module: 'iso' });
     document.getElementById('p-kpi').addEventListener('input', runKpi);
+    document.getElementById('kSrc').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-src]'); if (!b) return;
+      src = b.getAttribute('data-src');
+      [].forEach.call(this.querySelectorAll('[data-src]'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      document.getElementById('kAuto').hidden = src !== 'plant';
+      document.getElementById('kMeter').hidden = src !== 'meter';
+      if (src === 'meter') prefill(plantO());
+      runKpi();
+    });
+    if (window.LTCPlantStrip) window.LTCPlantStrip.onChange(function () { runKpi(); });
     document.getElementById('eBase').value = synth(900, 1);
     document.getElementById('eRep').value = synth(960, 0.95);
     document.getElementById('p-enpi').addEventListener('input', runEnpi);

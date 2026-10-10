@@ -15,6 +15,7 @@
  *   W3  NFPA 2001 flooding equations against the published per-m³ figures
  *   W4  TIA fiber budget, copper channel, TIA-607 conductor sizing
  *   W5  ISO/IEC 30134 KPIs and the ISO 50006 regression recovering a known model
+ *   W8  every page loads the plant + strip; ISO defaults to the plant; derived inputs are bound
  *   W7  hub: the full plant (air path, CHW, electrical rooms), ≤ 9 blocks per view,
  *       traceable connector ids, a script at every commissioning gate, HLT at L4
  *   W6  every page: workbench shell, engine before the shell, the IEC symbol
@@ -175,6 +176,26 @@ for (const [page, mod] of Object.entries(PAGES)) {
   ok('W7d', /o\.id = o\.fromId \+ '>' \+ o\.toId/.test(hub), "connectors carry 'from>to' ids, so the hover trace reads connectivity from the drawing");
   ok('W7e', (hub.match(/hold: '/g) || []).length === 6 && (hub.match(/expect: \[/g) || []).length === 6, 'every commissioning stage has tests, expectations and a hold point');
   ok('W7f', /id: 'l4'[\s\S]*?hlt: \[[\s\S]*?25 → 50 → 75 → 100 %[\s\S]*?\]/.test(hub), 'L4 carries the heat load test with its load steps');
+}
+
+{
+  /* W8 (v3.15.0) — the plant is edited in one place and the tools take their inputs from it.
+   * Owner: "minimize inputan, tapi di belakangnya ada otomatis calculation". */
+  for (const page of Object.keys(PAGES)) {
+    const h = readFileSync(join(root, page), 'utf8');
+    const at = (x) => h.indexOf(x);
+    ok(`W8a:${page}`, at('js/ltc-plant.js') > 0 && at('js/ltc-plant.js') < at('js/ltc-plant-strip.js') && at('js/ltc-plant-strip.js') < at(PAGES[page]),
+       'loads the plant model, then the plant strip, before its module');
+  }
+  const iso = readFileSync(join(root, 'js/ltc-iso.js'), 'utf8'), isoH = readFileSync(join(root, 'ltc-iso-energy-governance.html'), 'utf8');
+  ok('W8b', /var src = 'plant'/.test(iso) && /id="kMeter" hidden/.test(isoH), 'ISO energies default to the plant; metered inputs are the opt-in');
+  const binds = { 'js/ltc-ashrae.js': ['lSup', 'lAmb', 'lApp', 'cSup'], 'js/ltc-tia.js': ['pRacks'], 'js/ltc-nfpa.js': ['fL', 'fW', 'fH', 'dL', 'dW', 'dAch'] };
+  for (const [f, ids] of Object.entries(binds)) {
+    const src = readFileSync(join(root, f), 'utf8');
+    for (const id of ids) ok(`W8c:${id}`, src.includes(`bind('${id}'`), `${f} takes ${id} from the plant`);
+  }
+  const hubH = readFileSync(join(root, 'standards-ltc-lab.html'), 'utf8');
+  ok('W8d', !/Tier, ASHRAE and model pages read the same plant/.test(hubH), 'the hub does not claim pages read the plant before they do');
 }
 
 const total = pass + fails.length;

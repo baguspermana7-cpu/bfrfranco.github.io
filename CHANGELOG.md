@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v3.15.0 — 2026-10-11
+
+### LTC Workbench: edit the plant once; the tools stop asking for what it already knows
+
+Owner, on the ISO page's nine manual boxes: *"minimize inputan, tapi di belakangnya ada otomatis
+calculation, too much ini."*
+
+**Added — plant strip (`js/ltc-plant-strip.js`) on every workbench page.** One line (IT, configuration,
+climate, PUE design/annual, WUE, CUE) and *Edit plant* with three tiers: **Design** (configuration, IT load,
+liquid capture, TCS supply, CDU feed), **Site** (climate, grid factor, renewable, heat reuse, tariffs) and
+**Advanced** — 55 engine inputs, each *auto* until changed, a changed one badged and resettable.
+
+**Changed — engine v2 (`js/ltc-plant.js`).**
+- ISO/IEC 30134-2 metering points: IT input [M3] ← cords ← PDU output [M2] ← PDU ← UPS output [M1] ← UPS ←
+  LV distribution ← transformers [M0]. Cord and PDU losses now land in the hall air (the CRAHs carry them);
+  UPS, LV and transformer losses in the electrical rooms.
+- Annual MWh at each point over the climate bins; PUE cat 1/2/3 (1.157 / 1.182 / 1.188 at 100 MW tropical),
+  WUE, CUE, REF, ERF, CO₂, energy and water cost.
+- Sizing: generators, UPS modules (N+1 / 2N), transformers, MCC A/B. DH01 geometry: rows, racks, CDUs,
+  CRAHs, area, volume, air changes. Fault transients (FWS loss, cooler derate, CHW loss, chiller trip) as
+  a stated first-order model, checked against its analytic solution.
+- Site layer: three ILLUSTRATIVE climates (tropical, temperate, arid) or bins pasted from the site's EPW.
+
+**Changed — tools take their inputs from the plant.**
+- ISO: M0–M3, water, renewable, reuse and grid factor come from the plant — nothing to enter. *Metered
+  data* reopens the inputs, prefilled with the model, and reports each meter against it.
+- ASHRAE liquid class: FWS supply, design dry bulb and cooler approach from the plant, plus a line saying
+  what this plant actually does on its design day; condensation check starts at the coldest wetted surface.
+- TIA: racks per hall. NFPA: DH01 length, width, height and air changes for agent and detection sizing.
+- Every derived input shows *auto*; typing over it keeps the reader's value ("yours ↺", one click back).
+
+**Gates.** `test-ltc-plant.mjs` P6: M0 > M1 > M2 > M3, PUE1 < PUE2 < PUE3, CUE/REF/ERF identities, sizing by
+hand, hall geometry, transients against the analytic solution, climates. `test-ltc-workbench.mjs` W8 (+19):
+every page loads plant then strip, ISO defaults to the plant, every derived input is bound, and the hub
+does not claim a page reads the plant before it does.
+
 ## v3.14.0 — 2026-10-10
 
 ### LTC Workbench: one 100 MW plant that closes its heat balance

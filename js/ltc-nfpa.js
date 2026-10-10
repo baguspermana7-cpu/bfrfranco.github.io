@@ -241,6 +241,16 @@
       L.inspect({ eyebrow: 'Release sequence', title: SEQ[id].name, html: '<ul class="ltc-refs">' + (SEQ[id].act.length ? SEQ[id].act.map(function (a) { return '<li><p>' + L.esc(a) + '</p></li>'; }).join('') : '<li><p>Supervising.</p></li>') + '</ul>' });
     });
     setAgentDefaults(); runAgent(); runDet(); renderSeq();
+    /* the hall the plant sized: DH01 geometry and its CRAH airflow */
+    var S = window.LTCPlantStrip;
+    if (S) {
+      S.bind('fL', function (r) { return r.hall.lengthM; }, 'DH01 length from racks per row × pitch + end zones');
+      S.bind('fW', function (r) { return r.hall.widthM; }, 'DH01 width from row pairs, hot and cold aisles');
+      S.bind('fH', function (r) { return r.hall.heightM; }, 'DH01 clear height (advanced input)');
+      S.bind('dL', function (r) { return r.hall.lengthM; }, 'DH01 length');
+      S.bind('dW', function (r) { return r.hall.widthM; }, 'DH01 width');
+      S.bind('dAch', function (r) { return r.hall.airChangesPerHour; }, 'CRAH airflow × 3,600 / hall volume', 0);
+    }
     if (window.matchMedia('(min-width: 1280px)').matches) inspectAgent(ag.value);
   }
   function inspectAgent(name) {

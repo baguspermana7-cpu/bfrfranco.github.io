@@ -51,6 +51,25 @@
        sites in the same country can differ by double digits in fan energy and water. */
     var TROPICAL_BINS = [[24, 23, 1400], [26, 24.5, 2200], [28, 25.5, 2000], [30, 26.5, 1600], [32, 27, 1100], [34, 27.5, 460]];
 
+    /* Three ILLUSTRATIVE climates (bins sum to 8,760 h). They exist so the model has a sensible
+       starting point; a real study replaces them with bins built from the site's EPW file
+       (parseBins accepts "dry bulb, wet bulb, hours" lines). */
+    var CLIMATES = {
+        tropical: { label: 'Tropical lowland (illustrative)', db: 35, wb: 28, bins: TROPICAL_BINS },
+        temperate: { label: 'Temperate (illustrative)', db: 30, wb: 22,
+            bins: [[-5, -6, 600], [0, -1, 1300], [5, 3, 1700], [10, 7, 1800], [15, 11, 1600], [20, 15, 1100], [25, 18, 500], [30, 21, 160]] },
+        arid: { label: 'Hot arid (illustrative)', db: 45, wb: 24,
+            bins: [[10, 4, 800], [15, 7, 1200], [20, 10, 1500], [25, 13, 1700], [30, 16, 1500], [35, 19, 1200], [40, 21, 660], [45, 23, 200]] }
+    };
+    function parseBins(text) {
+        var out = [];
+        String(text || '').split(/\r?\n/).forEach(function (line) {
+            var v = line.split(/[,;\t ]+/).map(Number).filter(function (x) { return isFinite(x); });
+            if (v.length >= 3 && v[2] > 0 && v[1] <= v[0] + 0.01) out.push([v[0], v[1], v[2]]);
+        });
+        return out;
+    }
+
     /* VSD (magnetic-bearing) chiller part-load factor on COP, from the cited points:
        PLR 1.0 → 1.000, 0.8 → 6.268/5.5 = 1.140, 0.5 → 7.924/5.5 = 1.441. Linear between
        points, flat below 0.3 PLR (not extrapolated into the implausible low-load tail). */
@@ -101,10 +120,32 @@
         chillerStageAll: true,    // run every installed chiller at equal PLR (exploits the curve)
         chwHeadM: 35, cwHeadM: 25, pumpEff: 0.78,
         towerApproachK: 4, towerFanKwPerMw: 8, cyclesOfConc: 4,
-        upsEff: 0.97, txEff: 0.99, distLossPct: 1.0,
+        // electrical chain, IT side outward (ISO/IEC 30134-2 metering points in brackets):
+        // IT input [M3] ← cords ← PDU output [M2] ← PDU (transformer + panels) ← UPS output [M1] ← UPS ← LV distribution ← transformers ← MV [M0]
+        cordLossPct: 0.5,         // rack PDU + cords, % of IT — dissipated in the hall air
+        pduLossPct: 1.5,          // floor PDU / RPP incl. its transformer, % of throughput — in the hall air
+        upsEff: 0.97, txEff: 0.99,
+        distLossPct: 0.5,         // LV switchboards and cabling upstream of the UPS — in the electrical rooms
         elecRoomShare: 1.0,       // share of electrical losses that land in cooled rooms
         auxPctOfIt: 1.0,          // lighting, controls, BMS
-        cduOnUps: true            // CDU pumps on UPS so cold plates keep flow through a transfer
+        cduOnUps: true,           // CDU pumps on UPS so cold plates keep flow through a transfer
+        // ── site layer (entered once, shared by every page) ──
+        climate: 'tropical',      // tropical | temperate | arid | custom (custom = pasted bins)
+        gridEfKgPerKwh: 0.72,     // ILLUSTRATIVE grid emission factor — use the site's published factor
+        renewablePct: 0,          // share of facility energy from renewable supply (for CUE / REF)
+        heatReusePct: 0,          // share of liquid heat exported for reuse (ERF)
+        elecPrice: 0.10,          // per kWh
+        waterTariff: 1.5,         // per m³
+        // ── power sizing ──
+        genUnitKw: 3000, genRedundancy: 1,          // ASSUMED MV generator set
+        upsModuleKw: 1250, upsTopology: 'N+1',       // N+1 | 2N
+        txUnitKw: 3200, txRedundancy: 1,             // ASSUMED ~3.5 MVA at pf 0.92
+        // ── hall geometry (DH01 and siblings) ──
+        racksPerRow: 20, rackPitchM: 0.6, rackDepthM: 1.2, coldAisleM: 1.8, hotAisleM: 1.2, endZoneM: 4, hallHeightM: 5,
+        // ── thermal mass for the transient view ──
+        tcsLoopM3PerCdu: 6,       // ASSUMED TCS water volume per CDU (piping, manifolds, cold plates)
+        throttleC: 60,            // ASSUMED TCS return at which GPUs throttle
+        chwLoopLPerKw: 15         // ASSUMED CHW system volume per kW of evaporator duty
     };
 
     /* Four plant presets — the comparison practitioners actually run. */
@@ -132,6 +173,13 @@
         o.capturePct = clamp(o.capturePct, 0, 99);
         o.itUtil = clamp(o.itUtil, 0.1, 1);
         if (!PRESETS[o.preset] && input && PRESETS[input.preset]) o.preset = input.preset;
+        // a climate preset supplies bins and design conditions unless they were given explicitly
+        var cl = CLIMATES[o.climate];
+        if (cl) {
+            if (!(input && Array.isArray(input.climateBins) && input.climateBins.length)) o.climateBins = cl.bins;
+            if (!(input && input.designDbC != null)) o.designDbC = cl.db;
+            if (!(input && input.designWbC != null)) o.designWbC = cl.wb;
+        }
         return o;
     }
 
@@ -227,17 +275,24 @@
         var trimKwe = trimKw / trimCop;
         var coolerFans = c.qCooler / 1000 * p.coolerFanKwPerMw[p.liquidRejection];
 
+        /* electrical chain from the IT input outward; cord and PDU losses happen in the hall */
+        var cordLoss = it * p.cordLossPct / 100;
+        var m2 = it + cordLoss;                                      // PDU output  [M2]
+        var pduIn = m2 / (1 - p.pduLossPct / 100);
+        var pduLoss = pduIn - m2;
+        var m1 = pduIn + (p.cduOnUps ? tcsPump : 0);                 // UPS output  [M1]
+
         var airIt = it - liquidIt;
         var crahAirM3sPerKw = 1 / (RHO_A * CP_A * p.airDeltaK);    // m³/s per kW sensible
         // fan heat is itself removed by the CRAH: Q = Q0 + SFP·V, V = Q·k → Q = Q0 / (1 − SFP·k)
         var fanFrac = p.sfpKwPerM3s * crahAirM3sPerKw;
-        var crahLoad = (airIt + cduSkin) / (1 - fanFrac);
+        var crahLoad = (airIt + cduSkin + cordLoss + pduLoss) / (1 - fanFrac);
         var crahFans = crahLoad * fanFrac;
 
-        var upsOut = it + (p.cduOnUps ? tcsPump : 0);
-        var distLoss = upsOut * p.distLossPct / 100;
-        var upsIn = (upsOut + distLoss) / p.upsEff;
-        var upsLoss = upsIn - upsOut - distLoss;
+        var upsOut = m1;
+        var upsIn = upsOut / p.upsEff;
+        var upsLoss = upsIn - upsOut;
+        var distLoss = upsIn * p.distLossPct / 100;                  // LV distribution feeding the UPS
         var auxKw = p.itMw * 1000 * p.auxPctOfIt / 100;           // not utilisation-dependent
         var airChillers = p.chillerType === 'air';
 
@@ -260,13 +315,13 @@
             towerFans = towerRej / 1000 * p.towerFanKwPerMw;
             mcc = (p.cduOnUps ? 0 : tcsPump) + fwsPump + coolerFans + trimKwe
                 + crahFans + erFans + chillerKwe + chwPump + cwPump + towerFans + auxKw;
-            txLoss = (upsIn + mcc) / p.txEff - upsIn - mcc;
+            txLoss = (upsIn + distLoss + mcc) / p.txEff - upsIn - distLoss - mcc;
         }
         towerEvapKgS = towerRej * 0.85 / H_FG;
         var coolerEvap = p.liquidRejection === 'tower' ? 0 : c.evapKgS;  // tower mode already counted in towerRej
         var evapKgS = towerEvapKgS + coolerEvap;
         var makeupLps = evapKgS * p.cyclesOfConc / (p.cyclesOfConc - 1);
-        var facility = upsIn + mcc + txLoss;
+        var facility = upsIn + distLoss + mcc + txLoss;             // [M0]
 
         // energy balance: every kW of electricity in leaves as heat somewhere
         var heatOut = (p.liquidRejection === 'tower' ? 0 : c.qCooler) + towerRej + cwPump + towerFans + coolerFans + auxKw
@@ -278,6 +333,7 @@
             cduSkin: cduSkin, toFws: toFws, fwsLps: fwsM3s * 1000, fwsPump: fwsPump, cooler: c, trimKw: trimKw, trimKwe: trimKwe,
             coolerFans: coolerFans, airIt: airIt, crahLoad: crahLoad, crahFans: crahFans, fanFrac: fanFrac,
             crahAirM3sPerKw: crahAirM3sPerKw, upsOut: upsOut, upsIn: upsIn, upsLoss: upsLoss, distLoss: distLoss,
+            cordLoss: cordLoss, pduLoss: pduLoss, m1: m1, m2: m2, m3: it,
             txLoss: txLoss, auxKw: auxKw, erLoad: erLoad, erFans: erFans, evap: evap, plr: plr, cop: cop,
             chillerKwe: chillerKwe, chwPump: chwPump, cwPump: cwPump, towerRej: towerRej, towerFans: towerFans,
             mcc: mcc, facility: facility, pue: facility / it, makeupLps: makeupLps, wue: makeupLps * 3600 / it,
@@ -302,10 +358,11 @@
         d = solve(p, 1, p.designDbC, p.designWbC, sized);           // design day on the installed plant
 
         // annual: hour-weighted over climate bins at mean utilisation — PUE = Σ facility·h / Σ IT·h
-        var hours = 0, eFac = 0, eIt = 0, water = 0, trimH = 0, binOut = [];
+        var hours = 0, eFac = 0, eIt = 0, eM1 = 0, eM2 = 0, water = 0, trimH = 0, binOut = [], liqH = 0;
         p.climateBins.forEach(function (b) {
             var s = solve(p, p.itUtil, b[0], b[1], sized), h = b[2];
             hours += h; eFac += s.facility * h; eIt += s.it * h; water += s.makeupLps * 3600 * h / 1000;
+            eM1 += s.m1 * h; eM2 += s.m2 * h; liqH += s.liquidDuty * h;
             trimH += s.trimKw > 0 ? h : 0;
             binOut.push({ db: b[0], wb: b[1], hours: h, pue: s.pue, cop: s.cop, trimShare: s.cooler.trimShare, plr: s.plr });
         });
@@ -334,6 +391,30 @@
                       trimHours: trimH, hours: hours, bins: binOut,
                       split: { liquid: d.cooler.qCooler + d.trimKw, air: d.crahLoad, elec: d.erLoad } }
         };
+        /* annual energy at the ISO/IEC 30134-2 metering points, and the KPIs built on them */
+        var MWh = function (kwh) { return kwh / 1000; };
+        var m0 = MWh(eFac), m1 = MWh(eM1), m2 = MWh(eM2), m3 = MWh(eIt);
+        var ren = m0 * p.renewablePct / 100, reuse = MWh(liqH) * p.heatReusePct / 100;
+        res.annual = {
+            hours: hours, m0MWh: m0, m1MWh: m1, m2MWh: m2, m3MWh: m3, waterM3: water,
+            renewableMWh: ren, reuseMWh: reuse,
+            pue1: m0 / m1, pue2: m0 / m2, pue3: m0 / m3,
+            wue: water * 1000 / (m3 * 1000),
+            cue: (m0 - ren) * p.gridEfKgPerKwh / m3,                  // kgCO2/kWh_IT, market-based simplification
+            ref: ren / m0, erf: reuse / m0,
+            co2t: (m0 - ren) * p.gridEfKgPerKwh,                       // t (MWh × kg/kWh)
+            energyCost: m0 * 1000 * p.elecPrice, waterCost: water * p.waterTariff
+        };
+        /* power sizing: what the Tier topology draws */
+        var genN = Math.ceil(d.facility / p.genUnitKw), txN = Math.ceil((d.upsIn + d.distLoss + d.mcc) / p.txUnitKw);
+        var upsN = Math.ceil(d.upsOut / p.upsModuleKw);
+        res.power = {
+            genN: genN, genTotal: genN + p.genRedundancy, genUnitKw: p.genUnitKw,
+            txN: txN, txTotal: txN + p.txRedundancy, txUnitKw: p.txUnitKw,
+            upsN: upsN, upsTotal: p.upsTopology === '2N' ? 2 * upsN : upsN + 1, upsModuleKw: p.upsModuleKw, upsTopology: p.upsTopology,
+            mccAKw: d.mcc / 2, mccBKw: d.mcc / 2, cduFeed: p.cduFeed
+        };
+        res.hall = hallGeometry(p, res);
         res.trace = traces(res, p);
         res.fault = faultOverlay(res, p, f);
         return res;
@@ -361,6 +442,68 @@
             pue: T('PUE, design day', r.totals.pue, '', 'facility input / IT at design ambient and full load', []),
             pueAnnual: T('PUE, annual', r.totals.pueAnnual, '', 'Σ facility·h / Σ IT·h over the climate bins at mean utilisation', ['climateBins', 'itUtil'])
         };
+    }
+
+    /* Hall geometry: rows of racks in hot-aisle/cold-aisle pairs, CDUs at the row ends, CRAHs as
+       fan walls along both long sides. Positions in metres from the hall's west wall. */
+    function hallGeometry(p, r) {
+        var racks = r.it.racksPerHall, perRow = p.racksPerRow, rows = Math.ceil(racks / perRow);
+        if (rows % 2) rows++;                                          // racks face each other across a hot aisle
+        var pairs = rows / 2, pairW = 2 * p.rackDepthM + p.hotAisleM;
+        var length = perRow * p.rackPitchM + 2 * p.endZoneM;
+        var width = pairs * pairW + (pairs + 1) * p.coldAisleM + 2 * 1.5;   // 1.5 m to the fan walls
+        var rowsOut = [], k = 0;
+        for (var i = 0; i < pairs; i++) {
+            var y0 = 1.5 + p.coldAisleM + i * (pairW + p.coldAisleM);
+            rowsOut.push({ y: y0, face: 'south', hotAisleY: y0 + p.rackDepthM });
+            rowsOut.push({ y: y0 + p.rackDepthM + p.hotAisleM, face: 'north', hotAisleY: y0 + p.rackDepthM });
+        }
+        var rackList = [];
+        rowsOut.forEach(function (row, ri) {
+            for (var j = 0; j < perRow && k < racks; j++, k++) rackList.push({ i: k, row: ri, x: p.endZoneM + j * p.rackPitchM, y: row.y, cdu: (k % r.liquid.cduPerHall) });
+        });
+        var cdus = [], nC = r.liquid.cduPerHall;
+        for (var c = 0; c < nC; c++) cdus.push({ i: c, x: c % 2 ? length - p.endZoneM + 1 : 1, y: 1.5 + (c >> 1) * (width - 3) / Math.max(1, Math.ceil(nC / 2)), feeder: c % 2 ? 'B' : 'A' });
+        var crahs = [], nA = r.air.crahPerHall;
+        for (var a = 0; a < nA; a++) crahs.push({ i: a, x: (a >> 1) * length / Math.ceil(nA / 2) + length / Math.ceil(nA / 2) / 2, y: a % 2 ? width - 0.6 : 0.6, wall: a % 2 ? 'north' : 'south' });
+        return { lengthM: length, widthM: width, heightM: p.hallHeightM, areaM2: length * width, volumeM3: length * width * p.hallHeightM,
+                 rows: rowsOut.length, racksPerRow: perRow, rowsY: rowsOut, racks: rackList, cdus: cdus, crahs: crahs,
+                 airChangesPerHour: r.air.airflowHallM3s * 3600 / (length * width * p.hallHeightM) };
+    }
+
+    /* Time response after a fault — a first-order lumped model, stated so it can be checked:
+         C·dT/dt = Q_in − f·Q_design·(T − T_sink)/(T0 − T_sink)
+       C = water (or water + air) thermal mass, f = rejection capacity left (0…1). With f = 0
+       the rise is linear, T = T0 + Q·t/C; with f > 0 it settles at T_sink + (T0 − T_sink)/f with
+       τ = C·(T0 − T_sink)/(f·Q). Integrated numerically (1 s steps) so the page can draw it and the
+       test can compare it with the analytic solution. */
+    function transient(r, kind, opt) {
+        var p = r.input, o = opt || {}, hallLiq = r.liquid.dutyKw / p.halls;
+        var C, Q, T0, Ts, f, limit, label;
+        if (kind === 'fws-pump' || kind === 'cooler') {
+            C = p.tcsLoopM3PerCdu * r.liquid.cduPerHall * RHO_W * CP_W;   // kJ/K
+            Q = hallLiq; T0 = p.tcsReturnC; Ts = r.liquid.fwsSupplyC; f = kind === 'cooler' ? (o.f != null ? o.f : 0.5) : 0;
+            limit = p.throttleC; label = 'TCS return';
+        } else if (kind === 'chiller' || kind === 'chw') {
+            var evap = r.air.chillerEvapKw;
+            C = evap * p.chwLoopLPerKw / 1000 * RHO_W * CP_W;
+            Q = evap; T0 = p.chwSupplyC; Ts = p.chwSupplyC - 4;
+            var left = kind === 'chw' ? 0 : (r.air.chillersTotal - 1) * p.chillerUnitKw / evap;
+            f = Math.min(left, 1.5); limit = 27 - 6; label = 'CHW supply';   // 6 K coil approach to a 27 °C inlet
+        } else return null;
+        var dt = 1, t = 0, T = T0, series = [[0, T0]], hit = null, tMax = (o.minutes || 30) * 60;
+        while (t < tMax) {
+            var rej = f * Q * (T - Ts) / Math.max(T0 - Ts, 0.1);
+            T += (Q - rej) / C * dt; t += dt;
+            if (hit == null && T >= limit) hit = t;
+            if (t % 30 === 0) series.push([t / 60, T]);
+        }
+        var analytic = function (sec) {
+            if (f === 0) return T0 + Q * sec / C;
+            var Tss = Ts + (T0 - Ts) / f, tau = C * (T0 - Ts) / (f * Q);
+            return Tss + (T0 - Tss) * Math.exp(-sec / tau);
+        };
+        return { kind: kind, label: label, series: series, limitC: limit, secondsToLimit: hit, capacityLeft: f, analytic: analytic, C: C, Q: Q };
     }
 
     /* Fault overlay — what a failure does to one hall (default DH01). Steady-state shift plus
@@ -434,7 +577,8 @@
         return diff;
     }
 
-    var api = { DEFAULTS: DEFAULTS, PRESETS: PRESETS, TROPICAL_BINS: TROPICAL_BINS, PLR_CURVE: PLR_CURVE,
+    var api = { DEFAULTS: DEFAULTS, PRESETS: PRESETS, TROPICAL_BINS: TROPICAL_BINS, PLR_CURVE: PLR_CURVE, CLIMATES: CLIMATES,
+                parseBins: parseBins, transient: transient, hallGeometry: hallGeometry,
                 compute: compute, solve: solve, normalise: normalise, plrFactor: plrFactor, chillerCop: chillerCop,
                 lmtd: lmtd, load: load, save: save, KEY: KEY,
                 CONST: { CP_W: CP_W, RHO_W: RHO_W, CP_A: CP_A, RHO_A: RHO_A, H_FG: H_FG, KWRT: KWRT } };

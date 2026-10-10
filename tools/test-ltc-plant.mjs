@@ -11,6 +11,8 @@
  *   P4  faults: losing CDU feeder A on single-fed CDUs drops half of them and pushes the
  *       shortfall into the hall air; dual-fed CDUs lose none; one CDU out is covered by N+1;
  *       FWS loss gives minutes, flow loss gives seconds.
+ *   P6  engine v2: metering order M0>M1>M2>M3, PUE1<2<3, CUE/REF/ERF identities, sizing by hand,
+ *       hall geometry, transients against the analytic first-order solution, climate presets.
  *   P5  practitioner claims recomputed: the VSD part-load points, the 5.4 MW adiabatic-vs-fluid
  *       cooler count, and the water–energy shape of the four plant presets.
  *
@@ -54,7 +56,9 @@ for (let i = 0; i < 200; i++) {
   // CRAH: air load per hall incl. CDU skin, divided by (1 − fan fraction)
   const skin = (liquidIt + pump) * 0.01;
   const fanFrac = 1.2 / (1.18 * 1.006 * 12);
-  const hall = (15000 + skin) / 5 / (1 - fanFrac);
+  // cord and PDU losses dissipate in the hall air, so the CRAHs carry them too
+  const cord = 100000 * 0.005, pdu = (100000 + cord) / (1 - 0.015) - (100000 + cord);
+  const hall = (15000 + skin + cord + pdu) / 5 / (1 - fanFrac);
   near(r.air.hallLoadKw, hall, 0.5, 'P2 CRAH hall load kW');
   ok(r.air.crahPerHall === Math.ceil(hall / 250) + 1, `P2 CRAH per hall ${r.air.crahPerHall}`);
   ok(r.air.chillersN === Math.ceil(r.air.chillerEvapKw / 4000), 'P2 chiller count from evaporator load');
@@ -108,6 +112,45 @@ for (let i = 0; i < 200; i++) {
     ok(t.pueAnnual <= t.pue + 1e-9, `P5 ${k}: annual PUE above design-day PUE`);
     ok(Math.abs(t.hours - 8760) < 1, `P5 ${k}: climate bins cover ${t.hours} h, not 8,760`);
   }
+}
+
+// P6 — engine v2: metering points, annual KPIs, sizing, hall, transients, site layer
+{
+  const r = P.compute({});
+  const A = r.annual;
+  ok(A.m0MWh > A.m1MWh && A.m1MWh > A.m2MWh && A.m2MWh > A.m3MWh, 'P6 M0 > M1 > M2 > M3 (losses accumulate outward from the IT input)');
+  ok(A.pue1 < A.pue2 && A.pue2 < A.pue3, 'P6 PUE category 1 < 2 < 3 for the same facility');
+  near(A.m3MWh, 100 * 0.85 * 8760, 1, 'P6 M3 = IT MW × utilisation × 8,760 h');
+  near(A.cue, (A.m0MWh - A.renewableMWh) * 0.72 / A.m3MWh, 1e-9, 'P6 CUE identity');
+  near(A.pue3, r.totals.pueAnnual, 1e-9, 'P6 PUE3 equals the annual PUE');
+  const q = P.compute({ renewablePct: 40, heatReusePct: 20 }).annual;
+  ok(q.ref > 0.39 && q.ref < 0.41 && q.cue < A.cue && q.erf > 0, 'P6 renewable share lowers CUE and sets REF; reuse sets ERF');
+  // sizing by hand
+  const d = r.design;
+  ok(r.power.genTotal === Math.ceil(d.facility / 3000) + 1, 'P6 generator count = ceil(facility / unit) + 1');
+  ok(r.power.upsTotal === Math.ceil(d.upsOut / 1250) + 1, 'P6 UPS modules N+1');
+  ok(P.compute({ upsTopology: '2N' }).power.upsTotal === 2 * Math.ceil(d.upsOut / 1250), 'P6 UPS modules 2N');
+  // hall: every rack placed, rows paired across hot aisles
+  const h = r.hall;
+  ok(h.racks.length === r.it.racksPerHall && h.rows % 2 === 0, `P6 hall places ${h.racks.length} of ${r.it.racksPerHall} racks in ${h.rows} rows`);
+  ok(h.cdus.length === r.liquid.cduPerHall && h.crahs.length === r.air.crahPerHall, 'P6 hall carries the sized CDUs and CRAHs');
+  // transients against the analytic solution
+  for (const [k, f] of [['fws-pump', 0], ['cooler', 0.5], ['chw', 0]]) {
+    const t = P.transient(r, k, { f });
+    let worst = 0;
+    for (const [min, T] of t.series) worst = Math.max(worst, Math.abs(T - t.analytic(min * 60)));
+    ok(worst < 0.05, `P6 transient ${k}: numeric vs analytic off by ${worst.toFixed(3)} K`);
+  }
+  const fws = P.transient(r, 'fws-pump');
+  near(fws.secondsToLimit, (60 - 45) * fws.C / fws.Q, 1.5, 'P6 FWS loss: time to throttle = C·ΔT / Q');
+  ok(P.transient(r, 'chiller').secondsToLimit === null, 'P6 one chiller tripping with N+1 never reaches the limit');
+  // site layer
+  for (const c of Object.keys(P.CLIMATES)) {
+    const x = P.compute({ climate: c });
+    ok(Math.abs(x.totals.hours - 8760) < 1 && x.totals.balanceErr < 0.005, `P6 climate ${c}: 8,760 h and balance`);
+  }
+  ok(P.compute({ climate: 'temperate' }).totals.pueAnnual < P.compute({ climate: 'tropical' }).totals.pueAnnual, 'P6 a temperate site runs a lower annual PUE than a tropical one');
+  ok(JSON.stringify(P.parseBins('30,26,4000\n24 22 4760\nbad line')) === JSON.stringify([[30, 26, 4000], [24, 22, 4760]]), 'P6 parseBins reads db, wb, hours lines and skips the rest');
 }
 
 if (fails.length) {

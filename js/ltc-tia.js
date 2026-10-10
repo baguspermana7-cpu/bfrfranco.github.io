@@ -232,6 +232,7 @@
       L.inspect({ sym: SPACES.mda.sym, eyebrow: 'TIA-942-B space', title: SPACES.mda.name, html: '<p>' + L.esc(SPACES.mda.body) + '</p>' });
       fig.mark('mda', 'selected');
     }
+    if (window.LTCPlantStrip) window.LTCPlantStrip.bind('pRacks', function (r) { return r.it.racksPerHall; }, 'Plant racks per hall = hall IT / rack kW', 0);
   }
   window.LTCTia = { fiberCalc: fiberCalc, copperCalc: copperCalc, tbbSize: tbbSize, APPS: APPS };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

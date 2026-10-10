@@ -224,7 +224,7 @@
       '<div class="ltc-verdict" data-state="' + (margin >= 0 ? 'ok' : 'warn') + '"><b>' + (margin >= 0 ? 'Dry cooling holds' : 'Needs trim cooling') + '</b><span>' +
       (margin >= 0 ? 'At the design ambient a dry cooler with this approach delivers ' + L.fmt(achievable, 1) + ' °C — ' + L.fmt(margin, 1) + ' K under the required supply.'
                    : 'A dry cooler alone delivers ' + L.fmt(achievable, 1) + ' °C; the supply needs ' + L.fmt(-margin, 1) + ' K more — adiabatic assist, a tower or a chiller covers those hours.') +
-      '</span></div><dl class="ltc-readouts">' +
+      '</span></div>' + plantLine() + '<dl class="ltc-readouts">' +
       ro('Facility-water class', cls.id, '') + ro('Required supply', L.fmt(sup, 1), '°C') + ro('Dry-cooler leaving', L.fmt(achievable, 1), '°C') +
       ro('Free-cooling margin', L.fmt(margin, 1), 'K', margin >= 0 ? 'ok' : 'warn') + '</dl>' +
       '<div class="ltc-table-wrap"><table class="ltc-table"><thead><tr><th>Class</th><th class="n">Max supply</th><th>Typical heat rejection</th></tr></thead><tbody>' +
@@ -232,6 +232,14 @@
         return '<tr' + (k === cls ? ' data-hit' : '') + '><td class="mono">' + k.id + '</td><td class="n">' + (isFinite(k.max) ? k.max + ' °C' : '> 45 °C') + '</td><td>' + k.plant + '</td></tr>';
       }).join('') + '</tbody></table></div>';
     if (liqFig) liqFig.redraw();
+  }
+
+  /* what the shared plant actually does at its design day — the tool above is a dry-cooler what-if */
+  function plantLine() {
+    var S = window.LTCPlantStrip; if (!S) return '';
+    var r = S.get().result, q = r.liquid, names = { drycooler: 'dry coolers', adiabatic: 'adiabatic coolers', fluidcooler: 'fluid coolers', tower: 'towers + HX' };
+    return '<p class="ltc-note">This plant (' + L.esc(names[q.coolerType]) + '): sink ' + L.fmt(q.coolerSinkC, 1) + ' °C at design, cooler leaves ' + L.fmt(q.coolerLeavingC, 1) +
+      ' °C, trim chiller ' + (q.trimShareDesign > 0 ? 'carries ' + L.fmt(q.trimShareDesign * 100, 0) + ' % on the design day and runs ' + L.fmt(r.totals.trimHours, 0) + ' h/yr' : 'not needed') + '.</p>';
   }
 
   /* where the W-class is measured: an engine-drawn loop */
@@ -407,6 +415,15 @@
     var gt = document.getElementById('gTape');
     gt.addEventListener('click', function () { gt.setAttribute('aria-pressed', gt.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); runLog(); });
     runLog();
+    /* from the shared plant: the reader can still type over any of these */
+    var S = window.LTCPlantStrip;
+    if (S) {
+      S.bind('lSup', function (r) { return r.liquid.fwsSupplyC; }, 'Plant FWS supply = TCS supply − CDU approach');
+      S.bind('lAmb', function (r) { return r.input.designDbC; }, 'Plant design dry bulb (site climate)');
+      S.bind('lApp', function (r) { return r.input.coolerMinApproachK[r.input.liquidRejection]; }, 'Approach of the plant’s cooler type', 1);
+      S.bind('cSup', function (r) { return r.liquid.fwsSupplyC; }, 'Coldest wetted surface in the hall: FWS supply at the CDU primary');
+      S.onChange(function () { runLiquid(); });
+    }
     hover(document.getElementById('aOut'), 'aHover');
     hover(document.getElementById('gOut'), 'gHover');
     if (window.matchMedia('(min-width: 1280px)').matches) inspectClass(st.sel);

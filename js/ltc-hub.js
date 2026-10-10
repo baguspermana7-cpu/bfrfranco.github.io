@@ -142,9 +142,9 @@
   /* One model for every workbench page (js/ltc-plant.js). The map used to stop at the dry
    * cooler; the 10–30 % of IT heat liquid cooling does not capture, and the UPS and
    * transformer losses, had nowhere to go. Every block below now carries its number. */
-  var P = window.LTCPlant;
-  var state = P ? P.load() : {};
-  var R = P ? P.compute(state) : null;
+  var P = window.LTCPlant, S = window.LTCPlantStrip;
+  var state = S ? S.get().state : (P ? P.load() : {});
+  var R = S ? S.get().result : (P ? P.compute(state) : null);
   function f0(v) { return Math.round(v).toLocaleString('en-US'); }
   function f1(v) { return (Math.round(v * 10) / 10).toLocaleString('en-US'); }
   function mw(kw) { return f1(kw / 1000) + ' MW'; }
@@ -466,54 +466,17 @@
   var lifeFig = null;
 
   /* ---- plant parameters, balance and the four-plant comparison ------------- */
-  var CTL = [
-    ['itMw', 'IT load', 'MW', 10, 300, 5], ['capturePct', 'Liquid capture', '%', 50, 98, 1],
-    ['tcsSupplyC', 'TCS supply', '°C', 25, 45, 1], ['designDbC', 'Design dry bulb', '°C', 20, 45, 0.5],
-    ['designWbC', 'Design wet bulb', '°C', 15, 32, 0.5], ['itUtil', 'Annual IT utilisation', '', 0.4, 1, 0.05]
-  ];
-  function setState(patch) {
-    state = Object.assign({}, state, patch);
-    if (patch.tcsSupplyC != null) state.tcsReturnC = Number(patch.tcsSupplyC) + 10;
-    P.save(state);
-    R = P.compute(state);
-    paintPanel();
-    if (fig) fig.redraw();
-  }
+  /* Inputs live in the shared plant strip (js/ltc-plant-strip.js), not here: one place to edit
+   * the plant, every page redraws from the same result. This panel only reports. */
   function paintPanel() {
     var host = document.getElementById('ltcPlant');
     if (!host || !R) return;
-    var I = R.input, T = R.totals, preset = state.preset || '';
-    if (!host.firstChild) {
-      host.innerHTML = '<div class="ltc-plant-ctl"><div class="ltc-seg" role="group" aria-label="Plant configuration">' +
-        Object.keys(P.PRESETS).map(function (k) { return '<button type="button" data-preset="' + k + '">' + L.esc(P.PRESETS[k].label) + '</button>'; }).join('') +
-        '</div><div class="ltc-plant-fields">' + CTL.map(function (c) {
-          return '<div class="ltc-field"><label for="pl-' + c[0] + '">' + c[1] + '</label><output id="pl-' + c[0] + '-o"></output>' +
-            '<input type="range" id="pl-' + c[0] + '" min="' + c[3] + '" max="' + c[4] + '" step="' + c[5] + '" data-k="' + c[0] + '"></div>';
-        }).join('') + '<div class="ltc-field"><label>CDU feed</label><div class="ltc-seg" role="group" aria-label="CDU feed">' +
-        '<button type="button" data-feed="single">Single A/B</button><button type="button" data-feed="dual">Dual (ATS)</button></div></div></div></div>' +
-        '<p class="metabar ltc-plant-bal" id="ltcBal" aria-live="polite"></p>';
-      host.addEventListener('input', function (e) { var k = e.target.getAttribute('data-k'); if (k) { var o = {}; o[k] = Number(e.target.value); setState(o); } });
-      host.addEventListener('click', function (e) {
-        var b = e.target.closest('[data-preset]'); if (b) { var pr = b.getAttribute('data-preset'); setState(Object.assign({ preset: pr }, P.PRESETS[pr])); }
-        var fd = e.target.closest('[data-feed]'); if (fd) setState({ cduFeed: fd.getAttribute('data-feed') });
-      });
-    }
-    [].forEach.call(host.querySelectorAll('[data-preset]'), function (b) {
-      var p = P.PRESETS[b.getAttribute('data-preset')];
-      b.setAttribute('aria-pressed', String(p.chillerType === I.chillerType && p.liquidRejection === I.liquidRejection));
-    });
-    [].forEach.call(host.querySelectorAll('[data-feed]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-feed') === I.cduFeed)); });
-    CTL.forEach(function (c) {
-      var inp = document.getElementById('pl-' + c[0]), out = document.getElementById('pl-' + c[0] + '-o');
-      if (Number(inp.value) !== I[c[0]]) inp.value = I[c[0]];
-      out.textContent = (c[0] === 'itUtil' ? Math.round(I[c[0]] * 100) + ' %' : I[c[0]] + ' ' + c[2]);
-    });
-    var bal = R.totals.split;
-    document.getElementById('ltcBal').innerHTML =
+    var T = R.totals, A = R.annual, bal = T.split;
+    host.innerHTML = '<p class="ltc-plant-bal" aria-live="polite">' +
       '<span>heat out: liquid <b>' + mw(bal.liquid) + '</b></span><span class="sep">/</span><span>air <b>' + mw(bal.air) + '</b></span>' +
       '<span class="sep">/</span><span>electrical rooms <b>' + mw(bal.elec) + '</b></span><span class="sep">/</span>' +
-      '<span>PUE <b>' + T.pue.toFixed(3) + '</b> design · <b>' + T.pueAnnual.toFixed(3) + '</b> annual</span><span class="sep">/</span>' +
-      '<span>WUE <b>' + T.wueAnnual.toFixed(2) + '</b> L/kWh</span><span class="sep">/</span><span>energy balance closes to <b>' + (T.balanceErr * 100).toFixed(3) + ' %</b></span>';
+      '<span>water <b>' + f0(A.waterM3) + '</b> m³/yr</span><span class="sep">/</span>' +
+      '<span>energy balance closes to <b>' + (T.balanceErr * 100).toFixed(3) + ' %</b></span></p>';
     compare();
   }
   /* the four plants at THIS site and load: the water–energy trade-off, computed, not quoted */
@@ -545,7 +508,7 @@
     matrix();
     lifeTable();
     paintPanel();
-    window.addEventListener('storage', function (e) { if (e.key === P.KEY) { state = P.load(); R = P.compute(state); paintPanel(); if (fig) fig.redraw(); } });
+    if (S) S.onChange(function (r, st) { R = r; state = st; paintPanel(); if (fig) fig.redraw(); });
     /* the inspector is a persistent column only on wide screens; elsewhere it is a
      * drawer, and opening a drawer nobody asked for hides the plant */
     if (window.matchMedia('(min-width: 1280px)').matches) open('racks');
