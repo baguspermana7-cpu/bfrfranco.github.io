@@ -55,6 +55,13 @@ for (const f of files) {
         if (!e || !e.quote || !txt.includes(e.quote)) fail(`durationEvidence.${k} does not resolve verbatim to ${e ? e.src + '#' + e.i : 'anything'}`);
       }
     } else if (inc.durationMin != null) fail(`durationStatus ${st} but durationMin is ${inc.durationMin} — a number the dossier cannot support`);
+    // durationScore (20% of magnitude) is derived from the measured duration by fixed bands,
+    // so the two cannot drift apart again; it stays a judgement only where no duration exists.
+    const h = inc.durationMin / 60;
+    const want = st === 'no-outage' ? 1 : st === 'measured'
+      ? [[1, 3], [4, 4], [12, 5], [24, 6], [72, 7], [168, 8], [720, 9]].find(([lim]) => h < lim)?.[1] ?? 10 : null;
+    const got = (inc.magnitude || {}).durationScore;
+    if (want != null && got !== want) fail(`magnitude.durationScore ${got} but the duration band gives ${want}`);
   }
   for (const k of ['title', 'operator', 'dcName', 'date', 'brief', 'rootCause', 'technicalDeepDive']) {
     if (!inc[k] || String(inc[k]).trim() === '') fail(`missing/empty "${k}"`);

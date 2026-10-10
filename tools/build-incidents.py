@@ -687,6 +687,9 @@ def _dur(mins):
         return "—"
     mins = int(mins)
     h, m = divmod(mins, 60)
+    if h >= 48:  # "259h 51m" reads as a number to decode; days are how people say it
+        d, h = divmod(h + (1 if m >= 30 else 0), 24)
+        return f"{d}d {h}h" if h else f"{d}d"
     return f"{h}h {m}m" if h else f"{m}m"
 
 
@@ -772,7 +775,7 @@ def _pts(vals, cx, cy, r):
 _RADAR_DESC = {
     "usersScore": "Users affected (0–10) — breadth of the user/customer population impacted.",
     "financialScore": "Financial impact (0–10) — direct + consequential cost.",
-    "durationScore": "Outage duration (0–10) — how long service was degraded/down.",
+    "durationScore": "Outage duration (0–10), from the measured duration by fixed bands: <1 h 3 · 1–4 h 4 · 4–12 h 5 · 12–24 h 6 · 1–3 d 7 · 3–7 d 8 · 7–30 d 9 · >30 d 10; no customer downtime 1.",
     "blastRadiusScore": "Blast radius (0–10) — how wide the fault propagated across systems/regions.",
 }
 

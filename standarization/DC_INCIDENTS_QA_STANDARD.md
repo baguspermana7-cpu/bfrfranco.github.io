@@ -70,6 +70,8 @@ time. `durationEvidence.onset` / `.restored` point at the two entries, each with
 `durationStatus` is `measured`, `no-outage` (no customer downtime recorded) or `not-established`
 (the dossier has no restoration time) — the last two carry `durationMin: null`, because a number the
 dossier cannot trace is worse than none. `durationBasis` is the one-line from → to shown on the page.
+`magnitude.durationScore` is DERIVED from it by fixed bands (v3.13.6): <1 h 3 · 1–4 h 4 · 4–12 h 5 ·
+12–24 h 6 · 1–3 d 7 · 3–7 d 8 · 7–30 d 9 · >30 d 10; `no-outage` 1; `not-established` keeps a judged score.
 Gate: `node tools/test-incidents-corpus.mjs`.
 
 ## 4b · Retrospective FMEA (v3.13.0) — every dossier carries one

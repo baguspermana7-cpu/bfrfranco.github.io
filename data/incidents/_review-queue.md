@@ -35,10 +35,15 @@ wrong. `tools/test-incidents-corpus.mjs` now fails both classes.
   exposure window, not customer impact); AWS EBS 2011 ~90 h → ~36 h (straggler tail excluded); Rogers
   15 h → ~26 h (the figure the dossier itself had withdrawn).
 
-### Still open after the duration change
-- `magnitude.durationScore` is a 0–10 judgement made against the OLD durations and was not
-  re-scored. Magnitude notes that quote an hour figure may now disagree with the header:
-  alibaba-cloud-global-2023, att-nationwide-outage-2024, aws-ebs-ec2-rds-us-east-1-2011, aws-kinesis-thread-limit-outage-2020, aws-us-east-1-dynamodb-dns-2025, aws-us-east-1-thermal-2025, azure-active-directory-2020, azure-front-door-config-change-2025, azure-south-central-us-texas-cooling-2018, cloudflare-bot-management-feature-file-2025, cloudflare-flexential-pdx-power-2023, cyrusone-cme-chicago-cooling-2025, delta-atlanta-switchgear-2016, dyn-mirai-ddos-2016, equinix-ld8-london-ups-2020, facebook-meta-bgp-dns-2021, fastly-global-cdn-2021, kakao-sk-cc-pangyo-fire-2022, optus-australia-nationwide-2023, rogers-canada-nationwide-2022.
+### Decided by the owner, done in v3.13.6
+- **durationScore derived, not judged** (owner: "Terapkan pita tetap"). Fixed bands from the measured
+  duration: <1 h 3 · 1–4 h 4 · 4–12 h 5 · 12–24 h 6 · 1–3 d 7 · 3–7 d 8 · 7–30 d 9 · >30 d 10; no customer
+  downtime 1; `not-established` keeps its judged score. 30 scores changed; gated by
+  `tools/test-incidents-corpus.mjs`.
+
+### Still open
+- Magnitude `note` text on ~20 dossiers quotes the hour figure it was written against (e.g. Rogers
+  "~15h"); the header and sub-score are now right, the prose is not. Rewrite when each is next touched.
 
 ### Internal contradictions between fields or sources
 - **nirs-daejeon-battery-fire-2025** — first report ~20:15 (SOE 3) before ~20:20 ignition

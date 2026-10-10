@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v3.13.6 — 2026-10-10
+
+### The duration sub-score follows the duration; long outages read in days
+
+**Changed — `magnitude.durationScore` derived by fixed bands** (owner decision). It was a 0–10
+judgement made against the durations v3.13.5 corrected, so a 47-minute and a 10-day outage could
+carry the same score. Now: <1 h 3 · 1–4 h 4 · 4–12 h 5 · 12–24 h 6 · 1–3 d 7 · 3–7 d 8 · 7–30 d 9 · >30 d
+10; no customer downtime 1; where the dossier records no restoration time the judged score stays.
+30 of 43 change, and with them the ranking (duration is 20% of magnitude): UniSuper #14 → #4 (≈ 9 days
+dark), GCP Service Control 2025 #4 → #8 (≈ 1 h 39 m to substantial restoration), AWS us-east-1 2021
+#8 → #13. The band table is in the sub-score's tooltip.
+
+**Changed** — durations of 48 h or more read as days: CrowdStrike "259h 51m" → "10d 20h".
+
+**Gate** `tools/test-incidents-corpus.mjs`: `durationScore` must equal its band (seen to fail on one
+drifted score).
+
 ## v3.13.5 — 2026-10-10
 
 ### Incident durations mean one thing; the Virginia dossier says what actually happened
