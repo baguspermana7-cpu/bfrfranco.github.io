@@ -54,6 +54,13 @@ gate "article diagrams — figures current, and free of collisions" node tools/b
 gate "diagram survey coverage — every cockpit measured, declared, or excused" node tools/test-diagram-survey-coverage.mjs
 gate "diagram engine — metrics, placement, routing, facade" node tools/test-rz-diagram-engine.mjs
 gate "LTC workbench — standards arithmetic + page frame" node tools/test-ltc-workbench.mjs
+gate "LTC plant model — energy balance, 100 MW hand checks, faults, practitioner claims recomputed" node tools/test-ltc-plant.mjs
+gate "CSS structure — no rule silently discarded" node tools/audit-css-structure.mjs
+gate "motion — toast and sheet move the way the standard says" node tools/test-rz-motion.mjs --strict
+gate "flatten ratchet — washes and card stripes may fall, never rise" node tools/test-flatten-ratchet.mjs --strict
+gate "incident pages — generated pages match the builder" python3 tools/build-incidents.py --check
+gate "incident FMEA — grounded, scored with reasons, rendered" python3 tools/test-incidents-fmea.py --strict --require-all
+gate "incident FMEA simulator — live, consistent with the builder, hub agrees" node tools/test-fmea-sim.mjs --strict
 gate "diagram engine — adoption ratchet (hand-authored geometry may fall, never rise)" node tools/test-diagram-engine-adoption.mjs
 gate "diagram engine — one real diagram renders with zero collisions" node tools/demo-rz-diagram.mjs
 gate "DC AI GB300 engine — identities, balance, cliff, perturbation" node tools/test-dcai-engine.mjs

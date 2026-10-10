@@ -313,3 +313,39 @@ body.locked .ltc-app { filter: blur(8px); pointer-events: none; user-select: non
   .ltc-panel[hidden] { display: block; }
   .ltc-insp { position: static; transform: none; border: 0; }
 }
+
+/* ---- live plant (v3.14.0): parameters, balance, hover trace, scripts ---- */
+.ltc-plant { margin: 0 0 12px; }
+.ltc-plant-ctl { display: grid; gap: 12px; }
+.ltc-plant-ctl > .ltc-seg { flex-wrap: wrap; }
+.ltc-plant-ctl > .ltc-seg button { flex: 1 1 200px; }
+.ltc-plant-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px 20px; }
+.ltc-plant-bal { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 12px 0 0; padding: 8px 0; border-top: 1px solid var(--bd); border-bottom: 1px solid var(--bd);
+  font: 400 12.5px/1.5 'JetBrains Mono', monospace; color: var(--t2); font-variant-numeric: tabular-nums; }
+.ltc-plant-bal b { color: var(--t1); font-weight: 500; }
+.ltc-plant-bal .sep { color: var(--t3); }
+.ltc-h2 { font-size: 15px; font-weight: 600; color: var(--t1); margin: 24px 0 8px; }
+.ltc-life-table { margin-top: 12px; }
+.ltc-linkbtn { background: none; border: 0; padding: 0; color: var(--o); cursor: pointer; text-align: left; font: inherit; }
+.ltc-linkbtn:hover { text-decoration: underline; }
+.ltc-linkbtn:focus-visible { outline: 2px solid var(--o); outline-offset: 2px; }
+.ltc-script-h { font: 500 10.5px/1.2 'JetBrains Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); margin: 14px 0 6px; }
+.ltc-script-p { margin: 0; font-size: 13px; color: var(--t2); line-height: 1.5; }
+.ltc-script-l { margin: 0; padding-left: 18px; font-size: 13px; color: var(--t2); line-height: 1.5; }
+.ltc-script-l li { margin: 3px 0; }
+/* hover trace: the block and its connectors stay, the rest steps back */
+.ltc-canvas svg path[data-rzd-edge], .ltc-canvas svg rect[data-rzd-node] { transition: opacity 150ms ease; }
+.ltc-canvas svg.is-tracing path[data-rzd-edge]:not([data-trace]) { opacity: .12; }
+.ltc-canvas svg.is-tracing rect[data-rzd-node]:not([data-trace]) { opacity: .4; }
+.ltc-canvas svg.is-tracing rect[data-rzd-node][data-trace="self"] { stroke: var(--o); stroke-width: 1.6; }
+.ltc-tip { position: fixed; z-index: 60; max-width: 300px; padding: 10px 12px; background: var(--bg2); border: 1px solid var(--bd2); border-radius: 4px;
+  font-size: 12.5px; color: var(--t2); pointer-events: none; }
+.ltc-tip-h { font-weight: 600; color: var(--t1); margin-bottom: 6px; }
+.ltc-tip dl { display: grid; grid-template-columns: auto auto; gap: 3px 12px; margin: 0; }
+.ltc-tip dt { color: var(--t3); }
+.ltc-tip dd { margin: 0; text-align: right; font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; color: var(--t1); }
+.ltc-tip-f { margin: 8px 0 0; padding-top: 6px; border-top: 1px solid var(--bd); font: 400 11.5px/1.4 'JetBrains Mono', monospace; color: var(--t3); }
+.ltc-tip-n { margin-top: 6px; font-size: 12px; color: var(--t2); }
+@media (prefers-reduced-motion: reduce) { .ltc-canvas svg path[data-rzd-edge], .ltc-canvas svg rect[data-rzd-node] { transition: none; } }
+.ltc-views { margin: 0 0 8px; width: max-content; max-width: 100%; flex-wrap: wrap; }
+.ltc-plant-fields .ltc-field .ltc-seg { grid-column: 1 / -1; width: max-content; max-width: 100%; }

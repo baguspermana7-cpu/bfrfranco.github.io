@@ -11,6 +11,53 @@ release sections rather than semver.
 
 ---
 
+## v3.14.0 — 2026-10-10
+
+### LTC Workbench: one 100 MW plant that closes its heat balance
+
+Owner, on the plant map: *"residual air hotnya kemana? bukannya masih butuh CRAH, masuk ke FWS / chiller,
+cooling di electrical substation…"* — and on the lifecycle: *"ada summary scriptnya… L4 harusnya ada HLT."*
+
+**Added — `js/ltc-plant.js`, one plant model every workbench page reads** (shared through
+`localStorage ltc_plant_v1` and a `#p=` link). Default 100 MW IT, five halls.
+- Liquid path: racks → CDUs (TCS 35/45 °C) → facility water 32/42 °C → dry / adiabatic / fluid coolers or
+  towers, with a trim chiller for what the cooler cannot reach at the design ambient.
+- **Air path, which was missing:** the 15 % of IT heat liquid does not capture, plus CDU skin loss and fan
+  heat → CRAHs → chilled water → chillers → cooling towers (or air-cooled condensers).
+- **Electrical rooms:** UPS, distribution and transformer losses → their own cooling on chilled water.
+- Power chain: MV + generators → transformers → switchgear → UPS → PDU → racks; MCC → every mechanical load.
+- Annual PUE/WUE hour-weighted over climate bins, never a fixed fraction of the design-day value.
+- Energy balance asserted: electricity in = heat out to within 0.5 % on 202 plants (it closes to 0.000 %).
+
+**Changed — Plant map** is an overview plus three details (Power · Liquid heat · Air & rooms), each within
+the diagram engine's nine-block budget, every block carrying its live number. Hover a block: it and its
+connectors stay lit, the rest fades, and a tooltip shows the numbers and the formula (the DCMOC pattern,
+vanilla, on RZDiagram). A parameter strip (configuration, IT load, capture, TCS supply, design dry/wet
+bulb, utilisation, CDU feed) recomputes everything; a table compares the four plants at the same site.
+
+**Changed — Lifecycle**: every level carries a script summary (tested · expected · hold point · standards),
+shown as a table under the figure. **L4 Functional now contains the heat load test**: load banks stepped
+25 → 50 → 75 → 100 %, settle criterion, what to record, typical acceptance, failures injected at 100 %.
+
+**Practitioner posts the owner forwarded — checked, not merged.**
+- Taken after recomputing: dry bulb vs adiabatic vs wet-bulb limits; the adiabatic-cooler equipment
+  penalty at 30 °C FWS (this model: 11 units vs 4 fluid coolers at equal rating for 5.4 MW — direction
+  confirmed, magnitude depends on unit rating); the VSD part-load points COP 5.5 / 6.268 / 7.924
+  (= 0.64 / 0.56 / 0.44 kW/RT, consistent); annual figures by climate bin; site-specific climate.
+- Not taken: the same chiller curve's tail (COP ≈ 50 at 10 % load — drive, motor and fan losses do not
+  shrink with load; clamped at 30 % PLR); a uniform-random 75–100 % IT profile (mean 87.5 %, σ 7.2 % —
+  identical to the posted figures, i.e. plain noise, not an AI workload shape); a plant report's pump
+  power (6.1 MW for 775 L/s implies ≈ 600 m of head); the KL vs JB numbers (arithmetic consistent, but
+  unverifiable without the EPW files — the model takes site bins instead of hard-coding either site).
+
+**Fixed** — incident hub titles wrap instead of ending in an ellipsis (8 were clipped by 28–183 px; `audit-legibility` failed on them).
+
+**Gates.** `tools/test-ltc-plant.mjs` (balance on 202 plants, 100 MW hand checks, physics direction,
+faults, the practitioner claims recomputed). `test-ltc-workbench.mjs` W7 (+17): the new blocks, ≤ 9 per
+view, traceable connector ids, a script at every gate, HLT at L4. Seven mandatory audits that CLAUDE.md
+named but `ship-gate.sh` never ran are now wired (CSS structure, motion, flatten ratchet, incident
+builder, incident FMEA, FMEA simulator), and `report-register-wiring` is declared out with its reason.
+
 ## v3.13.6 — 2026-10-10
 
 ### The duration sub-score follows the duration; long outages read in days

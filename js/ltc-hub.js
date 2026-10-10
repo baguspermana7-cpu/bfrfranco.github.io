@@ -81,10 +81,111 @@
         text: 'Clean-agent systems: agent quantity from room volume, design concentration and temperature.',
         tool: ['ltc-nfpa-fire-risk.html#agent', 'Size the agent'] },
       { body: 'TIA', role: 'references', code: 'TIA-942-B annex',
-        text: 'Rated facilities reference suppression type alongside power and cooling redundancy.' } ] }
+        text: 'Rated facilities reference suppression type alongside power and cooling redundancy.' } ] },
+    { id: 'tx', sym: 'transformer', name: 'Transformers', sub: 'MV / LV', refs: [
+      { body: 'Uptime', role: 'governs', code: 'Tier Standard: Topology',
+        text: 'Transformers are capacity components on the distribution path: Tier III needs each one removable for maintenance without dropping the IT load.',
+        tool: ['ltc-uptime-tier-alignment.html#simulator', 'Test the power path'] },
+      { body: 'NFPA', role: 'references', code: 'NFPA 70 Art. 450',
+        text: 'Installation of transformers and transformer vaults.' },
+      { body: 'ISO/IEC', role: 'measures', code: 'ISO/IEC 30134-2',
+        text: 'Transformer losses sit on the overhead side of PUE at every category.',
+        tool: ['ltc-iso-energy-governance.html#kpi', 'Compare PUE categories'] } ] },
+    { id: 'mcc', sym: 'breaker', name: 'MCC A / B', sub: 'mechanical power', refs: [
+      { body: 'Uptime', role: 'governs', code: 'Tier Standard: Topology',
+        text: 'Cooling is critical infrastructure: the power paths to pumps, CRAHs and chillers must meet the same Tier objective as the IT power path.',
+        tool: ['ltc-uptime-tier-alignment.html#simulator', 'Sweep the cooling path'] },
+      { body: 'NFPA', role: 'references', code: 'NFPA 70 Art. 430',
+        text: 'Motors, motor circuits and controllers.' } ] },
+    { id: 'elec', sym: 'crah', name: 'Electrical rooms', sub: 'UPS · TX loss cooling', refs: [
+      { body: 'Uptime', role: 'governs', code: 'Tier Standard: Topology',
+        text: 'UPS and battery rooms need cooling with the same redundancy as the systems they protect; a UPS room that overheats takes the IT load with it.' },
+      { body: 'NFPA', role: 'governs', code: 'NFPA 855',
+        text: 'Stationary energy storage (lithium-ion UPS batteries): spacing, ventilation and thermal-runaway protection.' },
+      { body: 'ISO/IEC', role: 'measures', code: 'ISO/IEC 30134-2',
+        text: 'The cooling energy spent on electrical losses is overhead in PUE.' } ] },
+    { id: 'fws', sym: 'pump', name: 'Facility water', sub: 'FWS pumps', refs: [
+      { body: 'ASHRAE', role: 'governs', code: 'TC 9.9 liquid cooling classes',
+        text: 'The facility-water supply temperature sets the W-class (W17 … W45, W+), and with it which heat rejection can run without a chiller.',
+        tool: ['ltc-ashrae-thermal-control.html#liquid', 'Classify a supply temperature'] },
+      { body: 'Uptime', role: 'governs', code: 'Concurrent maintainability',
+        text: 'Pumps, valves and pipe sections are components: Tier III needs each isolatable without stopping flow to the CDUs.' } ] },
+    { id: 'trim', sym: 'chiller', name: 'Trim chiller', sub: 'on hot hours', refs: [
+      { body: 'ASHRAE', role: 'governs', code: 'Standard 90.4',
+        text: 'Mechanical load component: the hours the trim chiller runs are where a dry heat-rejection design loses its efficiency.' } ] },
+    { id: 'crah', sym: 'crah', name: 'CRAHs', sub: 'residual air heat', refs: [
+      { body: 'ASHRAE', role: 'governs', code: 'TC 9.9 Thermal Guidelines',
+        text: 'Liquid-cooled racks still reject 10–30 % of their heat to air (memory, drives, power supplies): server inlet air stays the control point.',
+        tool: ['ltc-ashrae-thermal-control.html#envelope', 'Check an inlet condition'] },
+      { body: 'ASHRAE', role: 'governs', code: 'Standard 90.4',
+        text: 'CRAH fan energy is part of the mechanical load component.' } ] },
+    { id: 'chw', sym: 'pump', name: 'Chilled water', sub: 'CHW loop', refs: [
+      { body: 'Uptime', role: 'governs', code: 'Concurrent maintainability',
+        text: 'A single CHW header is a single point of failure for every CRAH it serves; Tier III loops are valved so any section can be isolated.',
+        tool: ['ltc-uptime-tier-alignment.html#simulator', 'Sweep the cooling path'] } ] },
+    { id: 'chiller', sym: 'chiller', name: 'Chillers', sub: 'air path + rooms', refs: [
+      { body: 'ASHRAE', role: 'governs', code: 'Standard 90.4 / 90.1',
+        text: 'Chiller efficiency at full and part load counts toward the mechanical load component.' },
+      { body: 'ASHRAE', role: 'references', code: 'Standard 15',
+        text: 'Safety standard for refrigeration systems: machinery-room ventilation and refrigerant detection.' } ] },
+    { id: 'tower', sym: 'coolingTower', name: 'Cooling towers', sub: 'condenser heat', refs: [
+      { body: 'ISO/IEC', role: 'measures', code: 'ISO/IEC 30134-9 · WUE',
+        text: 'Evaporation, drift and blowdown are the site water use WUE counts.',
+        tool: ['ltc-iso-energy-governance.html#kpi', 'Compute WUE'] },
+      { body: 'ASHRAE', role: 'governs', code: 'Standard 188',
+        text: 'Legionellosis risk management for building water systems, cooling towers included.' } ] }
   ];
   var BY_ID = {};
   SYSTEMS.forEach(function (s) { BY_ID[s.id] = s; });
+
+  /* ---- the live plant ---------------------------------------------------- */
+  /* One model for every workbench page (js/ltc-plant.js). The map used to stop at the dry
+   * cooler; the 10–30 % of IT heat liquid cooling does not capture, and the UPS and
+   * transformer losses, had nowhere to go. Every block below now carries its number. */
+  var P = window.LTCPlant;
+  var state = P ? P.load() : {};
+  var R = P ? P.compute(state) : null;
+  function f0(v) { return Math.round(v).toLocaleString('en-US'); }
+  function f1(v) { return (Math.round(v * 10) / 10).toLocaleString('en-US'); }
+  function mw(kw) { return f1(kw / 1000) + ' MW'; }
+  var COOLER_NAME = { drycooler: 'Dry coolers', adiabatic: 'Adiabatic coolers', fluidcooler: 'Fluid coolers', tower: 'Towers + HX' };
+
+  /* live sublabel, tooltip rows and the headline formula for each block */
+  function live(id) {
+    if (!R) return null;
+    var Lq = R.liquid, A = R.air, E = R.elec, T = R.totals, I = R.input;
+    var air = A.chillerType === 'air';
+    var map = {
+      utility: { sub: mw(T.facilityKw) + ' import', rows: [['Facility load', mw(T.facilityKw)], ['PUE design / annual', T.pue.toFixed(3) + ' / ' + T.pueAnnual.toFixed(3)]], f: 'IT + cooling + losses + aux' },
+      tx: { sub: f0(E.txLossKw) + ' kW loss', rows: [['Efficiency', (I.txEff * 100).toFixed(1) + ' %'], ['Loss', f0(E.txLossKw) + ' kW']], f: 'loss = input × (1 − η)' },
+      genset: { sub: 'MV bus · carries ' + mw(T.facilityKw), rows: [['Load to carry', mw(T.facilityKw)], ['Connection', 'MV paralleling bus, ahead of the transformers']], f: 'standby for the whole facility, cooling included' },
+      swgr: { sub: 'A / B boards', rows: [['To UPS', mw(E.upsInKw)], ['To MCC', mw(E.mccKw)]] },
+      mcc: { sub: mw(E.mccKw) + ' mech', rows: [['Chillers', f0(A.chillerKwe) + ' kW'], ['CRAH fans', f0(A.fanKw) + ' kW'], ['FWS pumps', f0(Lq.fwsPumpKw) + ' kW'], ['Cooler fans', f0(Lq.coolerFanKw) + ' kW'], ['Trim chiller', f0(Lq.trimKwe) + ' kW'], ['CHW + CW pumps', f0(A.chwPumpKw + A.cwPumpKw) + ' kW'], ['Tower fans', f0(A.towerFanKw) + ' kW']], f: 'Σ mechanical loads not on UPS' },
+      ups: { sub: (I.upsEff * 100).toFixed(0) + ' % · ' + f0(E.upsLossKw) + ' kW loss', rows: [['Output', mw(E.upsOutKw)], ['Loss', f0(E.upsLossKw) + ' kW'], ['CDU pumps on UPS', I.cduOnUps ? 'yes' : 'no']], f: 'input = (IT + CDU pumps + distribution) / η' },
+      pdu: { sub: f0(E.distLossKw) + ' kW loss', rows: [['Distribution loss', f0(E.distLossKw) + ' kW']], f: 'output × loss %' },
+      elec: { sub: f0(E.roomLoadKw) + ' kW to CHW', rows: [['UPS loss', f0(E.upsLossKw) + ' kW'], ['Distribution', f0(E.distLossKw) + ' kW'], ['Transformers', f0(E.txLossKw) + ' kW'], ['Room cooling load', f0(E.roomLoadKw) + ' kW']], f: 'Σ electrical losses × room share' },
+      racks: { sub: f0(R.it.racks) + ' racks · ' + I.halls + ' halls', rows: [['IT load', mw(R.it.kw)], ['Into cold plates', mw(Lq.itKw) + ' (' + I.capturePct + ' %)'], ['Left in the air', mw(A.itKw)], ['Racks per hall', f0(R.it.racksPerHall) + ' × ' + I.rackKw + ' kW']], f: 'liquid = IT × capture; air = IT − liquid' },
+      cdu: { sub: Lq.cduTotal + ' × ' + f0(I.cduUnitKw) + ' kW · N+' + I.cduRedundancy, rows: [['Per hall', Lq.cduPerHall + ' (' + Lq.cduDutyN + ' duty)'], ['TCS', I.tcsSupplyC + ' / ' + I.tcsReturnC + ' °C'], ['TCS flow', f0(Lq.tcsLps) + ' L/s'], ['TCS pumps', f0(Lq.tcsPumpKw) + ' kW'], ['Feed', I.cduFeed === 'dual' ? 'dual (ATS)' : 'single, A/B alternating']], f: 'ceil(hall liquid duty / unit) + N' },
+      fws: { sub: f1(Lq.fwsSupplyC) + ' / ' + f1(Lq.fwsReturnC) + ' °C · ' + f0(Lq.fwsLps) + ' L/s', rows: [['Supply / return', Lq.fwsSupplyC + ' / ' + Lq.fwsReturnC + ' °C'], ['Flow', f0(Lq.fwsLps) + ' L/s'], ['Pumps', f0(Lq.fwsPumpKw) + ' kW']], f: 'flow = Q / (cp · ΔT_FWS)' },
+      reject: { sub: Lq.coolerUnitsTotal + ' units · leaves ' + f1(Lq.coolerLeavingC) + ' °C', rows: [['Type', COOLER_NAME[Lq.coolerType]], ['Design sink', f1(Lq.coolerSinkC) + ' °C'], ['Leaving water', f1(Lq.coolerLeavingC) + ' °C'], ['Duty', mw(Lq.coolerKw)], ['Units (N+1)', Lq.coolerUnitsTotal + ' (each derated to ' + (Lq.coolerDerate * 100).toFixed(0) + ' %)']], f: 'units = duty / (rated × LMTD_design / LMTD_rating)' },
+      trim: { sub: Lq.trimKw ? mw(Lq.trimKw) + ' on design day' : 'idle at design', rows: [['Design-day share', (Lq.trimShareDesign * 100).toFixed(0) + ' %'], ['Duty', mw(Lq.trimKw)], ['Input', f0(Lq.trimKwe) + ' kW'], ['Hours running / yr', f0(T.trimHours)]], f: 'FWS heat × (cooler leaving − FWS supply) / ΔT' },
+      crah: { sub: A.crahTotal + ' × ' + I.crahUnitKw + ' kW · N+' + I.crahRedundancy, rows: [['Per hall', A.crahPerHall + ' (' + A.crahDutyN + ' duty)'], ['Hall air load', f0(A.hallLoadKw) + ' kW'], ['Airflow per hall', f0(A.airflowHallM3s) + ' m³/s'], ['Fan power', f0(A.fanKw) + ' kW']], f: 'load = (air IT + CDU skin) / (1 − fan fraction)' },
+      chw: { sub: A.chwSupplyC + ' / ' + A.chwReturnC + ' °C · ' + f0(A.chwLps) + ' L/s', rows: [['Supply / return', A.chwSupplyC + ' / ' + A.chwReturnC + ' °C'], ['Flow', f0(A.chwLps) + ' L/s'], ['Load', mw(A.chillerEvapKw)]], f: 'flow = evaporator load / (cp · ΔT)' },
+      chiller: { sub: A.chillersTotal + ' × ' + f0(I.chillerUnitKw / 1000) + ' MW · COP ' + A.chillerCop.toFixed(1), rows: [['Type', air ? 'air-cooled' : 'water-cooled'], ['Running', A.chillersTotal + ' at ' + (A.chillerPlr * 100).toFixed(0) + ' % load'], ['COP / kW/RT', A.chillerCop.toFixed(2) + ' / ' + A.chillerKwPerRt.toFixed(3)], ['Input', f0(A.chillerKwe) + ' kW']], f: 'COP = rated × part-load factor × lift ratio' },
+      tower: air && Lq.coolerType !== 'tower' ? { sub: 'air-cooled condensers', rows: [['Condenser heat', 'to air at the chillers']], f: 'no tower: no evaporation' }
+        : { sub: mw(A.towerKw) + ' · ' + f1(A.makeupLps) + ' L/s make-up', rows: [['Heat rejected', mw(A.towerKw)], ['Make-up', f1(A.makeupLps) + ' L/s'], ['Water / year', f0(T.waterM3Year) + ' m³'], ['WUE annual', T.wueAnnual.toFixed(2) + ' L/kWh']], f: 'evaporation = latent heat / h_fg; make-up = evap × C/(C−1)' },
+      fire: { sub: 'detect · suppress', rows: [] }
+    };
+    return map[id] || null;
+  }
+  function tips() {
+    var t = {};
+    SYSTEMS.forEach(function (s) {
+      var l = live(s.id);
+      t[s.id] = { title: s.name, rows: l ? l.rows : [], formula: l ? l.f : '' };
+    });
+    return t;
+  }
 
   /* ---- figure ------------------------------------------------------------ */
   /* power and heat are always moving in a running plant: animate those
@@ -94,102 +195,120 @@
     d.edge = function (a, b, o) {
       o = o || {};
       if (o.pattern !== 'dotted' && !o.state) o.state = 'flow';
+      if (o.fromId && o.toId && !o.id) o.id = o.fromId + '>' + o.toId;
       return edge0(a, b, o);
     };
     return d;
   }
-  var GAP = 40;
+  /* The engine caps a diagram at nine blocks (Miller's 7±2): past that a reader sees a list,
+   * not a structure. The plant has eighteen, so it is drawn as an overview plus three details
+   * on the same model — every block in the overview opens the detail it belongs to. */
+  var VIEWS = {
+    overview: { label: 'Overview', nodes: [
+        ['utility', 0, 0, { name: 'Grid + generators' }], ['ups', 1, 0, { name: 'UPS + PDU' }], ['racks', 3, 0, { h: 'span', rows: 3 }],
+        ['elec', 1, 1], ['cdu', 2, 1], ['reject', 2, 2], ['crah', 2, 3], ['chiller', 1, 3], ['tower', 0, 3]],
+      edges: [['utility', 'r', 'ups', 'l', 'POWER', 'Power'], ['ups', 'r', 'racks', 'l', 'POWER', null, 'it'],
+        ['ups', 'b', 'elec', 't', 'LOSS', 'Losses as heat'], ['racks', 'l', 'cdu', 'r', 'LIQ', 'Heat (liquid)', 'liq'],
+        ['cdu', 'b', 'reject', 't', 'LIQ'], ['racks', 'l', 'crah', 'r', 'AIR', 'Heat (air → chilled water)', 'air'],
+        ['crah', 'l', 'chiller', 'r', 'AIR'], ['elec', 'b', 'chiller', 't', 'AIR'], ['chiller', 'l', 'tower', 'r', 'AIR']],
+      opens: { utility: 'power', ups: 'power', elec: 'air', cdu: 'liquid', reject: 'liquid', crah: 'air', chiller: 'air', tower: 'air' } },
+    power: { label: 'Power', stack: 1, nodes: [
+        ['utility', 0, 0], ['tx', 1, 0], ['swgr', 2, 0], ['ups', 3, 0], ['pdu', 4, 0], ['racks', 5, 0, { h: 'span', rows: 2 }],
+        ['genset', 1, 1], ['mcc', 2, 1], ['elec', 4, 1]],
+      edges: [['utility', 'r', 'tx', 'l', 'POWER', 'Power'], ['tx', 'r', 'swgr', 'l', 'POWER'], ['genset', 't', 'tx', 'b', 'POWER'],
+        ['swgr', 'r', 'ups', 'l', 'POWER'], ['ups', 'r', 'pdu', 'l', 'POWER'], ['pdu', 'r', 'racks', 'l', 'POWER'],
+        ['swgr', 'b', 'mcc', 't', 'POWER', null, 'mcc'], ['pdu', 'b', 'elec', 't', 'LOSS', 'Losses as heat']] },
+    liquid: { label: 'Liquid heat', stack: -1, nodes: [
+        ['ups', 3, 0, { name: 'UPS' }], ['racks', 4, 0, { h: 'span', rows: 2 }], ['mcc', 1, 0],
+        ['cdu', 3, 1], ['fws', 2, 1], ['reject', 1, 1], ['trim', 0, 1], ['tower', 0, 2]],
+      edges: [['ups', 'b', 'cdu', 't', 'POWER', 'Power', 'cdupumps'], ['mcc', 'b', 'reject', 't', 'POWER'],
+        ['racks', 'l', 'cdu', 'r', 'LIQ', 'Heat (liquid)', 'liq'], ['cdu', 'l', 'fws', 'r', 'LIQ'],
+        ['fws', 'l', 'reject', 'r', 'LIQ'], ['reject', 'l', 'trim', 'r', 'LIQ'], ['trim', 'b', 'tower', 't', 'AIR', 'Condenser heat']] },
+    air: { label: 'Air & rooms', stack: -1, nodes: [
+        ['racks', 4, 0, { h: 'span', rows: 2 }], ['fire', 4, 2], ['crah', 3, 1], ['chw', 2, 1], ['chiller', 1, 1], ['tower', 0, 1],
+        ['elec', 2, 0], ['mcc', 1, 2]],
+      edges: [['racks', 'l', 'crah', 'r', 'AIR', 'Heat (air → chilled water)'], ['crah', 'l', 'chw', 'r', 'AIR'],
+        ['chw', 'l', 'chiller', 'r', 'AIR'], ['chiller', 'l', 'tower', 'r', 'AIR'], ['elec', 'b', 'chw', 't', 'AIR'],
+        ['mcc', 't', 'chiller', 'b', 'POWER', 'Power'], ['fire', 't', 'racks', 'b', 'MON', 'Monitors']] }
+  };
+  var view = 'overview';
+  var NW = 172, CG = 40, RG = 56, NH = 88;
   function build(D, o) {
+    var V = VIEWS[view];
     var d = flowing(D.create({
-      slug: 'ltcmap', width: 1200, height: 600,
-      title: 'Liquid-to-chip plant — standards map',
-      desc: 'Power flows from the utility and engine generators through switchgear, UPS and PDUs to the IT racks; ' +
-            'heat leaves the racks through the CDU to dry coolers; fire protection watches the IT space. ' +
-            'Each block opens the standards that govern it.'
+      slug: 'ltcmap-' + view, width: 1240, height: 640,
+      title: 'Liquid-to-chip plant — ' + V.label,
+      desc: 'Power from utility and generators through transformers, switchgear, UPS and PDUs to the racks, and through the MCC to ' +
+            'the mechanical plant. Liquid heat leaves the racks through CDUs and facility water to the coolers and a trim chiller; ' +
+            'the residual air heat goes through CRAHs and chilled water to the chillers and cooling towers; UPS and transformer losses ' +
+            'are cooled on the same chilled water. This view: ' + V.label + '.'
     }));
+    var STY = { POWER: { tier: 1, stroke: 'ink' }, LIQ: { pattern: 'dashed', stroke: 'link' },
+                AIR: { pattern: 'dash-dot', stroke: 'accent' }, LOSS: { pattern: 'dotted', stroke: 'muted' },
+                MON: { pattern: 'dotted', stroke: 'soft', marker: false } };
+    var LBL = R ? { it: mw(R.it.kw), liq: mw(R.liquid.itKw), air: mw(R.air.itKw) + ' air', mcc: mw(R.elec.mccKw) + ' mech', cdupumps: 'CDU pumps on UPS' } : {};
     var box = {};
-    function n(id, x, y, extra) {
-      var s = BY_ID[id];
-      box[id] = d.node(x, y, Object.assign({
-        id: id, name: s.name, sublabel: s.sub, symbol: s.sym, interactive: true,
-        focal: !!s.focal, tier: s.focal ? 1 : 2, fill: s.focal ? 'paper-2' : 'paper',
-        legend: s.focal ? 'IT load — the control point' : 'Plant equipment'
-      }, extra || {}));
-      return box[id];
+    // narrow: one column in flow order (a transposed grid scaled into 360 px left 5 px text)
+    // stack in the direction things flow: power left → right, heat right → left
+    var order = V.nodes.slice().sort(function (a, b) { return V.stack ? V.stack * (a[1] - b[1]) || a[2] - b[2] : 0; })
+      .map(function (x) { return x[0]; });
+    function pos(c, r, id) {
+      return o.narrow ? { x: 24, y: 16 + order.indexOf(id) * (NH + 36) }
+                      : { x: 24 + c * (NW + CG), y: 24 + r * (NH + RG) };
     }
-    function right(b) { return b.x + b.w + GAP; }
-    function e(a, b, side, o2) {
-      var A = box[a], B = box[b];
-      var p1, p2;
-      if (side === 'h') {
-        p1 = { x: A.x + A.w, y: A.y + A.h / 2 }; p2 = { x: B.x, y: B.y + B.h / 2 };
-      } else {
-        p1 = { x: A.x + A.w / 2, y: A.y + A.h }; p2 = { x: B.x + B.w / 2, y: B.y };
+    V.nodes.forEach(function (spec) {
+      var id = spec[0], s = BY_ID[id], l = live(id), ex = spec[3] || {}, p = pos(spec[1], spec[2], id);
+      var opt = { id: id, name: ex.name || (id === 'reject' && R ? COOLER_NAME[R.liquid.coolerType] : s.name),
+                  sublabel: l ? l.sub : s.sub, symbol: s.sym, interactive: true, focal: !!s.focal,
+                  tier: s.focal ? 1 : 2, fill: s.focal ? 'paper-2' : 'paper', w: NW,
+                  legend: s.focal ? 'IT load — the control point' : 'Plant equipment' };
+      if (o.narrow) { opt.w = 210; opt.h = NH; }   // leaves a side channel for connectors that skip a block
+      else opt.h = ex.h === 'span' ? NH + (ex.rows - 1) * (NH + RG) : NH;
+      box[id] = d.node(p.x, p.y, opt);
+    });
+    function at(b, side) {
+      return side === 'l' ? { x: b.x, y: b.y + b.h / 2 } : side === 'r' ? { x: b.x + b.w, y: b.y + b.h / 2 }
+           : side === 't' ? { x: b.x + b.w / 2, y: b.y } : { x: b.x + b.w / 2, y: b.y + b.h };
+    }
+    var skip = 0;
+    V.edges.forEach(function (e) {
+      var A = box[e[0]], B = box[e[2]];
+      var p1 = at(A, e[1]), p2 = at(B, e[3]);
+      if (o.narrow) {
+        var ia = order.indexOf(e[0]), ib = order.indexOf(e[2]);
+        if (Math.abs(ia - ib) === 1) {   // neighbours in the stack: straight down or up
+          var down = A.y < B.y;
+          p1 = { x: A.x + A.w / 2, y: down ? A.y + A.h : A.y };
+          p2 = { x: B.x + B.w / 2, y: down ? B.y : B.y + B.h };
+        } else {                          // skips a block: leave and enter on the right, through the side channel
+          skip++;
+          p1 = { x: A.x + A.w, y: A.y + A.h / 2 - 8 + (skip % 3) * 8 };
+          p2 = { x: B.x + B.w, y: B.y + B.h / 2 - 8 + (skip % 3) * 8 };
+        }
       }
-      d.edge(p1, p2, Object.assign({ fromId: a, toId: b }, o2 || {}));
-    }
-
-    if (!o.narrow) {
-      var y0 = 24;
-      n('utility', 24, y0);
-      n('swgr', right(box.utility), y0);
-      n('ups', right(box.swgr), y0);
-      n('pdu', right(box.ups), y0);
-      n('racks', right(box.pdu) + 8, y0, { h: 232 });
-      n('genset', 24, y0 + 140);
-      n('cdu', box.pdu.x, y0 + 140);
-      n('reject', box.cdu.x - 40 - 132, y0 + 140, { w: 132 });
-      n('fire', box.racks.x, y0 + 280);
-      e('utility', 'swgr', 'h', { tier: 1, stroke: 'ink', legend: 'Power' });
-      d.edge({ x: box.genset.x + box.genset.w, y: box.genset.y + box.genset.h / 2 },
-             { x: box.swgr.x + box.swgr.w / 2, y: box.swgr.y + box.swgr.h },
-             { fromId: 'genset', toId: 'swgr', tier: 1, stroke: 'ink' });
-      e('swgr', 'ups', 'h', { tier: 1, stroke: 'ink' });
-      e('ups', 'pdu', 'h', { tier: 1, stroke: 'ink' });
-      d.edge({ x: box.pdu.x + box.pdu.w, y: box.pdu.y + box.pdu.h / 2 },
-             { x: box.racks.x, y: box.pdu.y + box.pdu.h / 2 }, { fromId: 'pdu', toId: 'racks', tier: 1, stroke: 'ink' });
-      d.edge({ x: box.racks.x, y: box.cdu.y + box.cdu.h / 2 },
-             { x: box.cdu.x + box.cdu.w, y: box.cdu.y + box.cdu.h / 2 },
-             { fromId: 'racks', toId: 'cdu', pattern: 'dashed', stroke: 'link', legend: 'Heat (liquid)' });
-      d.edge({ x: box.cdu.x, y: box.cdu.y + box.cdu.h / 2 },
-             { x: box.reject.x + box.reject.w, y: box.reject.y + box.reject.h / 2 },
-             { fromId: 'cdu', toId: 'reject', pattern: 'dashed', stroke: 'link' });
-      d.edge({ x: box.fire.x + box.fire.w / 2, y: box.fire.y },
-             { x: box.fire.x + box.fire.w / 2, y: box.racks.y + box.racks.h },
-             { fromId: 'fire', toId: 'racks', pattern: 'dotted', stroke: 'soft', legend: 'Monitors' });
-    } else {
-      /* narrow pane: two columns, power down the left, heat and fire on the right */
-      var x0 = 16, y = 16, ROWG = 32;
-      n('utility', x0, y);
-      n('genset', right(box.utility) - 8, y);
-      y += box.utility.h + ROWG; n('swgr', x0, y);
-      y += box.swgr.h + ROWG; n('ups', x0, y);
-      y += box.ups.h + ROWG; n('pdu', x0, y);
-      y += box.pdu.h + ROWG; n('racks', x0, y, { w: Math.max(box.pdu.w, 140) });
-      n('cdu', box.genset.x, box.ups.y);
-      n('reject', box.genset.x, box.swgr.y);
-      n('fire', box.genset.x, box.racks.y);
-      /* two feeders land on the switchgear's top edge: fan them (rule 4) */
-      var top = d.ports(box.swgr, 2, 'top', { id: 'swgr' });
-      d.edge({ x: top[0].x, y: box.utility.y + box.utility.h }, top[0],
-             { fromId: 'utility', toId: 'swgr', tier: 1, stroke: 'ink', legend: 'Power' });
-      d.edge({ x: box.genset.x, y: box.genset.y + box.genset.h / 2 }, top[1],
-             { fromId: 'genset', toId: 'swgr', tier: 1, stroke: 'ink' });
-      e('swgr', 'ups', 'v', { tier: 1, stroke: 'ink' });
-      e('ups', 'pdu', 'v', { tier: 1, stroke: 'ink' });
-      e('pdu', 'racks', 'v', { tier: 1, stroke: 'ink' });
-      d.edge({ x: box.racks.x + box.racks.w, y: box.racks.y + 16 },
-             { x: box.cdu.x + box.cdu.w / 2, y: box.cdu.y + box.cdu.h },
-             { fromId: 'racks', toId: 'cdu', pattern: 'dashed', stroke: 'link', legend: 'Heat (liquid)' });
-      d.edge({ x: box.cdu.x + box.cdu.w / 2, y: box.cdu.y },
-             { x: box.reject.x + box.reject.w / 2, y: box.reject.y + box.reject.h },
-             { fromId: 'cdu', toId: 'reject', pattern: 'dashed', stroke: 'link' });
-      d.edge({ x: box.fire.x, y: box.fire.y + box.fire.h / 2 },
-             { x: box.racks.x + box.racks.w, y: box.fire.y + box.fire.h / 2 },
-             { fromId: 'fire', toId: 'racks', pattern: 'dotted', stroke: 'soft', legend: 'Monitors' });
-    }
+      // into the tall racks block: keep the connector level with the other end
+      if (e[2] === 'racks' && !o.narrow) p2 = { x: B.x, y: p1.y };
+      if (e[0] === 'racks' && !o.narrow) p1 = { x: A.x, y: p2.y };
+      var opt = Object.assign({ fromId: e[0], toId: e[2] }, STY[e[4]]);
+      if (e[5]) opt.legend = e[5];
+      if (e[6] && LBL[e[6]] && !o.narrow) opt.label = LBL[e[6]];
+      d.edge(p1, p2, opt);
+    });
     d.legend();
     return d;
+  }
+  function viewBar() {
+    var host = document.getElementById('ltcViews');
+    if (!host) return;
+    host.innerHTML = Object.keys(VIEWS).map(function (k) {
+      return '<button type="button" data-view="' + k + '" aria-pressed="' + (k === view) + '">' + VIEWS[k].label + '</button>';
+    }).join('');
+    host.onclick = function (e) { var b = e.target.closest('[data-view]'); if (b) setView(b.getAttribute('data-view')); };
+  }
+  function setView(v) {
+    if (!VIEWS[v] || v === view) return;
+    view = v; viewBar();
+    if (fig) fig.redraw();
   }
 
   /* ---- inspector --------------------------------------------------------- */
@@ -200,12 +319,19 @@
     if (fig) {
       SYSTEMS.forEach(function (x) { fig.mark(x.id, x.id === id ? 'selected' : null); });
     }
-    var html = '<ul class="ltc-refs">' + s.refs.map(function (r) {
+    var l = live(id);
+    var html = (l && l.rows.length ? '<h3 class="ltc-script-h">Live · this plant</h3>' + L.kv(l.rows.map(function (r) { return [r[0], L.esc(r[1])]; })) +
+      (l.f ? '<p class="ltc-tip-f">ƒx ' + L.esc(l.f) + '</p>' : '') + '<h3 class="ltc-script-h">Standards</h3>' : '') +
+      '<ul class="ltc-refs">' + s.refs.map(function (r) {
       return '<li><code>' + L.esc(r.body + ' · ' + r.code) + '</code> <span class="ltc-chip">' +
         ROLE_WORD[r.role] + '</span><p>' + L.esc(r.text) + '</p>' +
         (r.tool ? '<a href="' + r.tool[0] + '">' + L.esc(r.tool[1]) + ' →</a>' : '') + '</li>';
     }).join('') + '</ul>';
-    L.inspect({ sym: s.sym, eyebrow: 'Plant block', title: s.name, html: html });
+    var go = view === 'overview' && VIEWS.overview.opens[id];
+    if (go) html = '<p><button class="ltc-btn" type="button" data-goview="' + go + '">Open the ' + L.esc(VIEWS[go].label) + ' detail →</button></p>' + html;
+    L.inspect({ sym: s.sym, eyebrow: 'Plant block', title: id === 'reject' && R ? COOLER_NAME[R.liquid.coolerType] : s.name, html: html });
+    var gb = document.querySelector('[data-goview]');
+    if (gb) gb.addEventListener('click', function () { setView(gb.getAttribute('data-goview')); });
   }
 
   /* ---- coverage matrix --------------------------------------------------- */
@@ -236,27 +362,56 @@
   }
 
   /* ---- lifecycle: commissioning levels and the tests standards ask for ----- */
+  /* Each level is a gate: a short script summary — what is tested, what is expected, and the
+   * hold point that closes it. Acceptance values marked "typical" are the ones commissioning
+   * plans commonly set; the project's own plan governs. Summaries of the cited documents, not
+   * quotations. L4 carries the heat load test (HLT): liquid-to-chip halls are where the
+   * thermal design is first proven at load. */
   var LIFE = [
-    { id: 'l1', name: 'L1 · Factory', sub: 'FAT at the vendor', sym: 'ups', tests: [
-      ['Vendor', 'Factory acceptance of UPS, switchgear, generators, chillers, CDUs against the submittal'],
-      ['NFPA 2001', 'Listed agent containers and valves arrive with their listing; quantities checked against the design'] ] },
-    { id: 'l2', name: 'L2 · Delivered', sub: 'site acceptance', sym: 'switchgear', tests: [
-      ['Site', 'Receipt inspection: nameplates, ratings, damage, documentation'],
-      ['TIA-568', 'Installed cabling certified: copper permanent links and fiber links tested (Tier 1 loss, Tier 2 OTDR where specified)'] ] },
-    { id: 'l3', name: 'L3 · Started', sub: 'install + start-up', sym: 'pump', tests: [
-      ['Vendor', 'Start-up of each unit by the manufacturer; settings recorded'],
-      ['NFPA 72', 'Detection devices installed and tested; aspirating transport time verified'] ] },
-    { id: 'l4', name: 'L4 · Functional', sub: 'each system, all modes', sym: 'cdu', focal: true, tests: [
-      ['NFPA 72', 'Acceptance testing of the fire alarm system and its interfaces'],
-      ['NFPA 2001', 'Enclosure integrity (door-fan) test proves the hold time; release sequence verified without discharge'],
-      ['ASHRAE', 'Cooling sequences verified at load; rack inlet and facility-water supply inside the design envelope'] ] },
-    { id: 'l5', name: 'L5 · Integrated', sub: 'IST · load banks', sym: 'rack', tests: [
-      ['Uptime', 'Tier Certification of Constructed Facility demonstrates maintainability (and fault tolerance for IV) under load'],
-      ['Site', 'Utility failure, generator transfer, UPS and cooling failover with load banks at design IT load'] ] },
-    { id: 'ops', name: 'Operate', sub: 'measure · improve', sym: 'meter', tests: [
-      ['ISO/IEC 30134', '12 months of PUE, WUE, CUE at a stated category'],
-      ['ISO 50001', 'Certification: stage 1 and 2 audits, annual surveillance, recertification in year 3'],
-      ['Uptime', 'Operational Sustainability (staffing, maintenance, management) assessed separately from topology'] ] }
+    { id: 'l1', name: 'L1 · Factory', sub: 'FAT at the vendor', sym: 'ups', script: {
+      purpose: 'Prove each major unit meets its submittal before it ships.',
+      tests: ['UPS: full-load and step-load test, efficiency at 25/50/75/100 %, battery autonomy', 'Switchgear: dielectric, functional and interlock checks', 'Generators: load-bank run at rating', 'CDUs: hydrostatic pressure test, pump curve, control and alarm I/O', 'Chillers: performance test at the rating condition'],
+      expect: ['Measured performance within the submittal tolerance', 'Every alarm point reaches the controller'],
+      hold: 'Witnessed FAT report signed; deviations closed or accepted',
+      refs: [['ASHRAE Guideline 0', 'Commissioning process: owner’s project requirements, basis of design, test scripts'], ['NFPA 2001', 'Listed agent containers and valves arrive with their listing']] } },
+    { id: 'l2', name: 'L2 · Delivered', sub: 'site acceptance', sym: 'switchgear', script: {
+      purpose: 'Confirm what arrived and how it was installed.',
+      tests: ['Receipt inspection: nameplates, ratings, transit damage, documents', 'Installation checks: terminations torqued, clearances, labelling', 'Piping: pressure test of installed TCS/FWS/CHW sections; flushing plan', 'Cabling: copper permanent links and fiber links certified'],
+      expect: ['Installed equipment matches the approved submittals', 'Pipework holds test pressure with no leak'],
+      hold: 'Installation checklists closed per system',
+      refs: [['TIA-568', 'Cabling certification: Tier 1 loss, Tier 2 OTDR where specified']] } },
+    { id: 'l3', name: 'L3 · Started', sub: 'start-up', sym: 'pump', script: {
+      purpose: 'Energise and start every unit on its own.',
+      tests: ['Energise boards, check phase rotation and protection settings', 'TCS loop: flush, filter, fill, vent; fluid sampled against the cooling-fluid specification', 'Manufacturer start-up of CDUs, pumps, CRAHs, chillers, coolers; set points recorded', 'BMS/EPMS point-to-point: every sensor and command verified end to end', 'Fire detection devices tested; aspirating transport time verified'],
+      expect: ['Each unit runs stable under its own controls', 'Loop fluid within specification; no air in high points'],
+      hold: 'Start-up reports and point-to-point list signed',
+      refs: [['NFPA 72', 'Device testing and aspirating transport time']] } },
+    { id: 'l4', name: 'L4 · Functional', sub: 'each system + HLT', sym: 'cdu', focal: true, script: {
+      purpose: 'Prove each system in every mode, then prove the hall thermally at load (HLT).',
+      tests: ['Sequences of operation: normal, standby changeover, failure and recovery, per system', 'Fire alarm acceptance and interfaces; release sequence verified without discharge', 'Clean-agent enclosure integrity (door-fan) test for hold time'],
+      expect: ['Every sequence behaves as written; every alarm annunciates', 'Enclosure holds agent for the design hold time'],
+      hold: 'Functional test scripts and the HLT report signed; open items tracked to L5',
+      hlt: [
+        'Preconditions: L3 closed; liquid load banks on the TCS manifolds and air load banks in the rows; instruments calibrated',
+        'Step the hall load 25 → 50 → 75 → 100 % of design, liquid and air at the design split; hold each step until temperatures settle (typical: < 0.5 K change over 15 min)',
+        'Record at each step: TCS supply/return and flow per CDU, FWS supply/return, CRAH supply/return air, rack-row inlet, pump and fan speeds, power',
+        'Accept (typical): TCS supply within ±1 K of set point; flow ≥ design; rack inlet inside the ASHRAE recommended envelope; measured heat ṁ·cp·ΔT within ±5 % of load-bank kW; no alarm',
+        'At 100 %: fail one CDU, one pump, one CRAH, one CDU feeder in turn; record the supply-temperature excursion and recovery time against the design limit',
+        'Return to normal; confirm controls restore the original set points'
+      ],
+      refs: [['ASHRAE TC 9.9', 'Rack inlet envelope and liquid-cooling W-classes are the acceptance limits'], ['NFPA 72 / NFPA 2001', 'Fire alarm acceptance; enclosure integrity']] } },
+    { id: 'l5', name: 'L5 · Integrated', sub: 'IST · load banks', sym: 'rack', script: {
+      purpose: 'Prove the systems together through the failures they were designed for.',
+      tests: ['Utility failure at design load: generator start, transfer, UPS ride-through, cooling continuity', 'CDU pumps on UPS keep flow through the transfer; chiller restart time measured against the thermal ride-through', 'Concurrent maintenance and (Tier IV) fault-tolerance demonstrations on live paths', 'Return to utility'],
+      expect: ['Load banks never lose power', 'TCS supply and rack inlet stay inside limits through every transfer', 'Recovery times within design'],
+      hold: 'IST report; Tier Certification of Constructed Facility where sought',
+      refs: [['Uptime', 'Constructed-facility certification demonstrates maintainability (and fault tolerance for Tier IV) under load']] } },
+    { id: 'ops', name: 'Operate', sub: 'measure · improve', sym: 'meter', script: {
+      purpose: 'Run, measure and keep the plant at its design performance.',
+      tests: ['12 months of PUE, WUE, CUE at a stated category', 'Retro-commissioning when measured performance drifts from the model', 'Water-management plan for evaporative equipment'],
+      expect: ['Annual PUE close to the modelled annual value, not the design-day one'],
+      hold: 'ISO 50001 surveillance audits; recertification in year 3',
+      refs: [['ISO/IEC 30134', 'KPI definitions and measurement categories'], ['ISO 50001', 'Energy management system'], ['Uptime', 'Operational Sustainability is assessed separately from topology'], ['ASHRAE 188', 'Legionella risk management for cooling towers']] } }
   ];
   var LBY = {}; LIFE.forEach(function (x) { LBY[x.id] = x; });
   function lifeBuild(D, o) {
@@ -281,20 +436,116 @@
     d.legend();
     return d;
   }
+  function scriptHtml(sc) {
+    function ul(xs) { return '<ul class="ltc-script-l">' + xs.map(function (x) { return '<li>' + L.esc(x) + '</li>'; }).join('') + '</ul>'; }
+    return '<p class="ltc-script-p">' + L.esc(sc.purpose) + '</p>' +
+      '<h3 class="ltc-script-h">Tested</h3>' + ul(sc.tests) +
+      (sc.hlt ? '<h3 class="ltc-script-h">Heat load test (HLT)</h3><ol class="ltc-script-l">' + sc.hlt.map(function (x) { return '<li>' + L.esc(x) + '</li>'; }).join('') + '</ol>' : '') +
+      '<h3 class="ltc-script-h">Expected</h3>' + ul(sc.expect) +
+      '<h3 class="ltc-script-h">Hold point</h3><p class="ltc-script-p">' + L.esc(sc.hold) + '</p>' +
+      '<ul class="ltc-refs">' + sc.refs.map(function (t) { return '<li><code>' + L.esc(t[0]) + '</code><p>' + L.esc(t[1]) + '</p></li>'; }).join('') + '</ul>';
+  }
   function openLife(id) {
     var s = LBY[id]; if (!s) return;
     if (lifeFig) LIFE.forEach(function (x) { lifeFig.mark(x.id, x.id === id ? 'selected' : null); });
-    L.inspect({ sym: s.sym, eyebrow: 'Commissioning', title: s.name, html: '<ul class="ltc-refs">' + s.tests.map(function (t) {
-      return '<li><code>' + L.esc(t[0]) + '</code><p>' + L.esc(t[1]) + '</p></li>'; }).join('') + '</ul>' });
+    L.inspect({ sym: s.sym, eyebrow: 'Commissioning', title: s.name, html: scriptHtml(s.script) });
+  }
+  /* the summary the owner asked to see without clicking: one row per level */
+  function lifeTable() {
+    var host = document.getElementById('ltcLifeTable');
+    if (!host) return;
+    host.innerHTML = '<table class="ltc-table"><thead><tr><th>Level</th><th>What is tested</th><th>Expected</th><th>Hold point</th></tr></thead><tbody>' +
+      LIFE.map(function (s) {
+        var sc = s.script;
+        return '<tr><td><button class="ltc-linkbtn" type="button" data-life="' + s.id + '">' + L.esc(s.name) + '</button></td><td>' +
+          L.esc(sc.tests.slice(0, 2).join('; ')) + (sc.hlt ? '; <b>HLT</b>: load steps 25→100 %, failures at 100 %' : '') +
+          '</td><td>' + L.esc(sc.expect[0]) + '</td><td>' + L.esc(sc.hold) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+    host.addEventListener('click', function (e) { var b = e.target.closest('[data-life]'); if (b) openLife(b.getAttribute('data-life')); });
   }
   var lifeFig = null;
+
+  /* ---- plant parameters, balance and the four-plant comparison ------------- */
+  var CTL = [
+    ['itMw', 'IT load', 'MW', 10, 300, 5], ['capturePct', 'Liquid capture', '%', 50, 98, 1],
+    ['tcsSupplyC', 'TCS supply', '°C', 25, 45, 1], ['designDbC', 'Design dry bulb', '°C', 20, 45, 0.5],
+    ['designWbC', 'Design wet bulb', '°C', 15, 32, 0.5], ['itUtil', 'Annual IT utilisation', '', 0.4, 1, 0.05]
+  ];
+  function setState(patch) {
+    state = Object.assign({}, state, patch);
+    if (patch.tcsSupplyC != null) state.tcsReturnC = Number(patch.tcsSupplyC) + 10;
+    P.save(state);
+    R = P.compute(state);
+    paintPanel();
+    if (fig) fig.redraw();
+  }
+  function paintPanel() {
+    var host = document.getElementById('ltcPlant');
+    if (!host || !R) return;
+    var I = R.input, T = R.totals, preset = state.preset || '';
+    if (!host.firstChild) {
+      host.innerHTML = '<div class="ltc-plant-ctl"><div class="ltc-seg" role="group" aria-label="Plant configuration">' +
+        Object.keys(P.PRESETS).map(function (k) { return '<button type="button" data-preset="' + k + '">' + L.esc(P.PRESETS[k].label) + '</button>'; }).join('') +
+        '</div><div class="ltc-plant-fields">' + CTL.map(function (c) {
+          return '<div class="ltc-field"><label for="pl-' + c[0] + '">' + c[1] + '</label><output id="pl-' + c[0] + '-o"></output>' +
+            '<input type="range" id="pl-' + c[0] + '" min="' + c[3] + '" max="' + c[4] + '" step="' + c[5] + '" data-k="' + c[0] + '"></div>';
+        }).join('') + '<div class="ltc-field"><label>CDU feed</label><div class="ltc-seg" role="group" aria-label="CDU feed">' +
+        '<button type="button" data-feed="single">Single A/B</button><button type="button" data-feed="dual">Dual (ATS)</button></div></div></div></div>' +
+        '<p class="metabar ltc-plant-bal" id="ltcBal" aria-live="polite"></p>';
+      host.addEventListener('input', function (e) { var k = e.target.getAttribute('data-k'); if (k) { var o = {}; o[k] = Number(e.target.value); setState(o); } });
+      host.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-preset]'); if (b) { var pr = b.getAttribute('data-preset'); setState(Object.assign({ preset: pr }, P.PRESETS[pr])); }
+        var fd = e.target.closest('[data-feed]'); if (fd) setState({ cduFeed: fd.getAttribute('data-feed') });
+      });
+    }
+    [].forEach.call(host.querySelectorAll('[data-preset]'), function (b) {
+      var p = P.PRESETS[b.getAttribute('data-preset')];
+      b.setAttribute('aria-pressed', String(p.chillerType === I.chillerType && p.liquidRejection === I.liquidRejection));
+    });
+    [].forEach.call(host.querySelectorAll('[data-feed]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-feed') === I.cduFeed)); });
+    CTL.forEach(function (c) {
+      var inp = document.getElementById('pl-' + c[0]), out = document.getElementById('pl-' + c[0] + '-o');
+      if (Number(inp.value) !== I[c[0]]) inp.value = I[c[0]];
+      out.textContent = (c[0] === 'itUtil' ? Math.round(I[c[0]] * 100) + ' %' : I[c[0]] + ' ' + c[2]);
+    });
+    var bal = R.totals.split;
+    document.getElementById('ltcBal').innerHTML =
+      '<span>heat out: liquid <b>' + mw(bal.liquid) + '</b></span><span class="sep">/</span><span>air <b>' + mw(bal.air) + '</b></span>' +
+      '<span class="sep">/</span><span>electrical rooms <b>' + mw(bal.elec) + '</b></span><span class="sep">/</span>' +
+      '<span>PUE <b>' + T.pue.toFixed(3) + '</b> design · <b>' + T.pueAnnual.toFixed(3) + '</b> annual</span><span class="sep">/</span>' +
+      '<span>WUE <b>' + T.wueAnnual.toFixed(2) + '</b> L/kWh</span><span class="sep">/</span><span>energy balance closes to <b>' + (T.balanceErr * 100).toFixed(3) + ' %</b></span>';
+    compare();
+  }
+  /* the four plants at THIS site and load: the water–energy trade-off, computed, not quoted */
+  function compare() {
+    var host = document.getElementById('ltcCompare');
+    if (!host) return;
+    var rows = Object.keys(P.PRESETS).map(function (k) {
+      var r = P.compute(Object.assign({}, state, P.PRESETS[k]));
+      return { k: k, label: P.PRESETS[k].label, r: r };
+    });
+    var cur = R.input;
+    host.innerHTML = '<table class="ltc-table"><thead><tr><th>Plant</th><th class="n">PUE design</th><th class="n">PUE annual</th>' +
+      '<th class="n">WUE L/kWh</th><th class="n">Water m³/yr</th><th class="n">Liquid coolers</th><th class="n">Trim h/yr</th><th class="n">Chiller COP</th></tr></thead><tbody>' +
+      rows.map(function (x) {
+        var t = x.r.totals, me = x.r.input.chillerType === cur.chillerType && x.r.input.liquidRejection === cur.liquidRejection;
+        return '<tr' + (me ? ' data-hit' : '') + '><td>' + L.esc(x.label) + '</td><td class="n">' + t.pue.toFixed(3) + '</td><td class="n">' + t.pueAnnual.toFixed(3) +
+          '</td><td class="n">' + t.wueAnnual.toFixed(2) + '</td><td class="n">' + f0(t.waterM3Year) + '</td><td class="n">' + x.r.liquid.coolerUnitsTotal +
+          '</td><td class="n">' + f0(t.trimHours) + '</td><td class="n">' + x.r.air.chillerCop.toFixed(2) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+  }
 
   var fig = null;
   function boot() {
     L.init({ module: 'hub' });
     fig = L.draw(document.getElementById('ltcMap'), build, open);
+    viewBar();
+    if (window.LTCTrace) LTCTrace.attach(document.getElementById('ltcMap'), tips);
     lifeFig = L.draw(document.getElementById('ltcLife'), lifeBuild, openLife);
     matrix();
+    lifeTable();
+    paintPanel();
+    window.addEventListener('storage', function (e) { if (e.key === P.KEY) { state = P.load(); R = P.compute(state); paintPanel(); if (fig) fig.redraw(); } });
     /* the inspector is a persistent column only on wide screens; elsewhere it is a
      * drawer, and opening a drawer nobody asked for hides the plant */
     if (window.matchMedia('(min-width: 1280px)').matches) open('racks');

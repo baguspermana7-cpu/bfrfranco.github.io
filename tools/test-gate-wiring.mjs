@@ -32,6 +32,8 @@ const root = join(here, '..');
  * name here is allowed; adding it without a reason is not, and the test below
  * enforces that. */
 const DECLARED_OUT = Object.freeze({
+  'report-register-wiring.mjs':
+    'a measurement, not a gate: it reports how far the two-register system reaches and exits 0 by design (its header says so).',
   'audit-seo.py':
     'reports per-page meta health as advice (long descriptions, missing OG). ' +
     'CLAUDE.md marks it non-strict, and it has no pass/fail contract to gate on.',

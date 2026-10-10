@@ -87,7 +87,9 @@
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
     .c-title { max-width:300px; }
-    .c-title .itt { display:block; font-weight:700; color:var(--text-strong); text-decoration:none; font-size:0.9rem; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    /* Titles wrap instead of ending in an ellipsis: eight titles were cut by 28-183 px and
+       tools/audit-legibility.mjs counts a clipped title as unreadable, which it is. */
+    .c-title .itt { display:block; font-weight:700; color:var(--text-strong); text-decoration:none; font-size:0.9rem; line-height:1.25; }
     .itr:hover .itt { color:var(--cyan); }
     .c-title .its { color:var(--muted); font-size:0.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.1rem; }
     .sev-chip { font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:600; padding:0.12rem 0.5rem; border-radius:2px; border:1px solid; white-space:nowrap; }
@@ -204,7 +206,7 @@
     .iid-sigs li { grid-template-columns:1fr 64px auto auto; }
     .iid-catbars li { cursor:pointer; }
     .iid-catbars li:hover .iid-cbl { color:var(--cyan); }
-    .iid-cbl, .iid-dbl, .iid-sig-n { color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-cbl, .iid-dbl, .iid-sig-n { color:var(--text-body); overflow-wrap:anywhere; }
     .iid-cbar, .iid-dbar, .iid-sig-bar { height:7px; background:var(--surface-2); border-radius:0; overflow:hidden; }
     .iid-cbar i, .iid-sig-bar i { display:block; height:100%; width:var(--w); background:var(--amber); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
     .iid-dbar i { display:block; height:100%; width:var(--w); background:var(--cyan); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
@@ -217,7 +219,7 @@
     .iid-rec:last-child { border-bottom:none; }
     .iid-rec-sev { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
     .iid-rec-b { display:flex; flex-direction:column; min-width:0; flex:1; }
-    .iid-rec-t { color:var(--text-strong); font-size:0.84rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-rec-t { color:var(--text-strong); font-size:0.84rem; font-weight:600; overflow-wrap:anywhere; }
     .iid-rec:hover .iid-rec-t { color:var(--cyan); }
     .iid-rec-m { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.68rem; }
     .iid-rec-tag { font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.04em; padding:0.1rem 0.35rem; border:1px solid var(--line); border-radius:2px; flex:0 0 auto; }
@@ -821,7 +823,7 @@ Recovery could not use the normal remote path because the network carrying it wa
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-90bc70bf"></script>
+    <script src="js/rz-version.js?v=20261010-59a14d68"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

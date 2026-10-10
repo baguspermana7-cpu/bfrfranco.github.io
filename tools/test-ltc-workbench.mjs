@@ -15,6 +15,8 @@
  *   W3  NFPA 2001 flooding equations against the published per-m³ figures
  *   W4  TIA fiber budget, copper channel, TIA-607 conductor sizing
  *   W5  ISO/IEC 30134 KPIs and the ISO 50006 regression recovering a known model
+ *   W7  hub: the full plant (air path, CHW, electrical rooms), ≤ 9 blocks per view,
+ *       traceable connector ids, a script at every commissioning gate, HLT at L4
  *   W6  every page: workbench shell, engine before the shell, the IEC symbol
  *       library, inline diagram tokens, and the fail-closed access gate with
  *       its own page key
@@ -155,6 +157,24 @@ for (const [page, mod] of Object.entries(PAGES)) {
   /* comments may NAME the old defect; only code may not reintroduce it */
   const lab = readFileSync(join(root, 'js/ltc-lab-ui.js'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
   ok('W6f', !/ISO 14644/.test(lab) && !/'Compliant'/.test(lab), 'the model lab screens standards; it does not claim compliance (ISO 14644 is a cleanroom standard)');
+}
+
+{
+  /* W7 (v3.14.0) — one plant, drawn as overview + details, with scripts at every gate.
+   * The plant map used to stop at the dry cooler: the residual air heat and the electrical
+   * losses had no block. Pin the blocks, the view budget and the lifecycle scripts. */
+  const hub = readFileSync(join(root, 'js/ltc-hub.js'), 'utf8');
+  const html = readFileSync(join(root, 'standards-ltc-lab.html'), 'utf8');
+  ok('W7a', html.indexOf('js/ltc-plant.js') > 0 && html.indexOf('js/ltc-plant.js') < html.indexOf('js/ltc-hub.js'), 'hub loads the shared plant model before the hub module');
+  for (const id of ['tx', 'mcc', 'elec', 'fws', 'trim', 'crah', 'chw', 'chiller', 'tower'])
+    ok('W7b:' + id, new RegExp("\\{ id: '" + id + "', sym:").test(hub), `plant block "${id}" exists (air path, chilled water, electrical rooms)`);
+  for (const m of hub.matchAll(/(\w+): \{ label: '([^']+)'(?:, stack: -?1)?, nodes: \[([\s\S]*?)\],\s*edges:/g)) {
+    const n = (m[3].match(/\['\w+', \d/g) || []).length;
+    ok('W7c:' + m[1], n >= 6 && n <= 9, `view "${m[2]}" has ${n} blocks; the engine budget is 9`);
+  }
+  ok('W7d', /o\.id = o\.fromId \+ '>' \+ o\.toId/.test(hub), "connectors carry 'from>to' ids, so the hover trace reads connectivity from the drawing");
+  ok('W7e', (hub.match(/hold: '/g) || []).length === 6 && (hub.match(/expect: \[/g) || []).length === 6, 'every commissioning stage has tests, expectations and a hold point');
+  ok('W7f', /id: 'l4'[\s\S]*?hlt: \[[\s\S]*?25 → 50 → 75 → 100 %[\s\S]*?\]/.test(hub), 'L4 carries the heat load test with its load steps');
 }
 
 const total = pass + fails.length;
