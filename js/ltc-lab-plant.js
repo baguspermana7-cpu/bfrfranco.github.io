@@ -114,13 +114,19 @@
       ['chiller', 1, 3, 'Chillers', A.chillersTotal + ' × ' + (r.input.chillerUnitKw / 1000) + ' MW · COP ' + A.chillerCop.toFixed(1), 'chiller'],
       ['tower', 0, 3, A.chillerType === 'air' && L.coolerType !== 'tower' ? 'Air-cooled condensers' : 'Cooling towers', f1(A.towerKw), 'coolingTower']
     ];
-    var narrow = host.clientWidth < 640, NW = narrow ? 210 : 172, NH = 88, CG = 40, RG = 52;
+    var narrow = host.clientWidth < 640, NW = 172, NH = 88, CG = 40, RG = 52;
+    /* phones: two lanes (as the hub overview) so every connector runs straight down or across;
+       [lane, row] per block, lane 0 | 1 | 'full'; vertical connectors at the lane centre x */
+    var NX = { 0: [16, 150], 1: [194, 150], full: [16, 328] };
+    var NPOS = { grid: ['full', 0], ups: [0, 1], elec: [1, 1], racks: ['full', 2], cdu: [0, 3], crah: [1, 3], cool: [0, 4], chiller: [1, 4], tower: ['full', 5] };
+    var NEDGE = { 'grid>ups': ['b', 't', 91], 'ups>racks': ['b', 't', 91], 'ups>elec': ['r', 'l'], 'racks>cdu': ['b', 't', 91], 'cdu>cool': ['b', 't', 91],
+                  'racks>crah': ['b', 't', 269], 'crah>chiller': ['b', 't', 269], 'elec>chiller': ['r', 'r', null, 12], 'chiller>tower': ['b', 't', 269] };
     var d = D.create({ slug: 'labov', title: 'Liquid-to-chip plant — overview',
       desc: 'Power from grid and generators through UPS and PDUs to the racks; liquid heat through CDUs to the liquid coolers; residual air heat through CRAHs to the chillers and towers; electrical losses cooled on chilled water.' });
     var box = {};
     B.forEach(function (b, i) {
-      var x = narrow ? 24 : 24 + b[1] * (NW + CG), y = narrow ? 16 + i * (NH + 36) : 24 + b[2] * (NH + RG);
-      box[b[0]] = d.node(x, y, { id: b[0], name: b[3], sublabel: b[4], symbol: b[5], interactive: true, w: NW,
+      var np = NPOS[b[0]], x = narrow ? NX[np[0]][0] : 24 + b[1] * (NW + CG), y = narrow ? 16 + np[1] * (NH + 36) : 24 + b[2] * (NH + RG);
+      box[b[0]] = d.node(x, y, { id: b[0], name: b[3], sublabel: b[4], symbol: b[5], interactive: true, w: narrow ? NX[np[0]][1] : NW,
         h: !narrow && b[0] === 'racks' ? NH + 2 * (NH + RG) : NH, focal: b[0] === 'racks', fill: b[0] === 'racks' ? 'paper-2' : 'paper',
         tier: b[0] === 'racks' ? 1 : 2, legend: b[0] === 'racks' ? 'IT load — the control point' : 'Plant equipment' });
     });
@@ -128,22 +134,19 @@
               A: { pattern: 'dash-dot', stroke: 'accent', legend: 'Heat (air → chilled water)', state: 'flow' }, X: { pattern: 'dotted', stroke: 'muted', legend: 'Losses as heat' } };
     var E2 = [['grid', 'r', 'ups', 'l', 'P'], ['ups', 'r', 'racks', 'l', 'P'], ['ups', 'b', 'elec', 't', 'X'], ['racks', 'l', 'cdu', 'r', 'Q'],
               ['cdu', 'b', 'cool', 't', 'Q'], ['racks', 'b', 'crah', 'r', 'A'], ['crah', 'l', 'chiller', 'r', 'A'], ['elec', 'b', 'chiller', 't', 'A'], ['chiller', 'l', 'tower', 'r', 'A']];
-    var order = B.map(function (b) { return b[0]; }), skip = 0, used = {};
-    function portShift(use, k1, k2) { var m = Math.max(use[k1] || 0, use[k2] || 0); use[k1] = (use[k1] || 0) + 1; use[k2] = (use[k2] || 0) + 1; return m ? (m % 2 ? 1 : -1) * 28 * Math.ceil(m / 2) : 0; }
     function at(bx, s) { return s === 'l' ? { x: bx.x, y: bx.y + bx.h / 2 } : s === 'r' ? { x: bx.x + bx.w, y: bx.y + bx.h / 2 } : s === 't' ? { x: bx.x + bx.w / 2, y: bx.y } : { x: bx.x + bx.w / 2, y: bx.y + bx.h }; }
     E2.forEach(function (e) {
-      var a = box[e[0]], b = box[e[2]], p1 = at(a, e[1]), p2 = at(b, e[3]), chan;
+      var a = box[e[0]], b = box[e[2]], s1 = e[1], s2 = e[3], p1 = at(a, s1), p2 = at(b, s2), chan;
       if (!narrow) {   // level with the other end — only on a left/right side, only while still on the rack block's border
         var lv = function (bx, sd, y) { return /[lr]/.test(sd) && y >= bx.y + 10 && y <= bx.y + bx.h - 10; };
         if (e[2] === 'racks' && lv(b, e[3], p1.y)) p2 = { x: p2.x, y: p1.y };
         if (e[0] === 'racks' && lv(a, e[1], p2.y)) p1 = { x: p1.x, y: p2.y };
+      } else {
+        var n = NEDGE[e[0] + '>' + e[2]];
+        s1 = n[0]; s2 = n[1]; chan = n[3]; p1 = at(a, s1); p2 = at(b, s2);
+        if (n[2] != null) { p1.x = n[2]; p2.x = n[2]; }
       }
-      else {
-        var ia = order.indexOf(e[0]), ib = order.indexOf(e[2]);
-        if (Math.abs(ia - ib) === 1) { var dn = a.y < b.y, sx = portShift(used, e[0] + (dn ? 'b' : 't'), e[2] + (dn ? 't' : 'b')); p1 = { x: a.x + a.w / 2 + sx, y: dn ? a.y + a.h : a.y }; p2 = { x: b.x + b.w / 2 + sx, y: dn ? b.y : b.y + b.h }; }
-        else { skip++; var o1 = used[e[0] + 'R'] = (used[e[0] + 'R'] || 0) + 1, o2 = used[e[2] + 'R'] = (used[e[2] + 'R'] || 0) + 1; p1 = { x: a.x + a.w, y: a.y + a.h / 2 + 12 * (o1 - 1) - 6 }; p2 = { x: b.x + b.w, y: b.y + b.h / 2 + 12 * (o2 - 1) - 6 }; chan = 12 + 9 * (skip - 1); }
-      }
-      d.edge(p1, p2, Object.assign({ fromId: e[0], toId: e[2], id: e[0] + '>' + e[2], stub: chan }, S[e[4]]));
+      d.edge(p1, p2, Object.assign({ fromId: e[0], toId: e[2], id: e[0] + '>' + e[2], fromSide: s1, toSide: s2, stub: chan }, S[e[4]]));
     });
     d.legend(); d.fit(16);
     host.innerHTML = d.render();

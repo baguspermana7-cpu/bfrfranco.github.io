@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v3.18.5 — 2026-10-11
+
+### Plant map and model lab on a phone: two lanes, and the lab diagram no longer runs off-screen
+
+**Model lab, broken on phones.** A CSS floor (`min-width: 480px` on `.ltc-schematic svg`) made the overview 480 px wide on a 390 px screen. The block borders on the right and every connector routed down the right-hand side channel ran past the screen edge, cut off, unless the reader scrolled sideways. The geometry gates passed, because the geometry was correct; the drawing was simply off-screen. The floor is removed.
+
+**Two-lane phone layout.** Phones now get the two-lane layout the Tier diagrams use (v3.18.4), on both the lab overview and the hub's four plant views (overview, power, liquid heat, air & rooms):
+- Power or liquid runs on the left lane, air on the right.
+- Blocks alone in their row span both lanes, so long sublabels fit.
+
+Connectors run straight down or straight across. One side channel is left (electrical rooms → chillers on the overview). Before, these views stacked every block in one column, with skip connectors in 3–4 nested channels.
+
+**Gates** — `tools/test-rzd-ports.mjs` adds two rules:
+- **R7:** a phone view shows the same connectors as the desktop view, so a narrow layout cannot silently drop a flow. A mutant missing `cdu>reject` fails it.
+- **R8:** at 390 px no diagram is wider than the screen. It fails the v3.18.4 tree ("lab: a diagram 480 px wide on a 390 px screen").
+
 ## v3.18.4 — 2026-10-11
 
 ### Tier diagrams on a phone: two lanes, no crossing lines, and 2N where it is 2N

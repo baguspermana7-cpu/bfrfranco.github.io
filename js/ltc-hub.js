@@ -212,24 +212,42 @@
         ['cdu', 'b', 'reject', 't', 'LIQ'], ['racks', 'b', 'crah', 'r', 'AIR', 'Heat (air → chilled water)', 'air'],
         ['crah', 'l', 'chiller', 'r', 'AIR'], ['elec', 'b', 'chiller', 't', 'AIR'], ['chiller', 'l', 'tower', 'r', 'AIR']],
       opens: { utility: 'power', ups: 'power', elec: 'air', cdu: 'liquid', reject: 'liquid', crah: 'air', chiller: 'air', tower: 'air' } },
-    power: { label: 'Power', stack: 1, nodes: [
+    power: { label: 'Power', nodes: [
         ['utility', 0, 0], ['tx', 1, 0], ['swgr', 2, 0], ['ups', 3, 0], ['pdu', 4, 0], ['racks', 5, 0, { h: 'span', rows: 2 }],
         ['genset', 1, 1], ['mcc', 2, 1], ['elec', 4, 1]],
       edges: [['utility', 'r', 'tx', 'l', 'POWER', 'Power'], ['tx', 'r', 'swgr', 'l', 'POWER'], ['genset', 't', 'tx', 'b', 'POWER'],
         ['swgr', 'r', 'ups', 'l', 'POWER'], ['ups', 'r', 'pdu', 'l', 'POWER'], ['pdu', 'r', 'racks', 'l', 'POWER'],
         ['swgr', 'b', 'mcc', 't', 'POWER', null, 'mcc'], ['pdu', 'b', 'elec', 't', 'LOSS', 'Losses as heat']] },
-    liquid: { label: 'Liquid heat', stack: -1, nodes: [
+    liquid: { label: 'Liquid heat', nodes: [
         ['ups', 3, 0, { name: 'UPS' }], ['racks', 4, 0, { h: 'span', rows: 2 }], ['mcc', 1, 0],
         ['cdu', 3, 1], ['fws', 2, 1], ['reject', 1, 1], ['trim', 0, 1], ['tower', 0, 2]],
       edges: [['ups', 'b', 'cdu', 't', 'POWER', 'Power', 'cdupumps'], ['mcc', 'b', 'reject', 't', 'POWER'],
         ['racks', 'l', 'cdu', 'r', 'LIQ', 'Heat (liquid)', 'liq'], ['cdu', 'l', 'fws', 'r', 'LIQ'],
         ['fws', 'l', 'reject', 'r', 'LIQ'], ['reject', 'l', 'trim', 'r', 'LIQ'], ['trim', 'b', 'tower', 't', 'AIR', 'Condenser heat']] },
-    air: { label: 'Air & rooms', stack: -1, nodes: [
+    air: { label: 'Air & rooms', nodes: [
         ['racks', 4, 0, { h: 'span', rows: 2 }], ['fire', 4, 2], ['crah', 3, 1], ['chw', 2, 1], ['chiller', 1, 1], ['tower', 0, 1],
         ['elec', 2, 0], ['mcc', 1, 2]],
       edges: [['racks', 'l', 'crah', 'r', 'AIR', 'Heat (air → chilled water)'], ['crah', 'l', 'chw', 'r', 'AIR'],
         ['chw', 'l', 'chiller', 'r', 'AIR'], ['chiller', 'l', 'tower', 'r', 'AIR'], ['elec', 'b', 'chw', 't', 'AIR'],
         ['mcc', 't', 'chiller', 'b', 'POWER', 'Power'], ['fire', 't', 'racks', 'b', 'MON', 'Monitors']] }
+  };
+  /* Narrow panes (phones): two lanes instead of one stacked column. Nodes [id, lane, row], lane
+   * 0 | 1 | 'full'; edges [from, side, to, side, x | {stub}]: a b→t pair runs straight down at x,
+   * an r→l pair straight across one row, an r→r pair down a side channel `stub` wide. */
+  var NX = { 0: [16, 150], 1: [194, 150], full: [16, 328] };
+  var NARROW = {
+    overview: { nodes: [['utility', 'full', 0], ['ups', 0, 1], ['elec', 1, 1], ['racks', 'full', 2], ['cdu', 0, 3], ['crah', 1, 3], ['reject', 0, 4], ['chiller', 1, 4], ['tower', 'full', 5]],
+      edges: [['utility', 'b', 'ups', 't', 91], ['ups', 'b', 'racks', 't', 91], ['ups', 'r', 'elec', 'l'], ['racks', 'b', 'cdu', 't', 91], ['cdu', 'b', 'reject', 't', 91],
+              ['racks', 'b', 'crah', 't', 269], ['crah', 'b', 'chiller', 't', 269], ['elec', 'r', 'chiller', 'r', { stub: 12 }], ['chiller', 'b', 'tower', 't', 269]] },
+    power: { nodes: [['utility', 0, 0], ['genset', 1, 0], ['tx', 'full', 1], ['swgr', 0, 2], ['mcc', 1, 2], ['ups', 'full', 3], ['pdu', 0, 4], ['elec', 1, 4], ['racks', 'full', 5]],
+      edges: [['utility', 'b', 'tx', 't', 91], ['genset', 'b', 'tx', 't', 269], ['tx', 'b', 'swgr', 't', 91], ['swgr', 'r', 'mcc', 'l'], ['swgr', 'b', 'ups', 't', 91],
+              ['ups', 'b', 'pdu', 't', 91], ['pdu', 'r', 'elec', 'l'], ['pdu', 'b', 'racks', 't', 91]] },
+    liquid: { nodes: [['racks', 0, 0], ['ups', 1, 0], ['cdu', 'full', 1], ['fws', 'full', 2], ['reject', 0, 3], ['mcc', 1, 3], ['trim', 'full', 4], ['tower', 'full', 5]],
+      edges: [['racks', 'b', 'cdu', 't', 91], ['ups', 'b', 'cdu', 't', 269], ['cdu', 'b', 'fws', 't', 91], ['fws', 'b', 'reject', 't', 91], ['mcc', 'l', 'reject', 'r'],
+              ['reject', 'b', 'trim', 't', 91], ['trim', 'b', 'tower', 't', 91]] },
+    air: { nodes: [['racks', 0, 0], ['fire', 1, 0], ['crah', 'full', 1], ['chw', 0, 2], ['elec', 1, 2], ['chiller', 0, 3], ['mcc', 1, 3], ['tower', 'full', 4]],
+      edges: [['fire', 'l', 'racks', 'r'], ['racks', 'b', 'crah', 't', 91], ['crah', 'b', 'chw', 't', 91], ['elec', 'l', 'chw', 'r'], ['chw', 'b', 'chiller', 't', 91],
+              ['mcc', 'l', 'chiller', 'r'], ['chiller', 'b', 'tower', 't', 91]] }
   };
   var view = 'overview';
   var NW = 172, CG = 40, RG = 56, NH = 88;
@@ -248,21 +266,15 @@
                 MON: { pattern: 'dotted', stroke: 'soft', marker: false } };
     var LBL = R ? { it: mw(R.it.kw), liq: mw(R.liquid.itKw), air: mw(R.air.itKw) + ' air', mcc: mw(R.elec.mccKw) + ' mech', cdupumps: 'CDU pumps on UPS' } : {};
     var box = {};
-    // narrow: one column in flow order (a transposed grid scaled into 360 px left 5 px text)
-    // stack in the direction things flow: power left → right, heat right → left
-    var order = V.nodes.slice().sort(function (a, b) { return V.stack ? V.stack * (a[1] - b[1]) || a[2] - b[2] : 0; })
-      .map(function (x) { return x[0]; });
-    function pos(c, r, id) {
-      return o.narrow ? { x: 24, y: 16 + order.indexOf(id) * (NH + 36) }
-                      : { x: 24 + c * (NW + CG), y: 24 + r * (NH + RG) };
-    }
-    V.nodes.forEach(function (spec) {
-      var id = spec[0], s = BY_ID[id], l = live(id), ex = spec[3] || {}, p = pos(spec[1], spec[2], id);
+    var NV = NARROW[view];
+    function pos(c, r) { return o.narrow ? { x: NX[c][0], y: 16 + r * (NH + 36) } : { x: 24 + c * (NW + CG), y: 24 + r * (NH + RG) }; }
+    (o.narrow ? NV : V).nodes.forEach(function (spec) {
+      var id = spec[0], s = BY_ID[id], l = live(id), ex = (o.narrow ? null : spec[3]) || {}, p = pos(spec[1], spec[2]);
       var opt = { id: id, name: ex.name || (id === 'reject' && R ? COOLER_NAME[R.liquid.coolerType] : s.name),
                   sublabel: l ? l.sub : s.sub, symbol: s.sym, interactive: true, focal: !!s.focal,
                   tier: s.focal ? 1 : 2, fill: s.focal ? 'paper-2' : 'paper', w: NW,
                   legend: s.focal ? 'IT load — the control point' : 'Plant equipment' };
-      if (o.narrow) { opt.w = 210; opt.h = NH; }   // leaves a side channel for connectors that skip a block
+      if (o.narrow) { opt.w = NX[spec[1]][1]; opt.h = NH; }
       else opt.h = ex.h === 'span' ? NH + (ex.rows - 1) * (NH + RG) : NH;
       box[id] = d.node(p.x, p.y, opt);
     });
@@ -270,33 +282,30 @@
       return side === 'l' ? { x: b.x, y: b.y + b.h / 2 } : side === 'r' ? { x: b.x + b.w, y: b.y + b.h / 2 }
            : side === 't' ? { x: b.x + b.w / 2, y: b.y } : { x: b.x + b.w / 2, y: b.y + b.h };
     }
-    var skip = 0, used = {};
-    function portShift(use, k1, k2) { var m = Math.max(use[k1] || 0, use[k2] || 0); use[k1] = (use[k1] || 0) + 1; use[k2] = (use[k2] || 0) + 1; return m ? (m % 2 ? 1 : -1) * 28 * Math.ceil(m / 2) : 0; }
+    if (o.narrow) {
+      var byKey = {};
+      V.edges.forEach(function (e) { byKey[e[0] + '>' + e[2]] = e; });
+      NV.edges.forEach(function (n) {
+        var A = box[n[0]], B = box[n[2]], e = byKey[n[0] + '>' + n[2]], g = n[4], stub = g && typeof g === 'object' ? g.stub : undefined;
+        function side(bx, sd) { return sd === 'b' ? { x: g, y: bx.y + bx.h } : sd === 't' ? { x: g, y: bx.y } : at(bx, sd); }
+        var opt = Object.assign({ fromId: n[0], toId: n[2], fromSide: n[1], toSide: n[3], stub: stub }, STY[e[4]]);
+        if (e[5]) opt.legend = e[5];
+        d.edge(side(A, n[1]), side(B, n[3]), opt);
+      });
+      d.legend();
+      return d;
+    }
     V.edges.forEach(function (e) {
       var A = box[e[0]], B = box[e[2]];
-      var p1 = at(A, e[1]), p2 = at(B, e[3]), chan;
-      if (o.narrow) {
-        var ia = order.indexOf(e[0]), ib = order.indexOf(e[2]);
-        if (Math.abs(ia - ib) === 1) {   // neighbours in the stack: straight down or up
-          var down = A.y < B.y, sx = portShift(used, e[0] + (down ? 'b' : 't'), e[2] + (down ? 't' : 'b'));   // a port already taken: step aside
-          p1 = { x: A.x + A.w / 2 + sx, y: down ? A.y + A.h : A.y };
-          p2 = { x: B.x + B.w / 2 + sx, y: down ? B.y : B.y + B.h };
-        } else {                          // skips a block: leave and enter on the right, through the side channel
-          skip++;
-          var o1 = used[e[0] + 'R'] = (used[e[0] + 'R'] || 0) + 1, o2 = used[e[2] + 'R'] = (used[e[2] + 'R'] || 0) + 1;   // one port per connector on each side
-          p1 = { x: A.x + A.w, y: A.y + A.h / 2 + 12 * (o1 - 1) - 6 };
-          p2 = { x: B.x + B.w, y: B.y + B.h / 2 + 12 * (o2 - 1) - 6 };
-          chan = 12 + 9 * (skip - 1);     // its own channel: two flows never share one stroke
-        }
-      }
+      var p1 = at(A, e[1]), p2 = at(B, e[3]);
       // into the tall racks block: keep the connector level with the other end
       // (only on a left/right side, and only while that level is still on the block's border)
       function level(bx, sd, y) { return /[lr]/.test(sd) && y >= bx.y + 10 && y <= bx.y + bx.h - 10; }
-      if (e[2] === 'racks' && !o.narrow && level(B, e[3], p1.y)) p2 = { x: p2.x, y: p1.y };
-      if (e[0] === 'racks' && !o.narrow && level(A, e[1], p2.y)) p1 = { x: p1.x, y: p2.y };
-      var opt = Object.assign({ fromId: e[0], toId: e[2], stub: chan }, STY[e[4]]);
+      if (e[2] === 'racks' && level(B, e[3], p1.y)) p2 = { x: p2.x, y: p1.y };
+      if (e[0] === 'racks' && level(A, e[1], p2.y)) p1 = { x: p1.x, y: p2.y };
+      var opt = Object.assign({ fromId: e[0], toId: e[2] }, STY[e[4]]);
       if (e[5]) opt.legend = e[5];
-      if (e[6] && LBL[e[6]] && !o.narrow) opt.label = LBL[e[6]];
+      if (e[6] && LBL[e[6]]) opt.label = LBL[e[6]];
       d.edge(p1, p2, opt);
     });
     d.legend();

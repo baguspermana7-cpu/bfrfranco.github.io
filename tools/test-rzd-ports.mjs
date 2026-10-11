@@ -13,6 +13,10 @@
  *   R4  no segment passes through any other block;
  *   R5  no two connectors share a stretch of line (collinear overlap > 4 units) — two flows drawn
  *       on one stroke cannot be told apart (hub overview: rack → CDU and rack → CRAH did).
+ *   R7  a phone shows the same connectors as the desktop: a narrow layout that forgets an edge
+ *       drops a flow silently.
+ *   R8  at 390 px every diagram fits the screen: an SVG wider than the viewport hides its right lane
+ *       and side channels behind a scroll (model lab: a 480 px CSS floor did).
  *   R6  Tier diagrams: no two connectors cross. The phone layout used to stack every block in one
  *       column and send skip connectors down nested side channels; two lanes route them straight.
  * Pages: hub (4 plant views), Tier (4 tiers × power/cooling), ISO, ASHRAE, TIA, NFPA, model lab;
@@ -24,7 +28,7 @@ import puppeteer from 'puppeteer';
 import path from 'path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const fails = [];
+const fails = [], seen = {};
 let checked = 0;
 
 function audit() {
@@ -146,6 +150,12 @@ for (const w of [1440, 390]) {
     await walk(p, async (where) => {
       await new Promise((r) => setTimeout(r, 120));
       const es = await p.evaluate(audit);
+      if (w === 390) {
+        const wide = await p.evaluate(() => [...document.querySelectorAll('svg')].filter((v) => v.querySelector('path[data-rzd-edge]') && v.getBoundingClientRect().width > 0)
+          .map((v) => Math.round(v.getBoundingClientRect().width)).filter((x) => x > window.innerWidth));
+        wide.forEach((x) => fails.push(`R8 ${w}px ${where}: a diagram ${x} px wide on a ${w} px screen`));
+      }
+      (seen[where] = seen[where] || {})[w] = es.map((e) => e.svg + ':' + e.id).sort().join(' ');
       es.forEach((e) => check(`${w}px ${where}`, e));
       for (let i = 0; i < es.length; i++) for (let j = i + 1; j < es.length; j++) {
         if (es[i].svg === es[j].svg && shared(es[i], es[j])) fails.push(`R5 ${w}px ${where}: ${es[i].id} and ${es[j].id} share a stretch of line`);
@@ -156,10 +166,16 @@ for (const w of [1440, 390]) {
   }
 }
 await b.close();
+for (const [where, by] of Object.entries(seen)) {
+  if (by[1440] !== by[390]) {
+    const a = new Set(by[1440].split(' ')), c = new Set(by[390].split(' '));
+    fails.push(`R7 ${where}: phone ${[...a].filter((x) => !c.has(x)).map((x) => 'drops ' + x).concat([...c].filter((x) => !a.has(x)).map((x) => 'adds ' + x)).join(', ')}`);
+  }
+}
 
 if (checked < 100) fails.push(`only ${checked} connectors checked — the walk did not reach the diagrams`);
 if (fails.length) {
-  console.log(`FAIL — ${fails.length} connector(s) of ${checked} enter or leave a block wrongly:`);
+  console.log(`FAIL — ${fails.length} finding(s) over ${checked} connectors:`);
   [...new Set(fails)].slice(0, 200).forEach((f) => console.log('  ' + f));
   process.exit(1);
 }
