@@ -178,6 +178,19 @@ for (let i = 0; i < 200; i++) {
   ok(run.maxInlet > per.maxInlet + 5, 'P7 if those racks kept running on air the room would overheat');
   const chw = DH.solveHall(r, 'chw', 'common', 10, 'throttled');
   ok(chw.supply > n.supply, 'P7 chilled water lost: supply air rises with the CHW transient');
+  // v3.17.4 — the solver is a mass and energy balance; the plan draws exactly these flows
+  for (const [nm, x] of [['normal', n], ['crah4', c4], ['feeder', per], ['running', run]]) {
+    const fed = x.racks.reduce((a, k) => a + k.f * k.dem, 0);
+    const mouths = x.aisles.reduce((a, ai) => a + ai.west + ai.east + ai.bypass, 0);
+    near(fed + x.recircM3s, x.airDemand, 1e-6 * x.airDemand + 1e-9, `P7 ${nm}: rack airflow = supply drawn + exhaust pulled back`);
+    near(mouths, x.airSupply, 1e-6 * x.airSupply, `P7 ${nm}: every m³/s the fans move reaches an aisle mouth (served or bypassed)`);
+    near(x.returnC - x.supply, x.qAirKw / (x.airSupply * P.CONST.RHO_A * P.CONST.CP_A), 1e-6, `P7 ${nm}: return − supply = air heat ÷ (ṁ·cp)`);
+    ok(x.aisles.every((ai) => ai.unmet < 1e-9 || ai.westTo < ai.eastTo), `P7 ${nm}: unmet air sits between where the two supplies end`);
+  }
+  ok(n.fanSpeed < 1 && n.supply === r.input.supplyAirC && !n.coilLimited && n.recircM3s < 1e-9, 'P7 normal: fans below rated speed, coil at set-point, no recirculation');
+  ok(c4.fanSpeed === 1 && c4.coilLimited && c4.supply > n.supply, 'P7 four CRAHs out: survivors at rated flow, coil cannot hold set-point');
+  const hot = c4.racks.filter((k) => k.f < 0.97);
+  ok(hot.length && hot.every((k) => k.inlet > c4.supply), 'P7 four CRAHs out: racks short of supply air run above supply temperature');
 }
 
 // P8 — defects found by review (v3.17.1); each assertion failed before its fix

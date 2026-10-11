@@ -61,6 +61,8 @@
         var ends = (p.getAttribute('data-rzd-edge') || '').split('>');
         if (ends[0] === id || ends[1] === id) {
           p.setAttribute('data-trace', '1');
+          var bead = s.querySelector('path[data-rzd-pulse="' + p.getAttribute('data-rzd-edge') + '"]');
+          if (bead) bead.setAttribute('data-trace', '1');
           near[ends[0]] = 1; near[ends[1]] = 1;
         }
       });

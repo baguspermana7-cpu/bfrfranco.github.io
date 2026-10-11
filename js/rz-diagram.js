@@ -154,7 +154,7 @@
     var H = s.height || 600;
     var slug = s.slug || 'rzd';
 
-    var occ = L.occupancy();
+    var occ = L.occupancy(), edgeMax = { x: 0, y: 0 };
     /* three paint layers, emitted in this order: zones sit behind everything,
      * connectors behind nodes, labels last so nothing can clip them. The
      * shipped skill paints labels BEFORE nodes and then needs a verifier to
@@ -434,7 +434,42 @@
           })
           .map(function (it) { return it.box; });
 
-        var r = L.route(from, to, { obstacles: obstacles, clearance: o.clearance });
+        var r;
+        /* A side not declared is read from the drawing: an endpoint lying on its
+         * own box's border lands on that side. */
+        function sideOf(pt, nid) {
+          var it = nid && occ.items.filter(function (q) { return q.meta.kind === 'node' && q.meta.id === nid; })[0];
+          if (!it) return null;
+          var b = it.box, e = 0.75;
+          if (Math.abs(pt.x - b.x) < e && pt.y >= b.y - e && pt.y <= b.y + b.h + e) return 'l';
+          if (Math.abs(pt.x - (b.x + b.w)) < e && pt.y >= b.y - e && pt.y <= b.y + b.h + e) return 'r';
+          if (Math.abs(pt.y - b.y) < e && pt.x >= b.x - e && pt.x <= b.x + b.w + e) return 't';
+          if (Math.abs(pt.y - (b.y + b.h)) < e && pt.x >= b.x - e && pt.x <= b.x + b.w + e) return 'b';
+          return null;
+        }
+        if (o.autoSide !== false) {
+          if (!o.fromSide) o.fromSide = sideOf(from, o.fromId);
+          if (!o.toSide) o.toSide = sideOf(to, o.toId);
+        }
+        if (o.fromSide || o.toSide) {
+          /* Port sides declared: leave and enter perpendicular to the box side
+           * through a short stub, and route the middle with the two endpoint boxes
+           * as obstacles too — so a connector never runs along its own box's
+           * border and its arrowhead always points into the side it lands on. */
+          var stub = o.stub == null ? 10 : o.stub;
+          var N = { l: [-1, 0], r: [1, 0], t: [0, -1], b: [0, 1] };
+          var out = function (pt, side) { var v = N[String(side || '').charAt(0)]; return v ? { x: pt.x + v[0] * stub, y: pt.y + v[1] * stub } : pt; };
+          var a1 = out(from, o.fromSide), b1 = out(to, o.toSide);
+          var ends = occ.items.filter(function (it) { return it.meta.kind === 'node' && (it.meta.id === o.fromId || it.meta.id === o.toId); })
+            .map(function (it) { return it.box; });
+          var mid = L.route(a1, b1, { obstacles: obstacles.concat(ends), clearance: o.clearance });
+          var pts = [from].concat(mid.points, [to]).filter(function (q, i, arr) { return i === 0 || q.x !== arr[i - 1].x || q.y !== arr[i - 1].y; });
+          r = L.route.fromPoints(pts);
+          r.transit = mid.transit; r.rerouted = mid.rerouted;
+        } else {
+          r = L.route(from, to, { obstacles: obstacles, clearance: o.clearance });
+        }
+        r.points.forEach(function (q) { edgeMax.x = Math.max(edgeMax.x, q.x); edgeMax.y = Math.max(edgeMax.y, q.y); });
         var stroke = tok(o.stroke || 'muted');
         /* `pattern` is the second channel. A transit stroke is always dashed —
          * that is rule 5's signal and it outranks the caller's choice. */
@@ -451,6 +486,12 @@
           (o.state ? ' data-rzd-state="' + esc(o.state) + '"' : '') +
           ' data-rzd-transit="' + (r.transit ? '1' : '0') +
           '" data-rzd-rerouted="' + (r.rerouted ? '1' : '0') + '"/>');
+        /* A live solid connector stays solid — dashing it would read as the
+         * legend's "dashed" pattern. Its motion rides on a bead overlay instead. */
+        if (o.state === 'flow' && pat === 'solid') {
+          layers.edges.push('<path d="' + r.d + '" fill="none" stroke="' + stroke + '" stroke-width="' + (TIER[o.tier || 2] + 1.6) +
+            '" stroke-linecap="round" stroke-dasharray="0.1 23.9" data-rzd-pulse="' + esc(o.id || '') + '" aria-hidden="true"/>');
+        }
 
         if (r.transit) {
           warnings.push({
@@ -620,7 +661,7 @@
       fit: function (pad) {
         var p = pad == null ? 24 : pad;
         if (!occ.items.length) return ctx;
-        var maxX = 0, maxY = 0;
+        var maxX = edgeMax.x ? edgeMax.x + 8 - p : 0, maxY = edgeMax.y ? edgeMax.y + 8 - p : 0;   // connector channels count too
         for (var i = 0; i < occ.items.length; i++) {
           var b = occ.items[i].box;
           if (b.x + b.w > maxX) maxX = b.x + b.w;

@@ -127,18 +127,23 @@
     var S = { P: { tier: 1, stroke: 'ink', legend: 'Power', state: 'flow' }, Q: { pattern: 'dashed', stroke: 'link', legend: 'Heat (liquid)', state: 'flow' },
               A: { pattern: 'dash-dot', stroke: 'accent', legend: 'Heat (air → chilled water)', state: 'flow' }, X: { pattern: 'dotted', stroke: 'muted', legend: 'Losses as heat' } };
     var E2 = [['grid', 'r', 'ups', 'l', 'P'], ['ups', 'r', 'racks', 'l', 'P'], ['ups', 'b', 'elec', 't', 'X'], ['racks', 'l', 'cdu', 'r', 'Q'],
-              ['cdu', 'b', 'cool', 't', 'Q'], ['racks', 'l', 'crah', 'r', 'A'], ['crah', 'l', 'chiller', 'r', 'A'], ['elec', 'b', 'chiller', 't', 'A'], ['chiller', 'l', 'tower', 'r', 'A']];
-    var order = B.map(function (b) { return b[0]; }), skip = 0;
+              ['cdu', 'b', 'cool', 't', 'Q'], ['racks', 'b', 'crah', 'r', 'A'], ['crah', 'l', 'chiller', 'r', 'A'], ['elec', 'b', 'chiller', 't', 'A'], ['chiller', 'l', 'tower', 'r', 'A']];
+    var order = B.map(function (b) { return b[0]; }), skip = 0, used = {};
+    function portShift(use, k1, k2) { var m = Math.max(use[k1] || 0, use[k2] || 0); use[k1] = (use[k1] || 0) + 1; use[k2] = (use[k2] || 0) + 1; return m ? (m % 2 ? 1 : -1) * 28 * Math.ceil(m / 2) : 0; }
     function at(bx, s) { return s === 'l' ? { x: bx.x, y: bx.y + bx.h / 2 } : s === 'r' ? { x: bx.x + bx.w, y: bx.y + bx.h / 2 } : s === 't' ? { x: bx.x + bx.w / 2, y: bx.y } : { x: bx.x + bx.w / 2, y: bx.y + bx.h }; }
     E2.forEach(function (e) {
-      var a = box[e[0]], b = box[e[2]], p1 = at(a, e[1]), p2 = at(b, e[3]);
-      if (!narrow) { if (e[2] === 'racks') p2 = { x: b.x, y: p1.y }; if (e[0] === 'racks') p1 = { x: a.x, y: p2.y }; }
+      var a = box[e[0]], b = box[e[2]], p1 = at(a, e[1]), p2 = at(b, e[3]), chan;
+      if (!narrow) {   // level with the other end — only on a left/right side, only while still on the rack block's border
+        var lv = function (bx, sd, y) { return /[lr]/.test(sd) && y >= bx.y + 10 && y <= bx.y + bx.h - 10; };
+        if (e[2] === 'racks' && lv(b, e[3], p1.y)) p2 = { x: p2.x, y: p1.y };
+        if (e[0] === 'racks' && lv(a, e[1], p2.y)) p1 = { x: p1.x, y: p2.y };
+      }
       else {
         var ia = order.indexOf(e[0]), ib = order.indexOf(e[2]);
-        if (Math.abs(ia - ib) === 1) { var dn = a.y < b.y; p1 = { x: a.x + a.w / 2, y: dn ? a.y + a.h : a.y }; p2 = { x: b.x + b.w / 2, y: dn ? b.y : b.y + b.h }; }
-        else { skip++; var off = -10 + (skip % 3) * 10; p1 = { x: a.x + a.w, y: a.y + a.h / 2 + off }; p2 = { x: b.x + b.w, y: b.y + b.h / 2 + off }; }
+        if (Math.abs(ia - ib) === 1) { var dn = a.y < b.y, sx = portShift(used, e[0] + (dn ? 'b' : 't'), e[2] + (dn ? 't' : 'b')); p1 = { x: a.x + a.w / 2 + sx, y: dn ? a.y + a.h : a.y }; p2 = { x: b.x + b.w / 2 + sx, y: dn ? b.y : b.y + b.h }; }
+        else { skip++; var o1 = used[e[0] + 'R'] = (used[e[0] + 'R'] || 0) + 1, o2 = used[e[2] + 'R'] = (used[e[2] + 'R'] || 0) + 1; p1 = { x: a.x + a.w, y: a.y + a.h / 2 + 12 * (o1 - 1) - 6 }; p2 = { x: b.x + b.w, y: b.y + b.h / 2 + 12 * (o2 - 1) - 6 }; chan = 12 + 9 * (skip - 1); }
       }
-      d.edge(p1, p2, Object.assign({ fromId: e[0], toId: e[2], id: e[0] + '>' + e[2] }, S[e[4]]));
+      d.edge(p1, p2, Object.assign({ fromId: e[0], toId: e[2], id: e[0] + '>' + e[2], stub: chan }, S[e[4]]));
     });
     d.legend(); d.fit(16);
     host.innerHTML = d.render();

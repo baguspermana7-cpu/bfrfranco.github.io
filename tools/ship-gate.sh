@@ -55,6 +55,7 @@ gate "diagram survey coverage — every cockpit measured, declared, or excused" 
 gate "diagram engine — metrics, placement, routing, facade" node tools/test-rz-diagram-engine.mjs
 gate "LTC workbench — standards arithmetic + page frame" node tools/test-ltc-workbench.mjs
 gate "LTC plant model — energy balance, 100 MW hand checks, faults, practitioner claims recomputed" node tools/test-ltc-plant.mjs
+gate "LTC diagram connectors — leave and enter blocks perpendicular, never along a border" node tools/test-rzd-ports.mjs
 gate "CSS structure — no rule silently discarded" node tools/audit-css-structure.mjs
 gate "motion — toast and sheet move the way the standard says" node tools/test-rz-motion.mjs --strict
 gate "flatten ratchet — washes and card stripes may fall, never rise" node tools/test-flatten-ratchet.mjs --strict

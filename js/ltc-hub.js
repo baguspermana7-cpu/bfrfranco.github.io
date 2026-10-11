@@ -209,7 +209,7 @@
         ['elec', 1, 1], ['cdu', 2, 1], ['reject', 2, 2], ['crah', 2, 3], ['chiller', 1, 3], ['tower', 0, 3]],
       edges: [['utility', 'r', 'ups', 'l', 'POWER', 'Power'], ['ups', 'r', 'racks', 'l', 'POWER', null, 'it'],
         ['ups', 'b', 'elec', 't', 'LOSS', 'Losses as heat'], ['racks', 'l', 'cdu', 'r', 'LIQ', 'Heat (liquid)', 'liq'],
-        ['cdu', 'b', 'reject', 't', 'LIQ'], ['racks', 'l', 'crah', 'r', 'AIR', 'Heat (air → chilled water)', 'air'],
+        ['cdu', 'b', 'reject', 't', 'LIQ'], ['racks', 'b', 'crah', 'r', 'AIR', 'Heat (air → chilled water)', 'air'],
         ['crah', 'l', 'chiller', 'r', 'AIR'], ['elec', 'b', 'chiller', 't', 'AIR'], ['chiller', 'l', 'tower', 'r', 'AIR']],
       opens: { utility: 'power', ups: 'power', elec: 'air', cdu: 'liquid', reject: 'liquid', crah: 'air', chiller: 'air', tower: 'air' } },
     power: { label: 'Power', stack: 1, nodes: [
@@ -270,26 +270,31 @@
       return side === 'l' ? { x: b.x, y: b.y + b.h / 2 } : side === 'r' ? { x: b.x + b.w, y: b.y + b.h / 2 }
            : side === 't' ? { x: b.x + b.w / 2, y: b.y } : { x: b.x + b.w / 2, y: b.y + b.h };
     }
-    var skip = 0;
+    var skip = 0, used = {};
+    function portShift(use, k1, k2) { var m = Math.max(use[k1] || 0, use[k2] || 0); use[k1] = (use[k1] || 0) + 1; use[k2] = (use[k2] || 0) + 1; return m ? (m % 2 ? 1 : -1) * 28 * Math.ceil(m / 2) : 0; }
     V.edges.forEach(function (e) {
       var A = box[e[0]], B = box[e[2]];
-      var p1 = at(A, e[1]), p2 = at(B, e[3]);
+      var p1 = at(A, e[1]), p2 = at(B, e[3]), chan;
       if (o.narrow) {
         var ia = order.indexOf(e[0]), ib = order.indexOf(e[2]);
         if (Math.abs(ia - ib) === 1) {   // neighbours in the stack: straight down or up
-          var down = A.y < B.y;
-          p1 = { x: A.x + A.w / 2, y: down ? A.y + A.h : A.y };
-          p2 = { x: B.x + B.w / 2, y: down ? B.y : B.y + B.h };
+          var down = A.y < B.y, sx = portShift(used, e[0] + (down ? 'b' : 't'), e[2] + (down ? 't' : 'b'));   // a port already taken: step aside
+          p1 = { x: A.x + A.w / 2 + sx, y: down ? A.y + A.h : A.y };
+          p2 = { x: B.x + B.w / 2 + sx, y: down ? B.y : B.y + B.h };
         } else {                          // skips a block: leave and enter on the right, through the side channel
           skip++;
-          p1 = { x: A.x + A.w, y: A.y + A.h / 2 - 8 + (skip % 3) * 8 };
-          p2 = { x: B.x + B.w, y: B.y + B.h / 2 - 8 + (skip % 3) * 8 };
+          var o1 = used[e[0] + 'R'] = (used[e[0] + 'R'] || 0) + 1, o2 = used[e[2] + 'R'] = (used[e[2] + 'R'] || 0) + 1;   // one port per connector on each side
+          p1 = { x: A.x + A.w, y: A.y + A.h / 2 + 12 * (o1 - 1) - 6 };
+          p2 = { x: B.x + B.w, y: B.y + B.h / 2 + 12 * (o2 - 1) - 6 };
+          chan = 12 + 9 * (skip - 1);     // its own channel: two flows never share one stroke
         }
       }
       // into the tall racks block: keep the connector level with the other end
-      if (e[2] === 'racks' && !o.narrow) p2 = { x: B.x, y: p1.y };
-      if (e[0] === 'racks' && !o.narrow) p1 = { x: A.x, y: p2.y };
-      var opt = Object.assign({ fromId: e[0], toId: e[2] }, STY[e[4]]);
+      // (only on a left/right side, and only while that level is still on the block's border)
+      function level(bx, sd, y) { return /[lr]/.test(sd) && y >= bx.y + 10 && y <= bx.y + bx.h - 10; }
+      if (e[2] === 'racks' && !o.narrow && level(B, e[3], p1.y)) p2 = { x: p2.x, y: p1.y };
+      if (e[0] === 'racks' && !o.narrow && level(A, e[1], p2.y)) p1 = { x: p1.x, y: p2.y };
+      var opt = Object.assign({ fromId: e[0], toId: e[2], stub: chan }, STY[e[4]]);
       if (e[5]) opt.legend = e[5];
       if (e[6] && LBL[e[6]] && !o.narrow) opt.label = LBL[e[6]];
       d.edge(p1, p2, opt);

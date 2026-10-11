@@ -433,6 +433,18 @@
     return first;
   }
 
+  /* A route through given waypoints (already orthogonal); collinear points are merged
+   * so the elbow radius is not starved by a zero-turn corner. */
+  route.fromPoints = function (points, radius) {
+    var pts = points.filter(function (q, i, arr) {
+      if (i === 0 || i === arr.length - 1) return true;
+      var a = arr[i - 1], b = arr[i + 1];
+      return !((a.x === q.x && q.x === b.x) || (a.y === q.y && q.y === b.y));
+    });
+    var p = pathFor(pts, radius == null ? ELBOW_R : radius), segs = toSegments(pts);
+    return { points: pts, segments: segs, d: p.d, radius: segs.length > 1 ? p.radius : 0, rerouted: false, transit: false };
+  };
+
   var API = {
     GAP_MIN: GAP_MIN,
     GAP_PREF: GAP_PREF,

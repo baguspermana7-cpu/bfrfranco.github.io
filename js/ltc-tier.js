@@ -227,7 +227,7 @@
       desc: (cool ? 'DH01 cooling for ' + T.label + ': the liquid sink (CDUs, facility water, liquid coolers) and the air sink (CRAHs, chilled water, chiller plant); the IT heat load needs both.'
                   : 'DH01 power for ' + T.label + ': generators, transformers with their LV boards, UPS and PDUs to the IT load, and the MCC that keeps the cooling running.') +
             ' Select a block to take it out.' }));
-    var NW = 168, NH = 88, CG = 44, RG = 40, box = {};
+    var NW = 156, NH = 88, CG = 20, RG = 40, box = {};
     var order = spec.nodes.slice().sort(function (a, b) { return a[1] - b[1] || a[2] - b[2]; }).map(function (x) { return x[0]; });
     spec.nodes.forEach(function (sp) {
       var n = nodeOf(st.tier, sp[0]), ex = sp[3] || {};
@@ -247,19 +247,25 @@
       return s0 === 'l' ? { x: bx.x, y: bx.y + bx.h * f } : s0 === 'r' ? { x: bx.x + bx.w, y: bx.y + bx.h * f }
            : s0 === 't' ? { x: bx.x + bx.w * f, y: bx.y } : { x: bx.x + bx.w * f, y: bx.y + bx.h };
     }
-    var skip = 0;
+    var skip = 0, used = {}, rank = {};
+    // narrow stack: a connector that skips blocks gets its own side channel, shorter spans inside
+    // longer ones so channels nest instead of crossing
+    spec.edges.filter(function (e) { return Math.abs(order.indexOf(e[0]) - order.indexOf(e[2])) > 1; })
+      .sort(function (a, b) { return Math.abs(order.indexOf(a[0]) - order.indexOf(a[2])) - Math.abs(order.indexOf(b[0]) - order.indexOf(b[2])); })
+      .forEach(function (e, i) { rank[e[0] + '>' + e[2]] = i; });
+    function portShift(use, k1, k2) { var m = Math.max(use[k1] || 0, use[k2] || 0); use[k1] = (use[k1] || 0) + 1; use[k2] = (use[k2] || 0) + 1; return m ? (m % 2 ? 1 : -1) * 28 * Math.ceil(m / 2) : 0; }
     spec.edges.forEach(function (e) {
       var A = box[e[0]], B = box[e[2]]; if (!A || !B) return;
-      var p1 = at(A, e[1]), p2 = at(B, e[3]);
+      var p1 = at(A, e[1]), p2 = at(B, e[3]), s1 = e[1].charAt(0), s2 = e[3].charAt(0), chan;
       if (!o.narrow) {   // a connector into or out of a tall block stays level with its other end
         if (B.h > NH && e[3].charAt(0) === 'l') p2 = { x: B.x, y: p1.y };
         if (A.h > NH && e[1].charAt(0) === 'r') p1 = { x: A.x + A.w, y: p2.y };
       } else {
         var ia = order.indexOf(e[0]), ib = order.indexOf(e[2]);
-        if (Math.abs(ia - ib) === 1) { var dn = A.y < B.y; p1 = { x: A.x + A.w / 2, y: dn ? A.y + A.h : A.y }; p2 = { x: B.x + B.w / 2, y: dn ? B.y : B.y + B.h }; }
-        else { skip++; var off = -10 + (skip % 3) * 10; p1 = { x: A.x + A.w, y: A.y + A.h / 2 + off }; p2 = { x: B.x + B.w, y: B.y + B.h / 2 + off }; }
+        if (Math.abs(ia - ib) === 1) { var dn = A.y < B.y, sx = portShift(used, e[0] + (dn ? 'b' : 't'), e[2] + (dn ? 't' : 'b')); p1 = { x: A.x + A.w / 2 + sx, y: dn ? A.y + A.h : A.y }; p2 = { x: B.x + B.w / 2 + sx, y: dn ? B.y : B.y + B.h }; s1 = dn ? 'b' : 't'; s2 = dn ? 't' : 'b'; }
+        else { skip++; var o1 = used[e[0] + 'R'] = (used[e[0] + 'R'] || 0) + 1, o2 = used[e[2] + 'R'] = (used[e[2] + 'R'] || 0) + 1; p1 = { x: A.x + A.w, y: A.y + A.h / 2 + 12 * (o1 - 1) - 6 }; p2 = { x: B.x + B.w, y: B.y + B.h / 2 + 12 * (o2 - 1) - 6 }; s1 = 'r'; s2 = 'r'; chan = 12 + 9 * rank[e[0] + '>' + e[2]]; }
       }
-      d.edge(p1, p2, Object.assign({ fromId: e[0], toId: e[2], id: e[0] + '>' + e[2] }, STY[e[4]]));
+      d.edge(p1, p2, Object.assign({ fromId: e[0], toId: e[2], id: e[0] + '>' + e[2], fromSide: s1, toSide: s2, stub: chan }, STY[e[4]]));
     });
     d.legend();
     return d;

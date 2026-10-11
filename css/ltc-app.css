@@ -207,7 +207,8 @@ button, input, select { font: inherit; color: inherit; }
 /* A connector carrying load moves. A solid line becomes 9-3 dashes; a line that
    already has a pattern keeps it, so the legend still reads. Each pattern moves by
    exactly one of its own periods per cycle, so the loop never snaps back. */
-.ltc-canvas path[data-rzd-state="flow"]:not([stroke-dasharray]) { stroke-dasharray: 9 3; animation: ltc-flow-12 0.9s linear infinite; }
+.ltc-canvas path[data-rzd-pulse] { stroke-dasharray: 0.1 23.9; animation: ltc-flow-24 1.2s linear infinite; pointer-events: none; }
+@keyframes ltc-flow-24 { to { stroke-dashoffset: -24; } }
 .ltc-canvas path[data-rzd-state="flow"][stroke-dasharray="6,4"] { animation: ltc-flow-10 0.8s linear infinite; }
 .ltc-canvas path[data-rzd-state="flow"][stroke-dasharray="1.5,3"] { animation: ltc-flow-9 0.8s linear infinite; }
 .ltc-canvas path[data-rzd-state="flow"][stroke-dasharray="8,3,1.5,3"] { animation: ltc-flow-31 1.6s linear infinite; }
@@ -217,7 +218,7 @@ button, input, select { font: inherit; color: inherit; }
 @keyframes ltc-flow-31 { to { stroke-dashoffset: -31; } }
 @media (prefers-reduced-motion: reduce) {
   .ltc-canvas path[data-rzd-state="flow"] { animation: none; }
-  .ltc-canvas path[data-rzd-state="flow"]:not([stroke-dasharray]) { stroke-dasharray: none; }
+  .ltc-canvas path[data-rzd-pulse] { display: none; }
 }
 
 /* ---- inspector ------------------------------------------------------------- */
@@ -335,6 +336,7 @@ body.locked .ltc-app { filter: blur(8px); pointer-events: none; user-select: non
 /* hover trace: the block and its connectors stay, the rest steps back */
 .ltc-canvas svg path[data-rzd-edge], .ltc-canvas svg rect[data-rzd-node] { transition: opacity 150ms ease; }
 .ltc-canvas svg.is-tracing path[data-rzd-edge]:not([data-trace]) { opacity: .12; }
+.ltc-canvas svg.is-tracing path[data-rzd-pulse]:not([data-trace]) { opacity: 0; }
 .ltc-canvas svg.is-tracing rect[data-rzd-node]:not([data-trace]) { opacity: .4; }
 .ltc-canvas svg.is-tracing rect[data-rzd-node][data-trace="self"] { stroke: var(--o); stroke-width: 1.6; }
 .ltc-tip { position: fixed; z-index: 60; max-width: 300px; padding: 10px 12px; background: var(--bg2); border: 1px solid var(--bd2); border-radius: 4px;
@@ -401,6 +403,21 @@ body.locked .ltc-app { filter: blur(8px); pointer-events: none; user-select: non
 .ltc-dh-k i.cdu { border-color: var(--c); background: var(--bg1); }
 .ltc-dh-k i.crah { background: var(--t2); }
 .ltc-dh-wrap canvas:focus-visible { outline: 2px solid var(--o); outline-offset: 2px; }
+.ltc-dh-chain { display: grid; gap: 6px; margin: 8px 0 2px; }
+.ltc-dh-chain > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ltc-dh-chain .ltc-eyebrow { flex: 0 0 76px; }
+.ltc-dh-chain ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 0; min-width: 0; }
+.ltc-dh-chain li { display: inline-flex; flex-direction: column; gap: 1px; padding: 4px 8px; border: 1px solid var(--bd); border-left-width: 2px; background: var(--bg1); font: 400 11px/1.25 'JetBrains Mono', monospace; color: var(--t3); position: relative; margin-right: 14px; }
+.ltc-dh-chain li b { font-weight: 500; font-size: 12px; color: var(--t1); white-space: nowrap; }
+.ltc-dh-chain li:not(:last-child)::after { content: ''; position: absolute; right: -12px; top: 50%; width: 9px; height: 1px; background: var(--t3); }
+.ltc-dh-chain li:not(:last-child)::before { content: ''; position: absolute; right: -13px; top: calc(50% - 3px); border: 3.5px solid transparent; border-left: 4px solid var(--t3); border-right: 0; }
+.ltc-dh-chain li.ok { border-left-color: var(--c); }
+.ltc-dh-chain li.warn { border-left-color: var(--o); }
+.ltc-dh-chain li.warn b { color: var(--o); }
+.ltc-dh-chain li.bad { border-left-color: var(--r); border-style: dashed solid dashed solid; }
+.ltc-dh-chain li.bad b { color: var(--r); }
+.ltc-dh-legend svg { flex: none; }
+@media (max-width: 640px) { .ltc-dh-chain > div { flex-direction: column; align-items: flex-start; gap: 4px; } .ltc-dh-chain .ltc-eyebrow { flex: none; } }
 .ltc-auto-info { background: none; border: 0; padding: 0 2px; font: 400 10.5px/1 'JetBrains Mono', monospace; color: var(--g); cursor: pointer; }
 .ltc-auto-info:focus-visible { outline: 2px solid var(--o); outline-offset: 1px; }
 .ltc-auto-why { grid-column: 1 / -1; margin: 2px 0 4px; font: 400 11.5px/1.4 'JetBrains Mono', monospace; color: var(--t3); }

@@ -11,6 +11,71 @@ release sections rather than semver.
 
 ---
 
+## v3.18.2 — 2026-10-11
+
+### DH01 thermal map: a mass and energy balance, drawn as one continuous air loop
+
+Owner review: the flow lines and arrows on the DH01 map were not right and the simulation did not hang
+together. The old solver assigned each CRAH to its nearest aisle and spread any deficit with a fitted
+"middle of the aisle" shape; the plan drew short arrows from units that did not line up with the aisles,
+and nothing showed where the air went after the rack.
+
+**Changed — solver (`js/ltc-dh01.js` `solveHall`)**
+- Rack airflow from its heat at the design ΔT.
+- CRAH fans share one speed up to their rated flow, 5 % over demand under pressure control. Normal: 97 %. Four units out: survivors at 100 %.
+- Each fan wall is one plenum feeding the aisle mouths in proportion to demand, discounted where its units are out.
+- Each cold aisle is marched from both ends until its air is used up.
+- Unmet demand is pulled from the hot aisle and plenum return, solved to a fixed point.
+- The CRAH coil is an effectiveness model fitted at design. With four units out, supply air rises to 25.2 °C, the set-point is not held, and 29 racks run above 27 °C, all on the west side.
+
+**Changed — plan**
+- One continuous loop: fan-wall plenum → end zone → cold aisle → through the rack → contained hot aisle (⊙ rising) → ceiling plenum (dashed) → fan walls.
+- Supply bands are as wide as their m³/s, narrow as racks draw air, and end where the air runs out; the stretch no air reaches is boxed in red.
+- Red arrows mark exhaust pulled back to the inlet.
+- Each CDU's secondary loop is drawn along the racks it serves: red dashed when dead, amber when a common header is short. Throttled racks are hatched grey.
+- CRAH fill shows fan speed.
+- Racks, CRAHs, CDUs and aisles all carry tooltips.
+- Phones keep the larger unrotated scale.
+
+**Added — system chain**
+- Liquid path: IT → cold plates → CDUs → TCS → FWS → coolers.
+- Air path: rack air → cold aisles → CRAHs → supply → return → CHW → chillers.
+- Each link is marked ok, degraded or failed under the selected fault.
+
+**Gate** — `tools/test-ltc-plant.mjs` P7 now pins the balance on four cases:
+- rack airflow = supply drawn + exhaust pulled back;
+- fan air = aisle mouths;
+- return − supply = air heat ÷ ṁ·cp;
+- unmet air lies between the two supply ends.
+
+Mutating the return or the bypass split fails seven assertions.
+
+### Connectors leave and enter their blocks properly (all LTC diagrams)
+
+Owner screenshot of the Tier power diagram:
+- Generator → transformer ran *along* the transformer's left border, with its arrowhead pointing up at that border.
+- TX → MCC ran along TX's bottom edge and down MCC's left edge.
+
+The router (`js/rz-diagram-layout.js`) knew nothing about which side of a block a connector meets, and excluded both end blocks from its obstacles.
+
+**Changed**
+- `RZDiagram.edge` reads the side each endpoint lies on (or takes `fromSide`/`toSide`). It leaves and enters perpendicular through a short stub, and routes the middle with both end blocks as obstacles.
+- The hub and model-lab "level with the rack block" adjustment no longer moves an endpoint off the block when the other end lies outside the block's height. This was the 3 connectors the new gate caught that started or ended in empty space.
+- Live **solid** connectors stay solid. They used to be dashed by the flow animation, which read as the legend's "Alternate path". Their motion now rides on a bead overlay that follows hover tracing.
+- Two flows no longer share a stroke:
+  - hub and lab overview — rack → CRAH leaves the rack block's bottom instead of riding rack → CDU's line;
+  - phone stacks — each connector that skips blocks gets its own side channel and its own port, shorter spans nested inside longer ones (the `skip % 3` offsets repeated, so two TX B connectors used one port).
+- `fit()` now counts connector channels, so they are no longer clipped off the right edge on phones.
+- Tier blocks are 156 wide with 20 gaps, so the power diagram renders at 0.96 scale instead of 0.81.
+
+**Gate** — `tools/test-rzd-ports.mjs` (wired in the ship gate) renders the hub's four views, all 16 Tier diagrams, ISO, ASHRAE, TIA, NFPA and the model lab at 1440 and 390. On all 256 connectors it requires:
+- a perpendicular first and last segment, pointing into the block;
+- no segment along an end block's border;
+- no segment through another block;
+- no two connectors on one line.
+
+On the old tree it fails 47 connectors, including the owner's `tx>mcc`. The shared-line rule, added afterwards, found 106 more cases in the 390 px stacks of the new routing; all are fixed.
+
 ## v3.18.1 — 2026-10-11
 
 ### Fixed — every Leaflet map was drawing "API KEY REQUIRED"
