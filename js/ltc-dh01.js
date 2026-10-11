@@ -323,18 +323,37 @@
     var short = ST.header === 'common' && Object.keys(s.lostCdu).length > 0;
     h.cdus.forEach(function (c) {
       var dead = s.lostCdu[c.i], col = dead ? (ST.header === 'per-cdu' ? red : amber) : short ? amber : cy, dash = dead ? [4, 3] : [];
+      // the loop: along the hot-aisle edge of each row it serves, turning at the row end into the next
+      // row (serpentine), and fed from the CDU through the end zone — never across a rack
       var mine = s.racks.filter(function (k) { return k.cdu === c.i; }), byRow = {};
       mine.forEach(function (k) { var b = byRow[k.row] = byRow[k.row] || { lo: 1e9, hi: -1e9 }; b.lo = Math.min(b.lo, k.x); b.hi = Math.max(b.hi, k.x + p.rackPitchM); });
-      var cp = P(c.x, c.y);
-      Object.keys(byRow).forEach(function (ri) {
-        var row = h.rowsY[ri], he = hotEdge(row), off = he > row.y + 0.01 ? -0.12 : 0.12, b = byRow[ri], ye = he + off;
-        var nearEnd = Math.abs(c.x - b.lo) < Math.abs(c.x - b.hi) ? b.lo : b.hi;
-        seg(P(b.lo, ye), P(b.hi, ye), col, small ? 1.4 : 2, dash);
-        var e = P(nearEnd, ye);
-        g.strokeStyle = col; g.lineWidth = small ? 0.9 : 1.2; g.setLineDash(dash); g.beginPath(); g.moveTo(cp[0], cp[1]);
-        if (rot) { g.lineTo(cp[0], e[1]); g.lineTo(e[0], e[1]); } else { g.lineTo(e[0], cp[1]); g.lineTo(e[0], e[1]); }
+      var rows = Object.keys(byRow).map(Number).sort(function (a, b) { return a - b; });
+      function ye(ri, k) { var row = h.rowsY[ri], he = hotEdge(row); return he + (he > row.y + 0.01 ? -1 : 1) * 0.12 * k; }
+      function path(pts, lw) {
+        g.strokeStyle = col; g.lineWidth = lw; g.setLineDash(dash); g.beginPath();
+        pts.forEach(function (q, n) { var v = P(q[0], q[1]); if (n) g.lineTo(v[0], v[1]); else g.moveTo(v[0], v[1]); });
         g.stroke(); g.setLineDash([]);
+      }
+      var lw = small ? 1.4 : 2, ez = 0.35;
+      rows.forEach(function (ri, n) {
+        var b = byRow[ri];
+        path([[b.lo, ye(ri, 1)], [b.hi, ye(ri, 1)]], lw);
+        if (n) {
+          // rows of one pair share a hot aisle, so their turn stays in it; a turn across a cold aisle
+          // runs further out, clear of the row labels
+          var pb = byRow[rows[n - 1]], east = rows[n - 1] % 2 === 0, tz = h.rowsY[ri].aisle === h.rowsY[rows[n - 1]].aisle ? 1.1 : ez,
+              xt = east ? Math.max(pb.hi, b.hi) + tz : Math.min(pb.lo, b.lo) - tz;
+          path([[east ? pb.hi : pb.lo, ye(rows[n - 1], 1)], [xt, ye(rows[n - 1], 1)], [xt, ye(ri, 1)], [east ? b.hi : b.lo, ye(ri, 1)]], lw);
+        }
       });
+      if (byRow[c.row]) {
+        var b0 = byRow[c.row], west = c.x < h.lengthM / 2, xs = s.racks.filter(function (k) { return k.row === c.row; }).map(function (k) { return k.x; });
+        var rowEnd = west ? Math.min.apply(null, xs) - ez : Math.max.apply(null, xs) + p.rackPitchM + ez;
+        var reach = west ? b0.lo : b0.hi, inside = Math.abs(reach - (west ? rowEnd + ez : rowEnd - ez)) > 1e-6;
+        var yl = ye(c.row, inside ? 2.2 : 1);            // a feed that passes other racks runs on its own line
+        path([[c.x, c.y], [c.x, yl], [reach, yl]].concat(inside ? [[reach, ye(c.row, 1)]] : []), small ? 0.9 : 1.2);
+      }
+      var cp = P(c.x, c.y);
       var bw = 18, bh = 13;
       g.fillStyle = bg1; g.strokeStyle = col; g.lineWidth = 1.4;
       g.fillRect(cp[0] - bw / 2, cp[1] - bh / 2, bw, bh); g.strokeRect(cp[0] - bw / 2, cp[1] - bh / 2, bw, bh);

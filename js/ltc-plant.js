@@ -483,17 +483,37 @@
             rowsOut.push({ y: y0, aisle: i, hotY0: y0 + p.rackDepthM });           // inlet faces the cold aisle below
             rowsOut.push({ y: y0 + p.rackDepthM + p.hotAisleM, aisle: i + 1, hotY0: y0 + p.rackDepthM });
         }
-        // each CDU serves a contiguous block of racks (one secondary loop), feeders alternate A / B
-        var nC = r.liquid.cduPerHall, perCdu = Math.ceil(racks / nC), rackList = [];
+        /* each CDU serves a contiguous block of racks (one secondary loop), feeders alternate A / B.
+           Blocks run serpentine — odd rows east to west — so a block that spills into the next row
+           turns at the row end, as the pipe would; sizes differ by at most one rack. */
+        var nC = Math.min(r.liquid.cduPerHall, racks), rackList = [];
         rowsOut.forEach(function (row, ri) {
-            for (var j = 0; j < perRow && k < racks; j++, k++) rackList.push({ i: k, row: ri, aisle: row.aisle, x: p.endZoneM + j * p.rackPitchM, y: row.y, cdu: Math.floor(k / perCdu) });
+            var inRow = Math.min(perRow, racks - k);
+            for (var j = 0; j < inRow; j++, k++) {
+                var s = ri * perRow + (ri % 2 ? inRow - 1 - j : j);
+                rackList.push({ i: k, row: ri, aisle: row.aisle, x: p.endZoneM + j * p.rackPitchM, y: row.y, cdu: Math.floor(s * nC / racks) });
+            }
         });
-        var cdus = [];
+        // a CDU stands in the end zone at a row end its block reaches (the end with most of its racks);
+        // a block wholly inside a row takes the nearer end of that row, on the second slot if needed
+        var cdus = [], used = {};
         for (var c = 0; c < nC; c++) {
-            var first = rackList[c * perCdu];
-            if (!first) break;
-            var west = Math.floor(first.i / perRow) % 2 === 0;
-            cdus.push({ i: c, x: west ? p.endZoneM / 2 : length - p.endZoneM / 2, y: first.y + p.rackDepthM / 2, feeder: c % 2 ? 'B' : 'A' });
+            var mine = rackList.filter(function (q) { return q.cdu === c; }), cand = [];
+            mine.forEach(function (q) {
+                var xs = rackList.filter(function (o) { return o.row === q.row; }).map(function (o) { return o.x; });
+                var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs);
+                if (q.x === lo || q.x === hi) cand.push({ row: q.row, west: q.x === lo, n: mine.filter(function (o) { return o.row === q.row; }).length });
+            });
+            if (!cand.length) {
+                var mid = (mine[0].x + mine[mine.length - 1].x) / 2;
+                cand.push({ row: mine[0].row, west: mid < length / 2, n: 0 });
+            }
+            cand.sort(function (a, b) { return b.n - a.n; });
+            var pick = cand.filter(function (a) { return !used[a.row + (a.west ? 'W' : 'E')]; })[0] || cand[0];
+            var key = pick.row + (pick.west ? 'W' : 'E'), slot = used[key] || 0;
+            used[key] = slot + 1;
+            var dx = p.endZoneM * (slot ? 0.78 : 0.5);                       // second slot sits nearer the racks
+            cdus.push({ i: c, x: pick.west ? dx : length - dx, y: rowsOut[pick.row].y + p.rackDepthM / 2, row: pick.row, feeder: c % 2 ? 'B' : 'A' });
         }
         // CRAH fan walls on the two end walls, blowing down the cold aisles; each unit feeds its nearest aisle
         var crahs = [], nA = r.air.crahPerHall, perWall = Math.ceil(nA / 2);

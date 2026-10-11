@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v3.18.3 — 2026-10-11
+
+### DH01: every CDU is on the map, and its loop never crosses a rack
+
+Found in review of the v3.18.2 map:
+- CDU 1 and CDU 6 were missing. The hall geometry put each CDU at the row end of its first rack. Blocks of 16 racks in rows of 19 (or 20) meant two CDUs started on the same row end, and one was drawn on top of the other.
+- Secondary-loop lines ran through the middle of the racks. The feed from each CDU box ran along the row centre line, and a block that spilled into the next row was joined straight across.
+
+Fixed in the plant model (`js/ltc-plant.js`, hall geometry):
+- **Serpentine blocks.** Racks are assigned to CDUs serpentine: odd rows run east to west. A block that spills into the next row turns at the row end, as the pipe does.
+- **Balanced blocks.** Block sizes differ by at most one rack (15 or 16 at 100 MW, instead of 16 × 9 + 8).
+- **One spot per CDU.** Each CDU stands in the end zone at a row end its own block reaches, choosing the row holding most of its racks. No two CDUs share a spot. A block wholly inside a row takes the nearer end, on a second slot.
+
+Fixed in the drawing (`js/ltc-dh01.js`):
+- Each loop runs along the hot-aisle edge of every row it serves.
+- A turn within a row pair stays inside the shared hot aisle. A turn across a cold aisle runs 1.1 m out, clear of the row labels.
+- The feed leaves the CDU box straight to the hot-aisle edge.
+
+**Gate** — `tools/test-ltc-plant.mjs` P6 checks, across four plants (100 MW, 37 MW, 13 racks per row, 1.5 MW CDUs):
+- each CDU is in an end zone, at a row it serves;
+- each CDU is at the row end its racks reach;
+- no two CDUs share a spot;
+- each block covers adjacent rows only;
+- block sizes differ by at most one.
+
+On the v3.18.2 tree it fails all four plants ("CDU 2 sits on another CDU"; "CDU 3 is not at the row end its own racks reach").
+
 ## v3.18.2 — 2026-10-11
 
 ### DH01 thermal map: a mass and energy balance, drawn as one continuous air loop

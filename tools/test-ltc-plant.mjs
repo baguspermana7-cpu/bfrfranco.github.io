@@ -140,6 +140,27 @@ for (let i = 0; i < 200; i++) {
   const h = r.hall;
   ok(h.racks.length === r.it.racksPerHall && h.rows % 2 === 0, `P6 hall places ${h.racks.length} of ${r.it.racksPerHall} racks in ${h.rows} rows`);
   ok(h.cdus.length === r.liquid.cduPerHall && h.crahs.length === r.air.crahPerHall, 'P6 hall carries the sized CDUs and CRAHs');
+  // CDU loops: each CDU is drawn at a row end its own block reaches, no two share a spot, loads balanced
+  for (const q of [{}, { itMw: 37 }, { racksPerRow: 13 }, { cduUnitKw: 1500 }]) {
+    const g = P.compute(q).hall, ez = r.input.endZoneM, spots = new Set(), sizes = [];
+    let bad = '';
+    g.cdus.forEach((c) => {
+      const mine = g.racks.filter((k) => k.cdu === c.i), west = c.x < g.lengthM / 2;
+      sizes.push(mine.length);
+      const key = c.x.toFixed(2) + ',' + c.y.toFixed(2);
+      if (spots.has(key)) bad = bad || `CDU ${c.i + 1} sits on another CDU`;
+      spots.add(key);
+      const row = g.rowsY.findIndex((rw) => Math.abs(rw.y + r.input.rackDepthM / 2 - c.y) < 1e-6);
+      const ends = (ri) => { const xs = g.racks.filter((k) => k.row === ri).map((k) => k.x); return [Math.min(...xs), Math.max(...xs)]; };
+      const touches = mine.filter((k) => ends(k.row).some((e) => Math.abs(k.x - e) < 1e-6));
+      if (!(c.x > 0 && c.x < ez) && !(c.x > g.lengthM - ez && c.x < g.lengthM)) bad = bad || `CDU ${c.i + 1} is not in an end zone`;
+      if (!mine.some((k) => k.row === row)) bad = bad || `CDU ${c.i + 1} sits at a row it does not serve`;
+      if (touches.length && !touches.some((k) => k.row === row && Math.abs(k.x - ends(row)[west ? 0 : 1]) < 1e-6)) bad = bad || `CDU ${c.i + 1} is not at the row end its own racks reach`;
+      const rows = [...new Set(mine.map((k) => k.row))].sort((a, b) => a - b);
+      if (rows.length && rows[rows.length - 1] - rows[0] !== rows.length - 1) bad = bad || `CDU ${c.i + 1} serves non-adjacent rows`;
+    });
+    ok(!bad && Math.max(...sizes) - Math.min(...sizes) <= 1, `P6 CDU loops placed and balanced ${JSON.stringify(q)} (${bad || sizes.join('/')})`);
+  }
   // transients against the analytic solution
   for (const [k, f] of [['fws-pump', 0], ['cooler', 0.5], ['chw', 0]]) {
     const t = P.transient(r, k, { f });
