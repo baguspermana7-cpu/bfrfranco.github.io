@@ -349,6 +349,53 @@
        "i": 4
       }
      }
+    ],
+    "short": "UPS cabinet internal fault",
+    "symbol": "ups",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Run infrared thermography, connection torque checks and battery condition monitoring on every UPS cabinet, and keep dated records",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Give the operator the cabinet's service bulletins and internal fault history for the Galaxy VX range",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Add aspirating smoke detection in UPS rooms and log alarm-to-ignition time",
+      "basis": "nfpa-76",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order evacuation and the fire call on the first alarm, then name who isolates the UPS",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Open the UPS input, output and battery breakers of the burning cabinet from the nearest safe point",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Move the room's protected load to the other UPS lines and keep the burnt cabinet locked out until the investigator releases it",
+      "basis": "uptime-os"
+     }
     ]
    },
    {
@@ -389,6 +436,42 @@
        "src": "coe",
        "i": 0
       }
+     }
+    ],
+    "short": "Plastic cabinet internals burn",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Specify low-combustibility internal construction for UPS power cabinets and replacement units",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Ask for the fuel load of each cabinet type at purchase and put the highest-fuel units in rooms with suppression",
+      "basis": "nfpa-75"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Put heat or smoke detection inside the cabinet or at its top vent, so a small fire shows before the room fills with smoke",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Keep the fire inside the cabinet with extinguishers and stop smoke reaching adjacent rooms",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "safety",
+      "phase": "recover",
+      "do": "Keep staff out of the smoke-filled room until it is cleared and tested",
+      "basis": "nfpa-1561"
      }
     ]
    },
@@ -446,6 +529,42 @@
        "i": 1
       }
      }
+    ],
+    "short": "Fire fought by hand only",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Provide cabinet-level clean-agent or in-cabinet suppression for energised UPS cabinets",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Check that any fixed suppression in UPS rooms is armed and not inhibited, and log the result at each shift",
+      "basis": "nfpa-75"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Use CO2 and dry-chem extinguishers to hold the fire while waiting for de-energisation, as crews did",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Tell the fire service at the door whether fixed suppression is armed and has discharged",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "recover",
+      "do": "Move from holding to full suppression once the site confirms the cabinet is isolated",
+      "basis": "nfpa-1561"
+     }
     ]
    },
    {
@@ -494,6 +613,52 @@
        "src": "improvement",
        "i": 5
       }
+     }
+    ],
+    "short": "Cabinet still energised",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Install a single-action isolation for each UPS cabinet and label where it is",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "prevent",
+      "do": "Write a joint energised-fire runbook with Hillsboro Fire & Rescue on who de-energises and the expected time",
+      "basis": "nims-ics",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Tell the fire service on arrival which feeds still supply the room: utility, UPS, battery, generator",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Isolate in order: utility input, generator, UPS output, battery DC, then confirm dead and report to the commander",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Wait for the site's authorised person to confirm isolation before committing water or entering the room",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Do not re-energise the room until the fire service releases the scene",
+      "basis": "nfpa-70e"
      }
     ]
    },
@@ -549,6 +714,42 @@
        "i": 2
       }
      }
+    ],
+    "short": "One UPS room drops X",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Validate N+1 or 2N power topology and run a failover drill for the loss of one UPS room",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch user-facing error rate and DownDetector against load served from the affected site, not only facility alarms",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Shift X traffic away from the Hillsboro site to other data centers and shed non-core features",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Move login and core services first to healthy sites, since login stayed degraded into Friday",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Post timestamped updates until the status is resolved, with the next update time",
+      "basis": "sre-incident"
+     }
     ]
    },
    {
@@ -591,6 +792,39 @@
        "i": 1
       }
      }
+    ],
+    "short": "Staff exposed to fire",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Drill evacuation of the UPS floor and keep the muster count current",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Evacuate on the alarm without inspecting the room, then confirm the count at the muster point",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Treat the room as live electrical until the site confirms isolation, even if the fire looks small",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "safety",
+      "phase": "contain",
+      "do": "Report the head count to the fire service before crews enter",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Keep everyone out of the room until the fire service hands the scene back",
+      "basis": "nims-ics"
+     }
     ]
    },
    {
@@ -632,9 +866,54 @@
        "i": 5
       }
      }
+    ],
+    "short": "Cause left undetermined",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Publish the investigator's findings, including what could not be ruled out",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Preserve maintenance, thermal-scan and battery records for the cabinet before the scene is cleared",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "contain",
+      "do": "Release the cabinet's firmware and event logs to the investigator and keep the burnt unit untouched",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Do not name a cause until the report is filed; correct the early 'battery set' wording",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "State publicly that the cause is undetermined and what is being done about each open possibility",
+      "basis": "itil-incident"
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "~24 h X outage; ~$250k damage"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -649,5 +928,107 @@
    "quote": "10:35 AM PT"
   }
  },
- "durationBasis": "Platform disruption ~11:00 PT Thu 22 May → marked resolved 10:35 PT Fri 23 May."
+ "durationBasis": "Platform disruption ~11:00 PT Thu 22 May → marked resolved 10:35 PT Fri 23 May.",
+ "response": {
+  "roles": {
+   "first-responder": "Facility fire-alarm system and Digital Realty site staff — no individual is named",
+   "incident-commander": "No incident commander is named in the record",
+   "fire-service": "Hillsboro Fire & Rescue, with Engine 6 named among responders",
+   "electrical": "Whoever de-energised the cabinet — the report does not name who or how long it took",
+   "safety": "Digital Realty personnel, evacuated with no injuries",
+   "service-recovery": "X engineering, working to remediate the outage",
+   "comms": "X engineering and Digital Realty public statements",
+   "vendor": "Schneider Electric, maker of the Galaxy VX UPS cabinet",
+   "authority": "Hillsboro Fire & Rescue investigator, Deputy Fire Commissioner Mike Mahar",
+   "customer": "X users worldwide, and X as tenant of the Digital Realty facility"
+  },
+  "recorded": [
+   {
+    "role": "fire-service",
+    "soe": 1,
+    "quote": "crews arrive and find the electrical bank",
+    "did": "Arrive about 10:21 AM PT, called by the fire-alarm system, and find the bank on fire and still energized"
+   },
+   {
+    "role": "safety",
+    "soe": 3,
+    "quote": "All personnel already safely evacuated with no reported injuries",
+    "did": "Staff are out of the building before crews arrive, with no injuries"
+   },
+   {
+    "role": "fire-service",
+    "soe": 4,
+    "quote": "Crews HOLD the fire manually with",
+    "did": "Hold the fire with several CO2 and dry-chem extinguishers while waiting for de-energisation"
+   },
+   {
+    "role": "comms",
+    "soe": 7,
+    "quote": "X engineering acknowledges the outage",
+    "did": "X says it has a data center outage and the team is working to remediate it"
+   },
+   {
+    "role": "comms",
+    "soe": 11,
+    "quote": "Digital Realty reports the situation stabilising",
+    "did": "Digital Realty reports the incident under control and the fire department's on-site response ended"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 13,
+    "quote": "X outage 'officially marked as resolved by 10:35 AM PT on Friday'",
+    "did": "X resolves the outage about 24 hours after its 11:00 AM PT Thursday start"
+   },
+   {
+    "role": "authority",
+    "soe": 14,
+    "quote": "Hillsboro Fire & Rescue investigation (Deputy Fire Commissioner Mike Mahar) filed",
+    "did": "Files the report: origin in 240 UPSA2 Power Cabinet 1, cause undetermined, about $250,000 damage"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "X intermittent outage, ~24 h",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "UPS cabinet internal fault",
+      "factor": 5
+     },
+     {
+      "label": "Plastic internals as fuel",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Single-room power topology",
+      "factor": 3
+     },
+     {
+      "label": "No fixed suppression shown",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Cabinet still energised",
+      "factor": 0
+     },
+     {
+      "label": "PM history unknown",
+      "factor": 4
+     }
+    ]
+   }
+  ]
+ }
 }

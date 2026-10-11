@@ -71319,10 +71319,10 @@ Every input, equation, constant, output, and reference behind the LTC steady-sta
 ## 01 Purpose & engineering basis
 
 
-The LTC System Modelling Lab answers five design questions for a liquid-to-chip cooled AI/HPC data center: *what coolant flow is needed*, *what pump power does that cost*, *what PUE and system COP result*, *how does the design score against ASHRAE / ANSI / ISO / NFPA / Uptime Institute criteria*, and *how sensitive are those results to each input parameter*.
+The lab sizes and balances a liquid-to-chip AI campus: coolant flow and pump power, CDUs, the heat rejection for the liquid loop, the CRAHs, chilled water, chillers and towers for the heat liquid cooling does *not* capture, the cooling of UPS and transformer losses, and the PUE, WUE, CUE, energy, water and cost that follow.
 
 
-The solver is a **steady-state energy balance** with no transient dynamics: at each solver call, Q_in = Q_cooling + Q_aux (losses), and the model reports the steady-state operating point for the given inputs. This is an engineering **pre-design and education aid**. Final system design must be validated by site-specific thermal and hydraulic modelling and commissioned against real telemetry. All outputs are labelled SIMULATED.
+Since v3.17.0 every physical number comes from the workbench’s shared plant engine, `js/ltc-plant.js`, through `js/ltc-lab-plant.js`. The engine is a **steady-state energy balance that closes**: electricity in equals heat out on every path, asserted to within 0.5 % on 202 test plants (it closes to about 10⁻¹⁴). The lab’s design scores, risk index and confidence remain its own screening layer. The same plant is the one every LTC Workbench page reads, so a change here moves the Tier simulator, ASHRAE, ISO, TIA and NFPA tools, and the reverse.
 
 
 
@@ -71332,46 +71332,25 @@ The solver is a **steady-state energy balance** with no transient dynamics: at e
 ## 02 Inputs
 
 
-The lab exposes a wide set of parameters. The five primary interactive sliders (flow-driving tier) are highlighted below; the remaining parameters are set via the architecture preset or manually. Ranges are enforced by `clamp()` in `gatherInputs()`.
-
-
+Three tiers. Most readers touch only the first. Everything else is *auto*: derived, or a stated default, until changed.
 
 
  |
- Field | Symbol | Unit | Range / default | Meaning |
+ Tier | Inputs | Default |
+
+
+
+ | Design | IT load · liquid capture · TCS supply (return follows at ΔT 10 K) · plant configuration (4 presets) · CDU feed single/dual · redundancy | 100 MW · 85 % · 35 °C · dry coolers + water-cooled chillers · single · N+1 |
+
+ | Site | Climate (illustrative tropical / temperate / arid bins, or bins pasted from the site’s EPW) · grid emission factor · renewable share · heat reuse · electricity and water tariffs | tropical · 0.72 kg/kWh · 0 % · 0 % · 0.10 /kWh · 1.5 /m³ |
+
+ | Advanced | 55 engine inputs: unit sizes, approaches, heads and efficiencies, chiller COP and staging, electrical losses, hall geometry, thermal masses | stated in `LTCPlant.DEFAULTS`; ASSUMED values are typical design values, not a vendor selection |
 
 
 
 
- | **IT Load** `inItLoad` | `itLoadMw` | MW | 0.5–80 · default 12 | Total IT electrical load driving the thermal calculation. `itKw = itLoadMw × 1000`. |
+The lab’s own panel still carries its 61 controls under **Advanced · auto**; the six primary sliders and the site fields write the shared plant on every run. A plant chosen on another workbench page is read first, so the lab’s defaults never overwrite it.
 
- | **Liquid Capture %** `inLiquidCapture` | `liquidCapture` | % | 0–100 · default 85 | Share of IT heat removed by the liquid loop. Drives `liquidKw` and thereby mass flow. |
-
- | **Supply Temperature** `inSupplyTemp` | `supplyTemp` | °C | 16–42 · default 32.5 | Entering liquid coolant temperature (liquid, not supply-air). Warm-water LTC designs typically run high-20s to low-30s °C. |
-
- | **Return Temperature** `inReturnTemp` | `returnTemp` | °C | supplyTemp+3 min · default 40.5 | Leaving liquid coolant temperature. Together with supply temp, sets `baseDeltaT`. |
-
- | **Pump Head** `inPumpHead` | `pumpHead` | m | 5–90 · default 28 | Nominal hydraulic head for the loop. Corrected for pipe-loss multiplier and density stress. |
-
- | Pump Efficiency `inPumpEff` | `pumpEff` | % | 35–95 · default 78 | Net pump efficiency converting hydraulic to electrical power. |
-
- | Architecture preset `inCoolingArchitecture` | — | enum | direct_liquid / hybrid / air_inrow_dahu | Auto-loads supply/return temps, capture %, airCOP, fan power, and pipe-loss for a representative profile. |
-
- | HX type / Coolant `inCoolant` | `coolantKey` | enum | water / pg20 / pg30 | Selects Cp and density (ρ) for the coolant. Water: Cp=4.186 kJ/kg·K, ρ=997 kg/m³; PG-20: Cp=3.92, ρ=1025; PG-30: Cp=3.75, ρ=1038. |
-
- | Economizer availability `inEconomizerHours` | `economizerHours` | % of year | 0–95 · default 34 | Share of annual hours under economizer conditions. Scales air-side COP and WUE. |
-
- | Facility fan power `inFanPower` | `fanPower` | % of IT | 0.5–12 · default 2.8 | Residual CRAH/DAHU fan overhead before liquid-capture and control reductions. |
-
- | UPS efficiency `inUpsEff` | `upsEff` | % | 90–99.5 · default 96.5 | UPS conversion efficiency. Loss = `itKw / upsEff − itKw`. |
-
- | Target PUE `inTargetPue` | `targetPue` | — | ≥1.05 · default 1.20 | Design target used by gap analysis and optimizer. Does not affect the solver result. |
-
-
-
-
-
- **Architecture presets:** *Direct Liquid (Warm-Water LTC)* loads capture 85 %, supply 32.5 °C, return 40.5 °C, airCOP 4.6, fan 2.8 % IT. *Hybrid* loads capture 55 %, supply 24 °C, return 32 °C. *Air In-Row/DAHU* loads capture 12 %, supply 18 °C, return 24 °C. *Manual* bypasses auto-load.
 
 
 
@@ -71380,7 +71359,99 @@ The lab exposes a wide set of parameters. The five primary interactive sliders (
 ## 03 Calculation methodology
 
 
-The solver runs in one deterministic pass with no iteration loops. Function names map one-to-one to `js/ltc-system-modelling-lab.js` (`computeModel`).
+One operating point = IT at a utilisation, ambient dry and wet bulb. The design day sizes the plant; the year is the same plant run over the climate bins.
+
+
+### Liquid path
+ liquid = IT × capture ṁ_TCS = liquid / (cp · ΔT_TCS), P_pump = ρ · g · H · V̇ / η (pump work returns as heat) CDUs per hall = ⌈hall liquid duty / CDU unit⌉ + N_spare; FWS supply = TCS supply − CDU approach cooler leaving = max(FWS supply, sink + min approach); sink = dry bulb · pre-cooled air (adiabatic) · wet bulb (fluid cooler, tower) trim share = (cooler leaving − FWS supply) / ΔT_FWS — the trim chiller cools the rest Cooler count: duty ÷ (rated unit × LMTD_actual / LMTD_rating), taken at the condition that loads the coolers most across the design day and the bins.
+
+### Air path — the heat liquid cooling does not capture
+ air load = IT × (1 − capture) + CDU skin loss + cord and PDU losses fan heat closes on itself: Q_CRAH = Q₀ / (1 − SFP / (ρ·cp·ΔT_air)) CRAHs per hall = ⌈hall air load / CRAH unit⌉ + N_spare; CHW flow = load / (cp · ΔT_CHW) chiller load = CRAHs + electrical rooms + CHW pump heat; COP = rated × part-load factor(PLR) × lift ratio Part-load factor from published VSD points (100 % 1.000, 80 % 1.140, 50 % 1.441), flat below 30 % PLR. Lift ratio = (T_cond,rated − T_evap)/(T_cond − T_evap).
+
+### Electrical chain and metering points (ISO/IEC 30134-2)
+ M3 = IT input ← cords ← M2 = PDU output ← PDU ← M1 = UPS output (+ CDU pumps on UPS) UPS in = M1 / η_UPS; LV distribution, transformers upstream; M0 = facility input Cord and PDU losses land in the hall air (the CRAHs carry them); UPS, LV and transformer losses in the electrical rooms, cooled on chilled water.
+
+### Annual figures
+ PUE_annual = Σ facility·h / Σ IT·h over the climate bins at mean utilisation WUE = make-up water / IT energy; make-up = evaporation × C/(C−1), evaporation = latent heat / h_fg CUE = (M0 − renewable) × grid factor / M3 (market-based simplification) Never a fixed fraction of the design-day PUE: the bins carry the ambient that sets trim hours, chiller lift and fan energy.
+
+
+
+
+
+## 04 Constants & data sources
+
+
+STANDARD: water cp 4.186 kJ/kg·K, ρ 997 kg/m³; air cp 1.006 kJ/kg·K, ρ 1.18 kg/m³; h_fg 2,430 kJ/kg; 1 RT = 3.517 kW. ASSUMED (each editable under Advanced): CDU 2,000 kW, CRAH 250 kW, chiller 4,000 kW_th at rated COP 6.5, SFP 1.2 kW per m³/s, TCS head 25 m at η 0.70, FWS head 30 m at η 0.75, UPS 97 %, transformer 99 %, cord 0.5 %, PDU 1.5 %, LV 0.5 %, tower cycles 4, cooler minimum approaches dry 4 K / adiabatic 1.5 K / fluid 2 K / tower 3 K. The climate bins are illustrative; replace them with bins built from the site’s EPW file.
+
+
+
+
+
+
+## 05 Outputs
+
+
+ |
+ Output | Derivation | Note |
+
+
+
+ | PUE (annual / design) | Σ facility·h / Σ IT·h; design-day facility / IT | The lab’s headline PUE is annual; the design day sizes the plant |
+
+ | PUE categories 1/2/3 | M0 / M1, M0 / M2, M0 / M3 | Same facility, three numbers: state the category |
+
+ | Flow, pump power, CDUs | TCS loop | Pump power = TCS + FWS pumps |
+
+ | System COP | IT / all cooling power | Pumps, fans, chillers, trim, towers |
+
+ | WUE, water, CUE, CO₂ | Over the bins | Site layer sets grid factor and renewable share |
+
+ | Energy, water cost, net OPEX | M0 × tariff, water × tariff − reuse credit | Tariffs from the site layer |
+
+ | Scores, risk, confidence | Lab screening model | Screening, not a compliance finding |
+
+
+
+
+
+
+
+
+## 06 Worked example
+
+
+Defaults: 100 MW IT in 5 halls, capture 85 %, TCS 35/45 °C, dry coolers + water-cooled chillers, tropical bins (design 35 °C dry bulb / 28 °C wet bulb), utilisation 85 %. Every number is what the engine returns; `tools/test-ltc-plant.mjs` recomputes the first ones by hand.
+
+
+
+
+- Liquid heat: `100,000 × 0.85 =` 85,000 kW ; TCS ΔT 10 K → `85,000 / (4.186 × 10) =` 2,030.6 kg/s = 2,036.7 L/s
+
+- TCS pumps: `997 × 9.81 × 25 × 2.0367 / 1000 / 0.70 =` 711 kW ; CDU duty 85,711 kW → 10 CDUs per hall (9 + 1)
+
+- Facility water 32/42 °C at 2,033 L/s. At 35 °C the dry coolers leave 39 °C: the trim chiller carries 70 % on the design day and runs 3,160 h a year; 65 coolers including the spare, sized for the cooler hours
+
+- Air path: 15,000 kW IT + 857 kW CDU skin + 500 kW cords + 1,530 kW PDUs, fan heat closed at 8.42 % → 3,907 kW per hall, 17 CRAHs (16 + 1)
+
+- Chillers: CRAHs + 5,005 kW electrical rooms + CHW pumps = 25,327 kW ; 8 machines at 79 % load, COP 6.81
+
+- Losses: UPS 3,178 kW, LV 530 kW, transformers 1,298 kW; mechanical (MCC) 22,004 kW; facility 129,750 kW
+
+- PUE 1.298 design-day, 1.189 annual ; categories 1/2/3 = 1.157 / 1.183 / 1.189 (M0 885,295 · M1 765,016 · M2 748,323 · M3 744,600 MWh)
+
+- WUE 0.67 L/kWh (499,745 m³/yr, the trim chiller’s condenser towers); CUE 0.856 kgCO₂/kWh at 0.72 kg/kWh; energy balance closes to 1.2 × 10⁻¹⁴
+
+
+ **SIMULATED result:** educational estimates from stated equations and stated assumptions, not site-validated measurements. A real study uses vendor selections and an 8,760-hour simulation on the site’s weather file.
+
+
+
+
+
+## A Legacy screening model (comparison only)
+
+
+Shown only when **Legacy screening model** is ticked under Run Model. This was the lab’s engine until v3.17.0: one deterministic pass with heuristic multipliers (density stress, control index, future factor) that no component can be traced to, and no separate air, chilled-water or electrical-room path. Kept for comparison; its equations follow, as they are in `computeModelLegacy`.
 
 
 
@@ -71467,142 +71538,6 @@ The solver runs in one deterministic pass with no iteration loops. Function name
 
 
 
-## 04 Constants & data sources
-
-
-All constants are declared in the top of `initCalculator()` in `js/ltc-system-modelling-lab.js`. Coolant property block:
-
-
-
-
- |
- Coolant | Cp (kJ/kg·K) | ρ (kg/m³) | Typical use |
-
-
-
-
- | Water (`water`) | `4.186` | `997` | Standard warm-water DLC loops. |
-
- | Propylene glycol 20% (`pg20`) | `3.92` | `1025` | Light freeze protection; moderate Cp penalty. |
-
- | Propylene glycol 30% (`pg30`) | `3.75` | `1038` | Full freeze protection; higher density, lower Cp. |
-
-
-
-
-
-
-
-
- |
- Rack profile | Typical density | LiquidBias | AirResidual | Notes |
-
-
-
-
- | AI/HPC direct liquid | 50–100 kW/rack | 1.15 | 0.12 | GPU/TPU clusters; dominant liquid capture. |
-
- | Enterprise mixed | 15–30 kW/rack | 0.82 | 0.45 | Mixed workloads; hybrid liquid + air. |
-
- | Immersion (single-phase) | 80–120 kW/rack | 1.28 | 0.05 | Full immersion; near-total liquid capture. |
-
- | Immersion (two-phase) | 80–120 kW/rack | 1.36 | 0.08 | Two-phase; highest capture bias. |
-
- | Legacy air + RDHx | 10–25 kW/rack | 0.62 | 0.72 | Rear-door HX hybrid; mostly air-side. |
-
-
-
-
-
-
-Hard guardrails: deltaT must be ≥3 °C (hard-stop below 3 °C); deltaT <6 °C triggers a design warning (typical target is ≥6–10 °C). Pump efficiency below 45% is a hard-stop; below 65% is a warning. Risk index is clamped to [5, 95] and blocked above 70 for optimizer/stochastic runs.
-
-
-
-
-
-
-## 05 Outputs
-
-
-
-
- |
- Output | Formula / derivation | Unit | Interpretation |
-
-
-
-
- | Design flow | `flowLPM` | L/min | Pump sizing flow including redundancy, margin, and pipe factor. |
-
- | Pump power | `pumpPowerKw` | kW | Electrical power to CDU pump; contributes directly to PUE. |
-
- | PUE | `totalFacilityKw / itKw` | — | Overall facility efficiency. Typical hyperscale target 1.10–1.25. |
-
- | System COP | `itKw / totalCoolingKw` | — | Cooling-side performance; higher = better. |
-
- | WUE | climate-adjusted | L/kWh | Water consumption per IT energy unit. |
-
- | Annual energy | `totalFacilityKw × 8760` | GWh/year | Full-facility energy footprint at stated load. |
-
- | Net OPEX | energy cost + water − heat-reuse credit | USD/year | Annual operating cost after any waste-heat recovery credit. |
-
- | Net carbon | `annualKWh × CI − avoidedCarbon` | t CO₂e/year | Gross minus heat-reuse displacement; carbon intensity is site-specific. |
-
- | Thermal delta-T | `deltaT` | °C | Effective liquid loop temperature rise after density-stress correction. |
-
- | Compliance scores | ASHRAE / ANSI / ISO / NFPA / Uptime | 0–100 | Weighted standards-alignment index per protocol. |
-
- | Risk index | additive penalty model | 0–100 | Composite resilience risk; <35 = low, 35–60 = moderate, >60 = high. |
-
- | CDU count | `ceil(liquidKw / cduUnit)` | count | Number of CDU units at stated kW capacity. |
-
-
-
-
-
-
-
-
-
-
-## 06 Worked example
-
-
-Default scenario: 12 MW IT load, direct-liquid architecture (85% capture), water coolant, supply 32.5 °C, return 40.5 °C, pump head 28 m, pump efficiency 78%, hydraulic margin 12%, pipe-loss ×1.0, N+1 redundancy. Numbers reproduce the live solver output at default settings.
-
-
-
-
-
-- IT load: `itKw = 12 × 1000 =` 12 000 kW
-
-- Liquid-side load: `liquidKw = 12 000 × 0.85 =` 10 200 kW
-
-- baseDeltaT: `40.5 − 32.5 =` 8.0 °C (within [3, 20] — valid design range)
-
-- Mass flow: `m = 10 200 / (4.186 × 8.0) =` 304.7 kg/s
-
-- Base volume flow: `304.7 / 997 =` 0.3056 m³/s
-
-- Design flow (N+1, 12% margin, ×1.0 pipe): `0.3056 × 1.15 × 1.12 × 1.0 =` 0.3936 m³/s → 23 616 LPM
-
-- Effective head: `28 × 1.0 × (1 + (densityStress−1) × 0.22) ≈` ~28.8 m (density stress ≈ 1.14 for 35 kW/rack default)
-
-- Hydraulic power: `P_hyd = 997 × 9.81 × 28.8 × 0.3936 / 1000 =` ~111 kW
-
-- Pump electrical power: `111 / 0.78 =` ~142 kW
-
-- PUE (simplified): liquid cooling + pump + air fan + UPS loss + dist loss + aux ÷ IT → ~1.27 (varies with climate / control settings)
-
-
-
- **SIMULATED result:** all numbers above are educational estimates produced by the deterministic solver with default parameters. They are not site-validated measurements. Real CDU selection, pipe sizing, and pump curves must be confirmed against vendor data and hydraulic commissioning.
-
-
-
-
-
 ## 07 References & standards
 
 
@@ -71622,7 +71557,7 @@ Default scenario: 12 MW IT load, direct-liquid architecture (85% capture), water
 
 - **ASHRAE 90.4 / Green Grid** — PUE and system COP definitions and reporting methodology.
 
-- **Engine source** — `js/ltc-system-modelling-lab.js` function `computeModel(input)`. All formula line-numbers are verifiable in that file.
+- **Engine source** — `js/ltc-plant.js` (physics, shared with every workbench page) through `js/ltc-lab-plant.js`; the legacy screening model is `computeModelLegacy` in `js/ltc-system-modelling-lab.js`. Gates: `tools/test-ltc-plant.mjs`, `tools/test-ltc-workbench.mjs`.
 
 
 
@@ -71633,10 +71568,10 @@ Default scenario: 12 MW IT load, direct-liquid architecture (85% capture), water
 ## 08 Assumptions & limitations
 
 
-The model assumes a well-mixed, single-pass steady-state loop at the stated supply and return temperatures. Pipe-loss multiplier (`coefPipeLoss`) is a network-complexity factor applied uniformly — it is not a pressure-drop simulation. CDU loss is a fixed percentage of liquid heat load (default 1.8%). Coolant properties are constant (no temperature-dependent Cp or ρ). Future-tech coefficient (`coefFutureTech`) is a linear efficiency multiplier without underlying technology model. Heat-reuse credit is illustrative and varies heavily by site.
+Steady state at each operating point; annual figures are hour-weighted over climate bins at a mean utilisation, which captures ambient-driven effects (trim hours, chiller lift, fan energy) but not load dynamics. Fault responses on the workbench (DH01 map, Tier sweep) use a stated first-order thermal-mass model checked against its analytic solution, and the DH01 map is a thermal approximation, not CFD. Unit sizes and efficiencies are typical design values until a vendor selection replaces them; climate bins are illustrative until replaced with the site’s EPW bins.
 
 
-This manual and the LTC lab are **engineering education and pre-design aids only**. Outputs are clearly labelled SIMULATED. No cross-page Rule-1 consistency is asserted (this tool is self-contained). Detailed system design must be performed by qualified mechanical and electrical engineers using site-specific data and vendor curves.
+This manual and the lab are **engineering education and pre-design aids**. Outputs are labelled SIMULATED; scores are screening, not compliance findings.
 
 
 
@@ -75923,7 +75858,30 @@ It does **not** issue compliance findings. Limits are summarised from the cited 
 
 
 
-## 02 ASHRAE — psychrometrics and envelopes
+## 02 One plant behind every tool
+
+
+Since v3.14.0 every page reads one plant model, `js/ltc-plant.js`: a 100 MW liquid-to-chip campus by default, five halls, edited in one place — the **plant strip** at the top of every workbench page (Design · Site · Advanced; every advanced input *auto* until changed). The tools then ask only for what the plant cannot know: ISO needs nothing, ASHRAE, TIA and NFPA take their plant-derived inputs as *auto* values the reader may type over, the Tier simulator draws DH01 from it, and the model lab computes on it.
+
+ liquid path: racks → CDUs (TCS) → facility water → dry / adiabatic / fluid coolers or towers + trim chiller air path: IT × (1 − capture) + CDU skin + cord and PDU losses + fan heat → CRAHs → chilled water → chillers → towers electrical: UPS, LV and transformer losses → electrical-room cooling on chilled water balance: electricity in = heat out on every path (asserted ≤ 0.5 % on 202 plants) Annual PUE, WUE and CUE are hour-weighted over climate bins (illustrative tropical / temperate / arid, or the site’s EPW bins), never a fixed fraction of the design-day value. Equations, defaults and a 100 MW worked example: the model lab manual.
+
+**Plant map.** An overview and three details — Power, Liquid heat, Air & rooms — each within the diagram engine’s nine-block budget, every block carrying its live number. Hover a block: it and its connectors stay lit, the rest fades, and a tooltip shows the numbers and the formula. A table compares the four plant configurations (air-cooled chillers; fluid, dry or adiabatic coolers with water-cooled chillers) at the same site and load.
+
+
+
+
+## 03 Commissioning lifecycle and the DH01 thermal map
+
+
+**Lifecycle.** L1 factory, L2 delivered, L3 started, L4 functional, L5 integrated, operate — each a gate with a script summary: what is tested, what is expected, the hold point that closes it, and the documents. L4 contains the **heat load test**: load banks stepped 25 → 50 → 75 → 100 % with liquid and air at the design split, each step held until temperatures settle, the TCS, FWS, CRAH and rack-inlet readings recorded, typical acceptance (TCS supply within ±1 K, flow ≥ design, rack inlet inside the recommended envelope, measured ṁ·cp·ΔT within ±5 % of load-bank kW), then CDU, pump, CRAH and CDU-feeder failures at 100 %. Acceptance values marked typical are set by the project’s commissioning plan.
+
+
+**DH01 thermal map.** The hall in plan from the plant’s geometry. Rack inlet = supply + the share of its aisle’s air deficit made up by recirculated exhaust, weighted toward the aisle middle. Faults: CDU feeder, one CDU, CRAH losses, facility water, chiller trip, chilled water — with the first-order transient (C·dT/dt = Q − f·Q·(T − T sink )/(T 0 − T sink )) checked against its analytic solution. A rack that loses cold-plate flow throttles in seconds, so the default shows IT shed; "if they kept running" is the worst case. Racks above 27 °C are outlined and above 32 °C hatched, so colour is not the only channel; the map is keyboard and touch operable. It is a thermal approximation for training, not CFD.
+
+
+
+
+## 04 ASHRAE — psychrometrics and envelopes
 
 
 Every humidity quantity is derived from dry-bulb, dew point and site pressure. Nothing is read off a printed chart.
@@ -75956,12 +75914,12 @@ Every humidity quantity is derived from dry-bulb, dew point and site pressure. N
 
 
 
-## 03 Tier — maintainability and fault tolerance by test
+## 05 Tier — maintainability and fault tolerance by test
 
 
-The Tier Standard: Topology defines Tiers by objective. The simulator tests the objective directly on a simplified path: every removable element (each single component, and each unit of an N-of-M group) is taken out one at a time, in two modes.
+The Tier Standard: Topology defines Tiers by objective. The simulator tests the objective directly on DH01’s topology, generated from the shared plant: the plant sets N (DH01’s share of generators, transformers and UPS modules, its CDUs and CRAHs, the central chiller plant and liquid coolers), the Tier sets the spares and the paths. Every removable element is taken out one at a time, in two modes — one unit of each identical group (they are symmetric), and every bus, UPS output board and pipe loop *whole*, because a component is a component however many units hang on it.
 
- group available ⇔ units in service ≥ N path conducts ⇔ every stage available (a source stage needs any one member) load carried (failure) ⇔ an *active* path conducts load carried (maintenance) ⇔ *any* path conducts — an alternate is switched in first Concurrently maintainable = every element passes the maintenance test. Fault tolerant (single failure) = every element passes the failure test. The sweep lists each element that fails either.
+ group available ⇔ units in service ≥ N path conducts ⇔ every stage available (a source stage needs any one member) load carried ⇔ *every* group it needs conducts: IT power AND mechanical power; liquid sink AND air sink group carried (failure) ⇔ an *active* path conducts load carried (maintenance) ⇔ *any* path conducts — an alternate is switched in first Concurrently maintainable = every element passes the maintenance test. Fault tolerant (single failure) = every element passes the failure test. The sweep lists each element that fails either.
  |
  Tier | Power path modelled | Cooling path modelled | Expected result |
 
@@ -75979,7 +75937,7 @@ The gate asserts these four outcomes for both power and cooling, so an edit that
 
 
 
-## 04 TIA — cabling, spaces, bonding
+## 06 TIA — cabling, spaces, bonding
 
 
 **Fiber budget.** Loss is built from TIA-568.3-D maximum component values and compared with the IEEE 802.3 channel insertion-loss limit and reach of the application.
@@ -76017,7 +75975,7 @@ TIA-607-B/C sizes the backbone bonding conductor at 2 kcmil per linear foot and 
 
 
 
-## 05 NFPA — agent, detection, sequence
+## 07 NFPA — agent, detection, sequence
 
 
 **Agent quantity** uses the NFPA 2001 total-flooding equations at the minimum design temperature; the concentration the same quantity produces at the maximum room temperature is checked against the agent's NOAEL, which decides whether the space may be occupied.
@@ -76037,7 +75995,7 @@ TIA-607-B/C sizes the backbone bonding conductor at 2 kcmil per linear foot and 
 Design concentration defaults are editable starting points: the real value is the listed system's minimum extinguishing concentration × 1.2 (Class A and C) or 1.3 (Class B). Container counts use the listed container size, also an input.
 
 
-**Detection.** High air movement reduces the area each spot smoke detector may cover (NFPA 72 high-airflow table: 60 ACH → 125 ft², 30 → 250, 20 → 375, 15 → 500, 12 → 625, 10 → 750, 8.6 → 875, ≤ 7.5 → 900). Between rows the higher-airflow row is used. Detectors are laid on a square grid of that area; cross-zoned release doubles the count, each zone meeting spacing on its own. Aspirating sampling holes are treated as spot detectors for spacing.
+**Room size and air changes** default to DH01 from the shared plant (length, width and height from the hall geometry; air changes from CRAH airflow ÷ hall volume), each overridable. **Detection.** High air movement reduces the area each spot smoke detector may cover (NFPA 72 high-airflow table: 60 ACH → 125 ft², 30 → 250, 20 → 375, 15 → 500, 12 → 625, 10 → 750, 8.6 → 875, ≤ 7.5 → 900). Between rows the higher-airflow row is used. Detectors are laid on a square grid of that area; cross-zoned release doubles the count, each zone meeting spacing on its own. Aspirating sampling holes are treated as spot detectors for spacing.
 
 
 **Release sequence.** A state machine — normal, alert, fire 1, pre-discharge, abort held, discharge — driven event by event. Delays, which outputs trip at which stage and whether an abort switch is fitted are site programming approved by the AHJ, not fixed by NFPA 2001.
@@ -76045,16 +76003,16 @@ Design concentration defaults are editable starting points: the real value is th
 
 
 
-## 06 ISO — KPIs, Sankey, baseline
+## 08 ISO — KPIs, Sankey, baseline
 
 
-KPIs use 12-month energies. PUE is reported per ISO/IEC 30134-2 category, because the metering point moves losses between IT and overhead.
+KPIs use 12-month energies. PUE is reported per ISO/IEC 30134-2 category, because the metering point moves losses between IT and overhead. By default the twelve-month energies at M0–M3, the water and the renewable and reused energy come from the shared plant, so nothing is entered; **Metered data** reopens the inputs, prefilled with the model, and reports each meter against it.
 
  PUE cat = E DC / E IT,cat (cat 1 UPS output · cat 2 PDU output · cat 3 IT input) REF = E ren / E DC · ERF = E reuse / E DC · WUE = water L / E IT kWh CUE = (E DC − E ren ) · EF / E IT CUE here is a market-based simplification; report the accounting basis with the number. The Sankey splits E DC by the meters only — overhead above M1 (cooling, UPS loss, lighting) stays one band without sub-metering. E facility = b 0 + b 1 ·E IT + b 2 ·CDD (OLS, monthly) CV(RMSE) = √(SSR/(n−p)) / ȳ ≤ 15 % · |NMBE| = |Σ(y−ŷ)| / ((n−p)·ȳ) ≤ 5 % avoided energy = Σ(ŷ reporting − y reporting ) · CUSUM = running sum Baseline per ISO 50006, verification per ISO 50015 / IPMVP Option C, calibration limits from ASHRAE Guideline 14. Annual PUE is energy-weighted (ΣE ÷ ΣIT), not the mean of monthly PUEs; the tool shows both.
 
 
 
-## 07 Diagrams and symbols
+## 09 Diagrams and symbols
 
 
 Every block diagram is drawn by the RZ diagram engine (`js/rz-diagram.js`): nodes sized from their own text, orthogonal connectors routed around boxes, labels placed by search, legend derived from what was drawn. Equipment glyphs are the IEC 60617 / ISA-5.1 symbols DCMOC uses (`assets/engineering/`, emitted as `js/rz-eng-symbols.js`), plus twelve web-only symbols for detectors, sprinklers, agent containers, EPO, meters, patch panels, transmitters and valves.
@@ -76065,10 +76023,10 @@ Connectors carrying load move; each dash pattern advances by exactly one of its 
 
 
 
-## 08 Verification and limits
+## 10 Verification and limits
 
 
-`tools/test-ltc-workbench.mjs` (75 assertions, in the ship gate) pins each module's arithmetic to hand-checkable values, requires every Tier topology — power and cooling — to meet its own objective, and holds each page's frame: script order, diagram tokens in both themes, cache tokens on every asset, and the fail-closed access gate.
+`tools/test-ltc-workbench.mjs` (131 assertions) and `tools/test-ltc-plant.mjs` (the plant: energy balance on 202 plants, 100 MW hand checks, metering order, transients against the analytic solution, DH01 behaviour, recomputed practitioner claims), both in the ship gate, pins each module's arithmetic to hand-checkable values, requires every Tier topology — power and cooling — to meet its own objective, and holds each page's frame: script order, diagram tokens in both themes, cache tokens on every asset, and the fail-closed access gate.
 
  **Limits.** Educational tools. Limits are summaries of the cited editions; check the edition your jurisdiction adopted and the IT and equipment manufacturers' own limits, which may be tighter. Tier results are for a simplified path, not a design review; Tier certification is issued by Uptime Institute only. Clean-agent systems are designed from the listed manufacturer's manual and approved by the AHJ. Reliability arithmetic ignores common-cause failure.
 

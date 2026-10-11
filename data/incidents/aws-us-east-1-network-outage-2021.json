@@ -374,7 +374,60 @@
      "O": 2,
      "D": 8
     },
-    "revisedRationale": "With the trigger disabled and back-off corrected, the retry storm should no longer form (O 4→2). Both actions are recorded as in progress, with the fix committed to deploy over about two weeks, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "With the trigger disabled and back-off corrected, the retry storm should no longer form (O 4→2). Both actions are recorded as in progress, with the fix committed to deploy over about two weeks, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Clients fail to back off",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Fix the latent client back-off defect so clients throttle under congestion",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add backpressure, jitter and circuit breakers to internal clients of backbone services",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on connection attempts and retry rates from internal clients toward the bridging devices",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Isolate the retrying clients and add capacity at the bridging devices until the loop breaks",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Stop the triggering scaling automation and hold it off until remediations are deployed",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm the retry rate has dropped, then restore dependent services in order, starting with DNS",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -425,7 +478,51 @@
      "O": 2,
      "D": 8
     },
-    "revisedRationale": "Recorded as completed: the devices are now protected against a similar surge, so a repeat needs the protection to fail as well (O 3→2). Severity and detection are unchanged because the region's control planes still depend on this path."
+    "revisedRationale": "Recorded as completed: the devices are now protected against a similar surge, so a repeat needs the protection to fail as well (O 3→2). Severity and detection are unchanged because the region's control planes still depend on this path.",
+    "short": "Bridging devices overwhelmed",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Deploy extra configuration that protects the bridging devices against a similar surge",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on queue and drop counters at the bridging devices between internal and main networks",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Shed or isolate traffic across the bridge by priority, with controls that do not harm healthy workloads",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Pre-approve which traffic is shed first, so operators act decisively under degraded telemetry",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 6
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring the network devices back to full service and confirm each service across the bridge recovers",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -477,6 +574,50 @@
        "src": "improvement",
        "i": 1
       }
+     }
+    ],
+    "short": "Ops tooling on failed network",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Provision a monitoring and telemetry path that does not use the internal network it watches",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Compare live telemetry to log timestamps and flag when real-time data stops, as a sign of congestion",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Treat the first symptom (internal DNS errors) as suspect and look for congestion on the bridge before remediating",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 3
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Fix the order of remediation by impact, such as internal DNS first, and re-check after each step",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore real-time monitoring and deployment systems on the internal network before closing the incident",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -534,6 +675,52 @@
        "i": 5
       }
      }
+    ],
+    "short": "Control planes share fate",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Decouple critical services, starting with API Gateway, from internal-network shared fate",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch Route 53, STS, EC2 API and Console login error rates together to see a shared-network fault",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Put each affected service owner on the bridge and ask for a statement of what is still serving",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Disable EventBridge event delivery to relieve load while other services recover",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore services in dependency order: DNS, EC2 APIs, STS and Route 53, then API Gateway and Connect",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Do not depend on US-EAST-1 control planes for your own failover; test switching with them unavailable",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     }
     ]
    },
    {
@@ -577,6 +764,42 @@
        "src": "improvement",
        "i": 3
       }
+     }
+    ],
+    "short": "Status page can't fail over",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run the Service Health Dashboard actively across multiple regions so it fails over independently",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Test dashboard posting during the first minutes of any regional event and alarm if it fails",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Use a channel outside the impaired network, such as social media, to acknowledge the event until the dashboard works",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name a communications owner to publish updates on the dashboard as soon as posting succeeds",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Post a service-by-service update once the dashboard is working and keep it current",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -625,9 +848,52 @@
      "O": 2,
      "D": 9
     },
-    "revisedRationale": "Running support across regions removes the single-network dependency (O 6→2). Recorded as committed / planned, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Running support across regions removes the single-network dependency (O 6→2). Recorded as committed / planned, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Support centre shares network",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Stand up a support system architecture that runs across multiple regions",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Probe case creation from outside the network and alarm when it fails",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers how to reach AWS when case creation is down, and when it will return",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Put support on the bridge so case backlog is tracked by service",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Re-file urgent cases once case creation returns at 14:25 and quote the incident time",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore case creation and clear the backlog by severity",
+      "basis": "itil-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "US-EAST-1 control plane · 6h52m"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -642,5 +908,99 @@
    "quote": "2021-12-07 02:22 PM PST All network devices fully recover"
   }
  },
- "durationBasis": "Congestion from 07:30 PST → all network devices recovered 14:22 PST 7 Dec"
+ "durationBasis": "Congestion from 07:30 PST → all network devices recovered 14:22 PST 7 Dec",
+ "response": {
+  "roles": {
+   "first-responder": "AWS internal operations teams — the record names no individual or first alarm",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "AWS network operators diagnosing and remediating — not individually named",
+   "change-owner": "Owner of the automated capacity-scaling activity — not named",
+   "service-recovery": "AWS service teams restoring DNS, EC2, API Gateway and others",
+   "comms": "AWS Service Health Dashboard and Support Contact Center",
+   "customer": "Customers of EC2, Route 53, STS, API Gateway, Connect and others in US-EAST-1"
+  },
+  "recorded": [
+   {
+    "role": "ops-lead",
+    "soe": 5,
+    "quote": "operators continue diagnosing with degraded telemetry and deliberately move cautiously with remediations",
+    "did": "Keep diagnosing with degraded telemetry and move cautiously so the still-healthy workloads are not harmed"
+   },
+   {
+    "role": "comms",
+    "soe": 5,
+    "quote": "Service Health Dashboard update posting begins to succeed",
+    "did": "Dashboard posting starts working at 08:22, about 52 minutes after onset, after failover to standby failed"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 6,
+    "quote": "Internal DNS is prioritized as an early recovery target",
+    "did": "Recover internal DNS errors first, fully by 09:28, removing one of the largest impact sources"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "operators disable EventBridge event delivery",
+    "did": "Disable EventBridge event delivery at 12:35 as a further mitigation; re-enabled at 14:35"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "US-EAST-1 congestion, 6 h 52 min",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Client back-off defect",
+      "factor": 0
+     },
+     {
+      "label": "Bridging devices swamped",
+      "mode": "FM-02"
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Scaling trigger never tested",
+      "factor": 1
+     },
+     {
+      "label": "Early DNS misdiagnosis",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Monitoring on failed network",
+      "factor": 2
+     },
+     {
+      "label": "Tooling on failed network",
+      "factor": 4
+     },
+     {
+      "label": "Retry feedback loop",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Support centre also impaired",
+      "mode": "FM-06"
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -391,6 +391,54 @@
        "i": 1
       }
      }
+    ],
+    "short": "UPS override drops the load",
+    "symbol": "ups",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Work only to a peer-reviewed method of procedure; a second competent person checks each step before the UPS is touched",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Use a true make-before-break maintenance bypass so the load moves to mains or generator before any UPS module work",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "detect",
+      "do": "Alarm the facilities control room the moment a UPS is placed in override, so the override is seen before the load drops",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "change-owner",
+      "phase": "contain",
+      "do": "Stop the work and leave the UPS in its current state; do not re-energise until the incident commander agrees",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Take command of the site, assign one person to the switchgear and keep everyone else clear of it",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Confirm the state of every source and downstream breaker before any power is restored",
+      "basis": "nfpa-70e"
+     }
     ]
    },
    {
@@ -435,6 +483,43 @@
        "src": "improvement",
        "i": 1
       }
+     }
+    ],
+    "short": "Backup path stranded",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Fit and routinely test source-transfer interlocks so generators and batteries pick up the load on any UPS fault",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "detect",
+      "do": "Test that the generator and battery path carries the load during every planned UPS maintenance window",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Check generator and battery breaker positions at the first sign of total loss of the data hall",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hold the generators and batteries in their present state until the electrical lead reports what is closed and what is open",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Close the backup path in a set order, with each source verified before the next is added",
+      "basis": "nfpa-110"
      }
     ]
    },
@@ -498,6 +583,54 @@
        "i": 2
       }
      }
+    ],
+    "short": "Uncontrolled re-energisation",
+    "symbol": "breaker",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Stage every re-energisation: sync-check, one source at a time, load ramped in steps and downstream state checked",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Add over-voltage protection and monitoring at rack and PDU level so a switching error cannot reach server supplies",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "detect",
+      "do": "Read the supply voltage at the PDUs before and during restoration and stop on any reading above nominal",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "change-owner",
+      "phase": "contain",
+      "do": "Open the main breakers again on any over-voltage reading and wait for the electrical lead",
+      "basis": "en-50110"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Forbid any restoration of power until the sequence has been agreed and written down",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Inventory which hardware took the surge before any server is powered up",
+      "basis": "nist-800-34"
+     }
     ]
    },
    {
@@ -543,6 +676,53 @@
        "i": 2
       }
      }
+    ],
+    "short": "Failover site also collapses",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Gate active:active replication on data integrity so corrupt state cannot reach the peer site",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Test failover with dirty-shutdown and hardware-damage scenarios, not only clean cutovers",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "Alarm on replication of invalid data between the two sites and suspend synchronisation",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Break replication between the two data centres as soon as one has failed uncleanly",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "crisis",
+      "phase": "contain",
+      "do": "Authorise the decision to take the surviving site offline rather than let corrupt data spread, and accept the outage",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore the peer site from a verified clean copy, not from live synchronised data",
+      "basis": "nist-800-34"
+     }
     ]
    },
    {
@@ -587,6 +767,49 @@
        "src": "improvement",
        "i": 5
       }
+     }
+    ],
+    "short": "Hardware damage forces rebuild",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Keep out-of-band, geographically separate recovery capability with rehearsed rebuild runbooks",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "Inspect and log every item of hardware that took the surge before it is returned to the rebuild queue",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Rank systems for restoration by flight operations first and publish the order to all teams",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Isolate every damaged rack and PDU until tested, so no restoration energises damaged equipment",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Rebuild and restore the damaged infrastructure, bringing flight operations back in the agreed order",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "crisis",
+      "phase": "recover",
+      "do": "Give passengers and the airline's operations teams a restoration timetable that is updated as systems return",
+      "basis": "iso-22301"
      }
     ]
    },
@@ -636,6 +859,47 @@
        "i": 4
       }
      }
+    ],
+    "short": "Live power work, peak weekend",
+    "playbook": [
+     {
+      "role": "crisis",
+      "phase": "prevent",
+      "do": "Impose change-freeze windows over peak and bank-holiday travel periods for live critical-power work",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Agree a BA/CBRE RACI for critical-power switching; require BA change-authority sign-off before any live work",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "detect",
+      "do": "Check the change calendar for peak travel windows before starting live work, and escalate if one applies",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Stop all other planned work on site during the incident so no second change adds to the first",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "vendor",
+      "phase": "recover",
+      "do": "Hand over a written account of who switched what, and when, to the BA incident lead",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -670,10 +934,145 @@
       "quote": "with no admission as to liability"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "No published root cause",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Commission an independent investigation with a stated publication date and scope",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "detect",
+      "do": "Preserve operator logs, work orders and the access record from the day of the incident",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "crisis",
+      "phase": "contain",
+      "do": "Publish the investigation's findings or a summary of them so other operators can learn from the event",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Publish the adjudicated root cause once the investigation is complete, whether or not the claim settles",
+      "basis": "iso-22301"
+     }
+    ]
+   }
+  ],
+  "impactShort": "BA global ops down, flights cancelled"
+ },
+ "durationStatus": "not-established",
+ "durationBasis": "Onset ~09:30 27 May 2017; restoration only \"over the following days\", no timestamp",
+ "response": {
+  "roles": {
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "On-site staff who overrode the UPS at the CBRE-managed facility — not named",
+   "vendor": "CBRE Global Workplace Solutions, the facilities manager under contract to BA",
+   "electrical": "Whoever re-energised the site and rebuilt the damaged hardware — not named",
+   "utility": "National Grid and SSE, the grid and distribution operators",
+   "crisis": "BA chief executive Alex Cruz and BA/IAG group leadership",
+   "service-recovery": "BA IT teams restoring systems and flights",
+   "authority": "The independent investigation commissioned by BA/IAG"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 1,
+    "quote": "is manually 'over-ridden' during on-site work",
+    "did": "Manually overrides the UPS feeding the core Boadicea House data centre during Saturday on-site work"
+   },
+   {
+    "role": "vendor",
+    "soe": 1,
+    "quote": "at the CBRE-managed facility",
+    "did": "CBRE manages the facility where the override was made; who exactly acted is not recorded"
+   },
+   {
+    "role": "crisis",
+    "soe": 11,
+    "quote": "publicly attributes the outage to a major 'power surge' at 09:30",
+    "did": "BA chief executive attributes the outage to a power surge that made systems 'collapse'"
+   },
+   {
+    "role": "utility",
+    "soe": 12,
+    "quote": "National Grid states there was no transmission-network problem in the Heathrow area",
+    "did": "National Grid rules out its network; SSE says any surge was on the customer side of the meter"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 13,
+    "quote": "BA progressively restores IT systems and flight operations over the following days",
+    "did": "Restores IT systems and flights progressively as damaged infrastructure is rebuilt"
+   },
+   {
+    "role": "vendor",
+    "soe": 14,
+    "quote": "CBRE confirms it manages the site",
+    "did": "CBRE says it supports the investigation and that no determination has been made on the cause"
    }
   ]
  },
- "durationStatus": "not-established",
- "durationBasis": "Onset ~09:30 27 May 2017; restoration only \"over the following days\", no timestamp"
+ "fishbone": {
+  "effect": "BA data centres lost, flights cancelled",
+  "bones": [
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "UPS manually over-ridden",
+      "factor": 0
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Uncontrolled re-energisation",
+      "factor": 3
+     },
+     {
+      "label": "Live work on peak weekend",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Backup path bypassed",
+      "factor": 1
+     },
+     {
+      "label": "Tightly coupled active:active",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Split BA/CBRE accountability",
+      "factor": 4
+     }
+    ]
+   }
+  ]
+ }
 }

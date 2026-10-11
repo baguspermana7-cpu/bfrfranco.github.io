@@ -21,6 +21,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import incidents_fmea  # noqa: E402  — retrospective FMEA section + its CSS
+import incidents_response  # noqa: E402  — who did what / who should, by role
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data", "incidents")
@@ -251,8 +252,7 @@ CSS = r"""
     .iid-range { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.05em; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:0.3rem 0.6rem; white-space:nowrap; }
     .iid-num { font-variant-numeric:tabular-nums slashed-zero; }
     .iid-kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:0.7rem; margin-bottom:0.9rem; }
-    .iid-kpi { background:var(--surface); border:1px solid var(--line); border-top:2px solid var(--cyan); border-radius:0 0 4px 4px; padding:0.75rem 0.85rem; transition:transform 0.18s ease, box-shadow 0.18s ease; }
-    .iid-kpi:hover { transform:translateY(-2px); box-shadow:0 10px 24px var(--shadow-deep); }
+    .iid-kpi { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.75rem 0.85rem; }
     .iid-kpi-l { font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); }
     .iid-kpi-v { display:flex; align-items:baseline; gap:0.3rem; margin:0.25rem 0 0.15rem; }
     .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-family:'Fraunces',Georgia,serif; font-size:1.8rem; font-weight:600; color:var(--text-strong); line-height:1; }
@@ -628,14 +628,15 @@ def render_hub(incidents):
             <li><b>Ranked bars</b> — magnitude, coloured by severity (red = most severe).</li>
             <li><b>Risk map</b> — blast radius (x) × outage duration (y); top-right is the worst quadrant. Dots sit at their true scores; hover any dot for its values.</li>
             <li><b>Semantic map</b> — a projection of the research vector-index: incidents near each other share a failure signature.</li>
-            <li><b>Per dossier</b> — a failure-cascade block diagram, a magnitude radar, and a phased SOE timeline; hover elements for detail, and hover underlined terms for definitions.</li>
+            <li><b>Per dossier</b> — a failure chain and a fishbone drawn by the RZ diagram engine, a magnitude radar, a phased SOE timeline, and the response by role: what each role did on the record, and an analyst playbook per failure mode.</li>
             </ul>
             <h4>Access</h4>
             <p>Root-only. The library is excluded from the public sitemap and search index.</p>
         </div></details>
-        <nav class="iv-tabs"><a href="#dashboard" class="on">Overview</a><a href="#incMap">Risk map</a><a href="#semantic">Semantic map</a><a href="#fmea-corpus">FMEA</a><a href="#all-incidents">Incident list</a></nav>
+        <nav class="iv-tabs"><a href="#dashboard" class="on">Overview</a><a href="#incMap">Risk map</a><a href="#semantic">Semantic map</a><a href="#fmea-corpus">FMEA</a><a href="#roles-corpus">Roles</a><a href="#all-incidents">Incident list</a></nav>
         {hero_dashboard(incidents)}
         {incidents_fmea.corpus_section(incidents)}
+        {incidents_response.corpus_section(incidents)}
 
         <h2 id="all-incidents">All incidents</h2>
         <div class="filterbar" id="filterbar">
@@ -668,7 +669,7 @@ def render_hub(incidents):
         <p class="disclaimer">Ranking is a transparent composite of sourced sub-scores (blast radius 35% · users 25% · financial 20% · duration 20%). Summaries are original; quoted excerpts are short, attributed, and for provenance only.</p>
         {FILTER_JS}
 """
-    return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="", head_extra=LEAFLET_HEAD + f"<style>{incidents_fmea.CSS}{incidents_fmea.CORPUS_CSS}</style>")
+    return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="", head_extra=LEAFLET_HEAD + f"<style>{incidents_fmea.CSS}{incidents_fmea.CORPUS_CSS}{incidents_response.CORPUS_CSS}</style>")
 
 
 def _dur_chip(inc):
@@ -739,6 +740,56 @@ def _imp_render(imps):
     return "".join(out)
 
 
+DOSSIER_CSS = r"""
+    .vh { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+    .inc-nav { position:sticky; top:var(--rz-nav-h,53px); z-index:40; background:var(--bg); border-bottom:1px solid var(--line); margin:1rem -1.1rem 0; }
+    .inc-nav-in { max-width:820px; margin:0 auto; display:flex; gap:1.4rem; overflow-x:auto; scrollbar-width:none; padding:0 1.1rem; }
+    .inc-nav-in::-webkit-scrollbar { display:none; }
+    .inc-nav a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:0.75rem 0 0.65rem; border-bottom:2px solid transparent; white-space:nowrap; min-height:44px; box-sizing:border-box; display:inline-flex; align-items:center; }
+    .inc-nav a:hover { color:var(--text-strong); }
+    .inc-nav a[aria-current=true] { color:var(--text-strong); border-bottom-color:var(--amber); }
+    .inc-nav a:focus-visible { outline:1px solid var(--amber); outline-offset:-1px; }
+    .inc-sec { scroll-margin-top:112px; padding-top:0.4rem; }
+    .inc-sec h2 { scroll-margin-top:112px; }
+    .inc-h3 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:0.95rem; font-weight:600; color:var(--text-strong); margin:1.6rem 0 0.5rem; }
+    .reading-col ul.tight li { text-align:left; -webkit-hyphens:manual; hyphens:manual; }
+    .facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin:1.1rem 0 0; border-top:1px solid var(--line); }
+    .facts > div { padding:0.65rem 0.9rem 0.7rem 0; border-bottom:1px solid var(--line); }
+    .facts dt { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+    .facts dd { margin:0.2rem 0 0; color:var(--text-body); font-size:0.86rem; line-height:1.45; }
+    .inc-fig { margin:0.4rem 0 0; --bg1:var(--surface); --bg3:var(--surface-2); --t1:var(--text-strong); --t2:var(--text-body); --t3:var(--muted); --bd:var(--line); --bd2:color-mix(in srgb, var(--text) 30%, transparent); --o:var(--amber); --c:var(--cyan); --g:var(--green); --r:var(--red); }
+    .inc-fig-scroll { overflow-x:auto; border:1px solid var(--line); border-radius:4px; background:var(--surface); }
+    .inc-fig-svg svg { display:block; width:100%; height:auto; }
+    .inc-fig-svg.fig-narrow { display:none; }
+    @media (max-width: 640px) { .inc-fig-svg.fig-wide { display:none; } .inc-fig-svg.fig-narrow { display:block; } }
+    .inc-fig figcaption { color:var(--muted); font-size:0.78rem; margin-top:0.45rem; line-height:1.45; }
+    .mag-row { display:grid; grid-template-columns:240px 1fr; gap:1.2rem; align-items:center; margin-top:1.4rem; }
+    .mag-row .viz { margin:0; }
+    details.inc-more { border-top:1px solid var(--line); margin-top:0.2rem; }
+    details.inc-more:last-of-type { border-bottom:1px solid var(--line); }
+    details.inc-more > summary { cursor:pointer; list-style:none; padding:0.7rem 0; color:var(--text-strong); font-weight:600; font-size:0.9rem; display:flex; gap:0.6rem; align-items:baseline; min-height:44px; box-sizing:border-box; }
+    details.inc-more > summary::-webkit-details-marker { display:none; }
+    details.inc-more > summary::before { content:"+"; font-family:'JetBrains Mono',monospace; color:var(--muted); width:0.8em; }
+    details.inc-more[open] > summary::before { content:"\2212"; }
+    details.inc-more > p, details.inc-more > .card, details.inc-more > .table-wrap { margin:0 0 0.9rem; color:var(--text-body); font-size:0.9rem; }
+    table.coe { width:100%; border-collapse:collapse; font-size:0.86rem; }
+    table.coe th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.55rem 0.7rem; border-bottom:1px solid var(--line); font-weight:500; }
+    table.coe td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; line-height:1.45; }
+    table.coe tr:last-child td { border-bottom:0; }
+    table.coe .c-own { color:var(--text-strong); width:22%; }
+    table.coe .c-st { color:var(--muted); font-size:0.8rem; width:32%; }
+    .soe li:target { background:var(--surface-2); }
+    @media (max-width: 720px) {
+        .facts { grid-template-columns:1fr 1fr; }
+        .mag-row { grid-template-columns:1fr; }
+        table.coe thead { display:none; }
+        table.coe tr { display:block; padding:0.55rem 0.7rem; border-bottom:1px solid var(--line); }
+        table.coe td { display:block; padding:0.1rem 0; border:0; width:auto !important; }
+        .inc-nav { margin:1rem -1.1rem 0; }
+    }
+"""
+
+
 SHARE_BAR = (
     '<aside class="share-buttons" aria-label="Share this dossier"><span class="share-label">Share</span>'
     '<button class="share-btn" onclick="rzShare(\'li\')" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11 0-4.124 2.062 2.062 0 010 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg></button>'
@@ -802,153 +853,6 @@ def radar_svg(mag):
     poly = f'<polygon class="vz-accent-fill" points="{_pts(vals, cx, cy, R)}"><title>Magnitude sub-scores (0–10)</title></polygon>'
     dots = "".join(f'<circle class="vz-accent-dot" cx="{p.split(",")[0]}" cy="{p.split(",")[1]}" r="2.4"/>' for p in _pts(vals, cx, cy, R).split(" "))
     return f'<div class="viz viz-radar"><svg viewBox="0 0 290 215" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title>{rings}{spokes}{poly}{dots}{labels}</svg></div>'
-
-
-def _clean_op(operator):
-    """A short, clean node label — no parentheticals/semicolons, <=22 chars."""
-    o = (operator or "").split("(")[0].split(";")[0].split(",")[0].strip()
-    return o[:22] if o else "Operator"
-
-
-def _clean_svc(s):
-    """A clean short downstream-node label from a (possibly verbose) servicesDown string —
-    drop parenthetical example-lists, keep up to ~5 words / 34 chars; full text lives in <title>."""
-    s = str(s or "").split("(")[0].strip().rstrip(":;,")
-    words = s.split()
-    out = ""
-    for w in words:
-        if len(out) + len(w) + 1 > 34:
-            break
-        out = (out + " " + w).strip()
-    return out or s[:34]
-
-
-def _wrap(text, width, maxlines=2):
-    """Greedy word-wrap into <=maxlines lines of ~width chars (for SVG tspans)."""
-    words = str(text or "").split()
-    lines, cur = [], ""
-    for w in words:
-        if len(cur) + len(w) + 1 <= width or not cur:
-            cur = (cur + " " + w).strip()
-        else:
-            lines.append(cur); cur = w
-            if len(lines) == maxlines - 1:
-                break
-    rest = " ".join(words[sum(len(l.split()) for l in lines):]) if lines else cur
-    if len(lines) < maxlines:
-        lines.append((cur if not lines else rest).strip())
-    out = [l for l in lines if l][:maxlines]
-    # Truncated means WORDS were dropped. This compared "".join(out) -- the lines
-    # glued WITHOUT spaces -- against the original text WITH them, so every
-    # two-line label counted as cut and got a false "…" (azure-west-us2 printed
-    # "Azure compute/storage in West US" / "2…" with nothing actually missing).
-    truncated = sum(len(l.split()) for l in out) < len(words)
-    # Never strand a 1-3 character token alone on the last line ("2", "AZ", "Inc"):
-    # pull the previous word down with it.
-    if len(out) == 2 and len(out[1]) <= 3 and len(out[0].split()) > 1:
-        head, last = out[0].rsplit(" ", 1)
-        out = [head, f"{last} {out[1]}"]
-    # The last line also carries every word that did not fit, so it can run past the
-    # box. The old false-positive above was what used to trim it; trim it on purpose.
-    if len(out[-1]) > width:
-        truncated = True
-        out[-1] = out[-1][: width - 1]
-        if " " in out[-1]:
-            out[-1] = out[-1].rsplit(" ", 1)[0]
-    if truncated:
-        out[-1] = out[-1].rstrip(" ,;:-(") + "…"
-    return out
-
-
-def cascade_svg(inc):
-    cat = (inc.get("category") or ["software"])[0]
-    trigger = CATEGORY_LABEL.get(cat, cat)
-    op_full = inc.get("operator", "") or ""
-    op = inc.get("operatorShort") or _clean_op(op_full)
-    dc_full = inc.get("dcName", "") or ""
-    downs = ((inc.get("severity", {}) or {}).get("servicesDown", []) or [])
-    shown = downs[:4]
-    more = len(downs) - len(shown)
-
-    def box(x, y, w, h, cls, title, head, sub=None, sub_full=None):
-        # head wraps to <=2 lines; sub is one small line; full text in <title> (hover)
-        hlines = _wrap(head, int((w - 20) / 6.6), 2)
-        ty = y + 17
-        parts = [f'<rect class="{cls}" x="{x}" y="{y}" width="{w}" height="{h}" rx="2"><title>{esc(title)}</title></rect>']
-        for j, ln in enumerate(hlines):
-            parts.append(f'<text class="vz-box-t" x="{x+10}" y="{ty + j*13}">{esc(ln)}</text>')
-        if sub:
-            sy = ty + len(hlines) * 13 + 1
-            parts.append(f'<text class="vz-box-s" x="{x+10}" y="{sy}"><title>{esc(sub_full or sub)}</title>{esc(str(sub)[:34])}</text>')
-        return "".join(parts)
-
-    W = 760
-    rows = max(1, len(shown))
-    H = max(158, 52 + rows * 44)
-    midY = H / 2 - 28
-    svg = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title>']
-    svg.append('<defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs>')
-    svg.append(f'<text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text>')
-    svg.append(box(8, midY, 176, 56, "vz-box-trigger", f"Trigger — {trigger} ({inc.get('date','')})", f"Trigger · {trigger}", inc.get("date", ""), inc.get("date", "")))
-    svg.append(box(240, midY, 224, 56, "vz-box-fault", f"Primary fault at {op_full} — {dc_full}", op, _clean_svc(dc_full), dc_full))
-    svg.append(f'<line class="vz-flow" x1="184" y1="{midY+28}" x2="238" y2="{midY+28}" marker-end="url(#ic-ar)"/>')
-    for i, d in enumerate(shown):
-        by = 26 + i * 44
-        svg.append(box(516, by, 236, 36, "vz-box-down",
-                       f"Downstream service degraded by the fault: {d}", _clean_svc(d)))
-        svg.append(f'<line class="vz-flow" x1="464" y1="{midY+28}" x2="514" y2="{by+18}" marker-end="url(#ic-ar)"/>')
-    if more > 0:
-        svg.append(f'<text class="vz-box-s" x="516" y="{26 + rows * 44 + 6}">+{more} more downstream services</text>')
-    svg.append('</svg>')
-    return f'<div class="viz viz-cascade">{"".join(svg)}</div>'
-
-
-def _two_lines(text, width):
-    """A timeline time label as at most two lines of `width` characters.
-
-    One 16-character line ran ~96px into a 92px step and overprinted its neighbour
-    ("…00:47 PD2011-04-21"). Splitting at the first space instead left lone "At",
-    "By", "c." and "ET" lines; this fills line one word by word, so a short word
-    stays with the next one. The full text is in the dot's <title> and the SOE list."""
-    words = text.split()
-    l1 = ""
-    while words and len((l1 + " " + words[0]).strip()) <= width:
-        l1 = (l1 + " " + words.pop(0)).strip()
-    if not l1 and words:
-        w = words.pop(0)
-        l1, words = (w, words) if len(w) <= width else (w[:width - 1] + "…", [])
-    l2 = " ".join(words)
-    if len(l2) > width:
-        l2 = l2[:width - 1].rstrip() + "…"
-    return l1, l2
-
-
-def soe_timeline_svg(soe):
-    if not soe:
-        return ""
-    n = len(soe)
-    # 46px margins: a 13-character label is ~86px wide, centred on the end dots; the
-    # old 30px margin cut the first and last labels at the SVG edge ("ept-Oct 2016").
-    W = max(560, 92 + (n - 1) * 92)
-    H = 96
-    x0, x1 = 46, W - 46
-    step = (x1 - x0) / max(1, n - 1)
-    parts = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title>']
-    parts.append(f'<line class="vz-grid" x1="{x0}" y1="48" x2="{x1}" y2="48"/>')
-    for i, e in enumerate(soe):
-        x = x0 + i * step
-        ph = (e.get("phase", "") or "")
-        tip = f'{e.get("t","")} · {ph} — {e.get("event","")}'.strip(" ·—")
-        parts.append(f'<circle class="vz-accent-dot" cx="{x:.0f}" cy="48" r="4.5"><title>{esc(tip)}</title></circle>')
-        parts.append(f'<text class="vz-tl-ph" x="{x:.0f}" y="30" text-anchor="middle">{esc(ph[:12])}</text>')
-        # Two short lines, date over time. One 16-character line ran ~96px into a 92px
-        # step, so neighbouring labels overprinted ("…00:47 PD2011-04-21") at every width.
-        l1, l2 = _two_lines(e.get("t", "") or "", 13)  # 13 mono chars ≈ 80px inside a 92px step
-        parts.append(f'<text class="vz-tl-t" x="{x:.0f}" y="66" text-anchor="middle">{esc(l1)}</text>')
-        if l2:
-            parts.append(f'<text class="vz-tl-t" x="{x:.0f}" y="79" text-anchor="middle">{esc(l2)}</text>')
-    parts.append('</svg>')
-    return f'<div class="viz viz-timeline">{"".join(parts)}</div>'
 
 
 def hub_magnitude_svg(incidents):
@@ -1225,7 +1129,7 @@ def hub_geo_map(incidents):
           'function init(){var el=document.getElementById("incMap");'
           'if(!el||typeof L==="undefined"){return setTimeout(init,150);} if(el._leaflet_id)return;'
           'var map=L.map("incMap",{center:[25,0],zoom:1,minZoom:1,maxZoom:8,worldCopyJump:true,scrollWheelZoom:false});'
-          'L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:19,attribution:"&copy; CARTO &copy; OpenStreetMap"}).addTo(map);'
+          'L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",{maxZoom:16,attribution:"Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors"}).addTo(map);'
           'PTS.forEach(function(p){var col=p.dom==="facility"?FAC:LOG;'
           'if(p.cx!=null){L.polyline([[p.cx,p.cy],[p.lat,p.lng]],{color:col,weight:0.8,opacity:0.4,interactive:false}).addTo(map);}'
           'var mk=L.circleMarker([p.lat,p.lng],{radius:Math.max(4,Math.min(11,3+p.sc*0.8)),fillColor:col,color:"#0c1512",weight:1,opacity:0.9,fillOpacity:0.85}).addTo(map);'
@@ -1420,7 +1324,7 @@ def iid_recent(incidents):
         where = ", ".join(v for v in [loc.get("city"), loc.get("country")] if v) or "Global"
         rows += (f'<a class="iid-rec" href="incident-{esc(x["slug"])}.html">'
                  f'<span class="iid-rec-sev sev-{band}"></span>'
-                 f'<span class="iid-rec-b"><span class="iid-rec-t">{esc(x.get("title","")[:52])}</span>'
+                 f'<span class="iid-rec-b"><span class="iid-rec-t">{esc(x.get("title",""))}</span>'
                  f'<span class="iid-rec-m">{esc(x.get("date",""))} · {esc(where)}</span></span>'
                  f'<span class="iid-rec-tag sev-{band}">{band.upper()}</span></a>')
     return f'<div class="iid-recent">{rows}</div>'
@@ -1531,45 +1435,124 @@ IID_SCRIPT = ('<script>(function(){'
               '})();</script>')
 
 
+_DIAGRAMS = None
+
+
+def _diagrams():
+    """Figures drawn by tools/build-incident-diagrams.mjs through the RZ diagram engine."""
+    global _DIAGRAMS
+    if _DIAGRAMS is None:
+        try:
+            with open(os.path.join(DATA_DIR, "_diagrams.json"), encoding="utf-8") as fh:
+                _DIAGRAMS = json.load(fh)
+        except FileNotFoundError:
+            _DIAGRAMS = {}
+    return _DIAGRAMS
+
+
+def _root_cause_html(text, used):
+    """The opening of the root cause, with the full narrative one click away.
+
+    Root-cause narratives run to 4,000 characters in one paragraph; shown whole, the
+    section opened on a wall of text. The lead keeps whole sentences up to ~480
+    characters, so it never stops mid-claim."""
+    import re as _re
+    text = (text or "").strip()
+    if len(text) <= 640:
+        return f'<div class="card">{linkify(text, used)}</div>'
+    cut, n = 0, 0
+    for m in _re.finditer(r'[.!?](?=\s+[A-Z(“"])', text):
+        if m.end() > 480 and cut:
+            break
+        cut = m.end()
+    if not cut or cut > 900:
+        return f'<div class="card">{linkify(text, used)}</div>'
+    lead, rest = text[:cut], text[cut:].strip()
+    return (f'<div class="card rc-lead">{linkify(lead, used)}</div>'
+            f'<details class="inc-more"><summary>Full root-cause narrative</summary><div class="card">{linkify(rest, used)}</div></details>')
+
+
+def _fig_svg(svg, cls=""):
+    import re as _re
+    m = _re.search(r'viewBox="0 0 (\d+) (\d+)"', svg)
+    w = int(m.group(1)) if m else 820
+    # Size bounds travel with the figure (DIAGRAM_ENGINE_STANDARD §3e): never upscale, and
+    # never shrink below 0.8 — the smallest engine type on these figures is 11 units, so
+    # 0.8 keeps it above the 8.5 px legibility floor; past that the figure scrolls.
+    style = f"max-width:{w}px;min-width:{-(-w * 4 // 5)}px"
+    return f'<div class="inc-fig-svg{cls}" style="{style}">{svg}</div>'
+
+
+def _figure(svg, caption, narrow=None):
+    """A wide engine figure, plus an optional single-column variant swapped in on phones."""
+    inner = _fig_svg(svg, " fig-wide" if narrow else "") + (_fig_svg(narrow, " fig-narrow") if narrow else "")
+    return (f'<figure class="inc-fig"><div class="inc-fig-scroll">{inner}</div>'
+            f'<figcaption>{caption}</figcaption></figure>')
+
+
+_SECTIONS = [("summary", "Summary"), ("timeline", "Timeline"), ("response", "Response"), ("fmea", "FMEA"),
+             ("causes", "Causes"), ("actions", "Actions"), ("sources", "Sources")]
+
+NAV_JS = r"""<script>(function(){
+var nav=document.querySelector('.inc-nav');if(!nav||!('IntersectionObserver' in window))return;
+var links={};[].forEach.call(nav.querySelectorAll('a'),function(a){links[a.getAttribute('href').slice(1)]=a;});
+var cur=null;function set(id){if(id===cur||!links[id])return;if(cur&&links[cur])links[cur].removeAttribute('aria-current');links[id].setAttribute('aria-current','true');cur=id;
+var a=links[id],s=nav.querySelector('.inc-nav-in');if(s&&(a.offsetLeft<s.scrollLeft||a.offsetLeft+a.offsetWidth>s.scrollLeft+s.clientWidth))s.scrollLeft=a.offsetLeft-16;}
+var vis={};var io=new IntersectionObserver(function(es){es.forEach(function(e){vis[e.target.id]=e.isIntersecting;});
+var ids=Object.keys(links);for(var i=0;i<ids.length;i++){if(vis[ids[i]]){set(ids[i]);break;}}},{rootMargin:'-120px 0px -55% 0px'});
+Object.keys(links).forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el);});
+})();</script>"""
+
+
 def render_incident(inc, rank):
     loc = inc.get("location", {})
     loc_s = ", ".join(x for x in [loc.get("city"), loc.get("country"), loc.get("az")] if x)
     sev = inc.get("severity", {})
+    soe_list = inc.get("sequenceOfEvents", [])
+    tags = incidents_response.soe_roles(inc)
 
-    def soe_li(e):
+    def soe_li(i, e):
         ph = f'<span class="phase-chip">{esc(e["phase"])}</span> ' if e.get("phase") else ""
-        return f'<li><time>{esc(e.get("t",""))}</time><span class="ev">{ph}{esc(e.get("event",""))}</span></li>'
-    soe = "".join(soe_li(e) for e in inc.get("sequenceOfEvents", []))
+        rt = "".join(f'<span class="rs-tag">{esc(t)}</span>' for t in tags.get(i, []))
+        return (f'<li id="soe-{i + 1}"><time>{esc(e.get("t",""))}</time>'
+                f'<span class="ev">{ph}{esc(e.get("event",""))}{rt}</span></li>')
+    soe = "".join(soe_li(i, e) for i, e in enumerate(soe_list))
 
+    metrics = inc.get("metrics", [])
     metrics_rows = "".join(
         f'<tr><td class="mlabel">{esc(m.get("label",""))}</td><td class="mval">{esc(m.get("value",""))}</td></tr>'
-        for m in inc.get("metrics", [])
+        for m in metrics
     )
     metrics_html = (
-        f'<h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody>{metrics_rows}</tbody></table></div>'
+        f'<details class="inc-more"><summary>All {len(metrics)} impact metrics</summary>'
+        f'<div class="table-wrap"><table class="metrics"><tbody>{metrics_rows}</tbody></table></div></details>'
         if metrics_rows else ""
     )
 
     _used = set()
-    cascade_html = cascade_svg(inc)
     radar_html = radar_svg(inc.get("magnitude", {}))
-    timeline_html = soe_timeline_svg(inc.get("sequenceOfEvents", []))
     mag_note = esc((inc.get("magnitude", {}) or {}).get("note", ""))
+    dg = _diagrams().get(inc["slug"], {})
+    chain_html = _figure(dg["chain"], "Every failure mode of the FMEA below. Active modes run in the order the "
+                         "sequence of events first shows them — record order, not a proof of cause; latent modes "
+                         "were in place before the event. Red outline: high priority. Dashed: no published "
+                         "corrective action.", dg.get("chainNarrow")) if dg.get("chain") else ""
+    fish_html = _figure(dg["fishbone"], "Each short label stands for a contributing factor or failure mode recorded "
+                        "in this dossier; the full sentences are listed below.") if dg.get("fishbone") else ""
 
     ca = inc.get("comprehensiveAnalysis", [])
-    analysis_html = ""
-    if ca:
-        blocks = "".join(
-            f'<div class="ca-block"><h3>{esc(s.get("heading",""))}</h3><p>{linkify(s.get("body",""), _used)}</p></div>'
-            for s in ca
-        )
-        analysis_html = f'<h2>Comprehensive analysis</h2>{blocks}'
+    analysis_html = "".join(
+        f'<details class="inc-more"><summary>{esc(s.get("heading",""))}</summary><p>{linkify(s.get("body",""), _used)}</p></details>'
+        for s in ca
+    )
 
     cf = "".join(f"<li>{esc(x)}</li>" for x in inc.get("contributingFactors", []))
-    coe = "".join(f'<li>{esc(c.get("action",""))} <span class="coe-meta">{esc(c.get("owner",""))} · {esc(c.get("status",""))}</span></li>' for c in inc.get("coe", []))
+    coe_rows = "".join(
+        f'<tr><td>{esc(c.get("action",""))}</td><td class="c-own">{esc(c.get("owner",""))}</td>'
+        f'<td class="c-st">{esc(c.get("status",""))}</td></tr>' for c in inc.get("coe", []))
     lessons = "".join(f"<li>{esc(x)}</li>" for x in inc.get("lessonsLearnt", []))
     imps = _imp_render(inc.get("improvements", []))
-    down = "".join(f"<li>{esc(x)}</li>" for x in sev.get("servicesDown", []))
+    down = ", ".join(esc(x) for x in sev.get("servicesDown", []))
     refs = "".join(
         f'<li><span class="chip {REF_TONE.get(r.get("type"),"muted")}">{esc(r.get("type",""))}</span> '
         f'<span class="rtitle">{esc(r.get("title",""))}</span>'
@@ -1577,9 +1560,12 @@ def render_incident(inc, rank):
         + f'<a href="{esc(r.get("url",""))}" target="_blank" rel="noopener nofollow">{esc(r.get("url",""))}</a></li>'
         for r in inc.get("references", [])
     )
+    dur_txt = (_dur(inc.get('durationMin')) + ' — ' if inc.get('durationMin') else '') + (inc.get('durationBasis') or 'Basis not recorded')
+    nav = "".join(f'<a href="#{k}">{v}</a>' for k, v in _SECTIONS
+                  if k != "response" or inc.get("response"))
     body = f"""        <div class="reading-col">
         <a class="backlink" href="dc-incidents.html">← All incidents</a>
-        <div class="eyebrow">Incident dossier · Rank #{rank}</div>
+        <div class="eyebrow">Incident dossier · Rank #{rank} · magnitude {inc['_score']:.1f}</div>
         <h1>{esc(inc['title'])}</h1>
         <div class="chips">
             <span class="chip">{esc(inc.get('operator',''))}</span>
@@ -1587,70 +1573,71 @@ def render_incident(inc, rank):
             <span class="chip amber" title="{esc(inc.get('durationBasis',''))}">{esc(_dur_chip(inc))}</span>
             {cat_chips(inc.get('category',[]))}
         </div>
+        </div>
+        <nav class="inc-nav" aria-label="Dossier sections"><div class="inc-nav-in">{nav}</div></nav>
+        <div class="reading-col">
+
+        <section class="inc-sec" id="summary" aria-labelledby="h-summary">
+        <h2 id="h-summary" class="vh">Summary</h2>
         <p class="lede">{linkify(inc.get('brief',''), _used)}</p>
-
-        <h2>Failure cascade</h2>
-        {cascade_html}
-        <p class="disclaimer">From the sourced root cause and affected-services record.</p>
-
-        <h2>Facility &amp; location</h2>
-        <dl class="kv">
-            <dt>Operator</dt><dd>{esc(inc.get('operator',''))}</dd>
-            <dt>Data center</dt><dd>{esc(inc.get('dcName',''))}</dd>
-            <dt>Location</dt><dd>{esc(loc_s)}</dd>
-            <dt>Date</dt><dd>{esc(inc.get('date',''))}</dd>
+        <dl class="facts">
+            <div><dt>Users affected</dt><dd>{esc(sev.get('usersAffected','—'))}</dd></div>
+            <div><dt>Duration</dt><dd>{esc(dur_txt)}</dd></div>
+            <div><dt>Financial</dt><dd>{esc(sev.get('impactUsd','—'))}</dd></div>
+            <div><dt>Scope</dt><dd>{esc(sev.get('tier','—'))}</dd></div>
+            <div><dt>Site</dt><dd>{esc(inc.get('dcName',''))} · {esc(loc_s)}</dd></div>
+            <div><dt>Services down</dt><dd>{down or '—'}</dd></div>
         </dl>
-
-        <h2>Impact &amp; scale</h2>
-        <dl class="kv">
-            <dt>Users affected</dt><dd>{esc(sev.get('usersAffected','—'))}</dd>
-            <dt>Financial</dt><dd>{esc(sev.get('impactUsd','—'))}</dd>
-            <dt>Scope</dt><dd>{esc(sev.get('tier','—'))}</dd>
-            <dt>Duration</dt><dd>{esc(_dur(inc.get('durationMin')) + ' — ' if inc.get('durationMin') else '')}{esc(inc.get('durationBasis') or 'Basis not recorded')}</dd>
-        </dl>
-        <div class="card"><strong>Services / systems down</strong><ul class="tight">{down}</ul></div>
+        {f'<h3 class="inc-h3">How the defences failed</h3>{chain_html}' if chain_html else ''}
+        <div class="mag-row">
+            <div class="mag-viz">{radar_html}</div>
+            <div class="mag-txt">{_mag_trace(inc.get('magnitude',{}) or {}, inc['_score'])}<p class="disclaimer">{mag_note}</p></div>
+        </div>
         {metrics_html}
+        </section>
 
-        <h2>Magnitude profile</h2>
-        {radar_html}
-        {_mag_trace(inc.get('magnitude',{}) or {}, inc['_score'])}
-        <p class="disclaimer">{mag_note}</p>
+        <section class="inc-sec" id="timeline" aria-labelledby="h-timeline">
+        <h2 id="h-timeline">Sequence of events</h2>
+        <ol class="soe">{soe}</ol>
+        </section>
+        {incidents_response.response_section(inc)}
+        <section class="inc-sec" id="fmea" aria-labelledby="h-fmea">{incidents_fmea.fmea_section(inc)}</section>
 
-        <h2>Sequence of events (SOE)</h2>
-        {timeline_html}
-        <ul class="soe">{soe}</ul>
+        <section class="inc-sec" id="causes" aria-labelledby="h-causes">
+        <h2 id="h-causes">Root cause and contributing factors</h2>
+        {_root_cause_html(inc.get('rootCause',''), _used)}
+        {f'<h3 class="inc-h3">Contributing factors by category</h3>{fish_html}' if fish_html else ''}
+        <ul class="tight">{cf}</ul>
+        {f'<h3 class="inc-h3">Analysis</h3>{analysis_html}' if analysis_html else ''}
+        <details class="inc-more"><summary>Technical deep-dive</summary><div class="card">{linkify(inc.get('technicalDeepDive',''), _used)}</div></details>
+        </section>
 
-        <h2>Root cause</h2>
-        <div class="card">{linkify(inc.get('rootCause',''), _used)}</div>
-
-        <h2>Contributing factors</h2>
-        <ul class="tight">{cf}</ul>{incidents_fmea.fmea_section(inc)}
-
-        <h2>Correction of errors (COE)</h2>
-        <ul class="tight">{coe}</ul>
-
-        <h2>Lessons learnt</h2>
+        <section class="inc-sec" id="actions" aria-labelledby="h-actions">
+        <h2 id="h-actions">Corrective actions and lessons</h2>
+        <h3 class="inc-h3">Correction of errors</h3>
+        <div class="table-wrap"><table class="coe"><thead><tr><th>Action</th><th>Owner</th><th>Status</th></tr></thead><tbody>{coe_rows}</tbody></table></div>
+        <h3 class="inc-h3">Lessons learnt</h3>
         <ul class="tight">{lessons}</ul>
-
-        <h2>Improvements &amp; remediation</h2>
+        <h3 class="inc-h3">Improvements</h3>
         <ul class="tight">{imps}</ul>
+        </section>
 
-        {analysis_html}
-
-        <h2>Technical deep-dive</h2>
-        <div class="card">{linkify(inc.get('technicalDeepDive',''), _used)}</div>
-
-        <h2>References &amp; provenance</h2>
+        <section class="inc-sec" id="sources" aria-labelledby="h-sources">
+        <h2 id="h-sources">References and provenance</h2>
         <ul class="refs">{refs}</ul>
         <p class="disclaimer">Quotes are short, attributed, and for provenance only; the analysis is original. Last verified {esc(inc.get('sourcing',{}).get('lastVerified','—'))}.</p>
+        </section>
         {SHARE_BAR}
         </div>
 """
-    fmea_head = (f"<style>{incidents_fmea.CSS}</style>"
-                 f'<script src="js/rz-fmea-sim.js?v={_asset_token("js/rz-fmea-sim.js")}" defer></script>'
-                 if inc.get("fmea") else "")
+    head = ""
+    if inc.get("fmea"):
+        head += (f"<style>{incidents_fmea.CSS}</style>"
+                 f'<script src="js/rz-fmea-sim.js?v={_asset_token("js/rz-fmea-sim.js")}" defer></script>')
+    head += f"<style>{incidents_response.CSS}{DOSSIER_CSS}</style>"
+    body += incidents_response.SCRIPT + NAV_JS
     return page_shell(inc["title"], inc.get("brief", "")[:180], f"incident-{inc['slug']}.html", body, base="",
-                      head_extra=fmea_head)
+                      head_extra=head)
 
 
 def main():

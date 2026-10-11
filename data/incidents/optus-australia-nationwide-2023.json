@@ -351,6 +351,46 @@
        "i": 1
       }
      }
+    ],
+    "short": "Unfiltered flood at peering",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add inbound prefix filters and a route-count rate limit on the Singtel ingress toward AS4804 before any exchange upgrade",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm Optus NOC on BGP announcement rate from Singtel peers against the 3,000 per hour baseline, instead of relying on Cloudflare telemetry",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "change-owner",
+      "phase": "contain",
+      "do": "Shut the affected Singtel peering session or apply a max-prefix cut at ingress when announcements spike far over baseline",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Hold all other Singtel router upgrades in the window until the offending node is identified",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-establish the peering session only after the filter is in place and the announcement rate is back near baseline",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     }
     ]
    },
    {
@@ -416,6 +456,47 @@
        "i": 0
       }
      }
+    ],
+    "short": "Default limit trips ~90 PEs",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Advise operators in writing that Cisco default route-limit thresholds are not sized to their route counts and must be tuned",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Set operator-tuned limits with warn-then-restart behaviour on every PE router rather than synchronized hard session teardown",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert the NOC when PE route counts pass a warning level well below the teardown threshold, so staff act before routers isolate",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident, confirm no cyberattack, and set the first goal as getting the PE fleet back in BGP",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Clear the flood source first, then reconnect the PE routers in batches so they do not trip again on re-advertisement",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -464,6 +545,42 @@
        "src": "improvement",
        "i": 4
       }
+     }
+    ],
+    "short": "Manual BGP session recovery",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Pre-stage remote reboot and automated session recovery for PE routers so restoration needs no site visits",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Track the count of down PE sessions against time and report restored percentage to the commander every 30 minutes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Order the PE routers by customer weight and restore the largest populations first",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Reconnect and reboot routers in turn until the fleet is restored; the record shows 11% at 11:30 and 88% at 13:00",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Publish restored percentage and next update time so customers see progress, not silence",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -517,6 +634,45 @@
        "i": 3
       }
      }
+    ],
+    "short": "000 calls share the IP core",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Require Triple-Zero calling to stay available when the carrier's IP core is down, for example by camp-on to other networks",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Run a continuous test call to 000 from a probe on the Optus network and page the NOC on the first failure",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Notify emergency services and the regulator at once that 000 is failing, so they can run alternate channels",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers to use a landline or another carrier's phone for emergencies",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore the 000 path first among customer services and run a welfare-check process for missed calls",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
     ]
    },
    {
@@ -565,9 +721,49 @@
        "i": 2
       }
      }
+    ],
+    "short": "No joint upstream change",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run Singtel and Optus changes through one joint staged rollout with a blast-radius review and a coordinated rollback plan",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "crisis",
+      "phase": "prevent",
+      "do": "Agree in writing who owns a change on shared infrastructure, so accountability is not disputed afterwards",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Give the Optus NOC advance notice of every Singtel change window and watch BGP counters through it",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Call a joint Singtel and Optus bridge so the upstream change owner can stop and roll back the upgrade",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "change-owner",
+      "phase": "recover",
+      "do": "Roll back the exchange upgrade on the node that disconnected and confirm announcements are back to normal",
+      "basis": "change-mgmt"
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "10M+ people offline ~12-13 h"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -582,5 +778,114 @@
    "quote": "~88% by 13:00 AEDT"
   }
  },
- "durationBasis": "Onset ~04:05 AEDT 8 Nov → ~88% of network restored by 13:00 AEDT."
+ "durationBasis": "Onset ~04:05 AEDT 8 Nov → ~88% of network restored by 13:00 AEDT.",
+ "response": {
+  "roles": {
+   "first-responder": "No on-call engineer is named in the record; the routers detected the flood themselves",
+   "ops-lead": "Optus network operations staff running the IP core — not named",
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "Singtel network staff who ran the router upgrade at a North American exchange",
+   "vendor": "Cisco Systems, maker of the PE routers and their default thresholds",
+   "service-recovery": "Optus engineers who reconnected and rebooted the affected routers",
+   "comms": "Optus public statements — spokesperson not named",
+   "crisis": "Optus executive leadership, including CEO Kelly Bayer Rosmarin",
+   "authority": "Senate public inquiry and the independent government (Bean) review",
+   "customer": "Optus mobile and fixed customers, hospitals, transport and payment users"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "Scheduled software upgrade performed on a router at a North American node",
+    "did": "Performs a scheduled software upgrade on a Singtel peering router, the trigger of the BGP flood"
+   },
+   {
+    "role": "comms",
+    "soe": 11,
+    "quote": "Optus publicly confirmed the outage was 'not due to a cyberattack,'",
+    "did": "States publicly that the outage was not a cyberattack and points recovery at the routing fault"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 12,
+    "quote": "engineers manually reconnected/rebooted affected routers",
+    "did": "Reconnect and reboot the affected routers by hand because tripped BGP sessions do not self-heal"
+   },
+   {
+    "role": "crisis",
+    "soe": 17,
+    "quote": "Optus CEO Kelly Bayer Rosmarin resigned",
+    "did": "CEO resigns on 20 Nov 2023, twelve days after the outage"
+   },
+   {
+    "role": "authority",
+    "soe": 17,
+    "quote": "a Senate public inquiry and an independent government (Bean) review were established",
+    "did": "Government opens a Senate inquiry and the Bean review into the outage"
+   },
+   {
+    "role": "customer",
+    "soe": 10,
+    "quote": "Customers diverted to rivals",
+    "did": "Move to TPG/Vodafone and Kogan Mobile during the outage, per press figures"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Nationwide outage, 10M+ people",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "PE routers on default limits",
+      "factor": 0
+     },
+     {
+      "label": "Sessions do not self-heal",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Fail-safe trips all 90 at once",
+      "factor": 1
+     },
+     {
+      "label": "No 000 fallback path",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "No joint staged change",
+      "factor": 5
+     },
+     {
+      "label": "Manual-only restoration",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Upstream exchange upgrade",
+      "mode": "FM-01"
+     },
+     {
+      "label": "No peering route filtering",
+      "factor": 2
+     }
+    ]
+   }
+  ]
+ }
 }

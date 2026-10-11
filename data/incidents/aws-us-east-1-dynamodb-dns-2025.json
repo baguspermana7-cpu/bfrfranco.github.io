@@ -418,7 +418,56 @@
      "O": 2,
      "D": 2
     },
-    "revisedRationale": "With the automation disabled (done, interim) the race cannot run, and the committed apply-time re-validation would refuse a stale write when it returns (O 4→2, D 8→2). The fix is recorded as committed before re-enabling the automation, not as shipped, so the D reduction is a claim about the action, not a confirmed outcome. Severity is unchanged: an empty endpoint record from any other cause would be just as wide."
+    "revisedRationale": "With the automation disabled (done, interim) the race cannot run, and the committed apply-time re-validation would refuse a stale write when it returns (O 4→2, D 8→2). The fix is recorded as committed before re-enabling the automation, not as shipped, so the D reduction is a claim about the action, not a confirmed outcome. Severity is unchanged: an empty endpoint record from any other cause would be just as wide.",
+    "short": "Stale plan overwrites DNS",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Re-check plan freshness at apply time with compare-and-swap against the live record, not only at the start",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Serialise Enactor writes and cleanup so one Enactor cannot delete a plan another is applying",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on Enactor apply latency far above normal and on any regional endpoint with zero IPs",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop the Enactors applying plans once an empty endpoint record is seen, before cleanup deletes more",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name the DNS state as the first suspect when DynamoDB clients cannot connect, and put the DNS team on the bridge",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore the endpoint IPs by hand and confirm dynamodb.us-east-1 resolves from outside the region",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -467,6 +516,48 @@
        "i": 2
       }
      }
+    ],
+    "short": "No DNS self-repair",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Build a guard so an empty or inconsistent endpoint record cannot persist and block every Enactor update",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm when the Planner's active plan is missing or Enactors report they cannot apply any plan",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Rebuild the DNS state by hand and use temporary mitigations so internal services reconnect first",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare manual recovery and assign one owner for DNS reconstruction, with a second to review it",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Wait for cached empty DNS answers to expire and confirm customers resolve the endpoint again",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Flush or shorten resolver caches that kept the empty answer, and retry DynamoDB calls with backoff",
+      "basis": "sre-incident"
+     }
     ]
    },
    {
@@ -509,7 +600,55 @@
       "quote": "customers experienced increased error rates and latencies for multiple AWS services"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "DynamoDB is base dependency",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "List every in-region service that hard-depends on the DynamoDB endpoint and give each a degraded mode",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch EC2 DWFM state-check failures as a first sign of a DynamoDB endpoint fault",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Pull EC2, NLB and other dependent service owners onto the bridge as errors spread",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Enable temporary mitigations that let internal services reconnect to DynamoDB",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post status naming DynamoDB, EC2 and NLB in US-EAST-1 as impaired and the next update time",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart dependent services in dependency order once DynamoDB DNS resolves, DynamoDB first",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Run workloads across regions so a US-EAST-1 DynamoDB failure does not stop the application",
+      "basis": "iso-22301"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -564,7 +703,43 @@
      "O": 3,
      "D": 8
     },
-    "revisedRationale": "Queue-depth throttling would hold recovery work below the level that causes collapse (O 6→3). Recorded as planned, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Queue-depth throttling would hold recovery work below the level that causes collapse (O 6→3). Recorded as planned, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "DWFM lease recovery collapse",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Rate-limit incoming EC2 work by waiting-queue depth so lease recovery cannot collapse",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on DWFM lease queue depth and timeouts as DynamoDB access returns",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Throttle incoming EC2 work and restart DWFM hosts selectively to clear the queue",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Keep launches throttled until the lease queue is below the limit",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-establish droplet leases, then lift the throttle in steps once DWFM is stable",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -611,7 +786,50 @@
      "O": 7,
      "D": 4
     },
-    "revisedRationale": "A regression test of the recovery workflow would expose a broken or slow path before an incident needs it (D 9→4). Recorded as planned, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "A regression test of the recovery workflow would expose a broken or slow path before an incident needs it (D 9→4). Recorded as planned, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "No DWFM recovery procedure",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Write and test a DWFM congestive-collapse recovery runbook",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add an EC2 test suite that exercises the DWFM recovery workflow",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page the EC2 DWFM team on lease timeouts and tell them the runbook is untested",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Break the collapse by throttling work and restarting hosts in small batches, checking each batch",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Record the actions that worked as the first draft of the runbook before the bridge closes",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -666,7 +884,49 @@
      "O": 4,
      "D": 8
     },
-    "revisedRationale": "A cap on removed capacity limits what flapping can take out of service, so the effect falls to customer-visible degradation (S 7→5). Recorded as planned, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "A cap on removed capacity limits what flapping can take out of service, so the effect falls to customer-visible degradation (S 7→5). Recorded as planned, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "NLB failover removes capacity",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add a velocity control that limits capacity removed in one health-check AZ failover",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on NLB targets flapping between healthy and unhealthy as new instances come up",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Disable automatic health-check failover and keep the healthy capacity in service",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Decide when to re-enable failover only after EC2 is stable",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-enable NLB automatic failover once EC2 stabilises, as done at 14:09",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Retry NLB connections with backoff and check targets in the other AZs while failover is off",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -699,9 +959,46 @@
       "quote": "a significant backlog of network state propagations"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Network state backlog",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Size Network Manager propagation for a post-DWFM burst of new instances",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch Network Manager propagation backlog and new-instance connectivity as DWFM leases return",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Hold incoming EC2 work until the propagation backlog drains",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Keep NLB failover off while new instances have no connectivity",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm new EC2 instances have connectivity as the backlog drains, then lift the throttles",
+      "basis": "itil-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "DynamoDB DNS empty · EC2 14 h"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -716,5 +1013,114 @@
    "quote": "overall event concluded ~2:20 PM"
   }
  },
- "durationBasis": "DynamoDB endpoint IPs deleted 23:48 PDT 19 Oct → event concluded ~14:20 PDT 20 Oct"
+ "durationBasis": "DynamoDB endpoint IPs deleted 23:48 PDT 19 Oct → event concluded ~14:20 PDT 20 Oct",
+ "response": {
+  "roles": {
+   "first-responder": "AWS on-call engineers — the record gives no individual or alarm that first paged them",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "AWS DynamoDB, EC2 and NLB engineers — not individually named",
+   "change-owner": "AWS DynamoDB DNS team owning the Planner and Enactor automation",
+   "service-recovery": "AWS EC2 DWFM and Network Manager recovery engineers — not named",
+   "comms": "AWS status communications — not in this sequence of events",
+   "customer": "Customers of DynamoDB, EC2 and NLB in US-EAST-1"
+  },
+  "recorded": [
+   {
+    "role": "ops-lead",
+    "soe": 4,
+    "quote": "Engineers identify DynamoDB's DNS state as the source of the outage",
+    "did": "Identify DynamoDB's DNS state as the source at 00:38, about 50 minutes after onset"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 6,
+    "quote": "operators begin manual reconstruction of the DNS state",
+    "did": "Start rebuilding the endpoint DNS by hand at 01:15 after temporary mitigations; complete at 02:25"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 11,
+    "quote": "Engineers throttle incoming EC2 work and selectively restart DWFM hosts",
+    "did": "Throttle incoming EC2 work and restart DWFM hosts at 04:14 to break the congestive collapse"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 13,
+    "quote": "Engineers disable NLB automatic health-check failovers",
+    "did": "Disable NLB automatic failover at 09:36 so flapping instances stop removing capacity"
+   },
+   {
+    "role": "change-owner",
+    "soe": 16,
+    "quote": "AWS separately disables the DynamoDB DNS Planner and Enactor automation worldwide pending fixes.",
+    "did": "Disable the DNS Planner and Enactor worldwide after the event, pending fixes"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "DynamoDB DNS empty, EC2 out ~14 h",
+  "bones": [
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Check stale at apply time",
+      "factor": 0
+     },
+     {
+      "label": "No apply-time exclusion",
+      "factor": 1
+     },
+     {
+      "label": "DynamoDB is base dependency",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "No tested DWFM recovery",
+      "factor": 3
+     },
+     {
+      "label": "No queue-depth throttle",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "No DNS self-repair",
+      "factor": 2
+     },
+     {
+      "label": "NLB failover too fast",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Enactor delay exposed race",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Network state backlog",
+      "mode": "FM-07"
+     }
+    ]
+   }
+  ]
+ }
 }

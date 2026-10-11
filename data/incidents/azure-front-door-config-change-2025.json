@@ -377,7 +377,48 @@
      "O": 6,
      "D": 4
     },
-    "revisedRationale": "Cross-build compatibility testing would catch incompatible metadata in pre-production, before customers are exposed (D 8→4). The dossier records this as planned for February 2026 with no confirmation of completion, so the reduction is a claim about the action, not a confirmed outcome. Version skew itself remains, so occurrence is unchanged."
+    "revisedRationale": "Cross-build compatibility testing would catch incompatible metadata in pre-production, before customers are exposed (D 8→4). The dossier records this as planned for February 2026 with no confirmation of completion, so the reduction is a claim about the action, not a confirmed outcome. Version skew itself remains, so occurrence is unchanged.",
+    "short": "Version-skewed config metadata",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Validate every feature across all coexisting control-plane build versions before a rolling deployment, and fail the release on any incompatible metadata",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Stop generating customer metadata while two control-plane builds coexist unless a compatibility test has passed for the pair",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on metadata produced by one build that the other build rejects when parsed in pre-production",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Halt the configuration pipeline at the pre-production stage the moment incompatible metadata is flagged",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Regenerate the affected customer metadata from a single build version and replay it through pre-production",
+      "basis": "change-mgmt"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -425,7 +466,44 @@
      "O": 3,
      "D": 4
     },
-    "revisedRationale": "With synchronous processing a bad configuration faults at the stage that receives it, before promotion, so the crash is seen with time to stop it (D 8→4). Recorded as completed. No fix to the latent bug itself is recorded, so occurrence is unchanged."
+    "revisedRationale": "With synchronous processing a bad configuration faults at the stage that receives it, before promotion, so the crash is seen with time to stop it (D 8→4). Recorded as completed. No fix to the latent bug itself is recorded, so occurrence is unchanged.",
+    "short": "Async data-plane crash",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Remove asynchronous processing from the data plane and process each customer configuration synchronously before it advances",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on data-plane instance crash counts and restart loops per edge site, not only on the propagation health signal",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop propagation and freeze new configuration for all edge sites on the first crash alert",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post to the status page and Azure Service Health that AFD and CDN connections are timing out, with the DNS symptom named",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Reload the corrected LKG configuration on the crashed edge instances in phases, checking each batch is stable",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -476,7 +554,48 @@
      "O": 2,
      "D": 8
     },
-    "revisedRationale": "Longer bake time and extra stages mean a fault must be slower than the new bake time to slip through (O 4→2). Recorded as completed. Detection is unchanged: if a fault did outlast the bake time, the safeguard would still report healthy."
+    "revisedRationale": "Longer bake time and extra stages mean a fault must be slower than the new bake time to slip through (O 4→2). Recorded as completed. Detection is unchanged: if a fault did outlast the bake time, the safeguard would still report healthy.",
+    "short": "Safeguard checks health early",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add rollout stages and lengthen bake time per stage so it exceeds the worst-case crash latency, about 5 minutes here",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Test the protection system with a delayed-crash fault in pre-production and prove it halts the push",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page on a crash signal from the data plane even when the propagation monitor reports healthy",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Block promotion to the next stage by hand when a data-plane crash appears inside bake time",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Roll the stage back to the last known good configuration and let the bake timer restart from zero",
+      "basis": "change-mgmt"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -531,7 +650,54 @@
      "O": 3,
      "D": 8
     },
-    "revisedRationale": "Cells confine a bad configuration to a fraction of the fleet, so the same fault becomes a partial outage (S 9→6). The dossier records this as planned for June 2026 with no confirmation, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Cells confine a bad configuration to a fraction of the fleet, so the same fault becomes a partial outage (S 9→6). The dossier records this as planned for June 2026 with no confirmation, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Global push, no cell boundary",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Segment edge sites into micro-cells so a bad configuration reaches one cell, trading a little consistency for survivability",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Cut propagation time from 45 to about 15 minutes only after cell boundaries exist, so speed does not widen the blast radius",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on the share of edge sites holding a new configuration version, and page when it passes the first cell",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order a global freeze of configuration propagation early, because spread is complete within minutes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Name the services in the dependency chain, including Microsoft 365 and Entra ID, in the first status post",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-enable propagation one cell at a time after the corrected LKG is confirmed on every site",
+      "basis": "change-mgmt"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -578,7 +744,47 @@
      "O": 3,
      "D": 8
     },
-    "revisedRationale": "If a bad configuration crashes an isolated worker, serving continues on the previous configuration and customers see at most degraded configuration updates (S 9→5). Recorded as planned for January 2026, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "If a bad configuration crashes an isolated worker, serving continues on the previous configuration and customers see at most degraded configuration updates (S 9→5). Recorded as planned for January 2026, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Config parsed on serving nodes",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Move configuration processing into isolated worker process instances apart from traffic-serving instances",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert separately on worker-process crashes and on serving-process crashes so a sacrificial worker failing is seen",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Kill the worker and keep the serving process running while the bad configuration is held back",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Keep a fallback origin or DNS path outside AFD for critical hostnames and switch to it when AFD times out",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart serving instances only after the offending configuration is removed from their local cache",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -633,7 +839,48 @@
      "O": 6,
      "D": 8
     },
-    "revisedRationale": "Recovery of about an hour is recorded as achieved, so a repeat is a shorter major degradation rather than hours of outage (S 8→7). The 10-minute target was dated March 2026 and is not confirmed in the dossier, so no further reduction is claimed."
+    "revisedRationale": "Recovery of about an hour is recorded as achieved, so a repeat is a shorter major degradation rather than hours of outage (S 8→7). The 10-minute target was dated March 2026 and is not confirmed in the dossier, so no further reduction is claimed.",
+    "short": "Slow fleet recovery ~4.5 h",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Cache last-known-good customer configuration locally on each edge site so recovery needs a reload rather than a rebuild",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Run a drill that measures time from corrected LKG to a healthy fleet and record the result against the 10-minute target",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Block all customer configuration changes before redeploying the LKG, as was done at 17:30 UTC",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers recovery is phased on purpose to avoid overloading the fleet, with expected times per stage",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Reload the corrected LKG across edge sites in batches, restore DNS first, then automatic traffic management",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -680,9 +927,51 @@
      "O": 3,
      "D": 8
     },
-    "revisedRationale": "With active-active failover the Portal stays reachable during an AFD failure, leaving limited impact (S 7→4). Recorded as completed."
+    "revisedRationale": "With active-active failover the Portal stays reachable during an AFD failure, leaving limited impact (S 7→4). Recorded as completed.",
+    "short": "Portal behind failing AFD",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Migrate the Azure Portal and other critical dependents to active-active failover so they can leave a degraded AFD",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Probe the Portal through AFD and through the alternate path separately, and page when the AFD path fails",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Fail the Portal away from AFD to alternate infrastructure, as was done at 17:26 UTC, on the first AFD alert",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell operators and customers how to reach the management plane while AFD is degraded",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Move your own management tooling off the failing edge path and confirm access before resuming changes",
+      "basis": "sre-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "AFD down globally · ~8h24m"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -697,5 +986,127 @@
    "quote": "00:05 UTC, 30 Oct 2025"
   }
  },
- "durationBasis": "AFD crashes/customer impact 15:41 UTC 29 Oct → full mitigation 00:05 UTC 30 Oct (8h24m)"
+ "durationBasis": "AFD crashes/customer impact 15:41 UTC 29 Oct → full mitigation 00:05 UTC 30 Oct (8h24m)",
+ "response": {
+  "roles": {
+   "first-responder": "Azure monitoring raised secondary impact alerts — no person is named",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "Azure Front Door engineers who investigated and moved the Portal — not named",
+   "change-owner": "Azure Front Door engineering, owner of the configuration pipeline",
+   "service-recovery": "Engineers who corrected and redeployed the LKG configuration",
+   "comms": "Azure status page and Azure Service Health publishers",
+   "customer": "AFD and Azure CDN customers, plus Microsoft first-party services behind AFD"
+  },
+  "recorded": [
+   {
+    "role": "first-responder",
+    "soe": 6,
+    "quote": "Engineering incident investigation commences following secondary impact alerts",
+    "did": "Starts the engineering investigation at 15:48 UTC on secondary impact alerts; the config-safety detector reported healthy"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "Examination of AFD configuration changes begins",
+    "did": "Narrows the search to the configuration-propagation pipeline at 16:15 UTC"
+   },
+   {
+    "role": "comms",
+    "soe": 8,
+    "quote": "First public communication posted to the Azure status page",
+    "did": "Posts the first public notice at 16:18 UTC, about 37 minutes after customer impact began"
+   },
+   {
+    "role": "comms",
+    "soe": 9,
+    "quote": "Targeted communications to impacted customers sent via Azure Service Health",
+    "did": "Sends targeted notices to impacted customers through Azure Service Health at 16:20 UTC"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 10,
+    "quote": "Engineers begin manually updating the 'Last Known Good' (LKG) configuration",
+    "did": "Starts removing the problematic configurations by hand at 17:10 UTC after the automatic safeguard failed"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 11,
+    "quote": "Azure Portal 'failed away from Azure Front Door' onto alternate infrastructure",
+    "did": "Fails the Azure Portal away from AFD at 17:26 UTC to keep a management plane"
+   },
+   {
+    "role": "change-owner",
+    "soe": 12,
+    "quote": "All AFD customer configuration changes/propagation blocked",
+    "did": "Blocks all customer configuration changes at 17:30 UTC so corrupt metadata cannot re-ignite the fleet"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 13,
+    "quote": "Deployment of the corrected LKG configuration is initiated across the edge fleet",
+    "did": "Starts deploying the corrected LKG configuration at 17:40 UTC; edge sites reload from 17:50 UTC"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "AFD global outage, ~8h24m",
+  "bones": [
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Cross-build validation gap",
+      "factor": 0
+     },
+     {
+      "label": "Rollout bake time too short",
+      "factor": 1
+     },
+     {
+      "label": "Version skew unguarded",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Config on serving instances",
+      "factor": 2
+     },
+     {
+      "label": "Global push, no cell boundary",
+      "factor": 3
+     },
+     {
+      "label": "Portal behind AFD",
+      "mode": "FM-07"
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Latent data-plane bug",
+      "mode": "FM-02"
+     },
+     {
+      "label": "Slow data-plane reload",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Safeguard checks health early",
+      "mode": "FM-03"
+     }
+    ]
+   }
+  ]
+ }
 }

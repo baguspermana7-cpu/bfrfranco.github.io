@@ -400,6 +400,49 @@
        "i": 4
       }
      }
+    ],
+    "short": "Drifting anchor on cables",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Designate an anchoring-exclusion zone off Yemen and push mariner advisories through the IMO and coastal states",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch AIS for any vessel stopped or drifting inside the cable corridor and alert the owners' NOC at once",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "authority",
+      "phase": "contain",
+      "do": "Tow or salvage a disabled not-under-command ship from a cable corridor before its anchor drags, as the salvage protocol asks",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Pre-warn the cable owners of the drift track and re-groom critical wavelengths off the cables on its path",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Locate each break by OTDR and mark the fault coordinates for the repair vessel",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -452,6 +495,52 @@
        "src": "improvement",
        "i": 0
       }
+     }
+    ],
+    "short": "Three cables, one corridor",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Commission a route-diversity study and fund at least one Europe-Asia path that avoids Bab-el-Mandeb",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Map each system's physical route against the others and flag every shared corridor in the carrier risk register",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "At the first cut, check which other systems share the corridor and treat them as at risk",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Shift traffic from the shared corridor onto non-Red-Sea or terrestrial capacity before more cables are lost",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Re-home critical circuits to a path outside the corridor and stop relying on logical diversity alone",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore the cut systems in order of capacity carried",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -507,6 +596,42 @@
        "i": 0
       }
      }
+    ],
+    "short": "Surviving paths run short",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Add capacity on a route that does not share the corridor so spare headroom survives a multi-cable loss",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Trend utilisation on surviving cables and terrestrial paths and alert when it passes a set headroom level",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Re-groom wavelengths and drop low-priority traffic classes first, so premium traffic keeps its path",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hold maintenance on the surviving paths during the outage",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Return traffic to the repaired cables in steps and check headroom at each step",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -557,6 +682,56 @@
        "i": 3
       }
      }
+    ],
+    "short": "Repair permits refused",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Negotiate a standing permitting and safe-passage regime for repair ships in contested Yemeni waters",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Start the permit request on the day of the cut and log the date each refusal arrives",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Escalate the refused permit to governments and the UN through the consortium, not through the ship operator",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "vendor",
+      "phase": "contain",
+      "do": "Ask for naval escort and a de-conflicted route for the repair ship alongside the permit",
+      "basis": "nims-ics",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Repair AAE-1 first once permits come, then the remaining two cables",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Plan on months, not weeks, of reduced capacity and re-home critical circuits",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     }
     ]
    },
    {
@@ -597,6 +772,42 @@
        "src": "coe",
        "i": 2
       }
+     }
+    ],
+    "short": "Repair vessel held by war risk",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Pre-position a war-risk-insured repair vessel and spare cable and repeater stock for the Red Sea",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Check the repair ship's position, insurance cover and spares inventory against the region quarterly",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Decide at once whether to wait for the security situation or send the ship with escort",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "authority",
+      "phase": "contain",
+      "do": "Provide naval-security clearance for the repair ship to work in the zone",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Mobilise the cable ship with spares and complete the repair as soon as access allows",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -644,10 +855,158 @@
        "i": 5
       }
      }
+    ],
+    "short": "No published fault forensics",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Publish fault coordinates, depth and sever-versus-shunt data for each cut",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Log the OTDR distance and time for every break at the moment of detection, to support later attribution",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Recover the damaged cable ends and photograph anchor marks during the repair",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Compare fault coordinates with the vessel's recorded track to confirm or rule out the anchor",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Issue the consortium's findings so the cause stops being only 'generally accepted'",
+      "basis": "itil-incident"
+     }
     ]
+   }
+  ],
+  "impactShort": "3 cables cut, ~25% Asia-Europe capacity"
+ },
+ "durationStatus": "not-established",
+ "durationBasis": "Cables cut 24 Feb 2024; AAE-1 repaired 'July 2024', no day given; end-user traffic loss ~0.",
+ "response": {
+  "roles": {
+   "first-responder": "Cable operators' line-monitoring teams, plus outside observers Kentik, Cloudflare Radar and NetBlocks",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "Operators such as HGC who rerouted traffic and re-groomed wavelengths",
+   "safety": "The crew of container ship Lobivia, who took the 24 Rubymar crew off",
+   "service-recovery": "The cable repair teams that fixed AAE-1 in July 2024; the operator is not named in the SOE",
+   "vendor": "Cable owners and consortia of AAE-1, EIG and Seacom/TGN-EA",
+   "authority": "The Yemeni Government, which refused the repair permits, and coastal states",
+   "customer": "East African and Gulf carriers and users that depend on the three cables"
+  },
+  "recorded": [
+   {
+    "role": "safety",
+    "soe": 1,
+    "quote": "All 24 crew evacuated by the container ship Lobivia",
+    "did": "Takes all 24 crew off the disabled Rubymar, which is left adrift with its anchor down"
+   },
+   {
+    "role": "first-responder",
+    "soe": 5,
+    "quote": "Loss observed out-of-band via BGP routing changes, latency and traffic monitoring by Kentik (Doug Madory), Cloudflare Radar and NetBlocks",
+    "did": "Spot the loss from routing, latency and traffic data, not from any facility alarm"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "Operator HGC reported rerouting affected traffic onto surviving cables and terrestrial paths",
+    "did": "HGC moves affected traffic onto surviving cables and terrestrial paths"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 8,
+    "quote": "Affected wavelengths dropped and re-groomed onto surviving fibres",
+    "did": "Operators drop and re-groom wavelengths onto surviving fibres and parallel routes"
+   },
+   {
+    "role": "authority",
+    "soe": 13,
+    "quote": "pending due to the refusal of permits from the Yemeni Government",
+    "did": "The Yemeni Government refuses permits, so AAE-1 repairs are still pending by 13 May 2024"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 14,
+    "quote": "repairs were successfully carried out on the AAE-1 cable",
+    "did": "AAE-1 repaired in July 2024, about 4-5 months after the cut"
    }
   ]
  },
- "durationStatus": "not-established",
- "durationBasis": "Cables cut 24 Feb 2024; AAE-1 repaired 'July 2024', no day given; end-user traffic loss ~0."
+ "fishbone": {
+  "effect": "3 cables cut; repair took ~5 months",
+  "bones": [
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Three systems, one corridor",
+      "factor": 0
+     },
+     {
+      "label": "No anchoring-exclusion zone",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Abandoned ship left adrift",
+      "factor": 2
+     },
+     {
+      "label": "No safe-passage regime",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Narrow seabed corridor",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Houthi missile strike",
+      "factor": 4
+     },
+     {
+      "label": "Permits refused",
+      "mode": "FM-04"
+     },
+     {
+      "label": "War-risk repair delay",
+      "mode": "FM-05"
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -11,6 +11,46 @@ release sections rather than semver.
 
 ---
 
+## v3.18.0 — 2026-10-11
+
+### Incident library: who did what, who should, and two figures the diagram engine draws
+
+Owner: *"sampai level action misal first responder ngapain, on scene commander dll semua roles terlihat
+fmeanya bener2 comprehensive"*, *"tambahkan blok diagram, fishbone"*, no filler, no AI-design slop.
+
+**Added — response by role on every dossier** (`tools/incidents_response.py`). Two layers that make
+different claims and are never mixed:
+- *Recorded* — what a role actually did. Each of the 263 actions points at a sequence-of-events entry and
+  carries a quote that must be a verbatim substring of it; if the source does not say who acted, nothing is
+  credited. A role the dossier declares but the record never shows acting is shown as **silent**.
+- *Playbook* — analyst guidance per failure mode: 1,524 actions, ≥4 per mode from ≥3 roles across detect,
+  contain and recover, each citing a named practice (NIMS/ICS, NFPA 1561/75/72/855/70E/110, EN 50110-1,
+  ASHRAE TC 9.9, Uptime OS, ISO 22301, ISO/IEC 27035, NIST SP 800-61/800-34, SRE incident management,
+  ITIL 4, change management) or the dossier's own COE / improvement / lesson. No clause numbers.
+- Rendered as a role × phase matrix, a role list with recorded / playbook per role, a "Who acts" block in
+  every FMEA row and role tags on the sequence of events. The hub adds the library view: an incident commander is declared in 43 dossiers and seen acting in 1 — and that one is the Dutch public safety region at GRIP 2, not the operator; a first responder in 41 and seen acting in 12 — across 43 public post-mortems, the person in charge of the response is almost never on the record.
+
+**Added — two engine figures per dossier** (`tools/build-incident-diagrams.mjs`, RZ diagram engine, IEC/ISA
+glyphs): a *failure chain* — FMEA modes in the order the record first shows them, latent conditions apart,
+ending in the outcome (a one-column variant replaces it under 640 px) — and a *fishbone* of contributing
+factors by category, each label pointing at the factor or mode it stands for. Any engine warning fails
+the build; a zone-label overflow check was added because the engine sizes nodes but not zone eyebrows.
+
+**Changed — page structure.** Sticky section nav with scroll-spy; a six-field fact sheet; the root
+cause opens with its lead sentences and keeps the full narrative one click away; analysis and the
+technical deep-dive are collapsed; COE is a table.
+
+**Removed — filler.** The generic cascade box (`Trigger → operator → services`) and the SOE dot strip,
+which was clipped at the column edge and repeated the list beneath it.
+
+**Fixed — the hub map showed "API KEY REQUIRED" on every tile.** CARTO now answers keyless requests with
+that image; tiles moved to Esri World Dark Gray Canvas. (`dc-market-tracker.html` uses the same CARTO URL
+and is not in this release.) KPI tiles lost their top stripe and hover lift; recent-incident titles are no
+longer cut at 52 characters.
+
+**Gates** `tools/test-incidents-response.py --strict --require-all` and
+`node tools/build-incident-diagrams.mjs --check`, both in the ship gate.
+
 ## v3.17.3 — 2026-10-11
 
 ### Incident magnitude notes agree with the measured durations

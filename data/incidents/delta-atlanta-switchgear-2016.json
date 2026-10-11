@@ -416,6 +416,58 @@
        "i": 0
       }
      }
+    ],
+    "short": "Test transfer ignites fire",
+    "symbol": "switchgear",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Before any live generator transfer, take thermography and insulation-resistance readings on the switchgear and check its maintenance records",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Run the test transfer in stages and under controlled load, not as one live switch",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Station a person at the switchgear during the transfer with a means to call it off and the fire alarm to hand",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Abort the transfer and open the sources feeding the power-control room on any smoke, noise or arc",
+      "basis": "en-50110"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Call the fire service at the first sign of fire, then name the person who confirms de-energisation",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Do not re-energise the room or repeat the test until the cause has been found and written down",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
     ]
    },
    {
@@ -469,6 +521,54 @@
        "src": "improvement",
        "i": 2
       }
+     }
+    ],
+    "short": "Fire protection undocumented",
+    "symbol": "smokeDetector",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Install and verify very early smoke detection and fixed suppression in the power-control room, with documented discharge tests",
+      "basis": "nfpa-76",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Validate the detection and fixed suppression design and performance of the power-control room",
+      "basis": "nfpa-75",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat a fire alarm in the power-control room as a call-out to the fire service, not as an item to inspect first",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order de-energisation of the room on fire alarm and brief the fire service on what is still live",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Hold water off live gear until the site confirms isolation",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "safety",
+      "phase": "recover",
+      "do": "Keep the room closed until the fire service hands it back, and record detection and suppression performance",
+      "basis": "nfpa-75"
      }
     ]
    },
@@ -524,6 +624,58 @@
        "i": 4
       }
      }
+    ],
+    "short": "Fire kills feed, backups dead",
+    "symbol": "transformer",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Add selective breaker coordination and surge isolation so an upstream fault trips locally and cannot destroy the transformer",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Audit the topology so no single switchgear or transfer switch can sever a feed and block generator failover",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "On loss of one feed, check at once that the generator and the second feed are still connected",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Direct one electrician to establish which sources are live and which breakers are open before any re-closing",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "utility",
+      "phase": "contain",
+      "do": "Confirm to the site whether the utility supply is healthy, so the fault is placed inside or outside the meter",
+      "basis": "nims-ics",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Restore power by the second feed or the generator only after the damaged transformer is isolated",
+      "basis": "nfpa-70e"
+     }
     ]
    },
    {
@@ -573,6 +725,58 @@
        "i": 1
       }
      }
+    ],
+    "short": "About 300 servers single-fed",
+    "symbol": "pdu",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Trace every PSU to independent PDUs by physical check and automated power-path mapping, across all 7,000 servers",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Correct the roughly 300 single-fed servers and audit dual-cord A/B integrity",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Run pull-the-plug failover drills on one feed at a time and log any server that goes down",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Rank the single-fed servers by function and bring those that carry check-in and flight operations up first",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hold the restart order until the power path for each server group has been confirmed",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-cable single-fed servers to an alternate PDU and prove it by failing the feed over",
+      "basis": "uptime-os"
+     }
     ]
    },
    {
@@ -614,6 +818,50 @@
        "src": "improvement",
        "i": 5
       }
+     }
+    ],
+    "short": "Failed nodes stop the platform",
+    "symbol": "fabric",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Re-architect for fault isolation and degraded-mode operation, so loss of about 4% of servers stays partial",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "Alarm when a node group leaves the cluster and when survivors lose contact with it",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Give the platform team a live list of unpowered racks, so lost contact between servers is matched to the power fault",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Cut the surviving servers off from the failed group to stop them stalling on it",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Run the reservation platform in degraded mode on the surviving servers where this is possible",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Reconnect failed nodes in dependency order and confirm check-in, baggage and kiosks one by one",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -671,6 +919,49 @@
        "i": 6
       }
      }
+    ],
+    "short": "Manual reboots, green screen",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Move the core platform to a geographically redundant system with tested automatic failover",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 6
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "Time each stage of a cold restart of the reservation platform in a drill and publish the real total",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Switch airport staff to manual check-in and handwritten boarding passes as soon as only the green-screen interface is up",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Reboot the 500 servers in the dependency order the platform needs",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring the full interface back after the green-screen service is stable and clear the backlog of flights",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Lift the ground stop only when the airline confirms it can handle departures",
+      "basis": "iso-22301"
+     }
     ]
    },
    {
@@ -704,9 +995,49 @@
       "quote": "The physical failure mode is therefore officially unverified."
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "No published root cause",
+    "playbook": [
+     {
+      "role": "incident-commander",
+      "phase": "prevent",
+      "do": "Commission a formal root-cause analysis with component forensics and a maintenance-record review",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 7
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Preserve the failed gear, relay settings and test records from the power-control room",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Log each corrective action in a tracked register with an owner and date",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 7
+      }
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Publish the failed component's make, age and failure mechanism so other operators can learn from it",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "2,100 flights cancelled · ~$150M"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -721,5 +1052,93 @@
    "quote": "2016-08-08 08:30 EST Systems operational again"
   }
  },
- "durationBasis": "Fire/power loss 02:30 EST 8 Aug → systems operational 08:30 EST (ground stop lifted 08:40)"
+ "durationBasis": "Fire/power loss 02:30 EST 8 Aug → systems operational 08:30 EST (ground stop lifted 08:40)",
+ "response": {
+  "roles": {
+   "first-responder": "No first responder is named; the record does not say who found the fire",
+   "incident-commander": "No incident commander is named in the record",
+   "electrical": "Delta operators who ran the scheduled generator test transfer — not named",
+   "fire-service": "Firefighters are mentioned only in an unverified retrospective; no fire service is named",
+   "safety": "No evacuation or injury is reported in any source",
+   "utility": "Georgia Power, the utility feeding the Atlanta headquarters site",
+   "service-recovery": "Delta IT staff who rebooted servers and restored the platform — not named",
+   "authority": "The FAA, which imposed and then lifted the ground stop"
+  },
+  "recorded": [
+   {
+    "role": "electrical",
+    "soe": 0,
+    "quote": "Operators perform a scheduled load transfer toward the backup generator for testing",
+    "did": "Run a scheduled transfer to the backup generator for testing; the fire follows within minutes"
+   },
+   {
+    "role": "utility",
+    "soe": 10,
+    "quote": "Georgia Power crews are reported to have responded on site and worked with Delta",
+    "did": "Respond on site and work with Delta; the utility says there was no area outage (as reported)"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 12,
+    "quote": "500 servers had to be rebooted",
+    "did": "Reboot about 500 servers by hand to bring the platform back online"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 14,
+    "quote": "It wasn't until 8:30 AM, six hours later, that the Delta systems were once again operational.",
+    "did": "Systems are operational again at 08:30, six hours after the fire"
+   },
+   {
+    "role": "authority",
+    "soe": 15,
+    "quote": "the ground stop was lifted at 8:40 AM on Monday",
+    "did": "FAA lifts the ground stop at 08:40; cancellations and delays continue"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Delta platform down, 2,100 cancelled",
+  "bones": [
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Live generator test transfer",
+      "factor": 1
+     },
+     {
+      "label": "Wiring gap not caught",
+      "factor": 0
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Module surge (as reported)",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "One event defeats dual feeds",
+      "factor": 2
+     },
+     {
+      "label": "Servers tightly coupled",
+      "factor": 3
+     },
+     {
+      "label": "Fire protection undocumented",
+      "factor": 7
+     }
+    ]
+   }
+  ]
+ }
 }

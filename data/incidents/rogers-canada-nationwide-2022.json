@@ -347,6 +347,42 @@
        "i": 3
       }
      }
+    ],
+    "short": "ACL filter removed in change",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Lab-test the exact phase-six configuration, including the filter removal, and require a peer sign-off before it reaches production",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Apply the change to one distribution router first and watch its route count against the ~10,000 norm before the next",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm the NOC when a distribution router advertises more routes to the core than a set ceiling, well under 900,000",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Stop the upgrade on any alarm and order the change owner to restore the filter on the router in question",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "change-owner",
+      "phase": "recover",
+      "do": "Reapply the ACL policy filter on the distribution routers once management access is back",
+      "basis": "change-mgmt"
+     }
     ]
    },
    {
@@ -391,6 +427,42 @@
        "src": "coe",
        "i": 1
       }
+     }
+    ],
+    "short": "Core routers lack route limits",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Configure max-prefix limits and control-plane policing on every core router",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on core-router CPU and route-table growth rate, not only on link loss",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Shut the BGP sessions from the flooding distribution router so the core stops receiving the routes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare a national incident and make clearing the flooding distribution routers the first step",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Reboot the crashed core routers only once the flood source is isolated",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -450,7 +522,43 @@
      "O": 4,
      "D": 8
     },
-    "revisedRationale": "With separate cores, a fault of this kind would take down one service family rather than both (S 9→8; still a full outage of a major service for hours). O and D are unchanged because separation does not stop the triggering fault or detect it. Rogers' pledge is recorded as committed post-incident, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "With separate cores, a fault of this kind would take down one service family rather than both (S 9→8; still a full outage of a major service for hours). O and D are unchanged because separation does not stop the triggering fault or detect it. Rogers' pledge is recorded as committed post-incident, not as completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Wireless, wireline share core",
+    "playbook": [
+     {
+      "role": "crisis",
+      "phase": "prevent",
+      "do": "Fund and finish the physical split of the wireless and wireline cores",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Track per-service health (mobile, home internet, 9-1-1 path) separately so a shared-core fault is seen as one event",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order the unaffected service family to be cut off from the failing core if the split exists",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Say at once that mobile, internet and 9-1-1 are all down, rather than service by service",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore the services that carry 9-1-1 first, then mobile, then fixed lines",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -494,6 +602,46 @@
        "src": "coe",
        "i": 2
       }
+     }
+    ],
+    "short": "Management path rides the core",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Build a management path on a separate provider and redundant NOC links, independent of the Rogers data network",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Test out-of-band access to core nodes monthly with the main network deliberately disabled",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Switch the response team to the out-of-band path and phones, since the VPN to core nodes is gone",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Mobilise engineers on site to the core nodes when remote access fails",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Regain management reach before touching the routers, then roll back the filter change",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -545,6 +693,42 @@
        "i": 3
       }
      }
+    ],
+    "short": "Slow, flapping core rebuild",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Write and rehearse a rollback for each phase of the core upgrade, with timings",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch BGP announcements and withdrawals during the rebuild and flag flapping as a setback",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Re-advertise prefixes in small groups and pause when a group flaps, as the 15:45 UTC withdrawal showed",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Set fixed checkpoints for the rebuild and report restored traffic percentage at each",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Purge bad routing state and rebuild core route tables in stages until traffic is stable",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -593,6 +777,42 @@
        "i": 4
       }
      }
+    ],
+    "short": "No 9-1-1 roaming fallback",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Require tested inter-carrier emergency roaming so 9-1-1 calls fall back to another network",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Run a test 9-1-1 call from a Rogers handset every few minutes and page on failure",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Tell 9-1-1 centres and the CRTC at once that Rogers mobiles cannot reach 9-1-1",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers to use a landline or another carrier's phone for emergencies",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore the 9-1-1 call path before general mobile service",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -622,9 +842,46 @@
       "quote": "mobile, home Internet, enterprise, 9-1-1, and Interac dropped simultaneously"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Interac depends on Rogers",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Require payment networks like Interac to hold a second carrier path",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Let merchants accept cash or offline card mode when Interac fails",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Monitor the Interac link from the carrier side and alert when transaction volumes drop",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell merchants and Interac of the outage so they can switch to alternate processing",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore the Interac connection and confirm debit transactions clear at several merchants",
+      "basis": "itil-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "12M+ customers, ~26 h outage"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -639,5 +896,115 @@
    "quote": "07:00 EDT"
   }
  },
- "durationBasis": "Customer impact 04:58 EDT 8 Jul → full restoration 07:00 EDT 9 Jul (CRTC window)."
+ "durationBasis": "Customer impact 04:58 EDT 8 Jul → full restoration 07:00 EDT 9 Jul (CRTC window).",
+ "response": {
+  "roles": {
+   "first-responder": "No on-call engineer is named; Rogers was blind and Cloudflare saw the withdrawal",
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "Rogers network staff running phase six of the seven-phase core upgrade",
+   "ops-lead": "Rogers employees trying to mobilise a team with the VPN to core nodes down",
+   "service-recovery": "Rogers responders who rebuilt the core route tables in stages",
+   "comms": "Rogers customer communications — not in the sequence of events",
+   "crisis": "Rogers executive leadership, which pledged $261M for separate networks",
+   "authority": "CRTC, with its independent Xona assessment, and Minister Champagne",
+   "customer": "More than 12 million Rogers customers, Interac users and 9-1-1 callers"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "Rogers staff remove the Access Control List (ACL) policy filter",
+    "did": "Remove the ACL policy filter from the distribution routers during phase six of seven, the trigger"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 4,
+    "quote": "hampering employees' ability to mobilize a team and identify the issue",
+    "did": "Cannot mobilise a team or find the fault because the VPN to core nodes went down with the network"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 9,
+    "quote": "responders must regain management reach, then isolate the flooding distribution routers, purge bad routing state, and rebuild core route tables in stages",
+    "did": "Regain management reach, isolate the flooding routers, purge bad routing state and rebuild core tables in stages"
+   },
+   {
+    "role": "authority",
+    "soe": 14,
+    "quote": "CRTC dates full restoration",
+    "did": "Dates full restoration at 07:00 EDT on 9 July, about 26 hours after onset"
+   },
+   {
+    "role": "authority",
+    "soe": 15,
+    "quote": "Minister Champagne sets a 60-day deadline for carriers to agree mutual assistance and emergency roaming",
+    "did": "Sets a 60-day deadline for carriers to agree mutual assistance and emergency roaming"
+   },
+   {
+    "role": "crisis",
+    "soe": 15,
+    "quote": "Rogers pledges $261 million to physically separate its wireless and wireline networks",
+    "did": "Pledges $261M to physically separate its wireless and wireline networks"
+   },
+   {
+    "role": "customer",
+    "soe": 6,
+    "quote": "a Hamilton man reportedly could not call 911 as his sister was dying",
+    "did": "A Hamilton man reportedly cannot reach 911 for his dying sister"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "National outage, 12M+ customers",
+  "bones": [
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "ACL filter removed in change",
+      "factor": 0
+     },
+     {
+      "label": "Change not lab-tested",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "No core overload protection",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "One converged core",
+      "factor": 3
+     },
+     {
+      "label": "No out-of-band management",
+      "factor": 4
+     },
+     {
+      "label": "No 9-1-1 roaming failover",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "No staged rollback ready",
+      "mode": "FM-05"
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -329,7 +329,49 @@
      "O": 2,
      "D": 6
     },
-    "revisedRationale": "The permanent fix removes this specific defect, so this trigger can no longer produce the outage (O 4→2). It is not scored 1 because the class of latent, configuration-gated bugs remains and is carried by FM-02. S and D are unchanged: another such bug would spread as widely and be caught the same way. The fix is recorded as deployed; the dossier does not record verification beyond that."
+    "revisedRationale": "The permanent fix removes this specific defect, so this trigger can no longer produce the outage (O 4→2). It is not scored 1 because the class of latent, configuration-gated bugs remains and is carried by FM-02. S and D are unchanged: another such bug would spread as widely and be caught the same way. The fix is recorded as deployed; the dossier does not record verification beyond that.",
+    "short": "Latent bug on valid config",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Test the code path behind each customer configuration state, including rare ones, before it is deployed",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on edge error rate per point of presence and page the on-call engineer within the first minute",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident, assign a lead to find the triggering configuration, and set the status-update cadence",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Find the customer configuration that preceded the error surge and disable it across the fleet",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Force the healthy state back to the edge nodes and verify error rates are normal region by region",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Post status updates until the incident is marked resolved, naming the cause when known",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -380,6 +422,45 @@
        "src": "improvement",
        "i": 2
       }
+     }
+    ],
+    "short": "QA misses rare config state",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add config-permutation testing and fuzzing so states gated on rare input are exercised before release",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Run the QA post-mortem on why the config-triggerable bug was not found before the 12 May deployment",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch the error-handling path in the edge software for first hits of unexercised code",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Pause further deployments of the same software version until the faulty path is understood",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Roll the fleet back or forward to the fixed version once the bug is found",
+      "basis": "change-mgmt"
      }
     ]
    },
@@ -432,6 +513,46 @@
        "src": "improvement",
        "i": 4
       }
+     }
+    ],
+    "short": "Config spreads with no canary",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Roll out configuration to a canary set of edge nodes first and stop the rollout on error rise",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Add a circuit-breaker that halts global configuration propagation when edge errors cross a threshold",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Compare error rates between canary and rest of fleet after each configuration push",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order configuration propagation frozen until the error surge is understood",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Revert the last propagated configuration across the edge, region by region",
+      "basis": "change-mgmt"
      }
     ]
    },
@@ -489,6 +610,46 @@
        "i": 3
       }
      }
+    ],
+    "short": "Mitigation only by hand",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Add automated isolation of a configuration that causes errors, so it does not wait on a human",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Track detection-to-recovery time per incident and report against the 49-minute baseline",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Split the team: one group finding the trigger, another preparing the fleet-wide disable",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Disable the identified customer configuration and force the healthy state on the fleet",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Deploy the permanent bug fix and track it as a separate milestone from the config-disable",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     }
     ]
    },
    {
@@ -527,9 +688,46 @@
       "i": 4
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Sole-CDN sites go dark",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Put a second CDN or an origin fallback behind your DNS so traffic can move away from one provider",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Probe your site from outside through the CDN and directly at origin and alarm on a mismatch",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Switch DNS or traffic steering to the secondary path and lower TTL ahead of time",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers on the status page which regions and services are affected",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Return traffic to the primary CDN after its status shows resolved and error rates are steady",
+      "basis": "sre-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "85% of edge errors · 49 min to 95%"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -544,5 +742,110 @@
    "quote": "11:00 UTC"
   }
  },
- "durationBasis": "Onset 09:47 UTC → majority of services recovered 11:00 UTC (95% normal by 10:36, 49 min)."
+ "durationBasis": "Onset 09:47 UTC → majority of services recovered 11:00 UTC (95% normal by 10:36, 49 min).",
+ "response": {
+  "roles": {
+   "first-responder": "Fastly monitoring and on-call engineers — not individually named",
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "Fastly engineers who began the 12 May software deployment — not named",
+   "ops-lead": "Fastly Engineering, who identified and disabled the triggering configuration",
+   "service-recovery": "Fastly Engineering, who built and deployed the permanent fix",
+   "comms": "Fastly status page and the post-mortem by Nick Rockwell",
+   "customer": "The unnamed customer who pushed the valid configuration, and sites such as Reddit, gov.uk and the BBC"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "Fastly begins a software deployment that introduces the latent bug",
+    "did": "Begins the 12 May deployment that carries the dormant bug to the global fleet"
+   },
+   {
+    "role": "customer",
+    "soe": 1,
+    "quote": "a customer pushes a valid configuration change meeting the 'specific circumstances,'",
+    "did": "Pushes a valid configuration change that activates the bug at 09:47 UTC"
+   },
+   {
+    "role": "first-responder",
+    "soe": 3,
+    "quote": "Fastly monitoring identifies the global disruption 'within one minute'",
+    "did": "Monitoring flags the network-wide error surge at 09:48 UTC"
+   },
+   {
+    "role": "comms",
+    "soe": 5,
+    "quote": "Fastly publishes a public status post acknowledging the incident",
+    "did": "Posts a public status update about 11 minutes after onset"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "Fastly Engineering identifies the customer configuration as the cause",
+    "did": "Identifies the customer configuration at 10:27 UTC, then moves to isolate and disable it"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 8,
+    "quote": "the triggering configuration is disabled and healthy state is forced across the fleet",
+    "did": "Disables the triggering configuration; services begin to recover at 10:36 UTC"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 13,
+    "quote": "We created a permanent fix for the bug and began deploying it at 17:25",
+    "did": "Deploys the permanent fix across the network from 17:25 UTC"
+   },
+   {
+    "role": "comms",
+    "soe": 14,
+    "quote": "This outage was broad and severe, and we're truly sorry for the impact to our customers",
+    "did": "Apologises and commits to examine why QA missed the bug and to cut remediation time"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "85% of Fastly edge returned errors",
+  "bones": [
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "QA missed the bug",
+      "factor": 0
+     },
+     {
+      "label": "27 days latent in production",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "No canary or circuit-breaker",
+      "factor": 2
+     },
+     {
+      "label": "Valid config hits fatal path",
+      "factor": 3
+     },
+     {
+      "label": "Manual-only containment",
+      "mode": "FM-04"
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Sites on a single CDN",
+      "factor": 4
+     }
+    ]
+   }
+  ]
+ }
 }

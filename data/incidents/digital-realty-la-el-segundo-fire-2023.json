@@ -326,6 +326,55 @@
        "i": 4
       }
      }
+    ],
+    "short": "Rack ignition, no cause",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Add rack-level current and arc monitoring and thermal checks to the colo inspection round",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat a rack current or temperature excursion in a customer cabinet as a call-out: go to the row, look, and escalate to the fire service on any smoke",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Open the rack feed and PDU breaker of the affected cabinet before the sprinkler head trips",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident and call the fire service at the first confirmed smoke, before the sprinkler discharges",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Obtain the fire department report and keep the burned rack's hardware for examination",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Photograph and tag the origin rack and its PDU and cabling before clean-up so the ignition source can be identified",
+      "basis": "nfpa-1561"
+     }
     ]
    },
    {
@@ -376,6 +425,53 @@
        "i": 0
       }
      }
+    ],
+    "short": "No early detection on record",
+    "symbol": "aspirating",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Install very-early aspirating smoke detection over each colo row and cross-zone it to suppression",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Record the first-alarm time in the shift log and verify aspirating detector sensitivity at each inspection",
+      "basis": "nfpa-72",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "On an early-stage alarm, de-energise the single affected row from the room PDUs before heat builds",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order the row isolated and send a person to the cabinet while the alarm is still at incipient stage",
+      "basis": "nfpa-76"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Check the alarm panel history and detector records for the night and include them in the report",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
     ]
    },
    {
@@ -423,6 +519,55 @@
        "i": 1
       }
      }
+    ],
+    "short": "Water on energised servers",
+    "symbol": "sprinkler",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Replace colo-hall water sprinklers with clean-agent or double-interlock pre-action protection",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Confirm on the panel which sprinkler zone discharged and report the zone to the incident commander",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Kill power to every cabinet under the discharged zone so water does not meet live equipment",
+      "evidence": {
+       "src": "factor",
+       "i": 0
+      }
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Close the sprinkler zone valve once the fire is out, to stop further water on the racks",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Power down wet servers, do not re-energise them, and book a drying and inspection with the colo operator",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Dry the racks and floor and test each customer's hardware before power is returned",
+      "basis": "nfpa-75"
+     }
     ]
    },
    {
@@ -469,6 +614,55 @@
        "i": 2
       }
      }
+    ],
+    "short": "Unburned suite also dark",
+    "symbol": "breaker",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Re-zone life-safety power shutdown so each colo suite has its own isolation point",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "detect",
+      "do": "Check with the fire service which suite the shutdown must cover before it is carried out",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "State which suite is involved before ordering power cut, so only the fire-origin suite is isolated",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Isolate only the suite the fire service named and hold the neighbouring suite live",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Restore the unburned suite as soon as the fire service releases it, as was done for Colo 3 after about an hour",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell the Colo 3 tenants when power returns and why it was cut",
+      "basis": "iso-22301"
+     }
     ]
    },
    {
@@ -503,7 +697,46 @@
       "i": 10
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Colo 4 dark for days",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Pre-plan water-damage remediation and a spares pool so a wet suite does not wait on equipment replacement",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Count damaged racks and wet floor area on the first walk-through and report to the incident commander",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "safety",
+      "phase": "contain",
+      "do": "Control access to Colo 4 and issue escorted visits to tenants in batches, since the lobby filled on Monday",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Set a re-energisation sequence by row after inspection, and publish it to tenants",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Remediate smoke and cleaning-chemical residue before power returns, then test each circuit",
+      "basis": "nfpa-75"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Move critical workloads to a second site while Colo 4 has no power, rather than wait for an ETA",
+      "basis": "nist-800-34"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -540,6 +773,55 @@
        "src": "coe",
        "i": 3
       }
+     }
+    ],
+    "short": "Operator silent for days",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Publish a customer incident-communication protocol with status-page updates and recovery ETAs",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Log every tenant call and ticket in the first hour so unanswered queries are visible",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post the first status update within the hour naming the affected suites and the next update time",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Assign one named communications owner and give them the remediation plan each shift",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Send tenants a recovery ETA per suite and update it whenever it moves",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Escalate to the account manager in writing and request an ETA if none is given within a day",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -586,10 +868,136 @@
        "i": 4
       }
      }
+    ],
+    "short": "Cause stays undetermined",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Obtain the El Segundo / LA County fire department incident report and preserve evidence from the origin rack",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "detect",
+      "do": "Keep the detection, suppression and sprinkler test records so a maintenance chain can be confirmed or excluded",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Freeze the origin cabinet and its power feed as evidence and log who has handled it",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Commission an independent root-cause analysis and publish it to tenants",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Ask the operator for the origin-rack findings and review your own rack equipment against them",
+      "basis": "iso-22301"
+     }
     ]
+   }
+  ],
+  "impactShort": "Colo 4 dark for days · servers lost"
+ },
+ "durationStatus": "not-established",
+ "durationBasis": "Onset 01:40 PT 21 May; Colo 3 back ~1 h, Colo 4 down several days with no restoration time given.",
+ "response": {
+  "roles": {
+   "first-responder": "Digital Realty LAX12 on-site staff — no one is named; no alarm or first-sighting is recorded",
+   "incident-commander": "No incident commander is named in the record",
+   "fire-service": "The fire department that closed Colo 3 and Colo 4 — agency not named",
+   "electrical": "Whoever de-energised Colo 3 and Colo 4 — not named in the record",
+   "safety": "Digital Realty site safety and access control — not named",
+   "service-recovery": "Digital Realty facility teams remediating Colo 4 — not named",
+   "comms": "Digital Realty customer communications — described by a tenant as silent",
+   "authority": "El Segundo / LA County fire authority — no report located in the record",
+   "customer": "Colo 3 and Colo 4 tenants, including Evocative (Krypt)"
+  },
+  "recorded": [
+   {
+    "role": "fire-service",
+    "soe": 5,
+    "quote": "Fire department responds and closes two colocation suites (Colo 3 and Colo 4)",
+    "did": "Responds and closes both suites; call time, apparatus and tactics are not public"
+   },
+   {
+    "role": "customer",
+    "soe": 10,
+    "quote": "The smell of smoke was intense, and the cleaning chemicals too.",
+    "did": "A Colo 3 tenant reports the lobby packed with people waiting for Colo 4 access, a day on"
+   },
+   {
+    "role": "customer",
+    "soe": 11,
+    "quote": "Evocative (operating as Krypt, holding former VPLS/INAP assets) loses an unknown number of servers",
+    "did": "Evocative loses an unknown number of servers to water damage"
+   },
+   {
+    "role": "customer",
+    "soe": 12,
+    "quote": "I contacted Digital Reality and they were tight-lipped, only responding with empty words",
+    "did": "A tenant asks the operator for status three days on and gets no recovery ETA"
    }
   ]
  },
- "durationStatus": "not-established",
- "durationBasis": "Onset 01:40 PT 21 May; Colo 3 back ~1 h, Colo 4 down several days with no restoration time given."
+ "fishbone": {
+  "effect": "Colo 4 out for days, servers lost",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Rack ignition, cause unknown",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Water sprinkler over live IT",
+      "factor": 0
+     },
+     {
+      "label": "No early detection on record",
+      "factor": 1
+     },
+     {
+      "label": "Suites cut together",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "No maintenance record",
+      "factor": 5
+     },
+     {
+      "label": "No customer ETA protocol",
+      "factor": 4
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -363,6 +363,53 @@
        "i": 4
       }
      }
+    ],
+    "short": "Permissions change unvetted",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run change-impact analysis and staged validation on ClickHouse permission changes, including every query that reads system tables",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Deploy the permissions change to one cluster first and run the Bot Management file generator against it before widening",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "On a permissions change, diff the row count of the generated feature file against the previous one and alert on any jump",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "change-owner",
+      "phase": "contain",
+      "do": "Revert the permissions change on the cluster as soon as the generated file is found to have doubled",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Link the incident timeline to the 11:05 change and name the change owner on the incident call",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Regenerate the feature file from the reverted cluster and check its row count before publishing",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -412,6 +459,43 @@
        "src": "improvement",
        "i": 6
       }
+     }
+    ],
+    "short": "Query without database filter",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add an explicit database-name filter to the system.columns query and de-duplicate columns before the file is built",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 6
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert when the generator output has duplicate feature names or more rows than the previous run",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Halt the feature-file generator job so no further oversized file is written",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hold generation off until the query is fixed and the output checked by a second engineer",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Rerun the fixed query and diff its output with the last known-good file before queueing it for distribution",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -465,7 +549,48 @@
      "O": 2,
      "D": 2
     },
-    "revisedRationale": "A bounds check before load would refuse the oversized file, so a bad file can still be generated but should no longer reach the proxies (O 5→2), and the refusal is an automated interlock (D 8→2). Severity is unchanged if a file passed the check another way. Cloudflare records this action as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "A bounds check before load would refuse the oversized file, so a bad file can still be generated but should no longer reach the proxies (O 5→2), and the refusal is an automated interlock (D 8→2). Severity is unchanged if a file passed the check another way. Cloudflare records this action as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Own config pushed unchecked",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Apply bounds checks on size and row count to Cloudflare-generated files, as for user input, before they enter distribution",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on a feature file that exceeds its expected size, before it reaches customer-serving machines",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop the every-five-minutes distribution queue and pin the proxies to the last-known-good file",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Assign one person to hold the queue and refuse further pushes until the file is validated",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Insert the validated file into the queue, then watch several cycles to confirm no bad file reappears",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -528,7 +653,54 @@
      "O": 4,
      "D": 6
     },
-    "revisedRationale": "If the proxy degrades instead of panicking, an oversized file costs bot-scoring quality rather than serving traffic, which is customer-visible degradation (S 9→5). O and D are unchanged because the out-of-bounds input can still arrive and is still seen at onset. Both actions are recorded as committed, not completed, so the reduction is a claim about the actions, not a confirmed outcome."
+    "revisedRationale": "If the proxy degrades instead of panicking, an oversized file costs bot-scoring quality rather than serving traffic, which is customer-visible degradation (S 9→5). O and D are unchanged because the out-of-bounds input can still arrive and is still seen at onset. Both actions are recorded as committed, not completed, so the reduction is a claim about the actions, not a confirmed outcome.",
+    "short": "Proxy panics on oversized file",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Replace the unguarded unwrap() with explicit handling that keeps the previous config when the file is rejected",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Review every core proxy module for error paths that panic on malformed input",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on worker-thread panic counts and 5xx rates per proxy version, not just the global error rate",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Route traffic away from the FL2 proxy where a legacy path exists, as was done for Workers KV and Access",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident and put the proxy owners on the call at the first FL2 panic",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart the FL2 workers after the good file is loaded and confirm 5xx rates return to baseline",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -561,7 +733,44 @@
       "i": 3
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Legacy proxy scores all zero",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Make the legacy proxy reject an oversized file and raise an error rather than emit a zero bot score",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm when the bot-score distribution collapses to zero across all traffic",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Disable bot-score based rules for customers on the legacy path so false blocks stop",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers who block on bot score that scores are wrong, and which rules to relax",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore scoring once the known-good file is loaded and re-enable the customers' rules",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -617,7 +826,48 @@
      "O": 5,
      "D": 9
     },
-    "revisedRationale": "An instant global disable would cut the outage from hours to the time needed to decide to use it, leaving a degraded bot-scoring feature instead of failing traffic (S 8→6). The gap is still exercised by any bad file, so O and D are unchanged. Recorded as committed, not completed: the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "An instant global disable would cut the outage from hours to the time needed to decide to use it, leaving a degraded bot-scoring feature instead of failing traffic (S 8→6). The gap is still exercised by any bad file, so O and D are unchanged. Recorded as committed, not completed: the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "No global kill switch",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Build global, feature-level kill switches so Bot Management scoring can be disabled network-wide at once",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Test the kill-switch path on a schedule, and alarm if it cannot reach all proxies",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop file generation and insert a known-good file, the durable stop used at 14:24 UTC",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order the rollback to the last-known-good file as soon as the bad file is identified, rather than keep diagnosing",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Deploy the correct configuration globally after a recovery test",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -668,6 +918,51 @@
        "i": 5
       }
      }
+    ],
+    "short": "DDoS hypothesis, flapping",
+    "playbook": [
+     {
+      "role": "incident-commander",
+      "phase": "prevent",
+      "do": "Add a playbook step: before declaring an attack, compare recent configuration pushes with the start of the symptoms",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Host the external status page off Cloudflare's own path so its failure is not a false signal for responders",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Ask whether the failure flaps on a five-minute cycle, which points to a generated file and not an attacker",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Assign one engineer to test the attack hypothesis and another to check config pushes in parallel",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Pin the rollout so every node serves the same file, ending the good/bad flapping",
+      "basis": "sre-incident"
+     }
     ]
    },
    {
@@ -705,9 +1000,49 @@
       "i": 13
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Products fail with core proxy",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Give Turnstile, Workers KV and Access a bypass route to a prior proxy version that can be switched on quickly",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on dashboard login and Turnstile load failures, since customers cannot log in to see status",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Route Workers KV and Access to the prior core proxy version, as done at 13:04 UTC",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers that dashboard logins are blocked because Turnstile cannot load, and give a workaround if one exists",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm Turnstile, KV and Access are normal once the proxy is fixed, and watch for a second dip",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Retry blocked logins and queued requests after service returns",
+      "basis": "itil-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "Core proxy 5xx, ~6 h to full recovery"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -722,5 +1057,104 @@
    "quote": "14:30 UTC"
   }
  },
- "durationBasis": "Customer impact 11:28 UTC 18 Nov → correct config deployed, core traffic largely normal 14:30 UTC (dossier ~3h window)"
+ "durationBasis": "Customer impact 11:28 UTC 18 Nov → correct config deployed, core traffic largely normal 14:30 UTC (dossier ~3h window)",
+ "response": {
+  "roles": {
+   "first-responder": "Cloudflare on-call engineers — not individually named",
+   "incident-commander": "No incident commander is named in the record; an internal incident call was created",
+   "ops-lead": "Cloudflare engineers who bypassed products and stopped the bad file — not named",
+   "change-owner": "The team that deployed the ClickHouse permissions change — not named",
+   "service-recovery": "Cloudflare engineers who deployed the known-good file — not named",
+   "comms": "Cloudflare public status communications — not in this sequence of events",
+   "crisis": "Matthew Prince, Cloudflare chief executive",
+   "customer": "Cloudflare customers and products behind the core proxy"
+  },
+  "recorded": [
+   {
+    "role": "first-responder",
+    "soe": 5,
+    "quote": "Manual investigation started by on-call engineers.",
+    "did": "Start a manual investigation at 11:32 UTC, one minute after the first automated test fired"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "initially wrongly suspected the symptoms we were seeing were caused by a hyper-scale DDoS attack",
+    "did": "The team first suspects a hyper-scale DDoS attack, reinforced by a coincidental status-page failure"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 14,
+    "quote": "engineers stop the creation and propagation of the bad feature file",
+    "did": "Stop creation and propagation of the bad file at 14:24 UTC and insert a known-good file into the queue"
+   },
+   {
+    "role": "crisis",
+    "soe": 16,
+    "quote": "CEO Matthew Prince publishes the public post-mortem the same day",
+    "did": "Publishes the post-mortem the same day: no data lost, not a breach"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Core traffic failing with 5xx",
+  "bones": [
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Wrong DDoS hypothesis",
+      "factor": 7
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Permissions change unvetted",
+      "factor": 0
+     },
+     {
+      "label": "No size check on own config",
+      "factor": 1
+     },
+     {
+      "label": "No global kill switch",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Unguarded unwrap() panics",
+      "factor": 2
+     },
+     {
+      "label": "Core dumps drain resources",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Hard 200-feature limit",
+      "factor": 5
+     },
+     {
+      "label": "Node-by-node rollout flaps",
+      "factor": 3
+     },
+     {
+      "label": "Query without database filter",
+      "mode": "FM-02"
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -37,9 +37,22 @@ The hub ranks strictly by `_score` and shows the weighting in the disclaimer. Su
 
 ## Visualizations (inline SVG + one real map, theme-aware, no runtime charting lib)
 
-Per incident: **failure-cascade block diagram** · **magnitude radar** (4 sub-scores) · **phased SOE timeline**. Hub: **magnitude bars** · **category bars** · **risk map** (blast × duration quadrant) · **semantic map** (vector-index 2D projection). All labelled, scaled, legended (no bare floating dots): operator abbreviations (`op_abbrev()`), 0–10 axis ticks, quadrant framing, deterministic jitter + per-side label de-collision, domain colour legend, clickable dots → dossier.
+Per incident (v3.18): **failure chain** and **fishbone**, both drawn at build time by the RZ diagram engine through `tools/build-incident-diagrams.mjs` (IEC 60617 / ISA-5.1 glyphs from `js/rz-eng-symbols.js`, zero engine warnings, a one-column chain variant swapped in under 640 px, scale floor 0.8 so 11-unit type stays above 8.5 px) · **magnitude radar** · **phased SOE list** with role tags · **response matrix** (role × detect/contain/recover). The old generic cascade box (`Trigger → operator → services`) and the clipped SOE dot strip were removed as filler: neither said anything the chips and the list did not. Hub: **magnitude bars** · **category bars** · **risk map** (blast × duration quadrant) · **semantic map** (vector-index 2D projection). All labelled, scaled, legended (no bare floating dots): operator abbreviations (`op_abbrev()`), 0–10 axis ticks, quadrant framing, deterministic jitter + per-side label de-collision, domain colour legend, clickable dots → dossier.
 
 **Geographic map** ("Where these happened"): real **Leaflet 1.9.4 + CARTO dark tiles** (same stack as `dc-market-tracker.html`), lazy-loaded via `page_shell(head_extra=LEAFLET_HEAD)` (hub only — incident pages stay lib-free). Markers plotted from `INCIDENT_COORDS` (slug→[lat,lng]; global logical failures anchored to the operator's origin region) with md5 jitter for co-located sites; domain-coloured, magnitude radius, dark popups linking to each dossier; `invalidateSize()` on reveal via IntersectionObserver (renders correctly behind the gate blur).
+
+## Page structure (v3.18)
+
+Sticky section nav (Summary · Timeline · Response · FMEA · Causes · Actions · Sources — seven, Miller), scroll-spy with a 2px amber underline, `scroll-margin-top` so a jump never lands under the navbar. Summary leads with the brief and a six-field fact sheet; long material is progressive disclosure — the root cause shows whole sentences up to ~480 characters with the full narrative one click away, comprehensive analysis and the technical deep-dive sit in `<details>`. COE is a table (action · owner · status), never bullets with chips.
+
+## Response by role (v3.18) — `tools/incidents_response.py`
+
+Owner: *"sampai level action misal first responder ngapain, on scene commander dll semua roles terlihat."* Two layers, kept apart because they make different claims:
+
+- **Recorded** (`response.recorded[]`) — what a role did, as the sources tell it. Each entry points at a SOE index and carries a quote that must be a VERBATIM substring of that entry. If the record does not say who acted, nothing is recorded. A declared role with no recorded action is shown as **silent** — across the first 17 dossiers no source shows an incident commander acting once; that is the finding, not a gap to fill.
+- **Playbook** (`fmea.modes[].playbook[]`) — analyst guidance per failure mode, by phase (prevent / detect / contain / recover), ≥4 actions from ≥3 roles covering detect, contain and recover, each citing a named practice from `BASIS` (NIMS/ICS, NFPA 1561/75/76/72/855/70E/110, EN 50110-1, ASHRAE TC 9.9, Uptime OS, ISO 22301, ISO/IEC 27035, NIST SP 800-61/800-34, SRE incident management, ITIL 4, change management) or the dossier's own COE / improvement / lesson / factor. No clause numbers — an unverified clause is a factual claim.
+
+Role vocabulary is fixed (16 keys in `ROLES`); `response.roles` says who each was in that incident. Rendered: a matrix of roles seen acting × phase, a vertical role list with recorded / playbook per role, a "Who acts" block in every FMEA row, role tags on the SOE list; the hub adds the library-wide table (dossiers, seen acting, recorded, playbook, silent) and who is first on the record at detection. Gate: `tools/test-incidents-response.py --strict --require-all`. Authoring brief for agents: verbatim-quote rule, ≥3 recorded, playbook floors, fishbone causes must be causes, never effects.
 
 ## Tooltips — RZExplain glossary
 
@@ -69,6 +82,6 @@ Short attributed provenance quotes only (copyright — the assembled narrative i
 
 ## Gates (all must pass before ship)
 
-`tools/test-incidents-corpus.mjs` (provenance + structure) · `tools/audit-page-gates.mjs` (root-gate UI) · `tools/audit-script-tags.py` (no unescaped `</script>`) · `tools/audit-version-stamp.py` · dark-coverage / responsive (no horizontal overflow at 360px). Ship: version bump `js/rz-version.js` + CHANGELOG entry + `tools/build-changelog-html.py --apply`, run from repo root; gated ships skip IndexNow.
+`tools/test-incidents-corpus.mjs` (provenance + structure) · `tools/test-incidents-response.py` (role layer) · `tools/build-incident-diagrams.mjs --check` (engine figures) · `tools/audit-page-gates.mjs` (root-gate UI) · `tools/audit-script-tags.py` (no unescaped `</script>`) · `tools/audit-version-stamp.py` · dark-coverage / responsive (no horizontal overflow at 360px). Ship: version bump `js/rz-version.js` + CHANGELOG entry + `tools/build-changelog-html.py --apply`, run from repo root; gated ships skip IndexNow.
 
 See [ARTICLE_DATAVIZ_STANDARD.md](ARTICLE_DATAVIZ_STANDARD.md), [EXPLAIN_ENGINE_STANDARD.md](EXPLAIN_ENGINE_STANDARD.md), [AUTH_STANDARD.md](AUTH_STANDARD.md), [DARK_MODE_STANDARD.md](DARK_MODE_STANDARD.md), [CONTENT_TAXONOMY_STANDARD.md](CONTENT_TAXONOMY_STANDARD.md).

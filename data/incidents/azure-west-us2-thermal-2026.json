@@ -301,6 +301,48 @@
        "i": 5
       }
      }
+    ],
+    "short": "Sag/swell, split transfer",
+    "symbol": "utility",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Review and standardise generator and UPS automatic-transfer thresholds under voltage sag and swell across the Quincy facilities",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on power-quality events (sag, swell) at the utility feed during storm warnings, and list which halls stayed on utility",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "utility",
+      "phase": "contain",
+      "do": "Notify the datacenter operator of lightning-driven disturbances on the feeds so the sites can choose to transfer to generator",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Transfer the facilities still on unstable utility to generator by hand, hall by hall, until the supply is steady",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "recover",
+      "do": "Check the cooling plant protection for tripped or latched states after the disturbance and before returning to utility",
+      "basis": "ashrae-tc99"
+     }
     ]
    },
    {
@@ -356,7 +398,49 @@
      "O": 3,
      "D": 6
     },
-    "revisedRationale": "If protection degrades in stages and restarts itself, a transient is less likely to collapse cooling long enough to breach thermal limits (O 6→3). The action is a review committed for October 2026, which may or may not change the design, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "If protection degrades in stages and restarts itself, a transient is less likely to collapse cooling long enough to breach thermal limits (O 6→3). The action is a review committed for October 2026, which may or may not change the design, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Cooling lockout, no return",
+    "symbol": "chiller",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Review the cooling fail-state: give protection a staged or degraded mode and an automatic return once voltage is normal",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page the cooling on-call on any cooling-protection lockout at once, as it holds until reset by hand",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Start load shedding in the affected halls at the lockout, because there is no ride-through plan after it latches",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Diagnose the latched protection component on site and reset the cooling plant in sequence once voltage is steady",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm the cooling plants hold on utility and generator before lifting load shedding",
+      "basis": "ashrae-tc99"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -393,7 +477,45 @@
       "quote": "The PIR gives no numeric temperature, threshold, or rate-of-rise"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Thermal shutdown, two AZs",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Document the ride-through time per hall once cooling stops, about 10 to 16 minutes here, and size load-shed steps to it",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on hall temperature rate of rise, so the order to shed load comes before the automatic shutdown at about 04:40 UTC",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Shut down non-critical workloads in the order agreed in advance and fail critical services to the third availability zone",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Fail over to a zone outside AZ-01 and AZ-03 when the provider's status shows the thermal event",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Power up halls only after cooling holds the temperature, in the order of storage first, then compute",
+      "basis": "ashrae-tc99"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -444,7 +566,48 @@
      "O": 4,
      "D": 6
     },
-    "revisedRationale": "Better-documented recovery makes a slow manual restoration less likely (O 6→4). Recorded as committed for June 2026; the dossier does not confirm completion, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Better-documented recovery makes a slow manual restoration less likely (O 6→4). Recorded as committed for June 2026; the dossier does not confirm completion, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Manual cooling recovery",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Improve the cooling recovery process and documentation so diagnosis after a lockout is a checklist",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Time-stamp the lockout, the first diagnosis and each plant reset in the incident log",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Restore the cooling plants in a written order, confirming temperatures fall at each step",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Assign a named cooling lead and a second engineer for the hall, and set a time to escalate to the vendor",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Post when cooling is restored and temperatures are stable at about 05:55 UTC, and say recovery of services follows",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -503,7 +666,47 @@
      "O": 4,
      "D": 9
     },
-    "revisedRationale": "With the platform limits removed, a long, manual storage return becomes less likely to set the outage length (O 7→4). Recorded as committed for July 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "With the platform limits removed, a long, manual storage return becomes less likely to set the outage length (O 7→4). Recorded as committed for July 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Slow storage return to service",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Remove platform limits on the speed of returning storage nodes to service and replace manual sequential coordination",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Track storage nodes validated and nodes waiting on one board against a plan hour by hour",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Run storage validation in parallel across clusters where the platform allows, rather than one after another",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers that VM recovery follows storage validation, with the 50% and 95% marks as they are reached",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Start dependent compute as each storage cluster is validated, not after all of them",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -546,7 +749,43 @@
      "O": 6,
      "D": 4
     },
-    "revisedRationale": "Tooling that lists devices in protective states would show operators what needs manual recovery early enough to act (D 8→4). Recorded as committed for August 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Tooling that lists devices in protective states would show operators what needs manual recovery early enough to act (D 8→4). Recorded as committed for August 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Protective states unseen",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Build tooling that lists which infrastructure devices are in protective states and need manual recovery",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Raise cross-team awareness at the lockout that a thermal event on shared infrastructure is under way",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Rank devices in protective state by foundational role, and restore networking and storage dependencies first",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Share the list of halls with restored cooling with the infrastructure teams as each hall clears",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Work the ranked device list for AZ-01 and AZ-03 and tick off each device as it rejoins",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -597,9 +836,49 @@
      "O": 3,
      "D": 8
     },
-    "revisedRationale": "Self-recovery from transient failures and multi-cluster flexibility remove the two causes recorded (O 6→3). Recorded as committed for June and August 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Self-recovery from transient failures and multi-cluster flexibility remove the two causes recorded (O 6→3). Recorded as committed for June and August 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Log Analytics single cluster",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Add Log Analytics startup resiliency so it self-recovers from transient initialisation failures",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Add multi-cluster flexibility so no single cluster carries telemetry for the region",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on Log Analytics and Application Insights ingestion lag and initialisation failures during recovery",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Do not rely on Application Insights alerts alone while telemetry backlogs are being processed; check service health with direct probes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart Log Analytics initialisation by hand and drain the backlog until it clears, as at 02:30 UTC on 30 May",
+      "basis": "sre-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "2 AZs shut down · ~22 h total"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -614,5 +893,101 @@
    "quote": "2026-05-29 12:00 UTC Approximately 95% of VMs recovered"
   }
  },
- "durationBasis": "Customer impact 04:24 UTC 29 May → ~95% of VMs recovered 12:00 UTC (50% at 06:15); 1326 included telemetry backlog"
+ "durationBasis": "Customer impact 04:24 UTC 29 May → ~95% of VMs recovered 12:00 UTC (50% at 06:15); 1326 included telemetry backlog",
+ "response": {
+  "roles": {
+   "first-responder": "No person is named; cooling protection sensed the fault and operations was engaged",
+   "incident-commander": "No incident commander is named in the record",
+   "mechanical": "Azure datacenter operations who diagnosed and restored cooling — not individually named",
+   "electrical": "Azure datacenter engineering for generator and UPS transfer — not named in the sequence",
+   "utility": "The utility feeding Quincy, WA, present but unstable in the storm",
+   "ops-lead": "Azure infrastructure and telemetry engineers during recovery — not named",
+   "service-recovery": "Azure teams that brought infrastructure, storage and VMs back online",
+   "comms": "No customer communication is recorded in the sequence of events",
+   "customer": "Azure customers with services in West US 2 AZ-01 and AZ-03"
+  },
+  "recorded": [
+   {
+    "role": "mechanical",
+    "soe": 4,
+    "quote": "Azure datacenter operations begin manual cooling diagnosis and restoration",
+    "did": "Begin manual cooling diagnosis and restoration about 7 minutes after the lockout; no outside emergency service is called"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 8,
+    "quote": "Approximately 50% of affected virtual machines recovered as infrastructure is brought back online",
+    "did": "Bring infrastructure back; about half of affected VMs recover by 06:15 UTC"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 9,
+    "quote": "storage validation extended over ~14 hours, constrained by platform limitations and manual, sequential coordination",
+    "did": "Validate the storage layer before compute resumes, over about 14 hours, by manual sequential steps"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 11,
+    "quote": "All services recovered except Application Insights and Log Analytics, which are processing telemetry backlogs",
+    "did": "Recover all services but two by 20:18 UTC; the telemetry backlogs clear by 02:30 UTC on 30 May"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Two AZs down, ~22 h to full recovery",
+  "bones": [
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Lightning sag/swell on grid",
+      "factor": 0
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Hard cooling lockout",
+      "factor": 1
+     },
+     {
+      "label": "No cooling auto-recovery",
+      "factor": 2
+     },
+     {
+      "label": "Telemetry on one cluster",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Uneven generator transfer",
+      "factor": 3
+     },
+     {
+      "label": "Slow storage return",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Manual cooling recovery",
+      "factor": 4
+     },
+     {
+      "label": "No protective-state tooling",
+      "factor": 7
+     }
+    ]
+   }
+  ]
+ }
 }

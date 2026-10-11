@@ -338,6 +338,53 @@
        "i": 1
       }
      }
+    ],
+    "short": "Undisclosed backend fault",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Stage every backend deployment and config change, with a one-click rollback ready before it is applied",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page the on-call from synthetic sign-in and Store checks run outside Sony's network, not from the status page after users complain",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Open a single incident bridge, ask first whether a deploy or config change went out, and stop all other changes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Roll back the latest backend change on the affected services before looking for a deeper fault",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore services in dependency order and verify sign-in, Store and multiplayer end to end before closing",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Say plainly whether the cause was an attack or an operations fault, since the record shows users feared a hack",
+      "basis": "nist-800-61",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     }
     ]
    },
    {
@@ -390,6 +437,46 @@
        "i": 0
       }
      }
+    ],
+    "short": "Shared auth, one fail domain",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Split the authentication and core-services layer into independent cells, so one bad cell does not fail every PSN category",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Game-day the shared layer on a schedule, with a deliberate failure of the identity service in a test region",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Graph sign-in success rate per category and per region, and alert when several categories fall together",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Fail traffic over to a healthy auth cell or region and shed low-priority features such as Store browsing",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring the shared layer back first, then Store, multiplayer and disc registration, confirming each in turn",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -438,6 +525,42 @@
        "src": "improvement",
        "i": 2
       }
+     }
+    ],
+    "short": "No failover evidenced",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Build automated regional failover for the shared services and prove it in a drill with a measured recovery time",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Track time since onset against the drilled recovery target and escalate when it is passed",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Decide at a set time to trigger regional failover instead of waiting on in-place repair",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Run the failover runbook step by step and log each action with a timestamp",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm services are healthy in the failover region, then plan the return to normal",
+      "basis": "nist-800-34"
      }
     ]
    },
@@ -488,6 +611,45 @@
        "i": 3
       }
      }
+    ],
+    "short": "Beta load beyond headroom",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Agree a go/no-go with partner publishers on capacity headroom before any large beta window",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Run a headroom check and add surge capacity in the days before a known demand spike",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch concurrent sessions and auth request rate against headroom during the window and page on the approach to limit",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Ask the partner to pause or reschedule the beta, as Capcom did, and throttle new logins to protect existing sessions",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Add capacity and release login throttling in steps while watching the error rate",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -523,7 +685,40 @@
       "quote": "PS5 disc-drive registration"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Online check blocks local play",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Let owned disc and downloaded titles launch from a cached licence when PSN is unreachable",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on a rise in licence-check and registration failures, since they only appear after sign-in is already down",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell owners which offline play and disc registration still work and which do not",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Raise the licence-check grace period so consoles stop failing local games while the backend is down",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-run pending disc registrations after sign-in returns and confirm they complete",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -568,6 +763,43 @@
        "src": "coe",
        "i": 2
       }
+     }
+    ],
+    "short": "Near-silent live comms",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Adopt a timestamped status cadence, with an update every 60 minutes even when there is no news",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Compare the status page with Downdetector and update it when external reports pass a set level",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name one communications owner at the start who is not working the fix",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "State what is affected, that no attack is indicated if known, and when the next update comes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Tell comms the moment each service returns so the status page matches reality",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -622,10 +854,167 @@
        "i": 4
       }
      }
+    ],
+    "short": "No RCA, no timestamps",
+    "playbook": [
+     {
+      "role": "incident-commander",
+      "phase": "prevent",
+      "do": "Record start, mitigation and restore times in the incident log while the incident runs",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Capture first-alert time from the monitoring system so a start timestamp exists for the report",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Publish the exact start and restore times at close, to stop the 18 to 24 hour dispute",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Write the post-incident RCA naming the failed subsystem, trigger and corrective actions",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Check the PS Plus extension in Subscription Management on the Store",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
     ]
+   }
+  ],
+  "impactShort": "Global PSN down, ~18-24 h"
+ },
+ "durationStatus": "not-established",
+ "durationBasis": "Failure evening 7 Feb PT → restored evening 8 Feb; no exact timestamps from Sony.",
+ "response": {
+  "roles": {
+   "first-responder": "No on-call engineer is named; detection is the status page and Downdetector",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "Sony PSN backend engineers doing the internal remediation — not named",
+   "change-owner": "Not identified: Sony never said whether a deploy or config change started it",
+   "service-recovery": "Sony teams that restored services and applied the PS Plus extension",
+   "comms": "@AskPlayStation and the PlayStation status page, staff not named",
+   "customer": "PSN players and PS Plus members worldwide"
+  },
+  "recorded": [
+   {
+    "role": "comms",
+    "soe": 6,
+    "quote": "initial @AskPlayStation acknowledgement of difficulty launching games, apps, or network features",
+    "did": "Posts a first acknowledgement via @AskPlayStation that games, apps and network features are failing to launch"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 6,
+    "quote": "an internal, undocumented remediation",
+    "did": "Works an internal remediation that the record does not describe"
+   },
+   {
+    "role": "comms",
+    "soe": 7,
+    "quote": "Sony posts only about two messages via the official PlayStation Twitter/X account",
+    "did": "Posts about two messages for the whole event, with no cause, detail or ETA"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 10,
+    "quote": "Backend services are restored globally after internal remediation",
+    "did": "Restores backend services globally on the evening of 8 February"
+   },
+   {
+    "role": "comms",
+    "soe": 11,
+    "quote": "Network services have fully recovered from an operational issue",
+    "did": "Declares recovery with that single sentence, the whole root-cause disclosure"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 15,
+    "quote": "The 5-day PS Plus extension is applied automatically to all members' renewal dates",
+    "did": "Applies the 5-day PS Plus extension to renewal dates about a month later"
+   },
+   {
+    "role": "customer",
+    "soe": 2,
+    "quote": "users worldwide report failures",
+    "did": "Report failures in volume to Downdetector, the outside signal of onset"
    }
   ]
  },
- "durationStatus": "not-established",
- "durationBasis": "Failure evening 7 Feb PT → restored evening 8 Feb; no exact timestamps from Sony."
+ "fishbone": {
+  "effect": "Global PSN outage, ~24 h",
+  "bones": [
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Shared auth single point",
+      "factor": 1
+     },
+     {
+      "label": "No failover evidenced",
+      "mode": "FM-03"
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Change discipline unverified",
+      "factor": 2
+     },
+     {
+      "label": "No capacity gate on beta",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Undisclosed backend fault",
+      "factor": 0
+     }
+    ]
+   },
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "No live comms cadence",
+      "factor": 4
+     },
+     {
+      "label": "No timestamps published",
+      "factor": 5
+     }
+    ]
+   }
+  ]
+ }
 }

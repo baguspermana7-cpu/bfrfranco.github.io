@@ -395,6 +395,53 @@
        "i": 0
       }
      }
+    ],
+    "short": "Tenant lithium battery fire",
+    "symbol": "battery",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Require BMS telemetry, string thermal imaging and charger audits for every battery in the hall, tenant-owned included",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat a battery-room temperature, off-gas or BMS alarm as a call-out: go, look, and call Delhi Fire Service on the first confirmed alarm",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident, name the floor and the live sources, and brief the fire service on arrival",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Isolate the battery string DC and the AC feed to the battery room, and cut networking power in the affected hall",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Fight the fire from outside the battery room until the facility confirms the room is isolated",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "crisis",
+      "phase": "recover",
+      "do": "Publish the independent RCA of ignition source, chemistry, BMS and detection performance",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
     ]
    },
    {
@@ -447,6 +494,48 @@
        "src": "improvement",
        "i": 1
       }
+     }
+    ],
+    "short": "No automated early detection",
+    "symbol": "smokeDetector",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Fit aspirating smoke detection and lithium off-gas sensing in the battery room, with logged alarm times",
+      "basis": "nfpa-72",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Verify detection-to-alarm interlocks by periodic functional test and keep the results",
+      "basis": "nfpa-72",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Log the time of the first alarm and of the call to the fire service, so response time can be measured",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order evacuation of the shared hall on the first smoke report, without waiting for a second alarm",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "recover",
+      "do": "Release the battery room to the facility only after off-gas and temperature readings are normal",
+      "basis": "nfpa-1561"
      }
     ]
    },
@@ -512,6 +601,54 @@
        "i": 3
       }
      }
+    ],
+    "short": "No lithium-rated suppression",
+    "symbol": "agentCylinder",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Specify battery-room suppression rated for lithium runaway, such as water mist or deluge, not gas alone",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Test the fixed suppression by scheduled discharge and keep the results",
+      "basis": "nfpa-75",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Report whether fixed suppression discharged when the fire service arrives, so tactics can fit",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Apply sustained cooling water to the battery room and watch for re-ignition for the whole operation",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Pull staff and tenants from the third floor and hold the fire to that floor",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "safety",
+      "phase": "recover",
+      "do": "Keep the room under a fire watch until cell temperatures are confirmed stable",
+      "basis": "nfpa-855"
+     }
     ]
    },
    {
@@ -564,6 +701,45 @@
        "src": "improvement",
        "i": 5
       }
+     }
+    ],
+    "short": "Tenant storage in shared hall",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Allow no tenant-owned lithium storage in a shared IT hall without a fire-rated room and its own detection and suppression",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Write a colo safety SLA with the operator covering tenant battery maintenance, BMS telemetry and inspection cadence",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Keep a register of every tenant energy-storage installation per floor, with install date and last inspection",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "List which tenants share the floor with the burning room and alert each tenant's contact",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Take stock of damaged equipment per tenant and agree access with each once the floor is released",
+      "basis": "iso-22301"
      }
     ]
    },
@@ -626,6 +802,45 @@
        "i": 4
       }
      }
+    ],
+    "short": "Single POP drives 3 metros",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Spread Delhi peering over physically separate POPs and pre-provision out-of-region failover for Delhi, Chennai and Mumbai",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "Alarm on lost ingress capacity per metro the moment a host facility cuts networking power",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Reroute traffic to remaining paths and add Chennai capacity while Delhi peering is out",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post customer impact on Service Health at once, naming Delhi, Mumbai and Chennai and the affected products",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Re-test latency and routing for Hybrid Connectivity, VPC and Media CDN after capacity returns",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -684,6 +899,46 @@
        "i": 4
       }
      }
+    ],
+    "short": "Re-entry waits on clearance",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Plan DR for weeks of denied access to the site, not for failover time alone",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "detect",
+      "do": "Get the fire and structural clearance criteria and expected date from the authorities on day one",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Augment out-of-region capacity in Chennai and optimise backbone capacity while the site is locked",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Give customers a status update that states the clearance gate and the next update time",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-enter on clearance, inspect each rack for damage before re-energising, and restore capacity in stages",
+      "basis": "nfpa-70e"
+     }
     ]
    },
    {
@@ -729,9 +984,49 @@
        "i": 0
       }
      }
+    ],
+    "short": "RCA not public",
+    "playbook": [
+     {
+      "role": "crisis",
+      "phase": "prevent",
+      "do": "Commit up front to publish the RCA findings, including detection and suppression performance",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Set data-centre fire-safety, redundancy and uptime standards for facilities hosting localised data",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Ask the operator in writing for the ignition source, battery type and suppression status",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers which facts are confirmed and which are reported only",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Check each facility action against the RCA when it arrives, and record its status",
+      "basis": "nims-ics"
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "Delhi POP lost · 3 metros degraded"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -746,5 +1041,116 @@
    "quote": "2026-06-26 12:00 (US/Pacific)"
   }
  },
- "durationBasis": "Fire call ~02:45 IST 5 Jun (21:15 UTC 4 Jun) → all capacity restored 12:00 PDT 26 Jun (19:00 UTC)."
+ "durationBasis": "Fire call ~02:45 IST 5 Jun (21:15 UTC 4 Jun) → all capacity restored 12:00 PDT 26 Jun (19:00 UTC).",
+ "response": {
+  "roles": {
+   "first-responder": "Whoever logged the emergency call to Delhi Fire Service — not named",
+   "incident-commander": "No incident commander is named in the record",
+   "fire-service": "Delhi Fire Service, ten fire tenders reported",
+   "electrical": "Facility staff who shut down networking power — not named in the record",
+   "safety": "Facility safety staff and whoever issues fire and structural clearance — not named",
+   "service-recovery": "Google network teams restoring Delhi and Chennai edge capacity",
+   "comms": "Google Cloud Service Health, nine status updates",
+   "crisis": "STT Global, which commissioned the independent RCA",
+   "authority": "Indian regulator — MeitY, named only as a gap in the record",
+   "customer": "Google Cloud customers in Delhi, Mumbai and Chennai"
+  },
+  "recorded": [
+   {
+    "role": "fire-service",
+    "soe": 3,
+    "quote": "personnel reportedly 'arrived within minutes' of the call",
+    "did": "Arrives within minutes of the 02:45 IST call, per unverified press"
+   },
+   {
+    "role": "fire-service",
+    "soe": 4,
+    "quote": "Ten fire tenders reportedly deployed to the site",
+    "did": "Deploys ten tenders and fights the fire manually for several hours"
+   },
+   {
+    "role": "fire-service",
+    "soe": 11,
+    "quote": "Fire brought under control and reportedly confined to the third floor",
+    "did": "Brings the fire under control and stops it spreading to other floors, after several hours"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 10,
+    "quote": "Google works to restore Internet Edge peering capacity in Delhi",
+    "did": "Restores Delhi peering, adds out-of-region capacity in Chennai and optimises backbone capacity"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 15,
+    "quote": "Google's team reportedly accesses the damaged site",
+    "did": "Enters the site after safety clearance and restores more capacity through the week"
+   },
+   {
+    "role": "crisis",
+    "soe": 16,
+    "quote": "STT Global reportedly commissions an independent root-cause analysis",
+    "did": "Commissions an independent RCA from about 23 June; findings due late July to early August"
+   },
+   {
+    "role": "comms",
+    "soe": 17,
+    "quote": "recovered and returned to normal service",
+    "did": "Declares the incident recovered and returned to normal service on 26 June"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Delhi POP lost, 3 metros degraded",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Lithium battery fault",
+      "mode": "FM-01"
+     },
+     {
+      "label": "No fixed suppression shown",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Tenant batteries, shared hall",
+      "factor": 0
+     },
+     {
+      "label": "No automated detection shown",
+      "factor": 1
+     },
+     {
+      "label": "Single POP serves 3 metros",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Battery upkeep undisclosed",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "No DC fire-safety standard",
+      "factor": 4
+     }
+    ]
+   }
+  ]
+ }
 }

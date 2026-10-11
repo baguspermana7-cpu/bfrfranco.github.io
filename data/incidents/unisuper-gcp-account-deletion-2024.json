@@ -387,7 +387,50 @@
      "O": 2,
      "D": 2
     },
-    "revisedRationale": "The tool is retired from the provisioning path and the behaviour that set Private Clouds for deletion in such workflows is corrected, so the slip can no longer arm a deletion (O 6→2) and a blank on a destructive workflow fails closed (D 9→2). Severity is unchanged: a deletion reached another way would cost the same. Both actions are recorded as completed by Google."
+    "revisedRationale": "The tool is retired from the provisioning path and the behaviour that set Private Clouds for deletion in such workflows is corrected, so the slip can no longer arm a deletion (O 6→2) and a blank on a destructive workflow fails closed (D 9→2). Severity is unchanged: a deletion reached another way would cost the same. Both actions are recorded as completed by Google.",
+    "short": "Blank field arms a deletion",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Make the provisioning workflow reject a blank required parameter and fail closed instead of substituting a default term",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Require a second operator to confirm the full parameter set, including term and deletion behaviour, before a Private Cloud is committed",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "factor",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Report any Private Cloud carrying a fixed term set by default, in a daily list reviewed by the platform on-call",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Remove the fixed term and automatic-deletion behaviour from the affected Private Cloud as soon as it is found",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "vendor",
+      "phase": "recover",
+      "do": "Scrub the database and review every GCVE Private Cloud for the same armed default",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -449,7 +492,46 @@
      "O": 2,
      "D": 9
     },
-    "revisedRationale": "With the deletion-setting behaviour corrected, this path to an unattended deletion is closed (O 4→2). Detection is unchanged: the dossier records no alarm or human confirmation on destructive lifecycle actions as implemented; that remains an analyst recommendation."
+    "revisedRationale": "With the deletion-setting behaviour corrected, this path to an unattended deletion is closed (O 4→2). Detection is unchanged: the dossier records no alarm or human confirmation on destructive lifecycle actions as implemented; that remains an analyst recommendation.",
+    "short": "Term expiry means delete",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Stop lifecycle automation deleting on term expiry unless a person has chosen deletion for that cloud",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on every destructive lifecycle action due within 90 days and send the list to a named platform owner",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Suspend the deletion job on any Private Cloud whose expiry was not chosen by the customer",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident as soon as UniSuper reports the cloud is gone, and name Google platform and UniSuper leads",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm the deletion is complete on both copies, then start the rebuild from the surviving backups",
+      "basis": "nist-800-34"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -496,7 +578,43 @@
      "O": 3,
      "D": 9
     },
-    "revisedRationale": "The dossier records this as addressed through the corrected deletion behaviour, which closes the trigger that bypassed notice (O 5→3). It does not record a separate notification control for every deletion source, so detection is unchanged and the reduction rests on the corrected behaviour, not on a confirmed notice mechanism."
+    "revisedRationale": "The dossier records this as addressed through the corrected deletion behaviour, which closes the trigger that bypassed notice (O 5→3). It does not record a separate notification control for every deletion source, so detection is unchanged and the reduction rests on the corrected behaviour, not on a confirmed notice mechanism.",
+    "short": "No notice before deletion",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Send the customer a notice before any deletion, whoever triggered it, operator or customer",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Ask the provider for a list of scheduled lifecycle events on each Private Cloud and review it every quarter",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell UniSuper's technology leaders and the Google account team the moment a deletion is seen, before the services go dark",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Hold the deletion of other resources belonging to the same customer until the cause is understood",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Open one joint bridge between Google and UniSuper to cut the time to restart",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -534,7 +652,43 @@
       "quote": "it caused deletion across both of these geographies"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Both copies, one subscription",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Keep a copy outside the deleted subscription, such as GCS backups or a second cloud provider",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Deny a subscription-level delete from removing both geographies unless a second approval is given",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert when the resource count in both geographies falls at once, as one event",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Lock the surviving backup stores against deletion while the cause is unknown",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Rebuild from the backup copy held outside the subscription",
+      "basis": "nist-800-34"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -580,6 +734,46 @@
        "i": 4
       }
      }
+    ],
+    "short": "Backups beyond blast radius",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Keep backups on an independent blast radius: a separate service object plus a second cloud provider",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Restore from each backup layer on a schedule, to prove the copies work and how long a restore takes",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm when a backup job fails or the backup set shrinks",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Freeze backup retention and deletion on all layers the moment a deletion is confirmed",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore in-region GCS backups, third-party backup data and second-provider backups, as UniSuper did",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     }
     ]
    },
    {
@@ -617,7 +811,44 @@
       "i": 8
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Nine-day full rebuild",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Rehearse a full Private Cloud rebuild from backups and write down the time each stage takes",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Open the bridge on the first sign that a whole cloud is gone, not only the application",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Split the rebuild into network and security, applications and data, with an owner for each",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Rebuild the Private Cloud, network and security configuration first, since applications depend on them",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Post a restore estimate to members and say plainly that balances are safe and it was not a cyberattack",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -665,9 +896,46 @@
      "O": 2,
      "D": 4
     },
-    "revisedRationale": "Google reports the fleet-wide review complete, concluding 'It is not a systemic issue', and the corrected behaviour stops new cases (O 4→2). The review was a one-time check rather than standing monitoring, so detection improves only to 'before impact with time to act' (D 9→4). Recorded as completed by Google."
+    "revisedRationale": "Google reports the fleet-wide review complete, concluding 'It is not a systemic issue', and the corrected behaviour stops new cases (O 4→2). The review was a one-time check rather than standing monitoring, so detection improves only to 'before impact with time to act' (D 9→4). Recorded as completed by Google.",
+    "short": "Same default on other clouds",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Run a one-off audit of every GCVE Private Cloud for the same default term, then keep it as a standing check",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Query the system database for fixed terms that nobody chose and report the count weekly",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Remove deletion behaviour from each Private Cloud found at risk",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Warn the owners of any at-risk Private Cloud before their term runs out",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Check each cleared Private Cloud still has its backups and run a test restore",
+      "basis": "nist-800-34"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "647,000+ members offline 9 days"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -682,5 +950,109 @@
    "quote": "Services are progressively restored"
   }
  },
- "durationBasis": "Online services dark early May → progressively restored after ~9 days (mid-May)."
+ "durationBasis": "Online services dark early May → progressively restored after ~9 days (mid-May).",
+ "response": {
+  "roles": {
+   "first-responder": "No on-call engineer is named; detection came when services went dark",
+   "incident-commander": "No incident commander is named; only a joint UniSuper and Google incident team",
+   "change-owner": "Google operators who provisioned the Private Cloud with a blank parameter",
+   "ops-lead": "UniSuper and Google engineers working the rebuild — not individually named",
+   "service-recovery": "The joint UniSuper and Google Cloud incident team that rebuilt the Private Cloud",
+   "comms": "UniSuper and Google joint statement, issued by the two CEOs",
+   "crisis": "UniSuper CEO Peter Chun and Google Cloud CEO Thomas Kurian",
+   "vendor": "Google Cloud, which ran the GCVE platform and the provisioning tool",
+   "customer": "UniSuper and its members, who lost access to their accounts"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "Google operators provision UniSuper's GCVE Private Cloud using a deprecated internal capacity-management tool; one required input parameter is left BLANK",
+    "did": "Provision the Private Cloud with a deprecated tool and leave one required parameter blank"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 8,
+    "quote": "UniSuper and Google Cloud mobilise a joint incident team",
+    "did": "Form a joint incident team to rebuild the Private Cloud, not just restart it"
+   },
+   {
+    "role": "customer",
+    "soe": 10,
+    "quote": "UniSuper had backups at another cloud provider",
+    "did": "UniSuper holds backups at a second cloud provider, which prevents complete data loss"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 11,
+    "quote": "Joint teams rebuild the GCVE Private Cloud, restore network and security configurations, restore applications",
+    "did": "Rebuild the Private Cloud, network and security configuration, applications and data over nine days"
+   },
+   {
+    "role": "crisis",
+    "soe": 13,
+    "quote": "UniSuper CEO Peter Chun and Google Cloud CEO Thomas Kurian issue a joint statement",
+    "did": "Issue a joint statement calling it an inadvertent misconfiguration, an isolated, one-of-a-kind occurrence"
+   },
+   {
+    "role": "vendor",
+    "soe": 15,
+    "quote": "Google executes systemic remediation: deprecates the internal tool",
+    "did": "Retires the tool, corrects deletion-on-blank behaviour, scrubs the database and reviews all GCVE Private Clouds"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "UniSuper offline 9 days",
+  "bones": [
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Operator left field blank",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Unsafe silent default",
+      "factor": 0
+     },
+     {
+      "label": "Copies share one subscription",
+      "factor": 4
+     },
+     {
+      "label": "No notice before deletion",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Deprecated provisioning tool",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "No alarm on expiry timer",
+      "factor": 5
+     },
+     {
+      "label": "Term expiry means delete",
+      "mode": "FM-02"
+     }
+    ]
+   }
+  ]
+ }
 }

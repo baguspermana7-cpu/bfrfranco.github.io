@@ -342,7 +342,54 @@
      "O": 3,
      "D": 8
     },
-    "revisedRationale": "Maintenance can no longer start without confirmed peer review, so an unreviewed change can no longer reach production (O 6→3). It is not 2: a reviewed change can still carry a misconfiguration that review misses, as lab testing also missed this one. Detection is unchanged because a misconfiguration that passes review would still be found by the protective trip. Severity is unchanged. The FCC report records this action as implemented."
+    "revisedRationale": "Maintenance can no longer start without confirmed peer review, so an unreviewed change can no longer reach production (O 6→3). It is not 2: a reviewed change can still carry a misconfiguration that review misses, as lab testing also missed this one. Detection is unchanged because a misconfiguration that passes review would still be found by the protective trip. Severity is unchanged. The FCC report records this action as implemented.",
+    "short": "Change loaded, no peer review",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Make the change ticket refuse a core load until a named second engineer has signed the configuration review",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run the peer review against the design and install procedure, not against the ticket text, before the maintenance window opens",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "factor",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm when a new element joins the wireless core without a matching approved change record",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Remove the new element from the core and block further loads in the window the moment the automated shutdown fires",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Freeze all other core maintenance and name one owner for the rollback",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm the element is out of every downstream table before bringing registration back",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -375,7 +422,48 @@
       "quote": "Lab testing by AT&T did not discover the improper configuration of the network element that caused the outage"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Testing misses the misconfig",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Test the configuration in a lab that matches production topology and model its network-wide impact",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "detect",
+      "do": "Run a post-installation test after committing, inside the window, before the engineer leaves the change",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "factor",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch error counts on the element and its downstream neighbours for the first minutes after load",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Back the element out of production if post-install checks show unexpected behaviour",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-test the corrected configuration end to end before it is loaded again",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -430,7 +518,53 @@
      "O": 4,
      "D": 6
     },
-    "revisedRationale": "With element-specific controls in place, the same class of error is meant to be quarantined at the element rather than disconnecting the country (S 10→6). The FCC report records the scan and controls as completed within 48 hours; the dossier records no later event that tested them, so the reduction is a claim about the controls, not an observed outcome. O and D are unchanged."
+    "revisedRationale": "With element-specific controls in place, the same class of error is meant to be quarantined at the element rather than disconnecting the country (S 10→6). The FCC report records the scan and controls as completed within 48 hours; the dossier records no later event that tested them, so the reduction is a claim about the controls, not an observed outcome. O and D are unchanged.",
+    "short": "All-or-nothing Protection Mode",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add element-specific mitigating controls so a bad element is quarantined, not the whole network",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Scan the production core for elements that lack those controls and fit them",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page on a Protection Mode trip within the first minute and name which elements were isolated",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Decide whether to hold Protection Mode while the fault is removed, so devices are not released onto a live error",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Remove the offending element, then lift Protection Mode only on confirmation that it is gone",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore voice and 5G processing elements to towers and switching in stages, FirstNet first",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -467,7 +601,53 @@
       "quote": "failed to prepare for the registration congestion associated with the network recovering from Protection Mode"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Re-registration storm",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Build registration capacity and congestion controls so devices re-attach in a controlled order",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Rehearse a Protection Mode recovery against the full device population, using the 10-hour remediation as the benchmark",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch registration queue depth as rollback finishes; page when attempts exceed what the management systems handle",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Throttle device registration by group at the network edge so the registrar is not hit all at once",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hold full release of access until the registration queue drains to a stable level",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Release devices back in waves and keep watching congestion until remediation is done",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -504,7 +684,56 @@
       "i": 9
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "911 and priority calls blocked",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Design a 911 and Wireless Priority Service path that stays up when voice processing is isolated",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Monitor 911 call completion to PSAPs and alarm when it falls, without waiting for customer reports",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Put PSAP routing restoration at the top of the recovery order and tell the team",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell PSAPs and public-safety agencies that 911 from AT&T devices is down so they can use other routes",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore 911 routing and Wireless Priority Service first, then verify with test calls to PSAPs",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Review the blocked 25,000+ calls against Parts 4 and 9 of the FCC rules",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -537,9 +766,56 @@
       "i": 13
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Late FirstNet notification",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Put a standing notification script and contact list for FirstNet and public-safety users in the runbook",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Start the public-safety notice clock at the Protection Mode trip, not when a restoration is reported",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name a comms lead within minutes and require the first FirstNet notice before the first press statement",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Send the FirstNet customer notice within the first hour with known impact and next update time",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Move critical public-safety voice to alternate carriers or radio until FirstNet is confirmed restored",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Publish initial findings once the cause is known and say plainly it was not a cyberattack",
+      "basis": "itil-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "125M devices offline 12h+"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -554,5 +830,115 @@
    "quote": "Full voice and 5G data service restored after an outage lasting at least twelve hours"
   }
  },
- "durationBasis": "Protection Mode shutdown 02:45 CT 22 Feb → full voice/5G restored after at least 12 h"
+ "durationBasis": "Protection Mode shutdown 02:45 CT 22 Feb → full voice/5G restored after at least 12 h",
+ "response": {
+  "roles": {
+   "change-owner": "The AT&T Mobility employee who loaded the new element — not named",
+   "first-responder": "No human first responder is named; detection was automated",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "AT&T network operations who rolled back the change — not named",
+   "service-recovery": "AT&T Mobility core and registration recovery teams — not named",
+   "comms": "AT&T Mobility FirstNet and public notification — not named",
+   "customer": "FirstNet and public-safety users, plus 125M registered devices",
+   "authority": "FCC PSHSB, which referred the matter to the Enforcement Bureau"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "An AT&T Mobility employee places a new, misconfigured network element into the production wireless core",
+    "did": "Places the new element in the production core at 02:42 CT without the required peer review"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 8,
+    "quote": "AT&T performs a rollback that backs out / removes the misconfigured network element",
+    "did": "Rolls back the change and removes the element; this takes close to two hours"
+   },
+   {
+    "role": "comms",
+    "soe": 12,
+    "quote": "FirstNet-customer notification begins",
+    "did": "Starts notifying FirstNet customers at 05:53 CT, over three hours after the outage began"
+   },
+   {
+    "role": "comms",
+    "soe": 13,
+    "quote": "AT&T Mobility issues its first public statement about the outage.",
+    "did": "Issues the first public statement at 07:05 CT"
+   },
+   {
+    "role": "authority",
+    "soe": 15,
+    "quote": "the FCC PSHSB later referred the matter to the Enforcement Bureau for potential violations",
+    "did": "Refers the outage to the FCC Enforcement Bureau for Part 4 and Part 9 review"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "125M devices offline 12h+",
+  "bones": [
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Peer review skipped",
+      "factor": 0
+     },
+     {
+      "label": "Weak change approval",
+      "factor": 5
+     },
+     {
+      "label": "Post-install test inadequate",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "No quarantine controls",
+      "factor": 3
+     },
+     {
+      "label": "No re-register capacity",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Element loaded at night",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Misconfigured network element",
+      "mode": "FM-02"
+     },
+     {
+      "label": "Lab test missed config",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "911 blocked for 25,000 calls",
+      "mode": "FM-05"
+     }
+    ]
+   }
+  ]
+ }
 }

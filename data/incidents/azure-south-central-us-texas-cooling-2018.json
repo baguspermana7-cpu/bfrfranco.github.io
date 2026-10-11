@@ -390,7 +390,60 @@
      "O": 4,
      "D": 6
     },
-    "revisedRationale": "Better suppression and isolation would make a cooling trip need a larger or rarer transient (O 6→4). The dossier records this as an implied remediation inferred from the identified design gap, not as a published commitment, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Better suppression and isolation would make a cooling trip need a larger or rarer transient (O 6→4). The dossier records this as an implied remediation inferred from the identified design gap, not as a published commitment, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Chillers locked out by swell",
+    "symbol": "chiller",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Re-engineer and periodically test surge suppression on the mechanical-cooling supply against lightning-scale swells",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Check the chillers' voltage-specification lockout settings so a sag after a swell does not hold them locked out",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Act on a chiller lockout alarm during storm warnings: go to the plant, check lockout state and report within minutes",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "utility",
+      "phase": "contain",
+      "do": "Warn the datacenter of lightning activity on the feeds so the site can pre-position engineers at the cooling plant",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "safety",
+      "phase": "contain",
+      "do": "Set storm-time rules for onsite teams working the plant while lightning is active: pairs, a stop-work trigger and a head count",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 6
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Reset the locked-out chillers as soon as the supply is stable, one at a time, checking each reaches load",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Keep the datacenter on generator supply until the utility feed is stable, then retransfer under supervision",
+      "basis": "nfpa-110"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -441,7 +494,49 @@
      "O": 3,
      "D": 6
     },
-    "revisedRationale": "Automatic redundant cooling that takes over without an operator would make this need a second failure (O 5→3). The action is recorded as implied, not committed, and the dossier records no action on the commissioning practice of leaving failover in manual mode or on alarm handling, so the reduction is a claim about the action and the human part of the cause is left untreated."
+    "revisedRationale": "Automatic redundant cooling that takes over without an operator would make this need a second failure (O 5→3). The action is recorded as implied, not committed, and the dossier records no action on the commissioning practice of leaving failover in manual mode or on alarm handling, so the reduction is a claim about the action and the human part of the cause is left untreated.",
+    "short": "Cooling failover left manual",
+    "symbol": "bms",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Keep automatic cooling failover enabled, and if new equipment forces manual mode, finish testing first or staff the plant",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page a second engineer when cooling alerts arrive during concurrent alarms, and rank them by thermal risk",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Assign one engineer to cooling alone at 08:42 UTC and shed load while the thermal buffer lasts",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Take the cooling failover from manual to automatic by hand and start the standby units",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Power down non-critical racks in a planned order to extend the buffer if cooling cannot be returned",
+      "basis": "ashrae-tc99"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -482,7 +577,48 @@
       "i": 2
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Heat outruns the shutdown",
+    "symbol": "tempSensor",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Add thermal monitoring in the fastest-heating zones and tune the graceful shutdown order so those racks go first",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on rate of temperature rise per zone, not only the threshold, so the hot zones are known before the buffer ends",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order pre-emptive shutdown of storage in the hottest zones before the threshold, accepting planned downtime",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "List storage servers, network devices and power units damaged, and quarantine them from rebuild",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Replace failed components and migrate customer data from damaged to healthy servers",
+      "basis": "nist-800-34"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -537,7 +673,43 @@
      "O": 4,
      "D": 8
     },
-    "revisedRationale": "Where synchronous replication is available, failover no longer loses data, so a repeat becomes a bounded failover rather than days of recovery (S 8→6). The action is a review, recorded as implied rather than committed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Where synchronous replication is available, failover no longer loses data, so a repeat becomes a bounded failover rather than days of recovery (S 8→6). The action is a review, recorded as implied rather than committed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Failover refused, slow repair",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Review geo-replication RPO and synchronous-replication options so the recover-or-failover choice is made in advance",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Keep a live list of storage scale units and data at risk of loss on failover, with their last replicated time",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Take the recover-in-place decision at a named time, with the data-loss figure in front of the decision maker",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Restore the software load balancers for the storage scale units before recovering storage servers",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Update customers on the recovery stage and expected time, including that data was kept at the cost of time",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -584,7 +756,46 @@
      "O": 2,
      "D": 9
     },
-    "revisedRationale": "Automatic failover removes the single-region dependency, so losing South Central US would no longer take ASM down (O 3→2). Recorded as an implied remediation, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Automatic failover removes the single-region dependency, so losing South Central US would no longer take ASM down (O 3→2). Recorded as an implied remediation, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "ASM primary in one region",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Add automatic failover and multi-region metadata replication to Azure Service Manager",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Map which control-plane services have a single-region primary and review the map at each region-level event",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers outside the region that management operations are failing and that the cause is in South Central US",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Use workloads and tooling that do not depend on ASM for management during the outage",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring the South Central US storage servers back first, since ASM impact ends only when they return",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -621,7 +832,43 @@
       "quote": "an Office-client aggressive-retry bug amplified load"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Sign-in degraded by reroute",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Keep an Azure AD site out of the datacenter that carries storage risk, and make scale-ahead independent of the ASM API",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch authentication success by site and alert when traffic reroutes away from a failed site",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Scale up the healthy Azure AD sites before rerouted traffic arrives and watch throttling at safe-utilisation limits",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Cut retries from clients when authentication times out, since retry load adds to the throttling",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm authentication routing is stable at the healthy sites, then declare Azure AD impact mitigated",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -668,9 +915,50 @@
      "O": 2,
      "D": 9
     },
-    "revisedRationale": "A corrected and decoupled status page should scale with incident traffic (O 6→2). Recorded as an implied remediation, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "A corrected and decoupled status page should scale with incident traffic (O 6→2). Recorded as an implied remediation, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Status page fails to scale",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Correct the status page auto-scale configuration and decouple it from affected infrastructure",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Load-test the status page at incident-level traffic before storm season",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on HTTP 500 rates on the status page itself and treat them as an incident",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Scale the status web app by hand and serve a static fallback page when 500s appear",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Post incident updates on a second channel while the status page is degraded",
+      "basis": "itil-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "Cooling lost · storage down 38 h"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -685,5 +973,110 @@
    "quote": "Majority restored 11:00 UTC 5 Sep"
   }
  },
- "durationBasis": "Customer impact 09:29 UTC 4 Sep → majority of Azure recovered 11:00 UTC 5 Sep (25h31m)"
+ "durationBasis": "Customer impact 09:29 UTC 4 Sep → majority of Azure recovered 11:00 UTC 5 Sep (25h31m)",
+ "response": {
+  "roles": {
+   "first-responder": "Onsite engineers who received the cooling alerts — not named, handling several alarms",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "Azure operations engineers on the incident — not individually named",
+   "electrical": "Onsite engineering teams who moved the datacenter onto generators in the storm",
+   "mechanical": "Datacenter cooling engineers — the record names no one on the chillers",
+   "utility": "The Texas utility feeds hit by lightning-driven voltage swells",
+   "safety": "No life-safety role is named; onsite teams worked while storms were active",
+   "service-recovery": "Azure engineers who restored load balancers and recovered storage in place",
+   "comms": "Azure status and communications engineering — not named",
+   "customer": "Azure customers using storage, ASM, VSTS and Azure AD"
+  },
+  "recorded": [
+   {
+    "role": "electrical",
+    "soe": 9,
+    "quote": "Onsite engineering teams — working while storms remain active, with no evacuation and no emergency-services dispatch reported — transfer the rest of the datacenter to generators",
+    "did": "Transfer the rest of the datacenter to generators while storms are still active, stabilising power"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 13,
+    "quote": "teams commit to recovering data in place",
+    "did": "Reject failover because asynchronous geo-replication would lose data, and recover data in place"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 15,
+    "quote": "Recovery step one: restore the Azure Software Load Balancers (SLBs) for the storage scale units",
+    "did": "Restores the software load balancers for the storage scale units first"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 16,
+    "quote": "replace failed components, migrate customer data from damaged to healthy servers, and validate that no recovered data is corrupted",
+    "did": "Replaces failed components, moves customer data to healthy servers and checks it is not corrupted"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Cooling lost, storage damaged",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Surge suppressors overloaded",
+      "factor": 0
+     },
+     {
+      "label": "Chillers locked out on sag",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Buffer outlasts no takeover",
+      "factor": 1
+     },
+     {
+      "label": "ASM single-region primary",
+      "factor": 3
+     },
+     {
+      "label": "Async geo-replication",
+      "factor": 6
+     },
+     {
+      "label": "AAD site co-located",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Failover left in manual",
+      "mode": "FM-02"
+     },
+     {
+      "label": "Status page autoscale wrong",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Lightning swells on feeds",
+      "mode": "FM-01"
+     },
+     {
+      "label": "Heat outran shutdown",
+      "factor": 2
+     }
+    ]
+   }
+  ]
+ }
 }

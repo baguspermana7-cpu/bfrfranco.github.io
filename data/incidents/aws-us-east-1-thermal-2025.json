@@ -377,6 +377,51 @@
        "i": 3
       }
      }
+    ],
+    "short": "Cooling units fail together",
+    "symbol": "chiller",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Segment the chilled-water loop and give each cooling unit its own power feed so one shared element cannot take several units down",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat simultaneous alarms on several cooling units in one hall as a common-cause event: page the cooling engineers and hall owner at once, not unit by unit",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Trend chilled-water supply temperature and BMS controls state per hall so a shared loop, feed or controls fault shows before rack inlets rise",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Open the incident, name the hall owner, and start the traffic-shift decision for the zone as soon as inlet temperature is climbing",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "mechanical",
+      "phase": "recover",
+      "do": "Find the shared element (loop, plant power feed or BMS) and restore units in stages, confirming each carries load before the next starts",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
     ]
    },
    {
@@ -426,6 +471,52 @@
        "i": 1
       }
      }
+    ],
+    "short": "Cooling short of hall load",
+    "symbol": "tempSensor",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Size in-hall cooling so the loss of several units still holds the hall below thresholds, and keep maintenance from cutting redundancy",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch rack- and hall-level inlet temperature against threshold and escalate at the rate of rise, before the servers' own limit is hit",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Move customer load out of the affected hall or zone before thresholds are crossed, not after",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Decide early which workloads to shed in the zone, using the heavy use1-az4 load as the reason to act sooner",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 2
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "recover",
+      "do": "Re-cool the hall in controlled steps and hold load off until inlet temperatures are back under threshold",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     }
     ]
    },
    {
@@ -469,7 +560,48 @@
       "quote": "affected by the loss of power during the thermal event"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Overtemp shutdown kills power",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Model thermal loss as a power-and-hardware-loss event and review whether staged load shedding can run before the servers' own shutdown fires",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat the first rack power-loss alarms in a hot hall as the shutdown having fired and report the affected rack list to operations",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "List the EC2 and EBS resources on the de-energised racks and stop control-plane retries aimed at them",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Inspect each de-energised rack for heat damage before re-energising it, and mark damaged hardware for replacement",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "State in the first status post that the cause is loss of power during a thermal event, as the first post did",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -522,6 +654,50 @@
        "i": 4
       }
      }
+    ],
+    "short": "Staged recovery, hw damage",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Pre-stage spare hardware near the zone so damaged racks can be replaced without waiting",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Log hall temperatures through the recovery and flag any rack that was held above threshold for later inspection",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Pace re-energisation to the cooling that is actually restored, to avoid thermal-cycling stressed equipment",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers that damaged hardware will not return in place and to restore from EBS snapshots or relaunch in unaffected zones",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Run a written staged thermal-recovery runbook: cooling first, then phased power, then storage checks",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
     ]
    },
    {
@@ -559,7 +735,41 @@
       "quote": "Containment held at the Availability-Zone boundary by design"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Dependent services impaired",
+    "symbol": "fabric",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Map which AWS services keep capacity on hardware in each zone, so a zone loss shows its dependents in advance",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "detect",
+      "do": "Post the dependent-service warning as soon as the zone impairment is confirmed, naming IoT Core, ELB, NAT Gateway and Redshift",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Shift traffic away from the zone and drain affected load balancer and NAT targets",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Move workloads on IoT Core, ELB, NAT Gateway and Redshift to capacity in unaffected zones",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Return provisioning to the zone once EC2 and EBS health is confirmed and watch error rates",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -605,6 +815,52 @@
        "i": 5
       }
      }
+    ],
+    "short": "Customer fails with the AZ",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Run regular game-days that take a whole zone away from the matching engine, Kafka and order routing, and fix what breaks",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Alert on cross-zone replication lag and order-routing errors so a one-AZ dependency shows before a real outage",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare failover to the surviving zone when the provider's status names an impaired zone, without waiting for full confirmation",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell users that trading and fund movement are paused and give the time of the next update",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore stateful services from snapshots into a healthy zone and reconcile order and balance records before reopening",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     }
     ]
    },
    {
@@ -642,9 +898,55 @@
       "i": 3
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "No post-event summary",
+    "symbol": "bms",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Publish a post-event summary for every multi-hour event, with the failed cooling component, temperatures reached and the corrective actions",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Record unit identifiers, controls logs and temperature traces while the event is live so a summary can name the component",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Assign an owner and a date for the review before the incident is closed",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Ask the provider for the cause and the status of the shared-element fix, and record the answer in the risk register",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "recover",
+      "do": "Close each corrective action against the published cause and report its status",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "One hall down · 28 h to resolved"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -659,5 +961,120 @@
    "quote": "2026-05-08 ~20:04 PDT"
   }
  },
- "durationBasis": "Cooling loss/shutdown ~16:20 PDT 7 May → incident marked resolved ~20:04 PDT 8 May (some damaged hardware remained impaired)"
+ "durationBasis": "Cooling loss/shutdown ~16:20 PDT 7 May → incident marked resolved ~20:04 PDT 8 May (some damaged hardware remained impaired)",
+ "response": {
+  "roles": {
+   "first-responder": "AWS facility on-call staff — the record names no one who saw the cooling loss",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "AWS operations engineers who shifted traffic out of use1-az4 — not individually named",
+   "mechanical": "AWS data center cooling engineers — the record names no one who restored cooling",
+   "service-recovery": "AWS teams running the staged cooling restoration and hardware recovery",
+   "comms": "AWS Health Dashboard status posts",
+   "customer": "AWS customers in use1-az4, among them Coinbase"
+  },
+  "recorded": [
+   {
+    "role": "ops-lead",
+    "soe": 4,
+    "quote": "AWS reportedly shifts customer traffic away from use1-az4",
+    "did": "Shifts customer traffic out of use1-az4 about 46 minutes after onset to hold the impairment to one zone"
+   },
+   {
+    "role": "comms",
+    "soe": 5,
+    "quote": "AWS Health Dashboard reportedly posts first status message",
+    "did": "Posts the first status message at 17:25 PDT: EC2 and EBS on impacted hardware affected by the loss of power"
+   },
+   {
+    "role": "comms",
+    "soe": 7,
+    "quote": "AWS Health Dashboard reportedly warns dependent services will be hit",
+    "did": "Warns at 18:47 PDT that other services depending on the affected EC2 and EBS may be impaired"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 9,
+    "quote": "AWS reports staged cooling-restoration underway",
+    "did": "Restores cooling in stages, paced to avoid damaging thermally stressed equipment"
+   },
+   {
+    "role": "comms",
+    "soe": 11,
+    "quote": "AWS advises customers to restore from EBS snapshots or launch resources in unaffected zones",
+    "did": "Tells customers to restore from EBS snapshots or relaunch in unaffected zones; some hardware will not return in place"
+   },
+   {
+    "role": "customer",
+    "soe": 6,
+    "quote": "Coinbase and other services on affected racks reportedly go dark",
+    "did": "Coinbase and other services on the affected racks go dark; Coinbase is down about 7 hours"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "use1-az4 hall down ~28 hours",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Several cooling units fail",
+      "mode": "FM-01"
+     },
+     {
+      "label": "Racks off, hardware damaged",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Cooling redundancy too thin",
+      "factor": 0
+     },
+     {
+      "label": "Probable shared dependency",
+      "factor": 1
+     },
+     {
+      "label": "Load concentrated in one zone",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Maintenance status undisclosed",
+      "factor": 3
+     },
+     {
+      "label": "No post-event summary",
+      "mode": "FM-07"
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Dense racks strain cooling",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Customer single-AZ dependency",
+      "factor": 6
+     }
+    ]
+   }
+  ]
+ }
 }

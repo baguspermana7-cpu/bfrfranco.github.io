@@ -327,6 +327,54 @@
        "i": 0
       }
      }
+    ],
+    "short": "Freeze-prep steps skipped",
+    "symbol": "coolingTower",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Run freeze-prep as a checklist-gated changeover with two-person sign-off on each tower drain-down",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Dry-run the full freeze-prep sequence each season and audit tower drain-down and valve line-ups before the first hard freeze",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Walk the plant and read chilled-water flow and tower temperature after each freeze-prep step before the next starts",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Stop all further tower drain-down and re-establish chilled-water flow to the halls before any other action",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Restore the towers to their pre-changeover line-up and confirm each cooling unit is online before resuming",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm tower and chiller status from the BMS and field before declaring freeze-prep complete",
+      "basis": "uptime-os"
+     }
     ]
    },
    {
@@ -368,6 +416,47 @@
        "src": "coe",
        "i": 3
       }
+     }
+    ],
+    "short": "No contractor-boundary checks",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Work to an approved method statement with on-site supervision and a two-person verify on live freeze-prep",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "prevent",
+      "do": "Name one accountable supervisor for freeze-prep, covering both staff and contractors, before the work starts",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Check the signed method statement against what the contractor is doing at each tower",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Stop contractor work on any step that does not match the method statement and call the supervisor",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Review the contractor boundary after the event and re-issue a verified method statement",
+      "basis": "change-mgmt"
      }
     ]
    },
@@ -421,7 +510,65 @@
      "O": 3,
      "D": 8
     },
-    "revisedRationale": "CyrusOne confirmed it installed additional cooling redundancy, so one tripped unit is less likely to leave the halls without cooling (O 5→3). The reduction is kept small because no tonnage or design is disclosed, and the dossier cannot say whether the new redundancy is free of the same freeze-prep common mode."
+    "revisedRationale": "CyrusOne confirmed it installed additional cooling redundancy, so one tripped unit is less likely to leave the halls without cooling (O 5→3). The reduction is kept small because no tonnage or design is disclosed, and the dossier cannot say whether the new redundancy is free of the same freeze-prep common mode.",
+    "short": "Plant trips, no backup carries",
+    "symbol": "chiller",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Provide N+1 or N+2 cooling with procedurally diverse changeover steps, so one lapse cannot trip every unit",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Install the additional redundancy to the CHI1 cooling systems that CyrusOne added after the event",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on loss of chilled-water supply across more than one unit and send it to the on-call mechanical engineer",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Tell the tenant the plant has failed so it can start load-shed before inlet temperatures climb",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Bring standby chillers and pumps online in order, starting with the units that can restart with the towers as they are",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore chilled-water circulation to the halls and confirm supply temperature is stable before IT load returns",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Return IT load to the halls in stages as supply temperature holds",
+      "basis": "ashrae-tc99"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -466,6 +613,54 @@
        "src": "coe",
        "i": 5
       }
+     }
+    ],
+    "short": "Alarms not tied to load-shed",
+    "symbol": "bms",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Wire BMS or DCIM high-temperature alarms to automated IT throttling before inlet limits are crossed",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Agree with the operator the inlet temperature at which the tenant sheds load, and test it",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Set high-temperature alarms on rack inlet and hall return air, and route them to the on-call line",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Halt or fail over trading systems on the agreed temperature trigger, not after hardware limits are close",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hold the load off the halls until cooling is proven stable",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Review alarm thresholds against the temperatures actually reached and reset them",
+      "basis": "uptime-os"
      }
     ]
    },
@@ -516,6 +711,50 @@
        "i": 1
       }
      }
+    ],
+    "short": "Manual chiller restart",
+    "symbol": "pump",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Pre-stage mobile cooling and restart procedures for the CHI1 plant, rehearsed in the pre-winter commissioning",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Log chilled-water temperature and flow every few minutes during the restart to see whether circulation is steady",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Restart chillers at limited capacity and rebuild chilled-water circulation before adding more units",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Set the order for returning IT load: bring it back only as chilled-water circulation is stable",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring IT load back in stages and confirm temperatures at each stage",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell the market when each product returns: EBS at about 07:00 ET, stock futures about 08:30 ET",
+      "basis": "iso-22301"
+     }
     ]
    },
    {
@@ -557,9 +796,68 @@
        "i": 4
       }
      }
+    ],
+    "short": "Matching engines on one campus",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Pursue geographically diverse cooling and power for critical matching engines",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Test a full failover of the matching engines to a second site",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "detect",
+      "do": "Watch for a halt or loss of price feed and alert traders and clearing members at once",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare a market-wide halt rather than run partial service from an unstable site",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Publish the halt notice, with the reason and who is working to resolve it",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Review market integrity after the halt before trading resumes in full",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Restart markets in sequence as each system is checked, with FX and futures first",
+      "basis": "nist-800-34"
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "CME markets halted ~11 h"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -574,5 +872,117 @@
    "quote": "2025-11-28 ~08:30 ET"
   }
  },
- "durationBasis": "Chiller failure evening 27 Nov CT → CME markets fully reopened ~08:30 ET 28 Nov (reported ~11 h)"
+ "durationBasis": "Chiller failure evening 27 Nov CT → CME markets fully reopened ~08:30 ET 28 Nov (reported ~11 h)",
+ "response": {
+  "roles": {
+   "first-responder": "No first responder is named; the record does not say who saw the first alarm",
+   "incident-commander": "No incident commander is named in the record",
+   "mechanical": "CyrusOne onsite staff, contractors and engineering teams at CHI1 — not named",
+   "vendor": "The contracting firm on the freeze-prep work — not named in any source",
+   "service-recovery": "CyrusOne, which restored stable operations at CHI1",
+   "comms": "CME Group, which published the market-halt notice",
+   "customer": "CME Group, tenant running its trading systems at CHI1",
+   "authority": "CFTC and SEC, reportedly aware and monitoring"
+  },
+  "recorded": [
+   {
+    "role": "mechanical",
+    "soe": 0,
+    "quote": "onsite staff and contractors began preparing/draining CHI1's cooling towers",
+    "did": "Prepare and drain the cooling towers for freezing weather without following standard winterization procedures"
+   },
+   {
+    "role": "customer",
+    "soe": 4,
+    "quote": "CME's trading systems (Globex and related markets) were halted/failed over",
+    "did": "CME halts or fails over its trading systems to stop generating heat and protect hardware"
+   },
+   {
+    "role": "comms",
+    "soe": 6,
+    "quote": "CME issued a public notice that its markets were halted due to a cooling issue",
+    "did": "CME publishes a notice that markets are halted by a cooling issue and that it is working to resolve it"
+   },
+   {
+    "role": "mechanical",
+    "soe": 7,
+    "quote": "CyrusOne mobilized engineering teams and contractors on-site to restart chillers",
+    "did": "Engineering teams and contractors restart the chillers and rebuild chilled-water circulation"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 13,
+    "quote": "restored stable and secure operations at its Chicago 1 (CHI1) data center",
+    "did": "CyrusOne reports stable operation restored and additional cooling redundancy installed"
+   },
+   {
+    "role": "authority",
+    "soe": 12,
+    "quote": "regulators (CFTC and SEC) reportedly aware and monitoring",
+    "did": "CFTC and SEC are reportedly aware and monitoring as futures trading resumes"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "CME markets halted ~11 h",
+  "bones": [
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Freeze-prep steps not followed",
+      "factor": 0
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "No contractor-boundary checks",
+      "factor": 4
+     },
+     {
+      "label": "Live-load winterization",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Common-mode cooling units",
+      "factor": 1
+     },
+     {
+      "label": "Alarms not wired to load-shed",
+      "mode": "FM-04"
+     },
+     {
+      "label": "Engines on one campus",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Chiller plant trips together",
+      "mode": "FM-03"
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Hard freeze approaching",
+      "factor": 2
+     }
+    ]
+   }
+  ]
+ }
 }

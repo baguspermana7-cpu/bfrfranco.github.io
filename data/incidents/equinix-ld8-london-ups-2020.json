@@ -386,6 +386,52 @@
        "i": 2
       }
      }
+    ],
+    "short": "Static switch fails in service",
+    "symbol": "ups",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Trend thermal and harmonic readings on the thyristor output static switch and replace it on drift",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat a UPS static-switch temperature or alarm-log event as a call-out; inspect the cabinet before it smokes",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order the Galaxy UPS output isolated and confirm which risers lose power before anyone opens the cabinet",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Open the UPS output and bypass breakers so the faulted switch is dead before inspection",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "vendor",
+      "phase": "recover",
+      "do": "Examine the failed output static switch and report why it failed and whether sister units are exposed",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Feed the risers from a healthy source, then restore customers floor by floor",
+      "basis": "nfpa-70e"
+     }
     ]
    },
    {
@@ -449,7 +495,60 @@
      "O": 2,
      "D": 9
     },
-    "revisedRationale": "With A and B routed to separate UPS systems, a single UPS or static-switch fault should drop one cord rather than both (O 5→2). D is unchanged because no end-to-end verification such as the recommended pull-the-plug testing is recorded, and S is unchanged for any other common point. The implementation is described only through an engineer's account relayed by a customer, and the wider convergence audit is not confirmed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "With A and B routed to separate UPS systems, a single UPS or static-switch fault should drop one cord rather than both (O 5→2). D is unchanged because no end-to-end verification such as the recommended pull-the-plug testing is recorded, and S is unchanged for any other common point. The implementation is described only through an engineer's account relayed by a customer, and the wider convergence audit is not confirmed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "A and B fed from one UPS",
+    "symbol": "pdu",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Route A and B through independent PDUs to separate UPS systems so no UPS feeds both cords",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Audit distribution boards, busbar risers and common-output cabinets for hidden A/B convergence",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Test A/B independence with a pull-the-plug check per customer rack and log the result",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Identify which racks have both cords on the failed UPS and feed them first",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Move the remaining dual-corded racks so each cord is on a different UPS before return to normal",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Check your own racks: confirm A and B cords land on separate UPS and ask the operator for the topology",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -505,6 +604,50 @@
        "i": 2
       }
      }
+    ],
+    "short": "Alarm powers down 4 levels",
+    "symbol": "epo",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Isolate life-safety interlocks so a fire-alarm trip on one UPS does not de-energise the redundant side of whole floors",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Confirm smoke versus fire at the cabinet and tell the fire panel operator at once",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Limit the power-down to the faulted UPS zone and keep unaffected levels live when no flame is present",
+      "basis": "nims-ics",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "contain",
+      "do": "Run a zoned fault-isolation procedure so engineers can work a faulted cabinet without a full evacuation",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Re-energise levels one at a time once the fire panel is reset and the switch is isolated",
+      "basis": "nfpa-70e"
+     }
     ]
    },
    {
@@ -552,6 +695,57 @@
       "evidence": {
        "src": "improvement",
        "i": 6
+      }
+     }
+    ],
+    "short": "No fast re-energise path",
+    "symbol": "ats",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Provide an alternate UPS string or generator path that can take the risers without a full migration",
+      "evidence": {
+       "src": "improvement",
+       "i": 6
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Report at once whether generator or alternate-UPS pick-up has occurred, instead of assuming it",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Choose between repairing the faulted cabinet and migrating to new infrastructure, and state the expected hours",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Commission the new power infrastructure and migrate customer supplies in a set order",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring up BT, LINX and other critical loads first, and report each restore time",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Give rolling restoration ETAs to customers and LINX as each stage completes",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
       }
      }
     ]
@@ -602,6 +796,45 @@
        "src": "coe",
        "i": 4
       }
+     }
+    ],
+    "short": "Access control dark in outage",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Put access-control controllers on protected power or an offline-capable fallback",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Check the access-control panel status at the start of every power event",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "safety",
+      "phase": "contain",
+      "do": "Run manual two-way-radio access with escorts and a logged entry list for customer engineers",
+      "evidence": {
+       "src": "factor",
+       "i": 6
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Tell customers how to get access during the outage, and who is authorised to escort",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore access control to normal and reconcile the manual entry log",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -663,6 +896,51 @@
        "i": 5
       }
      }
+    ],
+    "short": "Statement 7.5 h after onset",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Adopt an incident-communications standard with a set acknowledgement window and rolling ETAs",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Log each customer call from onset so the first unanswered hour is visible",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post an acknowledgement naming the affected levels and the next update time within the first hour",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name one communications owner and give them the facility status every hour",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Send customers the full RFO and publish a public RCA",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Ask the operator for the RFO in writing and review the topology against it",
+      "basis": "iso-22301"
+     }
     ]
    },
    {
@@ -700,9 +978,46 @@
       "i": 13
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Peering concentrated at LD8",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Dual-site critical peering across separate facilities, not only separate racks",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Monitor each peering point's BGP session state separately and alarm on the loss of the LD8 PoP",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell members which PoP is down and that the other ten are unaffected",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Direct traffic to the surviving PoPs and ask affected members to check their routes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring the LD8 PoP back after power is stable and confirm sessions member by member",
+      "basis": "itil-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "LD8 levels 1-4 dark · ~17.5 h"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -717,5 +1032,115 @@
    "quote": "13:42 BST"
   }
  },
- "durationBasis": "Power lost ~04:24 BST 18 Aug → all LINX devices restored 13:42 BST (BT back 08:03)."
+ "durationBasis": "Power lost ~04:24 BST 18 Aug → all LINX devices restored 13:42 BST (BT back 08:03).",
+ "response": {
+  "roles": {
+   "first-responder": "Equinix facilities technicians at LD8 — not individually named",
+   "incident-commander": "No incident commander is named in the record",
+   "electrical": "Equinix and its contractors who migrated customer power to new infrastructure",
+   "safety": "Whoever applied the fire-alarm power-down and evacuation of levels 1 to 4 — not named",
+   "service-recovery": "Equinix and contractor engineers restoring the site — not individually named",
+   "comms": "Equinix public statements and the LINX statements to members",
+   "vendor": "Schneider, maker of the Galaxy UPS (named only as the supplier)",
+   "customer": "LINX, Giganet, Matthew Skipsey and BT Enterprise/Global customers"
+  },
+  "recorded": [
+   {
+    "role": "customer",
+    "soe": 0,
+    "quote": "Giganet reports losing 'both A+B feeds' to a rack",
+    "did": "Giganet loses both A and B feeds to a rack at about 04:23"
+   },
+   {
+    "role": "first-responder",
+    "soe": 2,
+    "quote": "Equinix facilities technicians respond immediately",
+    "did": "Technicians respond to the fire alarm at 04:33 per the RFO"
+   },
+   {
+    "role": "first-responder",
+    "soe": 3,
+    "quote": "Responders find smoke but no open fire",
+    "did": "Find smoke but no open fire from the faulting switch"
+   },
+   {
+    "role": "safety",
+    "soe": 6,
+    "quote": "all systems within the vicinity of the fault – from levels one to four – were powered down",
+    "did": "Levels 1 to 4 are powered down and the IBX is evacuated on the fire alarm"
+   },
+   {
+    "role": "electrical",
+    "soe": 10,
+    "quote": "Equinix and contractors begin migrating customer power supplies onto newly commissioned infrastructure",
+    "did": "Migrate customer power to new infrastructure rather than restore the faulted cabinet"
+   },
+   {
+    "role": "comms",
+    "soe": 11,
+    "quote": "Power is now being restored to the site and LINX equipment is in the process of being brought live again.",
+    "did": "LINX tells members that power is returning from 11:46"
+   },
+   {
+    "role": "comms",
+    "soe": 12,
+    "quote": "Equinix engineers have diagnosed the root cause of the issue as a faulty UPS",
+    "did": "Equinix issues its first public statement, 12:04, naming a faulty UPS"
+   },
+   {
+    "role": "comms",
+    "soe": 14,
+    "quote": "Equinix confirms complete and stable power was restored to the whole site",
+    "did": "Confirms stable whole-site power at 21:49"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "LD8 levels 1-4 dark ~17.5 h",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Static switch fails, smokes",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "A and B on one UPS",
+      "factor": 0
+     },
+     {
+      "label": "A/B coupled at UPS output",
+      "factor": 1
+     },
+     {
+      "label": "LINX PoP in one domain",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Zone-wide power-down on alarm",
+      "factor": 3
+     },
+     {
+      "label": "No quick re-energise path",
+      "factor": 4
+     },
+     {
+      "label": "Statement after 7.5 h",
+      "factor": 6
+     }
+    ]
+   }
+  ]
+ }
 }

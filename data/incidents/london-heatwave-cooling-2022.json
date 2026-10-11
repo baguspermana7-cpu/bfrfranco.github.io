@@ -348,6 +348,44 @@
        "i": 0
       }
      }
+    ],
+    "short": "Cooling collapse at 40C",
+    "symbol": "chiller",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Raise the cooling plant's worst-case design ambient and factory-test the units to it",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page facilities on BMS hall-temperature trend and on cooling units nearing rated limit, ahead of the high-temperature alarm",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Start staged workload drain in the hottest hall before hardware limits, using the pre-agreed load-shed order",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Power down the part of the zone that cannot be held and limit new preemptible launches into it",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "mechanical",
+      "phase": "recover",
+      "do": "Restore cooling capacity unit by unit and confirm hall temperature before releasing load",
+      "basis": "ashrae-tc99"
+     }
     ]
    },
    {
@@ -400,6 +438,48 @@
        "i": 1
       }
      }
+    ],
+    "short": "Redundant units fail together",
+    "symbol": "chiller",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Function-test standby cooling units under near-design high ambient and log the result",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Audit the plant for common-mode paths so duplicated units cannot all be defeated by one driver such as ambient heat",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm when two or more cooling units drop or derate together; treat it as a shared driver",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare a thermal incident at the first second unit lost, before the hall cannot hold temperature",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Rebuild capacity in the zone and verify each hall before moving workloads back",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -440,6 +520,47 @@
        "src": "improvement",
        "i": 3
       }
+     }
+    ],
+    "short": "Abrupt thermal load-shed",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Write a staged thermal load-shed runbook: migrate or drain workloads before VMs are terminated",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Validate BMS high-temperature thresholds and shutdown setpoints so there is time to migrate",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert the Compute Engine owners the moment a zone power-down is chosen, with the list of VMs",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Terminate the lowest-priority VMs first and keep the rest running while the heat load falls",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart the terminated VMs in the zone once cooling is restored, in customer priority order",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -498,6 +619,45 @@
        "i": 5
       }
      }
+    ],
+    "short": "Disks damaged by power-down",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Harden Persistent Disk so an emergency power-down cannot leave replicas single-redundant",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Monitor disk IO errors and replica count after a power-down and page storage on any drop",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Hold the all-clear for the zone until storage health is checked, not only compute",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore Persistent Disk redundancy and remediate HDD-backed volumes with IO errors",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell affected customers to contact support and name which disks remain at risk",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -545,6 +705,42 @@
        "src": "improvement",
        "i": 4
       }
+     }
+    ],
+    "short": "Reroute hits all 3 zones",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add a scope guard so a zone-scoped traffic mitigation cannot be applied to all zones",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Require a second engineer to confirm the target zone before routing changes in an incident",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch traffic per zone after any routing change and alert if healthy zones lose load",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Revert the routing change at once and re-apply it scoped to the affected zone",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm internal services are serving in the two healthy zones before closing",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -596,6 +792,44 @@
        "i": 2
       }
      }
+    ],
+    "short": "Oracle cooling subset fails",
+    "symbol": "chiller",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Test Oracle's standby cooling at near-design ambient and publish the climate envelope",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Raise a cooling alert to the on-call as soon as temperatures leave band, before customers see errors",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Identify service infrastructure that can be powered down safely and shut it down to prevent hardware failure",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post status early to customers rather than after an hour; name the data centre and services affected",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore Oracle Integration Cloud and the remaining impacted subset after cooling is back",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -637,9 +871,53 @@
        "i": 4
       }
      }
+    ],
+    "short": "Plant history unpublished",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Ask the operator for plant type, redundancy and high-ambient test results as part of resilience review",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "prevent",
+      "do": "Agree before an incident what plant and test facts will be published afterwards",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "State what is confirmed and what is reported only, so customers do not rely on the larger figures",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Treat a single zone or building as a failure domain and test multi-zone failover",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 6
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Publish plant and maintenance-test history after the event for independent learning",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "Cooling lost at 2 London sites"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -654,5 +932,95 @@
    "quote": "20:43 US/Pacific"
   }
  },
- "durationBasis": "Cooling failure 06:33 PDT 19 Jul → resolved for all affected users 20:43 PDT (~14h10)."
+ "durationBasis": "Cooling failure 06:33 PDT 19 Jul → resolved for all affected users 20:43 PDT (~14h10).",
+ "response": {
+  "roles": {
+   "first-responder": "No on-call responder is named; BMS temperature monitoring raised the alarm",
+   "incident-commander": "No incident commander is named in the record",
+   "mechanical": "Operator facilities engineers restoring cooling — not individually named",
+   "ops-lead": "Google and Oracle engineers who powered down infrastructure and changed routing",
+   "service-recovery": "Operator engineering teams rebuilding capacity — not individually named",
+   "comms": "Google Cloud Service Health and the Oracle status channel",
+   "change-owner": "Google SRE and networking, owners of the routing tooling",
+   "customer": "Cloud customers hosted in europe-west2 and Oracle UK South"
+  },
+  "recorded": [
+   {
+    "role": "ops-lead",
+    "soe": 3,
+    "quote": "Google powers down part of the zone and limits preemptible launches",
+    "did": "Powers down part of europe-west2-a and limits preemptible launches to prevent machine damage"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 5,
+    "quote": "engineers inadvertently modify traffic routing for internal services",
+    "did": "Reroute internal-service traffic away from all three europe-west2 zones rather than only zone a"
+   },
+   {
+    "role": "comms",
+    "soe": 6,
+    "quote": "Google publicly acknowledges the fault",
+    "did": "Posts a cooling-related failure notice about 2.5 hours after the 06:33 PDT start"
+   },
+   {
+    "role": "comms",
+    "soe": 8,
+    "quote": "Oracle acknowledges the cooling problem at its UK South (London) data centre",
+    "did": "Acknowledges the cooling problem at 16:38 UTC"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 9,
+    "quote": "service infrastructure that can be safely powered down to prevent additional hardware failures",
+    "did": "Oracle identifies and powers down infrastructure that can be safely shut off"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 10,
+    "quote": "operator engineering teams restoring cooling and rebuilding capacity",
+    "did": "Operator engineering teams restore cooling and rebuild capacity; no evacuation or fire call occurs"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Cooling lost, europe-west2-a down",
+  "bones": [
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Record 40.3C ambient",
+      "factor": 0
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Design ambient set too low",
+      "factor": 1
+     },
+     {
+      "label": "Redundant units fail together",
+      "factor": 2
+     },
+     {
+      "label": "Sector-wide design gap",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "No high-ambient unit test",
+      "factor": 4
+     }
+    ]
+   }
+  ]
+ }
 }

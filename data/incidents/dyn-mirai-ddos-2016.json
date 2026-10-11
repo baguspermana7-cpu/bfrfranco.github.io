@@ -404,6 +404,51 @@
        "i": 3
       }
      }
+    ],
+    "short": "Port-53 flood on DNS",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Provision scrubbing and anycast capacity above the largest observed flood, and rehearse diverting port-53 traffic to it",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm the NOC on port-53 query-rate anomalies per anycast site, and page the on-call network engineer",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "security",
+      "phase": "contain",
+      "do": "Identify the attack family from flood signatures and share indicators with the scrubbing partners",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Apply traffic shaping, filtering and scrubbing on inbound port 53 and rebalance anycast away from the saturated sites",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Open a bridge with the scrubbing and upstream vendors and set the update cadence for customers",
+      "basis": "iso-27035"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore resolution region by region as scrubbing holds, and check each region before moving to the next",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Post a status update for each wave with start and end times",
+      "basis": "iso-27035"
+     }
     ]
    },
    {
@@ -456,6 +501,56 @@
        "i": 3
       }
      }
+    ],
+    "short": "Attack looks like retries",
+    "playbook": [
+     {
+      "role": "security",
+      "phase": "prevent",
+      "do": "Deploy DNS-layer anomaly detection that separates pseudo-random-subdomain floods from legitimate resolver retries",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Compare unique-source count with query volume; flag when source counts explode while customer zones stay stable",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Filter on query patterns (random labels) rather than by source address, so legitimate recursive resolvers keep being answered",
+      "basis": "nist-800-61",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Do not publish source-IP counts as the attack size until retries are separated from bots",
+      "basis": "iso-27035",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "recover",
+      "do": "Provide botnet-population estimates from outside telemetry to cross-check Dyn's own figures",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Relax the filters in steps, checking customer query success after each step",
+      "basis": "nist-800-61"
+     }
     ]
    },
    {
@@ -501,6 +596,50 @@
        "src": "improvement",
        "i": 4
       }
+     }
+    ],
+    "short": "Regional re-steering fails",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Size anycast and scrubbing capacity for an attack from every region at once, not for a regional footprint",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Check the source-region breakdown at every wave start; page the incident commander when it is global",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop re-steering load to other regions when sources span all regions, and divert to scrubbing centres instead",
+      "basis": "nist-800-61",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Ask scrubbing vendors for extra global capacity before the next wave, using the gap between waves",
+      "basis": "iso-27035",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore each region only once scrubbing is carrying its traffic",
+      "basis": "nist-800-61"
      }
     ]
    },
@@ -553,6 +692,52 @@
       "evidence": {
        "src": "improvement",
        "i": 2
+      }
+     }
+    ],
+    "short": "Sole DNS provider",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Publish NS records at two independent authoritative DNS providers with no shared infrastructure",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Probe your zone from outside, against each provider's nameservers separately, and alarm when one set stops answering",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Raise the secondary provider's share of answers and lower TTLs while the primary provider is being flooded",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell Managed DNS customers which nameservers are affected and that a second provider is the workaround",
+      "basis": "iso-27035"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-add the primary provider to rotation only after it answers steadily from all regions",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Review which hidden dependencies went down together and add them to the continuity plan",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
       }
      }
     ]
@@ -623,6 +808,57 @@
        "i": 0
       }
      }
+    ],
+    "short": "Default-credential IoT devices",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Ship devices with unique per-device passwords, Telnet off by default and a forced change at first boot",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Change default passwords on cameras, DVRs and routers and close Telnet from the internet",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     },
+     {
+      "role": "security",
+      "phase": "detect",
+      "do": "Scan your own address space for open Telnet and default-login devices before an attacker does",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Block inbound Telnet at the edge and quarantine devices found enrolled in a botnet",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "authority",
+      "phase": "contain",
+      "do": "Pursue and prosecute botnet authors and operators",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "recover",
+      "do": "Push signed firmware updates to remove default credentials from fielded devices",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
     ]
    },
    {
@@ -670,9 +906,49 @@
        "i": 4
       }
      }
+    ],
+    "short": "Postmortem lost offline",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Archive the incident postmortem in an independent store at publication, outside the corporate website",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Check each cited source still resolves when the postmortem is finalised and record fetch dates",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Keep the raw timeline and figures with their sources in the internal incident record",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-publish the postmortem from internal records when a site is retired or redirected",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Hold investigation findings in a public archive that outlives the operator",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "Dyn DNS down · 2 waves, dozens of sites"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -687,5 +963,121 @@
    "quote": "15:50-17:00"
   }
  },
- "durationBasis": "Impact 11:10 UTC (07:10 ET) → wave 2 mitigated ~17:00 UTC; third wave had no customer impact."
+ "durationBasis": "Impact 11:10 UTC (07:10 ET) → wave 2 mitigated ~17:00 UTC; third wave had no customer impact.",
+ "response": {
+  "roles": {
+   "first-responder": "Dyn NOC and DDoS telemetry — individuals not named",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "Dyn network engineers applying shaping, anycast and scrubbing — not named",
+   "service-recovery": "Dyn engineers restoring DNS service across regions — not named",
+   "comms": "Dyn public statements (the Hilton statement, now offline)",
+   "security": "Dyn security staff — only external analysis by Flashpoint and Akamai is credited",
+   "vendor": "Flashpoint, Akamai (analysis) and Level 3 (botnet sizing)",
+   "customer": "Dyn Managed DNS customers such as Twitter, Spotify, Reddit and SoundCloud",
+   "authority": "FBI and DOJ, who prosecuted the Mirai authors (not the Dyn attack)"
+  },
+  "recorded": [
+   {
+    "role": "first-responder",
+    "soe": 2,
+    "quote": "Dyn's NOC/DDoS telemetry detected anomalous port-53 traffic against East-coast DNS at attack onset",
+    "did": "Detects anomalous port-53 traffic against East-coast DNS between 07:10 and 07:30 ET"
+   },
+   {
+    "role": "vendor",
+    "soe": 3,
+    "quote": "Flashpoint is now reporting that they have seen indications that a Mirai-based botnet is indeed involved in the attack on Dyn today.",
+    "did": "Flashpoint reports indications that a Mirai-based botnet is involved"
+   },
+   {
+    "role": "vendor",
+    "soe": 4,
+    "quote": "approximately 10 percent were involved in the attack on Dyn.",
+    "did": "Level 3 sizes Mirai at about 550,000 nodes, about 10 percent in the Dyn attack"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 5,
+    "quote": "Dyn deployed traffic-shaping of inbound port-53 traffic, anycast routing-policy rebalancing, internal filtering and scrubbing services",
+    "did": "Applies traffic shaping, anycast rebalancing, filtering and scrubbing to the first wave"
+   },
+   {
+    "role": "customer",
+    "soe": 6,
+    "quote": "downstream customers using Dyn as authoritative DNS lost resolution",
+    "did": "Downstream customers lose resolution: Twitter, Spotify, Reddit, SoundCloud and others"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 10,
+    "quote": "anycast re-steering, scrubbing-center diversion and filtering of port-53 flood traffic",
+    "did": "Applies re-steering, scrubbing-centre diversion and filtering against the second wave"
+   },
+   {
+    "role": "comms",
+    "soe": 12,
+    "quote": "Dyn reported a third attack wave was mitigated without customer impact",
+    "did": "Reports that a third wave was mitigated with no customer impact"
+   },
+   {
+    "role": "authority",
+    "soe": 14,
+    "quote": "FBI/DOJ prosecuted Mirai authors Paras Jha, Josiah White and Dalton Norman",
+    "did": "Prosecutes the Mirai authors; the case did not cover the Dyn attack"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Dyn DNS down for dozens of sites",
+  "bones": [
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Copycat Mirai botnet",
+      "factor": 2
+     },
+     {
+      "label": "Default-credential IoT fleet",
+      "factor": 0
+     },
+     {
+      "label": "Owners never change passwords",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Dyn as sole DNS provider",
+      "factor": 3
+     },
+     {
+      "label": "Region-biased re-steering",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Retries look like attack",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Port-53 flood overwhelms DNS",
+      "mode": "FM-01"
+     }
+    ]
+   }
+  ]
+ }
 }

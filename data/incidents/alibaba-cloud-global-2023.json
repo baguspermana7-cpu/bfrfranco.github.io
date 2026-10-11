@@ -337,7 +337,47 @@
       "i": 1
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Global Auth, no isolation",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Split the Auth/IAM plane into regional cells so one change cannot fail every region at once",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page on a simultaneous Auth error spike in all regions and treat it as a shared-component fault, not a regional one",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare a global incident, freeze further control-plane changes and name one owner for the Auth service",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Revert the last change to the Auth/permission service across cells, starting with the HQ regions",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring Hangzhou and Beijing back first, then the remaining zones, checking OSS/OTS/SLS/MNS sign-in per region",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -375,7 +415,48 @@
       "i": 8
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Shared change, no canary",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Roll shared Auth changes out to one cell first with an automatic blast-radius cap and fast rollback",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Freeze shared control-plane changes during and right after peak events such as Double 11",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on Auth error rate within minutes of a control-plane change landing, and tie the alarm to the change record",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Halt the rollout and roll the change back as soon as the console/API anomaly appears",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm per region that Auth error rates are back to baseline before reopening the change window",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -417,7 +498,47 @@
       "quote": "Hangzhou (East China 1) and Beijing (North China 2) recovered in one hour while other AZs took three hours"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Auth recovery loop on OSS",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Give the permission service a self-contained bootstrap store that does not call OSS",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "During recovery, check whether Auth start-up is blocked on a permission check against OSS and log the finding",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Authorise a break-glass path to the permission service that bypasses OSS and record who used it",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Restart the permission service from the local bootstrap store, not from gated storage",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore the other availability zones in sequence after the HQ regions, verifying each before the next",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -455,7 +576,47 @@
       "quote": "Alibaba Cloud attributed the incident to an \"anomaly\" in the cloud product console access and API calls"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Console shares the failed Auth",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Build an out-of-band console and OpenAPI emergency path that does not authenticate through the main Auth layer",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Probe the console and OpenAPI from outside the Auth path so loss of operator tooling is alarmed at once",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Switch the response team to the out-of-band tools and tell staff which tools are dead",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Use the emergency path to inspect and repair Auth directly while the public console stays down",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell customers when console login and OpenAPI return in each region",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -496,7 +657,44 @@
       "quote": "signature verification failed everywhere at once"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Per-request Auth dependency",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add a degraded mode where OSS, OTS, SLS and MNS accept recently verified credentials briefly when central Auth is down",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch OSS/OTS/SLS/MNS failure rate per region and escalate when it rises together with Auth errors",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name the downstream apps hit (Taobao, Xianyu, DingTalk) and put their owners on the bridge",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Keep workloads on ECS and RDS running; they kept serving on built-in credentials, so avoid restarting them",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-enable OSS/OTS/SLS/MNS region by region as Auth stabilises, then watch the apps recover",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -538,9 +736,53 @@
       "i": 0
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "No post-mortem published",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Commit to publish a root-cause report for every global outage, as the first CoE action asks",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "detect",
+      "do": "Check at close that the triggering change and the safeguards that failed are named in the incident record",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Say plainly what is known and unknown, instead of repeating only 'anomaly'",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "recover",
+      "do": "Compare the 27 Nov database-API failure with this cause and publish whether they share one",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Re-assess exposure to the global Auth plane using the published report and plan regional isolation",
+      "basis": "iso-22301"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "All regions down · 207 min"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -555,5 +797,95 @@
    "quote": "2023-11-12 21:11 CST All global regions restored"
   }
  },
- "durationBasis": "Auth plane failing 17:44 CST 12 Nov → all global regions restored 21:11 CST (HQ regions back ~18:44)"
+ "durationBasis": "Auth plane failing 17:44 CST 12 Nov → all global regions restored 21:11 CST (HQ regions back ~18:44)",
+ "response": {
+  "roles": {
+   "first-responder": "Alibaba Cloud monitoring and on-call — individuals not named",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "Alibaba Cloud engineers restoring the Auth/permission service — not individually named",
+   "change-owner": "Owner of the shared Auth/permission change — not disclosed",
+   "service-recovery": "Alibaba Cloud regional recovery teams — not named",
+   "comms": "Alibaba Cloud public statement desk",
+   "customer": "Alibaba Cloud customers and the apps built on OSS/Auth"
+  },
+  "recorded": [
+   {
+    "role": "first-responder",
+    "soe": 1,
+    "quote": "Alibaba Cloud monitoring detects an 'anomaly' in cloud product console access and API calls across regions",
+    "did": "Monitoring flags an anomaly in console and API calls across regions at about 17:44"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 8,
+    "quote": "Engineers work to restore the Auth/permission service",
+    "did": "Engineers work to restore Auth; no play-by-play or rollback step is disclosed"
+   },
+   {
+    "role": "comms",
+    "soe": 13,
+    "quote": "Alibaba Cloud publicly attributes the incident only to a console/API 'anomaly' and issues no detailed root-cause post-mortem",
+    "did": "Gives only the 'anomaly' attribution and publishes no post-mortem"
+   },
+   {
+    "role": "customer",
+    "soe": 14,
+    "quote": "triggering SLA compensation of 25-30% of monthly service fees in vouchers",
+    "did": "Affected customers receive 25-30% SLA vouchers after availability falls to 99.5%"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "All-region outage, 207 min",
+  "bones": [
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "One global Auth/IAM plane",
+      "factor": 0
+     },
+     {
+      "label": "Auth and OSS circular wait",
+      "factor": 1
+     },
+     {
+      "label": "Console shares failed Auth",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Change day after Double 11",
+      "factor": 3
+     },
+     {
+      "label": "No staged rollout/blast cap",
+      "mode": "FM-02"
+     }
+    ]
+   },
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "No post-mortem published",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Repeat failure 15 days later",
+      "factor": 5
+     }
+    ]
+   }
+  ]
+ }
 }

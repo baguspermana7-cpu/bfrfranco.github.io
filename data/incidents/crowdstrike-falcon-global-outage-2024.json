@@ -434,7 +434,54 @@
      "O": 2,
      "D": 2
     },
-    "revisedRationale": "The Sensor Content Compiler now rejects a count mismatch at build time, and CrowdStrike verified no other Template Type had one (O 4→2), with the compile check acting as an automated interlock (D 9→2). Recorded as in production on 27 July 2024. Severity is unchanged should a similar fault get through another way."
+    "revisedRationale": "The Sensor Content Compiler now rejects a count mismatch at build time, and CrowdStrike verified no other Template Type had one (O 4→2), with the compile check acting as an automated interlock (D 9→2). Recorded as in production on 27 July 2024. Severity is unchanged should a similar fault get through another way.",
+    "short": "21 fields defined, 20 passed",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Validate the Template Type input-field count at compile time and check every other Template Type on every platform",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Review the Template Type definition against the integration code that calls the Content Interpreter before a sensor release",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "detect",
+      "do": "Check input counts for every Template Type once a mismatch is found, not only the one that crashed",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Hold all new Rapid Response Content for IPC Template Instances until the count is fixed",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "change-owner",
+      "phase": "recover",
+      "do": "Ship the compiler guard to production and confirm no other Template Type supplies a wrong number of inputs",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Publish the mismatch and the fix in the External RCA with dates",
+      "basis": "iso-27035"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -483,7 +530,58 @@
      "O": 5,
      "D": 2
     },
-    "revisedRationale": "The hardened validator now refuses an instance that matches over more fields than are provided, an automated interlock for this class (D 9→2). Recorded as released to production by 19 August 2024."
+    "revisedRationale": "The hardened validator now refuses an instance that matches over more fields than are provided, an automated interlock for this class (D 9→2). Recorded as released to production by 19 August 2024.",
+    "short": "Validator checks wrong count",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Make the Content Validator reject instances that match over more fields than the sensor supplies",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add a second check to the validator that reads the input count from the integration code, not from the definition",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Replay every instance that passed the validator through the Content Interpreter in a test sensor before release",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Suspend release of Rapid Response Content until the validator is fixed",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "change-owner",
+      "phase": "recover",
+      "do": "Release the hardened validator, allowing only wildcard criteria in the 21st field",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "recover",
+      "do": "Have the independent security vendors review the validator code and the build-to-deployment path",
+      "basis": "iso-27035",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -531,7 +629,48 @@
      "O": 3,
      "D": 4
     },
-    "revisedRationale": "Non-wildcard tests on every field would surface a missing input before release (D 9→4). The dossier records this as done for existing types with expansion ongoing, so the reduction is partly a claim about the action rather than a confirmed outcome."
+    "revisedRationale": "Non-wildcard tests on every field would surface a missing input before release (D 9→4). The dossier records this as done for existing types with expansion ongoing, so the reduction is partly a claim about the action rather than a confirmed outcome.",
+    "short": "Tests only wildcard the 21st",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Test non-wildcard matching criteria for every field of every Template Type, and complete the fuzz testing",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Test the exact production content path, not a static set of 12 cases",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Review test coverage per field at release sign-off and refuse a release where any field is only wildcard-tested",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Stop the release pipeline when a coverage gap is found, until the missing cases are added",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "change-owner",
+      "phase": "recover",
+      "do": "Add the non-wildcard cases to the suite and rerun the full suite on the reverted and new content",
+      "basis": "change-mgmt"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -587,7 +726,54 @@
      "O": 4,
      "D": 9
     },
-    "revisedRationale": "With bounds and size checks the same malformed content should no longer fault the kernel, so the effect drops from a crashed host to limited impact (S 10→4); the improvement wording is that parsing faults 'degrade gracefully', and the dossier does not describe the degraded behaviour itself. Recorded as added on 25 July 2024 and generally available by 9 August 2024."
+    "revisedRationale": "With bounds and size checks the same malformed content should no longer fault the kernel, so the effect drops from a crashed host to limited impact (S 10→4); the improvement wording is that parsing faults 'degrade gracefully', and the dossier does not describe the degraded behaviour itself. Recorded as added on 25 July 2024 and generally available by 9 August 2024.",
+    "short": "Interpreter reads past array",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add runtime bounds checking and an array-size check to the Content Interpreter so a parse fault does not crash the kernel",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Backport the bounds check to all Windows sensor versions 7.11 and above by hotfix",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Alarm on csagent.sys bugchecks and on a rise in blue-screen counts across the Windows fleet",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Revert the faulty content file at source as soon as crashes are tied to Channel File 291",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare a global incident and hold sensor content updates until the interpreter fix is released",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Apply the hotfix sensor on recovered hosts before they receive further content",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -640,7 +826,58 @@
      "O": 6,
      "D": 4
     },
-    "revisedRationale": "A canary ring would show a crash on a small population with time to halt the release (D 9→4) and confine the effect to that ring (S 10→6). The dossier records the initial controls as shipped with granularity still being enhanced, so the size of the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "A canary ring would show a crash on a small population with time to halt the release (D 9→4) and confine the effect to that ring (S 10→6). The dossier records the initial controls as shipped with granularity still being enhanced, so the size of the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "One-shot global content push",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Stage Rapid Response Content in rings with bake time and automatic halt on crash-rate spikes",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Use the new customer controls to place a canary group first and delay the rest of the fleet",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Watch crash and sensor-offline rates per ring and stop the push when the first ring shows a spike",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Revert the content at source; the fix was published at 05:27 UTC, 78 minutes after the push",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Notify customers to pause content updates fleet-wide while the cause is established",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell customers which timestamp marks the good file and which hosts need hands-on recovery",
+      "basis": "iso-27035"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -686,9 +923,53 @@
        "i": 4
       }
      }
+    ],
+    "short": "Boot loop blocks the cloud fix",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Keep pre-built recovery tooling, such as a bootable WinPE USB with channel-file removal, ready for each site",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Store BitLocker recovery keys where the on-site team can retrieve them without the failed hosts",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "List the hosts stuck in boot loop and group them by site and by encryption status",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Publish the Safe Mode steps: delete C-00000291*.sys and reboot, with the BitLocker key requirement noted",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Boot each host into Safe Mode or recovery, delete the matching channel files and reboot",
+      "basis": "nist-800-61"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Prioritise recovery by function: servers and emergency, airline and hospital systems before desktops",
+      "basis": "nist-800-34"
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "8.5M Windows hosts crashed worldwide"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -703,5 +984,98 @@
    "quote": "~99% of Windows sensors online by 2024-07-29 17:00 PT"
   }
  },
- "durationBasis": "Bad Channel File live 04:09 UTC 19 Jul → ~99% Windows sensors online 17:00 PT 29 Jul (00:00 UTC 30 Jul)"
+ "durationBasis": "Bad Channel File live 04:09 UTC 19 Jul → ~99% Windows sensors online 17:00 PT 29 Jul (00:00 UTC 30 Jul)",
+ "response": {
+  "roles": {
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "CrowdStrike sensor and content engineering — not individually named",
+   "ops-lead": "CrowdStrike engineers who reverted Channel File 291 — not named",
+   "comms": "CrowdStrike, which issued the remediation guidance and the External RCA",
+   "service-recovery": "Customer IT teams recovering boot-looping hosts by hand — not named in the record",
+   "vendor": "Microsoft, and two independent third-party security vendors engaged by CrowdStrike",
+   "customer": "CrowdStrike customers running Windows hosts with sensor 7.11 and above"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 1,
+    "quote": "Two additional IPC Template Instances are deployed as a new version of Channel File 291",
+    "did": "Deploys two new instances at 04:09 UTC; one has a non-wildcard criterion for the 21st input"
+   },
+   {
+    "role": "vendor",
+    "soe": 6,
+    "quote": "Microsoft later estimates the update 'affected 8.5 million Windows devices",
+    "did": "Microsoft estimates 8.5 million Windows devices affected, under one percent of all Windows machines"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "CrowdStrike publishes the reverted (good) Channel File 291",
+    "did": "Publishes the reverted file at 05:27 UTC, about 78 minutes after the bad file went out"
+   },
+   {
+    "role": "comms",
+    "soe": 9,
+    "quote": "CrowdStrike issues manual remediation",
+    "did": "Issues the manual fix: boot into Safe Mode, delete C-00000291*.sys files, then reboot"
+   },
+   {
+    "role": "change-owner",
+    "soe": 12,
+    "quote": "Bounds checking was added to the Content Interpreter function",
+    "did": "Adds bounds checking to the Content Interpreter and an input-array size check on 25 July"
+   },
+   {
+    "role": "comms",
+    "soe": 15,
+    "quote": "CrowdStrike publishes the External Technical Root Cause Analysis for Channel File 291",
+    "did": "Publishes the External RCA on 6 August and engages two independent third-party security vendors"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "8.5M Windows hosts in boot loop",
+  "bones": [
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "21 fields defined, 20 supplied",
+      "factor": 0
+     },
+     {
+      "label": "No runtime bounds check",
+      "factor": 3
+     },
+     {
+      "label": "Boot-start kernel driver",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Only 12 static test cases",
+      "factor": 1
+     },
+     {
+      "label": "No staged or canary rollout",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Validator assumed 21 inputs",
+      "factor": 2
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -427,7 +427,53 @@
      "O": 2,
      "D": 2
     },
-    "revisedRationale": "A block-list entry turns the slip into a refused command: the command can still be typed but no longer executes (O 6→2), and the refusal is an automated interlock (D 8→2). Recorded as committed for February 2023, not as completed, so the reduction is a claim about the action, not a confirmed outcome. Severity is unchanged: a globally-propagating command that escaped the audit would be just as wide."
+    "revisedRationale": "A block-list entry turns the slip into a refused command: the command can still be typed but no longer executes (O 6→2), and the refusal is an automated interlock (D 8→2). Recorded as committed for February 2023, not as completed, so the reduction is a claim about the action, not a confirmed outcome. Severity is unchanged: a globally-propagating command that escaped the audit would be just as wide.",
+    "short": "Purge command acts globally",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Document the scope of the IGP purge command per router platform, and state that the default is global on this platform",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Extend the AAA high-impact-command block-list to globally scoped commands on all three router vendors and all WAN roles",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on a sudden IGP topology recompute across routers and tie it to the change ticket, so on-call links packet loss to the command",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop all further changes on the backbone and check the engineer's session history for the commands already run",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post to the Service Health Dashboard that networking is degraded globally, not just a DNS problem",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Let the automated WAN recovery run, and recover manually any router that has not rejoined the IGP",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -488,7 +534,52 @@
      "O": 3,
      "D": 9
     },
-    "revisedRationale": "The CAB sweep and attestation make an unqualified SOP less likely to be run (O 4→3). The stronger control, treating every edit as de-qualifying, is an analyst recommendation with no recorded status, so no D reduction is claimed. The CAB review is recorded as committed for April 2023, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "The CAB sweep and attestation make an unqualified SOP less likely to be run (O 4→3). The stronger control, treating every edit as de-qualifying, is an analyst recommendation with no recorded status, so no D reduction is claimed. The CAB review is recorded as committed for April 2023, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "SOP edit goes live untested",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Treat any SOP edit as de-qualifying: re-validate it in the lab and confirm pre- and post-checks before it is scheduled",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Attest on each use that the SOP in hand is the qualified version and includes the alert-check step",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Compare the SOP version in the change ticket with the qualified version and block a mismatch before work starts",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Halt the SOP-driven work and pull every task using the edited SOP until it is re-qualified",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Run the Change Advisory Board review of all SOPs still pending qualification within 30 days",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -517,7 +608,47 @@
       "quote": "single-device access provided zero containment"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Isolation is not containment",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Treat protocol-propagating commands as global in change review, even on one router taken out of service",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Characterise which commands act through the routing protocol for every platform in the WAN, including the new Madrid router",
+      "evidence": {
+       "src": "factor",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch IGP adjacency and forwarding state on routers other than the one being changed during any backbone change",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Shut the IGP adjacency of the changed router, or take it off the backbone physically, to stop it re-sending protocol effects",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm every router has rebuilt its IGP database before removing the freeze on backbone changes",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -568,7 +699,48 @@
      "O": 6,
      "D": 4
     },
-    "revisedRationale": "If on-call can see the active change while alerts fire, the repeat can be stopped before it runs (D 8→4). Recorded as committed for February 2023, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "If on-call can see the active change while alerts fire, the repeat can be stopped before it runs (D 8→4). Recorded as committed for February 2023, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Executor misses on-call alerts",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Make the executing engineer a recipient of the on-call alerts for the device being changed and require acknowledgement before the next command",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page the named change owner directly when an alert fires inside an open change window",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Call the engineer doing the Madrid task by phone and order a stop at the first alert",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Use the real-time view of approved, break-glass and unqualified device activity to see who is changing what",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Freeze all changes to the WAN until every change owner has confirmed their state to the incident bridge",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -630,7 +802,43 @@
      "O": 7,
      "D": 6
     },
-    "revisedRationale": "Service-wide detection would show a wide event as one event at onset (D 8→6). These actions address M365 monitoring, not the WAN triage path, so the reduction is modest. Recorded as committed for March and May 2023, not completed, so it is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Service-wide detection would show a wide event as one event at onset (D 8→6). These actions address M365 monitoring, not the WAN triage path, so the reduction is modest. Recorded as committed for March and May 2023, not completed, so it is a claim about the action, not a confirmed outcome.",
+    "short": "DNS first, noisy alerts",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Tune SPO/ODB and Teams alerting thresholds to detect a regional request-rate shift rather than per-farm noise",
+      "evidence": {
+       "src": "coe",
+       "i": 7
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Check the change calendar for backbone work before opening a DNS investigation",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Test the DNS hypothesis and the Azure Front Door failover in parallel with a backbone review, limiting each to 15 minutes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Ask for a list of changes in the last 30 minutes across WAN, DNS and edge on the incident bridge",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Post when the fault is confirmed inside the WAN, so customers stop trying DNS and client-side fixes",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -671,7 +879,53 @@
       "i": 6
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Slow WAN reconvergence",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Give the platform a manual recovery path for routers that do not rejoin the IGP, and test it",
+      "evidence": {
+       "src": "factor",
+       "i": 6
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Track routers not yet rejoined and prefix reconvergence as one board, not per service",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Hold application restarts until packet loss has returned to normal, since apps cannot recover ahead of the network",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 6
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Give customers the recovery order: network, then Teams, SharePoint and OneDrive, then residual regions",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Keep Teams, SharePoint and OneDrive clients on retry with back-off and avoid restarting clients while packet loss persists",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Recover the two routers that did not heal automatically, and chase the India region packet loss",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -732,9 +986,50 @@
      "O": 2,
      "D": 8
     },
-    "revisedRationale": "Fixing the race and the reboot bug removes the two causes (O 4→2). The race fix is recorded as 99.48% deployed as of 6 February 2023 and the others as committed, so the reduction is a claim about the actions, not a confirmed outcome."
+    "revisedRationale": "Fixing the race and the reboot bug removes the two causes (O 4→2). The race fix is recorded as 99.48% deployed as of 6 February 2023 and the others as committed, so the reduction is a claim about the actions, not a confirmed outcome.",
+    "short": "Degraded nodes keep traffic",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Deploy the fix for the BitLocker and Shared Cache race, and the low-memory reboot bug that surfaced it",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on CAFE components that report a degraded Shared Cache after restart",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop routing production traffic to components in a known-unhealthy state",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Track residual Outlook on the web impact under its own incident so the main one can close",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart mailbox application pools in order and confirm each pool is healthy before the next",
+      "basis": "sre-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "Global WAN down · 5 h 35 min core"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -749,5 +1044,137 @@
    "quote": "by 11:30 telemetry shows impact no longer occurring for most customers"
   }
  },
- "durationBasis": "WAN IGP purge 07:08 UTC → impact no longer occurring for most customers 11:30 UTC 25 Jan"
+ "durationBasis": "WAN IGP purge 07:08 UTC → impact no longer occurring for most customers 11:30 UTC 25 Jan",
+ "response": {
+  "roles": {
+   "first-responder": "Microsoft on-call network engineers alerted by monitoring at 07:11 UTC — not named",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "Microsoft network and service engineers who investigated and tested mitigations",
+   "change-owner": "The network engineer doing the Madrid WAN capacity task — not named",
+   "service-recovery": "Microsoft engineers who restarted application pools after the WAN recovered",
+   "comms": "Microsoft Service Health Dashboard and status.office.com publishers",
+   "vendor": "The router vendor whose purge command defaults to global — not named",
+   "customer": "Microsoft 365, SharePoint, OneDrive, Teams and Outlook users"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "runs a command to purge the IGP database",
+    "did": "Runs the IGP purge on a new Madrid router at 07:08 UTC; on this platform it acts on every IGP-joined router"
+   },
+   {
+    "role": "first-responder",
+    "soe": 4,
+    "quote": "Microsoft monitoring alerts on-call engineers of a networking issue",
+    "did": "On-call engineers are alerted at 07:11 UTC, 3 to 5 minutes after the command"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 4,
+    "quote": "the team initially begins reviewing DNS configurations",
+    "did": "Starts by reviewing DNS configurations, which is not where the fault was"
+   },
+   {
+    "role": "comms",
+    "soe": 5,
+    "quote": "Microsoft publishes incident MO502273 to the Service Health Dashboard and status.office.com",
+    "did": "Publishes MO502273 at 07:27 UTC after the admin center is affected"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 6,
+    "quote": "SPO and ODB are failed off Azure Front Door routing to test for relief",
+    "did": "Fails SharePoint Online and OneDrive off Azure Front Door at 07:38 UTC; it does not help"
+   },
+   {
+    "role": "change-owner",
+    "soe": 8,
+    "quote": "the same command is run on a second Madrid router",
+    "did": "Runs the same command on a second Madrid router at about 07:41 UTC, the engineer not having been told of the alerts"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 9,
+    "quote": "Azure reverts a recently deployed IPv6 change suspected as the cause",
+    "did": "Reverts a recent IPv6 change at 07:44 UTC out of caution; it proved unrelated"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 15,
+    "quote": "Microsoft begins reviewing options to restart affected application pools",
+    "did": "Reviews application-pool restarts from 11:04 UTC; mailbox pool restarts run later at about 13:30 UTC"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Global WAN outage, 5 h 35 min core",
+  "bones": [
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Command repeated on router 2",
+      "factor": 4
+     },
+     {
+      "label": "Engineer not told of alerts",
+      "mode": "FM-04"
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "SOP edited, not re-tested",
+      "factor": 0
+     },
+     {
+      "label": "Purge not characterised",
+      "factor": 1
+     },
+     {
+      "label": "Alert noise slowed triage",
+      "factor": 7
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "AAA block-list gap",
+      "factor": 2
+     },
+     {
+      "label": "Isolation not blast radius",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Two routers failed to recover",
+      "factor": 6
+     },
+     {
+      "label": "CAFE Shared Cache race",
+      "mode": "FM-07"
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Hit in core business hours",
+      "factor": 5
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -370,6 +370,54 @@
        "i": 4
       }
      }
+    ],
+    "short": "Fault trip stops generators",
+    "symbol": "genset",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Review protection coordination so a utility-side ground fault clears without tripping every generator",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Test the 12,470 V ground-fault trip against the generator controls at commissioning and after any protection change",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "On a utility trip, confirm at the generator panels that each set is still running, not just that the site has power",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Isolate the faulted transformer feed and keep the generator bus separate from it before restarting any set",
+      "basis": "en-50110"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name one person to restart the generators and one to control the building so the work is not done in parallel",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Restart the generators in sequence and load them only after the transformer fault is cleared",
+      "basis": "nfpa-110"
+     }
     ]
    },
    {
@@ -422,6 +470,54 @@
        "src": "coe",
        "i": 4
       }
+     }
+    ],
+    "short": "UPS gives 4 min not 10",
+    "symbol": "battery",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Run routine capacity and load tests on the UPS strings and replace any bank that falls short of its rated ride-through",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Tell tenants the tested runtime for each string, not the nameplate figure",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Alarm the UPS monitor on runtime below the rated time at a given load, and on battery discharge during a generator start",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "first-responder",
+      "phase": "contain",
+      "do": "Start generator restart at once on utility loss, not after the UPS time has run out",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Treat a four-minute battery as the working figure and order generator restart on that budget",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Fail critical workloads over to other sites before the string runs out, rather than waiting for hardware to die",
+      "basis": "iso-22301"
      }
     ]
    },
@@ -480,6 +576,53 @@
        "i": 7
       }
      }
+    ],
+    "short": "Generator restart blocked",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Place a qualified electrical operator on every overnight shift, not security and a one-week technician",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 7
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Put the access-control system on UPS power so staff can reach the generators during an outage",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 6
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Report any door or reader that fails at power loss, and open the break-glass route to the generator room",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Send a second qualified person to the generator room and call the on-call electrical lead from home",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Walk the generator restart procedure with the on-call lead on the phone if the technician is alone",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Bring the generators up manually and confirm bus voltage before closing loads onto it",
+      "basis": "nfpa-110"
+     }
     ]
    },
    {
@@ -516,6 +659,54 @@
     "actions": [
      {
       "text": "Periodic protective-device and circuit-breaker inspection and testing on tenant circuits",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ],
+    "short": "Breakers faulty on re-energise",
+    "symbol": "breaker",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Inspect and test the circuit breakers on tenant circuits on a fixed cycle",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Record the last inspection date for each tenant breaker and share it with the tenant",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Test each breaker (insulation and trip test) before closing it onto a restored supply",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hold re-energisation of the tenant circuits until the test result for each breaker is read out",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Keep faulty breakers open and tagged out so they cannot be closed by mistake",
+      "basis": "en-50110"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Replace the failed breakers, restore both feeds and confirm clean power",
+      "basis": "nfpa-70e",
       "evidence": {
        "src": "improvement",
        "i": 4
@@ -573,7 +764,54 @@
      "O": 6,
      "D": 4
     },
-    "revisedRationale": "Power-source monitoring on Cloudflare's side would show a generator failover hours before a fault of this kind (D 9→4). O is unchanged because the facility-side notification is not publicly verified. Cloudflare's part is recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Power-source monitoring on Cloudflare's side would show a generator failover hours before a fault of this kind (D 9→4). O is unchanged because the facility-side notification is not publicly verified. Cloudflare's part is recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Power failover not visible",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Notify tenants immediately on generator failover or any power event, as a written SLA",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 9
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Send the generator-start notice to each tenant's on-call line the moment the generators start",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "Monitor the power source at the facility and alert when it moves from utility to generator",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 8
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Open a bridge with the facility operator at the first power warning and keep it open",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Report every power state change to the tenant's incident bridge until clean power is confirmed",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm the power source with the facility before moving traffic back",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -639,7 +877,58 @@
      "O": 2,
      "D": 9
     },
-    "revisedRationale": "With no single-site backend, losing one facility should cost capacity rather than the control plane (S 8→4), and the GA gate stops new single-site dependencies being shipped (O 5→2). Both are recorded as committed in the post-mortem, not as completed, so the reduction is a claim about the actions, not a confirmed outcome."
+    "revisedRationale": "With no single-site backend, losing one facility should cost capacity rather than the control plane (S 8→4), and the GA gate stops new single-site dependencies being shipped (O 5→2). Both are recorded as committed in the post-mortem, not as completed, so the reduction is a claim about the actions, not a confirmed outcome.",
+    "short": "Backends in one site only",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Replicate Kafka and ClickHouse across regions so no one facility holds the control plane",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Take PDX-04 fully offline in a drill, the scenario that had never been tested",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "Map every service that depends on a single-site backend and review the list at each release",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "factor",
+       "i": 9
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Confirm the data plane is still serving and keep the incident bounded to the control plane and analytics",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell customers the dashboard, API and analytics are affected and that traffic still flows",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Rebuild Kafka and ClickHouse in another region and move dependent services onto them",
+      "basis": "nist-800-34"
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -690,9 +979,53 @@
      "O": 5,
      "D": 4
     },
-    "revisedRationale": "Full-site drills would reveal failover and cold-start time before an incident does (D 9→4). Recorded as committed in the post-mortem, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Full-site drills would reveal failover and cold-start time before an incident does (D 9→4). Recorded as committed in the post-mortem, not as completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Slow failover, 2-day recovery",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Rehearse a cold start of control-plane and analytics services without PDX-04",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "Time every stage of the failover drill and flag stages that overrun their target",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Choose one service order for restoration and keep it fixed, to stop teams from trying competing fixes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Fail control-plane and analytics services over to surviving infrastructure while breakers are replaced",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Update customers as each service returns, through to full restoration at 04:25 UTC on 4 November",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm data catch-up for analytics and logs once the backends are healthy",
+      "basis": "nist-800-34"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "PDX-04 dark ~11 h; control plane down"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -707,5 +1040,124 @@
    "quote": "04:25 UTC Nov 4"
   }
  },
- "durationBasis": "Routers dark/power lost 11:44 UTC 2 Nov → control plane and analytics fully restored 04:25 UTC 4 Nov (data plane unaffected)"
+ "durationBasis": "Routers dark/power lost 11:44 UTC 2 Nov → control plane and analytics fully restored 04:25 UTC 4 Nov (data plane unaffected)",
+ "response": {
+  "roles": {
+   "utility": "Portland General Electric (PGE), the utility feeding PDX-04",
+   "vendor": "Flexential, the facility operator of PDX-04 — individuals not named",
+   "electrical": "Flexential staff who restarted the generators and replaced the breakers — not named",
+   "first-responder": "Flexential overnight security and a one-week technician — unconfirmed employee accounts",
+   "incident-commander": "No incident commander is named in the record",
+   "comms": "Flexential's tenant notification, first sent to Cloudflare at 12:28 UTC",
+   "service-recovery": "Cloudflare engineers failing control-plane and analytics services over — not named"
+  },
+  "recorded": [
+   {
+    "role": "utility",
+    "soe": 0,
+    "quote": "Portland General Electric (PGE) has an unplanned maintenance event",
+    "did": "Has an unplanned maintenance event that removes one of two independent feeds into PDX-04 at 08:50 UTC"
+   },
+   {
+    "role": "vendor",
+    "soe": 1,
+    "quote": "Flexential powers up on-site generators to supplement the lost feed",
+    "did": "Powers up the on-site generators; the site then runs on generators plus one utility feed"
+   },
+   {
+    "role": "comms",
+    "soe": 11,
+    "quote": "Flexential sends Cloudflare its first notification of the incident",
+    "did": "Sends Cloudflare its first notice at 12:28 UTC, 44 minutes after the routers went dark"
+   },
+   {
+    "role": "electrical",
+    "soe": 13,
+    "quote": "Flexential manually restarts generators, restoring partial power to the facility.",
+    "did": "Restarts generators by hand at 12:48 UTC, restoring partial power"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 15,
+    "quote": "Cloudflare works to fail control-plane and analytics services onto surviving infrastructure",
+    "did": "Fails control-plane and analytics services over to other sites while breakers are replaced"
+   },
+   {
+    "role": "electrical",
+    "soe": 16,
+    "quote": "Flexential replaces the failed circuit breakers, restores both utility feeds, and confirms clean power",
+    "did": "Replaces the failed breakers, restores both feeds and confirms clean power at 22:48 UTC"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "PDX-04 dark, control plane down",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "UPS lasts 4 min not 10",
+      "factor": 2
+     },
+     {
+      "label": "Faulty Cloudflare breakers",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Fault trip stops generators",
+      "factor": 1
+     },
+     {
+      "label": "Access control off battery",
+      "factor": 5
+     },
+     {
+      "label": "Kafka and ClickHouse one site",
+      "mode": "FM-06"
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "No notice of generator start",
+      "factor": 4
+     },
+     {
+      "label": "Full-site loss never tested",
+      "factor": 7
+     },
+     {
+      "label": "No power-source monitoring",
+      "factor": 8
+     }
+    ]
+   },
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Thin overnight staffing",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "PGE feed lost for 2h50m",
+      "factor": 0
+     }
+    ]
+   }
+  ]
+ }
 }

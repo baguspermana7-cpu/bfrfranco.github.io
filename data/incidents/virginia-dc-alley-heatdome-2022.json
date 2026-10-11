@@ -330,7 +330,46 @@
      "O": 5,
      "D": 4
     },
-    "revisedRationale": "Added import capacity reduces how often load growth meets a transmission ceiling (O 8→5); it does not change the severity or how the constraint is detected. The dossier records the lines as committed in August 2022 and in progress, from a source not re-verified verbatim, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Added import capacity reduces how often load growth meets a transmission ceiling (O 8→5); it does not change the severity or how the constraint is detected. The dossier records the lines as committed in August 2022 and in progress, from a source not re-verified verbatim, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Transmission lags load growth",
+    "playbook": [
+     {
+      "role": "utility",
+      "phase": "prevent",
+      "do": "Build the two new 500 kV lines into eastern Loudoun and sequence new connections to the capacity actually energised",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "utility",
+      "phase": "detect",
+      "do": "Compare the PJM planning study with Dominion's connection queue each year and flag any year where load exceeds import capability",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Phase new data-center energisation to the connection date Dominion gives, and do not commission load ahead of it",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell major customers about the pinch point in writing, with the delay and the line it depends on",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Resume new connections in steps as each 500 kV line is energised",
+      "basis": "change-mgmt"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -379,6 +418,42 @@
        "src": "coe",
        "i": 3
       }
+     }
+    ],
+    "short": "Line component fault",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Require disclosed inspection and testing of surge arrestors and line protection on 230 kV and above",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Raise a grid-operations alarm on a 230 kV line fault, with the fault location sent to data-center operators in the pocket",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Isolate the faulted line section and reroute power through adjacent 230 kV lines",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "utility",
+      "phase": "contain",
+      "do": "Check the lightning arrestors of the neighbouring circuits for the same condition before restoring the line",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Replace the failed arrestor, test the line and return it to service, with the make, model and age recorded",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -440,6 +515,46 @@
        "i": 0
       }
      }
+    ],
+    "short": "Common-mode ride-through trip",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Set one common voltage and frequency ride-through standard for data centers in the eastern-Loudoun pocket",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Compare each facility's relay, STS and UPS thresholds with the pocket standard, and retune any that trip on a transient the others ride out",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert PJM and Dominion when load in the pocket falls by more than a set MW within seconds",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Raise generation or dispatch reserves to absorb the load swing and hold frequency",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Return each facility from backup to utility feed only after the grid is stable, staggered between sites",
+      "basis": "nfpa-110"
+     }
     ]
    },
    {
@@ -480,6 +595,42 @@
        "src": "coe",
        "i": 4
       }
+     }
+    ],
+    "short": "Backup transfer fails",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Load-test the generators and test the transfer switches at every site under a simulated utility disturbance",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on a generator that fails to start or a transfer that does not complete within its set time",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Hold critical load on UPS and start the second generator in the redundant line",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "authority",
+      "phase": "contain",
+      "do": "Verify that simultaneous backup starts across the pocket do not create secondary fuel or fire hazards",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Refuel generators and return transfer switches to normal after the event",
+      "basis": "nfpa-110"
      }
     ]
    },
@@ -527,6 +678,42 @@
        "i": 4
       }
      }
+    ],
+    "short": "Frequency swing from load drop",
+    "playbook": [
+     {
+      "role": "utility",
+      "phase": "prevent",
+      "do": "Harden the PJM and Dominion playbooks for multi-GW instantaneous load swings",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch frequency and ACE live and alarm on a step change, with the cause matched to data-center transfers",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Reduce generation output to match the lost load and hold frequency inside its band",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare a grid event across PJM and Dominion and run one operations call until frequency is restored",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Return generation to schedule as the data-center load comes back, in steps, over the ~10 minutes of recovery",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -567,6 +754,42 @@
        "src": "improvement",
        "i": 2
       }
+     }
+    ],
+    "short": "Heat and record demand",
+    "playbook": [
+     {
+      "role": "utility",
+      "phase": "prevent",
+      "do": "Forecast summer peak against transmission and generation margin and publish an alert when the margin falls below a threshold",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert when load nears the forecast record and the heat index is high, so the control room has time to act",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Be ready to move load to backup on the utility's request, with generators fuelled and tested",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Ask data centers to reduce load or shift to generators in a staged order, not all at once",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell customers when the peak has passed and normal supply is safe to resume",
+      "basis": "itil-incident"
      }
     ]
    },
@@ -609,10 +832,157 @@
        "i": 0
       }
      }
+    ],
+    "short": "Fault details stay undisclosed",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Complete and publish the NERC and PJM analysis of the 22 July 2026 load loss, with the voltage class and failed component",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Record the fault location, time and relay operations at the moment of the event so the analysis has data",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "utility",
+      "phase": "contain",
+      "do": "Preserve the failed component and its protection records for the review",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Write the event timeline with the make, model and age of the failed part, and share it with the pocket's operators",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Publish what was learned and what is still unknown, so no detail is guessed",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     }
     ]
+   }
+  ],
+  "impactShort": "~3 GW of load dropped in seconds"
+ },
+ "durationBasis": "No customer-facing outage is recorded: the 2024 and 2026 load-loss events rode through on on-site backup, and the 2022 event was a connection constraint, not an outage.",
+ "durationStatus": "no-outage",
+ "response": {
+  "roles": {
+   "first-responder": "No on-call operator is named; grid telemetry saw the fault at 07:56:09 EDT",
+   "incident-commander": "No incident commander is named in the record",
+   "electrical": "Data-center control systems and electrical teams that transferred facilities to backup power",
+   "ops-lead": "PJM and Dominion system operators balancing frequency — not named",
+   "utility": "Dominion Energy (transmission owner) and PJM (grid operator)",
+   "comms": "Dominion Energy public statement on 'flickering lights'",
+   "authority": "NERC, which documented the load-loss class and is reviewing the 2026 event",
+   "service-recovery": "Not in the record: no facility is reported to have lost power or needed recovery",
+   "customer": "Roughly 60 data centers in 2024 and a larger cluster in 2026"
+  },
+  "recorded": [
+   {
+    "role": "utility",
+    "soe": 2,
+    "quote": "Dominion informs major customers that new data-center deliveries into eastern Loudoun could be delayed to ~2026",
+    "did": "Warns major customers on 29 July 2022 that new deliveries into eastern Loudoun may be delayed to about 2026"
+   },
+   {
+    "role": "utility",
+    "soe": 3,
+    "quote": "Dominion commits to remedy: two new 500 kV transmission lines into eastern Loudoun",
+    "did": "Commits to two new 500 kV lines into eastern Loudoun, with some new connections to resume within weeks"
+   },
+   {
+    "role": "customer",
+    "soe": 5,
+    "quote": "facilities transferred to backup generation, did not evacuate",
+    "did": "About 60 data centers transfer to backup generation at once in 2024; no one is evacuated"
+   },
+   {
+    "role": "electrical",
+    "soe": 8,
+    "quote": "the data centers' own control systems transferred them to backup power for a very short period of time",
+    "did": "Facility control systems move the 2026 load onto backup power for a short time"
+   },
+   {
+    "role": "comms",
+    "soe": 10,
+    "quote": "flickering lights in the area but no loss of power",
+    "did": "Dominion tells the public that the only visible effect was flickering lights"
+   },
+   {
+    "role": "utility",
+    "soe": 11,
+    "quote": "PJM reported 'a measurable frequency change but no reliability impacts'",
+    "did": "PJM reports a measurable frequency change and no reliability impact"
+   },
+   {
+    "role": "authority",
+    "soe": 14,
+    "quote": "NERC documents the load-loss class and the review of the 2026 event is ongoing",
+    "did": "NERC documents the load-loss class and keeps the 2026 review open"
    }
   ]
  },
- "durationBasis": "No customer-facing outage is recorded: the 2024 and 2026 load-loss events rode through on on-site backup, and the 2022 event was a connection constraint, not an outage.",
- "durationStatus": "no-outage"
+ "fishbone": {
+  "effect": "Multi-GW load loss in seconds",
+  "bones": [
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Load packed into one pocket",
+      "factor": 0
+     },
+     {
+      "label": "Un-coordinated ride-through",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Transmission lags demand",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "230 kV arrestor failure",
+      "factor": 3
+     },
+     {
+      "label": "2026 line fault",
+      "mode": "FM-02"
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Heat and record demand",
+      "factor": 4
+     }
+    ]
+   }
+  ]
+ }
 }

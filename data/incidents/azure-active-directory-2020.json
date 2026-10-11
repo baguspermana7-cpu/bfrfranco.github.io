@@ -379,7 +379,53 @@
      "O": 2,
      "D": 8
     },
-    "revisedRationale": "The specific defect is fixed (recorded as completed), and further SDP protections are added, so the escape now needs a new, different tooling defect (O 4→2). The class-level protections are recorded as committed, so that part of the reduction is a claim about the action, not a confirmed outcome. Severity and detection are unchanged: if an update did escape, nothing recorded would catch it sooner or shrink its reach."
+    "revisedRationale": "The specific defect is fixed (recorded as completed), and further SDP protections are added, so the escape now needs a new, different tooling defect (O 4→2). The class-level protections are recorded as committed, so that part of the reduction is a claim about the action, not a confirmed outcome. Severity and detection are unchanged: if an update did escape, nothing recorded would catch it sooner or shrink its reach.",
+    "short": "SDP sends update to production",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Test the SDP targeting code with its own pre-production gate, and fail closed so a ring that cannot be resolved blocks the deploy instead of widening it",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Fix the latent SDP defect and prove with a negative test that a validation-ring update cannot reach a production ring",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on any backend deployment whose target set is larger than its declared ring, before the first instance restarts",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Halt the rollout at once and stop further SDP deployments to the Azure AD backend until the target set is known",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post a first notice that sign-in to Azure AD dependent services is failing, with the next update time",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Take command, assign the manual-recovery team and the failover team, and re-plan on each regional recovery step",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -426,7 +472,44 @@
      "O": 3,
      "D": 4
     },
-    "revisedRationale": "A crash-on-startup confined to the validation ring is seen there before customers are exposed, which is 'detected before impact with time to act' (D 8→4). No action on the payload defect itself is recorded, so occurrence is unchanged."
+    "revisedRationale": "A crash-on-startup confined to the validation ring is seen there before customers are exposed, which is 'detected before impact with time to act' (D 8→4). No action on the payload defect itself is recorded, so occurrence is unchanged.",
+    "short": "Backend crashes on startup",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run the update against the validation ring and require a clean start of every instance before promotion",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on backend crash-loops and restart counts per ring; page engineering when startup failures are seen outside the validation ring",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop restarts of crashing instances that would feed the failure, and keep unaffected partitions serving",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Scale out the Azure AD services that will take load once instances return, as was done during the incident",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart instances in stages once the fixed configuration is applied, confirming each partition has quorum before the next",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -484,7 +567,46 @@
      "O": 2,
      "D": 4
     },
-    "revisedRationale": "Protecting last known-good metadata removes the shared failure between deployment and rollback (O 5→2), and broader, more frequent drills should expose a broken rollback before an incident does (D 8→4). Both actions are recorded as completed; the drill effect is still an inference, because the dossier does not say whether drills now cover corrupted-metadata conditions."
+    "revisedRationale": "Protecting last known-good metadata removes the shared failure between deployment and rollback (O 5→2), and broader, more frequent drills should expose a broken rollback before an incident does (D 8→4). Both actions are recorded as completed; the drill effect is still an inference, because the dossier does not say whether drills now cover corrupted-metadata conditions.",
+    "short": "Rollback blocked, bad metadata",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Protect last-known-good deployment metadata with an integrity check and a separate copy the deploy path cannot overwrite",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run rollback drills with corrupted metadata as the starting condition and record the time to the manual path",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat a rollback that fails to start as an incident state change and tell the commander within minutes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Switch to the manual configuration path as soon as automated rollback fails, without retrying it repeatedly",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Apply the manual configuration update to the backend instances on a path that does not use the SDP system",
+      "basis": "change-mgmt"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -525,7 +647,43 @@
       "quote": "recovery was further gated on restarting crashed backend instances and rebuilding a healthy quorum"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Manual recovery takes hours",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Keep a written manual-update procedure for the backend, tested in drills, so it can start in minutes",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Track instances updated, healthy and in quorum per region on one board, so the recovery curve is known at each hour",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order manual updates by regional impact, starting where sign-in success is lowest",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Give customers the recovery stages and times for each region and update when each stage completes",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm the residual instances are healthy by 02:25 UTC and release the incident only when all instances are clear",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -572,7 +730,51 @@
      "O": 3,
      "D": 6
     },
-    "revisedRationale": "Full backup coverage would let failover absorb most of a similar event, which Microsoft says would 'significantly reduce the impact' (S 8→6). The action is recorded as committed and in progress, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Full backup coverage would let failover absorb most of a similar event, which Microsoft says would 'significantly reduce the impact' (S 8→6). The action is recorded as committed and in progress, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Backup auth covers some only",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Expedite the rollout of the backup authentication system to all key services as a top priority",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Keep a list of which workloads can fail over to backup authentication and check it against the live outage on the first call",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Fail over every covered workload to backup authentication at the first sign of backend failure",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Rely on pre-authenticated sessions and Managed Identities where possible, and defer new sign-ins during the outage",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Return failed-over workloads to primary authentication in stages after the backend is stable",
+      "basis": "iso-22301"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -615,9 +817,51 @@
      "O": 2,
      "D": 9
     },
-    "revisedRationale": "An automated first notice within 15 minutes removes the manual dependency (O 6→2). Recorded as committed, so this is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "An automated first notice within 15 minutes removes the manual dependency (O 6→2). Recorded as committed, so this is a claim about the action, not a confirmed outcome.",
+    "short": "No automated first notice",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Onboard Azure AD scenarios to the automated communications pipeline so a first notice posts within 15 minutes of impact",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Trigger the notice pipeline from the same telemetry that flags the unhealthy service, not from a person's decision",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post to status channels used by tenants when sign-in to the portal and M365 is failing, since customers may not reach those portals",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Assign a named communications owner within the first 15 minutes and fix the update cadence",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Publish a post-incident review with the timeline, the SDP cause and the committed actions",
+      "basis": "itil-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "Global sign-in down · ~3 h primary"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -632,5 +876,124 @@
    "quote": "2020-09-29T00:23Z"
   }
  },
- "durationBasis": "Global auth failing 21:25Z 28 Sep → enough instances healthy for normal operation 00:23Z 29 Sep (2h58m)"
+ "durationBasis": "Global auth failing 21:25Z 28 Sep → enough instances healthy for normal operation 00:23Z 29 Sep (2h58m)",
+ "response": {
+  "roles": {
+   "first-responder": "Azure AD automated telemetry, then the engineers it engaged — not named",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "Azure AD engineering responders — not individually named",
+   "change-owner": "Microsoft Azure AD engineering, owner of the service update and the SDP system",
+   "service-recovery": "Engineers who ran the manual configuration update",
+   "comms": "Azure customer communications — no notice is recorded in the sequence of events",
+   "customer": "Microsoft and third-party services and tenants depending on Azure AD"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "Azure AD backend service update intended only for the internal validation test ring is deployed",
+    "did": "Deploys the update at 21:25 UTC; a latent SDP defect sends it to production instead of the validation ring"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 2,
+    "quote": "engineering is immediately engaged",
+    "did": "Engaged within about 5 minutes of impact after automated telemetry flags an unhealthy service"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 3,
+    "quote": "proactive scale-out of some Azure AD services to handle anticipated load",
+    "did": "Scales out some Azure AD services ahead of the fix and fails certain workloads over to the backup authentication system"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "Root cause established and remediation begun",
+    "did": "Establishes root cause at 22:02 UTC and starts the automated rollback"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 9,
+    "quote": "engineers begin manually updating the service configuration",
+    "did": "Starts a manual configuration update at 22:47 UTC on a path that bypasses the SDP system"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 10,
+    "quote": "Manual configuration-update operation completes end-to-end across affected backend instances",
+    "did": "Finishes the manual update at 23:59 UTC; normal operating parameters follow at 00:23 UTC"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Global Azure AD sign-in failure",
+  "bones": [
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Rollback drills too narrow",
+      "factor": 2
+     },
+     {
+      "label": "No automated first notice",
+      "factor": 5
+     },
+     {
+      "label": "Update escapes validation ring",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Deploy and rollback share data",
+      "factor": 1
+     },
+     {
+      "label": "No integrity guard on metadata",
+      "factor": 3
+     },
+     {
+      "label": "Backup auth partly rolled out",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Latent SDP code defect",
+      "factor": 0
+     },
+     {
+      "label": "Backend crash on startup",
+      "mode": "FM-02"
+     }
+    ]
+   },
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "SDP test gap unexplained",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Third-party apps depend on AAD",
+      "mode": "FM-01"
+     }
+    ]
+   }
+  ]
+ }
 }

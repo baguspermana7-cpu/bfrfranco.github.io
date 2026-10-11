@@ -338,7 +338,53 @@
      "O": 2,
      "D": 2
     },
-    "revisedRationale": "The tool now refuses the dangerous case outright, so the slip can still be typed but can no longer produce the effect (O 6→2), and the refusal is an automated interlock (D 9→2). Severity is unchanged: if capacity were lost another way, the outage would be just as wide."
+    "revisedRationale": "The tool now refuses the dangerous case outright, so the slip can still be typed but can no longer produce the effect (O 6→2), and the refusal is an automated interlock (D 9→2). Severity is unchanged: if capacity were lost another way, the outage would be just as wide.",
+    "short": "Mistyped removal command",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add a hard floor to the removal tool so no command can take a subsystem below its minimum capacity",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Remove capacity in small steps and show the target server list for confirmation before each step",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on index or placement capacity falling below its operating minimum, not on request errors",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop any further capacity removal and freeze playbook commands that remove servers in the region",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident and name the index restart as the first recovery step",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Return the removed capacity to index and placement and restart them in dependency order",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -385,7 +431,43 @@
      "O": 5,
      "D": 8
     },
-    "revisedRationale": "Cell partitioning bounds the blast radius, so the same coupling now takes out a cell instead of the region (S 9→6). It does not remove the coupling or make it visible, so O and D are unchanged. The post-mortem records this action as committed, not completed."
+    "revisedRationale": "Cell partitioning bounds the blast radius, so the same coupling now takes out a cell instead of the region (S 9→6). It does not remove the coupling or make it visible, so O and D are unchanged. The post-mortem records this action as committed, not completed.",
+    "short": "Billing servers carry index",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Map which subsystems each server carries and show it in the tool before a removal is accepted",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Scope removal by effect, not by intent: block any removal that touches servers shared with index or placement",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Raise an alert when a removal touches servers tagged to more than one subsystem",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "List the subsystems that lost servers in the command and restart those, not only the billing one",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Rebuild the server-to-subsystem map from the post-incident state and publish it to the S3 team",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -432,7 +514,43 @@
      "O": 3,
      "D": 6
     },
-    "revisedRationale": "With cells, losing one stops a fraction of the region rather than all of it (S 9→6). Recorded as committed in the post-mortem, not as completed."
+    "revisedRationale": "With cells, losing one stops a fraction of the region rather than all of it (S 9→6). Recorded as committed in the post-mortem, not as completed.",
+    "short": "One regional index",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Partition the index subsystem into cells so one restart does not stop GET, LIST, PUT and DELETE together",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Show request success rates per index cell so a single-cell fault is separated from a regional one",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Restart the index subsystem first and verify GET, LIST and DELETE before placement is touched",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hold placement restart until index shows enough capacity, as placement depends on it",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore PUT and new-object storage once placement recovers, and confirm all four APIs",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -487,7 +605,56 @@
      "O": 7,
      "D": 4
     },
-    "revisedRationale": "Regular rehearsal would reveal restart time before an incident does (D 9→4). The dossier records this action as implied by the post-mortem with completion not disclosed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Regular rehearsal would reveal restart time before an incident does (D 9→4). The dossier records this action as implied by the post-mortem with completion not disclosed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Restart not rehearsed at scale",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Rehearse full index and placement restart with metadata validation at current production scale",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Time each restart and validation stage in the rehearsal and publish the real total",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Track restart progress against the rehearsed timeline and flag when it falls behind",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Keep the metadata-integrity checks during restart; do not shortcut them for speed",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Give customers a revised restore estimate when the restart runs past the plan",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring up index capacity in stages and release the GET, LIST and DELETE APIs when enough is active",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -539,7 +706,47 @@
      "O": 2,
      "D": 9
     },
-    "revisedRationale": "Multi-region administration removes the single-region dependency, so a US-EAST-1 S3 impairment no longer disables status updates (O 6→2)."
+    "revisedRationale": "Multi-region administration removes the single-region dependency, so a US-EAST-1 S3 impairment no longer disables status updates (O 6→2).",
+    "short": "Status plane depends on S3",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run the SHD administration console across multiple regions so status can be updated during one region's S3 outage",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Test the SHD update path against a simulated S3 failure and alarm when it cannot write",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post to @AWSCloud and the SHD banner text while the dashboard cannot be updated",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name a communications owner who gets the backup channels without S3 at the start of the incident",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Update per-service status on the SHD once it works again and show the full timeline",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -572,9 +779,43 @@
       "i": 6
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Services depend on regional S3",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Define a degraded mode for EC2 launch, EBS snapshot restore and Lambda when regional S3 is unavailable",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on EC2 launch, EBS and Lambda error rates when S3 errors start, and open the dependency list",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Bring the owners of EC2, EBS, Lambda and the S3 console onto the bridge",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Verify EC2 launches, EBS snapshot operations and Lambda once S3 APIs are normal, in that order",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Move critical assets to a second region or a non-S3 store so one regional S3 outage does not stop the application",
+      "basis": "nist-800-34"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "S3 us-east-1 down ~4 h 17 min"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -589,5 +830,95 @@
    "quote": "2017-02-28 13:54 PST"
   }
  },
- "durationBasis": "Mistyped command 09:37 PST → all S3 APIs normal in US-EAST-1 13:54 PST (dossier: 4h17m)"
+ "durationBasis": "Mistyped command 09:37 PST → all S3 APIs normal in US-EAST-1 13:54 PST (dossier: 4h17m)",
+ "response": {
+  "roles": {
+   "first-responder": "No first responder is named; the fault was found internally",
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "The authorized S3 team member who ran the removal command",
+   "ops-lead": "AWS S3 engineers restarting the index and placement subsystems — not named",
+   "service-recovery": "AWS S3 recovery engineers — not individually named",
+   "comms": "AWS status communications via @AWSCloud and the SHD banner",
+   "customer": "S3 customers and sites such as Trello, GitHub, Slack and Quora"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "An authorized S3 team member, using an established playbook, executes a command",
+    "did": "Runs a command to remove a few servers from the S3 billing subsystem, at 09:37 PST"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 8,
+    "quote": "Recovery begins with a full restart of the index subsystem first",
+    "did": "Restart the index subsystem first, because placement depends on it"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 9,
+    "quote": "Metadata-integrity safety checks are run during restart and deliberately not shortcut",
+    "did": "Run metadata-integrity checks during restart rather than skip them, which slows recovery"
+   },
+   {
+    "role": "comms",
+    "soe": 10,
+    "quote": "it communicates via the @AWSCloud Twitter feed and SHD banner text",
+    "did": "Posts status on Twitter and the SHD banner while the dashboard cannot be updated, until about noon"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "S3 us-east-1 down ~4 h 17 min",
+  "bones": [
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Mistyped command input",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "No capacity-floor guardrail",
+      "factor": 0
+     },
+     {
+      "label": "Billing shares index servers",
+      "factor": 2
+     },
+     {
+      "label": "One regional index",
+      "factor": 4
+     },
+     {
+      "label": "Status plane depends on S3",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Restart not rehearsed in years",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "11+ external sites down",
+      "mode": "FM-06"
+     }
+    ]
+   }
+  ]
+ }
 }

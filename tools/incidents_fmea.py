@@ -74,6 +74,7 @@ SRC_LABEL = {
     "rootCause": "Root cause",
     "factor": "Contributing factor",
     "tech": "Technical deep-dive",
+    "lesson": "Lesson",
 }
 _LIST_FIELD = {
     "soe": "sequenceOfEvents",
@@ -82,6 +83,7 @@ _LIST_FIELD = {
     "improvement": "improvements",
     "ref": "references",
     "factor": "contributingFactors",
+    "lesson": "lessonsLearnt",
 }
 _TEXT_FIELD = {"rootCause": "rootCause", "tech": "technicalDeepDive"}
 ACTION_SOURCES = {"coe", "improvement"}
@@ -347,6 +349,11 @@ def _score_cell(k, v, rationale):
     return (f'<div class="fm-sc"><dt>{k} <b>{v}</b></dt><dd>{esc(rationale)}</dd></div>')
 
 
+def _who_acts(inc, m):
+    import incidents_response  # late: incidents_response imports this module
+    return incidents_response.mode_playbook_html(inc, m)
+
+
 def worksheet_html(inc):
     f = inc["fmea"]
     modes = sorted(f["modes"], key=lambda m: -rpn(m))
@@ -387,6 +394,7 @@ def worksheet_html(inc):
     <p class="fm-sub">Corrective action</p>
     <ul class="fm-acts">{acts}</ul>
     {rev_line}
+    {_who_acts(inc, m)}
     <p class="fm-sub">Evidence</p>
     <ul class="fm-ev">{ev}</ul>
     <button type="button" class="fm-wi-open" data-id="{esc(m["id"])}" hidden>Open in what-if</button>
@@ -477,7 +485,7 @@ def fmea_section(inc):
     total1 = sum(rpn(m["revised"]) if m.get("revised") else rpn(m) for m in modes)
     cut = round(100 * (total0 - total1) / total0) if total0 else 0
     return f"""
-        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <h2 id="h-fmea">Failure mode &amp; effects analysis (FMEA)</h2>
         <p class="fm-scope">{esc(f["scope"])}</p>
         <p class="metabar fm-meta"><span><b>{len(modes)}</b> failure modes</span><span class="sep">/</span><span><b>{high}</b> high priority</span><span class="sep">/</span><span><b>{acted} of {len(modes)}</b> with a published action</span><span class="sep">/</span><span>total RPN <b>{total0} → {total1}</b> (−{cut}%)</span></p>
         <div class="fm-sim" data-fm-sim>

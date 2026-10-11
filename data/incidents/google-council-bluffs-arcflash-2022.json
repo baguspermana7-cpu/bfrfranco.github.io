@@ -355,6 +355,57 @@
        "i": 2
       }
      }
+    ],
+    "short": "Arc flash at live cabinet",
+    "symbol": "switchgear",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Use remote racking and remote operators at cabinets that need frequent access, so no one stands inside the arc boundary when switching",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Check the arc rating of each worker's PPE against the labeled incident energy of that cabinet before access",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Call 911 on any explosion or flash and say how many are hurt and where; no alarm will do it",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Stage the air ambulance and hold the crew back from the cabinet until it is made safe",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Treat the cabinet as still live after the arc; isolate and prove dead before anyone returns to it",
+      "basis": "en-50110"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Retrieve and publish the accident abstract, so the initiating fault is on the record",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
     ]
    },
    {
@@ -407,6 +458,44 @@
        "src": "improvement",
        "i": 0
       }
+     }
+    ],
+    "short": "Live access, no lockout shown",
+    "symbol": "disconnect",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Require de-energisation and lockout first, with a written energized-work permit and the reason live access is needed, for every substation cabinet task",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Before opening the cabinet, test for absence of voltage and apply personal locks",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "safety",
+      "phase": "detect",
+      "do": "Audit permits against jobs in progress, so live work without a permit is stopped at the gate",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Stop all other work on the substation until the cabinet's energy state is confirmed by the host",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Restore the cabinet only after inspection and a signed release from the host",
+      "basis": "nfpa-70e"
      }
     ]
    },
@@ -471,7 +560,50 @@
      "O": 4,
      "D": 8
     },
-    "revisedRationale": "The cited abatement targets the deficient briefing directly, so a documented determination before each task makes the slip less likely (O 6→4). The dossier records the abatement as OSHA-directed with the case closed, but not what the contractor changed, so the reduction is a claim about the action, not a confirmed outcome. D is unchanged because no new check that would catch a missed briefing is recorded."
+    "revisedRationale": "The cited abatement targets the deficient briefing directly, so a documented determination before each task makes the slip less likely (O 6→4). The dossier records the abatement as OSHA-directed with the case closed, but not what the contractor changed, so the reduction is a claim about the action, not a confirmed outcome. D is unchanged because no new check that would catch a missed briefing is recorded.",
+    "short": "Job briefing deficient",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Hold a documented job briefing before each energized task, recording energization state, incident energy and PPE category",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "prevent",
+      "do": "Have the host coordinator and contractor foreman sign the existing-conditions determination together before the crew starts",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "detect",
+      "do": "Spot-check briefings on site; a missing or blank sign-off stops the task",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Stop and re-brief if the cabinet or the plan differs from the briefing",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Review the briefing record in the inspection and set abatement dates for the contractor",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -524,6 +656,47 @@
        "i": 4
       }
      }
+    ],
+    "short": "No arc-flash study, PPE",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Complete an NFPA 70E / IEEE 1584 incident-energy study for every substation cabinet and put the label on it",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Match PPE to the labeled incident energy at the briefing and check workers' kit before they open the cabinet",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Re-validate the study when equipment changes; flag any cabinet with no label as live-work prohibited",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Ask on arrival for the cabinet's incident-energy label to judge the burn injuries and blast risk",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "safety",
+      "phase": "recover",
+      "do": "Record the PPE worn and compare with the study in the investigation",
+      "basis": "nfpa-70e"
+     }
     ]
    },
    {
@@ -565,7 +738,44 @@
       "i": 10
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Alarm only by human report",
+    "playbook": [
+     {
+      "role": "first-responder",
+      "phase": "prevent",
+      "do": "Give the crew a radio or phone on the job and a plan for calling 911 with the exact location",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Report any explosion as an injury event first, even with no fire shown",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Dispatch ground ambulances and put an air ambulance on standby for burn victims",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Direct responders to the substation cabinet, not the data-center halls",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Issue an early statement that separates the injury event from any same-day service issue",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -617,10 +827,146 @@
        "i": 5
       }
      }
+    ],
+    "short": "Root cause not published",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Keep accident abstracts retrievable and accessible for catastrophic electrical events",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "detect",
+      "do": "Check each corrective action against what the record states; mark actions with no public status",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Say plainly which facts are undisclosed, such as the equipment, voltage and incident energy",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Publish an operator post-incident note covering the initiating fault, isolation status and PPE finding",
+      "basis": "nims-ics"
+     }
     ]
+   }
+  ],
+  "impactShort": "3 electricians burned · 1 critical"
+ },
+ "durationStatus": "no-outage",
+ "durationBasis": "Arc flash injured three electricians; no customer service impact or restoration documented.",
+ "response": {
+  "roles": {
+   "first-responder": "Whoever phoned in the 'large explosion' — not named",
+   "incident-commander": "Fire officials directed the scene; no site incident commander is named",
+   "fire-service": "Council Bluffs Fire Department, with an air ambulance on standby",
+   "electrical": "Three Capital Electric Construction Co. electricians, the injured crew",
+   "safety": "Capital Electric EHS and Google host site safety — not named individually",
+   "comms": "Google, which issued the first public statement that evening",
+   "authority": "OSHA, which opened inspections of Capital Electric and of Google"
+  },
+  "recorded": [
+   {
+    "role": "electrical",
+    "soe": 1,
+    "quote": "electricians are performing construction/installation work accessing an electrical cabinet",
+    "did": "Three Capital Electric electricians are working at an energized cabinet on a substation near the data-center buildings"
+   },
+   {
+    "role": "fire-service",
+    "soe": 5,
+    "quote": "Council Bluffs Fire Department dispatches units with air-ambulance on standby",
+    "did": "Dispatches units with an air ambulance on standby after the 911 call"
+   },
+   {
+    "role": "fire-service",
+    "soe": 6,
+    "quote": "fire officials direct the response",
+    "did": "Arrives within minutes and directs the response"
+   },
+   {
+    "role": "comms",
+    "soe": 11,
+    "quote": "Google issues its first public statement acknowledging",
+    "did": "Acknowledges an electrical incident that injured three people and pledges an investigation"
+   },
+   {
+    "role": "authority",
+    "soe": 13,
+    "quote": "OSHA opens two inspections",
+    "did": "Inspects contractor Capital Electric and host Google on 9 August"
+   },
+   {
+    "role": "authority",
+    "soe": 15,
+    "quote": "OSHA issues Citation 01001 to Capital Electric",
+    "did": "Cites Capital Electric under 29 CFR 1926.950(b)(1)(i); penalty raised to $20,000 in settlement"
    }
   ]
  },
- "durationStatus": "no-outage",
- "durationBasis": "Arc flash injured three electricians; no customer service impact or restoration documented."
+ "fishbone": {
+  "effect": "3 electricians burned in arc flash",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Cabinet fault, cause unknown",
+      "mode": "FM-01"
+     },
+     {
+      "label": "Gear upkeep not disclosed",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Crew inside arc boundary",
+      "factor": 0
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Job briefing deficient",
+      "factor": 1
+     },
+     {
+      "label": "No lockout shown",
+      "mode": "FM-02"
+     },
+     {
+      "label": "No arc-flash study shown",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Host and contractor boundary",
+      "factor": 4
+     }
+    ]
+   }
+  ]
+ }
 }

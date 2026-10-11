@@ -455,6 +455,56 @@
        "i": 4
       }
      }
+    ],
+    "short": "Inverter and battery fault",
+    "symbol": "ups",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Find the cause of recurring by-pass trips before an inverter goes back into service",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat an inverter humidity or temperature alarm as a call-out: go, look, log and escalate",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Supervise every battery string and alarm on drift in voltage, temperature or impedance",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident, take command and order isolation of the energy room before the fire service arrives",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Open the UPS input, output and battery DC breakers of the faulted string",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Establish the ignition mechanism and publish it",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
     ]
    },
    {
@@ -520,7 +570,45 @@
      "O": 2,
      "D": 4
     },
-    "revisedRationale": "Automatic suppression in the energy rooms would act on a fire without waiting for de-energisation, so an unsuppressed fire becomes guarded by design (O 5→2) and the response starts before spread (D 6→4). Severity is unchanged: if suppression failed, the outcome would be the same. OVHcloud's commitment is recorded from public statements with independent completion not verified, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Automatic suppression in the energy rooms would act on a fire without waiting for de-energisation, so an unsuppressed fire becomes guarded by design (O 5→2) and the response starts before spread (D 6→4). Severity is unchanged: if suppression failed, the outcome would be the same. OVHcloud's commitment is recorded from public statements with independent completion not verified, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "No automatic suppression",
+    "symbol": "sprinkler",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Fit automatic suppression to energy rooms and data halls",
+      "basis": "nfpa-75",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Where there is no suppression, call the fire service on the first confirmed alarm, before inspecting",
+      "basis": "nfpa-75"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Meet the fire service with one briefing: seat of fire, what is still live, water, people",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Hold water off live equipment until the site confirms isolation",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "safety",
+      "phase": "recover",
+      "do": "Keep staff out until the fire service hands the building back",
+      "basis": "nfpa-1561"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -574,6 +662,48 @@
       "evidence": {
        "src": "improvement",
        "i": 3
+      }
+     }
+    ],
+    "short": "Envelope spreads the fire",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Treat batteries and their chargers as one fire unit and compartment it",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Report smoke on upper floors as fire spread, not as a separate alarm",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Switch to defending the neighbouring buildings once the origin building cannot be held",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "safety",
+      "phase": "contain",
+      "do": "Close fire-stop doors behind the evacuation; never leave them wedged open",
+      "evidence": {
+       "src": "factor",
+       "i": 6
+      }
+     },
+     {
+      "role": "crisis",
+      "phase": "recover",
+      "do": "Audit every site for fire vulnerability and carry the findings into rebuild standards",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
       }
      }
     ]
@@ -640,6 +770,53 @@
        "i": 1
       }
      }
+    ],
+    "short": "Site stays live over an hour",
+    "symbol": "disconnect",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Install an accessible general cut-off and drill the isolation sequence",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "detect",
+      "do": "Know which sources feed each building — grid, UPS, batteries, generators — before the fire service asks",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Isolate in a fixed order: grid, generators with auto-start blocked, UPS output, battery DC",
+      "basis": "en-50110",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "utility",
+      "phase": "contain",
+      "do": "Cut at the substation on request when the site's own HT posts are inside the fire zone",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Get isolation confirmed by the site's authorised person before committing massive water",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Re-energise only after inspection and release by the fire service",
+      "basis": "nfpa-70e"
+     }
     ]
    },
    {
@@ -692,6 +869,46 @@
        "i": 2
       }
      }
+    ],
+    "short": "Fire water far too low",
+    "symbol": "pump",
+    "playbook": [
+     {
+      "role": "crisis",
+      "phase": "prevent",
+      "do": "Provide owned fire-water reserves or canal pumping sized for a building fire",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "fire-service",
+      "phase": "detect",
+      "do": "Measure hydrant flow on arrival and call for more water at once if it is short",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Give the fire service the site water plan: hydrants, flows, canal access",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Bring in a fireboat or tanker relay as soon as on-site flow is known to be short",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "crisis",
+      "phase": "recover",
+      "do": "Bring water resources up to the regulated requirement before rebuilding",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     }
     ]
    },
    {
@@ -737,6 +954,44 @@
        "i": 5
       }
      }
+    ],
+    "short": "Backups in the same building",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Keep at least one backup copy in another building or region",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "List every customer whose only backup was in SBG2 as soon as the building is lost",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell those customers directly what is lost, what is not, and when the next update comes",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Provision replacement servers in other sites",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Restore from off-site copies into another region",
+      "basis": "nist-800-34"
+     }
     ]
    },
    {
@@ -775,6 +1030,34 @@
        "i": 5
       }
      }
+    ],
+    "short": "Second fire in SBG1",
+    "symbol": "battery",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Inspect and isolate surviving battery rooms before anything is re-energised",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Keep a fire watch on battery rooms for the whole recovery",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Treat the recovering site as a live fire risk until the batteries are cleared",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Re-plan the restoration after the second power-down",
+      "basis": "nims-ics"
+     }
     ]
    },
    {
@@ -812,10 +1095,214 @@
       "quote": "Detection is credited ONLY with enabling safe evacuation, never suppression."
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Staff exposed to fire",
+    "symbol": "manualStation",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Drill night evacuation with the real night staffing",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Investigate an alarm in pairs and withdraw on visible smoke",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Take the head count from the site before sending crews inside",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "safety",
+      "phase": "contain",
+      "do": "Account for everyone at the assembly point and report the count to the fire service",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "safety",
+      "phase": "recover",
+      "do": "Keep staff out of live or smoke-damaged buildings until released",
+      "basis": "nfpa-70e"
+     }
+    ]
+   }
+  ],
+  "impactShort": "SBG2 lost · 3.6M websites offline"
+ },
+ "durationStatus": "not-established",
+ "durationBasis": "Faults and first alarm 00h35 9 Mar; SBG2 total loss, no customer service restoration time given.",
+ "response": {
+  "roles": {
+   "first-responder": "OVH night security guard at SBG",
+   "incident-commander": "OVH site command on the night — no one is named in the record",
+   "fire-service": "SIS / SDIS 67, Bas-Rhin fire and rescue",
+   "electrical": "OVH staff who isolated SBG2 and the backup supplies",
+   "utility": "SER, the Strasbourg grid operator",
+   "safety": "Whoever evacuated SBG2 and counted the night crew — not named",
+   "service-recovery": "OVHcloud support and recovery teams",
+   "comms": "OVHcloud public updates — not in this sequence of events",
+   "crisis": "OVHcloud executive leadership",
+   "customer": "OVHcloud customers hosted in SBG",
+   "authority": "BEA-RI, the French industrial-accident investigator"
+  },
+  "recorded": [
+   {
+    "role": "first-responder",
+    "soe": 3,
+    "quote": "Security guard reaches ground-floor energy room no.2 and finds thick black smoke",
+    "did": "Reaches energy room 2 two minutes after the alarm and finds thick black smoke"
+   },
+   {
+    "role": "safety",
+    "soe": 4,
+    "quote": "SBG2 evacuated; the small night crew is accounted for",
+    "did": "Evacuates SBG2 and accounts for the night crew: no victims, no injuries"
+   },
+   {
+    "role": "first-responder",
+    "soe": 5,
+    "quote": "OVH guard places the emergency call to the fire service",
+    "did": "Calls the fire service, seven minutes after the first alarm"
+   },
+   {
+    "role": "fire-service",
+    "soe": 7,
+    "quote": "deploy a single water lance while awaiting de-energisation",
+    "did": "Arrives at 00h59, sees arcing in the energy room, holds to one lance until the site is de-energised"
+   },
+   {
+    "role": "electrical",
+    "soe": 8,
+    "quote": "SBG2 electrical supply cut by OVH.",
+    "did": "Cuts SBG2's supply, 38 minutes after the alarm"
+   },
+   {
+    "role": "electrical",
+    "soe": 9,
+    "quote": "backup energies of SBG3/SBG1/SBG4 cut by OVH",
+    "did": "Cuts the backup supplies of SBG1, SBG3 and SBG4"
+   },
+   {
+    "role": "fire-service",
+    "soe": 11,
+    "quote": "Fireboat EUROPA requested",
+    "did": "Calls the fireboat EUROPA: the single hydrant gives under 60 m3/h"
+   },
+   {
+    "role": "utility",
+    "soe": 12,
+    "quote": "SER cuts remotely at the upstream source substation",
+    "did": "Cuts the site at the upstream substation; the HT posts inside the fire zone cannot be operated"
+   },
+   {
+    "role": "fire-service",
+    "soe": 15,
+    "quote": "massive water attack finally engaged",
+    "did": "Starts the massive water attack once the site is judged electrically secured"
+   },
+   {
+    "role": "fire-service",
+    "soe": 16,
+    "quote": "Fireboat EUROPA arrives",
+    "did": "Fireboat adds 3 pumps and 2 foam/water lances, decisive in sparing SBG1 and SBG3"
+   },
+   {
+    "role": "fire-service",
+    "soe": 19,
+    "quote": "Fire declared",
+    "did": "Declares the fire under control"
+   },
+   {
+    "role": "fire-service",
+    "soe": 20,
+    "quote": "Fire extinguished",
+    "did": "Extinguishes the fire; about 4,000 L of foam concentrate used"
+   },
+   {
+    "role": "customer",
+    "soe": 23,
+    "quote": "130+ customers pursue a class action",
+    "did": "Over 130 customers pursue a class action after first-instance awards were cut on appeal"
    }
   ]
  },
- "durationStatus": "not-established",
- "durationBasis": "Faults and first alarm 00h35 9 Mar; SBG2 total loss, no customer service restoration time given."
+ "fishbone": {
+  "effect": "SBG2 destroyed, 3.6M sites offline",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Inverter ASI2 fault",
+      "mode": "FM-01"
+     },
+     {
+      "label": "Battery bank fault",
+      "mode": "FM-01"
+     },
+     {
+      "label": "Generators auto-restart",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "No automatic suppression",
+      "factor": 0
+     },
+     {
+      "label": "Combustible free-cool shell",
+      "factor": 3
+     },
+     {
+      "label": "UPS and batteries split",
+      "factor": 7
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "By-pass trips not traced",
+      "factor": 2
+     },
+     {
+      "label": "No general cut-off",
+      "factor": 1
+     },
+     {
+      "label": "Fire-stop doors held open",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "One hydrant, under 60 m3/h",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "No off-site customer backup",
+      "factor": 8
+     }
+    ]
+   }
+  ]
+ }
 }

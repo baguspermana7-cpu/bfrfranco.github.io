@@ -61,6 +61,8 @@ gate "flatten ratchet — washes and card stripes may fall, never rise" node too
 gate "incident pages — generated pages match the builder" python3 tools/build-incidents.py --check
 gate "incident FMEA — grounded, scored with reasons, rendered" python3 tools/test-incidents-fmea.py --strict --require-all
 gate "incident FMEA simulator — live, consistent with the builder, hub agrees" node tools/test-fmea-sim.mjs --strict
+gate "incident response by role — quoted from the record, playbook cites a basis, rendered" python3 tools/test-incidents-response.py --strict --require-all
+gate "incident figures — drawn by the diagram engine, zero warnings, file current" node tools/build-incident-diagrams.mjs --check
 gate "diagram engine — adoption ratchet (hand-authored geometry may fall, never rise)" node tools/test-diagram-engine-adoption.mjs
 gate "diagram engine — one real diagram renders with zero collisions" node tools/demo-rz-diagram.mjs
 gate "DC AI GB300 engine — identities, balance, cliff, perturbation" node tools/test-dcai-engine.mjs

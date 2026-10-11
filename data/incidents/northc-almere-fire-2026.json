@@ -422,6 +422,53 @@
        "i": 2
       }
      }
+    ],
+    "short": "Power-room fire, cause open",
+    "symbol": "transformer",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Run thermographic inspection of transformers, switchgear and UPS on a fixed cadence, and monitor battery-string temperature continuously",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat the first alarm from the technical room as a real fire: evacuate first and call the fire brigade before anyone goes to look",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hand the fire brigade a briefing: what is in the room, what is still live, and where Almere 2 begins",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Isolate Almere 1 power feeds and let Almere 2 generators carry the undamaged half",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Order a complete shutdown of the data center before attacking the fire",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Run the independent cause investigation once the structure is safe, and fix the cause before re-energising",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
     ]
    },
    {
@@ -478,6 +525,53 @@
        "src": "improvement",
        "i": 5
       }
+     }
+    ],
+    "short": "Power-room suppression unknown",
+    "symbol": "sprinkler",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Fit the technical room with automatic suppression sized for the equipment and any Li-ion battery, with aspirating detection",
+      "basis": "nfpa-75",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Publish the detection-to-alarm timeline and suppression status once the expert report allows",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Log the time of the first alarm and the call to the fire brigade",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Plan for a long manual firefight where no suppression discharged, with cooling water on the compartment walls",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Keep staff and neighbours clear of the technical room and ask the region to issue smoke advice if the plume drifts",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Do not re-energise anything in the compartment until suppression state is recorded and repaired",
+      "basis": "nfpa-75"
      }
     ]
    },
@@ -537,6 +631,58 @@
        "i": 3
       }
      }
+    ],
+    "short": "Backup power in the same room",
+    "symbol": "transformer",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Put transformers, UPS and switchgear of each compartment in separate fire compartments",
+      "basis": "nfpa-75",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Map which loads share which power room, so one fire's reach is known beforehand",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Use the undamaged half: confirm Almere 2 generators are carrying load and keep Almere 1 de-energised",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Move critical tenant systems to a second site and tell NorthC which loads are lifesaving",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Build a temporary redundant power train with generators, UPS, distribution and cable",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Publish each reconnection milestone on the status page, with date and which hall",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -581,6 +727,43 @@
        "src": "improvement",
        "i": 4
       }
+     }
+    ],
+    "short": "Compartment too unstable",
+    "playbook": [
+     {
+      "role": "fire-service",
+      "phase": "prevent",
+      "do": "Pre-plan structural-collapse access for power rooms: external attack points and pre-engineered crane or demolition access",
+      "basis": "nfpa-1561",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "detect",
+      "do": "Get a structural assessment early and keep crews out of the compartment when it cannot be entered safely",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Demolish facade sections by crane to attack from outside, and fly a drone for interior imaging",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "authority",
+      "phase": "contain",
+      "do": "Warn residents of smoke by NL-Alert while the fire burns, and withdraw it once measurements are clear",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Secure the unstable structure first so the cause investigation can start",
+      "basis": "iso-22301"
      }
     ]
    },
@@ -639,6 +822,45 @@
        "i": 2
       }
      }
+    ],
+    "short": "Rebuild plant from scratch",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Hold a plan and pre-contracted supply for a temporary power train, so it is not designed during the outage",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Inventory the plant lost and the surviving plant the day the building is released",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Connect Almere 2 to the grid first so its halls recover while Almere 1 is rebuilt",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Reinstall transformers and UPS in phases and restore Almere 1 to grid",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Give tenants dated power milestones and hold to them",
+      "basis": "itil-incident"
+     }
     ]
    },
    {
@@ -696,6 +918,43 @@
        "src": "improvement",
        "i": 3
       }
+     }
+    ],
+    "short": "Tenants on one site",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Fail over critical tenant systems, such as the control centre servers, to a second site",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Test failover of single-site dependencies on a schedule; a failed test is the warning",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell tenants at the first hour that the site is down and give them an update time",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Switch to manual procedures for safety functions such as bus-driver radio and the emergency button",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring tenant systems back in the order the tenants set, with their lifesaving functions first",
+      "basis": "iso-22301"
      }
     ]
    },
@@ -756,9 +1015,55 @@
        "i": 0
       }
      }
+    ],
+    "short": "Cause, detection undisclosed",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Commit to a draft cause report date and publish the findings, including maintenance, hot-work and test history",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Preserve the damaged equipment and the maintenance logs for the investigators",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "State what is known and not known about ignition source and chemistry; do not speculate",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Ask NorthC in writing for the draft report and for the suppression and detection status",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Check each facility action against the report when it lands, and record its status",
+      "basis": "nims-ics",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "Almere 1 power lost · ~6 days"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -773,5 +1078,107 @@
    "quote": "Computable reports 09:30"
   }
  },
- "durationBasis": "Fire ~08:45 7 May → temporary power train for Almere 1 activated 09:30 13 May."
+ "durationBasis": "Fire ~08:45 7 May → temporary power train for Almere 1 activated 09:30 13 May.",
+ "response": {
+  "roles": {
+   "first-responder": "Whoever raised the alarm — detection and alarm time are not disclosed",
+   "incident-commander": "Veiligheidsregio Flevoland ran the response at GRIP 2; no site commander is named",
+   "fire-service": "Fire brigade, with a Brabant drone and a Lelystad Airport truck",
+   "safety": "NorthC staff who evacuated the building, per CEO Alexandra Schless",
+   "electrical": "NorthC power and facilities engineers — not named",
+   "service-recovery": "NorthC teams that built the temporary power train",
+   "comms": "NorthC status page; no named spokesperson in the sequence",
+   "authority": "Mayor Hein van der Loo and the Veiligheidsregio Flevoland",
+   "customer": "Transdev, Utrecht University, Infomedics, a water board and other tenants"
+  },
+  "recorded": [
+   {
+    "role": "safety",
+    "soe": 1,
+    "quote": "All people present were evacuated from the building in time",
+    "did": "Evacuates everyone in time; no injuries"
+   },
+   {
+    "role": "fire-service",
+    "soe": 2,
+    "quote": "Fire brigade responds and orders a COMPLETE datacenter shutdown",
+    "did": "Orders a complete shutdown of the data center and confirms the fire in the Almere 1 technical room"
+   },
+   {
+    "role": "incident-commander",
+    "soe": 6,
+    "quote": "issues an NL-Alert: avoid smoke, close windows/doors, switch off mechanical ventilation",
+    "did": "Veiligheidsregio Flevoland at GRIP 2 issues an NL-Alert: avoid smoke, close windows and doors, switch off ventilation"
+   },
+   {
+    "role": "fire-service",
+    "soe": 7,
+    "quote": "Facade sections are demolished with cranes for access",
+    "did": "Cannot send crews inside; demolishes facade sections and uses a drone for interior imaging"
+   },
+   {
+    "role": "authority",
+    "soe": 10,
+    "quote": "warns the fire is not yet under control and may take a while",
+    "did": "Mayor Hein van der Loo calls it a 'vreselijke brand' and warns it may take a while"
+   },
+   {
+    "role": "incident-commander",
+    "soe": 12,
+    "quote": "Incident downscaled from GRIP 2 to GRIP 1",
+    "did": "Downscales to GRIP 1 at about 20:50 and withdraws the NL-Alert"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 14,
+    "quote": "Temporary redundant power train activated for Almere 1",
+    "did": "Activates generators, UPS, distribution units and over 1 km of cable on 13 May, about six days on"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Almere 1 power lost for 6 days",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Power-room fire, cause open",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Transformers and UPS one room",
+      "factor": 0
+     },
+     {
+      "label": "No suppression shown",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Upkeep status unevidenced",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Compartment too unstable",
+      "factor": 2
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -461,6 +461,54 @@
        "i": 0
       }
      }
+    ],
+    "short": "Li-ion bank runaway",
+    "symbol": "battery",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Retire Li-ion banks at end of life and never relocate a past-life pack",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Add cell-level impedance, off-gas and thermal diagnostics to the inspection, since a pass/fail check gave false assurance",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Call the fire service on the first spark or smoke report from the battery area, before sending anyone to look",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Evacuate the floor, get a head count, and tell the fire service the battery is Li-ion and its state of charge",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Apply sustained water cooling to the battery bank, accepting server damage, and hold a long watch for re-ignition",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Move the surviving racks out of the heat and smoke zone and assess each before any power-up",
+      "basis": "nfpa-855"
+     }
     ]
    },
    {
@@ -519,6 +567,44 @@
        "i": 0
       }
      }
+    ],
+    "short": "Moved while live and charged",
+    "symbol": "disconnect",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Issue a hazardous-work permit that needs verified de-energisation, discharge and thermal monitoring before any Li-ion relocation",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Prove the auxiliary feed to the battery backup is open and test for absence of voltage before touching a cable",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "change-owner",
+      "phase": "detect",
+      "do": "Check state of charge and insulation materials at the start; stop the job if cells are at 80-90% or the aux feed is live",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "first-responder",
+      "phase": "contain",
+      "do": "Pull the crew back from the battery on any spark, smell or heat and call the fire service",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Return no battery to service until its charge, insulation and wiring are re-inspected",
+      "basis": "nfpa-855"
+     }
     ]
    },
    {
@@ -568,6 +654,45 @@
        "i": 3
       }
      }
+    ],
+    "short": "Illegal subcontracting",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Do the move with the battery manufacturer or a certified crew and no second-tier subcontractor",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Require named, qualified individuals on the permit and check them at the gate against employment records",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "safety",
+      "phase": "detect",
+      "do": "Audit who is on site against the tender at the start of each shift on critical-infrastructure work",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Halt any energy-storage job where the crew is not the one tendered",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Examine the tender and employment records of the firms, and resolve the charges",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
     ]
    },
    {
@@ -615,6 +740,48 @@
        "src": "improvement",
        "i": 1
       }
+     }
+    ],
+    "short": "No cell-level early warning",
+    "symbol": "smokeDetector",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Install battery off-gas and thermal-runaway detection and rated fire separation between Li-ion storage and server halls",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Place thermal monitoring on the batteries during any relocation or decommissioning",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Log the time of first alarm and the call to fire service, so the warning gap can be measured",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Treat any battery off-gas alarm as a fire: evacuate and isolate before it is confirmed",
+      "basis": "nfpa-72"
+     },
+     {
+      "role": "fire-service",
+      "phase": "recover",
+      "do": "Hand the room back only when off-gas and cell temperature readings are stable",
+      "basis": "nfpa-855"
      }
     ]
    },
@@ -668,6 +835,54 @@
        "src": "coe",
        "i": 4
       }
+     }
+    ],
+    "short": "Water held back from Li-ion",
+    "symbol": "agentCylinder",
+    "playbook": [
+     {
+      "role": "fire-service",
+      "phase": "prevent",
+      "do": "Pre-plan with NIRS the water or immersion cooling route for the Li-ion room, so crews know what may be sacrificed",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Put Li-ion energy storage in its own fire-rated room with battery-appropriate suppression, separated from IT space",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "detect",
+      "do": "Agree at the first hour whether servers or fire control come first; a decision delayed lets runaway re-ignite",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Switch to copious water cooling once gas is seen not to arrest the runaway",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "De-energise the room and its equipment so water can be applied safely",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Recover servers from the room after water exposure, and prioritise those with no other copy",
+      "basis": "nist-800-34"
      }
     ]
    },
@@ -733,6 +948,57 @@
        "i": 3
       }
      }
+    ],
+    "short": "One shutdown takes 647 systems",
+    "symbol": "crah",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Give each hall its own power and cooling and fault-isolate it, so one room's fire does not force a site-wide shutdown",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Spread critical services over multiple facilities or zones so one fire does not stop the nation",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Watch cooling status per room and decide the shutdown scope from a prepared map of which systems share which cooling",
+      "basis": "ashrae-tc99"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Shut down only the systems sharing the failed cooling, in priority order, and keep the rest running",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Tell ministries which services stop and for how long before the power goes",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore cooling first, then bring up Grade-1 services in the tiered order",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     }
     ]
    },
    {
@@ -791,6 +1057,48 @@
        "i": 2
       }
      }
+    ],
+    "short": "G-Drive has no backup",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Back up G-Drive to a separate site, dropping the exception for being too large to back up",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Test a restore of a sample of G-Drive from the offsite copy on a schedule",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Keep a register of systems with no recoverable copy and review it with the facility risk list",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Put the no-backup stores first in line for protection and salvage during a fire",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Salvage what exists on user machines and reconstruct documents with each ministry",
+      "basis": "nist-800-34"
+     }
     ]
    },
    {
@@ -837,10 +1145,171 @@
        "i": 5
       }
      }
+    ],
+    "short": "Weeks-long restoration",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Write and drill a restoration runbook with priority tiers and cooling-first sequencing",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "detect",
+      "do": "Track restored share against the plan each day, and flag slippage",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Restore Grade-1 services first and publish progress by tier",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Run each ministry's work on manual fallback for services not yet restored",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Set shifts and rest for restoration staff; do not run them to exhaustion",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     }
     ]
+   }
+  ],
+  "impactShort": "647 systems offline · 858 TB lost"
+ },
+ "durationStatus": "not-established",
+ "durationBasis": "Fire ~20:20 KST 26 Sep; only 231 of 647 systems (~32.5%) restored weeks later.",
+ "response": {
+  "roles": {
+   "first-responder": "Whoever noticed the fire at about 20:15 — not named",
+   "incident-commander": "No incident commander is named in the record",
+   "fire-service": "Korean fire authorities; reported ~101 firefighters and ~31 apparatus",
+   "electrical": "The relocation crew that disconnected the UPS batteries — not named",
+   "ops-lead": "NIRS operators who powered down the Daejeon systems",
+   "change-owner": "The worker who switched off the UPS battery to start the relocation",
+   "vendor": "Tender-winning firms that subcontracted the move to three others",
+   "service-recovery": "MOIS and NIRS teams restoring the 647 systems",
+   "safety": "No safety officer or permit-holder is named for the relocation",
+   "authority": "Korean National Police, which charged five with negligence",
+   "customer": "Ministries and agencies using the Daejeon systems and G-Drive"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 2,
+    "quote": "Worker switches OFF the UPS lithium-ion battery power to begin disconnection for relocation",
+    "did": "Starts disconnecting the battery for the move to the basement about 40 minutes before ignition"
+   },
+   {
+    "role": "fire-service",
+    "soe": 6,
+    "quote": "Fire authorities dispatch immediately",
+    "did": "Dispatch ~101 firefighters and ~31 apparatus and form a ~20-person task force with battery experts"
+   },
+   {
+    "role": "fire-service",
+    "soe": 7,
+    "quote": "Crews constrained from water flooding to avoid destroying the protected servers",
+    "did": "Hold back water to protect the servers and rely on gas/CO2, which cannot arrest the runaway"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 8,
+    "quote": "NIRS cuts power to all 647 Daejeon systems",
+    "did": "Shuts down all 647 systems after the room's HVAC/CRAC is lost, to avoid server overheating"
+   },
+   {
+    "role": "fire-service",
+    "soe": 10,
+    "quote": "Initial knockdown reached only after over 10 hours",
+    "did": "Reach initial knockdown after more than 10 hours, delayed by the water constraints"
+   },
+   {
+    "role": "authority",
+    "soe": 16,
+    "quote": "South Korean police reportedly charge five with professional negligence",
+    "did": "Charge a NIRS official, a PM-firm employee and three construction workers"
    }
   ]
  },
- "durationStatus": "not-established",
- "durationBasis": "Fire ~20:20 KST 26 Sep; only 231 of 647 systems (~32.5%) restored weeks later."
+ "fishbone": {
+  "effect": "647 systems offline, G-Drive lost",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Li-ion bank past 10 years",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Li-ion bank beside servers",
+      "factor": 5
+     },
+     {
+      "label": "Shared power and cooling",
+      "factor": 7
+     },
+     {
+      "label": "No G-Drive backup",
+      "factor": 4
+     },
+     {
+      "label": "No cell-level detection",
+      "factor": 8
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Isolation steps skipped",
+      "factor": 2
+     },
+     {
+      "label": "Water-cautious fire doctrine",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Crew had no battery experience",
+      "factor": 0
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Illegal subcontracting",
+      "factor": 1
+     }
+    ]
+   }
+  ]
+ }
 }

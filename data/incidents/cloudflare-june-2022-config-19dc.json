@@ -312,7 +312,50 @@
      "O": 2,
      "D": 8
     },
-    "revisedRationale": "If the policy no longer depends on order, a reorder can no longer withdraw the site-locals (O 6→2). Severity and detection are unchanged for any other policy error. Recorded as committed in the post-mortem, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "If the policy no longer depends on order, a reorder can no longer withdraw the site-locals (O 6→2). Severity and detection are unchanged for any other policy error. Recorded as committed in the post-mortem, not as completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Reordered BGP export policy",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Redesign AGGREGATES-OUT so the site-local advertisements do not depend on their order against REJECT-THE-REST",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run a pre-commit policy test that the site-local prefixes are still exported after any reorder",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on withdrawal of site-local prefixes from the MCP spines the moment the commit lands, not on request loss",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop the rollout to any remaining location as soon as MCP spines show withdrawn prefixes",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name the AGGREGATES-OUT reorder as the working cause on the incident call and freeze all other network changes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Restore the original term order and re-advertise the site-local prefixes on each spine",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -365,7 +408,58 @@
      "O": 5,
      "D": 4
     },
-    "revisedRationale": "An MCP site early in the stagger would expose a fault of this class at one location with time to stop the rollout (D 8→4), bounding the effect to customer-visible degradation at that site (S 8→5); Cloudflare says this 'would have significantly lessened the overall impact'. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "An MCP site early in the stagger would expose a fault of this class at one location with time to stop the rollout (D 8→4), bounding the effect to customer-visible degradation at that site (S 8→5); Cloudflare says this 'would have significantly lessened the overall impact'. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Stagger skips MCP until last",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Put at least one MCP data center early in the stagger so a fault shows at minimum blast radius",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Make the stagger steps small enough to catch an error before all spines get it",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Check MCP spine route tables after each stagger step, not just the metrics of the non-MCP sites",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Hold the final MCP step until the earlier steps have been checked against the MCP configuration",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Call a halt to the whole rollout when any one stage shows impact",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Revert the stagger stages already completed, working from the last location back",
+      "basis": "change-mgmt"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -413,7 +507,44 @@
      "O": 4,
      "D": 4
     },
-    "revisedRationale": "An MCP-specific test would show the withdrawal before production (D 8→4). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "An MCP-specific test would show the withdrawal before production (D 8→4). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "No MCP-specific validation",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add MCP-specific test and deploy procedures to the change pipeline",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run each network-config change against a lab copy of the MCP spine policy before deployment",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Compare the exported prefixes on a test spine before and after the change and flag any difference",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Block deployment of any change that touches a policy shared by MCP spines until the MCP test has passed",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Make the MCP test a required approval on the change record before the next rollout",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -455,7 +586,44 @@
       "i": 1
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "One withdrawal cuts all paths",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Separate the advertisement of site-local prefixes from the policy that carries internal and origin traffic",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "factor",
+       "i": 7
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on loss of reachability to origin servers and on Multimog forwarding failures together, pointing at one cause",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Re-advertise the site-local prefixes first, as that restores inbound access, origin access and east-west forwarding together",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Direct traffic away from the 19 MCP sites where possible to keep the remaining 96% of locations carrying load",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Verify Multimog forwarding between servers in each MCP site once prefixes return",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -507,7 +675,54 @@
      "O": 6,
      "D": 8
     },
-    "revisedRationale": "A timed auto-revert would undo a bad commit without engineer access to the site, shortening a repeat of this outage to the revert timer (S 7→5). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "A timed auto-revert would undo a bad commit without engineer access to the site, shortening a repeat of this outage to the revert timer (S 7→5). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "No commit-confirm rollback",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Build automated commit-confirm for network configuration changes so a bad commit reverts on a timer",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Require commit-confirm on every manual router commit until the automation is in place",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Start the auto-revert timer at deploy and alarm if impact is seen before it expires",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Let the timer lapse and do not confirm the commit once impact is seen",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Use the revert timer as the first step in the response, before manual diagnosis",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm that every spine returned to its prior policy after the timer fired",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -544,6 +759,43 @@
        "src": "improvement",
        "i": 4
       }
+     }
+    ],
+    "short": "Access depends on failed path",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Keep an out-of-band management path to every MCP site that does not use the site-local prefixes",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Test the take-control procedure on a schedule, and report if any site can be reached only through the production path",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Use the backup take-control procedures at once when direct access is lost, without waiting to confirm the cause",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Put one engineer on getting access back while others work the revert plan",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Reach each MCP site over the out-of-band path and apply the revert",
+      "basis": "sre-incident"
      }
     ]
    },
@@ -583,9 +835,51 @@
        "i": 4
       }
      }
+    ],
+    "short": "Reverts overwrite each other",
+    "playbook": [
+     {
+      "role": "incident-commander",
+      "phase": "prevent",
+      "do": "Appoint one change controller for emergency reversions on every network incident",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "detect",
+      "do": "Watch the fault for re-appearing after a revert; treat it as two engineers acting on the same device",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop all manual changes except those assigned by the change controller",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Log each revert, device and time in one shared place before the next engineer touches that device",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Apply the final revert in one pass per spine in the order the controller sets",
+      "basis": "sre-incident"
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "19 MCP sites out · 50% of requests"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -600,5 +894,94 @@
    "quote": "2022-06-21 07:42 UTC Final reverts completed"
   }
  },
- "durationBasis": "19 MCP DCs offline 06:27 UTC → final reverts, core routing restored 07:42 UTC"
+ "durationBasis": "19 MCP DCs offline 06:27 UTC → final reverts, core routing restored 07:42 UTC",
+ "response": {
+  "roles": {
+   "incident-commander": "Cloudflare's internal incident process — no commander is named in the record",
+   "change-owner": "Cloudflare network engineers who rolled out the policy change — not named",
+   "ops-lead": "Cloudflare network engineers who verified and reverted the change — not named",
+   "service-recovery": "Cloudflare network engineers carrying out the manual reverts",
+   "first-responder": "No first responder is named; detection was via the deploy's own impact"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 1,
+    "quote": "Change deployed to the busiest, non-MCP locations.",
+    "did": "Rolls the change out to the busiest non-MCP locations at 06:17 UTC with no impact"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 8,
+    "quote": "engineers begin confirming the policy-ordering hypothesis on a live device",
+    "did": "Make a first change on a router at 06:51 UTC to verify the policy-ordering cause"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 10,
+    "quote": "engineers fall back to backup take-control procedures",
+    "did": "Begin reverting at 06:58 UTC through backup take-control procedures, as direct access was withdrawn"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 11,
+    "quote": "network engineers walked over each other's changes, reverting the previous reverts",
+    "did": "Overwrite each other's reverts between 07:00 and 07:40 UTC, so the fault re-appears"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 12,
+    "quote": "Final reverts completed; core routing restored",
+    "did": "Complete the final reverts at 07:42 UTC and re-advertise the site-local prefixes"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "19 sites offline, 50% of requests",
+  "bones": [
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Policy terms reordered",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Stagger skipped MCP until last",
+      "factor": 0
+     },
+     {
+      "label": "Stagger steps too coarse",
+      "factor": 1
+     },
+     {
+      "label": "No MCP-specific validation",
+      "factor": 2
+     },
+     {
+      "label": "No auto-revert rollback",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Policy depends on term order",
+      "factor": 4
+     },
+     {
+      "label": "4% of sites carry 50% load",
+      "factor": 7
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -388,7 +388,54 @@
      "O": 3,
      "D": 4
     },
-    "revisedRationale": "Capacity-aware validation would flag an under-capacity target before execution (D 8→4) and a reviewed dry-run makes picking the wrong target less likely (O 6→3). The post-mortem records this as committed; the dossier does not record it as completed, so the reduction is a claim about the action, not a confirmed outcome. Severity is unchanged."
+    "revisedRationale": "Capacity-aware validation would flag an under-capacity target before execution (D 8→4) and a reviewed dry-run makes picking the wrong target less likely (O 6→3). The post-mortem records this as committed; the dossier does not record it as completed, so the reduction is a claim about the action, not a confirmed outcome. Severity is unchanged.",
+    "short": "Traffic shift to wrong network",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Check the target router and network capacity in a reviewed dry run before executing the traffic shift",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Build capacity-aware validation into the shift tool so it refuses a target network that cannot carry the load",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on EBS nodes losing both primary and secondary paths at once during a planned change",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Roll the shift back as soon as nodes isolate, and pause the rest of the upgrade",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident, freeze further network changes in the region and tell the team the re-mirror storm is likely",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Check which EBS nodes are still stuck after the rollback and track them to restore",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -421,7 +468,47 @@
       "quote": "a lower-capacity redundant network intended only for inter-node control/backup traffic"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Redundant network too small",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Size the redundant EBS network, or document that it cannot carry primary load, and make every runbook say so",
+      "evidence": {
+       "src": "factor",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Treat failover onto a lower-capacity path as a loss of redundancy in the change risk assessment",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm when traffic on the redundant EBS network passes its capacity",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Move traffic back to the primary network as soon as the secondary saturates",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-establish both paths to the isolated nodes and confirm connectivity to their replica peers",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -472,7 +559,52 @@
      "O": 2,
      "D": 6
     },
-    "revisedRationale": "Throttled, jittered re-mirroring should stop a correlated failure from becoming a capacity-exhausting stampede (O 5→2). Recorded as committed in the post-mortem, so this is a claim about the action, not a confirmed outcome. S and D unchanged."
+    "revisedRationale": "Throttled, jittered re-mirroring should stop a correlated failure from becoming a capacity-exhausting stampede (O 5→2). Recorded as committed in the post-mortem, so this is a claim about the action, not a confirmed outcome. S and D unchanged.",
+    "short": "Re-mirror stampede",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add back-pressure, jitter and admission control to re-mirroring so many nodes do not seek free space at once",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Make nodes slower to declare a replica failed on a transient network loss",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on cluster free capacity falling fast and on nodes entering a space-search retry loop",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Throttle re-mirroring in the affected cluster by hand until free capacity stops falling",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Ask for spare storage to be moved to the affected AZ before the cluster runs dry",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Clear stuck volumes as capacity returns, oldest first, and report the count at every update",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -527,7 +659,53 @@
      "O": 4,
      "D": 8
     },
-    "revisedRationale": "With per-zone isolation the same storm would stay inside one zone (S 9→6). It does not make the storm less likely or easier to detect. Committed in the post-mortem; the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "With per-zone isolation the same storm would stay inside one zone (S 9→6). It does not make the storm less likely or easier to detect. Committed in the post-mortem; the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Shared control plane starved",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Isolate the EBS control plane per AZ so one zone's load cannot starve the region",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on control-plane thread pool use and on EBS API errors in healthy AZs, not only in the failed one",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Disable Create Volume in the affected AZ to free control-plane threads, as done at 02:40",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Sever the degraded cluster's link to the control plane to stop it poisoning other zones",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Verify EBS-backed EC2 launches and attaches in the healthy AZs before the fix is called complete",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Keep the affected AZ's EBS APIs disabled until the control plane is stable, then re-enable by zone",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -560,7 +738,47 @@
       "i": 3
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Replication-close race",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add failure testing that closes large numbers of replication requests concurrently on one node",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on EBS node crashes that cluster in time with replication request closes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Quarantine the degraded cluster from the control plane when a second wave of stuck volumes starts",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Warn customers that a second wave is under way, and which volumes are likely hit",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Patch the race condition on nodes in the cluster before they are returned to service",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "factor",
+       "i": 3
+      }
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -601,7 +819,52 @@
       "quote": "a failed node cannot be reused until all its replicas are re-mirrored"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Days-long capacity recovery",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Hold spare EBS capacity in each AZ so cluster-wide exhaustion has somewhere to go",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Report free capacity and stuck volume count at every update so recovery time is estimated early",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Install new physical storage in the affected AZ, drawn from across the US East Region",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Restore volumes from snapshots wherever they exist, to bring them back faster than re-mirroring",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Run manual recovery on volumes with no snapshot or tied to hardware failures",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Keep EBS snapshots current and be ready to restore from them in another AZ",
+      "basis": "nist-800-34"
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -655,7 +918,43 @@
      "O": 2,
      "D": 6
     },
-    "revisedRationale": "Fixing the known bug lowers the chance of this failure (O 3→2), and failure testing of the path would expose a similar defect before an incident (D 9→6). The fix is recorded as committed and the testing is listed as an improvement with no status, so both reductions are claims about the actions, not confirmed outcomes."
+    "revisedRationale": "Fixing the known bug lowers the chance of this failure (O 3→2), and failure testing of the path would expose a similar defect before an incident (D 9→6). The fix is recorded as committed and the testing is listed as an improvement with no status, so both reductions are claims about the actions, not confirmed outcomes.",
+    "short": "RDS multi-AZ failover bug",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add regression and chaos tests of the RDS multi-AZ failover path under stuck I/O",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Check multi-AZ RDS instances against stuck I/O and alarm when one does not fail over on its own",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Fail over the stalled multi-AZ instances by hand",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring the remaining RDS databases online over the weekend, in order of customer impact",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Restore your database from a snapshot or replica in another AZ if failover has not occurred",
+      "basis": "nist-800-34"
+     }
+    ]
    },
    {
     "id": "FM-08",
@@ -699,9 +998,53 @@
      "O": 3,
      "D": 9
     },
-    "revisedRationale": "A defined standard for update frequency and detail makes vague updates less likely (O 6→3). Committed in the post-mortem; a claim about the action, not a confirmed outcome."
+    "revisedRationale": "A defined standard for update frequency and detail makes vague updates less likely (O 6→3). Committed in the post-mortem; a claim about the action, not a confirmed outcome.",
+    "short": "Slow, vague status updates",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Set an update cadence and a template naming the affected AZs and the share of volumes hit",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Compare status wording with the live stuck-volume count, and flag any update that understates the impact",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Publish AZ-specific updates that say which APIs are disabled and which are healthy",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name a communications owner at the start of the incident and approve each update",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Use the specific status to decide on failing over to another AZ without waiting for AWS",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "EBS stuck · ~90 h disruption"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -716,5 +1059,120 @@
    "quote": "2011-04-22 12:30 PDT All but about 2.2% of the volumes"
   }
  },
- "durationBasis": "Volumes stuck 00:47 PDT 21 Apr → all but 2.2% of affected-AZ volumes restored 12:30 PDT 22 Apr (35h43m)"
+ "durationBasis": "Volumes stuck 00:47 PDT 21 Apr → all but 2.2% of affected-AZ volumes restored 12:30 PDT 22 Apr (35h43m)",
+ "response": {
+  "roles": {
+   "first-responder": "AWS on-call engineers — the record does not say who first saw the fault",
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "AWS network engineers running the planned EBS capacity upgrade",
+   "ops-lead": "AWS EBS and control-plane engineers — not individually named",
+   "service-recovery": "AWS EBS and RDS recovery engineers — not individually named",
+   "comms": "AWS Support and status-page communications — not in this sequence of events",
+   "customer": "EC2 customers such as Reddit, Quora, Foursquare, Hootsuite and Heroku"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "engineers shifted traffic off a primary EBS router",
+    "did": "Shift traffic during the capacity upgrade onto the lower-capacity redundant EBS network instead of a primary router"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 2,
+    "quote": "The incorrect traffic shift was rolled back",
+    "did": "Roll back the shift about three minutes later; the re-mirroring storm has already begun"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 6,
+    "quote": "AWS disabled all Create Volume API requests in the affected AZ",
+    "did": "Disable Create Volume in the affected AZ at 02:40 to relieve control-plane thread starvation"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 9,
+    "quote": "AWS began disabling all communication between the degraded EBS cluster and the EBS control plane",
+    "did": "Cut the degraded cluster off from the control plane at 08:20 to stop it poisoning other zones"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 12,
+    "quote": "Installation of new physical storage capacity began.",
+    "did": "Begin installing new storage capacity on 22 April, relocated from across the US East Region"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 17,
+    "quote": "Manual recovery began on the remaining volumes",
+    "did": "Manually recover volumes with no snapshot or tied to hardware failures"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "EBS AZ outage, ~90 h disruption",
+  "bones": [
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Traffic shifted wrong way",
+      "mode": "FM-01"
+     },
+     {
+      "label": "Slow, vague updates",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Redundant net under-sized",
+      "factor": 0
+     },
+     {
+      "label": "Region-wide control plane",
+      "factor": 2
+     },
+     {
+      "label": "No re-mirror back-pressure",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Race in replication close",
+      "factor": 3
+     },
+     {
+      "label": "RDS failover bug",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Capacity must be relocated",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Customers in a single AZ",
+      "factor": 7
+     }
+    ]
+   }
+  ]
+ }
 }

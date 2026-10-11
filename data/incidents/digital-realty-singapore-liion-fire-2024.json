@@ -345,6 +345,52 @@
        "i": 5
       }
      }
+    ],
+    "short": "Battery room electrical fault",
+    "symbol": "battery",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Log BMS faults and inspect battery connections thermally; track state of charge and cell age per string",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat a BMS fault or battery-room temperature alarm as a call-out; do not wait for the building fire alarm",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Open the DC isolator of the faulted battery string and keep the other strings separated",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order evacuation and call SCDF at first sign of runaway, stating Li-ion in a third-floor room",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "safety",
+      "phase": "contain",
+      "do": "Account for every occupant at the assembly point and report the count to SCDF",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Establish the fault mechanism and battery make, chemistry and age, and publish them",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
     ]
    },
    {
@@ -404,6 +450,50 @@
        "src": "improvement",
        "i": 2
       }
+     }
+    ],
+    "short": "Water cannot stop runaway",
+    "symbol": "sprinkler",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Fit thermal-runaway detection and gas or aerosol suppression to Li-ion rooms to shorten cooling and cut water volume",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Give SCDF the battery chemistry, string layout and room access route on arrival",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Cool the battery rooms continuously with water jets and a robot, accepting a multi-day operation",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Agree with SCDF the cooling plan and the water drainage route before jets are committed",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "recover",
+      "do": "Declare stable only after cooling and damping-down confirm no re-ignition",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Keep battery rooms de-energised and under temperature watch until released by SCDF",
+      "basis": "nfpa-855"
      }
     ]
    },
@@ -469,6 +559,57 @@
        "i": 1
       }
      }
+    ],
+    "short": "Fire water in server halls",
+    "symbol": "pump",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Add water-tight bunding and drainage between battery rooms and IT halls",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Walk the server halls under the battery rooms for leaks and report water on the floor at once",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Open the feeders of halls where water is dripping or pooled before the water reaches live equipment",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "factor",
+       "i": 2
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order the building shutdown when water threatens short circuits, and tell tenants the time",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Dry, test and re-energise halls one at a time after water is removed",
+      "basis": "nfpa-75"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Power down wet racks and dry the hardware before migration",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
     ]
    },
    {
@@ -521,6 +662,52 @@
        "i": 3
       }
      }
+    ],
+    "short": "Operators kept out of building",
+    "playbook": [
+     {
+      "role": "incident-commander",
+      "phase": "prevent",
+      "do": "Agree with SCDF in advance a re-entry and safe-shutdown protocol for O&M engineers",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Report the point at which O&M staff can no longer enter, so tenants can plan remote shutdown",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Prepare a remote or SCDF-escorted shutdown plan for tenant hardware before access is lost",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Escort named O&M engineers to shut down specific racks when the area is safe",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Dry and verify wet hardware for data security before it returns to service",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-enter on release and migrate machinery in the order agreed with tenants",
+      "basis": "iso-22301"
+     }
     ]
    },
    {
@@ -571,6 +758,48 @@
        "i": 5
       }
      }
+    ],
+    "short": "One building takes the zone",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Place replicas in a second availability zone in another building",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "Alarm on network anomalies in one AZ and map which tenants depend on it",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Warn tenants early that the AZ may go fully offline and say what to move",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Fail over traffic out of the zone before the shutdown, not after it",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring the zone back on release, in dependency order, and confirm with tenants",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Shift Lazada and TikTok-style downstream traffic to another AZ until the building is released",
+      "basis": "iso-22301"
+     }
     ]
    },
    {
@@ -604,10 +833,167 @@
       "quote": "No make/model/chemistry can be attributed without over-claiming."
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Cause not disclosed",
+    "playbook": [
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Publish SCDF and operator findings on the fault, battery make, chemistry and age",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "detect",
+      "do": "Keep battery-room monitoring and inspection records so a lapse can be confirmed or excluded",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Preserve the battery room as evidence and log who has handled it",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Take the same battery model and string layout out of other sites for inspection",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Ask the operator for the battery make and chemistry and review it against your risk",
+      "basis": "iso-22301"
+     }
+    ]
+   }
+  ],
+  "impactShort": "Alibaba AZ-C offline · 2-day fire"
+ },
+ "durationStatus": "not-established",
+ "durationBasis": "Alarm morning 10 Sep, AZ-C offline ~01:46 11 Sep; no restoration time in dossier.",
+ "response": {
+  "roles": {
+   "first-responder": "Digital Realty Digital Loyang on-site staff — not named; the alarm is the only detection on record",
+   "incident-commander": "No incident commander is named in the record",
+   "fire-service": "SCDF, the Singapore Civil Defence Force",
+   "electrical": "Whoever executed the emergency power shutdown — not named",
+   "safety": "Building occupants and site staff who evacuated, about 20 before SCDF arrived",
+   "service-recovery": "Alibaba Cloud O&M engineers who dried and restored the wet hardware",
+   "comms": "Alibaba Cloud, which warned of a likely full AZ-C outage",
+   "customer": "Alibaba Cloud AZ-C and its tenants Lazada and ByteDance/TikTok",
+   "authority": "BCA, the Singapore building authority, with SCDF"
+  },
+  "recorded": [
+   {
+    "role": "fire-service",
+    "soe": 4,
+    "quote": "SCDF alerted and responds to the Loyang data centre",
+    "did": "Responds to secure the premises and stabilise the situation"
+   },
+   {
+    "role": "safety",
+    "soe": 5,
+    "quote": "All on-site personnel evacuated with no injuries",
+    "did": "All on-site personnel are out by about 08:15 SGT, no injuries"
+   },
+   {
+    "role": "fire-service",
+    "soe": 5,
+    "quote": "SCDF deploys four water jets to cool and contain the battery fire",
+    "did": "Deploys four water jets to cool and contain the battery fire"
+   },
+   {
+    "role": "customer",
+    "soe": 6,
+    "quote": "Alibaba Cloud detects network anomalies in Singapore Availability Zone C",
+    "did": "Alibaba Cloud, a tenant, detects network anomalies in AZ-C; Lazada and ByteDance/TikTok begin to see disruption"
+   },
+   {
+    "role": "comms",
+    "soe": 7,
+    "quote": "Alibaba warns of increasing likelihood of a complete network outage",
+    "did": "Warns of a complete AZ-C outage if battery-room temperatures are not controlled"
+   },
+   {
+    "role": "fire-service",
+    "soe": 11,
+    "quote": "an unmanned firefighting robot is deployed for damping-down",
+    "did": "Deploys a robot on the second day because manual entry stays too hot"
+   },
+   {
+    "role": "fire-service",
+    "soe": 12,
+    "quote": "SCDF declares the site stable",
+    "did": "Declares the site stable on 12 Sep after multi-day cooling"
+   },
+   {
+    "role": "authority",
+    "soe": 13,
+    "quote": "BCA assesses the structure",
+    "did": "Finds structure intact and issues closure orders for parts of floors 3, 4 and the mezzanine"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 14,
+    "quote": "Alibaba carefully dries water-exposed hardware to ensure data security",
+    "did": "Dries wet hardware, then migrates and restores machinery"
    }
   ]
  },
- "durationStatus": "not-established",
- "durationBasis": "Alarm morning 10 Sep, AZ-C offline ~01:46 11 Sep; no restoration time in dossier."
+ "fishbone": {
+  "effect": "AZ-C offline after battery fire",
+  "bones": [
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Batteries on 3rd floor",
+      "factor": 0
+     },
+     {
+      "label": "Batteries above server halls",
+      "factor": 2
+     },
+     {
+      "label": "One building per zone",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Battery-room electrical fault",
+      "mode": "FM-01"
+     },
+     {
+      "label": "Water cannot stop runaway",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Operators locked out",
+      "factor": 3
+     },
+     {
+      "label": "No inspection record",
+      "factor": 5
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -371,7 +371,56 @@
      "O": 5,
      "D": 4
     },
-    "revisedRationale": "Monitoring that catches incorrect configurations would see a false zero-usage report during the weeks before enforcement, which is detection before impact with time to act (D 9→4). The migration slip itself can still happen (O unchanged). Recorded as committed in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Monitoring that catches incorrect configurations would see a false zero-usage report during the weeks before enforcement, which is detection before impact with time to act (D 9→4). The migration slip itself can still happen (O unchanged). Recorded as committed in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Old quota state reports zero",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "After a quota-system cutover, list every old-system registration for the service and delete it before closing the change",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add an implausibility check on usage: a live global identity service reporting 0 is rejected as a bad signal",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on a high-traffic service whose quota usage reads zero, and open a ticket the same day",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Pin the service's quota to its last good value so a false zero cannot drive a cut",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Set the migration to hold until the residual old-system state is verified as removed",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Remove the residual old-quota state and confirm usage matches real traffic",
+      "basis": "change-mgmt"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -433,7 +482,52 @@
      "O": 4,
      "D": 6
     },
-    "revisedRationale": "If quota changes cannot be applied globally at speed, a bad reduction reaches one part of the system before the rest, bounding the outage to a partial one (S 9→6). The implausibility fail-safe is an analyst recommendation and is not credited. The review is recorded as committed in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "If quota changes cannot be applied globally at speed, a bad reduction reaches one part of the system before the rest, bounding the outage to a partial one (S 9→6). The implausibility fail-safe is an analyst recommendation and is not credited. The review is recorded as committed in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Global quota cut on bad signal",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Review the quota automation so a single signal cannot enforce a global quota change at once",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Turn the grace period into a fail-safe that alarms or blocks enforcement when the usage signal is implausible",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page on capacity alerts for the account database at once, as the 03:43 alert did, and check quota first",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Direct the team to disable quota enforcement as the first move, in one datacenter then all",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Disable quota enforcement on the User ID Service and confirm the Paxos leader resumes writing",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-enable enforcement only after the real usage is registered and the quota matches it",
+      "basis": "change-mgmt"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -488,7 +582,43 @@
      "O": 3,
      "D": 6
     },
-    "revisedRationale": "If a blocked writer no longer makes reads stale, authentication keeps working on current data while writes are impaired, so the effect falls from a global outage to a degradation confined to the identity service (S 9→6). Recorded as committed ('evaluate and implement') in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "If a blocked writer no longer makes reads stale, authentication keeps working on current data while writes are impaired, so the effect falls from a global outage to a degradation confined to the identity service (S 9→6). Recorded as committed ('evaluate and implement') in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Write failure breaks reads",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add a read fallback to the User ID database so a blocked Paxos leader does not make reads stale",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on stale-read and authentication-lookup error rates per region together",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Restore the Paxos leader's write ability by lifting the quota on the account database",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Tell dependent service owners that authentication is the cause so they do not restart their own services",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm reads are current and OAuth lookups succeed in every region before declaring recovery",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -543,7 +673,49 @@
      "O": 3,
      "D": 9
     },
-    "revisedRationale": "Stricter data-plane isolation would leave already-authorised data-plane work running during an identity failure, reducing the effect to customer-visible degradation (S 7→5). Recorded as committed in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Stricter data-plane isolation would leave already-authorised data-plane work running during an identity failure, reducing the effect to customer-visible degradation (S 7→5). Recorded as committed in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Data plane fails with auth",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Limit data-plane impact when the User ID Service fails, so BigQuery, GCS and GKE keep serving cached credentials",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Report per-service error rates for BigQuery, GCS and GKE during an authentication alert",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name an owner per dependent service and ask them for impact figures at a fixed interval",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Use service-account credentials already cached and avoid new token requests while authentication is failing",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Check BigQuery streaming, GCS OAuth requests and GKE control-plane error rates return to baseline",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Post per-service impact and recovery status in the incident report",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -588,9 +760,55 @@
       "i": 3
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Fix only by hand",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Build an automated override or rollback for a quota reduction on critical services",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page the on-call at the first capacity alert and record the page time against the alert time",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Set a target to start mitigation within the first half hour and track it",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Disable quota enforcement in one datacenter, watch it, then apply it everywhere",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Keep the external status channel working while the identity plane is failing",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Verify error rates are normal at 04:33 and close with a published remediation list",
+      "basis": "sre-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "Global auth down 47 min · Workspace out"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -605,5 +823,102 @@
    "quote": "04:33"
   }
  },
- "durationBasis": "User ID errors 03:46 PT 14 Dec → error rates normal 04:33 PT (Google-stated 47 min)."
+ "durationBasis": "User ID errors 03:46 PT 14 Dec → error rates normal 04:33 PT (Google-stated 47 min).",
+ "response": {
+  "roles": {
+   "first-responder": "Google on-call engineers paged at 03:48 — not individually named",
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "Google engineers who made the October quota-system migration change — not named",
+   "ops-lead": "Google engineers who identified the cause and disabled quota enforcement",
+   "service-recovery": "Google engineers restoring the User ID Service database and dependent services",
+   "comms": "Google Cloud Service Health incident reports and external communications",
+   "customer": "Google Cloud customers and authenticated Workspace users"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "a change registers the service with the new system but leaves parts of the previous quota system in place",
+    "did": "Registers the User ID Service with the new quota system but leaves old-system state reporting usage as 0"
+   },
+   {
+    "role": "first-responder",
+    "soe": 9,
+    "quote": "On-call engineers are paged",
+    "did": "Paged at 03:48, five minutes after the first automated alert"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 10,
+    "quote": "'The root cause and a potential fix were identified'",
+    "did": "Identify the root cause and a potential fix at 04:08"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 11,
+    "quote": "Engineers begin 'disabling the quota enforcement in one datacenter'",
+    "did": "Disable quota enforcement in one datacenter as the first mitigation, 04:22"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 12,
+    "quote": "'The same mitigation was applied to all datacenters'",
+    "did": "Apply the same mitigation to all datacenters at 04:27"
+   },
+   {
+    "role": "comms",
+    "soe": 15,
+    "quote": "Five remediation items published",
+    "did": "Publish five remediation items, including better external-comms tooling"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Global Google auth down 47 min",
+  "bones": [
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Migration left old quota state",
+      "factor": 0
+     },
+     {
+      "label": "Latent config not flagged",
+      "factor": 1
+     },
+     {
+      "label": "Fast global quota change",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Account DB quota cut",
+      "mode": "FM-02"
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Single global User ID service",
+      "factor": 3
+     },
+     {
+      "label": "Write failure breaks reads",
+      "factor": 4
+     },
+     {
+      "label": "Weak data-plane isolation",
+      "factor": 5
+     }
+    ]
+   }
+  ]
+ }
 }

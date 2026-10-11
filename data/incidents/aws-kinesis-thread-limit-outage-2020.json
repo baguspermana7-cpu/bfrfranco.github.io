@@ -351,7 +351,57 @@
      "O": 3,
      "D": 8
     },
-    "revisedRationale": "Fewer, larger servers shrink the fleet size that drives thread count, and a tested higher limit adds headroom, so a routine capacity addition should no longer reach the ceiling (O 7→3). The O(N) coupling itself remains, so severity and detection are unchanged. Both actions are recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Fewer, larger servers shrink the fleet size that drives thread count, and a tested higher limit adds headroom, so a routine capacity addition should no longer reach the ceiling (O 7→3). The O(N) coupling itself remains, so severity and detection are unchanged. Both actions are recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Thread cap hit on every server",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Before adding front-end capacity, compute the per-server thread count for the new fleet size and check it against the OS limit",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Move to larger CPU and memory servers so fewer servers are needed and peer threads per server fall",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on thread count per front-end server against the OS maximum during and after every capacity change",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop the capacity addition and remove the added servers once thread counts approach the limit",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hold the OS limit change until it is tested; restart under the existing limit",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart the front-end fleet in throttled batches and check each batch builds its shard-map",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -406,7 +456,47 @@
      "O": 7,
      "D": 4
     },
-    "revisedRationale": "An alarm on the limiting resource would show the fleet approaching the ceiling with time to act (D 8→4). It does not remove the condition, so O is unchanged. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "An alarm on the limiting resource would show the fleet approaching the ceiling with time to act (D 8→4). It does not remove the condition, so O is unchanged. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "No thread-use alarm",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add fine-grained thread-consumption alarms to the front-end fleet before further scaling",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page on the first Kinesis front-end error spike and open the thread count graph for the fleet first",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Check server resource ceilings (threads, memory, file handles) against any change made in the last few hours",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Call the incident at the first alarm instead of waiting for diagnosis, and open a bridge with the dependent service teams",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm the thread alarm is wired and firing on a test fleet before the recovery is called complete",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -453,7 +543,47 @@
      "O": 3,
      "D": 6
     },
-    "revisedRationale": "With cells, a breach of this kind would stop one cell rather than the fleet (S 9→6). Recorded as committed (medium-term), not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "With cells, a breach of this kind would stop one cell rather than the fleet (S 9→6). Recorded as committed (medium-term), not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Front-end fleet not in cells",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Cellularize the front-end fleet to match the back-end so a limit breach hits one cell",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Move large tenants like CloudWatch to a separate front-end fleet",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Show per-cell error rates on the dashboard to separate a cell fault from a fleet-wide one",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Add capacity to one cell only first and hold the rest until the thread count is confirmed",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart the affected cell first and check it before restarting others",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -508,7 +638,53 @@
      "O": 4,
      "D": 9
     },
-    "revisedRationale": "A faster cold start makes a throttled, hours-long restart less likely to set the outage duration (O 7→4). Severity is held at 8 because the dossier gives no target restart time. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "A faster cold start makes a throttled, hours-long restart less likely to set the outage duration (O 7→4). Severity is held at 8 because the dossier gives no target restart time. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Slow front-end cold restart",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Radically improve cold-start time so restart is not capped at a few hundred servers per hour",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Track servers restored per hour against a target, and page when the rate stalls",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Throttle restarts so shard-map and metadata retrieval is not overwhelmed and the failure re-triggered",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Defer raising the OS limit mid-incident until it is tested, and say so on the bridge",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring servers back in rate-limited batches and watch membership propagation, which can take up to an hour",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "recover",
+      "do": "Retry Kinesis puts with backoff while the fleet is restored so the retries do not add load",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -570,9 +746,59 @@
      "O": 3,
      "D": 8
     },
-    "revisedRationale": "If dependents degrade instead of failing, a Kinesis outage stays confined to Kinesis and its direct users (S 8→6). The COE item is recorded as 'Committed / implied by remediation' and the improvement names only Cognito and CloudWatch, not Lambda or EventBridge, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "If dependents degrade instead of failing, a Kinesis outage stays confined to Kinesis and its direct users (S 8→6). The COE item is recorded as 'Committed / implied by remediation' and the improvement names only Cognito and CloudWatch, not Lambda or EventBridge, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Dependents buffer unbounded",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add back-pressure to Cognito, Lambda and CloudWatch buffers so a Kinesis backlog does not block webservers or use host memory",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on dependent service buffer depth and host memory contention when Kinesis puts begin to fail",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Deploy a Cognito change that tolerates Kinesis errors without exhausting buffers",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Clear Lambda memory contention from metric buffers that cannot drain to Kinesis",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm Cognito, CloudWatch PutMetricData, EventBridge and ECS/EKS provisioning each return to normal in turn",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Post status through a channel that does not depend on Cognito, and use the backup tool",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 6
+      }
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "Kinesis down 18.5 h, 4 services hit"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -587,5 +813,110 @@
    "quote": "Majority of EventBridge, ECS and EKS event-processing and cluster-provisioning issues resolved"
   }
  },
- "durationBasis": "First customer-visible errors 05:15 PST → majority of downstream issues resolved 16:15 PST"
+ "durationBasis": "First customer-visible errors 05:15 PST → majority of downstream issues resolved 16:15 PST",
+ "response": {
+  "roles": {
+   "first-responder": "AWS Kinesis on-call engineers — automated alarms fired first, individuals not named",
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "AWS Kinesis team adding capacity to the front-end fleet — not named",
+   "ops-lead": "AWS engineers diagnosing and mitigating — not individually named",
+   "service-recovery": "AWS Kinesis, Cognito, Lambda and CloudWatch recovery engineers — not named",
+   "comms": "AWS status and support communications — not in this sequence of events",
+   "customer": "Customers of Kinesis, Cognito, CloudWatch, ECS and EKS in US-EAST-1"
+  },
+  "recorded": [
+   {
+    "role": "first-responder",
+    "soe": 3,
+    "quote": "Automated monitoring raises the first alarms for elevated Kinesis error rates",
+    "did": "Alarms fire at 05:15, about 90 minutes after the breach, on the symptom not the thread limit"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 4,
+    "quote": "Engineers narrow the root cause to candidate failures that would require a full front-end fleet restart.",
+    "did": "Narrow the cause to candidates that need a full fleet restart, at 07:51"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 6,
+    "quote": "Controlled, throttled restart of the front-end fleet begins",
+    "did": "Start a deliberately slow restart at 10:07 so shard-map retrieval is not overwhelmed"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 7,
+    "quote": "Cognito remediation deployment begins",
+    "did": "Deploy a Cognito change at 10:15 to cut reliance on backlogged Kinesis buffers"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 8,
+    "quote": "Engineers act to mitigate Lambda memory contention",
+    "did": "Mitigate Lambda memory contention from undrained metric buffers at 10:36"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Kinesis outage, ~18.5 h",
+  "bones": [
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Threads grow with fleet size",
+      "factor": 0
+     },
+     {
+      "label": "Front-end not in cells",
+      "factor": 2
+     },
+     {
+      "label": "Unbounded downstream buffers",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Capacity added at fleet scale",
+      "mode": "FM-01"
+     },
+     {
+      "label": "OS limit untested to raise",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "OS thread cap exceeded",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Alarm 90 min late, cause 6 h",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Cognito, Lambda, CloudWatch",
+      "mode": "FM-05"
+     }
+    ]
+   }
+  ]
+ }
 }

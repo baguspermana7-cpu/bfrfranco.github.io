@@ -326,7 +326,47 @@
       "i": 3
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Undetermined regional failure",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Keep power-chain and cooling inspection and test records for the region long enough to survive a post-incident review",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Raise a ticket with a tracking ID and first-alert timestamp at the first regional alarm, so the start of an outage can be fixed later",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Open a regional incident, record which services and scale units are affected, and decide whether customers are told to fail over",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Log region-health telemetry from outside the provider so impact scope and start time can be proved independently",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Return services to the region in a logged order, recording each step and time so the cause of a long restoration can be reviewed",
+      "basis": "iso-22301"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -359,7 +399,50 @@
       "i": 0
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Restoration ~50 h, unlogged",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Write a restoration runbook for a regional outage with a target time per stage, and rehearse it",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Time-stamp each recovery milestone in the ticket as it happens, since none survives for this event",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the expected recovery window early and revise it at each stage so customers can decide on failover",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Invoke the failover plan to the paired region once the provider's estimate passes your recovery time objective",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Record the cause of the duration in the post-incident review: restoration steps, phased service return and the reason for about 50 hours",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ]
    },
    {
     "id": "FM-03",
@@ -411,7 +494,44 @@
      "O": 3,
      "D": 9
     },
-    "revisedRationale": "A validated failover to the paired region turns a whole-region loss into a partial, time-bounded disruption for that customer (S 8→6). This is a recommended customer action, not an operator commitment, and China East 3 is access-restricted, so whether a given customer can adopt it is not established; the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "A validated failover to the paired region turns a whole-region loss into a partial, time-bounded disruption for that customer (S 8→6). This is a recommended customer action, not an operator commitment, and China East 3 is access-restricted, so whether a given customer can adopt it is not established; the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "No in-country failover",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Deploy across China North 3 and China East 3 and validate cross-region failover in a drill",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Watch the region-health feed and your own endpoint probes so a regional outage is recognised in minutes, not from a notice",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Decide to fail over to the paired region on probe failure alone, using the access arrangement for in-country disaster recovery",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "vendor",
+      "phase": "contain",
+      "do": "Tell customers how to use the paired region, which is access-restricted to scenarios such as in-country disaster recovery",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore data into the paired region from the last replica and then repatriate to the home region once the outage ends",
+      "basis": "nist-800-34"
+     }
+    ]
    },
    {
     "id": "FM-04",
@@ -448,7 +568,51 @@
       "quote": "a physically separated instance of cloud services located in China"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Notices on China-only feed",
+    "playbook": [
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Mirror sovereign-cloud incident notices to a durable public archive that survives dashboard redirects",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Subscribe to the China status and notification channel, not only the global Azure one, and test that alerts arrive",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post a first notice with a tracking ID on the China channel and link it from the global status page",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 0
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name one owner to keep both the China and global status entries consistent for the whole event",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Publish the post-incident review at the same address as the first notice and keep it there",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -485,10 +649,145 @@
       "i": 3
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "No surviving incident review",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Publish the post-incident review with the detection, isolation and recovery timeline and the confirmed root cause",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "prevent",
+      "do": "Keep post-incident reviews on a long-retention public archive rather than a short-retention status page",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Save the alarm log, ticket and first-alert timestamp into the review file at the time of the event",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Ask the operator for the review through the contract and note the missing answer in your own risk register",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Close the incident only when the review owner, the date and the repository for the review are named",
+      "basis": "sre-incident"
+     }
+    ]
+   }
+  ],
+  "impactShort": "Region down ~50 h (unverified)"
+ },
+ "durationStatus": "not-established",
+ "durationBasis": "Only an unverified ~50 h claim; no onset, restoration or source documented",
+ "response": {
+  "roles": {
+   "first-responder": "No first responder is named; no alarm or ticket survives in the record",
+   "incident-commander": "No incident commander is named in the record",
+   "vendor": "21Vianet, the operator of Azure in China — no individual named",
+   "service-recovery": "Operator recovery teams — not named; the record only claims recovery after ~50 hours",
+   "comms": "The China-only status feed — no notice survives for this event",
+   "customer": "Enterprise customers deployed only in China North 3"
+  },
+  "recorded": [
+   {
+    "role": "customer",
+    "soe": 9,
+    "quote": "a customer in only China North 3 absorbed the full outage",
+    "did": "Customers deployed only in China North 3 have no in-country failover and absorb the whole outage"
+   },
+   {
+    "role": "customer",
+    "soe": 10,
+    "quote": "Claimed ~50-hour disruption to enterprise customers in the region",
+    "did": "Enterprise customers in the region report a claimed 50-hour disruption; the figure is unverified"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 11,
+    "quote": "Claimed regional recovery after roughly 50 hours",
+    "did": "Region claimed recovered after about 50 hours; no restoration steps are documented"
    }
   ]
  },
- "durationStatus": "not-established",
- "durationBasis": "Only an unverified ~50 h claim; no onset, restoration or source documented"
+ "fishbone": {
+  "effect": "China North 3 outage, ~50 h claimed",
+  "bones": [
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Single-region deployment",
+      "factor": 4
+     },
+     {
+      "label": "Undetermined infra failure",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Short PIR retention",
+      "factor": 1
+     },
+     {
+      "label": "No PM records confirmable",
+      "factor": 3
+     },
+     {
+      "label": "Slow restoration, unlogged",
+      "mode": "FM-02"
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Sovereign-cloud status split",
+      "factor": 0
+     },
+     {
+      "label": "No regulator-published RCA",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Status feed redirected",
+      "factor": 2
+     },
+     {
+      "label": "Search tooling blocked",
+      "factor": 5
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -372,6 +372,48 @@
        "i": 0
       }
      }
+    ],
+    "short": "Global backbone command",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run maintenance commands in stages, with a mandatory dry-run and a blast-radius limit so none can touch the whole backbone",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Declare the scope of a capacity-assessment command (read-only or not) in the change ticket before it runs",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm on backbone link count and inter-data-center BGP sessions dropping together, and page the network on-call",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop the maintenance job and freeze all further backbone changes the moment links drop",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident and bring in network, DNS and data-center operations leads on an out-of-band channel",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-establish backbone links data center by data center, confirming each before the next",
+      "basis": "sre-incident"
+     }
     ]
    },
    {
@@ -419,6 +461,46 @@
        "src": "improvement",
        "i": 1
       }
+     }
+    ],
+    "short": "Audit tool fails open",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Fix the audit-tool bug and add regression tests that assert it blocks whole-backbone withdrawal commands",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Test the guardrail in a canary run that deliberately issues a blocked command, before each maintenance window",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert when a command executes without an audit-tool verdict logged for it",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Suspend maintenance jobs that rely on the audit tool until it passes the regression tests",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Revert the withdrawn configuration from the last known-good backbone state",
+      "basis": "change-mgmt"
      }
     ]
    },
@@ -476,6 +558,56 @@
        "i": 2
       }
      }
+    ],
+    "short": "DNS self-withdraws globally",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Add a global-scope guard so DNS locations cannot all withdraw their BGP advertisements at once",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alarm when the count of DNS locations still advertising prefixes falls below a floor",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Override the health check on a subset of DNS servers so they keep advertising their prefixes",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Order the DNS health-check override as an explicit decision with a named approver",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore BGP advertisements for DNS prefixes after the backbone reaches the data centers",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "vendor",
+      "phase": "recover",
+      "do": "Confirm from an external vantage point that DNS prefixes are visible again and resolving",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     }
     ]
    },
    {
@@ -523,6 +655,46 @@
        "src": "improvement",
        "i": 3
       }
+     }
+    ],
+    "short": "Tools die with prod DNS",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Build an out-of-band control plane for diagnosis, access and comms that does not use production DNS",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Exercise the incident tools with production DNS blocked, in a regular game day",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Move the incident to the out-of-band channels at once when internal tools fail to resolve",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Use external channels to tell staff and users what is down, since internal tools are not reachable",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring the internal tooling back in dependency order, DNS first, and verify each before its users return",
+      "basis": "sre-incident"
      }
     ]
    },
@@ -580,6 +752,42 @@
        "i": 4
       }
      }
+    ],
+    "short": "Slow on-site access",
+    "playbook": [
+     {
+      "role": "security",
+      "phase": "prevent",
+      "do": "Pre-stage and rehearse break-glass physical access to hardened data centers",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Declare remote access lost as soon as management sessions to the data centers time out, and dispatch",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "security",
+      "phase": "contain",
+      "do": "Activate the secure access protocols for the dispatch list immediately and pre-authorise the responders",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Dispatch a named engineer to each data center and hold a radio or phone link with them",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Restart the routers and systems on site, then hand control back to remote management",
+      "basis": "sre-incident"
+     }
     ]
    },
    {
@@ -621,6 +829,46 @@
        "i": 4
       }
      }
+    ],
+    "short": "Staged power-up needed",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Write and drill a staged power-up runbook for reversing tens-of-megawatts power dips",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch data-center power draw during restoration and report any step change",
+      "basis": "nfpa-110"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Bring load back in small blocks while the facility power team watches electrical systems",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Keep restoration blocks paced against power-team approval and tell leadership the expected pace",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring caches and services back after power is stable, checking each stage first",
+      "basis": "sre-incident"
+     }
     ]
    },
    {
@@ -654,9 +902,43 @@
       "quote": "DNS resolvers worldwide handling 30x more queries than usual"
      }
     ],
-    "actions": []
+    "actions": [],
+    "short": "Resolver retry storm",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Cap retry rate and cache SERVFAIL for longer in public resolvers so a dead authority does not draw 30x queries",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "vendor",
+      "phase": "detect",
+      "do": "Alarm on resolver query volume per zone to spot a failing authoritative nameserver early",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell third-party resolver operators and users that the outage is Meta's and not to keep retrying",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "customer",
+      "phase": "contain",
+      "do": "Back off retries with exponential delay in client apps when a name returns SERVFAIL",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore DNS gradually so returning clients do not trigger a second spike",
+      "basis": "sre-incident"
+     }
+    ]
    }
-  ]
+  ],
+  "impactShort": "All Meta apps down ~6-7 h worldwide"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -671,5 +953,109 @@
    "quote": "full reconnection noted by 21:28 UTC"
   }
  },
- "durationBasis": "Outage 15:39 UTC → Cloudflare sees DNS back 21:20 and full reconnection 21:28 UTC."
+ "durationBasis": "Outage 15:39 UTC → Cloudflare sees DNS back 21:20 and full reconnection 21:28 UTC.",
+ "response": {
+  "roles": {
+   "first-responder": "No on-call responder is named; detection is credited to Cloudflare, not Meta",
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "Meta engineer running the backbone maintenance job — not named",
+   "ops-lead": "Meta engineers dispatched into the data centers to debug and restart — not named",
+   "security": "Meta data-center security staff activating the secure access protocols",
+   "service-recovery": "Meta engineers restoring the backbone and powering up in stages — not named",
+   "comms": "Meta engineering communications, Santosh Janardhan's write-up",
+   "vendor": "Cloudflare, which watched BGP and DNS from outside",
+   "customer": "Users and third-party resolvers of Facebook, Instagram and WhatsApp"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "During a routine backbone maintenance job a capacity-assessment command is issued",
+    "did": "Issues a capacity-assessment command that withdraws all backbone connections"
+   },
+   {
+    "role": "vendor",
+    "soe": 4,
+    "quote": "Cloudflare observes the peak of routing changes as backbone connections begin dropping",
+    "did": "Observes the routing-change peak at about 15:40 UTC, from outside Meta"
+   },
+   {
+    "role": "security",
+    "soe": 10,
+    "quote": "it took extra time to activate the secure access protocols needed to get people onsite",
+    "did": "Activates secure physical-access protocols so staff can reach the data centers"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 11,
+    "quote": "Engineers are physically dispatched into hardened data centers to debug and restart the systems",
+    "did": "Go on-site to debug and restart systems, slowed by hardware hard to modify"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 13,
+    "quote": "Power-up is staged cautiously",
+    "did": "Powers up in stages because of power dips of tens of megawatts"
+   },
+   {
+    "role": "comms",
+    "soe": 15,
+    "quote": "Meta (Santosh Janardhan) publishes the detailed post-incident writeup",
+    "did": "Publishes the write-up on 5 Oct, after the initial 4 Oct statement"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "All Meta apps down ~6-7 h",
+  "bones": [
+   {
+    "cat": "People",
+    "causes": [
+     {
+      "label": "Global capacity command run",
+      "factor": 0
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Audit tool bug",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "DNS withdraws on backbone loss",
+      "factor": 2
+     },
+     {
+      "label": "Tools depend on prod DNS",
+      "factor": 3
+     },
+     {
+      "label": "Shared backbone and DNS",
+      "mode": "FM-03"
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Hardened access slows entry",
+      "factor": 4
+     },
+     {
+      "label": "Power swings limit restart",
+      "factor": 5
+     }
+    ]
+   }
+  ]
+ }
 }

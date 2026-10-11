@@ -516,6 +516,50 @@
        "i": 1
       }
      }
+    ],
+    "short": "Aged Li-ion cell fire",
+    "symbol": "battery",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Run a Li-ion programme: periodic cell inspection, ageing tests and end-of-life replacement for the B3F racks",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Treat a CCTV spark or fire-loop trip in the battery room as a confirmed fire and call the fire department at once, before inspecting",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident at the first alarm, tell the fire service the room holds Li-ion and gas has not stopped it, and start evacuation",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "safety",
+      "phase": "contain",
+      "do": "Evacuate all occupants from the building and account for each; 26 left on their own here",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Apply water to the battery racks as soon as the room is de-energised, with cooling kept on until runaway ends",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "authority",
+      "phase": "recover",
+      "do": "Establish why the cell's insulation broke down, and publish it",
+      "basis": "nfpa-855"
+     }
     ]
    },
    {
@@ -568,6 +612,47 @@
        "src": "improvement",
        "i": 3
       }
+     }
+    ],
+    "short": "BMS blind to cell short",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Add cell-level thermal, off-gas, smoke and thermal-imaging detection beyond the pack-temperature BMS",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Test the BMS against a staged cell fault, so its blindness is found before a fire",
+      "basis": "nfpa-855"
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Trust the fire-detection loop over a steady BMS reading; a 20C reading during an alarm is a BMS fault",
+      "basis": "nfpa-72",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Do not wait for BMS confirmation: act on the fire loop and CCTV",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Rebuild the monitoring chain and verify the new sensors before the batteries are put back on load",
+      "basis": "nfpa-855"
      }
     ]
    },
@@ -630,6 +715,53 @@
        "i": 4
       }
      }
+    ],
+    "short": "Gas cannot stop Li-ion fire",
+    "symbol": "agentCylinder",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Fit water-based cooling, such as sprinkler or water mist, in the battery room beside any gas system",
+      "basis": "nfpa-855",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "authority",
+      "phase": "prevent",
+      "do": "Extend the Feb 2022 data-centre suppression rules to existing buildings built before them",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Report to the fire service on the call that gas has discharged and the fire is still burning",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "fire-service",
+      "phase": "contain",
+      "do": "Ask the site for power isolation at once, since water cannot go on live equipment",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Prepare the isolation points before the fire service arrives, so water is not delayed by the search for switches",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "fire-service",
+      "phase": "recover",
+      "do": "Stay with the room until cell temperatures are stable, with a long soak after flames are out",
+      "basis": "nfpa-855"
+     }
     ]
    },
    {
@@ -690,6 +822,52 @@
        "i": 2
       }
      }
+    ],
+    "short": "One UPS feeds whole centre",
+    "symbol": "ups",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Zone the UPS feeds and move cabling away from above the battery racks, so one fire zone can be cut alone",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Separate the Li-ion battery rooms from UPS units with fire-rated bulkheads, ceiling voids included",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "detect",
+      "do": "Check on a walk-through that cable routes and partitions match the drawings",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Decide with the fire service and tenant before the cut which tenants lose power, and warn Kakao",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Alert the tenant's operations to expect a loss of all 32,000 servers at the time of the cut",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Re-energise only the areas released by the fire service, one zone at a time",
+      "basis": "nfpa-70e"
+     }
     ]
    },
    {
@@ -730,6 +908,46 @@
        "src": "improvement",
        "i": 5
       }
+     }
+    ],
+    "short": "No isolation plan or drills",
+    "playbook": [
+     {
+      "role": "safety",
+      "phase": "prevent",
+      "do": "Keep pre-agreed selective isolation maps with labeled switches, so the fire zone can be cut in minutes",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Drill a full-centre power-loss and isolation scenario with the fire service on site",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Walk the fire service to the isolation switches on arrival rather than looking for them",
+      "basis": "nfpa-1561"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Appoint one person to meet the fire service and own the isolation request",
+      "basis": "nims-ics"
+     },
+     {
+      "role": "fire-service",
+      "phase": "recover",
+      "do": "Confirm isolation with the site's authorised person before water goes on",
+      "basis": "nfpa-1561"
      }
     ]
    },
@@ -795,7 +1013,43 @@
      "O": 5,
      "D": 9
     },
-    "revisedRationale": "With services spread across sites, losing one facility should degrade Kakao rather than stop it nationwide (S 9→6). The dossier records the multi-site build as publicly committed with details not verified, so the reduction is a claim about the action, not a confirmed outcome. O and D are unchanged because the committed details do not confirm whole-site drills."
+    "revisedRationale": "With services spread across sites, losing one facility should degrade Kakao rather than stop it nationwide (S 9→6). The dossier records the multi-site build as publicly committed with details not verified, so the reduction is a claim about the action, not a confirmed outcome. O and D are unchanged because the committed details do not confirm whole-site drills.",
+    "short": "Kakao runs on one site",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Build geographic multi-site redundancy for authentication and messaging, and run full-power-loss DR drills",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Test failover of the sole authentication service; a drill that fails shows the single-site dependence",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Move authentication traffic to surviving capacity first and shed lower-priority services",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Hold services that depend on the dead authentication path in a static fallback until it returns",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore services in dependency order: authentication, then messaging, then the linked banking and KakaoT",
+      "basis": "nist-800-34"
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -840,9 +1094,47 @@
        "i": 3
       }
      }
+    ],
+    "short": "Slow single-site restart",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Rehearse a cold restart of the full server fleet, and time it",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "Track servers back on load against the rehearsed restart timeline",
+      "basis": "nist-800-34"
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Inspect the fire-damaged electrical room and release power zone by zone as each is proved safe",
+      "basis": "nfpa-70e"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Set the restart order and the next customer update time",
+      "basis": "iso-22301"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart and re-sync the fleet in stages, with checks on data between each",
+      "basis": "nist-800-34"
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "Kakao down 127 h 30 min, 32,000 servers"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -857,5 +1149,118 @@
    "quote": "~19:00"
   }
  },
- "durationBasis": "National disruption ~15:20 KST 15 Oct → Kakao services fully normalized ~19:00 20 Oct."
+ "durationBasis": "National disruption ~15:20 KST 15 Oct → Kakao services fully normalized ~19:00 20 Oct.",
+ "response": {
+  "roles": {
+   "first-responder": "Whoever reported the fire to the fire department at 15:33 — not named",
+   "incident-commander": "No incident commander is named in the record",
+   "fire-service": "Fire services; peak 114 personnel and 46 apparatus",
+   "electrical": "SK C&C operators who cut the whole building's power",
+   "safety": "SK C&C staff responsible for evacuation and isolation maps — not named",
+   "service-recovery": "Kakao engineers restarting the single-site fleet — not named",
+   "authority": "MSIT and the National Forensic Service, the investigators",
+   "customer": "Kakao, tenant of the site, and its users"
+  },
+  "recorded": [
+   {
+    "role": "fire-service",
+    "soe": 7,
+    "quote": "Firefighters arrive on scene",
+    "did": "Arrive at 15:37, 18 minutes after the 15:19 spark"
+   },
+   {
+    "role": "fire-service",
+    "soe": 9,
+    "quote": "fire services formally request SK C&C cut electricity to the B3F zone",
+    "did": "Ask SK C&C at 16:52 to cut power, since water cannot be used on live equipment"
+   },
+   {
+    "role": "electrical",
+    "soe": 10,
+    "quote": "a WHOLE-BUILDING power cut is executed",
+    "did": "SK C&C cuts the whole building because the B3F UPS also feeds the centre, de-energising about 32,000 Kakao servers"
+   },
+   {
+    "role": "fire-service",
+    "soe": 12,
+    "quote": "Main flames knocked down roughly two hours after ignition once water is applied",
+    "did": "Applies water to the 40 sqm area; about 60 battery packs are consumed"
+   },
+   {
+    "role": "fire-service",
+    "soe": 13,
+    "quote": "Full extinguishment declared",
+    "did": "Declares full extinguishment at 23:46 after 8h13m, peak 114 personnel and 46 apparatus"
+   },
+   {
+    "role": "authority",
+    "soe": 15,
+    "quote": "MSIT announces investigation results",
+    "did": "MSIT finds BMS detection failure, no Li-ion measures since 2016, and assigns fault to SK C&C and Kakao"
+   },
+   {
+    "role": "authority",
+    "soe": 16,
+    "quote": "National Forensic Service announces mechanism",
+    "did": "NFS names an internal short from age-related insulation breakdown as the probable ignition cause"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Kakao nationwide outage, 127 h",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Aged Li-ion cell short",
+      "mode": "FM-01"
+     },
+     {
+      "label": "BMS read 20C in a fire",
+      "factor": 1
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Gas-only suppression",
+      "factor": 2
+     },
+     {
+      "label": "One UPS feeds whole centre",
+      "factor": 3
+     },
+     {
+      "label": "Kakao on one site",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "No Li-ion fire measures",
+      "factor": 0
+     },
+     {
+      "label": "No plan or power-loss drills",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Code not applied to old sites",
+      "factor": 6
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -402,7 +402,47 @@
      "O": 3,
      "D": 4
     },
-    "revisedRationale": "A change that is flag-protected and disabled by default cannot fire on the critical path until it is deliberately enabled (O 5→3), and static analysis and testing aimed at malformed input would surface an unguarded dereference before release (D 6→4). S is unchanged because, if such a path does fire, it still runs inside a global control plane. Both actions are recorded as committed, not completed, so the reduction is a claim about the actions, not a confirmed outcome."
+    "revisedRationale": "A change that is flag-protected and disabled by default cannot fire on the critical path until it is deliberately enabled (O 5→3), and static analysis and testing aimed at malformed input would surface an unguarded dereference before release (D 6→4). S is unchanged because, if such a path does fire, it still runs inside a global control plane. Both actions are recorded as committed, not completed, so the reduction is a claim about the actions, not a confirmed outcome.",
+    "short": "Unguarded new code path",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Ship every change to a critical binary behind a feature flag that is off by default",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Run static analysis and malformed-input tests on the quota-check path to catch the unguarded null dereference before release",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Alert on Service Control crash-loop and 503 rate per region, so SRE is paged at onset",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare the incident and order the global feature-disable (red button) for the quota-check path as soon as the root cause is known",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Roll the red-button out region by region and confirm each Service Control region stops crashing before moving on",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-02",
@@ -449,6 +489,42 @@
        "src": "improvement",
        "i": 3
       }
+     }
+    ],
+    "short": "Blank policy write accepted",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Reject a policy record with blank required fields at the write boundary into the Spanner policy tables",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Page SRE on a spike in rejected or empty policy records before the data replicates",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Stop further policy writes and identify the bad record once Service Control starts crashing",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore the last good policy data in the regional tables once the bad record is identified",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Trace who or what authored the blank-field write and record it in the post-incident review",
+      "basis": "sre-incident"
      }
     ]
    },
@@ -497,6 +573,43 @@
        "src": "improvement",
        "i": 5
       }
+     }
+    ],
+    "short": "Instant global replication",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Stage policy metadata to one region and a small share of tasks first; widen only after a healthy interval",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch per-region crash and error counts during each policy push; halt the push on the first crash",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Freeze all policy replication while the red-button rollout is in progress",
+      "basis": "change-mgmt"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Assign one owner for the freeze and one for the rollback so they do not collide",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Resume policy replication in stages after the bad record is gone",
+      "basis": "change-mgmt"
      }
     ]
    },
@@ -549,7 +662,43 @@
      "O": 3,
      "D": 6
     },
-    "revisedRationale": "If the quota-check function is isolated and fails open, a crash in it skips the check instead of stopping API authorization, so customers see degraded quota enforcement rather than a global outage (S 9→5). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "If the quota-check function is isolated and fails open, a crash in it skips the check instead of stopping API authorization, so customers see degraded quota enforcement rather than a global outage (S 9→5). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Fails closed, not open",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Isolate the quota-check module so a crash in it skips the check instead of stopping API authorization",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch IAM token-issuance and Service Control 503s together so a gating failure is seen across products",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Disable the failing check on the critical path so authorization keeps serving",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Tell product teams IAM and Cloud Storage are affected so each can hold its own changes",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Confirm IAM tokens issue again in every region after the rollout",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-05",
@@ -600,7 +749,47 @@
      "O": 2,
      "D": 6
     },
-    "revisedRationale": "With randomized exponential backoff, a mass restart spreads its load over time instead of arriving at once, so the herd effect should not form (O 4→2). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "With randomized exponential backoff, a mass restart spreads its load over time instead of arriving at once, so the herd effect should not form (O 4→2). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Restart herd with no backoff",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Add randomized exponential backoff to Service Control task restarts",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Watch task-start rate and backend load in us-central1 during recovery",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Throttle task creation by hand and route traffic across regions to keep the infrastructure from overloading",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Hold the all-clear for us-central1 until throttled recovery is stable",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Lift the throttle step by step as load on the backing infrastructure settles",
+      "basis": "sre-incident"
+     }
+    ]
    },
    {
     "id": "FM-06",
@@ -647,7 +836,43 @@
      "O": 2,
      "D": 8
     },
-    "revisedRationale": "Removing the status stack's dependency on the products it reports on means a product outage no longer silences it (O 4→2). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+    "revisedRationale": "Removing the status stack's dependency on the products it reports on means a product outage no longer silences it (O 4→2). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.",
+    "short": "Status page shares fate",
+    "playbook": [
+     {
+      "role": "change-owner",
+      "phase": "prevent",
+      "do": "Move Cloud Service Health off the products it reports on so a product outage does not silence it",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Test that the status page can be posted to while Cloud Storage and IAM are failing",
+      "basis": "uptime-os"
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Use an out-of-band channel to tell customers an incident is under way while the status page is down",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Name a comms owner at the start of any incident that touches IAM or Cloud Storage",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Backfill the timeline on Cloud Service Health once it is back, with root cause and mitigation",
+      "basis": "itil-incident"
+     }
+    ]
    },
    {
     "id": "FM-07",
@@ -700,9 +925,46 @@
        "i": 6
       }
      }
+    ],
+    "short": "Backend on one cloud",
+    "playbook": [
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Give Workers KV a second storage provider or a degraded read-only mode",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "detect",
+      "do": "Alert on Workers KV error rate and on backing-provider health, not only on user requests",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Shed or fail-static the products that depend on Workers KV, such as AI Gateway, Stream and Pages",
+      "basis": "sre-incident"
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restore Workers KV once the backing provider returns and verify each dependent product",
+      "basis": "itil-incident"
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell Cloudflare customers which products were hit and when each recovered",
+      "basis": "itil-incident"
+     }
     ]
    }
-  ]
+  ],
+  "impactShort": "Google Cloud APIs down worldwide, 503s"
  },
  "durationStatus": "measured",
  "durationEvidence": {
@@ -717,5 +979,94 @@
    "quote": "~12:30 PM PDT"
   }
  },
- "durationBasis": "Crash loop 10:51 PDT 12 Jun → all regions except us-central1 recovered ~12:30 PDT."
+ "durationBasis": "Crash loop 10:51 PDT 12 Jun → all regions except us-central1 recovered ~12:30 PDT.",
+ "response": {
+  "roles": {
+   "first-responder": "Google Site Reliability Engineering, on call for the incident",
+   "incident-commander": "No incident commander is named in the record",
+   "change-owner": "The Service Control team that added the quota-check feature on 29 May",
+   "ops-lead": "Google engineers who throttled task creation in us-central1 — not named",
+   "service-recovery": "Google engineers running the red-button rollout — not named",
+   "comms": "Google Cloud Service Health, the public status channel",
+   "customer": "Cloudflare Workers KV, the downstream dependent"
+  },
+  "recorded": [
+   {
+    "role": "change-owner",
+    "soe": 0,
+    "quote": "a new quota-policy-check feature is added to Service Control WITHOUT error handling",
+    "did": "Ships the quota-check feature without error handling or a feature flag; it lies dormant about 14 days"
+   },
+   {
+    "role": "first-responder",
+    "soe": 4,
+    "quote": "Google's Site Reliability Engineering team is triaging the incident",
+    "did": "SRE is triaging within about 2 minutes of onset"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 10,
+    "quote": "engineers manually throttle task creation and use multi-regional routing",
+    "did": "Throttle task creation by hand and route multi-regionally so recovering us-central1 tasks do not re-overload it"
+   },
+   {
+    "role": "comms",
+    "soe": 8,
+    "quote": "First public incident report posted to Cloud Service Health",
+    "did": "Posts the first public report about an hour late because the status stack was itself down"
+   },
+   {
+    "role": "comms",
+    "soe": 11,
+    "quote": "Root cause and mitigation status published/updated by Google on Cloud Service Health",
+    "did": "Publishes root cause and mitigation status once the status infrastructure is restored"
+   },
+   {
+    "role": "customer",
+    "soe": 3,
+    "quote": "Cloudflare Workers KV",
+    "did": "Loses availability as the Google Cloud storage dependency fails"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "GCP APIs failed worldwide",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Null deref in new path",
+      "mode": "FM-01"
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Fails closed on crash",
+      "factor": 3
+     },
+     {
+      "label": "Global replication, no canary",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "No flag, not off by default",
+      "factor": 0
+     },
+     {
+      "label": "No write-boundary validation",
+      "factor": 1
+     }
+    ]
+   }
+  ]
+ }
 }
