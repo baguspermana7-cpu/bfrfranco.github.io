@@ -3,11 +3,15 @@
 (function (global) {
     'use strict';
 
+    // CARTO keyless tiles now return an "API KEY REQUIRED" image. The keys keep their old names
+    // (pages pass tile:'carto-dark') and resolve to Esri's keyless Canvas basemaps.
+    var ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/';
     var TILE_URLS = {
-        'carto-dark':  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-        'carto-light': 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+        'carto-dark':  ESRI + 'World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+        'carto-light': ESRI + 'World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
     };
-    var TILE_ATTR = '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/">OSM</a>';
+    var TILE_ATTR = 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors';
+    var TILE_NATIVE_MAX_ZOOM = 16;
 
     var VOLTAGE_COLORS = { 500: '#3b82f6', 275: '#94a3b8', 150: '#f87171' };
     var VOLTAGE_DEFAULT = '#94a3b8';
@@ -227,7 +231,7 @@
 
         L.tileLayer(tileUrl, {
             attribution: TILE_ATTR,
-            subdomains: 'abcd',
+            maxNativeZoom: TILE_NATIVE_MAX_ZOOM,
             maxZoom: 20
         }).addTo(map);
 

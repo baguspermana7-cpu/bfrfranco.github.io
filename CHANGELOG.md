@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v3.18.1 — 2026-10-11
+
+### Fixed — every Leaflet map was drawing "API KEY REQUIRED"
+
+CARTO's keyless basemaps (`dark_all`, `light_all`, `rastertiles/voyager`) now answer every tile request with an
+image reading *API KEY REQUIRED*. v3.18.0 moved the incident hub off them; this release moves the rest:
+- `js/rz-map.js` — the shared wrapper behind the six `pln-java-grid*` maps. The tile keys keep their names
+  (`carto-dark`, `carto-light`) so no page changes; they now resolve to Esri's keyless Canvas
+  `World_Dark_Gray_Base` / `World_Light_Gray_Base`.
+- `dc-market-tracker.html`, `pln-sumatra-grid.html` (voyager → light gray), and the dashboard map's dark and
+  light layers.
+- Esri serves these basemaps to zoom 16; `maxNativeZoom: 16` lets Leaflet upscale beyond that instead of
+  requesting empty tiles. Attribution changed to Esri / HERE / Garmin / OpenStreetMap as Esri requires.
+- Verified headless: java-grid 18, sumatra 24, market-tracker 12 tiles loaded from `server.arcgisonline.com`,
+  all HTTP 200. No CARTO URL remains in the site source.
+
+---
+
 ## v3.18.0 — 2026-10-11
 
 ### Incident library: who did what, who should, and two figures the diagram engine draws

@@ -31,7 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20261009-bfaeb6db">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin>
-    <script src="js/rz-version.js?v=20261011-b6d0c4b8" defer></script>
+    <script src="js/rz-version.js?v=20261011-36a8bb5a" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin defer></script>
@@ -189,8 +189,9 @@
             document.getElementById('sgStats').innerHTML = stats.map(function(s){ return '<div class="sg-stat"><div class="v">'+s.v+'</div><div class="l">'+s.l+'</div></div>'; }).join('');
             // ---- map ----
             var map = L.map('sgMap', { scrollWheelZoom:false }).setView([-0.5, 102.5], 5);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution:'&copy; OpenStreetMap, &copy; CARTO', maxZoom:18
+            // CARTO keyless tiles now return "API KEY REQUIRED"; Esri Canvas light gray is keyless.
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+                attribution:'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors', maxNativeZoom:16, maxZoom:18
             }).addTo(map);
             function edgeStyle(e){
                 if(e.island) return { color:'#22d3ee', weight:2, opacity:.85, dashArray:'5 4' };

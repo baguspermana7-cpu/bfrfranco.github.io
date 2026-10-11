@@ -735,7 +735,7 @@
 .rz-version-num { color:#0a6e52 !important; } .rz-version-label { color:#5b6b82 !important; }
 [data-theme="dark"] .rz-version-num { color:#7dd3b0 !important; } [data-theme="dark"] .rz-version-label { color:#9aa8bb !important; }
 </style>
-    <script src="js/rz-version.js?v=20261011-b6d0c4b8" defer></script>
+    <script src="js/rz-version.js?v=20261011-36a8bb5a" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>    <meta property="og:image:alt" content="Global Data Center Market Tracker | Live Capacity &amp; Growth Dashboard">
 
@@ -1127,7 +1127,7 @@
     </button>
 
     <script src="script.min.js?v=20260920-0e1dd953"></script>
-    <script src="js/rz-map.js?v=20260920-cc29ef53"></script>
+    <script src="js/rz-map.js?v=20261011-58cf2a70"></script>
 
     <!-- Main IIFE -->
     <script>
@@ -1245,10 +1245,10 @@
                 attributionControl: true
             });
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/">OSM</a>',
-                subdomains: 'abcd',
-                maxZoom: 20
+            // CARTO keyless tiles now return an "API KEY REQUIRED" image; Esri Canvas dark gray is keyless.
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+                maxZoom: 16
             }).addTo(dmtMap);
 
             renderMap();
