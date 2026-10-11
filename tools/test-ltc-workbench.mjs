@@ -211,6 +211,8 @@ for (const [page, mod] of Object.entries(PAGES)) {
   T.system('cooling');
   ok('W9d', !T.powered(4, { chwA: 1, chwB: 1 }, true) && T.powered(4, { chwA: 1 }, false), 'cooling needs both sinks: both CHW loops out loses the air sink; one is tolerated at Tier IV');
   ok('W9e', !T.powered(2, { fws: 1 }, true), 'Tier II: the single FWS loop is a component the sweep must take out whole');
+  ok('W9h', T.redLabel(18, 9) === '2N' && T.redLabel(2, 1) === '2N' && T.redLabel(17, 16) === 'N+1' && T.redLabel(9, 9) === 'N',
+     `redundancy reads as the industry writes it: 18 for 9 is 2N, not N+9 (got ${T.redLabel && T.redLabel(18, 9)})`);
   T.system('power');
   const tier = readFileSync(join(root, 'js/ltc-tier.js'), 'utf8');
   for (const m of tier.matchAll(/(power[12]|cool[12]): \{ nodes: \[([\s\S]*?)\],\s*edges:/g)) {

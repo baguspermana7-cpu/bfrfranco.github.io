@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v3.18.4 — 2026-10-11
+
+### Tier diagrams on a phone: two lanes, no crossing lines, and 2N where it is 2N
+
+Tier on a phone (390 px) stacked all nine blocks in one column. The connectors that skip a block (TX → MCC, PDU → IT, the generator feeds) then ran down five or six nested side channels and crossed one another 60 times across the eight views. Each connector met the routing rules, but the flow could not be followed.
+
+**Layout.** Narrow panes now use a two-lane layout:
+- Power: path A on the left, path B on the right. The generators and IT load span both lanes, and the MCC sits between them.
+- Cooling: the liquid sink on the left, the air sink on the right.
+
+Every connector now runs straight down or as one L. Only the A/B loop diamond in Tier III/IV cooling needs a side channel, one on each side of its lane. Desktop layouts are unchanged. On narrow panes the sublabels drop "up" so they fit the lane.
+
+**Redundancy labels.** Tier IV generators read "18/18 up · need 9 (N+9)". Twice the need or more now reads **2N**, in both the diagram and the inspector, which shared no rule before. Tier IV generators, the MCC pair and the Tier IV chiller plant now read 2N.
+
+**Gates**
+- `tools/test-rzd-ports.mjs` adds R6: no two connectors cross on any Tier diagram, at 1440 or 390. It finds 60 crossings on the v3.18.3 tree and none now.
+- `tools/test-ltc-workbench.mjs` W9h checks the redundancy label: 18 for 9 is 2N, 17 for 16 is N+1.
+
 ## v3.18.3 — 2026-10-11
 
 ### DH01: every CDU is on the map, and its loop never crosses a rack

@@ -13,6 +13,8 @@
  *   R4  no segment passes through any other block;
  *   R5  no two connectors share a stretch of line (collinear overlap > 4 units) — two flows drawn
  *       on one stroke cannot be told apart (hub overview: rack → CDU and rack → CRAH did).
+ *   R6  Tier diagrams: no two connectors cross. The phone layout used to stack every block in one
+ *       column and send skip connectors down nested side channels; two lanes route them straight.
  * Pages: hub (4 plant views), Tier (4 tiers × power/cooling), ISO, ASHRAE, TIA, NFPA, model lab;
  * at 1440 and 390 px.
  *
@@ -88,6 +90,17 @@ function shared(e, f) {
   }
   return false;
 }
+function crosses(e, f) {
+  let n = 0;
+  for (let i = 1; i < e.pts.length; i++) for (let j = 1; j < f.pts.length; j++) {
+    let a = e.pts[i - 1], b = e.pts[i], c = f.pts[j - 1], d = f.pts[j];
+    if (Math.abs(a.x - b.x) < E && Math.abs(c.y - d.y) < E) [a, b, c, d] = [c, d, a, b];
+    if (!(Math.abs(a.y - b.y) < E && Math.abs(c.x - d.x) < E)) continue;          // a-b horizontal, c-d vertical
+    const x = c.x, y = a.y;
+    if (x > Math.min(a.x, b.x) + 1 && x < Math.max(a.x, b.x) - 1 && y > Math.min(c.y, d.y) + 1 && y < Math.max(c.y, d.y) - 1) n++;
+  }
+  return n;
+}
 function check(where, e) {
   checked++;
   const n = e.pts.length, s0 = side(e.pts[0], e.A), s1 = side(e.pts[n - 1], e.B);
@@ -136,6 +149,7 @@ for (const w of [1440, 390]) {
       es.forEach((e) => check(`${w}px ${where}`, e));
       for (let i = 0; i < es.length; i++) for (let j = i + 1; j < es.length; j++) {
         if (es[i].svg === es[j].svg && shared(es[i], es[j])) fails.push(`R5 ${w}px ${where}: ${es[i].id} and ${es[j].id} share a stretch of line`);
+        if (es[i].svg === es[j].svg && /^tier/.test(where) && crosses(es[i], es[j])) fails.push(`R6 ${w}px ${where}: ${es[i].id} crosses ${es[j].id}`);
       }
     });
     await p.close();
@@ -149,4 +163,4 @@ if (fails.length) {
   [...new Set(fails)].slice(0, 200).forEach((f) => console.log('  ' + f));
   process.exit(1);
 }
-console.log(`PASS — ${checked} connectors leave and enter their blocks perpendicular, never along a border, through a block or on another connector's line (hub, Tier, ISO, ASHRAE, TIA, NFPA, lab · 1440/390).`);
+console.log(`PASS — ${checked} connectors leave and enter their blocks perpendicular, never along a border, through a block or on another connector's line, and no Tier connectors cross (hub, Tier, ISO, ASHRAE, TIA, NFPA, lab · 1440/390).`);
