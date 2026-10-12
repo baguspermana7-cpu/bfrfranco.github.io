@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v3.20.1 — 2026-10-12
+
+### Plant report draws the plant and tests every Tier; the plant map holds on every plant size
+
+**Report — plant schematics.** The exported report now opens with the four plant-map views (overview, power, liquid heat, air & rooms), drawn by the hub's own builder on the reader's plant. Each drawing is written into the file with its colours and type resolved under the light theme, so it reads correctly in a standalone file and when exported from a page in dark mode. Wide views scroll sideways instead of shrinking their labels below 80 % of their drawn size.
+
+**Report — Tier topology.** New section: the Tier sweep for Tiers I–IV, power and cooling, on this plant's unit counts. Every element is taken out once, planned and unplanned. The table shows whether each Tier is concurrently maintainable and fault tolerant, and what breaks it, by name ("UPS A — the whole board → IT power lost"). The Tier page keeps the system it was showing. The Tier and hub models now load on any workbench page for the report; their page boot runs only where their figure exists. Sections number themselves, and the contents list is built from them.
+
+**Fixed — plant map labels missing on most plant sizes.** The report's first sweep of the hub drew every view on 60 plants (5–300 MW, 50–98 % capture, four presets), desktop and phone. It found engine warnings, each logged as a console error on the live page, that no gate looked at (every other gate draws the 100 MW default):
+- On the overview and liquid views, the liquid-heat arrow label was unplaced on 102 of 240 plant/view pairs. A label longer than "85 MW" did not fit the 40 px column gap.
+- On phones, the "Engine generators" block overflowed on the power view at every plant size, the default included.
+- On phones, the cooler block overflowed on the hub and in the lab overview; and on desktop, at 300 MW, the cooling-tower block did.
+
+Fixes:
+- The column gap is 48 px.
+- Arrow labels read whole MW from 10 MW up.
+- The generator, cooler and tower sublabels are shorter: "MV bus · 391 MW", "65 units · 39 °C out", "256 MW · 120 L/s make-up".
+
+**Gates** — `tools/test-ltc-workbench.mjs` (284 assertions):
+- **W13:** 600 diagrams over 60 plants (four hub views and the lab overview, each at desktop and phone width), zero engine warnings. On the v3.19.0 tree it fails with eight kinds of defect.
+- **W12m:** the report carries the Tier sweep, each Tier reaching its own objective.
+- **W12n:** every plant-map view renders for the report on the result it is given.
+
 ## v3.20.0 — 2026-10-12
 
 ### Every article block diagram drawn by the engine, with IEC symbols on the equipment

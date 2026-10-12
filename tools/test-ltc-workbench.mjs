@@ -15,6 +15,7 @@
  *   W3  NFPA 2001 flooding equations against the published per-m³ figures
  *   W4  TIA fiber budget, copper channel, TIA-607 conductor sizing
  *   W5  ISO/IEC 30134 KPIs and the ISO 50006 regression recovering a known model
+ *   W13 every hub view and the lab overview, desktop and phone, on 60 plants: zero diagram-engine warnings
  *   W12 exported report: Sankey and power closure, engine numbers, every trace / input / fault / transient, embedded data
  *   W11 manuals: the lab manual's worked example equals the engine output; the hub manual covers the plant
  *   W10 model lab on the plant engine: load order, computeModel delegation, adapter parity, screening passthrough
@@ -293,8 +294,19 @@ for (const [page, mod] of Object.entries(PAGES)) {
   }
   const sb = { console, Math, JSON, Date }; sb.window = sb; sb.globalThis = sb; sb.document = { readyState: 'loading', addEventListener() {} };
   vm.createContext(sb);
-  for (const f of ['js/ltc-plant.js', 'js/ltc-dh01.js', 'js/ltc-report.js']) vm.runInContext(readFileSync(join(root, f), 'utf8'), sb, { filename: f });
+  for (const f of ['js/ltc-plant.js', 'js/ltc-dh01.js', 'js/ltc-tier.js', 'js/ltc-report.js']) vm.runInContext(readFileSync(join(root, f), 'utf8'), sb, { filename: f });
   const P = sb.LTCPlant, X = sb.LTCReport, D = sb.LTCDH01;
+  {
+    /* the plant map views the report embeds: drawn by the hub's own build on any result, no engine warnings */
+    const hb = { console, Math, JSON }; hb.window = hb; hb.globalThis = hb; hb.document = { readyState: 'loading', addEventListener() {}, documentElement: { getAttribute() { return null; } } };
+    vm.createContext(hb);
+    for (const f of ['js/rz-eng-symbols.js', 'js/rz-diagram-metrics.js', 'js/rz-diagram-layout.js', 'js/rz-diagram.js', 'js/ltc-app.js', 'js/ltc-plant.js', 'js/ltc-hub.js'])
+      vm.runInContext(readFileSync(join(root, f), 'utf8'), hb, { filename: f });
+    const r37 = hb.LTCPlant.compute({ itMw: 37 }), vs = hb.LTCHub.views();
+    ok('W12n', vs.length === 4 && vs.every((v) => { const x = hb.LTCHub.svg(v.id, r37); return x.warnings === 0 && /<svg/.test(x.svg); })
+       && hb.LTCHub.svg('overview', r37).svg.includes(r37.it.racks + ' racks'),
+       'every plant-map view renders for the report with zero engine warnings, on the result it is given (37 MW: ' + r37.it.racks + ' racks)');
+  }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));
   for (const [i, st] of plants.entries()) {
@@ -313,12 +325,50 @@ for (const [page, mod] of Object.entries(PAGES)) {
        'every calculation trace and every engine input is in the report');
     ok('W12i:' + id, ctx.faults.length === D.FAULTS.length && ctx.faults.every((x) => text.includes(x.label)) && (text.match(/<figure class="plan">/g) || []).length === D.FAULTS.length,
        'DH01 is drawn and tabulated under every fault the workbench models');
+    const tv = (sys, t) => ctx.tier.find((x) => x.system === sys && x.tier === t);
+    ok('W12m:' + id, ctx.tier && ctx.tier.length === 8 && ['power', 'cooling'].every((sys) => !tv(sys, 1).maint && !tv(sys, 2).maint && tv(sys, 3).maint && !tv(sys, 3).fault && tv(sys, 4).maint && tv(sys, 4).fault)
+       && text.includes('Tier topology') && sb.LTCTier.system() === 'power',
+       'the report carries the Tier sweep for power and cooling, each Tier reaching its own objective, and leaves the page on the system it was showing');
     ok('W12j:' + id, ctx.transients.length === 4 && ctx.transients.every((t) => t.series.length > 2), 'four transients, each with a time series');
     const data = JSON.parse(html.match(/<script type="application\/json" id="rz-data">([\s\S]*?)<\/script>/)[1]);
     ok('W12k:' + id, data.result.totals.pueAnnual === R.totals.pueAnnual && data.result.design.facility === R.design.facility, 'the embedded data is the engine result itself');
     const csv = X.csv(R).trim().split('\n');
     ok('W12l:' + id, csv[0] === 'key,value' && csv.length > 500 && csv.includes('totals.pueAnnual,' + R.totals.pueAnnual), `CSV carries every scalar of the result (${csv.length} rows)`);
   }
+}
+
+{
+  /* W13 (v3.20.1) — every plant diagram holds on every plant, not only the 100 MW default the
+   * other gates draw. The report's first sweep found the hub's liquid-heat arrow label unplaced on
+   * 102 of 240 plant/view pairs (any label longer than "85 MW" did not fit the 40 px column gap)
+   * and, on phones, "Engine generators" and the cooler block overflowing — each a console error
+   * on the live page that no gate looked at. */
+  const sb = { console: { log() {}, error() { sb.errs.push([...arguments].join(' ')); } }, Math, JSON, Date, errs: [], localStorage: { getItem() { return null; }, setItem() {} } };
+  sb.window = sb; sb.globalThis = sb; sb.addEventListener = () => {};
+  sb.document = { readyState: 'loading', addEventListener() {}, documentElement: { getAttribute() { return null; } } };
+  vm.createContext(sb);
+  for (const f of ['js/rz-eng-symbols.js', 'js/rz-diagram-metrics.js', 'js/rz-diagram-layout.js', 'js/rz-diagram.js', 'js/ltc-app.js', 'js/ltc-plant.js', 'js/ltc-hub.js', 'js/ltc-lab-plant.js'])
+    vm.runInContext(readFileSync(join(root, f), 'utf8'), sb, { filename: f });
+  const P = sb.LTCPlant, plants = [];
+  for (const it of [5, 7, 10, 15, 20, 37, 50, 75, 100, 150, 200, 250, 300]) for (const cap of [50, 70, 85, 98]) plants.push({ itMw: it, capturePct: cap });
+  for (const k of Object.keys(P.PRESETS)) plants.push(Object.assign({ itMw: 300 }, P.PRESETS[k]), Object.assign({ itMw: 5 }, P.PRESETS[k]));
+  const bad = {};
+  let n = 0;
+  for (const st of plants) {
+    const r = P.compute(st);
+    for (const narrow of [false, true]) {
+      for (const v of sb.LTCHub.views()) {
+        n++;
+        const x = sb.LTCHub.svg(v.id, r, narrow);
+        for (const w of x.why) bad[`hub ${v.id}${narrow ? ' (phone)' : ''}: ${w.replace(/[\d.,]+/g, '#')}`] = JSON.stringify(st);
+      }
+      sb.errs = []; n++;
+      sb.LTCLabPlant.overview({ clientWidth: narrow ? 390 : 1000, __traced: true, set innerHTML(v) {}, querySelector() { return null; } }, r);
+      for (const e of sb.errs) bad[`lab overview${narrow ? ' (phone)' : ''}: ${e.replace(/[\d.,]+/g, '#')}`] = JSON.stringify(st);
+    }
+  }
+  const kinds = Object.keys(bad);
+  ok('W13', kinds.length === 0, `${n} diagrams over ${plants.length} plants; engine warnings:\n    ` + kinds.map((k) => k + '  e.g. ' + bad[k]).join('\n    '));
 }
 
 const total = pass + fails.length;

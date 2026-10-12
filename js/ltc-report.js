@@ -26,8 +26,11 @@
       rows.map(function (r) { return '<tr>' + r.map(function (c, i) { return '<td' + (i ? ' class="n"' : '') + '>' + c + '</td>'; }).join('') + '</tr>'; }).join('') +
       '</tbody></table></div>';
   }
+  /* sections number themselves in the order they are written; the contents list is built from them */
+  var TOC = [];
   function sec(id, n, title, lead, body) {
-    return '<section id="' + id + '"><h2><span class="no">' + n + '</span>' + esc(title) + '</h2>' + (lead ? '<p class="lead">' + lead + '</p>' : '') + body + '</section>';
+    TOC.push(title); n = TOC.length;
+    return '<section id="s' + n + '"><h2><span class="no">' + n + '</span>' + esc(title) + '</h2>' + (lead ? '<p class="lead">' + lead + '</p>' : '') + body + '</section>';
   }
 
   /* ---- figures (pure SVG) ------------------------------------------------------------- */
@@ -270,13 +273,14 @@
     var p = R.input, d = R.design, l = R.liquid, a = R.air, e = R.elec, T = R.totals, A = R.annual, w = R.power, h = R.hall;
     var sk = sankey(R), items = powerItems(R), sumItems = items.reduce(function (s, i) { return s + i[1]; }, 0);
     var parts = [];
+    TOC = [];
     parts.push('<header class="cover"><p class="eyebrow">Liquid-to-chip plant · engineering report</p><h1>' + esc(ctx.title || (f(p.itMw) + ' MW liquid-cooled AI campus')) + '</h1>' +
       '<p class="meta">' + esc(ctx.presetLabel || 'custom plant') + ' · ' + esc(ctx.climateLabel || 'custom climate') + ' · CDU feed ' + esc(p.cduFeed) + ' · generated ' + esc(ctx.date || '') +
       ' · engine v' + esc(ctx.version || '?') + (ctx.url ? ' · <a href="' + esc(ctx.url) + '">' + esc(ctx.url) + '</a>' : '') + '</p>' + kpis(R) + '</header>');
-    parts.push('<nav class="toc"><b>Contents</b><ol>' + ['Key findings', 'Heat balance', 'Facility power', 'Metering & PUE categories', 'Liquid path', 'Air path', 'Electrical & sizing',
-      'Redundancy register', 'Annual performance', 'DH01 hall & faults', 'Transients', 'Standards cross-check', 'Calculation trace', 'Inputs', 'Assumptions & limits', 'Data']
-      .map(function (s, i) { return '<li><a href="#s' + (i + 1) + '">' + s + '</a></li>'; }).join('') + '</ol></nav>');
+    parts.push('%%TOC%%');
     parts.push(sec('s1', 1, 'Key findings', 'Read from the same result every workbench page draws; each sentence is a number in the sections below.', findings(R, ctx)));
+    if (ctx.views && ctx.views.length) parts.push(sec('', 0, 'Plant schematics', 'The plant map from the LTC hub, drawn on this plant: every block and connector the workbench shows, with this plant\'s numbers on it. Solid lines carry power, dashed liquid, dash-dot air, dotted losses.',
+      ctx.views.map(function (v) { return '<figure class="wide schem"><figcaption><b>' + esc(v.label) + '</b></figcaption>' + v.svg + '</figure>'; }).join('')));
     parts.push(sec('s2', 2, 'Heat balance', 'Where every kilowatt of heat goes, design day. Left: the path the heat takes inside the building. Right: the equipment that rejects it.',
       '<figure class="wide">' + sk.svg + '</figure><p class="check">Left ' + f(sk.totL) + ' kW = right ' + f(sk.totR) + ' kW (difference ' + f(sk.totL - sk.totR, 3) + ' kW). Chiller evaporator includes CHW pumps and room fans; towers then reject ' + mw(a.towerKw) + ' MW (evaporator + compressor + trim).</p>' +
       table(['Path', 'kW', 'Share'], sk.F.left.map(function (n) { return [esc(n[1]), f(n[2]), pct(n[2], sk.totL)]; }))));
@@ -309,25 +313,32 @@
       var cap = r[2] * r[3], ok = (r[2] - 1) * r[3] >= r[4] - 0.5;
       return [esc(r[0]) + ' <small>' + r[5] + '</small>', r[1], r[2], (root.LTCTier ? root.LTCTier.redLabel(r[2], r[1]) : (r[2] > r[1] ? 'N+' + (r[2] - r[1]) : 'N')), f(r[3]), f(cap), f(r[4]), pct(cap - r[4], r[4]), ok ? '<span class="tag ok">holds</span>' : '<span class="tag bad">short</span>'];
     })) + '<p class="note">Unit counts are capacity redundancy only. Whether a <em>path</em> can be taken out (concurrent maintainability, fault tolerance) is tested on the Tier page, element by element.</p>'));
-    parts.push(sec('s9', 9, 'Annual performance', 'The plant re-solved in each climate bin at mean utilisation, then weighted by hours.', '<figure class="wide">' + binsChart(R) + '</figure>' +
+    parts.push(sec('s9', 9, 'Tier topology', 'Each Tier of the Uptime Institute Tier Standard: Topology drawn on this plant\'s unit counts (DH01\'s share), every element taken out one at a time — planned (an alternate path may be switched in first) and unplanned (only paths already carrying load count). The load survives only if every group it needs keeps a path: IT power AND mechanical power; liquid heat sink AND air heat sink.',
+      ctx.tier ? table(['Tier', 'System', 'Elements tested', 'Concurrently maintainable', 'Fault tolerant', 'What breaks it'], ctx.tier.map(function (t) {
+        var why = t.maintFail.length ? 'planned: ' + t.maintFail.slice(0, 3).join('; ') + (t.maintFail.length > 3 ? ' (+' + (t.maintFail.length - 3) + ')' : '')
+          : t.faultFail.length ? 'unplanned: ' + t.faultFail.slice(0, 3).join('; ') + (t.faultFail.length > 3 ? ' (+' + (t.faultFail.length - 3) + ')' : '') : '—';
+        return [esc(t.label), t.system, t.n, t.maint ? '<span class="tag ok">yes</span>' : '<span class="tag bad">no</span>', t.fault ? '<span class="tag ok">yes</span>' : '<span class="tag bad">no</span>', '<small>' + esc(why) + '</small>'];
+      })) + '<p class="note">The objective each Tier must reach: I and II neither, III concurrently maintainable, IV fault tolerant as well. Compartmentalisation and continuous cooling (Tier IV) are not modelled. Simulate each element on the Tier page.</p>'
+        : '<p class="note">The Tier model did not load on this page; open the report from the Tier page to include it.</p>'));
+    parts.push(sec('s10', 10, 'Annual performance', 'The plant re-solved in each climate bin at mean utilisation, then weighted by hours.', '<figure class="wide">' + binsChart(R) + '</figure>' +
       table(['Dry bulb °C', 'Wet bulb °C', 'Hours', 'PUE', 'Chiller COP', 'Trim share', 'Chiller PLR'], T.bins.map(function (b) {
         return [f(b.db, 1), f(b.wb, 1), f(b.hours), f(b.pue, 3), f(b.cop, 2), pct(b.trimShare, 1), pct(b.plr, 1)]; })) +
       table(['Annual quantity', 'Value'], [['Facility energy (M0)', f(A.m0MWh) + ' MWh'], ['IT energy (M3)', f(A.m3MWh) + ' MWh'], ['Renewable / reused heat', f(A.renewableMWh) + ' / ' + f(A.reuseMWh) + ' MWh'],
         ['Water', f(A.waterM3) + ' m³ (WUE ' + f(A.wue, 3) + ' L/kWh)'], ['CUE / REF / ERF', f(A.cue, 3) + ' / ' + f(A.ref, 3) + ' / ' + f(A.erf, 3)], ['Emissions', f(A.co2t) + ' tCO₂'],
         ['Energy / water cost', f(A.energyCost) + ' / ' + f(A.waterCost) + ' (at ' + p.elecPrice + ' per kWh, ' + p.waterTariff + ' per m³)']])));
     if (ctx.faults) {
-      parts.push(sec('s10', 10, 'DH01 hall & faults', 'One hall in plan, ' + f(h.lengthM, 1) + ' × ' + f(h.widthM, 1) + ' × ' + f(h.heightM, 1) + ' m (' + f(h.areaM2) + ' m², ' + f(h.volumeM3) + ' m³), ' + h.rows + ' rows × ' + h.racksPerRow + ' racks, re-solved under every fault the workbench models (common secondary header, 5 min after the fault, racks throttled). A thermal approximation for training, not CFD.',
+      parts.push(sec('s11', 11, 'DH01 hall & faults', 'One hall in plan, ' + f(h.lengthM, 1) + ' × ' + f(h.widthM, 1) + ' × ' + f(h.heightM, 1) + ' m (' + f(h.areaM2) + ' m², ' + f(h.volumeM3) + ' m³), ' + h.rows + ' rows × ' + h.racksPerRow + ' racks, re-solved under every fault the workbench models (common secondary header, 5 min after the fault, racks throttled). A thermal approximation for training, not CFD.',
         legend() + '<div class="plans">' + ctx.faults.map(function (x) { return hallPlan(R, x.s, x.label); }).join('') + '</div>' +
         table(['Fault', 'Supply air °C', 'Max inlet °C', '> 27 °C', '> 32 °C', 'IT throttled kW', 'CRAH coil limited', 'Note'], ctx.faults.map(function (x) {
           return [esc(x.label), f(x.s.supply, 1), f(x.s.maxInlet, 1), x.s.over27, x.s.over32, f(x.s.itLostKw), x.s.coilLimited ? 'yes' : 'no', '<small>' + esc(x.s.note || '—') + '</small>']; }))));
-    } else parts.push(sec('s10', 10, 'DH01 hall & faults', '', '<p class="note">The DH01 solver did not load on this page; open the report from the LTC hub to include it.</p>'));
-    parts.push(sec('s11', 11, 'Transients', 'First-order lumped thermal mass, integrated in 1 s steps: C·dT/dt = Q − f·Q·(T − T_sink)/(T0 − T_sink). f = heat rejection still available ÷ load.',
+    } else parts.push(sec('s11', 11, 'DH01 hall & faults', '', '<p class="note">The DH01 solver did not load on this page; open the report from the LTC hub to include it.</p>'));
+    parts.push(sec('s12', 12, 'Transients', 'First-order lumped thermal mass, integrated in 1 s steps: C·dT/dt = Q − f·Q·(T − T_sink)/(T0 − T_sink). f = heat rejection still available ÷ load.',
       '<div class="tr">' + ctx.transients.map(function (t) {
         return '<figure><figcaption><b>' + esc(t.title) + '</b> · ' + esc(t.label) + ' · rejection left ' + f(t.capacityLeft * 100) + ' % of load · ' + (t.secondsToLimit != null ? 'limit in <b>' + f(t.secondsToLimit) + ' s</b>' : 'stays below the limit') + '</figcaption>' + transientChart(t) + '</figure>';
       }).join('') + '</div>' + table(['Scenario', 'Variable', 'Start °C', 'Limit °C', 'Thermal mass MJ/K', 'Heat in kW', 'Time to limit'], ctx.transients.map(function (t) {
         return [esc(t.title), esc(t.label), f(t.series[0][1], 1), f(t.limitC, 1), f(t.C / 1000, 1), f(t.Q), t.secondsToLimit != null ? f(t.secondsToLimit) + ' s' : 'not reached in ' + f(t.series[t.series.length - 1][0]) + ' min']; }))));
     var dh = ctx.faults ? ctx.faults[0].s : null;
-    parts.push(sec('s12', 12, 'Standards cross-check', 'What the plant\'s numbers say against each standard the workbench covers. A screening check, not a compliance statement.', table(['Standard', 'Check', 'Plant value', 'Result'], [
+    parts.push(sec('s13', 13, 'Standards cross-check', 'What the plant\'s numbers say against each standard the workbench covers. A screening check, not a compliance statement.', table(['Standard', 'Check', 'Plant value', 'Result'], [
       ['ASHRAE TC 9.9 (air)', 'Supply air within A1 recommended 18–27 °C', f(p.supplyAirC, 1) + ' °C', p.supplyAirC >= 18 && p.supplyAirC <= 27 ? '<span class="tag ok">within</span>' : '<span class="tag bad">outside</span>'],
       ['ASHRAE TC 9.9 (air)', 'DH01 max rack inlet, normal operation', dh ? f(dh.maxInlet, 1) + ' °C' : '—', dh ? (dh.maxInlet <= 27 ? '<span class="tag ok">within</span>' : '<span class="tag bad">above 27 °C</span>') : '—'],
       ['ASHRAE liquid classes', 'Facility water supply class (W17…W45, W+)', f(l.fwsSupplyC, 1) + ' °C', liquidClass(l.fwsSupplyC)],
@@ -337,15 +348,16 @@
       ['Uptime Tier (capacity)', 'Every equipment class survives one unit out', reg.filter(function (r) { return (r[2] - 1) * r[3] >= r[4] - 0.5; }).length + ' of ' + reg.length + ' classes', reg.every(function (r) { return (r[2] - 1) * r[3] >= r[4] - 0.5; }) ? '<span class="tag ok">N+1 or better</span>' : '<span class="tag bad">a class is short</span>'],
       ['NFPA 75 / 2001', 'Clean-agent protected volume, one hall', f(h.volumeM3) + ' m³ (' + f(h.areaM2) + ' m² × ' + f(h.heightM, 1) + ' m)', 'agent quantity on the NFPA page'],
       ['TIA-942', 'Racks to cable, one hall', f(R.it.racksPerHall) + ' racks in ' + h.rows + ' rows', 'port counts on the TIA page']])));
-    parts.push(sec('s13', 13, 'Calculation trace', 'Every headline quantity with its formula and the inputs it reads — the same trace the ƒx inspector shows.', traceTable(R)));
-    parts.push(sec('s14', 14, 'Inputs', 'Every engine input. <span class="tag">auto</span> = the engine default or derived value; <span class="tag y">yours</span> = changed on the plant strip.', inputsTable(R, ctx)));
-    parts.push(sec('s15', 15, 'Assumptions & limits', '', '<ul class="find"><li>Steady-state energy balance at the design day and in each climate bin; part-load chillers from the PLR curve; coolers derated by LMTD against their rating.</li>' +
+    parts.push(sec('s14', 14, 'Calculation trace', 'Every headline quantity with its formula and the inputs it reads — the same trace the ƒx inspector shows.', traceTable(R)));
+    parts.push(sec('s15', 15, 'Inputs', 'Every engine input. <span class="tag">auto</span> = the engine default or derived value; <span class="tag y">yours</span> = changed on the plant strip.', inputsTable(R, ctx)));
+    parts.push(sec('s16', 16, 'Assumptions & limits', '', '<ul class="find"><li>Steady-state energy balance at the design day and in each climate bin; part-load chillers from the PLR curve; coolers derated by LMTD against their rating.</li>' +
       '<li>Climate bins are illustrative unless pasted from the site\'s EPW file. Annual figures scale with the bins\' hours.</li><li>DH01 is one hall, solved as a mass and energy balance per aisle with recirculation — a training approximation, not CFD.</li>' +
       '<li>Transients are first-order lumped models; they bound ride-through, they do not replace a controls study.</li><li>CUE is market-based (facility − renewable) × grid factor ÷ IT; state the accounting basis with the number.</li>' +
       '<li>Costs are in the site currency at a flat tariff; no demand charges, no escalation.</li></ul>'));
-    parts.push(sec('s16', 16, 'Data', 'The full engine result is embedded in this file. Download it to check any number in this report.',
+    parts.push(sec('s17', 17, 'Data', 'The full engine result is embedded in this file. Download it to check any number in this report.',
       '<p class="dl"><button type="button" data-dl="json">Download JSON</button> <button type="button" data-dl="csv">Download CSV</button> <button type="button" data-dl="html">Save this report (HTML)</button> <button type="button" data-print>Print / PDF</button></p>'));
-    return page(ctx, parts.join(''), R);
+    var toc = '<nav class="toc"><b>Contents</b><ol>' + TOC.map(function (t, i) { return '<li><a href="#s' + (i + 1) + '">' + esc(t) + '</a></li>'; }).join('') + '</ol></nav>';
+    return page(ctx, parts.join('').replace('%%TOC%%', toc), R);
   }
 
   /* flat key → value rows for the CSV: every scalar in the result, arrays of objects as indexed rows */
@@ -367,17 +379,17 @@
     '.bar{position:sticky;top:0;z-index:2;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 16px;background:#111827;color:#e5e7eb;font:500 12px "JetBrains Mono",monospace}.bar span{flex:1}' +
     'button{font:500 12px "JetBrains Mono",monospace;padding:8px 12px;min-height:36px;border:1px solid #9aa3ad;border-radius:3px;background:#fff;color:#111;cursor:pointer}.bar button{background:#1f2937;color:#f9fafb;border-color:#4b5563}' +
     '.eyebrow{font:500 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#b45309;margin:0}h1{font-size:28px;line-height:1.2;margin:6px 0 4px}.meta{color:#4b5563;font-size:12.5px;margin:0 0 16px}' +
-    'h2{font-size:19px;margin:36px 0 6px;padding-top:12px;border-top:1px solid #d5d9df}h2 .no{display:inline-block;min-width:30px;color:#b45309;font:500 14px "JetBrains Mono",monospace}.lead{color:#4b5563;margin:0 0 12px}' +
+    'section{scroll-margin-top:60px}h2{font-size:19px;margin:36px 0 6px;padding-top:12px;border-top:1px solid #d5d9df}h2 .no{display:inline-block;min-width:30px;color:#b45309;font:500 14px "JetBrains Mono",monospace}.lead{color:#4b5563;margin:0 0 12px}' +
     '.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:#d5d9df;border:1px solid #d5d9df}.kpis div{background:#f8fafc;padding:10px 12px}.kpis span{display:block;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em}.kpis b{font:500 17px "JetBrains Mono",monospace;font-variant-numeric:tabular-nums}' +
     '.toc ol{columns:2;margin:6px 0 0;padding-left:22px}.toc{margin:20px 0;padding:12px 16px;border:1px solid #d5d9df;background:#f8fafc}a{color:#0e6f8a}' +
     '.tw{overflow-x:auto;margin:10px 0}table{border-collapse:collapse;width:100%;font-size:12.5px}th,td{border-bottom:1px solid #e5e7eb;padding:5px 8px;text-align:left;vertical-align:top}th{font:500 10.5px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;background:#f3f4f6;white-space:nowrap}td.n{font-variant-numeric:tabular-nums}code{font:12px "JetBrains Mono",monospace;color:#374151}' +
-    'figure{margin:12px 0}figure.wide{overflow-x:auto}svg{width:100%;height:auto;display:block}svg .sl{font:12px "IBM Plex Sans",sans-serif;fill:#1f2933}svg .sv{font:500 11.5px "JetBrains Mono",monospace;fill:#374151}svg .sd{font:10.5px "JetBrains Mono",monospace;fill:#6b7280}' +
+    'figure{margin:12px 0}figure.wide{overflow-x:auto}.schem{margin:16px 0 24px}.schem figcaption{font-size:12.5px;margin-bottom:4px}svg{width:100%;height:auto;display:block}svg .sl{font:12px "IBM Plex Sans",sans-serif;fill:#1f2933}svg .sv{font:500 11.5px "JetBrains Mono",monospace;fill:#374151}svg .sd{font:10.5px "JetBrains Mono",monospace;fill:#6b7280}' +
     '.check{font:12px "JetBrains Mono",monospace;color:#1a8f4e;margin:6px 0}.note{font-size:12.5px;color:#4b5563}.find li{margin:4px 0}' +
     '.tag{display:inline-block;padding:1px 6px;border-radius:2px;font:500 10.5px "JetBrains Mono",monospace;background:#eef2f6;color:#4b5563}.tag.y{background:#fdecc8;color:#92400e}.tag.ok{background:#dcf3e5;color:#166534}.tag.bad{background:#fde2e2;color:#991b1b}' +
     '.plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}.plan figcaption{font-size:11.5px;color:#374151;margin-top:4px}.plan figcaption b{display:block;font-size:12.5px}' +
     '.legend{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font:10.5px "JetBrains Mono",monospace;margin:8px 0}.legend span{padding:2px 6px;color:#111}.legend i{margin:0 12px 0 6px;font-style:normal;color:#6b7280}.legend b{display:inline-block;width:10px;height:10px;margin:0 4px 0 8px}' +
     '.tr{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}.tr figcaption{font-size:12px}.dl button{margin:4px 4px 4px 0}' +
-    '@media print{.bar,.dl{display:none}main{max-width:none;padding:0}section{break-inside:auto}figure,tr,.kpis{break-inside:avoid}h2{break-after:avoid}body{font-size:11.5px}}' +
+    '@media print{.bar,.dl{display:none}.schem svg{min-width:0!important}main{max-width:none;padding:0}section{break-inside:auto}figure,tr,.kpis{break-inside:avoid}h2{break-after:avoid}body{font-size:11.5px}}' +
     '@media(max-width:600px){h1{font-size:22px}.toc ol{columns:1}figure.wide svg{min-width:720px}}';
 
   function page(ctx, body, R) {
@@ -390,7 +402,7 @@
       'if(k==="html")sv(new Blob(["<!doctype html>\\n"+document.documentElement.outerHTML],{type:"text/html"}),"' + name + '.html")});';
     return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LTC plant report</title>' +
       '<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">' +
-      '<style>' + CSS + '</style></head><body><div class="bar"><span>LTC plant report · ' + esc(ctx.date || '') + '</span><button type="button" data-print>Print / PDF</button><button type="button" data-dl="json">JSON</button><button type="button" data-dl="csv">CSV</button><button type="button" data-dl="html">Save HTML</button></div><main>' +
+      '<style>' + (ctx.cssVars ? ':root{' + esc(ctx.cssVars) + '}' : '') + CSS + '</style></head><body><div class="bar"><span>LTC plant report · ' + esc(ctx.date || '') + '</span><button type="button" data-print>Print / PDF</button><button type="button" data-dl="json">JSON</button><button type="button" data-dl="csv">CSV</button><button type="button" data-dl="html">Save HTML</button></div><main>' +
       body + '</main><script type="application/json" id="rz-data">' + data + '<\/script><script type="text/plain" id="rz-csv">' + esc(csv(R)) + '<\/script><script>' + js + '<\/script></body></html>';
   }
 
@@ -404,28 +416,96 @@
       return t;
     });
   }
+  /* the Tier objectives on this plant, both systems; the page's own system choice is restored */
+  var GROUP = { power: { main: 'IT power', mech: 'mechanical power' }, cooling: { main: 'liquid heat sink', air: 'air heat sink' } };
+  function tierSweep(T) {
+    if (!T || !T.sweep) return null;
+    var was = T.system(), out = [];
+    try {
+      ['power', 'cooling'].forEach(function (sys) {
+        T.system(sys);
+        [1, 2, 3, 4].forEach(function (t) {
+          var sw = T.sweep(t), lab = (sys === 'power' ? T.TOPO : T.COOL)[t].label;
+          out.push({ tier: t, system: sys, label: lab, n: sw.length, maint: sw.every(function (r) { return r.maint; }), fault: sw.every(function (r) { return r.fault; }),
+            maintFail: sw.filter(function (r) { return !r.maint; }).map(function (r) { return r.e.label; }),
+            faultFail: sw.filter(function (r) { return !r.fault; }).map(function (r) { return r.e.label + (r.lost && r.lost.length ? ' → ' + r.lost.map(function (g) { return GROUP[sys][g] || g; }).join(' + ') + ' lost' : ''); }) });
+        });
+      });
+    } finally { T.system(was); }
+    return out;
+  }
   function context(P, R, state) {
     var D = root.LTCDH01, pr = Object.keys(P.PRESETS).filter(function (k) { return P.PRESETS[k].chillerType === R.input.chillerType && P.PRESETS[k].liquidRejection === R.input.liquidRejection; })[0];
     return {
       version: root.RZ_VERSION, date: new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC', url: root.location ? root.location.href.split('#')[0] : '',
       state: state, defaults: P.DEFAULTS, presetLabel: pr ? P.PRESETS[pr].label : 'custom plant', climateLabel: (P.CLIMATES[R.input.climate] || { label: 'custom climate' }).label,
       transients: transients(P, R),
+      tier: tierSweep(root.LTCTier),
       faults: D ? D.FAULTS.map(function (x) { return { id: x[0], label: x[1], s: D.solveHall(R, x[0], 'common', 5, 'throttled') }; }) : null
     };
   }
-  function needDh01(done) {
-    if (root.LTCDH01) return done();
-    var me = document.querySelector('script[src*="ltc-report.js"]'), s = document.createElement('script');
-    s.src = (me ? me.src.replace(/ltc-report\.js.*$/, '') : 'js/') + 'ltc-dh01.js?v=' + encodeURIComponent(root.RZ_VERSION || '');
-    s.onload = s.onerror = function () { done(); };
-    document.head.appendChild(s);
+  /* the DH01 solver and the Tier model load on demand where the page does not carry them */
+  function needModels(done) {
+    var want = [['LTCDH01', 'ltc-dh01.js'], ['LTCTier', 'ltc-tier.js'], ['LTCHub', 'ltc-hub.js']].filter(function (m) { return !root[m[0]]; }), left = want.length;
+    if (!left) return done();
+    var me = document.querySelector('script[src*="ltc-report.js"]'), base = me ? me.src.replace(/ltc-report\.js.*$/, '') : 'js/';
+    want.forEach(function (m) {
+      var s = document.createElement('script');
+      s.src = base + m[1] + '?v=' + encodeURIComponent(root.RZ_VERSION || '');
+      s.onload = s.onerror = function () { if (--left === 0) done(); };
+      document.head.appendChild(s);
+    });
+  }
+  /* An RZDiagram drawing takes its colours and type from the page's stylesheet (custom properties,
+   * classes). A standalone file has neither, so each element's computed paint is written onto it —
+   * resolved under the light theme, because the report is a paper document whatever the page shows. */
+  var PAINT = ['fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin', 'opacity', 'fill-opacity', 'stroke-opacity',
+               'font-family', 'font-size', 'font-weight', 'letter-spacing', 'text-anchor', 'dominant-baseline', 'visibility', 'display'];
+  function paintInline(markup, width) {
+    var host = document.createElement('div');
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:absolute;left:-100000px;top:0;width:' + width + 'px';
+    host.className = 'ltc-fig';
+    host.innerHTML = markup;
+    (document.querySelector('.ltc-work') || document.body).appendChild(host);
+    var src = host.querySelector('svg'), out = src.cloneNode(true), a = src.querySelectorAll('*'), b = out.querySelectorAll('*');
+    for (var i = 0; i < a.length; i++) {
+      var cs = getComputedStyle(a[i]), st = [];
+      PAINT.forEach(function (k) { var v = cs.getPropertyValue(k); if (v && v !== 'normal') st.push(k + ':' + v); });
+      b[i].setAttribute('style', st.join(';'));
+      b[i].removeAttribute('class');
+      b[i].removeAttribute('tabindex');
+      if (/^animate/.test(b[i].tagName)) b[i].remove();
+    }
+    out.removeAttribute('class');
+    out.setAttribute('style', 'width:100%;height:auto;background:#fff;min-width:' + Math.round(width * 0.8) + 'px');   // labels stay ≥ 80 % of drawn size: scroll, never shrink
+    host.remove();
+    return new XMLSerializer().serializeToString(out);
+  }
+  function plantViews(R) {
+    var H = root.LTCHub;
+    if (!H || !H.svg || !root.RZDiagram) return null;
+    var html = document.documentElement, theme = html.getAttribute('data-theme');
+    html.setAttribute('data-theme', 'light');
+    try {
+      var views = H.views().map(function (v) { var x = H.svg(v.id, R); return { id: v.id, label: v.label, svg: paintInline(x.svg, x.width), warnings: x.warnings }; });
+      // markers and <use> copies still name custom properties: carry their light-theme values along
+      var names = {}, cs = getComputedStyle(html);
+      views.forEach(function (v) { (v.svg.match(/var\(--[\w-]+/g) || []).forEach(function (m) { names[m.slice(4)] = 1; }); });
+      views.vars = Object.keys(names).map(function (k) { return k + ':' + cs.getPropertyValue(k).trim(); }).join(';');
+      return views;
+    } catch (e) { console.error('[ltc-report] plant views', e); return null; }
+    finally { if (theme) html.setAttribute('data-theme', theme); else html.removeAttribute('data-theme'); }
   }
   function exportReport() {
     var S = root.LTCPlantStrip, P = root.LTCPlant;
     if (!S || !P) return;
     var tab = root.open('', '_blank');   // opened inside the click, before the async load, so no popup blocker
-    needDh01(function () {
-      var g = S.get(), html = build(g.result, context(P, g.result, g.state));
+    needModels(function () {
+      var g = S.get(), ctx = context(P, g.result, g.state);
+      ctx.views = plantViews(g.result);
+      ctx.cssVars = ctx.views ? ctx.views.vars : '';
+      var html = build(g.result, ctx);
       var url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
       if (tab && !tab.closed) tab.location.href = url;
       else { var a = document.createElement('a'); a.href = url; a.download = 'ltc-plant-report.html'; document.body.appendChild(a); a.click(); a.remove(); }

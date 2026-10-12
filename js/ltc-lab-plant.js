@@ -109,7 +109,7 @@
       ['racks', 3, 0, 'IT racks', r.it.racks + ' racks · ' + r.input.halls + ' halls', 'rack'],
       ['elec', 1, 1, 'Electrical rooms', Math.round(E.roomLoadKw) + ' kW to CHW', 'crah'],
       ['cdu', 2, 1, 'CDUs', L.cduTotal + ' × ' + r.input.cduUnitKw + ' kW', 'cdu'],
-      ['cool', 2, 2, names[L.coolerType], L.coolerUnitsTotal + ' units · leaves ' + L.coolerLeavingC.toFixed(1) + ' °C', 'dryCooler'],
+      ['cool', 2, 2, names[L.coolerType], L.coolerUnitsTotal + ' units · ' + (Math.round(L.coolerLeavingC * 10) / 10) + ' °C out', 'dryCooler'],
       ['crah', 2, 3, 'CRAHs', A.crahTotal + ' × ' + r.input.crahUnitKw + ' kW', 'crah'],
       ['chiller', 1, 3, 'Chillers', A.chillersTotal + ' × ' + (r.input.chillerUnitKw / 1000) + ' MW · COP ' + A.chillerCop.toFixed(1), 'chiller'],
       ['tower', 0, 3, A.chillerType === 'air' && L.coolerType !== 'tower' ? 'Air-cooled condensers' : 'Cooling towers', f1(A.towerKw), 'coolingTower']

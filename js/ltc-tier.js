@@ -426,6 +426,7 @@
 
   var fig = null;
   function boot() {
+    if (!document.getElementById('tFig')) return;   // loaded elsewhere (the report) for the model only
     L.init({ module: 'tier' });
     document.querySelectorAll('[data-tier]').forEach(function (b) {
       b.addEventListener('click', function () { st.tier = +b.getAttribute('data-tier'); st.out = {}; render(); L.closeInspector(); });
@@ -449,6 +450,6 @@
     document.getElementById('p-availability').addEventListener('input', availCalc);
     availCalc();
   }
-  window.LTCTier = { get TOPO() { return TOPO; }, get COOL() { return COOL; }, powered: powered, sweep: sweep, kOfN: kOfN, lostGroups: lostGroups, redLabel: redLabel, system: function (n) { sysName = n; } };
+  window.LTCTier = { get TOPO() { return TOPO; }, get COOL() { return COOL; }, powered: powered, sweep: sweep, kOfN: kOfN, lostGroups: lostGroups, redLabel: redLabel, system: function (n) { var was = sysName; if (n) sysName = n; return was; } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

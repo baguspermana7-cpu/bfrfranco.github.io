@@ -148,6 +148,8 @@
   function f0(v) { return Math.round(v).toLocaleString('en-US'); }
   function f1(v) { return (Math.round(v * 10) / 10).toLocaleString('en-US'); }
   function mw(kw) { return f1(kw / 1000) + ' MW'; }
+  /* a connector label sits in the gap between two columns: whole MW from 10 MW up, one decimal below */
+  function mwShort(kw) { return (kw >= 9950 ? f0(kw / 1000) : f1(kw / 1000)) + ' MW'; }
   var COOLER_NAME = { drycooler: 'Dry coolers', adiabatic: 'Adiabatic coolers', fluidcooler: 'Fluid coolers', tower: 'Towers + HX' };
 
   /* live sublabel, tooltip rows and the headline formula for each block */
@@ -158,7 +160,7 @@
     var map = {
       utility: { sub: mw(T.facilityKw) + ' import', rows: [['Facility load', mw(T.facilityKw)], ['PUE design / annual', T.pue.toFixed(3) + ' / ' + T.pueAnnual.toFixed(3)]], f: 'IT + cooling + losses + aux' },
       tx: { sub: f0(E.txLossKw) + ' kW loss', rows: [['Efficiency', (I.txEff * 100).toFixed(1) + ' %'], ['Loss', f0(E.txLossKw) + ' kW']], f: 'loss = input × (1 − η)' },
-      genset: { sub: 'MV bus · carries ' + mw(T.facilityKw), rows: [['Load to carry', mw(T.facilityKw)], ['Connection', 'MV paralleling bus, ahead of the transformers']], f: 'standby for the whole facility, cooling included' },
+      genset: { sub: 'MV bus · ' + mwShort(T.facilityKw), rows: [['Load to carry', mw(T.facilityKw)], ['Connection', 'MV paralleling bus, ahead of the transformers']], f: 'standby for the whole facility, cooling included' },
       swgr: { sub: 'A / B boards', rows: [['To UPS', mw(E.upsInKw)], ['To MCC', mw(E.mccKw)]] },
       mcc: { sub: mw(E.mccKw) + ' mech', rows: [['Chillers', f0(A.chillerKwe) + ' kW'], ['CRAH fans', f0(A.fanKw) + ' kW'], ['FWS pumps', f0(Lq.fwsPumpKw) + ' kW'], ['Cooler fans', f0(Lq.coolerFanKw) + ' kW'], ['Trim chiller', f0(Lq.trimKwe) + ' kW'], ['CHW + CW pumps', f0(A.chwPumpKw + A.cwPumpKw) + ' kW'], ['Tower fans', f0(A.towerFanKw) + ' kW']], f: 'Σ mechanical loads not on UPS' },
       ups: { sub: (I.upsEff * 100).toFixed(0) + ' % · ' + f0(E.upsLossKw) + ' kW loss', rows: [['Output', mw(E.upsOutKw)], ['Loss', f0(E.upsLossKw) + ' kW'], ['CDU pumps on UPS', I.cduOnUps ? 'yes' : 'no']], f: 'input = (IT + CDU pumps + distribution) / η' },
@@ -167,13 +169,13 @@
       racks: { sub: f0(R.it.racks) + ' racks · ' + I.halls + ' halls', rows: [['IT load', mw(R.it.kw)], ['Into cold plates', mw(Lq.itKw) + ' (' + I.capturePct + ' %)'], ['Left in the air', mw(A.itKw)], ['Racks per hall', f0(R.it.racksPerHall) + ' × ' + I.rackKw + ' kW']], f: 'liquid = IT × capture; air = IT − liquid' },
       cdu: { sub: Lq.cduTotal + ' × ' + f0(I.cduUnitKw) + ' kW · N+' + I.cduRedundancy, rows: [['Per hall', Lq.cduPerHall + ' (' + Lq.cduDutyN + ' duty)'], ['TCS', I.tcsSupplyC + ' / ' + I.tcsReturnC + ' °C'], ['TCS flow', f0(Lq.tcsLps) + ' L/s'], ['TCS pumps', f0(Lq.tcsPumpKw) + ' kW'], ['Feed', I.cduFeed === 'dual' ? 'dual (ATS)' : 'single, A/B alternating']], f: 'ceil(hall liquid duty / unit) + N' },
       fws: { sub: f1(Lq.fwsSupplyC) + ' / ' + f1(Lq.fwsReturnC) + ' °C · ' + f0(Lq.fwsLps) + ' L/s', rows: [['Supply / return', Lq.fwsSupplyC + ' / ' + Lq.fwsReturnC + ' °C'], ['Flow', f0(Lq.fwsLps) + ' L/s'], ['Pumps', f0(Lq.fwsPumpKw) + ' kW']], f: 'flow = Q / (cp · ΔT_FWS)' },
-      reject: { sub: Lq.coolerUnitsTotal + ' units · leaves ' + f1(Lq.coolerLeavingC) + ' °C', rows: [['Type', COOLER_NAME[Lq.coolerType]], ['Design sink', f1(Lq.coolerSinkC) + ' °C'], ['Leaving water', f1(Lq.coolerLeavingC) + ' °C'], ['Duty', mw(Lq.coolerKw)], ['Units (N+1)', Lq.coolerUnitsTotal + ' (each derated to ' + (Lq.coolerDerate * 100).toFixed(0) + ' %)']], f: 'units = duty / (rated × LMTD_design / LMTD_rating)' },
+      reject: { sub: Lq.coolerUnitsTotal + ' units · ' + f1(Lq.coolerLeavingC) + ' °C out', rows: [['Type', COOLER_NAME[Lq.coolerType]], ['Design sink', f1(Lq.coolerSinkC) + ' °C'], ['Leaving water', f1(Lq.coolerLeavingC) + ' °C'], ['Duty', mw(Lq.coolerKw)], ['Units (N+1)', Lq.coolerUnitsTotal + ' (each derated to ' + (Lq.coolerDerate * 100).toFixed(0) + ' %)']], f: 'units = duty / (rated × LMTD_design / LMTD_rating)' },
       trim: { sub: Lq.trimKw ? mw(Lq.trimKw) + ' on design day' : 'idle at design', rows: [['Design-day share', (Lq.trimShareDesign * 100).toFixed(0) + ' %'], ['Duty', mw(Lq.trimKw)], ['Input', f0(Lq.trimKwe) + ' kW'], ['Hours running / yr', f0(T.trimHours)]], f: 'FWS heat × (cooler leaving − FWS supply) / ΔT' },
       crah: { sub: A.crahTotal + ' × ' + I.crahUnitKw + ' kW · N+' + I.crahRedundancy, rows: [['Per hall', A.crahPerHall + ' (' + A.crahDutyN + ' duty)'], ['Hall air load', f0(A.hallLoadKw) + ' kW'], ['Airflow per hall', f0(A.airflowHallM3s) + ' m³/s'], ['Fan power', f0(A.fanKw) + ' kW']], f: 'load = (air IT + CDU skin) / (1 − fan fraction)' },
       chw: { sub: A.chwSupplyC + ' / ' + A.chwReturnC + ' °C · ' + f0(A.chwLps) + ' L/s', rows: [['Supply / return', A.chwSupplyC + ' / ' + A.chwReturnC + ' °C'], ['Flow', f0(A.chwLps) + ' L/s'], ['Load', mw(A.chillerEvapKw)]], f: 'flow = evaporator load / (cp · ΔT)' },
       chiller: { sub: A.chillersTotal + ' × ' + f0(I.chillerUnitKw / 1000) + ' MW · COP ' + A.chillerCop.toFixed(1), rows: [['Type', air ? 'air-cooled' : 'water-cooled'], ['Running', A.chillersTotal + ' at ' + (A.chillerPlr * 100).toFixed(0) + ' % load'], ['COP / kW/RT', A.chillerCop.toFixed(2) + ' / ' + A.chillerKwPerRt.toFixed(3)], ['Input', f0(A.chillerKwe) + ' kW']], f: 'COP = rated × part-load factor × lift ratio' },
       tower: air && Lq.coolerType !== 'tower' ? { sub: 'air-cooled condensers', rows: [['Condenser heat', 'to air at the chillers']], f: 'no tower: no evaporation' }
-        : { sub: mw(A.towerKw) + ' · ' + f1(A.makeupLps) + ' L/s make-up', rows: [['Heat rejected', mw(A.towerKw)], ['Make-up', f1(A.makeupLps) + ' L/s'], ['Water / year', f0(T.waterM3Year) + ' m³'], ['WUE annual', T.wueAnnual.toFixed(2) + ' L/kWh']], f: 'evaporation = latent heat / h_fg; make-up = evap × C/(C−1)' },
+        : { sub: mwShort(A.towerKw) + ' · ' + (A.makeupLps >= 99.95 ? f0(A.makeupLps) : f1(A.makeupLps)) + ' L/s make-up', rows: [['Heat rejected', mw(A.towerKw)], ['Make-up', f1(A.makeupLps) + ' L/s'], ['Water / year', f0(T.waterM3Year) + ' m³'], ['WUE annual', T.wueAnnual.toFixed(2) + ' L/kWh']], f: 'evaporation = latent heat / h_fg; make-up = evap × C/(C−1)' },
       fire: { sub: 'detect · suppress', rows: [] }
     };
     return map[id] || null;
@@ -250,7 +252,7 @@
               ['mcc', 'l', 'chiller', 'r'], ['chiller', 'b', 'tower', 't', 91]] }
   };
   var view = 'overview';
-  var NW = 172, CG = 40, RG = 56, NH = 88;
+  var NW = 172, CG = 48, RG = 56, NH = 88;
   function build(D, o) {
     var V = VIEWS[view];
     var d = flowing(D.create({
@@ -264,7 +266,7 @@
     var STY = { POWER: { tier: 1, stroke: 'ink' }, LIQ: { pattern: 'dashed', stroke: 'link' },
                 AIR: { pattern: 'dash-dot', stroke: 'accent' }, LOSS: { pattern: 'dotted', stroke: 'muted' },
                 MON: { pattern: 'dotted', stroke: 'soft', marker: false } };
-    var LBL = R ? { it: mw(R.it.kw), liq: mw(R.liquid.itKw), air: mw(R.air.itKw) + ' air', mcc: mw(R.elec.mccKw) + ' mech', cdupumps: 'CDU pumps on UPS' } : {};
+    var LBL = R ? { it: mwShort(R.it.kw), liq: mwShort(R.liquid.itKw), air: mwShort(R.air.itKw) + ' air', mcc: mwShort(R.elec.mccKw) + ' mech', cdupumps: 'CDU pumps on UPS' } : {};
     var box = {};
     var NV = NARROW[view];
     function pos(c, r) { return o.narrow ? { x: NX[c][0], y: 16 + r * (NH + 36) } : { x: 24 + c * (NW + CG), y: 24 + r * (NH + RG) }; }
@@ -509,8 +511,19 @@
       }).join('') + '</tbody></table>';
   }
 
+  /* the report draws every view of the plant on a given result; the page's own view and result are kept */
+  window.LTCHub = {
+    views: function () { return Object.keys(VIEWS).map(function (k) { return { id: k, label: VIEWS[k].label }; }); },
+    svg: function (v, r, narrow) {
+      var v0 = view, r0 = R;
+      try { view = v; R = r || R; var d = build(window.RZDiagram, { narrow: !!narrow }); d.fit(16); return { svg: d.render(), width: d.width, height: d.height, warnings: d.warnings.length, why: d.warnings.map(function (w) { return w.kind + ": " + w.message; }) }; }
+      finally { view = v0; R = r0; }
+    }
+  };
+
   var fig = null;
   function boot() {
+    if (!document.getElementById('ltcMap')) return;   // loaded elsewhere (the report) to draw the plant only
     L.init({ module: 'hub' });
     fig = L.draw(document.getElementById('ltcMap'), build, open);
     viewBar();
