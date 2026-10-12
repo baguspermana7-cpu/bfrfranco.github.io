@@ -286,7 +286,9 @@
         // trim chiller: evaporator ~3 K below FWS supply; condenser on the plant's own medium
         var tEvT = (p.tcsSupplyC - p.cduApproachK) - 3;
         var condR = p.chillerType === 'air' ? 42 : 35, condN = p.chillerType === 'air' ? dbC + 12 : wbC + p.towerApproachK + 5;
-        var trimCop = p.trimChillerCop * clamp((condR - tEvT) / Math.max(condN - tEvT, 3), 0.4, 1.8);
+        // an air-cooled trim chiller is rated lower, as the main chiller is (chillerCop)
+        var trimRated = p.chillerType === 'air' ? Math.min(p.trimChillerCop, 5.5) : p.trimChillerCop;
+        var trimCop = trimRated * clamp((condR - tEvT) / Math.max(condN - tEvT, 3), 0.4, 1.8);
         var trimKwe = trimKw / trimCop;
         var coolerFans = c.qCooler / 1000 * p.coolerFanKwPerMw[p.liquidRejection];
 

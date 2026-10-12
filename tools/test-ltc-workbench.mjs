@@ -307,6 +307,13 @@ for (const [page, mod] of Object.entries(PAGES)) {
        && hb.LTCHub.svg('overview', r37).svg.includes(r37.it.racks + ' racks'),
        'every plant-map view renders for the report with zero engine warnings, on the result it is given (37 MW: ' + r37.it.racks + ' racks)');
   }
+  {
+    /* direction of the swing the report prints, and the air-cooled plant costs more power on the design day than the water-cooled one */
+    const O = X.options(P, P.compute({})), sv = (k) => O.sens.find((x) => x.key === k);
+    ok('W12p', ['capturePct', 'tcsSupplyC', 'upsEff', 'chillerCopRated'].every((k) => sv(k).hi.r.pue < sv(k).lo.r.pue)
+       && O.presets.find((o) => o.id === 'baseline').pueD > O.presets.find((o) => o.id === 'dry').pueD && O.presets.find((o) => o.id === 'baseline').wue === 0,
+       'more capture, warmer TCS, better UPS and chiller each lower annual PUE; air-cooled chillers (and trim) draw more on the design day than water-cooled, with no water');
+  }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));
   for (const [i, st] of plants.entries()) {
@@ -329,6 +336,11 @@ for (const [page, mod] of Object.entries(PAGES)) {
     ok('W12m:' + id, ctx.tier && ctx.tier.length === 8 && ['power', 'cooling'].every((sys) => !tv(sys, 1).maint && !tv(sys, 2).maint && tv(sys, 3).maint && !tv(sys, 3).fault && tv(sys, 4).maint && tv(sys, 4).fault)
        && text.includes('Tier topology') && sb.LTCTier.system() === 'power',
        'the report carries the Tier sweep for power and cooling, each Tier reaching its own objective, and leaves the page on the system it was showing');
+    const O = ctx.options, cur = (l) => l.filter((o) => o.current), same = (o) => Math.abs(o.pue - R.annual.pue3) < 1e-9 && Math.abs(o.cost - R.annual.energyCost - R.annual.waterCost) < 1e-6;
+    ok('W12o:' + id, O && O.presets.length === 4 && cur(O.presets).length === 1 && same(cur(O.presets)[0]) && cur(O.climates).length === 1 && same(cur(O.climates)[0])
+       && new Set(O.climates.map((o) => o.pue.toFixed(6))).size === O.climates.length && O.sens.every((s) => s.lo.v <= s.base && s.hi.v >= s.base && s.lo.v < s.hi.v)
+       && text.includes('Options &amp; sensitivity') && O.presets.every((o) => text.includes(o.label)),
+       'options: every configuration and climate re-solved (this plant\'s row equals the result, each climate differs), every sensitivity step brackets the input');
     ok('W12j:' + id, ctx.transients.length === 4 && ctx.transients.every((t) => t.series.length > 2), 'four transients, each with a time series');
     const data = JSON.parse(html.match(/<script type="application\/json" id="rz-data">([\s\S]*?)<\/script>/)[1]);
     ok('W12k:' + id, data.result.totals.pueAnnual === R.totals.pueAnnual && data.result.design.facility === R.design.facility, 'the embedded data is the engine result itself');

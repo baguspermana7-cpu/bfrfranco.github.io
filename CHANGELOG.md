@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.20.2 — 2026-10-13
+
+### Plant report compares the options; air-cooled trim chillers rated as air-cooled
+
+**Report — Options & sensitivity.** New section: the same IT load re-solved under each of the four plant configurations and in each of the three climates, and a tornado of annual PUE for seven design inputs moved one practical step each way: liquid capture ±5 pts, TCS supply ±3 °C, utilisation ±0.1, CHW supply ±2 °C, chiller COP ±1, CRAH ΔT ±2 K, UPS efficiency ±1 pt. Each row shows design and annual PUE, WUE, facility MWh, water, energy + water cost, the cost difference against this plant, and tCO₂. Key findings name the cheapest configuration and the input that moves PUE most. At the 100 MW default, adiabatic coolers would run about 1.03 M a year cheaper; TCS supply moves annual PUE most, from 1.215 to 1.176.
+
+**Fixed — air-cooled trim chiller rated like a water-cooled one.** The main chiller's rated COP is capped at 5.5 when air-cooled; the trim chiller kept the water-cooled 7. So the air-cooled plant came out more efficient on the design day (PUE 1.290) than the water-cooled one with towers (1.298). The trim chiller now takes the same cap. Air-cooled design PUE: 1.323. Water-cooled plants are unchanged.
+
+**Fixed — climate comparison.** A re-solve that changed only the climate kept the current plant's bins and design conditions, so every climate gave the same answer. The report's re-solve now takes the climate's own values.
+
+**Gates** — `tools/test-ltc-workbench.mjs` (293 assertions):
+- **W12o:** on 8 plants, every configuration and climate is re-solved; this plant's row equals the result; each climate differs; each step brackets the input.
+- **W12p:** more capture, a warmer TCS, a better UPS and a better chiller each lower annual PUE; the air-cooled plant draws more on the design day than the water-cooled one and uses no water.
+- Both fail on the v3.20.1 tree (9 assertions).
+
 ## v3.20.1 — 2026-10-12
 
 ### Plant report draws the plant and tests every Tier; the plant map holds on every plant size

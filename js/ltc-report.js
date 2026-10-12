@@ -210,6 +210,11 @@
     }
     var fws = ctx.transients.filter(function (t) { return t.kind === 'fws-pump'; })[0];
     if (fws && fws.secondsToLimit != null) out.push('Facility water lost: the TCS loop reaches its ' + f(fws.limitC) + ' °C throttle point in <b>' + f(fws.secondsToLimit) + ' s</b> on its own water — the ride-through the controls and the standby pumps must beat.');
+    if (ctx.options) {
+      var O = ctx.options, best = O.presets.reduce(function (m, o) { return o.cost < m.cost ? o : m; }), top = O.sens.reduce(function (m, x) { return Math.abs(x.hi.r.pue - x.lo.r.pue) > Math.abs(m.hi.r.pue - m.lo.r.pue) ? x : m; });
+      out.push((best.current ? 'This configuration is the cheapest to run of the four' : 'Cheapest to run of the four configurations: <b>' + esc(best.label) + '</b>, ' + f(O.base.cost - best.cost) + ' a year less than this plant (annual PUE ' + f(best.pue, 3) + ', WUE ' + f(best.wue, 2) + ' L/kWh)') +
+        '. The design input that moves annual PUE most is <b>' + esc(top.label) + '</b>: ' + f(top.lo.r.pue, 3) + ' to ' + f(top.hi.r.pue, 3) + ' over one step each way.');
+    }
     out.push('Heat balance closes to <b>' + f(Math.abs(R.design.balanceErr), 6) + ' kW</b>: every kilowatt into the building leaves through a named heat sink.');
     return '<ul class="find">' + out.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ul>';
   }
@@ -326,6 +331,7 @@
       table(['Annual quantity', 'Value'], [['Facility energy (M0)', f(A.m0MWh) + ' MWh'], ['IT energy (M3)', f(A.m3MWh) + ' MWh'], ['Renewable / reused heat', f(A.renewableMWh) + ' / ' + f(A.reuseMWh) + ' MWh'],
         ['Water', f(A.waterM3) + ' m³ (WUE ' + f(A.wue, 3) + ' L/kWh)'], ['CUE / REF / ERF', f(A.cue, 3) + ' / ' + f(A.ref, 3) + ' / ' + f(A.erf, 3)], ['Emissions', f(A.co2t) + ' tCO₂'],
         ['Energy / water cost', f(A.energyCost) + ' / ' + f(A.waterCost) + ' (at ' + p.elecPrice + ' per kWh, ' + p.waterTariff + ' per m³)']])));
+    if (ctx.options) parts.push(sec('', 0, 'Options & sensitivity', 'What this IT load would use and cost under another plant, at another site, or with one design input moved by a practical step.', optionsSection(ctx.options)));
     if (ctx.faults) {
       parts.push(sec('s11', 11, 'DH01 hall & faults', 'One hall in plan, ' + f(h.lengthM, 1) + ' × ' + f(h.widthM, 1) + ' × ' + f(h.heightM, 1) + ' m (' + f(h.areaM2) + ' m², ' + f(h.volumeM3) + ' m³), ' + h.rows + ' rows × ' + h.racksPerRow + ' racks, re-solved under every fault the workbench models (common secondary header, 5 min after the fault, racks throttled). A thermal approximation for training, not CFD.',
         legend() + '<div class="plans">' + ctx.faults.map(function (x) { return hallPlan(R, x.s, x.label); }).join('') + '</div>' +
@@ -379,7 +385,7 @@
     '.bar{position:sticky;top:0;z-index:2;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 16px;background:#111827;color:#e5e7eb;font:500 12px "JetBrains Mono",monospace}.bar span{flex:1}' +
     'button{font:500 12px "JetBrains Mono",monospace;padding:8px 12px;min-height:36px;border:1px solid #9aa3ad;border-radius:3px;background:#fff;color:#111;cursor:pointer}.bar button{background:#1f2937;color:#f9fafb;border-color:#4b5563}' +
     '.eyebrow{font:500 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#b45309;margin:0}h1{font-size:28px;line-height:1.2;margin:6px 0 4px}.meta{color:#4b5563;font-size:12.5px;margin:0 0 16px}' +
-    'section{scroll-margin-top:60px}h2{font-size:19px;margin:36px 0 6px;padding-top:12px;border-top:1px solid #d5d9df}h2 .no{display:inline-block;min-width:30px;color:#b45309;font:500 14px "JetBrains Mono",monospace}.lead{color:#4b5563;margin:0 0 12px}' +
+    'section{scroll-margin-top:60px}h2{font-size:19px;margin:36px 0 6px;padding-top:12px;border-top:1px solid #d5d9df}h2 .no{display:inline-block;min-width:30px;color:#b45309;font:500 14px "JetBrains Mono",monospace}.lead{color:#4b5563;margin:0 0 12px}h3{font-size:14.5px;margin:22px 0 8px;color:#1f2937}' +
     '.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:#d5d9df;border:1px solid #d5d9df}.kpis div{background:#f8fafc;padding:10px 12px}.kpis span{display:block;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em}.kpis b{font:500 17px "JetBrains Mono",monospace;font-variant-numeric:tabular-nums}' +
     '.toc ol{columns:2;margin:6px 0 0;padding-left:22px}.toc{margin:20px 0;padding:12px 16px;border:1px solid #d5d9df;background:#f8fafc}a{color:#0e6f8a}' +
     '.tw{overflow-x:auto;margin:10px 0}table{border-collapse:collapse;width:100%;font-size:12.5px}th,td{border-bottom:1px solid #e5e7eb;padding:5px 8px;text-align:left;vertical-align:top}th{font:500 10.5px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;background:#f3f4f6;white-space:nowrap}td.n{font-variant-numeric:tabular-nums}code{font:12px "JetBrains Mono",monospace;color:#374151}' +
@@ -389,7 +395,7 @@
     '.plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}.plan figcaption{font-size:11.5px;color:#374151;margin-top:4px}.plan figcaption b{display:block;font-size:12.5px}' +
     '.legend{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font:10.5px "JetBrains Mono",monospace;margin:8px 0}.legend span{padding:2px 6px;color:#111}.legend i{margin:0 12px 0 6px;font-style:normal;color:#6b7280}.legend b{display:inline-block;width:10px;height:10px;margin:0 4px 0 8px}' +
     '.tr{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}.tr figcaption{font-size:12px}.dl button{margin:4px 4px 4px 0}' +
-    '@media print{.bar,.dl{display:none}.schem svg{min-width:0!important}main{max-width:none;padding:0}section{break-inside:auto}figure,tr,.kpis{break-inside:avoid}h2{break-after:avoid}body{font-size:11.5px}}' +
+    '@media print{.bar,.dl{display:none}.schem svg{min-width:0!important}main{max-width:none;padding:0}section{break-inside:auto}figure,tr,.kpis{break-inside:avoid}h2,h3{break-after:avoid}body{font-size:11.5px}}' +
     '@media(max-width:600px){h1{font-size:22px}.toc ol{columns:1}figure.wide svg{min-width:720px}}';
 
   function page(ctx, body, R) {
@@ -434,12 +440,76 @@
     } finally { T.system(was); }
     return out;
   }
+  /* the same IT load under each configuration and each site, and the annual result's swing when one
+     design input moves by a practical step; every row is a full engine solve */
+  var SENS = [
+    ['capturePct', 'Liquid capture', 5, ' pts', 50, 98],
+    ['tcsSupplyC', 'TCS supply', 3, ' °C', 20, 50],
+    ['itUtil', 'Mean IT utilisation', 0.1, '', 0.3, 1],
+    ['chwSupplyC', 'Chilled-water supply', 2, ' °C', 7, 24],
+    ['chillerCopRated', 'Chiller rated COP', 1, '', 3, 10],
+    ['airDeltaK', 'CRAH air ΔT', 2, ' K', 6, 20],
+    ['upsEff', 'UPS efficiency', 0.01, '', 0.9, 0.995]
+  ];
+  function options(P, R) {
+    var I = R.input;
+    function solve(over) { return P.compute(Object.assign({}, I, over)); }
+    function row(r) { var A = r.annual; return { pueD: r.design.pue, pue: A.pue3, wue: A.wue, mwh: A.m0MWh, water: A.waterM3, cost: A.energyCost + A.waterCost, co2: A.co2t }; }
+    var presets = Object.keys(P.PRESETS).map(function (k) {
+      var x = P.PRESETS[k];
+      return Object.assign(row(solve({ chillerType: x.chillerType, liquidRejection: x.liquidRejection })), { id: k, label: x.label, current: x.chillerType === I.chillerType && x.liquidRejection === I.liquidRejection });
+    });
+    var climates = Object.keys(P.CLIMATES).map(function (k) { return Object.assign(row(solve({ climate: k, climateBins: undefined, designDbC: undefined, designWbC: undefined })), { id: k, label: P.CLIMATES[k].label, current: k === I.climate }); });
+    var sens = SENS.map(function (s) {
+      var k = s[0], v = I[k];
+      function at(x) { var o = {}; o[k] = Math.max(s[4], Math.min(s[5], x)); if (k === 'tcsSupplyC') o.tcsReturnC = I.tcsReturnC + (o[k] - v); return { v: o[k], r: row(solve(o)) }; }
+      return { key: k, label: s[1], unit: s[3], base: v, lo: at(v - s[2]), hi: at(v + s[2]) };
+    });
+    return { base: row(R), presets: presets, climates: climates, sens: sens };
+  }
+  /* tornado: annual PUE at each end of every step, widest swing on top */
+  function tornado(O) {
+    var rows = O.sens.slice().sort(function (a, b) { return Math.abs(b.hi.r.pue - b.lo.r.pue) - Math.abs(a.hi.r.pue - a.lo.r.pue); });
+    var W = 900, rh = 26, H = rows.length * rh + 34, cx = 505, half = 135, b = O.base.pue;
+    var span = Math.max.apply(null, rows.map(function (r) { return Math.max(Math.abs(r.lo.r.pue - b), Math.abs(r.hi.r.pue - b)); })) || 1;
+    function x(v) { return cx + half * (v - b) / span; }
+    function dv(v) { return v === Math.round(v) ? f(v) : f(v, v < 1 ? 3 : 1); }
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Annual PUE sensitivity">' +
+      '<line x1="' + cx + '" y1="4" x2="' + cx + '" y2="' + (H - 24) + '" stroke="' + C.t2 + '"/>' +
+      '<text x="' + cx + '" y="' + (H - 8) + '" text-anchor="middle" class="sl">annual PUE ' + f(b, 3) + ' (this plant) · red raises it, green lowers it</text>' +
+      rows.map(function (r, i) {
+        var y = 6 + i * rh;
+        return [r.lo, r.hi].map(function (e) {
+          var x0 = Math.min(x(e.r.pue), cx), w = Math.max(1, Math.abs(x(e.r.pue) - cx)), up = e.r.pue > b;
+          return '<rect x="' + x0 + '" y="' + (y + 3) + '" width="' + w + '" height="' + (rh - 10) + '" fill="' + (up ? C.bad : C.ok) + '" fill-opacity="0.75"/>' +
+            '<text x="' + (up ? x0 + w + 4 : x0 - 4) + '" y="' + (y + 15) + '" ' + (up ? '' : 'text-anchor="end" ') + 'class="sv">' + dv(e.v) + r.unit + ' → ' + f(e.r.pue, 3) + '</text>';
+        }).join('') + '<text x="8" y="' + (y + 15) + '" class="sl">' + esc(r.label) + ' (' + dv(r.base) + r.unit + ')</text>';
+      }).join('') + '</svg>';
+  }
+  function optionsSection(O) {
+    var b = O.base;
+    function step(v) { return v === Math.round(v) ? f(v) : f(v, v < 1 ? 3 : 1); }
+    function d(v, base, dp) { var x = v - base; return Math.abs(x) < Math.pow(10, -dp) / 2 ? '—' : (x > 0 ? '+' : '−') + f(Math.abs(x), dp); }
+    function rows(list) {
+      return list.map(function (o) {
+        return [(o.current ? '<b>' + esc(o.label) + '</b> <span class="tag">this plant</span>' : esc(o.label)), f(o.pueD, 3), f(o.pue, 3), f(o.wue, 3), f(o.mwh), f(o.water), f(o.cost), d(o.cost, b.cost, 0), f(o.co2)];
+      });
+    }
+    var head = ['Option', 'PUE design', 'PUE annual', 'WUE L/kWh', 'Facility MWh/yr', 'Water m³/yr', 'Energy + water cost/yr', 'Δ cost vs this plant', 'tCO₂/yr'];
+    return '<h3>Plant configuration — same IT, capture, climate and tariffs</h3>' + table(head, rows(O.presets)) +
+      '<h3>Site — same plant in each climate</h3>' + table(head, rows(O.climates)) +
+      '<h3>Design inputs — one step each way</h3><figure class="wide">' + tornado(O) + '</figure>' +
+      table(['Input', 'Step', 'PUE annual', 'WUE L/kWh', 'Δ cost/yr at low / high'], O.sens.map(function (s) {
+        return [esc(s.label), step(s.lo.v) + ' → ' + step(s.hi.v) + s.unit, f(s.lo.r.pue, 3) + ' → ' + f(s.hi.r.pue, 3), f(s.lo.r.wue, 3) + ' → ' + f(s.hi.r.wue, 3), d(s.lo.r.cost, b.cost, 0) + ' / ' + d(s.hi.r.cost, b.cost, 0)];
+      })) + '<p class="note">Each row is the whole plant re-solved (design day and every climate bin) with only that input changed; units are re-sized, so a step can cross a unit count. Climates are illustrative bins, not a site file.</p>';
+  }
   function context(P, R, state) {
     var D = root.LTCDH01, pr = Object.keys(P.PRESETS).filter(function (k) { return P.PRESETS[k].chillerType === R.input.chillerType && P.PRESETS[k].liquidRejection === R.input.liquidRejection; })[0];
     return {
       version: root.RZ_VERSION, date: new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC', url: root.location ? root.location.href.split('#')[0] : '',
       state: state, defaults: P.DEFAULTS, presetLabel: pr ? P.PRESETS[pr].label : 'custom plant', climateLabel: (P.CLIMATES[R.input.climate] || { label: 'custom climate' }).label,
       transients: transients(P, R),
+      options: options(P, R),
       tier: tierSweep(root.LTCTier),
       faults: D ? D.FAULTS.map(function (x) { return { id: x[0], label: x[1], s: D.solveHall(R, x[0], 'common', 5, 'throttled') }; }) : null
     };
@@ -522,7 +592,7 @@
     bar.appendChild(b);
   }
 
-  root.LTCReport = { build: build, csv: csv, heatFlows: heatFlows, powerItems: powerItems, register: register, context: context, exportReport: exportReport };
+  root.LTCReport = { build: build, csv: csv, heatFlows: heatFlows, powerItems: powerItems, register: register, context: context, options: options, exportReport: exportReport };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCReport;
   if (typeof document !== 'undefined' && document.querySelector) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountButton); else mountButton();
