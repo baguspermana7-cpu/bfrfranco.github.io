@@ -41,8 +41,9 @@
     var duration = cfg.duration || 700;
 
     var cvEls = {};
-    [].forEach.call(root.querySelectorAll('[data-cv]'), function (el) {
-      cvEls[el.getAttribute('data-cv')] = el;
+    /* data-pv: a counter drawn by the RZ diagram engine (a node's live sublabel) */
+    [].forEach.call(root.querySelectorAll('[data-cv], [data-pv]'), function (el) {
+      cvEls[el.getAttribute('data-cv') || el.getAttribute('data-pv')] = el;
     });
     var current = {};   /* live counter values */
     var anim = null;

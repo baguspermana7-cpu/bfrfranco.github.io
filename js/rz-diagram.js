@@ -83,7 +83,8 @@
    * node() for why that matters. */
   var NODE_OPTS = ['id', 'tag', 'name', 'sublabel', 'w', 'h', 'pad', 'stroke', 'fill',
                    'tier', 'dashed', 'focal', 'radius', 'legend', 'vAlign', 'nameFill',
-                   'symbol', 'symbolFill', 'interactive', 'state'];
+                   'symbol', 'symbolFill', 'interactive', 'state', 'valueKey',
+                   'valuePrefix'];
 
   /* Symbol glyph size in diagram units, and the gap under it. The glyph is an
    * IEC 60617 / ISA-5.1 drawing from js/rz-eng-symbols.js — the same library
@@ -161,6 +162,20 @@
      * catch masks that land under a node; painting labels last removes the
      * failure mode instead of detecting it. */
     var layers = { zones: [], edges: [], nodes: [], labels: [], hits: [] };
+    /* Reveal layers (v3.20.0). A scrollytelling figure shows its drawing in stages;
+     * ctx.layer(n) tags every element drawn after it with data-rzd-layer="n" until
+     * ctx.layer(null). It is applied where elements enter their paint layer, so a
+     * node's box, glyph, name and sublabel all carry it without each emitter knowing.
+     * Nothing is tagged unless a figure asks, so every other drawing is byte-identical. */
+    var curLayer = null;
+    Object.keys(layers).forEach(function (k) {
+      layers[k].push = function (str) {
+        if (curLayer !== null) {
+          str = String(str).replace(/<([a-zA-Z]+)(?=[\s>\/])/g, '<$1 data-rzd-layer="' + curLayer + '"');
+        }
+        return Array.prototype.push.call(this, str);
+      };
+    });
     var warnings = [];
     var seq = 0;
     /* What was actually drawn, so the legend is DERIVED rather than typed. A
@@ -177,6 +192,9 @@
       height: H,
       occupancy: occ,
       warnings: warnings,
+
+      /** Tag what is drawn next with a reveal layer; null stops tagging. */
+      layer: function (n) { curLayer = n === null || n === undefined ? null : esc(String(n)); },
 
       /* ---- zones ------------------------------------------------------ */
       /** A container: a boundary plus an eyebrow. Painted first, so a label
@@ -329,7 +347,8 @@
           cy += 16;
         }
         if (o.sublabel) {
-          ctx.text(o.sublabel, x + w / 2, cy + 8, { role: 'sublabel', anchor: 'middle', fill: 'soft' });
+          ctx.text(o.sublabel, x + w / 2, cy + 8, { role: 'sublabel', anchor: 'middle', fill: 'soft',
+                                                    pv: o.valueKey, pvPrefix: o.valuePrefix });
         }
 
         var box = { x: x, y: y, w: w, h: h };
@@ -385,6 +404,11 @@
           (t.tracking ? ' letter-spacing="' + t.tracking + 'em"' : '') +
           (o.anchor ? ' text-anchor="' + o.anchor + '"' : '') +
           (t.face === 'mono' ? ' style="font-variant-numeric:tabular-nums"' : '') +
+          /* A live value: js/rz-article-diagram.js rewrites this text each tick as
+           * prefix + value. Attributes only when asked for, so every figure drawn
+           * without one stays byte-identical. */
+          (o.pv ? ' data-pv="' + esc(o.pv) + '"' +
+                  (o.pvPrefix ? ' data-pv-prefix="' + esc(o.pvPrefix) + '"' : '') : '') +
           '>' + esc(content) + '</text>');
         occ.add(box, { id: o.id || id('text'), kind: 'text' });
         return box;
@@ -513,7 +537,8 @@
               '<rect x="' + p.box.x + '" y="' + p.box.y + '" width="' + p.box.w +
               '" height="' + p.box.h + '" rx="2" fill="' + tok('paper') + '"/>');
             ctx.text(content, p.box.x + p.box.w / 2, p.box.y + p.box.h - 4,
-              { role: 'arrow-label', anchor: 'middle', fill: o.labelFill || 'soft' });
+              { role: 'arrow-label', anchor: 'middle', fill: o.labelFill || 'soft',
+                pv: o.valueKey, pvPrefix: o.valuePrefix });
           } else {
             warnings.push({
               kind: 'label-unplaced', message: 'no clear position for arrow label "' + o.label + '"'

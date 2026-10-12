@@ -77,15 +77,15 @@ for (const f of ['index.html', 'article-24.html']) {
 for (const f of ['article-13.html', 'article-9.html']) {
   await withPage(async pg => {
     await pg.goto(BASE + f, { waitUntil: 'networkidle2', timeout: 40000 });
-    await pg.evaluate(() => document.querySelector('.rz-diagram')?.scrollIntoView({ block: 'center' }));
+    await pg.evaluate(() => document.querySelector('[data-rz-diagram]')?.scrollIntoView({ block: 'center' }));
     await sleep(800);
-    const pv0 = await pg.evaluate(() => document.querySelector('.rz-diagram [data-pv]')?.textContent);
+    const pv0 = await pg.evaluate(() => document.querySelector('[data-rz-diagram] [data-pv]')?.textContent);
     if (pv0 == null) throw new Error('no live values found');
     const btns = await pg.evaluate(() => document.querySelectorAll('.rz-diagram-btn').length);
     if (btns < 2) throw new Error('scenario buttons missing');
     await pg.evaluate(() => document.querySelectorAll('.rz-diagram-btn')[1].click());
     await sleep(400);
-    const changed = await pg.evaluate(() => document.querySelectorAll('.rz-diagram [data-flow].off, .rz-diagram [data-flow].slow, .rz-diagram [data-inst].warn, .rz-diagram [data-inst].alarm').length);
+    const changed = await pg.evaluate(() => document.querySelectorAll('[data-rz-diagram] [data-flow].off, [data-rz-diagram] [data-flow].slow, [data-rz-diagram] [data-inst].warn, [data-rz-diagram] [data-inst].alarm, [data-rz-diagram] [data-rzd-edge].off, [data-rz-diagram] [data-rzd-edge].slow, [data-rz-diagram] [data-rzd-node].warn, [data-rz-diagram] [data-rzd-node].alarm').length);
     if (!changed) throw new Error('scenario click changed no flow/alarm state');
   }, `diagram ${f}`);
 }
@@ -99,7 +99,7 @@ await withPage(async pg => {
   /* counters animate (and restart when intermediate steps fire) — poll until settled */
   let end = null;
   for (let t = 0; t < 12; t++) {
-    end = await pg.evaluate(() => ({ step: document.querySelector('.rz-scrolly').getAttribute('data-step'), day: document.querySelector('[data-cv="day"]').textContent, gpus: document.querySelector('[data-cv="gpus"]').textContent }));
+    end = await pg.evaluate(() => ({ step: document.querySelector('.rz-scrolly').getAttribute('data-step'), day: document.querySelector('[data-pv="day"]').textContent, gpus: document.querySelector('[data-pv="gpus"]').textContent }));
     if (end.step === '3' && end.day === '122' && end.gpus === '100,000') break;
     await sleep(300);
   }

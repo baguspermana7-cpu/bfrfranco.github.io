@@ -421,13 +421,11 @@
        the real Supabase error. NEVER present client-side role as a server authorization boundary. */
     function offlineRoot() { return Promise.resolve(null); }
 
-    /* Also check manually-created accounts stored in localStorage by admin */
-    function getManualAccounts() {
-        try {
-            var raw = localStorage.getItem('rz_manual_accounts');
-            return raw ? JSON.parse(raw) : [];
-        } catch (e) { return []; }
-    }
+    /* v3.19.1 — "manual accounts" are retired. The admin page used to write them to localStorage with the
+       password in plain text, and findUser() accepted them, so a login that only ever worked in the admin's
+       own browser kept a readable password there. Real accounts are created in the Supabase panel (hashed,
+       server-side). The legacy key is deleted, not just ignored, so the plaintext does not linger. */
+    try { localStorage.removeItem('rz_manual_accounts'); } catch (e) { /* storage blocked: nothing stored */ }
 
     /* Lazy-load the shared Supabase client (config + module) on demand, so the ONE shared login modal is
        Supabase-aware on EVERY page without adding the module to 105 pages. Resolves to window.rzSupa or null. */
@@ -463,14 +461,6 @@
         var match = null;
         VALID_USERS.forEach(function (u) {
             if (u.email === e && u.password === p) {
-                match = { email: u.email, tier: u.tier || 'pro', role: u.role || detectRole(u.email) };
-            }
-        });
-        if (match) return match;
-        /* Check manual accounts */
-        var manuals = getManualAccounts();
-        manuals.forEach(function (u) {
-            if (u.email.toLowerCase() === e && u.password === p) {
                 match = { email: u.email, tier: u.tier || 'pro', role: u.role || detectRole(u.email) };
             }
         });
@@ -519,42 +509,42 @@
             /* Auth wrap */
             '.rz-auth-wrap{display:inline-flex;align-items:center;position:relative;margin-left:8px;vertical-align:middle;}',
             /* Login button */
-            '.rz-login-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;border:1px solid rgba(125,221,180,0.4);background:linear-gradient(135deg,rgba(125,221,180,0.15),rgba(125,221,180,0.08));color:#A8ECCF;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;font-family:inherit;white-space:nowrap;}',
-            '.rz-login-btn:hover{background:linear-gradient(135deg,rgba(125,221,180,0.25),rgba(125,221,180,0.15));transform:translateY(-1px);box-shadow:0 4px 15px rgba(125,221,180,0.2);}',
+            '.rz-login-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:4px;border:1px solid rgba(125,221,180,0.4);background:rgba(125,221,180,0.08);color:#A8ECCF;font-size:0.82rem;font-weight:600;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease;font-family:inherit;white-space:nowrap;}',
+            '.rz-login-btn:hover{background:rgba(125,221,180,0.16);border-color:rgba(125,221,180,0.6);}',
             '.rz-login-btn i{font-size:1rem;}',
             /* User button (logged in) */
-            '.rz-user-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;border:1px solid rgba(125,221,180,0.3);background:rgba(125,221,180,0.08);color:#7DDDB4;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all 0.3s;}',
+            '.rz-user-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:4px;border:1px solid rgba(125,221,180,0.3);background:rgba(125,221,180,0.08);color:#7DDDB4;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:background-color 160ms ease;}',
             '.rz-user-btn:hover{background:rgba(125,221,180,0.15);}',
-            '.rz-user-avatar{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7DDDB4,#A8ECCF);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;}',
+            '.rz-user-avatar{width:28px;height:28px;border-radius:4px;background:#7DDDB4;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#0B1F17;}',
             '.rz-user-email{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
             '.rz-user-chevron{font-size:0.65rem;opacity:0.6;transition:transform 0.2s;}',
             /* Dropdown */
-            '.rz-user-dropdown{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:rgba(15,23,42,0.98);border:1px solid rgba(125,221,180,0.3);border-radius:12px;padding:12px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all 0.2s;z-index:9999;backdrop-filter:blur(20px);}',
-            '.rz-user-dropdown.show{opacity:1;visibility:visible;transform:translateY(0);}',
+            '.rz-user-dropdown{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:rgba(15,23,42,0.98);border:1px solid rgba(125,221,180,0.3);border-radius:4px;padding:12px;opacity:0;visibility:hidden;transition:opacity 160ms ease,visibility 160ms;z-index:9999;}',
+            '.rz-user-dropdown.show{opacity:1;visibility:visible;}',
             '.rz-dd-header{display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:8px;}',
-            '.rz-dd-badge{padding:3px 10px;border-radius:6px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;}',
-            '.rz-dd-badge.pro{background:linear-gradient(135deg,#7DDDB4,#A8ECCF);color:#0B1F17;}',
+            '.rz-dd-badge{padding:3px 10px;border-radius:4px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;}',
+            '.rz-dd-badge.pro{background:#7DDDB4;color:#0B1F17;}',
             '.rz-dd-badge.free{background:rgba(100,116,139,0.2);color:#94a3b8;}',
             /* Educator role (tier=pro, role=educator) — instrument-cyan, matches rz-ops admin UI. NOT purple. */
             '.rz-dd-badge.educator{background:rgba(8,145,178,0.18);color:#67e8f9;}',
             '.rz-dd-email{font-size:0.78rem;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
-            '.rz-dd-logout{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:none;border-radius:8px;background:rgba(239,68,68,0.1);color:#f87171;cursor:pointer;font-size:0.8rem;font-family:inherit;transition:all 0.2s;}',
+            '.rz-dd-logout{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:none;border-radius:4px;background:rgba(239,68,68,0.1);color:#f87171;cursor:pointer;font-size:0.8rem;font-family:inherit;transition:background-color 160ms ease;}',
             '.rz-dd-logout:hover{background:rgba(239,68,68,0.2);}',
             /* Login Modal */
             '.rz-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:99999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}',
             '.rz-modal-overlay.show{display:flex;}',
-            '.rz-modal{width:380px;max-width:90vw;background:#0f172a;border:1px solid rgba(125,221,180,0.3);border-radius:16px;padding:32px;position:relative;box-shadow:0 25px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04) inset;}',
-            '.rz-modal-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border:none;border-radius:8px;background:rgba(255,255,255,0.05);color:#94a3b8;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}',
-            '.rz-modal-close:hover{background:rgba(255,255,255,0.1);color:#fff;}',
+            '.rz-modal{width:380px;max-width:calc(100vw - 32px);box-sizing:border-box;background:#0f172a;border:1px solid #334155;border-top:2px solid #7DDDB4;border-radius:4px;padding:32px;position:relative;}',
+            '.rz-modal-close{position:absolute;top:12px;right:12px;width:44px;height:44px;border:none;border-radius:4px;background:transparent;color:#94a3b8;font-size:1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color 160ms ease,color 160ms ease;}',
+            '.rz-modal-close:hover{background:rgba(255,255,255,0.06);color:#f1f5f9;}',
             '.rz-modal h3{margin:0 0 6px;font-size:1.3rem;color:#f1f5f9;font-weight:700;}',
             '.rz-modal .rz-modal-sub{font-size:0.82rem;color:#94a3b8;margin:0 0 24px;}',
             '.rz-modal label{display:block;font-size:0.78rem;font-weight:600;color:#94a3b8;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}',
-            '.rz-modal input[type="email"],.rz-modal input[type="password"]{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#f1f5f9;font-size:0.9rem;font-family:inherit;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}',
-            '.rz-modal input:focus{border-color:rgba(125,221,180,0.5);box-shadow:0 0 0 3px rgba(125,221,180,0.1);}',
-            '.rz-modal .rz-submit-btn{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#7DDDB4,#4FBF92);color:#0B1F17;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.3s;}',
-            '.rz-modal .rz-submit-btn:hover{transform:translateY(-1px);box-shadow:0 8px 25px rgba(125,221,180,0.3);}',
-            '.rz-modal .rz-submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}',
-            '.rz-modal .rz-error{display:none;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;font-size:0.8rem;margin-bottom:12px;}',
+            '.rz-modal input[type="email"],.rz-modal input[type="password"]{width:100%;padding:10px 14px;border-radius:4px;border:1px solid #334155;background:#080c16;color:#f1f5f9;font-size:16px;font-family:inherit;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 160ms ease;}',
+            '.rz-modal input:focus-visible,.rz-modal input:focus{border-color:#7DDDB4;outline:1px solid #7DDDB4;outline-offset:0;}',
+            '.rz-modal .rz-submit-btn{width:100%;min-height:44px;padding:12px;border:none;border-radius:4px;background:#7DDDB4;color:#0B1F17;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background-color 160ms ease;}',
+            '.rz-modal .rz-submit-btn:hover{background:#A8ECCF;}',
+            '.rz-modal .rz-submit-btn:disabled{opacity:0.5;cursor:not-allowed;}',
+            '.rz-modal .rz-error{display:none;padding:8px 12px;border-radius:4px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;font-size:0.8rem;margin-bottom:12px;}',
             '.rz-modal .rz-error.show{display:block;}',
             '.rz-modal .rz-success{display:none;text-align:center;padding:20px 0;}',
             '.rz-modal .rz-success.show{display:block;}',
@@ -562,13 +552,13 @@
             '.rz-modal .rz-success p{color:#f1f5f9;font-weight:600;margin:4px 0;}',
             '.rz-modal .rz-success small{color:#64748b;font-size:0.8rem;}',
             /* Light theme */
-            '[data-theme="light"] .rz-login-btn{background:linear-gradient(135deg,rgba(125,221,180,0.1),rgba(125,221,180,0.05));color:#4FBF92;border-color:rgba(125,221,180,0.3);}',
+            '[data-theme="light"] .rz-login-btn{background:rgba(125,221,180,0.08);color:#146B4A;border-color:rgba(20,107,74,0.35);}',
             '[data-theme="light"] .rz-user-btn{background:rgba(125,221,180,0.06);color:#146B4A;border-color:rgba(125,221,180,0.2);}',
-            '[data-theme="light"] .rz-user-avatar{background:linear-gradient(135deg,#4FBF92,#7DDDB4);}',
-            '[data-theme="light"] .rz-user-dropdown{background:rgba(255,255,255,0.98);border-color:rgba(125,221,180,0.2);box-shadow:0 10px 40px rgba(0,0,0,0.12);}',
+            '[data-theme="light"] .rz-user-avatar{background:#7DDDB4;}',
+            '[data-theme="light"] .rz-user-dropdown{background:#ffffff;border-color:#cbd5e1;}',
             '[data-theme="light"] .rz-dd-email{color:#475569;}',
             '[data-theme="light"] .rz-dd-logout{background:rgba(239,68,68,0.06);color:#dc2626;}',
-            '[data-theme="light"] .rz-modal{background:#ffffff;border-color:rgba(125,221,180,0.2);box-shadow:0 25px 60px rgba(0,0,0,0.15),0 0 0 1px rgba(0,0,0,0.04) inset;}',
+            '[data-theme="light"] .rz-modal{background:#ffffff;border-color:#cbd5e1;border-top-color:#146B4A;}',
             '[data-theme="light"] .rz-modal h3{color:#1e293b;}',
             '[data-theme="light"] .rz-modal .rz-modal-sub{color:#64748b;}',
             '[data-theme="light"] .rz-modal label{color:#475569;}',
@@ -577,8 +567,8 @@
             '[data-theme="light"] .rz-modal .rz-modal-legal{color:#475569;}',
             '[data-theme="light"] .rz-modal .rz-modal-legal a{color:#146B4A;}',
             '[data-theme="light"] .rz-modal input[type="email"],[data-theme="light"] .rz-modal input[type="password"]{background:#f1f5f9;border-color:#e2e8f0;color:#1e293b;}',
-            '[data-theme="light"] .rz-modal input:focus{border-color:rgba(125,221,180,0.5);background:#fff;}',
-            '[data-theme="light"] .rz-modal-close{background:rgba(0,0,0,0.05);color:#64748b;}',
+            '[data-theme="light"] .rz-modal input:focus{border-color:#146B4A;outline-color:#146B4A;background:#fff;}',
+            '[data-theme="light"] .rz-modal-close{color:#475569;}',
             '[data-theme="light"] .rz-demo-hint{background:rgba(125,221,180,0.06) !important;border-color:rgba(125,221,180,0.15) !important;color:#475569 !important;}',
             '[data-theme="light"] .rz-demo-hint code{background:rgba(125,221,180,0.1) !important;color:#146B4A !important;}',
             '[data-theme="light"] .rz-demo-hint .rz-demo-label{color:#4FBF92 !important;}',
@@ -936,8 +926,7 @@
                             /* Only fall through to the offline demo/manual set for emails that are actually in
                                it — never run findUser for a real (Supabase) account that just failed auth. */
                             var eN = email.toLowerCase().trim();
-                            var known = VALID_USERS.some(function (u) { return u.email === eN; })
-                                || getManualAccounts().some(function (u) { return String(u.email || '').toLowerCase() === eN; });
+                            var known = VALID_USERS.some(function (u) { return u.email === eN; });
                             if (known) { var demoA = findUser(email, password); if (demoA) { _finish(demoA); return; } }
                             /* Offline root recovery — Supabase errored (network blip, unreachable, or no
                                such account); let the owner in with the recovery passphrase so Supabase

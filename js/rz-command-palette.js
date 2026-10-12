@@ -162,6 +162,8 @@
       if (typeof Fuse === 'undefined') {
         var s = document.createElement('script');
         s.src = 'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0';
+        s.integrity = 'sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt'; /* SRI: a changed CDN file is refused, not run */
+        s.crossOrigin = 'anonymous';
         s.onload = loadData;
         document.head.appendChild(s);
       } else { loadData(); }

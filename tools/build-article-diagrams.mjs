@@ -38,6 +38,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import vm from 'node:vm';
+import { convertedFigures } from './article-diagrams-converted.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -48,7 +49,9 @@ const sandbox = { module: { exports: {} }, console };
 sandbox.globalThis = sandbox;
 sandbox.window = sandbox;
 vm.createContext(sandbox);
-for (const rel of ['js/rz-diagram-metrics.js', 'js/rz-diagram-layout.js', 'js/rz-diagram.js']) {
+/* rz-eng-symbols.js first: a node that asks for an IEC 60617 / ISA-5.1 glyph gets it
+   from the same library DCMOC and the incident figures draw with. */
+for (const rel of ['js/rz-eng-symbols.js', 'js/rz-diagram-metrics.js', 'js/rz-diagram-layout.js', 'js/rz-diagram.js']) {
   vm.runInContext(readFileSync(join(root, rel), 'utf8'), sandbox, { filename: rel });
 }
 const { RZDiagram: D, RZDiagramMetrics: M, RZDiagramLayout: L } = sandbox;
@@ -631,7 +634,7 @@ const FIGURES = [
       });
 
       const basin = ctx.node(X_MID, BASIN_TOP, {
-        id: 'basin', tag: 'tower', name: 'Cooling tower basin', sublabel: 'circulating loop',
+        id: 'basin', tag: 'tower', name: 'Cooling tower basin', sublabel: 'circulating loop', symbol: 'coolingTower',
         w: W_MID, h: BASIN_H, vAlign: 'middle',
         stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'The loop itself'
       });
@@ -800,7 +803,7 @@ const FIGURES = [
         const out = [];
         rows.forEach((r, i) => {
           out.push(ctx.node(x, Y0 + i * PITCH, {
-            id: r.id, tag: r.tag, name: r.name, sublabel: r.sub, w: W,
+            id: r.id, tag: r.tag, name: r.name, sublabel: r.sub, w: W, symbol: r.symbol,
             stroke: strokeFor(i), fill: 'paper', tier: 2,
             legend: r.legend
           }));
@@ -811,13 +814,13 @@ const FIGURES = [
       const air = chain(COL_A, [
         { id: 'a-die', tag: 'source', name: 'GPU die', sub: 'heat flux to 1,000 W/cm\u00B2' },
         { id: 'a-room', tag: 'air', name: 'Heatsink \u2192 room air', sub: 'the room is in the path' },
-        { id: 'a-crah', tag: 'crah', name: 'CRAH \u2192 chilled water', sub: 'PUE 1.4\u20131.8' }
+        { id: 'a-crah', tag: 'crah', name: 'CRAH \u2192 chilled water', sub: 'PUE 1.4\u20131.8', symbol: 'crah' }
       ], () => 'rule-solid');
 
       const liq = chain(COL_B, [
         { id: 'l-die', tag: 'source', name: 'GPU die', sub: 'same heat, same flux' },
         { id: 'l-plate', tag: 'liquid', name: 'Cold plate', sub: 'liquid at the die' },
-        { id: 'l-cdu', tag: 'cdu', name: 'CDU \u2192 facility water', sub: 'PUE 1.10\u20131.35' }
+        { id: 'l-cdu', tag: 'cdu', name: 'CDU \u2192 facility water', sub: 'PUE 1.10\u20131.35', symbol: 'cdu' }
       ], (i) => (i === 1 ? 'accent' : 'rule-solid'));
 
       [[air, 'Air path'], [liq, 'Liquid path']].forEach(function (pair) {
@@ -966,7 +969,9 @@ const FIGURES = [
       ctx.legend();
       return ctx.fit(28);
     }
-  }
+  },
+  /* the diagrams articles used to draw by hand — see article-diagrams-converted.mjs */
+  ...convertedFigures(D)
 ];
 
 /* ==========================================================================
@@ -1027,8 +1032,19 @@ function figureMarkup(fig, ctx) {
   const bounds = 'max-width:' + ctx.width + 'px;min-width:' + ctx.width + 'px;';
   const svg = ctx.render().replace(
     '<svg ', '<svg style="' + bounds + TOKEN_BRIDGE + '" ');
-  return '\n' + svg +
-    '\n<figcaption class="rz-figcaption">' + captionMarkup(fig.caption) + '</figcaption>\n';
+  /* A living figure carries its runtime configuration inside the figure, where
+   * js/rz-article-diagram.js looks for it. It is emitted from the definition, so
+   * the scenarios cannot drift from the drawing they animate. `<` is escaped so
+   * no string in it can close the script element. */
+  const live = fig.live
+    ? '<script type="application/json" class="rz-diagram-cfg">' +
+      JSON.stringify(fig.live).replace(/</g, '\\u003c') + '</script>\n'
+    : '';
+  /* caption: null — the figure sits in a container that already titles it (a
+   * scrollytelling canvas), and a second caption would repeat that title. */
+  const cap = fig.caption === null ? ''
+    : '\n<figcaption class="rz-figcaption">' + captionMarkup(fig.caption) + '</figcaption>';
+  return '\n' + svg + cap + '\n' + live;
 }
 
 /* A caption carries two different things, and they were being set in one voice.

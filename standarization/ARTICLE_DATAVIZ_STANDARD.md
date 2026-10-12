@@ -81,11 +81,20 @@ Behavior: ~1s ticker (pauses offscreen via IntersectionObserver); `prefers-reduc
 animation (values still tick); theme-aware via the `--dg-*` CSS vars in `css/rz-article-dark.css`.
 
 Provenance: same gate as charts — `tools/audit-article-charts.mjs` validates `rz-diagram-cfg` blocks too
-(source + basisTag mandatory). Values must trace to the article body; anything modelled beyond stated figures
+(source + basisTag mandatory) — enforced for living diagrams by `tools/test-article-diagrams-engine.mjs` R5 since v3.20.0; the chart audit itself reads `[data-rz-chart]` only. Values must trace to the article body; anything modelled beyond stated figures
 uses `basisTag: "illustrative"` and says so in the caption.
 
 Reference implementations: `article-13` (2N power SLD), `article-9` (warm-water DLC loop), `article-25`
 (PJM grid — "Fast-forward: 2027–28" opens the 6 GW gap).
+
+**Since v3.20.0 a living diagram is drawn by the RZ diagram engine, not authored by hand.** Write it as an
+entry in `tools/article-diagrams-converted.mjs` with a `live:` block holding the config above; the page
+carries only `<figure class="rz-figure" data-rz-figure="ID" data-rz-diagram></figure>` and
+`tools/build-article-diagrams.mjs` fills it with the SVG, the caption and the config script. The runtime
+reads the engine's hooks (`data-rzd-edge` for flows, `data-rzd-node` for instruments, `text[data-pv]` for
+values, which also takes the warn/alarm state when a scenario alarms its key). The `data-flow` /
+`data-inst` markup above remains readable by the runtime but no article uses it, and
+`tools/test-article-diagrams-engine.mjs` fails a new one.
 
 
 ## Scrollytelling (v1.50.26)

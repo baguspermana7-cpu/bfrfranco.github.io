@@ -12,13 +12,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" crossorigin="">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" crossorigin="">
-    <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin="" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" defer integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" defer integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/rz-finance-suite.css?v=20260920-cf9e636d">
 <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -710,7 +710,7 @@
         body.light-mode .map-popup-row .val{color:#1e293b}
         body.light-mode #dcGlobalMap{background:#f8fafc}
     </style>
-    <script src="js/rz-version.js?v=20261012-e23f2a0d" defer></script>
+    <script src="js/rz-version.js?v=20261012-6f7ec037" defer></script>
     <script src="js/rz-explain-db.js?v=20260922-cc23355f" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
@@ -3394,12 +3394,11 @@ async function deleteSupaUser(userId){
 // ═══════════════════════════════════════════════════════════════
 // MANUAL ACCOUNT MANAGEMENT
 // ═══════════════════════════════════════════════════════════════
-function getManualAccounts(){
-    try{return JSON.parse(localStorage.getItem('rz_manual_accounts')||'[]')}catch(e){return[]}
-}
-function saveManualAccounts(arr){
-    localStorage.setItem('rz_manual_accounts',JSON.stringify(arr));
-}
+/* v3.19.1 — manual accounts retired: they kept the password in plain text in localStorage. Nothing is read
+   or written any more, and any copy left from before is deleted. Accounts live in Supabase only. */
+function getManualAccounts(){return []}
+function saveManualAccounts(){try{localStorage.removeItem('rz_manual_accounts')}catch(e){}}
+saveManualAccounts();
 function getAllCredentials(){
     const manual=getManualAccounts().map(a=>({
         name:a.name,email:a.email,password:a.password,tier:a.tier,role:a.role||'User',color:'#22d3ee'
@@ -3421,6 +3420,10 @@ function loadManualAccounts(){
     });
 }
 function openCreateModal(){
+    /* v3.19.1 — accounts are created in Supabase only (hashed, server-side). The legacy form below stored the
+       password in plain text in this browser's localStorage; it is no longer reachable. */
+    var supa=document.getElementById('supaAddForm');
+    if(supa){toggleAddAccount(true);supa.scrollIntoView({block:'center'});return;}
     document.getElementById('createForm').style.display='block';
     document.getElementById('createSuccess').style.display='none';
     document.getElementById('createError').style.display='none';

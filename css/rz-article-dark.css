@@ -627,6 +627,29 @@ html[data-rz-register="editorial"] .rz-diagram-msg{
   color:var(--rz-art-muted,#7E8590); margin-top:.55rem; min-height:1em;
 }
 
+/* LIVE ENGINE FIGURES (v3.20.0) — a living diagram drawn by the RZ diagram engine
+   (tools/build-article-diagrams.mjs, `live:` in the definition). Same runtime as the
+   hand-drawn ones; its hooks are the engine's own: a connector is data-rzd-edge with a
+   bead overlay data-rzd-pulse, a node is data-rzd-node, a value is text[data-pv].
+   Beads move only on a live connector; a stopped flow drops its bead and fades the
+   line; warn and alarm restroke the node, never fill it. */
+.rz-figure[data-rz-diagram] path[data-rzd-pulse]{ animation:rzDgBead 1.2s linear infinite; pointer-events:none; }
+.rz-figure[data-rz-diagram] path[data-rzd-pulse].slow{ animation-duration:3.2s; }
+.rz-figure[data-rz-diagram] path[data-rzd-pulse].off{ display:none; }
+.rz-figure[data-rz-diagram] path[data-rzd-edge].off{ opacity:.28; }
+@keyframes rzDgBead{ to{ stroke-dashoffset:-24; } }
+@media (prefers-reduced-motion: reduce){
+  .rz-figure[data-rz-diagram] path[data-rzd-pulse]{ animation:none; }
+}
+.rz-figure[data-rz-diagram] rect[data-rzd-node].warn{ stroke:#b45309; stroke-width:2; }
+.rz-figure[data-rz-diagram] rect[data-rzd-node].alarm{ stroke:#dc2626; stroke-width:2.4; }
+html[data-theme="dark"] .rz-figure[data-rz-diagram] rect[data-rzd-node].warn{ stroke:#FFAA00; }
+html[data-theme="dark"] .rz-figure[data-rz-diagram] rect[data-rzd-node].alarm{ stroke:#FF3030; }
+.rz-figure[data-rz-diagram] text[data-pv].warn{ fill:#b45309; }
+.rz-figure[data-rz-diagram] text[data-pv].alarm{ fill:#dc2626; }
+html[data-theme="dark"] .rz-figure[data-rz-diagram] text[data-pv].warn{ fill:#FFAA00; }
+html[data-theme="dark"] .rz-figure[data-rz-diagram] text[data-pv].alarm{ fill:#FF3030; }
+
 /* ============================================================================
    SCROLLYTELLING (v1.50.26) — pinned canvas + step cards, driven by
    js/rz-scrolly.js (data-step on the container reveals canvas layers).
@@ -668,6 +691,13 @@ html[data-rz-register="editorial"] .rz-scrolly-step-inner p{
 }
 /* canvas layers: hidden until their step (forwards AND backwards) */
 .rz-scrolly .st-layer{ opacity:0; transition:opacity .6s; }
+/* the same reveal for a canvas drawn by the RZ diagram engine: ctx.layer(n) tags each
+   element of stage n with data-rzd-layer="n" (v3.20.0) */
+.rz-scrolly [data-rzd-layer]{ opacity:0; transition:opacity .6s; }
+.rz-scrolly[data-step="1"] [data-rzd-layer="1"],
+.rz-scrolly[data-step="2"] [data-rzd-layer="1"], .rz-scrolly[data-step="2"] [data-rzd-layer="2"],
+.rz-scrolly[data-step="3"] [data-rzd-layer]{ opacity:1; }
+.rz-scrolly-canvas .rz-figure{ margin:0; }
 .rz-scrolly[data-step="1"] .st-l1,
 .rz-scrolly[data-step="2"] .st-l1, .rz-scrolly[data-step="2"] .st-l2,
 .rz-scrolly[data-step="3"] .st-l1, .rz-scrolly[data-step="3"] .st-l2, .rz-scrolly[data-step="3"] .st-l3{ opacity:1; }
@@ -675,7 +705,7 @@ html[data-rz-register="editorial"] .rz-scrolly-step-inner p{
 .rz-scrolly .dg-counter{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:15px; font-weight:600; fill:var(--dg-strong); font-variant-numeric:tabular-nums; }
 .rz-scrolly .dg-counter-label{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:8.5px; fill:var(--dg-muted); letter-spacing:.08em; }
 @media (prefers-reduced-motion: reduce){
-  .rz-scrolly .st-layer{ transition:none; }
+  .rz-scrolly .st-layer, .rz-scrolly [data-rzd-layer]{ transition:none; }
   html[data-rz-register="editorial"] .rz-scrolly-step-inner{ transition:none; }
 }
 html[data-rz-register="editorial"] [data-rz-scrolly-static] .rz-scrolly-canvas{

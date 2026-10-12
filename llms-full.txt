@@ -27849,27 +27849,14 @@ Source: Publicly available industry data and published standards. For educationa
 
 
 
+ 2N architecture: each UPS can carry the full rack load alone. This is the conventional centralised baseline: inject the UPS-A failure and UPS-B takes 100 % with no interruption at the rack. The AWS architecture below replaces the central pair with a battery in every rack.
 
 
 
 
 
- AWS Distributed Power Architecture
 
- Utility Grid (HV)
- →
- MV Switchgear
- →
- MV/LV Transformer
- →
- Power Shelf (AC→DC)
- →
- 48V Busbar
- →
- In-Rack BBU
- →
- IT Load
-
+ AWS distributed power architecture. Conversion to DC happens in the rack’s power shelf, and the backup battery sits in the rack on the 48 V busbar rather than in a central UPS room, so one failure reaches one rack, not a hall.
 
 
 
@@ -28041,18 +28028,8 @@ Ratio: P_loss(12V) / P_loss(48V) = 2304 / 144 = 16
 
 
 
- Microsoft Mt Diablo Architecture
 
- 480V AC Backbone
- →
- Sidecar Power Rack
- →
- ±400V DC Bus
- →
- Compute Rack
- →
- GPU/CPU Load
-
+ Microsoft Mt Diablo architecture. Conversion moves out of the compute rack into a sidecar power rack and the compute rack receives ±400 V DC, which the article credits with 15–35 % more accelerators per rack.
 
 
 
@@ -28657,44 +28634,8 @@ Inference Workloads (30% of compute):
 
 
 
- Anthropic Multi-Cloud Power & Data Flow Architecture
 
-
- AWS Trainium2** 600 MW | Indiana
- MISO Grid | 48V DC
-
- ↔
-
- Anthropic
-Control Plane
- Workload Orchestrator
-
- ↔
-
- Google TPU
- 1.1 GW | Oklahoma
- SPP Grid | 48V DC
-
-
-
-
- Azure GB200
- 300 MW | Virginia
- PJM Grid | ±400V DC
-
- ↔
-
- Global Load
-Balancer
- Latency-Aware Routing
-
- ↔
-
- Fluidstack
- 300 MW | Texas
- ERCOT Grid | 480V AC
-
-
+ Anthropic multi-cloud power and data flow, as the article lays it out. Four providers on four grids and three distribution standards, joined by two orchestration layers: a control plane for workloads and a global load balancer that routes by latency.
 
 
 
@@ -28720,7 +28661,7 @@ Balancer
 
 
 
- | AWS Rainier**
+ | **AWS Rainier**
  | Distributed Micro-UPS (in-rack BBU)
  | LFP Li-ion (48V packs)
  | 90 seconds
@@ -29007,25 +28948,8 @@ Source: Publicly available industry data and published standards. For educationa
 
 
 
- Cross-Cloud Training Migration Sequence
 
- 1. Failure Detected** Health check fails
- →
- 2. Checkpoint Sync
- 15-60s to save state
- →
- 3. Target Selection
- Capacity + cost eval
- →
- 4. Resource Alloc
- Spin up instances
- →
- 5. State Restore
- Load checkpoint
- →
- 6. Resume Training
- Continue from step N
-
+ Cross-cloud training migration sequence. Six steps from a failed health check to training resuming from the last checkpoint; the time budget below prices each one.
 
 
 
@@ -29041,7 +28965,7 @@ Checkpoint Size: 175B × 4 bytes (FP32) = 700 GB
  Step 1: Failure Detection
  Health check interval: 5 seconds
  Confirmation threshold: 3 consecutive fails
- Detection time: 15 seconds**
+ Detection time: **15 seconds**
 
  Step 2: Checkpoint Save
  Write speed (NVMe): 3.5 GB/s per node
@@ -41424,6 +41348,8 @@ xAI did it in 122 days.
 
  Scroll: 122 days, from empty factory to the world’s largest AI training cluster
 
+
+
  ILLUSTRATIVE Schematic build story; milestones (19 days to construction, unpermitted turbines + Megapack BESS, ~150 MW, 100,000 GPUs, 122 days vs 18–24 months) as stated in the article body.
 
 
@@ -43546,6 +43472,7 @@ The arithmetic is brutally simple. On the supply side, approximately 40 GW of th
 
 
 
+ Retirements against the interconnection queue — the race the article quantifies. Fast-forward to 2027–28 and the generation retiring by 2030 opens the capacity gap PJM projects, with 65 million people downstream.
 
 
 
@@ -47132,7 +47059,7 @@ So the “max” on a normal laptop today is a **~13B model at 4-bit**, or ~32B 
 
 
 
- The default→genius pipeline. Retrieval (4) and tools (5) deliver most of the felt intelligence on a CPU-only machine for a fraction of the effort; stages 6–9 add domain-baking, memory, and reliability. Source: synthesis of distillation, RAG, agentic-tooling, and LoRA literature.
+ The default→genius pipeline. Retrieval (4) and tools (5) deliver most of the felt intelligence on a CPU-only machine for a fraction of the effort; stages 6–9 add domain-baking, memory, and reliability. Evaluation feeds back to the prompt and to fine-tuning, and new data goes to RAG. Source: synthesis of distillation, RAG, agentic-tooling, and LoRA literature.
 
 
 
@@ -52619,18 +52546,8 @@ The operations team conducts a thorough RCA using Fishbone analysis. They identi
 
 
 
- Fishbone Analysis: Data Hall Thermal Excursion
 
- BMS Config Error
- +
- No Load Redistribution Test
- +
- Single Operator Shift
- +
- No Pre-Maintenance Verification
- =
- Thermal Excursion
-
+ The four contributing factors the team’s fishbone identified, and the event they added up to. CRAH-3 was down for routine maintenance, the BMS did not redistribute its load across the remaining three units, and inlet temperatures in two cabinet rows stayed above 35 °C for 18 minutes before the operator intervened by hand.
 
 
 
@@ -52807,22 +52724,8 @@ The pipeline embeds MoC authority directly in the RCA process. When a finding re
 
 
 
- RCA-to-Design Pipeline
 
- Incident
- →
- RCA Investigation
- →
- Finding Classification
- →
- Design Review
- →
- MoC Integration
- →
- System Change
- →
- Verification
-
+ The RCA-to-design pipeline. The investigation does not end at a recommendation: it runs through design review and change control, and the pipeline closes only when the change has been verified effective.
 
 
 
@@ -56986,6 +56889,7 @@ Nvidia's technical blog describes warm-water, single-phase direct liquid cooling
 
 
 
+ Warm-water loop: the dry cooler only works while ambient stays far enough below the return temperature. Switch to the Jakarta afternoon and the approach collapses; inject the CDU pump failover and flow drops to the backup path.
 
 
 

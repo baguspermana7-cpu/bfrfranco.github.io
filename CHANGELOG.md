@@ -11,6 +11,66 @@ release sections rather than semver.
 
 ---
 
+## v3.20.0 — 2026-10-12
+
+### Every article block diagram drawn by the engine, with IEC symbols on the equipment
+
+Twelve article figures were already engine-built. Seven articles still drew theirs by hand, and every gate was green, because `build-article-diagrams.mjs --check` only sees the figures it owns. Those hand-drawn diagrams were:
+- rows of `<span class="flow-box">` joined by "→" (article-6 ×2, article-13 ×4);
+- a fixed-coordinate SVG pipeline (article-28);
+- three hand-drawn living diagrams (article-9, -13, -25);
+- a scrollytelling canvas (article-23).
+
+All eleven are now drawn through the RZ diagram engine (`tools/article-diagrams-converted.mjs`), with the same boxes, words, numbers and connections. Equipment carries its IEC 60617 / ISA-5.1 glyph from `js/rz-eng-symbols.js`:
+- utility, switchgear and transformer;
+- UPS, PDU, battery and rack;
+- dry cooler, CDU, CRAH and cooling tower;
+- generator.
+
+Concepts get no glyph. A control plane, a pipeline stage and a coal-gas-nuclear fleet are not one piece of equipment.
+
+**Living diagrams keep their scenarios.** The three living diagrams keep their buttons, ticking values and fault injections. Each configuration is copied verbatim into the figure definition. The runtime now reads the engine's own hooks: a connector is `data-rzd-edge` with a bead overlay, a node is `data-rzd-node`, and a value is `text[data-pv]`. A scenario alarm on a reading's key now colours that reading, because the engine draws no separate instrument ring.
+
+**Article-23 scrolls by stage.** The Colossus canvas still reveals turbines and battery, then rack rows, then go-live as the reader scrolls, through a new `ctx.layer(n)`. The DAY / MW / GPUS counters are engine node values that `js/rz-scrolly.js` animates.
+
+**Two corrections the redraw forced, both stated in the captions:**
+- **AWS in-rack BBU.** The original put the battery in series between the 48 V busbar and the load. A battery backup unit sits on the busbar in parallel with the load, and that is what is drawn now.
+- **Article-13's 2N UPS pair.** It sits in the section on AWS's *distributed* UPS. Its caption now says it is the conventional centralised baseline, which the AWS architecture below replaces with a battery in every rack.
+
+**Figures that already used the engine** gained glyphs where the node is equipment:
+- cooling tower on the article-10 water loop;
+- CRAH and CDU on the article-18 heat paths.
+
+**Engine (`js/rz-diagram.js`), additive and byte-identical when unused:**
+- `valueKey` / `valuePrefix` on nodes and edges;
+- `ctx.layer(n)` for reveal layers.
+
+The incident figures (43 dossiers) and the existing article figures rebuild unchanged.
+
+**Gate.** `tools/test-article-diagrams-engine.mjs` (ship gate) lists every article from the filesystem and fails on:
+- hand-built flow-box markup;
+- any static SVG with 4+ labels outside an engine figure;
+- any living diagram not drawn by the engine;
+- any empty figure placeholder.
+
+On v3.19.0 it reports 10 findings; now 0. The article-16 scrollytelling bar chart is exempt by name with its reason, because a chart has no blocks or connectors. Orphaned `.flow-box` / `.architecture-diagram` CSS was removed from article-6 and -13.
+
+## v3.19.1 — 2026-10-12
+
+### Login dialog on the design system, plaintext admin accounts retired, CDN scripts pinned by hash
+
+Three findings from the February security and UI/UX audits were still open. Each was re-checked against today's code before it was fixed.
+
+**Login button, dropdown and dialog (154 pages).** `auth.js` injects its own stylesheet from a JS string array, and `tools/audit-vibecode.mjs` reads static CSS only — it says so in its own output. So the one dialog on almost every page kept 16 px radii, two-stop gradients on the button, the avatar and the PRO badge, a hover lift with a glow, resting drop shadows, a blurred dropdown and `transition: all`. Now: 4 px radius, 1 px hairline with a 2 px mint top rail on the dialog, flat mint fills, no resting shadow, a 1 px outline for input focus, named-property transitions at 160 ms. The close button is 44 px and the inputs are 16 px so iOS does not zoom. Avatar text was white on mint (fails contrast); it is now dark.
+
+**Manual accounts kept the password in plain text.** The admin page's legacy "Create Account" wrote `{email, password, …}` to `localStorage.rz_manual_accounts`, and `auth.js` accepted those passwords at login. The account only ever worked in the admin's own browser, so the feature never did what it claimed and left a readable password behind. Login no longer reads that key, both `auth.js` and the admin page delete it on load, and the admin "Create Account" button now opens the Supabase form (hashed, server-side). The demo account (`demo@`, published on purpose) is unchanged.
+
+**Subresource Integrity.** 0 of the CDN script and stylesheet tags carried `integrity`. Every version-pinned one now does — 171 tags on 79 pages, plus the incident hub's Leaflet (`tools/build-incidents.py`) and the command palette's lazy Fuse.js load. Each hash was fetched twice and was stable, and Leaflet's matches the SHA-256 Leaflet publishes. A CDN that serves different bytes for that version is now refused instead of run. Not pinnable, so not hashed: Google Fonts (CSS varies by browser), `cdn.tailwindcss.com`, an unversioned `chart.js`, and gtag. `ltc-system-modelling-lab.html` belongs to another session's in-flight work and is left for it.
+
+**Gate.** `tools/test-auth-surface.mjs` (ship gate) evaluates the same stylesheet array the browser gets, hover states included: radius ≤ 4 px, no gradient, no box-shadow, no hover transform, no `transition: all`, blur only on the dim layer; and no read or write of `rz_manual_accounts`. On v3.19.0 it reports 36 findings; now 0.
+
+**Still open, and not fixable on this host:** no CSP, HSTS or Permissions-Policy header (GitHub Pages sets none and allows none), and client-side session and Pro gating (a static site has no server to enforce them; the client role was never an authorization boundary).
+
 ## v3.19.0 — 2026-10-12
 
 ### LTC Workbench: export the plant as an engineering report

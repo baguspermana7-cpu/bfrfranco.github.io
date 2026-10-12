@@ -273,6 +273,18 @@ and 640 so a wide figure scrolls instead of shrinking.
 5. **Every `bo(...)` that leaves a drawing must land in a card row.** The parameter registry
    counts rendered reads; R8 is STRICT.
 6. **Fill in `title` and `desc`.** They are the accessible-figure contract, not decoration.
+7. **A glyph goes on a node only when the node IS that equipment** (a UPS, a transformer, a
+   rack, a dry cooler). A concept — a subsidy, a control plane, a pipeline stage, a fleet of
+   mixed generation — gets none: a generator symbol on "coal · gas · nuclear" says something false.
+8. **Live and staged figures use the engine's own hooks** (v3.20.0), never post-processed SVG:
+   - `valueKey` (+ `valuePrefix`) on a node or edge puts `data-pv` (+ `data-pv-prefix`) on its
+     sublabel or arrow label; `js/rz-article-diagram.js` and `js/rz-scrolly.js` rewrite that
+     text as prefix + value. Size the node for the widest value it will show.
+   - an edge with `id` and `state: 'flow'` is a living connector (`data-rzd-edge` plus a bead
+     overlay `data-rzd-pulse`); a node with `id` and `state` is a living instrument (`data-rzd-node`).
+   - `ctx.layer(n)` … `ctx.layer(null)` tags everything drawn in between with
+     `data-rzd-layer="n"`, which a scrollytelling canvas reveals by step.
+   None of these emits anything unless asked for, so every existing figure stays byte-identical.
 
 ---
 
@@ -311,6 +323,7 @@ no excuse. Both failure paths were injected and observed.
 | Adoption ratchet | **shipped** v3.10.3 — baseline 3,114, may fall, never rise |
 | LTC Workbench — hub + ASHRAE, Tier, TIA, NFPA, ISO | **drawn by the engine** v3.12.0, with `symbol` (IEC glyphs from `js/rz-eng-symbols.js`) and `interactive` nodes; gate `tools/test-ltc-workbench.mjs` |
 | Basis marks (every cockpit) | **measured** v3.10.2 — no longer `length × size × 0.6` |
+| Articles — every block diagram | **drawn by the engine** v3.20.0: 23 figures on 17 pages, including the three living diagrams and the article-23 scrollytelling canvas; IEC glyphs on equipment nodes. Gate `tools/test-article-diagrams-engine.mjs` enumerates the articles from the filesystem and fails on any diagram still drawn by hand (one bar chart exempt by name). |
 
 ### The gate is strict on this page
 

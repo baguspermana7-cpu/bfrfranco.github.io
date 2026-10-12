@@ -105,15 +105,20 @@
       var k;
       for (k in (cfg.flows || {})) flows[k] = cfg.flows[k];
       if (scen && scen.flows) for (k in scen.flows) flows[k] = scen.flows[k];
-      [].forEach.call(svg.querySelectorAll('[data-flow]'), function (el) {
-        var name = el.getAttribute('data-flow');
+      /* Hand-drawn figures tag a flow group with data-flow; figures drawn by the RZ
+         diagram engine (tools/build-article-diagrams.mjs) carry the connector id as
+         data-rzd-edge, and a live connector's bead overlay as data-rzd-pulse. */
+      [].forEach.call(svg.querySelectorAll('[data-flow], [data-rzd-edge], [data-rzd-pulse]'), function (el) {
+        var name = el.getAttribute('data-flow') || el.getAttribute('data-rzd-edge') ||
+                   el.getAttribute('data-rzd-pulse');
         var state = flows[name] || 'flow';
         el.classList.remove('flow', 'slow', 'off');
         el.classList.add(state);
       });
-      [].forEach.call(svg.querySelectorAll('[data-inst]'), function (el) {
+      /* an engine figure has no instrument ring, so a reading's own text carries the state */
+      [].forEach.call(svg.querySelectorAll('[data-inst], [data-rzd-node], text[data-pv]'), function (el) {
         el.classList.remove('warn', 'alarm');
-        var key = el.getAttribute('data-inst');
+        var key = el.getAttribute('data-inst') || el.getAttribute('data-rzd-node') || el.getAttribute('data-pv');
         if (scen && scen.alarms && scen.alarms[key]) el.classList.add(scen.alarms[key]);
       });
     }
@@ -123,6 +128,10 @@
     [].forEach.call(svg.querySelectorAll('text[data-pv], tspan[data-pv]'), function (el) {
       pvEls[el.getAttribute('data-pv')] = el;
     });
+    function show(k, v, spec) {
+      var el = pvEls[k];
+      el.textContent = (el.getAttribute('data-pv-prefix') || '') + fmt(v, spec.dp) + (spec.unit ? ' ' + spec.unit : '');
+    }
     function tick() {
       var k, base, delta, noise, v, spec;
       for (k in (cfg.baselines || {})) {
@@ -130,7 +139,7 @@
         if (!pvEls[k]) continue;
         /* scenario "exact" pins a value dead (e.g. an offline unit at exactly 0 — no jitter) */
         if (scen && scen.exact && typeof scen.exact[k] === 'number') {
-          pvEls[k].textContent = fmt(scen.exact[k], spec.dp) + (spec.unit ? ' ' + spec.unit : '');
+          show(k, scen.exact[k], spec);
           continue;
         }
         base = spec.v;
@@ -139,7 +148,7 @@
         v = base + delta + noise;
         if (typeof spec.min === 'number' && v < spec.min) v = spec.min;
         if (typeof spec.max === 'number' && v > spec.max) v = spec.max;
-        pvEls[k].textContent = fmt(v, spec.dp) + (spec.unit ? ' ' + spec.unit : '');
+        show(k, v, spec);
       }
     }
 

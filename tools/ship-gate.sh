@@ -51,6 +51,10 @@ gate "datahall engine — 57/57 doc-21 examples" node tools/test-datahall-calc.m
 # Article figures are built, not hand-maintained. --check fails if a figure in the HTML has
 # drifted from its definition, and the builder audits its own geometry before writing.
 gate "article diagrams — figures current, and free of collisions" node tools/build-article-diagrams.mjs --check
+# --check proves the figures the builder OWNS are current; it cannot see a diagram it does not own.
+# This enumerates every article from the filesystem and fails on any block diagram still drawn by hand
+# (owner, 2026-10-12: every article diagram through the engine, with IEC symbols).
+gate "article diagrams — no block diagram drawn by hand in any article" node tools/test-article-diagrams-engine.mjs
 gate "diagram survey coverage — every cockpit measured, declared, or excused" node tools/test-diagram-survey-coverage.mjs
 gate "diagram engine — metrics, placement, routing, facade" node tools/test-rz-diagram-engine.mjs
 gate "LTC workbench — standards arithmetic + page frame" node tools/test-ltc-workbench.mjs
@@ -170,6 +174,10 @@ gate "telemetry docs — browser, a11y, mobile, and gate safety" node tools/test
 # in both stylesheets) were fixed in v1.135.0, so there is nothing left to defer behind.
 # A monitor that is read as a gate is worse than no gate: it is a green light nobody earned.
 gate "anti-vibecode — hard-banned design tokens" node tools/audit-vibecode.mjs --strict
+# auth.js injects its own stylesheet from a JS array, which audit-vibecode cannot read (static CSS only).
+# This reads the same array the browser gets, hover states included, and keeps the plaintext
+# manual-account path retired (v3.19.1).
+gate "auth surface — login UI on the design system, no plaintext accounts" node tools/test-auth-surface.mjs
 gate "data-fill gradients — a bar takes one flat colour" node tools/test-data-fill-gradients.mjs
 gate "rendered precision — no raw float reaches a panel" node tools/test-dcai-rendered-precision.mjs
 gate "flow animation — cycles close, states styled, reduced motion reaches SMIL" node tools/test-dcai-flow-animation.mjs
