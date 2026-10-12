@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v3.19.0 — 2026-10-12
+
+### LTC Workbench: export the plant as an engineering report
+
+**Export report** — a new button on the plant strip, on all six workbench pages (`js/ltc-report.js`). It opens a standalone engineering report of the plant in a new tab. Every number in it comes from the same `LTCPlant` result the pages draw. It has 16 sections:
+- **Overview:** cover KPIs and key findings written from the numbers (trim-chiller hours, worst DH01 fault, CDU-feeder exposure, facility-water ride-through, heat-balance closure).
+- **Heat balance:** a Sankey diagram whose two sides sum to the same kW, and a facility-power breakdown whose items sum to the engine's facility total. The report prints both checks.
+- **Metering:** the M0→M3 cascade with PUE categories 1, 2 and 3.
+- **Plant detail:** liquid path, air path, and electrical sizing.
+- **Redundancy register:** need, installed, label (N+1 or 2N), capacity, margin, and whether the plant still carries the load with one unit out.
+- **Annual performance:** PUE per climate bin, column width ∝ hours, bins where the trim chillers run in red.
+- **DH01 in plan under all eight faults:** racks shaded by inlet temperature, lost CDUs and CRAHs marked, and a fault table.
+- **Transients:** four curves, each with its limit line and the time to reach it.
+- **Reference:** a standards cross-check (ASHRAE, ISO/IEC 30134, Uptime capacity, NFPA, TIA), every calculation trace with its formula and inputs, and every engine input with its name, unit, default and auto / yours state, plus assumptions & limits.
+
+The DH01 solver loads on demand on pages that do not carry it.
+
+**Data inside the file.** The full engine result is embedded in the report. Its toolbar downloads it as JSON or CSV (every scalar, one row each), saves the report as HTML, or prints it to PDF (print stylesheet). On a phone, wide charts scroll sideways instead of shrinking their labels to 5 px.
+
+**Fixed — ISO readout spilling out of its box.** On the ISO page at desktop width, "0.856 kgCO₂/kWh" ran 10 px past its readout cell, because the readout never wrapped. The number still never breaks; a long unit now drops under it.
+
+**Gate** — `tools/test-ltc-workbench.mjs` W12 (+127 assertions, 274 total). On eight plants (default, 37 MW, dual CDU feed, 70 % capture at 40 °C, and the four presets), it checks that:
+- the Sankey closes, and the power items sum to the facility total, both within 0.5 kW;
+- the report states the engine's PUE (design, annual, category 1), M0, CUE and trim hours, plus every bin PUE, every trace, every input, every fault and every transient;
+- no NaN, undefined or `[object Object]` appears in the rendered report;
+- the embedded data is the engine result, and the CSV carries every scalar.
+
+The first render printed "[object Object]" for the per-cooler-type inputs; W12e now fails that.
+
 ## v3.18.5 — 2026-10-11
 
 ### Plant map and model lab on a phone: two lanes, and the lab diagram no longer runs off-screen

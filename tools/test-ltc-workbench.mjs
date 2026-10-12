@@ -15,6 +15,7 @@
  *   W3  NFPA 2001 flooding equations against the published per-m³ figures
  *   W4  TIA fiber budget, copper channel, TIA-607 conductor sizing
  *   W5  ISO/IEC 30134 KPIs and the ISO 50006 regression recovering a known model
+ *   W12 exported report: Sankey and power closure, engine numbers, every trace / input / fault / transient, embedded data
  *   W11 manuals: the lab manual's worked example equals the engine output; the hub manual covers the plant
  *   W10 model lab on the plant engine: load order, computeModel delegation, adapter parity, screening passthrough
  *   W9  Tier groups (IT AND mechanical power; liquid AND air sinks), ≤ 9 blocks per Tier layout, DH01 on the hub
@@ -280,6 +281,44 @@ for (const [page, mod] of Object.entries(PAGES)) {
   ok('W11b', /js\/ltc-plant\.js/.test(man) && /Legacy screening model/.test(man), 'lab manual names the plant engine and labels the legacy model');
   const hubMan = readFileSync(join(root, 'manual/standards-ltc-lab.html'), 'utf8');
   ok('W11c', /One plant behind every tool/.test(hubMan) && /heat load test/i.test(hubMan) && /DH01 thermal map/.test(hubMan), 'hub manual covers the plant, the HLT and the DH01 map');
+}
+
+{
+  /* W12 (v3.19.0) — the exported report. Owner: "bisa di export jadi super detail report …
+   * bener2 comprehensive". A report that disagrees with the engine is worse than none, so every
+   * figure is checked against the result it was drawn from, on several plants. */
+  for (const page of Object.keys(PAGES)) {
+    const h = readFileSync(join(root, page), 'utf8'), at = (x) => h.indexOf(x);
+    ok(`W12a:${page}`, at('js/ltc-report.js') > at('js/ltc-plant-strip.js') && at('js/ltc-plant-strip.js') > 0, 'loads the report exporter after the plant strip');
+  }
+  const sb = { console, Math, JSON, Date }; sb.window = sb; sb.globalThis = sb; sb.document = { readyState: 'loading', addEventListener() {} };
+  vm.createContext(sb);
+  for (const f of ['js/ltc-plant.js', 'js/ltc-dh01.js', 'js/ltc-report.js']) vm.runInContext(readFileSync(join(root, f), 'utf8'), sb, { filename: f });
+  const P = sb.LTCPlant, X = sb.LTCReport, D = sb.LTCDH01;
+  ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
+  const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));
+  for (const [i, st] of plants.entries()) {
+    const R = P.compute(st), id = 'p' + i;
+    const F = X.heatFlows(R), L = F.left.reduce((a, n) => a + n[2], 0), Rt = F.right.reduce((a, n) => a + n[2], 0);
+    near('W12c:' + id, L, Rt, 0.5, 'heat Sankey: heat into the paths equals heat into the rejection equipment, kW');
+    near('W12d:' + id, X.powerItems(R).reduce((a, n) => a + n[1], 0), R.design.facility, 0.5, 'facility power items sum to the engine facility total, kW');
+    const ctx = X.context(P, R, st), html = X.build(R, ctx), text = html.replace(/<script[\s\S]*?<\/script>/g, '');
+    ok('W12e:' + id, !/NaN|undefined|\[object Object\]|Infinity/.test(text), 'no NaN / undefined / [object Object] in the rendered report');
+    const fmt = (v, d) => Number(v).toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+    for (const [what, v] of [['design PUE', fmt(R.totals.pue, 3)], ['annual PUE', fmt(R.totals.pueAnnual, 3)], ['M0 MWh', fmt(R.annual.m0MWh, 0)], ['PUE cat 1', fmt(R.annual.pue1, 3)],
+                             ['CUE', fmt(R.annual.cue, 3)], ['trim hours', fmt(R.totals.trimHours, 0) + ' h']])
+      ok(`W12f:${id}:${what}`, text.includes(v), `the report states the engine's ${what} (${v})`);
+    ok('W12g:' + id, R.totals.bins.every((b) => text.includes(fmt(b.pue, 3))), 'every climate bin PUE is in the report');
+    ok('W12h:' + id, Object.values(R.trace).every((t) => text.includes(t.label.replace(/&/g, '&amp;'))) && Object.keys(R.input).every((k) => text.includes('<code>' + k + '</code>')),
+       'every calculation trace and every engine input is in the report');
+    ok('W12i:' + id, ctx.faults.length === D.FAULTS.length && ctx.faults.every((x) => text.includes(x.label)) && (text.match(/<figure class="plan">/g) || []).length === D.FAULTS.length,
+       'DH01 is drawn and tabulated under every fault the workbench models');
+    ok('W12j:' + id, ctx.transients.length === 4 && ctx.transients.every((t) => t.series.length > 2), 'four transients, each with a time series');
+    const data = JSON.parse(html.match(/<script type="application\/json" id="rz-data">([\s\S]*?)<\/script>/)[1]);
+    ok('W12k:' + id, data.result.totals.pueAnnual === R.totals.pueAnnual && data.result.design.facility === R.design.facility, 'the embedded data is the engine result itself');
+    const csv = X.csv(R).trim().split('\n');
+    ok('W12l:' + id, csv[0] === 'key,value' && csv.length > 500 && csv.includes('totals.pueAnnual,' + R.totals.pueAnnual), `CSV carries every scalar of the result (${csv.length} rows)`);
+  }
 }
 
 const total = pass + fails.length;
