@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v3.21.1 — 2026-10-13
+
+### "Proven at Load": the heat load test written for this plant; one CRAH out no longer overheats an N+1 hall
+
+**Report and hub — heat load test plan.** The L4 heat load test (HLT) is now written from the plant on the strip, not as generic text:
+- **Load steps (25 / 50 / 75 / 100 %).** Each step lists DH01's liquid and air load banks, split by capture (100 MW default: 17,000 + 3,000 kW), plus kW per duty CDU. It gives TCS flow held at design (407.3 L/s, 45.3 per CDU) and the expected TCS ΔT and return (2.5 to 10 K, 37.5 to 45 °C). The accept band is the measured ṁ·cp·ΔT at ±5 % of the liquid banks.
+- **Failures at 100 %.** One CDU, one CRAH and CDU feeder A are each solved on the DH01 model, showing max rack inlet, racks throttled and IT throttled. The default plant holds the first two and fails the feeder (8,333 kW throttles on a single feed). The report says so before the test does.
+- **Where it appears.** The report gains section "Heat load test plan". The hub's L4 inspector shows the same numbers. The DH01 solver accepts `crah1` (one unit) beside `crah2` / `crah4`.
+
+**Fixed — DH01 air plenum wasted spare air.** Each CRAH wall split its air by aisle demand, discounted near a dead unit. What an aisle could not take was bypassed, never offered to the aisle that was short. With one CRAH out of an N+1 hall (280.8 m³/s for 274.2 needed), the aisle facing the dead unit starved: 3 racks over 27 °C, max inlet 36.4 °C. The plenum now re-offers spare air to the aisles still short, from either wall, until the air or the need runs out. Air pulled back out of the hot aisle now equals the hall's real shortfall: 2 CRAHs out gives 11.0 m³/s for a 10.9 shortfall, was 16.9.
+- One CRAH out of N+1 holds every rack at 24 °C.
+- With N CRAHs, one out still fails, at 37.4 °C.
+- The DH01 thermal view and the report's fault plans read the corrected model: 2 CRAHs lost now peaks at 37.5 °C (was 38.0).
+
+**Gates** — `tools/test-ltc-workbench.mjs` (302 assertions):
+- **W12q (per plant):** load banks split the hall load by capture; ΔT scales with load and reaches the design ΔT at 100 %; each single failure holds exactly when the design has that redundancy (CDU N+1, CRAH N+1, dual CDU feed).
+- **W12r:** over 24 plants (4 presets × 37/100/300 MW × 70/85 % capture), recirculated air equals the airflow shortfall within ±1 %. N+1 CRAHs keep every rack at or below 27 °C with one out; N CRAHs do not.
+
+Both gates were proven red on the v3.21.0 allocation: 9 failures, including "2 racks over 27 °C with N+1 CRAHs".
+
 ## v3.21.0 — 2026-10-13
 
 ### The data hall drawn as the room it is: whole hall, one scale, both heat paths, honest modals

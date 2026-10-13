@@ -314,6 +314,21 @@ for (const [page, mod] of Object.entries(PAGES)) {
        && O.presets.find((o) => o.id === 'baseline').pueD > O.presets.find((o) => o.id === 'dry').pueD && O.presets.find((o) => o.id === 'baseline').wue === 0,
        'more capture, warmer TCS, better UPS and chiller each lower annual PUE; air-cooled chillers (and trim) draw more on the design day than water-cooled, with no water');
   }
+  {
+    /* DH01 plenum: what one aisle cannot take is offered to the aisles still short, so the air pulled
+       back out of the hot aisle is the hall's real shortfall — and N+1 CRAHs carry one unit out */
+    const bad = [];
+    for (const k of Object.keys(P.PRESETS)) for (const mw of [37, 100, 300]) for (const cap of [70, 85]) {
+      const R = P.compute(Object.assign({}, P.PRESETS[k], { itMw: mw, capturePct: cap }));
+      for (const f of ['none', 'crah1', 'crah2', 'crah4']) {
+        const s = D.solveHall(R, f, 'common', 5, 'throttled'), short = Math.max(0, s.airDemand - s.airSupply);
+        if (Math.abs(s.recircM3s - short) > 0.01 * s.airDemand) bad.push(`${k}/${mw}/${cap}/${f}: recirc ${s.recircM3s.toFixed(1)} vs short ${short.toFixed(1)}`);
+        if ((f === 'none' || f === 'crah1') && s.over27) bad.push(`${k}/${mw}/${cap}/${f}: ${s.over27} racks over 27 °C with N+1 CRAHs`);
+      }
+      if (!D.solveHall(P.compute(Object.assign({}, P.PRESETS[k], { itMw: mw, capturePct: cap, crahRedundancy: 0 })), 'crah1', 'common', 5, 'throttled').over27) bad.push(`${k}/${mw}/${cap}: N CRAHs carried one out`);
+    }
+    ok('W12r', !bad.length, 'DH01: recirculated air equals the hall\'s airflow shortfall (±1 %), N+1 CRAHs hold every rack ≤ 27 °C with one out and N do not — 24 plants' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
+  }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));
   for (const [i, st] of plants.entries()) {
@@ -341,6 +356,12 @@ for (const [page, mod] of Object.entries(PAGES)) {
        && new Set(O.climates.map((o) => o.pue.toFixed(6))).size === O.climates.length && O.sens.every((s) => s.lo.v <= s.base && s.hi.v >= s.base && s.lo.v < s.hi.v)
        && text.includes('Options &amp; sensitivity') && O.presets.every((o) => text.includes(o.label)),
        'options: every configuration and climate re-solved (this plant\'s row equals the result, each climate differs), every sensitivity step brackets the input');
+    const H = ctx.hlt, s100 = H.steps[3], hf = (fid) => H.fails.find((x) => x.id === fid);
+    ok('W12q:' + id, H.steps.length === 4 && Math.abs(H.liquidKw + H.airKw - R.it.hallKw) < 1e-6 && Math.abs(H.liquidKw - R.it.hallKw * R.input.capturePct / 100) < 1e-6
+       && Math.abs(s100.dT - H.steps[0].dT * 4) < 1e-9 && Math.abs(s100.dT - R.liquid.tcsDeltaK) / R.liquid.tcsDeltaK < 0.02 && Math.abs(s100.returnC - R.input.tcsSupplyC - s100.dT) < 1e-9
+       && hf('cdu').pass === (R.input.cduRedundancy > 0) && hf('crah1').pass === (R.input.crahRedundancy > 0) && hf('cdu-feeder').pass === (R.input.cduFeed === 'dual')
+       && text.includes('Heat load test plan') && text.includes(Number(s100.liquidKw).toLocaleString('en-US', { maximumFractionDigits: 0 })),
+       'HLT plan: load banks split the hall load by capture, ΔT scales with load and reaches the design ΔT at 100 %, each single failure holds exactly when the design has the redundancy (CDU N+1, CRAH N+1, dual CDU feed)');
     ok('W12j:' + id, ctx.transients.length === 4 && ctx.transients.every((t) => t.series.length > 2), 'four transients, each with a time series');
     const data = JSON.parse(html.match(/<script type="application\/json" id="rz-data">([\s\S]*?)<\/script>/)[1]);
     ok('W12k:' + id, data.result.totals.pueAnnual === R.totals.pueAnnual && data.result.design.facility === R.design.facility, 'the embedded data is the engine result itself');

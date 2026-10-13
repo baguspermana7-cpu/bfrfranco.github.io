@@ -344,6 +344,7 @@
       }).join('') + '</div>' + table(['Scenario', 'Variable', 'Start °C', 'Limit °C', 'Thermal mass MJ/K', 'Heat in kW', 'Time to limit'], ctx.transients.map(function (t) {
         return [esc(t.title), esc(t.label), f(t.series[0][1], 1), f(t.limitC, 1), f(t.C / 1000, 1), f(t.Q), t.secondsToLimit != null ? f(t.secondsToLimit) + ' s' : 'not reached in ' + f(t.series[t.series.length - 1][0]) + ' min']; }))));
     var dh = ctx.faults ? ctx.faults[0].s : null;
+    if (ctx.hlt) parts.push(sec('', 0, 'Heat load test plan', 'The commissioning L4 heat load test (HLT) for DH01, written from this plant: what each load step should read, and what each single failure at full load should do.', hltSection(ctx.hlt)));
     parts.push(sec('s13', 13, 'Standards cross-check', 'What the plant\'s numbers say against each standard the workbench covers. A screening check, not a compliance statement.', table(['Standard', 'Check', 'Plant value', 'Result'], [
       ['ASHRAE TC 9.9 (air)', 'Supply air within A1 recommended 18–27 °C', f(p.supplyAirC, 1) + ' °C', p.supplyAirC >= 18 && p.supplyAirC <= 27 ? '<span class="tag ok">within</span>' : '<span class="tag bad">outside</span>'],
       ['ASHRAE TC 9.9 (air)', 'DH01 max rack inlet, normal operation', dh ? f(dh.maxInlet, 1) + ' °C' : '—', dh ? (dh.maxInlet <= 27 ? '<span class="tag ok">within</span>' : '<span class="tag bad">above 27 °C</span>') : '—'],
@@ -486,6 +487,41 @@
         }).join('') + '<text x="8" y="' + (y + 15) + '" class="sl">' + esc(r.label) + ' (' + dv(r.base) + r.unit + ')</text>';
       }).join('') + '</svg>';
   }
+  /* the L4 heat load test (HLT) written for this plant's DH01: load-bank kW per step from the hall
+     load and the capture split, TCS flow held at its design value so the return rises with load,
+     and the single-unit failures at 100 % read from the DH01 solver (5 min, racks throttled) */
+  var HLT_STEPS = [25, 50, 75, 100], HLT_FAULTS = [['cdu', 'One CDU'], ['crah1', 'One CRAH'], ['cdu-feeder', 'CDU feeder A']];
+  function hlt(R) {
+    var P = root.LTCPlant, K = P ? P.CONST : { CP_W: 4.186, RHO_W: 997 }, n = R.input.halls, l = R.liquid, a = R.air;
+    var liq = R.it.hallKw * R.input.capturePct / 100, air = R.it.hallKw - liq, lps = l.tcsLps / n, perCdu = lps / l.cduDutyN;
+    var steps = HLT_STEPS.map(function (p) {
+      var q = liq * p / 100, dT = q / (K.RHO_W / 1000 * K.CP_W * lps);
+      return { pct: p, liquidKw: q, airKw: air * p / 100, perCduKw: q / l.cduDutyN, tcsLps: lps, perCduLps: perCdu,
+        dT: dT, returnC: R.input.tcsSupplyC + dT, loKw: q * 0.95, hiKw: q * 1.05 };
+    });
+    var D = root.LTCDH01, fails = !D ? [] : HLT_FAULTS.map(function (x) {
+      var s = D.solveHall(R, x[0], 'common', 5, 'throttled');
+      return { id: x[0], label: x[1], maxInlet: s.maxInlet, throttled: s.throttled, itLostKw: s.itLostKw, note: s.note,
+        pass: !s.itLostKw && s.maxInlet <= 27 };
+    });
+    return { hallKw: R.it.hallKw, liquidKw: liq, airKw: air, cduN: l.cduDutyN, cduTotal: l.cduPerHall, cduUnitKw: R.input.cduUnitKw,
+      crahN: a.crahDutyN, crahTotal: a.crahPerHall, crahUnitKw: R.input.crahUnitKw, supplyC: R.input.tcsSupplyC, supplyAirC: R.input.supplyAirC,
+      steps: steps, fails: fails };
+  }
+  function hltSection(H) {
+    var head = ['Load', 'Liquid banks kW', 'Per CDU kW', 'Air banks kW', 'TCS L/s (per CDU)', 'TCS ΔT K', 'TCS return °C', 'Accept kW ±5 %'];
+    var bad = H.fails.filter(function (x) { return !x.pass; });
+    return '<p>DH01 carries <b>' + f(H.hallKw) + ' kW</b>: <b>' + f(H.liquidKw) + ' kW</b> to liquid load banks on the TCS manifolds and <b>' + f(H.airKw) + ' kW</b> to air load banks in the rows. ' +
+      H.cduN + ' duty of ' + H.cduTotal + ' CDUs (' + f(H.cduUnitKw) + ' kW each), ' + H.crahN + ' duty of ' + H.crahTotal + ' CRAHs (' + f(H.crahUnitKw) + ' kW each). ' +
+      'Hold each step until temperatures settle (typical: &lt; 0.5 K over 15 min). The accept band is the measured ṁ·cp·ΔT on the TCS, ±5 % of the liquid load banks.</p>' +
+      table(head, H.steps.map(function (s) {
+        return [s.pct + '&nbsp;%', f(s.liquidKw), f(s.perCduKw), f(s.airKw), f(s.tcsLps, 1) + ' (' + f(s.perCduLps, 1) + ')', f(s.dT, 2), f(s.returnC, 1), f(s.loKw) + ' – ' + f(s.hiKw)];
+      })) +
+      '<p class="note">Accept at every step (typical): TCS supply ' + f(H.supplyC, 1) + ' ± 1 °C; flow per CDU ≥ design; rack inlet inside the ASHRAE recommended envelope (18–27 °C, supply air ' + f(H.supplyAirC, 1) + ' °C); measured heat inside the band; no alarm. ΔT assumes the CDUs hold design flow; a CDU on ΔT control holds the ΔT and turns its flow down instead.</p>' +
+      (H.fails.length ? '<h3>Failures at 100 % — one unit at a time</h3>' + table(['Unit out', 'Max rack inlet °C', 'Racks throttled', 'IT throttled kW', 'Expected result', 'Why'], H.fails.map(function (x) {
+        return [esc(x.label), f(x.maxInlet, 1), f(x.throttled), f(x.itLostKw), x.pass ? '<span class="tag ok">holds</span>' : '<span class="tag bad">fails</span>', '<small>' + esc(x.note || '—') + '</small>'];
+      })) + (bad.length ? '<p class="note">This plant is expected to fail the HLT at: ' + bad.map(function (x) { return esc(x.label); }).join(', ') + '. Fix the design before the test, or record it as a known limit in the commissioning plan.</p>' : '') : '');
+  }
   function optionsSection(O) {
     var b = O.base;
     function step(v) { return v === Math.round(v) ? f(v) : f(v, v < 1 ? 3 : 1); }
@@ -504,8 +540,8 @@
       })) + '<p class="note">Each row is the whole plant re-solved (design day and every climate bin) with only that input changed; units are re-sized, so a step can cross a unit count. Climates are illustrative bins, not a site file.</p>';
   }
   function context(P, R, state) {
-    var D = root.LTCDH01, pr = Object.keys(P.PRESETS).filter(function (k) { return P.PRESETS[k].chillerType === R.input.chillerType && P.PRESETS[k].liquidRejection === R.input.liquidRejection; })[0];
-    return {
+    var c, D = root.LTCDH01, pr = Object.keys(P.PRESETS).filter(function (k) { return P.PRESETS[k].chillerType === R.input.chillerType && P.PRESETS[k].liquidRejection === R.input.liquidRejection; })[0];
+    c = {
       version: root.RZ_VERSION, date: new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC', url: root.location ? root.location.href.split('#')[0] : '',
       state: state, defaults: P.DEFAULTS, presetLabel: pr ? P.PRESETS[pr].label : 'custom plant', climateLabel: (P.CLIMATES[R.input.climate] || { label: 'custom climate' }).label,
       transients: transients(P, R),
@@ -513,6 +549,8 @@
       tier: tierSweep(root.LTCTier),
       faults: D ? D.FAULTS.map(function (x) { return { id: x[0], label: x[1], s: D.solveHall(R, x[0], 'common', 5, 'throttled') }; }) : null
     };
+    c.hlt = hlt(R);
+    return c;
   }
   /* the DH01 solver and the Tier model load on demand where the page does not carry them */
   function needModels(done) {
@@ -592,7 +630,7 @@
     bar.appendChild(b);
   }
 
-  root.LTCReport = { build: build, csv: csv, heatFlows: heatFlows, powerItems: powerItems, register: register, context: context, options: options, exportReport: exportReport };
+  root.LTCReport = { build: build, csv: csv, heatFlows: heatFlows, powerItems: powerItems, register: register, context: context, options: options, hlt: hlt, exportReport: exportReport };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCReport;
   if (typeof document !== 'undefined' && document.querySelector) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountButton); else mountButton();

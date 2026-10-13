@@ -461,10 +461,22 @@
       '<h3 class="ltc-script-h">Hold point</h3><p class="ltc-script-p">' + L.esc(sc.hold) + '</p>' +
       '<ul class="ltc-refs">' + sc.refs.map(function (t) { return '<li><code>' + L.esc(t[0]) + '</code><p>' + L.esc(t[1]) + '</p></li>'; }).join('') + '</ul>';
   }
+  /* the HLT written for this plant's DH01 (LTCReport.hlt): load banks per step and the single failures */
+  function hltHtml() {
+    var X = window.LTCReport, H = X && R ? X.hlt(R) : null;
+    if (!H) return '';
+    return '<h3 class="ltc-script-h">On this plant · DH01</h3><p class="ltc-script-p">' + f0(H.liquidKw) + ' kW liquid + ' + f0(H.airKw) + ' kW air load banks; ' +
+      H.cduN + ' of ' + H.cduTotal + ' CDUs and ' + H.crahN + ' of ' + H.crahTotal + ' CRAHs on duty; TCS flow held at ' + f1(H.steps[0].tcsLps) + ' L/s.</p>' +
+      '<table class="ltc-table ltc-hlt"><thead><tr><th>Load</th><th class="n">Liquid kW</th><th class="n">Air kW</th><th class="n">TCS ret °C</th></tr></thead><tbody>' +
+      H.steps.map(function (x) { return '<tr><td class="n">' + x.pct + ' %</td><td class="n">' + f0(x.liquidKw) + '</td><td class="n">' + f0(x.airKw) + '</td><td class="n">' + f1(x.returnC) + '</td></tr>'; }).join('') +
+      '</tbody></table><ul class="ltc-script-l">' + H.fails.map(function (x) {
+        return '<li>' + L.esc(x.label) + ' out at 100 %: <b>' + (x.pass ? 'holds' : 'fails') + '</b> — ' + (x.itLostKw ? f0(x.itLostKw) + ' kW IT throttles' : 'max rack inlet ' + f1(x.maxInlet) + ' °C') + '</li>';
+      }).join('') + '</ul>';
+  }
   function openLife(id) {
     var s = LBY[id]; if (!s) return;
     if (lifeFig) LIFE.forEach(function (x) { lifeFig.mark(x.id, x.id === id ? 'selected' : null); });
-    L.inspect({ sym: s.sym, eyebrow: 'Commissioning', title: s.name, html: scriptHtml(s.script) });
+    L.inspect({ sym: s.sym, eyebrow: 'Commissioning', title: s.name, html: scriptHtml(s.script) + (s.script.hlt ? hltHtml() : '') });
   }
   /* the summary the owner asked to see without clicking: one row per level */
   function lifeTable() {

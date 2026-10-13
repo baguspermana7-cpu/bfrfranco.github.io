@@ -53,10 +53,10 @@
       if (header === 'common') liqShortFrac = Math.min(1, ov.liquidShortKw / hallLiq);
       note = ov.note + (header === 'common' ? ' Common secondary header: the shortfall spreads over every rack.' : ' One loop per CDU: the racks on a dead CDU lose all their liquid cooling.');
       secs = ov.flowLost || header !== 'common' ? 10 : null;
-    } else if (fault === 'crah2' || fault === 'crah4') {
-      var n = fault === 'crah2' ? 2 : 4;
+    } else if (/^crah\d$/.test(fault)) { /* crah1 (the HLT's single failure), crah2, crah4 */
+      var n = +fault.slice(4);
       h.crahs.filter(function (c) { return c.wall === 'west'; }).slice(0, n).forEach(function (c) { crahOut[c.i] = 1; });
-      note = n + ' CRAH units out on the west wall. The survivors speed up to their rated flow; what they still cannot supply, the racks pull back out of the hot aisle.';
+      note = (n === 1 ? 'One CRAH unit' : n + ' CRAH units') + ' out on the west wall. The survivors speed up to their rated flow; what they still cannot supply, the racks pull back out of the hot aisle.';
     } else if (fault === 'fws-pump') {
       var tr = P.transient(r, 'fws-pump');
       series = tr; secs = tr.secondsToLimit;
@@ -88,17 +88,35 @@
     var pitch = 2 * p.rackDepthM + p.hotAisleM + p.coldAisleM;
     var aDem = h.aisles.map(function () { return 0; });
     h.racks.forEach(function (k, i) { aDem[k.aisle] += dem[i]; });
-    var mouth = h.aisles.map(function () { return { west: 0, east: 0 }; });
-    ['west', 'east'].forEach(function (wall) {
+    //     the plenum is pressurised: what an aisle cannot take is offered again to the aisles still
+    //     short (from either wall), so a wall with air to spare never starves an aisle while bypassing
+    var mouth = h.aisles.map(function () { return { west: 0, east: 0 }; }), WALLS = ['west', 'east'], rem = {}, wt = {};
+    WALLS.forEach(function (wall) {
       var units = h.crahs.filter(function (c) { return c.wall === wall; }), live = units.filter(function (c) { return !crahOut[c.i]; });
-      var W = live.length * perUnit;
-      var w = h.aisles.map(function (ai) {
+      rem[wall] = live.length * perUnit;
+      wt[wall] = h.aisles.map(function (ai) {
         var yc = (ai.y0 + ai.y1) / 2, all = 0, up = 0;
         units.forEach(function (c) { var e = Math.exp(-Math.abs(c.y - yc) / pitch); all += e; if (!crahOut[c.i]) up += e; });
         return aDem[ai.i] * (all ? up / all : 0);
       });
-      var sw = w.reduce(function (a, b) { return a + b; }, 0);
-      h.aisles.forEach(function (ai, j) { mouth[ai.i][wall] = sw ? W * w[j] / sw : 0; });
+    });
+    for (var pass = 0; pass < 24; pass++) {
+      var offer = {}, given = 0;
+      WALLS.forEach(function (wall) {
+        var sw = 0; h.aisles.forEach(function (ai, j) { if (mouth[ai.i].west + mouth[ai.i].east < aDem[ai.i] - 1e-9) sw += wt[wall][j]; });
+        offer[wall] = h.aisles.map(function (ai, j) { return sw && mouth[ai.i].west + mouth[ai.i].east < aDem[ai.i] - 1e-9 ? rem[wall] * wt[wall][j] / sw : 0; });
+      });
+      h.aisles.forEach(function (ai, j) {
+        var need = aDem[ai.i] - mouth[ai.i].west - mouth[ai.i].east, tot = offer.west[j] + offer.east[j];
+        if (need <= 1e-9 || tot <= 0) return;
+        var k = Math.min(1, need / tot);
+        WALLS.forEach(function (wall) { var g = offer[wall][j] * k; mouth[ai.i][wall] += g; rem[wall] -= g; given += g; });
+      });
+      if (given < 1e-6) break;
+    }
+    WALLS.forEach(function (wall) {                                       // the margin left over bypasses
+      var sw = wt[wall].reduce(function (a, b) { return a + b; }, 0);
+      h.aisles.forEach(function (ai, j) { if (sw) mouth[ai.i][wall] += rem[wall] * wt[wall][j] / sw; });
     });
     // 4 — march each cold aisle from both ends
     var cov = h.racks.map(function () { return 1; }), aisles = [];
