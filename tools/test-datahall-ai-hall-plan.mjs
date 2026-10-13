@@ -9,24 +9,23 @@
  *
  *   1. CDU GLYPHS == equipment.cdu_installed_per_hall. "jumlah cdu tidak ada" was a drawing that
  *      aggregated an odd count over four galleries. One glyph per installed unit, no divisor.
- *   2. CDUs stand in the CDU GALLERY of the mechanical zone, east of the rack field and clear of the
- *      cross aisle. v3.21.0, owner choice "ikut engine": the engine budgets 62 x 31 m as two 13.2 m
- *      banks + a 4.6 m cross aisle (= the full 31 m width) over ten 3.1 m rows (= 31 m of the
- *      length); the other 818 m2 holds the CDU gallery (220 m2), the air plant (450 m2) and the
- *      spare. The earlier contract put the CDUs IN the cross aisle — the egress route the engine
- *      keeps clear — and drew half the room.
+ *   2. CDUs stand in the CDU LINE at the row ends: south of the rack field, past the service corridor
+ *      (the egress route the engine keeps clear), north of the south fan-wall gallery. v3.21.7, owner:
+ *      the CDU and CRAH positions were "not like that in the real world". The engine now budgets
+ *      62 x 31 m as the hyperscale liquid hall: fan-wall gallery N 3 m + twenty 13.2 m rows across
+ *      the 62 m length + corridor 4.6 m + CDU line 3.9 m + service aisle + fan-wall gallery S 3 m.
  *   3. THE WATER MOVES from the CDUs to the rows: at least one animation per row, not just the two
  *      header trunks. "aliran simulasi air cdu ke row tidak ada."
  *   4. EVERY ROW IN BOTH BANKS reports its aisle temperature at SEVERAL points, and no two points
  *      in the same aisle print the same number — three readouts sharing one RZ_SIM seed key looked
  *      like three sensors and was one. "No hac temp indication in several point across row."
- *   5. ONE CRAH GLYPH PER INSTALLED UNIT, in the air plant east of the CDU gallery. "crah utk residual
- *      air gimana": the owner could not find the air path. A count on a bank was a label; a glyph per
- *      unit is the drawing.
+ *   5. ONE AIR-UNIT GLYPH PER INSTALLED UNIT, every one a fan-wall module in the north or the south
+ *      gallery, split evenly — never a block of CRAHs in the middle of the room (v3.21.7).
  *   6. ONE SCALE: every rack glyph has the engine's depth/width ratio (1.2 x 0.6 m) within 8 %. The
  *      body is inset 0.4/0.5 units for a visible gutter between racks (2.13 against 2.00, 6.5 %); the
  *      pre-v3.0 plan stretched one axis 1.74x, which this still catches by an order of magnitude.
  *
+ * v3.21.7 contract proven RED on v3.21.6 (63e352fb): CDUs east of the field, 90 CRAHs in six lines mid-room.
  * v3.21.0 contract proven RED on v3.20.3 (248dd63b): CDUs in the cross aisle, 20 CRAH glyphs for 90
  * installed, rack glyphs 15.6 % off the engine ratio. GREEN on the redrawn plan.
  *
@@ -91,16 +90,13 @@ try {
         const readout = (prefix) => [...hall.querySelectorAll('text')]
             .filter((t) => new RegExp(`^${prefix}\\d+\\d+t$`).test(t.id))
             .map((t) => ({ id: t.id, text: (t.textContent || '').trim() }));
-        /* the cross aisle is the vertical gap between the two rack banks */
-        const rackTops = racks.map((r) => rect(r).top).sort((a, b) => a - b);
-        const rackBottoms = racks.map((r) => rect(r).bottom).sort((a, b) => a - b);
-        const bankAbottom = rackBottoms[Math.floor(rackBottoms.length / 2) - 1];
-        const bankBtop = rackTops[Math.floor(rackTops.length / 2)];
+        const fieldTop = Math.min(...racks.map((r) => rect(r).top)), fieldBottom = Math.max(...racks.map((r) => rect(r).bottom));
+        const ppm = (window.__hallZones && window.__hallZones.ppm) || 0;
         const cduBoxes = cdus.map((c) => rect(c));
         return {
             engine: {
                 cduInstalled: engine.cduInstalled ?? null, crahInstalled: engine.crahInstalled ?? null,
-                rowsPerBank: engine.rowsPerBank ?? null, rackBanks: engine.rackBanks ?? null,
+                rowsPerBank: engine.rowsPerBank ?? null, rackBanks: engine.rackBanks ?? null, crossAisleM: engine.crossAisleM ?? null,
                 racksPerHall: engine.racksPerHall ?? null,
                 rackDepthM: engine.rackDepthM ?? null, rackPitchM: engine.rackPitchM ?? null
             },
@@ -109,12 +105,17 @@ try {
             rowGroups: hall.querySelectorAll('.rowg').length,
             rowAnimations: [...hall.querySelectorAll('.rowg')].filter((g) => g.querySelector('animate')).length,
             cduInGallery: (() => {
-                const fieldRight = Math.max(...racks.map((r) => rect(r).right));
-                return cduBoxes.length > 0 && cduBoxes.every((b) => b.left >= fieldRight - 1
-                    && (b.bottom <= bankAbottom + 2 || b.top >= bankBtop - 2));
+                const corridorEnd = fieldBottom + (engine.crossAisleM || 0) * ppm;
+                const crahSouthTop = Math.min(...crah.map((c) => rect(c).top).filter((t) => t > fieldBottom));
+                return ppm > 0 && cduBoxes.length > 0 && cduBoxes.every((b) => b.top >= corridorEnd - 1 && b.bottom <= crahSouthTop + 1);
             })(),
-            crahEastOfCdu: crah.length > 0 && cdus.length > 0
-                && Math.min(...crah.map((c) => rect(c).left)) >= Math.max(...cduBoxes.map((b) => b.right)) - 1,
+            crahInGalleries: (() => {
+                if (!crah.length || !cdus.length) return { ok: false, n: 0, s: 0 };
+                const cduBottom = Math.max(...cduBoxes.map((b) => b.bottom));
+                const north = crah.filter((c) => rect(c).bottom <= fieldTop + 1).length;
+                const south = crah.filter((c) => rect(c).top >= cduBottom - 1).length;
+                return { ok: north + south === crah.length && Math.abs(north - south) <= 1, n: north, s: south };
+            })(),
             rackRatios: racks.slice(0, 40).map((r) => { const b = r.querySelector('rect'); const w = parseFloat(b.getAttribute('width')), h = parseFloat(b.getAttribute('height')); return h > 0 ? w / h : -1; }),
             hot: readout('H'), cold: readout('C'),
             unavailable: /ROW LAYOUT UNAVAILABLE/.test(hall.innerHTML)
@@ -129,8 +130,8 @@ try {
         `${m.racks} of ${e.racksPerHall}`);
     check('one CDU glyph per INSTALLED unit, no aggregation divisor',
         e.cduInstalled != null && m.cdus === e.cduInstalled, `${m.cdus} of ${e.cduInstalled}`);
-    check('the CDUs stand in the CDU gallery, east of the rack field and clear of the cross aisle',
-        m.cduInGallery, m.cduInGallery ? 'mechanical zone, both blocks' : 'some CDU sits in the rack field or the egress aisle');
+    check('the CDUs stand in the CDU line at the row ends, past the service corridor',
+        m.cduInGallery, m.cduInGallery ? 'south of the corridor, north of the south fan wall' : 'some CDU sits in the rack field, the corridor or a gallery');
     check('every row carries its own flow animation, not just the header trunks',
         m.rowGroups > 0 && m.rowAnimations === m.rowGroups, `${m.rowAnimations} of ${m.rowGroups} rows`);
     check('the supply path animates end to end', m.animations >= m.rowGroups + 2,
@@ -181,8 +182,9 @@ try {
             ? `${sameWithinAisle.length} of ${aisleCount} aisle(s) flat (${Math.round(flatShare * 100)}%) — a shared seed shows as ~100%`
             : `each of ${aisleCount} aisles shows a gradient`);
 
-    check('one CRAH glyph per INSTALLED unit, in the air plant east of the CDU gallery',
-        e.crahInstalled != null && m.crah === e.crahInstalled && m.crahEastOfCdu, `${m.crah} of ${e.crahInstalled}${m.crahEastOfCdu ? '' : ' — some CRAH stands west of a CDU'}`);
+    check('one air-unit glyph per INSTALLED unit, every one a fan-wall module in the N or S gallery',
+        e.crahInstalled != null && m.crah === e.crahInstalled && m.crahInGalleries.ok,
+        `${m.crah} of ${e.crahInstalled} — north ${m.crahInGalleries.n}, south ${m.crahInGalleries.s}`);
     const want = (e.rackDepthM && e.rackPitchM) ? e.rackDepthM / e.rackPitchM : null;
     const worst = want ? Math.max(...m.rackRatios.map((r) => Math.abs(r / want - 1))) : null;
     check('the plan is drawn at ONE scale (rack glyphs keep the engine depth/width ratio)',

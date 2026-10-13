@@ -11,6 +11,66 @@ release sections rather than semver.
 
 ---
 
+## v3.21.7 — 2026-10-14
+
+### "Fan Wall": the DC AI hall laid out like a real GB300 liquid hall
+
+**Why.** The owner reviewed the hall plan and said the CDU and CRAH positions are "not like that in the real world", and that the arrangement made the hall a joke. They were right:
+- The plan put 90 CRAHs in six lines in the middle of the room and stood the CDUs in an east gallery.
+- Cold air had to travel 31 m down a cross aisle.
+- The engine's own comment called the air plant a "perimeter gallery" while the drawing put it mid-room.
+- The text above the plan was faint prose, the floor plans in Room Layout were the retired 72 × 48 m grid with "CRAH ×6" at 4 px, and the hover effects read as gimmicks.
+
+**The layout** follows the GB300 reference designs (Vertiv 360AI RD0019: perimeter chilled-water fan walls and liquid-to-liquid CDUs; Schneider GB300 NVL72 hall). The owner chose it over keeping the old engine geometry. From north to south:
+- **Fan-wall gallery N, 3 m.** 45 CHW fan-wall modules discharge straight into the cold aisles.
+- **Rack field.** 20 rows of 22 racks run north–south at 3.1 m pitch, the full 62 m length. Hot aisles are contained and rise to the ceiling plenum, which returns to both fan walls.
+- **Service corridor, 4.6 m.** TCS supply and return headers run overhead, with the busway feeders, the leak rope and the egress doors at both ends.
+- **CDU line, 3.9 m.** The 55 CDUs stand at the row ends, one group under each containment pair. Their secondaries rise to the corridor headers and their primaries sit on the HTW header behind them.
+- **Service aisle, 3.3 m.** This is the floor spare, 226 m².
+- **Fan-wall gallery S, 3 m.** 45 modules, one of them standby.
+
+**Engine (`js/dcai-model.js`, `js/dcai-engine.js`):**
+- `geometry.banks` changes from 2 to 1.
+- New leaves `cduLineDepthM` (3.9 m) and `fanWallGalleries` (2). `crahServiceM2` is retired.
+- The air-plant floor is now galleries × length × depth = 372 m², and its frontage is the two long walls.
+- New outputs: `fan_wall_modules_per_gallery` (45), `fan_wall_module_pitch_m` (1.38), `width_stack_m` (27.7 of 31 m) and `length_stack_m` (62 of 62 m), each with a fits flag.
+- The fan-wall face check still holds: 535 m² needed against 682 m² available at 2.5 m/s.
+- New output `fan_wall_face_velocity_ms` publishes the 2.5 m/s face velocity, so the plan prints it from the engine instead of as a literal.
+- The registry is regenerated: 292 parameters, R7 and R8 strict.
+
+**The hall plan:**
+- Three header cards give the IT load, the liquid path and the air path, each value hooked to the engine.
+- Under them, the floor budget term by term, and the width, length and fan-wall-face checks.
+- Every band of the plan is labelled down the west side.
+- Captions sit on solid backgrounds, so pipes run behind them, not through them.
+
+**Room Layout:** Floors 2–5 now draw both halls of a level at true scale on a 90 × 68 m plate:
+- A west core with stairs, lift, risers and MDF.
+- A spine corridor between the wings.
+- An east electrical wing per hall: UPS feed A and B, and the RPP and busway riser.
+- The core, spine and wing are page-authored allowances and are declared as such. The wing is schematic and is not sized to the UPS frame count.
+- The level totals (IT, racks, CDU, fan-wall modules) are two halls × the engine's per-hall value. They are declared as such, not hooked to the per-hall parameter they double.
+
+**Interaction:**
+- Hover a rack and its row, its contained hot aisle and that aisle's sensors stay lit.
+- Hover a CDU and the liquid path stays lit; hover a fan wall and the air path stays lit. Layer chips and key entries light their layer.
+- A clicked unit keeps a selection ring after its HMI closes.
+- A hall switch crossfades.
+- The cursor coordinate readout from the first cut was removed as a gimmick.
+- State is attributes only, so the drawing never refits on hover (`js/datahall-ai/hall-interact.js`).
+
+**Other changes:**
+- Labels: the Go-to chips read "CDU line" and "Fan walls"; the floor-budget panel reads "Service corridor", "CDU line" and "Fan-wall galleries"; the CRAH HMI now supplies "the cold aisles".
+- Rack inspector: it no longer names a bank. Its CDU dependency is the first CDU at its own row pair, and its fire zone is spread across the four rack-row zones.
+- Fire zones Z01–Z04 are renamed "CDU line 1–4".
+
+**Gates:**
+- `tools/test-datahall-ai-hall-plan.mjs` is rewritten: every CDU must stand in the CDU line, past the corridor, and every air unit must be a fan-wall module in the N or S gallery, split evenly. Proven RED on v3.21.6 (CDUs east of the field; 0 of 90 units in a gallery).
+- New `tools/test-datahall-ai-hall-interact.mjs` covers the interaction contract. Proven RED on v3.21.4 with 9 findings.
+- `tools/test-dcai-engine.mjs` gains the gallery, pitch and stack identities.
+
+**Still open:** the ground floor, the roof and the building isometric remain on the retired 72 × 48 m grid, captioned on the drawing. Moving them to the 90 × 68 m plate is the next change.
+
 ## v3.21.6 — 2026-10-14
 
 ### "Wind Tunnel": DH01 in 3D, with a CFD of its airflow

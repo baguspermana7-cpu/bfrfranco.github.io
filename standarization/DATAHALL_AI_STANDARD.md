@@ -456,6 +456,52 @@ WHERE they sit, in exactly one place: `window.HALL_LAYOUT` in `datahallAI.html`.
 - OPEN: the building footprint is still the retired 72 x 48 m grid, captioned as such. Two 62 x 31 m
   halls on one level need at least 62 x 62 m before any corridor; the site re-grid is its own change.
 
+## Hall layout — the hyperscale liquid hall (v3.21.7)
+
+The owner rejected the v3.21.0 arrangement: 90 CRAHs in six lines in the middle of the room, the
+CDUs in an east gallery, and cold air travelling 31 m down a cross aisle. The hall now follows the
+pattern of the GB300 reference designs (Vertiv 360AI RD0019: perimeter CHW fan walls plus
+liquid-to-liquid CDUs; Schneider GB300 NVL72 hall). From north to south, each band from the engine:
+
+| band | depth | engine |
+|---|---|---|
+| fan-wall gallery N | 3 m | `geometry.airPlantDepthM`; 45 modules at `fan_wall_module_pitch_m` |
+| rack field | 13.2 m | 20 rows × 22 racks, rows north–south at 3.1 m pitch = the 62 m length |
+| service corridor | 4.6 m | `crossAisleM`; TCS headers overhead, busway feeders, egress |
+| CDU line | 3.9 m | `cduLineDepthM`; the CDUs at the row ends, one group per containment pair |
+| service aisle | 3.3 m | the floor spare |
+| fan-wall gallery S | 3 m | as N |
+
+- **The plan closes.** `geometry.width_stack_fits` (27.7 of 31 m) and `length_stack_fits` (62 of 62 m) prove it. `fan_wall_fits` compares the face area needed at 2.5 m/s with the two long walls' face.
+- **The same arrangement everywhere.** The Room Layout level plans draw both halls of a level at true scale on a 90 × 68 m plate. The plate's core, spine and electrical wing are page-authored allowances, declared as such. The electrical wing is schematic and not sized to the UPS frame count.
+- **Gate.** `tools/test-datahall-ai-hall-plan.mjs` asserts that every CDU stands in the CDU line, past the corridor, and that every air unit is a fan-wall module in the N or S gallery, split evenly.
+
+## Hall plan micro-interactions (v3.21.7)
+
+`js/datahall-ai/hall-interact.js` lets the reader ask the hall plan a question by pointing at it.
+Hovering an object lights the part of the plant it belongs to and dims everything else to 22 %:
+
+| pointed at | stays lit |
+|---|---|
+| a rack | its row, its row label, its contained hot aisle, that aisle's thermal cells and sensors |
+| a CDU or the HTW entry | the liquid path: CDU stubs, corridor TCS headers, row manifolds (racks dimmed), HTW |
+| a fan-wall module | the air path: cold supply, hot aisles, plenum return, sensors, both fan-wall galleries |
+| a layer chip / a key entry | that layer / that kind of object |
+
+Other behaviour:
+- **Selection ring.** Clicking a unit puts a ring on it, and the ring survives a re-render. Closing the HMI then shows where you were.
+- **Hall switch.** Switching hall crossfades the new drawing in over 280 ms.
+- **Layer toggles.** A layer fades in or out over 200 ms (`display` transitions with `allow-discrete`).
+- **Tooltip.** The first tooltip after a pause eases in over 125 ms. Moving between objects then updates it in place, with no animation.
+
+Rules:
+- **State is attributes.** Use `data-hp-focus`, `data-hp-hot` and `data-hp-sel`. Never write a class: `rz-svg-legible` refits on any class change and the refit resets the pan.
+- **The spotlight is opacity only.** It waits a 110 ms dwell before it first engages, then retargets instantly, so sweeping across 880 racks never strobes.
+- **Keyboard parity.** Focusing a unit gives the same spotlight as hovering it.
+- **Mouse and pen only for hover.** Touch never triggers a false hover.
+- **Reduced motion keeps the opacity cues and drops all movement.** That removes the press scale and the crossfade offset.
+- **The spotlight joins on builder hooks.** They are `data-pi` (containment-pair index) on the row, its thermal cells, containment and sensors; `data-row-l` on the row label; and `hp-wall`. `tools/test-datahall-ai-hall-interact.mjs` fails if any hook disappears.
+
 ## CRITICAL: SVG Layout Anti-Overlap Rules
 
 When building complex SVGs with multiple columns (like the 4-DH electrical SLD):

@@ -466,7 +466,16 @@
     var rackFieldM2 = f.racksPerHall * geo.rackPitchM * rowPitchM;
     var crossAisleM2 = geo.crossAisleM * geo.lengthM;
     var cduGalleryM2 = (cduDutyHall + 1) * geo.cduServiceM2;
-    var airPlantM2 = (crahDutyHall + 1) * geo.crahServiceM2;
+    /* v3.21.7 — the air plant is two CHW fan-wall galleries, one along each long wall, so its
+       floor is gallery depth x hall length x galleries and its frontage is the two long walls.
+       Each installed air unit is one module of a gallery, at the pitch the wall gives it. */
+    var airPlantM2 = geo.fanWallGalleries * geo.lengthM * geo.airPlantDepthM;
+    var fanWallModulesPerGallery = Math.ceil((crahDutyHall + 1) / geo.fanWallGalleries);
+    /* the plan closes across the WIDTH too: north gallery + one row length + service corridor +
+       CDU line + south gallery must fit in the hall width; the rows must fit in the length */
+    var rowLengthM = div(f.racksPerHall, geo.rows, 'racks per row') * geo.rackPitchM;
+    var widthStackM = geo.fanWallGalleries * geo.airPlantDepthM + geo.banks * rowLengthM + geo.crossAisleM + geo.cduLineDepthM;
+    var lengthStackM = div(geo.rows, geo.banks, 'rows per bank') * (geo.rackDepthM + geo.coldAisleM + geo.hotAisleM);
     var floorUsedM2 = rackFieldM2 + crossAisleM2 + cduGalleryM2 + airPlantM2;
     var airDeltaTK = design.planes.p11_air_return_c - design.planes.p09_air_supply_c;
     var airFlowM3s = div(airHeatHall_kwth, geo.airDensityKgM3 * geo.airCpKjKgK * airDeltaTK, 'hall airflow');
@@ -476,7 +485,7 @@
        four-hall basis failed and the reason it is written this way rather than as "the two long
        walls": 179 CRAH cells needed 895 m2 of gallery, which at 3 m deep is 298 m of frontage
        against a 186 m perimeter — the plant did not fit around the room, let alone in it. */
-    var airPlantFrontageM = div(airPlantM2, geo.airPlantDepthM, 'air plant frontage');
+    var airPlantFrontageM = div(airPlantM2, geo.airPlantDepthM, 'air plant frontage');   /* = galleries x length */
     var hallPerimeterM = 2 * (geo.lengthM + geo.widthM);
     var airPlantFaceM2 = airPlantFrontageM * geo.heightM;
     var geometry = {
@@ -532,12 +541,21 @@
       air_delta_t_k: airDeltaTK,
       air_flow_m3s_per_hall: airFlowM3s,
       fan_wall_face_m2: fanWallFaceM2,
+      fan_wall_face_velocity_ms: geo.fanWallFaceVelocityMs,
       air_plant_frontage_m: airPlantFrontageM,
       hall_perimeter_m: hallPerimeterM,
       air_plant_frontage_fits: airPlantFrontageM <= hallPerimeterM,
       air_plant_face_available_m2: airPlantFaceM2,
       fan_wall_face_fraction: div(fanWallFaceM2, airPlantFaceM2),
-      fan_wall_fits: fanWallFaceM2 <= airPlantFaceM2
+      fan_wall_fits: fanWallFaceM2 <= airPlantFaceM2,
+      fan_wall_galleries: geo.fanWallGalleries,
+      fan_wall_modules_per_gallery: fanWallModulesPerGallery,
+      fan_wall_module_pitch_m: div(geo.lengthM, fanWallModulesPerGallery, 'fan wall module pitch'),
+      cdu_line_depth_m: geo.cduLineDepthM,
+      width_stack_m: widthStackM,
+      width_stack_fits: widthStackM <= geo.widthM,
+      length_stack_m: lengthStackM,
+      length_stack_fits: lengthStackM <= geo.lengthM + 1e-9
     };
 
     /* --- the MV/HV chain above the unit substations (v3.2.0) -------------------
@@ -663,7 +681,7 @@
     return deepFreeze({
       meta: {
         engine: 'dcai-engine.js',
-        version: '1.3.0',   /* v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
+        version: '1.4.0',   /* v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
         spec_version: m.specVersion,
         authority: m.authority,
         evidence_class: 'SIMULATED/ADOPTED',

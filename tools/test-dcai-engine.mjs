@@ -56,7 +56,7 @@ const S = C.snapshot;
 /* ── 0. sources and hygiene ─────────────────────────────────────────────── */
 ok(!/Math\.random/.test(ENGINE_SRC) && !/Math\.random/.test(MODEL_SRC), 'no Math.random in model or engine');
 ok(Object.isFrozen(S) && Object.isFrozen(S.design) && Object.isFrozen(M.thermal), 'snapshot and model are deep-frozen');
-ok(S.meta.version === '1.3.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
+ok(S.meta.version === '1.4.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
 ok(!/MEASURED/.test(MODEL_SRC.replace(/nothing may claim MEASURED[^\n]*/,'')), 'nothing in the model claims MEASURED');
 {
   /* every numeric leaf in the model has a `// source:` line within the 6 lines above it */
@@ -285,7 +285,14 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
     'rack_field_m2 = racks x rack pitch x row pitch');
   approx(Ge.cross_aisle_m2, M.geometry.crossAisleM * M.geometry.lengthM, 1e-9, 'cross_aisle_m2 = cross aisle width x hall length');
   approx(Ge.cdu_gallery_m2, E.cdu_installed_per_hall * M.geometry.cduServiceM2, 1e-9, 'cdu_gallery_m2 = installed CDUs x serviced floor each');
-  approx(Ge.air_plant_m2, E.crah_installed_per_hall * M.geometry.crahServiceM2, 1e-9, 'air_plant_m2 = installed CRAHs x serviced floor each');
+  approx(Ge.air_plant_m2, M.geometry.fanWallGalleries * M.geometry.lengthM * M.geometry.airPlantDepthM, 1e-9, 'air_plant_m2 = fan-wall galleries x hall length x gallery depth (v3.21.7)');
+  ok(Ge.fan_wall_modules_per_gallery * M.geometry.fanWallGalleries >= E.crah_installed_per_hall, 'every installed air unit has a module slot in a gallery',
+    Ge.fan_wall_modules_per_gallery + ' x ' + M.geometry.fanWallGalleries + ' for ' + E.crah_installed_per_hall);
+  approx(Ge.fan_wall_module_pitch_m, M.geometry.lengthM / Ge.fan_wall_modules_per_gallery, 1e-9, 'fan_wall_module_pitch_m = hall length / modules per gallery');
+  approx(Ge.width_stack_m, M.geometry.fanWallGalleries * M.geometry.airPlantDepthM + M.geometry.banks * Ge.racks_per_row * M.geometry.rackPitchM + M.geometry.crossAisleM + M.geometry.cduLineDepthM, 1e-9,
+    'width_stack_m = galleries + row length + service corridor + CDU line');
+  ok(Ge.width_stack_fits === true && Ge.width_stack_m <= M.geometry.widthM, 'the plan closes across the width', Ge.width_stack_m.toFixed(1) + ' of ' + M.geometry.widthM + ' m');
+  ok(Ge.length_stack_fits === true && Ge.length_stack_m <= M.geometry.lengthM + 1e-9, 'the rows close along the length', Ge.length_stack_m.toFixed(1) + ' of ' + M.geometry.lengthM + ' m');
   approx(Ge.floor_used_m2, Ge.rack_field_m2 + Ge.cross_aisle_m2 + Ge.cdu_gallery_m2 + Ge.air_plant_m2, 1e-9,
     'floor_used_m2 is the sum of its four named terms and nothing else');
   approx(Ge.floor_spare_m2, Ge.hall_area_m2 - Ge.floor_used_m2, 1e-9, 'floor_spare_m2 = hall area - floor used');
@@ -303,6 +310,8 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
     'air_flow_m3s_per_hall = hall air heat / (rho x cp x dT)');
   approx(Ge.fan_wall_face_m2, Ge.air_flow_m3s_per_hall / M.geometry.fanWallFaceVelocityMs, 1e-9,
     'fan_wall_face_m2 = airflow / face velocity');
+  approx(Ge.fan_wall_face_velocity_ms, M.geometry.fanWallFaceVelocityMs, 0,
+    'fan_wall_face_velocity_ms publishes the model face velocity');
   approx(Ge.air_plant_frontage_m, Ge.air_plant_m2 / M.geometry.airPlantDepthM, 1e-9,
     'air_plant_frontage_m = gallery floor / gallery depth');
   approx(Ge.hall_perimeter_m, 2 * (M.geometry.lengthM + M.geometry.widthM), 1e-9, 'hall_perimeter_m = 2 x (length + width)');

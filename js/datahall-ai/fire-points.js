@@ -68,10 +68,10 @@
      double-interlock release counts; `release` marks clean-agent zones; `epo` follows Tech Spec §6.9
      (NFPA 75 §9.4 — electrical rooms only). */
   var ZONE_TEMPLATE = deepFreeze([
-    { n: 1, name: 'CDU gallery 1', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
-    { n: 2, name: 'CDU gallery 2', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
-    { n: 3, name: 'CDU gallery 3', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
-    { n: 4, name: 'CDU gallery 4', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
+    { n: 1, name: 'CDU line 1', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
+    { n: 2, name: 'CDU line 2', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
+    { n: 3, name: 'CDU line 3', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
+    { n: 4, name: 'CDU line 4', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
     { n: 5, name: 'Rack rows 1-10', areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },
     { n: 6, name: 'Rack rows 11-20', areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },
     { n: 7, name: 'Rack rows 21-30', areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },

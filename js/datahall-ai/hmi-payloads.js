@@ -519,9 +519,9 @@
   def('rack-unit', { kind: 'engine', label: 'Rack', system: 'compute', tier2: 'rack' }, function (b, ctx, id) {
     var A = ctx.adapter, m = /^R(\d\d)-(\d\d)$/.exec(String(id)) || (String(id) === '1' || /^dh/i.test(String(id)) ? ['', '01', '01'] : null);
     if (!m) { throw new Error('hmi-payloads: rack-unit id must be R<row>-<pos>: ' + id); }
-    var row = Number(m[1]), pos = Number(m[2]), rpb = finite(A.rowsPerBank) ? A.rowsPerBank : null, bank = rpb ? (row <= rpb ? 'A' : 'B') : '—';
+    var row = Number(m[1]), pos = Number(m[2]);
     var hp = 'DH-0' + b.hall;
-    b.title = 'Rack R' + m[1] + '-' + m[2] + ' — RG-' + m[1] + ' · bank ' + bank + ' — ' + hp;
+    b.title = 'Rack R' + m[1] + '-' + m[2] + ' — RG-' + m[1] + ' — ' + hp;
     b.E('live', 'it_kw', 'Design IT load', 'kwPerRack', 'kW', { digits: 0 });
     b.E('live', 'gpus', 'GPUs', 'gpuPerRack', '', { digits: 0 });
     b.E('live', 'feed_a', 'Rack feed', 'rackFeedA', 'A', { digits: 0 });
@@ -534,11 +534,15 @@
     b.E('capacity', 'racks_per_row', 'Racks in this row (RPP group)', 'racksPerRow', '', { digits: 0 });
     b.E('capacity', 'group_kw', 'Row / RPP group load', 'groupKw', 'kW', { digits: 0 });
     b.E('capacity', 'group_a', 'Row LV current', 'reqCurrentA', 'A', { digits: 0 });
-    b.D('capacity', 'position', 'Position', 'row ' + row + ' of ' + (finite(A.rackRows) ? A.rackRows : '—') + ', bank ' + bank + ', position ' + pos + ' from the cross aisle', 'plan position from the engine hall geometry (geometry.rack_rows, geometry.rows_per_bank); a label (Track A §A2b)');
-    var gal = rpb ? (row <= rpb ? (pos <= 11 ? 1 : 3) : (pos <= 11 ? 2 : 4)) : 1;
-    b.dep('upstream', 'cdu:' + (finite(A.cduInstalled) ? Math.min(A.cduInstalled, (gal - 1) * Math.ceil(A.cduInstalled / 4) + 1) : 1), 'CDU gallery ' + gal + ' (TCS header)');
+    b.D('capacity', 'position', 'Position', 'row ' + row + ' of ' + (finite(A.rackRows) ? A.rackRows : '—') + ', position ' + pos + ' from the service corridor', 'plan position from the engine hall geometry (geometry.rack_rows, geometry.racks_per_row); a label (v3.21.7)');
+    /* v3.21.7 — the CDUs stand in the CDU line at the row ends, a group under each containment pair (the
+       hall plan's own distribution): pair p holds floor(n/pairs) units plus one of the remainder. */
+    var pairsN = finite(A.rackRows) ? A.rackRows / 2 : null, pIdx = Math.floor((row - 1) / 2);
+    var cduFirst = (finite(A.cduInstalled) && pairsN) ? pIdx * Math.floor(A.cduInstalled / pairsN) + Math.min(pIdx, A.cduInstalled % pairsN) + 1 : 1;
+    b.dep('upstream', 'cdu:' + cduFirst, 'CDU line at the end of this row pair (TCS header)');
     b.dep('upstream', 'sld-busway:dh0' + b.hall, 'Busway / RPP group RG-' + m[1]);
-    b.dep('upstream', 'fire-zone:' + hp + '-Z' + (row <= 10 ? '05' : row <= 20 ? '06' : row <= 30 ? '07' : '08'), 'Fire zone');
+    var zPer = finite(A.rackRows) ? Math.ceil(A.rackRows / 4) : 5;   /* four rack-row fire zones Z05-Z08 across the rows */
+    b.dep('upstream', 'fire-zone:' + hp + '-Z0' + Math.min(8, 5 + Math.floor((row - 1) / zPer)), 'Fire zone');
     b.dep('downstream', 'rack-manifold:1', 'Rack liquid manifold');
     b.trend('gpu_util', 'GPU utilisation', '%', { value: 92 }, 5, { digits: 0 });
     b.tier2('rack', ['manifold', String(pos)]);

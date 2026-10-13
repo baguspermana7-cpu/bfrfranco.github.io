@@ -90,6 +90,7 @@ gate "DC AI page — zero retired GB200 numerals" node tools/test-datahall-ai-no
 gate "DC AI CDU — 9 running / 12 installed" node tools/test-datahall-ai-cdu-basis.mjs
 gate "DC AI electrical — topology" node tools/test-datahall-ai-electrical-topology.mjs
 gate "DC AI electrical — visual projection" node tools/test-datahall-ai-electrical-visual-map.mjs
+gate "DC AI hall plan — micro-interaction contract" node tools/test-datahall-ai-hall-interact.mjs
 gate "DC AI electrical — four-second live parity" node tools/test-datahall-ai-electrical-live.mjs
 gate "DC AI fire — FACP cause and effect" node tools/test-datahall-ai-fire-cause-effect.mjs
 gate "DC AI fire workstation — inventory formula, isolation refusals, two-means rule, records, expiry, purity" node --test tools/test-datahall-ai-fire-points.mjs

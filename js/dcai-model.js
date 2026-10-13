@@ -402,9 +402,13 @@
       // source: 440 racks / 22 per row. A row is one RPP group, so the electrical unit of
       //         account and the floor unit of account are the same object. ADOPTED
       rows: 20,
-      // source: two banks facing a central cross aisle that carries the TCS headers; rows per
-      //         bank = rows / banks must be an integer. ADOPTED
-      banks: 2,
+      // source: v3.21.7 — ONE bank of 20 rows across the 62 m length, each 13.2 m row running
+      //         north-south between the two fan-wall galleries, the hyperscale liquid hall pattern
+      //         (Vertiv 360AI RD0019: perimeter CHW fan walls + liquid-to-liquid CDUs; Schneider
+      //         GB300 NVL72 hall). The retired basis was two banks around a central cross aisle,
+      //         which pushed the whole air plant into the east half of the room and made the cold
+      //         air travel 31 m. rows per bank = rows / banks must be an integer. ADOPTED
+      banks: 1,
       // source: NVIDIA GB300 NVL72 design guide rack footprint class 600 x 1200 mm. ADOPTED
       rackFootprintM2: 0.72,
       // source: the same 600 x 1200 mm class, stated as the two dimensions the floor plan needs
@@ -419,16 +423,23 @@
       //         manifolds and containment doors need the full clearance on both faces. ADOPTED
       coldAisleM: 1.2,
       hotAisleM: 0.7,
-      // source: the central aisle carries the TCS supply and return headers, the cable tray
-      //         spine and the fire egress route; 4.6 m is what a 31 m hall has left after two
-      //         13.2 m row banks. ADOPTED
+      // source: v3.21.7 — the SERVICE CORRIDOR along the south ends of the rows: it carries the
+      //         secondary-fluid-network (TCS) supply and return headers overhead, the busway
+      //         feeders and the fire egress route, between the row ends and the CDU line. Width
+      //         kept from the retired cross aisle. ADOPTED
       crossAisleM: 4.6,
+      // source: the CDU line south of the service corridor: CoolIT CHx1000 class 1.9 m deep with
+      //         1 m of access on each face = 3.9 m (the same unit as cduServiceM2). ADOPTED
+      cduLineDepthM: 3.9,
       // source: CoolIT CHx1000 class, about 0.9 x 1.9 m on plan, plus 1 m of access at each end
       //         = 0.9 x 3.9. Rounded to 4 m2 of serviced floor per unit. ADOPTED
       cduServiceM2: 4,
-      // source: large-frame CRAH class, about 1.0 x 2.6 m on plan, plus 1 m front and rear
-      //         access = 1.0 x 4.6. Rounded to 5 m2 of serviced floor per unit. ADOPTED
-      crahServiceM2: 5,
+      // source: v3.21.7 — the air plant is CHW FAN WALLS in two galleries, one along each long
+      //         wall (north and south), discharging into the cold aisles and drawing the contained
+      //         hot aisles back through the ceiling plenum (Vertiv 360AI RD0019 "Chilled Water
+      //         Modular Fan Wall", perimeter air). Each installed air unit is one fan-wall module
+      //         of the gallery. ADOPTED
+      fanWallGalleries: 2,
       // source: coil face velocity for a CHW air handler. Above roughly 3 m/s the coil carries
       //         moisture off the fins and the static penalty climbs steeply; 2.5 m/s is the
       //         conventional design point. It is the number that decides whether the air a hall
