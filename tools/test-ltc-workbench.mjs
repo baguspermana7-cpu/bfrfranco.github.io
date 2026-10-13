@@ -294,7 +294,7 @@ for (const [page, mod] of Object.entries(PAGES)) {
   }
   const sb = { console, Math, JSON, Date }; sb.window = sb; sb.globalThis = sb; sb.document = { readyState: 'loading', addEventListener() {} };
   vm.createContext(sb);
-  for (const f of ['js/ltc-plant.js', 'js/ltc-dh01.js', 'js/ltc-tier.js', 'js/ltc-report.js']) vm.runInContext(readFileSync(join(root, f), 'utf8'), sb, { filename: f });
+  for (const f of ['js/ltc-plant.js', 'js/ltc-dh01.js', 'js/ltc-dh01-3d.js', 'js/ltc-cfd.js', 'js/ltc-tier.js', 'js/ltc-report.js']) vm.runInContext(readFileSync(join(root, f), 'utf8'), sb, { filename: f });
   const P = sb.LTCPlant, X = sb.LTCReport, D = sb.LTCDH01;
   {
     /* the plant map views the report embeds: drawn by the hub's own build on any result, no engine warnings */
@@ -388,6 +388,68 @@ for (const [page, mod] of Object.entries(PAGES)) {
       }
     }
     ok('W12v', !bad.length, 'DH01 sequence of events: each timed threshold is crossed at its stated second and not before, FWS throttle at the transient\'s crossing, feeder shed = hall solve, time order — 12 plants × every fault' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
+  }
+  {
+    /* DH01 in 3D draws the solve, it does not re-solve: supply streams per aisle mouth and wall equal
+       the solver's marching, recirculation equals the hall's, every stream carries its rack's inlet and
+       exhaust, TCS per CDU is the plant flow (zero on a dead per-CDU loop), FWS stops with the pumps,
+       CHW stops with the chilled water — 8 plants × every fault × both headers */
+    const bad = [], G = sb.LTCDH013D;
+    for (const st0 of [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70 }].concat(Object.keys(P.PRESETS).map((k) => P.PRESETS[k]))) for (const [f] of D.FAULTS) for (const hd of ['common', 'per-cdu']) {
+      const R = P.compute(Object.assign({}, st0)), s = D.solveHall(R, f, hd, 5, 'throttled'), M = G.flowModel(R, s, { fault: f, header: hd, phase: 'throttled', load: 1, minute: 5 });
+      const tag = JSON.stringify(st0).slice(0, 40) + '/' + f + '/' + hd, of = (k) => M.streams.filter((x) => x.kind === k), sum = (a) => a.reduce((t, x) => t + x.flow, 0);
+      for (const a of s.aisles) for (const w of ['west', 'east']) {
+        const got = sum(of('air').filter((x) => s.racks[x.rack].aisle === a.i && x.wall === w));
+        if (Math.abs(got - a[w]) > 1e-6 * Math.max(1, a.demand)) bad.push(`${tag}: aisle ${a.i} ${w} ${got.toFixed(3)} vs ${a[w].toFixed(3)}`);
+      }
+      if (Math.abs(sum(of('recirc')) - s.recircM3s) > 1e-6 * s.airDemand) bad.push(`${tag}: recirculation ${sum(of('recirc'))} vs ${s.recircM3s}`);
+      for (const x of of('air').concat(of('recirc'))) { const k = s.racks[x.rack], ins = x.pts.find((q, j) => j > 0 && q[3] === k.inlet), ex = x.pts.find((q) => q[3] === k.exhaust); if (!ins || !ex) { bad.push(`${tag}: rack ${x.rack} stream lacks its inlet/exhaust`); break; } }
+      const perCdu = R.liquid.tcsLps / R.input.halls / R.liquid.cduPerHall;
+      for (const c of R.hall.cdus) {
+        const got = sum(of('tcs').filter((x) => R.hall.racks[x.rack].cdu === c.i)), dead = !!s.lostCdu[c.i];
+        const want = hd === 'per-cdu' ? (dead ? 0 : perCdu) : perCdu * R.hall.cdus.filter((u) => !s.lostCdu[u.i]).length / R.hall.cdus.length;
+        if (Math.abs(got - want) > 1e-6 * perCdu) { bad.push(`${tag}: CDU ${c.i} TCS ${got.toFixed(2)} vs ${want.toFixed(2)} L/s`); break; }
+      }
+      if ((f === 'fws-pump') !== (of('fws').length === 0)) bad.push(`${tag}: FWS streams ${of('fws').length}`);
+      if ((f === 'chw') !== (of('chw').length === 0)) bad.push(`${tag}: CHW streams ${of('chw').length}`);
+      if (M.streams.some((x) => !(x.cycle > 0) || x.legT.some((t) => !isFinite(t)))) bad.push(`${tag}: a stream with no finite cycle`);
+    }
+    ok('W12x', !bad.length, 'DH01 3D streams equal the solve: supply per aisle mouth and wall, recirculation, every rack\'s inlet and exhaust, TCS per CDU, FWS and CHW stopping with their fault — 8 plants × every fault × both headers' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
+  }
+  {
+    /* DH01 CFD: mass and energy close, and the solve agrees with the balance solve where it must —
+       normal operation inside the envelope and at its supply/return, a CRAH fault overheating the
+       same side; what only a CFD can say (where the recirculation lands) is reported, not gated */
+    const bad = [], F = sb.LTCCFD, R = P.compute({}), facts = [];
+    for (const f of ['none', 'crah2', 'crah4']) {
+      const s = D.solveHall(R, f, 'common', 5, 'throttled'), C = F.run(R, s, { dx: 0.6, steps: 250 }), r = F.report(C);
+      const err = Math.abs(r.qCrahKw - r.qRacksKw) / r.qRacksKw;
+      if (err > 0.01) bad.push(`${f}: heat removed ${r.qCrahKw.toFixed(0)} of ${r.qRacksKw.toFixed(0)} kW`);
+      if (r.residual > 5e-3) bad.push(`${f}: mass residual ${r.residual.toExponential(1)}`);
+      if (Math.abs(r.ret - s.returnC) > 1 || Math.abs(r.supply - s.supply) > 0.5) bad.push(`${f}: return ${r.ret.toFixed(2)} / supply ${r.supply.toFixed(2)} vs balance ${s.returnC.toFixed(2)} / ${s.supply.toFixed(2)}`);
+      if (f === 'none' && (r.over27 || r.maxInlet - s.maxInlet > 0.5)) bad.push(`normal: CFD hottest inlet ${r.maxInlet.toFixed(2)} °C, ${r.over27} racks over 27`);
+      if (f !== 'none' && (!r.over27) !== (!s.over27)) bad.push(`${f}: CFD ${r.over27} racks over 27 °C, balance ${s.over27}`);
+      if (f !== 'none') {
+        const half = (west) => C.racks.filter((x) => (R.hall.racks[x.n].x < R.hall.lengthM / 2) === west), m = (a) => a.reduce((t, x) => t + x.tin, 0) / a.length;
+        if (!(m(half(true)) > m(half(false)))) bad.push(`${f}: a west-wall fault does not heat the west half (${m(half(true)).toFixed(2)} vs ${m(half(false)).toFixed(2)})`);
+      }
+      facts.push(`${f} ${r.maxInlet.toFixed(1)} °C / ${r.over27} racks`);
+    }
+    {
+      /* the containment is whole: the only free faces between a hot aisle and the room are the
+         declared leakage openings (a short row blanked, doors and chimney walls closed) */
+      const C = F.setup(R, D.solveHall(R, 'none', 'common', 5, 'throttled'), { dx: 0.6 }), { nx, ny, nz } = C, ci = (i, j, k) => i + nx * (j + ny * k), jC = C.jC;
+      let open = 0;
+      for (let k = 0; k < nz; k++) for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+        const c = ci(i, j, k); if (C.solid[c]) continue;
+        for (const [a, b, d, fx] of [[i + 1, j, k, C.fu[i + 1 + (nx + 1) * (j + ny * k)]], [i, j, k + 1, C.fw[i + nx * (j + ny * (k + 1))]], [i, j + 1, k, j + 1 > jC ? 1 : C.fv[i + nx * (j + 1 + (ny + 1) * k)]]]) {
+          if (a >= nx || b >= ny || d >= nz || fx || C.solid[ci(a, b, d)]) continue;
+          if (C.hot[c] !== C.hot[ci(a, b, d)]) open++;
+        }
+      }
+      if (open !== C.leaks) bad.push(`containment: ${open} open faces between hot aisles and the room, ${C.leaks} declared`);
+    }
+    ok('W12y', !bad.length, 'DH01 CFD (0.6 m): containment closed but for its declared leakage openings, heat removed = rack heat within 1 %, mass residual < 5e-3, supply/return within 0.5/1 K of the balance solve, normal operation inside 27 °C, a west-wall CRAH fault heats the west half and puts racks over 27 °C when the balance does (' + facts.join(', ') + ')' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
   }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));

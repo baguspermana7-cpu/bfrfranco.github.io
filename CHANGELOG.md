@@ -11,6 +11,50 @@ release sections rather than semver.
 
 ---
 
+## v3.21.6 — 2026-10-14
+
+### "Wind Tunnel": DH01 in 3D, with a CFD of its airflow
+
+**Why.** The DH01 view was a plan and a mass-and-energy balance: it showed where a fault leaves each rack, not how the air gets there. The owner asked for a hall to turn around in, with the airflow, the heat, the turbulence and the water all moving, and accurate. The hub's DH01 tab now has a **3D · orbit** view and, behind it, a real CFD solve of the hall.
+
+**The CFD** (`js/ltc-cfd.js`, a background Web Worker):
+- **Equations:** incompressible, buoyant airflow on a staggered grid: semi-Lagrangian momentum, Boussinesq buoyancy, and a pressure projection solved by multigrid-preconditioned conjugate gradients, so mass is conserved in every cell. Energy is a conservative finite-volume upwind scheme, so the hall's heat balance closes.
+- **Racks:** black boxes, as DC CFD codes model IT. Each draws its solved airflow from the cold aisle and returns it at the drawn air's mean temperature plus its heat.
+- **CRAH fan walls:** supply below 2.6 m and return through the plenum wall and roof, at the solved unit flow. The coil holds set-point until its fitted effectiveness cannot.
+- **Geometry:** racks, CDUs, ceiling, hot-aisle chimneys and end doors are solid. A short row is closed with blanking panels. The containment leaks through a stated 5 cm slot between rack tops and chimney panels.
+- **Grids:** a 0.6 m grid settles in seconds. A 0.3 m grid is on offer and takes minutes.
+- **No turbulence model:** eddies the grid resolves are resolved, smaller ones are lost to numerical diffusion. This is for training and for comparison with the balance solve, not a design CFD.
+
+**What the view shows:**
+- Streaks advected through the solved velocity: jets off the fan walls, the turn into each aisle, recirculation over the racks.
+- A slice at any height, or down a cold aisle. It can show temperature, speed or resolved turbulence intensity, interpolated between cells on the GPU.
+- Glowing volumes of air above 27 °C outside the contained hot aisles.
+- Rack doors coloured by the CFD inlet and exhaust.
+- The TCS, FWS and CHW pipes with their flows.
+- A panel with the heat in versus heat removed, the mass residual, and the hottest inlet and racks over 27 °C, each against the balance solve.
+- Camera presets: orbit, top, cold-aisle walk-through, hot aisle, plenum. Every rack and unit carries the plan's tooltip.
+
+**Default 100 MW plant, CFD vs balance:**
+
+| Case | CFD | Balance |
+|---|---|---|
+| Normal operation | hottest inlet 24.0 °C | 24.0 °C |
+| Two CRAHs lost | 9 racks over 27 °C | 9 racks over 27 °C |
+| Four CRAHs lost | 71 racks over 27 °C, hottest 34 °C | 29 racks over 27 °C, hottest 41.9 °C |
+
+With four CRAHs lost, the CFD spreads the recirculation over more racks while supply and return agree within 0.4 K. Heat removed equals rack heat within 0.1 % in every case.
+
+**Found on the way:**
+- The last row holds 12 of 20 racks, which left its hot aisle open across the empty slots. The first CFD poured the whole air shortfall through that gap, giving a 56 °C hotspot. It is now blanked, as on site, and gated.
+- A plain SOR projection on the 0.3 m grid left 14 m/s spurious jets. It was replaced by MGPCG.
+
+**Gates** — `tools/test-ltc-workbench.mjs` (323 assertions):
+- **W12x:** the 3D balance streams equal the solve. That covers supply per aisle mouth and wall, recirculation, every rack's inlet and exhaust, TCS per CDU, and FWS and CHW stopping with their fault, for 8 plants × every fault × both headers.
+- **W12y:** the CFD's containment is closed except for its declared openings. Heat balance is within 1 %, mass residual is below 5e-3, and supply and return are within 0.5 K and 1 K of the balance. Normal operation stays inside 27 °C. A west-wall fault heats the west half and puts racks over 27 °C when the balance does.
+- Mutations fail them: the wall split fixed at ½, rack heat at 90 % ("heat removed 3,516 of 3,907 kW"), and the blanking removed ("40 open faces, 16 declared").
+
+three.js r170 (MIT) is vendored as a tree-shaken bundle (`js/vendor/three-r170.min.js`, `tools/three-vendor-entry.js`). It is loaded only when 3D is first opened.
+
 ## v3.21.5 — 2026-10-13
 
 ### "Alarm List": DH01's sequence of events, and a replay of the fault

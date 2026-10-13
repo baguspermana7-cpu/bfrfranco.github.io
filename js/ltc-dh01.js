@@ -80,8 +80,9 @@
     }
     // 1 — rack heat to air and the airflow it needs
     var itLost = 0, throttled = 0, base = (r.air.hallLoadKw - r.air.itKw / p.halls) * Lf / h.racks.length;
-    var q = h.racks.map(function (k) {
+    var liq = [], q = h.racks.map(function (k) {
       var lost = header === 'per-cdu' ? (lostCdu[k.cdu] ? 1 : 0) : liqShortFrac;
+      liq.push(1 - lost);
       if (phase !== 'running' && lost > 0) {          // the rack sheds the load its cold plates can no longer remove
         itLost += rackKw * lost; throttled++;
         return rackKw * (1 - lost) * (1 - cap) + base;
@@ -165,7 +166,7 @@
       if (moved < 0.01) break;
     }
     var racks = h.racks.map(function (k, i) {
-      return { i: k.i, x: k.x, y: k.y, row: k.row, aisle: k.aisle, cdu: k.cdu, q: q[i], dem: dem[i], inlet: inlet[i], exhaust: inlet[i] + p.airDeltaK, f: cov[i] };
+      return { i: k.i, x: k.x, y: k.y, row: k.row, aisle: k.aisle, cdu: k.cdu, q: q[i], dem: dem[i], inlet: inlet[i], exhaust: inlet[i] + p.airDeltaK, f: cov[i], liq: liq[i] };
     });
     var maxIn = inlet.reduce(function (m, v) { return Math.max(m, v); }, 0);
     var recirc = racks.reduce(function (a, k) { return a + (1 - k.f) * k.dem; }, 0);
@@ -508,12 +509,38 @@
       '<div class="ltc-dh-ld"><span class="ltc-eyebrow" id="dhLoadL">Hall load · HLT step</span><div class="ltc-seg" role="group" aria-labelledby="dhLoadL">' + LOADS.map(function (l) { return '<button type="button" data-ld="' + l + '">' + (l * 100) + ' %</button>'; }).join('') + '</div></div>' +
       '<div class="ltc-seg ltc-dh-phase" role="group" aria-label="Racks that lose liquid cooling" hidden><button type="button" data-ph="throttled">Racks throttle (seconds later)</button><button type="button" data-ph="running">If they kept running</button></div>' +
       '<div class="ltc-dh-min" hidden><button type="button" class="ltc-btn" id="dhPlay" aria-pressed="false">▶ Replay</button><label>Minute <input type="range" id="dhMin" min="0" max="30" step="0.5" value="5"><output id="dhMinO">5</output></label></div></div>' +
+      '<div class="ltc-seg ltc-dh-view" role="group" aria-label="DH01 view"><button type="button" data-vw="plan" aria-pressed="true">Plan</button><button type="button" data-vw="3d" aria-pressed="false">3D · orbit</button></div>' +
       '<p class="ltc-plant-bal" id="dhRead" aria-live="polite"></p><div class="ltc-dh-chain" id="dhChain"></div>' +
       '<div class="ltc-dh-wrap"><canvas id="dhCv" role="img" aria-label="DH01 plan coloured by rack inlet temperature"></canvas></div>' +
+      '<div class="ltc-dh-3d" id="dh3d" hidden></div>' +
       '<div class="ltc-dh-legend" id="dhLeg"></div><p class="ltc-note" id="dhNote"></p><div id="dhChart"></div>' +
       '<div class="ltc-soe-wrap" id="dhSoeW"><span class="ltc-eyebrow">Sequence of events · DH01</span><ol class="ltc-soe" id="dhSoe" aria-live="polite"></ol></div>' +
       '<p class="ltc-note"><b>Thermal approximation for training — not CFD.</b> A mass and energy balance on this plant’s numbers: rack airflow at the design ΔT; CRAH fans share one speed up to their rated flow (5 % over demand under pressure control); each fan wall feeds the aisle mouths in proportion to demand, less where its units are out; each cold aisle is marched from both ends until its air is used up; unmet demand is pulled from the hot aisle and plenum return (solved to a fixed point); the CRAH coil is an effectiveness model fitted at design, so supply air rises when the coil cannot hold set-point. Jets, plumes and leakage paths need a CFD study.</p>';
-    var cv = host.querySelector('#dhCv'), last = null, cursor = -1;
+    var cv = host.querySelector('#dhCv'), last = null, cursor = -1, view3d = false;
+    /* 3D: three.js and the 3D view load on first use only (≈ 540 kB), from beside this script */
+    function load3d(done) {
+      if (root.LTCDH013D && root.RZ3) return done();
+      var me = document.querySelector('script[src*="ltc-dh01.js"]'), base = me ? me.src.replace(/ltc-dh01\.js.*$/, '') : 'js/', v = '?v=' + encodeURIComponent(root.RZ_VERSION || '');
+      var files = [base + 'vendor/three-r170.min.js' + v, base + 'ltc-dh01-3d.js' + v], i = 0;
+      (function next() {
+        if (i === files.length) return done();
+        var sc = document.createElement('script'); sc.src = files[i++]; sc.onload = next;
+        sc.onerror = function () { host.querySelector('#dh3d').innerHTML = '<p class="ltc-note">The 3D view could not load. The plan above carries the same numbers.</p>'; };
+        document.head.appendChild(sc);
+      })();
+    }
+    function setView(v) {
+      view3d = v === '3d';
+      [].forEach.call(host.querySelectorAll('[data-vw]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-vw') === v)); });
+      host.querySelector('.ltc-dh-wrap').hidden = view3d; host.querySelector('#dhLeg').hidden = false; host.querySelector('#dh3d').hidden = !view3d;
+      if (!view3d) { paint(); return; }
+      host.querySelector('#dh3d').innerHTML = host.querySelector('#dh3d').innerHTML || '<p class="ltc-note">Loading the 3D hall…</p>';
+      load3d(function () {
+        var el = host.querySelector('#dh3d');
+        if (!root.LTCDH013D.isMounted()) { el.innerHTML = ''; root.LTCDH013D.mount(el, { rack: function (i, x, y) { showRack(i, x, y); }, unit: function (u, x, y) { showUnit(u, x, y); }, hide: function () { if (root.LTCTrace) root.LTCTrace.hide(); } }); }
+        paint();
+      });
+    }
     function legend() {
       var c = [18, 21, 24, 27, 30, 32, 35, 40, 45];
       function sv(body) { return '<svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true">' + body + '</svg>'; }
@@ -561,6 +588,7 @@
         (s.itLostKw ? '<span class="sep">/</span><span>IT shed <b>' + fmt(s.itLostKw / 1000, 1) + ' MW</b> on ' + s.throttled + ' racks</span>' : '') +
         (s.secondsToLimit ? '<span class="sep">/</span><span>to the limit <b>' + (s.secondsToLimit < 60 ? '≈' + fmt(s.secondsToLimit) + ' s' : fmt(s.secondsToLimit / 60, 1) + ' min') + '</b></span>' : '');
       host.querySelector('#dhNote').textContent = s.note;
+      if (view3d && root.LTCDH013D) root.LTCDH013D.update(r, s, ST);
       host.querySelector('#dhChain').innerHTML = chainHtml(r, s);
       var evs = timeline(r, ST.fault, ST.header, ST.phase, ST.load), timed = TIMED[ST.fault], now = ST.minute * 60;
       host.querySelector('#dhChart').innerHTML = chart(s.series, ST.minute, ST.fault, evs);
@@ -592,6 +620,7 @@
       var b = e.target.closest('[data-hdr]'); if (b) { ST.header = b.getAttribute('data-hdr'); paint(); }
       var ph = e.target.closest('[data-ph]'); if (ph) { ST.phase = ph.getAttribute('data-ph'); paint(); }
       var ld = e.target.closest('[data-ld]'); if (ld) { ST.load = +ld.getAttribute('data-ld'); paint(); }
+      var vw = e.target.closest('[data-vw]'); if (vw) setView(vw.getAttribute('data-vw'));
     });
     mi.addEventListener('input', function (e) { stop(); setMin(+e.target.value); });
     /* one tooltip path for mouse, touch and keyboard (LTCTrace.show clamps to the viewport) */
@@ -659,7 +688,7 @@
     document.addEventListener('ltc:tab', function () { if (cv.clientWidth) paint(); });
   }
 
-  root.LTCDH01 = { mount: mount, solveHall: solveHall, timeline: timeline, clock: clock, FAULTS: FAULTS, LOADS: LOADS };
+  root.LTCDH01 = { mount: mount, solveHall: solveHall, ramp: ramp, timeline: timeline, clock: clock, FAULTS: FAULTS, LOADS: LOADS };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCDH01;
   function boot() { var h = document.getElementById('ltcDh01'); if (h) mount(h); }
   if (typeof document !== 'undefined') { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot(); }
