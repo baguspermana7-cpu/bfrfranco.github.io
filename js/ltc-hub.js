@@ -169,7 +169,7 @@
       racks: { sub: f0(R.it.racks) + ' racks · ' + I.halls + ' halls', rows: [['IT load', mw(R.it.kw)], ['Into cold plates', mw(Lq.itKw) + ' (' + I.capturePct + ' %)'], ['Left in the air', mw(A.itKw)], ['Racks per hall', f0(R.it.racksPerHall) + ' × ' + I.rackKw + ' kW']], f: 'liquid = IT × capture; air = IT − liquid' },
       cdu: { sub: Lq.cduTotal + ' × ' + f0(I.cduUnitKw) + ' kW · N+' + I.cduRedundancy, rows: [['Per hall', Lq.cduPerHall + ' (' + Lq.cduDutyN + ' duty)'], ['TCS', I.tcsSupplyC + ' / ' + I.tcsReturnC + ' °C'], ['TCS flow', f0(Lq.tcsLps) + ' L/s'], ['TCS pumps', f0(Lq.tcsPumpKw) + ' kW'], ['Feed', I.cduFeed === 'dual' ? 'dual (ATS)' : 'single, A/B alternating']], f: 'ceil(hall liquid duty / unit) + N' },
       fws: { sub: f1(Lq.fwsSupplyC) + ' / ' + f1(Lq.fwsReturnC) + ' °C · ' + f0(Lq.fwsLps) + ' L/s', rows: [['Supply / return', Lq.fwsSupplyC + ' / ' + Lq.fwsReturnC + ' °C'], ['Flow', f0(Lq.fwsLps) + ' L/s'], ['Pumps', f0(Lq.fwsPumpKw) + ' kW']], f: 'flow = Q / (cp · ΔT_FWS)' },
-      reject: { sub: Lq.coolerUnitsTotal + ' units · ' + f1(Lq.coolerLeavingC) + ' °C out', rows: [['Type', COOLER_NAME[Lq.coolerType]], ['Design sink', f1(Lq.coolerSinkC) + ' °C'], ['Leaving water', f1(Lq.coolerLeavingC) + ' °C'], ['Duty', mw(Lq.coolerKw)], ['Units (N+1)', Lq.coolerUnitsTotal + ' (each derated to ' + (Lq.coolerDerate * 100).toFixed(0) + ' %)']], f: 'units = duty / (rated × LMTD_design / LMTD_rating)' },
+      reject: { sub: Lq.coolerUnitsTotal + ' units · ' + (Lq.coolerUnitsTotal >= 100 ? f0 : f1)(Lq.coolerLeavingC) + ' °C out', rows: [['Type', COOLER_NAME[Lq.coolerType]], ['Design sink', f1(Lq.coolerSinkC) + ' °C'], ['Leaving water', f1(Lq.coolerLeavingC) + ' °C'], ['Duty', mw(Lq.coolerKw)], ['Units (N+1)', Lq.coolerUnitsTotal + ' (each derated to ' + (Lq.coolerDerate * 100).toFixed(0) + ' %)']], f: 'units = duty / (rated × LMTD_design / LMTD_rating)' },
       trim: { sub: Lq.trimKw ? mw(Lq.trimKw) + ' on design day' : 'idle at design', rows: [['Design-day share', (Lq.trimShareDesign * 100).toFixed(0) + ' %'], ['Duty', mw(Lq.trimKw)], ['Input', f0(Lq.trimKwe) + ' kW'], ['Hours running / yr', f0(T.trimHours)]], f: 'FWS heat × (cooler leaving − FWS supply) / ΔT' },
       crah: { sub: A.crahTotal + ' × ' + I.crahUnitKw + ' kW · N+' + I.crahRedundancy, rows: [['Per hall', A.crahPerHall + ' (' + A.crahDutyN + ' duty)'], ['Hall air load', f0(A.hallLoadKw) + ' kW'], ['Airflow per hall', f0(A.airflowHallM3s) + ' m³/s'], ['Fan power', f0(A.fanKw) + ' kW']], f: 'load = (air IT + CDU skin) / (1 − fan fraction)' },
       chw: { sub: A.chwSupplyC + ' / ' + A.chwReturnC + ' °C · ' + f0(A.chwLps) + ' L/s', rows: [['Supply / return', A.chwSupplyC + ' / ' + A.chwReturnC + ' °C'], ['Flow', f0(A.chwLps) + ' L/s'], ['Load', mw(A.chillerEvapKw)]], f: 'flow = evaporator load / (cp · ΔT)' },
@@ -496,19 +496,51 @@
     compare();
   }
   /* the four plants at THIS site and load: the water–energy trade-off, computed, not quoted */
+  /* the same IT load under each plant, each climate and one design input moved a step — every row a
+     full engine solve (LTCReport.options); "Use" and each bar end apply that change to the shared plant */
   function compare() {
     var host = document.getElementById('ltcCompare');
-    if (!host) return;
-    var rows = P.comparePresets(state);   // drops a stored preset so each row really is its own plant
-    var cur = R.input;
-    host.innerHTML = '<table class="ltc-table"><thead><tr><th>Plant</th><th class="n">PUE design</th><th class="n">PUE annual</th>' +
-      '<th class="n">WUE L/kWh</th><th class="n">Water m³/yr</th><th class="n">Liquid coolers</th><th class="n">Trim h/yr</th><th class="n">Chiller COP</th></tr></thead><tbody>' +
-      rows.map(function (x) {
-        var t = x.r.totals, me = x.r.input.chillerType === cur.chillerType && x.r.input.liquidRejection === cur.liquidRejection;
-        return '<tr' + (me ? ' data-hit' : '') + '><td>' + L.esc(x.label) + '</td><td class="n">' + t.pue.toFixed(3) + '</td><td class="n">' + t.pueAnnual.toFixed(3) +
-          '</td><td class="n">' + t.wueAnnual.toFixed(2) + '</td><td class="n">' + f0(t.waterM3Year) + '</td><td class="n">' + x.r.liquid.coolerUnitsTotal +
-          '</td><td class="n">' + f0(t.trimHours) + '</td><td class="n">' + x.r.air.chillerCop.toFixed(2) + '</td></tr>';
-      }).join('') + '</tbody></table>';
+    if (!host || !R) return;
+    var X = window.LTCReport;
+    if (!X || !X.options || !S) { host.textContent = 'Comparison unavailable on this page.'; return; }
+    var O = X.options(P, R), b = O.base;
+    function money(v) { return (v / 1e6).toFixed(2) + ' M'; }
+    function dc(v) { var x = v - b.cost; return Math.abs(x) < 5e3 ? '—' : (x > 0 ? '+' : '−') + money(Math.abs(x)); }
+    function tbl(first, list, act) {
+      return '<div class="ltc-table-wrap"><table class="ltc-table ltc-opt"><thead><tr><th>' + first + '</th><th class="n">PUE design</th><th class="n">PUE annual</th><th class="n">WUE L/kWh</th>' +
+        '<th class="n">Water m³/yr</th><th class="n">Trim h/yr</th><th class="n">Cost /yr</th><th class="n">Δ cost</th></tr></thead><tbody>' +
+        list.map(function (o) {
+          return '<tr' + (o.current ? ' data-hit' : '') + '><td><span class="ltc-opt-name">' + L.esc(o.label) + '</span>' + (o.current ? '<span class="ltc-opt-cur">this plant</span>' : '<button class="ltc-btn ltc-opt-use" type="button" data-' + act + '="' + o.id + '" aria-label="Use ' + L.esc(o.label) + '">Use</button>') + '</td><td class="n">' + o.pueD.toFixed(3) + '</td><td class="n">' + o.pue.toFixed(3) +
+            '</td><td class="n">' + o.wue.toFixed(2) + '</td><td class="n">' + f0(o.water) + '</td><td class="n">' + f0(o.trim) + '</td><td class="n">' + money(o.cost) +
+            '</td><td class="n">' + dc(o.cost) + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+    }
+    var rows = O.sens.slice().sort(function (a, c) { return Math.abs(c.hi.r.pue - c.lo.r.pue) - Math.abs(a.hi.r.pue - a.lo.r.pue); });
+    var span = Math.max.apply(null, rows.map(function (r) { return Math.max(Math.abs(r.lo.r.pue - b.pue), Math.abs(r.hi.r.pue - b.pue)); })) || 1;
+    function dv(v) { return v === Math.round(v) ? f0(v) : v.toFixed(v < 1 ? 3 : 1); }
+    function end(r, e, side) {
+      var up = e.r.pue > b.pue, w = Math.max(1.5, 60 * Math.abs(e.r.pue - b.pue) / span);
+      return '<button type="button" class="ltc-tor-end ' + side + (up ? ' up' : ' dn') + '" data-sk="' + r.key + '" data-sv="' + e.v + '" aria-label="Set ' + L.esc(r.label) + ' to ' + dv(e.v) + r.unit + ': annual PUE ' + e.r.pue.toFixed(3) + '">' +
+        '<i style="width:' + w.toFixed(1) + '%"></i><span>' + dv(e.v) + r.unit + ' → ' + e.r.pue.toFixed(3) + '</span></button>';
+    }
+    host.innerHTML = '<p class="ltc-note ltc-opt-note">Every row is the whole plant re-solved. Cost /yr = energy + water at the site tariffs (site currency, M = million). <b>Use</b> puts that option on the shared plant; every workbench page follows.</p>' +
+      tbl('Plant', O.presets, 'preset') +
+      '<h3 class="ltc-h3">Same plant, three climates</h3>' + tbl('Climate', O.climates, 'climate') +
+      '<h3 class="ltc-h3">One design input, one step each way</h3><p class="ltc-note">Annual PUE ' + b.pue.toFixed(3) + ' at the centre line. Green lowers it, red raises it. Select a bar end to put that value on the plant.</p>' +
+      '<div class="ltc-tor">' + rows.map(function (r) {
+        return '<div class="ltc-tor-row"><span class="ltc-tor-lbl">' + L.esc(r.label) + ' <small>' + dv(r.base) + r.unit + '</small></span>' + end(r, r.lo, 'l') + end(r, r.hi, 'r') + '</div>';
+      }).join('') + '</div>';
+  }
+  function compareClick(e) {
+    var t = e.target.closest('button');
+    if (!t || !S) return;
+    if (t.dataset.preset) { var x = P.PRESETS[t.dataset.preset]; S.set({ preset: t.dataset.preset, chillerType: x.chillerType, liquidRejection: x.liquidRejection }); }
+    else if (t.dataset.climate) S.set({ climate: t.dataset.climate, climateBins: null, designDbC: null, designWbC: null });
+    else if (t.dataset.sk) {
+      var k = t.dataset.sk, v = Number(t.dataset.sv), patch = {}; patch[k] = v;
+      if (k === 'tcsSupplyC') patch.tcsReturnC = R.input.tcsReturnC + (v - R.input.tcsSupplyC);
+      S.set(patch);
+    }
   }
 
   /* the report draws every view of the plant on a given result; the page's own view and result are kept */
@@ -533,6 +565,7 @@
     lifeTable();
     paintPanel();
     if (S) S.onChange(function (r, st) { R = r; state = st; paintPanel(); if (fig) fig.redraw(); });
+    var cmp = document.getElementById('ltcCompare'); if (cmp) cmp.addEventListener('click', compareClick);
     /* the inspector is a persistent column only on wide screens; elsewhere it is a
      * drawer, and opening a drawer nobody asked for hides the plant */
     if (window.matchMedia('(min-width: 1280px)').matches) open('racks');

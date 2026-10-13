@@ -1,4 +1,4 @@
 /* Single source of truth for site version. Bump on every release per VERSIONING_STANDARD.md. */
-window.RZ_VERSION = '3.20.3';
+window.RZ_VERSION = '3.20.4';
 window.RZ_VERSION_DATE = '2026-10-13';
-window.RZ_VERSION_CODENAME = 'Found From Anywhere';
+window.RZ_VERSION_CODENAME = 'Try It on the Plant';

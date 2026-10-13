@@ -15,7 +15,7 @@
  *   W3  NFPA 2001 flooding equations against the published per-m³ figures
  *   W4  TIA fiber budget, copper channel, TIA-607 conductor sizing
  *   W5  ISO/IEC 30134 KPIs and the ISO 50006 regression recovering a known model
- *   W13 every hub view and the lab overview, desktop and phone, on 60 plants: zero diagram-engine warnings
+ *   W13 every hub view and the lab overview, desktop and phone, on 132 plants (sizes, captures, configurations × TCS × climates): zero diagram-engine warnings
  *   W12 exported report: Sankey and power closure, engine numbers, every trace / input / fault / transient, embedded data
  *   W11 manuals: the lab manual's worked example equals the engine output; the hub manual covers the plant
  *   W10 model lab on the plant engine: load order, computeModel delegation, adapter parity, screening passthrough
@@ -364,6 +364,9 @@ for (const [page, mod] of Object.entries(PAGES)) {
   const P = sb.LTCPlant, plants = [];
   for (const it of [5, 7, 10, 15, 20, 37, 50, 75, 100, 150, 200, 250, 300]) for (const cap of [50, 70, 85, 98]) plants.push({ itMw: it, capturePct: cap });
   for (const k of Object.keys(P.PRESETS)) plants.push(Object.assign({ itMw: 300 }, P.PRESETS[k]), Object.assign({ itMw: 5 }, P.PRESETS[k]));
+  // the options table and tornado apply configurations, climates and TCS steps: a cold TCS needs 100+ coolers
+  for (const k of Object.keys(P.PRESETS)) for (const it of [100, 300]) for (const tcs of [28, 32, 45]) for (const climate of Object.keys(P.CLIMATES))
+    plants.push(Object.assign({ itMw: it, tcsSupplyC: tcs, tcsReturnC: tcs + 10, climate }, P.PRESETS[k]));
   const bad = {};
   let n = 0;
   for (const st of plants) {

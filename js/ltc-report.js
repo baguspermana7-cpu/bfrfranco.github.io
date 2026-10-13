@@ -454,7 +454,7 @@
   function options(P, R) {
     var I = R.input;
     function solve(over) { return P.compute(Object.assign({}, I, over)); }
-    function row(r) { var A = r.annual; return { pueD: r.design.pue, pue: A.pue3, wue: A.wue, mwh: A.m0MWh, water: A.waterM3, cost: A.energyCost + A.waterCost, co2: A.co2t }; }
+    function row(r) { var A = r.annual; return { pueD: r.design.pue, trim: r.totals.trimHours, pue: A.pue3, wue: A.wue, mwh: A.m0MWh, water: A.waterM3, cost: A.energyCost + A.waterCost, co2: A.co2t }; }
     var presets = Object.keys(P.PRESETS).map(function (k) {
       var x = P.PRESETS[k];
       return Object.assign(row(solve({ chillerType: x.chillerType, liquidRejection: x.liquidRejection })), { id: k, label: x.label, current: x.chillerType === I.chillerType && x.liquidRejection === I.liquidRejection });

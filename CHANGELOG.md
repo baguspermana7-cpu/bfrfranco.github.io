@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v3.20.4 — 2026-10-13
+
+### Plant map: options you can apply, a live sensitivity tornado; cooler label fits on phones at 100+ units
+
+**Hub — options on the plant map.** The "same site, same load, four plants" table now holds three things, each row a full engine solve:
+- The four configurations, with design and annual PUE, WUE, water, trim hours, energy + water cost a year and the difference against this plant. A **Use** button puts a configuration on the shared plant, and every workbench page follows.
+- The same plant in each of the three climates, each with its own **Use**.
+- A tornado of annual PUE for seven design inputs moved one step each way, widest swing on top. Selecting a bar end puts that value on the plant.
+
+The numbers come from the same `LTCReport.options` the exported report prints.
+
+**Fixed — cooler block overflowed on phones.** At a cold TCS supply (28–32 °C) a 100–300 MW plant needs 100+ liquid coolers, and the sublabel "346 units · 30.6 °C out" no longer fitted the phone layout of the overview and liquid views. A sweep of 2,880 diagrams found 32 such renders. From 100 units the leaving temperature is shown in whole degrees: "346 units · 31 °C out". The model lab's overview gets the same change.
+
+**Gates** — `tools/test-ltc-workbench.mjs`:
+- **W13** now draws 1,320 diagrams over 132 plants. The new plants are configurations × TCS supply 28/32/45 °C × climates, at 100 and 300 MW: the plants the options and tornado can put on the map.
+- On the v3.20.3 hub, W13 fails with the overflow.
+
 ## v3.20.3 — 2026-10-13
 
 ### Search works below the site root; the 404 page works at every depth
