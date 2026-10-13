@@ -208,6 +208,7 @@
       var feeder = ctx.faults.filter(function (x) { return x.id === 'cdu-feeder'; })[0];
       if (feeder && feeder.s.itLostKw) out.push('CDU feed is <b>' + esc(R.input.cduFeed) + '</b>: losing feeder A takes ' + esc(feeder.s.note.split('.')[0]) + '; ' + mw(feeder.s.itLostKw) + ' MW of DH01 IT must throttle. A dual (ATS) feed removes this.');
     }
+    if (ctx.fit) out.push('As configured, the plant reaches <b>Tier ' + ROMAN[ctx.fit.reached] + '</b>' + (ctx.fit.blockers.length ? '; Tier ' + ROMAN[ctx.fit.reached + 1] + ' needs: ' + ctx.fit.blockers.map(function (x) { return esc(x.req); }).join(', ') : '') + (ctx.fit.verify.length ? ' (' + ctx.fit.verify.length + ' design item' + (ctx.fit.verify.length > 1 ? 's' : '') + ' to verify)' : '') + '.');
     var fws = ctx.transients.filter(function (t) { return t.kind === 'fws-pump'; })[0];
     if (fws && fws.secondsToLimit != null) out.push('Facility water lost: the TCS loop reaches its ' + f(fws.limitC) + ' °C throttle point in <b>' + f(fws.secondsToLimit) + ' s</b> on its own water — the ride-through the controls and the standby pumps must beat.');
     if (ctx.options) {
@@ -324,7 +325,7 @@
           : t.faultFail.length ? 'unplanned: ' + t.faultFail.slice(0, 3).join('; ') + (t.faultFail.length > 3 ? ' (+' + (t.faultFail.length - 3) + ')' : '') : '—';
         return [esc(t.label), t.system, t.n, t.maint ? '<span class="tag ok">yes</span>' : '<span class="tag bad">no</span>', t.fault ? '<span class="tag ok">yes</span>' : '<span class="tag bad">no</span>', '<small>' + esc(why) + '</small>'];
       })) + '<p class="note">The objective each Tier must reach: I and II neither, III concurrently maintainable, IV fault tolerant as well. Compartmentalisation and continuous cooling (Tier IV) are not modelled. Simulate each element on the Tier page.</p>'
-        : '<p class="note">The Tier model did not load on this page; open the report from the Tier page to include it.</p>'));
+        : '<p class="note">The Tier model did not load on this page; open the report from the Tier page to include it.</p>') + (ctx.fit ? fitSection(ctx.fit) : ''));
     parts.push(sec('s10', 10, 'Annual performance', 'The plant re-solved in each climate bin at mean utilisation, then weighted by hours.', '<figure class="wide">' + binsChart(R) + '</figure>' +
       table(['Dry bulb °C', 'Wet bulb °C', 'Hours', 'PUE', 'Chiller COP', 'Trim share', 'Chiller PLR'], T.bins.map(function (b) {
         return [f(b.db, 1), f(b.wb, 1), f(b.hours), f(b.pue, 3), f(b.cop, 2), pct(b.trimShare, 1), pct(b.plr, 1)]; })) +
@@ -524,6 +525,16 @@
         return [esc(x.label), f(x.maxInlet, 1), f(x.throttled), f(x.itLostKw), x.pass ? '<span class="tag ok">holds</span>' : '<span class="tag bad">fails</span>', x.holdsTo ? x.holdsTo + '&nbsp;% load' : 'no step', '<small>' + esc(x.note || '—') + '</small>'];
       })) + (bad.length ? '<p class="note">This plant is expected to fail the HLT at: ' + bad.map(function (x) { return esc(x.label); }).join(', ') + '. Fix the design before the test, or record it as a known limit in the commissioning plan.</p>' : '') : '');
   }
+  /* this plant as configured against each Tier objective (LTCTier.fit): met / gap / verify */
+  var ROMAN = ['', 'I', 'II', 'III', 'IV'];
+  function fitSection(F) {
+    var tag = { met: 'ok', gap: 'bad', verify: 'y' };
+    return '<h3>This plant, as configured, against each Tier</h3><p>The sweep above builds each Tier on this plant\'s unit counts. Taken as configured on the strip, the plant reaches <b>Tier ' + ROMAN[F.reached] + '</b>' +
+      (F.blockers.length ? '; Tier ' + ROMAN[F.reached + 1] + ' is blocked by ' + F.blockers.map(function (x) { return '<b>' + esc(x.req) + '</b>'; }).join(', ') : '') + '.</p>' +
+      table(['Tier', 'Requirement', 'This plant', 'Status'], F.rows.map(function (x) {
+        return [ROMAN[x.tier], esc(x.req) + (x.why ? '<br><small>' + esc(x.why) + '</small>' : ''), esc(x.value), '<span class="tag ' + tag[x.status] + '">' + x.status + '</span>'];
+      })) + '<p class="note"><b>verify</b> = not described by the plant inputs; it does not lower the Tier reached but must be shown in the design. A screening against the Tier objectives, not a Tier Certification.</p>';
+  }
   function optionsSection(O) {
     var b = O.base;
     function step(v) { return v === Math.round(v) ? f(v) : f(v, v < 1 ? 3 : 1); }
@@ -549,6 +560,7 @@
       transients: transients(P, R),
       options: options(P, R),
       tier: tierSweep(root.LTCTier),
+      fit: root.LTCTier && root.LTCTier.fit ? root.LTCTier.fit(R, root.LTCDH01) : null,
       faults: D ? D.FAULTS.map(function (x) { return { id: x[0], label: x[1], s: D.solveHall(R, x[0], 'common', 5, 'throttled') }; }) : null
     };
     c.hlt = hlt(R);

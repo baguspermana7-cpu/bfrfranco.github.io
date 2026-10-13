@@ -443,13 +443,69 @@
     if (window.LTCTrace) LTCTrace.attach(document.getElementById('tFig'), tierTips);
     /* the plant changes N: regenerate the four Tiers from it */
     if (window.LTCPlantStrip) window.LTCPlantStrip.onChange(function () {
-      GEN = makeTopo(); TOPO = GEN.power; COOL = GEN.cooling; SYS = { power: TOPO, cooling: COOL }; st.out = {}; render();
+      GEN = makeTopo(); TOPO = GEN.power; COOL = GEN.cooling; SYS = { power: TOPO, cooling: COOL }; st.out = {}; render(); paintFit();
     });
-    render();
+    render(); paintFit();
     availTable();
     document.getElementById('p-availability').addEventListener('input', availCalc);
     availCalc();
   }
-  window.LTCTier = { get TOPO() { return TOPO; }, get COOL() { return COOL; }, powered: powered, sweep: sweep, kOfN: kOfN, lostGroups: lostGroups, redLabel: redLabel, system: function (n) { var was = sysName; if (n) sysName = n; return was; } };
+  /* ---- this plant against the Tier objectives --------------------------------------------
+   * The sweep above builds each Tier's own topology on this plant's N. This asks the other
+   * question: what does the plant AS CONFIGURED on the strip reach? Each requirement is
+   *   met    — the plant inputs satisfy it (failures read from the engine's own fault model),
+   *   gap    — they do not, with the number that shows it,
+   *   verify — the plant model does not describe it (pump redundancy, a second cooling loop,
+   *            compartments); it never lowers the Tier reached, but it is listed against it.
+   * Reached = the highest Tier with no gap at or below it. A screening, not a certification. */
+  function fit(r, D) {
+    var P = window.LTCPlant, p = r.input, l = r.liquid, a = r.air, w = r.power, rows = [];
+    function n0(v) { return Math.round(v).toLocaleString('en-US'); }
+    function red(tot, need) { return tot > need ? 'N+' + (tot - need) : 'N'; }
+    function add(t, area, req, ok, val, why) { rows.push({ tier: t, area: area, req: req, status: ok === null ? 'verify' : ok ? 'met' : 'gap', value: val, why: why || '' }); }
+    function ov(kind) { return P.compute(p, { kind: kind }).fault; }
+    var feeder = ov('cdu-feeder'), one = ov('cdu'), ch = ov('chiller'), hallLiq = l.dutyKw / p.halls;
+    add(2, 'power', 'Generators N+1', w.genTotal > w.genN, w.genTotal + ' × ' + n0(w.genUnitKw) + ' kW for ' + w.genN + ' needed (' + red(w.genTotal, w.genN) + ')');
+    add(2, 'power', 'Transformers N+1', w.txTotal > w.txN, w.txTotal + ' for ' + w.txN + ' needed (' + red(w.txTotal, w.txN) + ')');
+    add(2, 'power', 'UPS modules N+1', w.upsTotal > w.upsN, w.upsTotal + ' × ' + n0(w.upsModuleKw) + ' kW for ' + w.upsN + ' needed (' + w.upsTopology + ')');
+    add(2, 'cooling', 'CDUs N+1 per hall', l.cduPerHall > l.cduDutyN, l.cduPerHall + ' for ' + l.cduDutyN + ' needed (' + red(l.cduPerHall, l.cduDutyN) + ')');
+    add(2, 'cooling', 'Liquid coolers N+1', l.coolerUnitsTotal > l.coolerUnits, l.coolerUnitsTotal + ' for ' + l.coolerUnits + ' needed');
+    add(2, 'cooling', 'CRAHs N+1 per hall', a.crahPerHall > a.crahDutyN, a.crahPerHall + ' for ' + a.crahDutyN + ' needed (' + red(a.crahPerHall, a.crahDutyN) + ')');
+    add(2, 'cooling', 'Chillers N+1', a.chillersTotal > a.chillersN, a.chillersTotal + ' for ' + a.chillersN + ' needed (' + red(a.chillersTotal, a.chillersN) + ')');
+    add(2, 'cooling', 'Pumps N+1 (FWS, CHW, condenser)', null, 'not a plant input', 'Count the pumps against their duty in the design.');
+    add(3, 'power', 'Second distribution path to the racks', p.upsTopology === '2N' ? true : null, p.upsTopology === '2N' ? 'two UPS systems, A and B' : 'one UPS system (N+1)',
+      p.upsTopology === '2N' ? '' : 'Tier III needs an alternate path to the dual-corded racks; the plant inputs do not describe one.');
+    add(3, 'power', 'CDU power maintainable (one feeder off)', !feeder.liquidShortKw, p.cduFeed === 'dual' ? 'dual-fed through ATS' : feeder.note + ' ' + n0(feeder.liquidShortKw) + ' kW of ' + n0(hallLiq) + ' kW liquid duty uncovered',
+      p.cduFeed === 'dual' ? '' : 'Maintaining feeder A takes every CDU on it; feed each CDU from A and B (ATS), or add CDUs so either half carries the hall.');
+    add(3, 'power', 'MCC A / B each carry the mechanical load', null, 'MCC A and B ' + n0(w.mccAKw) + ' kW each', 'Each side must carry ' + n0(w.mccAKw + w.mccBKw) + ' kW while the other is maintained.');
+    add(3, 'cooling', 'Second FWS and CHW path (valved)', null, 'not a plant input', 'Every pipe section, valve and header must be isolable with the load carried on the other path.');
+    add(4, 'power', 'Two active power paths', p.upsTopology === '2N', p.upsTopology === '2N' ? 'UPS A and B both carrying load' : 'one UPS system (N+1)', p.upsTopology === '2N' ? '' : 'A fault on the single UPS output path drops the racks.');
+    add(4, 'power', 'CDU feeder fault tolerated', !feeder.liquidShortKw, p.cduFeed === 'dual' ? 'dual-fed through ATS' : n0(feeder.liquidShortKw) + ' kW liquid duty uncovered');
+    add(4, 'cooling', 'One CDU fails', !one.liquidShortKw, one.note);
+    var c1 = D && D.solveHall ? D.solveHall(r, 'crah1', 'common', 5, 'throttled') : null;
+    add(4, 'cooling', 'One CRAH fails', c1 ? !c1.over27 : a.crahPerHall > a.crahDutyN, c1 ? 'max rack inlet ' + c1.maxInlet.toFixed(1) + ' °C (DH01)' : red(a.crahPerHall, a.crahDutyN));
+    add(4, 'cooling', 'One chiller trips', (a.chillersTotal - 1) * p.chillerUnitKw >= a.chillerEvapKw, ch.note);
+    add(4, 'cooling', 'Continuous cooling (CDU pumps on UPS)', !!p.cduOnUps, p.cduOnUps ? 'CDU pumps on UPS' : 'CDU pumps on the MCC', p.cduOnUps ? '' : 'Cold plates lose flow for the generator transfer: seconds to throttle.');
+    add(4, 'both', 'Compartmentalisation of A and B', null, 'not modelled', 'Fire and physical separation of the two paths.');
+    var reached = 1;
+    [2, 3, 4].forEach(function (t) { if (reached === t - 1 && !rows.some(function (x) { return x.tier <= t && x.status === 'gap'; })) reached = t; });
+    var next = reached < 4 ? rows.filter(function (x) { return x.tier === reached + 1 && x.status === 'gap'; }) : [];
+    return { reached: reached, rows: rows, blockers: next, verify: rows.filter(function (x) { return x.tier <= reached && x.status === 'verify'; }) };
+  }
+  function fitHtml(F) {
+    var R = ['', 'I', 'II', 'III', 'IV'];
+    return '<p class="ltc-fit-v' + (F.reached >= 3 ? ' ok' : '') + '" aria-live="polite">This plant, as configured, reaches <b>Tier ' + R[F.reached] + '</b>' +
+      (F.blockers.length ? '. Tier ' + R[F.reached + 1] + ' is blocked by: ' + F.blockers.map(function (x) { return L.esc(x.req); }).join('; ') + '.' : '.') +
+      (F.verify.length ? ' ' + F.verify.length + ' item' + (F.verify.length > 1 ? 's' : '') + ' to verify in the design.' : '') + '</p>' +
+      '<div class="ltc-table-wrap"><table class="ltc-table"><thead><tr><th>Tier</th><th>Requirement</th><th>This plant</th><th>Status</th></tr></thead><tbody>' +
+      F.rows.map(function (x) {
+        return '<tr><td class="mono">' + R[x.tier] + '</td><td>' + L.esc(x.req) + (x.why ? '<br><small class="ltc-note">' + L.esc(x.why) + '</small>' : '') + '</td><td>' + L.esc(x.value) + '</td><td><span class="ltc-fit ' + x.status + '">' + x.status + '</span></td></tr>';
+      }).join('') + '</tbody></table></div><p class="ltc-note">Read from the plant on the strip and the engine’s own fault model. A screening against the Tier objectives, not a Tier Certification (issued by Uptime Institute only).</p>';
+  }
+  function paintFit() {
+    var host = document.getElementById('tFit'), S = window.LTCPlantStrip;
+    if (host && S) host.innerHTML = fitHtml(fit(S.get().result, window.LTCDH01));
+  }
+  window.LTCTier = { get TOPO() { return TOPO; }, get COOL() { return COOL; }, powered: powered, sweep: sweep, fit: fit, kOfN: kOfN, lostGroups: lostGroups, redLabel: redLabel, system: function (n) { var was = sysName; if (n) sysName = n; return was; } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

@@ -349,6 +349,20 @@ for (const [page, mod] of Object.entries(PAGES)) {
     }
     ok('W12s', !bad.length, 'DH01 at the HLT steps: no fault eases as load rises, load 1 equals the design solve, the CDU feeder holds exactly to the step the survivors carry, FWS ride-through ∝ 1/load — 16 plants × every fault' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
   }
+  {
+    /* the plant as configured against the Tier objectives: every configuration reaches the Tier
+       its redundancy and feeds allow, worked out here independently of LTCTier.fit */
+    const bad = [], T = sb.LTCTier;
+    for (const k of Object.keys(P.PRESETS)) for (const feed of ['single', 'dual']) for (const ups of ['N+1', '2N']) for (const onUps of [true, false]) for (const cr of [0, 1]) {
+      const st = Object.assign({}, P.PRESETS[k], { cduFeed: feed, upsTopology: ups, cduOnUps: onUps, crahRedundancy: cr }), R = P.compute(st), F = T.fit(R, D);
+      const feederShort = P.compute(R.input, { kind: 'cdu-feeder' }).fault.liquidShortKw > 0;
+      const want = !cr ? 1 : feederShort ? 2 : ups !== '2N' || !onUps ? 3 : 4;
+      if (F.reached !== want) bad.push(`${k}/${feed}/${ups}/${onUps}/crah+${cr}: Tier ${F.reached}, want ${want}`);
+      if (F.reached < 4 && !F.blockers.length) bad.push(`${k}/${feed}/${ups}: below Tier IV with no blocker named`);
+      if (F.rows.some((x) => x.status === 'verify' && x.tier <= F.reached) !== (F.verify.length > 0)) bad.push(`${k}: verify list out of step`);
+    }
+    ok('W12t', !bad.length, 'this plant against each Tier: 64 configurations (presets × CDU feed × UPS N+1/2N × CDU pumps on UPS × CRAH N/N+1) reach the Tier worked out independently, each short of IV naming its blocker' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
+  }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));
   for (const [i, st] of plants.entries()) {
@@ -382,6 +396,8 @@ for (const [page, mod] of Object.entries(PAGES)) {
        && hf('cdu').pass === (R.input.cduRedundancy > 0) && hf('crah1').pass === (R.input.crahRedundancy > 0) && hf('cdu-feeder').pass === (R.input.cduFeed === 'dual')
        && text.includes('Heat load test plan') && text.includes(Number(s100.liquidKw).toLocaleString('en-US', { maximumFractionDigits: 0 })),
        'HLT plan: load banks split the hall load by capture, ΔT scales with load and reaches the design ΔT at 100 %, each single failure holds exactly when the design has the redundancy (CDU N+1, CRAH N+1, dual CDU feed)');
+    ok('W12u:' + id, ctx.fit && text.includes('This plant, as configured, against each Tier') && ctx.fit.rows.every((x) => text.includes(x.req.replace(/&/g, '&amp;'))),
+       'the report carries this plant against each Tier, every requirement listed');
     ok('W12j:' + id, ctx.transients.length === 4 && ctx.transients.every((t) => t.series.length > 2), 'four transients, each with a time series');
     const data = JSON.parse(html.match(/<script type="application\/json" id="rz-data">([\s\S]*?)<\/script>/)[1]);
     ok('W12k:' + id, data.result.totals.pueAnnual === R.totals.pueAnnual && data.result.design.facility === R.design.facility, 'the embedded data is the engine result itself');

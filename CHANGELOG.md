@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v3.21.4 — 2026-10-13
+
+### "As Built": the Tier this plant reaches, and what blocks the next one
+
+**Why.** The Tier sweep builds each Tier's own topology on the plant's unit counts. So the report could say "Tier III — concurrently maintainable" about a plant whose CDUs sit on single feeders: maintaining feeder A drops half of them. The workbench now also answers the other question: what does the plant, as configured on the strip, reach?
+
+**Tier page — new tab *This plant*.** Each requirement has a status:
+- **met:** the plant inputs satisfy it. Failures are read from the engine's own fault model and the DH01 solver.
+- **gap:** they do not, with the number that shows it.
+- **verify:** the plant model does not describe it.
+
+The requirements per Tier:
+- **Tier II:** N+1 generators, transformers, UPS modules, CDUs, liquid coolers, CRAHs and chillers; pumps are *verify*.
+- **Tier III:** a second distribution path (met with UPS 2N, otherwise *verify*); CDU power maintainable with one feeder off; MCC A/B each carrying the mechanical load (*verify*); a second, valved FWS and CHW path (*verify*).
+- **Tier IV:** two active power paths; a CDU feeder fault; one CDU, one CRAH (DH01 solver) and one chiller failing; continuous cooling (CDU pumps on UPS); compartmentalisation (*verify*).
+
+The plant reaches the highest Tier with no gap at or below it. The blockers for the next Tier are named.
+
+**Default 100 MW plant reaches Tier II.** Tier III is blocked by the CDU feed: 5 of 10 CDUs lose power and 7,142 kW of 17,142 kW liquid duty is uncovered. Changing the CDU feed:
+- Dual feed: Tier III.
+- Dual feed plus UPS 2N: Tier IV.
+- Without CDU pumps on UPS: back to Tier III.
+
+**Report.** The Tier topology section gains "This plant, as configured, against each Tier", and the key findings state the Tier reached and what the next one needs. The Tier page now loads the DH01 solver, so "One CRAH fails" reads the hall's max rack inlet.
+
+This is a screening against the Tier objectives, not a Tier Certification.
+
+**Gates** — `tools/test-ltc-workbench.mjs` (312 assertions):
+- **W12t:** 64 configurations (presets × CDU feed × UPS N+1/2N × CDU pumps on UPS × CRAH N/N+1). Each reaches the Tier worked out independently in the test, and each one short of Tier IV names its blocker. A mutation that marks the CDU feed always met fails it ("Tier 3, want 2").
+- **W12u (per plant):** the report lists every requirement.
+
 ## v3.21.3 — 2026-10-13
 
 ### Eight halls everywhere the page names a hall: switcher, building, floor plans, single-lines
