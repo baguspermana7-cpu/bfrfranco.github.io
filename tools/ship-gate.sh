@@ -55,6 +55,7 @@ gate "article diagrams — figures current, and free of collisions" node tools/b
 # This enumerates every article from the filesystem and fails on any block diagram still drawn by hand
 # (owner, 2026-10-12: every article diagram through the engine, with IEC symbols).
 gate "article diagrams — no block diagram drawn by hand in any article" node tools/test-article-diagrams-engine.mjs
+gate "site-root paths — 404 and the search palette resolve from the site root at any depth" node tools/test-site-root-paths.mjs
 gate "diagram survey coverage — every cockpit measured, declared, or excused" node tools/test-diagram-survey-coverage.mjs
 gate "diagram engine — metrics, placement, routing, facade" node tools/test-rz-diagram-engine.mjs
 gate "LTC workbench — standards arithmetic + page frame" node tools/test-ltc-workbench.mjs

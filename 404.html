@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,252 +29,71 @@
     <meta name="twitter:description" content="Page not found. Browse data center articles, calculators, and engineering insights.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
 
-    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="icon" type="image/png" href="/assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.min.css?v=20261009-bfaeb6db">
     <style>
+        /* v3.20.2 — the 404 on the design system: flat surface, solid type, 4px controls, 1px
+           hairlines, no aurora, no gradient text, no grain, no glow, no hover lift. Every URL on
+           this page is root-absolute because GitHub Pages serves it for a missing path at ANY
+           depth; relative URLs resolved against /manual/x.html and 404'd. */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(180deg, #e6eef1 0%, #d3e0e5 40%, #ffffff 70%);
-            color: #1e293b;
-            overflow: hidden;
-            position: relative;
+            min-height: 100vh; min-height: 100dvh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #080c16; color: #e2e8f0;
+            padding: 2rem 16px 4rem;
         }
-
-        .scene {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 800px;
-            padding: 2rem;
-            text-align: center;
+        .scene { display: flex; flex-direction: column; align-items: center; max-width: 640px; text-align: center; }
+        .code-404 {
+            font-family: "JetBrains Mono", ui-monospace, monospace;
+            font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+            color: #7DDDB4; margin-bottom: 1rem;
         }
-
-        .big-404 {
-            font-size: clamp(10rem, 25vw, 18rem);
-            font-weight: 800;
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1;
-            letter-spacing: -0.05em;
-            position: absolute;
-            top: -2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 0;
-            user-select: none;
-            pointer-events: none;
-            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        .character { width: clamp(200px, 40vw, 300px); height: auto; margin-bottom: 1.5rem; }
+        h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 700; color: #f1f5f9; line-height: 1.2; margin-bottom: 0.75rem; }
+        .subtitle { font-size: 1rem; color: #cbd5e1; max-width: 480px; line-height: 1.7; margin: 0 auto 1.75rem; }
+        .actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+        .btn-return, .btn-search {
+            display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px;
+            padding: 0 1.25rem; border-radius: 4px; font: 600 0.9rem "IBM Plex Sans", sans-serif;
+            text-decoration: none; cursor: pointer;
+            transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
         }
-
-        .character {
-            position: relative;
-            z-index: 2;
-            width: clamp(220px, 40vw, 340px);
-            margin-bottom: 1.5rem;
-            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
-            animation: float 4s ease-in-out infinite;
+        .btn-return { background: #7DDDB4; color: #0B1F17; border: 1px solid #7DDDB4; }
+        .btn-return:hover { background: #A8ECCF; border-color: #A8ECCF; }
+        .btn-search { background: transparent; color: #e2e8f0; border: 1px solid #334155; }
+        .btn-search:hover { border-color: #7DDDB4; color: #f1f5f9; }
+        .btn-search kbd {
+            font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.75rem;
+            padding: 1px 6px; border: 1px solid #334155; border-radius: 4px; color: #94a3b8;
         }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
+        .btn-return svg, .btn-search svg { width: 18px; height: 18px; }
+        .btn-return:focus-visible, .btn-search:focus-visible, .popular-links a:focus-visible { outline: 2px solid #7DDDB4; outline-offset: 2px; }
+        .popular-links { margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid #1e293b; width: 100%; }
+        .popular-links h2 {
+            font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.75rem; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; margin-bottom: 0.75rem;
         }
-
-        .content {
-            position: relative;
-            z-index: 3;
-        }
-
-        h1 {
-            font-size: clamp(1.5rem, 4vw, 2.25rem);
-            font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .subtitle {
-            font-size: clamp(0.85rem, 2vw, 1rem);
-            color: #64748b;
-            max-width: 480px;
-            line-height: 1.7;
-            margin: 0 auto 2rem;
-        }
-
-        .btn-return {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #1e293b;
-            color: #fff;
-            padding: 0.75rem 1.75rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(30, 41, 59, 0.25);
-        }
-
-        .btn-return:hover {
-            background: #10b981;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-return svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .popular-links {
-            margin-top: 2rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            max-width: 500px;
-        }
+        .popular-links ul { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 20px; justify-content: center; }
         .popular-links a {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            background: rgba(30,41,59,0.06);
-            color: #475569;
-            text-decoration: none;
-            font-size: 0.75rem;
-            font-weight: 500;
-            transition: all 0.2s;
+            display: inline-flex; align-items: center; min-height: 44px; color: #cbd5e1; font-size: 0.95rem;
+            text-decoration: underline; text-decoration-color: #334155; text-underline-offset: 4px;
+            transition: color 160ms ease, text-decoration-color 160ms ease;
         }
-        .popular-links a:hover {
-            background: rgba(16,185,129,0.1);
-            color: #059669;
-        }
+        .popular-links a:hover { color: #7DDDB4; text-decoration-color: #7DDDB4; }
         .footer-note {
-            position: fixed;
-            bottom: 1.5rem;
-            font-size: 0.65rem;
-            color: #94a3b8;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-        }
-
-        @media (max-width: 480px) {
-            .big-404 { top: 0; }
-            .character { width: 200px; }
-        }
-
-        /* ==========================================================================
-           v1.7.3 — 404 Awwwards uplift (dark-default + aurora + gradient text)
-           ========================================================================== */
-        body {
-            background: linear-gradient(180deg, #0f172a 0%, #0f2a33 50%, #0f172a 100%) !important;
-            color: #f1f5f9 !important;
-        }
-        body::before {
-            content: '';
-            position: fixed; inset: 0; pointer-events: none; z-index: 0;
-            background:
-                radial-gradient(60% 50% at 18% 22%, rgba(125,221,180,0.18), transparent 65%),
-                radial-gradient(55% 45% at 80% 30%, rgba(251,191,36,0.14), transparent 65%),
-                radial-gradient(70% 60% at 50% 90%, rgba(34,211,238,0.10), transparent 70%);
-            filter: blur(40px);
-            animation: rz404Aurora 22s ease-in-out infinite alternate;
-        }
-        @keyframes rz404Aurora {
-            0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.85; }
-            50%  { transform: translate3d(2%, -1.5%, 0) scale(1.05); opacity: 1; }
-            100% { transform: translate3d(-1.5%, 1.5%, 0) scale(1.02); opacity: 0.92; }
-        }
-
-        /* Big 404 text — gradient sweep */
-        .big-404 {
-            color: transparent !important;
-            background: linear-gradient(120deg, rgba(255,255,255,0.04) 0%, rgba(125,221,180,0.18) 35%, rgba(251,191,36,0.18) 65%, rgba(255,255,255,0.04) 100%);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rz404Sweep 12s ease-in-out infinite;
-            text-shadow: none !important;
-        }
-        @keyframes rz404Sweep {
-            0%, 100% { background-position: 0% 50%; }
-            50%      { background-position: 100% 50%; }
-        }
-
-        /* Heading — gradient sweep on smaller H1 too */
-        h1 {
-            color: #f1f5f9 !important;
-            background: linear-gradient(120deg, #f8fafc 0%, #7DDDB4 50%, #fbbf24 100%);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rz404Sweep 8s ease-in-out infinite;
-        }
-
-        .subtitle { color: #cbd5e1 !important; }
-
-        /* Return button — mint pill (Motion+ feel) */
-        .btn-return {
-            background: #7DDDB4 !important;
-            color: #0f172a !important;
-            box-shadow: 0 4px 20px rgba(125,221,180,0.35) !important;
-            border: 1px solid rgba(125,221,180,0.4) !important;
-        }
-        .btn-return:hover {
-            background: #5FCFA0 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(125,221,180,0.5) !important;
-        }
-
-        /* Popular links — pill row with proper contrast */
-        .popular-links a {
-            background: rgba(255,255,255,0.05) !important;
-            color: #cbd5e1 !important;
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(8px);
-        }
-        .popular-links a:hover {
-            background: rgba(125,221,180,0.15) !important;
-            color: #7DDDB4 !important;
-            border-color: rgba(125,221,180,0.3);
-            transform: translateY(-1px);
-        }
-
-        .footer-note { color: rgba(241,245,249,0.4) !important; }
-
-        /* Character image gets a soft glow halo */
-        .character {
-            filter: drop-shadow(0 0 30px rgba(125,221,180,0.25)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.4)) !important;
-        }
-
-        /* Subtle film grain */
-        body::after {
-            content: '';
-            position: fixed; inset: 0; pointer-events: none; z-index: 1;
-            opacity: 0.03; mix-blend-mode: overlay;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            body::before, .big-404, h1 { animation: none !important; }
+            margin-top: 2.5rem; font-family: "JetBrains Mono", ui-monospace, monospace;
+            font-size: 0.75rem; color: #64748b; letter-spacing: 0.1em; text-transform: uppercase;
         }
     </style>
-    <script src="js/rz-version.js?v=20261012-b1600dce" defer></script>
-    <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
-    <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
+    <script src="/js/rz-version.js?v=20261012-3c9583f6" defer></script>
+    <script src="/js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
+    <script src="/js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <script src="/js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
@@ -283,32 +102,42 @@
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <div class="scene" id="main-content">
-        <div class="big-404">404</div>
-        <img src="assets/character404.png" alt="Confused maintenance crew member" class="character" width="661" height="377">
-        <div class="content">
-            <h1>Whoa! This Circuit Went Open.</h1>
-            <p class="subtitle">
-                Looks like our safety crew checked every breaker panel, but this page doesn't exist in our infrastructure.
-                Even the best DCEO can't find a route to this address.
-            </p>
-            <a href="index.html" class="btn-return">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <main class="scene" id="main-content">
+        <p class="code-404">Error 404 &middot; page not found</p>
+        <img src="/assets/character404.png" alt="Confused maintenance crew member" class="character" width="661" height="377">
+        <h1>Whoa! This Circuit Went Open.</h1>
+        <p class="subtitle">
+            Looks like our safety crew checked every breaker panel, but this page doesn't exist in our infrastructure.
+            Search the site, or start from one of the pages below.
+        </p>
+        <div class="actions">
+            <button type="button" id="navSearchBtn" class="btn-search" aria-label="Search the site">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                Search the site <kbd>/</kbd>
+            </button>
+            <a href="/index.html" class="btn-return">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 8 8 12 12 16"></polyline>
                     <line x1="16" y1="12" x2="8" y2="12"></line>
                 </svg>
                 Return to Base Camp
             </a>
-            <div class="popular-links">
-                <a href="articles.html">Engineering Journal</a>
-                <a href="article-1.html">Proactive Engineering</a>
-                <a href="datacenter-solutions.html">DC Solutions</a>
-                <a href="capex-calculator.html">CAPEX Calculator</a>
-                <a href="article-13.html">Power Distribution</a>
-            </div>
         </div>
-    </div>
+        <nav class="popular-links" aria-label="Popular pages">
+            <h2>Popular pages</h2>
+            <ul>
+                <li><a href="/articles.html">Engineering Journal</a></li>
+                <li><a href="/article-1.html">Proactive Engineering</a></li>
+                <li><a href="/datacenter-solutions.html">DC Solutions</a></li>
+                <li><a href="/capex-calculator.html">CAPEX Calculator</a></li>
+                <li><a href="/article-13.html">Power Distribution</a></li>
+            </ul>
+        </nav>
+    </main>
     <p class="footer-note">ResistanceZero // Mission Critical // 2026</p>
 
 <style id="rz-cookie-banner-style">
@@ -413,7 +242,6 @@
     .popular-links { gap: 6px !important; padding: 0 1rem !important; }
     .popular-links a { font-size: 0.7rem !important; padding: 5px 12px !important; }
     .character { width: 180px !important; }
-    .big-404 { font-size: clamp(7rem, 30vw, 14rem) !important; }
 
     /* Tap targets */
     button, a.btn, [role="button"], .nav-link { min-height: 44px; }

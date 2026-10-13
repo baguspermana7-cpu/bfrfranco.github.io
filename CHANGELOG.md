@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v3.20.3 — 2026-10-13
+
+### Search works below the site root; the 404 page works at every depth
+
+**Fixed — search found nothing on all 40 manual pages.** `js/rz-command-palette.js` fetched `search-index.json` relative to the page, so on `/manual/*.html` it requested `/manual/search-index.json`, which does not exist (404 on the live site). The palette now resolves every fetch, result link, section link, command link and preview image against its own script URL (`at()`), so it works at any depth.
+
+**Fixed — the 404 page broke on any nested path.** GitHub Pages serves `404.html` for a missing URL at any depth. Its URLs were page-relative, so on `/manual/x.html` the illustration, the favicon and three scripts all 404'd, and every "popular page" link pointed at another missing page. Every URL on the page is now root-absolute.
+
+**Fixed — the search icon filled the modal.** The palette's own injected markup, and articles 19–28, wrapped the input in `.search-input-wrapper`; the stylesheets style `.search-input-wrap`. The magnifier was drawn unsized: 359 px wide on a 390 px phone, on top of the input. Fixed in the palette, in the ten articles, and in `standarization/article prompt/ARTICLE_CREATION_PROMPT.md`, which was copying the bug into every new article.
+
+**Changed — 404 on the design system, with search** (UIUX audit 2026-02-17, "404 Page Lacks Search Functionality"). The page gains a search button (opens the shared palette, "/" works too) beside Return to Base Camp. The aurora blur, gradient text, film grain, glowing pill button, hover lift and glassmorphism links are replaced with a flat surface, solid type, 4px controls, 1px hairlines and named 160 ms transitions. The illustration and the copy are kept.
+
+**Gates**
+- New `tools/test-site-root-paths.mjs` (ship gate): P1 every URL in 404.html is absolute; P2/P3 every palette fetch and every link it writes goes through `at()`; P4 no search modal uses `.search-input-wrapper`. Fails on v3.20.2 with 29 findings (P1 ×11, P2 ×3, P3 ×4, P4 ×11).
+- `tools/test-asset-cache-tokens.mjs` now resolves root-absolute `/js/…` paths against the site root. Before, it skipped them, so tokens on 404.html were never checked. Proven by a bogus token on 404.html, which the gate now fails.
+- Verified headless on `/manual/does-not-exist.html` at 390 and 1280 px: 0 failed requests, all links resolve, a search for "chiller" returns results whose first link returns 200; the palette icon is 20 px on article-1, article-23, manual/capex and 404.
+
 ## v3.20.2 — 2026-10-13
 
 ### Plant report compares the options; air-cooled trim chillers rated as air-cooled

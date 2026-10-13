@@ -70,7 +70,9 @@ for (const page of pages) { sources.set(page, await readFile(join(ROOT, page), '
    `../../styles.min.css` for the file a root page calls `styles.min.css`, and treating those as
    two assets would split every pin and every token check down the middle. */
 const assetKey = (page, href) => {
-    const file = resolve(dirname(join(ROOT, page)), href);
+    /* `/js/x.js` is root-absolute (404.html uses it, since it is served at every depth): resolve it
+       against the site root, not the filesystem root, or the gate silently skips the page. */
+    const file = href.startsWith('/') ? join(ROOT, href) : resolve(dirname(join(ROOT, page)), href);
     return file.startsWith(ROOT) ? relative(ROOT, file) : null;
 };
 for (const [page, html] of sources.entries()) {
