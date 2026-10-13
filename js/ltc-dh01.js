@@ -16,13 +16,16 @@
   'use strict';
   var P = root.LTCPlant, P0 = root.LTCPlant;
   var FAULTS = [
-    ['none', 'Normal'], ['cdu-feeder', 'CDU feeder A lost'], ['cdu', 'One CDU lost'], ['crah2', '2 CRAHs lost (west wall)'],
-    ['crah4', '4 CRAHs lost (west wall)'], ['fws-pump', 'Facility water lost'], ['chiller', 'One chiller trips'], ['chw', 'Chilled water lost']
+    ['none', 'Normal'], ['cdu-feeder', 'CDU feeder A lost'], ['cdu', 'One CDU lost'], ['crah1', 'One CRAH lost (west wall)'],
+    ['crah2', '2 CRAHs lost (west wall)'], ['crah4', '4 CRAHs lost (west wall)'], ['fws-pump', 'Facility water lost'], ['chiller', 'One chiller trips'], ['chw', 'Chilled water lost']
   ];
   /* phase: 'throttled' — a rack that loses cold-plate flow protects itself within seconds (GPU
    * throttle or shutdown), so the lasting consequence is lost IT capacity, not a hotter room;
    * 'running' — the worst case where those racks keep their full load on air. */
-  var ST = { fault: 'none', header: 'common', minute: 5, phase: 'throttled' };
+  var ST = { fault: 'none', header: 'common', minute: 5, phase: 'throttled', load: 1 };
+  /* hall load: the heat load test steps (25 / 50 / 75 / 100 % of design), so a failure can be tried
+     at the step the HLT will try it — and seen to hold at part load where it fails at full */
+  var LOADS = [0.25, 0.5, 0.75, 1];
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmt(v, d) { return Number(v).toLocaleString('en-US', { maximumFractionDigits: d || 0, minimumFractionDigits: d || 0 }); }
@@ -41,35 +44,39 @@
    *   6. the CRAH coil is an effectiveness model fitted at design (ε = ΔT / (T_supply − T_chw + ΔT)):
    *      when the coil cannot hold set-point — fewer units, warmer chilled water — supply air rises. */
   var MARGIN = 1.05, MIX_HOT = 0.6;
-  function solveHall(r, fault, header, minute, phase) {
-    var p = r.input, h = r.hall, CPA = P.CONST.CP_A, RHOA = P.CONST.RHO_A, RC = RHOA * CPA;
-    var rackKw = r.it.hallKw / h.racks.length, cap = p.capturePct / 100;
+  function solveHall(r, fault, header, minute, phase, load) {
+    var p = r.input, h = r.hall, CPA = P.CONST.CP_A, RHOA = P.CONST.RHO_A, RC = RHOA * CPA, Lf = load > 0 ? Math.min(load, 1) : 1;
+    var rackKw = r.it.hallKw * Lf / h.racks.length, cap = p.capturePct / 100;
     var chw = p.chwSupplyC, liqShortFrac = 0, lostCdu = {}, crahOut = {}, note = '', series = null, secs = null;
     var hallLiq = r.liquid.dutyKw / p.halls;
     if (fault === 'cdu-feeder' || fault === 'cdu') {
       var ov = P.compute(r.input, { kind: fault }).fault;
       ov.lostCdu.forEach(function (c) { lostCdu[c] = 1; });
       if (fault === 'cdu') lostCdu = { 1: 1 };
-      if (header === 'common') liqShortFrac = Math.min(1, ov.liquidShortKw / hallLiq);
-      note = ov.note + (header === 'common' ? ' Common secondary header: the shortfall spreads over every rack.' : ' One loop per CDU: the racks on a dead CDU lose all their liquid cooling.');
-      secs = ov.flowLost || header !== 'common' ? 10 : null;
+      /* the survivors' capacity is fixed; at part load less of the duty is missing (or none) */
+      var shortKw = Math.max(0, ov.liquidShortKw - hallLiq * (1 - Lf));
+      if (header === 'common') liqShortFrac = Math.min(1, shortKw / (hallLiq * Lf));
+      note = ov.note + (header !== 'common' ? ' One loop per CDU: the racks on a dead CDU lose all their liquid cooling.'
+        : Lf < 1 && ov.liquidShortKw > 0 && !shortKw ? ' At ' + Math.round(Lf * 100) + ' % hall load the CDUs left carry all of it on the common secondary header.'
+        : ' Common secondary header: the shortfall spreads over every rack.');
+      secs = (ov.flowLost || header !== 'common') && (header !== 'common' || shortKw > 0) ? 10 : null;
     } else if (/^crah\d$/.test(fault)) { /* crah1 (the HLT's single failure), crah2, crah4 */
       var n = +fault.slice(4);
       h.crahs.filter(function (c) { return c.wall === 'west'; }).slice(0, n).forEach(function (c) { crahOut[c.i] = 1; });
       note = (n === 1 ? 'One CRAH unit' : n + ' CRAH units') + ' out on the west wall. The survivors speed up to their rated flow; what they still cannot supply, the racks pull back out of the hot aisle.';
     } else if (fault === 'fws-pump') {
-      var tr = P.transient(r, 'fws-pump');
+      var tr = P.transient(r, 'fws-pump', { load: Lf });
       series = tr; secs = tr.secondsToLimit;
       note = 'TCS pumps keep running, heat rejection has stopped: the loop water absorbs the heat until the GPUs throttle at ' + p.throttleC + ' °C return. The room air is not involved until then.';
     } else if (fault === 'chiller' || fault === 'chw') {
-      var tc = P.transient(r, fault);
+      var tc = P.transient(r, fault, { load: Lf });
       series = tc;
       chw = Math.max(p.chwSupplyC, tc.analytic(minute * 60));
       note = fault === 'chiller' ? 'One chiller trips: the N+' + p.chillerRedundancy + ' spare carries the load, CHW recovers.' : 'All chilled water lost: CHW supply rises with the loop’s thermal mass; once the coils can no longer hold set-point the supply air follows (shown at ' + minute + ' min).';
       secs = tc.secondsToLimit;
     }
     // 1 — rack heat to air and the airflow it needs
-    var itLost = 0, throttled = 0, base = (r.air.hallLoadKw - r.air.itKw / p.halls) / h.racks.length;
+    var itLost = 0, throttled = 0, base = (r.air.hallLoadKw - r.air.itKw / p.halls) * Lf / h.racks.length;
     var q = h.racks.map(function (k) {
       var lost = header === 'per-cdu' ? (lostCdu[k.cdu] ? 1 : 0) : liqShortFrac;
       if (phase !== 'running' && lost > 0) {          // the rack sheds the load its cold plates can no longer remove
@@ -159,7 +166,7 @@
     });
     var maxIn = inlet.reduce(function (m, v) { return Math.max(m, v); }, 0);
     var recirc = racks.reduce(function (a, k) { return a + (1 - k.f) * k.dem; }, 0);
-    return { racks: racks, supply: supply, chw: chw, returnC: tRet, coilLimited: supply > p.supplyAirC + 0.05, eps: eps,
+    return { load: Lf, racks: racks, supply: supply, chw: chw, returnC: tRet, coilLimited: supply > p.supplyAirC + 0.05, eps: eps,
              maxInlet: maxIn, over27: racks.filter(function (k) { return k.inlet > 27; }).length,
              over32: racks.filter(function (k) { return k.inlet > 32; }).length, note: note, series: series, secondsToLimit: secs,
              itLostKw: itLost, throttled: throttled, qAirKw: qAir, recircM3s: recirc, aisles: aisles,
@@ -424,6 +431,7 @@
     host.innerHTML = '<div class="ltc-dh-ctl"><label class="ltc-eyebrow" for="dhFault">Fault</label><select class="ltc-select" id="dhFault">' +
       FAULTS.map(function (f) { return '<option value="' + f[0] + '">' + esc(f[1]) + '</option>'; }).join('') + '</select>' +
       '<div class="ltc-seg" role="group" aria-label="CDU secondary loops"><button type="button" data-hdr="common">Common header</button><button type="button" data-hdr="per-cdu">One loop per CDU</button></div>' +
+      '<div class="ltc-dh-ld"><span class="ltc-eyebrow" id="dhLoadL">Hall load · HLT step</span><div class="ltc-seg" role="group" aria-labelledby="dhLoadL">' + LOADS.map(function (l) { return '<button type="button" data-ld="' + l + '">' + (l * 100) + ' %</button>'; }).join('') + '</div></div>' +
       '<div class="ltc-seg ltc-dh-phase" role="group" aria-label="Racks that lose liquid cooling" hidden><button type="button" data-ph="throttled">Racks throttle (seconds later)</button><button type="button" data-ph="running">If they kept running</button></div>' +
       '<label class="ltc-dh-min" hidden>Minute <input type="range" id="dhMin" min="0" max="30" step="1" value="5"><output id="dhMinO">5</output></label></div>' +
       '<p class="ltc-plant-bal" id="dhRead" aria-live="polite"></p><div class="ltc-dh-chain" id="dhChain"></div>' +
@@ -447,12 +455,12 @@
     function chainHtml(r, s) {
       var p = r.input, F = ST.fault, cap = p.capturePct / 100, nC = r.liquid.cduPerHall, lost = Object.keys(s.lostCdu).length;
       function chip(lbl, val, st, why) { return '<li class="' + (st || 'ok') + '" title="' + esc(why) + '"><span>' + esc(lbl) + '</span><b>' + val + '</b></li>'; }
-      var itNow = r.it.hallKw - s.itLostKw;
+      var itNow = r.it.hallKw * s.load - s.itLostKw;
       var liq = [
         chip('IT · DH01', fmt(itNow / 1000, 1) + ' MW', s.itLostKw ? 'warn' : 'ok', s.itLostKw ? 'Racks on dead loops throttled: ' + fmt(s.itLostKw / 1000, 1) + ' MW shed' : 'Hall IT load'),
         chip('Cold plates ' + p.capturePct + ' %', fmt(itNow * cap / 1000, 1) + ' MW', s.itLostKw ? 'warn' : 'ok', 'Heat captured to liquid'),
         chip('CDUs', (nC - lost) + ' / ' + nC, lost ? (ST.header === 'per-cdu' ? 'bad' : 'warn') : 'ok', lost ? (ST.header === 'per-cdu' ? 'One loop per CDU: racks on a dead CDU lose all liquid cooling' : 'Common header: survivors share the duty, short by the lost units') : 'All CDUs running'),
-        chip('TCS', fmt(p.tcsSupplyC, 0) + ' → ' + fmt(p.tcsReturnC, 0) + ' °C', F === 'fws-pump' ? 'bad' : 'ok', F === 'fws-pump' ? 'No heat rejection: return rises to the ' + p.throttleC + ' °C throttle' : 'Secondary loop at design'),
+        chip('TCS', fmt(p.tcsSupplyC, 0) + ' → ' + fmt(p.tcsSupplyC + (p.tcsReturnC - p.tcsSupplyC) * s.load, s.load < 1 ? 1 : 0) + ' °C', F === 'fws-pump' ? 'bad' : 'ok', F === 'fws-pump' ? 'No heat rejection: return rises to the ' + p.throttleC + ' °C throttle' : 'Secondary loop at design'),
         chip('FWS', fmt(r.liquid.fwsSupplyC, 0) + ' °C', F === 'fws-pump' ? 'bad' : 'ok', 'Facility water to the CDUs'),
         chip(String(r.liquid.coolerType).replace('drycooler', 'dry coolers').replace('fluidcooler', 'fluid coolers'), r.liquid.coolerUnitsTotal + ' units', F === 'fws-pump' ? 'bad' : 'ok', 'Heat rejection to ambient')
       ];
@@ -469,9 +477,9 @@
       return '<div><span class="ltc-eyebrow">Liquid path</span><ol>' + liq.join('') + '</ol></div><div><span class="ltc-eyebrow">Air path</span><ol>' + air.join('') + '</ol></div>';
     }
     function paint() {
-      var r = root.LTCPlantStrip.get().result, s = solveHall(r, ST.fault, ST.header, ST.minute, ST.phase);
+      var r = root.LTCPlantStrip.get().result, s = solveHall(r, ST.fault, ST.header, ST.minute, ST.phase, ST.load);
       last = { r: r, s: s, geo: draw(cv, r, s, typeof cursor === 'number' ? cursor : -1) };
-      host.querySelector('#dhRead').innerHTML = '<span>DH01 <b>' + fmt(r.it.hallKw / 1000, 1) + ' MW</b> · ' + r.hall.racks.length + ' racks · ' + fmt(r.hall.lengthM, 1) + ' × ' + fmt(r.hall.widthM, 1) + ' m</span><span class="sep">/</span>' +
+      host.querySelector('#dhRead').innerHTML = '<span>DH01 <b>' + fmt(r.it.hallKw * s.load / 1000, 1) + ' MW</b>' + (s.load < 1 ? ' of ' + fmt(r.it.hallKw / 1000, 1) + ' (' + fmt(s.load * 100) + ' %)' : '') + ' · ' + r.hall.racks.length + ' racks · ' + fmt(r.hall.lengthM, 1) + ' × ' + fmt(r.hall.widthM, 1) + ' m</span><span class="sep">/</span>' +
         '<span>supply <b>' + fmt(s.supply, 1) + ' °C</b></span><span class="sep">/</span><span>hottest inlet <b>' + fmt(s.maxInlet, 1) + ' °C</b></span><span class="sep">/</span>' +
         '<span>racks &gt; 27 °C <b>' + s.over27 + '</b> · &gt; 32 °C <b>' + s.over32 + '</b></span><span class="sep">/</span>' +
         '<span>air supply / demand <b>' + fmt(s.airSupply, 0) + ' / ' + fmt(s.airDemand, 0) + '</b> m³/s</span>' +
@@ -482,6 +490,7 @@
       host.querySelector('#dhChart').innerHTML = chart(s.series, ST.minute, ST.fault);
       host.querySelector('.ltc-dh-min').hidden = !(ST.fault === 'chw' || ST.fault === 'chiller');
       [].forEach.call(host.querySelectorAll('[data-hdr]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-hdr') === ST.header)); });
+      [].forEach.call(host.querySelectorAll('[data-ld]'), function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-ld') === ST.load)); });
       [].forEach.call(host.querySelectorAll('[data-ph]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ph') === ST.phase)); });
       host.querySelector('.ltc-dh-phase').hidden = !(ST.fault === 'cdu-feeder' || ST.fault === 'cdu');
     }
@@ -489,6 +498,7 @@
     host.addEventListener('click', function (e) {
       var b = e.target.closest('[data-hdr]'); if (b) { ST.header = b.getAttribute('data-hdr'); paint(); }
       var ph = e.target.closest('[data-ph]'); if (ph) { ST.phase = ph.getAttribute('data-ph'); paint(); }
+      var ld = e.target.closest('[data-ld]'); if (ld) { ST.load = +ld.getAttribute('data-ld'); paint(); }
     });
     host.querySelector('#dhMin').addEventListener('input', function (e) { ST.minute = +e.target.value; host.querySelector('#dhMinO').textContent = ST.minute; paint(); });
     /* one tooltip path for mouse, touch and keyboard (LTCTrace.show clamps to the viewport) */
@@ -515,7 +525,7 @@
         [['Airflow', fmt(s.crahUnitM3s, 1) + ' of ' + fmt(s.crahRatedM3s, 1) + ' m³/s'], ['Fan speed', fmt(s.fanSpeed * 100) + ' %'], ['Supply', fmt(s.supply, 1) + ' °C'], ['Return', fmt(s.returnC, 1) + ' °C'], ['Coil', fmt(p.crahUnitKw) + ' kW rated · CHW ' + fmt(s.chw, 1) + ' °C']],
         note: 'All units share one speed under pressure control.' };
       else if (u.kind === 'cdu') t = { title: 'CDU ' + (u.c.i + 1) + ' · feeder ' + u.c.feeder, rows: [['State', u.dead ? 'lost' : 'running'], ['Racks served', String(u.racks)],
-        ['Duty', fmt(last.r.liquid.dutyKw / p.halls / last.r.liquid.cduPerHall) + ' kW'], ['TCS', fmt(p.tcsSupplyC, 0) + ' → ' + fmt(p.tcsReturnC, 0) + ' °C']],
+        ['Duty', fmt(last.r.liquid.dutyKw * s.load / p.halls / last.r.liquid.cduPerHall) + ' kW'], ['TCS', fmt(p.tcsSupplyC, 0) + ' → ' + fmt(p.tcsSupplyC + (p.tcsReturnC - p.tcsSupplyC) * s.load, 1) + ' °C']],
         note: ST.header === 'per-cdu' ? 'One secondary loop per CDU.' : 'Common secondary header: CDUs share the racks.' };
       else if (u.kind === 'aisle') t = { title: 'Cold aisle ' + (u.a.i + 1), rows: [['Demand', fmt(u.a.demand, 1) + ' m³/s'], ['From W wall', fmt(u.a.west, 1) + ' m³/s'], ['From E wall', fmt(u.a.east, 1) + ' m³/s'],
         [u.a.unmet > 1e-6 ? 'Unmet' : 'Bypass', fmt(u.a.unmet > 1e-6 ? u.a.unmet : u.a.bypass, 1) + ' m³/s']], note: u.a.unmet > 1e-6 ? 'Red dashed box: the stretch no supply air reaches.' : 'Fed from both ends.' };
@@ -556,7 +566,7 @@
     document.addEventListener('ltc:tab', function () { if (cv.clientWidth) paint(); });
   }
 
-  root.LTCDH01 = { mount: mount, solveHall: solveHall, FAULTS: FAULTS };
+  root.LTCDH01 = { mount: mount, solveHall: solveHall, FAULTS: FAULTS, LOADS: LOADS };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCDH01;
   function boot() { var h = document.getElementById('ltcDh01'); if (h) mount(h); }
   if (typeof document !== 'undefined') { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot(); }

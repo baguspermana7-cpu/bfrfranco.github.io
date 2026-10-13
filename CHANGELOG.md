@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v3.21.2 — 2026-10-13
+
+### DH01 at every heat-load-test step; one CRAH out as a fault you can pick
+
+**DH01 thermal view — hall load.** New control *Hall load · HLT step*: 25 / 50 / 75 / 100 % of design. It sets the load each fault is tried at, the same steps as the heat load test.
+- **What scales with load:**
+  - Rack heat and non-IT air heat.
+  - The CDU shortfall. The survivors' capacity is fixed, so at part load less duty is missing.
+  - The FWS and chilled-water ride-through. The rejection left is a share of design capacity, so it covers a part load more easily.
+- **Default 100 MW plant:**
+  - CDU feeder A lost: 8.3 MW IT throttles at 100 %, 3.3 MW at 75 %, nothing at 50 %. The note says so: "At 50 % hall load the CDUs left carry all of it."
+  - Facility water lost: 220 s to the TCS throttle point at 100 %, 877 s at 25 %.
+- **Where it shows:** the header shows "10.0 MW of 20.0 (50 %)". The TCS chip and CDU hover show the part-load return (constant flow).
+
+**One CRAH lost.** Added to the DH01 fault list beside 2 and 4 CRAHs. On an N+1 hall every rack stays at 24 °C; with N units the same fault reaches 37.4 °C.
+
+**Heat load test plan.** The failure table gains *Holds up to*: the highest HLT step at which each single failure still holds. Default plant: CDU feeder A holds to 50 %. The test team knows the step at which the feeder test will throttle racks. The hub's L4 inspector says the same.
+
+**Engine.** `LTCPlant.transient(r, kind, { load })`: heat in scales with load; rejection left is divided by it. `LTCDH01.solveHall(…, load)`; `LTCDH01.LOADS`.
+
+**Gates** — `tools/test-ltc-workbench.mjs` (303 assertions):
+- **W12s:** 16 plants × every fault.
+  - No fault eases as load rises.
+  - Load 1 equals the design solve.
+  - CDU feeder A holds exactly to the step the surviving CDUs can carry (checked against the engine's own shortfall).
+  - FWS ride-through at 25 % is 4× full load.
+- **Proven red:** a mutation that keeps the design shortfall at part load fails W12s on 3 plants ("feeder holds to 0 %, survivors carry 50 %").
+
 ## v3.21.1 — 2026-10-13
 
 ### "Proven at Load": the heat load test written for this plant; one CRAH out no longer overheats an N+1 hall

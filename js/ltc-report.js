@@ -500,8 +500,10 @@
         dT: dT, returnC: R.input.tcsSupplyC + dT, loKw: q * 0.95, hiKw: q * 1.05 };
     });
     var D = root.LTCDH01, fails = !D ? [] : HLT_FAULTS.map(function (x) {
-      var s = D.solveHall(R, x[0], 'common', 5, 'throttled');
-      return { id: x[0], label: x[1], maxInlet: s.maxInlet, throttled: s.throttled, itLostKw: s.itLostKw, note: s.note,
+      var s = D.solveHall(R, x[0], 'common', 5, 'throttled'), ok = function (v) { return !v.itLostKw && v.maxInlet <= 27; };
+      /* the highest HLT step at which this failure still holds (0 = fails even at 25 %) */
+      var holdsTo = 0; HLT_STEPS.forEach(function (st) { if (ok(D.solveHall(R, x[0], 'common', 5, 'throttled', st / 100))) holdsTo = st; });
+      return { id: x[0], label: x[1], holdsTo: holdsTo, maxInlet: s.maxInlet, throttled: s.throttled, itLostKw: s.itLostKw, note: s.note,
         pass: !s.itLostKw && s.maxInlet <= 27 };
     });
     return { hallKw: R.it.hallKw, liquidKw: liq, airKw: air, cduN: l.cduDutyN, cduTotal: l.cduPerHall, cduUnitKw: R.input.cduUnitKw,
@@ -518,8 +520,8 @@
         return [s.pct + '&nbsp;%', f(s.liquidKw), f(s.perCduKw), f(s.airKw), f(s.tcsLps, 1) + ' (' + f(s.perCduLps, 1) + ')', f(s.dT, 2), f(s.returnC, 1), f(s.loKw) + ' – ' + f(s.hiKw)];
       })) +
       '<p class="note">Accept at every step (typical): TCS supply ' + f(H.supplyC, 1) + ' ± 1 °C; flow per CDU ≥ design; rack inlet inside the ASHRAE recommended envelope (18–27 °C, supply air ' + f(H.supplyAirC, 1) + ' °C); measured heat inside the band; no alarm. ΔT assumes the CDUs hold design flow; a CDU on ΔT control holds the ΔT and turns its flow down instead.</p>' +
-      (H.fails.length ? '<h3>Failures at 100 % — one unit at a time</h3>' + table(['Unit out', 'Max rack inlet °C', 'Racks throttled', 'IT throttled kW', 'Expected result', 'Why'], H.fails.map(function (x) {
-        return [esc(x.label), f(x.maxInlet, 1), f(x.throttled), f(x.itLostKw), x.pass ? '<span class="tag ok">holds</span>' : '<span class="tag bad">fails</span>', '<small>' + esc(x.note || '—') + '</small>'];
+      (H.fails.length ? '<h3>Failures at 100 % — one unit at a time</h3>' + table(['Unit out', 'Max rack inlet °C', 'Racks throttled', 'IT throttled kW', 'Expected result', 'Holds up to', 'Why'], H.fails.map(function (x) {
+        return [esc(x.label), f(x.maxInlet, 1), f(x.throttled), f(x.itLostKw), x.pass ? '<span class="tag ok">holds</span>' : '<span class="tag bad">fails</span>', x.holdsTo ? x.holdsTo + '&nbsp;% load' : 'no step', '<small>' + esc(x.note || '—') + '</small>'];
       })) + (bad.length ? '<p class="note">This plant is expected to fail the HLT at: ' + bad.map(function (x) { return esc(x.label); }).join(', ') + '. Fix the design before the test, or record it as a known limit in the commissioning plan.</p>' : '') : '');
   }
   function optionsSection(O) {

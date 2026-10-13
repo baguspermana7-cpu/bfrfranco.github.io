@@ -470,7 +470,7 @@
       '<table class="ltc-table ltc-hlt"><thead><tr><th>Load</th><th class="n">Liquid kW</th><th class="n">Air kW</th><th class="n">TCS ret °C</th></tr></thead><tbody>' +
       H.steps.map(function (x) { return '<tr><td class="n">' + x.pct + ' %</td><td class="n">' + f0(x.liquidKw) + '</td><td class="n">' + f0(x.airKw) + '</td><td class="n">' + f1(x.returnC) + '</td></tr>'; }).join('') +
       '</tbody></table><ul class="ltc-script-l">' + H.fails.map(function (x) {
-        return '<li>' + L.esc(x.label) + ' out at 100 %: <b>' + (x.pass ? 'holds' : 'fails') + '</b> — ' + (x.itLostKw ? f0(x.itLostKw) + ' kW IT throttles' : 'max rack inlet ' + f1(x.maxInlet) + ' °C') + '</li>';
+        return '<li>' + L.esc(x.label) + ' out at 100 %: <b>' + (x.pass ? 'holds' : 'fails') + '</b> — ' + (x.itLostKw ? f0(x.itLostKw) + ' kW IT throttles' : 'max rack inlet ' + f1(x.maxInlet) + ' °C') + (x.pass ? '' : x.holdsTo ? '; holds up to the ' + x.holdsTo + ' % step' : '; fails at every step') + '</li>';
       }).join('') + '</ul>';
   }
   function openLife(id) {

@@ -537,18 +537,20 @@
        τ = C·(T0 − T_sink)/(f·Q). Integrated numerically (1 s steps) so the page can draw it and the
        test can compare it with the analytic solution. */
     function transient(r, kind, opt) {
-        var p = r.input, o = opt || {}, hallLiq = r.liquid.dutyKw / p.halls;
+        /* o.load: share of the design heat flowing when the fault hits (the HLT steps); the rejection
+           still available is a share of DESIGN capacity, so it covers a part load more easily */
+        var p = r.input, o = opt || {}, hallLiq = r.liquid.dutyKw / p.halls, Lf = o.load > 0 ? Math.min(o.load, 1) : 1;
         var C, Q, T0, Ts, f, limit, label;
         if (kind === 'fws-pump' || kind === 'cooler') {
             C = p.tcsLoopM3PerCdu * r.liquid.cduPerHall * RHO_W * CP_W;   // kJ/K
-            Q = hallLiq; T0 = p.tcsReturnC; Ts = r.liquid.fwsSupplyC; f = kind === 'cooler' ? (o.f != null ? o.f : 0.5) : 0;
+            Q = hallLiq * Lf; T0 = p.tcsReturnC; Ts = r.liquid.fwsSupplyC; f = kind === 'cooler' ? Math.min((o.f != null ? o.f : 0.5) / Lf, 1.5) : 0;
             limit = p.throttleC; label = 'TCS return';
         } else if (kind === 'chiller' || kind === 'chw') {
             var evap = r.air.chillerEvapKw;
             C = evap * p.chwLoopLPerKw / 1000 * RHO_W * CP_W;
-            Q = evap; T0 = p.chwSupplyC; Ts = p.chwSupplyC - 4;
+            Q = evap * Lf; T0 = p.chwSupplyC; Ts = p.chwSupplyC - 4;
             var left = kind === 'chw' ? 0 : (r.air.chillersTotal - 1) * p.chillerUnitKw / evap;
-            f = Math.min(left, 1.5); limit = 27 - 6; label = 'CHW supply';   // 6 K coil approach to a 27 °C inlet
+            f = Math.min(left / Lf, 1.5); limit = 27 - 6; label = 'CHW supply';   // 6 K coil approach to a 27 °C inlet
         } else return null;
         var dt = 1, t = 0, T = T0, series = [[0, T0]], hit = null, tMax = (o.minutes || 30) * 60;
         while (t < tMax) {

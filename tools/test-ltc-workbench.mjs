@@ -329,6 +329,26 @@ for (const [page, mod] of Object.entries(PAGES)) {
     }
     ok('W12r', !bad.length, 'DH01: recirculated air equals the hall\'s airflow shortfall (±1 %), N+1 CRAHs hold every rack ≤ 27 °C with one out and N do not — 24 plants' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
   }
+  {
+    /* DH01 at the HLT steps: a fault never bites harder at a lower load; the CDU feeder holds exactly
+       up to the step the surviving CDUs can carry; a lost loop rides through in proportion to 1 / load;
+       load 1 is the design solve */
+    const bad = [];
+    for (const k of Object.keys(P.PRESETS)) for (const st of [{}, { cduFeed: 'dual' }, { cduRedundancy: 0 }, { crahRedundancy: 0, itMw: 37 }]) {
+      const R = P.compute(Object.assign({}, P.PRESETS[k], st)), tag = k + JSON.stringify(st);
+      for (const [f] of D.FAULTS) {
+        const sv = D.LOADS.map((L) => D.solveHall(R, f, 'common', 5, 'throttled', L)), d = D.solveHall(R, f, 'common', 5, 'throttled');
+        for (let i = 1; i < sv.length; i++) if (sv[i].maxInlet < sv[i - 1].maxInlet - 1e-6 || sv[i].itLostKw < sv[i - 1].itLostKw - 1e-6) bad.push(`${tag}/${f}: eases as load rises`);
+        if (Math.abs(sv[3].maxInlet - d.maxInlet) > 1e-9 || Math.abs(sv[3].itLostKw - d.itLostKw) > 1e-9) bad.push(`${tag}/${f}: load 1 differs from design`);
+      }
+      const ov = P.compute(R.input, { kind: 'cdu-feeder' }).fault, duty = R.liquid.dutyKw / R.input.halls, cap = duty - ov.liquidShortKw;
+      const want = Math.max(0, ...D.LOADS.filter((L) => L * duty <= cap + 1e-6).map((L) => L * 100)), got = X.hlt(R).fails.find((x) => x.id === 'cdu-feeder').holdsTo;
+      if (want !== got) bad.push(`${tag}: feeder holds to ${got} %, survivors carry ${want} %`);
+      const t1 = P.transient(R, 'fws-pump').secondsToLimit, t4 = P.transient(R, 'fws-pump', { load: 0.25 }).secondsToLimit;
+      if (Math.abs(t4 / t1 - 4) > 0.02) bad.push(`${tag}: FWS ride-through at 25 % is ${(t4 / t1).toFixed(2)}× full load, not 4×`);
+    }
+    ok('W12s', !bad.length, 'DH01 at the HLT steps: no fault eases as load rises, load 1 equals the design solve, the CDU feeder holds exactly to the step the survivors carry, FWS ride-through ∝ 1/load — 16 plants × every fault' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
+  }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));
   for (const [i, st] of plants.entries()) {
