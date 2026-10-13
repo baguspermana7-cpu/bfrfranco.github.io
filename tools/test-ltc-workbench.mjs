@@ -363,6 +363,32 @@ for (const [page, mod] of Object.entries(PAGES)) {
     }
     ok('W12t', !bad.length, 'this plant against each Tier: 64 configurations (presets × CDU feed × UPS N+1/2N × CDU pumps on UPS × CRAH N/N+1) reach the Tier worked out independently, each short of IV naming its blocker' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
   }
+  {
+    /* sequence of events: every time is solved — each timed threshold holds at its second and not
+       one second earlier, the FWS throttle is the transient's own crossing, the feeder sheds what
+       the hall solve sheds, and the list runs in time order with steady state last */
+    const bad = [];
+    for (const k of Object.keys(P.PRESETS)) for (const st of [{}, { cduFeed: 'dual' }, { chillerRedundancy: 0 }]) {
+      const R = P.compute(Object.assign({}, P.PRESETS[k], st)), tag = k + JSON.stringify(st);
+      for (const [f] of D.FAULTS) {
+        const E = D.timeline(R, f, 'common', 'throttled', 1);
+        if (f === 'none') { if (E.length) bad.push(`${tag}: events with no fault`); continue; }
+        if (!E.length || E[0].t !== 0) bad.push(`${tag}/${f}: first event is not the fault at T+0`);
+        for (let i = 1; i < E.length; i++) if (E[i - 1].t == null ? E[i].t != null : E[i].t != null && E[i].t < E[i - 1].t) bad.push(`${tag}/${f}: out of order`);
+        if (f === 'chw' || f === 'chiller') for (const [re, test] of [[/coils lose/, (s) => s.coilLimited], [/above 27/, (s) => s.over27 > 0], [/above 32/, (s) => s.over32 > 0]]) {
+          const e = E.find((x) => x.t > 0 && x.t < 1800 && re.test(x.text));
+          if (e && (!test(D.solveHall(R, f, 'common', e.t / 60, 'throttled')) || test(D.solveHall(R, f, 'common', (e.t - 1) / 60, 'throttled')))) bad.push(`${tag}/${f}: ${re} not crossed at ${e.t} s`);
+          if (!e && test(D.solveHall(R, f, 'common', 30, 'throttled')) && !test(D.solveHall(R, f, 'common', 0, 'throttled'))) bad.push(`${tag}/${f}: ${re} crossed in 30 min, no event`);
+        }
+        if (f === 'fws-pump') { const lim = P.transient(R, 'fws-pump').secondsToLimit, e = E.find((x) => x.sev === 'trip'); if ((lim == null) !== !e || (e && Math.abs(e.t - lim) > 1)) bad.push(`${tag}: FWS throttle at ${e && e.t}, transient ${lim}`); }
+        if (f === 'cdu-feeder') {
+          const s = D.solveHall(R, f, 'common', 5, 'throttled'), e = E.find((x) => x.sev === 'trip');
+          if (!!s.itLostKw !== !!e || (e && !e.text.includes((s.itLostKw / 1000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MW'))) bad.push(`${tag}: feeder trip event disagrees with the hall solve`);
+        }
+      }
+    }
+    ok('W12v', !bad.length, 'DH01 sequence of events: each timed threshold is crossed at its stated second and not before, FWS throttle at the transient\'s crossing, feeder shed = hall solve, time order — 12 plants × every fault' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
+  }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));
   for (const [i, st] of plants.entries()) {
@@ -398,6 +424,8 @@ for (const [page, mod] of Object.entries(PAGES)) {
        'HLT plan: load banks split the hall load by capture, ΔT scales with load and reaches the design ΔT at 100 %, each single failure holds exactly when the design has the redundancy (CDU N+1, CRAH N+1, dual CDU feed)');
     ok('W12u:' + id, ctx.fit && text.includes('This plant, as configured, against each Tier') && ctx.fit.rows.every((x) => text.includes(x.req.replace(/&/g, '&amp;'))),
        'the report carries this plant against each Tier, every requirement listed');
+    ok('W12w:' + id, text.includes('Sequence of events') && ctx.faults.every((x) => x.soe.every((e) => text.includes(e.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')))),
+       'the report carries the sequence of events for every fault');
     ok('W12j:' + id, ctx.transients.length === 4 && ctx.transients.every((t) => t.series.length > 2), 'four transients, each with a time series');
     const data = JSON.parse(html.match(/<script type="application\/json" id="rz-data">([\s\S]*?)<\/script>/)[1]);
     ok('W12k:' + id, data.result.totals.pueAnnual === R.totals.pueAnnual && data.result.design.facility === R.design.facility, 'the embedded data is the engine result itself');

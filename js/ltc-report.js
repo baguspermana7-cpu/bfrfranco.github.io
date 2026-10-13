@@ -337,7 +337,8 @@
       parts.push(sec('s11', 11, 'DH01 hall & faults', 'One hall in plan, ' + f(h.lengthM, 1) + ' × ' + f(h.widthM, 1) + ' × ' + f(h.heightM, 1) + ' m (' + f(h.areaM2) + ' m², ' + f(h.volumeM3) + ' m³), ' + h.rows + ' rows × ' + h.racksPerRow + ' racks, re-solved under every fault the workbench models (common secondary header, 5 min after the fault, racks throttled). A thermal approximation for training, not CFD.',
         legend() + '<div class="plans">' + ctx.faults.map(function (x) { return hallPlan(R, x.s, x.label); }).join('') + '</div>' +
         table(['Fault', 'Supply air °C', 'Max inlet °C', '> 27 °C', '> 32 °C', 'IT throttled kW', 'CRAH coil limited', 'Note'], ctx.faults.map(function (x) {
-          return [esc(x.label), f(x.s.supply, 1), f(x.s.maxInlet, 1), x.s.over27, x.s.over32, f(x.s.itLostKw), x.s.coilLimited ? 'yes' : 'no', '<small>' + esc(x.s.note || '—') + '</small>']; }))));
+          return [esc(x.label), f(x.s.supply, 1), f(x.s.maxInlet, 1), x.s.over27, x.s.over32, f(x.s.itLostKw), x.s.coilLimited ? 'yes' : 'no', '<small>' + esc(x.s.note || '—') + '</small>']; })) +
+        soeSection(ctx.faults)));
     } else parts.push(sec('s11', 11, 'DH01 hall & faults', '', '<p class="note">The DH01 solver did not load on this page; open the report from the LTC hub to include it.</p>'));
     parts.push(sec('s12', 12, 'Transients', 'First-order lumped thermal mass, integrated in 1 s steps: C·dT/dt = Q − f·Q·(T − T_sink)/(T0 − T_sink). f = heat rejection still available ÷ load.',
       '<div class="tr">' + ctx.transients.map(function (t) {
@@ -511,6 +512,18 @@
       crahN: a.crahDutyN, crahTotal: a.crahPerHall, crahUnitKw: R.input.crahUnitKw, supplyC: R.input.tcsSupplyC, supplyAirC: R.input.supplyAirC,
       steps: steps, fails: fails };
   }
+  /* the alarm list per fault, in order: times solved from the hall and the plant transients */
+  var SEV_TAG = { ok: 'ok', info: '', warn: 'y', alarm: 'bad', trip: 'bad' };
+  function soeSection(faults) {
+    var rows = [], D = root.LTCDH01;
+    faults.forEach(function (x) {
+      (x.soe || []).forEach(function (e, i) {
+        rows.push([i ? '' : '<b>' + esc(x.label) + '</b>', '<code>' + D.clock(e.t) + '</code>', '<span class="tag ' + SEV_TAG[e.sev] + '">' + e.sev + '</span>', esc(e.text)]);
+      });
+    });
+    return rows.length ? '<h3>Sequence of events</h3><p class="note">What the alarm list shows after each fault at full hall load, in order. Times come from the solve, not a script: steady faults from the hall solve once fans and valves settle (<code>steady</code>); loss of facility or chilled water from the loop’s stored cold, with the hall re-solved along the transient to the second each threshold is crossed. Cold plates have almost no thermal mass, so a rack that loses flow throttles within about 10 s.</p>' +
+      table(['Fault', 'Time', 'Severity', 'Event'], rows) : '';
+  }
   function hltSection(H) {
     var head = ['Load', 'Liquid banks kW', 'Per CDU kW', 'Air banks kW', 'TCS L/s (per CDU)', 'TCS ΔT K', 'TCS return °C', 'Accept kW ±5 %'];
     var bad = H.fails.filter(function (x) { return !x.pass; });
@@ -561,7 +574,7 @@
       options: options(P, R),
       tier: tierSweep(root.LTCTier),
       fit: root.LTCTier && root.LTCTier.fit ? root.LTCTier.fit(R, root.LTCDH01) : null,
-      faults: D ? D.FAULTS.map(function (x) { return { id: x[0], label: x[1], s: D.solveHall(R, x[0], 'common', 5, 'throttled') }; }) : null
+      faults: D ? D.FAULTS.map(function (x) { return { id: x[0], label: x[1], s: D.solveHall(R, x[0], 'common', 5, 'throttled'), soe: D.timeline ? D.timeline(R, x[0], 'common', 'throttled', 1) : [] }; }) : null
     };
     c.hlt = hlt(R);
     return c;

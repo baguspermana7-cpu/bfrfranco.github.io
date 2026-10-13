@@ -26,6 +26,9 @@
   /* hall load: the heat load test steps (25 / 50 / 75 / 100 % of design), so a failure can be tried
      at the step the HLT will try it — and seen to hold at part load where it fails at full */
   var LOADS = [0.25, 0.5, 0.75, 1];
+  /* faults that ride on stored cold (loop water, CHW volume): the ones a clock means something for */
+  var TIMED = { 'fws-pump': 1, chiller: 1, chw: 1 };
+  var SEV = { ok: 'var(--g)', info: 'var(--t2)', warn: 'var(--o)', alarm: 'var(--r)', trip: 'var(--r)' };
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmt(v, d) { return Number(v).toLocaleString('en-US', { maximumFractionDigits: d || 0, minimumFractionDigits: d || 0 }); }
@@ -173,6 +176,72 @@
              crahAlive: alive.length, crahRatedM3s: rated, crahUnitM3s: perUnit, fanSpeed: rated ? perUnit / rated : 0,
              airDemand: demand, airSupply: S, lostCdu: lostCdu, crahOut: crahOut };
   }
+
+  /* Sequence of events — what the operator's alarm list would show, in order, for one fault. Every
+   * time is solved, not typed: the steady hall solve for faults with no thermal mass in play, the
+   * plant transient (loop water, CHW volume) for the ones that ride on stored cold, and the hall
+   * re-solved along that transient to the second each threshold is crossed. t = null: steady state
+   * once the fans and valves have settled. */
+  function timeline(r, fault, header, phase, load) {
+    var p = r.input, Lf = load > 0 ? Math.min(load, 1) : 1, ev = [], at = function (t, sev, text) { ev.push({ t: t, sev: sev, text: text }); };
+    if (!fault || fault === 'none') return ev;
+    var lbl = (FAULTS.filter(function (x) { return x[0] === fault; })[0] || [fault, fault])[1];
+    function first(fn, hi) {                       // earliest second (≤ hi) at which fn holds, bisected to 1 s
+      var prev = 0;
+      if (fn(0)) return 0;
+      for (var t = 60; t <= hi; t += 60) {
+        if (fn(t)) { var lo = prev; while (t - lo > 1) { var m = Math.floor((lo + t) / 2); if (fn(m)) t = m; else lo = m; } return t; }
+        prev = t;
+      }
+      return null;
+    }
+    function steady(s) {
+      if (s.crahAlive < r.hall.crahs.length) at(null, 'info', s.crahAlive + ' CRAHs left run at ' + fmt(s.fanSpeed * 100) + ' % fan speed: ' + fmt(s.airSupply, 0) + ' m³/s supplied, ' + fmt(s.airDemand, 0) + ' m³/s demanded.');
+      if (s.coilLimited) at(null, 'warn', 'CRAH coils cannot hold set-point: supply air ' + fmt(s.supply, 1) + ' °C.');
+      if (s.recircM3s > 0.05) at(null, 'warn', fmt(s.recircM3s, 1) + ' m³/s of exhaust pulled back into the cold aisles.');
+      if (s.over32) at(null, 'alarm', s.over32 + ' racks above the A1 allowable 32 °C (hottest inlet ' + fmt(s.maxInlet, 1) + ' °C).');
+      else if (s.over27) at(null, 'alarm', s.over27 + ' racks above the recommended 27 °C (hottest inlet ' + fmt(s.maxInlet, 1) + ' °C).');
+      else at(null, 'ok', 'Every rack inlet inside the recommended envelope (hottest ' + fmt(s.maxInlet, 1) + ' °C).');
+    }
+    if (fault === 'cdu-feeder' || fault === 'cdu') {
+      var s = solveHall(r, fault, header, 5, phase, Lf), ov = P.compute(p, { kind: fault }).fault;
+      at(0, 'alarm', fault === 'cdu' ? 'One CDU lost (CDU ' + (ov.lostCdu[0] + 1) + ').' : lbl + ': ' + ov.note);
+      if (s.secondsToLimit) {
+        at(s.secondsToLimit, phase === 'running' ? 'alarm' : 'trip', phase === 'running'
+          ? 'Cold plates on ' + (header === 'per-cdu' ? 'the dead loops' : 'the common header') + ' short of flow: their liquid heat moves to the air.'
+          : 'GPUs on ' + s.throttled + ' racks throttle to protect themselves: ' + fmt(s.itLostKw / 1000, 2) + ' MW of IT shed.');
+      } else at(0, 'ok', 'The CDUs left carry the liquid duty' + (Lf < 1 ? ' at ' + Math.round(Lf * 100) + ' % hall load' : '') + ': no rack loses cold-plate flow.');
+      steady(s);
+    } else if (/^crah\d$/.test(fault)) {
+      at(0, 'alarm', lbl + '.');
+      steady(solveHall(r, fault, header, 5, phase, Lf));
+    } else if (fault === 'fws-pump') {
+      var tr = P.transient(r, 'fws-pump', { load: Lf }), half = p.tcsReturnC + (p.throttleC - p.tcsReturnC) / 2;
+      at(0, 'alarm', 'Facility water lost to DH01: the TCS pumps keep running, heat rejection has stopped.');
+      var th = first(function (t) { return tr.analytic(t) >= half; }, 1800);
+      if (th != null) at(th, 'warn', 'TCS return ' + fmt(half, 1) + ' °C — halfway from the design ' + fmt(p.tcsReturnC, 0) + ' °C to the ' + fmt(p.throttleC, 0) + ' °C throttle.');
+      if (tr.secondsToLimit != null) at(tr.secondsToLimit, 'trip', 'TCS return reaches ' + fmt(p.throttleC, 0) + ' °C: GPUs throttle across DH01 until facility water is back.');
+      else at(null, 'ok', 'TCS return stays below the ' + fmt(p.throttleC, 0) + ' °C throttle for 30 min.');
+    } else if (fault === 'chiller' || fault === 'chw') {
+      var tc = P.transient(r, fault, { load: Lf }), sv = function (t) { return solveHall(r, fault, header, t / 60, phase, Lf); };
+      at(0, fault === 'chw' ? 'alarm' : 'warn', fault === 'chw' ? 'Chilled water lost: CHW supply starts to rise with the loop’s thermal mass.'
+        : 'One chiller trips: ' + (r.air.chillersTotal - 1) + ' of ' + r.air.chillersTotal + ' left (N+' + p.chillerRedundancy + ').');
+      var tCoil = first(function (t) { return sv(t).coilLimited; }, 1800);
+      if (tCoil != null) at(tCoil, 'warn', 'CHW ' + fmt(tc.analytic(tCoil), 1) + ' °C: CRAH coils lose the ' + fmt(p.supplyAirC, 0) + ' °C supply-air set-point.');
+      var t27 = first(function (t) { return sv(t).over27 > 0; }, 1800);
+      if (t27 != null) at(t27, 'alarm', 'First rack inlet above 27 °C (recommended).');
+      var t32 = first(function (t) { return sv(t).over32 > 0; }, 1800);
+      if (t32 != null) at(t32, 'trip', 'First rack inlet above 32 °C (A1 allowable).');
+      var end = sv(1800);
+      var peak = tc.series.reduce(function (m, x) { return Math.max(m, x[1]); }, 0);
+      if (tc.capacityLeft >= 1) at(null, 'ok', 'The chillers left absorb the load: CHW ' + (peak - p.chwSupplyC < 0.05 ? 'holds at ' + fmt(p.chwSupplyC, 1) + ' °C.' : 'peaks at ' + fmt(peak, 1) + ' °C and recovers.'));
+      else at(1800, end.over27 ? 'alarm' : 'info', 'At 30 min: CHW ' + fmt(end.chw, 1) + ' °C' + (end.chw > p.chwSupplyC + 0.05 ? ' and rising' : '') + ', supply air ' + fmt(end.supply, 1) + ' °C, ' + end.over27 + ' racks above 27 °C, ' + end.over32 + ' above 32 °C.');
+    }
+    return ev.map(function (e, i) { return { t: e.t, sev: e.sev, text: e.text, i: i }; })
+      .sort(function (a, b) { return a.t == null ? (b.t == null ? a.i - b.i : 1) : b.t == null ? -1 : a.t - b.t || a.i - b.i; })
+      .map(function (e) { return { t: e.t, sev: e.sev, text: e.text }; });
+  }
+  function clock(t) { if (t == null) return 'steady'; var m = Math.floor(t / 60), s = Math.round(t - m * 60); return 'T+' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
 
   /* colour: 18 °C → 45 °C, a perceptual ramp (blue · cyan · green · amber · red) */
   var STOPS = [[18, [40, 90, 200]], [24, [0, 190, 220]], [27, [0, 200, 120]], [32, [240, 190, 0]], [38, [240, 90, 40]], [45, [200, 20, 40]]];
@@ -407,7 +476,7 @@
     return { scale: scale, P: P, R: R, rot: rot, hits: hits };
   }
 
-  function chart(series, minute, kind) {
+  function chart(series, minute, kind, evs) {
     if (!series) return '';
     var W = 560, H = 150, pts = series.series, tMax = pts[pts.length - 1][0];
     var vals = pts.map(function (x) { return x[1]; }).concat([series.limitC]);
@@ -421,7 +490,12 @@
     g.push('<line x1="44" x2="' + (W - 16) + '" y1="' + Y(series.limitC) + '" y2="' + Y(series.limitC) + '" stroke="var(--r)" stroke-dasharray="4 3"/>',
       '<text x="' + (W - 18) + '" y="' + (Y(series.limitC) - 4) + '" fill="var(--r)" font-size="10" text-anchor="end" font-family="JetBrains Mono, monospace">limit ' + series.limitC + ' °C</text>',
       '<path d="' + path + '" fill="none" stroke="var(--c)" stroke-width="1.6"/>');
-    if (kind === 'chw' || kind === 'chiller') g.push('<line x1="' + X(minute) + '" x2="' + X(minute) + '" y1="12" y2="' + (H - 28) + '" stroke="var(--o)"/>');
+    (evs || []).forEach(function (e) {                 // the sequence of events, on the time axis
+      if (e.t == null || e.t > tMax * 60) return;
+      var x = X(e.t / 60).toFixed(1), c = SEV[e.sev] || 'var(--t2)';
+      g.push('<path d="M' + x + ' ' + (H - 28) + 'l-4 -7h8z" fill="' + c + '"><title>' + esc(clock(e.t) + ' · ' + e.text) + '</title></path>');
+    });
+    g.push('<line x1="' + X(minute) + '" x2="' + X(minute) + '" y1="12" y2="' + (H - 28) + '" stroke="var(--o)"/>');
     g.push('<text x="44" y="' + (H - 0) + '" fill="var(--t3)" font-size="10" font-family="JetBrains Mono, monospace">minutes after the fault · ' + esc(series.label) + ' °C</text></svg>');
     return '<div class="ltc-canvas" style="padding:8px">' + g.join('') + '</div>';
   }
@@ -433,10 +507,11 @@
       '<div class="ltc-seg" role="group" aria-label="CDU secondary loops"><button type="button" data-hdr="common">Common header</button><button type="button" data-hdr="per-cdu">One loop per CDU</button></div>' +
       '<div class="ltc-dh-ld"><span class="ltc-eyebrow" id="dhLoadL">Hall load · HLT step</span><div class="ltc-seg" role="group" aria-labelledby="dhLoadL">' + LOADS.map(function (l) { return '<button type="button" data-ld="' + l + '">' + (l * 100) + ' %</button>'; }).join('') + '</div></div>' +
       '<div class="ltc-seg ltc-dh-phase" role="group" aria-label="Racks that lose liquid cooling" hidden><button type="button" data-ph="throttled">Racks throttle (seconds later)</button><button type="button" data-ph="running">If they kept running</button></div>' +
-      '<label class="ltc-dh-min" hidden>Minute <input type="range" id="dhMin" min="0" max="30" step="1" value="5"><output id="dhMinO">5</output></label></div>' +
+      '<div class="ltc-dh-min" hidden><button type="button" class="ltc-btn" id="dhPlay" aria-pressed="false">▶ Replay</button><label>Minute <input type="range" id="dhMin" min="0" max="30" step="0.5" value="5"><output id="dhMinO">5</output></label></div></div>' +
       '<p class="ltc-plant-bal" id="dhRead" aria-live="polite"></p><div class="ltc-dh-chain" id="dhChain"></div>' +
       '<div class="ltc-dh-wrap"><canvas id="dhCv" role="img" aria-label="DH01 plan coloured by rack inlet temperature"></canvas></div>' +
       '<div class="ltc-dh-legend" id="dhLeg"></div><p class="ltc-note" id="dhNote"></p><div id="dhChart"></div>' +
+      '<div class="ltc-soe-wrap" id="dhSoeW"><span class="ltc-eyebrow">Sequence of events · DH01</span><ol class="ltc-soe" id="dhSoe" aria-live="polite"></ol></div>' +
       '<p class="ltc-note"><b>Thermal approximation for training — not CFD.</b> A mass and energy balance on this plant’s numbers: rack airflow at the design ΔT; CRAH fans share one speed up to their rated flow (5 % over demand under pressure control); each fan wall feeds the aisle mouths in proportion to demand, less where its units are out; each cold aisle is marched from both ends until its air is used up; unmet demand is pulled from the hot aisle and plenum return (solved to a fixed point); the CRAH coil is an effectiveness model fitted at design, so supply air rises when the coil cannot hold set-point. Jets, plumes and leakage paths need a CFD study.</p>';
     var cv = host.querySelector('#dhCv'), last = null, cursor = -1;
     function legend() {
@@ -487,20 +562,38 @@
         (s.secondsToLimit ? '<span class="sep">/</span><span>to the limit <b>' + (s.secondsToLimit < 60 ? '≈' + fmt(s.secondsToLimit) + ' s' : fmt(s.secondsToLimit / 60, 1) + ' min') + '</b></span>' : '');
       host.querySelector('#dhNote').textContent = s.note;
       host.querySelector('#dhChain').innerHTML = chainHtml(r, s);
-      host.querySelector('#dhChart').innerHTML = chart(s.series, ST.minute, ST.fault);
-      host.querySelector('.ltc-dh-min').hidden = !(ST.fault === 'chw' || ST.fault === 'chiller');
+      var evs = timeline(r, ST.fault, ST.header, ST.phase, ST.load), timed = TIMED[ST.fault], now = ST.minute * 60;
+      host.querySelector('#dhChart').innerHTML = chart(s.series, ST.minute, ST.fault, evs);
+      host.querySelector('.ltc-dh-min').hidden = !timed;
+      host.querySelector('#dhSoeW').hidden = !evs.length;
+      host.querySelector('#dhSoe').innerHTML = evs.map(function (e) {
+        var later = timed && (e.t == null ? now < 1800 : e.t > now);
+        return '<li class="' + e.sev + (later ? ' later' : '') + '"><time>' + clock(e.t) + '</time><i>' + e.sev + '</i><span>' + esc(e.text) + '</span></li>';
+      }).join('');
       [].forEach.call(host.querySelectorAll('[data-hdr]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-hdr') === ST.header)); });
       [].forEach.call(host.querySelectorAll('[data-ld]'), function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-ld') === ST.load)); });
       [].forEach.call(host.querySelectorAll('[data-ph]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ph') === ST.phase)); });
       host.querySelector('.ltc-dh-phase').hidden = !(ST.fault === 'cdu-feeder' || ST.fault === 'cdu');
     }
-    host.querySelector('#dhFault').addEventListener('change', function (e) { ST.fault = e.target.value; paint(); });
+    var play = null, btn = host.querySelector('#dhPlay'), mi = host.querySelector('#dhMin');
+    function setMin(m) { ST.minute = m; mi.value = m; host.querySelector('#dhMinO').textContent = m; paint(); }
+    function stop() { if (play) clearInterval(play); play = null; btn.textContent = '▶ Replay'; btn.setAttribute('aria-pressed', 'false'); }
+    /* replay: the fault from T+0, half a minute a step — the plan, the chain and the alarm list move
+       together; reduced motion jumps straight to the end */
+    btn.addEventListener('click', function () {
+      if (play) { stop(); return; }
+      if (root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches) { setMin(30); return; }
+      btn.textContent = '❚❚ Pause'; btn.setAttribute('aria-pressed', 'true');
+      setMin(ST.minute >= 30 ? 0 : ST.minute);
+      play = setInterval(function () { if (ST.minute >= 30) { stop(); return; } setMin(ST.minute + 0.5); }, 140);
+    });
+    host.querySelector('#dhFault').addEventListener('change', function (e) { stop(); ST.fault = e.target.value; if (TIMED[ST.fault]) setMin(0); else paint(); });
     host.addEventListener('click', function (e) {
       var b = e.target.closest('[data-hdr]'); if (b) { ST.header = b.getAttribute('data-hdr'); paint(); }
       var ph = e.target.closest('[data-ph]'); if (ph) { ST.phase = ph.getAttribute('data-ph'); paint(); }
       var ld = e.target.closest('[data-ld]'); if (ld) { ST.load = +ld.getAttribute('data-ld'); paint(); }
     });
-    host.querySelector('#dhMin').addEventListener('input', function (e) { ST.minute = +e.target.value; host.querySelector('#dhMinO').textContent = ST.minute; paint(); });
+    mi.addEventListener('input', function (e) { stop(); setMin(+e.target.value); });
     /* one tooltip path for mouse, touch and keyboard (LTCTrace.show clamps to the viewport) */
     function rackAt(e) {
       var b = cv.getBoundingClientRect(), mx = e.clientX - b.left, my = e.clientY - b.top, p = last.r.input;
@@ -566,7 +659,7 @@
     document.addEventListener('ltc:tab', function () { if (cv.clientWidth) paint(); });
   }
 
-  root.LTCDH01 = { mount: mount, solveHall: solveHall, FAULTS: FAULTS, LOADS: LOADS };
+  root.LTCDH01 = { mount: mount, solveHall: solveHall, timeline: timeline, clock: clock, FAULTS: FAULTS, LOADS: LOADS };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCDH01;
   function boot() { var h = document.getElementById('ltcDh01'); if (h) mount(h); }
   if (typeof document !== 'undefined') { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot(); }

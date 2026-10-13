@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v3.21.5 — 2026-10-13
+
+### "Alarm List": DH01's sequence of events, and a replay of the fault
+
+**Why.** The DH01 view showed where a fault leaves the hall, not how it gets there. An operator meets a fault as an alarm list: what tripped, what crossed which threshold, and when. The workbench now writes that list for every fault, and every time on it is solved, not scripted.
+
+**Sequence of events.** A new list sits under the DH01 plan on the hub and in the report. Each entry has a time (`T+mm:ss`, or `steady` once fans and valves settle), a severity (ok / info / warn / alarm / trip) and the event.
+- **CDU feeder, one CDU:** the loss at T+0. If cold-plate flow is short, the racks throttle at T+00:10 with the IT shed from the hall solve; otherwise the CDUs left carry the duty. The steady air consequences follow.
+- **CRAH faults:** fan speed of the units left, coil set-point, exhaust pulled back into the cold aisles, racks above 27 °C / 32 °C.
+- **Facility water lost:** TCS return halfway to the throttle, then the throttle itself. Both are read from the loop transient.
+- **Chiller trip, chilled water lost:** the hall is re-solved along the CHW transient and each threshold is bisected to the second: coils lose set-point, first rack above 27 °C, first above 32 °C, then the state at 30 min.
+
+At full load, the default 100 MW plant with chilled water lost reads: coils lose set-point at T+00:22, first rack above 27 °C at T+03:26, first above 32 °C at T+08:39. Facility water lost throttles the GPUs at T+03:40.
+
+**Replay.** Facility water, chiller and chilled-water faults get a ▶ Replay button. It runs the fault from T+0 in half-minute steps, and the plan, the heat chain, the transient chart and the alarm list move together. Events still ahead are dimmed, and the transient chart marks each event on its time axis. Reduced motion jumps straight to the end.
+
+**Gates** — `tools/test-ltc-workbench.mjs` (321 assertions):
+- **W12v:** 12 plants × every fault. Each timed threshold is crossed at its stated second and not one second earlier. The FWS throttle is the transient's own crossing, the feeder trip sheds what the hall solve sheds, and the list runs in time order with steady state last. Mutations fail it: bisecting to 30 s instead of 1 s ("coils lose not crossed"), and the FWS throttle moved 20 s ("throttle at 240, transient 220").
+- **W12w (per plant):** the report carries every event of every fault. Dropping the section fails it on all 8 plants.
+
 ## v3.21.4 — 2026-10-13
 
 ### "As Built": the Tier this plant reaches, and what blocks the next one
