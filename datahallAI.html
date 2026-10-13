@@ -165,7 +165,36 @@ body>.rz-manual-link,.scroll-top-btn{display:none!important}
 .bx{background:var(--bg2);border:1px solid var(--bd);border-radius:4px;padding:5px;margin-bottom:4px}
 .bx h3{font-size:10px;font-weight:600;margin-bottom:0}.bx .su{font-size:9px;color:var(--t3);margin-bottom:4px}
 .lg{display:flex;flex-wrap:wrap;gap:6px;padding:3px 0;font-size:9px;color:var(--t2)}
-.lg span{display:flex;align-items:center;gap:2px}.lg i{width:5px;height:5px;border-radius:1px;display:inline-block}
+.lg span{display:flex;align-items:center;gap:2px}
+/* v3.21.0 — hall plan layer bar and key */
+.hp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 4px}
+.hp-bar-l{font:600 10px var(--mono,"JetBrains Mono",monospace);letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-right:2px}
+.hp-chip{min-height:32px;padding:0 12px;border:1px solid var(--bd);border-radius:4px;background:transparent;color:var(--t3);font:600 11px "JetBrains Mono",monospace;letter-spacing:.04em;cursor:pointer;transition:border-color 160ms ease,color 160ms ease,background-color 160ms ease}
+.hp-chip[aria-pressed="true"]{border-color:var(--c);color:var(--t1);background:rgba(6,182,212,.08)}
+.hp-chip:hover{border-color:var(--t2)}
+.hp-chip:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+.hp-ramp{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font:11px "JetBrains Mono",monospace;color:var(--t3)}
+.hp-ramp i{display:inline-block;width:120px;height:8px;border-radius:2px;background:linear-gradient(90deg,#2563eb,#06b6d4 25%,#22c55e 50%,#f59e0b 70%,#ef4444)}
+.hp-key{display:flex;flex-wrap:wrap;gap:6px 16px;padding:4px 0 2px;font-size:11px;color:var(--t2)}
+.hp-key span{display:inline-flex;align-items:center;gap:5px}
+.hp-key i{display:inline-block;width:12px;height:9px;border-radius:1px}
+.hp-key .k-rack{background:linear-gradient(90deg,var(--c) 0 2px,var(--bg3) 2px calc(100% - 2px),var(--o) calc(100% - 2px))}
+.hp-key .k-hac{background:repeating-linear-gradient(45deg,rgba(245,158,11,.45) 0 1px,transparent 1px 4px);border:1px solid var(--o)}
+.hp-key .k-cdu{border:1px solid var(--c);background:var(--bg3)}
+.hp-key .k-sb{border:1px dashed var(--t3);background:var(--bg3)}
+.hp-key .k-crah{border:1px solid var(--b);background:var(--bg3)}
+#hSvg .hp-off{display:none}
+#hSvg[data-hp-hide~="thermal"] .hp-ly-thermal,#hSvg[data-hp-hide~="air"] .hp-ly-air,#hSvg[data-hp-hide~="liquid"] .hp-ly-liquid,#hSvg[data-hp-hide~="leak"] .hp-ly-leak,#hSvg[data-hp-hide~="overhead"] .hp-ly-overhead{display:none}
+#hSvg[data-hp-flash="racks"] .hp-rack > rect:first-child,#hSvg[data-hp-flash="cdu"] .hp-cdu > rect:first-child,#hSvg[data-hp-flash="crah"] .hp-crah > rect:first-child{stroke:var(--t1);stroke-width:2}
+.hp-go-l{margin-left:8px}
+#hSvg .hp-body{fill:#3b4b64;stroke:#7a8aa3;stroke-width:.5}
+#hSvg .hp-cab{fill:#1f2a3c}
+html[data-theme="light"] #hSvg .hp-body{fill:#cbd5e1;stroke:#64748b}
+html[data-theme="light"] #hSvg .hp-cab{fill:#e2e8f0}
+#hSvg [data-rz-equipment]{cursor:pointer}
+#hSvg .hp-rack:hover rect:first-child,#hSvg .hp-cdu:hover rect:first-child,#hSvg .hp-crah:hover rect:first-child{stroke:var(--t1);stroke-width:1.4}
+#hSvg [data-rz-equipment]:focus-visible{outline:2px solid var(--c);outline-offset:1px}
+.lg i{width:5px;height:5px;border-radius:1px;display:inline-block}
 svg text{user-select:none}
 /* v2.18.0 — a dash cycle only closes when the offset travelled is a WHOLE number of dash periods.
    These ran 24 against a 10+5 period (1.6 periods) and 16 against 6+4 (also 1.6), so every flow line
@@ -722,14 +751,14 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261013-4108b8a7" defer></script>
+</style>    <script src="js/rz-version.js?v=20261013-26ea959b" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
          plan, the building isometric, the fire mimic) could not take a font lift without a new
          overlap, which is why the page's own lift pass carries FLOOR:1 for them. Scaling moves the
          glyph and the geometry by the same factor, so no overlap can appear that was not there. -->
-    <script src="js/rz-svg-legible.js?v=20260920-8a2270ee" defer></script>
+    <script src="js/rz-svg-legible.js?v=20261013-ce783f47" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
     <!-- Basis engine — single source of truth for every displayed kW/MW/flow/temp/
          PUE/WUE. Loaded synchronously (NOT defer) so window.DCAI_MODEL /
@@ -771,7 +800,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/electrical-topology.js?v=3.8.0"></script>
     <script src="js/datahall-ai/electrical-live.js?v=3.8.0"></script>
     <script src="js/datahall-ai/sim-telemetry.js?v=20260920-61df5c2d"></script>
-    <script src="js/datahall-ai/hmi-payloads.js?v=20260920-f6f5cf81"></script>
+    <script src="js/datahall-ai/hmi-payloads.js?v=20261013-b5d68a2c"></script>
     <script src="js/datahall-ai/hmi-points.js?v=20260920-d82032ae"></script>
     <script src="js/datahall-ai/electrical-visual-map.js?v=3.8.0"></script>
     <script src="js/datahall-ai/fire-cause-effect.js?v=20260920-964e57d6"></script>
@@ -1102,19 +1131,39 @@ Requested model/calculation versions and the complete locked schema must validat
 <div class="k" data-rz-authored-basis="simulated average watts per Blackwell Ultra GPU (980-1180 W jitter); never a field reading"><div class="kl" title="Average watts per GPU — simulated draw per Blackwell Ultra chip">W/GPU</div><div class="kv" style="color:var(--o)" id="kW">&#8212;</div><div class="ks">avg</div></div>
 <div class="k" data-rz-authored-basis="FP4 dense AI performance per GB300 NVL72 rack is the PUBLISHED NVIDIA figure (about 1.4 EFLOPS), a label not a derived quantity"><div class="kl" title="FP4 AI performance — PUBLISHED per NVL72 rack (NVIDIA GB300 NVL72 datasheet)">FP4</div><div class="kv" style="color:var(--p)">1.4</div><div class="ks">EF</div></div>
 </div>
-<svg id="hSvg" viewBox="0 0 960 690" preserveAspectRatio="xMidYMid meet" style="width:100%;background:var(--bg2);border:1px solid var(--bd);border-radius:5px" xmlns="http://www.w3.org/2000/svg">
+<svg id="hSvg" viewBox="0 0 1200 720" preserveAspectRatio="xMidYMid meet" style="width:100%;background:var(--bg2);border:1px solid var(--bd);border-radius:4px" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Data hall plan: rack field, cross aisle, CDU gallery and air plant at one scale">
 <defs>
-<pattern id="gd" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M25 0L0 0 0 25" fill="none" stroke="rgba(255,255,255,.012)" stroke-width=".3"/></pattern>
-<filter id="gG"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<filter id="gB"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<filter id="gC"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<linearGradient id="hotG" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="rgba(245,158,11,.08)"/><stop offset="100%" stop-color="rgba(245,158,11,.01)"/></linearGradient>
+<pattern id="hpTile" width="10.2" height="10.2" patternUnits="userSpaceOnUse"><path d="M10.2 0L0 0 0 10.2" fill="none" stroke="var(--t3)" stroke-opacity=".09" stroke-width=".5"/></pattern>
+<pattern id="hpRoof" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--o)" stroke-opacity=".28" stroke-width="1"/></pattern>
+<linearGradient id="hpRack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--bg3)"/><stop offset="1" stop-color="var(--bg2)"/></linearGradient>
+<linearGradient id="hpCab" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--bg3)"/><stop offset="1" stop-color="var(--bg)"/></linearGradient>
+<marker id="hpArrB" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5 0 10z" fill="var(--b)"/></marker>
+<marker id="hpArrO" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5 0 10z" fill="var(--o)"/></marker>
 </defs>
-<rect width="960" height="690" fill="url(#gd)"/>
-<rect x="10" y="8" width="940" height="674" rx="3" fill="none" stroke="var(--bd2)" stroke-width="1"/>
-<g class="rz-basis" data-basis-param="geometry.hall_area_m2" data-basis-params="geometry.hall_area_m2 geometry.hall_length_m geometry.hall_width_m geometry.hall_height_m compute.racks_per_hall geometry.it_density_kw_per_m2" data-rz-text-group="basis" data-evidence="DERIVED" tabindex="0" role="button"><title>Hall geometry · DERIVED · geometry.hall_area_m2</title><text id="hallGeomCap" x="22" y="21" fill="var(--t3)" font-family="JetBrains Mono" font-size="7" font-weight="600">DATA HALL</text><circle class="rz-basis-mark" cx="16" cy="18.8" r="2.2" fill="#3f9d6b" stroke="var(--bg2,#0b1220)" stroke-width="0.5"/></g>
+<g class="rz-basis" data-basis-param="geometry.hall_area_m2" data-basis-params="geometry.hall_area_m2 geometry.hall_length_m geometry.hall_width_m geometry.hall_height_m compute.racks_per_hall geometry.it_density_kw_per_m2" data-rz-text-group="basis" data-evidence="DERIVED" tabindex="0" role="button"><title>Hall geometry · DERIVED · geometry.hall_area_m2</title><text id="hallGeomCap" x="70" y="24" fill="var(--t1)" font-family="JetBrains Mono" font-size="13" font-weight="600">DATA HALL</text><circle class="rz-basis-mark" cx="62" cy="20" r="2.2" fill="#3f9d6b" stroke="var(--bg2,#0b1220)" stroke-width="0.5"/></g>
 <g id="hc"></g></svg>
-<div class="lg"><span><i style="background:#22c55e;box-shadow:0 0 3px rgba(34,197,94,.5)"></i>AI Rack</span><span><i style="background:#3b82f6"></i>Network</span><span><i style="background:#555"></i>Passive</span><span><i style="background:var(--c)"></i>Row CDU</span><span style="color:var(--o)">&#9650;Hot</span><span style="color:var(--c)">&#9660;Cold</span><span style="color:var(--o)">&#9670;TTHT</span><span style="color:rgba(6,182,212,.4)">&#8213; OH Pipe</span></div>
+<div class="hp-bar" id="hallLayers" role="group" aria-label="Hall plan layers">
+<span class="hp-bar-l">Layers</span>
+<button type="button" class="hp-chip" data-hp-layer="thermal" aria-pressed="true">Thermal</button>
+<button type="button" class="hp-chip" data-hp-layer="air" aria-pressed="true">Airflow</button>
+<button type="button" class="hp-chip" data-hp-layer="liquid" aria-pressed="true">Liquid</button>
+<button type="button" class="hp-chip" data-hp-layer="leak" aria-pressed="true">Leak</button>
+<button type="button" class="hp-chip" data-hp-layer="overhead" aria-pressed="false">Overhead</button>
+<span class="hp-bar-l hp-go-l">Go to</span>
+<button type="button" class="hp-chip hp-go" data-hp-go="racks">Rack field</button>
+<button type="button" class="hp-chip hp-go" data-hp-go="cdu">CDU gallery</button>
+<button type="button" class="hp-chip hp-go" data-hp-go="crah">Air plant</button>
+<span class="hp-ramp" aria-hidden="true" data-rz-authored-basis="colour scale of the aisle heat map (20-40 C); a legend range, not an engine quantity"><span>20</span><i></i><span>40 °C</span></span>
+</div>
+<div class="hp-key" aria-label="Hall plan key">
+<span><i class="k-rack"></i>Rack (cyan front = cold face, amber rear = hot face)</span>
+<span><i class="k-hac"></i>Contained hot aisle</span>
+<span><i class="k-cdu"></i>CDU duty / <i class="k-sb"></i>standby</span>
+<span><i class="k-crah"></i>CRAH (spinning fans = duty)</span>
+<span><b style="color:var(--c)">━</b> TCS supply <b style="color:var(--o)">━</b> TCS return <b style="color:var(--g)">━</b> HTW <b style="color:var(--b)">━</b> CHW</span>
+<span><b style="color:var(--b)">➜</b> cold supply air <b style="color:var(--r)">◉</b> hot air rising to the plenum</span>
+<span>Hover: live values · click: equipment HMI · Shift+click or right-click: inspector</span>
+</div>
 </div>
 
 <!-- ============================================================================
@@ -1778,7 +1827,7 @@ window.DH_BASIS={
 "upsRatingKW":"equipment.ups_frame_kw","upsRatingMW":"equipment.ups_frame_kw","upsFramesPerFeedHall":"distribution.ups_frames_per_hall_per_feed","upsFramesTotal":"equipment.ups_frames_total","upsLoadPct":"equipment.ups_loading_pct","upsLoadNormalPct":"equipment.ups_loading_normal_pct","batteryKWh":"equipment.battery_kwh",
 "unitSubsPerFeed":"equipment.unit_subs_per_feed_per_hall","unitSubNormalPct":"equipment.unit_sub_loading_normal_pct","unitSubContingencyPct":"equipment.unit_sub_loading_contingency_pct","txRatingMVA":"equipment.transformer_unit_mva","txPerFeedHall":"distribution.transformers_per_hall_per_feed","txTotal":"equipment.transformers","txLoadPct":"equipment.transformer_loading_pct","facilityKva":"equipment.facility_kva",
 "gensetKW":"equipment.generator_unit_kw","gensetMW":"equipment.generator_unit_kw","gensetFacN":"equipment.gensets_duty","gensetFacNplus1":"equipment.gensets_installed",
-"hallLengthM":"geometry.hall_length_m","hallWidthM":"geometry.hall_width_m","hallHeightM":"geometry.hall_height_m","hallAreaM2":"geometry.hall_area_m2","hallVolM3":"geometry.hall_volume_m3","itDensityKwM2":"geometry.it_density_kw_per_m2",
+"hallLengthM":"geometry.hall_length_m","crossAisleM":"geometry.cross_aisle_m","floorSpareM2":"geometry.floor_spare_m2","hallWidthM":"geometry.hall_width_m","hallHeightM":"geometry.hall_height_m","hallAreaM2":"geometry.hall_area_m2","hallVolM3":"geometry.hall_volume_m3","itDensityKwM2":"geometry.it_density_kw_per_m2",
 "leavesPerHall":"network.leaves_per_hall","spinesPerHall":"network.spines_per_hall","coresPerHall":"network.cores_per_hall","switchesPerHall":"network.switches_per_hall",
 "leafRadix":"network.leaf_radix","gpuDownlinksPerHall":"network.gpu_downlinks_per_hall","leafSpineLinks":"network.leaf_spine_links_per_hall","spineCoreLinks":"network.spine_core_links_per_hall","switchesPerRackCheck":"network.switches_per_rack_check","computeTraysFacility":"compute.compute_trays_facility","switchesFacility":"power.fabric_switches_facility",
 "batteryPerHall":"equipment.battery_hall_kwh","gensetStandby":"equipment.gensets_standby",
@@ -4085,280 +4134,278 @@ function pad2(n){return String(n).padStart(2,'0')}
 /* 'CoolIT CHx1000 (row CDU)' -> 'CoolIT CHx1000': derived from the model name,
    never an invented abbreviation. */
 function cduShort(){var m=bs('cduModel');return m?m.replace(/\s*\(.*\)\s*$/,''):DASH}
-/* --- geometry (px). PLAN VIEW — the 62 m length runs left→right; rows run top→bottom.
-   Two banks of rows_per_bank rows (one row = one RPP group of racksPerRow racks) face
-   a central cross aisle that carries the TCS supply/return headers; CDU galleries sit at
-   both ends of the hall and feed the headers; CRAH walls run along the long sides.   */
-const LX=32,HX0=52,HX1=680,HW=HX1-HX0;          /* hall drawing area */
-const CRAH_T=34,CRAH_B=556,CRAH_H=12;            /* CRAH strips (long walls) */
-const BA_Y=52,BB_Y=316;                          /* bank A / bank B row tops */
-/* v3.0.0 — rack and pitch sizes are DERIVED from the engine's metres at one scale, not typed as
-   pixels. The typed pair (RACK_H 10.6, RACK_W 24) was fixed while the row count was not, so the
-   plan ran 10.13 px/m along the hall against 17.67 px/m across it — a 1.74x stretch — and inside
-   the 3.1 m row pitch it drew 2.37 m of rack against 0.73 m of aisle, the inverse of the real
-   1.2 m and 1.9 m. Deriving both from one px-per-metre keeps the drawing proportional at any rack
-   count: add racks and every element shrinks together instead of the aisles being squeezed out. */
-const _rowPitchM=bn('rowPitchM'),_rowLenM=bn('rowLengthM'),_rackWM=bn('rackPitchM'),_rackDM=bn('rackDepthM');
-const _rpb0=bn('rowsPerBank');
-const SC=(_rowPitchM&&_rowLenM&&_rpb0)?Math.min(HW/(_rpb0*_rowPitchM),234/_rowLenM):17.67;   /* px per metre, both axes */
-const RACK_H=(_rackWM!=null?_rackWM*SC:10.6);    /* rack WIDTH along the row */
-const RACK_W=(_rackDM!=null?_rackDM*SC:24);      /* rack DEPTH across the row */
-/* v3.3.0 — the cross aisle now carries the CDUs themselves. Owner, on the live drawing:
-   "cdu weird positioning" and "antara row dan cdu nggak match konsepnya". It was true: a CoolIT
-   CHx1000 is an END-OF-ROW CDU, and the drawing put four galleries on the SHORT walls — the ends
-   of the cross aisle, not the ends of the rows. Rows run top to bottom here, so a row's end IS
-   the cross aisle. The CDUs move into it, aligned under the rows they feed, and each row manifold
-   now starts at a CDU instead of at an anonymous header. */
-const XA_Y=286,CDU_Y=291,CDU_H=9,SUP_Y=304,RET_Y=308;    /* cross aisle: label, CDU band, then headers */
-const GAL_W=14;                                          /* legacy: CDU glyph width fallback */
-const TW=HX1-LX;                                  /* corridor / network sections below reuse this width */
+/* --- v3.21.0 — THE DATA HALL, DRAWN AS THE ROOM IT IS ------------------------------------------
+   Owner, on the phone: "Jelek sekali dan nggak sesuai aneh cdunya mana, crah utk residual air
+   gimana. Designnya sangat kurang immersive". Measured, the old plan was three defects at once:
+
+   1. It drew HALF the room. The engine budgets a 62 x 31 m hall: two 13.2 m row banks plus the
+      4.6 m cross aisle are exactly the 31 m width, and ten rows at 3.1 m are exactly 31 m of the
+      62 m length. The other 818 m2 is where the engine puts the CDU gallery (220 m2), the air
+      plant (450 m2) and the spare (148 m2). The old plan drew none of it, put the CRAH units on
+      the walls the rows already touch, and put the CDUs in the egress aisle.
+   2. It could not be read at its own size. Labels of 2.5-6.5 units forced a 2,700 px render, so
+      a 1440 px screen showed a third of the hall and a phone a sliver.
+   3. Nothing looked like what it was: a CDU was a 6 px cyan tick, a CRAH a blue strip, the air
+      path a 0.8-unit dashed line.
+
+   Now: ONE scale, the engine's metres at SC px/m on both axes, the whole room, every installed
+   unit as its own glyph at its plan footprint, and the two heat paths drawn end to end: liquid
+   from the rack manifolds to the CDU gallery to the HTW header, residual air from the contained
+   hot aisle through the ceiling plenum to the CRAH coils and back down the cross aisle.
+
+   Footprints that are not engine leaves are the model's own stated plan sizes (dcai-model.js
+   geometry comments: CHx1000 0.9 x 1.9 m with 1 m access at each end; air plant gallery 3 m
+   deep, one unit per frontage/units metres). They are declared on the drawing, never hooked. */
+const SC=17;                                   /* px per metre, BOTH axes */
+const HX0=70,HY0=120;                          /* hall origin (north-west inner wall corner) */
+const VB_W=1200;
+const M=(m)=>+(m*SC).toFixed(1);               /* metres -> px */
+const CDU_W_M=0.9,CDU_D_M=1.9,CDU_ACC_M=1.0;   /* CoolIT CHx1000 class, model comment */
+/* Rack-field heat ramp: the same scale draws every aisle, so colour compares across the hall. */
+function hallHeat(t,al){
+  const A=(al==null?.3:al);
+  const S=[[20,[37,99,235]],[25,[6,182,212]],[30,[34,197,94]],[34,[245,158,11]],[40,[239,68,68]]];
+  if(!(typeof t==='number'&&isFinite(t)))return 'rgba(100,116,139,.10)';
+  if(t<=S[0][0])return `rgba(${S[0][1]},${A})`;
+  for(let i=1;i<S.length;i++){if(t<=S[i][0]){const [t0,c0]=S[i-1],[t1,c1]=S[i],k=(t-t0)/(t1-t0);
+    return `rgba(${c0.map((v,j)=>Math.round(v+(c1[j]-v)*k)).join(',')},${A})`;}}
+  return `rgba(${S[S.length-1][1]},${A})`;
+}
+window.hallHeat=hallHeat;
 function renderHall(){
+const hc=$('hc');if(!hc)return;
 const rows=bn('rackRows'),perRow=bn('racksPerRow'),kwRack=bn('kwPerRack'),banks=bn('rackBanks'),rpb=bn('rowsPerBank');
-const groups=bn('rackGroups'),racksHall=bn('racksPerHall'),gpuR=bn('gpuPerRack'),feedA=bn('rackFeedA'),tcsLpm=bn('tcsFlowRackLpm');
-const cduInst=bn('cduInstalled'),cduRun=bn('cduRunning');
-const crahInst=bn('crahInstalled'),crahAct=bn('crahActive');
+const racksHall=bn('racksPerHall'),gpuR=bn('gpuPerRack'),feedA=bn('rackFeedA'),tcsLpm=bn('tcsFlowRackLpm');
+const cduInst=bn('cduInstalled'),cduRun=bn('cduRunning'),crahInst=bn('crahInstalled'),crahAct=bn('crahActive');
+const Lm=bn('hallLengthM'),Wm=bn('hallWidthM'),pitchM=bn('rowPitchM'),rackWM=bn('rackPitchM'),rackDM=bn('rackDepthM');
+const coldM=bn('coldAisleM'),hotM=bn('hotAisleM'),xaM=bn('crossAisleM'),frontM=bn('airPlantFrontageM');
 let s='';
-/* --- hall caption: geometry straight off the engine ---------------------- */
 const cap=$('hallGeomCap');
-if(cap){const L=bn('hallLengthM'),W=bn('hallWidthM'),A=bn('hallAreaM2'),H=bn('hallHeightM'),D=bn('itDensityKwM2');
-cap.textContent='DATA HALL — '+em(L)+' m × '+em(W)+' m — '+grp(A)+' m² — '+em(H)+' m clear — '
+if(cap){const A=bn('hallAreaM2'),H=bn('hallHeightM'),D=bn('itDensityKwM2');
+cap.textContent='DATA HALL DH-0'+(window.currentDH||1)+' — '+em(Lm)+' m × '+em(Wm)+' m — '+grp(A)+' m² — '+em(H)+' m clear — '
  +grp(racksHall)+' racks in '+em(banks)+' banks × '+em(rpb)+' rows × '+em(perRow)+' — '+(D==null?DASH:D.toFixed(0))+' kW/m²';}
-if(rows==null||perRow==null||banks==null||rpb==null||rpb*banks!==rows){
-s+=tx(HX0,72,'ROW LAYOUT UNAVAILABLE — engine basis (rackRows / racksPerRow / rackBanks) not loaded','var(--r)',7,0,1);
-}else{
-/* the pitch is the engine's row pitch at the same scale, so the gap that remains IS the real
-   cold + hot aisle rather than whatever was left over after a fixed-width rack */
-const pitch=(_rowPitchM!=null?_rowPitchM*SC:HW/rpb), gap=pitch-RACK_W;
-const rowX=r=>HX0+r*pitch+gap/2;                                  /* r = row index within a bank (0..rpb-1) */
-const bankY=b=>b===0?BA_Y:BB_Y, bankH=perRow*RACK_H;
-const rowKw=(kwRack!=null)?perRow*kwRack:null;
-/* Animation period from the engine's own row flow: 12,000 L/min-seconds keeps a 4,005 L/min row
-   near 3 s and a slower row proportionally slower. Clamped so a null or extreme basis can never
-   produce a frozen or strobing line. */
-const rowLpm=(tcsLpm!=null&&perRow!=null)?tcsLpm*perRow:null;
+const need=[rows,perRow,banks,rpb,Lm,Wm,pitchM,rackWM,rackDM,coldM,hotM,xaM];
+if(need.some(v=>v==null)||rpb*banks!==rows||rpb%2){
+s+=tx(HX0,HY0+20,'HALL PLAN UNAVAILABLE — engine geometry (rows, racks per row, aisles, hall size) not loaded','var(--r)',12,0,1);
+hc.innerHTML=s;return;}
+const HX1=HX0+M(Lm),HY1=HY0+M(Wm);
+const bankLm=perRow*rackWM;                                  /* 13.2 m */
+const fieldLm=rpb*pitchM;                                    /* 31 m of the 62 m length */
+const bankY=b=>b===0?HY0:HY0+M(bankLm+xaM);
+const xaY0=HY0+M(bankLm),xaY1=xaY0+M(xaM);
+const pairs=rpb/2;
+/* within a pair: cold | rack A | hot (2 x hotM) | rack B | cold  =  2 x pitch */
+const pairX=p=>HX0+M(p*2*pitchM);
+const rackAx=p=>pairX(p)+M(coldM), hotX0=p=>rackAx(p)+M(rackDM), rackBx=p=>hotX0(p)+M(2*hotM);
+const coldWX=p=>pairX(p), coldEX=p=>rackBx(p)+M(rackDM);
+const rowLpm=(tcsLpm!=null)?tcsLpm*perRow:null;
 const flowDur=(rowLpm&&rowLpm>0)?Math.max(1.2,Math.min(6,12000/rowLpm)).toFixed(2):'3.00';
-/* === AISLES — hot-aisle containment between the rows of a pair, cold aisles outside === */
-for(let b=0;b<banks;b++){const y=bankY(b);
-for(let r=0;r<rpb;r+=2){const x1=rowX(r)+RACK_W,x2=rowX(r+1);
-s+=`<rect x="${x1.toFixed(1)}" y="${y}" width="${(x2-x1).toFixed(1)}" height="${bankH.toFixed(1)}" fill="url(#hotG)" stroke="rgba(245,158,11,.14)" stroke-width=".4"/>`;}
-for(let r=1;r<rpb-1;r+=2){const x1=rowX(r)+RACK_W,x2=rowX(r+1);
-s+=`<rect x="${x1.toFixed(1)}" y="${y}" width="${(x2-x1).toFixed(1)}" height="${bankH.toFixed(1)}" fill="rgba(6,182,212,.035)" stroke="rgba(6,182,212,.08)" stroke-width=".3"/>`;}}
-/* v3.3.0 — the bank captions ran across the top of the hall at BA_Y-14, which is INSIDE the
-   north CRAH band (34-46) and under the row labels: three strings on one line. A plan drawing
-   labels a bank down its own edge, so they turn 90 degrees into the left margin where nothing
-   else is drawn. */
-[[0,BA_Y,'BANK A'],[1,BB_Y,'BANK B']].forEach(([bi,byv,nm])=>{
-const cy=byv+bankH/2, tag=nm+' — ROWS '+pad2(bi*rpb+1)+'–'+pad2((bi+1)*rpb)+' · '+grp(bn('racksPerBank'))+' racks';
-s+=`<g data-basis-param="${(window.DH_BASIS&&window.DH_BASIS.racksPerBank)||'compute.racks_per_bank'}"><text x="${(HX0-12).toFixed(1)}" y="${cy.toFixed(1)}" fill="rgba(6,182,212,.4)" font-family="${J}" font-size="3.8" text-anchor="middle" transform="rotate(-90 ${(HX0-12).toFixed(1)} ${cy.toFixed(1)})">${tag}</text></g>`;});
-/* === ROWS — one RPP group each; every rack is its own block =============== */
-for(let b=0;b<banks;b++){for(let r=0;r<rpb;r++){
-const rowNo=b*rpb+r+1,id=pad2(rowNo),x=rowX(r),y=bankY(b),mx=x-1.6;
-s+=`<g class="rowg" data-row="${id}" data-rg="RG-${id}">`;
-/* row manifold: TCS supply riser along the row, fed from the CDU band in the cross aisle.
-   v3.3.0 — the drop and the riser both flow now. Dash period is fixed; the DURATION carries the
-   row flow the engine publishes (tcsFlowRackLpm x racksPerRow), so a row moving more litres a
-   minute visibly moves faster. Motion that encodes a number is a reading, not decoration. */
-s+=`<line x1="${mx.toFixed(1)}" y1="${b===0?(y+bankH).toFixed(1):y.toFixed(1)}" x2="${mx.toFixed(1)}" y2="${(b===0?CDU_Y+CDU_H:CDU_Y).toFixed(1)}" stroke="rgba(6,182,212,.5)" stroke-width="1" stroke-dasharray="5 3"><animate attributeName="stroke-dashoffset" values="${b===0?'0;16':'0;-16'}" dur="${flowDur}s" repeatCount="indefinite"/></line>`;
-s+=`<line x1="${mx.toFixed(1)}" y1="${y.toFixed(1)}" x2="${mx.toFixed(1)}" y2="${(y+bankH).toFixed(1)}" stroke="rgba(6,182,212,.4)" stroke-width=".8" stroke-dasharray="4 2.5"><animate attributeName="stroke-dashoffset" values="${b===0?'0;-13':'0;13'}" dur="${flowDur}s" repeatCount="indefinite"/></line>`;
-s+=`<rect x="${(mx-1.4).toFixed(1)}" y="${(b===0?y+bankH+1.2:SUP_Y-2.4).toFixed(1)}" width="2.8" height="2.8" fill="var(--bg2)" stroke="var(--c)" stroke-width=".5"/>`;   /* row isolation valve */
-for(let k=0;k<perRow;k++){const ry=y+k*RACK_H,rk=pad2(k+1),rid='R'+id+'-'+rk;
-s+=`<g data-rz-equipment="rack-unit:${rid}" tabindex="0" role="button" data-tip="RACK ${rid} · RG-${id} · GB300 NVL72 · ${em(kwRack)} kW · ${em(gpuR)} GPU · ${em(feedA)} A dual-corded · TCS ${em(tcsLpm)} L/min via row manifold · click: rack HMI">`;
-s+=`<rect x="${x.toFixed(1)}" y="${(ry+.7).toFixed(1)}" width="${RACK_W}" height="${(RACK_H-1.4).toFixed(1)}" rx=".6" fill="rgba(34,197,94,.22)" stroke="rgba(34,197,94,.55)" stroke-width=".4"/>`;
-s+=`<line x1="${mx.toFixed(1)}" y1="${(ry+RACK_H/2).toFixed(1)}" x2="${(x+2).toFixed(1)}" y2="${(ry+RACK_H/2).toFixed(1)}" stroke="rgba(6,182,212,.6)" stroke-width=".5"/>`;   /* QD pair to the rack manifold */
-s+='</g>';}
-s+='</g>';
-s+=tx(x+RACK_W/2,b===0?y-3:y+bankH+5.2,'R'+id,'var(--g)',5.2,'middle',1,bo('racksPerRow',{also:['kwPerRack','rowItKw'],nomark:rowNo>1}));
-}}
-/* === CROSS AISLE — TCS headers from the CDU galleries, one branch per row === */
-s+=`<rect x="${HX0}" y="${XA_Y}" width="${HW}" height="${BB_Y-XA_Y-3}" fill="rgba(100,116,139,.04)" stroke="rgba(100,116,139,.12)" stroke-width=".4"/>`;
-s+=`<line x1="${HX0}" y1="${SUP_Y}" x2="${(HX0+rpb*pitch).toFixed(1)}" y2="${SUP_Y}" stroke="rgba(6,182,212,.55)" stroke-width="1.6" stroke-dasharray="8 4"><animate attributeName="stroke-dashoffset" values="0;-24" dur="${flowDur}s" repeatCount="indefinite"/></line>`;
-s+=`<line x1="${HX0}" y1="${RET_Y}" x2="${(HX0+rpb*pitch).toFixed(1)}" y2="${RET_Y}" stroke="rgba(245,158,11,.5)" stroke-width="1.6" stroke-dasharray="8 4"><animate attributeName="stroke-dashoffset" values="0;24" dur="${flowDur}s" repeatCount="indefinite"/></line>`;
-s+=tx(HX0+2,RET_Y+4.6,'FACILITY HTW HEADER — TCS SUPPLY '+em(bn('tcsSupply'))+' °C / RETURN '+em(bn('tcsReturn'))+' °C · every row drops to the CDU band above it','rgba(6,182,212,.45)',3.2,'start',0,bo('tcsSupply',{also:['tcsReturn']}));
-/* === HOT / COLD AISLE SENSORS =============================================
-   v3.3.0 — owner: "No hac temp indication in several point across row". There was ONE readout
-   pair per containment pair, parked in the cross aisle, and only for bank A: five numbers for a
-   hall of twenty rows, none of them standing in the aisle they measured. A contained hot aisle
-   has a gradient ALONG its length — that is the whole reason to instrument it — so each aisle
-   now carries three points at a quarter, a half and three quarters of the row, in BOTH banks.
-   The id scheme already allowed it (H{pair}{point}t / C{pair}{point}t); only the loop bound in
-   upd() and this drawing were capped at one. */
+const mechX0=HX0+M(fieldLm);
+const decl=t=>({declared:t});
+
+/* ===== HEADER — the two heat paths in numbers, straight off the engine ===================== */
+s+=tx(HX0,46,'IT '+grp(bn('itHall'))+' kW per hall','var(--t1)',11,'start',1,bo('itHall'));
+s+=tx(HX0+190,46,'LIQUID '+grp(bn('liquidHeat'))+' kWth → '+em(cduInst)+' CDU ('+em(cduRun)+' duty + '+((cduInst!=null&&cduRun!=null)?cduInst-cduRun:DASH)+')','var(--c)',11,'start',1,bo('liquidHeat',{also:['cduInstalled','cduRunning']}));
+s+=tx(HX0+560,46,'RESIDUAL AIR '+grp(bn('airHeat'))+' kWth → '+em(crahInst)+' CRAH ('+em(crahAct)+' duty + '+((crahInst!=null&&crahAct!=null)?crahInst-crahAct:DASH)+') × '+em(bn('crahRating'))+' kW','var(--b)',11,'start',1,bo('airHeat',{also:['crahInstalled','crahActive','crahRating']}));
+s+=tx(HX0,66,'LIQUID PATH  rack cold plates → row manifold → TCS header '+em(bn('tcsSupply'))+'/'+em(bn('tcsReturn'))+' °C → CDU plate HX → HTW '+em(bn('htwSupplyC'))+'/'+em(bn('htwReturnC'))+' °C → dry coolers','var(--c)',10,'start',0,bo('tcsSupply',{also:['tcsReturn','htwSupplyC','htwReturnC'],nomark:true}));
+s+=tx(HX0,84,'AIR PATH  CRAH → cross aisle '+em(bn('airSupplyC'))+' °C → cold aisles → rack fronts → contained hot aisle → ceiling plenum '+em(bn('airReturnC'))+' °C → CRAH coil on CHW '+em(bn('chwSupplyC'))+'/'+em(bn('chwReturnC'))+' °C','var(--b)',10,'start',0,bo('airSupplyC',{also:['airReturnC','chwSupplyC','chwReturnC'],nomark:true}));
+/* dimension lines */
+s+=`<g class="hp-dim" stroke="var(--t3)" stroke-width=".8"><line x1="${HX0}" y1="${HY1+50}" x2="${HX1}" y2="${HY1+50}"/><line x1="${HX0}" y1="${HY1+46}" x2="${HX0}" y2="${HY1+54}"/><line x1="${HX1}" y1="${HY1+46}" x2="${HX1}" y2="${HY1+54}"/><line x1="${HX0-60}" y1="${HY0}" x2="${HX0-60}" y2="${HY1}"/><line x1="${HX0-64}" y1="${HY0}" x2="${HX0-56}" y2="${HY0}"/><line x1="${HX0-64}" y1="${HY1}" x2="${HX0-56}" y2="${HY1}"/></g>`;
+s+=`<rect x="${(HX0+HX1)/2-26}" y="${HY1+43}" width="52" height="14" fill="var(--bg2)"/>`;
+s+=tx((HX0+HX1)/2,HY1+54,em(Lm)+' m','var(--t2)',10,'middle',1,bo('hallLengthM'));
+s+=`<g transform="rotate(-90 ${HX0-60} ${HY0+M(6.6)})"><rect x="${HX0-60-24}" y="${HY0+M(6.6)-7}" width="48" height="14" fill="var(--bg2)"/>`+tx(HX0-60,HY0+M(6.6)+4,em(Wm)+' m','var(--t2)',10,'middle',1,bo('hallWidthM'))+'</g>';
+/* north arrow */
+s+=`<g transform="translate(${VB_W-38},${HY0-30})"><polygon points="0,-10 6,6 0,2 -6,6" fill="var(--t2)"/>`+tx(0,18,'N','var(--t2)',10,'middle',1)+'</g>';
+
+/* ===== FLOOR, WALLS, ZONES ================================================================ */
+s+=`<rect x="${HX0}" y="${HY0}" width="${M(Lm)}" height="${M(Wm)}" fill="url(#hpTile)"/>`;
+s+=`<rect x="${HX0}" y="${xaY0}" width="${M(Lm)}" height="${M(xaM)}" fill="rgba(148,163,184,.05)"/>`;
+s+=`<rect x="${mechX0}" y="${HY0}" width="${(HX1-mechX0).toFixed(1)}" height="${M(Wm)}" fill="rgba(59,130,246,.035)"/>`;
+s+=`<rect x="${HX0-3}" y="${HY0-3}" width="${M(Lm)+6}" height="${M(Wm)+6}" fill="none" stroke="var(--t3)" stroke-width="3"/>`;
+s+=`<rect x="${HX0}" y="${HY0}" width="${M(Lm)}" height="${M(Wm)}" fill="none" stroke="var(--bd)" stroke-width=".6"/>`;
+s+=`<line x1="${mechX0}" y1="${HY0}" x2="${mechX0}" y2="${xaY0}" stroke="var(--t3)" stroke-width=".8" stroke-dasharray="6 4"/><line x1="${mechX0}" y1="${xaY1}" x2="${mechX0}" y2="${HY1}" stroke="var(--t3)" stroke-width=".8" stroke-dasharray="6 4"/>`;
+
+/* ===== THERMAL LAYER — aisles coloured by their own sensors ================================ */
+let th='<g class="hp-ly hp-ly-thermal">';
 const SENS_PTS=3;
-for(let b=0;b<banks;b++){const by=bankY(b);
-for(let r=0;r<rpb;r+=2){
-const pairIdx=b*Math.ceil(rpb/2)+r/2, id=pad2(pairIdx+1);
-const hx=(rowX(r)+RACK_W+rowX(r+1))/2;                       /* contained hot aisle of this pair */
-const cxL=rowX(r)-gap/4;                                     /* cold aisle feeding the pair's west face */
-s+=tx(hx,by+5.2,'HAC-'+id,'var(--o)',3.6,'middle');   /* inside the aisle it names: above it, it sat on the row labels */
-for(let si=0;si<SENS_PTS;si++){const fy=by+bankH*(si+1)/(SENS_PTS+1);
-s+=`<g data-rz-authored-basis="simulated aisle sensor: temperature jitter around the engine air planes (design.planes.p09 supply / p11 return); never a field reading"><text x="${hx.toFixed(1)}" y="${fy.toFixed(1)}" fill="var(--o)" font-family="${J}" font-size="6.5" text-anchor="middle" font-weight="600" id="H${pairIdx}${si}t">—</text><text x="${cxL.toFixed(1)}" y="${fy.toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="6.5" text-anchor="middle" font-weight="600" id="C${pairIdx}${si}t">—</text></g>`;}
-}}
-/* === CRAH WALLS — the long sides; one clickable bank per row pitch ========= */
-const crahPer=(crahInst!=null&&rpb)?crahInst/(2*rpb):null;
-for(let side=0;side<2;side++){const y=side===0?CRAH_T:CRAH_B,tag=side===0?'T':'B';
-for(let r=0;r<rpb;r++){const x=HX0+r*pitch+1,id=tag+pad2(r+1);
-/* v3.3.0 — the bank now says HOW MANY units it stands for. "≈4.5 units" was the only number on
-   it and it read as noise; a bank is an integer of real machines, and the remainder is spread one
-   per bank rather than hidden in a decimal. Owner: "Tidak ada crah" — they were drawn, they just
-   said nothing. */
-const nBanks=2*rpb,base=(crahInst!=null)?Math.floor(crahInst/nBanks):null,rem=(crahInst!=null)?crahInst%nBanks:0;
-const bankIdx=side*rpb+r,units=(base==null)?null:base+(bankIdx<rem?1:0);
-s+=`<g class="crah-unit crah-click" data-crah="CRAH-${id}" data-rz-equipment="crah:${id}" tabindex="0" role="button" data-tip="CRAH wall ${id} — ${em(units)} unit(s) of ${em(crahInst)} installed per hall (${em(crahAct)} duty + 1) · ${em(bn('crahRating'))} kW air path per unit · draws the contained hot aisle through the ceiling plenum, returns cold to the aisles it faces · planes p09/p11"><rect x="${x.toFixed(1)}" y="${y}" width="${(pitch-2).toFixed(1)}" height="${CRAH_H}" rx="1.5" fill="rgba(59,130,246,.10)" stroke="var(--b)" stroke-width=".5"/>`;
-/* id and unit count on ONE line: stacked, the count sat where the row label above it lands. */
-s+=`<text x="${(x+(pitch-2)/2).toFixed(1)}" y="${y+8}" fill="var(--b)" font-family="${J}" font-size="5.2" text-anchor="middle" font-weight="600">${id} ×${em(units)}</text></g>`;}
-s+=tx(HX0+HW/2,side===0?CRAH_T-4:CRAH_B+CRAH_H+7,'CRAH WALL '+(side===0?'NORTH':'SOUTH')+' — '+em(crahInst)+' units per hall ('+em(crahAct)+' duty + '+((crahInst!=null&&crahAct!=null)?(crahInst-crahAct):DASH)+') · '+em(bn('crahRating'))+' kW each · hot aisle returns overhead, cold air to every cold aisle','var(--b)',3.6,'middle',0,bo('crahInstalled',{also:['crahActive','crahRating'],nomark:side>0}));}
-/* === HOT-AISLE RETURN — owner: "memang nggak perlu crah utk hot aislenya?" ===
-   It is needed, and the drawing never said where the heat went. Each contained aisle returns
-   overhead to the CRAH wall it faces; drawn as the path it takes, not as floor area, because a
-   ceiling plenum occupies none. */
-for(let b=0;b<banks;b++){const by=bankY(b),wallY=b===0?CRAH_T+CRAH_H:CRAH_B,edgeY=b===0?by:by+bankH;
-for(let r=0;r<rpb;r+=2){const hx=(rowX(r)+RACK_W+rowX(r+1))/2;
-s+=`<line x1="${hx.toFixed(1)}" y1="${edgeY.toFixed(1)}" x2="${hx.toFixed(1)}" y2="${wallY}" stroke="rgba(245,158,11,.35)" stroke-width=".8" stroke-dasharray="3 2"><animate attributeName="stroke-dashoffset" values="${b===0?'0;10':'0;-10'}" dur="${flowDur}s" repeatCount="indefinite"/></line>`;
-s+=`<polygon points="${hx.toFixed(1)},${(b===0?wallY+1.6:wallY-1.6).toFixed(1)} ${(hx-1.6).toFixed(1)},${(b===0?wallY+4.4:wallY-4.4).toFixed(1)} ${(hx+1.6).toFixed(1)},${(b===0?wallY+4.4:wallY-4.4).toFixed(1)}" fill="rgba(245,158,11,.5)"/>`;}}
-s+=tx(HX0+HW/2,CRAH_B+CRAH_H+13,'HOT-AISLE RETURN → CRAH (ceiling plenum, both walls) · the water leaves by the CDU header in the cross aisle at '+em(bn('tcsReturn'))+' °C','rgba(245,158,11,.45)',3.2,'middle',0,bo('tcsReturn',{nomark:true}));
-/* === CDU GALLERY — IN the cross aisle, at the end of the rows it serves ====
-   v3.3.0 — owner: "cdu weird positioning". Four galleries stood on the SHORT walls, which are the
-   ends of the CROSS AISLE, not the ends of the rows; a row's coolant left the drawing sideways,
-   travelled the hall and came back. Rows run top to bottom here, so the row end IS the cross
-   aisle: every installed CDU now stands in it, spread across the same span the rows occupy, and
-   the row directly above or below each one drops straight into it. One glyph per installed unit —
-   no aggregation divisor, so the count on the drawing is the registry count. */
-const cduSpan=rpb*pitch, cduN=(cduInst!=null&&cduInst>0)?cduInst:null;
-s+=`<rect x="${HX0}" y="${CDU_Y-1.5}" width="${cduSpan.toFixed(1)}" height="${CDU_H+3}" rx="1.5" fill="rgba(6,182,212,.05)" stroke="rgba(6,182,212,.35)" stroke-width=".5"/>`;
-if(cduN){const cw=cduSpan/cduN;
-for(let n=1;n<=cduN;n++){const on=(cduRun!=null)?n<=cduRun:true,cx0=HX0+(n-1)*cw;
-s+=`<g class="cdu-click" data-cdu="${n}" data-rz-equipment="cdu:${n}" tabindex="0" role="button" data-tip="CDU-${pad2(n)} ${cduShort()} · end-of-row gallery, cross aisle · ${on?'DUTY':'STANDBY'} · ${em(bn('cduRating'))} kWth · ${em(bn('cduFlowPerUnitLpm'))} L/min · click: CDU HMI">`;
-s+=`<rect x="${(cx0+.4).toFixed(1)}" y="${CDU_Y}" width="${Math.max(1.2,cw-.8).toFixed(1)}" height="${CDU_H}" rx=".6" fill="${on?'rgba(6,182,212,.35)':'rgba(100,116,139,.25)'}" stroke="${on?'var(--c)':'var(--t3)'}" stroke-width=".4"/></g>`;}
-/* gallery legs into the facility header: the water the CDUs take and give back */
-for(let g=0;g<4;g++){const lx=HX0+cduSpan*(g+.5)/4;
-s+=`<line x1="${lx.toFixed(1)}" y1="${CDU_Y+CDU_H}" x2="${lx.toFixed(1)}" y2="${SUP_Y}" stroke="rgba(6,182,212,.5)" stroke-width="1.1" stroke-dasharray="4 2.5"><animate attributeName="stroke-dashoffset" values="0;-13" dur="${flowDur}s" repeatCount="indefinite"/></line>`;
-s+=`<line x1="${(lx+3).toFixed(1)}" y1="${CDU_Y+CDU_H}" x2="${(lx+3).toFixed(1)}" y2="${RET_Y}" stroke="rgba(245,158,11,.45)" stroke-width="1.1" stroke-dasharray="4 2.5"><animate attributeName="stroke-dashoffset" values="0;13" dur="${flowDur}s" repeatCount="indefinite"/></line>`;}}
-/* The band fills the row span, so its caption goes in the clear strip east of it rather than
-   across the glyphs and the row manifolds it would otherwise cross. */
-const capX=HX0+cduSpan+6;
-s+=tx(capX,CDU_Y+3.4,'CDU GALLERY','var(--c)',3.8,'start',1);
-s+=tx(capX,CDU_Y+8,em(cduInst)+' × '+cduShort(),'var(--c)',3.4,'start',0,bo('cduInstalled'));
-s+=tx(capX,CDU_Y+12.6,em(cduRun)+' duty + '+((cduInst!=null&&cduRun!=null)?(cduInst-cduRun):DASH)+' standby','var(--c)',3.2,'start',0,bo('cduRunning'));
-s+=tx(capX,CDU_Y+17.2,em(bn('cduRating'))+' kWth · '+(bn('cduFlowPerUnitLpm')==null?DASH:grp(bn('cduFlowPerUnitLpm')))+' L/min each','var(--t3)',3.2,'start',0,bo('cduRating',{also:['cduFlowPerUnitLpm']}));
-/* v2.18.0 — these two read the TCS supply header and were centred on the old side galleries at
-   x=39 and x=693, which put the left one across the drawing margin and into the first rack row.
-   v3.3.0 keeps them anchored to the ends of the header they describe, now beside the row field
-   rather than under it: the cross aisle below the header belongs to bank B. */
-s+=`<g data-rz-authored-basis="simulated gallery supply-header pressure (1.5-2.5 bar); flow per unit beside it is the engine equipment.cdu_flow_per_unit_lpm"><text x="${(HX0+cduSpan+6).toFixed(1)}" y="${(CDU_Y+21.8).toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="3" text-anchor="start" id="cduG1">—</text><text x="${(HX0+cduSpan+6).toFixed(1)}" y="${(CDU_Y+26.4).toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="3" text-anchor="start" id="cduG2">—</text></g>`;
-}
-/* v3.3.0 — the two MECHANICAL BANK CHIPS are gone. They existed for "the counts a per-glyph
-   drawing cannot show", and the drawing shows them now: the CDU count stands on its own gallery
-   and every CRAH bank carries its unit count on its face. The CDU chip also wrapped a SECOND
-   `data-rz-equipment="cdu:1"` around itself, 190 px away from CDU-01, so the hall had 56 CDU
-   targets for 55 installed units and one of them was not where any CDU stands. */
-s+=tx(847,322,'CRAH '+em(crahInst)+' ('+em(crahAct)+' duty + '+((crahInst!=null&&crahAct!=null)?(crahInst-crahAct):DASH)+') · '+em(bn('crahRating'))+' kW each','var(--b)',4.2,'middle',1,bo('crahInstalled',{also:['crahActive','crahRating']}));
-s+=bx(752,312,190,15,'rgba(59,130,246,.25)',3);
-const nwY=590;s+=tx(LX,nwY-4,'NETWORK / DWDM','var(--b)',5,0,1);['IB-Leaf','IB-Spine','ODF','DWDM','OOB','Storage'].forEach((l,i)=>{const x=LX+i*78;s+=`<g filter="url(#gB)"><rect x="${x}" y="${nwY}" width="62" height="18" rx="2" fill="rgba(59,130,246,.1)" stroke="rgba(59,130,246,.4)" stroke-width=".6"/>`+tx(x+31,nwY+8,l,'var(--b)',5,'middle',1)+tx(x+31,nwY+15,'N.0'+(i+1),'var(--t3)',3.5,'middle')+'</g>'});
-s+=tx(LX+480,nwY-4,'PASSIVE','var(--t3)',5,0,1);['CblMgmt','PDU/Mtr','Patch','Spare'].forEach((l,i)=>{const x=LX+480+i*60;s+=`<rect x="${x}" y="${nwY}" width="52" height="18" rx="2" fill="rgba(107,114,128,.06)" stroke="rgba(107,114,128,.2)" stroke-width=".5"/>`+tx(x+27,nwY+8,l,'var(--t3)',4.5,'middle')+tx(x+27,nwY+15,'P.0'+(i+1),'var(--t3)',3.5,'middle')});
-const pY=616;s+=tx(LX,pY,'CORRIDOR SERVICES','var(--t1)',5,0,1);
-// Pipe rack frame
-/* v3.10.8 — 72 put the frame's bottom edge at y=691 in a 690-tall viewBox, so it was clipped
-   by one unit (2.5px on screen). Its deepest content sits at pY+65 = 681, so 68 encloses
-   everything with six units to spare and stays inside the frame. The drawing was never the
-   problem — the box around it was one unit too tall. */
-s+=`<rect x="${LX}" y="${pY+3}" width="${TW}" height="68" rx="2" fill="rgba(107,114,128,.01)" stroke="rgba(107,114,128,.06)" stroke-width=".3" stroke-dasharray="4 3"/>`;
-/* v3.9.9 — clear of the valve tag that sits at the rack's right end */
-s+=tx(LX+TW-30,pY+8,'PIPE RACK','var(--t3)',3,'end');
-// === FWS SUPPLY DN250 CS (insulated double-line, green) ===
-const sY=pY+12,ej1=LX+Math.round(TW/3),ej2=LX+Math.round(2*TW/3);
-s+=`<g class="fws-pipe-click" data-rz-equipment="fws-piping:dh01" tabindex="0" role="button">`;
-s+=`<rect x="${LX+8}" y="${sY-3.5}" width="${TW-16}" height="7" rx="3" fill="rgba(34,197,94,.025)" stroke="rgba(34,197,94,.1)" stroke-width=".4"/>`;
-s+=fl(LX+8,sY,LX+TW-8,sY,'var(--g)','fR',.5,2);
-s+=tx(LX+TW/2,sY-5.5,'HTW SUP DN250 CS '+em(bn('htwSupplyC'))+'\u00B0C '+grp(bn('htwFlowM3h'))+' m\u00B3/h hall  INSULATED','var(--g)',3.5,'middle',0,bo('htwSupplyC',{also:['htwFlowM3h']}));
-// Butterfly valves (BV) at entry/exit — ISA diamond
-s+=symValve(LX+15,sY,'var(--g)');s+=tx(LX+15,sY-5,'BV','var(--g)',2.5,'middle');
-s+=symValve(LX+TW-15,sY,'var(--g)');s+=tx(LX+TW-15,sY-5,'BV','var(--g)',2.5,'middle');
-// Expansion joints (EJ) — bellows zigzag at 1/3 and 2/3 span
-[ej1,ej2].forEach(ex=>{s+=`<path d="M${ex-5} ${sY} L${ex-3} ${sY-3} L${ex-1} ${sY+3} L${ex+1} ${sY-3} L${ex+3} ${sY+3} L${ex+5} ${sY}" fill="none" stroke="var(--g)" stroke-width=".7"/>`});
-// Flow direction arrows
-for(let i=0;i<5;i++){const ax=LX+60+i*115;s+=`<polygon points="${ax},${sY-2} ${ax+4},${sY} ${ax},${sY+2}" fill="var(--g)" opacity=".5"/>`}
-// T-branch stubs to CDU risers (3 per row pair, upward)
-for(let i=0;i<3;i++){const brX=LX+Math.round(TW*(i+1)/4);s+=`<line x1="${brX}" y1="${sY-3.5}" x2="${brX}" y2="${sY-10}" stroke="rgba(34,197,94,.25)" stroke-width="1" stroke-dasharray="2 1.5"/><circle cx="${brX}" cy="${sY-10}" r="1.2" fill="rgba(34,197,94,.35)"/>`}
-// === FWS RETURN DN250 CS (insulated double-line, orange) ===
-const rY=pY+26;
-s+=`<rect x="${LX+8}" y="${rY-3.5}" width="${TW-16}" height="7" rx="3" fill="rgba(245,158,11,.025)" stroke="rgba(245,158,11,.1)" stroke-width=".4"/>`;
-s+=fl(LX+8,rY,LX+TW-8,rY,'var(--o)','fL',.5,2);
-s+=tx(LX+TW/2,rY-5.5,'HTW RET DN250 CS '+em(bn('htwReturnC'))+'\u00B0C  INSULATED','var(--o)',3.5,'middle',0,bo('htwReturnC'));
-s+=symValve(LX+15,rY,'var(--o)');s+=tx(LX+15,rY-5,'BV','var(--o)',2.5,'middle');
-s+=symValve(LX+TW-15,rY,'var(--o)');s+=tx(LX+TW-15,rY-5,'BV','var(--o)',2.5,'middle');
-[ej1,ej2].forEach(ex=>{s+=`<path d="M${ex-5} ${rY} L${ex-3} ${rY-3} L${ex-1} ${rY+3} L${ex+1} ${rY-3} L${ex+3} ${rY+3} L${ex+5} ${rY}" fill="none" stroke="var(--o)" stroke-width=".7"/>`});
-for(let i=0;i<5;i++){const ax=LX+60+i*115;s+=`<polygon points="${ax},${rY-2} ${ax-4},${rY} ${ax},${rY+2}" fill="var(--o)" opacity=".5"/>`}
-// === INSTRUMENTATION PANEL (PI/TI/FM, right side) ===
-const ipX=LX+TW+8;
-s+=`<rect x="${ipX}" y="${pY+4}" width="108" height="36" rx="3" fill="rgba(34,197,94,.015)" stroke="rgba(34,197,94,.08)" stroke-width=".4"/>`;
-s+=tx(ipX+54,pY+10,'FWS INSTRUMENTS','var(--g)',3.5,'middle',1);
-s+=symSensor(ipX+20,pY+24,'var(--g)','P');s+=lv('fwsPI',ipX+20,pY+34,'2.1bar','var(--g)',3,'middle',{declared:'simulated HTW header pressure reading; never a field reading'});
-s+=symSensor(ipX+54,pY+24,'var(--g)','T');s+=lv('fwsTI',ipX+54,pY+34,em(bn('htwSupplyC'))+'\u00B0C','var(--g)',3,'middle',bo('htwSupplyC'));
-s+=symSensor(ipX+88,pY+24,'var(--g)','F');s+=lv('fwsFM',ipX+88,pY+34,grp(bn('htwFlowM3h'))+'m\u00B3/h','var(--g)',3,'middle',bo('htwFlowM3h'));
-s+=fl(LX+TW-8,sY,ipX,sY,'rgba(34,197,94,.12)','','.3',1);
-s+=`</g>`;
-// === TCS NOTE (overhead) ===
-/* v3.9.9 — 4 units up: at pY+38 this annotation and the condensate-drain label at pY+42 were one
-   pixel apart, so two pipe notes read as one line of text. */
-s+=tx(LX+TW/2,pY+33,'TCS SUP/RET DN150 SS316L \u2192 OVERHEAD (see top)','rgba(6,182,212,.2)',3,'middle');
-// === CONDENSATE DRAIN DN50 CPVC ===
-const cdY=pY+45;
-s+=fl(LX,cdY,LX+TW,cdY,'rgba(100, 116, 139,.3)','fR',.25,1.5);
-s+=tx(LX+TW/2-40,cdY-3,'CONDENSATE DRAIN DN50 CPVC','var(--p)',3.5,'middle');
-// Slope indicator (1:100 grade)
-s+=`<path d="M${LX+TW/2+50} ${cdY-1.5} L${LX+TW/2+80} ${cdY}" stroke="var(--p)" stroke-width=".5" opacity=".5"/>`;
-s+=tx(LX+TW/2+65,cdY-3,'1:100','var(--p)',2.5,'middle',0,{declared:'floor-drain slope is a page-authored layout allowance, not an engine quantity'});
-// Drain valve (DV)
-s+=symValve(LX+TW-35,cdY,'var(--p)');s+=tx(LX+TW-35,cdY-5,'DV','var(--p)',2.5,'middle');
-// Clean-out point (CO)
-s+=`<circle cx="${LX+TW-12}" cy="${cdY}" r="2.5" fill="none" stroke="var(--p)" stroke-width=".5"/><line x1="${LX+TW-12}" y1="${cdY-2.5}" x2="${LX+TW-12}" y2="${cdY+2.5}" stroke="var(--p)" stroke-width=".4"/>`;
-s+=tx(LX+TW-12,cdY-5,'CO','var(--p)',2.5,'middle');
-// === LEAK DETECTION ROPE (24 ZONES) ===
-const lrY=pY+54;
-s+=`<g class="leak-click" data-rz-equipment="leak:dh01" tabindex="0" role="button">`;
-s+=`<line x1="${LX}" y1="${lrY}" x2="${LX+TW}" y2="${lrY}" stroke="rgba(245,158,11,.3)" stroke-width="1.2" stroke-dasharray="3 2"/>`;
-s+=tx(LX+45,lrY-3,'LEAK DETECTION ROPE','var(--o)',3.5,'middle');
-[1,4,8,12,16,20,24].forEach(z=>{const zx=LX+Math.round(z/24*TW);s+=`<line x1="${zx}" y1="${lrY-2.5}" x2="${zx}" y2="${lrY+2.5}" stroke="var(--o)" stroke-width=".6"/>`;s+=tx(zx,lrY+6,'Z'+z,'var(--o)',2.5,'middle')});
-s+=`</g>`;
-// === CABLE TRAY (3 separated sections) ===
-const ctY=pY+65,ctW=Math.round((TW-12)/3);
-s+=`<g class="cable-click" data-rz-equipment="cable-tray:dh01" tabindex="0" role="button">`;
-s+=`<rect x="${LX}" y="${ctY}" width="${ctW}" height="7" rx="1.5" fill="rgba(245,158,11,.03)" stroke="rgba(245,158,11,.12)" stroke-width=".4"/>`;
-s+='<g data-rz-authored-basis="cable-tray widths are page-authored layout allowances, not engine quantities">';s+=tx(LX+ctW/2,ctY+5,'PWR 300mm','var(--o)',3,'middle');
-s+=`<rect x="${LX+ctW+6}" y="${ctY}" width="${ctW}" height="7" rx="1.5" fill="rgba(59,130,246,.03)" stroke="rgba(59,130,246,.12)" stroke-width=".4"/>`;
-s+=tx(LX+ctW+6+ctW/2,ctY+5,'FIBER 450mm','var(--b)',3,'middle');
-s+=`<rect x="${LX+2*(ctW+6)}" y="${ctY}" width="${ctW}" height="7" rx="1.5" fill="rgba(100, 116, 139,.03)" stroke="rgba(100, 116, 139,.12)" stroke-width=".4"/>`;
-s+=tx(LX+2*(ctW+6)+ctW/2,ctY+5,'Cu 300mm','var(--p)',3,'middle');s+='</g>';
-s+=tx(LX+TW,ctY+5,'CABLE TRAY','var(--t3)',3,'end');
-s+=`</g>`;
-/* Electrical chip \u2014 hall distribution as the GB300 basis sizes it: the RPP
-   count is 2 panels per rack group (A + B), not the retired 12 \u00D7 630 A. */
-s+=bx(752,28,190,105,'rgba(245,158,11,.12)',4)+tx(847,39,'ELECTRICAL','var(--o)',6,'middle',1);
-[['TX-A/B '+em(bn('txRatingMVA'))+' MVA/unit',bo('txRatingMVA')],
- ['UPS '+em(bn('upsFramesPerFeedHall'))+' \u00D7 '+em(bn('upsRatingMW'))+' MW/feed '+em(bs('upsTopology')),bo('upsFramesPerFeedHall',{also:['upsRatingMW']})],
- ['RPP '+em(bn('rppPerHall'))+' ('+em(bn('rackGroups'))+' groups A+B)',bo('rppPerHall',{also:['rackGroups']})],
- grp(bn('buswayTrunkA'))+' A trunks per group',
- ['Rack feed '+em(bn('rackFeedA'))+' A dual-corded',bo('rackFeedA')],
- 'GenSet pool \u2014 facility-shared',
- ['ATS-LV <100ms',{declared:'transfer time is a page-authored design target, not an engine quantity'}]].forEach((l,i)=>{var it=Array.isArray(l)?l:[l];s+=tx(847,50+i*9.5,it[0],'var(--t2)',4,'middle',0,it[1])});
-s+=bx(752,140,190,55,'rgba(59,130,246,.12)',4)+tx(847,152,'NETWORK MDF','var(--b)',6,'middle',1);[['IB leaf '+em(bn('leavesPerHall'))+' spine '+em(bn('spinesPerHall')),bo('leavesPerHall',{also:['spinesPerHall']})],['OOB 25G BMC 1G',{declared:'out-of-band link speeds are page-authored design choices, not engine quantities'}],['DWDM ODF Patch']].forEach((l,i)=>{s+=tx(847,163+i*10,l[0],'var(--t2)',4,'middle',0,l[1])});
-s+=bx(752,202,90,42,'rgba(239,68,68,.12)',4)+tx(797,214,'FIRE','var(--r)',6,'middle',1)+tx(797,225,'Clean agent','var(--t3)',4,'middle')+tx(797,238,'\u25CF NORMAL','var(--g)',4,'middle',1);
-s+=bx(852,202,90,42,'rgba(34,197,94,.12)',4)+tx(897,214,'BMS','var(--g)',6,'middle',1)+tx(897,225,'DCIM','var(--t3)',4,'middle')+tx(897,238,'\u25CF ONLINE','var(--g)',4,'middle',1);
-// ===== ACCESS CONTROL =====
-s+=`<rect x="752" y="252" width="190" height="55" rx="4" fill="rgba(100, 116, 139,.03)" stroke="rgba(100, 116, 139,.2)" stroke-width=".8"/>`;
-s+=tx(847,264,'ACCESS CONTROL','var(--p)',6,'middle',1);
-s+=`<rect x="762" y="272" width="30" height="30" rx="2" fill="rgba(100, 116, 139,.08)" stroke="var(--p)" stroke-width=".6"/>`;
-s+=`<rect x="769" y="277" width="16" height="18" rx="1" fill="rgba(100, 116, 139,.15)" stroke="var(--p)" stroke-width=".8"/>`;
-s+=`<circle cx="780" cy="286" r="1.5" fill="var(--p)"/>`;
-s+=tx(777,300,'MANTRAP','var(--t3)',3,'middle');
-s+=`<rect x="800" y="272" width="70" height="14" rx="2" fill="var(--bg3)" stroke="var(--bd)" stroke-width=".4"/>`;
-s+=tx(804,281,'Inside:','var(--t3)',4);
-s+=`<text x="866" y="281" fill="var(--g)" font-family="${J}" font-size="5" text-anchor="end" font-weight="600" id="pplCount">3</text>`;
-s+=`<rect x="800" y="290" width="70" height="14" rx="2" fill="var(--bg3)" stroke="var(--bd)" stroke-width=".4"/>`;
-s+=tx(804,300,'Entry:','var(--t3)',4);
-s+=`<text x="866" y="300" fill="var(--c)" font-family="${J}" font-size="4" text-anchor="end" id="lastEntry">12:34</text>`;
-s+=`<circle cx="777" cy="272" r="2" fill="var(--g)" opacity=".5"><animate attributeName="opacity" values="0.2;0.8;0.2" dur="2s" repeatCount="indefinite"/></circle>`;
+for(let b=0;b<banks;b++){const by=bankY(b),bh=M(bankLm);
+for(let p=0;p<pairs;p++){const pi=b*pairs+p;
+for(let si=0;si<SENS_PTS;si++){const y0=by+bh*si/SENS_PTS,h=bh/SENS_PTS;
+th+=`<rect id="H${pi}${si}z" x="${hotX0(p)}" y="${y0.toFixed(1)}" width="${M(2*hotM)}" height="${h.toFixed(1)}" fill="${hallHeat(null)}"/>`;
+th+=`<rect class="C${pi}${si}z" x="${coldWX(p)}" y="${y0.toFixed(1)}" width="${M(coldM)}" height="${h.toFixed(1)}" fill="${hallHeat(null)}"/>`;
+th+=`<rect class="C${pi}${si}z" x="${coldEX(p)}" y="${y0.toFixed(1)}" width="${M(coldM)}" height="${h.toFixed(1)}" fill="${hallHeat(null)}"/>`;}}}
+th+='</g>';s+=th;
+
+/* ===== RACK FIELD ========================================================================== */
+for(let b=0;b<banks;b++){const by=bankY(b),bh=M(bankLm);
+/* hot-aisle containment: walls along both rack rear faces, doors at the cross-aisle end */
+for(let p=0;p<pairs;p++){const x0=hotX0(p),w=M(2*hotM),doorY=b===0?by+bh-3:by;
+s+=`<rect x="${x0}" y="${by}" width="${w}" height="${bh.toFixed(1)}" fill="none" stroke="var(--o)" stroke-width="1" stroke-opacity=".55"/>`;
+s+=`<rect class="hp-ly hp-ly-overhead" x="${x0}" y="${by}" width="${w}" height="${bh.toFixed(1)}" fill="url(#hpRoof)"/>`;
+s+=`<rect x="${(x0+2).toFixed(1)}" y="${doorY.toFixed(1)}" width="${(w-4).toFixed(1)}" height="3" fill="var(--o)" opacity=".8"/>`;}
+for(let r=0;r<rpb;r++){const p=Math.floor(r/2),west=r%2===0,rowNo=b*rpb+r+1,id=pad2(rowNo);
+const rx=west?rackAx(p):rackBx(p),rw=M(rackDM),rh=M(rackWM);
+const rearX=west?rx+rw:rx;                                      /* rear face = hot-aisle side */
+s+=`<g class="rowg" data-row="${id}" data-rg="RG-${id}">`;
+for(let k=0;k<perRow;k++){const ry=(b===0?by+bh-(k+1)*rh:by+k*rh),rk=pad2(k+1),rid='R'+id+'-'+rk;
+const fx=west?rx:rx+rw-1.6;
+s+=`<g class="hp-rack" data-rz-equipment="rack-unit:${rid}" tabindex="0" role="button" data-tip="RACK ${rid} · RG-${id} · GB300 NVL72 · ${em(kwRack)} kW · ${em(gpuR)} GPU · ${em(feedA)} A dual-corded · TCS ${tcsLpm==null?DASH:tcsLpm.toFixed(0)} L/min from the row manifold · front faces the cold aisle · click: rack HMI">`;
+s+=`<rect x="${(rx+.4).toFixed(1)}" y="${(ry+.5).toFixed(1)}" width="${(rw-.8).toFixed(1)}" height="${(rh-1).toFixed(1)}" rx="1" class="hp-body"/>`;
+s+=`<rect x="${fx.toFixed(1)}" y="${(ry+1.2).toFixed(1)}" width="1.6" height="${(rh-2.4).toFixed(1)}" fill="var(--c)" opacity=".85"/>`;
+s+=`<rect x="${(west?rx+rw-2:rx+.4).toFixed(1)}" y="${(ry+1.2).toFixed(1)}" width="1.6" height="${(rh-2.4).toFixed(1)}" fill="var(--o)" opacity=".7"/>`;
+s+=`<circle cx="${(west?rx+5:rx+rw-5).toFixed(1)}" cy="${(ry+rh/2).toFixed(1)}" r="1.4" fill="var(--g)"/>`;
+s+='</g>';}
+/* row manifold on the rear face: supply and return, both moving, period from the row's own flow */
+const m1=west?rearX+2.5:rearX-2.5,m2=west?rearX+5:rearX-5,yA=b===0?by:by+bh,yB=b===0?xaY0+M(.7):xaY1-M(.65);
+s+=`<g class="hp-ly hp-ly-liquid"><line x1="${m1.toFixed(1)}" y1="${yB.toFixed(1)}" x2="${m1.toFixed(1)}" y2="${yA.toFixed(1)}" stroke="var(--c)" stroke-width="1.4" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="${b===0?'0;20':'0;-20'}" dur="${flowDur}s" repeatCount="indefinite"/></line>`;
+s+=`<line x1="${m2.toFixed(1)}" y1="${yA.toFixed(1)}" x2="${m2.toFixed(1)}" y2="${(b===0?xaY0+M(1.05):xaY1-M(1.0)).toFixed(1)}" stroke="var(--o)" stroke-width="1.4" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="${b===0?'0;-20':'0;20'}" dur="${flowDur}s" repeatCount="indefinite"/></line></g>`;
+s+='</g>';
+const lx=rx+rw/2,ly=b===0?HY0-9:HY1+17;
+s+=tx(lx,ly,'R'+id,'var(--t2)',10,'middle',1,bo('racksPerRow',{also:['kwPerRack','rowItKw'],nomark:rowNo>1}));}
+const tag='BANK '+(b===0?'A':'B')+' · ROWS '+pad2(b*rpb+1)+'–'+pad2((b+1)*rpb)+' · '+grp(bn('racksPerBank'))+' RACKS';
+const cy=by+bh/2;
+s+=`<g transform="rotate(-90 ${HX0-26} ${cy.toFixed(1)})">`+tx(HX0-26,cy+3,tag,'var(--t3)',10,'middle',1,bo('racksPerBank',{nomark:b>0}))+'</g>';}
+
+/* ===== CROSS AISLE — TCS headers, egress, cable spine, leak rope ============================ */
+const galX=mechX0+M(.5);
+let lq='<g class="hp-ly hp-ly-liquid">';
+for(const [sy,ry,dir] of [[xaY0+M(.7),xaY0+M(1.05),1],[xaY1-M(.65),xaY1-M(1.0),-1]]){
+lq+=`<line x1="${(HX0+M(.6)).toFixed(1)}" y1="${sy.toFixed(1)}" x2="${galX}" y2="${sy.toFixed(1)}" stroke="var(--c)" stroke-width="3" stroke-dasharray="10 6"><animate attributeName="stroke-dashoffset" values="0;32" dur="${flowDur}s" repeatCount="indefinite"/></line>`;
+lq+=`<line x1="${(HX0+M(.6)).toFixed(1)}" y1="${ry.toFixed(1)}" x2="${(galX+5).toFixed(1)}" y2="${ry.toFixed(1)}" stroke="var(--o)" stroke-width="3" stroke-dasharray="10 6"><animate attributeName="stroke-dashoffset" values="0;-32" dur="${flowDur}s" repeatCount="indefinite"/></line>`;}
+lq+='</g>';s+=lq;
+s+=tx(HX0+M(1),xaY0+M(1.95),'TCS HEADERS — SUPPLY '+em(bn('tcsSupply'))+' °C ← CDU GALLERY · RETURN '+em(bn('tcsReturn'))+' °C → CDU GALLERY','var(--c)',10,'start',1,bo('tcsSupply',{also:['tcsReturn'],nomark:true}));
+s+=tx(HX0+M(1),xaY0+M(2.75),'CROSS AISLE '+em(xaM)+' m — headers, cable spine and the egress route; kept clear of equipment','var(--t3)',9,'start',0,bo('crossAisleM'));
+/* air: the cross aisle is the cold supply corridor from the air plant to every cold aisle */
+let af='<g class="hp-ly hp-ly-air">';
+af+=`<path d="M${(HX1-M(4)).toFixed(1)} ${(xaY0+M(3.15)).toFixed(1)} L${(HX0+M(2)).toFixed(1)} ${(xaY0+M(3.15)).toFixed(1)}" stroke="var(--b)" stroke-width="5" stroke-opacity=".35" stroke-dasharray="14 10" fill="none" marker-end="url(#hpArrB)"><animate attributeName="stroke-dashoffset" values="0;48" dur="3s" repeatCount="indefinite"/></path>`;
+for(let b=0;b<banks;b++){const by=bankY(b),bh=M(bankLm);
+for(let p=0;p<pairs;p++)for(const cxx of [coldWX(p)+M(coldM)/2,coldEX(p)+M(coldM)/2]){
+const y1=b===0?by+bh-4:by+4,y2=b===0?by+bh-M(3.2):by+M(3.2);
+af+=`<line x1="${cxx.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${cxx.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--b)" stroke-width="2" stroke-opacity=".6" marker-end="url(#hpArrB)"/>`;}
+/* hot aisle: air rises into the ceiling plenum (out of the plane: a circled dot) */
+for(let p=0;p<pairs;p++){const hx=hotX0(p)+M(hotM);for(const f of [1/3,2/3]){const yy=by+bh*f;
+af+=`<circle cx="${hx.toFixed(1)}" cy="${yy.toFixed(1)}" r="4.2" fill="none" stroke="var(--r)" stroke-width="1.1" stroke-opacity=".8"/><circle cx="${hx.toFixed(1)}" cy="${yy.toFixed(1)}" r="1.3" fill="var(--r)"/>`;}}
+/* ceiling plenum return over each bank to the air plant */
+const py=b===0?by+M(1.3):by+bh-M(1.3);
+af+=`<path d="M${(HX0+M(1)).toFixed(1)} ${py.toFixed(1)} L${(mechX0+M(8.2)).toFixed(1)} ${py.toFixed(1)}" stroke="var(--o)" stroke-width="4" stroke-opacity=".45" stroke-dasharray="12 8" fill="none" marker-end="url(#hpArrO)"><animate attributeName="stroke-dashoffset" values="0;-40" dur="3s" repeatCount="indefinite"/></path>`;}
+af+='</g>';s+=af;
+s+=`<g class="hp-ly hp-ly-air">`+tx(HX1-M(4.5),xaY0+M(2.8),'COLD SUPPLY '+em(bn('airSupplyC'))+' °C → every cold aisle','var(--b)',10,'end',1,bo('airSupplyC',{nomark:true}))+'</g>';
+/* overhead cable spine (three trays) — off by default, the overhead layer */
+s+=`<g class="hp-ly hp-ly-overhead"><g class="cable-click" data-rz-equipment="cable-tray:dh01" tabindex="0" role="button" data-tip="Overhead cable spine along the cross aisle: power, fiber and copper on separate trays">`;
+[['PWR 300 mm','var(--o)',0],['FIBER 450 mm','var(--b)',1],['Cu 300 mm','var(--p)',2]].forEach(([t,c,i])=>{const yy=xaY0+M(2.9)+i*7;
+s+=`<line x1="${HX0+M(1)}" y1="${yy.toFixed(1)}" x2="${(mechX0-M(.4)).toFixed(1)}" y2="${yy.toFixed(1)}" stroke="${c}" stroke-width="4" stroke-opacity=".35"/>`;});
+s+='</g>'+tx(mechX0-M(.8),xaY0+M(2.9)-5,'OVERHEAD CABLE SPINE · PWR 300 · FIBER 450 · Cu 300 mm','var(--t3)',9,'end',0,decl('cable-tray widths are page-authored layout allowances, not engine quantities'))+'</g>';
+
+/* ===== AISLE SENSORS — three points along every aisle, in both banks ======================== */
+for(let b=0;b<banks;b++){const by=bankY(b),bh=M(bankLm);
+for(let p=0;p<pairs;p++){const pi=b*pairs+p,hx=hotX0(p)+M(hotM),cx=coldWX(p)+M(coldM)/2;
+for(let si=0;si<SENS_PTS;si++){const fy=by+bh*(si+.5)/SENS_PTS;
+s+=`<g data-rz-authored-basis="simulated aisle sensor: temperature jitter around the engine air planes (design.planes.p09 supply / p11 return); never a field reading">`
+ +`<g transform="rotate(-90 ${hx.toFixed(1)} ${fy.toFixed(1)})"><rect x="${(hx-23).toFixed(1)}" y="${(fy-7.5).toFixed(1)}" width="46" height="13" rx="2" fill="var(--bg1,#0b1220)" fill-opacity=".82"/><text x="${hx.toFixed(1)}" y="${(fy+3).toFixed(1)}" fill="var(--o)" font-family="${J}" font-size="10" text-anchor="middle" font-weight="600" id="H${pi}${si}t">— °C</text></g>`
+ +`<g transform="rotate(-90 ${cx.toFixed(1)} ${fy.toFixed(1)})"><rect x="${(cx-23).toFixed(1)}" y="${(fy-7.5).toFixed(1)}" width="46" height="13" rx="2" fill="var(--bg1,#0b1220)" fill-opacity=".82"/><text x="${cx.toFixed(1)}" y="${(fy+3).toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="10" text-anchor="middle" font-weight="600" id="C${pi}${si}t">— °C</text></g></g>`;}}}
+
+/* ===== MECHANICAL ZONE — CDU gallery, air plant, spare ===================================== */
+const blocks=[[HY0,xaY0],[xaY1,HY1]];
+/* CDU gallery: two lines, 1.0 m access + 1.9 m unit + 1.0 m access deep, units at 0.9 m */
+const cduLineD=CDU_ACC_M*2+CDU_D_M, perLineBlock=Math.floor(bankLm/CDU_W_M);
+let cduSlots=[];for(let l=0;l<2;l++)for(let bl=0;bl<2;bl++)for(let k=0;k<perLineBlock;k++)cduSlots.push([l,bl,k]);
+const cduN=(cduInst!=null&&cduInst>0)?Math.min(cduInst,cduSlots.length):0;
+const galEnd=mechX0+M(2*cduLineD);
+/* gallery TCS risers and the HTW headers that feed the CDU primaries */
+let gl='<g class="hp-ly hp-ly-liquid">';
+gl+=`<line x1="${galX}" y1="${HY0+4}" x2="${galX}" y2="${HY1-4}" stroke="var(--c)" stroke-width="2.4"/>`;
+gl+=`<line x1="${galX+5}" y1="${HY0+4}" x2="${galX+5}" y2="${HY1-4}" stroke="var(--o)" stroke-width="2.4"/>`;
+for(const [y0,y1] of blocks){
+for(let l=0;l<2;l++){const hx=mechX0+M(l*cduLineD+cduLineD-CDU_ACC_M/2);
+gl+=`<line x1="${hx.toFixed(1)}" y1="${y0+4}" x2="${hx.toFixed(1)}" y2="${y1-4}" stroke="var(--g)" stroke-width="2.4" stroke-dasharray="8 5"><animate attributeName="stroke-dashoffset" values="0;26" dur="${flowDur}s" repeatCount="indefinite"/></line>`;}}
+gl+='</g>';s+=gl;
+for(let n=1;n<=cduN;n++){const [l,bl,k]=cduSlots[n-1],[y0]=blocks[bl];
+const x=mechX0+M(l*cduLineD+CDU_ACC_M),y=y0+M(.3+k*CDU_W_M),w=M(CDU_D_M),h=M(CDU_W_M);
+const on=(cduRun!=null)?n<=cduRun:true,c=on?'var(--c)':'var(--t3)',lbl='CDU-'+pad2(n);
+s+=`<g class="cdu-click hp-cdu" data-cdu="${n}" data-rz-equipment="cdu:${n}" tabindex="0" role="button" data-tip="${lbl} · ${cduShort()} · ${on?'DUTY':'STANDBY'} · ${em(bn('cduRating'))} kWth rated · ${grp(bn('cduFlowPerUnitLpm'))} L/min · plate HX: HTW primary / TCS secondary · click: CDU HMI">`;
+s+=`<rect x="${x.toFixed(1)}" y="${(y+.6).toFixed(1)}" width="${w.toFixed(1)}" height="${(h-1.2).toFixed(1)}" rx="1.4" class="hp-cab" stroke="${c}" stroke-width="${on?1:.8}" ${on?'':'stroke-dasharray="3 2"'}/>`;
+const hxW=w*.5;
+s+=`<path d="M${(x+3).toFixed(1)} ${(y+h/2).toFixed(1)} l2.5 -3.4 l2.5 6.8 l2.5 -6.8 l2.5 6.8 l2.5 -6.8 l2.5 3.4" fill="none" stroke="${c}" stroke-width=".9" opacity="${on?1:.6}"/>`;
+s+=`<circle cx="${(x+hxW+8).toFixed(1)}" cy="${(y+h/2).toFixed(1)}" r="4" fill="none" stroke="${c}" stroke-width=".9"/><path d="M${(x+hxW+6).toFixed(1)} ${(y+h/2-2.4).toFixed(1)} l4.4 2.4 l-4.4 2.4z" fill="${c}"/>`;
+s+='</g>';}
+s+=tx(mechX0+M(cduLineD),HY0-9,'CDU GALLERY','var(--c)',10,'middle',1);
+s+=tx(mechX0+M(.2),HY1+17,'CDU '+em(cduInst)+' × '+cduShort()+' · '+em(cduRun)+' duty + '+((cduInst!=null&&cduRun!=null)?cduInst-cduRun:DASH)+' standby · '+em(bn('cduRating'))+' kWth · '+grp(bn('cduFlowPerUnitLpm'))+' L/min each','var(--c)',9,'start',0,bo('cduInstalled',{also:['cduRunning','cduRating','cduFlowPerUnitLpm']}));
+/* air plant: lines of the engine frontage pitch, 1 m access front (west, the supply side) and rear */
+const apD=3,apX0=galEnd,lines=6;
+const perLine=(crahInst!=null)?Math.ceil(crahInst/lines):0;
+const nPer=[Math.ceil(perLine/2),Math.floor(perLine/2)];
+let crahN=0;const fanSpin=[];
+for(let l=0;l<lines;l++)for(let bl=0;bl<2;bl++){const [y0,y1]=blocks[bl],cnt=nPer[bl],pitch=M(bankLm)/Math.max(1,cnt);
+for(let k=0;k<cnt&&crahInst!=null&&crahN<crahInst;k++){crahN++;
+const x=apX0+M(l*apD+1),w=M(1),y=y0+k*pitch+pitch*.08,h=pitch*.84,on=(crahAct!=null)?crahN<=crahAct:true,c=on?'var(--b)':'var(--t3)',id=pad2(crahN);
+s+=`<g class="crah-unit crah-click hp-crah" data-crah="CRAH-${id}" data-rz-equipment="crah:${id}" tabindex="0" role="button" data-tip="CRAH-${id} · ${on?'DUTY':'STANDBY'} · ${em(bn('crahRating'))} kW rated, ${em(bn('crahPerUnit'))} kW duty each · draws the hot aisle back through the ceiling plenum, supplies ${em(bn('airSupplyC'))} °C into the cross aisle · CHW coil · click: CRAH HMI">`;
+s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="1.4" class="hp-cab" stroke="${c}" stroke-width="${on?1:.8}" ${on?'':'stroke-dasharray="3 2"'}/>`;
+s+=`<line x1="${(x+w-3).toFixed(1)}" y1="${(y+2).toFixed(1)}" x2="${(x+w-3).toFixed(1)}" y2="${(y+h-2).toFixed(1)}" stroke="var(--c)" stroke-width="2" stroke-dasharray="1.2 1.2" opacity=".8"/>`;
+const fr=Math.min(5,h/4.6);
+for(const fy of [y+h*.3,y+h*.7]){const fx=x+w*.42;
+s+=`<circle cx="${fx.toFixed(1)}" cy="${fy.toFixed(1)}" r="${fr.toFixed(1)}" fill="none" stroke="${c}" stroke-width=".8"/>`;
+s+=`<path d="M${fx.toFixed(1)} ${fy.toFixed(1)} l0 ${(-fr*.85).toFixed(1)} M${fx.toFixed(1)} ${fy.toFixed(1)} l${(fr*.74).toFixed(1)} ${(fr*.42).toFixed(1)} M${fx.toFixed(1)} ${fy.toFixed(1)} l${(-fr*.74).toFixed(1)} ${(fr*.42).toFixed(1)}" stroke="${c}" stroke-width="1.1">${on?`<animateTransform attributeName="transform" type="rotate" from="0 ${fx.toFixed(1)} ${fy.toFixed(1)}" to="360 ${fx.toFixed(1)} ${fy.toFixed(1)}" dur="1.6s" repeatCount="indefinite"/>`:''}</path>`;}
+s+='</g>';}}
+/* CHW to the coils, and the supply air leaving every line westward */
+let cw='<g class="hp-ly hp-ly-liquid">';
+for(let l=0;l<lines;l++){const hx=apX0+M(l*apD+2.5);
+for(const [y0,y1] of blocks)cw+=`<line x1="${hx.toFixed(1)}" y1="${y0+4}" x2="${hx.toFixed(1)}" y2="${y1-4}" stroke="var(--b)" stroke-width="1.6" stroke-dasharray="5 4" opacity=".75"/>`;}
+cw+='</g><g class="hp-ly hp-ly-air">';
+for(let l=0;l<lines;l++){const ax=apX0+M(l*apD+.9);
+for(const [y0,y1] of blocks){const ym=(y0+y1)/2;cw+=`<line x1="${(ax).toFixed(1)}" y1="${ym.toFixed(1)}" x2="${(ax-M(.75)).toFixed(1)}" y2="${ym.toFixed(1)}" stroke="var(--b)" stroke-width="2.4" stroke-opacity=".7" marker-end="url(#hpArrB)"/>`;}}
+cw+='</g>';s+=cw;
+const apMid=apX0+M(lines*apD/2);
+s+=tx(apMid,HY0-9,'AIR PLANT · CRAH FOR THE RESIDUAL AIR HEAT','var(--b)',10,'middle',1);
+s+=tx(mechX0+M(.2),HY1+31,'CRAH '+em(crahInst)+' · '+em(crahAct)+' duty + '+((crahInst!=null&&crahAct!=null)?crahInst-crahAct:DASH)+' standby · '+em(bn('crahRating'))+' kW rated · '+grp(bn('airHeat'))+' kWth per hall · CHW '+em(bn('chwSupplyC'))+'/'+em(bn('chwReturnC'))+' °C','var(--b)',9,'start',0,bo('crahInstalled',{also:['crahActive','crahRating','airHeat','chwSupplyC','chwReturnC']}));
+/* spare floor */
+const spX=apX0+M(lines*apD);
+if(spX<HX1-20){s+=`<rect x="${(spX+4).toFixed(1)}" y="${HY0+8}" width="${(HX1-spX-12).toFixed(1)}" height="${(M(bankLm)-16).toFixed(1)}" fill="none" stroke="var(--t3)" stroke-width=".8" stroke-dasharray="4 4"/>`;
+s+=`<g transform="rotate(-90 ${((spX+HX1)/2).toFixed(1)} ${(HY0+M(bankLm)/2).toFixed(1)})">`+tx((spX+HX1)/2,HY0+M(bankLm)/2+3,'SPARE · '+grp(bn('floorSpareM2'))+' m² unallocated','var(--t3)',9,'middle',0,bo('floorSpareM2'))+'</g>';}
+
+/* ===== UTILITY ENTRIES on the east wall — HTW to the CDUs, CHW to the CRAH coils =========== */
+const eY=xaY0+M(1.5),eY2=xaY0+M(2.0);
+s+=`<g class="fws-pipe-click" data-rz-equipment="fws-piping:dh01" tabindex="0" role="button" data-tip="HTW from the dry-cooler field to the CDU primaries · ${em(bn('htwSupplyC'))} °C supply / ${em(bn('htwReturnC'))} °C return · ${grp(bn('htwFlowHallM3h'))} m³/h per hall">`;
+s+=`<line x1="${HX1+22}" y1="${eY.toFixed(1)}" x2="${(mechX0+M(2*cduLineD-.5)).toFixed(1)}" y2="${eY.toFixed(1)}" stroke="var(--g)" stroke-width="3.2" stroke-dasharray="10 6"><animate attributeName="stroke-dashoffset" values="0;32" dur="${flowDur}s" repeatCount="indefinite"/></line>`;
+s+=symValve(HX1-10,eY,'var(--g)');
+s+='</g>';
+s+=tx(HX1+8,xaY0+21,'HTW '+em(bn('htwSupplyC'))+'°C','var(--g)',9,'start',1,bo('htwSupplyC',{nomark:true}));
+s+=`<g data-rz-authored-basis="simulated HTW header pressure reading; never a field reading"><text x="${HX1+8}" y="${(xaY0+9).toFixed(1)}" fill="var(--t3)" font-family="${J}" font-size="9">PI <tspan id="fwsPI" fill="var(--g)">—</tspan></text></g>`;
+s+=`<line x1="${HX1+22}" y1="${eY2.toFixed(1)}" x2="${(apX0+M(2.5)).toFixed(1)}" y2="${eY2.toFixed(1)}" stroke="var(--b)" stroke-width="2.4" stroke-dasharray="6 4" class="hp-ly hp-ly-liquid"/>`;
+s+=tx(HX1+8,xaY0+45,'CHW '+em(bn('chwSupplyC'))+'°C','var(--b)',9,'start',1,bo('chwSupplyC',{nomark:true}));
+
+/* ===== LEAK DETECTION — the rope follows the water ========================================= */
+s+=`<g class="hp-ly hp-ly-leak"><g class="leak-click" data-rz-equipment="leak:dh01" tabindex="0" role="button" data-tip="Leak detection rope under the TCS headers and the CDU gallery · 24 zones">`;
+const lkY=xaY0+M(.45);
+s+=`<line x1="${HX0+M(.6)}" y1="${lkY.toFixed(1)}" x2="${galEnd.toFixed(1)}" y2="${lkY.toFixed(1)}" stroke="var(--o)" stroke-width="1.2" stroke-dasharray="3 3"/>`;
+for(let z=1;z<=24;z++){const zx=HX0+M(.6)+(galEnd-HX0-M(.6))*(z-.5)/24;s+=`<line x1="${zx.toFixed(1)}" y1="${(lkY-3).toFixed(1)}" x2="${zx.toFixed(1)}" y2="${(lkY+3).toFixed(1)}" stroke="var(--o)" stroke-width=".8"/>`;}
+s+='</g>'+tx(galEnd-4,lkY-5,'LEAK ROPE · 24 ZONES','var(--o)',9,'end',0,decl('leak-rope zone count is a page-authored detection layout, not an engine quantity'))+'</g>';
+
+/* ===== ENTRY — access control at the cross-aisle door ====================================== */
+const dX=HX0-3,dY=(xaY0+xaY1)/2;
+s+=`<rect x="${dX-4}" y="${(dY-M(.9)).toFixed(1)}" width="8" height="${M(1.8)}" fill="var(--bg2)" stroke="var(--g)" stroke-width="1"/>`;
+s+=`<g data-rz-authored-basis="simulated occupancy count at the hall door reader; never a field reading">`+tx(dX-8,dY-4,'ENTRY','var(--g)',9,'end',1)+`<text x="${dX-8}" y="${(dY+10).toFixed(1)}" fill="var(--t3)" font-family="${J}" font-size="9" text-anchor="end"><tspan id="pplCount" fill="var(--g)" font-weight="600">—</tspan> inside</text></g>`;
+window.__hallZones={racks:HX0+M(fieldLm)/2,cdu:mechX0+M(cduLineD),crah:apMid,vb:VB_W};
 hc.innerHTML=s;
+hallApplyLayers();
 }
+/* Layers are a VIEW of one drawing, so the state survives a re-render (hall switch, engine tick). */
+const HP_LAYERS={thermal:true,air:true,liquid:true,leak:true,overhead:false};
+/* One attribute on the svg root, never a class on its children: js/rz-svg-legible.js rescales on ANY class
+   change under <body>, and a rescale resets the pan — toggling a layer threw the reader back to the west wall. */
+function hallApplyLayers(){const svg=$('hSvg');if(!svg)return;
+svg.setAttribute('data-hp-hide',Object.keys(HP_LAYERS).filter(k=>!HP_LAYERS[k]).join(' '));
+for(const k in HP_LAYERS){
+const bt=document.querySelector('#hallLayers [data-hp-layer="'+k+'"]');if(bt)bt.setAttribute('aria-pressed',HP_LAYERS[k]?'true':'false');}}
+(function(){const bar=$('hallLayers');if(!bar)return;bar.addEventListener('click',function(e){
+const go=e.target.closest('[data-hp-go]');
+if(go){const svg=$('hSvg'),z=window.__hallZones;if(!svg||!z)return;
+/* scroll the pan container so the zone sits in the middle of the pane; a fitted plan just flashes it */
+let sc=svg.parentElement;while(sc&&sc!==document.body&&!(sc.scrollWidth>sc.clientWidth+2&&/(auto|scroll)/.test(getComputedStyle(sc).overflowX)))sc=sc.parentElement;
+const k=svg.getBoundingClientRect().width/z.vb,x=z[go.getAttribute('data-hp-go')]*k;
+if(sc&&sc!==document.body){const left=svg.getBoundingClientRect().left-sc.getBoundingClientRect().left+sc.scrollLeft;sc.scrollTo({left:Math.max(0,left+x-sc.clientWidth/2),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
+svg.setAttribute('data-hp-flash',go.getAttribute('data-hp-go'));clearTimeout(window.__hpFlashT);window.__hpFlashT=setTimeout(()=>svg.removeAttribute('data-hp-flash'),900);return;}
+const bt=e.target.closest('[data-hp-layer]');if(!bt)return;
+const k=bt.getAttribute('data-hp-layer');HP_LAYERS[k]=!HP_LAYERS[k];hallApplyLayers();});})();
 window.renderHall=renderHall;
 RZDefer.add('hall',function(){renderHall();});
 
@@ -4376,7 +4423,7 @@ const SR=Math.ceil(_rpb/2)*_bk,SP=3;   /* containment pairs across the hall x po
    picks up a little on the throw, so the anchor walks with the point index — still declared
    simulated jitter about the engine air planes, never a field reading, and still 1 decimal
    (v2.18.0: five digits printed 25.78698 C on a 2.8 px glyph). */
-if(rzPanelOn('hall'))for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht)ht.textContent=RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1)+'\u00B0C';if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct)ct.textContent=RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1)+'\u00B0C';if(ch)ch.textContent=RZ_SIM('cah'+r+'-'+si,45,70,1)+'%'}
+if(rzPanelOn('hall'))for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht){const v=RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1);ht.textContent=v+'\u00B0C';const hz=$('H'+r+si+'z');if(hz)hz.setAttribute('fill',hallHeat(parseFloat(v),.34));}if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct){const v=RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1);ct.textContent=v+'\u00B0C';document.querySelectorAll('#hSvg .C'+r+si+'z').forEach(z=>z.setAttribute('fill',hallHeat(parseFloat(v),.16)));}if(ch)ch.textContent=RZ_SIM('cah'+r+'-'+si,45,70,1)+'%'}
 /* PUE/IT/DLC are ENGINE-DERIVED (not random). GPU% and W/GPU remain live
  * telemetry jitter (genuine sensor readings, not basis-of-design values). */
 /* v3.11.7 — these five cells live inside #p-hall; #sUA/#sUB below do not, so this function keeps
@@ -4405,7 +4452,7 @@ const le=$('lastEntry');if(le&&rzElemOn(le)){const now=new Date();le.textContent
 // CDU status updates
 for(let g=1;g<=2;g++){const el=$('cduG'+g);if(el)el.textContent=RZ_SIM('page11',1.5,2.5,1)+' bar · '+(DHE&&DHE.cduFlowPerUnitLpm!=null?Math.round(DHE.cduFlowPerUnitLpm)+' L/min per CDU':'\u2014')}
 // FWS corridor instruments
-const fPI=$('fwsPI');if(fPI)fPI.textContent=RZ_SIM('page12',1.8,2.4,1)+'bar';
+const fPI=$('fwsPI');if(fPI)fPI.textContent=RZ_SIM('page12',1.8,2.4,1)+' bar';
 /* v2.1.0 Rule 2 — HTW supply temperature and hall flow are engine planes (drawn once, marked); only the pressure reading jitters and it is declared simulated */
 }
 /* ---- v1.20.0: one-shot static engine bind for sidebar + Data Hall KPIs ----
@@ -10256,8 +10303,9 @@ function openCduHmi(id){
 id=parseInt(id,10);
 const label='CDU-'+String(id).padStart(2,'0');
 title.textContent=label+' HMI';
-mode.textContent='Online';
-mode.style.color='var(--g)';mode.style.borderColor='rgba(34,197,94,.3)';mode.style.background='rgba(34,197,94,.12)';
+var _sb=(DHE&&isFinite(DHE.cduRunning)&&id>DHE.cduRunning);
+mode.textContent=_sb?'Standby':'Online';
+mode.style.color=_sb?'var(--t3)':'var(--g)';mode.style.borderColor=_sb?'rgba(100,116,139,.3)':'rgba(34,197,94,.3)';mode.style.background=_sb?'rgba(100,116,139,.12)':'rgba(34,197,94,.12)';
 renderCduHmi(svg,id);
 // Position popup centered on screen
 hmi.style.left=Math.max(10,(window.innerWidth-760)/2)+'px';
@@ -10277,14 +10325,17 @@ var P=RZ_HMI_P('cdu',cduId,null,'renderCduHmi');
 var F='JetBrains Mono',W=720,H=440;
 var t1=P.v('htw_return_c'),t2=P.v('htw_supply_c'),t3=P.v('tcs_supply_c'),t4=P.v('tcs_return_c');
 var ps1=P.v('ps1'),dp=P.v('dp_bar');
-var flow=P.n('flow_lpm'),fan=P.n('fan'),p1pct=P.n('p1pct'),p2pct=P.n('p2pct'),p3pct=0;
+/* v3.21.0 — a CoolIT CHx1000 is liquid-to-liquid: there is no fan in it. The strip's first tile printed a
+   simulated "Fan Speed", and a standby unit read "Online" at full flow. The state comes from the payload. */
+var cOn=(P.state('pump_state_2')||'run')!=='stby';
+var flow=P.n('flow_lpm'),p1pct=cOn?P.n('p1pct'):0,p2pct=cOn?P.n('p2pct'):0,p3pct=0;
 /* v2.18.0 — P.n() is the RAW engine number and is for arithmetic only; P.v() is the payload's
    own text at its declared precision. Printing P.n() put 1497.2441888329738 on the panel and
    overflowed the box. Every display site below uses the *Txt twin. */
 var flowTxt=P.v('flow_lpm');
 var rpm=P.n('pump_rpm'),amps=P.v('pump_amps');
 var hxDutyTxt=P.v('duty_kwth');
-var hxDuty=P.n('duty_kwth'),glycol=30,valvePct=P.n('valve_pct'),expLvl=P.n('expansion_level'),strDP=P.v('strainer_dp');
+var hxDuty=P.n('duty_kwth'),glycol=30 /* 30 % PG: dcai-model.js thermal.tcsFluid* comment, ASSUMED */,valvePct=P.n('valve_pct'),expLvl=P.n('expansion_level'),strDP=P.v('strainer_dp');
 var s='';
 // Background
 s+=`<rect width="${W}" height="${H}" fill="#080e1a" rx="4"/>`;
@@ -10293,14 +10344,14 @@ s+=`<defs><linearGradient id="hxG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%"
 // ===== HEADER BAR =====
 s+=`<rect x="0" y="0" width="${W}" height="26" fill="rgba(6,182,212,.08)"/>`;
 s+=`<text x="10" y="17" fill="var(--c)" font-family="${F}" font-size="10" font-weight="600">CDU-${String(cduId).padStart(2,'0')} HMI</text>`;
-s+=`<circle cx="130" cy="13" r="4" fill="var(--g)" opacity=".8"/><text x="138" y="17" fill="var(--g)" font-family="${F}" font-size="8">Online</text>`;
+s+=`<circle cx="130" cy="13" r="4" fill="${cOn?'var(--g)':'var(--t3)'}" opacity=".8"/><text x="138" y="17" fill="${cOn?'var(--g)':'var(--t3)'}" font-family="${F}" font-size="8">${cOn?'Online':'Standby'}</text>`;
 s+=rzD(P.optAll(["htw_supply_c"]),`<text x="${W/2}" y="17" fill="var(--t2)" font-family="${F}" font-size="8" text-anchor="middle">Coolant Distribution Unit</text>`);
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">IP: 192.168.11.${170+cduId}</text>`);
 // ===== KPI STRIP (6 boxes) =====
 var iy=30,bw=108;
 var kpis=[
-{l:'Fan Speed',v:fan+'%',c:'var(--o)',bg:'rgba(245,158,11,.06)',bc:'var(--o)'},
-{l:'Mode',v:'Online',c:'var(--g)',bg:'rgba(34,197,94,.06)',bc:'var(--g)'},
+{l:'Pump Speed',v:(P.n('pump_rpm')==null?'\u2014':Math.round(P.n('pump_rpm')).toLocaleString('en-US'))+' rpm',c:'var(--o)',bg:'rgba(245,158,11,.06)',bc:'var(--o)'},
+{l:'Mode',v:cOn?'Online':'Standby',c:cOn?'var(--g)':'var(--t3)',bg:'rgba(34,197,94,.06)',bc:cOn?'var(--g)':'var(--t3)'},
 {l:'Sec Flow',v:flowTxt+' L/m',c:'var(--c)',bg:'rgba(6,182,212,.06)',bc:'var(--c)'},
 {l:'Supply T3',v:t3+'\u00B0C',c:'var(--c)',bg:'rgba(6,182,212,.06)',bc:'var(--c)'},
 {l:'HX Duty',v:hxDutyTxt+' kW',c:'var(--p)',bg:'rgba(100, 116, 139,.06)',bc:'var(--p)'},
@@ -11935,7 +11986,8 @@ if(hmi.classList.contains('show')&&!hmi.contains(e.target)&&!e.target.closest('.
 function openCrahHmi(crahId){
 crahId=/^CRAH-/.test(String(crahId))?String(crahId):'CRAH-'+crahId;
 title.textContent=crahId+' HMI';
-mode.textContent='Active';
+var _cn=parseInt(String(crahId).replace(/\D+/g,''),10),_sb=(DHE&&isFinite(DHE.crahActive)&&_cn>DHE.crahActive);
+mode.textContent=_sb?'Standby':'Active';
 renderCrahHmi(svg,crahId);
 hmi.style.left=Math.max(10,(window.innerWidth-760)/2)+'px';
 hmi.style.top=Math.max(10,(window.innerHeight-500)/2)+'px';
@@ -11953,18 +12005,26 @@ function renderCrahHmi(el,crahId){
 var P=RZ_HMI_P('crah',crahId,null,'renderCrahHmi');
 var F='JetBrains Mono',W=720,H=600;var s='';
 // === Thermodynamically consistent values ===
+/* v3.21.0 — the duty is the ENGINE's per-unit duty, and the water and air sides are derived from it.
+   It used to run the other way: a simulated 12.3 m3/h CHW flow x the plane dT gave 114 kW, and the air
+   dT then fell out of THAT at 6 K, so the panel printed return air 31 C against the engine's 36 C and a
+   duty 85 kW short of equipment.crah_duty_per_unit_kwth. A standby unit (n > crah_duty_per_hall) moves
+   no air and no water, and now says so instead of drawing a running fan wall. */
+var on=(P.state('unit_state')||'run')!=='stby';
 var cwIn=P.v('chw_supply_c'),cwOut=P.v('chw_return_c');
 var cwDt=parseFloat((cwOut-cwIn).toFixed(1));
-var cwFlow=P.v('cwFlow');
-var coolKw=parseFloat((cwFlow/3.6*4.18*cwDt).toFixed(1));
+var coolKw=on?P.n('duty_kwth'):0;
+var cwFlow=(on&&cwDt>0)?parseFloat((coolKw/(4.18*cwDt)*3.6).toFixed(1)):0;
 var supT=P.v('air_supply_c');
-var airflow=P.n('unit_air_m3h');
+var airflow=on?P.n('unit_air_m3h'):0;
 /* v2.18.0 — airflow stays numeric for the dT identity below; airflowTxt is what gets drawn.
    Its text already carries the unit. */
-var airflowTxt=P.v('unit_air_m3h');
-var airDt=parseFloat((coolKw/(airflow/3600*1.2*1.006)).toFixed(1));
-var retT=parseFloat((parseFloat(supT)+airDt).toFixed(1));
-var fanSpd=P.n('fan_pct');
+var airflowTxt=on?P.v('unit_air_m3h'):'0 m\u00B3/h';
+/* Return air is the engine plane p11, not a number re-derived from the airflow: design.flows.crah_air_m3s
+   carries 3.3 % over heat/(rho cp dT), and deriving dT from it printed 35.7 C beside an engine that says 36. */
+var retT=parseFloat(P.v('air_return_c'));
+var airDt=on?parseFloat((retT-parseFloat(supT)).toFixed(1)):0;
+var fanSpd=on?P.n('fan_pct'):0;
 var supRH=P.n('supply_rh'),retRH=P.n('retRH');
 var filterDp=P.n('filter_dp'),filterPct=P.n('filterPct');
 var cwPressure=P.v('cwPressure');
@@ -11972,7 +12032,7 @@ s+=`<rect width="${W}" height="${H}" fill="#080e1a" rx="4"/>`;
 // === HEADER (y=0-26) ===
 s+=`<rect x="0" y="0" width="${W}" height="26" fill="rgba(6,182,212,.08)"/>`;
 s+=`<text x="10" y="17" fill="var(--c)" font-family="${F}" font-size="11" font-weight="600">${crahId} \u2014 CW CRAH EC Fan Wall</text>`;
-s+=`<circle cx="380" cy="13" r="4" fill="var(--g)" opacity=".8"/><text x="388" y="17" fill="var(--g)" font-family="${F}" font-size="9">Active</text>`;
+s+=`<circle cx="380" cy="13" r="4" fill="${on?'var(--g)':'var(--t3)'}" opacity=".8"/><text x="388" y="17" fill="${on?'var(--g)':'var(--t3)'}" font-family="${F}" font-size="9">${on?'Active':'Standby'}</text>`;
 s+=rzD(P.optAll(["auto_1"]),`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">IP: 10.1.4.${P.n('auto_1')}</text>`);
 // === KPI STRIP (y=30-62) ===
 var kpis=[{l:'Supply Air',v:supT+'\u00B0C',c:'var(--c)'},{l:'Return Air',v:retT+'\u00B0C',c:'var(--o)'},{l:'Fan Speed',v:fanSpd+'%',c:'var(--g)'},{l:'Airflow',v:airflowTxt,c:'var(--c)'},{l:'CHWS/CHWR',v:cwIn+'/'+cwOut+'\u00B0C',c:'var(--b)'},{l:'Cooling',v:coolKw+' kW',c:'var(--o)'}];
@@ -12026,7 +12086,7 @@ s+=rzD(P.optAll(["cwFlow"]),`<text x="140" y="245" fill="var(--c)" font-family="
 s+=`<text x="115" y="260" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">\u0394T: ${cwDt.toFixed(1)}\u00B0C</text>`;
 // Supply Air Output (y=298-348)
 s+=`<rect x="10" y="298" width="210" height="50" rx="4" fill="rgba(6,182,212,.05)" stroke="var(--c)" stroke-width=".6"/>`;
-s+=`<text x="115" y="314" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">SUPPLY AIR TO RAISED FLOOR</text>`;
+s+=`<text x="115" y="314" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">SUPPLY AIR TO THE CROSS AISLE</text>`;
 s+=rzD(P.optAll(["air_supply_c", "unit_air_m3h", "supply_rh"]),`<text x="115" y="328" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle">${supT}\u00B0C | ${supRH}% RH | ${airflowTxt}</text>`);
 s+=`<circle cx="40" cy="342" r="6" fill="none" stroke="var(--o)" stroke-width=".5"/>`;
 s+=`<text x="40" y="345" fill="var(--o)" font-family="${F}" font-size="5" text-anchor="middle">TI</text>`;
@@ -12043,7 +12103,7 @@ s+=rzD(P.optAll(["auto_2", "fan_pct"]),`<text x="283" y="112" fill="var(--p)" fo
 var totalFanKw=0;
 for(var fr=0;fr<2;fr++){for(var fc=0;fc<3;fc++){
 var fx=238+fc*90,fy=124+fr*76;
-var rpm=P.n('rpm'),fkw=P.v('fkw');
+var rpm=on?P.n('rpm'):0,fkw=on?P.v('fkw'):'0.0';
 totalFanKw+=parseFloat(fkw);
 s+=`<rect x="${fx}" y="${fy}" width="82" height="66" rx="3" fill="rgba(34,197,94,.03)" stroke="var(--g)" stroke-width=".3"/>`;
 s+=`<circle cx="${fx+41}" cy="${fy+28}" r="20" fill="none" stroke="var(--g)" stroke-width=".4"/>`;
@@ -12108,7 +12168,7 @@ s+=`<text x="425" y="402" fill="var(--g)" font-family="${F}" font-size="6" text-
 s+=rzD(P.optAll(["fan_pct"]),`<text x="425" y="420" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">${fanSpd}% 2\u00D73</text>`);
 s+=`<text x="485" y="414" fill="var(--t3)" font-size="12">\u2192</text>`;
 s+=`<rect x="500" y="382" width="110" height="56" rx="2" fill="rgba(6,182,212,.08)" stroke="var(--c)" stroke-width=".4"/>`;
-s+=`<text x="555" y="402" fill="var(--c)" font-family="${F}" font-size="6" text-anchor="middle">RAISED FLOOR</text>`;
+s+=`<text x="555" y="402" fill="var(--c)" font-family="${F}" font-size="6" text-anchor="middle">CROSS AISLE</text>`;
 s+=rzD(P.optAll(["air_supply_c"]),`<text x="555" y="420" fill="var(--c)" font-family="${F}" font-size="8" text-anchor="middle" font-weight="600">${supT}\u00B0C</text>`);
 s+=`<text x="620" y="414" fill="var(--t3)" font-size="12">\u2192</text>`;
 s+=`<text x="670" y="414" fill="var(--c)" font-family="${F}" font-size="6" text-anchor="middle">COLD AISLE</text>`;
@@ -12128,7 +12188,7 @@ s+=`<text x="10" y="576" fill="var(--t3)" font-family="${F}" font-size="7">Contr
 s+=`<circle cx="10" cy="590" r="4" fill="var(--g)" opacity=".8"/><text x="18" y="593" fill="var(--g)" font-family="${F}" font-size="7">ON</text>`;
 s+=`<rect x="50" y="584" width="40" height="12" rx="2" fill="rgba(107,114,128,.08)" stroke="var(--t3)" stroke-width=".3"/>`;
 s+=`<text x="70" y="593" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="middle">OFF</text>`;
-s+=`<text x="${W-10}" y="593" fill="var(--t3)" font-family="${F}" font-size="7" text-anchor="end">${crahId} | Residual 15% air-side heat (VRM, DIMM, SSD, NIC)</text>`;
+s+=`<text x="${W-10}" y="593" fill="var(--t3)" font-family="${F}" font-size="7" text-anchor="end">${crahId} | Residual air heat ${(DHE&&DHE.airHeat&&DHE.itHall)?Math.round(DHE.airHeat/DHE.itHall*100):'\u2014'} % of hall IT \u2014 the rack share the cold plates do not capture, plus fabric, OOB, storage and distribution losses</text>`;
 el.innerHTML=s;
 
 /* @rz-hmi:end renderCrahHmi */}
@@ -12545,7 +12605,7 @@ s+=`<rect x="30" y="${bsY}" width="${W-60}" height="34" rx="3" fill="rgba(245,15
 s+=`<text x="50" y="${bsY+14}" fill="var(--o)" font-family="${F}" font-size="8" font-weight="600">PWR:</text>`;
 s+=`<text x="85" y="${bsY+14}" fill="var(--t2)" font-family="${F}" font-size="7">48VDC \u2500[\u2500Fuse\u2500]\u2500\u25B6 4,800W total (4\u00D71000W GPU + 2\u00D7250W CPU + NIC)</text>`;
 s+=`<text x="50" y="${bsY+28}" fill="var(--c)" font-family="${F}" font-size="8" font-weight="600">COOL:</text>`;
-s+=`<text x="90" y="${bsY+28}" fill="var(--t2)" font-family="${F}" font-size="7">TCS IN 35\u00B0C \u2500[Cu Cold Plate]\u2500\u25B6 TCS OUT 45\u00B0C | Blind-mate QD | \u0394T ~10\u00B0C</text>`;
+s+=`<text x="90" y="${bsY+28}" fill="var(--t2)" font-family="${F}" font-size="7">TCS IN ${(DHE&&isFinite(DHE.tcsSupply)?DHE.tcsSupply:'\u2014')}\u00B0C \u2500[Cu Cold Plate]\u2500\u25B6 TCS OUT ${(DHE&&isFinite(DHE.tcsReturn)?DHE.tcsReturn:'\u2014')}\u00B0C | Blind-mate QD | \u0394T ${(DHE&&isFinite(DHE.tcsSupply)&&isFinite(DHE.tcsReturn))?(DHE.tcsReturn-DHE.tcsSupply):'\u2014'} K</text>`;
 el.innerHTML=s;
 
 /* @rz-hmi:end renderComputeTray */}
@@ -12662,7 +12722,7 @@ s+=`<text x="10" y="18" fill="var(--c)" font-family="${F}" font-size="11" font-w
 // Supply header
 var shY=50,shH=60;
 s+=`<rect x="40" y="${shY}" width="${W-80}" height="${shH}" rx="4" fill="rgba(6,182,212,.06)" stroke="var(--c)" stroke-width="1.2"/>`;
-s+=`<text x="60" y="${shY+16}" fill="var(--c)" font-family="${F}" font-size="9" font-weight="600">SUPPLY HEADER (TCS IN 35\u00B0C)</text>`;
+s+=`<text x="60" y="${shY+16}" fill="var(--c)" font-family="${F}" font-size="9" font-weight="600">SUPPLY HEADER (TCS IN ${(DHE&&isFinite(DHE.tcsSupply)?DHE.tcsSupply:'\u2014')}\u00B0C)</text>`;
 s+=`<text x="60" y="${shY+32}" fill="var(--t2)" font-family="${F}" font-size="7">SS316L DN50 manifold | 25 bar rated | Welded construction</text>`;
 s+=`<text x="60" y="${shY+46}" fill="var(--t2)" font-family="${F}" font-size="7">Isolation ball valve (manual lockout) + Motorised shut-off valve</text>`;
 // Supply flow arrows
@@ -12682,7 +12742,7 @@ s+=`<text x="${qx+34}" y="${qdY+55}" fill="var(--t3)" font-family="${F}" font-si
 // Return header
 var rhY=qdY+80;
 s+=`<rect x="40" y="${rhY}" width="${W-80}" height="${shH}" rx="4" fill="rgba(245,158,11,.06)" stroke="var(--o)" stroke-width="1.2"/>`;
-s+=`<text x="60" y="${rhY+16}" fill="var(--o)" font-family="${F}" font-size="9" font-weight="600">RETURN HEADER (TCS OUT 45\u00B0C)</text>`;
+s+=`<text x="60" y="${rhY+16}" fill="var(--o)" font-family="${F}" font-size="9" font-weight="600">RETURN HEADER (TCS OUT ${(DHE&&isFinite(DHE.tcsReturn)?DHE.tcsReturn:'\u2014')}\u00B0C)</text>`;
 s+=`<text x="60" y="${rhY+32}" fill="var(--t2)" font-family="${F}" font-size="7">SS316L DN50 manifold | 25 bar rated | Welded construction</text>`;
 s+=`<text x="60" y="${rhY+46}" fill="var(--t2)" font-family="${F}" font-size="7">Isolation ball valve (manual lockout) + Motorised shut-off valve</text>`;
 s+=`<line x1="${W-50}" y1="${rhY+shH/2}" x2="50" y2="${rhY+shH/2}" stroke="var(--o)" stroke-width="3" opacity=".3" stroke-dasharray="12 6"><animate attributeName="stroke-dashoffset" values="0;36" dur="3s" repeatCount="indefinite"/></line>`;
@@ -12849,48 +12909,19 @@ row('NVLink','All domains up','var(--g)')+
 '<div style="color:var(--t3);margin-top:3px;font-size:8px">Design values are engine-derived; utilisation is simulated telemetry</div>';
 showTip(e);return;
 }
-// CDU hover
-var cduG=t.closest('.cdu-click');
-if(cduG){
-var cid=cduG.dataset.cdu;
-tip.innerHTML='<div style="color:var(--c);font-weight:600;margin-bottom:4px">CDU-'+String(cid).padStart(2,'0')+'</div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Mode</span><span style="color:var(--g)">Online</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Supply</span><span style="color:var(--c)">'+RZ_SIM('page54',34.5,35.8,1)+'\u00B0C</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Return</span><span style="color:var(--o)">'+RZ_SIM('page55',44.0,45.5,1)+'\u00B0C</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">FWS In</span><span style="color:var(--b)">'+RZ_SIM('page56',11.5,12.5,1)+'\u00B0C</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">FWS Out</span><span>'+RZ_SIM('page57',21.0,22.5,1)+'\u00B0C</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">TCS-Int \u0394P</span><span>'+RZ_SIM('page58',1.5,2.5,1)+' bar</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Flow</span><span>'+RZ_SIM('page59',350,450,0)+' L/min</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Pump</span><span>P1 '+RZ_SIM('page60',75,90,0)+'% | P2 Stby</span></div>'+
-'<div style="color:var(--t3);margin-top:3px;font-size:8px">\u25B6 Click for HMI mimic</div>';
-showTip(e);return;
-}
-// CRAH hover
-var crahG=t.closest('.crah-unit');
-if(crahG){
-var crahId=crahG.dataset.crah||'CRAH';
-var crahCap=RZ_SIM('page61',165,185,0);
-tip.innerHTML='<div style="color:var(--c);font-weight:600;margin-bottom:4px">'+crahId+'</div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Type</span><span>CW CRAH EC Fan Wall</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Supply Air</span><span style="color:var(--c)">25\u00B0C</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Return Air</span><span style="color:var(--o)">'+RZ_SIM('page62',28.5,30.0,1)+'\u00B0C</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Capacity</span><span>~'+crahCap+' kW</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Status</span><span style="color:var(--g)">Active</span></div>'+
-'<div style="color:var(--t3);margin-top:3px;font-size:8px">Cools residual 15% air-side heat<br>(VRM, DIMM, SSD, NIC)</div>'+
-'<div style="color:var(--t3);margin-top:3px;font-size:8px">\u25B6 Click for HMI mimic</div>';
-showTip(e);return;
-}
-// FWS pipe hover
-var fwsG=t.closest('.fws-pipe-click');
-if(fwsG){
-tip.innerHTML='<div style="color:var(--g);font-weight:600;margin-bottom:4px">FWS Piping</div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Supply</span><span style="color:var(--g)">'+RZ_SIM('page63',11.5,12.5,1)+'\u00B0C</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Return</span><span style="color:var(--o)">'+RZ_SIM('page64',21,22.5,1)+'\u00B0C</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Flow</span><span>'+RZ_SIM('page65',480,520,0)+' m\u00B3/h</span></div>'+
-'<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">Pipe</span><span>DN250 CS Insulated</span></div>'+
-'<div style="color:var(--t3);margin-top:3px;font-size:8px">\u25B6 Click for piping detail</div>';
-showTip(e);return;
-}
+// CDU / CRAH / HTW hover — v3.21.0: built from the SAME payload the HMI and the inspector render, so the
+// three can never disagree. The branches it replaces printed GB200-era planes (TCS 35/45, FWS 12/22 C,
+// CRAH return 28.5-30 C, "residual 15 %") over a GB300 hall that runs 40/50, 37/45 and 25/36.
+var eqG=svgUp(t,'data-rz-equipment'),eqRef=eqG?eqG.getAttribute('data-rz-equipment'):'';
+if(eqG&&/^(cdu|crah|fws-piping):/.test(eqRef)&&window.RZDatahallAIEquipmentInspector){
+var pl=null;try{pl=window.RZDatahallAIEquipmentInspector.build(eqRef,window.currentDH||1);}catch(x){pl=null}
+if(pl&&!pl.unavailable){
+var esc=function(v){return String(v==null?'\u2014':v).replace(/&/g,'&amp;').replace(/</g,'&lt;')};
+var chip=pl.statusChip||{},cc=chip.state==='standby'?'var(--t3)':chip.state==='fault'?'var(--r)':'var(--g)';
+var rowsH=((pl.tabs&&pl.tabs.live)||[]).slice(0,8).map(function(r){return '<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0"><span style="color:var(--t3)">'+esc(r.label)+'</span><span>'+esc(r.text)+(r.unit&&String(r.text).indexOf(r.unit)<0?' '+esc(r.unit):'')+'</span></div>'}).join('');
+tip.innerHTML='<div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:4px"><span style="color:var(--c);font-weight:600">'+esc(pl.title)+'</span><span style="color:'+cc+';font-weight:600">'+esc(chip.label||'')+'</span></div>'+rowsH+
+'<div style="color:var(--t3);margin-top:3px;font-size:8px">Click: equipment HMI \u00B7 Shift+click: inspector</div>';
+showTip(e);return;}}
 // Leak rope hover
 var leakG=t.closest('.leak-click');
 if(leakG){
@@ -16470,7 +16501,7 @@ if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
        each of which had correctly applied the scale it was told to. The cap was right and the unit
        was wrong. */
     R('#coolSvg',   {maxScale:12, minWidth:2790});   /* 524 labels, smallest 2.4 in a 960 viewBox */
-    R('#hSvg',      {maxScale:12, minWidth:2700});
+    R('#hSvg',      {maxScale:12, minWidth:1240});   /* v3.21.0: smallest label 9 units in a 1200 viewBox */
     R('#elecOvSvg', {maxScale:12, minWidth:2520});
     R('#elecDH1Svg',{maxScale:12, minWidth:2650});   /* same shape on all four halls */
     R('#elecDH2Svg',{maxScale:12, minWidth:2650});

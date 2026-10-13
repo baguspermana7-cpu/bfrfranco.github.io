@@ -126,6 +126,11 @@
     var available = pane.clientWidth || pane.getBoundingClientRect().width;
     if (!available) { return null; }
 
+    /* Measuring shrinks the drawing to the pane for a moment, which clamps the pane's scroll to 0.
+       v3.21.0 — keep where the reader had panned to and put it back once the width is restored: the
+       observer reruns this on ANY class change under <body>, so a ticker or a toggle anywhere on the
+       page threw a panned drawing back to its left edge. */
+    var prevWidth = svg.getBoundingClientRect().width, keepLeft = pane.scrollLeft, keepTop = pane.scrollTop;
     /* Measure at 1:1 with the pane, so a previous pass never compounds into the next one. */
     svg.style.width = available + 'px';
     var rendered = svg.getBoundingClientRect().width || available;
@@ -158,6 +163,11 @@
     }
     svg.style.width = width + 'px';
     svg.style.maxWidth = 'none';
+    if (keepLeft || keepTop) {
+      var ratio = prevWidth > 0 ? width / prevWidth : 1;
+      pane.scrollLeft = Math.round(keepLeft * ratio);
+      pane.scrollTop = Math.round(keepTop * ratio);
+    }
     svg.setAttribute(MARK, applied.toFixed(2));
 
     var reached = smallest * applied;

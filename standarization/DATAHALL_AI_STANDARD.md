@@ -359,7 +359,7 @@ $('tabSu').textContent = 'Summary text...';
 
 | Tab | viewBox | Notes |
 |-----|---------|-------|
-| Building (hSvg) | 960 480 | Floor plan with clickable racks |
+| Data hall (hSvg) | 1200 720 | v3.21.0: the whole 62 x 31 m room at one scale (17 px/m) |
 | Rack (rackSvg) | varies | Per-rack detail |
 | Cooling (coolSvg) | 960 750 | Full P&ID |
 | **Electrical (elecSvg)** | **960 3800** | Full facility SLD — very tall, scrollable |
@@ -367,43 +367,59 @@ $('tabSu').textContent = 'Summary text...';
 | Fire (fireSvg) | 960 580 | Detection & suppression |
 | BMS (bmsSvg) | 960 480 | BMS/DCIM architecture |
 
-## Hall plan contract (v3.3.0)
+## Hall plan contract (v3.21.0 — supersedes v3.3.0)
 
-The DATA HALL mimic is a **plan view**: the hall length runs left-right, rows run top-bottom, one
-row = one RPP group of `racksPerRow` racks. Everything below exists because the owner rejected an
-earlier drawing with *"antara row dan cdu nggak match konsepnya"*, *"cdu weird positioning"*,
-*"Tidak ada crah"* and *"No hac temp indication in several point across row"*.
+Owner, on the phone (2026-10-13): *"Jelek sekali dan nggak sesuai aneh cdunya mana, crah utk residual
+air gimana. Designnya sangat kurang immersive"*, then *"Harus super immersive, intuitive dan keren
+tampilannya. Modal2 saat click harus tetap ada dan improved accurate"*. Layout choice: **"Ikut engine"**.
 
-### Where the equipment stands
+### The room is the ENGINE's room
 
-| band | position | why |
+The engine budgets a 62 x 31 m hall: two 13.2 m row banks plus the 4.6 m cross aisle are exactly the
+31 m width, and ten 3.1 m rows are exactly 31 m of the 62 m length. The other 818 m2 is the
+mechanical zone: CDU gallery (220 m2), air plant (450 m2), spare (148 m2). The v3.3.0 drawing drew
+the rack field only, put the CRAH units on the walls the rows already touch, and put the CDUs in the
+egress aisle. Now:
+
+| zone | position | footprint source |
 |---|---|---|
-| CRAH walls | the two LONG sides (`CRAH_T` / `CRAH_B`) | the fan wall faces the aisles it feeds |
-| row columns | between them, at the engine's `rowPitchM` | pitch = rack depth + cold aisle + hot aisle, from the engine, never typed |
-| CDU gallery | **IN the cross aisle** | a CoolIT CHx1000 is an END-OF-ROW CDU, and with rows running top-bottom the row's end IS the cross aisle |
+| rack field | west 31 m; bank A north, cross aisle, bank B south | engine geometry leaves; pair = cold 1.2 / rack 1.2 / hot 2 x 0.7 / rack / cold |
+| cross aisle | full 62 m; TCS headers N (bank A) + S (bank B), leak rope, cold supply | engine `cross_aisle_m`; kept CLEAR of equipment (egress) |
+| CDU gallery | first 7.8 m of the mechanical zone, two lines, both blocks | CHx1000 0.9 x 1.9 m + 1 m access each end (model comment), one glyph per installed unit |
+| air plant | next 18 m, six 3 m gallery lines, units at frontage pitch | `airPlantDepthM` 3 m; one glyph per installed CRAH, fans spin only on duty units |
+| spare | the remainder | prints the engine's `floor_spare_m2` |
 
-Putting the CDUs on the SHORT walls is the mistake that was shipped twice: those are the ends of
-the *cross aisle*, not of the rows, so a row's coolant left the drawing sideways, ran the length of
-the hall and came back. One glyph per **installed** unit, spread across the same span the rows
-occupy — no aggregation divisor, so the count on the drawing is the count in the registry.
+**ONE scale**: `SC` px per metre on both axes. Every element is placed in metres and converted once.
 
-### The water path must be one continuous animation
+### Both heat paths, end to end
 
-CDU band → TCS supply header → row drop → row riser → return. The dash **period** carries the row
-flow the engine publishes (`tcsFlowRackLpm × racksPerRow`), clamped to 1.2–6 s, so a row moving
-more litres a minute visibly moves faster. Motion that encodes a number is a reading; motion that
-encodes nothing is decoration and §A bans it. Reduced motion is handled once, by the page's
-existing `matchMedia` → `pauseAnimations()` path — never add a second one.
+* Liquid: rack cold plates, then the rear-face row manifold (supply and return, period = the row flow),
+  then the TCS header, the gallery riser, the CDU plate HX, and HTW from the east wall to the dry coolers.
+* Residual air (`heat.air_hall_kwth`, about 26 % of hall IT, not "15 %"): CRAH discharge west into the
+  cross aisle, then into every cold aisle, through the rack fronts into the contained hot aisle (drawn
+  as a red circled dot: air rising out of the plane), then the ceiling plenum, then the CRAH coil on CHW.
+* The header states both, with engine numbers: LIQUID kWth to n CDU, RESIDUAL AIR kWth to n CRAH.
+
+### Layers, not clutter
+
+Thermal / Airflow / Liquid / Leak / Overhead chips (`#hallLayers`). State lives in ONE attribute on
+the svg root (`data-hp-hide`, `data-hp-flash`), never in classes on children: `js/rz-svg-legible.js`
+rescales on any class change under `<body>`, and a rescale resets the pan. "Go to" chips scroll the
+pan container to the rack field, the CDU gallery or the air plant: on a phone those are off screen.
+
+### Modals stay, and say what the engine says
+
+Click opens the equipment HMI, Shift+click or right-click opens the inspector, and hover shows the
+SAME payload the HMI and the inspector render, so the three cannot disagree. Standby units
+(n > duty count) print zero flow, duty and fan or pump speed, and say STANDBY in the chip, header and
+mode tile. CRAH duty is the engine per-unit duty. CHW flow is derived from it; return air is the
+engine plane p11. A CHx1000 has no fan, so the tile is pump speed.
 
 ### Aisle instrumentation
 
-A contained hot aisle has a gradient ALONG its length; that is the whole reason to instrument it.
-Three points per aisle at ¼, ½ and ¾ of the row, in **both** banks. Ids are
-`H{pair}{point}t` / `C{pair}{point}t` and the `upd()` loop bound must be
-`pairs = ceil(rowsPerBank/2) × rackBanks` by `points`, derived from the engine — it was hardcoded
-`si<1` with `b===0` and printed five numbers for a twenty-row hall. **Give every sensor its own
-`RZ_SIM` seed key** (`'hac'+pair+'-'+point`): three readouts that share one key print the same
-number three times and the drawing claims several points while showing one.
+Three points per aisle in both banks, ids `H{pair}{point}t` / `C{pair}{point}t`, each with its own
+`RZ_SIM` seed key. The heat map colours each segment from its own reading (`hallHeat()`), so colour
+compares across the hall.
 
 ### Measuring legibility on this page
 

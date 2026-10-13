@@ -252,13 +252,23 @@
     b.P('live', 'htw_return_c', 'HTW return', 'p06_htw_return_c');
     b.P('live', 'tcs_supply_c', 'TCS supply', 'p07_tcs_supply_c');
     b.P('live', 'tcs_return_c', 'TCS return', 'p08_tcs_return_c');
-    b.E('live', 'flow_lpm', 'TCS flow', 'cduFlowPerUnitLpm', 'L/min', { digits: 0 });
-    b.E('live', 'duty_kwth', 'Heat transferred', 'cduDutyPerUnit', 'kWth', { digits: 0 });
-    b.S('live', 'dp_bar', 'Differential pressure', { value: 1.8, text: '1.8 bar design ΔP' }, 0.25, 'bar', { digits: 2 });
-    b.S('live', 'pump_rpm', 'Pump speed', { value: 1450, text: '1450 rpm nominal' }, 40, 'rpm', { digits: 0 });
-    b.S('live', 'pump_amps', 'Pump current', { value: 42, text: '42 A nameplate' }, 3, 'A', { digits: 1 });
-    b.S('live', 'valve_pct', 'Control valve', { value: 70, text: '70 % design opening' }, 10, '%', { digits: 0, min: 0, max: 100 });
     var running = A.cduRunning, isStandby = finite(running) && n > running;
+    /* v3.21.0 — a standby CDU moves no water and carries no heat. It printed the duty unit's 983 kWth and
+       1,483 L/min, so the standby unit read as a third of a megawatt of capacity in use. */
+    var SB = 'standby unit: isolated and idle until a duty CDU trips (equipment.cdu_duty_per_hall)';
+    if (isStandby) {
+      b.D('live', 'flow_lpm', 'TCS flow', '0 L/min', SB, 0);
+      b.D('live', 'duty_kwth', 'Heat transferred', '0 kWth', SB, 0);
+      b.D('live', 'pump_rpm', 'Pump speed', '0 rpm', SB, 0);
+      b.D('live', 'pump_amps', 'Pump current', '0.0 A', SB, 0);
+    } else {
+      b.E('live', 'flow_lpm', 'TCS flow', 'cduFlowPerUnitLpm', 'L/min', { digits: 0 });
+      b.E('live', 'duty_kwth', 'Heat transferred', 'cduDutyPerUnit', 'kWth', { digits: 0 });
+      b.S('live', 'pump_rpm', 'Pump speed', { value: 1450, text: '1450 rpm nominal' }, 40, 'rpm', { digits: 0 });
+      b.S('live', 'pump_amps', 'Pump current', { value: 42, text: '42 A nameplate' }, 3, 'A', { digits: 1 });
+    }
+    b.S('live', 'dp_bar', 'Differential pressure', { value: 1.8, text: '1.8 bar design ΔP' }, 0.25, 'bar', { digits: 2 });
+    b.S('live', 'valve_pct', 'Control valve', { value: 70, text: '70 % design opening' }, 10, '%', { digits: 0, min: 0, max: 100 });
     var p1 = isStandby ? 'stby' : (cs.cduPumpFault === 1 ? 'fault' : 'run'), p2 = isStandby ? 'stby' : 'run', p3 = isStandby ? 'stby' : (cs.cduPumpFault === 1 ? 'run' : 'stby');
     b.ST('live', 'pump_state_1', 'Pump 1', p1, COOL_REASON); b.ST('live', 'pump_state_2', 'Pump 2', p2, COOL_REASON); b.ST('live', 'pump_state_3', 'Pump 3', p3, COOL_REASON);
     b.chip(isStandby ? 'STANDBY' : (p1 === 'fault' ? 'DEGRADED' : 'RUN'), isStandby ? 'standby' : (p1 === 'fault' ? 'fault' : 'normal'));
@@ -394,10 +404,17 @@
     b.title = 'CRAH-' + String(id) + ' — DH-0' + b.hall;
     b.P('live', 'chw_supply_c', 'CHW in', 'p12_chw_supply_c'); b.P('live', 'chw_return_c', 'CHW out', 'p13_chw_return_c');
     b.P('live', 'air_supply_c', 'Supply air', 'p09_air_supply_c'); b.P('live', 'air_return_c', 'Return air', 'p11_air_return_c');
-    b.E('live', 'duty_kwth', 'Unit duty', 'crahPerUnit', 'kWth', { digits: 0 });
-    b.S('live', 'fan_pct', 'Fan speed', { value: 75, text: '75 % design speed' }, 8, '%', { digits: 0, min: 0, max: 100 });
-    b.S('live', 'supply_rh', 'Supply RH', { value: 45, text: '45 % RH setpoint' }, 5, '%', { digits: 0, min: 0, max: 100 });
     var running = A.crahActive, st = finite(running) && n > running ? 'stby' : 'run';
+    /* v3.21.0 — a standby CRAH carries no duty and turns no fan; it printed the duty unit's figures. */
+    if (st === 'stby') {
+      var SBC = 'standby unit: fans stopped and CHW valve shut until a duty CRAH trips (equipment.crah_duty_per_hall)';
+      b.D('live', 'duty_kwth', 'Unit duty', '0 kWth', SBC, 0);
+      b.D('live', 'fan_pct', 'Fan speed', '0 %', SBC, 0);
+    } else {
+      b.E('live', 'duty_kwth', 'Unit duty', 'crahPerUnit', 'kWth', { digits: 0 });
+      b.S('live', 'fan_pct', 'Fan speed', { value: 75, text: '75 % design speed' }, 8, '%', { digits: 0, min: 0, max: 100 });
+    }
+    b.S('live', 'supply_rh', 'Supply RH', { value: 45, text: '45 % RH setpoint' }, 5, '%', { digits: 0, min: 0, max: 100 });
     b.ST('live', 'unit_state', 'Unit', st, COOL_REASON); b.chip(st === 'run' ? 'RUN' : 'STANDBY', st === 'run' ? 'normal' : 'standby');
     b.E('capacity', 'unit_kwth', 'Unit rating', 'crahRating', 'kWth', { digits: 0 });
     b.E('capacity', 'duty_per_hall', 'Duty units per hall', 'crahActive', '', { digits: 0 });

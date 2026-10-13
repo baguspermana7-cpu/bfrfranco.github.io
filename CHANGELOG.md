@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v3.21.0 — 2026-10-13
+
+### The data hall drawn as the room it is: whole hall, one scale, both heat paths, honest modals
+
+Owner, on the phone: *"Jelek sekali dan nggak sesuai aneh cdunya mana, crah utk residual air gimana. Designnya sangat kurang immersive"*, then *"Harus super immersive, intuitive dan keren tampilannya. Modal2 saat click harus tetap ada dan improved accurate"*. Layout chosen by the owner: follow the engine.
+
+**Fixed — the plan drew half the room, in the wrong places.** The engine budgets the 62 × 31 m hall as two 13.2 m banks plus the 4.6 m cross aisle (the full 31 m width) and ten 3.1 m rows (31 m of the 62 m length). The other 818 m² holds the CDU gallery (220 m²), the air plant (450 m²) and the spare (148 m²). The old plan drew only the rack field, put the CRAH units on the walls the rows already touch, and put the CDUs in the egress aisle. Now `#hSvg` draws the whole room at 17 px/m on both axes:
+- the rack field (440 racks, cyan front face and amber rear face, contained hot aisles with doors);
+- the cross aisle, with TCS headers for both banks, the leak rope and the cold supply;
+- the CDU gallery: 55 × CHx1000 at their plan footprint, with an HX and pump symbol, standby dashed, HTW entering from the east wall;
+- the air plant: 90 CRAH with spinning fans on duty units, coils on CHW;
+- the spare floor.
+
+**Fixed — it could not be read at its own size.** Labels of 2.5–6.5 units forced a 2,700 px render, so a 1440 px screen showed a third of the hall and a phone a sliver. Every label is now ≥ 9 units in a 1200 viewBox. The whole hall fits a laptop at 100 %, and a phone pans a 1,240 px drawing.
+
+**Added — both heat paths, end to end, and the controls to read them.**
+- The header states LIQUID kWth → 55 CDU and RESIDUAL AIR kWth → 90 CRAH from the engine, plus each path written out: cold plates → manifold → TCS → CDU HX → HTW → dry coolers, and CRAH → cross aisle → cold aisles → hot aisle → ceiling plenum → CRAH coil.
+- The heat map colours every aisle segment from its own sensor.
+- Layer chips (Thermal, Airflow, Liquid, Leak, Overhead) and "Go to" chips (Rack field, CDU gallery, Air plant) are added; the Go to chips matter most on a phone.
+
+**Fixed — the modals said things the engine does not.**
+- CRAH HMI: duty is the engine per-unit duty (199 kW, was 114 from a simulated CHW flow); CHW flow is derived from it; return air is the engine plane 36 °C (was 31 °C); "raised floor" became the cross aisle (the hall is slab, no raised floor); "residual 15 %" became the computed 26 % of hall IT.
+- CDU HMI: a CoolIT CHx1000 has no fan, so the "Fan Speed" tile is now pump speed. A standby CDU says STANDBY, not "Online" at full flow.
+- Payloads (inspector + HMI): standby CDU and CRAH units carry zero flow, duty and fan or pump speed, with the reason declared.
+- Rack manifold HMI: TCS 35/45 °C literals now read the engine planes (40/50 °C).
+- Hover: CDU, CRAH and HTW tooltips are built from the same payload as the HMI. They printed GB200 planes (TCS 35/45, FWS 12/22, CRAH return 28.5–30 °C). The rack tooltip printed `182.05128205128204 L/min`.
+
+**Gates**
+- `tools/test-datahall-ai-hall-plan.mjs` rewritten to the engine layout: CDUs in the gallery east of the rack field and clear of the cross aisle; one CRAH glyph per installed unit, east of the CDUs; rack glyphs at the engine's depth/width ratio. It now reads geometry from SVG attributes: it never enters the authorized audit state, so the hidden panel measured every box as 0 and the old "CDU in the cross aisle" check was vacuously true. Fails on v3.20.3 with 3 findings, passes now.
+- `test-dcai-coverage.mjs --strict --modals`: hSvg 34/34 numerals hooked; every hall inspector and modal row CLEAN.
+- The aisle sensor readouts are rotated to fit a 1.2 m aisle, so a reading's on-screen height is its width. A bare "—" placeholder measured 7–8 px and failed `test-conv-geometry.mjs` (G5) before the first tick. The placeholder now carries its unit ("— °C").
+
+**Found, not changed here:** the engine runs **8 halls**, while the building drawing shows 4 on two floors and the hall switcher offers DH-1 to DH-4. `design.flows.crah_air_m3s` carries 3.3 % over heat ÷ (ρ·cp·ΔT); the CRAH modal prints the engine plane rather than a third number.
+
 ## v3.20.4 — 2026-10-13
 
 ### Plant map: options you can apply, a live sensitivity tornado; cooler label fits on phones at 100+ units
@@ -27,6 +61,7 @@ The numbers come from the same `LTCReport.options` the exported report prints.
 **Gates** — `tools/test-ltc-workbench.mjs`:
 - **W13** now draws 1,320 diagrams over 132 plants. The new plants are configurations × TCS supply 28/32/45 °C × climates, at 100 and 300 MW: the plants the options and tornado can put on the map.
 - On the v3.20.3 hub, W13 fails with the overflow.
+
 
 ## v3.20.3 — 2026-10-13
 
