@@ -53,6 +53,11 @@ export const TAB_SETS = Object.freeze({
               reveal: { click: '#bldgSvg [data-floor="f2"]', expect: '#floorDetail' } },
             { tab: 'over', selector: '#floorSvg', label: 'floor plan — level 3',
               reveal: { click: '#bldgSvg [data-floor="f3"]', expect: '#floorDetail' } },
+            /* v3.21.3 — eight engine halls stack two a level, so floors 4 and 5 are hall levels too. */
+            { tab: 'over', selector: '#floorSvg', label: 'floor plan — level 4',
+              reveal: { click: '#bldgSvg [data-floor="f4"]', expect: '#floorDetail' } },
+            { tab: 'over', selector: '#floorSvg', label: 'floor plan — level 5',
+              reveal: { click: '#bldgSvg [data-floor="f5"]', expect: '#floorDetail' } },
             { tab: 'over', selector: '#floorSvg', label: 'floor plan — roof',
               reveal: { click: '#bldgSvg [data-floor="roof"]', expect: '#floorDetail' } },
             { tab: 'hall', selector: '#hSvg', label: 'data hall' },
@@ -63,6 +68,11 @@ export const TAB_SETS = Object.freeze({
             { tab: 'elec', sub: 'dh02', selector: '#elecDH2Svg', label: 'DH-02 SLD' },
             { tab: 'elec', sub: 'dh03', selector: '#elecDH3Svg', label: 'DH-03 SLD' },
             { tab: 'elec', sub: 'dh04', selector: '#elecDH4Svg', label: 'DH-04 SLD' },
+            /* v3.21.3 — the engine runs eight halls; each sheet is drawn when its sub-tab opens. */
+            { tab: 'elec', sub: 'dh05', selector: '#elecDH5Svg', label: 'DH-05 SLD' },
+            { tab: 'elec', sub: 'dh06', selector: '#elecDH6Svg', label: 'DH-06 SLD' },
+            { tab: 'elec', sub: 'dh07', selector: '#elecDH7Svg', label: 'DH-07 SLD' },
+            { tab: 'elec', sub: 'dh08', selector: '#elecDH8Svg', label: 'DH-08 SLD' },
             /* v2.13.0 §A7 — the Network tab is three views behind one scoped sub-bar (#netTabs,
                data-np, np-*), the same entry-level override the fire workstation uses. */
             { tab: 'net', sub: 'fabric', selector: '#netSvg', label: 'network compute fabric', subBar: '#netTabs', subAttr: 'data-np', subPanelPrefix: 'np-' },

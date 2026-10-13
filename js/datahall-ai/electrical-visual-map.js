@@ -12,8 +12,8 @@
 
   /* Only used when no engine snapshot is reachable at all; the hall count is a
      published quantity (racks_facility / racks_per_hall), never a house number. */
-  var FALLBACK_HALL_COUNT = 4;
-  var HALL_SCOPE = /^dh0([1-4])$/;
+  var FALLBACK_HALL_COUNT = 8;   /* v3.21.3: the engine count (facility.halls) */
+  var HALL_SCOPE = /^dh0([1-9])$/;
 
   function snapshotOrNull() {
     if (root && root.DCAI_CALC && root.DCAI_CALC.snapshot) { return root.DCAI_CALC.snapshot; }
@@ -44,13 +44,13 @@
 
   function feedFromId(lineId) {
     var id = String(lineId || '').toLowerCase();
-    if (/(?:-a(?:[1-4])?(?:-|$)|-fa(?:-|$))/.test(id)) { return 'A'; }
-    if (/(?:-b(?:[1-4])?(?:-|$)|-fb(?:-|$))/.test(id)) { return 'B'; }
+    if (/(?:-a(?:[1-9])?(?:-|$)|-fa(?:-|$))/.test(id)) { return 'A'; }
+    if (/(?:-b(?:[1-9])?(?:-|$)|-fb(?:-|$))/.test(id)) { return 'B'; }
     return '';
   }
 
   function hallFromId(lineId) {
-    var match = String(lineId || '').match(/^dh([1-4])-/i);
+    var match = String(lineId || '').match(/^dh([1-9])-/i);
     return match ? 'dh0' + match[1] : 'overview';
   }
 
@@ -63,31 +63,31 @@
        of the main transformer binds to an HV edge; everything on its 20 kV side binds to the
        transformer's own outgoing edge. A segment that used to say UTILITY-x-MV-BUS-x was
        claiming a hop that does not exist in a four-level chain. */
-    if (/^(?:elec|dh[1-4])-pln-[ab]-to-meter$/.test(id)) {
+    if (/^(?:elec|dh[1-9])-pln-[ab]-to-meter$/.test(id)) {
       return edgeId(feed, 'UTILITY-{F}-HV-INTAKE-{F}');
     }
-    if (/^(?:elec|dh[1-4])-hv-(?:meter-[ab]-to-cb|cb-[ab]-to-bus)$/.test(id)) {
+    if (/^(?:elec|dh[1-9])-hv-(?:meter-[ab]-to-cb|cb-[ab]-to-bus)$/.test(id)) {
       return edgeId(feed, 'HV-INTAKE-{F}-HV-BUS-{F}');
     }
-    if (/^(?:elec|dh[1-4])-hv-bus-[ab]-to-tx$/.test(id)) {
+    if (/^(?:elec|dh[1-9])-hv-bus-[ab]-to-tx$/.test(id)) {
       return edgeId(feed, 'HV-BUS-{F}-MAIN-TX-{F}');
     }
-    if (/^(?:elec|dh[1-4])-main-tx-[ab]-to-mv$/.test(id)) {
+    if (/^(?:elec|dh[1-9])-main-tx-[ab]-to-mv$/.test(id)) {
       return edgeId(feed, 'MAIN-TX-{F}-MV-BUS-{F}');
     }
     if (/^elec-(?:meter-[ab]-to-vcb-inc-[ab]|vcb-inc-[ab]-to-bus-[ab]|bus-[ab]-drop-vert)$/.test(id)) {
       return edgeId(feed, 'MAIN-TX-{F}-MV-BUS-{F}');
     }
-    if (/^elec-feeder-[ab][1-4]-(?:drop|exit)$/.test(id)) {
+    if (/^elec-feeder-[ab][1-9]-(?:drop|exit)$/.test(id)) {
       return edgeId(feed, 'MV-BUS-{F}-RMU-{F}');
     }
-    if (/^dh[1-4]-(?:meter-[ab]-to-vcb|vcb-inc-[ab]-to-bus)$/.test(id)) {
+    if (/^dh[1-9]-(?:meter-[ab]-to-vcb|vcb-inc-[ab]-to-bus)$/.test(id)) {
       return edgeId(feed, 'MAIN-TX-{F}-MV-BUS-{F}');
     }
-    if (/^dh[1-4]-(?:bus-to-f[ab]|f[ab]-to-rmu-drop|rmu-input-[ab]|rmu-meter-[ab]-to-vcb|rmu-vcb-[ab]-to-bus)$/.test(id)) {
+    if (/^dh[1-9]-(?:bus-to-f[ab]|f[ab]-to-rmu-drop|rmu-input-[ab]|rmu-meter-[ab]-to-vcb|rmu-vcb-[ab]-to-bus)$/.test(id)) {
       return edgeId(feed, 'MV-BUS-{F}-RMU-{F}');
     }
-    if (/^dh[1-4]-rmu-bus-[ab]-drop$/.test(id)) {
+    if (/^dh[1-9]-rmu-bus-[ab]-drop$/.test(id)) {
       return edgeId(feed, 'RMU-{F}-TX-{F}');
     }
     return null;
@@ -202,7 +202,7 @@
     normalizeScope: normalizeScope,
     projectLine: projectLine,
     hallCounts: hallCounts,
-    version: '2.0.0'
+    version: '2.1.0'
   });
 
   if (root) { root.RZDatahallAIElectricalVisualMap = API; }

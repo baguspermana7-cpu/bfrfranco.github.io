@@ -26,7 +26,8 @@ const HALLS = RACKS_FACILITY / RACKS_PER_HALL;
    shared token moves again. This pin is why that matters: the normalizer deliberately leaves
    version-pinned assets alone, so nothing else would have made a returning browser fetch the new
    module, and it would have kept repainting the hidden electrical panel from cache. */
-const ASSET_VERSION = '3.8.0';
+/* v3.9.0 (site v3.21.3) — visual-map accepts halls 1-9 (it matched [1-4]); the shared token moves. */
+const ASSET_VERSION = '3.9.0';
 
 function descriptor(lineId, extra = {}) {
   return { lineId, ...extra };
@@ -37,7 +38,12 @@ const utilityAFail = topology.evaluateScenario('utility_a_fail');
 const buswayATrip = topology.evaluateScenario('busway_a_trip');
 const rackPsuALoss = topology.evaluateScenario('rack_psu_a_loss');
 
-assert.equal(visual.version, '2.0.0');
+assert.equal(visual.version, '2.1.0');
+/* v3.21.3 — the engine runs eight halls. The scope and line-id patterns were [1-4], so DH-05..DH-08
+   fell back to dh01 and their lines were read as hall 1's. */
+for (const h of [5, 6, 7, 8]) {
+  assert.equal(visual.normalizeScope('dh0' + h), 'dh0' + h, `scope dh0${h} is a hall, not a fallback`);
+}
 assert.equal(visual.HALL_COUNT, HALLS, 'the hall count is read from the engine, not typed');
 
 assert.equal(visual.projectLine(descriptor('elec-pln-a-to-meter'), normal, 'overview').active, true);

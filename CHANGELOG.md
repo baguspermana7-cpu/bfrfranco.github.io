@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.21.3 — 2026-10-13
+
+### Eight halls everywhere the page names a hall: switcher, building, floor plans, single-lines
+
+The engine has run **8 halls × 440 racks** since 2026-09-09 (four halls of 880 did not fit their own floor or pass their own air). The page still offered DH-1..DH-4, drew a 4-storey building with two hall floors, and had four per-hall single-lines. The owner asked for the best option, so the page now follows the engine everywhere it names a hall.
+
+**Fixed — one source for where a hall sits.** `window.HALL_LAYOUT` holds the building's stacking rule in one place: two halls per level, North wing then South wing, from Floor 2 up. The rule is ADOPTED and declared on the drawing. It is applied to `facility.halls`, so 8 halls = Floors 2–5. Everything below reads it, and none of it types a hall list or a floor name any more.
+- Hall switcher: DH-1..DH-8, one button per engine hall. The sidebar location comes from the rule. It now says DH-1 is in the North wing, as every floor plan has always drawn it; the sidebar used to say South.
+- Building elevation: one slab per hall level, so 6 levels (ground + 4 hall levels + roof).
+- Floor plans: `renderHallLevel` draws any hall level. It replaces `renderFloor2` and `renderFloor3`, the same drawing typed twice. Floors 4 and 5 had no plan at all. UPS and battery room letters follow the hall (A/B serve DH-1/DH-2, … G/H serve DH-7/DH-8).
+- Electrical: eight per-hall SLD tabs, cloned from the DH-01 template. Each sheet is drawn the first time its tab opens, instead of eight 2,400-unit drawings built up front. The facility overview carries 16 feeder breakers (8 per bus), 8 hall columns in two rows of four, and 8 KPI cards. Clicking a column opens that hall's sheet.
+- The Tech Spec and the BMS tag note print the engine hall count where they said "4 halls".
+
+**Fixed — halls 5–8 were read as hall 1.** `electrical-visual-map.js` matched scopes and line ids on `[1-4]`, so `dh05`..`dh08` fell back to `dh01`. The patterns now accept halls 1–9 (module 2.1.0). `test-datahall-ai-electrical-visual-map.mjs` asserts that dh05..dh08 are halls; the assertion fails on the old patterns.
+
+**Gates:** the cockpit tab set gains floor plans for levels 4–5 and the DH-05..DH-08 single-lines, so geometry, legibility and coverage now walk them.
+
+**Retracted from v3.21.0:** "CRAH airflow 3.3 % above heat / (ρ·cp·ΔT)" was my error. The engine computes `crah_air_m3s` with ρ = 1.16 kg/m³ (air at the ~30 °C return class). My check used the 1.2 kg/m³ standard-air leaf that the fan-wall sizing uses at the supply plane. Both are declared, and the engine is consistent with itself.
+
+**Open, not changed here:** the building footprint is still the retired 72 × 48 m grid, captioned on the drawing. Two 62 × 31 m halls on one level need at least 62 × 62 m before any corridor. The site re-grid (and the ground floor and roof plans that sit on that grid) is its own change.
+
 ## v3.21.2 — 2026-10-13
 
 ### DH01 at every heat-load-test step; one CRAH out as a fault you can pick

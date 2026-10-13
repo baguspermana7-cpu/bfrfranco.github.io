@@ -392,7 +392,7 @@
       var result = electricalApi.evaluateScenario(byId('electricalScenario').value);
       var scope = activeElectricalScope();
       var counts = electricalVisualApi.hallCounts(result.racks, scope);
-      var scopeLabel = scope === 'overview' ? 'Facility overview · 4 hall instances' : scope.toUpperCase().replace('DH0', 'DH-0');
+      var scopeLabel = scope === 'overview' ? 'Facility overview · ' + (electricalVisualApi && electricalVisualApi.HALL_COUNT ? electricalVisualApi.HALL_COUNT : '—') + ' hall instances' : scope.toUpperCase().replace('DH0', 'DH-0');
       var summary = byId('electricalPathSummary');
       clear(summary);
       summary.appendChild(node('div', 'rz-ops-eyebrow', result.health + ' · ' + scopeLabel + ' · ' + result.scenarioLabel));

@@ -434,6 +434,28 @@ compares across the hall.
   margin, CDU caption moved east of its band, CRAH id merged onto one line with its unit count);
   only then could the readouts reach the floor **with the overlap count unchanged**.
 
+## Hall count and building stacking (v3.21.3)
+
+The engine owns HOW MANY halls there are (`facility.halls`, 8 since 2026-09-09). The page owns
+WHERE they sit, in exactly one place: `window.HALL_LAYOUT` in `datahallAI.html`.
+
+- Rule (ADOPTED, declared on the drawing): two halls per level, North wing then South wing, from
+  Floor 2 up. Floor 1 is the MEP ground floor; the roof carries heat rejection. 8 halls = Floors 2-5.
+- Everything that names a hall or a floor reads it: the hall switcher (one button per engine hall),
+  the sidebar location, the building elevation (one slab per hall level), the per-level floor plan
+  (`renderHallLevel`, which replaced the copy-pasted `renderFloor2`/`renderFloor3`), the per-hall SLD
+  tabs, the SLD overview columns and the KPI cards.
+- Never type a hall list (`['DH-01',...,'DH-04']`) or a floor name. A new hall count must change
+  nothing but the engine leaf.
+- Per-hall SLD sheets are cloned from the DH-01 template at load and DRAWN ON FIRST OPEN
+  (`window.drawHallSld`). Eight 2,400-unit sheets built up front is the hidden-panel cost removed
+  in v3.11.7.
+- Line ids and scopes in `electrical-visual-map.js` accept halls 1-9. Before v3.21.3 they matched
+  `[1-4]`, so DH-05..DH-08 fell back to hall 1's scope. `test-datahall-ai-electrical-visual-map.mjs`
+  asserts dh05..dh08 are halls (proven RED on the old patterns).
+- OPEN: the building footprint is still the retired 72 x 48 m grid, captioned as such. Two 62 x 31 m
+  halls on one level need at least 62 x 62 m before any corridor; the site re-grid is its own change.
+
 ## CRITICAL: SVG Layout Anti-Overlap Rules
 
 When building complex SVGs with multiple columns (like the 4-DH electrical SLD):
