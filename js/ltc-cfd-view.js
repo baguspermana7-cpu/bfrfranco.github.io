@@ -16,7 +16,7 @@
  * beyond the trilinear interpolation stated above. */
 (function (root) {
   'use strict';
-  var T_LO = 18, T_HI = 45, SP_MAX = 4, TI_MAX = 0.6, TRAIL_N = 2400, TRAIL_K = 14, TRAIL_DT = 0.07;
+  var T_LO = 18, T_HI = 45, SP_MAX = 4, TI_MAX = 0.6, TRAIL_N = 2400, TRAIL_K = 14, TRAIL_DT = 0.07, SMOKE_N = 1800, PUFF_N = 600, SMOKE_D = 0.01;
 
   /* field sampling, trilinear on the staggered grid the solver uses */
   function stg(A, sx, sy, sz, ox, oy, oz, x, y, z, d) {
@@ -215,7 +215,53 @@
     V.trail.geometry.attributes.position.needsUpdate = true; V.trail.geometry.attributes.color.needsUpdate = true;
   }
 
+  /* smoke: a puff released where the user clicks, carried by the solved velocity (RK2) plus a small
+     random walk (eddy diffusivity SMOKE_D m²/s) for the eddies a coarse grid cannot carry; it grows and
+     fades over its life and takes a tint of the air it is in. Three puffs live at once. */
+  function gauss() { return Math.sqrt(-2 * Math.log(Math.random() + 1e-12)) * Math.cos(6.283185307 * Math.random()); }
+  function smokeInit(V) {
+    var T = root.RZ3, g = new T.BufferGeometry();
+    g.setAttribute('position', new T.BufferAttribute(new Float32Array(SMOKE_N * 3), 3));
+    g.setAttribute('aLife', new T.BufferAttribute(new Float32Array(SMOKE_N), 1));
+    g.setAttribute('color', new T.BufferAttribute(new Float32Array(SMOKE_N * 3), 3));
+    var m = new T.ShaderMaterial({ uniforms: { uScale: { value: 800 } }, transparent: true, depthWrite: false,
+      vertexShader: 'attribute float aLife; attribute vec3 color; varying float vL; varying vec3 vC; uniform float uScale; void main(){ vL = aLife; vC = color; vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = aLife <= 0.0 ? 0.0 : clamp(uScale * (0.2 + 0.8 * (1.0 - aLife)) / -mv.z, 1.5, 96.0); gl_Position = projectionMatrix * mv; }',
+      fragmentShader: 'varying float vL; varying vec3 vC; void main(){ if (vL <= 0.0) discard; vec2 d = gl_PointCoord - 0.5; float r = dot(d, d); if (r > 0.25) discard; float a = (1.0 - r * 4.0) * min(1.0, vL * 3.0) * min(1.0, (1.0 - vL) * 12.0) * 0.42; gl_FragColor = vec4(mix(vec3(0.88, 0.9, 0.93), vC, 0.35), a); }' });
+    V.smoke = new T.Points(g, m); V.smoke.frustumCulled = false; V.smoke.renderOrder = 5; V.dyn.add(V.smoke);
+    V.sp = []; for (var n = 0; n < SMOKE_N; n++) V.sp.push({ x: 0, y: 0, z: 0, age: 0, life: 0 }); V.spNext = 0;
+  }
+  function smoke(V, x, y, z) {                       // x, y, z: solver metres (origin at the hall corner)
+    if (!V.smoke) smokeInit(V);
+    for (var n = 0; n < PUFF_N; n++) {
+      var q = V.sp[V.spNext]; V.spNext = (V.spNext + 1) % SMOKE_N;
+      q.x = x + 0.08 * gauss(); q.y = Math.max(0.05, y + 0.08 * gauss()); q.z = z + 0.08 * gauss(); q.age = -n * 0.004; q.life = 24 + 8 * Math.random();
+    }
+  }
+  function smokeStep(V, dt) {
+    var F = V.cfd; if (!V.smoke || !F) return;
+    // a particle's world size (0.2 m growing to 1 m) in pixels: drawing-buffer height over the view's height at 1 m
+    V.smoke.material.uniforms.uScale.value = V.renderer.domElement.height / (2 * Math.tan(V.cam.fov * Math.PI / 360));
+    var S = V.cfdSolid, P = V.smoke.geometry.attributes.position.array, Lf = V.smoke.geometry.attributes.aLife.array, Cc = V.smoke.geometry.attributes.color.array,
+      X0 = F.nx * F.dx / 2, Z0 = F.nz * F.dx / 2, rw = Math.sqrt(2 * SMOKE_D * Math.max(dt, 0)), H = F.ny * F.dx, any = false;
+    for (var n = 0; n < SMOKE_N; n++) {
+      var q = V.sp[n];
+      if (q.life <= 0 || q.age > q.life) { Lf[n] = 0; continue; }
+      any = true; q.age += dt;
+      if (q.age < 0) { Lf[n] = 0; continue; }               // a puff is released over a moment, not all at once
+      if (dt > 0) {
+        vel(F, q.x, q.y, q.z, tA); vel(F, q.x + 0.5 * dt * tA[0], q.y + 0.5 * dt * tA[1], q.z + 0.5 * dt * tA[2], tB);
+        var x = q.x + dt * tB[0] + rw * gauss(), y = Math.max(0.02, Math.min(H - 0.02, q.y + dt * tB[1] + rw * gauss())), z = q.z + dt * tB[2] + rw * gauss();
+        if (solidAt(F, S, x, y, z)) { q.age = q.life + 1; Lf[n] = 0; continue; }   // drawn into a rack or a coil: gone
+        q.x = x; q.y = y; q.z = z;
+      }
+      P[n * 3] = q.x - X0; P[n * 3 + 1] = q.y; P[n * 3 + 2] = q.z - Z0; Lf[n] = Math.max(1e-3, 1 - q.age / q.life);
+      var c = V.col(cellT(F, q.x, q.y, q.z)); Cc[n * 3] = c.r; Cc[n * 3 + 1] = c.g; Cc[n * 3 + 2] = c.b;
+    }
+    var g = V.smoke.geometry; g.attributes.position.needsUpdate = true; g.attributes.aLife.needsUpdate = true; g.attributes.color.needsUpdate = true;
+    V.smoke.visible = any;
+  }
+
   root.LTCCFDView = { cellT: cellT, cellField: cellField, vel: vel, solidAt: solidAt, centred: centred, vorticity: vorticity, pct: pct, probe: probe, pack: pack,
-    volume: volume, volumeFrame: volumeFrame, trails: trails, trailStep: trailStep, T_LO: T_LO, T_HI: T_HI, SP_MAX: SP_MAX, TI_MAX: TI_MAX, TRAIL_N: TRAIL_N, TRAIL_K: TRAIL_K };
+    volume: volume, volumeFrame: volumeFrame, trails: trails, trailStep: trailStep, smoke: smoke, smokeStep: smokeStep, SMOKE_N: SMOKE_N, SMOKE_D: SMOKE_D, PUFF_N: PUFF_N, T_LO: T_LO, T_HI: T_HI, SP_MAX: SP_MAX, TI_MAX: TI_MAX, TRAIL_N: TRAIL_N, TRAIL_K: TRAIL_K };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCCFDView;
 })(typeof window !== 'undefined' ? window : globalThis);

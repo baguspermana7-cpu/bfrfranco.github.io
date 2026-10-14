@@ -490,7 +490,22 @@ for (const [page, mod] of Object.entries(PAGES)) {
       if (inSolid) bad.push(`trails: ${inSolid} particle positions inside a rack, CDU or slab`);
       if (moved < N * 0.5) bad.push(`trails: only ${moved} of ${N} particles carry a tail`);
     }
-    ok('W12z', !bad.length, 'DH01 CFD view: vorticity of a solid-body rotation = 2Ω, the probe reads cell centres and interpolates between them, volume texels carry temperature and cell kind (solid stops the ray, slab see-through, contained faint), trails never enter a solid and carry tails; the limited energy scheme keeps the air inside its source temperatures' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
+    {
+      // smoke: a puff released in the room drifts with the flow, spreads, and never sits inside a solid
+      const Fr = { nx: C.nx, ny: C.ny, nz: C.nz, dx: C.dx, T: C.T, Tm: C.T, u: C.u, v: C.v, w: C.w }, M = V3.SMOKE_N, arr = (n) => ({ array: new Float32Array(n) });
+      const V = { cfd: Fr, cfdSolid: C.solid, col: () => ({ r: 1, g: 1, b: 1 }), renderer: { domElement: { height: 800 } }, cam: { fov: 42 },
+        smoke: { visible: true, material: { uniforms: { uScale: { value: 0 } } }, geometry: { attributes: { position: arr(M * 3), aLife: arr(M), color: arr(M * 3) } } }, sp: [], spNext: 0 };
+      for (let i = 0; i < M; i++) V.sp.push({ x: 0, y: 0, z: 0, age: 0, life: 0 });
+      let c0 = -1; for (let c = 0; c < C.T.length && c0 < 0; c++) { const i = c % C.nx, j = Math.floor(c / C.nx) % C.ny; if (j === 1 && i > C.nx / 3 && !C.solid[c] && !C.hot[c]) c0 = c; }
+      const x0 = (c0 % C.nx + 0.5) * C.dx, z0 = (Math.floor(c0 / (C.nx * C.ny)) + 0.5) * C.dx, live = () => V.sp.filter((q) => q.life > 0 && q.age >= 0 && q.age <= q.life);
+      V3.smoke(V, x0, 0.9, z0);
+      let inSolid = 0;
+      for (let t = 0; t < 100; t++) { V3.smokeStep(V, 0.05); for (const q of live()) if (V3.solidAt(Fr, C.solid, q.x, q.y, q.z)) inSolid++; }
+      const L = live(), cx = L.reduce((a, q) => a + q.x, 0) / L.length, cz = L.reduce((a, q) => a + q.z, 0) / L.length, sd = Math.sqrt(L.reduce((a, q) => a + (q.x - cx) ** 2 + (q.z - cz) ** 2, 0) / L.length);
+      if (inSolid) bad.push(`smoke: ${inSolid} particle positions inside a solid`);
+      if (!(L.length > V3.PUFF_N * 0.2 && Math.hypot(cx - x0, cz - z0) > 0.3 && sd > 0.1)) bad.push(`smoke: ${L.length} alive, drifted ${Math.hypot(cx - x0, cz - z0).toFixed(2)} m, spread ${sd.toFixed(2)} m`);
+    }
+    ok('W12z', !bad.length, 'DH01 CFD view: vorticity of a solid-body rotation = 2Ω, the probe reads cell centres and interpolates between them, volume texels carry temperature and cell kind (solid stops the ray, slab see-through, contained faint), trails never enter a solid and carry tails, a smoke puff drifts with the flow and spreads without entering a solid; the limited energy scheme keeps the air inside its source temperatures' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
   }
   {
     /* DH01 CFD grid check: the fast 0.6 m solve against the same fault on the 0.3 m grid with the
@@ -503,6 +518,19 @@ for (const [page, mod] of Object.entries(PAGES)) {
     for (let i = 1; i <= 600; i++) { F.step(C, 0.2, 12); if (i > 400) { C.racks.forEach((x, k) => { avg[k] += x.tin; }); n++; } }
     const a = Array.from(avg, (x) => x / n), mx = Math.max(...a), o27 = a.filter((t) => t > 27).length, o32 = a.filter((t) => t > 32).length;
     const good = Math.abs(mx - REF.max) <= 1 && Math.abs(o27 - REF.o27) <= 6 && Math.abs(o32 - REF.o32) <= 4;
+    {
+      /* air-management indices: the formulas on hand-made inlets, then the crah4 solve's own —
+         the inlet profile by height averages back to the rack's inlet, and four CRAHs out reads as
+         recirculation (RTI over 100 %, SHI up, RCI HI below good) */
+      const bad = [], k = 1.2 * 1.006 * 10, mk = (tin, tret) => F.indices({ tsup: 20, tret, racks: tin.map(() => ({ q: k, dem: 1 })) }, tin);
+      const a1 = mk([27, 32], 30), a2 = mk([17, 18], 30), a3 = mk([20, 20], 30), a4 = mk([25, 25], 35);
+      if (Math.abs(a1.rciHi - 50) > 1e-9 || Math.abs(a2.rciLo - 100 * (1 - 1 / 6)) > 1e-9 || Math.abs(a3.rti - 100) > 1e-9 || a3.shi !== 0 || Math.abs(a4.shi - 1 / 3) > 1e-9 || Math.abs(a4.rti - 150) > 1e-9)
+        bad.push(`formulas: RCI HI ${a1.rciHi} (50), RCI LO ${a2.rciLo} (83.3), RTI ${a3.rti} (100) / ${a4.rti} (150), SHI ${a3.shi} (0) / ${a4.shi} (0.333)`);
+      const r = F.report(C), x = r.idx, off = r.profile.map((p, i) => Math.abs(p.reduce((u, v) => u + v, 0) / p.length - r.inletMean[i]));
+      if (!r.averaged || !(Math.max(...off) <= 0.05)) bad.push(`profile: averaged ${r.averaged}, worst rack ${Math.max(...off).toFixed(3)} K from its inlet`);
+      if (!(x.rti > 105 && x.shi > 0.05 && x.rciHi < 96 && x.rciLo === 100)) bad.push(`crah4: RTI ${x.rti.toFixed(0)} %, SHI ${x.shi.toFixed(3)}, RCI HI ${x.rciHi.toFixed(1)} %, RCI LO ${x.rciLo.toFixed(1)} %`);
+      ok('W12a', !bad.length, `DH01 CFD air management: RCI HI/LO, RTI and SHI match their formulas on hand-made inlets; on crah4 the inlet profile by height averages back to each rack's inlet and the solve reads as recirculation (RTI ${x.rti.toFixed(0)} %, SHI ${x.shi.toFixed(2)}, RCI HI ${x.rciHi.toFixed(0)} %)` + (bad.length ? ' — ' + bad.join('; ') : ''));
+    }
     ok('W12g', good, `DH01 CFD grid check: the 0.6 m solve (crah4, inlets averaged over 40 s) agrees with the 0.3 m second-order solve — hottest inlet ${mx.toFixed(2)} °C vs ${REF.max}, racks > 27 °C ${o27} vs ${REF.o27}, > 32 °C ${o32} vs ${REF.o32} (within 1 K, 6 and 4 racks)`);
   }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');

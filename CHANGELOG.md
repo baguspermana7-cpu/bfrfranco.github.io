@@ -11,6 +11,54 @@ release sections rather than semver.
 
 ---
 
+## v3.21.10 — 2026-10-14
+
+### "Air Management": DH01 CFD reads like a data-hall survey, with smoke, inlet profiles and RCI / RTI / SHI
+
+**Why.** After v3.21.8 the owner asked for more: "improve more, super rich and immersive". The CFD showed the field, but not the numbers a data-hall air survey reports, and you could not drop smoke into the room.
+
+**Added (DH01 3D, `js/ltc-dh01-3d.js`, `js/ltc-cfd-view.js`):**
+- **Smoke.** Click anywhere in the hall to release a puff of 600 particles: on the slice, a rack face or the floor (1 m up).
+  - The solved velocity carries the puff (RK2). A small random walk (eddy diffusivity 0.01 m²/s) stands in for the eddies the grid cannot carry; the legend says so.
+  - The puff grows and fades over about 30 s, tinted by the air it is in.
+  - It vanishes when it is drawn into a rack or a coil.
+- **Inlet by height.** Each rack's front door is now three bands, bottom, middle and top third. Each band is coloured by the CFD inlet at that height, so exhaust curling over the rack tops shows as a red top band.
+- **Rack tooltip.** Hovering a rack adds:
+  - the CFD inlet, time-averaged;
+  - the inlet by height;
+  - a note when the top runs more than 3 K hotter than the bottom.
+- **Air-management indices** on the panel, from the CFD rack inlets. Hover each for its formula, the inputs this solve fed it and its rating.
+  - **RCI HI / LO** (Herrlin): the rack cooling index, on ASHRAE A1. Recommended is 18–27 °C and allowable is 15–32 °C. 100 % is ideal, ≥ 96 % good and ≤ 90 % poor.
+  - **RTI**: the return temperature index, return − supply over the racks' airflow-weighted rise. Above 100 % means recirculation; below means bypass.
+  - **SHI / RHI** (Sharma): the share of heat picked up before the inlets.
+  - With four CRAHs out at 0.6 m: RCI HI 75 %, RTI 120 %, SHI 0.17.
+
+**Solver (`js/ltc-cfd.js`):**
+- Each step now lists the moving energy faces once, with the upwind side resolved, and the sub-steps loop over that list. The result is bit-identical to v3.21.8 (max |ΔT| 0, max |Δu| 0 at 0.6 m and 0.3 m) and slightly faster.
+- `report()` adds `inletMean`, the time-averaged rack inlets, plus `profile` (each rack's inlet by height), `idx` (the indices) and `nsub`.
+
+**Tried and rejected: warm-starting the 0.3 m grid from a settled 0.6 m field.** With four CRAHs out, 300 fine steps, rack inlets averaged over the last 200, compared with the 900-step 0.3 m reference:
+
+| Start | Hottest inlet | Racks > 27 °C | RMS vs reference |
+|---|---|---|---|
+| Cold | 34.4 °C | 64 | 0.35 K |
+| Seeded from 0.6 m | 33.4 °C | 73 | 0.70 K |
+
+The seed carries the coarse grid's bias, and the fine grid takes longer to forget it than to settle from rest, so the code was removed. A cold 0.3 m start matches the reference within 0.35 K after about 60 s of simulated time.
+
+**Gates** (`tools/test-ltc-workbench.mjs`, 326 assertions):
+- **W12a**, new:
+  - RCI HI / LO, RTI and SHI equal their formulas on hand-made inlets;
+  - on crah4, each rack's inlet profile averages back to its inlet within 0.05 K;
+  - the solve reads as recirculation: RTI > 105 %, SHI > 0.05 and RCI HI < 96 %.
+- **W12z** now also checks that a smoke puff drifts with the flow, spreads, and never sits inside a solid.
+- Each new check was proven red on mutated code:
+  - the RCI denominator changed;
+  - the RTI rise offset;
+  - the top inlet row dropped from the profile;
+  - the smoke's solid check removed;
+  - the smoke's advection removed.
+
 ## v3.21.9 — 2026-10-14
 
 ### "Campus": the plant the engine sizes, on a site that can hold it

@@ -341,6 +341,37 @@
     });
     return out;
   }
+  /* per step: the faces that move, in face-list order, with their upwind cell, the cell beyond it
+     and how their face temperature is formed (0 inflow source, 1 first-order upwind, 2 limited) */
+  function energyPlan(C, first) {
+    var tot = 0; C.ef.forEach(function (E) { tot += E.f.length; });
+    var P = C.ep || (C.ep = { vel: new Float64Array(tot), cl: new Int32Array(tot), cr: new Int32Array(tot), up: new Int32Array(tot), far: new Int32Array(tot), kind: new Uint8Array(tot), si: new Int32Array(tot), n: 0 });
+    var n = 0;
+    for (var a = 0; a < 3; a++) {
+      var E = C.ef[a], U = C[E.V], FF = E.f, CL = E.cl, CR = E.cr, CLL = E.cll, CRR = E.crr, SR = E.src, roof = E.roof, nf = FF.length;
+      for (var e = 0; e < nf; e++) {
+        var vel = U[FF[e]]; if (vel === 0) continue;
+        var cl = CL[e], cr = CR[e], up = vel > 0 ? cl : cr, dn = vel > 0 ? cr : cl, far = vel > 0 ? CLL[e] : CRR[e], kd;
+        if (up < 0) { if (SR[e] < 0 || roof) continue; kd = 0; }
+        else kd = first || dn < 0 || far < 0 ? 1 : 2;
+        P.vel[n] = vel; P.cl[n] = cl; P.cr[n] = cr; P.up[n] = up; P.far[n] = far; P.kind[n] = kd; P.si[n] = SR[e]; n++;
+      }
+    }
+    P.n = n; return P;
+  }
+  /* one sub-step's face fluxes; kept small so the engine optimises the hot loop */
+  function energyFluxes(P, T, Tn, SRC, h) {
+    var n = P.n, VEL = P.vel, CL = P.cl, CR = P.cr, UP = P.up, FAR = P.far, KIND = P.kind, SI = P.si;
+    for (var e = 0; e < n; e++) {
+      var vel = VEL[e], cl = CL[e], cr = CR[e], kd = KIND[e], tf = 0;
+      if (kd === 0) tf = SRC[SI[e]];
+      else if (kd === 1) tf = T[UP[e]];
+      else { var up = UP[e], tu = T[up], d = T[up === cl ? cr : cl] - tu; if (d === 0) tf = tu; else { var r = (tu - T[FAR[e]]) / d, ar = r < 0 ? -r : r; tf = tu + 0.5 * (r + ar) / (1 + ar) * d; } }
+      var F = vel * tf * h;
+      if (cl >= 0) Tn[cl] -= F;
+      if (cr >= 0) Tn[cr] += F;
+    }
+  }
   function energy(C, dt) {
     var nx = C.nx, ny = C.ny, nz = C.nz, dx = C.dx, T = C.T, Tn = C.Tn, omax = 0, i, j, k, sxy = nx * ny;
     // a limited upwind scheme stays bounded while each cell's outflow in one sub-step is under half its volume
@@ -351,26 +382,12 @@
     }
     if (!C.ef) C.ef = energyFaces(C);
     var first = !!C.firstOrder, nsub = Math.max(1, Math.ceil(dt * omax / ((first ? 0.9 : 0.45) * dx))), h = dt / nsub / dx, S = C.solid, SRC = C.src, DV = C.div;
+    // the velocity is fixed across the sub-steps: list the moving faces once, upwind side resolved
+    C.nsub = nsub;
+    var P = energyPlan(C, first);
     for (var sub = 0; sub < nsub; sub++) {
       Tn.set(T);
-      for (var a = 0; a < 3; a++) {
-        var E = C.ef[a], U = C[E.V], FF = E.f, CL = E.cl, CR = E.cr, CLL = E.cll, CRR = E.crr, SR = E.src, roof = E.roof, nf = FF.length;
-        for (var e = 0; e < nf; e++) {
-          var vel = U[FF[e]]; if (vel === 0) continue;
-          var cl = CL[e], cr = CR[e], tf;
-          if (vel > 0) {
-            if (cl < 0) { if (SR[e] < 0 || roof) continue; tf = SRC[SR[e]]; }
-            else if (first || cr < 0 || CLL[e] < 0) tf = T[cl];
-            else { var tu = T[cl], d = T[cr] - tu; if (d === 0) tf = tu; else { var r = (tu - T[CLL[e]]) / d, ar = r < 0 ? -r : r; tf = tu + 0.5 * (r + ar) / (1 + ar) * d; } }
-          } else {
-            if (cr < 0) { if (SR[e] < 0 || roof) continue; tf = SRC[SR[e]]; }
-            else if (first || cl < 0 || CRR[e] < 0) tf = T[cr];
-            else { tu = T[cr]; d = T[cl] - tu; if (d === 0) tf = tu; else { r = (tu - T[CRR[e]]) / d; ar = r < 0 ? -r : r; tf = tu + 0.5 * (r + ar) / (1 + ar) * d; } }
-          }
-          var F = vel * tf * h;
-          if (cl >= 0) Tn[cl] -= F; if (cr >= 0) Tn[cr] += F;
-        }
-      }
+      energyFluxes(P, T, Tn, SRC, h);
       // the divergence left by the projection would create or destroy heat: remove it (T·div term)
       for (var c = 0; c < Tn.length; c++) if (!S[c]) Tn[c] += T[c] * DV[c] * h;
       T.set(Tn);
@@ -414,6 +431,7 @@
         wc = 0.5 * (C.w[i + nx * (j + ny * k)] + C.w[i + nx * (j + ny * (k + 1))]), sp = Math.sqrt(uc * uc + vc * vc + wc * wc);
       M.T[c] += (C.T[c] - M.T[c]) * a; M.s[c] += (sp - M.s[c]) * a; M.s2[c] += (sp * sp - M.s2[c]) * a;
     }
+    C.racks.forEach(function (R) { R.tm = M.n ? R.tm + (R.tin - R.tm) * a : R.tin; });
     M.n++;
   }
 
@@ -424,8 +442,31 @@
     var bnd = 0;                                            // heat leaving minus entering through the fan walls, per face
     C.crah.forEach(function (U) { if (U.dead) return; U.ret.forEach(function (f) { bnd += RHO * CP * Math.abs(C[f[0]][f[1]]) * C.dx * C.dx * C.T[f[2]]; }); });
     var supQ = 0; C.crah.forEach(function (U) { if (!U.dead) supQ += RHO * CP * U.q * C.tsup; });
+    var avg = C.mean && C.mean.n > 20, Tf = avg ? C.mean.T : C.T, inm = C.racks.map(function (R) { return avg ? R.tm : R.tin; });
+    // each rack's inlet by height: the drawing face averaged across its width, bottom row first
+    var prof = C.racks.map(function (R) {
+      var ni = R.i1 - R.i0, nj = R.faces.length / ni, out = [];
+      for (var jj = 0; jj < nj; jj++) { var t = 0; for (var ii = 0; ii < ni; ii++) t += Tf[R.faces[jj * ni + ii][1]]; out.push(t / ni); }
+      return out;
+    });
     return { t: C.t, steps: C.steps, inlet: inl, maxInlet: Math.max.apply(null, inl), over27: inl.filter(function (t) { return t > 27; }).length, over32: inl.filter(function (t) { return t > 32; }).length,
-             supply: C.tsup, ret: C.tret, qRacksKw: C.qRacks, qCrahKw: bnd - supQ, residual: C.res };
+             supply: C.tsup, ret: C.tret, qRacksKw: C.qRacks, qCrahKw: bnd - supQ, residual: C.res,
+             inletMean: inm, averaged: avg, profile: prof, profDy: C.dx, nsub: C.nsub || 0, idx: indices(C, inm) };
+  }
+
+  /* air-management indices on the rack inlets (ASHRAE A1: recommended 18–27 °C, allowable 15–32 °C):
+     RCI (Herrlin) = 100 % when no inlet leaves the recommended band; RTI = return − supply rise ÷ the
+     racks' airflow-weighted rise (> 100 % recirculation, < 100 % bypass); SHI (Sharma) = heat picked up
+     before the inlets ÷ heat picked up by the time air leaves the racks; RHI = 1 − SHI */
+  function indices(C, inl) {
+    var n = inl.length, hi = 0, lo = 0, q = 0, dem = 0, sIn = 0, sOut = 0, ts = C.tsup;
+    C.racks.forEach(function (R, k) {
+      var t = inl[k], rise = R.q / (RHO * CP * Math.max(R.dem, 1e-9));
+      if (t > 27) hi += t - 27; if (t < 18) lo += 18 - t;
+      q += R.q; dem += R.dem; sIn += t - ts; sOut += t + rise - ts;
+    });
+    var dTeq = q / (RHO * CP * Math.max(dem, 1e-9)), shi = sOut > 0 ? sIn / sOut : 0;
+    return { rciHi: 100 * (1 - hi / (n * 5)), rciLo: 100 * (1 - lo / (n * 3)), rti: dTeq > 0 ? 100 * (C.tret - ts) / dTeq : 0, dTeq: dTeq, shi: shi, rhi: 1 - shi };
   }
 
   function run(r, s, opt) {
@@ -434,7 +475,7 @@
     return C;
   }
 
-  var api = { setup: setup, step: step, run: run, report: report, vel: vel, RACK_H: RACK_H, PLEN_D: PLEN_D };
+  var api = { setup: setup, step: step, indices: indices, run: run, report: report, vel: vel, RACK_H: RACK_H, PLEN_D: PLEN_D };
   root.LTCCFD = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 

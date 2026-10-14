@@ -15,7 +15,7 @@
  * A thermal approximation for training — not CFD. */
 (function (root) {
   'use strict';
-  var RACK_H = 2.0, PLEN_D = 0.9, PIPE_V = 1.5, MIN_V = 0.15, COIL_V = 2.5;
+  var RACK_H = 2.0, DOOR_BANDS = 3, PLEN_D = 0.9, PIPE_V = 1.5, MIN_V = 0.15, COIL_V = 2.5;
 
   function lerp(a, b, u) { return a + (b - a) * u; }
   /* the marching the solver does, kept per wall: which share of each rack's supply came from which end */
@@ -145,7 +145,7 @@
       '<div class="ltc-seg" role="group" aria-label="Camera"><button type="button" data-cam="iso">Orbit</button><button type="button" data-cam="top">Top</button><button type="button" data-cam="cold">Cold aisle</button><button type="button" data-cam="hot">Hot aisle</button><button type="button" data-cam="plenum">Plenum</button><button type="button" data-tour aria-pressed="false">Auto-orbit</button></div>' +
       '<div class="ltc-seg" role="group" aria-label="Particle speed"><button type="button" data-sp="0.25">¼×</button><button type="button" data-sp="1" aria-pressed="true">Real time</button><button type="button" data-sp="3">3×</button></div></div>' +
       '<div class="ltc-3d-stage"><canvas class="ltc-3d-cv" tabindex="0" aria-label="DH01 in 3D: drag to orbit, scroll or pinch to zoom, hover a rack or unit for its numbers"></canvas><div class="ltc-3d-lbl"></div><div class="ltc-3d-hud" aria-live="polite"></div><div class="ltc-3d-probe" hidden></div><div class="ltc-3d-scale"></div>' +
-      '<p class="ltc-3d-hint">Drag to orbit · right-drag or two fingers to pan · scroll / pinch to zoom · hover a slice to probe the field</p></div>' +
+      '<p class="ltc-3d-hint">Drag to orbit · right-drag or two fingers to pan · scroll / pinch to zoom · hover a slice to probe the field · click to release smoke</p></div>' +
       '<p class="ltc-3d-sum"></p><p class="ltc-note ltc-3d-key"></p>';
     var cv = host.querySelector('canvas'), stage = host.querySelector('.ltc-3d-stage'), lblHost = host.querySelector('.ltc-3d-lbl');
     var renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: 'high-performance' });
@@ -185,6 +185,10 @@
       var tr = e.target.closest('[data-tour]'); if (tr) { ctl.autoRotate = !ctl.autoRotate; ctl.autoRotateSpeed = 0.7; tr.setAttribute('aria-pressed', String(ctl.autoRotate)); }
       var sp = e.target.closest('[data-sp]'); if (sp) { V.speed = +sp.getAttribute('data-sp'); [].forEach.call(host.querySelectorAll('[data-sp]'), function (b) { b.setAttribute('aria-pressed', String(b === sp)); }); }
     });
+    function ixShow(e) { var b = e.target.closest && e.target.closest('[data-ix]'), tp = b && ixTip(b.getAttribute('data-ix')); if (!tp || !root.LTCTrace) return; var rc = b.getBoundingClientRect(); root.LTCTrace.show(tp, e.clientX || rc.right, e.clientY || rc.bottom); }
+    function ixHide(e) { if (e.target.closest && e.target.closest('[data-ix]') && root.LTCTrace) root.LTCTrace.hide(); }
+    host.addEventListener('pointerover', ixShow); host.addEventListener('focusin', ixShow);
+    host.addEventListener('pointerout', ixHide); host.addEventListener('focusout', ixHide);
     function press(sel, on) { [].forEach.call(host.querySelectorAll(sel), function (b) { b.setAttribute('aria-pressed', String(b === on)); }); }
     host.querySelector('[data-at]').addEventListener('input', function (e) { V.sliceAt = +e.target.value; e.target.nextElementSibling.textContent = (+e.target.value).toFixed(2) + ' m'; cfdSlice(); });
     // hover: racks and units carry the same tooltip as the plan
@@ -201,6 +205,20 @@
     }
     cv.addEventListener('pointermove', function (e) { if (e.buttons === 0) pick(e); });
     cv.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') pick(e); });
+    // a click (not a drag) releases a puff of smoke where it lands: on the slice, a rack face or the floor
+    var down = null;
+    cv.addEventListener('pointerdown', function (e) { down = { x: e.clientX, y: e.clientY, t: e.timeStamp }; });
+    cv.addEventListener('pointerup', function (e) {
+      if (!down || !V.cfd || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 5 || e.timeStamp - down.t > 400) return;
+      var b = cv.getBoundingClientRect(); ndc.set((e.clientX - b.left) / b.width * 2 - 1, -(e.clientY - b.top) / b.height * 2 + 1); ray.setFromCamera(ndc, cam);
+      var cand = ray.intersectObjects((V.pickables || []).concat(V.cslice && V.cslice.visible ? [V.cslice] : []), false)[0], p;
+      if (cand) p = cand.point.clone().addScaledVector(ray.ray.direction, -0.15);
+      else if (ray.ray.direction.y < -1e-3) p = ray.ray.origin.clone().addScaledVector(ray.ray.direction, -ray.ray.origin.y / ray.ray.direction.y).setY(1.0);   // the floor, 1 m up
+      if (!p) return;
+      var F = V.cfd, x = p.x + F.nx * F.dx / 2, z = p.z + F.nz * F.dx / 2;
+      if (x < 0 || z < 0 || x > F.nx * F.dx || z > F.nz * F.dx) return;
+      root.LTCCFDView.smoke(V, x, Math.max(0.15, p.y), z);
+    });
     cv.addEventListener('pointerleave', function () { if (V.hooks.hide) V.hooks.hide(); probeOff(); });
     /* probe: the field where the pointer meets the slice */
     function probeOff() { var pe = host.querySelector('.ltc-3d-probe'); if (pe) pe.hidden = true; if (V.pmark) V.pmark.visible = false; }
@@ -257,18 +275,20 @@
     var ceil = box(L, 0.03, W, new T.MeshStandardMaterial({ color: 0x8091a3, transparent: true, opacity: 0.07, side: T.DoubleSide, depthWrite: false }), L / 2, plenY, W / 2);
     // racks: dark bodies; front and rear doors carry the inlet and exhaust colour
     var n = h.racks.length, body = new T.InstancedMesh(new T.BoxGeometry(pitch * 0.96, RACK_H, dep * 0.96), new T.MeshStandardMaterial({ color: 0x20262e, roughness: 0.55, metalness: 0.4 }), n);
-    var doorG = new T.BoxGeometry(pitch * 0.9, RACK_H * 0.94, 0.02), front = new T.InstancedMesh(doorG, new T.MeshStandardMaterial({ roughness: 0.4, metalness: 0.1, emissive: 0x000000 }), n),
-      rear = new T.InstancedMesh(doorG, new T.MeshStandardMaterial({ roughness: 0.4, metalness: 0.1 }), n);
+    // the front door in three bands (bottom, middle, top third), so the CFD's inlet by height shows
+    var doorG = new T.BoxGeometry(pitch * 0.9, RACK_H * 0.94, 0.02), bandG = new T.BoxGeometry(pitch * 0.9, RACK_H * 0.94 / DOOR_BANDS - 0.004, 0.02),
+      fronts = [], rear = new T.InstancedMesh(doorG, new T.MeshStandardMaterial({ roughness: 0.4, metalness: 0.1 }), n);
+    for (var b = 0; b < DOOR_BANDS; b++) fronts.push(new T.InstancedMesh(bandG, new T.MeshStandardMaterial({ roughness: 0.4, metalness: 0.1, emissive: 0x000000 }), n));
     var m4 = new T.Matrix4();
     h.racks.forEach(function (k, i) {
       var ai = h.aisles[k.aisle], inZ = ai.y1 <= k.y + 1e-9 ? k.y : k.y + dep, outZ = ai.y1 <= k.y + 1e-9 ? k.y + dep : k.y, xc = k.x + pitch / 2;
       m4.makeTranslation(xc - X0, RACK_H / 2, k.y + dep / 2 - Z0); body.setMatrixAt(i, m4);
-      m4.makeTranslation(xc - X0, RACK_H / 2, inZ - Z0 + (inZ < outZ ? -0.012 : 0.012)); front.setMatrixAt(i, m4);
+      fronts.forEach(function (f, b) { m4.makeTranslation(xc - X0, RACK_H * 0.03 + RACK_H * 0.94 * (b + 0.5) / DOOR_BANDS, inZ - Z0 + (inZ < outZ ? -0.012 : 0.012)); f.setMatrixAt(i, m4); f.setColorAt(i, new T.Color(0x334455)); });
       m4.makeTranslation(xc - X0, RACK_H / 2, outZ - Z0 + (outZ < inZ ? -0.012 : 0.012)); rear.setMatrixAt(i, m4);
-      front.setColorAt(i, new T.Color(0x334455)); rear.setColorAt(i, new T.Color(0x334455));
+      rear.setColorAt(i, new T.Color(0x334455));
     });
-    body.castShadow = true; body.receiveShadow = true; front.userData.rack = true; rear.userData.rack = true;
-    V.hall.add(body); V.hall.add(front); V.hall.add(rear); V.front = front; V.rear = rear;
+    body.castShadow = true; body.receiveShadow = true; rear.userData.rack = true;
+    V.hall.add(body); fronts.forEach(function (f) { f.userData.rack = true; V.hall.add(f); }); V.hall.add(rear); V.fronts = fronts; V.rear = rear;
     // hot-aisle chimneys: glass from the rack tops to the ceiling, doors at both ends
     var glass = new T.MeshStandardMaterial({ color: 0xff9a4a, transparent: true, opacity: 0.07, side: T.DoubleSide, depthWrite: false, roughness: 0.1 });
     var x0 = h.racks.reduce(function (m, k) { return Math.min(m, k.x); }, 1e9), x1 = h.racks.reduce(function (m, k) { return Math.max(m, k.x + pitch); }, 0);
@@ -282,7 +302,7 @@
       V.shell.push(box(0.02, plenY, hot, glass, x1, plenY / 2, hz + hot / 2));
     });
     // CRAH fan walls: units with fans that turn at the solved speed
-    V.crahs = []; V.pickables = [front, rear];
+    V.crahs = []; V.pickables = fronts.concat([rear]);
     var perWall = Math.ceil(h.crahs.length / 2);
     h.crahs.forEach(function (c) {
       var wN = c.wall === 'west' ? perWall : h.crahs.length - perWall, uw = W / wN * 0.86, g = new T.Group();
@@ -335,9 +355,9 @@
     var h = r.hall, p = r.input, X0 = h.lengthM / 2, Z0 = h.widthM / 2, col = V.col;
     if (!V.cfd) s.racks.forEach(function (k, i) {      // with the CFD on, its frames colour the doors
       var thr = k.liq != null && k.liq < 1 && st.phase !== 'running';
-      V.front.setColorAt(i, thr ? new T.Color(0x3a3f46) : col(k.inlet)); V.rear.setColorAt(i, thr ? new T.Color(0x3a3f46) : col(k.exhaust));
+      var ci = thr ? new T.Color(0x3a3f46) : col(k.inlet); V.fronts.forEach(function (f) { f.setColorAt(i, ci); }); V.rear.setColorAt(i, thr ? new T.Color(0x3a3f46) : col(k.exhaust));
     });
-    V.front.instanceColor.needsUpdate = true; V.rear.instanceColor.needsUpdate = true;
+    doorsDirty();
     V.crahs.forEach(function (u) { var dead = !!(s.crahOut || {})[u.c.i]; u.dead = dead; u.cab.material.color.set(dead ? 0x6b1d22 : 0x2c3946); u.cab.userData.unit.dead = dead; });
     V.cdus.forEach(function (u) { var dead = !!(s.lostCdu || {})[u.c.i]; u.m.material.color.set(dead ? 0x6b1d22 : 0x1d3a44); u.m.userData.unit.dead = dead; });
     V.fan = s.fanSpeed;
@@ -350,7 +370,7 @@
     var key = V.host.querySelector('.ltc-3d-key');
     var air = M.streams.filter(function (x) { return x.kind === 'air'; }).reduce(function (a, x) { return a + x.flow; }, 0), rec = M.streams.filter(function (x) { return x.kind === 'recirc'; }).reduce(function (a, x) { return a + x.flow; }, 0);
     var tcs = M.streams.filter(function (x) { return x.kind === 'tcs'; }).reduce(function (a, x) { return a + x.flow; }, 0);
-    key.innerHTML = '<b>CFD</b> (default): an incompressible, buoyant airflow solve of DH01 (js/ltc-cfd.js, in a background worker) on this plant’s racks, fans and containment. <b>Volume</b>: the solved field ray-marched on the GPU, one texel per cell, trilinear between them — <i>heat</i> glows where room air is above 27 °C (the contained hot aisles and plenum kept faint, so escaped hot air stands out; fast supply air shows as a cool haze), <i>isotherms</i> are the 27 and 32 °C surfaces of the room air, <i>speed</i> |u|, <i>turbulence</i> intensity (velocity fluctuation ÷ mean, after the first air change) and <i>vortices</i> |∇×u| (shear layers and eddies the grid resolves). <b>Flow trails</b>: ' + root.LTCCFDView.TRAIL_N.toLocaleString('en-US') + ' particles carried by the solved velocity, born at the fan walls, the rack exhausts and anywhere in the room, each with a one-second tail coloured by the air it passed through. <b>Slice</b>: temperature, speed, turbulence or vorticity on a plane; hover it to probe the field. Rack doors show the CFD inlet and exhaust; the panel compares the CFD with the balance solve. No turbulence model and a coarse grid: for training and comparison, not a design CFD. <b>Balance paths</b>: the streams of the balance solve, supply air to the racks ' + air.toFixed(1) + ' m³/s, exhaust pulled back ' + rec.toFixed(1) + ' m³/s, TCS ' + tcs.toFixed(0) + ' L/s, one particle per fixed volume: the stream density is the flow. Colour = temperature on the plan’s scale. Drawn, not modelled: 2.0 m racks, a 0.9 m ceiling plenum, hot aisles chimneyed to it, pipe routes and 1.5 m/s pipe velocity at design flow.';
+    key.innerHTML = '<b>CFD</b> (default): an incompressible, buoyant airflow solve of DH01 (js/ltc-cfd.js, in a background worker) on this plant’s racks, fans and containment. <b>Volume</b>: the solved field ray-marched on the GPU, one texel per cell, trilinear between them — <i>heat</i> glows where room air is above 27 °C (the contained hot aisles and plenum kept faint, so escaped hot air stands out; fast supply air shows as a cool haze), <i>isotherms</i> are the 27 and 32 °C surfaces of the room air, <i>speed</i> |u|, <i>turbulence</i> intensity (velocity fluctuation ÷ mean, after the first air change) and <i>vortices</i> |∇×u| (shear layers and eddies the grid resolves). <b>Flow trails</b>: ' + root.LTCCFDView.TRAIL_N.toLocaleString('en-US') + ' particles carried by the solved velocity, born at the fan walls, the rack exhausts and anywhere in the room, each with a one-second tail coloured by the air it passed through. <b>Slice</b>: temperature, speed, turbulence or vorticity on a plane; hover it to probe the field. <b>Smoke</b>: click anywhere to release a puff of ' + root.LTCCFDView.PUFF_N + ' particles carried by the solved velocity, plus a small random walk (' + root.LTCCFDView.SMOKE_D + ' m²/s) standing in for the eddies the grid cannot carry; it vanishes into racks and coils. Rack front doors are banded, bottom, middle and top third, each coloured by the CFD inlet at that height; the rear door shows the exhaust. <b>Air management</b>: RCI (Herrlin), RTI and SHI (Sharma) from the CFD rack inlets — hover each for its formula and inputs. The panel compares the CFD with the balance solve. No turbulence model and a coarse grid: for training and comparison, not a design CFD. <b>Balance paths</b>: the streams of the balance solve, supply air to the racks ' + air.toFixed(1) + ' m³/s, exhaust pulled back ' + rec.toFixed(1) + ' m³/s, TCS ' + tcs.toFixed(0) + ' L/s, one particle per fixed volume: the stream density is the flow. Colour = temperature on the plan’s scale. Drawn, not modelled: 2.0 m racks, a 0.9 m ceiling plenum, hot aisles chimneyed to it, pipe routes and 1.5 m/s pipe velocity at design flow.';
     applyLayers();
   }
 
@@ -468,6 +488,32 @@
     if (e) e.innerHTML = html.split('<br>').map(function (l, i) { return '<span' + (i ? ' class="x"' : '') + '>' + l + '</span>'; }).join('');
     if (m) m.innerHTML = html.split('<br>').slice(1).join('<br>');
   }
+  function ixb(k, v) { return '<b data-ix="' + k + '" tabindex="0">' + v + '</b>'; }
+  /* the air-management indices, traced: formula, the inputs this solve fed it, and the rating */
+  function ixTip(k) {
+    var F = view && view.cfd; if (!F || !F.rep.idx) return null;
+    var r = F.rep, x = r.idx, t = r.inletMean, n = t.length, over = 0, nOver = 0, under = 0, nUnder = 0, f1 = function (v) { return v.toFixed(1); };
+    t.forEach(function (v) { if (v > 27) { over += v - 27; nOver++; } if (v < 18) { under += 18 - v; nUnder++; } });
+    function rate(v) { return v >= 100 ? 'ideal' : v >= 96 ? 'good' : v >= 91 ? 'acceptable' : 'poor'; }
+    var src = 'Rack inlets from the CFD (' + F.dx + ' m grid, ' + (r.averaged ? 'time-averaged' : 'instantaneous') + ').';
+    if (k === 'rciHi') return { title: 'RCI HI · rack cooling index, hot side', formula: '(1 − Σ(T_in − 27) ÷ (n · (32 − 27))) × 100 %', rows: [['Σ over 27 °C', f1(over) + ' K across ' + nOver + ' racks'], ['n', n + ' racks'], ['RCI HI', f1(x.rciHi) + ' % · ' + rate(x.rciHi)]], note: 'Herrlin, on the ASHRAE A1 band: recommended max 27 °C, allowable max 32 °C. 100 % ideal, ≥ 96 % good, 91–95 % acceptable, ≤ 90 % poor. ' + src };
+    if (k === 'rciLo') return { title: 'RCI LO · rack cooling index, cold side', formula: '(1 − Σ(18 − T_in) ÷ (n · (18 − 15))) × 100 %', rows: [['Σ under 18 °C', f1(under) + ' K across ' + nUnder + ' racks'], ['n', n + ' racks'], ['RCI LO', f1(x.rciLo) + ' % · ' + rate(x.rciLo)]], note: 'Over-cooling: inlets below the recommended 18 °C (allowable min 15 °C) waste chiller energy. ' + src };
+    if (k === 'rti') return { title: 'RTI · return temperature index', formula: '(T_return − T_supply) ÷ ΔT_racks × 100 %', rows: [['T_return', f1(r.ret) + ' °C at the CRAH coils'], ['T_supply', f1(r.supply) + ' °C'], ['ΔT_racks', f1(x.dTeq) + ' K = Σ rack heat to air ÷ (ρ · cp · Σ rack airflow)'], ['RTI', x.rti.toFixed(0) + ' %']], note: '100 %: the CRAHs move exactly the racks\' air. Above 100 %: rack exhaust recirculates to inlets and the CRAHs see it twice. Below 100 %: supply air bypasses the racks straight back to the coils.' };
+    if (k === 'shi') return { title: 'SHI · supply heat index', formula: 'Σ(T_in − T_supply) ÷ Σ(T_out − T_supply)', rows: [['RHI', (x.rhi).toFixed(2) + ' = 1 − SHI'], ['SHI', x.shi.toFixed(3)]], note: 'Sharma: the share of the heat air carries that it picked up before reaching a rack. 0 = every rack breathes pure supply air; commonly aimed below 0.2. T_out = inlet + rack heat ÷ (ρ · cp · airflow). ' + src };
+    return null;
+  }
+  function doorsDirty() { view.fronts.forEach(function (f) { f.instanceColor.needsUpdate = true; }); view.rear.instanceColor.needsUpdate = true; }
+  /* a rack's CFD inlet at a height: linear between the drawing face's cell centres */
+  function profAt(p, dy, y) {
+    var f = y / dy - 0.5, j = Math.max(0, Math.min(p.length - 1, Math.floor(f))), a = Math.max(0, Math.min(1, f - j));
+    return j + 1 < p.length ? p[j] * (1 - a) + p[j + 1] * a : p[j];
+  }
+  /* what the CFD says about one rack, for the shared rack tooltip */
+  function rackCfd(i) {
+    var F = view && view.cfd; if (!F || !F.rep.profile || !F.rep.profile[i]) return null;
+    var p = F.rep.profile[i];
+    return { inlet: F.rep.inletMean[i], averaged: F.rep.averaged, dx: F.dx, bands: [0, 1, 2].map(function (b) { return profAt(p, F.rep.profDy, RACK_H * (b + 0.5) / 3); }), spread: Math.max.apply(null, p) - Math.min.apply(null, p) };
+  }
   function cfdFrame(F) {
     var V = view, CV = root.LTCCFDView, first = !V.cfd || V.cfd.nx !== F.nx;
     if (F.solid) {
@@ -476,16 +522,22 @@
     }
     V.cfd = F; V.vort = CV.vorticity(F, V.cfdSolid);
     if (first) { CV.trails(V); applyLayers(); }
-    // rack doors: the inlet and exhaust the CFD computes
-    F.rep.inlet.forEach(function (t, i) { V.front.setColorAt(i, V.col(t)); V.rear.setColorAt(i, V.col(t + (V.s ? V.s.racks[i].exhaust - V.s.racks[i].inlet : 12))); });
-    V.front.instanceColor.needsUpdate = true; V.rear.instanceColor.needsUpdate = true;
+    // rack doors: the inlet the CFD computes, by height (bottom, middle, top third), and the exhaust
+    F.rep.inletMean.forEach(function (t, i) {
+      V.fronts.forEach(function (f, b) { f.setColorAt(i, V.col(profAt(F.rep.profile[i], F.rep.profDy, RACK_H * (b + 0.5) / DOOR_BANDS))); });
+      V.rear.setColorAt(i, V.col(t + (V.s ? V.s.racks[i].exhaust - V.s.racks[i].inlet : 12)));
+    });
+    doorsDirty();
     cfdSlice(); cfdVolume();
     var rep = F.rep, bal = V.cfdBal || {}, err = rep.qRacksKw ? (rep.qCrahKw - rep.qRacksKw) / rep.qRacksKw * 100 : 0;
     var settled = Math.abs(err) < 1 && rep.t > 30, S = V.cfdSolid, tiRoom = null;
     if (F.ti) { var a = []; for (c = 0; c < F.ti.length; c++) if (!(S && S[c]) && !V.contained[c] && F.ti[c] > 0) a.push(F.ti[c]); a.sort(function (x, y) { return x - y; }); tiRoom = a.length ? a[Math.floor(a.length / 2)] : null; }
-    hud('<b>CFD</b> ' + F.dx + ' m · ' + (F.nx * F.ny * F.nz).toLocaleString('en-US') + ' cells · t = ' + rep.t.toFixed(0) + ' s' + (settled ? ' · <i class="ok">settled</i>' : ' · <i>converging</i>') +
+    var head = '<b>CFD</b> ' + F.dx + ' m · ' + (F.nx * F.ny * F.nz).toLocaleString('en-US') + ' cells · t = ' + rep.t.toFixed(0) + ' s' + (settled ? ' · <i class="ok">settled</i>' : ' · <i>converging</i>');
+    hud(head +
       '<br>heat in <b>' + Math.round(rep.qRacksKw).toLocaleString('en-US') + '</b> kW · removed <b>' + Math.round(rep.qCrahKw).toLocaleString('en-US') + '</b> kW (' + (err >= 0 ? '+' : '') + err.toFixed(1) + ' %) · mass residual ' + rep.residual.toExponential(1) +
       '<br>hottest inlet <b>' + rep.maxInlet.toFixed(1) + ' °C</b> (balance ' + (bal.max != null ? bal.max.toFixed(1) : '—') + ') · racks &gt; 27 °C <b>' + rep.over27 + '</b> (balance ' + (bal.over27 != null ? bal.over27 : '—') + ') · return ' + rep.ret.toFixed(1) + ' °C' +
+      '<br>air management, rack inlets ' + (rep.averaged ? 'time-averaged' : 'now') + ': RCI<sub>HI</sub> ' + ixb('rciHi', rep.idx.rciHi.toFixed(0) + ' %') + ' · RCI<sub>LO</sub> ' + ixb('rciLo', rep.idx.rciLo.toFixed(0) + ' %') +
+      ' · RTI ' + ixb('rti', rep.idx.rti.toFixed(0) + ' %') + (rep.idx.rti > 105 ? ' recirculation' : rep.idx.rti < 95 ? ' bypass' : ' balanced') + ' · SHI ' + ixb('shi', rep.idx.shi.toFixed(2)) +
       '<br>turbulence: room median TI <b>' + (tiRoom != null ? (tiRoom * 100).toFixed(0) + ' %' : '—') + '</b> · vorticity p99 <b>' + CV.pct(V.vort, S, 0.99).toFixed(2) + ' s⁻¹</b>' + (F.dx > 0.45 ? ' · <i>0.6 m cells carry the mean flow; the 0.3 m grid resolves the eddies</i>' : ' · eddies resolved down to ' + (2 * F.dx).toFixed(1) + ' m'));
   }
   function cfdVolume() {
@@ -580,7 +632,7 @@
       if (w >= 1) V.tween = null;
     }
     if (!reduce) {
-      step(dt * V.speed); root.LTCCFDView.trailStep(V, dt * V.speed);
+      step(dt * V.speed); root.LTCCFDView.trailStep(V, dt * V.speed); root.LTCCFDView.smokeStep(V, dt * V.speed);
       (V.crahs || []).forEach(function (u) { if (!u.dead) u.fans.forEach(function (f) { f.rotation.z += dt * V.speed * 14 * (V.fan || 0); }); });
     }
     V.ctl.update(); root.LTCCFDView.volumeFrame(V);
@@ -596,6 +648,6 @@
     });
   }
 
-  root.LTCDH013D = { isMounted: function () { return !!view; }, flowModel: flowModel, wallShares: wallShares, mount: mount, update: update, camTo: camTo, RACK_H: RACK_H, PLEN_D: PLEN_D, PIPE_V: PIPE_V };
+  root.LTCDH013D = { isMounted: function () { return !!view; }, rackCfd: rackCfd, flowModel: flowModel, wallShares: wallShares, mount: mount, update: update, camTo: camTo, RACK_H: RACK_H, PLEN_D: PLEN_D, PIPE_V: PIPE_V };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCDH013D;
 })(typeof window !== 'undefined' ? window : globalThis);

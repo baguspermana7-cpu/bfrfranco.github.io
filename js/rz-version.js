@@ -1,4 +1,4 @@
 /* Single source of truth for site version. Bump on every release per VERSIONING_STANDARD.md. */
-window.RZ_VERSION = '3.21.9';
+window.RZ_VERSION = '3.21.10';
 window.RZ_VERSION_DATE = '2026-10-14';
-window.RZ_VERSION_CODENAME = 'Campus';
+window.RZ_VERSION_CODENAME = 'Air Management';

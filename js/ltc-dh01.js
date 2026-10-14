@@ -654,12 +654,19 @@
       else t = { title: 'Hot aisle · rows ' + u.rows.map(function (x) { return 'R' + (x + 1); }).join(' + '), rows: [['Mean exhaust', fmt(u.mean, 1) + ' °C'], ['Plenum return', fmt(s.returnC, 1) + ' °C']], note: 'Contained; exhaust rises into the ceiling plenum and returns to the fan walls.' };
       if (root.LTCTrace && root.LTCTrace.show) root.LTCTrace.show(t, cx, cy2);
     }
+    // the 3D view's CFD, when it has solved this plant: the rack's inlet by height
+    function cfdRows(i) {
+      var c = root.LTCDH013D && root.LTCDH013D.rackCfd ? root.LTCDH013D.rackCfd(i) : null; if (!c) return [];
+      var rows = [['CFD inlet', fmt(c.inlet, 1) + ' °C ' + (c.averaged ? 'time-averaged' : 'now') + ' · ' + c.dx + ' m grid'], ['CFD by height', c.bands.map(function (t) { return fmt(t, 1); }).join(' · ') + ' °C (bottom · middle · top third)']];
+      if (c.bands[2] - c.bands[0] > 3) rows.push(['Pattern', 'top ' + fmt(c.bands[2] - c.bands[0], 1) + ' K hotter than bottom: exhaust curling over the rack tops']);
+      return rows;
+    }
     function showRack(i, cx, cy2) {
       if (!last || i < 0) { if (root.LTCTrace) root.LTCTrace.hide(); return; }
       var k = last.s.racks[i];
       var band = k.inlet <= 27 ? 'inside recommended (18–27 °C)' : k.inlet <= 32 ? 'allowable A1 only (≤ 32 °C)' : 'beyond A1 allowable';
       if (root.LTCTrace && root.LTCTrace.show) root.LTCTrace.show({ title: 'Rack ' + (k.i + 1) + ' · row ' + (k.row + 1),
-        rows: [['Inlet', fmt(k.inlet, 1) + ' °C'], ['Exhaust', fmt(k.exhaust, 1) + ' °C'], ['Heat to air', fmt(k.q, 1) + ' kW'], ['Airflow', fmt(k.dem, 2) + ' m³/s · ' + fmt(k.f * 100) + ' % from supply'], ['CDU', (k.cdu + 1) + ' (feeder ' + (k.cdu % 2 ? 'B' : 'A') + ')']], note: band }, cx, cy2);
+        rows: [['Inlet', fmt(k.inlet, 1) + ' °C'], ['Exhaust', fmt(k.exhaust, 1) + ' °C'], ['Heat to air', fmt(k.q, 1) + ' kW'], ['Airflow', fmt(k.dem, 2) + ' m³/s · ' + fmt(k.f * 100) + ' % from supply'], ['CDU', (k.cdu + 1) + ' (feeder ' + (k.cdu % 2 ? 'B' : 'A') + ')']].concat(cfdRows(i)), note: band }, cx, cy2);
       cv.setAttribute('aria-label', 'DH01 plan. Rack ' + (k.i + 1) + ', row ' + (k.row + 1) + ': inlet ' + fmt(k.inlet, 1) + ' °C, ' + band + '. Arrow keys move between racks.');
     }
     function at(i) { var b = cv.getBoundingClientRect(), k = last.s.racks[i], p = last.r.input, rr = last.geo.R(k.x, k.y, p.rackPitchM, p.rackDepthM); return [b.left + rr[0] + rr[2], b.top + rr[1]]; }
