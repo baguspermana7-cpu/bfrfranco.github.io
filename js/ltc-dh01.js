@@ -42,11 +42,30 @@
    *      their demand, discounted by the share of nearby units (exp(−distance / aisle pitch)) still alive;
    *   4. each cold aisle is marched from both ends — every rack takes its demand from the air still
    *      flowing past it, so the supply runs out where the arrows on the plan end;
-   *   5. a rack's unmet demand is drawn from exhaust leaking out of the containment (its hot aisle,
-   *      mixed with the plenum return), solved as a fixed point;
+   *   5. the hall's unmet demand is shared out the way the DH01 CFD shows it lands (calibrated
+   *      below), then each rack draws its share from exhaust leaking out of the containment (its hot
+   *      aisle, mixed with the plenum return), solved as a fixed point;
    *   6. the CRAH coil is an effectiveness model fitted at design (ε = ΔT / (T_supply − T_chw + ΔT)):
    *      when the coil cannot hold set-point — fewer units, warmer chilled water — supply air rises. */
   var MARGIN = 1.05, MIX_HOT = 0.6;
+  /* where the recirculated air lands, calibrated on the DH01 CFD (js/ltc-cfd.js): two and four west-wall
+     CRAHs out on the 0.3 m grid (second-order, rack inlets averaged over 50 s), and one CRAH out with N
+     units (no spare) at 37, 100 and 300 MW on the 0.6 m grid. The plug-flow march alone put the shortfall
+     at the dead units' end of each aisle (four out: RMS 4.4 K per rack, hottest inlet 41.8 °C vs 34.8,
+     29 racks over 27 °C vs 64). The CFD puts it where the two fan walls' supplies meet, with exhaust
+     curling over the rack tops there; a small shortfall stays near the dead unit, a large one spreads
+     over every aisle. So:
+       a share of each aisle's shortfall, rising to SHARE_HALL once the hall is FULL_SHARE_AT short, is
+       pooled and handed back to the aisles by demand;
+       within an aisle, SHARE_MARCH follows the march, the rest a hump centred where the supplies meet
+       (the west share of the aisle's supply along it): a narrow HUMP_W (share of the half-length) plus
+       a HUMP_WIDE_K share of a wide one. Centred mid-aisle instead, the RMS is the same but four out
+       puts 5 racks over 32 °C against the CFD's 13: the hot tail needs the meeting point.
+     Fitted: four out RMS 1.7 K, hottest 34.0 °C (CFD 34.8), 68 racks over 27 °C (64), 15 over 32 (13);
+     two out RMS 0.7 K; N units, one out, RMS 0.8–1.0 K and racks over 27 °C whenever the CFD has them.
+     Checked off-fit on a 37 MW hall and a 70 % capture plant: better than the march on every case.
+     With no shortfall (no fault, one of N+1 CRAHs out, CDU faults) nothing moves. */
+  var SHARE_HALL = 0.75, FULL_SHARE_AT = 0.05, SHARE_MARCH = 0.25, HUMP_W = 0.4, HUMP_WIDE_K = 0.3, HUMP_WIDE_W = 1.0;
   function solveHall(r, fault, header, minute, phase, load) {
     var p = r.input, h = r.hall, CPA = P.CONST.CP_A, RHOA = P.CONST.RHO_A, RC = RHOA * CPA, Lf = load > 0 ? Math.min(load, 1) : 1;
     var rackKw = r.it.hallKw * Lf / h.racks.length, cap = p.capturePct / 100;
@@ -148,6 +167,39 @@
       aisles.push({ i: ai.i, west: qw, east: qe, westTo: xw, eastTo: xe, demand: D, bypass: Math.max(0, mouth[ai.i].west + mouth[ai.i].east - D),
                     unmet: sl.reduce(function (a, s) { return a + s.rem; }, 0) });
     });
+    // 5a — share the shortfall out the way the CFD shows it lands (see SHARE_HALL); mass is conserved:
+    //      the recirculated airflow still equals the demand the supply does not meet
+    var unmetAll = 0, demAll = 0, aU = {}, aDm = {}, aSpan = {}, aMeet = {}, sM = {}, sH = {};
+    h.racks.forEach(function (k, i) {
+      var u = dem[i] * (1 - cov[i]); unmetAll += u; demAll += dem[i]; aU[k.aisle] = (aU[k.aisle] || 0) + u; aDm[k.aisle] = (aDm[k.aisle] || 0) + dem[i];
+      var sp = aSpan[k.aisle] || (aSpan[k.aisle] = { lo: Infinity, hi: -Infinity }); sp.lo = Math.min(sp.lo, k.x); sp.hi = Math.max(sp.hi, k.x + p.rackPitchM);
+    });
+    if (unmetAll > 1e-9) {
+      aisles.forEach(function (A) { aMeet[A.i] = A.west + A.east > 0 ? A.west / (A.west + A.east) : 0.5; });
+      var hump = h.racks.map(function (k) {
+        var sp = aSpan[k.aisle], half = (sp.hi - sp.lo) / 2, d = (k.x + p.rackPitchM / 2 - sp.lo - (sp.hi - sp.lo) * aMeet[k.aisle]) / half;
+        return (1 - HUMP_WIDE_K) * Math.exp(-(d / HUMP_W) * (d / HUMP_W)) + HUMP_WIDE_K * Math.exp(-(d / HUMP_WIDE_W) * (d / HUMP_WIDE_W));
+      });
+      h.racks.forEach(function (k, i) { sM[k.aisle] = (sM[k.aisle] || 0) + dem[i] * (1 - cov[i]); sH[k.aisle] = (sH[k.aisle] || 0) + dem[i] * hump[i]; });
+      var draw = h.racks.map(function (k, i) {
+        var a = k.aisle, sh = SHARE_HALL * Math.min(1, unmetAll / demAll / FULL_SHARE_AT), Ua = (1 - sh) * aU[a] + sh * unmetAll * aDm[a] / demAll, g = sM[a] > 1e-9 ? SHARE_MARCH : 0;
+        return Ua * (g * dem[i] * (1 - cov[i]) / (sM[a] || 1) + (1 - g) * dem[i] * hump[i] / sH[a]);
+      });
+      for (var cap2 = 0; cap2 < 20; cap2++) {      // no rack draws more than its demand: the excess goes to the rest of its aisle
+        var ex = {}, room = {};
+        h.racks.forEach(function (k, i) { if (draw[i] > dem[i]) { ex[k.aisle] = (ex[k.aisle] || 0) + draw[i] - dem[i]; draw[i] = dem[i]; } else room[k.aisle] = (room[k.aisle] || 0) + dem[i] - draw[i]; });
+        if (!Object.keys(ex).length) break;
+        h.racks.forEach(function (k, i) { if (ex[k.aisle] && room[k.aisle] > 0 && draw[i] < dem[i]) draw[i] += ex[k.aisle] * (dem[i] - draw[i]) / room[k.aisle]; });
+      }
+      cov = h.racks.map(function (k, i) { return dem[i] > 0 ? 1 - draw[i] / dem[i] : 1; });
+      // each aisle now takes the supply its racks draw: its mouth flows follow, split as before
+      aisles.forEach(function (A) {
+        var got = 0; h.racks.forEach(function (k, i) { if (k.aisle === A.i) got += dem[i] * cov[i]; });
+        var was = A.west + A.east;
+        if (was > 1e-12) { A.west *= got / was; A.east *= got / was; } else { A.west = got / 2; A.east = got / 2; }
+        A.unmet = Math.max(0, A.demand - got);
+      });
+    }
     // 6 — coil: supply air the CRAHs can hold with this airflow and this chilled water
     var eps = Math.max(0.3, Math.min(0.95, p.airDeltaK / Math.max(0.5, p.supplyAirC - p.chwSupplyC + p.airDeltaK)));
     var Cair = S * RC, supply = Cair > 0 ? Math.max(p.supplyAirC, chw + (1 - eps) / eps * qAir / Cair) : 45;
@@ -650,7 +702,7 @@
         ['Duty', fmt(last.r.liquid.dutyKw * s.load / p.halls / last.r.liquid.cduPerHall) + ' kW'], ['TCS', fmt(p.tcsSupplyC, 0) + ' → ' + fmt(p.tcsSupplyC + (p.tcsReturnC - p.tcsSupplyC) * s.load, 1) + ' °C']],
         note: ST.header === 'per-cdu' ? 'One secondary loop per CDU.' : 'Common secondary header: CDUs share the racks.' };
       else if (u.kind === 'aisle') t = { title: 'Cold aisle ' + (u.a.i + 1), rows: [['Demand', fmt(u.a.demand, 1) + ' m³/s'], ['From W wall', fmt(u.a.west, 1) + ' m³/s'], ['From E wall', fmt(u.a.east, 1) + ' m³/s'],
-        [u.a.unmet > 1e-6 ? 'Unmet' : 'Bypass', fmt(u.a.unmet > 1e-6 ? u.a.unmet : u.a.bypass, 1) + ' m³/s']], note: u.a.unmet > 1e-6 ? 'Red dashed box: the stretch no supply air reaches.' : 'Fed from both ends.' };
+        [u.a.unmet > 1e-6 ? 'Unmet' : 'Bypass', fmt(u.a.unmet > 1e-6 ? u.a.unmet : u.a.bypass, 1) + ' m³/s']], note: u.a.unmet > 1e-6 ? 'Red dashed box: where the supply from the two walls runs out; exhaust is pulled back over the racks around it.' : 'Fed from both ends.' };
       else t = { title: 'Hot aisle · rows ' + u.rows.map(function (x) { return 'R' + (x + 1); }).join(' + '), rows: [['Mean exhaust', fmt(u.mean, 1) + ' °C'], ['Plenum return', fmt(s.returnC, 1) + ' °C']], note: 'Contained; exhaust rises into the ceiling plenum and returns to the fan walls.' };
       if (root.LTCTrace && root.LTCTrace.show) root.LTCTrace.show(t, cx, cy2);
     }

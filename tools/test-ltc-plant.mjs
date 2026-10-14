@@ -206,7 +206,9 @@ for (let i = 0; i < 200; i++) {
     near(fed + x.recircM3s, x.airDemand, 1e-6 * x.airDemand + 1e-9, `P7 ${nm}: rack airflow = supply drawn + exhaust pulled back`);
     near(mouths, x.airSupply, 1e-6 * x.airSupply, `P7 ${nm}: every m³/s the fans move reaches an aisle mouth (served or bypassed)`);
     near(x.returnC - x.supply, x.qAirKw / (x.airSupply * P.CONST.RHO_A * P.CONST.CP_A), 1e-6, `P7 ${nm}: return − supply = air heat ÷ (ṁ·cp)`);
-    ok(x.aisles.every((ai) => ai.unmet < 1e-9 || ai.westTo < ai.eastTo), `P7 ${nm}: unmet air sits between where the two supplies end`);
+    // v3.21.13: the shortfall is shared over the aisles as the CFD shows (no longer only where the march
+    // leaves a gap), so each aisle's own balance is the check: what its mouths deliver plus what it pulls back = its demand
+    ok(x.aisles.every((ai) => { const d = x.racks.filter((k) => k.aisle === ai.i).reduce((a, k) => a + k.f * k.dem, 0); return Math.abs(d + ai.unmet - ai.demand) < 1e-6 * Math.max(1, ai.demand) && Math.abs(Math.min(ai.west + ai.east, ai.demand) - d) < 1e-6 * Math.max(1, ai.demand); }), `P7 ${nm}: each aisle's supply drawn plus air pulled back equals its demand`);
   }
   ok(n.fanSpeed < 1 && n.supply === r.input.supplyAirC && !n.coilLimited && n.recircM3s < 1e-9, 'P7 normal: fans below rated speed, coil at set-point, no recirculation');
   ok(c4.fanSpeed === 1 && c4.coilLimited && c4.supply > n.supply, 'P7 four CRAHs out: survivors at rated flow, coil cannot hold set-point');

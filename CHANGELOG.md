@@ -11,6 +11,65 @@ release sections rather than semver.
 
 ---
 
+## v3.21.13 — 2026-10-15
+
+### "Recalibrated": the DH01 balance solve now puts recirculated air where the CFD does
+
+**Why.** v3.21.11's rack-by-rack chart showed the balance solve and the CFD disagreeing by 4.4 K RMS per rack with four CRAHs out. The owner approved recalibrating the balance on the CFD. The balance solve drives the plan, the rack tooltips, the HLT verdicts, the sequence of events and the report, so this changes numbers across the workbench.
+
+**What was wrong.** The balance marched each cold aisle as plug flow from both fan walls, so all of the unmet airflow landed on the racks the supply never reached, at the dead units' end. The CFD, on the 0.3 m grid with the second-order schemes, disagrees in two ways:
+- **Position.** The heat sits around where the two walls' supplies meet, with exhaust curling over the rack tops there.
+- **Spread.** A large shortfall spreads over every aisle; a small one stays near the dead unit.
+
+**The change** (`solveHall` step 5a, `js/ltc-dh01.js`):
+- The unmet airflow is shared out before the hot-aisle fixed point.
+  - Up to 75 % of each aisle's shortfall is pooled and handed back to the aisles by demand. The share rises linearly to that 75 % as the hall's shortfall reaches 5 %.
+  - Within each aisle, 25 % follows the old march and the rest follows a hump centred where the two walls' supplies meet: a narrow core (0.4 of the half-length) plus a 30 % wide shoulder.
+  - No rack draws more than its own demand.
+- Mass is conserved: the recirculated airflow still equals the shortfall to 1e-12 (W12r). Each aisle's mouth flows are rescaled to the supply its racks now draw, so the 3D streams still sum to the solve (W12x).
+- With no shortfall (no fault, one of N+1 CRAHs out, CDU and feeder faults) nothing changes: max |Δ| 5e-14 °C.
+- One option was tried and rejected: centring the hump mid-aisle. It gave the same RMS, but with four CRAHs out it put 5 racks over 32 °C against the CFD's 13.
+
+**Fit** against five CFD cases. Each cell gives the balance before → after, then the CFD.
+
+| Case | RMS per rack | Hottest inlet | Racks > 27 °C | Racks > 32 °C |
+|---|---|---|---|---|
+| 4 CRAHs out (0.3 m) | 4.39 → **1.72 K** | 41.8 → **34.0** · CFD 34.8 | 29 → **68** · 64 | 26 → **15** · 13 |
+| 2 CRAHs out (0.3 m) | 1.93 → **0.70 K** | 37.5 → **28.3** · 27.7 | 9 → **5** · 9 | 4 → **0** · 0 |
+| N units, 1 out, 100 MW (0.6 m) | 1.48 → **0.83 K** | 36.7 → **28.2** · 27.7 | 4 → **2** · 5 | 2 → **0** · 0 |
+| N units, 1 out, 300 MW (0.6 m) | 1.52 → **1.02 K** | 37.3 → **29.7** · 29.3 | 8 → **6** · 26 | 6 → **0** · 0 |
+| N units, 1 out, 37 MW (0.6 m) | 2.38 → **0.98 K** | 37.2 → **27.6** · 28.4 | 4 → **4** · 11 | 2 → **0** · 0 |
+
+**Off-fit check** against the 0.6 m CFD on plants the fit never saw. The new model is better on every case:
+
+| Plant | Fault | RMS per rack, march → new |
+|---|---|---|
+| 70 % capture | 2 CRAHs out | 1.67 → 0.91 K |
+| 70 % capture | 4 CRAHs out | 3.21 → 1.49 K |
+| 37 MW hall | 2 CRAHs out | 4.53 → 2.13 K |
+| 37 MW hall | 4 CRAHs out | 7.97 → 6.81 K |
+
+The last case loses four of a small hall's CRAHs and runs to 56 °C, and neither model holds it well.
+
+**Still true:**
+- An N-unit hall with one CRAH out puts racks over 27 °C, as the CFD does (W12r).
+- An N+1 hall holds every rack at or below 27 °C.
+
+**What moved for a reader:**
+- On the plan and in the rack tooltips, a CRAH fault's hot racks now sit around the middle of the aisles.
+- They are spread over more racks and are less extreme: with four out, 34 °C at worst instead of 42 °C.
+- The plan's red dashed box keeps marking where the walls' supply runs out; its tooltip now says the exhaust is pulled back over the racks around it.
+
+**Gate W12cal**, new, reads the five cases from `tools/fixtures/dh01-cfd-reference.json`. For each it requires:
+- a per-rack RMS within 0.25 K of the fit;
+- the hottest inlet within 1.5 K of the CFD;
+- racks over 27 °C whenever the CFD has them;
+- racks over 32 °C within 4 of the CFD's count.
+
+It was proven red on the old march, on the share without its ramp, and on the mid-aisle hump.
+
+**Gate change.** In `tools/test-ltc-plant.mjs`, P7's check "unmet air sits only between where the two supplies end" encoded the plug-flow assumption that the CFD disproved. It is replaced by each aisle's own balance: the supply its racks draw plus the air they pull back equals its demand, and that supply equals what its mouths deliver.
+
 ## v3.21.12 — 2026-10-14
 
 ### "Yard": the campus blocks open their own inspector

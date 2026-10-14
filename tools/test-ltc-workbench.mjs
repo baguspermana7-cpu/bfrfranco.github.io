@@ -539,6 +539,23 @@ for (const [page, mod] of Object.entries(PAGES)) {
     }
     ok('W12g', good, `DH01 CFD grid check: the 0.6 m solve (crah4, inlets averaged over 40 s) agrees with the 0.3 m second-order solve — hottest inlet ${mx.toFixed(2)} °C vs ${REF.max}, racks > 27 °C ${o27} vs ${REF.o27}, > 32 °C ${o32} vs ${REF.o32} (within 1 K, 6 and 4 racks)`);
   }
+  {
+    /* the balance solve against the CFD it is calibrated on (tools/fixtures/dh01-cfd-reference.json):
+       per-rack RMS within a quarter kelvin of the fit, the hottest inlet within 1.5 K, racks over 27 °C
+       whenever the CFD has them and racks over 32 °C within 4 of its count (the hot tail). The plug-flow march alone gave RMS 1.5–4.4 K and a hottest inlet
+       7–10 K high, at the dead units' end of the aisle where the CFD has it where the jets meet. */
+    const ref = JSON.parse(readFileSync(join(root, 'tools/fixtures/dh01-cfd-reference.json'), 'utf8')), FIT = { crah2: 0.70, crah4: 1.72, N100: 0.83, N300: 1.02, N37: 0.98 }, bad = [], facts = [];
+    for (const c of ref.cases) {
+      const s = D.solveHall(P.compute(Object.assign({}, c.preset ? P.PRESETS[c.preset] : {}, c.plant)), c.fault, 'common', 5, 'throttled'), b = s.racks.map((k) => k.inlet), r = c.inlet;
+      const rms = b.length === r.length ? Math.sqrt(r.reduce((u, t, i) => u + (t - b[i]) ** 2, 0) / r.length) : NaN, mx = Math.max(...r), o27 = r.filter((t) => t > 27).length, o32 = r.filter((t) => t > 32).length;
+      facts.push(`${c.id} RMS ${rms.toFixed(2)} K, hottest ${s.maxInlet.toFixed(1)}/${mx.toFixed(1)}, >27 ${s.over27}/${o27}, >32 ${s.over32}/${o32}`);
+      if (!(rms <= FIT[c.id] + 0.25)) bad.push(`${c.id}: RMS ${rms.toFixed(2)} K (fit ${FIT[c.id]})`);
+      if (!(Math.abs(s.maxInlet - mx) <= 1.5)) bad.push(`${c.id}: hottest ${s.maxInlet.toFixed(1)} vs CFD ${mx.toFixed(1)} °C`);
+      if ((o27 > 0) !== (s.over27 > 0)) bad.push(`${c.id}: ${s.over27} racks over 27 °C, CFD ${o27}`);
+      if (!(Math.abs(s.over32 - o32) <= 4)) bad.push(`${c.id}: ${s.over32} racks over 32 °C, CFD ${o32}`);
+    }
+    ok('W12cal', !bad.length, 'DH01 balance solve against the CFD it is calibrated on: per-rack RMS within 0.25 K of the fit, hottest inlet within 1.5 K, racks over 27 °C when the CFD has them, racks over 32 °C within 4 (' + facts.join('; ') + ')' + (bad.length ? ' — ' + bad.join('; ') : ''));
+  }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));
   for (const [i, st] of plants.entries()) {
