@@ -678,10 +678,61 @@
       annual_site_water_m3: 0
     };
 
+    /* SITE (v3.21.9) — the campus that carries the plant. The engine's counts times the model's
+       per-unit floor allowances (all ASSUMED) give the electrical wing each hall level needs, the
+       building plate, the share of dry coolers the roof can carry and the yard the rest need. */
+    var st = m.site;
+    var hallLevels = Math.ceil(f.halls / 2);
+    var elecHallM2 = (2 * equipment.unit_subs_per_feed_per_hall * st.unitSubM2 +
+                      2 * distribution.ups_frames_per_hall_per_feed * st.upsFrameM2 +
+                      div(equipment.battery_hall_kwh, st.batteryKwhPerM2)) * st.electricalCirculation;
+    /* whole metres, rounded UP: the wing has to hold at least the rooms the allowances ask for */
+    var wingM = Math.ceil(div(elecHallM2, geo.widthM, 'electrical wing length'));
+    var plateL = st.coreDepthM + geo.lengthM + wingM, plateW = 2 * geo.widthM + st.spineM;
+    var footprintM2 = plateL * plateW;
+    var roofDc = Math.min(equipment.dry_coolers_installed, Math.floor(footprintM2 * st.roofUsableFraction / st.dryCoolerM2));
+    var yardDc = equipment.dry_coolers_installed - roofDc;
+    var worstFacilityKwe = worst ? worst.electrical.facility_kwe : design.electrical.facility_kwe;
+    var fuelM3 = worstFacilityKwe * st.fuelAutonomyH * st.dieselLPerKwh / 1000;
+    var yards = {
+      dry: yardDc * st.dryCoolerM2,
+      genset: equipment.gensets_installed * st.gensetM2,
+      chiller: equipment.chillers_installed * st.chillerM2 * st.chillerPlantFactor,
+      mainTx: distribution.main_tx_total * st.mainTxM2,
+      gis: distribution.hv_switchyard_bays * st.gisBayM2,
+      fuel: fuelM3 * st.fuelFarmM2PerM3
+    };
+    var plantM2 = yards.dry + yards.genset + yards.chiller + yards.mainTx + yards.gis + yards.fuel;
+    var site = {
+      hall_levels: hallLevels,
+      building_levels: hallLevels + 2,                                   /* ground floor + hall levels + roof */
+      core_depth_m: st.coreDepthM,
+      spine_m: st.spineM,
+      electrical_m2_per_hall: elecHallM2,
+      electrical_wing_m: wingM,
+      electrical_wing_fits: wingM * geo.widthM >= elecHallM2,
+      plate_length_m: plateL,
+      plate_width_m: plateW,
+      footprint_m2: footprintM2,
+      roof_usable_m2: footprintM2 * st.roofUsableFraction,
+      dry_coolers_roof: roofDc,
+      dry_coolers_yard: yardDc,
+      dry_cooler_yard_m2: yards.dry,
+      genset_yard_m2: yards.genset,
+      chiller_plant_m2: yards.chiller,
+      main_tx_yard_m2: yards.mainTx,
+      gis_hall_m2: yards.gis,
+      fuel_autonomy_h: st.fuelAutonomyH,
+      fuel_m3: fuelM3,
+      fuel_farm_m2: yards.fuel,
+      plant_outside_m2: plantM2,
+      site_area_m2: (footprintM2 + plantM2) * st.campusRoadFactor
+    };
+
     return deepFreeze({
       meta: {
         engine: 'dcai-engine.js',
-        version: '1.4.0',   /* v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
+        version: '1.5.0',   /* v3.21.9: the site branch — electrical wing, plate, roof share and yards from the engine counts. // was 1.4.0 — v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
         spec_version: m.specVersion,
         authority: m.authority,
         evidence_class: 'SIMULATED/ADOPTED',
@@ -702,7 +753,8 @@
       network: network,
       geometry: geometry,
       pue: pue,
-      wue: wue
+      wue: wue,
+      site: site
     });
   }
 

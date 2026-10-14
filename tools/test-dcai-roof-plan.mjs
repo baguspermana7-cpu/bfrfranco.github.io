@@ -13,9 +13,10 @@
  * (one glyph standing for a bank) but it may not describe a different machine.
  *
  * WHAT THIS ASSERTS on the roof view of #floorSvg
- *   R1 the drawn dry-cooler count is declared as an aggregation whose arithmetic closes against
- *      the engine: banks x units per bank = equipment.dry_coolers_installed, with the duty count
- *      stated beside it
+ *   R1 the drawn dry-cooler count closes against the engine. Since v3.21.8 the roof carries only
+ *      the share its usable area holds (site.dry_coolers_roof) and the rest stands in the yard on
+ *      the site plan: banks x units per bank = the roof share, and the roof states the roof share,
+ *      the yard share, the installed total and the duty count
  *   R2 wherever the roof names chillers it states the engine count, never a drawn-glyph count
  *   R3 no water-spending rejection technology is claimed while the engine publishes WUE 0 —
  *      adiabatic / evaporative / spray / wet-bulb may appear only in a sentence that says the
@@ -49,6 +50,8 @@ const CHILLERS = value('equipment.chillers_installed');
 const CH_DESIGN = value('equipment.chillers_running_design');
 const CH_WORST = value('equipment.chillers_running_worst_bin');
 const WUE = value('wue.l_per_kwh');
+const DC_ROOF = value('site.dry_coolers_roof');
+const DC_YARD = value('site.dry_coolers_yard');
 
 const WATER_WORDS = /adiabatic|evaporative|evap\b|spray|wet[- ]?bulb|cooling tower/i;
 const NOT_ADOPTED = /not adopted|rejected|retired|would (?:cost|spend|consume)|instead of|no (?:adiabatic|evaporative)/i;
@@ -102,11 +105,13 @@ const fail = (message) => failures.push(message);
 
 /* R1 */
 if (!view.banks) fail('R1 the roof draws no dry-cooler bank blocks');
-const perBank = view.banks ? Math.ceil(DC_INSTALLED / view.banks) : 0;
+const perBank = view.banks ? Math.ceil(DC_ROOF / view.banks) : 0;
+if (DC_ROOF + DC_YARD !== DC_INSTALLED) fail(`R1 roof ${DC_ROOF} + yard ${DC_YARD} is not the ${DC_INSTALLED} installed`);
+for (const [name, v] of [['roof share', DC_ROOF], ['yard share', DC_YARD]]) if (!view.all.includes(String(v))) fail(`R1 the roof does not state the ${name} (${v})`);
 if (!view.all.includes(String(DC_INSTALLED))) fail(`R1 the roof does not state the engine's installed dry-cooler count (${DC_INSTALLED})`);
 if (!view.all.includes(String(DC_RUNNING))) fail(`R1 the roof does not state the dry-cooler duty count at design (${DC_RUNNING})`);
 if (view.banks && !view.all.includes(String(perBank))) {
-    fail(`R1 the aggregation divisor is invisible: ${view.banks} banks drawn for ${DC_INSTALLED} units is ${perBank} per bank, and no text says so`);
+    fail(`R1 the aggregation divisor is invisible: ${view.banks} banks drawn for ${DC_ROOF} roof units is ${perBank} per bank, and no text says so`);
 }
 
 /* R2 */

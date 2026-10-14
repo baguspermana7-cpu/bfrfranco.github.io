@@ -524,7 +524,7 @@ const D = sandbox.RZDiagram;
   const pageSrc = readFileSync(join(root, 'datahallAI.html'), 'utf8');
   const block = pageSrc.slice(
     pageSrc.indexOf('var ISO_OCC=null'),
-    pageSrc.indexOf('// 3D equipment box:')
+    pageSrc.indexOf('function renderOverview(){')
   );
   ok('I0', block.length > 400 && block.includes('isoResolvePlacement'),
     `the isometric placement block must be extractable: ${block.length} chars`);

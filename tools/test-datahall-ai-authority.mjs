@@ -10,7 +10,7 @@ const PAGE_SOURCE = await readFile(resolve(ROOT, 'datahallAI.html'), 'utf8');
 const MODEL_SOURCE = await readFile(resolve(ROOT, 'js/dcai-model.js'), 'utf8');
 const CALC_SOURCE = await readFile(resolve(ROOT, 'js/dcai-engine.js'), 'utf8');
 const REGISTRY_SOURCE = await readFile(resolve(ROOT, 'js/dcai-parameters.js'), 'utf8');
-const ASSET_VERSION = '1.4.0';
+const ASSET_VERSION = '1.5.0';
 const SPEC_VERSION = 'gb300-500mw-2026-09-06';
 const EXPECTED_SNAPSHOT = DCAI_ENGINE.snapshot;
 const CORE_ACTION_IDS = Object.freeze([
@@ -87,8 +87,12 @@ async function preparePage(browser, origin, fixture, javaScriptEnabled = true) {
   page.on('request', (request) => {
     const url = request.url();
     if (request.isNavigationRequest() && url.startsWith(`${origin}/datahallAI.html`)) {
+      /* the pinned token, not a literal: a literal stopped matching on the next version bump and
+         turned this fixture into a copy of the healthy page */
+      const pinned = `js/dcai-engine.js?v=${ASSET_VERSION}`;
+      if (fixture === 'request-mismatch' && !PAGE_SOURCE.includes(pinned)) throw new Error(`request-mismatch: the page no longer loads ${pinned}`);
       const body = fixture === 'request-mismatch'
-        ? PAGE_SOURCE.replace('js/dcai-engine.js?v=1.4.0', 'js/dcai-engine.js?v=0.9.0')
+        ? PAGE_SOURCE.replace(pinned, 'js/dcai-engine.js?v=0.9.0')
         : PAGE_SOURCE;
       request.respond({ status: 200, contentType: 'text/html', body });
       return;

@@ -816,7 +816,7 @@
   });
   def('room', { kind: 'authored', label: 'Room', system: 'building', tier2: null }, function (b, ctx, id) {
     b.title = 'Room — ' + id;
-    b.D('live', 'grid', 'Building grid', 'retired-basis site layout (72 × 48 m plot)', 'building grid and room dimensions are the retired-basis site layout kept until the site re-grid (Track A §A5)');
+    b.D('live', 'grid', 'Building plate', 'engine plate: core + hall + electrical wing by two halls + spine', 'the plate dimensions are engine outputs (site.plate_length_m, site.plate_width_m); the room zoning inside it is page-authored');
     b.S('live', 'temp_c', 'Room temperature', { value: 24, text: '24 °C support-room setpoint' }, 1, '°C');
     b.S('live', 'rh_pct', 'Relative humidity', { value: 50, text: '50 % RH setpoint' }, 6, '%', { digits: 0 });
     b.trend('temp_c', 'Room temperature', '°C', { value: 24 }, 1);

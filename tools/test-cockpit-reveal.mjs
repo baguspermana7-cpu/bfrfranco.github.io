@@ -56,7 +56,11 @@ const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
 try {
   const set = TAB_SETS['datahallAI.html'];
   const floors = set.diagrams.filter((d) => d.selector === '#floorSvg');
-  assert.equal(floors.length, 4, 'the building has four floor views and each is its own drill-down');
+  /* one drill-down per building level, counted by the engine (ground + hall levels + roof) — the
+     literal 4 went stale when the eight halls became four hall levels in v3.21.3 */
+  const levels = JSON.parse(readFileSync(new URL('../data/dcai-parameters.json', import.meta.url), 'utf8'))
+    .parameters.find((p) => p.id === 'site.building_levels').value;
+  assert.equal(floors.length, levels, `the building has ${levels} levels and each is its own drill-down`);
   const floor = floors[0];
   assert.ok(floor.reveal && floor.reveal.click && floor.reveal.expect,
     '#floorSvg is hidden behind a click in the isometric — it must declare reveal:{click,expect}');
@@ -68,8 +72,8 @@ try {
   assert.equal(plain(bldg), plain(floor), 'the two share a tab — that is why the old key collided');
   assert.notEqual(keyed(bldg), keyed(floor), 'a revealed view must not collide with its parent tab');
   const gate = readFileSync(resolve(ROOT, 'tools/audit-legibility.mjs'), 'utf8');
-  assert.equal(new Set(floors.map(keyed)).size, 4,
-    'the four floors share #floorSvg, so the key has to separate them by how each is reached');
+  assert.equal(new Set(floors.map(keyed)).size, levels,
+    'the building levels share #floorSvg, so the key has to separate them by how each is reached');
   assert.match(gate, /entry\.reveal \? entry\.reveal\.click : ''/,
     'audit-legibility must key visited views so a revealed one is not skipped');
 
@@ -94,10 +98,13 @@ try {
     }
     return { display: getComputedStyle(document.getElementById('floorDetail')).display,
              total, under, min: Number(min.toFixed(2)),
+             schedule: [...svg.querySelectorAll('text')].some((t) => t.textContent.trim() === 'SCHEDULE'),
              scale: svg.getAttribute('data-rz-legible-scale') };
   });
   assert.equal(shown.display, 'block', 'the reveal must actually open #floorDetail');
-  assert.ok(shown.total > 100, `the opened floor plan should carry its labels, saw ${shown.total}`);
+  /* v3.21.9 — the site plan moved its counts into a schedule and carries ~75 labels where the retired
+     ground floor crammed 222; the bar is "the plan rendered", proved by its own schedule */
+  assert.ok(shown.total > 40 && shown.schedule, `the opened site plan should carry its labels and schedule, saw ${shown.total}`);
   assert.equal(shown.under, 0, `${shown.under} of ${shown.total} floor-plan labels are under ${FLOOR_PX}px`);
   assert.ok(shown.min >= FLOOR_PX, `smallest floor-plan label is ${shown.min}px`);
   assert.ok(Number(shown.scale) > 1, 'the drill-down must be registered with RZSvgLegible');

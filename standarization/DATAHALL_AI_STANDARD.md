@@ -476,6 +476,13 @@ liquid-to-liquid CDUs; Schneider GB300 NVL72 hall). From north to south, each ba
 - **The same arrangement everywhere.** The Room Layout level plans draw both halls of a level at true scale on a 90 × 68 m plate. The plate's core, spine and electrical wing are page-authored allowances, declared as such. The electrical wing is schematic and not sized to the UPS frame count.
 - **Gate.** `tools/test-datahall-ai-hall-plan.mjs` asserts that every CDU stands in the CDU line, past the corridor, and that every air unit is a fan-wall module in the N or S gallery, split evenly.
 
+## Site plan and building plate (v3.21.9)
+
+- The building plate is an engine output: `site.plate_length_m` = core + hall length + electrical wing, and `site.plate_width_m` = two halls + spine. The electrical wing is `site.electrical_wing_m`: the hall's 2N rooms divided by the hall width, rounded up to whole metres. No drawing may type a plate, wing, core or spine dimension.
+- Plant that does not fit the building is drawn on the ground-floor site plan, never captioned away. Each yard area is the engine count × a `site.*` allowance. The roof carries `site.dry_coolers_roof` and the yard carries `site.dry_coolers_yard`; the two must sum to the installed count.
+- Block arrangement, roads, the STP footprint and room zoning are page-authored and must be declared where they are drawn. Counts and areas live in the schedule under the plan, not in captions squeezed between blocks.
+- The building view is an exploded stack of opaque plates zoned like their own plans, with labels in one column beside it.
+
 ## Hall plan micro-interactions (v3.21.7)
 
 `js/datahall-ai/hall-interact.js` lets the reader ask the hall plan a question by pointing at it.

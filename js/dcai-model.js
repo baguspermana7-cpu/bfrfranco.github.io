@@ -458,6 +458,65 @@
     },
 
     /* ------------------------------------------------------------------------
+     * SITE — the campus that carries the plant the engine sizes (v3.21.9)
+     *
+     * A 628 MW plant does not fit inside the building that holds its halls: 631 dry coolers
+     * want ~4.6x the roof and 171 gensets ~2.2x the ground floor. These leaves are the per-unit
+     * FLOOR ALLOWANCES that turn the engine's counts into yard and room areas. Each is an
+     * allowance per installed unit INCLUDING its service and access clearance, not a vendor
+     * footprint; every one is ASSUMED and the site plan says so.
+     * ----------------------------------------------------------------------*/
+    site: {
+      // source: building core west of the halls — two egress stairs, goods + passenger lift,
+      //         MEP risers and the MDF stacked through every level. ASSUMED
+      coreDepthM: 8,
+      // source: spine corridor between the north and south hall of a level: egress, equipment
+      //         moves and the cable/pipe tray route between core and electrical wing. ASSUMED
+      spineM: 6,
+      // source: one 1.25 MW UPS frame with front access and rear clearance. ASSUMED allowance
+      upsFrameM2: 6,
+      // source: one 2.5 MVA cast-resin unit substation (transformer + LV main board section)
+      //         with its working clearances. ASSUMED allowance
+      unitSubM2: 20,
+      // source: lithium-ion battery cabinets with their access aisle, expressed as stored energy
+      //         per square metre of battery room. ASSUMED allowance
+      batteryKwhPerM2: 50,
+      // source: corridors, cable ways and maintenance space inside the electrical rooms, as a
+      //         multiplier on the equipment allowance. ASSUMED
+      electricalCirculation: 1.25,
+      // source: one 1 MW V-bank dry cooler with its row spacing and maintenance aisle, the
+      //         spacing that keeps discharge air from recirculating into the next unit. ASSUMED
+      dryCoolerM2: 45,
+      // source: share of the roof that can carry plant after setbacks, access ways, risers and
+      //         the lightning-protection grid. ASSUMED
+      roofUsableFraction: 0.7,
+      // source: one 4 MW containerised genset with its radiator, exhaust and access aisle. ASSUMED
+      gensetM2: 80,
+      // source: one 4 MW water-cooled chiller with tube-pull clearance. ASSUMED allowance
+      chillerM2: 45,
+      // source: pumps, headers and the plant room aisles as a multiplier on the chiller
+      //         allowance. ASSUMED
+      chillerPlantFactor: 1.4,
+      // source: one 100 MVA ONAF main transformer outdoors, with its fire walls and oil bund.
+      //         ASSUMED allowance
+      mainTxM2: 300,
+      // source: one 150 kV GIS bay, its share of the GIS hall and its control room. ASSUMED
+      gisBayM2: 30,
+      // source: on-site fuel for the gensets at the worst-bin facility load. Uptime Institute
+      //         Tier topology asks for at least 12 h on site; 24 h is the design basis adopted
+      //         here. ADOPTED
+      fuelAutonomyH: 24,
+      // source: specific diesel consumption of a large MV genset near full load. ASSUMED
+      dieselLPerKwh: 0.25,
+      // source: above-ground bunded tank farm, plan area per cubic metre stored, including
+      //         tank spacing and the bund. ASSUMED allowance
+      fuelFarmM2PerM3: 0.4,
+      // source: roads, setbacks, laydown and the security perimeter as a multiplier on the
+      //         sum of the building and the yards. ASSUMED
+      campusRoadFactor: 1.3
+    },
+
+    /* ------------------------------------------------------------------------
      * WEATHER — annual dry-bulb bins for the annual PUE
      * ----------------------------------------------------------------------*/
     weather: {

@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-dcai-parameter-registry.mjs",
-  "engineVersion": "1.4.0",
+  "engineVersion": "1.5.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/dcai-parameters.curated.json; authored-leaf provenance is read from js/dcai-model.js.",
   "parameters": [
     {
@@ -6600,6 +6600,7 @@
         }
       ],
       "tests": [
+        "test-dcai-engine.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -8234,6 +8235,7 @@
         }
       ],
       "tests": [
+        "test-dcai-engine.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [
@@ -8324,6 +8326,7 @@
         }
       ],
       "tests": [
+        "test-dcai-engine.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -9414,7 +9417,7 @@
       "label": "version",
       "unit": null,
       "kind": "authored",
-      "value": "1.4.0",
+      "value": "1.5.0",
       "formula": null,
       "deps": [],
       "scope": "meta",
@@ -11300,6 +11303,1219 @@
         "test-dcai-engine.mjs"
       ],
       "docs": []
+    },
+    {
+      "id": "site.building_levels",
+      "unit": null,
+      "kind": "derived",
+      "value": 6,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "facility.halls"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.chiller_plant_m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 9009,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.chiller.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "site.chillerM2",
+        "site.chillerPlantFactor",
+        "thermal.tcsSupplyC",
+        "weather.bins.6.ambientDbC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.core_depth_m",
+      "unit": "m",
+      "kind": "authored",
+      "value": 8,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "site.coreDepthM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js site.coreDepthM",
+        "method": "building core west of the halls — two egress stairs, goods + passenger lift, MEP risers and the MDF stacked through every level. ASSUMED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "site.dry_cooler_yard_m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 20655,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "electrical.powerFactor",
+        "equipment.dryCooler.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.efficiency",
+        "equipment.ups.inverterEfficiency",
+        "equipment.ups.runtimeMin",
+        "equipment.ups.unitKw",
+        "equipment.ups.usableDoD",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.lengthM",
+        "geometry.widthM",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "site.batteryKwhPerM2",
+        "site.coreDepthM",
+        "site.dryCoolerM2",
+        "site.electricalCirculation",
+        "site.roofUsableFraction",
+        "site.spineM",
+        "site.unitSubM2",
+        "site.upsFrameM2",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.condApproachK",
+        "thermal.copMax",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.tcsSupplyC",
+        "weather.bins.2.ambientDbC",
+        "weather.bins.3.ambientDbC",
+        "weather.bins.4.ambientDbC",
+        "weather.bins.5.ambientDbC",
+        "weather.bins.6.ambientDbC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.dry_coolers_roof",
+      "unit": null,
+      "kind": "derived",
+      "value": 172,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.efficiency",
+        "equipment.ups.inverterEfficiency",
+        "equipment.ups.runtimeMin",
+        "equipment.ups.unitKw",
+        "equipment.ups.usableDoD",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.lengthM",
+        "geometry.widthM",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "site.batteryKwhPerM2",
+        "site.coreDepthM",
+        "site.dryCoolerM2",
+        "site.electricalCirculation",
+        "site.roofUsableFraction",
+        "site.spineM",
+        "site.unitSubM2",
+        "site.upsFrameM2",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-roof-plan.mjs"
+      ],
+      "docs": [
+        "standarization/DATAHALL_AI_STANDARD.md"
+      ]
+    },
+    {
+      "id": "site.dry_coolers_yard",
+      "unit": null,
+      "kind": "derived",
+      "value": 459,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "electrical.powerFactor",
+        "equipment.dryCooler.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.efficiency",
+        "equipment.ups.inverterEfficiency",
+        "equipment.ups.runtimeMin",
+        "equipment.ups.unitKw",
+        "equipment.ups.usableDoD",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.lengthM",
+        "geometry.widthM",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "site.batteryKwhPerM2",
+        "site.coreDepthM",
+        "site.dryCoolerM2",
+        "site.electricalCirculation",
+        "site.roofUsableFraction",
+        "site.spineM",
+        "site.unitSubM2",
+        "site.upsFrameM2",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.condApproachK",
+        "thermal.copMax",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.tcsSupplyC",
+        "weather.bins.2.ambientDbC",
+        "weather.bins.3.ambientDbC",
+        "weather.bins.4.ambientDbC",
+        "weather.bins.5.ambientDbC",
+        "weather.bins.6.ambientDbC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-roof-plan.mjs"
+      ],
+      "docs": [
+        "standarization/DATAHALL_AI_STANDARD.md"
+      ]
+    },
+    {
+      "id": "site.electrical_m2_per_hall",
+      "unit": null,
+      "kind": "derived",
+      "value": 2854.708333333333,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.efficiency",
+        "equipment.ups.inverterEfficiency",
+        "equipment.ups.runtimeMin",
+        "equipment.ups.unitKw",
+        "equipment.ups.usableDoD",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "site.batteryKwhPerM2",
+        "site.electricalCirculation",
+        "site.unitSubM2",
+        "site.upsFrameM2",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.electrical_wing_fits",
+      "unit": null,
+      "kind": "authored",
+      "value": true,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "LABEL",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js",
+        "method": "text label or identifier republished from the model",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "site.electrical_wing_m",
+      "unit": "m",
+      "kind": "derived",
+      "value": 93,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.efficiency",
+        "equipment.ups.inverterEfficiency",
+        "equipment.ups.runtimeMin",
+        "equipment.ups.unitKw",
+        "equipment.ups.usableDoD",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.widthM",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "site.batteryKwhPerM2",
+        "site.electricalCirculation",
+        "site.unitSubM2",
+        "site.upsFrameM2",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [
+        "standarization/DATAHALL_AI_STANDARD.md"
+      ]
+    },
+    {
+      "id": "site.footprint_m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 11084,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.efficiency",
+        "equipment.ups.inverterEfficiency",
+        "equipment.ups.runtimeMin",
+        "equipment.ups.unitKw",
+        "equipment.ups.usableDoD",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.lengthM",
+        "geometry.widthM",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "site.batteryKwhPerM2",
+        "site.coreDepthM",
+        "site.electricalCirculation",
+        "site.spineM",
+        "site.unitSubM2",
+        "site.upsFrameM2",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.fuel_autonomy_h",
+      "unit": null,
+      "kind": "authored",
+      "value": 24,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "site.fuelAutonomyH"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js site.fuelAutonomyH",
+        "method": "on-site fuel for the gensets at the worst-bin facility load. Uptime Institute Tier topology asks for at least 12 h on site; 24 h is the design basis adopted here. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "site.fuel_farm_m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 1617.4832605728936,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.chwPumpHeadM",
+        "hydraulics.crahFanStaticPa",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsPumpHeadM",
+        "hydraulics.waterCpKjPerKgK",
+        "site.dieselLPerKwh",
+        "site.fuelAutonomyH",
+        "site.fuelFarmM2PerM3",
+        "thermal.airSupplyC",
+        "thermal.airsideDeltaTK",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.chwDeltaTK",
+        "thermal.condApproachK",
+        "thermal.copMax",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsDeltaTK",
+        "thermal.tcsSupplyC",
+        "weather.bins.2.ambientDbC",
+        "weather.bins.3.ambientDbC",
+        "weather.bins.4.ambientDbC",
+        "weather.bins.5.ambientDbC",
+        "weather.bins.6.ambientDbC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.fuel_m3",
+      "unit": "m³",
+      "kind": "derived",
+      "value": 4043.708151432234,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.chwPumpHeadM",
+        "hydraulics.crahFanStaticPa",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsPumpHeadM",
+        "hydraulics.waterCpKjPerKgK",
+        "site.dieselLPerKwh",
+        "site.fuelAutonomyH",
+        "thermal.airSupplyC",
+        "thermal.airsideDeltaTK",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.chwDeltaTK",
+        "thermal.condApproachK",
+        "thermal.copMax",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsDeltaTK",
+        "thermal.tcsSupplyC",
+        "weather.bins.2.ambientDbC",
+        "weather.bins.3.ambientDbC",
+        "weather.bins.4.ambientDbC",
+        "weather.bins.5.ambientDbC",
+        "weather.bins.6.ambientDbC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.genset_yard_m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 13680,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.generator.unitKw",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.waterCpKjPerKgK",
+        "site.gensetM2",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.copMax",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsSupplyC",
+        "weather.bins.2.ambientDbC",
+        "weather.bins.3.ambientDbC",
+        "weather.bins.4.ambientDbC",
+        "weather.bins.5.ambientDbC",
+        "weather.bins.6.ambientDbC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.gis_hall_m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 600,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hvCircuitMva",
+        "electrical.mainTxMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "site.gisBayM2"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.hall_levels",
+      "unit": null,
+      "kind": "derived",
+      "value": 4,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "facility.halls"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.main_tx_yard_m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 4800,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mainTxMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "site.mainTxM2"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.plant_outside_m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 50361.483260572895,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "electrical.hvCircuitMva",
+        "electrical.mainTxMva",
+        "electrical.powerFactor",
+        "equipment.chiller.unitKwTh",
+        "equipment.dryCooler.unitKwTh",
+        "equipment.generator.unitKw",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.efficiency",
+        "equipment.ups.inverterEfficiency",
+        "equipment.ups.runtimeMin",
+        "equipment.ups.unitKw",
+        "equipment.ups.usableDoD",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.lengthM",
+        "geometry.widthM",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.chwPumpHeadM",
+        "hydraulics.crahFanStaticPa",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsPumpHeadM",
+        "hydraulics.waterCpKjPerKgK",
+        "site.batteryKwhPerM2",
+        "site.chillerM2",
+        "site.chillerPlantFactor",
+        "site.coreDepthM",
+        "site.dieselLPerKwh",
+        "site.dryCoolerM2",
+        "site.electricalCirculation",
+        "site.fuelAutonomyH",
+        "site.fuelFarmM2PerM3",
+        "site.gensetM2",
+        "site.gisBayM2",
+        "site.mainTxM2",
+        "site.roofUsableFraction",
+        "site.spineM",
+        "site.unitSubM2",
+        "site.upsFrameM2",
+        "thermal.airSupplyC",
+        "thermal.airsideDeltaTK",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.chwDeltaTK",
+        "thermal.condApproachK",
+        "thermal.copMax",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsDeltaTK",
+        "thermal.tcsSupplyC",
+        "weather.bins.2.ambientDbC",
+        "weather.bins.3.ambientDbC",
+        "weather.bins.4.ambientDbC",
+        "weather.bins.5.ambientDbC",
+        "weather.bins.6.ambientDbC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.plate_length_m",
+      "unit": "m",
+      "kind": "derived",
+      "value": 163,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.efficiency",
+        "equipment.ups.inverterEfficiency",
+        "equipment.ups.runtimeMin",
+        "equipment.ups.unitKw",
+        "equipment.ups.usableDoD",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.lengthM",
+        "geometry.widthM",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "site.batteryKwhPerM2",
+        "site.coreDepthM",
+        "site.electricalCirculation",
+        "site.unitSubM2",
+        "site.upsFrameM2",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [
+        "standarization/DATAHALL_AI_STANDARD.md"
+      ]
+    },
+    {
+      "id": "site.plate_width_m",
+      "unit": "m",
+      "kind": "derived",
+      "value": 68,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.widthM",
+        "site.spineM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [
+        "standarization/DATAHALL_AI_STANDARD.md"
+      ]
+    },
+    {
+      "id": "site.roof_usable_m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 7758.799999999999,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.efficiency",
+        "equipment.ups.inverterEfficiency",
+        "equipment.ups.runtimeMin",
+        "equipment.ups.unitKw",
+        "equipment.ups.usableDoD",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.lengthM",
+        "geometry.widthM",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "site.batteryKwhPerM2",
+        "site.coreDepthM",
+        "site.electricalCirculation",
+        "site.roofUsableFraction",
+        "site.spineM",
+        "site.unitSubM2",
+        "site.upsFrameM2",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.site_area_m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 79879.12823874477,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "electrical.hvCircuitMva",
+        "electrical.mainTxMva",
+        "electrical.powerFactor",
+        "equipment.chiller.unitKwTh",
+        "equipment.dryCooler.unitKwTh",
+        "equipment.generator.unitKw",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.efficiency",
+        "equipment.ups.inverterEfficiency",
+        "equipment.ups.runtimeMin",
+        "equipment.ups.unitKw",
+        "equipment.ups.usableDoD",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.lengthM",
+        "geometry.widthM",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.chwPumpHeadM",
+        "hydraulics.crahFanStaticPa",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsPumpHeadM",
+        "hydraulics.waterCpKjPerKgK",
+        "site.batteryKwhPerM2",
+        "site.campusRoadFactor",
+        "site.chillerM2",
+        "site.chillerPlantFactor",
+        "site.coreDepthM",
+        "site.dieselLPerKwh",
+        "site.dryCoolerM2",
+        "site.electricalCirculation",
+        "site.fuelAutonomyH",
+        "site.fuelFarmM2PerM3",
+        "site.gensetM2",
+        "site.gisBayM2",
+        "site.mainTxM2",
+        "site.roofUsableFraction",
+        "site.spineM",
+        "site.unitSubM2",
+        "site.upsFrameM2",
+        "thermal.airSupplyC",
+        "thermal.airsideDeltaTK",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.chwDeltaTK",
+        "thermal.condApproachK",
+        "thermal.copMax",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsDeltaTK",
+        "thermal.tcsSupplyC",
+        "weather.bins.2.ambientDbC",
+        "weather.bins.3.ambientDbC",
+        "weather.bins.4.ambientDbC",
+        "weather.bins.5.ambientDbC",
+        "weather.bins.6.ambientDbC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "site.spine_m",
+      "unit": "m",
+      "kind": "authored",
+      "value": 6,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "site.spineM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js site.spineM",
+        "method": "spine corridor between the north and south hall of a level: egress, equipment moves and the cable/pipe tray route between core and electrical wing. ASSUMED",
+        "asOf": "2026-09-06"
+      }
     },
     {
       "id": "wue.annual_site_water_m3",

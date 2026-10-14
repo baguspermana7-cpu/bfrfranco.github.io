@@ -373,6 +373,7 @@ export function scopeFor(id) {
   if (branch === 'design') return second === 'planes' || second === 'heat' || second === 'flows' || second === 'counts' ? 'plant' : 'site';
   if (branch === 'bins') return 'site';
   if (branch === 'pue' || branch === 'wue') return 'site';
+  if (branch === 'site') return /per_hall|wing/.test(id) ? 'hall' : 'site';
   return 'site';
 }
 export function labelFor(id) {

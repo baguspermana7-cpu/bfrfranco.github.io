@@ -11,6 +11,53 @@ release sections rather than semver.
 
 ---
 
+## v3.21.9 — 2026-10-14
+
+### "Campus": the plant the engine sizes, on a site that can hold it
+
+**Why.** The owner asked for the layout to be perfected. The building views were the last drawings still on the retired 72 × 48 m grid, and the engine's own counts show that grid could never have worked:
+- The engine sizes 631 dry coolers, 171 gensets of 4 MW, 143 chillers, 16 main transformers of 100 MVA and a 20-bay 150 kV switchyard.
+- The ground floor drew six gensets with a "171×" label, and the roof drew eight dry coolers.
+- At honest per-unit allowances, the dry coolers alone want about 4.6 roofs and the gensets about 2.2 ground floors.
+- Each hall's 2N electrical rooms need about 2,855 m², while the level plan gave them a 20 m schematic wing of 620 m².
+
+The owner chose a campus site plan over captioning the shortfall.
+
+**Engine 1.5.0, new `site` branch (`js/dcai-model.js`, `js/dcai-engine.js`):**
+- Per-unit floor allowances, each including service clearance and each ASSUMED:
+  - UPS frame 6 m², unit substation 20 m², battery 50 kWh/m², electrical circulation 1.25.
+  - Dry cooler 45 m², roof usable fraction 0.7, genset 80 m².
+  - Chiller 45 m² × plant factor 1.4, main transformer 300 m², GIS bay 30 m².
+  - Tank farm 0.4 m²/m³, campus road factor 1.3.
+- Fuel: 24 h on site (ADOPTED) at 0.25 L/kWh (ASSUMED).
+- Outputs:
+  - The electrical wing per hall: 2,855 m² of rooms, rounded up to 93 m.
+  - The building plate: 163 × 68 m, 6 levels.
+  - The roof share of the dry coolers (172) and the yard share (459).
+  - The yard areas, the fuel volume (4,044 m³), the plant outside the building (50,361 m²) and the site area (79,879 m²).
+- Each output has an identity in `tools/test-dcai-engine.mjs`: 568 pass.
+- The registry has 315 parameters, R7 and R8 strict.
+
+**Room Layout:**
+- **Ground floor → site plan.**
+  - Eight numbered blocks to one scale: STP, GIS, main transformers, fuel farm, building, gensets, chiller plant and dry-cooler yard.
+  - Every genset, chiller, dry cooler and main transformer is drawn as a unit. The main transformers carry the SLD inspector hooks `sld-main-tx:dh0Nx`.
+  - The links between blocks are drawn: 20 kV, CHW/CDW, HTW and diesel.
+  - Under the plan, a schedule gives every count and area from the engine, and a ground-floor inset at the hall-level scale shows the rooms inside the building.
+- **Hall levels.** The core, spine and electrical wing now come from the engine. Each wing holds unit substations and UPS + battery for feed A and feed B, plus the RPP/busway riser.
+- **Roof.** Four banks carry the 172 roof units over the two hall wings, with the HTW headers down the spine and the support AHU on the core.
+- **Building view.** It is redrawn as one exploded stack of opaque plates, each zoned like its own plan. The labels sit in one column, beside a facility card with the footprint, the yards and the site. It replaces 72 × 48 m translucent slabs carrying ~90 floating tags.
+
+**Gates:**
+- `test-dcai-roof-plan` R1 now closes the roof share against the engine: roof + yard = installed.
+- `test-datahall-ai-authority` built its request-mismatch fixture from a hard-coded `?v=1.4.0`. After the engine bump the replace matched nothing and the fixture silently became the healthy page. It now uses the pinned constant and fails if the page stops loading it.
+- `test-cockpit-reveal` existed but was never wired into the ship gate, so it went stale for five releases: it still expected four floor views after the building became six levels. It now counts the levels from the engine (`site.building_levels`) and is wired.
+- `test-rz-diagram-engine` extracts the placement block up to `renderOverview`. The retired slab and box helpers are deleted, along with the old floor-plan helpers (`rm`, `eq`, `rmLive`, `eqLive`, `rmTx`, `stair`) this change orphaned.
+
+**Honest boundary:**
+- Every allowance is a planning allowance, not a vendor footprint.
+- The block arrangement, the 12 m roads, the STP footprint and the room zoning are page-authored and declared on the drawing.
+- The site area depends on the 1.3 road factor more than on any single allowance.
 ## v3.21.8 — 2026-10-14
 
 ### "Smoke Test": DH01 CFD as a volume, with trails, vortices and a probe, and a grid-checked solver
@@ -125,7 +172,7 @@ Each new check was proven red on mutated code: MacCormack forced on 0.6 m, a non
 - New `tools/test-datahall-ai-hall-interact.mjs` covers the interaction contract. Proven RED on v3.21.4 with 9 findings.
 - `tools/test-dcai-engine.mjs` gains the gallery, pitch and stack identities.
 
-**Still open:** the ground floor, the roof and the building isometric remain on the retired 72 × 48 m grid, captioned on the drawing. Moving them to the 90 × 68 m plate is the next change.
+**Still open:** the ground floor, the roof and the building isometric remain on the retired 72 × 48 m grid, captioned on the drawing. (Closed in v3.21.9.)
 
 ## v3.21.6 — 2026-10-14
 

@@ -768,7 +768,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261014-ed5273cd" defer></script>
+</style>    <script src="js/rz-version.js?v=20261014-04861133" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -786,11 +786,11 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          byte-frozen by the ship gate and still proving its own 57 worked examples, but this
          page no longer loads it. The ?v= token IS the version pin the authority block checks
          (= DCAI_CALC.snapshot.meta.version); tools/test-dcai-engine-version-pin.mjs asserts it. -->
-    <script src="js/dcai-model.js?v=1.4.0" data-datahall-model-authority></script>
-    <script src="js/dcai-engine.js?v=1.4.0" data-datahall-calc-authority></script>
+    <script src="js/dcai-model.js?v=1.5.0" data-datahall-model-authority></script>
+    <script src="js/dcai-engine.js?v=1.5.0" data-datahall-calc-authority></script>
     <!-- generated registry twin: the authority block validates the live snapshot against
          every id the registry publishes, so the allow-list is generated, never typed -->
-    <script src="js/dcai-parameters.js?v=1.4.0" data-datahall-registry></script>
+    <script src="js/dcai-parameters.js?v=1.5.0" data-datahall-registry></script>
     <script src="js/rz-evidence.js?v=20260920-3f7c72db"></script>
     <!-- v3.10.2 — the width budget, loaded BEFORE rz-svg-basis so a basis mark sits just past the
          end of its label instead of past a length*size*0.6 estimate of it. Synchronous and
@@ -817,7 +817,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/electrical-topology.js?v=3.9.0"></script>
     <script src="js/datahall-ai/electrical-live.js?v=3.9.0"></script>
     <script src="js/datahall-ai/sim-telemetry.js?v=20260920-61df5c2d"></script>
-    <script src="js/datahall-ai/hmi-payloads.js?v=20261013-2432306e"></script>
+    <script src="js/datahall-ai/hmi-payloads.js?v=20261014-7b5b236e"></script>
     <script src="js/datahall-ai/hmi-points.js?v=20260920-d82032ae"></script>
     <script src="js/datahall-ai/electrical-visual-map.js?v=3.9.0"></script>
     <script src="js/datahall-ai/fire-cause-effect.js?v=20260920-964e57d6"></script>
@@ -1442,7 +1442,7 @@ Requested model/calculation versions and the complete locked schema must validat
 <script>
 (function(root,d){
 'use strict';
-var DATAHALL_CURRENT_ASSET_VERSION='1.4.0';                 /* = DCAI_CALC.snapshot.meta.version */
+var DATAHALL_CURRENT_ASSET_VERSION='1.5.0';                 /* = DCAI_CALC.snapshot.meta.version */
 var DATAHALL_CURRENT_SPEC_VERSION='gb300-500mw-2026-09-06';  /* = DCAI_MODEL.specVersion */
 /* v2.0.0 — the allow-list is the REGISTRY. v1.20.0 typed 68 numeric + 15 string model paths,
    28 function names and 33 state keys into this page by hand; the generated registry
@@ -1585,7 +1585,7 @@ var DH=(function(){
     return null;
   }
   var C=authority.calc,M=authority.model,S=authority.snapshot;
-  var P=S.power,Cm=S.compute,H=S.heat,Dz=S.design,E=S.equipment,Di=S.distribution,N=S.network,G=S.geometry,U=S.pue,W=S.wue;
+  var P=S.power,Cm=S.compute,H=S.heat,Dz=S.design,E=S.equipment,Di=S.distribution,N=S.network,G=S.geometry,U=S.pue,W=S.wue,T=S.site||{};
   var El=Dz.electrical,Pl=Dz.planes,Fl=Dz.flows;
   var halls=M.facility.halls;
   var rd=function(x,d){return C.round(x,d==null?0:d);};
@@ -1765,6 +1765,14 @@ txRatingMVA:E.transformer_unit_mva,                   /* 2.5 */
     fanWallGalleries:G.fan_wall_galleries, fanWallModules:G.fan_wall_modules_per_gallery, fanWallPitchM:rd(G.fan_wall_module_pitch_m,2), fanWallVelocityMs:G.fan_wall_face_velocity_ms,
     fanWallFaceM2:rd(G.fan_wall_face_m2,0), fanWallFaceAvailM2:rd(G.air_plant_face_available_m2,0),
     cduLineDepthM:G.cdu_line_depth_m, widthStackM:rd(G.width_stack_m,1), lengthStackM:rd(G.length_stack_m,1),
+    /* ---- site (v3.21.9) — the campus that carries the plant: building plate, roof share, yards ---- */
+    hallLevels:T.hall_levels, buildingLevels:T.building_levels, coreDepthM:T.core_depth_m, spineM:T.spine_m,
+    elecHallM2:rd(T.electrical_m2_per_hall,0), elecWingM:T.electrical_wing_m, elecWingFits:T.electrical_wing_fits,
+    plateLengthM:T.plate_length_m, plateWidthM:T.plate_width_m, footprintM2:rd(T.footprint_m2,0), roofUsableM2:rd(T.roof_usable_m2,0),
+    dcRoof:T.dry_coolers_roof, dcYard:T.dry_coolers_yard, dcYardM2:rd(T.dry_cooler_yard_m2,0), gensetYardM2:rd(T.genset_yard_m2,0),
+    chillerPlantM2:rd(T.chiller_plant_m2,0), mainTxYardM2:rd(T.main_tx_yard_m2,0), gisHallM2:rd(T.gis_hall_m2,0),
+    fuelAutonomyH:T.fuel_autonomy_h, fuelM3:rd(T.fuel_m3,0), fuelFarmM2:rd(T.fuel_farm_m2,0),
+    plantOutsideM2:rd(T.plant_outside_m2,0), siteAreaM2:rd(T.site_area_m2,0),
     /* ---- fabric ---- */
     leavesPerHall:N.leaves_per_hall, spinesPerHall:N.spines_per_hall, coresPerHall:N.cores_per_hall,
     switchesPerHall:N.switches_per_hall,
@@ -1858,7 +1866,7 @@ window.DH_BASIS={
 "upsRatingKW":"equipment.ups_frame_kw","upsRatingMW":"equipment.ups_frame_kw","upsFramesPerFeedHall":"distribution.ups_frames_per_hall_per_feed","upsFramesTotal":"equipment.ups_frames_total","upsLoadPct":"equipment.ups_loading_pct","upsLoadNormalPct":"equipment.ups_loading_normal_pct","batteryKWh":"equipment.battery_kwh",
 "unitSubsPerFeed":"equipment.unit_subs_per_feed_per_hall","unitSubNormalPct":"equipment.unit_sub_loading_normal_pct","unitSubContingencyPct":"equipment.unit_sub_loading_contingency_pct","txRatingMVA":"equipment.transformer_unit_mva","txPerFeedHall":"distribution.transformers_per_hall_per_feed","txTotal":"equipment.transformers","txLoadPct":"equipment.transformer_loading_pct","facilityKva":"equipment.facility_kva",
 "gensetKW":"equipment.generator_unit_kw","gensetMW":"equipment.generator_unit_kw","gensetFacN":"equipment.gensets_duty","gensetFacNplus1":"equipment.gensets_installed",
-"hallLengthM":"geometry.hall_length_m","crossAisleM":"geometry.cross_aisle_m","crossAisleM2":"geometry.cross_aisle_m2","fanWallVelocityMs":"geometry.fan_wall_face_velocity_ms","floorSpareM2":"geometry.floor_spare_m2","airPlantM2":"geometry.air_plant_m2","airFlowM3s":"geometry.air_flow_m3s_per_hall","fanWallGalleries":"geometry.fan_wall_galleries","fanWallModules":"geometry.fan_wall_modules_per_gallery","fanWallPitchM":"geometry.fan_wall_module_pitch_m","fanWallFaceM2":"geometry.fan_wall_face_m2","fanWallFaceAvailM2":"geometry.air_plant_face_available_m2","cduLineDepthM":"geometry.cdu_line_depth_m","widthStackM":"geometry.width_stack_m","lengthStackM":"geometry.length_stack_m","cduGalleryM2":"geometry.cdu_gallery_m2","rackFieldM2":"geometry.rack_field_m2","hallWidthM":"geometry.hall_width_m","hallHeightM":"geometry.hall_height_m","hallAreaM2":"geometry.hall_area_m2","hallVolM3":"geometry.hall_volume_m3","itDensityKwM2":"geometry.it_density_kw_per_m2",
+"hallLengthM":"geometry.hall_length_m","crossAisleM":"geometry.cross_aisle_m","hallLevels":"site.hall_levels","buildingLevels":"site.building_levels","coreDepthM":"site.core_depth_m","spineM":"site.spine_m","elecHallM2":"site.electrical_m2_per_hall","elecWingM":"site.electrical_wing_m","plateLengthM":"site.plate_length_m","plateWidthM":"site.plate_width_m","footprintM2":"site.footprint_m2","roofUsableM2":"site.roof_usable_m2","dcRoof":"site.dry_coolers_roof","dcYard":"site.dry_coolers_yard","dcYardM2":"site.dry_cooler_yard_m2","gensetYardM2":"site.genset_yard_m2","chillerPlantM2":"site.chiller_plant_m2","mainTxYardM2":"site.main_tx_yard_m2","gisHallM2":"site.gis_hall_m2","fuelAutonomyH":"site.fuel_autonomy_h","fuelM3":"site.fuel_m3","fuelFarmM2":"site.fuel_farm_m2","plantOutsideM2":"site.plant_outside_m2","siteAreaM2":"site.site_area_m2","crossAisleM2":"geometry.cross_aisle_m2","fanWallVelocityMs":"geometry.fan_wall_face_velocity_ms","floorSpareM2":"geometry.floor_spare_m2","airPlantM2":"geometry.air_plant_m2","airFlowM3s":"geometry.air_flow_m3s_per_hall","fanWallGalleries":"geometry.fan_wall_galleries","fanWallModules":"geometry.fan_wall_modules_per_gallery","fanWallPitchM":"geometry.fan_wall_module_pitch_m","fanWallFaceM2":"geometry.fan_wall_face_m2","fanWallFaceAvailM2":"geometry.air_plant_face_available_m2","cduLineDepthM":"geometry.cdu_line_depth_m","widthStackM":"geometry.width_stack_m","lengthStackM":"geometry.length_stack_m","cduGalleryM2":"geometry.cdu_gallery_m2","rackFieldM2":"geometry.rack_field_m2","hallWidthM":"geometry.hall_width_m","hallHeightM":"geometry.hall_height_m","hallAreaM2":"geometry.hall_area_m2","hallVolM3":"geometry.hall_volume_m3","itDensityKwM2":"geometry.it_density_kw_per_m2",
 "leavesPerHall":"network.leaves_per_hall","spinesPerHall":"network.spines_per_hall","coresPerHall":"network.cores_per_hall","switchesPerHall":"network.switches_per_hall",
 "leafRadix":"network.leaf_radix","gpuDownlinksPerHall":"network.gpu_downlinks_per_hall","leafSpineLinks":"network.leaf_spine_links_per_hall","spineCoreLinks":"network.spine_core_links_per_hall","switchesPerRackCheck":"network.switches_per_rack_check","computeTraysFacility":"compute.compute_trays_facility","switchesFacility":"power.fabric_switches_facility",
 "batteryPerHall":"equipment.battery_hall_kwh","gensetStandby":"equipment.gensets_standby",
@@ -2033,30 +2041,6 @@ var bC=$('bldgC'),fC=$('floorC');if(!bC)return;
 var S=5.2,ZS=3.0,OX=530,OY=400;
 function iX(x,y){return Math.round(OX+(x-y)*0.866*S)}
 function iY(x,y,z){return Math.round(OY+(x+y)*0.5*S-z*ZS)}
-// Isometric polygon for a slab top face
-function isoTop(x,y,w,d,z){return iX(x,y)+','+iY(x,y,z)+' '+iX(x+w,y)+','+iY(x+w,y,z)+' '+iX(x+w,y+d)+','+iY(x+w,y+d,z)+' '+iX(x,y+d)+','+iY(x,y+d,z)}
-// Isometric right face
-function isoRight(x,y,w,d,z1,z2){return iX(x+w,y)+','+iY(x+w,y,z2)+' '+iX(x+w,y+d)+','+iY(x+w,y+d,z2)+' '+iX(x+w,y+d)+','+iY(x+w,y+d,z1)+' '+iX(x+w,y)+','+iY(x+w,y,z1)}
-// Isometric front face
-function isoFront(x,y,w,d,z1,z2){return iX(x,y+d)+','+iY(x,y+d,z2)+' '+iX(x+w,y+d)+','+iY(x+w,y+d,z2)+' '+iX(x+w,y+d)+','+iY(x+w,y+d,z1)+' '+iX(x,y+d)+','+iY(x,y+d,z1)}
-
-function drawSlab(x,y,w,d,z,h,fill,stroke,op){
-var s='';
-// Front face (darkest)
-s+='<polygon points="'+isoFront(x,y,w,d,z,z+h)+'" fill="'+fill+'" fill-opacity="'+(op*.35)+'" stroke="'+stroke+'" stroke-width=".5"/>';
-// Right face (medium)
-s+='<polygon points="'+isoRight(x,y,w,d,z,z+h)+'" fill="'+fill+'" fill-opacity="'+(op*.50)+'" stroke="'+stroke+'" stroke-width=".5"/>';
-// Top face (lightest)
-s+='<polygon points="'+isoTop(x,y,w,d,z+h)+'" fill="'+fill+'" fill-opacity="'+op+'" stroke="'+stroke+'" stroke-width="1.0"/>';
-// Lit edge highlight on top-face front edge
-s+='<line x1="'+iX(x,y+d)+'" y1="'+iY(x,y+d,z+h)+'" x2="'+iX(x+w,y+d)+'" y2="'+iY(x+w,y+d,z+h)+'" stroke="rgba(255,255,255,.15)" stroke-width="1"/>';
-return s;
-}
-
-// Draw room block on iso top face (colored rect on floor surface)
-function isoRoom(fx,fy,fw,fd,fz,fill,op){
-return '<polygon points="'+isoTop(fx,fy,fw,fd,fz)+'" fill="'+fill+'" fill-opacity="'+(op||.5)+'"/>';
-}
 
 // Text on isometric surface — with opaque label-mask (P&ID text-break) so
 // structural iso edges/grid never visually cross the label (doc-14 §3, doc-13 §4).
@@ -2175,893 +2159,240 @@ ISO_OCC=null;
 return svg;
 }
 
-// 3D equipment box: isoBox(x,y,w,d,z,h,fill,label)
-function isoBox(x,y,w,d,z,h,fill,label,labelColor,o){
-var s='<g filter="url(#eqSh)">';
-s+=drawSlab(x,y,w,d,z,h,fill,'rgba(255,255,255,.3)',.6);
-s+='</g>';
-if(label)s+=isoLabel(x+w/2,y+d/2,z+h+0.8,label,labelColor||'#fff',7,1,o,true);/* rigid: a tag names THIS box */
-return s;
-}
-// Building dimensions
-var BW=72,BD=48;
-// Floor z positions (exploded view with gaps)
-var FH=6; // floor slab height
-var GAP=18; // gap between floors
-/* v3.21.3 — one slab per hall level from HALL_LAYOUT (the engine hall count, two halls a level),
-   between the MEP ground floor and the roof. It was four slabs hard-typed for four halls. */
-var HL=window.HALL_LAYOUT.levels();
-var Z_GF=0, Z_RF=(FH+GAP)*(HL.length+1);
-var floors=[{z:Z_GF,label:'GROUND FLOOR',sub:'MEP · Chillers · Generators · WTP',color:'#f59e0b',key:'gf'}]
-.concat(HL.map(function(L,i){return {z:(FH+GAP)*(i+1),label:'FLOOR '+L.floor,sub:L.halls.map(function(h){return 'Datahall '+h}).join(' + '),color:'#22c55e',key:L.key,halls:L.halls};}))
-.concat([{z:Z_RF,label:'ROOF',sub:'Heat Rejection · Dry Coolers · AHU',color:'#06b6d4',key:'roof'}]);
-
+/* v3.21.9 — the building as the engine sizes it, one exploded stack of opaque plates. The retired
+   view stacked translucent 72 x 48 m slabs with ~90 floating tags, so every level showed through every
+   other and nothing could be read. Each plate is now the engine plate (core + hall + electrical wing by
+   two halls + spine), zoned exactly as its own floor plan, drawn bottom to top so an upper plate hides
+   the back of the one below and leaves its front band in view. Labels sit in one column to the right,
+   one per level; no label floats over the drawing. The plant that does not fit the building is on the
+   site plan (ground floor). */
 function renderOverview(){
 isoBeginPlacement();
-var s='';
-// Defs
-s+='<defs><filter id="bSh" x="-5%" y="-5%" width="120%" height="130%"><feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity=".15"/></filter>';
-s+='<filter id="eqSh" x="-10%" y="-10%" width="130%" height="140%"><feDropShadow dx="1" dy="1" stdDeviation="1.5" flood-opacity=".2"/></filter>';
-s+='<pattern id="bGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" fill="none" stroke="rgba(255,255,255,.015)" stroke-width=".3"/></pattern></defs>';
-s+='<rect width="1200" height="850" fill="url(#bGrid)"/>';
-// Title
-var NLV=floors.length;
-s+=tx(600,22,'BUILDING OVERVIEW \u2014 '+NLV+'-STORY AI DATA CENTER \u2014 '+HL.length+' HALL LEVELS','var(--t1)',13,'middle',1,{declared:window.HALL_LAYOUT.declared});
-s+=tx(600,40,BW+'m \u00D7 '+BD+'m \u00D7 '+NLV+' Levels \u2502 '+(BW*BD*NLV).toLocaleString('en-US')+' m\u00B2 Total','var(--t3)',8,'end',0,{declared:'building plot '+BW+' x '+BD+' m is the drawn site grid (retired basis, see floor-plan caption) stacked over '+NLV+' levels; not an engine quantity'});
-s+=tx(612,40,(DHE?DHE.halls:'\u2014')+'\u00D7 GB300 NVL72 Data Halls \u2502 '+(DHE?DHE.itFacilityMW:'\u2014')+' MW IT','var(--t3)',8,'start',0,bo('itFacilityMW'));
-
-// Ground plane / shadow
-s+='<polygon points="'+isoTop(-3,-3,BW+6,BD+6,-2)+'" fill="rgba(0,0,0,.12)" filter="url(#bSh)"/>';
-
-// Draw floors bottom to top
-floors.forEach(function(f,fi){
-s+=drawSlab(0,0,BW,BD,f.z,FH,f.color,'rgba(255,255,255,.2)',.55);
-
-// Room blocks on top face
-if(f.key==='gf'){
-// Zone overlays — symmetric A/B layout (per 2D GF plan + SLD audit)
-// Row 1 North: Loading | Fire+Gen | Fuel+WTP
-s+=isoRoom(0,0,18,10,f.z+FH,'#78716c',.22);
-s+=isoRoom(18,0,36,10,f.z+FH,'#3b82f6',.28);
-s+=isoRoom(54,0,18,10,f.z+FH,'#f59e0b',.22);
-// Row 2: TX-A+MSB-A (west) | BMS (center) | TX-B+MSB-B (east)
-s+=isoRoom(0,12,30,12,f.z+FH,'#f59e0b',.22);
-s+=isoRoom(30,12,12,12,f.z+FH,'#64748b',.18);
-s+=isoRoom(42,12,30,12,f.z+FH,'#f59e0b',.22);
-// Row 3: Workshop/Storage (west) | Control Center (center) | Workshop/Storage (east)
-s+=isoRoom(0,26,30,10,f.z+FH,'#94a3b8',.15);
-s+=isoRoom(30,26,12,10,f.z+FH,'#3b82f6',.18);
-s+=isoRoom(42,26,30,10,f.z+FH,'#94a3b8',.15);
-// Row 4 South: NOC/Security/Fire Ctrl | AHU Room
-s+=isoRoom(0,38,48,10,f.z+FH,'#14b8a6',.18);
-s+=isoRoom(48,38,24,10,f.z+FH,'#64748b',.18);
-// Zone labels (floating above each area for readability)
-s+=isoLabel(35,5,f.z+FH+7.5,'GENERATOR ROOM','#93c5fd',9,1);
-s+=isoLabel(10,18,f.z+FH+7.5,'TX-A ROOM','#fde68a',9,1);
-s+=isoLabel(60,18,f.z+FH+7.5,'TX-B ROOM','#fde68a',9,1);
-s+=isoLabel(36,18,f.z+FH+5,'BMS / EPMS','#cbd5e1',8,1);
-s+=isoLabel(10,31,f.z+FH+6.5,'WORKSHOP / STORAGE','#d6d3d1',9,1);
-s+=isoLabel(36,31,f.z+FH+5,'CONTROL CENTER','#93c5fd',9,1);
-// v1.41.1 — MMR (Meet-Me Room) added to ground-floor support zone east.
-// Carrier-neutral telecom termination, customer cross-connects. Co-located
-// near loading bay for cable-pull access.
-s+=isoLabel(60,31,f.z+FH+6.5,'MMR / TELECOM','#67e8f9',9,1);
-// MMR equipment sub-blocks (4 carrier racks + customer FDF + CRAH + UPS)
-s+=isoBox(56,28,3,2,f.z+FH,1.5,'#06b6d4','','#67e8f9');
-s+=isoBox(60,28,3,2,f.z+FH,1.5,'#06b6d4','ISAT','#67e8f9');
-s+=isoBox(64,28,3,2,f.z+FH,1.5,'#06b6d4','XL','#67e8f9');
-s+=isoBox(56,32,3,2,f.z+FH,1.5,'#06b6d4','LINKNET','#67e8f9');
-s+=isoBox(60,32,3,2,f.z+FH,1.5,'#06b6d4','FDF','#67e8f9');
-s+=isoBox(64,32,3,2,f.z+FH,1.5,'#06b6d4','','#67e8f9');
-s+=isoLabel(20,43,f.z+FH+5.5,'NOC / SECURITY','#67e8f9',9,1);
-s+=isoLabel(60,43,f.z+FH+6.5,'AHU ROOM','#cbd5e1',8,1);
-s+=isoLabel(10,5,f.z+FH+4,'LOADING','#d6d3d1',8,1);
-s+=isoLabel(55,5,f.z+FH+4,'FUEL','#fde68a',8,1);
-// 3D Equipment: generator BANKS — the facility pool is far larger than the
-// six glyphs; the room label carries the engine count.
-for(var gi=0;gi<6;gi++)s+=isoBox(18+gi*6,2,6,4,f.z+FH,3,'#3b82f6','','#93c5fd');
-// Fuel day tanks (4× 1000L, in fuel storage area, east)
-s+=isoBox(56,1,3,2,f.z+FH,1,'#f59e0b','','#fde68a');
-s+=isoBox(60,1,3,2,f.z+FH,1,'#f59e0b','','#fde68a');
-s+=isoBox(56,4,3,2,f.z+FH,1,'#f59e0b','','#fde68a');
-s+=isoBox(60,4,3,2,f.z+FH,1,'#f59e0b','','#fde68a');
-// Transformers A (engine-derived MVA, west — TX-A room)
-s+=isoBox(2,15,3,2,f.z+FH,2.5,'#f59e0b','','#fde68a');
-s+=isoBox(7,15,3,2,f.z+FH,2.5,'#f59e0b','','#fde68a');
-s+=isoBox(12,15,3,2,f.z+FH,2.5,'#f59e0b','','#fde68a');
-s+=isoBox(17,15,3,2,f.z+FH,2.5,'#f59e0b','','#fde68a');
-// Transformers B (engine-derived MVA, east — TX-B room)
-s+=isoBox(44,15,3,2,f.z+FH,2.5,'#f59e0b','','#fde68a');
-s+=isoBox(49,15,3,2,f.z+FH,2.5,'#f59e0b','','#fde68a');
-s+=isoBox(54,15,3,2,f.z+FH,2.5,'#f59e0b','','#fde68a');
-s+=isoBox(59,15,3,2,f.z+FH,2.5,'#f59e0b','','#fde68a');
-// MSB-A panels (west, 2× per SLD)
-s+=isoBox(16,17,5,1.5,f.z+FH,2.5,'#f59e0b','','#fde68a');
-s+=isoBox(22,17,5,1.5,f.z+FH,2.5,'#f59e0b','','#fde68a');
-// MSB-B panels (east, 2× per SLD)
-s+=isoBox(48,17,5,1.5,f.z+FH,2.5,'#f59e0b','','#fde68a');
-s+=isoBox(54,17,5,1.5,f.z+FH,2.5,'#f59e0b','','#fde68a');
-// BMS/EPMS (center)
-s+=isoBox(33,16,6,4,f.z+FH,2,'#64748b','','#cbd5e1');
-// ATS (8× Automatic Transfer Switch, 4 per feed side, 2×1.5×2 each)
-s+=isoBox(20,8,2,1.5,f.z+FH,2,'#3b82f6','','#93c5fd');
-s+=isoBox(24,8,2,1.5,f.z+FH,2,'#3b82f6','','#93c5fd');
-s+=isoBox(28,8,2,1.5,f.z+FH,2,'#3b82f6','','#93c5fd');
-s+=isoBox(32,8,2,1.5,f.z+FH,2,'#3b82f6','','#93c5fd');
-s+=isoBox(40,8,2,1.5,f.z+FH,2,'#3b82f6','','#93c5fd');
-s+=isoBox(44,8,2,1.5,f.z+FH,2,'#3b82f6','','#93c5fd');
-s+=isoBox(48,8,2,1.5,f.z+FH,2,'#3b82f6','','#93c5fd');
-s+=isoBox(52,8,2,1.5,f.z+FH,2,'#3b82f6','','#93c5fd');
-// EPMS/DCIM panels (in BMS room)
-s+=isoBox(33,20,3,2,f.z+FH,1.5,'#64748b','','#cbd5e1');
-s+=isoBox(37,20,3,2,f.z+FH,1.5,'#64748b','','#cbd5e1');
-// FACP (Fire Alarm Control Panel, NOC area)
-s+=isoBox(20,40,4,3,f.z+FH,1.8,'#f59e0b','FACP','#fde68a');
-// AHU (2× Carrier 39HQ 150kW, replacing CWP — CW pumps are on Roof)
-s+=isoBox(52,40,6,4,f.z+FH,2.5,'#64748b','','#cbd5e1');
-s+=isoBox(60,40,6,4,f.z+FH,2.5,'#64748b','','#cbd5e1');
-}
-if(f.halls){
-var dhN=f.halls.map(function(h){return 'DH-'+h});
-// Zone overlays
-s+=isoRoom(4,4,30,18,f.z+FH,'#22c55e',.25);
-s+=isoRoom(4,26,30,18,f.z+FH,'#22c55e',.25);
-s+=isoRoom(38,4,30,40,f.z+FH,'#f59e0b',.15);
-s+=isoRoom(4,22,30,4,f.z+FH,'#94a3b8',.12);
-// Zone labels
-/* v3.10.12 — at FH+6.5 these captions float in the same band the equipment tags project into,
-   which is why "DH-4 - 440 racks" kept meeting "BD" however the placement search moved it: the
-   search can find a clear slot, but a caption starting inside the equipment plane means every
-   nearby slot is contested. FH+10 puts it above that plane, where a caption over a hall belongs. */
-s+=isoLabel(19,12,f.z+FH+10,dhN[0]+' — '+dhaG(DHAX().racks)+' racks','#86efac',10,1,bo('racksPerHall',{nomark:fi>0}));
-s+=isoLabel(19,35,f.z+FH+10,dhN[1]+' — '+dhaG(DHAX().racks)+' racks','#86efac',10,1,bo('racksPerHall',{nomark:true}));
-s+=isoLabel(53,22,f.z+FH+5.5,'ELECTRICAL WING','#fde68a',9,1);
-s+=isoLabel(19,23,f.z+FH+2,'CORRIDOR','#94a3b8',6.5);
-// 3D Equipment: Rack rows (3 strips per hall)
-for(var ri=0;ri<3;ri++){
-s+=isoBox(6,5+ri*5,24,3,f.z+FH,2.2,'#22c55e','','#86efac');
-s+=isoBox(6,27+ri*5,24,3,f.z+FH,2.2,'#22c55e','','#86efac');
-}
-// CDU strip (×6 per DH — end-of-row)
-s+=isoBox(6,18,20,2,f.z+FH,1.8,'#06b6d4','CDU ×'+dhaF(DHAX().cduInst),'#67e8f9',bo('cduInstalled',{nomark:fi>0}));
-s+=isoBox(6,40,20,2,f.z+FH,1.8,'#06b6d4','CDU ×'+dhaF(DHAX().cduInst),'#67e8f9',bo('cduInstalled',{nomark:true}));
-// CRAH units
-for(var ci=0;ci<4;ci++){
-s+=isoBox(5+ci*7,21,3,2,f.z+FH,1.5,'#3b82f6','','#93c5fd');
-s+=isoBox(5+ci*7,43,3,2,f.z+FH,1.5,'#3b82f6','','#93c5fd');
-}
-// Electrical wing: UPS + RPP + Battery (no STS — dual-corded racks)
-// 4× UPS per floor: UPS-1A/2A (Feed A) + UPS-1B/2B (Feed B), 3×2×2.5 each
-s+=isoBox(40,5,3,2,f.z+FH,2.5,'#64748b','','#cbd5e1');
-s+=isoBox(44,5,3,2,f.z+FH,2.5,'#64748b','','#cbd5e1');
-s+=isoBox(40,11,3,2,f.z+FH,2.5,'#64748b','','#cbd5e1');
-s+=isoBox(44,11,3,2,f.z+FH,2.5,'#64748b','','#cbd5e1');
-/* v3.9.3 — two boxes, one word, printed twice: the ELECTRICAL WING card carries the real count
-   ("N RPP groups"), so the glyphs keep their shape and give the caption its space back. */
-s+=isoBox(48,6,8,8,f.z+FH,1.5,'#f59e0b','','#fde68a');
-s+=isoBox(48,16,8,8,f.z+FH,1.5,'#f59e0b','','#fde68a');
-// Battery room (between UPS boxes)
-s+=isoRoom(40,18,8,6,f.z+FH,'#64748b',.12);
-s+=isoBox(41,19,3,4,f.z+FH,1.8,'#64748b','','#cbd5e1');
-s+=isoBox(45,19,3,4,f.z+FH,1.8,'#64748b','','#cbd5e1');
-// Overhead busway bar (thin, elevated)
-s+=isoBox(6,12,24,1,f.z+FH+3,0.3,'#f59e0b','','#fde68a');
-s+=isoBox(6,34,24,1,f.z+FH+3,0.3,'#f59e0b','','#fde68a');
-// Hot aisle strips (red thin markers between rack rows)
-for(var hai=0;hai<3;hai++){
-s+=isoRoom(8,7+hai*5,20,0.8,f.z+FH+0.1,'#f59e0b',.5);
-s+=isoRoom(8,29+hai*5,20,0.8,f.z+FH+0.1,'#f59e0b',.5);
-}
-// Cold aisle strips (blue thin markers)
-for(var cai=0;cai<3;cai++){
-s+=isoRoom(8,5.5+cai*5,20,0.8,f.z+FH+0.1,'#3b82f6',.45);
-s+=isoRoom(8,27.5+cai*5,20,0.8,f.z+FH+0.1,'#3b82f6',.45);
-}
-/* Each drawn strip stands for a THIRD of the hall's rows (the engine's row
-   count is on the hall label); the glyphs are not one-per-row. */
-var isoRowSpan=(DHAX().rows!=null)?Math.round(DHAX().rows/3):null;
-for(var rli=0;rli<3;rli++){
-/* v3.9.3 — the three strips are representative, not rows 1-3, and the hall card prints the real
-   count ("20 rows x 22"). An ordinal on a representative glyph names nothing and these three
-   reached eight neighbours across the exploded stack. */
-}
-// Vertical busbar trunking (electrical wing, tall thin box)
-s+=isoBox(46,10,2,20,f.z+FH,3.5,'#f59e0b','BT','#fde68a');
-}
-if(f.key==='roof'){
-// Zone overlays (per 2D Roof plan + P&ID audit)
-s+=isoRoom(3,2,34,13,f.z+FH,'#06b6d4',.25);   // Chiller plant (expanded for 8×)
-s+=isoRoom(37,2,35,13,f.z+FH,'#22c55e',.2);    // Dry cooler array
-s+=isoRoom(10,17,24,6,f.z+FH,'#3b82f6',.15);   // CW Pump station
-s+=isoRoom(10,25,24,3,f.z+FH,'#3b82f6',.12);   // FWS Pump station (new)
-s+=isoRoom(3,30,30,14,f.z+FH,'#64748b',.25);   // AHU zone
-s+=isoRoom(35,28,32,15,f.z+FH,'#f59e0b',.2);   // VRF zone
-// Zone labels
-s+=isoLabel(20,8,f.z+FH+8.5,'CHILLER PLANT','#67e8f9',10,1);
-s+=isoLabel(54,8,f.z+FH+7.5,'DRY COOLER ARRAY','#86efac',9,1);
-s+=isoLabel(22,20,f.z+FH+4,'CW PUMP STATION','#93c5fd',8,1);
-s+=isoLabel(22,27,f.z+FH+3,'FWS PUMP STATION','#93c5fd',7,1);
-s+=isoLabel(18,38,f.z+FH+6,'AHU / AIR HANDLING','#cbd5e1',9,1);
-s+=isoLabel(51,37,f.z+FH+5,'VRF CONDENSING','#fde68a',9,1);
-// 3D Equipment: chiller BANKS — 8 glyphs stand for the whole facility plant;
-// the zone label carries the engine's run/installed counts.
-for(var chi=0;chi<4;chi++)s+=isoBox(5+chi*8,4,7,3,f.z+FH,3,'#06b6d4','','#67e8f9');
-for(var chi=0;chi<4;chi++)s+=isoBox(5+chi*8,9,7,3,f.z+FH,3,'#06b6d4','','#67e8f9');
-// AHU boxes (2× 12×5×3 — larger, per real dimensions)
-s+=isoBox(5,32,12,5,f.z+FH,3,'#64748b','','#cbd5e1');
-s+=isoBox(19,32,12,5,f.z+FH,3,'#64748b','','#cbd5e1');
-// Dry-cooler BANKS (8 glyphs; the engine count is on the zone label)
-for(var dci=0;dci<8;dci++){
-var dcx=39+dci%4*8,dcy=4+Math.floor(dci/4)*6;
-s+=isoBox(dcx,dcy,8,3,f.z+FH,3,'#22c55e','','#86efac');
-s+='<ellipse cx="'+iX(dcx+4,dcy+1.5)+'" cy="'+iY(dcx+4,dcy+1.5,f.z+FH+3.5)+'" rx="5" ry="3" fill="none" stroke="rgba(255,255,255,.4)" stroke-width=".5"/>';
-}
-// CW Pumps (4× 3×2×1.5, center area between chiller & AHU)
-for(var pi=0;pi<4;pi++)s+=isoBox(12+pi*5,18,3,2,f.z+FH,1.5,'#3b82f6','P'+(pi+1),'#93c5fd');
-// FWS Pumps (3× VFD 55kW, new — per P&ID)
-for(var fwi=0;fwi<3;fwi++)s+=isoBox(14+fwi*5,25.5,3,2,f.z+FH,1.5,'#3b82f6','','#93c5fd');   /* v3.9.3 — three identical pumps; the FWS PUMP STATION caption names them once */
-// CW header pipe
-s+=isoBox(10,16,26,1.5,f.z+FH,0.5,'#06b6d4','','#67e8f9');
-// FWS header pipe
-s+=isoBox(10,24.5,26,1,f.z+FH,0.4,'#06b6d4','FWS','#67e8f9');
-// VRF condensing units (4× Daikin VRV)
-for(var vi=0;vi<4;vi++)s+=isoBox(37+vi*7,30,5,4,f.z+FH,1.5,'#f59e0b','','#fde68a');   /* v3.8.1 — four identical glyphs; the VRF CONDENSING caption names them once */
-// CW pipe segments (supply/return between chiller plant → dry cooler array)
-s+=isoBox(36,6,3,1,f.z+FH,0.4,'#06b6d4','CWS','#67e8f9');
-s+=isoBox(36,9,3,1,f.z+FH,0.4,'#3b82f6','CWR','#93c5fd');
-// Expansion vessel (near chiller plant)
-s+=isoBox(32,4,3,3,f.z+FH,2,'#06b6d4','EV','#67e8f9');
-// Makeup water tank (near pump station)
-s+=isoBox(32,18,4,4,f.z+FH,2.5,'#3b82f6','MWT','#93c5fd');
-}
-
-// Floor label (right side)
-var lx=iX(BW+4,BD*0.5);
-var ly=iY(BW+4,BD*0.5,f.z+FH/2);
-/* v3.10.8 — the floor caption was two raw <text> elements, so it never entered the placement
-   pass and kept landing on the ground-floor switchgear tags (GROUND FLOOR x SM6 20kV, x MV
-   SWGR-B, and the FLOOR 2 subtitle on the water tank). It is ONE block of two lines and moves
-   as one. Horizontally: it is parked to the right of the building, so the open canvas is
-   further right, and sliding it up or down would walk it into the floor above or below. */
-(function(fl,fx,fy){
-var M=window.RZDiagramMetrics;
-var wl=M?M.textWidth(fl.label,13,'mono'):String(fl.label).length*13*0.62;
-var ws=M?M.textWidth(fl.sub,9,'mono'):String(fl.sub).length*9*0.62;
-var fbox={x:fx,y:fy-15,w:Math.max(wl,ws),h:31};
-s+=isoDefer(fbox,function(b){
-return'<text x="'+b.x+'" y="'+(b.y+13)+'" fill="'+fl.color+'" font-family="'+J+'" font-size="13" font-weight="700">'+fl.label+'</text>'+
-'<text x="'+b.x+'" y="'+(b.y+29)+'" fill="var(--t3)" font-family="'+J+'" font-size="9">'+fl.sub+'</text>';
-},'x',10,12);
-})(f,lx,ly);
-
-// Clickable overlay (transparent polygon over top face)
-s+='<polygon points="'+isoTop(0,0,BW,BD,f.z+FH)+'" fill="transparent" data-floor="'+f.key+'" style="cursor:pointer" class="iso-floor"><title>Click to view '+f.label+'</title></polygon>';
+var D=window.DHE||{};var n=function(k){var v=D[k];return (typeof v==='number'&&isFinite(v))?v:null};
+var grp=function(v){return v==null?'—':String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,',')};
+var PL=n('plateLengthM'),PW=n('plateWidthM'),CORE=n('coreDepthM'),SPINE=n('spineM'),Lm=n('hallLengthM'),Wm=n('hallWidthM'),
+    WING=n('elecWingM'),rows=n('rackRows'),pitch=n('rowPitchM'),nRoof=n('dcRoof');
+if([PL,PW,CORE,SPINE,Lm,Wm,WING,rows,pitch,nRoof].some(function(v){return v==null})){
+  bC.innerHTML=tx(600,420,'BUILDING VIEW UNAVAILABLE — engine site outputs not loaded','var(--r)',12,'middle',1);return;}
+var HLV=window.HALL_LAYOUT.levels();
+var lv=[{key:'gf',label:'GROUND',color:'var(--o)'}]
+  .concat(HLV.map(function(L){return {key:L.key,label:'FLOOR '+L.floor,color:'var(--g)',halls:L.halls}}))
+  .concat([{key:'roof',label:'ROOF',color:'var(--c)'}]);
+/* dimetric projection: the long axis runs nearly flat so six plates fit one sheet */
+var A=3.5,B=2.0,C=.62,Dd=1.05,STEP=Math.min(104,520/(lv.length-1)),SL=7,OX=250,OY=590;
+function P(x,y,i){return [+(OX+x*A-y*B).toFixed(1),+(OY+x*C+y*Dd-i*STEP).toFixed(1)]}
+function poly(pts,fill,st,sw,ex){return '<polygon points="'+pts.map(function(p){return p.join(',')}).join(' ')+'" fill="'+fill+'"'+(st?' stroke="'+st+'" stroke-width="'+(sw||.6)+'"':'')+(ex||'')+'/>'}
+function face(x,y,w,h,i,fill,st,sw){return poly([P(x,y,i),P(x+w,y,i),P(x+w,y+h,i),P(x,y+h,i)],fill,st,sw)}
+function line(x1,y1,x2,y2,i,c,sw,dash){var p=P(x1,y1,i),q=P(x2,y2,i);return '<line x1="'+p[0]+'" y1="'+p[1]+'" x2="'+q[0]+'" y2="'+q[1]+'" stroke="'+c+'" stroke-width="'+(sw||.6)+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>'}
+function slab(i,edge){
+  var a=P(0,PW,i),b=P(PL,PW,i),c=P(PL,0,i);
+  var s=poly([a,b,[b[0],b[1]+SL],[a[0],a[1]+SL]],'var(--bg3)',edge,.8);           /* south face */
+  s+=poly([b,c,[c[0],c[1]+SL],[b[0],b[1]+SL]],'var(--bg3)',edge,.8);              /* east face */
+  return s+face(0,0,PL,PW,i,'var(--bg2)',edge,1.1);}
+var s='<rect width="1200" height="850" fill="var(--bg2)"/>';
+s+=tx(600,24,'THE BUILDING — '+(D.buildingLevels||'—')+' levels on a '+PL+' × '+PW+' m plate, '+(D.hallLevels||'—')+' of them hall levels','var(--t1)',13,'middle',1,bo('buildingLevels',{also:['plateLengthM','plateWidthM','hallLevels']}));
+s+=tx(600,42,'exploded view, north to the upper left · click a level to open its plan · the plant that does not fit is on the ground-floor site plan','var(--t3)',9,'middle',0);
+var EDGE='rgba(148,163,184,.55)';
+lv.forEach(function(f,i){
+  s+='<g>'+slab(i,EDGE);
+  if(f.key==='gf'){
+    gfRooms(CORE,Lm,Wm,SPINE,PL,PW).forEach(function(r){s+=face(r[0],r[1],r[2],r[3],i,r[5],'rgba(148,163,184,.35)',.4);});
+  }else if(f.key==='roof'){
+    s+=face(0,0,CORE,PW,i,'rgba(120,113,108,.18)');
+    var bw=(PL-CORE-4)/2;
+    [[CORE+2,2],[CORE+2+bw,2],[CORE+2,Wm+SPINE+1],[CORE+2+bw,Wm+SPINE+1]].forEach(function(b){
+      s+=face(b[0],b[1],bw-1,Wm-3,i,'rgba(34,197,94,.14)','var(--g)',.6);
+      for(var k=1;k<10;k++)s+=line(b[0]+k*(bw-1)/10,b[1]+1,b[0]+k*(bw-1)/10,b[1]+Wm-4,i,'rgba(34,197,94,.55)',.5);});
+    s+=line(CORE+1,Wm+SPINE*.35,PL-1,Wm+SPINE*.35,i,'var(--o)',1.4)+line(CORE+1,Wm+SPINE*.65,PL-1,Wm+SPINE*.65,i,'var(--g)',1.4);
+  }else{
+    s+=face(0,0,CORE,PW,i,'rgba(120,113,108,.18)')+face(CORE,Wm,PL-CORE,SPINE,i,'rgba(148,163,184,.10)');
+    [0,Wm+SPINE].forEach(function(y0){
+      s+=face(CORE,y0,Lm,Wm,i,'rgba(34,197,94,.13)','var(--g)',.6);
+      for(var r=0;r<rows;r++){var x=CORE+(r+.5)*Lm/rows;s+=line(x,y0+3.5,x,y0+Wm*.55,i,'rgba(148,163,184,.75)',.7);}
+      s+=line(CORE+.5,y0+Wm*.72,CORE+Lm-.5,y0+Wm*.72,i,'var(--c)',1.1);                       /* the CDU line */
+      s+=face(CORE+Lm,y0,WING,Wm,i,'rgba(245,158,11,.12)','var(--o)',.6)+line(CORE+Lm+WING/2,y0,CORE+Lm+WING/2,y0+Wm,i,'rgba(245,158,11,.5)',.5);});
+  }
+  /* the level's own click target: its top face */
+  s+='<polygon points="'+[P(0,0,i),P(PL,0,i),P(PL,PW,i),P(0,PW,i)].map(function(p){return p.join(',')}).join(' ')+'" fill="transparent" data-floor="'+f.key+'" style="cursor:pointer" class="iso-floor"><title>Open the '+f.label.toLowerCase()+' plan</title></polygon>';
+  s+='</g>';
+  /* the label column */
+  var anchor=P(PL,PW*.5,i),ly=anchor[1]+4,lx=880;
+  s+='<line x1="'+(anchor[0]+6)+'" y1="'+anchor[1]+'" x2="'+(lx-6)+'" y2="'+(ly-4)+'" stroke="var(--t3)" stroke-width=".6" stroke-dasharray="2 2"/>';
+  s+=tx(lx,ly,f.label,f.color,12,'start',1);
+  var sub,so=null;
+  if(f.key==='gf'){sub='20 kV switchrooms A and B · NOC · MMR · dock';}
+  else if(f.key==='roof'){sub=nRoof+' dry coolers · HTW headers · AHU';so=bo('dcRoof',{nomark:true});}
+  else{sub='Datahall '+f.halls.join(' + ')+' · 2 × '+(D.itHall!=null?(D.itHall/1000).toFixed(2):'—')+' MW IT';so=bo('itHall',{nomark:true});}
+  s+=tx(lx,ly+14,sub,'var(--t3)',9,'start',0,so);
 });
-
-// Cross-floor vertical risers (dashed lines connecting floors)
-// Power Riser A (west side, near TX-A)
-for(var ri=0;ri<3;ri++){
-var rz1=ri*(FH+GAP)+FH,rz2=(ri+1)*(FH+GAP);
-s+='<line x1="'+iX(15,24)+'" y1="'+iY(15,24,rz1)+'" x2="'+iX(15,24)+'" y2="'+iY(15,24,rz2)+'" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4 3" opacity=".6"/>';
-}
-s+=isoLabel(15,25,Z_RF+FH+2,'PWR-A','#f59e0b',6,1);
-// Power Riser B (east side, near TX-B)
-for(var ri=0;ri<3;ri++){
-var rz1=ri*(FH+GAP)+FH,rz2=(ri+1)*(FH+GAP);
-s+='<line x1="'+iX(57,24)+'" y1="'+iY(57,24,rz1)+'" x2="'+iX(57,24)+'" y2="'+iY(57,24,rz2)+'" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4 3" opacity=".6"/>';
-}
-s+=isoLabel(57,25,Z_RF+FH+2,'PWR-B','#f59e0b',6,1);
-// Cooling Riser (center, CW supply/return)
-for(var ri=0;ri<3;ri++){
-var rz1=ri*(FH+GAP)+FH,rz2=(ri+1)*(FH+GAP);
-s+='<line x1="'+iX(36,12)+'" y1="'+iY(36,12,rz1)+'" x2="'+iX(36,12)+'" y2="'+iY(36,12,rz2)+'" stroke="#06b6d4" stroke-width="1.2" stroke-dasharray="4 3" opacity=".6"/>';
-}
-s+=isoLabel(36,13,Z_RF+FH+2,'CW RISER','#06b6d4',6,1);
-
-// External structures
-// MV Switchgear A (west, aligned with TX-A)
-s+=drawSlab(-18,10,14,12,0,4,'#f59e0b','rgba(245,158,11,.4)',.4);
-s+=isoLabel(-11,16,7.5,'MV SWGR-A','#f59e0b',9,1);
-s+=isoLabel(-11,16,4,'SM6 20kV','var(--t3)',6.5);
-
-// MV Switchgear B (east, aligned with TX-B)
-s+=drawSlab(BW+4,10,14,12,0,4,'#f59e0b','rgba(245,158,11,.4)',.4);
-s+=isoLabel(BW+11,16,7.5,'MV SWGR-B','#f59e0b',9,1);
-s+=isoLabel(BW+11,16,4,'SM6 20kV','var(--t3)',6.5);
-
-// Gate House (south center)
-s+=drawSlab(24,BD+4,16,6,0,2.5,'#94a3b8','rgba(148,163,184,.4)',.35);
-s+=isoLabel(32,BD+7,5.5,'GATE HOUSE','#94a3b8',9,1);
-s+=isoLabel(32,BD+7,2.5,'ANPR + Boom','var(--t3)',6.5);
-
-// STP (south-east of building)
-s+=drawSlab(BW+4,BD-8,10,8,0,3,'#06b6d4','rgba(6,182,212,.4)',.35);
-s+=isoLabel(BW+9,BD-4,4,'STP','#06b6d4',9,1);
-
-// Fuel Farm (north, near generators)
-s+=drawSlab(BW+4,2,8,10,0,2,'#f59e0b','rgba(245,158,11,.4)',.3);
-s+=isoLabel(BW+8,7,4.5,'FUEL','#f59e0b',9,1);
-s+=isoLabel(BW+8,7,1.5,'80,000L','var(--t3)',6.5,0,{declared:'bulk fuel tank volume is a page-authored site figure (the engine publishes no fuel-storage quantity yet)'});
-
-// Cable / Busduct routes — MV SWGR → TX horizontal cable runs (GF level)
-// MV-A to TX-A entry (dashed orange cable)
-s+='<line x1="'+iX(-4,16)+'" y1="'+iY(-4,16,FH+1)+'" x2="'+iX(2,16)+'" y2="'+iY(2,16,FH+1)+'" stroke="#f59e0b" stroke-dasharray="6 3" stroke-width="1.5" opacity=".7"/>';
-// MV-B to TX-B entry (dashed orange cable)
-s+='<line x1="'+iX(BW+4,16)+'" y1="'+iY(BW+4,16,FH+1)+'" x2="'+iX(70,16)+'" y2="'+iY(70,16,FH+1)+'" stroke="#f59e0b" stroke-dasharray="6 3" stroke-width="1.5" opacity=".7"/>';
-// TX-A → MSB-A horizontal bus link
-s+='<line x1="'+iX(20,17)+'" y1="'+iY(20,17,FH+2)+'" x2="'+iX(27,17)+'" y2="'+iY(27,17,FH+2)+'" stroke="#f59e0b" stroke-width="1.5" opacity=".6"/>';
-// TX-B → MSB-B horizontal bus link
-s+='<line x1="'+iX(44,17)+'" y1="'+iY(44,17,FH+2)+'" x2="'+iX(48,17)+'" y2="'+iY(48,17,FH+2)+'" stroke="#f59e0b" stroke-width="1.5" opacity=".6"/>';
-// Busduct "BD" labels on vertical risers at each floor junction
-/* v3.9.3 — one tag per riser, not one per floor junction. The same two letters were printed six
-   times up two vertical risers and met a different zone caption on each floor; a riser is one
-   object and gets named once, at the middle junction where the run is clearest. */
-for(var bdi=0;bdi<3;bdi++){
-var bdz=(bdi+1)*(FH+GAP);
-if(bdi!==1) continue;
-s+='<text x="'+(iX(15,24)+8)+'" y="'+iY(15,24,bdz)+'" fill="#f59e0b" font-family="'+J+'" font-size="5" font-weight="700">BD</text>';
-s+='<text x="'+(iX(57,24)+8)+'" y="'+iY(57,24,bdz)+'" fill="#f59e0b" font-family="'+J+'" font-size="5" font-weight="700">BD</text>';
-}
-
-// North arrow (top-right) — doc-03: north arrow consistent with the
-// detailed floor views. Industrial-instrumentation style: thin muted
-// stroke, single N-arrow glyph. Corner clear of KPI panel/title/legend.
-s+='<g transform="translate(1150,70)">';
-s+='<line x1="0" y1="13" x2="0" y2="-10" stroke="var(--t3)" stroke-width="1" opacity=".55"/>';
-s+='<polygon points="0,-16 6,2 -6,2" fill="var(--t3)" opacity=".6"/>';
-s+=tx(0,-20,'N','var(--t3)',9,'middle',1);
-s+='</g>';
-
-// Legend strip at bottom
-var LY=770;
-s+='<rect x="20" y="'+(LY-8)+'" width="1160" height="38" rx="4" fill="rgba(255,255,255,.02)" stroke="var(--bd)" stroke-width=".5"/>';
-var lgd=[
-{c:'#f59e0b',l:'Ground — MEP/Infra'},{c:'#22c55e',l:'Floor '+window.HALL_LAYOUT.firstFloor+'–'+(window.HALL_LAYOUT.firstFloor+window.HALL_LAYOUT.levels().length-1)+' — Data Halls'},
-{c:'#06b6d4',l:'Roof — Mechanical'},{c:'#3b82f6',l:'External — MV/Utility'},
-{c:'#64748b',l:'Support Rooms'},{c:'#3b82f6',l:'Office/NOC'}
-];
-var lx2=40;
-lgd.forEach(function(l){
-s+='<rect x="'+lx2+'" y="'+(LY)+'" width="10" height="10" rx="2" fill="'+l.c+'" fill-opacity=".5"/>';
-s+=tx(lx2+14,LY+9,l.l,'var(--t3)',8);
-lx2+=185;
-});
-
-// KPI summary strip
-s+='<rect x="20" y="50" width="280" height="115" rx="5" fill="rgba(255,255,255,.03)" stroke="var(--bd)" stroke-width=".5"/>';
-s+=tx(30,68,'FACILITY SUMMARY','var(--t1)',9,0,1);
-var kpis=[
-['Total IT Load',(DHE?DHE.itFacilityMW+' MW':'—'),'var(--o)',bo('itFacilityMW')],
-['Total Facility',(DHE?(DHE.facTotalMW+' MW (PUE '+DHE.pue+')'):'—'),'var(--g)',bo('facTotalMW',{also:['pue']})],
-['Data Halls',(DH?(DH.halls+'\u00D7 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),'var(--g)',bo('itHall')],
-['GPUs Total',(DHE?DHE.gpuPerFacility.toLocaleString()+'\u00D7 B300':'—'),'var(--pk)',bo('gpuPerFacility')],
-['Cooling','Dry Cooler + DLC','var(--c)'],
-['Redundancy','2N Power / N+1 Cool','var(--t2)']
-];
-var ky=84;
-kpis.forEach(function(k){
-s+=tx(34,ky,k[0],'var(--t3)',7.5);
-s+=tx(290,ky,k[1],k[2],7.5,'end',1,k[3]);
-ky+=15;
-});
-
-// Click hint
-s+=tx(600,810,'Click any floor layer to explore detailed room layout','var(--t3)',8,'middle');
-
+/* risers: core stair-lift shaft and the spine risers carry everything between levels */
+var top=lv.length-1;
+[[CORE*.5,Wm+SPINE*.5,'var(--t3)'],[CORE+Lm+WING*.5,Wm+SPINE*.5,'var(--o)']].forEach(function(r){
+  var p=P(r[0],r[1],0),q=P(r[0],r[1],top);s+='<line x1="'+p[0]+'" y1="'+p[1]+'" x2="'+q[0]+'" y2="'+q[1]+'" stroke="'+r[2]+'" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>';});
+/* facility card, top right */
+s+='<rect x="880" y="58" width="300" height="120" rx="3" fill="var(--bg3)" fill-opacity=".7" stroke="var(--bd)" stroke-width="1"/><rect x="880" y="58" width="2" height="120" fill="var(--o)"/>';
+var kp=[['IT load',(D.itFacilityMW!=null?D.itFacilityMW+' MW':'—'),'var(--o)',bo('itFacilityMW',{nomark:true})],
+        ['Facility at design',(D.facTotalMW!=null?D.facTotalMW+' MW · PUE '+D.pue:'—'),'var(--g)',bo('facTotalMW',{also:['pue'],nomark:true})],
+        ['GPUs',(D.gpuPerFacility!=null?D.gpuPerFacility.toLocaleString('en-US'):'—'),'var(--t1)',bo('gpuPerFacility',{nomark:true})],
+        ['Building footprint',grp(n('footprintM2'))+' m²','var(--t1)',bo('footprintM2',{nomark:true})],
+        ['Plant outside it',grp(n('plantOutsideM2'))+' m² of yards','var(--t1)',bo('plantOutsideM2',{nomark:true})],
+        ['Site',grp(n('siteAreaM2'))+' m²','var(--t1)',bo('siteAreaM2',{nomark:true})]];
+kp.forEach(function(k,j){var y=78+j*17;s+=tx(894,y,k[0],'var(--t3)',9,'start',0)+tx(1170,y,k[1],k[2],9,'end',1,k[3]);});
+/* north arrow along the plate's own axes */
+var n0=P(-8,PW*.3,0),n1=P(-8,PW*.3-14,0);
+s+='<line x1="'+n0[0]+'" y1="'+n0[1]+'" x2="'+n1[0]+'" y2="'+n1[1]+'" stroke="var(--t2)" stroke-width="1.2"/>'+tx(n1[0]-6,n1[1]-4,'N','var(--t2)',9,'middle',1);
+/* key */
+[['var(--o)','electrical: switchrooms, wings, risers'],['var(--g)','data halls and dry coolers'],['var(--c)','CDU line'],['rgba(120,113,108,.9)','core: stairs, lifts, MDF']].forEach(function(e,j){
+  var kx=40+j*280;s+='<rect x="'+kx+'" y="808" width="12" height="10" fill="'+e[0]+'" fill-opacity=".5" stroke="'+e[0]+'" stroke-width=".8"/>'+tx(kx+18,817,e[1],'var(--t2)',9,'start',0);});
 bC.innerHTML=isoResolvePlacement(s);
-
-// Hover effect
 var isoFloors=document.querySelectorAll('.iso-floor');
 isoFloors.forEach(function(el){
-el.addEventListener('mouseenter',function(){el.setAttribute('fill','rgba(255,255,255,.1)')});
+el.addEventListener('mouseenter',function(){el.setAttribute('fill','rgba(255,255,255,.07)')});
 el.addEventListener('mouseleave',function(){el.setAttribute('fill','transparent')});
 });
 }
 
-// ============================
-// 2D FLOOR PLAN RENDERERS
-// ============================
-var M=12; // scale: 12px per meter
-var MX=48,MY=20; // offset
-
-/* v3.7.0 — the transformer-room caption. The room draws four glyphs because four fit; the engine
-   sizes 33 unit substations per feed per hall, so the caption states the ENGINE count and says
-   how many of them are drawn, the same rule the CRAH and CDU banks already follow. */
-function rmTx(px,py,feed){
-var per=DHAX().tx,mva=DHAX().txMVA;
-/* the ratio is a page-authored equipment class, the counts are engine values: two claims, so
-   two texts. One hooked span covering both would report the "0.4" of 20kV/0.4kV as a drawn
-   value of the transformer count, which is how a hook starts lying. */
-/* one line, two claims: the declared ratio ends where the hooked counts begin, so the caption
-   occupies exactly the row the old single string did and adds no vertical collision. */
-return tx(px-3,py,'20kV/0.4kV \u00B7','var(--o)',4.6,'end',0,{declared:'the 20 kV / 400 V unit-substation class is a page-authored equipment selection; the engine publishes the count and the unit rating, not the winding ratio'})
- +tx(px+3,py,dhaF(mva)+' MVA each \u00B7 '+dhaF(per)+' per feed \u2014 4 shown','var(--o)',4.6,'start',0,bo('txPerFeedHall',{also:['txRatingMVA'],nomark:feed==='B'}));
+/* the ground floor's room zoning inside the plate, shared by the site plan and the building view.
+   Page-authored layout (declared where it is drawn): x, y, w, h in plate metres, name, fill, note. */
+function gfRooms(core,Lm,Wm,spine,PL,PW){
+  var xH=core,xW=core+Lm,hS=Wm+spine,dS=PW-Wm-spine,wW=PL-core-Lm;
+  return [
+  [0,0,core,PW,'CORE','rgba(148,163,184,.10)','stairs · lifts · risers'],
+  [xH,0,Lm*.34,Wm,'LOADING DOCK','rgba(120,113,108,.14)','goods lift lobby'],
+  [xH+Lm*.34,0,Lm*.33,Wm,'WORKSHOP','rgba(120,113,108,.10)','stores · spares'],
+  [xH+Lm*.67,0,Lm*.33,Wm,'MMR-A','rgba(236,72,153,.10)','carrier meet-me'],
+  [xW,0,wW,Wm,'20 kV SWITCHROOM A','rgba(245,158,11,.10)','feed A boards → risers to the halls'],
+  [xH,hS,Lm*.25,dS,'ENTRANCE','rgba(59,130,246,.10)','security'],
+  [xH+Lm*.25,hS,Lm*.30,dS,'NOC / SOC','rgba(20,184,166,.12)','operations'],
+  [xH+Lm*.55,hS,Lm*.25,dS,'BMS · FIRE','rgba(239,68,68,.08)','FACP · EPMS'],
+  [xH+Lm*.80,hS,Lm*.20,dS,'MMR-B','rgba(236,72,153,.10)','entry B'],
+  [xW,hS,wW,dS,'20 kV SWITCHROOM B','rgba(245,158,11,.10)','feed B boards → risers to the halls']];
 }
-
-function rm(x,y,w,h,fill,stroke,label,sub,equip,tip,o){
-var px=MX+x*M,py=MY+y*M,pw=w*M,ph=h*M;o=o||{};
-var s='<rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1" rx="2"'+(tip?' data-tip="'+escT(tip)+'"':'')+'/>';
-/* v3.6.3 — where the room's name stack sits.
- *
- * The default is the vertical centre, which is also where this plan lays out the equipment inside
- * a room, so a room with kit in it printed its name straight through that kit: "MSB-A / ATS-A" over
- * ATS-2A and ATS-3A, "Comms Room" over IDF, "Fuel Storage" over T2, "Video wall + Ops" over OPS.
- * Thirteen of those, and all of them invisible until the drill-down they live in was first opened.
- *
- * `textAt:'bottom'` stacks the three rows upward from the room's bottom edge instead, which is
- * where a draughtsman puts a room name when the middle is occupied. It is an option, not the new
- * default: an empty room reads better with its name centred, and moving every room's text would
- * trade these overlaps for new ones against the rooms below. */
-var rows=[];
-if(label){ rows.push({txt:label,fs:Math.min(9,Math.max(6,pw/label.length*1.2)),col:'var(--t1)',bold:1}); }
-if(sub){ rows.push({txt:sub,fs:6,col:'var(--t3)',o:o.sub||(o.subBasis?{basis:o.subBasis}:o.subDeclared?{declared:o.subDeclared}:null)}); }
-if(equip){ rows.push({txt:equip,fs:5.5,col:'var(--t2)',o:o.equip||(o.equipBasis?{basis:o.equipBasis}:o.equipDeclared?{declared:o.equipDeclared}:null)}); }
-var bottom=(o.textAt==='bottom');   /* 'top' is the mirror, for a room whose kit sits low */
-for(var ri=0;ri<rows.length;ri++){
-  var r=rows[ri];
-  var ry = bottom
-    ? (py+ph-5-(rows.length-1-ri)*9)
-    : (o.textAt==='top')
-      ? (py+12+ri*9)
-      : (ri===0 ? (py+ph/2-(sub?4:0)) : ri===1 ? (py+ph/2+8) : (py+ph/2+(sub?18:10)));
-  if(r.bold){
-    s+='<text x="'+(px+pw/2)+'" y="'+ry+'" fill="'+r.col+'" font-family="'+J+'" font-size="'+r.fs+'" font-weight="700" text-anchor="middle">'+r.txt+'</text>';
-  } else {
-    s+=tx2(px+pw/2,ry,r.txt,r.col,r.fs,'middle',0,r.o);
-  }
-}
-return s;
-}
-
-/* v3.6.3 — where an equipment tag sits.
- *
- * The default is the box centre, which is right for a box that holds nothing else. It is wrong for
- * the ones a symFloor* symbol is drawn over: symFloorGEN(23,3.5) and eqLive(21,2,4,3,...,'G1 4MW')
- * name the SAME point, so the IEC "G in a circle" was rendered directly on top of the tag — not a
- * near miss, two marks in one place. The geometry survey counted 14 of those on the floor plan
- * (six generators, eight transformers) and they had never been looked at, because the drill-down
- * they live in was never opened.
- *
- * `labelBelow` puts the tag under the box and leaves the interior to the symbol, which is how a
- * floor plan is drawn on paper. It is an option rather than the default because most equipment
- * boxes here carry no symbol, and moving every tag would trade these collisions for new ones
- * against whatever sits below. */
-function labelY(py,ph,o){ return (o && o.labelBelow) ? (py+ph+5) : (py+ph/2+2); }
-
-// Equipment symbol — small labeled rect (optional data-tip for click tooltip)
-function escT(t){return t.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function eq(x,y,w,h,fill,label,sz,tip,o){
-var px=MX+x*M,py=MY+y*M,pw=w*M,ph=h*M;
-var s='';if(tip)s+='<g data-tip="'+escT(tip)+'" style="cursor:pointer">';
-s+='<rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'" fill="'+fill+'" stroke="rgba(255,255,255,.2)" stroke-width=".5" rx="1"/>';
-if(label){s+=tx2(px+pw/2,labelY(py,ph,o),label,'var(--t1)',sz||5,'middle',0,o);}
-if(tip)s+='</g>';
-return s;
-}
-
-// Room with live parameters (temp, RH, status)
-function rmLive(x,y,w,h,fill,stroke,label,sub,equip,tip,temp,rh,status,o){
-var s=rm(x,y,w,h,fill,stroke,label,sub,equip,tip,o);
-var px=MX+x*M,py=MY+y*M,pw=w*M,ph=h*M;
-// Status dot in top-right corner
-var stColor=status==='Alarm'?'var(--r)':status==='Warning'?'var(--o)':'var(--g)';
-var pulse=status==='Alarm'||status==='Running'?' opacity=".8"><animate attributeName="opacity" values=".4;1;.4" dur="3s" repeatCount="indefinite"/':'';
-s+='<circle cx="'+(px+pw-8)+'" cy="'+(py+8)+'" r="3" fill="'+stColor+'"'+pulse+'></circle>';
-// Temp/RH in bottom-right
-var paramStr=temp?(temp+'\u00B0C'):'';
-if(rh)paramStr+=' | '+rh+'%';
-if(paramStr){
-s+='<g data-rz-authored-basis="simulated room sensor: temperature and RH jitter around the engine air planes (design.planes.p09/p11); never a field reading" opacity=".7">'+tx2(px+pw-4,py+ph-4,paramStr,'var(--t3)',5,'end')+'</g>';
-}
-return s;
-}
-
-// Equipment with status indicator (optional data-tip for click tooltip)
-function eqLive(x,y,w,h,fill,label,sz,status,tip,o){
-var px=MX+x*M,py=MY+y*M,pw=w*M,ph=h*M;
-var s='';if(tip)s+='<g data-tip="'+escT(tip)+'" style="cursor:pointer">';
-s+='<rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'" fill="'+fill+'" stroke="rgba(255,255,255,.2)" stroke-width=".5" rx="1"/>';
-if(label){s+=tx2(px+pw/2,labelY(py,ph,o),label,'var(--t1)',sz||5,'middle',0,o);}
-var stColor=status==='running'?'var(--g)':status==='standby'?'var(--o)':status==='alarm'?'var(--r)':'var(--t3)';
-var pulse=(status==='running'||status==='alarm');
-s+='<circle cx="'+(px+pw-4)+'" cy="'+(py+4)+'" r="2" fill="'+stColor+'"';
-if(pulse)s+='><animate attributeName="opacity" values=".4;1;.4" dur="3s" repeatCount="indefinite"/></circle>';
-else s+='/>';
-if(tip)s+='</g>';
-return s;
-}
-
-// IEC Electrical symbols for floor plans
-function symFloorTX(x,y){
-var px=MX+x*M,py=MY+y*M;
-return'<circle cx="'+px+'" cy="'+(py-4)+'" r="5" fill="none" stroke="var(--o)" stroke-width=".6"/><circle cx="'+px+'" cy="'+(py+4)+'" r="5" fill="none" stroke="var(--o)" stroke-width=".6"/><text x="'+px+'" y="'+(py-6)+'" fill="var(--o)" font-family="'+J+'" font-size="3.5" text-anchor="middle">Y</text><text x="'+px+'" y="'+(py+6)+'" fill="var(--o)" font-family="'+J+'" font-size="3.5" text-anchor="middle">\u0394</text>';
-}
-function symFloorGEN(x,y){
-var px=MX+x*M,py=MY+y*M;
-return'<circle cx="'+px+'" cy="'+py+'" r="6" fill="none" stroke="var(--b)" stroke-width=".7"/><text x="'+px+'" y="'+(py+3)+'" fill="var(--b)" font-family="'+J+'" font-size="6" text-anchor="middle" font-weight="700">G</text>';
-}
-function symFloorUPS(x,y){
-var px=MX+x*M,py=MY+y*M;
-return'<rect x="'+(px-7)+'" y="'+(py-5)+'" width="14" height="10" rx="1.5" fill="none" stroke="var(--p)" stroke-width=".6"/><text x="'+px+'" y="'+(py+2)+'" fill="var(--p)" font-family="'+J+'" font-size="4" text-anchor="middle">~=</text>';
-}
-function symFloorPUMP(x,y){
-var px=MX+x*M,py=MY+y*M;
-return'<circle cx="'+px+'" cy="'+py+'" r="5" fill="none" stroke="var(--c)" stroke-width=".6"/><polygon points="'+(px-2)+','+(py-3)+' '+(px+4)+','+py+' '+(px-2)+','+(py+3)+'" fill="var(--c)" fill-opacity=".3"/>';
-}
-
-// Door symbol
-function door(x,y,horiz,w){
-var px=MX+x*M,py=MY+y*M,dw=(w||1.2)*M;
-if(horiz)return'<line x1="'+px+'" y1="'+py+'" x2="'+(px+dw)+'" y2="'+py+'" stroke="var(--bg2)" stroke-width="3"/>';
-return'<line x1="'+px+'" y1="'+py+'" x2="'+px+'" y2="'+(py+dw)+'" stroke="var(--bg2)" stroke-width="3"/>';
-}
-
-// Wall line
-function wall(x1,y1,x2,y2){
-return'<line x1="'+(MX+x1*M)+'" y1="'+(MY+y1*M)+'" x2="'+(MX+x2*M)+'" y2="'+(MY+y2*M)+'" stroke="var(--t2)" stroke-width="1.5"/>';
-}
-
-// Dimension line
-function dim(x1,y1,x2,y2,label){
-var px1=MX+x1*M,py1=MY+y1*M,px2=MX+x2*M,py2=MY+y2*M;
-var s='<line x1="'+px1+'" y1="'+py1+'" x2="'+px2+'" y2="'+py2+'" stroke="var(--t3)" stroke-width=".3" stroke-dasharray="4 2"/>';
-s+='<text x="'+((px1+px2)/2)+'" y="'+((py1+py2)/2-3)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">'+label+'</text>';
-return s;
-}
-
-// Stairwell symbol
-function stair(x,y,w,h){
-var px=MX+x*M,py=MY+y*M,pw=w*M,ph=h*M;
-var s='<rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'" fill="rgba(120,113,108,.15)" stroke="var(--t3)" stroke-width=".8" rx="1"/>';
-var steps=Math.floor(ph/4);
-for(var i=1;i<steps;i++){s+='<line x1="'+px+'" y1="'+(py+i*4)+'" x2="'+(px+pw)+'" y2="'+(py+i*4)+'" stroke="var(--t3)" stroke-width=".3"/>';}
-s+='<text x="'+(px+pw/2)+'" y="'+(py+ph/2+2)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">\u2191\u2193</text>';
-return s;
-}
-
 // ---- GROUND FLOOR ----
+/* v3.21.9 — the ground floor is the CAMPUS. The retired drawing put six gensets, eight chillers and a
+   fuel tank inside a 72 x 48 m ground floor and wrote "171x 4 MW" beside them: the engine sizes 171
+   gensets, 143 chillers and 631 dry coolers, and none of that fits under the building that holds the
+   halls. Every block below is the engine's count times the model's per-unit allowance
+   (js/dcai-model.js site.*, all ASSUMED), drawn to one isotropic scale:
+     north  | 150 kV GIS hall · 16 main transformers 150/20 kV · fuel farm
+     middle | the building plate (core + hall + electrical wing by two halls + spine) · genset yard
+     south  | chiller plant · dry-cooler yard (the units the roof cannot carry)
+   The block ARRANGEMENT and the 12 m roads are page-authored layout and are declared; the AREAS are
+   engine outputs and are hooked. Each block carries a numbered tag, and every count and area sits in
+   the schedule under the plan, so no caption has to squeeze between blocks. The ground floor itself
+   is drawn again below at the hall-level scale; its room zoning is page-authored. */
 function renderGroundFloor(el){
-var s='';
-var BW=72*M,BH=48*M;
-s+='<rect x="-230" y="-100" width="1420" height="880" fill="var(--bg2)"/>';
-s+='<defs><pattern id="gfGrid" width="'+M+'" height="'+M+'" patternUnits="userSpaceOnUse"><path d="M'+M+' 0L0 0 0 '+M+'" fill="none" stroke="rgba(255,255,255,.02)" stroke-width=".2"/></pattern></defs>';
-s+='<rect x="'+MX+'" y="'+MY+'" width="'+BW+'" height="'+BH+'" fill="url(#gfGrid)"/>';
-
-// Title
-s+=tx(MX+BW/2,-72,'GROUND FLOOR PLAN \u2014 MEP, CHILLER PLANT & INFRASTRUCTURE','var(--t1)',11,'middle',1);
-s+=tx(MX+BW/2,-56,'Engineering-Based Symmetric A/B Power Path Layout','var(--t3)',7,'middle');
-
-// Building outline
-s+='<rect x="'+MX+'" y="'+MY+'" width="'+BW+'" height="'+BH+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
-
-// Dimensions
-s+=dim(0,-3,72,-3,'72,000 mm');
-s+=dim(-4,0,-4,48,'48,000 mm');
-
-// ================================================================
-// ROW 1 — NORTH PERIMETER (y=0..10): Heavy MEP + Generators
-// ================================================================
-s+='<text x="'+(MX+BW/2)+'" y="'+(MY-6)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle" opacity=".5">NORTH \u2014 HEAVY MEP ZONE (Exhaust / Fuel / Noise Isolation)</text>';
-
-// Loading Dock
-s+=rm(0,0,10,10,'rgba(120,113,108,.12)','rgba(120,113,108,.4)','Loading Dock','10m\u00D710m','Freight access','Loading Dock: 10m\u00D710m, 3.5m clear, roller shutter doors, truck turning');
-s+=eq(1,2,3,2,'rgba(120,113,108,.15)','Dock',4,'Loading Platform: 3m\u00D72m, 1200kg capacity, roller shutter 3.5\u00D73.5m clear height');
-s+=eq(5,2,3,2,'rgba(120,113,108,.15)','Lift',4,'Freight Lift: 2000kg capacity, 3.5\u00D72.5m car, hydraulic, 4-stop');
-
-// Fire Suppression Storage
-s+=rm(10,0,10,10,'rgba(239,68,68,.1)','rgba(239,68,68,.35)','Fire Supp.','10m\u00D710m','Clean agent (pending)','Fire Suppression: 4\u00D7 180L clean-agent (selection pending) — formerly Novec 1230 42bar N\u2082, manifold, pipe network',{textAt:'bottom'});
-s+=eq(11,2,2,1.8,'rgba(239,68,68,.15)','N1',3.5,'Clean-agent cylinder N1 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
-s+=eq(14,2,2,1.8,'rgba(239,68,68,.15)','N2',3.5,'Clean-agent cylinder N2 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
-s+=eq(11,5,2,1.8,'rgba(239,68,68,.15)','N3',3.5,'Clean-agent cylinder N3 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
-s+=eq(14,5,2,1.8,'rgba(239,68,68,.15)','N4',3.5,'Clean-agent cylinder N4 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
-
-// Generator Room — facility genset pool from the engine: unit MW, duty + standby, redundancy (DHE); six representative glyphs
-s+=rmLive(20,0,30,10,'rgba(59,130,246,.1)','rgba(59,130,246,.4)','Generator Room','30m\u00D710m',(DH?(DH.gensetFacNplus1+'\u00D7 '+DH.gensetMW+' MW '+DH.gensetRedundancy+' (facility)'):'—'),(DH?('Generator: '+DH.gensetFacNplus1+'\u00D7 '+DH.gensetMW+' MW class MV diesel ('+DH.gensetKW+' kW), facility pool: '+DH.gensetFacN+' duty + '+(DH.gensetFacNplus1-DH.gensetFacN)+' standby, '+DH.gensetRedundancy+' \u2014 6 of '+DH.gensetFacNplus1+' shown'+DH.gensetMW+'MW (2,500-2,750 ekW @60Hz), <10s start, '+DH.gensetFacN+' running + 1 standby (N+1) for '+DH.facTotalMW+' MW facility, 48hr fuel'):'—'),28,null,'Running',{equip:bo('gensetFacNplus1',{also:['gensetMW']})});
-s+=eqLive(21,2,4,3,'rgba(59,130,246,.18)',(DH?('G1 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G1: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorGEN(23,3.5);
-s+=eqLive(25.8,2,4,3,'rgba(59,130,246,.18)',(DH?('G2 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G2: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorGEN(27.8,3.5);
-s+=eqLive(30.6,2,4,3,'rgba(59,130,246,.18)',(DH?('G3 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G3: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorGEN(32.6,3.5);
-s+=eqLive(35.4,2,4,3,'rgba(59,130,246,.18)',(DH?('G4 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G4: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorGEN(37.4,3.5);
-s+=eqLive(40.2,2,4,3,'rgba(59,130,246,.18)',(DH?('G5 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G5: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorGEN(42.2,3.5);
-s+=eqLive(45,2,4,3,'rgba(59,130,246,.18)','G6 STBY',4,'standby','Generator G6 (standby unit of the '+(DH?DH.gensetRedundancy:'—')+' pool): '+(DH?DH.gensetMW:'—')+' MW class MV diesel, Status: STANDBY (Reserve), \u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorGEN(47,3.5);
-// Day tanks (6× matching generators)
-s+=eq(21,6.5,3.5,2,'rgba(245,158,11,.15)','DT-1',3.5,'Day Tank DT-1: 2000L diesel, 1200\u00D7800\u00D71000mm, auto-fill from Fuel Farm, level sensor, 4hr@50% load');
-s+=eq(25.8,6.5,3.5,2,'rgba(245,158,11,.15)','DT-2',3.5,'Day Tank DT-2: 2000L diesel, 1200\u00D7800\u00D71000mm, auto-fill from Fuel Farm, level sensor, 4hr@50% load');
-s+=eq(30.6,6.5,3.5,2,'rgba(245,158,11,.15)','DT-3',3.5,'Day Tank DT-3: 2000L diesel, 1200\u00D7800\u00D71000mm, auto-fill from Fuel Farm, level sensor, 4hr@50% load');
-s+=eq(35.4,6.5,3.5,2,'rgba(245,158,11,.15)','DT-4',3.5,'Day Tank DT-4: 2000L diesel, 1200\u00D7800\u00D71000mm, auto-fill from Fuel Farm, level sensor, 4hr@50% load');
-s+=eq(40.2,6.5,3.5,2,'rgba(245,158,11,.15)','DT-5',3.5,'Day Tank DT-5: 2000L diesel, 1200\u00D7800\u00D71000mm, auto-fill from Fuel Farm, level sensor, 4hr@50% load');
-s+=eq(45,6.5,3.5,2,'rgba(245,158,11,.15)','DT-6',3.5,'Day Tank DT-6: 2000L diesel, 1200\u00D7800\u00D71000mm, auto-fill from Fuel Farm, level sensor, 4hr@50% load');
-
-// Fuel Storage
-s+=rm(50,0,12,10,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','Fuel Storage','12m\u00D710m','4\u00D7 20,000L diesel','Fuel Storage: 4\u00D7 20,000L diesel, bunded, leak detection, 48hr autonomy',{equipDeclared:'bulk fuel storage (4 x 20,000 L, 48 h autonomy) is a page-authored design selection, not an engine quantity',textAt:'top'});
-s+=eq(51,6,4,3,'rgba(245,158,11,.12)','T1',4,'Bulk Tank T1: 20000L diesel, 2400\u00D72400\u00D74000mm, double-wall steel, leak detection, bunded 110%, \u2192 Electrical Tab');
-s+=eq(56,6,4,3,'rgba(245,158,11,.12)','T2',4,'Bulk Tank T2: 20000L diesel, 2400\u00D72400\u00D74000mm, double-wall steel, leak detection, bunded 110%, \u2192 Electrical Tab');
-
-// WTP
-s+=rm(62,0,10,10,'rgba(6,182,212,.12)','rgba(6,182,212,.4)','WTP','10m\u00D710m','RO + DI Polisher','WTP: 10m\u00D710m, RO system 5m\u00B3/hr, DI polisher <5\u00B5S/cm, dosing');
-s+=eq(63,2,3,2,'rgba(6,182,212,.2)','RO',4,'RO System: Pentair PRO-Series, 5m\u00B3/hr permeate, 2500\u00D71200\u00D71800mm, TDS<10ppm, 3-stage membrane, \u2192 Cooling Tab');
-s+=eq(67,2,3,2,'rgba(6,182,212,.2)','DI',4,'DI Polisher: Mixed-bed resin, <5\u00B5S/cm output, 600\u00D7600\u00D71500mm, auto-regeneration, \u2192 Cooling Tab');
-
-// === CORRIDOR 1 (y=10..12) ===
-s+='<rect x="'+MX+'" y="'+(MY+10*M)+'" width="'+BW+'" height="'+(2*M)+'" fill="rgba(148,163,184,.06)" stroke="var(--t3)" stroke-width=".3" rx="1"/>';
-s+='<text x="'+(MX+BW/2)+'" y="'+(MY+11.2*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">MAIN CORRIDOR \u2014 2m</text>';
-
-// ================================================================
-// ROW 2 — ELECTRICAL CORE (y=12..24): Symmetric A/B Power Path
-// ================================================================
-s+='<text x="'+(MX+BW/2)+'" y="'+(MY+11.5*M+4)+'" fill="var(--o)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".4">SYMMETRIC ELECTRICAL ZONE \u2014 Feed A (West) | Feed B (East)</text>';
-
-// TX-A Room (left — Feed A) — engine-derived TX MVA
-s+=rmLive(0,12,16,12,'rgba(245,158,11,.12)','rgba(245,158,11,.4)','TX-A Room','16m\u00D712m',(DH?(DH.txPerFeedHall+'\u00D7 TX '+DH.txRatingMVA+'MVA'):'—'),(DH?('Transformer A: '+DH.txPerFeedHall+'\u00D7 cast-resin '+DH.txRatingMVA+'MVA, 20kV\u2192400V, \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%'):'—'),35,null,'Normal',{equip:bo('txPerFeedHall',{also:['txRatingMVA'],nomark:false})});
-s+=eqLive(1.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-1A',4.5,'running',(DH?('Transformer TX-1A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorTX(4,15.2);
-s+=eqLive(8.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-2A',4.5,'running',(DH?('Transformer TX-2A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorTX(11,15.2);
-s+=eqLive(1.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-3A',4.5,'running',(DH?('Transformer TX-3A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorTX(4,20.2);
-s+=eqLive(8.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-4A',4.5,'running',(DH?('Transformer TX-4A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorTX(11,20.2);
-/* v3.7.0 — the room draws four glyphs; the engine sizes 33 unit substations per feed per hall.
-   A caption that says "4 units" states the drawing's own convenience as a design figure. */
-s+=rmTx(MX+8*M,MY+23*M,'A');
-
-// MSB-A / ATS-A (Feed A) — 2× MSB + 4× ATS
-s+=rmLive(16,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-A / ATS-A','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-A: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A trunk class, 4\u00D7 ATS, <100ms transfer',null,null,'Normal',{textAt:'bottom'});
-s+=eq(17,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-1A',4,'MSB-1A: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
-s+=eq(23,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-2A',4,'MSB-2A: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
-s+=eq(17,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-1A',3.2,'ATS-1A: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
-s+=eq(20.3,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-2A',3.2,'ATS-2A: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
-s+=eq(23.6,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-3A',3.2,'ATS-3A: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
-s+=eq(26.9,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-4A',3.2,'ATS-4A: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
-s+=eq(17,19.5,5,2,'rgba(245,158,11,.1)','DB-NC-A',4,'DB-NC-A: Non-Critical Distribution, 400A, Lighting/AHU/Misc, 800\u00D7600\u00D72000mm, \u2192 Electrical Tab');
-s+=eq(23,19.5,5,2,'rgba(245,158,11,.1)','DB-CL-A',4,'DB-CL-A: Cooling Distribution, 800A, Chillers/Pumps/Fans, 800\u00D7600\u00D72000mm, \u2192 Electrical Tab');
-
-// BMS / EPMS (Center)
-s+=rmLive(30,12,12,12,'rgba(100, 116, 139,.1)','rgba(100, 116, 139,.35)','BMS / EPMS','12m\u00D712m','EcoStruxure DCIM','BMS: Schneider EcoStruxure IT, redundant servers, EPMS, BACnet/IP, Modbus/TCP, OPC-UA',21,null,'Normal',{textAt:'bottom'});
-s+=eq(31,14,4,3,'rgba(100, 116, 139,.15)','SVR-1',4,'Server SVR-1: Dell PowerEdge R760 2U, DCIM Primary, EcoStruxure BMS, 482\u00D7750\u00D789mm, redundant PSU, \u2192 BMS Tab');
-s+=eq(36,14,4,3,'rgba(100, 116, 139,.15)','SVR-2',4,'Server SVR-2: Dell PowerEdge R760 2U, DCIM Standby, EcoStruxure BMS, 482\u00D7750\u00D789mm, hot-standby failover, \u2192 BMS Tab');
-s+=eq(31,18,4,2,'rgba(100, 116, 139,.12)','EPMS',4,'EPMS: Schneider ION9000, Revenue-grade power analyzer, Accuracy 0.1%, RS485+Ethernet, DIN-rail, \u2192 BMS Tab');
-s+=eq(36,18,4,2,'rgba(100, 116, 139,.12)','BACnet',4,'BACnet Gateway: BACnet/IP to Modbus/TCP converter, 8-port, DIN-rail mount, OPC-UA capable, \u2192 BMS Tab');
-
-// MSB-B / ATS-B (Feed B) — 2× MSB + 4× ATS
-s+=rmLive(42,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-B / ATS-B','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-B: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A trunk class, 4\u00D7 ATS, <100ms transfer',null,null,'Normal',{textAt:'bottom'});
-s+=eq(43,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-1B',4,'MSB-1B: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
-s+=eq(49,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-2B',4,'MSB-2B: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
-s+=eq(43,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-1B',3.2,'ATS-1B: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
-s+=eq(46.3,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-2B',3.2,'ATS-2B: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
-s+=eq(49.6,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-3B',3.2,'ATS-3B: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
-s+=eq(52.9,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-4B',3.2,'ATS-4B: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
-s+=eq(43,19.5,5,2,'rgba(245,158,11,.1)','DB-NC-B',4,'DB-NC-B: Non-Critical Distribution, 400A, Lighting/AHU/Misc, 800\u00D7600\u00D72000mm, \u2192 Electrical Tab');
-s+=eq(49,19.5,5,2,'rgba(245,158,11,.1)','DB-CL-B',4,'DB-CL-B: Cooling Distribution, 800A, Chillers/Pumps/Fans, 800\u00D7600\u00D72000mm, \u2192 Electrical Tab');
-
-// TX-B Room (right — Feed B) — engine-derived TX MVA
-s+=rmLive(56,12,16,12,'rgba(245,158,11,.12)','rgba(245,158,11,.4)','TX-B Room','16m\u00D712m',(DH?(DH.txPerFeedHall+'\u00D7 TX '+DH.txRatingMVA+'MVA'):'—'),(DH?('Transformer B: '+DH.txPerFeedHall+'\u00D7 cast-resin '+DH.txRatingMVA+'MVA, 20kV\u2192400V, \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%'):'—'),35,null,'Normal',{equip:bo('txPerFeedHall',{also:['txRatingMVA'],nomark:true})});
-s+=eqLive(57.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-1B',4.5,'running',(DH?('Transformer TX-1B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorTX(60,15.2);
-s+=eqLive(64.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-2B',4.5,'running',(DH?('Transformer TX-2B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorTX(67,15.2);
-s+=eqLive(57.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-3B',4.5,'running',(DH?('Transformer TX-3B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorTX(60,20.2);
-s+=eqLive(64.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-4B',4.5,'running',(DH?('Transformer TX-4B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
-s+=symFloorTX(67,20.2);
-s+=rmTx(MX+64*M,MY+23*M,'B');
-
-// === CORRIDOR 2 (y=24..26) ===
-s+='<rect x="'+MX+'" y="'+(MY+24*M)+'" width="'+BW+'" height="'+(2*M)+'" fill="rgba(148,163,184,.06)" stroke="var(--t3)" stroke-width=".3" rx="1"/>';
-s+='<text x="'+(MX+BW/2)+'" y="'+(MY+25.2*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">CORRIDOR \u2014 2m</text>';
-
-// ================================================================
-// ROW 3 — WORKSHOP / OFFICE (y=26..36): Support Facilities
-// ================================================================
-// Stairwell A
-s+=stair(0,26,6,10);
-s+='<text x="'+(MX+3*M)+'" y="'+(MY+27*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">Stair A</text>';
-
-// Workshop/Storage A (West)
-s+=rm(6,26,12,10,'rgba(148,163,184,.1)','rgba(148,163,184,.4)','Workshop A','12m\u00D710m','Maintenance + Spares','Workshop/Storage A: Maintenance tools, spare parts, staging area, workbenches');
-s+=eq(7,28,4,3,'rgba(148,163,184,.12)','W-Bench',4,'Workbench: 2400\u00D7800mm heavy-duty, ESD mat, lighting, power outlets, tool pegboard');
-s+=eq(12,28,4,3,'rgba(148,163,184,.12)','Shelving',4,'Shelving: Heavy-duty 5-tier, 2400\u00D7600\u00D72000mm, 500kg/shelf, spare filters, cables, fittings');
-s+=eq(7,32,4,3,'rgba(148,163,184,.12)','Tool Cab',4,'Tool Cabinet: Snap-on double-bay, 1800\u00D7600\u00D72000mm, lockable, hand tools, meters, PPE');
-s+=eq(12,32,4,3,'rgba(148,163,184,.12)','Parts',4,'Spare Parts Store: Rack-mount 2400\u00D7600mm, UPS modules, CDU pumps, filters, fuses, critical spares');
-
-// Office + WC (center-west)
-s+=rm(18,26,12,10,'rgba(59,130,246,.08)','rgba(59,130,246,.3)','Office + WC','12m\u00D710m','Admin + Toilets','Office: Open plan admin, meeting room, male/female/PWD toilets, ventilated');
-s+=eq(19,28,4,3,'rgba(59,130,246,.1)','Office',4,'Office Area: Open plan 4\u00D73m, 4 workstations, meeting room, admin console');
-s+=eq(24,28,4,3,'rgba(148,163,184,.1)','WC',4,'Toilet/WC: Male + Female + PWD accessible, ventilated, plumbing to STP');
-
-// Break Room (center-east)
-s+=rm(30,26,12,10,'rgba(59,130,246,.08)','rgba(59,130,246,.3)','Break Room','12m\u00D710m','Pantry + Prayer','Break Room: Pantry, prayer room, lockers, first aid station');
-s+=eq(31,28,4,3,'rgba(59,130,246,.1)','Pantry',4,'Pantry: Kitchenette, microwave, refrigerator, water dispenser, dining area for 8');
-s+=eq(36,28,4,3,'rgba(59,130,246,.1)','Prayer',4,'Prayer/Quiet Room: 4\u00D73m, multi-faith, ablution area, ventilated');
-s+=eq(31,32,4,3,'rgba(148,163,184,.1)','Lockers',4,'Locker Area: 20 personal lockers, changing bench, mirror');
-s+=eq(36,32,4,3,'rgba(239,68,68,.1)','First Aid',3.5,'First Aid Station: AED, burn kit, eye wash, stretcher, emergency shower');
-
-// Chiller Plant Hall (East) \u2014 8\u00D7 water-cooled centrifugal chillers + CW risers up to roof manifold
-s+=rmLive(42,26,24,10,'rgba(6,182,212,.12)','rgba(6,182,212,.45)','Chiller Plant Hall','24m \u00D7 10m',(DH?(DH.chillersInstalled+'\u00D7 '+(DH.chillerRating/1000)+' MW class \u2014 facility'):'—'),'Chiller Plant Hall: '+(DH?DH.chillersInstalled:'—')+'\u00D7 water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class, COP '+(DH?DH.chillerCOP:'—')+' DERIVED (Carnot fraction), '+(DH?DH.chillersRunning:'—')+' running at design \u2014 8 of '+(DH?DH.chillersInstalled:'—')+' shown, R-1234ze(E) refrigerant, mag-bearing oil-free. CW supply/return DN500 risers route up to dry-cooler array on roof. 7+1 N+1 redundancy at 32 MW nameplate.',35,null,'Running',{equip:bo('chillersInstalled',{also:['chillerRating']})});
-/* v3.8.0 — eight glyphs, not eight machines. The engine sizes 143 chillers (36 running on the
-   design day, 142 in the worst weather bin, one spare), so a drawing that showed "CH-1..CH-7 +
-   CH-8 STANDBY" was telling an N+1 story about a plant that is N+1 on 142, not on 7. The glyphs
-   stay as banks and the caption carries the arithmetic. */
-for(var chx=0;chx<4;chx++){
-s+=eqLive(43+chx*5.5,27,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chx+1),4.2,'running','Chiller CH-'+(chx+1)+': water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class @ COP '+(DH?DH.chillerCOP:'—')+' derived, R-1234ze(E), mag bearing, oil-free. Evap LWT '+(DH?DH.chwSupplyC:'—')+'\u00B0C, CW Out '+(DH?DH.cdwReturnC:'—')+'\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
-}
-for(var chy=0;chy<3;chy++){
-s+=eqLive(43+chy*5.5,31.5,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chy+5),4.2,'running','Chiller CH-'+(chy+5)+': water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class @ COP '+(DH?DH.chillerCOP:'—')+' derived, R-1234ze(E), mag bearing, oil-free. Evap LWT '+(DH?DH.chwSupplyC:'—')+'\u00B0C, CW Out '+(DH?DH.cdwReturnC:'—')+'\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
-}
-// CH-8 standby (N+1)
-s+=eqLive(43+3*5.5,31.5,4.5,3.5,'rgba(6,182,212,.12)','CH-BANK 8',4,'standby','Chiller bank 8 of 8 drawn: the engine sizes '+dhaG(DHAX().chillersInstalled)+' machines of '+dhaF(DHAX().chKwTh!=null?DHAX().chKwTh/1000:null,1)+' MW \u2014 '+dhaG(DHAX().chillersRun)+' run on the design day and '+dhaG(DHAX().chillersWorst)+' in the worst weather bin, so the installed spare is '+dhaG((DHAX().chillersInstalled!=null&&DHAX().chillersWorst!=null)?DHAX().chillersInstalled-DHAX().chillersWorst:null)+'. Status: STANDBY BANK. \u2192 Cooling Tab');
-/* v3.10.12 — the band at this column, read properly instead of nudged three times.
-   Chiller glyph rows end at grid 35.0; the CW riser caption sits at 35.7 and its text runs to
-   about 450.4 px; the AHU room starts at 37.5. The corridor strip in between is only 72 px wide
-   at the far left, so it does not reach this column at all. That leaves 450.4 to 470 for two
-   captions: this one at 36.3 (452.6-457.2) and the glyph note at 36.9 (460-464). */
-s+=tx(MX+54*M,MY+36.3*M,dhaG(DHAX().chillersInstalled)+' installed \u00B7 '+dhaG(DHAX().chillersRun)+' duty at design \u00B7 '+dhaG(DHAX().chillersWorst)+' at the worst bin','var(--c)',4,'middle',0,bo('chillersInstalled',{also:['chillersRunning','chillersWorst']}));
-s+=tx(MX+54*M,MY+36.9*M,'8 glyphs drawn \u00D7 '+dhaG(DHAX().chillersInstalled!=null?Math.ceil(DHAX().chillersInstalled/8):null)+' machines per bank','var(--t3)',3.6,'middle',0,{declared:'drawing aggregation: an identity over the marked installed count divided by the eight glyphs drawn, printed so the reader can check the drawing against the engine; not itself an engine quantity'});
-// CW supply + return risers indicator (rising to roof)
-s+='<text x="'+(MX+54*M)+'" y="'+(MY+35.7*M)+'" fill="var(--c)" font-family="'+J+'" font-size="4.5" text-anchor="middle" opacity=".75">\u2191 CW Supply/Return Risers to Roof Dry-Cooler Array (DN500, 30% PG)</text>';
-
-// Stairwell B
-s+=stair(66,26,6,10);
-s+='<text x="'+(MX+69*M)+'" y="'+(MY+27*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">Stair B</text>';
-
-// === CORRIDOR 3 (y=36..37.5) ===
-s+='<rect x="'+MX+'" y="'+(MY+36*M)+'" width="'+BW+'" height="'+(1.5*M)+'" fill="rgba(148,163,184,.06)" stroke="var(--t3)" stroke-width=".3" rx="1"/>';
-s+='<text x="'+(MX+BW/2)+'" y="'+(MY+37*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">CORRIDOR</text>';
-
-// ================================================================
-// ROW 4 — SOUTH PERIMETER (y=37.5..48): Support & Cooling
-// ================================================================
-s+='<text x="'+(MX+BW/2)+'" y="'+(MY+48.5*M+8)+'" fill="var(--b)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".4">SOUTH \u2014 OPERATIONS & COOLING SUPPORT</text>';
-
-// Security
-s+=rm(0,37.5,12,10.5,'rgba(59,130,246,.1)','rgba(59,130,246,.35)','Security','12m\u00D710.5m','Access + CCTV','Security: Mantrap airlock, biometric+card, 32ch CCTV NVR, visitor mgmt');
-s+=eq(1,39.5,4,3,'rgba(59,130,246,.15)','Mantrap',3.5,'Mantrap Airlock: Double-door interlocking, 2400\u00D72400mm, biometric + proximity card, anti-tailgating');
-s+=eq(6,39.5,4,2,'rgba(59,130,246,.12)','Desk',4,'Security Desk: 2\u00D7 monitors, Lenel OnGuard access control, 32ch NVR, visitor management');
-
-// Fire Control
-s+=rm(12,37.5,10,10.5,'rgba(239,68,68,.1)','rgba(239,68,68,.35)','Fire Control','10m\u00D710.5m','FACP + VESDA','Fire Control: Notifier NFS2-3030 FACP, 640 pts, VESDA LaserPLUS');
-s+=eq(13,39.5,3,2.5,'rgba(239,68,68,.15)','FACP',4,'FACP: Notifier NFS2-3030, 640 addressable points, 19\u2033 rack mount, VESDA LaserPLUS integration, \u2192 Fire Tab');
-
-// NOC
-s+=rmLive(22,37.5,14,10.5,'rgba(20,184,166,.1)','rgba(20,184,166,.35)','NOC','14m\u00D710.5m','Video wall + Ops','NOC: 3\u00D73 video wall, 8 operator positions, DCIM dashboards, 24/7',22,null,'Running',{textAt:'bottom'});
-s+=eq(23,39.5,6,2,'rgba(20,184,166,.2)','V-Wall',4,'Video Wall: 3\u00D73 NEC UN552VS 55\u2033, 4K UHD, Datapath controller, 6000\u00D72000mm total, \u2192 BMS Tab');
-s+=eq(23,42.5,4,2.5,'rgba(20,184,166,.12)','OPS',4,'Operator Station: Dual 27\u2033 monitors, KVM switch, DCIM/BMS/EPMS client, \u2192 BMS Tab');
-s+=eq(29,42.5,4,2.5,'rgba(20,184,166,.12)','OPS',4,'Operator Station: Dual 27\u2033 monitors, KVM switch, DCIM/BMS/EPMS client, \u2192 BMS Tab');
-
-// Comms Room
-s+=rm(36,37.5,12,10.5,'rgba(236,72,153,.1)','rgba(236,72,153,.35)','Comms Room','12m\u00D710.5m','MDF + IDF','Comms: Main distribution frame, IDF, fiber patch, OOB switches',{textAt:'bottom'});
-s+=eq(37,40,4,3,'rgba(236,72,153,.12)','MDF',4,'MDF: Main Distribution Frame, 42U rack 600\u00D71200mm, fiber/copper patch, core switches, \u2192 Network Tab');
-s+=eq(42,40,4,3,'rgba(236,72,153,.12)','IDF',4,'IDF: Intermediate Distribution Frame, 24U rack 600\u00D7800mm, floor distribution, access switches, \u2192 Network Tab');
-
-// AHU Room (clickable)
-s+='<g class="ahu-click" data-rz-equipment="ahu:1" tabindex="0" role="button"><title>AHU — click for inspector, double-click for HMI</title>';
-s+=rm(48,37.5,12,10.5,'rgba(6,182,212,.1)','rgba(6,182,212,.35)','AHU Room','12m\u00D710.5m','2\u00D7 AHU 150kW','AHU: 2\u00D7 Carrier 39HQ 150kW, supply/return for office & support \u25B6 Click for P&ID',{textAt:'top'});
-s+=eq(49,40,4,3,'rgba(6,182,212,.18)','AHU-1',4,'AHU-1: Carrier 39HQ 150kW, 24000m\u00B3/h, 5000\u00D72200\u00D72800mm, G4+F7 filters, CHW coil 7/12\u00B0C, VFD fan, \u2192 HVAC Tab');
-s+=eq(54,40,4,3,'rgba(6,182,212,.18)','AHU-2',4,'AHU-2: Carrier 39HQ 150kW, 24000m\u00B3/h, 5000\u00D72200\u00D72800mm, G4+F7 filters, CHW coil 7/12\u00B0C, VFD fan, \u2192 HVAC Tab');
-s+='<text x="'+(MX+54*M)+'" y="'+(MY+47*M)+'" fill="var(--c)" font-family="'+J+'" font-size="4.5" text-anchor="middle" opacity=".7">\u25B6 Click: P&ID</text>';
-s+='</g>';
-
-// Electrical Store / Spare Parts (CW pumps moved to Roof per audit)
-s+=rm(60,37.5,12,10.5,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','Elec. Store','12m\u00D710.5m','Spares + Test Equip','Electrical Store: Spare breakers, fuses, cable, test equipment, calibration tools');
-s+=eq(61,39.5,4,3,'rgba(245,158,11,.12)','Breakers',4,'Spare Breakers: MCCB/ACB spares, Schneider Compact/Masterpact, sorted by rating, climate-controlled');
-s+=eq(66,39.5,4,3,'rgba(245,158,11,.12)','Cable',4,'Cable Store: XLPE/LSF cable drums, 1.5mm\u00B2 to 240mm\u00B2, copper, fire-rated, labelled by circuit');
-s+=eq(61,43.5,4,3,'rgba(245,158,11,.12)','Test Eq',4,'Test Equipment: Fluke 1760 PQ analyzer, Megger MIT1025 insulation tester, thermal camera, PAT tester');
-s+=eq(66,43.5,4,3,'rgba(245,158,11,.12)','Fuses',4,'Fuse Store: HRC fuses, miniature fuses, fuse links, sorted by type/rating, stock control system');
-
-// ================================================================
-// EXTERNAL STRUCTURES (outside building footprint)
-// ================================================================
-
-// --- MV SWITCHGEAR A (West side, aligned with TX-A) ---
-var mvAx=MX-18*M,mvAy=MY+12*M,mvAw=16*M,mvAh=12*M;
-s+='<rect x="'+mvAx+'" y="'+mvAy+'" width="'+mvAw+'" height="'+mvAh+'" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.5)" stroke-width="1.5" rx="3" stroke-dasharray="6 3"/>';
-s+='<rect x="'+(mvAx+2)+'" y="'+(mvAy+2)+'" width="'+(mvAw-4)+'" height="18" rx="2" fill="rgba(245,158,11,.1)"/>';
-s+='<text x="'+(mvAx+mvAw/2)+'" y="'+(mvAy+14)+'" fill="var(--o)" font-family="'+J+'" font-size="8" font-weight="700" text-anchor="middle">MV SWGR-A</text>';
-s+='<text x="'+(mvAx+mvAw/2)+'" y="'+(mvAy+32)+'" fill="var(--t2)" font-family="'+J+'" font-size="6" text-anchor="middle">SM6 20kV Ring Main</text>';
-s+='<text x="'+(mvAx+mvAw/2)+'" y="'+(mvAy+44)+'" fill="var(--t3)" font-family="'+J+'" font-size="5.5" text-anchor="middle">VCB 630A | 25kA</text>';
-s+='<text x="'+(mvAx+mvAw/2)+'" y="'+(mvAy+56)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">Feeds TX-1A..4A</text>';
-s+=eq(-17,16.4,4,3,'rgba(245,158,11,.15)','RMU',5,'RMU: Schneider SM6 Ring Main Unit, 20kV, 3-panel (2\u00D7load break + 1\u00D7fuse), 1800\u00D7800\u00D71800mm, SF6 insulated, \u2192 Electrical Tab');
-s+=eq(-12,16.4,4,3,'rgba(245,158,11,.15)','VCB',5,'VCB: Vacuum Circuit Breaker, 20kV 630A 25kA, 800\u00D7800\u00D71800mm, motorized close/trip, protection relay, \u2192 Electrical Tab');
-// Cable tray MV-A to TX-A
-s+='<line x1="'+(mvAx+mvAw)+'" y1="'+(mvAy+mvAh/2)+'" x2="'+MX+'" y2="'+(MY+18*M)+'" stroke="var(--o)" stroke-width="2" stroke-dasharray="8 4" opacity=".5"/>';
-/* v3.6.3 — lifted clear of the TX-A row. The transformer tags moved below their boxes so the IEC
-   symbol could have the box interior, and this cable note was sitting exactly where TX-1A's tag
-   landed. A route annotation belongs on its route, not across the equipment it feeds. */
-s+='<text x="'+(mvAx+mvAw+10)+'" y="'+(mvAy+mvAh/2-13)+'" fill="var(--o)" font-family="'+J+'" font-size="4.5" opacity=".7">20kV XLPE 3\u00D7(1\u00D7240mm\u00B2)</text>';
-
-// --- MV SWITCHGEAR B (East side, aligned with TX-B) ---
-var mvBx=MX+BW+2*M,mvBy=MY+12*M,mvBw=16*M,mvBh=12*M;
-s+='<rect x="'+mvBx+'" y="'+mvBy+'" width="'+mvBw+'" height="'+mvBh+'" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.5)" stroke-width="1.5" rx="3" stroke-dasharray="6 3"/>';
-s+='<rect x="'+(mvBx+2)+'" y="'+(mvBy+2)+'" width="'+(mvBw-4)+'" height="18" rx="2" fill="rgba(245,158,11,.1)"/>';
-s+='<text x="'+(mvBx+mvBw/2)+'" y="'+(mvBy+14)+'" fill="var(--o)" font-family="'+J+'" font-size="8" font-weight="700" text-anchor="middle">MV SWGR-B</text>';
-s+='<text x="'+(mvBx+mvBw/2)+'" y="'+(mvBy+32)+'" fill="var(--t2)" font-family="'+J+'" font-size="6" text-anchor="middle">SM6 20kV Ring Main</text>';
-s+='<text x="'+(mvBx+mvBw/2)+'" y="'+(mvBy+44)+'" fill="var(--t3)" font-family="'+J+'" font-size="5.5" text-anchor="middle">VCB 630A | 25kA</text>';
-s+='<text x="'+(mvBx+mvBw/2)+'" y="'+(mvBy+56)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">Feeds TX-1B..4B</text>';
-// Cable tray MV-B to TX-B
-s+='<line x1="'+mvBx+'" y1="'+(mvBy+mvBh/2)+'" x2="'+(MX+BW)+'" y2="'+(MY+18*M)+'" stroke="var(--o)" stroke-width="2" stroke-dasharray="8 4" opacity=".5"/>';
-s+='<text x="'+(mvBx-10)+'" y="'+(mvBy+mvBh/2-5)+'" fill="var(--o)" font-family="'+J+'" font-size="4.5" text-anchor="end" opacity=".7">20kV XLPE 3\u00D7(1\u00D7240mm\u00B2)</text>';
-
-// --- GATE HOUSE (South center) ---
-var ghx=MX+28*M,ghy=MY+BH+3*M,ghw=16*M,ghh=7*M;
-s+='<rect x="'+ghx+'" y="'+ghy+'" width="'+ghw+'" height="'+ghh+'" fill="rgba(148,163,184,.08)" stroke="rgba(148,163,184,.5)" stroke-width="1.5" rx="3" stroke-dasharray="6 3"/>';
-s+='<rect x="'+(ghx+2)+'" y="'+(ghy+2)+'" width="'+(ghw-4)+'" height="16" rx="2" fill="rgba(148,163,184,.08)"/>';
-s+='<text x="'+(ghx+ghw/2)+'" y="'+(ghy+13)+'" fill="var(--t1)" font-family="'+J+'" font-size="8" font-weight="700" text-anchor="middle">GATE HOUSE</text>';
-s+='<text x="'+(ghx+ghw/2)+'" y="'+(ghy+30)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">Security Checkpoint</text>';
-s+='<text x="'+(ghx+ghw/2)+'" y="'+(ghy+42)+'" fill="var(--t3)" font-family="'+J+'" font-size="5.5" text-anchor="middle">Boom Gate | ANPR | Turnstile</text>';
-// Gate barrier lines
-s+='<line x1="'+(ghx-2*M)+'" y1="'+(ghy+ghh/2)+'" x2="'+ghx+'" y2="'+(ghy+ghh/2)+'" stroke="var(--t3)" stroke-width="2" stroke-dasharray="4 2" opacity=".4"/>';
-s+='<line x1="'+(ghx+ghw)+'" y1="'+(ghy+ghh/2)+'" x2="'+(ghx+ghw+2*M)+'" y2="'+(ghy+ghh/2)+'" stroke="var(--t3)" stroke-width="2" stroke-dasharray="4 2" opacity=".4"/>';
-// Perimeter fence
-s+='<line x1="'+(MX-2*M)+'" y1="'+(ghy+ghh/2)+'" x2="'+(ghx-2*M)+'" y2="'+(ghy+ghh/2)+'" stroke="var(--t3)" stroke-width="1" stroke-dasharray="3 3" opacity=".3"/>';
-s+='<line x1="'+(ghx+ghw+2*M)+'" y1="'+(ghy+ghh/2)+'" x2="'+(MX+BW+2*M)+'" y2="'+(ghy+ghh/2)+'" stroke="var(--t3)" stroke-width="1" stroke-dasharray="3 3" opacity=".3"/>';
-s+='<text x="'+(MX-M)+'" y="'+(ghy+ghh/2-5)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5" opacity=".5">PERIMETER FENCE</text>';
-// Road from gate to building
-s+='<line x1="'+(ghx+ghw/2)+'" y1="'+ghy+'" x2="'+(ghx+ghw/2)+'" y2="'+(MY+BH)+'" stroke="var(--t3)" stroke-width="3" stroke-dasharray="10 6" opacity=".15"/>';
-s+='<text x="'+(ghx+ghw/2+10)+'" y="'+(ghy-5)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5" opacity=".5">ACCESS ROAD</text>';
-
-// --- STP (Southeast, clickable) ---
-var stpx=MX+BW+2*M,stpy=MY+38*M,stpw=14*M,stph=10*M;
-s+='<g class="stp-click" data-rz-equipment="stp:1" tabindex="0" role="button"><title>STP — click for inspector, double-click for HMI</title>';
-s+='<rect x="'+stpx+'" y="'+stpy+'" width="'+stpw+'" height="'+stph+'" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.45)" stroke-width="1.5" rx="3" stroke-dasharray="6 3"/>';
-s+='<rect x="'+(stpx+2)+'" y="'+(stpy+2)+'" width="'+(stpw-4)+'" height="16" rx="2" fill="rgba(6,182,212,.08)"/>';
-s+='<text x="'+(stpx+stpw/2)+'" y="'+(stpy+13)+'" fill="var(--c)" font-family="'+J+'" font-size="8" font-weight="700" text-anchor="middle">STP</text>';
-s+='<text x="'+(stpx+stpw/2)+'" y="'+(stpy+30)+'" fill="var(--t2)" font-family="'+J+'" font-size="6" text-anchor="middle">Sewage Treatment</text>';
-s+='<text x="'+(stpx+stpw/2)+'" y="'+(stpy+42)+'" fill="var(--t3)" font-family="'+J+'" font-size="5.5" text-anchor="middle">SBR 50m\u00B3/day</text>';
-s+='<text x="'+(stpx+stpw/2)+'" y="'+(stpy+56)+'" fill="var(--c)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".7">\u25B6 Click: P&ID</text>';
-s+='<line x1="'+(MX+BW)+'" y1="'+(MY+44*M)+'" x2="'+stpx+'" y2="'+(stpy+stph/2)+'" stroke="var(--c)" stroke-width="1.5" stroke-dasharray="5 3" opacity=".3"/>';
-s+='</g>';
-
-// --- FUEL FARM (North, near generators) ---
-var ffx=MX+50*M,ffy=MY-7*M,ffw=12*M,ffh=5*M;
-s+='<rect x="'+ffx+'" y="'+ffy+'" width="'+ffw+'" height="'+ffh+'" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.4)" stroke-width="1" rx="3" stroke-dasharray="6 3"/>';
-s+='<text x="'+(ffx+ffw/2)+'" y="'+(ffy+ffh/2-3)+'" fill="var(--o)" font-family="'+J+'" font-size="7" font-weight="700" text-anchor="middle">FUEL FARM</text>';
-s+='<text x="'+(ffx+ffw/2)+'" y="'+(ffy+ffh/2+8)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">80,000L Diesel | Bunded</text>';
-s+='<line x1="'+(ffx+ffw/2)+'" y1="'+(ffy+ffh)+'" x2="'+(MX+40*M)+'" y2="'+MY+'" stroke="var(--o)" stroke-width="1.5" stroke-dasharray="5 3" opacity=".3"/>';
-
-// ================================================================
-// ANNOTATIONS & LEGEND
-// ================================================================
-
-// North arrow
-s+='<g transform="translate('+(MX+BW+30)+','+(MY+3*M)+')">';
-s+='<polygon points="0,-12 6,3 -6,3" fill="var(--t3)" opacity=".6"/>';
-s+=tx(0,-16,'N','var(--t3)',8,'middle',1);
-s+='</g>';
-
-// Scale bar
-var sBy=MY+BH+10;
-s+='<line x1="'+(MX+BW-20*M)+'" y1="'+sBy+'" x2="'+(MX+BW)+'" y2="'+sBy+'" stroke="var(--t2)" stroke-width="1"/>';
-s+='<line x1="'+(MX+BW-20*M)+'" y1="'+(sBy-4)+'" x2="'+(MX+BW-20*M)+'" y2="'+(sBy+4)+'" stroke="var(--t2)" stroke-width=".5"/>';
-s+='<line x1="'+(MX+BW)+'" y1="'+(sBy-4)+'" x2="'+(MX+BW)+'" y2="'+(sBy+4)+'" stroke="var(--t2)" stroke-width=".5"/>';
-s+=tx(MX+BW-10*M,sBy-6,'20m','var(--t3)',6,'middle');
-
-// Legend
-var lgx=MX-18*M,lgy=MY+30*M;
-s+='<rect x="'+lgx+'" y="'+lgy+'" width="'+(16*M)+'" height="'+(15*M)+'" rx="4" fill="rgba(15,23,42,.6)" stroke="rgba(148,163,184,.15)" stroke-width=".5"/>';
-s+='<text x="'+(lgx+8*M)+'" y="'+(lgy+14)+'" fill="var(--t1)" font-family="'+J+'" font-size="7" font-weight="700" text-anchor="middle">LEGEND</text>';
-var lgItems=[
-{c:'rgba(59,130,246,.35)',l:'Generator / Fire'},
-{c:'rgba(245,158,11,.4)',l:'Electrical (TX/MSB/ATS)'},
-{c:'rgba(100, 116, 139,.4)',l:'Workshop / BMS / Support'},
-{c:'rgba(6,182,212,.4)',l:'Water / Cooling'},
-{c:'rgba(59,130,246,.35)',l:'Security / Office'},
-{c:'rgba(236,72,153,.35)',l:'Communications'},
-{c:'rgba(148,163,184,.4)',l:'Support / Stairs'}
-];
-for(var li=0;li<lgItems.length;li++){
-var liy=lgy+26+li*20;
-s+='<rect x="'+(lgx+8)+'" y="'+liy+'" width="14" height="10" rx="1.5" fill="'+lgItems[li].c.replace('.35','.12').replace('.4','.12')+'" stroke="'+lgItems[li].c+'" stroke-width=".8"/>';
-s+='<text x="'+(lgx+28)+'" y="'+(liy+8)+'" fill="var(--t2)" font-family="'+J+'" font-size="6">'+lgItems[li].l+'</text>';
-}
-s+='<rect x="'+(lgx+8)+'" y="'+(lgy+26+lgItems.length*20)+'" width="14" height="10" rx="1.5" fill="none" stroke="var(--t3)" stroke-width=".8" stroke-dasharray="3 2"/>';
-s+='<text x="'+(lgx+28)+'" y="'+(lgy+34+lgItems.length*20)+'" fill="var(--t2)" font-family="'+J+'" font-size="6">External Structure</text>';
-
-el.innerHTML='<g data-rz-authored-basis="building grid: the 72 x 48 m plot, room dimensions and wall positions are the retired-basis site layout kept until the site re-grid (captioned on the drawing); every count and rating on this floor that is an engine quantity carries its own mark">'+s+'</g>';
+var grp=function(v){return v==null?'—':String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,',')};
+var D=window.DHE||{};var n=function(k){var v=D[k];return (typeof v==='number'&&isFinite(v))?v:null};
+var PL=n('plateLengthM'),PW=n('plateWidthM'),core=n('coreDepthM'),spine=n('spineM'),Lm=n('hallLengthM'),Wm=n('hallWidthM'),
+    aTx=n('mainTxYardM2'),aGis=n('gisHallM2'),aFuel=n('fuelFarmM2'),aGen=n('gensetYardM2'),aCh=n('chillerPlantM2'),aDc=n('dcYardM2'),
+    site=n('siteAreaM2'),nTx=n('mainTxTotal'),nGen=n('gensetFacNplus1'),nCh=n('chillersInstalled'),nDc=n('dcYard'),nBays=n('hvSwitchyardBays');
+if([PL,PW,core,spine,Lm,Wm,aTx,aGis,aFuel,aGen,aCh,aDc,site,nTx,nGen,nCh,nDc,nBays].some(function(v){return v==null})){
+  el.innerHTML=tx(20,20,'SITE PLAN UNAVAILABLE — engine site outputs not loaded','var(--r)',12,0,1);return;}
+var decl=function(t){return {declared:t}};
+var LAYOUT=decl('block arrangement and the 12 m roads are page-authored campus layout; block areas are engine outputs');
+var ROOMS=decl('ground-floor room zoning inside the plate is page-authored layout, not an engine quantity');
+var G=12,aStp=240;                                   /* road between blocks, metres; sewage plant footprint, m² (both declared) */
+var genW=aGen/PW, Wi=PL+G+genW;                      /* middle band: building + genset yard, one depth */
+var dA=(aStp+aGis+aTx+aFuel)/(Wi-3*G), stpW=aStp/dA, gisW=aGis/dA, txW=aTx/dA, fuW=aFuel/dA;
+var dC=(aCh+aDc)/(Wi-G), chW=aCh/dC, dcW=aDc/dC;
+var envH=dA+G+PW+G+dC, k=Math.max(1,Math.sqrt(site/(Wi*envH))), BW=Wi*k, BH=envH*k, mx=(BW-Wi)/2, my=(BH-envH)/2;
+var P=+(930/BW).toFixed(3), OX=35, OY=62;
+var X=function(m){return +(OX+m*P).toFixed(1)},Y=function(m){return +(OY+m*P).toFixed(1)};
+var R=function(x,y,w,h,f,st,sw,ex){return '<rect x="'+X(x)+'" y="'+Y(y)+'" width="'+(w*P).toFixed(1)+'" height="'+(h*P).toFixed(1)+'" fill="'+f+'"'+(st?' stroke="'+st+'" stroke-width="'+(sw||1)+'"':'')+(ex||'')+'/>'};
+/* n units packed into a block at a unit aspect (length / depth), each drawn inset in its cell */
+function pack(x,y,w,h,cnt,asp,fill,stroke){
+  var cols=Math.max(1,Math.round(Math.sqrt(cnt*w/(h*asp)))),rows=Math.ceil(cnt/cols),cw=w/cols,ch=h/rows,o='';
+  for(var i=0;i<cnt;i++){var r=Math.floor(i/cols),c=i%cols;o+=R(x+c*cw+cw*.12,y+r*ch+ch*.14,cw*.76,ch*.72,fill,stroke,.4);}
+  return o;}
+/* a block tag: the number of its schedule row and a short name, on an opaque pill so units never cross it */
+function tag(x,y,w,h,no,name,c){var cx=X(x+w/2),cy=Y(y+h/2),t=no+'  '+name,tw=t.length*6.2+14;
+  return '<rect x="'+(cx-tw/2).toFixed(1)+'" y="'+(cy-9)+'" width="'+tw.toFixed(1)+'" height="17" rx="2" fill="var(--bg2)" stroke="'+c+'" stroke-width=".8"/>'+tx(cx,cy+4,t,c,10,'middle',1);}
+var s='<rect x="-20" y="-40" width="1000" height="1400" fill="var(--bg2)"/>';
+s+=tx(500,10,'SITE PLAN — the campus that carries a '+(D.facTotalMW!=null?D.facTotalMW:'—')+' MW plant','var(--t1)',13,'middle',1,bo('facTotalMW',{nomark:true}));
+s+=tx(500,28,'each block = the engine count × a per-unit floor allowance (ASSUMED), drawn to one scale · north up','var(--t3)',9.5,'middle',0,LAYOUT);
+s+=R(0,0,BW,BH,'rgba(148,163,184,.025)','var(--t3)',1.1,' stroke-dasharray="8 5"');
+var ox=mx,oy=my,yA=oy,c1='var(--o)';
+/* ---- north band: STP · GIS hall · main transformers · fuel farm ---- */
+s+='<g class="stp-click" data-rz-equipment="stp:1" tabindex="0" role="button"><title>STP — click for inspector, double-click for HMI</title>'+R(ox,yA,stpW,dA,'rgba(6,182,212,.08)','var(--c)',.8,' stroke-dasharray="4 2"')+'</g>';
+s+=tx(X(ox+stpW/2),Y(yA+dA/2)+4,'8','var(--c)',10,'middle',1);
+var gX=ox+stpW+G;
+s+='<g data-rz-equipment="sld-mv-sub:dh01" tabindex="0" role="button"><title>150 kV GIS hall — click for inspector</title>'+R(gX,yA,gisW,dA,'rgba(245,158,11,.10)',c1,1);
+for(var b=1;b<nBays;b++)s+='<line x1="'+X(gX+b*gisW/nBays)+'" y1="'+Y(yA+dA*.2)+'" x2="'+X(gX+b*gisW/nBays)+'" y2="'+Y(yA+dA*.8)+'" stroke="var(--o)" stroke-width=".5" opacity=".6"/>';
+s+='</g>'+tag(gX,yA,gisW,dA,'1','GIS',c1);
+var txX=gX+gisW+G;
+s+=R(txX,yA,txW,dA,'rgba(245,158,11,.04)','rgba(245,158,11,.45)',.8);
+for(var t=0;t<nTx;t++){var hall=Math.floor(t/2)+1,fd=t%2?'b':'a',cw=txW/nTx;
+  s+='<g data-rz-equipment="sld-main-tx:dh0'+hall+fd+'" tabindex="0" role="button"><title>Main transformer DH-0'+hall+' feed '+fd.toUpperCase()+' — 150/20 kV</title>'+R(txX+t*cw+cw*.18,yA+dA*.2,cw*.64,dA*.6,'rgba(245,158,11,.22)','var(--o)',.6)+'</g>';}
+s+=tag(txX,yA,txW,dA,'2','MAIN TRANSFORMERS',c1);
+var fuX=txX+txW+G;
+s+=R(fuX,yA,fuW,dA,'rgba(239,68,68,.06)','rgba(239,68,68,.5)',.8,' stroke-dasharray="4 2"');
+for(var f=0;f<6;f++)s+='<circle cx="'+X(fuX+fuW*(f+.5)/6)+'" cy="'+Y(yA+dA/2)+'" r="'+(Math.min(fuW/6,dA)*P*.36).toFixed(1)+'" fill="none" stroke="var(--r)" stroke-width=".6" opacity=".55"/>';
+s+=tag(fuX,yA,fuW,dA,'3','FUEL','var(--r)');
+/* ---- middle band: the building · genset yard ---- */
+var yB=yA+dA+G,bx0=ox;
+s+=R(bx0,yB,PL,PW,'rgba(34,197,94,.035)','var(--t1)',1.6);
+gfRooms(core,Lm,Wm,spine,PL,PW).forEach(function(r){s+=R(bx0+r[0],yB+r[1],r[2],r[3],r[5],'rgba(148,163,184,.4)',.5);});
+s+=R(bx0+core,yB+Wm,PL-core,spine,'rgba(148,163,184,.06)');
+s+=tag(bx0,yB,PL,PW,'4','THE BUILDING','var(--g)');
+var gnX=bx0+PL+G;
+s+='<g data-rz-equipment="sld-mv-sub:dh01b" tabindex="0" role="button"><title>Genset yard — 20 kV gensets on the switchroom boards</title>'+R(gnX,yB,genW,PW,'rgba(148,163,184,.04)','rgba(148,163,184,.55)',.8)+pack(gnX+1,yB+1,genW-2,PW-2,nGen,3,'rgba(148,163,184,.30)','var(--t2)')+'</g>';
+s+=tag(gnX,yB,genW,PW,'5','GENSETS','var(--t1)');
+/* ---- south band: chiller plant · dry-cooler yard ---- */
+var yC=yB+PW+G;
+s+='<g data-rz-equipment="chiller:1" tabindex="0" role="button"><title>Chiller plant — click for inspector, double-click for HMI</title>'+R(ox,yC,chW,dC,'rgba(59,130,246,.05)','var(--b)',1)+pack(ox+1,yC+1,chW-2,dC-2,nCh,2,'rgba(59,130,246,.28)','var(--b)')+'</g>';
+s+=tag(ox,yC,chW,dC,'6','CHILLER PLANT','var(--b)');
+var dX=ox+chW+G;
+s+='<g data-rz-equipment="dry-cooler:1" tabindex="0" role="button"><title>Dry-cooler yard — click for inspector, double-click for HMI</title>'+R(dX,yC,dcW,dC,'rgba(34,197,94,.04)','var(--g)',1)+pack(dX+1,yC+1,dcW-2,dC-2,nDc,4,'rgba(34,197,94,.26)','var(--g)')+'</g>';
+s+=tag(dX,yC,dcW,dC,'7','DRY-COOLER YARD','var(--g)');
+/* ---- the links that make it one plant ---- */
+var xW=bx0+core+Lm,wW=PL-core-Lm,hS=yB+Wm+spine,dS=PW-Wm-spine;
+var lnk=function(x1,y1,x2,y2,c,dash){return '<line x1="'+X(x1)+'" y1="'+Y(y1)+'" x2="'+X(x2)+'" y2="'+Y(y2)+'" stroke="'+c+'" stroke-width="1.6" opacity=".8"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>'};
+s+=lnk(txX+txW*.25,yA+dA,txX+txW*.25,yB,'var(--o)')+lnk(txX+txW*.75,yA+dA,xW+wW*.5,yB,'var(--o)');
+s+=lnk(gnX,yB+Wm*.5,xW+wW,yB+Wm*.5,'var(--o)','5 3')+lnk(gnX,hS+dS*.5,xW+wW,hS+dS*.5,'var(--o)','5 3');
+s+=lnk(ox+chW*.5,yC,ox+chW*.5,yB+PW,'var(--b)')+lnk(dX+dcW*.08,yC,bx0+PL*.82,yB+PW,'var(--g)');
+s+=lnk(fuX+fuW*.5,yA+dA,gnX+genW*.5,yB,'var(--r)','3 3');
+/* scale bar, north arrow, line key */
+var sbY=Y(BH)+22;
+s+='<rect x="'+X(0)+'" y="'+sbY+'" width="'+(50*P).toFixed(1)+'" height="3" fill="var(--t2)"/><rect x="'+X(50)+'" y="'+sbY+'" width="'+(50*P).toFixed(1)+'" height="3" fill="rgba(148,163,184,.3)"/>';
+s+=tx(X(0),sbY+16,'0','var(--t3)',8.5,'middle',0)+tx(X(100),sbY+16,'100 m','var(--t3)',8.5,'middle',0,LAYOUT);
+s+='<g transform="translate('+(X(BW)-10)+','+(sbY+2)+')"><polygon points="0,-10 6,6 0,2 -6,6" fill="var(--t2)"/>'+tx(0,18,'N','var(--t2)',9,'middle',1)+'</g>';
+[['var(--o)','20 kV'],['var(--b)','CHW / CDW'],['var(--g)','HTW to the dry coolers'],['var(--r)','diesel']].forEach(function(e,i){
+  var kx=X(130)+i*150;s+='<line x1="'+kx+'" y1="'+(sbY+2)+'" x2="'+(kx+22)+'" y2="'+(sbY+2)+'" stroke="'+e[0]+'" stroke-width="2"/>'+tx(kx+28,sbY+5,e[1],'var(--t2)',8.5,'start',0);});
+/* ---- schedule: one row per block, every count and area from the engine ---- */
+var TY=sbY+44;
+s+=tx(35,TY,'SCHEDULE','var(--t1)',10,'start',1)+tx(965,TY,'AREA m²','var(--t3)',9,'end',1);
+s+='<line x1="35" y1="'+(TY+6)+'" x2="965" y2="'+(TY+6)+'" stroke="var(--bd)" stroke-width="1"/>';
+var rows=[
+  ['1','GIS switchyard',(D.hvIntakeKv||'—')+' kV gas-insulated switchgear · '+nBays+' bays (line + transformer)',bo('hvSwitchyardBays',{also:['hvIntakeKv'],nomark:true}),grp(aGis),bo('gisHallM2',{nomark:true}),c1],
+  ['2','Main transformers',nTx+' × '+(D.mainTxMva||'—')+' MVA 150/20 kV · one per hall per feed',bo('mainTxTotal',{also:['mainTxMva'],nomark:true}),grp(aTx),bo('mainTxYardM2',{nomark:true}),c1],
+  ['3','Fuel farm',grp(n('fuelM3'))+' m³ of diesel · '+(D.fuelAutonomyH||'—')+' h at the worst-bin load',bo('fuelM3',{also:['fuelAutonomyH'],nomark:true}),grp(aFuel),bo('fuelFarmM2',{nomark:true}),'var(--r)'],
+  ['4','The building',PL+' × '+PW+' m · '+(D.buildingLevels||'—')+' levels, halls on '+(D.hallLevels||'—'),bo('plateLengthM',{also:['plateWidthM','buildingLevels','hallLevels'],nomark:true}),grp(n('footprintM2')),bo('footprintM2',{nomark:true}),'var(--g)'],
+  ['5','Gensets',nGen+' × '+(D.gensetMW||'—')+' MW, '+(D.gensetRedundancy||'—')+' · on the 20 kV switchroom boards',bo('gensetFacNplus1',{also:['gensetMW'],nomark:true}),grp(aGen),bo('gensetYardM2',{nomark:true}),'var(--t1)'],
+  ['6','Chiller plant',nCh+' installed · '+(D.chillersRunning||'—')+' run at design · '+(D.chillersWorst||'—')+' in the worst bin',bo('chillersInstalled',{also:['chillersRunning','chillersWorst'],nomark:true}),grp(aCh),bo('chillerPlantM2',{nomark:true}),'var(--b)'],
+  ['7','Dry-cooler yard',nDc+' units here + '+(D.dcRoof||'—')+' on the roof = '+(D.dryCoolersInstalled||'—')+' installed, dry only',bo('dcYard',{also:['dcRoof','dryCoolersInstalled'],nomark:true}),grp(aDc),bo('dcYardM2',{nomark:true}),'var(--g)'],
+  ['8','STP','sewage treatment for the site · page-authored footprint',null,grp(aStp),decl('the sewage plant footprint is a page-authored allowance, not an engine output'),'var(--c)']];
+rows.forEach(function(r,i){var y=TY+24+i*19;
+  s+=tx(43,y,r[0],r[6],9.5,'middle',1)+tx(60,y,r[1],'var(--t1)',9.5,'start',1)+tx(200,y,r[2],'var(--t2)',9,'start',0,r[3])+tx(965,y,r[4],'var(--t1)',9.5,'end',1,r[5]);});
+var TT=TY+24+rows.length*19;
+s+='<line x1="35" y1="'+(TT-10)+'" x2="965" y2="'+(TT-10)+'" stroke="var(--bd)" stroke-width="1"/>';
+s+=tx(60,TT+4,'Plant outside the building','var(--t2)',9.5,'start',1)+tx(965,TT+4,grp(n('plantOutsideM2')),'var(--t1)',9.5,'end',1,bo('plantOutsideM2',{nomark:true}));
+s+=tx(60,TT+23,'Site, with roads, setbacks and the perimeter','var(--t2)',9.5,'start',1)+tx(965,TT+23,grp(site),'var(--o)',10,'end',1,bo('siteAreaM2',{nomark:true}));
+/* ---- the ground floor itself, at the hall-level scale ---- */
+var IY=TT+70,Q=+(880/PL).toFixed(3),IX=60;
+var x=function(m){return +(IX+m*Q).toFixed(1)},y=function(m){return +(IY+m*Q).toFixed(1)};
+s+=tx(35,IY-18,'GROUND FLOOR — inside the building (plate '+PL+' × '+PW+' m)','var(--t1)',11,'start',1,bo('plateLengthM',{also:['plateWidthM'],nomark:true}));
+s+='<rect x="'+x(0)+'" y="'+y(0)+'" width="'+(PL*Q).toFixed(1)+'" height="'+(PW*Q).toFixed(1)+'" fill="rgba(148,163,184,.03)" stroke="var(--t2)" stroke-width="1.6"/>';
+s+='<rect x="'+x(core)+'" y="'+y(Wm)+'" width="'+((PL-core)*Q).toFixed(1)+'" height="'+(spine*Q).toFixed(1)+'" fill="rgba(148,163,184,.07)"/>';
+s+=tx(x(core+Lm*.5),y(Wm+spine/2)+3,'SPINE CORRIDOR','var(--t3)',8.5,'middle',1,ROOMS);
+gfRooms(core,Lm,Wm,spine,PL,PW).forEach(function(r){
+  s+='<rect x="'+x(r[0])+'" y="'+y(r[1])+'" width="'+(r[2]*Q).toFixed(1)+'" height="'+(r[3]*Q).toFixed(1)+'" fill="'+r[5]+'" stroke="rgba(148,163,184,.5)" stroke-width=".7"/>';
+  var cx=x(r[0]+r[2]/2),cy=y(r[1]+r[3]/2);
+  if(r[2]<r[3]*.5){s+='<g transform="rotate(-90 '+cx+' '+cy+')">'+tx(cx,cy+3,r[4],'var(--t2)',8.5,'middle',1,ROOMS)+'</g>';}
+  else{s+=tx(cx,cy-3,r[4],'var(--t1)',9,'middle',1,ROOMS)+tx(cx,cy+10,r[6],'var(--t3)',8.5,'middle',0,ROOMS);}});
+var VH=Math.ceil(y(PW)+80);
+el.innerHTML=s.replace('height="1400"','height="'+VH+'"');
+var fs=document.getElementById('floorSvg');if(fs)fs.setAttribute('viewBox','-20 -40 1000 '+VH);
 }
 
 // ---- FLOOR 2 ----
@@ -3069,6 +2400,7 @@ el.innerHTML='<g data-rz-authored-basis="building grid: the 72 x 48 m plot, room
    were the same drawing typed twice for halls 1-2 and 3-4. Halls 5-8 had no plan at all. Room
    letters follow the hall: UPS Room A/B serve DH-1/DH-2, C/D serve DH-3/DH-4, and so on. */
 function renderHallLevel(el,L){
+var grp=function(v){return v==null?'—':String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,',')};
 /* v3.21.7 — the hall level drawn TO SCALE on its own floor plate. Until now this plan was the retired
    retired building grid with two undersized boxes standing for the 62 x 31 m halls, "CRAH x6" at 4 px and a CDU
    gallery the hall plan no longer has. The plate is now what the hall needs, west to east:
@@ -3080,17 +2412,19 @@ function renderHallLevel(el,L){
 var HA=L.halls[0],HB=L.halls[1]!=null?L.halls[1]:L.halls[0],FN=L.floor,LA=String.fromCharCode(64+HA),LB=String.fromCharCode(64+HB);
 var D=window.DHE||{};var n=function(k){var v=D[k];return (typeof v==='number'&&isFinite(v))?v:null};
 var Lm=n('hallLengthM'),Wm=n('hallWidthM'),rows=n('rackRows'),perRow=n('racksPerRow'),pitch=n('rowPitchM'),rackW=n('rackPitchM'),rackD=n('rackDepthM'),
-    xa=n('crossAisleM'),cduD=n('cduLineDepthM'),galN=n('fanWallGalleries'),apM2=n('airPlantM2');
+    xa=n('crossAisleM'),cduD=n('cduLineDepthM'),galN=n('fanWallGalleries'),apM2=n('airPlantM2'),
+    CORE=n('coreDepthM'),SPINE=n('spineM'),WING=n('elecWingM');
 var s='';
-if([Lm,Wm,rows,perRow,pitch,rackW,rackD,xa,cduD,galN,apM2].some(function(v){return v==null})){
+if([Lm,Wm,rows,perRow,pitch,rackW,rackD,xa,cduD,galN,apM2,CORE,SPINE,WING].some(function(v){return v==null})){
   el.innerHTML=tx(20,20,'FLOOR PLAN UNAVAILABLE — engine hall geometry not loaded','var(--r)',12,0,1);return;}
-var CORE=8,SPINE=6,WING=20;                      /* page-authored plate allowances, metres (declared) */
-var PL=CORE+Lm+WING,PW=2*Wm+SPINE;               /* 90 x 68 m */
-var P=8.6,OX=70,OY=24;                             /* px per metre on this sheet */
+/* v3.21.9 — the plate comes from the engine: core and spine are site allowances and the electrical
+   wing is as long as the rooms the hall's 2N chain needs (unit substations, UPS frames, batteries) */
+var PL=CORE+Lm+WING,PW=2*Wm+SPINE;
+var P=+(880/PL).toFixed(3),OX=60,OY=24;           /* px per metre on this sheet */
 var X=function(m){return +(OX+m*P).toFixed(1)},Y=function(m){return +(OY+m*P).toFixed(1)};
 var R=function(x,y,w,h,f,st,sw,ex){return '<rect x="'+X(x)+'" y="'+Y(y)+'" width="'+(w*P).toFixed(1)+'" height="'+(h*P).toFixed(1)+'" fill="'+f+'"'+(st?' stroke="'+st+'" stroke-width="'+(sw||1)+'"':'')+(ex||'')+'/>'};
 var decl=function(t){return {declared:t}};
-var PLATE=decl('floor plate allowances (core 8 m, spine corridor 6 m, electrical wing 20 m) are page-authored layout, not engine quantities');
+var PLATE=bo('plateLengthM',{also:['plateWidthM']});
 var gD=apM2/(galN*Lm),rowL=perRow*rackW,yF1=gD+rowL,yC1=yF1+xa,yL1=yC1+cduD,yS0=Wm-gD;
 
 s+='<rect x="-20" y="-40" width="1000" height="720" fill="var(--bg2)"/>';
@@ -3117,15 +2451,15 @@ function hall(h,y0,wing){
   g+=tx(X(hx+1),Y(y0+yF1+xa*.62),'SERVICE CORRIDOR · '+(D.rackRows||'—')+' rows × '+(D.racksPerRow||'—')+' racks above','var(--t2)',8.5,'start',0,bo('rackRows',{also:['racksPerRow'],nomark:true}));
   g+=tx(X(hx+Lm-1),Y(y0+yF1+xa*.62),(D.itHall!=null?(D.itHall/1000).toFixed(2):'—')+' MW IT','var(--o)',9,'end',1,bo('itHall',{nomark:true}));
   g+=tx(X(hx+1),Y(y0+yL1+(yS0-yL1)*.7),'CDU LINE · '+(D.cduInstalled||'—')+' × '+((D.cduModel||'').replace(/\s*\(.*\)\s*$/,'')||'CDU'),'var(--c)',8.5,'start',0,bo('cduInstalled',{nomark:true}));
-  g+=tx(X(hx+1),Y(y0+yS0+gD*.62),'FAN-WALL GALLERY · '+(n('fanWallModules')||'—')+' modules','var(--b)',8.5,'start',0,bo('fanWallModules',{nomark:true}));
-  /* electrical wing — schematic */
-  var ex=CORE+Lm,eL=wing;
-  g+='<g data-rz-authored-basis="electrical wing room layout is schematic and page-authored; it is not sized to the engine UPS frame count, which the labels carry">';
-  g+=R(ex,y0,WING,Wm*.34,'rgba(245,158,11,.07)','rgba(245,158,11,.4)',.8)+R(ex,y0+Wm*.34,WING,Wm*.34,'rgba(16,185,129,.06)','rgba(16,185,129,.4)',.8)+R(ex,y0+Wm*.68,WING,Wm*.32,'rgba(120,113,108,.06)','rgba(120,113,108,.35)',.8);
-  g+='</g>';
-  g+=tx(X(ex+1),Y(y0+Wm*.17)-2,'UPS DH-0'+h+' · FEED A','var(--b)',9,'start',1)+tx(X(ex+1),Y(y0+Wm*.17)+11,(D.upsFramesPerFeedHall||'—')+' × '+(D.upsRatingMW||'—')+' MW frames','var(--t2)',8.5,'start',0,bo('upsFramesPerFeedHall',{also:['upsRatingMW'],nomark:true}));
-  g+=tx(X(ex+1),Y(y0+Wm*.51)-2,'UPS DH-0'+h+' · FEED B','var(--g)',9,'start',1)+tx(X(ex+1),Y(y0+Wm*.51)+11,(D.upsFramesPerFeedHall||'—')+' × '+(D.upsRatingMW||'—')+' MW frames','var(--t2)',8.5,'start',0,bo('upsFramesPerFeedHall',{also:['upsRatingMW'],nomark:true}));
-  g+=tx(X(ex+1),Y(y0+Wm*.84)-2,'RPP + BUSWAY RISER','var(--o)',9,'start',1)+tx(X(ex+1),Y(y0+Wm*.84)+11,(D.rppPerHall||'—')+' RPP · 2 × '+(D.buswayAFmt||'—')+' A','var(--t2)',8.5,'start',0,bo('rppPerHall',{also:['buswayA'],nomark:true}));
+  g+=tx(X(hx+1),Y(y0+yS0+gD-.3),'FAN-WALL GALLERY · '+(n('fanWallModules')||'—')+' modules','var(--b)',8.5,'start',0,bo('fanWallModules',{nomark:true}));
+  /* electrical wing — engine length; the room split inside it is page-authored */
+  var ex=CORE+Lm,fd=Wm*.44,ROOMS=decl('room split inside the electrical wing is page-authored; the wing length and the equipment counts are engine outputs');
+  ['A','B'].forEach(function(F,i){var fy=y0+i*fd,c=i?'var(--g)':'var(--b)';
+    g+=R(ex,fy,WING*.5,fd,'rgba(245,158,11,.07)','rgba(245,158,11,.45)',.8)+R(ex+WING*.5,fy,WING*.5,fd,i?'rgba(16,185,129,.06)':'rgba(59,130,246,.06)',i?'rgba(16,185,129,.45)':'rgba(59,130,246,.45)',.8);
+    g+=tx(X(ex+1),Y(fy+fd*.42),'UNIT SUBSTATIONS · FEED '+F,'var(--o)',9,'start',1,ROOMS)+tx(X(ex+1),Y(fy+fd*.42)+12,(D.unitSubsPerFeed||'—')+' × '+(D.txRatingMVA||'—')+' MVA, 20/0.4 kV','var(--t2)',8.5,'start',0,bo('unitSubsPerFeed',{also:['txRatingMVA'],nomark:true}));
+    g+=tx(X(ex+WING*.5+1),Y(fy+fd*.42),'UPS + BATTERY · FEED '+F,c,9,'start',1,ROOMS)+tx(X(ex+WING*.5+1),Y(fy+fd*.42)+12,(D.upsFramesPerFeedHall||'—')+' × '+(D.upsRatingMW||'—')+' MW frames','var(--t2)',8.5,'start',0,bo('upsFramesPerFeedHall',{also:['upsRatingMW'],nomark:true}));});
+  g+=R(ex,y0+2*fd,WING,Wm-2*fd,'rgba(120,113,108,.06)','rgba(120,113,108,.35)',.8);
+  g+=tx(X(ex+1),Y(y0+2*fd+(Wm-2*fd)*.62),'RPP + BUSWAY RISER · '+(D.rppPerHall||'—')+' RPP · 2 × '+(D.buswayAFmt||'—')+' A','var(--t2)',8.5,'start',0,bo('rppPerHall',{also:['buswayA'],nomark:true}));
   return g;
 }
 s+=hall(HA,0,LA);
@@ -3138,7 +2472,7 @@ s+=R(0,0,CORE,Wm,'rgba(120,113,108,.06)','var(--t3)',.8)+R(0,Wm+SPINE,CORE,Wm,'r
   s+='<g transform="rotate(-90 '+X(CORE/2)+' '+Y(c[0])+')">'+tx(X(CORE/2),Y(c[0])+3,c[1],'var(--t3)',8.5,'middle',1)+'</g>';});
 /* dimensions */
 s+='<g stroke="var(--t3)" stroke-width=".7"><line x1="'+X(CORE)+'" y1="'+(Y(PW)+14)+'" x2="'+X(CORE+Lm)+'" y2="'+(Y(PW)+14)+'"/><line x1="'+X(0)+'" y1="'+(Y(PW)+14)+'" x2="'+X(CORE)+'" y2="'+(Y(PW)+14)+'" stroke-dasharray="2 2"/><line x1="'+(X(0)-16)+'" y1="'+Y(0)+'" x2="'+(X(0)-16)+'" y2="'+Y(Wm)+'"/><line x1="'+(X(0)-16)+'" y1="'+Y(Wm+SPINE)+'" x2="'+(X(0)-16)+'" y2="'+Y(PW)+'"/></g>';
-s+=tx(X(CORE+Lm/2),Y(PW)+28,Lm+' m hall · '+WING+' m electrical wing · '+CORE+' m core','var(--t2)',9,'middle',0,bo('hallLengthM',{nomark:true}));
+s+=tx(X(CORE+Lm/2),Y(PW)+28,Lm+' m hall · '+WING+' m electrical wing for '+grp(D.elecHallM2)+' m² of rooms · '+CORE+' m core','var(--t2)',9,'middle',0,bo('hallLengthM',{also:['elecWingM','elecHallM2','coreDepthM'],nomark:true}));
 s+='<g transform="rotate(-90 '+(X(0)-24)+' '+Y(Wm/2)+')">'+tx(X(0)-24,Y(Wm/2),Wm+' m','var(--t2)',9,'middle',1,bo('hallWidthM',{nomark:true}))+'</g>';
 s+='<g transform="rotate(-90 '+(X(0)-24)+' '+Y(Wm+SPINE+Wm/2)+')">'+tx(X(0)-24,Y(Wm+SPINE+Wm/2),Wm+' m','var(--t2)',9,'middle',1,bo('hallWidthM',{nomark:true}))+'</g>';
 /* north arrow */
@@ -3150,183 +2484,63 @@ var fk=[['IT on this level',(D.itHall!=null?(2*D.itHall/1000).toFixed(2)+' MW':'
         ['CDU',(D.cduInstalled!=null?(2*D.cduInstalled)+' (2 × '+D.cduInstalled+')':'—'),'var(--c)',{declared:'level total = two halls per level × the engine per-hall value; the engine publishes no per-level quantity'}],
         ['Fan-wall modules',(D.crahInstalled!=null?(2*D.crahInstalled)+' (2 × '+D.crahInstalled+')':'—'),'var(--b)',{declared:'level total = two halls per level × the engine per-hall value; the engine publishes no per-level quantity'}]];
 fk.forEach(function(k,i){var kx=X(0)+i*205;s+=tx(kx,KY,k[0],'var(--t3)',8.5,'start',0)+tx(kx,KY+15,k[1],k[2],11,'start',1,k[3]);});
-el.innerHTML=s;
+var VH=Math.ceil(KY+60);
+el.innerHTML=s.replace('height="720"','height="'+VH+'"');
+var fs=document.getElementById('floorSvg');if(fs)fs.setAttribute('viewBox','-20 -40 1000 '+VH);
 }
 
 // ---- ROOF ----
+/* v3.21.9 — the roof of the engine plate, to scale. It carries the share of the dry-cooler field the
+   usable roof can hold (site.dry_coolers_roof); the rest stands in the yard on the site plan. The
+   retired roof drew eight coolers on a 72 x 48 m grid for an engine that sizes 631. Four banks over
+   the two hall wings, the HTW headers down the spine walkway, the core overrun with the support AHU. */
 function renderRoof(el){
-var s='';
-s+='<rect width="960" height="620" fill="var(--bg2)"/>';
-s+='<defs><pattern id="rfGrid" width="'+M+'" height="'+M+'" patternUnits="userSpaceOnUse"><path d="M'+M+' 0L0 0 0 '+M+'" fill="none" stroke="rgba(255,255,255,.02)" stroke-width=".2"/></pattern></defs>';
-s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="url(#rfGrid)"/>';
-
-s+=tx(480,11,'ROOF PLAN \u2014 HEAT REJECTION & DRY COOLERS','var(--t1)',10,'middle',1);
-/* v3.6.3 — the roof caption reads from the left margin. Centred under the title it was ~440 px
-   wide and reached the SAF facade tags on the north wall; moving it up or down only changed which
-   neighbour it met. A note this long is a margin note. */
-/* v3.6.3 — the caption was 100 characters wide and reached the SAF facade tags on the north wall
-   from any vertical position; shortened rather than shuffled, because the sentence was carrying
-   the same fact twice. */
-s+=tx(480,21,'Chillers live on the Ground Floor \u2014 the roof carries heat rejection only','var(--t3)',4.5,'middle');
-
-// Building outline
-s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
-
-// === CW Riser & Distribution Manifold (NW quadrant) \u2014 Chillers moved to Ground Floor ===
-s+=rm(2,1,28,19,'rgba(100, 116, 139,.12)','rgba(100, 116, 139,.45)','CW DISTRIBUTION MANIFOLD','28m \u00D7 19m','Risers from Chiller Plant (GF)','CW distribution manifold: supply/return risers from the '+dhaG(DHAX().chillersInstalled)+' chillers of '+dhaF(DHAX().chKwTh!=null?DHAX().chKwTh/1000:null,1)+' MW housed on the Ground Floor, up to the dry-cooler array. DN500 carbon-steel insulated, 30% PG glycol. Eight riser pairs are drawn as an aggregation \u2014 the plant is not eight machines.',{textAt:'top'});
-// 8 supply + return riser pairs (correspond to the 8 chillers on Ground Floor)
-for(var ri=0;ri<8;ri++){
-var rix=4+ri*3,riy=6;
-s+='<rect x="'+(MX+rix*M)+'" y="'+(MY+riy*M)+'" width="'+(M*1)+'" height="'+(M*4)+'" rx="1" fill="rgba(6,182,212,.18)" stroke="var(--c)" stroke-width=".6"/>';
-/* v3.6.3 — riser tags above their pipes. Below, at riy+5.2, they sat on the CW SUPPLY HEADER
-   caption that runs across the manifold at 11.5 m. */
-s+='<text x="'+(MX+(rix+0.5)*M)+'" y="'+(MY+(riy-0.8)*M)+'" fill="var(--c)" font-family="'+J+'" font-size="3" text-anchor="middle">S-'+(ri+1)+'</text>';
-s+='<rect x="'+(MX+(rix+1.3)*M)+'" y="'+(MY+riy*M)+'" width="'+(M*1)+'" height="'+(M*4)+'" rx="1" fill="rgba(245,158,11,.18)" stroke="var(--o)" stroke-width=".6"/>';
-s+='<text x="'+(MX+(rix+1.8)*M)+'" y="'+(MY+(riy-0.8)*M)+'" fill="var(--o)" font-family="'+J+'" font-size="3" text-anchor="middle">R-'+(ri+1)+'</text>';
-}
-// Manifold cross-headers (supply + return)
-s+='<line x1="'+(MX+4*M)+'" y1="'+(MY+12*M)+'" x2="'+(MX+28*M)+'" y2="'+(MY+12*M)+'" stroke="var(--c)" stroke-width="2.5" opacity=".7"/>';
-s+='<line x1="'+(MX+4*M)+'" y1="'+(MY+14.5*M)+'" x2="'+(MX+28*M)+'" y2="'+(MY+14.5*M)+'" stroke="var(--o)" stroke-width="2.5" opacity=".7"/>';
-s+='<text x="'+(MX+16*M)+'" y="'+(MY+11.5*M)+'" fill="var(--c)" font-family="'+J+'" font-size="4.5" text-anchor="middle">CW SUPPLY HEADER DN500</text>';
-s+='<text x="'+(MX+16*M)+'" y="'+(MY+14*M)+'" fill="var(--o)" font-family="'+J+'" font-size="4.5" text-anchor="middle">CW RETURN HEADER DN500</text>';
-// Engineering callout
-s+='<rect x="'+(MX+4*M)+'" y="'+(MY+16*M)+'" width="'+(24*M)+'" height="'+(3*M)+'" rx="1.5" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.25)" stroke-width=".4" stroke-dasharray="3 2"/>';
-s+=tx(MX+16*M,MY+17.4*M,'Chillers: '+dhaG(DHAX().chillersInstalled)+'\u00D7 '+dhaF(DHAX().chKwTh!=null?DHAX().chKwTh/1000:null,1)+' MW water-cooled \u2014 Ground Floor plant, not on this roof','var(--o)',3.8,'middle',0,bo('chillersInstalled',{also:['chillerRating']}));
-s+=tx(MX+16*M,MY+18.6*M,'8 riser pairs drawn for '+dhaG(DHAX().chillersInstalled)+' machines \u2014 one pair per bank of '+dhaG(DHAX().chillersInstalled!=null?Math.ceil(DHAX().chillersInstalled/8):null),'var(--t3)',3.5,'middle',0,bo('chillersInstalled',{nomark:true}));
-
-// === Dry Cooler Array (NE quadrant) ===
-/* v3.8.0 — the roof was the last drawing still on the retired plant. It drew EIGHT dry coolers
-   against an engine that sizes 631, and called them "BAC TrilliumSeries Adiabatic" in the same
-   tooltip that claimed "WUE 0.00, zero water evap". An adiabatic cooler spends water by design;
-   the reason this facility runs a 40 °C cold-plate inlet is to reject heat DRY, which is what
-   makes the published WUE of 0.00 true rather than flattering. Eight glyphs stay — they are an
-   aggregation — but the divisor is now ON the drawing. */
-var rfDcInst=DHAX().dryCoolersInstalled,rfDcRun=DHAX().dryCoolersRunning,rfDcBanks=8;
-var rfPerBank=(rfDcInst!=null)?Math.ceil(rfDcInst/rfDcBanks):null;
-s+=rm(32,2,38,16,'rgba(34,197,94,.1)','rgba(34,197,94,.4)','DRY COOLER ARRAY','38m \u00D7 16m',dhaG(rfDcInst)+' V-bank units \u2014 dry only','Dry-cooler array: '+dhaG(rfDcInst)+' installed V-bank dry coolers ('+dhaG(rfDcRun)+' duty on the design day) of '+dhaG(DHAX().dcKwTh)+' kW each, closed-loop 30% PG glycol. DRY ONLY \u2014 no adiabatic pre-cooling, no spray: that is what makes the published WUE of 0.00 true. '+rfDcBanks+' glyphs drawn, one per bank of '+dhaG(rfPerBank)+'.');
-s+=tx(MX+51*M,MY+1.4*M,dhaG(rfDcInst)+' installed \u00B7 '+dhaG(rfDcRun)+' duty at design','var(--g)',4.4,'middle',0,bo('dryCoolersInstalled',{also:['dryCoolersRunning']}));
-/* the divisor is an identity over the two hooked counts, not a registry value of its own —
-   hooking it would claim the registry publishes 79, which it does not. */
-s+=tx(MX+51*M,MY+2.5*M,rfDcBanks+' glyphs drawn \u00D7 '+dhaG(rfPerBank)+' units per bank','var(--t3)',4,'middle',0,{declared:'drawing aggregation: an identity over the marked installed count divided by the eight glyphs drawn, printed so the reader can check the drawing against the engine; not itself an engine quantity'});
-// Dry cooler units (2 rows of 4)
-for(var dc=0;dc<4;dc++){
-s+='<g data-rz-equipment="roof-dry-cooler-bank:'+(dc+1)+'" tabindex="0" role="button"><title>Dry-cooler bank DC-'+(dc+1)+' — click for inspector</title>'+eq(34+dc*8.5,4,7,5,'rgba(34,197,94,.18)','DC-'+(dc+1),5)+'</g>';
-// Fan circles
-s+='<circle cx="'+(MX+(37.5+dc*8.5)*M)+'" cy="'+(MY+6.5*M)+'" r="'+(1.8*M)+'" fill="none" stroke="rgba(34,197,94,.25)" stroke-width=".5"/>';
-}
-for(var dc2=0;dc2<4;dc2++){
-s+='<g data-rz-equipment="roof-dry-cooler-bank:'+(dc2+5)+'" tabindex="0" role="button"><title>Dry-cooler bank DC-'+(dc2+5)+' — click for inspector</title>'+eq(34+dc2*8.5,10,7,5,'rgba(34,197,94,.18)','DC-'+(dc2+5),5)+'</g>';
-s+='<circle cx="'+(MX+(37.5+dc2*8.5)*M)+'" cy="'+(MY+12.5*M)+'" r="'+(1.8*M)+'" fill="none" stroke="rgba(34,197,94,.25)" stroke-width=".5"/>';
-}
-
-// === CW Pump Station (Center) ===
-s+=rm(2,20,18,8,'rgba(100, 116, 139,.1)','rgba(100, 116, 139,.35)','CW Pump Station','18m \u00D7 8m','4\u00D7 Grundfos NB 100-200 VFD','CW Pumps: 4\u00D7 Grundfos NB 100-200, VFD, 30% PG glycol, closed-loop',{textAt:'top'});
-s+=eq(4,22,3,3,'rgba(100, 116, 139,.2)','P1',5);
-s+=eq(8,22,3,3,'rgba(100, 116, 139,.2)','P2',5);
-s+=eq(12,22,3,3,'rgba(100, 116, 139,.2)','P3',5);
-s+=eq(16,22,3,3,'rgba(100, 116, 139,.2)','P4',5);
-
-// === AHU Bank (SW quadrant) ===
-s+=rm(2,30,22,16,'rgba(100, 116, 139,.1)','rgba(100, 116, 139,.4)','AHU BANK','22m \u00D7 16m','2\u00D7 Carrier 39HQ + 4\u00D7 Daikin VRV IV','AHU: 2\u00D7 Carrier 39HQ for office/support, 4\u00D7 Daikin VRV IV outdoor units');
-// AHU units
-s+=eq(4,33,8,5,'rgba(100, 116, 139,.2)','AHU-1',5);
-s+=eq(14,33,8,5,'rgba(100, 116, 139,.2)','AHU-2',5);
-// VRV outdoor units
-s+=eq(4,40,4,3,'rgba(245,158,11,.15)','VRV-1',4);
-s+=eq(9,40,4,3,'rgba(245,158,11,.15)','VRV-2',4);
-s+=eq(14,40,4,3,'rgba(245,158,11,.15)','VRV-3',4);
-s+=eq(19,40,4,3,'rgba(245,158,11,.15)','VRV-4',4);
-
-// === Supply/Exhaust Fans — Facade Grilles (ducted to building perimeter) ===
-// SAF grilles on North wall (y=0)
-for(var saf=0;saf<2;saf++){
-var sfx=MX+(28+saf*8)*M;
-s+='<rect x="'+(sfx-3*M)+'" y="'+(MY-0.5*M)+'" width="'+(6*M)+'" height="'+(1.5*M)+'" rx="1" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.4)" stroke-width=".6"/>';
-// Louver lines
-for(var lv2=0;lv2<4;lv2++){s+='<line x1="'+(sfx-2.5*M)+'" y1="'+(MY-0.2*M+lv2*0.35*M)+'" x2="'+(sfx+2.5*M)+'" y2="'+(MY-0.2*M+lv2*0.35*M)+'" stroke="rgba(245,158,11,.25)" stroke-width=".3"/>';}
-/* v3.6.3 — beside the grille, not above it. Centred above, the caption sat on the outward arrow
-   and reached the roof-plan title in the top margin; a facade tag belongs next to its louvre. */
-s+='<text x="'+(sfx+3.4*M)+'" y="'+(MY+0.6*M)+'" fill="rgba(245,158,11,.6)" font-family="'+J+'" font-size="4" text-anchor="start">SAF-'+(saf+1)+' Facade</text>';
-// Arrow pointing outward (up)
-s+='<polygon points="'+sfx+','+(MY-2*M)+' '+(sfx-1.5*M)+','+(MY-1*M)+' '+(sfx+1.5*M)+','+(MY-1*M)+'" fill="rgba(245,158,11,.3)"/>';
-// Dashed duct routing from interior
-s+='<line x1="'+sfx+'" y1="'+(MY+20*M)+'" x2="'+sfx+'" y2="'+(MY+1*M)+'" stroke="rgba(245,158,11,.15)" stroke-width="1" stroke-dasharray="4 3"/>';
-}
-// SEF grilles on South wall (y=48)
-for(var sef=0;sef<2;sef++){
-var sefx=MX+(28+sef*8)*M;
-s+='<rect x="'+(sefx-3*M)+'" y="'+(MY+47*M)+'" width="'+(6*M)+'" height="'+(1.5*M)+'" rx="1" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.4)" stroke-width=".6"/>';
-for(var lv3=0;lv3<4;lv3++){s+='<line x1="'+(sefx-2.5*M)+'" y1="'+(MY+47.2*M+lv3*0.35*M)+'" x2="'+(sefx+2.5*M)+'" y2="'+(MY+47.2*M+lv3*0.35*M)+'" stroke="rgba(245,158,11,.25)" stroke-width=".3"/>';}
-s+='<text x="'+(sefx+3.4*M)+'" y="'+(MY+48.1*M)+'" fill="rgba(245,158,11,.6)" font-family="'+J+'" font-size="4" text-anchor="start">SEF-'+(sef+1)+' Facade</text>';
-// Arrow pointing outward (down)
-s+='<polygon points="'+sefx+','+(MY+50.5*M)+' '+(sefx-1.5*M)+','+(MY+49.5*M)+' '+(sefx+1.5*M)+','+(MY+49.5*M)+'" fill="rgba(245,158,11,.3)"/>';
-// Dashed duct routing from interior
-s+='<line x1="'+sefx+'" y1="'+(MY+28*M)+'" x2="'+sefx+'" y2="'+(MY+47*M)+'" stroke="rgba(245,158,11,.15)" stroke-width="1" stroke-dasharray="4 3"/>';
-}
-
-// === Walkways / Access ===
-s+='<rect x="'+(MX+22*M)+'" y="'+(MY+30*M)+'" width="'+(2*M)+'" height="'+(16*M)+'" fill="rgba(148,163,184,.06)" stroke="var(--t3)" stroke-width=".3" rx="1"/>';
-s+='<text x="'+(MX+23*M)+'" y="'+(MY+38*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="4" text-anchor="middle" transform="rotate(-90,'+(MX+23*M)+','+(MY+38*M)+')">ACCESS WALKWAY</text>';
-
-// === Cable Tray / Pipe Riser area ===
-s+=rm(26,30,18,16,'rgba(120,113,108,.08)','rgba(120,113,108,.3)','Pipe Riser Area','18m \u00D7 16m','CW + Glycol risers','Pipe Risers: CW supply/return, glycol, condensate drain, fire main, make-up water');
-// Riser shafts
-s+='<rect x="'+(MX+30*M)+'" y="'+(MY+34*M)+'" width="'+(3*M)+'" height="'+(3*M)+'" fill="rgba(6,182,212,.1)" stroke="rgba(6,182,212,.3)" stroke-width=".5" rx="1"/>';
-s+='<text x="'+(MX+31.5*M)+'" y="'+(MY+36*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="4" text-anchor="middle">CW Riser</text>';
-s+='<rect x="'+(MX+35*M)+'" y="'+(MY+34*M)+'" width="'+(3*M)+'" height="'+(3*M)+'" fill="rgba(239,68,68,.1)" stroke="rgba(239,68,68,.3)" stroke-width=".5" rx="1"/>';
-s+='<text x="'+(MX+36.5*M)+'" y="'+(MY+36*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="4" text-anchor="middle">Fire Riser</text>';
-
-// === Lightning Protection — Distributed Air Terminal Grid (IEC 62305-3) ===
-// Perimeter rods (~every 12m along building edges)
-var lrPerimeter=[[0,0],[12,0],[24,0],[36,0],[48,0],[60,0],[72,0],[0,48],[12,48],[24,48],[36,48],[48,48],[60,48],[72,48],[0,16],[0,32]];
-for(var lr=0;lr<lrPerimeter.length;lr++){
-var lrx=lrPerimeter[lr][0],lry=lrPerimeter[lr][1];
-s+='<circle cx="'+(MX+lrx*M)+'" cy="'+(MY+lry*M)+'" r="2.5" fill="var(--t3)" opacity=".35"/>';
-s+='<line x1="'+(MX+lrx*M)+'" y1="'+(MY+lry*M-4)+'" x2="'+(MX+lrx*M)+'" y2="'+(MY+lry*M+4)+'" stroke="var(--t3)" stroke-width=".5" opacity=".4"/>';
-}
-// Interior rods (grid pattern)
-var lrInterior=[[24,16],[48,16],[24,32],[48,32]];
-for(var lr2=0;lr2<lrInterior.length;lr2++){
-var lrx2=lrInterior[lr2][0],lry2=lrInterior[lr2][1];
-s+='<circle cx="'+(MX+lrx2*M)+'" cy="'+(MY+lry2*M)+'" r="2.5" fill="var(--t3)" opacity=".35"/>';
-s+='<line x1="'+(MX+lrx2*M)+'" y1="'+(MY+lry2*M-4)+'" x2="'+(MX+lrx2*M)+'" y2="'+(MY+lry2*M+4)+'" stroke="var(--t3)" stroke-width=".5" opacity=".4"/>';
-}
-s+='<text x="'+(MX+58*M)+'" y="'+(MY+24*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">Lightning Protection \u2014 Air Terminal Grid (IEC 62305-3)</text>';
-// Maintenance walkway dashed outline (perimeter)
-s+='<rect x="'+(MX+1*M)+'" y="'+(MY+1*M)+'" width="'+(70*M)+'" height="'+(46*M)+'" fill="none" stroke="var(--t3)" stroke-width=".3" stroke-dasharray="4 3" rx="2"/>';
-s+='<text x="'+(MX+55*M)+'" y="'+(MY+44*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="4" text-anchor="middle" opacity=".5">Maintenance Walkway</text>';
-// Roof Access label (light text only, no room box)
-s+='<text x="'+(MX+58*M)+'" y="'+(MY+36*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".4">Roof Access</text>';
-
-// Stairwell heads
-s+=stair(0,2,4,6);
-s+='<text x="'+(MX+2*M)+'" y="'+(MY+2.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">Stair A</text>';
-s+=stair(0,40,4,6);
-s+='<text x="'+(MX+2*M)+'" y="'+(MY+40.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">Stair B</text>';
-
-// Dimensions
-s+=dim(2,-1.5,30,-1.5,'28m (CW Manifold)');
-s+=dim(32,-1.5,70,-1.5,'38m (Dry Coolers)');
-s+=dim(-3,1,-3,20,'19m');
-
-// North arrow
-s+='<g transform="translate('+(MX+72*M+25)+','+(MY+5*M)+')">';
-s+='<polygon points="0,-10 5,2 -5,2" fill="var(--t3)" opacity=".6"/>';
-s+=tx(0,-14,'N','var(--t3)',7,'middle',1);
-s+='</g>';
-
-// Equipment schedule at bottom
-var ESY=MY+48.5*M;
-s+='<rect x="'+MX+'" y="'+ESY+'" width="'+(72*M)+'" height="25" rx="3" fill="rgba(6,182,212,.04)" stroke="rgba(6,182,212,.15)" stroke-width=".5"/>';
-var rk2=[{l:'CW Risers',v:'8 pairs DN500',c:'var(--p)'},{l:'Dry Coolers',v:'8\u00D7 BAC',c:'var(--g)'},{l:'CW Pumps',v:'4\u00D7 VFD',c:'var(--pk)'},{l:'AHU',v:'2\u00D7 Carrier',c:'var(--b)'},{l:'VRV',v:'4\u00D7 Daikin',c:'var(--o)'},{l:'Total Rej.',v:(DHE?DHE.facTotalMW+' MW':'—'),c:'var(--o)'}];
-var rkx=MX+20;
-rk2.forEach(function(k){
-s+='<text x="'+rkx+'" y="'+(ESY+9)+'" fill="var(--t3)" font-family="'+J+'" font-size="6">'+k.l+'</text>';
-s+='<text x="'+rkx+'" y="'+(ESY+19)+'" fill="'+k.c+'" font-family="'+J+'" font-size="7" font-weight="700">'+k.v+'</text>';
-rkx+=140;
-});
-
-el.innerHTML='<g data-rz-authored-basis="building grid: the 72 x 48 m plot, room dimensions and wall positions are the retired-basis site layout kept until the site re-grid (captioned on the drawing); every count and rating on this floor that is an engine quantity carries its own mark">'+s+'</g>';
+var grp=function(v){return v==null?'—':String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,',')};
+var D=window.DHE||{};var n=function(k){var v=D[k];return (typeof v==='number'&&isFinite(v))?v:null};
+var PL=n('plateLengthM'),PW=n('plateWidthM'),CORE=n('coreDepthM'),SPINE=n('spineM'),Wm=n('hallWidthM'),nRoof=n('dcRoof'),nInst=n('dryCoolersInstalled');
+if([PL,PW,CORE,SPINE,Wm,nRoof,nInst].some(function(v){return v==null})){
+  el.innerHTML=tx(20,20,'ROOF PLAN UNAVAILABLE — engine site outputs not loaded','var(--r)',12,0,1);return;}
+var decl=function(t){return {declared:t}};
+var LAY=decl('roof bank arrangement, walkways and setbacks are page-authored layout; the unit counts are engine outputs');
+var P=+(880/PL).toFixed(3),OX=60,OY=40;
+var X=function(m){return +(OX+m*P).toFixed(1)},Y=function(m){return +(OY+m*P).toFixed(1)};
+var R=function(x,y,w,h,f,st,sw,ex){return '<rect x="'+X(x)+'" y="'+Y(y)+'" width="'+(w*P).toFixed(1)+'" height="'+(h*P).toFixed(1)+'" fill="'+f+'"'+(st?' stroke="'+st+'" stroke-width="'+(sw||1)+'"':'')+(ex||'')+'/>'};
+function pack(x,y,w,h,cnt,asp,fill,stroke){
+  var cols=Math.max(1,Math.round(Math.sqrt(cnt*w/(h*asp)))),rows=Math.ceil(cnt/cols),cw=w/cols,ch=h/rows,o='';
+  for(var i=0;i<cnt;i++){var r=Math.floor(i/cols),c=i%cols;o+=R(x+c*cw+cw*.12,y+r*ch+ch*.16,cw*.76,ch*.68,fill,stroke,.4);}
+  return o;}
+var s='<rect x="-20" y="-40" width="1000" height="720" fill="var(--bg2)"/>';
+s+=tx(X(PL/2),14,'ROOF — '+PL+' × '+PW+' m · '+nRoof+' of the '+nInst+' dry coolers stand here, the rest in the yard','var(--t1)',11,'middle',1,bo('dcRoof',{also:['plateLengthM','plateWidthM','dryCoolersInstalled']}));
+s+=R(0,0,PL,PW,'rgba(148,163,184,.03)','var(--t2)',2);
+/* the four banks: two per hall wing, 2 m perimeter setback, core and spine kept clear */
+var x0=CORE+2,xm=CORE+2+(PL-CORE-4)/2,bw=(PL-CORE-4)/2,banks=[[x0,2,Wm-3],[xm,2,Wm-3],[x0,Wm+SPINE+1,Wm-3],[xm,Wm+SPINE+1,Wm-3]];
+var per=Math.ceil(nRoof/banks.length),left=nRoof;
+banks.forEach(function(b,i){var c=Math.min(per,left);left-=c;
+  s+='<g data-rz-equipment="roof-dry-cooler-bank:'+(i+1)+'" tabindex="0" role="button"><title>Roof dry-cooler bank RB-'+(i+1)+' — '+c+' units — click for inspector</title>'+R(b[0],b[1],bw-1,b[2],'rgba(34,197,94,.04)','var(--g)',.9)+pack(b[0]+.5,b[1]+.5,bw-2,b[2]-1,c,4,'rgba(34,197,94,.26)','var(--g)')+'</g>';
+  s+=tx(X(b[0]+1),i<2?Y(b[1])-4:Y(PW)+14,'RB-'+(i+1)+' · '+c+' units','var(--g)',9,'start',1,LAY);});
+/* spine walkway with the HTW headers */
+s+=R(CORE,Wm,PL-CORE,SPINE,'rgba(148,163,184,.06)');
+s+='<line x1="'+X(CORE+1)+'" y1="'+Y(Wm+SPINE*.32)+'" x2="'+X(PL-1)+'" y2="'+Y(Wm+SPINE*.32)+'" stroke="var(--o)" stroke-width="2.2"/>';
+s+='<line x1="'+X(CORE+1)+'" y1="'+Y(Wm+SPINE*.68)+'" x2="'+X(PL-1)+'" y2="'+Y(Wm+SPINE*.68)+'" stroke="var(--g)" stroke-width="2.2"/>';
+s+=tx(X(CORE+3),Y(Wm+SPINE*.32)-3,'HTW RETURN '+(D.htwReturnC!=null?D.htwReturnC:'—')+' °C from the CDU line, risers in the spine','var(--o)',8.5,'start',0,bo('htwReturnC',{nomark:true}));
+s+=tx(X(CORE+3),Y(Wm+SPINE*.68)+10,'HTW SUPPLY '+(D.htwSupplyC!=null?D.htwSupplyC:'—')+' °C back to the halls','var(--g)',8.5,'start',0,bo('htwSupplyC',{nomark:true}));
+/* west core overrun: stairs, lift, the support-space AHU */
+s+=R(0,0,CORE,PW,'rgba(120,113,108,.08)','var(--t3)',.8);
+s+='<g class="ahu-click" data-rz-equipment="ahu:1" tabindex="0" role="button"><title>Support-space AHU — click for inspector, double-click for HMI</title>'+R(.8,Wm+1,CORE-1.6,SPINE+6,'rgba(6,182,212,.14)','var(--c)',.8)+'</g>';
+[[Wm*.35,'STAIR A · LIFT'],[Wm+SPINE/2+3,'AHU'],[Wm+SPINE+Wm*.65,'STAIR B']].forEach(function(c){
+  s+='<g transform="rotate(-90 '+X(CORE/2)+' '+Y(c[0])+')">'+tx(X(CORE/2),Y(c[0])+3,c[1],'var(--t2)',8.5,'middle',1,LAY)+'</g>';});
+/* key figures */
+var KY=Y(PW)+46;
+var fk=[['On the roof',nRoof+' units','var(--g)',bo('dcRoof',{nomark:true})],
+        ['In the yard',(D.dcYard!=null?D.dcYard:'—')+' units','var(--g)',bo('dcYard',{nomark:true})],
+        ['Duty at design',(D.dryCoolersRunning!=null?D.dryCoolersRunning:'—')+' of '+nInst,'var(--t1)',bo('dryCoolersRunning',{also:['dryCoolersInstalled'],nomark:true})],
+        ['Usable roof',grp(n('roofUsableM2'))+' m²','var(--t1)',bo('roofUsableM2',{nomark:true})]];
+fk.forEach(function(k,i){var kx=X(0)+i*215;s+=tx(kx,KY,k[0],'var(--t3)',8.5,'start',0)+tx(kx,KY+16,k[1],k[2],11,'start',1,k[3]);});
+s+=tx(X(0),KY+42,'Dry only: no adiabatic pads and no spray, so the published WUE of 0 holds. The CHW risers serve the '+(D.chillersInstalled||'—')+' chillers of the plant on the site plan.','var(--t3)',8.5,'start',0,bo('chillersInstalled',{nomark:true}));
+s+='<g transform="translate('+(X(PL)+24)+','+(Y(0)+14)+')"><polygon points="0,-10 6,6 0,2 -6,6" fill="var(--t2)"/>'+tx(0,18,'N','var(--t2)',9,'middle',1)+'</g>';
+var VH=Math.ceil(KY+90);
+el.innerHTML=s.replace('height="720"','height="'+VH+'"');
+var fs=document.getElementById('floorSvg');if(fs)fs.setAttribute('viewBox','-20 -40 1000 '+VH);
 }
 
 // ============================
@@ -3530,7 +2744,7 @@ fs./* v3.6.3 — the upper floors and the roof draw their dimension strings and 
            plan, which is where dimensions belong on a drawing — but the viewBox stopped at the plan, so
            the geometry survey counted 32 elements painted past the frame. The margin is part of the
            drawing; the box now says so. Ground keeps its own box, which already carries one. */
-        setAttribute('viewBox',key==='gf'?'-230 -100 1420 880':'-20 -40 1000 720');
+        setAttribute('viewBox','-20 -40 1000 720');   /* the site plan sets its own height after it draws */
 switch(key){
 case 'gf':renderGroundFloor(fc);break;
 case 'roof':renderRoof(fc);break;

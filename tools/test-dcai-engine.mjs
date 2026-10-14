@@ -56,7 +56,7 @@ const S = C.snapshot;
 /* ── 0. sources and hygiene ─────────────────────────────────────────────── */
 ok(!/Math\.random/.test(ENGINE_SRC) && !/Math\.random/.test(MODEL_SRC), 'no Math.random in model or engine');
 ok(Object.isFrozen(S) && Object.isFrozen(S.design) && Object.isFrozen(M.thermal), 'snapshot and model are deep-frozen');
-ok(S.meta.version === '1.4.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
+ok(S.meta.version === '1.5.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
 ok(!/MEASURED/.test(MODEL_SRC.replace(/nothing may claim MEASURED[^\n]*/,'')), 'nothing in the model claims MEASURED');
 {
   /* every numeric leaf in the model has a `// source:` line within the 6 lines above it */
@@ -312,6 +312,32 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
     'fan_wall_face_m2 = airflow / face velocity');
   approx(Ge.fan_wall_face_velocity_ms, M.geometry.fanWallFaceVelocityMs, 0,
     'fan_wall_face_velocity_ms publishes the model face velocity');
+
+/* v3.21.9 — the site branch: the campus closes against the engine's own counts */
+{
+  const T = S.site, ST = M.site, Eq = S.equipment, Di = S.distribution;
+  approx(T.electrical_m2_per_hall, (2 * Eq.unit_subs_per_feed_per_hall * ST.unitSubM2 + 2 * Di.ups_frames_per_hall_per_feed * ST.upsFrameM2 +
+    Eq.battery_hall_kwh / ST.batteryKwhPerM2) * ST.electricalCirculation, 1e-9, 'site electrical room per hall = (unit subs + UPS frames + battery) x circulation');
+  ok(T.electrical_wing_m === Math.ceil(T.electrical_m2_per_hall / Ge.hall_width_m), 'site electrical wing = rooms / hall width, rounded up to whole metres');
+  ok(T.electrical_wing_fits === true && T.electrical_wing_m * Ge.hall_width_m >= T.electrical_m2_per_hall, 'site electrical wing holds its rooms');
+  ok(T.plate_length_m === ST.coreDepthM + Ge.hall_length_m + T.electrical_wing_m && T.plate_width_m === 2 * Ge.hall_width_m + ST.spineM,
+    'site plate = core + hall + wing by two halls + spine');
+  approx(T.footprint_m2, T.plate_length_m * T.plate_width_m, 1e-9, 'site footprint = plate length x width');
+  ok(T.hall_levels * 2 >= M.facility.halls && T.building_levels === T.hall_levels + 2, 'site levels: two halls a level, plus ground floor and roof');
+  ok(T.dry_coolers_roof + T.dry_coolers_yard === Eq.dry_coolers_installed, 'site roof + yard dry coolers = installed');
+  ok(T.dry_coolers_roof * ST.dryCoolerM2 <= T.roof_usable_m2, 'site roof dry coolers fit the usable roof');
+  approx(T.dry_cooler_yard_m2, T.dry_coolers_yard * ST.dryCoolerM2, 1e-9, 'site dry-cooler yard = yard units x allowance');
+  approx(T.genset_yard_m2, Eq.gensets_installed * ST.gensetM2, 1e-9, 'site genset yard = installed gensets x allowance');
+  approx(T.chiller_plant_m2, Eq.chillers_installed * ST.chillerM2 * ST.chillerPlantFactor, 1e-9, 'site chiller plant = chillers x allowance x plant factor');
+  approx(T.main_tx_yard_m2, Di.main_tx_total * ST.mainTxM2, 1e-9, 'site main transformer yard = 100 MVA units x allowance');
+  approx(T.gis_hall_m2, Di.hv_switchyard_bays * ST.gisBayM2, 1e-9, 'site GIS hall = switchyard bays x allowance');
+  ok(Eq.gensets_installed * Eq.generator_unit_kw * T.fuel_autonomy_h * ST.dieselLPerKwh / 1000 >= T.fuel_m3 - 1e-9,
+    'site fuel never exceeds what the installed gensets could burn in the autonomy');
+  approx(T.fuel_farm_m2, T.fuel_m3 * ST.fuelFarmM2PerM3, 1e-9, 'site fuel farm = fuel x allowance');
+  approx(T.plant_outside_m2, T.dry_cooler_yard_m2 + T.genset_yard_m2 + T.chiller_plant_m2 + T.main_tx_yard_m2 + T.gis_hall_m2 + T.fuel_farm_m2, 1e-6,
+    'site plant outside the building = the six yards');
+  approx(T.site_area_m2, (T.footprint_m2 + T.plant_outside_m2) * ST.campusRoadFactor, 1e-6, 'site area = (building + yards) x road factor');
+}
   approx(Ge.air_plant_frontage_m, Ge.air_plant_m2 / M.geometry.airPlantDepthM, 1e-9,
     'air_plant_frontage_m = gallery floor / gallery depth');
   approx(Ge.hall_perimeter_m, 2 * (M.geometry.lengthM + M.geometry.widthM), 1e-9, 'hall_perimeter_m = 2 x (length + width)');

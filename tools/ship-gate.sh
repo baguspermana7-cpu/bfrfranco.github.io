@@ -139,6 +139,10 @@ gate "Conventional formulas — declared arithmetic actually holds" node tools/t
 # x 2 themes. The flip condition documented here has been met, so the gate is armed — a new
 # label that lands on another one, or an element drawn outside its viewBox, now fails the ship.
 gate "Conventional geometry — collisions, clipping, arrangement" node tools/test-conv-geometry.mjs
+# v3.21.9 — the reveal gate existed but was never wired, so it went stale for five releases (it
+# still expected four floor views after the building became six levels). Every building level must
+# open its own floor plan.
+gate "DC AI building levels — every level is its own drill-down" node tools/test-cockpit-reveal.mjs
 gate "Conventional study — reconciled four-hall basis" node --test tools/test-conv-design-basis.mjs
 gate "Conventional alarms — common historian workspace" node --test tools/test-conv-alarm-workspace.mjs
 gate "Conventional alarms — modal runtime and accessibility" node tools/test-conv-alarm-runtime.mjs
