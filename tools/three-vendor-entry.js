@@ -7,4 +7,4 @@
 export { WebGLRenderer, Scene, PerspectiveCamera, OrthographicCamera, Color, Fog, AmbientLight, HemisphereLight, DirectionalLight, PointLight,
   BoxGeometry, PlaneGeometry, CylinderGeometry, CircleGeometry, BufferGeometry, BufferAttribute, InstancedMesh, Mesh, Group, Points, LineSegments, Line,
   MeshStandardMaterial, MeshBasicMaterial, LineBasicMaterial, PointsMaterial, ShaderMaterial, CanvasTexture, Object3D, Matrix4, Vector2, Vector3, Raycaster,
-  EdgesGeometry, AdditiveBlending, NormalBlending, DoubleSide, SRGBColorSpace, ACESFilmicToneMapping, Quaternion, TubeGeometry, CatmullRomCurve3, LineCurve3, CurvePath, InstancedBufferAttribute, DynamicDrawUsage, PCFSoftShadowMap, GridHelper } from './package/build/three.module.js';
+  EdgesGeometry, AdditiveBlending, NormalBlending, DoubleSide, SRGBColorSpace, ACESFilmicToneMapping, Quaternion, TubeGeometry, CatmullRomCurve3, LineCurve3, CurvePath, InstancedBufferAttribute, DynamicDrawUsage, PCFSoftShadowMap, GridHelper, Data3DTexture, DataTexture, FloatType, HalfFloatType, RGBAFormat, RedFormat, LinearFilter, NearestFilter, BackSide, FrontSide, GLSL3, UnsignedByteType } from './package/build/three.module.js';

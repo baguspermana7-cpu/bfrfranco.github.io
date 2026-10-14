@@ -294,7 +294,7 @@ for (const [page, mod] of Object.entries(PAGES)) {
   }
   const sb = { console, Math, JSON, Date }; sb.window = sb; sb.globalThis = sb; sb.document = { readyState: 'loading', addEventListener() {} };
   vm.createContext(sb);
-  for (const f of ['js/ltc-plant.js', 'js/ltc-dh01.js', 'js/ltc-dh01-3d.js', 'js/ltc-cfd.js', 'js/ltc-tier.js', 'js/ltc-report.js']) vm.runInContext(readFileSync(join(root, f), 'utf8'), sb, { filename: f });
+  for (const f of ['js/ltc-plant.js', 'js/ltc-dh01.js', 'js/ltc-dh01-3d.js', 'js/ltc-cfd.js', 'js/ltc-cfd-view.js', 'js/ltc-tier.js', 'js/ltc-report.js']) vm.runInContext(readFileSync(join(root, f), 'utf8'), sb, { filename: f });
   const P = sb.LTCPlant, X = sb.LTCReport, D = sb.LTCDH01;
   {
     /* the plant map views the report embeds: drawn by the hub's own build on any result, no engine warnings */
@@ -424,8 +424,8 @@ for (const [page, mod] of Object.entries(PAGES)) {
     for (const f of ['none', 'crah2', 'crah4']) {
       const s = D.solveHall(R, f, 'common', 5, 'throttled'), C = F.run(R, s, { dx: 0.6, steps: 250 }), r = F.report(C);
       const err = Math.abs(r.qCrahKw - r.qRacksKw) / r.qRacksKw;
-      if (err > 0.01) bad.push(`${f}: heat removed ${r.qCrahKw.toFixed(0)} of ${r.qRacksKw.toFixed(0)} kW`);
-      if (r.residual > 5e-3) bad.push(`${f}: mass residual ${r.residual.toExponential(1)}`);
+      if (!(err <= 0.01)) bad.push(`${f}: heat removed ${r.qCrahKw.toFixed(0)} of ${r.qRacksKw.toFixed(0)} kW`);
+      if (!(r.residual <= 5e-3)) bad.push(`${f}: mass residual ${r.residual.toExponential(1)}`);
       if (Math.abs(r.ret - s.returnC) > 1 || Math.abs(r.supply - s.supply) > 0.5) bad.push(`${f}: return ${r.ret.toFixed(2)} / supply ${r.supply.toFixed(2)} vs balance ${s.returnC.toFixed(2)} / ${s.supply.toFixed(2)}`);
       if (f === 'none' && (r.over27 || r.maxInlet - s.maxInlet > 0.5)) bad.push(`normal: CFD hottest inlet ${r.maxInlet.toFixed(2)} °C, ${r.over27} racks over 27`);
       if (f !== 'none' && (!r.over27) !== (!s.over27)) bad.push(`${f}: CFD ${r.over27} racks over 27 °C, balance ${s.over27}`);
@@ -450,6 +450,60 @@ for (const [page, mod] of Object.entries(PAGES)) {
       if (open !== C.leaks) bad.push(`containment: ${open} open faces between hot aisles and the room, ${C.leaks} declared`);
     }
     ok('W12y', !bad.length, 'DH01 CFD (0.6 m): containment closed but for its declared leakage openings, heat removed = rack heat within 1 %, mass residual < 5e-3, supply/return within 0.5/1 K of the balance solve, normal operation inside 27 °C, a west-wall CRAH fault heats the west half and puts racks over 27 °C when the balance does (' + facts.join(', ') + ')' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
+  }
+  {
+    /* DH01 CFD view: the numbers behind the colours are the frame's — vorticity of a known field,
+       the probe on cell centres, the texels the GPU ray-marches, trails that never enter a solid —
+       and the solver's limited energy scheme invents no temperature outside its sources */
+    const bad = [], V3 = sb.LTCCFDView, F = sb.LTCCFD;
+    {
+      const n = 8, dx = 0.5, Om = 0.7, c0 = n * dx / 2, Fr = { nx: n, ny: n, nz: n, dx, u: new Float32Array((n + 1) * n * n), v: new Float32Array(n * (n + 1) * n), w: new Float32Array(n * n * (n + 1)), T: new Float32Array(n * n * n), Tm: new Float32Array(n * n * n) };
+      for (let k = 0; k < n; k++) for (let j = 0; j < n; j++) for (let i = 0; i <= n; i++) Fr.u[i + (n + 1) * (j + n * k)] = -Om * ((k + 0.5) * dx - c0);
+      for (let k = 0; k <= n; k++) for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) Fr.w[i + n * (j + n * k)] = Om * ((i + 0.5) * dx - c0);
+      for (let c = 0; c < n * n * n; c++) Fr.Tm[c] = 20 + (c % n);
+      const om = V3.vorticity(Fr, null), mid = 3 + n * (3 + n * 3);
+      if (Math.abs(om[mid] - 2 * Om) > 1e-5) bad.push(`vorticity of a solid-body rotation ${om[mid].toFixed(5)}, expected ${2 * Om}`);
+      const q = V3.probe(Fr, null, null, om, 3.5 * dx, 2.5 * dx, 4.5 * dx), q2 = V3.probe(Fr, null, null, om, 4 * dx, 2.5 * dx, 4.5 * dx);
+      if (Math.abs(q.T - 23) > 1e-5 || Math.abs(q2.T - 23.5) > 1e-5) bad.push(`probe: ${q.T} at a cell centre (23), ${q2.T} between two (23.5)`);
+      Fr.Tm[mid] = 31.5; const S = new Uint8Array(n * n * n), cont = new Uint8Array(n * n * n), slab = new Uint8Array(n * n * n); S[0] = 1; S[1] = 1; slab[1] = 1; cont[2] = 1;
+      const D = V3.pack(Fr, 'heat', S, cont, om, slab).data;
+      if (D[mid * 4] !== 128 || D[3] !== 0 || D[7] !== 64 || D[11] !== 153 || D[15] !== 255) bad.push(`texels: T ${D[mid * 4]} (128), kinds ${[D[3], D[7], D[11], D[15]]} (0,64,153,255)`);
+    }
+    const R = P.compute({}), s = D.solveHall(R, 'crah4', 'common', 5, 'throttled'), C = F.setup(R, s, { dx: 0.6 });
+    let tmin = s.supply, tmax = s.supply;                    // every temperature a source has carried in
+    for (let i = 0; i < 150; i++) { F.step(C, 0.2, 12); tmin = Math.min(tmin, ...C.src); tmax = Math.max(tmax, ...C.src); }
+    {
+      let lo = Infinity, hi = -Infinity;
+      for (let c = 0; c < C.T.length; c++) if (!C.solid[c]) { lo = Math.min(lo, C.T[c]); hi = Math.max(hi, C.T[c]); }
+      if (!(lo >= tmin - 0.05 && hi <= tmax + 0.05)) bad.push(`energy: air ${lo.toFixed(2)}…${hi.toFixed(2)} °C outside its sources ${tmin.toFixed(2)}…${tmax.toFixed(2)}`);
+    }
+    {
+      const Fr = { nx: C.nx, ny: C.ny, nz: C.nz, dx: C.dx, T: C.T, Tm: C.T, u: C.u, v: C.v, w: C.w }, K = V3.TRAIL_K, N = 300;
+      const V = { cfd: Fr, cfdSolid: C.solid, r: R, s, col: () => ({ r: 1, g: 1, b: 1 }), tp: [], trail: { visible: true, geometry: { attributes: { position: { array: new Float32Array(N * (K - 1) * 6) }, color: { array: new Float32Array(N * (K - 1) * 8) } } } } };
+      for (let i = 0; i < N; i++) V.tp.push({ h: new Float32Array(K * 3), c: new Float32Array(K * 3), age: 1e9, life: 1, rec: 0, still: 0 });
+      let inSolid = 0, moved = 0;
+      for (let t = 0; t < 120; t++) {
+        V3.trailStep(V, 0.05);
+        for (const q of V.tp) if (q.age < 1e8 && V3.solidAt(Fr, C.solid, q.h[0], q.h[1], q.h[2])) inSolid++;
+      }
+      for (const q of V.tp) if (Math.hypot(q.h[0] - q.h[3 * (K - 1)], q.h[1] - q.h[3 * (K - 1) + 1], q.h[2] - q.h[3 * (K - 1) + 2]) > 0.05) moved++;
+      if (inSolid) bad.push(`trails: ${inSolid} particle positions inside a rack, CDU or slab`);
+      if (moved < N * 0.5) bad.push(`trails: only ${moved} of ${N} particles carry a tail`);
+    }
+    ok('W12z', !bad.length, 'DH01 CFD view: vorticity of a solid-body rotation = 2Ω, the probe reads cell centres and interpolates between them, volume texels carry temperature and cell kind (solid stops the ray, slab see-through, contained faint), trails never enter a solid and carry tails; the limited energy scheme keeps the air inside its source temperatures' + (bad.length ? ' — ' + bad.slice(0, 3).join('; ') : ''));
+  }
+  {
+    /* DH01 CFD grid check: the fast 0.6 m solve against the same fault on the 0.3 m grid with the
+       second-order schemes (MacCormack momentum + TVD energy), recorded 2026-10-14 from
+       LTCCFD.run(dx 0.3, 900 steps of 0.2 s, rack inlets averaged over the last 250): crah4 hottest
+       inlet 34.78 °C, 64 racks over 27 °C, 13 over 32 °C. The 0.6 m default must land within 1 K and
+       a few racks of it — MacCormack on 0.6 m cells gave 31.9 °C / 82 / 0 and is why it is off there. */
+    const F = sb.LTCCFD, R = P.compute({}), s = D.solveHall(R, 'crah4', 'common', 5, 'throttled'), C = F.setup(R, s, { dx: 0.6 }), REF = { max: 34.78, o27: 64, o32: 13 };
+    const avg = new Float64Array(C.racks.length); let n = 0;
+    for (let i = 1; i <= 600; i++) { F.step(C, 0.2, 12); if (i > 400) { C.racks.forEach((x, k) => { avg[k] += x.tin; }); n++; } }
+    const a = Array.from(avg, (x) => x / n), mx = Math.max(...a), o27 = a.filter((t) => t > 27).length, o32 = a.filter((t) => t > 32).length;
+    const good = Math.abs(mx - REF.max) <= 1 && Math.abs(o27 - REF.o27) <= 6 && Math.abs(o32 - REF.o32) <= 4;
+    ok('W12g', good, `DH01 CFD grid check: the 0.6 m solve (crah4, inlets averaged over 40 s) agrees with the 0.3 m second-order solve — hottest inlet ${mx.toFixed(2)} °C vs ${REF.max}, racks > 27 °C ${o27} vs ${REF.o27}, > 32 °C ${o32} vs ${REF.o32} (within 1 K, 6 and 4 racks)`);
   }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));

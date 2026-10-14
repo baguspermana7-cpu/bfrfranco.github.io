@@ -2,13 +2,14 @@
  * from the same plant and the same DH01 balance solve every other view reads.
  *
  *   grid      staggered (MAC): pressure and temperature at cell centres, each velocity component on
- *             its own faces; default 0.3 m cells, so the 0.6 m rack pitch, 1.2 m rack depth and the
- *             1.2 / 1.8 m aisles land on cell boundaries
- *   momentum  semi-Lagrangian advection (back-traced, trilinear) of each component, Boussinesq
- *             buoyancy g·β·(T − T_supply), then a pressure projection (red-black SOR) that removes
- *             the divergence the advection left: mass is conserved in every fluid cell
- *   energy    finite-volume, first-order upwind, conservative: what leaves one cell enters the next,
- *             so the hall's heat balance closes to the projection residual
+ *             its own faces; 0.6 m cells in the browser by default (0.3 m on request), so the 0.6 m rack
+ *             pitch, 1.2 m rack depth and the 1.2 / 1.8 m aisles land on cell boundaries
+ *   momentum  advection of each component — semi-Lagrangian (back-traced, trilinear) on 0.6 m cells,
+ *             clamped MacCormack (second order) on 0.3 m cells — Boussinesq buoyancy g·β·(T − T_supply),
+ *             then a pressure projection (multigrid-preconditioned conjugate gradients) that removes the
+ *             divergence the advection left: mass is conserved in every fluid cell to the residual reported
+ *   energy    finite-volume, second-order upwind with a van Leer limiter (TVD), conservative: what leaves
+ *             one cell enters the next, so the hall's heat balance closes to the projection residual
  *   racks     black boxes, as DC CFD codes model IT: the front face draws the rack's airflow out of the
  *             cold aisle, the rear face returns it at the drawn air's mean temperature + q / (ρ·cp·V)
  *   CRAHs     fan walls: supply faces below 2.6 m at the solved unit flow, return faces in the ceiling
@@ -37,7 +38,10 @@
       bu: new Float32Array(nu), bv: new Float32Array(nv), bw: new Float32Array(nw),  // prescribed velocity on fixed faces
       tu: new Int32Array(nu).fill(-1), tv: new Int32Array(nv).fill(-1), tw: new Int32Array(nw).fill(-1), // inflow source id (−1: none)
       hot: new Uint8Array(N), leaks: 0, jC: 0, src: [], racks: [], crah: [], sp: p.supplyAirC, chw: s.chw, eps: s.eps, Tref: s.supply,
-      mean: null, avgN: 0 };
+      mean: null, avgN: 0,
+      // schemes: TVD energy always; MacCormack momentum only where the grid can carry the eddies it keeps
+      // (on 0.6 m cells it over-mixed: crah4 hottest inlet 31.9 °C against 34.8 °C on 0.3 m — see the gate)
+      firstOrder: o.energy === 'upwind1', semiLagrangian: o.momentum ? o.momentum === 'sl' : dx > 0.45 };
     function ci(i, j, k) { return i + nx * (j + ny * k); }
     function I(x) { return Math.max(0, Math.min(nx, Math.round(x / dx))); }
     function J(y) { return Math.max(0, Math.min(ny, Math.round(y / dx))); }
@@ -143,23 +147,39 @@
     return out;
   }
 
+  /* momentum advection: MacCormack (back-trace, forward-trace, half the round-trip error added back),
+     clamped to the eight values around the back-traced point, so it never invents an extremum; where
+     the clamp bites it falls back to the plain semi-Lagrangian value. Far less numerical viscosity than
+     semi-Lagrangian alone, so jets, shear layers and eddies the grid can carry survive. */
+  var MM = [0, 0];
+  function sampleMM(A, sx, sy, sz, ox, oy, oz, x, y, z, dx) {
+    var fx = x / dx - ox, fy = y / dx - oy, fz = z / dx - oz;
+    fx = fx < 0 ? 0 : fx > sx - 1.001 ? sx - 1.001 : fx; fy = fy < 0 ? 0 : fy > sy - 1.001 ? sy - 1.001 : fy; fz = fz < 0 ? 0 : fz > sz - 1.001 ? sz - 1.001 : fz;
+    var i = fx | 0, j = fy | 0, k = fz | 0, s1 = sx, s2 = sx * sy, o = i + s1 * j + s2 * k;
+    var a0 = A[o], a1 = A[o + 1], a2 = A[o + s1], a3 = A[o + s1 + 1], a4 = A[o + s2], a5 = A[o + s2 + 1], a6 = A[o + s2 + s1], a7 = A[o + s2 + s1 + 1];
+    MM[0] = Math.min(a0, a1, a2, a3, a4, a5, a6, a7); MM[1] = Math.max(a0, a1, a2, a3, a4, a5, a6, a7);
+  }
   function advect(C, dt) {
     var nx = C.nx, ny = C.ny, nz = C.nz, dx = C.dx, q = [0, 0, 0], i, j, k, x, y, z, f;
     C.u0.set(C.u); C.v0.set(C.v); C.w0.set(C.w);
-    for (k = 0; k < nz; k++) for (j = 0; j < ny; j++) for (i = 0; i <= nx; i++) {
-      f = i + (nx + 1) * (j + ny * k); if (C.fu[f]) continue;
-      x = i * dx; y = (j + 0.5) * dx; z = (k + 0.5) * dx; vel(C, x, y, z, q);
-      C.u[f] = sample(C.u0, nx + 1, ny, nz, 0, 0.5, 0.5, x - dt * q[0], y - dt * q[1], z - dt * q[2], dx);
-    }
-    for (k = 0; k < nz; k++) for (j = 0; j <= ny; j++) for (i = 0; i < nx; i++) {
-      f = i + nx * (j + (ny + 1) * k); if (C.fv[f]) continue;
-      x = (i + 0.5) * dx; y = j * dx; z = (k + 0.5) * dx; vel(C, x, y, z, q);
-      C.v[f] = sample(C.v0, nx, ny + 1, nz, 0.5, 0, 0.5, x - dt * q[0], y - dt * q[1], z - dt * q[2], dx);
-    }
-    for (k = 0; k <= nz; k++) for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
-      f = i + nx * (j + ny * k); if (C.fw[f]) continue;
-      x = (i + 0.5) * dx; y = (j + 0.5) * dx; z = k * dx; vel(C, x, y, z, q);
-      C.w[f] = sample(C.w0, nx, ny, nz + 1, 0.5, 0.5, 0, x - dt * q[0], y - dt * q[1], z - dt * q[2], dx);
+    if (!C.u1) { C.u1 = new Float32Array(C.u.length); C.v1 = new Float32Array(C.v.length); C.w1 = new Float32Array(C.w.length); }
+    var comps = [[C.u, C.u0, C.u1, C.fu, nx + 1, ny, nz, 0, 0.5, 0.5], [C.v, C.v0, C.v1, C.fv, nx, ny + 1, nz, 0.5, 0, 0.5], [C.w, C.w0, C.w1, C.fw, nx, ny, nz + 1, 0.5, 0.5, 0]];
+    for (var m = 0; m < 3; m++) {
+      var A = comps[m][0], A0 = comps[m][1], A1 = comps[m][2], FX = comps[m][3], sx = comps[m][4], sy = comps[m][5], sz = comps[m][6], ox = comps[m][7], oy = comps[m][8], oz = comps[m][9];
+      A1.set(A0);
+      for (k = 0; k < sz; k++) for (j = 0; j < sy; j++) for (i = 0; i < sx; i++) {             // back-trace
+        f = i + sx * (j + sy * k); if (FX[f]) continue;
+        x = (i + ox) * dx; y = (j + oy) * dx; z = (k + oz) * dx; vel(C, x, y, z, q);
+        A1[f] = sample(A0, sx, sy, sz, ox, oy, oz, x - dt * q[0], y - dt * q[1], z - dt * q[2], dx);
+      }
+      if (C.semiLagrangian) { A.set(A1); continue; }
+      for (k = 0; k < sz; k++) for (j = 0; j < sy; j++) for (i = 0; i < sx; i++) {             // forward-trace, correct, clamp
+        f = i + sx * (j + sy * k); if (FX[f]) continue;
+        x = (i + ox) * dx; y = (j + oy) * dx; z = (k + oz) * dx; vel(C, x, y, z, q);
+        var back = sample(A1, sx, sy, sz, ox, oy, oz, x + dt * q[0], y + dt * q[1], z + dt * q[2], dx), val = A1[f] + 0.5 * (A0[f] - back);
+        sampleMM(A0, sx, sy, sz, ox, oy, oz, x - dt * q[0], y - dt * q[1], z - dt * q[2], dx);
+        A[f] = val < MM[0] || val > MM[1] ? A1[f] : val;
+      }
     }
   }
 
@@ -183,7 +203,6 @@
     return m;
   }
 
-  /* projection: φ_c = (Σ φ_nb − div) / n over the free faces, red-black SOR; then u −= ∇φ on free faces */
   /* projection: solve A·φ = −div, A·φ = Σ k_f·(φ_c − φ_nb) over the free faces (k_f = 1), with a
      geometric multigrid V-cycle — each coarser level merges 2×2×2 cells and carries a face
      conductance k = Σ of its four child faces (Galerkin with piecewise-constant transfer), so obstacles and openings survive coarsening.
@@ -300,47 +319,57 @@
     return divergence(C);
   }
 
-  /* energy: conservative first-order upwind; inflow faces bring their source's temperature */
+  /* energy: conservative finite volume, second-order upwind with a van Leer limiter (TVD: no new
+     extrema, so no over- or undershoot), first-order next to walls, solids and inflow faces; inflow
+     faces bring their source's temperature. What leaves one cell enters the next, exactly. */
+  /* the faces energy flows through never change: listed once per axis with their two cells and the
+     cells beyond them (−1: wall, solid or outside), skipping faces fixed at zero velocity */
+  function energyFaces(C) {
+    var nx = C.nx, ny = C.ny, nz = C.nz, S = C.solid, sxy = nx * ny, out = [];
+    function fl(c) { return c >= 0 && !S[c] ? c : -1; }
+    [[C.fu, C.bu, C.tu, nx + 1, ny, nz, 1, 0], [C.fv, C.bv, null, nx, ny + 1, nz, nx, 1], [C.fw, C.bw, C.tw, nx, ny, nz + 1, sxy, 2]].forEach(function (d) {
+      var FX = d[0], BX = d[1], TX = d[2], sx = d[3], sy = d[4], sz = d[5], st = d[6], ax = d[7], list = { f: [], cl: [], cr: [], cll: [], crr: [], src: [] };
+      for (var k = 0; k < sz; k++) for (var j = 0; j < sy; j++) for (var i = 0; i < sx; i++) {
+        var f = i + sx * (j + sy * k); if (FX[f] && !BX[f]) continue;
+        var p = [i, j, k][ax], n = [nx, ny, nz][ax], cc = i + nx * (j + ny * k);
+        var cr = p < n ? fl(cc) : -1, cl = p > 0 ? fl(cc - st) : -1;
+        if (cl < 0 && cr < 0) continue;
+        list.f.push(f); list.cl.push(cl); list.cr.push(cr); list.src.push(TX ? TX[f] : -1);
+        list.cll.push(cl >= 0 && p > 1 ? fl(cl - st) : -1); list.crr.push(cr >= 0 && p < n - 1 ? fl(cr + st) : -1);
+      }
+      out.push({ V: ax === 0 ? 'u' : ax === 1 ? 'v' : 'w', roof: ax === 1, f: Int32Array.from(list.f), cl: Int32Array.from(list.cl), cr: Int32Array.from(list.cr), cll: Int32Array.from(list.cll), crr: Int32Array.from(list.crr), src: Int32Array.from(list.src) });
+    });
+    return out;
+  }
   function energy(C, dt) {
-    var nx = C.nx, ny = C.ny, nz = C.nz, dx = C.dx, T = C.T, Tn = C.Tn, omax = 0, i, j, k;
-    // upwind stays bounded while the outflow of every cell in one sub-step is below its volume
+    var nx = C.nx, ny = C.ny, nz = C.nz, dx = C.dx, T = C.T, Tn = C.Tn, omax = 0, i, j, k, sxy = nx * ny;
+    // a limited upwind scheme stays bounded while each cell's outflow in one sub-step is under half its volume
     for (k = 0; k < nz; k++) for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
       var fu = i + (nx + 1) * (j + ny * k), fv = i + nx * (j + (ny + 1) * k), fw = i + nx * (j + ny * k);
-      var o = Math.max(0, C.u[fu + 1]) + Math.max(0, -C.u[fu]) + Math.max(0, C.v[fv + nx]) + Math.max(0, -C.v[fv]) + Math.max(0, C.w[fw + nx * ny]) + Math.max(0, -C.w[fw]);
+      var o = Math.max(0, C.u[fu + 1]) + Math.max(0, -C.u[fu]) + Math.max(0, C.v[fv + nx]) + Math.max(0, -C.v[fv]) + Math.max(0, C.w[fw + sxy]) + Math.max(0, -C.w[fw]);
       if (o > omax) omax = o;
     }
-    var nsub = Math.max(1, Math.ceil(dt * omax / (0.9 * dx))), h = dt / nsub / dx, S = C.solid, Uu = C.u, Vv = C.v, Ww = C.w, TU = C.tu, TW = C.tw, SRC = C.src, DV = C.div;
-    function face(vel, srcId, cl, cr) {          // flux (m/s·K) through a face, positive towards cr
-      if (vel > 0) return vel * (cl >= 0 ? T[cl] : SRC[srcId]);
-      return vel * (cr >= 0 ? T[cr] : SRC[srcId]);
-    }
+    if (!C.ef) C.ef = energyFaces(C);
+    var first = !!C.firstOrder, nsub = Math.max(1, Math.ceil(dt * omax / ((first ? 0.9 : 0.45) * dx))), h = dt / nsub / dx, S = C.solid, SRC = C.src, DV = C.div;
     for (var sub = 0; sub < nsub; sub++) {
       Tn.set(T);
-      for (k = 0; k < nz; k++) for (j = 0; j < ny; j++) for (i = 0; i <= nx; i++) {
-        var f = i + (nx + 1) * (j + ny * k), U = Uu[f]; if (!U) continue;
-        var cl = i > 0 ? i - 1 + nx * (j + ny * k) : -1, cr = i < nx ? i + nx * (j + ny * k) : -1;
-        if (cl >= 0 && S[cl]) cl = -1; if (cr >= 0 && S[cr]) cr = -1;
-        if (cl < 0 && cr < 0) continue;
-        if ((U > 0 && cl < 0 || U < 0 && cr < 0) && TU[f] < 0) continue;  // no source: nothing enters
-        var F = face(U, TU[f], cl, cr) * h;
-        if (cl >= 0) Tn[cl] -= F; if (cr >= 0) Tn[cr] += F;
-      }
-      for (k = 0; k < nz; k++) for (j = 0; j <= ny; j++) for (i = 0; i < nx; i++) {
-        f = i + nx * (j + (ny + 1) * k); U = Vv[f]; if (!U) continue;
-        cl = j > 0 ? i + nx * (j - 1 + ny * k) : -1; cr = j < ny ? i + nx * (j + ny * k) : -1;
-        if (cl >= 0 && S[cl]) cl = -1; if (cr >= 0 && S[cr]) cr = -1;
-        if (cl < 0 && cr < 0) continue;
-        if (U > 0 && cl < 0 || U < 0 && cr < 0) continue;                // only outflow leaves through the roof
-        F = face(U, -1, cl, cr) * h; if (cl >= 0) Tn[cl] -= F; if (cr >= 0) Tn[cr] += F;
-      }
-      for (k = 0; k <= nz; k++) for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
-        f = i + nx * (j + ny * k); U = Ww[f]; if (!U) continue;
-        cl = k > 0 ? i + nx * (j + ny * (k - 1)) : -1; cr = k < nz ? i + nx * (j + ny * k) : -1;
-        if (cl >= 0 && S[cl]) cl = -1; if (cr >= 0 && S[cr]) cr = -1;
-        if (cl < 0 && cr < 0) continue;
-        if ((U > 0 && cl < 0 || U < 0 && cr < 0) && TW[f] < 0) continue;
-        F = face(U, TW[f], cl, cr) * h;
-        if (cl >= 0) Tn[cl] -= F; if (cr >= 0) Tn[cr] += F;
+      for (var a = 0; a < 3; a++) {
+        var E = C.ef[a], U = C[E.V], FF = E.f, CL = E.cl, CR = E.cr, CLL = E.cll, CRR = E.crr, SR = E.src, roof = E.roof, nf = FF.length;
+        for (var e = 0; e < nf; e++) {
+          var vel = U[FF[e]]; if (vel === 0) continue;
+          var cl = CL[e], cr = CR[e], tf;
+          if (vel > 0) {
+            if (cl < 0) { if (SR[e] < 0 || roof) continue; tf = SRC[SR[e]]; }
+            else if (first || cr < 0 || CLL[e] < 0) tf = T[cl];
+            else { var tu = T[cl], d = T[cr] - tu; if (d === 0) tf = tu; else { var r = (tu - T[CLL[e]]) / d, ar = r < 0 ? -r : r; tf = tu + 0.5 * (r + ar) / (1 + ar) * d; } }
+          } else {
+            if (cr < 0) { if (SR[e] < 0 || roof) continue; tf = SRC[SR[e]]; }
+            else if (first || cl < 0 || CRR[e] < 0) tf = T[cr];
+            else { tu = T[cr]; d = T[cl] - tu; if (d === 0) tf = tu; else { r = (tu - T[CRR[e]]) / d; ar = r < 0 ? -r : r; tf = tu + 0.5 * (r + ar) / (1 + ar) * d; } }
+          }
+          var F = vel * tf * h;
+          if (cl >= 0) Tn[cl] -= F; if (cr >= 0) Tn[cr] += F;
+        }
       }
       // the divergence left by the projection would create or destroy heat: remove it (T·div term)
       for (var c = 0; c < Tn.length; c++) if (!S[c]) Tn[c] += T[c] * DV[c] * h;

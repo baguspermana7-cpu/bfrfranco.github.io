@@ -519,9 +519,9 @@
     var cv = host.querySelector('#dhCv'), last = null, cursor = -1, view3d = false;
     /* 3D: three.js and the 3D view load on first use only (≈ 540 kB), from beside this script */
     function load3d(done) {
-      if (root.LTCDH013D && root.RZ3) return done();
+      if (root.LTCDH013D && root.LTCCFDView && root.RZ3) return done();
       var me = document.querySelector('script[src*="ltc-dh01.js"]'), base = me ? me.src.replace(/ltc-dh01\.js.*$/, '') : 'js/', v = '?v=' + encodeURIComponent(root.RZ_VERSION || '');
-      var files = [base + 'vendor/three-r170.min.js' + v, base + 'ltc-dh01-3d.js' + v], i = 0;
+      var files = [base + 'vendor/three-r170.min.js' + v, base + 'ltc-cfd-view.js' + v, base + 'ltc-dh01-3d.js' + v], i = 0;
       (function next() {
         if (i === files.length) return done();
         var sc = document.createElement('script'); sc.src = files[i++]; sc.onload = next;

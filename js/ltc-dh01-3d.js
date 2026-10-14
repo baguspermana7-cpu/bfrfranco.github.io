@@ -136,16 +136,17 @@
     var T = root.RZ3; if (!T || view) return view;
     var D = root.LTCDH01, ramp = D.ramp;
     host.innerHTML = '<div class="ltc-3d-bar">' +
-      '<div class="ltc-seg" role="group" aria-label="Layers"><button type="button" data-l="cfd" aria-pressed="true">CFD airflow</button><button type="button" data-l="hot" aria-pressed="true">Air &gt; 27 °C</button><button type="button" data-l="air" aria-pressed="false">Balance paths</button><button type="button" data-l="water" aria-pressed="true">Water</button><button type="button" data-l="shell" aria-pressed="true">Containment</button></div>' +
-      '<div class="ltc-seg" role="group" aria-label="Slice plane"><button type="button" data-sl="h" aria-pressed="true">Slice · level</button><button type="button" data-sl="v" aria-pressed="false">Slice · cold aisle</button><button type="button" data-sl="off" aria-pressed="false">No slice</button></div>' +
-      '<div class="ltc-seg" role="group" aria-label="Slice shows"><button type="button" data-sf="T" aria-pressed="true">Temperature</button><button type="button" data-sf="speed" aria-pressed="false">Speed</button><button type="button" data-sf="ti" aria-pressed="false">Turbulence</button></div>' +
-      '<label class="ltc-3d-at">Slice height <input type="range" min="0.15" max="4.85" step="0.15" value="1.2" data-at><output>1.2 m</output></label>' +
+      '<div class="ltc-seg" role="group" aria-label="Layers"><button type="button" data-l="cfd" aria-pressed="true">CFD flow trails</button><button type="button" data-l="air" aria-pressed="false">Balance paths</button><button type="button" data-l="water" aria-pressed="true">Water</button><button type="button" data-l="shell" aria-pressed="true">Containment</button></div>' +
+      '<div class="ltc-seg" role="group" aria-label="CFD volume"><button type="button" data-vol="heat" aria-pressed="true">Volume · heat</button><button type="button" data-vol="iso" aria-pressed="false">Isotherms 27 / 32 °C</button><button type="button" data-vol="speed" aria-pressed="false">Speed</button><button type="button" data-vol="ti" aria-pressed="false">Turbulence</button><button type="button" data-vol="vort" aria-pressed="false">Vortices</button><button type="button" data-vol="off" aria-pressed="false">No volume</button></div>' +
+      '<div class="ltc-seg" role="group" aria-label="Slice plane"><button type="button" data-sl="h" aria-pressed="false">Slice · level</button><button type="button" data-sl="v" aria-pressed="false">Slice · cold aisle</button><button type="button" data-sl="off" aria-pressed="true">No slice</button></div>' +
+      '<div class="ltc-seg" role="group" aria-label="Slice shows"><button type="button" data-sf="T" aria-pressed="true">Temperature</button><button type="button" data-sf="speed" aria-pressed="false">Speed</button><button type="button" data-sf="ti" aria-pressed="false">Turbulence</button><button type="button" data-sf="vort" aria-pressed="false">Vortices</button></div>' +
+      '<label class="ltc-3d-at" hidden>Slice height <input type="range" min="0.15" max="4.85" step="0.15" value="1.2" data-at><output>1.2 m</output></label>' +
       '<div class="ltc-seg" role="group" aria-label="CFD grid"><button type="button" data-dx="0.6" aria-pressed="true">Grid 0.6 m · fast</button><button type="button" data-dx="0.3" aria-pressed="false">0.3 m · fine (minutes)</button></div>' +
-      '<div class="ltc-seg" role="group" aria-label="Camera"><button type="button" data-cam="iso">Orbit</button><button type="button" data-cam="top">Top</button><button type="button" data-cam="cold">Cold aisle</button><button type="button" data-cam="hot">Hot aisle</button><button type="button" data-cam="plenum">Plenum</button></div>' +
+      '<div class="ltc-seg" role="group" aria-label="Camera"><button type="button" data-cam="iso">Orbit</button><button type="button" data-cam="top">Top</button><button type="button" data-cam="cold">Cold aisle</button><button type="button" data-cam="hot">Hot aisle</button><button type="button" data-cam="plenum">Plenum</button><button type="button" data-tour aria-pressed="false">Auto-orbit</button></div>' +
       '<div class="ltc-seg" role="group" aria-label="Particle speed"><button type="button" data-sp="0.25">¼×</button><button type="button" data-sp="1" aria-pressed="true">Real time</button><button type="button" data-sp="3">3×</button></div></div>' +
-      '<div class="ltc-3d-stage"><canvas class="ltc-3d-cv" tabindex="0" aria-label="DH01 in 3D: drag to orbit, scroll or pinch to zoom, hover a rack or unit for its numbers"></canvas><div class="ltc-3d-lbl"></div><div class="ltc-3d-hud" aria-live="polite"></div>' +
-      '<p class="ltc-3d-hint">Drag to orbit · right-drag or two fingers to pan · scroll / pinch to zoom</p></div>' +
-      '<p class="ltc-note ltc-3d-key"></p>';
+      '<div class="ltc-3d-stage"><canvas class="ltc-3d-cv" tabindex="0" aria-label="DH01 in 3D: drag to orbit, scroll or pinch to zoom, hover a rack or unit for its numbers"></canvas><div class="ltc-3d-lbl"></div><div class="ltc-3d-hud" aria-live="polite"></div><div class="ltc-3d-probe" hidden></div><div class="ltc-3d-scale"></div>' +
+      '<p class="ltc-3d-hint">Drag to orbit · right-drag or two fingers to pan · scroll / pinch to zoom · hover a slice to probe the field</p></div>' +
+      '<p class="ltc-3d-sum"></p><p class="ltc-note ltc-3d-key"></p>';
     var cv = host.querySelector('canvas'), stage = host.querySelector('.ltc-3d-stage'), lblHost = host.querySelector('.ltc-3d-lbl');
     var renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(root.devicePixelRatio || 1, 2));
@@ -157,11 +158,11 @@
     scene.add(new T.HemisphereLight(0xcfdcff, 0x2a2018, 1.25)); scene.add(new T.AmbientLight(0x404a58, 0.6));
     var sun = new T.DirectionalLight(0xffffff, 1.6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); scene.add(sun); scene.add(sun.target);
     var hall = new T.Group(), dyn = new T.Group(); scene.add(hall); scene.add(dyn);
-    var V = { renderer: renderer, scene: scene, cam: cam, ctl: ctl, sun: sun, hall: hall, dyn: dyn, host: host, cv: cv, layers: { cfd: true, hot: true, air: false, water: true, slice: false, shell: true }, dx: 0.6, slicePlane: 'h', sliceField: 'T', sliceAt: 1.2,
+    var V = { renderer: renderer, scene: scene, cam: cam, ctl: ctl, sun: sun, hall: hall, dyn: dyn, host: host, cv: cv, layers: { cfd: true, air: false, water: true, slice: false, shell: true }, volMode: 'heat', dx: 0.6, slicePlane: 'off', sliceField: 'T', sliceAt: 1.2,
               speed: 1, key: '', t: 0, last: 0, hooks: hooks || {}, labels: [], visible: true, tween: null };
     view = V;
     function col(t) { var c = ramp(t); return new T.Color(c[0] / 255, c[1] / 255, c[2] / 255); }
-    V.col = col;
+    V.col = col; V.ramp = ramp;
     // particles: one Points cloud per family, soft round sprites, additive on the dark hall
     function cloud(size) {
       var g = new T.BufferGeometry(), m = new T.ShaderMaterial({
@@ -174,11 +175,14 @@
     V.air = cloud(2.0); V.water = cloud(1.3);
     // controls
     host.addEventListener('click', function (e) {
-      var l = e.target.closest('[data-l]'); if (l) { var k = l.getAttribute('data-l'); V.layers[k] = !V.layers[k]; l.setAttribute('aria-pressed', String(V.layers[k])); applyLayers(); if (k === 'cfd' && V.layers.cfd && V.r) cfdStart(V.r, V.s, V.st); }
+      var l = e.target.closest('[data-l]'); if (l) { var k = l.getAttribute('data-l'); V.layers[k] = !V.layers[k]; l.setAttribute('aria-pressed', String(V.layers[k])); applyLayers(); }
+      if (e.target.closest('button')) probeOff();
       var c = e.target.closest('[data-cam]'); if (c) camTo(c.getAttribute('data-cam'));
       var sl = e.target.closest('[data-sl]'); if (sl) { V.slicePlane = sl.getAttribute('data-sl'); V.sliceAt = V.slicePlane === 'h' ? +host.querySelector('[data-at]').value : null; press('[data-sl]', sl); host.querySelector('.ltc-3d-at').hidden = V.slicePlane !== 'h'; cfdSlice(); }
       var sf = e.target.closest('[data-sf]'); if (sf) { V.sliceField = sf.getAttribute('data-sf'); press('[data-sf]', sf); cfdSlice(); }
       var gx = e.target.closest('[data-dx]'); if (gx) { V.dx = +gx.getAttribute('data-dx'); press('[data-dx]', gx); if (V.r) cfdStart(V.r, V.s, V.st); }
+      var vo = e.target.closest('[data-vol]'); if (vo) { V.volMode = vo.getAttribute('data-vol'); press('[data-vol]', vo); cfdVolume(); applyLayers(); }
+      var tr = e.target.closest('[data-tour]'); if (tr) { ctl.autoRotate = !ctl.autoRotate; ctl.autoRotateSpeed = 0.7; tr.setAttribute('aria-pressed', String(ctl.autoRotate)); }
       var sp = e.target.closest('[data-sp]'); if (sp) { V.speed = +sp.getAttribute('data-sp'); [].forEach.call(host.querySelectorAll('[data-sp]'), function (b) { b.setAttribute('aria-pressed', String(b === sp)); }); }
     });
     function press(sel, on) { [].forEach.call(host.querySelectorAll(sel), function (b) { b.setAttribute('aria-pressed', String(b === on)); }); }
@@ -188,17 +192,34 @@
     function pick(e) {
       var b = cv.getBoundingClientRect(); ndc.set((e.clientX - b.left) / b.width * 2 - 1, -(e.clientY - b.top) / b.height * 2 + 1);
       ray.setFromCamera(ndc, cam);
-      var hits = ray.intersectObjects(V.pickables || [], false);
-      if (!hits.length) { if (V.hooks.hide) V.hooks.hide(); return; }
+      var hits = ray.intersectObjects(V.pickables || [], false), sh = V.cslice && V.cslice.visible ? ray.intersectObject(V.cslice, false)[0] : null;
+      if (!hits.length || sh && sh.distance < hits[0].distance) { if (V.hooks.hide) V.hooks.hide(); probeAt(e, sh); return; }
+      probeOff();
       var o = hits[0].object;
       if (o.userData.rack && hits[0].instanceId != null && V.hooks.rack) V.hooks.rack(hits[0].instanceId, e.clientX, e.clientY);
       else if (o.userData.unit && V.hooks.unit) V.hooks.unit(o.userData.unit, e.clientX, e.clientY);
     }
     cv.addEventListener('pointermove', function (e) { if (e.buttons === 0) pick(e); });
     cv.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') pick(e); });
-    cv.addEventListener('pointerleave', function () { if (V.hooks.hide) V.hooks.hide(); });
+    cv.addEventListener('pointerleave', function () { if (V.hooks.hide) V.hooks.hide(); probeOff(); });
+    /* probe: the field where the pointer meets the slice */
+    function probeOff() { var pe = host.querySelector('.ltc-3d-probe'); if (pe) pe.hidden = true; if (V.pmark) V.pmark.visible = false; }
+    function probeAt(e, hit) {
+      var pe = host.querySelector('.ltc-3d-probe'), F = V.cfd, CV = root.LTCCFDView; if (!F || !hit) return probeOff();
+      var X0 = F.nx * F.dx / 2, Z0 = F.nz * F.dx / 2, x = hit.point.x + X0, y = hit.point.y, z = hit.point.z + Z0, q = CV.probe(F, V.cfdSolid, F.ti, V.vort, x, y, z);
+      if (!V.pmark) { V.pmark = new T.Mesh(new T.CylinderGeometry(0.04, 0.04, 1, 8), new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 })); V.dyn.add(V.pmark); }
+      V.pmark.visible = true; V.pmark.scale.y = Math.max(0.05, y); V.pmark.position.set(hit.point.x, y / 2, hit.point.z);
+      var env = q.T <= 27 ? 'within the ASHRAE recommended range' : q.T <= 32 ? 'above recommended, within A1 allowable' : 'above A1 allowable (32 °C)';
+      pe.innerHTML = q.solid ? '<b>Solid</b> (rack, CDU or ceiling slab) at ' + x.toFixed(1) + ', ' + y.toFixed(1) + ', ' + z.toFixed(1) + ' m' :
+        '<b>' + q.T.toFixed(1) + ' °C</b> time-averaged · now ' + q.Ti.toFixed(1) + ' °C<br>' + env +
+        '<br>speed <b>' + q.sp.toFixed(2) + ' m/s</b> (u ' + q.u[0].toFixed(2) + ', v ' + q.u[1].toFixed(2) + ', w ' + q.u[2].toFixed(2) + ')' +
+        '<br>turbulence intensity <b>' + (q.ti != null ? (q.ti * 100).toFixed(0) + ' %' : 'after 12 s') + '</b> · vorticity <b>' + (q.vort != null ? q.vort.toFixed(2) : '—') + ' s⁻¹</b>' +
+        '<br><span>x ' + x.toFixed(1) + ' m · height ' + y.toFixed(2) + ' m · y ' + z.toFixed(1) + ' m · cell ' + F.dx + ' m, trilinear</span>';
+      var b = stage.getBoundingClientRect(); pe.hidden = false;
+      pe.style.transform = 'translate(' + Math.max(6, Math.min(b.width - pe.offsetWidth - 6, e.clientX - b.left + 14)).toFixed(0) + 'px,' + Math.max(6, Math.min(b.height - pe.offsetHeight - 6, e.clientY - b.top + 14)).toFixed(0) + 'px)';
+    }
     function size() {
-      var w = stage.clientWidth || 600, hh = Math.max(320, Math.min(Math.round(w * 0.58), 720));
+      var w = stage.clientWidth || 600, hh = w < 640 ? Math.max(320, Math.min(Math.round(w * 1.15), 520)) : Math.max(320, Math.min(Math.round(w * 0.58), 720));
       renderer.setSize(w, hh, false); cv.style.width = w + 'px'; cv.style.height = hh + 'px'; cam.aspect = w / hh; cam.updateProjectionMatrix();
     }
     V.size = size;
@@ -213,7 +234,7 @@
     var V = view; if (!V) return;
     V.air.visible = V.layers.air; V.water.visible = V.layers.water;
     if (V.slice) V.slice.visible = false;
-    if (V.streak) V.streak.visible = V.layers.cfd; if (V.cslice) V.cslice.visible = V.layers.cfd && V.slicePlane !== 'off'; if (V.hot) V.hot.visible = V.layers.cfd && V.layers.hot;
+    if (V.trail) V.trail.visible = V.layers.cfd; if (V.cslice) V.cslice.visible = !!V.cfd && V.slicePlane !== 'off'; if (V.vol) V.vol.visible = !!V.cfd && V.volMode !== 'off';
     (V.shell || []).forEach(function (m) { m.visible = V.layers.shell; });
     (V.pipes || []).forEach(function (m) { m.visible = V.layers.water; });
   }
@@ -312,7 +333,7 @@
     var gkey = JSON.stringify([r.hall.lengthM, r.hall.widthM, r.hall.racks.length, r.hall.cdus.length, r.hall.crahs.length]);
     if (gkey !== V.gkey) { buildHall(r); V.gkey = gkey; }
     var h = r.hall, p = r.input, X0 = h.lengthM / 2, Z0 = h.widthM / 2, col = V.col;
-    if (!(V.layers.cfd && V.cfd)) s.racks.forEach(function (k, i) {      // with the CFD on, its frames colour the doors
+    if (!V.cfd) s.racks.forEach(function (k, i) {      // with the CFD on, its frames colour the doors
       var thr = k.liq != null && k.liq < 1 && st.phase !== 'running';
       V.front.setColorAt(i, thr ? new T.Color(0x3a3f46) : col(k.inlet)); V.rear.setColorAt(i, thr ? new T.Color(0x3a3f46) : col(k.exhaust));
     });
@@ -325,11 +346,11 @@
     if (skey !== V.skey) { seed(M); V.skey = skey; }
     else { V.streams.forEach(function (sm, i) { var nw = M.streams[i]; sm.pts = nw.pts; sm.v = nw.v; sm.legT = nw.legT; sm.cycle = nw.cycle; }); recolor(); }
     V.model = M; V.r = r; V.s = s; V.st = st;
-    if (V.layers.cfd) cfdStart(r, s, st);
+    cfdStart(r, s, st);
     var key = V.host.querySelector('.ltc-3d-key');
     var air = M.streams.filter(function (x) { return x.kind === 'air'; }).reduce(function (a, x) { return a + x.flow; }, 0), rec = M.streams.filter(function (x) { return x.kind === 'recirc'; }).reduce(function (a, x) { return a + x.flow; }, 0);
     var tcs = M.streams.filter(function (x) { return x.kind === 'tcs'; }).reduce(function (a, x) { return a + x.flow; }, 0);
-    key.innerHTML = '<b>CFD airflow</b> (default): an incompressible, buoyant airflow solve of DH01 (js/ltc-cfd.js, in a background worker) on this plant’s racks, fans and containment — streaks follow the solved velocity, so jets, recirculation and the eddies the grid resolves are what the solve produced; the slice shows temperature, speed or resolved turbulence intensity (velocity fluctuation ÷ mean, after the first air change); glowing cells are air above 27 °C outside the contained hot aisles and plenum; rack doors show the CFD inlet and exhaust. The panel compares it with the balance solve. No turbulence model and a coarse grid: for training and comparison, not a design CFD. <b>Balance paths</b>: the streams of the balance solve, Supply air to the racks ' + air.toFixed(1) + ' m³/s, exhaust pulled back ' + rec.toFixed(1) + ' m³/s, TCS ' + tcs.toFixed(0) + ' L/s, one particle per fixed volume: the stream density is the flow. Colour = temperature on the plan’s scale. Drawn, not modelled: 2.0 m racks, a 0.9 m ceiling plenum, hot aisles chimneyed to it, pipe routes and 1.5 m/s pipe velocity at design flow. Thermal approximation for training — not CFD.';
+    key.innerHTML = '<b>CFD</b> (default): an incompressible, buoyant airflow solve of DH01 (js/ltc-cfd.js, in a background worker) on this plant’s racks, fans and containment. <b>Volume</b>: the solved field ray-marched on the GPU, one texel per cell, trilinear between them — <i>heat</i> glows where room air is above 27 °C (the contained hot aisles and plenum kept faint, so escaped hot air stands out; fast supply air shows as a cool haze), <i>isotherms</i> are the 27 and 32 °C surfaces of the room air, <i>speed</i> |u|, <i>turbulence</i> intensity (velocity fluctuation ÷ mean, after the first air change) and <i>vortices</i> |∇×u| (shear layers and eddies the grid resolves). <b>Flow trails</b>: ' + root.LTCCFDView.TRAIL_N.toLocaleString('en-US') + ' particles carried by the solved velocity, born at the fan walls, the rack exhausts and anywhere in the room, each with a one-second tail coloured by the air it passed through. <b>Slice</b>: temperature, speed, turbulence or vorticity on a plane; hover it to probe the field. Rack doors show the CFD inlet and exhaust; the panel compares the CFD with the balance solve. No turbulence model and a coarse grid: for training and comparison, not a design CFD. <b>Balance paths</b>: the streams of the balance solve, supply air to the racks ' + air.toFixed(1) + ' m³/s, exhaust pulled back ' + rec.toFixed(1) + ' m³/s, TCS ' + tcs.toFixed(0) + ' L/s, one particle per fixed volume: the stream density is the flow. Colour = temperature on the plan’s scale. Drawn, not modelled: 2.0 m racks, a 0.9 m ceiling plenum, hot aisles chimneyed to it, pipe routes and 1.5 m/s pipe velocity at design flow.';
     applyLayers();
   }
 
@@ -414,11 +435,11 @@
 
   /* ------------------------------------------------------------------ CFD layer
    * js/ltc-cfd.js runs in a Web Worker on the same plant and the same DH01 solve; each frame it
-   * posts the temperature and velocity fields. Here they become: streaks advected through the
-   * solved velocity (direction, speed and the eddies the grid resolves), a slice through the field
-   * (temperature, speed or resolved turbulence intensity, GPU-interpolated between cells), the
-   * volume of air above 27 °C, and rack doors coloured by the inlet the CFD computes. */
-  var CFD_N = 5200, SPEED_MAX = 3;
+   * posts the temperature and velocity fields. js/ltc-cfd-view.js turns them into the ray-marched
+   * volume (heat, isotherms, speed, turbulence, vortices), the particle trails and the probe; here
+   * they also colour the rack doors with the inlet the CFD computes, paint the slice and fill the
+   * panel that compares the CFD with the balance solve. */
+  var SPEED_MAX = 3;
   function cfdPayload(r, s) {
     var p = r.input, h = r.hall;
     return { r: { input: { rackPitchM: p.rackPitchM, rackDepthM: p.rackDepthM, hotAisleM: p.hotAisleM, supplyAirC: p.supplyAirC },
@@ -442,84 +463,49 @@
       V.cfd = null; hud('Solving the airflow on a ' + V.dx + ' m grid…');
     }, 250);
   }
-  function hud(html) { var e = view && view.host.querySelector('.ltc-3d-hud'); if (e) e.innerHTML = html; }
+  function hud(html) {                               // on a phone the panel keeps its first line; the rest sits under the stage
+    var V = view; if (!V) return; var e = V.host.querySelector('.ltc-3d-hud'), m = V.host.querySelector('.ltc-3d-sum');
+    if (e) e.innerHTML = html.split('<br>').map(function (l, i) { return '<span' + (i ? ' class="x"' : '') + '>' + l + '</span>'; }).join('');
+    if (m) m.innerHTML = html.split('<br>').slice(1).join('<br>');
+  }
   function cfdFrame(F) {
-    var V = view, T = root.RZ3, first = !V.cfd || V.cfd.nx !== F.nx;
-    if (F.solid) { V.cfdSolid = F.solid; V.contained = containedMask(F); }
-    V.cfd = F;
-    if (first) cfdSeed();
+    var V = view, CV = root.LTCCFDView, first = !V.cfd || V.cfd.nx !== F.nx;
+    if (F.solid) {
+      V.cfdSolid = F.solid; V.contained = containedMask(F); V.slab = new Uint8Array(F.solid.length);
+      for (var c = 0; c < F.solid.length; c++) if (F.solid[c] && (Math.floor(c / F.nx) % F.ny + 0.5) * F.dx > RACK_H) V.slab[c] = 1;
+    }
+    V.cfd = F; V.vort = CV.vorticity(F, V.cfdSolid);
+    if (first) { CV.trails(V); applyLayers(); }
     // rack doors: the inlet and exhaust the CFD computes
     F.rep.inlet.forEach(function (t, i) { V.front.setColorAt(i, V.col(t)); V.rear.setColorAt(i, V.col(t + (V.s ? V.s.racks[i].exhaust - V.s.racks[i].inlet : 12))); });
     V.front.instanceColor.needsUpdate = true; V.rear.instanceColor.needsUpdate = true;
-    cfdSlice(); cfdHot();
+    cfdSlice(); cfdVolume();
     var rep = F.rep, bal = V.cfdBal || {}, err = rep.qRacksKw ? (rep.qCrahKw - rep.qRacksKw) / rep.qRacksKw * 100 : 0;
-    var settled = Math.abs(err) < 1 && rep.t > 30;
+    var settled = Math.abs(err) < 1 && rep.t > 30, S = V.cfdSolid, tiRoom = null;
+    if (F.ti) { var a = []; for (c = 0; c < F.ti.length; c++) if (!(S && S[c]) && !V.contained[c] && F.ti[c] > 0) a.push(F.ti[c]); a.sort(function (x, y) { return x - y; }); tiRoom = a.length ? a[Math.floor(a.length / 2)] : null; }
     hud('<b>CFD</b> ' + F.dx + ' m · ' + (F.nx * F.ny * F.nz).toLocaleString('en-US') + ' cells · t = ' + rep.t.toFixed(0) + ' s' + (settled ? ' · <i class="ok">settled</i>' : ' · <i>converging</i>') +
       '<br>heat in <b>' + Math.round(rep.qRacksKw).toLocaleString('en-US') + '</b> kW · removed <b>' + Math.round(rep.qCrahKw).toLocaleString('en-US') + '</b> kW (' + (err >= 0 ? '+' : '') + err.toFixed(1) + ' %) · mass residual ' + rep.residual.toExponential(1) +
-      '<br>hottest inlet <b>' + rep.maxInlet.toFixed(1) + ' °C</b> (balance ' + (bal.max != null ? bal.max.toFixed(1) : '—') + ') · racks &gt; 27 °C <b>' + rep.over27 + '</b> (balance ' + (bal.over27 != null ? bal.over27 : '—') + ') · return ' + rep.ret.toFixed(1) + ' °C');
+      '<br>hottest inlet <b>' + rep.maxInlet.toFixed(1) + ' °C</b> (balance ' + (bal.max != null ? bal.max.toFixed(1) : '—') + ') · racks &gt; 27 °C <b>' + rep.over27 + '</b> (balance ' + (bal.over27 != null ? bal.over27 : '—') + ') · return ' + rep.ret.toFixed(1) + ' °C' +
+      '<br>turbulence: room median TI <b>' + (tiRoom != null ? (tiRoom * 100).toFixed(0) + ' %' : '—') + '</b> · vorticity p99 <b>' + CV.pct(V.vort, S, 0.99).toFixed(2) + ' s⁻¹</b>' + (F.dx > 0.45 ? ' · <i>0.6 m cells carry the mean flow; the 0.3 m grid resolves the eddies</i>' : ' · eddies resolved down to ' + (2 * F.dx).toFixed(1) + ' m'));
   }
-  function cellT(F, x, y, z) {                       // trilinear on cell centres
-    var A = F.Tm || F.T, nx = F.nx, ny = F.ny, nz = F.nz, d = F.dx;
-    var fx = Math.max(0, Math.min(nx - 1.001, x / d - 0.5)), fy = Math.max(0, Math.min(ny - 1.001, y / d - 0.5)), fz = Math.max(0, Math.min(nz - 1.001, z / d - 0.5));
-    var i = fx | 0, j = fy | 0, k = fz | 0, a = fx - i, b = fy - j, c = fz - k, o = i + nx * (j + ny * k), s1 = nx, s2 = nx * ny;
-    return ((A[o] * (1 - a) + A[o + 1] * a) * (1 - b) + (A[o + s1] * (1 - a) + A[o + s1 + 1] * a) * b) * (1 - c) + ((A[o + s2] * (1 - a) + A[o + s2 + 1] * a) * (1 - b) + (A[o + s2 + s1] * (1 - a) + A[o + s2 + s1 + 1] * a) * b) * c;
+  function cfdVolume() {
+    var V = view; if (!V || !V.cfd) return;
+    if (V.volMode === 'off') { if (V.vol) V.vol.visible = false; scale(); return; }
+    root.LTCCFDView.volume(V, V.cfd, V.volMode, V.contained, V.vort, V.slab);
+    V.vol.visible = true; scale();
   }
-  function stg(A, sx, sy, sz, ox, oy, oz, x, y, z, d) {
-    var fx = Math.max(0, Math.min(sx - 1.001, x / d - ox)), fy = Math.max(0, Math.min(sy - 1.001, y / d - oy)), fz = Math.max(0, Math.min(sz - 1.001, z / d - oz));
-    var i = fx | 0, j = fy | 0, k = fz | 0, a = fx - i, b = fy - j, c = fz - k, o = i + sx * (j + sy * k), s1 = sx, s2 = sx * sy;
-    return ((A[o] * (1 - a) + A[o + 1] * a) * (1 - b) + (A[o + s1] * (1 - a) + A[o + s1 + 1] * a) * b) * (1 - c) + ((A[o + s2] * (1 - a) + A[o + s2 + 1] * a) * (1 - b) + (A[o + s2 + s1] * (1 - a) + A[o + s2 + s1 + 1] * a) * b) * c;
-  }
-  function cfdVel(F, x, y, z, o) {
-    o[0] = stg(F.u, F.nx + 1, F.ny, F.nz, 0, 0.5, 0.5, x, y, z, F.dx); o[1] = stg(F.v, F.nx, F.ny + 1, F.nz, 0.5, 0, 0.5, x, y, z, F.dx); o[2] = stg(F.w, F.nx, F.ny, F.nz + 1, 0.5, 0.5, 0, x, y, z, F.dx);
-    return o;
-  }
-  function solidAt(F, x, y, z) {
-    var S = view.cfdSolid; if (!S) return false;
-    var i = Math.floor(x / F.dx), j = Math.floor(y / F.dx), k = Math.floor(z / F.dx);
-    if (i < 0 || j < 0 || k < 0 || i >= F.nx || j >= F.ny || k >= F.nz) return true;
-    return !!S[i + F.nx * (j + F.ny * k)];
-  }
-  function cfdSeed() {
-    var V = view, T = root.RZ3;
-    V.cp = []; for (var i = 0; i < CFD_N; i++) V.cp.push({ x: 0, y: 0, z: 0, age: 1e9, life: 1 });
-    if (V.streak) { V.dyn.remove(V.streak); V.streak.geometry.dispose(); }
-    var g = new T.BufferGeometry();
-    g.setAttribute('position', new T.BufferAttribute(new Float32Array(CFD_N * 6), 3).setUsage(T.DynamicDrawUsage));
-    g.setAttribute('color', new T.BufferAttribute(new Float32Array(CFD_N * 6), 3).setUsage(T.DynamicDrawUsage));
-    V.streak = new T.LineSegments(g, new T.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.95, blending: T.AdditiveBlending, depthWrite: false }));
-    V.streak.frustumCulled = false; V.dyn.add(V.streak);
-    applyLayers();
-  }
-  function respawn(q) {
-    var V = view, F = V.cfd, L = F.nx * F.dx, W = F.nz * F.dx, H = F.ny * F.dx;
-    for (var tries = 0; tries < 20; tries++) {
-      var sup = Math.random() < 0.45 && V.s, alive = sup ? V.r.hall.crahs.filter(function (c) { return !(V.s.crahOut || {})[c.i]; }) : null;
-      if (sup && alive.length) {                        // at a fan face, where the supply enters
-        var c = alive[(Math.random() * alive.length) | 0], uw = W / Math.ceil(V.r.hall.crahs.length / 2);
-        q.x = c.wall === 'west' ? 0.05 + Math.random() * 0.3 : L - 0.05 - Math.random() * 0.3; q.y = Math.random() * 2.5; q.z = c.y + (Math.random() - 0.5) * uw;
-      } else { q.x = Math.random() * L; q.y = Math.random() * H; q.z = Math.random() * W; }
-      if (!solidAt(F, q.x, q.y, q.z)) break;
+  /* the colour scale of what the volume shows */
+  function scale() {
+    var V = view, e = V.host.querySelector('.ltc-3d-scale'), CV = root.LTCCFDView, m = V.volMode; if (!e) return;
+    if (m === 'off' || !V.cfd) { e.innerHTML = ''; return; }
+    var stops = [], lab;
+    if (m === 'heat' || m === 'iso') { for (var t = CV.T_LO; t <= CV.T_HI; t += 3) stops.push('rgb(' + V.ramp(t).join(',') + ')'); lab = [CV.T_LO + ' °C', m === 'iso' ? 'surfaces 27 · 32 °C' : 'room air > 27 °C glows', CV.T_HI + ' °C']; }
+    else {
+      for (var i = 0; i <= 8; i++) { var s = i / 8, c = s < 0.45 ? [13 + (0 - 13) * s / 0.45, 31 + (191 - 31) * s / 0.45, 115 + (242 - 115) * s / 0.45] : s < 0.55 ? [0, 191, 242] : [(s - 0.55) / 0.45 * 255, 191 + (242 - 191) * (s - 0.55) / 0.45, 242 - (242 - 191) * (s - 0.55) / 0.45]; stops.push('rgb(' + c.map(Math.round).join(',') + ')'); }
+      var mx = m === 'speed' ? CV.SP_MAX + ' m/s' : m === 'ti' ? (CV.TI_MAX * 100) + ' %' : (V.vol ? V.vol.userData.chMax.toFixed(1) : '—') + ' s⁻¹';
+      lab = ['0', m === 'speed' ? 'speed |u|' : m === 'ti' ? 'turbulence σ ÷ mean' : 'vorticity |∇×u|', mx];
     }
-    q.age = 0; q.life = 3 + Math.random() * 5;
-  }
-  var tmpV = [0, 0, 0], tmpW = [0, 0, 0];
-  function cfdStep(dt) {
-    var V = view, F = V.cfd; if (!F || !V.streak || !V.layers.cfd) return;
-    var P = V.streak.geometry.attributes.position.array, Cc = V.streak.geometry.attributes.color.array, X0 = F.nx * F.dx / 2, Z0 = F.nz * F.dx / 2, TL = 0.3;
-    for (var n = 0; n < V.cp.length; n++) {
-      var q = V.cp[n];
-      if (q.age > q.life) respawn(q);
-      cfdVel(F, q.x, q.y, q.z, tmpV);                                                    // RK2 through the solved field
-      cfdVel(F, q.x + 0.5 * dt * tmpV[0], q.y + 0.5 * dt * tmpV[1], q.z + 0.5 * dt * tmpV[2], tmpW);
-      q.x += dt * tmpW[0]; q.y += dt * tmpW[1]; q.z += dt * tmpW[2]; q.age += dt;
-      if (solidAt(F, q.x, q.y, q.z)) { q.age = 1e9; }
-      var sp = Math.sqrt(tmpW[0] * tmpW[0] + tmpW[1] * tmpW[1] + tmpW[2] * tmpW[2]), c = V.col(cellT(F, q.x, q.y, q.z)), fade = Math.min(1, q.age * 2, (q.life - q.age) * 2), b = Math.min(0.7, 0.18 + sp / 3) * Math.max(0, fade);
-      var o = n * 6;
-      P[o] = q.x - X0; P[o + 1] = q.y; P[o + 2] = q.z - Z0;
-      P[o + 3] = q.x - X0 - tmpW[0] * TL; P[o + 4] = q.y - tmpW[1] * TL; P[o + 5] = q.z - Z0 - tmpW[2] * TL;
-      Cc[o] = c.r * b; Cc[o + 1] = c.g * b; Cc[o + 2] = c.b * b; Cc[o + 3] = c.r * b * 0.08; Cc[o + 4] = c.g * b * 0.08; Cc[o + 5] = c.b * b * 0.08;
-    }
-    V.streak.geometry.attributes.position.needsUpdate = true; V.streak.geometry.attributes.color.needsUpdate = true;
+    e.innerHTML = '<i style="background:linear-gradient(90deg,' + stops.join(',') + ')"></i><span>' + lab[0] + '</span><span>' + lab[1] + '</span><span>' + lab[2] + '</span>';
   }
   /* slice: one canvas pixel per cell, interpolated on the GPU */
   function speedRamp(v) { var t = Math.max(0, Math.min(1, v / SPEED_MAX)); return [Math.round(20 + 230 * t), Math.round(40 + 180 * Math.sqrt(t)), Math.round(90 + 120 * (1 - t))]; }
@@ -533,9 +519,9 @@
       var L = F.nx * F.dx, W = F.nz * F.dx, H = F.ny * F.dx;
       V.cslice = new T.Mesh(plane === 'h' ? new T.PlaneGeometry(L, W) : new T.PlaneGeometry(L, H), new T.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.8, side: T.DoubleSide, depthWrite: false }));
       if (plane === 'h') V.cslice.rotation.x = -Math.PI / 2;
-      V.cslice.userData = { cv: cv, plane: plane, n: F.nx * F.ny * F.nz }; V.dyn.add(V.cslice);
+      V.cslice.userData = { cv: cv, plane: plane, n: F.nx * F.ny * F.nz }; V.cslice.renderOrder = 4; V.dyn.add(V.cslice);
     }
-    var cv2 = V.cslice.userData.cv, g = cv2.getContext('2d'), img = g.createImageData(cv2.width, cv2.height), D = img.data, S = V.cfdSolid, A = F.Tm || F.T, ti = F.ti;
+    var cv2 = V.cslice.userData.cv, g = cv2.getContext('2d'), img = g.createImageData(cv2.width, cv2.height), D = img.data, S = V.cfdSolid, A = F.Tm || F.T, ti = F.ti, vo = V.vort, vmax = Math.max(0.5, root.LTCCFDView.pct(vo || [], S, 0.995));
     var at = V.sliceAt != null ? V.sliceAt : (plane === 'h' ? 1.2 : null), nx = F.nx, ny = F.ny, nz = F.nz;
     if (plane === 'v' && at == null) { var ai = V.r.hall.aisles[Math.min(1, V.r.hall.aisles.length - 1)]; at = (ai.y0 + ai.y1) / 2; }
     var fixed = plane === 'h' ? Math.max(0, Math.min(ny - 1, Math.floor(at / F.dx))) : Math.max(0, Math.min(nz - 1, Math.floor(at / F.dx)));
@@ -545,7 +531,7 @@
       if (mode === 'T') rgb = ramp(A[c]);
       else {
         var uc = 0.5 * (F.u[i + (nx + 1) * (j + ny * k)] + F.u[i + 1 + (nx + 1) * (j + ny * k)]), vc = 0.5 * (F.v[i + nx * (j + (ny + 1) * k)] + F.v[i + nx * (j + 1 + (ny + 1) * k)]), wc = 0.5 * (F.w[c] + F.w[c + nx * ny]);
-        rgb = mode === 'speed' ? speedRamp(Math.sqrt(uc * uc + vc * vc + wc * wc)) : speedRamp(ti ? ti[c] * SPEED_MAX / 0.6 : 0);
+        rgb = mode === 'speed' ? speedRamp(Math.sqrt(uc * uc + vc * vc + wc * wc)) : mode === 'vort' ? speedRamp(vo ? vo[c] / vmax * SPEED_MAX : 0) : speedRamp(ti ? ti[c] * SPEED_MAX / 0.6 : 0);
       }
       D[o] = rgb[0]; D[o + 1] = rgb[1]; D[o + 2] = rgb[2]; D[o + 3] = 215;
     }
@@ -565,23 +551,6 @@
     }
     return m;
   }
-  /* the air above 27 °C, one soft sprite per cell */
-  function cfdHot() {
-    var V = view, T = root.RZ3, F = V.cfd, A = F.Tm || F.T, S = V.cfdSolid, pos = [], col = [], X0 = F.nx * F.dx / 2, Z0 = F.nz * F.dx / 2;
-    for (var k = 0; k < F.nz; k++) for (var j = 0; j < F.ny; j++) for (var i = 0; i < F.nx; i++) {
-      var c = i + F.nx * (j + F.ny * k), t = A[c]; if (t <= 27 || S && S[c] || V.contained && V.contained[c]) continue;
-      pos.push((i + 0.5) * F.dx - X0, (j + 0.5) * F.dx, (k + 0.5) * F.dx - Z0); var cc = V.col(t), w = Math.min(1, (t - 27) / 8) * 0.55; col.push(cc.r * w, cc.g * w, cc.b * w);
-    }
-    if (!V.hot) {
-      var g = new T.BufferGeometry(), m = new T.ShaderMaterial({ uniforms: { uSize: { value: 9 * V.renderer.getPixelRatio() } }, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-        vertexShader: 'attribute vec3 color; varying vec3 vC; uniform float uSize; void main(){ vC = color; vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = clamp(uSize * (30.0 / -mv.z), 2.0, 60.0); gl_Position = projectionMatrix * mv; }',
-        fragmentShader: 'varying vec3 vC; void main(){ vec2 d = gl_PointCoord - 0.5; float r = dot(d, d); if (r > 0.25) discard; gl_FragColor = vec4(vC, (0.25 - r) * 2.0); }' });
-      V.hot = new T.Points(g, m); V.hot.frustumCulled = false; V.dyn.add(V.hot);
-    }
-    V.hot.geometry.dispose(); var ng = new T.BufferGeometry(); ng.setAttribute('position', new T.BufferAttribute(new Float32Array(pos), 3)); ng.setAttribute('color', new T.BufferAttribute(new Float32Array(col), 3)); V.hot.geometry = ng;
-    V.hot.visible = V.layers.cfd && V.layers.hot;
-  }
-
   var CAMS = {
     iso: function (d) { return { p: [d.L * 0.62, Math.max(d.L, d.W) * 0.78, d.W * 0.95], t: [0, 0.8, 0] }; },
     top: function (d) { return { p: [0, Math.max(d.L, d.W) * 1.55, 0.01], t: [0, 0, 0] }; },
@@ -611,10 +580,10 @@
       if (w >= 1) V.tween = null;
     }
     if (!reduce) {
-      step(dt * V.speed); cfdStep(dt * V.speed);
+      step(dt * V.speed); root.LTCCFDView.trailStep(V, dt * V.speed);
       (V.crahs || []).forEach(function (u) { if (!u.dead) u.fans.forEach(function (f) { f.rotation.z += dt * V.speed * 14 * (V.fan || 0); }); });
     }
-    V.ctl.update();
+    V.ctl.update(); root.LTCCFDView.volumeFrame(V);
     V.renderer.render(V.scene, V.cam);
     var b = V.cv.clientWidth, hh = V.cv.clientHeight, v = new root.RZ3.Vector3();
     V.labels.forEach(function (l) {

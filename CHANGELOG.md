@@ -11,6 +11,62 @@ release sections rather than semver.
 
 ---
 
+## v3.21.8 — 2026-10-14
+
+### "Smoke Test": DH01 CFD as a volume, with trails, vortices and a probe, and a grid-checked solver
+
+**Why.** The owner looked at v3.21.6 and said the CFD was still ugly: "I can see the gradient, the flow... Where the turbulence? Where's the temperature? I need more accurate." The streaks read as hair, the heat showed only as sprites above 27 °C, and the turbulence was a slice option. This release shows the whole field in 3D and checks the solver against a finer grid.
+
+**What the view shows** (new `js/ltc-cfd-view.js`):
+- **Volume.** The solved field is ray-marched on the GPU, one texel per cell, interpolated between cells. It has five modes:
+  - *Heat*: room air above 27 °C glows. The contained hot aisles and plenum stay faint, so escaped hot air stands out. Fast supply air shows as a cool haze.
+  - *Isotherms*: the 27 °C and 32 °C surfaces of the room air, lit by the temperature gradient.
+  - *Speed*.
+  - *Turbulence intensity*.
+  - *Vortices*: |∇×u|, showing the shear layers and eddies the grid resolves.
+
+  A ray stops at a rack or CDU, so what is behind a rack stays hidden. The ceiling slab is see-through, like its glass.
+- **Flow trails.** 2,400 particles move with the solved velocity. They start at the fan walls, the rack exhausts and anywhere in the room, and each has a one-second tail coloured by the air it passed through. You can watch air leave a fan wall cold, cross a rack and reach the plenum hot.
+- **Probe.** Hover the slice to read the field at that point:
+  - temperature, time-averaged and instantaneous, against the ASHRAE envelope;
+  - speed and its three components;
+  - turbulence intensity and vorticity;
+  - position and cell size.
+- **Slice.** It can now show vorticity too.
+- **Panel.** It adds the room's median turbulence intensity and the 99th-percentile vorticity.
+- **Other controls.** Auto-orbit, and a colour scale for whatever the volume shows.
+- **Phones.** The stage is taller. The panel keeps its first line, and the rest sits under the stage.
+
+**Solver** (`js/ltc-cfd.js`):
+- **Energy** is now second-order upwind with a van Leer limiter (TVD). It is still conservative, so the heat balance closes, and it creates no new extremes. Each cell's outflow per sub-step is held under half its volume.
+- **Momentum** uses clamped MacCormack (second order) on the 0.3 m grid and stays semi-Lagrangian on the 0.6 m grid. On 0.6 m cells, MacCormack over-mixed: with four CRAHs out, the hottest inlet came out at 31.9 °C, against 34.8 °C on 0.3 m. A rack row is only two cells deep at 0.6 m.
+- The energy faces are listed once per grid. With the old schemes selected, the result is bit-identical to v3.21.6.
+
+**Grid check: four west-wall CRAHs out, rack inlets averaged:**
+
+| Solve | Hottest inlet | Racks > 27 °C | Racks > 32 °C |
+|---|---|---|---|
+| 0.3 m, second-order schemes (reference) | 34.8 °C | 64 | 13 |
+| 0.3 m, v3.21.6 schemes | 35.9 °C | 65 | 17 |
+| **0.6 m, this release (default)** | **35.3 °C** | **68** | **16** |
+| 0.6 m, v3.21.6 schemes | 34.3 °C | 70 | 14 |
+| 0.6 m, MacCormack + TVD (rejected) | 31.9 °C | 82 | 0 |
+
+With two CRAHs out, the 0.6 m default puts 9 racks over 27 °C. The 0.3 m reference and the balance solve both give 9; v3.21.6 gave 5. The 0.6 m solve runs at about 35 ms per step.
+
+**Gates** (`tools/test-ltc-workbench.mjs`, 325 assertions):
+- **W12g:** the 0.6 m solve must stay within 1 K, 6 racks over 27 °C and 4 racks over 32 °C of the recorded 0.3 m reference.
+- **W12z:** five checks on the view and the energy scheme:
+  - the vorticity of a solid-body rotation is 2Ω;
+  - the probe reads cell centres and interpolates between them;
+  - the volume texels carry temperature and cell kind;
+  - trails never enter a solid;
+  - the energy scheme keeps the air inside the temperatures its sources carried.
+
+Each new check was proven red on mutated code: MacCormack forced on 0.6 m, a non-TVD (Fromm) energy scheme, a sign flip in the vorticity, and trails allowed into racks.
+
+**Vendor.** The three.js r170 bundle adds `Data3DTexture`, `DataTexture`, `GLSL3` and the texture constants (533 KB, still lazy-loaded).
+
 ## v3.21.7 — 2026-10-14
 
 ### "Fan Wall": the DC AI hall laid out like a real GB300 liquid hall
