@@ -261,7 +261,60 @@
     V.smoke.visible = any;
   }
 
+  /* charts under the stage, pure SVG strings (CSS colour tokens, so both themes) */
+  var MONO = ' font-family="JetBrains Mono, monospace" font-size="10"';
+  function svgOpen(W, H, label) { return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + label + '" style="width:100%;max-width:' + W + 'px">'; }
+  function poly(pts, X, Y) { return pts.map(function (p, i) { return (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1); }).join(''); }
+  /* the solve settling: hottest and mean rack inlet, CRAH return, against simulated time; the balance
+     solve's hottest inlet and the 27 °C recommended limit as references */
+  function historySvg(H, bal, width) {
+    if (!H || H.length < 2) return '';
+    var W = Math.round(Math.max(300, Math.min(560, width || 560))), Ht = 180, L = 40, Rm = 14, T = 12, B = 42, t0 = H[0].t, t1 = H[H.length - 1].t;
+    var vals = [27]; H.forEach(function (h) { vals.push(h.max, h.mean, h.ret); }); if (bal != null) vals.push(bal);
+    var lo = Math.floor(Math.min.apply(null, vals) - 0.5), hi = Math.ceil(Math.max.apply(null, vals) + 0.5);
+    var X = function (t) { return L + (t - t0) / Math.max(1e-9, t1 - t0) * (W - L - Rm); }, Y = function (v) { return T + (hi - v) / (hi - lo) * (Ht - T - B); };
+    var g = [svgOpen(W, Ht, 'CFD rack inlets and return temperature against simulated time'), '<rect width="100%" height="100%" fill="var(--bg1)"/>'];
+    var stp = hi - lo > 16 ? 5 : 2;
+    for (var v = Math.ceil(lo / stp) * stp; v <= hi; v += stp) g.push('<line x1="' + L + '" x2="' + (W - Rm) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" stroke="var(--bd)"/><text x="' + (L - 5) + '" y="' + (Y(v) + 3.5).toFixed(1) + '"' + MONO + ' fill="var(--t3)" text-anchor="end">' + v + '</text>');
+    var ts = t1 - t0 > 150 ? 50 : t1 - t0 > 60 ? 20 : 10;
+    for (var t = Math.ceil(t0 / ts) * ts; t <= t1; t += ts) g.push('<text x="' + X(t).toFixed(1) + '" y="' + (Ht - B + 13) + '"' + MONO + ' fill="var(--t3)" text-anchor="middle">' + t + '</text>');
+    g.push('<line x1="' + L + '" x2="' + (W - Rm) + '" y1="' + Y(27).toFixed(1) + '" y2="' + Y(27).toFixed(1) + '" stroke="var(--o)" stroke-dasharray="2 3"/>');
+    if (bal != null) g.push('<line x1="' + L + '" x2="' + (W - Rm) + '" y1="' + Y(bal).toFixed(1) + '" y2="' + Y(bal).toFixed(1) + '" stroke="var(--r)" stroke-dasharray="5 3"/><text x="' + (W - Rm - 2) + '" y="' + (Y(bal) - 4).toFixed(1) + '"' + MONO + ' fill="var(--r)" text-anchor="end">balance solve, hottest ' + bal.toFixed(1) + '</text>');
+    [['max', 'var(--r)', 1.6], ['mean', 'var(--c)', 1.4], ['ret', 'var(--t2)', 1.2]].forEach(function (k) {
+      g.push('<path d="' + poly(H.map(function (h) { return [h.t, h[k[0]]]; }), X, Y) + '" fill="none" stroke="' + k[1] + '" stroke-width="' + k[2] + '"/>');
+    });
+    var e = H[H.length - 1];
+    g.push('<text x="' + L + '" y="' + (Ht - 16) + '"' + MONO + ' fill="var(--t3)">seconds simulated · 27 °C dotted</text>',
+      '<text x="' + L + '" y="' + (Ht - 3) + '"' + MONO + ' fill="var(--t3)"><tspan fill="var(--r)">hottest inlet ' + e.max.toFixed(1) + '</tspan> · <tspan fill="var(--c)">mean ' + e.mean.toFixed(1) + '</tspan> · return ' + e.ret.toFixed(1) + ' °C</text></svg>');
+    return g.join('');
+  }
+  /* rack by rack: the CFD inlet (time-averaged) against the balance solve's, 1 : 1 diagonal, the 27 °C
+     limit on both axes; each dot carries its rack index for the shared tooltip */
+  function scatterStats(cfd, bal) {
+    var n = cfd.length, se = 0, hot = 0, both = 0, onlyC = 0, onlyB = 0;
+    for (var i = 0; i < n; i++) { var d = cfd[i] - bal[i]; se += d * d; if (d > 0) hot++; var c = cfd[i] > 27, b = bal[i] > 27; if (c && b) both++; else if (c) onlyC++; else if (b) onlyB++; }
+    return { rms: Math.sqrt(se / Math.max(1, n)), cfdHotter: hot, both: both, onlyCfd: onlyC, onlyBal: onlyB, n: n };
+  }
+  function scatterSvg(cfd, bal, ramp) {
+    if (!cfd || !bal || !cfd.length) return '';
+    var W = 330, H = 300, L = 40, Rm = 12, T = 12, B = 44, all = cfd.concat(bal, [27]);
+    var lo = Math.floor(Math.min.apply(null, all) - 0.5), hi = Math.ceil(Math.max.apply(null, all) + 0.5);
+    var X = function (v) { return L + (v - lo) / (hi - lo) * (W - L - Rm); }, Y = function (v) { return T + (hi - v) / (hi - lo) * (H - T - B); }, st = scatterStats(cfd, bal);
+    var g = [svgOpen(W, H, 'Rack inlet, CFD against the balance solve'), '<rect width="100%" height="100%" fill="var(--bg1)"/>'], stp = hi - lo > 16 ? 5 : 2;
+    for (var v = Math.ceil(lo / stp) * stp; v <= hi; v += stp) {
+      g.push('<line x1="' + L + '" x2="' + (W - Rm) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" stroke="var(--bd)"/><text x="' + (L - 5) + '" y="' + (Y(v) + 3.5).toFixed(1) + '"' + MONO + ' fill="var(--t3)" text-anchor="end">' + v + '</text>');
+      g.push('<text x="' + X(v).toFixed(1) + '" y="' + (H - B + 13) + '"' + MONO + ' fill="var(--t3)" text-anchor="middle">' + v + '</text>');
+    }
+    g.push('<line x1="' + X(lo) + '" y1="' + Y(lo) + '" x2="' + X(hi) + '" y2="' + Y(hi) + '" stroke="var(--t3)" stroke-dasharray="4 3"/>',
+      '<line x1="' + X(27).toFixed(1) + '" x2="' + X(27).toFixed(1) + '" y1="' + T + '" y2="' + (H - B) + '" stroke="var(--o)" stroke-dasharray="2 3"/>',
+      '<line x1="' + L + '" x2="' + (W - Rm) + '" y1="' + Y(27).toFixed(1) + '" y2="' + Y(27).toFixed(1) + '" stroke="var(--o)" stroke-dasharray="2 3"/>');
+    cfd.forEach(function (c, i) { var col = ramp(c); g.push('<circle data-rack="' + i + '" cx="' + X(bal[i]).toFixed(1) + '" cy="' + Y(c).toFixed(1) + '" r="3.4" fill="rgb(' + col.join(',') + ')" stroke="var(--bg1)" stroke-width="0.6"/>'); });
+    g.push('<text x="' + L + '" y="' + (H - B + 27) + '"' + MONO + ' fill="var(--t3)">x balance solve · y CFD (°C) · RMS ' + st.rms.toFixed(1) + ' K</text>',
+      '<text x="' + L + '" y="' + (H - 5) + '"' + MONO + ' fill="var(--t3)">&gt; 27 °C: both ' + st.both + ' · CFD only ' + st.onlyCfd + ' · balance only ' + st.onlyBal + '</text></svg>');
+    return g.join('');
+  }
+
   root.LTCCFDView = { cellT: cellT, cellField: cellField, vel: vel, solidAt: solidAt, centred: centred, vorticity: vorticity, pct: pct, probe: probe, pack: pack,
-    volume: volume, volumeFrame: volumeFrame, trails: trails, trailStep: trailStep, smoke: smoke, smokeStep: smokeStep, SMOKE_N: SMOKE_N, SMOKE_D: SMOKE_D, PUFF_N: PUFF_N, T_LO: T_LO, T_HI: T_HI, SP_MAX: SP_MAX, TI_MAX: TI_MAX, TRAIL_N: TRAIL_N, TRAIL_K: TRAIL_K };
+    volume: volume, volumeFrame: volumeFrame, trails: trails, trailStep: trailStep, smoke: smoke, smokeStep: smokeStep, historySvg: historySvg, scatterSvg: scatterSvg, scatterStats: scatterStats, SMOKE_N: SMOKE_N, SMOKE_D: SMOKE_D, PUFF_N: PUFF_N, T_LO: T_LO, T_HI: T_HI, SP_MAX: SP_MAX, TI_MAX: TI_MAX, TRAIL_N: TRAIL_N, TRAIL_K: TRAIL_K };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCCFDView;
 })(typeof window !== 'undefined' ? window : globalThis);

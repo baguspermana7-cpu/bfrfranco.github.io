@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v3.21.11 — 2026-10-14
+
+### "Second Opinion": DH01 CFD convergence history and a rack-by-rack CFD vs balance chart
+
+**Why.** The panel gave one line of CFD against the balance solve, the hottest inlet and the count over 27 °C. It did not show where the two disagree or whether the solve had settled. Two charts now sit under the 3D stage.
+
+**Added (`js/ltc-cfd-view.js` `historySvg` / `scatterSvg` / `scatterStats`, wired in `js/ltc-dh01-3d.js`):**
+- **Convergence history.** The hottest and mean rack inlet and the CRAH return, against simulated time. The balance solve's hottest inlet and the 27 °C limit are drawn as references. You can watch the solve settle, and at 0.3 m the eddies show as wobble on the hottest inlet. The history is kept to 400 points and redrawn at most twice a second.
+- **Rack by rack.** Each rack's time-averaged CFD inlet against the balance solve's, with a 1 : 1 diagonal and the 27 °C limit on both axes. The chart prints the RMS difference and the racks over 27 °C in both models, in the CFD only and in the balance only. Hover a dot for that rack's full tooltip.
+- Both charts are drawn at the container's width, so the labels stay readable on a phone.
+
+**What the chart shows (four CRAHs out, 0.6 m):**
+- The two models differ by an RMS of **4.8 K** per rack.
+- The balance solve marches each cold aisle as plug flow. Racks reached by supply get exactly 25 °C, and the ones past the end of the supply get up to 42 °C.
+- The CFD mixes more:
+  - racks the balance calls clean read 25–33 °C;
+  - racks the balance calls starved read 25–35 °C.
+- **Where the heat lands differs.** By aisle thirds (west · middle · east), the CFD's hot spot sits in the **middle** of each aisle: aisle 1 reads 26.9 · 31.6 · 26.1 °C. That is where the jets from the two fan walls meet and exhaust curls over the rack tops. The balance puts it at the **west end**, by the dead units: 34.2 · 32.2 · 25.2 °C.
+- **The CFD spreads the shortfall over every aisle.** Aisle 3 reads 26.8 °C in the CFD against 25.2 °C in the balance.
+- The mean inlet agrees: 27.45 °C in the CFD, 27.86 °C in the balance, so the heat balance is consistent and only the distribution differs.
+- With two CRAHs out, the RMS difference is 2.1 K. With one out, or with a CDU or CDU-feeder fault, the two agree within 0.1 K.
+- Smoothing the balance's supply coverage along each aisle brings the four-CRAH RMS from 4.8 down to 3.2 K, and no further, because it cannot move the hot spot to the aisle middle. A proper correction is a change to the balance model. It was not made in this release.
+- The CFD agrees with its own 0.3 m grid (v3.21.8).
+
+**Gate.** W12a now also checks the charts:
+- one dot per rack, carrying the rack's index;
+- the printed RMS and the over-27 counts equal a hand computation;
+- three history lines, with no NaN.
+
+It was proven red with a dot dropped and with the RMS divided by n + 1.
+
 ## v3.21.10 — 2026-10-14
 
 ### "Air Management": DH01 CFD reads like a data-hall survey, with smoke, inlet profiles and RCI / RTI / SHI

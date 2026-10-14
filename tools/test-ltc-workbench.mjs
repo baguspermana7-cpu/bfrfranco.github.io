@@ -529,7 +529,13 @@ for (const [page, mod] of Object.entries(PAGES)) {
       const r = F.report(C), x = r.idx, off = r.profile.map((p, i) => Math.abs(p.reduce((u, v) => u + v, 0) / p.length - r.inletMean[i]));
       if (!r.averaged || !(Math.max(...off) <= 0.05)) bad.push(`profile: averaged ${r.averaged}, worst rack ${Math.max(...off).toFixed(3)} K from its inlet`);
       if (!(x.rti > 105 && x.shi > 0.05 && x.rciHi < 96 && x.rciLo === 100)) bad.push(`crah4: RTI ${x.rti.toFixed(0)} %, SHI ${x.shi.toFixed(3)}, RCI HI ${x.rciHi.toFixed(1)} %, RCI LO ${x.rciLo.toFixed(1)} %`);
-      ok('W12a', !bad.length, `DH01 CFD air management: RCI HI/LO, RTI and SHI match their formulas on hand-made inlets; on crah4 the inlet profile by height averages back to each rack's inlet and the solve reads as recirculation (RTI ${x.rti.toFixed(0)} %, SHI ${x.shi.toFixed(2)}, RCI HI ${x.rciHi.toFixed(0)} %)` + (bad.length ? ' — ' + bad.join('; ') : ''));
+      // the charts under the stage draw this solve: one dot per rack carrying its index, the RMS they print, three history lines
+      const V3 = sb.LTCCFDView, bi = s.racks.map((k) => k.inlet), sv = V3.scatterSvg(r.inletMean, bi, () => [1, 2, 3]), stt = V3.scatterStats(r.inletMean, bi);
+      const rms = Math.sqrt(r.inletMean.reduce((u, t, i) => u + (t - bi[i]) ** 2, 0) / bi.length), dots = sv.match(/<circle data-rack="\d+"/g) || [];
+      const hv = V3.historySvg([{ t: 1, max: 30, mean: 25, ret: 35 }, { t: 2, max: 31, mean: 26, ret: 36 }], s.maxInlet, 400);
+      if (dots.length !== bi.length || !sv.includes('RMS ' + rms.toFixed(1) + ' K') || Math.abs(stt.rms - rms) > 1e-9 || stt.both + stt.onlyCfd !== r.inletMean.filter((t) => t > 27).length || (hv.match(/<path /g) || []).length !== 3 || /NaN|undefined/.test(sv + hv))
+        bad.push(`charts: ${dots.length} dots for ${bi.length} racks, RMS ${stt.rms.toFixed(3)} vs ${rms.toFixed(3)}, ${(hv.match(/<path /g) || []).length} history lines`);
+      ok('W12a', !bad.length, `DH01 CFD air management: RCI HI/LO, RTI and SHI match their formulas on hand-made inlets; on crah4 the inlet profile by height averages back to each rack's inlet and the solve reads as recirculation (RTI ${x.rti.toFixed(0)} %, SHI ${x.shi.toFixed(2)}, RCI HI ${x.rciHi.toFixed(0)} %); the charts carry one dot per rack and the RMS they print` + (bad.length ? ' — ' + bad.join('; ') : ''));
     }
     ok('W12g', good, `DH01 CFD grid check: the 0.6 m solve (crah4, inlets averaged over 40 s) agrees with the 0.3 m second-order solve — hottest inlet ${mx.toFixed(2)} °C vs ${REF.max}, racks > 27 °C ${o27} vs ${REF.o27}, > 32 °C ${o32} vs ${REF.o32} (within 1 K, 6 and 4 racks)`);
   }

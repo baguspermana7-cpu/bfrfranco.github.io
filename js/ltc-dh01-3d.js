@@ -146,7 +146,7 @@
       '<div class="ltc-seg" role="group" aria-label="Particle speed"><button type="button" data-sp="0.25">¼×</button><button type="button" data-sp="1" aria-pressed="true">Real time</button><button type="button" data-sp="3">3×</button></div></div>' +
       '<div class="ltc-3d-stage"><canvas class="ltc-3d-cv" tabindex="0" aria-label="DH01 in 3D: drag to orbit, scroll or pinch to zoom, hover a rack or unit for its numbers"></canvas><div class="ltc-3d-lbl"></div><div class="ltc-3d-hud" aria-live="polite"></div><div class="ltc-3d-probe" hidden></div><div class="ltc-3d-scale"></div>' +
       '<p class="ltc-3d-hint">Drag to orbit · right-drag or two fingers to pan · scroll / pinch to zoom · hover a slice to probe the field · click to release smoke</p></div>' +
-      '<p class="ltc-3d-sum"></p><p class="ltc-note ltc-3d-key"></p>';
+      '<p class="ltc-3d-sum"></p><div class="ltc-3d-charts"><figure><figcaption>CFD convergence · rack inlets and return</figcaption><div class="ltc-3d-hist"></div></figure><figure><figcaption>Rack inlets · CFD against the balance solve</figcaption><div class="ltc-3d-scat"></div></figure></div><p class="ltc-note ltc-3d-key"></p>';
     var cv = host.querySelector('canvas'), stage = host.querySelector('.ltc-3d-stage'), lblHost = host.querySelector('.ltc-3d-lbl');
     var renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(root.devicePixelRatio || 1, 2));
@@ -187,6 +187,8 @@
     });
     function ixShow(e) { var b = e.target.closest && e.target.closest('[data-ix]'), tp = b && ixTip(b.getAttribute('data-ix')); if (!tp || !root.LTCTrace) return; var rc = b.getBoundingClientRect(); root.LTCTrace.show(tp, e.clientX || rc.right, e.clientY || rc.bottom); }
     function ixHide(e) { if (e.target.closest && e.target.closest('[data-ix]') && root.LTCTrace) root.LTCTrace.hide(); }
+    host.addEventListener('pointerover', function (e) { var d = e.target.closest && e.target.closest('[data-rack]'); if (d && V.hooks.rack) V.hooks.rack(+d.getAttribute('data-rack'), e.clientX, e.clientY); });
+    host.addEventListener('pointerout', function (e) { if (e.target.closest && e.target.closest('[data-rack]') && V.hooks.hide) V.hooks.hide(); });
     host.addEventListener('pointerover', ixShow); host.addEventListener('focusin', ixShow);
     host.addEventListener('pointerout', ixHide); host.addEventListener('focusout', ixHide);
     function press(sel, on) { [].forEach.call(host.querySelectorAll(sel), function (b) { b.setAttribute('aria-pressed', String(b === on)); }); }
@@ -370,7 +372,7 @@
     var key = V.host.querySelector('.ltc-3d-key');
     var air = M.streams.filter(function (x) { return x.kind === 'air'; }).reduce(function (a, x) { return a + x.flow; }, 0), rec = M.streams.filter(function (x) { return x.kind === 'recirc'; }).reduce(function (a, x) { return a + x.flow; }, 0);
     var tcs = M.streams.filter(function (x) { return x.kind === 'tcs'; }).reduce(function (a, x) { return a + x.flow; }, 0);
-    key.innerHTML = '<b>CFD</b> (default): an incompressible, buoyant airflow solve of DH01 (js/ltc-cfd.js, in a background worker) on this plant’s racks, fans and containment. <b>Volume</b>: the solved field ray-marched on the GPU, one texel per cell, trilinear between them — <i>heat</i> glows where room air is above 27 °C (the contained hot aisles and plenum kept faint, so escaped hot air stands out; fast supply air shows as a cool haze), <i>isotherms</i> are the 27 and 32 °C surfaces of the room air, <i>speed</i> |u|, <i>turbulence</i> intensity (velocity fluctuation ÷ mean, after the first air change) and <i>vortices</i> |∇×u| (shear layers and eddies the grid resolves). <b>Flow trails</b>: ' + root.LTCCFDView.TRAIL_N.toLocaleString('en-US') + ' particles carried by the solved velocity, born at the fan walls, the rack exhausts and anywhere in the room, each with a one-second tail coloured by the air it passed through. <b>Slice</b>: temperature, speed, turbulence or vorticity on a plane; hover it to probe the field. <b>Smoke</b>: click anywhere to release a puff of ' + root.LTCCFDView.PUFF_N + ' particles carried by the solved velocity, plus a small random walk (' + root.LTCCFDView.SMOKE_D + ' m²/s) standing in for the eddies the grid cannot carry; it vanishes into racks and coils. Rack front doors are banded, bottom, middle and top third, each coloured by the CFD inlet at that height; the rear door shows the exhaust. <b>Air management</b>: RCI (Herrlin), RTI and SHI (Sharma) from the CFD rack inlets — hover each for its formula and inputs. The panel compares the CFD with the balance solve. No turbulence model and a coarse grid: for training and comparison, not a design CFD. <b>Balance paths</b>: the streams of the balance solve, supply air to the racks ' + air.toFixed(1) + ' m³/s, exhaust pulled back ' + rec.toFixed(1) + ' m³/s, TCS ' + tcs.toFixed(0) + ' L/s, one particle per fixed volume: the stream density is the flow. Colour = temperature on the plan’s scale. Drawn, not modelled: 2.0 m racks, a 0.9 m ceiling plenum, hot aisles chimneyed to it, pipe routes and 1.5 m/s pipe velocity at design flow.';
+    key.innerHTML = '<b>CFD</b> (default): an incompressible, buoyant airflow solve of DH01 (js/ltc-cfd.js, in a background worker) on this plant’s racks, fans and containment. <b>Volume</b>: the solved field ray-marched on the GPU, one texel per cell, trilinear between them — <i>heat</i> glows where room air is above 27 °C (the contained hot aisles and plenum kept faint, so escaped hot air stands out; fast supply air shows as a cool haze), <i>isotherms</i> are the 27 and 32 °C surfaces of the room air, <i>speed</i> |u|, <i>turbulence</i> intensity (velocity fluctuation ÷ mean, after the first air change) and <i>vortices</i> |∇×u| (shear layers and eddies the grid resolves). <b>Flow trails</b>: ' + root.LTCCFDView.TRAIL_N.toLocaleString('en-US') + ' particles carried by the solved velocity, born at the fan walls, the rack exhausts and anywhere in the room, each with a one-second tail coloured by the air it passed through. <b>Slice</b>: temperature, speed, turbulence or vorticity on a plane; hover it to probe the field. <b>Smoke</b>: click anywhere to release a puff of ' + root.LTCCFDView.PUFF_N + ' particles carried by the solved velocity, plus a small random walk (' + root.LTCCFDView.SMOKE_D + ' m²/s) standing in for the eddies the grid cannot carry; it vanishes into racks and coils. Rack front doors are banded, bottom, middle and top third, each coloured by the CFD inlet at that height; the rear door shows the exhaust. <b>Air management</b>: RCI (Herrlin), RTI and SHI (Sharma) from the CFD rack inlets — hover each for its formula and inputs. The panel compares the CFD with the balance solve; under the stage, the convergence history (hottest and mean rack inlet, CRAH return, against simulated time) and every rack’s CFD inlet against the balance solve’s, hover a dot for the rack. No turbulence model and a coarse grid: for training and comparison, not a design CFD. <b>Balance paths</b>: the streams of the balance solve, supply air to the racks ' + air.toFixed(1) + ' m³/s, exhaust pulled back ' + rec.toFixed(1) + ' m³/s, TCS ' + tcs.toFixed(0) + ' L/s, one particle per fixed volume: the stream density is the flow. Colour = temperature on the plan’s scale. Drawn, not modelled: 2.0 m racks, a 0.9 m ceiling plenum, hot aisles chimneyed to it, pipe routes and 1.5 m/s pipe velocity at design flow.';
     applyLayers();
   }
 
@@ -480,13 +482,27 @@
     V.cfdT = setTimeout(function () {                 // the replay moves the minute fast: start once it settles
       var pl = cfdPayload(r, s); V.cfdBal = { max: s.maxInlet, over27: s.over27, ret: s.returnC };
       V.worker.postMessage({ cmd: 'start', key: key, r: pl.r, s: pl.s, opt: { dx: V.dx, batch: V.dx < 0.5 ? 1 : 3 } });
-      V.cfd = null; hud('Solving the airflow on a ' + V.dx + ' m grid…');
+      V.cfd = null; V.hist = []; charts(); hud('Solving the airflow on a ' + V.dx + ' m grid…');
     }, 250);
   }
   function hud(html) {                               // on a phone the panel keeps its first line; the rest sits under the stage
     var V = view; if (!V) return; var e = V.host.querySelector('.ltc-3d-hud'), m = V.host.querySelector('.ltc-3d-sum');
     if (e) e.innerHTML = html.split('<br>').map(function (l, i) { return '<span' + (i ? ' class="x"' : '') + '>' + l + '</span>'; }).join('');
     if (m) m.innerHTML = html.split('<br>').slice(1).join('<br>');
+  }
+  /* the convergence history (decimated to 400 points) and the two charts under the stage, at most twice a second */
+  function record(rep) {
+    var V = view, H = V.hist || (V.hist = []), m = 0;
+    rep.inlet.forEach(function (t) { m += t; });
+    H.push({ t: rep.t, max: rep.maxInlet, mean: m / rep.inlet.length, ret: rep.ret });
+    if (H.length > 400) V.hist = H.filter(function (h, i) { return i % 2 === 0 || i === H.length - 1; });
+    var now = Date.now(); if (now - (V.chT || 0) > 500) { V.chT = now; charts(); }
+  }
+  function charts() {
+    var V = view, CV = root.LTCCFDView, h = V.host.querySelector('.ltc-3d-hist'), sc = V.host.querySelector('.ltc-3d-scat'), F = V.cfd;
+    if (!h || !sc) return;
+    h.innerHTML = CV.historySvg(V.hist, V.cfdBal ? V.cfdBal.max : null, h.clientWidth || (h.parentNode && h.parentNode.clientWidth)); h.closest('.ltc-3d-charts').classList.toggle('on', !!h.innerHTML);
+    sc.innerHTML = F && V.s && F.rep.inletMean.length === V.s.racks.length ? CV.scatterSvg(F.rep.inletMean, V.s.racks.map(function (k) { return k.inlet; }), V.ramp) : '';
   }
   function ixb(k, v) { return '<b data-ix="' + k + '" tabindex="0">' + v + '</b>'; }
   /* the air-management indices, traced: formula, the inputs this solve fed it, and the rating */
@@ -529,6 +545,7 @@
     });
     doorsDirty();
     cfdSlice(); cfdVolume();
+    record(F.rep);
     var rep = F.rep, bal = V.cfdBal || {}, err = rep.qRacksKw ? (rep.qCrahKw - rep.qRacksKw) / rep.qRacksKw * 100 : 0;
     var settled = Math.abs(err) < 1 && rep.t > 30, S = V.cfdSolid, tiRoom = null;
     if (F.ti) { var a = []; for (c = 0; c < F.ti.length; c++) if (!(S && S[c]) && !V.contained[c] && F.ti[c] > 0) a.push(F.ti[c]); a.sort(function (x, y) { return x - y; }); tiRoom = a.length ? a[Math.floor(a.length / 2)] : null; }
