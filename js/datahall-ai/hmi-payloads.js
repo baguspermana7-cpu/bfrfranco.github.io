@@ -640,6 +640,59 @@
     b.dep('downstream', 'sld-rmu:dh0' + b.hall, 'RMU-' + b.hall);
     b.trend('winding_c', 'Winding temperature', '°C', { value: 78 }, 7);
   });
+  /* v3.21.10 — the campus blocks on the site plan. The GIS hall, the genset yard and the fuel farm
+     are plant the engine sizes (site branch) but had no inspector of their own: the GIS hall and
+     the genset yard borrowed the 20 kV substation payload, the fuel farm had none. */
+  def('site-gis', { kind: 'engine', label: '150 kV GIS hall', system: 'electrical' }, function (b, ctx) {
+    b.title = '150 kV GIS switchyard — campus intake';
+    var sa = electricalState(ctx, 'SRC-UTILITY-A', 'online'), sb = electricalState(ctx, 'SRC-UTILITY-B', 'online');
+    b.ST('live', 'utility_a', 'Grid circuit A', sa, SCEN_REASON); b.ST('live', 'utility_b', 'Grid circuit B', sb, SCEN_REASON);
+    b.E('live', 'hv_current_a', 'Intake current, worst bin', 'hvCurrentA', 'A', { digits: 0 });
+    b.E('capacity', 'intake_kv', 'Intake voltage', 'hvIntakeKv', 'kV', { digits: 0 });
+    b.E('capacity', 'circuits_duty', 'Grid circuits on duty', 'hvCircuitsDuty', '', { digits: 0 });
+    b.E('capacity', 'circuits_installed', 'Grid circuits installed', 'hvCircuitsInstalled', '', { digits: 0 });
+    b.E('capacity', 'circuit_mva', 'Thermal rating per circuit', 'hvCircuitMva', 'MVA', { digits: 0 });
+    b.E('capacity', 'line_bays', 'Line bays', 'hvLineBays', '', { digits: 0 });
+    b.E('capacity', 'tx_bays', 'Transformer bays', 'hvTxBays', '', { digits: 0 });
+    b.E('capacity', 'bays', 'Bays in the switchyard', 'hvSwitchyardBays', '', { digits: 0 });
+    b.E('capacity', 'hall_m2', 'GIS hall floor', 'gisHallM2', 'm²', { digits: 0 });
+    b.S('maint', 'sf6_bar', 'SF6 density, worst compartment', { value: 6, text: '6 bar rated fill' }, 0.08, 'bar', { digits: 2 });
+    var ok = sa === 'online' && sb === 'online';
+    b.chip(ok ? 'NORMAL' : 'N-1', ok ? 'normal' : 'standby');
+    if (!ok) { b.alarm({ tag: 'GIS', point: sa !== 'online' ? 'LINE-A' : 'LINE-B', severity: 'high', message: 'Grid circuit lost — the switchyard runs N-1 on the remaining circuits', system: 'electrical', currentState: sa !== 'online' ? sa : sb }); }
+    b.dep('upstream', 'sld-mv-sub:grid', 'PLN 150 kV grid');
+    b.dep('downstream', 'sld-main-tx:dh01a', 'Main transformers');
+    b.trend('sf6_bar', 'SF6 density', 'bar', { value: 6 }, 0.08, { digits: 2 });
+  });
+  def('site-genset-yard', { kind: 'engine', label: 'Genset yard', system: 'electrical' }, function (b, ctx) {
+    b.title = 'Genset yard — 20 kV standby generation';
+    var sg = electricalState(ctx, 'SRC-GENSET-POOL', 'standby');
+    b.ST('live', 'pool', 'Generator pool', sg, SCEN_REASON);
+    b.E('live', 'installed', 'Gensets installed', 'gensetFacNplus1', '', { digits: 0 });
+    b.E('capacity', 'duty', 'Gensets on duty at the worst bin', 'gensetFacN', '', { digits: 0 });
+    b.E('capacity', 'standby', 'Standby units', 'gensetStandby', '', { digits: 0 });
+    b.E('capacity', 'unit_kw', 'Unit rating', 'gensetKW', 'kW', { digits: 0 });
+    b.E('capacity', 'yard_m2', 'Yard area', 'gensetYardM2', 'm²', { digits: 0 });
+    b.E('capacity', 'autonomy_h', 'Fuel autonomy at full load', 'fuelAutonomyH', 'h', { digits: 0 });
+    b.S('maint', 'jacket_c', 'Jacket water, keep-warm', { value: 40, text: '40 °C keep-warm setpoint' }, 1.5, '°C', { digits: 1 });
+    b.chip(sg === 'running' ? 'RUNNING' : 'STANDBY', sg === 'running' ? 'normal' : 'standby');
+    if (sg === 'running') { b.alarm({ tag: 'GEN-POOL', point: 'RUN', severity: 'high', message: 'Generator pool running — the campus is off the grid', system: 'electrical', currentState: sg }); }
+    b.dep('upstream', 'site-fuel-farm:1', 'Fuel farm');
+    b.dep('downstream', 'sld-mv-sub:dh01', '20 kV switchroom boards');
+    b.trend('jacket_c', 'Jacket water', '°C', { value: 40 }, 1.5, { digits: 1 });
+  });
+  def('site-fuel-farm', { kind: 'engine', label: 'Fuel farm', system: 'electrical' }, function (b, ctx) {
+    b.title = 'Fuel farm — diesel bulk storage';
+    var sg = electricalState(ctx, 'SRC-GENSET-POOL', 'standby');
+    b.ST('live', 'pool', 'Generator pool', sg, SCEN_REASON);
+    b.E('live', 'fuel_m3', 'Stored diesel', 'fuelM3', 'm³', { digits: 0 });
+    b.E('capacity', 'autonomy_h', 'Autonomy at the worst-bin facility load', 'fuelAutonomyH', 'h', { digits: 0 });
+    b.E('capacity', 'farm_m2', 'Farm area, bunded', 'fuelFarmM2', 'm²', { digits: 0 });
+    b.S('live', 'level_pct', 'Tank level', { value: 95, text: '95 % normal fill' }, 1, '%', { digits: 1 });
+    b.chip(sg === 'running' ? 'DRAWING' : 'FULL', sg === 'running' ? 'standby' : 'normal');
+    b.dep('downstream', 'site-genset-yard:1', 'Genset yard');
+    b.trend('level_pct', 'Tank level', '%', { value: 95 }, 1, { digits: 1 });
+  });
   def('sld-rmu', { kind: 'engine', label: 'Ring main unit', system: 'electrical', tier2: 'mimic' }, function (b, ctx) {
     b.title = 'RMU-' + b.hall + ' — DH-0' + b.hall;
     var ea = feedEdgeState(ctx, 'A', 'RMU'), eb = feedEdgeState(ctx, 'B', 'RMU');

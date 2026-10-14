@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v3.21.12 — 2026-10-14
+
+### "Yard": the campus blocks open their own inspector
+
+**Why.** v3.21.9 drew the campus, but three of its blocks had no inspector of their own. The 150 kV GIS hall and the genset yard borrowed the 20 kV substation payload, which titled them "MV customer substation". The fuel farm could not be clicked at all.
+
+**Added (`js/datahall-ai/hmi-payloads.js`, `datahallAI.html` site plan):**
+- `site-gis` — grid circuits A/B from the electrical scenario. Engine values: intake current and voltage, duty and installed circuits, circuit rating, line and transformer bays, GIS hall area. SF6 density is a simulated reading, declared.
+- `site-genset-yard` — generator pool state from the scenario. Engine values: installed, duty and standby units, unit rating, yard area, fuel autonomy. Jacket-water keep-warm is simulated, declared.
+- `site-fuel-farm` — engine values: stored diesel, autonomy and bunded area. Tank level is simulated, declared.
+- Dependencies link the three blocks: grid, then GIS, then main transformers; fuel farm, then genset yard, then the 20 kV boards.
+
+**Gates.** hmi-payloads 6/6; inspector-runtime PASS; coverage `--strict --modals` CLEAN, including the three new `inspector:site-*` rows.
+
 ## v3.21.11 — 2026-10-14
 
 ### "Second Opinion": DH01 CFD convergence history and a rack-by-rack CFD vs balance chart
