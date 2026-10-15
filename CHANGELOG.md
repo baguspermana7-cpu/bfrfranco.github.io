@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v3.21.18 — 2026-10-15
+
+### "Paper": the engineering report is a PDF document, and the Model page exports it too
+
+**Why.** The owner opened Export Report on the Model page: "export reportnya jelek sekali — harus PDF export dan harus super comprehensive, levelnya bener-bener detail dan sangat immersive dan clear." That button downloaded a plain-text executive pack; the Report tab's "Export PDF (Single)" was a 127-page flat dump of the lab model's tables. The six workbench pages already had the plant's engineering report (`js/ltc-report.js`, v3.19.0), but the Model page never loaded it, and the report itself was a web page: no cover, no page breaks, no page numbers, figures cut wherever the paper ended.
+
+**The report is now a paper document** (`js/ltc-report.js`, per `documentation/design.md` §11):
+- **Cover**: title, plant and climate, twelve headline figures, author, date, engine version, source URL, licence, scope; then a **contents page** listing every chapter with the question it answers.
+- **A4 pages** with a running head (site · report title) and "page n of m" in the margin boxes (CSS `@page`, Chrome 131+); none on the cover. Chapters that open on a figure start a new page; the short table chapters (liquid path, air path, electrical, redundancy, standards cross-check, assumptions, data) follow on. Table heads repeat across pages; figures, rows and findings never split. DH01 plans three to a row, transients two.
+- **Opens the print dialog itself** once the fonts settle (bounded to 2.5 s), where "Save as PDF" writes the file; a Save as PDF button repeats it. Vector throughout: every figure is SVG, every number searchable. The HTML, JSON and CSV downloads stay.
+- **Plant drawings on any page.** The hub's plant map is painted inside a hidden frame that carries the exporting page's stylesheets, the hub's sheet, and the site's light-theme colour tokens read from the page — from its root or from the drawing scope the Model page uses. Before, a page without the hub's stylesheet (the Model page) exported the four schematics as black rectangles.
+- On screen the same file reads as a stack of sheets.
+
+**The Model page** (`ltc-system-modelling-lab.html`, `js/ltc-lab-ui.js`): Export Report in the nav and the new Export PDF report button in the Report tab open this document on the page's own engine result, with a **Design screening** chapter right after the findings: the weighted screen (radial), the five standards screens with their weights, the four design dimensions against their 60–100 band, risk index, confidence and operating scenario, the **model validation** table (each check, value, band, red/green marker, source) and every lab input as set. The key findings state the screen. The older flat dumps stay in the Report tab as "Legacy audit tables".
+
+**Gate** (`tools/test-ltc-workbench.mjs`, W12pr, 338 assertions): cover and contents on every chapter, the @page rules and page counters, which chapters open a page and which flow, the print hook, the screening chapter present only when opened from the Model page with its scores, validation rows (2 of 3 in band, one red marker), inputs, title in the running head, and the Model page's script order and button wiring. Headless check: 25 pages from the Model page, 23 from the hub, no NaN, schematics in colour on both.
+
 ## v3.21.17 — 2026-10-15
 
 ### "Roads": the campus becomes an engine layout — roads, fence, gates, bands, and a site area that is a product of lengths

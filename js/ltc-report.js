@@ -28,9 +28,11 @@
   }
   /* sections number themselves in the order they are written; the contents list is built from them */
   var TOC = [];
+  /* chapters that open a figure start on a new page; these short, table-only ones follow on */
+  var FLOW = { 'Liquid path': 1, 'Air path': 1, 'Electrical & sizing': 1, 'Redundancy register': 1, 'Standards cross-check': 1, 'Assumptions & limits': 1, 'Data': 1 };
   function sec(id, n, title, lead, body) {
-    TOC.push(title); n = TOC.length;
-    return '<section id="s' + n + '"><h2><span class="no">' + n + '</span>' + esc(title) + '</h2>' + (lead ? '<p class="lead">' + lead + '</p>' : '') + body + '</section>';
+    TOC.push({ title: title, lead: String(lead || '').replace(/<[^>]+>/g, '') }); n = TOC.length;
+    return '<section id="s' + n + '"' + (FLOW[title] ? ' class="flow"' : '') + '><h2><span class="no">' + n + '</span>' + esc(title) + '</h2>' + (lead ? '<p class="lead">' + lead + '</p>' : '') + body + '</section>';
   }
 
   /* ---- figures (pure SVG) ------------------------------------------------------------- */
@@ -216,6 +218,11 @@
       out.push((best.current ? 'This configuration is the cheapest to run of the four' : 'Cheapest to run of the four configurations: <b>' + esc(best.label) + '</b>, ' + f(O.base.cost - best.cost) + ' a year less than this plant (annual PUE ' + f(best.pue, 3) + ', WUE ' + f(best.wue, 2) + ' L/kWh)') +
         '. The design input that moves annual PUE most is <b>' + esc(top.label) + '</b>: ' + f(top.lo.r.pue, 3) + ' to ' + f(top.hi.r.pue, 3) + ' over one step each way.');
     }
+    if (ctx.lab && ctx.lab.scores) {
+      var Lb = ctx.lab, vN = (Lb.validation || []).length, vIn = (Lb.validation || []).filter(function (r) { return r.inBand; }).length, sIn = SCREENS.filter(function (x) { return Lb.scores[x[1]] >= 60; }).length;
+      out.push('The Model page\'s weighted screen reads <b>' + f(Lb.scores.total) + ' / 100</b>' + (Lb.grade ? ' (' + esc(Lb.grade) + ')' : '') + ': ' + sIn + ' of ' + SCREENS.length + ' standards screens in band, ' +
+        (vN ? vIn + ' of ' + vN + ' validation checks in band, ' : '') + 'risk index ' + f(Lb.risk, 1) + ' / 100.');
+    }
     out.push('Heat balance closes to <b>' + f(Math.abs(R.design.balanceErr), 6) + ' kW</b>: every kilowatt into the building leaves through a named heat sink.');
     return '<ul class="find">' + out.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ul>';
   }
@@ -274,17 +281,69 @@
     }), 'trace');
   }
 
+  /* ---- the model lab's screening layer: only when the report is opened from the Model page ---- */
+  function radial(score, word) {
+    var r = 46, c = 2 * Math.PI * r, k = Math.max(0, Math.min(100, score || 0)) / 100;
+    return '<svg viewBox="0 0 120 120" role="img" aria-label="Weighted screen ' + f(score) + ' of 100"><circle cx="60" cy="60" r="' + r + '" fill="none" stroke="#e5e7eb" stroke-width="10"/>' +
+      '<circle cx="60" cy="60" r="' + r + '" fill="none" stroke="' + C.liq + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + (c * k).toFixed(1) + ' ' + (c * (1 - k)).toFixed(1) + '" transform="rotate(-90 60 60)"/>' +
+      '<text x="60" y="58" text-anchor="middle" class="sb">' + f(score) + '%</text><text x="60" y="78" text-anchor="middle" class="sl">' + esc(word || '') + '</text></svg>';
+  }
+  /* a value against its band: the band in green, the marker green inside it and red outside */
+  function hbar(v, lo, hi, unit, ok) {
+    var span = hi - lo, pad = span * 0.35, min = lo - pad, max = hi + pad, W = 160;
+    function X(x) { return W * Math.max(0, Math.min(1, (x - min) / (max - min))); }
+    return '<svg viewBox="0 0 ' + W + ' 18" class="band" role="img" aria-label="' + (v == null ? 'no value' : f(v, 2) + ' ' + esc(unit)) + ' against ' + lo + ' to ' + hi + '">' +
+      '<rect x="0" y="6" width="' + W + '" height="6" fill="#eef2f6"/><rect x="' + X(lo).toFixed(1) + '" y="6" width="' + (X(hi) - X(lo)).toFixed(1) + '" height="6" fill="#bfe9cf"/>' +
+      (v == null ? '' : '<rect x="' + (X(v) - 1.5).toFixed(1) + '" y="2" width="3" height="14" fill="' + (ok ? C.ok : C.bad) + '"/>') + '</svg>';
+  }
+  var SCREENS = [['ASHRAE TC 9.9 · thermal', 'ashrae', 0.24], ['ANSI/TIA · topology', 'ansi', 0.16], ['ISO 50001 · energy', 'iso', 0.16], ['NFPA 75 · fire', 'nfpa', 0.2], ['Uptime · redundancy', 'uptime', 0.24]];
+  function labSection(L) {
+    var sc = L.scores || {}, sub = L.sub || {};
+    function band(v) { return v >= 60 ? '<span class="tag ok">in band</span>' : '<span class="tag bad">below 60</span>'; }
+    var html = '<div class="labtop"><figure class="radial">' + radial(sc.total, L.grade) + '<figcaption>Weighted screen · 0–100</figcaption></figure><div>' +
+      table(['Standards screen', 'Score', 'Weight', 'Band ≥ 60'], SCREENS.map(function (x) { return [esc(x[0]), f(sc[x[1]]), f(x[2] * 100) + ' %', band(sc[x[1]])]; })) +
+      '<p class="note">Heuristic 0–100 screening scores from the lab model, weighted into the screen above. A screen, not a compliance finding; each row opens the workbench tool for that standard.</p></div></div>' +
+      table(['Design dimension', 'Score', 'Against 60–100'], [['Efficiency', 'efficiency'], ['Resilience', 'resilience'], ['Sustainability', 'sustainability'], ['Operability', 'operability']].map(function (x) {
+        var v = sub[x[1]]; return [x[0], v == null ? '—' : f(v) + ' %', v == null ? '' : hbar(v, 60, 100, '%', v >= 60)]; })) +
+      '<div class="kpis k3"><div><span>Risk index</span><b>' + f(L.risk, 1) + ' / 100</b></div><div><span>Model confidence</span><b>' + f(L.confidence) + ' %</b></div><div><span>Operating scenario</span><b>' + esc(L.failureMode || 'normal') + '</b></div></div>' +
+      (L.failureNote ? '<p class="note">' + esc(L.failureNote) + '</p>' : '');
+    if (L.validation && L.validation.length) {
+      var n = L.validation.filter(function (r) { return r.inBand; }).length;
+      html += '<h3>Model validation — ' + n + ' of ' + L.validation.length + ' in band</h3><p class="note">Live values against sourced benchmark bands (ASHRAE TC 9.9, OCP cold plate, Uptime). Out of band means review that aspect; it is not a failure.</p>' +
+        table(['Check', 'Model value', 'Band', '', 'Result', 'Source'], L.validation.map(function (r) {
+          var span = r.hi - r.lo, dec = span < 2 ? 2 : span < 20 ? 1 : 0, u = r.unit ? ' ' + esc(r.unit) : '';
+          return [esc(r.label), r.value == null ? '—' : f(r.value, dec) + u, r.lo + '–' + r.hi + u, hbar(r.value, r.lo, r.hi, r.unit || '', r.inBand),
+            r.inBand ? '<span class="tag ok">in band</span>' : '<span class="tag bad">out of band</span>', '<small>' + esc(r.source || '') + '</small>'];
+        }));
+    }
+    if (L.inputs && L.inputs.length) {
+      var rows = [];
+      for (var i = 0; i < L.inputs.length; i += 2) {
+        var a = L.inputs[i], b = L.inputs[i + 1];
+        rows.push([esc(a.label), esc(a.value), b ? esc(b.label) : '', b ? esc(b.value) : '']);
+      }
+      html += '<h3>Lab inputs as set on the Model page</h3>' + table(['Input', 'Value', 'Input', 'Value'], rows, 'inp2');
+    }
+    return html;
+  }
+
   function build(R, ctx) {
     ctx = ctx || {};
     var p = R.input, d = R.design, l = R.liquid, a = R.air, e = R.elec, T = R.totals, A = R.annual, w = R.power, h = R.hall;
     var sk = sankey(R), items = powerItems(R), sumItems = items.reduce(function (s, i) { return s + i[1]; }, 0);
     var parts = [];
     TOC = [];
-    parts.push('<header class="cover"><p class="eyebrow">Liquid-to-chip plant · engineering report</p><h1>' + esc(ctx.title || (f(p.itMw) + ' MW liquid-cooled AI campus')) + '</h1>' +
-      '<p class="meta">' + esc(ctx.presetLabel || 'custom plant') + ' · ' + esc(ctx.climateLabel || 'custom climate') + ' · CDU feed ' + esc(p.cduFeed) + ' · generated ' + esc(ctx.date || '') +
-      ' · engine v' + esc(ctx.version || '?') + (ctx.url ? ' · <a href="' + esc(ctx.url) + '">' + esc(ctx.url) + '</a>' : '') + '</p>' + kpis(R) + '</header>');
+    var title = ctx.title || (f(p.itMw) + ' MW liquid-cooled AI campus');
+    parts.push('<section class="cover"><p class="eyebrow">resistancezero.com · LTC Workbench · engineering report</p><div class="rule"></div><h1>' + esc(title) + '</h1>' +
+      '<p class="sub">' + esc(ctx.presetLabel || 'custom plant') + ' · ' + esc(ctx.climateLabel || 'custom climate') + ' · CDU feed ' + esc(p.cduFeed) + ' · ' + f(p.halls) + ' halls · ' + f(R.it.racks) + ' racks' +
+      (ctx.lab ? ' · opened from the Model page' : '') + '</p>' + kpis(R) +
+      '<dl class="cmeta"><dt>Author</dt><dd>Bagus Dwi Permana</dd><dt>Generated</dt><dd>' + esc(ctx.date || '') + '</dd><dt>Engine</dt><dd>LTC Workbench v' + esc(ctx.version || '?') + ' · js/ltc-plant.js, one solve for every page</dd>' +
+      (ctx.url ? '<dt>Source</dt><dd><a href="' + esc(ctx.url) + '">' + esc(ctx.url) + '</a></dd>' : '') + '<dt>License</dt><dd>CC BY-NC 4.0</dd>' +
+      '<dt>Scope</dt><dd>Educational steady-state model: it sizes and balances one plant from the stated inputs. Not a basis of design, not an 8,760-hour simulation, not a compliance statement. Inputs marked ASSUMED are typical design values, not a vendor selection.</dd></dl>' +
+      '<p class="howto">Every number in this document is an output of the same engine solve the workbench pages draw. The calculation trace (formula and inputs for each headline quantity), every input with its auto / yours state, and the complete result as JSON and CSV are in the last sections, so any figure can be checked.</p></section>');
     parts.push('%%TOC%%');
     parts.push(sec('s1', 1, 'Key findings', 'Read from the same result every workbench page draws; each sentence is a number in the sections below.', findings(R, ctx)));
+    if (ctx.lab) parts.push(sec('', 0, 'Design screening', 'The Model page\'s screening layer on this plant: the weighted standards screen, the four design dimensions, the risk index, and the model\'s live values against sourced benchmark bands.', labSection(ctx.lab)));
     if (ctx.views && ctx.views.length) parts.push(sec('', 0, 'Plant schematics', 'The plant map from the LTC hub, drawn on this plant: every block and connector the workbench shows, with this plant\'s numbers on it. Solid lines carry power, dashed liquid, dash-dot air, dotted losses.',
       ctx.views.map(function (v) { return '<figure class="wide schem"><figcaption><b>' + esc(v.label) + '</b></figcaption>' + v.svg + '</figure>'; }).join('')));
     parts.push(sec('s2', 2, 'Heat balance', 'Where every kilowatt of heat goes, design day. Left: the path the heat takes inside the building. Right: the equipment that rejects it.',
@@ -365,8 +424,9 @@
       '<li>Costs are in the site currency at a flat tariff; no demand charges, no escalation.</li></ul>'));
     parts.push(sec('s17', 17, 'Data', 'The full engine result is embedded in this file. Download it to check any number in this report.',
       '<p class="dl"><button type="button" data-dl="json">Download JSON</button> <button type="button" data-dl="csv">Download CSV</button> <button type="button" data-dl="html">Save this report (HTML)</button> <button type="button" data-print>Print / PDF</button></p>'));
-    var toc = '<nav class="toc"><b>Contents</b><ol>' + TOC.map(function (t, i) { return '<li><a href="#s' + (i + 1) + '">' + esc(t) + '</a></li>'; }).join('') + '</ol></nav>';
-    return page(ctx, parts.join('').replace('%%TOC%%', toc), R);
+    var toc = '<nav class="toc"><h2 class="plain">Contents</h2><ol>' + TOC.map(function (t, i) {
+      return '<li><a href="#s' + (i + 1) + '"><b>' + (i + 1) + '</b><span>' + esc(t.title) + '</span>' + (t.lead ? '<small>' + esc(t.lead) + '</small>' : '') + '</a></li>'; }).join('') + '</ol></nav>';
+    return page(ctx, parts.join('').replace('%%TOC%%', function () { return toc; }), R);
   }
 
   /* flat key → value rows for the CSV: every scalar in the result, arrays of objects as indexed rows */
@@ -384,22 +444,41 @@
     return 'key,value\n' + flatten(R, '').map(function (r) { var v = String(r[1]); return r[0] + ',' + (/[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v); }).join('\n') + '\n';
   }
 
-  var CSS = 'body{margin:0;background:#fff;color:#1f2933;font:400 14px/1.55 "IBM Plex Sans",system-ui,sans-serif}main{max-width:980px;margin:0 auto;padding:24px 16px 64px}' +
+  /* Paper first (documentation/design.md §11): A4, running head and page numbers from @page margin
+     boxes (Chrome ≥ 131), every section on its own page, figures and rows never split, tables repeat
+     their head. On screen the same document reads as a stack of sheets. */
+  var CSS = '*{box-sizing:border-box}html{background:#e9edf3}body{margin:0;color:#1f2933;font:400 13.5px/1.5 "IBM Plex Sans",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+    'main{max-width:900px;margin:20px auto 64px;padding:0 12px}main>section,main>nav{background:#fff;box-shadow:0 1px 3px rgba(17,24,39,.18);margin:0 0 16px;padding:40px 44px;scroll-margin-top:60px}' +
     '.bar{position:sticky;top:0;z-index:2;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 16px;background:#111827;color:#e5e7eb;font:500 12px "JetBrains Mono",monospace}.bar span{flex:1}' +
-    'button{font:500 12px "JetBrains Mono",monospace;padding:8px 12px;min-height:36px;border:1px solid #9aa3ad;border-radius:3px;background:#fff;color:#111;cursor:pointer}.bar button{background:#1f2937;color:#f9fafb;border-color:#4b5563}' +
-    '.eyebrow{font:500 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#b45309;margin:0}h1{font-size:28px;line-height:1.2;margin:6px 0 4px}.meta{color:#4b5563;font-size:12.5px;margin:0 0 16px}' +
-    'section{scroll-margin-top:60px}h2{font-size:19px;margin:36px 0 6px;padding-top:12px;border-top:1px solid #d5d9df}h2 .no{display:inline-block;min-width:30px;color:#b45309;font:500 14px "JetBrains Mono",monospace}.lead{color:#4b5563;margin:0 0 12px}h3{font-size:14.5px;margin:22px 0 8px;color:#1f2937}' +
-    '.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:#d5d9df;border:1px solid #d5d9df}.kpis div{background:#f8fafc;padding:10px 12px}.kpis span{display:block;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em}.kpis b{font:500 17px "JetBrains Mono",monospace;font-variant-numeric:tabular-nums}' +
-    '.toc ol{columns:2;margin:6px 0 0;padding-left:22px}.toc{margin:20px 0;padding:12px 16px;border:1px solid #d5d9df;background:#f8fafc}a{color:#0e6f8a}' +
-    '.tw{overflow-x:auto;margin:10px 0}table{border-collapse:collapse;width:100%;font-size:12.5px}th,td{border-bottom:1px solid #e5e7eb;padding:5px 8px;text-align:left;vertical-align:top}th{font:500 10.5px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;background:#f3f4f6;white-space:nowrap}td.n{font-variant-numeric:tabular-nums}code{font:12px "JetBrains Mono",monospace;color:#374151}' +
-    'figure{margin:12px 0}figure.wide{overflow-x:auto}.schem{margin:16px 0 24px}.schem figcaption{font-size:12.5px;margin-bottom:4px}svg{width:100%;height:auto;display:block}svg .sl{font:12px "IBM Plex Sans",sans-serif;fill:#1f2933}svg .sv{font:500 11.5px "JetBrains Mono",monospace;fill:#374151}svg .sd{font:10.5px "JetBrains Mono",monospace;fill:#6b7280}' +
-    '.check{font:12px "JetBrains Mono",monospace;color:#1a8f4e;margin:6px 0}.note{font-size:12.5px;color:#4b5563}.find li{margin:4px 0}' +
+    'button{font:500 12px "JetBrains Mono",monospace;padding:8px 12px;min-height:36px;border:1px solid #9aa3ad;border-radius:3px;background:#fff;color:#111;cursor:pointer}.bar button{background:#1f2937;color:#f9fafb;border-color:#4b5563}.bar button.pri{background:#b45309;border-color:#b45309}' +
+    '.cover{min-height:640px}.eyebrow{font:500 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#b45309;margin:0 0 14px}.cover .rule{width:72px;height:3px;background:#b45309;margin:0 0 16px}' +
+    'h1{font-size:32px;line-height:1.15;margin:0 0 8px;font-weight:600;letter-spacing:-.01em}.cover .sub{font-size:14px;color:#4b5563;margin:0 0 24px}.meta{color:#4b5563;font-size:12.5px;margin:0 0 16px}' +
+    '.cmeta{display:grid;grid-template-columns:max-content 1fr;gap:5px 18px;margin:26px 0 0;font-size:12.5px}.cmeta dt{font:500 10.5px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;padding-top:2px}.cmeta dd{margin:0}.howto{margin:22px 0 0;padding:10px 12px;border-left:3px solid #d5d9df;color:#4b5563;font-size:12.5px}' +
+    '.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#d5d9df;border:1px solid #d5d9df}.kpis.k3{grid-template-columns:repeat(3,1fr);margin:12px 0}.kpis div{background:#f8fafc;padding:10px 12px}.kpis span{display:block;font-size:10.5px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em}.kpis b{font:500 17px "JetBrains Mono",monospace;font-variant-numeric:tabular-nums}' +
+    '.toc ol{list-style:none;margin:6px 0 0;padding:0}.toc li{border-bottom:1px solid #e5e7eb}.toc a{display:grid;grid-template-columns:36px 1fr;gap:0 10px;padding:6px 0;color:inherit;text-decoration:none}.toc a b{font:500 15px "JetBrains Mono",monospace;color:#b45309;grid-row:span 2}.toc a span{font-weight:600}.toc a small{color:#4b5563;font-size:11.5px;line-height:1.4}' +
+    'h2{display:grid;grid-template-columns:auto 1fr;align-items:baseline;gap:16px;margin:0 0 16px;padding:12px 16px;background:#1f2937;color:#fff;font:600 19px/1.2 "IBM Plex Sans",sans-serif;border-left:4px solid #b45309}h2 .no{font:500 30px "JetBrains Mono",monospace;color:#9ca3af}h2.plain{display:block}' +
+    '.lead{color:#4b5563;margin:0 0 12px}h3{font-size:14px;margin:22px 0 8px;color:#1f2937;border-bottom:1px solid #e5e7eb;padding-bottom:4px}a{color:#0e6f8a}' +
+    '.tw{overflow-x:auto;margin:10px 0}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border-bottom:1px solid #e5e7eb;padding:5px 8px;text-align:left;vertical-align:top}th{font:500 10px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;background:#f3f4f6;white-space:nowrap}td.n{font-variant-numeric:tabular-nums}table.inp2 td:nth-child(odd){color:#4b5563}code{font:11.5px "JetBrains Mono",monospace;color:#374151}' +
+    'figure{margin:12px 0}figure.wide{overflow-x:auto}.schem{margin:16px 0 24px}.schem figcaption{font-size:12.5px;margin-bottom:4px}svg{width:100%;height:auto;display:block}svg .sl{font:12px "IBM Plex Sans",sans-serif;fill:#1f2933}svg .sv{font:500 11.5px "JetBrains Mono",monospace;fill:#374151}svg .sd{font:10.5px "JetBrains Mono",monospace;fill:#6b7280}svg .sb{font:500 22px "JetBrains Mono",monospace;fill:#1f2933}' +
+    '.check{font:12px "JetBrains Mono",monospace;color:#1a8f4e;margin:6px 0}.note{font-size:12px;color:#4b5563}.find li{margin:5px 0}' +
     '.tag{display:inline-block;padding:1px 6px;border-radius:2px;font:500 10.5px "JetBrains Mono",monospace;background:#eef2f6;color:#4b5563}.tag.y{background:#fdecc8;color:#92400e}.tag.ok{background:#dcf3e5;color:#166534}.tag.bad{background:#fde2e2;color:#991b1b}' +
     '.plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}.plan figcaption{font-size:11.5px;color:#374151;margin-top:4px}.plan figcaption b{display:block;font-size:12.5px}' +
     '.legend{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font:10.5px "JetBrains Mono",monospace;margin:8px 0}.legend span{padding:2px 6px;color:#111}.legend i{margin:0 12px 0 6px;font-style:normal;color:#6b7280}.legend b{display:inline-block;width:10px;height:10px;margin:0 4px 0 8px}' +
     '.tr{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}.tr figcaption{font-size:12px}.dl button{margin:4px 4px 4px 0}' +
-    '@media print{.bar,.dl{display:none}.schem svg{min-width:0!important}main{max-width:none;padding:0}section{break-inside:auto}figure,tr,.kpis{break-inside:avoid}h2,h3{break-after:avoid}body{font-size:11.5px}}' +
-    '@media(max-width:600px){h1{font-size:22px}.toc ol{columns:1}figure.wide svg{min-width:720px}}';
+    '.labtop{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start}.radial{margin:0}.radial figcaption{text-align:center;font-size:11px;color:#6b7280}svg.band{width:160px;height:18px}' +
+    '@media print{html{background:#fff}.bar,.dl{display:none}main{max-width:none;margin:0;padding:0}main>section,main>nav{box-shadow:none;margin:0;padding:0;break-before:page}main>section.cover{break-before:auto;min-height:0}main>section.flow{break-before:auto;margin-top:16pt}.toc a{padding:3.5pt 0}.toc a small{font-size:8.5pt}.toc a span{font-size:10pt}' +
+    'body{font-size:10.5pt}table{font-size:8.8pt}th{font-size:7.2pt}code{font-size:8.5pt}h1{font-size:26pt}h2{font-size:15pt;margin-bottom:10pt}h2 .no{font-size:22pt}.kpis b{font-size:13pt}' +
+    'figure,tr,.kpis,.plan,.labtop,.find li{break-inside:avoid}h2,h3,figcaption{break-after:avoid}thead{display:table-header-group}.schem svg{min-width:0!important}figure.wide,.tw{overflow:visible}' +
+    '.plans{grid-template-columns:repeat(3,1fr)}.tr{grid-template-columns:repeat(2,1fr)}a{color:inherit;text-decoration:none}}' +
+    '@media(max-width:600px){main>section,main>nav{padding:20px 16px}h1{font-size:22px}.kpis{grid-template-columns:repeat(2,1fr)}figure.wide svg{min-width:720px}.labtop{grid-template-columns:1fr}}';
+  function cssStr(x) { return String(x == null ? '' : x).replace(/[\\"\n]/g, ' '); }
+  /* A4 with the running head and the page count in the margin boxes; the cover page carries neither */
+  function pageRules(ctx, title) {
+    var font = 'font:500 8.5px "JetBrains Mono",monospace;color:#6b7280';
+    return '@page{size:A4;margin:20mm 18mm 18mm}@page{@top-left{content:"resistancezero.com · LTC Workbench";' + font + '}@top-right{content:"' + cssStr(title) + '";' + font + '}' +
+      '@bottom-left{content:"© ' + new Date().getFullYear() + ' Bagus Dwi Permana · CC BY-NC 4.0 · ' + cssStr(ctx.date) + '";' + font + '}@bottom-right{content:"page " counter(page) " of " counter(pages);' + font + '}}' +
+      '@page:first{@top-left{content:none}@top-right{content:none}@bottom-left{content:none}@bottom-right{content:none}}';
+  }
 
   function page(ctx, body, R) {
     var data = JSON.stringify({ generated: ctx.date, version: ctx.version, url: ctx.url, state: ctx.state || {}, result: R }).replace(/</g, '\\u003c');
@@ -409,9 +488,11 @@
       'if(k==="json")sv(new Blob([JSON.stringify(D,null,1)],{type:"application/json"}),"' + name + '.json");' +
       'if(k==="csv")sv(new Blob([document.getElementById("rz-csv").textContent],{type:"text/csv"}),"' + name + '.csv");' +
       'if(k==="html")sv(new Blob(["<!doctype html>\\n"+document.documentElement.outerHTML],{type:"text/html"}),"' + name + '.html")});';
-    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LTC plant report</title>' +
+    var title = ctx.title || (f(R.input.itMw) + ' MW liquid-cooled AI campus');
+    if (ctx.autoPrint !== false) js += 'window.addEventListener("load",function(){Promise.race([document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve(),new Promise(function(r){setTimeout(r,2500)})]).then(function(){setTimeout(function(){window.print()},400)})});';
+    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + esc(title) + ' — LTC engineering report</title>' +
       '<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">' +
-      '<style>' + (ctx.cssVars ? ':root{' + esc(ctx.cssVars) + '}' : '') + CSS + '</style></head><body><div class="bar"><span>LTC plant report · ' + esc(ctx.date || '') + '</span><button type="button" data-print>Print / PDF</button><button type="button" data-dl="json">JSON</button><button type="button" data-dl="csv">CSV</button><button type="button" data-dl="html">Save HTML</button></div><main>' +
+      '<style>' + (ctx.cssVars ? ':root{' + esc(ctx.cssVars) + '}' : '') + CSS + pageRules(ctx, title) + '</style></head><body><div class="bar"><span>LTC engineering report · ' + esc(ctx.date || '') + ' · in the print dialog choose “Save as PDF”</span><button type="button" class="pri" data-print>Save as PDF</button><button type="button" data-dl="json">JSON</button><button type="button" data-dl="csv">CSV</button><button type="button" data-dl="html">Save HTML</button></div><main>' +
       body + '</main><script type="application/json" id="rz-data">' + data + '<\/script><script type="text/plain" id="rz-csv">' + esc(csv(R)) + '<\/script><script>' + js + '<\/script></body></html>';
   }
 
@@ -580,32 +661,35 @@
     return c;
   }
   /* the DH01 solver and the Tier model load on demand where the page does not carry them */
+  var MODELS = [['LTC', 'ltc-app.js'], ['LTCDH01', 'ltc-dh01.js'], ['LTCTier', 'ltc-tier.js'], ['LTCHub', 'ltc-hub.js']];
   function needModels(done) {
-    var want = [['LTCDH01', 'ltc-dh01.js'], ['LTCTier', 'ltc-tier.js'], ['LTCHub', 'ltc-hub.js']].filter(function (m) { return !root[m[0]]; }), left = want.length;
-    if (!left) return done();
-    var me = document.querySelector('script[src*="ltc-report.js"]'), base = me ? me.src.replace(/ltc-report\.js.*$/, '') : 'js/';
-    want.forEach(function (m) {
+    var want = MODELS.filter(function (m) { return !root[m[0]]; });
+    var base = assetBase() + 'js/';
+    (function next() {             // in order: the Tier model and the hub read window.LTC as they load
+      var m = want.shift();
+      if (!m) return done();
       var s = document.createElement('script');
       s.src = base + m[1] + '?v=' + encodeURIComponent(root.RZ_VERSION || '');
-      s.onload = s.onerror = function () { if (--left === 0) done(); };
+      s.onload = s.onerror = next;
       document.head.appendChild(s);
-    });
+    })();
   }
-  /* An RZDiagram drawing takes its colours and type from the page's stylesheet (custom properties,
-   * classes). A standalone file has neither, so each element's computed paint is written onto it —
-   * resolved under the light theme, because the report is a paper document whatever the page shows. */
+  /* An RZDiagram drawing takes its colours and type from the hub's stylesheet (custom properties,
+   * classes). The report is a standalone file and the exporting page may not carry that sheet (the
+   * Model page has its own), so the drawings are painted inside a hidden frame that loads
+   * css/ltc-app.css under the light theme, and each element's computed paint is written onto it. */
   var PAINT = ['fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin', 'opacity', 'fill-opacity', 'stroke-opacity',
                'font-family', 'font-size', 'font-weight', 'letter-spacing', 'text-anchor', 'dominant-baseline', 'visibility', 'display'];
-  function paintInline(markup, width) {
-    var host = document.createElement('div');
+  function paintInline(doc, markup, width) {
+    var host = doc.createElement('div'), win = doc.defaultView;
     host.setAttribute('aria-hidden', 'true');
-    host.style.cssText = 'position:absolute;left:-100000px;top:0;width:' + width + 'px';
+    host.style.cssText = 'position:absolute;left:0;top:0;width:' + width + 'px';
     host.className = 'ltc-fig';
     host.innerHTML = markup;
-    (document.querySelector('.ltc-work') || document.body).appendChild(host);
+    doc.body.appendChild(host);
     var src = host.querySelector('svg'), out = src.cloneNode(true), a = src.querySelectorAll('*'), b = out.querySelectorAll('*');
     for (var i = 0; i < a.length; i++) {
-      var cs = getComputedStyle(a[i]), st = [];
+      var cs = win.getComputedStyle(a[i]), st = [];
       PAINT.forEach(function (k) { var v = cs.getPropertyValue(k); if (v && v !== 'normal') st.push(k + ':' + v); });
       b[i].setAttribute('style', st.join(';'));
       b[i].removeAttribute('class');
@@ -617,33 +701,72 @@
     host.remove();
     return new XMLSerializer().serializeToString(out);
   }
-  function plantViews(R) {
+  function assetBase() {
+    var me = document.querySelector('script[src*="ltc-report.js"]');
+    return me ? me.src.replace(/js\/ltc-report\.js.*$/, '') : '';
+  }
+  function plantViews(R, done) {
     var H = root.LTCHub;
-    if (!H || !H.svg || !root.RZDiagram) return null;
-    var html = document.documentElement, theme = html.getAttribute('data-theme');
+    if (!H || !H.svg || !root.RZDiagram) return done(null);
+    /* the drawings name the site's colour tokens (var(--bg1) …); their light-theme values are read
+       from the exporting page's own root and written into the frame, wherever that page keeps them */
+    var drawn, tokens = '';
+    try { drawn = H.views().map(function (v) { var x = H.svg(v.id, R); return { id: v.id, label: v.label, svg: x.svg, width: x.width, warnings: x.warnings }; }); }
+    catch (e) { console.error('[ltc-report] plant views', e); return done(null); }
+    var html = document.documentElement, theme = html.getAttribute('data-theme'), names = {};
+    drawn.forEach(function (v) { (v.svg.match(/var\(--[\w-]+/g) || []).forEach(function (m) { names[m.slice(4)] = 1; }); });
     html.setAttribute('data-theme', 'light');
     try {
-      var views = H.views().map(function (v) { var x = H.svg(v.id, R); return { id: v.id, label: v.label, svg: paintInline(x.svg, x.width), warnings: x.warnings }; });
-      // markers and <use> copies still name custom properties: carry their light-theme values along
-      var names = {}, cs = getComputedStyle(html);
-      views.forEach(function (v) { (v.svg.match(/var\(--[\w-]+/g) || []).forEach(function (m) { names[m.slice(4)] = 1; }); });
-      views.vars = Object.keys(names).map(function (k) { return k + ':' + cs.getPropertyValue(k).trim(); }).join(';');
-      return views;
-    } catch (e) { console.error('[ltc-report] plant views', e); return null; }
-    finally { if (theme) html.setAttribute('data-theme', theme); else html.removeAttribute('data-theme'); }
+      // a page may scope the tokens to its drawing area (the Model page: .ltc-schematic) rather than :root
+      var scopes = [html, document.querySelector('.ltc-schematic'), document.querySelector('.ltc-canvas'), document.querySelector('[data-rzd-node]')].filter(Boolean);
+      var styles = scopes.map(function (el) { return getComputedStyle(el); });
+      tokens = Object.keys(names).map(function (k) {
+        for (var i = 0; i < styles.length; i++) { var v = styles[i].getPropertyValue(k).trim(); if (v) return k + ':' + v; }
+        return '';
+      }).filter(Boolean).join(';');
+    } finally { if (theme) html.setAttribute('data-theme', theme); else html.removeAttribute('data-theme'); }
+    var fr = document.createElement('iframe'), fired = false;
+    fr.setAttribute('aria-hidden', 'true'); fr.setAttribute('title', 'report figures');
+    fr.style.cssText = 'position:absolute;left:-100000px;top:0;width:1200px;height:800px;border:0';
+    document.body.appendChild(fr);
+    /* the frame carries every stylesheet and inline style of the exporting page (the drawing's
+       classes and the tokens they read may live in either) plus the hub's sheet when the page lacks it */
+    var doc = fr.contentDocument, heads = [];
+    [].forEach.call(document.querySelectorAll('link[rel~="stylesheet"][href], style'), function (el) { heads.push(el.outerHTML); });
+    if (!document.querySelector('link[href*="ltc-app.css"]')) heads.push('<link rel="stylesheet" href="' + (assetBase() + 'css/ltc-app.css?v=' + encodeURIComponent(root.RZ_VERSION || '')).replace(/"/g, '&quot;') + '">');
+    doc.open();
+    doc.write('<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><base href="' + document.baseURI.replace(/"/g, '&quot;') + '">' + heads.join('') + '<style>:root{' + tokens + '}</style></head><body></body></html>');
+    doc.close();
+    function go() {
+      if (fired) return; fired = true;
+      var views = null;
+      try {
+        views = drawn.map(function (v) { return { id: v.id, label: v.label, svg: paintInline(doc, v.svg, v.width), warnings: v.warnings }; });
+        views.vars = tokens;                    // markers and <use> copies still name the tokens: the report carries their values
+      } catch (e) { console.error('[ltc-report] plant views', e); views = null; }
+      fr.remove();
+      done(views);
+    }
+    var links = doc.querySelectorAll('link[rel~="stylesheet"]'), left = links.length;
+    [].forEach.call(links, function (l) { l.onload = l.onerror = function () { if (--left <= 0) go(); }; });
+    if (!left) setTimeout(go, 0);
+    setTimeout(go, 4000);                       // a sheet that never answers must not hold the report
   }
-  function exportReport() {
-    var S = root.LTCPlantStrip, P = root.LTCPlant;
-    if (!S || !P) return;
+  function exportReport(opts) {
+    var S = root.LTCPlantStrip, P = root.LTCPlant, o = opts && opts.result ? opts : null;
+    if (!P || (!S && !o)) return;
     var tab = root.open('', '_blank');   // opened inside the click, before the async load, so no popup blocker
     needModels(function () {
-      var g = S.get(), ctx = context(P, g.result, g.state);
-      ctx.views = plantViews(g.result);
-      ctx.cssVars = ctx.views ? ctx.views.vars : '';
-      var html = build(g.result, ctx);
-      var url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-      if (tab && !tab.closed) tab.location.href = url;
-      else { var a = document.createElement('a'); a.href = url; a.download = 'ltc-plant-report.html'; document.body.appendChild(a); a.click(); a.remove(); }
+      var g = o ? { result: o.result, state: o.state || P.load() } : S.get(), ctx = context(P, g.result, g.state);
+      if (o) { ctx.lab = o.lab || null; if (o.title) ctx.title = o.title; }
+      plantViews(g.result, function (views) {
+        ctx.views = views;
+        ctx.cssVars = views ? views.vars : '';
+        var html = build(g.result, ctx);
+        var url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+        if (tab && !tab.closed) tab.location.href = url;
+        else { var a = document.createElement('a'); a.href = url; a.download = 'ltc-plant-report.html'; document.body.appendChild(a); a.click(); a.remove(); }
+      });
     });
   }
   function mountButton() {

@@ -924,10 +924,7 @@
         });
         var expBtn = el('button', { type: 'button',
             className: 'ltc-nav-btn ltc-nav-btn-primary', textContent: 'Export Report' });
-        expBtn.addEventListener('click', function () {
-            var b = document.getElementById('exportExecutive');
-            if (b) b.click(); else activateLtcTab('report');
-        });
+        expBtn.addEventListener('click', exportPdfReport);
         actions.appendChild(bell);
         actions.appendChild(docBtn);
         actions.appendChild(saveBtn);
@@ -937,6 +934,56 @@
         if (theme && theme.parentNode) theme.parentNode.insertBefore(actions, theme);
         else if (navLinks) navLinks.insertBefore(actions, navLinks.firstChild);
     }
+
+    // ════════════════════════════════════════════════════════
+    // exportPdfReport — the plant's engineering report (js/ltc-report.js), as the six
+    // workbench pages export it, plus this page's screening layer: the standards screen,
+    // the four design dimensions, risk and confidence, the validation bands, and every
+    // lab input as set. The report opens in a new tab and offers the print dialog, where
+    // "Save as PDF" writes the file. Falls back to the Report tab when the module is absent.
+    // ════════════════════════════════════════════════════════
+    function labReportOptions(model) {
+        var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc;
+        var inputs = [];
+        document.querySelectorAll('label[for^="in"]').forEach(function (lb) {
+            var el = document.getElementById(lb.htmlFor);
+            if (!el || !/^(INPUT|SELECT)$/.test(el.tagName)) return;
+            var v = el.tagName === 'SELECT' ? (el.selectedOptions && el.selectedOptions[0] ? el.selectedOptions[0].textContent : el.value)
+                : el.type === 'checkbox' ? (el.checked ? 'yes' : 'no') : el.value;
+            var plain = lb.cloneNode(true);                      // the label's own words, not the help text and badges the page adds
+            [].forEach.call(plain.querySelectorAll('.term-tooltip'), function (t) { t.replaceWith(document.createTextNode(t.getAttribute('data-term-title') || t.textContent)); });
+            [].forEach.call(plain.querySelectorAll('*'), function (c) { c.remove(); });
+            inputs.push({ key: el.id, label: plain.textContent.replace(/\s+/g, ' ').trim(), value: String(v == null ? '' : v).trim() });
+        });
+        var total = model.scores ? model.scores.total : null;
+        return {
+            result: model.plant,
+            state: window.LTCPlant && window.LTCPlant.load ? window.LTCPlant.load() : {},
+            title: (Math.round(model.itKw / 100) / 10) + ' MW liquid-to-chip plant — ' + (model.rackTypeLabel || 'model lab'),
+            lab: {
+                scores: model.scores || null,
+                sub: eng && eng.designSubScores ? eng.designSubScores(model) : null,
+                grade: total == null ? '' : gradeWord(total),
+                risk: model.riskIndex, confidence: model.confidence,
+                failureMode: model.failureMode, failureNote: model.failureNote,
+                validation: eng && eng.validation ? eng.validation(model) : [],
+                inputs: inputs
+            }
+        };
+    }
+    function exportPdfReport() {
+        var model = window.__ltcLastModel;
+        if (window.LTCReport && window.LTCReport.exportReport && model && model.plant && window.LTCPlant) {
+            window.LTCReport.exportReport(labReportOptions(model));
+            var s = document.getElementById('exportStatus');
+            if (s) { s.className = 'status-pill ok'; s.textContent = 'PDF report opened in a new tab'; }
+            return;
+        }
+        var b = document.getElementById('exportExecutive');
+        if (b) b.click(); else activateLtcTab('report');
+    }
+    var pdfReportBtn = document.getElementById('exportPdfReport');
+    if (pdfReportBtn) pdfReportBtn.addEventListener('click', exportPdfReport);
 
     // ════════════════════════════════════════════════════════
     // bindRunBtn — wire ltcRunBtn to existing runCalc

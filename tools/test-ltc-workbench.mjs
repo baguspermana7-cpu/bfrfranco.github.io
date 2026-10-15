@@ -640,6 +640,56 @@ for (const [page, mod] of Object.entries(PAGES)) {
 }
 
 {
+  /* W12pr (v3.21.18) — the report as a paper document. Owner: "harus pdf export dan harus super
+   * comprehensive, levelnya bener-bener detail dan sangat immersive dan clear". The document opens a
+   * cover and a contents page, prints A4 with a running head and "page n of m" from @page margin
+   * boxes, opens every figure-led chapter on a new page, lets the short table chapters follow on,
+   * offers the print dialog itself, and — opened from the Model page — carries that page's
+   * screening layer. Each statement is checked on the built HTML, not on a browser. */
+  const sb = { console, Math, JSON, Date }; sb.window = sb; sb.globalThis = sb; sb.document = { readyState: 'loading', addEventListener() {} };
+  vm.createContext(sb);
+  for (const f of ['js/ltc-plant.js', 'js/ltc-dh01.js', 'js/ltc-dh01-3d.js', 'js/ltc-cfd.js', 'js/ltc-cfd-view.js', 'js/ltc-tier.js', 'js/ltc-report.js']) vm.runInContext(readFileSync(join(root, f), 'utf8'), sb, { filename: f });
+  const P = sb.LTCPlant, X = sb.LTCReport;
+  const R = P.compute({}), ctx = X.context(P, R, {}), html = X.build(R, ctx), text = html.replace(/<script[\s\S]*?<\/script>/g, '');
+  const secs = html.match(/<section id="s\d+"/g) || [], toc = html.match(/<nav class="toc">[\s\S]*?<\/nav>/)[0], items = toc.match(/<li>/g) || [];
+  ok('W12pr-a', html.includes('<section class="cover">') && html.includes('Bagus Dwi Permana') && html.includes('CC BY-NC 4.0') && /<title>[^<]*LTC engineering report<\/title>/.test(html),
+     'the report opens on a cover: author, licence, title');
+  ok('W12pr-b', items.length === secs.length && secs.length >= 19 && toc.includes('Heat balance') && toc.includes('Where every kilowatt of heat goes'),
+     `the contents page lists every chapter with its lead (${items.length} of ${secs.length})`);
+  ok('W12pr-c', /@page\{size:A4;margin:20mm 18mm 18mm\}/.test(html) && html.includes('counter(page) " of " counter(pages)') && html.includes('@page:first{@top-left{content:none}')
+     && html.includes('content:"resistancezero.com · LTC Workbench"'),
+     'A4 with a running head and "page n of m" in the margin boxes, none on the cover');
+  ok('W12pr-d', /main>section,main>nav\{[^}]*break-before:page/.test(html) && /main>section\.flow\{break-before:auto/.test(html) && html.includes('thead{display:table-header-group}')
+     && /figure,tr,\.kpis,\.plan,\.labtop,\.find li\{break-inside:avoid\}/.test(html),
+     'chapters open a page, flowing chapters follow on, table heads repeat, figures and rows never split');
+  const flow = (t) => new RegExp('<section id="s\\d+" class="flow"><h2><span class="no">\\d+</span>' + t).test(html), opens = (t) => new RegExp('<section id="s\\d+"><h2><span class="no">\\d+</span>' + t).test(html);
+  ok('W12pr-e', ['Liquid path', 'Air path', 'Electrical &amp; sizing', 'Redundancy register', 'Standards cross-check'].every(flow) && ['Heat balance', 'Facility power', 'Annual performance', 'DH01 hall &amp; faults', 'Transients'].every(opens),
+     'the short table chapters flow; the figure-led chapters open a page');
+  ok('W12pr-f', html.includes('window.print()') && html.includes('Promise.race') && html.includes('>Save as PDF<') && !text.includes('Design screening'),
+     'the document offers the print dialog itself after the fonts settle (bounded wait), has a Save as PDF button, and carries no screening chapter unless opened from the Model page');
+  const lab = { scores: { ashrae: 93, ansi: 82, iso: 89, nfpa: 94, uptime: 100, total: 92 }, sub: { efficiency: 83, resilience: 63, sustainability: 30, operability: 92 }, grade: 'Strong',
+    risk: 38.6, confidence: 91, failureMode: 'normal', failureNote: 'Normal operation profile',
+    validation: [{ key: 'pue', label: 'PUE (design band)', unit: '', source: 'Uptime survey 2024', value: 1.19, lo: 1.1, hi: 1.22, inBand: true },
+                 { key: 'wue', label: 'WUE', unit: 'L/kWh', source: 'Uptime survey', value: 0.67, lo: 0.1, hi: 1.1, inBand: true },
+                 { key: 'deltaT', label: 'Loop ΔT', unit: 'K', source: 'ASHRAE TC 9.9', value: 14, lo: 8, hi: 12, inBand: false }],
+    inputs: [{ key: 'inItLoad', label: 'IT Load (MW)', value: '100' }, { key: 'inRackType', label: 'Rack Type Profile', value: 'AI/HPC Direct Liquid' }, { key: 'inClimate', label: 'Climate Profile', value: 'Tropical' }] };
+  const h2 = X.build(R, Object.assign({}, ctx, { lab, title: 'Lab plant' })), t2 = h2.replace(/<script[\s\S]*?<\/script>/g, '');
+  ok('W12pr-g', opens.call(null, 'Design screening') === false && /<section id="s2"><h2><span class="no">2<\/span>Design screening/.test(h2) && t2.includes('>92%<') && t2.includes('Strong')
+     && ['ASHRAE TC 9.9 · thermal', 'ANSI/TIA · topology', 'ISO 50001 · energy', 'NFPA 75 · fire', 'Uptime · redundancy'].every((n) => t2.includes(n)) && t2.includes('38.6 / 100') && t2.includes('91 %'),
+     'from the Model page the report carries a Design screening chapter right after the findings: the weighted screen, the five standards screens, risk and confidence');
+  ok('W12pr-h', t2.includes('Model validation — 2 of 3 in band') && t2.includes('Loop ΔT') && t2.includes('8–12 K') && (t2.match(/>out of band</g) || []).length === 1 && (t2.match(/>in band</g) || []).length >= 7
+     && t2.includes('fill="' + '#c62828' + '"') && t2.includes('ASHRAE TC 9.9'),
+     'the validation table states each check, its band and source; the out-of-band marker is red');
+  ok('W12pr-i', t2.includes('Lab inputs as set on the Model page') && t2.includes('AI/HPC Direct Liquid') && t2.includes('Climate Profile') && t2.includes('weighted screen reads <b>92 / 100</b>')
+     && t2.includes('2 of 3 validation checks in band') && t2.includes('content:"Lab plant"') && h2.includes('<title>Lab plant — LTC engineering report</title>'),
+     'the lab inputs are listed, the findings state the screen, and the page title and running head carry the report title');
+  const page = readFileSync(join(root, 'ltc-system-modelling-lab.html'), 'utf8'), at = (x) => page.indexOf(x), ui = readFileSync(join(root, 'js/ltc-lab-ui.js'), 'utf8');
+  ok('W12pr-j', at('js/ltc-report.js') > at('js/ltc-lab-plant.js') && at('js/ltc-report.js') < at('js/ltc-lab-ui.js') && page.includes('id="exportPdfReport"') && !/id="exportPdfReport"[^>]*onclick/.test(page)
+     && ui.includes("expBtn.addEventListener('click', exportPdfReport)") && ui.includes('window.LTCReport.exportReport(labReportOptions(model))') && ui.includes("getElementById('exportPdfReport')"),
+     'the Model page loads the report module after the plant adapter, and both Export buttons open the report with the screening layer');
+}
+
+{
   /* W13 (v3.20.1) — every plant diagram holds on every plant, not only the 100 MW default the
    * other gates draw. The report's first sweep found the hub's liquid-heat arrow label unplaced on
    * 102 of 240 plant/view pairs (any label longer than "85 MW" did not fit the 40 px column gap)
