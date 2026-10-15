@@ -47,7 +47,12 @@ EXCLUDE_DIRS = {
 
 
 def in_excluded(path: Path) -> bool:
-    s = str(path)
+    # Match the path RELATIVE to the repo, never the absolute one: a worktree under ~/.cache
+    # matched '.cache' and the audit scanned zero pages while reporting CLEAN (2026-10-15).
+    try:
+        s = '/' + path.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        s = str(path)
     return any(f'/{d}/' in s or s.endswith(f'/{d}') for d in EXCLUDE_DIRS)
 
 
@@ -159,6 +164,9 @@ def main() -> int:
             print(f'\nFix: change </script> -> <\\/script> at each flagged line.')
             print('See standarization/PDF_EXPORT_STANDARD.md "Lesson learnt: 2026-05-09" for context.')
 
+    if not files:
+        print('FAIL — scanned 0 pages; an audit that sees nothing is not clean')
+        return 1
     if args.strict and findings:
         return 1
     return 0

@@ -70,10 +70,18 @@ file/rule findings across 172 files despite exit 0**.
 | 24 | Excessive hover animations | Restrained, purposeful transitions. |
 | 25 | 3 feature cards in a row as the default hero | Layout follows content, not the 3-card template. |
 | 26 | Exactly 3 pricing tiers template | N/A (no generic pricing table); if pricing appears it follows real plans. |
+| 27 | **Gradient text** (`background-clip: text` over a gradient) | One colour per heading; a muted second clause is the only emphasis. Owner, 2026-10-15, on the hub H1. |
+| 28 | **Glass by token** — `--glass-*` custom properties or `backdrop-filter` on a decorative block | Rule 6 by another name. Opaque panel + hairline. |
+| 29 | **Stat-tile strip** — three or more sibling tiles with a big mono number each, outside a cockpit | One mono metabar line, or nothing. Rejected v3.11.15, again on the hub 2026-10-15. |
+| 30 | **Hover lift** — `:hover { transform: translateY(-N) }` with N ≥ 2px on a decorative block, whether or not the transition is in the same rule | Border-colour or background change only. |
+| 31 | **Keyword marquee / ticker** on any page | Carries no information (Occam, §D18). Removed from index v1.18.15; banned everywhere 2026-10-15. |
+| 32 | **Neon green** `#00FF88` as an accent, flow colour, tag colour or status dot | Owner, 2026-10-15: *"masih ada hijau neon, itu ai design slop juga."* The hub register carries ONE accent (signal amber); state is amber or neutral. |
+| 34 | **Serif display headline + mono-uppercase chrome everywhere** (Fraunces hero, tracked mono nav, buttons and captions) | Owner, 2026-10-15: *"font style itu juga sepertinya ai design slop"*. Hub register: headings are the body face (IBM Plex Sans 600, −.02em), nav and buttons sentence-case sans; mono is reserved for numbers, eyebrows, figure labels and tags. |
+| 33 | **Aurora / blurred radial mesh** behind a hero, and the **blue-navy cast** of `#0a0e1a` | Owner, 2026-10-15: *"warna backgroundnya masih ai design slop"*. Hub register: neutral graphite `#0b0c0e` / `#121316` / `#191b1f`, no mesh. §B's aurora entry is WITHDRAWN for new work; index.html keeps it only until its own revamp lands. |
 
 ## B. RZ SIGNATURE — deliberate design, PROTECTED (do NOT strip as "slop")
 An over-eager de-slop pass must not remove these; they are the site's identity, not vibecode:
-- **Aurora-mesh hero** — multi-stop radial gradients drifting on 22s/28s loops (mint+gold+violet+blue+
+- ~~Aurora-mesh hero~~ — **withdrawn by the owner 2026-10-15 (§A33)**; listed here only so an old reader knows it was once protected. Multi-stop radial gradients drifting on 22s/28s loops (mint+gold+violet+blue+
   pink), CSS-only, honours reduced-motion. This is a canonical pattern (UI_FEATURES_STANDARD), NOT an
   "orb". Keep it.
 - **Thin-line instrument hairlines** (0.6–1.4px tier-graded), oscilloscope tokens, editorial article

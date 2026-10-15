@@ -395,7 +395,11 @@ The palette is derived from professional display standards:
 ```css
 :root {
     /* Backgrounds — 3-layer elevation system */
-    --rz-bg-base:      #0a0e1a;   /* Page background — deep slate, not pure black */
+    --rz-bg-base:      #0a0e1a;   /* Page background — deep slate, not pure black.
+                                     2026-10-15: the owner read the blue cast as slop on the
+                                     DC Solutions hub; the hub register (css/rz-hub.css) uses
+                                     neutral graphite #0b0c0e / #121316 / #191b1f, no aurora,
+                                     no oscilloscope green. New pages follow the hub. */
     --rz-bg-elevated:  #111827;   /* Card, panel, sidebar background */
     --rz-bg-overlay:   #1c2333;   /* Modal, dropdown, tooltip background */
     --rz-bg-inset:     #080c16;   /* Input field, code block background */

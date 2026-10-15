@@ -48,7 +48,9 @@ EXCLUDE_PATH_PREFIXES = (
 
 
 def is_excluded(path):
-    parts = path.parts
+    # Exclusions match the path RELATIVE to the repo, never the absolute one: a checkout under
+    # ~/.cache (a git worktree) excluded every page and the audit passed on nothing (2026-10-15).
+    parts = path.relative_to(ROOT).parts if path.is_absolute() and str(path).startswith(str(ROOT)) else path.parts
     if any(p in EXCLUDE_DIRS for p in parts):
         return True
     if path.name in EXCLUDE_FILES:
@@ -196,6 +198,9 @@ def main():
         if counts['error']:
             print(f'Error:   {counts["error"]}')
 
+    if counts['total'] == 0:
+        print('FAIL — scanned 0 pages; an audit that sees nothing is not clean')
+        return 1
     if args.strict and counts['fail'] > 0:
         return 1
     return 0

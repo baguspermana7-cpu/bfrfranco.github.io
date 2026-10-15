@@ -11,6 +11,53 @@ release sections rather than semver.
 
 ---
 
+## v3.22.0 — 2026-10-16
+
+### "Stage": the DC Solutions hub becomes one drawing and one camera — and the gate learns the tells it was blind to
+
+**The owner's complaint**, on a screenshot of `datacenter-solutions.html`: *"ini ai design slop"*, then
+*"warna backgroundnya masih ai design slop"*, then *"masih ada hijau neon, itu ai design slop juga"*.
+`audit-vibecode --strict` reported the page clean while it carried gradient text, a pulsing badge,
+three CTAs, four glass stat tiles, a 24-item ticker, 20 floating particles, 48 `box-shadow`, 39
+radii ≥ 8px, 20 `transition: all` and 18 hover lifts in 2,765 lines of inline CSS.
+
+**The page now.** Register borrowed from Oxide Computer (numbered figures, hash gutter, leader rows,
+one accent, a five-word nav) and Linear (one headline, one action, 13px/4px row density); tokens are
+RZ. The copy scrolls in one column; in the other, ONE dotted isometric drawing is pinned and a camera
+moves to each section's part of it (`js/rz-hub-scene.js`, `css/rz-hub.css`): the campus as the DC AI
+engine lays it out (site 412 × 231 m, the bands, roads, fence, genset yard; chillers 143, dry coolers
+631, gensets 171 — read from `DCAI_CALC.snapshot`, printed "—" when the engine is absent, never
+typed), transmission tiers into the GIS, the power/cooling chain as an inspection panel whose boxes
+are links to the calculator rows (hover a row: its box lights; click a box: its calculators), and
+the standards stack. Labels appear per camera; flow runs only while a section with flow is in view;
+nothing follows the cursor; reduced motion gets cuts instead of moves. Phone: the drawing is a 42 vh
+strip pinned above the copy. Surfaces are neutral graphite (`#0b0c0e` / `#121316` / `#191b1f`), no
+aurora, no mesh, no green: one accent, signal amber, with a contrast-safe text variant for light mode.
+Hero: eyebrow, one Fraunces headline with a muted second clause, one lead, one solid 44px action and
+one text link, a mono metabar (21 calculators · 7 engines · 9 cockpits · 0 signups). Five numbered
+sections (Platforms, Grid, Calculators, Knowledge, About) replace eight; five card families become one
+row family and one tile family; trust is a list, FAQ is native `<details>`, the footer is three flat
+columns. The reviewed root-card gate (`handleRootCardClick`, `#rootStandardsCard`) is carried over
+verbatim and the crawler suite (36 tests) still passes on it. 4,230 lines → ~500.
+
+**The gate.** `ANTI_VIBECODE_STANDARD.md` §A gains seven tells (27–33: gradient text, glass by token,
+stat-tile strip, hover lift, marquee anywhere, neon green, aurora/navy cast — the last two withdrawn
+by the owner from §B). `documentation/design.md` §5 records the graphite decision. Detectors for
+27–31 are the next ship; this one records the tells and the pages that carry them (gradient text 39
+pages, stat tiles 29, glass 106, hover lifts 73, marquee 4).
+
+**Found on the way — two audits that scanned nothing.** `audit-mobile-responsive.py` and
+`audit-script-tags.py` excluded any path containing `.cache` by matching the ABSOLUTE path, so in a
+git worktree under `~/.cache` they walked zero pages and exited 0 (`Pass: 0 Fail: 0`); every ship
+gate run from that worktree carried two vacuous audits. Both now match the repo-relative path and
+FAIL on an empty scan (291 pages scanned, 182 pass, 76 noindex, clean).
+
+**Also in this ship:** `index1.html`, a `noindex` mockup of the homepage in the same register (career
+as a single-line diagram, readouts panel, certification plates; `js/rz-home-scene.js`) for the
+owner's review before `index.html` is touched.
+
+**Gates:** `bash tools/ship-gate.sh` 123/123 and `probe-accuracy-validation` 82/82 from the worktree. The first full run failed one gate, `test-mobile-forms` (the command-palette input rendered 13.3px at 390px because this page no longer loads `styles.css`, where the site-wide 16px floor lives); the floor is now repeated in `css/rz-hub.css` and the gate re-run green. `audit-mobile-responsive.py` and `audit-script-tags.py` now report 291 pages scanned, where before this ship they reported 0 from a worktree.
+
 ## v3.21.19 — 2026-10-16
 
 ### "Verdicts": one judgement per chapter, a glossary that covers every abbreviation, numbered references
