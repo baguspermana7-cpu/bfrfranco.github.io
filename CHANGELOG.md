@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v3.21.14 — 2026-10-15
+
+### "Walkthrough": a guided tour of DH01 that reads its captions off the solve
+
+**Why.** The owner keeps asking for the CFD to be "super rich and immersive". A reader dropped into the 3D view still had to find the problem rack on their own. The tour takes them to it.
+
+**Added:**
+- **Guided tour button** in the 3D camera controls (`js/ltc-dh01-3d.js`), driven by `LTCCFDView.tourPlan` (`js/ltc-cfd-view.js`, pure). It makes six camera stops, each with a caption built from the current solve:
+  1. **The hall.** The fault, the hottest rack inlet and which rack it is (CFD when solved, else the balance solve), plus RCI HI and RTI.
+  2. **The cold aisle of the hottest rack.** The range of its rack inlets.
+  3. **That rack.** Its inlet and its inlet at the bottom, middle and top. Smoke is released automatically at its top front, so you watch the exhaust curl over the top.
+  4. **Its hot aisle.** The row's mean exhaust on its way to the plenum.
+  5. **The ceiling plenum.** Return and supply temperature at the coils, and the CRAHs out.
+  6. **Summary.** Racks over 27 °C in the CFD and in the balance solve. With four CRAHs out, after v3.21.13's recalibration, that reads 68 and 68.
+- Each stop eases in over 2.6 s and holds 4.2 s, or 7 s at the smoke stop. The tour ends on its own, when you press the button again, or when you drag the view. With reduced motion it cuts instead of flying.
+- The caption sits at the bottom of the stage and is announced to screen readers.
+
+**Gate.** W12a now also checks the tour:
+- six steps;
+- the named rack is the CFD's hottest, and its inlet is in the first caption;
+- the smoke point is in room air, outside any rack or contained hot aisle, on the cold-aisle side of the rack face;
+- no caption carries NaN or undefined, and every camera coordinate is finite.
+
+It was proven red with the coldest rack picked and with the smoke moved to the rack's hot side.
+
 ## v3.21.13 — 2026-10-15
 
 ### "Recalibrated": the DH01 balance solve now puts recirculated air where the CFD does

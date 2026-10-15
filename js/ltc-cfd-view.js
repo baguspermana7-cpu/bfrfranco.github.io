@@ -314,7 +314,30 @@
     return g.join('');
   }
 
+  /* guided tour: camera keyframes (scene metres, hall centred) with captions read off this solve, and
+     a smoke release at the hottest rack's top front. Pure: hall geometry, balance solve and CFD report in. */
+  function tourPlan(r, s, rep, o) {
+    var h = r.hall, p = r.input, L = h.lengthM, W = h.widthM, H = h.heightM, X0 = L / 2, Z0 = W / 2, dep = p.rackDepthM, pitch = p.rackPitchM, f1 = function (v) { return v.toFixed(1); };
+    var inl = rep && rep.inletMean && rep.inletMean.length === h.racks.length ? rep.inletMean : s.racks.map(function (k) { return k.inlet; }), src = rep && rep.inletMean ? 'CFD' : 'balance solve';
+    var hi = 0; inl.forEach(function (t, i) { if (t > inl[hi]) hi = i; });
+    var k = h.racks[hi], ai = h.aisles[k.aisle], az = (ai.y0 + ai.y1) / 2, front = ai.y1 <= k.y + 1e-9 ? k.y : k.y + dep, toward = az < front ? -1 : 1, xc = k.x + pitch / 2;
+    var row = h.rowsY[k.row], hz = row.hotY0 + p.hotAisleM / 2, inA = inl.filter(function (t, i) { return h.racks[i].aisle === k.aisle; });
+    var prof = rep && rep.profile && rep.profile[hi], band = function (y) { if (!prof) return null; var f = y / rep.profDy - 0.5, j = Math.max(0, Math.min(prof.length - 1, Math.floor(f))), a = Math.max(0, Math.min(1, f - j)); return j + 1 < prof.length ? prof[j] * (1 - a) + prof[j + 1] * a : prof[j]; };
+    var rowEx = s.racks.filter(function (q) { return h.rowsY[q.row].hotY0 === row.hotY0; }), exM = rowEx.reduce(function (a, q) { return a + q.exhaust; }, 0) / rowEx.length;
+    var dead = s.crahOut ? Object.keys(s.crahOut).length : 0, X = function (x) { return x - X0; }, Z = function (z) { return z - Z0; }, idx = rep && rep.idx;
+    var steps = [
+      { p: [L * 0.62, Math.max(L, W) * 0.78, W * 0.95], t: [0, 0.8, 0], caption: (o && o.fault ? o.fault + ' · ' : '') + 'hottest rack inlet ' + f1(inl[hi]) + ' °C at rack ' + ((k.i != null ? k.i : hi) + 1) + ', row ' + (k.row + 1) + ' (' + src + ')' + (idx ? ' · RCI HI ' + idx.rciHi.toFixed(0) + ' % · RTI ' + idx.rti.toFixed(0) + ' %' : '') },
+      { p: [X(0.8), 1.6, Z(az)], t: [X(L), 1.1, Z(az)], caption: 'Cold aisle ' + (k.aisle + 1) + ': supply enters from both fan walls; its rack inlets run ' + f1(Math.min.apply(null, inA)) + '–' + f1(Math.max.apply(null, inA)) + ' °C (' + src + ')' },
+      { p: [X(xc + 5), 1.9, Z(az + toward * 0.3)], t: [X(xc), 1.6, Z(front)], smoke: [xc, Math.min(2.15, H - 0.2), front + toward * 0.25], caption: 'Rack ' + ((k.i != null ? k.i : hi) + 1) + ': inlet ' + f1(inl[hi]) + ' °C' + (prof ? ', bottom · middle · top ' + [1, 3, 5].map(function (q) { return f1(band(2 * q / 6)); }).join(' · ') + ' °C' : '') + '. Smoke released at its top front: watch where it goes' },
+      { p: [X(xc + 3), 3.6, Z(hz)], t: [X(xc - 4), 1.0, Z(hz)], caption: 'Hot aisle behind row ' + (k.row + 1) + ', contained up to the ceiling: exhaust averages ' + f1(exM) + ' °C on its way to the plenum' },
+      { p: [X(-2), H - 0.3, Z(1)], t: [X(L), H - 0.6, Z(W)], caption: 'Ceiling plenum: return to the CRAH coils at ' + f1(rep && rep.ret != null ? rep.ret : s.returnC) + ' °C, supply ' + f1(rep && rep.supply != null ? rep.supply : s.supply) + ' °C' + (dead ? ' · ' + dead + ' CRAH' + (dead > 1 ? 's' : '') + ' out' : '') },
+      { p: [L * 0.62, Math.max(L, W) * 0.78, W * 0.95], t: [0, 0.8, 0], caption: (rep && rep.over27 != null ? rep.over27 + ' racks over 27 °C in the CFD, ' : '') + s.over27 + ' in the balance solve · drag to explore, click to release smoke anywhere' }
+    ];
+    steps.forEach(function (q, i) { q.d = i ? 2600 : 1200; q.hold = q.smoke ? 7000 : 4200; });
+    return { rack: hi, steps: steps };
+  }
+
   root.LTCCFDView = { cellT: cellT, cellField: cellField, vel: vel, solidAt: solidAt, centred: centred, vorticity: vorticity, pct: pct, probe: probe, pack: pack,
-    volume: volume, volumeFrame: volumeFrame, trails: trails, trailStep: trailStep, smoke: smoke, smokeStep: smokeStep, historySvg: historySvg, scatterSvg: scatterSvg, scatterStats: scatterStats, SMOKE_N: SMOKE_N, SMOKE_D: SMOKE_D, PUFF_N: PUFF_N, T_LO: T_LO, T_HI: T_HI, SP_MAX: SP_MAX, TI_MAX: TI_MAX, TRAIL_N: TRAIL_N, TRAIL_K: TRAIL_K };
+    volume: volume, volumeFrame: volumeFrame, trails: trails, trailStep: trailStep, smoke: smoke, smokeStep: smokeStep, historySvg: historySvg, tourPlan: tourPlan, scatterSvg: scatterSvg, scatterStats: scatterStats, SMOKE_N: SMOKE_N, SMOKE_D: SMOKE_D, PUFF_N: PUFF_N, T_LO: T_LO, T_HI: T_HI, SP_MAX: SP_MAX, TI_MAX: TI_MAX, TRAIL_N: TRAIL_N, TRAIL_K: TRAIL_K };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCCFDView;
 })(typeof window !== 'undefined' ? window : globalThis);

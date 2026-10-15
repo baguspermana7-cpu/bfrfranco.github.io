@@ -535,7 +535,14 @@ for (const [page, mod] of Object.entries(PAGES)) {
       const hv = V3.historySvg([{ t: 1, max: 30, mean: 25, ret: 35 }, { t: 2, max: 31, mean: 26, ret: 36 }], s.maxInlet, 400);
       if (dots.length !== bi.length || !sv.includes('RMS ' + rms.toFixed(1) + ' K') || Math.abs(stt.rms - rms) > 1e-9 || stt.both + stt.onlyCfd !== r.inletMean.filter((t) => t > 27).length || (hv.match(/<path /g) || []).length !== 3 || /NaN|undefined/.test(sv + hv))
         bad.push(`charts: ${dots.length} dots for ${bi.length} racks, RMS ${stt.rms.toFixed(3)} vs ${rms.toFixed(3)}, ${(hv.match(/<path /g) || []).length} history lines`);
-      ok('W12a', !bad.length, `DH01 CFD air management: RCI HI/LO, RTI and SHI match their formulas on hand-made inlets; on crah4 the inlet profile by height averages back to each rack's inlet and the solve reads as recirculation (RTI ${x.rti.toFixed(0)} %, SHI ${x.shi.toFixed(2)}, RCI HI ${x.rciHi.toFixed(0)} %); the charts carry one dot per rack and the RMS they print` + (bad.length ? ' — ' + bad.join('; ') : ''));
+      // guided tour: six steps read off this solve, the hottest rack named, the smoke released in room air in front of it
+      const tp = V3.tourPlan(R, s, r, { fault: '4 CRAHs lost' }), hi = r.inletMean.indexOf(Math.max(...r.inletMean)), sm = tp.steps.find((q) => q.smoke), Fr2 = { nx: C.nx, ny: C.ny, nz: C.nz, dx: C.dx };
+      const smc = sm && C.solid[Math.floor(sm.smoke[0] / C.dx) + C.nx * (Math.floor(sm.smoke[1] / C.dx) + C.ny * Math.floor(sm.smoke[2] / C.dx))];
+      if (tp.steps.length !== 6 || tp.rack !== hi || !tp.steps[0].caption.includes(r.inletMean[hi].toFixed(1)) || !sm || smc || V3.solidAt(Fr2, C.solid, ...sm.smoke) || C.hot[Math.floor(sm.smoke[0] / C.dx) + C.nx * (Math.floor(sm.smoke[1] / C.dx) + C.ny * Math.floor(sm.smoke[2] / C.dx))]
+          || (() => { const k = R.hall.racks[hi], ai = R.hall.aisles[k.aisle], az = (ai.y0 + ai.y1) / 2, fr = ai.y1 <= k.y + 1e-9 ? k.y : k.y + R.input.rackDepthM; return !(Math.abs(sm.smoke[2] - az) < Math.abs(fr - az)); })()
+          || tp.steps.some((q) => /NaN|undefined/.test(q.caption) || q.p.concat(q.t).some((v) => !isFinite(v))))
+        bad.push(`tour: ${tp.steps.length} steps, rack ${tp.rack} vs hottest ${hi}, smoke ${sm && sm.smoke.map((v) => v.toFixed(2))}`);
+      ok('W12a', !bad.length, `DH01 CFD air management: RCI HI/LO, RTI and SHI match their formulas on hand-made inlets; on crah4 the inlet profile by height averages back to each rack's inlet and the solve reads as recirculation (RTI ${x.rti.toFixed(0)} %, SHI ${x.shi.toFixed(2)}, RCI HI ${x.rciHi.toFixed(0)} %); the charts carry one dot per rack and the RMS they print; the guided tour names the hottest rack and releases its smoke in room air` + (bad.length ? ' — ' + bad.join('; ') : ''));
     }
     ok('W12g', good, `DH01 CFD grid check: the 0.6 m solve (crah4, inlets averaged over 40 s) agrees with the 0.3 m second-order solve — hottest inlet ${mx.toFixed(2)} °C vs ${REF.max}, racks > 27 °C ${o27} vs ${REF.o27}, > 32 °C ${o32} vs ${REF.o32} (within 1 K, 6 and 4 racks)`);
   }
