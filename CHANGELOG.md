@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v3.22.1 — 2026-10-16
+
+### The gate learns the eight tells the owner found on the hub — and its own fixture suite joins the ship gate
+
+**Fix:** `tools/audit-vibecode.mjs` gains one detector per ANTI_VIBECODE §A row 27–34: `gradient-text`,
+`glass-token` (the `--glass-*` family, not only the blur), `stat-strip` (≥ 3 stat/metric/kpi tiles outside the
+instrument register), `hover-lift` (any `:hover` lift ≥ 2px on a decorative block, whichever block holds the
+transition — the split that let the hub's tiles through), `keyword-marquee`, `neon-green` and `aurora-navy`
+(by HUE BAND, not one hex: neon h 95–170° s ≥ .9; navy h 205–250° s ≥ .3 l ≤ .14 — graphite `#0b0c0e` is
+outside, `#0a0e1a` and the site's `#0f172a` inside), `serif-display-chrome` (a serif display face, or
+mono-uppercase on nav/buttons). Proven RED 8/8 against the v3.21.19 `datacenter-solutions.html`, GREEN on
+the v3.22.0 page. Scope: GATING on the hub family (`HUB_STRICT`), MONITORED with a printed per-rule count
+everywhere else, flip condition written in the standard. Monitor rows today: aurora-navy 162 · serif 126 ·
+neon-green 109 · hover-lift 58 · stat-strip 47 · gradient-text 23 · glass-token 11 · marquee 3 (539 findings,
+278 files — the honest backlog, every row sampled and real).
+
+**Found on the way — the fourth "gate that exists but is not wired":** `tools/test-audit-vibecode.mjs` was never
+in `ship-gate.sh`. Four of its fixtures seeded `8px` against the audit's `> 8` ceiling (changed with the
+register rule in v3.11.12) and had sat red since; nobody ran it. Seeds moved one step above each ceiling
+(9px / .625rem / editorial 11px), suite 20/20, and it is now gate 1 of the anti-vibecode pair.
+
+**Gates:** the static set from the worktree — script-tags, js-syntax, version-stamp (272/279), css-structure, anti-vibecode --strict (0 gating, 539 monitored), anti-vibecode fixtures 20/20, mobile scorer, crawler 36/36, agent-harness parity, changelog --check, gate-wiring, ltc-workbench 344/344, cache tokens. The browser gates were NOT re-run for this ship: it changes tools, standards, the changelog and cache tokens only, and no page markup or stylesheet; v3.22.0's full run (123/123, probe 82/82) stands for the rendered surfaces.
+
+---
+
 ## v3.22.0 — 2026-10-16
 
 ### "Stage": the DC Solutions hub becomes one drawing and one camera — and the gate learns the tells it was blind to

@@ -180,6 +180,10 @@ gate "telemetry docs — browser, a11y, mobile, and gate safety" node tools/test
 # in both stylesheets) were fixed in v1.135.0, so there is nothing left to defer behind.
 # A monitor that is read as a gate is worse than no gate: it is a green light nobody earned.
 gate "anti-vibecode — hard-banned design tokens" node tools/audit-vibecode.mjs --strict
+# v3.22.1 — the audit's own fixture suite was never in this file: four fixtures sat red for months
+# (seeded 8px against a `> 8` ceiling) and nobody saw, the fourth instance of "a gate that exists but
+# is not wired". §A27–34 (the tells the owner found on the hub) are proven RED→GREEN here.
+gate "anti-vibecode fixtures — every detector RED on its seed, GREEN on the register" node --test tools/test-audit-vibecode.mjs
 # auth.js injects its own stylesheet from a JS array, which audit-vibecode cannot read (static CSS only).
 # This reads the same array the browser gets, hover states included, and keeps the plaintext
 # manual-account path retired (v3.19.1).

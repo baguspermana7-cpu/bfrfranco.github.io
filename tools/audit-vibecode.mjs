@@ -483,8 +483,119 @@ const RULES = [
       return hits.length ? `${hits.length} decorative hover(s) moving on \`transition: all\`: ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
     } },
 
+  /* ── §A 27–34: the tells the owner found on the hub page, 2026-10-15, that this audit passed. ──
+     Each one is SCOPED: gating on the hub family (HUB_STRICT), MONITOR everywhere else with the
+     count printed, the way the coverage gate went 24 % → 100 %. Flip condition per rule: a page
+     goes strict when its own row reads zero, and the rule goes strict site-wide when the
+     monitor table is empty. Proven RED on the v3.21.19 hub page in tools/test-audit-vibecode.mjs. */
+  { id: "gradient-text", scoped: true,                                // §A rule 27
+    test: (t) => {
+      const hits = cssBlocks(t).filter((b) =>
+        /(?:-webkit-)?background-clip:\s*text/i.test(b.body)
+        && /background(?:-image)?:\s*[^;]*gradient\(/i.test(b.body));
+      return hits.length ? `${hits.length} gradient-text block(s): ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
+    } },
+
+  { id: "glass-token", scoped: true,                                  // §A rule 28
+    /* glass-decoration resolves `var(--glass-blur)`; this catches the REST of the token family
+       (`--glass-bg`, `--glass-border` …) used on a decorative block, which is glass by name
+       even when the blur itself is declared elsewhere. */
+    test: (t) => {
+      const hits = decorBlocks(t).filter((b) => /var\(--glass-[a-z-]*\)/i.test(b.body));
+      return hits.length ? `${hits.length} decorative block(s) on --glass-* tokens: ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
+    } },
+
+  { id: "stat-strip", scoped: true,                                   // §A rule 29
+    /* Three or more sibling tiles whose class says stat/metric/kpi, outside the instrument
+       register (a cockpit's readouts ARE the content). Markup, not CSS: the tile's selector
+       is the same vocabulary on every page that has one. */
+    test: (t) => {
+      if (/data-rz-register="instrument"/.test(t)) return null;
+      const tiles = t.match(/class="[^"]*\b(?:stat|metric|kpi)[-_]?(?:item|card|tile|box|block)\b[^"]*"/gi) || [];
+      return tiles.length >= 3 ? `${tiles.length} stat tiles in a strip (one mono metabar line, or nothing)` : null;
+    } },
+
+  { id: "hover-lift", scoped: true,                                   // §A rule 30
+    /* excessive-hover needs `transition: all` IN THE SAME BLOCK; the hub page split them and
+       walked through. The lift is the tell, wherever the transition lives. */
+    test: (t) => {
+      const hits = decorBlocks(t).filter((b) => {
+        if (!/:hover/.test(b.sel)) return false;
+        const m = /transform:[^;]*translate(?:Y|3d)?\(\s*(?:[^,)]*,\s*)?-(\d*\.?\d+)(px|rem)/i.exec(b.body);
+        if (!m) return false;
+        const px = m[2] === 'rem' ? parseFloat(m[1]) * PIXELS_PER_REM : parseFloat(m[1]);
+        return px >= 2;
+      });
+      return hits.length ? `${hits.length} decorative hover lift(s): ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
+    } },
+
+  { id: "keyword-marquee", scoped: true,                              // §A rule 31
+    test: (t) => (/rz-marquee|marquee-track|@keyframes\s+(?:rz-)?marquee\b/i.test(t)
+      ? "keyword marquee / ticker (carries no information — delete)" : null) },
+
+  { id: "neon-green", scoped: true,                                   // §A rule 32
+    /* By hue band, not by one hex (memory: banning `#8b5cf6` by string left 1,238 same-hue
+       literals live). Hue 95–170°, saturation ≥ 0.9, lightness 0.4–0.65 is the oscilloscope
+       neon the owner named; a muted status green (lower saturation) is not in the band. */
+    test: (t) => {
+      const hits = colourLiterals(t).filter(([, h, s, l]) => h >= 95 && h <= 170 && s >= 0.9 && l >= 0.4 && l <= 0.65);
+      return hits.length ? `${hits.length} neon-green literal(s): ${[...new Set(hits.map((h) => h[0]))].slice(0, 4).join(', ')}` : null;
+    } },
+
+  { id: "aurora-navy", scoped: true,                                  // §A rule 33
+    /* Two halves of one tell: the aurora mesh (named `aurora-*` wherever it appears) and the
+       blue-navy cast of a page background — a dark surface with a blue hue and real
+       saturation. Graphite (#0b0c0e, s ≈ 0.12) is below the band; #0a0e1a (s ≈ 0.44) is in it. */
+    test: (t) => {
+      const aurora = cssBlocks(t).filter((b) => /aurora/i.test(b.sel)).length;
+      const navy = (t.match(/(?:background(?:-color)?|--[a-z0-9-]*bg[a-z0-9-]*)\s*:\s*(#[0-9a-f]{3,8})\b/gi) || [])
+        .map((d) => d.match(/#[0-9a-f]{3,8}/i)[0])
+        .filter((hex) => { const c = hexToHsl(hex); return c && c[0] >= 205 && c[0] <= 250 && c[1] >= 0.3 && c[2] <= 0.14; });
+      if (!aurora && !navy.length) return null;
+      return [aurora ? `${aurora} aurora block(s)` : null, navy.length ? `navy-cast background(s): ${[...new Set(navy)].slice(0, 3).join(', ')}` : null].filter(Boolean).join('; ');
+    } },
+
+  { id: "serif-display-chrome", scoped: true,                         // §A rule 34
+    /* A serif display face on headings / hero, or tracked mono-uppercase on nav and buttons.
+       Mono uppercase on a tag, eyebrow, figure label or stamp is the register, not the tell. */
+    test: (t) => {
+      const serif = /font-family:[^;}]*\b(?:Fraunces|Playfair|Newsreader|Instrument Serif|Cormorant|Lora|Merriweather|DM Serif)\b/i.test(t)
+        || /family=(?:Fraunces|Playfair|Newsreader|Instrument\+Serif|Cormorant|Lora|Merriweather|DM\+Serif)/i.test(t);
+      const chrome = cssBlocks(t).filter((b) =>
+        finalCompounds(b.sel).some((c) => /(?:^|[.\s])(?:nav-link|nav-links|navbar|btn|button|cta)\b/i.test(c))
+        && /text-transform:\s*uppercase/i.test(b.body)
+        && /font-family:[^;]*mono/i.test(b.body));
+      if (!serif && !chrome.length) return null;
+      return [serif ? 'serif display face' : null, chrome.length ? `${chrome.length} mono-uppercase nav/button block(s): ${chrome.slice(0, 3).map((h) => h.sel).join(', ')}` : null].filter(Boolean).join('; ');
+    } },
+
   ...Array.from(DECORATIVE_RULES, id => ({ id })),
 ];
+
+/* The pages where §A27–34 GATE today. Everything else is monitored with its count printed. */
+const HUB_STRICT = new Set(['datacenter-solutions.html', 'css/rz-hub.css', 'js/rz-hub.js', 'js/rz-hub-scene.js', 'js/rz-home-scene.js', 'index1.html']);
+
+function hexToHsl(hex) {
+  let h = hex.slice(1);
+  if (h.length === 3 || h.length === 4) h = h.split('').map((c) => c + c).join('');
+  if (h.length !== 6 && h.length !== 8) return null;
+  const r = parseInt(h.slice(0, 2), 16) / 255, g = parseInt(h.slice(2, 4), 16) / 255, b = parseInt(h.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min, s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let hue = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [hue * 60, s, l];
+}
+/* Every colour literal in the text as [literal, h, s, l]: #rgb/#rrggbb and rgb()/rgba(). */
+function colourLiterals(t) {
+  const out = [];
+  for (const m of t.matchAll(/#(?:[0-9a-f]{6}|[0-9a-f]{3})\b/gi)) { const c = hexToHsl(m[0]); if (c) out.push([m[0], ...c]); }
+  for (const m of t.matchAll(/rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/gi)) {
+    const hex = '#' + [m[1], m[2], m[3]].map((n) => Math.min(255, +n).toString(16).padStart(2, '0')).join('');
+    const c = hexToHsl(hex); if (c) out.push([m[0] + ')', ...c]);
+  }
+  return out;
+}
 
 const files = walk(ROOT);
 const findings = [];
@@ -515,7 +626,7 @@ for (const f of files) {
     const m = blocks ? (blocks.length ? `${blocks.length} decorative block(s): ${blocks.map(block => block.sel).join(', ')}` : null) : r.test(t, f);
     if (!m) continue;
     const rel = f.replace(ROOT + "/", "");
-    findings.push({ file: rel, rule: r.id, msg: m, blocks, monitor: false });
+    findings.push({ file: rel, rule: r.id, msg: m, blocks, monitor: Boolean(r.scoped) && !HUB_STRICT.has(rel) });
   }
 }
 
@@ -558,6 +669,11 @@ if (!findings.length) { console.log("No detected findings in this static scope; 
 
 for (const [rule, fs] of Object.entries(group(gating))) {
   console.log(`  ✗ ${rule}: ${fs.length} file(s) — ${fs.slice(0, 4).join(", ")}${fs.length > 4 ? " …" : ""}`);
+}
+const monitorRows = Object.entries(group(monitored));
+if (monitorRows.length) console.log(`  ○ MONITOR — §A27–34 gate on ${[...HUB_STRICT].join(', ')}; a page flips strict when its own row reads zero:`);
+for (const [rule, fs] of monitorRows) {
+  console.log(`  ○ ${rule}: ${fs.length} file(s) — ${fs.slice(0, 3).join(', ')}${fs.length > 3 ? ' …' : ''}`);
 }
 console.log(`── ${gating.length} gating + ${monitored.length} monitored finding(s) across ${new Set(findings.map((f) => f.file)).size} file(s). See standarization/ANTI_VIBECODE_STANDARD.md`);
 if (!gating.length) console.log("── no gating findings in this scope; monitored findings and visual review remain unresolved. Not a ship clearance.");

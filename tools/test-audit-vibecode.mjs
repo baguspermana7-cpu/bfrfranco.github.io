@@ -20,8 +20,11 @@ function scan(css, { file = 'fixture.css', args = [] } = {}) {
   }
 }
 
+/* v3.22.1 — these fixtures seeded 8px while the audit's unscoped ceiling is `> 8` (editorial > 10,
+   instrument > 3) since the register change; the file was never in ship-gate.sh, so four of them
+   sat red for months. Seeds now sit one step ABOVE each ceiling. */
 test('decorative rules gate beyond the flagship and expose every block', () => {
-  const result = scan('.card { border-radius: 8px; border-left: 3px solid red; } .panel { border-radius: 12px; }');
+  const result = scan('.card { border-radius: 9px; border-left: 3px solid red; } .panel { border-radius: 12px; }');
   assert.equal(result.status, 1);
   assert.equal(result.report.findings.find(finding => finding.rule === 'large-radius').blocks.length, 2);
   assert.ok(result.report.inventory.excludedNames.includes('dcmoc'));
@@ -38,7 +41,7 @@ test('none, zero and transparent borders cannot disguise shadow-only cards', () 
 });
 
 test('detect decimal, shorthand and rem radii and logical callout rails', () => {
-  for (const radius of ['8.5px', '.5rem', '4px 12px', '4px / 12px']) {
+  for (const radius of ['8.5px', '.625rem', '4px 12px', '4px / 12px']) {
     assert.equal(scan(`.card { border-radius: ${radius}; }`).status, 1, radius);
   }
   assert.equal(scan('.callout { border-inline-start: 3.5px solid red; }').status, 1);
@@ -58,7 +61,7 @@ test('preserve print, geometry, photos, functional UI and protected aurora', () 
 });
 
 test('print exemption cannot leak; braces in strings do not break extraction', () => {
-  const result = scan('@media print { .card { border-radius: 12px; } } .card::before { content: "}"; border-radius: 8px; }');
+  const result = scan('@media print { .card { border-radius: 12px; } } .card::before { content: "}"; border-radius: 9px; }');
   assert.equal(result.status, 1);
   assert.equal(result.report.findings[0].blocks.length, 1);
 });
@@ -81,7 +84,7 @@ test('semantic safety-state rails remain functional, decorative warnings still f
 
 test('page rules never exempt screen CSS and prefixed selectors resolve root tokens', () => {
   assert.equal(scan('@page { margin: 2cm; } .card { border-radius: 12px; }').status, 1);
-  assert.equal(scan('html[data-rz-register="editorial"] .card { border-radius: 8px; }').status, 1);
+  assert.equal(scan('html[data-rz-register="editorial"] .card { border-radius: 11px; }').status, 1);
   assert.equal(scan(':root { --radius-card: 12px; } html[data-rz-register="editorial"] .card { border-radius: var(--radius-card); }').status, 1);
 });
 
@@ -155,4 +158,67 @@ test('a modal backdrop is functional, not decorative glass', () => {
 test('functional blur on a sticky header stays exempt', () => {
   const result = scan('.navbar.scrolled { backdrop-filter: saturate(180%) blur(14px); }');
   assert.ok(!result.report.findings.some(f => f.rule === 'glass-decoration'));
+});
+
+/* §A 27–34 — the tells the owner found on the hub page (2026-10-15) that the audit passed.
+   Each fixture is the shape the v3.21.19 datacenter-solutions.html actually carried. They GATE
+   on the hub family and are MONITORED elsewhere; both halves are asserted. */
+const HUB = 'datacenter-solutions.html';
+const TELLS = {
+  'gradient-text': '.hero h1 { background: linear-gradient(90deg, #0ea5e9, #6366f1); -webkit-background-clip: text; color: transparent; }',
+  'glass-token': '.stat-item { background: var(--glass-bg); border: 1px solid var(--glass-border); }',
+  'stat-strip': '<div class="stat-item"><b>12+</b></div><div class="stat-item"><b>12</b></div><div class="stat-item"><b>7</b></div>',
+  'hover-lift': '.tool-card { transition: border-color 200ms; } .tool-card:hover { transform: translateY(-5px); }',
+  'keyword-marquee': '<div class="rz-marquee"><div class="rz-marquee-track">LIQUID COOLING</div></div>',
+  'neon-green': '.ds-tag { color: #00FF88; }',
+  'aurora-navy': '.hero-aurora { position: absolute; } body { background: #0a0e1a; }',
+  'serif-display-chrome': '.hero h1 { font-family: "Fraunces", serif; } .nav-link { font-family: "JetBrains Mono", monospace; text-transform: uppercase; letter-spacing: .1em; }',
+};
+
+test('§A27–34 gate on the hub family, one rule per tell', () => {
+  for (const [rule, css] of Object.entries(TELLS)) {
+    const result = scan(css, { file: HUB });
+    assert.equal(result.status, 1, rule);
+    const hit = result.report.findings.find(finding => finding.rule === rule);
+    assert.ok(hit && !hit.monitor, `${rule} must gate on ${HUB}`);
+  }
+});
+
+test('§A27–34 are MONITORED, not gating, outside the hub family', () => {
+  for (const [rule, css] of Object.entries(TELLS)) {
+    const result = scan(css, { file: 'article-99.html' });
+    assert.equal(result.status, 0, rule);
+    const hit = result.report.findings.find(finding => finding.rule === rule);
+    assert.ok(hit && hit.monitor, `${rule} must be monitored on a page outside the hub family`);
+  }
+});
+
+test('§A27–34 do not fire on the hub register itself', () => {
+  const clean = `
+    .hub-hero h1 { font-family: "IBM Plex Sans", sans-serif; color: var(--rz-text-primary); }
+    .nav-link { font-family: "IBM Plex Sans", sans-serif; }
+    .hub-tag { font-family: "JetBrains Mono", monospace; text-transform: uppercase; letter-spacing: .1em; }
+    .hub-tile { background: var(--rz-bg-elevated); border: 1px solid var(--rz-line-tier-2); transition: border-color 200ms; }
+    .hub-tile:hover { border-color: var(--rz-accent-signal); }
+    body { background: #0b0c0e; } .x { background: #121316; } .y { background: #191b1f; }
+    .ok { color: #16a34a; } .amber { color: #FFAA00; }
+    <div class="stat-item"></div><div class="stat-item"></div>
+  `;
+  const result = scan(clean, { file: HUB });
+  assert.equal(result.status, 0, JSON.stringify(result.report.findings.map(finding => finding.rule)));
+});
+
+test('neon green is a hue band, not one hex; navy is saturation, not darkness', () => {
+  for (const hex of ['#00ff88', '#0f8', '#39ff14', '#00E07A', 'rgb(0, 255, 136)']) {
+    assert.equal(scan(`.tag { color: ${hex}; }`, { file: HUB }).status, 1, hex);
+  }
+  for (const hex of ['#10b981', '#16a34a', '#7DDDB4']) {
+    assert.equal(scan(`.tag { color: ${hex}; }`, { file: HUB }).status, 0, hex);
+  }
+  for (const hex of ['#0a0e1a', '#0f172a', '#0a1220']) {
+    assert.equal(scan(`body { background: ${hex}; }`, { file: HUB }).status, 1, hex);
+  }
+  for (const hex of ['#0b0c0e', '#121316', '#08090b', '#1b1d22']) {
+    assert.equal(scan(`body { background: ${hex}; }`, { file: HUB }).status, 0, hex);
+  }
 });

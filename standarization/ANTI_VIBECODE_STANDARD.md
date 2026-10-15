@@ -356,6 +356,24 @@ As of v1.135.2 the gate is **strict**, and coverage is:
 | Render-hosted (needs computed geometry, not text) | 20, 25 | 2 |
 | **Un-gateable judgement calls — declared, not faked** | 13, 16 | 2 |
 
+### §A27–34 detectors (v3.22.1) — strict on the hub family, MONITOR everywhere else
+
+Eight detectors in `tools/audit-vibecode.mjs`, one per row 27–34 (`gradient-text`, `glass-token`,
+`stat-strip`, `hover-lift`, `keyword-marquee`, `neon-green`, `aurora-navy`, `serif-display-chrome`).
+Proven RED 8/8 on the v3.21.19 `datacenter-solutions.html` and GREEN on the v3.22.0 page; fixtures in
+`tools/test-audit-vibecode.mjs` (now in `ship-gate.sh` — it never was, and four of its fixtures had
+sat red for months). Scope: GATING on `HUB_STRICT` (the hub page, `css/rz-hub.css`, the hub/home scene
+scripts, `index1.html`); MONITORED with a printed count everywhere else. Flip condition: a page goes
+strict when its own row reads zero; a rule goes strict site-wide when its monitor row is empty.
+
+Measured 2026-10-16 (monitor rows): aurora-navy 162 files (the site's `#0f172a` dark default IS the
+navy cast) · serif-display-chrome 126 (the Fraunces font link on every page) · neon-green 109
+(`#00FF88` 74, the instrument register's `#22F5A8`/`#00E07A` status greens among the rest — a cockpit's
+NORMAL state colour is a semantic choice the owner decides, not a sweep) · hover-lift 58 · stat-strip
+47 · gradient-text 23 · glass-token 11 · keyword-marquee 3. `neon-green` and `aurora-navy` match by
+HUE BAND (neon: h 95–170°, s ≥ .9, l .4–.65; navy: h 205–250°, s ≥ .3, l ≤ .14), never by one hex —
+banning `#8b5cf6` by string once left 1,238 same-hue literals live.
+
 ### Monitor + strict scope (v1.135.2) — OBSOLETE, see the note below
 
 > **Re-measured 2026-10-03 (v3.11.12): this carve-out no longer describes the tool, and the backlog
