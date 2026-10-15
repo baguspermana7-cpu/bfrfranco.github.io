@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v3.21.19 — 2026-10-16
+
+### "Verdicts": one judgement per chapter, a glossary that covers every abbreviation, numbered references
+
+**Why.** v3.21.18 made the report a paper document; the owner's standing bar is "detail dan sangat clear". A 27-page report is clear only if a reader knows where to look first and never has to ask what a term means.
+
+**Report** (`js/ltc-report.js`):
+- **Verdict by chapter** after the key findings: twelve rows (thirteen from the Model page), each a sentence of the engine's own numbers with a status — holds, review, fails — and a link to the chapter. The lines are written into each verdict, not hidden: PUE against 1.25 good practice and the Uptime 2024 survey average 1.56; WUE against 1.0 and the LBNL typical 1.8 L/kWh; ride-through against 5 min (a controls response) and 1 min; DH01 judged on the single-element faults the design basis covers (a CDU, a CRAH, a chiller, a CDU feeder), with the beyond-N+1 cases reported, not judged. On the default plant the single CDU feed shows up three times — electrical, DH01, heat load test — and a dual feed clears all three.
+- **Glossary**: 50 entries, every abbreviation the report uses, from A1 to WUE, including the metering points M0–M3 and the liquid classes.
+- **References**: nine numbered sources (ASHRAE TC 9.9 thermal and liquid guidelines, Uptime Tier Standard and 2024 survey, ISO/IEC 30134 parts 2/3/6/8/9, NFPA 75 and 2001, ANSI/TIA-942, OCP, LBNL).
+
+**Gate** (W12v, 344 assertions): each status is checked against a plant that must flip it (dual CDU feed, no CRAH spare, the cheapest configuration); every abbreviation token in the built report must be a glossary term; every verdict links to the chapter it judges; references and glossary are in the contents. Two mutants red: a verdict that ignores the plant, a glossary entry renamed.
+
 ## v3.21.18 — 2026-10-15
 
 ### "Paper": the engineering report is a PDF document, and the Model page exports it too

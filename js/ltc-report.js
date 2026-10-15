@@ -29,7 +29,7 @@
   /* sections number themselves in the order they are written; the contents list is built from them */
   var TOC = [];
   /* chapters that open a figure start on a new page; these short, table-only ones follow on */
-  var FLOW = { 'Liquid path': 1, 'Air path': 1, 'Electrical & sizing': 1, 'Redundancy register': 1, 'Standards cross-check': 1, 'Assumptions & limits': 1, 'Data': 1 };
+  var FLOW = { 'Liquid path': 1, 'Air path': 1, 'Electrical & sizing': 1, 'Redundancy register': 1, 'Standards cross-check': 1, 'Assumptions & limits': 1, 'References': 1, 'Data': 1 };
   function sec(id, n, title, lead, body) {
     TOC.push({ title: title, lead: String(lead || '').replace(/<[^>]+>/g, '') }); n = TOC.length;
     return '<section id="s' + n + '"' + (FLOW[title] ? ' class="flow"' : '') + '><h2><span class="no">' + n + '</span>' + esc(title) + '</h2>' + (lead ? '<p class="lead">' + lead + '</p>' : '') + body + '</section>';
@@ -327,6 +327,126 @@
     return html;
   }
 
+  /* ---- one verdict per chapter, from the numbers: the reader sees where to look first -------
+     Thresholds are stated, not hidden: PUE against the Uptime Institute 2024 survey average (1.56)
+     and a 1.25 good-practice line; WUE against the LBNL 1.8 L/kWh typical and 1.0; ride-through
+     against 5 min (a controls response) and 1 min. */
+  var SINGLE = { cdu: 1, crah1: 1, chiller: 1, 'cdu-feeder': 1 };
+  var TAG = { ok: 'ok', y: 'y', bad: 'bad' }, TAGWORD = { ok: 'holds', y: 'review', bad: 'fails' };
+  function verdicts(R, ctx) {
+    var T = R.totals, A = R.annual, p = R.input, reg = register(R), V = [];
+    function v(ch, status, text) { V.push({ chapter: ch, status: status, text: text }); }
+    v('Heat balance', Math.abs(R.design.balanceErr) < 1 ? 'ok' : 'bad', 'closes to ' + f(Math.abs(R.design.balanceErr), 3) + ' kW');
+    var trimPct = T.hours ? 100 * T.trimHours / T.hours : 0;
+    v('Liquid path', trimPct === 0 ? 'ok' : trimPct < 50 ? 'y' : 'bad', trimPct === 0 ? 'the ' + R.liquid.coolerType + 's carry the liquid heat every hour of the year'
+      : 'trim chillers run ' + f(trimPct) + ' % of the year (' + f(T.trimHours) + ' h); ' + f(R.liquid.trimShareDesign * 100) + ' % of the FWS heat on the design day');
+    v('Air path', p.crahRedundancy > 0 && R.air.chillersTotal > R.air.chillersN ? 'ok' : 'bad', 'CRAHs N+' + p.crahRedundancy + ' per hall, chillers ' + R.air.chillersN + '+' + (R.air.chillersTotal - R.air.chillersN) + ', COP ' + f(R.air.chillerCop, 2) + ' on the design day');
+    v('Electrical & sizing', R.power.upsTopology === '2N' || p.cduFeed === 'dual' ? 'ok' : 'y', 'UPS ' + R.power.upsTopology + ', generators N+' + (R.power.genTotal - R.power.genN) + ', CDU feed ' + p.cduFeed + (p.cduFeed === 'dual' ? '' : ': one feeder lost drops half the CDUs'));
+    var hold = reg.filter(function (r) { return (r[2] - 1) * r[3] >= r[4] - 0.5; }), miss = reg.filter(function (r) { return (r[2] - 1) * r[3] < r[4] - 0.5; });
+    v('Redundancy register', miss.length ? 'bad' : 'ok', hold.length + ' of ' + reg.length + ' equipment classes carry the load with one unit out' + (miss.length ? ': ' + miss.map(function (r) { return r[0]; }).join(', ') + ' do not' : ''));
+    if (ctx.fit) v('Tier topology', ctx.fit.reached >= 3 ? 'ok' : ctx.fit.reached === 2 ? 'y' : 'bad', 'reaches Tier ' + ROMAN[ctx.fit.reached] + ' as configured' + (ctx.fit.blockers.length ? '; Tier ' + ROMAN[ctx.fit.reached + 1] + ' blocked by ' + ctx.fit.blockers.map(function (x) { return x.req; }).join(', ') : ''));
+    v('Annual performance', A.pue3 <= 1.25 ? 'ok' : A.pue3 <= 1.56 ? 'y' : 'bad', 'PUE ' + f(A.pue3, 3) + ' (cat 3) against 1.25 good practice and the 1.56 Uptime 2024 survey average; WUE ' + f(A.wue, 2) + ' L/kWh against 1.0 and the 1.8 LBNL typical');
+    if (A.wue > 1.8) V[V.length - 1].status = 'bad'; else if (A.wue > 1.0 && V[V.length - 1].status === 'ok') V[V.length - 1].status = 'y';
+    if (ctx.options) {
+      var O = ctx.options, best = O.presets.reduce(function (m, o) { return o.cost < m.cost ? o : m; });
+      v('Options & sensitivity', best.current ? 'ok' : 'y', best.current ? 'this configuration is the cheapest of the four to run' : best.label + ' would run ' + f(O.base.cost - best.cost) + ' a year cheaper');
+    }
+    if (ctx.faults) {
+      /* the design basis is one element out (a CDU, a CRAH, a chiller, a CDU feeder); losing two or
+         four CRAHs is beyond N+1 and is reported, not judged */
+      var single = ctx.faults.filter(function (x) { return SINGLE[x.id]; }), lost = single.filter(function (x) { return x.s.over27 || x.s.itLostKw; });
+      var worst = ctx.faults.reduce(function (m, x) { return x.s.maxInlet > m.s.maxInlet ? x : m; }, ctx.faults[0]);
+      v('DH01 hall & faults', lost.length ? 'bad' : 'ok', (lost.length ? lost.map(function (x) { return x.label; }).join(', ') + ' puts racks over 27 °C or throttles IT' : 'every single-element fault keeps every rack at or under 27 °C') +
+        '; beyond N+1, ' + worst.label + ' reaches ' + f(worst.s.maxInlet, 1) + ' °C with ' + worst.s.over27 + ' racks over 27 °C');
+    }
+    if (ctx.transients) {
+      var hit = ctx.transients.filter(function (t) { return t.secondsToLimit != null; }).sort(function (a, b) { return a.secondsToLimit - b.secondsToLimit; })[0];
+      v('Transients', !hit ? 'ok' : hit.secondsToLimit >= 300 ? 'ok' : hit.secondsToLimit >= 60 ? 'y' : 'bad', !hit ? 'no scenario reaches its limit within the window' : 'shortest ride-through: ' + hit.title + ', limit in ' + f(hit.secondsToLimit) + ' s (5 min = a controls response, 1 min = an operator cannot act)');
+    }
+    if (ctx.hlt) { var bad = ctx.hlt.fails.filter(function (x) { return !x.pass; }); v('Heat load test plan', bad.length ? 'bad' : 'ok', bad.length ? 'expected to fail at ' + bad.map(function (x) { return x.label; }).join(', ') : 'every single-unit failure at 100 % load holds'); }
+    v('Standards cross-check', p.supplyAirC >= 18 && p.supplyAirC <= 27 ? 'ok' : 'bad', 'supply air ' + f(p.supplyAirC, 1) + ' °C against ASHRAE A1 18–27 °C; facility water class ' + liquidClass(R.liquid.fwsSupplyC));
+    if (ctx.lab && ctx.lab.scores) v('Design screening', ctx.lab.scores.total >= 80 ? 'ok' : ctx.lab.scores.total >= 60 ? 'y' : 'bad', 'weighted screen ' + f(ctx.lab.scores.total) + ' / 100' + (ctx.lab.grade ? ' (' + ctx.lab.grade + ')' : ''));
+    return V;
+  }
+  function verdictTable(V) {
+    return '<h3>Verdict by chapter</h3>' + table(['Chapter', 'Verdict', 'Status'], V.map(function (x) {
+      return ['<a href="%%SEC:' + esc(x.chapter) + '%%">' + esc(x.chapter) + '</a>', esc(x.text), '<span class="tag ' + TAG[x.status] + '">' + TAGWORD[x.status] + '</span>'];
+    }), 'verd') + '<p class="note">holds = the number meets its stated line; review = inside the common range but not the good-practice line, or a choice worth a look; fails = outside the line. The lines are written into each verdict.</p>';
+  }
+
+  /* every abbreviation the report uses, so a reader needs no other document; the test checks the
+     report text against this list */
+  var GLOSSARY = [
+    ['A1', 'ASHRAE TC 9.9 air class A1: recommended server inlet 18–27 °C, allowable 15–32 °C.'],
+    ['ANSI', 'American National Standards Institute; here the ANSI/TIA-942 data centre standard.'],
+    ['ASHRAE', 'American Society of Heating, Refrigerating and Air-Conditioning Engineers; TC 9.9 writes the data centre thermal guidelines and the liquid cooling classes.'],
+    ['ATS', 'Automatic transfer switch: a dual-fed CDU takes power from feeder A or B through one.'],
+    ['BMS', 'Building management system: the controls that read the plant\'s sensors and drive its valves, pumps and fans.'],
+    ['CDU', 'Coolant distribution unit: pumps, filter and a plate heat exchanger between the TCS (rack side) and the FWS (facility side).'],
+    ['CFD', 'Computational fluid dynamics: a flow and heat solve on a 3-D grid. The DH01 chapter uses an aisle balance, not CFD.'],
+    ['CHW', 'Chilled water: the chillers\' cold loop that feeds the CRAH coils and the electrical-room coolers.'],
+    ['COP', 'Coefficient of performance: heat removed ÷ electrical input of a chiller or of the whole cooling system.'],
+    ['CRAH', 'Computer room air handler: a fan-and-coil unit on chilled water that cools the hall air; fan walls are the same thing on the end walls.'],
+    ['CUE', 'Carbon usage effectiveness (ISO/IEC 30134-8): kgCO₂ per kWh of IT energy.'],
+    ['CW', 'Condenser water: the loop between water-cooled chillers and the cooling towers.'],
+    ['DH01', 'Data hall 01: the one hall the plan, fault and heat-load-test chapters are solved on; every hall is sized alike.'],
+    ['EPW', 'EnergyPlus weather file: hourly site weather, pasted as dry-bulb / wet-bulb bins for the annual solve.'],
+    ['ERF', 'Energy reuse factor (ISO/IEC 30134-6): reused energy ÷ facility energy.'],
+    ['FWS', 'Facility water system: the building loop on the facility side of the CDUs, out to the liquid coolers and trim chillers.'],
+    ['GPU', 'Graphics processing unit: the chip the cold plates cool; it throttles when the TCS return passes its limit.'],
+    ['HLT', 'Heat load test: the level-4 commissioning test that loads the hall with load banks and fails units one at a time.'],
+    ['HPC', 'High-performance computing: dense, liquid-cooled compute, the rack profile this plant carries.'],
+    ['IEC', 'International Electrotechnical Commission; ISO/IEC 30134 is the data centre KPI series (PUE, REF, ERF, CUE, WUE).'],
+    ['ISO', 'International Organization for Standardization; ISO 50001 is the energy management standard the Model page screens against.'],
+    ['IT', 'Information technology load: the servers, measured at M3; the control point every other number is sized from.'],
+    ['KPI', 'Key performance indicator: the ISO/IEC 30134 metrics (PUE, WUE, CUE, REF, ERF).'],
+    ['LBNL', 'Lawrence Berkeley National Laboratory: source of the typical data centre WUE used as a line.'],
+    ['LMTD', 'Log-mean temperature difference: the driving temperature of a heat exchanger; coolers are derated by LMTD against their rating.'],
+    ['LTC', 'Liquid-to-chip: cold plates on the chips, coolant to a CDU, heat to the facility water.'],
+    ['LV', 'Low voltage: the distribution downstream of the transformers (switchgear, UPS, PDUs).'],
+    ['M0', 'ISO/IEC 30134-2 metering point: facility input at the utility boundary.'],
+    ['M1', 'Metering point: UPS output (PUE category 1).'],
+    ['M2', 'Metering point: PDU output (PUE category 2).'],
+    ['M3', 'Metering point: IT equipment input (PUE category 3).'],
+    ['MCC', 'Motor control centre: the switchboard feeding the mechanical plant (pumps, fans, chillers), split A and B.'],
+    ['MV', 'Medium voltage: the utility intake and generators, ahead of the transformers.'],
+    ['NFPA', 'National Fire Protection Association; NFPA 75 covers IT equipment protection, NFPA 2001 clean-agent systems.'],
+    ['OCP', 'Open Compute Project: publishes cold-plate and facility-water guidelines the Model page screens against.'],
+    ['PDU', 'Power distribution unit: the hall-level distribution between the UPS and the rack (RPP: remote power panel, the same role).'],
+    ['PLR', 'Part-load ratio: chiller load ÷ its rated capacity; the COP follows the PLR curve.'],
+    ['PUE', 'Power usage effectiveness (ISO/IEC 30134-2): facility energy ÷ IT energy, at category 1, 2 or 3.'],
+    ['REF', 'Renewable energy factor (ISO/IEC 30134-3): renewable energy ÷ facility energy.'],
+    ['RPP', 'Remote power panel: see PDU.'],
+    ['RT', 'Ton of refrigeration (3.517 kW); kW/RT is the chiller input per ton.'],
+    ['TC', 'Technical committee; ASHRAE TC 9.9 is the mission-critical facilities committee.'],
+    ['TCO', 'Total cost of ownership: capital plus operating cost over the life.'],
+    ['TCS', 'Technology cooling system: the coolant loop on the rack side of the CDU, through the manifolds and cold plates.'],
+    ['TIA', 'Telecommunications Industry Association; ANSI/TIA-942 covers data centre topology and cabling.'],
+    ['TX', 'Transformer.'],
+    ['UPS', 'Uninterruptible power supply: battery-backed conversion between the LV switchgear and the PDUs.'],
+    ['UTC', 'Coordinated universal time, the report\'s timestamp.'],
+    ['VSD', 'Variable-speed drive: lets a chiller, pump or fan run at part speed.'],
+    ['W17 … W45, W+', 'ASHRAE liquid cooling classes, named for the maximum facility water supply temperature in °C the equipment accepts.'],
+    ['WUE', 'Water usage effectiveness (ISO/IEC 30134-9): litres of water per kWh of IT energy.']
+  ];
+  function glossary() {
+    return '<dl class="gl">' + GLOSSARY.map(function (g) { return '<dt>' + esc(g[0]) + '</dt><dd>' + esc(g[1]) + '</dd>'; }).join('') + '</dl>';
+  }
+  var REFS = [
+    'ASHRAE TC 9.9 (2021). Thermal Guidelines for Data Processing Environments, 5th ed. Atlanta: ASHRAE.',
+    'ASHRAE TC 9.9 (2021). Liquid Cooling Guidelines for Datacom Equipment Centers, 3rd ed. (facility water classes W17–W45, W+).',
+    'Uptime Institute. Tier Standard: Topology. New York: Uptime Institute LLC.',
+    'Uptime Institute (2024). Global Data Center Survey: industry average PUE 1.56.',
+    'ISO/IEC 30134-2:2016 Power usage effectiveness (PUE); -3 Renewable energy factor (REF); -6 Energy reuse factor (ERF); -8 Carbon usage effectiveness (CUE); -9 Water usage effectiveness (WUE).',
+    'NFPA 75: Standard for the Fire Protection of Information Technology Equipment; NFPA 2001: Standard on Clean Agent Fire Extinguishing Systems.',
+    'ANSI/TIA-942: Telecommunications Infrastructure Standard for Data Centers.',
+    'Open Compute Project. Cold Plate Requirements and Facility Water System guidance.',
+    'Lawrence Berkeley National Laboratory. Data center water use: typical WUE about 1.8 L/kWh.'
+  ];
+  function references() {
+    return '<ol class="refs">' + REFS.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ol>';
+  }
+
   function build(R, ctx) {
     ctx = ctx || {};
     var p = R.input, d = R.design, l = R.liquid, a = R.air, e = R.elec, T = R.totals, A = R.annual, w = R.power, h = R.hall;
@@ -342,7 +462,7 @@
       '<dt>Scope</dt><dd>Educational steady-state model: it sizes and balances one plant from the stated inputs. Not a basis of design, not an 8,760-hour simulation, not a compliance statement. Inputs marked ASSUMED are typical design values, not a vendor selection.</dd></dl>' +
       '<p class="howto">Every number in this document is an output of the same engine solve the workbench pages draw. The calculation trace (formula and inputs for each headline quantity), every input with its auto / yours state, and the complete result as JSON and CSV are in the last sections, so any figure can be checked.</p></section>');
     parts.push('%%TOC%%');
-    parts.push(sec('s1', 1, 'Key findings', 'Read from the same result every workbench page draws; each sentence is a number in the sections below.', findings(R, ctx)));
+    parts.push(sec('s1', 1, 'Key findings', 'Read from the same result every workbench page draws; each sentence is a number in the sections below.', findings(R, ctx) + verdictTable(verdicts(R, ctx))));
     if (ctx.lab) parts.push(sec('', 0, 'Design screening', 'The Model page\'s screening layer on this plant: the weighted standards screen, the four design dimensions, the risk index, and the model\'s live values against sourced benchmark bands.', labSection(ctx.lab)));
     if (ctx.views && ctx.views.length) parts.push(sec('', 0, 'Plant schematics', 'The plant map from the LTC hub, drawn on this plant: every block and connector the workbench shows, with this plant\'s numbers on it. Solid lines carry power, dashed liquid, dash-dot air, dotted losses.',
       ctx.views.map(function (v) { return '<figure class="wide schem"><figcaption><b>' + esc(v.label) + '</b></figcaption>' + v.svg + '</figure>'; }).join('')));
@@ -422,11 +542,17 @@
       '<li>Climate bins are illustrative unless pasted from the site\'s EPW file. Annual figures scale with the bins\' hours.</li><li>DH01 is one hall, solved as a mass and energy balance per aisle with recirculation — a training approximation, not CFD.</li>' +
       '<li>Transients are first-order lumped models; they bound ride-through, they do not replace a controls study.</li><li>CUE is market-based (facility − renewable) × grid factor ÷ IT; state the accounting basis with the number.</li>' +
       '<li>Costs are in the site currency at a flat tariff; no demand charges, no escalation.</li></ul>'));
+    parts.push(sec('', 0, 'Glossary', 'Every abbreviation in this report, in one place.', glossary()));
+    parts.push(sec('', 0, 'References', 'The documents the checks and lines in this report are taken from.', references()));
     parts.push(sec('s17', 17, 'Data', 'The full engine result is embedded in this file. Download it to check any number in this report.',
       '<p class="dl"><button type="button" data-dl="json">Download JSON</button> <button type="button" data-dl="csv">Download CSV</button> <button type="button" data-dl="html">Save this report (HTML)</button> <button type="button" data-print>Print / PDF</button></p>'));
     var toc = '<nav class="toc"><h2 class="plain">Contents</h2><ol>' + TOC.map(function (t, i) {
       return '<li><a href="#s' + (i + 1) + '"><b>' + (i + 1) + '</b><span>' + esc(t.title) + '</span>' + (t.lead ? '<small>' + esc(t.lead) + '</small>' : '') + '</a></li>'; }).join('') + '</ol></nav>';
-    return page(ctx, parts.join('').replace('%%TOC%%', function () { return toc; }), R);
+    var body = parts.join('').replace('%%TOC%%', function () { return toc; }).replace(/%%SEC:([^%]+)%%/g, function (m, t) {
+      for (var i = 0; i < TOC.length; i++) if (esc(TOC[i].title) === t) return '#s' + (i + 1);
+      return '#s1';
+    });
+    return page(ctx, body, R);
   }
 
   /* flat key → value rows for the CSV: every scalar in the result, arrays of objects as indexed rows */
@@ -465,6 +591,8 @@
     '.plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}.plan figcaption{font-size:11.5px;color:#374151;margin-top:4px}.plan figcaption b{display:block;font-size:12.5px}' +
     '.legend{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font:10.5px "JetBrains Mono",monospace;margin:8px 0}.legend span{padding:2px 6px;color:#111}.legend i{margin:0 12px 0 6px;font-style:normal;color:#6b7280}.legend b{display:inline-block;width:10px;height:10px;margin:0 4px 0 8px}' +
     '.tr{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}.tr figcaption{font-size:12px}.dl button{margin:4px 4px 4px 0}' +
+    '.gl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:8px 0;font-size:12.5px}.gl dt{font:500 11.5px "JetBrains Mono",monospace;color:#1f2937;padding-top:1px}.gl dd{margin:0;color:#374151}' +
+    '.refs{margin:8px 0;padding-left:28px;font-size:12.5px}.refs li{margin:0 0 5px;padding-left:4px}.refs li::marker{font:500 11px "JetBrains Mono",monospace;color:#6b7280}table.verd td:first-child{white-space:nowrap}' +
     '.labtop{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start}.radial{margin:0}.radial figcaption{text-align:center;font-size:11px;color:#6b7280}svg.band{width:160px;height:18px}' +
     '@media print{html{background:#fff}.bar,.dl{display:none}main{max-width:none;margin:0;padding:0}main>section,main>nav{box-shadow:none;margin:0;padding:0;break-before:page}main>section.cover{break-before:auto;min-height:0}main>section.flow{break-before:auto;margin-top:16pt}.toc a{padding:3.5pt 0}.toc a small{font-size:8.5pt}.toc a span{font-size:10pt}' +
     'body{font-size:10.5pt}table{font-size:8.8pt}th{font-size:7.2pt}code{font-size:8.5pt}h1{font-size:26pt}h2{font-size:15pt;margin-bottom:10pt}h2 .no{font-size:22pt}.kpis b{font-size:13pt}' +
@@ -780,7 +908,7 @@
     bar.appendChild(b);
   }
 
-  root.LTCReport = { build: build, csv: csv, heatFlows: heatFlows, powerItems: powerItems, register: register, context: context, options: options, hlt: hlt, exportReport: exportReport };
+  root.LTCReport = { build: build, csv: csv, heatFlows: heatFlows, powerItems: powerItems, register: register, context: context, options: options, hlt: hlt, verdicts: verdicts, GLOSSARY: GLOSSARY, exportReport: exportReport };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCReport;
   if (typeof document !== 'undefined' && document.querySelector) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountButton); else mountButton();

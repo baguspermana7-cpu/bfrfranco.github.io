@@ -690,6 +690,40 @@ for (const [page, mod] of Object.entries(PAGES)) {
 }
 
 {
+  /* W12v (v3.21.19) — one verdict per chapter, from the engine; a glossary that covers every
+   * abbreviation the report uses; numbered references. Owner: "detail dan sangat clear". A verdict
+   * that does not follow the plant is decoration, so each status is checked against a plant that
+   * must flip it. */
+  const sb = { console, Math, JSON, Date }; sb.window = sb; sb.globalThis = sb; sb.document = { readyState: 'loading', addEventListener() {} };
+  vm.createContext(sb);
+  for (const f of ['js/ltc-plant.js', 'js/ltc-dh01.js', 'js/ltc-dh01-3d.js', 'js/ltc-cfd.js', 'js/ltc-cfd-view.js', 'js/ltc-tier.js', 'js/ltc-report.js']) vm.runInContext(readFileSync(join(root, f), 'utf8'), sb, { filename: f });
+  const P = sb.LTCPlant, X = sb.LTCReport;
+  const V = (st) => { const R = P.compute(st); const ctx = X.context(P, R, st); return { R, ctx, v: X.verdicts(R, ctx), html: X.build(R, ctx) }; };
+  const base = V({}), dual = V({ cduFeed: 'dual' }), noSpare = V({ crahRedundancy: 0 }), hybrid = V(Object.assign({}, P.PRESETS.hybrid));
+  const st = (x, ch) => (x.v.find((q) => q.chapter === ch) || {}).status;
+  ok('W12v-a', base.v.length >= 11 && base.v.every((q) => /^(ok|y|bad)$/.test(q.status) && q.text.length > 10) && !base.v.some((q) => /NaN|—/.test(q.text)),
+     `${base.v.length} verdicts, each with a status and a sentence of numbers`);
+  ok('W12v-b', st(base, 'Heat balance') === 'ok' && st(base, 'Electrical & sizing') === 'y' && st(dual, 'Electrical & sizing') === 'ok' && st(base, 'DH01 hall & faults') === 'bad' && st(dual, 'DH01 hall & faults') === 'ok'
+     && st(base, 'Heat load test plan') === 'bad' && st(dual, 'Heat load test plan') === 'ok',
+     'a single CDU feed is flagged in the electrical, DH01 and HLT verdicts; a dual feed clears all three');
+  ok('W12v-c', st(base, 'Air path') === 'ok' && st(noSpare, 'Air path') === 'bad' && st(base, 'Options & sensitivity') === 'y' && st(hybrid, 'Options & sensitivity') === 'ok' && st(base, 'Annual performance') === 'ok'
+     && st(base, 'Redundancy register') === 'ok' && st(noSpare, 'Redundancy register') === 'bad',
+     'no CRAH spare flips the air-path and register verdicts; the cheapest configuration clears the options verdict');
+  const text = base.html.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ');
+  const gl = new Set(X.GLOSSARY.map((g) => g[0])), allow = new Set('MW KW KWH MWH USD JSON CSV HTML PDF II III IV AI CC BY NC ML MJ LPM AND LLC'.split(' '));
+  const missing = {};
+  (text.match(/\b[A-Z][A-Z0-9]{1,5}\b/g) || []).forEach((t) => { if (/[A-Z]{2}/.test(t) && !allow.has(t) && !gl.has(t)) missing[t] = (missing[t] || 0) + 1; });
+  ok('W12v-d', Object.keys(missing).length === 0 && X.GLOSSARY.length >= 45 && base.html.includes('<dt>CDU</dt>') && base.html.includes('<dt>W17 … W45, W+</dt>'),
+     'every abbreviation in the report is in the glossary' + (Object.keys(missing).length ? ' — missing: ' + JSON.stringify(missing) : ''));
+  const toc = base.html.match(/<nav class="toc">[\s\S]*?<\/nav>/)[0], titles = [...toc.matchAll(/<span>([^<]+)<\/span>/g)].map((m) => m[1]);
+  const links = [...base.html.matchAll(/<a href="#s(\d+)">([^<]+)<\/a><\/td>/g)];
+  ok('W12v-e', links.length === base.v.length && links.every((m) => titles[+m[1] - 1] === m[2]) && !/%%SEC/.test(base.html),
+     'every verdict links to the chapter it judges');
+  ok('W12v-f', text.includes('ISO/IEC 30134-2:2016') && (base.html.match(/<ol class="refs">[\s\S]*?<\/ol>/)[0].match(/<li>/g) || []).length >= 8 && titles.includes('Glossary') && titles.includes('References'),
+     'a numbered references chapter and a glossary chapter are in the contents');
+}
+
+{
   /* W13 (v3.20.1) — every plant diagram holds on every plant, not only the 100 MW default the
    * other gates draw. The report's first sweep found the hub's liquid-heat arrow label unplaced on
    * 102 of 240 plant/view pairs (any label longer than "85 MW" did not fit the 40 px column gap)
