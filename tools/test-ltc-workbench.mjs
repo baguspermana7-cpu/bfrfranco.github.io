@@ -565,23 +565,34 @@ for (const [page, mod] of Object.entries(PAGES)) {
   }
   {
     /* DH01 CFD fault transient: normal operation for PRE_T seconds, then four CRAHs trip at t = 0. The
-       hall starts inside 27 °C, the first rack crosses 27 °C within seconds (fans stop at once in the
-       model; real coast-down adds 10–20 s), the solve stays divergence-free across the switch and climbs
+       hall starts inside 27 °C, the first rack crosses 27 °C within seconds (the fans coast down with FAN_TAU), the solve stays divergence-free across the switch and climbs
        toward the steady four-out reference (W12g: 34.78 °C) rather than overshooting past it. */
     const F = sb.LTCCFD, R = P.compute({}), s0 = D.solveHall(R, 'none', 'common', 5, 'throttled'), s4 = D.solveHall(R, 'crah4', 'common', 5, 'throttled');
     const A = F.setup(R, s0, { dx: 0.6 }); while (A.t < F.PRE_T - 1e-9) F.step(A, 0.2, 12);
-    const pre = F.report(A), C = F.faultFrom(F.setup(R, s4, { dx: 0.6 }), A), res0 = C.res, trace = [];
+    const C4 = F.setup(R, s4, { dx: 0.6 }), s4b = Float32Array.from(C4.bu), pre = F.report(A), C = F.faultFrom(C4, A), res0 = C.res, trace = [];
+    const ramp0d = C.bu[C.crah.find((U) => U.dead).sup[0]]; let rampTd = null, rampTl = null;
     let carried = 0; for (let c = 0; c < C.T.length; c++) if (!C.solid[c]) carried = Math.max(carried, Math.abs(C.T[c] - A.T[c]));
     let own = null;
-    for (let i = 0; i < 200; i++) { F.step(C, 0.2, 12); if (own == null && C.racks.some((k) => k.tin > 27)) own = C.t; if (i % 25 === 24) trace.push(F.report(C).maxInlet); }
+    let tLo = Infinity, srcOk = C.tu[C.crah.find((U) => U.dead).sup[0]] === C.supId;
+    for (let i = 0; i < 200; i++) { F.step(C, 0.2, 12); if (i < 60) for (let c = 0; c < C.T.length; c++) if (!C.solid[c] && C.T[c] < tLo) tLo = C.T[c]; if (i === 29) { rampTd = C.bu[C.crah.find((U) => U.dead).sup[0]]; rampTl = C.bu[C.crah.find((U) => !U.dead).sup[0]]; } if (own == null && C.racks.some((k) => k.tin > 27)) own = C.t; if (i % 25 === 24) trace.push(F.report(C).maxInlet); }
     const r = F.report(C), bad = [];
     if (!(pre.maxInlet <= 27)) bad.push(`before the fault the hottest inlet is ${pre.maxInlet.toFixed(2)} °C`);
     if (!(res0 <= 5e-3)) bad.push(`projection after the switch leaves ${res0}`);
-    if (!readFileSync(join(root, 'js/ltc-dh01-3d.js'), 'utf8').includes(`${F.PRE_T} s of the no-fault solve`)) bad.push(`the 3D legend does not state PRE_T (${F.PRE_T} s)`);
+    const leg = readFileSync(join(root, 'js/ltc-dh01-3d.js'), 'utf8');
+    if (!leg.includes(`${F.PRE_T} s of the no-fault solve`) || !leg.includes(`${F.FAN_TAU} s time constant`)) bad.push(`the 3D legend does not state PRE_T (${F.PRE_T} s) and FAN_TAU (${F.FAN_TAU} s)`);
+    // the fans coast: a tripped unit's supply face holds its normal velocity at t = 0 and decays with FAN_TAU; the survivors' rise the same way
+    const dead = C.crah.find((U) => U.dead), live = C.crah.find((U) => !U.dead), fd = dead.sup[0], fl = live.sup[0], kR = Math.exp(-5.8 / F.FAN_TAU);   // the ramp is evaluated at the start of the step that ends at 6.0 s
+    if (!(ramp0d > 0 && Math.abs(ramp0d - A.bu[fd]) < 1e-6 && Math.abs(C.bu[fd]) <= 0.01 * A.bu[fd] && Math.abs(rampTd - A.bu[fd] * kR) < 1e-4 && Math.abs(rampTl - (s4b[fl] + (A.bu[fl] - s4b[fl]) * kR)) < 1e-4 && Math.abs(C.bu[fl] - s4b[fl]) <= 0.01 * Math.abs(A.bu[fl] - s4b[fl])))
+      bad.push(`fan coast-down: tripped face ${ramp0d} at t = 0 (normal ${A.bu[fd]}), ${rampTd} at 6 s (expected ${(A.bu[fd] * kR).toFixed(4)}), now ${C.bu[fd]}; survivor ${rampTl} vs ${(s4b[fl] + (A.bu[fl] - s4b[fl]) * kR).toFixed(4)}`);
+    // the air a coasting unit still brings carries its supply temperature: nothing in the room falls below it
+    if (!(srcOk && tLo >= Math.min(pre.supply, r.supply) - 0.05)) bad.push(`coasting inflow: source ${srcOk ? 'kept' : 'LOST'}, room air down to ${tLo.toFixed(2)} °C against supply ${Math.min(pre.supply, r.supply).toFixed(2)}`);
+    // each rack's own crossing: the earliest is the reported first, over 32 °C never before over 27 °C
+    const t27 = r.t27.filter((x) => x != null), t32 = r.t32.filter((x) => x != null);
+    if (!(t27.length && Math.min(...t27) === r.first27 && r.t32.every((x, i) => x == null || (r.t27[i] != null && x >= r.t27[i])) && t32.length < t27.length)) bad.push(`crossings: ${t27.length} over 27 °C (first ${Math.min(...t27)}), ${t32.length} over 32 °C`);
     if (!(carried === 0)) bad.push(`the fault does not start from the normal field (max |ΔT| ${carried})`);
-    if (!(r.transient && r.first27 != null && r.first27 <= 10 && Math.abs(r.first27 - own) < 1e-9)) bad.push(`first rack over 27 °C reported at ${r.first27} s, crossed at ${own} s`);
+    if (!(r.transient && r.first27 != null && r.first27 >= 2 && r.first27 <= 20 && Math.abs(r.first27 - own) < 1e-9)) bad.push(`first rack over 27 °C reported at ${r.first27} s, crossed at ${own} s`);
     if (!(trace[0] < trace[trace.length - 1] && Math.max(...trace) <= 34.78 + 2 && Math.abs(trace[trace.length - 1] - 34.78) <= 2)) bad.push(`hottest inlet over time ${trace.map((x) => x.toFixed(1)).join(' ')}`);
-    ok('W12tr', !bad.length, `DH01 CFD fault transient: normal operation (hottest ${pre.maxInlet.toFixed(1)} °C), four CRAHs trip at t = 0, first rack over 27 °C at ${r.first27 != null ? r.first27.toFixed(1) : '—'} s, hottest inlet ${trace.map((x) => x.toFixed(1)).join(' → ')} °C toward the steady 34.8` + (bad.length ? ' — ' + bad.join('; ') : ''));
+    ok('W12tr', !bad.length, `DH01 CFD fault transient: normal operation (hottest ${pre.maxInlet.toFixed(1)} °C), four CRAHs trip at t = 0, fans coasting (τ ${F.FAN_TAU} s), first rack over 27 °C at ${r.first27 != null ? r.first27.toFixed(1) : '—'} s, hottest inlet ${trace.map((x) => x.toFixed(1)).join(' → ')} °C toward the steady 34.8` + (bad.length ? ' — ' + bad.join('; ') : ''));
   }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));

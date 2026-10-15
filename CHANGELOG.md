@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v3.21.16 — 2026-10-15
+
+### "Coast-Down": the fans do not stop at once, and every rack reports when it crossed 27 °C
+
+**Why.** v3.21.15 solved a CRAH trip from normal operation, but took the tripped fans to stop at once, so the first rack crossed 27 °C at 1.0 s. Real fans coast down over tens of seconds, and the survivors ramp up under pressure control. The owner asked for more accuracy, and an operator wants to know which racks go first.
+
+**Changed (`js/ltc-cfd.js`):**
+- **Fan coast-down.** At the fault, `faultFrom` lists every prescribed face that differs between the normal and the faulted solve: a tripped unit's supply and return faces, and the survivors' speed-up. Each one coasts from its normal velocity to the fault's with a 6 s time constant (95 % of the change by 18 s). A coasting inflow face keeps its supply source, so the air it still brings carries its temperature.
+- **Every unit lists its faces.** A tripped unit's supply and return faces exist with zero velocity, so the heat report counts a coasting unit's return at its present velocity. During the transient the report reads "removed 3,520 kW (−10 %, the room air is warming)", which is the heat the room stores while it heats.
+- **Per-rack crossings.** During a transient the solver records when each rack first crossed 27 °C and 32 °C. `report()` adds `t27`, `t32` and `ramping`.
+
+**Shown:**
+- **Panel:** "t = 17 s after the fault · fans coasting · over 27 °C: first rack at 6.0 s, 40 racks by now, half of them by 12 s".
+- **Rack tooltip:** a "CFD after the fault" row, "over 27 °C at 8.4 s · over 32 °C at 21.0 s", or "still under 27 °C at 65 s".
+- **Guided tour:** the hottest rack's stop says when it crossed 27 °C; the summary gives the first crossing and the time by which half the crossing racks had crossed.
+- **Legend:** states the coast-down and its time constant.
+
+**Four CRAHs out, 0.6 m, fans stopping at once → coasting:**
+
+| | At once (v3.21.15) | Coasting (this release) |
+|---|---|---|
+| First rack over 27 °C | 1.0 s | **6.0 s** |
+| Hottest inlet at 5 s | 31.6 °C | 26.1 °C |
+| Racks over 27 °C at 15 s | 52 | 35 |
+| Half of the crossing racks over 27 °C by | — | 15 s |
+| Settled hottest inlet | 34.9 °C | 34.7 °C |
+
+The steady state is unchanged; only the first half-minute moves.
+
+**Gate W12tr** now also requires:
+- a tripped unit's supply face at its normal velocity at t = 0, at e^(−5.8/6) of it after the step ending at 6 s, and under 1 % of it at 40 s; a survivor's face rising the same way;
+- the coasting inflow keeping its source: no room air below the supply temperature during the first 12 s;
+- each rack's crossing consistent with the reported first, and no rack over 32 °C before it was over 27 °C;
+- the legend stating the coast-down time constant.
+
+It was proven red with the ramp removed, with the coasting inflow's source dropped (room air then fell to 0 °C), and with the 32 °C threshold lowered.
+
 ## v3.21.15 — 2026-10-15
 
 ### "Step Response": a sudden fault is solved from normal operation, so the CFD shows how fast the hall heats

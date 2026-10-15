@@ -710,6 +710,7 @@
     function cfdRows(i) {
       var c = root.LTCDH013D && root.LTCDH013D.rackCfd ? root.LTCDH013D.rackCfd(i) : null; if (!c) return [];
       var rows = [['CFD inlet', fmt(c.inlet, 1) + ' °C ' + (c.averaged ? 'time-averaged' : 'now') + ' · ' + c.dx + ' m grid'], ['CFD by height', c.bands.map(function (t) { return fmt(t, 1); }).join(' · ') + ' °C (bottom · middle · top third)']];
+      if (c.transient) rows.push(['CFD after the fault', c.t27 == null ? 'still under 27 °C at ' + fmt(c.t, 0) + ' s' : 'over 27 °C at ' + fmt(c.t27, 1) + ' s' + (c.t32 != null ? ' · over 32 °C at ' + fmt(c.t32, 1) + ' s' : '')]);
       if (c.bands[2] - c.bands[0] > 3) rows.push(['Pattern', 'top ' + fmt(c.bands[2] - c.bands[0], 1) + ' K hotter than bottom: exhaust curling over the rack tops']);
       return rows;
     }

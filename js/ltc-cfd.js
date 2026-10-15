@@ -25,7 +25,7 @@
  * Web Worker in the browser (postMessage protocol at the end). */
 (function (root) {
   'use strict';
-  var PRE_T = 15, FAULT_WARM = 45, RHO = 1.2, CP = 1.006, G = 9.81, RACK_H = 2.0, PLEN_D = 0.9, CRAH_SUP_H = 2.6, RET_W = 1.2, LEAK_GAP = 0.05;
+  var PRE_T = 15, FAULT_WARM = 45, FAN_TAU = 6, RHO = 1.2, CP = 1.006, G = 9.81, RACK_H = 2.0, PLEN_D = 0.9, CRAH_SUP_H = 2.6, RET_W = 1.2, LEAK_GAP = 0.05;
 
   function setup(r, s, opt) {
     var o = opt || {}, dx = o.dx || 0.3, p = r.input, h = r.hall, L = h.lengthM, W = h.widthM, H = h.heightM;
@@ -100,18 +100,18 @@
     var jS = Math.min(jC, J(CRAH_SUP_H));
     h.crahs.forEach(function (c) {
       var uw = W / perWall[c.wall], k0 = K(c.y - uw / 2), k1 = Math.max(k0 + 1, K(c.y + uw / 2)), iF = c.wall === 'west' ? 0 : nx, sg = c.wall === 'west' ? 1 : -1;
-      var U = { c: c, dead: !!out[c.i], ret: [], k0: k0, k1: k1, wall: c.wall };
-      if (!U.dead) {
-        // the return is drawn through the plenum's end wall AND its roof over the unit (the return
-        // grille), so no face runs faster than a real plenum return
-        var q = s.crahUnitM3s, aS = (k1 - k0) * jS * dx * dx, nRoof = Math.max(1, I(RET_W)), aR = (k1 - k0) * ((ny - jC - 1) + nRoof) * dx * dx;
-        for (var kk = k0; kk < k1; kk++) {
-          for (var jj = 0; jj < jS; jj++) { var f = iF + (nx + 1) * (jj + ny * kk); C.bu[f] = sg * q / aS; C.tu[f] = supId; }
-          for (jj = jC + 1; jj < ny; jj++) { f = iF + (nx + 1) * (jj + ny * kk); C.bu[f] = -sg * q / aR; U.ret.push(['u', f, ci(c.wall === 'west' ? 0 : nx - 1, jj, kk)]); }
-          for (var ii = 0; ii < nRoof; ii++) { var ic = c.wall === 'west' ? ii : nx - 1 - ii; f = ic + nx * (ny + (ny + 1) * kk); C.fv[f] = 1; C.bv[f] = q / aR; U.ret.push(['v', f, ci(ic, ny - 1, kk)]); }
-        }
-        U.q = q;
+      var U = { c: c, dead: !!out[c.i], ret: [], sup: [], k0: k0, k1: k1, wall: c.wall };
+      // every unit lists its supply and return faces (a tripped unit's still carry air while its fans
+      // coast down); only a live unit's are given a velocity here. The return is drawn through the
+      // plenum's end wall AND its roof over the unit (the return grille), so no face runs faster than
+      // a real plenum return
+      var q = s.crahUnitM3s, aS = (k1 - k0) * jS * dx * dx, nRoof = Math.max(1, I(RET_W)), aR = (k1 - k0) * ((ny - jC - 1) + nRoof) * dx * dx, live = !U.dead;
+      for (var kk = k0; kk < k1; kk++) {
+        for (var jj = 0; jj < jS; jj++) { var f = iF + (nx + 1) * (jj + ny * kk); if (live) { C.bu[f] = sg * q / aS; C.tu[f] = supId; } U.sup.push(f); }
+        for (jj = jC + 1; jj < ny; jj++) { f = iF + (nx + 1) * (jj + ny * kk); if (live) C.bu[f] = -sg * q / aR; U.ret.push(['u', f, ci(c.wall === 'west' ? 0 : nx - 1, jj, kk)]); }
+        for (var ii = 0; ii < nRoof; ii++) { var ic = c.wall === 'west' ? ii : nx - 1 - ii; f = ic + nx * (ny + (ny + 1) * kk); C.fv[f] = 1; if (live) C.bv[f] = q / aR; U.ret.push(['v', f, ci(ic, ny - 1, kk)]); }
       }
+      U.q = live ? q : 0;
       C.crah.push(U);
     });
     // faces touching a solid cell are fixed (zero unless prescribed above)
@@ -409,12 +409,15 @@
 
   function step(C, dt, iters) {
     dt = dt || 0.1;
+    fanRamp(C);
     boundaries(C);
     advect(C, dt); buoyancy(C, dt); applyFixed(C);
     C.res = project(C, iters || 12);
     energy(C, dt);
     C.t += dt; C.steps++;
-    if (C.transient && C.first27 == null) for (var q = 0; q < C.racks.length; q++) if (C.racks[q].tin > 27) { C.first27 = C.t; break; }
+    if (C.transient) for (var q = 0; q < C.racks.length; q++) {   // when each rack first crosses the ASHRAE lines after the fault
+      var Rq = C.racks[q]; if (Rq.t27 == null && Rq.tin > 27) { Rq.t27 = C.t; if (C.first27 == null) C.first27 = C.t; } if (Rq.t32 == null && Rq.tin > 32) Rq.t32 = C.t;
+    }
     accumulate(C);
     return C;
   }
@@ -438,11 +441,13 @@
 
   /* what the solve says: per-rack inlet, energy and mass balance, against the balance solve */
   function report(C) {
-    var inl = C.racks.map(function (R) { return R.tin; }), qAir = 0;
-    C.crah.forEach(function (U) { if (!U.dead) qAir += RHO * CP * U.q * (C.tret - C.tsup); });
-    var bnd = 0;                                            // heat leaving minus entering through the fan walls, per face
-    C.crah.forEach(function (U) { if (U.dead) return; U.ret.forEach(function (f) { bnd += RHO * CP * Math.abs(C[f[0]][f[1]]) * C.dx * C.dx * C.T[f[2]]; }); });
-    var supQ = 0; C.crah.forEach(function (U) { if (!U.dead) supQ += RHO * CP * U.q * C.tsup; });
+    var inl = C.racks.map(function (R) { return R.tin; }), a2 = RHO * CP * C.dx * C.dx, bnd = 0, supQ = 0;
+    // heat leaving through every return face minus heat entering through every supply face, at the
+    // faces' present velocities (a coasting unit's included)
+    C.crah.forEach(function (U) {
+      U.ret.forEach(function (f) { bnd += a2 * Math.abs(C[f[0]][f[1]]) * C.T[f[2]]; });
+      U.sup.forEach(function (f) { supQ += a2 * Math.abs(C.bu[f]) * C.tsup; });
+    });
     var avg = C.mean && C.mean.n > 20, Tf = avg ? C.mean.T : C.T, inm = C.racks.map(function (R) { return avg ? R.tm : R.tin; });
     // each rack's inlet by height: the drawing face averaged across its width, bottom row first
     var prof = C.racks.map(function (R) {
@@ -452,7 +457,7 @@
     });
     return { t: C.t, steps: C.steps, inlet: inl, maxInlet: Math.max.apply(null, inl), over27: inl.filter(function (t) { return t > 27; }).length, over32: inl.filter(function (t) { return t > 32; }).length,
              supply: C.tsup, ret: C.tret, qRacksKw: C.qRacks, qCrahKw: bnd - supQ, residual: C.res,
-             inletMean: inm, averaged: avg, profile: prof, profDy: C.dx, nsub: C.nsub || 0, transient: !!C.transient, first27: C.first27 != null ? C.first27 : null, idx: indices(C, inm) };
+             inletMean: inm, averaged: avg, profile: prof, profDy: C.dx, nsub: C.nsub || 0, transient: !!C.transient, first27: C.first27 != null ? C.first27 : null, ramping: !!C.ramp, t27: C.transient ? C.racks.map(function (R) { return R.t27 != null ? R.t27 : null; }) : null, t32: C.transient ? C.racks.map(function (R) { return R.t32 != null ? R.t32 : null; }) : null, idx: indices(C, inm) };
   }
 
   /* air-management indices on the rack inlets (ASHRAE A1: recommended 18–27 °C, allowable 15–32 °C):
@@ -475,10 +480,26 @@
      runs: the hottest inlet settles within about 40 s on the 0.6 m grid) */
   function faultFrom(C, A) {
     ['T', 'u', 'v', 'w'].forEach(function (k) { C[k].set(A[k]); });
+    // the fans do not stop at once: every prescribed face that differs between the two solves (a
+    // tripped unit's supply and return, the survivors' speed-up) coasts from its normal value to the
+    // fault's with time constant FAN_TAU; inflow faces keep their source so the air they still bring
+    // carries its temperature
+    var ramp = { f: [], a: [], b: [] };
+    [['bu', 'tu'], ['bv', null]].forEach(function (d, m) {
+      var B = C[d[0]], B0 = A[d[0]], T1 = d[1] && C[d[1]], T0 = d[1] && A[d[1]];
+      for (var f = 0; f < B.length; f++) if (B[f] !== B0[f]) { ramp.f.push(f + m * 1e9); ramp.a.push(B0[f]); ramp.b.push(B[f]); B[f] = B0[f]; if (T1 && T1[f] < 0 && T0[f] >= 0) T1[f] = T0[f]; }
+    });
+    C.ramp = ramp.f.length ? { f: Int32Array.from(ramp.f.map(function (x) { return x % 1e9; })), m: Uint8Array.from(ramp.f.map(function (x) { return x >= 1e9 ? 1 : 0; })), a: Float32Array.from(ramp.a), b: Float32Array.from(ramp.b) } : null;
     applyFixed(C); C.res = project(C, 40);
     C.u0.set(C.u); C.v0.set(C.v); C.w0.set(C.w);
     C.t = 0; C.transient = true; C.warm = FAULT_WARM;
     return C;
+  }
+  function fanRamp(C) {
+    var R = C.ramp; if (!R) return;
+    var k = Math.exp(-C.t / FAN_TAU), done = k < 1e-4;
+    for (var e = 0; e < R.f.length; e++) { var B = R.m[e] ? C.bv : C.bu; B[R.f[e]] = done ? R.b[e] : R.b[e] + (R.a[e] - R.b[e]) * k; }
+    if (done) C.ramp = null;
   }
 
   function run(r, s, opt) {
@@ -487,7 +508,7 @@
     return C;
   }
 
-  var api = { setup: setup, faultFrom: faultFrom, PRE_T: PRE_T, step: step, indices: indices, run: run, report: report, vel: vel, RACK_H: RACK_H, PLEN_D: PLEN_D };
+  var api = { setup: setup, faultFrom: faultFrom, PRE_T: PRE_T, FAN_TAU: FAN_TAU, FAULT_WARM: FAULT_WARM, step: step, indices: indices, run: run, report: report, vel: vel, RACK_H: RACK_H, PLEN_D: PLEN_D };
   root.LTCCFD = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 
