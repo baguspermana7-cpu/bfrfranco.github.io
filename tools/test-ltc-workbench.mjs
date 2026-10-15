@@ -563,6 +563,26 @@ for (const [page, mod] of Object.entries(PAGES)) {
     }
     ok('W12cal', !bad.length, 'DH01 balance solve against the CFD it is calibrated on: per-rack RMS within 0.25 K of the fit, hottest inlet within 1.5 K, racks over 27 °C when the CFD has them, racks over 32 °C within 4 (' + facts.join('; ') + ')' + (bad.length ? ' — ' + bad.join('; ') : ''));
   }
+  {
+    /* DH01 CFD fault transient: normal operation for PRE_T seconds, then four CRAHs trip at t = 0. The
+       hall starts inside 27 °C, the first rack crosses 27 °C within seconds (fans stop at once in the
+       model; real coast-down adds 10–20 s), the solve stays divergence-free across the switch and climbs
+       toward the steady four-out reference (W12g: 34.78 °C) rather than overshooting past it. */
+    const F = sb.LTCCFD, R = P.compute({}), s0 = D.solveHall(R, 'none', 'common', 5, 'throttled'), s4 = D.solveHall(R, 'crah4', 'common', 5, 'throttled');
+    const A = F.setup(R, s0, { dx: 0.6 }); while (A.t < F.PRE_T - 1e-9) F.step(A, 0.2, 12);
+    const pre = F.report(A), C = F.faultFrom(F.setup(R, s4, { dx: 0.6 }), A), res0 = C.res, trace = [];
+    let carried = 0; for (let c = 0; c < C.T.length; c++) if (!C.solid[c]) carried = Math.max(carried, Math.abs(C.T[c] - A.T[c]));
+    let own = null;
+    for (let i = 0; i < 200; i++) { F.step(C, 0.2, 12); if (own == null && C.racks.some((k) => k.tin > 27)) own = C.t; if (i % 25 === 24) trace.push(F.report(C).maxInlet); }
+    const r = F.report(C), bad = [];
+    if (!(pre.maxInlet <= 27)) bad.push(`before the fault the hottest inlet is ${pre.maxInlet.toFixed(2)} °C`);
+    if (!(res0 <= 5e-3)) bad.push(`projection after the switch leaves ${res0}`);
+    if (!readFileSync(join(root, 'js/ltc-dh01-3d.js'), 'utf8').includes(`${F.PRE_T} s of the no-fault solve`)) bad.push(`the 3D legend does not state PRE_T (${F.PRE_T} s)`);
+    if (!(carried === 0)) bad.push(`the fault does not start from the normal field (max |ΔT| ${carried})`);
+    if (!(r.transient && r.first27 != null && r.first27 <= 10 && Math.abs(r.first27 - own) < 1e-9)) bad.push(`first rack over 27 °C reported at ${r.first27} s, crossed at ${own} s`);
+    if (!(trace[0] < trace[trace.length - 1] && Math.max(...trace) <= 34.78 + 2 && Math.abs(trace[trace.length - 1] - 34.78) <= 2)) bad.push(`hottest inlet over time ${trace.map((x) => x.toFixed(1)).join(' ')}`);
+    ok('W12tr', !bad.length, `DH01 CFD fault transient: normal operation (hottest ${pre.maxInlet.toFixed(1)} °C), four CRAHs trip at t = 0, first rack over 27 °C at ${r.first27 != null ? r.first27.toFixed(1) : '—'} s, hottest inlet ${trace.map((x) => x.toFixed(1)).join(' → ')} °C toward the steady 34.8` + (bad.length ? ' — ' + bad.join('; ') : ''));
+  }
   ok('W12b', !!(X && X.build && D && D.solveHall), 'the report module and the DH01 solver load without a DOM');
   const plants = [{}, { itMw: 37 }, { cduFeed: 'dual' }, { capturePct: 70, tcsSupplyC: 40 }].concat(Object.keys(P.PRESETS).map((k) => Object.assign({}, P.PRESETS[k])));
   for (const [i, st] of plants.entries()) {

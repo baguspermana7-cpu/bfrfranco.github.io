@@ -279,12 +279,13 @@
     var ts = t1 - t0 > 150 ? 50 : t1 - t0 > 60 ? 20 : 10;
     for (var t = Math.ceil(t0 / ts) * ts; t <= t1; t += ts) g.push('<text x="' + X(t).toFixed(1) + '" y="' + (Ht - B + 13) + '"' + MONO + ' fill="var(--t3)" text-anchor="middle">' + t + '</text>');
     g.push('<line x1="' + L + '" x2="' + (W - Rm) + '" y1="' + Y(27).toFixed(1) + '" y2="' + Y(27).toFixed(1) + '" stroke="var(--o)" stroke-dasharray="2 3"/>');
-    if (bal != null) g.push('<line x1="' + L + '" x2="' + (W - Rm) + '" y1="' + Y(bal).toFixed(1) + '" y2="' + Y(bal).toFixed(1) + '" stroke="var(--r)" stroke-dasharray="5 3"/><text x="' + (W - Rm - 2) + '" y="' + (Y(bal) - 4).toFixed(1) + '"' + MONO + ' fill="var(--r)" text-anchor="end">balance solve, hottest ' + bal.toFixed(1) + '</text>');
+    if (t0 < 0 && t1 > 0) g.push('<line x1="' + X(0).toFixed(1) + '" x2="' + X(0).toFixed(1) + '" y1="' + T + '" y2="' + (Ht - B) + '" stroke="var(--t2)"/><text x="' + (X(0) + 4).toFixed(1) + '" y="' + (T + 10) + '"' + MONO + ' fill="var(--t2)">fault</text>');
+    if (bal != null) g.push('<line x1="' + L + '" x2="' + (W - Rm) + '" y1="' + Y(bal).toFixed(1) + '" y2="' + Y(bal).toFixed(1) + '" stroke="var(--r)" stroke-dasharray="5 3"/><text x="' + (W - Rm - 2) + '" y="' + (Y(bal) + 12).toFixed(1) + '"' + MONO + ' fill="var(--r)" text-anchor="end">balance solve, hottest ' + bal.toFixed(1) + '</text>');
     [['max', 'var(--r)', 1.6], ['mean', 'var(--c)', 1.4], ['ret', 'var(--t2)', 1.2]].forEach(function (k) {
       g.push('<path d="' + poly(H.map(function (h) { return [h.t, h[k[0]]]; }), X, Y) + '" fill="none" stroke="' + k[1] + '" stroke-width="' + k[2] + '"/>');
     });
     var e = H[H.length - 1];
-    g.push('<text x="' + L + '" y="' + (Ht - 16) + '"' + MONO + ' fill="var(--t3)">seconds simulated · 27 °C dotted</text>',
+    g.push('<text x="' + L + '" y="' + (Ht - 16) + '"' + MONO + ' fill="var(--t3)">' + (t0 < 0 ? 'seconds after the fault' : 'seconds simulated') + ' · 27 °C dotted</text>',
       '<text x="' + L + '" y="' + (Ht - 3) + '"' + MONO + ' fill="var(--t3)"><tspan fill="var(--r)">hottest inlet ' + e.max.toFixed(1) + '</tspan> · <tspan fill="var(--c)">mean ' + e.mean.toFixed(1) + '</tspan> · return ' + e.ret.toFixed(1) + ' °C</text></svg>');
     return g.join('');
   }

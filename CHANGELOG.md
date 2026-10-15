@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v3.21.15 — 2026-10-15
+
+### "Step Response": a sudden fault is solved from normal operation, so the CFD shows how fast the hall heats
+
+**Why.** The DH01 CFD started every solve from still air at supply temperature. Its convergence curve was a start-up artefact, not the hall's response to the fault. For a CRAH or CDU loss, what an operator needs is how long before racks go over 27 °C. That needs the fault to strike a hall already in normal operation.
+
+**Changed (`js/ltc-cfd.js` worker, `js/ltc-dh01-3d.js`):**
+- **Sudden faults** (one, two or four CRAHs, a CDU, a CDU feeder) now run in two phases:
+  1. 15 s of the no-fault solve. The page sends it as `pre`, a balance solve with no fault.
+  2. The fault at t = 0. `faultFrom` carries the settled temperature and velocity fields over, applies the fault's fixed faces and projects the field so it is divergence-free.
+
+  Time-averages start 45 s after the fault, once the transient has passed.
+- **Time-driven faults** stay the steady field at the replay minute: chilled water, chiller and facility water, where the plant transient already carries the time.
+- **Panel:** "normal operation before the fault, t = −8 s", then "t = 32 s after the fault · first rack over 27 °C at 1.0 s". A transient solve is called settled after 45 s.
+- **History chart:** negative time is the pre-fault phase. A "fault" marker sits at t = 0, and the axis reads seconds after the fault. The balance label moved below its line, where it no longer collides with the hottest-inlet curve.
+
+**What it shows, with four CRAHs out:**
+- Before the fault, every rack inlet is at 24 °C with return at 35.2 °C.
+- After the trip, the first rack crosses 27 °C at **1.0 s**, as hot-aisle exhaust is pulled over the rack tops.
+- The hottest inlet reaches 31 °C by 5 s and settles at about 35 °C within **40 s**, the same steady value as the old solve from rest.
+- Return air climbs to 39.3 °C.
+- The fans are taken to stop at once. A real coast-down adds some 10–20 s, and the legend says so.
+
+**Gate W12tr**, new. On the default plant, with four CRAHs tripping after 15 s of normal operation, it requires:
+- the hall inside 27 °C before the fault;
+- the fault starting from exactly the settled field, with max |ΔT| 0;
+- the projection after the switch at or below 5e-3;
+- the reported first crossing of 27 °C equal to the crossing measured step by step, within 10 s;
+- the hottest inlet climbing toward the recorded four-out steady 34.8 °C, within 2 K and without overshooting past it;
+- the legend stating the pre-fault time the worker uses.
+
+It was proven red with no projection after the switch, with the temperature field not carried over, and with the crossing threshold changed.
+
 ## v3.21.14 — 2026-10-15
 
 ### "Walkthrough": a guided tour of DH01 that reads its captions off the solve

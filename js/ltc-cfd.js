@@ -25,7 +25,7 @@
  * Web Worker in the browser (postMessage protocol at the end). */
 (function (root) {
   'use strict';
-  var RHO = 1.2, CP = 1.006, G = 9.81, RACK_H = 2.0, PLEN_D = 0.9, CRAH_SUP_H = 2.6, RET_W = 1.2, LEAK_GAP = 0.05;
+  var PRE_T = 15, FAULT_WARM = 45, RHO = 1.2, CP = 1.006, G = 9.81, RACK_H = 2.0, PLEN_D = 0.9, CRAH_SUP_H = 2.6, RET_W = 1.2, LEAK_GAP = 0.05;
 
   function setup(r, s, opt) {
     var o = opt || {}, dx = o.dx || 0.3, p = r.input, h = r.hall, L = h.lengthM, W = h.widthM, H = h.heightM;
@@ -414,6 +414,7 @@
     C.res = project(C, iters || 12);
     energy(C, dt);
     C.t += dt; C.steps++;
+    if (C.transient && C.first27 == null) for (var q = 0; q < C.racks.length; q++) if (C.racks[q].tin > 27) { C.first27 = C.t; break; }
     accumulate(C);
     return C;
   }
@@ -451,7 +452,7 @@
     });
     return { t: C.t, steps: C.steps, inlet: inl, maxInlet: Math.max.apply(null, inl), over27: inl.filter(function (t) { return t > 27; }).length, over32: inl.filter(function (t) { return t > 32; }).length,
              supply: C.tsup, ret: C.tret, qRacksKw: C.qRacks, qCrahKw: bnd - supQ, residual: C.res,
-             inletMean: inm, averaged: avg, profile: prof, profDy: C.dx, nsub: C.nsub || 0, idx: indices(C, inm) };
+             inletMean: inm, averaged: avg, profile: prof, profDy: C.dx, nsub: C.nsub || 0, transient: !!C.transient, first27: C.first27 != null ? C.first27 : null, idx: indices(C, inm) };
   }
 
   /* air-management indices on the rack inlets (ASHRAE A1: recommended 18–27 °C, allowable 15–32 °C):
@@ -469,13 +470,24 @@
     return { rciHi: 100 * (1 - hi / (n * 5)), rciLo: 100 * (1 - lo / (n * 3)), rti: dTeq > 0 ? 100 * (C.tret - ts) / dTeq : 0, dTeq: dTeq, shi: shi, rhi: 1 - shi };
   }
 
+  /* the fault at t = 0: the settled no-fault field carried over, the fault's fixed faces applied and the
+     velocity projected; time-averages start once the transient has passed (FAULT_WARM, from the CRAH-trip
+     runs: the hottest inlet settles within about 40 s on the 0.6 m grid) */
+  function faultFrom(C, A) {
+    ['T', 'u', 'v', 'w'].forEach(function (k) { C[k].set(A[k]); });
+    applyFixed(C); C.res = project(C, 40);
+    C.u0.set(C.u); C.v0.set(C.v); C.w0.set(C.w);
+    C.t = 0; C.transient = true; C.warm = FAULT_WARM;
+    return C;
+  }
+
   function run(r, s, opt) {
     var o = opt || {}, C = setup(r, s, o), n = o.steps || 300;
     for (var i = 0; i < n; i++) step(C, o.dt || 0.2, o.iters || 12);
     return C;
   }
 
-  var api = { setup: setup, step: step, indices: indices, run: run, report: report, vel: vel, RACK_H: RACK_H, PLEN_D: PLEN_D };
+  var api = { setup: setup, faultFrom: faultFrom, PRE_T: PRE_T, step: step, indices: indices, run: run, report: report, vel: vel, RACK_H: RACK_H, PLEN_D: PLEN_D };
   root.LTCCFD = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 
@@ -486,14 +498,20 @@
       var m = e.data;
       if (m.cmd === 'stop') { gen++; return; }
       if (m.cmd !== 'start') return;
-      var my = ++gen; C = setup(m.r, m.s, m.opt);
+      // a sudden fault (CRAHs, CDUs) starts from the hall in normal operation: PRE_T seconds of the
+      // no-fault solve, then the fault at t = 0, so the frames show the real transient
+      var my = ++gen, A = m.pre ? setup(m.r, m.pre, m.opt) : null;
+      C = A ? null : setup(m.r, m.s, m.opt);
       (function loop() {
         if (my !== gen) return;
-        for (var i = 0; i < (m.opt && m.opt.batch || 2); i++) step(C, 0.2, 12);
-        var cellsT = C.mean && C.mean.n > 20 ? C.mean.T : C.T;
-        root.postMessage({ cmd: 'frame', key: m.key, nx: C.nx, ny: C.ny, nz: C.nz, dx: C.dx, T: new Float32Array(C.T), Tm: new Float32Array(cellsT),
-          u: new Float32Array(C.u), v: new Float32Array(C.v), w: new Float32Array(C.w),
-          ti: C.mean ? tiField(C) : null, solid: C.steps <= 4 ? new Uint8Array(C.solid) : null, rep: report(C) });
+        if (A && A.t >= PRE_T - 1e-9) { C = faultFrom(setup(m.r, m.s, m.opt), A); A = null; }
+        var X = A || C;
+        for (var i = 0; i < (m.opt && m.opt.batch || 2); i++) step(X, 0.2, 12);
+        var cellsT = X.mean && X.mean.n > 20 ? X.mean.T : X.T, rep = report(X);
+        if (A) { rep.t = A.t - PRE_T; rep.pre = true; }
+        root.postMessage({ cmd: 'frame', key: m.key, nx: X.nx, ny: X.ny, nz: X.nz, dx: X.dx, T: new Float32Array(X.T), Tm: new Float32Array(cellsT),
+          u: new Float32Array(X.u), v: new Float32Array(X.v), w: new Float32Array(X.w),
+          ti: X.mean ? tiField(X) : null, solid: X.steps <= 4 ? new Uint8Array(X.solid) : null, rep: rep });
         setTimeout(loop, 0);
       })();
     };
