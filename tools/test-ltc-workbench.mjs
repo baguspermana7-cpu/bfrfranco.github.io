@@ -721,6 +721,34 @@ for (const [page, mod] of Object.entries(PAGES)) {
      'every verdict links to the chapter it judges');
   ok('W12v-f', text.includes('ISO/IEC 30134-2:2016') && (base.html.match(/<ol class="refs">[\s\S]*?<\/ol>/)[0].match(/<li>/g) || []).length >= 8 && titles.includes('Glossary') && titles.includes('References'),
      'a numbered references chapter and a glossary chapter are in the contents');
+
+  /* W12ld (v3.22.1) — the four table-only chapters get a drawing each: a temperature ladder for the
+   * liquid path and one for the air path, an electrical staircase from the facility meter to the IT
+   * input, and the redundancy register as capacity bars. Each drawing carries its numbers as data
+   * attributes so the check reads the drawing, not the engine, and the staircase must close:
+   * facility − every step = IT. */
+  const svgOf = (h, aria) => (h.match(new RegExp('<svg[^>]*aria-label="' + aria + '"[\\s\\S]*?<\\/svg>')) || [''])[0];
+  const cols = (s) => [...s.matchAll(/class="lcol" data-lo="([^"]+)" data-hi="([^"]+)"/g)].map((m) => [+m[1], +m[2]]);
+  const adia = V({ liquidRejection: 'adiabatic' }), airCh = V({ chillerType: 'air' });
+  const L = cols(svgOf(base.html, 'Liquid path temperatures')), La = cols(svgOf(adia.html, 'Liquid path temperatures'));
+  const bp = base.R.input, bl = base.R.liquid;
+  ok('W12ld-a', L.length === 4 && L[0][0] === bp.tcsSupplyC && L[0][1] === bp.tcsReturnC && L[1][0] === bl.fwsSupplyC && L[1][1] === bl.fwsReturnC && L[2][0] === bl.coolerSinkC && L[2][1] === bl.coolerLeavingC && L[3][0] === bl.fwsSupplyC && L[3][1] === bl.coolerLeavingC
+     && L.every((c) => c[1] >= c[0]) && svgOf(base.html, 'Liquid path temperatures').includes('CDU HX ' + bp.cduApproachK.toFixed(1) + ' K'),
+     `liquid ladder: TCS, FWS, cooler and trim bars carry the engine's temperatures, cold end below hot end, the CDU approach on the link — got ${JSON.stringify(L)}`);
+  ok('W12ld-b', La.length === 3 && adia.R.liquid.trimKw < 0.5 && La[2][1] === adia.R.liquid.fwsSupplyC,
+     `adiabatic plant: no trim bar, the coolers reach the FWS supply — got ${JSON.stringify(La)} trim ${adia.R.liquid.trimKw}`);
+  const A = cols(svgOf(base.html, 'Air path temperatures')), Aa = cols(svgOf(airCh.html, 'Air path temperatures')), ba = base.R.air;
+  ok('W12ld-c', A.length === 3 && A[0][0] === bp.supplyAirC && A[0][1] === bp.supplyAirC + bp.airDeltaK && A[1][0] === ba.chwSupplyC && A[1][1] === ba.chwReturnC && A[2][0] === bp.designWbC && A[2][1] === bp.designWbC + bp.towerApproachK
+     && Aa[2][0] === bp.designDbC && Aa[2][1] === bp.designDbC && svgOf(airCh.html, 'Air path temperatures').includes('Condenser air'),
+     `air ladder: hall air, CHW and the condenser side (wet bulb + tower approach; dry bulb for an air-cooled chiller) — got ${JSON.stringify(A)} / ${JSON.stringify(Aa)}`);
+  const stairKw = (h) => [...svgOf(h, 'From the utility meter to the IT input').matchAll(/data-kw="([^"]+)"/g)].map((m) => +m[1]);
+  const S = stairKw(base.html), Sn = stairKw(V({ cduOnUps: false }).html), close = (k) => Math.abs(k[0] - k.slice(1, -1).reduce((a, b) => a + b, 0) - k[k.length - 1]);
+  ok('W12ld-d', S.length === 9 && Sn.length === 8 && close(S) < 0.01 && close(Sn) < 0.01 && S[0] === base.R.design.facility && S[8] === base.R.design.m3 && S[1] === base.R.design.mcc && S[4] === base.R.design.upsLoss,
+     `electrical staircase closes: facility − MCC − transformer − distribution − UPS − TCS pumps − PDU − cords = IT (${S.map((v) => v.toFixed(0)).join(' ')}; residual ${close(S).toFixed(3)} / ${close(Sn).toFixed(3)} kW)`);
+  const bars = (h) => [...svgOf(h, 'Redundancy register').matchAll(/class="rb" data-n1="([^"]+)" data-load="([^"]+)" data-ok="(\d)"/g)].map((m) => [+m[1], +m[2], +m[3]]);
+  const B = bars(base.html), reg = X.register(base.R), Bn = bars(noSpare.html);
+  ok('W12ld-e', B.length === reg.length && B.every((b, i) => b[0] === (reg[i][2] - 1) * reg[i][3] && b[1] === reg[i][4] && b[2] === (b[0] >= b[1] - 0.5 ? 1 : 0)) && Bn.some((b) => b[2] === 0) && B.every((b) => b[2] === 1),
+     `register bars: one per class, tick at (installed − 1) × unit, status from tick vs load; no CRAH spare shows a short bar — got ${JSON.stringify(B)}`);
 }
 
 {

@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.22.2 — 2026-10-16
+
+### The engineering report draws its four table chapters
+
+**Why.** v3.21.18 made the report a paper document and v3.21.19 gave it verdicts, a glossary and references, but four chapters — Liquid path, Air path, Electrical & sizing, Redundancy register — were still tables only. A reader had to assemble the temperature chain, the loss chain and the one-unit-out margins in their head. The owner's standing brief for this report: "super comprehensive, detail, immersive, clear".
+
+**What is drawn** (`js/ltc-report.js`):
+- **Liquid path — a temperature ladder.** One bar per loop on a shared °C axis, cold end to hot end: the TCS loop at the cold plates, the facility water loop, the liquid coolers from their sink (dry bulb, or the adiabatic sink) to their leaving temperature, and — when the coolers cannot reach the FWS supply — a red bar for the gap the trim chillers close, with the share of FWS heat they take. The dashed links carry the CDU heat-exchanger approach and the cooler approach. On the default dry-cooler plant the picture shows why 70 % of the heat is on trim chillers at the design hour: the coolers leave at 39 °C against a 32 °C supply.
+- **Air path — a second ladder.** Hall air supply to return, the chilled-water loop at the CRAH coils, and the condenser side: wet bulb plus tower approach for a water-cooled chiller, dry bulb for an air-cooled one. The links carry the coil approach and the chiller's minimum lift.
+- **Electrical & sizing — a staircase.** From the facility meter (M0) down to the IT input (M3), one step per loss or branch: mechanical (MCC) with rooms and auxiliaries, transformer, distribution, UPS, the TCS pumps when they sit on the UPS, PDU, cords. The UPS input, M1 and M2 are marked where the stair passes them.
+- **Redundancy register — capacity bars.** For every equipment class: installed capacity in grey, the design load as the bar, and a tick at the capacity with one unit out. A bar past its tick is short.
+- Glossary: HX.
+
+**Gate** (`tools/test-ltc-workbench.mjs`, W12ld, 349 assertions): each drawing carries its numbers as data attributes, so the check reads the drawing. The ladders must carry the engine's temperatures with the cold end below the hot end, the trim bar must disappear on an adiabatic plant, the condenser side must switch to dry bulb for an air-cooled chiller, the staircase must close (facility − every step = IT, with and without the TCS pumps on the UPS), and the register ticks must sit at (installed − 1) × unit with a short bar appearing when the CRAH spare is removed. Two mutants proven red: a dropped staircase step, a tick at installed × unit.
+
 ## v3.22.1 — 2026-10-16
 
 ### The gate learns the eight tells the owner found on the hub — and its own fixture suite joins the ship gate

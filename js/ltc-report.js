@@ -199,6 +199,98 @@
       ['Chillers', a.chillersN, a.chillersTotal, p.chillerUnitKw, a.chillerEvapKw, 'campus']
     ];
   }
+
+  /* temperature ladder: one column per loop, a bar from its cold end to its hot end on a shared °C axis,
+     the approach between neighbouring loops written on the link. cols: [{label, lo, hi, color, note}],
+     links: [{a, aEnd, b, bEnd, text}] (ends: 'lo' | 'hi'). The data-lo / data-hi attributes carry the values. */
+  function ladder(cols, links, aria) {
+    var W = 760, lines = cols.reduce(function (m, c) { return Math.max(m, c.note ? c.note.split(' · ').length : 0); }, 0), top = 30 + 13 * (lines + 1), bot = top + 186, H = bot + 24, lx = 60, bw = 34;
+    var all = [];
+    cols.forEach(function (c) { all.push(c.lo, c.hi); });
+    var tmin = Math.floor(Math.min.apply(null, all) / 5) * 5 - 2, tmax = Math.ceil(Math.max.apply(null, all) / 5) * 5 + 2;
+    function Y(t) { return bot - (bot - top) * (t - tmin) / (tmax - tmin); }
+    var colW = (W - lx - 20) / cols.length;
+    function X(i) { return lx + colW * i + colW / 2; }
+    var out = [];
+    for (var t = tmin + 2; t <= tmax; t += 5) out.push('<line x1="' + lx + '" y1="' + Y(t).toFixed(1) + '" x2="' + (W - 10) + '" y2="' + Y(t).toFixed(1) + '" stroke="' + C.grid + '" stroke-dasharray="2 3"/><text x="' + (lx - 6) + '" y="' + (Y(t) + 4).toFixed(1) + '" text-anchor="end" class="sd">' + t + ' °C</text>');
+    cols.forEach(function (c, i) {
+      var x = X(i), y1 = Y(c.hi), y2 = Y(c.lo), h = Math.max(2, y2 - y1);
+      out.push('<g class="lcol" data-lo="' + c.lo + '" data-hi="' + c.hi + '"><rect x="' + (x - bw / 2) + '" y="' + y1.toFixed(1) + '" width="' + bw + '" height="' + h.toFixed(1) + '" fill="' + c.color + '" fill-opacity=".85"/>' +
+        '<text x="' + x + '" y="' + (top - 13 * (lines + 1) - 4) + '" text-anchor="middle" class="sl">' + esc(c.label) + '</text>' +
+        (c.note ? c.note.split(' · ').map(function (ln, j) { return '<text x="' + x + '" y="' + (top - 13 * (lines - j) - 2) + '" text-anchor="middle" class="sd">' + esc(ln) + '</text>'; }).join('') : '') +
+        '<text x="' + (x + bw / 2 + 5) + '" y="' + (y1 + 4).toFixed(1) + '" class="sv">' + f(c.hi, 1) + '</text>' +
+        (c.hi - c.lo > 0.05 ? '<text x="' + (x + bw / 2 + 5) + '" y="' + (y2 + 4).toFixed(1) + '" class="sv">' + f(c.lo, 1) + '</text>' : '') + '</g>');
+    });
+    links.forEach(function (k) {
+      var a = cols[k.a], b = cols[k.b], xa = X(k.a) + bw / 2 + 44, xb = X(k.b) - bw / 2 - 4, ya = Y(a[k.aEnd]), yb = Y(b[k.bEnd]), xm = (xa + xb) / 2;
+      out.push('<path d="M' + xa.toFixed(1) + ',' + ya.toFixed(1) + ' L' + xm.toFixed(1) + ',' + ya.toFixed(1) + ' L' + xm.toFixed(1) + ',' + yb.toFixed(1) + ' L' + xb.toFixed(1) + ',' + yb.toFixed(1) + '" fill="none" stroke="#6b7280" stroke-width="1" stroke-dasharray="3 2"/>' +
+        '<text x="' + xm.toFixed(1) + '" y="' + (Math.min(ya, yb) - 5).toFixed(1) + '" text-anchor="middle" class="sd lk">' + esc(k.text) + '</text>');
+    });
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(aria) + '">' + out.join('') + '</svg>';
+  }
+  function liquidLadder(R) {
+    var p = R.input, l = R.liquid, approach = l.coolerLeavingC - l.coolerSinkC;
+    var cols = [
+      { label: 'TCS loop · cold plates', lo: p.tcsSupplyC, hi: p.tcsReturnC, color: C.liq, note: 'ΔT ' + f(l.tcsDeltaK, 1) + ' K · ' + f(l.tcsLps, 0) + ' L/s' },
+      { label: 'FWS loop · facility water', lo: l.fwsSupplyC, hi: l.fwsReturnC, color: C.chw, note: 'ΔT ' + f(l.fwsReturnC - l.fwsSupplyC, 1) + ' K · ' + f(l.fwsLps, 0) + ' L/s' },
+      { label: 'Liquid coolers · ' + l.coolerType, lo: l.coolerSinkC, hi: l.coolerLeavingC, color: C.ok, note: 'sink ' + f(l.coolerSinkC, 1) + ' → leaving ' + f(l.coolerLeavingC, 1) + ' °C' }
+    ];
+    var links = [{ a: 0, aEnd: 'lo', b: 1, bEnd: 'lo', text: 'CDU HX ' + f(p.cduApproachK, 1) + ' K' }, { a: 1, aEnd: 'hi', b: 2, bEnd: 'hi', text: 'approach ' + f(approach, 1) + ' K' }];
+    if (l.trimKw > 0.5) {
+      cols.push({ label: 'Trim chillers · design day', lo: l.fwsSupplyC, hi: l.coolerLeavingC, color: C.heat, note: f(l.trimShareDesign * 100, 0) + ' % of FWS heat · ' + mw(l.trimKw) + ' MW' });
+      links.push({ a: 2, aEnd: 'hi', b: 3, bEnd: 'hi', text: 'trim ' + f(l.coolerLeavingC - l.fwsSupplyC, 1) + ' K' });
+    }
+    return ladder(cols, links, 'Liquid path temperatures');
+  }
+  function airLadder(R) {
+    var p = R.input, a = R.air, water = a.chillerType === 'water';
+    var sink = water ? p.designWbC : p.designDbC, cw = water ? p.designWbC + p.towerApproachK : p.designDbC;
+    var cols = [
+      { label: 'Hall air · supply to return', lo: p.supplyAirC, hi: p.supplyAirC + p.airDeltaK, color: C.air, note: 'ΔT ' + f(p.airDeltaK, 1) + ' K · ' + f(a.airflowHallM3s, 0) + ' m³/s per hall' },
+      { label: 'CHW loop · CRAH coils', lo: a.chwSupplyC, hi: a.chwReturnC, color: C.chw, note: 'ΔT ' + f(a.chwReturnC - a.chwSupplyC, 1) + ' K · ' + f(a.chwLps, 0) + ' L/s · chiller COP ' + f(a.chillerCop, 2) },
+      { label: water ? 'Condenser water · from towers' : 'Condenser air · ambient', lo: sink, hi: cw, color: C.ok, note: water ? 'wet bulb ' + f(p.designWbC, 1) + ' °C · tower approach ' + f(p.towerApproachK, 1) + ' K' : 'dry bulb ' + f(p.designDbC, 1) + ' °C' }
+    ];
+    var links = [{ a: 0, aEnd: 'lo', b: 1, bEnd: 'lo', text: 'coil ' + f(p.supplyAirC - a.chwSupplyC, 1) + ' K' }, { a: 1, aEnd: 'lo', b: 2, bEnd: 'hi', text: 'lift ≥ ' + f(cw - a.chwSupplyC, 1) + ' K' }];
+    return ladder(cols, links, 'Air path temperatures');
+  }
+
+  /* electrical staircase: the facility meter down to the IT input, one step per loss or branch.
+     Identity (engine): facility = UPS in + transformer + distribution + MCC; UPS in = UPS out + UPS loss;
+     UPS out = IT + cords + PDU (+ TCS pumps when on UPS). Each step carries data-kw. */
+  function stair(R) {
+    var d = R.design, p = R.input;
+    var steps = [['Mechanical (MCC) + rooms + auxiliary', d.mcc, 'liq'], ['Transformer losses', d.txLoss, 'elec'], ['Distribution losses', d.distLoss, 'elec'], ['UPS losses', d.upsLoss, 'elec']];
+    if (p.cduOnUps) steps.push(['TCS pumps on UPS', d.tcsPump, 'liq']);
+    steps.push(['PDU / RPP losses', d.pduLoss, 'elec'], ['Power cords', d.cordLoss, 'elec']);
+    var W = 760, H = 60 + steps.length * 26, lx = 300, scale = (W - lx - 150) / d.facility, col = { elec: C.elec, liq: C.liq };
+    var out = ['<g class="step" data-kw="' + d.facility + '"><rect x="' + lx + '" y="6" width="' + (d.facility * scale).toFixed(1) + '" height="16" fill="#6b7280"/><text x="' + (lx - 8) + '" y="18" text-anchor="end" class="sl">M0 · facility input</text><text x="' + (lx + d.facility * scale + 6).toFixed(1) + '" y="18" class="sv">' + f(d.facility) + ' kW</text></g>'];
+    var run = d.facility;
+    steps.forEach(function (s, i) {
+      var y = 32 + i * 26, x0 = lx + (run - s[1]) * scale;
+      out.push('<g class="step" data-kw="' + s[1] + '"><rect x="' + x0.toFixed(1) + '" y="' + y + '" width="' + Math.max(1, s[1] * scale).toFixed(1) + '" height="16" fill="' + col[s[2]] + '"/>' +
+        '<line x1="' + lx + '" y1="' + (y + 8) + '" x2="' + x0.toFixed(1) + '" y2="' + (y + 8) + '" stroke="' + C.grid + '"/>' +
+        '<text x="' + (lx - 8) + '" y="' + (y + 12) + '" text-anchor="end" class="sl">− ' + esc(s[0]) + '</text><text x="' + (lx + run * scale + 6).toFixed(1) + '" y="' + (y + 12) + '" class="sv">' + f(s[1]) + ' kW</text></g>');
+      run -= s[1];
+      var mark = i === 2 ? 'UPS input' : i === 3 ? 'M1 · UPS output' : i === steps.length - 2 ? 'M2 · PDU output' : '';
+      if (mark) out.push('<text x="' + (lx + run * scale - 6).toFixed(1) + '" y="' + (y + 24) + '" text-anchor="end" class="sd">' + mark + ' ' + f(run) + ' kW</text>');
+    });
+    var y = 32 + steps.length * 26;
+    out.push('<g class="step" data-kw="' + d.m3 + '"><rect x="' + lx + '" y="' + y + '" width="' + (d.m3 * scale).toFixed(1) + '" height="16" fill="#1f2937"/><text x="' + (lx - 8) + '" y="' + (y + 12) + '" text-anchor="end" class="sl">M3 · IT input</text><text x="' + (lx + d.m3 * scale + 6).toFixed(1) + '" y="' + (y + 12) + '" class="sv">' + f(d.m3) + ' kW · PUE ' + f(d.pue, 3) + '</text></g>');
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="From the utility meter to the IT input">' + out.join('') + '</svg>';
+  }
+
+  /* redundancy register as bars: installed capacity (light), the capacity with one unit out (tick), the load (dark) */
+  function regBars(reg) {
+    var W = 760, rh = 28, lx = 230, max = Math.max.apply(null, reg.map(function (r) { return r[2] * r[3]; })), scale = (W - lx - 232) / max;
+    return '<svg viewBox="0 0 ' + W + ' ' + (reg.length * rh + 24) + '" role="img" aria-label="Redundancy register">' + reg.map(function (r, i) {
+      var y = 4 + i * rh, cap = r[2] * r[3], n1 = (r[2] - 1) * r[3], ok = n1 >= r[4] - 0.5, xt = lx + n1 * scale;
+      return '<g class="rb" data-n1="' + n1 + '" data-load="' + r[4] + '" data-ok="' + (ok ? 1 : 0) + '"><text x="' + (lx - 8) + '" y="' + (y + 13) + '" text-anchor="end" class="sl">' + esc(r[0]) + ' <tspan class="sd">' + r[2] + ' × ' + f(r[3]) + '</tspan></text>' +
+        '<rect x="' + lx + '" y="' + (y + 2) + '" width="' + (cap * scale).toFixed(1) + '" height="16" fill="#e5e7eb"/>' +
+        '<rect x="' + lx + '" y="' + (y + 2) + '" width="' + (r[4] * scale).toFixed(1) + '" height="16" fill="' + (ok ? C.liq : C.bad) + '" fill-opacity=".85"/>' +
+        '<line x1="' + xt.toFixed(1) + '" y1="' + (y - 1) + '" x2="' + xt.toFixed(1) + '" y2="' + (y + 21) + '" stroke="' + (ok ? C.ok : C.bad) + '" stroke-width="2"/>' +
+        '<text x="' + (lx + cap * scale + 6).toFixed(1) + '" y="' + (y + 13) + '" class="sv">' + (ok ? 'holds' : 'short') + ' · N−1 ' + f(n1) + ' vs ' + f(r[4]) + ' kW</text></g>';
+    }).join('') + '<text x="' + lx + '" y="' + (reg.length * rh + 18) + '" class="sd">grey = installed capacity · bar = design load · tick = capacity with one unit out</text></svg>';
+  }
   function findings(R, ctx) {
     var T = R.totals, A = R.annual, l = R.liquid, out = [];
     out.push('Design-day PUE <b>' + f(T.pue, 3) + '</b> at ' + R.input.designDbC + ' °C db / ' + R.input.designWbC + ' °C wb; annual PUE <b>' + f(T.pueAnnual, 3) + '</b> over the ' + esc((ctx.climateLabel || 'site')) + ' bins at ' + f(R.input.itUtil * 100) + ' % utilisation.');
@@ -396,6 +488,7 @@
     ['GPU', 'Graphics processing unit: the chip the cold plates cool; it throttles when the TCS return passes its limit.'],
     ['HLT', 'Heat load test: the level-4 commissioning test that loads the hall with load banks and fails units one at a time.'],
     ['HPC', 'High-performance computing: dense, liquid-cooled compute, the rack profile this plant carries.'],
+    ['HX', 'Heat exchanger: here the plate exchanger inside the CDU that separates the TCS loop from the facility water; its approach is the temperature difference it needs to pass the heat.'],
     ['IEC', 'International Electrotechnical Commission; ISO/IEC 30134 is the data centre KPI series (PUE, REF, ERF, CUE, WUE).'],
     ['ISO', 'International Organization for Standardization; ISO 50001 is the energy management standard the Model page screens against.'],
     ['IT', 'Information technology load: the servers, measured at M3; the control point every other number is sized from.'],
@@ -475,26 +568,26 @@
       '<figure class="wide">' + meters(R) + '</figure>' + table(['Category', 'IT measured at', 'IT energy MWh/yr', 'PUE'], [
         ['Category 1', 'UPS output (M1)', f(A.m1MWh), f(A.pue1, 3)], ['Category 2', 'PDU output (M2)', f(A.m2MWh), f(A.pue2, 3)], ['Category 3', 'IT equipment input (M3)', f(A.m3MWh), f(A.pue3, 3)]]) +
       '<p class="note">Same facility, three PUEs: a reported PUE without its category is not comparable. Facility input M0 = ' + f(A.m0MWh) + ' MWh/yr.</p>'));
-    parts.push(sec('s5', 5, 'Liquid path', 'Cold plate → TCS (technology cooling system) → CDU → FWS (facility water) → liquid coolers, with trim chillers when the coolers cannot reach the FWS supply.', table(['Quantity', 'Value'], [
+    parts.push(sec('s5', 5, 'Liquid path', 'Cold plate → TCS (technology cooling system) → CDU → FWS (facility water) → liquid coolers, with trim chillers when the coolers cannot reach the FWS supply.', '<figure class="wide">' + liquidLadder(R) + '</figure><p class="note">Each bar is one loop, cold end to hot end on the same °C axis; the dashed links carry the approach between loops. Where the coolers\' leaving temperature sits above the FWS supply, the red bar is the gap the trim chillers close.</p>' + table(['Quantity', 'Value'], [
       ['Heat into cold plates', f(l.itKw) + ' kW (' + f(p.capturePct) + ' % of IT)'], ['Liquid duty incl. TCS pumps', f(l.dutyKw) + ' kW'], ['TCS supply / return', f(p.tcsSupplyC, 1) + ' / ' + f(p.tcsReturnC, 1) + ' °C (ΔT ' + f(l.tcsDeltaK, 1) + ' K)'],
       ['TCS flow / pump power', f(l.tcsLps, 0) + ' L/s · ' + f(l.tcsPumpKw) + ' kW'], ['CDUs', l.cduDutyN + ' duty + ' + (l.cduPerHall - l.cduDutyN) + ' spare per hall · ' + l.cduTotal + ' total · ' + f(p.cduUnitKw) + ' kW each'],
       ['CDU skin loss to room', f(l.cduSkinKw) + ' kW'], ['FWS supply / return', f(l.fwsSupplyC, 1) + ' / ' + f(l.fwsReturnC, 1) + ' °C'], ['FWS flow / pump power', f(l.fwsLps, 0) + ' L/s · ' + f(l.fwsPumpKw) + ' kW'],
       ['Cooler type / sink / leaving', esc(l.coolerType) + ' · sink ' + f(l.coolerSinkC, 1) + ' °C · leaving ' + f(l.coolerLeavingC, 1) + ' °C'], ['Coolers', l.coolerUnits + ' duty / ' + l.coolerUnitsTotal + ' installed · derated ' + f(l.coolerUnitKw) + ' kW (' + pct(l.coolerDerate, 1) + ' of rating)'],
       ['Cooler duty / fans', f(l.coolerKw) + ' kW · fans ' + f(l.coolerFanKw) + ' kW'], ['Trim chillers, design day', f(l.trimKw) + ' kW duty · ' + f(l.trimKwe) + ' kW electrical (' + pct(l.trimShareDesign, 1) + ' of FWS heat)']])));
-    parts.push(sec('s6', 6, 'Air path', 'Residual IT heat, CDU skin loss and fan heat to CRAHs → chilled water → chillers → cooling towers.', table(['Quantity', 'Value'], [
+    parts.push(sec('s6', 6, 'Air path', 'Residual IT heat, CDU skin loss and fan heat to CRAHs → chilled water → chillers → cooling towers.', '<figure class="wide">' + airLadder(R) + '</figure>' + table(['Quantity', 'Value'], [
       ['IT heat left in air', f(a.itKw) + ' kW'], ['Air load per hall incl. fans', f(a.hallLoadKw) + ' kW'], ['CRAHs', a.crahDutyN + ' duty / ' + a.crahPerHall + ' per hall · ' + a.crahTotal + ' total · ' + f(p.crahUnitKw) + ' kW each'],
       ['Airflow per hall', f(a.airflowHallM3s, 1) + ' m³/s at ΔT ' + f(p.airDeltaK) + ' K · ' + f(h.airChangesPerHour) + ' air changes / h'], ['CRAH fan power', f(a.fanKw) + ' kW'],
       ['CHW supply / return', f(a.chwSupplyC, 1) + ' / ' + f(a.chwReturnC, 1) + ' °C · ' + f(a.chwLps) + ' L/s'], ['Chillers', a.chillersN + ' duty / ' + a.chillersTotal + ' installed · ' + esc(a.chillerType) + '-cooled · PLR ' + pct(a.chillerPlr, 1)],
       ['Chiller evaporator / input', f(a.chillerEvapKw) + ' kW · ' + f(a.chillerKwe) + ' kW (COP ' + f(a.chillerCop, 2) + ', ' + f(a.chillerKwPerRt, 3) + ' kW/RT)'],
       ['CHW / CW pumps', f(a.chwPumpKw) + ' / ' + f(a.cwPumpKw) + ' kW'], ['Towers', f(a.towerKw) + ' kW rejected · fans ' + f(a.towerFanKw) + ' kW · make-up ' + f(a.makeupLps, 1) + ' L/s']])));
-    parts.push(sec('s7', 7, 'Electrical & sizing', 'From the utility to the cord: the losses each stage adds and the units it takes.', table(['Quantity', 'Value'], [
+    parts.push(sec('s7', 7, 'Electrical & sizing', 'From the utility to the cord: the losses each stage adds and the units it takes.', '<figure class="wide">' + stair(R) + '</figure>' + table(['Quantity', 'Value'], [
       ['IT (M3) → PDU output (M2)', f(d.m3) + ' → ' + f(d.m2) + ' kW (cords ' + f(d.cordLoss) + ' kW)'], ['UPS output (M1)', f(d.m1) + ' kW (PDU ' + f(d.pduLoss) + ' kW' + (p.cduOnUps ? ', TCS pumps on UPS ' + f(d.tcsPump) + ' kW' : '') + ')'],
       ['UPS input / loss', f(e.upsInKw) + ' kW · ' + f(e.upsLossKw) + ' kW at η ' + f(p.upsEff * 100, 1) + ' %'], ['Distribution / transformer losses', f(e.distLossKw) + ' / ' + f(e.txLossKw) + ' kW'],
       ['Electrical-room cooling', f(e.roomLoadKw) + ' kW heat · ' + f(e.roomFanKw) + ' kW fans'], ['Generators', w.genN + ' + ' + (w.genTotal - w.genN) + ' × ' + f(w.genUnitKw) + ' kW'],
       ['Transformers', w.txN + ' + ' + (w.txTotal - w.txN) + ' × ' + f(w.txUnitKw) + ' kVA'], ['UPS modules', w.upsN + ' + ' + (w.upsTotal - w.upsN) + ' × ' + f(w.upsModuleKw) + ' kW (' + esc(w.upsTopology) + ')'],
       ['CDU feed', esc(w.cduFeed === 'dual' ? 'dual-fed through ATS' : 'single-fed, alternating A / B')]])));
     var reg = register(R);
-    parts.push(sec('s8', 8, 'Redundancy register', 'Installed against needed, and whether the plant still carries the design load with one unit out.', table(['Equipment', 'Need (N)', 'Installed', 'Label', 'Unit kW', 'Capacity kW', 'Load kW', 'Margin', 'One unit out'], reg.map(function (r) {
+    parts.push(sec('s8', 8, 'Redundancy register', 'Installed against needed, and whether the plant still carries the design load with one unit out.', '<figure class="wide">' + regBars(register(R)) + '</figure>' + table(['Equipment', 'Need (N)', 'Installed', 'Label', 'Unit kW', 'Capacity kW', 'Load kW', 'Margin', 'One unit out'], reg.map(function (r) {
       var cap = r[2] * r[3], ok = (r[2] - 1) * r[3] >= r[4] - 0.5;
       return [esc(r[0]) + ' <small>' + r[5] + '</small>', r[1], r[2], (root.LTCTier ? root.LTCTier.redLabel(r[2], r[1]) : (r[2] > r[1] ? 'N+' + (r[2] - r[1]) : 'N')), f(r[3]), f(cap), f(r[4]), pct(cap - r[4], r[4]), ok ? '<span class="tag ok">holds</span>' : '<span class="tag bad">short</span>'];
     })) + '<p class="note">Unit counts are capacity redundancy only. Whether a <em>path</em> can be taken out (concurrent maintainability, fault tolerance) is tested on the Tier page, element by element.</p>'));
