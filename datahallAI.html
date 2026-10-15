@@ -768,7 +768,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261015-18c145b9" defer></script>
+</style>    <script src="js/rz-version.js?v=20261015-f02acd0a" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -786,11 +786,11 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          byte-frozen by the ship gate and still proving its own 57 worked examples, but this
          page no longer loads it. The ?v= token IS the version pin the authority block checks
          (= DCAI_CALC.snapshot.meta.version); tools/test-dcai-engine-version-pin.mjs asserts it. -->
-    <script src="js/dcai-model.js?v=1.5.0" data-datahall-model-authority></script>
-    <script src="js/dcai-engine.js?v=1.5.0" data-datahall-calc-authority></script>
+    <script src="js/dcai-model.js?v=1.6.0" data-datahall-model-authority></script>
+    <script src="js/dcai-engine.js?v=1.6.0" data-datahall-calc-authority></script>
     <!-- generated registry twin: the authority block validates the live snapshot against
          every id the registry publishes, so the allow-list is generated, never typed -->
-    <script src="js/dcai-parameters.js?v=1.5.0" data-datahall-registry></script>
+    <script src="js/dcai-parameters.js?v=1.6.0" data-datahall-registry></script>
     <script src="js/rz-evidence.js?v=20260920-3f7c72db"></script>
     <!-- v3.10.2 — the width budget, loaded BEFORE rz-svg-basis so a basis mark sits just past the
          end of its label instead of past a length*size*0.6 estimate of it. Synchronous and
@@ -1442,7 +1442,7 @@ Requested model/calculation versions and the complete locked schema must validat
 <script>
 (function(root,d){
 'use strict';
-var DATAHALL_CURRENT_ASSET_VERSION='1.5.0';                 /* = DCAI_CALC.snapshot.meta.version */
+var DATAHALL_CURRENT_ASSET_VERSION='1.6.0';                 /* = DCAI_CALC.snapshot.meta.version */
 var DATAHALL_CURRENT_SPEC_VERSION='gb300-500mw-2026-09-06';  /* = DCAI_MODEL.specVersion */
 /* v2.0.0 — the allow-list is the REGISTRY. v1.20.0 typed 68 numeric + 15 string model paths,
    28 function names and 33 state keys into this page by hand; the generated registry
@@ -1773,6 +1773,8 @@ txRatingMVA:E.transformer_unit_mva,                   /* 2.5 */
     chillerPlantM2:rd(T.chiller_plant_m2,0), mainTxYardM2:rd(T.main_tx_yard_m2,0), gisHallM2:rd(T.gis_hall_m2,0),
     fuelAutonomyH:T.fuel_autonomy_h, fuelM3:rd(T.fuel_m3,0), fuelFarmM2:rd(T.fuel_farm_m2,0),
     plantOutsideM2:rd(T.plant_outside_m2,0), siteAreaM2:rd(T.site_area_m2,0),
+    stpM2:T.stp_m2, roadM:T.road_m, setbackM:T.setback_m, gensetYardW:rd(T.genset_yard_width_m,1), northBandM:rd(T.north_band_depth_m,1), southBandM:rd(T.south_band_depth_m,1),
+    siteWidthM:rd(T.site_width_m,1), siteDepthM:rd(T.site_depth_m,1), roadsM2:rd(T.roads_m2,0),
     /* ---- fabric ---- */
     leavesPerHall:N.leaves_per_hall, spinesPerHall:N.spines_per_hall, coresPerHall:N.cores_per_hall,
     switchesPerHall:N.switches_per_hall,
@@ -1866,7 +1868,7 @@ window.DH_BASIS={
 "upsRatingKW":"equipment.ups_frame_kw","upsRatingMW":"equipment.ups_frame_kw","upsFramesPerFeedHall":"distribution.ups_frames_per_hall_per_feed","upsFramesTotal":"equipment.ups_frames_total","upsLoadPct":"equipment.ups_loading_pct","upsLoadNormalPct":"equipment.ups_loading_normal_pct","batteryKWh":"equipment.battery_kwh",
 "unitSubsPerFeed":"equipment.unit_subs_per_feed_per_hall","unitSubNormalPct":"equipment.unit_sub_loading_normal_pct","unitSubContingencyPct":"equipment.unit_sub_loading_contingency_pct","txRatingMVA":"equipment.transformer_unit_mva","txPerFeedHall":"distribution.transformers_per_hall_per_feed","txTotal":"equipment.transformers","txLoadPct":"equipment.transformer_loading_pct","facilityKva":"equipment.facility_kva",
 "gensetKW":"equipment.generator_unit_kw","gensetMW":"equipment.generator_unit_kw","gensetFacN":"equipment.gensets_duty","gensetFacNplus1":"equipment.gensets_installed",
-"hallLengthM":"geometry.hall_length_m","crossAisleM":"geometry.cross_aisle_m","hallLevels":"site.hall_levels","buildingLevels":"site.building_levels","coreDepthM":"site.core_depth_m","spineM":"site.spine_m","elecHallM2":"site.electrical_m2_per_hall","elecWingM":"site.electrical_wing_m","plateLengthM":"site.plate_length_m","plateWidthM":"site.plate_width_m","footprintM2":"site.footprint_m2","roofUsableM2":"site.roof_usable_m2","dcRoof":"site.dry_coolers_roof","dcYard":"site.dry_coolers_yard","dcYardM2":"site.dry_cooler_yard_m2","gensetYardM2":"site.genset_yard_m2","chillerPlantM2":"site.chiller_plant_m2","mainTxYardM2":"site.main_tx_yard_m2","gisHallM2":"site.gis_hall_m2","fuelAutonomyH":"site.fuel_autonomy_h","fuelM3":"site.fuel_m3","fuelFarmM2":"site.fuel_farm_m2","plantOutsideM2":"site.plant_outside_m2","siteAreaM2":"site.site_area_m2","crossAisleM2":"geometry.cross_aisle_m2","fanWallVelocityMs":"geometry.fan_wall_face_velocity_ms","floorSpareM2":"geometry.floor_spare_m2","airPlantM2":"geometry.air_plant_m2","airFlowM3s":"geometry.air_flow_m3s_per_hall","fanWallGalleries":"geometry.fan_wall_galleries","fanWallModules":"geometry.fan_wall_modules_per_gallery","fanWallPitchM":"geometry.fan_wall_module_pitch_m","fanWallFaceM2":"geometry.fan_wall_face_m2","fanWallFaceAvailM2":"geometry.air_plant_face_available_m2","cduLineDepthM":"geometry.cdu_line_depth_m","widthStackM":"geometry.width_stack_m","lengthStackM":"geometry.length_stack_m","cduGalleryM2":"geometry.cdu_gallery_m2","rackFieldM2":"geometry.rack_field_m2","hallWidthM":"geometry.hall_width_m","hallHeightM":"geometry.hall_height_m","hallAreaM2":"geometry.hall_area_m2","hallVolM3":"geometry.hall_volume_m3","itDensityKwM2":"geometry.it_density_kw_per_m2",
+"hallLengthM":"geometry.hall_length_m","crossAisleM":"geometry.cross_aisle_m","hallLevels":"site.hall_levels","buildingLevels":"site.building_levels","coreDepthM":"site.core_depth_m","spineM":"site.spine_m","elecHallM2":"site.electrical_m2_per_hall","elecWingM":"site.electrical_wing_m","plateLengthM":"site.plate_length_m","plateWidthM":"site.plate_width_m","footprintM2":"site.footprint_m2","roofUsableM2":"site.roof_usable_m2","dcRoof":"site.dry_coolers_roof","dcYard":"site.dry_coolers_yard","dcYardM2":"site.dry_cooler_yard_m2","gensetYardM2":"site.genset_yard_m2","chillerPlantM2":"site.chiller_plant_m2","mainTxYardM2":"site.main_tx_yard_m2","gisHallM2":"site.gis_hall_m2","fuelAutonomyH":"site.fuel_autonomy_h","fuelM3":"site.fuel_m3","fuelFarmM2":"site.fuel_farm_m2","plantOutsideM2":"site.plant_outside_m2","siteAreaM2":"site.site_area_m2","stpM2":"site.stp_m2","roadM":"site.road_m","setbackM":"site.setback_m","gensetYardW":"site.genset_yard_width_m","northBandM":"site.north_band_depth_m","southBandM":"site.south_band_depth_m","siteWidthM":"site.site_width_m","siteDepthM":"site.site_depth_m","roadsM2":"site.roads_m2","crossAisleM2":"geometry.cross_aisle_m2","fanWallVelocityMs":"geometry.fan_wall_face_velocity_ms","floorSpareM2":"geometry.floor_spare_m2","airPlantM2":"geometry.air_plant_m2","airFlowM3s":"geometry.air_flow_m3s_per_hall","fanWallGalleries":"geometry.fan_wall_galleries","fanWallModules":"geometry.fan_wall_modules_per_gallery","fanWallPitchM":"geometry.fan_wall_module_pitch_m","fanWallFaceM2":"geometry.fan_wall_face_m2","fanWallFaceAvailM2":"geometry.air_plant_face_available_m2","cduLineDepthM":"geometry.cdu_line_depth_m","widthStackM":"geometry.width_stack_m","lengthStackM":"geometry.length_stack_m","cduGalleryM2":"geometry.cdu_gallery_m2","rackFieldM2":"geometry.rack_field_m2","hallWidthM":"geometry.hall_width_m","hallHeightM":"geometry.hall_height_m","hallAreaM2":"geometry.hall_area_m2","hallVolM3":"geometry.hall_volume_m3","itDensityKwM2":"geometry.it_density_kw_per_m2",
 "leavesPerHall":"network.leaves_per_hall","spinesPerHall":"network.spines_per_hall","coresPerHall":"network.cores_per_hall","switchesPerHall":"network.switches_per_hall",
 "leafRadix":"network.leaf_radix","gpuDownlinksPerHall":"network.gpu_downlinks_per_hall","leafSpineLinks":"network.leaf_spine_links_per_hall","spineCoreLinks":"network.spine_core_links_per_hall","switchesPerRackCheck":"network.switches_per_rack_check","computeTraysFacility":"compute.compute_trays_facility","switchesFacility":"power.fabric_switches_facility",
 "batteryPerHall":"equipment.battery_hall_kwh","gensetStandby":"equipment.gensets_standby",
@@ -2269,96 +2271,131 @@ function gfRooms(core,Lm,Wm,spine,PL,PW){
   [xW,hS,wW,dS,'20 kV SWITCHROOM B','rgba(245,158,11,.10)','feed B boards → risers to the halls']];
 }
 // ---- GROUND FLOOR ----
-/* v3.21.9 — the ground floor is the CAMPUS. The retired drawing put six gensets, eight chillers and a
-   fuel tank inside a 72 x 48 m ground floor and wrote "171x 4 MW" beside them: the engine sizes 171
-   gensets, 143 chillers and 631 dry coolers, and none of that fits under the building that holds the
-   halls. Every block below is the engine's count times the model's per-unit allowance
-   (js/dcai-model.js site.*, all ASSUMED), drawn to one isotropic scale:
-     north  | 150 kV GIS hall · 16 main transformers 150/20 kV · fuel farm
+/* v3.21.16 — the ground floor is the CAMPUS, and the campus is now an engine layout. v3.21.9 drew
+   the yards as blocks floating in a boundary scaled to (building + yards) x 1.3: no roads, no fence,
+   no gate, and the fuel farm a road's width from the oil-filled main transformers. The engine now
+   publishes the arrangement itself (site.road_m, setback_m, the band depths, the site width and depth),
+   so the site area is a product of lengths and every road, verge and setback on this sheet is the
+   engine's. Three bands on 12 m roads, north up, ringed by a perimeter road inside the fence:
+     north  | 150 kV GIS hall · 16 main transformers 150/20 kV · STP · fuel farm
      middle | the building plate (core + hall + electrical wing by two halls + spine) · genset yard
      south  | chiller plant · dry-cooler yard (the units the roof cannot carry)
-   The block ARRANGEMENT and the 12 m roads are page-authored layout and are declared; the AREAS are
-   engine outputs and are hooked. Each block carries a numbered tag, and every count and area sits in
-   the schedule under the plan, so no caption has to squeeze between blocks. The ground floor itself
-   is drawn again below at the hall-level scale; its room zoning is page-authored. */
+   The STP stands between the transformers and the diesel so two fire loads are never neighbours.
+   What stays page-authored, and is declared where drawn: which block sits in which band, the two
+   gates and the gatehouse, the bund and fire-wall drawing of a transformer bay, the room zoning
+   inside the plate. */
 function renderGroundFloor(el){
 var grp=function(v){return v==null?'—':String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,',')};
 var D=window.DHE||{};var n=function(k){var v=D[k];return (typeof v==='number'&&isFinite(v))?v:null};
 var PL=n('plateLengthM'),PW=n('plateWidthM'),core=n('coreDepthM'),spine=n('spineM'),Lm=n('hallLengthM'),Wm=n('hallWidthM'),
-    aTx=n('mainTxYardM2'),aGis=n('gisHallM2'),aFuel=n('fuelFarmM2'),aGen=n('gensetYardM2'),aCh=n('chillerPlantM2'),aDc=n('dcYardM2'),
+    aTx=n('mainTxYardM2'),aGis=n('gisHallM2'),aFuel=n('fuelFarmM2'),aGen=n('gensetYardM2'),aCh=n('chillerPlantM2'),aDc=n('dcYardM2'),aStp=n('stpM2'),
+    G=n('roadM'),SB=n('setbackM'),genW=n('gensetYardW'),dA=n('northBandM'),dC=n('southBandM'),SW=n('siteWidthM'),SD=n('siteDepthM'),
     site=n('siteAreaM2'),nTx=n('mainTxTotal'),nGen=n('gensetFacNplus1'),nCh=n('chillersInstalled'),nDc=n('dcYard'),nBays=n('hvSwitchyardBays');
-if([PL,PW,core,spine,Lm,Wm,aTx,aGis,aFuel,aGen,aCh,aDc,site,nTx,nGen,nCh,nDc,nBays].some(function(v){return v==null})){
+if([PL,PW,core,spine,Lm,Wm,aTx,aGis,aFuel,aGen,aCh,aDc,aStp,G,SB,genW,dA,dC,SW,SD,site,nTx,nGen,nCh,nDc,nBays].some(function(v){return v==null})){
   el.innerHTML=tx(20,20,'SITE PLAN UNAVAILABLE — engine site outputs not loaded','var(--r)',12,0,1);return;}
 var decl=function(t){return {declared:t}};
-var LAYOUT=decl('block arrangement and the 12 m roads are page-authored campus layout; block areas are engine outputs');
+var LAYOUT=decl('which block stands in which band, the gates and the gatehouse are page-authored campus layout; the roads, setback, band depths and areas are engine outputs');
 var ROOMS=decl('ground-floor room zoning inside the plate is page-authored layout, not an engine quantity');
-var G=12,aStp=240;                                   /* road between blocks, metres; sewage plant footprint, m² (both declared) */
-var genW=aGen/PW, Wi=PL+G+genW;                      /* middle band: building + genset yard, one depth */
-var dA=(aStp+aGis+aTx+aFuel)/(Wi-3*G), stpW=aStp/dA, gisW=aGis/dA, txW=aTx/dA, fuW=aFuel/dA;
-var dC=(aCh+aDc)/(Wi-G), chW=aCh/dC, dcW=aDc/dC;
-var envH=dA+G+PW+G+dC, k=Math.max(1,Math.sqrt(site/(Wi*envH))), BW=Wi*k, BH=envH*k, mx=(BW-Wi)/2, my=(BH-envH)/2;
-var P=+(930/BW).toFixed(3), OX=35, OY=62;
+var BAY=decl('the bund and fire-wall drawing of a transformer bay is page-authored; the bay count and area are engine outputs');
+var P=+(930/SW).toFixed(3), OX=35, OY=70;
 var X=function(m){return +(OX+m*P).toFixed(1)},Y=function(m){return +(OY+m*P).toFixed(1)};
 var R=function(x,y,w,h,f,st,sw,ex){return '<rect x="'+X(x)+'" y="'+Y(y)+'" width="'+(w*P).toFixed(1)+'" height="'+(h*P).toFixed(1)+'" fill="'+f+'"'+(st?' stroke="'+st+'" stroke-width="'+(sw||1)+'"':'')+(ex||'')+'/>'};
+var LN=function(x1,y1,x2,y2,c,sw,dash,ex){return '<line x1="'+X(x1)+'" y1="'+Y(y1)+'" x2="'+X(x2)+'" y2="'+Y(y2)+'" stroke="'+c+'" stroke-width="'+(sw||1)+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+(ex||'')+'/>'};
 /* n units packed into a block at a unit aspect (length / depth), each drawn inset in its cell */
 function pack(x,y,w,h,cnt,asp,fill,stroke){
   var cols=Math.max(1,Math.round(Math.sqrt(cnt*w/(h*asp)))),rows=Math.ceil(cnt/cols),cw=w/cols,ch=h/rows,o='';
   for(var i=0;i<cnt;i++){var r=Math.floor(i/cols),c=i%cols;o+=R(x+c*cw+cw*.12,y+r*ch+ch*.14,cw*.76,ch*.72,fill,stroke,.4);}
   return o;}
-/* a block tag: the number of its schedule row and a short name, on an opaque pill so units never cross it */
-function tag(x,y,w,h,no,name,c){var cx=X(x+w/2),cy=Y(y+h/2),t=no+'  '+name,tw=t.length*6.2+14;
+/* a block tag: the schedule row number and a short name on an opaque pill. Big blocks carry it at
+   their centre; the shallow north-band blocks carry it astride their south edge, over the road */
+function tag(x,y,w,h,no,name,c,edge){var cx=X(x+w/2),cy=edge?Y(y+h):Y(y+h/2),t=no+'  '+name,tw=t.length*6.2+14;
   return '<rect x="'+(cx-tw/2).toFixed(1)+'" y="'+(cy-9)+'" width="'+tw.toFixed(1)+'" height="17" rx="2" fill="var(--bg2)" stroke="'+c+'" stroke-width=".8"/>'+tx(cx,cy+4,t,c,10,'middle',1);}
+/* an opaque base under a translucent block so the road tint never shows through it */
+var base=function(x,y,w,h){return R(x,y,w,h,'var(--bg2)')};
 var s='<rect x="-20" y="-40" width="1000" height="1400" fill="var(--bg2)"/>';
 s+=tx(500,10,'SITE PLAN — the campus that carries a '+(D.facTotalMW!=null?D.facTotalMW:'—')+' MW plant','var(--t1)',13,'middle',1,bo('facTotalMW',{nomark:true}));
-s+=tx(500,28,'each block = the engine count × a per-unit floor allowance (ASSUMED), drawn to one scale · north up','var(--t3)',9.5,'middle',0,LAYOUT);
-s+=R(0,0,BW,BH,'rgba(148,163,184,.025)','var(--t3)',1.1,' stroke-dasharray="8 5"');
-var ox=mx,oy=my,yA=oy,c1='var(--o)';
-/* ---- north band: STP · GIS hall · main transformers · fuel farm ---- */
-s+='<g class="stp-click" data-rz-equipment="stp:1" tabindex="0" role="button"><title>STP — click for inspector, double-click for HMI</title>'+R(ox,yA,stpW,dA,'rgba(6,182,212,.08)','var(--c)',.8,' stroke-dasharray="4 2"')+'</g>';
-s+=tx(X(ox+stpW/2),Y(yA+dA/2)+4,'8','var(--c)',10,'middle',1);
-var gX=ox+stpW+G;
-s+='<g data-rz-equipment="site-gis:1" tabindex="0" role="button"><title>150 kV GIS hall — click for inspector</title>'+R(gX,yA,gisW,dA,'rgba(245,158,11,.10)',c1,1);
-for(var b=1;b<nBays;b++)s+='<line x1="'+X(gX+b*gisW/nBays)+'" y1="'+Y(yA+dA*.2)+'" x2="'+X(gX+b*gisW/nBays)+'" y2="'+Y(yA+dA*.8)+'" stroke="var(--o)" stroke-width=".5" opacity=".6"/>';
-s+='</g>'+tag(gX,yA,gisW,dA,'1','GIS',c1);
-var txX=gX+gisW+G;
-s+=R(txX,yA,txW,dA,'rgba(245,158,11,.04)','rgba(245,158,11,.45)',.8);
-for(var t=0;t<nTx;t++){var hall=Math.floor(t/2)+1,fd=t%2?'b':'a',cw=txW/nTx;
-  s+='<g data-rz-equipment="sld-main-tx:dh0'+hall+fd+'" tabindex="0" role="button"><title>Main transformer DH-0'+hall+' feed '+fd.toUpperCase()+' — 150/20 kV</title>'+R(txX+t*cw+cw*.18,yA+dA*.2,cw*.64,dA*.6,'rgba(245,158,11,.22)','var(--o)',.6)+'</g>';}
-s+=tag(txX,yA,txW,dA,'2','MAIN TRANSFORMERS',c1);
-var fuX=txX+txW+G;
-s+='<g data-rz-equipment="site-fuel-farm:1" tabindex="0" role="button"><title>Fuel farm — click for inspector</title>';
+s+=tx(500,28,'each block = the engine count × a per-unit floor allowance (ASSUMED) · '+G+' m roads, '+SB+' m setback inside the property line · north up','var(--t3)',9.5,'middle',0,bo('roadM',{also:['setbackM']}));
+/* property line, setback, fence, and the road surface the fence encloses: the yards stand on it */
+s+=R(0,0,SW,SD,'rgba(148,163,184,.02)','var(--t3)',1,' stroke-dasharray="8 5"');
+s+=R(SB,SB,SW-2*SB,SD-2*SB,'rgba(148,163,184,.07)','var(--t2)',1.2);
+var ox=SB+G,oy=SB+G,CW=SW-2*(SB+G),yA=oy,c1='var(--o)';
+/* road centre lines: the ring, the two east-west roads between the bands, the north-south roads */
+var CL='rgba(148,163,184,.35)';
+s+=R(SB+G/2,SB+G/2,SW-2*SB-G,SD-2*SB-G,'none',CL,.7,' stroke-dasharray="6 4"');
+var yB=yA+dA+G,yC=yB+PW+G;
+s+=LN(SB,yA+dA+G/2,SW-SB,yA+dA+G/2,CL,.7,'6 4')+LN(SB,yB+PW+G/2,SW-SB,yB+PW+G/2,CL,.7,'6 4');
+/* ---- north band: GIS hall · main transformers · STP · fuel farm ---- */
+var gisW=aGis/dA,txW=aTx/dA,stpW=aStp/dA,fuW=aFuel/dA;
+var gX=ox,txX=gX+gisW+G,spX=txX+txW+G,fuX=spX+stpW+G;
+[gX+gisW+G/2,txX+txW+G/2,spX+stpW+G/2].forEach(function(x){s+=LN(x,SB,x,yA+dA+G,CL,.7,'6 4');});
+s+=base(gX,yA,gisW,dA)+'<g data-rz-equipment="site-gis:1" tabindex="0" role="button"><title>150 kV GIS hall — click for inspector</title>'+R(gX,yA,gisW,dA,'rgba(245,158,11,.10)',c1,1);
+for(var b=1;b<nBays;b++)s+=LN(gX+b*gisW/nBays,yA+dA*.2,gX+b*gisW/nBays,yA+dA*.8,'var(--o)',.5,null,' opacity=".6"');
+s+='</g>'+tag(gX,yA,gisW,dA,'1','GIS',c1,1);
+/* each transformer in its own bay: oil bund (dashed) and a fire wall to the next bay */
+s+=base(txX,yA,txW,dA)+R(txX,yA,txW,dA,'rgba(245,158,11,.04)','rgba(245,158,11,.45)',.8);
+for(var t=0;t<nTx;t++){var hall=Math.floor(t/2)+1,fd=t%2?'b':'a',cw=txW/nTx,bx=txX+t*cw;
+  s+=R(bx+cw*.08,yA+dA*.1,cw*.84,dA*.8,'none','rgba(245,158,11,.5)',.5,' stroke-dasharray="2 2"');
+  s+='<g data-rz-equipment="sld-main-tx:dh0'+hall+fd+'" tabindex="0" role="button"><title>Main transformer DH-0'+hall+' feed '+fd.toUpperCase()+' — 150/20 kV</title>'+R(bx+cw*.22,yA+dA*.25,cw*.56,dA*.5,'rgba(245,158,11,.24)','var(--o)',.6)+'</g>';
+  if(t<nTx-1)s+=LN(bx+cw,yA+dA*.05,bx+cw,yA+dA*.95,'var(--t2)',1.6);}
+s+=tag(txX,yA,txW,dA,'2','MAIN TRANSFORMERS',c1,1);
+s+=base(spX,yA,stpW,dA)+'<g class="stp-click" data-rz-equipment="stp:1" tabindex="0" role="button"><title>STP — click for inspector, double-click for HMI</title>'+R(spX,yA,stpW,dA,'rgba(6,182,212,.08)','var(--c)',.8,' stroke-dasharray="4 2"')+'</g>';
+s+=tag(spX,yA,stpW,dA,'8','STP','var(--c)',1);
+s+=base(fuX,yA,fuW,dA)+'<g data-rz-equipment="site-fuel-farm:1" tabindex="0" role="button"><title>Fuel farm — click for inspector</title>';
 s+=R(fuX,yA,fuW,dA,'rgba(239,68,68,.06)','rgba(239,68,68,.5)',.8,' stroke-dasharray="4 2"');
 for(var f=0;f<6;f++)s+='<circle cx="'+X(fuX+fuW*(f+.5)/6)+'" cy="'+Y(yA+dA/2)+'" r="'+(Math.min(fuW/6,dA)*P*.36).toFixed(1)+'" fill="none" stroke="var(--r)" stroke-width=".6" opacity=".55"/>';
-s+='</g>';
-s+=tag(fuX,yA,fuW,dA,'3','FUEL','var(--r)');
+s+='</g>'+tag(fuX,yA,fuW,dA,'3','FUEL FARM','var(--r)',1);
 /* ---- middle band: the building · genset yard ---- */
-var yB=yA+dA+G,bx0=ox;
-s+=R(bx0,yB,PL,PW,'rgba(34,197,94,.035)','var(--t1)',1.6);
+var bx0=ox,gnX=bx0+PL+G;
+s+=LN(bx0+PL+G/2,yA+dA,bx0+PL+G/2,yC,CL,.7,'6 4');
+s+=base(bx0,yB,PL,PW)+R(bx0,yB,PL,PW,'rgba(34,197,94,.035)','var(--t1)',1.6);
 gfRooms(core,Lm,Wm,spine,PL,PW).forEach(function(r){s+=R(bx0+r[0],yB+r[1],r[2],r[3],r[5],'rgba(148,163,184,.4)',.5);});
 s+=R(bx0+core,yB+Wm,PL-core,spine,'rgba(148,163,184,.06)');
 s+=tag(bx0,yB,PL,PW,'4','THE BUILDING','var(--g)');
-var gnX=bx0+PL+G;
-s+='<g data-rz-equipment="site-genset-yard:1" tabindex="0" role="button"><title>Genset yard — click for inspector</title>'+R(gnX,yB,genW,PW,'rgba(148,163,184,.04)','rgba(148,163,184,.55)',.8)+pack(gnX+1,yB+1,genW-2,PW-2,nGen,3,'rgba(148,163,184,.30)','var(--t2)')+'</g>';
+s+=base(gnX,yB,genW,PW)+'<g data-rz-equipment="site-genset-yard:1" tabindex="0" role="button"><title>Genset yard — click for inspector</title>'+R(gnX,yB,genW,PW,'rgba(148,163,184,.04)','rgba(148,163,184,.55)',.8)+pack(gnX+1,yB+1,genW-2,PW-2,nGen,3,'rgba(148,163,184,.30)','var(--t2)')+'</g>';
 s+=tag(gnX,yB,genW,PW,'5','GENSETS','var(--t1)');
 /* ---- south band: chiller plant · dry-cooler yard ---- */
-var yC=yB+PW+G;
-s+='<g data-rz-equipment="chiller:1" tabindex="0" role="button"><title>Chiller plant — click for inspector, double-click for HMI</title>'+R(ox,yC,chW,dC,'rgba(59,130,246,.05)','var(--b)',1)+pack(ox+1,yC+1,chW-2,dC-2,nCh,2,'rgba(59,130,246,.28)','var(--b)')+'</g>';
+var chW=aCh/dC,dcW=aDc/dC,dX=ox+chW+G;
+s+=LN(ox+chW+G/2,yB+PW,ox+chW+G/2,SD-SB,CL,.7,'6 4');
+s+=base(ox,yC,chW,dC)+'<g data-rz-equipment="chiller:1" tabindex="0" role="button"><title>Chiller plant — click for inspector, double-click for HMI</title>'+R(ox,yC,chW,dC,'rgba(59,130,246,.05)','var(--b)',1)+pack(ox+1,yC+1,chW-2,dC-2,nCh,2,'rgba(59,130,246,.28)','var(--b)')+'</g>';
 s+=tag(ox,yC,chW,dC,'6','CHILLER PLANT','var(--b)');
-var dX=ox+chW+G;
-s+='<g data-rz-equipment="dry-cooler:1" tabindex="0" role="button"><title>Dry-cooler yard — click for inspector, double-click for HMI</title>'+R(dX,yC,dcW,dC,'rgba(34,197,94,.04)','var(--g)',1)+pack(dX+1,yC+1,dcW-2,dC-2,nDc,4,'rgba(34,197,94,.26)','var(--g)')+'</g>';
+s+=base(dX,yC,dcW,dC)+'<g data-rz-equipment="dry-cooler:1" tabindex="0" role="button"><title>Dry-cooler yard — click for inspector, double-click for HMI</title>'+R(dX,yC,dcW,dC,'rgba(34,197,94,.04)','var(--g)',1)+pack(dX+1,yC+1,dcW-2,dC-2,nDc,4,'rgba(34,197,94,.26)','var(--g)')+'</g>';
 s+=tag(dX,yC,dcW,dC,'7','DRY-COOLER YARD','var(--g)');
+/* ---- the gates: staff and visitors at the west on the road under the building's entrance face;
+        tankers and plant deliveries at the east on the road under the fuel farm ---- */
+function gate(x,y,vert,label,anchor){var g='';
+  g+=vert?LN(x,y-G/2,x,y+G/2,'var(--bg2)',3):LN(x-G/2,y,x+G/2,y,'var(--bg2)',3);
+  g+=vert?LN(x,y-G/2,x,y+G/2,'var(--t1)',1.2,'2 2'):LN(x-G/2,y,x+G/2,y,'var(--t1)',1.2,'2 2');
+  g+='<rect x="'+(X(x)-3)+'" y="'+(Y(y)-3)+'" width="6" height="6" fill="var(--t1)"/>';
+  /* the label sits above a west gate and below an east gate, so it never runs into the block beside it */
+  return g+tx(vert?X(x)+(anchor==='start'?6:-6):X(x),vert?(anchor==='start'?Y(y)-6:Y(y)+15):Y(y)-7,label,'var(--t2)',8.5,anchor,1,LAYOUT);}
+var gyW=yB+PW+G/2,gyE=yA+dA+G/2;
+s+=gate(SB,gyW,1,'MAIN GATE','start')+gate(SW-SB,gyE,1,'SERVICE GATE','end');
+s+=R(SB+1.5,gyW-G/2-7,8,6,'rgba(148,163,184,.25)','var(--t2)',.7)+tx(X(SB+5.5),Y(gyW-G/2-10)-1,'GATEHOUSE','var(--t3)',7.5,'middle',0,LAYOUT);
 /* ---- the links that make it one plant ---- */
 var xW=bx0+core+Lm,wW=PL-core-Lm,hS=yB+Wm+spine,dS=PW-Wm-spine;
-var lnk=function(x1,y1,x2,y2,c,dash){return '<line x1="'+X(x1)+'" y1="'+Y(y1)+'" x2="'+X(x2)+'" y2="'+Y(y2)+'" stroke="'+c+'" stroke-width="1.6" opacity=".8"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>'};
-s+=lnk(txX+txW*.25,yA+dA,txX+txW*.25,yB,'var(--o)')+lnk(txX+txW*.75,yA+dA,xW+wW*.5,yB,'var(--o)');
+var lnk=function(x1,y1,x2,y2,c,dash){return LN(x1,y1,x2,y2,c,1.6,dash,' opacity=".85"')};
+var pth=function(pts,c,dash){return '<polyline points="'+pts.map(function(p){return X(p[0])+','+Y(p[1])}).join(' ')+'" fill="none" stroke="'+c+'" stroke-width="1.6" opacity=".85"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>'};
+/* 20 kV: feed A from the west half of the transformer row straight into switchroom A on the north
+   face of the wing; feed B from the east half down the east road into switchroom B on the south face */
+s+=lnk(txX+txW*.3,yA+dA,txX+txW*.3,yB,'var(--o)');
+s+=pth([[txX+txW*.7,yA+dA],[txX+txW*.7,gyE],[bx0+PL+G/2,gyE],[bx0+PL+G/2,hS+dS*.5],[bx0+PL,hS+dS*.5]],'var(--o)');
 s+=lnk(gnX,yB+Wm*.5,xW+wW,yB+Wm*.5,'var(--o)','5 3')+lnk(gnX,hS+dS*.5,xW+wW,hS+dS*.5,'var(--o)','5 3');
 s+=lnk(ox+chW*.5,yC,ox+chW*.5,yB+PW,'var(--b)')+lnk(dX+dcW*.08,yC,bx0+PL*.82,yB+PW,'var(--g)');
-s+=lnk(fuX+fuW*.5,yA+dA,gnX+genW*.5,yB,'var(--r)','3 3');
+s+=lnk(fuX+fuW*.5,yA+dA,fuX+fuW*.5,yB,'var(--r)','3 3');
+/* ---- dimensions: the site, and the three bands ---- */
+var dim=function(x1,y1,x2,y2,label,basis,vert){var o=LN(x1,y1,x2,y2,'var(--t3)',.7);
+  o+=vert?LN(x1-1.5,y1,x1+1.5,y1,'var(--t3)',.7)+LN(x2-1.5,y2,x2+1.5,y2,'var(--t3)',.7):LN(x1,y1-1.5,x1,y1+1.5,'var(--t3)',.7)+LN(x2,y2-1.5,x2,y2+1.5,'var(--t3)',.7);
+  var cx=X((x1+x2)/2),cy=Y((y1+y2)/2);
+  return o+(vert?'<g transform="rotate(-90 '+cx+' '+cy+')">'+tx(cx,cy-3,label,'var(--t3)',8.5,'middle',0,basis)+'</g>':tx(cx,cy-3,label,'var(--t3)',8.5,'middle',0,basis));};
+s+=dim(0,-4,SW,-4,Math.round(SW)+' m',bo('siteWidthM',{nomark:true}));
+s+=dim(-4,0,-4,SD,Math.round(SD)+' m',bo('siteDepthM',{nomark:true}),1);
+var dxR=SW+4;
+s+=dim(dxR,yA,dxR,yA+dA,dA+' m',bo('northBandM',{nomark:true}),1)+dim(dxR,yB,dxR,yB+PW,PW+' m',bo('plateWidthM',{nomark:true}),1)+dim(dxR,yC,dxR,yC+dC,dC+' m',bo('southBandM',{nomark:true}),1);
 /* scale bar, north arrow, line key */
-var sbY=Y(BH)+22;
+var sbY=Y(SD)+24;
 s+='<rect x="'+X(0)+'" y="'+sbY+'" width="'+(50*P).toFixed(1)+'" height="3" fill="var(--t2)"/><rect x="'+X(50)+'" y="'+sbY+'" width="'+(50*P).toFixed(1)+'" height="3" fill="rgba(148,163,184,.3)"/>';
 s+=tx(X(0),sbY+16,'0','var(--t3)',8.5,'middle',0)+tx(X(100),sbY+16,'100 m','var(--t3)',8.5,'middle',0,LAYOUT);
-s+='<g transform="translate('+(X(BW)-10)+','+(sbY+2)+')"><polygon points="0,-10 6,6 0,2 -6,6" fill="var(--t2)"/>'+tx(0,18,'N','var(--t2)',9,'middle',1)+'</g>';
+s+='<g transform="translate('+(X(SW)-10)+','+(sbY+2)+')"><polygon points="0,-10 6,6 0,2 -6,6" fill="var(--t2)"/>'+tx(0,18,'N','var(--t2)',9,'middle',1)+'</g>';
 [['var(--o)','20 kV'],['var(--b)','CHW / CDW'],['var(--g)','HTW to the dry coolers'],['var(--r)','diesel']].forEach(function(e,i){
   var kx=X(130)+i*150;s+='<line x1="'+kx+'" y1="'+(sbY+2)+'" x2="'+(kx+22)+'" y2="'+(sbY+2)+'" stroke="'+e[0]+'" stroke-width="2"/>'+tx(kx+28,sbY+5,e[1],'var(--t2)',8.5,'start',0);});
 /* ---- schedule: one row per block, every count and area from the engine ---- */
@@ -2367,19 +2404,20 @@ s+=tx(35,TY,'SCHEDULE','var(--t1)',10,'start',1)+tx(965,TY,'AREA m²','var(--t3)
 s+='<line x1="35" y1="'+(TY+6)+'" x2="965" y2="'+(TY+6)+'" stroke="var(--bd)" stroke-width="1"/>';
 var rows=[
   ['1','GIS switchyard',(D.hvIntakeKv||'—')+' kV gas-insulated switchgear · '+nBays+' bays (line + transformer)',bo('hvSwitchyardBays',{also:['hvIntakeKv'],nomark:true}),grp(aGis),bo('gisHallM2',{nomark:true}),c1],
-  ['2','Main transformers',nTx+' × '+(D.mainTxMva||'—')+' MVA 150/20 kV · one per hall per feed',bo('mainTxTotal',{also:['mainTxMva'],nomark:true}),grp(aTx),bo('mainTxYardM2',{nomark:true}),c1],
-  ['3','Fuel farm',grp(n('fuelM3'))+' m³ of diesel · '+(D.fuelAutonomyH||'—')+' h at the worst-bin load',bo('fuelM3',{also:['fuelAutonomyH'],nomark:true}),grp(aFuel),bo('fuelFarmM2',{nomark:true}),'var(--r)'],
+  ['2','Main transformers',nTx+' × '+(D.mainTxMva||'—')+' MVA 150/20 kV · one per hall per feed, each in a bunded bay behind a fire wall',bo('mainTxTotal',{also:['mainTxMva'],nomark:true}),grp(aTx),bo('mainTxYardM2',{nomark:true}),c1],
+  ['3','Fuel farm',grp(n('fuelM3'))+' m³ of diesel · '+(D.fuelAutonomyH||'—')+' h at the worst-bin load · the STP and two roads between it and the transformers',bo('fuelM3',{also:['fuelAutonomyH'],nomark:true}),grp(aFuel),bo('fuelFarmM2',{nomark:true}),'var(--r)'],
   ['4','The building',PL+' × '+PW+' m · '+(D.buildingLevels||'—')+' levels, halls on '+(D.hallLevels||'—'),bo('plateLengthM',{also:['plateWidthM','buildingLevels','hallLevels'],nomark:true}),grp(n('footprintM2')),bo('footprintM2',{nomark:true}),'var(--g)'],
-  ['5','Gensets',nGen+' × '+(D.gensetMW||'—')+' MW, '+(D.gensetRedundancy||'—')+' · on the 20 kV switchroom boards',bo('gensetFacNplus1',{also:['gensetMW'],nomark:true}),grp(aGen),bo('gensetYardM2',{nomark:true}),'var(--t1)'],
+  ['5','Gensets',nGen+' × '+(D.gensetMW||'—')+' MW, '+(D.gensetRedundancy||'—')+' · a yard '+Math.round(genW)+' m wide beside the building, on the 20 kV switchroom boards',bo('gensetFacNplus1',{also:['gensetMW','gensetYardW'],nomark:true}),grp(aGen),bo('gensetYardM2',{nomark:true}),'var(--t1)'],
   ['6','Chiller plant',nCh+' installed · '+(D.chillersRunning||'—')+' run at design · '+(D.chillersWorst||'—')+' in the worst bin',bo('chillersInstalled',{also:['chillersRunning','chillersWorst'],nomark:true}),grp(aCh),bo('chillerPlantM2',{nomark:true}),'var(--b)'],
   ['7','Dry-cooler yard',nDc+' units here + '+(D.dcRoof||'—')+' on the roof = '+(D.dryCoolersInstalled||'—')+' installed, dry only',bo('dcYard',{also:['dcRoof','dryCoolersInstalled'],nomark:true}),grp(aDc),bo('dcYardM2',{nomark:true}),'var(--g)'],
-  ['8','STP','sewage treatment for the site · page-authored footprint',null,grp(aStp),decl('the sewage plant footprint is a page-authored allowance, not an engine output'),'var(--c)']];
+  ['8','STP','package sewage treatment for the campus staff',null,grp(aStp),bo('stpM2',{nomark:true}),'var(--c)'],
+  ['','Roads and setback',G+' m roads between and around the bands · verges · '+SB+' m setback to the property line · gates page-authored',bo('roadM',{also:['setbackM'],nomark:true}),grp(n('roadsM2')),bo('roadsM2',{nomark:true}),'var(--t3)']];
 rows.forEach(function(r,i){var y=TY+24+i*19;
   s+=tx(43,y,r[0],r[6],9.5,'middle',1)+tx(60,y,r[1],'var(--t1)',9.5,'start',1)+tx(200,y,r[2],'var(--t2)',9,'start',0,r[3])+tx(965,y,r[4],'var(--t1)',9.5,'end',1,r[5]);});
 var TT=TY+24+rows.length*19;
 s+='<line x1="35" y1="'+(TT-10)+'" x2="965" y2="'+(TT-10)+'" stroke="var(--bd)" stroke-width="1"/>';
 s+=tx(60,TT+4,'Plant outside the building','var(--t2)',9.5,'start',1)+tx(965,TT+4,grp(n('plantOutsideM2')),'var(--t1)',9.5,'end',1,bo('plantOutsideM2',{nomark:true}));
-s+=tx(60,TT+23,'Site, with roads, setbacks and the perimeter','var(--t2)',9.5,'start',1)+tx(965,TT+23,grp(site),'var(--o)',10,'end',1,bo('siteAreaM2',{nomark:true}));
+s+=tx(60,TT+23,'Site · '+Math.round(SW)+' × '+Math.round(SD)+' m inside the property line','var(--t2)',9.5,'start',1,bo('siteWidthM',{also:['siteDepthM'],nomark:true}))+tx(965,TT+23,grp(site),'var(--o)',10,'end',1,bo('siteAreaM2',{nomark:true}));
 /* ---- the ground floor itself, at the hall-level scale ---- */
 var IY=TT+70,Q=+(880/PL).toFixed(3),IX=60;
 var x=function(m){return +(IX+m*Q).toFixed(1)},y=function(m){return +(IY+m*Q).toFixed(1)};
@@ -2396,11 +2434,6 @@ var VH=Math.ceil(y(PW)+80);
 el.innerHTML=s.replace('height="1400"','height="'+VH+'"');
 var fs=document.getElementById('floorSvg');if(fs)fs.setAttribute('viewBox','-20 -40 1000 '+VH);
 }
-
-// ---- FLOOR 2 ----
-/* v3.21.3 — one plan per HALL LEVEL (HALL_LAYOUT), replacing renderFloor2/renderFloor3, which
-   were the same drawing typed twice for halls 1-2 and 3-4. Halls 5-8 had no plan at all. Room
-   letters follow the hall: UPS Room A/B serve DH-1/DH-2, C/D serve DH-3/DH-4, and so on. */
 function renderHallLevel(el,L){
 var grp=function(v){return v==null?'—':String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,',')};
 /* v3.21.7 — the hall level drawn TO SCALE on its own floor plate. Until now this plan was the retired
@@ -2448,12 +2481,12 @@ function hall(h,y0,wing){
   g+=R(hx+.4,y0+yC1+1,Lm-.8,1.9,'rgba(6,182,212,.18)','var(--c)',.7);
   g+='</g>';
   /* labels outside the clickable group so the walker reads them as plain annotation */
-  g+=tx(X(hx+1),Y(y0+gD*.62),'FAN-WALL GALLERY · '+(n('fanWallModules')||'—')+' modules','var(--b)',8.5,'start',0,bo('fanWallModules',{nomark:true}));
-  g+=tx(X(hx+Lm-1),Y(y0+gD*.62),'DATAHALL '+h+' · '+Lm+' × '+Wm+' m','var(--g)',10,'end',1,bo('hallLengthM',{also:['hallWidthM'],nomark:true}));
+  g+=tx(X(hx+1),Y(y0+(gD-1)/2)+3,'FAN-WALL GALLERY · '+(n('fanWallModules')||'—')+' modules','var(--b)',8.5,'start',0,bo('fanWallModules',{nomark:true}));
+  g+=tx(X(hx+Lm-1),Y(y0+(gD-1)/2)+3.5,'DATAHALL '+h+' · '+Lm+' × '+Wm+' m','var(--g)',10,'end',1,bo('hallLengthM',{also:['hallWidthM'],nomark:true}));
   g+=tx(X(hx+1),Y(y0+yF1+xa*.62),'SERVICE CORRIDOR · '+(D.rackRows||'—')+' rows × '+(D.racksPerRow||'—')+' racks above','var(--t2)',8.5,'start',0,bo('rackRows',{also:['racksPerRow'],nomark:true}));
   g+=tx(X(hx+Lm-1),Y(y0+yF1+xa*.62),(D.itHall!=null?(D.itHall/1000).toFixed(2):'—')+' MW IT','var(--o)',9,'end',1,bo('itHall',{nomark:true}));
   g+=tx(X(hx+1),Y(y0+yL1+(yS0-yL1)*.7),'CDU LINE · '+(D.cduInstalled||'—')+' × '+((D.cduModel||'').replace(/\s*\(.*\)\s*$/,'')||'CDU'),'var(--c)',8.5,'start',0,bo('cduInstalled',{nomark:true}));
-  g+=tx(X(hx+1),Y(y0+yS0+gD-.3),'FAN-WALL GALLERY · '+(n('fanWallModules')||'—')+' modules','var(--b)',8.5,'start',0,bo('fanWallModules',{nomark:true}));
+  g+=tx(X(hx+1),Y(y0+yS0+1+(gD-1)/2)+3,'FAN-WALL GALLERY · '+(n('fanWallModules')||'—')+' modules','var(--b)',8.5,'start',0,bo('fanWallModules',{nomark:true}));
   /* electrical wing — engine length; the room split inside it is page-authored */
   var ex=CORE+Lm,fd=Wm*.44,ROOMS=decl('room split inside the electrical wing is page-authored; the wing length and the equipment counts are engine outputs');
   ['A','B'].forEach(function(F,i){var fy=y0+i*fd,c=i?'var(--g)':'var(--b)';
@@ -2518,8 +2551,9 @@ s+=R(0,0,PL,PW,'rgba(148,163,184,.03)','var(--t2)',2);
 var x0=CORE+2,xm=CORE+2+(PL-CORE-4)/2,bw=(PL-CORE-4)/2,banks=[[x0,2,Wm-3],[xm,2,Wm-3],[x0,Wm+SPINE+1,Wm-3],[xm,Wm+SPINE+1,Wm-3]];
 var per=Math.ceil(nRoof/banks.length),left=nRoof;
 banks.forEach(function(b,i){var c=Math.min(per,left);left-=c;
-  s+='<g data-rz-equipment="roof-dry-cooler-bank:'+(i+1)+'" tabindex="0" role="button"><title>Roof dry-cooler bank RB-'+(i+1)+' — '+c+' units — click for inspector</title>'+R(b[0],b[1],bw-1,b[2],'rgba(34,197,94,.04)','var(--g)',.9)+pack(b[0]+.5,b[1]+.5,bw-2,b[2]-1,c,4,'rgba(34,197,94,.26)','var(--g)')+'</g>';
-  s+=tx(X(b[0]+1),i<2?Y(b[1])-4:Y(PW)+14,'RB-'+(i+1)+' · '+c+' units','var(--g)',9,'start',1,LAY);});
+  s+='<g data-rz-equipment="roof-dry-cooler-bank:'+(i+1)+'" tabindex="0" role="button"><title>Roof dry-cooler bank RB-'+(i+1)+' — '+c+' units — click for inspector</title>'+R(b[0],b[1],bw-1,b[2],'rgba(34,197,94,.04)','var(--g)',.9)+pack(b[0]+.5,b[1]+3,bw-2,b[2]-3.5,c,4,'rgba(34,197,94,.26)','var(--g)')+'</g>';
+  var lt='RB-'+(i+1)+' · '+c+' units';
+  s+='<rect x="'+(X(b[0]+1)-3)+'" y="'+(Y(b[1])+2)+'" width="'+(lt.length*5.6+8).toFixed(1)+'" height="13" rx="2" fill="var(--bg2)"/>'+tx(X(b[0]+1),Y(b[1])+12,lt,'var(--g)',9,'start',1,LAY);});
 /* spine walkway with the HTW headers */
 s+=R(CORE,Wm,PL-CORE,SPINE,'rgba(148,163,184,.06)');
 s+='<line x1="'+X(CORE+1)+'" y1="'+Y(Wm+SPINE*.32)+'" x2="'+X(PL-1)+'" y2="'+Y(Wm+SPINE*.32)+'" stroke="var(--o)" stroke-width="2.2"/>';

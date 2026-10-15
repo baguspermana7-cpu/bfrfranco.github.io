@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v3.21.17 — 2026-10-15
+
+### "Roads": the campus becomes an engine layout — roads, fence, gates, bands, and a site area that is a product of lengths
+
+**Why.** The owner looked at v3.21.9 again: "masih kurang sempurna". The site plan was yards floating in a boundary scaled to (building + yards) × 1.3: no roads, no fence, no gate, the fuel farm one road from the oil-filled main transformers, and no feed-B route. The roof clipped two of its bank labels on the plate edge, and the hall level printed its gallery labels across the fan-wall ribbon.
+
+**Engine 1.6.0 (`js/dcai-model.js`, `js/dcai-engine.js`):**
+- `campusRoadFactor 1.3` is retired. New leaves `site.roadM 12`, `site.setbackM 6`, `site.stpM2 240` (all ASSUMED, sourced in the model).
+- The arrangement is published: three east–west bands on 12 m roads (north: GIS · main transformers · STP · fuel farm; middle: the building plate · genset yard; south: chiller plant · dry-cooler yard), a perimeter road inside the fence, the setback to the property line. Outputs: `genset_yard_width_m`, `north_band_depth_m`, `south_band_depth_m`, `campus_width_m`, `campus_depth_m`, `site_width_m`, `site_depth_m`, `site_area_m2` = width × depth, `roads_m2` = all that is not a block.
+- Site 412 × 231 m = 95,126 m², of which 33,441 m² is roads, verges and setback (was 79,879 m² from the factor, which left no room for a perimeter road). Ten identities in `test-dcai-engine.mjs` (588 pass).
+
+**Site plan (`datahallAI.html`):**
+- Property line, setback, fence, road surface and centre lines, two gates (main gate at the west on the road under the entrance face; service gate at the east under the fuel farm) and a gatehouse — page-authored and declared.
+- The STP stands between the transformers and the diesel. Each main transformer in a bunded bay behind a fire wall. Feed B 20 kV drawn down the east road into switchroom B; feed A into switchroom A.
+- Dimensions: site width and depth, the three band depths. Schedule gains STP hooked (`site.stp_m2`) and a "Roads, verges and setback" row (`site.roads_m2`); the site row prints W × D.
+- Roof: bank labels inside the bank on an opaque pill above the units. Hall level: gallery labels centred in the free band between the hall edge and the fan-wall ribbon.
+
+**Gates.** Registry 326 parameters, R7/R8 strict (two layout intermediates declared internal); basis map 242 fields at parity; engine 588; payloads 6/6; coverage strict with modals; geometry, legibility, roof-plan, cockpit-reveal, authority at 1.6.0.
+
 ## v3.21.16 — 2026-10-15
 
 ### "Coast-Down": the fans do not stop at once, and every rack reports when it crossed 27 °C

@@ -703,6 +703,23 @@
       fuel: fuelM3 * st.fuelFarmM2PerM3
     };
     var plantM2 = yards.dry + yards.genset + yards.chiller + yards.mainTx + yards.gis + yards.fuel;
+    /* THE CAMPUS ARRANGEMENT (v3.21.16) — three east-west bands on roads of roadM, north up:
+         north  | GIS hall · main transformers · STP · fuel farm   one depth, sized by their areas
+         middle | the building plate · genset yard                   the plate's depth
+         south  | chiller plant · dry-cooler yard                    one depth
+       The genset yard stands the full plate depth beside the building, so the campus is the plate,
+       a road and the yard wide; the north band carries three roads between its four blocks and the
+       south band one. A perimeter road rings the bands inside the fence and the setback lies between
+       the fence and the property line, so the site area is a product of lengths, not a factor.
+       Until v3.21.15 it was (building + yards) x 1.3, which left no room for the perimeter road. */
+    var road = st.roadM, setback = st.setbackM;
+    var gensetYardW = div(yards.genset, plateW, 'genset yard width');
+    var campusW = plateL + road + gensetYardW;
+    var northDepth = div(yards.gis + yards.mainTx + st.stpM2 + yards.fuel, campusW - 3 * road, 'north band depth');
+    var southDepth = div(yards.chiller + yards.dry, campusW - road, 'south band depth');
+    var campusD = northDepth + road + plateW + road + southDepth;
+    var siteW = campusW + 2 * (road + setback), siteD = campusD + 2 * (road + setback);
+    var siteArea = siteW * siteD;
     var site = {
       hall_levels: hallLevels,
       building_levels: hallLevels + 2,                                   /* ground floor + hall levels + roof */
@@ -726,13 +743,24 @@
       fuel_m3: fuelM3,
       fuel_farm_m2: yards.fuel,
       plant_outside_m2: plantM2,
-      site_area_m2: (footprintM2 + plantM2) * st.campusRoadFactor
+      stp_m2: st.stpM2,
+      road_m: road,
+      setback_m: setback,
+      genset_yard_width_m: gensetYardW,
+      north_band_depth_m: northDepth,
+      south_band_depth_m: southDepth,
+      campus_width_m: campusW,
+      campus_depth_m: campusD,
+      site_width_m: siteW,
+      site_depth_m: siteD,
+      site_area_m2: siteArea,
+      roads_m2: siteArea - footprintM2 - plantM2 - st.stpM2     /* roads, verges and the setback: all that is not a block */
     };
 
     return deepFreeze({
       meta: {
         engine: 'dcai-engine.js',
-        version: '1.5.0',   /* v3.21.9: the site branch — electrical wing, plate, roof share and yards from the engine counts. // was 1.4.0 — v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
+        version: '1.6.0',   /* v3.21.16: the campus arrangement — roads, setback, bands and the site area as a product of lengths. // was 1.5.0 — v3.21.9: the site branch — electrical wing, plate, roof share and yards from the engine counts. // was 1.4.0 — v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
         spec_version: m.specVersion,
         authority: m.authority,
         evidence_class: 'SIMULATED/ADOPTED',

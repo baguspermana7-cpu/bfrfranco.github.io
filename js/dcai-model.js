@@ -511,9 +511,14 @@
       // source: above-ground bunded tank farm, plan area per cubic metre stored, including
       //         tank spacing and the bund. ASSUMED allowance
       fuelFarmM2PerM3: 0.4,
-      // source: roads, setbacks, laydown and the security perimeter as a multiplier on the
-      //         sum of the building and the yards. ASSUMED
-      campusRoadFactor: 1.3
+      // source: campus roads, two lanes with verges, wide enough for a fuel tanker and a
+      //         transformer transporter to pass; the same width rings the yards inside the
+      //         fence and separates the bands. ASSUMED
+      roadM: 12,
+      // source: landscape setback between the property line and the security fence. ASSUMED
+      setbackM: 6,
+      // source: package sewage treatment plant for the campus staff, with its tanks. ASSUMED allowance
+      stpM2: 240
     },
 
     /* ------------------------------------------------------------------------

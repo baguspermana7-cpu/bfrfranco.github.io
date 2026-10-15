@@ -56,7 +56,7 @@ const S = C.snapshot;
 /* ── 0. sources and hygiene ─────────────────────────────────────────────── */
 ok(!/Math\.random/.test(ENGINE_SRC) && !/Math\.random/.test(MODEL_SRC), 'no Math.random in model or engine');
 ok(Object.isFrozen(S) && Object.isFrozen(S.design) && Object.isFrozen(M.thermal), 'snapshot and model are deep-frozen');
-ok(S.meta.version === '1.5.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
+ok(S.meta.version === '1.6.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
 ok(!/MEASURED/.test(MODEL_SRC.replace(/nothing may claim MEASURED[^\n]*/,'')), 'nothing in the model claims MEASURED');
 {
   /* every numeric leaf in the model has a `// source:` line within the 6 lines above it */
@@ -336,7 +336,16 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   approx(T.fuel_farm_m2, T.fuel_m3 * ST.fuelFarmM2PerM3, 1e-9, 'site fuel farm = fuel x allowance');
   approx(T.plant_outside_m2, T.dry_cooler_yard_m2 + T.genset_yard_m2 + T.chiller_plant_m2 + T.main_tx_yard_m2 + T.gis_hall_m2 + T.fuel_farm_m2, 1e-6,
     'site plant outside the building = the six yards');
-  approx(T.site_area_m2, (T.footprint_m2 + T.plant_outside_m2) * ST.campusRoadFactor, 1e-6, 'site area = (building + yards) x road factor');
+  approx(T.genset_yard_width_m, T.genset_yard_m2 / T.plate_width_m, 1e-9, 'site genset yard stands the full plate depth beside the building');
+  approx(T.campus_width_m, T.plate_length_m + T.road_m + T.genset_yard_width_m, 1e-9, 'site campus width = plate + road + genset yard');
+  approx(T.north_band_depth_m * (T.campus_width_m - 3 * T.road_m), T.gis_hall_m2 + T.main_tx_yard_m2 + T.stp_m2 + T.fuel_farm_m2, 1e-6, 'site north band holds GIS, main transformers, STP and the fuel farm on three roads');
+  approx(T.south_band_depth_m * (T.campus_width_m - T.road_m), T.chiller_plant_m2 + T.dry_cooler_yard_m2, 1e-6, 'site south band holds the chiller plant and the dry-cooler yard on one road');
+  approx(T.campus_depth_m, T.north_band_depth_m + T.road_m + T.plate_width_m + T.road_m + T.south_band_depth_m, 1e-9, 'site campus depth = three bands and two roads');
+  approx(T.site_width_m, T.campus_width_m + 2 * (T.road_m + T.setback_m), 1e-9, 'site width = campus + perimeter road + setback each side');
+  approx(T.site_depth_m, T.campus_depth_m + 2 * (T.road_m + T.setback_m), 1e-9, 'site depth = campus + perimeter road + setback each side');
+  approx(T.site_area_m2, T.site_width_m * T.site_depth_m, 1e-6, 'site area = width x depth, a product of lengths');
+  approx(T.roads_m2, T.site_area_m2 - T.footprint_m2 - T.plant_outside_m2 - T.stp_m2, 1e-6, 'site roads, verges and setback = all that is not a block');
+  ok(T.road_m === ST.roadM && T.setback_m === ST.setbackM && T.stp_m2 === ST.stpM2, 'site road, setback and STP are the model leaves');
 }
   approx(Ge.air_plant_frontage_m, Ge.air_plant_m2 / M.geometry.airPlantDepthM, 1e-9,
     'air_plant_frontage_m = gallery floor / gallery depth');
