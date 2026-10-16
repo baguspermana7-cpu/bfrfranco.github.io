@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v3.22.6 — 2026-10-16 — "Plant"
+
+### Changed — the hub mockup's hero is the plant, running (`datacenter-solutions1.html`, noindex)
+- **The cockpit screenshot is gone.** The owner, on the v3.22.5 mockup: *"tampilan ss datacenter
+  nggak usah"*, *"gak perlu ada 2 card itu"*, *"nggak ada buttonnya, atau indication itu clickable"*,
+  *"sangat kurang immersive"*. The hero is now ONE figure drawn by RZDiagram — the 150 kV intake
+  through GIS, main transformers, 20 kV board, unit substations and UPS to the racks, then the
+  liquid path through the CDUs to the dry coolers and the air path through the fan walls to the
+  chillers — with IEC 60617 / ISA-5.1 glyphs and every count from `DCAI_CALC.snapshot`.
+- **The design year plays through it.** The seven weather bins (`bins[0..6]`, width ∝ hours) sit
+  above the drawing as a strip; the page advances one bin every 2.6 s while the hero is in view
+  and the tab is visible. Ambient, PUE, facility draw and chillers-running move between the
+  engine's bin values (620 ms tween between two published numbers, never a count-up from zero);
+  at the 36 °C bin the chillers go to 142 of 143, the liquid path reads "on compressors" in the
+  alert colour and the chiller node switches state. Hover, focus or tap a bin to hold it; the play
+  resumes after 7 s quiet. `prefers-reduced-motion`: no autoplay, no tween, no pulses.
+- **The figure draws itself** left to right on first paint (each element staggered by its
+  x-position, 46 ms a step) and every node answers the mouse: hover or focus reads its rows into
+  the readout below, click pins it, double-click or Enter opens the page where it is computed.
+  Phones get the same plant as two stacked sheets (power, heat) so the glyphs stay readable.
+- **Every catalogue row carries an `Open ↗` control** at its right edge and the row's index, name
+  and control turn amber together on hover and focus. The four cells are placed explicitly on the
+  grid, so the lock icon `auth.js` prepends to a gated link lands inside the name cell instead of
+  taking the first column — which is what broke A.03 and B.03 on the owner's phone.
+- Rows arrive in a 35 ms stagger as each group scrolls in (`IntersectionObserver`, off under
+  reduced motion). The four vignette cards and the separate "The engine" section are removed; the
+  engine stamp moves to the trust row.
+- `js/rz-hub-product.js` rewritten (444 → 420 lines): `figPlant` composes `powerChain` +
+  `heatPath`; `figPower` / `figHeat` for narrow viewports; `tween`, `stagger`, `yearRender`,
+  `keysPaint`; `leaders`, `miniPue` and the vignettes deleted.
+
 ## v3.22.5 — 2026-10-16
 
 ### The mockup becomes a catalogue: every tool visible, one render, nothing split

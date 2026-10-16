@@ -1,16 +1,13 @@
-/* rz-hub-product.js — the DC Solutions hub as a product page (PLAN H1, take 3, 2026-10-16).
+/* rz-hub-product.js — the DC Solutions hub as a product page (PLAN H1, take 4, 2026-10-16).
  *
- * Borrowed from the references the owner approved (Oxide Computer, Linear) and read live:
- *   - a small live panel with tabs whose leader line names the figure ("FIG. 1"),
- *   - the product itself as the hero render (here: the real cockpit, screenshotted),
- *   - feature columns that each carry a LIVE vignette, not an icon,
- *   - spec tables, two-tone headlines.
- *
- * Everything drawn here is drawn by the site's own engines: RZDiagram lays out the
- * figures (measured boxes, routed connectors, IEC 60617 / ISA-5.1 glyphs from
- * rz-eng-symbols.js), DCAI_CALC.snapshot supplies every number. A number the engine
- * does not publish prints "—". Nothing follows the cursor; hover and focus select,
- * click navigates. ES5, zero deps beyond the engines.
+ * The hero is the plant itself, drawn by the site's own engines and running: RZDiagram lays
+ * out one figure (power chain, 150 kV to the rack, then the heat path, rack to ambient) with
+ * IEC 60617 / ISA-5.1 glyphs from rz-eng-symbols.js; DCAI_CALC.snapshot supplies every number;
+ * the seven weather bins of the design year play through the figure, one at a time, with the
+ * readouts tweening and the chillers changing state when the liquid path loses free cooling.
+ * Hover or focus reads a box, click pins it, double-click or Enter opens where it is computed.
+ * A number the engine does not publish prints "—". Nothing follows the cursor. ES5, no deps
+ * beyond the engines.
  */
 (function () {
   'use strict';
@@ -19,6 +16,8 @@
   var S = window.DCAI_CALC && window.DCAI_CALC.snapshot;
   var D = window.RZDiagram, L = window.RZDiagramLayout;
   var REDUCE = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NARROW = window.matchMedia ? window.matchMedia('(max-width: 800px)') : { matches: false };
+  var DESIGN_BIN = 5, DWELL = 2600, IDLE = 7000;
 
   function get(path) {
     if (!S) return null;
@@ -37,11 +36,28 @@
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
+  /* A numeral moves to its new value instead of jumping — 620 ms, ease-out, cubic. */
+  function tween(el, to, render) {
+    if (!el) return;
+    var first = typeof el.__v !== 'number', from = first ? 0 : el.__v; el.__v = to;
+    /* The first paint is the engine's value, never a count-up from zero: a numeral on this page is
+     * either a published value or on its way between two of them. */
+    if (first || REDUCE || typeof to !== 'number' || from === to || !window.requestAnimationFrame) { el.textContent = render(to); return; }
+    var t0 = performance.now(), dur = 620;
+    if (el.__raf) cancelAnimationFrame(el.__raf);
+    (function step(now) {
+      var p = Math.min(1, (now - t0) / dur); p = 1 - Math.pow(1 - p, 3);
+      el.textContent = render(from + (to - from) * p);
+      if (p < 1) el.__raf = requestAnimationFrame(step);
+    })(t0);
+  }
+
   /* ------------------------------------------------------------------ */
   /* The readout rows behind every node: label · value · registry id      */
   /* ------------------------------------------------------------------ */
-  var BIN = 5; /* index into S.bins — the design day until a scenario button says otherwise */
-  function bin() { return S && S.bins && S.bins[BIN] || null; }
+  var BIN = DESIGN_BIN;
+  function bins() { return (S && S.bins) || []; }
+  function bin() { return bins()[BIN] || null; }
   function binRows() {
     var b = bin(); if (!b) return [];
     return [['At ' + b.ambient_db_c + ' °C — PUE', fmt(b.pue, 3), '', 'bins[' + BIN + '].pue'],
@@ -112,7 +128,7 @@
       ['Unit duty', F('equipment.crah_unit_kwth'), 'kW th', 'equipment.crah_unit_kwth'],
       ['Supply / return air', F('design.planes.p09_air_supply_c') + ' / ' + F('design.planes.p11_air_return_c'), '°C', 'design.planes.p09_air_supply_c'],
       ['Air share of heat', fmt((1 - (get('heat.liquid_capture_ratio') || 0)) * 100), '%', 'heat.liquid_capture_ratio']] },
-    chiller: { title: 'Chillers', sub: 'air path only; the liquid path runs free', href: 'pue-calculator.html', rows: [
+    chiller: { title: 'Chillers', sub: 'air path only while the liquid path runs free', href: 'pue-calculator.html', rows: [
       ['Installed', F('equipment.chillers_installed'), '', 'equipment.chillers_installed'],
       ['Running, design day', F('equipment.chillers_running_design'), '', 'equipment.chillers_running_design'],
       ['Running, worst bin', F('equipment.chillers_running_worst_bin'), '', 'equipment.chillers_running_worst_bin'],
@@ -136,7 +152,7 @@
   };
 
   /* ------------------------------------------------------------------ */
-  /* FIG. 1 — three drawings through RZDiagram                            */
+  /* FIG. 1 — the plant through RZDiagram                                 */
   /* ------------------------------------------------------------------ */
   function mid(box, side) { return L.fanPoints(box, 1, side)[0]; }
   function node(ctx, x, y, o) { o.interactive = true; if (!o.tier) o.tier = 2; return ctx.node(x, y, o); }
@@ -147,55 +163,68 @@
     ctx.edge({ x: from.x, y: from.y }, { x: to.x, y: to.y }, o);
     ctx.layer(null);
   }
-
-  function figSld() {
-    var ctx = D.create({ width: 1180, height: 330, slug: 'hubsld', title: 'Power chain, 150 kV to the rack',
-      desc: 'Utility intake at 150 kV through the GIS, main transformers to 20 kV, unit substations to 400 V, UPS, racks. Standby generation on the 20 kV board.' });
-    var Y = 150, x = 24, GAP = 46, H = 92;
+  function powerChain(ctx, x, Y, GAP, H) {
     function step(o) { var b = node(ctx, x, Y, Object.assign({ h: H }, o)); x = b.x + b.w + GAP; return b; }
-    var utility = step({ id: 'utility', tag: 'grid', name: 'PLN ' + F('distribution.hv_intake_kv') + ' kV', symbol: 'utility', sublabel: F('distribution.hv_circuits_installed') + ' circuits × ' + F('distribution.hv_circuit_mva') + ' MVA' });
-    var gis = step({ id: 'gis', tag: 'hv', name: 'GIS', symbol: 'switchgear', sublabel: F('distribution.hv_switchyard_bays') + ' bays' });
-    var mtx = step({ id: 'mtx', tag: '150/20 kV', name: 'MAIN TX', symbol: 'transformer', sublabel: F('distribution.main_tx_total') + ' × ' + F('distribution.main_tx_mva') + ' MVA' });
-    var mv = step({ id: 'mv', tag: 'mv', name: F('distribution.mv_kv') + ' kV BOARD', symbol: 'switchgear', sublabel: F('distribution.mv_fault_ka_per_section', 1) + ' kA · ' + F('distribution.mv_board_ka_rating', 1) + ' kA gear', focal: true, tier: 1 });
-    var usub = step({ id: 'usub', tag: '20/0.4 kV', name: 'UNIT SUBS', symbol: 'transformer', sublabel: F('equipment.transformers') + ' × ' + F('equipment.transformer_unit_mva', 1) + ' MVA' });
-    var ups = step({ id: 'ups', tag: 'ups', name: 'UPS', symbol: 'ups', sublabel: F('equipment.ups_frames_total') + ' × ' + F('equipment.ups_frame_kw') + ' kW' });
-    var racks = step({ id: 'racks', tag: 'load', name: 'NVL72 RACKS', symbol: 'rack', sublabel: F('compute.racks_facility') + ' × ' + F('power.rack_it_kw') + ' kW' });
-    var genset = node(ctx, mv.x + (mv.w - 128) / 2, 18, { id: 'genset', tag: 'standby', name: 'GENSETS', symbol: 'genset', w: 128, h: 88, sublabel: F('equipment.gensets_installed') + ' × ' + F('equipment.generator_unit_kw') + ' kW', dashed: true });
-    edge(ctx, utility, gis, { label: F('distribution.hv_current_a') + ' A', state: 'flow', tier: 1 });
-    edge(ctx, gis, mtx, { state: 'flow', tier: 1 });
-    edge(ctx, mtx, mv, { label: F('distribution.main_tx_secondary_a') + ' A', state: 'flow', tier: 1 });
-    edge(ctx, mv, usub, { label: F('distribution.mv_feeder_rated_a') + ' A feeders', state: 'flow', tier: 1 });
-    edge(ctx, usub, ups, { label: F('distribution.voltage_ll_v') + ' V', state: 'flow', tier: 1 });
-    edge(ctx, ups, racks, { label: F('distribution.rack_feed_current_a') + ' A / rack', state: 'flow', tier: 1 });
-    edge(ctx, genset, mv, { from: { x: genset.x + genset.w / 2, y: genset.y + genset.h }, to: { x: mv.x + mv.w / 2, y: mv.y }, pattern: 'dashed', label: 'ATS', tier: 2 });
-    ctx.zone(utility.x - 12, Y - 28, (mtx.x + mtx.w + 12) - (utility.x - 12), H + 56, { label: F('distribution.hv_intake_kv') + ' kV switchyard', tier: 3 });
-    ctx.fit(20);
-    return ctx;
+    var n = {};
+    n.utility = step({ id: 'utility', tag: 'grid', name: 'PLN ' + F('distribution.hv_intake_kv') + ' kV', symbol: 'utility', sublabel: F('distribution.hv_circuits_installed') + ' circuits × ' + F('distribution.hv_circuit_mva') + ' MVA' });
+    n.gis = step({ id: 'gis', tag: 'hv', name: 'GIS', symbol: 'switchgear', sublabel: F('distribution.hv_switchyard_bays') + ' bays' });
+    n.mtx = step({ id: 'mtx', tag: '150/20 kV', name: 'MAIN TX', symbol: 'transformer', sublabel: F('distribution.main_tx_total') + ' × ' + F('distribution.main_tx_mva') + ' MVA' });
+    n.mv = step({ id: 'mv', tag: 'mv', name: F('distribution.mv_kv') + ' kV BOARD', symbol: 'switchgear', sublabel: F('distribution.mv_fault_ka_per_section', 1) + ' kA · ' + F('distribution.mv_board_ka_rating', 1) + ' kA gear', tier: 1 });
+    n.usub = step({ id: 'usub', tag: '20/0.4 kV', name: 'UNIT SUBS', symbol: 'transformer', sublabel: F('equipment.transformers') + ' × ' + F('equipment.transformer_unit_mva', 1) + ' MVA' });
+    n.ups = step({ id: 'ups', tag: 'ups', name: 'UPS', symbol: 'ups', sublabel: F('equipment.ups_frames_total') + ' × ' + F('equipment.ups_frame_kw') + ' kW' });
+    n.racks = step({ id: 'racks', tag: 'load', name: 'NVL72 RACKS', symbol: 'rack', sublabel: F('compute.racks_facility') + ' × ' + F('power.rack_it_kw') + ' kW', focal: true, tier: 1 });
+    n.genset = node(ctx, n.mv.x + (n.mv.w - 128) / 2, Y - 132, { id: 'genset', tag: 'standby', name: 'GENSETS', symbol: 'genset', w: 128, h: 88, sublabel: F('equipment.gensets_installed') + ' × ' + F('equipment.generator_unit_kw') + ' kW', dashed: true });
+    edge(ctx, n.utility, n.gis, { label: F('distribution.hv_current_a') + ' A', state: 'flow', tier: 1 });
+    edge(ctx, n.gis, n.mtx, { state: 'flow', tier: 1 });
+    edge(ctx, n.mtx, n.mv, { label: F('distribution.main_tx_secondary_a') + ' A', state: 'flow', tier: 1 });
+    edge(ctx, n.mv, n.usub, { label: F('distribution.mv_feeder_rated_a') + ' A feeders', state: 'flow', tier: 1 });
+    edge(ctx, n.usub, n.ups, { label: F('distribution.voltage_ll_v') + ' V', state: 'flow', tier: 1 });
+    edge(ctx, n.ups, n.racks, { label: F('distribution.rack_feed_current_a') + ' A / rack', state: 'flow', tier: 1 });
+    edge(ctx, n.genset, n.mv, { from: { x: n.genset.x + n.genset.w / 2, y: n.genset.y + n.genset.h }, to: { x: n.mv.x + n.mv.w / 2, y: n.mv.y }, pattern: 'dashed', label: 'ATS', tier: 2 });
+    ctx.zone(n.utility.x - 12, Y - 28, (n.mtx.x + n.mtx.w + 12) - (n.utility.x - 12), H + 56, { label: F('distribution.hv_intake_kv') + ' kV switchyard', tier: 3 });
+    n.next = x;
+    return n;
   }
-
-  function figCooling() {
-    var ctx = D.create({ width: 1180, height: 330, slug: 'hubcool', title: 'Heat path, rack to ambient',
-      desc: 'Liquid path: racks to CDUs to dry coolers, warm water, no chiller. Air path: fan walls to chillers for the share the liquid does not take.' });
-    var Y = 40, x = 24, GAP = 118, H = 92;
+  function heatPath(ctx, racks, x, Y, GAP, H) {
     function step(o) { var b = node(ctx, x, Y, Object.assign({ h: H }, o)); x = b.x + b.w + GAP; return b; }
-    var racks = step({ id: 'racks', tag: 'load', name: 'NVL72 RACKS', symbol: 'rack', sublabel: F('heat.liquid_kwth') + ' kW th liquid' });
-    var cdu = step({ id: 'cdu', tag: 'l2l', name: 'CDU ARRAY', symbol: 'cdu', sublabel: F('equipment.cdu_installed_facility') + ' × ' + F('equipment.cdu_unit_kwth') + ' kW', focal: true, tier: 1 });
-    var dry = step({ id: 'dry', tag: 'reject', name: 'DRY COOLERS', symbol: 'dryCooler', sublabel: F('equipment.dry_coolers_installed') + ' × ' + F('equipment.dry_cooler_unit_kwth') + ' kW' });
-    var crah = node(ctx, racks.x, Y + H + 76, { id: 'crah', tag: 'air', name: 'FAN WALLS', symbol: 'crah', w: racks.w, h: H, sublabel: F('heat.air_kwth') + ' kW th air', dashed: true });
-    var chiller = node(ctx, cdu.x, Y + H + 76, { id: 'chiller', tag: 'mech', name: 'CHILLERS', symbol: 'chiller', w: cdu.w, h: H, sublabel: F('equipment.chillers_installed') + ' × ' + F('equipment.chiller_unit_kwth') + ' kW', dashed: true });
+    var n = { racks: racks };
+    n.cdu = step({ id: 'cdu', tag: 'l2l', name: 'CDU ARRAY', symbol: 'cdu', sublabel: F('equipment.cdu_installed_facility') + ' × ' + F('equipment.cdu_unit_kwth') + ' kW' });
+    n.dry = step({ id: 'dry', tag: 'reject', name: 'DRY COOLERS', symbol: 'dryCooler', sublabel: F('equipment.dry_coolers_installed') + ' × ' + F('equipment.dry_cooler_unit_kwth') + ' kW' });
+    n.crah = node(ctx, racks.x, Y + H + 76, { id: 'crah', tag: 'air', name: 'FAN WALLS', symbol: 'crah', w: racks.w, h: H, sublabel: F('heat.air_kwth') + ' kW th air', dashed: true });
+    n.chiller = node(ctx, n.cdu.x, Y + H + 76, { id: 'chiller', tag: 'mech', name: 'CHILLERS', symbol: 'chiller', w: n.cdu.w, h: H, sublabel: F('equipment.chillers_installed') + ' × ' + F('equipment.chiller_unit_kwth') + ' kW', dashed: true });
     function pipes(a, b, hot, cold) {
       var ar = L.fanPoints(a, 2, 'right'), bl = L.fanPoints(b, 2, 'left');
       edge(ctx, a, b, { from: ar[0], to: bl[0], stroke: 'alarm-caution', label: hot, state: 'flow', tier: 2 });
       edge(ctx, b, a, { from: bl[1], to: ar[1], stroke: 'link', label: cold, pattern: 'dash-dot', state: 'flow', tier: 2 });
     }
-    pipes(racks, cdu, 'TCS ' + F('design.planes.p08_tcs_return_c') + ' °C', 'TCS ' + F('design.planes.p07_tcs_supply_c') + ' °C');
-    pipes(cdu, dry, 'HTW ' + F('design.planes.p06_htw_return_c') + ' °C', 'HTW ' + F('design.planes.p05_htw_supply_c') + ' °C');
-    edge(ctx, racks, crah, { from: { x: racks.x + racks.w / 2, y: racks.y + racks.h }, to: { x: crah.x + crah.w / 2, y: crah.y }, stroke: 'soft', pattern: 'dotted', label: 'air ' + F('design.planes.p11_air_return_c') + ' °C', tier: 3 });
-    edge(ctx, crah, chiller, { label: 'CHW ' + F('design.planes.p12_chw_supply_c') + ' / ' + F('design.planes.p13_chw_return_c') + ' °C', stroke: 'link', pattern: 'dash-dot', tier: 2 });
-    edge(ctx, chiller, dry, { from: { x: chiller.x + chiller.w, y: chiller.y + chiller.h / 2 }, to: { x: dry.x + dry.w / 2, y: dry.y + dry.h }, label: 'CDW ' + F('design.planes.p15_cdw_supply_c') + ' / ' + F('design.planes.p16_cdw_return_c') + ' °C', stroke: 'soft', pattern: 'dotted', tier: 3 });
-    ctx.zone(racks.x - 14, Y - 26, (cdu.x + cdu.w + 14) - (racks.x - 14), (chiller.y + chiller.h + 26) - (Y - 26), { label: 'inside the building', tier: 3 });
+    pipes(racks, n.cdu, 'TCS ' + F('design.planes.p08_tcs_return_c') + ' °C', 'TCS ' + F('design.planes.p07_tcs_supply_c') + ' °C');
+    pipes(n.cdu, n.dry, 'HTW ' + F('design.planes.p06_htw_return_c') + ' °C', 'HTW ' + F('design.planes.p05_htw_supply_c') + ' °C');
+    edge(ctx, racks, n.crah, { from: { x: racks.x + racks.w / 2, y: racks.y + racks.h }, to: { x: n.crah.x + n.crah.w / 2, y: n.crah.y }, stroke: 'soft', pattern: 'dotted', label: 'air ' + F('design.planes.p11_air_return_c') + ' °C', tier: 3 });
+    edge(ctx, n.crah, n.chiller, { label: 'CHW ' + F('design.planes.p12_chw_supply_c') + ' / ' + F('design.planes.p13_chw_return_c') + ' °C', stroke: 'link', pattern: 'dash-dot', state: 'flow', tier: 2 });
+    edge(ctx, n.chiller, n.dry, { from: { x: n.chiller.x + n.chiller.w, y: n.chiller.y + n.chiller.h / 2 }, to: { x: n.dry.x + n.dry.w / 2, y: n.dry.y + n.dry.h }, label: 'CDW ' + F('design.planes.p15_cdw_supply_c') + ' / ' + F('design.planes.p16_cdw_return_c') + ' °C', stroke: 'soft', pattern: 'dotted', tier: 3 });
+    n.next = x;
+    return n;
+  }
+  /* One figure: electricity in at the left, heat out at the right, the racks where they meet. */
+  function figPlant() {
+    var ctx = D.create({ width: 1560, height: 440, slug: 'hubplant', title: 'The plant: 150 kV to the rack, rack to ambient',
+      desc: 'Utility intake through the GIS, main transformers to 20 kV, unit substations to 400 V, UPS, racks; then the liquid path through CDUs to dry coolers and the air path through fan walls to chillers.' });
+    var Y = 150, H = 92;
+    var p = powerChain(ctx, 24, Y, 34, H);
+    var h = heatPath(ctx, p.racks, p.next + 60, Y, 96, H);
+    ctx.zone(p.usub.x - 14, Y - 26, (h.cdu.x + h.cdu.w + 14) - (p.usub.x - 14), (h.chiller.y + h.chiller.h + 26) - (Y - 26), { label: 'inside the building', tier: 3 });
     ctx.fit(20);
     return ctx;
+  }
+  /* Phones: the same plant as two stacked sheets so the glyphs stay readable. */
+  function figPower() {
+    var ctx = D.create({ width: 1180, height: 330, slug: 'hubsld', title: 'Power chain, 150 kV to the rack', desc: 'Utility intake to the racks, standby generation on the 20 kV board.' });
+    powerChain(ctx, 24, 150, 46, 92); ctx.fit(20); return ctx;
+  }
+  function figHeat() {
+    var ctx = D.create({ width: 1180, height: 330, slug: 'hubcool', title: 'Heat path, rack to ambient', desc: 'Liquid path to dry coolers, air path to chillers.' });
+    var racks = node(ctx, 24, 40, { id: 'racks', tag: 'load', name: 'NVL72 RACKS', symbol: 'rack', h: 92, sublabel: F('heat.liquid_kwth') + ' kW th liquid', focal: true, tier: 1 });
+    heatPath(ctx, racks, racks.x + racks.w + 118, 40, 118, 92); ctx.fit(20); return ctx;
   }
 
   /* The campus to scale: the engine's lengths, dimension lines, a scale bar. Hand SVG,
@@ -213,10 +242,10 @@
       var tick = 5; if (y1 === y2) { out.push('<line x1="' + x1 + '" y1="' + (y1 - tick) + '" x2="' + x1 + '" y2="' + (y1 + tick) + '" class="sd"/><line x1="' + x2 + '" y1="' + (y1 - tick) + '" x2="' + x2 + '" y2="' + (y1 + tick) + '" class="sd"/>'); t((x1 + x2) / 2, y1 - 6, s, 'sm', 'middle'); }
       else { out.push('<line x1="' + (x1 - tick) + '" y1="' + y1 + '" x2="' + (x1 + tick) + '" y2="' + y1 + '" class="sd"/><line x1="' + (x1 - tick) + '" y1="' + y2 + '" x2="' + (x1 + tick) + '" y2="' + y2 + '" class="sd"/>'); out.push('<text x="' + (x1 - 8) + '" y="' + ((y1 + y2) / 2) + '" class="sm" text-anchor="middle" transform="rotate(-90 ' + (x1 - 8) + ' ' + ((y1 + y2) / 2) + ')">' + esc(s) + '</text>'); }
     }
-    r(0, 0, W, Dp, 'sl t3');                                                /* property line */
-    r(set, set, W - 2 * set, Dp - 2 * set, 'sl t3', ' stroke-dasharray="2,3"'); /* fence */
+    r(0, 0, W, Dp, 'sl t3');
+    r(set, set, W - 2 * set, Dp - 2 * set, 'sl t3', ' stroke-dasharray="2,3"');
     var ix = set + road, iy = set + road, iw = W - 2 * (set + road), id = Dp - 2 * (set + road);
-    r(ix, iy, iw, id, 'sl t3');                                             /* ring road inner edge */
+    r(ix, iy, iw, id, 'sl t3');
     var yA = iy, yB = yA + nb + road, yC = yB + pw + road;
     var bands = [['GIS', .22, 'gis'], ['MAIN TX YARD', .30, 'txyard'], ['STP', .08, null], ['FUEL FARM', .40, 'fuel']], bx = ix;
     bands.forEach(function (b) { var w = (iw - road * 3) * b[1]; if (b[2]) out.push('<g data-rzd-hit="' + b[2] + '" class="rzd-hit" tabindex="0" role="button" aria-label="' + b[0] + '">'); r(bx, yA, w, nb, 'sl t2 sf'); t(X0 + (bx + w / 2) * sc, Y0 + (yA + nb / 2) * sc + 3, b[0], 'st', 'middle'); if (b[2]) out.push('</g>'); bx += w + road; });
@@ -257,8 +286,8 @@
     if (!r) {
       var b = bin();
       box.innerHTML = '<div class="ro-head"><b>The facility, as computed</b><span>' + (b ? 'ambient ' + b.ambient_db_c + ' °C · ' + fmt(b.hours) + ' h a year' : 'design day') + '</span></div><table class="ro-rows">' +
-        [['Total IT', F('power.total_it_mw', 2), 'MW'], ['Facility draw', b ? fmt(b.facility_kwe / 1000, 1) : '\u2014', 'MW'], ['PUE at this bin', b ? fmt(b.pue, 3) : '\u2014', ''], ['Chillers running', b ? fmt(b.chillers_running) : '\u2014', ''], ['Racks · GPUs', F('compute.racks_facility') + ' · ' + F('compute.gpu_facility'), ''], ['Free-cooling hours', F('pue.free_cooling_hours') + ' / ' + F('pue.hours_total'), '']]
-          .map(function (row) { return '<tr><th>' + row[0] + '</th><td>' + row[1] + (row[2] ? ' <i>' + row[2] + '</i>' : '') + '</td></tr>'; }).join('') + '</table>';
+        [['Total IT', F('power.total_it_mw', 2), 'MW'], ['Facility draw', b ? fmt(b.facility_kwe / 1000, 1) : '—', 'MW'], ['PUE at this bin', b ? fmt(b.pue, 3) : '—', ''], ['Chillers running', b ? fmt(b.chillers_running) : '—', ''], ['Racks · GPUs', F('compute.racks_facility') + ' · ' + F('compute.gpu_facility'), ''], ['Free-cooling hours', F('pue.free_cooling_hours') + ' / ' + F('pue.hours_total'), '']]
+          .map(function (row) { return '<tr><th>' + row[0] + '</th><td>' + row[1] + (row[2] ? ' <i>' + row[2] + '</i>' : '') + '</td></tr>'; }).join('') + '</table><p class="ro-empty">Hover or tap any box in the drawing to read its rows.</p>';
       return;
     }
     var h = '<div class="ro-head"><b>' + esc(r.title) + '</b><span>' + esc(r.sub || '') + '</span></div><table class="ro-rows">';
@@ -267,7 +296,7 @@
     h += '</table><a class="ro-go" href="' + esc(r.href) + '">Open where this is computed <span aria-hidden="true">→</span></a>';
     box.innerHTML = h;
   }
-  function wire(host) {
+  function wire(host, onTouch) {
     var hot = null;
     function light(id) {
       if (hot === id) return; hot = id;
@@ -281,164 +310,136 @@
       });
       readout(id, host);
     }
-    host.addEventListener('pointerover', function (e) { var h = e.target.closest && e.target.closest('[data-rzd-hit]'); if (h) light(h.getAttribute('data-rzd-hit')); });
+    host.addEventListener('pointerover', function (e) { var h = e.target.closest && e.target.closest('[data-rzd-hit]'); if (h) { light(h.getAttribute('data-rzd-hit')); onTouch(); } });
     host.addEventListener('pointerleave', function () { if (!host.__pinned) light(null); });
-    host.addEventListener('focusin', function (e) { var h = e.target.closest && e.target.closest('[data-rzd-hit]'); if (h) light(h.getAttribute('data-rzd-hit')); });
+    host.addEventListener('focusin', function (e) { var h = e.target.closest && e.target.closest('[data-rzd-hit]'); if (h) { light(h.getAttribute('data-rzd-hit')); onTouch(); } });
     host.addEventListener('click', function (e) {
       var h = e.target.closest && e.target.closest('[data-rzd-hit]'); if (!h) return;
-      var id = h.getAttribute('data-rzd-hit'); host.__pinned = id; light(id);
+      var id = h.getAttribute('data-rzd-hit'); host.__pinned = id; hot = null; light(id); onTouch();
       var go = ROWS[id] && ROWS[id].href; if (go && e.detail >= 2) window.location.href = go;
     });
     host.addEventListener('keydown', function (e) { var h = e.target.closest && e.target.closest('[data-rzd-hit]'); if (h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); var go = ROWS[h.getAttribute('data-rzd-hit')]; if (go) window.location.href = go.href; } });
+    host.__light = light;
     light(null);
   }
 
-  function mountFigures() {
-    var host = $('#fig1'); if (!host || !D || !L) return;
-    var stage = $('[data-stage]', host), tabs = $$('[data-fig]', host), caps = {};
-    var FIGS = { sld: figSld, cooling: figCooling, site: figSite }, cache = {};
+  /* The figure draws itself left to right: every element is staggered by where it sits. */
+  function stagger(stage) {
+    if (REDUCE) return;
+    var base = 0;
+    $$('svg', stage).forEach(function (svg) {
+      var maxI = 0;
+      $$(':scope > *', svg).forEach(function (el) {
+        var i = 0; try { i = Math.round(el.getBBox().x / 48); } catch (err) { i = 0; }
+        if (!isFinite(i) || i < 0) i = 0; if (i > maxI) maxI = i;
+        el.style.setProperty('--i', base + i);
+      });
+      base += maxI + 4;
+    });
+    stage.classList.remove('is-draw'); void stage.offsetWidth; stage.classList.add('is-draw');
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* The hero: keys, the year strip, the figure, the readout             */
+  /* ------------------------------------------------------------------ */
+  var KEYS = [
+    { k: 'ambient', label: 'Ambient', id: function () { return 'bins[' + BIN + '].ambient_db_c'; }, val: function (b) { return b.ambient_db_c; }, out: function (v) { return fmt(v) + ' °C'; } },
+    { k: 'pue', label: 'PUE at this bin', id: function () { return 'bins[' + BIN + '].pue'; }, val: function (b) { return b.pue; }, out: function (v) { return fmt(v, 3); } },
+    { k: 'facility', label: 'Facility draw', id: function () { return 'bins[' + BIN + '].facility_kwe'; }, val: function (b) { return b.facility_kwe / 1000; }, out: function (v) { return fmt(v, 1) + ' MW'; } },
+    { k: 'chillers', label: 'Chillers running', id: function () { return 'bins[' + BIN + '].chillers_running'; }, val: function (b) { return b.chillers_running; }, out: function (v) { return fmt(Math.round(v)) + ' of ' + F('equipment.chillers_installed'); } },
+    { k: 'liquid', label: 'Liquid path', id: function () { return 'bins[' + BIN + '].liquid_free_cooling'; }, val: function (b) { return b.liquid_free_cooling; }, out: function (v) { return v ? 'free cooling' : 'on compressors'; } },
+    { k: 'it', label: 'Total IT', id: function () { return 'power.total_it_mw'; }, val: function () { return get('power.total_it_mw'); }, out: function (v) { return fmt(v, 2) + ' MW'; } },
+    { k: 'gpu', label: 'GPUs', id: function () { return 'compute.gpu_facility'; }, val: function () { return get('compute.gpu_facility'); }, out: function (v) { return fmt(Math.round(v)); } }
+  ];
+  function keysRender(list) {
+    list.innerHTML = KEYS.map(function (k, i) { return '<li style="--i:' + i + '" data-key-row="' + k.k + '"><span>' + esc(k.label) + '</span><b data-key="' + k.k + '">—</b><code>' + esc(k.id()) + '</code></li>'; }).join('');
+  }
+  function keysPaint(list) {
+    var b = bin(); if (!b) return;
+    KEYS.forEach(function (k) {
+      var el = $('[data-key="' + k.k + '"]', list), row = el && el.parentNode, v = k.val(b);
+      if (!el) return;
+      $('code', row).textContent = k.id();
+      if (typeof v === 'number' && k.k !== 'chillers' && k.k !== 'gpu') tween(el, v, k.out); else el.textContent = k.out(v);
+      if (k.k === 'liquid' || k.k === 'chillers' || k.k === 'pue') row.classList.toggle('is-warn', !b.liquid_free_cooling);
+    });
+  }
+  function yearRender(strip) {
+    var bs = bins(), total = 0; bs.forEach(function (b) { total += b.hours; });
+    strip.innerHTML = bs.map(function (b, i) {
+      return '<button type="button" data-bin="' + i + '" style="--h:' + (b.hours / total).toFixed(4) + '" aria-pressed="' + (i === BIN ? 'true' : 'false') + '" title="' + b.ambient_db_c + ' °C dry bulb, ' + fmt(b.hours) + ' h a year">' +
+        '<b>' + b.ambient_db_c + ' °C</b><span>' + fmt(b.hours) + ' h' + (i === DESIGN_BIN ? ' · design' : '') + (b.liquid_free_cooling ? '' : ' · cliff') + '</span><i class="dwell" aria-hidden="true"></i></button>';
+    }).join('');
+  }
+
+  function mountHero() {
+    var host = $('#plant'); if (!host || !D || !L) return;
+    var stage = $('[data-stage]', host), tabs = $$('[data-fig]', host), caps = {}, list = $('#heroKeys'), strip = $('#yearStrip');
+    var FIGS = { plant: function () { return NARROW.matches ? [figPower(), figHeat()] : [figPlant()]; }, site: function () { return [figSite()]; } }, cache = {};
+    var current = 'plant', timer = null, idleUntil = 0, inView = true, playing = !REDUCE && bins().length > 1;
     $$('[data-fig-cap]', host).forEach(function (c) { caps[c.getAttribute('data-fig-cap')] = c; });
+
+    function paintState() {
+      var b = bin(); if (!b) return;
+      var design = get('equipment.chillers_running_design'), warn = typeof design === 'number' && b.chillers_running > design;
+      $$('[data-rzd-node="chiller"]', host).forEach(function (n) { n.classList.toggle('is-warn', warn); });
+      host.classList.toggle('is-cliff', !b.liquid_free_cooling);
+      $$('[data-bin]', strip).forEach(function (x) { x.setAttribute('aria-pressed', +x.getAttribute('data-bin') === BIN ? 'true' : 'false'); });
+      keysPaint(list);
+      readout(host.__pinned || null, host);
+    }
     function show(name) {
+      current = name;
       tabs.forEach(function (t) { var on = t.getAttribute('data-fig') === name; t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1; });
       for (var k in caps) caps[k].hidden = k !== name;
-      if (!cache[name]) { var ctx = FIGS[name](); cache[name] = ctx.render(); if (ctx.warnings && ctx.warnings.length) console.warn('[fig1 ' + name + ']', ctx.warnings); }
-      stage.innerHTML = cache[name]; var sv = stage.querySelector('svg'); if (sv) { sv.setAttribute('role', 'group'); sv.removeAttribute('aria-labelledby'); sv.setAttribute('aria-label', (FIGS[name] === figSite ? 'Campus to scale' : name === 'sld' ? 'Power chain' : 'Heat path') + ' — interactive drawing'); } host.setAttribute('data-fig-on', name); host.__pinned = null; readout(null, host); if (host.__afterShow) host.__afterShow();
-      if (!REDUCE) { stage.classList.remove('is-in'); void stage.offsetWidth; stage.classList.add('is-in'); }
+      var key = name + (NARROW.matches ? ':narrow' : '');
+      if (!cache[key]) cache[key] = FIGS[name]().map(function (ctx) { if (ctx.warnings && ctx.warnings.length) console.warn('[plant ' + name + ']', ctx.warnings); return ctx.render(); }).join('');
+      stage.innerHTML = cache[key];
+      $$('svg', stage).forEach(function (sv) { sv.setAttribute('role', 'group'); sv.removeAttribute('aria-labelledby'); sv.setAttribute('aria-label', (name === 'site' ? 'Campus to scale' : 'The plant') + ' — interactive drawing'); });
+      host.setAttribute('data-fig-on', name); host.__pinned = null;
+      if (host.__light) { host.__light(null); }
+      stagger(stage); paintState();
     }
-    tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-fig')); }); });
+    tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-fig')); touch(); }); });
     host.addEventListener('keydown', function (e) {
       if (!e.target.hasAttribute('data-fig')) return; var i = tabs.indexOf(e.target), n = tabs.length;
       if (e.key === 'ArrowRight') { tabs[(i + 1) % n].focus(); show(tabs[(i + 1) % n].getAttribute('data-fig')); }
       if (e.key === 'ArrowLeft') { tabs[(i - 1 + n) % n].focus(); show(tabs[(i - 1 + n) % n].getAttribute('data-fig')); }
     });
-    function status() {
-      var b = bin(), st = $('[data-scen-status]', host); if (!st || !b) return;
-      var design = get('equipment.chillers_running_design'), warn = typeof design === 'number' && b.chillers_running > design;
-      st.innerHTML = 'PUE <b>' + fmt(b.pue, 3) + '</b> · facility <b>' + fmt(b.facility_kwe / 1000, 1) + ' MW</b> · chillers <b class="' + (warn ? 'warn' : '') + '">' + fmt(b.chillers_running) + (warn ? ' — liquid path on compressors' : '') + '</b>';
-      $$('[data-rzd-node="chiller"]', host).forEach(function (n) { n.classList.toggle('is-warn', warn); });
-      if (!host.__pinned) readout(null, host); else readout(host.__pinned, host);
+    if (NARROW.addEventListener) NARROW.addEventListener('change', function () { show(current); });
+
+    /* The year plays through the figure. Any touch from the reader pauses it; it resumes
+     * after a quiet while. Off-screen or in a hidden tab it does not run. */
+    function setBin(i) { BIN = i; paintState(); }
+    function touch() { idleUntil = Date.now() + IDLE; strip.classList.add('is-paused'); }
+    function tick() {
+      timer = null; if (!playing) return;
+      if (!inView || document.hidden || Date.now() < idleUntil) { strip.classList.toggle('is-paused', Date.now() < idleUntil); timer = setTimeout(tick, 400); return; }
+      strip.classList.remove('is-paused');
+      setBin((BIN + 1) % bins().length);
+      timer = setTimeout(tick, DWELL);
     }
-    $$('[data-scen]', host).forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        BIN = +btn.getAttribute('data-scen');
-        $$('[data-scen]', host).forEach(function (x) { x.setAttribute('aria-pressed', x === btn ? 'true' : 'false'); });
-        status();
-      });
-    });
-    wire(host); show('sld'); status();
-    host.__afterShow = status;
+    strip.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-bin]'); if (b) { setBin(+b.getAttribute('data-bin')); touch(); } });
+    strip.addEventListener('pointerover', function (e) { var b = e.target.closest && e.target.closest('[data-bin]'); if (b) { setBin(+b.getAttribute('data-bin')); touch(); } });
+    strip.addEventListener('focusin', function (e) { var b = e.target.closest && e.target.closest('[data-bin]'); if (b) { setBin(+b.getAttribute('data-bin')); touch(); } });
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { inView = es[0].isIntersecting; }, { threshold: 0.15 }).observe(host);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && playing && !timer) tick(); });
+
+    keysRender(list); yearRender(strip); wire(host, touch); show('plant');
+    if (playing) timer = setTimeout(tick, DWELL + 1200);
   }
 
-  /* ------------------------------------------------------------------ */
-  /* Vignettes — the feature columns' live panels                        */
-  /* ------------------------------------------------------------------ */
-  function vignettePue() {
-    var host = $('#vgPue'); if (!host) return;
-    var bins = (S && S.bins) || []; if (!bins.length) { host.innerHTML = '<p class="ro-empty">—</p>'; return; }
-    var W = 300, H = 120, pad = 26, lo = 1.10, hi = 1.30;
-    var xs = function (i) { return pad + i * (W - pad - 8) / (bins.length - 1); }, ys = function (v) { return H - 18 - (v - lo) / (hi - lo) * (H - 30); };
-    var d = ''; bins.forEach(function (b, i) { var x = xs(i), y = ys(b.pue); d += (i ? ' H' + x.toFixed(1) + ' V' + y.toFixed(1) : 'M' + x.toFixed(1) + ' ' + y.toFixed(1)); });
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="vg-chart" role="img" aria-label="PUE by weather bin">';
-    [1.12, 1.20, 1.25].forEach(function (g) { svg += '<line x1="' + pad + '" y1="' + ys(g) + '" x2="' + (W - 8) + '" y2="' + ys(g) + '" class="vg-grid"/><text x="' + (pad - 4) + '" y="' + (ys(g) + 3) + '" class="vg-ax" text-anchor="end">' + g.toFixed(2) + '</text>'; });
-    svg += '<path d="' + d + '" class="vg-line"/>';
-    bins.forEach(function (b, i) { svg += '<circle cx="' + xs(i) + '" cy="' + ys(b.pue) + '" r="2.5" class="vg-dot' + (b.liquid_free_cooling ? '' : ' is-cliff') + '"/><text x="' + xs(i) + '" y="' + (H - 4) + '" class="vg-ax" text-anchor="middle">' + b.ambient_db_c + '°</text>'; });
-    svg += '</svg>';
-    var rows = '<table class="vg-rows">' + bins.map(function (b) { return '<tr' + (b.liquid_free_cooling ? '' : ' class="is-cliff"') + '><th>' + b.ambient_db_c + ' °C</th><td>' + fmt(b.pue, 3) + '</td><td>' + fmt(b.hours) + ' h</td><td>' + fmt(b.chillers_running) + ' chillers</td></tr>'; }).join('') + '</table>';
-    host.innerHTML = svg + rows;
-  }
-  function vignettePlanes() {
-    var host = $('#vgPlanes'); if (!host) return;
-    var P = (S && S.design && S.design.planes) || {};
-    var keys = [['p00_ambient_db_c', 'ambient'], ['p02_dry_cooler_leaving_c', 'dry cooler out'], ['p05_htw_supply_c', 'HTW supply'], ['p07_tcs_supply_c', 'TCS supply'], ['p08_tcs_return_c', 'TCS return'], ['p06_htw_return_c', 'HTW return'], ['p09_air_supply_c', 'air supply'], ['p11_air_return_c', 'air return'], ['p12_chw_supply_c', 'CHW supply']];
-    var lo = 14, hi = 54, W = 300, H = 168;
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="vg-chart" role="img" aria-label="Temperature planes">';
-    svg += '<line x1="40" y1="8" x2="40" y2="' + (H - 8) + '" class="vg-grid"/>';
-    /* Hottest at the top. Labels keep a 12-unit pitch and never leave the frame: each one sits
-     * at its temperature unless the one above forces it down. */
-    var items = keys.map(function (k) { return { v: P[k[0]], l: k[1] }; }).filter(function (i) { return typeof i.v === 'number'; }).sort(function (a, b) { return b.v - a.v; });
-    var last = -Infinity;
-    items.forEach(function (it) {
-      var y = Math.max(10, H - 8 - (it.v - lo) / (hi - lo) * (H - 18)); if (y < last + 13) y = last + 13; last = y;
-      svg += '<line x1="40" y1="' + y.toFixed(1) + '" x2="46" y2="' + y.toFixed(1) + '" class="vg-grid"/><circle cx="40" cy="' + y.toFixed(1) + '" r="2.5" class="vg-dot"/><text x="34" y="' + (y + 3).toFixed(1) + '" class="vg-ax" text-anchor="end">' + it.v + '°</text><text x="50" y="' + (y + 3).toFixed(1) + '" class="vg-lbl">' + esc(it.l) + '</text>';
-    });
-    svg += '</svg>';
-    host.innerHTML = svg + '<p class="vg-note">Free-cooling margin at the design day <b>' + F('design.planes.p04_free_cooling_margin_k', 1) + ' K</b> — the liquid path sits on the cliff at ' + F('pue.free_cooling_cliff_ambient_c') + ' °C.</p>';
-  }
-  function vignetteCapacity() {
-    var host = $('#vgCapacity'); if (!host) return;
-    host.innerHTML = '<table class="vg-rows vg-spec">' + [
-      ['Halls', halls(), ''],
-      ['Racks', F('compute.racks_facility'), ''], ['GPUs', F('compute.gpu_facility'), ''],
-      ['Rack IT', F('power.rack_it_kw'), 'kW'], ['Total IT', F('power.total_it_mw', 2), 'MW'],
-      ['PUE, design day', F('pue.design_day', 3), ''], ['PUE, annual', F('pue.annual_bin_weighted', 3), ''],
-      ['Free cooling', fmt((get('pue.free_cooling_fraction') || 0) * 100, 1), '% of hours'],
-      ['Water', '0', 'L/kWh']].map(function (r) { return '<tr><th>' + r[0] + '</th><td>' + r[1] + (r[2] ? ' <i>' + r[2] + '</i>' : '') + '</td></tr>'; }).join('') + '</table>';
-  }
-  function vignetteFleet() {
-    var host = $('#vgFleet'); if (!host) return;
-    host.innerHTML = '<table class="vg-rows vg-spec">' + [
-      ['Main transformers', F('distribution.main_tx_total') + ' × ' + F('distribution.main_tx_mva') + ' MVA'],
-      ['Unit substations', F('equipment.transformers') + ' × ' + F('equipment.transformer_unit_mva', 1) + ' MVA'],
-      ['UPS frames', F('equipment.ups_frames_total') + ' × ' + F('equipment.ups_frame_kw') + ' kW'],
-      ['Gensets', F('equipment.gensets_installed') + ' × ' + F('equipment.generator_unit_kw') + ' kW'],
-      ['CDUs', F('equipment.cdu_installed_facility') + ' × ' + F('equipment.cdu_unit_kwth') + ' kW'],
-      ['Fan-wall modules', F('equipment.crah_installed_facility') + ' × ' + F('equipment.crah_unit_kwth') + ' kW'],
-      ['Chillers', F('equipment.chillers_installed') + ' × ' + F('equipment.chiller_unit_kwth') + ' kW'],
-      ['Dry coolers', F('equipment.dry_coolers_installed') + ' × ' + F('equipment.dry_cooler_unit_kwth') + ' kW']].map(function (r) { return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('') + '</table>';
-  }
-
-  /* Hero: the keys list on the left and the cockpit render on the right, joined by leader lines
-   * the way Oxide joins its terminal panel to the rack photograph. Geometry is measured from the
-   * DOM, so the line lands on the chip at every width; it is redrawn on resize. */
-  function leaders() {
-    var grid = $('#heroGrid'), img = $('#heroRender img'), list = $('#heroKeys'), svg = $('#heroLeaders'); if (!grid || !img || !list || !svg) return;
-    var pts = [
-      { x: 18.5, y: 22, label: 'PUE, design day', value: F('pue.design_day', 3), id: 'pue.design_day' },
-      { x: 17, y: 46, label: 'IT load', value: F('power.total_it_mw', 2) + ' MW', id: 'power.total_it_mw' },
-      { x: 63, y: 21.5, label: 'GPUs', value: F('compute.gpu_facility'), id: 'compute.gpu_facility' },
-      { x: 65, y: 30.5, label: 'NVL72 racks', value: F('compute.racks_facility'), id: 'compute.racks_facility' }
-    ];
-    list.innerHTML = pts.map(function (p, i) { return '<li style="--i:' + i + '"><span>' + esc(p.label) + '</span><b>' + esc(p.value) + '</b><code>' + esc(p.id) + '</code></li>'; }).join('');
-    function draw() {
-      var g = grid.getBoundingClientRect(), r = img.getBoundingClientRect(), out = '';
-      if (window.innerWidth <= 1100 || !r.width) { svg.innerHTML = ''; return; }
-      svg.setAttribute('viewBox', '0 0 ' + g.width + ' ' + g.height);
-      /* each key drops from the bottom of its cell into the render, runs along a rail just
-       * inside the top edge, and lands on its chip — four lines, four rails, no crossings */
-      $$('li', list).forEach(function (li, i) {
-        var b = li.getBoundingClientRect(), p = pts[i];
-        var x0 = b.left + b.width / 2 - g.left, y0 = b.bottom - g.top, x1 = r.left - g.left + r.width * p.x / 100, y1 = r.top - g.top + r.height * p.y / 100;
-        var rail = r.top - g.top - 10 - i * 11; /* rails sit in the 64px gap above the render */
-        out += '<path style="--i:' + i + '" d="M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' V' + rail.toFixed(1) + ' H' + x1.toFixed(1) + ' V' + y1.toFixed(1) + '"/><circle style="--i:' + i + '" cx="' + x1.toFixed(1) + '" cy="' + y1.toFixed(1) + '" r="3"/>';
-      });
-      svg.innerHTML = out;
-    }
-    if (img.complete) draw(); else img.addEventListener('load', draw);
-    if ('ResizeObserver' in window) new ResizeObserver(function () { draw(); }).observe(grid); else window.addEventListener('resize', draw);
-  }
-
-  /* Linear-style live vignette: one real input, the engine's own table behind it. Linear
-   * interpolation between adjacent bins; the chiller count and free-cooling flag are the bin's. */
-  function miniPue() {
-    var host = $('#miniPue'), bins = (S && S.bins) || []; if (!host || !bins.length) return;
-    var inp = $('input', host), out = $('output', host);
-    function at(t) {
-      var lo = bins[0], hi = bins[bins.length - 1];
-      for (var i = 0; i < bins.length - 1; i++) if (t >= bins[i].ambient_db_c && t <= bins[i + 1].ambient_db_c) { lo = bins[i]; hi = bins[i + 1]; break; }
-      var f = hi.ambient_db_c === lo.ambient_db_c ? 0 : (t - lo.ambient_db_c) / (hi.ambient_db_c - lo.ambient_db_c), near = f < .5 ? lo : hi;
-      return { pue: lo.pue + (hi.pue - lo.pue) * f, ch: near.chillers_running, fc: near.liquid_free_cooling, h: near.hours };
-    }
-    function paint() {
-      var t = +inp.value, v = at(t); out.textContent = t + ' °C';
-      $('[data-mini="pue"]', host).textContent = fmt(v.pue, 3); $('[data-mini="ch"]', host).textContent = fmt(v.ch);
-      $('[data-mini="fc"]', host).textContent = v.fc ? 'free cooling' : 'on compressors'; $('[data-mini="h"]', host).textContent = fmt(v.h);
-      $$('[data-mini]', host).forEach(function (e) { e.classList.toggle('is-cliff', !v.fc); });
-    }
-    inp.addEventListener('input', paint); paint();
+  /* Catalogue rows arrive in a short stagger as each group scrolls in. */
+  function reveal() {
+    if (REDUCE || !('IntersectionObserver' in window)) return;
+    var groups = $$('.tgrp'); if (!groups.length) return;
+    groups.forEach(function (g) { $$('.tool', g).forEach(function (t, i) { t.style.setProperty('--i', i); }); g.classList.add('is-pending'); });
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+    groups.forEach(function (g) { io.observe(g); });
   }
 
   function stamp() { $$('[data-engine-stamp]').forEach(function (e) { e.textContent = 'numbers: DC AI engine v' + (S && S.meta && S.meta.version || '—') + ' · ' + (S && S.meta && S.meta.spec_version || ''); }); }
 
-  function init() { mountFigures(); vignettePue(); vignettePlanes(); vignetteCapacity(); vignetteFleet(); leaders(); miniPue(); stamp(); }
+  function init() { mountHero(); reveal(); stamp(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
