@@ -396,6 +396,14 @@
       if (!cache[key]) cache[key] = FIGS[name]().map(function (ctx) { if (ctx.warnings && ctx.warnings.length) console.warn('[plant ' + name + ']', ctx.warnings); return ctx.render(); }).join('');
       stage.innerHTML = cache[key];
       $$('svg', stage).forEach(function (sv) { sv.setAttribute('role', 'group'); sv.removeAttribute('aria-labelledby'); sv.setAttribute('aria-label', (name === 'site' ? 'Campus to scale' : 'The plant') + ' — interactive drawing'); });
+      /* the IEC genset glyph carries its G as a 13-unit letter; at this figure's scale that is a 6 px
+       * glyph, so it is drawn as a stroke here — same symbol, a path instead of a text node */
+      $$('g.rzd-sym text', stage).forEach(function (t) {
+        if (t.textContent.trim() !== 'G') return;
+        var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('d', 'M38.6 22.2 A5.8 5.8 0 1 0 39.8 26.8 H35'); p.setAttribute('fill', 'none'); p.setAttribute('stroke', 'currentColor'); p.setAttribute('stroke-width', '2');
+        t.parentNode.replaceChild(p, t);
+      });
       host.setAttribute('data-fig-on', name); host.__pinned = null;
       if (host.__light) { host.__light(null); }
       stagger(stage); paintState();
@@ -440,6 +448,40 @@
 
   function stamp() { $$('[data-engine-stamp]').forEach(function (e) { e.textContent = 'numbers: DC AI engine v' + (S && S.meta && S.meta.version || '—') + ' · ' + (S && S.meta && S.meta.spec_version || ''); }); }
 
-  function init() { mountHero(); reveal(); stamp(); }
+  /* ------------------------------------------------------------------ */
+  /* Micro-interactions: the tab ink, j/k over the list, copy a key's id  */
+  /* ------------------------------------------------------------------ */
+  function ink() {
+    $$('.fp-tabs').forEach(function (bar) {
+      var i = document.createElement('i'); i.className = 'fp-ink'; bar.appendChild(i); bar.classList.add('has-ink');
+      function place() { var on = $('.fp-tab[aria-selected="true"]', bar); if (!on) return; var b = bar.getBoundingClientRect(), r = on.getBoundingClientRect(); i.style.width = r.width + 'px'; i.style.transform = 'translateX(' + (r.left - b.left) + 'px)'; }
+      new MutationObserver(place).observe(bar, { attributes: true, subtree: true, attributeFilter: ['aria-selected'] });
+      if ('ResizeObserver' in window) new ResizeObserver(place).observe(bar);
+      place();
+    });
+  }
+  function keysNav() {
+    var rows = $$('.tool'); if (!rows.length) return;
+    document.addEventListener('keydown', function (e) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      var t = e.target, tag = t && t.tagName; if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
+      if (e.key !== 'j' && e.key !== 'k') return;
+      var cur = rows.indexOf(document.activeElement), next = e.key === 'j' ? Math.min(rows.length - 1, cur + 1) : Math.max(0, cur < 0 ? 0 : cur - 1);
+      e.preventDefault(); rows.forEach(function (r) { r.classList.remove('is-cursor'); }); rows[next].classList.add('is-cursor'); rows[next].focus({ preventScroll: false });
+    });
+    rows.forEach(function (r) { r.addEventListener('blur', function () { r.classList.remove('is-cursor'); }); });
+  }
+  function copyKeys() {
+    var list = $('#heroKeys'); if (!list) return;
+    list.addEventListener('click', function (e) {
+      var li = e.target.closest('li'); if (!li) return; var code = $('code', li), id = code.textContent;
+      function done() { var was = code.textContent; code.textContent = 'copied ' + id; li.classList.add('is-copied'); setTimeout(function () { code.textContent = was; li.classList.remove('is-copied'); }, 1400); }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(id).then(done, done); else done();
+    });
+    $$('li', list).forEach(function (li) { li.title = 'click to copy the registry id'; });
+  }
+  function kchip() { var b = $('[data-kchip]'); if (!b) return; b.addEventListener('click', function () { var s = $('#navSearchBtn'); if (s) s.click(); }); }
+
+  function init() { mountHero(); reveal(); stamp(); ink(); keysNav(); copyKeys(); kchip(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

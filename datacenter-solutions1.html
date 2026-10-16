@@ -184,7 +184,7 @@
     }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer integrity="sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt" crossorigin="anonymous"></script>
-    <script src="js/rz-version.js?v=20261016-db39c16e" defer></script>
+    <script src="js/rz-version.js?v=20261016-17d53e0a" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 
@@ -229,10 +229,10 @@
 .keys li code { font-size: 10px; color: var(--rz-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .keys li.is-warn b { color: var(--rz-accent-alert); }
 .year { display: flex; border-bottom: 1px solid var(--rz-line-tier-2); background: var(--rz-bg-base); }
-.year button { appearance: none; position: relative; flex: var(--h) 1 0; min-width: 72px; margin: 0; padding: 9px 10px 11px; border: 0; border-left: 1px solid var(--rz-line-tier-3); background: none; text-align: left; font-family: var(--rz-font-mono); color: var(--rz-text-muted); cursor: pointer; overflow: hidden; transition: color var(--rz-dur-press) var(--rz-ease-out), background-color var(--rz-dur-press) var(--rz-ease-out); }
+.year button { appearance: none; position: relative; flex: var(--h) 1 0; min-width: max-content; margin: 0; padding: 9px 10px 11px; border: 0; border-left: 1px solid var(--rz-line-tier-3); background: none; text-align: left; font-family: var(--rz-font-mono); color: var(--rz-text-muted); cursor: pointer; overflow: hidden; transition: color var(--rz-dur-press) var(--rz-ease-out), background-color var(--rz-dur-press) var(--rz-ease-out); }
 .year button:first-child { border-left: 0; }
 .year button b { display: block; font-size: 12px; font-weight: 500; color: var(--rz-text-secondary); white-space: nowrap; }
-.year button span { display: block; font-size: 10px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.year button span { display: block; font-size: 10px; margin-top: 2px; white-space: nowrap; }
 .year button:hover, .year button:focus-visible { color: var(--rz-text-secondary); background: var(--rz-bg-hover); outline: none; }
 .year button[aria-pressed="true"] { background: var(--rz-bg-elevated); color: var(--rz-text-secondary); } .year button[aria-pressed="true"] b { color: var(--rz-text-accent); }
 .year .dwell { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--rz-accent-signal); transform: scaleX(0); transform-origin: left; }
@@ -275,19 +275,75 @@
 .tgrp h3 { margin: 0 0 var(--rz-space-2); font-size: 15px; font-weight: 600; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--rz-line-tier-1); }
 .tgrp h3 small { font-weight: 400; color: var(--rz-text-muted); font-size: 12.5px; }
 .tools { list-style: none; margin: 0; padding: 0; }
-.tool { display: grid; grid-template-columns: 44px 200px 1fr auto; grid-template-rows: auto; gap: 4px 12px; align-items: baseline; padding: 10px 8px; margin: 0 -8px; border-bottom: 1px solid var(--rz-line-tier-3); text-decoration: none; color: inherit; border-radius: 3px; transition: background-color var(--rz-dur-press) var(--rz-ease-out); }
+.tool { display: grid; grid-template-columns: 32px 44px 200px 1fr auto; grid-template-rows: auto; gap: 4px 12px; align-items: baseline; padding: 10px 8px; margin: 0 -8px; border-bottom: 1px solid var(--rz-line-tier-3); text-decoration: none; color: inherit; border-radius: 3px; transition: background-color var(--rz-dur-press) var(--rz-ease-out); }
 .tool:hover, .tool:focus-visible { background: var(--rz-bg-hover); outline: none; }
-.tool .ix { grid-column: 1; grid-row: 1; font-family: var(--rz-font-mono); font-size: 11px; color: var(--rz-text-muted); transition: color var(--rz-dur-press) var(--rz-ease-out); }
-.tool .nm { grid-column: 2; grid-row: 1; font-size: 14px; font-weight: 500; color: var(--rz-text-primary); padding-right: 18px; }
-.tool .ln { grid-column: 3; grid-row: 1; font-size: 12.5px; color: var(--rz-text-secondary); line-height: 1.4; }
-.tool .go { grid-column: 4; grid-row: 1; justify-self: end; font-family: var(--rz-font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--rz-text-muted); border: 1px solid var(--rz-line-tier-2); border-radius: 3px; padding: 4px 8px; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; transition: color var(--rz-dur-press) var(--rz-ease-out), border-color var(--rz-dur-press) var(--rz-ease-out); }
+.pp { --ic-green: #3FB98A; --ic-blue: #5A9BF0; }
+:root:not([data-theme="dark"]) .pp { --ic-green: #1E7A58; --ic-blue: #1F5FB8; }
+.tool .ic { grid-column: 1; grid-row: 1 / span 2; align-self: start; width: 32px; height: 32px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; color: var(--ic-green); background: color-mix(in srgb, var(--ic-green) 12%, transparent); border: 1px solid color-mix(in srgb, var(--ic-green) 22%, transparent); transition: background-color var(--rz-dur-press) var(--rz-ease-out), border-color var(--rz-dur-press) var(--rz-ease-out); }
+.tgrp[data-tint="blue"] .tool .ic { color: var(--ic-blue); background: color-mix(in srgb, var(--ic-blue) 12%, transparent); border-color: color-mix(in srgb, var(--ic-blue) 22%, transparent); }
+.tool:hover .ic, .tool:focus-visible .ic { background: color-mix(in srgb, var(--ic-green) 22%, transparent); border-color: color-mix(in srgb, var(--ic-green) 45%, transparent); }
+.tgrp[data-tint="blue"] .tool:hover .ic, .tgrp[data-tint="blue"] .tool:focus-visible .ic { background: color-mix(in srgb, var(--ic-blue) 22%, transparent); border-color: color-mix(in srgb, var(--ic-blue) 45%, transparent); }
+.tool .ix { grid-column: 2; grid-row: 1; font-family: var(--rz-font-mono); font-size: 11px; color: var(--rz-text-muted); transition: color var(--rz-dur-press) var(--rz-ease-out); }
+.tool .nm { grid-column: 3; grid-row: 1; font-size: 14px; font-weight: 500; color: var(--rz-text-primary); padding-right: 18px; }
+.tool .ln { grid-column: 4; grid-row: 1; font-size: 12.5px; color: var(--rz-text-secondary); line-height: 1.4; }
+.tool .go { grid-column: 5; grid-row: 1; justify-self: end; font-family: var(--rz-font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--rz-text-muted); border: 1px solid var(--rz-line-tier-2); border-radius: 3px; padding: 4px 8px; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; transition: color var(--rz-dur-press) var(--rz-ease-out), border-color var(--rz-dur-press) var(--rz-ease-out); }
 .tool .go i { font-style: normal; color: var(--rz-text-muted); transition: color var(--rz-dur-press) var(--rz-ease-out); }
 .tool:hover .nm, .tool:focus-visible .nm { color: var(--rz-text-accent); }
 .tool:hover .ix, .tool:hover .go, .tool:hover .go i, .tool:focus-visible .go, .tool:focus-visible .go i { color: var(--rz-text-accent); }
 .tool:hover .go, .tool:focus-visible .go { border-color: var(--rz-accent-signal); }
-.tool .rz-lock-icon { grid-column: 2; grid-row: 1; justify-self: end; align-self: center; font-size: 10px; color: var(--rz-text-muted); }
+.tool .rz-lock-icon { grid-column: 3; grid-row: 1; justify-self: end; align-self: center; font-size: 10px; color: var(--rz-text-muted); }
 .tgrp.is-pending .tool { opacity: 0; transform: translateY(6px); }
 .tgrp.is-in .tool { opacity: 1; transform: none; transition: opacity 360ms var(--rz-ease-out), transform 360ms var(--rz-ease-out), background-color var(--rz-dur-press) var(--rz-ease-out); transition-delay: calc(var(--i, 0) * 35ms), calc(var(--i, 0) * 35ms), 0s; }
+/* ---- the hardware in 3D ---- */
+.h3 { margin-top: var(--rz-space-10); border: 1px solid var(--rz-line-tier-1); border-radius: 6px; background: var(--rz-bg-elevated); overflow: hidden; }
+.h3-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px var(--rz-space-4); border-bottom: 1px solid var(--rz-line-tier-3); }
+.h3-btn { appearance: none; background: var(--rz-bg-base); border: 1px solid var(--rz-line-tier-2); border-radius: 3px; color: var(--rz-text-secondary); font-family: var(--rz-font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 7px 11px; min-height: 32px; cursor: pointer; transition: border-color var(--rz-dur-press) var(--rz-ease-out), color var(--rz-dur-press) var(--rz-ease-out), background-color var(--rz-dur-press) var(--rz-ease-out), transform var(--rz-dur-press) var(--rz-ease-out); }
+.h3-btn:hover { border-color: var(--rz-line-tier-1); color: var(--rz-text-primary); } .h3-btn:active { transform: scale(.98); }
+.h3-btn[aria-pressed="true"] { border-color: var(--rz-accent-signal); color: var(--rz-text-accent); background: var(--rz-accent-signal-bg); }
+.h3-hint { margin-left: auto; font-family: var(--rz-font-mono); font-size: 10.5px; color: var(--rz-text-muted); }
+.h3-stage { position: relative; height: clamp(360px, 46vw, 620px); background: radial-gradient(ellipse at 50% 60%, var(--rz-bg-hover) 0%, var(--rz-bg-base) 70%); }
+.h3-stage canvas { display: block; width: 100%; height: 100%; touch-action: none; outline: none; cursor: grab; } .h3-stage canvas:active { cursor: grabbing; }
+.h3-labels { position: absolute; inset: 0; pointer-events: none; }
+.h3-tag { position: absolute; left: 0; top: 0; margin: -11px 0 0 -11px; width: 22px; height: 22px; border-radius: 3px; background: var(--rz-bg-elevated); border: 1px solid var(--rz-line-tier-1); color: var(--rz-text-secondary); font-family: var(--rz-font-mono); font-size: 11px; display: flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer; transition: background-color var(--rz-dur-press) var(--rz-ease-out), color var(--rz-dur-press) var(--rz-ease-out), border-color var(--rz-dur-press) var(--rz-ease-out); }
+.h3-tag.is-hot { background: var(--rz-accent-signal); color: var(--rz-text-inverse); border-color: var(--rz-accent-signal); }
+.h3-nogl { margin: 0; padding: var(--rz-space-6); color: var(--rz-text-muted); font-size: 13px; }
+.h3-foot { display: grid; grid-template-columns: 1fr 360px; border-top: 1px solid var(--rz-line-tier-2); }
+.h3-list { display: flex; align-items: stretch; border-right: 1px solid var(--rz-line-tier-2); min-width: 0; }
+.h3-nav { display: flex; flex-direction: column; border-right: 1px solid var(--rz-line-tier-3); } .h3-nav .h3-btn { border: 0; border-radius: 0; flex: 1; min-width: 44px; background: none; } .h3-nav .h3-btn + .h3-btn { border-top: 1px solid var(--rz-line-tier-3); }
+.h3-parts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); flex: 1; }
+.h3-parts li { display: flex; gap: 10px; align-items: baseline; padding: 9px 12px; border-bottom: 1px solid var(--rz-line-tier-3); border-right: 1px solid var(--rz-line-tier-3); font-size: 12.5px; color: var(--rz-text-secondary); cursor: pointer; transition: background-color var(--rz-dur-press) var(--rz-ease-out), color var(--rz-dur-press) var(--rz-ease-out); }
+.h3-parts li b { font-family: var(--rz-font-mono); font-weight: 500; font-size: 11px; color: var(--rz-text-muted); width: 14px; } .h3-parts li i { font-style: normal; font-family: var(--rz-font-mono); font-size: 10px; color: var(--rz-text-muted); margin-left: auto; white-space: nowrap; }
+.h3-parts li:hover, .h3-parts li.is-hot { background: var(--rz-bg-hover); color: var(--rz-text-primary); } .h3-parts li.is-hot b { color: var(--rz-text-accent); }
+.h3-read { padding: var(--rz-space-4); font-size: 13px; min-height: 120px; }
+.h3-read b { display: block; font-size: 15px; color: var(--rz-text-primary); } .h3-read span { display: block; font-family: var(--rz-font-mono); font-size: 11px; color: var(--rz-text-muted); margin-top: 2px; } .h3-read p { margin: 8px 0 0; color: var(--rz-text-secondary); line-height: 1.5; }
+.h3-spec { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-top: 1px solid var(--rz-line-tier-2); } .h3-spec div { padding: 10px 12px; border-right: 1px solid var(--rz-line-tier-3); display: flex; flex-direction: column; gap: 2px; min-width: 0; } .h3-spec span { font-family: var(--rz-font-mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--rz-text-muted); } .h3-spec b { font-family: var(--rz-font-mono); font-size: 16px; font-weight: 500; color: var(--rz-text-primary); font-variant-numeric: tabular-nums; } .h3-spec code { font-size: 10px; color: var(--rz-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.h3-read em { font-style: normal; color: var(--rz-text-secondary); } .h3-read em[data-src="PUBLISHED"] { color: var(--rz-text-accent); }
+/* ---- group illustrations ---- */
+.tgi { position: relative; height: 128px; margin: 10px 0 4px; border: 1px solid var(--rz-line-tier-2); border-radius: 4px; background: var(--rz-bg-base); overflow: hidden; color: var(--rz-text-secondary); }
+.tgi-svg { width: 100%; height: 100%; display: block; font-family: var(--rz-font-mono); }
+.tgi-l { font-size: 9.5px; fill: var(--rz-text-muted); letter-spacing: .06em; } .tgi-s { font-size: 12px; fill: var(--rz-text-primary); font-weight: 500; letter-spacing: .04em; }
+.tgi-wire { fill: none; stroke: var(--rz-line-tier-1); stroke-width: 1.2; transition: stroke var(--rz-dur-tip) var(--rz-ease-out); } .tgi-wire.is-lost { stroke: var(--rz-accent-alert); stroke-dasharray: 3 3; }
+.tgi-cb path { fill: none; stroke: var(--rz-text-secondary); stroke-width: 1.4; } .tgi-cb circle { fill: var(--rz-text-secondary); }
+.tgi-bus { fill: var(--rz-text-secondary); } .tgi-gen.is-on { color: var(--rz-text-accent) !important; }
+.tgi-pulse { fill: none; stroke: var(--rz-accent-signal); stroke-width: 1.6; stroke-dasharray: 2 10; stroke-linecap: round; animation: hubFlow 1.2s linear infinite; }
+.tgi-grid { stroke: var(--rz-line-tier-3); stroke-width: 1; } .tgi-cursor { stroke: var(--rz-line-tier-1); stroke-width: 1; stroke-dasharray: 2 2; }
+.tgi-line { fill: none; stroke: var(--rz-text-secondary); stroke-width: 1.4; } .tgi-line.is-on { stroke: var(--rz-accent-signal); } .tgi-c3 { stroke: var(--rz-text-primary); }
+.tgi-cur { fill: var(--rz-accent-signal); } .tgi-cur.is-cliff { fill: var(--rz-accent-alert); } .tgi.is-cliff .tgi-st { fill: var(--rz-accent-alert); }
+.tgi-gatebox { fill: var(--rz-bg-elevated); stroke: var(--rz-line-tier-1); stroke-width: 1.2; transition: fill var(--rz-dur-tip) var(--rz-ease-out), stroke var(--rz-dur-tip) var(--rz-ease-out); }
+.tgi-gate.is-done .tgi-gatebox, .tgi-node.is-done .tgi-gatebox, .tgi-row.is-done .tgi-gatebox { fill: var(--rz-accent-signal); stroke: var(--rz-accent-signal); } .tgi-row.is-done .tgi-l, .tgi-node.is-done .tgi-l, .tgi-gate.is-done .tgi-l { fill: var(--rz-text-primary); }
+.tgi-bar { stroke: var(--rz-line-tier-1); stroke-width: 1; transform-origin: left center; transform-box: fill-box; } .tgi-bin { fill: var(--rz-bg-hover); } .tgi-liq { fill: color-mix(in srgb, var(--ic-blue) 35%, transparent); } .tgi-air { fill: color-mix(in srgb, var(--ic-green) 30%, transparent); }
+.tgi[data-ats="1"] .tgi-st { fill: var(--rz-accent-alert); } .tgi[data-ats="2"] .tgi-st { fill: var(--rz-text-accent); }
+/* ---- micro-interactions ---- */
+.fp-tabs { position: relative; } .fp-ink { position: absolute; left: 0; bottom: -1px; height: 2px; width: 0; background: var(--rz-accent-signal); transition: transform 260ms var(--rz-ease-out), width 260ms var(--rz-ease-out); pointer-events: none; }
+.fp-tabs.has-ink .fp-tab[aria-selected="true"] { border-bottom-color: transparent; }
+.pp .btn, .fp-scen button, .year button, .h3-btn, .fp-tab { transition-property: background-color, border-color, color, transform; transition-duration: var(--rz-dur-press); transition-timing-function: var(--rz-ease-out); }
+.pp .btn:active, .fp-scen button:active, .h3-btn:active, .fp-tab:active { transform: scale(.98); }
+.tool .go i { display: inline-block; transition: transform var(--rz-dur-press) var(--rz-ease-out), color var(--rz-dur-press) var(--rz-ease-out); } .tool:hover .go i, .tool:focus-visible .go i { transform: translate(1px, -1px); }
+.tool.is-cursor { background: var(--rz-bg-hover); box-shadow: inset 2px 0 0 var(--rz-accent-signal); }
+.keys li { cursor: copy; } .keys li code { transition: color var(--rz-dur-tip) var(--rz-ease-out); } .keys li.is-copied code { color: var(--rz-text-accent); }
+.kchip { appearance: none; vertical-align: middle; margin-left: 12px; background: var(--rz-bg-elevated); border: 1px solid var(--rz-line-tier-1); border-radius: 4px; color: var(--rz-text-secondary); font-family: var(--rz-font-mono); font-size: 11px; letter-spacing: .06em; padding: 6px 10px; cursor: pointer; transition: border-color var(--rz-dur-press) var(--rz-ease-out), color var(--rz-dur-press) var(--rz-ease-out), transform var(--rz-dur-press) var(--rz-ease-out); }
+.kchip kbd { font-family: inherit; border: 1px solid var(--rz-line-tier-1); border-radius: 3px; padding: 1px 5px; margin-right: 6px; color: var(--rz-text-primary); } .kchip:hover { border-color: var(--rz-accent-signal); color: var(--rz-text-primary); } .kchip:active { transform: scale(.98); }
+@media (prefers-reduced-motion: reduce) { .fp-ink { transition: none; } .tgi-pulse { animation: none; } }
 /* ---- who · questions ---- */
 .about { display: grid; grid-template-columns: 1fr 1fr; gap: var(--rz-space-10); align-items: start; }
 .about .certs { font-family: var(--rz-font-mono); font-size: 12px; color: var(--rz-text-secondary); line-height: 2; }
@@ -295,9 +351,9 @@
 .stamp { font-family: var(--rz-font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--rz-text-muted); }
 .rz-reveal { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .keys li { animation: none; opacity: 1; } .fp-stage path[data-rzd-pulse], .year .dwell { animation: none; } .year .dwell { transform: scaleX(1); } .rz-reveal { opacity: 1; transition: none; } }
-@media (max-width: 1100px) { .fp-read { grid-template-columns: 1fr; } .keys { grid-template-columns: repeat(4, 1fr); } .keys li:nth-child(5) { border-left: 0; } .keys li:nth-child(n+5) { border-top: 1px solid var(--rz-line-tier-3); } .tgrid { grid-template-columns: 1fr; } .tool { grid-template-columns: 44px 220px 1fr auto; } }
+@media (max-width: 1100px) { .fp-read { grid-template-columns: 1fr; } .h3-foot { grid-template-columns: 1fr; } .h3-list { border-right: 0; border-bottom: 1px solid var(--rz-line-tier-2); } .keys { grid-template-columns: repeat(4, 1fr); } .keys li:nth-child(5) { border-left: 0; } .keys li:nth-child(n+5) { border-top: 1px solid var(--rz-line-tier-3); } .tgrid { grid-template-columns: 1fr; } .tool { grid-template-columns: 32px 44px 220px 1fr auto; } }
 @media (max-width: 800px) { .about { grid-template-columns: 1fr; } .fp-cap span:not(:first-child) { display: none; } .pp section { padding: var(--rz-space-16) 0; } .keys { grid-template-columns: 1fr 1fr; } .keys li:nth-child(3) { border-left: 0; } .keys li:nth-child(n+3) { border-top: 1px solid var(--rz-line-tier-3); } .keys li:nth-child(5) { border-left: 1px solid var(--rz-line-tier-3); } .year button span { display: none; } .year button { padding: 10px 6px; } .year button b { font-size: 11px; } .fp-stage svg { min-width: 760px; } .trust .stamp { margin-left: 0; }
-  .tool { grid-template-columns: 40px 1fr auto; } .tool .ix { grid-column: 1; grid-row: 1; } .tool .nm { grid-column: 2; grid-row: 1; } .tool .go { grid-column: 3; grid-row: 1; } .tool .ln { grid-column: 2 / 4; grid-row: 2; } .tool .rz-lock-icon { grid-column: 2; grid-row: 1; } }
+  .tool { grid-template-columns: 32px 1fr auto; } .tool .ic { grid-row: 1 / span 2; } .tool .ix { grid-column: 2; grid-row: 2; } .tool .nm { grid-column: 2; grid-row: 1; } .tool .go { grid-column: 3; grid-row: 1; } .tool .ln { grid-column: 2 / 4; grid-row: 2; padding-left: 48px; } .tool .rz-lock-icon { grid-column: 2; grid-row: 1; } }
 </style>
 
 </head>
@@ -373,8 +429,9 @@
   <div class="wrap">
     <p class="eyebrow">01 / The instruments</p>
     <h2>Every tool, on one page. <span>41 cockpits, calculators, monitors, labs and papers — each states its basis before it prints a number.</span></h2>
+    <p class="fp-hint" style="padding-left:0;border:0">Keyboard: <b>j</b> / <b>k</b> move down the list, <b>Enter</b> opens <button type="button" class="kchip" data-kchip><kbd>⌘K</kbd>search all 41</button></p>
     <div class="tgrid">
-      <div class="tgrp">
+      <div class="tgrp" data-tint="green">
         <h3>Cockpits<small>Two buildings run as operations cockpits, every number from an engine.</small></h3>
         <ol class="tools">
 <li><a class="tool" href="datahallAI.html"><span class="ix">K.01</span><span class="nm">DC AI / HPC cockpit</span><span class="ln">GB300 NVL72 · 8 halls · 539 MW IT · SLD, hall plan, cooling P&ID, network, fire, BMS</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
@@ -388,7 +445,7 @@
 <li><a class="tool" href="ict.html"><span class="ix">K.09</span><span class="nm">ICT</span><span class="ln">Architecture by segment: IT, OT, corporate, security</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
         </ol>
       </div>
-      <div class="tgrp">
+      <div class="tgrp" data-tint="blue">
         <h3>Cost and planning<small>Build it on paper first.</small></h3>
         <ol class="tools">
 <li><a class="tool" href="capex-calculator.html"><span class="ix">A.01</span><span class="nm">CAPEX calculator</span><span class="ln">14 cost components · scenario A vs B · tier classification · PDF</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
@@ -399,7 +456,7 @@
 <li><a class="tool" href="spares-readiness-calculator.html"><span class="ix">A.06</span><span class="nm">Spares readiness engine</span><span class="ln">Critical spares, lead time and stock-out risk per system</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
         </ol>
       </div>
-      <div class="tgrp">
+      <div class="tgrp" data-tint="blue">
         <h3>Strategy and market<small>Decide with the numbers in front of you.</small></h3>
         <ol class="tools">
 <li><a class="tool" href="tco-calculator.html"><span class="ix">B.01</span><span class="nm">TCO comparison</span><span class="ln">Build vs colocation vs cloud, 2025–2030 projection</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
@@ -407,7 +464,7 @@
 <li><a class="tool" href="dc-market-tracker.html"><span class="ix">B.03</span><span class="nm">Market tracker</span><span class="ln">25+ markets · capacity, pricing, pipeline</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
         </ol>
       </div>
-      <div class="tgrp">
+      <div class="tgrp" data-tint="green">
         <h3>Engineering and compliance<small>Size it, check it, prove it against the standard.</small></h3>
         <ol class="tools">
 <li><a class="tool" href="pue-calculator.html"><span class="ix">C.01</span><span class="nm">PUE calculator</span><span class="ln">Cooling type · climate zone · IT load distribution</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
@@ -421,14 +478,14 @@
 <li><a class="tool" href="compare-raised-floor-vs-slab.html"><span class="ix">C.09</span><span class="nm">Raised floor vs slab</span><span class="ln">Plenum vs overhead · load capacity · retrofit cost</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
         </ol>
       </div>
-      <div class="tgrp">
+      <div class="tgrp" data-tint="blue">
         <h3>Grid monitors<small>Where the power is, region by region.</small></h3>
         <ol class="tools">
 <li><a class="tool" href="pln-java-grid.html"><span class="ix">G.01</span><span class="nm">Java–Bali grid monitor</span><span class="ln">Jakarta–Banten · Jabar · Jateng · Jatim · historical series</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
 <li><a class="tool" href="pln-sumatra-grid.html"><span class="ix">G.02</span><span class="nm">Sumatra grid monitor</span><span class="ln">Substation capacity and generation mix along the backbone</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
         </ol>
       </div>
-      <div class="tgrp">
+      <div class="tgrp" data-tint="green">
         <h3>Labs<small>The methods behind the numbers, as workbenches you can run.</small></h3>
         <ol class="tools">
 <li><a class="tool" href="standards-ltc-lab.html" id="rootStandardsCard"><span class="ix">L.01</span><span class="nm">Standards + liquid-to-chip lab</span><span class="ln">ANSI/TIA-942 · ASHRAE TC 9.9 · ISO 50001 · NFPA · Uptime engines</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
@@ -437,7 +494,7 @@
 <li><a class="tool" href="ai-engineering-maintenance.html"><span class="ix">L.04</span><span class="nm">AI engineering maintenance</span><span class="ln">FMECA + knowledge graph · 109 fault modes · ML advisor concept</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
         </ol>
       </div>
-      <div class="tgrp">
+      <div class="tgrp" data-tint="blue">
         <h3>Knowledge<small>Papers, pillars, manuals, incidents.</small></h3>
         <ol class="tools">
 <li><a class="tool" href="article-13.html"><span class="ix">P.01</span><span class="nm">Data center power distribution design</span><span class="ln">Technical paper · hyperscaler architecture, 2026</span><span class="go">Open<i aria-hidden="true">↗</i></span></a></li>
@@ -454,16 +511,43 @@
   </div>
 </section>
 
+<section id="hardware">
+  <div class="wrap">
+    <p class="eyebrow">02 / The hardware</p>
+    <h2>The rack the plant is built from. <span>GB300 NVL72 — 72 GPUs in one NVLink domain, 142 kW, drawn from the published counts. Drag it, open it.</span></h2>
+    <div class="h3" id="hw3d">
+      <div class="fp-tabs" role="tablist" aria-label="Hardware views">
+        <button type="button" class="fp-tab" role="tab" data-view="rack" aria-selected="true">Rack</button>
+        <button type="button" class="fp-tab" role="tab" data-view="tray" aria-selected="false">Compute tray</button>
+        <button type="button" class="fp-tab" role="tab" data-view="switch" aria-selected="false">NVLink switch tray</button>
+        <span class="fig-cap fp-cap"><b>FIG. 2</b><span>GB300 NVL72 · counts published · placements adopted</span></span>
+      </div>
+      <div class="h3-bar">
+        <button type="button" class="h3-btn" data-explode aria-pressed="false">Exploded view</button>
+        <button type="button" class="h3-btn" data-reset>Reset</button>
+        <span class="h3-hint">drag to orbit · scroll or pinch to zoom · hover or tap a part</span>
+      </div>
+      <div class="h3-stage"><canvas aria-label="GB300 NVL72 in 3D: drag to orbit, hover a part for its count and evidence" tabindex="0"></canvas><div class="h3-labels" aria-hidden="true"></div></div>
+      <div class="h3-foot">
+        <div class="h3-list"><div class="h3-nav"><button type="button" class="h3-btn" data-prev aria-label="Previous part">◂</button><button type="button" class="h3-btn" data-next aria-label="Next part">▸</button></div><ol class="h3-parts"></ol></div>
+        <div class="h3-read" aria-live="polite"></div>
+      </div>
+      <div class="h3-spec" aria-label="Published specification"></div>
+      <p class="fp-hint">Counts are PUBLISHED (DGX GB300 reference architecture, nvidia.com); the frame, tray pitch, stacking order and the placement of parts inside a tray are ADOPTED from Open Rack v3 and NVIDIA photographs — no public CAD exists, and nothing here claims to be one.</p>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="wrap about">
-    <div><p class="eyebrow">02 / Who</p><h2>Built by a certified data-center engineer. <span>Not a content team.</span></h2><p class="lede">Bagus Dwi Permana leads engineering operations for mission-critical facilities in Bekasi, Indonesia. The site is his working method, published: the same checks he runs before a switching order are the gates every page here passes before it ships.</p></div>
+    <div><p class="eyebrow">03 / Who</p><h2>Built by a certified data-center engineer. <span>Not a content team.</span></h2><p class="lede">Bagus Dwi Permana leads engineering operations for mission-critical facilities in Bekasi, Indonesia. The site is his working method, published: the same checks he runs before a switching order are the gates every page here passes before it ships.</p></div>
     <div class="certs">AK3 Listrik · SKTTK Level 6 · SAP HV &amp; LV authorised person<br>CDCP · CDCS · ATD · ATS<br>ISO 50001 lead auditor<br><a class="lnk" href="index.html#about">Profile and record →</a></div>
   </div>
 </section>
 
 <section class="faq">
   <div class="wrap">
-    <p class="eyebrow">03 / Questions</p>
+    <p class="eyebrow">04 / Questions</p>
     <details><summary>Where do the numbers on this page come from?</summary><p>From <code>js/dcai-engine.js</code>, the DC AI engine, computed in your browser from a declared model (<code>js/dcai-model.js</code>). Every value carries a registry id; the readout beside the drawing prints it.</p></details>
     <details><summary>Is the 500 MW campus a real site?</summary><p>No. It is an adopted GB300 scenario — simulated, not measured telemetry — built so that every count is derived and every check can fail. The engine says so in its own metadata.</p></details>
     <details><summary>Do I need an account?</summary><p>The calculators, grid monitors, manuals and the journal are open. The two operations cockpits and the labs ask for a sign-in because they carry the full model.</p></details>
@@ -567,6 +651,9 @@
 <script src="js/rz-diagram-metrics.js?v=20261016-1994fd2b" defer></script>
 <script src="js/rz-diagram-layout.js?v=20261016-a82d8709" defer></script>
 <script src="js/rz-diagram.js?v=20261016-578db8a8" defer></script>
-<script src="js/rz-hub-product.js?v=20261016-e17f40ab" defer></script>
+<script src="js/rz-hub-icons.js?v=20261016-6dd78a27" defer></script>
+<script src="js/rz-hub-product.js?v=20261016-21a132cb" defer></script>
+<script src="js/rz-hub-illus.js?v=20261016-75b191f5" defer></script>
+<script src="js/rz-hub-3d.js?v=20261016-3ddce719" defer></script>
 </body>
 </html>

@@ -11,6 +11,53 @@ release sections rather than semver.
 
 ---
 
+## v3.22.8 — 2026-10-16 — "Hardware"
+
+### Added — the hub mockup gets the hardware in 3D, an icon per tool, a running panel per group, and the small interactions (`datacenter-solutions1.html`, noindex)
+- Owner, with nine Oxide screenshots: *"Bisa nggak kamu buat 3D nya utk B300 servernya dan rack
+  nvl72 … bisa explode view saat di klick button exploded"*, *"micro interaction yg seperti linear"*,
+  *"antara group of tools dikasih gambar2 ilustrasi animasi"*, *"per tools … ada icon yg unique"*,
+  *"terlihat cold plate, alur air dan terlihat perpindahan panas"*, *"Server jangan hitam doank"*.
+- **`js/rz-hub-3d.js` — section "02 / The hardware".** The GB300 NVL72 rack, its compute tray and
+  its NVLink switch tray built procedurally in WebGL (the site's `js/vendor/three-r170.min.js`,
+  loaded on approach) from a declared dimension table. Published counts from `DCAI_MODEL.gb300`:
+  18 compute trays, 9 switch trays, 8 power shelves of 6 × 5.5 kW, 2 superchips a tray (Grace +
+  2 × B300), 4 CX-8 + 1 BF-3, 2 switch ASICs a switch tray, 72 GPUs. Adopted and printed as such:
+  the 48 OU frame, 1 OU a tray, the stacking order, the placement inside a tray, four front fans for
+  the air-cooled share. Inside the tray: two PCBs, Grace under a silver lid with LPDDR5X around it,
+  each B300 die with eight HBM stacks, VRM rows, a copper cold plate per chip with a serpentine
+  groove and a fin field, the coolant loop as tubes — supply blue, return amber — and the water as
+  moving dots that warm from blue to amber as they pass the CPU and both GPU plates (TCS 40 → 50 °C,
+  the engine's p07/p08), GPU dies pulsing with heat, quick disconnects, an 18-slot NVLink block, the
+  busbar clip, a translucent lid. The rack: aluminium trays with fan grilles and cages on every
+  faceplate, PSU handles, OOB ports, busbar, supply and return manifolds with water rising and
+  falling, the cable cartridge. Orbit with damping, idle rotate until touched, hover = part lit in
+  amber + readout, click pins, numbered tags projected from 3D, a part list with prev/next,
+  **Exploded view** tweens trays out of the rack and lid / plates / NICs / rear parts out of the tray,
+  Reset. A published-spec row under it (GPUs, NVLink, memory, rack IT, installed power, feed
+  current, TCS) with registry ids. No WebGL → a sentence, the counts stand. Honest boundary printed
+  on the figure: no public CAD exists; counts published, placements adopted.
+- **`js/rz-hub-icons.js`** — 41 glyphs keyed by href: 15 from RZEngSymbols (the IEC/ISA glyphs the
+  drawings use), 26 authored in the same 48-box / 2 px style; a 32 px tile tinted green
+  (cockpits, engineering, labs) or blue (planning, market, grid, knowledge), hues outside the
+  neon detector band, first column of every row.
+- **`js/rz-hub-illus.js`** — one live panel above each group, ticking only while on screen: the ATS
+  sequence on the engine's 171 × 4,000 kW pool with its 24 h fuel; the Cx L0–L6 gates; the
+  build / colo / cloud cumulative shape, labelled "a shape, not a result"; PUE across the engine's
+  seven bins with a sweeping cursor, red on the cliff bin; the Java–Bali 500 kV chain; electricity
+  in = heat out (539.05 MW IT → 424.9 MW th liquid + 142.0 MW th air, `heat.*`); the knowledge
+  titles stepping. Reduced motion: final frame, no ticking.
+- **Micro-interactions**: a sliding ink under the active tab (both tab bars), `scale(.98)` on
+  press, the `OPEN ↗` arrow nudging on hover, `j` / `k` over the 41 rows with a cursor row, click a
+  hero key to copy its registry id, a ⌘K chip that opens the palette. Not the cursor-following
+  glow (rejected site-wide).
+
+### Fixed
+- `audit-legibility --strict` on the mockup (reported by the LTC session): the year strip's
+  "600 h · design" and "160 h · cliff" were clipped (buttons sized by hours now never go below
+  their label); the IEC genset glyph's 13-unit "G" rendered 6 px in the plant figure and is drawn
+  as a stroke path in that figure instead.
+
 ## v3.22.7 — 2026-10-16 — "Envelopes"
 
 ### The two table-only chapters of the engineering report get their figures
