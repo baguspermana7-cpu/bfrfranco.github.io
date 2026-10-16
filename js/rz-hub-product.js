@@ -258,7 +258,7 @@
       var b = bin();
       box.innerHTML = '<div class="ro-head"><b>The facility, as computed</b><span>' + (b ? 'ambient ' + b.ambient_db_c + ' °C · ' + fmt(b.hours) + ' h a year' : 'design day') + '</span></div><table class="ro-rows">' +
         [['Total IT', F('power.total_it_mw', 2), 'MW'], ['Facility draw', b ? fmt(b.facility_kwe / 1000, 1) : '\u2014', 'MW'], ['PUE at this bin', b ? fmt(b.pue, 3) : '\u2014', ''], ['Chillers running', b ? fmt(b.chillers_running) : '\u2014', ''], ['Racks · GPUs', F('compute.racks_facility') + ' · ' + F('compute.gpu_facility'), ''], ['Free-cooling hours', F('pue.free_cooling_hours') + ' / ' + F('pue.hours_total'), '']]
-          .map(function (row) { return '<tr><th>' + row[0] + '</th><td>' + row[1] + (row[2] ? ' <i>' + row[2] + '</i>' : '') + '</td></tr>'; }).join('') + '</table><p class="ro-empty">Hover or focus a box for its own rows.</p>';
+          .map(function (row) { return '<tr><th>' + row[0] + '</th><td>' + row[1] + (row[2] ? ' <i>' + row[2] + '</i>' : '') + '</td></tr>'; }).join('') + '</table>';
       return;
     }
     var h = '<div class="ro-head"><b>' + esc(r.title) + '</b><span>' + esc(r.sub || '') + '</span></div><table class="ro-rows">';
@@ -403,12 +403,13 @@
       var g = grid.getBoundingClientRect(), r = img.getBoundingClientRect(), out = '';
       if (window.innerWidth <= 1100 || !r.width) { svg.innerHTML = ''; return; }
       svg.setAttribute('viewBox', '0 0 ' + g.width + ' ' + g.height);
+      /* each key drops from the bottom of its cell into the render, runs along a rail just
+       * inside the top edge, and lands on its chip — four lines, four rails, no crossings */
       $$('li', list).forEach(function (li, i) {
         var b = li.getBoundingClientRect(), p = pts[i];
-        var x0 = b.right - g.left, y0 = b.top + b.height / 2 - g.top, x1 = r.left - g.left + r.width * p.x / 100, y1 = r.top - g.top + r.height * p.y / 100;
-        /* the vertical run sits in the gutter between the two columns, never over the copy */
-        var gap = (r.left - g.left) - x0, xm = x0 + Math.max(10, gap * 0.35) + i * Math.min(8, gap * 0.12);
-        out += '<path style="--i:' + i + '" d="M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' H' + xm.toFixed(1) + ' V' + y1.toFixed(1) + ' H' + x1.toFixed(1) + '"/><circle style="--i:' + i + '" cx="' + x1.toFixed(1) + '" cy="' + y1.toFixed(1) + '" r="3"/>';
+        var x0 = b.left + b.width / 2 - g.left, y0 = b.bottom - g.top, x1 = r.left - g.left + r.width * p.x / 100, y1 = r.top - g.top + r.height * p.y / 100;
+        var rail = r.top - g.top - 10 - i * 11; /* rails sit in the 64px gap above the render */
+        out += '<path style="--i:' + i + '" d="M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' V' + rail.toFixed(1) + ' H' + x1.toFixed(1) + ' V' + y1.toFixed(1) + '"/><circle style="--i:' + i + '" cx="' + x1.toFixed(1) + '" cy="' + y1.toFixed(1) + '" r="3"/>';
       });
       svg.innerHTML = out;
     }

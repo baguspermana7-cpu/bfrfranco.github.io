@@ -184,7 +184,7 @@
     }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer integrity="sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt" crossorigin="anonymous"></script>
-    <script src="js/rz-version.js?v=20261016-e380ac7c" defer></script>
+    <script src="js/rz-version.js?v=20261016-54176fc2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 
@@ -197,7 +197,7 @@
 .pp .eyebrow b { color: var(--rz-text-accent); font-weight: 500; }
 .pp h1, .pp h2 { font-family: var(--rz-font-display); font-weight: 600; letter-spacing: -.025em; line-height: 1.05; margin: 0; color: var(--rz-text-primary); }
 .pp h1 { font-size: clamp(32px, 3.7vw, 50px); max-width: 20ch; }
-.pp h2 { font-size: clamp(26px, 3.2vw, 40px); max-width: 30ch; }
+.pp h2 { font-size: clamp(24px, 2.8vw, 36px); max-width: 34ch; }
 .pp h2 span, .pp h1 span { color: var(--rz-text-muted); font-weight: 500; }
 .pp .lede { font-size: 16px; line-height: 1.55; color: var(--rz-text-secondary); max-width: 56ch; margin: var(--rz-space-5) 0 0; }
 .pp .acts { display: flex; gap: var(--rz-space-4); align-items: center; margin-top: var(--rz-space-6); flex-wrap: wrap; }
@@ -207,19 +207,18 @@
 .pp .lnk:hover { border-color: var(--rz-accent-signal); }
 .pp section { padding: var(--rz-space-24) 0; border-top: 1px solid var(--rz-line-tier-3); }
 .pp .hero { padding-top: var(--rz-space-16); border-top: 0; }
-.hero-grid { display: grid; grid-template-columns: 5fr 7fr; gap: var(--rz-space-12); align-items: center; position: relative; }
-.pp .hero { overflow-x: clip; }
-.hero-copy { position: relative; z-index: 2; }
-.hero-figcap { margin-top: var(--rz-space-8); }
+.hero-grid { position: relative; }
+.hero-copy { max-width: 760px; }
+.hero-figrow { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--rz-space-4); margin-top: var(--rz-space-12); }
 .fig-cap { font-family: var(--rz-font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--rz-text-muted); display: flex; gap: 10px; align-items: center; }
 .fig-cap b { border: 1px solid var(--rz-line-tier-1); padding: 3px 6px; border-radius: 2px; color: var(--rz-text-secondary); font-weight: 500; white-space: nowrap; }
-.hero-keys { list-style: none; margin: var(--rz-space-3) 0 0; padding: 0; border: 1px solid var(--rz-line-tier-1); border-radius: 4px; background: var(--rz-bg-elevated); }
-.hero-keys li { display: grid; grid-template-columns: 1fr auto; gap: 2px 14px; align-items: baseline; padding: 9px 12px; border-top: 1px solid var(--rz-line-tier-3); font-family: var(--rz-font-mono); opacity: 0; animation: hubIn 400ms var(--rz-ease-out) forwards; animation-delay: calc(300ms + var(--i) * 110ms); }
-.hero-keys li:first-child { border-top: 0; }
-.hero-keys li b { color: var(--rz-text-primary); font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums; grid-row: span 2; align-self: center; text-align: right; }
-.hero-keys li span { color: var(--rz-text-secondary); font-size: 12px; grid-column: 1; }
-.hero-keys li code { font-size: 10px; color: var(--rz-text-muted); grid-column: 1; }
-.hero-render { position: relative; margin: 0; width: calc(100% + 140px); border: 1px solid var(--rz-line-tier-1); border-radius: 6px; background: var(--rz-bg-inset); overflow: hidden; }
+.hero-keys { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); border: 1px solid var(--rz-line-tier-1); border-radius: 4px; background: var(--rz-bg-elevated); }
+.hero-keys li { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border-left: 1px solid var(--rz-line-tier-3); font-family: var(--rz-font-mono); opacity: 0; animation: hubIn 400ms var(--rz-ease-out) forwards; animation-delay: calc(300ms + var(--i) * 110ms); }
+.hero-keys li:first-child { border-left: 0; }
+.hero-keys li b { color: var(--rz-text-primary); font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.hero-keys li span { color: var(--rz-text-secondary); font-size: 12px; }
+.hero-keys li code { font-size: 10px; color: var(--rz-text-muted); }
+.hero-render { position: relative; margin: 64px 0 0; border: 1px solid var(--rz-line-tier-1); border-radius: 6px; background: var(--rz-bg-inset); overflow: hidden; }
 .hero-render img { display: block; width: 100%; height: auto; }
 .hero-leaders { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 1; }
 .hero-leaders path { fill: none; stroke: var(--rz-accent-signal); stroke-width: 1px; opacity: .9; stroke-dasharray: 1200; stroke-dashoffset: 1200; animation: hubDraw 1100ms var(--rz-ease-out) forwards; animation-delay: calc(350ms + var(--i) * 110ms); }
@@ -229,8 +228,8 @@
 .trust { display: flex; flex-wrap: wrap; gap: var(--rz-space-8); align-items: center; margin-top: var(--rz-space-8); padding-top: var(--rz-space-5); border-top: 1px solid var(--rz-line-tier-3); font-family: var(--rz-font-mono); font-size: 12px; color: var(--rz-text-secondary); }
 .trust .eyebrow { margin: 0; }
 /* FIG panel */
-.figpanel { margin-top: var(--rz-space-10); border: 1px solid var(--rz-line-tier-1); border-radius: 6px; background: var(--rz-bg-elevated); display: grid; grid-template-columns: 1fr 320px; overflow: hidden; }
-.figpanel .fp-main { min-width: 0; border-right: 1px solid var(--rz-line-tier-2); }
+.figpanel { margin-top: var(--rz-space-10); border: 1px solid var(--rz-line-tier-1); border-radius: 6px; background: var(--rz-bg-elevated); overflow: hidden; }
+.figpanel .fp-main { min-width: 0; }
 .fp-tabs { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 1px solid var(--rz-line-tier-2); padding: 0 var(--rz-space-3); align-items: center; }
 .fp-tab { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 12px 14px; font-family: var(--rz-font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--rz-text-muted); cursor: pointer; transition: color var(--rz-dur-press) var(--rz-ease-out), border-color var(--rz-dur-press) var(--rz-ease-out); }
 .fp-tab[aria-selected="true"] { color: var(--rz-text-primary); border-bottom-color: var(--rz-accent-signal); }
@@ -261,21 +260,29 @@
 .fp-stage .sl { fill: none; stroke: var(--bd2); vector-effect: non-scaling-stroke; } .fp-stage .sl.t1 { stroke: var(--t1); stroke-width: 1.4px; } .fp-stage .sl.t2 { stroke-width: 1px; } .fp-stage .sl.t3 { stroke: var(--bd); stroke-width: .7px; } .fp-stage .sf { fill: var(--bg3); }
 .fp-stage .st { font-size: 11px; fill: var(--t2); letter-spacing: .08em; } .fp-stage .sm { font-size: 10px; fill: var(--t3); letter-spacing: .06em; } .fp-stage .sd { stroke: var(--t3); stroke-width: .7px; fill: none; }
 .fp-stage g.rzd-hit.is-hot .sl { stroke: var(--rz-accent-signal); } .fp-stage g.rzd-hit.is-hot .st { fill: var(--rz-text-accent); }
-.fp-read { padding: var(--rz-space-4); font-size: 13px; }
-.ro-empty { color: var(--rz-text-muted); margin: 0; line-height: 1.5; }
+.fp-read { padding: var(--rz-space-4); font-size: 13px; border-top: 1px solid var(--rz-line-tier-2); display: grid; grid-template-columns: 220px 1fr; gap: var(--rz-space-4) var(--rz-space-6); align-items: start; min-height: 120px; }
+.ro-empty { color: var(--rz-text-muted); margin: 0; line-height: 1.5; grid-column: 1 / -1; font-size: 12px; }
 .ro-head b { display: block; font-size: 15px; color: var(--rz-text-primary); } .ro-head span { color: var(--rz-text-muted); font-family: var(--rz-font-mono); font-size: 11px; }
-.ro-rows { width: 100%; border-collapse: collapse; margin-top: var(--rz-space-3); font-family: var(--rz-font-mono); font-size: 12px; }
+.ro-rows { border-collapse: collapse; margin: 0; font-family: var(--rz-font-mono); font-size: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0 var(--rz-space-6); }
+.ro-rows tbody { display: contents; } .ro-rows tr { display: flex; justify-content: space-between; gap: 10px; }
 .ro-rows th { text-align: left; font-weight: 400; color: var(--rz-text-secondary); padding: 6px 0; border-top: 1px solid var(--rz-line-tier-3); }
 .ro-rows td { text-align: right; color: var(--rz-text-primary); padding: 6px 0 6px 8px; border-top: 1px solid var(--rz-line-tier-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ro-rows td i { font-style: normal; color: var(--rz-text-muted); } .ro-rows td.ro-id { display: none; }
-.ro-go { display: inline-block; margin-top: var(--rz-space-4); color: var(--rz-text-accent); text-decoration: none; font-size: 13px; }
+.ro-go { display: inline-block; margin-top: var(--rz-space-2); color: var(--rz-text-accent); text-decoration: none; font-size: 13px; }
+/* catalogue */
+.tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--rz-space-8) var(--rz-space-12); margin-top: var(--rz-space-10); }
+.tgrp h3 { margin: 0 0 var(--rz-space-2); font-size: 15px; font-weight: 600; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--rz-line-tier-1); }
+.tgrp h3 small { font-weight: 400; color: var(--rz-text-muted); font-size: 12.5px; }
+.tools { list-style: none; margin: 0; padding: 0; }
+.tool { display: grid; grid-template-columns: 44px 220px 1fr; gap: 12px; align-items: baseline; padding: 9px 6px; margin: 0 -6px; border-bottom: 1px solid var(--rz-line-tier-3); text-decoration: none; color: inherit; border-radius: 3px; transition: background-color var(--rz-dur-press) var(--rz-ease-out); }
+.tool:hover, .tool:focus-visible { background: var(--rz-bg-hover); outline: none; }
+.tool .ix { font-family: var(--rz-font-mono); font-size: 11px; color: var(--rz-text-muted); }
+.tool .nm { font-size: 14px; font-weight: 500; color: var(--rz-text-primary); }
+.tool:hover .nm { color: var(--rz-text-accent); }
+.tool .ln { font-size: 12.5px; color: var(--rz-text-secondary); line-height: 1.4; }
+@media (max-width: 1100px) { .tgrid { grid-template-columns: 1fr; } }
+@media (max-width: 800px) { .tool { grid-template-columns: 40px 1fr; } .tool .ln { grid-column: 2; } }
 /* strip */
-.strip { display: grid; grid-template-columns: 1fr 1fr; gap: var(--rz-space-4); margin-top: var(--rz-space-8); }
-.strip a { display: block; border: 1px solid var(--rz-line-tier-2); border-radius: 6px; overflow: hidden; background: var(--rz-bg-inset); text-decoration: none; color: inherit; transition: border-color var(--rz-dur-press) var(--rz-ease-out); }
-.strip a:hover { border-color: var(--rz-accent-signal); }
-.strip img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top left; transition: opacity var(--rz-dur-menu) var(--rz-ease-out); }
-.strip a:hover img { opacity: .92; }
-.strip .fig-cap { padding: 10px 12px; border-top: 1px solid var(--rz-line-tier-3); }
 /* feature columns */
 .cols4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--rz-space-6); margin-top: var(--rz-space-10); }
 .vg { border-top: 1px solid var(--rz-line-tier-2); padding-top: var(--rz-space-4); }
@@ -324,7 +331,7 @@
 .stamp { font-family: var(--rz-font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--rz-text-muted); margin-top: var(--rz-space-3); }
 .rz-reveal { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .hero-leaders path { animation: none; stroke-dashoffset: 0; } .hero-leaders circle, .hero-keys li { animation: none; opacity: 1; } .fp-stage path[data-rzd-pulse] { animation: none; } .rz-reveal { opacity: 1; transition: none; } }
-@media (max-width: 1100px) { .hero-grid { grid-template-columns: 1fr; } .hero-render { width: 100%; } .hero-leaders { display: none; } .hero-keys { max-width: none; } .cols4 { grid-template-columns: 1fr 1fr; } .figpanel { grid-template-columns: 1fr; } .figpanel .fp-main { border-right: 0; border-bottom: 1px solid var(--rz-line-tier-2); } }
+@media (max-width: 1100px) { .fp-read { grid-template-columns: 1fr; } .hero-leaders { display: none; } .hero-render { margin-top: var(--rz-space-4); } .hero-keys { grid-template-columns: 1fr 1fr; width: 100%; } .hero-keys li:nth-child(3) { border-left: 0; } .hero-keys li:nth-child(n+3) { border-top: 1px solid var(--rz-line-tier-3); } .cols4 { grid-template-columns: 1fr 1fr; } .figpanel { grid-template-columns: 1fr; } .figpanel .fp-main { border-right: 0; border-bottom: 1px solid var(--rz-line-tier-2); } }
 @media (max-width: 800px) { .two, .grid2, .about { grid-template-columns: 1fr; } .fp-status { margin-left: 0; width: 100%; } .strip { grid-template-columns: 1fr; } .cols4 { grid-template-columns: 1fr; } .fp-cap span:not(:first-child) { display: none; } .pp section { padding: var(--rz-space-16) 0; } }
 </style>
 
@@ -379,22 +386,106 @@
       <p class="eyebrow"><b>DC Solutions</b> · engineering &amp; telemetry</p>
       <h1>Plan, cost and commission a data center <span>with numbers an engineer would sign.</span></h1>
       <p class="lede">Twenty-one calculators, seven engines and nine operations cockpits share one method: every figure is computed from a declared basis, carries its registry id, and can be traced to the line that produced it.</p>
-      <div class="acts"><a class="btn" href="#calculators">Open the instruments</a><a class="lnk" href="#fig2">Read the 500 MW drawing →</a></div>
-      <div class="fig-cap hero-figcap"><b>FIG. 1</b> AI data hall operations · live cockpit · engine v1.6.0</div>
-      <ol class="hero-keys" id="heroKeys" aria-label="Design-day readouts"></ol>
+      <div class="acts"><a class="btn" href="#calculators">See every tool</a><a class="lnk" href="#fig2">Read the 500 MW drawing →</a></div>
     </div>
+    <div class="hero-figrow"><div class="fig-cap"><b>FIG. 1</b> AI data hall operations · the live cockpit · engine v1.6.0</div><ol class="hero-keys" id="heroKeys" aria-label="Design-day readouts"></ol></div>
     <figure class="hero-render" id="heroRender">
       <img src="assets/hub/dashboard.webp" width="1800" height="1125" alt="The DC AI operations cockpit: the campus photograph with the engine's design-day readouts — PUE, IT load, GPUs, racks — in instrument chips" loading="eager" fetchpriority="high">
     </figure>
     <svg class="hero-leaders" id="heroLeaders" aria-hidden="true"></svg>
+    <div class="trust"><p class="eyebrow">Computed against</p><span>ASHRAE TC 9.9</span><span>TIA-942-C</span><span>Uptime Institute Tier</span><span>NFPA 75 · 76 · 2001 · 855</span><span>ISO 50001 · 30134</span><span>EN 50600</span><span>GHG Protocol</span></div>
   </div>
-  <div class="wrap"><div class="trust"><p class="eyebrow">Computed against</p><span>ASHRAE TC 9.9</span><span>TIA-942-C</span><span>Uptime Institute Tier</span><span>NFPA 75 · 76 · 2001 · 855</span><span>ISO 50001 · 30134</span><span>EN 50600</span><span>GHG Protocol</span></div></div>
+</section>
+
+<section id="calculators">
+  <div class="wrap">
+    <p class="eyebrow">01 / The instruments</p>
+    <h2>Every tool, on one page. <span>41 cockpits, calculators, monitors, labs and papers — each states its basis before it prints a number.</span></h2>
+    <div class="tgrid">
+      <div class="tgrp">
+        <h3>Cockpits<small>Two buildings run as operations cockpits, every number from an engine.</small></h3>
+        <ol class="tools">
+<li><a class="tool" href="datahallAI.html"><span class="ix">K.01</span><span class="nm">DC AI / HPC cockpit</span><span class="ln">GB300 NVL72 · 8 halls · 539 MW IT · SLD, hall plan, cooling P&ID, network, fire, BMS</span></a></li>
+<li><a class="tool" href="dc-conventional.html"><span class="ix">K.02</span><span class="nm">DC Conventional cockpit</span><span class="ln">EPMS · data hall · chiller plant · fire · fuel · water · ICT</span></a></li>
+<li><a class="tool" href="EPMS_Telemetry.html"><span class="ix">K.03</span><span class="nm">EPMS telemetry</span><span class="ln">The single-line as the operator sees it: breakers, ATS, bus couplers</span></a></li>
+<li><a class="tool" href="datahall.html"><span class="ix">K.04</span><span class="nm">Data hall</span><span class="ln">Rack field, heat map, min / max / average per row</span></a></li>
+<li><a class="tool" href="chiller-plant.html"><span class="ix">K.05</span><span class="nm">Chiller plant</span><span class="ln">Primary–secondary to the DAHU/CRAH terminals, flow and ΔT</span></a></li>
+<li><a class="tool" href="fire-system.html"><span class="ix">K.06</span><span class="nm">Fire system</span><span class="ln">P&ID, detection zones, cause-and-effect matrix</span></a></li>
+<li><a class="tool" href="fuel-system.html"><span class="ix">K.07</span><span class="nm">Fuel system</span><span class="ln">Day tanks, bulk storage, transfer pumps, autonomy</span></a></li>
+<li><a class="tool" href="water-system.html"><span class="ix">K.08</span><span class="nm">Water system</span><span class="ln">Make-up, treatment, storage, leak detection</span></a></li>
+<li><a class="tool" href="ict.html"><span class="ix">K.09</span><span class="nm">ICT</span><span class="ln">Architecture by segment: IT, OT, corporate, security</span></a></li>
+        </ol>
+      </div>
+      <div class="tgrp">
+        <h3>Cost and planning<small>Build it on paper first.</small></h3>
+        <ol class="tools">
+<li><a class="tool" href="capex-calculator.html"><span class="ix">A.01</span><span class="nm">CAPEX calculator</span><span class="ln">14 cost components · scenario A vs B · tier classification · PDF</span></a></li>
+<li><a class="tool" href="opex-calculator.html"><span class="ix">A.02</span><span class="nm">OPEX calculator</span><span class="ln">30+ countries · climate zones · staffing · energy and maintenance</span></a></li>
+<li><a class="tool" href="dcmoc/"><span class="ix">A.03</span><span class="nm">DC MOC</span><span class="ln">CAPEX + OPEX engine · shift optimisation · Monte Carlo · executive PDF</span></a></li>
+<li><a class="tool" href="cx-calculator.html"><span class="ix">A.04</span><span class="nm">Cx calculator</span><span class="ln">L0–L6 commissioning lifecycle · Gantt · Monte Carlo · 8 archetypes</span></a></li>
+<li><a class="tool" href="rfs-readiness-workbench.html"><span class="ix">A.05</span><span class="nm">RFS readiness workbench</span><span class="ln">G0–G7 gate board · defect tracking · customer overlay · forecast</span></a></li>
+<li><a class="tool" href="spares-readiness-calculator.html"><span class="ix">A.06</span><span class="nm">Spares readiness engine</span><span class="ln">Critical spares, lead time and stock-out risk per system</span></a></li>
+        </ol>
+      </div>
+      <div class="tgrp">
+        <h3>Strategy and market<small>Decide with the numbers in front of you.</small></h3>
+        <ol class="tools">
+<li><a class="tool" href="tco-calculator.html"><span class="ix">B.01</span><span class="nm">TCO comparison</span><span class="ln">Build vs colocation vs cloud, 2025–2030 projection</span></a></li>
+<li><a class="tool" href="roi-calculator.html"><span class="ix">B.02</span><span class="nm">ROI calculator</span><span class="ln">Investment decision with sensitivity on utilisation and tariff</span></a></li>
+<li><a class="tool" href="dc-market-tracker.html"><span class="ix">B.03</span><span class="nm">Market tracker</span><span class="ln">25+ markets · capacity, pricing, pipeline</span></a></li>
+        </ol>
+      </div>
+      <div class="tgrp">
+        <h3>Engineering and compliance<small>Size it, check it, prove it against the standard.</small></h3>
+        <ol class="tools">
+<li><a class="tool" href="pue-calculator.html"><span class="ix">C.01</span><span class="nm">PUE calculator</span><span class="ln">Cooling type · climate zone · IT load distribution</span></a></li>
+<li><a class="tool" href="tier-advisor.html"><span class="ix">C.02</span><span class="nm">Tier advisor</span><span class="ln">Uptime Tier I–IV · TIA-942 · EN 50600 · 12+ jurisdictions</span></a></li>
+<li><a class="tool" href="tia-942-checklist.html"><span class="ix">C.03</span><span class="nm">TIA-942 checklist</span><span class="ln">56 items · 4 tiers · weighted scoring and gap analysis</span></a></li>
+<li><a class="tool" href="carbon-footprint.html"><span class="ix">C.04</span><span class="nm">Carbon footprint</span><span class="ln">GHG Protocol scope 1/2/3 · life-cycle · 33 countries</span></a></li>
+<li><a class="tool" href="fire-calculator.html"><span class="ix">C.05</span><span class="nm">Fire suppression calculator</span><span class="ln">NFPA 2001 clean-agent sizing · NOAEL margin</span></a></li>
+<li><a class="tool" href="fire-checklist.html"><span class="ix">C.06</span><span class="nm">Fire safety checklist</span><span class="ln">Detection and suppression design bands · NFPA 855 batteries</span></a></li>
+<li><a class="tool" href="cdu-hub.html"><span class="ix">C.07</span><span class="nm">Liquid-cooling CDU toolkit</span><span class="ln">Selection guide · maintenance checklist · mini-BMS · comparison</span></a></li>
+<li><a class="tool" href="compare-air-vs-liquid-cooling.html"><span class="ix">C.08</span><span class="nm">Air vs liquid cooling</span><span class="ln">DX · chilled water · RDHx · direct-to-chip for AI/HPC loads</span></a></li>
+<li><a class="tool" href="compare-raised-floor-vs-slab.html"><span class="ix">C.09</span><span class="nm">Raised floor vs slab</span><span class="ln">Plenum vs overhead · load capacity · retrofit cost</span></a></li>
+        </ol>
+      </div>
+      <div class="tgrp">
+        <h3>Grid monitors<small>Where the power is, region by region.</small></h3>
+        <ol class="tools">
+<li><a class="tool" href="pln-java-grid.html"><span class="ix">G.01</span><span class="nm">Java–Bali grid monitor</span><span class="ln">Jakarta–Banten · Jabar · Jateng · Jatim · historical series</span></a></li>
+<li><a class="tool" href="pln-sumatra-grid.html"><span class="ix">G.02</span><span class="nm">Sumatra grid monitor</span><span class="ln">Substation capacity and generation mix along the backbone</span></a></li>
+        </ol>
+      </div>
+      <div class="tgrp">
+        <h3>Labs<small>The methods behind the numbers, as workbenches you can run.</small></h3>
+        <ol class="tools">
+<li><a class="tool" href="standards-ltc-lab.html" id="rootStandardsCard"><span class="ix">L.01</span><span class="nm">Standards + liquid-to-chip lab</span><span class="ln">ANSI/TIA-942 · ASHRAE TC 9.9 · ISO 50001 · NFPA · Uptime engines</span></a></li>
+<li><a class="tool" href="ltc-system-modelling-lab.html"><span class="ix">L.02</span><span class="nm">Liquid-to-chip system modelling lab</span><span class="ln">CDU · manifold · chip stack · acceptance · DH01 CFD</span></a></li>
+<li><a class="tool" href="network-visualization-hub.html"><span class="ix">L.03</span><span class="nm">Network visualization hub</span><span class="ln">Modbus · BACnet · OPC-UA · DNP3 · PROFINET · TLS · APIs, animated</span></a></li>
+<li><a class="tool" href="ai-engineering-maintenance.html"><span class="ix">L.04</span><span class="nm">AI engineering maintenance</span><span class="ln">FMECA + knowledge graph · 109 fault modes · ML advisor concept</span></a></li>
+        </ol>
+      </div>
+      <div class="tgrp">
+        <h3>Knowledge<small>Papers, pillars, manuals, incidents.</small></h3>
+        <ol class="tools">
+<li><a class="tool" href="article-13.html"><span class="ix">P.01</span><span class="nm">Data center power distribution design</span><span class="ln">Technical paper · hyperscaler architecture, 2026</span></a></li>
+<li><a class="tool" href="pillar-cooling.html"><span class="ix">P.02</span><span class="nm">Cooling systems</span><span class="ln">Air · chilled water · direct liquid · free cooling · PUE</span></a></li>
+<li><a class="tool" href="pillar-power.html"><span class="ix">P.03</span><span class="nm">Power systems</span><span class="ln">UPS · generators · switchgear · PDU · N+1 · grid connection</span></a></li>
+<li><a class="tool" href="pillar-standards.html"><span class="ix">P.04</span><span class="nm">Standards and compliance</span><span class="ln">TIA-942 · Uptime · EN 50600 · ISO 27001 · ASHRAE</span></a></li>
+<li><a class="tool" href="pillar-fire-safety.html"><span class="ix">P.05</span><span class="nm">Fire safety</span><span class="ln">NFPA 75/76 · VESDA · clean agent · compartmentation</span></a></li>
+<li><a class="tool" href="pillar-sustainability.html"><span class="ix">P.06</span><span class="nm">Sustainability</span><span class="ln">PUE · WUE · CUE · renewable PPA · ISO 50001 · net zero</span></a></li>
+<li><a class="tool" href="dc-incidents.html"><span class="ix">P.07</span><span class="nm">Incident library</span><span class="ln">43 dossiers · sequence of events · FMEA · role-by-role response</span></a></li>
+<li><a class="tool" href="manual/"><span class="ix">P.08</span><span class="nm">Technical manuals</span><span class="ln">Formulas and methodology for every engine on this site</span></a></li>
+        </ol>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="fig2">
   <div class="wrap">
-    <p class="eyebrow">01 / The engine</p>
-    <h2>One engine, instrumented end to end. <span>Power in, heat out, every count derived — never typed. Hover any box; the readout is the engine's own row.</span></h2>
+    <p class="eyebrow">02 / The engine</p>
+    <h2>One engine behind the numbers. <span>Power in, heat out, every count derived. Hover a box to read its row.</span></h2>
     <div class="figpanel" id="fig1">
       <div class="fp-main">
         <div class="fp-tabs" role="tablist" aria-label="Drawings">
@@ -411,104 +502,28 @@
         <div class="fp-stage is-in" data-stage role="tabpanel"></div>
         <p class="fp-hint">Hover or focus a box to read its rows · double-click or Enter opens where it is computed · drag sideways on a phone</p>
       </div>
-      <aside class="fp-read" data-readout aria-live="polite"></aside>
+      <div class="fp-read" data-readout aria-live="polite"></div>
     </div>
     <p class="stamp" data-engine-stamp></p>
-    <div class="strip">
-      <a href="datahallAI.html"><img src="assets/hub/campus.webp" width="1600" height="1134" alt="The building, exploded by level: six levels on a 163 × 68 m plate, four of them hall levels"><span class="fig-cap"><b>FIG. 3</b> the building, by level</span></a>
-      <a href="datahallAI.html"><img src="assets/hub/hall.webp" width="1600" height="1044" alt="Data hall DH-01 plan: 440 racks in 20 rows between two fan-wall galleries, CDU line, service corridor, air flows drawn"><span class="fig-cap"><b>FIG. 4</b> hall DH-01, 440 racks, 20 rows</span></a>
-      <a href="datahallAI.html"><img src="assets/hub/sld.webp" width="1600" height="910" alt="Facility electrical single-line: 150 kV intake, 16 main transformers, the 20 kV board, eight hall feeds"><span class="fig-cap"><b>FIG. 5</b> single-line, 150 kV to the halls</span></a>
-      <a href="datahallAI.html"><img src="assets/hub/cooling.webp" width="1600" height="910" alt="Cooling P&amp;ID: dry cooler array, CDU and HTW pumps, chiller plant, with live planes"><span class="fig-cap"><b>FIG. 6</b> cooling P&amp;ID, live planes</span></a>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <p class="eyebrow">02 / What the engine answers</p>
-    <h2>Four questions every owner asks. <span>Answered from the same snapshot the cockpit runs on.</span></h2>
     <div class="cols4">
-      <div class="vg"><p class="eyebrow">PUE by weather bin</p><div class="vg-box" id="vgPue"></div><ul><li><a href="pue-calculator.html">PUE calculator</a> — the bin method, your climate</li><li><a href="carbon-footprint.html">Carbon footprint</a> — grid factor, CUE</li><li><a href="opex-calculator.html">OPEX</a> — the energy line it drives</li></ul></div>
-      <div class="vg"><p class="eyebrow">Temperature planes</p><div class="vg-box" id="vgPlanes"></div><ul><li><a href="cdu-comparison.html">CDU comparison</a> — approach, flow, published duty</li><li><a href="compare-air-vs-liquid-cooling.html">Air vs liquid</a> — where the cliff moves</li><li><a href="manual/datahallai.html">Method</a> — the 23 planes, derived</li></ul></div>
-      <div class="vg"><p class="eyebrow">Capacity</p><div class="vg-box" id="vgCapacity"></div><ul><li><a href="capex-calculator.html">CAPEX</a> — per MW, per rack</li><li><a href="tco-calculator.html">TCO</a> — build, lease, cloud</li><li><a href="roi-calculator.html">ROI</a> — payback at your tariff</li></ul></div>
-      <div class="vg"><p class="eyebrow">The fleet</p><div class="vg-box" id="vgFleet"></div><ul><li><a href="spares-readiness-calculator.html">Spares readiness</a> — what the fleet needs on the shelf</li><li><a href="tier-advisor.html">Tier advisor</a> — N, N+1, 2N, per system</li><li><a href="cx-calculator.html">Cx calculator</a> — the test programme, sized</li></ul></div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <p class="eyebrow">03 / Two platforms</p>
-    <h2>Two buildings, one method. <span>An AI campus at 142 kW a rack and a conventional site at 8 — both run as operations cockpits, both auditable.</span></h2>
-    <div class="two">
-      <div class="plat"><h3>DC AI / HPC<small>GB300 NVL72 · 8 halls · 539 MW IT · warm-water dry cooling</small></h3><img src="assets/hub/network.webp" width="1400" height="687" alt="Rack fabric: one leaf per rack, a spine pair per rail group, four rails"><ul class="facts"><li><b>Electrical</b> 150 kV intake, 16 main transformers, 528 unit substations, a 20 kV board whose fault level is checked against the gear.</li><li><b>Cooling</b> 85 % of the heat leaves on water at 40/50 °C and never meets a chiller on the design day.</li><li><b>Network</b> 7,040 fabric switches, 253,440 CX-8 ports, a radix check that must come out integer.</li><li><a class="lnk" href="datahallAI.html">Open the cockpit →</a></li></ul></div>
-      <div class="plat"><h3>DC Conventional<small>EPMS · data hall · chiller plant · fire · fuel · water · ICT</small></h3><img src="assets/hub/epms.webp" width="1600" height="939" alt="EPMS telemetry: utility A and B, generators, the MV single-line with breakers and ATS"><ul class="facts"><li><b>EPMS</b> the single-line as the operator sees it: breakers, ATS, bus couplers, 91 of 98 closed.</li><li><b>Chiller plant</b> primary–secondary to the DAHU/CRAH terminals, flow and ΔT on the same screen.</li><li><b>Fire, fuel, water</b> each a P&amp;ID with the instrument tags and the cause-and-effect matrix.</li><li><a class="lnk" href="dc-conventional.html">Open the cockpit →</a></li></ul></div>
-    </div>
-  </div>
-</section>
-
-<section id="calculators">
-  <div class="wrap">
-    <p class="eyebrow">04 / The instruments</p>
-    <h2>Build, operate, compare, export. <span>Each calculator states its inputs, its basis and its unit before it prints a number.</span></h2>
-    <div class="grid2">
-      <div class="card"><h3>Calculators</h3><p>Twenty-one, grouped by the decision they serve. Every output row carries a basis; CSV export on all of them.</p>
-        <table class="spec"><thead><tr><th>Instrument</th><th>Computes</th><th>Basis</th></tr></thead><tbody>
-          <tr><td><a href="capex-calculator.html">CAPEX</a></td><td>Build cost per MW and per rack, by system</td><td class="mono">Uptime · vendor list prices</td></tr>
-          <tr><td><a href="opex-calculator.html">OPEX</a></td><td>Energy, water, staff, maintenance per year</td><td class="mono">PUE × tariff</td></tr>
-          <tr><td><a href="tco-calculator.html">TCO</a></td><td>Build vs lease vs cloud, 10 years</td><td class="mono">NPV at your rate</td></tr>
-          <tr><td><a href="pue-calculator.html">PUE</a></td><td>Design-day and annual PUE by weather bin</td><td class="mono">ASHRAE bins</td></tr>
-          <tr><td><a href="carbon-footprint.html">Carbon</a></td><td>CUE and scope-2 tonnes from the grid factor</td><td class="mono">GHG Protocol</td></tr>
-          <tr><td><a href="tier-advisor.html">Tier advisor</a></td><td>Redundancy per system against a target tier</td><td class="mono">Uptime · TIA-942</td></tr>
-          <tr><td><a href="spares-readiness-calculator.html">Spares</a></td><td>Shelf stock from MTBF and the fleet count</td><td class="mono">Fleet × failure rate</td></tr>
-          <tr><td><a href="cx-calculator.html">Cx</a></td><td>Commissioning programme, levels 1–5</td><td class="mono">ASHRAE G0</td></tr>
-        </tbody></table>
-        <div class="mini" id="miniPue">
-          <div class="mini-head"><span class="eyebrow">Try one</span><b>PUE at your ambient</b></div>
-          <label class="mini-row"><span>Ambient, dry bulb</span><input type="range" min="24" max="36" step="1" value="34" aria-label="Ambient dry-bulb temperature, °C"><output>34 °C</output></label>
-          <div class="mini-out"><div><small>PUE</small><b data-mini="pue">—</b></div><div><small>Chillers running</small><b data-mini="ch">—</b></div><div><small>Liquid path</small><b data-mini="fc">—</b></div><div><small>Hours a year</small><b data-mini="h">—</b></div></div>
-          <p class="mini-note">Interpolated between the engine's weather bins — the same table the cockpit runs on. <a class="lnk" href="pue-calculator.html">Run it with your climate →</a></p>
-        </div>
-        <p class="stamp"><a class="lnk" href="tools.html">All twenty-one, with inputs and outputs →</a></p>
-      </div>
-      <div class="card"><h3>Grid monitors</h3><p>Where the power is, region by region: the Java–Bali backbone at 500 and 150 kV, the 20 kV data-center feeders, known operators and intakes.</p>
-        <img src="assets/hub/pln.webp" width="1600" height="1000" alt="DKI Jakarta + Banten provincial grid monitor: headlines, voltage and plant filters, the geographic map">
-        <table class="spec"><tbody>
-          <tr><td><a href="pln-java-grid-jakarta-banten.html">Jakarta + Banten</a></td><td>Highest-density node; coastal coal and city-edge gas</td><td class="mono">RUPTL 2025–34</td></tr>
-          <tr><td><a href="pln-java-grid-jabar.html">Jawa Barat</a></td><td>The hydro and the Cirata floating solar</td><td class="mono">PLN P2B</td></tr>
-          <tr><td><a href="pln-java-grid-jateng.html">Jawa Tengah</a></td><td>Batang and the 500 kV spine east</td><td class="mono">PLN P2B</td></tr>
-          <tr><td><a href="pln-java-grid-historical.html">Historical</a></td><td>Load and outage record, 2019 →</td><td class="mono">PLN annual</td></tr>
-        </tbody></table>
-      </div>
-      <div class="card"><h3>Labs and standards</h3><p>The methods behind the numbers, each as a workbench you can run: thermal control, tiers, fire agents, topology readiness, energy KPIs.</p>
-        <table class="spec"><tbody>
-          <tr><td><a href="standards-ltc-lab.html" id="rootStandardsCard">Standards workbench</a></td><td>ASHRAE · Tier · NFPA 2001 · TIA · ISO 30134/50006, one plant model</td><td class="mono">344 assertions</td></tr>
-          <tr><td><a href="ltc-system-modelling-lab.html">System modelling lab</a></td><td>DH-01 solved: air, liquid, CFD, the report</td><td class="mono">solver-held</td></tr>
-          <tr><td><a href="manual/">Technical manuals</a></td><td>How each engine computes what it prints</td><td class="mono">public</td></tr>
-          <tr><td><a href="glossary.html">Glossary</a></td><td>Every abbreviation the pages use</td><td class="mono">1,100 terms</td></tr>
-        </tbody></table>
-      </div>
-      <div class="card"><h3>Incident library</h3><p>Forty-three data-center incidents, each with its sequence of events, a retrospective FMEA and a role-by-role response — the failure chain and fishbone drawn through the same diagram engine as this page.</p>
-        <table class="spec"><tbody>
-          <tr><td><a href="dc-incidents.html">Browse the library</a></td><td>By system, by severity, by year</td><td class="mono">43 dossiers</td></tr>
-          <tr><td><a href="articles.html">Technical journal</a></td><td>Articles with living diagrams and sourced charts</td><td class="mono">27 articles</td></tr>
-          <tr><td><a href="dc-market-tracker.html">Market tracker</a></td><td>APAC capacity, operators, pipeline</td><td class="mono">Cushman · CBRE</td></tr>
-        </tbody></table>
-      </div>
+      <div class="vg"><p class="eyebrow">PUE by weather bin</p><div class="vg-box" id="vgPue"></div></div>
+      <div class="vg"><p class="eyebrow">Temperature planes</p><div class="vg-box" id="vgPlanes"></div></div>
+      <div class="vg"><p class="eyebrow">Capacity</p><div class="vg-box" id="vgCapacity"></div></div>
+      <div class="vg"><p class="eyebrow">The fleet</p><div class="vg-box" id="vgFleet"></div></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="wrap about">
-    <div><p class="eyebrow">05 / Who</p><h2>Built by a certified data-center engineer. <span>Not a content team.</span></h2><p class="lede">Bagus Dwi Permana leads engineering operations for mission-critical facilities in Bekasi, Indonesia. The site is his working method, published: the same checks he runs before a switching order are the gates every page here passes before it ships.</p></div>
+    <div><p class="eyebrow">03 / Who</p><h2>Built by a certified data-center engineer. <span>Not a content team.</span></h2><p class="lede">Bagus Dwi Permana leads engineering operations for mission-critical facilities in Bekasi, Indonesia. The site is his working method, published: the same checks he runs before a switching order are the gates every page here passes before it ships.</p></div>
     <div class="certs">AK3 Listrik · SKTTK Level 6 · SAP HV &amp; LV authorised person<br>CDCP · CDCS · ATD · ATS<br>ISO 50001 lead auditor<br><a class="lnk" href="index.html#about">Profile and record →</a></div>
   </div>
 </section>
 
 <section class="faq">
   <div class="wrap">
-    <p class="eyebrow">06 / Questions</p>
+    <p class="eyebrow">04 / Questions</p>
     <details><summary>Where do the numbers on this page come from?</summary><p>From <code>js/dcai-engine.js</code>, the DC AI engine, computed in your browser from a declared model (<code>js/dcai-model.js</code>). Every value carries a registry id; the readout beside the drawing prints it.</p></details>
     <details><summary>Is the 500 MW campus a real site?</summary><p>No. It is an adopted GB300 scenario — simulated, not measured telemetry — built so that every count is derived and every check can fail. The engine says so in its own metadata.</p></details>
     <details><summary>Do I need an account?</summary><p>The calculators, grid monitors, manuals and the journal are open. The two operations cockpits and the labs ask for a sign-in because they carry the full model.</p></details>
@@ -612,6 +627,6 @@
 <script src="js/rz-diagram-metrics.js?v=20261016-1994fd2b" defer></script>
 <script src="js/rz-diagram-layout.js?v=20261016-a82d8709" defer></script>
 <script src="js/rz-diagram.js?v=20261016-578db8a8" defer></script>
-<script src="js/rz-hub-product.js?v=20261016-1db872d1" defer></script>
+<script src="js/rz-hub-product.js?v=20261016-f2fcf245" defer></script>
 </body>
 </html>

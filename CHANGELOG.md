@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v3.22.5 — 2026-10-16
+
+### The mockup becomes a catalogue: every tool visible, one render, nothing split
+
+**Fix (owner, on the live v3.22.4 mockup):** *"tools2nya malah tidak terlihat … gambarnya excessive … jangan
+ada split screen"*. `datacenter-solutions1.html` is rebuilt around the hub's actual job — the tool list:
+41 rows (9 cockpit pages, 6 cost and planning, 3 strategy, 9 engineering and compliance, 2 grid monitors,
+4 labs, 8 knowledge) as dense two-column rows with index, name and one line, nothing behind a click, no
+classifying tag. Images cut from seven to one: the cockpit render in the hero, with the keys row above it and
+the leader rails in the gap, not across the cockpit's own bar. The strip of four renders, the platform
+images, the map card and the 2×2 cards are gone. No two-column layout remains: the hero stacks, and the
+FIG. 2 readout moved from a side column to a row of cells under the drawing. FIG. 2 (power chain · heat
+path · campus), the weather-bin strip and the four live vignettes stay.
+
+**Gates:** static set green; browser gates not re-run (only the noindex mockup changed).
+
+---
+
 ## v3.22.4 — 2026-10-16
 
 ### A product-page mockup of the DC Solutions hub, published `noindex` for the owner's review
