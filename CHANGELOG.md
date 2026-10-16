@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v3.22.4 — 2026-10-16
+
+### A product-page mockup of the DC Solutions hub, published `noindex` for the owner's review
+
+**Added:** `datacenter-solutions1.html` (noindex, nofollow) — the third take on the hub after the owner
+rejected the v3.22.0 "Stage" page (*"split screen tanpa interaksi mouse, terkunci scroll, gambar nggak
+accurate, tag free/gated = slop juga"*) and set the bar at the live homepage (*"10:4, harus surpass"*).
+Borrowed from Oxide Computer and Linear, read live: the product itself as the hero render (the real DC AI
+cockpit, screenshotted in the authorized audit state, `assets/hub/*.webp`), a keys list whose leader lines
+are measured from the DOM to the chips on the render, `FIG. 2` drawn through RZDiagram with the
+IEC 60617 / ISA-5.1 glyphs the cockpits use (power chain · heat path · campus to scale), hover/focus
+readouts that print the engine's own rows and registry ids, a weather-bin strip (24 / 30 / 34 / 36 °C) that
+re-reads `S.bins` and flags the chillers at the worst bin, a strip of four cockpit renders, four live
+vignettes (PUE by bin, temperature planes, capacity, fleet) and a Linear-style live instrument inside the
+calculators card (PUE at your ambient, interpolated between bins). No tag classifies an item; nothing follows
+the cursor; no sticky stage. `js/rz-hub-product.js`. The live `datacenter-solutions.html` is untouched
+until the owner approves.
+
+**Gates:** `audit-vibecode --strict` adds the mockup and `js/rz-hub-product.js` to the strict hub family;
+static set green (script-tags, js-syntax, version-stamp, css-structure, vibecode, vibecode fixtures,
+mobile scorer, crawler, harness parity, changelog, gate-wiring, cache tokens). Browser gates not re-run:
+the only page that changed is the new noindex mockup; v3.22.0's full run stands for the live pages.
+
+---
+
 ## v3.22.3 — 2026-10-16
 
 ### Every verdict that is not "holds" names what moves it — and the plant is re-solved to prove it

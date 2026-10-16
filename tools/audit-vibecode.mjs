@@ -573,7 +573,7 @@ const RULES = [
 ];
 
 /* The pages where §A27–34 GATE today. Everything else is monitored with its count printed. */
-const HUB_STRICT = new Set(['datacenter-solutions.html', 'css/rz-hub.css', 'js/rz-hub.js', 'js/rz-hub-scene.js', 'js/rz-home-scene.js', 'index1.html']);
+const HUB_STRICT = new Set(['datacenter-solutions.html', 'css/rz-hub.css', 'js/rz-hub.js', 'js/rz-hub-scene.js', 'js/rz-home-scene.js', 'js/rz-hub-product.js', 'index1.html', 'datacenter-solutions1.html']);
 
 function hexToHsl(hex) {
   let h = hex.slice(1);
