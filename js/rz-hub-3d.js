@@ -60,6 +60,7 @@
 
   /* ---- builders ----------------------------------------------------------------------- */
   function cssColor(host, name, fallback) { var v = getComputedStyle(host).getPropertyValue(name).trim(); return v || fallback; }
+  var QUALITY = { particles: 1 };
   function build(T, host) {
     var mat = {
       frame: new T.MeshStandardMaterial({ color: 0x5a5f66, metalness: 0.7, roughness: 0.45 }),
@@ -106,6 +107,7 @@
       var g2 = new T.BufferGeometry(); g2.setAttribute('position', new T.BufferAttribute(new Float32Array(pts.map(function (v, i) { return i % 3 === 1 ? v + 0.0008 : v; })), 3)); var groove2 = new T.LineSegments(g2, mat.groove); groove2.userData.part = part; g.add(groove2);
       [-1, 1].forEach(function (sx) { g.add(at(cyl(0.004, 0.012, mat.steel, part, 'y', 10), sx * (w / 2 - 0.012), th + 0.004, -d / 2 + 0.012)); });
       for (var f = 0; f < 9; f++) g.add(at(box(w - 0.012, 0.006, 0.0012, mat.copper, part), 0, -0.003, -d / 2 + 0.008 + f * (d - 0.016) / 8));
+      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (c) { g.add(at(cyl(0.0025, 0.002, mat.steel, part, 'y', 8), c[0] * (w / 2 - 0.006), th + 0.001, c[1] * (d / 2 - 0.006))); });
       return g;
     }
     /* a printed label: a tiny canvas texture on a plane, so every tray reads its slot */
@@ -157,7 +159,7 @@
       var ring = at(new T.Mesh(new T.CylinderGeometry(s / 2 - 0.002, s / 2 - 0.002, 0.004, 24), mat.dark.clone()), 0, 0, 0.0135); ring.rotation.x = Math.PI / 2; ring.userData.part = part; ring.material.transparent = true; ring.material.opacity = 0.15; g.add(ring);
       return g;
     }
-    function cage(w, part) { var g = new T.Group(); g.add(at(box(w, 0.020, 0.10, mat.steel, part, true), 0, 0, 0)); g.add(at(box(w - 0.006, 0.012, 0.004, mat.chip, part), 0, 0, 0.052)); return g; }
+    function cage(w, part) { var g = new T.Group(); g.add(at(box(w, 0.020, 0.10, mat.steel, part, true), 0, 0, 0)); g.add(at(box(w - 0.006, 0.012, 0.004, mat.chip, part), 0, 0, 0.052)); for (var fi = 0; fi < 7; fi++) g.add(at(box(w - 0.008, 0.008, 0.0012, mat.alu, part), 0, 0.014, -0.04 + fi * 0.011)); return g; }
     /* the loop as a polyline in tray coordinates; returns { tube, curve } */
     function loopPath(points, m, part) {
       var cp = new T.CurvePath();
@@ -166,6 +168,7 @@
       return { tube: tube, curve: cp };
     }
     function particles(curve, count, part, heatAt, size) {
+      count = Math.max(12, Math.round(count * (QUALITY.particles || 1)));
       var pos = new Float32Array(count * 3), col = new Float32Array(count * 3), geo = new T.BufferGeometry();
       geo.setAttribute('position', new T.BufferAttribute(pos, 3)); geo.setAttribute('color', new T.BufferAttribute(col, 3));
       var pm = new T.PointsMaterial({ size: size || 0.028, vertexColors: true, sizeAttenuation: true, transparent: true, opacity: 1, depthWrite: false, blending: T.AdditiveBlending });
@@ -211,6 +214,7 @@
         /* Grace: package with a silver lid, LPDDR5X around it */
         g.add(at(box(0.078, 0.0015, 0.078, mat.gold, 'cpu'), bx, 0.0078, zc, [0, 0.015, 0]));
         g.add(at(box(0.07, 0.004, 0.07, mat.chip, 'cpu'), bx, 0.009, zc, [0, 0.015, 0]));
+        var cf = box(0.086, 0.005, 0.086, mat.vrm, 'cpu', true); at(cf, bx, 0.0095, zc, [0, 0.015, 0]); g.add(cf);
         g.add(at(box(0.05, 0.002, 0.05, mat.lid, 'cpu'), bx, 0.012, zc, [0, 0.015, 0]));
         for (var m = 0; m < 8; m++) { var mx = bx + (m < 4 ? -0.055 : 0.055), mz = zc - 0.03 + (m % 4) * 0.02; g.add(at(box(0.012, 0.002, 0.016, mat.hbm, 'cpu'), mx, 0.008, mz)); }
         /* two B300: die under a lid, eight HBM stacks around each */
@@ -218,6 +222,7 @@
           var x = bx + gx * 0.056;
           g.add(at(box(0.083, 0.0015, 0.083, mat.gold, 'gpu'), x, 0.0078, zg, [0, 0.015, 0]));
           g.add(at(box(0.075, 0.004, 0.075, mat.chip, 'gpu'), x, 0.009, zg, [0, 0.015, 0]));
+          var gf = box(0.092, 0.005, 0.092, mat.vrm, 'gpu', true); at(gf, x, 0.0095, zg, [0, 0.015, 0]); g.add(gf);
           var die = at(box(0.028, 0.002, 0.028, mat.lid, 'gpu'), x, 0.012, zg, [0, 0.015, 0]); die.userData.heat = true; g.add(die);
           for (var h = 0; h < 8; h++) { var a = h * Math.PI / 4, hx = x + Math.cos(a) * 0.026, hz = zg + Math.sin(a) * 0.026; g.add(at(box(0.011, 0.002, 0.011, mat.hbm, 'gpu'), hx, 0.012, hz, [0, 0.015, 0])); }
         });
@@ -248,6 +253,7 @@
       for (var s2 = 0; s2 < 18; s2++) g.add(at(box(0.009, 0.014, 0.004, mat.chip, 'nvl'), -0.12 + s2 * 0.0141, 0.020, 0.0, [0, 0, -0.08]));
       g.add(at(box(0.040, 0.030, 0.025, mat.copper, 'clip'), 0.17, 0.020, 0.013, [0, 0, -0.06]));
       var lidG = new T.Group(); lidG.add(at(box(W, 0.004, D - 0.02, mat.glass, 'lid', true), 0, 0, 0));
+      lidG.add(at(labelPlate('GB300 NVL72 · COMPUTE TRAY', 0.16, 0.02), W / 2 - 0.12, 0.0025, D / 2 - 0.08));
       for (var vs = 0; vs < 12; vs++) lidG.add(at(box(0.16, 0.0045, 0.004, mat.dark, 'lid'), -W / 2 + 0.11, 0, -D / 2 + 0.08 + vs * 0.012));
       at(lidG, 0, H - 0.002, D / 2 - 0.01, [0, 0.17, 0]); g.add(lidG);
       for (var sc = 0; sc < 6; sc++) [-1, 1].forEach(function (sx) { g.add(at(cyl(0.0025, 0.002, mat.steel, 'ct', 'x', 8), sx * (W / 2 - 0.001), H - 0.01, 0.08 + sc * 0.14)); });
@@ -311,11 +317,18 @@
       slots.forEach(function (s, i) {
         var nk = (counts[s.kind] = (counts[s.kind] || 0) + 1), lab = (s.kind === 'ct' ? 'CT ' : s.kind === 'sw' ? 'NVSW ' : s.kind === 'ps' ? 'PS ' : 'OOB ') + (nk < 10 ? '0' : '') + nk;
         var t = s.kind === 'ct' ? computeTray(false, lab) : s.kind === 'sw' ? switchTray(false, lab) : s.kind === 'ps' ? powerShelf(lab) : oobSwitch();
-        t.position.set(0, s.y, -G.trayD / 2 + 0.05); t.userData.ex = [0, 0, s.kind === 'ct' ? 0.42 : s.kind === 'sw' ? 0.58 : s.kind === 'ps' ? 0.30 : 0.26]; g.add(t);
+        t.position.set(0, s.y, -G.trayD / 2 + 0.05); t.userData.ex = [0, 0, s.kind === 'ct' ? 0.42 : s.kind === 'sw' ? 0.58 : s.kind === 'ps' ? 0.30 : 0.26]; t.userData.slot = lab; t.userData.ou = Math.round((s.y - 0.02) / G.OU) + 1; g.add(t);
         if (s.kind === 'ct' || s.kind === 'sw') { [[-0.24, mat.supply], [0.24, mat.ret]].forEach(function (q) { g.add(at(cyl(0.008, 0.05, mat.steel, 'man', 'z'), q[0], s.y + 0.03, -D / 2 + 0.10, [0, 0, -0.3])); }); }
         if (s.kind === 'sw') { if (swTop === null) swTop = s.y; swBot = s.y; }
       });
-      if (swTop !== null) g.add(at(box(0.50, (swTop - swBot) + G.OU * 1.5, 0.12, mat.cart, 'cart', true), 0, (swTop + swBot) / 2 + G.OU / 2, -D / 2 + 0.16, [0, 0, -0.45]));
+      if (swTop !== null) {
+        var cartH = (swTop - swBot) + G.OU * 1.5, cartY = (swTop + swBot) / 2 + G.OU / 2;
+        g.add(at(box(0.50, cartH, 0.12, mat.cart, 'cart', true), 0, cartY, -D / 2 + 0.16, [0, 0, -0.45]));
+        /* the copper spine: two bundles of cables drawn as instanced strands */
+        var strand = new T.CylinderGeometry(0.0022, 0.0022, cartH + 0.6, 6), inst = new T.InstancedMesh(strand, mat.copper.clone(), 160), m4 = new T.Matrix4();
+        for (var si = 0; si < 160; si++) { var col = si < 80 ? -1 : 1, a = (si % 80) / 80 * Math.PI * 2, rr = 0.012 + 0.03 * ((si * 7) % 11) / 11; m4.makeTranslation(col * 0.17 + Math.cos(a) * rr, cartY, -D / 2 + 0.16 + Math.sin(a) * rr * 0.6); inst.setMatrixAt(si, m4); }
+        inst.userData.part = 'cart'; inst.userData.ex = [0, 0, -0.45]; inst.castShadow = false; inst.position.set(0, 0, 0); g.add(inst);
+      }
       /* the manifold water: supply rises, return falls */
       var up = new T.CurvePath(); up.add(new T.LineCurve3(new T.Vector3(-0.24, 0.1, -D / 2 + 0.07), new T.Vector3(-0.24, H - 0.1, -D / 2 + 0.07)));
       var dn = new T.CurvePath(); dn.add(new T.LineCurve3(new T.Vector3(0.24, H - 0.1, -D / 2 + 0.07), new T.Vector3(0.24, 0.1, -D / 2 + 0.07)));
@@ -335,7 +348,9 @@
     var gl; try { gl = cv.getContext('webgl2') || cv.getContext('webgl'); } catch (e) { gl = null; }
     if (!gl) { stage.innerHTML = '<p class="h3-nogl">This browser has no WebGL; the counts above are the same ones the drawing would show.</p>'; return; }
     var renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(root.devicePixelRatio || 1, root.innerWidth < 800 ? 1.5 : 1.25)); renderer.outputColorSpace = T.SRGBColorSpace; renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.35;
+    var phone = root.innerWidth < 800, dprMax = phone ? 1 : 1.25, degraded = false;
+    QUALITY.particles = phone ? 0.5 : 1;
+    renderer.setPixelRatio(Math.min(root.devicePixelRatio || 1, dprMax)); renderer.outputColorSpace = T.SRGBColorSpace; renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.35;
     var scene = new T.Scene();
     /* a studio environment painted on a canvas — three soft light bands over a dark floor — so the
      * aluminium, copper and steel have something to reflect; the renderer builds the PMREM from it */
@@ -345,7 +360,7 @@
       [[40, 30, 120, 26], [220, 20, 160, 22], [400, 36, 90, 20]].forEach(function (b) { e2.fillStyle = 'rgba(255,250,240,0.55)'; e2.fillRect(b[0], b[1], b[2], b[3]); });
       var envTex = new T.CanvasTexture(ec); envTex.mapping = 303; envTex.colorSpace = T.SRGBColorSpace; scene.environment = envTex;
     } catch (e) { /* no environment: the lights alone carry it */ }
-    renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = !phone; renderer.shadowMap.type = T.PCFSoftShadowMap;
     var cam = new T.PerspectiveCamera(34, 1, 0.01, 50);
     var ctl = new T.OrbitControls(cam, cv); ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.enablePan = false; ctl.autoRotate = !REDUCE; ctl.autoRotateSpeed = 0.5;
     scene.add(new T.HemisphereLight(0xe8eef6, 0x2a2d33, 1.5)); scene.add(new T.AmbientLight(0x6a717a, 0.6));
@@ -357,7 +372,7 @@
     var grid = new T.GridHelper(4, 40, gridCol, gridCol); grid.material.transparent = true; grid.material.opacity = 0.35; scene.add(grid);
     var floor = new T.Mesh(new T.PlaneGeometry(6, 6), new T.MeshStandardMaterial({ color: 0x101216, metalness: 0.2, roughness: 0.78 })); floor.rotation.x = -Math.PI / 2; floor.position.y = -0.004; floor.receiveShadow = true; scene.add(floor);
     var B = build(T, host), world = new T.Group(); scene.add(world);
-    var view = 'rack', model = null, explode = 0, explodeTarget = 0, hot = null, pinned = null, active = -1, raf = null, raycaster = new T.Raycaster(), ptr = new T.Vector2(-9, -9), meshes = [], spinners = [], heats = [], tagged = [];
+    var lastSlot = null, view = 'rack', model = null, explode = 0, explodeTarget = 0, hot = null, pinned = null, active = -1, raf = null, raycaster = new T.Raycaster(), ptr = new T.Vector2(-9, -9), meshes = [], spinners = [], heats = [], tagged = [];
 
     function fit(name) {
       if (name === 'rack') { grid.position.y = 0; floor.position.y = -0.004; cam.position.set(3.1, 2.3, 3.9); ctl.target.set(0, 1.25, 0); ctl.minDistance = 1.2; ctl.maxDistance = 8; }
@@ -376,11 +391,15 @@
       });
       tabs.forEach(function (t) { var on = t.getAttribute('data-view') === name; t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1; });
       host.setAttribute('data-view-on', name); pinned = null; active = -1; hot = null;
-      explode = explodeTarget = 0; explodeBtn.setAttribute('aria-pressed', 'false');
+      explode = explodeTarget = 0; explodeBtn.setAttribute('aria-pressed', 'false'); cut = false; if (cutBtn) cutBtn.setAttribute('aria-pressed', 'false');
       fit(name); renderList(); readout(null); applyExplode(); draw();
     }
+    var guides = null;
     function applyExplode() {
-      model.traverse(function (o) { var ex = o.userData.ex; if (!ex || !o.userData.p0) return; o.position.set(o.userData.p0.x + ex[0] * explode, o.userData.p0.y + ex[1] * explode, o.userData.p0.z + ex[2] * explode); });
+      var pts = [];
+      model.traverse(function (o) { var ex = o.userData.ex; if (!ex || !o.userData.p0) return; o.position.set(o.userData.p0.x + ex[0] * explode, o.userData.p0.y + ex[1] * explode, o.userData.p0.z + ex[2] * explode); if (explode > 0.02 && o.parent === model) { pts.push(o.userData.p0.x, o.userData.p0.y, o.userData.p0.z, o.position.x, o.position.y, o.position.z); } });
+      if (guides) { model.remove(guides); guides = null; }
+      if (pts.length) { var gg = new T.BufferGeometry(); gg.setAttribute('position', new T.BufferAttribute(new Float32Array(pts), 3)); guides = new T.LineSegments(gg, new T.LineBasicMaterial({ color: 0x8a9097, transparent: true, opacity: 0.5 })); model.add(guides); }
     }
     function renderList() {
       var V = VIEWS[view];
@@ -391,7 +410,7 @@
       var V = VIEWS[view];
       if (!id) { read.innerHTML = '<b>' + V.title + '</b><span>' + (view === 'rack' ? n(CT) + ' compute trays · ' + n(SW) + ' switch trays · ' + n(PS) + ' power shelves · ' + n(get('compute.gpu_per_rack') || 72) + ' GPUs · ' + n(get('power.rack_it_kw') || 142) + ' kW' : view === 'tray' ? n(M.gpuPerTray || 4) + ' B300 · ' + n(M.cpuPerTray || 2) + ' Grace · ' + n(NIC) + ' CX-8 · 1 BF-3 · TCS ' + n(TCS_S) + ' → ' + n(TCS_R) + ' °C' : n(M.nvswitchPerTray || 2) + ' NVLink switch ASICs · TCS ' + n(TCS_S) + ' → ' + n(TCS_R) + ' °C') + '</span><p>Hover or tap a part, or step through the list. <em>Counts published; placements adopted.</em></p>'; return; }
       var p = PARTS[id], i = V.parts.indexOf(id);
-      read.innerHTML = '<b>' + (i + 1) + ' · ' + p.name + '</b><span>' + (p.count > 1 ? '× ' + n(p.count) + ' ' + p.unit : p.unit) + ' · <em data-src="' + p.src + '">' + p.src + '</em></span><p>' + p.note + '</p>';
+      read.innerHTML = '<b>' + (i + 1) + ' · ' + p.name + (lastSlot && view === 'rack' ? ' — slot ' + lastSlot.label + ' · OU ' + lastSlot.ou : '') + '</b><span>' + (p.count > 1 ? '× ' + n(p.count) + ' ' + p.unit : p.unit) + ' · <em data-src="' + p.src + '">' + p.src + '</em></span><p>' + p.note + '</p>';
     }
     function light(id) {
       hot = id;
@@ -413,26 +432,39 @@
     }
     function resize() { var w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
     function draw() { if (raf) return; raf = requestAnimationFrame(frame); }
-    var lastInput = 0, inView = true;
+    var lastInput = 0, inView = true, lastT = 0, slow = 0;
+    function degrade() {
+      if (degraded) return; degraded = true;
+      renderer.shadowMap.enabled = false; renderer.setPixelRatio(1); key.castShadow = false;
+      model.traverse(function (o) { if (o.material && o.material.needsUpdate !== undefined) o.material.needsUpdate = true; });
+      host.setAttribute('data-quality', 'lite');
+    }
     function frame(t) {
       raf = null;
+      var dt = lastT ? Math.min(100, t - lastT) : 16; lastT = t;
+      /* a frame that takes longer than 28 ms, eight times in a row, means this device cannot carry
+       * the shadows and the full pixel ratio — drop them once, keep the detail */
+      if (dt > 28) { if (++slow >= 8) degrade(); } else slow = 0;
       var exploding = Math.abs(explodeTarget - explode) > 0.001;
-      if (exploding) { explode += (explodeTarget - explode) * (REDUCE ? 1 : 0.14); if (Math.abs(explodeTarget - explode) <= 0.001) explode = explodeTarget; applyExplode(); }
+      if (exploding) { var k = REDUCE ? 1 : 1 - Math.exp(-dt / 110); explode += (explodeTarget - explode) * k; if (Math.abs(explodeTarget - explode) <= 0.001) explode = explodeTarget; applyExplode(); }
       var loops = model.userData.loops || [];
       for (var i = 0; i < loops.length; i++) B.step(loops[i], t);
-      for (var s = 0; s < spinners.length; s++) spinners[s].rotation.z += REDUCE ? 0 : 0.25;
+      for (var s = 0; s < spinners.length; s++) spinners[s].rotation.z += REDUCE ? 0 : 0.016 * dt;
+      ctl.autoRotateSpeed = 0.5 * (dt / 16.7);
       var pulse = REDUCE ? 0.7 : 0.7 + 0.3 * Math.sin(t / 600);
       for (var h = 0; h < heats.length; h++) { heats[h].material.emissive.setHex(0xff7a1a); heats[h].material.emissiveIntensity = pulse; }
       ctl.update();
       try { renderer.render(scene, cam); } catch (e) { if (scene.environment) { scene.environment = null; renderer.render(scene, cam); } else throw e; }
       placeLabels();
       var moving = ctl.autoRotate || exploding || (t - lastInput) < 1400 || (!REDUCE && (loops.length || spinners.length));
-      if (moving && inView) raf = requestAnimationFrame(frame);
+      if (moving && inView) { if ((t - lastInput) > 10000 && !exploding) raf = requestAnimationFrame(function () { raf = requestAnimationFrame(frame); }); else raf = requestAnimationFrame(frame); }
     }
     function pick(ev) {
       var r = cv.getBoundingClientRect(); ptr.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
       raycaster.setFromCamera(ptr, cam); var hits = raycaster.intersectObjects(meshes, false);
-      return hits.length ? hits[0].object.userData.part : null;
+      if (!hits.length) { lastSlot = null; return null; }
+      var o = hits[0].object, slot = null; while (o && !slot) { if (o.userData && o.userData.slot) slot = { label: o.userData.slot, ou: o.userData.ou }; o = o.parent; }
+      lastSlot = slot; return hits[0].object.userData.part;
     }
     function touched() { ctl.autoRotate = false; lastInput = performance.now(); draw(); }
     cv.addEventListener('pointermove', function (ev) { if (pinned) return; var id = pick(ev); if (id !== hot) light(id); });
@@ -446,6 +478,14 @@
     host.querySelector('[data-prev]').addEventListener('click', function () { var P = VIEWS[view].parts; active = (active - 1 + P.length) % P.length; pinned = P[active]; light(pinned); touched(); });
     host.querySelector('[data-next]').addEventListener('click', function () { var P = VIEWS[view].parts; active = (active + 1) % P.length; pinned = P[active]; light(pinned); touched(); });
     explodeBtn.addEventListener('click', function () { explodeTarget = explodeTarget ? 0 : 1; explodeBtn.setAttribute('aria-pressed', explodeTarget ? 'true' : 'false'); touched(); });
+    var cutBtn = host.querySelector('[data-cutaway]'), cut = false;
+    function applyCut() { model.traverse(function (o) { if (!o.userData || !o.userData.part) return; if (o.userData.part === 'lid' || o.userData.part === 'cold') o.visible = !cut; }); }
+    if (cutBtn) cutBtn.addEventListener('click', function () { cut = !cut; cutBtn.setAttribute('aria-pressed', cut ? 'true' : 'false'); applyCut(); touched(); });
+    Array.prototype.forEach.call(host.querySelectorAll('[data-cam]'), function (b) { b.addEventListener('click', function () {
+      var k = b.getAttribute('data-cam'), rack = view === 'rack', t = rack ? [0, 1.25, 0] : [0, 0.04, 0.40], d = rack ? 5.2 : 1.9;
+      var pos = k === 'front' ? [0.001, t[1] + (rack ? 0.3 : 0.5), t[2] + d] : k === 'rear' ? [0.001, t[1] + (rack ? 0.3 : 0.5), t[2] - d] : k === 'top' ? [0.001, t[1] + d, t[2] + 0.001] : [t[0] + d * 0.6, t[1] + d * 0.45, t[2] + d * 0.75];
+      cam.position.set(pos[0], pos[1], pos[2]); ctl.target.set(t[0], t[1], t[2]); ctl.update(); touched();
+    }); });
     resetBtn.addEventListener('click', function () { fit(view); explodeTarget = 0; explodeBtn.setAttribute('aria-pressed', 'false'); pinned = null; light(null); ctl.autoRotate = !REDUCE; draw(); });
     tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-view')); }); });
     ctl.addEventListener('change', function () { lastInput = performance.now(); draw(); });

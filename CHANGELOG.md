@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v3.23.1 — 2026-10-17 — "Hardware"
+
+### Added — the 3D can be walked around and opened without orbiting (`js/rz-hub-3d.js`, mockup)
+- **Camera presets** Iso · Front · Rear · Top beside the explode button, for the rack and for each
+  tray, so the busbar, the supply and return manifolds and the cable cartridge at the rear are one
+  click away.
+- **Cutaway** hides the lid and the cold plates so the chips, the loop and the water stay in view
+  assembled; it resets with the view.
+- **Guide lines** in the exploded view: a dashed grey segment from every part's seat to where it
+  sits, the convention of an exploded engineering drawing.
+- **Slot readout**: hovering one tray in the rack names it — `Compute tray — slot CT 07 · OU 31`
+  — from the stacking order the figure declares.
+- The NVLink cartridge carries two bundles of copper strands (160 instanced cylinders, one draw
+  call) instead of a plain block.
+- The render loop halves its rate after 10 s without input; the water and the fans keep moving.
+
 ## v3.23.0 — 2026-10-17 — "Journal"
 
 ### The journal family on one register: no more blank-on-scroll, no slop, one honest filter
