@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v3.22.9 — 2026-10-17 — "Hardware"
+
+### Fixed — the 3D floor no longer mirrors the studio (`js/rz-hub-3d.js`)
+- The first render with the environment map showed a white glare band across the floor under the
+  rack and the tray — the floor was half-metal and the studio's light bands were near white. Floor
+  to a matte dark plane (metalness .2, roughness .78), the environment bands at 55 % and the sky
+  gradient two stops darker; the aluminium, copper and steel keep their reflections.
+
 ## v3.22.8 — 2026-10-16 — "Hardware"
 
 ### Added — the hub mockup gets the hardware in 3D, an icon per tool, a running panel per group, and the small interactions (`datacenter-solutions1.html`, noindex)

@@ -294,8 +294,8 @@
      * aluminium, copper and steel have something to reflect; the renderer builds the PMREM from it */
     try {
       var ec = document.createElement('canvas'); ec.width = 512; ec.height = 256; var e2 = ec.getContext('2d');
-      var grad = e2.createLinearGradient(0, 0, 0, 256); grad.addColorStop(0, '#9fb0c4'); grad.addColorStop(0.42, '#3a4149'); grad.addColorStop(0.55, '#1e2227'); grad.addColorStop(1, '#0b0c0e'); e2.fillStyle = grad; e2.fillRect(0, 0, 512, 256);
-      [[40, 30, 120, 26], [220, 20, 160, 22], [400, 36, 90, 20]].forEach(function (b) { e2.fillStyle = 'rgba(255,250,240,0.9)'; e2.fillRect(b[0], b[1], b[2], b[3]); });
+      var grad = e2.createLinearGradient(0, 0, 0, 256); grad.addColorStop(0, '#6f7c8c'); grad.addColorStop(0.42, '#2c3238'); grad.addColorStop(0.55, '#1e2227'); grad.addColorStop(1, '#0b0c0e'); e2.fillStyle = grad; e2.fillRect(0, 0, 512, 256);
+      [[40, 30, 120, 26], [220, 20, 160, 22], [400, 36, 90, 20]].forEach(function (b) { e2.fillStyle = 'rgba(255,250,240,0.55)'; e2.fillRect(b[0], b[1], b[2], b[3]); });
       var envTex = new T.CanvasTexture(ec); envTex.mapping = 303; envTex.colorSpace = T.SRGBColorSpace; scene.environment = envTex;
     } catch (e) { /* no environment: the lights alone carry it */ }
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
@@ -307,7 +307,7 @@
     var rim = new T.DirectionalLight(0xffffff, 0.6); rim.position.set(0, 1, -4); scene.add(rim);
     var gridCol = new T.Color(cssColor(host, '--rz-line-tier-2', '#2a2d31'));
     var grid = new T.GridHelper(4, 40, gridCol, gridCol); grid.material.transparent = true; grid.material.opacity = 0.35; scene.add(grid);
-    var floor = new T.Mesh(new T.PlaneGeometry(6, 6), new T.MeshStandardMaterial({ color: 0x14161a, metalness: 0.5, roughness: 0.35 })); floor.rotation.x = -Math.PI / 2; floor.position.y = -0.004; floor.receiveShadow = true; scene.add(floor);
+    var floor = new T.Mesh(new T.PlaneGeometry(6, 6), new T.MeshStandardMaterial({ color: 0x101216, metalness: 0.2, roughness: 0.78 })); floor.rotation.x = -Math.PI / 2; floor.position.y = -0.004; floor.receiveShadow = true; scene.add(floor);
     var B = build(T, host), world = new T.Group(); scene.add(world);
     var view = 'rack', model = null, explode = 0, explodeTarget = 0, hot = null, pinned = null, active = -1, raf = null, raycaster = new T.Raycaster(), ptr = new T.Vector2(-9, -9), meshes = [], spinners = [], heats = [];
 
