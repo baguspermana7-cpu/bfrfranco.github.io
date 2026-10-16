@@ -54,14 +54,14 @@
 
 html[data-rz-register="editorial"][data-theme="dark"]{
   --rz-art-accent:#E8B563;        /* default editorial amber; override per series */
-  --rz-art-accent2:#6FBF9A;
+  --rz-art-accent2:#969eaa; /* owner 2026-10-16: no second hue — the old green now reads as muted text */
   --rz-art-bg:#0E0F12;
   --rz-art-panel:#16181D;
   --rz-art-text:#CFD3DA;
   --rz-art-strong:#F6F7F9;
   --rz-art-muted:#969eaa;
   --rz-art-line:rgba(160,168,180,.14);
-  --rz-art-serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --rz-art-serif:'IBM Plex Sans',system-ui,-apple-system,sans-serif; /* owner 2026-10-16: serif display = slop; the token stays so 43 pages keep their selectors */
   --rz-art-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
   --rz-art-mono:'IBM Plex Mono',ui-monospace,monospace;
 }
@@ -216,7 +216,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .section-title{
 
 /* ---- read-progress bar (injected by rz-article-editorial.js) ---- */
 .rz-read-prog{position:fixed;top:0;left:0;height:3px;width:0;z-index:9999;
-  background:linear-gradient(90deg,var(--rz-art-accent,#E8B563),var(--rz-art-accent2,#6FBF9A));
+  background:var(--rz-art-accent,#E8B563);
   transition:width .12s linear;}
 
 /* ---- staggered entrance ---- */
@@ -240,14 +240,14 @@ html[data-rz-register="editorial"]:not([data-theme="dark"]){
   /* !important beats the inline style="--rz-art-accent:#E8B563" each article sets on <html>:
      #E8B563 is the DARK accent (≈1.7:1 on white, fails) — day needs the readable gold #b45309. */
   --rz-art-accent:#92400e !important;            /* readable amber across light editorial surfaces */
-  --rz-art-accent2:#6FBF9A;
+  --rz-art-accent2:#6b7280; /* owner 2026-10-16: no second hue — the old green now reads as muted text */
   --rz-art-bg:#f8f9fa;
   --rz-art-panel:#f1f3f5;
   --rz-art-text:#343a40;
   --rz-art-strong:#1a1d23;
-  --rz-art-muted:#6b7280;
+  --rz-art-muted:#5c6470; /* 5.3:1 on the light panel; #6b7280 read 4.34 on 40 small texts (axe) */
   --rz-art-line:rgba(40,44,52,.12);
-  --rz-art-serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --rz-art-serif:'IBM Plex Sans',system-ui,-apple-system,sans-serif; /* owner 2026-10-16: serif display = slop; the token stays so 43 pages keep their selectors */
   --rz-art-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
   --rz-art-mono:'IBM Plex Mono',ui-monospace,monospace;
 }
@@ -382,7 +382,7 @@ html[data-rz-register="editorial"] .quote-callout{
 html[data-rz-register="editorial"] .quote-callout::before{
   content:'\201C';
   position:absolute;left:.6rem;top:.02rem;
-  font-family:'Fraunces',Georgia,serif;font-size:2.8rem;line-height:1;
+  font-family:var(--rz-art-sans);font-size:2.8rem;line-height:1;
   color:var(--rz-art-accent);opacity:.55;
 }
 
@@ -583,7 +583,7 @@ html[data-rz-register="editorial"]:not([data-theme="dark"]) .rz-diagram svg{ bac
 }
 html[data-theme="dark"] .rz-diagram svg{
   --dg-line:#a0a8b426; --dg-strong:#F6F7F9; --dg-muted:#9aa8bb;
-  --dg-pipe:#00DDFF; --dg-pipe2:#FFAA00; --dg-ok:#00FF88; --dg-warn:#FFAA00; --dg-alarm:#FF3030;
+  --dg-pipe:#00DDFF; --dg-pipe2:#FFAA00; --dg-ok:#9aa8bb; --dg-warn:#FFAA00; --dg-alarm:#FF3030; /* ok = neutral, not neon (§A32) */
   --dg-box:#1b1e24;
 }
 .rz-diagram .dg-box{ fill:var(--dg-box); stroke:var(--dg-line); stroke-width:1; }
@@ -921,7 +921,7 @@ html[data-rz-register="editorial"] .rz-chart-chip{
 }
 html[data-rz-register="editorial"] .rz-chart-chip.derived{ background: rgba(10,138,90,.14); color: #0a8a5a; }
 html[data-rz-register="editorial"] .rz-chart-chip.warn{ background: rgba(217,119,6,.16); color: #92400e; }
-html[data-rz-register="editorial"][data-theme="dark"] .rz-chart-chip.derived{ background: rgba(0,255,136,.14); color: #00FF88; }
+html[data-rz-register="editorial"][data-theme="dark"] .rz-chart-chip.derived{ background: rgba(232,181,99,.14); color: #E8B563; }
 html[data-rz-register="editorial"][data-theme="dark"] .rz-chart-chip.warn{ background: rgba(252,211,77,.16); color: #fcd34d; }
 
 /* day body copy was inheriting Inter (day block had no p font rule) — force Plex +
@@ -1422,3 +1422,115 @@ html[data-rz-register="editorial"] .comparison-grid > .comparison-card:has(> :is
     padding:.75rem .9rem !important; column-gap:.9rem;
   }
 }
+
+/* ============================================================================
+   JOURNAL (v3.23) — the hub (articles.html) and the three series landings share
+   ONE register with the article pages: graphite surfaces, one amber accent, the
+   body face for headings, mono only for numbers / eyebrows / chips. No gradient,
+   no blur, no canvas, no ticker, no transform on hover (ANTI_VIBECODE §A27–34,
+   owner 2026-10-16). Cards and the toolbar are rendered by tools/build-journal.py;
+   js/rz-journal-filter.js only wires the toolbar.
+   ========================================================================== */
+html[data-rz-register="editorial"] .navbar.scrolled,
+html[data-rz-register="editorial"] body.rz-nav-open .navbar{background:var(--rz-art-bg)!important;border-bottom:1px solid var(--rz-art-line)}
+html[data-rz-register="editorial"] .jwrap{max-width:1120px;margin:0 auto;padding:0 20px}
+html[data-rz-register="editorial"] .jhero{padding:112px 0 28px;border-bottom:1px solid var(--rz-art-line)}
+html[data-rz-register="editorial"] .jhero h1{font:600 clamp(1.9rem,3.6vw,2.6rem)/1.15 var(--rz-art-sans);letter-spacing:-.02em;color:var(--rz-art-strong);margin:0 0 12px}
+html[data-rz-register="editorial"] .jhero p{font:400 1.05rem/1.6 var(--rz-art-sans);color:var(--rz-art-text);max-width:62ch;margin:0}
+html[data-rz-register="editorial"] .jmeta{font:500 .78rem/1.5 var(--rz-art-mono);color:var(--rz-art-muted);letter-spacing:.02em;margin:0 0 10px}
+html[data-rz-register="editorial"] .jmeta b{color:var(--rz-art-accent);font-weight:600}
+html[data-rz-register="editorial"] .jnotice{margin:28px 0 0;padding:16px 18px;border:1px solid var(--rz-art-line);background:var(--rz-art-panel);font:400 .92rem/1.55 var(--rz-art-sans);color:var(--rz-art-text)}
+html[data-rz-register="editorial"] .jnotice b{color:var(--rz-art-strong);font-weight:600}
+html[data-rz-register="editorial"] .jnotice p{margin:0 0 8px}
+html[data-rz-register="editorial"] .jnotice p:last-child{margin:0}
+html[data-rz-register="editorial"] .jnotice a{color:var(--rz-art-accent);text-decoration:underline;text-underline-offset:2px}
+html[data-rz-register="editorial"] .jrow{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin:20px 0 0;padding:14px 0;border-top:1px solid var(--rz-art-line);border-bottom:1px solid var(--rz-art-line);font:400 .95rem/1.5 var(--rz-art-sans);color:var(--rz-art-text)}
+html[data-rz-register="editorial"] .jrow .jrow-k{font:500 .74rem/1.5 var(--rz-art-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--rz-art-muted)}
+html[data-rz-register="editorial"] .jrow a{color:var(--rz-art-accent);text-decoration:none;border-bottom:1px solid currentColor;margin-left:auto;white-space:nowrap}
+html[data-rz-register="editorial"] .jrow a:hover{color:var(--rz-art-strong)}
+/* toolbar */
+html[data-rz-register="editorial"] .jtool{margin:28px 0 20px;display:grid;gap:12px}
+html[data-rz-register="editorial"] .jtool-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+html[data-rz-register="editorial"] .jtool-fields{gap:12px}
+html[data-rz-register="editorial"] .jtool-label{font:500 .72rem/1 var(--rz-art-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--rz-art-muted);display:block;margin:0 0 6px}
+html[data-rz-register="editorial"] .jtool-search{flex:1 1 260px;position:relative}
+html[data-rz-register="editorial"] .jtool-search input{width:100%;box-sizing:border-box;min-height:44px;padding:10px 44px 10px 12px;font:400 1rem/1.3 var(--rz-art-sans);color:var(--rz-art-strong);background:var(--rz-art-panel);border:1px solid var(--rz-art-line);border-radius:4px;outline:none}
+html[data-rz-register="editorial"] .jtool-search input:focus{border-color:var(--rz-art-accent)}
+html[data-rz-register="editorial"] .jtool-search input::placeholder{color:var(--rz-art-muted)}
+html[data-rz-register="editorial"] .jtool-search kbd{position:absolute;right:10px;bottom:12px;font:500 .72rem/1 var(--rz-art-mono);color:var(--rz-art-muted);border:1px solid var(--rz-art-line);border-radius:3px;padding:3px 6px}
+html[data-rz-register="editorial"] .jtool-sort{flex:0 1 200px}
+html[data-rz-register="editorial"] .jtool-sort select{width:100%;min-height:44px;padding:10px 12px;font:400 .95rem/1.3 var(--rz-art-sans);color:var(--rz-art-strong);background:var(--rz-art-panel);border:1px solid var(--rz-art-line);border-radius:4px}
+html[data-rz-register="editorial"] .jchip{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:6px 12px;font:500 .84rem/1.2 var(--rz-art-sans);color:var(--rz-art-text);background:transparent;border:1px solid var(--rz-art-line);border-radius:4px;cursor:pointer;transition:border-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),background-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease)}
+html[data-rz-register="editorial"] .jchip:hover{border-color:var(--rz-art-muted);color:var(--rz-art-strong)}
+html[data-rz-register="editorial"] .jchip:focus-visible{outline:2px solid var(--rz-art-accent);outline-offset:2px}
+html[data-rz-register="editorial"] .jchip[aria-pressed="true"]{color:var(--rz-art-strong);background:var(--rz-art-panel);border-color:var(--rz-art-accent);box-shadow:inset 0 0 0 1px var(--rz-art-accent)}
+html[data-rz-register="editorial"] .jchip:disabled{opacity:.45;cursor:not-allowed}
+html[data-rz-register="editorial"] .jchip-n{font:500 .72rem/1 var(--rz-art-mono);color:var(--rz-art-muted);padding:3px 5px;border:1px solid var(--rz-art-line);border-radius:3px;min-width:1.4em;text-align:center}
+html[data-rz-register="editorial"] .jchip[aria-pressed="true"] .jchip-n{color:var(--rz-art-accent);border-color:var(--rz-art-accent)}
+html[data-rz-register="editorial"] .jtool-series .jchip{min-height:32px;padding:4px 10px;font-size:.8rem}
+html[data-rz-register="editorial"] .jtool-status{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0;font:400 .84rem/1.5 var(--rz-art-mono);color:var(--rz-art-muted)}
+html[data-rz-register="editorial"] .jtool-status b{color:var(--rz-art-strong);font-weight:600}
+html[data-rz-register="editorial"] .jtool-tag{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1px solid var(--rz-art-accent);border-radius:3px;color:var(--rz-art-accent)}
+html[data-rz-register="editorial"] .jtool-tag button,html[data-rz-register="editorial"] .jtool-clear,html[data-rz-register="editorial"] .jtool-empty button{font:500 .8rem/1.2 var(--rz-art-sans);color:var(--rz-art-accent);background:none;border:0;border-bottom:1px solid currentColor;padding:0;cursor:pointer;min-height:0}
+html[data-rz-register="editorial"] .jtool-tag button{border:0;font-size:1rem;line-height:1}
+html[data-rz-register="editorial"] .jtool-empty{margin:24px 0;padding:18px;border:1px dashed var(--rz-art-line);font:400 .95rem/1.5 var(--rz-art-sans);color:var(--rz-art-text)}
+/* grid + cards */
+html[data-rz-register="editorial"] .jgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin:0 0 40px}
+html[data-rz-register="editorial"] .jcard{position:relative;display:flex;flex-direction:column;background:var(--rz-art-panel);border:1px solid var(--rz-art-line);border-radius:4px;overflow:hidden;transition:border-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease)}
+html[data-rz-register="editorial"] .jcard:hover,html[data-rz-register="editorial"] .jcard:focus-within{border-color:var(--rz-art-muted)}
+html[data-rz-register="editorial"] .jcard[hidden]{display:none}
+html[data-rz-register="editorial"] .jcard-media{aspect-ratio:1200/630;background:var(--rz-art-bg);border-bottom:1px solid var(--rz-art-line);overflow:hidden}
+html[data-rz-register="editorial"] .jcard-media img{width:100%;height:100%;object-fit:cover;display:block;margin:0;border:0;border-radius:0}
+html[data-rz-register="editorial"] .jcard-media--num{display:flex;align-items:flex-end;padding:14px 16px;aspect-ratio:1200/420}
+html[data-rz-register="editorial"] .jcard-media--num span{font:500 2.4rem/1 var(--rz-art-mono);color:var(--rz-art-muted);letter-spacing:-.02em}
+html[data-rz-register="editorial"] .jcard-body{display:flex;flex-direction:column;gap:8px;padding:14px 16px 16px;flex:1}
+html[data-rz-register="editorial"] .jcard-eyebrow{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0;font:500 .7rem/1.4 var(--rz-art-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--rz-art-muted)}
+html[data-rz-register="editorial"] .jcard-eyebrow span:first-child{color:var(--rz-art-accent)}
+html[data-rz-register="editorial"] .jcard-title{margin:0;font:600 1.08rem/1.3 var(--rz-art-sans);letter-spacing:-.01em;color:var(--rz-art-strong)}
+html[data-rz-register="editorial"] .jcard-title a{color:inherit;text-decoration:none}
+html[data-rz-register="editorial"] .jcard-title a::after{content:"";position:absolute;inset:0}
+html[data-rz-register="editorial"] .jcard-title a:focus-visible{outline:2px solid var(--rz-art-accent);outline-offset:2px}
+html[data-rz-register="editorial"] .jcard-excerpt{margin:0;font:400 .9rem/1.55 var(--rz-art-sans);color:var(--rz-art-text);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+html[data-rz-register="editorial"] .jcard-meta{display:flex;flex-wrap:wrap;gap:4px 14px;margin:auto 0 0;padding-top:10px;border-top:1px solid var(--rz-art-line);font:400 .76rem/1.5 var(--rz-art-mono);color:var(--rz-art-muted)}
+html[data-rz-register="editorial"] .jcard-no{margin-left:auto}
+html[data-rz-register="editorial"] .jcard-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0;position:relative;z-index:1}
+html[data-rz-register="editorial"] .jtag{font:400 .72rem/1.2 var(--rz-art-mono);color:var(--rz-art-muted);background:transparent;border:1px solid var(--rz-art-line);border-radius:3px;padding:4px 7px;min-height:28px;cursor:pointer;transition:border-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease)}
+html[data-rz-register="editorial"] .jtag:hover{color:var(--rz-art-strong);border-color:var(--rz-art-muted)}
+/* principles + framework: lists, not tiles */
+html[data-rz-register="editorial"] .jsection{padding:32px 0;border-top:1px solid var(--rz-art-line)}
+html[data-rz-register="editorial"] .jsection h2{font:600 1.35rem/1.25 var(--rz-art-sans);letter-spacing:-.02em;color:var(--rz-art-strong);margin:0 0 6px}
+html[data-rz-register="editorial"] .jsection > p{font:400 .95rem/1.55 var(--rz-art-sans);color:var(--rz-art-muted);margin:0 0 18px;max-width:62ch}
+html[data-rz-register="editorial"] .jlist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 32px;border-top:1px solid var(--rz-art-line)}
+html[data-rz-register="editorial"] .jlist li{display:grid;grid-template-columns:2.2rem 1fr;gap:0 10px;padding:14px 0;border-bottom:1px solid var(--rz-art-line)}
+html[data-rz-register="editorial"] .jlist .jlist-n{font:500 .95rem/1.4 var(--rz-art-mono);color:var(--rz-art-accent)}
+html[data-rz-register="editorial"] .jlist b{display:block;font:600 1rem/1.4 var(--rz-art-sans);color:var(--rz-art-strong);margin:0 0 2px}
+html[data-rz-register="editorial"] .jlist p{margin:0;font:400 .9rem/1.5 var(--rz-art-sans);color:var(--rz-art-text)}
+@media (max-width:600px){
+  html[data-rz-register="editorial"] .jwrap{padding:0 16px}
+  html[data-rz-register="editorial"] .jhero{padding-top:96px}
+  html[data-rz-register="editorial"] .jgrid{grid-template-columns:1fr}
+  html[data-rz-register="editorial"] .jtool-sort{flex-basis:100%}
+  html[data-rz-register="editorial"] .jrow a{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  html[data-rz-register="editorial"] .jchip,html[data-rz-register="editorial"] .jcard,html[data-rz-register="editorial"] .jtag{transition:none}
+}
+html[data-rz-register="editorial"] .jtool-tag[hidden],html[data-rz-register="editorial"] .jtool-clear[hidden],html[data-rz-register="editorial"] .jtool-empty[hidden]{display:none}
+html[data-rz-register="editorial"] .nav-dropdown:not(:hover):not(:focus-within) .dropdown-menu{opacity:0;visibility:hidden}
+/* FACT LIST (v3.23) — a strip of stat/metric/kpi tiles (§A29) is re-registered as one fact per row:
+   mono number, label, sub-text, hairline. tools/sweep-journal-register.py marks the parent with
+   data-rz-fact-list; the vibecode detector counts only tiles outside such a parent. */
+html[data-rz-register="editorial"] [data-rz-fact-list]{display:grid!important;grid-template-columns:1fr!important;grid-auto-flow:row!important;gap:0!important;margin:20px 0!important;padding:0!important;border:0!important;border-top:1px solid var(--rz-art-line)!important;background:none!important;box-shadow:none!important;border-radius:0!important}
+html[data-rz-register="editorial"] [data-rz-fact-list] > *{display:grid!important;grid-template-columns:minmax(7rem,max-content) 1fr!important;grid-template-areas:"v l" "v s"!important;column-gap:18px!important;row-gap:2px!important;align-items:baseline!important;padding:12px 0!important;margin:0!important;border:0!important;border-bottom:1px solid var(--rz-art-line)!important;background:none!important;box-shadow:none!important;border-radius:0!important;text-align:left!important;transform:none!important;min-height:0!important;width:auto!important;max-width:none!important}
+html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="value"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="-val"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="number"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="figure"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="num"]{grid-area:v;font:500 1.25rem/1.2 var(--rz-art-mono)!important;color:var(--rz-art-accent)!important;letter-spacing:-.01em;margin:0!important;background:none!important;-webkit-text-fill-color:currentColor!important}
+html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="label"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="-lbl"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="title"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > h3,html[data-rz-register="editorial"] [data-rz-fact-list] > * > h4,html[data-rz-register="editorial"] [data-rz-fact-list] > * > h5{grid-area:l;font:600 .95rem/1.4 var(--rz-art-sans)!important;color:var(--rz-art-strong)!important;text-transform:none!important;letter-spacing:0!important;margin:0!important}
+html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="sub"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="desc"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="note"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > p,html[data-rz-register="editorial"] [data-rz-fact-list] > * > small{grid-area:s;font:400 .86rem/1.5 var(--rz-art-sans)!important;color:var(--rz-art-muted)!important;margin:0!important}
+html[data-rz-register="editorial"] [data-rz-fact-list] > * > svg,html[data-rz-register="editorial"] [data-rz-fact-list] > * > i,html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="icon"]{display:none!important}
+/* the shared footer is navy in styles.css; on the register it is graphite in both themes (the hub does the same) */
+html[data-rz-register="editorial"][data-theme="dark"] .footer,html[data-rz-register="editorial"][data-theme="dark"] .footer-enhanced{background:#121316!important;border-top:1px solid rgba(255,255,255,.12)}
+html[data-rz-register="editorial"] .jarticles{border-top:0;padding-top:8px}
+html[data-rz-register="editorial"] .jarticles .jtool{margin-top:16px}
+/* DARK PANEL (v3.23) — an embedded panel that is dark in both themes (marked data-rz-dark-panel by the
+   sweep) keeps light headings when the register's light theme would force them dark (article-13's
+   calculator title read 1.13:1 under axe). */
+html[data-rz-register="editorial"] .article-body [data-rz-dark-panel][data-rz-dark-panel] :is(h1,h2,h3,h4,h5,h6),html[data-rz-register="editorial"] [data-rz-dark-panel][data-rz-dark-panel] :is(h1,h2,h3,h4,h5,h6){color:#F6F7F9!important} /* doubled attribute: outranks the light-theme `:not([data-theme="dark"]) .article-body h3` rule (0,3,2) */

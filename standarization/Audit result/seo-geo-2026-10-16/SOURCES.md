@@ -1,0 +1,30 @@
+# Sources — SEO/GEO audit 2026-10-16
+
+| # | Source | Date | Taken |
+|---|---|---|---|
+| 1 | Google — AI features and your website — https://developers.google.com/search/docs/appearance/ai-features | updated 2025-12-10 | no special files/markup/schema needed; "structured data matches the visible text"; preview controls |
+| 2 | Google — Optimizing for generative AI features (AI optimization guide) — https://developers.google.com/search/docs/fundamentals/ai-optimization-guide | 2026 (updated 2026-07-10 per #6) | ignore llms.txt/chunking/inauthentic mentions; "non-commodity" first-hand content; Generative AI performance report; distrust third-party tools |
+| 3 | SEJ — Google's new AI search guide calls AEO and GEO "still SEO" — https://www.searchenginejournal.com/googles-new-ai-search-guide-calls-aeo-and-geo-still-seo/575026/ | 2026 | mythbusting summary |
+| 4 | Google Search Central — documentation updates (changelog) — https://developers.google.com/search/updates | 2026-06-12 entry | FAQ rich results no longer shown; FAQ docs removed (May 2026 changelog) |
+| 5 | Search Engine Roundtable — Google: no AI system currently uses llms.txt — https://www.seroundtable.com/google-ai-llms-txt-39607.html | 2025-06 | Mueller quote |
+| 6 | Hybrid Ranking — llms.txt one year later — https://hybridranking.com/blog/llms-txt-one-year-later | 2026-07 | vendor positions; Illyes 2025-07-24; Lighthouse llms.txt audit |
+| 7 | Hybrid Ranking — FAQ rich results are gone — https://hybridranking.com/blog/faq-rich-results-dead-experience-signals-2026 | 2026 | timeline 2026-05-07 / June / August (third-party; cross-checked with #4) |
+| 8 | Ahrefs — 137K sites: 97 % of llms.txt files never read — https://ahrefs.com/blog/llmstxt-study/ | 2026-06 (May logs) | 97 % unread; agents 10.5 %, training crawlers 5.3 % of requests; no Gemini crawler (Googlebot + Google-Extended token) |
+| 9 | SEJ / SE Ranking — llms.txt shows no clear effect on AI citations (300K domains) — https://www.searchenginejournal.com/llms-txt-shows-no-clear-effect-on-ai-citations-based-on-300k-domains/561542/ | 2025–26 | no correlation (via #6) |
+| 10 | Search Engine Roundtable — adding schema did not improve AI citations — https://www.seroundtable.com/study-schema-citations-study-41311.html | 2026-05-13 | schema alone ≠ citation lift |
+| 11 | OtterlyAI — The AI citations report 2026 — https://otterly.ai/blog/the-ai-citations-report-2026/ | Jan–Feb 2026 data | community 52.5 %; Perplexity forums 16.9 %; Google AIO brand 59.8 %; 73 % of sites with crawler barriers. (Its page also shows "Summarize with AI" prompt injection, cited as an anti-pattern) |
+| 12 | Agenzy — Which sources AI engines cite (2.28M citations) — https://www.agenzy.lt/blog/which-sources-ai-engines-cite-2026 | 2026 | Reddit/Wikipedia top for ChatGPT/Perplexity, YouTube for AIO; Perplexity ~21.9 vs ChatGPT ~7.9 sources per answer |
+| 13 | Aggarwal et al. — GEO: Generative Engine Optimization (KDD 2024) — https://arxiv.org/abs/2311.09735 | rev. 2024-06-28 | citations/quotes/statistics raise visibility up to ~40 % on the benchmark; lab, not production |
+| 14 | OpenAI — Overview of OpenAI crawlers — https://platform.openai.com/docs/bots | current | OAI-SearchBot vs GPTBot vs ChatGPT-User; opt-out removes from answers; ~24 h robots latency |
+| 15 | Anthropic — Does Anthropic crawl data from the web… — https://support.claude.com/en/articles/8896518 | current | ClaudeBot, Claude-User, Claude-SearchBot |
+| 16 | Perplexity — Crawlers — https://docs.perplexity.ai/guides/bots | current | PerplexityBot (search, not training), Perplexity-User |
+| 17 | Search Influence — Inside Bing's new AI Performance report — https://www.searchinfluence.com/blog/bing-ai-performance-report-copilot-citations/ | 2026 | public preview Feb 2026; daily/page/grounding-query exports; no API yet |
+| 18 | Themeisle — Track AI referral traffic in GA4 — https://themeisle.com/blog/track-ai-referral-traffic-ga4/ (also mo.agency, seoworks via search) | 2026 | custom channel regex; GA4 AI Assistants channel (May 2026) misses some engines |
+| 19 | Google — Article structured data / author best practices — https://developers.google.com/search/docs/appearance/structured-data/article ; ProfilePage — https://developers.google.com/search/docs/appearance/structured-data/profile-page | current | author url → profile page; ProfilePage for "About Me"/author pages |
+| 20 | Momentic — Using @id in schema — https://momenticmarketing.com/blog/id-schema-for-seo-llms-knowledge-graphs | 2025–26 | @id joins nodes into one graph |
+| 21 | Hacker News — Show HN guidelines — https://news.ycombinator.com/showhn.html | current | "something you've made that other people can play with"; blog posts off-topic |
+| 22 | Reddit — self-promotion wiki — https://www.reddit.com/wiki/selfpromotion | current | participation over link-dropping (page body did not render in fetch; cite as the canonical rule location) |
+| 23 | introl.com — PJM's 6 GW capacity shortfall — https://introl.com/blog/pjm-grid-crisis-2027-data-center-capacity-shortfall | 2026 | the query winner's structure: `## TL;DR` opener, role-based `## Key Takeaways`, 7 language copies |
+| 24 | Vertiv — Quantifying PUE when introducing liquid cooling — https://www.vertiv.com/en-us/about/news-and-events/articles/blog-posts/quantifying-data-center-pue-when-introducing-liquid-cooling/ | — | owns the liquid-cooling-PUE query (10/10 results) |
+| 25 | Live probes, 2026-10-16: curl of resistancezero.com (headers, http→200, www→301, bot UAs 200, llms-full 2,873,225 B, incident page 246,711 B); WebSearch topic probes (PJM, Colossus, PFAS, PUE, name, brand) | 2026-10-16 | §1 and §2 evidence |
+| 26 | Repo, tree f494d442d: `SEO_AUDIT_LEDGER.md`, `SEO_OPTIMIZATION_STANDARD.md` (line 321, FAQ Placement), `CONTENT_LINKAGE_PLAYBOOK.md`, `robots.txt`, `sitemap.xml` (180 URLs), `llms.txt`, `tools/audit-seo.py` run (177 pages, 0 errors, 52 warnings), `crawler_audit.py --strict`, `inject-schema-faq-howto.py`, `indexnow-submit.py`, `audit-post-drafts.py`, `Article/Post Draft/` | 2026-10-16 | all ✅ findings |

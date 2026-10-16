@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-rz-register="editorial" style="--rz-art-accent:#0891b2;--rz-art-accent2:#67e8f9;">
+<html lang="en" data-rz-register="editorial">
 <head>
     <!-- Google tag (gtag.js) -->
     <!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
@@ -31,13 +31,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <!-- SEO Meta Tags -->
-    <title>DC Operations Insights | Bagus Dwi Permana</title>
+    <title>Journal — Data Center Operations Engineering | Bagus Dwi Permana</title>
     <meta name="description" content="24 technical articles on data center operations, AI infrastructure, power distribution, and resilience engineering by Bagus Dwi Permana.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="keywords" content="Data Center Articles, Infrastructure Operations, Alarm Fatigue, Maintenance Compliance, Technical Debt, RCA, Reliability Engineering, Ahli K3 Listrik">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0066cc">
+    <meta name="theme-color" content="#0E0F12">
     <link rel="canonical" href="https://resistancezero.com/articles.html">
     <link rel="author" href="/humans.txt">
 
@@ -356,8 +356,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- editorial register (RZ Dark System v1) — index grid, dark-only, scoped. -->
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261012-9a70d791">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261016-f6e588a9">
     <script src="js/rz-explain-db.js?v=20260922-cc23355f" defer></script>
 <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
 <script src="js/rz-article-editorial.js?v=20260920-10bc5a1a" defer></script>
@@ -365,684 +365,28 @@
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="styles.min.css?v=20261009-bfaeb6db">
     <style>
-        /* Articles Page Styles */
-        .articles-hero {
-            background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 50%, #2d5a87 100%);
-            padding: 8rem 2rem 3rem;
-            color: #E8EDF5;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            z-index: 0;
-        }
-        .articles-particles {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 50; /* above all page sections (z-index:1) but below navbar (z-index:1000) */
-            pointer-events: none;
-        }
-        .articles-hero::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 20% 80%, rgba(96, 165, 250, 0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        .articles-hero > * { position: relative; z-index: 1; }
-        .articles-hero h1 {
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
-            margin-bottom: 1rem;
-            color: #E8EDF5;
-            animation: fadeInUp 0.8s ease forwards;
-        }
-        .articles-hero p {
-            font-size: 1.25rem;
-            color: rgba(255, 255, 255, 0.8);
-            max-width: 700px;
-            margin: 0 auto;
-            animation: fadeInUp 0.8s ease 0.2s forwards;
-            opacity: 0;
-        }
-
-        .legal-disclaimer-wrap {
-            background: #f8fafc;
-            padding: 0 2rem 2rem;
-        }
-        .legal-disclaimer {
-            max-width: 980px;
-            margin: 0 auto;
-            border-radius: 14px;
-            border: 1px solid rgba(59, 130, 246, 0.25);
-            background: linear-gradient(135deg, rgba(30, 58, 95, 0.04), rgba(37, 99, 235, 0.08));
-            box-shadow: 0 8px 24px rgba(30, 58, 95, 0.1);
-            padding: 1.15rem 1.35rem;
-        }
-        .legal-disclaimer-title {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            margin: 0 0 0.55rem;
-            font-size: 0.78rem;
-            letter-spacing: 0.08em;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #1e3a5f;
-        }
-        .legal-disclaimer p {
-            margin: 0;
-            font-size: 0.8rem;
-            line-height: 1.6;
-            color: #334155;
-        }
-        .legal-disclaimer p + p {
-            margin-top: 0.4rem;
-        }
-        .legal-disclaimer a {
-            color: #1d4ed8;
-            text-decoration: underline;
-            font-weight: 600;
-        }
-        [data-theme="dark"] .legal-disclaimer-wrap {
-            background: #0b1220;
-        }
-        [data-theme="dark"] .legal-disclaimer {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.86), rgba(30, 58, 95, 0.58));
-            border-color: rgba(96, 165, 250, 0.35);
-            box-shadow: 0 12px 24px rgba(2, 6, 23, 0.45);
-        }
-        [data-theme="dark"] .legal-disclaimer-title {
-            color: #bfdbfe;
-        }
-        [data-theme="dark"] .legal-disclaimer p {
-            color: #cbd5e1;
-        }
-        [data-theme="dark"] .legal-disclaimer a {
-            color: #93c5fd;
-        }
-
-        /* Philosophy Section */
-        .philosophy-section {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            padding: 3rem 2rem;
-        }
-        /* v1.43.x dark-mode rollout — section was a light gradient block on dark */
-        [data-theme="dark"] .philosophy-section {
-            background: linear-gradient(135deg, #141826 0%, #10131f 100%);
-        }
-        .philosophy-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .philosophy-card {
-            background: #fff;
-            border-radius: 4px;
-            padding: 1.5rem;
-            box-shadow: none;
-            border-left: 2px solid #2d5a87;
-            animation: fadeInUp 0.6s ease forwards;
-            opacity: 0;
-        }
-        .philosophy-card:nth-child(1) { animation-delay: 0.1s; }
-        .philosophy-card:nth-child(2) { animation-delay: 0.2s; }
-        .philosophy-card:nth-child(3) { animation-delay: 0.3s; }
-        .philosophy-card h3 {
-            color: #1e3a5f;
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .philosophy-card h3 span {
-            width: 40px;
-            height: 40px;
-            background: #2d5a87;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #E8EDF5;
-            font-size: 1.25rem;
-        }
-        .philosophy-card p {
-            color: #64748b;
-            line-height: 1.7;
-        }
-
-        /* Framework Section */
-        .framework-section {
-            background: linear-gradient(135deg, #0b1220 0%, #1e293b 100%);
-            padding: 3rem 2rem;
-            color: #E8EDF5;
-        }
-        .framework-title {
-            text-align: center;
-            font-size: 1.75rem;
-            margin-bottom: 0.5rem;
-            color: #ffffff;
-        }
-        .framework-subtitle {
-            text-align: center;
-            color: #94a3b8;
-            margin-bottom: 2rem;
-        }
-        .framework-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        .framework-item {
-            background: rgba(45, 90, 135, 0.3);
-            border-radius: 4px;
-            padding: 1.25rem;
-            text-align: center;
-            border: 1px solid rgba(96, 165, 250, 0.2);
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.6s ease forwards;
-            opacity: 0;
-        }
-        .framework-item:nth-child(1) { animation-delay: 0.1s; }
-        .framework-item:nth-child(2) { animation-delay: 0.2s; }
-        .framework-item:nth-child(3) { animation-delay: 0.3s; }
-        .framework-item:nth-child(4) { animation-delay: 0.4s; }
-        .framework-item:hover {
-            background: rgba(45, 90, 135, 0.5);
-            transform: translateY(-4px);
-            border-color: #60a5fa;
-        }
-        .framework-item .num {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #60a5fa;
-            margin-bottom: 0.5rem;
-        }
-        .framework-item .label {
-            font-size: 0.9rem;
-            color: #e5e7eb;
-            font-weight: 600;
-        }
-        .framework-item .desc {
-            font-size: 0.75rem;
-            color: #94a3b8;
-            margin-top: 0.5rem;
-        }
-
-        /* Articles Section */
-        .articles-section {
-            padding: 3rem 2rem;
-            background: var(--gray-100);
-        }
-        .section-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .section-header h2 {
-            font-size: 1.75rem;
-            color: #1e3a5f;
-            margin-bottom: 0.5rem;
-        }
-        .section-header p {
-            color: #64748b;
-        }
-        .articles-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .article-card {
-            background: #fff;
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: none;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            animation: fadeInUp 0.6s ease forwards;
-            opacity: 0;
-            text-decoration: none;
-        }
-        .article-card:nth-child(1) { animation-delay: 0.05s; }
-        .article-card:nth-child(2) { animation-delay: 0.1s; }
-        .article-card:nth-child(3) { animation-delay: 0.15s; }
-        .article-card:nth-child(4) { animation-delay: 0.2s; }
-        .article-card:nth-child(5) { animation-delay: 0.25s; }
-        .article-card:nth-child(6) { animation-delay: 0.3s; }
-        .article-card:nth-child(7) { animation-delay: 0.35s; }
-        .article-card:nth-child(8) { animation-delay: 0.4s; }
-        .article-card:nth-child(9) { animation-delay: 0.45s; }
-        .article-card:nth-child(10) { animation-delay: 0.5s; }
-        .article-card:nth-child(11) { animation-delay: 0.55s; }
-        .article-card:nth-child(12) { animation-delay: 0.6s; }
-        .article-card:nth-child(13) { animation-delay: 0.65s; }
-        .article-card:nth-child(14) { animation-delay: 0.7s; }
-        .article-card:nth-child(15) { animation-delay: 0.75s; }
-        .article-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
-        }
-        .article-card-image {
-            height: 160px;
-            background: #0b1220;
-            position: relative;
-            overflow: hidden;
-        }
-        .article-card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.75;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        .article-card:hover .article-card-image img {
-            opacity: 0.9;
-            transform: scale(1.05);
-        }
-        /* v1.49.10 — instrument chip: legible on ANY thumbnail (light or dark photo),
-           replaces the saturated category-gradient ovals (white-on-red washed out). */
-        .article-card-number {
-            position: absolute;
-            top: 0.75rem;
-            left: 0.75rem;
-            background: rgba(13, 16, 20, 0.72) !important;
-            color: #E8EDF5;
-            padding: 0.22rem 0.55rem;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 7px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: 'zero' 1, 'tnum' 1;
-            letter-spacing: 0.02em;
-            line-height: 1.1;
-        }
-        .article-card-content {
-            padding: 1.15rem;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .article-card-category {
-            display: inline-block;
-            padding: 0.3rem 0.65rem;
-            border-radius: 4px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.65rem;
-            width: fit-content;
-        }
-        .cat-operations { background: rgba(59, 130, 246, 0.1); color: #1d4ed8; }
-        .cat-alarm { background: rgba(239, 68, 68, 0.1); color: #b91c1c; }
-        .cat-asset { background: rgba(16, 185, 129, 0.1); color: #047857; }
-        .cat-capability { background: rgba(14,116,144, 0.1); color: #0369a1; }
-        .cat-risk { background: rgba(245, 158, 11, 0.1); color: #92400e; }
-        .cat-learning { background: rgba(56, 189, 248, 0.1); color: #0e7490; }
-        .cat-resilience { background: rgba(34, 197, 94, 0.1); color: #166534; }
-        /* v3.6.3 — #0891b2 on its own 10% tint reaches 3.27 at 10.4 px; #0e7490 is the same cyan one
-   step darker and reaches 4.76 on the same ground. */
-        .cat-safety { background: rgba(8,145,178, 0.1); color: #0e7490; }
-        .article-card-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #1e3a5f;
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
-        }
-        .article-card-excerpt {
-            color: #64748b;
-            font-size: 0.8rem;
-            line-height: 1.55;
-            margin-bottom: 1rem;
-            flex: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .article-card-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 0.75rem;
-            border-top: 1px solid #e5e7eb;
-            font-size: 0.75rem;
-            color: #9ca3af;
-        }
-        .article-card-date {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .article-card-link {
-            color: #2d5a87;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.8rem;
-            transition: color 0.3s ease;
-        }
-        .article-card-readtime {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            color: #9ca3af;
-            font-size: 0.72rem;
-        }
-        .article-card-readtime svg { flex-shrink: 0; }
-        .article-card-link:hover { color: #1e3a5f; }
-        .article-card-link svg { transition: transform 0.3s ease; }
-        .article-card:hover .article-card-link svg { transform: translateX(4px); }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 1024px) {
-            .articles-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 768px) {
-            .articles-particles { display: none; }
-            .articles-hero { padding: 6rem 1rem 2.5rem; }
-            .legal-disclaimer-wrap { padding: 0 1rem 1.5rem; }
-            .legal-disclaimer { padding: 1rem; }
-            .articles-section { padding: 2rem 1rem; }
-            .articles-grid { grid-template-columns: 1fr; gap: 1rem; }
-            .framework-grid { grid-template-columns: repeat(2, 1fr); }
-            .philosophy-grid { grid-template-columns: 1fr; }
-            .article-card-image { height: 140px; }
-            .article-card-content { padding: 1rem; }
-        }
-        /* Ensure page content stacks above fixed particle canvas */
-        #main-content, .ticker-bar, .footer, .footer-enhanced { position: relative; z-index: 1; }
-
-        /* ==========================================================================
-           v1.6.2 — Awwwards uplift on articles hub (aurora + gradient + card dark)
-           Mirror linear.app + vercel.com + resend.com patterns
-           ========================================================================== */
-
-        /* Aurora mesh on articles-hero (dark mode only) */
-        [data-theme="dark"] .articles-hero { position: relative; overflow: hidden; }
-        [data-theme="dark"] .articles-hero::before,
-        [data-theme="dark"] .articles-hero::after {
-            content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-        }
-        [data-theme="dark"] .articles-hero::before {
-            background:
-                radial-gradient(60% 50% at 18% 22%, rgba(96,165,250,0.18), transparent 65%),
-                radial-gradient(55% 45% at 80% 30%, rgba(125,221,180,0.14), transparent 65%),
-                radial-gradient(70% 60% at 50% 90%, rgba(34,211,238,0.10), transparent 70%);
-            filter: blur(40px);
-            animation: rzAuroraDrift 22s ease-in-out infinite alternate;
-        }
-        [data-theme="dark"] .articles-hero::after {
-            background:
-                radial-gradient(45% 35% at 88% 75%, rgba(251,191,36,0.10), transparent 65%),
-                radial-gradient(40% 30% at 12% 75%, rgba(244,114,182,0.08), transparent 65%);
-            filter: blur(50px);
-            animation: rzAuroraDrift 28s ease-in-out infinite alternate-reverse;
-        }
-        @keyframes rzAuroraDrift {
-            0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.85; }
-            50%  { transform: translate3d(2%, -1.5%, 0) scale(1.05); opacity: 1; }
-            100% { transform: translate3d(-1.5%, 1.5%, 0) scale(1.02); opacity: 0.92; }
-        }
-        [data-theme="dark"] .articles-hero > * { position: relative; z-index: 1; }
-
-        /* Gradient-shift text on H1 */
-        [data-theme="dark"] .articles-hero h1 {
-            background: linear-gradient(120deg, #f8fafc 0%, #60a5fa 35%, #7DDDB4 65%, #f8fafc 100%);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-            animation: rzNameSweep 12s ease-in-out infinite;
-        }
-        @keyframes rzNameSweep {
-            0%, 100% { background-position: 0% 50%; }
-            50%      { background-position: 100% 50%; }
-        }
-
-        /* Article card dark-mode override (was hardcoded #fff) */
-        [data-theme="dark"] .article-card {
-            background: rgba(30, 41, 59, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        }
-        [data-theme="dark"] .article-card-title { color: #f1f5f9 !important; }
-        [data-theme="dark"] .article-card-excerpt { color: #cbd5e1 !important; }
-        [data-theme="dark"] .article-card-meta { color: #94a3b8 !important; }
-        /* v1.19.x light-mode contrast fix: card meta authored dark-first (#9ca3af 2.54:1 on white) */
-        html:not([data-theme="dark"]) .article-card-meta,
-        html:not([data-theme="dark"]) .article-card-date,
-        html:not([data-theme="dark"]) .article-card-readtime { color: #64748b; }
-
-        /* Article card shine sweep on hover */
-        [data-theme="dark"] .article-card { position: relative; overflow: hidden; }
-        [data-theme="dark"] .article-card::after {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.08) 55%, transparent 70%);
-            transform: translateX(-100%);
-            transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-            z-index: 2;
-        }
-        [data-theme="dark"] .article-card:hover::after { transform: translateX(100%); }
-        [data-theme="dark"] .article-card:hover {
-            border-color: transparent !important;
-            box-shadow:
-                0 0 0 1px rgba(96,165,250,0.4),
-                0 18px 40px rgba(0,0,0,0.5),
-                0 0 60px rgba(96,165,250,0.12);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            [data-theme="dark"] .articles-hero::before,
-            [data-theme="dark"] .articles-hero::after,
-            [data-theme="dark"] .articles-hero h1 { animation: none !important; }
-        }
-
-        /* Catch the .philosophy-card white-bg gap */
-        [data-theme="dark"] .philosophy-card {
-            background: rgba(30, 41, 59, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            color: #cbd5e1;
-        }
-        [data-theme="dark"] .philosophy-card h3,
-        [data-theme="dark"] .philosophy-card .philosophy-title { color: #f1f5f9; }
-    /* v1.8.0 — mobile responsive landing patch */
-@media (max-width: 768px) {
-    html, body { overflow-x: hidden; max-width: 100vw; }
-    img { max-width: 100%; height: auto; display: block; }
-
-    /* Bento grid stacks single-column on mobile */
-    .bento-container, .bento-row { 
-        grid-template-columns: 1fr !important;
-        gap: 0.75rem !important;
-        padding: 0 0.75rem !important;
+    /* v1.8.0 — mobile responsive patch (journal: the checkpoints the static scorer reads; the layout itself is the editorial register) */
+    @media (max-width: 768px) {
+        html, body { overflow-x: hidden; max-width: 100vw; }
+        img { max-width: 100%; height: auto; display: block; }
+        .nav-menu, .nav-links { display: none; }
+        .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+        button, a.btn, [role="button"] { min-height: 44px; }
     }
-    .bento-row-career { grid-template-columns: 1fr !important; }
-    .bento-card { padding: 1.25rem !important; }
-    .bento-name { font-size: 2rem !important; line-height: 1.1 !important; }
-    .bento-desc { font-size: 0.9rem !important; }
-    .bento-photo { max-height: 280px; object-fit: cover; }
-    .bento-photo, .bento-identity { width: 100% !important; }
+    </style>
 
-    /* Hero CTA row stacks */
-    .bento-cta-row { flex-direction: column !important; gap: 0.5rem !important; }
-    .bento-cta-row a { width: 100% !important; justify-content: center !important; }
-
-    /* Aurora hero padding tightens */
-    .hero, .articles-hero, .tools-hero, .changelog-hero {
-        padding: 4rem 1rem 2rem !important;
-    }
-    .hero h1, .articles-hero h1, .tools-hero h1, .changelog-hero h1 {
-        font-size: clamp(1.8rem, 7vw, 2.5rem) !important;
-    }
-
-    /* Navbar mobile collapse */
-    .navbar { padding: 0.5rem 0.75rem !important; }
-    .nav-container { padding: 0 0.5rem !important; gap: 0.5rem !important; }
-    .nav-menu, .nav-links { display: none !important; }
-    .nav-logo img, .nav-avatar { width: 32px !important; height: 32px !important; }
-    .nav-search-btn, .nav-theme-btn, .nav-user-btn, .rz-user-btn { 
-        padding: 6px 10px !important;
-        min-height: 44px;
-    }
-
-    /* Footer 3-column collapses */
-    .footer-grid, .footer-enhanced .footer-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1.25rem !important;
-        padding: 1rem !important;
-        text-align: left !important;
-    }
-
-    /* Marquee speed slower on mobile (more readable) */
-    .rz-marquee-track { animation-duration: 90s !important; }
-    .rz-marquee { padding: 0.6rem 0 !important; }
-    .rz-marquee-item { font-size: 0.7rem !important; }
-
-    /* Floating share-buttons → bottom-bar transition */
-    .share-buttons {
-        position: fixed !important;
-        bottom: 0 !important;
-        top: auto !important;
-        left: 0 !important;
-        right: 0 !important;
-        transform: none !important;
-        flex-direction: row !important;
-        justify-content: center !important;
-        gap: 8px !important;
-        padding: 8px 12px !important;
-        background: rgba(15,23,42,0.92) !important;
-        border-top: 1px solid rgba(255,255,255,0.08);
-        backdrop-filter: blur(10px);
-        z-index: 100;
-    }
-    .share-btn { width: 40px !important; height: 40px !important; }
-
-    /* Article grid stacks */
-    .articles-grid, .article-card-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1rem !important;
-        padding: 0 0.75rem !important;
-    }
-
-    /* Tools grid stacks */
-    .tools-grid {
-        grid-template-columns: 1fr !important;
-        gap: 0.75rem !important;
-    }
-
-    /* Changelog cards */
-    .changelog-list { padding: 0 1rem 3rem !important; }
-    .changelog-entry { padding: 1.25rem !important; }
-    .filter-chips { gap: 0.4rem !important; padding: 0 1rem; }
-    .filter-chip { padding: 0.4rem 0.9rem !important; font-size: 0.75rem !important; }
-
-    /* Glossary search + entries */
-    .glossary-search { width: 100% !important; padding: 0.75rem 1rem !important; }
-    .glossary-grid { grid-template-columns: 1fr !important; }
-
-    /* News ticker */
-    .ticker-container, .news-ticker-container { padding: 0.4rem 0 !important; font-size: 0.72rem !important; }
-
-    /* Tap targets */
-    button, a.btn, .nav-link, [role="button"] { min-height: 44px; }
-}
-
-@media (max-width: 480px) {
-    .bento-name { font-size: 1.7rem !important; }
-    .bento-photo { max-height: 220px; }
-    .nav-brand-text { display: none; }
-}
-
-/* a11y (v1.50.41): dark counterparts for the darkened light-mode chip/excerpt colors */
-[data-theme="dark"] .article-card-excerpt { color:#94a3b8; }
-[data-theme="dark"] [style*="color: #b91c1c"] { color:#f87171 !important; }
-[data-theme="dark"] [style*="color: #0e7490"] { color:#22d3ee !important; }
-[data-theme="dark"] [style*="color: #047857"] { color:#34d399 !important; }
-[data-theme="dark"] .cat-alarm { color:#f87171; }
-[data-theme="dark"] .cat-asset { color:#34d399; }
-[data-theme="dark"] .cat-risk { color:#fbbf24; }
-[data-theme="dark"] .cat-operations { color:#93c5fd; }
-[data-theme="dark"] .cat-capability { color:#67e8f9; }
-[data-theme="dark"] .section-header h2 { color:#e2e8f0; }
-[data-theme="dark"] .cat-resilience { color:#4ade80; }
-[data-theme="dark"] .cat-learning { color:#38bdf8; }
-[data-theme="dark"] [style*="color: #1d4ed8"] { color:#93c5fd !important; }
-/* DC Incidents case-library feature (root-gated) — instrument-green editorial, anti-slop */
-.incidents-feature { max-width:1100px; margin:0 auto 2.2rem; padding:0 1.25rem; }
-.incidents-feature a { display:flex; gap:1.25rem; align-items:center; justify-content:space-between; text-decoration:none;
-  border:1px solid rgba(47,107,79,0.4); border-left:2px solid #2f6b4f; border-radius:4px;
-  padding:1.15rem 1.35rem; background:#f4f6f2; transition:border-color .18s ease, transform .18s ease; }
-.incidents-feature a > div { flex:1 1 auto; min-width:0; }
-.incidents-feature a:hover { border-color:#2f6b4f; transform:translateY(-1px); }
-[data-theme="dark"] .incidents-feature a { background:#0f1b16; border-color:rgba(127,209,168,0.28); border-left-color:#7fd1a8; }
-.incidents-feature .if-eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase; color:#2f6b4f; display:flex; align-items:center; gap:0.4rem; margin-bottom:0.3rem; }
-[data-theme="dark"] .incidents-feature .if-eyebrow { color:#7fd1a8; }
-.incidents-feature .if-title { font-size:1.3rem; font-weight:700; color:#10201a; margin:0 0 0.25rem; letter-spacing:-0.01em; }
-[data-theme="dark"] .incidents-feature .if-title { color:#f4f1e9; }
-.incidents-feature .if-blurb { font-size:0.9rem; color:#3b463d; max-width:64ch; margin:0; line-height:1.55; }
-[data-theme="dark"] .incidents-feature .if-blurb { color:#c6ccbc; }
-.incidents-feature .if-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:#6a7367; margin-top:0.45rem; }
-[data-theme="dark"] .incidents-feature .if-count { color:#8b9484; }
-.incidents-feature .if-cta { font-family:'JetBrains Mono',monospace; font-size:0.8rem; font-weight:700; color:#2f6b4f; white-space:nowrap; }
-[data-theme="dark"] .incidents-feature .if-cta { color:#7fd1a8; }
-.incidents-feature .if-lock { border:1px solid currentColor; border-radius:4px; padding:0.06rem 0.45rem; font-size:0.62rem; }
-@media (max-width:640px){ .incidents-feature a{ flex-direction:column; align-items:flex-start; } }
-</style>
 
     <link rel="prefetch" href="article-26.html">
     <link rel="prefetch" href="article-25.html">
     <link rel="prefetch" href="article-24.html">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer integrity="sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt" crossorigin="anonymous"></script>
-    <script src="js/rz-version.js?v=20261016-8f741684" defer></script>
+    <script src="js/rz-version.js?v=20261016-f61c022f" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
+    <script src="js/rz-journal-filter.js?v=20261016-b76a014e" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
     <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
 </head>
 <body>
-    <!-- Search Overlay & Modal -->
-    <div class="search-overlay" id="searchOverlay" style="display:none;"></div>
-    <div class="search-modal" id="searchModal" style="display:none;">
-        <div class="search-input-wrap">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search articles, calculators, tools..." autocomplete="off" aria-label="Search articles, calculators, tools...">
-            <kbd class="search-kbd">ESC</kbd>
-        </div>
-        <div class="search-chips" id="searchChips">
-            <button class="search-chip active" data-filter="all">All</button>
-            <button class="search-chip" data-filter="articles">Articles</button>
-            <button class="search-chip" data-filter="calculators">Calculators</button>
-            <button class="search-chip" data-filter="tools">Tools</button>
-        </div>
-        <div class="search-results" id="searchResults">
-            <div class="search-empty">Type to search across all content</div>
-        </div>
-        <div class="search-footer">
-            <span><kbd class="search-kbd">&uarr;&darr;</kbd> Navigate</span>
-            <span><kbd class="search-kbd">Enter</kbd> Open</span>
-        </div>
-    </div>
-    <div class="search-preview" id="searchPreview"></div>
-
-    <canvas id="articles-particles" class="articles-particles" aria-hidden="true"></canvas>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
@@ -1123,667 +467,112 @@
     </nav>
 
     <main id="main-content">
-    <!-- Latest Updates Ticker -->
-    <div class="news-ticker-container">
-        <div class="ticker-label">
-            <span class="ticker-text">Latest</span>
-        </div>
-        <div class="ticker-wrapper">
-            <div class="ticker-content" id="tickerContent">
-            </div>
-        </div>
-        <div class="ticker-glow"></div>
+    <div class="jwrap">
+      <header class="jhero">
+        <p class="jmeta"><!-- journal:meta -->34 articles · 3 series · updated 22 Jul 2026<!-- /journal:meta --></p>
+        <h1>Operations Engineering Journal</h1>
+        <p>Independent research on how data centers are actually run: reliability, cooling, power, people and the economics around them. Every article is built from published standards, public data and field practice, and every number on this site traces to its source.</p>
+      </header>
+      <aside class="jnotice" aria-label="Legal notice">
+        <p><b>Legal notice.</b> All articles and technical content on ResistanceZero are independent personal research based on publicly available standards, references and field study. They do not represent any current or former employer.</p>
+        <p>This site is provided for educational and informational use only, not as legal, financial, investment, procurement, safety or engineering advice. Validate decisions with qualified professionals and current local regulations. Use of this site is subject to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+      </aside>
+
+      <p class="jrow"><span class="jrow-k">Case library</span><span>Data-center incidents: 43 governed dossiers with sequence of events, root cause, correction of errors and cited evidence. Root access.</span><a href="dc-incidents.html">Open the library</a></p>
+
+      <section class="jsection jarticles" aria-labelledby="ja">
+        <h2 id="ja">Articles</h2>
+        <p>Every article, newest first. Filter by topic or series, search a title, summary or tag, or sort; the view is in the address bar, so it can be shared.</p>
+        <!-- journal:toolbar scope=all -->
+<form class="jtool" role="search" aria-label="Filter the journal" data-journal-filter data-scope="all">
+<div class="jtool-row jtool-fields">
+<label class="jtool-search"><span class="jtool-label">Search</span><input type="search" name="q" placeholder="Title, summary or tag" autocomplete="off" spellcheck="false"><kbd aria-hidden="true">/</kbd></label>
+<label class="jtool-sort"><span class="jtool-label">Sort</span><select name="sort"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="long">Longest read</option><option value="short">Shortest read</option></select></label>
+</div>
+<div class="jtool-row jtool-chips" role="group" aria-label="Topic">
+<button type="button" class="jchip" data-topic="" aria-pressed="true">All topics <span class="jchip-n">34</span></button>
+<button type="button" class="jchip" data-topic="ai" aria-pressed="false">AI &amp; HPC infrastructure <span class="jchip-n">6</span></button>
+<button type="button" class="jchip" data-topic="cooling" aria-pressed="false">Cooling &amp; thermal <span class="jchip-n">2</span></button>
+<button type="button" class="jchip" data-topic="power" aria-pressed="false">Power &amp; grid <span class="jchip-n">5</span></button>
+<button type="button" class="jchip" data-topic="ops" aria-pressed="false">Operations &amp; maintenance <span class="jchip-n">4</span></button>
+<button type="button" class="jchip" data-topic="reliability" aria-pressed="false">Reliability &amp; safety <span class="jchip-n">7</span></button>
+<button type="button" class="jchip" data-topic="market" aria-pressed="false">Market, economics &amp; policy <span class="jchip-n">5</span></button>
+<button type="button" class="jchip" data-topic="water" aria-pressed="false">Sustainability &amp; water <span class="jchip-n">2</span></button>
+<button type="button" class="jchip" data-topic="workforce" aria-pressed="false">Workforce &amp; careers <span class="jchip-n">3</span></button>
+</div>
+<div class="jtool-row jtool-chips jtool-series" role="group" aria-label="Series">
+<button type="button" class="jchip" data-series="" aria-pressed="true">All series <span class="jchip-n">34</span></button>
+<button type="button" class="jchip" data-series="journal" aria-pressed="false">Engineering Journal <span class="jchip-n">20</span></button>
+<button type="button" class="jchip" data-series="global" aria-pressed="false">Global Analysis <span class="jchip-n">10</span></button>
+<button type="button" class="jchip" data-series="ff" aria-pressed="false">Future Forward <span class="jchip-n">4</span></button>
+</div>
+<p class="jtool-status"><span aria-live="polite"><b data-journal-count>34</b> of 34 articles</span><span class="jtool-tag" data-journal-tag hidden>tag: <span></span> <button type="button" aria-label="Remove tag filter">×</button></span><button type="button" class="jtool-clear" hidden>Clear filters</button></p>
+</form>
+<!-- /journal:toolbar -->
+        <!-- journal:grid scope=all -->
+<div class="jgrid" data-journal-grid>
+<article class="jcard" data-id="article-28" data-topic="ai" data-series="ff" data-date="2026-07-22" data-read="18" data-tags="ai frontier|hyperscale data center|gpu cluster|model compression"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-28-hero.webp" alt="Datacenter rack wall compressing through golden data streams into a single glowing laptop — the compression horizon" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>AI &amp; HPC infrastructure</span><span>Future Forward</span></p><h3 class="jcard-title"><a href="article-28.html">The Compression Horizon: How Close Can a Laptop Get to a Datacenter&#x27;s Mind?</a></h3><p class="jcard-excerpt">Can 300 TB of training data become 1 KB? The hard physics (Shannon, Kolmogorov, Landauer) and a practical pipeline for task-specific local AI.</p><p class="jcard-meta"><time datetime="2026-07-22">22 Jul 2026</time><span>18 min read</span><span class="jcard-no">No. 28</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="ai frontier">AI frontier</button><button type="button" class="jtag" data-tag="hyperscale data center">Hyperscale Data Center</button><button type="button" class="jtag" data-tag="gpu cluster">GPU Cluster</button></p></div></article>
+<article class="jcard" data-id="article-27" data-topic="workforce" data-series="global" data-date="2026-04-12" data-read="20" data-tags="workforce|data center operations|ai infrastructure|staffing crisis"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-27-hero.webp" alt="Data center operations floor with engineering team — AI workforce crisis" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Workforce &amp; careers</span><span>Global Analysis</span></p><h3 class="jcard-title"><a href="article-27.html">No Humans, No Data Centers: 20 Strategies to Solve the AI Workforce Crisis</a></h3><p class="jcard-excerpt">467,000 positions unfilled. 70% of operators struggling. Every strategy the DC industry is using to fight the AI workforce crisis — with a free cost modeler.</p><p class="jcard-meta"><time datetime="2026-04-12">12 Apr 2026</time><span>20 min read</span><span class="jcard-no">No. 27</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="workforce">Workforce</button><button type="button" class="jtag" data-tag="data center operations">Data Center Operations</button><button type="button" class="jtag" data-tag="ai infrastructure">AI Infrastructure</button></p></div></article>
+<article class="jcard" data-id="article-26" data-topic="cooling" data-series="global" data-date="2026-04-11" data-read="14" data-tags="pfas|data center cooling|environmental investigation|two-phase immersion cooling"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-26-hero.webp" alt="Two-phase immersion cooling tank open for maintenance inspection in a high-density data center" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Cooling &amp; thermal</span><span>Global Analysis</span></p><h3 class="jcard-title"><a href="article-26.html">The Invisible Leak: What Happens When You Open a Two-Phase Cooling System — And Why Nobody Is Measuring It</a></h3><p class="jcard-excerpt">Two-phase immersion fluid loss, measured: why 17.1%/yr sits above P95, how drains dominate the variance, and what a continuous-loss term implies.</p><p class="jcard-meta"><time datetime="2026-04-11">11 Apr 2026</time><span>14 min read</span><span class="jcard-no">No. 26</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="pfas">PFAS</button><button type="button" class="jtag" data-tag="data center cooling">Data Center Cooling</button><button type="button" class="jtag" data-tag="environmental investigation">Environmental Investigation</button></p></div></article>
+<article class="jcard" data-id="article-25" data-topic="power" data-series="global" data-date="2026-03-29" data-read="28" data-tags="pjm interconnection|power grid|data center energy|grid reliability"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-25-hero.webp" alt="Aerial view of a metropolitan area served by PJM Interconnection" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Power &amp; grid</span><span>Global Analysis</span></p><h3 class="jcard-title"><a href="article-25.html">PJM Is 6 GW Short by 2027. 65 Million People Are in the Blast Zone.</a></h3><p class="jcard-excerpt">PJM faces a 6 GW shortfall by 2027: data centers drive 40% of load growth while 40 GW of thermal plant retires. An engineering analysis.</p><p class="jcard-meta"><time datetime="2026-03-29">29 Mar 2026</time><span>28 min read</span><span class="jcard-no">No. 25</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="pjm interconnection">PJM Interconnection</button><button type="button" class="jtag" data-tag="power grid">Power Grid</button><button type="button" class="jtag" data-tag="data center energy">Data Center Energy</button></p></div></article>
+<article class="jcard" data-id="article-24" data-topic="workforce" data-series="journal" data-date="2026-03-29" data-read="28" data-tags="data center jobs|ai infrastructure careers|skilled trades|workforce shortage"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-24-hero.webp" alt="Data center chiller plant and dry coolers — the cooling infrastructure that keeps AI servers running" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Workforce &amp; careers</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-24.html">Data Center Manpower Shortage: The Most In-Demand Job in AI</a></h3><p class="jcard-excerpt">Data center careers for HVAC engineers, electricians, and robotic technicians. Compare salary ranges, training programs, and entry requirements.</p><p class="jcard-meta"><time datetime="2026-03-29">29 Mar 2026</time><span>28 min read</span><span class="jcard-no">No. 24</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="data center jobs">Data Center Jobs</button><button type="button" class="jtag" data-tag="ai infrastructure careers">AI Infrastructure Careers</button><button type="button" class="jtag" data-tag="skilled trades">Skilled Trades</button></p></div></article>
+<article class="jcard" data-id="article-23" data-topic="ai" data-series="journal" data-date="2026-03-29" data-read="28" data-tags="xai colossus|hyperscale data center|gpu cluster|environmental justice"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-23-hero.webp" alt="xAI Colossus supercomputer facility in Memphis Tennessee with GPU racks and cooling infrastructure" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>AI &amp; HPC infrastructure</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-23.html">From Empty Field to 150 MW in 122 Days: What Really Happened at xAI Colossus</a></h3><p class="jcard-excerpt">Engineering analysis of xAI Colossus, the fastest supercomputer build in history: 200K GPUs, 150 MW, unpermitted turbines, and what Memphis pays.</p><p class="jcard-meta"><time datetime="2026-03-29">29 Mar 2026</time><span>28 min read</span><span class="jcard-no">No. 23</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="xai colossus">xAI Colossus</button><button type="button" class="jtag" data-tag="hyperscale data center">Hyperscale Data Center</button><button type="button" class="jtag" data-tag="gpu cluster">GPU Cluster</button></p></div></article>
+<article class="jcard" data-id="article-22" data-topic="ai" data-series="journal" data-date="2026-03-22" data-read="32" data-tags="nvidia photonics|co-packaged optics|silicon photonics|ai infrastructure"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-22-hero.webp" alt="NVIDIA silicon photonics co-packaged optics for AI factory interconnects" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>AI &amp; HPC infrastructure</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-22.html">NVIDIA&#x27;s $4 Billion Photonics Play: Why the Future of AI Runs on Light</a></h3><p class="jcard-excerpt">NVIDIA&#x27;s $4B bet on silicon photonics: an engineering analysis of CPO, ELS, micro ring modulators, and why AI factories need optical interconnects.</p><p class="jcard-meta"><time datetime="2026-03-22">22 Mar 2026</time><span>32 min read</span><span class="jcard-no">No. 22</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="nvidia photonics">NVIDIA Photonics</button><button type="button" class="jtag" data-tag="co-packaged optics">Co-Packaged Optics</button><button type="button" class="jtag" data-tag="silicon photonics">Silicon Photonics</button></p></div></article>
+<article class="jcard" data-id="article-21" data-topic="power" data-series="journal" data-date="2026-03-22" data-read="28" data-tags="nuclear smr|ai data centers|clean energy|data center power"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-21-hero.webp" alt="Nuclear Small Modular Reactor concept for AI data center campus" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Power &amp; grid</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-21.html">Nuclear SMRs for AI: The $10 Billion Bet on Atomic-Powered Data Centers</a></h3><p class="jcard-excerpt">Microsoft, Amazon, Google, Meta and Oracle are betting billions on nuclear SMRs for AI data centers. A DC engineer analyzes the costs and timelines.</p><p class="jcard-meta"><time datetime="2026-03-22">22 Mar 2026</time><span>28 min read</span><span class="jcard-no">No. 21</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="nuclear smr">Nuclear SMR</button><button type="button" class="jtag" data-tag="ai data centers">AI Data Centers</button><button type="button" class="jtag" data-tag="clean energy">Clean Energy</button></p></div></article>
+<article class="jcard" data-id="FF-3" data-topic="workforce" data-series="ff" data-date="2026-03-22" data-read="24" data-tags="ai inference|training vs inference|gpu economics|ai infrastructure"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/future-forward-3-cover.webp" alt="AI inference chips glowing in a data center rack with streaming data visualizations" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Workforce &amp; careers</span><span>Future Forward</span></p><h3 class="jcard-title"><a href="FF-3.html">AI Inference Economics: The Cost of Running Models</a></h3><p class="jcard-excerpt">Inference now dominates AI compute — 2/3 of workloads, $50B+ chip market, 93 GW by 2030. Data-backed analysis with interactive cost calculator.</p><p class="jcard-meta"><time datetime="2026-03-22">22 Mar 2026</time><span>24 min read</span><span class="jcard-no">No. FF 3</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="ai inference">AI Inference</button><button type="button" class="jtag" data-tag="training vs inference">Training vs Inference</button><button type="button" class="jtag" data-tag="gpu economics">GPU Economics</button></p></div></article>
+<article class="jcard" data-id="article-20" data-topic="water" data-series="journal" data-date="2026-03-21" data-read="14" data-tags="ai water usage|data center sustainability|sam altman|fact-check"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-20-hero.webp" alt="Sam Altman AI Water Claims Fact-Check — data center cooling towers and water consumption analysis" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Sustainability &amp; water</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-20.html">Sam Altman Says AI Water Concerns Are &#x27;Fake&#x27; — The Data Says Otherwise</a></h3><p class="jcard-excerpt">Inside the PFAS problem in data centers: where fluorinated chemistry sits in cooling and fire systems, what is being restricted, and the engineering options.</p><p class="jcard-meta"><time datetime="2026-03-21">21 Mar 2026</time><span>14 min read</span><span class="jcard-no">No. 20</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="ai water usage">AI Water Usage</button><button type="button" class="jtag" data-tag="data center sustainability">Data Center Sustainability</button><button type="button" class="jtag" data-tag="sam altman">Sam Altman</button></p></div></article>
+<article class="jcard" data-id="FF-2" data-topic="ai" data-series="ff" data-date="2026-03-21" data-read="22" data-tags="data center talent|engineer shortage|workforce crisis|hiring analysis"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/future-forward-2-cover.webp" alt="Data center engineers working in a modern facility highlighting the talent gap crisis" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>AI &amp; HPC infrastructure</span><span>Future Forward</span></p><h3 class="jcard-title"><a href="FF-2.html">Data Center Talent Shortage: Hiring, Pay and Training</a></h3><p class="jcard-excerpt">340K unfilled DC positions globally. Analysis of hiring, pay, and training constraints, with an interactive talent gap calculator across 12 markets.</p><p class="jcard-meta"><time datetime="2026-03-21">21 Mar 2026</time><span>22 min read</span><span class="jcard-no">No. FF 2</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="data center talent">Data Center Talent</button><button type="button" class="jtag" data-tag="engineer shortage">Engineer Shortage</button><button type="button" class="jtag" data-tag="workforce crisis">Workforce Crisis</button></p></div></article>
+<article class="jcard" data-id="FF-1" data-topic="ai" data-series="ff" data-date="2026-03-15" data-read="17" data-tags="future of web|ai search|digital platforms|website strategy"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/future-forward-1-cover.webp" alt="A creator working in front of a laptop with platform logos and urban screens outside, symbolizing the split web economy" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>AI &amp; HPC infrastructure</span><span>Future Forward</span></p><h3 class="jcard-title"><a href="FF-1.html">The Web Didn&#x27;t Die. It Split: Who Wins the Next Interface Shift?</a></h3><p class="jcard-excerpt">Analysis of the web from 2020 to 2035: AI answers, search click compression, platform power, and how durable sites survive the split. Future Forward FF-1.</p><p class="jcard-meta"><time datetime="2026-03-15">15 Mar 2026</time><span>17 min read</span><span class="jcard-no">No. FF 1</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="future of web">Future of Web</button><button type="button" class="jtag" data-tag="ai search">AI Search</button><button type="button" class="jtag" data-tag="digital platforms">Digital Platforms</button></p></div></article>
+<article class="jcard" data-id="geopolitics-3" data-topic="reliability" data-series="global" data-date="2026-03-15" data-read="18" data-tags="submarine cables|strait of hormuz|gcc connectivity|infrastructure resilience"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/geopolitics-3-cover.webp" alt="Submarine cable corridor disruption scenario in the Strait of Hormuz and Gulf of Oman" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Reliability &amp; safety</span><span>Global Analysis</span></p><h3 class="jcard-title"><a href="geopolitics-3.html">If Multiple Fiber Routes Failed Simultaneously in the Strait of Hormuz: What Breaks First?</a></h3><p class="jcard-excerpt">Engineering-first analysis of simultaneous fiber damage in the Strait of Hormuz: cable routing, latency, repair delays and GCC industrial exposure.</p><p class="jcard-meta"><time datetime="2026-03-15">15 Mar 2026</time><span>18 min read</span><span class="jcard-no">No. G 3</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="submarine cables">Submarine Cables</button><button type="button" class="jtag" data-tag="strait of hormuz">Strait of Hormuz</button><button type="button" class="jtag" data-tag="gcc connectivity">GCC Connectivity</button></p></div></article>
+<article class="jcard" data-id="article-19" data-topic="market" data-series="global" data-date="2026-03-08" data-read="8" data-tags="singapore data center|batam data center|site selection|infrastructure"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-19-cover.webp" alt="Singapore vs Batam Data Centers: Why Cost Alone Doesn&#x27;t Win" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Market, economics &amp; policy</span><span>Global Analysis</span></p><h3 class="jcard-title"><a href="article-19.html">Singapore vs Batam Data Centers: Why Cost Alone Doesn&#x27;t Win</a></h3><p class="jcard-excerpt">Batam is cheaper, Singapore is more certain. 2026 analysis: when to choose Singapore, when to choose Batam, and when to use both.</p><p class="jcard-meta"><time datetime="2026-03-08">8 Mar 2026</time><span>8 min read</span><span class="jcard-no">No. 19</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="singapore data center">Singapore Data Center</button><button type="button" class="jtag" data-tag="batam data center">Batam Data Center</button><button type="button" class="jtag" data-tag="site selection">Site Selection</button></p></div></article>
+<article class="jcard" data-id="geopolitics-2" data-topic="market" data-series="global" data-date="2026-03-08" data-read="25" data-tags="economic growth|ai infrastructure|renewable energy|semiconductors"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/geopolitics-2-cover.webp" alt="The $50 Trillion Economic Shift - Visualization of interconnected growth sectors from AI to clean energy reshaping global GDP 2026-2036" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Market, economics &amp; policy</span><span>Global Analysis</span></p><h3 class="jcard-title"><a href="geopolitics-2.html">The $50 Trillion Shift: Fastest-Growing Sectors 2026-2036</a></h3><p class="jcard-excerpt">Which economic sectors grow fastest by 2036? Ranked analysis of AI, energy, semiconductors with methodology scoring and data center demand impact.</p><p class="jcard-meta"><time datetime="2026-03-08">8 Mar 2026</time><span>25 min read</span><span class="jcard-no">No. G 2</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="economic growth">Economic Growth</button><button type="button" class="jtag" data-tag="ai infrastructure">AI Infrastructure</button><button type="button" class="jtag" data-tag="renewable energy">Renewable Energy</button></p></div></article>
+<article class="jcard" data-id="article-18" data-topic="ai" data-series="journal" data-date="2026-02-22" data-read="18" data-tags="ai factory|data center architecture|liquid cooling|gpu infrastructure"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-18-cover.webp" alt="AI Factories: Why Traditional Data Center Architecture Faces Technical Extinction" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>AI &amp; HPC infrastructure</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-18.html">AI Factories: Why Traditional Data Center Architecture Faces Technical Extinction</a></h3><p class="jcard-excerpt">130kW rack density, liquid cooling, $600B+ hyperscaler CAPEX. Power, cooling, and network requirements for AI facilities. Readiness calculator.</p><p class="jcard-meta"><time datetime="2026-02-22">22 Feb 2026</time><span>18 min read</span><span class="jcard-no">No. 18</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="ai factory">AI Factory</button><button type="button" class="jtag" data-tag="data center architecture">Data Center Architecture</button><button type="button" class="jtag" data-tag="liquid cooling">Liquid Cooling</button></p></div></article>
+<article class="jcard" data-id="article-17" data-topic="market" data-series="global" data-date="2026-02-14" data-read="30" data-tags="data center investment|southeast asia|investment opportunity|structural demand analysis"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-17-cover.webp" alt="The $37 Billion Opportunity: Why SEA&#x27;s Data Center Surge Will Define the Next Digital Decade" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Market, economics &amp; policy</span><span>Global Analysis</span></p><h3 class="jcard-title"><a href="article-17.html">The $37 Billion Opportunity: Why SEA&#x27;s Data Center Surge Will Define the Next Digital Decade</a></h3><p class="jcard-excerpt">$37B SEA data center opportunity: Jevons Paradox, sovereign AI mandates, $602B hyperscaler capex. Interactive Opportunity Value Calculator.</p><p class="jcard-meta"><time datetime="2026-02-14">14 Feb 2026</time><span>30 min read</span><span class="jcard-no">No. 17</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="data center investment">Data Center Investment</button><button type="button" class="jtag" data-tag="southeast asia">Southeast Asia</button><button type="button" class="jtag" data-tag="investment opportunity">Investment Opportunity</button></p></div></article>
+<article class="jcard" data-id="article-16" data-topic="market" data-series="global" data-date="2026-02-14" data-read="25" data-tags="data center bubble|southeast asia|investment risk|oversupply"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-16-cover.webp" alt="The Great SEA Data Center Bubble: When $37 Billion Bets on a Promise" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Market, economics &amp; policy</span><span>Global Analysis</span></p><h3 class="jcard-title"><a href="article-16.html">The Great SEA Data Center Bubble: When $37 Billion Bets on a Promise</a></h3><p class="jcard-excerpt">6,068 MW pipeline in Southeast Asia. Johor&#x27;s 5.8 GW gamble, Indonesia at 1,717 MW. Interactive bubble risk calculator and market analysis.</p><p class="jcard-meta"><time datetime="2026-02-14">14 Feb 2026</time><span>25 min read</span><span class="jcard-no">No. 16</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="data center bubble">Data Center Bubble</button><button type="button" class="jtag" data-tag="southeast asia">Southeast Asia</button><button type="button" class="jtag" data-tag="investment risk">Investment Risk</button></p></div></article>
+<article class="jcard" data-id="article-15" data-topic="ops" data-series="journal" data-date="2026-02-14" data-read="35" data-tags=""><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-15-cover.webp" alt="Data Center Service Catalog: 135 Services by Revenue Tier" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Operations &amp; maintenance</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-15.html">Data Center Service Catalog: 135 Services by Revenue Tier</a></h3><p class="jcard-excerpt">135 data center services across 11 categories with regional pricing. Interactive revenue calculator for Americas, Europe, SEA, and Australia.</p><p class="jcard-meta"><time datetime="2026-02-14">14 Feb 2026</time><span>35 min read</span><span class="jcard-no">No. 15</span></p></div></article>
+<article class="jcard" data-id="article-14" data-topic="market" data-series="global" data-date="2026-02-14" data-read="35" data-tags="data center opposition|community impact|electricity bills|southeast asia"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-14-cover.webp" alt="The $64 Billion Rebellion: Why Communities Worldwide Are Fighting Data Centers" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Market, economics &amp; policy</span><span>Global Analysis</span></p><h3 class="jcard-title"><a href="article-14.html">The $64 Billion Rebellion: Why Communities Worldwide Are Fighting Data Centers</a></h3><p class="jcard-excerpt">$64B in data center projects contested globally. Multi-perspective community impact analysis with interactive scorecard calculator.</p><p class="jcard-meta"><time datetime="2026-02-14">14 Feb 2026</time><span>35 min read</span><span class="jcard-no">No. 14</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="data center opposition">Data Center Opposition</button><button type="button" class="jtag" data-tag="community impact">Community Impact</button><button type="button" class="jtag" data-tag="electricity bills">Electricity Bills</button></p></div></article>
+<article class="jcard" data-id="article-13" data-topic="power" data-series="journal" data-date="2026-02-08" data-read="45" data-tags=""><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-13-cover.webp" alt="Data Center Power Distribution Design: Hyperscaler Architecture Deep Dive" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Power &amp; grid</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-13.html">Data Center Power Distribution Design: Hyperscaler Architecture Deep Dive</a></h3><p class="jcard-excerpt">Hyperscaler power distribution: AWS, Google, Microsoft, xAI architectures analyzed. 48V/380V/800V DC, failure scenarios, reliability engineering.</p><p class="jcard-meta"><time datetime="2026-02-08">8 Feb 2026</time><span>45 min read</span><span class="jcard-no">No. 13</span></p></div></article>
+<article class="jcard" data-id="article-12" data-topic="power" data-series="journal" data-date="2026-02-08" data-read="28" data-tags="ai data centers|renewable energy|grid modernization|southeast asia"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-12-cover.webp" alt="The Uncomfortable Truth: How AI Data Centers Are Secretly Funding Your Grid&#x27;s Future" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Power &amp; grid</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-12.html">The Uncomfortable Truth: How AI Data Centers Are Secretly Funding Your Grid&#x27;s Future</a></h3><p class="jcard-excerpt">How AI data centers fund grid modernization through $100B+ renewable investment and $33,500/MW surplus value. Interactive economic simulator.</p><p class="jcard-meta"><time datetime="2026-02-08">8 Feb 2026</time><span>28 min read</span><span class="jcard-no">No. 12</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="ai data centers">AI Data Centers</button><button type="button" class="jtag" data-tag="renewable energy">Renewable Energy</button><button type="button" class="jtag" data-tag="grid modernization">Grid Modernization</button></p></div></article>
+<article class="jcard" data-id="article-11" data-topic="power" data-series="journal" data-date="2026-02-08" data-read="25" data-tags="ai data centers|electricity|southeast asia|infrastructure"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-11-cover.webp" alt="AI Data Centers vs Citizen Electricity Bills: Who Really Pays?" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Power &amp; grid</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-11.html">AI Data Centers vs Citizen Electricity Bills: Who Really Pays?</a></h3><p class="jcard-excerpt">One AI data center equals 100,000 households in power demand. Interactive impact calculator for Southeast Asian electricity bill analysis.</p><p class="jcard-meta"><time datetime="2026-02-08">8 Feb 2026</time><span>25 min read</span><span class="jcard-no">No. 11</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="ai data centers">AI Data Centers</button><button type="button" class="jtag" data-tag="electricity">Electricity</button><button type="button" class="jtag" data-tag="southeast asia">Southeast Asia</button></p></div></article>
+<article class="jcard" data-id="article-10" data-topic="water" data-series="journal" data-date="2026-02-08" data-read="20" data-tags="water stress|ai data centers|sustainability"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-10-cover.webp" alt="Water Stress and AI Data Centers: The Hidden Crisis in Southeast Asia" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Sustainability &amp; water</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-10.html">Water Stress and AI Data Centers: The Hidden Crisis in Southeast Asia</a></h3><p class="jcard-excerpt">58% of data centers in water-stressed regions. Interactive water stress calculator, WUE benchmarks, and sustainable cooling strategies for SEA.</p><p class="jcard-meta"><time datetime="2026-02-08">8 Feb 2026</time><span>20 min read</span><span class="jcard-no">No. 10</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="water stress">Water Stress</button><button type="button" class="jtag" data-tag="ai data centers">AI Data Centers</button><button type="button" class="jtag" data-tag="sustainability">Sustainability</button></p></div></article>
+<article class="jcard" data-id="geopolitics-1" data-topic="reliability" data-series="global" data-date="2026-02-08" data-read="30" data-tags="emergency preparedness|civil defense|geopolitics|national security"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/geopolitics-1-cover.webp" alt="The 72-Hour Warning: Global Emergency Preparedness Guide 2026" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Reliability &amp; safety</span><span>Global Analysis</span></p><h3 class="jcard-title"><a href="geopolitics-1.html">The 72-Hour Warning: Global Emergency Preparedness Guide 2026</a></h3><p class="jcard-excerpt">Why 20+ nations urge 72-hour preparedness. NEW START expired, NATO concerns, infrastructure attacks. Interactive survival kit calculator included.</p><p class="jcard-meta"><time datetime="2026-02-08">8 Feb 2026</time><span>30 min read</span><span class="jcard-no">No. G 1</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="emergency preparedness">Emergency Preparedness</button><button type="button" class="jtag" data-tag="civil defense">Civil Defense</button><button type="button" class="jtag" data-tag="geopolitics">Geopolitics</button></p></div></article>
+<article class="jcard" data-id="article-9" data-topic="cooling" data-series="journal" data-date="2026-02-07" data-read="18" data-tags="chiller-free cooling|direct liquid cooling|hvac engineering"><div class="jcard-body"><p class="jcard-eyebrow"><span>Cooling &amp; thermal</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-9.html">The HVAC Shock: No Chillers Doesn&#x27;t Mean No Cooling</a></h3><p class="jcard-excerpt">Nvidia Rubin&#x27;s direct-to-chip cooling doesn&#x27;t eliminate HVAC. Tropical climate analysis, hybrid cooling, and fault scenario implementation guide.</p><p class="jcard-meta"><time datetime="2026-02-07">7 Feb 2026</time><span>18 min read</span><span class="jcard-no">No. 9</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="chiller-free cooling">Chiller-Free Cooling</button><button type="button" class="jtag" data-tag="direct liquid cooling">Direct Liquid Cooling</button><button type="button" class="jtag" data-tag="hvac engineering">HVAC Engineering</button></p></div></article>
+<article class="jcard" data-id="article-8" data-topic="reliability" data-series="journal" data-date="2025-12-28" data-read="22" data-tags="leading indicators|weak signals|safety culture|drift to failure"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-8-cover.webp" alt="Why &#x27;No Incident&#x27; Is Not Evidence of Safety" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Reliability &amp; safety</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-8.html">Why &#x27;No Incident&#x27; Is Not Evidence of Safety</a></h3><p class="jcard-excerpt">Safety as presence of positive capacity, not absence of incidents. Weak signal detection, HRO principles, and Safety-II in data centers.</p><p class="jcard-meta"><time datetime="2025-12-28">28 Dec 2025</time><span>22 min read</span><span class="jcard-no">No. 8</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="leading indicators">Leading Indicators</button><button type="button" class="jtag" data-tag="weak signals">Weak Signals</button><button type="button" class="jtag" data-tag="safety culture">Safety Culture</button></p></div></article>
+<article class="jcard" data-id="article-2" data-topic="ops" data-series="journal" data-date="2025-12-07" data-read="25" data-tags="alarm fatigue|system design|safety engineering|isa-18.2"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-2-cover.webp" alt="Alarm Fatigue Is Not a Human Problem — It Is a System Design Failure" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Operations &amp; maintenance</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-2.html">Alarm Fatigue Is Not a Human Problem — It Is a System Design Failure</a></h3><p class="jcard-excerpt">Why alarm fatigue is a system design failure, not operator negligence. ISA-18.2 framework applied to data center BMS and DCIM alarm rationalization.</p><p class="jcard-meta"><time datetime="2025-12-07">7 Dec 2025</time><span>25 min read</span><span class="jcard-no">No. 2</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="alarm fatigue">Alarm Fatigue</button><button type="button" class="jtag" data-tag="system design">System Design</button><button type="button" class="jtag" data-tag="safety engineering">Safety Engineering</button></p></div></article>
+<article class="jcard" data-id="article-1" data-topic="reliability" data-series="journal" data-date="2025-12-06" data-read="20" data-tags="critical infrastructure|proactive engineering|safety-ii|operational maturity"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-1-cover.webp" alt="When Nothing Happens, Engineering Is Working" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Reliability &amp; safety</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-1.html">When Nothing Happens, Engineering Is Working</a></h3><p class="jcard-excerpt">Document preventive work and assess data center operational maturity using Safety-II principles and an interactive calculator.</p><p class="jcard-meta"><time datetime="2025-12-06">6 Dec 2025</time><span>20 min read</span><span class="jcard-no">No. 1</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="critical infrastructure">Critical Infrastructure</button><button type="button" class="jtag" data-tag="proactive engineering">Proactive Engineering</button><button type="button" class="jtag" data-tag="safety-ii">Safety-II</button></p></div></article>
+<article class="jcard" data-id="article-3" data-topic="ops" data-series="journal" data-date="2025-11-30" data-read="24" data-tags="maintenance compliance|workflow engineering|asset governance|cmms|preventive maintenance"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-3-cover.webp" alt="Maintenance Compliance Is Not a Technician Problem" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Operations &amp; maintenance</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-3.html">Maintenance Compliance Is Not a Technician Problem</a></h3><p class="jcard-excerpt">Maintenance compliance as workflow engineering, not technician discipline. CMMS optimization, asset governance, and PM completion rate strategies.</p><p class="jcard-meta"><time datetime="2025-11-30">30 Nov 2025</time><span>24 min read</span><span class="jcard-no">No. 3</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="maintenance compliance">Maintenance Compliance</button><button type="button" class="jtag" data-tag="workflow engineering">Workflow Engineering</button><button type="button" class="jtag" data-tag="asset governance">Asset Governance</button></p></div></article>
+<article class="jcard" data-id="article-4" data-topic="ops" data-series="journal" data-date="2025-11-22" data-read="20" data-tags=""><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-4-cover.webp" alt="In-House Capability Is a Reliability Strategy" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Operations &amp; maintenance</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-4.html">In-House Capability Is a Reliability Strategy</a></h3><p class="jcard-excerpt">Building in-house capability as a reliability strategy. Vendor dependency risks, decision latency analysis, and knowledge retention frameworks.</p><p class="jcard-meta"><time datetime="2025-11-22">22 Nov 2025</time><span>20 min read</span><span class="jcard-no">No. 4</span></p></div></article>
+<article class="jcard" data-id="article-5" data-topic="reliability" data-series="journal" data-date="2025-11-16" data-read="20" data-tags="technical debt|operational risk|weibull analysis|deferred maintenance"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-5-cover.webp" alt="Technical Debt in Live Data Centers Is Operational Risk" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Reliability &amp; safety</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-5.html">Technical Debt in Live Data Centers Is Operational Risk</a></h3><p class="jcard-excerpt">Technical debt in live data centers is operational risk. Hidden cost analysis, debt quantification methods, and remediation prioritization.</p><p class="jcard-meta"><time datetime="2025-11-16">16 Nov 2025</time><span>20 min read</span><span class="jcard-no">No. 5</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="technical debt">Technical Debt</button><button type="button" class="jtag" data-tag="operational risk">Operational Risk</button><button type="button" class="jtag" data-tag="weibull analysis">Weibull Analysis</button></p></div></article>
+<article class="jcard" data-id="article-6" data-topic="reliability" data-series="journal" data-date="2025-11-15" data-read="25" data-tags="rca|design authority|incident learning|stamp|fram"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-6-cover.webp" alt="Why Post-Incident RCA Fails Without Design Authority" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Reliability &amp; safety</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-6.html">Why Post-Incident RCA Fails Without Design Authority</a></h3><p class="jcard-excerpt">Why post-incident RCA fails without design authority. Organizational learning barriers and the gap between findings and system-level change.</p><p class="jcard-meta"><time datetime="2025-11-15">15 Nov 2025</time><span>25 min read</span><span class="jcard-no">No. 6</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="rca">RCA</button><button type="button" class="jtag" data-tag="design authority">Design Authority</button><button type="button" class="jtag" data-tag="incident learning">Incident Learning</button></p></div></article>
+<article class="jcard" data-id="article-7" data-topic="reliability" data-series="journal" data-date="2025-11-09" data-read="20" data-tags="reliability|tier ratings|operational resilience|hollnagel"><div class="jcard-media"><img loading="lazy" decoding="async" src="assets/article-7-cover.webp" alt="From Reliability to Resilience: Why Tier Ratings Stop at Design" width="1200" height="630"></div><div class="jcard-body"><p class="jcard-eyebrow"><span>Reliability &amp; safety</span><span>Engineering Journal</span></p><h3 class="jcard-title"><a href="article-7.html">From Reliability to Resilience: Why Tier Ratings Stop at Design</a></h3><p class="jcard-excerpt">Moving beyond Uptime Institute tier ratings to operational resilience. Reliability vs resilience, adaptive capacity, and graceful degradation.</p><p class="jcard-meta"><time datetime="2025-11-09">9 Nov 2025</time><span>20 min read</span><span class="jcard-no">No. 7</span></p><p class="jcard-tags"><button type="button" class="jtag" data-tag="reliability">Reliability</button><button type="button" class="jtag" data-tag="tier ratings">Tier Ratings</button><button type="button" class="jtag" data-tag="operational resilience">Operational Resilience</button></p></div></article>
+</div>
+<p class="jtool-empty" data-journal-empty hidden>No article matches these filters. <button type="button">Clear filters</button></p>
+<!-- /journal:grid -->
+      </section>
+
+      <section class="jsection" aria-labelledby="jp">
+        <h2 id="jp">How the journal is written</h2>
+        <p>Three rules every article follows.</p>
+        <ol class="jlist">
+          <li><span class="jlist-n">01</span><div><b>Systems over symptoms</b><p>When problems recur, look past the event to the system conditions that made it possible. Durable improvement comes from redesigning systems, not from blaming people.</p></div></li>
+          <li><span class="jlist-n">02</span><div><b>Evidence over intuition</b><p>Every claim is grounded in operational data, safety-science literature or a documented case. What is known is kept apart from what is assumed.</p></div></li>
+          <li><span class="jlist-n">03</span><div><b>Practice over theory</b><p>The articles come from live operations: real constraints, real decisions, real consequences. Theory informs practice; practice validates theory.</p></div></li>
+        </ol>
+      </section>
+
+      <section class="jsection" aria-labelledby="jf">
+        <h2 id="jf">The operational excellence framework</h2>
+        <p>Four pillars that connect every article in this journal.</p>
+        <ol class="jlist">
+          <li><span class="jlist-n">I</span><div><b>Human factors</b><p>Cognitive load, attention and human-system interaction.</p></div></li>
+          <li><span class="jlist-n">II</span><div><b>System design</b><p>Workflows, governance and control structures.</p></div></li>
+          <li><span class="jlist-n">III</span><div><b>Risk management</b><p>Technical debt, latent conditions and drift.</p></div></li>
+          <li><span class="jlist-n">IV</span><div><b>Organizational learning</b><p>Root-cause analysis, feedback loops and continuous improvement.</p></div></li>
+        </ol>
+      </section>
     </div>
-
-    <!-- Hero Section -->
-    <section class="articles-hero">
-        <div class="container">
-            <h1>Operations Engineering Journal</h1>
-            <p>An independent educational journal exploring reliability, resilience, and human factors in data center operations — built from publicly available research, published standards, and personal study as a knowledge-sharing hobby project. Not affiliated with or representing any company.</p>
-        </div>
-    </section>
-
-    <section class="legal-disclaimer-wrap" aria-label="Legal Disclaimer">
-        <div class="legal-disclaimer">
-            <p class="legal-disclaimer-title"><span aria-hidden="true">&#9888;</span> Legal Notice</p>
-            <p>All articles and technical content on ResistanceZero are independent personal research based on publicly available standards, references, and field study. They do not represent any current or former employer.</p>
-            <p>This site is provided for educational and informational use only, not as legal, financial, investment, procurement, safety, or engineering advice. Always validate decisions with qualified professionals and current local regulations.</p>
-            <p>Use of this site is subject to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</p>
-        </div>
-    </section>
-
-    <!-- DC Incidents case library (root-gated feature) -->
-    <div class="incidents-feature">
-        <a href="dc-incidents.html" title="Root-only — post-incident case library">
-            <div>
-                <div class="if-eyebrow"><span class="if-lock">🔒 ROOT</span> Post-incident case library</div>
-                <div class="if-title">Data-Center Incidents — Case Library</div>
-                <p class="if-blurb">Governed dossiers of the biggest data-center &amp; cloud failures — ranked by magnitude, each with a full sequence of events, root-cause analysis, correction-of-errors, lessons learnt and cited evidence.</p>
-                <div class="if-count"><!--INC_COUNT-->43 major incidents catalogued · 30 with official post-mortems<!--/INC_COUNT--></div>
-            </div>
-            <span class="if-cta">View library →</span>
-        </a>
-    </div>
-
-    <!-- Articles Section -->
-    <section class="articles-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Published Articles</h2>
-            </div>
-
-            <div class="articles-grid">
-                <!-- Article 27 (DC Workforce Crisis) -->
-                <a href="article-28.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #0b1f2a 0%, #0e7490 50%, #6FBF9A 100%);">
-                        <img loading="lazy" src="assets/article-28-hero.webp" alt="Information compression and compute density visualization" onerror="this.style.display='none'" width="1200" height="509">
-                        <span class="article-card-number">NEW</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(14, 116, 144, 0.12); color: #0e7490;">Future Forward</span>
-                        <h3 class="article-card-title">The Compression Horizon: How Close Can a Laptop Get to a Datacenter's Mind?</h3>
-                        <p class="article-card-excerpt">Can 300 TB of data become 1 KB, or a laptop match a 1 GW datacenter? The hard physics (Shannon, Kolmogorov, Landauer), the real frontier closing the gap, and the pipeline that turns a default local AI into a domain genius.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Jul 22, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="article-27.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 50%, #ef4444 100%);">
-                        <img loading="lazy" src="assets/article-27-hero.webp" alt="Data center operations team — AI workforce crisis solutions" onerror="this.style.display='none'" width="1200" height="509">
-                        <span class="article-card-number">27</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(220, 38, 38, 0.1); color: #b91c1c;">Global Analysis</span>
-                        <h3 class="article-card-title">No Humans, No Data Centers: 20 Strategies to Solve the AI Workforce Crisis</h3>
-                        <p class="article-card-excerpt">467,000 positions unfilled. 70% of operators struggling. Every strategy the DC industry is using to fight the AI workforce crisis — with a free cost modeler and Gantt planner.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Apr 12, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 26 (PFAS Forever Chemicals) -->
-                <a href="article-26.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 50%, #ef4444 100%);">
-                        <img loading="lazy" src="assets/article-26-hero.webp" alt="PFAS forever chemicals in data center cooling systems — aerial view" onerror="this.style.display='none'" width="1200" height="509">
-                        <span class="article-card-number">26</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(220, 38, 38, 0.1); color: #b91c1c;">Global Analysis</span>
-                        <h3 class="article-card-title">The Invisible Leak: What Happens When You Open a Two-Phase Cooling System</h3>
-                        <p class="article-card-excerpt">Maintenance vapor release releases 20–30× more PFAS than sealed-system leaks — and zero federal reporting is required. An engineer's inside view.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Apr 11, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 25 (PJM Grid Crisis) -->
-                <a href="article-25.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 50%, #ef4444 100%);">
-                        <img loading="lazy" src="assets/article-25-hero.webp" alt="PJM Grid Crisis: 65 Million People at Risk" onerror="this.style.display='none'" width="1200" height="654">
-                        <span class="article-card-number">25</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(185, 28, 28, 0.1); color: #b91c1c;">Energy &amp; Policy</span>
-                        <h3 class="article-card-title">PJM Is 6 GW Short by 2027. 65 Million People Are in the Blast Zone.</h3>
-                        <p class="article-card-excerpt">The largest power grid in North America is running out of capacity — and data centers are consuming 40% of the growth.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Mar 29, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 24 (DC Careers) -->
-                <a href="article-24.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #34d399 100%);">
-                        <img loading="lazy" src="assets/article-24-hero.webp" alt="Data Center Manpower Shortage: The Most In-Demand Job in AI" onerror="this.style.display='none'" width="1200" height="654">
-                        <span class="article-card-number">24</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(5, 150, 105, 0.1); color: #047857;">Career Analysis</span>
-                        <h3 class="article-card-title">Data Center Manpower Shortage: The Most In-Demand Job in AI</h3>
-                        <p class="article-card-excerpt">HVAC engineers, electricians, and robotic technicians — the hidden six-figure careers powering the AI revolution.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Mar 29, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 16 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 23 (xAI Colossus) -->
-                <a href="article-23.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
-                        <img loading="lazy" src="assets/article-23-hero.webp" alt="From Empty Field to 150 MW in 122 Days: What Really Happened at xAI Colossus" onerror="this.style.display='none'" width="1200" height="654">
-                        <span class="article-card-number">23</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(8, 145, 178, 0.1); color: #0e7490;">Engineering Analysis</span>
-                        <h3 class="article-card-title">From Empty Field to 150 MW in 122 Days: What Really Happened at xAI Colossus</h3>
-                        <p class="article-card-excerpt">An engineer's analysis of the fastest supercomputer build in history — 100,000 GPUs in 122 days — and what it cost Memphis.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Mar 29, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 22 (NVIDIA Photonics) -->
-                <a href="article-22.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #083344 0%, #155e75 50%, #0891b2 100%);">
-                        <img loading="lazy" src="assets/article-22-hero.webp" alt="NVIDIA's $4 Billion Photonics Play: Why the Future of AI Runs on Light" onerror="this.style.display='none'" width="1200" height="675">
-                        <span class="article-card-number">22</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(8, 145, 178, 0.1); color: #0e7490;">Engineering Analysis</span>
-                        <h3 class="article-card-title">NVIDIA's $4 Billion Photonics Play: Why the Future of AI Runs on Light</h3>
-                        <p class="article-card-excerpt">NVIDIA invested $2B in Lumentum and $2B in Coherent for silicon photonics and co-packaged optics. Engineering analysis of CPO, ELS, and why AI factories need optical interconnects.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Mar 22, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 32 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 21 (Nuclear SMR for AI) -->
-                <a href="article-21.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #022c22 0%, #064e3b 50%, #059669 100%);">
-                        <img loading="lazy" src="assets/article-21-hero.webp" alt="Nuclear SMRs for AI: The $10 Billion Bet on Atomic-Powered Data Centers" onerror="this.style.display='none'" width="1200" height="509">
-                        <span class="article-card-number">21</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(5, 150, 105, 0.1); color: #047857;">Engineering Analysis</span>
-                        <h3 class="article-card-title">Nuclear SMRs for AI: The $10 Billion Bet on Atomic-Powered Data Centers</h3>
-                        <p class="article-card-excerpt">Microsoft, Amazon, Google, Meta, and Oracle are racing to secure nuclear power for AI. Technology comparison, cost analysis, and engineering timeline assessment.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Mar 22, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 28 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 20 (Sam Altman Water Fact-Check) -->
-                <a href="article-20.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #1c1917 0%, #450a0a 50%, #dc2626 100%);">
-                        <img loading="lazy" src="assets/article-20-hero.webp" alt="Sam Altman Says AI Water Concerns Are Fake — The Data Says Otherwise" onerror="this.style.display='none'" width="1200" height="509">
-                        <span class="article-card-number">20</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(220, 38, 38, 0.1); color: #b91c1c;">Fact-Check</span>
-                        <h3 class="article-card-title">Sam Altman Says AI Water Concerns Are "Fake" — The Data Says Otherwise</h3>
-                        <p class="article-card-excerpt">A data center engineer fact-checks Sam Altman's claim. 17 billion gallons in 2023, 68 billion projected by 2028. Peer-reviewed research vs CEO talking points.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Mar 21, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 19 (Singapore vs Batam) -->
-                <a href="article-19.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #042f2e 0%, #134e4a 50%, #0891b2 100%);">
-                        <picture><source srcset="assets/article-19-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-19-cover.png" alt="Singapore vs Batam Data Centers: Why Cost Alone Doesn't Win" onerror="this.style.display='none'" width="1200" height="509"></picture>
-                        <span class="article-card-number">19</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(8, 145, 178, 0.1); color: #0e7490;">Site Selection</span>
-                        <h3 class="article-card-title">Singapore vs Batam Data Centers: Why Cost Alone Doesn't Win</h3>
-                        <p class="article-card-excerpt">20 km apart, 2-3x cost difference. Decision matrix for when to choose Singapore, Batam, or the dual-site corridor model. Objective use-case analysis.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Mar 8, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 8 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 18 (AI Factories) -->
-                <a href="article-18.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #0c1929 0%, #1e3a8a 50%, #2563eb 100%);">
-                        <picture><source srcset="assets/article-18-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-18-cover.png" alt="AI Factories: Why Traditional Data Center Architecture Faces Technical Extinction" onerror="this.style.display='none'" width="1344" height="768"></picture>
-                        <span class="article-card-number">18</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(59, 130, 246, 0.1); color: #1d4ed8;">AI Infrastructure</span>
-                        <h3 class="article-card-title">AI Factories: Why Traditional Data Center Architecture Faces Technical Extinction</h3>
-                        <p class="article-card-excerpt">130kW rack density, liquid cooling revolution, $600B+ hyperscaler CAPEX, Ultra Ethernet vs InfiniBand, stranded asset risk. Interactive AI Factory Readiness Calculator inside.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Feb 22, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 17 (Strategic Opportunity Analysis) -->
-                <a href="article-17.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%);">
-                        <picture><source srcset="assets/article-17-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-17-cover.jpg" alt="The $37 Billion Opportunity: SEA DC Strategic Analysis" onerror="this.style.display='none'" width="1200" height="669"></picture>
-                        <span class="article-card-number">17</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(5, 150, 105, 0.1); color: #047857;">Strategic Analysis</span>
-                        <h3 class="article-card-title">The $37 Billion Opportunity: Why SEA's Data Center Surge Will Define the Next Digital Decade</h3>
-                        <p class="article-card-excerpt">Beyond the bubble narrative: Jevons Paradox, $602B rational hyperscaler capex, $1T digital economy, sovereign AI mandates across 6 nations. Interactive Opportunity Value Calculator inside.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Feb 14, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 32 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 16 (SEA DC Bubble Analysis) -->
-                <a href="article-16.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #1a0f00 0%, #451a03 50%, #92400e 100%);">
-                        <picture><source srcset="assets/article-16-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-16-cover.jpg" alt="The Great SEA Data Center Bubble Analysis" onerror="this.style.display='none'" width="1200" height="669"></picture>
-                        <span class="article-card-number">NEW</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(217, 119, 6, 0.1); color: #92400e;">Industry Analysis</span>
-                        <h3 class="article-card-title">The Great SEA Data Center Bubble: When $37 Billion Bets on a Promise</h3>
-                        <p class="article-card-excerpt">6,068 MW pipeline. Johor's 5.8 GW gamble. Indonesia at 1,717 MW. Is Southeast Asia building the infrastructure of the future — or repeating the telecom crash of 2001? Interactive bubble risk calculator inside.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Feb 14, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 15 (Service Catalog & Revenue Calculator) -->
-                <a href="article-15.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #0b1a2e 0%, #1e3a5f 50%, #2d5a87 100%);">
-                        <picture><source srcset="assets/article-15-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-15-cover.jpg" alt="Data Center Service Catalog — 135 services by revenue tier" onerror="this.style.display='none'" width="800" height="1433"></picture>
-                        <span class="article-card-number">15</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(245, 158, 11, 0.1); color: #92400e;">Revenue & Strategy</span>
-                        <h3 class="article-card-title">Data Center Service Catalog: 135 Services by Revenue Tier</h3>
-                        <p class="article-card-excerpt">135 DC services across 11 categories with regional pricing for Americas, Europe, SEA, and Australia. Interactive revenue calculator included.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Feb 14, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 35 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 14 - The $64 Billion Rebellion -->
-                <a href="article-14.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #1a0000 0%, #450a0a 50%, #991b1b 100%);">
-                        <picture><source srcset="assets/article-14-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-14-cover.jpg" alt="The $64 Billion Rebellion - Communities vs Data Centers" onerror="this.style.display='none'" width="800" height="1433"></picture>
-                        <span class="article-card-number">14</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(220, 38, 38, 0.1); color: #b91c1c;">Community & Policy</span>
-                        <h3 class="article-card-title">The $64 Billion Rebellion: Why Communities Worldwide Are Fighting Data Centers</h3>
-                        <p class="article-card-excerpt">$64B in projects contested globally. From Virginia to Johor — multi-perspective analysis with interactive Community Impact Scorecard calculator.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Feb 14, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 26 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 13 (Power Distribution Deep Dive) -->
-                <a href="article-13.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #0b1220 0%, #1e3a5f 100%);">
-                        <picture><source srcset="assets/article-13-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-13-cover.jpg" alt="Data Center Power Distribution Design" onerror="this.style.display='none'" width="1024" height="1024"></picture>
-                        <span class="article-card-number">13</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(245, 158, 11, 0.1); color: #92400e;">Technical Paper</span>
-                        <h3 class="article-card-title">Data Center Power Distribution Design: Hyperscaler Architecture Deep Dive</h3>
-                        <p class="article-card-excerpt">15,000+ word analysis of AWS, Google, Microsoft, xAI, and Anthropic power systems. 48V/380V/800V DC, failure scenarios, and reliability engineering.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Feb 8, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 31 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 12 - Devil's Advocate -->
-                <a href="article-12.html" class="article-card">
-                    <div class="article-card-image" style="background: linear-gradient(135deg, #022c22 0%, #064e3b 100%);">
-                        <picture><source srcset="assets/article-12-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-12-cover.jpg" alt="Data Centers Funding Grid Future" onerror="this.style.display='none'" width="1535" height="1303"></picture>
-                        <span class="article-card-number">12</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(16, 185, 129, 0.1); color: #047857;">Energy & Grid Economics</span>
-                        <h3 class="article-card-title">The Uncomfortable Truth: How AI Data Centers Are Secretly Funding Your Grid's Future</h3>
-                        <p class="article-card-excerpt">$100B+ renewable investment, $33,500/MW grid surplus value, 80-95% load factor economics. Economic value simulator included.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Feb 8, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 24 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 11 -->
-                <a href="article-11.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-11-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-11-cover.jpg" alt="AI Data Center Electricity Bills" width="1200" height="630"></picture>
-                        <span class="article-card-number">11</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(220, 38, 38, 0.1); color: #b91c1c;">Energy & Policy</span>
-                        <h3 class="article-card-title">AI Data Centers vs Citizen Electricity Bills: Who Really Pays?</h3>
-                        <p class="article-card-excerpt">Comprehensive SEA analysis with interactive impact calculator. One AI data center = 100,000 households.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Feb 8, 2026
-                            </span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 15 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 10 -->
-                <a href="article-10.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-10-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-10-cover.jpg" alt="Water Stress Data Centers" width="600" height="1075"></picture>
-                        <span class="article-card-number">10</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(6, 182, 212, 0.1); color: #0e7490;">Sustainability</span>
-                        <h3 class="article-card-title">Water Stress and AI Data Centers: The Hidden Crisis in Southeast Asia</h3>
-                        <p class="article-card-excerpt">58% of data centers operate in water-stressed regions. Interactive water stress analysis and consumption calculator.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">Feb 8, 2026</span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 16 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 9 -->
-                <a href="article-9.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-9-cover_.webp" type="image/webp"><img loading="lazy" src="assets/article-9-cover_.jpg" alt="HVAC Data Center Cooling" width="1600" height="893"></picture>
-                        <span class="article-card-number">09</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category" style="background: rgba(59, 130, 246, 0.1); color: #1d4ed8;">Critical Infrastructure</span>
-                        <h3 class="article-card-title">The HVAC Shock: "No Chillers" Doesn't Mean "No Cooling"</h3>
-                        <p class="article-card-excerpt">Nvidia's Rubin sent HVAC stocks tumbling. Tropical climate implementation guide and fault scenario analysis.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">Feb 7, 2026</span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 10 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 8 -->
-                <a href="article-8.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-8-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-8-cover.jpg" alt="No Incident Not Safety" width="1600" height="893"></picture>
-                        <span class="article-card-number">08</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category cat-safety">Safety Science</span>
-                        <h3 class="article-card-title">Why "No Incident" Is Not Evidence of Safety</h3>
-                        <p class="article-card-excerpt">Safety lives in signals that precede failure, not absence of visible harm. Weak signals accumulate silently.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">Nov 2, 2025</span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 30 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 7 -->
-                <a href="article-7.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-7-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-7-cover.jpg" alt="Reliability to Resilience" width="1600" height="893"></picture>
-                        <span class="article-card-number">07</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category cat-resilience">Resilience Engineering</span>
-                        <h3 class="article-card-title">From Reliability to Resilience: Why Tier Ratings Stop at Design</h3>
-                        <p class="article-card-excerpt">Tier ratings describe what systems can survive, not how organizations respond. Resilience is operational.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">Nov 9, 2025</span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 35 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 6 -->
-                <a href="article-6.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-6-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-6-cover.jpg" alt="RCA Design Authority" width="1600" height="893"></picture>
-                        <span class="article-card-number">06</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category cat-learning">Incident Learning</span>
-                        <h3 class="article-card-title">Why Post-Incident RCA Fails Without Design Authority</h3>
-                        <p class="article-card-excerpt">When RCA cannot modify system architecture or decision boundaries, it becomes reporting ritual.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">Nov 15, 2025</span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 30 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 5 -->
-                <a href="article-5.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-5-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-5-cover.jpg" alt="Technical Debt" width="1600" height="893"></picture>
-                        <span class="article-card-number">05</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category cat-risk">Risk Management</span>
-                        <h3 class="article-card-title">Technical Debt in Live Data Centers Is Operational Risk</h3>
-                        <p class="article-card-excerpt">Temporary fixes and workaround culture silently erode resilience. Debt accrues interest over time.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">Nov 16, 2025</span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 33 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 4 -->
-                <a href="article-4.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-4-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-4-cover.jpg" alt="In-House Capability" width="1600" height="893"></picture>
-                        <span class="article-card-number">04</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category cat-capability">Capability Development</span>
-                        <h3 class="article-card-title">In-House Capability Is a Reliability Strategy</h3>
-                        <p class="article-card-excerpt">Excessive vendor dependency increases latent risk. Decision latency becomes the real failure mode.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">Nov 23, 2025</span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 34 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 3 -->
-                <a href="article-3.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-3-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-3-cover.jpg" alt="Maintenance Compliance" width="1600" height="873"></picture>
-                        <span class="article-card-number">03</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category cat-asset">Asset Management</span>
-                        <h3 class="article-card-title">Maintenance Compliance Is Not a Technician Problem</h3>
-                        <p class="article-card-excerpt">Compliance is an emergent property of workflow engineering and asset governance — not individual discipline.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">Nov 30, 2025</span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 32 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 2 -->
-                <a href="article-2.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-2-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-2-cover.jpg" alt="Alarm Management" width="1600" height="893"></picture>
-                        <span class="article-card-number">02</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category cat-alarm">Alarm Management</span>
-                        <h3 class="article-card-title">Alarm Fatigue Is Not a Human Problem</h3>
-                        <p class="article-card-excerpt">Alarm fatigue misattributed to negligence. In mission-critical environments, this interpretation is dangerous.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">Dec 7, 2025</span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 16 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Article 1 -->
-                <a href="article-1.html" class="article-card">
-                    <div class="article-card-image">
-                        <picture><source srcset="assets/article-1-cover.webp" type="image/webp"><img loading="lazy" src="assets/article-1-cover.jpg" alt="Data Center Operations" width="1600" height="893"></picture>
-                        <span class="article-card-number">01</span>
-                    </div>
-                    <div class="article-card-content">
-                        <span class="article-card-category cat-operations">Operations</span>
-                        <h3 class="article-card-title">When Nothing Happens, Engineering Is Working</h3>
-                        <p class="article-card-excerpt">In critical infrastructure, success is the absence of events. The work required to make that absence possible.</p>
-                        <div class="article-card-meta">
-                            <span class="article-card-date">Dec 6, 2025</span>
-                            <span class="article-card-readtime"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 34 min</span>
-                            <span class="article-card-link">Read <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Philosophy Section -->
-    <section class="philosophy-section">
-        <div class="container">
-            <div class="philosophy-grid">
-                <div class="philosophy-card">
-                    <h3><span>1</span> Systems Over Symptoms</h3>
-                    <p>When problems recur, we look beyond individual events to the system conditions that made them possible. Sustainable improvement comes from redesigning systems, not blaming people.</p>
-                </div>
-                <div class="philosophy-card">
-                    <h3><span>2</span> Evidence Over Intuition</h3>
-                    <p>Every claim is grounded in operational data, safety science literature, or documented case patterns. We distinguish what we know from what we assume.</p>
-                </div>
-                <div class="philosophy-card">
-                    <h3><span>3</span> Practice Over Theory</h3>
-                    <p>These articles emerge from live operations—real constraints, real decisions, real consequences. Theory informs practice; practice validates theory.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Framework Section -->
-    <section class="framework-section">
-        <div class="container">
-            <h2 class="framework-title">The Operational Excellence Framework</h2>
-            <p class="framework-subtitle">Four pillars that connect all articles in this journal</p>
-            <div class="framework-grid">
-                <div class="framework-item">
-                    <div class="num">I</div>
-                    <div class="label">Human Factors</div>
-                    <div class="desc">Cognitive load, attention, and human-system interaction</div>
-                </div>
-                <div class="framework-item">
-                    <div class="num">II</div>
-                    <div class="label">System Design</div>
-                    <div class="desc">Workflows, governance, and control structures</div>
-                </div>
-                <div class="framework-item">
-                    <div class="num">III</div>
-                    <div class="label">Risk Management</div>
-                    <div class="desc">Technical debt, latent conditions, and drift</div>
-                </div>
-                <div class="framework-item">
-                    <div class="num">IV</div>
-                    <div class="label">Organizational Learning</div>
-                    <div class="desc">RCA, feedback loops, and continuous improvement</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     </main>
+
     <footer class="footer footer-enhanced">
         <div class="container">
             <div class="footer-grid">
@@ -1815,172 +604,14 @@
         </div>
     </footer>
 
-
-    <script src="script.min.js?v=20260920-0e1dd953"></script>
-
-    <!-- Latest Updates Ticker Script -->
-    <script>
-    (function() {
-        const latestPosts = [
-            { type: 'article', title: 'The Invisible Leak: PFAS in Data Centers — What Maintenance Releases vs. What\'s Measured', url: 'article-26.html', date: '11 Apr 2026' },
-            { type: 'article', title: 'PJM Is 6 GW Short by 2027. 65 Million People Are in the Blast Zone.', url: 'article-25.html', date: '29 Mar 2026' },
-            { type: 'article', title: 'Nuclear SMRs for AI: The $10B Bet on Atomic Data Centers', url: 'article-21.html', date: '22 Mar 2026' },
-            { type: 'article', title: 'Sam Altman Says AI Water Concerns Are "Fake" — The Data Says Otherwise', url: 'article-20.html', date: '21 Mar 2026' },
-            { type: 'article', title: 'Singapore vs Batam Data Centers: Why Cost Alone Doesn\'t Win', url: 'article-19.html', date: '08 Mar 2026' },
-            { type: 'article', title: 'AI Factories: Why Traditional DC Architecture Faces Technical Extinction', url: 'article-18.html', date: '22 Feb 2026' },
-            { type: 'article', title: 'The $37B Opportunity: Why SEA\'s DC Surge Will Define the Next Digital Decade', url: 'article-17.html', date: '14 Feb 2026' },
-            { type: 'article', title: 'The Great SEA Data Center Bubble: When $37 Billion Bets on a Promise', url: 'article-16.html', date: '14 Feb 2026' },
-            { type: 'article', title: 'DC Service Catalog: 135 Services by Revenue Tier — Interactive Calculator', url: 'article-15.html', date: '14 Feb 2026' },
-            { type: 'article', title: 'The $64 Billion Rebellion: Why Communities Worldwide Are Fighting Data Centers', url: 'article-14.html', date: '14 Feb 2026' }
-        ];
-        const tickerContent = document.getElementById('tickerContent');
-        if (!tickerContent) return;
-        function generateTickerItems() {
-            return latestPosts.map(post => `
-                <a href="${post.url}" class="ticker-item">
-                    <span class="ticker-item-title">${post.title}</span>
-                    <span class="ticker-item-date">${post.date}</span>
-                </a>
-            `).join('');
-        }
-        const items = generateTickerItems();
-        tickerContent.innerHTML = items + items;
-        setTimeout(() => {
-            const contentWidth = tickerContent.scrollWidth / 2;
-            const duration = Math.max(20, contentWidth / 50);
-            tickerContent.style.animationDuration = duration + 's';
-        }, 100);
-    })();
-    </script>
-<script src="auth.js?v=20261012-8db3d360" defer></script>
-<script src="rz-engine.min.js?v=20260922-a7d3acc6" defer></script>
-<script src="rz-tracker.js" defer></script>
-
-<!-- Full-Page Particle System (Green) -->
-<script>
-(function(){
-    var cv=document.getElementById('articles-particles');
-    if(!cv)return;
-    var ctx=cv.getContext('2d',{alpha:true,desynchronized:true});
-    var W,H,dpr,particles=[],mouse={x:-9999,y:-9999},raf;
-    var COUNT=30,CONNECT_DIST=150,MOUSE_R=110,FRICTION=0.97;
-
-    var FILL=['rgba(16,185,129,0.40)','rgba(5,150,105,0.35)','rgba(34,197,94,0.30)','rgba(4,120,87,0.25)','rgba(52,211,153,0.30)'];
-    var LINE='rgba(16,185,129,0.12)';
-
-    function resize(){
-        dpr=window.devicePixelRatio||1;
-        W=window.innerWidth;H=window.innerHeight;
-        cv.width=W*dpr;cv.height=H*dpr;
-        ctx.setTransform(1,0,0,1,0,0);
-        ctx.scale(dpr,dpr);
-    }
-
-    function Particle(i){this.i=i;this.init(true)}
-    Particle.prototype.init=function(scatter){
-        this.x=Math.random()*W;
-        this.y=scatter?Math.random()*H:H+30;
-        this.r=Math.random()*3.5+2.5;
-        this.vx=(Math.random()-0.5)*0.5;
-        this.vy=(Math.random()-0.5)*0.3;
-        this.depth=Math.random()*0.5+0.5;
-        this.color=FILL[Math.floor(Math.random()*FILL.length)];
-    };
-    Particle.prototype.update=function(){
-        this.vy-=0.002*this.depth;
-        this.x+=this.vx*this.depth;
-        this.y+=this.vy*this.depth;
-        var dx=this.x-mouse.x,dy=this.y-mouse.y;
-        var dist=Math.sqrt(dx*dx+dy*dy);
-        if(dist<MOUSE_R&&dist>0){
-            var force=(MOUSE_R-dist)/MOUSE_R*1.0;
-            var angle=Math.atan2(dy,dx);
-            this.vx+=Math.cos(angle)*force*0.25;
-            this.vy+=Math.sin(angle)*force*0.25;
-        }
-        this.vx*=FRICTION;this.vy*=FRICTION;
-        if(this.x<-20)this.x=W+20;
-        if(this.x>W+20)this.x=-20;
-        if(this.y<-30){this.y=H+20;this.x=Math.random()*W;}
-        if(this.y>H+30){this.y=-20;this.x=Math.random()*W;}
-    };
-    Particle.prototype.draw=function(){
-        ctx.beginPath();
-        ctx.arc(this.x,this.y,this.r*this.depth,0,Math.PI*2);
-        ctx.fillStyle=this.color;
-        ctx.fill();
-    };
-
-    function drawConnections(){
-        ctx.strokeStyle=LINE;
-        ctx.lineWidth=0.7;
-        for(var i=0;i<particles.length;i++){
-            for(var j=i+1;j<particles.length;j++){
-                var dx=particles[i].x-particles[j].x;
-                var dy=particles[i].y-particles[j].y;
-                var dist=Math.sqrt(dx*dx+dy*dy);
-                if(dist<CONNECT_DIST){
-                    ctx.globalAlpha=(1-dist/CONNECT_DIST)*0.5;
-                    ctx.beginPath();
-                    ctx.moveTo(particles[i].x,particles[i].y);
-                    ctx.lineTo(particles[j].x,particles[j].y);
-                    ctx.stroke();
-                }
-            }
-        }
-        ctx.globalAlpha=1;
-    }
-
-    function animate(){
-        ctx.clearRect(0,0,W,H);
-        for(var i=0;i<particles.length;i++){
-            particles[i].update();
-            particles[i].draw();
-        }
-        drawConnections();
-        raf=requestAnimationFrame(animate);
-    }
-
-    function isVisible(){return cv.offsetWidth>0&&cv.offsetHeight>0}
-
-    function init(){
-        if(!isVisible())return;
-        resize();
-        particles=[];
-        for(var i=0;i<COUNT;i++) particles.push(new Particle(i));
-        if(raf) cancelAnimationFrame(raf);
-        animate();
-    }
-
-    window.addEventListener('resize',function(){resize()});
-    document.addEventListener('mousemove',function(e){
-        mouse.x=e.clientX;mouse.y=e.clientY;
-    });
-    document.addEventListener('touchmove',function(e){
-        mouse.x=e.touches[0].clientX;mouse.y=e.touches[0].clientY;
-    },{passive:true});
-    document.addEventListener('touchend',function(){mouse.x=-9999;mouse.y=-9999});
-
-    document.addEventListener('visibilitychange',function(){
-        if(document.hidden){if(raf){cancelAnimationFrame(raf);raf=null}}
-        else if(!raf&&isVisible()){animate()}
-    });
-
-    init();
-})();
-</script>
-
-
-
-<!-- Scroll to Top -->
 <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
 
-
-
-<!-- Search: shared js/rz-command-palette.js -->
+    <script src="script.min.js?v=20260920-0e1dd953"></script>
+<script src="auth.js?v=20261012-8db3d360" defer></script>
+<script src="rz-engine.min.js?v=20260922-a7d3acc6" defer></script>
+<script src="rz-tracker.js" defer></script>
 <script src="js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
-
 </body>
 </html>

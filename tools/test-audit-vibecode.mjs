@@ -184,12 +184,22 @@ test('§A27–34 gate on the hub family, one rule per tell', () => {
   }
 });
 
-test('§A27–34 are MONITORED, not gating, outside the hub family', () => {
+test('§A27–34 are MONITORED, not gating, outside the hub and journal families', () => {
   for (const [rule, css] of Object.entries(TELLS)) {
-    const result = scan(css, { file: 'article-99.html' });
+    const result = scan(css, { file: 'tco-calculator.html' });
     assert.equal(result.status, 0, rule);
     const hit = result.report.findings.find(finding => finding.rule === rule);
-    assert.ok(hit && hit.monitor, `${rule} must be monitored on a page outside the hub family`);
+    assert.ok(hit && hit.monitor, `${rule} must be monitored on a page outside the strict families`);
+  }
+});
+
+test('§A27–34 GATE on the journal family (v3.23.0: articles hub, series landings, every editorial page)', () => {
+  for (const [rule, css] of Object.entries(TELLS)) {
+    for (const file of ['article-99.html', 'articles.html', 'FF-9.html', 'css/rz-article-dark.css']) {
+      const result = scan(css, { file });
+      const hit = result.report.findings.find(finding => finding.rule === rule);
+      assert.ok(hit && !hit.monitor && result.status === 1, `${rule} must gate on ${file}`);
+    }
   }
 });
 

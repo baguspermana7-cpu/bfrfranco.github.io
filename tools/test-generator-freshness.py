@@ -59,6 +59,8 @@ BUILDERS = [
     ("search-sections.json", ["python3", "tools/build-search-sections.py", "--check"]),
     ("rz-explain-db.js + search-terms.json", ["python3", "tools/build-explain-db.py", "--check"]),
     ("Search Console indexing list", ["python3", "tools/build-indexing-list.py", "--check"]),
+    ("data/journal.json + journal grids", ["python3", "tools/build-journal.py", "--check"]),
+    ("journal register sweep (article CSS)", ["python3", "tools/sweep-journal-register.py", "--check"]),
 ]
 
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-rz-register="editorial" style="--rz-art-accent:#E8B563;--rz-art-accent2:#6FBF9A;">
+<html lang="en" data-rz-register="editorial">
 <head>
     <!-- Google tag (gtag.js) -->
     <!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
@@ -82,8 +82,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- v1.43.12 editorial register (RZ Dark System v1) — dark-only, scoped. -->
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261012-9a70d791">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261016-f6e588a9">
     <script src="js/rz-explain-db.js?v=20260922-cc23355f" defer></script>
 <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
 <script src="js/rz-article-editorial.js?v=20260920-10bc5a1a" defer></script>
@@ -195,22 +195,20 @@
             --accent-cyan: #06b6d4;
             --accent-amber: #f59e0b;
             --accent-red: #ef4444;
-            --bg-dark: #0f172a;
+            --bg-dark: var(--rz-art-bg);
             --bg-light: #f8fafc;
             --text-primary: #1e293b;
-            --text-secondary: #64748b;
-        }
+            --text-secondary: #64748b;}
 
         [data-theme="dark"] {
-            --bg-light: #1e293b;
+            --bg-light: var(--rz-art-panel);
             --text-primary: #e2e8f0;
-            --text-secondary: #94a3b8;
-        }
+            --text-secondary: #94a3b8;}
 
-        [data-theme="dark"] .article-content { background: #0f172a; }
-        [data-theme="dark"] .toc-section { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        [data-theme="dark"] .article-content { background: var(--rz-art-bg);}
+        [data-theme="dark"] .toc-section { background: var(--rz-art-bg);}
         [data-theme="dark"] .toc-item { background: rgba(255,255,255,0.05); color: #e2e8f0; }
-        [data-theme="dark"] .data-table thead { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        [data-theme="dark"] .data-table thead { background: var(--rz-art-bg);}
         [data-theme="dark"] .data-table td { border-bottom-color: rgba(255,255,255,0.1); }
         [data-theme="dark"] .data-table tbody tr:hover { background: rgba(255,255,255,0.05); }
         [data-theme="dark"] .info-box { background: transparent; }
@@ -241,13 +239,12 @@
 
         /* Hero Section */
         .article-hero {
-            background: linear-gradient(135deg, #0b1220 0%, #064e3b 50%, #0f172a 100%);
+            background: #0E0F12;
             padding: 7rem 2rem 3.5rem;
             color: #fff;
             text-align: center;
             position: relative;
-            overflow: hidden;
-        }
+            overflow: hidden;}
 
         .article-hero::before {
             content: '';
@@ -346,10 +343,9 @@
             padding: 0.75rem 1rem;
             border-radius: 4px;
             border-left: 2px solid var(--accent-emerald);
-            transition: all 0.2s ease;
+            transition: color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),background-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),border-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),opacity var(--rz-dur-tip,160ms) var(--rz-ease-out,ease);
             text-decoration: none;
-            color: var(--text-primary);
-        }
+            color: var(--text-primary);}
 
         .toc-item:hover {
             transform: translateX(4px);
@@ -465,7 +461,7 @@
             bottom: 130%;
             left: 50%;
             transform: translateX(-50%);
-            background: #1e293b;
+            background: #121316;
             color: #e2e8f0;
             padding: 0.5rem 0.75rem;
             border-radius: 8px;
@@ -478,8 +474,7 @@
             z-index: 100;
             max-width: 300px;
             white-space: normal;
-            line-height: 1.4;
-        }
+            line-height: 1.4;}
 
         .tooltip:hover::after { opacity: 1; }
 
@@ -618,11 +613,11 @@
 
         /* Interactive Chart Container */
         .chart-container {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #CFD3DA;
+            background: #0E0F12;
             border-radius: 16px;
             padding: 2rem;
-            margin: 2rem 0;
-        }
+            margin: 2rem 0;}
 
         .chart-title {
             text-align: center;
@@ -640,11 +635,11 @@
         }
 
         .chart-wrapper {
-            background: rgba(2, 6, 23, 0.5);
+            color: #CFD3DA;
+            background: #0E0F12;
             border-radius: 12px;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
+            margin-bottom: 1.5rem;}
 
         .chart-canvas { width: 100%; height: auto; display: block; }
 
@@ -714,7 +709,7 @@
             border: 1px solid rgba(16, 185, 129, 0.15);
         }
 
-        .callout-label { color: #64748b; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .callout-label { color: #9aa3ad; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;}
         [data-theme="dark"] .callout-label { color: #94a3b8; }
         .callout-value { font-size: 1.5rem; font-weight: 800; color: var(--accent-emerald-light); }
         html:not([data-theme="dark"]) .callout-value { color: #047857; }
@@ -728,12 +723,11 @@
 
         /* Calculator Section */
         .calculator-section {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: #0E0F12;
             padding: 3rem 2rem;
             border-radius: 20px;
             margin: 3rem 0;
-            color: #fff;
-        }
+            color: #fff;}
 
         .calculator-title {
             font-size: 1.5rem;
@@ -767,11 +761,10 @@
             color: #fff;
             font-size: 0.95rem;
             font-weight: 600;
-            transition: all 0.2s ease;
-            -webkit-appearance: none;
-        }
+            transition: color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),background-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),border-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),opacity var(--rz-dur-tip,160ms) var(--rz-ease-out,ease);
+            -webkit-appearance: none;}
 
-        .calc-select option { background: #1e293b; color: #fff; }
+        .calc-select option { background: #121316; color: #fff;}
 
         .calc-select:focus, .calc-input:focus {
             outline: none;
@@ -1031,9 +1024,9 @@
 
         /* Evidence Block */
         .evidence-block {
-            background: #0f172a;
-            border-radius: 4px; padding: 2rem; margin: 2rem 0; border: 1px solid rgba(16,185,129,0.2);
-        }
+            color: #CFD3DA;
+            background: #0E0F12;
+            border-radius: 4px; padding: 2rem; margin: 2rem 0; border: 1px solid rgba(16,185,129,0.2);}
         .evidence-block-title {
             color: #6ee7b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
             letter-spacing: 1.5px; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px;
@@ -1056,8 +1049,7 @@
         }
         .res-mode-bar .mode-btn {
             padding: 8px 18px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none;
-            background: transparent; color: #94a3b8; transition: all 0.3s; font-family: inherit;
-        }
+            background: transparent; color: #94a3b8; transition: color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),background-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),border-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),opacity var(--rz-dur-tip,160ms) var(--rz-ease-out,ease); font-family: inherit;}
         .res-mode-bar .mode-btn.active { background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 4px 15px rgba(16,185,129,0.4), 0 0 20px rgba(16,185,129,0.2); border-color: #10b981; font-weight: 700; }
         .res-toolbar-row {
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
@@ -1085,11 +1077,10 @@
         }
         .res-pro-panel .panel-title i { color: #64748b; }
         .res-gate-overlay {
-            position: absolute; inset: 0; background: rgba(15,23,42,0.85); border-radius: 14px;
+            position: absolute; inset: 0; color: #CFD3DA; background: #0E0F12; border-radius: 14px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 0.5rem; z-index: 5; cursor: pointer;
-        }
-        .res-gate-overlay i { font-size: 1.5rem; color: #64748b; }
+            gap: 0.5rem; z-index: 5; cursor: pointer;}
+        .res-gate-overlay i { font-size: 1.5rem; color: #9aa3ad;}
         .res-gate-overlay span { font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
         .res-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; }
         .res-kpi-card {
@@ -1101,7 +1092,7 @@
 
         /* Calculator Input Tooltips */
         .tooltip-trigger { display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(16,185,129,0.15);color:#10b981;font-size:0.65rem;font-weight:700;cursor:help;margin-left:6px;vertical-align:middle;position:relative; }
-        .tooltip-content { display:none;position:fixed;width:280px;background:#1e293b;border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:14px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.4);pointer-events:none; }
+        .tooltip-content { display:none;position:fixed;width:280px;color: #CFD3DA;background: #121316;border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:14px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.4);pointer-events:none;}
         .tooltip-trigger:hover .tooltip-content { display:block; }
         .tooltip-title { font-size:0.82rem;font-weight:700;color:#10b981;margin-bottom:6px; }
         .tooltip-desc { font-size:0.78rem;color:#cbd5e1;line-height:1.5;margin-bottom:8px; }
@@ -1121,36 +1112,33 @@
         .res-narrative strong { color:#e2e8f0; }
 
         /* Dark mode overrides for new elements */
-        [data-theme="dark"] .tooltip-content { background:#0f172a; border-color:rgba(16,185,129,0.4); }
+        [data-theme="dark"] .tooltip-content { background: var(--rz-art-bg); border-color:rgba(16,185,129,0.4);}
         [data-theme="dark"] .res-narrative { color:#cbd5e1; }
 
         /* Login Modal */
         .res-login-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
-            z-index: 9999; align-items: center; justify-content: center;
-        }
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            z-index: 9999; align-items: center; justify-content: center;}
         .res-login-overlay.active { display: flex; }
         .res-login-box {
-            background: #0f172a; border-radius: 16px; padding: 2.5rem; max-width: 380px; width: 90%;
-            border: 1px solid rgba(100, 116, 139,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5); position: relative;
-        }
+            color: #CFD3DA;
+            background: #0E0F12; border-radius: 16px; padding: 2.5rem; max-width: 380px; width: 90%;
+            border: 1px solid rgba(100, 116, 139,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5); position: relative;}
         .res-login-box h3 { color: #e2e8f0; margin: 0 0 0.5rem; font-size: 1.1rem; }
-        .res-login-box p { color: #64748b; font-size: 0.8rem; margin: 0 0 1.5rem; }
+        .res-login-box p { color: #9aa3ad; font-size: 0.8rem; margin: 0 0 1.5rem;}
         .res-login-box input {
-            width: 100%; padding: 0.75rem 1rem; background: #1e293b; border: 1px solid #334155;
-            border-radius: 8px; color: #e2e8f0; font-size: 0.9rem; margin-bottom: 0.75rem; box-sizing: border-box;
-        }
+            width: 100%; padding: 0.75rem 1rem; background: #121316; border: 1px solid #334155;
+            border-radius: 8px; color: #e2e8f0; font-size: 0.9rem; margin-bottom: 0.75rem; box-sizing: border-box;}
         .res-login-box input:focus { outline: none; border-color: #64748b; }
         .res-login-box button.login-submit {
             width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #64748b, #64748b); color: #fff;
             border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem; margin-top: 0.5rem;
         }
-        .res-login-box .demo-hint { font-size: 0.7rem; color: #64748b; margin-top: 0.75rem; text-align: center; }
+        .res-login-box .demo-hint { font-size: 0.7rem; color: #9aa3ad; margin-top: 0.75rem; text-align: center;}
         .res-login-box .demo-hint code { background: rgba(100, 116, 139,0.15); padding: 1px 5px; border-radius: 3px; color: #94a3b8; }
         .res-login-close {
             position: absolute; top: 12px; right: 16px; background: none; border: none;
-            color: #64748b; font-size: 1.2rem; cursor: pointer;
-        }
+            color: #9aa3ad; font-size: 1.2rem; cursor: pointer;}
         [data-theme="light"] .res-login-box { background: #ffffff; border-color: #e2e8f0; }
         [data-theme="light"] .res-login-box h3 { color: #1e293b; }
         [data-theme="light"] .res-login-box p { color: #64748b; }
@@ -1160,7 +1148,7 @@
         .privacy-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.72rem; color: #64748b; margin-top: 0.5rem; padding: 6px 0; }
         .privacy-badge i { color: #10b981; font-size: 0.8rem; }
         .benchmark-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); }
-        .benchmark-meta-tag { font-size: 0.65rem; color: #64748b; background: rgba(255,255,255,0.04); padding: 3px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
+        .benchmark-meta-tag { font-size: 0.65rem; color: #9aa3ad; background: rgba(255,255,255,0.04); padding: 3px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px;}
         .benchmark-meta-tag i { font-size: 0.6rem; }
 
         @media (max-width: 600px) {
@@ -1174,7 +1162,7 @@
 
         @media print {
             .navbar, .share-buttons, .toc-section, .calculator-section, .chart-container { display: none !important; }
-            .article-hero { padding: 2rem; background: #064e3b !important; }
+            .article-hero { padding: 2rem; color: #CFD3DA; background: #064e3b !important;}
             .article-content { padding: 1rem; }
             .article-body { font-size: 11pt; }
         }
@@ -1210,15 +1198,14 @@
             visibility: hidden; opacity: 0;
             position: absolute; bottom: calc(100% + 8px); left: 50%;
             transform: translateX(-50%);
-            background: #1e293b; color: #e2e8f0;
+            background: #121316; color: #e2e8f0;
             padding: 0.7rem 0.9rem; border-radius: 8px;
             font-size: 0.72rem; font-weight: 400; line-height: 1.5;
             width: 260px; z-index: 100;
             box-shadow: 0 8px 25px rgba(0,0,0,0.5);
             border: 1px solid rgba(245,158,11,0.2);
             transition: opacity 0.2s ease; pointer-events: none;
-            text-transform: none; letter-spacing: normal;
-        }
+            text-transform: none; letter-spacing: normal;}
         .res-tip:hover .res-tip-body { visibility: visible; opacity: 1; }
         .res-tip-body .rtt { font-weight: 700; color: #fbbf24; margin-bottom: 3px; font-size: 0.75rem; }
         .res-tip-body .rtd { color: #cbd5e1; }
@@ -1229,7 +1216,7 @@
         }
 </style>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer integrity="sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt" crossorigin="anonymous"></script>
-    <script src="js/rz-version.js?v=20261016-8f741684" defer></script>
+    <script src="js/rz-version.js?v=20261016-f61c022f" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 <style id="rz-mobile-v18">
@@ -1442,7 +1429,7 @@
                 <!-- Section 1: Abstract -->
                 <h2 id="abstract"><span class="section-number">01</span> Abstract</h2>
 
-                <p>Data center reliability has traditionally been defined through design constructs: redundancy levels, fault-tolerant topologies, and tier certification. The Uptime Institute's Tier Standard, first published in the mid-1990s and revised through subsequent editions, provides a globally recognized framework for classifying data center infrastructure based on its design capacity to withstand component failures and permit concurrent maintenance. These classifications have become the lingua franca of the industry, shaping investment decisions, contractual <span class="tooltip" data-tooltip="Service Level Agreement: A commitment between a service provider and a client defining the expected level of service, including uptime guarantees.">SLA</span> structures, and organizational identity.</p>
+                <p>Data center reliability has traditionally been defined through design constructs: redundancy levels, fault-tolerant topologies, and tier certification. The Uptime Institute's Tier Standard, first published in the mid-1990s and revised through subsequent editions, provides a globally recognized framework for classifying data center infrastructure based on its design capacity to withstand component failures and permit concurrent maintenance. These classifications have become the lingua franca of the industry, shaping investment decisions, contractual <span data-rz-dark-panel class="tooltip" data-tooltip="Service Level Agreement: A commitment between a service provider and a client defining the expected level of service, including uptime guarantees.">SLA</span> structures, and organizational identity.</p>
 
                 <p>Yet a persistent paradox undermines the sufficiency of this framework: facilities with identical Tier certifications routinely exhibit dramatically different performance under stress. Two Tier III data centers, both validated against the same topology standard, can respond to the same category of disturbance with entirely divergent outcomes. One isolates the fault, adapts its operational posture, and recovers within minutes. The other cascades into a broader outage that extends for hours, damages equipment, and erodes client trust. The design was equivalent. The outcome was not.</p>
 
@@ -1450,7 +1437,7 @@
                     "Reliability is a property of the system as designed. Resilience is a property of the organization as it operates. Tier ratings capture the first but remain silent on the second. This silence is not a minor gap; it is the central vulnerability of modern data center assurance."
                 </blockquote>
 
-                <p>This paper argues that the distinction between reliability and resilience is not merely semantic but fundamentally structural. Reliability, grounded in probabilistic failure analysis and expressed through metrics such as <span class="tooltip" data-tooltip="Mean Time Between Failures: The average time elapsed between one failure and the next, measuring the reliability of a repairable system.">MTBF</span> and component availability, describes the system's capacity to function without failure under anticipated conditions. Resilience, by contrast, encompasses the organization's ability to absorb unexpected disruptions, adapt its responses in real time, and recover functionality while learning from the experience <a href="#ref1" class="cite">[1]</a>.</p>
+                <p>This paper argues that the distinction between reliability and resilience is not merely semantic but fundamentally structural. Reliability, grounded in probabilistic failure analysis and expressed through metrics such as <span data-rz-dark-panel class="tooltip" data-tooltip="Mean Time Between Failures: The average time elapsed between one failure and the next, measuring the reliability of a repairable system.">MTBF</span> and component availability, describes the system's capacity to function without failure under anticipated conditions. Resilience, by contrast, encompasses the organization's ability to absorb unexpected disruptions, adapt its responses in real time, and recover functionality while learning from the experience <a href="#ref1" class="cite">[1]</a>.</p>
 
                 <p>Drawing on resilience engineering theory, particularly the work of Erik Hollnagel <a href="#ref2" class="cite">[2]</a>, David Woods <a href="#ref7" class="cite">[7]</a>, and organizational safety researchers including James Reason <a href="#ref8" class="cite">[8]</a> and Nancy Leveson <a href="#ref9" class="cite">[9]</a>, this paper develops a comprehensive framework for understanding, measuring, and building operational resilience in critical facilities. It introduces a seven-dimension resilience assessment model that complements existing Tier classifications rather than replacing them, and provides practical implementation guidance for operations teams seeking to move beyond design-centric assurance.</p>
 
@@ -1463,9 +1450,9 @@
                 </div>
 
                 <!-- Evidence Block -->
-                <div class="evidence-block">
+                <div data-rz-dark-panel class="evidence-block">
                     <div class="evidence-block-title"><i class="fas fa-chart-bar"></i> Key Evidence from Research</div>
-                    <div class="evidence-grid">
+                    <div data-rz-fact-list class="evidence-grid">
                         <div class="evidence-card">
                             <div class="evidence-number">15%</div>
                             <div class="evidence-label">Loads Down in Tier-III Facility</div>
@@ -1517,7 +1504,7 @@
 
 
                 <div class="data-table-wrapper">
-                    <table class="data-table">
+                    <table data-rz-dark-panel class="data-table">
                         <thead>
                             <tr>
                                 <th scope="col">Tier Level</th>
@@ -1539,7 +1526,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Tier II</strong></td>
-                                <td><span class="tooltip" data-tooltip="N+1: A redundancy configuration where one additional component is added beyond the minimum required (N) to serve the load.">N+1</span></td>
+                                <td><span data-rz-dark-panel class="tooltip" data-tooltip="N+1: A redundancy configuration where one additional component is added beyond the minimum required (N) to serve the load.">N+1</span></td>
                                 <td>Single path</td>
                                 <td>Partial</td>
                                 <td>No</td>
@@ -1555,7 +1542,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Tier IV</strong></td>
-                                <td><span class="tooltip" data-tooltip="2N: A fully redundant configuration where the total infrastructure is duplicated, with each system capable of supporting the full load independently.">2N</span> or <span class="tooltip" data-tooltip="2N+1: Beyond full duplication, this adds an extra component to the already fully redundant 2N configuration for additional safety margin.">2N+1</span></td>
+                                <td><span data-rz-dark-panel class="tooltip" data-tooltip="2N: A fully redundant configuration where the total infrastructure is duplicated, with each system capable of supporting the full load independently.">2N</span> or <span data-rz-dark-panel class="tooltip" data-tooltip="2N+1: Beyond full duplication, this adds an extra component to the already fully redundant 2N configuration for additional safety margin.">2N+1</span></td>
                                 <td>Dual path (both active)</td>
                                 <td>Yes</td>
                                 <td>Yes</td>
@@ -1597,13 +1584,13 @@
 
                 <div class="formula-box">
                     <div class="formula-box-title">Reliability Metrics</div>
-                    <p style="margin:0.5rem 0;"><strong>Availability</strong> = <span class="tooltip" data-tooltip="Mean Time Between Failures: Average operational time between system failures.">MTBF</span> / (MTBF + <span class="tooltip" data-tooltip="Mean Time To Repair: The average time required to repair a failed component or system and restore it to operational status.">MTTR</span>)</p>
+                    <p style="margin:0.5rem 0;"><strong>Availability</strong> = <span data-rz-dark-panel class="tooltip" data-tooltip="Mean Time Between Failures: Average operational time between system failures.">MTBF</span> / (MTBF + <span data-rz-dark-panel class="tooltip" data-tooltip="Mean Time To Repair: The average time required to repair a failed component or system and restore it to operational status.">MTTR</span>)</p>
                     <p style="margin:0.5rem 0;"><strong>System Availability (series)</strong> = A<sub>1</sub> &times; A<sub>2</sub> &times; ... &times; A<sub>n</sub></p>
                     <p style="margin:0.5rem 0;"><strong>System Availability (parallel)</strong> = 1 - (1 - A<sub>1</sub>) &times; (1 - A<sub>2</sub>) &times; ... &times; (1 - A<sub>n</sub>)</p>
                     <p style="margin:0;font-size:0.85rem;color:var(--text-secondary);">Where A = individual component availability, MTBF = mean time between failures, MTTR = mean time to repair</p>
                 </div>
 
-                <p>Reliability engineering focuses on reducing failure probability through redundancy (adding parallel components), derating (operating components below maximum capacity), and selection (choosing components with proven failure rates). These are powerful techniques, and they form the foundation of all Tier classifications. A <span class="tooltip" data-tooltip="2N: A fully redundant configuration where the total infrastructure is duplicated.">2N</span> power distribution, for example, mathematically reduces the probability of total power loss to negligible levels, assuming that both paths are properly maintained and operated.</p>
+                <p>Reliability engineering focuses on reducing failure probability through redundancy (adding parallel components), derating (operating components below maximum capacity), and selection (choosing components with proven failure rates). These are powerful techniques, and they form the foundation of all Tier classifications. A <span data-rz-dark-panel class="tooltip" data-tooltip="2N: A fully redundant configuration where the total infrastructure is duplicated.">2N</span> power distribution, for example, mathematically reduces the probability of total power loss to negligible levels, assuming that both paths are properly maintained and operated.</p>
 
                 <p>However, the word "assuming" in that sentence carries the entire weight of the reliability-resilience distinction.</p>
 
@@ -1650,7 +1637,7 @@
                     </div>
                 </div>
 
-                <p>The critical insight is that a reliable system can still be fragile. A 2N power distribution provides extraordinary redundancy, but if the operations team has never practiced a failover, if the <span class="tooltip" data-tooltip="Automatic Transfer Switch: A device that automatically transfers electrical load from one power source to another when the primary source fails.">ATS</span> maintenance is overdue, if the <span class="tooltip" data-tooltip="Building Management System: An integrated system for monitoring and controlling building services including HVAC, power, fire, and security.">BMS</span> alarm configuration has drifted from the original design, then the system's theoretical reliability may never be realized in practice.</p>
+                <p>The critical insight is that a reliable system can still be fragile. A 2N power distribution provides extraordinary redundancy, but if the operations team has never practiced a failover, if the <span data-rz-dark-panel class="tooltip" data-tooltip="Automatic Transfer Switch: A device that automatically transfers electrical load from one power source to another when the primary source fails.">ATS</span> maintenance is overdue, if the <span data-rz-dark-panel class="tooltip" data-tooltip="Building Management System: An integrated system for monitoring and controlling building services including HVAC, power, fire, and security.">BMS</span> alarm configuration has drifted from the original design, then the system's theoretical reliability may never be realized in practice.</p>
 
                 <p>Conversely, a resilient system can gracefully degrade. An organization with strong operational practices may operate an N+1 facility with better real-world outcomes than a poorly operated 2N facility, because the team knows how to manage reduced capacity, has practiced emergency procedures, maintains current documentation, and communicates effectively under pressure.</p>
 
@@ -1666,12 +1653,12 @@
 
                 <h3>TCCF vs TCOS: The Two Halves of the Tier System</h3>
 
-                <p>The Uptime Institute actually offers two distinct certification tracks, though the industry overwhelmingly focuses on only one. The Tier Certification of Constructed Facility (<span class="tooltip" data-tooltip="Tier Certification of Constructed Facility: Uptime Institute's validation that the as-built data center meets the design requirements of the claimed Tier level.">TCCF</span>) validates that the physical infrastructure has been built according to the claimed Tier topology. The Tier Certification of Operational Sustainability (<span class="tooltip" data-tooltip="Tier Certification of Operational Sustainability: Uptime Institute's assessment of operational practices including staffing, maintenance, training, and management processes.">TCOS</span>) evaluates the operational practices, management behaviors, staffing levels, training programs, maintenance processes, and organizational governance that determine how effectively the infrastructure is operated <a href="#ref4" class="cite">[4]</a>.</p>
+                <p>The Uptime Institute actually offers two distinct certification tracks, though the industry overwhelmingly focuses on only one. The Tier Certification of Constructed Facility (<span data-rz-dark-panel class="tooltip" data-tooltip="Tier Certification of Constructed Facility: Uptime Institute's validation that the as-built data center meets the design requirements of the claimed Tier level.">TCCF</span>) validates that the physical infrastructure has been built according to the claimed Tier topology. The Tier Certification of Operational Sustainability (<span data-rz-dark-panel class="tooltip" data-tooltip="Tier Certification of Operational Sustainability: Uptime Institute's assessment of operational practices including staffing, maintenance, training, and management processes.">TCOS</span>) evaluates the operational practices, management behaviors, staffing levels, training programs, maintenance processes, and organizational governance that determine how effectively the infrastructure is operated <a href="#ref4" class="cite">[4]</a>.</p>
 
                 <p>The disparity in adoption between these two programs is revealing. While hundreds of facilities worldwide hold TCCF certification, the number holding TCOS certification is a fraction of that total. This adoption gap reflects several organizational realities:</p>
 
                 <div class="data-table-wrapper">
-                    <table class="data-table">
+                    <table data-rz-dark-panel class="data-table">
                         <thead>
                             <tr>
                                 <th scope="col">Dimension</th>
@@ -1729,7 +1716,7 @@
 
                 <p>The gap between design certification and operational reality manifests in several predictable patterns. Over time, even a well-designed facility can drift from its certified configuration through a process that safety science researchers call "normalization of deviance" <a href="#ref13" class="cite">[13]</a>. Maintenance windows get deferred. Temporary configurations become permanent. Alarm setpoints are adjusted to reduce nuisance notifications. Staffing models are optimized for cost rather than capability. Documentation falls behind as-built reality.</p>
 
-                <p>Each individual deviation may be minor and rational in isolation. But the cumulative effect is a progressive widening of the gap between the facility's theoretical capability (as certified) and its actual capability (as operated). This drift is invisible to design-based assessment because the physical infrastructure has not changed. The <span class="tooltip" data-tooltip="Uninterruptible Power Supply: A device that provides emergency power when the input power source fails, bridging the gap until generators start.">UPS</span> units are still in place. The <span class="tooltip" data-tooltip="Power Distribution Unit: A device used to distribute electric power within a data center, from the main feed to individual racks.">PDU</span> topology remains 2N. The generators still have sufficient capacity. What has changed is the organizational capacity to realize the design's potential when it matters most.</p>
+                <p>Each individual deviation may be minor and rational in isolation. But the cumulative effect is a progressive widening of the gap between the facility's theoretical capability (as certified) and its actual capability (as operated). This drift is invisible to design-based assessment because the physical infrastructure has not changed. The <span data-rz-dark-panel class="tooltip" data-tooltip="Uninterruptible Power Supply: A device that provides emergency power when the input power source fails, bridging the gap until generators start.">UPS</span> units are still in place. The <span data-rz-dark-panel class="tooltip" data-tooltip="Power Distribution Unit: A device used to distribute electric power within a data center, from the main feed to individual racks.">PDU</span> topology remains 2N. The generators still have sufficient capacity. What has changed is the organizational capacity to realize the design's potential when it matters most.</p>
 
                 <div class="info-box critical">
                     <div class="info-box-title">The Certification Paradox</div>
@@ -1760,7 +1747,7 @@
 
                 <h3>Origins and Core Philosophy</h3>
 
-                <p>Resilience engineering emerged as a discipline in the early 2000s, driven by the recognition that traditional safety management approaches, focused on preventing specific identified failure modes, were insufficient to explain performance variability in complex sociotechnical systems <a href="#ref1" class="cite">[1]</a>. The field draws on insights from high-reliability organizations (<span class="tooltip" data-tooltip="High Availability: System design approach ensuring a high level of operational performance, typically with 99.99%+ uptime through redundancy and failover mechanisms.">HA</span> research by Weick and Sutcliffe <a href="#ref10" class="cite">[10]</a>), systems theory (Leveson's systems-theoretic accident model <a href="#ref9" class="cite">[9]</a>), and organizational culture research (Westrum's typology of organizational cultures <a href="#ref14" class="cite">[14]</a>).</p>
+                <p>Resilience engineering emerged as a discipline in the early 2000s, driven by the recognition that traditional safety management approaches, focused on preventing specific identified failure modes, were insufficient to explain performance variability in complex sociotechnical systems <a href="#ref1" class="cite">[1]</a>. The field draws on insights from high-reliability organizations (<span data-rz-dark-panel class="tooltip" data-tooltip="High Availability: System design approach ensuring a high level of operational performance, typically with 99.99%+ uptime through redundancy and failover mechanisms.">HA</span> research by Weick and Sutcliffe <a href="#ref10" class="cite">[10]</a>), systems theory (Leveson's systems-theoretic accident model <a href="#ref9" class="cite">[9]</a>), and organizational culture research (Westrum's typology of organizational cultures <a href="#ref14" class="cite">[14]</a>).</p>
 
                 <p>The fundamental philosophical shift introduced by resilience engineering is the distinction between what Hollnagel terms Safety-I and Safety-II <a href="#ref2" class="cite">[2]</a>:</p>
 
@@ -1812,7 +1799,7 @@
                 <p>Adaptive capacity refers to the organization's ability to adjust its behavior in response to novel situations that fall outside the envelope of anticipated scenarios <a href="#ref7" class="cite">[7]</a>. In high-stakes environments, the ability to improvise intelligently when procedures do not match reality is often the decisive factor in incident outcomes. This capacity cannot be stockpiled or purchased; it must be cultivated through training, experience, and organizational culture that empowers front-line decision-making.</p>
 
                 <h4>Margin Management</h4>
-                <p>Resilient organizations actively manage their operating margins, maintaining buffers between normal operating conditions and failure boundaries. In data center operations, this manifests as maintaining spare capacity in cooling systems beyond peak load projections, keeping <span class="tooltip" data-tooltip="Uninterruptible Power Supply: Provides emergency power during primary source failures and conditions power to protect sensitive equipment.">UPS</span> battery runtime above minimum requirements, and staffing above the bare minimum needed for routine operations. The erosion of margins, often driven by cost optimization pressure, is one of the primary mechanisms through which organizations drift toward failure <a href="#ref13" class="cite">[13]</a>.</p>
+                <p>Resilient organizations actively manage their operating margins, maintaining buffers between normal operating conditions and failure boundaries. In data center operations, this manifests as maintaining spare capacity in cooling systems beyond peak load projections, keeping <span data-rz-dark-panel class="tooltip" data-tooltip="Uninterruptible Power Supply: Provides emergency power during primary source failures and conditions power to protect sensitive equipment.">UPS</span> battery runtime above minimum requirements, and staffing above the bare minimum needed for routine operations. The erosion of margins, often driven by cost optimization pressure, is one of the primary mechanisms through which organizations drift toward failure <a href="#ref13" class="cite">[13]</a>.</p>
 
                 <h4>Brittleness</h4>
                 <p>Brittleness describes the tendency of a system to fail suddenly and completely once a performance boundary is exceeded, in contrast to resilient systems that degrade gracefully. A facility may appear highly reliable during normal operations while being extremely brittle under stress. The distinction is not visible in routine metrics like uptime percentage; it only becomes apparent when the system is pushed beyond its normal operating envelope.</p>
@@ -1840,13 +1827,13 @@
                 <p>Monitoring goes beyond alarm management to encompass the proactive surveillance of system health indicators that can reveal developing problems before they become incidents. This cornerstone includes:</p>
 
                 <ul>
-                    <li><strong>Leading indicator identification</strong> through <span class="tooltip" data-tooltip="Building Management System: Integrated system for monitoring and controlling building services including HVAC, power, fire safety, and security.">BMS</span> and <span class="tooltip" data-tooltip="Data Center Infrastructure Management: Software tools that collect and manage information about a data center's IT equipment and facility infrastructure.">DCIM</span> trend analysis</li>
+                    <li><strong>Leading indicator identification</strong> through <span data-rz-dark-panel class="tooltip" data-tooltip="Building Management System: Integrated system for monitoring and controlling building services including HVAC, power, fire safety, and security.">BMS</span> and <span data-rz-dark-panel class="tooltip" data-tooltip="Data Center Infrastructure Management: Software tools that collect and manage information about a data center's IT equipment and facility infrastructure.">DCIM</span> trend analysis</li>
                     <li><strong>Alarm rationalization</strong> that reduces noise while preserving signal quality</li>
                     <li><strong>Predictive maintenance programs</strong> that use condition-based data to anticipate failures</li>
                     <li><strong>Environmental scanning</strong> for external threats (weather, utility grid conditions, supply chain disruptions)</li>
                 </ul>
 
-                <p><strong>Data center example:</strong> A monitoring-capable organization tracks UPS battery internal resistance trends, cooling system delta-T patterns, generator fuel consumption curves, and <span class="tooltip" data-tooltip="Power Usage Effectiveness: A ratio describing how efficiently a data center uses energy, calculated as total facility energy divided by IT equipment energy. A PUE of 1.0 would mean all energy goes to computing.">PUE</span> drift patterns. When battery resistance in a specific UPS string begins trending upward, the team initiates investigation and replacement before the battery fails during the next utility transfer. The monitoring system does not merely detect failures; it reveals the precursors to failure, providing time to intervene.</p>
+                <p><strong>Data center example:</strong> A monitoring-capable organization tracks UPS battery internal resistance trends, cooling system delta-T patterns, generator fuel consumption curves, and <span data-rz-dark-panel class="tooltip" data-tooltip="Power Usage Effectiveness: A ratio describing how efficiently a data center uses energy, calculated as total facility energy divided by IT equipment energy. A PUE of 1.0 would mean all energy goes to computing.">PUE</span> drift patterns. When battery resistance in a specific UPS string begins trending upward, the team initiates investigation and replacement before the battery fails during the next utility transfer. The monitoring system does not merely detect failures; it reveals the precursors to failure, providing time to intervene.</p>
 
                 <h3>3. Anticipating: Knowing What to Expect</h3>
 
@@ -1872,10 +1859,10 @@
                     <li><strong>Cross-facility learning</strong> that allows insights from one site to improve practices at others</li>
                 </ul>
 
-                <p><strong>Data center example:</strong> Following a near-miss event where an <span class="tooltip" data-tooltip="Static Transfer Switch: A device that provides instantaneous transfer of power between two independent AC sources with no interruption to the connected loads.">STS</span> failed to transfer during testing, a learning organization conducts a blameless post-mortem, identifies that the failure resulted from a firmware version mismatch that went undetected during commissioning, implements a firmware audit process across all critical switching devices, shares the finding with other facilities in the portfolio, and updates commissioning checklists to prevent recurrence. The event becomes a source of organizational improvement rather than merely a maintenance ticket.</p>
+                <p><strong>Data center example:</strong> Following a near-miss event where an <span data-rz-dark-panel class="tooltip" data-tooltip="Static Transfer Switch: A device that provides instantaneous transfer of power between two independent AC sources with no interruption to the connected loads.">STS</span> failed to transfer during testing, a learning organization conducts a blameless post-mortem, identifies that the failure resulted from a firmware version mismatch that went undetected during commissioning, implements a firmware audit process across all critical switching devices, shares the finding with other facilities in the portfolio, and updates commissioning checklists to prevent recurrence. The event becomes a source of organizational improvement rather than merely a maintenance ticket.</p>
 
                 <div class="data-table-wrapper">
-                    <table class="data-table">
+                    <table data-rz-dark-panel class="data-table">
                         <thead>
                             <tr>
                                 <th scope="col">Cornerstone</th>
@@ -1925,11 +1912,11 @@
 
                 <h3>The Facility</h3>
 
-                <p>A Tier III certified data center in a tropical climate zone, supporting enterprise colocation clients with combined IT load of 4.2 MW. The facility features <span class="tooltip" data-tooltip="2N: A fully redundant configuration where the total infrastructure is duplicated, with each system capable of supporting the full load independently.">2N</span> <a href="article-13.html">power distribution</a> through dual UPS systems feeding independent <span class="tooltip" data-tooltip="Power Distribution Unit: A device used to distribute electric power within a data center, from the main feed to individual racks.">PDU</span> paths to each rack. Cooling is provided by chilled water with N+1 redundancy across five Computer Room Air Handlers (CRAHs). The facility holds both TCCF certification and maintains a 99.995% availability SLA with its anchor tenant.</p>
+                <p>A Tier III certified data center in a tropical climate zone, supporting enterprise colocation clients with combined IT load of 4.2 MW. The facility features <span data-rz-dark-panel class="tooltip" data-tooltip="2N: A fully redundant configuration where the total infrastructure is duplicated, with each system capable of supporting the full load independently.">2N</span> <a href="article-13.html">power distribution</a> through dual UPS systems feeding independent <span data-rz-dark-panel class="tooltip" data-tooltip="Power Distribution Unit: A device used to distribute electric power within a data center, from the main feed to individual racks.">PDU</span> paths to each rack. Cooling is provided by chilled water with N+1 redundancy across five Computer Room Air Handlers (CRAHs). The facility holds both TCCF certification and maintains a 99.995% availability SLA with its anchor tenant.</p>
 
                 <h3>The Incident Sequence</h3>
 
-                <div style="background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);border-radius:16px;padding:2rem;margin:1.5rem 0;color:#e2e8f0;">
+                <div style="background: #0E0F12;border-radius:16px;padding:2rem;margin:1.5rem 0;color:#e2e8f0;">
                     <h4 style="color:#34d399;margin-bottom:1rem;">Timeline of a Cascading Failure</h4>
 
                     <div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.1);">
@@ -2000,7 +1987,7 @@
                 <h3>The Seven Dimensions</h3>
 
                 <div class="data-table-wrapper">
-                    <table class="data-table">
+                    <table data-rz-dark-panel class="data-table">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
@@ -2087,7 +2074,7 @@
                 <p>Building operational resilience is not a one-time project but an ongoing organizational development journey. The following maturity model describes five progressive stages that organizations typically pass through as they develop resilience capabilities on top of their existing tier design. For a deeper exploration of how <a href="article-1.html">operational maturity transforms proactive engineering practices</a>, see our companion analysis:</p>
 
                 <div class="data-table-wrapper">
-                    <table class="data-table">
+                    <table data-rz-dark-panel class="data-table">
                         <thead>
                             <tr>
                                 <th scope="col">Stage</th>
@@ -2165,11 +2152,11 @@
 
                 <p>The following interactive simulation demonstrates how reliable-only systems compare with resilient systems under varying levels of disturbance intensity. As you increase the disturbance slider, observe how the reliable-only system (designed for anticipated failure modes) degrades sharply beyond its design envelope, while the resilient system (supported by strong operational practices) maintains higher performance through adaptive response. The performance gap between the two widens as disturbance intensity increases, illustrating why operational resilience becomes more valuable precisely when conditions become more challenging.</p>
 
-                <div class="chart-container">
+                <div data-rz-dark-panel class="chart-container">
                     <div class="chart-title">Disturbance Intensity vs Recovery Performance</div>
                     <div class="chart-subtitle">Comparing reliable-only systems against resilient systems under increasing stress</div>
 
-                    <div class="chart-wrapper">
+                    <div data-rz-dark-panel class="chart-wrapper">
                         <canvas id="resilienceChart" class="chart-canvas" width="800" height="380"></canvas>
                     </div>
 
@@ -2211,7 +2198,7 @@
 
                 <p>Use this interactive assessment tool to evaluate your facility's resilience posture. Input your current operational parameters to generate a Reliability Score (based on design redundancy) and a Resilience Score (based on operational capability across seven dimensions). The gap between these scores reveals whether your operations are keeping pace with your design investment. A large gap indicates that operational practices are undermining the theoretical capability of the infrastructure, creating hidden risk that will only become visible during the next significant incident.</p>
 
-                <div class="calculator-section" id="resilienceCalc">
+                <div data-rz-dark-panel class="calculator-section" id="resilienceCalc">
                     <!-- Toolbar Row -->
                     <div class="res-toolbar-row">
                         <div class="res-mode-bar">
@@ -2231,8 +2218,8 @@
 
                     <div class="calc-grid">
                         <div class="calc-input-group">
-                            <label class="calc-label">Redundancy Configuration <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Redundancy Configuration</div><div class="tooltip-desc">Infrastructure redundancy level per Uptime Institute topology. N=no redundancy, N+1=one extra, 2N=full mirror, 2N+1=mirror+spare. Higher tier demands proportionally higher operational resilience.</div><div class="tooltip-formula">Benchmark: Tier III=N+1, Tier IV=2N+1</div></span></span></label>
-                            <select class="calc-select" id="calcRedundancy" aria-label="Calc Redundancy">
+                            <label class="calc-label">Redundancy Configuration <span class="tooltip-trigger">?<span data-rz-dark-panel class="tooltip-content"><div class="tooltip-title">Redundancy Configuration</div><div class="tooltip-desc">Infrastructure redundancy level per Uptime Institute topology. N=no redundancy, N+1=one extra, 2N=full mirror, 2N+1=mirror+spare. Higher tier demands proportionally higher operational resilience.</div><div class="tooltip-formula">Benchmark: Tier III=N+1, Tier IV=2N+1</div></span></span></label>
+                            <select data-rz-dark-panel class="calc-select" id="calcRedundancy" aria-label="Calc Redundancy">
                                 <option value="N">N (No Redundancy)</option>
                                 <option value="N+1" selected>N+1</option>
                                 <option value="2N">2N</option>
@@ -2241,8 +2228,8 @@
                         </div>
 
                         <div class="calc-input-group">
-                            <label class="calc-label">Emergency Drill Frequency <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Emergency Drill Frequency</div><div class="tooltip-desc">How often the team practices emergency scenarios (power loss, cooling failure, fire). Monthly drills build muscle memory and expose procedural gaps. Annual or never creates dangerous competency decay.</div><div class="tooltip-formula">Benchmark: Best practice = Monthly (Uptime M&amp;O)</div></span></span></label>
-                            <select class="calc-select" id="calcDrillFreq" aria-label="Calc Drill Freq">
+                            <label class="calc-label">Emergency Drill Frequency <span class="tooltip-trigger">?<span data-rz-dark-panel class="tooltip-content"><div class="tooltip-title">Emergency Drill Frequency</div><div class="tooltip-desc">How often the team practices emergency scenarios (power loss, cooling failure, fire). Monthly drills build muscle memory and expose procedural gaps. Annual or never creates dangerous competency decay.</div><div class="tooltip-formula">Benchmark: Best practice = Monthly (Uptime M&amp;O)</div></span></span></label>
+                            <select data-rz-dark-panel class="calc-select" id="calcDrillFreq" aria-label="Calc Drill Freq">
                                 <option value="Never">Never</option>
                                 <option value="Annual" selected>Annual</option>
                                 <option value="Quarterly">Quarterly</option>
@@ -2251,7 +2238,7 @@
                         </div>
 
                         <div class="calc-input-group">
-                            <label class="calc-label">Critical Alarm Response Time (minutes) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Critical Alarm Response Time</div><div class="tooltip-desc">Time from alarm to first operator action on critical infrastructure alerts. Includes detection, acknowledgment, and initial assessment. Sub-5 min response prevents cascade failures.</div><div class="tooltip-formula">Benchmark: Tier IV target &le;5 min, Industry avg 15 min</div></span></span></label>
+                            <label class="calc-label">Critical Alarm Response Time (minutes) <span class="tooltip-trigger">?<span data-rz-dark-panel class="tooltip-content"><div class="tooltip-title">Critical Alarm Response Time</div><div class="tooltip-desc">Time from alarm to first operator action on critical infrastructure alerts. Includes detection, acknowledgment, and initial assessment. Sub-5 min response prevents cascade failures.</div><div class="tooltip-formula">Benchmark: Tier IV target &le;5 min, Industry avg 15 min</div></span></span></label>
                             <div class="calc-slider-container">
                                 <input type="range" class="calc-slider" id="calcResponseTime" min="1" max="60" value="15" aria-label="Calc Response Time">
                                 <span class="calc-slider-value" id="calcResponseTimeVal">15 min</span>
@@ -2259,8 +2246,8 @@
                         </div>
 
                         <div class="calc-input-group">
-                            <label class="calc-label">Recovery Testing Level <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Recovery Testing Level</div><div class="tooltip-desc">Maturity of disaster recovery and failover testing program. Tests should cover full power path, cooling path, and network failover. Untested recovery plans fail 75% of the time.</div><div class="tooltip-formula">Benchmark: Best practice = Tested Quarterly (EN 50600)</div></span></span></label>
-                            <select class="calc-select" id="calcRecovery" aria-label="Calc Recovery">
+                            <label class="calc-label">Recovery Testing Level <span class="tooltip-trigger">?<span data-rz-dark-panel class="tooltip-content"><div class="tooltip-title">Recovery Testing Level</div><div class="tooltip-desc">Maturity of disaster recovery and failover testing program. Tests should cover full power path, cooling path, and network failover. Untested recovery plans fail 75% of the time.</div><div class="tooltip-formula">Benchmark: Best practice = Tested Quarterly (EN 50600)</div></span></span></label>
+                            <select data-rz-dark-panel class="calc-select" id="calcRecovery" aria-label="Calc Recovery">
                                 <option value="None">None</option>
                                 <option value="Documented" selected>Documented</option>
                                 <option value="Tested Annually">Tested Annually</option>
@@ -2269,7 +2256,7 @@
                         </div>
 
                         <div class="calc-input-group">
-                            <label class="calc-label">Cross-Training Coverage (%) <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Cross-Training Coverage</div><div class="tooltip-desc">Percentage of critical procedures where more than one team member is qualified. Single-point-of-knowledge (SPoK) creates availability risk during absences.</div><div class="tooltip-formula">Benchmark: Target &ge;60%, critical systems &ge;80%</div></span></span></label>
+                            <label class="calc-label">Cross-Training Coverage (%) <span class="tooltip-trigger">?<span data-rz-dark-panel class="tooltip-content"><div class="tooltip-title">Cross-Training Coverage</div><div class="tooltip-desc">Percentage of critical procedures where more than one team member is qualified. Single-point-of-knowledge (SPoK) creates availability risk during absences.</div><div class="tooltip-formula">Benchmark: Target &ge;60%, critical systems &ge;80%</div></span></span></label>
                             <div class="calc-slider-container">
                                 <input type="range" class="calc-slider" id="calcCrossTrain" min="0" max="100" value="30" aria-label="Calc Cross Train">
                                 <span class="calc-slider-value" id="calcCrossTrainVal">30%</span>
@@ -2277,8 +2264,8 @@
                         </div>
 
                         <div class="calc-input-group">
-                            <label class="calc-label">Documentation Currency <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Documentation Currency</div><div class="tooltip-desc">How up-to-date are SOPs, one-line diagrams, and emergency procedures. Outdated docs cause incorrect emergency actions. Real-time updated = CMMS/DCIM integrated.</div><div class="tooltip-formula">Benchmark: Best practice = Current &lt;1yr (ISO 22301)</div></span></span></label>
-                            <select class="calc-select" id="calcDocCurrency" aria-label="Calc Doc Currency">
+                            <label class="calc-label">Documentation Currency <span class="tooltip-trigger">?<span data-rz-dark-panel class="tooltip-content"><div class="tooltip-title">Documentation Currency</div><div class="tooltip-desc">How up-to-date are SOPs, one-line diagrams, and emergency procedures. Outdated docs cause incorrect emergency actions. Real-time updated = CMMS/DCIM integrated.</div><div class="tooltip-formula">Benchmark: Best practice = Current &lt;1yr (ISO 22301)</div></span></span></label>
+                            <select data-rz-dark-panel class="calc-select" id="calcDocCurrency" aria-label="Calc Doc Currency">
                                 <option value="Outdated >2yr">Outdated >2yr</option>
                                 <option value="Outdated 1-2yr" selected>Outdated 1-2yr</option>
                                 <option value="Current <1yr">Current &lt;1yr</option>
@@ -2287,8 +2274,8 @@
                         </div>
 
                         <div class="calc-input-group">
-                            <label class="calc-label">Communication Plan <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Communication Plan</div><div class="tooltip-desc">Maturity of emergency communication protocols &mdash; who to call, when, what to say. Tested plans reduce response confusion by 60%.</div><div class="tooltip-formula">Benchmark: Best practice = Tested &amp; Drilled</div></span></span></label>
-                            <select class="calc-select" id="calcCommPlan" aria-label="Calc Comm Plan">
+                            <label class="calc-label">Communication Plan <span class="tooltip-trigger">?<span data-rz-dark-panel class="tooltip-content"><div class="tooltip-title">Communication Plan</div><div class="tooltip-desc">Maturity of emergency communication protocols &mdash; who to call, when, what to say. Tested plans reduce response confusion by 60%.</div><div class="tooltip-formula">Benchmark: Best practice = Tested &amp; Drilled</div></span></span></label>
+                            <select data-rz-dark-panel class="calc-select" id="calcCommPlan" aria-label="Calc Comm Plan">
                                 <option value="None">None</option>
                                 <option value="Basic" selected>Basic</option>
                                 <option value="Detailed">Detailed</option>
@@ -2297,8 +2284,8 @@
                         </div>
 
                         <div class="calc-input-group">
-                            <label class="calc-label">Lessons Learned Program <span class="tooltip-trigger">?<span class="tooltip-content"><div class="tooltip-title">Lessons Learned Program</div><div class="tooltip-desc">How post-incident findings are captured, tracked, and fed back into design and operations. Integrated programs prevent 40% of recurring incidents.</div><div class="tooltip-formula">Benchmark: Best practice = Integrated into design</div></span></span></label>
-                            <select class="calc-select" id="calcLessons" aria-label="Calc Lessons">
+                            <label class="calc-label">Lessons Learned Program <span class="tooltip-trigger">?<span data-rz-dark-panel class="tooltip-content"><div class="tooltip-title">Lessons Learned Program</div><div class="tooltip-desc">How post-incident findings are captured, tracked, and fed back into design and operations. Integrated programs prevent 40% of recurring incidents.</div><div class="tooltip-formula">Benchmark: Best practice = Integrated into design</div></span></span></label>
+                            <select data-rz-dark-panel class="calc-select" id="calcLessons" aria-label="Calc Lessons">
                                 <option value="None">None</option>
                                 <option value="Ad-hoc" selected>Ad-hoc</option>
                                 <option value="Structured">Structured</option>
@@ -2365,16 +2352,16 @@
                             <div class="res-pro-panel-header"><i class="fas fa-search-plus"></i> Resilience Gap Deep Dive</div>
                             <div class="res-pro-panel-body" id="resPanel1Body">
                                 <div class="res-kpi-grid">
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiGapSeverity">--</div><div class="res-kpi-label">Gap Severity <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Gap Severity</div><div class="rtd">Overall severity of gaps between current resilience posture and target. Higher = more urgent.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiDesignOpsRatio">--</div><div class="res-kpi-label">Design vs Ops Ratio <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Design vs Ops Ratio</div><div class="rtd">Balance between engineering design and operational readiness investments.</div><span class="rtf">Optimal: 40-60% range</span></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiWeakest">--</div><div class="res-kpi-label">Weakest Dimension <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Weakest Dimension</div><div class="rtd">The resilience dimension scoring lowest — priority area for improvement.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiStrongest">--</div><div class="res-kpi-label">Strongest Dimension <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Strongest Dimension</div><div class="rtd">Highest-scoring resilience dimension — leverage this strength.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiImprovePotential">--</div><div class="res-kpi-label">Improvement Potential <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Improvement Potential</div><div class="rtd">Maximum score improvement achievable by addressing identified gaps.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiTierEquivGap">--</div><div class="res-kpi-label">Tier Equivalence Gap <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Tier Equivalence Gap</div><div class="rtd">Gap between current resilience and the next Uptime Institute tier level.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiGapSeverity">--</div><div class="res-kpi-label">Gap Severity <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Gap Severity</div><div class="rtd">Overall severity of gaps between current resilience posture and target. Higher = more urgent.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiDesignOpsRatio">--</div><div class="res-kpi-label">Design vs Ops Ratio <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Design vs Ops Ratio</div><div class="rtd">Balance between engineering design and operational readiness investments.</div><span data-rz-dark-panel class="rtf">Optimal: 40-60% range</span></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiWeakest">--</div><div class="res-kpi-label">Weakest Dimension <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Weakest Dimension</div><div class="rtd">The resilience dimension scoring lowest — priority area for improvement.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiStrongest">--</div><div class="res-kpi-label">Strongest Dimension <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Strongest Dimension</div><div class="rtd">Highest-scoring resilience dimension — leverage this strength.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiImprovePotential">--</div><div class="res-kpi-label">Improvement Potential <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Improvement Potential</div><div class="rtd">Maximum score improvement achievable by addressing identified gaps.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiTierEquivGap">--</div><div class="res-kpi-label">Tier Equivalence Gap <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Tier Equivalence Gap</div><div class="rtd">Gap between current resilience and the next Uptime Institute tier level.</div></span></span></div></div>
                                 </div>
                                 <canvas id="resRadarChart" width="400" height="300" style="width:100%;max-width:400px;margin:1rem auto;display:block;"></canvas>
                             </div>
-                            <div class="res-gate-overlay" onclick="resShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
+                            <div data-rz-dark-panel class="res-gate-overlay" onclick="resShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                         </div>
 
                         <!-- Panel 2: Cost of Downtime Analysis -->
@@ -2382,15 +2369,15 @@
                             <div class="res-pro-panel-header"><i class="fas fa-dollar-sign"></i> Cost of Downtime Analysis</div>
                             <div class="res-pro-panel-body" id="resPanel2Body">
                                 <div class="res-kpi-grid">
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiAnnualCost">--</div><div class="res-kpi-label">Est. Annual Downtime Cost <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Annual Downtime Cost</div><div class="rtd">Estimated yearly cost of unplanned downtime based on current resilience score.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiCostPerGap">--</div><div class="res-kpi-label">Cost per Gap Point <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Cost per Gap Point</div><div class="rtd">Incremental cost of each point of resilience gap — helps prioritize investments.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiRiskExposure">--</div><div class="res-kpi-label">Operational Risk Exposure <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Risk Exposure</div><div class="rtd">Total operational risk from identified resilience gaps, expressed as expected annual loss.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiSlaPenalty">--</div><div class="res-kpi-label">SLA Penalty Estimate <span class="res-tip">?<span class="res-tip-body"><div class="rtt">SLA Penalty Risk</div><div class="rtd">Estimated SLA penalties from resilience shortfalls over the next 12 months.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiRecoveryRoi">--</div><div class="res-kpi-label">Recovery ROI <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Recovery ROI</div><div class="rtd">Return on investment for resilience improvements based on avoided downtime costs.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiInsurance">--</div><div class="res-kpi-label">Insurance Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Insurance Impact</div><div class="rtd">Estimated insurance premium change based on current resilience posture.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiAnnualCost">--</div><div class="res-kpi-label">Est. Annual Downtime Cost <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Annual Downtime Cost</div><div class="rtd">Estimated yearly cost of unplanned downtime based on current resilience score.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiCostPerGap">--</div><div class="res-kpi-label">Cost per Gap Point <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Cost per Gap Point</div><div class="rtd">Incremental cost of each point of resilience gap — helps prioritize investments.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiRiskExposure">--</div><div class="res-kpi-label">Operational Risk Exposure <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Risk Exposure</div><div class="rtd">Total operational risk from identified resilience gaps, expressed as expected annual loss.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiSlaPenalty">--</div><div class="res-kpi-label">SLA Penalty Estimate <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">SLA Penalty Risk</div><div class="rtd">Estimated SLA penalties from resilience shortfalls over the next 12 months.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiRecoveryRoi">--</div><div class="res-kpi-label">Recovery ROI <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Recovery ROI</div><div class="rtd">Return on investment for resilience improvements based on avoided downtime costs.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiInsurance">--</div><div class="res-kpi-label">Insurance Impact <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Insurance Impact</div><div class="rtd">Estimated insurance premium change based on current resilience posture.</div></span></span></div></div>
                                 </div>
                             </div>
-                            <div class="res-gate-overlay" onclick="resShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
+                            <div data-rz-dark-panel class="res-gate-overlay" onclick="resShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                         </div>
 
                         <!-- Panel 3: Benchmarking & Maturity -->
@@ -2398,17 +2385,17 @@
                             <div class="res-pro-panel-header"><i class="fas fa-chart-line"></i> Benchmarking &amp; Maturity</div>
                             <div class="res-pro-panel-body" id="resPanel3Body">
                                 <div class="res-kpi-grid">
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiPercentile">--</div><div class="res-kpi-label">Industry Percentile <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Industry Percentile</div><div class="rtd">How this facility ranks against industry peers for resilience.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiHollnagel">--</div><div class="res-kpi-label">Hollnagel Maturity Level <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Hollnagel Maturity</div><div class="rtd">Resilience maturity per Hollnagel's Four Cornerstones: Respond, Monitor, Learn, Anticipate.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiWestrum">--</div><div class="res-kpi-label">Westrum Culture Type <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Westrum Culture Type</div><div class="rtd">Organizational culture classification: Pathological, Bureaucratic, or Generative.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiProfile">--</div><div class="res-kpi-label">Comparable Facility Profile <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Comparable Profile</div><div class="rtd">Benchmark comparison to facilities with similar size, tier, and geography.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiPercentile">--</div><div class="res-kpi-label">Industry Percentile <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Industry Percentile</div><div class="rtd">How this facility ranks against industry peers for resilience.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiHollnagel">--</div><div class="res-kpi-label">Hollnagel Maturity Level <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Hollnagel Maturity</div><div class="rtd">Resilience maturity per Hollnagel's Four Cornerstones: Respond, Monitor, Learn, Anticipate.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiWestrum">--</div><div class="res-kpi-label">Westrum Culture Type <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Westrum Culture Type</div><div class="rtd">Organizational culture classification: Pathological, Bureaucratic, or Generative.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiProfile">--</div><div class="res-kpi-label">Comparable Facility Profile <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Comparable Profile</div><div class="rtd">Benchmark comparison to facilities with similar size, tier, and geography.</div></span></span></div></div>
                                 </div>
                                 <div style="margin-top:1rem;">
                                     <h4 style="color:#94a3b8;font-size:0.85rem;margin-bottom:0.75rem;"><i class="fas fa-chart-bar" style="margin-right:6px;color:#10b981;"></i>Sensitivity Analysis — Dimension Impact</h4>
                                     <div id="resTornadoBars"></div>
                                 </div>
                             </div>
-                            <div class="res-gate-overlay" onclick="resShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
+                            <div data-rz-dark-panel class="res-gate-overlay" onclick="resShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                         </div>
 
                         <!-- Panel 4: Improvement Roadmap -->
@@ -2416,25 +2403,25 @@
                             <div class="res-pro-panel-header"><i class="fas fa-road"></i> Improvement Roadmap</div>
                             <div class="res-pro-panel-body" id="resPanel4Body">
                                 <div class="res-kpi-grid">
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi30day">--</div><div class="res-kpi-label">30-Day Impact Projection <span class="res-tip">?<span class="res-tip-body"><div class="rtt">30-Day Projection</div><div class="rtd">Expected resilience improvement in 30 days if recommended actions are implemented.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi90day">--</div><div class="res-kpi-label">90-Day Target Score <span class="res-tip">?<span class="res-tip-body"><div class="rtt">90-Day Target</div><div class="rtd">Achievable resilience score in 90 days with focused investment.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi1year">--</div><div class="res-kpi-label">1-Year Transformation <span class="res-tip">?<span class="res-tip-body"><div class="rtt">1-Year Transformation</div><div class="rtd">Full resilience transformation target over 12 months.</div></span></span></div></div>
-                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiPriority">--</div><div class="res-kpi-label">Priority Investment Area <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Priority Investment</div><div class="rtd">Highest-ROI area for resilience improvement spending.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi30day">--</div><div class="res-kpi-label">30-Day Impact Projection <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">30-Day Projection</div><div class="rtd">Expected resilience improvement in 30 days if recommended actions are implemented.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi90day">--</div><div class="res-kpi-label">90-Day Target Score <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">90-Day Target</div><div class="rtd">Achievable resilience score in 90 days with focused investment.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpi1year">--</div><div class="res-kpi-label">1-Year Transformation <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">1-Year Transformation</div><div class="rtd">Full resilience transformation target over 12 months.</div></span></span></div></div>
+                                    <div class="res-kpi"><div class="res-kpi-value" id="resKpiPriority">--</div><div class="res-kpi-label">Priority Investment Area <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Priority Investment</div><div class="rtd">Highest-ROI area for resilience improvement spending.</div></span></span></div></div>
                                 </div>
                                 <div style="margin-top:1rem;">
                                     <h4 style="color:#94a3b8;font-size:0.85rem;margin-bottom:0.75rem;"><i class="fas fa-dice" style="margin-right:6px;color:#10b981;"></i>Monte Carlo Simulation (10,000 iterations)</h4>
                                     <div class="res-kpi-grid" style="margin-bottom:0.75rem;">
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcMean">--</div><div class="res-kpi-label">MC Mean <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Monte Carlo Mean</div><div class="rtd">Average resilience score from Monte Carlo simulation across all scenarios.</div></span></span></div></div>
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcStdDev">--</div><div class="res-kpi-label">Std Dev <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Standard Deviation</div><div class="rtd">Spread of resilience outcomes — wider = more uncertainty.</div></span></span></div></div>
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP5">--</div><div class="res-kpi-label">P5 (Worst) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P5 — Worst Case</div><div class="rtd">5th percentile — 95% of scenarios score above this level.</div></span></span></div></div>
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP50">--</div><div class="res-kpi-label">P50 (Median) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P50 — Median</div><div class="rtd">Most likely resilience score outcome.</div></span></span></div></div>
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP95">--</div><div class="res-kpi-label">P95 (Best) <span class="res-tip">?<span class="res-tip-body"><div class="rtt">P95 — Best Case</div><div class="rtd">Top 5% optimistic scenario.</div></span></span></div></div>
-                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcRange">--</div><div class="res-kpi-label">Range <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Range</div><div class="rtd">Spread between worst-case and best-case scenarios.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcMean">--</div><div class="res-kpi-label">MC Mean <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Monte Carlo Mean</div><div class="rtd">Average resilience score from Monte Carlo simulation across all scenarios.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcStdDev">--</div><div class="res-kpi-label">Std Dev <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Standard Deviation</div><div class="rtd">Spread of resilience outcomes — wider = more uncertainty.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP5">--</div><div class="res-kpi-label">P5 (Worst) <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">P5 — Worst Case</div><div class="rtd">5th percentile — 95% of scenarios score above this level.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP50">--</div><div class="res-kpi-label">P50 (Median) <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">P50 — Median</div><div class="rtd">Most likely resilience score outcome.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcP95">--</div><div class="res-kpi-label">P95 (Best) <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">P95 — Best Case</div><div class="rtd">Top 5% optimistic scenario.</div></span></span></div></div>
+                                        <div class="res-kpi"><div class="res-kpi-value" id="resMcRange">--</div><div class="res-kpi-label">Range <span data-rz-dark-panel class="res-tip">?<span data-rz-dark-panel class="res-tip-body"><div class="rtt">Range</div><div class="rtd">Spread between worst-case and best-case scenarios.</div></span></span></div></div>
                                     </div>
                                     <canvas id="resHistChart" width="800" height="300" style="width:100%;margin:1rem auto;display:block;"></canvas>
                                 </div>
                             </div>
-                            <div class="res-gate-overlay" onclick="resShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
+                            <div data-rz-dark-panel class="res-gate-overlay" onclick="resShowLogin()"><i class="fas fa-lock"></i><span>Sign In</span></div>
                         </div>
 
                         <!-- Narrative Box -->
@@ -2448,7 +2435,7 @@
                     <div class="benchmark-meta">Model v1.0 · Feb 2026 · Based on Uptime Institute 2023, Hollnagel Resilience Engineering 2014, EN 50600 · 7-dimension weighted model</div>
 
                     <!-- Calculator Disclaimer -->
-                    <div class="calc-disclaimer" style="background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;">
+                    <div class="calc-disclaimer" style="color: #CFD3DA;background: #121316;border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;">
                         <div style="display:flex;align-items:flex-start;gap:0.75rem;">
                             <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;"><i class="fas fa-triangle-exclamation"></i></div>
                             <div>
@@ -2462,16 +2449,16 @@
                     </div>
 
                     <!-- Login Modal -->
-                    <div class="res-login-overlay" id="resLoginOverlay">
-                        <div class="res-login-box">
+                    <div data-rz-dark-panel class="res-login-overlay" id="resLoginOverlay">
+                        <div data-rz-dark-panel class="res-login-box">
                             <button class="res-login-close" onclick="resHideLogin()">&times;</button>
                             <h3 style="margin:0 0 0.5rem;color:#10b981;"><i class="fas fa-crown"></i> Full analysis Access</h3>
                             <p style="margin:0 0 1.25rem;color:rgba(255,255,255,0.6);font-size:0.85rem;">Sign in for Resilience Gap Deep Dive, Cost of Downtime, Benchmarking, and Improvement Roadmap.</p>
-                            <input type="email" id="resLoginEmail" placeholder="Email address" style="width:100%;padding:0.65rem 0.75rem;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#fff;margin-bottom:0.65rem;font-size:0.9rem;box-sizing:border-box;" aria-label="Email address">
-                            <input type="password" id="resLoginPassword" placeholder="Password" style="width:100%;padding:0.65rem 0.75rem;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#fff;margin-bottom:0.65rem;font-size:0.9rem;box-sizing:border-box;" aria-label="Password">
+                            <input type="email" id="resLoginEmail" placeholder="Email address" style="width:100%;padding:0.65rem 0.75rem;border-radius:6px;border:1px solid #334155;background: #121316;color:#fff;margin-bottom:0.65rem;font-size:0.9rem;box-sizing:border-box;" aria-label="Email address">
+                            <input type="password" id="resLoginPassword" placeholder="Password" style="width:100%;padding:0.65rem 0.75rem;border-radius:6px;border:1px solid #334155;background: #121316;color:#fff;margin-bottom:0.65rem;font-size:0.9rem;box-sizing:border-box;" aria-label="Password">
                             <div id="resLoginError" style="color:#ef4444;font-size:0.8rem;margin-bottom:0.5rem;display:none;"></div>
                             <button onclick="resHandleLogin()" style="width:100%;padding:0.7rem;border:none;border-radius:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-weight:600;cursor:pointer;font-size:0.95rem;">Sign In</button>
-<p style="text-align:center;font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#64748b;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#64748b;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
+<p style="text-align:center;font-size:0.68rem;color:#9aa3ad;margin-top:8px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#9aa3ad;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#9aa3ad;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
                         </div>
                     </div>
 
@@ -2487,7 +2474,7 @@
                 <p>These initial steps require minimal investment and can be implemented within the authority of the operations team without extensive approval processes:</p>
 
                 <ul>
-                    <li><strong>Alarm audit and rationalization</strong> &mdash; Review all active alarms in <span class="tooltip" data-tooltip="Building Management System: Integrated system for monitoring and controlling building services.">BMS</span> and <span class="tooltip" data-tooltip="Data Center Infrastructure Management: Software tools for managing data center IT and facility infrastructure.">DCIM</span> systems. Identify and suppress nuisance alarms. Ensure critical alarms are distinguishable from informational notifications. Target: reduce alarm volume by 40-60% while preserving all safety-critical notifications.</li>
+                    <li><strong>Alarm audit and rationalization</strong> &mdash; Review all active alarms in <span data-rz-dark-panel class="tooltip" data-tooltip="Building Management System: Integrated system for monitoring and controlling building services.">BMS</span> and <span data-rz-dark-panel class="tooltip" data-tooltip="Data Center Infrastructure Management: Software tools for managing data center IT and facility infrastructure.">DCIM</span> systems. Identify and suppress nuisance alarms. Ensure critical alarms are distinguishable from informational notifications. Target: reduce alarm volume by 40-60% while preserving all safety-critical notifications.</li>
                     <li><strong>Emergency procedure review</strong> &mdash; Conduct a read-through of all Emergency Operating Procedures with the current operations team. Identify any procedures that do not reflect current facility configuration. Flag outdated procedures for immediate update.</li>
                     <li><strong>Shift handover formalization</strong> &mdash; Implement a structured shift handover protocol that includes: open work orders, current alarms, pending maintenance activities, weather and utility status, and any abnormal operating conditions. Document each handover.</li>
                     <li><strong>On-call roster review</strong> &mdash; Verify that escalation contacts are current, reachable, and understand their roles during emergencies. Update the escalation matrix if any gaps are identified.</li>
@@ -2503,7 +2490,7 @@
                     <li><strong>Cross-training assessment</strong> &mdash; Map the team's competency matrix across all critical systems (electrical, mechanical, fire, BMS, IT infrastructure). Identify single points of knowledge failure where only one team member understands a critical system. Initiate cross-training for the highest-risk gaps.</li>
                     <li><strong>Documentation currency audit</strong> &mdash; Compare as-built drawings with actual facility configuration for critical power and cooling systems. Identify discrepancies and establish a prioritized update schedule. Implement a change management process that requires documentation updates concurrent with any facility modification.</li>
                     <li><strong>Near-miss reporting system</strong> &mdash; Establish a voluntary, non-punitive near-miss reporting mechanism. Communicate clearly that the purpose is learning, not discipline. Set a target for monthly near-miss reports and celebrate reporting activity.</li>
-                    <li><strong><span class="tooltip" data-tooltip="Computerized Maintenance Management System: Software that maintains a computer database of information about an organization's maintenance operations, used to schedule and track maintenance activities.">CMMS</span> integration review</strong> &mdash; Ensure that maintenance management data feeds into operational decision-making. Review preventive maintenance completion rates, overdue work orders, and deferred maintenance items for risk implications.</li>
+                    <li><strong><span data-rz-dark-panel class="tooltip" data-tooltip="Computerized Maintenance Management System: Software that maintains a computer database of information about an organization's maintenance operations, used to schedule and track maintenance activities.">CMMS</span> integration review</strong> &mdash; Ensure that maintenance management data feeds into operational decision-making. Review preventive maintenance completion rates, overdue work orders, and deferred maintenance items for risk implications.</li>
                 </ul>
 
                 <h3>Strategic: 1-Year Actions</h3>
@@ -2519,7 +2506,7 @@
                 </ul>
 
                 <div class="data-table-wrapper">
-                    <table class="data-table">
+                    <table data-rz-dark-panel class="data-table">
                         <thead>
                             <tr>
                                 <th scope="col">Time Horizon</th>
@@ -3643,7 +3630,7 @@
             for (var i = 0; i < dimNames.length; i++) {
                 var score = dimScores[i] || 0;
                 var color = score >= 70 ? '#10b981' : score >= 40 ? '#f59e0b' : '#ef4444';
-                dimRows += '<tr><td style="padding:6px 10px;border-bottom:1px solid #1e293b;color:#cbd5e1;">' + dimNames[i] + '</td><td style="padding:6px 10px;border-bottom:1px solid #1e293b;text-align:center;"><div style="background:#0f172a;border-radius:4px;overflow:hidden;height:14px;"><div style="height:100%;width:' + score + '%;background:' + color + ';border-radius:4px;"></div></div></td><td style="padding:6px 10px;border-bottom:1px solid #1e293b;text-align:center;color:' + color + ';font-weight:600;">' + score + '/100</td></tr>';
+                dimRows += '<tr><td style="padding:6px 10px;border-bottom:1px solid #1e293b;color:#cbd5e1;">' + dimNames[i] + '</td><td style="padding:6px 10px;border-bottom:1px solid #1e293b;text-align:center;"><div style="background:#0E0F12;border-radius:4px;overflow:hidden;height:14px;"><div style="height:100%;width:' + score + '%;background:' + color + ';border-radius:4px;"></div></div></td><td style="padding:6px 10px;border-bottom:1px solid #1e293b;text-align:center;color:' + color + ';font-weight:600;">' + score + '/100</td></tr>';
             }
 
             // Recommendations

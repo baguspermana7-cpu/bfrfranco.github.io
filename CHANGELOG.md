@@ -11,6 +11,72 @@ release sections rather than semver.
 
 ---
 
+## v3.23.0 — 2026-10-17 — "Journal"
+
+### The journal family on one register: no more blank-on-scroll, no slop, one honest filter
+
+**Owner, 2026-10-16, from the phone:** `articles.html` *"abis scroll kadang blank"*; *"masih ada AI design slop … di page
+ini dan sub pagenya masih banyak. Follow antivibe and follow UX law. Audit total dan fix properly jangan sepotong-sepotong"*;
+*"fitur filter by tag … harus jauh-jauh lebih bagus, sempurna dan intuitive"*.
+
+**Measured first.** CDP LayerTree at 390 px × DPR 2.75: the hub carried **48 composited layers** (an article page: 17): a
+fixed full-viewport particle `<canvas>` redrawn every frame, two `filter: blur(40/50px)` aurora orbs, a keyword marquee and
+28 cards with `transition: all` + hover lift. The blank could not be reproduced in headless (software raster), so this
+release removes every GPU-heavy decoration on the page (all of them §A27–34 tells anyway) and gates the structure
+(`tools/test-journal.mjs` J3/J5c: no fixed decorative canvas, no blur ≥ 20 px, no `transition: all`, ≤ 20 layers).
+`audit-vibecode --json` on the family: 139 monitored rows across gradient-text, hover-lift, keyword-marquee, aurora-navy,
+serif-display-chrome, stat-strip. `article:tag` meta: 97 tags, 93 used once — not a filter.
+
+**Added**
+- `tools/build-journal.py` + `data/journal.json`: ONE source of truth for the journal, read from each page's own `<meta>`
+  (34 pages: article-1…28, FF-1…3, geopolitics-1…3), with a curated 8-topic map (AI & HPC infrastructure · Cooling & thermal ·
+  Power & grid · Operations & maintenance · Reliability & safety · Market, economics & policy · Sustainability & water ·
+  Workforce & careers) and three series. The hand-written card copies (28 on the hub, 3 + 3 + 9 on the landings) are now
+  builder output between `<!-- journal:grid -->` markers; `--check` is in `tools/test-generator-freshness.py`.
+- `js/rz-journal-filter.js` (ES5, 170 lines) + the JOURNAL section of `css/rz-article-dark.css`: search (title, summary,
+  tags; `/` focuses it), topic chips with live counts (a chip whose count falls to zero is disabled, never hidden), series
+  chips, sort, clickable card tags, "N of 34 articles", one Clear, an empty state, and the whole state in the URL
+  (`?topic=power&series=global&q=pfas`) so a filtered view is a link and the back button undoes a chip. Chips are
+  `<button aria-pressed>`; nothing animates but border colour on the motion tokens.
+- `tools/sweep-journal-register.py`: the per-page inline CSS of the 39 editorial pages rewritten onto the register by HUE
+  BAND, never by hex list — **1,405 rewrites**: 635 navy-cast backgrounds (incl. `--*bg*` tokens; a dark-theme rule takes the theme token, an
+  unscoped rule — an embedded panel dark in both themes — takes a graphite literal and declares light text so what it
+  contains stays readable), 104 gradient-text → one colour, 153 `transition: all` → the register's four properties,
+  61 hover lifts removed, 54 blurs / backdrop-filters removed, 70 serif faces → the sans stack (Fraunces also
+  dropped from the Google Fonts link), 35 per-page `<html style="--rz-art-accent:…">` overrides removed (one accent, not 28),
+  5 navy literals in exported-SVG JS strings → graphite, 15 already-graphite containers given light text,
+  34 dark panels marked `data-rz-dark-panel` (the register keeps their headings light in light mode), 132 slate-grey
+  texts on dark surfaces lifted to a readable grey (axe), 107 stat-tile strips marked `data-rz-fact-list` and rendered by the register as one fact per row (mono number,
+  label, sub-text, hairline). Idempotent (`--check`), reproducible (pristine HEAD + sweep == the shipped tree), the full
+  before→after log in `standarization/Audit result/journal-sweep.md`.
+- `tools/test-journal.mjs`: J1 journal.json = page meta and every grid = the builder; J2 the sweep is a no-op; J3 structure
+  on all 38 family pages (proven RED on a seeded navy literal + ticker); J4 the filter in a real browser at 390 and 1440
+  (topic chip → exactly the JSON's count, URL written and restored, search, Clear, empty state, `aria-pressed`); J5 computed
+  fonts/backgrounds, composited layers ≤ 20, a fact list renders as full-width rows.
+
+**Changed**
+- `articles.html`, `insights.html`, `geopolitics.html`, `future-forward.html` rebuilt on the editorial register: graphite
+  surfaces, one amber accent, IBM Plex Sans headings, mono only for the metabar, eyebrows, counts and tags. The hub keeps its
+  legal notice (one hairline panel), the case-library row, the writing principles and the framework as lists, not tiles.
+  The landings lose the amber stat strips, navy category tiles, "coming soon" tag clouds and their three inline copies of
+  the old search modal (the shared palette was already loaded). Heroes are a plain H1 under one mono metabar line
+  (`34 articles · 3 series · updated 22 Jul 2026`, generated).
+- `css/rz-article-dark.css`: `--rz-art-serif` now resolves to the sans stack (the token stays so 43 pages keep their
+  selectors), `--rz-art-accent2` (the second, green hue) → muted text, the diagram `--dg-ok` and the derived-chip green →
+  neutral / amber, the hanging quotation glyph loses Fraunces; the family's navbar surface is graphite when scrolled.
+- `tools/audit-vibecode.mjs`: the journal family joins strict scope (`JOURNAL_STRICT`); `stat-strip` counts only tiles
+  outside a `data-rz-fact-list` parent and outside `<script>` (a print/PDF template is a paper document), with the vocabulary
+  widened to `evidence|figure|number` tiles (the detector had passed article-26's hero strip; the owner's eye had not);
+  `aurora-navy` matches a class or id named aurora-*, not the word in prose (Oklo Aurora is a reactor).
+  `tools/test-audit-vibecode.mjs`: the monitored fixture moves off `article-99.html` (now strict) and a new fixture proves
+  the eight tells GATE on the journal family. Site-wide monitored findings 538 → 407.
+- `assets/article-29-hero.webp`, `assets/article-29-card.webp`, `assets/og/article-29.webp`: the owner's two renders for the
+  coming article 29, hero/OG and card; the builder prefers `<id>-card.webp` for the grid when it exists.
+
+**Research staged, not yet published:** `Article/Article_29/` (how an LLM works, tokens to frontier hardware: 76 sources,
+5 calculator specs, 10 diagram specs) and `Article/Article_30/` (the "Agentic AI" debate: 63 sources, Elder's 14 claims
+graded) and `standarization/Audit result/seo-geo-2026-10-16/` (SEO + GEO strategy, 14 new ledger rows). Content, not code.
+
 ## v3.22.10 — 2026-10-17 — "Hardware"
 
 ### Changed — the 3D gets its detail from pixels and runs smooth (`js/rz-hub-3d.js`)

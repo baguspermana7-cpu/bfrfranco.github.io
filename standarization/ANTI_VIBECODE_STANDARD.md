@@ -374,6 +374,27 @@ NORMAL state colour is a semantic choice the owner decides, not a sweep) · hove
 HUE BAND (neon: h 95–170°, s ≥ .9, l .4–.65; navy: h 205–250°, s ≥ .3, l ≤ .14), never by one hex —
 banning `#8b5cf6` by string once left 1,238 same-hue literals live.
 
+### Journal family strict + the fact-list rule (v3.23.0, 2026-10-17)
+
+The journal hub (`articles.html`), the three series landings and every page on the editorial register (`article-*`,
+`FF-*`, `geopolitics-*`, `css/rz-article-dark.css`, `js/rz-journal-filter.js`) joined strict scope (`JOURNAL_STRICT` in
+`tools/audit-vibecode.mjs`). Getting the rows to zero took a sweep TOOL, not hand edits: `tools/sweep-journal-register.py`
+rewrote 1,405 declarations on 35 pages by hue band (the same bands the detectors use) and is a no-op on the shipped tree
+(`--check`, wired into `test-generator-freshness.py`). The before→after log is `standarization/Audit result/journal-sweep.md`.
+
+Two detector changes, both because the eye found what the regex missed:
+- **§A29 stat-strip** now counts tiles named `stat|stats|metric|kpi|evidence|figure|number` + `item|card|tile|box|block|cell`
+  (article-26's `.pfas-evidence-card` hero strip had walked through), skips `<script>` bodies (a print/PDF template is a paper
+  document, protected above), and skips tiles inside a parent marked `data-rz-fact-list`. That attribute is not an exemption
+  by name: the register renders such a parent as ONE FACT PER ROW (mono number, label, sub-text, hairline — the "one mono
+  metabar line, or nothing" alternative), and `tools/test-journal.mjs` J5d checks in a browser that the rows really are
+  full-width. Content stays; the tile grid does not.
+- **§A33 aurora** matches a class or id named `aurora-*`, not the word in prose or a chart title (Oklo Aurora is a reactor).
+
+Rule for the next family: screenshot both themes at 390 + 1440, measure composited layers (CDP LayerTree; the blank-on-scroll
+hub had 48, an article 17), inventory with `audit-vibecode --json`, sweep with a reproducible tool, widen the detector to what
+the eye found, join strict scope, gate the structure, re-shoot.
+
 ### Monitor + strict scope (v1.135.2) — OBSOLETE, see the note below
 
 > **Re-measured 2026-10-03 (v3.11.12): this carve-out no longer describes the tool, and the backlog

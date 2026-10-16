@@ -511,8 +511,31 @@ const RULES = [
        is the same vocabulary on every page that has one. */
     test: (t) => {
       if (/data-rz-register="instrument"/.test(t)) return null;
-      const tiles = t.match(/class="[^"]*\b(?:stat|metric|kpi)[-_]?(?:item|card|tile|box|block)\b[^"]*"/gi) || [];
-      return tiles.length >= 3 ? `${tiles.length} stat tiles in a strip (one mono metabar line, or nothing)` : null;
+      /* a parent marked data-rz-fact-list is re-registered by css/rz-article-dark.css as one fact
+         per row (tools/sweep-journal-register.py R9); tiles inside it are a list, not a strip.
+         tools/test-journal.mjs checks in a browser that such a parent really renders as rows. */
+      const spans = [];
+      const open = /<([a-zA-Z][a-zA-Z0-9-]*)\b[^<>]*\bdata-rz-fact-list\b[^<>]*>/g;
+      let o;
+      while ((o = open.exec(t))) {
+        const tag = o[1];
+        const re = new RegExp(`<(/?)${tag}\\b[^<>]*>`, 'g');
+        re.lastIndex = o.index + o[0].length;
+        let depth = 1, m;
+        while (depth && (m = re.exec(t))) depth += m[1] ? -1 : 1;
+        spans.push([o.index, m ? m.index + m[0].length : t.length]);
+      }
+      /* script bodies are skipped: a class name inside a JS string is a print/PDF template or an
+         export (paper documents are protected, see the header), not the page's own markup */
+      const scripts = [];
+      const sc = /<script\b[^>]*>[\s\S]*?<\/script>/gi;
+      let s;
+      while ((s = sc.exec(t))) scripts.push([s.index, s.index + s[0].length]);
+      const inside = (i) => spans.some(([a, b]) => i >= a && i < b) || scripts.some(([a, b]) => i >= a && i < b);
+      const tile = /class="[^"]*\b(?:stat|stats|metric|kpi|evidence|figure|number)[-_]?(?:item|card|tile|box|block|cell)\b[^"]*"/gi;
+      let tiles = 0, m;
+      while ((m = tile.exec(t))) if (!inside(m.index)) tiles++;
+      return tiles >= 3 ? `${tiles} stat tiles in a strip (one mono metabar line, or nothing)` : null;
     } },
 
   { id: "hover-lift", scoped: true,                                   // §A rule 30
@@ -547,7 +570,8 @@ const RULES = [
        blue-navy cast of a page background — a dark surface with a blue hue and real
        saturation. Graphite (#0b0c0e, s ≈ 0.12) is below the band; #0a0e1a (s ≈ 0.44) is in it. */
     test: (t) => {
-      const aurora = cssBlocks(t).filter((b) => /aurora/i.test(b.sel)).length;
+      // a class or id named aurora-*, not the word in prose or a chart title (Oklo Aurora is a reactor)
+      const aurora = cssBlocks(t).filter((b) => /[.#][a-z0-9_-]*aurora/i.test(b.sel)).length;
       const navy = (t.match(/(?:background(?:-color)?|--[a-z0-9-]*bg[a-z0-9-]*)\s*:\s*(#[0-9a-f]{3,8})\b/gi) || [])
         .map((d) => d.match(/#[0-9a-f]{3,8}/i)[0])
         .filter((hex) => { const c = hexToHsl(hex); return c && c[0] >= 205 && c[0] <= 250 && c[1] >= 0.3 && c[2] <= 0.14; });
@@ -574,6 +598,12 @@ const RULES = [
 
 /* The pages where §A27–34 GATE today. Everything else is monitored with its count printed. */
 const HUB_STRICT = new Set(['datacenter-solutions.html', 'css/rz-hub.css', 'js/rz-hub.js', 'js/rz-hub-scene.js', 'js/rz-home-scene.js', 'js/rz-hub-product.js', 'index1.html', 'datacenter-solutions1.html']);
+/* The journal family joined strict scope at v3.23.0 (owner 2026-10-16: "audit total dan fix properly"):
+   the hub, the three series landings, every page on the editorial register and its stylesheet.
+   tools/sweep-journal-register.py rewrote 1,405 declarations to get every row to zero. */
+const JOURNAL_STRICT = (rel) => /^(articles1?|insights|geopolitics|future-forward|article-\d+|FF-\d+|geopolitics-\d+)\.html$/.test(rel)
+  || rel === 'css/rz-article-dark.css' || rel === 'js/rz-journal-filter.js';
+const isStrict = (rel) => HUB_STRICT.has(rel) || JOURNAL_STRICT(rel);
 
 function hexToHsl(hex) {
   let h = hex.slice(1);
@@ -626,7 +656,7 @@ for (const f of files) {
     const m = blocks ? (blocks.length ? `${blocks.length} decorative block(s): ${blocks.map(block => block.sel).join(', ')}` : null) : r.test(t, f);
     if (!m) continue;
     const rel = f.replace(ROOT + "/", "");
-    findings.push({ file: rel, rule: r.id, msg: m, blocks, monitor: Boolean(r.scoped) && !HUB_STRICT.has(rel) });
+    findings.push({ file: rel, rule: r.id, msg: m, blocks, monitor: Boolean(r.scoped) && !isStrict(rel) });
   }
 }
 
@@ -671,7 +701,7 @@ for (const [rule, fs] of Object.entries(group(gating))) {
   console.log(`  ✗ ${rule}: ${fs.length} file(s) — ${fs.slice(0, 4).join(", ")}${fs.length > 4 ? " …" : ""}`);
 }
 const monitorRows = Object.entries(group(monitored));
-if (monitorRows.length) console.log(`  ○ MONITOR — §A27–34 gate on ${[...HUB_STRICT].join(', ')}; a page flips strict when its own row reads zero:`);
+if (monitorRows.length) console.log(`  ○ MONITOR — §A27–34 gate on ${[...HUB_STRICT].join(', ')} + the journal family (articles, insights, geopolitics, future-forward, article-*, FF-*, geopolitics-*, css/rz-article-dark.css); a page flips strict when its own row reads zero:`);
 for (const [rule, fs] of monitorRows) {
   console.log(`  ○ ${rule}: ${fs.length} file(s) — ${fs.slice(0, 3).join(', ')}${fs.length > 3 ? ' …' : ''}`);
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-rz-register="editorial" style="--rz-art-accent:#E8B563;--rz-art-accent2:#6FBF9A;">
+<html lang="en" data-rz-register="editorial">
 <head>
     <!-- Google tag (gtag.js) -->
     <!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
@@ -84,8 +84,8 @@
     <!-- v1.43.9 — editorial register (RZ Dark System v1). Adds Fraunces + Plex fonts,
          the editorial article skin (scoped to data-rz-register=editorial + dark),
          and the read-progress/entrance runtime. Light mode + structure untouched. -->
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261012-9a70d791">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261016-f6e588a9">
     <script src="js/rz-explain-db.js?v=20260922-cc23355f" defer></script>
 <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
 <script src="js/rz-article-editorial.js?v=20260920-10bc5a1a" defer></script>
@@ -432,7 +432,7 @@
 
         /* Chemistry callout — monospace formula block */
         .pfas-chem-block {
-            background: #0f172a;
+            background: #0E0F12;
             border: 1px solid rgba(217,119,6,0.25);
             border-radius: 4px;
             padding: 1.25rem 1.5rem;
@@ -445,8 +445,7 @@
              * indentation render as blank lines and the alignment spaces wrap.
              * Preformatting now belongs to .pfas-chem-calc alone, so the
              * container is ordinary flow and the source can be indented. */
-            white-space: normal;
-        }
+            white-space: normal;}
         @media (max-width: 768px) { .pfas-chem-block { font-size: 0.72rem; padding: 1rem 1.1rem; } }
         .pfas-chem-block .chem-label {
             font-size: 0.72rem;
@@ -590,20 +589,19 @@
         }
         .pfas-card .pfas-card-stat span:first-child { color: #64748b; }
         .pfas-card .pfas-card-stat span:last-child { color: #92400e; font-weight: 700; }
-        [data-theme="dark"] .pfas-card { background: #1e293b; border-color: #374151; }
+        [data-theme="dark"] .pfas-card { background: var(--rz-art-panel); border-color: #374151;}
         [data-theme="dark"] .pfas-card h4 { color: #fcd34d; }
         [data-theme="dark"] .pfas-card p { color: #64748b; }
         [data-theme="dark"] .pfas-card .pfas-card-stat { border-color: #374151; }
 
         /* Engineer note — first-person callout */
         .pfas-engineer-note {
-            background: #1e293b;
+            background: #121316;
             border-left: 2px solid #d97706;
             border-radius: 0 4px 4px 0;
             padding: 1.5rem 2rem;
             margin: 2rem 0;
-            color: #e2e8f0;
-        }
+            color: #e2e8f0;}
         .pfas-engineer-note .engineer-label {
             font-size: 0.72rem;
             font-weight: 700;
@@ -633,19 +631,19 @@
 
         /* Toolbar */
         .pfas-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:0.75rem; padding:0.75rem 1rem; background: #f8fafc; border-radius:8px; margin-bottom:1.25rem; border: 1px solid #e5e7eb; }
-        [data-theme="dark"] .pfas-toolbar { background: #111827; border-color: #374151; }
+        [data-theme="dark"] .pfas-toolbar { background: var(--rz-art-bg); border-color: #374151;}
         .pfas-mode-bar { display:flex; gap:0.5rem; }
-        .pfas-mode-btn { padding:0.4rem 1rem; border-radius:6px; font-size:0.8rem; font-weight:600; border: 1px solid #d1d5db; cursor:pointer; transition:all 0.15s; background: #fff; color:#64748b; }
+        .pfas-mode-btn { padding:0.4rem 1rem; border-radius:6px; font-size:0.8rem; font-weight:600; border: 1px solid #d1d5db; cursor:pointer; transition: color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),background-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),border-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),opacity var(--rz-dur-tip,160ms) var(--rz-ease-out,ease); background: #fff; color:#64748b;}
         .pfas-mode-btn.active { background: #b45309; color:#fff; border-color: #b45309; }
-        [data-theme="dark"] .pfas-mode-btn { background: #1f2937; border-color: #374151; color:#9ca3af; }
+        [data-theme="dark"] .pfas-mode-btn { background: var(--rz-art-panel); border-color: #374151; color:#9ca3af;}
         [data-theme="dark"] .pfas-mode-btn.active { background: #b45309; color:#fff; }
         .pfas-action-btns { display:flex; gap:0.5rem; margin-left:auto; }
-        .pfas-action-btn { padding:0.4rem 0.875rem; border-radius:6px; font-size:0.78rem; font-weight:600; border: 1px solid; cursor:pointer; display:inline-flex; align-items:center; gap:0.35rem; transition:all 0.15s; }
+        .pfas-action-btn { padding:0.4rem 0.875rem; border-radius:6px; font-size:0.78rem; font-weight:600; border: 1px solid; cursor:pointer; display:inline-flex; align-items:center; gap:0.35rem; transition: color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),background-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),border-color var(--rz-dur-tip,160ms) var(--rz-ease-out,ease),opacity var(--rz-dur-tip,160ms) var(--rz-ease-out,ease);}
         .pfas-action-btn.reset { border-color: #d1d5db; background: #fff; color:#374151; }
         .pfas-action-btn.reset:hover { background: #f3f4f6; }
         .pfas-action-btn.pdf { border-color: #b45309; background: #b45309; color:#fff; }
         .pfas-action-btn.pdf:hover { background: #b45309; }
-        [data-theme="dark"] .pfas-action-btn.reset { background: #1f2937; border-color: #374151; color:#d1d5db; }
+        [data-theme="dark"] .pfas-action-btn.reset { background: var(--rz-art-panel); border-color: #374151; color:#d1d5db;}
         .pfas-privacy { font-size:0.68rem; color:#9ca3af; margin-left:auto; white-space:nowrap; }
 
         /* Input grid */
@@ -655,15 +653,15 @@
         [data-theme="dark"] .pfas-label { color:#d1d5db; }
         .pfas-select, .pfas-num { padding:0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius:6px; font-size:0.84rem; background: #fff; color:#111827; width:100%; box-sizing:border-box; }
         .pfas-select:focus, .pfas-num:focus { outline:2px solid #b45309; outline-offset:1px; }
-        [data-theme="dark"] .pfas-select, [data-theme="dark"] .pfas-num { background: #1f2937; border-color: #374151; color:#f3f4f6; }
+        [data-theme="dark"] .pfas-select, [data-theme="dark"] .pfas-num { background: var(--rz-art-panel); border-color: #374151; color:#f3f4f6;}
 
         /* Tooltip */
         .pfas-tt { position:relative; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background: #b45309; color:#fff; font-size:0.65rem; font-weight:700; cursor:help; flex-shrink:0; }
-        .pfas-tt-box { display:none; position:absolute; z-index:100; left:120%; top:50%; transform:translateY(-50%); width:220px; background: #1e293b; border-radius:8px; padding:0.75rem; box-shadow:0 4px 20px rgba(0,0,0,0.3); pointer-events:none; }
+        .pfas-tt-box { display:none; position:absolute; z-index:100; left:120%; top:50%; transform:translateY(-50%); width:220px; color: #CFD3DA; background: #121316; border-radius:8px; padding:0.75rem; box-shadow:0 4px 20px rgba(0,0,0,0.3); pointer-events:none;}
         .pfas-tt:hover .pfas-tt-box, .pfas-tt:focus .pfas-tt-box { display:block; }
         .pfas-tt-title { color:#b45309; font-size:0.78rem; font-weight:700; margin-bottom:0.3rem; }
         .pfas-tt-desc { color:#cbd5e1; font-size:0.72rem; line-height:1.5; margin-bottom:0.3rem; }
-        .pfas-tt-bench { color:#64748b; font-size:0.68rem; font-style:italic; border-top: 1px solid #334155; padding-top:0.3rem; }
+        .pfas-tt-bench { color: #9aa3ad; font-size:0.68rem; font-style:italic; border-top: 1px solid #334155; padding-top:0.3rem;}
 
         /* Results grid */
         .pfas-results-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin:1.25rem 0; }
@@ -672,7 +670,7 @@
         @media (max-width: 768px) { .pfas-results-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 480px) { .pfas-results-grid { grid-template-columns: 1fr; } }
         .pfas-kpi-card { background: #f9fafb; border: 1px solid #e5e7eb; border-top: 3px solid #b45309; border-radius:4px; padding:0.875rem; }
-        [data-theme="dark"] .pfas-kpi-card { background: #111827; border-color: #374151; }
+        [data-theme="dark"] .pfas-kpi-card { background: var(--rz-art-bg); border-color: #374151;}
         .pfas-kpi-label { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:0.4rem; }
         [data-theme="dark"] .pfas-kpi-label { color:#9ca3af; }
         .pfas-kpi-value { font-size:1.4rem; font-weight:800; color:#b45309; line-height:1.1; margin-bottom:0.3rem; font-variant-numeric: tabular-nums; font-feature-settings:"zero" 1; }
@@ -692,7 +690,7 @@
         .pfas-pro-panels { display:none; margin-top:1.5rem; }
         .pfas-pro-panels.active { display:block; }
         .pfas-pro-panel { background: #f9fafb; border: 1px solid #e5e7eb; border-radius:4px; margin-bottom:1rem; overflow:hidden; position:relative; }
-        [data-theme="dark"] .pfas-pro-panel { background: #111827; border-color: #374151; }
+        [data-theme="dark"] .pfas-pro-panel { background: var(--rz-art-bg); border-color: #374151;}
         .pfas-pro-panel-header { padding:0.875rem 1.25rem; border-bottom: 1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between; }
         [data-theme="dark"] .pfas-pro-panel-header { border-color: #374151; }
         .pfas-pro-panel-title { font-size:0.95rem; font-weight:700; color:#1e293b; }
@@ -704,20 +702,20 @@
         .pfas-chart-container { height:240px; position:relative; margin-bottom:0.5rem; }
 
         /* Gate overlay */
-        .pfas-gate { position:absolute; inset:0; background: rgba(15,23,42,0.82); backdrop-filter:blur(3px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem; border-radius:10px; }
+        .pfas-gate { position:absolute; inset:0; color: #CFD3DA; background: #0E0F12; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem; border-radius:10px;}
         .pfas-gate i { font-size:2rem; color:#b45309; }
         .pfas-gate p { color:#e2e8f0; font-size:0.9rem; font-weight:600; margin:0; }
         .pfas-gate-btn { padding:0.5rem 1.25rem; background: #b45309; color:#fff; border: none; border-radius:6px; font-size:0.82rem; font-weight:700; cursor:pointer; }
         .pfas-gate.hidden { display:none; }
 
         /* Login modal */
-        .pfas-login-overlay { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9999; align-items:center; justify-content:center; }
+        .pfas-login-overlay { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center;}
         .pfas-login-overlay.open { display:flex; }
-        .pfas-login-box { background: #0f172a; border-radius:12px; padding:2rem; width:min(380px,92vw); position:relative; border: 1px solid #334155; }
-        .pfas-login-close { position:absolute; top:0.75rem; right:0.75rem; background: none; border: none; color:#64748b; font-size:1.4rem; cursor:pointer; }
+        .pfas-login-box { color: #CFD3DA; background: #0E0F12; border-radius:12px; padding:2rem; width:min(380px,92vw); position:relative; border: 1px solid #334155;}
+        .pfas-login-close { position:absolute; top:0.75rem; right:0.75rem; background: none; border: none; color: #9aa3ad; font-size:1.4rem; cursor:pointer;}
         .pfas-login-box h3 { color:#f1f5f9; font-size:1.1rem; margin:0 0 0.4rem; }
-        .pfas-login-box p { color:#64748b; font-size:0.82rem; margin:0 0 1.25rem; }
-        .pfas-login-box input { display:block; width:100%; box-sizing:border-box; padding:0.65rem 0.875rem; border: 1px solid #334155; border-radius:7px; background: #0f172a; color:#f1f5f9; font-size:0.875rem; margin-bottom:0.75rem; }
+        .pfas-login-box p { color: #9aa3ad; font-size:0.82rem; margin:0 0 1.25rem;}
+        .pfas-login-box input { display:block; width:100%; box-sizing:border-box; padding:0.65rem 0.875rem; border: 1px solid #334155; border-radius:7px; background: #0E0F12; color:#f1f5f9; font-size:0.875rem; margin-bottom:0.75rem;}
         .pfas-login-submit { width:100%; padding:0.7rem; background: #b45309; color:#fff; border: none; border-radius:7px; font-size:0.9rem; font-weight:700; cursor:pointer; margin-top:0.25rem; }
         .pfas-login-error { display:none; color:#fbbf24; font-size:0.78rem; margin-top:0.5rem; text-align:center; }
         .pfas-login-demo { margin-top:0.75rem; text-align:center; font-size:0.72rem; color:#64748b; }
@@ -728,7 +726,7 @@
         /* Benchmark meta */
         .pfas-benchmark-meta { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.75rem; }
         .pfas-benchmark-tag { font-size:0.68rem; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius:4px; padding:0.2rem 0.5rem; color:#475569; }
-        [data-theme="dark"] .pfas-benchmark-tag { background: #1e293b; border-color: #334155; color:#9ca3af; }
+        [data-theme="dark"] .pfas-benchmark-tag { background: var(--rz-art-panel); border-color: #334155; color:#9ca3af;}
 
         /* Priority badges */
         .pfas-badge { display:inline-block; font-size:0.65rem; font-weight:700; padding:0.15rem 0.4rem; border-radius:4px; margin-right:0.35rem; }
@@ -741,7 +739,7 @@
         [data-theme="dark"] .pfas-disclaimer { color:#64748b; border-color: #374151; }
         .pfas-downloads { display:grid; grid-template-columns:repeat(2,1fr); gap:0.75rem; margin:1.25rem 0; }
         .pfas-dl { display:flex; gap:0.7rem; align-items:flex-start; padding:0.8rem 1rem; border: 1px solid rgba(180,83,9,0.3); border-radius:10px; background: rgba(232,181,99,0.05); text-decoration:none; color:inherit; transition:border-color .15s ease, transform .15s ease; }
-        .pfas-dl:hover { border-color: #b45309; transform:translateY(-1px); }
+        .pfas-dl:hover { border-color: #b45309;}
         .pfas-dl > i { color:#b45309; margin-top:0.15rem; font-size:0.95rem; }
         .pfas-dl-name { display:block; font-family:'JetBrains Mono', monospace; font-weight:700; font-size:0.8rem; color:#b45309; word-break:break-all; }
         .pfas-dl-desc { display:block; font-size:0.78rem; color:#4b5563; line-height:1.45; margin-top:0.25rem; }
@@ -764,7 +762,7 @@
 
         /* References Section */
         .references-section { background: #f8fafc; padding: 2rem; border-radius: 16px; margin: 3rem 0 0; }
-        [data-theme="dark"] .references-section { background: rgba(15,23,42,0.55); }
+        [data-theme="dark"] .references-section { background: var(--rz-art-bg);}
         .references-title { font-size: 1.25rem; font-weight: 700; color: #92400e; margin-bottom: 1.5rem; }
         [data-theme="dark"] .references-title { color: #fcd34d; }
         .references-list { display: grid; gap: 0.75rem; }
@@ -803,7 +801,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-insigh
 html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-danger-box h3 { color:#fcd34d !important; }
 html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warning-box h3 { color:#fbbf24 !important; }
 </style>
-    <script src="js/rz-version.js?v=20261016-8f741684" defer></script>
+    <script src="js/rz-version.js?v=20261016-f61c022f" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 <style id="rz-mobile-v18">
@@ -950,7 +948,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
 
 <!-- Evidence Block -->
 <div class="pfas-evidence-block" role="region" aria-label="Evidence summary">
-    <div class="pfas-evidence-grid">
+    <div data-rz-fact-list class="pfas-evidence-grid">
         <div class="pfas-evidence-card">
             <div class="pfas-evidence-value">12,000+</div>
             <div class="pfas-evidence-label">PFAS Compounds</div>
@@ -1010,7 +1008,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
 
     <p>The C-F bond has a dissociation energy of approximately <span class="pfas-stat">544 kJ/mol</span> &mdash; the strongest bond in organic chemistry. Nothing in the natural world breaks it down efficiently. Not UV radiation, not biological enzymes, not soil bacteria, not the acidic environment of a human gut. This bond energy is why PFAS bioaccumulates across food chains, why it has been detected in the blood of polar bears in the Arctic and in the tissue of fish in remote mountain lakes with no industrial activity for hundreds of kilometers. Once a PFAS molecule is released into the environment, it persists. This persistence makes the amount released during operation and maintenance important to measure.</p>
 
-    <div class="pfas-chem-block is-table">
+    <div data-rz-dark-panel class="pfas-chem-block is-table">
         <span class="chem-label">PFAS Bond Chemistry &mdash; Why Persistence Is the Problem</span>
         <table class="pfas-chem-table">
             <tr class="grp"><td colspan="3">Bond dissociation energy</td></tr>
@@ -1073,7 +1071,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
 
     <p>That remaining 6% of the fluid charge &mdash; representing anywhere from <span class="pfas-stat">3 to 12 liters</span> in a standard 10-rack cluster &mdash; went to atmosphere in the time it takes to make a cup of coffee. And that was the expected result. That is the process working correctly.</p>
 
-    <div class="pfas-engineer-note">
+    <div data-rz-dark-panel class="pfas-engineer-note">
         <span class="engineer-label">Field Note &mdash; Engineer Perspective</span>
         <p>A standard two-phase immersion cluster holds <strong>50 to 200 liters of Novec 7000 per rack</strong>. A 10-rack AI training cluster therefore contains between 500 and 2,000 liters of PFAS fluid. The integrated drain system recovers approximately 94-96% of that volume under ideal conditions. The remaining 2-6% &mdash; representing 10 to 120 liters depending on system size &mdash; coats every internal surface and evaporates directly to atmosphere during the maintenance window. This is not a failure mode. This is the design operating as intended. The fluid was engineered to evaporate at low temperatures. It does exactly that.</p>
     </div>
@@ -1295,7 +1293,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
     </figure>
 
 
-    <div class="pfas-chem-block is-table">
+    <div data-rz-dark-panel class="pfas-chem-block is-table">
         <span class="chem-label">Reference inputs (tagged)</span>
         <table class="pfas-chem-table">
             <tr><td class="k">Single immersion tank charge</td><td class="v"><span class="chem-highlight">800 L</span></td><td class="n">Illustrative &mdash; mid-range tank</td></tr>
@@ -1309,7 +1307,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
         </table>
     </div>
 
-    <div class="pfas-chem-block">
+    <div data-rz-dark-panel class="pfas-chem-block">
         <span class="chem-label">Model A &mdash; annual loss &amp; cost, single 800 L tank</span>
         <p class="pfas-chem-calc">Evaporative / maintenance loss
   well-run :  0.020 &times; 800 L  =   <span class="chem-highlight">16 L/yr</span>
@@ -1324,7 +1322,7 @@ Fluid replacement cost @ $70/L
         <p class="pfas-chem-note">Even the &ldquo;good&rdquo; tank quietly spends four figures a year replacing fluid that went to atmosphere; the measured-field tank approaches $10k/yr &mdash; per tank.</p>
     </div>
 
-    <div class="pfas-chem-block">
+    <div data-rz-dark-panel class="pfas-chem-block">
         <span class="chem-label">Model B &mdash; per-MW reference hall (8 &times; 800 L tanks &asymp; 6,400 L)</span>
         <p class="pfas-chem-calc">Charge  =  8 &times; 800 L  =  6,400 L
 
@@ -1334,7 +1332,7 @@ Annual loss
         <p class="pfas-chem-note">Per-MW fluid-replacement OPEX therefore runs ~$9k&ndash;$77k/yr. Independent analyses put fluid loss at 5&ndash;12% of the OPEX savings that justified the immersion build in the first place &mdash; a real erosion of the business case, hidden inside the consumables line.</p>
     </div>
 
-    <div class="pfas-chem-block">
+    <div data-rz-dark-panel class="pfas-chem-block">
         <span class="chem-label">Model C &mdash; GWP-weighted emissions, single tank at field loss (137 L)</span>
         <p class="pfas-chem-calc">Loss mass  =  137 L &times; 1.40 kg/L  =  <span class="chem-highlight">192 kg/yr</span>
 
@@ -1346,7 +1344,7 @@ CO&#8322;e if Galden-class PFPE (GWP ~10,000 &mdash; commonly cited but disputed
         <p class="pfas-chem-note">The fluid choice swings the climate footprint of the <i>same leak</i> by ~17&times;. None of this appears in a facility&rsquo;s Scope-1 inventory today.<br><em>* PFPEs are nearly involatile, so the effective atmospheric GWP is contested; treat the Galden line as an illustrative upper bound (see fluid-properties.csv).</em></p>
     </div>
 
-    <div class="pfas-chem-block">
+    <div data-rz-dark-panel class="pfas-chem-block">
         <span class="chem-label">Model D &mdash; HFO &rarr; TFA 10-year loading, single Opteon-class tank</span>
         <p class="pfas-chem-calc">HFO density 1.37 kg/L ; MW(HFO-1336mzz-Z) 164 ; MW(TFA) 114  &rarr;  ratio 0.695
 TFA yield = the undisclosed variable  &rarr;  modelled at 50% and 100% of a single-TFA path
@@ -1375,7 +1373,7 @@ TFA formed over 10 yr
 
     <p>Chemours' primary replacement offering, Opteon 2P50, is based on HFO-1336mzz-Z, a hydrofluoroolefin compound. The "hydrofluoroolefin" classification is meaningful: HFOs contain carbon-fluorine bonds (which is why they have the thermal and dielectric properties needed for immersion cooling), but they also have a carbon-carbon double bond that makes them more reactive &mdash; meaning they break down in the atmosphere significantly faster than traditional PFAS. Opteon 2P50 has an atmospheric half-life of approximately <span class="pfas-stat">26 days</span>, compared to effectively infinite persistence for PFOA and PFOS. This is a genuine improvement. It is not, however, the end of the story.</p>
 
-    <div class="pfas-chem-block is-table">
+    <div data-rz-dark-panel class="pfas-chem-block is-table">
         <span class="chem-label">HFO Degradation Pathway &mdash; What Happens After Atmospheric Breakdown</span>
         <p class="pfas-chem-calc">HFO-1336mzz-Z  &rarr;  (UV photolysis, OH radical reaction)  &rarr;  <span class="chem-highlight">CF3COOH</span>
                                                             (Trifluoroacetic acid / TFA)</p>
@@ -1660,7 +1658,7 @@ TFA formed over 10 yr
         <!-- Free Inputs (8) -->
         <div class="pfas-input-grid">
             <div class="pfas-input-group">
-                <label class="pfas-label">Cooling System Type <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Cooling System Type</div><div class="pfas-tt-desc">Primary server cooling method determines the type and quantity of PFAS compounds present on-site.</div><div class="pfas-tt-bench">Two-phase PFAS systems (Novec 7000, HFC-based) carry the highest regulatory exposure as of EPA MCL ruling April 2024.</div></span></span></label>
+                <label class="pfas-label">Cooling System Type <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Cooling System Type</div><div class="pfas-tt-desc">Primary server cooling method determines the type and quantity of PFAS compounds present on-site.</div><div class="pfas-tt-bench">Two-phase PFAS systems (Novec 7000, HFC-based) carry the highest regulatory exposure as of EPA MCL ruling April 2024.</div></span></span></label>
                 <select class="pfas-select" id="pfasCoolingType" aria-label="Pfas Cooling Type">
                     <option value="two-phase-pfas">Two-Phase Immersion — PFAS (Novec/HFC)</option>
                     <option value="two-phase-hfo">Two-Phase Immersion — HFO (Opteon 2P50/Galden)</option>
@@ -1672,7 +1670,7 @@ TFA formed over 10 yr
                 </select>
             </div>
             <div class="pfas-input-group">
-                <label class="pfas-label">Fire Suppression System <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Fire Suppression</div><div class="pfas-tt-desc">FM-200 (HFC-227ea) and Novec 1230 (FK-5-1-12) both contain fluorinated compounds with significant environmental persistence.</div><div class="pfas-tt-bench">FM-200 GWP: 3,220. Novec 1230 GWP: 1. Both classified as PFAS under expanding EPA PFAS definition (2024).</div></span></span></label>
+                <label class="pfas-label">Fire Suppression System <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Fire Suppression</div><div class="pfas-tt-desc">FM-200 (HFC-227ea) and Novec 1230 (FK-5-1-12) both contain fluorinated compounds with significant environmental persistence.</div><div class="pfas-tt-bench">FM-200 GWP: 3,220. Novec 1230 GWP: 1. Both classified as PFAS under expanding EPA PFAS definition (2024).</div></span></span></label>
                 <select class="pfas-select" id="pfasFireSuppression" aria-label="Pfas Fire Suppression">
                     <option value="fm200">FM-200 (HFC-227ea) — Fluorinated</option>
                     <option value="novec1230">Novec 1230 (FK-5-1-12) — Fluorinated</option>
@@ -1682,7 +1680,7 @@ TFA formed over 10 yr
                 </select>
             </div>
             <div class="pfas-input-group">
-                <label class="pfas-label">Facility Age <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Facility Age</div><div class="pfas-tt-desc">Older facilities with two-phase PFAS systems have accumulated more maintenance vapor release events and are less likely to have vapor recovery protocols.</div><div class="pfas-tt-bench">Average two-phase immersion system operational life: 10–15 years. Most Novec 7000 installations commissioned 2015–2022.</div></span></span></label>
+                <label class="pfas-label">Facility Age <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Facility Age</div><div class="pfas-tt-desc">Older facilities with two-phase PFAS systems have accumulated more maintenance vapor release events and are less likely to have vapor recovery protocols.</div><div class="pfas-tt-bench">Average two-phase immersion system operational life: 10–15 years. Most Novec 7000 installations commissioned 2015–2022.</div></span></span></label>
                 <select class="pfas-select" id="pfasFacilityAge" aria-label="Pfas Facility Age">
                     <option value="new">Less than 3 years (commissioned 2023+)</option>
                     <option value="mid-early">3–7 years (commissioned 2017–2022)</option>
@@ -1691,7 +1689,7 @@ TFA formed over 10 yr
                 </select>
             </div>
             <div class="pfas-input-group">
-                <label class="pfas-label">Distance to Nearest Water Source <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Water Proximity</div><div class="pfas-tt-desc">PFAS compounds are highly mobile in groundwater. Proximity to drinking water supplies, rivers, or residential wells determines regulatory exposure and contamination liability.</div><div class="pfas-tt-bench">EPA MCL: 4 ppt for PFOA/PFOS (effective Apr 2024). PFAS detected in water sources up to 3 km from industrial sites.</div></span></span></label>
+                <label class="pfas-label">Distance to Nearest Water Source <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Water Proximity</div><div class="pfas-tt-desc">PFAS compounds are highly mobile in groundwater. Proximity to drinking water supplies, rivers, or residential wells determines regulatory exposure and contamination liability.</div><div class="pfas-tt-bench">EPA MCL: 4 ppt for PFOA/PFOS (effective Apr 2024). PFAS detected in water sources up to 3 km from industrial sites.</div></span></span></label>
                 <select class="pfas-select" id="pfasWaterDistance" aria-label="Pfas Water Distance">
                     <option value="very-close">Less than 500 m — Critical proximity</option>
                     <option value="close">500 m – 2 km — High proximity</option>
@@ -1700,7 +1698,7 @@ TFA formed over 10 yr
                 </select>
             </div>
             <div class="pfas-input-group">
-                <label class="pfas-label">Average Rack Density <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Rack Density</div><div class="pfas-tt-desc">Technical justification for two-phase PFAS cooling only exists above ~100 kW/rack. Below this threshold, direct-to-chip water cooling is equivalent and PFAS-free.</div><div class="pfas-tt-bench">Uptime Institute 2025: global avg 15–25 kW/rack. 95% of capacity operates below two-phase PFAS threshold.</div></span></span></label>
+                <label class="pfas-label">Average Rack Density <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Rack Density</div><div class="pfas-tt-desc">Technical justification for two-phase PFAS cooling only exists above ~100 kW/rack. Below this threshold, direct-to-chip water cooling is equivalent and PFAS-free.</div><div class="pfas-tt-bench">Uptime Institute 2025: global avg 15–25 kW/rack. 95% of capacity operates below two-phase PFAS threshold.</div></span></span></label>
                 <select class="pfas-select" id="pfasRackDensity" aria-label="Pfas Rack Density">
                     <option value="low">Less than 15 kW/rack — Typical enterprise</option>
                     <option value="medium">15–40 kW/rack — Hyperscale standard</option>
@@ -1709,7 +1707,7 @@ TFA formed over 10 yr
                 </select>
             </div>
             <div class="pfas-input-group">
-                <label class="pfas-label">Maintenance Frequency <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Maintenance Frequency</div><div class="pfas-tt-desc">Each planned maintenance window on a two-phase system opens the fluid bath to atmosphere, releasing PFAS vapor. This is the primary environmental release pathway — not sealed-system leaks.</div><div class="pfas-tt-bench">Est. vapor release per open event: 0.5–2% of bath volume. Semiconductor industry recovery standard: 60–80% capture efficiency.</div></span></span></label>
+                <label class="pfas-label">Maintenance Frequency <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Maintenance Frequency</div><div class="pfas-tt-desc">Each planned maintenance window on a two-phase system opens the fluid bath to atmosphere, releasing PFAS vapor. This is the primary environmental release pathway — not sealed-system leaks.</div><div class="pfas-tt-bench">Est. vapor release per open event: 0.5–2% of bath volume. Semiconductor industry recovery standard: 60–80% capture efficiency.</div></span></span></label>
                 <select class="pfas-select" id="pfasMaintenanceFreq" aria-label="Pfas Maintenance Freq">
                     <option value="monthly">Monthly (12× per year)</option>
                     <option value="quarterly" selected>Quarterly (4× per year)</option>
@@ -1718,7 +1716,7 @@ TFA formed over 10 yr
                 </select>
             </div>
             <div class="pfas-input-group">
-                <label class="pfas-label">Regulatory Jurisdiction <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Jurisdiction</div><div class="pfas-tt-desc">PFAS regulation varies significantly by region. California leads US states; the EU ECHA restriction is the most comprehensive globally, covering ~10,000 PFAS compounds.</div><div class="pfas-tt-bench">US Federal: EPA MCL 4ppt (Apr 2024). EU: ECHA Universal PFAS Restriction decision expected 2026. CA: DTSC SAFER Act expanding 2025.</div></span></span></label>
+                <label class="pfas-label">Regulatory Jurisdiction <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Jurisdiction</div><div class="pfas-tt-desc">PFAS regulation varies significantly by region. California leads US states; the EU ECHA restriction is the most comprehensive globally, covering ~10,000 PFAS compounds.</div><div class="pfas-tt-bench">US Federal: EPA MCL 4ppt (Apr 2024). EU: ECHA Universal PFAS Restriction decision expected 2026. CA: DTSC SAFER Act expanding 2025.</div></span></span></label>
                 <select class="pfas-select" id="pfasJurisdiction" aria-label="Pfas Jurisdiction">
                     <option value="us-ca">United States — California</option>
                     <option value="us-other">United States — Other State</option>
@@ -1728,13 +1726,13 @@ TFA formed over 10 yr
                 </select>
             </div>
             <div class="pfas-input-group">
-                <label class="pfas-label">Number of Immersion Tanks <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Tank Count</div><div class="pfas-tt-desc">Total number of two-phase immersion tanks at the facility. Each tank is an independent vapor release source during maintenance windows.</div><div class="pfas-tt-bench">Typical tank volume: 600–1,200L per unit. Enterprise deployment: 5–20 tanks. Hyperscale: 50–500+ tanks.</div></span></span></label>
+                <label class="pfas-label">Number of Immersion Tanks <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Tank Count</div><div class="pfas-tt-desc">Total number of two-phase immersion tanks at the facility. Each tank is an independent vapor release source during maintenance windows.</div><div class="pfas-tt-bench">Typical tank volume: 600–1,200L per unit. Enterprise deployment: 5–20 tanks. Hyperscale: 50–500+ tanks.</div></span></span></label>
                 <input class="pfas-num" type="number" id="pfasTankCount" value="10" min="1" max="1000" aria-label="Pfas Tank Count">
             </div>
         </div>
 
         <!-- KPI Results (6 cards — auto-updates) -->
-        <div class="pfas-results-grid" id="pfasResultsGrid">
+        <div data-rz-fact-list class="pfas-results-grid" id="pfasResultsGrid">
             <div class="pfas-kpi-card" id="pfasKpiRisk">
                 <div class="pfas-kpi-label">Overall Risk Level</div>
                 <div class="pfas-kpi-value" id="pfasRiskValue">—</div>
@@ -1751,7 +1749,7 @@ TFA formed over 10 yr
                 <div class="pfas-kpi-sub" id="pfasRegSub">Based on current EPA/EU status</div>
             </div>
             <div class="pfas-kpi-card" id="pfasKpiVapor">
-                <div class="pfas-kpi-label">Est. Annual Vapor Release <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Where the per-event figure comes from</div><div class="pfas-tt-desc">Each opening releases 0.008&nbsp;kg of fluid per litre of charge. For the default 800&nbsp;L tank that is 6.4&nbsp;kg, or 0.57&nbsp;% of the charge per event.</div><div class="pfas-tt-bench">That constant has a physical scale behind it. A saturated headspace filling a third of an 800&nbsp;L tank holds about 2.0&nbsp;kg of Novec&nbsp;7000 vapour when the tank is opened at 32.5&nbsp;&deg;C, so 0.008 is roughly <strong>three full headspace exchanges</strong> &mdash; about five if the tank is opened cool at 22&nbsp;&deg;C, where the vapour is thinner. Film and drag-out sit inside that total, not on top of it. A multi-hour full-hatch entry turns the headspace over several times, which is the range this figure sits in. The coefficient is still an assumption, not a measurement &mdash; but it is an assumption of the right order.</div></span></span></div>
+                <div class="pfas-kpi-label">Est. Annual Vapor Release <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Where the per-event figure comes from</div><div class="pfas-tt-desc">Each opening releases 0.008&nbsp;kg of fluid per litre of charge. For the default 800&nbsp;L tank that is 6.4&nbsp;kg, or 0.57&nbsp;% of the charge per event.</div><div class="pfas-tt-bench">That constant has a physical scale behind it. A saturated headspace filling a third of an 800&nbsp;L tank holds about 2.0&nbsp;kg of Novec&nbsp;7000 vapour when the tank is opened at 32.5&nbsp;&deg;C, so 0.008 is roughly <strong>three full headspace exchanges</strong> &mdash; about five if the tank is opened cool at 22&nbsp;&deg;C, where the vapour is thinner. Film and drag-out sit inside that total, not on top of it. A multi-hour full-hatch entry turns the headspace over several times, which is the range this figure sits in. The coefficient is still an assumption, not a measurement &mdash; but it is an assumption of the right order.</div></span></span></div>
                 <div class="pfas-kpi-value" id="pfasVaporValue">—</div>
                 <div class="pfas-kpi-sub" id="pfasVaporSub">kg PFAS/year (no recovery)</div>
             </div>
@@ -1775,15 +1773,15 @@ TFA formed over 10 yr
             <div class="pfas-pro-label"><i class="fas fa-lock-open"></i> Full analysis Inputs</div>
             <div class="pfas-input-grid">
                 <div class="pfas-input-group">
-                    <label class="pfas-label">Fluid Volume Per Tank (Liters) <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Fluid Volume</div><div class="pfas-tt-desc">Total working fluid volume per immersion tank determines total PFAS inventory and absolute vapor release volume per maintenance event.</div><div class="pfas-tt-bench">Typical range: 400–1,500L. GRC ICEraQ: ~600L. LiquidStack: ~800–1,200L. Submer SmartPodX: ~900L.</div></span></span></label>
+                    <label class="pfas-label">Fluid Volume Per Tank (Liters) <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Fluid Volume</div><div class="pfas-tt-desc">Total working fluid volume per immersion tank determines total PFAS inventory and absolute vapor release volume per maintenance event.</div><div class="pfas-tt-bench">Typical range: 400–1,500L. GRC ICEraQ: ~600L. LiquidStack: ~800–1,200L. Submer SmartPodX: ~900L.</div></span></span></label>
                     <input class="pfas-num" type="number" id="pfasFluidVol" value="800" min="100" max="5000" aria-label="Pfas Fluid Vol">
                 </div>
                 <div class="pfas-input-group">
-                    <label class="pfas-label">Maintenance Events Per Tank/Year <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Maintenance Events</div><div class="pfas-tt-desc">Number of times each tank is opened per year, including planned maintenance, server additions/removals, and unplanned interventions.</div><div class="pfas-tt-bench">Industry average: 4–8 events/tank/year. Each open event at 650 hPa vapor pressure releases measurable PFAS volumes.</div></span></span></label>
+                    <label class="pfas-label">Maintenance Events Per Tank/Year <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Maintenance Events</div><div class="pfas-tt-desc">Number of times each tank is opened per year, including planned maintenance, server additions/removals, and unplanned interventions.</div><div class="pfas-tt-bench">Industry average: 4–8 events/tank/year. Each open event at 650 hPa vapor pressure releases measurable PFAS volumes.</div></span></span></label>
                     <input class="pfas-num" type="number" id="pfasMaintEvents" value="4" min="1" max="52" aria-label="Pfas Maint Events">
                 </div>
                 <div class="pfas-input-group">
-                    <label class="pfas-label">Vapor Recovery System <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Vapor Recovery</div><div class="pfas-tt-desc">Active vapor capture shrouds recover 60–80% of released PFAS during maintenance events, analogous to refrigerant recovery under Clean Air Act §608.</div><div class="pfas-tt-bench">Recovery units cost $15,000–$40,000/unit. ROI positive within 2 years for facilities with 20+ tanks.</div></span></span></label>
+                    <label class="pfas-label">Vapor Recovery System <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Vapor Recovery</div><div class="pfas-tt-desc">Active vapor capture shrouds recover 60–80% of released PFAS during maintenance events, analogous to refrigerant recovery under Clean Air Act §608.</div><div class="pfas-tt-bench">Recovery units cost $15,000–$40,000/unit. ROI positive within 2 years for facilities with 20+ tanks.</div></span></span></label>
                     <select class="pfas-select" id="pfasVaporRecovery" aria-label="Pfas Vapor Recovery">
                         <option value="none">None — open venting</option>
                         <option value="partial">Partial — passive containment only</option>
@@ -1791,7 +1789,7 @@ TFA formed over 10 yr
                     </select>
                 </div>
                 <div class="pfas-input-group">
-                    <label class="pfas-label">HFO Transition Plan <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Transition Timeline</div><div class="pfas-tt-desc">Mid-life fluid replacement cost: 30–45% of original cooling capex. Disposal cost: $8–$15/liter for PFAS-classified fluids at licensed incineration facilities.</div><div class="pfas-tt-bench">Cost for 100,000L replacement: $0.8M–$1.5M disposal + engineering + recommissioning.</div></span></span></label>
+                    <label class="pfas-label">HFO Transition Plan <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Transition Timeline</div><div class="pfas-tt-desc">Mid-life fluid replacement cost: 30–45% of original cooling capex. Disposal cost: $8–$15/liter for PFAS-classified fluids at licensed incineration facilities.</div><div class="pfas-tt-bench">Cost for 100,000L replacement: $0.8M–$1.5M disposal + engineering + recommissioning.</div></span></span></label>
                     <select class="pfas-select" id="pfasTransitionYear" aria-label="Pfas Transition Year">
                         <option value="none">No plan to transition</option>
                         <option value="2025">Planning 2025</option>
@@ -1802,7 +1800,7 @@ TFA formed over 10 yr
                     </select>
                 </div>
                 <div class="pfas-input-group">
-                    <label class="pfas-label">Sensitive Ecosystem Nearby <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Sensitive Ecosystem</div><div class="pfas-tt-desc">Wetlands, protected watersheds, drinking water reservoirs, or residential well fields within 5 km significantly elevate regulatory and litigation exposure.</div><div class="pfas-tt-bench">EPA Superfund PFAS enforcement has prioritized sites within 2 km of public water supplies. Class action PFAS litigation is active in 38 US states.</div></span></span></label>
+                    <label class="pfas-label">Sensitive Ecosystem Nearby <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Sensitive Ecosystem</div><div class="pfas-tt-desc">Wetlands, protected watersheds, drinking water reservoirs, or residential well fields within 5 km significantly elevate regulatory and litigation exposure.</div><div class="pfas-tt-bench">EPA Superfund PFAS enforcement has prioritized sites within 2 km of public water supplies. Class action PFAS litigation is active in 38 US states.</div></span></span></label>
                     <select class="pfas-select" id="pfasEcosystem" aria-label="Pfas Ecosystem">
                         <option value="no">No sensitive ecosystem identified</option>
                         <option value="yes">Yes — wetland, reservoir, or residential wells within 5 km</option>
@@ -1820,14 +1818,14 @@ TFA formed over 10 yr
                     <span style="font-size:0.72rem;color:#9ca3af;">10,000 iterations · ±15% variance</span>
                 </div>
                 <div class="pfas-pro-panel-inner">
-                    <div class="pfas-pro-kpi-grid">
+                    <div data-rz-fact-list class="pfas-pro-kpi-grid">
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">P5 — Optimistic</div><div class="pfas-kpi-value" id="pfasP5">—</div><div class="pfas-kpi-sub">5th percentile</div></div>
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">P50 — Median</div><div class="pfas-kpi-value" id="pfasP50">—</div><div class="pfas-kpi-sub">Median scenario</div></div>
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">P95 — Pessimistic</div><div class="pfas-kpi-value" id="pfasP95">—</div><div class="pfas-kpi-sub">95th percentile</div></div>
                     </div>
                     <div class="pfas-chart-container"><canvas id="pfasMCChart"></canvas></div>
                 </div>
-                <div class="pfas-gate" id="pfasGate1"><i class="fas fa-lock"></i><p>Monte Carlo analysis requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
+                <div data-rz-dark-panel class="pfas-gate" id="pfasGate1"><i class="fas fa-lock"></i><p>Monte Carlo analysis requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
             </div>
 
             <!-- Panel 2: Regulatory Timeline 2024-2029 -->
@@ -1837,14 +1835,14 @@ TFA formed over 10 yr
                     <span style="font-size:0.72rem;color:#9ca3af;">US EPA · EU ECHA · State-level</span>
                 </div>
                 <div class="pfas-pro-panel-inner">
-                    <div class="pfas-pro-kpi-grid">
+                    <div data-rz-fact-list class="pfas-pro-kpi-grid">
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">2024 Status</div><div class="pfas-kpi-value" id="pfasReg2024" style="font-size:1rem;">—</div><div class="pfas-kpi-sub">Current obligations</div></div>
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">2026–2027 Risk</div><div class="pfas-kpi-value" id="pfasReg2027" style="font-size:1rem;">—</div><div class="pfas-kpi-sub">Expected rulemaking</div></div>
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">2029 Liability Est.</div><div class="pfas-kpi-value" id="pfasReg2029" style="font-size:1rem;">—</div><div class="pfas-kpi-sub">Projected compliance cost</div></div>
                     </div>
                     <div class="pfas-chart-container"><canvas id="pfasRegChart"></canvas></div>
                 </div>
-                <div class="pfas-gate" id="pfasGate2"><i class="fas fa-lock"></i><p>Regulatory timeline requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
+                <div data-rz-dark-panel class="pfas-gate" id="pfasGate2"><i class="fas fa-lock"></i><p>Regulatory timeline requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
             </div>
 
             <!-- Panel 3: Sensitivity Tornado -->
@@ -1854,14 +1852,14 @@ TFA formed over 10 yr
                     <span style="font-size:0.72rem;color:#9ca3af;">±20% per variable</span>
                 </div>
                 <div class="pfas-pro-panel-inner">
-                    <div class="pfas-pro-kpi-grid">
+                    <div data-rz-fact-list class="pfas-pro-kpi-grid">
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">#1 Driver</div><div class="pfas-kpi-value" id="pfasDriver1" style="font-size:1rem;">—</div><div class="pfas-kpi-sub" id="pfasDriver1Sub">Highest sensitivity</div></div>
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">#2 Driver</div><div class="pfas-kpi-value" id="pfasDriver2" style="font-size:1rem;">—</div><div class="pfas-kpi-sub" id="pfasDriver2Sub">Second sensitivity</div></div>
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">#3 Driver</div><div class="pfas-kpi-value" id="pfasDriver3" style="font-size:1rem;">—</div><div class="pfas-kpi-sub" id="pfasDriver3Sub">Third sensitivity</div></div>
                     </div>
                     <div class="pfas-chart-container"><canvas id="pfasTornadoChart"></canvas></div>
                 </div>
-                <div class="pfas-gate" id="pfasGate3"><i class="fas fa-lock"></i><p>Sensitivity analysis requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
+                <div data-rz-dark-panel class="pfas-gate" id="pfasGate3"><i class="fas fa-lock"></i><p>Sensitivity analysis requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
             </div>
 
             <!-- Panel 4: Strategic Roadmap -->
@@ -1872,7 +1870,7 @@ TFA formed over 10 yr
                 <div class="pfas-pro-panel-inner">
                     <div id="pfasRoadmap" style="font-size:0.875rem;line-height:1.7;color:#374151;"></div>
                 </div>
-                <div class="pfas-gate" id="pfasGate4"><i class="fas fa-lock"></i><p>Strategic roadmap requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
+                <div data-rz-dark-panel class="pfas-gate" id="pfasGate4"><i class="fas fa-lock"></i><p>Strategic roadmap requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
             </div>
 
             <!-- Panel 5: Fluid-Loss & Environmental Cost -->
@@ -1882,7 +1880,7 @@ TFA formed over 10 yr
                     <span style="font-size:0.72rem;color:#9ca3af;">Derived from the vapor-loss model · see article §Worked Models</span>
                 </div>
                 <div class="pfas-pro-panel-inner">
-                    <div class="pfas-pro-kpi-grid cols-4">
+                    <div data-rz-fact-list class="pfas-pro-kpi-grid cols-4">
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">Annual Fluid Lost</div><div class="pfas-kpi-value" id="pfasFluidLostL" style="font-size:1.05rem;">—</div><div class="pfas-kpi-sub" id="pfasFluidLostSub">Litres / year to atmosphere</div></div>
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">Replacement Cost</div><div class="pfas-kpi-value" id="pfasFluidCost" style="font-size:1.05rem;">—</div><div class="pfas-kpi-sub" id="pfasFluidCostSub">Fluid re-purchase / year</div></div>
                         <div class="pfas-kpi-card"><div class="pfas-kpi-label">GWP-Weighted</div><div class="pfas-kpi-value" id="pfasFluidCO2e" style="font-size:1.05rem;">—</div><div class="pfas-kpi-sub" id="pfasFluidCO2eSub">t CO₂e / year (Scope-1 equiv.)</div></div>
@@ -1890,7 +1888,7 @@ TFA formed over 10 yr
                     </div>
                     <p style="font-size:0.72rem;color:#9ca3af;margin:0.75rem 0 0;line-height:1.6;">Illustrative model — fluid density, unit price (<span style="white-space:nowrap;">$50–90/L</span>), GWP and TFA molar yield are representative published/vendor values; results scale linearly with the maintenance-vapor estimate above. Make-up rate shown as % of installed charge.</p>
                 </div>
-                <div class="pfas-gate" id="pfasGate5"><i class="fas fa-lock"></i><p>Fluid-loss cost model requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
+                <div data-rz-dark-panel class="pfas-gate" id="pfasGate5"><i class="fas fa-lock"></i><p>Fluid-loss cost model requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
             </div>
         </div>
 
@@ -1908,8 +1906,8 @@ TFA formed over 10 yr
     </div>
 
     <!-- Login Modal -->
-    <div class="pfas-login-overlay" id="pfasLoginOverlay">
-        <div class="pfas-login-box">
+    <div data-rz-dark-panel class="pfas-login-overlay" id="pfasLoginOverlay">
+        <div data-rz-dark-panel class="pfas-login-box">
             <button class="pfas-login-close" onclick="pfasHideLogin()">&times;</button>
             <h3><i class="fas fa-lock" style="color:var(--rz-signal-amber,#b45309);"></i> Full analysis — PFAS Risk</h3>
             <p>Sign in for Monte Carlo simulation, regulatory timeline 2024–2029, sensitivity tornado chart, and strategic roadmap for your facility.</p>
