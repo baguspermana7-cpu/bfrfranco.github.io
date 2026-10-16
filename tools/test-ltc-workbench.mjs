@@ -749,6 +749,28 @@ for (const [page, mod] of Object.entries(PAGES)) {
   const B = bars(base.html), reg = X.register(base.R), Bn = bars(noSpare.html);
   ok('W12ld-e', B.length === reg.length && B.every((b, i) => b[0] === (reg[i][2] - 1) * reg[i][3] && b[1] === reg[i][4] && b[2] === (b[0] >= b[1] - 0.5 ? 1 : 0)) && Bn.some((b) => b[2] === 0) && B.every((b) => b[2] === 1),
      `register bars: one per class, tick at (installed − 1) × unit, status from tick vs load; no CRAH spare shows a short bar — got ${JSON.stringify(B)}`);
+
+  /* W12lv (v3.22.3) — every verdict that is not "holds" names one concrete change, and the change is
+   * real: the gate applies the lever's own input change, re-solves and re-judges the plant itself,
+   * and the chapter must come out better than before. The lever's stated "then holds" must agree. */
+  const Lv = X.levers(base.R, base.ctx, base.v), rank = { bad: 0, y: 1, ok: 2 };
+  const judged = Lv.map((l, i) => ({ l, v: base.v[i] })).filter((x) => x.l.over);
+  const rejudge = judged.map((x) => {
+    const R2 = P.compute(x.l.over), c2 = X.context(P, R2, {}), st = (X.verdicts(R2, c2).find((q) => q.chapter === x.l.chapter) || {}).status;
+    return { chapter: x.l.chapter, before: x.v.status, claimed: x.l.after, actual: st };
+  });
+  ok('W12lv-a', Lv.length === base.v.length && judged.length >= 6 && rejudge.every((r) => rank[r.actual] > rank[r.before] && r.actual === r.claimed),
+     `each lever, applied by the gate itself, improves its chapter and reaches the verdict it claims — ${JSON.stringify(rejudge)}`);
+  const liq = Lv.find((l) => l.chapter === 'Liquid path'), tr = Lv.find((l) => l.chapter === 'Transients');
+  const nums = (s) => (s.match(/[\d,]+(?= h)/g) || []).map((x) => +x.replace(/,/g, ''));
+  ok('W12lv-b', liq && /→/.test(liq.text) && nums(liq.text).length === 2 && nums(liq.text)[1] < nums(liq.text)[0] && nums(liq.text)[0] === base.R.totals.trimHours && /cost\/yr|cost unchanged/.test(liq.text)
+     && tr && / s → /.test(tr.text) && +tr.text.match(/(\d+) s →/)[1] < +tr.text.match(/→ (\d+) s/)[1],
+     `the liquid lever states trim hours before → after from the engine and the transients lever a longer ride-through — got "${liq && liq.text}" / "${tr && tr.text}"`);
+  ok('W12lv-c', base.v.filter((v) => v.status === 'ok').every((v, i) => Lv.find((l) => l.chapter === v.chapter).text === 'holds; no change needed') && !Lv.some((l) => /NaN|undefined|\+0 cost/.test(l.text)),
+     'holding chapters need no lever; no NaN, undefined or a zero cost delta in any lever text');
+  const cells = (base.html.match(/<span class="lvr">/g) || []).length, thenTags = (base.html.match(/>then (holds|review|fails)</g) || []).length;
+  ok('W12lv-d', cells === base.v.length && thenTags === judged.length && base.html.includes('What moves it'),
+     `the verdict table carries a "What moves it" cell per row and a "then …" tag per applied lever (${cells} / ${thenTags})`);
 }
 
 {

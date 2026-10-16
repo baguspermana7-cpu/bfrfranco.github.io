@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.22.3 — 2026-10-16
+
+### Every verdict that is not "holds" names what moves it — and the plant is re-solved to prove it
+
+**Why.** v3.21.19 gave the report a verdict per chapter with the line each was judged against. A reader then asked the natural next question of every "review" and "fails": what would fix it, and would it? The answer was scattered across the Options chapter, the fault tables and the Tier blockers.
+
+**What changed** (`js/ltc-report.js`, `levers()`): the verdict table gains a fourth column, "What moves it". For each chapter that is not holding, the report picks one concrete input change, re-solves the whole plant with it — design day, climate bins, DH01 faults, the heat load test, the transients, the Tier fit — re-judges every chapter on the new plant, and writes the result it reaches as "then holds / review / fails" next to the lever:
+- Liquid path: the better of adiabatic coolers, fluid coolers and TCS supply +3 °C, by trim-chiller hours; stated as trim hours before → after, WUE before → after and the running-cost delta.
+- Air path: N+1 on whichever of CRAHs or chillers has no spare, with the units added.
+- Electrical & sizing: CDU feed dual (ATS per CDU).
+- Redundancy register: one more unit of each short class, through its redundancy input.
+- Annual performance: the best other configuration or the best single design step from the sensitivity table, whichever reaches further (by WUE when WUE drives the verdict).
+- DH01 hall & faults and Heat load test plan: the lever each failing single fault implies (a lost feeder → dual feed; a lost CDU, CRAH or chiller → one more of it), with the faults still failing after it.
+- Transients: double the loop volumes (buffer tanks), with the shortest ride-through before → after.
+- Standards: supply air to 24 °C. Tier topology states its blockers; the screening layer names its lowest screen.
+Chapters that hold say "holds; no change needed". A cost-neutral lever says "running cost unchanged".
+
+On the default dry-cooler plant: adiabatic coolers take the trim chillers from 3,160 h to 0 h a year, −1,031,124 cost/yr, then holds; dual CDU feed clears the DH01 fault and the heat load test, running cost unchanged; doubling the loop volumes takes the shortest ride-through from 188 s to 376 s.
+
+**Gate** (`tools/test-ltc-workbench.mjs`, W12lv, 353 assertions): the gate applies each lever's own input change, re-solves and re-judges the plant itself, and every lever must improve its chapter and reach exactly the verdict it claims; the liquid lever's trim hours must be the engine's and fall, the transients lever's ride-through must lengthen, holding chapters carry no lever, and the rendered table carries a cell per row and a "then …" tag per applied lever. Two mutants proven red: a selector that picks the worst candidate, and a lever that proposes the single feed it is meant to replace.
+
 ## v3.22.2 — 2026-10-16
 
 ### The engineering report draws its four table chapters

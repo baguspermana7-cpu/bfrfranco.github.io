@@ -460,10 +460,90 @@
     if (ctx.lab && ctx.lab.scores) v('Design screening', ctx.lab.scores.total >= 80 ? 'ok' : ctx.lab.scores.total >= 60 ? 'y' : 'bad', 'weighted screen ' + f(ctx.lab.scores.total) + ' / 100' + (ctx.lab.grade ? ' (' + ctx.lab.grade + ')' : ''));
     return V;
   }
-  function verdictTable(V) {
-    return '<h3>Verdict by chapter</h3>' + table(['Chapter', 'Verdict', 'Status'], V.map(function (x) {
-      return ['<a href="%%SEC:' + esc(x.chapter) + '%%">' + esc(x.chapter) + '</a>', esc(x.text), '<span class="tag ' + TAG[x.status] + '">' + TAGWORD[x.status] + '</span>'];
-    }), 'verd') + '<p class="note">holds = the number meets its stated line; review = inside the common range but not the good-practice line, or a choice worth a look; fails = outside the line. The lines are written into each verdict.</p>';
+  /* what moves each verdict that is not "holds": the plant is re-solved with one concrete change
+     (and every chapter re-judged on it), so the lever states the verdict it reaches, not a hope.
+     Returns one entry per verdict: { chapter, text, over, after } — over is the input change applied,
+     absent when the lever is a statement only (Tier blockers, the screening layer). */
+  var RANK = { bad: 0, y: 1, ok: 2 };
+  var FAULT_LEVER = { 'cdu-feeder': ['CDU feed dual', { cduFeed: 'dual' }], cdu: ['one more CDU per hall', { cduRedundancy: 1 }], crah1: ['one more CRAH per hall', { crahRedundancy: 1 }], chiller: ['one more chiller', { chillerRedundancy: 1 }] };
+  var REG_KEY = { Generators: 'genRedundancy', Transformers: 'txRedundancy', CDUs: 'cduRedundancy', CRAHs: 'crahRedundancy', Chillers: 'chillerRedundancy' };
+  function levers(R, ctx, V) {
+    var P = ctx.engine, p = R.input, cost = function (r) { return r.annual.energyCost + r.annual.waterCost; };
+    if (!P) return [];
+    function solve(over) {
+      var o = Object.assign({}, p, over);
+      Object.keys(over).forEach(function (k) { if (/Redundancy$/.test(k)) o[k] = (p[k] || 0) + over[k]; });
+      var r = P.compute(o), c = context(P, r, ctx.state); c.engine = null;
+      return { R: r, ctx: c, V: verdicts(r, c), over: o };
+    }
+    function after(x, ch) { return (x.V.filter(function (q) { return q.chapter === ch; })[0] || { status: 'ok' }).status; }
+    function pick(ch, cands, measure) {
+      var best = null;
+      cands.forEach(function (c) {
+        var x = solve(c[1]); x.label = c[0]; x.after = after(x, ch); x.m = measure(x.R, x.ctx);
+        if (!best || RANK[x.after] > RANK[best.after] || (RANK[x.after] === RANK[best.after] && x.m < best.m)) best = x;
+      });
+      return best;
+    }
+    function dc(x) { var d = cost(x.R) - cost(R); return Math.abs(d) < 0.5 ? 'running cost unchanged' : (d < 0 ? '−' : '+') + f(Math.abs(d)) + ' cost/yr'; }
+    function done(ch, x, text) { return { chapter: ch, text: x.label + ': ' + text + ', ' + dc(x), over: x.over, after: x.after }; }
+    function faultsLever(ch, ids) {
+      var over = {}, labels = [];
+      ids.forEach(function (id) { var L = FAULT_LEVER[id]; if (L && labels.indexOf(L[0]) < 0) { labels.push(L[0]); Object.assign(over, L[1]); } });
+      if (!labels.length) return { chapter: ch, text: 'the failing cases are beyond one element out; they are reported, not designed for' };
+      var x = solve(over); x.label = labels.join(' + '); x.after = after(x, ch);
+      var lost = x.ctx.faults ? x.ctx.faults.filter(function (q) { return SINGLE[q.id] && (q.s.over27 || q.s.itLostKw); }).length : 0;
+      return done(ch, x, (ch === 'Heat load test plan' ? x.ctx.hlt.fails.filter(function (q) { return !q.pass; }).length + ' failures left at 100 % load' : lost + ' single-element faults still put racks over 27 °C'));
+    }
+    return V.map(function (v) {
+      var ch = v.chapter, T = R.totals;
+      if (v.status === 'ok') return { chapter: ch, text: 'holds; no change needed' };
+      if (ch === 'Liquid path') {
+        var x = pick(ch, [['Adiabatic coolers', { liquidRejection: 'adiabatic' }], ['Fluid coolers', { liquidRejection: 'fluidcooler' }], ['TCS supply +3 °C', { tcsSupplyC: p.tcsSupplyC + 3, tcsReturnC: p.tcsReturnC + 3 }]], function (r) { return r.totals.trimHours; });
+        return done(ch, x, 'trim chillers ' + f(T.trimHours) + ' h → ' + f(x.R.totals.trimHours) + ' h a year, WUE ' + f(R.annual.wue, 2) + ' → ' + f(x.R.annual.wue, 2) + ' L/kWh');
+      }
+      if (ch === 'Air path') { var o = {}; if (!(p.crahRedundancy > 0)) o.crahRedundancy = 1; if (R.air.chillersTotal <= R.air.chillersN) o.chillerRedundancy = 1; var xa = solve(o); xa.label = 'N+1 on ' + Object.keys(o).map(function (k) { return k.replace('Redundancy', 's'); }).join(' and '); xa.after = after(xa, ch); return done(ch, xa, (xa.R.air.crahTotal - R.air.crahTotal) + ' CRAHs and ' + (xa.R.air.chillersTotal - R.air.chillersTotal) + ' chillers added'); }
+      if (ch === 'Electrical & sizing') { var xe = solve({ cduFeed: 'dual' }); xe.label = 'CDU feed dual (ATS per CDU)'; xe.after = after(xe, ch); return done(ch, xe, 'a feeder lost leaves every CDU running'); }
+      if (ch === 'Redundancy register') {
+        var reg = register(R), miss = reg.filter(function (r) { return (r[2] - 1) * r[3] < r[4] - 0.5; }), ov = {}, names = [];
+        miss.forEach(function (r) { var k = REG_KEY[r[0].replace(/ \(.*/, '')]; if (k) { ov[k] = 1; names.push(r[0]); } });
+        if (!names.length) return { chapter: ch, text: 'add one unit to ' + miss.map(function (r) { return r[0]; }).join(', ') + ' (no redundancy input for this class)' };
+        var xr = solve(ov); xr.label = 'one more unit of ' + names.join(', '); xr.after = after(xr, ch);
+        return done(ch, xr, register(xr.R).filter(function (r) { return (r[2] - 1) * r[3] >= r[4] - 0.5; }).length + ' of ' + reg.length + ' classes then hold');
+      }
+      if (ch === 'Tier topology') return { chapter: ch, text: ctx.fit && ctx.fit.blockers.length ? 'for Tier ' + ROMAN[ctx.fit.reached + 1] + ': ' + ctx.fit.blockers.map(function (b) { return b.req; }).join('; ') : 'see the Tier page' };
+      if (ch === 'Annual performance') {
+        var O = ctx.options, byWue = R.annual.wue > 1.0 && R.annual.pue3 <= 1.25, key = byWue ? 'wue' : 'pue';
+        var bp = O.presets.filter(function (q) { return !q.current; }).reduce(function (m, q) { return q[key] < m[key] ? q : m; });
+        var bs = O.sens.reduce(function (m, s) { var e = s.lo.r[key] < s.hi.r[key] ? s.lo : s.hi; return !m || e.r[key] < m.e.r[key] ? { s: s, e: e } : m; }, null);
+        var cands = [[bp.label, { chillerType: P.PRESETS[bp.id].chillerType, liquidRejection: P.PRESETS[bp.id].liquidRejection }]];
+        if (bs) { var so = {}; so[bs.s.key] = bs.e.v; if (bs.s.key === 'tcsSupplyC') so.tcsReturnC = p.tcsReturnC + (bs.e.v - p.tcsSupplyC); cands.push([bs.s.label + ' ' + f(bs.e.v, bs.e.v === Math.round(bs.e.v) ? 0 : 2) + bs.s.unit, so]); }
+        var xn = pick(ch, cands, function (r) { return r.annual[key]; });
+        return done(ch, xn, 'PUE ' + f(R.annual.pue3, 3) + ' → ' + f(xn.R.annual.pue3, 3) + ', WUE ' + f(R.annual.wue, 2) + ' → ' + f(xn.R.annual.wue, 2) + ' L/kWh');
+      }
+      if (ch === 'Options & sensitivity') { var best = ctx.options.presets.reduce(function (m, q) { return q.cost < m.cost ? q : m; }); var xo = solve({ chillerType: P.PRESETS[best.id].chillerType, liquidRejection: P.PRESETS[best.id].liquidRejection }); xo.label = best.label; xo.after = after(xo, ch); return done(ch, xo, 'PUE ' + f(xo.R.annual.pue3, 3) + ', WUE ' + f(xo.R.annual.wue, 2) + ' L/kWh'); }
+      if (ch === 'DH01 hall & faults') return faultsLever(ch, ctx.faults.filter(function (q) { return SINGLE[q.id] && (q.s.over27 || q.s.itLostKw); }).map(function (q) { return q.id; }));
+      if (ch === 'Heat load test plan') return faultsLever(ch, ctx.hlt.fails.filter(function (q) { return !q.pass; }).map(function (q) { return q.id; }));
+      if (ch === 'Transients') {
+        var xt = solve({ tcsLoopM3PerCdu: p.tcsLoopM3PerCdu * 2, chwLoopLPerKw: p.chwLoopLPerKw * 2 }); xt.label = 'double the loop volumes (buffer tanks)'; xt.after = after(xt, ch);
+        var sh = function (ts) { return ts.filter(function (t) { return t.secondsToLimit != null; }).sort(function (a, b) { return a.secondsToLimit - b.secondsToLimit; })[0]; }, h0 = sh(ctx.transients), h1 = sh(xt.ctx.transients);
+        return done(ch, xt, 'shortest ride-through ' + (h0 ? f(h0.secondsToLimit) + ' s' : 'not reached') + ' → ' + (h1 ? f(h1.secondsToLimit) + ' s' : 'not reached'));
+      }
+      if (ch === 'Standards cross-check') { var xs = solve({ supplyAirC: 24 }); xs.label = 'supply air 24 °C'; xs.after = after(xs, ch); return done(ch, xs, 'inside ASHRAE A1 recommended'); }
+      if (ch === 'Design screening' && ctx.lab && ctx.lab.scores) {
+        var low = SCREENS.map(function (s) { return [s[0], ctx.lab.scores[s[1]]]; }).filter(function (s) { return typeof s[1] === 'number'; }).sort(function (a, b) { return a[1] - b[1]; })[0];
+        return { chapter: ch, text: low ? 'lowest screen: ' + low[0] + ' at ' + f(low[1]) + ' / 100' : 'see the Model page' };
+      }
+      return { chapter: ch, text: 'see the chapter' };
+    });
+  }
+  function verdictTable(V, L) {
+    var byCh = {}; (L || []).forEach(function (x) { byCh[x.chapter] = x; });
+    return '<h3>Verdict by chapter</h3>' + table(['Chapter', 'Verdict', 'Status', 'What moves it'], V.map(function (x) {
+      var l = byCh[x.chapter];
+      return ['<a href="%%SEC:' + esc(x.chapter) + '%%">' + esc(x.chapter) + '</a>', esc(x.text), '<span class="tag ' + TAG[x.status] + '">' + TAGWORD[x.status] + '</span>',
+        l ? '<span class="lvr">' + esc(l.text) + (l.after ? ' <span class="tag ' + TAG[l.after] + '">then ' + TAGWORD[l.after] + '</span>' : '') + '</span>' : ''];
+    }), 'verd') + '<p class="note">holds = the number meets its stated line; review = inside the common range but not the good-practice line, or a choice worth a look; fails = outside the line. The lines are written into each verdict. "What moves it" is one concrete change, the plant re-solved and every chapter re-judged with it; "then holds / review / fails" is the verdict that change reaches.</p>';
   }
 
   /* every abbreviation the report uses, so a reader needs no other document; the test checks the
@@ -555,7 +635,7 @@
       '<dt>Scope</dt><dd>Educational steady-state model: it sizes and balances one plant from the stated inputs. Not a basis of design, not an 8,760-hour simulation, not a compliance statement. Inputs marked ASSUMED are typical design values, not a vendor selection.</dd></dl>' +
       '<p class="howto">Every number in this document is an output of the same engine solve the workbench pages draw. The calculation trace (formula and inputs for each headline quantity), every input with its auto / yours state, and the complete result as JSON and CSV are in the last sections, so any figure can be checked.</p></section>');
     parts.push('%%TOC%%');
-    parts.push(sec('s1', 1, 'Key findings', 'Read from the same result every workbench page draws; each sentence is a number in the sections below.', findings(R, ctx) + verdictTable(verdicts(R, ctx))));
+    parts.push(sec('s1', 1, 'Key findings', 'Read from the same result every workbench page draws; each sentence is a number in the sections below.', findings(R, ctx) + (function () { var V = verdicts(R, ctx); return verdictTable(V, levers(R, ctx, V)); })()));
     if (ctx.lab) parts.push(sec('', 0, 'Design screening', 'The Model page\'s screening layer on this plant: the weighted standards screen, the four design dimensions, the risk index, and the model\'s live values against sourced benchmark bands.', labSection(ctx.lab)));
     if (ctx.views && ctx.views.length) parts.push(sec('', 0, 'Plant schematics', 'The plant map from the LTC hub, drawn on this plant: every block and connector the workbench shows, with this plant\'s numbers on it. Solid lines carry power, dashed liquid, dash-dot air, dotted losses.',
       ctx.views.map(function (v) { return '<figure class="wide schem"><figcaption><b>' + esc(v.label) + '</b></figcaption>' + v.svg + '</figure>'; }).join('')));
@@ -685,7 +765,7 @@
     '.legend{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font:10.5px "JetBrains Mono",monospace;margin:8px 0}.legend span{padding:2px 6px;color:#111}.legend i{margin:0 12px 0 6px;font-style:normal;color:#6b7280}.legend b{display:inline-block;width:10px;height:10px;margin:0 4px 0 8px}' +
     '.tr{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}.tr figcaption{font-size:12px}.dl button{margin:4px 4px 4px 0}' +
     '.gl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:8px 0;font-size:12.5px}.gl dt{font:500 11.5px "JetBrains Mono",monospace;color:#1f2937;padding-top:1px}.gl dd{margin:0;color:#374151}' +
-    '.refs{margin:8px 0;padding-left:28px;font-size:12.5px}.refs li{margin:0 0 5px;padding-left:4px}.refs li::marker{font:500 11px "JetBrains Mono",monospace;color:#6b7280}table.verd td:first-child{white-space:nowrap}' +
+    '.refs{margin:8px 0;padding-left:28px;font-size:12.5px}.refs li{margin:0 0 5px;padding-left:4px}.refs li::marker{font:500 11px "JetBrains Mono",monospace;color:#6b7280}table.verd td:first-child{white-space:nowrap}.lvr{color:#374151}' +
     '.labtop{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start}.radial{margin:0}.radial figcaption{text-align:center;font-size:11px;color:#6b7280}svg.band{width:160px;height:18px}' +
     '@media print{html{background:#fff}.bar,.dl{display:none}main{max-width:none;margin:0;padding:0}main>section,main>nav{box-shadow:none;margin:0;padding:0;break-before:page}main>section.cover{break-before:auto;min-height:0}main>section.flow{break-before:auto;margin-top:16pt}.toc a{padding:3.5pt 0}.toc a small{font-size:8.5pt}.toc a span{font-size:10pt}' +
     'body{font-size:10.5pt}table{font-size:8.8pt}th{font-size:7.2pt}code{font-size:8.5pt}h1{font-size:26pt}h2{font-size:15pt;margin-bottom:10pt}h2 .no{font-size:22pt}.kpis b{font-size:13pt}' +
@@ -872,6 +952,7 @@
     c = {
       version: root.RZ_VERSION, date: new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC', url: root.location ? root.location.href.split('#')[0] : '',
       state: state, defaults: P.DEFAULTS, presetLabel: pr ? P.PRESETS[pr].label : 'custom plant', climateLabel: (P.CLIMATES[R.input.climate] || { label: 'custom climate' }).label,
+      engine: P,
       transients: transients(P, R),
       options: options(P, R),
       tier: tierSweep(root.LTCTier),
@@ -1001,7 +1082,7 @@
     bar.appendChild(b);
   }
 
-  root.LTCReport = { build: build, csv: csv, heatFlows: heatFlows, powerItems: powerItems, register: register, context: context, options: options, hlt: hlt, verdicts: verdicts, GLOSSARY: GLOSSARY, exportReport: exportReport };
+  root.LTCReport = { build: build, csv: csv, heatFlows: heatFlows, powerItems: powerItems, register: register, context: context, options: options, hlt: hlt, verdicts: verdicts, levers: levers, GLOSSARY: GLOSSARY, exportReport: exportReport };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCReport;
   if (typeof document !== 'undefined' && document.querySelector) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountButton); else mountButton();
