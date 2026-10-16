@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v3.22.10 — 2026-10-17 — "Hardware"
+
+### Changed — the 3D gets its detail from pixels and runs smooth (`js/rz-hub-3d.js`)
+- Owner on the live v3.22.9: *"3Dnya masih sangat kurang detail, dan nggak smooth"*. The rack had
+  carried every grille, cage, LED, ear and label of all 37 trays as meshes — about a thousand draw
+  calls under a 2048 shadow map. Each rack-level tray is now two meshes: a body and a faceplate
+  whose grilles (honeycomb), OSFP cages with port slots, status LEDs, ears with thumbscrews and the
+  slot label are painted once on a canvas per kind and reused (`faceTexture`). Power shelves show
+  six PSU modules with handles and LEDs the same way; the OOB switch its 24 ports. Draw calls fall
+  roughly ten-fold; the shadow map is 1024 on phones; the pixel ratio caps at 1.25 on desktops.
+- The superchip PCBs carry a painted board — traces, vias, silkscreen outlines, `GB300 · SUPERCHIP`
+  — instead of a flat green. Each cold plate has inlet and outlet nipples and a doubled serpentine
+  groove; each package sits on a gold substrate rim; capacitor rows run along the boards; the lid
+  carries vent slots; the rails carry screws; a front fill light makes faceplates read.
+- Two temperature tags ride the quick disconnects — `40 °C in`, `50 °C out`, the engine's TCS
+  planes — and follow the parts through the exploded view.
+
 ## v3.22.9 — 2026-10-17 — "Hardware"
 
 ### Fixed — the 3D floor no longer mirrors the studio (`js/rz-hub-3d.js`)

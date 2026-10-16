@@ -77,6 +77,8 @@
       supply: new T.MeshStandardMaterial({ color: 0x3f8df5, metalness: 0.3, roughness: 0.4 }),
       ret: new T.MeshStandardMaterial({ color: 0xf0a030, metalness: 0.3, roughness: 0.4 }),
       cart: new T.MeshStandardMaterial({ color: 0x3b3e44, metalness: 0.3, roughness: 0.7 }),
+      gold: new T.MeshStandardMaterial({ color: 0xd4a84a, metalness: 0.9, roughness: 0.3 }),
+      cap: new T.MeshStandardMaterial({ color: 0x2a2d33, metalness: 0.5, roughness: 0.5 }),
       glass: new T.MeshStandardMaterial({ color: 0xd4d8dc, metalness: 0.6, roughness: 0.3, transparent: true, opacity: 0.35 }),
       edge: new T.LineBasicMaterial({ color: 0x0f1114, transparent: true, opacity: 0.35 }),
       groove: new T.LineBasicMaterial({ color: 0x4a2c10, transparent: true, opacity: 0.9 })
@@ -101,6 +103,8 @@
       for (var i = 0; i < lanes; i++) { var z = zs + i * pitch, a = i % 2 ? x1 : x0, b = i % 2 ? x0 : x1; pts.push(a, y, z, b, y, z); if (i < lanes - 1) pts.push(b, y, z, b, y, z + pitch); }
       var gg = new T.BufferGeometry(); gg.setAttribute('position', new T.BufferAttribute(new Float32Array(pts), 3));
       var groove = new T.LineSegments(gg, mat.groove); groove.userData.part = part; g.add(groove);
+      var g2 = new T.BufferGeometry(); g2.setAttribute('position', new T.BufferAttribute(new Float32Array(pts.map(function (v, i) { return i % 3 === 1 ? v + 0.0008 : v; })), 3)); var groove2 = new T.LineSegments(g2, mat.groove); groove2.userData.part = part; g.add(groove2);
+      [-1, 1].forEach(function (sx) { g.add(at(cyl(0.004, 0.012, mat.steel, part, 'y', 10), sx * (w / 2 - 0.012), th + 0.004, -d / 2 + 0.012)); });
       for (var f = 0; f < 9; f++) g.add(at(box(w - 0.012, 0.006, 0.0012, mat.copper, part), 0, -0.003, -d / 2 + 0.008 + f * (d - 0.016) / 8));
       return g;
     }
@@ -111,6 +115,38 @@
       c.fillStyle = '#1b1d21'; c.fillRect(200, 8, 44, 18); c.fillStyle = '#e9ecef'; c.font = '600 12px IBM Plex Mono, Menlo, monospace'; c.fillText('NVL72', 203, 17);
       var tex = new T.CanvasTexture(cv); tex.colorSpace = T.SRGBColorSpace;
       var m = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshStandardMaterial({ map: tex, metalness: 0.1, roughness: 0.6 })); m.userData.part = 'label'; return m;
+    }
+    /* a painted faceplate: grilles, cages, LEDs, ears and the label on one canvas, so a tray in the
+     * rack is two meshes instead of twenty — detail by pixels, not by draw calls */
+    var faceCache = {};
+    function faceTexture(kind, label) {
+      var key = kind + '|' + label; if (faceCache[key]) return faceCache[key];
+      var cv = document.createElement('canvas'); cv.width = 1024; cv.height = 80; var c = cv.getContext('2d');
+      var base = c.createLinearGradient(0, 0, 0, 80); base.addColorStop(0, kind === 'sw' ? '#3a3e45' : '#9aa0a8'); base.addColorStop(0.5, kind === 'sw' ? '#2f3338' : '#868c94'); base.addColorStop(1, kind === 'sw' ? '#26292e' : '#6f757d'); c.fillStyle = base; c.fillRect(0, 0, 1024, 80);
+      c.strokeStyle = 'rgba(255,255,255,0.08)'; for (var l = 0; l < 80; l += 3) { c.beginPath(); c.moveTo(0, l + 0.5); c.lineTo(1024, l + 0.5); c.stroke(); }
+      function grille(x, y, r) { c.fillStyle = '#15171b'; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); c.fillStyle = '#3a3e45'; for (var i = -r; i <= r; i += 6) for (var j = -r; j <= r; j += 6) { if (i * i + j * j < (r - 4) * (r - 4)) { c.beginPath(); c.arc(x + i, y + j + (Math.round(i / 6) % 2 ? 3 : 0), 1.8, 0, Math.PI * 2); c.fill(); } } c.strokeStyle = '#c9ced4'; c.lineWidth = 2; c.beginPath(); c.arc(x, y, r + 1, 0, Math.PI * 2); c.stroke(); }
+      function cage(x, w) { c.fillStyle = '#b9bec4'; c.fillRect(x, 22, w, 36); c.fillStyle = '#0f1114'; c.fillRect(x + 4, 30, w - 8, 20); c.fillStyle = '#2b2f35'; c.fillRect(x + 6, 33, w - 12, 6); c.fillStyle = '#39a0ff'; c.fillRect(x + w - 10, 26, 3, 3); }
+      function ear(x) { c.fillStyle = '#b4b9bf'; c.fillRect(x, 0, 18, 80); c.fillStyle = '#6a7079'; c.beginPath(); c.arc(x + 9, 40, 5, 0, Math.PI * 2); c.fill(); c.fillStyle = '#d7dbe0'; c.fillRect(x + 7, 39, 4, 2); }
+      ear(0); ear(1006);
+      if (kind === 'ct') { for (var f = 0; f < 4; f++) grille(70 + f * 88, 40, 30); for (var k = 0; k < 5; k++) cage(560 + k * 84, 72); c.fillStyle = '#39a0ff'; c.fillRect(30, 10, 5, 5); c.fillStyle = '#f0a030'; c.fillRect(40, 10, 5, 5); }
+      if (kind === 'sw') { for (var f2 = 0; f2 < 2; f2++) grille(70 + f2 * 88, 40, 30); for (var k2 = 0; k2 < 4; k2++) cage(640 + k2 * 60, 50); for (var m = 0; m < 6; m++) { c.fillStyle = '#39a0ff'; c.fillRect(280 + m * 14, 36, 6, 6); } }
+      if (kind === 'ps') { for (var q = 0; q < 6; q++) { var x0 = 40 + q * 158; c.fillStyle = '#c7ccd1'; c.fillRect(x0, 6, 150, 68); c.fillStyle = '#8a9097'; c.fillRect(x0 + 8, 14, 134, 10); c.fillStyle = '#1a1d22'; for (var g = 0; g < 10; g++) c.fillRect(x0 + 10 + g * 13, 34, 8, 30); c.fillStyle = '#5ad27a'; c.fillRect(x0 + 136, 30, 6, 6); c.fillStyle = '#2b2f35'; c.fillRect(x0 + 60, 50, 30, 18); } }
+      if (kind === 'oob') { for (var pt = 0; pt < 24; pt++) { c.fillStyle = '#0f1114'; c.fillRect(120 + pt * 32, 28, 24, 24); c.fillStyle = '#5ad27a'; c.fillRect(122 + pt * 32, 24, 4, 3); } c.fillStyle = '#c7ccd1'; c.fillRect(40, 20, 60, 40); }
+      if (label) { c.fillStyle = '#e9ecef'; c.fillRect(kind === 'ps' ? 980 - 180 : 440, 8, 100, 18); c.fillStyle = '#1b1d21'; c.font = '600 14px IBM Plex Mono, Menlo, monospace'; c.textBaseline = 'middle'; c.fillText(label, (kind === 'ps' ? 800 : 440) + 6, 17); }
+      var tex = new T.CanvasTexture(cv); tex.colorSpace = T.SRGBColorSpace; tex.anisotropy = 4;
+      faceCache[key] = new T.MeshStandardMaterial({ map: tex, metalness: 0.55, roughness: 0.5 }); return faceCache[key];
+    }
+    /* the PCB: traces and silkscreen painted once */
+    var pcbTex = null;
+    function pcbMaterial() {
+      if (pcbTex) return pcbTex;
+      var cv = document.createElement('canvas'); cv.width = 512; cv.height = 768; var c = cv.getContext('2d');
+      c.fillStyle = '#1b4d33'; c.fillRect(0, 0, 512, 768);
+      c.strokeStyle = '#2f7a52'; c.lineWidth = 1.2; for (var i = 0; i < 90; i++) { var x = (i * 97) % 512, y = (i * 61) % 768, L = 40 + (i * 37) % 160; c.beginPath(); c.moveTo(x, y); c.lineTo(x + (i % 2 ? L : 0), y + (i % 2 ? 0 : L)); c.lineTo(x + (i % 2 ? L : L / 2), y + (i % 2 ? L / 2 : L)); c.stroke(); }
+      c.fillStyle = '#b9bec4'; for (var v = 0; v < 400; v++) { c.beginPath(); c.arc((v * 131) % 512, (v * 73) % 768, 1.4, 0, Math.PI * 2); c.fill(); }
+      c.strokeStyle = '#e8ecef'; c.lineWidth = 1; for (var r = 0; r < 24; r++) c.strokeRect((r * 149) % 480 + 8, (r * 211) % 740 + 8, 22 + (r % 3) * 10, 12 + (r % 2) * 8);
+      c.fillStyle = '#e8ecef'; c.font = '600 11px IBM Plex Mono, Menlo, monospace'; c.fillText('GB300 · SUPERCHIP', 20, 740); c.fillText('P2 · REV A', 400, 740);
+      var tex = new T.CanvasTexture(cv); tex.colorSpace = T.SRGBColorSpace; pcbTex = new T.MeshStandardMaterial({ map: tex, metalness: 0.15, roughness: 0.85 }); return pcbTex;
     }
     function fan(part) {
       var g = new T.Group(), s = G.fanD;
@@ -150,17 +186,19 @@
     /* ---- the compute tray, origin at its rear-bottom centre, +z to the front ---- */
     function computeTray(detail, label) {
       var g = new T.Group(), W = G.trayW, D = G.trayD, H = G.trayH;
+      if (!detail) {
+        var body = box(W + 0.024, H, D, mat.alu, 'ct'); body.castShadow = false; at(body, 0, H / 2, D / 2); g.add(body);
+        var fp = new T.Mesh(new T.PlaneGeometry(W + 0.024, H), faceTexture('ct', label)); fp.userData.part = 'ct'; fp.position.set(0, H / 2, D + 0.001); g.add(fp);
+        return g;
+      }
       g.add(at(box(W, 0.004, D, mat.alu, 'ct', true), 0, 0.002, D / 2));
       g.add(at(box(0.006, H, D, mat.alu, 'ct'), -W / 2 + 0.003, H / 2, D / 2));
       g.add(at(box(0.006, H, D, mat.alu, 'ct'), W / 2 - 0.003, H / 2, D / 2));
       var face = at(box(W, H, 0.010, mat.face, 'ct', true), 0, H / 2, D - 0.005); g.add(face);
-      /* faceplate detail on every tray: fan grilles left, cages right, a status LED */
       for (var fi = 0; fi < FANS; fi++) { var grille = at(cyl(0.017, 0.004, mat.dark, 'ct', 'z', 20), -W / 2 + 0.03 + fi * 0.046, H / 2, D + 0.002); g.add(grille); }
       for (var ci = 0; ci < NIC + 1; ci++) { g.add(at(box(0.034, 0.016, 0.004, mat.chip, ci < NIC ? 'nic' : 'dpu'), W / 2 - 0.035 - ci * 0.044, H / 2, D + 0.002)); }
       var led = at(box(0.004, 0.004, 0.003, mat.supply, 'ct'), -W / 2 + 0.012, H - 0.008, D + 0.002); g.add(led);
       [-1, 1].forEach(function (sx) { g.add(at(box(0.012, H, 0.004, mat.alu, 'ct'), sx * (W / 2 + 0.006), H / 2, D - 0.003)); g.add(at(cyl(0.004, 0.006, mat.steel, 'ct', 'z', 12), sx * (W / 2 + 0.006), H / 2, D + 0.002)); });
-      if (label) g.add(at(labelPlate(label, 0.09, 0.012), W / 2 - 0.26, H - 0.009, D + 0.0015));
-      if (!detail) { g.add(at(box(W, 0.004, D, mat.alu, 'ct'), 0, H - 0.002, D / 2)); return g; }
       /* the front bay: four fans and the five cages behind the faceplate */
       for (var f = 0; f < FANS; f++) g.add(at(fan('fan'), -W / 2 + 0.03 + f * 0.046, H / 2, D - 0.03, [0, 0, 0.12]));
       for (var c = 0; c < NIC; c++) g.add(at(cage(0.040, 'nic'), W / 2 - 0.035 - c * 0.044, 0.016, D - 0.07, [0, 0, 0.14]));
@@ -169,20 +207,24 @@
       var loops = [];
       [-1, 1].forEach(function (sx) {
         var bx = sx * 0.135, zc = 0.50, zg = 0.31;
-        g.add(at(box(0.23, 0.0025, 0.40, mat.pcb, 'ct', true), bx, 0.006, 0.42));
+        g.add(at(box(0.23, 0.0025, 0.40, pcbMaterial(), 'ct', true), bx, 0.006, 0.42));
         /* Grace: package with a silver lid, LPDDR5X around it */
+        g.add(at(box(0.078, 0.0015, 0.078, mat.gold, 'cpu'), bx, 0.0078, zc, [0, 0.015, 0]));
         g.add(at(box(0.07, 0.004, 0.07, mat.chip, 'cpu'), bx, 0.009, zc, [0, 0.015, 0]));
         g.add(at(box(0.05, 0.002, 0.05, mat.lid, 'cpu'), bx, 0.012, zc, [0, 0.015, 0]));
         for (var m = 0; m < 8; m++) { var mx = bx + (m < 4 ? -0.055 : 0.055), mz = zc - 0.03 + (m % 4) * 0.02; g.add(at(box(0.012, 0.002, 0.016, mat.hbm, 'cpu'), mx, 0.008, mz)); }
         /* two B300: die under a lid, eight HBM stacks around each */
         [-1, 1].forEach(function (gx) {
           var x = bx + gx * 0.056;
+          g.add(at(box(0.083, 0.0015, 0.083, mat.gold, 'gpu'), x, 0.0078, zg, [0, 0.015, 0]));
           g.add(at(box(0.075, 0.004, 0.075, mat.chip, 'gpu'), x, 0.009, zg, [0, 0.015, 0]));
           var die = at(box(0.028, 0.002, 0.028, mat.lid, 'gpu'), x, 0.012, zg, [0, 0.015, 0]); die.userData.heat = true; g.add(die);
           for (var h = 0; h < 8; h++) { var a = h * Math.PI / 4, hx = x + Math.cos(a) * 0.026, hz = zg + Math.sin(a) * 0.026; g.add(at(box(0.011, 0.002, 0.011, mat.hbm, 'gpu'), hx, 0.012, hz, [0, 0.015, 0])); }
         });
         /* VRM rows along the outer edge */
         for (var v = 0; v < 10; v++) g.add(at(box(0.008, 0.006, 0.008, mat.vrm, 'ct'), bx + sx * 0.105, 0.010, 0.25 + v * 0.032));
+        for (var cc = 0; cc < 14; cc++) g.add(at(cyl(0.0025, 0.007, mat.cap, 'ct', 'y', 8), bx - 0.09 + cc * 0.014, 0.011, 0.595));
+        for (var cd = 0; cd < 6; cd++) g.add(at(cyl(0.0035, 0.009, mat.cap, 'ct', 'y', 8), bx + sx * 0.085, 0.012, 0.44 + cd * 0.022));
         /* cold plates: one on the CPU, one on each GPU, lifted together when exploded */
         g.add(at(plate(0.075, 0.075, 'cold'), bx, 0.015, zc, [0, 0.08, 0]));
         g.add(at(plate(0.080, 0.080, 'cold'), bx - 0.056, 0.015, zg, [0, 0.08, 0]));
@@ -199,28 +241,34 @@
       });
       /* rear: quick disconnects with coloured collars, NVLink block, busbar clip */
       [[-0.21, mat.supply, 'qd'], [0.21, mat.ret, 'qd']].forEach(function (q) {
-        g.add(at(cyl(0.012, 0.05, mat.steel, 'qd', 'z'), q[0], 0.030, 0.025, [0, 0, -0.08]));
+        var qd = at(cyl(0.012, 0.05, mat.steel, 'qd', 'z'), q[0], 0.030, 0.025, [0, 0, -0.08]); qd.userData.tag = (q[0] < 0 ? n(TCS_S) + ' °C in' : n(TCS_R) + ' °C out'); g.add(qd);
         g.add(at(cyl(0.014, 0.012, q[1], 'qd', 'z'), q[0], 0.030, 0.012, [0, 0, -0.08]));
       });
       var nvl = at(box(0.26, 0.030, 0.030, mat.cart, 'nvl', true), 0, 0.020, 0.016, [0, 0, -0.08]); g.add(nvl);
       for (var s2 = 0; s2 < 18; s2++) g.add(at(box(0.009, 0.014, 0.004, mat.chip, 'nvl'), -0.12 + s2 * 0.0141, 0.020, 0.0, [0, 0, -0.08]));
       g.add(at(box(0.040, 0.030, 0.025, mat.copper, 'clip'), 0.17, 0.020, 0.013, [0, 0, -0.06]));
-      g.add(at(box(W, 0.004, D - 0.02, mat.glass, 'lid', true), 0, H - 0.002, D / 2 - 0.01, [0, 0.17, 0]));
+      var lidG = new T.Group(); lidG.add(at(box(W, 0.004, D - 0.02, mat.glass, 'lid', true), 0, 0, 0));
+      for (var vs = 0; vs < 12; vs++) lidG.add(at(box(0.16, 0.0045, 0.004, mat.dark, 'lid'), -W / 2 + 0.11, 0, -D / 2 + 0.08 + vs * 0.012));
+      at(lidG, 0, H - 0.002, D / 2 - 0.01, [0, 0.17, 0]); g.add(lidG);
+      for (var sc = 0; sc < 6; sc++) [-1, 1].forEach(function (sx) { g.add(at(cyl(0.0025, 0.002, mat.steel, 'ct', 'x', 8), sx * (W / 2 - 0.001), H - 0.01, 0.08 + sc * 0.14)); });
       g.userData.loops = loops;
       return g;
     }
     function switchTray(detail, label) {
       var g = new T.Group(), W = G.trayW, D = G.trayD, H = G.trayH;
+      if (!detail) {
+        var body = box(W + 0.024, H, D, mat.dark, 'sw'); body.castShadow = false; at(body, 0, H / 2, D / 2); g.add(body);
+        var fp = new T.Mesh(new T.PlaneGeometry(W + 0.024, H), faceTexture('sw', label)); fp.userData.part = 'sw'; fp.position.set(0, H / 2, D + 0.001); g.add(fp);
+        return g;
+      }
       g.add(at(box(W, 0.004, D, mat.alu, 'sw', true), 0, 0.002, D / 2));
       g.add(at(box(0.006, H, D, mat.alu, 'sw'), -W / 2 + 0.003, H / 2, D / 2)); g.add(at(box(0.006, H, D, mat.alu, 'sw'), W / 2 - 0.003, H / 2, D / 2));
       g.add(at(box(W, H, 0.010, mat.dark, 'sw', true), 0, H / 2, D - 0.005));
       for (var fi = 0; fi < 2; fi++) g.add(at(cyl(0.017, 0.004, mat.face, 'sw', 'z', 20), -W / 2 + 0.03 + fi * 0.046, H / 2, D + 0.002));
       for (var pi = 0; pi < 4; pi++) g.add(at(box(0.020, 0.012, 0.004, mat.steel, 'sw'), W / 2 - 0.03 - pi * 0.028, H / 2, D + 0.002));
       [-1, 1].forEach(function (sx) { g.add(at(box(0.012, H, 0.004, mat.alu, 'sw'), sx * (W / 2 + 0.006), H / 2, D - 0.003)); g.add(at(cyl(0.004, 0.006, mat.steel, 'sw', 'z', 12), sx * (W / 2 + 0.006), H / 2, D + 0.002)); });
-      if (label) g.add(at(labelPlate(label, 0.09, 0.012), 0, H - 0.009, D + 0.0015));
-      if (!detail) { g.add(at(box(W, 0.004, D, mat.alu, 'sw'), 0, H - 0.002, D / 2)); return g; }
       for (var f = 0; f < 2; f++) g.add(at(fan('fan'), -W / 2 + 0.03 + f * 0.046, H / 2, D - 0.03, [0, 0, 0.12]));
-      g.add(at(box(0.46, 0.0025, 0.42, mat.pcb, 'sw', true), 0, 0.006, 0.40));
+      g.add(at(box(0.46, 0.0025, 0.42, pcbMaterial(), 'sw', true), 0, 0.006, 0.40));
       var loops = [];
       [-1, 1].forEach(function (sx) {
         var x = sx * 0.11, z = 0.40;
@@ -233,7 +281,7 @@
       var tS = loopPath(pts.slice(0, 3), mat.supply, 'loop'), tM = loopPath(pts.slice(2, 10), mat.steel, 'loop'), tR = loopPath(pts.slice(9), mat.ret, 'loop');
       [tS.tube, tM.tube, tR.tube].forEach(function (t) { t.userData.ex = [0, 0.08, 0]; g.add(t); });
       var full = loopPath(pts, mat.steel, 'loop'), pt = particles(full.curve, 70, 'loop', [[0.40, 0.5], [0.62, 1]]); pt.userData.ex = [0, 0.08, 0]; g.add(pt); loops.push(pt);
-      [[-0.21, mat.supply], [0.21, mat.ret]].forEach(function (q) { g.add(at(cyl(0.012, 0.05, mat.steel, 'qd', 'z'), q[0], 0.030, 0.025, [0, 0, -0.08])); g.add(at(cyl(0.014, 0.012, q[1], 'qd', 'z'), q[0], 0.030, 0.012, [0, 0, -0.08])); });
+      [[-0.21, mat.supply], [0.21, mat.ret]].forEach(function (q) { var qd = at(cyl(0.012, 0.05, mat.steel, 'qd', 'z'), q[0], 0.030, 0.025, [0, 0, -0.08]); qd.userData.tag = (q[0] < 0 ? n(TCS_S) + ' °C in' : n(TCS_R) + ' °C out'); g.add(qd); g.add(at(cyl(0.014, 0.012, q[1], 'qd', 'z'), q[0], 0.030, 0.012, [0, 0, -0.08])); });
       g.add(at(box(0.42, 0.030, 0.030, mat.cart, 'nvl', true), 0, 0.020, 0.016, [0, 0, -0.08]));
       for (var s2 = 0; s2 < 36; s2++) g.add(at(box(0.008, 0.014, 0.004, mat.chip, 'nvl'), -0.20 + s2 * 0.0114, 0.020, 0.0, [0, 0, -0.08]));
       g.add(at(box(0.040, 0.030, 0.025, mat.copper, 'clip'), 0.24, 0.020, 0.013, [0, 0, -0.06]));
@@ -242,13 +290,12 @@
       return g;
     }
     function powerShelf(label) {
-      var g = new T.Group(), W = G.trayW, D = G.shelfD, H = G.trayH;
-      g.add(at(box(W, H, D, mat.face, 'ps', true), 0, H / 2, D / 2));
-      if (label) g.add(at(labelPlate(label, 0.09, 0.012), -W / 2 + 0.06, H - 0.006, D + 0.031));
-      for (var i = 0; i < PSU; i++) { var x = -W / 2 + 0.03 + G.psuW / 2 + i * (G.psuW + 0.006); g.add(at(box(G.psuW, H - 0.008, 0.02, mat.psu, 'ps', true), x, H / 2, D + 0.01)); g.add(at(box(0.03, 0.004, 0.006, mat.dark, 'ps'), x, H / 2 + 0.010, D + 0.022)); g.add(at(box(0.004, 0.004, 0.003, mat.supply, 'ps'), x - 0.03, H / 2 - 0.010, D + 0.021)); }
+      var g = new T.Group(), W = G.trayW + 0.024, D = G.shelfD, H = G.trayH;
+      var body = box(W, H, D, mat.face, 'ps'); body.castShadow = false; at(body, 0, H / 2, D / 2); g.add(body);
+      var fp = new T.Mesh(new T.PlaneGeometry(W, H), faceTexture('ps', label)); fp.userData.part = 'ps'; fp.position.set(0, H / 2, D + 0.001); g.add(fp);
       return g;
     }
-    function oobSwitch() { var g = new T.Group(); g.add(at(box(G.trayW, G.trayH, 0.45, mat.dark, 'oob', true), 0, G.trayH / 2, 0.225)); for (var i = 0; i < 24; i++) g.add(at(box(0.012, 0.010, 0.004, mat.steel, 'oob'), -0.22 + i * 0.016, G.trayH / 2, 0.452)); return g; }
+    function oobSwitch() { var g = new T.Group(), W = G.trayW + 0.024, H = G.trayH; var body = box(W, H, 0.45, mat.dark, 'oob'); body.castShadow = false; at(body, 0, H / 2, 0.225); g.add(body); var fp = new T.Mesh(new T.PlaneGeometry(W, H), faceTexture('oob', 'OOB')); fp.userData.part = 'oob'; fp.position.set(0, H / 2, 0.451); g.add(fp); return g; }
     function rack() {
       var g = new T.Group(), H = G.rackOU * G.OU + 0.08, W = G.rackW, D = G.rackD;
       [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (c) { g.add(at(box(G.post, H, G.post, mat.frame, 'frame'), c[0] * (W / 2 - G.post / 2), H / 2, c[1] * (D / 2 - G.post / 2))); });
@@ -288,7 +335,7 @@
     var gl; try { gl = cv.getContext('webgl2') || cv.getContext('webgl'); } catch (e) { gl = null; }
     if (!gl) { stage.innerHTML = '<p class="h3-nogl">This browser has no WebGL; the counts above are the same ones the drawing would show.</p>'; return; }
     var renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(root.devicePixelRatio || 1, 1.5)); renderer.outputColorSpace = T.SRGBColorSpace; renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.35;
+    renderer.setPixelRatio(Math.min(root.devicePixelRatio || 1, root.innerWidth < 800 ? 1.5 : 1.25)); renderer.outputColorSpace = T.SRGBColorSpace; renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.35;
     var scene = new T.Scene();
     /* a studio environment painted on a canvas — three soft light bands over a dark floor — so the
      * aluminium, copper and steel have something to reflect; the renderer builds the PMREM from it */
@@ -302,14 +349,15 @@
     var cam = new T.PerspectiveCamera(34, 1, 0.01, 50);
     var ctl = new T.OrbitControls(cam, cv); ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.enablePan = false; ctl.autoRotate = !REDUCE; ctl.autoRotateSpeed = 0.5;
     scene.add(new T.HemisphereLight(0xe8eef6, 0x2a2d33, 1.5)); scene.add(new T.AmbientLight(0x6a717a, 0.6));
-    var key = new T.DirectionalLight(0xffffff, 2.0); key.position.set(2.5, 4, 3); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0004; key.shadow.camera.left = key.shadow.camera.bottom = -2.2; key.shadow.camera.right = key.shadow.camera.top = 2.2; key.shadow.camera.near = 0.5; key.shadow.camera.far = 12; scene.add(key);
+    var key = new T.DirectionalLight(0xffffff, 2.0); key.position.set(2.5, 4, 3); key.castShadow = true; key.shadow.mapSize.set(root.innerWidth < 800 ? 1024 : 2048, root.innerWidth < 800 ? 1024 : 2048); key.shadow.bias = -0.0004; key.shadow.camera.left = key.shadow.camera.bottom = -2.2; key.shadow.camera.right = key.shadow.camera.top = 2.2; key.shadow.camera.near = 0.5; key.shadow.camera.far = 12; scene.add(key);
     var fill = new T.DirectionalLight(0xbfc8d6, 0.9); fill.position.set(-3, 2, -2); scene.add(fill);
     var rim = new T.DirectionalLight(0xffffff, 0.6); rim.position.set(0, 1, -4); scene.add(rim);
+    var front = new T.DirectionalLight(0xfff4e6, 0.7); front.position.set(0.5, 1.5, 5); scene.add(front);
     var gridCol = new T.Color(cssColor(host, '--rz-line-tier-2', '#2a2d31'));
     var grid = new T.GridHelper(4, 40, gridCol, gridCol); grid.material.transparent = true; grid.material.opacity = 0.35; scene.add(grid);
     var floor = new T.Mesh(new T.PlaneGeometry(6, 6), new T.MeshStandardMaterial({ color: 0x101216, metalness: 0.2, roughness: 0.78 })); floor.rotation.x = -Math.PI / 2; floor.position.y = -0.004; floor.receiveShadow = true; scene.add(floor);
     var B = build(T, host), world = new T.Group(); scene.add(world);
-    var view = 'rack', model = null, explode = 0, explodeTarget = 0, hot = null, pinned = null, active = -1, raf = null, raycaster = new T.Raycaster(), ptr = new T.Vector2(-9, -9), meshes = [], spinners = [], heats = [];
+    var view = 'rack', model = null, explode = 0, explodeTarget = 0, hot = null, pinned = null, active = -1, raf = null, raycaster = new T.Raycaster(), ptr = new T.Vector2(-9, -9), meshes = [], spinners = [], heats = [], tagged = [];
 
     function fit(name) {
       if (name === 'rack') { grid.position.y = 0; floor.position.y = -0.004; cam.position.set(3.1, 2.3, 3.9); ctl.target.set(0, 1.25, 0); ctl.minDistance = 1.2; ctl.maxDistance = 8; }
@@ -318,12 +366,13 @@
     }
     function show(name) {
       view = name; if (model) world.remove(model);
-      model = B[name](); world.add(model); meshes = []; spinners = []; heats = [];
+      model = B[name](); world.add(model); meshes = []; spinners = []; heats = []; tagged = [];
       model.traverse(function (o) {
         if (o.userData && o.userData.ex) o.userData.p0 = o.position.clone();
         if (o.isMesh && o.userData.part && o.userData.part !== 'frame' && o.userData.part !== 'label') meshes.push(o);
         if (o.userData && o.userData.spin) spinners.push(o);
         if (o.userData && o.userData.heat) heats.push(o);
+        if (o.userData && o.userData.tag) tagged.push(o);
       });
       tabs.forEach(function (t) { var on = t.getAttribute('data-view') === name; t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1; });
       host.setAttribute('data-view-on', name); pinned = null; active = -1; hot = null;
@@ -336,7 +385,7 @@
     function renderList() {
       var V = VIEWS[view];
       list.innerHTML = V.parts.map(function (id, i) { var p = PARTS[id]; return '<li data-part="' + id + '"><b>' + (i + 1) + '</b><span>' + p.name + '</span><i>' + (p.count > 1 ? '×' + n(p.count) + ' ' : '') + p.src.toLowerCase() + '</i></li>'; }).join('');
-      labels.innerHTML = V.parts.map(function (id, i) { return '<span class="h3-tag" data-part="' + id + '"><b>' + (i + 1) + '</b></span>'; }).join('');
+      labels.innerHTML = V.parts.map(function (id, i) { return '<span class="h3-tag" data-part="' + id + '"><b>' + (i + 1) + '</b></span>'; }).join('') + tagged.map(function (m, i) { return '<span class="h3-tag h3-temp" data-temp="' + i + '">' + m.userData.tag + '</span>'; }).join('');
     }
     function readout(id) {
       var V = VIEWS[view];
@@ -356,7 +405,7 @@
     function placeLabels() {
       var w = cv.clientWidth, h = cv.clientHeight;
       Array.prototype.forEach.call(labels.children, function (t) {
-        var m = anchorOf(t.getAttribute('data-part')); if (!m) { t.style.display = 'none'; return; }
+        var m = t.hasAttribute('data-temp') ? tagged[+t.getAttribute('data-temp')] : anchorOf(t.getAttribute('data-part')); if (!m) { t.style.display = 'none'; return; }
         m.getWorldPosition(v3); v3.project(cam);
         if (v3.z > 1) { t.style.display = 'none'; return; }
         t.style.display = ''; t.style.transform = 'translate(' + ((v3.x + 1) / 2 * w).toFixed(1) + 'px,' + ((1 - v3.y) / 2 * h).toFixed(1) + 'px)';
