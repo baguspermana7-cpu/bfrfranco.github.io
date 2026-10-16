@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v3.22.7 — 2026-10-16 — "Envelopes"
+
+### The two table-only chapters of the engineering report get their figures
+
+**Why.** After v3.22.2 every other chapter of the LTC report opened with a drawing; Tier topology and Standards cross-check were still a table each, and the Tier page ran half empty. A Tier verdict is a sweep of elements, and a standards check is a position inside a band — both are pictures before they are sentences.
+
+**What changed** (`js/ltc-report.js`):
+- **Element-out matrix** (`tierMatrix`), one for the power system and one for cooling: a row per removable element, a column per Tier, each cell split planned | unplanned, green when the load is still carried, red when a group is lost, a dot where that Tier's topology has no such element. It reads straight off the Tier model's own sweep (`tierSweep` now returns the per-element rows), so the matrix and the summary table cannot disagree. The default plant shows Tier I–II red on TX, UPS, PDU and MCC, Tier III red only in the unplanned half of its active path, Tier IV all green.
+- **ASHRAE envelopes** (`envelopes`): the hall's supply and return air and DH01's hottest rack inlet under every modelled fault against the recommended band and the A1–A4 allowable classes; below it the facility water supply against the liquid classes W17 … W+, the class the FWS supply falls in lit, the TCS loop ends marked. Coincident fault inlets are listed once per value, so nine faults at 24.0 °C are one line, not nine overlapping labels.
+- **Standards cross-check** gains the row "DH01 max rack inlet, worst fault" (the default plant: 34.0 °C with four CRAHs lost, beyond the A1 allowable 32 °C), so the figure's worst point is also a sentence in the table.
+
+**Gate** (`tools/test-ltc-workbench.mjs`, W12en, 357 assertions): the matrix is read back from its data attributes and compared cell by cell with `LTCTier.sweep` for all four Tiers of both systems (80 cells); the envelopes' points must equal the engine's supply, return, every fault's max inlet and the FWS/TCS ends, the air bands must be ASHRAE's, and exactly one liquid class is lit — the one the FWS supply falls in — before and after a colder TCS supply moves it. Mutants: swapping the planned/unplanned attributes (2 assertions red) and plotting the return temperature as supply (1 red).
+
 ## v3.22.6 — 2026-10-16 — "Plant"
 
 ### Changed — the hub mockup's hero is the plant, running (`datacenter-solutions1.html`, noindex)

@@ -771,6 +771,38 @@ for (const [page, mod] of Object.entries(PAGES)) {
   const cells = (base.html.match(/<span class="lvr">/g) || []).length, thenTags = (base.html.match(/>then (holds|review|fails)</g) || []).length;
   ok('W12lv-d', cells === base.v.length && thenTags === judged.length && base.html.includes('What moves it'),
      `the verdict table carries a "What moves it" cell per row and a "then …" tag per applied lever (${cells} / ${thenTags})`);
+
+  /* W12en: the Tier element-out matrix and the standards envelopes are read from the drawing's
+   * data attributes and compared with the Tier model's own sweep and the engine's temperatures. */
+  const mx = (h, sys) => [...svgOf(h, 'Element-out matrix, ' + sys + ' system').matchAll(/class="tc" data-key="([^"]+)" data-tier="(\d)" data-maint="([01])" data-fault="([01])"/g)]
+    .map((m) => ({ key: m[1], tier: +m[2], maint: m[3] === '1', fault: m[4] === '1' }));
+  const TT = sb.LTCTier, wasSys = TT.system();
+  let mxN = 0, mxBad = [], mxCells = 0;
+  for (const sys of ['power', 'cooling']) {
+    TT.system(sys); const cs = mx(base.html, sys); mxCells += cs.length;
+    for (const t of [1, 2, 3, 4]) for (const r of TT.sweep(t)) {
+      mxN++; const c = cs.find((q) => q.key === r.e.key && q.tier === t);
+      if (!c || c.maint !== r.maint || c.fault !== r.fault) mxBad.push(sys + '/' + t + '/' + r.e.key);
+    }
+  }
+  TT.system(wasSys);
+  const mxP = mx(base.html, 'power');
+  ok('W12en-a', mxN >= 40 && mxCells === mxN && mxBad.length === 0 && TT.system() === 'power',
+     `Tier matrix: ${mxCells} cells = ${mxN} sweep rows, every planned/unplanned verdict equals the Tier model's — bad ${JSON.stringify(mxBad.slice(0, 4))}`);
+  ok('W12en-b', mxP.filter((c) => c.tier === 4).every((c) => c.maint && c.fault) && mxP.some((c) => c.tier === 1 && !c.fault) && mxP.filter((c) => c.tier === 3).every((c) => c.maint) && mxP.some((c) => c.tier === 3 && !c.fault),
+     'Tier IV cells all green, Tier III planned green with an unplanned red, Tier I has a red');
+  const env = (h) => svgOf(h, 'Hall air and facility water against the ASHRAE classes');
+  const pts = (h) => Object.fromEntries([...env(h).matchAll(/class="pt" data-id="([^"]+)" data-c="([^"]+)"/g)].map((m) => [m[1], +m[2]]));
+  const wOn = (h) => [...env(h).matchAll(/class="wc" data-cls="([^"]+)" data-on="1"/g)].map((m) => m[1]);
+  const wcls = (c) => { for (const w of [17, 27, 32, 40, 45]) if (c <= w) return 'W' + w; return 'W+'; };
+  const E = pts(base.html), cold = V({ tcsSupplyC: 24 }), Ec = pts(cold.html);
+  ok('W12en-c', E.supply === bp.supplyAirC && E.return === bp.supplyAirC + bp.airDeltaK && base.ctx.faults.every((x) => E['f-' + x.id] === x.s.maxInlet)
+     && E.fws === bl.fwsSupplyC && E.fwsr === bl.fwsReturnC && E.tcs === bp.tcsSupplyC && E.tcsr === bp.tcsReturnC
+     && [[18, 27], [15, 32], [10, 35], [5, 40], [5, 45]].every((b) => env(base.html).includes('data-lo="' + b[0] + '" data-hi="' + b[1] + '"')),
+     `envelopes: supply, return, every fault's max inlet, FWS and TCS ends are the engine's; the five air bands are ASHRAE's — got ${JSON.stringify(E)}`);
+  ok('W12en-d', wOn(base.html).join() === wcls(bl.fwsSupplyC) && wOn(cold.html).join() === wcls(cold.R.liquid.fwsSupplyC) && wcls(bl.fwsSupplyC) !== wcls(cold.R.liquid.fwsSupplyC)
+     && Ec.fws === cold.R.liquid.fwsSupplyC && text.includes('worst fault'),
+     `one liquid class lit, the one the FWS supply falls in: ${wOn(base.html)} at ${bl.fwsSupplyC} °C, ${wOn(cold.html)} at ${cold.R.liquid.fwsSupplyC} °C`);
 }
 
 {

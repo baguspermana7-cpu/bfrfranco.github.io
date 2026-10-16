@@ -291,6 +291,94 @@
         '<text x="' + (lx + cap * scale + 6).toFixed(1) + '" y="' + (y + 13) + '" class="sv">' + (ok ? 'holds' : 'short') + ' · N−1 ' + f(n1) + ' vs ' + f(r[4]) + ' kW</text></g>';
     }).join('') + '<text x="' + lx + '" y="' + (reg.length * rh + 18) + '" class="sd">grey = installed capacity · bar = design load · tick = capacity with one unit out</text></svg>';
   }
+
+  /* the Tier sweep as a matrix: one row per removable element, one column per Tier; each cell is
+     split planned | unplanned, green when the load is still carried, red when a group is lost, a
+     dot where that Tier's topology has no such element. Rows carry data-* so the test can read the
+     drawing against LTCTier.sweep itself. */
+  function tierMatrix(tier, sys) {
+    var T = (tier || []).filter(function (t) { return t.system === sys; }), rows = [], seen = {};
+    T.forEach(function (t) { (t.rows || []).forEach(function (r) {
+      if (seen[r.key] == null) { seen[r.key] = rows.length; rows.push({ key: r.key, label: r.label.replace(/ N\+N/, '').replace(/ — any 1 of \d+/, ' — one unit') }); }
+    }); });
+    var W = 760, lx = 300, cw = 100, rh = 18, top = 40, H = top + rows.length * rh + 26, o = [];
+    o.push('<text x="0" y="13" class="sl">' + (sys === 'power' ? 'Power system' : 'Cooling system') + ' · element out, one at a time</text>');
+    [1, 2, 3, 4].forEach(function (t, i) { o.push('<text x="' + (lx + i * cw + cw / 2) + '" y="' + (top - 8) + '" text-anchor="middle" class="sv">Tier ' + ROMAN[t] + '</text>'); });
+    rows.forEach(function (r, i) {
+      var y = top + i * rh;
+      if (i % 2) o.push('<rect x="0" y="' + y + '" width="' + W + '" height="' + rh + '" fill="#f3f4f6"/>');
+      o.push('<text x="' + (lx - 8) + '" y="' + (y + 13) + '" text-anchor="end" class="sl">' + esc(r.label) + '</text>');
+      T.forEach(function (t) {
+        var c = (t.rows || []).filter(function (q) { return q.key === r.key; })[0], x = lx + (t.tier - 1) * cw;
+        if (!c) { o.push('<text x="' + (x + cw / 2) + '" y="' + (y + 13) + '" text-anchor="middle" class="sd">·</text>'); return; }
+        o.push('<g class="tc" data-key="' + esc(c.key) + '" data-tier="' + t.tier + '" data-maint="' + (c.maint ? 1 : 0) + '" data-fault="' + (c.fault ? 1 : 0) + '">' +
+          '<title>' + esc(c.label + ' · Tier ' + ROMAN[t.tier] + ' · planned: ' + (c.maint ? 'carried' : 'lost') + ' · unplanned: ' + (c.fault ? 'carried' : 'lost') + (c.lost.length ? ' (' + c.lost.join(' + ') + ')' : '')) + '</title>' +
+          '<rect x="' + (x + 6) + '" y="' + (y + 2) + '" width="' + (cw / 2 - 7) + '" height="' + (rh - 4) + '" fill="' + (c.maint ? C.ok : C.bad) + '" fill-opacity=".85"/>' +
+          '<rect x="' + (x + cw / 2 + 1) + '" y="' + (y + 2) + '" width="' + (cw / 2 - 7) + '" height="' + (rh - 4) + '" fill="' + (c.fault ? C.ok : C.bad) + '" fill-opacity=".85"/></g>');
+      });
+    });
+    o.push('<text x="0" y="' + (H - 6) + '" class="sd">each cell: planned | unplanned · green = the load is still carried · red = lost · · = not in that Tier\'s topology</text>');
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Element-out matrix, ' + sys + ' system">' + o.join('') + '</svg>';
+  }
+
+  /* the hall air against the ASHRAE TC 9.9 air classes and the facility water against the liquid
+     classes, each on its own °C axis; the points are the engine's temperatures and DH01's worst
+     rack inlet under every fault the workbench models */
+  var AIR_CLASSES = [['Recommended', 18, 27, 0.35], ['A1 allowable', 15, 32, 0.22], ['A2 allowable', 10, 35, 0.15], ['A3 allowable', 5, 40, 0.1], ['A4 allowable', 5, 45, 0.06]];
+  var W_CLASSES = [['W17', 2, 17], ['W27', 17, 27], ['W32', 27, 32], ['W40', 32, 40], ['W45', 40, 45], ['W+', 45, 55]];
+  function envelopes(R, ctx) {
+    var p = R.input, l = R.liquid, W = 760, lx = 120, rx = 740, lo = 0, hi = 55, faults = ctx.faults || [], o = [];
+    function X(c) { return lx + (rx - lx) * (Math.min(Math.max(c, lo), hi) - lo) / (hi - lo); }
+    function axis(y) {
+      var s = '<line x1="' + lx + '" y1="' + y + '" x2="' + rx + '" y2="' + y + '" stroke="' + C.grid + '"/>';
+      for (var c = lo; c <= hi; c += 5) s += '<line x1="' + X(c) + '" y1="' + y + '" x2="' + X(c) + '" y2="' + (y + 4) + '" stroke="' + C.grid + '"/><text x="' + X(c) + '" y="' + (y + 15) + '" text-anchor="middle" class="sd">' + c + '</text>';
+      return s + '<text x="' + rx + '" y="' + (y + 28) + '" text-anchor="end" class="sd">°C</text>';
+    }
+    function pt(id, c, color) { return '<g class="pt" data-id="' + esc(id) + '" data-c="' + c + '"><path d="M' + X(c).toFixed(1) + ',0 l-5,-9 h10 z" fill="' + color + '"/></g>'; }
+    /* air panel */
+    var y = 30;
+    o.push('<text x="0" y="14" class="sl">Hall air · ASHRAE TC 9.9 classes</text>');
+    AIR_CLASSES.forEach(function (b, i) {
+      var yy = y + i * 16;
+      o.push('<rect class="band" data-lo="' + b[1] + '" data-hi="' + b[2] + '" x="' + X(b[1]).toFixed(1) + '" y="' + yy + '" width="' + (X(b[2]) - X(b[1])).toFixed(1) + '" height="14" fill="' + C.ok + '" fill-opacity="' + b[3] + '"/>' +
+        '<text x="' + (lx - 8) + '" y="' + (yy + 11) + '" text-anchor="end" class="sl">' + b[0] + '</text><text x="' + (X(b[1]) + 4).toFixed(1) + '" y="' + (yy + 11) + '" class="sd">' + b[1] + '–' + b[2] + '</text>');
+    });
+    var yp = y + AIR_CLASSES.length * 16 + 14, air = [['supply', 'Supply air', p.supplyAirC, C.air], ['return', 'Return air', p.supplyAirC + p.airDeltaK, C.heat]];
+    o.push('<text x="' + (lx - 8) + '" y="' + (yp - 2) + '" text-anchor="end" class="sl">Hall points</text>');
+    o.push('<g transform="translate(0,' + yp + ')">' + air.map(function (a) { return pt(a[0], a[2], a[3]); }).join('') + faults.map(function (x) { return pt('f-' + x.id, x.s.maxInlet, C.bad); }).join('') + '</g>');
+    o.push(axis(yp + 2));
+    /* labels: the two hall points, then every distinct inlet value with the faults that give it */
+    var byVal = {}, order = [];
+    faults.forEach(function (x) { var k = f(x.s.maxInlet, 1); if (!byVal[k]) { byVal[k] = []; order.push(k); } byVal[k].push(x.label); });
+    var lines = air.map(function (a) { return a[1] + ' ' + f(a[2], 1) + ' °C'; });
+    /* a fault list longer than the figure is wide wraps onto a second, indented line */
+    order.forEach(function (k) {
+      var head = 'DH01 max rack inlet ' + k + ' °C: ', cur = head;
+      byVal[k].forEach(function (lab, i) {
+        var piece = (i ? ', ' : '') + lab;
+        if ((cur + piece).length > 112) { lines.push(cur + ','); cur = '    ' + lab; } else cur += piece;
+      });
+      lines.push(cur);
+    });
+    lines.forEach(function (t, i) { o.push('<text x="0" y="' + (yp + 46 + i * 13) + '" class="sd">' + esc(t) + '</text>'); });
+    /* liquid panel */
+    var y2 = yp + 46 + lines.length * 13 + 14, on = liquidClass(l.fwsSupplyC);
+    o.push('<text x="0" y="' + y2 + '" class="sl">Facility water supply · ASHRAE liquid classes</text>');
+    W_CLASSES.forEach(function (w) {
+      var lit = w[0] === on, x0 = X(w[1]), x1 = X(w[2]);
+      o.push('<rect class="wc" data-cls="' + w[0] + '" data-on="' + (lit ? 1 : 0) + '" x="' + x0.toFixed(1) + '" y="' + (y2 + 10) + '" width="' + (x1 - x0 - 1).toFixed(1) + '" height="18" fill="' + C.liq + '" fill-opacity="' + (lit ? 1 : 0.18) + '"/>' +
+        '<text x="' + ((x0 + x1) / 2).toFixed(1) + '" y="' + (y2 + 23) + '" text-anchor="middle" class="' + (lit ? 'sv' : 'sl') + '"' + (lit ? ' fill="#fff"' : '') + '>' + w[0] + '</text>');
+    });
+    o.push('<text x="' + (lx - 8) + '" y="' + (y2 + 23) + '" text-anchor="end" class="sl">Class</text>');
+    var yq = y2 + 46, liq = [['fws', 'FWS supply', l.fwsSupplyC, C.liq], ['fwsr', 'FWS return', l.fwsReturnC, C.liq], ['tcs', 'TCS supply', p.tcsSupplyC, C.chw], ['tcsr', 'TCS return', p.tcsReturnC, C.chw]];
+    o.push('<text x="' + (lx - 8) + '" y="' + (yq - 2) + '" text-anchor="end" class="sl">Loop points</text>');
+    o.push('<g transform="translate(0,' + yq + ')">' + liq.map(function (a) { return pt(a[0], a[2], a[3]); }).join('') + '</g>');
+    o.push(axis(yq + 2));
+    o.push('<text x="0" y="' + (yq + 46) + '" class="sd">' + esc(liq.map(function (a) { return a[1] + ' ' + f(a[2], 1) + ' °C'; }).join(' · ')) + '</text>');
+    o.push('<text x="0" y="' + (yq + 59) + '" class="sd">' + esc('the lit class is the one the FWS supply falls in: ' + on + ' (named for its maximum supply temperature)') + '</text>');
+    var H = yq + 69;
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Hall air and facility water against the ASHRAE classes">' + o.join('') + '</svg>';
+  }
   function findings(R, ctx) {
     var T = R.totals, A = R.annual, l = R.liquid, out = [];
     out.push('Design-day PUE <b>' + f(T.pue, 3) + '</b> at ' + R.input.designDbC + ' °C db / ' + R.input.designWbC + ' °C wb; annual PUE <b>' + f(T.pueAnnual, 3) + '</b> over the ' + esc((ctx.climateLabel || 'site')) + ' bins at ' + f(R.input.itUtil * 100) + ' % utilisation.');
@@ -672,7 +760,9 @@
       return [esc(r[0]) + ' <small>' + r[5] + '</small>', r[1], r[2], (root.LTCTier ? root.LTCTier.redLabel(r[2], r[1]) : (r[2] > r[1] ? 'N+' + (r[2] - r[1]) : 'N')), f(r[3]), f(cap), f(r[4]), pct(cap - r[4], r[4]), ok ? '<span class="tag ok">holds</span>' : '<span class="tag bad">short</span>'];
     })) + '<p class="note">Unit counts are capacity redundancy only. Whether a <em>path</em> can be taken out (concurrent maintainability, fault tolerance) is tested on the Tier page, element by element.</p>'));
     parts.push(sec('s9', 9, 'Tier topology', 'Each Tier of the Uptime Institute Tier Standard: Topology drawn on this plant\'s unit counts (DH01\'s share), every element taken out one at a time — planned (an alternate path may be switched in first) and unplanned (only paths already carrying load count). The load survives only if every group it needs keeps a path: IT power AND mechanical power; liquid heat sink AND air heat sink.',
-      ctx.tier ? table(['Tier', 'System', 'Elements tested', 'Concurrently maintainable', 'Fault tolerant', 'What breaks it'], ctx.tier.map(function (t) {
+      ctx.tier ? '<figure class="wide">' + tierMatrix(ctx.tier, 'power') + '</figure><figure class="wide">' + tierMatrix(ctx.tier, 'cooling') + '</figure>' +
+        '<p class="note">Read a column top to bottom: every element of that Tier\'s topology taken out, planned (left half, an alternate path switched in first) and unplanned (right half, only paths already carrying load). A Tier is concurrently maintainable when its planned halves are all green, fault tolerant when the unplanned halves are too. The table below sums each column.</p>' +
+        table(['Tier', 'System', 'Elements tested', 'Concurrently maintainable', 'Fault tolerant', 'What breaks it'], ctx.tier.map(function (t) {
         var why = t.maintFail.length ? 'planned: ' + t.maintFail.slice(0, 3).join('; ') + (t.maintFail.length > 3 ? ' (+' + (t.maintFail.length - 3) + ')' : '')
           : t.faultFail.length ? 'unplanned: ' + t.faultFail.slice(0, 3).join('; ') + (t.faultFail.length > 3 ? ' (+' + (t.faultFail.length - 3) + ')' : '') : '—';
         return [esc(t.label), t.system, t.n, t.maint ? '<span class="tag ok">yes</span>' : '<span class="tag bad">no</span>', t.fault ? '<span class="tag ok">yes</span>' : '<span class="tag bad">no</span>', '<small>' + esc(why) + '</small>'];
@@ -699,16 +789,20 @@
         return [esc(t.title), esc(t.label), f(t.series[0][1], 1), f(t.limitC, 1), f(t.C / 1000, 1), f(t.Q), t.secondsToLimit != null ? f(t.secondsToLimit) + ' s' : 'not reached in ' + f(t.series[t.series.length - 1][0]) + ' min']; }))));
     var dh = ctx.faults ? ctx.faults[0].s : null;
     if (ctx.hlt) parts.push(sec('', 0, 'Heat load test plan', 'The commissioning L4 heat load test (HLT) for DH01, written from this plant: what each load step should read, and what each single failure at full load should do.', hltSection(ctx.hlt)));
-    parts.push(sec('s13', 13, 'Standards cross-check', 'What the plant\'s numbers say against each standard the workbench covers. A screening check, not a compliance statement.', table(['Standard', 'Check', 'Plant value', 'Result'], [
+    var worstF = ctx.faults ? ctx.faults.reduce(function (m, x) { return x.s.maxInlet > m.s.maxInlet ? x : m; }, ctx.faults[0]) : null;
+    parts.push(sec('s13', 13, 'Standards cross-check', 'What the plant\'s numbers say against each standard the workbench covers. A screening check, not a compliance statement.', '<figure class="wide">' + envelopes(R, ctx) + '</figure>' +
+      '<p class="note">Top: the hall\'s supply and return air and DH01\'s hottest rack inlet under each fault, against the ASHRAE air classes (the recommended band, then A1–A4 allowable). Bottom: the facility water supply against the liquid classes; the lit class is the one this plant\'s FWS supply falls in, with the TCS loop ends for reference.</p>' +
+      table(['Standard', 'Check', 'Plant value', 'Result'], [
       ['ASHRAE TC 9.9 (air)', 'Supply air within A1 recommended 18–27 °C', f(p.supplyAirC, 1) + ' °C', p.supplyAirC >= 18 && p.supplyAirC <= 27 ? '<span class="tag ok">within</span>' : '<span class="tag bad">outside</span>'],
-      ['ASHRAE TC 9.9 (air)', 'DH01 max rack inlet, normal operation', dh ? f(dh.maxInlet, 1) + ' °C' : '—', dh ? (dh.maxInlet <= 27 ? '<span class="tag ok">within</span>' : '<span class="tag bad">above 27 °C</span>') : '—'],
+      ['ASHRAE TC 9.9 (air)', 'DH01 max rack inlet, normal operation', dh ? f(dh.maxInlet, 1) + ' °C' : '—', dh ? (dh.maxInlet <= 27 ? '<span class="tag ok">within</span>' : '<span class="tag bad">above 27 °C</span>') : '—']].concat(worstF ? [
+      ['ASHRAE TC 9.9 (air)', 'DH01 max rack inlet, worst fault', f(worstF.s.maxInlet, 1) + ' °C (' + esc(worstF.label) + ')', worstF.s.maxInlet <= 32 ? '<span class="tag ok">within A1 allowable</span>' : '<span class="tag bad">beyond A1 allowable</span>']] : []).concat([
       ['ASHRAE liquid classes', 'Facility water supply class (W17…W45, W+)', f(l.fwsSupplyC, 1) + ' °C', liquidClass(l.fwsSupplyC)],
       ['ISO/IEC 30134-2', 'PUE category 3, annual', f(A.pue3, 3), 'cat 1 ' + f(A.pue1, 3) + ' · cat 2 ' + f(A.pue2, 3)],
       ['ISO/IEC 30134-8 / -9', 'CUE / WUE', f(A.cue, 3) + ' kgCO₂/kWh · ' + f(A.wue, 3) + ' L/kWh', 'grid ' + p.gridEfKgPerKwh + ' kg/kWh'],
       ['ISO/IEC 30134-3 / -6', 'REF / ERF', f(A.ref, 3) + ' / ' + f(A.erf, 3), A.erf > 0 ? 'heat reuse declared' : 'no reuse declared'],
       ['Uptime Tier (capacity)', 'Every equipment class survives one unit out', reg.filter(function (r) { return (r[2] - 1) * r[3] >= r[4] - 0.5; }).length + ' of ' + reg.length + ' classes', reg.every(function (r) { return (r[2] - 1) * r[3] >= r[4] - 0.5; }) ? '<span class="tag ok">N+1 or better</span>' : '<span class="tag bad">a class is short</span>'],
       ['NFPA 75 / 2001', 'Clean-agent protected volume, one hall', f(h.volumeM3) + ' m³ (' + f(h.areaM2) + ' m² × ' + f(h.heightM, 1) + ' m)', 'agent quantity on the NFPA page'],
-      ['TIA-942', 'Racks to cable, one hall', f(R.it.racksPerHall) + ' racks in ' + h.rows + ' rows', 'port counts on the TIA page']])));
+      ['TIA-942', 'Racks to cable, one hall', f(R.it.racksPerHall) + ' racks in ' + h.rows + ' rows', 'port counts on the TIA page']]))));
     parts.push(sec('s14', 14, 'Calculation trace', 'Every headline quantity with its formula and the inputs it reads — the same trace the ƒx inspector shows.', traceTable(R)));
     parts.push(sec('s15', 15, 'Inputs', 'Every engine input. <span class="tag">auto</span> = the engine default or derived value; <span class="tag y">yours</span> = changed on the plant strip.', inputsTable(R, ctx)));
     parts.push(sec('s16', 16, 'Assumptions & limits', '', '<ul class="find"><li>Steady-state energy balance at the design day and in each climate bin; part-load chillers from the PLR curve; coolers derated by LMTD against their rating.</li>' +
@@ -819,7 +913,8 @@
           var sw = T.sweep(t), lab = (sys === 'power' ? T.TOPO : T.COOL)[t].label;
           out.push({ tier: t, system: sys, label: lab, n: sw.length, maint: sw.every(function (r) { return r.maint; }), fault: sw.every(function (r) { return r.fault; }),
             maintFail: sw.filter(function (r) { return !r.maint; }).map(function (r) { return r.e.label; }),
-            faultFail: sw.filter(function (r) { return !r.fault; }).map(function (r) { return r.e.label + (r.lost && r.lost.length ? ' → ' + r.lost.map(function (g) { return GROUP[sys][g] || g; }).join(' + ') + ' lost' : ''); }) });
+            faultFail: sw.filter(function (r) { return !r.fault; }).map(function (r) { return r.e.label + (r.lost && r.lost.length ? ' → ' + r.lost.map(function (g) { return GROUP[sys][g] || g; }).join(' + ') + ' lost' : ''); }),
+            rows: sw.map(function (r) { return { key: r.e.key, label: r.e.label, maint: r.maint, fault: r.fault, lost: (r.lost || []).map(function (g) { return GROUP[sys][g] || g; }) }; }) });
         });
       });
     } finally { T.system(was); }
