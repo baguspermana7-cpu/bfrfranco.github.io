@@ -1242,7 +1242,10 @@ html[data-rz-register="editorial"] [data-rz-toc] > [hidden]{
     line-height:1.15 !important;
   }
   html[data-rz-register="editorial"] .article-body > p,
-  html[data-rz-register="editorial"] .article-body li{
+  html[data-rz-register="editorial"] .article-body li,
+  html[data-rz-register="editorial"] .article-body > :is(ul,ol) > li{
+    /* v3.24.5: the third selector matches the desktop justify rule's specificity — without it 147
+       list items on article 29 stayed justified on a phone and opened rivers around code tokens */
     text-align:left;
     hyphens:manual;
   }

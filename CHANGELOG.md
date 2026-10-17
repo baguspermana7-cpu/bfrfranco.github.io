@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v3.24.5 — 2026-10-17 — "Ragged"
+
+### Lists stop justifying on a phone
+
+**Owner:** *"improve more"*. Article 29 at 390 px still justified 147 list items: the phone rule
+`.article-body li { text-align:left }` lost on specificity to the desktop `.article-body > :is(ul,ol) > li`
+justify rule, so lists with code tokens opened wide rivers between words.
+
+**Changed**
+- `css/rz-article-dark.css`: the phone left-align rule carries the matching `> :is(ul,ol) > li` selector
+  (all 40 editorial pages).
+- `tools/test-journal.mjs` J5e also fails on any justified paragraph or list item at 390 px (147 on v3.24.4).
+
 ## v3.24.4 — 2026-10-17 — "Hub"
 
 ### Fixed — the catalogue packs, the knowledge panel reads, the panels read on a phone (`datacenter-solutions.html`, `js/rz-hub-illus.js`)

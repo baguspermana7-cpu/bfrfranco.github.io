@@ -175,6 +175,8 @@ if (!STATIC) {
           if (rl.bottom > ri.top + 1) bad.push('label beside input');
           if (b.scrollWidth > b.clientWidth + 1) bad.push('overflows');
         }
+        const justified = [...document.querySelectorAll('.article-body p, .article-body li')].filter((e) => getComputedStyle(e).textAlign === 'justify').length;
+        if (justified) bad.push(justified + ' justified paragraph(s)/item(s) on a phone');
         const title = document.querySelector('.article-title .highlight');
         return { n: blocks.length, bad, italic: title ? getComputedStyle(title).fontStyle : 'none' };
       });
