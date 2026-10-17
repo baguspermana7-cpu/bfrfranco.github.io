@@ -16,4 +16,4 @@ As someone who has spent 12 years building and operating data centers, I genuine
 
 I wrote a deep engineering analysis covering the full timeline, the technical specs, the environmental controversy, and what the industry should learn from it.
 
-Full analysis: https://resistancezero.com/article-23.html
+Full analysis: https://resistancezero.com/article-23.html?utm_source=facebook&utm_medium=social&utm_campaign=a23

@@ -1,4 +1,5 @@
 SEO Title: When Nothing Happens Engineering Is Working | Data Center Ops
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Description: The paradox of proactive engineering in critical infrastructure. Safety-II framework, maturity calculator, and 8-stage proactive operations model for data centers.
 Tags: Data Center, Operations, Safety Engineering, Reliability Engineering, Critical Infrastructure
 
@@ -85,4 +86,4 @@ The ROI comes from three sources: avoided downtime (the obvious one), extended e
 
 For the full 9,000-word analysis with the interactive Operational Maturity Calculator, Eight-Stage Framework breakdown, and real case context from a 10MW facility, visit the original at resistancezero.com:
 
-https://resistancezero.com/article-1.html
+https://resistancezero.com/article-1.html?utm_source=medium&utm_medium=syndication&utm_campaign=a1

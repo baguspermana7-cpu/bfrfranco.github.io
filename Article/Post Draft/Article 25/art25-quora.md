@@ -31,4 +31,4 @@ For consumers, the impact is real. Capacity cost increases translate to approxim
 
 The honest answer from an infrastructure perspective: we cannot build unlimited data centers without proportional investment in grid infrastructure. The data center industry needs to contribute its fair share to grid upgrades, not just consume capacity that was built for residential and commercial customers.
 
-Full analysis with interactive grid calculator: [resistancezero.com/article-25.html](https://resistancezero.com/article-25.html)
+Full analysis with interactive grid calculator: [resistancezero.com/article-25.html](https://resistancezero.com/article-25.html?utm_source=quora&utm_medium=social&utm_campaign=a25)

@@ -1,4 +1,5 @@
 # Medium Post
+*Publish via medium.com/p/import (sets the canonical).*
 
 ## Title
 Nuclear SMRs for AI: A Data Center Engineer's Honest Assessment of Big Tech's $10 Billion Atomic Bet
@@ -74,7 +75,7 @@ The nuclear bet is enormous, unprecedented, and not guaranteed to work on the ti
 
 Whether the engineering delivers will be one of the defining infrastructure stories of the next decade.
 
-Full article with 7-reactor technology comparison table, company deal cards, grid impact data, and global SMR race analysis: https://resistancezero.com/article-21.html
+Full article with 7-reactor technology comparison table, company deal cards, grid impact data, and global SMR race analysis: https://resistancezero.com/article-21.html?utm_source=medium&utm_medium=syndication&utm_campaign=a21
 
 ---
 

@@ -1,4 +1,5 @@
 SEO Title: Water Stress and AI Data Centers in SEA
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Description: 58% of global data centers sit in water-stressed regions. This analysis maps 11 SEA hubs from Jakarta's 85% crisis to low-stress alternatives in Johor Bahru and Da Nang.
 Tags: Data Centers, Water Stress, AI, Southeast Asia, Sustainability
 
@@ -162,4 +163,4 @@ The full article, including an interactive water consumption calculator that let
 
 ---
 
-Originally published at [resistancezero.com](https://resistancezero.com/article-10.html)
+Originally published at [resistancezero.com](https://resistancezero.com/article-10.html?utm_source=medium&utm_medium=syndication&utm_campaign=a10)

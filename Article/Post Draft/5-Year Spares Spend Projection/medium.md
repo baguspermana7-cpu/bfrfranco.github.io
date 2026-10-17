@@ -1,4 +1,5 @@
 # Three Compounding Forces That Blow Up Your Spares Budget by Year 4
+*Publish via medium.com/p/import (sets the canonical).*
 
 (74-char title: "Three Compounding Forces That Blow Up Your Spares Budget")
 

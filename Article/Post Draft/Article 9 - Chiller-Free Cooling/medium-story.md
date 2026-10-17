@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: No Chillers Does Not Mean No Cooling in Data Centers
 (Preview: "No Chillers Does Not Mean No Cooling in Data Centers | by Bagusdpermana | Medium" = 68 chars, fits 74 limit)
 SEO Description: Jensen Huang said "no water chillers are necessary." HVAC stocks dropped 7.5%. But heat rejection never disappears. Tropical physics, fault scenarios, and the real cooling shift.
@@ -173,4 +174,4 @@ And for facility operators in the tropics: do not believe the headline. Your chi
 
 Originally published at resistancezero.com
 
-Full analysis with interactive PUE impact calculator and regional comparison tool: https://resistancezero.com/article-9.html
+Full analysis with interactive PUE impact calculator and regional comparison tool: https://resistancezero.com/article-9.html?utm_source=medium&utm_medium=syndication&utm_campaign=a9

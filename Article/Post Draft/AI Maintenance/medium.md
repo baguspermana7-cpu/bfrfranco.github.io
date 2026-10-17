@@ -1,4 +1,5 @@
 # Medium — AI Engineering Maintenance concept
+*Publish via medium.com/p/import (sets the canonical).*
 
 **SEO title** (≤74 char):
 Beyond Predictive Maintenance: A Knowledge-Graph Approach for Data Centers

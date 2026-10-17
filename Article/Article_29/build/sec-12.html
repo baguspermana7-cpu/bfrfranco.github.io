@@ -1,0 +1,112 @@
+<h2 id="serving">Serving: how one GPU talks to a thousand users</h2>
+
+<p>Answering a prompt happens in two phases. First the GPU reads the whole prompt at once, which is heavy arithmetic. Then it writes the answer one token at a time, and each token requires reading all of the model's weights from memory again, which is a memory-speed problem and not an arithmetic one. Serving software exists to keep many users' requests in flight at once so that every one of those expensive weight reads is shared. The data-center consequence is that tokens per second per GPU is set by HBM bandwidth and by how much memory the KV cache leaves free.</p>
+
+<h3 id="prefill-decode">Prefill and decode</h3>
+
+<p><a href="glossary.html#term-prefill">Prefill</a> processes the prompt in one parallel pass. It costs <code>2&middot;N&middot;n_prompt</code> FLOPs, it is compute-bound, and it fills the KV cache. <a href="glossary.html#term-decode">Decode</a> then generates one token per step per sequence. Each step reads all the weights plus the sequence's KV cache for a tiny amount of arithmetic, so decode is memory-bandwidth-bound.</p>
+
+<p>Prefill example (derived): a 4,000-token prompt on a 70B FP8 model costs 2 &times; 70.6e9 &times; 4,000 = 5.65e14 FLOP. At 50% of an H200's 1,979&nbsp;TFLOP/s FP8 dense peak (the 50% is an assumption) that is 5.65e14 / 9.9e14 = 0.57&nbsp;s <a href="#src-9">[S9]</a>.</p>
+
+<figure class="rz-figure" data-rz-figure="llm-d6"></figure>
+
+<h3 id="serving-metrics">The metrics</h3>
+
+<ul>
+<li><strong><a href="glossary.html#term-ttft">TTFT</a></strong> (time to first token) &asymp; queueing + prefill time.</li>
+<li><strong><a href="glossary.html#term-tpot">TPOT</a> / ITL</strong> (time per output token, or inter-token latency) = the decode step time.</li>
+<li><strong>Throughput</strong> = total tokens per second per GPU or per node.</li>
+<li><strong>Goodput</strong> = requests per second that meet both the TTFT and TPOT targets. DistServe reports serving &ldquo;7.4x more requests or 12.6x tighter SLO&rdquo; by separating the phases <a href="#src-44">[S44]</a>.</li>
+</ul>
+
+<h3 id="engines">The engines</h3>
+
+<p><strong>vLLM</strong> stores the KV cache in fixed-size blocks, like operating-system pages (<a href="glossary.html#term-pagedattention">PagedAttention</a>), so memory is allocated on demand and blocks can be shared between requests. Earlier systems used only 20.4&ndash;38.2% of their KV memory for real token state; vLLM reports near-zero waste and 2&ndash;4&times; the throughput at the same latency versus FasterTransformer and Orca <a href="#src-30">[S30]</a>. <strong>SGLang</strong> keeps a radix tree of cached prefixes (RadixAttention) to reuse KV across calls and reports up to 6.4&times; throughput on agent, JSON, RAG and multi-turn workloads <a href="#src-31">[S31]</a>. <strong>TensorRT-LLM</strong> is NVIDIA's compiled engine with in-flight batching and FP8/FP4 kernels (background; its documentation was not re-read for this article). <strong>llama.cpp</strong> and <strong>Ollama</strong> run GGUF-quantised weights on CPU, Apple Metal, CUDA and ROCm <a href="#src-39">[S39]</a>.</p>
+
+<h3 id="batching-caching">Continuous batching, prefix caching, disaggregation</h3>
+
+<ul>
+<li><strong><a href="glossary.html#term-continuous-batching">Continuous batching</a></strong>: finished sequences leave and new ones join at every decode step, rather than waiting for a whole batch to finish. vLLM and SGLang both do this <a href="#src-30">[S30]</a><a href="#src-31">[S31]</a>.</li>
+<li><strong><a href="glossary.html#term-prefix-caching">Prefix caching</a></strong>: reuse the KV cache for a shared system prompt or document. API vendors price cache reads at 2.5&ndash;10% of normal input <a href="#src-27">[S27]</a>.</li>
+<li><strong>Disaggregated prefill and decode</strong>: run the two phases on separate GPU pools and move the KV cache between them over NVLink or RDMA <a href="#src-44">[S44]</a><a href="#src-63">[S63]</a>. DeepSeek runs a 320-GPU decode unit <a href="#src-1">[S1]</a>. vLLM's own documentation is explicit that it lets you tune TTFT and ITL separately and control tail ITL, but that it &ldquo;DOES NOT improve throughput&rdquo; <a href="#src-63">[S63]</a>.</li>
+</ul>
+
+<h3 id="roofline">The roofline and the bandwidth ceiling</h3>
+
+<p>The <a href="glossary.html#term-roofline">roofline</a> model says attainable FLOP/s = min(peak FLOP/s, arithmetic intensity &times; memory bandwidth), where intensity is FLOPs per byte moved. The crossover is the ridge point, peak divided by bandwidth (derived, dense FLOPs):</p>
+
+<div class="table-wrap">
+<table class="ws-table">
+<caption>Ridge points: below this intensity a workload is bandwidth-bound (derived from vendor peak and bandwidth)</caption>
+<thead><tr><th scope="col">Device</th><th scope="col">Precision</th><th scope="col">Peak, dense</th><th scope="col">Bandwidth</th><th scope="col">Ridge (FLOP/byte)</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><td>H100 SXM</td><td>BF16</td><td class="n">989&nbsp;TF</td><td class="n">3.35&nbsp;TB/s</td><td class="n">295</td><td><a href="#src-8">[S8]</a></td></tr>
+<tr><td>H100 SXM</td><td>FP8</td><td class="n">1,979&nbsp;TF</td><td class="n">3.35&nbsp;TB/s</td><td class="n">591</td><td><a href="#src-8">[S8]</a></td></tr>
+<tr><td>H200</td><td>BF16</td><td class="n">989&nbsp;TF</td><td class="n">4.8&nbsp;TB/s</td><td class="n">206</td><td><a href="#src-9">[S9]</a></td></tr>
+<tr><td>MI355X</td><td>FP8</td><td class="n">5&nbsp;PF</td><td class="n">8&nbsp;TB/s</td><td class="n">625</td><td><a href="#src-13">[S13]</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The B200 is left out of the table because NVIDIA's page quotes &ldquo;FP8 72 PFLOPS&rdquo; for the 8-GPU system without saying whether it is sparse or dense; the ridge point is unverified (562 if the figure is sparse) <a href="#src-12">[S12]</a>.</p>
+
+<p>For decode at batch <code>B</code> with weights of <code>b</code> bytes per parameter, FLOPs = <code>2&middot;N&middot;B</code> and bytes moved &asymp; <code>N&middot;b</code>, so intensity &asymp; <code>2B/b</code>. At BF16 (b = 2) that is about <code>B</code>. Decode becomes compute-bound only near a batch of 200&ndash;300 on Hopper, and the KV cache usually runs out of memory first. A 4,000-token prefill has intensity near 4,000 and is compute-bound.</p>
+
+<figure class="rz-figure" data-rz-figure="llm-d10"></figure>
+
+<p>At batch 1 the ceiling is therefore <code>tokens/s &le; bandwidth / weight bytes</code> (derived):</p>
+
+<div class="table-wrap">
+<table class="ws-table">
+<caption>Decode ceiling at batch 1 (tokens per second = bandwidth &divide; weight bytes)</caption>
+<thead><tr><th scope="col">Model and precision</th><th scope="col">Hardware</th><th scope="col">Bandwidth</th><th scope="col">Weight bytes</th><th scope="col">Ceiling (tok/s)</th></tr></thead>
+<tbody>
+<tr><td>8B BF16</td><td>RTX 4090</td><td class="n">1,008&nbsp;GB/s</td><td class="n">16.1&nbsp;GB</td><td class="n">63</td></tr>
+<tr><td>8B Q4_K_M</td><td>RTX 4090</td><td class="n">1,008&nbsp;GB/s</td><td class="n">4.9&nbsp;GB</td><td class="n">205</td></tr>
+<tr><td>8B Q4_K_M</td><td>RTX 5090</td><td class="n">1,792&nbsp;GB/s</td><td class="n">4.9&nbsp;GB</td><td class="n">364</td></tr>
+<tr><td>70B Q4_K_M</td><td>Mac Studio M3 Ultra</td><td class="n">819&nbsp;GB/s</td><td class="n">43.2&nbsp;GB</td><td class="n">19</td></tr>
+<tr><td>70B Q4_K_M</td><td>M4 Max</td><td class="n">546&nbsp;GB/s</td><td class="n">43.2&nbsp;GB</td><td class="n">13</td></tr>
+<tr><td>70B FP8</td><td>H100</td><td class="n">3.35&nbsp;TB/s</td><td class="n">70.6&nbsp;GB</td><td class="n">47</td></tr>
+<tr><td>70B FP8</td><td>H200</td><td class="n">4.8&nbsp;TB/s</td><td class="n">70.6&nbsp;GB</td><td class="n">68</td></tr>
+<tr><td>70B FP8</td><td>B200 / MI355X</td><td class="n">8&nbsp;TB/s</td><td class="n">70.6&nbsp;GB</td><td class="n">113</td></tr>
+</tbody>
+</table>
+</div>
+<p>Bandwidth sources: <a href="#src-8">[S8]</a><a href="#src-9">[S9]</a><a href="#src-12">[S12]</a><a href="#src-13">[S13]</a><a href="#src-71">[S71]</a>; the RTX 5090 figure is 512-bit &times; 28&nbsp;Gbps &divide; 8 = 1,792&nbsp;GB/s <a href="#src-15">[S15]</a>; the RTX 4090 value comes from secondary sources. Real engines reach roughly 50&ndash;80% of these ceilings; that range is an engineering rule of thumb, not a sourced figure.</p>
+
+<p>Speculative decoding exploits the same fact. Because a decode step is limited by reading weights, verifying several drafted tokens costs about as much as generating one, which is why it gives 2&ndash;3&times; with identical outputs <a href="#src-32">[S32]</a>.</p>
+
+<h3 id="batching-cost">Batching, cost per million tokens and joules per token</h3>
+
+<p>Batching shares each weight read among many users. The setup (derived): Llama 3 70B in FP8 (70.6&nbsp;GB) on one H200 (141&nbsp;GB, 4.8&nbsp;TB/s), average context 4,096 tokens with a BF16 KV cache of 1.34&nbsp;GB per sequence, $3.50 per GPU-hour (an assumed rental price) and 1.3&nbsp;kW all-in IT power per GPU (assumed, from the DGX H100 figure <a href="#src-70">[S70]</a>). The step time is <code>max((W + B&middot;KV) / BW, 2&middot;N&middot;B / peak) / eff</code>, where <code>eff</code> is the fraction of ideal bandwidth the engine achieves (assumed).</p>
+
+<div class="table-wrap">
+<table class="ws-table">
+<caption>70B FP8 on one H200: batch size against speed, cost and energy (derived, assumptions stated above; eff = 1.0 / 0.6)</caption>
+<thead><tr><th scope="col">Batch</th><th scope="col">Memory used</th><th scope="col">Step time (ms)</th><th scope="col">Per-user tok/s</th><th scope="col">Total tok/s</th><th scope="col">$ per M tokens</th><th scope="col">J per token</th></tr></thead>
+<tbody>
+<tr><td class="n">1</td><td class="n">72&nbsp;GB</td><td class="n">15.0 / 25.0</td><td class="n">67 / 40</td><td class="n">67 / 40</td><td class="n">14.57 / 24.29</td><td class="n">19.5 / 32.5</td></tr>
+<tr><td class="n">8</td><td class="n">81&nbsp;GB</td><td class="n">16.9 / 28.2</td><td class="n">59 / 35</td><td class="n">472 / 283</td><td class="n">2.06 / 3.43</td><td class="n">2.8 / 4.6</td></tr>
+<tr><td class="n">16</td><td class="n">92&nbsp;GB</td><td class="n">19.2 / 32.0</td><td class="n">52 / 31</td><td class="n">834 / 500</td><td class="n">1.17 / 1.94</td><td class="n">1.6 / 2.6</td></tr>
+<tr><td class="n">32</td><td class="n">114&nbsp;GB</td><td class="n">23.7 / 39.4</td><td class="n">42 / 25</td><td class="n">1,353 / 812</td><td class="n">0.72 / 1.20</td><td class="n">0.96 / 1.6</td></tr>
+</tbody>
+</table>
+</div>
+
+<figure class="rz-chart" data-rz-chart>
+  <div class="rz-chart-canvas"><canvas></canvas></div>
+  <script type="application/json" class="rz-chart-cfg">
+{"type": "bar", "title": "Cost per million tokens falls as the batch grows (70B FP8, one H200)", "labels": ["Batch 1", "Batch 8", "Batch 16", "Batch 32"], "series": [{"label": "Engine at 100% of bandwidth ceiling", "data": [14.57, 2.06, 1.17, 0.72], "unit": " USD"}, {"label": "Engine at 60% of ceiling", "data": [24.29, 3.43, 1.94, 1.20], "unit": " USD"}], "yLabel": "USD per million output tokens", "x": "Concurrent sequences", "y": "USD per million tokens", "source": "Derived: step time = max((W + B*KV)/BW, 2*N*B/peak)/eff; H200 4.8 TB/s [S9]; $3.50/GPU-hour assumed rental price; Article 29 dossier section 6.6", "basisTag": "derived"}
+  </script>
+</figure>
+
+<p>Going from batch 1 to batch 16 cuts the cost per token 12&times; (14.57 / 1.17 = 12.5), and to batch 32 about 20&times; (14.57 / 0.72 = 20.2), while the speed seen by each user falls by only about 37% (67 to 42 tok/s). The KV cache, not arithmetic, ends the growth: at batch 32 the compute time is 2.3&nbsp;ms against 23.7&nbsp;ms of memory time, and memory used is already 114 of 141&nbsp;GB.</p>
+
+<p>At about 1&nbsp;J per token (batch 32, ideal efficiency), a 1,000-token answer is about 1&nbsp;kJ, which is 1,000 / 3,600 = 0.27&nbsp;Wh. That is the same order as published per-prompt figures of 0.24&nbsp;Wh <a href="#src-18">[S18]</a> and about 0.3&nbsp;Wh <a href="#src-66">[S66]</a>. It is an illustration under stated assumptions, not a measurement.</p>
+
+<div class="llm-calc" data-llm-calc="serve"></div>
+
+<div class="ws-insight-box">
+<h4>Size by memory first, then by batch</h4>
+<p>For decode, divide HBM bandwidth by weight bytes to find the ceiling, then check how many sequences' KV caches fit beside the weights. That second number, not the FLOP rating, sets your tokens per second per kW. Prefix caching and a tighter context limit raise it without new hardware.</p>
+</div>

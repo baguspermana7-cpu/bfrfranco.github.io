@@ -2,7 +2,8 @@
 /* ============================================================================
    verify-article-light.mjs — headless verification for light-mode editorial CSS
    Checks that html[data-rz-register="editorial"]:not([data-theme="dark"]) rules
-   apply correctly: Fraunces on .article-title, drop-cap on first p, mono on .article-meta.
+   apply correctly: IBM Plex Sans on .article-title (the serif display face was withdrawn
+   in v3.23.0, owner 2026-10-15/16), drop-cap on first p, mono on .article-meta.
    Also verifies the dark block still works.
    Usage: node tools/verify-article-light.mjs
    ============================================================================ */
@@ -83,28 +84,28 @@ async function checkTheme(theme) {
   const pg = await openPage(theme);
 
   try {
-    // 1. Check .article-title font-family contains Fraunces
+    // 1. Check .article-title font-family is the sans stack (no serif display face since v3.23.0)
     const titleFont = await pg.evaluate(() => {
       const el = document.querySelector('.article-title');
       if (!el) return null;
       return window.getComputedStyle(el).fontFamily;
     });
-    if (titleFont && titleFont.toLowerCase().includes('fraunces')) {
+    if (titleFont && titleFont.toLowerCase().includes('ibm plex sans')) {
       pass(`[${theme}] .article-title font-family`, titleFont);
     } else {
-      fail(`[${theme}] .article-title font-family should contain Fraunces`, titleFont || 'element not found');
+      fail(`[${theme}] .article-title font-family should be the IBM Plex Sans stack`, titleFont || 'element not found');
     }
 
-    // 2. Check .article-body h2 font-family contains Fraunces
+    // 2. Check .article-body h2 font-family is the sans stack
     const h2Font = await pg.evaluate(() => {
       const el = document.querySelector('.article-body h2');
       if (!el) return null;
       return window.getComputedStyle(el).fontFamily;
     });
-    if (h2Font && h2Font.toLowerCase().includes('fraunces')) {
+    if (h2Font && h2Font.toLowerCase().includes('ibm plex sans')) {
       pass(`[${theme}] .article-body h2 font-family`, h2Font);
     } else {
-      fail(`[${theme}] .article-body h2 font-family should contain Fraunces`, h2Font || 'element not found');
+      fail(`[${theme}] .article-body h2 font-family should be the IBM Plex Sans stack`, h2Font || 'element not found');
     }
 
     // 3. Check drop-cap: first letter of first paragraph should have larger font-size
@@ -124,7 +125,7 @@ async function checkTheme(theme) {
 
     // 3b. Check ::first-letter pseudo-element via counter trick: computed font-size of drop-cap
     // (We can't directly query ::first-letter with getComputedStyle, but we can verify the
-    //  Fraunces font-family is set on it via a style sheet check)
+    //  the sans stack is set on it via a style sheet check)
     const dropCapCheck = await pg.evaluate(() => {
       // Check that any stylesheet has the drop-cap rule with font-size: 3.1rem
       for (const sheet of document.styleSheets) {

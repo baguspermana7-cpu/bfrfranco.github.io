@@ -22,6 +22,6 @@ The honest metric isn't "1 KB / 1 GW." It's **Capability Density**: usable intel
 And the practical payoff: you can make a default local model genuinely sharp on your own work without any training — strong base + quantization + retrieval (RAG) + tools. Stages that need zero GPU deliver ~80% of the felt intelligence.
 
 Full piece — the walls, the frontier climbing them (analog memristors, neuromorphic, reversible, thermodynamic compute), and a concrete no-GPU recipe:
-https://resistancezero.com/article-28.html
+https://resistancezero.com/article-28.html?utm_source=linkedin&utm_medium=social&utm_campaign=a28
 
 #AI #MachineLearning #DataCenters #EdgeAI #LLM #Compression #Neuromorphic #LocalAI

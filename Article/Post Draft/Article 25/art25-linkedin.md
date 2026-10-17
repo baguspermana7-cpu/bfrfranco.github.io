@@ -32,6 +32,6 @@ We are building the most power-hungry technology in human history on a grid desi
 The data center industry needs to be honest about its power footprint and contribute proportionally to grid infrastructure investment. We cannot build infinite data centers without grid investment. Reliability is not someone else's problem — it is our problem.
 
 Full analysis with interactive grid reliability calculator:
-https://resistancezero.com/article-25.html
+https://resistancezero.com/article-25.html?utm_source=linkedin&utm_medium=social&utm_campaign=a25
 
 #PowerGrid #DataCenter #Energy #PJM #AIInfrastructure #GridReliability #Nuclear #CleanEnergy

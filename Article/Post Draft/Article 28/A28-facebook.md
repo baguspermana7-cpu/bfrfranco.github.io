@@ -9,4 +9,4 @@ We almost never need the raw data or the raw compute. We need the *capability*. 
 So the datacenter never moves into your laptop. Its *mind* does.
 
 I also lay out a concrete, no-GPU recipe to make a local AI genuinely smart on your own documents. Read it here:
-https://resistancezero.com/article-28.html
+https://resistancezero.com/article-28.html?utm_source=facebook&utm_medium=social&utm_campaign=a28

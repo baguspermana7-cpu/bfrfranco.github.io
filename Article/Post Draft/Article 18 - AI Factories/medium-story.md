@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: AI Factories: Why Traditional DC Architecture Is Dead | by Bagusdpermana
 SEO Description: 130kW rack density, liquid cooling revolution, $600B hyperscaler CAPEX, Ultra Ethernet vs InfiniBand. Deep analysis of why traditional data centers cannot survive the AI era.
 Tags: AI Infrastructure, Data Center, Liquid Cooling, NVIDIA, GPU Computing
@@ -89,4 +90,4 @@ Infrastructure is not the cost center. Infrastructure is the product.
 Originally published at resistancezero.com
 
 Full interactive article with data tables, executive quotes, and an AI Factory Infrastructure Readiness Calculator:
-https://resistancezero.com/article-18.html
+https://resistancezero.com/article-18.html?utm_source=medium&utm_medium=syndication&utm_campaign=a18

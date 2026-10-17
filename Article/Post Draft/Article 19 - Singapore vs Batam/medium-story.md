@@ -1,4 +1,5 @@
 SEO Title: Singapore vs Batam Data Centers: Why Cost Alone Doesn't Win
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Description: 20 km apart, 2-3x cost difference. An objective analysis of when to choose Singapore, Batam, or both for data center workloads. Decision matrix inside.
 Tags: Data Center, Singapore, Infrastructure, Cloud Computing, Site Selection
 
@@ -61,4 +62,4 @@ There is no universally correct location. The correct answer depends on what you
 
 For the full interactive article with detailed cost comparison tables, the complete decision matrix, and corridor model analysis, visit the original at resistancezero.com:
 
-https://resistancezero.com/article-19.html
+https://resistancezero.com/article-19.html?utm_source=medium&utm_medium=syndication&utm_campaign=a19

@@ -6,6 +6,6 @@ But you never needed the bytes or the FLOPs. You need the *capability* — and t
 
 The real metric is Capability Density: intelligence per byte + per watt. Plus a concrete no-GPU recipe to make a local model sharp on your own data.
 
-https://resistancezero.com/article-28.html
+https://resistancezero.com/article-28.html?utm_source=mastodon&utm_medium=social&utm_campaign=a28
 
 #AI #LLM #EdgeAI #Compression #Neuromorphic

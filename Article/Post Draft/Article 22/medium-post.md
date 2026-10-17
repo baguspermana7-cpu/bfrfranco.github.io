@@ -1,4 +1,5 @@
 SEO Title (74 char max):
+*Publish via medium.com/p/import (sets the canonical).*
 NVIDIA's $4B Photonics Play: Why AI's Future Runs on Light, Not Copper
 
 ---
@@ -13,7 +14,7 @@ Tags: NVIDIA, Photonics, AI Infrastructure, Data Center, Silicon Photonics, Co-P
 
 ---
 
-Full article at: https://resistancezero.com/article-22.html
+Full article at: https://resistancezero.com/article-22.html?utm_source=medium&utm_medium=syndication&utm_campaign=a22
 
 Adapt the article content for Medium format. Key sections to include:
 1. The $4B announcement and what it signals

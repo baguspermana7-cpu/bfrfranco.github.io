@@ -1,4 +1,5 @@
 Title: Why Data Center RFS Dates Slip — And the Gate Structure That Prevents It
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

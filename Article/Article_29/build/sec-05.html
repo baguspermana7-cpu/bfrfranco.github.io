@@ -1,0 +1,39 @@
+<h2 id="moe">Mixture of Experts: big brain, small bill</h2>
+
+<p>In a mixture-of-experts (<a href="glossary.html#term-moe">MoE</a>) model, the single feed-forward network of each block is replaced by many smaller ones, called experts, plus a small router. For every token the router picks a handful of experts and the rest stay idle. The model can hold far more knowledge than it computes with on any one token. The price is paid elsewhere: all experts must sit in memory, and tokens must be shipped between GPUs to reach them.</p>
+
+<h3 id="routing">5.1 Routing and load balancing</h3>
+
+<p>DeepSeek-V3 is the best documented example <a href="#src-1">[S1]</a>. Every layer except the first three is an MoE layer with one shared expert (always on) and 256 routed experts, each with an intermediate width of 2,048. The router computes a sigmoid affinity <code>s_i = &sigma;(u&middot;e_i)</code> between the token vector <code>u</code> and each expert&rsquo;s centroid <code>e_i</code>, takes the top 8, and normalises the gates over the selected experts. Each token may be routed to at most 4 nodes, which caps cross-node traffic.</p>
+
+<figure class="rz-figure" data-rz-figure="llm-d4"></figure>
+
+<p>The hard part is balance. If the router favours a few experts, those GPUs saturate while others idle. Earlier MoEs such as Switch Transformers <a href="#src-59">[S59]</a> added an auxiliary loss to push the load flat; the DeepSeek authors report that a large auxiliary loss &ldquo;impairs the model performance&rdquo; <a href="#src-1">[S1]</a>. Their alternative is an auxiliary-loss-free bias: each expert carries a bias <code>b_i</code> that is added to its score <em>only when choosing the top 8</em>, never in the gate weights. After each training step, <code>b_i</code> is lowered by a small step if the expert was overloaded and raised if it was underloaded. A tiny sequence-level balance loss remains as a safety net.</p>
+
+<h3 id="moe-total-active">5.2 Total versus active parameters</h3>
+
+<p>The result for DeepSeek-V3 is 671B total and 37B active parameters <a href="#src-1">[S1]</a>, so <code>37 / 671 = 5.5%</code> of the weights work on a given token (derived). Per-token compute is <code>2 &times; 37e9 = 7.4e10</code> FLOP, against <code>2 &times; 671e9 = 1.34e12</code> for a dense model of the same size, a factor of 18 (derived). Other published MoE models follow the same pattern:</p>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>Total and active parameters of open MoE models. Active share is derived.</caption>
+<thead><tr><th>Model</th><th>Total (B)</th><th>Active (B)</th><th>Active share</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Qwen3-235B-A22B</td><td class="n">235</td><td class="n">22</td><td class="n">9.4%</td><td><a href="#src-3">[S3]</a></td></tr>
+<tr><td>Llama 4 Maverick</td><td class="n">400</td><td class="n">17</td><td class="n">4.3%</td><td><a href="#src-23">[S23]</a></td></tr>
+<tr><td>DeepSeek-V3</td><td class="n">671</td><td class="n">37</td><td class="n">5.5%</td><td><a href="#src-1">[S1]</a></td></tr>
+<tr><td>Kimi K2</td><td class="n">1,000</td><td class="n">32</td><td class="n">3.2%</td><td><a href="#src-25">[S25]</a></td></tr>
+<tr><td>DeepSeek-V4-Pro</td><td class="n">1,600</td><td class="n">49</td><td class="n">3.1%</td><td><a href="#src-26">[S26]</a></td></tr>
+</tbody></table></div>
+
+<p>Each number buys something different. <strong>Memory</strong> is set by the total: 671B parameters in FP8 is 671&nbsp;GB, which fits an eight-GPU H200 server (<code>8 &times; 141 = 1,128 GB</code>, derived from <a href="#src-9">[S9]</a>) but not a single card. <strong>Compute per token</strong> is set by the active count. <strong>Bandwidth</strong> sits between them. At batch size 1, only the active experts&rsquo; weights are read per step, so decode is fast. At a large batch, different tokens select different experts, so almost all experts are touched on every step and the bandwidth demand moves back toward the total <a href="#src-1">[S1]</a>. An MoE is therefore cheapest per token at high batch and in compute, and dearest in HBM capacity.</p>
+
+<h3 id="moe-network">5.3 The network bill</h3>
+
+<p>Placing different experts on different GPUs is called expert parallelism. Every MoE layer then needs an all-to-all exchange: each token&rsquo;s vector is sent to the GPUs holding its chosen experts and the results are sent back. This happens twice per layer, for every layer. DeepSeek-V3&rsquo;s production decode unit spans 40 nodes, 320 GPUs, with one expert per GPU plus 64 GPUs for redundant and shared experts <a href="#src-1">[S1]</a>. The cap of 4 nodes per token exists to limit exactly this traffic.</p>
+
+<p>The consequence for the facility is that an MoE service is a networking workload as much as a compute one. The experts live on NVLink within a node and on InfiniBand or RoCE between nodes, so the fabric has to be sized and cabled as part of the compute, not added afterwards. A 671B MoE is also not a &ldquo;smaller&rdquo; deployment than a dense 405B: the dense model needs fewer GPUs for its weights, the MoE needs fewer FLOPs per token, and which one is cheaper depends on batch size and on the interconnect.</p>
+
+<div class="ws-insight-box">
+<h4>Operator takeaway</h4>
+<p>Read an MoE spec sheet in two columns. Total parameters tell you how many GPUs must hold the model. Active parameters tell you what each token costs in compute. The gap between them is paid for in interconnect.</p>
+</div>

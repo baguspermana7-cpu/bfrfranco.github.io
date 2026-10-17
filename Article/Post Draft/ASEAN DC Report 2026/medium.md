@@ -1,4 +1,5 @@
 Title: ASEAN Data Center 2026 — Six Markets, One Report, No Shortcuts
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

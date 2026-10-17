@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: AI Data Centers Are Raising Your Electricity Bill. Here Is How.
 (Preview: "AI Data Centers Are Raising Your Electricity Bill. Here Is How. | by Bagusdpermana | Medium" = 74 chars, fits 74 limit)
 SEO Description: Data centers consumed 415 TWh globally in 2024 and are projected to double by 2030. In the PJM grid region, consumers paid $7.7 billion for transmission upgrades driven by data center demand. Southeast Asia is next.
@@ -134,4 +135,4 @@ The conversation has begun. The question now is whether Southeast Asian policyma
 
 Originally published at resistancezero.com
 
-Full analysis with interactive electricity bill impact calculator and country-by-country tariff comparisons: https://resistancezero.com/article-11.html
+Full analysis with interactive electricity bill impact calculator and country-by-country tariff comparisons: https://resistancezero.com/article-11.html?utm_source=medium&utm_medium=syndication&utm_campaign=a11

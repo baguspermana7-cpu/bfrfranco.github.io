@@ -1,0 +1,54 @@
+<h2 id="sampling">A guessing engine: logits, softmax and sampling</h2>
+
+<p>After the last block, the model produces one score for every entry in its vocabulary, 100,000 to 200,000 of them. Those scores become probabilities, and the software draws one token from them, appends it and runs the model again. Nothing is looked up or checked. Every word of every answer is a draw from a distribution the model learned during training, and the settings of that draw (temperature and its relatives) decide how adventurous the output is.</p>
+
+<h3 id="logits">6.1 From logits to probabilities</h3>
+
+<p>The final vector <code>h</code> is multiplied by an output matrix to give <a href="glossary.html#term-logits">logits</a>, one per vocabulary entry: <code>z = h&middot;W_out<sup>T</sup></code>, a vector of length <code>V</code>. The <a href="glossary.html#term-softmax">softmax</a> converts it to probabilities:</p>
+
+<pre class="formula">p_i = exp(z_i / T) / &Sigma;_j exp(z_j / T)</pre>
+
+<p><code>T</code> is the <a href="glossary.html#term-temperature">temperature</a>. During training the objective is the cross-entropy <code>L = &minus;&Sigma;_t log p(x_t | x_&lt;t)</code> averaged over tokens, and perplexity is <code>exp(L)</code>. Minimising it is what &ldquo;next-token prediction&rdquo; means.</p>
+
+<p>A worked case with three candidate tokens whose logits are 4, 3 and 1 (illustrative numbers, computed here):</p>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>Effect of temperature on three tokens with logits 4, 3 and 1.</caption>
+<thead><tr><th>Temperature</th><th>p(token 1)</th><th>p(token 2)</th><th>p(token 3)</th></tr></thead>
+<tbody>
+<tr><td>0.5</td><td class="n">0.879</td><td class="n">0.119</td><td class="n">0.002</td></tr>
+<tr><td>1.0</td><td class="n">0.705</td><td class="n">0.259</td><td class="n">0.035</td></tr>
+<tr><td>2.0</td><td class="n">0.547</td><td class="n">0.331</td><td class="n">0.122</td></tr>
+</tbody></table></div>
+
+<p>Lower <code>T</code> sharpens the distribution; as <code>T</code> approaches 0 the draw becomes greedy, always picking the largest logit. Higher <code>T</code> flattens it.</p>
+
+<h3 id="sampling-knobs">6.2 Temperature, top-k, top-p, min-p, penalties</h3>
+
+<ul>
+<li><strong>Greedy</strong> (<code>T &rarr; 0</code>): deterministic, but prone to repeating itself.</li>
+<li><strong>Temperature</strong>: a global sharpen or flatten. DeepSeek recommends <code>T</code> between 0.5 and 0.7, with 0.6 suggested, for R1 <a href="#src-4">[S4]</a>.</li>
+<li><strong>Top-k</strong>: keep the <code>k</code> most probable tokens and renormalise.</li>
+<li><a href="glossary.html#term-top-p">Top-p</a> (nucleus): keep the smallest set of tokens whose probabilities add to at least <code>p</code>. The set shrinks when the model is confident and widens when it is not.</li>
+<li><strong>Min-p</strong>: keep tokens with <code>p_i &ge; min_p &times; p_max</code>, a threshold that scales with the model&rsquo;s confidence (Nguyen et al., arXiv 2407.01082; background reference).</li>
+<li><strong>Repetition, frequency and presence penalties</strong>: subtract from, or divide, the logits of tokens already produced. These are heuristics bolted on at serving time. They are not part of the trained model.</li>
+</ul>
+
+<p>The sampler runs on the final token of every step and costs almost nothing next to the matrix multiplies. Its settings are a product decision, not a hardware one, but they matter operationally: a deterministic setting makes outputs repeatable for testing, while a higher temperature raises output variety and the chance of a wrong continuation.</p>
+
+<h3 id="hallucination">6.3 Why it hallucinates</h3>
+
+<p>The training objective rewards assigning high probability to text that looks like the training data. It does not reward being true. Where the training data was unambiguous, the correct continuation gets nearly all the probability. Where a fact was rare or absent, the model still has to emit some token, and it emits the most plausible-looking one. A plausible name, date or citation has the same form as a correct one. Lowering the temperature does not add knowledge; it only removes randomness around whatever the distribution already favours.</p>
+
+<p>So hallucination is not a sampler bug to be tuned away. It follows from the objective and from training data that has gaps. The practical remedies move the knowledge or the check outside the weights: retrieval of source text, tools that compute or look things up, and verifiers that test the answer (section 14 of the full article returns to this).</p>
+
+<h3 id="speculative">6.4 Speculative decoding: guessing ahead</h3>
+
+<p>Decode wastes hardware. At batch size 1 the GPU must stream all active weights from HBM to produce one token, and its arithmetic units are mostly idle. <a href="glossary.html#term-speculative-decoding">Speculative decoding</a> uses that slack. A small draft model proposes several tokens ahead; the large model then checks all of them in one forward pass, which costs about the same as generating a single token because the weight read is shared. A modified rejection-sampling rule accepts the drafted tokens that the large model would plausibly have produced and corrects the first mismatch, so the output distribution is <em>identical</em> to sampling from the large model alone <a href="#src-32">[S32]</a>.</p>
+
+<p>Reported speed-ups are 2&ndash;3&times; on T5-XXL with identical outputs <a href="#src-32">[S32]</a> and 2&ndash;2.5&times; on a 70B Chinchilla model <a href="#src-33">[S33]</a>. DeepSeek-V3&rsquo;s multi-token-prediction module, trained to depth 1, can serve as the draft <a href="#src-1">[S1]</a>. The gain depends on how often the draft agrees with the large model, and it shrinks at large batch, where the GPU is no longer idle.</p>
+
+<div class="ws-insight-box">
+<h4>Operator takeaway</h4>
+<p>Speculative decoding is a way to trade spare arithmetic for fewer memory trips, with no change in answers. It helps the latency of a lightly loaded GPU and gives little on a saturated one.</p>
+</div>

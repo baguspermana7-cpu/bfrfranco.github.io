@@ -6,4 +6,4 @@ Result? Electrical trace drops from 12+ inches to <0.5 inch. Power per bit plumm
 
 The GPU bottleneck is shifting to interconnect. Jensen knows.
 
-https://resistancezero.com/article-22.html
+https://resistancezero.com/article-22.html?utm_source=x&utm_medium=social&utm_campaign=a22

@@ -25,4 +25,4 @@ NVIDIA's Spectrum-X Photonics and Quantum-X Photonics switches are designed to d
 
 I wrote a detailed engineering analysis with an interactive calculator that compares copper DAC, pluggable optics, and CPO for different AI cluster configurations:
 
-https://resistancezero.com/article-22.html
+https://resistancezero.com/article-22.html?utm_source=quora&utm_medium=social&utm_campaign=a22

@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: Data Center TCO Calculator — Build vs Colo vs Cloud | by Bagusdpermana
 SEO Description: Free interactive tool comparing total cost of ownership for building, colocation, and cloud data center deployments across 12 global markets with real 2025 pricing data.
 Tags: Data Center, Total Cost Of Ownership, Colocation, Cloud Computing, Infrastructure

@@ -7,6 +7,6 @@ The core problem: as GPU clusters scale to hundreds of thousands of accelerators
 Co-packaged optics places optical engines directly next to switch ASICs. Electrical trace: 12+ inches → less than half an inch.
 
 Full engineering analysis with interactive interconnect calculator:
-https://resistancezero.com/article-22.html
+https://resistancezero.com/article-22.html?utm_source=mastodon&utm_medium=social&utm_campaign=a22
 
 #NVIDIA #Photonics #CoPacagedOptics #SiliconPhotonics #AIInfrastructure #DataCenter

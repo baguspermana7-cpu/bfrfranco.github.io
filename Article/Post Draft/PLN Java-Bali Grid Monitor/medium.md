@@ -1,4 +1,5 @@
 Title: Mapping the PLN Java-Bali Grid — 744 Nodes, 488 Edges, One Synchronous Chain
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

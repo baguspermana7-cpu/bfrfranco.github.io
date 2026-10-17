@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: Data Center CAPEX Calculator Tool | by Bagusdpermana | Medium
 SEO Description: Free interactive calculator for estimating data center construction costs. Model IT load, cooling architecture, redundancy tier, seismic zone, and location factors with detailed infrastructure cost breakdowns.
 Tags: Data Center, CAPEX, Construction Cost, Infrastructure, Capital Expenditure

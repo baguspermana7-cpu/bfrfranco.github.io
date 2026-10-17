@@ -7,4 +7,4 @@ One vendor = bottleneck risk.
 Two = redundancy + design optionality + supply chain control.
 
 Full engineering breakdown:
-https://resistancezero.com/article-22.html
+https://resistancezero.com/article-22.html?utm_source=x&utm_medium=social&utm_campaign=a22

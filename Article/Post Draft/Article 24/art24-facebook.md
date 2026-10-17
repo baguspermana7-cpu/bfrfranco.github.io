@@ -18,4 +18,4 @@ If you know someone looking for a stable, well-paying career — or someone fini
 
 I wrote a full analysis with salary data, geographic hotspots, training programs, and an interactive calculator to estimate your own DC career salary.
 
-Full article: https://resistancezero.com/article-24.html
+Full article: https://resistancezero.com/article-24.html?utm_source=facebook&utm_medium=social&utm_campaign=a24

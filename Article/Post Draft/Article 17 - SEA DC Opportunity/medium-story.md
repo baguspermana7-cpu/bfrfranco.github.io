@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: The $37B SEA Data Center Opportunity | by Bagusdpermana
 SEO Description: Jevons Paradox, $602B hyperscaler capex, $1T digital economy, sovereign AI mandates across 6 nations. Why the bubble narrative fundamentally misunderstands SEA infrastructure.
 Tags: Data Center, Southeast Asia, AI Infrastructure, Investment, Jevons Paradox
@@ -120,4 +121,4 @@ I built an interactive Opportunity Value Calculator where you can model the tota
 
 ---
 
-Originally published at [resistancezero.com](https://resistancezero.com/article-17.html)
+Originally published at [resistancezero.com](https://resistancezero.com/article-17.html?utm_source=medium&utm_medium=syndication&utm_campaign=a17)

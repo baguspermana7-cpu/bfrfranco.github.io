@@ -27,6 +27,11 @@ right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
 
 | Touch | Update (same commit) |
 |---|---|
+| **Production pipeline** | Follow `standarization/ARTICLE_PRODUCTION_STANDARD.md` (v3.24.1): research dossier → prose fragments → calculators with tests → engine figures → assembler → siblings → gates. The rows below are what the pipeline touches. |
+| `data/journal.json` + hub/landing grids | `tools/build-journal.py`: add the page to `TOPIC_OF` (one topic) / `SERIES_OF`, raise `PAGES`, then `python3 tools/build-journal.py --apply` — the hub (`articles.html`) and the three landings are GENERATED from it; never hand-edit their card grids. `--check` is in `test-generator-freshness.py`. |
+| Series navigation | `python3 tools/sync-article-series.py --apply` (counts on every sibling, the previous article's Next links) then `python3 tools/test-article-series.py`. The new page carries `<span>Latest Article</span>` in its `.article-nav` for the next sync. |
+| OG card | `python3 tools/build-og-images.py --apply` (renders from the page title + first content image; never a hand-made card) then `python3 tools/test-og-card-freshness.py`. |
+| Staging | `git add article-N.html` BEFORE the sitemap/llms builders — the crawler inventory only lists tracked files. |
 | `insights.html` | "Latest Publications" feed — prepend newest with **real** `datePublished` (read from the article's JSON-LD/meta — never fabricate dates), real `<title>`, correct `feed-category` (`engineering` / `global` / `future-forward`). Keep ~8 most-recent. |
 | `articles.html` | Article index/grid card + count. |
 | Series landing | `future-forward.html` (FF-n) or `geopolitics.html` (geopolitics-n) — add the entry + update series counts/stats (no `0 / New` placeholders). |
@@ -36,7 +41,7 @@ right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
 | `llms.txt` / `llms-full.txt` | `python3 tools/build-llms-txt.py --apply` + `build-llms-full.py --apply`. |
 | `standarization/Indexing gconsole/top-urls-request-indexing.txt` | Add the new URL. |
 | Related-articles | Cross-link from 2–3 sibling articles. |
-| `Article/Post Draft/<Name>/` | 5 platform MDs (x, linkedin, mastodon, medium, facebook) — `feedback_post_draft_mandate`. |
+| `Article/Post Draft/Article <N>/` | 5 platform drafts named `A<N>-x-post-1.md`, `A<N>-linkedin.md`, `A<N>-mastodon-1.md`, `A<N>-medium.md`, `A<N>-facebook.md` (FF: `Future Forward <N> - <title>/FF<N>-…`, geopolitics: `Geopolitics <N> - <title>/G<N>-…`), written from the page's own numbers; every resistancezero.com link carries `?utm_source=<platform>&utm_medium=social&utm_campaign=a<N>` (Medium: `utm_medium=syndication` + the line "Publish via medium.com/p/import (sets the canonical)"). GATE: `python3 tools/audit-post-drafts.py --strict` (journal family strict since v3.24.1; `--fix-utm` tags older drafts). `feedback_post_draft_mandate`, owner 2026-10-17: "Ensure all article have that". |
 
 ## 2. New / updated CALCULATOR or TOOL
 

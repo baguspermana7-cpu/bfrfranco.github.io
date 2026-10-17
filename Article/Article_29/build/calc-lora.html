@@ -1,0 +1,6 @@
+<section class="llm-calc-block">
+<h3>Can I fine-tune it on one card? LoRA and QLoRA memory</h3>
+<p>This calculator estimates the memory to fine-tune a model with a low-rank adapter. Adapter size is <code>P_lora = layers × Σ_targets r × (d_in + d_out)</code>; the base weights are held in 16-bit or in 4-bit NF4, the adapters carry 16 bytes per parameter of optimiser state, and activations are a rough <code>layers × seq_len × micro_batch × d_model × k_act × 2 B</code> with gradient checkpointing. Activations are the uncertain term, so a plus or minus 50% band is shown. Every result has a "Show working" line that prints the formula and the numbers it used.</p>
+<div class="llm-calc" data-llm-calc="lora"></div>
+<p class="calc-basis">Basis: estimate. Sources: LoRA [S34]; QLoRA and NF4 bits per weight [S35]; 16 bytes per parameter of training state [S60]. The activation factor is an assumption. Constants as of 2026-10-16.</p>
+</section>

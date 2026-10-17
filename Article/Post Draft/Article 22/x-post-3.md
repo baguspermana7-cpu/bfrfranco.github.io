@@ -8,4 +8,4 @@ Copper can't do this. Pluggable optics can't scale this far.
 
 Co-packaged optics is the only path forward.
 
-https://resistancezero.com/article-22.html
+https://resistancezero.com/article-22.html?utm_source=x&utm_medium=social&utm_campaign=a22

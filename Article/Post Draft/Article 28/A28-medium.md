@@ -1,6 +1,6 @@
 # Medium — The Compression Horizon
 
-*Republish of the ResistanceZero article. Canonical: https://resistancezero.com/article-28.html*
+*Republish of the ResistanceZero article. Canonical: https://resistancezero.com/article-28.html*?utm_source=medium&utm_medium=syndication&utm_campaign=a28
 
 ## How close can a laptop get to a datacenter's mind?
 
@@ -33,4 +33,4 @@ The honest metric is **Capability Density**: usable intelligence per byte and pe
 And it's practical. To make a default local model genuinely smart on your own work, with no GPU: strong base model → quantize to fit → good system prompt → retrieval (RAG) over your documents → tools/agent loops. Stages that need zero training deliver most of the felt intelligence.
 
 Full version, with charts, a substrate comparison, and the full pipeline diagram:
-**https://resistancezero.com/article-28.html**
+**https://resistancezero.com/article-28.html**?utm_source=medium&utm_medium=syndication&utm_campaign=a28

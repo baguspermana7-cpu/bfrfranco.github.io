@@ -1,4 +1,5 @@
 # Medium Post
+*Publish via medium.com/p/import (sets the canonical).*
 
 SEO Title: The Most In-Demand Job in AI Isn't What You Think
 Subtitle: HVAC engineers, electricians, and robotic technicians are the hidden six-figure careers powering the AI revolution.
@@ -69,4 +70,4 @@ For anyone considering a career change, for parents advising graduating students
 
 ---
 
-*Originally published at [resistancezero.com](https://resistancezero.com/article-24.html)*
+*Originally published at [resistancezero.com](https://resistancezero.com/article-24.html?utm_source=medium&utm_medium=syndication&utm_campaign=a24)*

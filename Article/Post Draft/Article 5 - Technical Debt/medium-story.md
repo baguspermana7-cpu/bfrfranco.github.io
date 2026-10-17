@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: Technical Debt in Data Centers Is Operational Risk
 (Preview: "Technical Debt in Data Centers Is Operational Risk | by Bagusdpermana | Medium" = 66 chars, fits 74 limit)
 SEO Description: How deferred maintenance, design shortcuts, and knowledge loss create compounding risk in live data centers. Weibull analysis shows UPS battery hazard rates increase 132% past design life.
@@ -164,4 +165,4 @@ The choice is not whether to pay the debt. It is whether to pay it on your terms
 
 Originally published at resistancezero.com
 
-Full analysis with interactive technical debt risk analyzer and Weibull calculator: https://resistancezero.com/article-5.html
+Full analysis with interactive technical debt risk analyzer and Weibull calculator: https://resistancezero.com/article-5.html?utm_source=medium&utm_medium=syndication&utm_campaign=a5

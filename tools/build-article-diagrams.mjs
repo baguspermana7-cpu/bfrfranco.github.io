@@ -138,6 +138,508 @@ function assessmentMethodFigure(D, M, L) {
   return ctx.fit(28);
 }
 
+/* ==========================================================================
+ * Article 29 — "How a Large Language Model Actually Works" (eleven figures)
+ * ----------------------------------------------------------------------------
+ * These figures are laid out on a GRID, not by typed coordinates. A node names
+ * its column and row; the column width is the widest node in the column,
+ * measured with the engine's own metrics; the row pitch is the tallest node
+ * plus a gap; zones are the bounding box of the nodes they name; connector
+ * endpoints are the sides of the two boxes, fanned when several share a side,
+ * and the engine routes between them. Nothing here is a number typed by eye,
+ * so a longer sublabel widens its column instead of overflowing it.
+ * ======================================================================== */
+function gridFigure(spec) {
+  const ctx = D.create({ slug: spec.slug, title: spec.title, desc: spec.desc });
+  const X0 = 40, Y0 = spec.top == null ? 44 : spec.top;
+  const GY = spec.gapY == null ? 36 : spec.gapY;
+  const need = (n) => {
+    const nameW = n.name ? M.textWidth(n.name, 12, 'sans') : 0;
+    const subW = n.sub ? M.textWidth(n.sub, 9, 'mono') : 0;
+    const tagW = n.tag ? M.textWidth(String(n.tag).toUpperCase(), 9, 'mono', { tracking: 0.18 }) + 10 : 0;
+    const w = M.grid4(Math.max(nameW, subW, tagW, n.symbol ? 28 : 0) + 24);
+    const h = M.grid4((n.tag ? 18 : 0) + (n.symbol ? 32 : 0) + (n.name ? 16 : 0) + (n.sub ? 14 : 0) + 24);
+    return { w, h: Math.max(h, n.h || 0) };
+  };
+  const nodes = spec.nodes.map((n) => Object.assign({}, n, { need: need(n) }));
+  const ncols = Math.max(...nodes.map((n) => n.col)) + 1;
+  const colW = [];
+  for (let c = 0; c < ncols; c++) {
+    colW[c] = Math.max((spec.colMin || [])[c] || 0,
+      ...nodes.filter((n) => n.col === c).map((n) => n.need.w), 0);
+  }
+  const gaps = spec.gaps || [];
+  const colX = [];
+  let x = X0;
+  for (let c = 0; c < ncols; c++) { colX[c] = x; x += colW[c] + (gaps[c] == null ? 56 : gaps[c]); }
+  const maxH = Math.max(...nodes.map((n) => n.need.h));
+  const pitch = maxH + GY;
+  const box = {};
+  nodes.forEach((n) => {
+    const h = n.need.h;
+    box[n.id] = { x: colX[n.col], y: Y0 + n.row * pitch + (maxH - h) / 2, w: colW[n.col], h };
+  });
+
+  const bounds = (ids, pad) => {
+    const bs = ids.map((i) => box[i]);
+    const p = Object.assign({ t: 30, b: 14, l: 16, r: 16 }, pad || {});
+    const x1 = Math.min(...bs.map((b) => b.x)) - p.l, y1 = Math.min(...bs.map((b) => b.y)) - p.t;
+    const x2 = Math.max(...bs.map((b) => b.x + b.w)) + p.r, y2 = Math.max(...bs.map((b) => b.y + b.h)) + p.b;
+    return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+  };
+  (spec.zones || []).forEach((z) => {
+    let b;
+    if (z.cols) {                         /* a lane: the whole height, named columns only */
+      const all = bounds(nodes.map((n) => n.id), z.pad);
+      const xs = z.cols;
+      const x1 = colX[Math.min(...xs)] - 14, x2 = colX[Math.max(...xs)] + colW[Math.max(...xs)] + 14;
+      b = { x: x1, y: all.y, w: x2 - x1, h: all.h };
+    } else b = bounds(z.ids, z.pad);
+    const lw = M.textWidth(String(z.label).toUpperCase(), 9, 'mono', { tracking: 0.18 }) + 24;
+    if (lw > b.w) ctx.warnings.push({ kind: 'zone-label-overflow',
+      message: 'zone "' + z.label + '" needs ' + Math.ceil(lw) + ' units, zone is ' + Math.round(b.w) });
+    ctx.zone(b.x, b.y, b.w, b.h, { label: z.label, tier: 3, dashed: z.dashed !== false });
+  });
+
+  nodes.forEach((n) => {
+    const b = box[n.id];
+    ctx.node(b.x, b.y, {
+      id: n.id, tag: n.tag, name: n.name, sublabel: n.sub, w: b.w, h: b.h,
+      stroke: n.stroke || 'rule-solid', fill: n.fill || 'paper', tier: n.tier || 2,
+      dashed: n.dashed, symbol: n.symbol, legend: n.legend, vAlign: n.symbol ? undefined : 'middle'
+    });
+  });
+
+  const cx = (i) => box[i].x + box[i].w / 2, cy = (i) => box[i].y + box[i].h / 2;
+  const SIDE = { l: 'left', r: 'right', t: 'top', b: 'bottom' };
+  const edges = spec.edges.map((e, k) => {
+    let fs = e.fs, ts = e.ts;
+    const dx = cx(e.b) - cx(e.a), dy = cy(e.b) - cy(e.a);
+    if (!fs || !ts) {
+      if (Math.abs(dy) < 4) { fs = fs || (dx > 0 ? 'r' : 'l'); ts = ts || (dx > 0 ? 'l' : 'r'); }
+      else if (Math.abs(dx) < 4) { fs = fs || (dy > 0 ? 'b' : 't'); ts = ts || (dy > 0 ? 't' : 'b'); }
+      else { fs = fs || (dx > 0 ? 'r' : 'l'); ts = ts || (dy > 0 ? 't' : 'b'); }
+    }
+    return Object.assign({}, e, { fs, ts, k });
+  });
+  /* fan the connectors that share a side, ordered by where the other end is, so they do not cross */
+  const groups = {};
+  edges.forEach((e) => {
+    (groups[e.a + ':' + e.fs] = groups[e.a + ':' + e.fs] || []).push({ e, end: 'from', other: e.b });
+    (groups[e.b + ':' + e.ts] = groups[e.b + ':' + e.ts] || []).push({ e, end: 'to', other: e.a });
+  });
+  Object.keys(groups).forEach((key) => {
+    const [id, side] = key.split(':');
+    const g = groups[key];
+    const vertical = side === 'l' || side === 'r';
+    g.sort((p, q) => (vertical ? cy(p.other) - cy(q.other) : cx(p.other) - cx(q.other)) || (p.e.k - q.e.k));
+    const pts = ctx.ports(box[id], g.length, SIDE[side], { id });
+    g.forEach((m, i) => { m.e[m.end === 'from' ? 'pf' : 'pt'] = pts[i]; });
+  });
+  let anyLegend = nodes.some((n) => n.legend);
+  edges.forEach((e) => {
+    if (e.legend) anyLegend = true;
+    ctx.edge({ x: e.pf.x, y: e.pf.y }, { x: e.pt.x, y: e.pt.y }, {
+      fromId: e.a, toId: e.b, stroke: e.stroke || 'ink', tier: e.tier || 2,
+      pattern: e.pattern || 'solid', label: e.label, legend: e.legend
+    });
+  });
+  if (anyLegend) ctx.legend();
+  return ctx.fit(28);
+}
+
+const LLM_FIGURES = [
+  /* ---------------------------------------------------------------- D1 */
+  {
+    id: 'llm-d1', page: 'article-29.html',
+    caption:
+      'One decoder block, repeated 80 times in Llama 3 70B [S2]. Each sub-layer reads the residual stream, ' +
+      'computes something, and ADDS it back, so the stream is never replaced, only written to. Attention also ' +
+      'writes this token’s keys and values to a cache that costs 320 KiB per token (derived from [S2]).',
+    because:
+      'the prose lists the parts of a block in sequence; the two skip connections and the cache loop are ' +
+      'topology. A list cannot show that the stream bypasses each sub-layer, or that attention reads what a ' +
+      'previous step wrote.',
+    build: () => gridFigure({
+      slug: 'llm1', title: 'One decoder block',
+      desc: 'Token vectors pass through attention and a feed-forward network; each adds its result back to the residual stream.',
+      gaps: [60, 110], colMin: [240],
+      nodes: [
+        { id: 'in', col: 0, row: 0, tag: 'width 8,192 [S2]', name: 'Residual stream in', sub: 'one vector per token' },
+        { id: 'n1', col: 1, row: 1, name: 'RMSNorm' },
+        { id: 'att', col: 1, row: 2, tag: '64 Q · 8 KV heads [S2]', name: 'Self-attention', sub: 'grouped-query (GQA)',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Sub-layer that reads and writes the stream' },
+        { id: 'add1', col: 0, row: 2, name: '+', sub: 'residual add', legend: 'Normalise and add' },
+        { id: 'n2', col: 1, row: 3, name: 'RMSNorm' },
+        { id: 'ffn', col: 1, row: 4, tag: '2/3 of block weights', name: 'Feed-forward (SwiGLU)', sub: 'derived',
+          stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'add2', col: 0, row: 4, name: '+', sub: 'residual add' },
+        { id: 'out', col: 0, row: 5, name: 'Residual stream out' },
+        { id: 'kv', col: 2, row: 2, tag: '320 KiB / token', name: 'KV cache', sub: 'derived',
+          dashed: true, legend: 'State kept between tokens' }
+      ],
+      edges: [
+        { a: 'in', b: 'n1' }, { a: 'n1', b: 'att' }, { a: 'att', b: 'add1' },
+        { a: 'in', b: 'add1', label: 'skip', stroke: 'muted', pattern: 'dashed', legend: 'Skip connection' },
+        { a: 'add1', b: 'n2', fs: 'r', ts: 'l' }, { a: 'n2', b: 'ffn' }, { a: 'ffn', b: 'add2' },
+        { a: 'add1', b: 'add2', label: 'skip', stroke: 'muted', pattern: 'dashed' },
+        { a: 'add2', b: 'out' },
+        { a: 'att', b: 'kv', label: 'write K,V' }, { a: 'kv', b: 'att', label: 'read past K,V', fs: 'l', ts: 'r' }
+      ],
+      zones: [{ ids: ['n1', 'att', 'add1', 'n2', 'ffn', 'add2'], label: '× 80 layers [S2]' }]
+    })
+  },
+  /* ---------------------------------------------------------------- D2 */
+  {
+    id: 'llm-d2', page: 'article-29.html',
+    caption:
+      'One attention head. Scores are Q·K^T divided by √128 = 11.3 (derived, head size d_h = 128), masked so ' +
+      'a token cannot see the future, softmaxed into weights, and used to average V. The grey zone is the part whose ' +
+      'cost grows as n², which FlashAttention keeps in on-chip SRAM [S50].',
+    because:
+      'the equation is one line in the prose, but the order matters and the mask sits between scores and softmax. ' +
+      'Drawn, the n×n block is visibly the only stage that scales quadratically.',
+    build: () => gridFigure({
+      slug: 'llm2', title: 'Attention head',
+      desc: 'Queries score keys; softmax turns scores into weights; weights average values.',
+      gaps: [60, 70],
+      nodes: [
+        { id: 'x', col: 0, row: 1.75, name: 'Token vectors X', sub: 'n × d' },
+        { id: 'q', col: 1, row: 0, name: 'Q = X·W_Q' },
+        { id: 'k', col: 1, row: 1, name: 'K = X·W_K' },
+        { id: 'v', col: 1, row: 3.5, name: 'V = X·W_V' },
+        { id: 's', col: 2, row: 0.5, h: 56, tag: '√128 = 11.3', name: 'Scores', sub: 'Q·K^T / √d_h, d_h = 128',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'The n×n stage' },
+        { id: 'm', col: 2, row: 1.5, name: 'Causal mask', sub: 'future = −∞' },
+        { id: 'sm', col: 2, row: 2.5, name: 'Softmax', sub: 'rows sum to 1' },
+        { id: 'o', col: 2, row: 3.5, name: 'Output', sub: 'A·V' }
+      ],
+      edges: [
+        { a: 'x', b: 'q', ts: 'l' }, { a: 'x', b: 'k', ts: 'l' }, { a: 'x', b: 'v', ts: 'l' },
+        { a: 'q', b: 's', ts: 'l' }, { a: 'k', b: 's', ts: 'l', label: 'transpose' },
+        { a: 's', b: 'm' }, { a: 'm', b: 'sm' }, { a: 'sm', b: 'o', label: 'weights A' }, { a: 'v', b: 'o' }
+      ],
+      zones: [{ ids: ['s', 'm', 'sm'], label: 'O(n²·d) · SRAM [S50]' }]
+    })
+  },
+  /* ---------------------------------------------------------------- D3 */
+  {
+    id: 'llm-d3', page: 'article-29.html',
+    caption:
+      'Why context fills a GPU. KV memory grows linearly: 2.5 GiB at 8K, 10 GiB at 32K, 40 GiB at 128K for one Llama 3 70B ' +
+      'conversation, next to 70.6 GB of FP8 weights on a 141 GB H200 [S2][S9]. Below, the same 128K costs 40, 8.6 or 100 GiB ' +
+      'depending on the attention design (GQA, MLA, MHA) [S1][S2][S30].',
+    because:
+      'a table can list 2.5, 10 and 40 GiB; it cannot show that the 40 GiB lands on the same chip as the weights, ' +
+      'or that the attention design alone moves the same context from 8.6 to 100 GiB.',
+    build: () => gridFigure({
+      slug: 'llm3', title: 'Why context fills a GPU',
+      desc: 'KV memory grows linearly with tokens; at 128K one Llama 3 70B conversation needs 40 GiB.',
+      gaps: [56, 96], gapY: 40,
+      nodes: [
+        { id: 'k8', col: 0, row: 0, name: 'KV at 8K', sub: '2.5 GiB' },
+        { id: 'k32', col: 1, row: 0, name: 'KV at 32K', sub: '10 GiB' },
+        { id: 'k128', col: 2, row: 0, tag: 'grows with context', name: 'KV at 128K', sub: '40 GiB',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'The part that grows with context' },
+        { id: 'w', col: 1, row: 1, tag: 'FP8', name: 'Weights', sub: '70.6 GB' },
+        { id: 'gpu', col: 2, row: 1, tag: '141 GB [S9]', name: 'H200 HBM', sub: 'weights + KV must fit' },
+        { id: 'l70', col: 0, row: 2.4, tag: '[S2]', name: 'Llama 3 70B · GQA', sub: '40 GiB at 128K' },
+        { id: 'ds', col: 1, row: 2.4, tag: '[S1]', name: 'DeepSeek-V3 · MLA', sub: '8.6 GiB at 128K' },
+        { id: 'opt', col: 2, row: 2.4, tag: '[S30]', name: 'OPT-13B · MHA', sub: '100 GiB at 128K' }
+      ],
+      edges: [
+        { a: 'k8', b: 'k32', label: '×4' }, { a: 'k32', b: 'k128', label: '×4' },
+        { a: 'w', b: 'gpu', label: 'resident' }, { a: 'k128', b: 'gpu', label: '+40 GiB' }
+      ],
+      zones: [{ ids: ['l70', 'ds', 'opt'], label: 'Same 128K context, three attention designs' }]
+    })
+  },
+  /* ---------------------------------------------------------------- D4 */
+  {
+    id: 'llm-d4', page: 'article-29.html',
+    caption:
+      'Mixture-of-experts routing in DeepSeek-V3 [S1]. A router scores 256 experts per token and sends it to the top 8, plus ' +
+      'one shared expert that always runs; the other 248 are skipped. Only 37B of 671B parameters run per token ' +
+      '(5.5 %, derived), and routing is limited to 4 nodes per token to bound all-to-all traffic.',
+    because:
+      'the active-parameter count is one sentence in the prose, but “skipped” is a place, not a quantity: the 248 idle ' +
+      'experts are still in memory. The drawing separates what is stored from what is computed.',
+    build: () => gridFigure({
+      slug: 'llm4', title: 'Mixture of Experts routing',
+      desc: 'A router sends each token to 8 of 256 experts plus one shared expert; only 37B of 671B parameters run.',
+      gaps: [48, 76, 48],
+      nodes: [
+        { id: 'tok', col: 0, row: 2, tag: 'width 7,168 [S1]', name: 'Token vector' },
+        { id: 'r', col: 1, row: 2, h: 80, tag: '[S1]', name: 'Router', sub: 'sigmoid affinity + bias',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'The decision' },
+        { id: 'e1', col: 2, row: 0, name: 'Expert 17', sub: 'one of top-8' },
+        { id: 'e2', col: 2, row: 1, name: 'Expert 88', sub: 'one of top-8' },
+        { id: 'e3', col: 2, row: 2, name: '… 6 more', sub: 'top-8 in all' },
+        { id: 'sh', col: 2, row: 4, tag: 'always on', name: 'Shared expert' },
+        { id: 'idle', col: 2, row: 3, name: '248 idle experts', sub: 'stored, not computed',
+          stroke: 'soft', dashed: true, legend: 'In memory, skipped' },
+        { id: 'sum', col: 3, row: 2, h: 76, tag: '8 + 1', name: 'Weighted sum', sub: 'original-affinity gates' },
+        { id: 'out', col: 3, row: 3.6, tag: '37B of 671B run', name: 'To next layer', sub: '5.5 % of parameters' }
+      ],
+      edges: [
+        { a: 'tok', b: 'r' }, { a: 'r', b: 'e1', ts: 'l' }, { a: 'r', b: 'e2', ts: 'l', label: 'top-8' }, { a: 'r', b: 'e3', ts: 'l' },
+        { a: 'tok', b: 'sh', fs: 'b', ts: 'l' },
+        { a: 'e1', b: 'sum', fs: 'r', ts: 'l' }, { a: 'e2', b: 'sum', fs: 'r', ts: 'l' }, { a: 'e3', b: 'sum', fs: 'r', ts: 'l' },
+        { a: 'sh', b: 'sum', fs: 'r', ts: 'l' },
+        { a: 'sum', b: 'out' },
+        { a: 'r', b: 'idle', ts: 'l', label: 'skipped', stroke: 'soft', pattern: 'dashed' }
+      ],
+      zones: [{ ids: ['e1', 'e2', 'e3'], label: '≤ 4 nodes [S1]' }]
+    })
+  },
+  /* ---------------------------------------------------------------- D5 */
+  {
+    id: 'llm-d5', page: 'article-29.html',
+    caption:
+      'From web text to assistant. Llama 3 pre-trains on 15.6T tokens for 3.8×10²⁵ FLOP [S2], about 25 MW on 16K H100 ' +
+      '(derived); the mix is 50 % general, 25 % math, 17 % code, 8 % multilingual [S2]. Post-training adds SFT and RL, and the ' +
+      'RL model can be distilled: a 32B student keeps 91 % of the teacher’s AIME score [S4][S54].',
+    because:
+      'the pipeline is the ORDER of stages, and the numbers belong to different stages. In prose the reader holds ten ' +
+      'stages in mind; drawn, the compute-heavy stage is the one boxed and the distil branch visibly leaves from RL.',
+    build: () => gridFigure({
+      slug: 'llm5', title: 'From web text to assistant',
+      desc: 'Data is filtered and mixed, pre-trained at scale, then post-trained with SFT and RL.',
+      gaps: [52, 52], gapY: 60, colMin: [160, 216, 256],
+      nodes: [
+        { id: 'a', col: 0, row: 0, tag: 'raw sources', name: 'Collect + filter', sub: 'dedup · quality · PII' },
+        { id: 'b', col: 1, row: 0, tag: '[S2]', name: 'Data mix', sub: 'gen 50 · math 25 · code 17 · multi 8' },
+        { id: 'c', col: 2, row: 0, tag: '128K vocab [S2]', name: 'Tokenize' },
+        { id: 'd', col: 2, row: 1, tag: '[S2]', name: 'Pre-training', sub: '15.6T tokens · 3.8e25 FLOP',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Where the compute goes' },
+        { id: 'e', col: 1, row: 1, tag: '[S1]', name: 'Context extension', sub: '4K → 32K → 128K' },
+        { id: 'f', col: 0, row: 1, name: 'SFT', sub: 'supervised fine-tuning' },
+        { id: 'g', col: 0, row: 2, tag: '[S4][S54]', name: 'RL: RLHF / DPO / GRPO', sub: 'verifiable rewards' },
+        { id: 'h', col: 1, row: 2, name: 'Evals + safety → release', sub: 'weights or API' },
+        { id: 'i', col: 0, row: 3, tag: '[S4]', name: 'Distill to students', sub: '32B keeps 91 % of AIME', dashed: true,
+          legend: 'Branch, not a stage' }
+      ],
+      edges: [
+        { a: 'a', b: 'b' }, { a: 'b', b: 'c' }, { a: 'c', b: 'd' }, { a: 'd', b: 'e' }, { a: 'e', b: 'f' },
+        { a: 'f', b: 'g' }, { a: 'g', b: 'h' },
+        { a: 'g', b: 'i', label: 'distil', stroke: 'muted', pattern: 'dashed' }
+      ],
+      zones: [
+        { ids: ['a', 'b', 'c'], label: 'Data' },
+        { ids: ['d'], label: '16K H100 · 25 MW' },
+        { ids: ['f', 'g', 'i'], label: 'Post-training' }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D6 */
+  {
+    id: 'llm-d6', page: 'article-29.html',
+    caption:
+      'What a GPU does when you hit Enter. Prefill of a 4,000-token prompt runs in parallel and is compute-bound, about 0.57 s ' +
+      'on an H200 (derived). Each decode step then re-reads all 70.6 GB of weights plus the KV cache, about 114 GB per step at batch ' +
+      '32: 23.7 ms ideal, 39.4 ms at 60 % bandwidth utilisation (derived). New requests join the running batch [S30].',
+    because:
+      'two numbers, 0.57 s and 23.7 ms, come from different bottlenecks, and the prose cannot put them on the same clock. ' +
+      'The swimlane shows that every decode step touches memory again while prefill touches it once.',
+    build: () => gridFigure({
+      slug: 'llm6', title: 'What a GPU does when you hit Enter',
+      desc: 'Prefill processes the whole prompt in parallel; decode emits one token per step and is bandwidth-bound.',
+      gaps: [60, 60], gapY: 28,
+      nodes: [
+        { id: 'q', col: 0, row: 0, name: 'Request queued' },
+        { id: 'join', col: 0, row: 3, tag: '[S30]', name: 'Continuous batching', sub: 'new requests join here',
+          stroke: 'soft', dashed: true, legend: 'Scheduler event' },
+        { id: 'done', col: 0, row: 5, name: 'EOS', sub: 'sequence ends' },
+        { id: 'pf', col: 1, row: 1, tag: 'compute-bound', name: 'Prefill 4,000 tokens', sub: '≈ 0.57 s on H200 (derived)',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Compute-bound step' },
+        { id: 'ttft', col: 1, row: 2, name: 'First token', sub: 'TTFT ≈ 0.57 s' },
+        { id: 'd1', col: 1, row: 3, tag: 'memory-bound', name: 'Decode step 1', sub: 'reads weights + KV' },
+        { id: 'd2', col: 1, row: 4, name: 'Decode step 2', sub: '23.7 ms ideal · 39.4 at 60 %' },
+        { id: 'dn', col: 1, row: 5, name: '… step n', sub: 'one token per step' },
+        { id: 'hb', col: 2, row: 4, tag: 'derived', name: 'Weights + KV per step', sub: '≈ 114 GB at batch 32' }
+      ],
+      edges: [
+        { a: 'q', b: 'pf' }, { a: 'pf', b: 'ttft' }, { a: 'ttft', b: 'd1' }, { a: 'd1', b: 'd2' }, { a: 'd2', b: 'dn' },
+        { a: 'dn', b: 'done' }, { a: 'join', b: 'd1', label: 'joins', stroke: 'muted', pattern: 'dashed' },
+        { a: 'd1', b: 'hb', stroke: 'soft', pattern: 'dotted', label: 'memory-bound', legend: 'Reads HBM every step' },
+        { a: 'd2', b: 'hb', stroke: 'soft', pattern: 'dotted' },
+        { a: 'dn', b: 'hb', stroke: 'soft', pattern: 'dotted' }
+      ],
+      zones: [
+        { cols: [0], label: 'Scheduler' }, { cols: [1], label: 'GPU compute' }, { cols: [2], label: 'HBM traffic' }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D7 */
+  {
+    id: 'llm-d7', page: 'article-29.html',
+    caption:
+      'The hardware ladder, laptop to campus. Memory, bandwidth and power each jump at every rung: 819 GB/s at 512 GB unified ' +
+      '[S71], 8×H200 for 1.13 TB [S9], a 72-GPU rack with 13.4 TB HBM at 132 kW [S10][S68], a 9,216-chip pod near 10 MW [S14], ' +
+      'then 150 MW to 1.2 GW campuses [S19][S20]. Liquid cooling becomes mandatory at the rack [S10][S14]. Multipliers derived.',
+    because:
+      'the prose gives each rung its own paragraph, so the reader meets 819 GB/s and 1.2 GW in different places. One column ' +
+      'shows the jump in scale and where the cooling regime changes.',
+    build: () => gridFigure({
+      slug: 'llm7', title: 'From laptop to gigawatt campus',
+      desc: 'Each rung multiplies memory, bandwidth and power; the model you can serve or train follows.',
+      gapY: 64, colMin: [320],
+      nodes: [
+        { id: 'L0', col: 0, row: 0, tag: 'serves 70B Q4', name: 'Laptop / Mac Studio', sub: '≤512 GB unified · 819 GB/s [S71]' },
+        { id: 'L1', col: 0, row: 1, tag: 'serves 8–32B', name: 'Workstation GPU', sub: 'RTX 5090 32 GB · 1.79 TB/s · 575 W [S15]' },
+        { id: 'L2', col: 0, row: 2, tag: 'serves 405B FP8', name: '8-GPU server', sub: '8×H200 1.13 TB · 10–14 kW [S9][S70][S12]' },
+        { id: 'L3', col: 0, row: 3, tag: '1T-param MoE', name: 'NVL72 rack', symbol: 'rack',
+          sub: '72 GPUs · 13.4 TB HBM · 132 kW liquid [S10][S68]',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Liquid-cooled rungs' },
+        { id: 'L4', col: 0, row: 4, tag: '≈ 10 MW', name: 'Pod', sub: 'Ironwood 9,216 chips · 42.5 EF [S14]' },
+        { id: 'L5', col: 0, row: 5, tag: '150 MW – 1.2 GW', name: 'Campus', sub: '100k–200k+ GPUs [S19][S20]' }
+      ],
+      edges: [
+        { a: 'L0', b: 'L1', label: '×2.2 bandwidth' }, { a: 'L1', b: 'L2', label: '×8 GPUs' },
+        { a: 'L2', b: 'L3', label: '×9 GPUs, ×10 kW' }, { a: 'L3', b: 'L4', label: '×128 chips' },
+        { a: 'L4', b: 'L5', label: '×15–120 power' }
+      ],
+      zones: [
+        { ids: ['L0', 'L1', 'L2'], label: 'Air-cooled [S10]', pad: { b: 8 } },
+        { ids: ['L3', 'L4', 'L5'], label: 'Liquid cooling [S10][S14]', pad: { t: 30, b: 8 } }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D8 */
+  {
+    id: 'llm-d8', page: 'article-29.html',
+    caption:
+      'An agent is a loop the harness controls. The model only proposes a tool call; the harness gates it, runs it in a sandbox, ' +
+      'feeds the observation back as untrusted input, and lets the verifier decide whether to stop [S61]. A budget caps steps, tokens ' +
+      'and time. Example: a 30-step run costs about $2.64 uncached and about $0.36 with prompt caching (derived, section 8.2).',
+    because:
+      'the prose says “the agent decides”; the drawing shows it does not. Only the model is vendor code, the verifier ' +
+      'and the budget sit outside it, and the observation arrow re-enters the context as untrusted text.',
+    build: () => gridFigure({
+      slug: 'llm8', title: 'An agent is a loop the harness controls',
+      desc: 'The model proposes; the harness executes in a sandbox, verifies, and decides whether to continue.',
+      gaps: [52, 52, 64],
+      nodes: [
+        { id: 'user', col: 0, row: 0, name: 'Goal / task', stroke: 'soft', fill: 'paper-2', dashed: true, legend: 'Task in, result out' },
+        { id: 'ver', col: 2, row: 0, name: 'Verifier', sub: 'tests · linters · evaluator',
+          legend: 'Harness (your code)' },
+        { id: 'done', col: 3, row: 0, tag: 'derived', name: 'Result + log', sub: '$2.64 → $0.36 cached', stroke: 'soft', fill: 'paper-2', dashed: true },
+        { id: 'ctx', col: 1, row: 1, name: 'Context manager', sub: 'prompt · memory · cache' },
+        { id: 'llm', col: 2, row: 1, tag: 'vendor', name: 'Model', sub: 'plan → tool call (JSON)',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Model (vendor)' },
+        { id: 'bud', col: 3, row: 1, name: 'Budget', sub: 'steps · tokens · time' },
+        { id: 'obs', col: 0, row: 2, tag: 'untrusted', name: 'Observation', sub: 'tool output is data',
+          stroke: 'alarm-caution', dashed: true, legend: 'Untrusted input' },
+        { id: 'sbx', col: 1, row: 2, name: 'Sandbox + MCP tools', sub: 'no secrets · egress control' },
+        { id: 'gate', col: 2, row: 2, name: 'Policy gate', sub: 'allowlist · approval [S61]' }
+      ],
+      edges: [
+        { a: 'user', b: 'ctx', fs: 'r', ts: 't' }, { a: 'ctx', b: 'llm' },
+        { a: 'llm', b: 'gate' }, { a: 'gate', b: 'sbx' }, { a: 'sbx', b: 'obs' },
+        { a: 'obs', b: 'ctx', fs: 't', ts: 'l', label: 'loop', stroke: 'accent', tier: 1 },
+        { a: 'llm', b: 'ver', label: 'candidate' }, { a: 'ver', b: 'done', label: 'pass' },
+        { a: 'ver', b: 'ctx', fs: 'l', ts: 't', label: 'fail: feedback' },
+        { a: 'bud', b: 'llm', stroke: 'muted', pattern: 'dashed', legend: 'Stops the loop when exceeded' }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D9 */
+  {
+    id: 'llm-d9', page: 'article-29.html',
+    caption:
+      'Distillation. DeepSeek-R1 (671B, 37B active) scores 79.8 on AIME24; its reasoning traces fine-tune a Qwen2.5-32B student ' +
+      'to 72.6, 91 % of the teacher with 4.8 % of the parameters [S4]. Matching soft logits instead of traces is the other route ' +
+      '[S56]; Qwen3 reports about a tenth of the GPU-hours of RL [S3].',
+    because:
+      'the three nouns, teacher, trace and student, are easy to blur in prose. The drawing fixes who produces what, and ' +
+      'shows the logit route as an alternative that ends at the same SFT step.',
+    build: () => gridFigure({
+      slug: 'llm9', title: 'Distillation',
+      desc: 'A large teacher’s outputs train a small student that keeps most of the skill at a fraction of the size.',
+      gaps: [52, 52, 52],
+      nodes: [
+        { id: 't', col: 0, row: 1.5, tag: 'AIME24 79.8 [S4]', name: 'Teacher: DeepSeek-R1', sub: '671B / 37B active',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Teacher and result' },
+        { id: 'gen', col: 1, row: 1, name: 'Reasoning traces', sub: 'sequence-level' },
+        { id: 'logit', col: 1, row: 2, tag: '[S56]', name: 'Soft targets (logits)', sub: 'logit-level, alternative',
+          stroke: 'soft', dashed: true, legend: 'Alternative route' },
+        { id: 's', col: 2, row: 0, name: 'Student: Qwen2.5-32B', sub: 'base model' },
+        { id: 'sft', col: 2, row: 1, name: 'SFT on traces' },
+        { id: 'res', col: 3, row: 1, tag: 'AIME24 72.6 [S4]', name: 'R1-Distill-Qwen-32B', sub: '91 % of teacher · 4.8 % size',
+          stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'q3', col: 3, row: 0, tag: '[S3]', name: 'Qwen3 strong-to-weak', sub: '≈ 1/10 the GPU-hours of RL',
+          stroke: 'soft', dashed: true }
+      ],
+      edges: [
+        { a: 't', b: 'gen', ts: 'l' }, { a: 't', b: 'logit', ts: 'l' }, { a: 'gen', b: 'sft' },
+        { a: 'logit', b: 'sft', fs: 'r', ts: 'b', stroke: 'muted', pattern: 'dashed' },
+        { a: 's', b: 'sft' }, { a: 'sft', b: 'res' }
+      ]
+    })
+  },
+  /* --------------------------------------------------------------- D10 */
+  {
+    id: 'llm-d10', page: 'article-29.html',
+    caption:
+      'Roofline in blocks: why decode waits on memory. Below the ridge point, speed is set by bandwidth; above it, by compute. Ridge: ' +
+      'H100 295 FLOP/B [S8], H200 206 [S9], MI355X 625 [S13]. Decode at batch 1 does about 1 FLOP per byte, batch 32 about 32, a ' +
+      '4K-token prefill about 4,000. Derived from vendor peak and bandwidth; dense FLOPs.',
+    because:
+      'the log-log chart carries the exact curves; this block version only says which workload sits on which side. It restates ' +
+      'the table of ridge points, so it is kept minimal.',
+    build: () => gridFigure({
+      slug: 'llm10', title: 'Roofline: why decode waits on memory',
+      desc: 'Below the ridge point performance is set by bandwidth; above it, by compute.',
+      gaps: [56, 56], colMin: [0, 0, 200],
+      nodes: [
+        { id: 'bw', col: 0, row: 0, tag: 'slope', name: 'Bandwidth roof', sub: 'H100 3.35 \u00B7 H200 4.8 \u00B7 MI355X 8 TB/s' },
+        { id: 'd1', col: 0, row: 1, tag: '\u2248 1 FLOP/B', name: 'Decode, batch 1', sub: 'weights re-read per token' },
+        { id: 'd32', col: 0, row: 2, tag: '\u2248 32 FLOP/B', name: 'Decode, batch 32', sub: 'weights shared by 32 users' },
+        { id: 'ridge', col: 1, row: 2, tag: '[S8][S9][S13]', name: 'Ridge point', sub: 'H100 295 \u00B7 H200 206 \u00B7 MI355X 625',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Where the limit changes' },
+        { id: 'cp', col: 2, row: 0, tag: 'flat roof', name: 'Compute roof', sub: 'H100 989 TF \u00B7 MI355X 5 PF' },
+        { id: 'pre', col: 2, row: 2, tag: '\u2248 4,000 FLOP/B', name: 'Prefill, 4K prompt', sub: 'all prompt tokens at once' }
+      ],
+      edges: [
+        { a: 'd1', b: 'd32', label: 'batch \u00D732' }, { a: 'd32', b: 'ridge' }, { a: 'ridge', b: 'pre' },
+        { a: 'bw', b: 'ridge', fs: 'r', ts: 't' }, { a: 'cp', b: 'ridge', fs: 'l', ts: 't', stroke: 'muted', pattern: 'dashed' }
+      ],
+      zones: [
+        { ids: ['bw', 'd1', 'd32'], label: 'Bandwidth-bound: below ridge' },
+        { ids: ['cp', 'pre'], label: 'Compute-bound: above ridge' }
+      ]
+    })
+  },
+  /* --------------------------------------------------------------- D11 */
+  {
+    id: 'llm-d11', page: 'article-29.html',
+    caption:
+      'What the model sees. A sentence becomes sub-word tokens, then integer IDs, then one embedding row per ID. The same text costs ' +
+      'more tokens in Indonesian: about 1.20 tokens per English word against 1.60 to 2.05 for Indonesian on o200k (measured [S72]).',
+    because:
+      'the 1.20 versus 1.60–2.05 ratio is a table row; the drawing adds the actual split of one Indonesian phrase, which ' +
+      'shows why the ratio is above 1 (long affixed words break into pieces).',
+    build: () => gridFigure({
+      slug: 'llm11', title: 'What the model sees',
+      desc: 'The same sentence costs more tokens in Indonesian.',
+      gaps: [72],
+      nodes: [
+        { id: 'en', col: 0, row: 0, tag: 'Indonesian text', name: '‘pendinginan’ · ‘dikonsumsi’ · ‘Transformer’' },
+        { id: 'tokid', col: 0, row: 1, tag: 'o200k · measured [S72]', name: 'pending|inan · dik|onsum|si · Transformer',
+          stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Where the cost is counted' },
+        { id: 'ids', col: 0, row: 2, name: 'Integer IDs', sub: 'one per token' },
+        { id: 'emb', col: 0, row: 3, name: 'Embedding rows', sub: 'one vector per ID' },
+        { id: 'cen', col: 1, row: 0.5, tag: 'English', name: '1.20 tok/word', stroke: 'soft', dashed: true, legend: 'Tokens per word' },
+        { id: 'cid', col: 1, row: 1.5, tag: 'Indonesian [S72]', name: '1.60–2.05 tok/word', stroke: 'soft', dashed: true }
+      ],
+      edges: [
+        { a: 'en', b: 'tokid' }, { a: 'tokid', b: 'ids' }, { a: 'ids', b: 'emb' },
+        { a: 'tokid', b: 'cen', ts: 'l', stroke: 'muted', pattern: 'dotted' }, { a: 'tokid', b: 'cid', ts: 'l', stroke: 'muted', pattern: 'dotted' }
+      ]
+    })
+  }
+];
+
 const FIGURES = [
   {
     id: 'method-assessment',
@@ -971,7 +1473,9 @@ const FIGURES = [
     }
   },
   /* the diagrams articles used to draw by hand — see article-diagrams-converted.mjs */
-  ...convertedFigures(D)
+  ...convertedFigures(D),
+  /* article 29 — see the grid helper above */
+  ...LLM_FIGURES
 ];
 
 /* ==========================================================================

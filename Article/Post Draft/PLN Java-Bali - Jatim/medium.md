@@ -1,4 +1,5 @@
 Title: East Java's Grid — Why Paiton's 4.71 GW Matters Beyond the Province
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

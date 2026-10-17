@@ -1,0 +1,6 @@
+<section class="llm-calc-block">
+<h3>Will it fit? Model memory and KV cache</h3>
+<p>This calculator adds the weights, the key-value (KV) cache that grows with context and batch, and a runtime overhead, then tells you the smallest hardware that holds it. Weights are <code>N_total × precision / 8</code>; the KV cache is <code>2 × layers × kv_heads × d_head × kv_bits/8</code> bytes per token (MLA models use <code>layers × mla_width × kv_bits/8</code>), times context and batch; the total is <code>(W_bytes + KV_bytes) × (1 + overhead)</code>. The 10% overhead is a rule of thumb, and the Apple 75% usable-memory share is an assumption. Every result has a "Show working" line that prints the formula and the numbers it used.</p>
+<div class="llm-calc" data-llm-calc="fit"></div>
+<p class="calc-basis">Basis: estimate. Sources: model dimensions [S1] [S2] [S3]; GPU memory [S8] [S9] [S10] [S12] [S13] [S15] [S71]; bits per weight [S35] [S39]. Constants as of 2026-10-16.</p>
+</section>

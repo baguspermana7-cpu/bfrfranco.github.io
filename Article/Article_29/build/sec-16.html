@@ -1,0 +1,40 @@
+<h2 id="checklist">Engineer's checklist</h2>
+
+<p>Everything above reduces to a short list of formulas and defaults. Use the table as a take-home card: the formula is what to compute, the default is the number to start from, and the source is where it comes from. Anything marked derived is arithmetic on sourced inputs; anything marked assumed is an engineering assumption you should replace with your own measurement. To check a model against a GPU, start with <a href="#kv-cache">the KV-cache calculator</a>.</p>
+
+<div class="table-wrap">
+<table class="ws-table">
+<caption>The article in one table: formula, default and source for each topic</caption>
+<thead><tr><th scope="col">Topic</th><th scope="col">Formula</th><th scope="col">Default or worked value</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><td>Training compute</td><td><code>C &asymp; 6&middot;N&middot;D</code></td><td>Llama 3 405B: 6 &times; 405e9 &times; 15.6e12 = 3.79e25 (paper: 3.8e25)</td><td><a href="#src-7">[S7]</a><a href="#src-2">[S2]</a></td></tr>
+<tr><td>Inference compute</td><td><code>&asymp; 2&middot;N_active</code> FLOPs per token</td><td>One-third of the training cost per token</td><td><a href="#src-7">[S7]</a></td></tr>
+<tr><td>Compute-optimal data</td><td><code>D &asymp; 20&middot;N</code>, so <code>N = &radic;(C/120)</code></td><td>C = 5.76e23 gives 69B on 1.4T tokens</td><td><a href="#src-5">[S5]</a><a href="#src-6">[S6]</a></td></tr>
+<tr><td>Utilisation</td><td>Sustained = peak &times; MFU</td><td>MFU 38&ndash;43% (Llama 3)</td><td><a href="#src-2">[S2]</a></td></tr>
+<tr><td>Training energy</td><td>GPU-hours &times; kW per GPU &times; PUE</td><td>70B on 15T: 4.42M GPU-h, 6.77&nbsp;GWh at PUE 1.2 (derived; PUE assumed)</td><td><a href="#src-8">[S8]</a><a href="#src-70">[S70]</a></td></tr>
+<tr><td>Weight memory</td><td><code>N &times; bytes per parameter</code></td><td>70B: 141&nbsp;GB BF16, 71&nbsp;GB FP8, 43&nbsp;GB Q4_K_M (derived)</td><td><a href="#src-39">[S39]</a></td></tr>
+<tr><td>KV cache</td><td><code>2 &times; layers &times; KV heads &times; d_head &times; bytes &times; tokens &times; batch</code></td><td>Llama 3 70B: 320&nbsp;KiB per token, 40&nbsp;GiB at 128K (derived)</td><td><a href="#src-2">[S2]</a><a href="#src-30">[S30]</a></td></tr>
+<tr><td>MoE memory vs compute</td><td>Memory by total parameters, compute by active</td><td>DeepSeek-V3: 671B total, 37B active (5.5%)</td><td><a href="#src-1">[S1]</a></td></tr>
+<tr><td>Post-training</td><td>GRPO advantage <code>A_i = (r_i &minus; mean) / std</code></td><td>No critic network; verifiable rewards</td><td><a href="#src-54">[S54]</a><a href="#src-4">[S4]</a></td></tr>
+<tr><td>Distillation</td><td>Student SFT on teacher outputs</td><td>32B student keeps 72.6 / 79.8 = 91% of R1's AIME</td><td><a href="#src-4">[S4]</a></td></tr>
+<tr><td>LoRA parameters</td><td><code>r&middot;(d_in + d_out)</code> per matrix</td><td>Llama 3 8B, r = 16: 41.9M (0.52%)</td><td><a href="#src-34">[S34]</a></td></tr>
+<tr><td>Fine-tune memory</td><td>Full 16&nbsp;B/param; QLoRA 0.516&nbsp;B/param base</td><td>70B: 1.13&nbsp;TB full; about 36&nbsp;GB QLoRA base (derived)</td><td><a href="#src-60">[S60]</a><a href="#src-35">[S35]</a></td></tr>
+<tr><td>Quantization quality</td><td>Memory = <code>N &times; bits / 8</code></td><td>8-bit near lossless; 4-bit task-dependent; under 3-bit degrades</td><td><a href="#src-38">[S38]</a><a href="#src-39">[S39]</a></td></tr>
+<tr><td>Prefill time</td><td><code>2&middot;N&middot;n_prompt / (peak &times; MFU)</code></td><td>4,000 tokens, 70B FP8, H200 at 50%: 0.57&nbsp;s (MFU assumed)</td><td><a href="#src-9">[S9]</a></td></tr>
+<tr><td>Decode ceiling, batch 1</td><td><code>tokens/s &le; bandwidth / weight bytes</code></td><td>70B FP8 on H200: 4.8&nbsp;TB/s &divide; 70.6&nbsp;GB = 68 tok/s; engines reach about 50&ndash;80% (rule of thumb)</td><td><a href="#src-9">[S9]</a></td></tr>
+<tr><td>Ridge point</td><td>Peak FLOP/s &divide; bandwidth</td><td>H100 BF16: 295; H200 BF16: 206 FLOP/byte</td><td><a href="#src-8">[S8]</a><a href="#src-9">[S9]</a></td></tr>
+<tr><td>Cost per M tokens</td><td>(GPU $/h) &divide; (tokens/s &times; 3,600) &times; 10<sup>6</sup></td><td>$3.50/h at 1,353 tok/s (batch 32): $0.72 (derived; price assumed)</td><td><a href="#src-9">[S9]</a></td></tr>
+<tr><td>Energy per answer</td><td>J per token &times; tokens &divide; 3,600</td><td>About 1&nbsp;J/token: 0.27&nbsp;Wh per 1,000 tokens (derived); published 0.24&ndash;0.3&nbsp;Wh</td><td><a href="#src-18">[S18]</a><a href="#src-66">[S66]</a></td></tr>
+<tr><td>Rack power</td><td>Rack kW &divide; GPUs</td><td>GB200 NVL72: 132 / 72 = 1.83&nbsp;kW per GPU; 192&nbsp;kW peak design</td><td><a href="#src-10">[S10]</a><a href="#src-68">[S68]</a></td></tr>
+<tr><td>Cluster power</td><td>GPUs &times; kW per GPU &times; PUE</td><td>100k H100: 153&nbsp;MW; 100k GB200: 220&nbsp;MW at PUE 1.2 (assumed)</td><td><a href="#src-70">[S70]</a><a href="#src-68">[S68]</a></td></tr>
+<tr><td>Training power swings</td><td>Synchronous load steps</td><td>&ldquo;Tens of megawatts&rdquo;; 419 interruptions in 54 days on 16K H100</td><td><a href="#src-2">[S2]</a></td></tr>
+<tr><td>Agent run cost</td><td>steps &times; (context &times; in-price + output &times; out-price)</td><td>30 steps, 40k context: $2.64 uncached, $0.36 with caching (derived)</td><td><a href="#src-27">[S27]</a></td></tr>
+<tr><td>Agent security</td><td>Tool output is untrusted input</td><td>Sandbox, least privilege, approval for irreversible actions</td><td><a href="#src-61">[S61]</a></td></tr>
+<tr><td>Benchmarks</td><td>Compare under the same harness</td><td>SWE-bench Verified official top: 79.2%</td><td><a href="#src-22">[S22]</a></td></tr>
+<tr><td>Frontier trend</td><td>Compute &times; 5 per year</td><td>Largest estimated run 9.4e26 FLOP, about 233&nbsp;MW</td><td><a href="#src-64">[S64]</a><a href="#src-65">[S65]</a></td></tr>
+<tr><td>Energy at scale</td><td>Prompts per day &times; Wh &divide; 24&nbsp;h</td><td>1 billion at 0.24&nbsp;Wh: 240&nbsp;MWh/day, 10&nbsp;MW average (derived)</td><td><a href="#src-18">[S18]</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Four numbers cover most conversations with a team that wants to run a model: weight bytes (<code>N &times; bytes</code>), KV bytes per token and the context length you will allow, the bandwidth ceiling (<code>bandwidth &divide; weight bytes</code>), and the rack kW that the GPUs behind those numbers draw.</p>

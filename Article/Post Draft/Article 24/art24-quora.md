@@ -42,4 +42,4 @@ A realistic timeline: 6-12 months of training, a $45,000 starting role, and prog
 
 I wrote a full analysis covering the workforce data, salary breakdowns by role and region, geographic hotspots, training programs, and built an interactive salary calculator.
 
-Full article: [resistancezero.com/article-24.html](https://resistancezero.com/article-24.html)
+Full article: [resistancezero.com/article-24.html](https://resistancezero.com/article-24.html?utm_source=quora&utm_medium=social&utm_campaign=a24)

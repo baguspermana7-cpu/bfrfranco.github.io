@@ -1,4 +1,5 @@
 Title: The Wrong Model for Data Center Spare Parts — And What to Use Instead
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

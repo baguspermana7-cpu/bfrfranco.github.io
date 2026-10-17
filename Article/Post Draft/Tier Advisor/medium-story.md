@@ -1,4 +1,5 @@
 SEO Title: Data Center Tier Classification: Beyond the Marketing
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Description: Free interactive tool maps your power, cooling, and network infrastructure to Uptime Institute, TIA-942, and EN 50600 tier levels with regional compliance.
 Tags: Data Center, Tier Classification, Uptime Institute, Infrastructure, Compliance
 

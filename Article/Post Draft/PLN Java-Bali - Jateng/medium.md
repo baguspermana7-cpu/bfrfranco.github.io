@@ -1,4 +1,5 @@
 Title: Central Java's Grid Paradox — Highest Renewable Share, Heaviest Coal Corridor
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

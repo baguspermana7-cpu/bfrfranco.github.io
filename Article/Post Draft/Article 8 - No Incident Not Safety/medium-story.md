@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: No Incident Is Not Evidence of Safety
 (Preview: "No Incident Is Not Evidence of Safety | by Bagusdpermana | Medium" = 65 chars, fits 74 limit)
 SEO Description: 70% of data center outages had detectable precursors weeks before failure. Drift-to-failure theory, weak signal taxonomy, leading indicators, and Safety Health Index for critical infrastructure.
@@ -219,4 +220,4 @@ The full interactive article includes a Safety Health Index calculator that quan
 
 ---
 
-Originally published at [resistancezero.com](https://resistancezero.com/article-8.html)
+Originally published at [resistancezero.com](https://resistancezero.com/article-8.html?utm_source=medium&utm_medium=syndication&utm_campaign=a8)

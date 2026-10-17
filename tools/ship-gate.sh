@@ -245,6 +245,10 @@ gate "asset cache tokens — a token changes when its file does" node tools/test
 gate "cache tokens normalised — one asset, one token, adopted from the site not the clock" node tools/normalize-cache-tokens.mjs
 gate "min-twin freshness — no page runs a stale minified build" node tools/audit-min-twins.mjs --strict
 gate "OG card freshness — every card matches a fresh render of its generator" python3 tools/test-og-card-freshness.py
+gate "journal family — data = meta, grids generated, structure, filter in a browser, layers" node tools/test-journal.mjs
+gate "post drafts — five platforms + UTM links on every journal page" python3 tools/audit-post-drafts.py --strict
+gate "article series navigation — counts and Prev/Next current" python3 tools/test-article-series.py
+gate "article 29 LLM calculators — worked examples, sources, monotonicity" node tools/test-llm-calc.mjs
 gate "generator freshness — every generated artefact matches a fresh build" python3 tools/test-generator-freshness.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs

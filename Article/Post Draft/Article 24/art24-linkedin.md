@@ -42,6 +42,6 @@ Entry path: 6-12 months training, $45K starting, $100K+ within 3-5 years with th
 
 I wrote a comprehensive analysis covering the workforce crisis, salary data, geographic hotspots, training programs, and built an interactive salary calculator so you can estimate your own DC career trajectory.
 
-Full article: https://resistancezero.com/article-24.html
+Full article: https://resistancezero.com/article-24.html?utm_source=linkedin&utm_medium=social&utm_campaign=a24
 
 #DataCenter #Careers #SkilledTrades #HVAC #AIInfrastructure #WorkforceDevelopment #TechJobs #Engineering

@@ -1,4 +1,5 @@
 Title: 10 Years of Java-Bali Power Data — What the Generation Mix Actually Shows
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

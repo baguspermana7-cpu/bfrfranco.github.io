@@ -1,4 +1,5 @@
 SEO Title: The $50 Trillion Shift: Which Sectors Grow Fastest 2026-2036
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Description: Ranked analysis of 8 economic sectors scored across growth speed, scale, infrastructure pull, and risk. AI infrastructure leads at 88/100. Full methodology and counter-arguments included.
 Tags: AI, Economic Growth, Renewable Energy, Semiconductors, Data Centers
 
@@ -62,4 +63,4 @@ Power, chips, and regulatory capacity are the binding constraints. Those who und
 
 The full interactive analysis with all data tables, scoring methodology, confidence labels, and action maps for investors, operators, and career professionals is available at:
 
-https://resistancezero.com/geopolitics-2.html
+https://resistancezero.com/geopolitics-2.html?utm_source=medium&utm_medium=syndication&utm_campaign=g2

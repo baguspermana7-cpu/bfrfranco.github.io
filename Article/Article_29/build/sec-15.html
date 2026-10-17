@@ -1,0 +1,50 @@
+<h2 id="frontier">The frontier and its limits</h2>
+
+<p>The largest training runs have grown by about five times a year, and the people building them are now meeting three limits: the supply of human-written text, the cost of electricity and the physical size of a single site. The growth is shifting from bigger pre-training runs towards two other levers, reinforcement learning on checkable tasks and more thinking at answer time. All of these end up as megawatts, which is why this is a facilities topic and not only a research one.</p>
+
+<h3 id="compute-trend">Compute grows about five times a year</h3>
+
+<p>Epoch AI's dashboard puts frontier language-model training compute at roughly 5&times; per year since 2020, training cost at about 3.5&times; per year, and chip price-performance improving about 49% per year since 2023 <a href="#src-64">[S64]</a>. The ratio of the first two, 5 / 3.5 = 1.4, is of the same order as the 49% price-performance gain. The largest known runs, from Epoch's table of frontier models (estimates; read 2026-10-16) <a href="#src-65">[S65]</a>:</p>
+
+<div class="table-wrap">
+<table class="ws-table">
+<caption>Largest estimated training runs (Epoch AI estimates; closed-model figures are not published by the developers)</caption>
+<thead><tr><th scope="col">Model</th><th scope="col">Date</th><th scope="col">Training FLOP</th><th scope="col">Confidence</th><th scope="col">Hardware</th><th scope="col">Power</th></tr></thead>
+<tbody>
+<tr><td>GPT-6 Astra</td><td>2026-09-03</td><td class="n">9.4e26 (CI 5e26&ndash;2e27)</td><td>Likely</td><td>&ge;100k GB200, Abilene</td><td class="n">&asymp;233&nbsp;MW</td></tr>
+<tr><td>Grok 4</td><td>2025-07-09</td><td class="n">5.0e26</td><td>Speculative</td><td>&asymp;200k GPUs</td><td>&mdash;</td></tr>
+<tr><td>GPT-4.5</td><td>2025-02-27</td><td class="n">3.8e26</td><td>Likely</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td>Grok 3</td><td>2025-02-17</td><td class="n">3.5e26</td><td>Likely</td><td>&asymp;80k H100</td><td class="n">&asymp;110&nbsp;MW</td></tr>
+<tr><td>Llama 4 Behemoth (preview)</td><td>2025-04-05</td><td class="n">5.2e25</td><td>Likely</td><td>H100</td><td class="n">&asymp;44&nbsp;MW</td></tr>
+<tr><td>Llama 3.1 405B</td><td>2024-07-23</td><td class="n">3.8e25</td><td>Confident</td><td>16,384 H100</td><td class="n">&asymp;22.6&nbsp;MW</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Fourteen models in the dataset exceed 1e25 FLOP and four exceed 1e26 <a href="#src-65">[S65]</a>. Epoch's GPT-6 Astra estimate assumes about 100,000 GB200 for 90 days at 25% FP8 model-FLOPs utilisation. The implied sustained rate is 9.4e26 / (1e5 &times; 90 &times; 86,400&nbsp;s) = 1.21&nbsp;PFLOP/s per GPU (derived). On the 20-tokens-per-parameter rule a budget of 9.4e26 FLOP would suggest <code>N = &radic;(C/120) = &radic;(9.4e26 / 120)</code> = 2.8 trillion parameters trained on 56 trillion tokens (derived from the scaling-law relation <code>C = 6&middot;N&middot;20N</code>), though practice has moved well past 20 tokens per parameter for models meant to be served at scale. What is public is limited: compute and power come from Epoch's estimates built on developers' statements about cluster size, and exact FLOPs, costs and parameter counts of closed models are not published.</p>
+
+<h3 id="data-wall">The data wall and synthetic data</h3>
+
+<p>Villalobos et al. projected that, if trends continue, models will be trained on datasets &ldquo;roughly equal in size to the available stock of public human text data between 2026 and 2032&rdquo; <a href="#src-41">[S41]</a>. 2026 is the start of that window. The responses already in use are synthetic data (Qwen3 used &ldquo;trillions&rdquo; of synthetic tokens), reinforcement learning on tasks whose answers can be verified, and distillation from stronger models <a href="#src-3">[S3]</a><a href="#src-4">[S4]</a>. Each of these moves compute out of the pre-training run and into data generation and post-training.</p>
+
+<h3 id="test-time-axis">Test-time compute as the new axis</h3>
+
+<p>The <a href="glossary.html#term-scaling-law">scaling laws</a> that guided pre-training have a counterpart at inference: accuracy rises with the number of thinking tokens <a href="#src-57">[S57]</a><a href="#src-24">[S24]</a>. This moves cost from the training cluster to the serving fleet. Training is a project with an end date; thinking tokens are a recurring load that grows with usage and with the effort setting, so it adds permanent data-center capacity.</p>
+
+<h3 id="energy">Energy: per query, per run, per grid</h3>
+
+<ul>
+<li><strong>Per query.</strong> Google reports that the median Gemini Apps text prompt uses 0.24&nbsp;Wh, emits 0.03&nbsp;gCO<sub>2</sub>e and consumes 0.26&nbsp;mL of water, with energy per prompt down 33&times; in twelve months (August 2025) <a href="#src-18">[S18]</a>. Epoch estimates about 0.3&nbsp;Wh for a typical GPT-4o query, against an older claim of 3&nbsp;Wh <a href="#src-66">[S66]</a>. Because energy follows tokens, a long reasoning or agent run can cost one to two orders of magnitude more (derived from the serving section; not measured).</li>
+<li><strong>Per run.</strong> Epoch's power estimates in the table above run from about 22.6&nbsp;MW for Llama 3.1 405B to about 233&nbsp;MW for GPT-6 Astra. The worked 70B budget earlier in this article gives 25.1&nbsp;MW on 16,384 GPUs, consistent with the Llama 3 estimate.</li>
+<li><strong>Per grid.</strong> The IEA estimates data centres used about 415&nbsp;TWh in 2024, around 1.5% of world electricity, and projects about 945&nbsp;TWh in 2030 (an increase of 945 / 415 = 2.3&times;); the United States accounts for 45% of the 2024 use <a href="#src-67">[S67]</a>.</li>
+<li><strong>Scale illustration (derived).</strong> One billion prompts a day at 0.24&nbsp;Wh is 240&nbsp;MWh a day, which is 240 / 24 = 10&nbsp;MW on average.</li>
+</ul>
+
+<h3 id="open-closed">Open and closed models</h3>
+
+<p>Open-weight frontier-scale mixture-of-experts models now exist under MIT or Apache licences: DeepSeek-V4-Pro at 1.6 trillion parameters, Kimi K2 at 1 trillion, Qwen3 and gpt-oss <a href="#src-26">[S26]</a><a href="#src-25">[S25]</a><a href="#src-3">[S3]</a><a href="#src-24">[S24]</a>. Closed models from Anthropic, OpenAI and Google do not disclose their sizes <a href="#src-27">[S27]</a><a href="#src-28">[S28]</a><a href="#src-29">[S29]</a>. On the official SWE-bench board the best entries are close (79.2 against 78.8), though the second entry is a vendor agent built around Doubao-Seed-Code, whose weights may not be open, which is unverified <a href="#src-22">[S22]</a>. For an operator the practical difference is who carries the serving cost: with open weights you can run the model on your own racks and you carry the hardware sizing described in the earlier sections.</p>
+
+<div class="ws-insight-box">
+<h4>Plan for serving growth, not only for a training run</h4>
+<p>A single frontier training run is estimated at 233&nbsp;MW, but the load that keeps growing is inference: every higher effort setting, every agent step and every extra user adds tokens. At 0.24&ndash;0.3&nbsp;Wh per ordinary prompt the energy is small per query and large in aggregate, so capacity plans should carry tokens per day as a first-class input.</p>
+</div>

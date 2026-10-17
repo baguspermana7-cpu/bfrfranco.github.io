@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: How AWS, Google, and Microsoft Power Their Data Centers
 (Preview: "How AWS, Google, and Microsoft Power Their Data Centers | by Bagusdpermana | Medium" = 73 chars, fits 74 limit)
 SEO Description: AWS distributed UPS cuts losses by 35%. Google 48V DC reduces distribution losses 16x. Microsoft Mt Diablo enables 1 MW racks. xAI Colossus draws 2 GW. A deep dive into hyperscaler power design.
@@ -134,4 +135,4 @@ The critical design principles for AI-era power distribution are: design for the
 
 Originally published at resistancezero.com
 
-Full analysis with interactive power distribution calculator, availability modeling, and hyperscaler architecture diagrams: https://resistancezero.com/article-13.html
+Full analysis with interactive power distribution calculator, availability modeling, and hyperscaler architecture diagrams: https://resistancezero.com/article-13.html?utm_source=medium&utm_medium=syndication&utm_campaign=a13

@@ -1,4 +1,5 @@
 # Two Inputs, One Heatmap: How Sensitivity Surfaces Answer "What Should I Fix First?"
+*Publish via medium.com/p/import (sets the canonical).*
 
 (74-char title: "Two Inputs, One Heatmap: Sensitivity Surfaces for Spares Decisions")
 

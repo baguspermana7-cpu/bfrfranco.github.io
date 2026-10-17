@@ -112,8 +112,15 @@ def sync_footer(text: str, names: list[str], position: int) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--patch", action="store_true")
+    parser.add_argument("--apply", action="store_true", help="write the synced navigation blocks in place (v3.24.1: the step every new article runs)")
     args = parser.parse_args()
     changes = collect_changes(ROOT)
+    if args.apply:
+        for name, before, after in changes:
+            (ROOT / name).write_text(after, encoding="utf-8")
+            print(f"SYNCED {name}")
+        print(f"{len(changes)} series navigation block(s) written")
+        return 0
     if args.patch:
         print("*** Begin Patch")
         for name, before, after in changes:

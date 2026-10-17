@@ -1,4 +1,5 @@
 Title: The Invisible PFAS Problem in Data Centers Nobody Is Counting
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

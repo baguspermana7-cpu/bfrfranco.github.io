@@ -1,4 +1,5 @@
 # Medium — LTC Labs
+*Publish via medium.com/p/import (sets the canonical).*
 
 **SEO title** (≤74): Running Standards as Workbenches — A Lab Cluster for DC Compliance
 

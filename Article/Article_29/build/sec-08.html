@@ -1,0 +1,64 @@
+<h2 id="training">Training: from 15 trillion tokens to a base model</h2>
+
+<p>Training starts with a pile of text, filtered and mixed, and a model whose weights are random. The model reads a batch, predicts every next token, measures how wrong it was, and nudges the weights to be less wrong. That step repeats millions of times, on thousands of GPUs, for weeks. The outcome is a base model that continues text well. Everything it later does as an assistant is built on top of that.</p>
+
+<h3 id="data">8.1 The data pipeline and the mix</h3>
+
+<p>Sources are web crawl, code, books, papers, multilingual text and synthetic data. Meta&rsquo;s final Llama&nbsp;3 mix was about 50% general knowledge, 25% maths and reasoning, 17% code and 8% multilingual <a href="#src-2">[S2]</a>. Processing includes deduplication at URL, document and line level, heuristic and model-based quality filters, personal-data removal, and a classifier that down-samples over-represented topics; the proportions were chosen using small-model scaling experiments <a href="#src-2">[S2]</a>. Qwen3 uses 36T tokens in 119 languages and dialects, adds text extracted from PDFs, and generates &ldquo;trillions&rdquo; of synthetic tokens with its maths and coding models <a href="#src-3">[S3]</a>. DeepSeek-V3 packs documents without cross-sample attention masks and trains partly with a fill-in-the-middle objective <a href="#src-1">[S1]</a>.</p>
+
+<p>Public human text is finite. Villalobos et&nbsp;al. project that training sets will be roughly equal to the available stock of public human text between 2026 and 2032 <a href="#src-41">[S41]</a>. That window includes the present year, which is why synthetic data and reinforcement learning are now where growth is being pursued.</p>
+
+<figure class="rz-figure" data-rz-figure="llm-d5"></figure>
+
+<h3 id="objective">8.2 Objective, optimiser, schedule, precision</h3>
+
+<p>The objective is next-token cross-entropy (section 6). DeepSeek-V3 adds a multi-token-prediction loss of depth 1 <a href="#src-1">[S1]</a>. The optimiser is AdamW. DeepSeek-V3 used <code>&beta;&#8321; = 0.9</code>, <code>&beta;&#8322; = 0.95</code>, weight decay 0.1, a peak learning rate of 2.2e-4 after a 2K-step linear warm-up, then constant, then cosine decay, with gradient clipping at 1.0 <a href="#src-1">[S1]</a>. Llama&nbsp;3 peak rates fell with size: 3e-4 (8B), 1.5e-4 (70B), 8e-5 (405B) <a href="#src-2">[S2]</a>. Kimi K2 used the Muon optimiser <a href="#src-25">[S25]</a>. The Llama&nbsp;3&nbsp;405B run used 16M tokens per batch at sequence length 8,192 <a href="#src-2">[S2]</a>.</p>
+
+<p>The default number format is BF16. DeepSeek-V3 ran its matrix multiplies (forward, input-gradient and weight-gradient) in <a href="glossary.html#term-fp8">FP8</a> with fine-grained tile and block scaling, keeping sensitive operations in higher precision <a href="#src-1">[S1]</a>. DeepSeek-V4 ships its expert weights in FP4 and the remaining weights in FP8 <a href="#src-26">[S26]</a>.</p>
+
+<h3 id="scaling-laws">8.3 Scaling laws</h3>
+
+<p>Three results frame how big to train. Kaplan et&nbsp;al. (2020) found loss falling as a power law in parameters, <code>L(N) = (N_c/N)^0.076</code>, in data, <code>L(D) = (D_c/D)^0.095</code>, and in compute with exponent about 0.050; their allocation rule was <code>N &prop; C^0.73</code>, which says to grow the model much faster than the data <a href="#src-7">[S7]</a>. Hoffmann et&nbsp;al. (Chinchilla, 2022) fitted <code>L(N,D) = E + A/N^&alpha; + B/D^&beta;</code> and concluded the opposite: for each doubling of model size, double the tokens. Their 70B model trained on 1.4T tokens, using the same compute as the 280B Gopher, reached 67.5% on MMLU <a href="#src-5">[S5]</a>. The fitted constants were E&nbsp;=&nbsp;1.6934, A&nbsp;=&nbsp;406.4, B&nbsp;=&nbsp;410.7, &alpha;&nbsp;=&nbsp;0.3392, &beta;&nbsp;=&nbsp;0.2849.</p>
+
+<p>A 2024 replication found that this parametric fit was inconsistent with the paper&rsquo;s other two methods (it implied about 70 tokens per parameter). The re-estimate, E&nbsp;=&nbsp;1.8172, A&nbsp;=&nbsp;482.01, B&nbsp;=&nbsp;2085.43, &alpha;&nbsp;=&nbsp;0.3478, &beta;&nbsp;=&nbsp;0.3658, gives &ldquo;around 20 tokens per parameter&rdquo; <a href="#src-6">[S6]</a>. The rule of thumb that follows: with <code>D = 20N</code>, <code>C = 6 &times; N &times; 20N = 120N&sup2;</code>, so <code>N_opt = &radic;(C/120)</code>. For Chinchilla&rsquo;s budget, <code>&radic;(5.76e23/120) = 69B</code> and <code>20 &times; 69B = 1.4T</code> tokens, as published. For Llama&nbsp;3&nbsp;405B&rsquo;s budget of 3.8e25, the rule gives 563B parameters and 11.3T tokens; Meta reports that its own data-specific fits made 405B &ldquo;approximately compute-optimal&rdquo; <a href="#src-2">[S2]</a>. Section 7 showed why small models ignore the rule: compute-optimal means cheapest to train, not cheapest to use.</p>
+
+<h3 id="parallelism">8.4 Parallelism</h3>
+
+<p>No GPU holds a frontier model plus its training state. With mixed-precision Adam, each parameter needs 16 bytes: 2 for the weight, 2 for the gradient, 12 for the FP32 master copy and moments <a href="#src-60">[S60]</a>. For a 70B model that is <code>70e9 &times; 16 = 1.12 TB</code>, derived, before any activations. The state is split along several axes:</p>
+
+<ul>
+<li><strong>Data parallel and ZeRO/FSDP</strong>: replicas each take a slice of the batch and all-reduce gradients; ZeRO shards optimiser state, gradients and parameters across replicas, and trained models above 100B on 400 GPUs at 15 PFLOPS <a href="#src-60">[S60]</a>.</li>
+<li><strong>Tensor parallel</strong>: split each matrix across GPUs. Its traffic needs NVLink-class bandwidth, so it stays within one NVLink domain.</li>
+<li><strong>Pipeline parallel</strong>: assign consecutive layers to stages and use micro-batches to hide the idle &ldquo;bubble&rdquo;.</li>
+<li><strong>Context parallel</strong>: split one long sequence across GPUs.</li>
+<li><strong>Expert parallel</strong>: place experts on different GPUs, joined by all-to-all <a href="#src-1">[S1]</a>.</li>
+</ul>
+
+<p>Llama&nbsp;3&nbsp;405B combined tensor, context, pipeline and fully-sharded data parallelism. On 8,192 GPUs it ran TP8 &times; PP16 &times; DP64 at 430 TFLOP/s per GPU, 43% BF16 MFU; the reported <a href="glossary.html#term-mfu">MFU</a> range was 38&ndash;43% <a href="#src-2">[S2]</a>.</p>
+
+<h3 id="budget">8.5 A worked budget: 70B parameters, 15T tokens</h3>
+
+<p>Assumptions: a dense 70B model, 15T tokens, H100 SXM BF16 dense peak of 989 TFLOP/s <a href="#src-8">[S8]</a>, 40% MFU (inside Llama&nbsp;3&rsquo;s 38&ndash;43% <a href="#src-2">[S2]</a>), 1.275&nbsp;kW of IT power per GPU (DGX H100 maximum 10.2&nbsp;kW &divide; 8 <a href="#src-70">[S70]</a>), PUE 1.2 (assumed), and $2.00&ndash;3.00 per GPU-hour (an assumed market range, not a sourced price).</p>
+
+<ol>
+<li>Compute: <code>6 &times; 70e9 &times; 15e12 = 6.30e24</code> FLOP.</li>
+<li>Sustained per GPU: <code>989e12 &times; 0.40 = 3.956e14</code> FLOP/s.</li>
+<li>GPU-seconds: <code>6.30e24 / 3.956e14 = 1.593e10</code> s, which is <strong>4.42M GPU-hours</strong>.</li>
+<li>Wall clock on 16,384 GPUs: 270 hours, <strong>11.3 days</strong>; on 4,096 GPUs, about 45 days. Restarts excluded.</li>
+<li>Cost: $8.85M at $2, $11.06M at $2.50, $13.27M at $3 per GPU-hour.</li>
+<li>Energy: IT <code>4.42M &times; 1.275 kW = 5.64 GWh</code>; facility at PUE 1.2, <strong>6.77 GWh</strong>.</li>
+<li>Average facility power on 16,384 GPUs: <code>16,384 &times; 1.275 &times; 1.2 = 25.1 MW</code>.</li>
+</ol>
+
+<p>Two cross-checks. Meta reports 30.84M H100 GPU-hours for Llama&nbsp;3.1&nbsp;405B <a href="#src-69">[S69]</a>; <code>3.8e25 / (30.84e6 &times; 3600) = 342</code> TFLOP/s per GPU, 34.6% of the dense peak, which is below the 38&ndash;43% steady-state MFU because the GPU-hours include downtime and context extension. Epoch estimates that run&rsquo;s training power at about 22.6&nbsp;MW <a href="#src-65">[S65]</a>, consistent with step 7. For DeepSeek-V3, <code>6 &times; 37e9 &times; 14.8e12 = 3.29e24</code> FLOP over 2.664M pre-training GPU-hours is 343 TFLOP/s per GPU, which is 35% of the H100 BF16 dense peak if the H800 is assumed equal to it (that assumption is not sourced). Its widely quoted $5.576M is the final run at an assumed $2 per GPU-hour on 2.788M GPU-hours, and the report says it excludes prior research and ablation <a href="#src-1">[S1]</a>. The R1 reinforcement-learning stage was reported as $294k on 512 H800s for 80 hours <a href="#src-73">[S73]</a>; 512&nbsp;&times;&nbsp;80 = 40,960 GPU-hours is $82k at $2, so the figure evidently covers more than that run, and its composition is not verified.</p>
+
+<div class="llm-calc" data-llm-calc="training"></div>
+
+<h3 id="power-swings">8.6 What a 16K-GPU job does to your power system</h3>
+
+<p>Synchronous training makes the whole cluster compute, then communicate, in step. Meta reports that this makes power swing by &ldquo;on the order of tens of megawatts&rdquo; <a href="#src-2">[S2]</a>. UPS, generators and the utility interconnect must tolerate that load step; the article on xAI Colossus (150&nbsp;MW in 122 days) on this site covers the other end of the scale. Meta also reports 419 unexpected interruptions in 54 days on 16K H100 GPUs <a href="#src-2">[S2]</a>, roughly one every three hours, and still achieved more than 90% effective training time. A training hall is therefore a facility that loses and regains tens of megawatts of load repeatedly, which is a different duty from an enterprise hall at steady state.</p>
+
+<div class="ws-insight-box">
+<h4>Operator takeaway</h4>
+<p>The 25.1&nbsp;MW average hides the swing. Specify power quality against the step in load and its recovery after a restart, not against the mean, and treat a restart event as a normal operating condition.</p>
+</div>

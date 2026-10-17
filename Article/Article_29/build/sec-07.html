@@ -1,0 +1,66 @@
+<h2 id="families">Model families in 2026: who is how big</h2>
+
+<p>As of mid-October 2026 the models worth knowing fall into two groups. Open-weight models publish their size, so their memory footprint can be computed. Closed models from Anthropic, OpenAI and Google publish a context window and a price but no parameter count, and any figure quoted for them is a guess. Among the open models, the largest are mixtures of experts with one to two orders of magnitude fewer active than total parameters.</p>
+
+<h3 id="dense-moe-open-closed">7.1 Dense versus MoE, open versus closed</h3>
+
+<p>A dense model uses all its parameters on every token, so total equals active. An MoE has a total much larger than its active count (section 5). Memory, and therefore the hardware tier, follows the total; per-token compute follows the active count. For closed models, parameter counts are not published by Anthropic, OpenAI or Google, and this article does not repeat figures seen elsewhere.</p>
+
+<h3 id="family-table">7.2 The table</h3>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>Model families as of 2026-10-16. n/p = not published. Licences as stated on each source.</caption>
+<thead><tr><th>Model</th><th>Type</th><th>Total / active</th><th>Context</th><th>Pre-train tokens</th><th>Licence</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Llama 3.1 8B / 70B / 405B</td><td>dense</td><td class="n">8B / 70B / 405B</td><td class="n">128K</td><td class="n">~15T (15.6T for 405B)</td><td>Llama 3.1 Community</td><td><a href="#src-69">[S69]</a> <a href="#src-2">[S2]</a></td></tr>
+<tr><td>Llama 4 Scout</td><td>MoE, 16 experts</td><td class="n">109B / 17B</td><td class="n">10M</td><td class="n">~40T</td><td>Llama 4 Community (700M MAU clause)</td><td><a href="#src-23">[S23]</a></td></tr>
+<tr><td>Llama 4 Maverick</td><td>MoE, 128 experts</td><td class="n">400B / 17B</td><td class="n">1M</td><td class="n">~22T</td><td>Llama 4 Community</td><td><a href="#src-23">[S23]</a></td></tr>
+<tr><td>Qwen3-32B</td><td>dense</td><td class="n">32B</td><td class="n">128K</td><td class="n">36T</td><td>Apache 2.0</td><td><a href="#src-3">[S3]</a></td></tr>
+<tr><td>Qwen3-30B-A3B</td><td>MoE, 128/8</td><td class="n">30B / 3B</td><td class="n">128K</td><td class="n">36T</td><td>Apache 2.0</td><td><a href="#src-3">[S3]</a></td></tr>
+<tr><td>Qwen3-235B-A22B</td><td>MoE, 128/8</td><td class="n">235B / 22B</td><td class="n">128K</td><td class="n">36T</td><td>Apache 2.0</td><td><a href="#src-3">[S3]</a></td></tr>
+<tr><td>DeepSeek-V3</td><td>MoE, 256+1/8</td><td class="n">671B / 37B</td><td class="n">128K</td><td class="n">14.8T</td><td>MIT (weights; see repository)</td><td><a href="#src-1">[S1]</a></td></tr>
+<tr><td>DeepSeek-R1</td><td>MoE (V3 base)</td><td class="n">671B / 37B</td><td class="n">128K</td><td>V3 base</td><td>MIT</td><td><a href="#src-4">[S4]</a></td></tr>
+<tr><td>DeepSeek-V4-Pro</td><td>MoE, CSA+HCA</td><td class="n">1.6T / 49B</td><td class="n">1M</td><td class="n">&gt;32T</td><td>MIT</td><td><a href="#src-26">[S26]</a></td></tr>
+<tr><td>DeepSeek-V4-Flash</td><td>MoE</td><td class="n">284B / 13B</td><td class="n">1M</td><td class="n">&gt;32T</td><td>MIT</td><td><a href="#src-26">[S26]</a></td></tr>
+<tr><td>Kimi K2</td><td>MoE, 384/8, MLA</td><td class="n">1T / 32B</td><td class="n">128K</td><td class="n">15.5T</td><td>Modified MIT</td><td><a href="#src-25">[S25]</a></td></tr>
+<tr><td>gpt-oss-120b</td><td>MoE, MXFP4</td><td class="n">117B / 5.1B</td><td>not stated in the source extract</td><td>n/p</td><td>Apache 2.0</td><td><a href="#src-24">[S24]</a></td></tr>
+<tr><td>Mistral 7B</td><td>dense</td><td class="n">7B</td><td>&mdash;</td><td>n/p</td><td>Apache 2.0</td><td><a href="#src-74">[S74]</a></td></tr>
+<tr><td>Claude Opus 5.5, Sonnet 5.5, Haiku 5.5, Fable 5.1</td><td>closed</td><td>n/p</td><td class="n">1M; 128K max output</td><td>n/p</td><td>proprietary</td><td><a href="#src-27">[S27]</a></td></tr>
+<tr><td>GPT-6 Astra, GPT-6.1 Sol, GPT-6 Luna</td><td>closed</td><td>n/p</td><td class="n">1.05M; 128K output</td><td>n/p</td><td>proprietary</td><td><a href="#src-28">[S28]</a></td></tr>
+<tr><td>Gemini 3.1 Pro (preview), 3.8 Flash</td><td>closed</td><td>n/p</td><td>reported 1M, not confirmed on the docs page read</td><td>n/p</td><td>proprietary</td><td><a href="#src-29">[S29]</a></td></tr>
+</tbody></table></div>
+
+<p>List prices per million tokens (input / output) on 2026-10-16: Claude Fable&nbsp;5.1 $10/$50, Opus&nbsp;5.5 $4/$20, Sonnet&nbsp;5.5 $2/$10, Haiku&nbsp;5.5 from $0.10/$0.50 <a href="#src-27">[S27]</a>; GPT-6 Astra $10/$50, GPT-6.1 Sol $2/$10, GPT-6 Luna $0.10/$0.50 <a href="#src-28">[S28]</a>; Gemini 3.1 Pro Preview $2/$12 up to 200K prompt tokens and $4/$18 above <a href="#src-29">[S29]</a>. Anthropic lists batch processing at 50% off and cache reads at 5&ndash;10% of the input price <a href="#src-27">[S27]</a>.</p>
+
+<h3 id="tokens-per-param">7.3 Tokens per parameter: why small models are over-trained</h3>
+
+<p>Divide pre-training tokens by parameters and the families separate sharply. The compute-optimal ratio from the Chinchilla study is about 20 <a href="#src-5">[S5]</a>. Everything else in the table follows from a different goal: a model that will be served billions of times is cheaper to run if it is small, so extra training compute is spent once to buy cheaper inference for its whole life.</p>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>Pre-training tokens per parameter, derived from the table above (tokens divided by total parameters unless stated).</caption>
+<thead><tr><th>Model</th><th>Arithmetic</th><th>Tokens per parameter</th></tr></thead>
+<tbody>
+<tr><td>Kimi K2</td><td class="n">15.5T / 1T</td><td class="n">15.5</td></tr>
+<tr><td>Chinchilla 70B</td><td class="n">1.4T / 70B</td><td class="n">20</td></tr>
+<tr><td>DeepSeek-V3 (total)</td><td class="n">14.8T / 671B</td><td class="n">22</td></tr>
+<tr><td>Llama 3.1 405B</td><td class="n">15.6T / 405B</td><td class="n">39</td></tr>
+<tr><td>Llama 4 Maverick</td><td class="n">22T / 400B</td><td class="n">55</td></tr>
+<tr><td>Llama 4 Scout</td><td class="n">40T / 109B</td><td class="n">367</td></tr>
+<tr><td>DeepSeek-V3 (active)</td><td class="n">14.8T / 37B</td><td class="n">400</td></tr>
+<tr><td>Llama 3 8B</td><td class="n">15T / 8B</td><td class="n">1,875</td></tr>
+<tr><td>Qwen3-0.6B</td><td class="n">36T / 0.6B</td><td class="n">60,000</td></tr>
+</tbody></table></div>
+
+<figure class="rz-chart" data-rz-chart>
+<div class="rz-chart-canvas"><canvas></canvas></div>
+<script type="application/json" class="rz-chart-cfg">
+{"type": "bar", "title": "Pre-training tokens per parameter (log scale)", "labels": ["Kimi K2", "Chinchilla 70B", "Llama 3.1 405B", "Llama 4 Scout", "Llama 3 8B", "Qwen3-0.6B"], "series": [{"label": "Tokens per parameter", "data": [15.5, 20, 39, 367, 1875, 60000], "unit": ""}], "x": "Model", "yLabel": "Tokens per parameter (log)", "logY": true, "source": "Derived: token counts from Kimi K2, Chinchilla (arXiv 2203.15556), Llama 3 (arXiv 2407.21783), Llama 4 and Qwen3 model cards and reports", "basisTag": "derived"}
+</script>
+</figure>
+
+<p>Qwen3-0.6B sees 3,000 times more tokens per weight than Chinchilla&rsquo;s optimum (<code>60,000 / 20</code>). The small model is not compute-optimal for training, and it is not meant to be. It is built to fit a phone or to serve at very low cost per token.</p>
+
+<div class="ws-insight-box">
+<h4>Operator takeaway</h4>
+<p>A model name tells you less than three numbers: total parameters for the memory tier, active parameters for compute per token, and the licence for whether you may host it. For closed models you get a price and a window, and the hardware is the vendor&rsquo;s concern.</p>
+</div>

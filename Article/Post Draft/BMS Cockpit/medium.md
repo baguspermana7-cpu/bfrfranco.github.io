@@ -1,4 +1,5 @@
 # Medium — BMS Cockpit cluster
+*Publish via medium.com/p/import (sets the canonical).*
 
 **SEO title** (≤74): The Data-Center Cockpit Above the SCADA — An Industrial-Instrumentation Take
 

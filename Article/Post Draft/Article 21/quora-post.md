@@ -48,6 +48,6 @@ But Big Tech has something traditional utilities did not: combined cash reserves
 
 My timeline: Microsoft's TMI restart in 2027 is highly likely (existing reactor). The first commercial SMR operations targeting data centers will not arrive before 2030. This is a 2030s solution being planned today.
 
-I wrote a comprehensive engineering analysis covering all deals, a 7-reactor technology comparison, cost breakdown, grid impact data, and the water angle: https://resistancezero.com/article-21.html
+I wrote a comprehensive engineering analysis covering all deals, a 7-reactor technology comparison, cost breakdown, grid impact data, and the water angle: https://resistancezero.com/article-21.html?utm_source=quora&utm_medium=social&utm_campaign=a21
 
 Sources: IEA Energy and AI Report 2024, Goldman Sachs data center power forecast, LBNL/DOE data center electricity study, Constellation Energy press release, Amazon/Google/Meta nuclear announcements, NuScale SEC filings, FERC orders.

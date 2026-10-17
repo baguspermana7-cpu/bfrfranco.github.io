@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: Why Post-Incident RCA Fails Without Design Authority
 (Preview: "Why Post-Incident RCA Fails Without Design Authority | by Bagusdpermana | Medium" = 69 chars, fits 74 limit)
 SEO Description: 60% of data center incidents repeat root causes already found. RCA effectiveness equation, five methodology comparison, six-dimension scorecard, and RCA-to-design pipeline for critical infrastructure.
@@ -205,6 +206,6 @@ When RCA gains the power to redesign, learning becomes real and recurrence decli
 
 ---
 
-Originally published at [resistancezero.com](https://resistancezero.com/article-6.html)
+Originally published at [resistancezero.com](https://resistancezero.com/article-6.html?utm_source=medium&utm_medium=syndication&utm_campaign=a6)
 
-Read the full interactive article with the RCA Effectiveness Scorecard calculator, RCA Authority Canvas visualization, and complete methodology comparison at [resistancezero.com/article-6.html](https://resistancezero.com/article-6.html)
+Read the full interactive article with the RCA Effectiveness Scorecard calculator, RCA Authority Canvas visualization, and complete methodology comparison at [resistancezero.com/article-6.html](https://resistancezero.com/article-6.html?utm_source=medium&utm_medium=syndication&utm_campaign=a6)

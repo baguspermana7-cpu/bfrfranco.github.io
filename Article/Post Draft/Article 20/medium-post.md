@@ -1,4 +1,5 @@
 # Medium Post
+*Publish via medium.com/p/import (sets the canonical).*
 
 ## Title
 Sam Altman Says AI Water Concerns Are "Fake" -- A Data Center Engineer's Fact-Check
@@ -70,7 +71,7 @@ What is not helpful is a tech CEO standing on a global stage and calling the con
 
 The water data is not fake. The communities are not fake. And the 68 billion gallons projected by 2028 will not be fake either -- unless the industry takes the problem seriously enough to actually solve it.
 
-Full article with verdict table, evidence cards, and complete sources: https://resistancezero.com/article-20.html
+Full article with verdict table, evidence cards, and complete sources: https://resistancezero.com/article-20.html?utm_source=medium&utm_medium=syndication&utm_campaign=a20
 
 ---
 

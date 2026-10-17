@@ -34,6 +34,6 @@ MY TIMELINE
 SMRs are a 2030s solution being planned today. For 2028 power needs, natural gas and existing nuclear PPAs remain the only options.
 
 Full analysis with 7-reactor comparison, cost breakdown, and grid data:
-https://resistancezero.com/article-21.html
+https://resistancezero.com/article-21.html?utm_source=linkedin&utm_medium=social&utm_campaign=a21
 
 #Nuclear #DataCenters #AI #SMR #Energy #Infrastructure #CleanEnergy #Engineering

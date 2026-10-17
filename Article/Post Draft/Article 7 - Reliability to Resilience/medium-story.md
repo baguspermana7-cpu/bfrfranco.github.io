@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: Why Tier Ratings Stop at Design and Miss Resilience
 (Preview: "Why Tier Ratings Stop at Design and Miss Resilience | by Bagusdpermana | Medium" = 67 chars, fits 74 limit)
 SEO Description: Two identical Tier III data centers, same design, opposite outcomes under stress. 60-80% of outages are human/process failures. A 7-dimension resilience framework fills the gap.
@@ -191,4 +192,4 @@ The answer will tell you more about the facility's real resilience than any cert
 
 Originally published at resistancezero.com
 
-Full analysis with interactive resilience vs reliability canvas and 7-dimension assessment calculator: https://resistancezero.com/article-7.html
+Full analysis with interactive resilience vs reliability canvas and 7-dimension assessment calculator: https://resistancezero.com/article-7.html?utm_source=medium&utm_medium=syndication&utm_campaign=a7

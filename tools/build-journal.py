@@ -55,13 +55,13 @@ TOPIC_OF = {
     'article-13': 'power', 'article-14': 'market', 'article-15': 'ops', 'article-16': 'market',
     'article-17': 'market', 'article-18': 'ai', 'article-19': 'market', 'article-20': 'water',
     'article-21': 'power', 'article-22': 'ai', 'article-23': 'ai', 'article-24': 'workforce',
-    'article-25': 'power', 'article-26': 'cooling', 'article-27': 'workforce', 'article-28': 'ai',
+    'article-25': 'power', 'article-26': 'cooling', 'article-27': 'workforce', 'article-28': 'ai', 'article-29': 'ai',
     'FF-1': 'ai', 'FF-2': 'ai', 'FF-3': 'workforce',
     'geopolitics-1': 'reliability', 'geopolitics-2': 'market', 'geopolitics-3': 'reliability',
 }
-SERIES_OF = {'article-25': 'global', 'article-26': 'global', 'article-27': 'global', 'article-28': 'ff',
+SERIES_OF = {'article-25': 'global', 'article-26': 'global', 'article-27': 'global', 'article-28': 'ff', 'article-29': 'ff',
              'article-14': 'global', 'article-16': 'global', 'article-17': 'global', 'article-19': 'global'}
-PAGES = ['article-%d' % n for n in range(1, 29)] + ['FF-1', 'FF-2', 'FF-3', 'geopolitics-1', 'geopolitics-2', 'geopolitics-3']
+PAGES = ['article-%d' % n for n in range(1, 30)] + ['FF-1', 'FF-2', 'FF-3', 'geopolitics-1', 'geopolitics-2', 'geopolitics-3']
 SPLICE_PAGES = ['articles.html', 'articles1.html', 'insights.html', 'geopolitics.html', 'future-forward.html']
 
 META_RE = re.compile(r'<meta\s+(?:property|name)="([^"]+)"\s+content="([^"]*)"', re.I)

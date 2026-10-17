@@ -29,4 +29,4 @@ The site location makes this worse — South Memphis already hosts 22 of Tenness
 
 The engineering achievement is real. The environmental compliance failure is also real. Both things are true simultaneously, and the industry needs to learn from both.
 
-Full engineering analysis with an interactive calculator: [resistancezero.com/article-23.html](https://resistancezero.com/article-23.html)
+Full engineering analysis with an interactive calculator: [resistancezero.com/article-23.html](https://resistancezero.com/article-23.html?utm_source=quora&utm_medium=social&utm_campaign=a23)

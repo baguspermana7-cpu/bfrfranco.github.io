@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: In-House Capability Is a Reliability Strategy, Not a Cost Decision
 (Preview: "In-House Capability Is a Reliability Strategy, Not a Cost Decision | by Bagusdpermana | Medium" = 74 chars, fits 74 limit)
 SEO Description: MTTR decomposition of 428 incidents reveals vendor mobilization as the dominant bottleneck. ICB framework and capability layering reduce incident response time by 61%.
@@ -155,7 +156,7 @@ The question for operations leaders is not whether they can afford the investmen
 
 Originally published at resistancezero.com
 
-Read the full article with interactive MTTR calculator, five-phase decomposition data, and the ICB framework breakdown: https://resistancezero.com/article-4.html
+Read the full article with interactive MTTR calculator, five-phase decomposition data, and the ICB framework breakdown: https://resistancezero.com/article-4.html?utm_source=medium&utm_medium=syndication&utm_campaign=a4
 
 ---
 

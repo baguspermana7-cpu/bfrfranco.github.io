@@ -1,0 +1,6 @@
+<section class="llm-calc-block">
+<h3>How fast and how cheap is serving? Throughput and cost per million tokens</h3>
+<p>This calculator is a roofline ceiling for decoding. Each step reads the weights and the KV cache once, so <code>t_mem = (W + B × KV_seq) / (n_gpus × BW)</code>, compared with <code>t_comp = 2 × N_active × B / (n_gpus × F)</code>. The step time is the larger of the two divided by an assumed bandwidth efficiency, throughput is <code>B / t_step</code>, and cost is <code>(n_gpus × price) / (throughput × 3600) × 1e6</code> dollars per million tokens. It is a ceiling-based estimate, not a benchmark. Every result has a "Show working" line that prints the formula and the numbers it used.</p>
+<div class="llm-calc" data-llm-calc="serve"></div>
+<p class="calc-basis">Basis: ceiling-based estimate, not a benchmark. Sources: GPU bandwidth, memory and FLOPs [S8] [S9] [S12] [S13] [S14]; power per GPU [S70]. Bandwidth efficiency, prefill utilisation and GPU price are assumptions. Constants as of 2026-10-16.</p>
+</section>

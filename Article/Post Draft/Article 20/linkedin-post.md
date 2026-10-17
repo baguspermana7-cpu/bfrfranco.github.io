@@ -30,6 +30,6 @@ Both things are true simultaneously: the industry is improving, AND the current 
 What is not helpful is dismissing the concerns of researchers, communities, and your own company's sustainability reports as "fake." That is not engineering. That is PR.
 
 Full fact-check with all sources, verdict table, and community impact analysis:
-https://resistancezero.com/article-20.html
+https://resistancezero.com/article-20.html?utm_source=linkedin&utm_medium=social&utm_campaign=a20
 
 #DataCenters #AI #Sustainability #WaterManagement #Infrastructure #Engineering #FactCheck #CriticalInfrastructure

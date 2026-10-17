@@ -1,4 +1,5 @@
 Title: The Jakarta Grid Concentration Problem — 18 DC Operators on One Backbone Node
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

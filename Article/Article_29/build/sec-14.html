@@ -1,0 +1,85 @@
+<h2 id="agents">Agents and harnesses</h2>
+
+<p>A model on its own only produces text. An <a href="glossary.html#term-agent">agent</a> is that model placed inside a loop: it proposes an action, ordinary software carries the action out and reports the result, and the model decides what to do next. The software around the model is the <a href="glossary.html#term-harness">harness</a>, and it, not the model, decides what is allowed to run, what gets checked and when to stop. For an operations team the practical point is that an agent turns one question into dozens of model calls, so cost, latency and security all multiply.</p>
+
+<h3 id="tool-calling">Tool calling, ReAct, workflows and agents</h3>
+
+<p>In <a href="glossary.html#term-tool-calling">tool calling</a> the model emits a structured request, typically JSON with a function name and arguments. The harness executes it and returns the result as a new message. The model never runs code itself. ReAct showed the value of interleaving reasoning, action and observation: on the ALFWorld and WebShop tasks it beat imitation and reinforcement-learning methods by 34 and 10 absolute points, using one or two in-context examples <a href="#src-42">[S42]</a>.</p>
+
+<p>Anthropic's guidance draws a line that is useful for scoping: &ldquo;Workflows are systems where LLMs and tools are orchestrated through predefined code paths. Agents are systems where LLMs dynamically direct their own processes and tool usage.&rdquo; Its patterns are prompt chaining, routing, parallelisation, orchestrator-workers and evaluator-optimiser, and its advice is to start simple and to design the agent-computer interface as carefully as a human interface <a href="#src-62">[S62]</a>. A fixed workflow is cheaper and easier to test; reach for an agent only when the steps cannot be known in advance.</p>
+
+<h3 id="mcp">The Model Context Protocol</h3>
+
+<p><a href="glossary.html#term-mcp">MCP</a> standardises how a model application connects to tools. It uses JSON-RPC 2.0 between <em>hosts</em> (the LLM application), <em>clients</em> (connectors) and <em>servers</em>. Servers expose <strong>resources</strong>, <strong>prompts</strong> and <strong>tools</strong>, and clients may offer elicitation, where the server asks the user for input. The version read for this article is the 2026-07-28 revision. Its security principles are user consent and control, data privacy and tool safety. It states that tools &ldquo;represent arbitrary code execution&rdquo; and that tool descriptions are to be treated as untrusted unless the server is trusted <a href="#src-61">[S61]</a>.</p>
+
+<h3 id="harness-design">Designing the harness</h3>
+
+<p>The model proposes; the harness disposes. A working checklist, drawn from the vendor guidance cited above <a href="#src-61">[S61]</a><a href="#src-62">[S62]</a>:</p>
+
+<ul>
+<li><strong>Context.</strong> Keep a small, clear set of tools with explicit schemas. Manage the window with summarisation or compaction, give sub-agents their own windows, and cache the stable prefix. Memory is the window itself, a retrieval store, or notes persisted to files.</li>
+<li><strong>Verification.</strong> Check results with tests, linters or an evaluator, not with the model that wrote them. A model grading itself shares its own blind spots.</li>
+<li><strong>Sandbox.</strong> Run tools in a container with no secrets and controlled network egress.</li>
+<li><strong>Budgets.</strong> Cap steps, tokens and wall-clock time.</li>
+<li><strong>Approval.</strong> Require a human to confirm irreversible actions.</li>
+<li><strong>Logging.</strong> Record every call so a run can be replayed.</li>
+</ul>
+
+<figure class="rz-figure" data-rz-figure="llm-d8"></figure>
+
+<p>Multi-agent designs, in which an orchestrator hands separable subtasks to parallel workers, spend tokens in proportion to the number of agents. Anthropic's advice is that this pays only when the subtasks are genuinely independent <a href="#src-62">[S62]</a>.</p>
+
+<h3 id="cost-latency">A run's cost and latency</h3>
+
+<p>Take an agent loop of 30 steps. Each step re-sends a 40,000-token context and generates 800 tokens, at Sonnet 5.5 list prices of $2 per million input tokens and $10 per million output tokens <a href="#src-27">[S27]</a> (derived):</p>
+
+<div class="table-wrap">
+<table class="ws-table">
+<caption>Cost of one 30-step agent run, with and without prompt caching (derived; list prices from the vendor)</caption>
+<thead><tr><th scope="col">Item</th><th scope="col">Tokens</th><th scope="col">Uncached</th><th scope="col">With cache reads</th></tr></thead>
+<tbody>
+<tr><td>Input (30 &times; 40,000)</td><td class="n">1,200,000</td><td class="n">$2.40</td><td class="n">$0.12</td></tr>
+<tr><td>Output (30 &times; 800)</td><td class="n">24,000</td><td class="n">$0.24</td><td class="n">$0.24</td></tr>
+<tr><td><strong>Total</strong></td><td></td><td class="n">$2.64</td><td class="n">$0.36</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The cached column assumes cache reads at 5% of the input price, so 1.2M &times; $0.10 per million = $0.12; cache-write costs are not modelled <a href="#src-27">[S27]</a>. Latency is 30 &times; (TTFT + 800 &times; TPOT). With an assumed 0.5&nbsp;s TTFT and 20&nbsp;ms per token, each step takes 0.5 + 800 &times; 0.02 = 16.5&nbsp;s and the run about 8 minutes. The rates in the latency line are assumptions. The lesson for capacity planning is that prefix caching, covered in the serving section, is worth more to an agent than to a chat, because the same long prefix is re-sent at every step.</p>
+
+<h3 id="failure-modes">Failure modes</h3>
+
+<ul>
+<li><strong>Hallucination.</strong> The sampler always produces some plausible continuation, so claims must be checked by tools or retrieval.</li>
+<li><strong><a href="glossary.html#term-prompt-injection">Prompt injection</a>.</strong> Instructions hidden in a web page, file or tool output can redirect the agent. MCP's specification treats tool descriptions as untrusted <a href="#src-61">[S61]</a>. Mitigations are least-privilege tools, human confirmation and isolating untrusted content.</li>
+<li><strong>Loops and drift.</strong> The agent repeats a call or forgets the goal. Step and token budgets and progress checks contain it.</li>
+<li><strong>Over-trust in self-verification.</strong> Use external checks, such as test suites.</li>
+</ul>
+
+<h3 id="evaluating-agents">Evaluating agents</h3>
+
+<p>SWE-bench consists of 2,294 real GitHub issues from 12 Python repositories. At its launch the best model, Claude 2, solved 1.96% <a href="#src-58">[S58]</a>. On the official SWE-bench Verified leaderboard data, read on 2026-10-16, the top entry is 79.2% (Claude 4.5 Opus with two different agent scaffolds, December 2025), followed by 78.8% and 77.4% <a href="#src-22">[S22]</a>. Higher figures for 2026 models circulate in vendor and aggregator material but do not appear on the official board, so this article does not quote them. Vendor-run examples: gpt-oss-120b at 62.4 with high reasoning effort <a href="#src-24">[S24]</a>, and Kimi K2 at 65.8 <a href="#src-25">[S25]</a>.</p>
+
+<p>GAIA poses 466 questions that real assistants face; humans score 92% against 15% for GPT-4 with plugins in the 2023 paper, and answers to 300 questions are withheld for the leaderboard <a href="#src-43">[S43]</a>. Current GAIA leaderboard values could not be read and are not quoted.</p>
+
+<p>Scores from different sources disagree for four reasons: contamination of training data with test items, saturation of an old benchmark, dependence on the agent scaffold (the same model scores differently under different harnesses, visible within the official board itself <a href="#src-22">[S22]</a>), and the difference between pass@1 and pass@k.</p>
+
+<h3 id="rag-long-context">RAG, long context or fine-tuning</h3>
+
+<div class="table-wrap">
+<table class="ws-table">
+<caption>Which tool for which need</caption>
+<thead><tr><th scope="col">Need</th><th scope="col">Best tool</th><th scope="col">Why</th></tr></thead>
+<tbody>
+<tr><td>Facts that change often, or are private</td><td><a href="glossary.html#term-rag">RAG</a> (retrieve, then generate)</td><td>Fresh and citable; cheap to update. Cost grows with the chunks retrieved</td></tr>
+<tr><td>One large document set per session, up to about 1M tokens</td><td>Long context with prompt caching</td><td>Current windows reach 1M tokens <a href="#src-27">[S27]</a><a href="#src-28">[S28]</a><a href="#src-26">[S26]</a>; cache reads cost 2.5&ndash;10% of input <a href="#src-27">[S27]</a>; the KV memory is the server's problem</td></tr>
+<tr><td>A behaviour, format, tone or narrow skill</td><td>Fine-tune (LoRA)</td><td>Changes how the model answers, not what it knows</td></tr>
+<tr><td>Smaller and cheaper at one fixed task</td><td>Distil</td><td>A 32B student keeps 91% of R1's AIME score <a href="#src-4">[S4]</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="ws-insight-box">
+<h4>Treat every tool result as hostile input</h4>
+<p>Give an agent the fewest tools and the least privilege that finish the job, run them in a sandbox without secrets, and require a person to approve anything irreversible. If an agent can read a web page and also run a command, a hidden instruction on the page can run the command.</p>
+</div>

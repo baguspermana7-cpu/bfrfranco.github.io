@@ -1,0 +1,58 @@
+<h2 id="block">Inside one block: embeddings, position, attention</h2>
+
+<p>Each token ID is swapped for a vector, told where it sits in the sequence, and then passed through a stack of identical blocks. In every block, each token looks back over the earlier tokens, weighs which ones matter, and mixes their information into its own vector; a second small network then reworks that vector. The model is this block repeated, 80 times in Llama&nbsp;3&nbsp;70B <a href="#src-2">[S2]</a>, with the same shapes at every depth. The parts are described below in the order the data meets them (see the block figure in section 1).</p>
+
+<h3 id="embeddings">3.1 Embeddings: a lookup table of meaning-vectors</h3>
+
+<p>An <a href="glossary.html#term-embedding">embedding</a> matrix <code>E</code> of shape <code>V &times; d</code> holds one row per vocabulary entry. Token ID 5,000 simply fetches row 5,000, a vector of <code>d</code> numbers (<code>d_model</code>, 8,192 for Llama&nbsp;3&nbsp;70B <a href="#src-2">[S2]</a>). The vector is the starting point for that token&rsquo;s meaning, and every later layer refines it. Small models often reuse the same matrix as the output head: Qwen3 0.6B, 1.7B and 4B tie input and output embeddings <a href="#src-3">[S3]</a>.</p>
+
+<h3 id="position">3.2 Position: from sinusoids to million-token contexts</h3>
+
+<p>Attention treats its inputs as an unordered set, so order has to be injected. <a href="glossary.html#term-positional-encoding">Positional encoding</a> has gone through four steps.</p>
+
+<ul>
+<li><strong>Sinusoidal (2017).</strong> A fixed pattern <code>PE(pos,2i) = sin(pos / 10000^(2i/d))</code> with the matching cosine, added to the embeddings <a href="#src-51">[S51]</a>.</li>
+<li><strong>RoPE.</strong> Rotary position embedding rotates each two-dimensional pair of query and key components by an angle <code>pos &times; &theta;_i</code>, with <code>&theta;_i = base^(&minus;2i/d)</code>. The dot product of a query and a key then depends only on their distance <a href="#src-47">[S47]</a>. <a href="glossary.html#term-rope">RoPE</a> is the common choice today; Llama&nbsp;3 uses base 500,000 <a href="#src-2">[S2]</a>.</li>
+<li><strong>ALiBi.</strong> No position vectors at all; each head subtracts a linear penalty <code>m &times; |i &minus; j|</code> from the attention scores. A 1.3B model trained on 1,024 tokens ran at 2,048 tokens with the same perplexity as a sinusoidal model trained at 2,048, and trained 11% faster using 11% less memory <a href="#src-48">[S48]</a>.</li>
+<li><strong>YaRN.</strong> Rescales the RoPE frequencies so a trained model can be extended to longer context, reported to need 10&times; fewer tokens and 2.5&times; fewer training steps than earlier extension methods <a href="#src-49">[S49]</a>.</li>
+</ul>
+
+<p>In practice the context is grown in stages. DeepSeek-V3 is pre-trained at 4K tokens, extended to 32K, then to 128K <a href="#src-1">[S1]</a>. Llama&nbsp;4 Scout is listed at 10M tokens and Maverick at 1M <a href="#src-23">[S23]</a>. DeepSeek-V4 claims 1M and swaps dense attention for a hybrid compressed-sparse scheme; at 1M it needs 27% of V3.2&rsquo;s per-token FLOPs and 10% of its KV cache <a href="#src-26">[S26]</a>.</p>
+
+<h3 id="attention">3.3 Attention, step by step</h3>
+
+<p>For a sequence of <code>n</code> token vectors <code>X</code> (shape <code>n &times; d</code>), one head of <a href="glossary.html#term-attention">attention</a> works as follows <a href="#src-51">[S51]</a>:</p>
+
+<pre class="formula">Q = X&middot;W_Q     K = X&middot;W_K     V = X&middot;W_V          (each W is d &times; d_h)
+S = Q&middot;K<sup>T</sup> / &radic;d_h                              (n &times; n scores)
+S_ij = &minus;&infin;  for j &gt; i                             (causal mask)
+A = softmax(S), row by row                        (each row sums to 1)
+head = A&middot;V</pre>
+
+<p>The query says what a token is looking for, the key says what each earlier token offers, and the value is the content that gets averaged. The mask forbids a token from seeing the future, which is what makes next-token training legal. The <a href="glossary.html#term-softmax">softmax</a> turns each row of scores into weights. The division by <code>&radic;d_h</code> exists because, for unit-variance components, <code>q&middot;k</code> has variance <code>d_h</code>; without scaling, the softmax saturates <a href="#src-51">[S51]</a>. With <code>d_h = 128</code>, the divisor is <code>&radic;128 = 11.3</code>, derived.</p>
+
+<figure class="rz-figure" data-rz-figure="llm-d2"></figure>
+
+<p>The cost is the catch. The score matrix is <code>n &times; n</code>, so compute grows as <code>n&sup2; &times; d</code> and a naive implementation writes <code>n&sup2;</code> numbers to HBM. FlashAttention computes the same exact result in tiles that stay in on-chip SRAM, never materialising the full matrix; it reported a 3&times; speed-up on GPT-2 at 1K context and the first better-than-chance result on the 16K-token Path-X task <a href="#src-50">[S50]</a>.</p>
+
+<h3 id="heads">3.4 Many heads, fewer KV heads</h3>
+
+<p>A layer runs <code>h</code> heads in parallel and concatenates them. Each head needs its own K and V during generation, and those are what the KV cache stores. Four designs reduce that load:</p>
+
+<ul>
+<li><strong>MHA</strong>: every query head has its own K/V (the original design).</li>
+<li><strong>MQA</strong>: all query heads share a single K/V head <a href="#src-46">[S46]</a>.</li>
+<li><a href="glossary.html#term-gqa">GQA</a>: <code>g</code> K/V groups with <code>1 &lt; g &lt; h</code> <a href="#src-45">[S45]</a>. Llama&nbsp;3 uses 8 KV heads at every size <a href="#src-2">[S2]</a>; Qwen3 MoE uses 4 <a href="#src-3">[S3]</a>. For Llama&nbsp;3&nbsp;70B that is <code>64 / 8 = 8&times;</code> less cache than MHA, derived.</li>
+<li><a href="glossary.html#term-mla">MLA</a> (DeepSeek-V2/V3): K and V are projected down into a shared latent of 512 numbers, plus a 64-number RoPE key. Only those 576 values per layer are cached; K and V are re-expanded when needed <a href="#src-1">[S1]</a>. Full MHA with 128 heads of 128 dimensions would store <code>2 &times; 128 &times; 128 = 32,768</code> values per layer, so MLA is <code>32,768 / 576 &asymp; 57&times;</code> smaller, derived.</li>
+</ul>
+
+<h3 id="ffn">3.5 The feed-forward network and the residual stream</h3>
+
+<p>After attention comes the <a href="glossary.html#term-ffn">FFN</a>, applied to each token independently. Llama-style models use a gated form, SwiGLU: <code>FFN(x) = W_down &middot; (SiLU(W_gate&middot;x) &odot; W_up&middot;x)</code> (background, <a href="#src-2">[S2]</a> for the model). It widens the vector to a hidden size several times <code>d</code>, applies a nonlinearity, and narrows it back. By parameter count it dominates: with MHA attention is about <code>4d&sup2;</code> weights per layer while a gated FFN is about <code>3 &times; d &times; d_ff</code>, roughly 8 to 10.5&nbsp;<code>d&sup2;</code>, so the FFN holds about two thirds of a dense block (derived). That is the part an MoE replaces (section 5).</p>
+
+<p>Both sub-layers write back with a residual add, in the pre-norm form <code>x &larr; x + Sublayer(Norm(x))</code>. The vector between blocks is the <a href="glossary.html#term-residual-stream">residual stream</a>; each block edits it and none replaces it, which keeps gradients healthy through 80 layers. The normalisation is <a href="glossary.html#term-rmsnorm">RMSNorm</a>, <code>x / RMS(x) &times; &gamma;</code>, which drops LayerNorm&rsquo;s mean subtraction and is cheaper. DeepSeek-V3 adds extra RMSNorms after its compressed latents <a href="#src-1">[S1]</a>.</p>
+
+<div class="ws-insight-box">
+<h4>Why the maths decides the hardware</h4>
+<p>Almost every operation above is a dense matrix multiply, which tensor cores run at near peak. Attention over a long context is the exception, because it also reads the cache. That one memory read per token is what the next section sizes.</p>
+</div>

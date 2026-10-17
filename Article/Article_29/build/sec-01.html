@@ -1,0 +1,39 @@
+<h2 id="answer">The one-paragraph answer</h2>
+
+<p>A large language model is a machine that, given some text, produces a probability for every possible next piece of text, picks one, appends it, and repeats. Everything else &mdash; the essays, the code, the tool calls of an agent &mdash; is that single loop run thousands of times. The loop is built from one repeated unit, the transformer block, and each block is almost entirely matrix multiplication. That is why the hardware looks the way it does: dense arithmetic units fed by very fast memory, packed into racks that draw 100&nbsp;kW and more.</p>
+
+<h3 id="answer-shape">The shape of the machine</h3>
+
+<p>Text is first cut into <a href="glossary.html#term-token">tokens</a> and each token becomes a vector of a few thousand numbers (an <a href="glossary.html#term-embedding">embedding</a>). That vector then passes through a stack of identical blocks. Llama&nbsp;3&nbsp;70B has 80 of them and a vector width of 8,192 <a href="#src-2">[S2]</a>. Each block does two things: <a href="glossary.html#term-attention">attention</a> lets every token gather information from the earlier tokens, and a feed-forward network (<a href="glossary.html#term-ffn">FFN</a>) transforms each token on its own. Both add their result back onto the running vector, the <a href="glossary.html#term-residual-stream">residual stream</a>. After the last block, the vector is converted into one score per vocabulary entry (the <a href="glossary.html#term-logits">logits</a>), and a sampler chooses the next token.</p>
+
+<figure class="rz-figure" data-rz-figure="llm-d1"></figure>
+
+<p>The &ldquo;knowledge&rdquo; of the model is the set of numbers inside those matrices, the <a href="glossary.html#term-parameters">parameters</a>. Llama&nbsp;3&nbsp;70B has 70&nbsp;billion of them. Nothing is looked up in a database at run time. The weights were shaped, once, by predicting the next token across trillions of tokens of text.</p>
+
+<h3 id="answer-two-formulas">Two formulas that size everything</h3>
+
+<p>Two approximations from the scaling-law literature <a href="#src-7">[S7]</a> carry most of this article. For a model with <code>N</code> parameters:</p>
+
+<pre class="formula">training compute   C &asymp; 6 &times; N &times; D        (D = training tokens)
+inference compute  &asymp; 2 &times; N_active per generated token</pre>
+
+<p>The factor 2 is one multiply and one add per weight in the forward pass. Training adds a backward pass that costs about twice the forward pass, so 2 + 4 = 6 <a href="#src-7">[S7]</a>. As a check, Meta trained Llama&nbsp;3&nbsp;405B on 15.6&nbsp;trillion tokens: <code>6 &times; 405e9 &times; 15.6e12 = 3.79e25</code> FLOP, against the 3.8e25 the paper states <a href="#src-2">[S2]</a>. For inference, a 70B dense model costs <code>2 &times; 70e9 = 1.4e11</code> FLOP per token.</p>
+
+<h3 id="answer-two-limits">Two different limits</h3>
+
+<p>Those FLOP counts say how much arithmetic is needed. They do not say how fast a GPU can do it, because the arithmetic is only half of the cost. To generate one token, a GPU must also stream every active weight from memory (HBM) to the compute units. At batch size 1 the arithmetic per byte moved is tiny, so the GPU waits on memory. Generation is therefore limited by <strong>memory bandwidth</strong>. Reading the prompt, and training, process many tokens per weight fetched, so they are limited by <strong>compute</strong>. The rest of the article is this split, worked out in numbers.</p>
+
+<ul>
+<li><strong>Talking</strong> (decode): bandwidth-bound. Tokens per second at batch 1 is at most HBM bandwidth divided by the bytes of weights. For a 70B model in FP8 on an H200 (4.8&nbsp;TB/s <a href="#src-9">[S9]</a>), that is <code>4.8e12 / 70.6e9 &asymp; 68</code> tokens per second, derived.</li>
+<li><strong>Reading and learning</strong> (prefill, training): compute-bound, so they scale with peak FLOP/s and with how much of it you keep busy (<a href="glossary.html#term-mfu">MFU</a>).</li>
+<li><strong>Remembering the conversation</strong>: the <a href="glossary.html#term-kv-cache">KV cache</a> grows with every token and competes with the weights for the same HBM (section 4).</li>
+</ul>
+
+<h3 id="answer-map">How the rest of the first half is organised</h3>
+
+<p>The next seven sections follow the data. Section 2 turns text into tokens and shows what a token costs. Section 3 opens one block. Section 4 sizes the memory that a conversation occupies while the model talks; for Llama&nbsp;3&nbsp;70B that is 320&nbsp;KiB per token, or 40&nbsp;GiB at a 128K-token context (derived from the shapes in <a href="#src-2">[S2]</a>). Section 5 explains why the largest open models are mixtures of experts that activate only a few percent of their weights. Section 6 covers how a token is chosen. Section 7 lists who has built what, and section 8 shows how a base model is trained and what that does to a power system.</p>
+
+<div class="ws-insight-box">
+<h4>What to carry into the later sections</h4>
+<p>Size the memory by total parameters plus the cache. Size the compute by active parameters times tokens. Size the electrical and cooling plant by the number of GPUs that those two requirements force you to rack together.</p>
+</div>

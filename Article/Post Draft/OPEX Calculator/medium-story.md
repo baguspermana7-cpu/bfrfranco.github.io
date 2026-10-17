@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: Data Center OPEX Calculator | by Bagusdpermana | Medium
 SEO Description: Free interactive calculator for estimating data center operational costs across 30+ countries. Model staffing, energy, maintenance, and climate-adjusted expenses with country-specific benchmarks.
 Tags: Data Center, OPEX, Operational Cost, Facility Management, Energy Efficiency

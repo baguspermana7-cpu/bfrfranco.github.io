@@ -1,4 +1,5 @@
 Title: Why TIA-942-B Compliance Is Harder Than Tier Labeling — And How to Self-Assess
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

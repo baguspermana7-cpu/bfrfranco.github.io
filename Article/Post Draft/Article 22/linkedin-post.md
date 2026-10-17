@@ -25,6 +25,6 @@ Jensen Huang's "AI factory" framework treats data centers as industrial machines
 
 I wrote a full engineering breakdown with an interactive AI Factory Interconnect Analyzer that compares copper DAC, pluggable optics, and CPO for different cluster configurations.
 
-Read the full analysis: https://resistancezero.com/article-22.html
+Read the full analysis: https://resistancezero.com/article-22.html?utm_source=linkedin&utm_medium=social&utm_campaign=a22
 
 #NVIDIA #Photonics #CoPackagedOptics #SiliconPhotonics #AIInfrastructure #DataCenter #Lumentum #Coherent #OpticalNetworking

@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: Global Data Center Market Tracker — 25+ Markets Mapped | by Bagusdpermana
 SEO Description: Free interactive dashboard tracking global data center capacity, construction pipeline, and market growth across 25+ markets with 2025-2030 projections and SVG world map.
 Tags: Data Center, Infrastructure, Market Research, Colocation, Cloud Computing

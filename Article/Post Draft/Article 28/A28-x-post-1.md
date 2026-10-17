@@ -22,4 +22,4 @@ And compute-per-capability halves ~every 8 months (Epoch AI), faster than Moore'
 7/ Practical payoff: make a default local model genuinely smart with ZERO training — base + quantize + RAG + tools. No GPU needed for ~80% of the win.
 
 Full piece 👇
-https://resistancezero.com/article-28.html
+https://resistancezero.com/article-28.html?utm_source=x&utm_medium=social&utm_campaign=a28

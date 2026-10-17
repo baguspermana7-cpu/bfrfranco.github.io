@@ -1,0 +1,49 @@
+<h2 id="kv-cache">The KV cache: where your HBM goes</h2>
+
+<p>When a model writes a reply, each new token needs the keys and values of every token before it. Recomputing them each step would be absurdly wasteful, so they are stored in GPU memory: the <a href="glossary.html#term-kv-cache">KV cache</a>. It grows with every token of every conversation, and it sits in the same HBM as the weights. On a long context, the cache, not the parameter count, decides how many users one GPU can hold.</p>
+
+<h3 id="kv-formula">4.1 The formula and a worked table</h3>
+
+<pre class="formula">KV bytes = 2 (K and V) &times; n_layers &times; n_kv_heads &times; d_head &times; bytes per value &times; tokens &times; batch</pre>
+
+<p>A check against a published number: OPT-13B has 40 layers, 40 heads of 128 dimensions in 16-bit values. <code>2 &times; 5,120 &times; 40 &times; 2 = 819,200</code> bytes, the 800&nbsp;KB per token stated in the vLLM paper <a href="#src-30">[S30]</a>. For Llama&nbsp;3&nbsp;70B (80 layers, 8 KV heads, d_head 128 <a href="#src-2">[S2]</a>): <code>2 &times; 80 &times; 8 &times; 128 &times; 2 = 327,680</code> bytes, which is 320&nbsp;KiB per token. At 128K tokens (131,072) that is <code>320 KiB &times; 131,072 = 40 GiB</code>, derived.</p>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>KV cache per sequence, 16-bit cache. All values derived from the layer and head counts in the cited sources.</caption>
+<thead><tr><th>Model</th><th>Layers / KV heads / d_head</th><th>KiB per token</th><th>8K ctx (GiB)</th><th>32K (GiB)</th><th>128K (GiB)</th></tr></thead>
+<tbody>
+<tr><td>Llama 3 8B</td><td>32 / 8 / 128 <a href="#src-2">[S2]</a></td><td class="n">128</td><td class="n">1.0</td><td class="n">4.0</td><td class="n">16.0</td></tr>
+<tr><td>Llama 3 70B</td><td>80 / 8 / 128 <a href="#src-2">[S2]</a></td><td class="n">320</td><td class="n">2.5</td><td class="n">10.0</td><td class="n">40.0</td></tr>
+<tr><td>Llama 3 405B</td><td>126 / 8 / 128 <a href="#src-2">[S2]</a></td><td class="n">504</td><td class="n">3.9</td><td class="n">15.8</td><td class="n">63.0</td></tr>
+<tr><td>Qwen3-32B</td><td>64 / 8 / 128 <a href="#src-3">[S3]</a></td><td class="n">256</td><td class="n">2.0</td><td class="n">8.0</td><td class="n">32.0</td></tr>
+<tr><td>Qwen3-235B-A22B</td><td>94 / 4 / 128 <a href="#src-3">[S3]</a></td><td class="n">188</td><td class="n">1.5</td><td class="n">5.9</td><td class="n">23.5</td></tr>
+<tr><td>DeepSeek-V3 (MLA)</td><td>61 &times; (512 + 64) <a href="#src-1">[S1]</a></td><td class="n">68.6</td><td class="n">0.54</td><td class="n">2.1</td><td class="n">8.6</td></tr>
+<tr><td>OPT-13B (MHA, check)</td><td>40 / 40 / 128 <a href="#src-30">[S30]</a></td><td class="n">800</td><td class="n">6.25</td><td class="n">25</td><td class="n">100</td></tr>
+</tbody></table></div>
+
+<p>The DeepSeek-V3 row follows from MLA: <code>61 &times; (512 + 64) &times; 2 B = 70,272 B &asymp; 68.6 KiB</code> per token, against 3.81&nbsp;MiB per token if the same model used full MHA with 128 heads (<code>2 &times; 61 &times; 128 &times; 128 &times; 2 B</code>), derived from <a href="#src-1">[S1]</a>. The Qwen3 head dimension of 128 comes from the model configuration files rather than the report table; it is consistent with 64 heads &times; 128 = 8,192.</p>
+
+<figure class="rz-figure" data-rz-figure="llm-d3"></figure>
+
+<h3 id="kv-users">4.2 Long context versus concurrent users</h3>
+
+<p>Put the 70B model on one H200, which has 141&nbsp;GB of HBM <a href="#src-9">[S9]</a>. In FP8 the weights take about 70.6&nbsp;GB, leaving <code>141 &minus; 70.6 = 70.4 GB</code> for everything else. One conversation at 128K tokens needs 40&nbsp;GiB (42.9&nbsp;GB), which is more than half the size of the FP8 weights. Divide the remainder by the per-sequence cache and the upper bounds on concurrency, before any runtime overhead, are:</p>
+
+<ul>
+<li>at 8K tokens (2.5&nbsp;GiB = 2.68&nbsp;GB each): <code>70.4 / 2.68 &asymp; 26</code> sequences;</li>
+<li>at 32K tokens (10&nbsp;GiB = 10.74&nbsp;GB each): <code>70.4 / 10.74 &asymp; 6</code> sequences;</li>
+<li>at 128K tokens: 1 sequence, with about 27&nbsp;GB left.</li>
+</ul>
+
+<p>These are derived ceilings, not benchmarks; real engines also reserve working memory. The shape is what matters: quadrupling the context cuts the number of simultaneous users by about four.</p>
+
+<p>Waste makes it worse. The vLLM authors measured that earlier serving systems used only 20.4% to 38.2% of KV memory for real token state, with the rest lost to fragmentation and over-reservation; paging the cache like virtual memory raised throughput 2&ndash;4&times; <a href="#src-30">[S30]</a>. Three levers shrink the cache itself: fewer KV heads (GQA, 8&times; on Llama&nbsp;3&nbsp;70B), a compressed latent (MLA, about 57&times; against full MHA), and a smaller cache datatype, since the formula is linear in bytes per value.</p>
+
+<p>The datatype lever is simple arithmetic. The table assumes 16 bits per cached value. Storing the cache in 8 bits halves every figure: the 128K-token Llama&nbsp;3&nbsp;70B sequence drops from 40&nbsp;GiB to 20&nbsp;GiB (derived). The formula has no hidden constants, so any change to layers, KV heads, head size or precision scales the result in proportion; the calculator below applies exactly this formula.</p>
+
+<div class="llm-calc" data-llm-calc="fit"></div>
+
+<div class="ws-insight-box">
+<h4>Operator takeaway</h4>
+<p>Quote a model&rsquo;s memory as weights plus cache at the context you will actually serve. A card that holds the weights comfortably can still serve a single user at long context. Hardware tiers, and so rack counts, follow from this sum.</p>
+</div>

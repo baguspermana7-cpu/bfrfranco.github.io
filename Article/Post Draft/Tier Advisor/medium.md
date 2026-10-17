@@ -1,4 +1,5 @@
 Title: Three Tier Classification Frameworks, One Infrastructure — How to Read All Three at Once
+*Publish via medium.com/p/import (sets the canonical).*
 
 ---
 

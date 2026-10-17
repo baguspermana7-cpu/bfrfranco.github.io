@@ -1,4 +1,5 @@
 SEO Title: TIA-942 Compliance Checklist for Data Centers | by Bagusdpermana
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Description: Assess data center compliance with ANSI/TIA-942-B across 56 checklist items, 6 infrastructure domains, and 4 tier levels using weighted scoring that reflects real-world criticality.
 Tags: Data Center, TIA-942, Infrastructure, Compliance, Critical Infrastructure
 

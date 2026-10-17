@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: How AI Data Centers Fund $57B in Grid Modernization
 (Preview: "How AI Data Centers Fund $57B in Grid Modernization | by Bagusdpermana | Medium" = 68 chars, fits 74 limit)
 SEO Description: Amazon contracted 34 GW of renewable capacity. Data centers generate $33,500/MW in annual grid surplus value. The counter-argument to "data centers vs citizens" narrative, backed by data.
@@ -135,4 +136,4 @@ The grid's future is being built now. The question is whether it will be built f
 
 Originally published at resistancezero.com
 
-Full analysis with interactive economic value simulator and renewable investment calculator: https://resistancezero.com/article-12.html
+Full analysis with interactive economic value simulator and renewable investment calculator: https://resistancezero.com/article-12.html?utm_source=medium&utm_medium=syndication&utm_campaign=a12

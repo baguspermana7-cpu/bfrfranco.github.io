@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: 97% PM Compliance Without Adding a Single Technician
 (Preview: "97% PM Compliance Without Adding a Single Technician | by Bagusdpermana | Medium" = 68 chars, fits 74 limit)
 SEO Description: Why maintenance compliance plateaus at 70-85% in data centers and how a systems engineering approach achieved 97.2% in 18 weeks. No headcount added. Five root causes, eight interventions.
@@ -211,4 +212,4 @@ Fix the system. The people will follow.
 
 Originally published at resistancezero.com
 
-Full analysis with interactive compliance predictor and Monte Carlo simulation: https://resistancezero.com/article-3.html
+Full analysis with interactive compliance predictor and Monte Carlo simulation: https://resistancezero.com/article-3.html?utm_source=medium&utm_medium=syndication&utm_campaign=a3

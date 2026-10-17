@@ -1293,9 +1293,9 @@ Every calculator exports CSV; the cockpits export a Tech Spec PDF; the labs expo
 ======================================================================
 # Journal — Data Center Operations Engineering | Bagus Dwi Permana — https://resistancezero.com/articles.html
 
-> 24 technical articles on data center operations, AI infrastructure, power distribution, and resilience engineering by Bagus Dwi Permana.
+> Independent research on how data centers are run: reliability, cooling, power, people, economics. Every number traces to its source. Filter by topic or series.
 
-34 articles · 3 series · updated 22 Jul 2026
+35 articles · 3 series · updated 17 Oct 2026
 
 
 # Operations Engineering Journal
@@ -1331,8 +1331,8 @@ Every article, newest first. Filter by topic or series, search a title, summary 
  Sort Newest first Oldest first Longest read Shortest read
 
 
-**All topics 34
- AI & HPC infrastructure 6
+**All topics 35
+ AI & HPC infrastructure 7
  Cooling & thermal 2
  Power & grid 5
  Operations & maintenance 4
@@ -1342,17 +1342,28 @@ Every article, newest first. Filter by topic or series, search a title, summary 
  Workforce & careers 3
 
 
- All series 34
+ All series 35
  Engineering Journal 20
  Global Analysis 10
- Future Forward 4
+ Future Forward 5
 
 
- 34** of 34 articles tag: **× Clear filters
+ 35** of 35 articles tag: **× Clear filters
 
 
 
 
+
+
+ AI & HPC infrastructure Future Forward
+
+### How an LLM Actually Works: Tokens to a 1 GW Campus
+
+What an LLM computes, from tokens to serving, and why it needs the hardware you run, up to a 132 kW rack. Five calculators, every number sourced.
+
+ 17 Oct 2026 69 min read No. 29
+
+ AI Infrastructure Large Language Models GPU Cluster
 
 
  AI & HPC infrastructure Future Forward
@@ -1458,7 +1469,7 @@ Inference now dominates AI compute — 2/3 of workloads, $50B+ chip market, 93 G
 
 ### Sam Altman Says AI Water Concerns Are 'Fake' — The Data Says Otherwise
 
-Inside the PFAS problem in data centers: where fluorinated chemistry sits in cooling and fire systems, what is being restricted, and the engineering options.
+A data center engineer fact-checks Sam Altman's claim. Peer-reviewed research vs CEO talking points. 17 billion gallons and counting.
 
  21 Mar 2026 14 min read No. 20
 
@@ -1845,7 +1856,7 @@ A resistive memory device whose crossbar arrays perform vector-matrix multiplica
 ### Retrieval-Augmented Generation (RAG)
 
 Grounding a language model's answers in retrieved documents: embed a corpus into a vector store, fetch the most relevant chunks for a query, and inject them into the prompt. The highest-ROI way to make a local model accurate on your own data.
- The Compression Horizon
+ The Compression HorizonArticle 29
 
 
 ### Approach Temperature (ATD)
@@ -1966,6 +1977,24 @@ Specialized cooling solutions designed for artificial intelligence and machine l
 
 A cooling method that pre-cools outdoor air by evaporating water before it passes through a heat exchanger. Adiabatic coolers extend the operating hours of free cooling in warm climates while using significantly less water than cooling towers. Common in European and Australian data centers.
 
+
+
+### Abliteration (refusal-direction removal)
+
+The community name for weight orthogonalisation, which edits an open-weight model so it never writes to its “refusal direction”. Arditi et al. found refusal is mediated by a one-dimensional subspace across 13 open chat models up to 72B; the method removes a learned behaviour and adds no knowledge or capability [S40].
+ Article 29
+
+
+### Agent (LLM agent)
+
+A system in which a language model dynamically directs its own process and tool use, as opposed to a workflow, where LLMs and tools follow predefined code paths. Anthropic advises starting simple and designing the agent–computer interface as carefully as a human UI [S62].
+ Article 29
+
+
+### Attention (self-attention)
+
+The operation that lets each token weigh every earlier token and take a weighted average of their information. For one head, scores are Q·K T /√d h , a causal mask hides future tokens, and softmax turns each row into weights that sum to 1 [S51].
+ Article 29
 
 
 
@@ -2099,6 +2128,12 @@ An automatically operated electrical switch that protects circuits from overcurr
 
 Large-format power equipment serving the entire facility, including main transformers, generators, and UPS systems. Bulk power design determines the fundamental capacity and redundancy level of the data center. Typical bulk power configurations include N+1, 2N, and distributed redundant architectures.
 
+
+
+### BPE (Byte-Pair Encoding)
+
+A tokenizer-building method that starts from the 256 byte values and repeatedly merges the most frequent adjacent pair into a new symbol until the vocabulary reaches a target size. Byte-level BPE (GPT-2 onward, tiktoken, Llama 3, Qwen, DeepSeek) never meets an unknown character, because every string is bytes [S2][S3][S72].
+ Article 29
 
 
 
@@ -2285,6 +2320,24 @@ A tube or channel that protects electrical wiring from physical damage. Types us
 
 
 
+### Chinchilla Scaling (compute-optimal training)
+
+The finding that for a fixed compute budget, model size and training tokens should grow together, about 20 tokens per parameter. The original 70B model trained on 1.4T tokens matched the compute of the 280B Gopher and reached 67.5% on MMLU; a 2024 replication re-estimated “around 20 tokens per parameter” [S5][S6].
+ Article 29
+
+
+### Context Window (context length)
+
+The maximum number of tokens a model can take into account in one request, prompt plus output. The KV cache grows with it, so a 128K-token Llama 3 70B sequence needs 40 GiB of cache (derived from [S2]); current frontier windows are about 1M tokens [S27][S28][S26].
+ Article 29
+
+
+### Continuous Batching (in-flight batching)
+
+A scheduling method in which finished sequences leave and new requests join the batch at every decode step, instead of waiting for a whole batch to finish. vLLM, SGLang and TensorRT-LLM all do it, which is how batching raises throughput while per-user speed falls only moderately [S30][S31].
+ Article 29
+
+
 
 
 ### Capacity Auction (PJM RPM)
@@ -2446,6 +2499,30 @@ A small fuel storage tank (typically 500-2,000 liters) located near each generat
 
 
 
+### Decode (token generation)
+
+The second phase of serving: one token is generated per step per sequence, each step reading all the weights plus the KV cache for little arithmetic. It is memory-bandwidth-bound, so at batch 1 tokens/s ≤ memory bandwidth ÷ weight bytes, for example at most 68 tok/s for 70B FP8 on an H200 (derived) [S9].
+ Article 29
+
+
+### Direct Liquid Cooling for AI Racks
+
+Coolant piped to cold plates on the GPUs and CPUs, required at the rack densities of current AI systems. GB200 and GB300 NVL72 racks are liquid-cooled, and Vertiv’s reference design supports up to 132 kW per rack with hybrid liquid and air cooling [S10][S11][S68].
+ Article 29DLC
+
+
+### Distillation (LLM distillation)
+
+Training a small student model to imitate a large teacher, either on the teacher’s full next-token distribution or on text the teacher generated. DeepSeek-R1-Distill-Qwen-32B keeps about 91% of the teacher’s AIME score (72.6 of 79.8) with 4.8% of its total parameters (derived) [S4][S56].
+ Article 29Knowledge Distillation
+
+
+### DPO (Direct Preference Optimization)
+
+A preference-tuning method that solves the RLHF objective in closed form as a classification loss on preference pairs. It needs no separate reward model and no reinforcement-learning loop [S53].
+ Article 29
+
+
 
 
 ### DCDC (Data Center Design Consultant — BICSI)
@@ -2572,6 +2649,12 @@ The dominant networking standard for data center LAN connections. Current speeds
 
 
 
+### Embedding (token embedding)
+
+A lookup table that replaces each token ID with a vector of d_model numbers, the starting representation the layers then refine. Its size is vocabulary × d_model: Llama 3 70B has 128,256 × 8,192 ≈ 1.05B input-embedding parameters (derived from [S2]).
+ Article 29
+
+
 
 
 
@@ -2673,6 +2756,24 @@ A systematic reliability engineering method (MIL-STD-1629A) that identifies ever
  Critical Spares Engine
 
 
+### FFN (Feed-Forward Network)
+
+The per-token multilayer perceptron in each transformer layer, applied after attention and separate for every position. In Llama-style models it uses SwiGLU, and in a dense transformer it holds about two-thirds of each layer’s weights (derived); Llama 3 70B uses d = 8,192 and an FFN width of 28,672 [S2].
+ Article 29
+
+
+### FLOPs (Floating-Point Operations)
+
+A count of arithmetic operations, distinct from FLOP/s (or FLOPS), the rate at which a chip performs them. Training costs about 6·N·D FLOPs for N parameters and D tokens, and inference about 2·N active FLOPs per generated token [S7].
+ Article 29
+
+
+### FP8 (8-bit floating point)
+
+A floating-point format that stores each number in one byte (E4M3 or E5M2), halving weight memory against BF16 and doubling peak tensor throughput on Hopper and Blackwell. An H100 SXM peaks at 1,979 TFLOPS dense in FP8 against 989 in BF16, and DeepSeek-V3 ran its training matrix multiplications in FP8 [S8][S1].
+ Article 29
+
+
 
 
 
@@ -2750,6 +2851,24 @@ An unintentional electrical path between an energized conductor and ground. Grou
 
 Connecting multiple generators to a common bus to share the electrical load. Paralleling requires synchronization of voltage, frequency, and phase angle. Paralleled generators provide greater flexibility, N+1 redundancy, and the ability to match generation capacity to actual load.
 
+
+
+### GGUF (llama.cpp model file format)
+
+The single-file format llama.cpp uses to store quantised model weights for CPU, Apple Metal, CUDA and ROCm inference. Its Q4_K_M type averages 4.89 bits per weight because block scales are stored alongside the weights [S39].
+ Article 29
+
+
+### GQA (Grouped-Query Attention)
+
+An attention variant in which several query heads share one key/value head, so only g K/V groups (1 < g < h) are cached instead of h. Llama 3 uses 8 KV heads at every size, which makes the 70B model’s cache 64/8 = 8× smaller than full multi-head attention (derived) [S45][S2].
+ Article 29
+
+
+### GRPO (Group Relative Policy Optimization)
+
+A reinforcement-learning method that samples a group of answers per prompt and scores each by its reward standardised within the group, so no value (critic) network is needed. Introduced in DeepSeekMath 7B and used for DeepSeek-R1’s large-scale RL [S54][S4].
+ Article 29
 
 
 
@@ -2835,6 +2954,18 @@ A cooling strategy combining multiple technologies such as air cooling for low-d
 
 A large-diameter pipe that distributes chilled water or coolant from the central plant to multiple branch circuits serving CRAH units or in-row coolers. Primary headers connect to the chiller plant; secondary headers distribute within the data hall. Properly sized headers ensure balanced flow distribution.
 
+
+
+### Harness (agent harness)
+
+The code around a model that runs the agent loop: it executes the model’s tool calls, returns results as messages, and enforces tools, sandboxing, step and token budgets, verification and human approval for irreversible actions. The model never runs code itself [S62][S61].
+ Article 29
+
+
+### HBM (High Bandwidth Memory)
+
+Stacked DRAM packaged next to the GPU die, giving far higher bandwidth than ordinary GPU memory. An H200 has 141 GB at 4.8 TB/s, and a GB200 NVL72 rack holds 13.4 TB of HBM3E; because decode is bandwidth-bound, HBM bandwidth sets tokens per second [S9][S10].
+ Article 29
 
 
 
@@ -2933,6 +3064,12 @@ The final phase of data center commissioning where all systems (electrical, mech
 
 
 
+### InfiniBand
+
+A high-bandwidth, low-latency network fabric used to connect GPU servers into clusters; RoCE (RDMA over Ethernet) is the Ethernet alternative. Scale-out links run at 400–800 Gb/s per GPU, and expert-parallel all-to-all traffic makes this fabric a first-class cost for mixture-of-experts models [S2][S11][S1].
+ Article 29
+
+
 
 
 ### Interconnection Queue
@@ -2999,6 +3136,12 @@ A unit of energy equal to one kilowatt of power sustained for one hour. Data cen
 
 A 2×2 procurement strategy framework (Peter Kraljic, HBR 1983) that positions items on supply risk (x-axis) versus profit/spend impact (y-axis): Strategic (high-high) → partnership, dual-source; Bottleneck (high risk, low spend) → secure supply, safety stock; Leverage (low risk, high spend) → competitive tender; Non-Critical (low-low) → catalog purchasing. For data center M&E spares, most long-lead equipment (switchgear, transformers, chillers) falls in Strategic or Bottleneck, justifying proactive safety stock and supplier partnership investment.
  Critical Spares Engine
+
+
+### KV Cache (Key–Value Cache)
+
+The stored key and value vectors of every earlier token, kept so each new token does not recompute them. Bytes = 2 × layers × KV heads × head dim × bytes per value × tokens × batch; Llama 3 70B needs 320 KiB per token in BF16, or 40 GiB for one 128K-token sequence (derived from [S2]).
+ Article 29
 
 
 
@@ -3103,6 +3246,18 @@ LED lighting systems with occupancy sensors and emergency backup in data halls. 
 
 
 
+### Logits
+
+The raw score the final layer assigns to every entry in the vocabulary, one number per token candidate, before they become probabilities. They are computed as z = h L ·W out T over a vocabulary of 100K–200K entries, and softmax converts them to a distribution.
+ Article 29
+
+
+### LoRA (Low-Rank Adaptation)
+
+A fine-tuning method that freezes the base weights and learns a low-rank update ΔW = B·A for selected matrices. On GPT-3 175B it cut trainable parameters 10,000× and GPU memory 3× versus full Adam fine-tuning, with no added latency once merged [S34].
+ Article 29
+
+
 
 
 ### Lights-Out Data Center
@@ -3203,6 +3358,30 @@ A detailed, step-by-step document describing how to perform a specific maintenan
 
 Electrical systems operating between 1 kV and 36 kV (IEC definition). Data centers commonly receive utility power at medium voltage (11 kV, 22 kV, or 33 kV) and distribute it through MV switchgear and ring main units before stepping down to LV via transformers.
 
+
+
+### MCP (Model Context Protocol)
+
+A JSON-RPC 2.0 protocol between hosts (LLM apps), clients and servers, where servers expose resources, prompts and tools. Its specification treats tools as arbitrary code execution and tool descriptions as untrusted unless the server is trusted [S61].
+ Article 29
+
+
+### MFU (Model FLOPs Utilization)
+
+The fraction of a chip’s peak FLOP/s that a training run actually sustains on model arithmetic. Llama 3 405B ran at 430 TFLOPs per GPU, 43% BF16 MFU, with a reported range of 38–43% on 16K H100s [S2].
+ Article 29
+
+
+### MLA (Multi-head Latent Attention)
+
+DeepSeek’s attention variant that caches one compressed latent per token instead of full keys and values, then re-expands K and V from it. DeepSeek-V3 caches 512 + 64 values per layer, about 68.6 KiB per token, roughly 57× less than full multi-head attention (derived) [S1].
+ Article 29
+
+
+### MoE (Mixture of Experts)
+
+A design that replaces one large FFN with many smaller expert FFNs and a router that sends each token to only a few of them. DeepSeek-V3 has 671B total but 37B active parameters (1 shared + 256 routed experts, 8 routed active per token), so memory scales with the total and per-token compute with the active count [S1].
+ Article 29
 
 
 
@@ -3320,6 +3499,18 @@ The underlying network topology connecting all switches, routers, and servers wi
 
 NFPA 70, the standard for electrical safety in the United States. The NEC covers wiring methods, overcurrent protection, grounding, and equipment requirements. Article 645 specifically addresses IT equipment rooms and data centers, including provisions for EPO and under-floor wiring.
 
+
+
+### NVL72 (GB200 NVL72)
+
+A liquid-cooled NVIDIA rack-scale system of 72 Blackwell GPUs and 36 Grace CPUs in one NVLink domain, with 13.4 TB of HBM3E. Its nominal rack TDP is 132 kW, with about 192 kW peak electrical design power [S10][S68].
+ Article 29
+
+
+### NVLink
+
+NVIDIA’s high-bandwidth GPU-to-GPU interconnect. A GB200 NVL72 rack links its 72 GPUs at 130 TB/s, and tensor parallelism is kept inside one NVLink domain (8 GPUs on HGX, 72 on NVL72) [S10].
+ Article 29
 
 
 
@@ -3485,6 +3676,42 @@ The component within a server that converts AC power to the DC voltages required
 
 
 
+### PagedAttention
+
+vLLM’s method of storing the KV cache in fixed-size blocks, like operating-system memory pages, allocated on demand and shareable across requests. Existing systems used only 20.4–38.2% of KV memory for token states; vLLM reached near-zero waste and 2–4× throughput at the same latency [S30].
+ Article 29
+
+
+### Parameters (model weights)
+
+The learned numbers inside a model, counted as N (for example 70B). Weight memory is N × bytes per parameter (BF16 2, FP8 1, INT4 0.5), and a mixture-of-experts model such as DeepSeek-V3 has 671B total but 37B active parameters [S1].
+ Article 29
+
+
+### Positional Encoding
+
+Information added to a transformer so it can tell token order, since attention on its own is order-blind. Variants include sinusoidal (2017), learned absolute tables, RoPE and ALiBi [S51][S47][S48].
+ Article 29
+
+
+### Prefill (prompt processing)
+
+The first phase of serving a request: the whole prompt is processed in one parallel pass, which fills the KV cache. It is compute-bound, costing about 2·N·n prompt FLOPs; a 4,000-token prompt on a 70B FP8 model is about 5.65e14 FLOP (derived).
+ Article 29
+
+
+### Prefix Caching
+
+Reusing the stored KV cache for a prompt prefix that repeats across requests, such as a system prompt or a shared document. API vendors price cache reads at 2.5–10% of normal input, and SGLang’s RadixAttention automates the reuse [S27][S31].
+ Article 29
+
+
+### Prompt Injection
+
+Instructions hidden in retrieved web pages, files or tool output that hijack an agent. Mitigations are least-privilege tools, human confirmation of risky actions and isolating untrusted content [S61][S62].
+ Article 29
+
+
 
 
 ### PFAS (Per- and Polyfluoroalkyl Substances)
@@ -3520,6 +3747,18 @@ A quick-release fastener used on server rack doors, side panels, and blanking pa
 
 A drip-free coupling that connects and disconnects liquid-cooling lines without draining the loop. OCP's UQD (Universal Quick Disconnect) and UQDB (blind-mate) standardise coupler dimensions and performance so parts interoperate across vendors — typically 100 psi working / 300 psi burst, ≥5,000 mating cycles, ~0.02-0.07 mL dripless spillage; UQDB adds ±1 mm blind-mate tolerance for rack insertion. Never mix QD standards across a loop.
  CDU Commissioning Checklist
+
+
+### QLoRA (Quantized LoRA)
+
+LoRA training on a frozen base model stored in 4-bit NormalFloat (NF4), with paged optimisers to absorb memory spikes. It fine-tunes a 65B model on a single 48 GB GPU while preserving 16-bit fine-tuning performance [S35].
+ Article 29
+
+
+### Quantization (weight quantisation)
+
+Storing model weights in fewer bits to cut memory and bandwidth: memory = N × bits / 8. Llama-3.1-8B is 14.96 GiB in F16, 7.95 GiB at Q8_0 and 4.58 GiB at Q4_K_M; 8-bit is near lossless, while below 3 bits quality drops sharply [S39][S38].
+ Article 29
 
 
 
@@ -3639,6 +3878,42 @@ A chemical compound used in the vapor-compression refrigeration cycle of CRAC un
 
 The duration a UPS can sustain IT load on battery power after utility failure. Standard runtime designs provide 5-15 minutes, sufficient for generator start and transfer. Extended runtime configurations use additional battery cabinets. Runtime decreases as batteries age and as load increases.
 
+
+
+### Reasoning Model
+
+A model trained, often with reinforcement learning on verifiable rewards, to write a long chain of thought before its final answer. DeepSeek-R1 argued that reasoning “can be incentivized through pure reinforcement learning” without human-labeled reasoning trajectories [S4].
+ Article 29
+
+
+### Residual Stream
+
+The running vector for each token that every sub-layer reads and adds its output back into, x ← x + Sublayer(Norm(x)). Attention and FFN layers write into this shared stream, which is where interpretability work reads out directions such as the one that mediates refusal [S40].
+ Article 29
+
+
+### RLHF (Reinforcement Learning from Human Feedback)
+
+Post-training in which a reward model is trained on human preference pairs and the policy is then optimised against it, typically with PPO and a KL penalty to the SFT model. Human raters preferred a 1.3B InstructGPT to the 175B GPT-3 [S52].
+ Article 29
+
+
+### RMSNorm (Root-Mean-Square Normalisation)
+
+A normalisation that rescales a vector by its root-mean-square, x/RMS(x)·γ. It skips the mean-centring step of LayerNorm, which makes it cheaper; DeepSeek-V3 also applies extra RMSNorms after its compressed latents [S1].
+ Article 29
+
+
+### Roofline (roofline model)
+
+A model that bounds attainable speed by min(peak FLOP/s, arithmetic intensity × memory bandwidth), where intensity is FLOPs per byte moved. The ridge point is peak ÷ bandwidth, about 295 FLOP/byte for an H100 in BF16 (989 TF ÷ 3.35 TB/s, derived) [S8]; decode sits far below it, prefill above.
+ Article 29
+
+
+### RoPE (Rotary Position Embedding)
+
+A positional encoding that rotates each 2-D pair of query and key dimensions by an angle proportional to position, so the query–key dot product depends only on relative distance. Llama 3 uses a base θ of 500,000 [S47][S2].
+ Article 29
 
 
 
@@ -3774,6 +4049,30 @@ The physical barrier between the interior and exterior of a data center building
 
 
 
+### Scaling Law
+
+An empirical power-law relation between loss and model size, data or compute. Kaplan et al. fitted L(N) ∝ N −0.076 ; Chinchilla revised the allocation, and test-time compute adds a second scaling axis [S7][S5][S57].
+ Article 29
+
+
+### SFT (Supervised Fine-Tuning)
+
+Further training of a pre-trained model on demonstration pairs of a prompt and a desired response, the first post-training step that turns a text predictor into an assistant. It uses the same next-token loss as pre-training, on curated examples [S52].
+ Article 29
+
+
+### Softmax
+
+The function that turns a vector of scores into probabilities that are positive and sum to 1, p i = exp(z i ) / Σ j exp(z j ). It is applied to the attention scores in every head and to the output logits before a token is sampled [S51].
+ Article 29
+
+
+### Speculative Decoding
+
+A way to speed up generation in which a small draft model proposes several tokens and the large model verifies them in one parallel forward pass, with a rejection rule that keeps the output distribution identical to the large model’s. Reported speed-ups are 2–3× on T5-XXL and 2–2.5× on Chinchilla 70B [S32][S33].
+ Article 29
+
+
 
 
 ### Spectrum-X (NVIDIA)
@@ -3872,6 +4171,60 @@ A measure of waveform quality expressed as a percentage of the fundamental frequ
 
 Automated collection and transmission of measurements from remote sensors and meters to a central monitoring system. Data center telemetry covers electrical parameters, environmental conditions, cooling system status, and network performance. Modern telemetry uses streaming protocols (MQTT, gRPC) for real-time data ingestion.
  EPMS Telemetry
+
+
+### Temperature (sampling temperature)
+
+A sampling setting that divides the logits by T before softmax: T < 1 sharpens the distribution, T > 1 flattens it, and T → 0 is greedy argmax. DeepSeek recommends T = 0.5–0.7 (0.6) for R1 [S4].
+ Article 29
+
+
+### Test-Time Compute (inference-time scaling)
+
+Compute spent while answering rather than while training, mainly by generating more reasoning tokens or sampling more candidates. Compute-optimal test-time scaling was reported as more than 4× more efficient than best-of-N, and in FLOP-matched tests it can beat a 14× larger model [S57].
+ Article 29
+
+
+### Token
+
+The unit of text a language model reads and writes: a piece of a word, a whole common word, a punctuation mark or a few bytes, each replaced by an integer ID. Price, context limits and speed are all counted in tokens, and rare words, other languages and code split into more tokens than common English [S72].
+ Article 29
+
+
+### Tokenizer
+
+The program that cuts text into tokens from a fixed vocabulary and maps each token to an integer ID. Vocabulary sizes differ by model: Llama 3 uses 128K entries, Qwen3 151,669 and o200k_base 200,019 [S2][S3][S72].
+ Article 29
+
+
+### Tool Calling (function calling)
+
+The model emits a structured call, a function name and JSON arguments, and the harness executes it and returns the result as a new message. ReAct-style interleaving of reasoning and actions beat imitation and RL methods by 34 and 10 absolute points on ALFWorld and WebShop [S42].
+ Article 29
+
+
+### Top-p (Nucleus Sampling)
+
+A sampling filter that keeps the smallest set of highest-probability tokens whose cumulative probability reaches p, then renormalises and samples from that set. Top-k keeps a fixed number of tokens instead; both are decoding heuristics applied after the model, not part of training.
+ Article 29
+
+
+### TPOT (Time Per Output Token, also inter-token latency)
+
+The time between successive output tokens, equal to the decode step time. Together with TTFT it sets goodput, the requests per second that meet both latency targets; DistServe reported 7.4× more requests or 12.6× tighter targets by separating prefill and decode [S44].
+ Article 29
+
+
+### TPU (Tensor Processing Unit)
+
+Google’s custom accelerator for machine-learning workloads. An Ironwood (TPU v7) chip delivers 4,614 TFLOPs FP8 with 192 GB HBM at 7.37 TB/s, and a 9,216-chip liquid-cooled pod draws about 10 MW [S14].
+ Article 29
+
+
+### TTFT (Time To First Token)
+
+The delay between sending a request and receiving the first output token, approximately queueing time plus prefill time. It is one of the two latency targets, with TPOT, that define goodput [S44].
+ Article 29
 
 
 
@@ -4161,9 +4514,9 @@ All content on ResistanceZero is independent personal research derived from publ
 ======================================================================
 # Future Forward | Web, Platforms & Digital Behavior | ResistanceZero — https://resistancezero.com/future-forward.html
 
-> A research series on the future of the web, AI interfaces, platform economics and digital behavior, with long-form analysis and strategy tools.
+> Long-form research on the future of the web, AI infrastructure, platform economics and digital behaviour, looked at from the plant room.
 
-Insights · 34 articles · 3 series · updated 22 Jul 2026
+Insights · 35 articles · 3 series · updated 17 Oct 2026
 
 
 # Future Forward
@@ -4187,8 +4540,8 @@ Newest first. Filter by topic, search, or sort; the view is in the address bar.
  Sort Newest first Oldest first Longest read Shortest read
 
 
-**All topics 4
- AI & HPC infrastructure 3
+**All topics 5
+ AI & HPC infrastructure 4
  Cooling & thermal 0
  Power & grid 0
  Operations & maintenance 0
@@ -4198,11 +4551,22 @@ Newest first. Filter by topic, search, or sort; the view is in the address bar.
  Workforce & careers 1
 
 
- 4** of 4 articles tag: **× Clear filters
+ 5** of 5 articles tag: **× Clear filters
 
 
 
 
+
+
+ AI & HPC infrastructure Future Forward
+
+### How an LLM Actually Works: Tokens to a 1 GW Campus
+
+What an LLM computes, from tokens to serving, and why it needs the hardware you run, up to a 132 kW rack. Five calculators, every number sourced.
+
+ 17 Oct 2026 69 min read No. 29
+
+ AI Infrastructure Large Language Models GPU Cluster
 
 
  AI & HPC infrastructure Future Forward
@@ -4274,9 +4638,9 @@ This site is provided for educational and informational use only, not as legal, 
 ======================================================================
 # Global Security Analysis | Bagus Dwi Permana — https://resistancezero.com/geopolitics.html
 
-> In-depth analysis of global security trends, geopolitical risks, infrastructure resilience, and emergency preparedness from an engineering perspective.
+> In-depth research on geopolitical risk, infrastructure resilience, emergency preparedness and the markets that fund data centers.
 
-Insights · 34 articles · 3 series · updated 22 Jul 2026
+Insights · 35 articles · 3 series · updated 17 Oct 2026
 
 
 # Global Analysis
@@ -4453,9 +4817,9 @@ This site is provided for educational and informational use only, not as legal, 
 ======================================================================
 # Insights Hub | Engineering & Global Analysis | Bagus Dwi Permana — https://resistancezero.com/insights.html
 
-> Data center engineering insights, global security analysis, and forward-looking technology trends from an Engineering Operations Manager.
+> Three series in one journal: Engineering Journal, Global Analysis and Future Forward, plus live trackers and reports on data centers and infrastructure.
 
-34 articles · 3 series · updated 22 Jul 2026
+35 articles · 3 series · updated 17 Oct 2026
 
 
 # Insights
@@ -4502,13 +4866,24 @@ The nine most recent articles across all series. All 34 in the journal hub.
 
  AI & HPC infrastructure Future Forward
 
+### How an LLM Actually Works: Tokens to a 1 GW Campus
+
+What an LLM computes, from tokens to serving, and why it needs the hardware you run, up to a 132 kW rack. Five calculators, every number sourced.
+
+ 17 Oct 2026 69 min read No. 29
+
+**AI Infrastructure Large Language Models GPU Cluster
+
+
+ AI & HPC infrastructure Future Forward
+
 ### The Compression Horizon: How Close Can a Laptop Get to a Datacenter's Mind?
 
 Can 300 TB of training data become 1 KB? The hard physics (Shannon, Kolmogorov, Landauer) and a practical pipeline for task-specific local AI.
 
  22 Jul 2026 18 min read No. 28
 
-**AI frontier Hyperscale Data Center GPU Cluster
+ AI frontier Hyperscale Data Center GPU Cluster
 
 
  Workforce & careers Global Analysis
@@ -4586,17 +4961,6 @@ Microsoft, Amazon, Google, Meta and Oracle are betting billions on nuclear SMRs 
  22 Mar 2026 28 min read No. 21
 
  Nuclear SMR AI Data Centers Clean Energy
-
-
- Workforce & careers Future Forward
-
-### AI Inference Economics: The Cost of Running Models
-
-Inference now dominates AI compute — 2/3 of workloads, $50B+ chip market, 93 GW by 2030. Data-backed analysis with interactive cost calculator.
-
- 22 Mar 2026 24 min read No. FF 3
-
- AI Inference Training vs Inference GPU Economics
 
 
 
@@ -20418,7 +20782,7 @@ Back to Engineering Journal
 
 
  01
- Engineering Journal — Article 1 of 28
+ Engineering Journal — Article 1 of 29
 
  When Nothing Happens, Engineering Is Working
 
@@ -22190,7 +22554,7 @@ Back to Articles
 
 
  10
- Engineering Journal — Article 10 of 28
+ Engineering Journal — Article 10 of 29
 
 
 
@@ -23446,7 +23810,7 @@ Back to Articles
 
 
  11
- Engineering Journal — Article 11 of 28
+ Engineering Journal — Article 11 of 29
 
 
 
@@ -24592,7 +24956,7 @@ This companion analysis examines $57B+ in clean-energy investment and asks how d
 
 
  12
- Engineering Journal — Article 12 of 28
+ Engineering Journal — Article 12 of 29
 
 
 
@@ -26414,7 +26778,7 @@ Back to Engineering Journal
 
 
  13
- Engineering Journal — Article 13 of 28
+ Engineering Journal — Article 13 of 29
 
 
 
@@ -29788,7 +30152,7 @@ Back to Articles
 
 
  14
- Engineering Journal — Article 14 of 28
+ Engineering Journal — Article 14 of 29
 
 
 
@@ -31376,7 +31740,7 @@ Back to Engineering Journal
 
 
  15
- Engineering Journal — Article 15 of 28
+ Engineering Journal — Article 15 of 29
 
 
 
@@ -32159,7 +32523,7 @@ Back to Articles
 
 
  16
- Engineering Journal — Article 16 of 28
+ Engineering Journal — Article 16 of 29
 
 
 
@@ -33492,7 +33856,7 @@ Back to Articles
 
 
  17
- Engineering Journal — Article 17 of 28
+ Engineering Journal — Article 17 of 29
 
 
 
@@ -35145,7 +35509,7 @@ Rack density surging to 130kW. Liquid cooling becoming non-negotiable. $600B+ in
 
 
  18
- Engineering Journal — Article 18 of 28
+ Engineering Journal — Article 18 of 29
 
 
 
@@ -36482,7 +36846,7 @@ When operators ignore alarms, the system has failed them — not the other way a
 
 
  02
- Engineering Journal — Article 2 of 28
+ Engineering Journal — Article 2 of 29
 
 
 
@@ -37509,7 +37873,7 @@ Systemic approach to maintenance excellence
 ======================================================================
 # AI Data Center Water Use: Altman vs the Data | ResistanceZero — https://resistancezero.com/article-20.html
 
-> Inside the PFAS problem in data centers: where fluorinated chemistry sits in cooling and fire systems, what is being restricted, and the engineering options.
+> A data center engineer fact-checks Sam Altman's claim. Peer-reviewed research vs CEO talking points. 17 billion gallons and counting.
 
 *
  When a tech CEO says "trust me" about water, engineers reach for the data.
@@ -46113,7 +46477,2026 @@ How a new fee structure reshapes mid-level hiring for the facilities that power 
 
  * Previous Article
  All Articles
+ Next Article **
+
+
+
+
+
+
+
+
+All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. Terms & Disclaimer
+
+
+======================================================================
+# How a Large Language Model Actually Works: From One Token to a 1 GW Campus | ResistanceZero — https://resistancezero.com/article-29.html
+
+> What an LLM computes, from tokens to serving, and why it needs the hardware you run, up to a 132 kW rack. Five calculators, every number sourced.
+
+*
+ Tokens as light: one answer is a river of probabilities flowing through stacked layers, and every layer is a rack somewhere drawing kilowatts.
+
+
+
+## Key numbers
+
+
+Eight figures carry this article; each is sourced in Sources.
+
+
+- **Training compute ≈ 6 × parameters × tokens** — Llama 3 405B: 6 × 405e9 × 15.6e12 = 3.79e25 FLOP; the paper states 3.8e25. [S2]
+
+- **Inference ≈ 2 × active parameters per generated token** — A forward pass is one third of the training cost per token. [S7]
+
+- **KV cache = 2 × layers × KV heads × head dim × bytes per token** — Llama 3 70B: 320 KiB per token, 40 GiB at 128K context; DeepSeek-V3's MLA needs 57× less. [S2]
+
+- **Compute-optimal training uses about 20 tokens per parameter** — Chinchilla, confirmed by the 2024 replication; small models are deliberately over-trained past it. [S5]
+
+- **Decode speed ≤ HBM bandwidth ÷ bytes of weights** — 70B in FP8 (70 GB) on an H200 (4.8 TB/s): at most 68 tokens per second per user at batch 1. [S9]
+
+- **One GB200 NVL72 rack is 132 kW nominal, liquid-cooled** — 72 GPUs, 13.4 TB of HBM, one 130 TB/s NVLink domain; 100k GB200 ≈ 220 MW at PUE 1.2. [S10]
+
+- **A frontier training run swings the site load by tens of megawatts** — Llama 3 on 16K H100s: 419 unexpected interruptions in 54 days, 78% hardware. [S2]
+
+- **A median text prompt costs about 0.24 Wh** — Google's Gemini Apps measurement, August 2025; a 1,000-token answer on a 70B model derives to about 0.27 Wh. [S18]
+
+
+In one breath: a large language model turns text into tokens, runs them through a stack of identical transformer blocks that score every token against every earlier one, and emits a probability for the next token. Training that stack on trillions of tokens costs about six floating-point operations per parameter per token; running it costs two per active parameter per generated token, and at that point the bottleneck is how fast the weights can be streamed from memory, not how fast they can be multiplied. The hardware ladder in this article is the direct consequence: the model must fit in HBM, the HBM must be fed, and the racks that do it are 132 kW and liquid-cooled.
+
+
+
+## The one-paragraph answer
+
+
+A large language model is a machine that, given some text, produces a probability for every possible next piece of text, picks one, appends it, and repeats. Everything else — the essays, the code, the tool calls of an agent — is that single loop run thousands of times. The loop is built from one repeated unit, the transformer block, and each block is almost entirely matrix multiplication. That is why the hardware looks the way it does: dense arithmetic units fed by very fast memory, packed into racks that draw 100 kW and more.
+
+
+### The shape of the machine
+
+
+Text is first cut into tokens and each token becomes a vector of a few thousand numbers (an embedding). That vector then passes through a stack of identical blocks. Llama 3 70B has 80 of them and a vector width of 8,192 [S2]. Each block does two things: attention lets every token gather information from the earlier tokens, and a feed-forward network (FFN) transforms each token on its own. Both add their result back onto the running vector, the residual stream. After the last block, the vector is converted into one score per vocabulary entry (the logits), and a sampler chooses the next token.
+
+
+
+
+ One decoder block, repeated 80 times in Llama 3 70B [S2]. Each sub-layer reads the residual stream, computes something, and ADDS it back, so the stream is never replaced, only written to. Attention also writes this token’s keys and values to a cache that costs 320 KiB per token (derived from [S2]).
+
+
+
+The “knowledge” of the model is the set of numbers inside those matrices, the parameters. Llama 3 70B has 70 billion of them. Nothing is looked up in a database at run time. The weights were shaped, once, by predicting the next token across trillions of tokens of text.
+
+
+### Two formulas that size everything
+
+
+Two approximations from the scaling-law literature [S7] carry most of this article. For a model with `N` parameters:
+
+
+training compute C ≈ 6 × N × D (D = training tokens)
+inference compute ≈ 2 × N_active per generated token
+
+ The factor 2 is one multiply and one add per weight in the forward pass. Training adds a backward pass that costs about twice the forward pass, so 2 + 4 = 6 [S7]. As a check, Meta trained Llama 3 405B on 15.6 trillion tokens: `6 × 405e9 × 15.6e12 = 3.79e25` FLOP, against the 3.8e25 the paper states [S2]. For inference, a 70B dense model costs `2 × 70e9 = 1.4e11` FLOP per token.
+
+
+### Two different limits
+
+
+Those FLOP counts say how much arithmetic is needed. They do not say how fast a GPU can do it, because the arithmetic is only half of the cost. To generate one token, a GPU must also stream every active weight from memory (HBM) to the compute units. At batch size 1 the arithmetic per byte moved is tiny, so the GPU waits on memory. Generation is therefore limited by **memory bandwidth**. Reading the prompt, and training, process many tokens per weight fetched, so they are limited by **compute**. The rest of the article is this split, worked out in numbers.
+
+
+- **Talking** (decode): bandwidth-bound. Tokens per second at batch 1 is at most HBM bandwidth divided by the bytes of weights. For a 70B model in FP8 on an H200 (4.8 TB/s [S9]), that is `4.8e12 / 70.6e9 ≈ 68` tokens per second, derived.
+
+- **Reading and learning** (prefill, training): compute-bound, so they scale with peak FLOP/s and with how much of it you keep busy (MFU).
+
+- **Remembering the conversation**: the KV cache grows with every token and competes with the weights for the same HBM (section 4).
+
+
+### How the rest of the first half is organised
+
+
+The next seven sections follow the data. Section 2 turns text into tokens and shows what a token costs. Section 3 opens one block. Section 4 sizes the memory that a conversation occupies while the model talks; for Llama 3 70B that is 320 KiB per token, or 40 GiB at a 128K-token context (derived from the shapes in [S2]). Section 5 explains why the largest open models are mixtures of experts that activate only a few percent of their weights. Section 6 covers how a token is chosen. Section 7 lists who has built what, and section 8 shows how a base model is trained and what that does to a power system.
+
+
+
+
+#### What to carry into the later sections
+
+
+Size the memory by total parameters plus the cache. Size the compute by active parameters times tokens. Size the electrical and cooling plant by the number of GPUs that those two requirements force you to rack together.
+
+
+
+
+## Tokens: the unit everything is billed in
+
+
+A model never sees letters or words. A tokenizer cuts the text into pieces from a fixed vocabulary and replaces each piece with an integer ID. Common English words are usually one token; rare words, other languages and source code split into several. Price, speed and context limits are all counted in tokens, so the tokenizer decides what a page of text costs.
+
+
+### 2.1 What a tokenizer does
+
+
+The dominant method is byte-pair encoding (BPE). Start from the 256 possible bytes. Count which adjacent pair of symbols is most frequent in a large corpus, merge that pair into a new symbol, and repeat until the vocabulary reaches a target size `V`. Encoding a new string replays those merges in order. “Byte-level” BPE, used by GPT-2 onward, tiktoken, Llama 3, Qwen and DeepSeek, can encode any string, because every string is bytes and no character is ever unknown [S72].
+
+
+Two libraries recur. SentencePiece treats the input as a raw stream with whitespace written as `▁`; it implements BPE and a unigram model and was used by Llama 1/2, T5 and Gemma (background, not re-read for this article). tiktoken is OpenAI’s fast BPE implementation, with encodings such as `cl100k_base` (GPT-4 era) and `o200k_base` (GPT-4o era and gpt-oss) [S72].
+
+
+
+
+ What the model sees. A sentence becomes sub-word tokens, then integer IDs, then one embedding row per ID. The same text costs more tokens in Indonesian: about 1.20 tokens per English word against 1.60 to 2.05 for Indonesian on o200k (measured [S72]).
+
+
+
+### 2.2 Vocabulary sizes
+
+
+The vocabulary is a trade. A larger `V` packs more text into each token, so fewer steps are needed per document, but it enlarges the embedding table (`V × d` parameters) and the output layer. For Llama 3 70B that table is about `128,256 × 8,192 ≈ 1.05e9` parameters, with a similar output head, derived from the vocabulary in [S2].
+
+
+
+
+ Tokenizer vocabulary sizes. Rows marked measured were read from the tokenizer files for this article.
+ |
+ Tokenizer / model | Vocabulary | Source |
+
+
+ | cl100k_base | 100,277 | [S72], measured |
+
+ | o200k_base | 200,019 | [S72], measured |
+
+ | Llama 3 / 3.1 | 128K (100K from tiktoken + 28K for non-English) | [S2] |
+
+ | Qwen3 | 151,669 | [S3] |
+
+ | DeepSeek-V3 | 128,815 in `tokenizer.json` (report: “128K”) | [S72], [S1] |
+
+ | Kimi K2 | 160K | [S25] |
+
+
+
+
+
+### 2.3 English, Indonesian and code, measured
+
+
+For this article I encoded three samples with four tokenizers: a 133-word English paragraph about data-center cooling, its 118-word Indonesian translation, and a 7-line Python function [S72]. The sample is small, so read the ratios as indicative.
+
+
+
+
+ Tokens per word and characters per token, measured on one paragraph and its translation.
+ |
+ Tokenizer | EN tok/word | EN chars/tok | ID tok/word | ID ÷ EN tokens | Code chars/tok |
+
+
+ | cl100k_base | 1.20 | 4.88 | 2.05 | 1.51× | 2.98 |
+
+ | o200k_base | 1.20 | 4.91 | 1.60 | 1.19× | 2.94 |
+
+ | Qwen3 | 1.20 | 4.88 | 2.05 | 1.51× | 2.70 |
+
+ | DeepSeek-V3 | 1.19 | 4.94 | 1.72 | 1.28× | 2.80 |
+
+
+
+
+
+
+
+
+
+
+Words split along morphemes the vocabulary has not learned. In `o200k_base`, “pendinginan” becomes `pending|inan`, “dikonsumsi” becomes `dik|onsum|si`, “megawatt” becomes `meg|aw|att`, while “Transformer” is a single token [S72]. Code is denser in symbols than prose: about 2.7–3.0 characters per token here, against 4.9 for English.
+
+
+Tokenizers also change between model generations. Meta reports that Llama 3’s English compression rose from 3.17 to 3.94 characters per token over Llama 2 [S2]. Anthropic states that on its current tokenizer, 1M tokens is about 555k words, about 2.5M characters; that is `1,000,000 / 555,000 = 1.80` tokens per word, derived. Earlier Claude models fit about 750k words in 1M tokens, 1.33 tokens per word [S27]. So “a token is three quarters of a word” is a property of one tokenizer, not a law. The values quoted here span 1.19 to 1.80 tokens per English word.
+
+
+### 2.4 Why tokens set cost and context
+
+
+cost = input_tokens × input_price + output_tokens × output_price
+
+ Take a 10,000-word document priced at $2 per million input tokens (the Sonnet 5.5 list price [S27]):
+
+
+- English, `o200k`: `10,000 × 1.20 = 12,000` tokens, $0.024.
+
+- Indonesian, `o200k`: `10,000 × 1.60 = 16,000` tokens, $0.032.
+
+- Indonesian, `cl100k` or Qwen3: `10,000 × 2.05 = 20,500` tokens, $0.041.
+
+- English on the 1.80 tokens-per-word Claude tokenizer: 18,018 tokens by the dossier’s 555k-word rule, $0.036.
+
+
+The same ratio applies to the context window. A window of 128K tokens holds fewer Indonesian words than English ones, in proportion to the table above. The effect compounds with the KV cache (section 4), which is also counted per token: a language that costs 1.5× the tokens also costs 1.5× the cache memory for the same document.
+
+
+
+
+### What will this document cost? Tokens and API price
+
+
+This calculator converts a word count into tokens for a chosen tokenizer, then prices the input and a proportional output. Input tokens are `words × tok_per_word[language][tokenizer]`, output tokens are `tokens_in × output_ratio`, and cost per call is the input and output tokens times their per-million prices, with cached input billed at a fraction. Token ratios come from a sample of one paragraph, so treat them as plus or minus 15%. Every result has a "Show working" line that prints the formula and the numbers it used.
+
+
+
+Basis: estimate. Token ratios: self-measurement on one English/Indonesian paragraph [S72] and the vendor statement of 555k words per 1M tokens [S27]. List prices as of 2026-10-16 [S27] [S28] [S29]; prices change, so edit them.
+
+
+
+
+
+#### Operator takeaway
+
+
+Capacity planning for a multilingual service has to use tokens measured on your own text and your own tokenizer. A vendor’s tokens-per-word figure for English will understate the load of an Indonesian-language workload by 19–51% on the tokenizers measured here [S72].
+
+
+
+
+## Inside one block: embeddings, position, attention
+
+
+Each token ID is swapped for a vector, told where it sits in the sequence, and then passed through a stack of identical blocks. In every block, each token looks back over the earlier tokens, weighs which ones matter, and mixes their information into its own vector; a second small network then reworks that vector. The model is this block repeated, 80 times in Llama 3 70B [S2], with the same shapes at every depth. The parts are described below in the order the data meets them (see the block figure in section 1).
+
+
+### 3.1 Embeddings: a lookup table of meaning-vectors
+
+
+An embedding matrix `E` of shape `V × d` holds one row per vocabulary entry. Token ID 5,000 simply fetches row 5,000, a vector of `d` numbers (`d_model`, 8,192 for Llama 3 70B [S2]). The vector is the starting point for that token’s meaning, and every later layer refines it. Small models often reuse the same matrix as the output head: Qwen3 0.6B, 1.7B and 4B tie input and output embeddings [S3].
+
+
+### 3.2 Position: from sinusoids to million-token contexts
+
+
+Attention treats its inputs as an unordered set, so order has to be injected. Positional encoding has gone through four steps.
+
+
+- **Sinusoidal (2017).** A fixed pattern `PE(pos,2i) = sin(pos / 10000^(2i/d))` with the matching cosine, added to the embeddings [S51].
+
+- **RoPE.** Rotary position embedding rotates each two-dimensional pair of query and key components by an angle `pos × θ_i`, with `θ_i = base^(−2i/d)`. The dot product of a query and a key then depends only on their distance [S47]. RoPE is the common choice today; Llama 3 uses base 500,000 [S2].
+
+- **ALiBi.** No position vectors at all; each head subtracts a linear penalty `m × |i − j|` from the attention scores. A 1.3B model trained on 1,024 tokens ran at 2,048 tokens with the same perplexity as a sinusoidal model trained at 2,048, and trained 11% faster using 11% less memory [S48].
+
+- **YaRN.** Rescales the RoPE frequencies so a trained model can be extended to longer context, reported to need 10× fewer tokens and 2.5× fewer training steps than earlier extension methods [S49].
+
+
+In practice the context is grown in stages. DeepSeek-V3 is pre-trained at 4K tokens, extended to 32K, then to 128K [S1]. Llama 4 Scout is listed at 10M tokens and Maverick at 1M [S23]. DeepSeek-V4 claims 1M and swaps dense attention for a hybrid compressed-sparse scheme; at 1M it needs 27% of V3.2’s per-token FLOPs and 10% of its KV cache [S26].
+
+
+### 3.3 Attention, step by step
+
+
+For a sequence of `n` token vectors `X` (shape `n × d`), one head of attention works as follows [S51]:
+
+
+Q = X·W_Q K = X·W_K V = X·W_V (each W is d × d_h)
+S = Q·K T / √d_h (n × n scores)
+S_ij = −∞ for j > i (causal mask)
+A = softmax(S), row by row (each row sums to 1)
+head = A·V
+
+ The query says what a token is looking for, the key says what each earlier token offers, and the value is the content that gets averaged. The mask forbids a token from seeing the future, which is what makes next-token training legal. The softmax turns each row of scores into weights. The division by `√d_h` exists because, for unit-variance components, `q·k` has variance `d_h`; without scaling, the softmax saturates [S51]. With `d_h = 128`, the divisor is `√128 = 11.3`, derived.
+
+
+
+
+ One attention head. Scores are Q·K^T divided by √128 = 11.3 (derived, head size d_h = 128), masked so a token cannot see the future, softmaxed into weights, and used to average V. The grey zone is the part whose cost grows as n², which FlashAttention keeps in on-chip SRAM [S50].
+
+
+
+The cost is the catch. The score matrix is `n × n`, so compute grows as `n² × d` and a naive implementation writes `n²` numbers to HBM. FlashAttention computes the same exact result in tiles that stay in on-chip SRAM, never materialising the full matrix; it reported a 3× speed-up on GPT-2 at 1K context and the first better-than-chance result on the 16K-token Path-X task [S50].
+
+
+### 3.4 Many heads, fewer KV heads
+
+
+A layer runs `h` heads in parallel and concatenates them. Each head needs its own K and V during generation, and those are what the KV cache stores. Four designs reduce that load:
+
+
+- **MHA**: every query head has its own K/V (the original design).
+
+- **MQA**: all query heads share a single K/V head [S46].
+
+- GQA: `g` K/V groups with `1 < g < h` [S45]. Llama 3 uses 8 KV heads at every size [S2]; Qwen3 MoE uses 4 [S3]. For Llama 3 70B that is `64 / 8 = 8×` less cache than MHA, derived.
+
+- MLA (DeepSeek-V2/V3): K and V are projected down into a shared latent of 512 numbers, plus a 64-number RoPE key. Only those 576 values per layer are cached; K and V are re-expanded when needed [S1]. Full MHA with 128 heads of 128 dimensions would store `2 × 128 × 128 = 32,768` values per layer, so MLA is `32,768 / 576 ≈ 57×` smaller, derived.
+
+
+### 3.5 The feed-forward network and the residual stream
+
+
+After attention comes the FFN, applied to each token independently. Llama-style models use a gated form, SwiGLU: `FFN(x) = W_down · (SiLU(W_gate·x) ⊙ W_up·x)` (background, [S2] for the model). It widens the vector to a hidden size several times `d`, applies a nonlinearity, and narrows it back. By parameter count it dominates: with MHA attention is about `4d²` weights per layer while a gated FFN is about `3 × d × d_ff`, roughly 8 to 10.5 `d²`, so the FFN holds about two thirds of a dense block (derived). That is the part an MoE replaces (section 5).
+
+
+Both sub-layers write back with a residual add, in the pre-norm form `x ← x + Sublayer(Norm(x))`. The vector between blocks is the residual stream; each block edits it and none replaces it, which keeps gradients healthy through 80 layers. The normalisation is RMSNorm, `x / RMS(x) × γ`, which drops LayerNorm’s mean subtraction and is cheaper. DeepSeek-V3 adds extra RMSNorms after its compressed latents [S1].
+
+
+
+
+#### Why the maths decides the hardware
+
+
+Almost every operation above is a dense matrix multiply, which tensor cores run at near peak. Attention over a long context is the exception, because it also reads the cache. That one memory read per token is what the next section sizes.
+
+
+
+
+## The KV cache: where your HBM goes
+
+
+When a model writes a reply, each new token needs the keys and values of every token before it. Recomputing them each step would be absurdly wasteful, so they are stored in GPU memory: the KV cache. It grows with every token of every conversation, and it sits in the same HBM as the weights. On a long context, the cache, not the parameter count, decides how many users one GPU can hold.
+
+
+### 4.1 The formula and a worked table
+
+
+KV bytes = 2 (K and V) × n_layers × n_kv_heads × d_head × bytes per value × tokens × batch
+
+ A check against a published number: OPT-13B has 40 layers, 40 heads of 128 dimensions in 16-bit values. `2 × 5,120 × 40 × 2 = 819,200` bytes, the 800 KB per token stated in the vLLM paper [S30]. For Llama 3 70B (80 layers, 8 KV heads, d_head 128 [S2]): `2 × 80 × 8 × 128 × 2 = 327,680` bytes, which is 320 KiB per token. At 128K tokens (131,072) that is `320 KiB × 131,072 = 40 GiB`, derived.
+
+
+
+
+ KV cache per sequence, 16-bit cache. All values derived from the layer and head counts in the cited sources.
+ |
+ Model | Layers / KV heads / d_head | KiB per token | 8K ctx (GiB) | 32K (GiB) | 128K (GiB) |
+
+
+ | Llama 3 8B | 32 / 8 / 128 [S2] | 128 | 1.0 | 4.0 | 16.0 |
+
+ | Llama 3 70B | 80 / 8 / 128 [S2] | 320 | 2.5 | 10.0 | 40.0 |
+
+ | Llama 3 405B | 126 / 8 / 128 [S2] | 504 | 3.9 | 15.8 | 63.0 |
+
+ | Qwen3-32B | 64 / 8 / 128 [S3] | 256 | 2.0 | 8.0 | 32.0 |
+
+ | Qwen3-235B-A22B | 94 / 4 / 128 [S3] | 188 | 1.5 | 5.9 | 23.5 |
+
+ | DeepSeek-V3 (MLA) | 61 × (512 + 64) [S1] | 68.6 | 0.54 | 2.1 | 8.6 |
+
+ | OPT-13B (MHA, check) | 40 / 40 / 128 [S30] | 800 | 6.25 | 25 | 100 |
+
+
+
+
+
+The DeepSeek-V3 row follows from MLA: `61 × (512 + 64) × 2 B = 70,272 B ≈ 68.6 KiB` per token, against 3.81 MiB per token if the same model used full MHA with 128 heads (`2 × 61 × 128 × 128 × 2 B`), derived from [S1]. The Qwen3 head dimension of 128 comes from the model configuration files rather than the report table; it is consistent with 64 heads × 128 = 8,192.
+
+
+
+
+ Why context fills a GPU. KV memory grows linearly: 2.5 GiB at 8K, 10 GiB at 32K, 40 GiB at 128K for one Llama 3 70B conversation, next to 70.6 GB of FP8 weights on a 141 GB H200 [S2][S9]. Below, the same 128K costs 40, 8.6 or 100 GiB depending on the attention design (GQA, MLA, MHA) [S1][S2][S30].
+
+
+
+### 4.2 Long context versus concurrent users
+
+
+Put the 70B model on one H200, which has 141 GB of HBM [S9]. In FP8 the weights take about 70.6 GB, leaving `141 − 70.6 = 70.4 GB` for everything else. One conversation at 128K tokens needs 40 GiB (42.9 GB), which is more than half the size of the FP8 weights. Divide the remainder by the per-sequence cache and the upper bounds on concurrency, before any runtime overhead, are:
+
+
+- at 8K tokens (2.5 GiB = 2.68 GB each): `70.4 / 2.68 ≈ 26` sequences;
+
+- at 32K tokens (10 GiB = 10.74 GB each): `70.4 / 10.74 ≈ 6` sequences;
+
+- at 128K tokens: 1 sequence, with about 27 GB left.
+
+
+These are derived ceilings, not benchmarks; real engines also reserve working memory. The shape is what matters: quadrupling the context cuts the number of simultaneous users by about four.
+
+
+Waste makes it worse. The vLLM authors measured that earlier serving systems used only 20.4% to 38.2% of KV memory for real token state, with the rest lost to fragmentation and over-reservation; paging the cache like virtual memory raised throughput 2–4× [S30]. Three levers shrink the cache itself: fewer KV heads (GQA, 8× on Llama 3 70B), a compressed latent (MLA, about 57× against full MHA), and a smaller cache datatype, since the formula is linear in bytes per value.
+
+
+The datatype lever is simple arithmetic. The table assumes 16 bits per cached value. Storing the cache in 8 bits halves every figure: the 128K-token Llama 3 70B sequence drops from 40 GiB to 20 GiB (derived). The formula has no hidden constants, so any change to layers, KV heads, head size or precision scales the result in proportion; the calculator below applies exactly this formula.
+
+
+
+
+### Will it fit? Model memory and KV cache
+
+
+This calculator adds the weights, the key-value (KV) cache that grows with context and batch, and a runtime overhead, then tells you the smallest hardware that holds it. Weights are `N_total × precision / 8`; the KV cache is `2 × layers × kv_heads × d_head × kv_bits/8` bytes per token (MLA models use `layers × mla_width × kv_bits/8`), times context and batch; the total is `(W_bytes + KV_bytes) × (1 + overhead)`. The 10% overhead is a rule of thumb, and the Apple 75% usable-memory share is an assumption. Every result has a "Show working" line that prints the formula and the numbers it used.
+
+
+
+Basis: estimate. Sources: model dimensions [S1] [S2] [S3]; GPU memory [S8] [S9] [S10] [S12] [S13] [S15] [S71]; bits per weight [S35] [S39]. Constants as of 2026-10-16.
+
+
+
+
+
+#### Operator takeaway
+
+
+Quote a model’s memory as weights plus cache at the context you will actually serve. A card that holds the weights comfortably can still serve a single user at long context. Hardware tiers, and so rack counts, follow from this sum.
+
+
+
+
+## Mixture of Experts: big brain, small bill
+
+
+In a mixture-of-experts (MoE) model, the single feed-forward network of each block is replaced by many smaller ones, called experts, plus a small router. For every token the router picks a handful of experts and the rest stay idle. The model can hold far more knowledge than it computes with on any one token. The price is paid elsewhere: all experts must sit in memory, and tokens must be shipped between GPUs to reach them.
+
+
+### 5.1 Routing and load balancing
+
+
+DeepSeek-V3 is the best documented example [S1]. Every layer except the first three is an MoE layer with one shared expert (always on) and 256 routed experts, each with an intermediate width of 2,048. The router computes a sigmoid affinity `s_i = σ(u·e_i)` between the token vector `u` and each expert’s centroid `e_i`, takes the top 8, and normalises the gates over the selected experts. Each token may be routed to at most 4 nodes, which caps cross-node traffic.
+
+
+
+
+ Mixture-of-experts routing in DeepSeek-V3 [S1]. A router scores 256 experts per token and sends it to the top 8, plus one shared expert that always runs; the other 248 are skipped. Only 37B of 671B parameters run per token (5.5 %, derived), and routing is limited to 4 nodes per token to bound all-to-all traffic.
+
+
+
+The hard part is balance. If the router favours a few experts, those GPUs saturate while others idle. Earlier MoEs such as Switch Transformers [S59] added an auxiliary loss to push the load flat; the DeepSeek authors report that a large auxiliary loss “impairs the model performance” [S1]. Their alternative is an auxiliary-loss-free bias: each expert carries a bias `b_i` that is added to its score only when choosing the top 8*, never in the gate weights. After each training step, `b_i` is lowered by a small step if the expert was overloaded and raised if it was underloaded. A tiny sequence-level balance loss remains as a safety net.
+
+
+### 5.2 Total versus active parameters
+
+
+The result for DeepSeek-V3 is 671B total and 37B active parameters [S1], so `37 / 671 = 5.5%` of the weights work on a given token (derived). Per-token compute is `2 × 37e9 = 7.4e10` FLOP, against `2 × 671e9 = 1.34e12` for a dense model of the same size, a factor of 18 (derived). Other published MoE models follow the same pattern:
+
+
+
+
+ Total and active parameters of open MoE models. Active share is derived.
+ |
+ Model | Total (B) | Active (B) | Active share | Source |
+
+
+ | Qwen3-235B-A22B | 235 | 22 | 9.4% | [S3] |
+
+ | Llama 4 Maverick | 400 | 17 | 4.3% | [S23] |
+
+ | DeepSeek-V3 | 671 | 37 | 5.5% | [S1] |
+
+ | Kimi K2 | 1,000 | 32 | 3.2% | [S25] |
+
+ | DeepSeek-V4-Pro | 1,600 | 49 | 3.1% | [S26] |
+
+
+
+
+
+Each number buys something different. **Memory** is set by the total: 671B parameters in FP8 is 671 GB, which fits an eight-GPU H200 server (`8 × 141 = 1,128 GB`, derived from [S9]) but not a single card. **Compute per token** is set by the active count. **Bandwidth** sits between them. At batch size 1, only the active experts’ weights are read per step, so decode is fast. At a large batch, different tokens select different experts, so almost all experts are touched on every step and the bandwidth demand moves back toward the total [S1]. An MoE is therefore cheapest per token at high batch and in compute, and dearest in HBM capacity.
+
+
+### 5.3 The network bill
+
+
+Placing different experts on different GPUs is called expert parallelism. Every MoE layer then needs an all-to-all exchange: each token’s vector is sent to the GPUs holding its chosen experts and the results are sent back. This happens twice per layer, for every layer. DeepSeek-V3’s production decode unit spans 40 nodes, 320 GPUs, with one expert per GPU plus 64 GPUs for redundant and shared experts [S1]. The cap of 4 nodes per token exists to limit exactly this traffic.
+
+
+The consequence for the facility is that an MoE service is a networking workload as much as a compute one. The experts live on NVLink within a node and on InfiniBand or RoCE between nodes, so the fabric has to be sized and cabled as part of the compute, not added afterwards. A 671B MoE is also not a “smaller” deployment than a dense 405B: the dense model needs fewer GPUs for its weights, the MoE needs fewer FLOPs per token, and which one is cheaper depends on batch size and on the interconnect.
+
+
+
+
+#### Operator takeaway
+
+
+Read an MoE spec sheet in two columns. Total parameters tell you how many GPUs must hold the model. Active parameters tell you what each token costs in compute. The gap between them is paid for in interconnect.
+
+
+
+
+## A guessing engine: logits, softmax and sampling
+
+
+After the last block, the model produces one score for every entry in its vocabulary, 100,000 to 200,000 of them. Those scores become probabilities, and the software draws one token from them, appends it and runs the model again. Nothing is looked up or checked. Every word of every answer is a draw from a distribution the model learned during training, and the settings of that draw (temperature and its relatives) decide how adventurous the output is.
+
+
+### 6.1 From logits to probabilities
+
+
+The final vector `h` is multiplied by an output matrix to give logits, one per vocabulary entry: `z = h·W_out T `, a vector of length `V`. The softmax converts it to probabilities:
+
+
+p_i = exp(z_i / T) / Σ_j exp(z_j / T)
+
+ `T` is the temperature. During training the objective is the cross-entropy `L = −Σ_t log p(x_t | x_<t)` averaged over tokens, and perplexity is `exp(L)`. Minimising it is what “next-token prediction” means.
+
+
+A worked case with three candidate tokens whose logits are 4, 3 and 1 (illustrative numbers, computed here):
+
+
+
+
+ Effect of temperature on three tokens with logits 4, 3 and 1.
+ |
+ Temperature | p(token 1) | p(token 2) | p(token 3) |
+
+
+ | 0.5 | 0.879 | 0.119 | 0.002 |
+
+ | 1.0 | 0.705 | 0.259 | 0.035 |
+
+ | 2.0 | 0.547 | 0.331 | 0.122 |
+
+
+
+
+
+Lower `T` sharpens the distribution; as `T` approaches 0 the draw becomes greedy, always picking the largest logit. Higher `T` flattens it.
+
+
+### 6.2 Temperature, top-k, top-p, min-p, penalties
+
+
+- **Greedy** (`T → 0`): deterministic, but prone to repeating itself.
+
+- **Temperature**: a global sharpen or flatten. DeepSeek recommends `T` between 0.5 and 0.7, with 0.6 suggested, for R1 [S4].
+
+- **Top-k**: keep the `k` most probable tokens and renormalise.
+
+- Top-p (nucleus): keep the smallest set of tokens whose probabilities add to at least `p`. The set shrinks when the model is confident and widens when it is not.
+
+- **Min-p**: keep tokens with `p_i ≥ min_p × p_max`, a threshold that scales with the model’s confidence (Nguyen et al., arXiv 2407.01082; background reference).
+
+- **Repetition, frequency and presence penalties**: subtract from, or divide, the logits of tokens already produced. These are heuristics bolted on at serving time. They are not part of the trained model.
+
+
+The sampler runs on the final token of every step and costs almost nothing next to the matrix multiplies. Its settings are a product decision, not a hardware one, but they matter operationally: a deterministic setting makes outputs repeatable for testing, while a higher temperature raises output variety and the chance of a wrong continuation.
+
+
+### 6.3 Why it hallucinates
+
+
+The training objective rewards assigning high probability to text that looks like the training data. It does not reward being true. Where the training data was unambiguous, the correct continuation gets nearly all the probability. Where a fact was rare or absent, the model still has to emit some token, and it emits the most plausible-looking one. A plausible name, date or citation has the same form as a correct one. Lowering the temperature does not add knowledge; it only removes randomness around whatever the distribution already favours.
+
+
+So hallucination is not a sampler bug to be tuned away. It follows from the objective and from training data that has gaps. The practical remedies move the knowledge or the check outside the weights: retrieval of source text, tools that compute or look things up, and verifiers that test the answer (section 14 of the full article returns to this).
+
+
+### 6.4 Speculative decoding: guessing ahead
+
+
+Decode wastes hardware. At batch size 1 the GPU must stream all active weights from HBM to produce one token, and its arithmetic units are mostly idle. Speculative decoding uses that slack. A small draft model proposes several tokens ahead; the large model then checks all of them in one forward pass, which costs about the same as generating a single token because the weight read is shared. A modified rejection-sampling rule accepts the drafted tokens that the large model would plausibly have produced and corrects the first mismatch, so the output distribution is *identical* to sampling from the large model alone [S32].
+
+
+Reported speed-ups are 2–3× on T5-XXL with identical outputs [S32] and 2–2.5× on a 70B Chinchilla model [S33]. DeepSeek-V3’s multi-token-prediction module, trained to depth 1, can serve as the draft [S1]. The gain depends on how often the draft agrees with the large model, and it shrinks at large batch, where the GPU is no longer idle.
+
+
+
+
+#### Operator takeaway
+
+
+Speculative decoding is a way to trade spare arithmetic for fewer memory trips, with no change in answers. It helps the latency of a lightly loaded GPU and gives little on a saturated one.
+
+
+
+
+## Model families in 2026: who is how big
+
+
+As of mid-October 2026 the models worth knowing fall into two groups. Open-weight models publish their size, so their memory footprint can be computed. Closed models from Anthropic, OpenAI and Google publish a context window and a price but no parameter count, and any figure quoted for them is a guess. Among the open models, the largest are mixtures of experts with one to two orders of magnitude fewer active than total parameters.
+
+
+### 7.1 Dense versus MoE, open versus closed
+
+
+A dense model uses all its parameters on every token, so total equals active. An MoE has a total much larger than its active count (section 5). Memory, and therefore the hardware tier, follows the total; per-token compute follows the active count. For closed models, parameter counts are not published by Anthropic, OpenAI or Google, and this article does not repeat figures seen elsewhere.
+
+
+### 7.2 The table
+
+
+
+
+ Model families as of 2026-10-16. n/p = not published. Licences as stated on each source.
+ |
+ Model | Type | Total / active | Context | Pre-train tokens | Licence | Source |
+
+
+ | Llama 3.1 8B / 70B / 405B | dense | 8B / 70B / 405B | 128K | ~15T (15.6T for 405B) | Llama 3.1 Community | [S69] [S2] |
+
+ | Llama 4 Scout | MoE, 16 experts | 109B / 17B | 10M | ~40T | Llama 4 Community (700M MAU clause) | [S23] |
+
+ | Llama 4 Maverick | MoE, 128 experts | 400B / 17B | 1M | ~22T | Llama 4 Community | [S23] |
+
+ | Qwen3-32B | dense | 32B | 128K | 36T | Apache 2.0 | [S3] |
+
+ | Qwen3-30B-A3B | MoE, 128/8 | 30B / 3B | 128K | 36T | Apache 2.0 | [S3] |
+
+ | Qwen3-235B-A22B | MoE, 128/8 | 235B / 22B | 128K | 36T | Apache 2.0 | [S3] |
+
+ | DeepSeek-V3 | MoE, 256+1/8 | 671B / 37B | 128K | 14.8T | MIT (weights; see repository) | [S1] |
+
+ | DeepSeek-R1 | MoE (V3 base) | 671B / 37B | 128K | V3 base | MIT | [S4] |
+
+ | DeepSeek-V4-Pro | MoE, CSA+HCA | 1.6T / 49B | 1M | >32T | MIT | [S26] |
+
+ | DeepSeek-V4-Flash | MoE | 284B / 13B | 1M | >32T | MIT | [S26] |
+
+ | Kimi K2 | MoE, 384/8, MLA | 1T / 32B | 128K | 15.5T | Modified MIT | [S25] |
+
+ | gpt-oss-120b | MoE, MXFP4 | 117B / 5.1B | not stated in the source extract | n/p | Apache 2.0 | [S24] |
+
+ | Mistral 7B | dense | 7B | — | n/p | Apache 2.0 | [S74] |
+
+ | Claude Opus 5.5, Sonnet 5.5, Haiku 5.5, Fable 5.1 | closed | n/p | 1M; 128K max output | n/p | proprietary | [S27] |
+
+ | GPT-6 Astra, GPT-6.1 Sol, GPT-6 Luna | closed | n/p | 1.05M; 128K output | n/p | proprietary | [S28] |
+
+ | Gemini 3.1 Pro (preview), 3.8 Flash | closed | n/p | reported 1M, not confirmed on the docs page read | n/p | proprietary | [S29] |
+
+
+
+
+
+List prices per million tokens (input / output) on 2026-10-16: Claude Fable 5.1 $10/$50, Opus 5.5 $4/$20, Sonnet 5.5 $2/$10, Haiku 5.5 from $0.10/$0.50 [S27]; GPT-6 Astra $10/$50, GPT-6.1 Sol $2/$10, GPT-6 Luna $0.10/$0.50 [S28]; Gemini 3.1 Pro Preview $2/$12 up to 200K prompt tokens and $4/$18 above [S29]. Anthropic lists batch processing at 50% off and cache reads at 5–10% of the input price [S27].
+
+
+### 7.3 Tokens per parameter: why small models are over-trained
+
+
+Divide pre-training tokens by parameters and the families separate sharply. The compute-optimal ratio from the Chinchilla study is about 20 [S5]. Everything else in the table follows from a different goal: a model that will be served billions of times is cheaper to run if it is small, so extra training compute is spent once to buy cheaper inference for its whole life.
+
+
+
+
+ Pre-training tokens per parameter, derived from the table above (tokens divided by total parameters unless stated).
+ |
+ Model | Arithmetic | Tokens per parameter |
+
+
+ | Kimi K2 | 15.5T / 1T | 15.5 |
+
+ | Chinchilla 70B | 1.4T / 70B | 20 |
+
+ | DeepSeek-V3 (total) | 14.8T / 671B | 22 |
+
+ | Llama 3.1 405B | 15.6T / 405B | 39 |
+
+ | Llama 4 Maverick | 22T / 400B | 55 |
+
+ | Llama 4 Scout | 40T / 109B | 367 |
+
+ | DeepSeek-V3 (active) | 14.8T / 37B | 400 |
+
+ | Llama 3 8B | 15T / 8B | 1,875 |
+
+ | Qwen3-0.6B | 36T / 0.6B | 60,000 |
+
+
+
+
+
+
+
+
+
+
+Qwen3-0.6B sees 3,000 times more tokens per weight than Chinchilla’s optimum (`60,000 / 20`). The small model is not compute-optimal for training, and it is not meant to be. It is built to fit a phone or to serve at very low cost per token.
+
+
+
+
+#### Operator takeaway
+
+
+A model name tells you less than three numbers: total parameters for the memory tier, active parameters for compute per token, and the licence for whether you may host it. For closed models you get a price and a window, and the hardware is the vendor’s concern.
+
+
+
+
+## Training: from 15 trillion tokens to a base model
+
+
+Training starts with a pile of text, filtered and mixed, and a model whose weights are random. The model reads a batch, predicts every next token, measures how wrong it was, and nudges the weights to be less wrong. That step repeats millions of times, on thousands of GPUs, for weeks. The outcome is a base model that continues text well. Everything it later does as an assistant is built on top of that.
+
+
+### 8.1 The data pipeline and the mix
+
+
+Sources are web crawl, code, books, papers, multilingual text and synthetic data. Meta’s final Llama 3 mix was about 50% general knowledge, 25% maths and reasoning, 17% code and 8% multilingual [S2]. Processing includes deduplication at URL, document and line level, heuristic and model-based quality filters, personal-data removal, and a classifier that down-samples over-represented topics; the proportions were chosen using small-model scaling experiments [S2]. Qwen3 uses 36T tokens in 119 languages and dialects, adds text extracted from PDFs, and generates “trillions” of synthetic tokens with its maths and coding models [S3]. DeepSeek-V3 packs documents without cross-sample attention masks and trains partly with a fill-in-the-middle objective [S1].
+
+
+Public human text is finite. Villalobos et al. project that training sets will be roughly equal to the available stock of public human text between 2026 and 2032 [S41]. That window includes the present year, which is why synthetic data and reinforcement learning are now where growth is being pursued.
+
+
+
+
+ From web text to assistant. Llama 3 pre-trains on 15.6T tokens for 3.8×10²⁵ FLOP [S2], about 25 MW on 16K H100 (derived); the mix is 50 % general, 25 % math, 17 % code, 8 % multilingual [S2]. Post-training adds SFT and RL, and the RL model can be distilled: a 32B student keeps 91 % of the teacher’s AIME score [S4][S54].
+
+
+
+### 8.2 Objective, optimiser, schedule, precision
+
+
+The objective is next-token cross-entropy (section 6). DeepSeek-V3 adds a multi-token-prediction loss of depth 1 [S1]. The optimiser is AdamW. DeepSeek-V3 used `β₁ = 0.9`, `β₂ = 0.95`, weight decay 0.1, a peak learning rate of 2.2e-4 after a 2K-step linear warm-up, then constant, then cosine decay, with gradient clipping at 1.0 [S1]. Llama 3 peak rates fell with size: 3e-4 (8B), 1.5e-4 (70B), 8e-5 (405B) [S2]. Kimi K2 used the Muon optimiser [S25]. The Llama 3 405B run used 16M tokens per batch at sequence length 8,192 [S2].
+
+
+The default number format is BF16. DeepSeek-V3 ran its matrix multiplies (forward, input-gradient and weight-gradient) in FP8 with fine-grained tile and block scaling, keeping sensitive operations in higher precision [S1]. DeepSeek-V4 ships its expert weights in FP4 and the remaining weights in FP8 [S26].
+
+
+### 8.3 Scaling laws
+
+
+Three results frame how big to train. Kaplan et al. (2020) found loss falling as a power law in parameters, `L(N) = (N_c/N)^0.076`, in data, `L(D) = (D_c/D)^0.095`, and in compute with exponent about 0.050; their allocation rule was `N ∝ C^0.73`, which says to grow the model much faster than the data [S7]. Hoffmann et al. (Chinchilla, 2022) fitted `L(N,D) = E + A/N^α + B/D^β` and concluded the opposite: for each doubling of model size, double the tokens. Their 70B model trained on 1.4T tokens, using the same compute as the 280B Gopher, reached 67.5% on MMLU [S5]. The fitted constants were E = 1.6934, A = 406.4, B = 410.7, α = 0.3392, β = 0.2849.
+
+
+A 2024 replication found that this parametric fit was inconsistent with the paper’s other two methods (it implied about 70 tokens per parameter). The re-estimate, E = 1.8172, A = 482.01, B = 2085.43, α = 0.3478, β = 0.3658, gives “around 20 tokens per parameter” [S6]. The rule of thumb that follows: with `D = 20N`, `C = 6 × N × 20N = 120N²`, so `N_opt = √(C/120)`. For Chinchilla’s budget, `√(5.76e23/120) = 69B` and `20 × 69B = 1.4T` tokens, as published. For Llama 3 405B’s budget of 3.8e25, the rule gives 563B parameters and 11.3T tokens; Meta reports that its own data-specific fits made 405B “approximately compute-optimal” [S2]. Section 7 showed why small models ignore the rule: compute-optimal means cheapest to train, not cheapest to use.
+
+
+### 8.4 Parallelism
+
+
+No GPU holds a frontier model plus its training state. With mixed-precision Adam, each parameter needs 16 bytes: 2 for the weight, 2 for the gradient, 12 for the FP32 master copy and moments [S60]. For a 70B model that is `70e9 × 16 = 1.12 TB`, derived, before any activations. The state is split along several axes:
+
+
+- **Data parallel and ZeRO/FSDP**: replicas each take a slice of the batch and all-reduce gradients; ZeRO shards optimiser state, gradients and parameters across replicas, and trained models above 100B on 400 GPUs at 15 PFLOPS [S60].
+
+- **Tensor parallel**: split each matrix across GPUs. Its traffic needs NVLink-class bandwidth, so it stays within one NVLink domain.
+
+- **Pipeline parallel**: assign consecutive layers to stages and use micro-batches to hide the idle “bubble”.
+
+- **Context parallel**: split one long sequence across GPUs.
+
+- **Expert parallel**: place experts on different GPUs, joined by all-to-all [S1].
+
+
+Llama 3 405B combined tensor, context, pipeline and fully-sharded data parallelism. On 8,192 GPUs it ran TP8 × PP16 × DP64 at 430 TFLOP/s per GPU, 43% BF16 MFU; the reported MFU range was 38–43% [S2].
+
+
+### 8.5 A worked budget: 70B parameters, 15T tokens
+
+
+Assumptions: a dense 70B model, 15T tokens, H100 SXM BF16 dense peak of 989 TFLOP/s [S8], 40% MFU (inside Llama 3’s 38–43% [S2]), 1.275 kW of IT power per GPU (DGX H100 maximum 10.2 kW ÷ 8 [S70]), PUE 1.2 (assumed), and $2.00–3.00 per GPU-hour (an assumed market range, not a sourced price).
+
+
+- Compute: `6 × 70e9 × 15e12 = 6.30e24` FLOP.
+
+- Sustained per GPU: `989e12 × 0.40 = 3.956e14` FLOP/s.
+
+- GPU-seconds: `6.30e24 / 3.956e14 = 1.593e10` s, which is **4.42M GPU-hours**.
+
+- Wall clock on 16,384 GPUs: 270 hours, **11.3 days**; on 4,096 GPUs, about 45 days. Restarts excluded.
+
+- Cost: $8.85M at $2, $11.06M at $2.50, $13.27M at $3 per GPU-hour.
+
+- Energy: IT `4.42M × 1.275 kW = 5.64 GWh`; facility at PUE 1.2, **6.77 GWh**.
+
+- Average facility power on 16,384 GPUs: `16,384 × 1.275 × 1.2 = 25.1 MW`.
+
+
+Two cross-checks. Meta reports 30.84M H100 GPU-hours for Llama 3.1 405B [S69]; `3.8e25 / (30.84e6 × 3600) = 342` TFLOP/s per GPU, 34.6% of the dense peak, which is below the 38–43% steady-state MFU because the GPU-hours include downtime and context extension. Epoch estimates that run’s training power at about 22.6 MW [S65], consistent with step 7. For DeepSeek-V3, `6 × 37e9 × 14.8e12 = 3.29e24` FLOP over 2.664M pre-training GPU-hours is 343 TFLOP/s per GPU, which is 35% of the H100 BF16 dense peak if the H800 is assumed equal to it (that assumption is not sourced). Its widely quoted $5.576M is the final run at an assumed $2 per GPU-hour on 2.788M GPU-hours, and the report says it excludes prior research and ablation [S1]. The R1 reinforcement-learning stage was reported as $294k on 512 H800s for 80 hours [S73]; 512 × 80 = 40,960 GPU-hours is $82k at $2, so the figure evidently covers more than that run, and its composition is not verified.
+
+
+
+
+### How much does training cost? Compute, GPU-hours and energy
+
+
+This calculator turns a parameter count and a token count into total compute, GPU-hours, wall-clock days, dollars and electricity. Compute is `C = 6 × N × D`; GPU-hours are `C / (peak × MFU) / 3600`; cost is `GPU_hours / goodput × price`; facility energy is IT energy times PUE. For a mixture-of-experts model enter the active parameters. The formula leaves out attention FLOPs and does not describe reinforcement-learning post-training. Every result has a "Show working" line that prints the formula and the numbers it used.
+
+
+
+Basis: estimate. Sources: 6ND [S7]; Chinchilla check [S5] [S6]; MFU and goodput [S2]; GPU peaks [S8] [S9] [S13]; power per GPU [S70] [S12] [S68]. Price per GPU-hour is your assumption. Constants as of 2026-10-16.
+
+
+
+
+### 8.6 What a 16K-GPU job does to your power system
+
+
+Synchronous training makes the whole cluster compute, then communicate, in step. Meta reports that this makes power swing by “on the order of tens of megawatts” [S2]. UPS, generators and the utility interconnect must tolerate that load step; the article on xAI Colossus (150 MW in 122 days) on this site covers the other end of the scale. Meta also reports 419 unexpected interruptions in 54 days on 16K H100 GPUs [S2], roughly one every three hours, and still achieved more than 90% effective training time. A training hall is therefore a facility that loses and regains tens of megawatts of load repeatedly, which is a different duty from an enterprise hall at steady state.
+
+
+
+
+#### Operator takeaway
+
+
+The 25.1 MW average hides the swing. Specify power quality against the step in load and its recovery after a restart, not against the mean, and treat a restart event as a normal operating condition.
+
+
+
+
+## Post-training: from autocomplete to assistant to reasoner
+
+
+A freshly pre-trained model only continues text. Ask it a question and it may answer, or it may write ten more questions. Post-training turns that continuer into an assistant by showing it good answers and by scoring its attempts, and the newest recipes reward it for getting checkable answers right. The compute is a small fraction of pre-training, but the way the model now thinks, with long chains of reasoning before it answers, changes how much serving capacity you need.
+
+
+### SFT, RLHF, DPO and Constitutional AI
+
+
+The first step is supervised fine-tuning (SFT): continue training with the same next-token loss as pre-training, but only on (prompt, response) pairs written or approved by people. The loss is `L = −Σ t log p(x t | x <t )`, applied to the response tokens. SFT teaches format and tone. It does not teach the model which of two plausible answers people prefer.
+
+
+That gap is closed by reinforcement learning from human feedback (RLHF). Raters rank pairs of answers, a reward model is trained to predict the ranking, and the policy is then optimised against that reward with PPO plus a KL penalty that keeps it close to the SFT model. The result that made the method standard: human raters preferred a 1.3B InstructGPT model to the 175B GPT-3, a model 135 times larger (175 / 1.3 = 135) [S52]. Alignment data bought more than parameters did.
+
+
+Direct Preference Optimization (DPO) removes the reward model and the RL loop. It solves the same objective in closed form and trains on the preference pairs as a classification loss [S53]. For an operator this matters because the job becomes an ordinary supervised run: no second model to host and no sampling loop to schedule.
+
+
+Constitutional AI replaces most human harmlessness labels with AI labels. The model critiques and revises its own outputs against a written list of principles, and AI preference judgements (RLAIF) train the final policy [S55]. Refusal behaviour is installed by these stages, which is the subject of the section on “uncensored” models further down.
+
+
+
+
+
+ Post-training methods compared: what each needs and what it removes
+ |
+ Method | Training signal | Extra models to host | Source |
+
+
+ | SFT | Demonstration responses | None | [S52] |
+
+ | RLHF (PPO) | Reward model trained on human rankings, plus KL penalty | Reward model, reference policy | [S52] |
+
+ | DPO | Preference pairs, classification loss | Reference policy only | [S53] |
+
+ | Constitutional AI / RLAIF | AI preference labels from written principles | Labelling model | [S55] |
+
+ | GRPO | Reward standardised within a sampled group | No critic network | [S54] |
+
+
+
+
+
+### GRPO and verifiable rewards
+
+
+PPO needs a value (critic) network about as large as the policy, which roughly doubles training memory. Group Relative Policy Optimization (GRPO) drops it. For each prompt the model samples a group of `G` answers, scores each with a reward `r i `, and uses the answer's standing within the group as its advantage:
+
+
+A_i = (r_i − mean(r_1 … r_G)) / std(r_1 … r_G)
+
+ A KL term to a reference policy remains. GRPO was introduced in DeepSeekMath 7B, which reached 51.7% on the MATH benchmark, or 60.9% when 64 samples are combined by self-consistency [S54].
+
+
+The second idea is where the reward comes from. In **RL with verifiable rewards (RLVR)** the reward is a program: the unit tests pass, or the final maths answer matches. No reward model is learned and none can be flattered. DeepSeek-R1 used GRPO at scale on this basis, and its authors state that reasoning ability “can be incentivized through pure reinforcement learning, obviating the need for human-labeled reasoning trajectories” [S4].
+
+
+The cost side is small by pre-training standards. Nature reported the R1 reinforcement-learning stage at $294,000 on 512 H800 GPUs for 80 hours [S73]. Those inputs give 512 × 80 = 40,960 GPU-hours, which is about $82,000 at $2 per GPU-hour. The reported figure is higher, so it evidently includes more than that single run; the composition was not verified.
+
+
+### Reasoning models and test-time compute
+
+
+A reasoning model writes a long chain of thought before the visible answer. Every thinking token is generated by the same decode loop as any other token, so thinking costs tokens, time and energy in exact proportion to its length. This is the second scaling axis, test-time compute: accuracy can be bought at inference instead of at training.
+
+
+Snell et al. measured the trade. A compute-optimal allocation of test-time compute is more than 4× more efficient than best-of-N sampling, and in FLOP-matched comparisons a small model given thinking budget can beat a model 14× larger on problems it can partly solve [S57]. Verifiers, such as process reward models or unit tests, rank or prune the candidates.
+
+
+Vendors now expose this as a dial. OpenAI's gpt-oss offers low, medium and high reasoning effort, and its SWE-bench score rises from 47.9 to 52.6 to 62.4 across the three settings [S24]. The Claude API exposes an “effort” control and adaptive thinking [S27].
+
+
+
+
+
+
+
+
+The data-center consequence follows from the energy per token covered in the serving section. At roughly 1 J per generated token (an illustrative figure derived there, not a measurement), a 10,000-token reasoning chain costs about 10 kJ, which is 10,000 / 3,600 = 2.8 Wh, against about 0.27 Wh for a 1,000-token answer. Reasoning moves cost from the training cluster to the serving fleet, which is why test-time compute is a capacity-planning question and not only a benchmark one.
+
+
+
+
+#### Plan serving capacity for thinking tokens
+
+
+Output length, not prompt length, sets the decode load of a reasoning workload. When a product turns on a higher effort setting, the same number of requests can consume several times the GPU-seconds. Measure tokens generated per request in production before you size the next cluster.
+
+
+
+
+## Distillation, fine-tuning and quantization: making it small
+
+
+A frontier model is too large and too slow for most jobs, so the field has three ways to shrink one. Distillation trains a small model to imitate a big one. Fine-tuning with LoRA adapts a model by training a sliver of extra weights instead of all of them. Quantization stores each weight in fewer bits. All three exist for the same reason you size a cooling plant to the load rather than the nameplate: memory and bandwidth are the scarce resources, and every byte removed from the weights is a byte the GPU does not have to read for every token.
+
+
+### Distillation: a small student learns from a large teacher
+
+
+Distillation comes in two forms. In **logit (soft-label) distillation** the student is trained to match the teacher's full next-token distribution, by minimising `KL(p teacher ∥ p student )` at temperature `T` and scaling the loss by `T²` [S56]. This needs the teacher's logits. In **sequence-level distillation** the teacher writes text and the student is fine-tuned on it with plain SFT, so only the teacher's outputs are needed. That is the form behind the DeepSeek-R1-Distill models, which were trained on samples generated by R1 and built on Qwen2.5 and Llama 3 bases [S4]. The dossier could not re-verify the size of the training set (reported as 800,000 samples, unverified).
+
+
+
+
+
+ DeepSeek-R1-Distill students against the 671B teacher and two references (pass@1 and ratings as published)
+ |
+ Model | AIME24 | MATH-500 | GPQA-D | LiveCodeBench | Codeforces rating |
+
+
+ | R1-Distill-Qwen-1.5B | 28.9 | 83.9 | 33.8 | 16.9 | 954 |
+
+ | R1-Distill-Qwen-7B | 55.5 | 92.8 | 49.1 | 37.6 | 1189 |
+
+ | R1-Distill-Qwen-14B | 69.7 | 93.9 | 59.1 | 53.1 | 1481 |
+
+ | R1-Distill-Qwen-32B | 72.6 | 94.3 | 62.1 | 57.2 | 1691 |
+
+ | R1-Distill-Llama-70B | 70.0 | 94.5 | 65.2 | 57.5 | 1633 |
+
+ | o1-mini (reference) | 63.6 | 90.0 | 60.0 | 53.8 | 1820 |
+
+ | GPT-4o-0513 (reference) | 9.3 | 74.6 | 49.9 | 32.9 | 759 |
+
+ | DeepSeek-R1 (teacher) | 79.8 | — | — | — | — |
+
+
+
+
+Source: DeepSeek-R1 model card [S4].
+
+
+The 32B student keeps 72.6 / 79.8 = 91% of the teacher's AIME score while holding 32 / 671 = 4.8% of its total parameters (derived). Qwen3 reports the same economics for its small models: strong-to-weak distillation gave “significantly better performance than reinforcement learning while requiring approximately only 1/10 of the GPU hours” [S3]. One legal caution: some API terms forbid using a model's outputs to train a competing model, so read the licence of the teacher before generating data from it.
+
+
+
+
+ Distillation. DeepSeek-R1 (671B, 37B active) scores 79.8 on AIME24; its reasoning traces fine-tune a Qwen2.5-32B student to 72.6, 91 % of the teacher with 4.8 % of the parameters [S4]. Matching soft logits instead of traces is the other route [S56]; Qwen3 reports about a tenth of the GPU-hours of RL [S3].
+
+
+
+### LoRA and QLoRA: the maths and the memory
+
+
+LoRA freezes a weight matrix `W` of shape `d_out × d_in` and learns a low-rank update `ΔW = B·A`, with `B` of shape `d_out × r`, `A` of shape `r × d_in` and `r` far smaller than either dimension, scaled by `α/r`. Trainable parameters per adapted matrix are `r·(d_in + d_out)`. On GPT-3 175B this gave 10,000× fewer trainable parameters and 3× less GPU memory than full Adam fine-tuning, and no extra inference latency once the update is merged into `W` [S34].
+
+
+A worked case: Llama 3 8B, rank 16, adapting all seven linear layers in each block (q, k, v, o, gate, up, down), with `d = 4,096`, key/value width 1,024, FFN width 14,336 and 32 layers (derived from the public model configuration; the FFN width was not re-read for this article):
+
+
+per layer = 16 × [(4096+4096) + 2×(4096+1024) + (4096+4096) + 3×(4096+14336)]
+ = 16 × 81,920 = 1,310,720
+total = 1,310,720 × 32 = 41.9 M (0.52% of 8.03 B)
+
+ QLoRA keeps the frozen base in 4-bit NormalFloat (NF4) with double quantization of the scale constants and uses paged optimizers to ride out memory spikes. It fine-tunes a 65B model on a single 48 GB GPU while preserving 16-bit fine-tuning quality, and its Guanaco model reached 99.3% of ChatGPT on the Vicuna benchmark after 24 hours on one GPU [S35].
+
+
+The memory rules, with ZeRO's 16 bytes per parameter for mixed-precision Adam as the full fine-tune baseline (2 weights + 2 gradients + 12 for the FP32 master copy and moments) [S60]:
+
+
+- **Full fine-tune** ≈ 16 B/param + activations: 8B → 128 GB; 70B → 70.6 × 16 = 1.13 TB; 405B → 6.5 TB (derived).
+
+- **LoRA** (BF16 base) ≈ 2 B/param for the base + 16 B per trainable parameter + activations.
+
+- **QLoRA** ≈ 0.516 B/param for the base (4.127 bits) + 16 B per trainable parameter + activations: 8B → 4.1 GB; 70B → 36 GB (derived).
+
+
+Activations depend on sequence length and batch size, and gradient checkpointing trades extra compute for lower memory, so treat these as floors. The calculator below applies them.
+
+
+
+
+### Can I fine-tune it on one card? LoRA and QLoRA memory
+
+
+This calculator estimates the memory to fine-tune a model with a low-rank adapter. Adapter size is `P_lora = layers × Σ_targets r × (d_in + d_out)`; the base weights are held in 16-bit or in 4-bit NF4, the adapters carry 16 bytes per parameter of optimiser state, and activations are a rough `layers × seq_len × micro_batch × d_model × k_act × 2 B` with gradient checkpointing. Activations are the uncertain term, so a plus or minus 50% band is shown. Every result has a "Show working" line that prints the formula and the numbers it used.
+
+
+
+Basis: estimate. Sources: LoRA [S34]; QLoRA and NF4 bits per weight [S35]; 16 bytes per parameter of training state [S60]. The activation factor is an assumption. Constants as of 2026-10-16.
+
+
+
+
+### Quantization: fewer bits per weight
+
+
+Quantization stores weights as low-bit integers or small floats, with a scale per block. Memory is `N × bits / 8`. Four methods carry most of the field:
+
+
+- **LLM.int8()** halves inference memory with no degradation by keeping the few outlier dimensions in 16-bit; more than 99.9% of values are still multiplied in 8-bit [S38].
+
+- **GPTQ** is a one-shot, second-order method for 3–4 bits. It quantizes a 175B model in about 4 GPU-hours with negligible accuracy loss [S36].
+
+- **AWQ** protects the roughly 1% of weights that matter most, chosen by activation magnitude rather than weight magnitude; its TinyChat engine runs more than 3× faster than Hugging Face FP16 [S37].
+
+- **FP8 and FP4** are hardware formats: FP8 on Hopper, Blackwell and MI355X, and NVFP4 or MXFP4 on Blackwell and MI355X [S10][S13]. gpt-oss ships its expert weights in MXFP4 so that 117B parameters fit on one 80 GB GPU [S24].
+
+
+The GGUF format used by llama.cpp and Ollama makes the trade visible. Effective bits per weight exceed the nominal label because block scales are stored with the weights. For Llama 3.1 8B [S39]:
+
+
+
+
+
+
+
+
+Quality follows the bits. Eight-bit is near lossless [S38], four-bit usually costs little but depends on the task, and below three bits the loss climbs sharply; llama.cpp measures the damage with perplexity and KL divergence against the FP16 original [S39]. Weight memory examples (derived): a 70B model takes 141 GB in BF16, 71 GB in FP8 and 43 GB in Q4_K_M (70.6 × 4.894 / 8 = 43.2). DeepSeek-V3 at 671B parameters needs 671 GB in FP8, which fits eight H200 (8 × 141 = 1,128 GB) but not eight H100 (640 GB). Llama 4 Scout at int4 is about 55 GB (109 × 0.5), consistent with Meta's single-H100 claim [S23].
+
+
+### What hardware for a 7B, 14B or 70B fine-tune
+
+
+Applying the formulas above (derived; activation memory excluded):
+
+
+
+
+
+ Fine-tuning memory guide by model size (derived from the 16 B/param and QLoRA rules)
+ |
+ Model | QLoRA | LoRA (BF16 base) | Full fine-tune |
+
+
+ | 7–8B | 12–24 GB GPU | 24–32 GB (RTX 4090 / 5090 class) | ≥128 GB, sharded (2× H100) |
+
+ | 14B | 24 GB | 48–80 GB | — |
+
+ | 70B | One 48–80 GB GPU | 2–4× 80 GB | ≥16× 80 GB (two HGX nodes) |
+
+
+
+
+
+
+#### Memory sets the tier, and fine-tunes are small jobs
+
+
+A LoRA or QLoRA run on an 8B or 70B model fits one workstation card or one 8-GPU server. Only a full fine-tune of a 70B model, at 1.13 TB, needs a multi-node cluster. Ask which of the three a request really is before it becomes a rack allocation.
+
+
+
+
+## “Uncensored” models: what abliteration actually is
+
+
+Chat models are trained to decline some requests. When a model's weights are public, that trained behaviour is part of the file, and researchers have shown it can be located and changed. The result is what people call an “uncensored” or “abliterated” model. This section describes the mechanism that was published, what it does and does not change, and where responsibility sits when such a model is hosted. It gives no procedure.
+
+
+### How refusal is trained in
+
+
+Refusal is not a filter bolted on after the model. It is learned in the stages described earlier: supervised examples of declining, preference training that rewards declining in the right cases, and, in Constitutional AI, written principles the model applies to its own outputs [S52][S55]. Because it is learned behaviour stored in the weights, anyone holding the weights can change it.
+
+
+### The single-direction finding
+
+
+Arditi et al. (NeurIPS 2024) reported that refusal “is mediated by a one-dimensional subspace, across 13 popular open-source chat models up to 72B” [S40]. Their approach is interpretability work: compare the model's internal activations, in the residual stream, on prompts it refuses against prompts it answers. The difference of the two mean activations defines a direction, which they call the refusal direction. Two interventions follow from it:
+
+
+- **Directional ablation** removes that component from every residual activation while the model runs.
+
+- **Weight orthogonalisation** edits the weights so that they never write along that direction. This is the technique the community calls abliteration.
+
+
+The converse also holds in the paper: adding the direction makes a model refuse harmless requests [S40]. A second, coarser route exists: supervised fine-tuning on data that contains no refusals has a similar effect and can degrade other behaviours; the sources here do not quantify that degradation.
+
+
+### What it does and does not change
+
+
+The paper measured the effect on the behaviour and on general capability [S40]:
+
+
+
+
+
+ Measured effects of removing the refusal direction (Arditi et al.)
+ |
+ Measure | Result |
+
+
+ | Models tested | 13, up to 72B parameters |
+
+ | Attack success rate, Qwen models | 79–84% |
+
+ | Attack success rate, Llama-2 models | 4–23% |
+
+ | MMLU, ARC, GSM8K | Largely preserved |
+
+ | TruthfulQA | −1 to −3.5 points |
+
+
+
+
+
+Two points matter for anyone evaluating such a model. First, the edit removes a learned behaviour; it adds no knowledge and no capability. The model's factual errors and its tendency to hallucinate are unchanged. Second, the effect differs between model families by a wide margin, as the two attack-success ranges show, so a claim made about one model does not transfer to another.
+
+
+The authors addressed the dual-use question in their own ethics statement. They write that the method “marginally lowers the bar for jailbreaking open-source model weights”, and argue it “does not substantially alter the risk profile of open sourcing models”, because fine-tuning already achieved the same end [S40]. Readers can weigh that argument for themselves; it is the researchers' position, not a settled one.
+
+
+### Licences, liability and the operator's responsibility
+
+
+Modifying weights does not remove the licence attached to them. Open-weight licences differ in what they constrain:
+
+
+
+
+
+ Licence terms that still bind a modified open-weight model
+ |
+ Family | Licence | Use conditions | Source |
+
+
+ | Llama 4 (Scout, Maverick) | Llama 4 Community | Must comply with Meta's Acceptable Use Policy; a separate licence is required above 700M monthly active users | [S23] |
+
+ | Qwen3, gpt-oss | Apache 2.0 | No use policy in the licence | [S3][S24] |
+
+ | DeepSeek-R1, V4 | MIT | No use policy in the licence | [S4][S26] |
+
+
+
+
+
+A permissive licence only means the licensor imposes no use policy. The party that deploys the model remains accountable under the law that applies to it. The EU AI Act (Regulation (EU) 2024/1689) places obligations on providers of general-purpose AI models; the application date quoted in secondary summaries was not re-checked for this article, so confirm it against the regulation text before relying on it. An operator who hosts a modified model on their own infrastructure is the deployer of that system, and the output filtering, access control, logging and terms of use around it are the operator's to design.
+
+
+
+
+#### Hosting a modified model makes you the deployer
+
+
+The licence travels with the weights and the legal responsibility travels with the host. Before running any modified open-weight model on your own hardware, read its licence, record who may reach it, and put your own input and output controls around it. The model will not supply them.
+
+
+
+
+## Serving: how one GPU talks to a thousand users
+
+
+Answering a prompt happens in two phases. First the GPU reads the whole prompt at once, which is heavy arithmetic. Then it writes the answer one token at a time, and each token requires reading all of the model's weights from memory again, which is a memory-speed problem and not an arithmetic one. Serving software exists to keep many users' requests in flight at once so that every one of those expensive weight reads is shared. The data-center consequence is that tokens per second per GPU is set by HBM bandwidth and by how much memory the KV cache leaves free.
+
+
+### Prefill and decode
+
+
+Prefill processes the prompt in one parallel pass. It costs `2·N·n_prompt` FLOPs, it is compute-bound, and it fills the KV cache. Decode then generates one token per step per sequence. Each step reads all the weights plus the sequence's KV cache for a tiny amount of arithmetic, so decode is memory-bandwidth-bound.
+
+
+Prefill example (derived): a 4,000-token prompt on a 70B FP8 model costs 2 × 70.6e9 × 4,000 = 5.65e14 FLOP. At 50% of an H200's 1,979 TFLOP/s FP8 dense peak (the 50% is an assumption) that is 5.65e14 / 9.9e14 = 0.57 s [S9].
+
+
+
+
+ What a GPU does when you hit Enter. Prefill of a 4,000-token prompt runs in parallel and is compute-bound, about 0.57 s on an H200 (derived). Each decode step then re-reads all 70.6 GB of weights plus the KV cache, about 114 GB per step at batch 32: 23.7 ms ideal, 39.4 ms at 60 % bandwidth utilisation (derived). New requests join the running batch [S30].
+
+
+
+### The metrics
+
+
+- **TTFT** (time to first token) ≈ queueing + prefill time.
+
+- **TPOT / ITL** (time per output token, or inter-token latency) = the decode step time.
+
+- **Throughput** = total tokens per second per GPU or per node.
+
+- **Goodput** = requests per second that meet both the TTFT and TPOT targets. DistServe reports serving “7.4x more requests or 12.6x tighter SLO” by separating the phases [S44].
+
+
+### The engines
+
+
+**vLLM** stores the KV cache in fixed-size blocks, like operating-system pages (PagedAttention), so memory is allocated on demand and blocks can be shared between requests. Earlier systems used only 20.4–38.2% of their KV memory for real token state; vLLM reports near-zero waste and 2–4× the throughput at the same latency versus FasterTransformer and Orca [S30]. **SGLang** keeps a radix tree of cached prefixes (RadixAttention) to reuse KV across calls and reports up to 6.4× throughput on agent, JSON, RAG and multi-turn workloads [S31]. **TensorRT-LLM** is NVIDIA's compiled engine with in-flight batching and FP8/FP4 kernels (background; its documentation was not re-read for this article). **llama.cpp** and **Ollama** run GGUF-quantised weights on CPU, Apple Metal, CUDA and ROCm [S39].
+
+
+### Continuous batching, prefix caching, disaggregation
+
+
+- **Continuous batching**: finished sequences leave and new ones join at every decode step, rather than waiting for a whole batch to finish. vLLM and SGLang both do this [S30][S31].
+
+- **Prefix caching**: reuse the KV cache for a shared system prompt or document. API vendors price cache reads at 2.5–10% of normal input [S27].
+
+- **Disaggregated prefill and decode**: run the two phases on separate GPU pools and move the KV cache between them over NVLink or RDMA [S44][S63]. DeepSeek runs a 320-GPU decode unit [S1]. vLLM's own documentation is explicit that it lets you tune TTFT and ITL separately and control tail ITL, but that it “DOES NOT improve throughput” [S63].
+
+
+### The roofline and the bandwidth ceiling
+
+
+The roofline model says attainable FLOP/s = min(peak FLOP/s, arithmetic intensity × memory bandwidth), where intensity is FLOPs per byte moved. The crossover is the ridge point, peak divided by bandwidth (derived, dense FLOPs):
+
+
+
+
+
+ Ridge points: below this intensity a workload is bandwidth-bound (derived from vendor peak and bandwidth)
+ |
+ Device | Precision | Peak, dense | Bandwidth | Ridge (FLOP/byte) | Source |
+
+
+ | H100 SXM | BF16 | 989 TF | 3.35 TB/s | 295 | [S8] |
+
+ | H100 SXM | FP8 | 1,979 TF | 3.35 TB/s | 591 | [S8] |
+
+ | H200 | BF16 | 989 TF | 4.8 TB/s | 206 | [S9] |
+
+ | MI355X | FP8 | 5 PF | 8 TB/s | 625 | [S13] |
+
+
+
+
+
+The B200 is left out of the table because NVIDIA's page quotes “FP8 72 PFLOPS” for the 8-GPU system without saying whether it is sparse or dense; the ridge point is unverified (562 if the figure is sparse) [S12].
+
+
+For decode at batch `B` with weights of `b` bytes per parameter, FLOPs = `2·N·B` and bytes moved ≈ `N·b`, so intensity ≈ `2B/b`. At BF16 (b = 2) that is about `B`. Decode becomes compute-bound only near a batch of 200–300 on Hopper, and the KV cache usually runs out of memory first. A 4,000-token prefill has intensity near 4,000 and is compute-bound.
+
+
+
+
+ Roofline in blocks: why decode waits on memory. Below the ridge point, speed is set by bandwidth; above it, by compute. Ridge: H100 295 FLOP/B [S8], H200 206 [S9], MI355X 625 [S13]. Decode at batch 1 does about 1 FLOP per byte, batch 32 about 32, a 4K-token prefill about 4,000. Derived from vendor peak and bandwidth; dense FLOPs.
+
+
+
+At batch 1 the ceiling is therefore `tokens/s ≤ bandwidth / weight bytes` (derived):
+
+
+
+
+
+ Decode ceiling at batch 1 (tokens per second = bandwidth ÷ weight bytes)
+ |
+ Model and precision | Hardware | Bandwidth | Weight bytes | Ceiling (tok/s) |
+
+
+ | 8B BF16 | RTX 4090 | 1,008 GB/s | 16.1 GB | 63 |
+
+ | 8B Q4_K_M | RTX 4090 | 1,008 GB/s | 4.9 GB | 205 |
+
+ | 8B Q4_K_M | RTX 5090 | 1,792 GB/s | 4.9 GB | 364 |
+
+ | 70B Q4_K_M | Mac Studio M3 Ultra | 819 GB/s | 43.2 GB | 19 |
+
+ | 70B Q4_K_M | M4 Max | 546 GB/s | 43.2 GB | 13 |
+
+ | 70B FP8 | H100 | 3.35 TB/s | 70.6 GB | 47 |
+
+ | 70B FP8 | H200 | 4.8 TB/s | 70.6 GB | 68 |
+
+ | 70B FP8 | B200 / MI355X | 8 TB/s | 70.6 GB | 113 |
+
+
+
+
+Bandwidth sources: [S8][S9][S12][S13][S71]; the RTX 5090 figure is 512-bit × 28 Gbps ÷ 8 = 1,792 GB/s [S15]; the RTX 4090 value comes from secondary sources. Real engines reach roughly 50–80% of these ceilings; that range is an engineering rule of thumb, not a sourced figure.
+
+
+Speculative decoding exploits the same fact. Because a decode step is limited by reading weights, verifying several drafted tokens costs about as much as generating one, which is why it gives 2–3× with identical outputs [S32].
+
+
+### Batching, cost per million tokens and joules per token
+
+
+Batching shares each weight read among many users. The setup (derived): Llama 3 70B in FP8 (70.6 GB) on one H200 (141 GB, 4.8 TB/s), average context 4,096 tokens with a BF16 KV cache of 1.34 GB per sequence, $3.50 per GPU-hour (an assumed rental price) and 1.3 kW all-in IT power per GPU (assumed, from the DGX H100 figure [S70]). The step time is `max((W + B·KV) / BW, 2·N·B / peak) / eff`, where `eff` is the fraction of ideal bandwidth the engine achieves (assumed).
+
+
+
+
+
+ 70B FP8 on one H200: batch size against speed, cost and energy (derived, assumptions stated above; eff = 1.0 / 0.6)
+ |
+ Batch | Memory used | Step time (ms) | Per-user tok/s | Total tok/s | $ per M tokens | J per token |
+
+
+ | 1 | 72 GB | 15.0 / 25.0 | 67 / 40 | 67 / 40 | 14.57 / 24.29 | 19.5 / 32.5 |
+
+ | 8 | 81 GB | 16.9 / 28.2 | 59 / 35 | 472 / 283 | 2.06 / 3.43 | 2.8 / 4.6 |
+
+ | 16 | 92 GB | 19.2 / 32.0 | 52 / 31 | 834 / 500 | 1.17 / 1.94 | 1.6 / 2.6 |
+
+ | 32 | 114 GB | 23.7 / 39.4 | 42 / 25 | 1,353 / 812 | 0.72 / 1.20 | 0.96 / 1.6 |
+
+
+
+
+
+
+
+
+
+
+Going from batch 1 to batch 16 cuts the cost per token 12× (14.57 / 1.17 = 12.5), and to batch 32 about 20× (14.57 / 0.72 = 20.2), while the speed seen by each user falls by only about 37% (67 to 42 tok/s). The KV cache, not arithmetic, ends the growth: at batch 32 the compute time is 2.3 ms against 23.7 ms of memory time, and memory used is already 114 of 141 GB.
+
+
+At about 1 J per token (batch 32, ideal efficiency), a 1,000-token answer is about 1 kJ, which is 1,000 / 3,600 = 0.27 Wh. That is the same order as published per-prompt figures of 0.24 Wh [S18] and about 0.3 Wh [S66]. It is an illustration under stated assumptions, not a measurement.
+
+
+
+
+### How fast and how cheap is serving? Throughput and cost per million tokens
+
+
+This calculator is a roofline ceiling for decoding. Each step reads the weights and the KV cache once, so `t_mem = (W + B × KV_seq) / (n_gpus × BW)`, compared with `t_comp = 2 × N_active × B / (n_gpus × F)`. The step time is the larger of the two divided by an assumed bandwidth efficiency, throughput is `B / t_step`, and cost is `(n_gpus × price) / (throughput × 3600) × 1e6` dollars per million tokens. It is a ceiling-based estimate, not a benchmark. Every result has a "Show working" line that prints the formula and the numbers it used.
+
+
+
+Basis: ceiling-based estimate, not a benchmark. Sources: GPU bandwidth, memory and FLOPs [S8] [S9] [S12] [S13] [S14]; power per GPU [S70]. Bandwidth efficiency, prefill utilisation and GPU price are assumptions. Constants as of 2026-10-16.
+
+
+
+
+
+#### Size by memory first, then by batch
+
+
+For decode, divide HBM bandwidth by weight bytes to find the ceiling, then check how many sequences' KV caches fit beside the weights. That second number, not the FLOP rating, sets your tokens per second per kW. Prefix caching and a tighter context limit raise it without new hardware.
+
+
+
+
+## The hardware ladder, rung by rung
+
+
+The same model runs on a laptop, a workstation card, a server, a liquid-cooled rack or a campus of tens of thousands of accelerators. What changes from rung to rung is memory, memory bandwidth and the power and cooling needed to feed them. The model that fits a rung is set by its weight memory plus its KV cache, and the speed is set by bandwidth. For a facility engineer the important step is the one from server to rack, where air cooling stops being an option.
+
+
+The serving rule used throughout: memory needed = weights (`N × bytes per parameter`) + KV cache (see the KV-cache section and its calculator) + roughly 10–20% runtime overhead (a rule of thumb, not a sourced figure). Training needs about 16 B per parameter plus activations [S60]; the energy calculator in the training section turns a GPU count into megawatts.
+
+
+
+
+ The hardware ladder, laptop to campus. Memory, bandwidth and power each jump at every rung: 819 GB/s at 512 GB unified [S71], 8×H200 for 1.13 TB [S9], a 72-GPU rack with 13.4 TB HBM at 132 kW [S10][S68], a 9,216-chip pod near 10 MW [S14], then 150 MW to 1.2 GW campuses [S19][S20]. Liquid cooling becomes mandatory at the rack [S10][S14]. Multipliers derived.
+
+
+
+### Laptop and Mac Studio
+
+
+Apple's unified memory lets a laptop-class chip hold a model that would need a data-center GPU elsewhere. The M4 Max offers up to 128 GB at 546 GB/s, and the Mac Studio M3 Ultra up to 512 GB at 819 GB/s [S71]. A 70B model at Q4_K_M (43 GB) fits an M4 Max. DeepSeek-V3 at about 4 bits needs 671 × 0.5 = 336 GB to 671 × 4.894 / 8 = 410 GB and so fits the 512 GB M3 Ultra (derived). The bandwidth ceilings from the serving section apply: about 19 tok/s for 70B Q4 on the M3 Ultra and 13 on the M4 Max. Newer Apple silicon than these two parts was not checked for this article.
+
+
+### Workstation GPU
+
+
+An RTX 5090 carries 32 GB of GDDR7 at 1,792 GB/s, draws 575 W and asks for a 1,000 W power supply [S15]. An RTX 4090 has 24 GB (its 1,008 GB/s figure is from secondary sources). These cards serve an 8B model at BF16, a 14B at 8-bit or a 32B at 4-bit (about 20 GB, derived), and fine-tune 8–14B models with QLoRA.
+
+
+### One server
+
+
+The eight-GPU node is the standard unit. A DGX H100 draws about 10.2 kW at maximum [S70], which is 10.2 / 8 = 1.275 kW per GPU slot including the host. The parts:
+
+
+
+
+
+ Accelerators and 8-GPU systems: memory, bandwidth and power (vendor figures; dense FLOPs)
+ |
+ Part | Memory | Bandwidth | Power | Source |
+
+
+ | H100 SXM | 80 GB | 3.35 TB/s | — | [S8] |
+
+ | H200 | 141 GB | 4.8 TB/s | — | [S9] |
+
+ | MI355X | 288 GB | 8 TB/s | 1,400 W | [S13] |
+
+ | DGX H100 (8 GPUs) | 640 GB | — | 10.2 kW max | [S70] |
+
+ | DGX B200 (8 GPUs) | 1,440 GB | 64 TB/s | 14.3 kW | [S12] |
+
+
+
+
+
+Eight H200 give 8 × 141 = 1,128 GB, which holds a 405B model at FP8 (405 GB) with room for KV, or DeepSeek-V3 at FP8 (671 GB). Eight H100 (640 GB) cannot hold the latter. The same server fully fine-tunes an 8B model, LoRA-tunes a 70B and QLoRA-tunes a 405B (derived).
+
+
+### One rack: NVL72
+
+
+The GB200 NVL72 joins 72 GPUs and 36 Grace CPUs in a single NVLink domain with 13.4 TB of HBM3E, 576 TB/s of aggregate memory bandwidth and 130 TB/s of NVLink bandwidth, and it is liquid-cooled [S10]. The GB300 NVL72 raises memory to 20 TB and gives each GPU an 800 Gb/s network interface [S11]. HPE lists the GB200 NVL72 rack at 132 kW nominal TDP and about 192 kW peak electrical design power [S68]. Per GPU that is 132 / 72 = 1.83 kW (derived).
+
+
+What fits: a trillion-parameter mixture-of-experts model with long context, since Kimi K2 at FP8 is about 1 TB (derived) against 13.4 TB of HBM, and a full fine-tune of a 70B model (1.13 TB). NVIDIA's Vera Rubin NVL144 is reported for the second half of 2026 at 288 GB HBM4 per GPU and 120–130 kW per rack, but those figures come from secondary reporting of a roadmap and are unverified [S75].
+
+
+
+
+
+
+
+
+### A pod
+
+
+Beyond one NVLink domain, racks are joined by scale-out networks: InfiniBand or RoCE at 400–800 Gb/s per GPU [S2][S11]. Llama 3 405B was trained on 16,384 H100 over such a fabric [S2]. Google's answer is the TPU pod: an Ironwood pod joins 9,216 chips for 42.5 EFLOPS of FP8, draws about 10 MW and is liquid-cooled; one chip has 192 GB of HBM at 7.37 TB/s and 4,614 TFLOPS FP8 [S14]. All-in that is 10 MW / 9,216 = 1.09 kW per chip (derived). Vertiv and NVIDIA publish a 7 MW reference architecture for GB200 NVL72 [S68].
+
+
+### A campus
+
+
+xAI states that Colossus was built in 122 days and then doubled in 92 days to 200,000 GPUs [S19]; the site's article 23 covers that build. OpenAI states that Stargate Abilene uses GB200 systems and that GPT-5.5 was trained there [S21]; Epoch estimates the site reaches its planned 1.2 GW in the fourth quarter of 2026 [S20]. Claims about Colossus beyond 200,000 GPUs rest on secondary sources and are not used here. Cluster power scales linearly from the unit figures (derived, PUE of 1.2 assumed):
+
+
+- 100,000 H100 × 1.275 kW = 127.5 MW IT; × 1.2 = 153 MW, in line with the roughly 150 MW public figure for Colossus phase 1 in article 23.
+
+- 100,000 GB200 = 100,000 / 72 = 1,389 racks × 132 kW = 183 MW IT; × 1.2 = 220 MW. Epoch's estimate for GPT-6 Astra is about 233 MW [S65].
+
+
+### Inference ASICs: Groq and Cerebras
+
+
+These chips trade capacity for bandwidth by keeping weights in on-chip SRAM. The Groq chip holds 230 MB of SRAM at 80 TB/s, draws 215 W TDP and is scheduled deterministically by its compiler [S17]. At 230 MB per chip a 70B FP8 model needs 70.6 GB / 230 MB = 307 chips for the weights alone (derived), so deployments are many-chip racks. The Cerebras WSE-3 puts 44 GB of SRAM at 21 PB/s and 900,000 cores on one 46,225 mm² wafer; the CS-3 system draws about 27 kW, occupies 16 RU and is liquid-cooled. Its datasheet figure of 125 PFLOPS FP16 is a sparse number, while the company's current web page claims 250 PFLOPS for a “WSE-3 Turbo” without stating the basis [S16].
+
+
+### What it means for your facility
+
+
+- **Density.** A single DGX H100 at 10.2 kW already sits at or above what a conventional rack is commonly provisioned for (a rule of thumb of 4–8 kW, not sourced here). An NVL72 at 132 kW is more than ten times that eight-GPU node (132 / 10.2 = 12.9).
+
+- **Liquid cooling.** GB200 and GB300 NVL72 and Ironwood are liquid-cooled [S10][S11][S14]. Vertiv's reference design supports up to 132 kW per rack with hybrid liquid and air [S68]. Google says direct liquid cooling can “reliably sustain up to twice the performance of standard air cooling” [S14].
+
+- **Power quality.** Synchronous training makes cluster power swing “on the order of tens of megawatts”, and Llama 3's 16K-GPU run logged 419 unexpected interruptions in 54 days [S2]. UPS, generator and utility interconnection need to be designed for that load step.
+
+- **PUE.** The campus figures above assume a PUE of 1.2; substitute your own with the site's PUE calculator.
+
+
+
+
+#### The rack is the design unit
+
+
+From NVL72 upward, the 72 GPUs, the NVLink fabric and the cold plates are one product. Plan floor loading, coolant distribution and electrical feeds per rack at 132 kW nominal and 192 kW peak design, and treat the training load step as part of the electrical specification, not as an operations surprise.
+
+
+
+
+## Agents and harnesses
+
+
+A model on its own only produces text. An agent is that model placed inside a loop: it proposes an action, ordinary software carries the action out and reports the result, and the model decides what to do next. The software around the model is the harness, and it, not the model, decides what is allowed to run, what gets checked and when to stop. For an operations team the practical point is that an agent turns one question into dozens of model calls, so cost, latency and security all multiply.
+
+
+### Tool calling, ReAct, workflows and agents
+
+
+In tool calling the model emits a structured request, typically JSON with a function name and arguments. The harness executes it and returns the result as a new message. The model never runs code itself. ReAct showed the value of interleaving reasoning, action and observation: on the ALFWorld and WebShop tasks it beat imitation and reinforcement-learning methods by 34 and 10 absolute points, using one or two in-context examples [S42].
+
+
+Anthropic's guidance draws a line that is useful for scoping: “Workflows are systems where LLMs and tools are orchestrated through predefined code paths. Agents are systems where LLMs dynamically direct their own processes and tool usage.” Its patterns are prompt chaining, routing, parallelisation, orchestrator-workers and evaluator-optimiser, and its advice is to start simple and to design the agent-computer interface as carefully as a human interface [S62]. A fixed workflow is cheaper and easier to test; reach for an agent only when the steps cannot be known in advance.
+
+
+### The Model Context Protocol
+
+
+MCP standardises how a model application connects to tools. It uses JSON-RPC 2.0 between *hosts* (the LLM application), *clients* (connectors) and *servers*. Servers expose **resources**, **prompts** and **tools**, and clients may offer elicitation, where the server asks the user for input. The version read for this article is the 2026-07-28 revision. Its security principles are user consent and control, data privacy and tool safety. It states that tools “represent arbitrary code execution” and that tool descriptions are to be treated as untrusted unless the server is trusted [S61].
+
+
+### Designing the harness
+
+
+The model proposes; the harness disposes. A working checklist, drawn from the vendor guidance cited above [S61][S62]:
+
+
+- **Context.** Keep a small, clear set of tools with explicit schemas. Manage the window with summarisation or compaction, give sub-agents their own windows, and cache the stable prefix. Memory is the window itself, a retrieval store, or notes persisted to files.
+
+- **Verification.** Check results with tests, linters or an evaluator, not with the model that wrote them. A model grading itself shares its own blind spots.
+
+- **Sandbox.** Run tools in a container with no secrets and controlled network egress.
+
+- **Budgets.** Cap steps, tokens and wall-clock time.
+
+- **Approval.** Require a human to confirm irreversible actions.
+
+- **Logging.** Record every call so a run can be replayed.
+
+
+
+
+ An agent is a loop the harness controls. The model only proposes a tool call; the harness gates it, runs it in a sandbox, feeds the observation back as untrusted input, and lets the verifier decide whether to stop [S61]. A budget caps steps, tokens and time. Example: a 30-step run costs about $2.64 uncached and about $0.36 with prompt caching (derived, section 8.2).
+
+
+
+Multi-agent designs, in which an orchestrator hands separable subtasks to parallel workers, spend tokens in proportion to the number of agents. Anthropic's advice is that this pays only when the subtasks are genuinely independent [S62].
+
+
+### A run's cost and latency
+
+
+Take an agent loop of 30 steps. Each step re-sends a 40,000-token context and generates 800 tokens, at Sonnet 5.5 list prices of $2 per million input tokens and $10 per million output tokens [S27] (derived):
+
+
+
+
+
+ Cost of one 30-step agent run, with and without prompt caching (derived; list prices from the vendor)
+ |
+ Item | Tokens | Uncached | With cache reads |
+
+
+ | Input (30 × 40,000) | 1,200,000 | $2.40 | $0.12 |
+
+ | Output (30 × 800) | 24,000 | $0.24 | $0.24 |
+
+ | **Total** | | $2.64 | $0.36 |
+
+
+
+
+
+The cached column assumes cache reads at 5% of the input price, so 1.2M × $0.10 per million = $0.12; cache-write costs are not modelled [S27]. Latency is 30 × (TTFT + 800 × TPOT). With an assumed 0.5 s TTFT and 20 ms per token, each step takes 0.5 + 800 × 0.02 = 16.5 s and the run about 8 minutes. The rates in the latency line are assumptions. The lesson for capacity planning is that prefix caching, covered in the serving section, is worth more to an agent than to a chat, because the same long prefix is re-sent at every step.
+
+
+### Failure modes
+
+
+- **Hallucination.** The sampler always produces some plausible continuation, so claims must be checked by tools or retrieval.
+
+- **Prompt injection.** Instructions hidden in a web page, file or tool output can redirect the agent. MCP's specification treats tool descriptions as untrusted [S61]. Mitigations are least-privilege tools, human confirmation and isolating untrusted content.
+
+- **Loops and drift.** The agent repeats a call or forgets the goal. Step and token budgets and progress checks contain it.
+
+- **Over-trust in self-verification.** Use external checks, such as test suites.
+
+
+### Evaluating agents
+
+
+SWE-bench consists of 2,294 real GitHub issues from 12 Python repositories. At its launch the best model, Claude 2, solved 1.96% [S58]. On the official SWE-bench Verified leaderboard data, read on 2026-10-16, the top entry is 79.2% (Claude 4.5 Opus with two different agent scaffolds, December 2025), followed by 78.8% and 77.4% [S22]. Higher figures for 2026 models circulate in vendor and aggregator material but do not appear on the official board, so this article does not quote them. Vendor-run examples: gpt-oss-120b at 62.4 with high reasoning effort [S24], and Kimi K2 at 65.8 [S25].
+
+
+GAIA poses 466 questions that real assistants face; humans score 92% against 15% for GPT-4 with plugins in the 2023 paper, and answers to 300 questions are withheld for the leaderboard [S43]. Current GAIA leaderboard values could not be read and are not quoted.
+
+
+Scores from different sources disagree for four reasons: contamination of training data with test items, saturation of an old benchmark, dependence on the agent scaffold (the same model scores differently under different harnesses, visible within the official board itself [S22]), and the difference between pass@1 and pass@k.
+
+
+### RAG, long context or fine-tuning
+
+
+
+
+
+ Which tool for which need
+ |
+ Need | Best tool | Why |
+
+
+ | Facts that change often, or are private | RAG (retrieve, then generate) | Fresh and citable; cheap to update. Cost grows with the chunks retrieved |
+
+ | One large document set per session, up to about 1M tokens | Long context with prompt caching | Current windows reach 1M tokens [S27][S28][S26]; cache reads cost 2.5–10% of input [S27]; the KV memory is the server's problem |
+
+ | A behaviour, format, tone or narrow skill | Fine-tune (LoRA) | Changes how the model answers, not what it knows |
+
+ | Smaller and cheaper at one fixed task | Distil | A 32B student keeps 91% of R1's AIME score [S4] |
+
+
+
+
+
+
+#### Treat every tool result as hostile input
+
+
+Give an agent the fewest tools and the least privilege that finish the job, run them in a sandbox without secrets, and require a person to approve anything irreversible. If an agent can read a web page and also run a command, a hidden instruction on the page can run the command.
+
+
+
+
+## The frontier and its limits
+
+
+The largest training runs have grown by about five times a year, and the people building them are now meeting three limits: the supply of human-written text, the cost of electricity and the physical size of a single site. The growth is shifting from bigger pre-training runs towards two other levers, reinforcement learning on checkable tasks and more thinking at answer time. All of these end up as megawatts, which is why this is a facilities topic and not only a research one.
+
+
+### Compute grows about five times a year
+
+
+Epoch AI's dashboard puts frontier language-model training compute at roughly 5× per year since 2020, training cost at about 3.5× per year, and chip price-performance improving about 49% per year since 2023 [S64]. The ratio of the first two, 5 / 3.5 = 1.4, is of the same order as the 49% price-performance gain. The largest known runs, from Epoch's table of frontier models (estimates; read 2026-10-16) [S65]:
+
+
+
+
+
+ Largest estimated training runs (Epoch AI estimates; closed-model figures are not published by the developers)
+ |
+ Model | Date | Training FLOP | Confidence | Hardware | Power |
+
+
+ | GPT-6 Astra | 2026-09-03 | 9.4e26 (CI 5e26–2e27) | Likely | ≥100k GB200, Abilene | ≈233 MW |
+
+ | Grok 4 | 2025-07-09 | 5.0e26 | Speculative | ≈200k GPUs | — |
+
+ | GPT-4.5 | 2025-02-27 | 3.8e26 | Likely | — | — |
+
+ | Grok 3 | 2025-02-17 | 3.5e26 | Likely | ≈80k H100 | ≈110 MW |
+
+ | Llama 4 Behemoth (preview) | 2025-04-05 | 5.2e25 | Likely | H100 | ≈44 MW |
+
+ | Llama 3.1 405B | 2024-07-23 | 3.8e25 | Confident | 16,384 H100 | ≈22.6 MW |
+
+
+
+
+
+Fourteen models in the dataset exceed 1e25 FLOP and four exceed 1e26 [S65]. Epoch's GPT-6 Astra estimate assumes about 100,000 GB200 for 90 days at 25% FP8 model-FLOPs utilisation. The implied sustained rate is 9.4e26 / (1e5 × 90 × 86,400 s) = 1.21 PFLOP/s per GPU (derived). On the 20-tokens-per-parameter rule a budget of 9.4e26 FLOP would suggest `N = √(C/120) = √(9.4e26 / 120)` = 2.8 trillion parameters trained on 56 trillion tokens (derived from the scaling-law relation `C = 6·N·20N`), though practice has moved well past 20 tokens per parameter for models meant to be served at scale. What is public is limited: compute and power come from Epoch's estimates built on developers' statements about cluster size, and exact FLOPs, costs and parameter counts of closed models are not published.
+
+
+### The data wall and synthetic data
+
+
+Villalobos et al. projected that, if trends continue, models will be trained on datasets “roughly equal in size to the available stock of public human text data between 2026 and 2032” [S41]. 2026 is the start of that window. The responses already in use are synthetic data (Qwen3 used “trillions” of synthetic tokens), reinforcement learning on tasks whose answers can be verified, and distillation from stronger models [S3][S4]. Each of these moves compute out of the pre-training run and into data generation and post-training.
+
+
+### Test-time compute as the new axis
+
+
+The scaling laws that guided pre-training have a counterpart at inference: accuracy rises with the number of thinking tokens [S57][S24]. This moves cost from the training cluster to the serving fleet. Training is a project with an end date; thinking tokens are a recurring load that grows with usage and with the effort setting, so it adds permanent data-center capacity.
+
+
+### Energy: per query, per run, per grid
+
+
+- **Per query.** Google reports that the median Gemini Apps text prompt uses 0.24 Wh, emits 0.03 gCO 2 e and consumes 0.26 mL of water, with energy per prompt down 33× in twelve months (August 2025) [S18]. Epoch estimates about 0.3 Wh for a typical GPT-4o query, against an older claim of 3 Wh [S66]. Because energy follows tokens, a long reasoning or agent run can cost one to two orders of magnitude more (derived from the serving section; not measured).
+
+- **Per run.** Epoch's power estimates in the table above run from about 22.6 MW for Llama 3.1 405B to about 233 MW for GPT-6 Astra. The worked 70B budget earlier in this article gives 25.1 MW on 16,384 GPUs, consistent with the Llama 3 estimate.
+
+- **Per grid.** The IEA estimates data centres used about 415 TWh in 2024, around 1.5% of world electricity, and projects about 945 TWh in 2030 (an increase of 945 / 415 = 2.3×); the United States accounts for 45% of the 2024 use [S67].
+
+- **Scale illustration (derived).** One billion prompts a day at 0.24 Wh is 240 MWh a day, which is 240 / 24 = 10 MW on average.
+
+
+### Open and closed models
+
+
+Open-weight frontier-scale mixture-of-experts models now exist under MIT or Apache licences: DeepSeek-V4-Pro at 1.6 trillion parameters, Kimi K2 at 1 trillion, Qwen3 and gpt-oss [S26][S25][S3][S24]. Closed models from Anthropic, OpenAI and Google do not disclose their sizes [S27][S28][S29]. On the official SWE-bench board the best entries are close (79.2 against 78.8), though the second entry is a vendor agent built around Doubao-Seed-Code, whose weights may not be open, which is unverified [S22]. For an operator the practical difference is who carries the serving cost: with open weights you can run the model on your own racks and you carry the hardware sizing described in the earlier sections.
+
+
+
+
+#### Plan for serving growth, not only for a training run
+
+
+A single frontier training run is estimated at 233 MW, but the load that keeps growing is inference: every higher effort setting, every agent step and every extra user adds tokens. At 0.24–0.3 Wh per ordinary prompt the energy is small per query and large in aggregate, so capacity plans should carry tokens per day as a first-class input.
+
+
+
+
+## Engineer's checklist
+
+
+Everything above reduces to a short list of formulas and defaults. Use the table as a take-home card: the formula is what to compute, the default is the number to start from, and the source is where it comes from. Anything marked derived is arithmetic on sourced inputs; anything marked assumed is an engineering assumption you should replace with your own measurement. To check a model against a GPU, start with the KV-cache calculator.
+
+
+
+
+
+ The article in one table: formula, default and source for each topic
+ |
+ Topic | Formula | Default or worked value | Source |
+
+
+ | Training compute | `C ≈ 6·N·D` | Llama 3 405B: 6 × 405e9 × 15.6e12 = 3.79e25 (paper: 3.8e25) | [S7][S2] |
+
+ | Inference compute | `≈ 2·N_active` FLOPs per token | One-third of the training cost per token | [S7] |
+
+ | Compute-optimal data | `D ≈ 20·N`, so `N = √(C/120)` | C = 5.76e23 gives 69B on 1.4T tokens | [S5][S6] |
+
+ | Utilisation | Sustained = peak × MFU | MFU 38–43% (Llama 3) | [S2] |
+
+ | Training energy | GPU-hours × kW per GPU × PUE | 70B on 15T: 4.42M GPU-h, 6.77 GWh at PUE 1.2 (derived; PUE assumed) | [S8][S70] |
+
+ | Weight memory | `N × bytes per parameter` | 70B: 141 GB BF16, 71 GB FP8, 43 GB Q4_K_M (derived) | [S39] |
+
+ | KV cache | `2 × layers × KV heads × d_head × bytes × tokens × batch` | Llama 3 70B: 320 KiB per token, 40 GiB at 128K (derived) | [S2][S30] |
+
+ | MoE memory vs compute | Memory by total parameters, compute by active | DeepSeek-V3: 671B total, 37B active (5.5%) | [S1] |
+
+ | Post-training | GRPO advantage `A_i = (r_i − mean) / std` | No critic network; verifiable rewards | [S54][S4] |
+
+ | Distillation | Student SFT on teacher outputs | 32B student keeps 72.6 / 79.8 = 91% of R1's AIME | [S4] |
+
+ | LoRA parameters | `r·(d_in + d_out)` per matrix | Llama 3 8B, r = 16: 41.9M (0.52%) | [S34] |
+
+ | Fine-tune memory | Full 16 B/param; QLoRA 0.516 B/param base | 70B: 1.13 TB full; about 36 GB QLoRA base (derived) | [S60][S35] |
+
+ | Quantization quality | Memory = `N × bits / 8` | 8-bit near lossless; 4-bit task-dependent; under 3-bit degrades | [S38][S39] |
+
+ | Prefill time | `2·N·n_prompt / (peak × MFU)` | 4,000 tokens, 70B FP8, H200 at 50%: 0.57 s (MFU assumed) | [S9] |
+
+ | Decode ceiling, batch 1 | `tokens/s ≤ bandwidth / weight bytes` | 70B FP8 on H200: 4.8 TB/s ÷ 70.6 GB = 68 tok/s; engines reach about 50–80% (rule of thumb) | [S9] |
+
+ | Ridge point | Peak FLOP/s ÷ bandwidth | H100 BF16: 295; H200 BF16: 206 FLOP/byte | [S8][S9] |
+
+ | Cost per M tokens | (GPU $/h) ÷ (tokens/s × 3,600) × 10 6 | $3.50/h at 1,353 tok/s (batch 32): $0.72 (derived; price assumed) | [S9] |
+
+ | Energy per answer | J per token × tokens ÷ 3,600 | About 1 J/token: 0.27 Wh per 1,000 tokens (derived); published 0.24–0.3 Wh | [S18][S66] |
+
+ | Rack power | Rack kW ÷ GPUs | GB200 NVL72: 132 / 72 = 1.83 kW per GPU; 192 kW peak design | [S10][S68] |
+
+ | Cluster power | GPUs × kW per GPU × PUE | 100k H100: 153 MW; 100k GB200: 220 MW at PUE 1.2 (assumed) | [S70][S68] |
+
+ | Training power swings | Synchronous load steps | “Tens of megawatts”; 419 interruptions in 54 days on 16K H100 | [S2] |
+
+ | Agent run cost | steps × (context × in-price + output × out-price) | 30 steps, 40k context: $2.64 uncached, $0.36 with caching (derived) | [S27] |
+
+ | Agent security | Tool output is untrusted input | Sandbox, least privilege, approval for irreversible actions | [S61] |
+
+ | Benchmarks | Compare under the same harness | SWE-bench Verified official top: 79.2% | [S22] |
+
+ | Frontier trend | Compute × 5 per year | Largest estimated run 9.4e26 FLOP, about 233 MW | [S64][S65] |
+
+ | Energy at scale | Prompts per day × Wh ÷ 24 h | 1 billion at 0.24 Wh: 240 MWh/day, 10 MW average (derived) | [S18] |
+
+
+
+
+
+Four numbers cover most conversations with a team that wants to run a model: weight bytes (`N × bytes`), KV bytes per token and the context length you will allow, the bandwidth ceiling (`bandwidth ÷ weight bytes`), and the rack kW that the GPUs behind those numbers draw.
+
+
+## Frequently asked questions
+
+
+
+#### Does an LLM calculate, or does it guess?
+
+
+It computes a probability over the next token and samples from it; that is the whole mechanism. Arithmetic, facts and plans all come out of that distribution, which is why the output is always plausible and not always right. Reasoning models spend extra compute at answer time to improve the odds, and interpretability work shows real internal circuits, but nothing in the sampler checks truth. In an operations setting every number an LLM produces is a proposal that a deterministic tool must verify.
+
+
+
+
+#### How much GPU memory does a model need?
+
+
+Weights take parameters × bytes per parameter (70B at BF16 = 140 GB, at FP8 = 70 GB, at 4-bit about 35 GB), plus the KV cache, which grows with context and concurrent users: 2 × layers × KV heads × head dimension × bytes per token, 320 KiB per token for Llama 3 70B, so 40 GiB for one 128K-token session. The fit calculator in this article does the sum for any model and hardware.
+
+
+
+
+#### Why is text generation limited by memory bandwidth and not by FLOPs?
+
+
+Each generated token needs every weight read from HBM once, but only a few operations per weight. At batch 1 the arithmetic intensity is far below the GPU's ridge point, so the roofline is the bandwidth line: 70B in FP8 on an H200 cannot exceed 4.8 TB/s ÷ 70 GB = 68 tokens per second per user. Batching users together raises the intensity until compute becomes the limit.
+
+
+
+
+#### What does an AI training run do to a data center?
+
+
+Llama 3 ran on up to 16,384 H100s at 700 W each; Meta reports power swings on the order of tens of megawatts as jobs start, checkpoint and restart, and 419 unexpected interruptions in a 54-day window, 78% of them hardware. The racks that replaced that generation, GB200 NVL72, draw 132 kW nominal and are liquid-cooled, which is why direct-to-chip cooling, transient-tolerant electrical design and PUE at high density are now the plant-room questions.
+
+
+
+
+#### RAG, a long context window, or fine-tuning: which one?
+
+
+Facts that change often or are private: retrieval (RAG), which is fresh, citable and cheap to update. One large document set per session under about a million tokens: a long context with prompt caching. A behaviour, format, tone or narrow skill: a LoRA fine-tune, which changes how the model answers rather than what it knows. The article's section on agents gives the decision table with the costs.
+
+
+
+
+#### How much energy does one prompt use?
+
+
+Google measured the median Gemini Apps text prompt at 0.24 Wh, 0.03 gCO2e and 0.26 mL of water in August 2025. The article's serving section derives about 1 joule per token for a 70B model on an H200 at batch 32, which is roughly 0.27 Wh for a 1,000-token answer, the same order as Google's figure and Epoch's 0.3 Wh estimate for a GPT-4o query.
+
+
+
+## Sources & further reading
+
+
+75 sources, accessed 2026-10-16 unless the source says otherwise; primary papers, vendor specification pages and official documentation first. Numbers marked (derived) in the text are recomputed from these sources, with the arithmetic shown.
+
+
+- **[S1]** DeepSeek-V3 Technical Report (DeepSeek-AI), arXiv 2412.19437v2 — arxiv.org (https://arxiv.org/abs/2412.19437) (Dec 2024). Taken: params, MLA dims, MoE config, GPU-h, FP8, LR, deployment
+
+- **[S2]** The Llama 3 Herd of Models (Meta), arXiv 2407.21783v3 — arxiv.org (https://arxiv.org/abs/2407.21783) (Jul 2024). Taken: 405B FLOPs, tokens, 16K H100, MFU, 4D parallel, data mix, interruptions, MW swings, vocab
+
+- **[S3]** Qwen3 Technical Report, arXiv 2505.09388 — arxiv.org (https://arxiv.org/abs/2505.09388) (May 2025). Taken: architecture tables, 36T, 119 langs, vocab, Apache, distillation 1/10 GPU-h
+
+- **[S4]** DeepSeek-R1, arXiv 2501.12948, and HF model card — arxiv.org (https://arxiv.org/abs/2501.12948) (Jan 2025 / Nature Sep 2025). Taken: pure-RL claim, distill table, MIT, temperature
+
+- **[S5]** Training Compute-Optimal LLMs (Chinchilla), arXiv 2203.15556 — arxiv.org (https://arxiv.org/abs/2203.15556) (Mar 2022). Taken: 70B/4× data, doubling rule, MMLU 67.5
+
+- **[S6]** Chinchilla Scaling: A replication attempt (Besiroglu et al.), arXiv 2404.10102 — arxiv.org (https://arxiv.org/abs/2404.10102) (Apr 2024). Taken: original and re-fit constants, ≈20 tok/param
+
+- **[S7]** Scaling Laws for Neural Language Models (Kaplan et al.), arXiv 2001.08361 — arxiv.org (https://arxiv.org/abs/2001.08361) (Jan 2020). Taken: α_N, α_D, α_C, N∝C^0.73, C≈6NBS
+
+- **[S8]** NVIDIA H100 product page — nvidia.com (https://www.nvidia.com/en-us/data-center/h100/) (current). Taken: SXM/NVL specs
+
+- **[S9]** NVIDIA H200 product page — nvidia.com (https://www.nvidia.com/en-us/data-center/h200/) (current). Taken: 141 GB, 4.8 TB/s
+
+- **[S10]** NVIDIA GB200 NVL72 page — nvidia.com (https://www.nvidia.com/en-us/data-center/gb200-nvl72/) (current). Taken: rack specs
+
+- **[S11]** NVIDIA GB300 NVL72 page — nvidia.com (https://www.nvidia.com/en-us/data-center/gb300-nvl72/) (current). Taken: rack specs
+
+- **[S12]** NVIDIA DGX B200 page — nvidia.com (https://www.nvidia.com/en-us/data-center/dgx-b200/) (current). Taken: 1,440 GB, 64 TB/s, 72 PF FP8, 14.3 kW
+
+- **[S13]** AMD Instinct MI355X product page — amd.com (https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x.html) (current (AMD calc. May 2025)). Taken: 288 GB, 8 TB/s, 1,400 W TBP, BF16 2.5 PF, FP8 5 / 10.1 PF, MXFP4 10.1 PF
+
+- **[S14]** Google blog: Ironwood TPU — blog.google (https://blog.google/products/google-cloud/ironwood-tpu-age-of-inference/) (Apr 2025). Taken: per-chip and pod specs, 10 MW
+
+- **[S15]** NVIDIA RTX 5090 page; PCGamesN RTX 5090 specs (28 Gbps) — nvidia.com (https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/) (2025). Taken: 32 GB, 512-bit, 575 W; 28 Gbps → 1,792 GB/s
+
+- **[S16]** Cerebras chip page; WSE-3/CS-3 spec sheet mirror (flopper.io) — cerebras.ai (https://cerebras.ai/chip/) (current). Taken: 4T transistors, 900k cores, 44 GB, 21 PB/s, 125 PF sparse, 27 kW; "250 PF Turbo"
+
+- **[S17]** GroqChip Processor Product Brief v1.7 — groq.com (https://groq.com/wp-content/uploads/2024/08/GroqChip™-Processor-Product-Brief-v1.7.pdf) (Aug 2024). Taken: 230 MB SRAM, 80 TB/s, TOPS, power
+
+- **[S18]** Google Cloud blog: Measuring the environmental impact of AI inference — cloud.google.com (https://cloud.google.com/blog/products/infrastructure/measuring-the-environmental-impact-of-ai-inference) (Aug 2025). Taken: 0.24 Wh, 0.03 g, 0.26 mL, 33×
+
+- **[S19]** xAI Colossus page — x.ai (https://x.ai/colossus) (current). Taken: 122 days; doubled in 92 days to 200k GPUs
+
+- **[S20]** Epoch AI: OpenAI Stargate — where the US sites stand — epoch.ai (https://epoch.ai/publications/openai-stargate-where-the-us-sites-stand) (2026). Taken: Abilene ≈0.3 GW (Apr), 1.2 GW by Q4 2026
+
+- **[S21]** OpenAI: five new Stargate sites / Stargate posts — openai.com (https://openai.com/index/five-new-stargate-sites/) (2025–2026). Taken: Abilene GB200, ~7 GW planned, GPT-5.5 trained at Abilene
+
+- **[S22]** SWE-bench official leaderboard data (leaderboards.json) — github.com (https://github.com/SWE-bench/swe-bench.github.io/blob/master/data/leaderboards.json) (read 2026-10-16). Taken: Verified top entries
+
+- **[S23]** Llama 4 Maverick/Scout model card — huggingface.co (https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct) (Apr 2025). Taken: params, context, tokens, GPU-h, licence
+
+- **[S24]** gpt-oss-120b model card — huggingface.co (https://huggingface.co/openai/gpt-oss-120b) (Aug 2025). Taken: 117B/5.1B, MXFP4, Apache, 80 GB, SWE-bench by effort
+
+- **[S25]** Kimi K2 Instruct model card — huggingface.co (https://huggingface.co/moonshotai/Kimi-K2-Instruct) (Jul 2025). Taken: 1T/32B, 384E, MLA, 15.5T, 160K vocab
+
+- **[S26]** DeepSeek-V4-Pro model card (and arXiv 2606.19348) — huggingface.co (https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) (Apr–Jun 2026). Taken: 1.6T/49B, 284B/13B, 1M ctx, CSA+HCA, 27% FLOPs, 10% KV, >32T, FP4+FP8, MIT
+
+- **[S27]** Claude Docs: Models overview — platform.claude.com (https://platform.claude.com/docs/en/about-claude/models/overview) (read 2026-10-16). Taken: lineup, prices, 1M ctx, tokenizer words/token
+
+- **[S28]** OpenAI API docs: Models — developers.openai.com (https://developers.openai.com/api/docs/models) (read 2026-10-16). Taken: GPT-6 family context and prices
+
+- **[S29]** Gemini API docs: Models; Pricing — ai.google.dev (https://ai.google.dev/gemini-api/docs/models) (read 2026-10-16). Taken: model list, prices
+
+- **[S30]** Efficient Memory Management for LLM Serving with PagedAttention, arXiv 2309.06180 — arxiv.org (https://arxiv.org/abs/2309.06180) (Sep 2023). Taken: 20.4–38.2% utilisation, 800 KB/token OPT-13B, 2–4×
+
+- **[S31]** SGLang, arXiv 2312.07104 — arxiv.org (https://arxiv.org/abs/2312.07104) (Dec 2023). Taken: RadixAttention, 6.4×
+
+- **[S32]** Fast Inference via Speculative Decoding (Leviathan et al.), arXiv 2211.17192 — arxiv.org (https://arxiv.org/abs/2211.17192) (Nov 2022). Taken: 2–3×, identical outputs
+
+- **[S33]** Accelerating LLM Decoding with Speculative Sampling (Chen et al.), arXiv 2302.01318 — arxiv.org (https://arxiv.org/abs/2302.01318) (Feb 2023). Taken: 2–2.5× on Chinchilla 70B
+
+- **[S34]** LoRA, arXiv 2106.09685 — arxiv.org (https://arxiv.org/abs/2106.09685) (Jun 2021). Taken: 10,000× params, 3× memory
+
+- **[S35]** QLoRA, arXiv 2305.14314 — arxiv.org (https://arxiv.org/abs/2305.14314) (May 2023). Taken: 65B on 48 GB, NF4, 99.3%
+
+- **[S36]** GPTQ, arXiv 2210.17323 — arxiv.org (https://arxiv.org/abs/2210.17323) (Oct 2022). Taken: 3–4 bit, 4 GPU-h for 175B
+
+- **[S37]** AWQ, arXiv 2306.00978 — arxiv.org (https://arxiv.org/abs/2306.00978) (Jun 2023). Taken: 1% salient, >3×
+
+- **[S38]** LLM.int8(), arXiv 2208.07339 — arxiv.org (https://arxiv.org/abs/2208.07339) (Aug 2022). Taken: half memory, 99.9% 8-bit
+
+- **[S39]** llama.cpp quantize README — github.com (https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md) (current). Taken: GGUF bpw and sizes for Llama-3.1-8B
+
+- **[S40]** Refusal in LMs Is Mediated by a Single Direction (Arditi et al.), arXiv 2406.11717v3 — arxiv.org (https://arxiv.org/abs/2406.11717) (Jun 2024 (NeurIPS 2024)). Taken: method, 13 models ≤72B, ASR, capability, ethics
+
+- **[S41]** Will we run out of data? (Villalobos et al.), arXiv 2211.04325 — arxiv.org (https://arxiv.org/abs/2211.04325) (Oct 2022 (rev. 2024)). Taken: 2026–2032
+
+- **[S42]** ReAct, arXiv 2210.03629 — arxiv.org (https://arxiv.org/abs/2210.03629) (Oct 2022). Taken: +34/+10 points
+
+- **[S43]** GAIA, arXiv 2311.12983 — arxiv.org (https://arxiv.org/abs/2311.12983) (Nov 2023). Taken: 92% vs 15%, 466 questions
+
+- **[S44]** DistServe, arXiv 2401.09670 — arxiv.org (https://arxiv.org/abs/2401.09670) (Jan 2024). Taken: 7.4× requests / 12.6× SLO
+
+- **[S45]** GQA, arXiv 2305.13245 — arxiv.org (https://arxiv.org/abs/2305.13245) (May 2023). Taken: GQA definition, 5% uptrain
+
+- **[S46]** Fast Transformer Decoding: One Write-Head (MQA), arXiv 1911.02150 — arxiv.org (https://arxiv.org/abs/1911.02150) (Nov 2019). Taken: MQA
+
+- **[S47]** RoFormer (RoPE), arXiv 2104.09864 — arxiv.org (https://arxiv.org/abs/2104.09864) (Apr 2021). Taken: RoPE
+
+- **[S48]** ALiBi (Train Short, Test Long), arXiv 2108.12409 — arxiv.org (https://arxiv.org/abs/2108.12409) (Aug 2021). Taken: 1,024→2,048, 11%
+
+- **[S49]** YaRN, arXiv 2309.00071 — arxiv.org (https://arxiv.org/abs/2309.00071) (Aug 2023). Taken: 10× fewer tokens, 2.5× fewer steps
+
+- **[S50]** FlashAttention, arXiv 2205.14135 — arxiv.org (https://arxiv.org/abs/2205.14135) (May 2022). Taken: 3× GPT-2, Path-X
+
+- **[S51]** Attention Is All You Need, arXiv 1706.03762 — arxiv.org (https://arxiv.org/abs/1706.03762) (Jun 2017). Taken: attention, sinusoidal PE
+
+- **[S52]** InstructGPT, arXiv 2203.02155 — arxiv.org (https://arxiv.org/abs/2203.02155) (Mar 2022). Taken: RLHF, 1.3B > 175B
+
+- **[S53]** DPO, arXiv 2305.18290 — arxiv.org (https://arxiv.org/abs/2305.18290) (May 2023). Taken: DPO
+
+- **[S54]** DeepSeekMath (GRPO), arXiv 2402.03300 — arxiv.org (https://arxiv.org/abs/2402.03300) (Feb 2024). Taken: GRPO, 51.7%/60.9%
+
+- **[S55]** Constitutional AI, arXiv 2212.08073 — arxiv.org (https://arxiv.org/abs/2212.08073) (Dec 2022). Taken: CAI/RLAIF
+
+- **[S56]** Distilling the Knowledge in a Neural Network (Hinton et al.), arXiv 1503.02531 — arxiv.org (https://arxiv.org/abs/1503.02531) (Mar 2015). Taken: soft-target distillation
+
+- **[S57]** Scaling LLM Test-Time Compute Optimally (Snell et al.), arXiv 2408.03314 — arxiv.org (https://arxiv.org/abs/2408.03314) (Aug 2024). Taken: >4×, 14× larger
+
+- **[S58]** SWE-bench, arXiv 2310.06770 — arxiv.org (https://arxiv.org/abs/2310.06770) (Oct 2023). Taken: 2,294 issues, 1.96%
+
+- **[S59]** Switch Transformers, arXiv 2101.03961 — arxiv.org (https://arxiv.org/abs/2101.03961) (Jan 2021). Taken: MoE history, 7×
+
+- **[S60]** ZeRO, arXiv 1910.02054 — arxiv.org (https://arxiv.org/abs/1910.02054) (Oct 2019). Taken: 16 B/param (2+2+12), 15 PF on 400 GPUs
+
+- **[S61]** Model Context Protocol specification (rev. 2026-07-28) — modelcontextprotocol.io (https://modelcontextprotocol.io/specification/latest) (2026-07-28). Taken: roles, features, security
+
+- **[S62]** Anthropic: Building effective agents — anthropic.com (https://www.anthropic.com/engineering/building-effective-agents) (2024-12-19). Taken: workflows vs agents, patterns, ACI
+
+- **[S63]** vLLM docs: Disaggregated prefilling — docs.vllm.ai (https://docs.vllm.ai/en/latest/features/disagg_prefill.html) (current). Taken: purpose, no throughput gain, connectors
+
+- **[S64]** Epoch AI Trends dashboard — epoch.ai (https://epoch.ai/trends) (updated 2026-02-05). Taken: 5×/yr, 3.5×/yr, 49%/yr, Colossus 2 H100e
+
+- **[S65]** Epoch AI frontier models dataset (CSV) — epoch.ai (https://epoch.ai/data/frontier_ai_models.csv) (read 2026-10-16). Taken: FLOP, power, hardware estimates
+
+- **[S66]** Epoch AI: How much energy does ChatGPT use? — epoch.ai (https://epoch.ai/gradient-updates/how-much-energy-does-chatgpt-use) (Feb 2025). Taken: ≈0.3 Wh
+
+- **[S67]** IEA: Energy and AI, executive summary — iea.org (https://www.iea.org/reports/energy-and-ai/executive-summary) (Apr 2025). Taken: 415 TWh 2024, 945 TWh 2030, regional shares
+
+- **[S68]** HPE GB200 NVL72 doc (132 kW TDP, EDPp ≈192 kW); DCD: Vertiv–NVIDIA 7 MW GB200 NVL72 reference architecture — hpe.com (https://www.hpe.com/us/en/collaterals/collateral.a50009224enw.html) (Oct 2024 / 2025). Taken: rack power
+
+- **[S69]** Llama 3.1 405B model card — huggingface.co (https://huggingface.co/meta-llama/Llama-3.1-405B) (Jul 2024). Taken: 30.84M GPU-h, 39.3M total, 11,390 t CO₂e
+
+- **[S70]** NVIDIA DGX SuperPOD H100 electrical design guide — docs.nvidia.com (https://docs.nvidia.com/dgx-superpod/design-guides/dgx-superpod-data-center-design-h100/latest/electrical.html) (current). Taken: DGX H100 ≈10.2 kW max (via search snippet)
+
+- **[S71]** Apple Mac Studio page — apple.com (https://www.apple.com/mac-studio/) (2025 lineup). Taken: M4 Max 128 GB / 546 GB/s; M3 Ultra 512 GB / 819 GB/s (any newer Apple silicon was not checked)
+
+- **[S72]** Self-measurement for this dossier: tiktoken (cl100k_base, o200k_base) and HF `tokenizers` with Qwen/Qwen3-8B and deepseek-ai/DeepSeek-V3 tokenizer.json — author measurement, method in the text (2026-10-16). Taken: tokens/word table
+
+- **[S73]** Reuters via BNN Bloomberg: DeepSeek says R1 cost $294,000 to train (Nature paper) — bnnbloomberg.ca (https://www.bnnbloomberg.ca/business/artificial-intelligence/2025/09/18/chinas-deepseek-says-its-hit-ai-model-cost-just-us294000-to-train/) (2025-09-18). Taken: $294k, 512 H800, 80 h
+
+- **[S74]** Mistral 7B, arXiv 2310.06825 — arxiv.org (https://arxiv.org/abs/2310.06825) (Oct 2023). Taken: Apache 2.0
+
+- **[S75]** The Register: Nvidia charts course for 600 kW racks (GTC 2025 roadmap); NADDOD Rubin NVL144 blog — theregister.com (https://www.theregister.com/2025/03/19/nvidia_charts_course_for_600kw) (2025). Taken: Rubin roadmap figures (UNVERIFIED)
+
+
+
+** Previous Article
+All Articles
  Latest Article
+
+
+
+
+
+
+
+#### Bagus Dwi Permana
+
+
+Engineering Operations Manager | Ahli K3 Listrik
+
+
+12+ years in data center operations across Southeast Asia and the Middle East. CDFOM certified. Writes about the engineering and physics behind mission-critical infrastructure — and, increasingly, the local-AI tooling that runs alongside it.
+
+
+
+
+ LinkedIn
+ (https://linkedin.com/in/baguspermana)
+
+
+ X / Twitter
+ (https://x.com/BagusDPermana)
+
+
+
+
+
+
+### Continue Reading
+
+
+
+ 28
+
+
+#### The Compression Horizon: How Close Can a Laptop Get to a Datacenter's Mind?
+
+
+The hard physics of compression and compute density, and a pipeline for a task-specific local AI.
+
+
+
+
+ 23
+
+
+#### From Empty Field to 150 MW in 122 Days: What Really Happened at xAI Colossus
+
+
+200K GPUs, 150 MW, unpermitted turbines: the fastest supercomputer build in history.
+
+
+
+
+ 22
+
+
+#### NVIDIA's $4 Billion Photonics Play: Why the Future of AI Runs on Light
+
+
+Co-packaged optics and why AI factories need optical interconnects.
+
+
+
+
+ 13
+
+
+#### Data Center Power Distribution Design: Hyperscaler Architecture Deep Dive
+
+
+48V/380V/800V DC, failure scenarios and reliability calculations.
+
+
 
 
 
@@ -46168,7 +48551,7 @@ Back to Engineering Journal
 
 
  03
- Engineering Journal — Article 3 of 28
+ Engineering Journal — Article 3 of 29
 
 
 
@@ -47754,7 +50137,7 @@ Back to Engineering Journal
 
 
  04
- Engineering Journal — Article 4 of 28
+ Engineering Journal — Article 4 of 29
 
 
 
@@ -49133,7 +51516,7 @@ Back to Engineering Journal
 
 
  05
- Engineering Journal — Article 5 of 28
+ Engineering Journal — Article 5 of 29
 
 
 
@@ -50764,7 +53147,7 @@ Back to Engineering Journal
 
 
  06
- Engineering Journal — Article 6 of 28
+ Engineering Journal — Article 6 of 29
 
 
 
@@ -52281,7 +54664,7 @@ Back to Engineering Journal
 
 
  07
- Engineering Journal — Article 7 of 28
+ Engineering Journal — Article 7 of 29
 
 
 
@@ -53988,7 +56371,7 @@ Lagging indicators create the illusion of stability. This paper dissects drift-t
 
 
  08
- Engineering Journal — Article 8 of 28
+ Engineering Journal — Article 8 of 29
 
 
 
@@ -55507,7 +57890,7 @@ How chiller-free data center cooling works, where tropical conditions limit it, 
 
 
  09
- Engineering Journal — Article 9 of 28
+ Engineering Journal — Article 9 of 29
 
 
 

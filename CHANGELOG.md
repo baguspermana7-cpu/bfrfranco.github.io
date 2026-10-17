@@ -11,6 +11,54 @@ release sections rather than semver.
 
 ---
 
+## v3.24.1 — 2026-10-17 — "Tokens"
+
+### Article 29: How a Large Language Model Actually Works — from one token to a 1 GW campus
+
+**Owner:** *"saya mau buat article baru terkait AI, LLM, token, inference engine, transformer fungsi math besar,
+agentic ai, harness, cara train, uncensored model, frontier, guessing engine semuanya dari awal basic sampai advance
+termasuk step2 utk di level apa hardwarenya seperti apa … ada diagram pastikan standard dan super accurat jika ada
+simulasi/calculator juga"* — and, on the process: *"Update standarization etc any doc standard when create article.
+Including drafting post for linkedin, x, mastodon etc. Ensure all article have that."*
+
+**Added**
+- `article-29.html` (15,955 words, 69 min, Future Forward · AI infrastructure): sixteen sections from the one-paragraph
+  answer through tokenizers, the transformer block, the KV cache, mixture of experts, sampling, model families, training,
+  post-training, distillation / LoRA / quantization, "uncensored" models (mechanism and responsibility only), serving,
+  the hardware ladder (laptop → workstation → server → GB200 NVL72 → pod → campus → inference ASICs), agents and
+  harnesses, the frontier's limits, and an engineer's checklist. 75 sources with stable `#src-N` ids; eight key numbers
+  under the H1 (`6·N·D`, `2·N_active`, 320 KiB/token KV cache, 20 tokens/parameter, decode ≤ bandwidth ÷ weight bytes,
+  132 kW per NVL72 rack, tens-of-MW swings, 0.24 Wh/prompt); a visible FAQ identical to its JSON-LD; the owner's two
+  renders as cover and journal card. Every number traces to `Article/Article_29/RESEARCH.md`; 19 claims the research
+  could not verify stay marked or were cut.
+- Eleven figures drawn by the diagram engine (`tools/build-article-diagrams.mjs`, ids `llm-d1…d11`: decoder block,
+  attention head, KV-cache growth, MoE routing, training pipeline, prefill/decode timeline, hardware ladder, agent loop,
+  distillation, roofline blocks, tokenization) — zero engine warnings, rendered and looked at.
+- Five calculators in `js/rz-llm-calc.js` (pure engine, every constant sourced, every output with its formula): memory &
+  fit, training compute / cost / energy / MW, inference throughput & $/M tokens, LoRA/QLoRA memory, tokens & cost per
+  document. `tools/test-llm-calc.mjs`: 375 assertions from the worked examples; 46 RZExplain entries for their labels.
+- 57 glossary terms (token … scaling-law), each backlinked to the article section; explain DB rebuilt (962 entries).
+- `standarization/ARTICLE_PRODUCTION_STANDARD.md`: the pipeline every article now follows (dossier → fragments →
+  calculators + tests → figures → assembler → siblings → social drafts → gates), with the traps this first run hit.
+- Social drafts for EVERY journal page: `tools/audit-post-drafts.py` v2 (strict on article-N / FF-N / geopolitics-N,
+  pattern-matched platforms, UTM-tagged links, Medium import line, `--fix-utm`) wired into `ship-gate.sh`; the v1 audit
+  expected file names no folder used and had never passed. 23 articles had no Facebook draft, article-27 one file, the
+  FF and geopolitics pages no folder, 0 of 230 drafts a UTM tag — 56 drafts written, 196 links tagged, the Medium
+  import line added to 51 older Medium drafts; the audit passes on all 38 journal pages.
+- `tools/sync-article-series.py --apply` (the tool only emitted a patch nothing applied); `test-article-series.py`
+  and `test-journal.mjs` join the ship gate.
+
+**Changed**
+- `articles.html`, `insights.html`, `geopolitics.html`, `future-forward.html`: article 29 in the generated grids
+  (35 pages); their OG/meta titles and descriptions rewritten to the new pages (≤ 160 chars, complete sentences) and
+  their OG cards regenerated — four had been stale since v3.23.0.
+- `article-28.html` and every sibling: series counts "of 29", article 28's Next links.
+- `tools/build-journal.py`: article 29 mapped (AI & HPC infrastructure · Future Forward), card-image preference.
+- `tools/verify-article-light.mjs`: expects the sans stack (the serif face was withdrawn in v3.23.0).
+- `article-20.html`: its meta description described the PFAS article (a paste); now the page's own og:description
+  (found by the drafts agent reading every page's numbers).
+- `CONTENT_LINKAGE_PLAYBOOK.md` §1: journal builder, series sync, OG generator, staging-before-sitemap, draft naming + UTM rows.
+
 ## v3.24.0 — 2026-10-17 — "Hub"
 
 ### Changed — the DC Solutions hub is the product page (`datacenter-solutions.html` replaced; `datacenter-solutions1.html` and `js/rz-hub-scene.js` removed)

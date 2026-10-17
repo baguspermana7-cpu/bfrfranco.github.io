@@ -1,0 +1,74 @@
+<h2 id="tokens">Tokens: the unit everything is billed in</h2>
+
+<p>A model never sees letters or words. A <a href="glossary.html#term-tokenizer">tokenizer</a> cuts the text into pieces from a fixed vocabulary and replaces each piece with an integer ID. Common English words are usually one token; rare words, other languages and source code split into several. Price, speed and context limits are all counted in tokens, so the tokenizer decides what a page of text costs.</p>
+
+<h3 id="tokenizer">2.1 What a tokenizer does</h3>
+
+<p>The dominant method is byte-pair encoding (<a href="glossary.html#term-bpe">BPE</a>). Start from the 256 possible bytes. Count which adjacent pair of symbols is most frequent in a large corpus, merge that pair into a new symbol, and repeat until the vocabulary reaches a target size <code>V</code>. Encoding a new string replays those merges in order. &ldquo;Byte-level&rdquo; BPE, used by GPT-2 onward, tiktoken, Llama&nbsp;3, Qwen and DeepSeek, can encode any string, because every string is bytes and no character is ever unknown <a href="#src-72">[S72]</a>.</p>
+
+<p>Two libraries recur. SentencePiece treats the input as a raw stream with whitespace written as <code>&#9601;</code>; it implements BPE and a unigram model and was used by Llama&nbsp;1/2, T5 and Gemma (background, not re-read for this article). tiktoken is OpenAI&rsquo;s fast BPE implementation, with encodings such as <code>cl100k_base</code> (GPT-4 era) and <code>o200k_base</code> (GPT-4o era and gpt-oss) <a href="#src-72">[S72]</a>.</p>
+
+<figure class="rz-figure" data-rz-figure="llm-d11"></figure>
+
+<h3 id="vocab">2.2 Vocabulary sizes</h3>
+
+<p>The vocabulary is a trade. A larger <code>V</code> packs more text into each token, so fewer steps are needed per document, but it enlarges the embedding table (<code>V &times; d</code> parameters) and the output layer. For Llama&nbsp;3&nbsp;70B that table is about <code>128,256 &times; 8,192 &asymp; 1.05e9</code> parameters, with a similar output head, derived from the vocabulary in <a href="#src-2">[S2]</a>.</p>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>Tokenizer vocabulary sizes. Rows marked measured were read from the tokenizer files for this article.</caption>
+<thead><tr><th>Tokenizer / model</th><th>Vocabulary</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>cl100k_base</td><td class="n">100,277</td><td><a href="#src-72">[S72]</a>, measured</td></tr>
+<tr><td>o200k_base</td><td class="n">200,019</td><td><a href="#src-72">[S72]</a>, measured</td></tr>
+<tr><td>Llama 3 / 3.1</td><td class="n">128K (100K from tiktoken + 28K for non-English)</td><td><a href="#src-2">[S2]</a></td></tr>
+<tr><td>Qwen3</td><td class="n">151,669</td><td><a href="#src-3">[S3]</a></td></tr>
+<tr><td>DeepSeek-V3</td><td class="n">128,815 in <code>tokenizer.json</code> (report: &ldquo;128K&rdquo;)</td><td><a href="#src-72">[S72]</a>, <a href="#src-1">[S1]</a></td></tr>
+<tr><td>Kimi K2</td><td class="n">160K</td><td><a href="#src-25">[S25]</a></td></tr>
+</tbody></table></div>
+
+<h3 id="languages">2.3 English, Indonesian and code, measured</h3>
+
+<p>For this article I encoded three samples with four tokenizers: a 133-word English paragraph about data-center cooling, its 118-word Indonesian translation, and a 7-line Python function <a href="#src-72">[S72]</a>. The sample is small, so read the ratios as indicative.</p>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>Tokens per word and characters per token, measured on one paragraph and its translation.</caption>
+<thead><tr><th>Tokenizer</th><th>EN tok/word</th><th>EN chars/tok</th><th>ID tok/word</th><th>ID &divide; EN tokens</th><th>Code chars/tok</th></tr></thead>
+<tbody>
+<tr><td>cl100k_base</td><td class="n">1.20</td><td class="n">4.88</td><td class="n">2.05</td><td class="n">1.51&times;</td><td class="n">2.98</td></tr>
+<tr><td>o200k_base</td><td class="n">1.20</td><td class="n">4.91</td><td class="n">1.60</td><td class="n">1.19&times;</td><td class="n">2.94</td></tr>
+<tr><td>Qwen3</td><td class="n">1.20</td><td class="n">4.88</td><td class="n">2.05</td><td class="n">1.51&times;</td><td class="n">2.70</td></tr>
+<tr><td>DeepSeek-V3</td><td class="n">1.19</td><td class="n">4.94</td><td class="n">1.72</td><td class="n">1.28&times;</td><td class="n">2.80</td></tr>
+</tbody></table></div>
+
+<figure class="rz-chart" data-rz-chart>
+<div class="rz-chart-canvas"><canvas></canvas></div>
+<script type="application/json" class="rz-chart-cfg">
+{"type": "bar", "title": "Tokens for the same content in Indonesian, relative to English", "labels": ["cl100k_base", "o200k_base", "Qwen3", "DeepSeek-V3"], "series": [{"label": "Indonesian tokens / English tokens", "data": [1.51, 1.19, 1.51, 1.28], "unit": "x"}], "x": "Tokenizer", "yLabel": "Token ratio (EN = 1)", "source": "Self-measurement on one 133-word EN paragraph and its 118-word ID translation (tiktoken, HF tokenizers); see article sources S72", "basisTag": "measured"}
+</script>
+</figure>
+
+<p>Words split along morphemes the vocabulary has not learned. In <code>o200k_base</code>, &ldquo;pendinginan&rdquo; becomes <code>pending|inan</code>, &ldquo;dikonsumsi&rdquo; becomes <code>dik|onsum|si</code>, &ldquo;megawatt&rdquo; becomes <code>meg|aw|att</code>, while &ldquo;Transformer&rdquo; is a single token <a href="#src-72">[S72]</a>. Code is denser in symbols than prose: about 2.7&ndash;3.0 characters per token here, against 4.9 for English.</p>
+
+<p>Tokenizers also change between model generations. Meta reports that Llama&nbsp;3&rsquo;s English compression rose from 3.17 to 3.94 characters per token over Llama&nbsp;2 <a href="#src-2">[S2]</a>. Anthropic states that on its current tokenizer, 1M tokens is about 555k words, about 2.5M characters; that is <code>1,000,000 / 555,000 = 1.80</code> tokens per word, derived. Earlier Claude models fit about 750k words in 1M tokens, 1.33 tokens per word <a href="#src-27">[S27]</a>. So &ldquo;a token is three quarters of a word&rdquo; is a property of one tokenizer, not a law. The values quoted here span 1.19 to 1.80 tokens per English word.</p>
+
+<h3 id="token-cost">2.4 Why tokens set cost and context</h3>
+
+<pre class="formula">cost = input_tokens &times; input_price + output_tokens &times; output_price</pre>
+
+<p>Take a 10,000-word document priced at $2 per million input tokens (the Sonnet&nbsp;5.5 list price <a href="#src-27">[S27]</a>):</p>
+
+<ul>
+<li>English, <code>o200k</code>: <code>10,000 &times; 1.20 = 12,000</code> tokens, $0.024.</li>
+<li>Indonesian, <code>o200k</code>: <code>10,000 &times; 1.60 = 16,000</code> tokens, $0.032.</li>
+<li>Indonesian, <code>cl100k</code> or Qwen3: <code>10,000 &times; 2.05 = 20,500</code> tokens, $0.041.</li>
+<li>English on the 1.80 tokens-per-word Claude tokenizer: 18,018 tokens by the dossier&rsquo;s 555k-word rule, $0.036.</li>
+</ul>
+
+<p>The same ratio applies to the <a href="glossary.html#term-context-window">context window</a>. A window of 128K tokens holds fewer Indonesian words than English ones, in proportion to the table above. The effect compounds with the KV cache (section 4), which is also counted per token: a language that costs 1.5&times; the tokens also costs 1.5&times; the cache memory for the same document.</p>
+
+<div class="llm-calc" data-llm-calc="tokens"></div>
+
+<div class="ws-insight-box">
+<h4>Operator takeaway</h4>
+<p>Capacity planning for a multilingual service has to use tokens measured on your own text and your own tokenizer. A vendor&rsquo;s tokens-per-word figure for English will understate the load of an Indonesian-language workload by 19&ndash;51% on the tokenizers measured here <a href="#src-72">[S72]</a>.</p>
+</div>

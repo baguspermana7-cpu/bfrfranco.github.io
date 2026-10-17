@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: $64 Billion Blocked: Communities vs Data Centers Worldwide
 (Preview: "$64 Billion Blocked: Communities vs Data Centers Worldwide | by Bagusdpermana | Medium" = 74 chars, fits 74 limit)
 SEO Description: $64B in projects blocked across 24 states. 142 activist groups. Malaysia's first DC protest. 9,000 diesel generators in Virginia. The global data center rebellion analyzed from every angle.
@@ -141,4 +142,4 @@ The question is not whether communities and data centers can coexist. They can. 
 
 Originally published at resistancezero.com
 
-Full analysis with interactive community impact scorecard calculator and multi-perspective data from 40+ sources: https://resistancezero.com/article-14.html
+Full analysis with interactive community impact scorecard calculator and multi-perspective data from 40+ sources: https://resistancezero.com/article-14.html?utm_source=medium&utm_medium=syndication&utm_campaign=a14

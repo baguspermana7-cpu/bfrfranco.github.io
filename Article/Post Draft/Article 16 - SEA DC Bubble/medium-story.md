@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: The SEA Data Center Bubble: $37B Risk | by Bagusdpermana
 SEO Description: 6,068 MW pipeline. $37B invested. Johor's 5.8 GW gamble for 3.8M people. Indonesia at 1,717 MW. Is Southeast Asia building a data center bubble? A deep investigation with data.
 Tags: Data Center, Southeast Asia, Investment Risk, AI Infrastructure, Bubble
@@ -96,4 +97,4 @@ I built an interactive Bubble Risk Calculator that lets you model supply-demand 
 
 ---
 
-Originally published at [resistancezero.com](https://resistancezero.com/article-16.html)
+Originally published at [resistancezero.com](https://resistancezero.com/article-16.html?utm_source=medium&utm_medium=syndication&utm_campaign=a16)

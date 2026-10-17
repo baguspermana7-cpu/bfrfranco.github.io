@@ -20,4 +20,4 @@ Meanwhile, Microsoft is spending $1.6 billion to restart Three Mile Island's nuc
 
 I wrote a detailed analysis covering the grid data, the nuclear deals, the political battle, and what happens if PJM fails — with an interactive calculator.
 
-Full analysis: https://resistancezero.com/article-25.html
+Full analysis: https://resistancezero.com/article-25.html?utm_source=facebook&utm_medium=social&utm_campaign=a25

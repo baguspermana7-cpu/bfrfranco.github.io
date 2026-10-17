@@ -1,0 +1,63 @@
+<h2 id="uncensored">&ldquo;Uncensored&rdquo; models: what abliteration actually is</h2>
+
+<p>Chat models are trained to decline some requests. When a model's weights are public, that trained behaviour is part of the file, and researchers have shown it can be located and changed. The result is what people call an &ldquo;uncensored&rdquo; or &ldquo;abliterated&rdquo; model. This section describes the mechanism that was published, what it does and does not change, and where responsibility sits when such a model is hosted. It gives no procedure.</p>
+
+<h3 id="refusal-training">How refusal is trained in</h3>
+
+<p>Refusal is not a filter bolted on after the model. It is learned in the stages described earlier: supervised examples of declining, preference training that rewards declining in the right cases, and, in Constitutional AI, written principles the model applies to its own outputs <a href="#src-52">[S52]</a><a href="#src-55">[S55]</a>. Because it is learned behaviour stored in the weights, anyone holding the weights can change it.</p>
+
+<h3 id="single-direction">The single-direction finding</h3>
+
+<p>Arditi et al. (NeurIPS 2024) reported that refusal &ldquo;is mediated by a one-dimensional subspace, across 13 popular open-source chat models up to 72B&rdquo; <a href="#src-40">[S40]</a>. Their approach is interpretability work: compare the model's internal activations, in the residual stream, on prompts it refuses against prompts it answers. The difference of the two mean activations defines a direction, which they call the refusal direction. Two interventions follow from it:</p>
+
+<ul>
+<li><strong>Directional ablation</strong> removes that component from every residual activation while the model runs.</li>
+<li><strong>Weight orthogonalisation</strong> edits the weights so that they never write along that direction. This is the technique the community calls <a href="glossary.html#term-abliteration">abliteration</a>.</li>
+</ul>
+
+<p>The converse also holds in the paper: adding the direction makes a model refuse harmless requests <a href="#src-40">[S40]</a>. A second, coarser route exists: supervised fine-tuning on data that contains no refusals has a similar effect and can degrade other behaviours; the sources here do not quantify that degradation.</p>
+
+<h3 id="what-changes">What it does and does not change</h3>
+
+<p>The paper measured the effect on the behaviour and on general capability <a href="#src-40">[S40]</a>:</p>
+
+<div class="table-wrap">
+<table class="ws-table">
+<caption>Measured effects of removing the refusal direction (Arditi et al.)</caption>
+<thead><tr><th scope="col">Measure</th><th scope="col">Result</th></tr></thead>
+<tbody>
+<tr><td>Models tested</td><td class="n">13, up to 72B parameters</td></tr>
+<tr><td>Attack success rate, Qwen models</td><td class="n">79&ndash;84%</td></tr>
+<tr><td>Attack success rate, Llama-2 models</td><td class="n">4&ndash;23%</td></tr>
+<tr><td>MMLU, ARC, GSM8K</td><td>Largely preserved</td></tr>
+<tr><td>TruthfulQA</td><td class="n">&minus;1 to &minus;3.5 points</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Two points matter for anyone evaluating such a model. First, the edit removes a learned behaviour; it adds no knowledge and no capability. The model's factual errors and its tendency to hallucinate are unchanged. Second, the effect differs between model families by a wide margin, as the two attack-success ranges show, so a claim made about one model does not transfer to another.</p>
+
+<p>The authors addressed the dual-use question in their own ethics statement. They write that the method &ldquo;marginally lowers the bar for jailbreaking open-source model weights&rdquo;, and argue it &ldquo;does not substantially alter the risk profile of open sourcing models&rdquo;, because fine-tuning already achieved the same end <a href="#src-40">[S40]</a>. Readers can weigh that argument for themselves; it is the researchers' position, not a settled one.</p>
+
+<h3 id="licences-responsibility">Licences, liability and the operator's responsibility</h3>
+
+<p>Modifying weights does not remove the licence attached to them. Open-weight licences differ in what they constrain:</p>
+
+<div class="table-wrap">
+<table class="ws-table">
+<caption>Licence terms that still bind a modified open-weight model</caption>
+<thead><tr><th scope="col">Family</th><th scope="col">Licence</th><th scope="col">Use conditions</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><td>Llama 4 (Scout, Maverick)</td><td>Llama 4 Community</td><td>Must comply with Meta's Acceptable Use Policy; a separate licence is required above 700M monthly active users</td><td><a href="#src-23">[S23]</a></td></tr>
+<tr><td>Qwen3, gpt-oss</td><td>Apache 2.0</td><td>No use policy in the licence</td><td><a href="#src-3">[S3]</a><a href="#src-24">[S24]</a></td></tr>
+<tr><td>DeepSeek-R1, V4</td><td>MIT</td><td>No use policy in the licence</td><td><a href="#src-4">[S4]</a><a href="#src-26">[S26]</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>A permissive licence only means the licensor imposes no use policy. The party that deploys the model remains accountable under the law that applies to it. The EU AI Act (Regulation (EU) 2024/1689) places obligations on providers of general-purpose AI models; the application date quoted in secondary summaries was not re-checked for this article, so confirm it against the regulation text before relying on it. An operator who hosts a modified model on their own infrastructure is the deployer of that system, and the output filtering, access control, logging and terms of use around it are the operator's to design.</p>
+
+<div class="ws-insight-box">
+<h4>Hosting a modified model makes you the deployer</h4>
+<p>The licence travels with the weights and the legal responsibility travels with the host. Before running any modified open-weight model on your own hardware, read its licence, record who may reach it, and put your own input and output controls around it. The model will not supply them.</p>
+</div>

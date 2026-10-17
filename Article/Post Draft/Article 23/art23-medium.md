@@ -1,4 +1,5 @@
 # Medium Post
+*Publish via medium.com/p/import (sets the canonical).*
 
 SEO Title: xAI Built a 100,000-GPU Supercomputer in 122 Days. Here's What It Cost.
 Subtitle: An engineer's analysis of the fastest data center build in history — the achievement and the consequences.
@@ -55,4 +56,4 @@ As data center engineers, we build infrastructure that operates for decades. The
 
 ---
 
-*Originally published at [resistancezero.com](https://resistancezero.com/article-23.html)*
+*Originally published at [resistancezero.com](https://resistancezero.com/article-23.html?utm_source=medium&utm_medium=syndication&utm_campaign=a23)*

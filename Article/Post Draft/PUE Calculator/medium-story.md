@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: PUE Calculator for Data Centers | by Bagusdpermana | Medium
 SEO Description: Free interactive PUE calculator that models data center power efficiency from first principles. Analyze cooling COP, UPS topology, climate zones, and facility loads aligned with ASHRAE TC 9.9 and Green Grid standards.
 Tags: PUE, Data Center, Energy Efficiency, Power Usage Effectiveness, Green Grid

@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: Alarm Fatigue Is a System Design Failure, Not a Human One
 (Preview: "Alarm Fatigue Is a System Design Failure, Not a Human One | by Bagusdpermana | Medium" = 74 chars, fits 74 limit)
 SEO Description: When data center operators ignore alarms, the system has failed them. ISA-18.2 rationalization achieved 90% alarm reduction and 75% faster response times in a live facility.
@@ -187,7 +188,7 @@ Originally published at resistancezero.com.
 
 The full interactive version of this article includes an ISA-18.2 compliance calculator, Poisson alarm flood probability modeling, a Monte Carlo risk simulation with 10,000 iterations, and an interactive Sankey diagram showing how 3,847 configured alarm points were rationalized down to 391 active points:
 
-https://resistancezero.com/article-2.html
+https://resistancezero.com/article-2.html?utm_source=medium&utm_medium=syndication&utm_campaign=a2
 
 ---
 

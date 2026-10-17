@@ -6,6 +6,6 @@ When you optimize a factory, you optimize the entire system — not just one mac
 
 $4B in photonics is not a bet on fiber optics. It's a bet on system-level optimization.
 
-https://resistancezero.com/article-22.html
+https://resistancezero.com/article-22.html?utm_source=mastodon&utm_medium=social&utm_campaign=a22
 
 #JensenHuang #AIFactory #DataCenter #OpticalNetworking #Photonics

@@ -34,6 +34,6 @@ The engineering reality is nuanced. The industry IS making progress with closed-
 
 Both things are true: the industry is improving, AND the current situation is a real problem. What is not helpful is dismissing peer-reviewed research and community concerns as "fake."
 
-I wrote a comprehensive fact-check with a full verdict table, community impact analysis, and all sources cited: https://resistancezero.com/article-20.html
+I wrote a comprehensive fact-check with a full verdict table, community impact analysis, and all sources cited: https://resistancezero.com/article-20.html?utm_source=quora&utm_medium=social&utm_campaign=a20
 
 Sources: UC Riverside research (Joule), Microsoft 2024 Environmental Sustainability Report, Google 2024 Environmental Report, The Dalles city water records, Xylem/Global Water Intelligence 2026.

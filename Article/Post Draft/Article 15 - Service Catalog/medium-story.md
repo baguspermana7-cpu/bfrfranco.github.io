@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS (fill these in before publishing):
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: 135 Data Center Services Ranked by Annual Revenue Potential
 (Preview: "135 Data Center Services Ranked by Annual Revenue Potential | by Bagusdpermana | Medium" = 74 chars, fits 74 limit)
 SEO Description: The definitive data center service catalog: 135+ services across 12 categories ranked by Annual Revenue Potential. Regional pricing for Americas, Europe, SEA, and Australia. From colocation to sustainability.
@@ -173,4 +174,4 @@ The data center services market is expanding faster than at any point in its his
 
 Originally published at resistancezero.com
 
-Full analysis with interactive service catalog calculator, regional pricing comparisons, and quote builder for all 135+ services: https://resistancezero.com/article-15.html
+Full analysis with interactive service catalog calculator, regional pricing comparisons, and quote builder for all 135+ services: https://resistancezero.com/article-15.html?utm_source=medium&utm_medium=syndication&utm_campaign=a15

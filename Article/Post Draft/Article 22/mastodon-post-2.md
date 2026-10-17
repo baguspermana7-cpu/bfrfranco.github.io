@@ -7,6 +7,6 @@ That's why NVIDIA can't just buy TSMC wafers and call it a day. They need Lument
 The silicon photonics revolution requires a marriage of silicon fabrication and III-V laser physics.
 
 Wrote a deep dive on the full technology stack:
-https://resistancezero.com/article-22.html
+https://resistancezero.com/article-22.html?utm_source=mastodon&utm_medium=social&utm_campaign=a22
 
 #SiliconPhotonics #LaserPhysics #Semiconductors #AIInfrastructure #NVIDIA

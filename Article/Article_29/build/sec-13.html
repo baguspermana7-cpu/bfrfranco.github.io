@@ -1,0 +1,79 @@
+<h2 id="hardware">The hardware ladder, rung by rung</h2>
+
+<p>The same model runs on a laptop, a workstation card, a server, a liquid-cooled rack or a campus of tens of thousands of accelerators. What changes from rung to rung is memory, memory bandwidth and the power and cooling needed to feed them. The model that fits a rung is set by its weight memory plus its KV cache, and the speed is set by bandwidth. For a facility engineer the important step is the one from server to rack, where air cooling stops being an option.</p>
+
+<p>The serving rule used throughout: memory needed = weights (<code>N &times; bytes per parameter</code>) + KV cache (see <a href="#kv-cache">the KV-cache section and its calculator</a>) + roughly 10&ndash;20% runtime overhead (a rule of thumb, not a sourced figure). Training needs about 16&nbsp;B per parameter plus activations <a href="#src-60">[S60]</a>; the energy calculator in <a href="#training">the training section</a> turns a GPU count into megawatts.</p>
+
+<figure class="rz-figure" data-rz-figure="llm-d7"></figure>
+
+<h3 id="laptop">Laptop and Mac Studio</h3>
+
+<p>Apple's unified memory lets a laptop-class chip hold a model that would need a data-center GPU elsewhere. The M4 Max offers up to 128&nbsp;GB at 546&nbsp;GB/s, and the Mac Studio M3 Ultra up to 512&nbsp;GB at 819&nbsp;GB/s <a href="#src-71">[S71]</a>. A 70B model at Q4_K_M (43&nbsp;GB) fits an M4 Max. DeepSeek-V3 at about 4 bits needs 671 &times; 0.5 = 336&nbsp;GB to 671 &times; 4.894 / 8 = 410&nbsp;GB and so fits the 512&nbsp;GB M3 Ultra (derived). The bandwidth ceilings from the serving section apply: about 19 tok/s for 70B Q4 on the M3 Ultra and 13 on the M4 Max. Newer Apple silicon than these two parts was not checked for this article.</p>
+
+<h3 id="workstation">Workstation GPU</h3>
+
+<p>An RTX 5090 carries 32&nbsp;GB of GDDR7 at 1,792&nbsp;GB/s, draws 575&nbsp;W and asks for a 1,000&nbsp;W power supply <a href="#src-15">[S15]</a>. An RTX 4090 has 24&nbsp;GB (its 1,008&nbsp;GB/s figure is from secondary sources). These cards serve an 8B model at BF16, a 14B at 8-bit or a 32B at 4-bit (about 20&nbsp;GB, derived), and fine-tune 8&ndash;14B models with QLoRA.</p>
+
+<h3 id="server">One server</h3>
+
+<p>The eight-GPU node is the standard unit. A DGX H100 draws about 10.2&nbsp;kW at maximum <a href="#src-70">[S70]</a>, which is 10.2 / 8 = 1.275&nbsp;kW per GPU slot including the host. The parts:</p>
+
+<div class="table-wrap">
+<table class="ws-table">
+<caption>Accelerators and 8-GPU systems: memory, bandwidth and power (vendor figures; dense FLOPs)</caption>
+<thead><tr><th scope="col">Part</th><th scope="col">Memory</th><th scope="col">Bandwidth</th><th scope="col">Power</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><td>H100 SXM</td><td class="n">80&nbsp;GB</td><td class="n">3.35&nbsp;TB/s</td><td class="n">&mdash;</td><td><a href="#src-8">[S8]</a></td></tr>
+<tr><td>H200</td><td class="n">141&nbsp;GB</td><td class="n">4.8&nbsp;TB/s</td><td class="n">&mdash;</td><td><a href="#src-9">[S9]</a></td></tr>
+<tr><td>MI355X</td><td class="n">288&nbsp;GB</td><td class="n">8&nbsp;TB/s</td><td class="n">1,400&nbsp;W</td><td><a href="#src-13">[S13]</a></td></tr>
+<tr><td>DGX H100 (8 GPUs)</td><td class="n">640&nbsp;GB</td><td class="n">&mdash;</td><td class="n">10.2&nbsp;kW max</td><td><a href="#src-70">[S70]</a></td></tr>
+<tr><td>DGX B200 (8 GPUs)</td><td class="n">1,440&nbsp;GB</td><td class="n">64&nbsp;TB/s</td><td class="n">14.3&nbsp;kW</td><td><a href="#src-12">[S12]</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Eight H200 give 8 &times; 141 = 1,128&nbsp;GB, which holds a 405B model at FP8 (405&nbsp;GB) with room for KV, or DeepSeek-V3 at FP8 (671&nbsp;GB). Eight H100 (640&nbsp;GB) cannot hold the latter. The same server fully fine-tunes an 8B model, LoRA-tunes a 70B and QLoRA-tunes a 405B (derived).</p>
+
+<h3 id="rack">One rack: NVL72</h3>
+
+<p>The <a href="glossary.html#term-nvl72">GB200 NVL72</a> joins 72 GPUs and 36 Grace CPUs in a single <a href="glossary.html#term-nvlink">NVLink</a> domain with 13.4&nbsp;TB of <a href="glossary.html#term-hbm">HBM3E</a>, 576&nbsp;TB/s of aggregate memory bandwidth and 130&nbsp;TB/s of NVLink bandwidth, and it is liquid-cooled <a href="#src-10">[S10]</a>. The GB300 NVL72 raises memory to 20&nbsp;TB and gives each GPU an 800&nbsp;Gb/s network interface <a href="#src-11">[S11]</a>. HPE lists the GB200 NVL72 rack at 132&nbsp;kW nominal TDP and about 192&nbsp;kW peak electrical design power <a href="#src-68">[S68]</a>. Per GPU that is 132 / 72 = 1.83&nbsp;kW (derived).</p>
+
+<p>What fits: a trillion-parameter mixture-of-experts model with long context, since Kimi K2 at FP8 is about 1&nbsp;TB (derived) against 13.4&nbsp;TB of HBM, and a full fine-tune of a 70B model (1.13&nbsp;TB). NVIDIA's Vera Rubin NVL144 is reported for the second half of 2026 at 288&nbsp;GB HBM4 per GPU and 120&ndash;130&nbsp;kW per rack, but those figures come from secondary reporting of a roadmap and are unverified <a href="#src-75">[S75]</a>.</p>
+
+<figure class="rz-chart" data-rz-chart>
+  <div class="rz-chart-canvas"><canvas></canvas></div>
+  <script type="application/json" class="rz-chart-cfg">
+{"type": "bar", "title": "Power of one system, from an 8-GPU server to a liquid-cooled rack", "labels": ["DGX H100 (8 GPUs)", "DGX B200 (8 GPUs)", "Cerebras CS-3", "GB200 NVL72, nominal", "GB200 NVL72, peak design"], "series": [{"label": "System power", "data": [10.2, 14.3, 27, 132, 192], "unit": " kW"}], "yLabel": "kW per system", "x": "System", "y": "kW per system", "source": "NVIDIA DGX H100 design guide [S70]; NVIDIA DGX B200 [S12]; Cerebras CS-3 [S16]; HPE GB200 NVL72 (132 kW TDP, about 192 kW EDPp) [S68]", "basisTag": "published"}
+  </script>
+</figure>
+
+<h3 id="pod">A pod</h3>
+
+<p>Beyond one NVLink domain, racks are joined by scale-out networks: <a href="glossary.html#term-infiniband">InfiniBand</a> or RoCE at 400&ndash;800&nbsp;Gb/s per GPU <a href="#src-2">[S2]</a><a href="#src-11">[S11]</a>. Llama 3 405B was trained on 16,384 H100 over such a fabric <a href="#src-2">[S2]</a>. Google's answer is the <a href="glossary.html#term-tpu">TPU</a> pod: an Ironwood pod joins 9,216 chips for 42.5&nbsp;EFLOPS of FP8, draws about 10&nbsp;MW and is liquid-cooled; one chip has 192&nbsp;GB of HBM at 7.37&nbsp;TB/s and 4,614&nbsp;TFLOPS FP8 <a href="#src-14">[S14]</a>. All-in that is 10&nbsp;MW / 9,216 = 1.09&nbsp;kW per chip (derived). Vertiv and NVIDIA publish a 7&nbsp;MW reference architecture for GB200 NVL72 <a href="#src-68">[S68]</a>.</p>
+
+<h3 id="campus">A campus</h3>
+
+<p>xAI states that Colossus was built in 122 days and then doubled in 92 days to 200,000 GPUs <a href="#src-19">[S19]</a>; the site's <a href="article-23.html">article 23</a> covers that build. OpenAI states that Stargate Abilene uses GB200 systems and that GPT-5.5 was trained there <a href="#src-21">[S21]</a>; Epoch estimates the site reaches its planned 1.2&nbsp;GW in the fourth quarter of 2026 <a href="#src-20">[S20]</a>. Claims about Colossus beyond 200,000 GPUs rest on secondary sources and are not used here. Cluster power scales linearly from the unit figures (derived, PUE of 1.2 assumed):</p>
+
+<ul>
+<li>100,000 H100 &times; 1.275&nbsp;kW = 127.5&nbsp;MW IT; &times; 1.2 = 153&nbsp;MW, in line with the roughly 150&nbsp;MW public figure for Colossus phase 1 in article 23.</li>
+<li>100,000 GB200 = 100,000 / 72 = 1,389 racks &times; 132&nbsp;kW = 183&nbsp;MW IT; &times; 1.2 = 220&nbsp;MW. Epoch's estimate for GPT-6 Astra is about 233&nbsp;MW <a href="#src-65">[S65]</a>.</li>
+</ul>
+
+<h3 id="asics">Inference ASICs: Groq and Cerebras</h3>
+
+<p>These chips trade capacity for bandwidth by keeping weights in on-chip SRAM. The Groq chip holds 230&nbsp;MB of SRAM at 80&nbsp;TB/s, draws 215&nbsp;W TDP and is scheduled deterministically by its compiler <a href="#src-17">[S17]</a>. At 230&nbsp;MB per chip a 70B FP8 model needs 70.6&nbsp;GB / 230&nbsp;MB = 307 chips for the weights alone (derived), so deployments are many-chip racks. The Cerebras WSE-3 puts 44&nbsp;GB of SRAM at 21&nbsp;PB/s and 900,000 cores on one 46,225&nbsp;mm&sup2; wafer; the CS-3 system draws about 27&nbsp;kW, occupies 16 RU and is liquid-cooled. Its datasheet figure of 125&nbsp;PFLOPS FP16 is a sparse number, while the company's current web page claims 250&nbsp;PFLOPS for a &ldquo;WSE-3 Turbo&rdquo; without stating the basis <a href="#src-16">[S16]</a>.</p>
+
+<h3 id="facility">What it means for your facility</h3>
+
+<ul>
+<li><strong>Density.</strong> A single DGX H100 at 10.2&nbsp;kW already sits at or above what a conventional rack is commonly provisioned for (a rule of thumb of 4&ndash;8&nbsp;kW, not sourced here). An NVL72 at 132&nbsp;kW is more than ten times that eight-GPU node (132 / 10.2 = 12.9).</li>
+<li><strong>Liquid cooling.</strong> GB200 and GB300 NVL72 and Ironwood are liquid-cooled <a href="#src-10">[S10]</a><a href="#src-11">[S11]</a><a href="#src-14">[S14]</a>. Vertiv's reference design supports up to 132&nbsp;kW per rack with hybrid liquid and air <a href="#src-68">[S68]</a>. Google says <a href="glossary.html#term-direct-liquid-cooling">direct liquid cooling</a> can &ldquo;reliably sustain up to twice the performance of standard air cooling&rdquo; <a href="#src-14">[S14]</a>.</li>
+<li><strong>Power quality.</strong> Synchronous training makes cluster power swing &ldquo;on the order of tens of megawatts&rdquo;, and Llama 3's 16K-GPU run logged 419 unexpected interruptions in 54 days <a href="#src-2">[S2]</a>. UPS, generator and utility interconnection need to be designed for that load step.</li>
+<li><strong>PUE.</strong> The campus figures above assume a PUE of 1.2; substitute your own with the site's PUE calculator.</li>
+</ul>
+
+<div class="ws-insight-box">
+<h4>The rack is the design unit</h4>
+<p>From NVL72 upward, the 72 GPUs, the NVLink fabric and the cold plates are one product. Plan floor loading, coolant distribution and electrical feeds per rack at 132&nbsp;kW nominal and 192&nbsp;kW peak design, and treat the training load step as part of the electrical specification, not as an operations surprise.</p>
+</div>

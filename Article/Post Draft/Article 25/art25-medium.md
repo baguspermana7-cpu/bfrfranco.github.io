@@ -1,4 +1,5 @@
 # Medium Post
+*Publish via medium.com/p/import (sets the canonical).*
 
 SEO Title: PJM Is 6 GW Short by 2027. 65 Million People Are in the Blast Zone.
 Subtitle: The largest power grid in North America is running out of capacity. Data centers are consuming 40% of the growth.
@@ -73,4 +74,4 @@ PJM's challenge is a preview of what every major grid will face as AI infrastruc
 
 ---
 
-*Originally published at [resistancezero.com](https://resistancezero.com/article-25.html)*
+*Originally published at [resistancezero.com](https://resistancezero.com/article-25.html?utm_source=medium&utm_medium=syndication&utm_campaign=a25)*

@@ -32,6 +32,6 @@ As data center operators, we build infrastructure that runs for decades. The 122
 
 I wrote a full engineering analysis with an interactive Build Speed Analyzer calculator.
 
-Full article: https://resistancezero.com/article-23.html
+Full article: https://resistancezero.com/article-23.html?utm_source=linkedin&utm_medium=social&utm_campaign=a23
 
 #DataCenter #AIInfrastructure #xAI #Colossus #EnvironmentalJustice #Engineering #GPU #NVIDIA #CriticalInfrastructure

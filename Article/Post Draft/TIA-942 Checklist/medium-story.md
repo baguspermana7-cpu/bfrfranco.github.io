@@ -1,4 +1,5 @@
 MEDIUM DRAFT SETTINGS
+*Publish via medium.com/p/import (sets the canonical).*
 SEO Title: TIA-942 Compliance Checklist Tool | by Bagusdpermana | Medium
 SEO Description: Free interactive TIA-942-B compliance assessment for data centers. Evaluate 56 checklist items across 6 infrastructure categories with tier-specific filtering, weighted scoring, and gap analysis.
 Tags: TIA-942, Data Center, Compliance, Infrastructure Standard, Tier Classification
