@@ -158,6 +158,29 @@ if (!STATIC) {
       }
       await page.close();
     }
+    /* J5e: article calculators are styled by the register on a phone (v3.24.2: they rendered as raw
+       inline labels and bare inputs, because calc-* was only styled inside article-13's own <style>) */
+    {
+      const page = await browser.newPage();
+      await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+      await page.goto(base + 'article-29.html', { waitUntil: 'networkidle2' });
+      const calc = await page.evaluate(() => {
+        const blocks = [...document.querySelectorAll('.llm-calc-block')];
+        const bad = [];
+        for (const b of blocks) {
+          const inp = b.querySelector('.calc-input'), lab = b.querySelector('.calc-label');
+          if (!inp || !lab) { bad.push('not mounted'); continue; }
+          const ri = inp.getBoundingClientRect(), rl = lab.getBoundingClientRect();
+          if (ri.height < 40) bad.push('input ' + Math.round(ri.height) + 'px');
+          if (rl.bottom > ri.top + 1) bad.push('label beside input');
+          if (b.scrollWidth > b.clientWidth + 1) bad.push('overflows');
+        }
+        const title = document.querySelector('.article-title .highlight');
+        return { n: blocks.length, bad, italic: title ? getComputedStyle(title).fontStyle : 'none' };
+      });
+      ok('J5e', calc.n === 5 && calc.bad.length === 0 && calc.italic === 'normal', `article-29 calculators at 390: ${JSON.stringify(calc)}`);
+      await page.close();
+    }
     /* J5d: a fact list renders as rows */
     const fl = FAMILY.find((f) => /data-rz-fact-list/.test(read(f)));
     if (fl) {

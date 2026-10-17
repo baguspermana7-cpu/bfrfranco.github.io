@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v3.24.3 — 2026-10-17 — "Calculators"
+
+### Article calculators get the register; the headline's second clause is muted
+
+**Owner:** *"improve more"*. Reading article 29 on a phone: its five calculators rendered as raw inline
+labels beside 21 px inputs and plain-text results — the site's `calc-*` classes were only ever styled inside
+article-13's own `<style>`, so a new article inherited nothing. And the amber italic second clause of every
+article headline is the emphasis §A27 withdraws ("a muted second clause is the only emphasis").
+
+**Changed**
+- `css/rz-article-dark.css` CALCULATOR section: one register rule set for every article calculator — label
+  over input, 44 px mono controls, results as a label/value list, "show working" in muted mono, the error box,
+  two columns on a phone; fact-list value column fixed at 9.5 rem (7.5 rem on a phone) so labels align.
+- `.article-title .highlight` (both themes, all 40 editorial pages): muted, upright, weight 500 instead of
+  amber italic.
+- `tools/test-journal.mjs` J5e: on article-29 at 390 px every calculator has inputs ≥ 40 px, labels above
+  inputs, no horizontal overflow, and an upright headline clause — RED on v3.24.1's stylesheet
+  ("input 21px", "label beside input", "overflows"), GREEN now (64/64).
+
 ## v3.24.2 — 2026-10-17 — "Hub"
 
 ### Fixed — five things the live hub showed on a desktop and a phone (`datacenter-solutions.html`, `js/rz-hub-product.js`)
