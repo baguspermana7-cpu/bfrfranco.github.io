@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v3.24.6 — 2026-10-17 — "Hub"
+
+### Fixed — the plant's bin strip clipped every label on a phone (`datacenter-solutions.html`, `js/rz-hub-product.js`)
+- At 390 and 360 px each bin button was narrower than "24 °C", so the strip read "24 °( 26 °(".
+  On phones the bins print as "24°" (the unit stays in the title and returns on desktop), the
+  selected bin no longer widens with its hours, and all seven fit at 360 px — checked per button.
+- On phones the status row drops its two constants (Total IT, GPUs, which do not change with the
+  bin) and keeps the four that do: two lines instead of five.
+- The gap between the hero copy and the plant tightens from 48 to 40 px.
+
 ## v3.24.5 — 2026-10-17 — "Ragged"
 
 ### Lists stop justifying on a phone

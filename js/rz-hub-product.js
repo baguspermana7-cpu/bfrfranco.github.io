@@ -378,7 +378,7 @@
     { k: 'gpu', label: 'GPUs', id: function () { return 'compute.gpu_facility'; }, val: function () { return get('compute.gpu_facility'); }, out: function (v) { return fmt(Math.round(v)); } }
   ];
   function keysRender(list) {
-    list.innerHTML = KEYS.map(function (k, i) { return '<li style="--i:' + i + '" data-key-row="' + k.k + '"><span>' + esc(k.label) + '</span><b data-key="' + k.k + '">—</b><code>' + esc(k.id()) + '</code></li>'; }).join('');
+    list.innerHTML = KEYS.map(function (k, i) { return '<li style="--i:' + i + '" data-key-row="' + k.k + '"' + (k.k === 'it' || k.k === 'gpu' ? ' class="is-static"' : '') + '><span>' + esc(k.label) + '</span><b data-key="' + k.k + '">—</b><code>' + esc(k.id()) + '</code></li>'; }).join('');
   }
   function keysPaint(list) {
     var b = bin(); if (!b) return;
@@ -394,7 +394,7 @@
     var bs = bins(), total = 0; bs.forEach(function (b) { total += b.hours; });
     strip.innerHTML = bs.map(function (b, i) {
       return '<button type="button" data-bin="' + i + '" style="--h:' + (b.hours / total).toFixed(4) + '" aria-pressed="' + (i === BIN ? 'true' : 'false') + '" title="' + b.ambient_db_c + ' °C dry bulb, ' + fmt(b.hours) + ' h a year">' +
-        '<b>' + b.ambient_db_c + ' °C</b><span>' + fmt(b.hours) + ' h' + (i === DESIGN_BIN ? ' · design' : '') + (b.liquid_free_cooling ? '' : ' · cliff') + '</span><i class="dwell" aria-hidden="true"></i></button>';
+        '<b>' + b.ambient_db_c + '°<i>C</i></b><span>' + fmt(b.hours) + ' h' + (i === DESIGN_BIN ? ' · design' : '') + (b.liquid_free_cooling ? '' : ' · cliff') + '</span><i class="dwell" aria-hidden="true"></i></button>';
     }).join('');
   }
 
