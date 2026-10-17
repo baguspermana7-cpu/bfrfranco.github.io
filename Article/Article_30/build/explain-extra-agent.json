@@ -1,0 +1,132 @@
+{
+  "agent-v": {
+    "t": "Variability of input (V)",
+    "d": "How different each input is. 1 means a fixed format that a rule fitting on one page can handle; 5 means free text, screenshots or logs that are never the same twice. It sets N = (V − 1) / 4, the need for language understanding. Scores of 2 or less send the task to a script regardless of the total.",
+    "u": "1-5"
+  },
+  "agent-e": {
+    "t": "Cost of an error (E)",
+    "d": "How bad a wrong action is. 1 is trivial and reversible; 5 is safety, money or outage and cannot be undone. It scales the residual risk, which the verifiability input then reduces.",
+    "u": "1-5"
+  },
+  "agent-vf": {
+    "t": "Verifiability (Vf)",
+    "d": "Whether a mechanical check exists. 1 means none; 5 means a deterministic oracle such as a test suite, a schema or a simulator. A high value cancels most of the error cost in the residual-risk term.",
+    "u": "1-5"
+  },
+  "agent-f": {
+    "t": "Frequency (F)",
+    "d": "How often the task runs. 1 is rare, 5 is many times a day. It does not change the score; with F of 4 or more and V of 3 or less it adds a note to codify the stable path as a script.",
+    "u": "1-5"
+  },
+  "agent-l": {
+    "t": "Latency budget (L)",
+    "d": "How long the answer may take. 1 is sub-second or real-time, 5 is minutes or more. It applies a latency penalty to the score, and L = 1 sends the task to a script because model decode latency cannot meet a real-time path.",
+    "u": "1-5"
+  },
+  "agent-steps": {
+    "t": "Steps per run (n)",
+    "d": "How many sequential steps the agent takes in one run. If every step must succeed, the run succeeds with probability Ps^n, so the same per-step rate falls fast as n grows.",
+    "u": "steps"
+  },
+  "agent-p-step": {
+    "t": "Per-step success (p)",
+    "d": "The probability that one attempt at one step is correct. Steps are treated as independent, which is optimistic because real errors correlate. This is a user assumption, not a measured rate.",
+    "u": "0.5-0.9999"
+  },
+  "agent-d-detect": {
+    "t": "Verifier detection rate (d)",
+    "d": "The fraction of bad steps that a check catches and sends back for a retry. 0 means no verifier. A deterministic check can be near 1; a model-based verifier may share the generator's blind spots. User assumption.",
+    "u": "0-1"
+  },
+  "agent-retries": {
+    "t": "Retries per step (k)",
+    "d": "How many times a detected bad step is retried before the run gives up with a detected failure. Total attempts per step are at most k + 1.",
+    "u": "0-5"
+  },
+  "agent-t-in": {
+    "t": "Input tokens per attempt",
+    "d": "Tokens sent to the model on one attempt, including the history the step re-reads. Cost per attempt multiplies it by the input list price, reduced by the cached share.",
+    "u": "tokens"
+  },
+  "agent-t-out": {
+    "t": "Output tokens per attempt",
+    "d": "Tokens the model writes on one attempt. Output is priced several times higher than input.",
+    "u": "tokens"
+  },
+  "agent-cached": {
+    "t": "Cached input share",
+    "d": "The fraction of input tokens served from the prompt cache. Cache reads cost a fraction of the normal input price (10% is used here; vendors range 2.5-10%). Caching changes the slope of the cost curve, not its shape.",
+    "u": "0-0.95"
+  },
+  "agent-target": {
+    "t": "Target run success",
+    "d": "The run-level success probability you want. The calculator returns the per-step success needed to reach it: target^(1/n).",
+    "u": "0.01-0.999"
+  },
+  "agent-c0": {
+    "t": "Initial context (c0)",
+    "d": "Tokens already in the context at step 1: system prompt, tool definitions and the task. Every step re-sends them.",
+    "u": "tokens"
+  },
+  "agent-growth": {
+    "t": "Context growth per step (g)",
+    "d": "Tokens added to the history after each step by tool results and the model's own output. Because the whole history is re-sent each step, total input grows with the square of the step count.",
+    "u": "tokens"
+  },
+  "agent-out-step": {
+    "t": "Output per step (o)",
+    "d": "Tokens the model writes in one step. It sets output cost and, with the time per output token, the decode time of the step.",
+    "u": "tokens"
+  },
+  "agent-cost-cap": {
+    "t": "Cost cap (C)",
+    "d": "The most you are willing to spend on one run. The planner finds the largest step count whose cumulative cost stays at or under it.",
+    "u": "USD"
+  },
+  "agent-wall-cap": {
+    "t": "Wall-clock cap (Tw)",
+    "d": "The longest a run may take. Divided by the time per step it gives the step limit set by time.",
+    "u": "s"
+  },
+  "agent-tool-latency": {
+    "t": "Tool latency per step (tt)",
+    "d": "Time spent in tools per step (API calls, builds, tests), added to the model's time to first token and decode time.",
+    "u": "s"
+  },
+  "agent-policy": {
+    "t": "Policy cap on steps",
+    "d": "A step limit set by your own rule, independent of cost, time and context. The planner returns the smallest of the four limits.",
+    "u": "steps"
+  },
+  "agent-timeout-x": {
+    "t": "Per-step timeout multiplier",
+    "d": "The suggested per-step timeout is this multiple of the expected step time. The default of 3 is a rule of thumb that you can change.",
+    "u": "x"
+  },
+  "agent-rho": {
+    "t": "Correlation factor (ρ)",
+    "d": "How much a gate loses when it shares the generator's model family and so shares its blind spots. The effective catch rate becomes d × (1 − ρ). The default of 0.5 is an assumption.",
+    "u": "0-1"
+  },
+  "agent-gate-name": {
+    "t": "Gate name",
+    "d": "A label for one gate in the verification ladder, such as tests, lint, type check, LLM code review or human gate. Leave a slot empty and at 0 to leave it out.",
+    "u": ""
+  },
+  "agent-gate-catch": {
+    "t": "Gate catch rate (assumption)",
+    "d": "The probability that this gate catches a defect that reaches it. No measured per-gate catch rates were found for LLM pipelines, so these are what-if values you set.",
+    "u": "0-1"
+  },
+  "agent-gate-shared": {
+    "t": "Shares the generator's model family",
+    "d": "Whether this gate uses the same model family that wrote the work. If yes, its catch rate is reduced by the correlation factor because it tends to miss the same mistakes.",
+    "u": ""
+  },
+  "agent-gate-hard": {
+    "t": "Hard or advisory gate",
+    "d": "A hard gate cannot be overridden and blocks the work; an advisory gate can be ignored. The ladder draws hard gates as solid rungs and advisory gates as dashed. The kind does not change the arithmetic.",
+    "u": ""
+  }
+}

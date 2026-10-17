@@ -1,0 +1,6 @@
+<section class="llm-calc-block agent-calc-block">
+<h3>Tool-loop budget planner</h3>
+<p>This planner sets <code>max_steps</code>, a per-step timeout and a cost cap before a run, from the three limits that bind: money, wall clock and context window. Every step re-sends the history, so <code>Cost(S) = pin_eff·[S·c0 + g·S(S−1)/2]/1e6 + price.out·S·o/1e6</code> grows with the square of S. The step limit is <code>max_steps = min(S_cost, S_time, S_ctx, S_policy)</code> with <code>t_step = ttft + o·tpot + tt</code> and <code>S_time = floor(Tw / t_step)</code>.</p>
+<div class="agent-calc" data-agent-calc="budget"></div>
+<p class="calc-basis">Basis: model — illustrative. Prices are list price on 2026-10-16 (A29 [S27] via [S59]); time to first token, time per output token and the 200,000-token window are assumptions (A29 sections 8.2 and 8.5).</p>
+</section>

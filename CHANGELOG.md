@@ -11,6 +11,45 @@ release sections rather than semver.
 
 ---
 
+## v3.24.10 — 2026-10-17 — "Agents"
+
+### Article 30: Is "Agentic AI" a Fraud? — and the last second hues leave every article
+
+**Owner:** the brief to research John Elder's "Agentic AI is fraud" video and write article 30 from basic to
+advanced with calculators and diagrams; then *"improve more"*.
+
+**Added**
+- `article-30.html` (≈12.7k words, Future Forward · AI, tested against the evidence): eleven sections that steelman
+  the video, then grade its fourteen claims and the six counter-claims against 63 sources — the mechanism (right, and
+  exactly what vendors document), the absolutes (the model computes, unreliably, and cannot report how), what an agent
+  is mechanically, the measured record (METR horizon 50 % vs 80 %, 5.6×; SWE-bench's own audit), failure modes, the
+  money (big-four 2026 capex ≈ $0.7T, not the video's unsourced $3T), the name, the engineering stance, a ten-point
+  checklist for "put an agent on the BMS", and a verdict table. A disclosure near the top: researched and drafted with
+  Claude, and several key sources are Anthropic's own. Eight engine-drawn figures (`agentic-d1…d8`, zero warnings);
+  four calculators in `js/rz-agent-calc.js` (agent or script, run cost and reliability with compounding error, loop
+  budget, verification-ladder coverage) with `tools/test-agent-calc.mjs` (557 assertions); 32 new glossary terms and
+  backlinks on 8 existing ones; 26 RZExplain entries; five social drafts with UTM links.
+- `tools/assemble-article.py`: the article assembler, promoted from the article 29 session script and driven by
+  `Article/Article_<N>/build/article.json` (shell from the previous article, fragments spliced, sources from the
+  dossier table — local-file sources listed as such, cited-but-undefined sources fail the build — JSON-LD, FAQ, key
+  numbers, search-index entry, token restamp).
+
+**Fixed**
+- A compounding figure in the prose: `0.995^20 = 0.899` is wrong (it is 0.905); the step probability is
+  0.95 × 1.04706 = 0.9947 and 0.9947^20 = 0.899 — caught by the figure agent recomputing the number for D6.
+- The shared cookie banner (navy, blur, shadow, blue Accept), the login button and the signed-in pill (mint, navy
+  dropdown) on every editorial page now sit on the register, including the banner's "Learn more" link that
+  per-page legacy rules (`#cookieBanner p a { color:#93c5fd !important }`) kept blue or cyan.
+- `tools/test-journal.mjs` J5f could not see that chrome: J4 declines cookies and the browser's localStorage is
+  shared across its pages, so the banner never rendered in J5f; and the mint login button's background alpha
+  (0.08) sat under the 0.3 threshold while its hue lived in text and border. J5f now clears consent per page and
+  checks text and border colour of banner, login and user pill. Proven: 72 failures on the previous stylesheet,
+  0 on this one. Its amber band now starts at 20° so the light-theme accent `#92400e` (23°) is not flagged.
+
+**Changed**
+- `standarization/ARTICLE_PRODUCTION_STANDARD.md`: a new page's OG card needs `build-og-images.py --apply --discover`.
+- Journal grids (36 pages), series navigation "of 30", hub/landing OG cards regenerated.
+
 ## v3.24.9 — 2026-10-17 — "Register"
 
 ### Changed — the shared login, account and cookie widgets leave the withdrawn palette on every page (`auth.js`, `auth.min.js`, `js/rz-cookie-consent.js`)

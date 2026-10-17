@@ -68,6 +68,7 @@ node   tools/test-journal.mjs                      # JOURNAL family gate (v3.23.
 python3 tools/audit-post-drafts.py --strict         # every journal page (article-N, FF-N, geopolitics-N) carries its five social drafts (x, linkedin, mastodon, medium, facebook; any prefix/extension) with UTM-tagged resistancezero links and a Medium import/canonical line (v3.24.1 — the v1 audit expected file names nobody used and never passed). Other pages monitored. `--fix-utm` tags older drafts.
 python3 tools/test-article-series.py               # series navigation current on every article (counts, Prev/Next, the previous article's tail) — after adding an article run the sync tool in the same folder with --apply (sync-article-series) first.
 node   tools/test-llm-calc.mjs                      # article 29's five LLM calculators (js/rz-llm-calc.js): every worked example in Article/Article_29/CALCULATORS.md (375 assertions), invalid inputs, monotonicity, a source on every constant, formula strings match the spec.
+node   tools/test-agent-calc.mjs                    # article 30's four agent calculators (js/rz-agent-calc.js): agent-or-script, run cost and reliability with compounding error, loop budget, verification-ladder coverage (557 assertions).
 ```
 
 **Engine + accuracy tests** (v1.32.x accuracy-review work — gate any ship that touches the BMS cockpit pages):

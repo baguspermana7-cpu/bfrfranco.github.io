@@ -640,6 +640,307 @@ const LLM_FIGURES = [
   }
 ];
 
+/* ==========================================================================
+ * Article 30 — "Is 'Agentic AI' a Fraud?" (eight figures)
+ * ----------------------------------------------------------------------------
+ * Same method as article 29: gridFigure() above. Convention of this article:
+ * probabilistic components are accent + paper-2, deterministic components are
+ * ink, human gates are alarm-caution and dashed, safety-rated equipment is
+ * alarm-fault. Every distinction also rides on a second channel (dash, tag,
+ * legend) so none depends on colour alone.
+ * ======================================================================== */
+const AGENTIC_FIGURES = [
+  /* ---------------------------------------------------------------- D1 */
+  {
+    id: 'agentic-d1', page: 'article-30.html',
+    caption:
+      'One tool call, two descriptions. Operator drove a browser from screenshots, not an API script [S58]. ' +
+      'The mechanism in the video is right [S1]; “the LLM did nothing” is not: the model plans, the harness checks, ' +
+      'and code executes and reports back [S15][S16].',
+    because:
+      'the prose can say the video is half right; only the drawing shows which arrows the model decides and which ' +
+      'code executes, and that the second description has a return path and a confirm gate the first one lacks.',
+    build: () => gridFigure({
+      slug: 'agentic1', title: 'One tool call, two descriptions',
+      desc: 'Top: the video’s account. Bottom: the same call with the decisions the model makes marked.',
+      gaps: [52, 52, 52], gapY: 58,
+      nodes: [
+        { id: 'u1', col: 0, row: 0, name: 'User', sub: '“book me a table”' },
+        { id: 'l1', col: 1, row: 0, name: 'LLM', sub: 'guesses a command', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic: the model decides' },
+        { id: 'py', col: 2, row: 0, name: 'python opentable.py', sub: '→ OpenTable API', stroke: 'ink', legend: 'Deterministic: code executes' },
+        { id: 'l1b', col: 3, row: 0, name: 'LLM', sub: '“I booked you a table!”', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'l2', col: 0, row: 1, tag: 'plan [S15]', name: 'LLM', sub: 'pick tool, fill args', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'h', col: 1, row: 1, name: 'Harness', sub: 'schema · permissions', stroke: 'ink' },
+        { id: 'g', col: 2, row: 1, name: 'Confirm gate', sub: 'before side effects', stroke: 'alarm-caution', dashed: true, legend: 'Human gate' },
+        { id: 'x', col: 3, row: 1, name: 'Executor', sub: 'API call or browser', stroke: 'ink' },
+        { id: 'o', col: 3, row: 2, name: 'Observation', sub: 'result or error', stroke: 'ink' }
+      ],
+      edges: [
+        { a: 'u1', b: 'l1', stroke: 'accent' }, { a: 'l1', b: 'py', stroke: 'ink', pattern: 'dashed' }, { a: 'py', b: 'l1b', stroke: 'ink', pattern: 'dashed' },
+        { a: 'l2', b: 'h', stroke: 'accent', legend: 'Decided by the model' },
+        { a: 'h', b: 'g', stroke: 'ink', pattern: 'dashed', legend: 'Executed by code' },
+        { a: 'g', b: 'x', stroke: 'ink', pattern: 'dashed' },
+        { a: 'x', b: 'o', stroke: 'ink', pattern: 'dashed' },
+        { a: 'o', b: 'l2', stroke: 'accent', fs: 'l', ts: 'b', label: 'next step or stop' }
+      ],
+      zones: [
+        { ids: ['u1', 'l1', 'py', 'l1b'], label: 'As described in the video [S1]' },
+        { ids: ['l2', 'h', 'g', 'x', 'o'], label: 'As documented [S15][S16][S58]' }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D2 */
+  {
+    id: 'agentic-d2', page: 'article-30.html',
+    caption:
+      'Observe, act, verify. The model proposes; deterministic checks decide whether the step counts. Anthropic: ' +
+      'the agent gets ground truth from the environment at each step [S14].',
+    because:
+      'a list of “schema check, verifier, budget, human gate” hides that the verifier feeds the context and that the ' +
+      'budget guard can halt the model from outside it; the loop shape shows who can stop what.',
+    build: () => gridFigure({
+      slug: 'agentic2', title: 'Observe, act, verify',
+      desc: 'The model proposes; deterministic checks decide whether the step counts.',
+      gaps: [48, 52, 52], gapY: 36,
+      nodes: [
+        { id: 'bud', col: 1, row: 0, name: 'Budget guard', sub: 'steps · tokens · time · $', stroke: 'ink' },
+        { id: 'hum', col: 2, row: 0, name: 'Human gate', sub: 'irreversible actions', stroke: 'alarm-caution', dashed: true, legend: 'Human gate' },
+        { id: 'ctx', col: 0, row: 1, name: 'Context', sub: 'goal · history · tool results', stroke: 'ink' },
+        { id: 'llm', col: 1, row: 1, name: 'LLM', sub: 'propose next action', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic: the model proposes' },
+        { id: 'val', col: 2, row: 1, name: 'Schema / policy check', stroke: 'ink', legend: 'Deterministic check' },
+        { id: 'exe', col: 3, row: 1, name: 'Execute tool', stroke: 'ink' },
+        { id: 'ver', col: 3, row: 2, name: 'Verifier', sub: 'tests · lint · types · rules', stroke: 'ink' },
+        { id: 'done', col: 3, row: 3, name: 'Stop', sub: 'success or escalate', stroke: 'ink' }
+      ],
+      edges: [
+        { a: 'ctx', b: 'llm' }, { a: 'llm', b: 'val' },
+        { a: 'val', b: 'llm', label: 'reject: reason', fs: 'b', ts: 'b', stroke: 'muted', pattern: 'dashed', legend: 'Rejection / halt' },
+        { a: 'val', b: 'exe', label: 'valid' }, { a: 'exe', b: 'ver' },
+        { a: 'ver', b: 'ctx', label: 'pass/fail + log', fs: 'l', ts: 'b' },
+        { a: 'bud', b: 'llm', label: 'halt', stroke: 'muted', pattern: 'dashed' },
+        { a: 'llm', b: 'hum', label: 'side effect', fs: 't', ts: 'l' },
+        { a: 'hum', b: 'exe', label: 'approved', fs: 'r', ts: 't' },
+        { a: 'ver', b: 'done', label: 'goal met' }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D3 */
+  {
+    id: 'agentic-d3', page: 'article-30.html',
+    caption:
+      'Who decides the next step? Six levels from hand-written logic to an autonomous agent [S14][S20]. Only the last ' +
+      'level lets the model choose steps and tools; everything left of it is a workflow with predefined code paths, ' +
+      'and the first three are decades old (cron, RPA, expert systems).',
+    because:
+      'the argument turns on where the line between workflow and agent sits; a paragraph asserts it, the spectrum ' +
+      'shows five levels on one side and one on the other.',
+    build: () => gridFigure({
+      slug: 'agentic3', title: 'Who decides the next step?',
+      desc: 'Six levels, from hand-written logic to an autonomous agent.',
+      gaps: [28, 28, 28, 28, 44], top: 56,
+      nodes: [
+        { id: 'c0', col: 0, row: 0, tag: 'all: code', name: 'Code', sub: 'rules decide', stroke: 'ink' },
+        { id: 'c1', col: 1, row: 0, tag: 'output: LLM', name: 'One call', sub: 'single prompt', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'LLM decides this part' },
+        { id: 'c2', col: 2, row: 0, tag: 'output: LLM', name: 'Chain', sub: 'fixed sequence', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'c3', col: 3, row: 0, tag: 'branch: LLM', name: 'Router', sub: 'LLM picks branch', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'c4', col: 4, row: 0, tag: 'move: LLM', name: 'State machine', sub: 'LLM picks move', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'c5', col: 5, row: 0, tag: 'steps: LLM', name: 'Agent', sub: 'LLM picks steps', stroke: 'accent', fill: 'paper-2', tier: 1 }
+      ],
+      edges: [
+        { a: 'c0', b: 'c1', stroke: 'muted', pattern: 'dashed', legend: 'More control moves to the model' },
+        { a: 'c1', b: 'c2', stroke: 'muted', pattern: 'dashed' }, { a: 'c2', b: 'c3', stroke: 'muted', pattern: 'dashed' },
+        { a: 'c3', b: 'c4', stroke: 'muted', pattern: 'dashed' }, { a: 'c4', b: 'c5', stroke: 'muted', pattern: 'dashed' }
+      ],
+      zones: [
+        { ids: ['c1', 'c2', 'c3', 'c4'], label: 'Workflow: predefined code paths [S14]' },
+        { ids: ['c5'], label: 'Agent' }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D4 */
+  {
+    id: 'agentic-d4', page: 'article-30.html',
+    caption:
+      'Factory: LLMs write, exit codes decide. Hard gates are lint, test, build, nonempty and secrets, and no job can ' +
+      'override them [S60]. One demo job passed every gate: security and code PASS, UX and UI SKIP [S61].',
+    because:
+      'a list of roles and gates does not show the three ways back to the builder or that state is written to ' +
+      'board.json at every transition; the loop structure is the point.',
+    build: () => gridFigure({
+      slug: 'agentic4', title: 'Factory: LLMs write, exit codes decide',
+      desc: 'Spec to merge with every transition recorded by the factory CLI in board.json.',
+      gaps: [48, 56, 56], gapY: 48,
+      nodes: [
+        { id: 'spec', col: 0, row: 0, name: 'spec-writer', sub: 'request → spec.md', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'LLM role' },
+        { id: 'bld', col: 1, row: 0, name: 'builder', sub: 'code + tests, commit', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'gate', col: 2, row: 0, tag: 'never overridable', name: 'factory gate', sub: 'lint · test · build', stroke: 'ink', tier: 1, legend: 'CLI step (exit code)' },
+        { id: 'rev', col: 3, row: 0, name: '4 reviewers', sub: 'security · code · ux · ui', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'dec', col: 1, row: 1, name: 'DECIDE', sub: 'fix ≤2 · override · abandon', stroke: 'alarm-caution', dashed: true, legend: 'Human decision' },
+        { id: 'ver', col: 3, row: 1, name: 'factory verdict', sub: 'VERDICT regex · HEAD same', stroke: 'ink' },
+        { id: 'board', col: 2, row: 2, name: 'board.json', sub: 'every transition', stroke: 'ink', dashed: true },
+        { id: 'app', col: 3, row: 2, name: 'approver', sub: 'factory deliver', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'mg', col: 3, row: 3, name: 'Merge to main', sub: 're-gated · push if push=true', stroke: 'ink' }
+      ],
+      edges: [
+        { a: 'spec', b: 'bld' }, { a: 'bld', b: 'gate' },
+        { a: 'gate', b: 'bld', label: 'NEEDS_FIX ≤3', fs: 'b', ts: 'b', stroke: 'muted', pattern: 'dashed', legend: 'Back to the builder' },
+        { a: 'gate', b: 'rev', label: 'REVIEW' }, { a: 'rev', b: 'ver' },
+        { a: 'ver', b: 'dec', label: 'rounds exhausted', fs: 'l', ts: 'r' },
+        { a: 'dec', b: 'bld', label: 'fix' },
+        { a: 'ver', b: 'app', label: 'READY' }, { a: 'app', b: 'mg' },
+        { a: 'ver', b: 'board', stroke: 'muted', pattern: 'dotted', fs: 'b', ts: 't', legend: 'Writes state' },
+        { a: 'dec', b: 'board', stroke: 'muted', pattern: 'dotted', fs: 'b', ts: 'l' },
+        { a: 'app', b: 'board', stroke: 'muted', pattern: 'dotted', fs: 'l', ts: 'r' }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D5 */
+  {
+    id: 'agentic-d5', page: 'article-30.html',
+    caption:
+      'Drafter and checker. The probabilistic half reads and drafts; the deterministic half validates, executes and ' +
+      'tests. Self-explanations from the model can be unfaithful [S3], so nothing downstream trusts them. The seam is ' +
+      'where the engineering lives.',
+    because:
+      'a two-column table says which half does what; it cannot show that every path from the model passes through one ' +
+      'typed interface, or that test failures return to the drafter as text.',
+    build: () => gridFigure({
+      slug: 'agentic5', title: 'Drafter and checker',
+      desc: 'What each half is good at, and the interface between them.',
+      gaps: [72, 72], gapY: 32,
+      nodes: [
+        { id: 'p3', col: 0, row: 0, name: 'Draft code, MOP, ticket', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic (LLM)' },
+        { id: 'p1', col: 0, row: 1, name: 'Read text, logs, screens', sub: 'and choose among options', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'p4', col: 0, row: 2, tag: 'may be unfaithful [S3]', name: 'Explain', stroke: 'accent', fill: 'paper-2', tier: 1, dashed: true },
+        { id: 'iface', col: 1, row: 1, name: 'Typed tool interface', sub: 'JSON schema · allow-list · ranges', stroke: 'ink', tier: 1, legend: 'Deterministic (code)' },
+        { id: 'd3', col: 2, row: 0, name: 'Test, lint, type-check', stroke: 'ink' },
+        { id: 'dv', col: 2, row: 1, name: 'Validate + enforce', sub: 'schema · limits · permissions', stroke: 'ink' },
+        { id: 'd2', col: 2, row: 2, name: 'Execute and measure', stroke: 'ink' },
+        { id: 'd5', col: 2, row: 3, name: 'Log and replay', stroke: 'ink' }
+      ],
+      edges: [
+        { a: 'p3', b: 'iface', fs: 'r', ts: 't' }, { a: 'p1', b: 'iface' }, { a: 'p4', b: 'iface', fs: 'r', ts: 'b' },
+        { a: 'iface', b: 'dv' }, { a: 'iface', b: 'd2', fs: 'b', ts: 'l' },
+        { a: 'dv', b: 'd3', fs: 't', ts: 'b', stroke: 'muted', pattern: 'dashed' },
+        { a: 'd3', b: 'p3', label: 'error text back', fs: 'l', ts: 'r', stroke: 'muted', pattern: 'dashed', legend: 'Feedback to the drafter' },
+        { a: 'd2', b: 'd5' }
+      ],
+      zones: [
+        { ids: ['p3', 'p1', 'p4'], label: 'Probabilistic (LLM)' },
+        { ids: ['d3', 'dv', 'd2', 'd5'], label: 'Deterministic (code)' }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D6 */
+  {
+    id: 'agentic-d6', page: 'article-30.html',
+    caption:
+      '0.95 twenty times. At 95 % per step a 20-step run succeeds 35.8 % of the time (0.95^20, derived). With a ' +
+      'verifier that detects 90 % of bad steps and two retries, a step succeeds 99.47 % of the time and the run ' +
+      '89.9 % (derived, CALCULATORS C-ii). METR’s 50 % versus 80 % horizon gap is the field version [S27].',
+    because:
+      'the multiplication is one line in the prose; the drawing shows where the verifier sits (inside the step, ' +
+      'looping back) and why detection, not model quality, moves the run from 0.358 to 0.899.',
+    build: () => gridFigure({
+      slug: 'agentic6', title: '0.95 twenty times',
+      desc: 'Per-step success multiplies; a verifier with retries breaks the chain.',
+      gaps: [72, 72], gapY: 64,
+      nodes: [
+        { id: 'a', col: 0, row: 0, tag: '× 20 steps', name: 'Step', sub: 'p = 0.95', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic step' },
+        { id: 'r1', col: 2, row: 0, tag: '95 % per step', name: 'Run succeeds', sub: '0.358 over 20 steps', stroke: 'ink', tier: 1 },
+        { id: 'b', col: 0, row: 1, tag: '× 20 steps', name: 'Step', sub: 'p = 0.95', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'vf', col: 1, row: 1, name: 'Verifier', sub: 'd = 0.9 · k = 2', stroke: 'ink', legend: 'Deterministic check' },
+        { id: 'r2', col: 2, row: 1, tag: '99.47 % per step', name: 'Run succeeds', sub: '0.899 over 20 steps', stroke: 'ink', tier: 1 }
+      ],
+      edges: [
+        { a: 'a', b: 'r1', label: 'multiply 20 times' },
+        { a: 'b', b: 'vf', label: 'attempt' },
+        { a: 'vf', b: 'b', label: 'detected: retry', fs: 'b', ts: 'b', stroke: 'muted', pattern: 'dashed', legend: 'Detected failure retries' },
+        { a: 'vf', b: 'r2', label: 'passes' }
+      ],
+      zones: [
+        { ids: ['a', 'r1'], label: 'Without a verifier' },
+        { ids: ['b', 'vf', 'r2'], label: 'With a verifier', pad: { b: 38 } }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D7 */
+  {
+    id: 'agentic-d7', page: 'article-30.html',
+    caption:
+      'Money, models and narratives, 2024–2026. Time runs down; each lane is one kind of event. Capital moved first and ' +
+      'fastest (OpenAI $122B at $852B [S51]; Anthropic $65B at $965B [S48]), measured capability moved on a ~131-day ' +
+      'doubling [S26], and the critiques [S39][S37] arrived while both kept rising.',
+    because:
+      'sixteen dated events across three kinds do not survive as prose; read side by side on one time axis they show ' +
+      'that the critique lane is dense in 2025 and the capital lane in 2026.',
+    build: () => gridFigure({
+      slug: 'agentic7', title: 'Money, models and narratives, 2024–2026',
+      desc: 'Events on one time axis: capability, capital, critiques.',
+      gaps: [44, 44], gapY: 28,
+      nodes: [
+        { id: 'k1', col: 2, row: 0, tag: 'Jun–Aug 2025', name: 'Gartner: >40% cancelled by 2027', sub: 'MIT NANDA “95%” [S39][S37]', stroke: 'soft', dashed: true, legend: 'Critique' },
+        { id: 'c1', col: 0, row: 0, tag: 'Dec 2024–Jun 2025', name: 'Limits found', sub: 'pretraining ends [S53] · [S3][S5][S6]', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Capability' },
+        { id: 'c2', col: 0, row: 1, tag: 'Jan–Apr 2026', name: 'METR: 50% horizon ≈17 h', sub: '80% ≈3 h · ~131 d doubling [S26][S27]', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'm1', col: 1, row: 1, tag: 'Feb 2026', name: 'OpenAI $122B at $852B', sub: 'raised from $110B [S51]', stroke: 'ink', legend: 'Capital' },
+        { id: 'k2', col: 2, row: 1, tag: 'Nov 2025–Feb 2026', name: 'LeCun leaves Meta [S55]', sub: 'SWE-bench Verified retired [S23]', stroke: 'soft', dashed: true },
+        { id: 'm2', col: 1, row: 2, tag: 'May–Jun 2026', name: 'Anthropic $65B at $965B', sub: 'draft S-1 [S48][S49]', stroke: 'ink' },
+        { id: 'm3', col: 1, row: 3, tag: 'Jul–Sep 2026', name: 'Big-four capex ≈$0.7T', sub: 'OpenAI IPO not in 2026 [S40][S52]', stroke: 'ink' },
+        { id: 'k3', col: 2, row: 3, tag: 'Aug–Sep 2026', name: 'Elder video [S1]', sub: 'safety departures [S56]', stroke: 'soft', dashed: true }
+      ],
+      edges: [],
+      zones: [
+        { cols: [0], label: 'Capability' }, { cols: [1], label: 'Capital' }, { cols: [2], label: 'Critique' }
+      ]
+    })
+  },
+  /* ---------------------------------------------------------------- D8 */
+  {
+    id: 'agentic-d8', page: 'article-30.html',
+    caption:
+      'An agent next to a chiller plant. The agent can read and propose; only the control system, with its interlocks ' +
+      'and a human, can act. There is no connector from the agent to the BMS, the PLC or the safety system. ' +
+      '“Limit active control of OT infrastructure by AI without a human in the loop” (CISA, ASD ACSC et al. [S33]).',
+    because:
+      'the rule “no autonomous control of OT” is a sentence; the drawing makes its form checkable, by showing the one ' +
+      'path from the agent to the plant runs through an operator and a range-checking gateway, and that data flows back ' +
+      'one way only.',
+    build: () => gridFigure({
+      slug: 'agentic8', title: 'An agent next to a chiller plant',
+      desc: 'The agent can read and propose; only the control system, with its interlocks and a human, can act.',
+      gaps: [60, 72, 52], gapY: 32, colMin: [236],
+      nodes: [
+        { id: 'kbt', col: 0, row: 0, name: 'SOP library / CMMS', sub: 'MOPs · work orders', stroke: 'ink' },
+        { id: 'agent', col: 0, row: 1, name: 'LLM agent', sub: 'read-only tools', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic' },
+        { id: 'op', col: 0, row: 2, name: 'Operator', sub: 'approves', stroke: 'alarm-caution', dashed: true, legend: 'Human gate' },
+        { id: 'hist', col: 1, row: 1, name: 'Historian replica', sub: 'one-way out', stroke: 'ink' },
+        { id: 'gw', col: 1, row: 2, name: 'Change gateway', sub: 'range · interlock check', stroke: 'ink' },
+        { id: 'bms', col: 2, row: 2, symbol: 'bms', name: 'BMS / EPMS', sub: 'supervisory', stroke: 'ink' },
+        { id: 'plc', col: 2, row: 3, name: 'PLC', sub: 'local control', stroke: 'ink' },
+        { id: 'chl', col: 3, row: 3, symbol: 'chiller', name: 'Chiller', stroke: 'ink' },
+        { id: 'sis', col: 3, row: 4, tag: 'IEC 61511', name: 'SIS / EPO / fire', sub: 'hard-wired, out of scope', stroke: 'alarm-fault', fill: 'paper', tier: 1, legend: 'Safety-rated' }
+      ],
+      edges: [
+        { a: 'kbt', b: 'agent', label: 'SOPs' }, { a: 'agent', b: 'kbt', label: 'draft WO', stroke: 'muted', pattern: 'dashed' },
+        { a: 'agent', b: 'op', label: 'change + evidence' },
+        { a: 'op', b: 'gw', label: 'approved' },
+        { a: 'gw', b: 'bms', label: 'setpoint' },
+        { a: 'bms', b: 'plc', fs: 'b', ts: 't' }, { a: 'plc', b: 'bms', fs: 't', ts: 'b', stroke: 'muted' },
+        { a: 'plc', b: 'chl' },
+        { a: 'bms', b: 'hist', label: 'one way', fs: 't', ts: 'r', stroke: 'muted' },
+        { a: 'hist', b: 'agent', label: 'trends', fs: 'l', ts: 'r', stroke: 'muted' },
+        { a: 'sis', b: 'chl', label: 'trip, independent', stroke: 'alarm-fault' }
+      ],
+      zones: [
+        { ids: ['kbt', 'agent'], label: 'IT / enterprise' },
+        { ids: ['hist', 'gw'], label: 'DMZ' },
+        { ids: ['bms', 'plc', 'chl'], label: 'OT control (IEC 62443 zone)' },
+        { ids: ['sis'], label: 'Safety' }
+      ]
+    })
+  }
+];
+
 const FIGURES = [
   {
     id: 'method-assessment',
@@ -1475,7 +1776,9 @@ const FIGURES = [
   /* the diagrams articles used to draw by hand — see article-diagrams-converted.mjs */
   ...convertedFigures(D),
   /* article 29 — see the grid helper above */
-  ...LLM_FIGURES
+  ...LLM_FIGURES,
+  /* article 30 */
+  ...AGENTIC_FIGURES
 ];
 
 /* ==========================================================================

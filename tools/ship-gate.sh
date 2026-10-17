@@ -249,6 +249,7 @@ gate "journal family — data = meta, grids generated, structure, filter in a br
 gate "post drafts — five platforms + UTM links on every journal page" python3 tools/audit-post-drafts.py --strict
 gate "article series navigation — counts and Prev/Next current" python3 tools/test-article-series.py
 gate "article 29 LLM calculators — worked examples, sources, monotonicity" node tools/test-llm-calc.mjs
+gate "article 30 agent calculators — worked examples, compounding reliability, budgets" node tools/test-agent-calc.mjs
 gate "generator freshness — every generated artefact matches a fresh build" python3 tools/test-generator-freshness.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs

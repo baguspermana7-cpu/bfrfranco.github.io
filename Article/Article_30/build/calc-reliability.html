@@ -1,0 +1,6 @@
+<section class="llm-calc-block agent-calc-block">
+<h3>Run cost and reliability with compounding error</h3>
+<p>This estimator shows why a 95%-per-step agent fails most 20-step runs and what a verifier with retries changes. Each attempt is good with probability p; a bad attempt is caught with probability d and retried up to k times. It computes <code>q = (1 − p) · d</code>, <code>E = (1 − q^(k+1)) / (1 − q)</code>, <code>Ps = p · E</code> and <code>P_run = Ps^n</code>, then <code>cost_run = n · E · cost_att</code> and <code>cost_per_success = cost_run / P_run</code>. Steps are assumed independent, which is optimistic.</p>
+<div class="agent-calc" data-agent-calc="reliability"></div>
+<p class="calc-basis">Basis: model — illustrative. Prices are list price on 2026-10-16 (Sonnet-class, A29 [S27] via [S59]); per-step success and detection rate are your assumptions. METR horizon gap [S27].</p>
+</section>

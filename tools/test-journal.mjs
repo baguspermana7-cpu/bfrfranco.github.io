@@ -190,13 +190,17 @@ if (!STATIC) {
     for (const art of FAMILY.filter((f) => /^(article-\d+|FF-\d+|geopolitics-\d+)\.html$/.test(f))) for (const theme of ['dark', 'light']) {
       const page = await browser.newPage();
       await page.setViewport({ width: 1440, height: 1000 });
+      /* J4 declines cookies, and localStorage is shared across pages of one browser: without this the banner
+         never renders here and its navy/blur/blue passed unseen (v3.24.10) */
+      await page.evaluateOnNewDocument(() => { try { localStorage.removeItem('rz_cookie_consent'); localStorage.removeItem('cookieConsent'); } catch (e) { /* ignore */ } });
       await page.goto(base + art, { waitUntil: 'networkidle2' });
       await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
       await new Promise((r) => setTimeout(r, 600));
       const found = await page.evaluate(() => {
         const hsl = (r, g, b) => { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; if (mx === mn) return [0, 0, l]; const d = mx - mn, s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn); let h = mx === r ? ((g - b) / d + (g < b ? 6 : 0)) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return [h * 60, s, l]; };
         const out = { navy: [], rails: [], fixed: [] };
-        const scope = document.querySelectorAll('body, main, .article-content, .article-content *, .toc-mobile-toggle');
+        /* + the shared chrome a reader sees on every article: cookie banner, login button, user pill (v3.24.9) */
+        const scope = document.querySelectorAll('body, main, .article-content, .article-content *, .toc-mobile-toggle, .rz-cookie-banner, .rz-cookie-banner *, .rz-login-btn, .rz-user-btn, .rz-user-avatar');
         for (const e of scope) {
           if (e.closest('svg, canvas, figure.rz-figure, figure.rz-chart, img')) continue;
           const cs = getComputedStyle(e), r = e.getBoundingClientRect();
@@ -208,7 +212,16 @@ if (!STATIC) {
           if (cs.boxShadow !== 'none') { const g = cs.boxShadow.match(/rgba?\((\d+), (\d+), (\d+)/); if (g && Math.max(+g[1], +g[2], +g[3]) - Math.min(+g[1], +g[2], +g[3]) > 40) out.rails.push('glow:' + (e.className || e.tagName).toString().slice(0, 26)); }
           const bl = parseFloat(cs.borderLeftWidth), bt = parseFloat(cs.borderTopWidth);
           if (bl >= 2 && bl > bt && !e.matches('blockquote, th, td')) out.rails.push((e.className || e.tagName).toString().slice(0, 30));
-          if (cs.position === 'fixed' && m) { const [h, s] = hsl(+m[1], +m[2], +m[3]); if (s > .5 && !(h >= 25 && h <= 45)) out.fixed.push((e.className || e.id).toString().slice(0, 30) + ' ' + cs.backgroundColor); }
+          if (m && (cs.position === 'fixed' || e.closest('.rz-cookie-banner, .rz-login-btn, .rz-user-btn'))) { const [h, s, l] = hsl(+m[1], +m[2], +m[3]); if ((m[4] === undefined || +m[4] > 0.3) && s > .5 && l > .12 && l < .9 && !(h >= 20 && h <= 45)) out.fixed.push((e.className || e.id).toString().slice(0, 30) + ' ' + cs.backgroundColor); }
+          if (cs.backdropFilter && cs.backdropFilter !== 'none' && e.closest('.rz-cookie-banner')) out.fixed.push('blur:' + (e.className || e.tagName).toString().slice(0, 24));
+          if (e.closest('.rz-cookie-banner, .rz-login-btn, .rz-user-btn, .rz-user-avatar')) {
+            for (const prop of ['color', 'borderTopColor']) {
+              const c = cs[prop].match(/rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?/);
+              if (!c || (c[4] !== undefined && +c[4] < 0.2)) continue;
+              const [h, s, l] = hsl(+c[1], +c[2], +c[3]);
+              if (s > .45 && l > .2 && l < .85 && !(h >= 20 && h <= 45)) out.fixed.push(prop + ':' + (e.className || e.tagName).toString().slice(0, 22) + ' ' + cs[prop]);
+            }
+          }
         }
         for (const k of Object.keys(out)) out[k] = [...new Set(out[k])].slice(0, 5);
         return out;

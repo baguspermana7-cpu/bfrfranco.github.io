@@ -1,0 +1,6 @@
+<section class="llm-calc-block agent-calc-block">
+<h3>Agent or script? A decision scorer</h3>
+<p>This scorer turns the decision table into a number so you can see why a task lands on script, hybrid or agent. It rates variability of input (V), cost of an error (E), verifiability (Vf), frequency (F) and latency budget (L) from 1 to 5, then computes <code>N = (V − 1) / 4</code>, <code>Risk = ((E − 1) / 4) · (1 − (Vf − 1) / 4)</code>, <code>Lp = (5 − L) / 4</code> and <code>Score = 100 · N · (1 − Risk) · (1 − 0.5·Lp)</code>. Below 35 is script, 35 to 65 is hybrid, 65 and above is an agent loop with verifiers; four hard overrides apply afterwards. It is a judgement aid, not a measurement: the weights are design choices.</p>
+<div class="agent-calc" data-agent-calc="decide"></div>
+<p class="calc-basis">Basis: model — illustrative. The weights and bands are the dossier's design choices; the first override cites CISA AI-in-OT guidance [S33]. Constants as of 2026-10-16.</p>
+</section>
