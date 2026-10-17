@@ -45,7 +45,7 @@ file/rule findings across 172 files despite exit 0**.
 | # | Sign | RZ rule / correct alternative |
 |---|---|---|
 | 1 | **Inter / Geist / Space Grotesk as PRIMARY font** | Base UI font = **`'IBM Plex Sans'`**; display = Fraunces; mono = JetBrains Mono. Inter/Geist/Space-Grotesk may NOT be the first family in any `font-family` stack. |
-| 2 | Dot-grid pattern on `.hero-background` / any bg | Soft radial washes only (gold+mint, opacity ≤0.06). |
+| 2 | Dot-grid pattern on `.hero-background` / any bg | Flat graphite surface. (The "soft radial washes" once offered here were withdrawn with the aurora, §A33.) |
 | 3 | Anthropic-purple `#8B5CF6` as a pill/accent | Mint `#7DDDB4`; residual semantic uses must move to a named token, never the raw pill color. **Named tokens that exist for this (v1.134.21):** `--rz-restricted` (root-gated links; `#7A4800` light / `#FFAA00` dark) and `--oe-violet` (the violet slot of the eight-hue `.oe-*` categorical family; `#5B34C4` / `#C3B0FA`). Categorical uses elsewhere take the same re-chosen ramp `#C3B0FA` / `#7B4FE0`; brand surfaces take mint (`#A8ECCF` dark, `#146B4A` light — `#4FBF92` is 2.3:1 on white and must not be used as text). |
 | 4 | Sparkle icons ✨ / wand / `fa-magic` as UI | Instrument icons (thin-line), never "AI sparkle". |
 | 5 | Emojis as application icons/controls or in headings | Drawn/SVG or professional icon; text stays emoji-free. |
@@ -53,10 +53,10 @@ file/rule findings across 172 files despite exit 0**.
 | 7 | Radial "orbs" — decorative glowing circles in bg | (see RZ-SIGNATURE for the ALLOWED aurora hero; standalone orbs are banned) |
 | 8 | Harsh / high-contrast gradients | Muted multi-stop washes only. |
 | 9 | Rainbow coloring on text/accents | Single semantic hue per element. |
-| 10 | Colored left-stripe callouts (`.info-box` accent rail slop) | Flat `color-mix` tint + 1px hairline + 2px semantic rail (editorial language). |
+| 10 | Colored left-stripe callouts — **including the 2px "semantic rail" this row used to recommend** (owner 2026-10-17: "Itu banyak sekali ai design slop") | A graphite panel with ONE 1px hairline; the callout's title may carry the accent, the frame never does. Enforced on the rendered page by `test-journal.mjs` J5f and repaired by `registerSurfaces()`. |
 | 11 | Drop-shadows as the primary card affordance | Hairline borders; shadows only subtle + purposeful. |
 | 12 | Soft/large corner radius everywhere (pill-ish) | Restrained radii per the instrument scale. |
-| 13 | Purple-and-black scheme | RZ tokens (instrument-cyan / signal-amber / oscilloscope-green / fault-red). |
+| 13 | Purple-and-black scheme | The register: graphite + ONE accent (signal amber); fault red only for a real fault state. Instrument cyan and oscilloscope green survive only inside cockpit instrument registers as STATE colours. |
 | 14 | Neon colors | Muted instrument palette. |
 | 15 | Basic/default pastel palette | The considered RZ palette only. |
 | 16 | Bento grids as generic filler | Grid only when the content is genuinely a dashboard. |
@@ -85,7 +85,8 @@ An over-eager de-slop pass must not remove these; they are the site's identity, 
   pink), CSS-only, honours reduced-motion. This is a canonical pattern (UI_FEATURES_STANDARD), NOT an
   "orb". Keep it.
 - **Thin-line instrument hairlines** (0.6–1.4px tier-graded), oscilloscope tokens, editorial article
-  register (`data-rz-register="editorial"`), IBM Plex Sans + Fraunces + JetBrains Mono type.
+  register (`data-rz-register="editorial"`), IBM Plex Sans (headings AND body) + a mono face for numbers only.
+  (Fraunces was withdrawn 2026-10-15, §A34; the oscilloscope tokens are state colours inside cockpits, never chrome.)
 - **Semantic category colors** (e.g. a policy/legal icon) via named tokens.
 - **Skeleton loaders** where real async loads occur (their PRESENCE is good — their ABSENCE is a tell).
 
@@ -394,6 +395,23 @@ Two detector changes, both because the eye found what the regex missed:
 Rule for the next family: screenshot both themes at 390 + 1440, measure composited layers (CDP LayerTree; the blank-on-scroll
 hub had 48, an article 17), inventory with `audit-vibecode --json`, sweep with a reproducible tool, widen the detector to what
 the eye found, join strict scope, gate the structure, re-shoot.
+
+### Computed, not source (v3.24.7, 2026-10-17)
+
+The journal family passed every rule above in source — the v3.23.0 sweep, `audit-vibecode --strict`, a computed
+check on a handful of hub selectors — while article 29 rendered on navy (styles.css `[data-theme=dark]
+.article-content`, tables, inputs, related cards), with a 2px amber rail on every callout, a 4px light-blue bio rail,
+a cyan floating contents button and a cyan glow card. The owner saw it in one look. A colour on the screen is the
+product of three files (styles.css, the page's own `<style>` and tokens, the register), and no source scan sees the
+product. Rules that follow:
+- A "no slop" claim is checked on the RENDERED page: every element of every page in the family, both themes
+  (`tools/test-journal.mjs` J5f: navy band, left rail ≥2px wider than the top border, saturated box-shadow,
+  saturated non-amber fixed chrome; data marks — dots, bars, fills, swatches, ≤24px — are content and exempt).
+- Where the sources are many, repair from the computed colour (`registerSurfaces()` in
+  `js/rz-article-editorial.js`, inline `!important`, cleared and re-measured on every theme switch) and fix the
+  sources over time; the gate measures the result either way.
+- Prove the gate red on the previous stylesheet before trusting its green (J5f: 53 of 78 page×theme pairs red on
+  v3.24.6), and look at a contact sheet before reporting.
 
 ### Monitor + strict scope (v1.135.2) — OBSOLETE, see the note below
 

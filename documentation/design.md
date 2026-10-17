@@ -1,6 +1,6 @@
 # resistancezero.com — Brand & Design System Manifest
 
-> **Version**: 1.0 — 2026-05-13
+> **Version**: 1.1 — 2026-10-17 (register note below; v1.0 2026-05-13)
 > **Owner**: Bagus Dwi Permana
 > **Scope**: All pages at resistancezero.com (103+ indexable HTML files)
 > **Status**: Active — append-only decision log in Section 15
@@ -8,6 +8,19 @@
 > This is the authoritative design system document. Tactical implementation rules
 > (class names, CSS snippets, JS patterns) live in `../standarization/`. This
 > document governs the WHY behind every visual and structural decision.
+
+> **2026-10-17 — the register this document now describes (supersedes Sections 2–5 where they differ).**
+> The owner, reviewing the hub and the journal one screenshot at a time (2026-10-15…17), withdrew the aurora mesh,
+> the navy cast (`#0a0e1a`/`#0f172a`/`#1e293b` surfaces), neon/oscilloscope green and mint as chrome accents, the
+> Fraunces serif display, gradient and amber-italic headline emphasis, glass tokens, stat-tile strips, hover lifts,
+> keyword marquees, pastel bento, card shine and coloured callout rails (including the 2 px "semantic rail").
+> What remains is the identity: **neutral graphite** (`#0b0c0e / #121316 / #191b1f`; articles `#0E0F12 / #16181D`;
+> light `#F5F7FA / #FFFFFF`), **one accent — signal amber** (`#E8B563` dark text, `#7A4800`/`#92400e` light, AA),
+> **IBM Plex Sans** for headings and body, mono only for numbers/eyebrows/chips/figure labels, **1 px hairlines**,
+> radius ≤ 4 px, motion on tokens with no transforms on hover, figures drawn by the diagram engine, every number
+> traceable. Cockpit instrument registers keep cyan/green/red as STATE colours inside instruments, never as chrome.
+> Decision log: `standarization/ANTI_VIBECODE_STANDARD.md` §A27–34 and "Computed, not source";
+> `standarization/UIUX_AUDIT_LEDGER.md` rows 16–20. Where a section below says otherwise, this note wins.
 
 ---
 

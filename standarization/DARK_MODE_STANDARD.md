@@ -6,6 +6,13 @@ Origin: owner flagged the existing cockpit dark mode as "AI design slop" and ask
 
 > **Decision (LOCKED 2026-06-01, owner "proceed all"):** HYBRID register split — **Instrument** register for cockpits + SLD/P&ID labs, **Editorial** register for landing / articles / hubs / plans. First editorial adoption shipped on `plan-dark-mode-standard.html`. Cockpit instrument re-skin queued (must preserve semantic SLD/alarm colours — additive atmosphere/type only).
 
+
+> **2026-10-17 update.** The editorial register's display face is IBM Plex Sans (Fraunces withdrawn 2026-10-15),
+> and no dark surface may sit in the navy band (hue 200–250°, s ≥ .25, l ≤ .22): graphite `#0b0c0e/#121316` on the hub,
+> `--rz-art-bg #0E0F12 / --rz-art-panel #16181D` on articles. `tools/test-journal.mjs` J5f measures every rendered
+> element of the editorial family in both themes; `registerSurfaces()` in `js/rz-article-editorial.js` maps what the
+> cascade still paints navy. The token table below (`--rz-display:'Fraunces'`, `--rz-radius:10px`) is history.
+
 ## MANDATORY: every content page must define a dark palette (v1.47.x)
 
 The recurring failure — pages that render **white body in dark mode** (only the nav + title go dark) — comes from hand-rolled per-page skins that never wire a dark palette. Two rules, **enforced by `node tools/audit-dark-coverage.mjs --strict`** (in the ship-audit suite):

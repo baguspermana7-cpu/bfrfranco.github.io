@@ -6,6 +6,16 @@
 
 ---
 
+> **Register update 2026-10-17 (v3.24.7) — read before using any visual pattern below.** The owner withdrew,
+> between 2026-10-15 and 2026-10-17: the aurora/radial washes, the navy dark defaults, the pastel bento rotation,
+> per-page/per-calculator accent hues, the serif display face, stat-tile strips, keyword marquees, hover lifts,
+> coloured callout rails (including the 2 px "semantic rail") and card shine sweeps. The live register is
+> graphite + ONE accent (signal amber) + IBM Plex Sans + 1 px hairlines; see `CLAUDE.md` "Canonical patterns",
+> `standarization/ANTI_VIBECODE_STANDARD.md` §A27–34 and "Computed, not source", and
+> `standarization/ARTICLE_PRODUCTION_STANDARD.md` for articles. Sections below that prescribe a withdrawn pattern
+> are kept as history and are marked **WITHDRAWN**; behaviour sections (search, TOC, series nav, cookie consent,
+> scroll-to-top, script placement) remain current.
+
 ## Overview
 
 Seven UI features are implemented across all articles:
@@ -654,7 +664,7 @@ All 9 standalone calculator pages: pue, capex, opex, roi, carbon-footprint, data
 </div>
 ```
 
-### Per-Calculator Accent Colors
+### Per-Calculator Accent Colors — WITHDRAWN 2026-10-17 (one accent site-wide; the table is history)
 
 | Calculator | Accent RGB | Dark Accent | Border Color |
 |-----------|-----------|-------------|-------------|
@@ -922,7 +932,7 @@ All card hover states must use ONLY `border-color` and `box-shadow` changes. Zer
 Reason: `transform: translateY()` or `scale()` on cards causes micro-movement while scrolling.
 The global override at end of styles.css enforces this — do not remove.
 
-### bento-exp-card Redesign Pattern (Claude-inspired)
+### bento-exp-card Redesign Pattern (Claude-inspired) — WITHDRAWN (§A16, §A29)
 
 New pattern for experience cards:
 - Grid: `repeat(6,1fr)` with `nth-child(-n+3): span 2` and `nth-child(n+4): span 3`
@@ -1511,7 +1521,7 @@ RZMap.setLineVisible = function(lineId, visible) {
 
 ---
 
-## Plan v12 patterns — 2026-05-09
+## Plan v12 patterns — 2026-05-09 — WITHDRAWN 2026-10-15…17 (Pixel Rise cue as decoration, radial washes, pastel bento; kept as history)
 
 ### Pixel Rise scroll cue (replaces the static SCROLL TO EXPLORE pattern)
 
@@ -1545,7 +1555,7 @@ Use `.share-buttons` + `.share-btn.{linkedin,twitter,whatsapp,instagram,facebook
 
 `.hero-background::before` carries ONLY soft radial washes (gold + mint, opacity ≤0.06). Never apply repeating dot/grid patterns — they read as "default Claude" noise. `::after` aurora overlays disabled.
 
-### Calm pastel bento card palette
+### Calm pastel bento card palette — WITHDRAWN (§A15/§A16)
 
 Bento cards in landing-page hero must use the 5-card pastel rotation (border-left 3 px accent + matching bullet dots):
 - Card 1: mint `#A7F3D0`

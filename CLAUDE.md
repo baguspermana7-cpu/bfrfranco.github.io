@@ -247,91 +247,82 @@ DO NOT remove the hamburger script tag from any page. DO NOT remove the open-sta
 
 ## Rejected patterns — DO NOT REINTRODUCE
 
-These were explicitly rejected by the user. Adding them back is a regression:
+These were explicitly rejected by the owner. Adding them back is a regression. Items 10–16 (2026-10-15…17)
+supersede what items 1, 3, 6 and 7 once recommended as the replacement; the full list with detectors is
+`standarization/ANTI_VIBECODE_STANDARD.md` §A1–34.
 
-1. **Dot-grid pattern on `.hero-background`** — looks like "default Claude noise". Use only soft radial washes (gold + mint, opacity ≤0.06).
-2. **Rotated `.floating-side-cards`** at right-edge of index.html (`#DATACENTER AI / HPC` + `#DATACENTER CONVENTIONAL` vertical tabs) — rejected as noisy.
-3. **Anthropic-default purple `#8B5CF6` user pill** — replaced with mint `#7DDDB4` (Motion+ feel).
-4. **Cursor-tracking effects** (mouse spotlight, magnetic cursor, 3D card tilt with mouse follow) — explicitly disabled in `script.js` (`initCardTilt`, `initSpotlight` — early return). Don't re-enable.
-5. **Visible "GitHub" label + `github.com/baguspermana7-cpu` URL** in Contact section + footer — removed in v1.1.0. Schema.org `sameAs` JSON-LD references are kept; visible text is gone.
-6. **Saturated emerald solid bento cards** — replaced with calm pastel rotation (mint / lavender / peach / pink / cream).
-7. **Saturated gradient callout fills + 3–4px accent borders** (`.info-box`/`.ws-insight-box`/`.ws-engineer-note`) — replaced (v1.50.1) by the editorial language: flat `color-mix` tint + 1px hairline + a 2px semantic accent rail, scoped to `html[data-rz-register="editorial"]` in `css/rz-article-dark.css`. See ARTICLE_DATAVIZ + DARK_MODE standards. **Extended (v1.51.9, "slop sweep 2")**: translucent `-card/-panel/-block` washes and prose `span[style*=background]` highlights are also banned — the editorial runtime (`flattenWashes()` in `js/rz-article-editorial.js`) MEASURES computed background alpha (.02–.5 = slop wash → `data-rz-flat` → flattened to panel+hairline) so opaque instrument embeds keep their skin. Never re-add tinted highlight spans or translucent card washes to article bodies; never flatten by class-name blanket (it can't tell a wash from an instrument surface — computed alpha can).
-8. **White text on saturated category-gradient number badges** (articles grid) — washed out on red/teal thumbnails; replaced with one dark-glass instrument chip (`rgba(13,16,20,.72)` + hairline + mono tabular number) in `articles.html`.
-9. **Article body centered per-paragraph with a `ch`-based measure** — caused ragged left edges (lead ¶ vs body ¶). Use the single LEFT-aligned, justified, fixed-`rem` reading column in `css/rz-article-dark.css` (v1.50.1).
+1. **Dot-grid pattern on any background** — "default Claude noise". (The "soft radial washes" once offered as
+   the alternative are withdrawn too: see 11.)
+2. **Rotated `.floating-side-cards`** at right-edge of index.html — rejected as noisy.
+3. **Anthropic-default purple `#8B5CF6`** as a pill/accent. Its v1 replacement, a mint pill, is a second hue: the
+   register carries ONE accent (signal amber).
+4. **Cursor-tracking effects** (mouse spotlight, magnetic cursor, 3D tilt) — disabled in `script.js`
+   (`initCardTilt`, `initSpotlight` return early). Don't re-enable.
+5. **Visible "GitHub" label + URL** in Contact/footer — removed v1.1.0; `sameAs` JSON-LD stays.
+6. **Saturated emerald bento cards — and the pastel rotation that replaced them.** Bento as filler is §A16; a
+   pastel palette is §A15.
+7. **Callout fills and accent rails.** v1.50.1 replaced 3–4 px gradient callouts with a tint + 2 px rail; on
+   2026-10-17 the owner rejected that too ("Itu banyak sekali ai design slop"). A callout, card or panel is a
+   graphite panel with ONE 1 px hairline — no wash, no coloured left stripe, no glow (UX law 14).
+8. **White text on saturated category-gradient number badges** — use a neutral mono chip.
+9. **Article body centered per-paragraph with a `ch` measure** — one LEFT-aligned fixed-`rem` column; justified
+   on desktop, LEFT-aligned on a phone (lists included).
+10. **Gradient text** on any heading (§A27); the headline's second clause is MUTED and upright, never amber italic.
+11. **Aurora / blurred radial mesh and the navy cast** (`#0a0e1a`, `#0f172a`, `#1e293b` as surfaces) (§A33).
+12. **Neon green `#00FF88`** and any second accent hue in chrome; cyan/blue floating buttons (§A32).
+13. **Serif display + mono-uppercase chrome** (Fraunces hero, tracked mono nav/buttons) (§A34).
+14. **Stat-tile strips, glass by token, hover lift, keyword marquee/ticker** (§A28–31). Facts render as a
+    fact list (`data-rz-fact-list`), one per row.
+15. **Decorative motion on a page that should read:** fixed animated canvases, 20 px+ blurs, `transition: all`
+    — they also made the journal hub go blank on a phone (48 composited layers).
+16. **A slop claim checked on source only.** The owner judges the rendered page; gate the COMPUTED style of every
+    element (`tools/test-journal.mjs` J5f). See `standarization/ANTI_VIBECODE_STANDARD.md` "Computed, not source".
 
 ---
 
 ## Canonical patterns to follow
 
+The site register (hub, journal, articles): neutral graphite surfaces `#0b0c0e / #121316 / #191b1f` (articles:
+`--rz-art-bg #0E0F12`, `--rz-art-panel #16181D`), light mode `#F5F7FA / #FFFFFF`; ONE accent, signal amber
+(`#E8B563` text in dark, `#7A4800`/`#92400e` in light for AA); IBM Plex Sans for headings and body, JetBrains/IBM
+Plex Mono only for numbers, eyebrows, chips and figure labels; 1 px hairlines; radius ≤ 4 px; motion on the
+`--rz-ease-*` / `--rz-dur-*` tokens, border-colour on hover, no transforms. Tokens: `css/rz-hub.css:12–37`,
+`css/rz-article-dark.css` `--rz-art-*`.
+
 ### `.share-buttons` floating right-column
 
 5 canonical platforms ONLY (in this order): LinkedIn / X (Twitter) / WhatsApp / Instagram / Facebook.
+Pattern in `styles.css` and `styles-index.css`; collapses to a bottom bar under 768 px. Neutral surface, no
+per-page colour variants.
 
-Pattern in `styles.css` and `styles-index.css`:
-```css
-.share-buttons { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); }
-.share-buttons.visible { opacity: 1; visibility: visible; }
-@media (max-width: 768px) { /* collapses to bottom bar */ }
-```
+### Articles and the journal
 
-DON'T add per-page colour variants. Extend the canonical list in styles.css if a new platform is genuinely needed.
-
-### Aurora mesh hero (v1.4.0+)
-
-Multi-stop radial gradients drifting on alternating 22s + 28s loops. Mint + gold + violet + blue + pink. CSS-only, GPU-accelerated transforms. Honours `prefers-reduced-motion`.
-
-### Pixel Rise scroll cue (v1.1.0+)
-
-Soft chevron-bounce + uppercase letterspaced caption. Use on landing pages instead of static "↓ SCROLL" labels.
-
-```html
-<a href="#firstSection" class="scroll-explore-pixel">
-  <span class="scroll-explore-caption">Scroll to explore more</span>
-  <span class="scroll-explore-arrow"><svg>...chevron-down...</svg></span>
-</a>
-```
-
-### Pastel bento card palette
-
-5-card rotation in landing-page hero:
-- Card 1: mint `#A7F3D0`
-- Card 2: lavender `#C7D2FE`
-- Card 3: peach `#FED7AA`
-- Card 4: pink `#FBCFE8`
-- Card 5: cream `#FDE68A`
-
-Award badges (`.bento-award`) use muted pastel chip (mint bg + dark text), NOT saturated emerald.
-
-### Card shine sweep on hover (v1.4.0+)
-
-```css
-.card::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.07) 50%, transparent 70%);
-    transform: translateX(-100%);
-    transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.card:hover::after { transform: translateX(100%); }
-```
-
-### Marquee strip (v1.4.0+, vercel.com pattern)
-
-Horizontal scroll of engineering keywords with edge fade-out masks. 60s linear loop. Honours `prefers-reduced-motion`.
+Every article follows `standarization/ARTICLE_PRODUCTION_STANDARD.md` (dossier → fragments → calculators with
+tests → engine figures → assembler → siblings → social drafts → gates). The hub and the series landings are
+GENERATED by `tools/build-journal.py`; page CSS is kept on the register by `tools/sweep-journal-register.py`
+(`--check` in the freshness gate) and, for what the cascade assembles, by `registerSurfaces()` in
+`js/rz-article-editorial.js`.
 
 ### Open Graph cards
 
-Per-page 1200×630 WebP at `assets/og/<slug>.webp`. Generated by `tools/build-og-images.py`. Page meta references this path.
-
-Fallback for pages without their own OG card: `assets/profile-photo.jpg`.
+Per-page 1200×630 WebP at `assets/og/<slug>.webp`, always rendered by `tools/build-og-images.py` (never a hand-made
+card; `tools/test-og-card-freshness.py`). Fallback: `assets/profile-photo.jpg`.
 
 ### Dark-mode default colours
 
 ```css
-[data-theme="dark"] body { background: #0f172a; color: #f1f5f9; }
-[data-theme="dark"] .card { background: #1e293b; border: 1px solid rgba(255,255,255,0.08); }
-[data-theme="dark"] .input-field { background: #1e293b; color: #f1f5f9; border-color: rgba(255,255,255,0.12); }
-[data-theme="dark"] select option { background: #1e293b; color: #f1f5f9; }
+[data-theme="dark"] body   { background: #0b0c0e; color: #e8edf5; }   /* graphite, never navy */
+[data-theme="dark"] .card  { background: #121316; border: 1px solid rgba(255,255,255,0.12); }
+[data-theme="dark"] .input-field { background: #0b0c0e; color: #e8edf5; border-color: rgba(255,255,255,0.12); }
+[data-theme="dark"] select option { background: #121316; color: #e8edf5; }
 ```
+`styles.css` still carries the old navy defaults for pages not yet on a register; never copy them into new work.
+
+### Withdrawn (kept here so an old commit message makes sense)
+
+Aurora mesh hero (v1.4.0), pastel bento palette, card shine sweep on hover, keyword marquee strip, the Pixel Rise
+bouncing scroll cue as decoration, mint user pill, the 2 px editorial accent rail. All withdrawn by the owner
+2026-10-15…17; do not reintroduce.
 
 ---
 
