@@ -155,7 +155,7 @@
   /* FIG. 1 — the plant through RZDiagram                                 */
   /* ------------------------------------------------------------------ */
   function mid(box, side) { return L.fanPoints(box, 1, side)[0]; }
-  function node(ctx, x, y, o) { o.interactive = true; if (!o.tier) o.tier = 2; return ctx.node(x, y, o); }
+  function node(ctx, x, y, o) { o.interactive = true; if (!o.tier) o.tier = 2; var b = ctx.node(x, y, o); b.id = o.id; return b; }
   function edge(ctx, a, b, o) {
     o = o || {}; o.fromId = a.id; o.toId = b.id;
     var from = o.from || mid(a, o.fromSide || 'right'), to = o.to || mid(b, o.toSide || 'left');
@@ -296,19 +296,45 @@
     h += '</table><a class="ro-go" href="' + esc(r.href) + '">Open where this is computed <span aria-hidden="true">→</span></a>';
     box.innerHTML = h;
   }
+  /* The plant as a graph, declared once: what feeds what. Hovering a node lights its upstream
+   * (where its power or heat comes from) in amber, its downstream a little brighter, the rest dim. */
+  var DOWN = { utility: ['gis'], gis: ['mtx'], mtx: ['mv'], genset: ['mv'], mv: ['usub'], usub: ['ups'], ups: ['racks'], racks: ['cdu', 'crah'], cdu: ['dry'], crah: ['chiller'], chiller: ['dry'], dry: [] };
+  function reach(id, forward) {
+    var seen = {}, q = [id];
+    while (q.length) { var cur = q.shift(); Object.keys(DOWN).forEach(function (a) { DOWN[a].forEach(function (b) { var nxt = forward ? (a === cur ? b : null) : (b === cur ? a : null); if (nxt && !seen[nxt]) { seen[nxt] = true; q.push(nxt); } }); }); }
+    return seen;
+  }
+  function linked(a, b) { return (DOWN[a] || []).indexOf(b) >= 0 || (DOWN[b] || []).indexOf(a) >= 0; }
+  function tip(host, id) {
+    var stage = $('[data-stage]', host), t = $('.fp-tip', stage);
+    if (!t) { t = document.createElement('div'); t.className = 'fp-tip'; t.setAttribute('aria-hidden', 'true'); stage.appendChild(t); }
+    var r = ROWS[id], anchor = id && ($('[data-rzd-node="' + id + '"]', stage) || $('[data-rzd-hit="' + id + '"]', stage));
+    if (!r || !anchor) { t.classList.remove('is-on'); return; }
+    var rows = (id === 'chiller' || id === 'dry' || id === 'cdu' || id === 'crah') ? binRows().concat(r.rows).slice(0, 4) : r.rows.slice(0, 4);
+    t.innerHTML = '<b>' + esc(r.title) + '</b><small>' + esc(r.sub || '') + '</small><table>' + rows.map(function (row) { return '<tr><th>' + esc(row[0]) + '</th><td>' + esc(row[1]) + (row[2] ? ' <i>' + esc(row[2]) + '</i>' : '') + '</td></tr>'; }).join('') + '</table><em>double-click or Enter opens the page →</em>';
+    var sb = stage.getBoundingClientRect(), ab = anchor.getBoundingClientRect(), x = ab.right - sb.left + stage.scrollLeft + 12, y = ab.top - sb.top + stage.scrollTop - 4;
+    t.classList.add('is-on');
+    if (x + 250 > stage.clientWidth + stage.scrollLeft) x = ab.left - sb.left + stage.scrollLeft - 252;
+    if (x < stage.scrollLeft + 8) x = stage.scrollLeft + 8;
+    if (y + t.offsetHeight > stage.scrollHeight - 8) y = Math.max(8, stage.scrollHeight - t.offsetHeight - 8);
+    t.style.left = x + 'px'; t.style.top = y + 'px';
+  }
   function wire(host, onTouch) {
     var hot = null;
     function light(id) {
       if (hot === id) return; hot = id;
-      $$('.is-hot', host).forEach(function (e) { e.classList.remove('is-hot'); });
-      $$('.is-dim', host).forEach(function (e) { e.classList.remove('is-dim'); });
-      if (!id) { readout(null, host); return; }
+      $$('.is-hot, .is-dim, .is-up, .is-down', host).forEach(function (e) { e.classList.remove('is-hot'); e.classList.remove('is-dim'); e.classList.remove('is-up'); e.classList.remove('is-down'); });
+      if (!id) { readout(null, host); tip(host, null); return; }
       $$('[data-rzd-node="' + id + '"],[data-rzd-sym="' + id + '"],[data-rzd-hit="' + id + '"]', host).forEach(function (e) { e.classList.add('is-hot'); });
+      var up = reach(id, false), down = reach(id, true);
       $$('[data-rzd-layer]', host).forEach(function (e) {
-        var l = e.getAttribute('data-rzd-layer'); var on = l.indexOf('e:' + id + '>') === 0 || l.slice(-(id.length + 1)) === '>' + id;
-        e.classList.add(on ? 'is-hot' : 'is-dim');
+        var l = e.getAttribute('data-rzd-layer'), m = /^e:([^>]+)>(.+)$/.exec(l); if (!m) return;
+        var a = m[1], b = m[2], touches = a === id || b === id;
+        var inUp = (a === id || up[a]) && (b === id || up[b]) && linked(a, b) && !(a === id && down[b]) && !(b === id && down[a]);
+        var inDown = (a === id || down[a]) && (b === id || down[b]) && linked(a, b) && !inUp;
+        e.classList.add(touches && !inDown ? 'is-hot' : inUp ? 'is-up' : inDown ? 'is-down' : 'is-dim');
       });
-      readout(id, host);
+      readout(id, host); tip(host, id);
     }
     host.addEventListener('pointerover', function (e) { var h = e.target.closest && e.target.closest('[data-rzd-hit]'); if (h) { light(h.getAttribute('data-rzd-hit')); onTouch(); } });
     host.addEventListener('pointerleave', function () { if (!host.__pinned) light(null); });

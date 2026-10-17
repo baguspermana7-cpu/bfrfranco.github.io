@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v3.24.0 — 2026-10-17 — "Hub"
+
+### Changed — the DC Solutions hub is the product page (`datacenter-solutions.html` replaced; `datacenter-solutions1.html` and `js/rz-hub-scene.js` removed)
+- Owner: *"ganti hub live datacenter-solutions.html dengan mockup ini"*. The mockup reviewed over
+  v3.22.4 → v3.23.1 becomes the live hub, with the original title, description, robots and canonical
+  restored, the JSON-LD, the cookie script and the reviewed root-card gate (`a#rootStandardsCard`)
+  carried over. The v3.22.0 "Stage" page and its scene module go. `audit-vibecode`'s hub strict
+  scope now lists the four hub modules (`rz-hub-product`, `rz-hub-3d`, `rz-hub-icons`,
+  `rz-hub-illus`) and drops the two deleted files. Full ship gate and the accuracy probe run on
+  this tree before the push.
+
+### Changed — the plant's readouts step aside; hovering the drawing explains it (`js/rz-hub-product.js`)
+- Owner, with a screenshot of the seven key cells and the bin strip: *"Area ini kecilkan, agar
+  hanya sampingan. Dan gambar skematik animasi buat ada animasi mouse hover yg sangat intuitive."*
+  The keys are one slim mono status row (label · value, no registry id in the row — it stays in the
+  click-to-copy and the readout); the bin strip is 28 px tall. The drawing gets the room back.
+- Hover grammar on the figure, from a declared feed graph (`DOWN`: utility → GIS → main TX → 20 kV
+  board → unit subs → UPS → racks → CDU / fan walls → dry coolers / chillers, gensets → board):
+  the hovered node glows amber; every edge upstream of it — where its power or its heat comes
+  from — turns amber with its flow pulse doubled; the edges downstream stay bright; everything
+  else dims. A tooltip card appears beside the node with its title, its first four rows (the bin
+  rows first on the cooling nodes) and the open hint; it flips to the node's left near the right
+  edge and is off on touch devices, where the readout below carries the same rows.
+- Found while wiring it: the figure's edge layers had been named `e:undefined>undefined` since
+  v3.22.4 — the node box RZDiagram returns carries no id — so the hover had never lit an edge.
+  The wrapper now stamps the id on the box; this is the first release where the edges answer.
+
 ## v3.23.1 — 2026-10-17 — "Hardware"
 
 ### Added — the 3D can be walked around and opened without orbiting (`js/rz-hub-3d.js`, mockup)

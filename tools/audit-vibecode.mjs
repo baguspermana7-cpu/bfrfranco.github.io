@@ -597,7 +597,7 @@ const RULES = [
 ];
 
 /* The pages where §A27–34 GATE today. Everything else is monitored with its count printed. */
-const HUB_STRICT = new Set(['datacenter-solutions.html', 'css/rz-hub.css', 'js/rz-hub.js', 'js/rz-hub-scene.js', 'js/rz-home-scene.js', 'js/rz-hub-product.js', 'index1.html', 'datacenter-solutions1.html']);
+const HUB_STRICT = new Set(['datacenter-solutions.html', 'css/rz-hub.css', 'js/rz-hub.js', 'js/rz-home-scene.js', 'js/rz-hub-product.js', 'js/rz-hub-3d.js', 'js/rz-hub-icons.js', 'js/rz-hub-illus.js', 'index1.html']);
 /* The journal family joined strict scope at v3.23.0 (owner 2026-10-16: "audit total dan fix properly"):
    the hub, the three series landings, every page on the editorial register and its stylesheet.
    tools/sweep-journal-register.py rewrote 1,405 declarations to get every row to zero. */
