@@ -68,17 +68,17 @@
     if (document.getElementById('rz-cookie-css')) return;
     var css = [
       '.rz-cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:100001;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1rem;padding:.85rem 1.5rem;',
-      'background:rgba(255,255,255,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,.08);box-shadow:0 -2px 16px rgba(0,0,0,.06);',
-      'font-size:.85rem;color:#374151;transform:translateY(0);transition:transform .4s cubic-bezier(.4,0,.2,1);}',
+      'background:#ffffff;border-top:1px solid #d4d7dc;',
+      'font-size:.85rem;color:#3a3d42;transform:translateY(0);transition:transform .4s cubic-bezier(.4,0,.2,1);}',
       '.rz-cookie-banner.hidden{transform:translateY(100%);pointer-events:none;}',
       '.rz-cookie-banner p{margin:0;}',
-      '.rz-cookie-banner a{color:#1d4ed8;text-decoration:underline;text-underline-offset:2px;}',
+      '.rz-cookie-banner a{color:#1b1d21;text-decoration:underline;text-underline-offset:2px;}',
       '.rz-cookie-actions{display:flex;gap:.5rem;flex-shrink:0;}',
-      '.rz-cookie-accept{background:#1d4ed8;color:#fff;border:1px solid #1d4ed8;border-radius:8px;padding:6px 16px;font-size:.8rem;font-weight:600;cursor:pointer;}',
-      '.rz-cookie-decline{background:transparent;color:#475569;border:1px solid #cbd5e1;border-radius:8px;padding:6px 16px;font-size:.8rem;font-weight:500;cursor:pointer;}',
-      '[data-theme="dark"] .rz-cookie-banner{background:rgba(15,23,42,.95);border-top-color:rgba(255,255,255,.08);color:#cbd5e1;}',
-      '[data-theme="dark"] .rz-cookie-banner a{color:#93c5fd;}',
-      '[data-theme="dark"] .rz-cookie-decline{color:#94a3b8;border-color:#334155;}',
+      '.rz-cookie-accept{background:#FFAA00;color:#0b0c0e;border:1px solid #FFAA00;border-radius:4px;padding:6px 16px;font-size:.8rem;font-weight:600;cursor:pointer;}',
+      '.rz-cookie-decline{background:transparent;color:#3a3d42;border:1px solid #c9cdd3;border-radius:4px;padding:6px 16px;font-size:.8rem;font-weight:500;cursor:pointer;}',
+      '[data-theme="dark"] .rz-cookie-banner{background:#121316;border-top-color:#2a2d33;color:#b8bec7;}',
+      '[data-theme="dark"] .rz-cookie-banner a{color:#e8edf5;}',
+      '[data-theme="dark"] .rz-cookie-decline{color:#b8bec7;border-color:#2a2d33;}',
       '@media (max-width:600px){.rz-cookie-banner{flex-direction:column;gap:.6rem;text-align:center;}}'
     ].join('');
     var s = document.createElement('style');

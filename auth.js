@@ -2,7 +2,7 @@
  * (#8B5CF6 / #A78BFA / #7C3AED, plus their rgb() forms): login button, user avatar, PRO
  * badge, modal border, sign-in button, focused inputs, legal links. That colour is
  * HARD-BANNED by standarization/ANTI_VIBECODE_STANDARD.md §A.3 and by CLAUDE.md's rejected-
- * patterns list, which named mint #7DDDB4 as its replacement — and this module ships on every
+ * patterns list, which named mint #FFAA00 as its replacement — and this module ships on every
  * page of the site, so the ban was being broken site-wide.
  * It went unnoticed because the audit that enforces the ban tested only the literal string
  * "#8b5cf6" and scanned only .html and .css. This module authors the same colour as
@@ -509,21 +509,21 @@
             /* Auth wrap */
             '.rz-auth-wrap{display:inline-flex;align-items:center;position:relative;margin-left:8px;vertical-align:middle;}',
             /* Login button */
-            '.rz-login-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:4px;border:1px solid rgba(125,221,180,0.4);background:rgba(125,221,180,0.08);color:#A8ECCF;font-size:0.82rem;font-weight:600;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease;font-family:inherit;white-space:nowrap;}',
-            '.rz-login-btn:hover{background:rgba(125,221,180,0.16);border-color:rgba(125,221,180,0.6);}',
+            '.rz-login-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:4px;border:1px solid rgba(255,170,0,0.4);background:rgba(255,170,0,0.08);color:#FFC44D;font-size:0.82rem;font-weight:600;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease;font-family:inherit;white-space:nowrap;}',
+            '.rz-login-btn:hover{background:rgba(255,170,0,0.16);border-color:rgba(255,170,0,0.6);}',
             '.rz-login-btn i{font-size:1rem;}',
             /* User button (logged in) */
-            '.rz-user-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:4px;border:1px solid rgba(125,221,180,0.3);background:rgba(125,221,180,0.08);color:#7DDDB4;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:background-color 160ms ease;}',
-            '.rz-user-btn:hover{background:rgba(125,221,180,0.15);}',
-            '.rz-user-avatar{width:28px;height:28px;border-radius:4px;background:#7DDDB4;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#0B1F17;}',
+            '.rz-user-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:4px;border:1px solid rgba(255,170,0,0.3);background:rgba(255,170,0,0.08);color:#FFAA00;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:background-color 160ms ease;}',
+            '.rz-user-btn:hover{background:rgba(255,170,0,0.15);}',
+            '.rz-user-avatar{width:28px;height:28px;border-radius:4px;background:#FFAA00;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#0b0c0e;}',
             '.rz-user-email{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
             '.rz-user-chevron{font-size:0.65rem;opacity:0.6;transition:transform 0.2s;}',
             /* Dropdown */
-            '.rz-user-dropdown{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:rgba(15,23,42,0.98);border:1px solid rgba(125,221,180,0.3);border-radius:4px;padding:12px;opacity:0;visibility:hidden;transition:opacity 160ms ease,visibility 160ms;z-index:9999;}',
+            '.rz-user-dropdown{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:rgba(18,19,22,0.98);border:1px solid rgba(255,170,0,0.3);border-radius:4px;padding:12px;opacity:0;visibility:hidden;transition:opacity 160ms ease,visibility 160ms;z-index:9999;}',
             '.rz-user-dropdown.show{opacity:1;visibility:visible;}',
             '.rz-dd-header{display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:8px;}',
             '.rz-dd-badge{padding:3px 10px;border-radius:4px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;}',
-            '.rz-dd-badge.pro{background:#7DDDB4;color:#0B1F17;}',
+            '.rz-dd-badge.pro{background:#FFAA00;color:#0b0c0e;}',
             '.rz-dd-badge.free{background:rgba(100,116,139,0.2);color:#94a3b8;}',
             /* Educator role (tier=pro, role=educator) — instrument-cyan, matches rz-ops admin UI. NOT purple. */
             '.rz-dd-badge.educator{background:rgba(8,145,178,0.18);color:#67e8f9;}',
@@ -533,16 +533,16 @@
             /* Login Modal */
             '.rz-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:99999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}',
             '.rz-modal-overlay.show{display:flex;}',
-            '.rz-modal{width:380px;max-width:calc(100vw - 32px);box-sizing:border-box;background:#0f172a;border:1px solid #334155;border-top:2px solid #7DDDB4;border-radius:4px;padding:32px;position:relative;}',
+            '.rz-modal{width:380px;max-width:calc(100vw - 32px);box-sizing:border-box;background:#121316;border:1px solid #2a2d33;border-radius:4px;padding:32px;position:relative;}',
             '.rz-modal-close{position:absolute;top:12px;right:12px;width:44px;height:44px;border:none;border-radius:4px;background:transparent;color:#94a3b8;font-size:1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color 160ms ease,color 160ms ease;}',
             '.rz-modal-close:hover{background:rgba(255,255,255,0.06);color:#f1f5f9;}',
             '.rz-modal h3{margin:0 0 6px;font-size:1.3rem;color:#f1f5f9;font-weight:700;}',
             '.rz-modal .rz-modal-sub{font-size:0.82rem;color:#94a3b8;margin:0 0 24px;}',
             '.rz-modal label{display:block;font-size:0.78rem;font-weight:600;color:#94a3b8;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}',
-            '.rz-modal input[type="email"],.rz-modal input[type="password"]{width:100%;padding:10px 14px;border-radius:4px;border:1px solid #334155;background:#080c16;color:#f1f5f9;font-size:16px;font-family:inherit;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 160ms ease;}',
-            '.rz-modal input:focus-visible,.rz-modal input:focus{border-color:#7DDDB4;outline:1px solid #7DDDB4;outline-offset:0;}',
-            '.rz-modal .rz-submit-btn{width:100%;min-height:44px;padding:12px;border:none;border-radius:4px;background:#7DDDB4;color:#0B1F17;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background-color 160ms ease;}',
-            '.rz-modal .rz-submit-btn:hover{background:#A8ECCF;}',
+            '.rz-modal input[type="email"],.rz-modal input[type="password"]{width:100%;padding:10px 14px;border-radius:4px;border:1px solid #2a2d33;background:#0b0c0e;color:#f1f5f9;font-size:16px;font-family:inherit;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 160ms ease;}',
+            '.rz-modal input:focus-visible,.rz-modal input:focus{border-color:#FFAA00;outline:1px solid #FFAA00;outline-offset:0;}',
+            '.rz-modal .rz-submit-btn{width:100%;min-height:44px;padding:12px;border:none;border-radius:4px;background:#FFAA00;color:#0b0c0e;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background-color 160ms ease;}',
+            '.rz-modal .rz-submit-btn:hover{background:#FFC44D;}',
             '.rz-modal .rz-submit-btn:disabled{opacity:0.5;cursor:not-allowed;}',
             '.rz-modal .rz-error{display:none;padding:8px 12px;border-radius:4px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;font-size:0.8rem;margin-bottom:12px;}',
             '.rz-modal .rz-error.show{display:block;}',
@@ -552,30 +552,30 @@
             '.rz-modal .rz-success p{color:#f1f5f9;font-weight:600;margin:4px 0;}',
             '.rz-modal .rz-success small{color:#64748b;font-size:0.8rem;}',
             /* Light theme */
-            '[data-theme="light"] .rz-login-btn{background:rgba(125,221,180,0.08);color:#146B4A;border-color:rgba(20,107,74,0.35);}',
-            '[data-theme="light"] .rz-user-btn{background:rgba(125,221,180,0.06);color:#146B4A;border-color:rgba(125,221,180,0.2);}',
-            '[data-theme="light"] .rz-user-avatar{background:#7DDDB4;}',
+            '[data-theme="light"] .rz-login-btn{background:rgba(255,170,0,0.08);color:#7A4800;border-color:rgba(20,107,74,0.35);}',
+            '[data-theme="light"] .rz-user-btn{background:rgba(255,170,0,0.06);color:#7A4800;border-color:rgba(255,170,0,0.2);}',
+            '[data-theme="light"] .rz-user-avatar{background:#FFAA00;}',
             '[data-theme="light"] .rz-user-dropdown{background:#ffffff;border-color:#cbd5e1;}',
             '[data-theme="light"] .rz-dd-email{color:#475569;}',
             '[data-theme="light"] .rz-dd-logout{background:rgba(239,68,68,0.06);color:#dc2626;}',
-            '[data-theme="light"] .rz-modal{background:#ffffff;border-color:#cbd5e1;border-top-color:#146B4A;}',
+            '[data-theme="light"] .rz-modal{background:#ffffff;border-color:#cbd5e1;}',
             '[data-theme="light"] .rz-modal h3{color:#1e293b;}',
             '[data-theme="light"] .rz-modal .rz-modal-sub{color:#64748b;}',
             '[data-theme="light"] .rz-modal label{color:#475569;}',
             '.rz-modal .rz-modal-legal{color:#94a3b8;}',
-            '.rz-modal .rz-modal-legal a{color:#A8ECCF;text-decoration:underline;text-underline-offset:2px;}',
+            '.rz-modal .rz-modal-legal a{color:#FFC44D;text-decoration:underline;text-underline-offset:2px;}',
             '[data-theme="light"] .rz-modal .rz-modal-legal{color:#475569;}',
-            '[data-theme="light"] .rz-modal .rz-modal-legal a{color:#146B4A;}',
+            '[data-theme="light"] .rz-modal .rz-modal-legal a{color:#7A4800;}',
             '[data-theme="light"] .rz-modal input[type="email"],[data-theme="light"] .rz-modal input[type="password"]{background:#f1f5f9;border-color:#e2e8f0;color:#1e293b;}',
-            '[data-theme="light"] .rz-modal input:focus{border-color:#146B4A;outline-color:#146B4A;background:#fff;}',
+            '[data-theme="light"] .rz-modal input:focus{border-color:#7A4800;outline-color:#7A4800;background:#fff;}',
             '[data-theme="light"] .rz-modal-close{color:#475569;}',
-            '[data-theme="light"] .rz-demo-hint{background:rgba(125,221,180,0.06) !important;border-color:rgba(125,221,180,0.15) !important;color:#475569 !important;}',
-            '[data-theme="light"] .rz-demo-hint code{background:rgba(125,221,180,0.1) !important;color:#146B4A !important;}',
+            '[data-theme="light"] .rz-demo-hint{background:rgba(255,170,0,0.06) !important;border-color:rgba(255,170,0,0.15) !important;color:#475569 !important;}',
+            '[data-theme="light"] .rz-demo-hint code{background:rgba(255,170,0,0.1) !important;color:#7A4800 !important;}',
             '[data-theme="light"] .rz-demo-hint .rz-demo-label{color:#4FBF92 !important;}',
             '[data-theme="light"] .rz-pro-link{color:#4FBF92 !important;}',
             '[data-theme="light"] .rz-pro-link:hover{color:#2F7F63 !important;}',   /* v3.6.1 — was #6d28d9: the v1.134.20 mint sweep left the HOVER purple, so the one state a reader reaches by pointing at the link was the banned colour. A darker mint keeps the hover a deepening of the same hue rather than a jump to another one. */
             /* Pro link */
-            '.rz-pro-link:hover{color:#A8ECCF !important;text-decoration:underline !important;}',
+            '.rz-pro-link:hover{color:#FFC44D !important;text-decoration:underline !important;}',
             '.rz-root-link .rz-lock-icon{font-size:.7em;margin-right:5px;opacity:.65;}',
             '.rz-root-link.rz-root-locked{filter:saturate(0.9);}',
             '.floating-side-card.rz-root-link .floating-card-label{display:inline-flex;align-items:center;}',
@@ -615,7 +615,7 @@
             '<div class="rz-modal">' +
                 '<button class="rz-modal-close" onclick="window._rzAuth.hideModal()" aria-label="Close login dialog">&times;</button>' +
                 '<div id="rzModalForm">' +
-                    '<h3 id="rzModalTitle"><i class="fas fa-shield-alt" style="color:#7DDDB4;margin-right:8px;" aria-hidden="true"></i>Sign In</h3>' +
+                    '<h3 id="rzModalTitle"><i class="fas fa-shield-alt" style="color:#FFAA00;margin-right:8px;" aria-hidden="true"></i>Sign In</h3>' +
                     '<p class="rz-modal-sub">Access calculators, tools, and analytical content.</p>' +
                     '<div class="rz-error" id="rzModalError">Invalid email or password.</div>' +
                     /* v1.40.1 — wrapped in <form> so Enter submits + autocomplete + browser warns on insecure context */
@@ -629,10 +629,10 @@
                     '<div class="rz-modal-legal" style="text-align:center;margin-top:12px;font-size:0.68rem;line-height:1.5;">' +
                         'By signing in, you agree to our <a href="terms.html">Terms</a> &amp; <a href="privacy.html">Privacy Policy</a>' +
                     '</div>' +
-                    '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(125,221,180,0.12);border:1px solid rgba(125,221,180,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
-                        '<span class="rz-demo-label" style="color:#A8ECCF;font-weight:600;">Demo Account:</span><br>' +
-                        '<code style="background:rgba(125,221,180,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7DDDB4;">demo@resistancezero.com</code> / ' +
-                        '<code style="background:rgba(125,221,180,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7DDDB4;">demo2026</code>' +
+                    '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(255,170,0,0.12);border:1px solid rgba(255,170,0,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
+                        '<span class="rz-demo-label" style="color:#FFC44D;font-weight:600;">Demo Account:</span><br>' +
+                        '<code style="background:rgba(255,170,0,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#FFAA00;">demo@resistancezero.com</code> / ' +
+                        '<code style="background:rgba(255,170,0,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#FFAA00;">demo2026</code>' +
                     '</div>' +
                 '</div>' +
                 '<div class="rz-success" id="rzModalSuccess">' +
@@ -892,13 +892,13 @@
                     }
                     /* v1.29.0 — append stale-cache rescue link */
                     errorEl.innerHTML = msg + ' ' +
-                        '<a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#A8ECCF;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
+                        '<a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#FFC44D;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
                     errorEl.classList.add('show');
                 });
                 return;
             }
 
-            var rescueLink = ' <a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#A8ECCF;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
+            var rescueLink = ' <a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#FFC44D;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
             function _showErr(msg) { if (!errorEl) return; errorEl.innerHTML = msg + rescueLink; errorEl.classList.add('show'); }
             function _finish(u) {
                 if (errorEl) { errorEl.classList.remove('show'); errorEl.textContent = ''; }

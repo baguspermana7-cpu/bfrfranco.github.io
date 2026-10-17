@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v3.24.9 — 2026-10-17 — "Register"
+
+### Changed — the shared login, account and cookie widgets leave the withdrawn palette on every page (`auth.js`, `auth.min.js`, `js/rz-cookie-consent.js`)
+- v3.24.8 fixed these three widgets on the hub only, by override. The standards now list the mint
+  user pill and the navy surfaces as withdrawn site-wide (CLAUDE.md "Withdrawn", §3, §11), so the
+  fix moves to the source. `auth.js`: every mint value becomes the signal amber (`#FFAA00`,
+  `#FFC44D` on hover, `#7A4800` as light-mode text), the navy dropdown and sign-in modal take the
+  graphite surfaces (`#121316`, hairline `#2a2d33`, inputs `#0b0c0e`), and the modal's 2 px top
+  rail is removed. `auth.min.js` rebuilt with terser (the homepage loads the twin). The cookie
+  banner loses its blur and shadow, takes opaque graphite in dark and white in light, 4 px buttons,
+  an amber Accept with dark text, and neutral links instead of blue. The educator badge keeps its
+  documented cyan (AUTH_STANDARD).
+- `?v=` tokens re-stamped on the 195 pages that load `auth.js`, the 2 that load `auth.min.js`, and
+  every page that loads the cookie banner, and the 44 generated incident pages rebuilt so they
+  carry the same tokens. Full ship gate 128/128 after two fixes on this tree (the version token
+  re-stamped after the bump; the incident pages regenerated rather than hand-patched); probe 82/82.
+
 ## v3.24.8 — 2026-10-17 — "Hub"
 
 ### Fixed — the last template widgets on the hub (`datacenter-solutions.html`)
