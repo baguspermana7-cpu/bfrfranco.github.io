@@ -185,7 +185,7 @@
     }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer integrity="sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt" crossorigin="anonymous"></script>
-    <script src="js/rz-version.js?v=20261017-31689501" defer></script>
+    <script src="js/rz-version.js?v=20261017-8b069498" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 
@@ -285,7 +285,7 @@
 .ro-rows td i { font-style: normal; color: var(--rz-text-muted); } .ro-rows td.ro-id { display: none; }
 .ro-go { display: inline-block; margin-top: var(--rz-space-2); color: var(--rz-text-accent); text-decoration: none; font-size: 13px; }
 /* ---- catalogue ---- */
-.tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--rz-space-8) var(--rz-space-12); margin-top: var(--rz-space-10); }
+.tgrid { columns: 2; column-gap: var(--rz-space-12); margin-top: var(--rz-space-10); } .tgrid .tgrp { break-inside: avoid; margin-bottom: var(--rz-space-10); display: block; }
 .tgrp h3 { margin: 0 0 var(--rz-space-2); font-size: 15px; font-weight: 600; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--rz-line-tier-1); }
 .tgrp h3 small { font-weight: 400; color: var(--rz-text-muted); font-size: 12.5px; }
 .tools { list-style: none; margin: 0; padding: 0; }
@@ -337,7 +337,8 @@
 /* ---- group illustrations ---- */
 .tgi { position: relative; height: 128px; margin: 10px 0 4px; border: 1px solid var(--rz-line-tier-2); border-radius: 4px; background: var(--rz-bg-base); overflow: hidden; color: var(--rz-text-secondary); }
 .tgi-svg { width: 100%; height: 100%; display: block; font-family: var(--rz-font-mono); }
-.tgi-l { font-size: 9.5px; fill: var(--rz-text-muted); letter-spacing: .06em; } .tgi-s { font-size: 12px; fill: var(--rz-text-primary); font-weight: 500; letter-spacing: .04em; }
+.tgi { --tk: 1; } @media (max-width: 600px) { .tgi { --tk: 1.4; } }
+.tgi-l { font-size: calc(9.5px * var(--tk)); fill: var(--rz-text-muted); letter-spacing: .06em; } .tgi-s { font-size: calc(12px * var(--tk)); fill: var(--rz-text-primary); font-weight: 500; letter-spacing: .04em; }
 .tgi-wire { fill: none; stroke: var(--rz-line-tier-1); stroke-width: 1.2; transition: stroke var(--rz-dur-tip) var(--rz-ease-out); } .tgi-wire.is-lost { stroke: var(--rz-accent-alert); stroke-dasharray: 3 3; }
 .tgi-cb path { fill: none; stroke: var(--rz-text-secondary); stroke-width: 1.4; } .tgi-cb circle { fill: var(--rz-text-secondary); }
 .tgi-bus { fill: var(--rz-text-secondary); } .tgi-gen.is-on { color: var(--rz-text-accent) !important; }
@@ -346,6 +347,7 @@
 .tgi-line { fill: none; stroke: var(--rz-text-secondary); stroke-width: 1.4; } .tgi-line.is-on { stroke: var(--rz-accent-signal); } .tgi-c3 { stroke: var(--rz-text-primary); }
 .tgi-cur { fill: var(--rz-accent-signal); } .tgi-cur.is-cliff { fill: var(--rz-accent-alert); } .tgi.is-cliff .tgi-st { fill: var(--rz-accent-alert); }
 .tgi-gatebox { fill: var(--rz-bg-elevated); stroke: var(--rz-line-tier-1); stroke-width: 1.2; transition: fill var(--rz-dur-tip) var(--rz-ease-out), stroke var(--rz-dur-tip) var(--rz-ease-out); }
+.tgi-row.is-done .tgi-spine { transform: translateY(-8px); } .tgi-spine { transition: transform 360ms var(--rz-ease-out), fill var(--rz-dur-tip) var(--rz-ease-out), stroke var(--rz-dur-tip) var(--rz-ease-out); transform-box: fill-box; }
 .tgi-gate.is-done .tgi-gatebox, .tgi-node.is-done .tgi-gatebox, .tgi-row.is-done .tgi-gatebox { fill: var(--rz-accent-signal); stroke: var(--rz-accent-signal); } .tgi-row.is-done .tgi-l, .tgi-node.is-done .tgi-l, .tgi-gate.is-done .tgi-l { fill: var(--rz-text-primary); }
 .tgi-bar { stroke: var(--rz-line-tier-1); stroke-width: 1; transform-origin: left center; transform-box: fill-box; } .tgi-bin { fill: var(--rz-bg-hover); } .tgi-liq { fill: color-mix(in srgb, var(--ic-blue) 35%, transparent); } .tgi-air { fill: color-mix(in srgb, var(--ic-green) 30%, transparent); }
 .tgi[data-ats="1"] .tgi-st { fill: var(--rz-accent-alert); } .tgi[data-ats="2"] .tgi-st { fill: var(--rz-text-accent); }
@@ -368,7 +370,7 @@
 .stamp { font-family: var(--rz-font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--rz-text-muted); }
 .rz-reveal { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .keys li { animation: none; opacity: 1; } .fp-stage path[data-rzd-pulse], .year .dwell { animation: none; } .year .dwell { transform: scaleX(1); } .rz-reveal { opacity: 1; transition: none; } }
-@media (max-width: 1100px) { .fp-read { grid-template-columns: 1fr; } .h3-foot { grid-template-columns: 1fr; } .h3-list { border-right: 0; border-bottom: 1px solid var(--rz-line-tier-2); } .tgrid { grid-template-columns: 1fr; } .tool { grid-template-columns: 32px 44px 220px 1fr auto; } }
+@media (max-width: 1100px) { .fp-read { grid-template-columns: 1fr; } .h3-foot { grid-template-columns: 1fr; } .h3-list { border-right: 0; border-bottom: 1px solid var(--rz-line-tier-2); } .tgrid { columns: 1; } .tool { grid-template-columns: 32px 44px 220px 1fr auto; } }
 @media (max-width: 800px) { .about { grid-template-columns: 1fr; } .fp-cap span:not(:first-child) { display: none; } .pp section { padding: var(--rz-space-16) 0; } .year button span { display: none; } .year button { padding: 0 6px; min-width: 36px; } .fp-stage svg { min-width: 760px; } .trust .stamp { margin-left: 0; }
   .tool { grid-template-columns: 32px 1fr auto; } .tool .ic { grid-row: 1 / span 2; } .tool .ix { grid-column: 2; grid-row: 2; } .tool .nm { grid-column: 2; grid-row: 1; } .tool .go { grid-column: 3; grid-row: 1; } .tool .ln { grid-column: 2 / 4; grid-row: 2; padding-left: 48px; } .tool .rz-lock-icon { grid-column: 2; grid-row: 1; } }
 </style>
@@ -672,7 +674,7 @@
 <script src="js/rz-diagram.js?v=20261016-578db8a8" defer></script>
 <script src="js/rz-hub-icons.js?v=20261016-6dd78a27" defer></script>
 <script src="js/rz-hub-product.js?v=20261017-38a9420a" defer></script>
-<script src="js/rz-hub-illus.js?v=20261016-75b191f5" defer></script>
+<script src="js/rz-hub-illus.js?v=20261017-f6e16f43" defer></script>
 <script src="js/rz-hub-3d.js?v=20261016-b5c49bde" defer></script>
 </body>
 </html>

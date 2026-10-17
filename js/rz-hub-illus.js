@@ -28,7 +28,7 @@
       '<path class="tgi-wire tgi-load" d="M246 50 H300"/>' + sym('rack', 300, 30, 40) + '<text x="320" y="92" class="tgi-l" text-anchor="middle">LOAD</text>' +
       '<g class="tgi-flow"><path class="tgi-pulse tgi-p1" d="M64 50 H240"/><path class="tgi-pulse tgi-pL" d="M246 50 H300"/></g>' +
       '<text x="512" y="28" class="tgi-s tgi-st" text-anchor="end">UTILITY · NORMAL</text>' +
-      '<text x="512" y="52" class="tgi-l" text-anchor="end">' + n(gi) + ' × ' + n(gk) + ' kW · ' + n(fa) + ' h fuel</text>' +
+      '<text x="512" y="118" class="tgi-l" text-anchor="end">' + n(gi) + ' × ' + n(gk) + ' kW · ' + n(fa) + ' h fuel</text>' +
       '<text x="512" y="76" class="tgi-l tgi-t" text-anchor="end"></text></svg>';
     return { svg: svg, tick: function (host, t) {
       var ph = (t / 1000) % 14, st = host.querySelector('.tgi-st'), cb = host.querySelector('.tgi-cb1 path'), p1 = host.querySelector('.tgi-p1'), gen = host.querySelector('.tgi-gen'), tt = host.querySelector('.tgi-t'), w1 = host.querySelector('.tgi-w1');
@@ -68,7 +68,7 @@
   /* 4 · engineering: PUE across the engine's weather bins, a cursor sweeping it */
   function engineering() {
     var bins = (S && S.bins) || []; if (!bins.length) return null;
-    var lo = 1.10, hi = 1.30, x0 = 44, x1 = 400, xs = function (i) { return x0 + i * (x1 - x0) / (bins.length - 1); }, ys = function (v) { return 110 - (v - lo) / (hi - lo) * 84; };
+    var lo = 1.10, hi = 1.30, x0 = 44, x1 = 290, xs = function (i) { return x0 + i * (x1 - x0) / (bins.length - 1); }, ys = function (v) { return 110 - (v - lo) / (hi - lo) * 84; };
     var d = ''; bins.forEach(function (b, i) { d += (i ? ' H' + xs(i).toFixed(1) + ' V' + ys(b.pue).toFixed(1) : 'M' + xs(i) + ' ' + ys(b.pue).toFixed(1)); }); d += ' H' + (x1 + 20);
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="tgi-svg" role="img" aria-label="PUE by ambient bin">';
     [1.12, 1.20, 1.25].forEach(function (g) { svg += '<path d="M' + x0 + ' ' + ys(g).toFixed(1) + ' H' + (x1 + 20) + '" class="tgi-grid"/><text x="' + (x0 - 4) + '" y="' + (ys(g) + 3).toFixed(1) + '" class="tgi-l" text-anchor="end">' + g.toFixed(2) + '</text>'; });
@@ -106,14 +106,20 @@
     return { svg: svg, tick: function (host, t) { var u = Math.min(1, ((t / 1000) % 6) / 1.2); host.querySelector('.tgi-liq').style.transform = 'scaleX(' + u + ')'; host.querySelector('.tgi-air').style.transform = 'scaleX(' + u + ')'; } };
   }
   /* 7 · knowledge: the titles stepping */
+  /* 7 · knowledge: the shelf — one spine per title across the width; the one being read stands
+   * out of the row and its title prints large on the right */
   function knowledge(group) {
-    var titles = Array.prototype.map.call(group.querySelectorAll('.tool .nm'), function (e) { return e.textContent; });
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="tgi-svg" role="img" aria-label="The knowledge shelf">';
-    titles.forEach(function (tt, i) { svg += '<g class="tgi-row" data-i="' + i + '"><rect x="20" y="' + (14 + i * 13) + '" width="4" height="9" class="tgi-gatebox"/><text x="32" y="' + (22 + i * 13) + '" class="tgi-l">' + esc(tt) + '</text></g>'; });
-    svg += '<text x="512" y="118" class="tgi-l" text-anchor="end">' + titles.length + ' titles · read in order or by need</text></svg>';
-    return { svg: svg, tick: function (host, t) { var i = Math.floor((t / 1000) % titles.length); Array.prototype.forEach.call(host.querySelectorAll('.tgi-row'), function (g, k) { g.classList.toggle('is-done', k === i); }); } };
+    var titles = Array.prototype.map.call(group.querySelectorAll('.tool .nm'), function (e) { return e.textContent; }), n = titles.length;
+    var x0 = 24, x1 = 240, pitch = (x1 - x0) / n, svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="tgi-svg" role="img" aria-label="The knowledge shelf: ' + n + ' titles">';
+    svg += '<path d="M' + (x0 - 8) + ' 108 H' + (x1 + 4) + '" class="tgi-wire"/>';
+    titles.forEach(function (tt, i) { var h = 58 + ((i * 37) % 5) * 7, x = x0 + i * pitch; svg += '<g class="tgi-row" data-i="' + i + '"><rect x="' + x.toFixed(1) + '" y="' + (108 - h) + '" width="' + (pitch - 6).toFixed(1) + '" height="' + h + '" rx="1.5" class="tgi-gatebox tgi-spine"/><text x="' + (x + (pitch - 6) / 2).toFixed(1) + '" y="104" class="tgi-l" text-anchor="middle">' + String(i + 1) + '</text></g>'; });
+    svg += '<text x="512" y="30" class="tgi-l" text-anchor="end">' + n + ' TITLES · READ IN ORDER OR BY NEED</text><text x="512" y="60" class="tgi-s tgi-st" text-anchor="end"></text><text x="512" y="80" class="tgi-l tgi-t" text-anchor="end"></text></svg>';
+    return { svg: svg, tick: function (host, t) {
+      var i = Math.floor((t / 1600) % n);
+      Array.prototype.forEach.call(host.querySelectorAll('.tgi-row'), function (g, k) { g.classList.toggle('is-done', k === i); });
+      host.querySelector('.tgi-st').textContent = titles[i]; host.querySelector('.tgi-t').textContent = 'P.0' + (i + 1);
+    } };
   }
-
   var ORDER = [cockpits, cost, strategy, engineering, grid, labs, knowledge];
   function mount() {
     var groups = document.querySelectorAll('.tgrp'); if (!groups.length) return;

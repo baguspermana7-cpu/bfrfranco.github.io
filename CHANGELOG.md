@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v3.24.4 — 2026-10-17 — "Hub"
+
+### Fixed — the catalogue packs, the knowledge panel reads, the panels read on a phone (`datacenter-solutions.html`, `js/rz-hub-illus.js`)
+- The seven tool groups sat in a two-column grid, so a short group left a hole under it the height
+  of its neighbour (Labs beside Knowledge, Strategy beside Engineering). They now flow in two
+  balanced columns and never split.
+- The knowledge panel was eight titles in 9.5 px against the left edge of an empty box. It is a
+  shelf now: one spine per title across the panel; the one being read stands out of the row, turns
+  amber and its title prints large on the right with its index.
+- On a phone every panel scaled its 520-unit drawing into 340 px and its labels fell to about 6 px.
+  The panel type scales by 1.4 under 600 px; the three labels that then collided (the genset line on
+  the load icon, the PUE readout on the chart, the shelf header on the last spine) moved.
+
 ## v3.24.3 — 2026-10-17 — "Calculators"
 
 ### Article calculators get the register; the headline's second clause is muted
