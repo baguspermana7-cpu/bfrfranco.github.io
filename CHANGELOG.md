@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v3.24.12 — 2026-10-17 — "Hub"
+
+### Fixed — two things the hub did that nobody could see (`js/rz-hub-illus.js`, `js/rz-hub-3d.js`)
+- The seven group panels shared one `requestAnimationFrame` loop that never stopped: it ran every
+  frame for the life of the tab, checking visibility, even with every panel scrolled away or the tab
+  hidden. It now runs only while a panel is on screen and the tab is visible, and wakes from the
+  IntersectionObserver and `visibilitychange`. Measured: a panel's cursor holds still off screen and
+  advances on screen.
+- The 3D figure's numbered tags piled on each other on a phone (tags 6 and 7 on the rack). A tag
+  that would land within 26 px of one already placed is held back unless it is the part in focus;
+  temperature tags are never held back. At 390 px the rack shows four clean tags of seven; the
+  rest appear as the view turns or when picked from the list.
+
 ## v3.24.11 — 2026-10-17 — "Hub"
 
 ### Fixed — the plant tooltip could vanish on a desktop, and spilled when it showed (`datacenter-solutions.html`, `js/rz-hub-product.js`)

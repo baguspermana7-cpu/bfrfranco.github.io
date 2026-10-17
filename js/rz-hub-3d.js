@@ -422,12 +422,17 @@
     function anchorOf(id) { for (var i = 0; i < meshes.length; i++) if (meshes[i].userData.part === id) return meshes[i]; return null; }
     var v3 = new T.Vector3();
     function placeLabels() {
-      var w = cv.clientWidth, h = cv.clientHeight;
+      var w = cv.clientWidth, h = cv.clientHeight, taken = [];
       Array.prototype.forEach.call(labels.children, function (t) {
         var m = t.hasAttribute('data-temp') ? tagged[+t.getAttribute('data-temp')] : anchorOf(t.getAttribute('data-part')); if (!m) { t.style.display = 'none'; return; }
         m.getWorldPosition(v3); v3.project(cam);
         if (v3.z > 1) { t.style.display = 'none'; return; }
-        t.style.display = ''; t.style.transform = 'translate(' + ((v3.x + 1) / 2 * w).toFixed(1) + 'px,' + ((1 - v3.y) / 2 * h).toFixed(1) + 'px)';
+        var px = (v3.x + 1) / 2 * w, py = (1 - v3.y) / 2 * h, hot = t.classList.contains('is-hot');
+        /* a numbered tag that would land on another one is held back, unless it is the part in focus */
+        var clash = !t.hasAttribute('data-temp') && !hot && taken.some(function (q) { return Math.abs(q[0] - px) < 26 && Math.abs(q[1] - py) < 26; });
+        if (clash) { t.style.display = 'none'; return; }
+        if (!t.hasAttribute('data-temp')) taken.push([px, py]);
+        t.style.display = ''; t.style.transform = 'translate(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px)';
       });
     }
     function resize() { var w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }

@@ -134,12 +134,19 @@
     var t0 = performance.now();
     live.forEach(function (l) { try { l.tick(l.host, REDUCE ? 4200 : 0); } catch (e) { /* a panel that cannot draw stays as rendered */ } });
     if (REDUCE) return;
-    if ('IntersectionObserver' in root) { var io = new IntersectionObserver(function (es) { es.forEach(function (e) { for (var i = 0; i < live.length; i++) if (live[i].host === e.target) live[i].on = e.isIntersecting; }); }, { threshold: 0.2 }); live.forEach(function (l) { io.observe(l.host); }); } else live.forEach(function (l) { l.on = true; });
-    var last = 0;
-    (function loop(now) {
-      if (now - last > 80) { last = now; for (var i = 0; i < live.length; i++) if (live[i].on && !document.hidden) { try { live[i].tick(live[i].host, now - t0); } catch (e) { live[i].on = false; } } }
-      requestAnimationFrame(loop);
-    })(t0);
+    if ('IntersectionObserver' in root) { var io = new IntersectionObserver(function (es) { es.forEach(function (e) { for (var i = 0; i < live.length; i++) if (live[i].host === e.target) live[i].on = e.isIntersecting; }); if (root.__rzIllusWake) root.__rzIllusWake(); }, { threshold: 0.2 }); live.forEach(function (l) { io.observe(l.host); }); } else live.forEach(function (l) { l.on = true; });
+    /* one loop for all panels, and only while one of them is on screen and the tab is visible */
+    var last = 0, raf = null;
+    function anyOn() { for (var i = 0; i < live.length; i++) if (live[i].on) return true; return false; }
+    function loop(now) {
+      raf = null;
+      if (now - last > 80) { last = now; for (var i = 0; i < live.length; i++) if (live[i].on) { try { live[i].tick(live[i].host, now - t0); } catch (e) { live[i].on = false; } } }
+      if (anyOn() && !document.hidden) raf = requestAnimationFrame(loop);
+    }
+    function wake() { if (!raf && anyOn() && !document.hidden) raf = requestAnimationFrame(loop); }
+    root.__rzIllusWake = wake;
+    document.addEventListener('visibilitychange', wake);
+    wake();
   }
   root.RZHubIllus = { mount: mount };
   if (typeof document !== 'undefined') { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount(); }
