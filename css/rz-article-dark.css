@@ -1597,6 +1597,11 @@ html[data-rz-register="editorial"] [data-rz-rail-off]{border-left-width:0!import
 /* a callout INSIDE a panel that is dark in both themes keeps the dark surface (the -note/-box rule above
    gave article-26's chem notes a light panel under light text in light theme, 1.33:1 under axe) */
 html[data-rz-register="editorial"] .article-body [data-rz-dark-panel] :is([class*="-box"],[class*="-note"]){background:transparent!important;border-color:rgba(255,255,255,.14)!important}
+/* v3.24.13 — the [class*="-box"]/[class*="-note"] callout rule also caught things that are NOT callouts: a figure
+   caption's argument (.rz-figcaption-note), one-line source and result notes, and the TITLE inside a callout
+   (.info-box-title, .formula-box-title …). Each became its own framed box while another rule zeroed its padding, so the
+   text sat glued to a border on 23 pages. They are text: no frame, no panel. J5f "flush:" keeps it so. */
+html[data-rz-register="editorial"] .article-body :is(.rz-figcaption-note, .src-note, .llm-calc-notes, .ws-note, .pfas-chem-note, .iso-mapping-note, [class*="-box-title"], [class*="-box-header"], [class*="-note-title"]){background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 html[data-rz-register="editorial"] .related-card-number{color:var(--rz-art-muted)!important;font-family:var(--rz-art-mono)}
 /* shared widgets on the editorial register (v3.24.10): the cookie banner (navy, blur, shadow, 8px, blue
    Accept), the login button and the signed-in pill (mint, navy dropdown) were the last second hues on every

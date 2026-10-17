@@ -202,8 +202,14 @@ if (!STATIC) {
         /* + the shared chrome a reader sees on every article: cookie banner, login button, user pill (v3.24.9) */
         const scope = document.querySelectorAll('body, main, .article-content, .article-content *, .toc-mobile-toggle, .rz-cookie-banner, .rz-cookie-banner *, .rz-login-btn, .rz-user-btn, .rz-user-avatar');
         for (const e of scope) {
-          if (e.closest('svg, canvas, figure.rz-figure, figure.rz-chart, img')) continue;
+          if (e.closest('svg, canvas, img')) continue;
           const cs = getComputedStyle(e), r = e.getBoundingClientRect();
+          /* text flush against its own visible border: the -note callout rule boxed .rz-figcaption-note while another
+             rule zeroed its padding, so captions read as text glued to a frame (v3.24.13) */
+          if (r.width && r.height && parseFloat(cs.borderLeftWidth) >= 1 && parseFloat(cs.borderTopWidth) >= 1 && !/rgba\([^)]*, 0\)/.test(cs.borderLeftColor) && cs.borderLeftStyle !== 'none'
+              && parseFloat(cs.paddingLeft) < 4 && !e.matches('input, select, textarea, button, table, tr, th, td, hr, pre, code')
+              && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim().length > 20)) out.rails.push('flush:' + (e.className || e.tagName).toString().slice(0, 26));
+          if (e.closest('figure.rz-figure, figure.rz-chart')) continue;
           if (!r.width || !r.height || cs.visibility === 'hidden' || cs.display === 'none') continue;
           /* data colour (legend dots, bar fills, swatches) is content, not a surface — same rule as the runtime */
           if (r.width <= 24 || r.height <= 12 || /(^|[\s_-])(dot|bar|fill|swatch|legend|marker)([\s_-]|$)/i.test(String(e.className))) continue;

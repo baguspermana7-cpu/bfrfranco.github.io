@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.24.13 — 2026-10-17 — "Captions"
+
+### Fixed — text glued to a frame on 23 journal pages
+
+**Owner:** *"improve more"* after article 30 went live; the figure captions under every diagram read as a boxed
+paragraph with the text touching its border.
+
+- The editorial callout rule (`[class*="-box"]`, `[class*="-note"]` in `css/rz-article-dark.css`) also matched things
+  that are not callouts: a figure caption's argument (`.rz-figcaption-note`), one-line source and result notes
+  (`.src-note`, `.llm-calc-notes`, `.ws-note`, `.pfas-chem-note`, `.iso-mapping-note`) and the title inside a
+  callout (`.info-box-title`, `.formula-box-title`, `.a22-chart-box-title` …). Each got its own panel and border
+  while another rule zeroed its padding. They are text again: no frame, no panel.
+- `tools/test-journal.mjs` J5f now flags any element whose own text sits flush against its own visible border, figure
+  captions included (they were skipped with the figure). Proven: 46 failures on 23 pages before the fix, 0 after.
+
 ## v3.24.12 — 2026-10-17 — "Hub"
 
 ### Fixed — two things the hub did that nobody could see (`js/rz-hub-illus.js`, `js/rz-hub-3d.js`)
