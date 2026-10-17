@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.24.11 — 2026-10-17 — "Hub"
+
+### Fixed — the plant tooltip could vanish on a desktop, and spilled when it showed (`datacenter-solutions.html`, `js/rz-hub-product.js`)
+- The hover card was hidden by `@media (hover: none)`. Touch-screen laptops and some browsers
+  report `hover: none` while a mouse is in use, so the card never appeared there (the headless
+  check reported it too, which is how this surfaced). The card is now suppressed per event, only
+  when the pointer that triggered it is a finger (`pointerType === 'touch'`).
+- When it did show, long values ran past its edge ("4 MW class MV diesel generator", every value
+  column). The table is fixed-layout with a 48 % label column and values that wrap; the card is
+  270 px.
+- Campus: the "GENSET YARD" label sat on the dry-cooler yard's top border; it now centres in the
+  road between them.
+- The bin strip and the status row print temperatures the same way ("24 °C"); phones still drop
+  the unit.
+
 ## v3.24.10 — 2026-10-17 — "Agents"
 
 ### Article 30: Is "Agentic AI" a Fraud? — and the last second hues leave every article

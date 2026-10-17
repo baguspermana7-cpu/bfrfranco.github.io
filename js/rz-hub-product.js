@@ -259,7 +259,7 @@
     out.push('<g data-rzd-hit="genset" class="rzd-hit" tabindex="0" role="button" aria-label="Genset yard">');
     r(gx, yB, gw, pw, 'sl t2');
     for (var rr = 0; rr < 3; rr++) for (var c = 0; c < 8; c++) r(gx + 4 + c * (gw - 8) / 8, yB + 4 + rr * (pw - 8) / 3, (gw - 8) / 8 - 3, (pw - 8) / 3 - 3, 'sl t3');
-    t(X0 + (gx + gw / 2) * sc, Y0 + (yB + pw + 12) * sc, 'GENSET YARD · ' + F('equipment.gensets_installed') + ' × ' + F('equipment.generator_unit_kw') + ' kW', 'st', 'middle');
+    t(X0 + (gx + gw / 2) * sc, Y0 + (yB + pw + road / 2) * sc + 4, 'GENSET YARD · ' + F('equipment.gensets_installed') + ' × ' + F('equipment.generator_unit_kw') + ' kW', 'st', 'middle');
     out.push('</g>');
     out.push('<g data-rzd-hit="chiller" class="rzd-hit" tabindex="0" role="button" aria-label="Chiller plant">');
     var cw = iw * .5; r(ix, yC, cw, sb * .5, 'sl t2'); for (var k = 0; k < 12; k++) r(ix + 3 + k * (cw - 6) / 12, yC + 3, (cw - 6) / 12 - 3, sb * .5 - 6, 'sl t3');
@@ -305,11 +305,12 @@
     return seen;
   }
   function linked(a, b) { return (DOWN[a] || []).indexOf(b) >= 0 || (DOWN[b] || []).indexOf(a) >= 0; }
+  var lastPointer = 'mouse';
   function tip(host, id) {
     var stage = $('[data-stage]', host), t = $('.fp-tip', stage);
     if (!t) { t = document.createElement('div'); t.className = 'fp-tip'; t.setAttribute('aria-hidden', 'true'); stage.appendChild(t); }
     var r = ROWS[id], anchor = id && ($('[data-rzd-node="' + id + '"]', stage) || $('[data-rzd-hit="' + id + '"]', stage));
-    if (!r || !anchor) { t.classList.remove('is-on'); return; }
+    if (!r || !anchor || lastPointer === 'touch') { t.classList.remove('is-on'); return; }
     var rows = (id === 'chiller' || id === 'dry' || id === 'cdu' || id === 'crah') ? binRows().concat(r.rows).slice(0, 4) : r.rows.slice(0, 4);
     t.innerHTML = '<b>' + esc(r.title) + '</b><small>' + esc(r.sub || '') + '</small><table>' + rows.map(function (row) { return '<tr><th>' + esc(row[0]) + '</th><td>' + esc(row[1]) + (row[2] ? ' <i>' + esc(row[2]) + '</i>' : '') + '</td></tr>'; }).join('') + '</table><em>double-click or Enter opens the page →</em>';
     var sb = stage.getBoundingClientRect(), ab = anchor.getBoundingClientRect(), x = ab.right - sb.left + stage.scrollLeft + 12, y = ab.top - sb.top + stage.scrollTop - 4;
@@ -336,7 +337,8 @@
       });
       readout(id, host); tip(host, id);
     }
-    host.addEventListener('pointerover', function (e) { var h = e.target.closest && e.target.closest('[data-rzd-hit]'); if (h) { light(h.getAttribute('data-rzd-hit')); onTouch(); } });
+    host.addEventListener('pointerover', function (e) { lastPointer = e.pointerType || 'mouse'; var h = e.target.closest && e.target.closest('[data-rzd-hit]'); if (h) { light(h.getAttribute('data-rzd-hit')); onTouch(); } });
+    host.addEventListener('pointerdown', function (e) { lastPointer = e.pointerType || 'mouse'; }, true);
     host.addEventListener('pointerleave', function () { if (!host.__pinned) light(null); });
     host.addEventListener('focusin', function (e) { var h = e.target.closest && e.target.closest('[data-rzd-hit]'); if (h) { light(h.getAttribute('data-rzd-hit')); onTouch(); } });
     host.addEventListener('click', function (e) {
@@ -394,7 +396,7 @@
     var bs = bins(), total = 0; bs.forEach(function (b) { total += b.hours; });
     strip.innerHTML = bs.map(function (b, i) {
       return '<button type="button" data-bin="' + i + '" style="--h:' + (b.hours / total).toFixed(4) + '" aria-pressed="' + (i === BIN ? 'true' : 'false') + '" title="' + b.ambient_db_c + ' °C dry bulb, ' + fmt(b.hours) + ' h a year">' +
-        '<b>' + b.ambient_db_c + '°<i>C</i></b><span>' + fmt(b.hours) + ' h' + (i === DESIGN_BIN ? ' · design' : '') + (b.liquid_free_cooling ? '' : ' · cliff') + '</span><i class="dwell" aria-hidden="true"></i></button>';
+        '<b>' + b.ambient_db_c + '<i>&#160;</i>°<i>C</i></b><span>' + fmt(b.hours) + ' h' + (i === DESIGN_BIN ? ' · design' : '') + (b.liquid_free_cooling ? '' : ' · cliff') + '</span><i class="dwell" aria-hidden="true"></i></button>';
     }).join('');
   }
 
