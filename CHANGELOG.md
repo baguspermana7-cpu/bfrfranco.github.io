@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v3.24.2 — 2026-10-17 — "Hub"
+
+### Fixed — five things the live hub showed on a desktop and a phone (`datacenter-solutions.html`, `js/rz-hub-product.js`)
+- The bin strip clipped its last button ("36 °C 160 h · cliff" cut at the right edge on desktop).
+  Each bin now shows its temperature only; the selected bin widens to its content and adds its
+  hours and "design" / "cliff".
+- The readout repeated the "hover or tap" hint the line above it already gives; removed.
+- Phones: the plant drawing is wider than the screen with nothing saying so. A right-edge fade and a
+  `swipe ⟶` chip appear on the drawing and leave once it is swiped (or reaches its end).
+- Phones and tablets: the `j / k` keyboard hint is hidden where there is no keyboard
+  (`hover: none` / `pointer: coarse`); the ⌘K chip stays.
+- Phones: the "Computed against" standards row is a two-column grid instead of a ragged wrap.
+
 ## v3.24.1 — 2026-10-17 — "Tokens"
 
 ### Article 29: How a Large Language Model Actually Works — from one token to a 1 GW campus

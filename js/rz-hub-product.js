@@ -287,7 +287,7 @@
       var b = bin();
       box.innerHTML = '<div class="ro-head"><b>The facility, as computed</b><span>' + (b ? 'ambient ' + b.ambient_db_c + ' °C · ' + fmt(b.hours) + ' h a year' : 'design day') + '</span></div><table class="ro-rows">' +
         [['Total IT', F('power.total_it_mw', 2), 'MW'], ['Facility draw', b ? fmt(b.facility_kwe / 1000, 1) : '—', 'MW'], ['PUE at this bin', b ? fmt(b.pue, 3) : '—', ''], ['Chillers running', b ? fmt(b.chillers_running) : '—', ''], ['Racks · GPUs', F('compute.racks_facility') + ' · ' + F('compute.gpu_facility'), ''], ['Free-cooling hours', F('pue.free_cooling_hours') + ' / ' + F('pue.hours_total'), '']]
-          .map(function (row) { return '<tr><th>' + row[0] + '</th><td>' + row[1] + (row[2] ? ' <i>' + row[2] + '</i>' : '') + '</td></tr>'; }).join('') + '</table><p class="ro-empty">Hover or tap any box in the drawing to read its rows.</p>';
+          .map(function (row) { return '<tr><th>' + row[0] + '</th><td>' + row[1] + (row[2] ? ' <i>' + row[2] + '</i>' : '') + '</td></tr>'; }).join('') + '</table>';
       return;
     }
     var h = '<div class="ro-head"><b>' + esc(r.title) + '</b><span>' + esc(r.sub || '') + '</span></div><table class="ro-rows">';
@@ -459,6 +459,12 @@
     if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { inView = es[0].isIntersecting; }, { threshold: 0.15 }).observe(host);
     document.addEventListener('visibilitychange', function () { if (!document.hidden && playing && !timer) tick(); });
 
+    /* phones: the drawing is wider than the screen — say so, and stop saying it once they swipe */
+    var wrap = stage.parentNode;
+    if (wrap && wrap.classList.contains('fp-stagewrap')) stage.addEventListener('scroll', function () {
+      wrap.classList.toggle('is-moved', stage.scrollLeft > 8);
+      wrap.classList.toggle('is-end', stage.scrollLeft + stage.clientWidth >= stage.scrollWidth - 4);
+    }, { passive: true });
     keysRender(list); yearRender(strip); wire(host, touch); show('plant');
     if (playing) timer = setTimeout(tick, DWELL + 1200);
   }

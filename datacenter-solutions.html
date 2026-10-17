@@ -185,7 +185,7 @@
     }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer integrity="sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt" crossorigin="anonymous"></script>
-    <script src="js/rz-version.js?v=20261017-7c783ed2" defer></script>
+    <script src="js/rz-version.js?v=20261017-977cf03b" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 
@@ -213,6 +213,7 @@
 .fig-cap b { border: 1px solid var(--rz-line-tier-1); padding: 3px 6px; border-radius: 2px; color: var(--rz-text-secondary); font-weight: 500; white-space: nowrap; }
 .trust { display: flex; flex-wrap: wrap; gap: var(--rz-space-5) var(--rz-space-8); align-items: center; margin-top: var(--rz-space-8); padding-top: var(--rz-space-5); border-top: 1px solid var(--rz-line-tier-3); font-family: var(--rz-font-mono); font-size: 12px; color: var(--rz-text-secondary); }
 .trust .eyebrow { margin: 0; } .trust .stamp { margin: 0 0 0 auto; }
+@media (max-width: 800px) { .trust { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; } .trust .eyebrow, .trust .stamp { grid-column: 1 / -1; } }
 @keyframes hubIn { to { opacity: 1; } }
 @keyframes hubFlow { to { stroke-dashoffset: -24; } }
 @keyframes hubDwell { from { transform: scaleX(0); } to { transform: scaleX(1); } }
@@ -232,7 +233,8 @@
 .year button { appearance: none; position: relative; flex: var(--h) 1 0; min-width: 44px; margin: 0; padding: 0 8px; border: 0; border-left: 1px solid var(--rz-line-tier-3); background: none; text-align: left; font-family: var(--rz-font-mono); color: var(--rz-text-muted); cursor: pointer; overflow: hidden; display: flex; align-items: center; gap: 6px; transition: color var(--rz-dur-press) var(--rz-ease-out), background-color var(--rz-dur-press) var(--rz-ease-out); }
 .year button:first-child { border-left: 0; }
 .year button b { font-size: 11px; font-weight: 500; color: var(--rz-text-secondary); white-space: nowrap; }
-.year button span { font-size: 9.5px; white-space: nowrap; color: var(--rz-text-muted); }
+.year button span { font-size: 9.5px; white-space: nowrap; color: var(--rz-text-muted); display: none; }
+.year button[aria-pressed="true"] { min-width: max-content; } .year button[aria-pressed="true"] span { display: inline; }
 .year button:hover, .year button:focus-visible { color: var(--rz-text-secondary); background: var(--rz-bg-hover); outline: none; }
 .year button[aria-pressed="true"] { background: var(--rz-bg-elevated); color: var(--rz-text-secondary); } .year button[aria-pressed="true"] b { color: var(--rz-text-accent); }
 .year .dwell { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--rz-accent-signal); transform: scaleX(0); transform-origin: left; }
@@ -257,6 +259,8 @@
 .fp-stage [data-rzd-layer].is-down { opacity: .85 !important; }
 .fp-stage path[data-rzd-pulse].is-up, .fp-stage path[data-rzd-pulse].is-hot { animation-duration: .6s; stroke-width: 2.2; }
 .fp-stage { position: relative; }
+.plant .fp-stagewrap { position: relative; } .plant .fp-swipe { display: none; }
+@media (max-width: 800px) { .plant .fp-stagewrap::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 36px; pointer-events: none; background: linear-gradient(to right, transparent, var(--rz-bg-elevated)); transition: opacity var(--rz-dur-tip) var(--rz-ease-out); } .plant .fp-stagewrap.is-end::after { opacity: 0; } .plant .fp-swipe { display: inline-flex; position: absolute; right: 10px; top: 10px; z-index: 2; gap: 6px; align-items: center; padding: 4px 8px; border: 1px solid var(--rz-line-tier-1); border-radius: 3px; background: var(--rz-bg-elevated); font-family: var(--rz-font-mono); font-size: 10.5px; color: var(--rz-text-secondary); pointer-events: none; transition: opacity var(--rz-dur-tip) var(--rz-ease-out); } .plant .fp-stagewrap.is-moved .fp-swipe { opacity: 0; } }
 .fp-tip { position: absolute; z-index: 3; width: 240px; max-width: calc(100% - 24px); background: var(--rz-bg-elevated); border: 1px solid var(--rz-line-tier-1); border-left: 2px solid var(--rz-accent-signal); border-radius: 4px; padding: 9px 11px; font-size: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.35); pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity var(--rz-dur-tip) var(--rz-ease-out), transform var(--rz-dur-tip) var(--rz-ease-out); }
 .fp-tip.is-on { opacity: 1; transform: none; }
 .fp-tip b { display: block; font-size: 13px; color: var(--rz-text-primary); } .fp-tip small { display: block; color: var(--rz-text-muted); font-family: var(--rz-font-mono); font-size: 10.5px; margin-bottom: 6px; }
@@ -353,6 +357,7 @@
 .tool .go i { display: inline-block; transition: transform var(--rz-dur-press) var(--rz-ease-out), color var(--rz-dur-press) var(--rz-ease-out); } .tool:hover .go i, .tool:focus-visible .go i { transform: translate(1px, -1px); }
 .tool.is-cursor { background: var(--rz-bg-hover); box-shadow: inset 2px 0 0 var(--rz-accent-signal); }
 .keys li { cursor: copy; } .keys li code { transition: color var(--rz-dur-tip) var(--rz-ease-out); } .keys li.is-copied code { color: var(--rz-text-accent); }
+@media (hover: none), (pointer: coarse) { .kb-hint { display: none; } }
 .kchip { appearance: none; vertical-align: middle; margin-left: 12px; background: var(--rz-bg-elevated); border: 1px solid var(--rz-line-tier-1); border-radius: 4px; color: var(--rz-text-secondary); font-family: var(--rz-font-mono); font-size: 11px; letter-spacing: .06em; padding: 6px 10px; cursor: pointer; transition: border-color var(--rz-dur-press) var(--rz-ease-out), color var(--rz-dur-press) var(--rz-ease-out), transform var(--rz-dur-press) var(--rz-ease-out); }
 .kchip kbd { font-family: inherit; border: 1px solid var(--rz-line-tier-1); border-radius: 3px; padding: 1px 5px; margin-right: 6px; color: var(--rz-text-primary); } .kchip:hover { border-color: var(--rz-accent-signal); color: var(--rz-text-primary); } .kchip:active { transform: scale(.98); }
 @media (prefers-reduced-motion: reduce) { .fp-ink { transition: none; } .tgi-pulse { animation: none; } }
@@ -429,7 +434,7 @@
       </div>
       <ol class="keys" id="heroKeys" aria-label="Live readouts"></ol>
       <div class="year" id="yearStrip" role="group" aria-label="Weather bins of the design year — hover or tap one to hold it"></div>
-      <div class="fp-stage" data-stage role="tabpanel"></div>
+      <div class="fp-stagewrap"><div class="fp-stage" data-stage role="tabpanel"></div><span class="fp-swipe" aria-hidden="true">swipe ⟶</span></div>
       <p class="fp-hint">Hover or tap a box to read its rows · double-click or Enter opens the page where it is computed · the bins above play on their own, touch one to hold it</p>
       <div class="fp-read" data-readout aria-live="polite"></div>
     </div>
@@ -441,7 +446,7 @@
   <div class="wrap">
     <p class="eyebrow">01 / The instruments</p>
     <h2>Every tool, on one page. <span>41 cockpits, calculators, monitors, labs and papers — each states its basis before it prints a number.</span></h2>
-    <p class="fp-hint" style="padding-left:0;border:0">Keyboard: <b>j</b> / <b>k</b> move down the list, <b>Enter</b> opens <button type="button" class="kchip" data-kchip><kbd>⌘K</kbd>search all 41</button></p>
+    <p class="fp-hint kb-hint" style="padding-left:0;border:0">Keyboard: <b>j</b> / <b>k</b> move down the list, <b>Enter</b> opens <button type="button" class="kchip" data-kchip><kbd>⌘K</kbd>search all 41</button></p>
     <div class="tgrid">
       <div class="tgrp" data-tint="green">
         <h3>Cockpits<small>Two buildings run as operations cockpits, every number from an engine.</small></h3>
@@ -666,7 +671,7 @@
 <script src="js/rz-diagram-layout.js?v=20261016-a82d8709" defer></script>
 <script src="js/rz-diagram.js?v=20261016-578db8a8" defer></script>
 <script src="js/rz-hub-icons.js?v=20261016-6dd78a27" defer></script>
-<script src="js/rz-hub-product.js?v=20261016-68d8c6c6" defer></script>
+<script src="js/rz-hub-product.js?v=20261017-38a9420a" defer></script>
 <script src="js/rz-hub-illus.js?v=20261016-75b191f5" defer></script>
 <script src="js/rz-hub-3d.js?v=20261016-b5c49bde" defer></script>
 </body>
