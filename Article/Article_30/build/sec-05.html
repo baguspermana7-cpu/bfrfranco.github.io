@@ -1,0 +1,64 @@
+<h2 id="record">Does it work? The measured record</h2>
+
+<p>Agents are scored on tasks with a clear pass or fail, mostly in software, and the scores are high and rising. The same data also show that the success rate falls sharply as the required reliability goes up, and that several famous benchmarks have lost credibility as they were tuned against. The honest reading is that capability has grown quickly and reliability has grown more slowly, and that the second one is the constraint for anyone who has to run these systems. This section goes through the numbers in the order a sceptical engineer would ask for them.</p>
+
+<h3 id="record-coding">5.1 Coding benchmarks and their decay</h3>
+
+<p><a href="glossary.html#term-swe-bench">SWE-bench</a> Verified asks an agent to resolve real GitHub issues in open-source projects, judged by the project&rsquo;s tests. The official leaderboard data, read on 2026-10-16, put the top entry at 79.2% (two systems, each using Claude 4.5 Opus), followed by 78.8% and 77.4%; the Verified board has no entries after December 2025 <a href="#src-22">[S22]</a>. In February 2026 OpenAI announced that it no longer evaluates on Verified, citing flawed tests and contamination, and recommended SWE-bench Pro <a href="#src-23">[S23]</a>. The specific percentages attached to that decision (that at least 59.4% of an audited 27.6% subset had tests rejecting correct fixes, and that scores fall from about 70% to about 23% on Pro) reached me through a news report and search snippets because OpenAI&rsquo;s page was not readable. Treat them as reported, unverified <a href="#src-24">[S24]</a>.</p>
+
+<p>The defensible reading is narrow. A score near 80% on a retired benchmark is not &ldquo;agents fix 80% of real issues&rdquo;. It is evidence that agents with good harnesses pass most of a set of tests that are partly flawed and may have leaked into training data.</p>
+
+<p>Terminal-Bench 2.0 uses 89 tasks in containers, each with a human-written oracle solution. Top entries on the mirrored leaderboard are 84.7% (&plusmn;2.1), 84.5% (&plusmn;2.6), 83.1% and 82.2% <a href="#src-25">[S25]</a>. The useful finding is not the top score. The same underlying model scores differently under different harnesses, which is direct evidence that the &ldquo;plumbing&rdquo; the video dismisses changes outcomes <a href="#src-25">[S25]</a>.</p>
+
+<h3 id="record-horizons">5.2 Time horizons</h3>
+
+<p><a href="glossary.html#term-metr">METR</a> measures how long a task, in human working time, an AI system can complete at a given success rate. The <a href="glossary.html#term-time-horizon">time horizon</a> at 50% is the task length the system completes half the time; at 80% it is the length completed four times in five. The table gives the latest points on METR&rsquo;s page, last updated 2026-09-08 <a href="#src-27">[S27]</a>.</p>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>METR time horizons, 50% and 80% success. Source: <a href="#src-27">[S27]</a>. The ratio column is derived: 50% horizon divided by 80% horizon.</caption>
+<thead><tr><th>Model (release)</th><th>50% horizon</th><th>95% CI</th><th>80% horizon</th><th>Ratio</th></tr></thead>
+<tbody>
+<tr><td>GPT-5 (2025-08)</td><td class="n">203 min</td><td class="n">113&ndash;406</td><td class="n">38 min</td><td class="n">5.3&times;</td></tr>
+<tr><td>Claude Opus 4.5 (2025-11)</td><td class="n">293 min</td><td class="n">162&ndash;624</td><td class="n">49 min</td><td class="n">6.0&times;</td></tr>
+<tr><td>GPT-5.2 (2025-12)</td><td class="n">352 min</td><td class="n">198&ndash;815</td><td class="n">66 min</td><td class="n">5.3&times;</td></tr>
+<tr><td>Claude Opus 4.6 (2026-02)</td><td class="n">719 min (12.0&nbsp;h)</td><td class="n">317&ndash;3,634</td><td class="n">70 min</td><td class="n">10.3&times;</td></tr>
+<tr><td>Claude Mythos Preview, early (2026-04)</td><td class="n">1,045 min (17.4&nbsp;h)</td><td class="n">509&ndash;3,304</td><td class="n">186 min (3.1&nbsp;h)</td><td class="n">5.6&times;</td></tr>
+</tbody></table></div>
+
+<p>Derived ratios: 203/38 = 5.3; 293/49 = 6.0; 352/66 = 5.3; 719/70 = 10.3; 1,045/186 = 5.6. METR&rsquo;s fitted doubling time since 2023 is about 131 days in its blog post and 128.7 days in its data file <a href="#src-26">[S26]</a> <a href="#src-27">[S27]</a>. From the data-file value the growth is <code>2^(365/128.7) = 7.1</code> times per year (derived). METR also warns that &ldquo;Measurements above 16 hrs are unreliable with our current task suite&rdquo;, and stresses that the tasks are low-context, like work given to a new hire, and mostly software, machine learning and cyber-security <a href="#src-27">[S27]</a>.</p>
+
+<figure class="rz-chart" data-rz-chart>
+<div class="rz-chart-canvas"><canvas></canvas></div>
+<script type="application/json" class="rz-chart-cfg">
+{"type": "bar", "title": "METR time horizon: 50% versus 80% success", "labels": ["GPT-5", "Opus 4.5", "GPT-5.2", "Opus 4.6", "Mythos Preview (early)"], "series": [{"label": "50% horizon", "data": [203, 293, 352, 719, 1045], "unit": "min"}, {"label": "80% horizon", "data": [38, 49, 66, 70, 186], "unit": "min"}], "x": "Model", "yLabel": "Task length (human minutes)", "source": "METR task-completion time horizons, benchmark_results_1_1, page last updated 2026-09-08 (article sources S27)", "basisTag": "published"}
+</script>
+</figure>
+
+<p>The gap between the two bars for each model is the reliability problem in one picture. A system that handles a 17-hour task half the time handles a 3-hour task four times in five. For planning, the 80% figure is the one that resembles an operating commitment.</p>
+
+<h3 id="record-developers">5.3 Developers: the 19% slowdown and its withdrawal</h3>
+
+<p>The most quoted productivity result is METR&rsquo;s randomised trial from early 2025, in which experienced open-source developers took 19% longer with AI tools (confidence interval +2% to +39%) while believing they were faster <a href="#src-28">[S28]</a> <a href="#src-29">[S29]</a>. A follow-up published 2026-02-24 estimates the change in time at &minus;18% for returning developers (CI &minus;38% to +9%) and &minus;4% for new ones (CI &minus;15% to +9%). METR calls the data &ldquo;an unreliable signal&rdquo; because developers declined to work without AI, pay fell from $150 to $50 per hour, and time tracking was unreliable. It now believes late-2025 tools &ldquo;likely&rdquo; sped developers up, but the size is unknown <a href="#src-29">[S29]</a>. Neither result is statistically established. Both refute confident claims in either direction. A statement that AI &ldquo;slows developers by 19%&rdquo; is therefore not a current fact, and neither is its opposite.</p>
+
+<p>On E11 (cannot be used for serious coding; will not replace coders) the evidence is mixed: a 2025 slowdown <a href="#src-28">[S28]</a>, weak evidence of speedup in 2026 <a href="#src-29">[S29]</a>, and high scores on agent coding benchmarks with the contamination caveats above <a href="#src-22">[S22]</a> <a href="#src-23">[S23]</a> <a href="#src-25">[S25]</a>. &ldquo;Cannot be used&rdquo; is too strong for the record. &ldquo;Will not replace&rdquo; is a prediction, graded as such: <strong>partly supported</strong>.</p>
+
+<h3 id="record-compounding">5.4 Compounding error</h3>
+
+<p>Why does a 50-versus-80 gap exist at all? A multi-step task succeeds only if every step does. If each step succeeds with probability <code>p</code> and the steps are independent, a run of <code>n</code> steps succeeds with <code>p^n</code>:</p>
+
+<pre class="formula">P(run) = p<sup>n</sup>
+0.95<sup>20</sup> = 0.358        (20 steps at 95% each)
+0.99<sup>100</sup> = 0.366       (100 steps at 99% each)</pre>
+
+<p>Anthropic names <a href="glossary.html#term-compounding-error">compounding errors</a> as a cost of agents <a href="#src-14">[S14]</a>. A deterministic <a href="glossary.html#term-verifier">verifier</a> changes the arithmetic. Suppose a check catches a bad step with probability <code>d</code> and the step is retried up to <code>k</code> times. With <code>p = 0.95</code>, <code>d = 0.9</code> and <code>k = 2</code>, the chance of an undetected-bad step falls and a step succeeds with probability 0.995, so a 20-step run succeeds with <code>0.995^20 = 0.899</code> (derived; the full model is in the calculator below). The extra attempts raise the cost per run from $1.76 to $1.84, about 5% (1.843/1.760 = 1.047), under the calculator&rsquo;s default prices and token counts.</p>
+
+<figure class="rz-figure" data-rz-figure="agentic-d6"></figure>
+
+<div class="agent-calc" data-agent-calc="reliability"></div>
+
+<p>Two caveats apply and the calculator prints them. Independence is optimistic, because real errors correlate. A model-based verifier may share the generator&rsquo;s blind spots. The METR 50-versus-80 gap is the empirical version of this curve <a href="#src-27">[S27]</a>.</p>
+
+<div class="ws-insight-box">
+<h4>Reliability, not capability, is the constraint</h4>
+<p>If a task needs 20 steps and the per-step success is 95%, you have a one-in-three system. The cheapest improvement is a deterministic check at each step, and a bigger model is the expensive one. Ask any vendor for the success rate at your required run length, not for a benchmark peak.</p>
+</div>

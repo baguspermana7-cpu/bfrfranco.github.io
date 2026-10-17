@@ -1,0 +1,83 @@
+<h2 id="stance">The engineering stance</h2>
+
+<p>The useful question for an engineer is not whether the word is fair but where a probabilistic component belongs in a system whose other parts are deterministic. The answer from the evidence is consistent: let the model do what only a model can do (read untidy input, choose among options, draft), and put every consequence behind a check that does not rely on the model. This section gives a decision table for whether to use an agent at all, a reference architecture, a worked example from a real pipeline, and the budgets that keep a run bounded.</p>
+
+<h3 id="stance-decide">9.1 Agent or script?</h3>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>Decision table. Source: dossier synthesis of <a href="#src-14">[S14]</a> <a href="#src-33">[S33]</a>; an engineering judgement and not a standard.</caption>
+<thead><tr><th>Condition</th><th>Prefer</th></tr></thead>
+<tbody>
+<tr><td>Input is structured, the rule fits on a page, it runs often</td><td>Script or workflow engine</td></tr>
+<tr><td>Input is free text, logs, screenshots, varied documents</td><td>An LLM step (classify, extract, draft)</td></tr>
+<tr><td>Output can be checked mechanically (tests, schema, simulation, diff)</td><td>Agent loop with that check as the oracle</td></tr>
+<tr><td>Error is costly and irreversible, the check is weak</td><td>LLM proposes only; a human approves; a deterministic executor acts</td></tr>
+<tr><td>Hard real-time or safety function</td><td>Never the LLM; PLC, SIS or BMS logic</td></tr>
+<tr><td>The task repeats identically after the agent has solved it</td><td>Promote the solution to a script</td></tr>
+</tbody></table></div>
+
+<p>The scorer below turns the table into numbers so that the reasoning is visible. It takes five inputs from 1 to 5: variability of input (<code>V</code>), cost of an error (<code>E</code>), verifiability (<code>Vf</code>), frequency (<code>F</code>) and latency budget (<code>L</code>). Its weights are the author&rsquo;s design choices and are labelled as a judgement aid, not a measurement.</p>
+
+<pre class="formula">N     = (V &minus; 1) / 4
+Risk  = ((E &minus; 1) / 4) &times; (1 &minus; (Vf &minus; 1) / 4)
+Lp    = (5 &minus; L) / 4
+Score = 100 &times; N &times; (1 &minus; Risk) &times; (1 &minus; 0.5 &times; Lp)</pre>
+
+<p>A score below 35 means script or workflow; 35 to 65 means hybrid (the model classifies, extracts or drafts, code validates and executes, a person approves side effects); 65 or above means an agent loop with verifiers. Hard overrides apply afterwards: with <code>E = 5</code> and <code>Vf &le; 2</code> no autonomous action is allowed, in line with the CISA principle on human oversight <a href="#src-33">[S33]</a>; with <code>L = 1</code> the path is real-time and not an LLM; with <code>V &le; 2</code> the answer is a script. Worked check for a BMS alarm-triage summary (4, 4, 3, 5, 3): <code>N = 0.75</code>, <code>Risk = 0.75 &times; 0.5 = 0.375</code>, <code>Lp = 0.5</code>, so <code>Score = 100 &times; 0.75 &times; 0.625 &times; 0.75 = 35.2</code>, a hybrid, just. A chiller setpoint write (3, 5, 2, 4, 2) scores 7.8 and trips the first override.</p>
+
+<div class="agent-calc" data-agent-calc="decide"></div>
+
+<h3 id="stance-architecture">9.2 Reference architecture</h3>
+
+<p>The pattern, from the sources cited so far, has six parts in a line. A probabilistic planner (the LLM) proposes an action. A typed tool interface validates it against a schema and an allow-list. Deterministic executors (scripts, APIs, compilers) carry it out. Verifiers (tests, linters, type checkers, simulators, policy checks) judge the result. A human gate stands in front of irreversible actions. An audit log records everything. Budgets on steps, tokens, time and cost are enforced outside the model. The model never holds credentials directly and never writes to safety-rated systems <a href="#src-14">[S14]</a> <a href="#src-31">[S31]</a> <a href="#src-32">[S32]</a> <a href="#src-33">[S33]</a>. Anthropic describes the value of the verifier in the same terms: the agent should get &ldquo;ground truth from the environment at each step&rdquo; <a href="#src-14">[S14]</a>.</p>
+
+<figure class="rz-figure" data-rz-figure="agentic-d2"></figure>
+
+<p>The seam between the two halves is where the engineering is. The model sees text and produces text; the interface turns that text into a typed call or rejects it with a reason that goes back to the model; the executor and verifier produce facts. The model&rsquo;s own explanations of what it did are kept outside the chain of evidence.</p>
+
+<figure class="rz-figure" data-rz-figure="agentic-d5"></figure>
+
+<h3 id="stance-factory">9.3 A worked example: a software factory</h3>
+
+<p>The author runs a pipeline for software changes that applies these rules. It is a local tool and not a published product, and the facts below were read from its skill file and command-line source on 2026-10-16 <a href="#src-60">[S60]</a>. The roles are an orchestrator on a frontier model; a <code>spec-writer</code>; a <code>builder</code>; four reviewers working in parallel (security, code, UX, UI), where the UX and UI reviewers may answer SKIP only if no user-interface file changed; and an <code>approver</code>. The sub-agents run on a mid-tier model and the approver on a small one <a href="#src-60">[S60]</a>.</p>
+
+<p>Every transition is written by a command-line tool into a state file, <code>factory/board.json</code>. The orchestrator is told never to move a job forward on its own reading of a result, but to run the tool and act on its status line. That is the probabilistic and deterministic split made explicit: language models write and judge, while exit codes decide <a href="#src-60">[S60]</a>.</p>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>Deterministic gates in the factory. Source: <a href="#src-60">[S60]</a>. The last column is what each gate catches by construction.</caption>
+<thead><tr><th>Gate</th><th>Mechanism</th><th>Catches</th><th>Hard?</th></tr></thead>
+<tbody>
+<tr><td>lint, test, build</td><td>Shell exit codes, 900 s timeout</td><td>Style, type, build errors and regressions covered by tests</td><td>Yes</td></tr>
+<tr><td>secrets</td><td>Regex over added lines for key formats and private keys</td><td>Credential leaks</td><td>Yes</td></tr>
+<tr><td>nonempty</td><td>Fails when the diff is empty</td><td>&ldquo;Done&rdquo; claims with no code</td><td>Yes</td></tr>
+<tr><td>protected</td><td>Flags .env, *.pem, *.key, firebase.json, .github/workflows/*</td><td>Edits to deployment, CI and secrets files</td><td>No</td></tr>
+<tr><td>tests_added</td><td>Fails when source changed but no test file did</td><td>Untested code</td><td>No</td></tr>
+</tbody></table></div>
+
+<p>Review verdicts are parsed by the pattern <code>VERDICT: PASS|FAIL|SKIP</code>; a missing or unparseable verdict is a problem, an invalid SKIP is rejected, and if the code changed after gating the verdicts are stale. The fix loop is capped: <code>max_fix_rounds</code> is 3, at most two <code>fix</code> decisions are allowed per job, and overrides are refused while a hard gate fails. Delivery merges with <code>--no-ff</code> in the job&rsquo;s worktree, re-runs lint, test and build on the merge result, and pushes fast-forward only, and only if the repository has opted in with <code>&quot;push&quot;: true</code>. The owner&rsquo;s switches for delivery, push and human review are declared off-limits to the agent <a href="#src-60">[S60]</a>.</p>
+
+<figure class="rz-figure" data-rz-figure="agentic-d4"></figure>
+
+<p>What the pipeline has actually demonstrated is small. One demonstration job (2026-10-16, a <code>readingTime</code> helper) changed two files; lint and test passed, the build was skipped because none is configured, the other four gates passed, the security and code reviews passed, and the UX and UI reviews were skipped as designed <a href="#src-61">[S61]</a>. There are no multi-job statistics, so the per-gate catch rates are unmeasured. The calculator below treats them as numbers you enter, and its presets are labelled assumptions.</p>
+
+<p>What no gate in this pipeline catches: a wrong specification; tests that encode the same misunderstanding as the code; and blind spots shared by reviewer models from the same family as the generator <a href="#src-60">[S60]</a>. The ladder calculator makes the last point numerically. With five independent gates at 0.60, 0.10, 0.15, 0.50 and 0.50 catch rates, the chance a defect escapes is <code>0.4 &times; 0.9 &times; 0.85 &times; 0.5 &times; 0.5 = 0.0765</code>, a coverage of 92.35%. If the LLM review (0.50) shares the generator&rsquo;s family and its effective catch rate is halved to 0.25, the escape chance becomes <code>0.4 &times; 0.9 &times; 0.85 &times; 0.75 &times; 0.5 = 0.11475</code>, a coverage of 88.5%. These values are what-ifs. The structural lesson holds whatever the values: a defect must pass every rung, so add rungs that fail for different reasons.</p>
+
+<div class="agent-calc" data-agent-calc="ladder"></div>
+
+<h3 id="stance-budget">9.4 Budgets</h3>
+
+<p>Three limits bind an agent run: money, wall-clock time and the context window. Because history is re-read each step, cost grows with the square of the step count. With <code>c0</code> the starting context, <code>g</code> the tokens added per step and <code>S</code> the number of steps:</p>
+
+<pre class="formula">input tokens to step S = S &times; c0 + g &times; S(S &minus; 1) / 2
+Cost(S) = price_in &times; [S &times; c0 + g &times; S(S &minus; 1)/2] / 10<sup>6</sup> + price_out &times; S &times; o / 10<sup>6</sup>
+t_step  = TTFT + o &times; TPOT + t_tool
+max_steps = min(S_cost, S_time, S_context)</pre>
+
+<p>With defaults of 20,000 starting tokens, 3,000 tokens added per step, 800 output tokens per step, a $5 cap, a 600 s wall clock and 5 s per tool call, at $2 and $10 per million tokens: <code>Cost(10) = $0.75</code>, <code>Cost(20) = $2.10</code>, <code>Cost(30) = $4.05</code>, <code>Cost(40) = $6.60</code>. The cost cap allows 34 steps. One step takes <code>0.5 + 800 &times; 0.02 + 5 = 21.5 s</code> (the latency constants are assumptions from <a href="article-29.html#agents">Article&nbsp;29</a>), so the wall clock allows <code>floor(600 / 21.5) = 27</code> steps. The context limit, compaction at 80% of a 200,000-token window, allows <code>floor((160,000 &minus; 20,000) / 3,000) + 1 = 47</code>. The binding limit is the wall clock, at 27 steps, and a per-step timeout near 65 s (three times the step time) is suggested. Caching changes the slope of the cost curve, not its shape.</p>
+
+<div class="agent-calc" data-agent-calc="budget"></div>
+
+<div class="ws-insight-box">
+<h4>Rules to carry out of this section</h4>
+<p>Use the simplest system that works. Put validation, execution, verification and limits in code. Give every irreversible action a human gate. Add verifiers that fail for different reasons. When an agent&rsquo;s path for a class of task becomes stable, replace it with a script. The last rule is what turns an expensive exploration into a cheap, testable routine.</p>
+</div>

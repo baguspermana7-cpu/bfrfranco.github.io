@@ -1,0 +1,58 @@
+<h2 id="agent">What an agent actually is</h2>
+
+<p>An agent is a loop. A program shows a language model the goal and the history so far, the model proposes the next action, ordinary code checks and executes it, the result goes back into the history, and the cycle repeats until a stop condition is reached. In that loop the model does the one thing a conventional program cannot do cheaply, which is to turn untidy input (free text, logs, a screenshot, an error message) into a plausible next step without a rule written for that exact case. Everything else is conventional software. This section describes the division of labour, re-examines the restaurant demo from the video, and places the idea in its history.</p>
+
+<h3 id="agent-labour">4.1 Division of labour in one step</h3>
+
+<p>The table lists what happens in a single iteration of the loop, who does it, and whether the step is deterministic.</p>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>One agent step, by actor. Source: dossier synthesis of <a href="#src-14">[S14]</a> <a href="#src-15">[S15]</a> <a href="#src-16">[S16]</a>; the split is an engineering description, not a vendor specification.</caption>
+<thead><tr><th>Step</th><th>Who</th><th>Deterministic?</th></tr></thead>
+<tbody>
+<tr><td>Parse unstructured intent (&ldquo;table for two near the office, not too loud, after 7&rdquo;) into a goal</td><td>LLM</td><td>No</td></tr>
+<tr><td>Choose a tool among N and fill typed arguments</td><td>LLM</td><td>No, but schema-validated</td></tr>
+<tr><td>Validate arguments against a JSON schema or policy</td><td>Harness code</td><td>Yes</td></tr>
+<tr><td>Execute: HTTP call, SQL, shell, git, browser click</td><td>Ordinary code</td><td>Yes (the world may not be)</td></tr>
+<tr><td>Observe the result, compare with the goal, decide the next action or stop</td><td>LLM</td><td>No</td></tr>
+<tr><td>Enforce budgets, permissions, approvals, logging</td><td>Harness code</td><td>Yes</td></tr>
+</tbody></table></div>
+
+<p>Anthropic&rsquo;s own definition says the same in one sentence: agents &ldquo;are typically just LLMs using tools based on environmental feedback in a loop&rdquo; <a href="#src-14">[S14]</a>. The disagreement with the video is therefore not about the mechanism. It is about whether the three non-deterministic rows are worth anything. An analogy from the plant room helps: in a PLC panel the I/O cards do all the physical switching, and nobody concludes that the control logic &ldquo;did nothing&rdquo;. The logic decides which output to drive and when. In an agent the model fills that role for inputs that no one wrote rules for. Whether it fills the role well enough is a reliability question, taken up in section 5.</p>
+
+<h3 id="agent-demo">4.2 The restaurant demo, re-examined</h3>
+
+<p>Elder&rsquo;s example of &ldquo;the LLM did nothing&rdquo; is OpenAI&rsquo;s restaurant-booking demo, which he describes as probably a Python program calling probably the OpenTable API (E5, 03:50&ndash;05:11) <a href="#src-1">[S1]</a>. He hedges with &ldquo;probably&rdquo;, and the hedge was warranted. The demo came from Operator, a research preview announced on 2025-01-23. Operator was &ldquo;powered by a Computer-Using Agent model, or CUA&rdquo;, trained &ldquo;to interact with the front-end of websites, meaning it doesn&rsquo;t need to use developer-facing APIs&rdquo;; the model &ldquo;can use buttons, navigate menus, and fill out forms on a web page much like a human would&rdquo;, and was &ldquo;trained to ask for user confirmation before finalizing tasks with external side effects&rdquo; <a href="#src-58">[S58]</a>. So the booking was not an API script. A vision model read screenshots of a web page and chose clicks (a <a href="glossary.html#term-computer-using-agent">computer-using agent</a>). Whether OpenTable was a named launch partner I could not confirm; the launch coverage lists DoorDash, eBay, Instacart, Priceline, StubHub and Uber, so the partner claim is unverified <a href="#src-58">[S58]</a>.</p>
+
+<p>This matters because the case chosen to show the model contributes nothing is one where the model did the part a script cannot do: perceive an arbitrary page and decide what to do on it. The generic mechanism in his account is correct (section 2). The example does not illustrate it.</p>
+
+<figure class="rz-figure" data-rz-figure="agentic-d1"></figure>
+
+<h3 id="agent-history">4.3 What is old and what is new</h3>
+
+<p>&ldquo;Decades-old automation&rdquo; (E6, E7) is partly right, and the history shows which part.</p>
+
+<ul>
+<li><strong>Agent as a concept.</strong> Russell and Norvig define an agent as &ldquo;anything that can be viewed as perceiving its environment through sensors and acting upon that environment through actuators&rdquo; (quoted from the textbook, not re-read here) <a href="#src-21">[S21]</a>. By that definition a thermostat is an agent. The word never claimed intelligence.</li>
+<li><strong>The loop.</strong> ReAct (2022) interleaves reasoning, an action and an observation, and is the template for most agent loops today <a href="#src-18">[S18]</a> (see also <a href="glossary.html#term-react">ReAct</a>, <a href="glossary.html#term-agent-loop">agent loop</a>). Closed-loop control is far older. The new element is the controller, which accepts natural-language state.</li>
+<li><strong>Tool use and integration.</strong> Toolformer showed in 2023 that a model can learn when to call an API <a href="#src-17">[S17]</a>. The Model Context Protocol standardises how tools are described and called over JSON-RPC 2.0; its specification notes that tools &ldquo;represent arbitrary code execution&rdquo; <a href="#src-19">[S19]</a> (<a href="glossary.html#term-mcp">MCP</a>).</li>
+<li><strong>Decades old:</strong> scheduled scripts, workflow engines, <a href="glossary.html#term-expert-system">expert systems</a> built from hand-written rules, and <a href="glossary.html#term-rpa">RPA</a>, which replays recorded user-interface actions.</li>
+<li><strong>Not available before roughly 2023:</strong> a general component that maps free text, screenshots, logs and error messages to a plausible next action without a rule written for that case. RPA breaks when a button moves. A CUA-style agent may survive the move, and may also click the wrong thing. The trade is flexibility for reliability, and that trade is the real subject of the debate.</li>
+</ul>
+
+<p>On this evidence E7, &ldquo;decades-old automation&rdquo;, is <strong>partly supported</strong>: the executor half is old, the planning half is new. E6, &ldquo;the LLM did nothing&rdquo;, is <strong>unsupported</strong>, since the table in 4.1 lists what the model does, and the harness choice demonstrably changes results, as the Terminal-Bench entries in section 5 show.</p>
+
+<h3 id="agent-spectrum">4.4 The spectrum: workflow versus agent</h3>
+
+<p>Much of the argument over &ldquo;is it really an agent&rdquo; dissolves once autonomy is treated as a scale. Anthropic separates two kinds of system: &ldquo;Workflows are systems where LLMs and tools are orchestrated through predefined code paths. Agents&hellip; are systems where LLMs dynamically direct their own processes and tool usage&rdquo; <a href="#src-14">[S14]</a>. A <a href="glossary.html#term-workflow">workflow</a> in this sense has the model fill in steps inside a fixed skeleton. LangChain, in July 2026, describes six levels: hand-written logic, a single LLM call, a chain, a router, a state machine, and an autonomous agent. It grades them by three questions: who decides the output of each step, who decides which step comes next, and who decides what steps are available <a href="#src-20">[S20]</a>.</p>
+
+<figure class="rz-figure" data-rz-figure="agentic-d3"></figure>
+
+<p>Anthropic&rsquo;s advice to builders points the same way as the critic: look for &ldquo;the simplest solution possible&hellip; This might mean not building agentic systems at all&rdquo;, because agents bring &ldquo;higher costs, and the potential for compounding errors&rdquo;, and extensive testing &ldquo;in sandboxed environments, along with the appropriate guardrails&rdquo; is recommended <a href="#src-14">[S14]</a>. An <a href="glossary.html#term-orchestrator">orchestrator</a> that calls other models is simply another point on the same scale.</p>
+
+<div class="ws-insight-box">
+<h4>What this means for the BMS team</h4>
+<p>Ask of any proposed &ldquo;agent&rdquo; which of the three decisions the model makes: the output, the next step, the set of available steps. If only the first, you are buying a drafting tool inside a workflow, which is easier to test and to bound. Each additional decision handed to the model needs its own deterministic check.</p>
+</div>
+
+<p>Two of the owner&rsquo;s counter-claims are covered here. That the model acts as a semantic router or dynamic planner over unstructured intent (C2) is <strong>supported</strong> <a href="#src-14">[S14]</a> <a href="#src-20">[S20]</a> <a href="#src-58">[S58]</a>. That observe, act and reflect (running tests, reading the error, fixing) is a genuine pattern (C3) is supported as a pattern and only partly as a new one, since ReAct dates from 2022 <a href="#src-18">[S18]</a> and closed-loop control is far older.</p>

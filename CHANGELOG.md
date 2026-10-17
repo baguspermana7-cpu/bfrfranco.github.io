@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v3.24.7 — 2026-10-17 — "Graphite"
+
+### Every article on the register: no navy, no rails, no glow — measured in the browser
+
+**Owner:** *"Aku bilang no ai design slop. Itu banyak sekali ai design slop."* He was right, and the gates had
+passed it. Article 29 in a browser: the reading column sat on styles.css's navy `[data-theme=dark] .article-content`
+(#0f172a), tables on #1e293b, related cards and the author bio on rgba(15,23,42,.8) with a 4 px light-blue rail, a
+cyan floating contents button with a blue glow, and 2 px amber rails on every callout, figure note, calculator note
+and the sources note. Across the 39 editorial pages a new whole-page scan found 53 failures (navy surfaces, rails,
+cyan chrome) and later a cyan glow card on FF-3. The source sweep (v3.23.0) could not see them because they come from
+styles.css descendant rules, page tokens with arbitrary names and bespoke widget classes, together.
+
+**Changed**
+- `css/rz-article-dark.css` "SLOP SWEEP 3": page canvas, `.article-content`, `.article-body`, tables, inputs, related
+  cards, author bio, key-numbers and calculator blocks on graphite tokens; callouts are a panel with ONE hairline
+  (the 2 px accent rail and the 6 % amber wash are gone — UX law 14); the contents button is a neutral square.
+- `js/rz-article-editorial.js` `registerSurfaces()`: on every editorial page and every theme switch, the COMPUTED
+  colour decides — a navy-band surface (hue 200–250°, s ≥ .25, l ≤ .22) goes to the register's bg/panel token, a lone
+  left rail ≥ 2 px is removed, a saturated box-shadow glow is removed; legend dots, bar fills and swatches are data
+  colour and left alone. Marks are cleared and re-measured on each refresh.
+- `tools/test-journal.mjs` J5f: every rendered element of all 39 editorial pages in both themes — no navy surface,
+  no rail, no coloured glow, no saturated non-amber fixed chrome. RED on v3.24.6's stylesheet (6 of 6 sampled
+  page×theme pairs; 53 of 78 once widened to the family), GREEN now: 134/134. Two contrast regressions the change itself caused (white related-card numbers on the new
+  light panel; article-26 chem notes given a light panel inside a dark-in-both-themes block) were caught by axe and
+  fixed before release.
+
 ## v3.24.6 — 2026-10-17 — "Hub"
 
 ### Fixed — the plant's bin strip clipped every label on a phone (`datacenter-solutions.html`, `js/rz-hub-product.js`)

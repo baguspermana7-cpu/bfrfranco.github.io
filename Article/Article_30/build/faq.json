@@ -1,0 +1,26 @@
+[
+ {
+  "q": "What is an AI agent, in engineering terms?",
+  "a": "An agent is a language model running in a loop with tools. The model proposes the next action, ordinary code validates and executes it, and the result goes back into the model's context until a stop condition is met. Anthropic defines agents as typically just LLMs using tools based on environmental feedback in a loop. The model handles untidy input and chooses steps; deterministic code handles execution, permissions, budgets and logging. The model never runs anything itself. Every capability of an agent is a capability of the code that executes its tool calls [S14][S15][S16]."
+ },
+ {
+  "q": "Is agentic AI a fraud, as one popular video claims?",
+  "a": "The video's mechanism description is largely correct: a model predicts one token at a time and cannot act without code that executes its calls [S15][S16]. Its absolutes do not hold. Interpretability work found multi-step computation inside a model [S3][S4], and the restaurant demo it cites used a vision-based browser agent, not an API script [S58]. The securities-fraud remark is hedged by the speaker himself, and no regulator action alleging it was found in a limited search [S1]. The marketing critique has substance: analysts name it agent washing [S39]."
+ },
+ {
+  "q": "Can a language model reason or do maths?",
+  "a": "Partly. Anthropic's attribution-graph study of Claude 3.5 Haiku found two parallel pathways when adding 36 and 59, one for rough magnitude and one for the exact last digit [S3][S4]. The same study found the model's account of carrying the 1 did not match what it did [S3]. Apple's GSM-Symbolic found that adding one clause can cut accuracy by up to 65% [S7]. The practical rule is to treat output as a proposal and check it with something deterministic, such as a test, a schema or a second data source."
+ },
+ {
+  "q": "How reliable are agents on long tasks?",
+  "a": "Reliability falls as the required success rate rises. METR measures task length in human time. Its early Claude Mythos Preview result was a 50% time horizon of 1,045 minutes (about 17.4 hours) but an 80% horizon of only 186 minutes (about 3.1 hours), a ratio of 5.6 [S27]. Independent steps compound: 0.95 per step over 20 steps gives 0.95 to the power 20, or 0.358 (derived). A deterministic verifier with retries can lift that run to about 0.90 for roughly 5% more tokens in the article's model."
+ },
+ {
+  "q": "Is the AI industry out of private money and forced to list?",
+  "a": "The evidence is mixed. An IPO motive exists: Anthropic confidentially submitted a draft S-1 on 2026-06-01 [S49], and OpenAI said an IPO in 2026 would be ill-advised [S52]. But the two largest private rounds on record closed in the same half-year: OpenAI raised $122B at $852B on 2026-03-31 [S51] and Anthropic raised $65B at $965B on 2026-05-28 [S48]. Big-four capex guidance for 2026 sums to roughly $0.70 to $0.74 trillion (derived) [S40][S45]. The video's figure of $3 trillion is unverified."
+ },
+ {
+  "q": "Can an agent be safely connected to a building management system?",
+  "a": "Safely means read-only access plus draft outputs, with a person and the existing control system between a suggestion and a setpoint. CISA, ASD's ACSC and partner agencies advise to limit active control of OT infrastructure by AI without a human in the loop [S33]. The article's ten-point checklist adds a one-way data path through a historian replica, typed and range-checked tools, untrusted-input handling per OWASP [S31][S32], budgets with a kill switch, and keeping safety functions out of scope entirely."
+ }
+]

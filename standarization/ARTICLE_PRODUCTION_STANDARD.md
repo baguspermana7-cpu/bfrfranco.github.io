@@ -149,7 +149,9 @@ Static: `test-<article>-calc.mjs`, `build-explain-db.py --check`, `audit-article
 Browser (one at a time, under `flock /tmp/claude-1000/kereta-browser.lock`): `test-journal.mjs`,
 `audit-dark-coverage.mjs --strict`, `audit-legibility.mjs --strict`, `audit-responsive-layout.mjs --strict`,
 `audit-a11y.mjs --strict`, `audit-interactions.mjs`, `test-flatten-ratchet.mjs --strict`, and the
-article's own screenshots at 390 and 1440 in both themes, looked at, plus one calculator exercised.
+article's own screenshots at 390 and 1440 in both themes, looked at, plus one calculator exercised. Since v3.24.7
+`test-journal.mjs` J5f scans every rendered element of every editorial page for navy surfaces, left rails, coloured
+glows and saturated chrome: a gate that reads only source or chosen selectors passed a page the owner called slop.
 
 ## 9. After the push
 

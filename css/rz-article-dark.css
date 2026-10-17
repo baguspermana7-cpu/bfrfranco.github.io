@@ -794,10 +794,11 @@ html[data-rz-register="editorial"] .pfas-warning-box,
 html[data-rz-register="editorial"] .pfas-danger-box,
 html[data-rz-register="editorial"] .pfas-engineer-note{
   --cl: var(--rz-art-accent, #b45309);
-  background: color-mix(in srgb, var(--cl) 6%, transparent) !important;
-  background-image: none !important;                 /* kill the gradient fill */
-  border: 1px solid color-mix(in srgb, var(--cl) 24%, transparent) !important;
-  border-left: 2px solid var(--cl) !important;       /* thin accent rail (was 3–4px) */
+  /* v3.24.6, owner: "no ai design slop": the tinted wash + accent rail were the last stripe on a card
+     (UX law 14) — a callout is a graphite panel with one hairline, the title alone carries the accent */
+  background: var(--rz-art-panel) !important;
+  background-image: none !important;
+  border: 1px solid var(--rz-art-line) !important;
   border-radius: 4px !important;
   box-shadow: none !important;
   padding: 1.15rem 1.35rem !important;
@@ -877,10 +878,9 @@ html[data-rz-register="editorial"] .article-body > figure img{
 html[data-rz-register="editorial"] .article-body [class*="-box"],
 html[data-rz-register="editorial"] .article-body [class*="-note"]{
   --cl: var(--rz-art-accent, #b45309);
-  background: color-mix(in srgb, var(--cl) 6%, transparent) !important;
+  background: var(--rz-art-panel) !important;
   background-image: none !important;
-  border: 1px solid color-mix(in srgb, var(--cl) 22%, transparent) !important;
-  border-left: 2px solid var(--cl) !important;
+  border: 1px solid var(--rz-art-line) !important;
   border-radius: 4px !important;
   box-shadow: none !important;
 }
@@ -1564,3 +1564,37 @@ html[data-rz-register="editorial"] .llm-calc-block [role="alert"]:not([hidden]){
   html[data-rz-register="editorial"] .llm-calc-block .calc-grid,html[data-rz-register="editorial"] .llm-calc-block .calc-results{grid-template-columns:1fr 1fr}
   html[data-rz-register="editorial"] [data-rz-fact-list] > *{grid-template-columns:7.5rem 1fr!important}
 }
+
+/* SLOP SWEEP 3 (v3.24.6) — owner 2026-10-17: "Aku bilang no ai design slop. Itu banyak sekali".
+   Measured on article 29 in a browser, not in the source: the reading column sat on styles.css's navy
+   `[data-theme=dark] .article-content` (#0f172a), tables on #1e293b, related cards and the author bio on
+   rgba(15,23,42,.8) with a 4px light-blue rail, a cyan floating TOC button with a blue glow, and 2px amber
+   rails on callouts, figure notes, calculator notes and the sources note. All of it now sits on the
+   register: graphite surfaces, one hairline, one accent used for text only. */
+html[data-rz-register="editorial"] :is(body, main, .article-content, .article-content > .container){background:var(--rz-art-bg)!important;background-image:none!important}
+html[data-rz-register="editorial"] .article-body :is(table, .ws-table){background:transparent!important}
+html[data-rz-register="editorial"] .article-body :is(table, .ws-table) th{background:var(--rz-art-panel)!important;color:var(--rz-art-strong)!important}
+html[data-rz-register="editorial"] .article-body :is(table, .ws-table) :is(td, th){border-color:var(--rz-art-line)!important}
+html[data-rz-register="editorial"] .article-body :is(table, .ws-table) a{color:var(--rz-art-accent)!important}
+html[data-rz-register="editorial"] :is(.author-bio, .related-card, .related-card-number, .related-card-content, .key-numbers, .llm-calc-block){background:var(--rz-art-panel)!important;background-image:none!important;border:1px solid var(--rz-art-line)!important;box-shadow:none!important}
+html[data-rz-register="editorial"] :is(.related-card-number, .related-card-content){border:0!important;background:transparent!important}
+html[data-rz-register="editorial"] :is(.rz-figcaption-note, .llm-calc-notes, .src-note, .calc-basis){border-left:0!important;padding-left:0!important}
+html[data-rz-register="editorial"] .toc-mobile-toggle{background:var(--rz-art-panel)!important;color:var(--rz-art-strong)!important;border:1px solid var(--rz-art-line)!important;box-shadow:none!important;border-radius:4px!important}
+html[data-rz-register="editorial"] .toc-mobile-toggle:hover{transform:none!important;border-color:var(--rz-art-muted)!important}
+/* sweep 3, part 2: styles.css paints `[data-theme=dark] .article-body` #0f172a, its tables #1e293b/#0f172a,
+   every `[class*=-box|card-|box-]` rgba(15,23,42,.8) and form controls #1e293b — re-registered here */
+html[data-rz-register="editorial"][data-theme="dark"] .article-body{background:transparent!important}
+html[data-rz-register="editorial"][data-theme="dark"] .article-body :is([class*="-box"],[class*="card-"],[class*="box-"],[class*="-card"],[class*="-stat"],[class*="-grid"]){background-color:var(--rz-art-panel)!important;background-image:none!important}
+html[data-rz-register="editorial"][data-theme="dark"] .article-body :is([class*="-grid"],[class*="card-"],[class*="box-"]):not([class*="-box"]):not([class*="-card"]){background-color:transparent!important}
+html[data-rz-register="editorial"] .article-body :is(td, tr){background-color:transparent!important}
+html[data-rz-register="editorial"] .article-body :is(input, select, textarea){background-color:var(--rz-art-bg)!important;color:var(--rz-art-strong)!important;border-color:var(--rz-art-line)!important}
+/* the last rails: a card is a panel with ONE hairline (UX law 14); status may colour the title, never a stripe */
+html[data-rz-register="editorial"] .article-body :is([class*="-card"],[class*="-block"],[class*="-narrative"],[class*="-panel"],[class*="-item"]){border-left-width:1px!important;border-left-color:var(--rz-art-line)!important}
+/* marks set by js/rz-article-editorial.js registerSurfaces() from the COMPUTED colour (v3.24.7) */
+html[data-rz-register="editorial"] [data-rz-surface="panel"]{background-color:var(--rz-art-panel)!important;background-image:none!important}
+html[data-rz-register="editorial"] [data-rz-surface="bg"]{background-color:var(--rz-art-bg)!important;background-image:none!important}
+html[data-rz-register="editorial"] [data-rz-rail-off]{border-left-width:0!important;border-left-color:transparent!important}
+/* a callout INSIDE a panel that is dark in both themes keeps the dark surface (the -note/-box rule above
+   gave article-26's chem notes a light panel under light text in light theme, 1.33:1 under axe) */
+html[data-rz-register="editorial"] .article-body [data-rz-dark-panel] :is([class*="-box"],[class*="-note"]){background:transparent!important;border-color:rgba(255,255,255,.14)!important}
+html[data-rz-register="editorial"] .related-card-number{color:var(--rz-art-muted)!important;font-family:var(--rz-art-mono)}

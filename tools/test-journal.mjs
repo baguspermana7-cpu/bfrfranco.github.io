@@ -183,6 +183,39 @@ if (!STATIC) {
       ok('J5e', calc.n === 5 && calc.bad.length === 0 && calc.italic === 'normal', `article-29 calculators at 390: ${JSON.stringify(calc)}`);
       await page.close();
     }
+    /* J5f (v3.24.6): every rendered element of an article, in both themes — not a chosen selector list.
+       The first J5b scanned a handful of selectors on the hub and passed while article 29 sat on a navy
+       .article-content from styles.css, with navy tables and related cards, a cyan TOC button and 2px
+       amber rails on its callouts. */
+    for (const art of FAMILY.filter((f) => /^(article-\d+|FF-\d+|geopolitics-\d+)\.html$/.test(f))) for (const theme of ['dark', 'light']) {
+      const page = await browser.newPage();
+      await page.setViewport({ width: 1440, height: 1000 });
+      await page.goto(base + art, { waitUntil: 'networkidle2' });
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+      await new Promise((r) => setTimeout(r, 600));
+      const found = await page.evaluate(() => {
+        const hsl = (r, g, b) => { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; if (mx === mn) return [0, 0, l]; const d = mx - mn, s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn); let h = mx === r ? ((g - b) / d + (g < b ? 6 : 0)) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return [h * 60, s, l]; };
+        const out = { navy: [], rails: [], fixed: [] };
+        const scope = document.querySelectorAll('body, main, .article-content, .article-content *, .toc-mobile-toggle');
+        for (const e of scope) {
+          if (e.closest('svg, canvas, figure.rz-figure, figure.rz-chart, img')) continue;
+          const cs = getComputedStyle(e), r = e.getBoundingClientRect();
+          if (!r.width || !r.height || cs.visibility === 'hidden' || cs.display === 'none') continue;
+          /* data colour (legend dots, bar fills, swatches) is content, not a surface — same rule as the runtime */
+          if (r.width <= 24 || r.height <= 12 || /(^|[\s_-])(dot|bar|fill|swatch|legend|marker)([\s_-]|$)/i.test(String(e.className))) continue;
+          const m = cs.backgroundColor.match(/rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?/);
+          if (m && (m[4] === undefined || +m[4] > 0.3)) { const [h, s, l] = hsl(+m[1], +m[2], +m[3]); if (h >= 200 && h <= 250 && s >= .25 && l <= .22) out.navy.push((e.className || e.tagName).toString().slice(0, 30)); }
+          if (cs.boxShadow !== 'none') { const g = cs.boxShadow.match(/rgba?\((\d+), (\d+), (\d+)/); if (g && Math.max(+g[1], +g[2], +g[3]) - Math.min(+g[1], +g[2], +g[3]) > 40) out.rails.push('glow:' + (e.className || e.tagName).toString().slice(0, 26)); }
+          const bl = parseFloat(cs.borderLeftWidth), bt = parseFloat(cs.borderTopWidth);
+          if (bl >= 2 && bl > bt && !e.matches('blockquote, th, td')) out.rails.push((e.className || e.tagName).toString().slice(0, 30));
+          if (cs.position === 'fixed' && m) { const [h, s] = hsl(+m[1], +m[2], +m[3]); if (s > .5 && !(h >= 25 && h <= 45)) out.fixed.push((e.className || e.id).toString().slice(0, 30) + ' ' + cs.backgroundColor); }
+        }
+        for (const k of Object.keys(out)) out[k] = [...new Set(out[k])].slice(0, 5);
+        return out;
+      });
+      ok(`J5f:${art}:${theme}`, !found.navy.length && !found.rails.length && !found.fixed.length, JSON.stringify(found));
+      await page.close();
+    }
     /* J5d: a fact list renders as rows */
     const fl = FAMILY.find((f) => /data-rz-fact-list/.test(read(f)));
     if (fl) {

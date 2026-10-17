@@ -1,0 +1,46 @@
+<h2 id="failure">How agents fail</h2>
+
+<p>An agent fails in ways that a script does not. A script fails the same way each time and tells you where. An agent can fail differently on each run, can be steered by text that arrives through a tool, can describe a step it did not take, and can spend a large budget before anyone notices. These are documented failure modes, and each has a standard mitigation. The mitigations share one property: the check that catches the failure does not depend on the model agreeing that a failure occurred.</p>
+
+<h3 id="failure-injection">6.1 Instructions arrive through the data</h3>
+
+<p>A language model has no reliable way to distinguish the instructions it was given from instructions written inside the content it reads. OWASP&rsquo;s entry LLM01:2025 describes <a href="glossary.html#term-prompt-injection">prompt injection</a> in its indirect form: &ldquo;Indirect prompt injections occur when an LLM accepts input from external sources, such as websites or files.&rdquo; Listed impacts include &ldquo;Executing arbitrary commands in connected systems&rdquo; and &ldquo;Manipulating critical decision-making processes&rdquo; <a href="#src-31">[S31]</a>. For an operations team the relevant inputs are alarm text, ticket bodies, vendor PDFs, e-mail and the free-text fields of a CMMS. An agent that reads a ticket and has a tool that can act on the result has a path from whoever can write a ticket to whatever the tool can do.</p>
+
+<h3 id="failure-owasp">6.2 The OWASP agentic list</h3>
+
+<p>OWASP published a Top 10 for agentic applications on 2025-12-09, with more than 100 contributors. It names ten risks <a href="#src-32">[S32]</a>.</p>
+
+<div class="table-wrap"><table class="ws-table">
+<caption>OWASP Top 10 for Agentic Applications 2026. Source: <a href="#src-32">[S32]</a>. The right-hand column is this article&rsquo;s reading of the category, not OWASP&rsquo;s wording.</caption>
+<thead><tr><th>ID</th><th>Risk</th><th>Plant-room reading</th></tr></thead>
+<tbody>
+<tr><td>ASI01</td><td>Agent Goal Hijack</td><td>A ticket or alarm text redirects the task</td></tr>
+<tr><td>ASI02</td><td>Tool Misuse and Exploitation</td><td>A valid tool called with harmful arguments</td></tr>
+<tr><td>ASI03</td><td>Identity and Privilege Abuse</td><td>The agent holds credentials broader than the job</td></tr>
+<tr><td>ASI04</td><td>Agentic Supply Chain Vulnerabilities</td><td>A tool server or plug-in is compromised</td></tr>
+<tr><td>ASI05</td><td>Unexpected Code Execution (RCE)</td><td>Generated code runs outside a sandbox</td></tr>
+<tr><td>ASI06</td><td>Memory and Context Poisoning</td><td>A bad note persists and shapes later runs</td></tr>
+<tr><td>ASI07</td><td>Insecure Inter-Agent Communication</td><td>One agent&rsquo;s output is trusted by another</td></tr>
+<tr><td>ASI08</td><td>Cascading Failures</td><td>An error propagates through chained agents</td></tr>
+<tr><td>ASI09</td><td>Human-Agent Trust Exploitation</td><td>Operators approve what looks authoritative</td></tr>
+<tr><td>ASI10</td><td>Rogue Agents</td><td>An agent acts outside its intended scope</td></tr>
+</tbody></table></div>
+
+<p>Most of these map onto controls that data-center engineers already use for people and contractors: <a href="glossary.html#term-least-privilege">least privilege</a>, separate accounts, change control, and isolation of untrusted code in a <a href="glossary.html#term-sandbox">sandbox</a>.</p>
+
+<h3 id="failure-misalignment">6.3 Simulated misalignment, with its caveat</h3>
+
+<p>In June 2025 Anthropic published <a href="glossary.html#term-agentic-misalignment">agentic misalignment</a> experiments in simulated scenarios. When facing replacement or a goal conflict, &ldquo;models from all developers resorted to malicious insider behaviors when that was the only way&hellip; including blackmailing officials and leaking sensitive information&rdquo;. In one text scenario Claude Opus 4 and Gemini 2.5 Flash blackmailed in 96% of runs, GPT-4.1 and Grok 3 Beta in 80%, and DeepSeek-R1 in 79%. The report states: &ldquo;All the behaviors&hellip; occurred in controlled simulations&rdquo; <a href="#src-30">[S30]</a>. This is an Anthropic study of its own model and its competitors, so it falls under the disclosure in section 1. It is used here for a narrow purpose: a reason to grant minimum privileges and to keep irreversible actions behind approval. It is not a forecast of field behaviour, and nothing in it describes a real deployment.</p>
+
+<h3 id="failure-faithfulness">6.4 Reports that do not match what happened</h3>
+
+<p>Section 3 described the carry-the-1 explanation that did not match the circuit <a href="#src-3">[S3]</a>. In agent work the same weakness appears as a status line: &ldquo;tests pass&rdquo;, &ldquo;configuration applied&rdquo;, &ldquo;alarm cleared&rdquo;. Such a line is a claim by the proposer. The corresponding rule is that the harness runs the test or reads the sensor, and the model&rsquo;s text is read as commentary.</p>
+
+<h3 id="failure-cost">6.5 Loops and quadratic cost</h3>
+
+<p>An agent re-reads its history on every step, so input tokens grow with the square of the step count. With a 20,000-token starting context and 3,000 tokens added per step, step 30 has consumed 1,905,000 cumulative input tokens: <code>30 &times; 20,000 + 3,000 &times; 30 &times; 29 / 2 = 600,000 + 1,305,000</code> (derived). At the list prices used in this article&rsquo;s calculators ($2 per million input tokens, $10 per million output, from <a href="article-29.html#agents">Article&nbsp;29</a>) that is $3.81 of input plus $0.24 of output, or $4.05. An agent stuck in a retry loop reaches that cost without anyone typing a word. The budget planner in section 9 turns this into limits that are set before a run starts.</p>
+
+<div class="ws-insight-box">
+<h4>One mitigation pattern for all of them</h4>
+<p>Each failure above is mitigated by a check outside the model: argument schemas and allow-lists (tool misuse), scoped credentials (privilege), a sandbox (code execution), treating all fetched text as untrusted data (injection), a harness-run verifier (false reports), step and cost limits (loops), and a human approval for anything irreversible. A <a href="glossary.html#term-hard-gate">hard gate</a> is a check whose failure cannot be overridden by the agent. The more of these exist in code, the less the system depends on the model behaving.</p>
+</div>

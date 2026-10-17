@@ -198,6 +198,58 @@
     });
   }
 
+  /* registerSurfaces (v3.24.7) — owner 2026-10-17: "Aku bilang no ai design slop. Itu banyak sekali".
+     The journal pages inherit navy from three places a source sweep cannot see together: styles.css
+     descendant rules (`[data-theme=dark] .article-body …`), page tokens with arbitrary names, and
+     bespoke classes. So the COMPUTED colour decides: an element whose background falls in the navy band
+     (hue 200–250°, s ≥ .25, l ≤ .22, alpha > .3) is put on the register's surface tokens, and a lone
+     coloured left rail (≥ 2px, wider than its top border) becomes no rail. Marks are attributes the
+     stylesheet resolves through theme variables, and every refresh clears them first, so a theme switch
+     re-measures. tools/test-journal.mjs J5f measures the rendered result on every editorial page. */
+  function registerSurfaces(){
+    var scope=document.querySelector('.article-content')||document.querySelector('main');
+    if(!scope) return;
+    [].forEach.call(document.querySelectorAll('[data-rz-surface],[data-rz-rail-off],[data-rz-glow-off]'),function(el){
+      if(el.hasAttribute('data-rz-surface')){ el.style.removeProperty('background-color'); el.style.removeProperty('background-image'); }
+      if(el.hasAttribute('data-rz-glow-off')) el.style.removeProperty('box-shadow');
+      el.removeAttribute('data-rz-surface'); el.removeAttribute('data-rz-rail-off'); el.removeAttribute('data-rz-glow-off');
+    });
+    var skip='svg,canvas,img,figure.rz-figure,figure.rz-chart,[data-rz-chart],[data-rz-diagram],[data-rz-instrument],.rz-scrolly-stage';
+    var list=[scope].concat([].slice.call(scope.querySelectorAll('*')));
+    var marks=[];
+    list.forEach(function(el){
+      if(el.closest && el.closest(skip)) return;
+      var cs=getComputedStyle(el), box=el.getBoundingClientRect();
+      /* a legend dot, a bar fill or a swatch is DATA colour, not a surface: leave it */
+      if(box.width<=24 || box.height<=12 || /(^|[\s_-])(dot|bar|fill|swatch|legend|marker)([\s_-]|$)/i.test(String(el.className))) return;
+      var m=/rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?/.exec(cs.backgroundColor);
+      if(m && (m[4]===undefined || +m[4]>0.3)){
+        var r=+m[1]/255,g=+m[2]/255,b=+m[3]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2;
+        if(mx!==mn){
+          var d=mx-mn,s=l>0.5?d/(2-mx-mn):d/(mx+mn);
+          var h=mx===r?((g-b)/d+(g<b?6:0)):mx===g?(b-r)/d+2:(r-g)/d+4; h*=60;
+          if(h>=200 && h<=250 && s>=0.25 && l<=0.22) marks.push([el,'data-rz-surface',l<=0.12?'bg':'panel']);
+        }
+      }
+      /* a coloured glow (box-shadow with a saturated colour) is decoration, not depth */
+      if(cs.boxShadow && cs.boxShadow!=='none'){
+        var sh=/rgba?\((\d+), (\d+), (\d+)/.exec(cs.boxShadow);
+        if(sh && (Math.max(+sh[1],+sh[2],+sh[3])-Math.min(+sh[1],+sh[2],+sh[3]))>40) marks.push([el,'data-rz-glow-off','']);
+      }
+      var bl=parseFloat(cs.borderLeftWidth)||0, bt=parseFloat(cs.borderTopWidth)||0;
+      if(bl>=2 && bl>bt && !/^(BLOCKQUOTE|TH|TD)$/.test(el.tagName)) marks.push([el,'data-rz-rail-off','']);
+    });
+    marks.forEach(function(k){
+      k[0].setAttribute(k[1],k[2]);
+      /* inline !important: form controls and bespoke widgets carry their own !important dark rules */
+      if(k[1]==='data-rz-glow-off') k[0].style.setProperty('box-shadow','none','important');
+      if(k[1]==='data-rz-surface'){
+        k[0].style.setProperty('background-color',k[2]==='bg'?'var(--rz-art-bg)':'var(--rz-art-panel)','important');
+        k[0].style.setProperty('background-image','none','important');
+      }
+    });
+  }
+
   function readingContext(element,body){
     var excluded='nav,aside,header,footer,figure,figcaption,table,button,code,pre,svg,canvas,[data-rz-chart],[data-rz-diagram],[data-rz-instrument]';
     for(var parent=element;parent && parent!==body;parent=parent.parentElement){
@@ -261,6 +313,7 @@
       root.setAttribute('data-rz-sampling','');
       try{
         flattenWashes();
+        registerSurfaces();
         normalizeReadingText();
         getComputedStyle(root).opacity;
       }catch(error){ console.warn('Editorial surface refresh failed',error); }
