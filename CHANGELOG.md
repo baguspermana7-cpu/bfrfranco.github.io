@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v3.24.8 — 2026-10-17 — "Hub"
+
+### Fixed — the last template widgets on the hub (`datacenter-solutions.html`)
+- A whole-page computed scan of the hub (every rendered element, both themes: navy surfaces,
+  gradients, shadows, radius >= 8 px, backdrop blur, neon-green text) found the hub's own content
+  clean and three shared widgets that were not: the cookie banner (navy in dark mode, 12 px blur,
+  shadow, 8 px buttons, a blue Accept), the user dropdown (navy) and the mint login pill. Under the
+  hub register (`body.pp`) they now take the graphite surfaces, one amber action, hairline borders,
+  4 px radius, no blur and no shadow. Scoped to this page: the shared `rz-cookie-consent.js` and
+  `auth.js` are untouched, so no other page changes. Re-scan: zero findings in both themes; the one
+  remaining gradient is the 3D stage's neutral backdrop.
+
 ## v3.24.7 — 2026-10-17 — "Graphite"
 
 ### Every article on the register: no navy, no rails, no glow — measured in the browser
