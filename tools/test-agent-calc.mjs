@@ -247,6 +247,23 @@ Object.keys(formulas).forEach((name) => {
   Object.keys(res.out).forEach((k) => ok(`OUT ${name}.${k} carries value/unit/formula/inputs`, 'value' in res.out[k] && 'unit' in res.out[k] && res.out[k].formula && typeof res.out[k].inputs === 'object'));
 });
 
+// ---- FMT: what a reader sees (v3.24.15 — "9.113e-5", "0.08800" and "1.843 (USD)" were on the page)
+{
+  const F = (value, unit) => A.fmt({ value, unit });
+  const cases = [[1.843, 'USD', '$1.84'], [0.088, 'USD', '$0.088'], [2.0499, 'USD', '$2.05'], [0.004213, 'USD', '$0.0042'],
+    [12345.6, 'USD', '$12,346'], [0, 'USD', '$0'], [-3.5, 'USD', '\u2212$3.50'], [9.113e-5, 'probability', '9.11 \u00D7 10\u207B\u2075'],
+    [3.15e24, 'FLOP', '3.15 \u00D7 10\u00B2\u2074'], [0.9947, 'probability', '0.9947'], [0.088, 'x', '0.088'], [1, 'x', '1'],
+    [123.4, 'x', '123.4'], [42.5, 'x', '42.5'], [9.9999e-4, 'x', '1 \u00D7 10\u207B\u00B3'], [NaN, 'x', '\u2014'], [true, '', 'yes']];
+  cases.forEach(([val, u, want]) => ok(`FMT ${val} ${u}`, F(val, u) === want, `got ${JSON.stringify(F(val, u))}, want ${JSON.stringify(want)}`));
+  ok('FMT USD label carries no unit', A.unitTag('USD') === '');
+  ok('FMT USD/Mtok label says per Mtok', A.unitTag('USD/Mtok') === ' (per Mtok)');
+  ok('FMT other units in brackets', A.unitTag('GB') === ' (GB)' && A.unitTag('') === '');
+  ok('FMT no exponent notation for any default output', Object.keys(A).filter((k) => typeof A[k] === 'function' && !/^(fmt|unitTag|mount)$/.test(k)).every((k) => {
+    let r; try { r = A[k]({}); } catch (e) { return true; }
+    return !r || !r.out || Object.keys(r.out).every((o) => !/e[+-]\d/.test(A.fmt(r.out[o])));
+  }));
+}
+
 if (fails.length) {
   console.log(`FAIL agent-calc — ${fails.length} of ${n} assertions failed`);
   fails.forEach((f) => console.log('  - ' + f));

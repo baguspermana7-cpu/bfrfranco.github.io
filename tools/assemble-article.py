@@ -98,8 +98,7 @@ def main(n):
     utils_tok = mtok.group(1) if mtok else 'dev'
     for old in ('rz-llm-calc.js', 'rz-agent-calc.js', 'rz-calc-utils.js'):
         head = re.sub(r'\s*<script src="js/' + re.escape(old) + r'\?v=[^"]*" defer></script>', '', head)
-    scripts = f'<script src="js/rz-calc-utils.js?v={utils_tok}" defer></script>\n    ' + ''.join(f'<script src="js/{s}?v=dev" defer></script>\n    ' for s in C.get('calcScripts', []))
-    head = head.replace('<script src="js/rz-article-toc.js', scripts + '<script src="js/rz-article-toc.js', 1)
+    scripts = f'<script src="js/rz-calc-utils.js?v={utils_tok}" defer></script>\n' + ''.join(f'<script src="js/{s}?v=dev" defer></script>\n' for s in C.get('calcScripts', []))
     ld = [
         {"@context": "https://schema.org", "@type": "TechnicalArticle", "headline": C['title'], "description": C['desc'],
          "image": f"https://resistancezero.com/assets/og/article-{n}.webp",
@@ -127,6 +126,13 @@ def main(n):
     tail = src[src.index('<div class="author-bio">'):]
     for old in ('rz-llm-calc.js', 'rz-agent-calc.js', 'rz-calc-utils.js'):
         tail = re.sub(r'\n?<script src="js/' + re.escape(old) + r'\?v=[^"]*" defer></script>', '', tail)
+    # the calculator scripts go where the shell keeps them: just before the TOC script at the end of the body.
+    # v3.24.15: they were inserted into <head> before an anchor the head does not carry, a silent no-op that shipped
+    # article 30 with four empty calculators — so a missing anchor now fails the build.
+    anchor = '<script src="js/rz-article-toc.js'
+    if C.get('calcScripts') and anchor not in tail:
+        sys.exit(f'assemble: no {anchor!r} in the shell tail to place calculator scripts before')
+    tail = tail.replace(anchor, scripts + anchor, 1)
     rel = ('<div class="related-articles">\n<h3>Continue Reading</h3>\n<div class="related-grid">\n' + ''.join(
         f'<a href="article-{r}.html" class="related-card">\n<div class="related-card-number">{r}</div>\n'
         f'<div class="related-card-content">\n<h4>{E(t)}</h4>\n<p>{E(d)}</p>\n</div>\n</a>\n' for r, t, d in C['related'])

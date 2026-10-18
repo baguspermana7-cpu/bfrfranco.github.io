@@ -222,8 +222,8 @@
       O("q", "Bad and detected per attempt q", "probability", "q = (1 − p) · d", ["p", "d"]),
       O("E", "Expected attempts per step E", "attempts", "E = (1 − q^(k+1)) / (1 − q)", ["p", "d", "k"]),
       O("Ps", "Step succeeds Ps", "probability", "Ps = p · E", ["p", "d", "k"]),
-      O("Pu", "Step fails silently Pu (dangerous)", "probability", "Pu = (1 − p)(1 − d) · E", ["p", "d", "k"]),
-      O("Px", "Step exhausts retries Px (detected, safe)", "probability", "Px = q^(k+1)", ["p", "d", "k"]),
+      O("Pu", "Step fails silently, Pu: the dangerous case", "probability", "Pu = (1 − p)(1 − d) · E", ["p", "d", "k"]),
+      O("Px", "Step exhausts retries, Px: caught, safe", "probability", "Px = q^(k+1)", ["p", "d", "k"]),
       O("check", "Check Ps + Pu + Px", "", "check: Ps + Pu + Px = 1", ["p", "d", "k"]),
       O("P_run", "Run succeeds P_run", "probability", "P_run = Ps^n", ["n", "p", "d", "k"]),
       O("retries", "Expected retries per run", "retries", "retries = n · (E − 1)", ["n", "p", "d", "k"]),
@@ -267,7 +267,7 @@
     out: (function () {
       var o = [
         O("pin_eff", "Effective input price", "$ per 1M", "pin_eff = price.in·(1−f) + price.in·price.cacheReadFrac·f", ["f"]),
-        O("S_cost_raw", "Steps the cost cap allows (continuous)", "steps", "S_cost = largest S with Cost(S) ≤ C: solve a·S² + b·S − C = 0", ["c0", "g", "o", "C", "f"]),
+        O("S_cost_raw", "Steps the cost cap allows, continuous", "steps", "S_cost = largest S with Cost(S) ≤ C: solve a·S² + b·S − C = 0", ["c0", "g", "o", "C", "f"]),
         O("S_cost", "S_cost: steps the cost cap allows", "steps", "S_cost = largest S with Cost(S) ≤ C: solve a·S² + b·S − C = 0", ["c0", "g", "o", "C", "f"]),
         O("t_step", "Time per step", "s", "t_step = ttft + o·tpot + tt", ["o", "tt"]),
         O("S_time", "S_time: steps the wall clock allows", "steps", "S_time = floor(Tw / t_step)", ["Tw", "o", "tt"]),
@@ -374,18 +374,43 @@
     })()
   };
 
+  /* v3.24.15 — a reader-facing number: "$1.84" not "1.843 (USD)", "9.11 × 10⁻⁵" not "9.113e-5",
+     "0.088" not "0.08800". The raw value still goes to the CSV and to the worked-step line. */
+  var SUP = { "-": "\u207B", "0": "\u2070", "1": "\u00B9", "2": "\u00B2", "3": "\u00B3", "4": "\u2074",
+    "5": "\u2075", "6": "\u2076", "7": "\u2077", "8": "\u2078", "9": "\u2079" };
+  function trimZ(s) { return s.indexOf(".") < 0 ? s : s.replace(/0+$/, "").replace(/\.$/, ""); }
+  function sci(x) {
+    var e = Math.floor(Math.log(Math.abs(x)) / Math.LN10), m = x / Math.pow(10, e);
+    if (Math.abs(m) >= 9.995) { m /= 10; e += 1; }
+    return trimZ(m.toFixed(2)) + " \u00D7 10" + String(e).replace(/[-0-9]/g, function (c) { return SUP[c]; });
+  }
+  function isMoney(u) { return typeof u === "string" && u.indexOf("USD") === 0; }
   function fmt(o) {
     var x = o.value;
     if (typeof x === "boolean") return x ? "yes" : "no";
     if (typeof x === "string") return x;
-    if (!isFinite(x)) return "—";
+    if (!isFinite(x)) return "\u2014";
     var a = Math.abs(x);
-    if (a === 0) return "0";
-    if (a >= 1e15 || a < 1e-3) return x.toExponential(3);
+    if (a === 0) return isMoney(o.unit) ? "$0" : "0";
+    if (isMoney(o.unit)) {
+      var sgn = x < 0 ? "\u2212$" : "$";
+      if (a >= 1000) return sgn + a.toLocaleString("en-US", { maximumFractionDigits: 0 });
+      if (a >= 1) return sgn + a.toFixed(2);
+      if (a >= 0.01) return sgn + trimZ(a.toFixed(3));
+      return sgn + trimZ(a.toPrecision(2));
+    }
+    if (a >= 1e15 || a < 1e-3) return sci(x);
     if (a >= 1000) return x.toLocaleString("en-US", { maximumFractionDigits: 0 });
-    if (a >= 100) return x.toFixed(1);
-    if (a >= 10) return x.toFixed(2);
-    return x.toPrecision(4);
+    if (a >= 100) return trimZ(x.toFixed(1));
+    if (a >= 10) return trimZ(x.toFixed(2));
+    return trimZ(x.toPrecision(4));
+  }
+  /* the label carries the unit only when the value does not: "$" already says USD */
+  function unitTag(u) {
+    if (!u) return "";
+    if (u === "USD") return "";
+    if (u.indexOf("USD/") === 0) return " (per " + u.slice(4) + ")";
+    return " (" + u + ")";
   }
   function tidy(n) { return parseFloat(n.toPrecision(12)); }
 
@@ -530,7 +555,7 @@
         m = r.out[order[n]];
         item = h("div", "calc-result-item");
         v = h("div", "calc-result-value", fmt(m));
-        lab = h("div", "calc-result-label", m.label + (m.unit ? " (" + m.unit + ")" : ""));
+        lab = h("div", "calc-result-label", m.label + unitTag(m.unit));
         w = h("div", "agent-calc-work agent-calc-hidden", m.formula + "  |  " + inputsText(m.inputs));
         item.appendChild(v); item.appendChild(lab); item.appendChild(w);
         results.appendChild(item);
@@ -582,6 +607,8 @@
   }
 
   win.RZAgentCalc = {
+    fmt: fmt,
+    unitTag: unitTag,
     constants: constants,
     presets: presets,
     fields: { decide: DECIDE_FIELDS, reliability: REL_FIELDS, budget: BUD_FIELDS, ladder: LADDER_FIELDS },

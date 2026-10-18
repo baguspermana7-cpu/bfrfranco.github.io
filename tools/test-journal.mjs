@@ -200,7 +200,7 @@ if (!STATIC) {
         const hsl = (r, g, b) => { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; if (mx === mn) return [0, 0, l]; const d = mx - mn, s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn); let h = mx === r ? ((g - b) / d + (g < b ? 6 : 0)) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return [h * 60, s, l]; };
         const out = { navy: [], rails: [], fixed: [] };
         /* + the shared chrome a reader sees on every article: cookie banner, login button, user pill (v3.24.9) */
-        const scope = document.querySelectorAll('body, main, .article-content, .article-content *, .toc-mobile-toggle, .rz-cookie-banner, .rz-cookie-banner *, .rz-login-btn, .rz-user-btn, .rz-user-avatar');
+        const scope = document.querySelectorAll('body, main, .article-content, .article-content *, .toc-mobile-toggle, .rz-cookie-banner, .rz-cookie-banner *, .rz-login-btn, .rz-user-btn, .rz-user-avatar, .series-nav, .series-nav *');
         for (const e of scope) {
           if (e.closest('svg, canvas, img')) continue;
           const cs = getComputedStyle(e), r = e.getBoundingClientRect();
@@ -218,9 +218,9 @@ if (!STATIC) {
           if (cs.boxShadow !== 'none') { const g = cs.boxShadow.match(/rgba?\((\d+), (\d+), (\d+)/); if (g && Math.max(+g[1], +g[2], +g[3]) - Math.min(+g[1], +g[2], +g[3]) > 40) out.rails.push('glow:' + (e.className || e.tagName).toString().slice(0, 26)); }
           const bl = parseFloat(cs.borderLeftWidth), bt = parseFloat(cs.borderTopWidth);
           if (bl >= 2 && bl > bt && !e.matches('blockquote, th, td')) out.rails.push((e.className || e.tagName).toString().slice(0, 30));
-          if (m && (cs.position === 'fixed' || e.closest('.rz-cookie-banner, .rz-login-btn, .rz-user-btn'))) { const [h, s, l] = hsl(+m[1], +m[2], +m[3]); if ((m[4] === undefined || +m[4] > 0.3) && s > .5 && l > .12 && l < .9 && !(h >= 20 && h <= 45)) out.fixed.push((e.className || e.id).toString().slice(0, 30) + ' ' + cs.backgroundColor); }
+          if (m && (cs.position === 'fixed' || e.closest('.rz-cookie-banner, .rz-login-btn, .rz-user-btn, .series-nav'))) { const [h, s, l] = hsl(+m[1], +m[2], +m[3]); if ((m[4] === undefined || +m[4] > 0.3) && s > .5 && l > .12 && l < .9 && !(h >= 20 && h <= 45)) out.fixed.push((e.className || e.id).toString().slice(0, 30) + ' ' + cs.backgroundColor); }
           if (cs.backdropFilter && cs.backdropFilter !== 'none' && e.closest('.rz-cookie-banner')) out.fixed.push('blur:' + (e.className || e.tagName).toString().slice(0, 24));
-          if (e.closest('.rz-cookie-banner, .rz-login-btn, .rz-user-btn, .rz-user-avatar')) {
+          if (e.closest('.rz-cookie-banner, .rz-login-btn, .rz-user-btn, .rz-user-avatar, .series-nav')) {
             for (const prop of ['color', 'borderTopColor']) {
               const c = cs[prop].match(/rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?/);
               if (!c || (c[4] !== undefined && +c[4] < 0.2)) continue;
@@ -228,6 +228,58 @@ if (!STATIC) {
               if (s > .45 && l > .2 && l < .85 && !(h >= 20 && h <= 45)) out.fixed.push(prop + ':' + (e.className || e.tagName).toString().slice(0, 22) + ' ' + cs[prop]);
             }
           }
+        }
+        /* inline code stretched by justification (v3.24.15): a one-line code span wider than its own text measured alone */
+        for (const c of document.querySelectorAll('.article-body > p code, .article-body > ul > li code, .article-body > ol > li code')) {
+          if (!/\s/.test(c.textContent.trim()) || c.getClientRects().length !== 1) continue;
+          const probe = c.cloneNode(true); probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;display:inline;left:-9999px';
+          c.parentElement.appendChild(probe); const alone = probe.getBoundingClientRect().width; probe.remove();
+          const w = c.getBoundingClientRect().width;
+          if (alone > 0 && w > alone * 1.08 + 2) out.rails.push('stretched-code:' + c.textContent.trim().slice(0, 24));
+        }
+        /* a calculator mount that never rendered (v3.24.15: article 30 shipped without its calculator script — four
+           empty 16px boxes, no error anywhere) */
+        for (const el of document.querySelectorAll('.article-body *')) {
+          const a = [...el.attributes].find((x) => /^data-[a-z]+-calc$/.test(x.name));
+          if (a && el.getBoundingClientRect().height < 60) out.fixed.push('empty-calc:' + a.name + '=' + a.value);
+        }
+        /* chart series (v3.24.15): distinct, and amber / neutral / fault red only — article 30's 50% and 80% bars
+           were the same colour, and the instrument palette carried neon green and cyan into articles */
+        if (window.Chart && Chart.getChart) for (const cv of document.querySelectorAll('figure.rz-chart canvas')) {
+          const ch = Chart.getChart(cv); if (!ch) continue;
+          const cols = ch.data.datasets.map((d) => String(Array.isArray(d.backgroundColor) ? d.backgroundColor[0] : d.backgroundColor));
+          if (ch.config.type !== 'pie' && ch.config.type !== 'doughnut' && cols.length > 1 && new Set(cols).size < cols.length) out.fixed.push('chart-same-colour:' + cols.join('|'));
+          for (const c of cols) {
+            let r, g, b2; const hx = c.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i), rg = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+            if (hx) { r = parseInt(hx[1], 16); g = parseInt(hx[2], 16); b2 = parseInt(hx[3], 16); } else if (rg) { r = +rg[1]; g = +rg[2]; b2 = +rg[3]; } else continue;
+            const [h, s, l] = hsl(r, g, b2);
+            if (s > .35 && l > .12 && l < .92 && !(h >= 20 && h <= 45) && !(h >= 345 || h <= 12)) out.fixed.push('chart-hue:' + c);
+          }
+        }
+        /* chart basis chips: neutral or amber, never a second hue (v3.24.15 — "PUBLISHED" was mint in light) */
+        for (const c of document.querySelectorAll('.rz-chart-chip')) {
+          const cs = getComputedStyle(c);
+          for (const prop of ['color', 'backgroundColor', 'borderTopColor']) {
+            const m = cs[prop].match(/rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?/);
+            if (!m || (m[4] !== undefined && +m[4] < 0.1)) continue;
+            const [h, s, l] = hsl(+m[1], +m[2], +m[3]);
+            if (s > .35 && l > .12 && l < .9 && !(h >= 20 && h <= 45)) out.fixed.push('chip-' + prop + ':' + c.textContent.trim() + ' ' + cs[prop]);
+          }
+        }
+        /* one left edge (v3.24.15): the hero strip of key numbers and the series bar start where the title starts */
+        const tl = document.querySelector('.article-title');
+        if (tl && innerWidth >= 1200) {
+          const x0 = tl.getBoundingClientRect().left;
+          for (const s of ['.series-nav', '[data-rz-fact-list]']) {
+            const el = [...document.querySelectorAll(s)].find((x) => !x.closest('.article-content') && x.getBoundingClientRect().width);
+            if (el && Math.abs(el.getBoundingClientRect().left - x0) > 2) out.fixed.push('edge:' + s + ' ' + Math.round(el.getBoundingClientRect().left) + ' vs title ' + Math.round(x0));
+          }
+        }
+        /* table cells with no horizontal padding: adjacent columns read as one word (v3.24.15) */
+        for (const tb of document.querySelectorAll('.article-body table')) {
+          const cells = [...tb.querySelectorAll('td, th')].filter((c) => c.textContent.trim());
+          const tight = cells.filter((c) => { const s = getComputedStyle(c); return parseFloat(s.paddingLeft) + parseFloat(s.paddingRight) < 6; });
+          if (cells.length >= 4 && tight.length > cells.length / 2) out.fixed.push('tight-cells:' + (tb.className || 'table') + ' ' + tight.length + '/' + cells.length);
         }
         for (const k of Object.keys(out)) out[k] = [...new Set(out[k])].slice(0, 5);
         return out;

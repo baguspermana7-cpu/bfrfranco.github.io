@@ -26,7 +26,31 @@
 
   function isDark(){ return document.documentElement.getAttribute('data-theme') === 'dark'; }
 
+  function isEditorial(){ return document.documentElement.getAttribute('data-rz-register') === 'editorial'; }
+  /* v3.24.15 — on the editorial register the chart speaks the register: ONE amber for the lead series, neutral greys
+     for the rest, red only for a fault. The instrument palette below put neon #00FF88 and cyan #00DDFF into articles,
+     and gave every series without an explicit accent the same colour (article 30's 50% and 80% bars: identical). */
+  function editorialPalette(){
+    var d = isDark();
+    return {
+      grid:  d ? 'rgba(255,255,255,0.07)' : 'rgba(17,24,39,0.08)',
+      tick:  d ? '#9AA1AB' : '#5B626C',
+      text:  d ? '#D4D8DE' : '#2A2F36',
+      tipBg: d ? '#16181D' : '#FFFFFF',
+      tipBd: d ? 'rgba(255,255,255,0.14)' : 'rgba(17,24,39,0.14)',
+      tipTx: d ? '#E8ECF1' : '#1B1F24',
+      cross: d ? 'rgba(232,181,99,0.55)' : 'rgba(146,64,14,0.45)',
+      accents: {
+        signal: d ? '#E8B563' : '#92400E',
+        info:   d ? '#C3C8D0' : '#4B5260',
+        data:   d ? '#7E8590' : '#A3A9B3',
+        alert:  d ? '#E5534B' : '#B42318'
+      },
+      order: ['signal', 'info', 'data']
+    };
+  }
   function palette(){
+    if(isEditorial()) return editorialPalette();
     var d = isDark();
     return {
       grid:  d ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
@@ -105,8 +129,8 @@
   function buildData(cfg, pal){
     return {
       labels: cfg.labels,
-      datasets: cfg.series.map(function(s){
-        var col = pal.accents[s.accent] || pal.accents.signal;
+      datasets: cfg.series.map(function(s, i){
+        var col = pal.accents[s.accent] || (pal.order ? pal.accents[pal.order[Math.min(i, pal.order.length - 1)]] : pal.accents.signal);
         var base = { label: s.label, data: s.data, borderColor: col, backgroundColor: col, yAxisID: s.axis || 'y' };
         if(cfg.type === 'line'){ base.tension = 0.25; base.borderWidth = 2; base.pointRadius = 0; base.pointHoverRadius = 4; base.fill = false; }
         if(cfg.type === 'bar'){ var bar = s.colorAccents ? s.colorAccents.map(function(a){ return pal.accents[a] || col; }) : (s.colors ? s.colors : hexA(col, isDark() ? 0.8 : 0.85)); base.backgroundColor = bar; base.borderColor = bar; base.borderWidth = 1; base.borderRadius = 3; }

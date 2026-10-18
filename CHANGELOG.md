@@ -11,6 +11,47 @@ release sections rather than semver.
 
 ---
 
+## v3.24.15 — 2026-10-18 — "Calculators"
+
+### Fixed — article 30's four calculators were empty; tables, formulas, numbers and edges across the journal
+
+**Owner:** *"sempurnakan, continue"*, then *"Continue polish more"* and *"Yg terbaik. Harus terbaik walau
+ultraeffort"*.
+
+- `article-30.html` shipped without `js/rz-calc-utils.js` and `js/rz-agent-calc.js`: the four calculators (agent or
+  script, run cost and reliability, loop budget, verification ladder) rendered as empty 16 px boxes, with no error.
+  Cause: `tools/assemble-article.py` removed the previous article's calculator scripts from the end of the body and
+  inserted the new ones into `<head>` before an anchor the head does not carry — a silent no-op. The scripts now go
+  back where the shell keeps them, and a missing anchor fails the build.
+- Tables in the reading column had no cell padding on desktop: `.ws-table` (articles 29, 30) and `.ws-lever-table`
+  (28) were never defined and the only padding rule sat in a phone media query, so "E13" and "11:14" read as
+  "E1311:14". `css/rz-article-dark.css` now carries a floor at element specificity, so a page's own table styling
+  still wins.
+- Justified paragraphs stretched the spaces inside inline code ("p = 0.95" set as "p   =   0.95"; 123 code spans
+  with spaces across the journal). On desktop an inline code span is now one unit to the justifier.
+- Calculator results in articles 29 and 30 read as a reader expects: `$1.84` instead of `1.843 (USD)`,
+  `9.11 × 10⁻⁵` instead of `9.113e-5`, `0.088` instead of `0.08800`; labels with two bracketed asides in a row
+  ("Step fails silently Pu (dangerous) (probability)") rewritten. The raw value still goes to the CSV and the
+  worked-step line. Both calculator tests now assert the format (578 and 396 assertions).
+- The series bar under every article hero ("Engineering Journal — Article N of 30") still carried the blue gradient
+  wash, blue border, 12 px radius and blue number chip from `styles.css`; it is on the graphite register now.
+- One left edge: the key-number strip under the hero and the series bar started at 23 px and 270 px at 1440 against
+  176 px for the title and the text — their wrappers carried their own 900–1100 px caps. Both now start where the
+  title starts, on desktop and on a phone. On a phone the number column narrows from 9.5 to 7 rem, so a label no
+  longer breaks into two lines.
+- The chart basis chip under every sourced chart was mint in light ("PUBLISHED") and two different yellows in dark;
+  published/standard is neutral, modelled/vendor amber, outlined, the same in both themes.
+- Charts on the editorial register (`js/rz-article-chart.js`): every series without an explicit accent took the same
+  amber, so article 30's "50% horizon" and "80% horizon" bars were indistinguishable; the instrument palette also
+  carried neon `#00FF88`, cyan `#00DDFF` and a navy tooltip into articles. On the register the lead series is amber,
+  the next ones neutral greys, red only for a fault, tooltip on graphite. Calculator and instrument pages keep theirs.
+
+**Gates** — `tools/test-journal.mjs` J5f now also fails on: a `data-*-calc` mount under 60 px tall, a one-line code
+span wider than its own text, a table where most cells have no horizontal padding, the series bar's colours, and a
+hero strip or series bar whose left edge is off the title's, a chart basis chip in a second hue, and chart series that share a colour or leave amber/neutral/red. Each proven red on the previous files (three empty
+calculators per theme; three stretched formulas; tight tables on six pages; 72 off-edge series bars, 18 off-edge
+strips) and green after: 137 assertions on 40 pages.
+
 ## v3.24.14 — 2026-10-18 — "Hub"
 
 ### Added — the 3D figure answers the keyboard (`js/rz-hub-3d.js`, `datacenter-solutions.html`)

@@ -520,6 +520,16 @@ html[data-rz-register="editorial"] .article-body > p,
 html[data-rz-register="editorial"] .article-body > :is(ul,ol) > li{
   text-align: justify; text-justify: inter-word; hyphens: auto;
 }
+/* v3.24.15 — justification also stretches the spaces INSIDE inline code: article 30 set "p = 0.95" as
+   "p   =   0.95" (123 code spans with spaces across the journal). An inline-block is one unit to the line
+   justifier, so a formula keeps its own spacing; max-width lets a long one wrap inside itself. Desktop only —
+   the phone is left-aligned and has no rivers to stop. */
+@media (min-width:768px){
+  html[data-rz-register="editorial"] .article-body > p code,
+  html[data-rz-register="editorial"] .article-body > :is(ul,ol) > li code{
+    display: inline-block; max-width: 100%; vertical-align: baseline; text-indent: 0;
+  }
+}
 /* the article-body itself owns no width/centering on editorial pages — the
    .container grid below owns the layout (override the v1.49.8 generic caps) */
 html[data-rz-register="editorial"] .article-body{
@@ -920,10 +930,11 @@ html[data-rz-register="editorial"] .rz-chart-chip{
   display: inline-block; font-size: .6rem; letter-spacing: .05em; font-weight: 600;
   padding: .12rem .42rem; border-radius: 4px; margin-right: .45rem; vertical-align: middle;
 }
-html[data-rz-register="editorial"] .rz-chart-chip.derived{ background: rgba(10,138,90,.14); color: #0a8a5a; }
-html[data-rz-register="editorial"] .rz-chart-chip.warn{ background: rgba(217,119,6,.16); color: #92400e; }
-html[data-rz-register="editorial"][data-theme="dark"] .rz-chart-chip.derived{ background: rgba(232,181,99,.14); color: #E8B563; }
-html[data-rz-register="editorial"][data-theme="dark"] .rz-chart-chip.warn{ background: rgba(252,211,77,.16); color: #fcd34d; }
+/* v3.24.15 — the basis chip was mint in light ("PUBLISHED") and two different yellows in dark: state on this register is
+   neutral or amber. Published/standard = neutral; modelled/vendor = amber. Same in both themes, outlined, no wash. */
+/* .derived.derived outranks the pages' `:root:not([data-theme="dark"]) .rz-chart-chip.derived { color:#065f46 !important }` */
+html[data-rz-register="editorial"] .rz-chart-chip.derived.derived{ background: transparent !important; color: color-mix(in srgb, var(--rz-art-muted) 55%, var(--rz-art-text)) !important; border: 1px solid var(--rz-art-line) !important; }
+html[data-rz-register="editorial"] .rz-chart-chip.warn.warn{ background: transparent !important; color: var(--rz-art-accent) !important; border: 1px solid currentColor !important; }
 
 /* day body copy was inheriting Inter (day block had no p font rule) — force Plex +
    the editorial line-height in BOTH themes. */
@@ -1525,7 +1536,19 @@ html[data-rz-register="editorial"] .nav-dropdown:not(:hover):not(:focus-within) 
    mono number, label, sub-text, hairline. tools/sweep-journal-register.py marks the parent with
    data-rz-fact-list; the vibecode detector counts only tiles outside such a parent. */
 html[data-rz-register="editorial"] [data-rz-fact-list]{display:grid!important;grid-template-columns:1fr!important;grid-auto-flow:row!important;gap:0!important;margin:20px 0!important;padding:0!important;border:0!important;border-top:1px solid var(--rz-art-line)!important;background:none!important;box-shadow:none!important;border-radius:0!important}
+/* v3.24.15 — the key-number strip under the hero and the series bar each had their own left edge (23 px and 270 px
+   at 1440, against 176 px for the title and the text): three edges in one screen. Both now sit on the hero's
+   1088 px container. J5f "edge" keeps them on it. */
+html[data-rz-register="editorial"] [data-rz-fact-list]:not(.article-content [data-rz-fact-list]),
+html[data-rz-register="editorial"] .series-nav{max-width:1088px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}
+
+html[data-rz-register="editorial"] [data-rz-fact-list]:not(.article-content [data-rz-fact-list]){width:100%!important}
+/* its wrapper (.ws-/.sea-/.hfx-evidence-block …) carried its own 900–1100 px cap, centred, so the list inside could
+   never reach the title's edge; the wrapper spans the page and keeps the phone gutter instead */
+html[data-rz-register="editorial"] :not(.article-content *):has(> [data-rz-fact-list]){max-width:none!important;margin-left:0!important;margin-right:0!important;padding-left:20px!important;padding-right:20px!important;box-sizing:border-box}
 html[data-rz-register="editorial"] [data-rz-fact-list] > *{display:grid!important;grid-template-columns:9.5rem 1fr!important;grid-template-areas:"v l" "v s"!important;column-gap:18px!important;row-gap:2px!important;align-items:baseline!important;padding:12px 0!important;margin:0!important;border:0!important;border-bottom:1px solid var(--rz-art-line)!important;background:none!important;box-shadow:none!important;border-radius:0!important;text-align:left!important;transform:none!important;min-height:0!important;width:auto!important;max-width:none!important}
+/* v3.24.15 — on a phone a 9.5rem number column left 200 px for the label, so most labels broke into two lines */
+@media (max-width:767px){html[data-rz-register="editorial"] [data-rz-fact-list] > *{grid-template-columns:7rem 1fr!important;column-gap:14px!important}}
 html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="value"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="-val"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="number"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="figure"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="num"]{grid-area:v;font:500 1.25rem/1.2 var(--rz-art-mono)!important;color:var(--rz-art-accent)!important;letter-spacing:-.01em;margin:0!important;background:none!important;-webkit-text-fill-color:currentColor!important}
 html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="label"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="-lbl"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="title"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > h3,html[data-rz-register="editorial"] [data-rz-fact-list] > * > h4,html[data-rz-register="editorial"] [data-rz-fact-list] > * > h5{grid-area:l;font:600 .95rem/1.4 var(--rz-art-sans)!important;color:var(--rz-art-strong)!important;text-transform:none!important;letter-spacing:0!important;margin:0!important}
 html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="sub"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="desc"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > [class*="note"],html[data-rz-register="editorial"] [data-rz-fact-list] > * > p,html[data-rz-register="editorial"] [data-rz-fact-list] > * > small{grid-area:s;font:400 .86rem/1.5 var(--rz-art-sans)!important;color:var(--rz-art-muted)!important;margin:0!important}
@@ -1572,6 +1595,12 @@ html[data-rz-register="editorial"] .llm-calc-block [role="alert"]:not([hidden]){
    rails on callouts, figure notes, calculator notes and the sources note. All of it now sits on the
    register: graphite surfaces, one hairline, one accent used for text only. */
 html[data-rz-register="editorial"] :is(body, main, .article-content, .article-content > .container){background:var(--rz-art-bg)!important;background-image:none!important}
+/* v3.24.15 — a table in the reading column had NO cell padding on desktop: `.ws-table` (articles 29, 30) and
+   `.ws-lever-table` (28) were never defined, and the only padding rule sat in a phone media query, so "E13" and
+   "11:14" rendered as "E1311:14". This is the floor, at element specificity (:where) so a page's own table styling
+   still wins. J5f "tight-cells" keeps it. */
+:where(html[data-rz-register="editorial"] .article-body) :is(td, th){padding:.55rem .8rem;vertical-align:top;text-align:left}
+:where(html[data-rz-register="editorial"] .article-body) th{font-weight:600}
 html[data-rz-register="editorial"] .article-body :is(table, .ws-table){background:transparent!important}
 html[data-rz-register="editorial"] .article-body :is(table, .ws-table) th{background:var(--rz-art-panel)!important;color:var(--rz-art-strong)!important}
 html[data-rz-register="editorial"] .article-body :is(table, .ws-table) :is(td, th){border-color:var(--rz-art-line)!important}
@@ -1612,6 +1641,15 @@ html[data-rz-register="editorial"] :is(.rz-cookie-banner a, .rz-cookie-banner p 
 html[data-rz-register="editorial"] :is(.rz-cookie-accept,.rz-cookie-decline){border-radius:4px!important;font-weight:600;box-shadow:none!important}
 html[data-rz-register="editorial"] .rz-cookie-accept{background:var(--rz-art-accent)!important;color:var(--rz-art-bg)!important;border:1px solid var(--rz-art-accent)!important}
 html[data-rz-register="editorial"] .rz-cookie-decline{background:transparent!important;color:var(--rz-art-text)!important;border:1px solid var(--rz-art-line)!important}
+/* v3.24.15 — the series bar under every article hero ("Engineering Journal — Article N of 30") still carried
+   styles.css's blue gradient wash, blue border, 12px radius, blue badge and a navy-on-blue number chip */
+html[data-rz-register="editorial"] .series-nav{background:var(--rz-art-panel)!important;background-image:none!important;border:1px solid var(--rz-art-line)!important;border-radius:4px!important;box-shadow:none!important}
+html[data-rz-register="editorial"] .series-badge{color:var(--rz-art-strong)!important;border-color:var(--rz-art-line)!important;background:transparent!important}
+html[data-rz-register="editorial"] .series-badge-icon{background:transparent!important;color:var(--rz-art-muted)!important;border:1px solid var(--rz-art-line)!important;border-radius:3px!important;font-family:var(--rz-art-mono)!important;font-weight:500!important}
+html[data-rz-register="editorial"] .series-title{color:var(--rz-art-muted)!important}
+html[data-rz-register="editorial"] .series-link{color:var(--rz-art-text)!important;background:transparent!important;border:1px solid transparent;border-radius:4px}
+html[data-rz-register="editorial"] .series-link:hover{border-color:var(--rz-art-accent)!important;color:var(--rz-art-strong)!important}
+html[data-rz-register="editorial"] .series-link.disabled{color:var(--rz-art-muted)!important;opacity:.55}
 html[data-rz-register="editorial"] .rz-login-btn{background:transparent!important;color:var(--rz-art-strong)!important;border:1px solid var(--rz-art-line)!important;box-shadow:none!important}
 html[data-rz-register="editorial"] .rz-login-btn:hover{border-color:var(--rz-art-accent)!important}
 html[data-rz-register="editorial"] .rz-login-btn i{color:var(--rz-art-accent)!important}
