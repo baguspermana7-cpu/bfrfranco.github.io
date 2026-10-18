@@ -494,6 +494,24 @@
     resetBtn.addEventListener('click', function () { fit(view); explodeTarget = 0; explodeBtn.setAttribute('aria-pressed', 'false'); pinned = null; light(null); ctl.autoRotate = !REDUCE; draw(); });
     tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-view')); }); });
     ctl.addEventListener('change', function () { lastInput = performance.now(); draw(); });
+    /* keyboard on the focused canvas: arrows orbit, + / - zoom, E explode, C cutaway, 1-4 camera presets, 0 reset */
+    var camBtns = Array.prototype.slice.call(host.querySelectorAll('[data-cam]'));
+    cv.addEventListener('keydown', function (e) {
+      var k = e.key, step = 0.12, used = true, off = cam.position.clone().sub(ctl.target);
+      var sph = { r: off.length(), th: Math.atan2(off.x, off.z), ph: Math.acos(Math.max(-1, Math.min(1, off.y / off.length()))) };
+      if (k === 'ArrowLeft') sph.th -= step; else if (k === 'ArrowRight') sph.th += step;
+      else if (k === 'ArrowUp') sph.ph = Math.max(0.15, sph.ph - step); else if (k === 'ArrowDown') sph.ph = Math.min(Math.PI * 0.49, sph.ph + step);
+      else if (k === '+' || k === '=') sph.r = Math.max(ctl.minDistance, sph.r * 0.88); else if (k === '-' || k === '_') sph.r = Math.min(ctl.maxDistance, sph.r * 1.14);
+      else if (k === 'e' || k === 'E') { explodeBtn.click(); e.preventDefault(); return; }
+      else if ((k === 'c' || k === 'C') && cutBtn) { cutBtn.click(); e.preventDefault(); return; }
+      else if (k >= '1' && k <= '4' && camBtns[+k - 1]) { camBtns[+k - 1].click(); e.preventDefault(); return; }
+      else if (k === '0') { resetBtn.click(); e.preventDefault(); return; }
+      else used = false;
+      if (!used) return;
+      e.preventDefault();
+      cam.position.set(ctl.target.x + sph.r * Math.sin(sph.ph) * Math.sin(sph.th), ctl.target.y + sph.r * Math.cos(sph.ph), ctl.target.z + sph.r * Math.sin(sph.ph) * Math.cos(sph.th));
+      ctl.update(); touched();
+    });
     host.__rz3d = { ctl: ctl, setExplode: function (v) { explodeTarget = v; explode = v; applyExplode(); draw(); }, show: show };
     if ('ResizeObserver' in root) new ResizeObserver(function () { resize(); draw(); }).observe(stage); else root.addEventListener('resize', function () { resize(); draw(); });
     /* off-screen the loop stops; back on-screen it resumes where it was */

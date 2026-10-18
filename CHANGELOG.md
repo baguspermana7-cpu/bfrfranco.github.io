@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v3.24.14 — 2026-10-18 — "Hub"
+
+### Added — the 3D figure answers the keyboard (`js/rz-hub-3d.js`, `datacenter-solutions.html`)
+- The canvas took focus but ignored every key, so the figure could only be turned with a mouse or a
+  finger. On the focused canvas: arrows orbit (left/right around, up/down over), `+` / `−` zoom
+  within the view's limits, `E` toggles the exploded view, `C` the cutaway, `1`–`4` the Iso / Front /
+  Rear / Top presets, `0` resets. The canvas label names the keys for a screen reader, and the hint
+  line lists them where there is a keyboard. Proven in a browser: two ← moved the camera from
+  (3.10, 2.30, 3.90) to (2.08, 2.30, 4.53), `+` closed in, `E` set the explode button pressed,
+  `3` went to the rear.
+- Full ship gate on this tree (the hub's releases since v3.24.9 had run only the static set).
+
 ## v3.24.13 — 2026-10-17 — "Captions"
 
 ### Fixed — text glued to a frame on 23 journal pages
