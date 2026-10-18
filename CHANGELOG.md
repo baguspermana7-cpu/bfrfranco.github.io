@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v3.24.18 — 2026-10-18 — "Hub"
+
+### Fixed
+- **The catalogue illustrations collided on phones.** A headless check now measures every text box
+  in the seven panels against every other and against the SVG frame, at 390 and 1440 px. It found
+  text overlaps or clipping in five of the seven panels at 390 px, and in the commissioning panel on
+  desktop too. All five panels were relaid out so that check reads zero at both widths:
+  - ATS: the status was a 30-character phrase running into the BUS label. It is now one or two
+    words (ON UTILITY / UTILITY LOST / ON GENSET / RETRANSFER), and the detail line carries the rest
+    (genset start countdown, which breaker is closed).
+  - Commissioning gates: the line moved down so the upper L-labels clear the status, and the
+    footnote is short enough to stay inside the frame.
+  - Strategy: the chart ends at x 440 so the cloud / build / colo labels fit, spaced 20 apart.
+  - Engineering: the PUE chart is narrower so the chillers line no longer crosses the cliff step.
+  - Labs: the heat-out bars start at x 236, so the IT + LOSS line and the LIQUID + AIR line no
+    longer overlap. The footnote fits.
+  - Knowledge: a long title ("Data center power distribution design") ran into the shelf. Titles
+    now fit the free width, with an ellipsis when needed.
+- The weather-bin strip under the hero squeezed its last bin ("36 °C") past the frame. Bins now
+  keep their content width.
+- The compute-tray summary broke "°C" onto a line of its own. It now uses non-breaking spaces.
+
 ## v3.24.17 — 2026-10-18 — "Second Brain"
 
 ### Changed — Second Brain catches up with the site and with the tools Claude now works through

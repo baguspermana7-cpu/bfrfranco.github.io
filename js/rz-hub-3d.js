@@ -429,7 +429,7 @@
     }
     function readout(id) {
       var V = VIEWS[view];
-      if (!id) { read.innerHTML = '<b>' + V.title + '</b><span>' + (view === 'rack' ? n(CT) + ' compute trays · ' + n(SW) + ' switch trays · ' + n(PS) + ' power shelves · ' + n(get('compute.gpu_per_rack') || 72) + ' GPUs · ' + n(get('power.rack_it_kw') || 142) + ' kW' : view === 'tray' ? n(M.gpuPerTray || 4) + ' B300 · ' + n(M.cpuPerTray || 2) + ' Grace · ' + n(NIC) + ' CX-8 · 1 BF-3 · TCS ' + n(TCS_S) + ' → ' + n(TCS_R) + ' °C' : n(M.nvswitchPerTray || 2) + ' NVLink switch ASICs · TCS ' + n(TCS_S) + ' → ' + n(TCS_R) + ' °C') + '</span><p>Hover or tap a part, or step through the list. <em>Counts published; placements adopted.</em></p>'; return; }
+      if (!id) { read.innerHTML = '<b>' + V.title + '</b><span>' + (view === 'rack' ? n(CT) + ' compute trays · ' + n(SW) + ' switch trays · ' + n(PS) + ' power shelves · ' + n(get('compute.gpu_per_rack') || 72) + ' GPUs · ' + n(get('power.rack_it_kw') || 142) + ' kW' : view === 'tray' ? n(M.gpuPerTray || 4) + ' B300 · ' + n(M.cpuPerTray || 2) + ' Grace · ' + n(NIC) + ' CX-8 · 1 BF-3 · TCS ' + n(TCS_S) + '&#160;→&#160;' + n(TCS_R) + '&#160;°C' : n(M.nvswitchPerTray || 2) + ' NVLink switch ASICs · TCS ' + n(TCS_S) + '&#160;→&#160;' + n(TCS_R) + '&#160;°C') + '</span><p>Hover or tap a part, or step through the list. <em>Counts published; placements adopted.</em></p>'; return; }
       var p = PARTS[id], i = V.parts.indexOf(id);
       read.innerHTML = '<b>' + (i + 1) + ' · ' + p.name + (lastSlot && view === 'rack' ? ' — slot ' + lastSlot.label + ' · OU ' + lastSlot.ou : '') + '</b><span>' + (p.count > 1 ? '× ' + n(p.count) + ' ' + p.unit : p.unit) + ' · <em data-src="' + p.src + '">' + p.src + '</em></span><p>' + p.note + '</p>';
     }
