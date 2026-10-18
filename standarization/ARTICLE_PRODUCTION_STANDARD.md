@@ -117,6 +117,7 @@ register-clean shell plus the fragments:
 | Glossary | ≥ 5 terms (article 29: 57) as `<div class="term" id="term-<slug>">`, each with a backlink to the article section; `python3 tools/build-explain-db.py --apply`; `node tools/test-explain-db.mjs` |
 | Search index | append the entry to `search-index.json` (`id` = next integer, title, url, description, category, keywords, image, date, readingTime) |
 | Series nav | `python3 tools/sync-article-series.py --apply`; `python3 tools/test-article-series.py` |
+| Second Brain | `python3 "Apps/second brain/sync-graph.py" --sync-journal` (generates the new page's node + edges from `data/journal.json`), then `--strict` must exit 0 — run AFTER the journal map so the page is in the JSON |
 | OG card | never a hand-made card: `python3 tools/build-og-images.py --apply --discover` renders `assets/og/article-N.webp` (a NEW page is only found with `--discover`) from the page's title and its first content image; `python3 tools/test-og-card-freshness.py` |
 | Stage first | `git add article-N.html …` — the crawler inventory only sees TRACKED files, so sitemap/llms skip an unstaged page |
 | Crawl artefacts | in this order: `build-sitemap.py --apply`, `build-llms-txt.py --apply`, `build-llms-full.py --apply`, `build-search-sections.py --apply`, `build-indexing-list.py --apply`; then `python3 tools/test-generator-freshness.py`, `python3 tools/crawler_audit.py --strict`, `node tools/test-page-metadata.mjs` |

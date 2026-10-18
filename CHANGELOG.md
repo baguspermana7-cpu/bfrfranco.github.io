@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v3.24.19 — 2026-10-19 — "Whole Graph"
+
+### Fixed — Second Brain said "healthy" while 26 of 36 journal pages had no node
+
+**Owner:** *"Continue. Improve more dan pastikan proof"*, *"Setiap pekerjaan harus ada proof"*.
+
+- `Apps/second brain/sync-graph.py` checked the graph only against itself (dead URLs, orphans, vault notes), so it
+  reported "Graph is healthy" with the FF series, the geopolitics series and most articles missing. Check 5 now
+  compares the graph with `data/journal.json` (generated from the pages on disk): every journal page needs a node.
+  `--strict` exits 1 on any issue so a gate can run it. Proven red on the v3.24.18 graph (exit 1, 26 pages listed)
+  and green on this one (exit 0).
+- `--sync-journal` GENERATES the missing nodes and edges from `data/journal.json` between `journal:auto` markers
+  (curated nodes untouched; each page links the journal hub, its series and the next article). Idempotent: a second
+  run writes the same block. The graph renders 175 nodes (was 149) and 377 edges, no dangling edge, no duplicate id,
+  no page error.
+- Wired: `tools/ship-gate.sh` runs `sync-graph.py --strict`; `CLAUDE.md` lists it; the article standard's sibling
+  table gains a Second Brain row (run `--sync-journal` after the journal map).
+
 ## v3.24.18 — 2026-10-18 — "Hub"
 
 ### Fixed

@@ -69,6 +69,7 @@ python3 tools/audit-post-drafts.py --strict         # every journal page (articl
 python3 tools/test-article-series.py               # series navigation current on every article (counts, Prev/Next, the previous article's tail) — after adding an article run the sync tool in the same folder with --apply (sync-article-series) first.
 node   tools/test-llm-calc.mjs                      # article 29's five LLM calculators (js/rz-llm-calc.js): every worked example in Article/Article_29/CALCULATORS.md (396 assertions incl. the number format a reader sees), invalid inputs, monotonicity, a source on every constant, formula strings match the spec.
 node   tools/test-agent-calc.mjs                    # article 30's four agent calculators (js/rz-agent-calc.js): agent-or-script, run cost and reliability with compounding error, loop budget, verification-ladder coverage, number format (578 assertions).
+python3 "Apps/second brain/sync-graph.py" --strict   # Second Brain graph: every page in data/journal.json has a node (checks 1-4 only tested the graph against itself and said "healthy" with 26 of 36 journal pages missing); after adding an article run it with --sync-journal, which regenerates the journal:auto block. Also dead URLs and orphans.
 ```
 
 **Engine + accuracy tests** (v1.32.x accuracy-review work — gate any ship that touches the BMS cockpit pages):
