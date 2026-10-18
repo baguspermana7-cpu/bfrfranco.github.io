@@ -16,28 +16,33 @@
   function sym(kind, x, y, s) { var m = LIB && LIB.MARKUP[kind]; if (!m) return ''; var k = s / 48; return '<g transform="translate(' + x + ',' + y + ') scale(' + k + ')" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + m + '</g>'; }
   var W = 520, H = 128;
 
-  /* 1 · cockpits: the ATS sequence on the engine's standby pool */
+  /* 1 · cockpits: the ATS sequence on the engine's standby pool — two sources, one transfer, one bus */
   function cockpits() {
     var gk = get('equipment.generator_unit_kw'), gi = get('equipment.gensets_installed'), fa = get('site.fuel_autonomy_h');
+    var cb = function (k, y) { return '<g class="tgi-cb tgi-cb' + k + '" transform="translate(150,' + y + ')"><path d="M0 0 H24"/><circle r="2.2"/><circle cx="24" cy="0" r="2.2"/></g>'; };
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="tgi-svg" role="img" aria-label="Automatic transfer: utility to standby generation and back">' +
-      '<g class="tgi-util" style="color:var(--t2)">' + sym('utility', 22, 30, 40) + '</g><text x="42" y="92" class="tgi-l" text-anchor="middle">UTILITY</text>' +
-      '<g class="tgi-gen" style="color:var(--t2)">' + sym('genset', 22, 30, 40) + '</g>' +
-      '<path class="tgi-wire tgi-w1" d="M64 50 H150"/><g class="tgi-cb tgi-cb1" transform="translate(150,50)"><path d="M0 0 L22 -9"/><circle r="2.2"/><circle cx="24" cy="0" r="2.2"/></g><path class="tgi-wire tgi-w1b" d="M174 50 H240"/>' +
+      '<g class="tgi-util" style="color:var(--t2)">' + sym('utility', 18, 6, 34) + '</g><text x="35" y="52" class="tgi-l" text-anchor="middle">UTILITY</text>' +
+      '<g class="tgi-gen" style="color:var(--t2)">' + sym('genset', 18, 72, 34) + '</g><text x="35" y="118" class="tgi-l" text-anchor="middle">GENSET</text>' +
+      '<path class="tgi-wire tgi-w1" d="M58 23 H150"/><path class="tgi-wire" d="M174 23 H200 V50"/>' + cb(1, 23) +
+      '<path class="tgi-wire" d="M58 89 H150 M174 89 H200 V50"/>' + cb(2, 89) +
+      '<text x="162" y="12" class="tgi-l" text-anchor="middle">N</text><text x="162" y="108" class="tgi-l" text-anchor="middle">E</text>' +
+      '<path class="tgi-wire" d="M200 50 H240"/><circle cx="200" cy="50" r="2.2" class="tgi-node-dot"/>' +
       '<rect x="240" y="26" width="6" height="48" class="tgi-bus"/><text x="243" y="18" class="tgi-l" text-anchor="middle">BUS</text>' +
-      '<path class="tgi-wire tgi-w2" d="M64 50 H150" transform="translate(0,52)" style="display:none"/>' +
       '<path class="tgi-wire tgi-load" d="M246 50 H300"/>' + sym('rack', 300, 30, 40) + '<text x="320" y="92" class="tgi-l" text-anchor="middle">LOAD</text>' +
-      '<g class="tgi-flow"><path class="tgi-pulse tgi-p1" d="M64 50 H240"/><path class="tgi-pulse tgi-pL" d="M246 50 H300"/></g>' +
+      '<g class="tgi-flow"><path class="tgi-pulse tgi-p1" d="M58 23 H200 V50 H240"/><path class="tgi-pulse tgi-p2" d="M58 89 H200 V50 H240" style="display:none"/><path class="tgi-pulse tgi-pL" d="M246 50 H300"/></g>' +
       '<text x="512" y="28" class="tgi-s tgi-st" text-anchor="end">UTILITY · NORMAL</text>' +
       '<text x="512" y="118" class="tgi-l" text-anchor="end">' + n(gi) + ' × ' + n(gk) + ' kW · ' + n(fa) + ' h fuel</text>' +
       '<text x="512" y="76" class="tgi-l tgi-t" text-anchor="end"></text></svg>';
     return { svg: svg, tick: function (host, t) {
-      var ph = (t / 1000) % 14, st = host.querySelector('.tgi-st'), cb = host.querySelector('.tgi-cb1 path'), p1 = host.querySelector('.tgi-p1'), gen = host.querySelector('.tgi-gen'), tt = host.querySelector('.tgi-t'), w1 = host.querySelector('.tgi-w1');
-      var state = ph < 5 ? 0 : ph < 6.5 ? 1 : ph < 11 ? 2 : 3;
+      var ph = (t / 1000) % 14, q = function (s) { return host.querySelector(s); }, st = q('.tgi-st'), tt = q('.tgi-t');
+      var state = ph < 5 ? 0 : ph < 6.5 ? 1 : ph < 11 ? 2 : 3, onU = state === 0 || state === 3, onG = state === 2;
       host.setAttribute('data-ats', state);
       st.textContent = ['UTILITY · NORMAL', 'UTILITY LOST · GENSET STARTING', 'ON GENSET · ATS CLOSED', 'UTILITY BACK · RETRANSFER'][state];
       tt.textContent = state === 1 ? 'start ' + Math.max(0, (6.5 - ph)).toFixed(1) + ' s' : state === 2 ? 'fuel ' + n(fa) + ' h' : '';
-      cb.setAttribute('d', state === 0 || state === 3 ? 'M0 0 H24' : 'M0 0 L22 -9');
-      p1.style.display = state === 1 ? 'none' : ''; w1.classList.toggle('is-lost', state === 1 || state === 2); gen.classList.toggle('is-on', state === 2);
+      q('.tgi-cb1 path').setAttribute('d', onU ? 'M0 0 H24' : 'M0 0 L22 -9');
+      q('.tgi-cb2 path').setAttribute('d', onG ? 'M0 0 H24' : 'M0 0 L22 -9');
+      q('.tgi-p1').style.display = onU ? '' : 'none'; q('.tgi-p2').style.display = onG ? '' : 'none';
+      q('.tgi-w1').classList.toggle('is-lost', state === 1 || state === 2); q('.tgi-gen').classList.toggle('is-on', onG);
     } };
   }
   /* 2 · cost and planning: the commissioning levels as gates on a line */
@@ -94,15 +99,19 @@
   }
   /* 6 · labs: electricity in, heat out — the balance the LTC plant model holds */
   function labs() {
-    var it = get('power.total_it_mw'), liq = get('heat.liquid_kwth'), air = get('heat.air_kwth'); if (it == null) return null;
-    var tot = liq + air, wl = 300 * liq / tot, wa = 300 - wl;
+    var it = get('power.total_it_kwe'), loss = get('design.electrical.ups_dist_loss_kwe'), aux = get('design.electrical.aux_kwe'), liq = get('heat.liquid_kwth'), air = get('heat.air_kwth');
+    if (it == null || loss == null || aux == null || liq == null || air == null) return null;
+    /* the engine's air heat carries the UPS, distribution and aux losses too (dcai-engine airHeat_kwth), so the
+     * electricity that becomes heat is IT + those losses — the two sides then close to the kilowatt */
+    var ein = it + loss + aux, tot = liq + air, wl = 300 * liq / tot, wa = 300 - wl;
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="tgi-svg" role="img" aria-label="Electricity in, heat out">' +
-      '<text x="20" y="40" class="tgi-l">IT ELECTRICITY IN</text><rect x="20" y="48" width="140" height="22" class="tgi-bar tgi-bin"/><text x="26" y="63" class="tgi-s">' + n(it, 2) + ' MW</text>' +
+      '<text x="20" y="40" class="tgi-l">ELECTRICITY IN</text><rect x="20" y="48" width="140" height="22" class="tgi-bar tgi-bin"/><text x="26" y="63" class="tgi-s">' + n(ein / 1000, 2) + ' MW</text>' +
+      '<text x="20" y="86" class="tgi-l">IT ' + n(it / 1000, 2) + ' + LOSSES ' + n((loss + aux) / 1000, 2) + '</text>' +
       '<path class="tgi-wire" d="M160 59 H200"/><path class="tgi-pulse tgi-p1" d="M160 59 H200"/>' +
-      '<text x="200" y="40" class="tgi-l">HEAT OUT · LIQUID ' + n(liq / 1000, 1) + ' MW TH · AIR ' + n(air / 1000, 1) + ' MW TH</text>' +
+      '<text x="200" y="40" class="tgi-l">HEAT OUT · ' + n(tot / 1000, 2) + ' MW</text><text x="200" y="86" class="tgi-l">LIQUID ' + n(liq / 1000, 1) + ' + AIR ' + n(air / 1000, 1) + '</text>' +
       '<rect x="200" y="48" width="' + wl.toFixed(1) + '" height="22" class="tgi-bar tgi-liq"/><rect x="' + (200 + wl).toFixed(1) + '" y="48" width="' + wa.toFixed(1) + '" height="22" class="tgi-bar tgi-air"/>' +
       '<text x="206" y="63" class="tgi-s">liquid ' + n(100 * liq / tot) + ' %</text><text x="' + (206 + wl).toFixed(1) + '" y="63" class="tgi-s">air</text>' +
-      '<text x="20" y="100" class="tgi-l">the engine closes the balance; the LTC labs let you move the plant and watch it hold · heat.liquid_kwth · heat.air_kwth</text></svg>';
+      '<text x="20" y="116" class="tgi-l">air carries the UPS, distribution and aux losses · the LTC labs move the plant</text></svg>';
     return { svg: svg, tick: function (host, t) { var u = Math.min(1, ((t / 1000) % 6) / 1.2); host.querySelector('.tgi-liq').style.transform = 'scaleX(' + u + ')'; host.querySelector('.tgi-air').style.transform = 'scaleX(' + u + ')'; } };
   }
   /* 7 · knowledge: the titles stepping */

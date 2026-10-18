@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v3.24.16 — 2026-10-18 — "Hub"
+
+### Fixed
+- **The ATS panel drew the genset on top of the utility pylon.** Both glyphs sat at one point, so
+  the cockpit illustration showed a scribble where the sources should be. It now draws two sources
+  with their own breakers (N and E) joining at the transfer point: utility closed in normal, both
+  open while the genset starts, E closed on genset, N closed on retransfer. The red lost-supply
+  dash stops at the open N breaker instead of running into a junction the genset is feeding.
+- **The labs panel's energy balance did not close.** It printed 539.05 MW of IT electricity in and
+  424.9 + 142.0 = 566.9 MW of heat out. The engine's air heat carries the UPS, distribution and aux
+  losses too (`airHeat_kwth`), so the panel now prints electricity in as IT + those losses
+  (539.05 + 27.85 = 566.90 MW) against heat out 566.90 MW, every term read from the snapshot. Its
+  footnote also ran off the right edge; it is shorter now.
+- The raised spine on the knowledge shelf printed its number in grey on amber; it now uses the
+  inverse text colour, with the same fade as the fill.
+
+### Changed
+- **The 3D figure stands in a studio, not on a slab.** The floor and its 100 mm grid now fade out
+  radially (grid cut into cell-long segments with a per-vertex alpha; floor colour map a radial
+  ramp to transparent), so the stage background shows where the room ends instead of a hard plane
+  edge and a full-frame grid. The tray views use the same grid at half scale (50 mm cells) and are
+  framed about 20 % closer, so the tray fills the stage.
+- Floor and grid take the page's `--rz-bg-hover` / `--rz-line-tier-2` tokens and follow a theme
+  switch (the light theme had a dark floor slab under the model).
+- `standarization/AGENT_HARNESS_STANDARD.md` "Last updated" restamped to the release date; gate 103
+  (release parity) failed on it since the date rolled to 2026-10-18.
+- Verified headless: keys C, −, 0 (cutaway, zoom out, reset) proven alongside the v3.24.14 set;
+  rack + tray rendered dark, then switched to light in place, `pageerror` 0.
+
 ## v3.24.15 — 2026-10-18 — "Calculators"
 
 ### Fixed — article 30's four calculators were empty; tables, formulas, numbers and edges across the journal

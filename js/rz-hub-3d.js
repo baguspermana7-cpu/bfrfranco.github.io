@@ -369,14 +369,35 @@
     var rim = new T.DirectionalLight(0xffffff, 0.6); rim.position.set(0, 1, -4); scene.add(rim);
     var front = new T.DirectionalLight(0xfff4e6, 0.7); front.position.set(0.5, 1.5, 5); scene.add(front);
     var gridCol = new T.Color(cssColor(host, '--rz-line-tier-2', '#2a2d31'));
-    var grid = new T.GridHelper(4, 40, gridCol, gridCol); grid.material.transparent = true; grid.material.opacity = 0.35; scene.add(grid);
-    var floor = new T.Mesh(new T.PlaneGeometry(6, 6), new T.MeshStandardMaterial({ color: 0x101216, metalness: 0.2, roughness: 0.78 })); floor.rotation.x = -Math.PI / 2; floor.position.y = -0.004; floor.receiveShadow = true; scene.add(floor);
+    /* the floor and its 100 mm grid fade out radially instead of ending at a hard edge: the grid is
+     * cut into cell-long segments so each vertex can carry its own alpha, and the floor's colour map
+     * is a radial ramp to transparent — the stage background shows through where the room ends */
+    var grid = (function () {
+      var pos = [], col = [], n = 40, h = 2, c = 0.1, fade = function (x, z) { var r = Math.sqrt(x * x + z * z) / h; return r >= 1 ? 0 : 0.55 * (1 - r * r) * (1 - r * r); };
+      for (var i = 0; i <= n; i++) { var k = -h + i * c; for (var j = 0; j < n; j++) { var a = -h + j * c, b = a + c;
+        pos.push(a, 0, k, b, 0, k, k, 0, a, k, 0, b);
+        col.push(gridCol.r, gridCol.g, gridCol.b, fade(a, k), gridCol.r, gridCol.g, gridCol.b, fade(b, k), gridCol.r, gridCol.g, gridCol.b, fade(k, a), gridCol.r, gridCol.g, gridCol.b, fade(k, b)); } }
+      var g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(new Float32Array(pos), 3)); g.setAttribute('color', new T.BufferAttribute(new Float32Array(col), 4));
+      return new T.LineSegments(g, new T.LineBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false }));
+    })(); scene.add(grid);
+    var floorTex = (function () { var fc = document.createElement('canvas'); fc.width = fc.height = 256; var f2 = fc.getContext('2d'), rg = f2.createRadialGradient(128, 128, 0, 128, 128, 128);
+      rg.addColorStop(0, 'rgba(255,255,255,1)'); rg.addColorStop(0.55, 'rgba(255,255,255,0.85)'); rg.addColorStop(1, 'rgba(255,255,255,0)'); f2.fillStyle = rg; f2.fillRect(0, 0, 256, 256);
+      var t = new T.CanvasTexture(fc); t.colorSpace = T.SRGBColorSpace; return t; })();
+    var floor = new T.Mesh(new T.PlaneGeometry(4, 4), new T.MeshStandardMaterial({ color: 0x101216, map: floorTex, alphaMap: floorTex, transparent: true, depthWrite: false, metalness: 0.2, roughness: 0.78 })); floor.rotation.x = -Math.PI / 2; floor.position.y = -0.004; floor.receiveShadow = true; floor.renderOrder = -2; grid.renderOrder = -1; scene.add(floor);
+    /* floor and grid take the page's own surface tokens, and follow a theme switch */
+    function paintFloor() {
+      floor.material.color.set(cssColor(host, '--rz-bg-hover', '#191b1f')); gridCol.set(cssColor(host, '--rz-line-tier-2', '#2a2d31'));
+      var ca = grid.geometry.getAttribute('color'); for (var q = 0; q < ca.count; q++) ca.setXYZ(q, gridCol.r, gridCol.g, gridCol.b); ca.needsUpdate = true; if (inView) draw();
+    }
+    paintFloor();
+    try { new MutationObserver(paintFloor).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); } catch (e) { /* no observer: the floor keeps the theme it mounted with */ }
     var B = build(T, host), world = new T.Group(); scene.add(world);
     var lastSlot = null, view = 'rack', model = null, explode = 0, explodeTarget = 0, hot = null, pinned = null, active = -1, raf = null, raycaster = new T.Raycaster(), ptr = new T.Vector2(-9, -9), meshes = [], spinners = [], heats = [], tagged = [];
 
     function fit(name) {
-      if (name === 'rack') { grid.position.y = 0; floor.position.y = -0.004; cam.position.set(3.1, 2.3, 3.9); ctl.target.set(0, 1.25, 0); ctl.minDistance = 1.2; ctl.maxDistance = 8; }
-      else { grid.position.y = -0.02; floor.position.y = -0.024; cam.position.set(0.95, 0.78, 1.60); ctl.target.set(0, 0.04, 0.40); ctl.minDistance = 0.25; ctl.maxDistance = 3; }
+      /* rack: 100 mm cells over a 2 m radius; trays: the same grid at half scale (50 mm cells, a bench mat) */
+      if (name === 'rack') { grid.scale.setScalar(1); floor.scale.setScalar(1); grid.position.set(0, 0, 0); floor.position.set(0, -0.004, 0); cam.position.set(3.1, 2.3, 3.9); ctl.target.set(0, 1.25, 0); ctl.minDistance = 1.2; ctl.maxDistance = 8; }
+      else { grid.scale.setScalar(0.5); floor.scale.setScalar(0.5); grid.position.set(0, -0.02, 0.40); floor.position.set(0, -0.024, 0.40); cam.position.set(0.76, 0.64, 1.33); ctl.target.set(0, 0.04, 0.40); ctl.minDistance = 0.25; ctl.maxDistance = 3; }
       ctl.update();
     }
     function show(name) {
@@ -487,7 +508,7 @@
     function applyCut() { model.traverse(function (o) { if (!o.userData || !o.userData.part) return; if (o.userData.part === 'lid' || o.userData.part === 'cold') o.visible = !cut; }); }
     if (cutBtn) cutBtn.addEventListener('click', function () { cut = !cut; cutBtn.setAttribute('aria-pressed', cut ? 'true' : 'false'); applyCut(); touched(); });
     Array.prototype.forEach.call(host.querySelectorAll('[data-cam]'), function (b) { b.addEventListener('click', function () {
-      var k = b.getAttribute('data-cam'), rack = view === 'rack', t = rack ? [0, 1.25, 0] : [0, 0.04, 0.40], d = rack ? 5.2 : 1.9;
+      var k = b.getAttribute('data-cam'), rack = view === 'rack', t = rack ? [0, 1.25, 0] : [0, 0.04, 0.40], d = rack ? 5.2 : 1.55;
       var pos = k === 'front' ? [0.001, t[1] + (rack ? 0.3 : 0.5), t[2] + d] : k === 'rear' ? [0.001, t[1] + (rack ? 0.3 : 0.5), t[2] - d] : k === 'top' ? [0.001, t[1] + d, t[2] + 0.001] : [t[0] + d * 0.6, t[1] + d * 0.45, t[2] + d * 0.75];
       cam.position.set(pos[0], pos[1], pos[2]); ctl.target.set(t[0], t[1], t[2]); ctl.update(); touched();
     }); });
