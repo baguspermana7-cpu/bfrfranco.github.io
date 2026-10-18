@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v3.24.17 — 2026-10-18 — "Second Brain"
+
+### Changed — Second Brain catches up with the site and with the tools Claude now works through
+
+**Owner:** *"install dan set up codebase memory … optimize dg tools lain seperti obsidian, caveman … update juga
+secondbrain, update session manager"*.
+
+- `Apps/second brain/index.html`: the graph stopped at article 27 and described a toolchain from August. It now
+  carries articles 28–30 (Future Forward) and a Claude toolchain cluster — codebase-memory-mcp, Graphify, RZMemory,
+  the Session Manager with its new Optimise page, token thrift, context-mode — linked to MEMORY.md, the Obsidian vault
+  and this app. 124 nodes, 300 edges; `sync-graph.py` reports no dead URL, no isolated node, no missing vault note.
+  The journal hub node says 30 articles, the MEMORY.md node its 16 KB autotrim.
+- `Apps/second brain/codebase-graph.html`: rebuilt with Graphify 0.9.92 from the current code (6,027 nodes,
+  17,555 edges, aggregated to a community view, 199 KB, still root-gated).
+
+Outside the repository (no site change): codebase-memory-mcp 0.9.0 → 0.12.1 behind a wrapper with its own cache and a
+3 GB memory budget, six projects reindexed (rz-work 22,973 nodes), a SessionStart refresher that reindexes only what
+changed, and a Session Manager page that shows the context each Claude session re-sends per turn.
+
 ## v3.24.16 — 2026-10-18 — "Hub"
 
 ### Fixed

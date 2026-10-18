@@ -713,7 +713,7 @@ const G={
 const RAW=[
   /* ─ CORE ─ */
   {id:'idx',    label:'Home',               group:'core',  url:'index.html',              desc:'Main landing page — DC engineering hub, navigation root.',tags:['landing','root'],path:'rz-work/index.html'},
-  {id:'arts',   label:'Engineering Journal',group:'core',  url:'articles.html',           desc:'All 26 long-form technical DC engineering articles.',tags:['journal','articles'],path:'rz-work/articles.html'},
+  {id:'arts',   label:'Engineering Journal',group:'core',  url:'articles.html',           desc:'All 30 long-form technical DC engineering articles, filterable by topic and series.',tags:['journal','articles'],path:'rz-work/articles.html'},
   {id:'ins',    label:'All Insights',        group:'core',  url:'insights.html',           desc:'Aggregated hub: Engineering Journal, Geopolitics, Future Forward.',tags:['hub','insights'],path:'rz-work/insights.html'},
   {id:'dash',   label:'Dashboard',           group:'core',  url:'dashboard.html',          desc:'Real-time DC operations dashboard with live metrics and tool links.',tags:['dashboard','ops'],path:'rz-work/dashboard.html'},
   {id:'glos',   label:'Glossary',            group:'core',  url:'glossary.html',           desc:'Comprehensive DC engineering terminology reference.',tags:['reference','glossary'],path:'rz-work/glossary.html'},
@@ -839,7 +839,7 @@ const RAW=[
   {id:'rzstd',  label:'RZ Standardization',  group:'memory',url:null,desc:'Global rz-work standards — PRO_MODE, PDF_EXPORT, TOOLTIP, AUTH, UI_FEATURES, SEO, LEGAL, DATAHALL_AI.',tags:['standard','rz-work'],path:'rz-work/standarization/'},
 
   /* ─ MEMORY ─ */
-  {id:'mem',    label:'MEMORY.md (Hub)',     group:'memory',url:null,desc:'Master memory index for all Claude sessions. 200-line index of all memory files.',tags:['memory','index'],path:'.claude/projects/-home-baguspermana7/memory/MEMORY.md'},
+  {id:'mem',    label:'MEMORY.md (Hub)',     group:'memory',url:null,desc:'Master memory index loaded into every Claude session, kept under 16 KB by autotrim; the rest stays searchable in RZMemory.',tags:['memory','index'],path:'.claude/projects/-home-baguspermana7/memory/MEMORY.md'},
   {id:'mde',    label:'Mem: Dunia Emosi',   group:'memory',url:null,desc:'Dunia Emosi app details — 9 modules, color palette, game mechanics.',tags:['memory','dunia-emosi'],path:'memory/dunia-emosi-details.md'},
   {id:'mdcm',   label:'Mem: DCMOC',         group:'memory',url:null,desc:'DC MOC app details — Next.js stack, module breakdown, API endpoints.',tags:['memory','dcmoc'],path:'memory/dcmoc-details.md'},
   {id:'mpf',    label:'Mem: Portfolio',     group:'memory',url:null,desc:'Portfolio website details — 28+ HTML files, CSS patterns, fixes applied.',tags:['memory','portfolio'],path:'memory/portfolio-details.md'},
@@ -866,6 +866,16 @@ const RAW=[
     tags:['repos','install','tools','automation','documentation'],
     path:'rz-work/standarization/repos/REPO_INSTALL_PLAN.md' },
   {id:'manuals',label:'Technical Manuals',group:'core',url:'manual/',desc:'Per-calculator methodology manuals — inputs, formulas (engine-anchored), sourced constants, output equations, engine-verified worked examples, standards references. 33 calculator/cockpit manuals + 7 reference stubs + hub.',tags:['methodology','manual','reference','formulas'],path:'rz-work/manual/'},
+  /* 2026-10-18 — articles 28-30 and the Claude toolchain */
+  {id:'a28',label:'Art-28: Compression Horizon',group:'articles',url:'article-28.html',desc:'Future Forward — how close a laptop can get to a datacenter model: quantisation, distillation and the hardware floor.',tags:['ai','compression','frontier'],path:'rz-work/article-28.html'},
+  {id:'a29',label:'Art-29: How an LLM Works',group:'articles',url:'article-29.html',desc:'Future Forward — tokens, embeddings, attention and inference, traced from one token to a 1 GW campus. Five calculators.',tags:['ai','llm','inference'],path:'rz-work/article-29.html'},
+  {id:'a30',label:'Art-30: Agentic AI Graded',group:'articles',url:'article-30.html',desc:'Future Forward — a viral claim that agentic AI is fraud, graded claim by claim against 63 sources. Four calculators.',tags:['ai','agents','reliability'],path:'rz-work/article-30.html'},
+  {id:'cbm',label:'codebase-memory-mcp',group:'memory',url:null,desc:'Code knowledge graph Claude queries over MCP (v0.12.1): callers, call paths and architecture without reading files. Six projects indexed; refreshed on session start whenever the code changed.',tags:['claude','mcp','code-graph'],path:'~/.local/bin/codebase-memory-mcp'},
+  {id:'gfy',label:'Graphify',group:'memory',url:'Apps/second brain/codebase-graph.html',desc:'Clusters the same code into a graph for people: the Obsidian 09-Codebase vault and the Codebase Graph page in this app.',tags:['graph','obsidian','code-graph'],path:'~/.venvs/graphify'},
+  {id:'rzm',label:'RZMemory',group:'memory',url:null,desc:'Semantic memory of past Claude sessions plus the project knowledge base (memory_search, kb_search), on Milvus.',tags:['claude','memory','search'],path:'~/.claude/rzmemory'},
+  {id:'sesm',label:'Session Manager',group:'memory',url:null,desc:'Local web GUI for every Claude, Codex and Ollama session: resume, orchestration IDE, and the Optimise page (context per session, code-graph freshness, token thrift).',tags:['claude','sessions','optimise'],path:'~/.claude/rzsessions'},
+  {id:'thrift',label:'Token Thrift',group:'memory',url:null,desc:'Statusline token meter, MEMORY.md autotrim, transcript GC, sub-agent model tiers and caveman output compression: keeps every Claude turn small.',tags:['claude','tokens','cost'],path:'~/.claude/scripts'},
+  {id:'ctxm',label:'context-mode',group:'memory',url:null,desc:'Runs large tool output in a sandbox and returns only the answer, so raw data never enters the conversation.',tags:['claude','context','mcp'],path:'context-mode plugin'},
 ];
 
 /* ── EDGES ── */
@@ -989,6 +999,8 @@ const E=[
   /* Article 27 — workforce-adjacent */
   ['a27','arts'],['a27','geo'],['a27','rzeng'],['a27','glos'],
   ['a27','a24'],['a27','a25'],['arts','a27'],
+  /* 2026-10-18 — articles 28-30 and the Claude toolchain */
+  ['a28','arts'],['a28','ff'],['a29','arts'],['a29','ff'],['a30','arts'],['a30','ff'],['a28','a29'],['a29','a30'],['a29','glos'],['a30','glos'],['cbm','gfy'],['gfy','vault'],['gfy','asb'],['cbm','sesm'],['rzm','sesm'],['sesm','thrift'],['thrift','mem'],['rzm','mem'],['ctxm','thrift'],['cbm','asb'],['rzm','asb'],['a30','cbm'],
 ];
 
 /* ── GRAPH ── */
