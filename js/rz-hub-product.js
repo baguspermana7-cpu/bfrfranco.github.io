@@ -458,7 +458,7 @@
     strip.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-bin]'); if (b) { setBin(+b.getAttribute('data-bin')); touch(); } });
     strip.addEventListener('pointerover', function (e) { var b = e.target.closest && e.target.closest('[data-bin]'); if (b) { setBin(+b.getAttribute('data-bin')); touch(); } });
     strip.addEventListener('focusin', function (e) { var b = e.target.closest && e.target.closest('[data-bin]'); if (b) { setBin(+b.getAttribute('data-bin')); touch(); } });
-    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { inView = es[0].isIntersecting; }, { threshold: 0.15 }).observe(host);
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { inView = es[0].isIntersecting; host.classList.toggle('is-off', !inView); }, { threshold: 0.15 }).observe(host);
     document.addEventListener('visibilitychange', function () { if (!document.hidden && playing && !timer) tick(); });
 
     /* phones: the drawing is wider than the screen — say so, and stop saying it once they swipe */

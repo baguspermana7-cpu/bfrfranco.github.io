@@ -185,7 +185,7 @@
     }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer integrity="sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt" crossorigin="anonymous"></script>
-    <script src="js/rz-version.js?v=20261018-9bc5371f" defer></script>
+    <script src="js/rz-version.js?v=20261018-946e2930" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 
@@ -337,7 +337,7 @@
 .h3-parts li:hover, .h3-parts li.is-hot { background: var(--rz-bg-hover); color: var(--rz-text-primary); } .h3-parts li.is-hot b { color: var(--rz-text-accent); }
 .h3-read { padding: var(--rz-space-4); font-size: 13px; min-height: 120px; }
 .h3-read b { display: block; font-size: 15px; color: var(--rz-text-primary); } .h3-read span { display: block; font-family: var(--rz-font-mono); font-size: 11px; color: var(--rz-text-muted); margin-top: 2px; } .h3-read p { margin: 8px 0 0; color: var(--rz-text-secondary); line-height: 1.5; }
-.h3-spec { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-top: 1px solid var(--rz-line-tier-2); } .h3-spec div { padding: 10px 12px; border-right: 1px solid var(--rz-line-tier-3); display: flex; flex-direction: column; gap: 2px; min-width: 0; } .h3-spec span { font-family: var(--rz-font-mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--rz-text-muted); } .h3-spec b { font-family: var(--rz-font-mono); font-size: 16px; font-weight: 500; color: var(--rz-text-primary); font-variant-numeric: tabular-nums; } .h3-spec code { font-size: 10px; color: var(--rz-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.h3-spec { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-top: 1px solid var(--rz-line-tier-2); } .h3-spec div { padding: 10px 12px; border-right: 1px solid var(--rz-line-tier-3); display: flex; flex-direction: column; gap: 2px; min-width: 0; } .h3-spec span { font-family: var(--rz-font-mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--rz-text-muted); } .h3-spec b { font-family: var(--rz-font-mono); font-size: 16px; font-weight: 500; color: var(--rz-text-primary); font-variant-numeric: tabular-nums; } .h3-spec code { font-size: 10px; line-height: 1.45; color: var(--rz-text-muted); overflow-wrap: anywhere; }
 .h3-read em { font-style: normal; color: var(--rz-text-secondary); } .h3-read em[data-src="PUBLISHED"] { color: var(--rz-text-accent); }
 /* ---- group illustrations ---- */
 .tgi { position: relative; height: 128px; margin: 10px 0 4px; border: 1px solid var(--rz-line-tier-2); border-radius: 4px; background: var(--rz-bg-base); overflow: hidden; color: var(--rz-text-secondary); }
@@ -347,6 +347,8 @@
 .tgi-wire { fill: none; stroke: var(--rz-line-tier-1); stroke-width: 1.2; transition: stroke var(--rz-dur-tip) var(--rz-ease-out); } .tgi-wire.is-lost { stroke: var(--rz-accent-alert); stroke-dasharray: 3 3; }
 .tgi-cb path { fill: none; stroke: var(--rz-text-secondary); stroke-width: 1.4; } .tgi-cb circle { fill: var(--rz-text-secondary); }
 .tgi-bus, .tgi-node-dot { fill: var(--rz-text-secondary); } .tgi-gen.is-on { color: var(--rz-text-accent) !important; }
+/* off-screen panels and the hero hold their flow dashes still — an infinite dash animation repaints its SVG every frame */
+.is-off, .is-off * { animation-play-state: paused !important; }
 .tgi-pulse { fill: none; stroke: var(--rz-accent-signal); stroke-width: 1.6; stroke-dasharray: 2 10; stroke-linecap: round; animation: hubFlow 1.2s linear infinite; }
 .tgi-grid { stroke: var(--rz-line-tier-3); stroke-width: 1; } .tgi-cursor { stroke: var(--rz-line-tier-1); stroke-width: 1; stroke-dasharray: 2 2; }
 .tgi-line { fill: none; stroke: var(--rz-text-secondary); stroke-width: 1.4; } .tgi-line.is-on { stroke: var(--rz-accent-signal); } .tgi-c3 { stroke: var(--rz-text-primary); }
@@ -678,9 +680,7 @@ body.pp .rz-user-dropdown { background: var(--rz-bg-elevated); border-color: var
   })();
 </script>
 <script src="auth.js?v=20261017-b130c1bf" defer></script>
-<script src="rz-engine.min.js?v=20260922-a7d3acc6" defer></script>
 <script src="rz-tracker.js" defer></script>
-<script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
 <script src="js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
 <script src="js/dcai-model.js?v=1.6.0" defer></script>
 <script src="js/dcai-engine.js?v=1.6.0" defer></script>
@@ -689,8 +689,8 @@ body.pp .rz-user-dropdown { background: var(--rz-bg-elevated); border-color: var
 <script src="js/rz-diagram-layout.js?v=20261016-a82d8709" defer></script>
 <script src="js/rz-diagram.js?v=20261016-578db8a8" defer></script>
 <script src="js/rz-hub-icons.js?v=20261016-6dd78a27" defer></script>
-<script src="js/rz-hub-product.js?v=20261017-30b191f2" defer></script>
-<script src="js/rz-hub-illus.js?v=20261018-7c0ec396" defer></script>
-<script src="js/rz-hub-3d.js?v=20261018-b22c727d" defer></script>
+<script src="js/rz-hub-product.js?v=20261018-8040cae4" defer></script>
+<script src="js/rz-hub-illus.js?v=20261018-b49f868f" defer></script>
+<script src="js/rz-hub-3d.js?v=20261018-a8efc874" defer></script>
 </body>
 </html>

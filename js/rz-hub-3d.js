@@ -458,7 +458,10 @@
     }
     function resize() { var w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
     function draw() { if (raf) return; raf = requestAnimationFrame(frame); }
-    var lastInput = 0, inView = true, lastT = 0, slow = 0;
+    /* render on demand: the figure turns and its coolant runs for AUTO_MS after it first shows (or after
+     * Reset), and while someone drags, hovers or a tween runs; at rest it holds its last frame and costs
+     * nothing — a figure that redraws forever was the page's single biggest load */
+    var AUTO_MS = 9000, autoUntil = performance.now() + AUTO_MS, lastInput = 0, inView = true, lastT = 0, slow = 0;
     function degrade() {
       if (degraded) return; degraded = true;
       renderer.shadowMap.enabled = false; renderer.setPixelRatio(1); key.castShadow = false;
@@ -482,8 +485,9 @@
       ctl.update();
       try { renderer.render(scene, cam); } catch (e) { if (scene.environment) { scene.environment = null; renderer.render(scene, cam); } else throw e; }
       placeLabels();
-      var moving = ctl.autoRotate || exploding || (t - lastInput) < 1400 || (!REDUCE && (loops.length || spinners.length));
-      if (moving && inView) { if ((t - lastInput) > 10000 && !exploding) raf = requestAnimationFrame(function () { raf = requestAnimationFrame(frame); }); else raf = requestAnimationFrame(frame); }
+      if (ctl.autoRotate && t > autoUntil) ctl.autoRotate = false;
+      var moving = ctl.autoRotate || exploding || (t - lastInput) < 1400;
+      if (moving && inView) raf = requestAnimationFrame(frame); else lastT = 0;
     }
     function pick(ev) {
       var r = cv.getBoundingClientRect(); ptr.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
@@ -493,7 +497,8 @@
       lastSlot = slot; return hits[0].object.userData.part;
     }
     function touched() { ctl.autoRotate = false; lastInput = performance.now(); draw(); }
-    cv.addEventListener('pointermove', function (ev) { if (pinned) return; var id = pick(ev); if (id !== hot) light(id); });
+    var pickEv = null, pickRaf = 0;
+    cv.addEventListener('pointermove', function (ev) { if (pinned) return; pickEv = ev; if (!pickRaf) pickRaf = requestAnimationFrame(function () { pickRaf = 0; if (pinned) return; var id = pick(pickEv); if (id !== hot) light(id); }); });
     cv.addEventListener('pointerleave', function () { if (!pinned) light(null); });
     cv.addEventListener('pointerdown', touched, { passive: true });
     cv.addEventListener('wheel', touched, { passive: true });
@@ -512,7 +517,7 @@
       var pos = k === 'front' ? [0.001, t[1] + (rack ? 0.3 : 0.5), t[2] + d] : k === 'rear' ? [0.001, t[1] + (rack ? 0.3 : 0.5), t[2] - d] : k === 'top' ? [0.001, t[1] + d, t[2] + 0.001] : [t[0] + d * 0.6, t[1] + d * 0.45, t[2] + d * 0.75];
       cam.position.set(pos[0], pos[1], pos[2]); ctl.target.set(t[0], t[1], t[2]); ctl.update(); touched();
     }); });
-    resetBtn.addEventListener('click', function () { fit(view); explodeTarget = 0; explodeBtn.setAttribute('aria-pressed', 'false'); pinned = null; light(null); ctl.autoRotate = !REDUCE; draw(); });
+    resetBtn.addEventListener('click', function () { fit(view); explodeTarget = 0; explodeBtn.setAttribute('aria-pressed', 'false'); pinned = null; light(null); ctl.autoRotate = !REDUCE; autoUntil = performance.now() + AUTO_MS; draw(); });
     tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-view')); }); });
     ctl.addEventListener('change', function () { lastInput = performance.now(); draw(); });
     /* keyboard on the focused canvas: arrows orbit, + / - zoom, E explode, C cutaway, 1-4 camera presets, 0 reset */

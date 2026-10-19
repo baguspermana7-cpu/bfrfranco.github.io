@@ -144,7 +144,7 @@
     var t0 = performance.now();
     live.forEach(function (l) { try { l.tick(l.host, REDUCE ? 4200 : 0); } catch (e) { /* a panel that cannot draw stays as rendered */ } });
     if (REDUCE) return;
-    if ('IntersectionObserver' in root) { var io = new IntersectionObserver(function (es) { es.forEach(function (e) { for (var i = 0; i < live.length; i++) if (live[i].host === e.target) live[i].on = e.isIntersecting; }); if (root.__rzIllusWake) root.__rzIllusWake(); }, { threshold: 0.2 }); live.forEach(function (l) { io.observe(l.host); }); } else live.forEach(function (l) { l.on = true; });
+    if ('IntersectionObserver' in root) { var io = new IntersectionObserver(function (es) { es.forEach(function (e) { e.target.classList.toggle('is-off', !e.isIntersecting); for (var i = 0; i < live.length; i++) if (live[i].host === e.target) live[i].on = e.isIntersecting; }); if (root.__rzIllusWake) root.__rzIllusWake(); }, { threshold: 0.2 }); live.forEach(function (l) { io.observe(l.host); }); } else live.forEach(function (l) { l.on = true; });
     /* one loop for all panels, and only while one of them is on screen and the tab is visible */
     var last = 0, raf = null;
     function anyOn() { for (var i = 0; i < live.length; i++) if (live[i].on) return true; return false; }

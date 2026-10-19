@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.24.20 — 2026-10-19 — "Light Hub"
+
+### Fixed
+- **The DC Solutions hub was heavy enough to hang the browser** (owner report). Measured A/B
+  against v3.24.19 in the same headless browser, 10-second idle windows:
+  - **3D figure:** it redrew every frame for as long as it was on screen (auto-rotate, coolant
+    flow and fans kept the loop alive, at half rate after 10 s but never stopping). It now renders
+    on demand. It turns and runs its coolant for 9 s after it first shows (or after Reset), and
+    while someone drags, hovers or a tween runs. At rest it holds its last frame and requests no
+    frames. The hover raycast runs at most once a frame instead of on every pointer event.
+  - **Off-screen animations:** the hero plant and the seven catalogue panels kept their
+    infinite dash animations running off screen, repainting their SVGs every frame. Panels and the
+    hero now pause their CSS animations while off screen.
+  - **Unused and duplicate scripts:** the 509 KB `rz-engine.min.js` was loaded and parsed on a
+    page that never calls it, and `rz-mobile-nav.js` was loaded twice. Both tags are gone.
+  - **Result:** scrolled to the end of the page, v3.24.19 ran 109 animation frames and 56 s of
+    script time across threads per 10 s window (WebGL is software-rendered in the harness).
+    v3.24.20 runs 0 frames and 1 ms. On the hero, busy time fell from 448 % to 268 % of the window.
+- The registry ids under the rack spec grid were cut off with an ellipsis
+  (`distribution.rack_feed_…`). They wrap now, so every id reads in full.
+
 ## v3.24.19 — 2026-10-19 — "Whole Graph"
 
 ### Fixed — Second Brain said "healthy" while 26 of 36 journal pages had no node
