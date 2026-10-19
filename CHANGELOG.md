@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v3.24.21 — 2026-10-19 — "Callouts"
+
+### Fixed
+- **The 3D figure's callouts overlapped and ran off the stage.** A headless check now places every
+  visible tag box in all six states (rack, compute tray, switch tray, each normal and exploded) at
+  1440 and 390 px. Before the fix: a numbered tag on the "40 °C in" readout (compute tray, desktop),
+  tag 6 on "50 °C out" (switch tray), and on phones the compute tray ran out of the frame with
+  readouts off the edge. After: 0 overlaps and 0 tags off the stage in all twelve cases, and every
+  view still shows its tags.
+  - Tags are tested as their real boxes (4 px clear), not a fixed 26 px square. The temperature
+    readouts and the part in focus are placed first. A readout that would run off the right edge,
+    or onto another readout, moves to the other side of its point.
+  - The tray views back the camera off on a narrow stage (same line of sight, distance scaled by
+    the stage aspect), so the whole tray fits on a phone.
+  - New tags start hidden, so they no longer flash at the stage's top-left corner before the first
+    frame places them.
+- Registry ids under the spec grid break at "." and "_" instead of mid-word.
+
 ## v3.24.20 — 2026-10-19 — "Light Hub"
 
 ### Fixed

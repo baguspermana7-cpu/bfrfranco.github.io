@@ -397,7 +397,7 @@
     function fit(name) {
       /* rack: 100 mm cells over a 2 m radius; trays: the same grid at half scale (50 mm cells, a bench mat) */
       if (name === 'rack') { grid.scale.setScalar(1); floor.scale.setScalar(1); grid.position.set(0, 0, 0); floor.position.set(0, -0.004, 0); cam.position.set(3.1, 2.3, 3.9); ctl.target.set(0, 1.25, 0); ctl.minDistance = 1.2; ctl.maxDistance = 8; }
-      else { grid.scale.setScalar(0.5); floor.scale.setScalar(0.5); grid.position.set(0, -0.02, 0.40); floor.position.set(0, -0.024, 0.40); cam.position.set(0.76, 0.64, 1.33); ctl.target.set(0, 0.04, 0.40); ctl.minDistance = 0.25; ctl.maxDistance = 3; }
+      else { grid.scale.setScalar(0.5); floor.scale.setScalar(0.5); grid.position.set(0, -0.02, 0.40); floor.position.set(0, -0.024, 0.40); ctl.target.set(0, 0.04, 0.40); var ar = (stage.clientWidth || 16) / (stage.clientHeight || 9), k = Math.max(1, 1.7 / ar); cam.position.set(0.76 * k, 0.04 + 0.60 * k, 0.40 + 0.93 * k); ctl.minDistance = 0.25; ctl.maxDistance = 3; }
       ctl.update();
     }
     function show(name) {
@@ -425,7 +425,7 @@
     function renderList() {
       var V = VIEWS[view];
       list.innerHTML = V.parts.map(function (id, i) { var p = PARTS[id]; return '<li data-part="' + id + '"><b>' + (i + 1) + '</b><span>' + p.name + '</span><i>' + (p.count > 1 ? '×' + n(p.count) + ' ' : '') + p.src.toLowerCase() + '</i></li>'; }).join('');
-      labels.innerHTML = V.parts.map(function (id, i) { return '<span class="h3-tag" data-part="' + id + '"><b>' + (i + 1) + '</b></span>'; }).join('') + tagged.map(function (m, i) { return '<span class="h3-tag h3-temp" data-temp="' + i + '">' + m.userData.tag + '</span>'; }).join('');
+      labels.innerHTML = V.parts.map(function (id, i) { return '<span class="h3-tag" style="display:none" data-part="' + id + '"><b>' + (i + 1) + '</b></span>'; }).join('') + tagged.map(function (m, i) { return '<span class="h3-tag h3-temp" style="display:none" data-temp="' + i + '">' + m.userData.tag + '</span>'; }).join('');
     }
     function readout(id) {
       var V = VIEWS[view];
@@ -443,16 +443,26 @@
     function anchorOf(id) { for (var i = 0; i < meshes.length; i++) if (meshes[i].userData.part === id) return meshes[i]; return null; }
     var v3 = new T.Vector3();
     function placeLabels() {
-      var w = cv.clientWidth, h = cv.clientHeight, taken = [];
-      Array.prototype.forEach.call(labels.children, function (t) {
+      /* every tag is a real box: the temperature readouts and the part in focus are placed first and
+       * always shown; a numbered tag that would overlap a placed box (4 px clear) or leave the stage is
+       * held back. Sizes are read once per tag — the boxes do not change size while the figure turns */
+      var w = cv.clientWidth, h = cv.clientHeight, taken = [], all = Array.prototype.slice.call(labels.children);
+      all.sort(function (a, b) { var ra = a.hasAttribute('data-temp') || a.classList.contains('is-hot') ? 0 : 1, rb = b.hasAttribute('data-temp') || b.classList.contains('is-hot') ? 0 : 1; return ra - rb; });
+      all.forEach(function (t) {
         var m = t.hasAttribute('data-temp') ? tagged[+t.getAttribute('data-temp')] : anchorOf(t.getAttribute('data-part')); if (!m) { t.style.display = 'none'; return; }
         m.getWorldPosition(v3); v3.project(cam);
         if (v3.z > 1) { t.style.display = 'none'; return; }
-        var px = (v3.x + 1) / 2 * w, py = (1 - v3.y) / 2 * h, hot = t.classList.contains('is-hot');
-        /* a numbered tag that would land on another one is held back, unless it is the part in focus */
-        var clash = !t.hasAttribute('data-temp') && !hot && taken.some(function (q) { return Math.abs(q[0] - px) < 26 && Math.abs(q[1] - py) < 26; });
-        if (clash) { t.style.display = 'none'; return; }
-        if (!t.hasAttribute('data-temp')) taken.push([px, py]);
+        var px = (v3.x + 1) / 2 * w, py = (1 - v3.y) / 2 * h, must = t.hasAttribute('data-temp') || t.classList.contains('is-hot');
+        if (!t.__wh) { t.style.display = ''; t.__wh = [t.offsetWidth || 22, t.offsetHeight || 20]; }
+        var bw = t.__wh[0], bh = t.__wh[1], ox = t.hasAttribute('data-temp') ? 8 : -bw / 2, oy = t.hasAttribute('data-temp') ? -24 : -bh / 2, box = [px + ox - 4, py + oy - 4, px + ox + bw + 4, py + oy + bh + 4];
+        var out = box[0] < 0 || box[1] < 0 || box[2] > w || box[3] > h;
+        /* a temperature readout that would run off the right edge reads to the left of its point */
+        if (t.hasAttribute('data-temp')) { t.style.marginLeft = ''; if (box[2] > w) { ox = -bw - 8; box = [px + ox - 4, py + oy - 4, px + ox + bw + 4, py + oy + bh + 4]; t.style.marginLeft = ox + 'px'; out = box[0] < 0 || box[1] < 0 || box[3] > h; } if (out) { t.style.display = 'none'; return; } }
+        var hits = function (bx) { return taken.some(function (q) { return bx[0] < q[2] && bx[2] > q[0] && bx[1] < q[3] && bx[3] > q[1]; }); }, clash = hits(box);
+        /* two readouts close together on a narrow stage: the second tries the other side of its point, else waits */
+        if (clash && t.hasAttribute('data-temp')) { var ox2 = ox === 8 ? -bw - 8 : 8, b2 = [px + ox2 - 4, py + oy - 4, px + ox2 + bw + 4, py + oy + bh + 4]; if (!hits(b2) && b2[0] >= 0 && b2[2] <= w) { box = b2; clash = false; t.style.marginLeft = ox2 === 8 ? '' : ox2 + 'px'; } else { t.style.display = 'none'; return; } }
+        if (!must && (clash || out)) { t.style.display = 'none'; return; }
+        taken.push(box);
         t.style.display = ''; t.style.transform = 'translate(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px)';
       });
     }
@@ -548,7 +558,7 @@
       ['GPUs a rack', n(get('compute.gpu_per_rack') || 72), 'compute.gpu_per_rack'], ['NVLink domain', n(M.nvlinkDomainTBs || 130) + ' TB/s', 'gb300.nvlinkDomainTBs'], ['NVLink a GPU', n(M.nvlinkPerGpuGBs || 1800) + ' GB/s', 'gb300.nvlinkPerGpuGBs'],
       ['GPU memory a rack', n(M.gpuMemoryTbPerRack || 20) + ' TB', 'gb300.gpuMemoryTbPerRack'], ['Rack IT', n(get('power.rack_it_kw') || 142) + ' kW', 'power.rack_it_kw'], ['Power installed', n((M.shelfKw || 33) * PS) + ' kW', 'gb300.powerShelves × shelfKw'],
       ['Feed current a rack', n(get('distribution.rack_feed_current_a')) + ' A', 'distribution.rack_feed_current_a'], ['TCS supply / return', n(TCS_S) + ' / ' + n(TCS_R) + ' °C', 'design.planes.p07 · p08']
-    ].map(function (r) { return '<div><span>' + r[0] + '</span><b>' + r[1] + '</b><code>' + r[2] + '</code></div>'; }).join('');
+    ].map(function (r) { return '<div><span>' + r[0] + '</span><b>' + r[1] + '</b><code>' + r[2].replace(/([._])/g, '$1<wbr>') + '</code></div>'; }).join('');
     resize(); show('rack');
   }
 
