@@ -546,19 +546,21 @@ if (D.regionsCountry) {
     ok('every market region in the canonical 5-set', badRegion.length === 0, badRegion.join(', '));
     const badPower = keys.filter(k => !(D.markets[k].powerCost >= 0.03 && D.markets[k].powerCost <= 0.30));
     ok('market powerCost within plausibility band 0.03-0.30 $/kWh', badPower.length === 0, badPower.join(', '));
-    const badVac = keys.filter(k => !(D.markets[k].vacancy >= 0 && D.markets[k].vacancy <= 15));
-    ok('market vacancy within 0-15%', badVac.length === 0, badVac.join(', '));
+    /* 0-30 % since the H1 2026 refresh: new supply put Cushman & Wakefield colocation vacancy at 26.2 % in Dubai,
+       20.4 % in Jakarta and 15.6 % in Hong Kong (quotes re-read live, v3.24.24) — 15 % no longer bounds real markets */
+    const badVac = keys.filter(k => !(D.markets[k].vacancy >= 0 && D.markets[k].vacancy <= 30));
+    ok('market vacancy within 0-30%', badVac.length === 0, badVac.join(', '));
     const badPlayers = keys.filter(k => !Array.isArray(D.markets[k].players) || D.markets[k].players.length < 1);
     ok('every market lists >=1 operator', badPlayers.length === 0, badPlayers.join(', '));
     // worked examples — pinned totals (update intentionally with any data refresh)
     const g = M.market.summary();
     eq('market.summary global count', g.count, 25);
-    eq('market.summary global operational MW', g.operational, 17640);
-    eq('market.summary global construction MW', g.construction, 6310);
-    eq('market.summary global planned MW', g.planned, 19750);
-    near('market.summary global pipelineRatio', g.pipelineRatio, 1.4773, 0.001);
+    eq('market.summary global operational MW', g.operational, 21923);
+    eq('market.summary global construction MW', g.construction, 8498);
+    eq('market.summary global planned MW', g.planned, 21450);
+    near('market.summary global pipelineRatio', g.pipelineRatio, 1.3661, 0.001);
     const na = M.market.summary('North America');
-    eq('market.summary NA operational MW', na.operational, 7740);
+    eq('market.summary NA operational MW', na.operational, 8897);
     eq('market.summary NA count', na.count, 6);
     eq('market.regions() = canonical 5-set', JSON.stringify(M.market.regions()), JSON.stringify(REGIONS));
     ok("DATA.sources['markets'] registered", !!(D.sources && D.sources['markets'] && D.sources['markets'].source && D.sources['markets'].asOf));
@@ -572,6 +574,32 @@ if (D.regionsCountry) {
     eq('market.cagrBand(0.05) low', M.market.cagrBand(0.05), 'low');
     ok('every market region resolves a colour', keys.every(k => M.market.colorByRegion(D.markets[k].region) !== D.marketViz.fallback));
     ok("DATA.sources['marketViz'] registered", !!(D.sources && D.sources['marketViz']));
+    /* The tracker and its manual print market figures; they must be the engine's (v3.24.24). The page said
+       "Q1 2025 estimates · Updated quarterly" for 18 months, and the manual table kept its own copy of all 25 rows. */
+    const page = readFileSync(resolve(__dirname, '..', 'dc-market-tracker.html'), 'utf8');
+    ok('tracker as-of is read from DATA.sources.markets (no hand-written data date)',
+        page.includes('id="dmtAsOf"') && page.includes('RZEngine.data.sources') && !/Data:\s*Q[1-4] 20\d\d|Updated quarterly/.test(page));
+    ok("DATA.sources['markets'] carries asOf + short label", /^\d{4}-\d{2}$/.test(D.sources.markets.asOf || '') && !!D.sources.markets.short);
+    const man = readFileSync(resolve(__dirname, '..', 'manual', 'dc-market-tracker.html'), 'utf8');
+    const fmt = (n) => n.toLocaleString('en-US');
+    const drift = keys.filter((k) => { const m = D.markets[k];
+        return !man.includes('<tr><td>' + m.name + '</td><td>' + m.region.replace(/&/g, '&amp;') + '</td><td>' + fmt(m.operational) + '</td><td>' + fmt(m.construction + m.planned) + '</td><td><code>' + m.powerCost.toFixed(3) + '</code></td><td>' + m.vacancy + '</td>'); });
+    ok('manual market table = DATA.markets (op, pipeline, power, vacancy)', drift.length === 0, drift.join(', '));
+}
+/* Industry-average PUE: one engine value (v3.24.24). The PUE and carbon calculators hard-coded Uptime 2024's 1.58 in
+   14 places while dcValue carried 1.56; each page now reads DATA.pueBenchmark and its fallback must equal it. */
+{
+    const avg = D.pueBenchmark && D.pueBenchmark.industryAvg;
+    ok("DATA.pueBenchmark.industryAvg sourced", typeof avg === 'number' && !!(D.sources && D.sources.pueBenchmark && D.sources.pueBenchmark.asOf));
+    for (const f of ['pue-calculator.html', 'carbon-footprint.html', 'roi-calculator.html', 'manual/pue.html', 'manual/carbon.html', 'manual/roi.html', 'manual/compare-air-vs-liquid-cooling.html']) {
+        const h = readFileSync(resolve(__dirname, '..', f), 'utf8');
+        if (f === 'pue-calculator.html' || f === 'carbon-footprint.html') {   // the two pages that compute against it
+            const fb = h.match(/RZEngine\.data\.pueBenchmark;\s*return b \? b\.industryAvg : ([\d.]+);/);
+            ok(f + ' reads DATA.pueBenchmark, fallback = engine value', !!fb && +fb[1] === avg, fb ? fb[1] : 'no reader');
+        }
+        const stale = (h.match(/\b1\.5[0-9]\b(?=[^\n]{0,40}(?:[Aa]verage|[Aa]vg))|(?:[Aa]verage|[Aa]vg)[^\n<]{0,30}\b1\.5[0-9]\b/g) || []).filter((s) => !s.includes(String(avg)));
+        ok(f + ' prints no other "average PUE" literal', stale.length === 0, stale.join(' | '));
+    }
 }
 
 /* ============================================================

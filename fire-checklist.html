@@ -30,7 +30,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20261009-bfaeb6db">
-    <script src="js/rz-version.js?v=20261025-a998b6f5" defer></script>
+    <script src="js/rz-version.js?v=20261025-d21190a4" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <script type="application/ld+json">
@@ -66,6 +66,8 @@
         .ck-item { display:flex; gap:.6rem; align-items:flex-start; padding:.45rem .2rem; border-bottom:1px solid var(--fc-border); font-size:.9rem; line-height:1.5; }
         .ck-item input { margin-top:.2rem; width:16px; height:16px; accent-color:var(--fc-primary); flex-shrink:0; }
         .ck-item b { color:var(--fc-text); }
+        .ck-label { display:flex; gap:.6rem; align-items:flex-start; cursor:pointer; width:100%; }
+        .ck-progress { font-family:'JetBrains Mono',monospace; font-size:.75rem; color:var(--fc-muted, #94a3b8); margin:.2rem 0 0; }
         .cad { font-family:'JetBrains Mono',monospace; font-size:.6rem; font-weight:700; padding:1px 6px; border-radius:4px; text-transform:uppercase; }
         .cad.d { background:rgba(10,138,90,.16); color:#065f46; } .cad.w { background:rgba(6,182,212,.16); color:#155e75; }
         .cad.m { background:rgba(217,119,6,.16); color:#92400e; } .cad.q { background:rgba(14,116,144,.16); color:#64748b; }
@@ -176,7 +178,7 @@
                     <tr><td>LOAEL</td><td>&gt;10%</td><td>10.5%</td><td>52%</td><td><span class="src std">NFPA 2001</span></td></tr>
                     <tr><td>Discharge time</td><td colspan="2">≤ 10 s (halocarbon)</td><td>≤ 60 s (inert)</td><td><span class="src std">NFPA 2001</span></td></tr>
                     <tr><td>Concentration hold (retention)</td><td colspan="3">≥ 10 min (verified by door-fan test)</td><td><span class="src std">NFPA 2001</span></td></tr>
-                    <tr><td>100-yr GWP</td><td>1</td><td>3,220</td><td>0</td><td><span class="src std">IPCC AR6</span></td></tr>
+                    <tr><td>100-yr GWP</td><td>1</td><td>3,220</td><td>0</td><td><span class="src std">IPCC AR4</span></td></tr>
                     <tr><td>Atmospheric lifetime</td><td>~5 days</td><td>~36 yr</td><td>n/a</td><td><span class="src std">IPCC</span></td></tr>
                 </tbody>
             </table></div>
@@ -219,37 +221,37 @@
         <section class="ck-sec" id="s4">
             <h2><span class="n">04</span> Commissioning — numeric procedure</h2>
             <ul class="ck-list">
-                <li class="ck-item"><input type="checkbox"><span><b>Room integrity (door-fan) test.</b> Measure equivalent leakage area; confirm the agent concentration is retained for the required <b>hold time (≥10 min)</b>. Seal penetrations and re-test until pass. <span class="src std">NFPA 2001</span></span></li>
-                <li class="ck-item"><input type="checkbox"><span><b>Agent quantity &amp; cylinder charge.</b> Verify charged weight/pressure vs the design (W = (V/s)·(C/(100−C))); record cylinder serials, fill weight and superpressurization. <span class="src std">NFPA 2001</span></span></li>
-                <li class="ck-item"><input type="checkbox"><span><b>Discharge test (where required).</b> Confirm full discharge ≤ 10 s (halocarbon) / ≤ 60 s (inert) and measured concentration reaches design. <span class="src std">NFPA 2001</span></span></li>
-                <li class="ck-item"><input type="checkbox"><span><b>Detection cross-zone verification.</b> Prove no single detector releases agent; confirm pre-discharge delay + abort + manual release. <span class="src std">NFPA 72</span></span></li>
-                <li class="ck-item"><input type="checkbox"><span><b>HVAC/damper + EPO interlocks.</b> On confirmed alarm: air handlers stop, dampers close, EPO sequence verified. <span class="src std">NFPA 70/75</span></span></li>
-                <li class="ck-item"><input type="checkbox"><span><b>Li-ion off-gas detection commissioning.</b> Calibrate H₂/CO sensors; verify alarm at ≤25% LFL and exhaust/ventilation start; confirm BMS-shutdown sequence. <span class="src std">NFPA 855</span></span></li>
-                <li class="ck-item"><input type="checkbox"><span><b>Integrated systems test (IST).</b> End-to-end: detection → alarm → HVAC → EPO → release → BMS, all together. <span class="src typ">TYPICAL</span></span></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span><b>Room integrity (door-fan) test.</b> Measure equivalent leakage area; confirm the agent concentration is retained for the required <b>hold time (≥10 min)</b>. Seal penetrations and re-test until pass. <span class="src std">NFPA 2001</span></span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span><b>Agent quantity &amp; cylinder charge.</b> Verify charged weight/pressure vs the design (W = (V/s)·(C/(100−C))); record cylinder serials, fill weight and superpressurization. <span class="src std">NFPA 2001</span></span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span><b>Discharge test (where required).</b> Confirm full discharge ≤ 10 s (halocarbon) / ≤ 60 s (inert) and measured concentration reaches design. <span class="src std">NFPA 2001</span></span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span><b>Detection cross-zone verification.</b> Prove no single detector releases agent; confirm pre-discharge delay + abort + manual release. <span class="src std">NFPA 72</span></span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span><b>HVAC/damper + EPO interlocks.</b> On confirmed alarm: air handlers stop, dampers close, EPO sequence verified. <span class="src std">NFPA 70/75</span></span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span><b>Li-ion off-gas detection commissioning.</b> Calibrate H₂/CO sensors; verify alarm at ≤25% LFL and exhaust/ventilation start; confirm BMS-shutdown sequence. <span class="src std">NFPA 855</span></span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span><b>Integrated systems test (IST).</b> End-to-end: detection → alarm → HVAC → EPO → release → BMS, all together. <span class="src typ">TYPICAL</span></span></label></li>
             </ul>
         </section>
 
         <section class="ck-sec" id="s5">
             <h2><span class="n">05</span> Installation checklist</h2>
             <ul class="ck-list">
-                <li class="ck-item"><input type="checkbox"><span>Enclosure sealed (cable penetrations, floor/ceiling voids, dampers) for room integrity</span></li>
-                <li class="ck-item"><input type="checkbox"><span>Cylinders mounted, restrained, labelled; discharge nozzles positioned per drawings</span></li>
-                <li class="ck-item"><input type="checkbox"><span>Detectors (aspirating + spot) installed, addressed, cross-zoned to the panel</span></li>
-                <li class="ck-item"><input type="checkbox"><span>FACP, abort/manual-release stations, pre-discharge warning devices installed</span></li>
-                <li class="ck-item"><input type="checkbox"><span>HVAC/damper interlocks and EPO wired and labelled</span></li>
-                <li class="ck-item"><input type="checkbox"><span>Li-ion room: H₂/CO gas detection, exhaust fans, fire-rated separation in place</span></li>
-                <li class="ck-item"><input type="checkbox"><span>Signage, occupant safety placards, and as-built documentation pack</span></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Enclosure sealed (cable penetrations, floor/ceiling voids, dampers) for room integrity</span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Cylinders mounted, restrained, labelled; discharge nozzles positioned per drawings</span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Detectors (aspirating + spot) installed, addressed, cross-zoned to the panel</span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>FACP, abort/manual-release stations, pre-discharge warning devices installed</span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>HVAC/damper interlocks and EPO wired and labelled</span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Li-ion room: H₂/CO gas detection, exhaust fans, fire-rated separation in place</span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Signage, occupant safety placards, and as-built documentation pack</span></label></li>
             </ul>
         </section>
 
         <section class="ck-sec" id="s6">
             <h2><span class="n">06</span> Routine inspection</h2>
             <ul class="ck-list">
-                <li class="ck-item"><input type="checkbox"><span>Cylinder pressure gauges in the green band; no leak indication</span></li>
-                <li class="ck-item"><input type="checkbox"><span>FACP normal — no trouble/alarm; detectors not in fault</span></li>
-                <li class="ck-item"><input type="checkbox"><span>Abort/manual-release stations unobstructed; signage legible</span></li>
-                <li class="ck-item"><input type="checkbox"><span>Room enclosure intact (no new penetrations, doors self-close/seal)</span></li>
-                <li class="ck-item"><input type="checkbox"><span>Li-ion room: gas-detection normal, exhaust available, temperature in band</span></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Cylinder pressure gauges in the green band; no leak indication</span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>FACP normal — no trouble/alarm; detectors not in fault</span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Abort/manual-release stations unobstructed; signage legible</span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Room enclosure intact (no new penetrations, doors self-close/seal)</span></label></li>
+                <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Li-ion room: gas-detection normal, exhaust available, temperature in band</span></label></li>
             </ul>
         </section>
 
@@ -295,17 +297,17 @@
                     <div><label>Service type</label><input type="text" aria-label="Service record entry"></div>
                 </div>
                 <ul class="ck-list" style="margin-top:.8rem;">
-                    <li class="ck-item"><input type="checkbox"><span>Cylinder weight / pressure within design — value: ____________</span></li>
-                    <li class="ck-item"><input type="checkbox"><span>Door-fan / room-integrity hold time ≥ 10 min — value: ____________</span></li>
-                    <li class="ck-item"><input type="checkbox"><span>Detection cross-zone + abort verified</span></li>
-                    <li class="ck-item"><input type="checkbox"><span>HVAC/damper + EPO interlocks verified</span></li>
-                    <li class="ck-item"><input type="checkbox"><span>Li-ion gas detection (H₂/CO) calibrated; exhaust verified</span></li>
-                    <li class="ck-item"><input type="checkbox"><span>FACP normal; no outstanding trouble</span></li>
+                    <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Cylinder weight / pressure within design — value: ____________</span></label></li>
+                    <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Door-fan / room-integrity hold time ≥ 10 min — value: ____________</span></label></li>
+                    <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Detection cross-zone + abort verified</span></label></li>
+                    <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>HVAC/damper + EPO interlocks verified</span></label></li>
+                    <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>Li-ion gas detection (H₂/CO) calibrated; exhaust verified</span></label></li>
+                    <li class="ck-item"><label class="ck-label"><input type="checkbox"><span>FACP normal; no outstanding trouble</span></label></li>
                 </ul>
                 <div><label>Findings / next service date</label><input type="text" aria-label="Service record entry"></div>
                 <div class="form-grid" style="margin-top:.5rem;"><div><label>Technician signature</label><input type="text" aria-label="Service record entry"></div><div><label>Supervisor sign-off</label><input type="text" aria-label="Service record entry"></div></div>
                 <button class="btn-print" id="fire-checklistTrig" type="button">Export PDF&nbsp;&mdash; choose sections</button>
-                <button class="btn-print ghost" onclick="document.querySelectorAll('.form-card input').forEach(function(i){i.type==='checkbox'?i.checked=false:i.value='';})">Clear form</button>
+                <button class="btn-print ghost" onclick="window.rzFireChecklistClear && rzFireChecklistClear()">Clear form</button>
             </div>
         </section>
 
@@ -328,6 +330,29 @@
         var hb=document.querySelector('.hamburger'), nm=document.querySelector('.nav-menu');
         if(hb&&nm) hb.addEventListener('click',function(){ hb.classList.toggle('active'); nm.classList.toggle('active'); });
         var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
+    })();
+    </script>
+    <script>
+    /* Checklist state (v3.24.24): ticks and service-record fields survive a reload, each list shows how many items are
+       done, and Clear empties the form and the saved copy. Before, the 26 checkboxes had no label (clicking the text
+       did nothing) and a reload lost everything. */
+    (function(){
+        var KEY='rz_fire_checklist_v1';
+        var inputs=[].slice.call(document.querySelectorAll('.ck-list input[type=checkbox], .form-card input'));
+        function load(){ try { return JSON.parse(localStorage.getItem(KEY)||'{}'); } catch(e){ return {}; } }
+        function save(){ var s={}; inputs.forEach(function(i,n){ s[n]=i.type==='checkbox'?i.checked:i.value; }); try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} }
+        function progress(){
+            [].forEach.call(document.querySelectorAll('.ck-list'), function(ul){
+                var boxes=ul.querySelectorAll('input[type=checkbox]'); if(!boxes.length) return;
+                var p=ul.nextElementSibling; if(!p || !p.classList.contains('ck-progress')){ p=document.createElement('p'); p.className='ck-progress'; p.setAttribute('aria-live','polite'); ul.parentNode.insertBefore(p, ul.nextSibling); }
+                var done=[].filter.call(boxes,function(b){return b.checked;}).length;
+                p.textContent=done+' of '+boxes.length+' checked';
+            });
+        }
+        var s=load(); inputs.forEach(function(i,n){ if(s[n]===undefined) return; if(i.type==='checkbox') i.checked=!!s[n]; else i.value=s[n]; });
+        inputs.forEach(function(i){ i.addEventListener(i.type==='checkbox'?'change':'input', function(){ save(); progress(); }); });
+        window.rzFireChecklistClear=function(){ document.querySelectorAll('.form-card input').forEach(function(i){ if(i.type==='checkbox') i.checked=false; else i.value=''; }); save(); progress(); };
+        progress();
     })();
     </script>
     <script src="auth.js?v=20261017-b130c1bf" defer></script>

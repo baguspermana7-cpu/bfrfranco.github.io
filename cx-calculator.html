@@ -672,7 +672,7 @@ a[href$="opex-calculator.html"][href] { color:#34d399 !important; }
 .cx-disc-fine[class] { color:#94a3b8 !important; }
 .cx-disc-fine a { text-decoration:underline !important; text-underline-offset:2px; color:#93c5fd !important; }
 </style>
-    <script src="js/rz-version.js?v=20261025-a998b6f5" defer></script>
+    <script src="js/rz-version.js?v=20261025-d21190a4" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
@@ -1343,9 +1343,9 @@ var CX_RATES = {
 var CX_COOLING = {air:{cost:1.00,dur:1.00},inrow:{cost:1.12,dur:1.08},rdhx:{cost:1.25,dur:1.18},dlc:{cost:1.45,dur:1.35},immersion:{cost:1.55,dur:1.40}};
 var CX_REDUNDANCY = {
   'N':   {cost:1.00,dur:1.00,tier:'Tier I',avail:'99.671%',scenarios:3,istHrs:14},
-  'N+1': {cost:1.35,dur:1.30,tier:'Tier II/III',avail:'99.982%',scenarios:6,istHrs:16},
+  'N+1': {cost:1.35,dur:1.30,tier:'Tier II/III',avail:'99.741–99.982%',scenarios:6,istHrs:16},
   '2N':  {cost:2.00,dur:1.75,tier:'Tier IV',avail:'99.995%',scenarios:10,istHrs:110},
-  '2N+1':{cost:2.25,dur:1.90,tier:'Tier IV+',avail:'99.9995%',scenarios:10,istHrs:120}
+  '2N+1':{cost:2.25,dur:1.90,tier:'Tier IV',avail:'99.995%',scenarios:10,istHrs:120}
 };
 var CX_BUILDING = {warehouse:{cost:0.80,dur:0.85},modular:{cost:0.75,dur:0.70},purpose:{cost:1.00,dur:1.00},highrise:{cost:1.30,dur:1.25}};
 var CX_SEISMIC = {'0':{cost:1.00,dur:1.00},'1':{cost:1.05,dur:1.03},'2':{cost:1.12,dur:1.08},'3':{cost:1.22,dur:1.15},'4':{cost:1.35,dur:1.25}};
@@ -5588,7 +5588,7 @@ function cxRenderFaq(){
     {cat:'Inputs & Configuration',icon:'fa-sliders',items:[
       {q:'What is IT Load Capacity?',a:'The total planned IT electrical load in kilowatts (kW). This is the <strong>primary scaling factor</strong> for all commissioning costs, durations, and equipment quantities. Range: 100 kW (edge) to 100,000 kW (hyperscale campus). Example: a 2,000 kW facility is a typical enterprise data center; 50,000 kW is hyperscale.'},
       {q:'How does Cooling Type affect commissioning?',a:'Cooling type is the <strong>second-biggest cost driver</strong> after redundancy. Multipliers:<ul><li>Raised Floor CRAC/CRAH: 1.0x (baseline)</li><li>In-Row Cooling: 1.12x</li><li>Rear Door Heat Exchanger: 1.25x</li><li>Direct Liquid Cooling (DLC): 1.45x</li><li>Immersion Cooling: 1.55x</li></ul>DLC/immersion add entirely new commissioning disciplines: CDU redundancy testing, liquid loop zoning, coolant flow balancing, manifold pressure testing, and rack-level thermal acceptance.'},
-      {q:'What do the Redundancy levels mean?',a:'Redundancy is the <strong>biggest cost driver</strong> — going from N+1 to 2N roughly doubles commissioning scope.<ul><li><strong>N</strong> — No redundancy (single path)</li><li><strong>N+1</strong> — One extra component per group (Tier II/III)</li><li><strong>2N</strong> — Fully redundant parallel paths (Tier III/IV)</li><li><strong>2N+1</strong> — Dual path plus spare (Tier IV+)</li></ul>Higher redundancy means every failure scenario must be tested for both paths.'},
+      {q:'What do the Redundancy levels mean?',a:'Redundancy is the <strong>biggest cost driver</strong> — going from N+1 to 2N roughly doubles commissioning scope.<ul><li><strong>N</strong> — No redundancy (single path)</li><li><strong>N+1</strong> — One extra component per group (Tier II/III)</li><li><strong>2N</strong> — Fully redundant parallel paths (Tier III/IV)</li><li><strong>2N+1</strong> — Dual path plus a spare (Tier IV, above its minimum)</li></ul>Higher redundancy means every failure scenario must be tested for both paths.'},
       {q:'What is Rack Density and why does it matter?',a:'Rack density is the average IT power per rack:<ul><li><strong>Standard</strong>: 4-8 kW/rack — traditional enterprise</li><li><strong>Medium</strong>: 8-15 kW/rack — modern enterprise/colo</li><li><strong>High</strong>: 15-30 kW/rack — GPU compute, HPC</li><li><strong>Ultra-High</strong>: 50-100+ kW/rack — AI factory, dense GPU clusters</li></ul>Higher density increases cooling system complexity, thermal testing scope, and the consequence of single-rack failures during IST.'},
       {q:'What are the Scenario Presets?',a:'Eight pre-configured archetypes with industry-standard parameters:<ol><li><strong>Enterprise 2MW</strong> — Tier III, N+1, air cooling</li><li><strong>Colocation 10MW</strong> — Tier III+, 2N, in-row</li><li><strong>Hyperscale 50MW</strong> — 2N+1, DLC</li><li><strong>AI Factory 100MW</strong> — 2N+1, DLC, ultra-high density (2026)</li><li><strong>Edge 500kW</strong> — Tier II, N+1, modular</li><li><strong>Modular 5MW</strong> — Prefab pods, RDHX</li><li><strong>Fast-Track 10MW</strong> — Repurposed warehouse</li><li><strong>Recommissioning 3MW</strong> — Existing facility upgrade</li></ol>Load a preset to auto-fill all inputs, then customize as needed.'},
       {q:'What Full access inputs are available?',a:'Full access mode adds 6 additional parameters:<ul><li><strong>Generator Type</strong> — Diesel, gas, dual-fuel, BESS (affects FAT and startup testing)</li><li><strong>Seismic Zone</strong> — 0 to 4 (adds anchor bolt, rack seismic, isolation testing)</li><li><strong>Cx Scope</strong> — New build, retrofit, expansion, recommissioning</li><li><strong>Substation Config</strong> — Utility-fed, ring bus, dual sub (ring bus adds 80-110%)</li><li><strong>BMS/DCIM Complexity</strong> — Basic to AI-driven (doubles controls Cx scope)</li><li><strong>Delivery Method</strong> — Traditional, design-build, EPC, fast-track</li></ul>'},
@@ -6358,7 +6358,7 @@ function toggleCalcTheme() {
 
 <script src="rz-tracker.js" defer></script>
 <script src="auth.js?v=20261017-b130c1bf" defer></script>
-<script src="rz-engine.min.js?v=20260922-a7d3acc6" defer></script>
+<script src="rz-engine.min.js?v=20261024-90cc5600" defer></script>
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>
 <script src="js/rz-scenario.js?v=20260920-9c559f43"></script>

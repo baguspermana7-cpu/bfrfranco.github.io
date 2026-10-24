@@ -11,6 +11,70 @@ release sections rather than semver.
 
 ---
 
+## v3.24.24 — 2026-10-25 — "Hub Tools"
+
+**Owner:** *"lakukan update dan penyempurnaan semua tools yang ada di hub ini. literally semuanya"* — all 33 tools
+linked from `datacenter-solutions.html` were loaded in a headless browser at 390 px (dark) and 1440 px (light),
+every visible input was changed, and their standards claims were checked against primary sources.
+
+### Fixed — tools that rendered nothing or hid their data
+- **The TIA-942 checklist rendered no items since July.** Chart.js loads with `defer`, so a top-level
+  `Chart.register` threw "Chart is not defined" while the inline script parsed, and the `DOMContentLoaded` init
+  registered below it never ran: 0 items, score stuck at 0 %, no charts. The plugins now register on the first
+  draw. Live before: 0 items and the page error; after: 62 items at the default filter, ticking 5 moves the score
+  0 % → 9 %, 2 charts drawn.
+- **The PLN Java grid map showed 2 of its 181 power plants.** The tier-2 rule of the "Show all 150 kV" substation
+  button also applied to plants, and 179 plants carry tier 2, so the Coal / Hydro / Solar / Geo / Biomass / Wind
+  toggles had nothing to hide. On the map a plant now follows its fuel toggle only (the schematic keeps its rule):
+  181 drawn, Coal off leaves 151. The provenance cards no longer run 9 px past a 390 px screen.
+- **The fire-protection checklist lost every tick on reload, and an item's text did not tick its box** (the
+  25 checkboxes had no label). Each item is a label now, each list shows "n of N checked", ticks and the
+  service-record fields are kept in the browser, and Clear empties both.
+- Tier Advisor: "Number of floors" and "Building age" were read nowhere. Tier depends on topology, not on either,
+  so they now appear in the report's facility parameters instead of being dropped silently.
+
+### Changed — data brought up to date, one source per number
+- **Market tracker: H1 2026.** 74 values in the shared engine (`DATA.markets`): operational and under-construction
+  MW and vacancy for all 25 markets from CBRE North America Data Center Trends H1 2026 and Cushman & Wakefield
+  Global Data Center Market Comparison H1 2026 (Nairobi and Johannesburg vacancy: Knight Frank). Every value carries
+  a verbatim quote from its source; five were re-read live before use. Largest moves: Dublin 400 → 1,253 MW
+  (C&W counts hyperscale self-build), Northern Virginia under construction 1,100 → 2,420 MW, Dubai vacancy
+  3.0 → 26.2 %. Colo price stays on the 2025 basis — CBRE publishes wholesale 250–500 kW asking rent, a different
+  measure. The page said "Data: Q1 2025 estimates · Updated quarterly" and "Real-time"; the data date is now read
+  from `DATA.sources.markets` and the hero carries 2026 figures (7.5 GW under construction in North America, CBRE;
+  +57 % data center capex in 2025, Dell'Oro; 1,360 hyperscale sites, Synergy). Four 2026 references added. The
+  manual's 25-row table is regenerated from the engine; it had already drifted on 9 markets.
+- **Industry-average PUE: 1.52** (Uptime Institute Global Data Center Survey 2026, read in the report). The PUE and
+  carbon calculators hard-coded Uptime 2024's 1.58 in 14 places while the engine used 1.56; both now read
+  `DATA.pueBenchmark`, and the ROI preset and four manuals follow. The carbon manual's worked example is recomputed
+  (5,878 → 5,668 tCO₂e/yr, 0.671 → 0.647 kgCO₂e/kWh, grade D unchanged) and the page prints 5,668 with defaults.
+- **TIA-942 checklist → revision C (2024).** Three requirements from TIA's own TIA-942-C white paper: cabinets
+  ≥ 800 mm in MDA/HDA/IDA, Category 6A to high-throughput access points, ASHRAE class H1. The immersion item cited
+  a clause the old revision does not have; it now points to the -C annex, and the page says its other clause
+  numbers follow -B and are indicative. BICSI 002-2019 → 002-2024. The manual said 79 items (the page had 85) and
+  a worked example of "48–55 %, grade D"; the page's own formula gives 43.2 %, grade F — all its figures are now
+  computed from the item array.
+
+### Fixed — standards claims checked against primary sources
+- DC AI: IEEE 519 "caps TDD at 5 % for I_sc/I_L 100–1,000" — Table 2 gives 15 % for that row (5 % is below 20).
+- DC Conventional: NFPA 2001 halocarbon discharge "30 s" → 10 s; "ASHRAE recommended 40–60 % RH" → dew point
+  −9 to 15 °C and ≤ 60 % RH (also in the TIA checklist, whose allowable range was wrong too).
+- Tier Advisor, OPEX, CAPEX, CX, N+1 vs 2N: the 99.671–99.995 % availability figures were presented as the Uptime
+  Tier Standard; Uptime removed them in 2009. They are labelled as the legacy estimate, OPEX's Tier IV 99.99 % is
+  99.995 %, CX's N+1 99.982 % (a Tier III figure) is 99.741–99.982 %, and "Tier IV+" (which does not exist) is gone.
+- Fire checklist: HFC-227ea GWP 3,220 was labelled IPCC AR6; it is the AR4 value the site uses throughout.
+- Carbon calculator: its grid-factor source line now names the engine reference (IEA 2026 + Ember), not IEA 2023/2024.
+
+### Gates (each proven red on the pre-fix files)
+- `tools/test-hub-tools.mjs` (browser): TIA renders and scores, every PLN plant on the map and the fuel toggle
+  removes its plants, fire-checklist ticks survive reload, tracker date = engine, PUE pages read the engine.
+  Red on v3.24.22: 0 items + "Chart is not defined", 2 of 181 plants, no labels.
+- `tools/test-standard-claims.mjs`: 7 rules over 246 pages — red with 8 findings before.
+- `tools/test-tia942-manual.mjs`: every manual count and the worked score from the item array; no top-level
+  `Chart.*` call — red 10/10 before.
+- `tools/test-rz-engine.mjs` (now in ship-gate; it was not): market totals recomputed, vacancy band 0–30 % (Dubai
+  26.2 % is a sourced value), tracker and manual read the engine, PUE literals — red 13 before.
+
 ## v3.24.23 — 2026-10-25 — "Plain Record"
 
 ### Changed

@@ -357,7 +357,7 @@
                 <thead><tr><th>Field / ID</th><th>Symbol</th><th>Unit</th><th>Range / default</th><th>Meaning</th></tr></thead>
                 <tbody>
                     <tr><td>IT Load <code>itLoad</code></td><td><code>P<sub>IT</sub></code></td><td>kW</td><td>50–100 000 · default 1 000</td><td>Rack-level IT power draw (servers + storage + network). Does not include cooling or power-distribution overhead.</td></tr>
-                    <tr><td>PUE <code>pueValue</code></td><td><code>PUE</code></td><td>ratio</td><td>1.1–2.5 · default 1.58</td><td>Total facility power ÷ IT power. Multiplies IT load to give facility power. Industry average 1.58 (Uptime 2026).</td></tr>
+                    <tr><td>PUE <code>pueValue</code></td><td><code>PUE</code></td><td>ratio</td><td>1.1–2.5 · default 1.52</td><td>Total facility power ÷ IT power. Multiplies IT load to give facility power. Industry average 1.52 (Uptime 2026).</td></tr>
                     <tr><td>Country <code>countrySelect</code></td><td>—</td><td>ISO-2 enum</td><td>32 countries</td><td>Selects grid emission factor and electricity rate from <code>COUNTRIES[]</code> (patched at runtime from <code>RZEngine.data.countries</code>).</td></tr>
                     <tr><td>Grid intensity <code>gridIntensity</code></td><td><code>EF<sub>grid</sub></code></td><td>kgCO₂e/kWh</td><td>read-only · auto-filled</td><td>National average emission factor for purchased electricity. Source: IEA 2026 + Ember. Range 0.02 (SE) to 0.90 (ZA).</td></tr>
                     <tr><td>Generator fuel <code>genType</code></td><td>—</td><td>enum</td><td>diesel / hvo</td><td>Standard diesel 2.68 kgCO₂/L; HVO (hydrotreated vegetable oil) 0.54 kgCO₂/L (~80% lower).</td></tr>
@@ -485,7 +485,7 @@
                 <span class="mn-eq">targetDcEmissions = dcSectorEmissions × (1 − ndcReduction)</span>
                 <span class="mn-eq">cumulativeBudget  = (dcSectorEmissions + targetDcEmissions) / 2 × budgetYears  [linear]</span>
                 <span class="mn-eq">annualBudgetPerMW = cumulativeBudget / budgetYears / nationalMW × 1 000     [tCO₂/MW/yr]</span>
-                <span class="mn-where">NDC reduction = |ndcTarget%| / 100. nationalMW estimated as dcSectorEmissions / (0.475 kgCO₂/kWh × 8.76 × 1.58). Three budget methodologies: linear trajectory, front-loaded (×0.85), back-loaded (×1.15). <span class="mn-src">UNFCCC NDC Registry · Paris Agreement Art. 4</span></span>
+                <span class="mn-where">NDC reduction = |ndcTarget%| / 100. nationalMW estimated as dcSectorEmissions / (0.475 kgCO₂/kWh × 8.76 × 1.52). Three budget methodologies: linear trajectory, front-loaded (×0.85), back-loaded (×1.15). <span class="mn-src">UNFCCC NDC Registry · Paris Agreement Art. 4</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.4rem 0 0.3rem;">Carbon offset and compliance cost</h3>
@@ -605,24 +605,24 @@
         <!-- 6. WORKED EXAMPLE -->
         <section class="mn-section">
             <h2><span class="mn-num">06</span> Worked example</h2>
-            <p class="mn-lead">Default inputs: 1 000 kW IT, PUE 1.58, United States (grid 0.40 kgCO₂e/kWh), diesel generator 200 h/yr, air_crac cooling (R-410A, GWP 2088, 0.30 kg/kW, 5% leak), no renewables, 1 MW facility, purpose-built, concrete C30, steel world-average, traditional workload, VRLA battery 10 min N+1, 20-year life. All numbers verified by <code>node -e</code> against the engine logic.</p>
+            <p class="mn-lead">Default inputs: 1 000 kW IT, PUE 1.52, United States (grid 0.40 kgCO₂e/kWh), diesel generator 200 h/yr, air_crac cooling (R-410A, GWP 2088, 0.30 kg/kW, 5% leak), no renewables, 1 MW facility, purpose-built, concrete C30, steel world-average, traditional workload, VRLA battery 10 min N+1, 20-year life. All numbers verified by <code>node -e</code> against the engine logic.</p>
             <div class="mn-worked">
                 <ol>
-                    <li><strong>Facility energy:</strong> <code>1000 kW × 1.58 PUE × 8760 h =</code> <span class="mn-result">13 840.8 MWh/yr</span></li>
-                    <li><strong>Scope 2:</strong> <code>13 840.8 MWh × 0.40 kgCO₂/kWh =</code> <span class="mn-result">5 536 tCO₂e/yr</span></li>
+                    <li><strong>Facility energy:</strong> <code>1000 kW × 1.52 PUE × 8760 h =</code> <span class="mn-result">13 315.2 MWh/yr</span></li>
+                    <li><strong>Scope 2:</strong> <code>13 315.2 MWh × 0.40 kgCO₂/kWh =</code> <span class="mn-result">5 326 tCO₂e/yr</span></li>
                     <li><strong>Scope 1a — generator diesel:</strong> <code>1000 kW × 0.30 L/kW·h × 200 h × 2.68 kgCO₂/L / 1000 =</code> <span class="mn-result">160.8 tCO₂e/yr</span></li>
                     <li><strong>Scope 1b — refrigerant:</strong> total charge <code>1000 × 0.30 = 300 kg</code>; leak <code>300 × 0.05 × 2088 / 1000 =</code> <span class="mn-result">31.3 tCO₂e/yr</span>; Scope 1 total <span class="mn-result">192 tCO₂e/yr</span></li>
                     <li><strong>Scope 3 (simplified):</strong> <code>1000 kW × 0.15 =</code> <span class="mn-result">150 tCO₂e/yr</span></li>
-                    <li><strong>Annual total:</strong> <code>192 + 5536 + 150 =</code> <span class="mn-result">5 878 tCO₂e/yr</span> → Carbon intensity <code>5878 × 1000 / (1000 × 8760) =</code> <span class="mn-result">0.671 kgCO₂e/kWh IT → Grade D (below average)</span></li>
-                    <li><strong>Offset cost:</strong> <code>5878 × $35 =</code> <span class="mn-result">$205 730/yr</span></li>
+                    <li><strong>Annual total:</strong> <code>192 + 5326 + 150 =</code> <span class="mn-result">5 668 tCO₂e/yr</span> → Carbon intensity <code>5668 × 1000 / (1000 × 8760) =</code> <span class="mn-result">0.647 kgCO₂e/kWh IT → Grade D (below average)</span></li>
+                    <li><strong>Offset cost:</strong> <code>5668 × $35 =</code> <span class="mn-result">$198 380/yr</span></li>
                     <li><strong>LCA A1–A3 materials (1 MW, C30, world-avg steel):</strong> concrete <code>1000 t × 150 =</code> 150 t, steel <code>200 t × 1850 =</code> 370 t, copper <code>20 t × 4100 =</code> 82 t, aluminium <code>10 t × 10 000 =</code> 100 t, PVC <code>7 t × 2800 =</code> 20 t → <span class="mn-result">722 tCO₂e embodied (A1–A3)</span></li>
                     <li><strong>IT embodied (traditional, 20yr / 4yr refresh = 5 cycles):</strong> 1 250 servers × 1 200 kgCO₂e × 5 cycles + 62.5 switches × 450 × 4 cycles + 25 storage × 2 000 × 5 cycles = <span class="mn-result">7 863 tCO₂e over life</span></li>
                     <li><strong>Battery carbon (VRLA, 10 min, N+1, 5yr replace → 4 cycles):</strong> <code>1000 kW × (10/60) min × 1.25 × 68 kgCO₂e/kWh / 1000 × 4 cycles =</code> <span class="mn-result">56.7 tCO₂e</span></li>
                     <li><strong>MEP + construction + EOL:</strong> 150 + 20.0 + 7.5 = <span class="mn-result">177.5 tCO₂e</span></li>
                     <li><strong>Module D recycling credits (steel 92%, copper 85%, Al 85%):</strong> steel <code>200 × 0.92 × 1500 =</code> 276 t, copper <code>20 × 0.85 × 3000 =</code> 51 t, Al <code>10 × 0.85 × 9000 =</code> 76.5 t → <span class="mn-result">−404 tCO₂e (benefit)</span></li>
                     <li><strong>Total LCA (excl. ops):</strong> <code>722 + 7863 + 56.7 + 177.5 − 404 =</code> <span class="mn-result">8 415 tCO₂e</span></li>
-                    <li><strong>Lifetime operational (20yr):</strong> <code>5878 × 20 =</code> <span class="mn-result">117 560 tCO₂e</span></li>
-                    <li><strong>Cradle-to-grave total:</strong> <code>8415 + 117 560 =</code> <span class="mn-result">125 975 tCO₂e over 20 years</span></li>
+                    <li><strong>Lifetime operational (20yr):</strong> <code>5668 × 20 =</code> <span class="mn-result">113 360 tCO₂e</span></li>
+                    <li><strong>Cradle-to-grave total:</strong> <code>8415 + 113 360 =</code> <span class="mn-result">121 775 tCO₂e over 20 years</span></li>
                 </ol>
             </div>
             <div class="mn-note"><strong>Reading:</strong> for this typical 1 MW colo in the US, Scope 2 electricity dominates at ~94% of annual emissions. Switching to 100% renewable PPA reduces Scope 2 to near zero, cutting the annual total to ~342 tCO₂e and flipping the grade from D to A+. On a lifetime basis, IT equipment manufacturing (7 863 t) exceeds the entire building structure (722 t) by ~11×, reflecting the embodied-carbon intensity of AI/GPU hardware. Low-carbon steel (EAF) would reduce the steel line from 370 t to 100 t — a 73% saving on structural steel alone.</div>
@@ -715,7 +715,7 @@
         });
     })();
     </script>
-    <script src="../js/rz-version.js?v=20261025-a998b6f5" defer></script>
+    <script src="../js/rz-version.js?v=20261025-d21190a4" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>

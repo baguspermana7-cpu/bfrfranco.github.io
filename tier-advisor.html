@@ -350,7 +350,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
 [data-theme="dark"] .disc-fine { color:#94a3b8 !important; }
 [data-theme="dark"] div > p > a[href$="terms.html"], [data-theme="dark"] div > p > a[href$="privacy.html"] { color:#67e8f9 !important; }
 </style>
-    <script src="js/rz-version.js?v=20261025-a998b6f5" defer></script>
+    <script src="js/rz-version.js?v=20261025-d21190a4" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="Tier Advisor | Data Center Tier Classification Calculator">
 
@@ -425,7 +425,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
             </div>
             <div style="max-width:800px;margin:0 auto 1.5rem;text-align:left;padding:1.25rem 1.5rem;background:rgba(100, 116, 139,0.04);border:1px solid rgba(100, 116, 139,0.12);border-radius:12px;">
                 <h3 style="font-size:0.95rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-info-circle" style="color:#64748b;"></i> What is Tier Classification?</h3>
-                <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.75rem 0;">The <strong>Uptime Institute Tier Standard</strong> classifies data centers from Tier I (basic, 99.67% availability) to Tier IV (fault tolerant, 99.995% availability) based on infrastructure topology and redundancy. <strong>TIA-942-B</strong> uses "Rated" levels 1-4 with additional telecom and security requirements. <strong>EN 50600</strong> defines Availability Classes VK1-VK4 aligned with European standards.</p>
+                <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.75rem 0;">The <strong>Uptime Institute Tier Standard</strong> classifies data centers from Tier I (basic) to Tier IV (fault tolerant) by infrastructure topology and redundancy. It assigns no availability figure: the 99.671&ndash;99.995 % values often quoted with the Tiers are from an older Uptime table, withdrawn in 2009. <strong>TIA-942-C</strong> uses "Rated" levels 1-4 with additional telecom and security requirements. <strong>EN 50600</strong> defines Availability Classes VK1-VK4 aligned with European standards.</p>
                 <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0;">This calculator maps your actual infrastructure against all four major frameworks simultaneously, identifies which subsystem limits your classification, and shows exactly what upgrades are needed to reach the next level.</p>
             </div>
             <div class="quick-stats">
@@ -1531,7 +1531,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
         };
         function fl(v){return inputLabels[v]||v.replace(/_/g,' ');}
         var inputs=[
-            ['Facility Type',fl(gv('facilityType'))],['IT Load',gv('itLoad')+' kW'],
+            ['Facility Type',fl(gv('facilityType'))],['IT Load',gv('itLoad')+' kW'],['Floors',(gv('numFloors')==='4'?'4+':gv('numFloors'))],['Building Age',gv('buildingAge')+' years'],
             ['Utility Feeds',fl(gv('utilityFeeds'))],['Generators',fl(gv('genConfig'))],
             ['UPS Config',fl(gv('upsConfig'))],['UPS Topology',fl(gv('upsTopo'))],
             ['Transfer Switch',fl(gv('atsConfig'))],['PDU Redundancy',fl(gv('pduRedundancy'))],
@@ -1786,7 +1786,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
         // Footer
         html+='<div style="text-align:center;margin-top:20px;padding-top:12px;border-top:2px solid #64748b;font-size:8px;color:#94a3b8;">resistancezero.com &middot; Generated '+dateStr+' &middot; All calculations performed client-side &middot; Tier Advisor v1.0 &middot; &copy; 2026 Bagus Dwi Permana</div>';
         html+='<script src="auth.js?v=20261017-b130c1bf" defer><\/script>';
-        html+='<script src="rz-engine.min.js?v=20260922-a7d3acc6" defer><\/script>';
+        html+='<script src="rz-engine.min.js?v=20261024-90cc5600" defer><\/script>';
         html+='</body></html>';
         w.document.write(html);
         w.document.close();

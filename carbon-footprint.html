@@ -629,7 +629,7 @@ button[onclick^="setPreset"] { background:#166534 !important; border-color:#1665
 :root:not([data-theme="dark"]) .tabs-group-label { color:#64748b !important; }
 [data-theme="dark"] .tabs-group-label { color:#8b98ac !important; }
 </style>
-    <script src="js/rz-version.js?v=20261025-a998b6f5" defer></script>
+    <script src="js/rz-version.js?v=20261025-d21190a4" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
@@ -764,7 +764,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
                 The <strong>Life-Cycle Assessment</strong> tab provides cradle-to-grave analysis including manufacturing, transport, operation, and end-of-life phases. The <strong>Carbon Budget</strong> tab allocates your facility's fair share of national emissions under Paris Agreement targets, showing how your data center compares against science-based thresholds for <strong>33 countries</strong>.
             </p>
             <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0;">
-                Grid emission factors are sourced from <strong>IEA 2023</strong> and <strong>Ember Climate</strong> data. Embodied carbon estimates follow <strong>ICE Database</strong> and peer-reviewed LCA studies for IT hardware. All calculations align with the <strong>GHG Protocol Corporate Standard</strong>.
+                Grid emission factors come from the shared engine country reference (2026-Q1), built on <strong>IEA 2026</strong> and <strong>Ember</strong> grid-intensity data. Embodied carbon estimates follow <strong>ICE Database</strong> and peer-reviewed LCA studies for IT hardware. All calculations align with the <strong>GHG Protocol Corporate Standard</strong>.
             </p>
         </div>
         <div class="quick-stats">
@@ -839,15 +839,15 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
                         </div>
                         <input type="number" class="input-field" id="itLoad" value="1000" min="50" max="100000" step="10" oninput="calculate()" aria-label="It Load">
 
-                        <label class="input-label">Power Usage Effectiveness (PUE) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> PUE Rating</div><div class="tooltip-desc">Ratio of total facility power to IT equipment power. A PUE of 1.0 means all energy goes to IT; 2.0 means 50% is overhead. Global average is ~1.58. Best-in-class hyperscalers achieve 1.1-1.2.</div></div></span></label>
+                        <label class="input-label">Power Usage Effectiveness (PUE) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> PUE Rating</div><div class="tooltip-desc">Ratio of total facility power to IT equipment power. A PUE of 1.0 means all energy goes to IT; 2.0 means 50% is overhead. Global average is ~1.52 (Uptime Institute 2026). Best-in-class hyperscalers achieve 1.1-1.2.</div></div></span></label>
                         <div class="preset-group">
                             <button class="preset-btn" onclick="setPreset('pueValue',1.2)">1.2 Best</button>
                             <button class="preset-btn" onclick="setPreset('pueValue',1.4)">1.4 Good</button>
-                            <button class="preset-btn active" onclick="setPreset('pueValue',1.58)">1.58 Average</button>
+                            <button class="preset-btn active" onclick="setPreset('pueValue',1.52)">1.52 Average</button>
                             <button class="preset-btn" onclick="setPreset('pueValue',1.8)">1.8 Legacy</button>
                             <button class="preset-btn" onclick="setPreset('pueValue',2.0)">2.0 Poor</button>
                         </div>
-                        <input type="number" class="input-field" id="pueValue" value="1.58" min="1.1" max="2.5" step="0.01" oninput="calculate()" aria-label="PUE Value">
+                        <input type="number" class="input-field" id="pueValue" value="1.52" min="1.1" max="2.5" step="0.01" oninput="calculate()" aria-label="PUE Value">
                     </div>
 
                     <!-- Section 2 - Location & Grid -->
@@ -1366,7 +1366,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
         <div class="cf-privacy-badge"><i class="fas fa-shield-halved"></i> PDF generated in your browser — no data is sent to any server</div>
         <div class="cf-benchmark-meta">
             <span class="cf-benchmark-tag"><i class="fas fa-code-branch"></i> Model v1.0</span>
-            <span class="cf-benchmark-tag"><i class="fas fa-calendar"></i> Updated Feb 2026</span>
+            <span class="cf-benchmark-tag"><i class="fas fa-calendar"></i> Updated Oct 2026</span>
             <span class="cf-benchmark-tag"><i class="fas fa-book"></i> Sources: GHG Protocol, EN 15978, ICE v4.1, Paris Agreement NDCs</span>
             <span class="cf-benchmark-tag"><i class="fas fa-info-circle"></i> Scope 1/2/3 + LCA A1-D + National Carbon Budget</span>
         </div>
@@ -1572,7 +1572,8 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
     var DIESEL_EMISSION_FACTOR = 2.68; // kgCO2/L
     var HVO_EMISSION_FACTOR = 0.54; // kgCO2/L
     var DIESEL_CONSUMPTION_RATE = 0.3; // L/kW/hr
-    var INDUSTRY_AVG_PUE = 1.58;
+    // Industry-average PUE from the engine (DATA.pueBenchmark, Uptime 2026); the page carried Uptime 2024's 1.58 (v3.24.24)
+    function industryAvgPue() { var b = window.RZEngine && RZEngine.data && RZEngine.data.pueBenchmark; return b ? b.industryAvg : 1.52; }
     var INDUSTRY_AVG_CARBON = 0.475; // kgCO2/kWh
 
     var COOLING_DATA = {
@@ -1845,7 +1846,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
         }
         // === Common inputs ===
         var itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
-        var pue = parseFloat(document.getElementById('pueValue').value) || 1.58;
+        var pue = parseFloat(document.getElementById('pueValue').value) || 1.52;
         var country = document.getElementById('countrySelect').value;
         var gridIntensity = parseFloat(document.getElementById('gridIntensity').value) || COUNTRIES[country].grid;
         var renewablePct = parseFloat(document.getElementById('renewablePct').value) || 0;
@@ -1996,7 +1997,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
         }
 
         // Estimate national MW capacity
-        var nationalMW = dcSectorEmissions / (INDUSTRY_AVG_CARBON * 8.76 * INDUSTRY_AVG_PUE); // rough MW estimate
+        var nationalMW = dcSectorEmissions / (INDUSTRY_AVG_CARBON * 8.76 * industryAvgPue()); // rough MW estimate
         if (nationalMW < 10) nationalMW = 10;
         var annualBudgetPerMW = cumulativeBudget / budgetYears / nationalMW * 1000; // tCO2/MW/yr
 
@@ -2160,7 +2161,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
 
         if (currentTab === 'operational') {
             var itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
-            var industryAvg = INDUSTRY_AVG_CARBON * itLoad * 8760 * INDUSTRY_AVG_PUE / 1000;
+            var industryAvg = INDUSTRY_AVG_CARBON * itLoad * 8760 * industryAvgPue() / 1000;
             comparisonChartInstance = new Chart(ctx2.getContext('2d'), {
                 type: 'bar',
                 data: {
@@ -2280,7 +2281,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
             'Renewable %': { vary: 0.2, impact: 0 },
             'Leak Rate': { vary: 0.2, impact: 0 }
         };
-        var pue = parseFloat(document.getElementById('pueValue').value) || 1.58;
+        var pue = parseFloat(document.getElementById('pueValue').value) || 1.52;
         var grid = parseFloat(document.getElementById('gridIntensity').value) || 0.40;
         var itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
         var genHours = parseFloat(document.getElementById('genHours').value) || 200;
@@ -2514,13 +2515,13 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
 
         // Methodology
         html += '<h2>Methodology</h2>';
-        html += '<p style="font-size:10px;color:#94a3b8;">Operational emissions calculated per GHG Protocol Corporate Standard (Scope 1/2/3). Grid emission factors from IEA World Energy Outlook 2024. Refrigerant GWP&#8321;&#8320;&#8320; values on the IPCC AR4 basis, which is the basis EU F-gas regulation uses and which the rest of this site follows (R-410A 2088, R-134a 1430, R-32 675). On AR6 the same blend is about 2256. Life-cycle assessment follows ISO 14040/14044 and EN 15978 (modules A1-D). Material carbon factors from ICE Database v4.1 (University of Bath). Server embodied carbon from manufacturer PCF reports (Dell, HPE, NVIDIA). National carbon budgets derived from UNFCCC NDC Registry targets. Monte Carlo simulation: 10,000 iterations with uniform distribution. Industry benchmarks from Uptime Institute 2024 Global Survey.</p>';
+        html += '<p style="font-size:10px;color:#94a3b8;">Operational emissions calculated per GHG Protocol Corporate Standard (Scope 1/2/3). Grid emission factors from the shared engine country reference (DATA.countries, 2026-Q1: IEA 2026 + Ember grid intensity). Refrigerant GWP&#8321;&#8320;&#8320; values on the IPCC AR4 basis, which is the basis EU F-gas regulation uses and which the rest of this site follows (R-410A 2088, R-134a 1430, R-32 675). On AR6 the same blend is about 2256. Life-cycle assessment follows ISO 14040/14044 and EN 15978 (modules A1-D). Material carbon factors from ICE Database v4.1 (University of Bath). Server embodied carbon from manufacturer PCF reports (Dell, HPE, NVIDIA). National carbon budgets derived from UNFCCC NDC Registry targets. Monte Carlo simulation: 10,000 iterations with uniform distribution. Industry benchmarks from the Uptime Institute 2026 Global Data Center Survey.</p>';
 
         // Footer
         html += '<div class="pdf-footer">resistancezero.com \u00b7 Generated ' + dateStr + ' \u00b7 All calculations performed client-side \u00b7 No data transmitted to any server<br>Carbon Footprint Calculator v1.0 \u2014 Bagus Dwi Permana Portfolio</div>';
 
         html += '<script src="auth.js?v=20261017-b130c1bf" defer><\/script>';
-        html += '<script src="rz-engine.min.js?v=20260922-a7d3acc6" defer><\/script>';
+        html += '<script src="rz-engine.min.js?v=20261024-90cc5600" defer><\/script>';
         html += '</body></html>';
         w.document.write(html);
         w.document.close();
@@ -2572,7 +2573,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
     }
 
     function buildSVGBar(r) {
-        var industryAvg = INDUSTRY_AVG_CARBON * r.itLoad * 8760 * INDUSTRY_AVG_PUE / 1000;
+        var industryAvg = INDUSTRY_AVG_CARBON * r.itLoad * 8760 * industryAvgPue() / 1000;
         var bestPractice = industryAvg * 0.3;
         var data = [
             { value: r.totalEmissions, label: 'Your DC', color: '#22c55e' },
@@ -2599,7 +2600,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
     // ══════════════════════════════════════════════════════════════
     function resetDefaults() {
         document.getElementById('itLoad').value = 1000;
-        document.getElementById('pueValue').value = 1.58;
+        document.getElementById('pueValue').value = 1.52;
         document.getElementById('countrySelect').value = 'US';
         document.getElementById('coolingType').value = 'air_crac';
         document.getElementById('genType').value = 'diesel';
@@ -2645,7 +2646,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
         document.querySelectorAll('.preset-btn').forEach(function(btn) { btn.classList.remove('active'); });
         document.querySelectorAll('.preset-btn').forEach(function(btn) {
             var onclick = btn.getAttribute('onclick') || '';
-            if (onclick.indexOf("'itLoad',1000") !== -1 || onclick.indexOf("'pueValue',1.58") !== -1) {
+            if (onclick.indexOf("'itLoad',1000") !== -1 || onclick.indexOf("'pueValue',1.52") !== -1) {
                 btn.classList.add('active');
             }
         });
@@ -2767,7 +2768,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
     }
     </script>
     <script src="rz-tracker.js" defer></script>
-<script src="rz-engine.min.js?v=20260922-a7d3acc6" defer></script>
+<script src="rz-engine.min.js?v=20261024-90cc5600" defer></script>
 
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>

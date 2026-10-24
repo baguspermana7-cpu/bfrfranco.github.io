@@ -4,7 +4,7 @@
  "dataVersion": "2.5.1",
  "modelCount": 53,
  "functionCount": 235,
- "sourceCount": 162,
+ "sourceCount": 163,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -2699,9 +2699,9 @@
   },
   {
    "key": "markets",
-   "source": "CBRE Global DC Market 2025 + JLL Outlook 2025 + Cushman & Wakefield 2025 + Synergy Research 2024 (capacity/vacancy/colo/pipeline per market); market-level powerCost from utility filings (PJM, ERCOT, Dominion, IMDA et al.)",
-   "asOf": "2026-04",
-   "method": "per-market figures; NOT interchangeable with regions.*.powerKwh macro blends (different denominators)"
+   "source": "operational/construction MW + vacancy: CBRE North America Data Center Trends H1 2026 (press releases 27 Aug-8 Sep 2026: N. Virginia, Dallas, Phoenix, Chicago, Silicon Valley) and Cushman & Wakefield Global Data Center Market Comparison H1 2026 (EMEA/APAC/Americas, read via datacentres.com market pages) for the other markets; Nairobi + Johannesburg vacancy Knight Frank 2026; Dallas planned 3.7 GW (CBRE H1 2026 via Data Center Frontier). planned MW (24 markets), coloPrice, powerCost and cagr are the earlier 2025 basis (CBRE/JLL/C&W 2025 + utility filings) — no public 2026 figure in the same definition",
+   "asOf": "2026-09",
+   "method": "per-market broker figures, MW rounded to the nearest MW and vacancy to 0.1 %; vacancy definitions differ by broker (CBRE metro vacancy vs C&W colocation vacancy) and C&W operational MW counts hyperscale self-build + colocation IT load (excl. captive/telco), which is why hyperscale-heavy metros (Dublin 400 -> 1,253 MW) rose most; coloPrice is retail colo $/kW/month, NOT the CBRE 250-500 kW wholesale asking rent; NOT interchangeable with regions.*.powerKwh macro blends"
   },
   {
    "key": "mepPctOfCapex",
@@ -2765,6 +2765,12 @@
    "source": "Screening model: fixed infrastructure-overhead share 0.55 at partial IT load (industry rule-of-thumb band 0.4-0.7; Green Grid partial-load PUE guidance)",
    "asOf": "2026",
    "method": "PUE(l) = 1 + overhead*(0.55/l + 0.45) — screening estimate, labeled"
+  },
+  {
+   "key": "pueBenchmark",
+   "source": "Uptime Institute Global Data Center Survey 2026, Figure 2: \"2026 industry average PUE is 1.52\" (annual average, operator respondents)",
+   "asOf": "2026",
+   "method": "survey annual average; dcValue.industryAvgPUE (article-12 model, 1.56) is that article's own basis and is not this benchmark"
   },
   {
    "key": "pueDefaults",

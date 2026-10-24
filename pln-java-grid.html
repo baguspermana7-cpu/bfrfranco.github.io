@@ -571,11 +571,12 @@
         .pjg-prov-tab.active { background: var(--pjg-gradient); color: white; border-color: transparent; }
         .pjg-prov-grid {
             display: grid; gap: 1rem;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
         }
         .pjg-prov-card {
             background: var(--pjg-bg3); border: 1px solid var(--pjg-border);
             border-radius: 4px; padding: 0.85rem 1rem;
+            min-width: 0; overflow-wrap: anywhere;   /* ran 9 px past a 390 px screen (v3.24.24) */
         }
         .pjg-prov-card h4 {
             font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em;
@@ -1059,7 +1060,7 @@
 }
 
     </style>
-    <script src="js/rz-version.js?v=20261025-a998b6f5" defer></script>
+    <script src="js/rz-version.js?v=20261025-d21190a4" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>    <meta property="og:image:alt" content="PLN Java-Bali Grid Monitor | 500/275/150 kV Single-Line Diagram">
 
@@ -1499,7 +1500,7 @@
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js" defer integrity="sha384-yc/c2Lk1s2V2ir1rxvjo8YyVD9PlOlYTqpNr3Wm1WIuAA30GlDYNx6U5104OiavY" crossorigin="anonymous"></script>
     <script src="script.min.js?v=20260920-0e1dd953" defer></script>
     <script src="auth.js?v=20261017-b130c1bf" defer></script>
-    <script src="rz-engine.min.js?v=20260922-a7d3acc6" defer></script>
+    <script src="rz-engine.min.js?v=20261024-90cc5600" defer></script>
     <script src="js/rz-map.js?v=20261011-58cf2a70" defer></script>
     <script src="js/pln-tooltip.js?v=20260920-d7be053c" defer></script>
     <script src="js/pln-java-grid-data.js?v=20260920-c83cf566" defer></script>
@@ -2204,7 +2205,8 @@
                 var edges = window.PLN_JAVA_GRID.edges || [];
                 for (var i = 0; i < nodes.length; i++) {
                     var n = nodes[i];
-                    var vis = shouldShowNode(n);
+                    // plants follow only their fuel toggle: the tier-2 substation rule hid 179 of 181 (v3.24.24)
+                    var vis = (n.kind === 'plant') ? !(n.fuel && STATE.fuelOn[n.fuel] === false) : shouldShowNode(n);
                     if (STATE.mapInst.setMarkerVisible) STATE.mapInst.setMarkerVisible(n.id, vis);
                 }
                 for (var j = 0; j < edges.length; j++) {

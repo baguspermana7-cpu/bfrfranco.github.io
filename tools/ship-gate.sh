@@ -252,6 +252,10 @@ gate "article 29 LLM calculators — worked examples, sources, monotonicity" nod
 gate "article 30 agent calculators — worked examples, compounding reliability, budgets" node tools/test-agent-calc.mjs
 gate "Second Brain graph — every journal page has a node, no dead URL or orphan" python3 "Apps/second brain/sync-graph.py" --strict
 gate "generator freshness — every generated artefact matches a fresh build" python3 tools/test-generator-freshness.py
+gate "RZEngine — worked examples, data invariants, provenance; tracker + manual + PUE pages read the engine" node tools/test-rz-engine.mjs
+gate "TIA-942 manual — every count and the worked score follow the checklist items" node tools/test-tia942-manual.mjs
+gate "standards claims — no page prints a claim already proven wrong (IEEE 519 row, NFPA 2001 time, ASHRAE RH, Uptime Tier figures, GWP basis)" node tools/test-standard-claims.mjs
+gate "hub tools render — TIA checklist draws, every PLN plant on the map, fire checklist keeps ticks, tracker + PUE read the engine" node tools/test-hub-tools.mjs
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs
 gate "deferred panels — the nine hidden panels do not paint before first paint" node tools/test-dcai-deferred-panels.mjs

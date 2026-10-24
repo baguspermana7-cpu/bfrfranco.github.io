@@ -768,7 +768,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261025-a998b6f5" defer></script>
+</style>    <script src="js/rz-version.js?v=20261025-d21190a4" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -12355,7 +12355,7 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
 
 </script><script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
 <script src="auth.js?v=20261017-b130c1bf" defer></script>
-<script src="rz-engine.min.js?v=20260922-a7d3acc6" defer></script>
+<script src="rz-engine.min.js?v=20261024-90cc5600" defer></script>
 <script>
 (function(){
     /* Tier-feature gate. Replaces the legacy ROOT_ONLY hard block with the
@@ -14412,7 +14412,7 @@ function buildTechSpecHtml(){
     '<p>Trade-off: 30-min Li-ion has ~3&times; the CAPEX of 10-min, ~3&times; the floor area, and ~3&times; the heat load. For a generator-backed facility 10-min is industry standard; 15-min is used when generator start time is uncertain (e.g. dual-fuel or marine-grade). 30-min is used only when generator is excluded (data-centre on dedicated solar+BESS island).</p>'+
 
     '<h4>4.9 Harmonic Analysis (IEEE 519 + IEC 61000-3-2)</h4>'+
-    '<p>UPS rectifier + chiller VFD + LED lighting all inject harmonic current upstream. IEEE 519:2014 caps total demand distortion (TDD) at 5 % at the point of common coupling (PCC) for utility ratio I_sc/I_L between 100&ndash;1,000.</p>'+
+    '<p>UPS rectifier + chiller VFD + LED lighting all inject harmonic current upstream. IEEE 519-2014 Table 2 caps total demand distortion (TDD) at the point of common coupling (PCC) by short-circuit ratio: 5 % below I_sc/I_L 20, rising to 15 % for 100&ndash;1,000. This design holds the strictest 5 % so it passes on a weak utility tie too.</p>'+
     TC('Harmonic budget at LV bus')+
     R([
       ['UPS rectifier (12-pulse or active front-end)','THDi &lt; 5 % per IEC 62040-3','meets IEEE 519 in isolation'],
