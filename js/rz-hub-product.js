@@ -352,17 +352,33 @@
   }
 
   /* The figure draws itself left to right: every element is staggered by where it sits. */
+  /* The flow dashes are the only thing on the figure that moves every frame. Left inside the drawing,
+   * each frame repaints all of it (46 boxes, 46 labels, 12 symbols); lifted onto a thin SVG of the same
+   * viewBox laid over it, on its own compositor layer, a frame repaints eight strokes. Traced A/B on
+   * the hero at rest (headless, 4 s, two runs each): paint 339/338 ms -> 195/203 ms. The per-frame
+   * style pass the dash animation itself costs is unchanged. */
+  function layerFlow(stage) {
+    $$('svg', stage).forEach(function (sv) {
+      var ps = $$(':scope > path[data-rzd-pulse]', sv); if (!ps.length) return;
+      var wrap = document.createElement('div'), ov = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      wrap.className = 'fp-layer'; sv.parentNode.insertBefore(wrap, sv); wrap.appendChild(sv);
+      ov.setAttribute('viewBox', sv.getAttribute('viewBox')); ov.setAttribute('preserveAspectRatio', sv.getAttribute('preserveAspectRatio') || 'xMidYMid meet');
+      ov.setAttribute('class', 'fp-flow'); ov.setAttribute('aria-hidden', 'true'); ov.setAttribute('focusable', 'false');
+      ps.forEach(function (p) { ov.appendChild(p); }); wrap.appendChild(ov);
+    });
+  }
   function stagger(stage) {
     if (REDUCE) return;
-    var base = 0;
+    var base = 0, prev = 0;
     $$('svg', stage).forEach(function (svg) {
-      var maxI = 0;
+      /* the flow layer draws in with the figure it sits on, not after it */
+      var own = svg.classList.contains('fp-flow'), b0 = own ? prev : base, maxI = 0;
       $$(':scope > *', svg).forEach(function (el) {
         var i = 0; try { i = Math.round(el.getBBox().x / 48); } catch (err) { i = 0; }
         if (!isFinite(i) || i < 0) i = 0; if (i > maxI) maxI = i;
-        el.style.setProperty('--i', base + i);
+        el.style.setProperty('--i', b0 + i);
       });
-      base += maxI + 4;
+      if (!own) { prev = base; base += maxI + 4; }
     });
     stage.classList.remove('is-draw'); void stage.offsetWidth; stage.classList.add('is-draw');
   }
@@ -423,7 +439,8 @@
       var key = name + (NARROW.matches ? ':narrow' : '');
       if (!cache[key]) cache[key] = FIGS[name]().map(function (ctx) { if (ctx.warnings && ctx.warnings.length) console.warn('[plant ' + name + ']', ctx.warnings); return ctx.render(); }).join('');
       stage.innerHTML = cache[key];
-      $$('svg', stage).forEach(function (sv) { sv.setAttribute('role', 'group'); sv.removeAttribute('aria-labelledby'); sv.setAttribute('aria-label', (name === 'site' ? 'Campus to scale' : 'The plant') + ' — interactive drawing'); });
+      layerFlow(stage);
+      $$('svg:not(.fp-flow)', stage).forEach(function (sv) { sv.setAttribute('role', 'group'); sv.removeAttribute('aria-labelledby'); sv.setAttribute('aria-label', (name === 'site' ? 'Campus to scale' : 'The plant') + ' — interactive drawing'); });
       /* the IEC genset glyph carries its G as a 13-unit letter; at this figure's scale that is a 6 px
        * glyph, so it is drawn as a stroke here — same symbol, a path instead of a text node */
       $$('g.rzd-sym text', stage).forEach(function (t) {

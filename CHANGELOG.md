@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v3.24.22 — 2026-10-24 — "Flow Layer"
+
+### Changed
+- **The hero's flow dashes paint on their own layer.** The eight animated dashes were drawn inside
+  the plant figure, so every frame repainted the whole drawing (46 boxes, 46 labels, 12 symbols).
+  They now sit on a thin SVG with the same viewBox, laid over the figure on its own compositor
+  layer. Traced A/B on the hero at rest (headless, 4 s, two runs each): paint time 339 / 338 ms
+  became 195 / 203 ms, and raster was unchanged. The dashes land on their wires to 0 px at 1440, 900
+  and 390 px. They draw in with the figure, and hover still lights them.
+- Tried and dropped: stepping the dash animation to 30 fps (`steps(42)`) did not reduce Chrome's
+  per-frame style passes (599 vs 601 per 10 s), so it was not shipped.
+- `standarization/AGENT_HARNESS_STANDARD.md` "Last updated" restamped to the release date.
+
 ## v3.24.21 — 2026-10-19 — "Callouts"
 
 ### Fixed
