@@ -271,7 +271,10 @@ STYLE_RE = re.compile(r'(<style[^>]*>)(.*?)(</style>)', re.S)
 HTML_STYLE_RE = re.compile(r'(<html\b[^>]*?)\s+style="[^"]*--rz-art-accent[^"]*"([^>]*>)')
 FONT_LINK_RE = re.compile(r'(<link[^>]*href="https://fonts\.googleapis\.com/css2\?)([^"]*)(")')
 SERIF_FAMILY_RE = re.compile(r'family=(?:Fraunces|Playfair\+Display|Newsreader|Instrument\+Serif|Cormorant[^&"]*|Lora|Merriweather|DM\+Serif[^&"]*)(?::[^&"]*)?&?')
-TILE_RE = re.compile(r'class="[^"]*\b(?:stat|stats|metric|kpi|evidence|figure|number)[-_]?(?:item|card|tile|box|block|cell)\b[^"]*"', re.I)
+TILE_RE = re.compile(r'class="[^"]*\b(?:stat|stats|metric|kpi|evidence|figure|number)[-_]?(?:item|card|tile|box|block|cell)(?=[\s"])[^"]*"', re.I)
+# The tile word must END the class token: `\b` also matched `evidence-card-value`, so a card's
+# own value/label/sub children made the card a "parent of tiles" and it was marked as a nested
+# fact list (articles 1/2/3/5; article-1 then rendered 601 px wide on a 360 px phone).
 STYLE_ATTR_RE = re.compile(r'(\sstyle=")([^"]*)(")')
 TAG_RE = re.compile(r'<(/?)([a-zA-Z][a-zA-Z0-9-]*)([^<>]*?)(/?)>')
 VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr'}
@@ -303,7 +306,8 @@ def fact_lists(text, log, name):
             parents.setdefault(pid, []).append(m.start())
         if not selfclose and tag not in VOID:
             stack.append((tag, m.start()))
-    hits = [(pid, n) for pid, n in parents.items() if len(n) >= 3]
+    tiles = {t for n in parents.values() for t in n}
+    hits = [(pid, n) for pid, n in parents.items() if len(n) >= 3 and pid not in tiles]
     for pid, n in sorted(hits, reverse=True):
         head = TAG_RE.match(text, pid)
         if not head or 'data-rz-fact-list' in head.group(3):

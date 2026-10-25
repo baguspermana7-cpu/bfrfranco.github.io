@@ -45,25 +45,28 @@ async function newPageSafe() {
 
 async function measure(f) {
   const r = { f, mobileOverflow: 0, tabletOverflow: 0, wideTableW: 0 };
-  for (const [w, key] of [[390, 'm'], [768, 't'], [2400, 'wide']]) {
+  for (const [w, key] of [[360, 'm'], [390, 'm'], [768, 't'], [2400, 'wide']]) {
     const pg = await newPageSafe();
-    await pg.setViewport({ width: w, height: 900 });
+    // A phone, not a narrow desktop window: with isMobile the layout viewport WIDENS to fit
+    // overflowing content (the page loads zoomed out) even where body{overflow-x:hidden}
+    // keeps scrollX at 0 — a desktop-window run reported article-1 clean at 601 px wide.
+    await pg.setViewport(w === 2400 ? { width: w, height: 900 } : { width: w, height: 900, isMobile: true, hasTouch: true });
     try {
       await pg.goto('file://' + resolve(ROOT, f), { waitUntil: 'domcontentloaded', timeout: 25000 });
       await new Promise(rs => setTimeout(rs, 200));
-      const m = await pg.evaluate(() => {
+      const m = await pg.evaluate((__W) => {
         // Honest metric: can the USER actually scroll the page sideways? scrollWidth
         // alone false-positives when overflow-x:hidden clips content (html stays visible).
         window.scrollTo(99999, 0);
-        const over = Math.round(window.scrollX);
+        const over = Math.max(Math.round(window.scrollX), window.innerWidth - __W);
         window.scrollTo(0, 0);
         let maxArtTbl = 0;
         document.querySelectorAll('.article-body > table, .article-body > .table-wrap > table').forEach(e => {
           const bw = e.getBoundingClientRect().width; if (bw > maxArtTbl) maxArtTbl = bw;
         });
         return { over, maxArtTbl: Math.round(maxArtTbl) };
-      });
-      if (key === 'm') r.mobileOverflow = m.over;
+      }, w);
+      if (key === 'm') r.mobileOverflow = Math.max(r.mobileOverflow, m.over);
       if (key === 't') r.tabletOverflow = m.over;
       if (key === 'wide') r.wideTableW = m.maxArtTbl;
     } catch (e) { /* heavy/auth pages may time out on file://; not a layout failure */ }
@@ -87,7 +90,7 @@ const wideTbl = rows.filter(r => r.wideTableW > 900);
 let failed = false;
 if (mob.length) {
   failed = true;
-  console.log('\n✗ MOBILE (390) horizontal overflow — page scrolls sideways on a phone:');
+  console.log('\n✗ MOBILE (360/390) horizontal overflow — page scrolls sideways on a phone:');
   mob.sort((a, c) => c.mobileOverflow - a.mobileOverflow).forEach(r => console.log(`   ${r.f.padEnd(38)} +${r.mobileOverflow}px`));
 }
 if (tab.length) {

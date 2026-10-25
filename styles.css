@@ -6097,6 +6097,17 @@ section {
     .toc-mobile-toggle { display: flex; }
 }
 
+/* Phone/tablet: the TOC button sits at the left end of the share bar, not over the
+   reading column; the bar's icons centre in the space to its right. */
+@media (max-width: 1024px) {
+    .toc-mobile-toggle { bottom: 18px; }
+    body:has(#tocMobileToggle) .share-buttons { padding-left: 76px; }
+    body:has(#tocMobileToggle):not(:has(#shareButtons)) { padding-bottom: 80px; }
+}
+@media (max-width: 360px) {
+    .toc-mobile-toggle { bottom: 11px; }
+}
+
 /* ==========================================
    Feature 24: Article Series Navigation
    ========================================== */

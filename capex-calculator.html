@@ -458,8 +458,9 @@
 
         @media (max-width: 1024px) {
             .simulator-container {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
+            .simulator-inputs, .simulator-results { min-width: 0; }
         }
 
         .simulator-inputs {
@@ -476,8 +477,10 @@
 
         @media (max-width: 600px) {
             .input-row {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
+            .input-group, .input-row .input-field { min-width: 0; max-width: 100%; } /* a long <select> option set the track's min-content width */
+            .simulator-inputs select { width: 100%; max-width: 100%; min-width: 0; } /* inline-block select sized to its longest option (refrigerant list: 327 px in a 278 px column) */
         }
 
         .input-group {
@@ -930,7 +933,7 @@ button[onclick^="setPreset"] { background:#166534 !important; border-color:#1665
 :root:not([data-theme="dark"]) #uncertaintyPanel > div { color:#495057 !important; }
 [data-theme="dark"] #uncP90 { color:#f87171 !important; }
 </style>
-    <script src="js/rz-version.js?v=20261025-3cdf9670" defer></script>
+    <script src="js/rz-version.js?v=20261025-68831425" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
@@ -2007,6 +2010,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
 <!-- Footer -->
     <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#475569;border-color:rgba(71,85,105,0.4)}.rz-manual-link a:hover{color:#0891b2;border-color:rgba(8,145,178,0.5)}[data-theme="dark"] .rz-manual-link a{color:#94a3b8;border-color:rgba(148,163,184,0.35)}[data-theme="dark"] .rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/capex.html">Technical Manual &amp; Methodology &#8599;</a></div>
+    <style>@media (max-width: 768px){footer > div > div[style*="grid-template-columns"]{grid-template-columns:minmax(0,1fr)!important}}</style><!-- the inline 2fr 1fr 1fr footer grid has no class, so no .footer-grid rule reaches it on a phone -->
     <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem;">
         <div style="max-width: 1200px; margin: 0 auto;">
             <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: start;">

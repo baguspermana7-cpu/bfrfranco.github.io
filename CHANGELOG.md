@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v3.24.26 — 2026-10-25 — "Real Phone"
+
+**Owner:** *"continue, improve more, polish more"*. The responsive gate emulated a narrow desktop window, so
+five pages that load zoomed out on a real phone passed it. The table-of-contents button covered body text.
+
+### Fixed
+- **Five pages loaded wider than the phone.** On a phone the layout viewport grows to fit overflowing content,
+  even where `body{overflow-x:hidden}` keeps `scrollX` at 0. Measured at 360 px: article-1 601 px wide (the
+  menu button off-screen), tier-advisor and tia-942 382, capex and opex 378. Causes:
+  - article-1: 56 legacy `.tooltip::after` tooltips, opacity 0 but `white-space:nowrap`, still laid out past
+    the right edge. They now take no space until hovered and wrap at 260 px.
+  - capex, opex, tier-advisor: the footer is an inline `2fr 1fr 1fr` grid with no class, so no `.footer-grid`
+    phone rule reached it. A scoped rule collapses it to one column under 768 px.
+  - tier-advisor, tia-942: the phone chart grid was `1fr` (min auto). Now `minmax(0,1fr)`.
+  - capex: the simulator and input grids were `1fr`, and a long `<select>` option set the track width. Now
+    `minmax(0,1fr)`; the refrigerant `<select>` sized itself to its longest option (327 px in a 278 px
+    column) and now takes the column width.
+- **Nested fact lists on articles 1, 2, 3 and 5.** `tools/sweep-journal-register.py` matched
+  `evidence-card` inside `evidence-card-value`, so each card's own value, label and sub line made the card a
+  "parent of tiles" and a fact list inside a fact list. The tile word must now end the class token, and a tile
+  is never itself marked. The old sweep re-adds 20 attributes on 4 pages; the new one 0.
+- **TOC button over the text on phones.** It sits at the left end of the bottom share bar (whose icons centre
+  in the space to its right) instead of 90 px above it.
+
+### Gate
+- `tools/audit-responsive-layout.mjs` now emulates a phone (`isMobile`, touch) at 360 and 390 px and also fails
+  a layout viewport wider than the screen. On the v3.24.25 tree it fails 5 pages (article-1 +241, tia-942 and
+  tier-advisor +22, capex and opex +18) where the previous version reported clean; on this tree it passes.
+
+---
+
 ## v3.24.25 — 2026-10-25 — "Narrow Column"
 
 **Owner:** *"continue, improve more, polish more"* — the two article-30 figures v3.24.23 left scrolling at 360 px,
