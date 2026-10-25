@@ -161,7 +161,7 @@ let PHONE = false;
  * labels stay at the site's 8.5 px legibility floor (scale 0.945). A 375 px
  * phone has a 351 px column, so 368 units is the widest that still fits. */
 const PHONE_MIN_SCALE = 0.945;
-const PHONE_MAX_PX = 368;
+const PHONE_MAX_PX = 355;
 function phoneSpec(spec) {
   const ph = spec.phone;
   const row = {};
@@ -180,7 +180,7 @@ function phoneSpec(spec) {
   return Object.assign({}, spec, {
     slug: spec.slug + 'n', nodes, edges, gaps: [], colMin: ph.colMin,
     gapY: ph.gapY == null ? 28 : ph.gapY, top: ph.top, left: ph.left,
-    zones: ph.zones || spec.zones, phone: undefined, fitPad: 20
+    zones: ph.zones || spec.zones, phone: undefined, fitPad: ph.fitPad || 20
   });
 }
 
@@ -745,7 +745,7 @@ const AGENTIC_FIGURES = [
       'a list of “schema check, verifier, budget, human gate” hides that the verifier feeds the context and that the ' +
       'budget guard can halt the model from outside it; the loop shape shows who can stop what.',
     build: () => gridFigure({
-      phone: { order: ['bud', 'ctx', 'llm', 'val', 'hum', 'exe', 'ver', 'done'], gapY: 32, left: 52,
+      phone: { order: ['bud', 'ctx', 'llm', 'val', 'hum', 'exe', 'ver', 'done'], gapY: 32, left: 54, fitPad: 14,
         edges: { 2: { fs: 'r', ts: 'r' }, 3: { fs: 'l', ts: 'l' }, 5: { fs: 'l', ts: 'l' }, 6: { fs: 'l', ts: 'l' }, 7: { fs: 'r', ts: 'r' } } },
       slug: 'agentic2', title: 'Observe, act, verify',
       desc: 'The model proposes; deterministic checks decide whether the step counts.',
@@ -816,7 +816,7 @@ const AGENTIC_FIGURES = [
       'a list of roles and gates does not show the three ways back to the builder or that state is written to ' +
       'board.json at every transition; the loop structure is the point.',
     build: () => gridFigure({
-      phone: { order: ['spec', 'bld', 'gate', 'rev', 'ver', 'dec', 'board', 'app', 'mg'], gapY: 32,
+      phone: { order: ['spec', 'bld', 'gate', 'rev', 'ver', 'dec', 'board', 'app', 'mg'], gapY: 32, left: 46,
         edges: { 2: { fs: 'r', ts: 'r' }, 6: { fs: 'l', ts: 'l' }, 7: { fs: 'r', ts: 'r' }, 9: { fs: 'r', ts: 'r' } } },
       slug: 'agentic4', title: 'Factory: LLMs write, exit codes decide',
       desc: 'Spec to merge with every transition recorded by the factory CLI in board.json.',
@@ -858,7 +858,8 @@ const AGENTIC_FIGURES = [
     build: () => gridFigure({
       phone: { order: ['p3', 'p1', 'p4', 'iface', 'dv', 'd2', 'd5', 'd3'], gapY: 44,
         zones: [{ ids: ['p3', 'p1', 'p4'], label: 'LLM' }, { ids: ['dv', 'd2', 'd5', 'd3'], label: 'Code' }],
-        edges: { 0: { fs: 'l', ts: 'l' }, 1: { fs: 'r', ts: 'r' }, 4: { fs: 'l', ts: 'l' }, 5: { fs: 'r', ts: 'r' }, 6: { fs: 'r', ts: 'r' } } },
+        edges: { 0: { fs: 'l', ts: 'l' }, 1: { fs: 'r', ts: 'r' }, 4: { fs: 'l', ts: 'l' }, 5: { fs: 'l', ts: 'l' },
+          6: { fs: 'r', ts: 'r', label: undefined, legend: 'Error text back to the drafter' } } },
       slug: 'agentic5', title: 'Drafter and checker',
       desc: 'What each half is good at, and the interface between them.',
       gaps: [48, 48], gapY: 32,
@@ -1977,6 +1978,12 @@ function overlapFindings(page, id, ctx) {
   for (const it of ctx.occupancy.items) {
     if (it.box.x < -0.5 || it.box.y < -0.5) findings.push(
       `${page} · ${id}: ${it.meta.kind}:${it.meta.id || ''} starts at ${it.box.x.toFixed(0)},${it.box.y.toFixed(0)} — outside the drawing, clipped`);
+  }
+  /* An arrow label's occupancy is its text; the panel behind it is wider and
+   * is not in the occupancy map, so check the drawn rectangles too. */
+  for (const m of ctx.render().matchAll(/<rect x="(-?[\d.]+)" y="(-?[\d.]+)"/g)) {
+    if (+m[1] < -0.5 || +m[2] < -0.5) findings.push(
+      `${page} · ${id}: a rectangle starts at ${(+m[1]).toFixed(1)},${(+m[2]).toFixed(1)} — outside the drawing, clipped`);
   }
   const geom = ctx.occupancy.items.filter((i) => i.meta.kind === 'text' || i.meta.kind === 'node');
   for (let a = 0; a < geom.length; a++) {

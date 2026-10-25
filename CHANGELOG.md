@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.24.25 — 2026-10-25 — "Narrow Column"
+
+**Owner:** *"continue, improve more, polish more"* — the two article-30 figures v3.24.23 left scrolling at 360 px,
+and a clipped-label case its check could not see.
+
+### Fixed
+- **Every article-30 figure now fits a 360 px phone.** The phone composition may be at most 355 units wide
+  (336 px column ÷ the 0.945 legibility floor; it was 368, sized for 375 px). D2 "Observe, act, verify" 356 → 352
+  (left margin and right padding retuned); D5 "Drafter and checker" 364 → 268: the right-lane label "error text
+  back" pushed it wide, so on the phone that dashed line carries its meaning in the legend ("Error text back to
+  the drafter") and the dashed validate-to-test line moved to the left lane. Measured in a browser at 360, 375 and 390 px: every
+  figure's scroll width equals its box (D2 and D5 scrolled 1 and 8 px before), page scrollX 0, no page errors.
+- **Arrow-label panels clipped at the left edge.** The clipped check read the occupancy map, which holds an arrow
+  label's text but not the panel behind it, so D4's "fix" label panel started at x = −1.8 and passed. The builder
+  now also fails any drawn rectangle left of or above the origin (RED on D4 before its fix, the only case across
+  all articles); D4's phone column moves right 6 units.
+
+### Checked, no change
+- The mobile Table of Contents sheet is closed on load (its top sits at the viewport bottom at 390 × 800); it only
+  appeared in element screenshots because a tall element capture enlarges the viewport.
+
 ## v3.24.24 — 2026-10-25 — "Hub Tools"
 
 **Owner:** *"lakukan update dan penyempurnaan semua tools yang ada di hub ini. literally semuanya"* — all 33 tools
