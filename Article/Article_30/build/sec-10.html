@@ -1,18 +1,18 @@
-<h2 id="bms">&ldquo;Put an agent on the BMS&rdquo;: a checklist for operations</h2>
+<h2 id="bms">Checklist: connecting an agent to a BMS</h2>
 
-<p>A data-center team will be asked sooner or later to connect an agent to the building management system. The safe answer is neither yes nor no. It is a description of what the agent may read, what it may write, and what stands between its suggestion and the plant. Government guidance on AI in operational technology (<a href="glossary.html#term-ot">OT</a>) points the same way as the architecture in section 9, and the checklist below applies it. In short: read freely, propose in writing, and let only the existing control system, with its interlocks and a person, act.</p>
+<p>When asked to connect an agent to the building management system, specify what the agent may read, what it may write, and what stands between its suggestion and the plant. Government guidance on AI in operational technology (<a href="glossary.html#term-ot">OT</a>) matches the architecture in section 9; the checklist below applies it. Rule: read freely, propose in writing, and let only the existing control system, with its interlocks and a person, act.</p>
 
-<h3 id="bms-anchors">10.1 Guidance this checklist rests on</h3>
+<h3 id="bms-anchors">10.1 Guidance used</h3>
 
 <ul>
 <li><strong>CISA, ASD&rsquo;s ACSC, NSA&rsquo;s AI Security Center, the FBI and five partner agencies</strong>, <em>Principles for the Secure Integration of Artificial Intelligence in Operational Technology</em> (published 2025-12-03; PDF revision January 2026). Four principles: understand AI; consider AI use in the OT domain; establish AI governance and assurance frameworks; embed oversight and failsafe practices. It advises to &ldquo;limit active control of OT infrastructure by AI without a human in the loop to account for safety concerns and latency limitations&rdquo; and to &ldquo;regularly update and validate AI models&rdquo; <a href="#src-33">[S33]</a>. The phrase is <a href="glossary.html#term-human-in-the-loop">human in the loop</a>.</li>
-<li><strong>NIST AI Risk Management Framework 1.0</strong>, released 2023-01-26 <a href="#src-34">[S34]</a>. Its four functions are commonly given as Govern, Map, Measure and Manage; I did not re-read the document for this article.</li>
+<li><strong>NIST AI Risk Management Framework 1.0</strong>, released 2023-01-26 <a href="#src-34">[S34]</a>. Its four functions are commonly given as Govern, Map, Measure and Manage; the document was not re-read for this article.</li>
 <li><strong>ISO/IEC 42001:2023</strong>, a management-system standard for AI (<a href="glossary.html#term-iso-42001">ISO/IEC 42001</a>); its scope was not re-read for this article <a href="#src-35">[S35]</a>.</li>
 <li><strong>IEC 62443</strong> for security zones and conduits in industrial systems and <strong>IEC 61511</strong> for safety instrumented systems (<a href="glossary.html#term-iec-62443">IEC 62443</a>, <a href="glossary.html#term-sis">SIS</a>); cited as background, not read for this article <a href="#src-36">[S36]</a>. NIST&rsquo;s framework is covered in the glossary under <a href="glossary.html#term-nist-ai-rmf">NIST AI RMF</a>.</li>
 <li><strong>OWASP</strong> LLM01 and the agentic Top 10 for injection and tool risks <a href="#src-31">[S31]</a> <a href="#src-32">[S32]</a>.</li>
 </ul>
 
-<h3 id="bms-list">10.2 The ten points</h3>
+<h3 id="bms-list">10.2 Ten-point checklist</h3>
 
 <ol>
 <li><strong>Read-only first.</strong> The agent reads BMS, EPMS and DCIM trends, alarms and CMMS history. It writes only to a ticket, a draft MOP or a chat message.</li>
@@ -29,11 +29,11 @@
 
 <figure class="rz-figure" data-rz-figure="agentic-d8"></figure>
 
-<p>The figure shows the permitted data flow. Trends and alarms move one way from the control zone to a historian replica in the DMZ, and from there to the agent. The agent can draft a work order, and it can send a proposed change with its evidence to an operator. An approved change passes through a change gateway that checks range and interlock conditions before reaching the BMS. No path leads from the agent to the BMS, the PLC or the safety system. The safety system trips equipment independently.</p>
+<p>Permitted data flow: Trends and alarms move one way from the control zone to a historian replica in the DMZ, and from there to the agent. The agent can draft a work order, and it can send a proposed change with its evidence to an operator. An approved change passes through a change gateway that checks range and interlock conditions before reaching the BMS. No path leads from the agent to the BMS, the PLC or the safety system. The safety system trips equipment independently.</p>
 
-<h3 id="bms-targets">10.3 Good first targets, and out-of-scope ones</h3>
+<h3 id="bms-targets">10.3 Suitable and out-of-scope tasks</h3>
 
-<p>The scorer in section 9 places these tasks, using the dossier&rsquo;s own scores as examples; the inputs are judgements, so move the sliders to match your site.</p>
+<p>Scores from the section 9 scorer. Inputs are judgements; adjust them to your site.</p>
 
 <div class="table-wrap"><table class="ws-table">
 <caption>Example scorer results (inputs V, E, Vf, F, L). Source: the calculator in section 9.1; judgement aid, not measurement.</caption>
@@ -46,9 +46,9 @@
 <tr><td>Chiller setpoint write</td><td class="n">3, 5, 2, 4, 2</td><td class="n">7.8</td><td>Script plus red flag; no autonomous action</td></tr>
 </tbody></table></div>
 
-<p>Good first targets are alarm-flood summaries, CMMS drafting, retrieval of procedures and shift-handover notes. They share three properties: the input is untidy, the output is a draft that a person reads, and a wrong answer costs a minute and not an outage. Out of scope are setpoints, sequences of operation and safety functions. The same rules apply to the agent&rsquo;s memory: anything it stores between runs is data an attacker could shape, so keep it small, reviewable and expiring.</p>
+<p>Suitable first tasks: alarm-flood summaries, CMMS drafting, procedure retrieval, shift-handover notes. Common properties: untidy input, a draft output that a person reads, and a wrong answer that costs a minute, not an outage. Out of scope are setpoints, sequences of operation and safety functions. The same rules apply to the agent&rsquo;s memory: anything it stores between runs is data an attacker could shape, so keep it small, reviewable and expiring.</p>
 
 <div class="ws-insight-box">
-<h4>The one-line answer</h4>
+<h4>Summary</h4>
 <p>&ldquo;Put an agent on the BMS&rdquo; becomes &ldquo;put an agent next to the BMS, with read-only access, a draft-only output, and a person between its suggestion and the setpoint.&rdquo; Anything beyond that needs its own risk assessment against the guidance <a href="#src-33">[S33]</a>.</p>
 </div>

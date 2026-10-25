@@ -427,6 +427,14 @@ html[data-rz-register="editorial"] .rz-figure svg{
      type shouted and shrank wide ones until it vanished. */
   display:block;width:100%;height:auto;
 }
+/* Phone composition (tools/build-article-diagrams.mjs `phone`): the same nodes
+   and edges in one column, drawn at 1:1 so nothing scrolls sideways and no label
+   shrinks. Shown whenever the column is narrower than the wide drawing. */
+html[data-rz-register="editorial"] .rz-figure svg.rz-fig-narrow{display:none;}
+@media (max-width:799px){
+  html[data-rz-register="editorial"] .rz-figure svg.rz-fig-wide{display:none;}
+  html[data-rz-register="editorial"] .rz-figure svg.rz-fig-narrow{display:block;margin:0 auto;}
+}
 html[data-rz-register="editorial"] .rz-figcaption{
   margin-top:.85rem;max-width:68ch;line-height:1.6;
 }

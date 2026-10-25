@@ -502,7 +502,7 @@ Accessed 2026-10-16 unless noted. "Taken" = what was used.
 | S5 | Shojaee et al., "The Illusion of Thinking" (Apple) | https://arxiv.org/abs/2506.06941 | 2025-06 | Collapse, effort decline, 3 regimes |
 | S6 | A. Lawsen, "Comment on The Illusion of Thinking" | https://arxiv.org/abs/2506.09250 | 2025-06 | Token limits, impossible instances, generating functions |
 | S7 | Mirzadeh et al., "GSM-Symbolic" (ICLR 2025) | https://arxiv.org/abs/2410.05229 | 2024-10 | "up to 65%", hypothesis quote |
-| S8 | DeepSeek-AI, "DeepSeek-R1" | https://arxiv.org/abs/2501.12948 | 2025-01 (Nature version 2025) | Emergent reflection; AIME figures (not re-read) |
+| S8 | DeepSeek-AI, "DeepSeek-R1" | https://arxiv.org/abs/2501.12948 | 2025-01 (Nature version 2025) | Emergent reflection; R1 79.8% AIME (re-read); R1-Zero 15.6→71.0% (reported) |
 | S9 | Bender et al., "On the Dangers of Stochastic Parrots" (FAccT '21) | https://dl.acm.org/doi/10.1145/3442188.3445922 | 2021-03 | Definition quote (not re-read; 403) |
 | S10 | F. Chollet, "On the Measure of Intelligence" | https://arxiv.org/abs/1911.01547 | 2019-11 | Skill-acquisition efficiency |
 | S11 | ARC Prize, ARC-AGI-2 page | https://arcprize.org/arc-agi/2/ | 2025 | Human calibration, dataset sizes |
@@ -517,7 +517,7 @@ Accessed 2026-10-16 unless noted. "Taken" = what was used.
 | S20 | LangChain (J. Ou), "What is an AI agent?" | https://blog.langchain.com/what-is-an-agent/ | 2026-07-31 | Autonomy spectrum, loop components |
 | S21 | Russell & Norvig, *Artificial Intelligence: A Modern Approach*, 4th ed., ch. 2 | https://aima.cs.berkeley.edu/ | 2020 | Agent definition (not re-read) |
 | S22 | SWE-bench leaderboards.json | https://raw.githubusercontent.com/SWE-bench/swe-bench.github.io/master/data/leaderboards.json | read 2026-10-16 | Verified top entries |
-| S23 | OpenAI, "Why we no longer evaluate SWE-bench Verified" (403) | https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/ | 2026-02 | Retirement (figures via S24/snippets) |
+| S23 | OpenAI, "Why we no longer evaluate SWE-bench Verified" | https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/ | 2026-02 | 59.4% of 138 audited problems flawed; contamination; use Pro (re-read 2026-10-25) |
 | S24 | Decrypt, "OpenAI Says Benchmark… Is 'Contaminated'" | https://decrypt.co/359012/openai-benchmark-measure-ai-coding-supremacy-contaminated | 2026-02-24 | ~70%→~23% on Pro |
 | S25 | Terminal-Bench 2.0 leaderboard (Snorkel mirror; tbench.ai) | https://snorkel.ai/leaderboard/terminal-bench-2-0/ | 2026-10 | Top entries, 89 tasks |
 | S26 | METR, "Time Horizon 1.1" | https://metr.org/blog/2026-1-29-time-horizon-1-1/ | 2026-01-29 | Suite size, 131-day doubling |

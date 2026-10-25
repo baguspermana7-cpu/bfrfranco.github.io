@@ -11,6 +11,53 @@ release sections rather than semver.
 
 ---
 
+## v3.24.23 — 2026-10-25 — "Plain Record"
+
+### Changed
+- **Article 30 rewritten in plain engineering prose.** Owner, on the live page: *"style tulisannya
+  dan arrangement dll itu terlalu ai design slop"*, *"'The claim, in his words#' ini kan aneh to the
+  point aja stright forward. dan bener2 accrrata dan comprehensive"*.
+  - Every heading now says what the section contains ("The 14 claims tested", "How a language model
+    produces text and calls tools", "Can a language model reason or do arithmetic?", "Investment,
+    revenue and the IPO claim", "Checklist: connecting an agent to a BMS"); framing, rhetoric and
+    remarks about the article itself are cut.
+  - Facts kept: every citation, number, quotation and source id was compared mechanically between
+    the old and new fragments before the rewrite was accepted.
+  - The source notes for [S8] and [S23] were shortened (they render as the "Taken:" line in the
+    source list), and the leaked-financials row names its route ("Reuters, via CNBC; prospectus not
+    public").
+  - Title: "Is 'Agentic AI' a Fraud? 14 Claims Tested Against the Evidence"; the OG card was
+    regenerated with it.
+- **More charts and tables, less list text.** Four sourced charts added (run success by step count,
+  cost of one run by step count, 2026 capex guidance ranges, grades for E1–E14), all carrying
+  `source` + `basisTag`; three lists became tables (3.4 the case against, 4.3 old versus new, 7.4).
+  Charts now draw their y-axis title (`yLabel` was never read), use whole-number ticks when every
+  value is an integer, and space the x-axis evenly.
+
+### Fixed
+- **Figures cut off.** Owner, with a screenshot of the restaurant-demo diagram: *"terpotong dan aneh
+  sekali jelek ini chartnya"*.
+  - Desktop: all eight figures were recomposed to fit the 736 px column; the builder now FAILS any
+    article-30 figure wider than the column (`FIT_TO_COLUMN_PAGES`). Measured at 1440: 8 of 8 fit
+    the 744 px container, 0 scroll.
+  - Phone: a figure that fits the desktop column still scrolled sideways in a 351–366 px phone
+    column (508–732 px drawings). Each figure now carries a `phone` composition of the same nodes,
+    edges and zones in one column, drawn at 1:1 and shown below 800 px. It may shrink only to the
+    8.5 px label floor (scale 0.945). The builder fails a phone drawing wider than 368 units, any
+    overlap, and any label placed outside the drawing (a new check: `fit()` grows the canvas right
+    and down only, so a label left of the origin was silently clipped — it caught five on the first
+    run). Measured at 375 px: 8 of 8 figures fit, page scroll-x 0, 0 page errors. At 360 px two
+    still scroll inside their own track, by 1 px (D2) and 8 px (D5).
+  - The safety-system box in the chiller-plant figure renders in the site's alert red
+    (`faultRed`), so it no longer reads as the same thing as a probabilistic box.
+- `standarization/AGENT_HARNESS_STANDARD.md` "Last updated" restamped to the release date.
+
+### Not done
+- Lucide icons: none are used on this page; standard IEC/ISA symbols appear where the figure draws
+  equipment (BMS, chiller). Replacing icons elsewhere was deferred by the owner ("skip dulu ini").
+- 17 figures on other journal pages are still wider than the column (listed by the builder); they
+  scroll inside their own track.
+
 ## v3.24.22 — 2026-10-24 — "Flow Layer"
 
 ### Changed

@@ -149,9 +149,53 @@ function assessmentMethodFigure(D, M, L) {
  * and the engine routes between them. Nothing here is a number typed by eye,
  * so a longer sublabel widens its column instead of overflowing it.
  * ======================================================================== */
+/* Phone variant. A figure refit to the 736 px column still scrolls inside a
+ * 366 px phone column, and the owner reads that as cut off (article-30,
+ * 2026-10-25). Shrinking it is no answer: at 0.5x a 9-unit label renders at
+ * 4.5 px. So a figure may carry `phone`, a second composition of the SAME
+ * nodes, edges and zones: one column in reading order, with side overrides
+ * for the edges that would otherwise cross a box. The build loop draws it with
+ * PHONE set and the page shows it below 800 px (css/rz-article-dark.css). */
+let PHONE = false;
+/* The phone drawing may shrink to the column, but only as far as its 9-unit
+ * labels stay at the site's 8.5 px legibility floor (scale 0.945). A 375 px
+ * phone has a 351 px column, so 368 units is the widest that still fits. */
+const PHONE_MIN_SCALE = 0.945;
+const PHONE_MAX_PX = 368;
+function phoneSpec(spec) {
+  const ph = spec.phone;
+  const row = {};
+  ph.order.forEach((id, i) => { row[id] = i; });
+  const nodes = spec.nodes.map((n) => {
+    if (row[n.id] == null) throw new Error(spec.slug + ': phone order misses node ' + n.id);
+    return Object.assign({}, n, { col: 0, row: row[n.id] });
+  });
+  if (ph.order.length !== spec.nodes.length) throw new Error(spec.slug + ': phone order has extra ids');
+  const edges = spec.edges.map((e, k) => {
+    const o = (ph.edges || {})[k];
+    const base = Object.assign({}, e);
+    delete base.fs; delete base.ts;
+    return o ? Object.assign(base, o) : base;
+  });
+  return Object.assign({}, spec, {
+    slug: spec.slug + 'n', nodes, edges, gaps: [], colMin: ph.colMin,
+    gapY: ph.gapY == null ? 28 : ph.gapY, top: ph.top, left: ph.left,
+    zones: ph.zones || spec.zones, phone: undefined, fitPad: 20
+  });
+}
+
 function gridFigure(spec) {
+  if (PHONE) {
+    if (!spec.phone) return null;
+    PHONE = false;
+    try {
+      const c = gridFigure(phoneSpec(spec));
+      c.variant = 'phone';
+      return c;
+    } finally { PHONE = true; }
+  }
   const ctx = D.create({ slug: spec.slug, title: spec.title, desc: spec.desc });
-  const X0 = 40, Y0 = spec.top == null ? 44 : spec.top;
+  const X0 = spec.left == null ? 40 : spec.left, Y0 = spec.top == null ? 44 : spec.top;
   const GY = spec.gapY == null ? 36 : spec.gapY;
   const need = (n) => {
     const nameW = n.name ? M.textWidth(n.name, 12, 'sans') : 0;
@@ -245,7 +289,7 @@ function gridFigure(spec) {
     });
   });
   if (anyLegend) ctx.legend();
-  return ctx.fit(28);
+  return ctx.fit(spec.fitPad || 28);
 }
 
 const LLM_FIGURES = [
@@ -661,9 +705,11 @@ const AGENTIC_FIGURES = [
       'the prose can say the video is half right; only the drawing shows which arrows the model decides and which ' +
       'code executes, and that the second description has a return path and a confirm gate the first one lacks.',
     build: () => gridFigure({
+      phone: { order: ['u1', 'l1', 'py', 'l1b', 'l2', 'h', 'g', 'x', 'o'], gapY: 44,
+        zones: [{ ids: ['u1', 'l1', 'py', 'l1b'], label: 'The video [S1]' }, { ids: ['l2', 'h', 'g', 'x', 'o'], label: 'Documented [S15][S16]' }], edges: { 7: { fs: 'r', ts: 'r' } } },
       slug: 'agentic1', title: 'One tool call, two descriptions',
       desc: 'Top: the video’s account. Bottom: the same call with the decisions the model makes marked.',
-      gaps: [52, 52, 52], gapY: 58,
+      gaps: [28, 28, 28], gapY: 58,
       nodes: [
         { id: 'u1', col: 0, row: 0, name: 'User', sub: '“book me a table”' },
         { id: 'l1', col: 1, row: 0, name: 'LLM', sub: 'guesses a command', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic: the model decides' },
@@ -699,18 +745,20 @@ const AGENTIC_FIGURES = [
       'a list of “schema check, verifier, budget, human gate” hides that the verifier feeds the context and that the ' +
       'budget guard can halt the model from outside it; the loop shape shows who can stop what.',
     build: () => gridFigure({
+      phone: { order: ['bud', 'ctx', 'llm', 'val', 'hum', 'exe', 'ver', 'done'], gapY: 32, left: 52,
+        edges: { 2: { fs: 'r', ts: 'r' }, 3: { fs: 'l', ts: 'l' }, 5: { fs: 'l', ts: 'l' }, 6: { fs: 'l', ts: 'l' }, 7: { fs: 'r', ts: 'r' } } },
       slug: 'agentic2', title: 'Observe, act, verify',
       desc: 'The model proposes; deterministic checks decide whether the step counts.',
-      gaps: [48, 52, 52], gapY: 36,
+      gaps: [48, 76], gapY: 40,
       nodes: [
         { id: 'bud', col: 1, row: 0, name: 'Budget guard', sub: 'steps · tokens · time · $', stroke: 'ink' },
-        { id: 'hum', col: 2, row: 0, name: 'Human gate', sub: 'irreversible actions', stroke: 'alarm-caution', dashed: true, legend: 'Human gate' },
-        { id: 'ctx', col: 0, row: 1, name: 'Context', sub: 'goal · history · tool results', stroke: 'ink' },
+        { id: 'hum', col: 1, row: 2, name: 'Human gate', sub: 'irreversible actions', stroke: 'alarm-caution', dashed: true, legend: 'Human gate' },
+        { id: 'ctx', col: 0, row: 1, name: 'Context', sub: 'goal · history · results', stroke: 'ink' },
         { id: 'llm', col: 1, row: 1, name: 'LLM', sub: 'propose next action', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic: the model proposes' },
         { id: 'val', col: 2, row: 1, name: 'Schema / policy check', stroke: 'ink', legend: 'Deterministic check' },
-        { id: 'exe', col: 3, row: 1, name: 'Execute tool', stroke: 'ink' },
-        { id: 'ver', col: 3, row: 2, name: 'Verifier', sub: 'tests · lint · types · rules', stroke: 'ink' },
-        { id: 'done', col: 3, row: 3, name: 'Stop', sub: 'success or escalate', stroke: 'ink' }
+        { id: 'exe', col: 2, row: 2, name: 'Execute tool', stroke: 'ink' },
+        { id: 'ver', col: 2, row: 3, name: 'Verifier', sub: 'tests · lint · types · rules', stroke: 'ink' },
+        { id: 'done', col: 2, row: 4, name: 'Stop', sub: 'success or escalate', stroke: 'ink' }
       ],
       edges: [
         { a: 'ctx', b: 'llm' }, { a: 'llm', b: 'val' },
@@ -718,8 +766,8 @@ const AGENTIC_FIGURES = [
         { a: 'val', b: 'exe', label: 'valid' }, { a: 'exe', b: 'ver' },
         { a: 'ver', b: 'ctx', label: 'pass/fail + log', fs: 'l', ts: 'b' },
         { a: 'bud', b: 'llm', label: 'halt', stroke: 'muted', pattern: 'dashed' },
-        { a: 'llm', b: 'hum', label: 'side effect', fs: 't', ts: 'l' },
-        { a: 'hum', b: 'exe', label: 'approved', fs: 'r', ts: 't' },
+        { a: 'llm', b: 'hum', label: 'side effect', fs: 'b', ts: 't' },
+        { a: 'hum', b: 'exe', label: 'approved', fs: 'r', ts: 'l' },
         { a: 'ver', b: 'done', label: 'goal met' }
       ]
     })
@@ -735,16 +783,17 @@ const AGENTIC_FIGURES = [
       'the argument turns on where the line between workflow and agent sits; a paragraph asserts it, the spectrum ' +
       'shows five levels on one side and one on the other.',
     build: () => gridFigure({
+      phone: { order: ['c0', 'c1', 'c2', 'c3', 'c4', 'c5'], gapY: 44, colMin: [252] },
       slug: 'agentic3', title: 'Who decides the next step?',
       desc: 'Six levels, from hand-written logic to an autonomous agent.',
-      gaps: [28, 28, 28, 28, 44], top: 56,
+      gaps: [44, 44], top: 56, gapY: 48,
       nodes: [
         { id: 'c0', col: 0, row: 0, tag: 'all: code', name: 'Code', sub: 'rules decide', stroke: 'ink' },
         { id: 'c1', col: 1, row: 0, tag: 'output: LLM', name: 'One call', sub: 'single prompt', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'LLM decides this part' },
         { id: 'c2', col: 2, row: 0, tag: 'output: LLM', name: 'Chain', sub: 'fixed sequence', stroke: 'accent', fill: 'paper-2', tier: 1 },
-        { id: 'c3', col: 3, row: 0, tag: 'branch: LLM', name: 'Router', sub: 'LLM picks branch', stroke: 'accent', fill: 'paper-2', tier: 1 },
-        { id: 'c4', col: 4, row: 0, tag: 'move: LLM', name: 'State machine', sub: 'LLM picks move', stroke: 'accent', fill: 'paper-2', tier: 1 },
-        { id: 'c5', col: 5, row: 0, tag: 'steps: LLM', name: 'Agent', sub: 'LLM picks steps', stroke: 'accent', fill: 'paper-2', tier: 1 }
+        { id: 'c3', col: 0, row: 1, tag: 'branch: LLM', name: 'Router', sub: 'LLM picks branch', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'c4', col: 1, row: 1, tag: 'move: LLM', name: 'State machine', sub: 'LLM picks move', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'c5', col: 2, row: 1, tag: 'steps: LLM', name: 'Agent', sub: 'LLM picks steps', stroke: 'accent', fill: 'paper-2', tier: 1 }
       ],
       edges: [
         { a: 'c0', b: 'c1', stroke: 'muted', pattern: 'dashed', legend: 'More control moves to the model' },
@@ -767,30 +816,32 @@ const AGENTIC_FIGURES = [
       'a list of roles and gates does not show the three ways back to the builder or that state is written to ' +
       'board.json at every transition; the loop structure is the point.',
     build: () => gridFigure({
+      phone: { order: ['spec', 'bld', 'gate', 'rev', 'ver', 'dec', 'board', 'app', 'mg'], gapY: 32,
+        edges: { 2: { fs: 'r', ts: 'r' }, 6: { fs: 'l', ts: 'l' }, 7: { fs: 'r', ts: 'r' }, 9: { fs: 'r', ts: 'r' } } },
       slug: 'agentic4', title: 'Factory: LLMs write, exit codes decide',
       desc: 'Spec to merge with every transition recorded by the factory CLI in board.json.',
-      gaps: [48, 56, 56], gapY: 48,
+      gaps: [44, 120], gapY: 48,
       nodes: [
         { id: 'spec', col: 0, row: 0, name: 'spec-writer', sub: 'request → spec.md', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'LLM role' },
         { id: 'bld', col: 1, row: 0, name: 'builder', sub: 'code + tests, commit', stroke: 'accent', fill: 'paper-2', tier: 1 },
         { id: 'gate', col: 2, row: 0, tag: 'never overridable', name: 'factory gate', sub: 'lint · test · build', stroke: 'ink', tier: 1, legend: 'CLI step (exit code)' },
-        { id: 'rev', col: 3, row: 0, name: '4 reviewers', sub: 'security · code · ux · ui', stroke: 'accent', fill: 'paper-2', tier: 1 },
-        { id: 'dec', col: 1, row: 1, name: 'DECIDE', sub: 'fix ≤2 · override · abandon', stroke: 'alarm-caution', dashed: true, legend: 'Human decision' },
-        { id: 'ver', col: 3, row: 1, name: 'factory verdict', sub: 'VERDICT regex · HEAD same', stroke: 'ink' },
-        { id: 'board', col: 2, row: 2, name: 'board.json', sub: 'every transition', stroke: 'ink', dashed: true },
-        { id: 'app', col: 3, row: 2, name: 'approver', sub: 'factory deliver', stroke: 'accent', fill: 'paper-2', tier: 1 },
-        { id: 'mg', col: 3, row: 3, name: 'Merge to main', sub: 're-gated · push if push=true', stroke: 'ink' }
+        { id: 'rev', col: 2, row: 1, name: '4 reviewers', sub: 'security · code · ux · ui', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'dec', col: 1, row: 2, name: 'DECIDE', sub: 'fix ≤2 · override · abandon', stroke: 'alarm-caution', dashed: true, legend: 'Human decision' },
+        { id: 'ver', col: 2, row: 2, name: 'factory verdict', sub: 'VERDICT regex · HEAD same', stroke: 'ink' },
+        { id: 'board', col: 1, row: 3, name: 'board.json', sub: 'every transition', stroke: 'ink', dashed: true },
+        { id: 'app', col: 2, row: 3, name: 'approver', sub: 'factory deliver', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'mg', col: 2, row: 4, name: 'Merge to main', sub: 're-gated · push opt-in', stroke: 'ink' }
       ],
       edges: [
         { a: 'spec', b: 'bld' }, { a: 'bld', b: 'gate' },
-        { a: 'gate', b: 'bld', label: 'NEEDS_FIX ≤3', fs: 'b', ts: 'b', stroke: 'muted', pattern: 'dashed', legend: 'Back to the builder' },
+        { a: 'gate', b: 'bld', label: 'NEEDS_FIX ≤3', fs: 't', ts: 't', stroke: 'muted', pattern: 'dashed', legend: 'Back to the builder' },
         { a: 'gate', b: 'rev', label: 'REVIEW' }, { a: 'rev', b: 'ver' },
         { a: 'ver', b: 'dec', label: 'rounds exhausted', fs: 'l', ts: 'r' },
         { a: 'dec', b: 'bld', label: 'fix' },
         { a: 'ver', b: 'app', label: 'READY' }, { a: 'app', b: 'mg' },
-        { a: 'ver', b: 'board', stroke: 'muted', pattern: 'dotted', fs: 'b', ts: 't', legend: 'Writes state' },
+        { a: 'ver', b: 'board', stroke: 'muted', pattern: 'dotted', fs: 'b', ts: 'r', legend: 'Writes state' },
         { a: 'dec', b: 'board', stroke: 'muted', pattern: 'dotted', fs: 'b', ts: 'l' },
-        { a: 'app', b: 'board', stroke: 'muted', pattern: 'dotted', fs: 'l', ts: 'r' }
+        { a: 'app', b: 'board', stroke: 'muted', pattern: 'dotted', fs: 'l', ts: 'b' }
       ]
     })
   },
@@ -805,14 +856,17 @@ const AGENTIC_FIGURES = [
       'a two-column table says which half does what; it cannot show that every path from the model passes through one ' +
       'typed interface, or that test failures return to the drafter as text.',
     build: () => gridFigure({
+      phone: { order: ['p3', 'p1', 'p4', 'iface', 'dv', 'd2', 'd5', 'd3'], gapY: 44,
+        zones: [{ ids: ['p3', 'p1', 'p4'], label: 'LLM' }, { ids: ['dv', 'd2', 'd5', 'd3'], label: 'Code' }],
+        edges: { 0: { fs: 'l', ts: 'l' }, 1: { fs: 'r', ts: 'r' }, 4: { fs: 'l', ts: 'l' }, 5: { fs: 'r', ts: 'r' }, 6: { fs: 'r', ts: 'r' } } },
       slug: 'agentic5', title: 'Drafter and checker',
       desc: 'What each half is good at, and the interface between them.',
-      gaps: [72, 72], gapY: 32,
+      gaps: [48, 48], gapY: 32,
       nodes: [
         { id: 'p3', col: 0, row: 0, name: 'Draft code, MOP, ticket', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic (LLM)' },
         { id: 'p1', col: 0, row: 1, name: 'Read text, logs, screens', sub: 'and choose among options', stroke: 'accent', fill: 'paper-2', tier: 1 },
         { id: 'p4', col: 0, row: 2, tag: 'may be unfaithful [S3]', name: 'Explain', stroke: 'accent', fill: 'paper-2', tier: 1, dashed: true },
-        { id: 'iface', col: 1, row: 1, name: 'Typed tool interface', sub: 'JSON schema · allow-list · ranges', stroke: 'ink', tier: 1, legend: 'Deterministic (code)' },
+        { id: 'iface', col: 1, row: 1, name: 'Typed tool interface', sub: 'schema · allow-list · ranges', stroke: 'ink', tier: 1, legend: 'Deterministic (code)' },
         { id: 'd3', col: 2, row: 0, name: 'Test, lint, type-check', stroke: 'ink' },
         { id: 'dv', col: 2, row: 1, name: 'Validate + enforce', sub: 'schema · limits · permissions', stroke: 'ink' },
         { id: 'd2', col: 2, row: 2, name: 'Execute and measure', stroke: 'ink' },
@@ -842,6 +896,7 @@ const AGENTIC_FIGURES = [
       'the multiplication is one line in the prose; the drawing shows where the verifier sits (inside the step, ' +
       'looping back) and why detection, not model quality, moves the run from 0.358 to 0.899.',
     build: () => gridFigure({
+      phone: { order: ['a', 'r1', 'b', 'vf', 'r2'], gapY: 44, edges: { 2: { fs: 'r', ts: 'r' } } },
       slug: 'agentic6', title: '0.95 twenty times',
       desc: 'Per-step success multiplies; a verifier with retries breaks the chain.',
       gaps: [72, 72], gapY: 64,
@@ -875,17 +930,18 @@ const AGENTIC_FIGURES = [
       'sixteen dated events across three kinds do not survive as prose; read side by side on one time axis they show ' +
       'that the critique lane is dense in 2025 and the capital lane in 2026.',
     build: () => gridFigure({
+      phone: { order: ['c1', 'k1', 'k2', 'c2', 'm1', 'm2', 'm3', 'k3'], gapY: 20, zones: [] },
       slug: 'agentic7', title: 'Money, models and narratives, 2024–2026',
       desc: 'Events on one time axis: capability, capital, critiques.',
-      gaps: [44, 44], gapY: 28,
+      gaps: [24, 24], gapY: 28,
       nodes: [
-        { id: 'k1', col: 2, row: 0, tag: 'Jun–Aug 2025', name: 'Gartner: >40% cancelled by 2027', sub: 'MIT NANDA “95%” [S39][S37]', stroke: 'soft', dashed: true, legend: 'Critique' },
-        { id: 'c1', col: 0, row: 0, tag: 'Dec 2024–Jun 2025', name: 'Limits found', sub: 'pretraining ends [S53] · [S3][S5][S6]', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Capability' },
-        { id: 'c2', col: 0, row: 1, tag: 'Jan–Apr 2026', name: 'METR: 50% horizon ≈17 h', sub: '80% ≈3 h · ~131 d doubling [S26][S27]', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'k1', col: 2, row: 0, tag: 'Jun–Aug 2025', name: 'Gartner: >40% cancelled', sub: 'by 2027 [S39] · MIT “95%” [S37]', stroke: 'soft', dashed: true, legend: 'Critique' },
+        { id: 'c1', col: 0, row: 0, tag: 'Dec 2024–Jun 2025', name: 'Limits found', sub: 'pretraining ends [S53][S3][S5][S6]', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Capability' },
+        { id: 'c2', col: 0, row: 1, tag: 'Jan–Apr 2026', name: 'METR: 50% horizon ≈17 h', sub: '80% horizon ≈3 h [S27]', stroke: 'accent', fill: 'paper-2', tier: 1 },
         { id: 'm1', col: 1, row: 1, tag: 'Feb 2026', name: 'OpenAI $122B at $852B', sub: 'raised from $110B [S51]', stroke: 'ink', legend: 'Capital' },
         { id: 'k2', col: 2, row: 1, tag: 'Nov 2025–Feb 2026', name: 'LeCun leaves Meta [S55]', sub: 'SWE-bench Verified retired [S23]', stroke: 'soft', dashed: true },
         { id: 'm2', col: 1, row: 2, tag: 'May–Jun 2026', name: 'Anthropic $65B at $965B', sub: 'draft S-1 [S48][S49]', stroke: 'ink' },
-        { id: 'm3', col: 1, row: 3, tag: 'Jul–Sep 2026', name: 'Big-four capex ≈$0.7T', sub: 'OpenAI IPO not in 2026 [S40][S52]', stroke: 'ink' },
+        { id: 'm3', col: 1, row: 3, tag: 'Jul–Sep 2026', name: 'Big-four capex ≈$0.7T', sub: 'no OpenAI IPO 2026 [S40][S52]', stroke: 'ink' },
         { id: 'k3', col: 2, row: 3, tag: 'Aug–Sep 2026', name: 'Elder video [S1]', sub: 'safety departures [S56]', stroke: 'soft', dashed: true }
       ],
       edges: [],
@@ -896,7 +952,7 @@ const AGENTIC_FIGURES = [
   },
   /* ---------------------------------------------------------------- D8 */
   {
-    id: 'agentic-d8', page: 'article-30.html',
+    id: 'agentic-d8', page: 'article-30.html', faultRed: true,
     caption:
       'An agent next to a chiller plant. The agent can read and propose; only the control system, with its interlocks ' +
       'and a human, can act. There is no connector from the agent to the BMS, the PLC or the safety system. ' +
@@ -906,9 +962,11 @@ const AGENTIC_FIGURES = [
       'path from the agent to the plant runs through an operator and a range-checking gateway, and that data flows back ' +
       'one way only.',
     build: () => gridFigure({
+      phone: { order: ['kbt', 'agent', 'op', 'gw', 'hist', 'bms', 'plc', 'chl', 'sis'], gapY: 44,
+        edges: { 4: { fs: 'r', ts: 'r' }, 9: { fs: 'l', ts: 'l' } } },
       slug: 'agentic8', title: 'An agent next to a chiller plant',
       desc: 'The agent can read and propose; only the control system, with its interlocks and a human, can act.',
-      gaps: [60, 72, 52], gapY: 32, colMin: [236],
+      gaps: [56, 112], gapY: 32, colMin: [0, 0, 160],
       nodes: [
         { id: 'kbt', col: 0, row: 0, name: 'SOP library / CMMS', sub: 'MOPs · work orders', stroke: 'ink' },
         { id: 'agent', col: 0, row: 1, name: 'LLM agent', sub: 'read-only tools', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic' },
@@ -917,8 +975,8 @@ const AGENTIC_FIGURES = [
         { id: 'gw', col: 1, row: 2, name: 'Change gateway', sub: 'range · interlock check', stroke: 'ink' },
         { id: 'bms', col: 2, row: 2, symbol: 'bms', name: 'BMS / EPMS', sub: 'supervisory', stroke: 'ink' },
         { id: 'plc', col: 2, row: 3, name: 'PLC', sub: 'local control', stroke: 'ink' },
-        { id: 'chl', col: 3, row: 3, symbol: 'chiller', name: 'Chiller', stroke: 'ink' },
-        { id: 'sis', col: 3, row: 4, tag: 'IEC 61511', name: 'SIS / EPO / fire', sub: 'hard-wired, out of scope', stroke: 'alarm-fault', fill: 'paper', tier: 1, legend: 'Safety-rated' }
+        { id: 'chl', col: 2, row: 4, symbol: 'chiller', name: 'Chiller', stroke: 'ink' },
+        { id: 'sis', col: 1, row: 4, tag: 'IEC 61511', name: 'SIS / EPO / fire', sub: 'hard-wired, out of scope', stroke: 'alarm-fault', fill: 'paper', tier: 1, legend: 'Safety-rated' }
       ],
       edges: [
         { a: 'kbt', b: 'agent', label: 'SOPs' }, { a: 'agent', b: 'kbt', label: 'draft WO', stroke: 'muted', pattern: 'dashed' },
@@ -934,7 +992,7 @@ const AGENTIC_FIGURES = [
       zones: [
         { ids: ['kbt', 'agent'], label: 'IT / enterprise' },
         { ids: ['hist', 'gw'], label: 'DMZ' },
-        { ids: ['bms', 'plc', 'chl'], label: 'OT control (IEC 62443 zone)' },
+        { ids: ['bms', 'plc', 'chl'], label: 'OT · IEC 62443 zone' },
         { ids: ['sis'], label: 'Safety' }
       ]
     })
@@ -1810,8 +1868,13 @@ const TOKEN_BRIDGE = [
   '--g:var(--rz-art-accent2)',
   '--r:var(--rz-art-accent)'
 ].join(';');
+/* A figure that draws a safety-rated system (SIS, EPO, fire) opts into a red fault role with
+ * `faultRed: true`. The article palette has one accent, so alarm-fault otherwise renders in it and a
+ * safety box reads as the same thing as a probabilistic one. --rz-chip-alert is the site's themed alert
+ * red (styles.css), so the figure still carries no hex and follows the theme. */
+const FAULT_BRIDGE = TOKEN_BRIDGE.replace('--r:var(--rz-art-accent)', '--r:var(--rz-chip-alert)');
 
-function figureMarkup(fig, ctx) {
+function figureMarkup(fig, ctx, narrow) {
   /* Size bounds travel WITH the figure, because they depend on its own viewBox.
    *
    * `width:100%` alone fails in both directions. A 1,672-unit figure shrinks
@@ -1837,8 +1900,13 @@ function figureMarkup(fig, ctx) {
    * and code blocks. Scrolling a figure is a cost; being unable to read it is a
    * defect. */
   const bounds = 'max-width:' + ctx.width + 'px;min-width:' + ctx.width + 'px;';
-  const svg = ctx.render().replace(
-    '<svg ', '<svg style="' + bounds + TOKEN_BRIDGE + '" ');
+  const bridge = fig.faultRed ? FAULT_BRIDGE : TOKEN_BRIDGE;
+  let svg = ctx.render().replace(
+    '<svg ', '<svg ' + (narrow ? 'class="rz-fig-wide" ' : '') + 'style="' + bounds + bridge + '" ');
+  if (narrow) {
+    const nb = 'max-width:' + narrow.width + 'px;min-width:' + Math.ceil(narrow.width * PHONE_MIN_SCALE) + 'px;';
+    svg += '\n' + narrow.render().replace('<svg ', '<svg class="rz-fig-narrow" style="' + nb + bridge + '" ');
+  }
   /* A living figure carries its runtime configuration inside the figure, where
    * js/rz-article-diagram.js looks for it. It is emitted from the definition, so
    * the scenarios cannot drift from the drawing they animate. `<` is escaped so
@@ -1894,8 +1962,37 @@ function captionMarkup(caption) {
 const ARTICLE_TRACK_PX = 736;
 const WIDTH_WARN_RATIO = 1.0;   // report any figure wider than the column
 const WIDTH_FAIL_RATIO = 2.0;   // past 2x, more of the figure is hidden than shown
+/* Pages refit to the column. The owner reads a figure cut off at the column edge as broken
+ * (2026-10-25, article-30: "terpotong dan aneh sekali"), so on these pages any figure wider
+ * than the column fails the build. FLIP: add a page here once its figures are refit; the
+ * remaining overflow list printed below is the backlog. */
+const FIT_TO_COLUMN_PAGES = new Set(['article-30.html']);
 
 const findings = [];
+/* Two boxes the composition placed on top of each other. The engine warns about
+ * what it was ASKED to do wrong; this catches what the layout did wrong. */
+function overlapFindings(page, id, ctx) {
+  /* fit() grows the canvas right and down only, so anything placed left of or
+   * above the origin is cut off by the viewBox: a label pushed outside a lane. */
+  for (const it of ctx.occupancy.items) {
+    if (it.box.x < -0.5 || it.box.y < -0.5) findings.push(
+      `${page} · ${id}: ${it.meta.kind}:${it.meta.id || ''} starts at ${it.box.x.toFixed(0)},${it.box.y.toFixed(0)} — outside the drawing, clipped`);
+  }
+  const geom = ctx.occupancy.items.filter((i) => i.meta.kind === 'text' || i.meta.kind === 'node');
+  for (let a = 0; a < geom.length; a++) {
+    for (let b = a + 1; b < geom.length; b++) {
+      const A = geom[a], B = geom[b];
+      if (M.contains(A.box, B.box) || M.contains(B.box, A.box)) continue;
+      const ov = M.overlap(A.box, B.box);
+      if (ov && ov.ox > 0.5 && ov.oy > 0.5) {
+        findings.push(
+          `${page} · ${id}: ${A.meta.kind}:${A.meta.id} overlaps ` +
+          `${B.meta.kind}:${B.meta.id} by ${ov.ox.toFixed(1)}x${ov.oy.toFixed(1)} ` +
+          `(shorter axis: ${ov.axis})`);
+      }
+    }
+  }
+}
 /* Overflow a reader can scroll to is a cost, not a defect. It belongs in the
  * report so the author sees the bill, not in the exit code. */
 const notes = [];
@@ -1942,6 +2039,10 @@ for (const [page, figs] of byPage) {
         `${page} · ${fig.id}: ${ctx.width} px is ${over.toFixed(2)}x the ${ARTICLE_TRACK_PX} px ` +
         `reading column — ${hidden}% of the figure is off-screen on arrival. Past 2x the scroll ` +
         `stops being a cost and becomes the whole experience. Stack or wrap the composition.`);
+    } else if (over > WIDTH_WARN_RATIO && FIT_TO_COLUMN_PAGES.has(page)) {
+      findings.push(
+        `${page} · ${fig.id}: ${ctx.width} px is wider than the ${ARTICLE_TRACK_PX} px column on a page refit ` +
+        `to it — ${hidden}% would be cut off on arrival. Narrow the composition (fewer columns, shorter sublines).`);
     } else if (over > WIDTH_WARN_RATIO) {
       notes.push(
         `${page} · ${fig.id}: ${ctx.width} px, ${over.toFixed(2)}x the ${ARTICLE_TRACK_PX} px column ` +
@@ -1953,20 +2054,22 @@ for (const [page, figs] of byPage) {
      * wrong — two boxes the author placed on top of each other. Without it this
      * tool would happily write a figure whose zone eyebrow sits across the node
      * above it, which is precisely what the first draft did. */
-    const geom = ctx.occupancy.items.filter(
-      (i) => i.meta.kind === 'text' || i.meta.kind === 'node');
-    for (let a = 0; a < geom.length; a++) {
-      for (let b = a + 1; b < geom.length; b++) {
-        const A = geom[a], B = geom[b];
-        if (M.contains(A.box, B.box) || M.contains(B.box, A.box)) continue;
-        const ov = M.overlap(A.box, B.box);
-        if (ov && ov.ox > 0.5 && ov.oy > 0.5) {
-          findings.push(
-            `${page} · ${fig.id}: ${A.meta.kind}:${A.meta.id} overlaps ` +
-            `${B.meta.kind}:${B.meta.id} by ${ov.ox.toFixed(1)}x${ov.oy.toFixed(1)} ` +
-            `(shorter axis: ${ov.axis})`);
-        }
-      }
+    overlapFindings(page, fig.id, ctx);
+
+    /* The phone composition, when the figure has one, is held to the same
+     * geometry audit and must fit the phone column outright: its whole reason
+     * to exist is that nothing scrolls sideways. */
+    PHONE = true;
+    let narrow;
+    try { narrow = fig.build(); } finally { PHONE = false; }
+    if (narrow && narrow.variant !== 'phone') narrow = null;
+    if (narrow) {
+      for (const w of narrow.warnings) findings.push(`${page} · ${fig.id} (phone): ${w.kind} — ${w.message}`);
+      if (narrow.width > PHONE_MAX_PX) findings.push(
+        `${page} · ${fig.id} (phone): ${narrow.width} px is wider than the ${PHONE_MAX_PX} px phone column`);
+      overlapFindings(page, fig.id + ' (phone)', narrow);
+    } else if (FIT_TO_COLUMN_PAGES.has(page) && fig.build.toString().includes('gridFigure')) {
+      findings.push(`${page} · ${fig.id}: no phone composition — it would scroll sideways on a phone`);
     }
     const open = new RegExp(
       '<figure\\b[^>]*data-rz-figure="' + fig.id + '"[^>]*>', 'i');
@@ -1981,7 +2084,7 @@ for (const [page, figs] of byPage) {
     const start = m.index + m[0].length;
     const end = html.indexOf('</figure>', start);
     if (end < 0) { findings.push(`${page} · ${fig.id}: placeholder is not closed`); continue; }
-    html = html.slice(0, start) + figureMarkup(fig, ctx) + html.slice(end);
+    html = html.slice(0, start) + figureMarkup(fig, ctx, narrow) + html.slice(end);
   }
 
   if (html !== before) {

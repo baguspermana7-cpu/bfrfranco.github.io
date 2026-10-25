@@ -116,10 +116,16 @@
   function mono(size, color){ return { color: color, font: { family: "'IBM Plex Mono',monospace", size: size } }; }
   function buildScales(cfg, pal){
     if(cfg.type === 'doughnut' || cfg.type === 'pie') return {};
+    /* the article fragments name the left-axis title `yLabel`; the renderer only read `y`, so every such chart
+       (article 29: 6, article 30: 5) drew a bare axis. Accept both. */
+    if(!cfg.y && cfg.yLabel) cfg = Object.assign({}, cfg, { y: cfg.yLabel });
     var sc = {
       x: { title: { display: !!cfg.x, text: cfg.x, color: pal.tick, font: { family: "'IBM Plex Mono',monospace", size: 10 } }, ticks: mono(10, pal.tick), grid: { display: false } },
       y: { beginAtZero: true, title: { display: !!cfg.y, text: cfg.y, color: pal.tick, font: { family: "'IBM Plex Mono',monospace", size: 10 } }, ticks: { color: pal.tick, font: { family: "'IBM Plex Mono',monospace", size: 10 }, callback: function(v){ return (typeof v === 'number') ? v.toLocaleString() : v; } }, grid: { color: pal.grid, lineWidth: 0.6 } }
     };
+    /* counts (claims, units, events) never get a 0.5 tick: when every value on the left axis is a whole number,
+       the axis steps in whole numbers too */
+    if(cfg.series.every(function(s){ return s.axis === 'y1' || s.data.every(function(v){ return v == null || Math.round(v) === v; }); })) sc.y.ticks.precision = 0;
     if(cfg.series.some(function(s){ return s.axis === 'y1'; })){
       sc.y1 = { position: 'right', beginAtZero: true, title: { display: !!cfg.y1, text: cfg.y1, color: pal.tick, font: { family: "'IBM Plex Mono',monospace", size: 10 } }, ticks: mono(10, pal.tick), grid: { drawOnChartArea: false } };
     }
