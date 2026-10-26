@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v3.24.27 — 2026-10-26 — "Share"
+
+**Owner:** *"continue, improve more, polish more"*. Fourteen articles carried a share bar nobody could see, and two
+shared the wrong article.
+
+### Fixed
+- **Share bar invisible on 14 articles.** `styles.css` holds `.share-buttons` at opacity 0 until a script adds
+  `.visible` once the hero scrolls away. Articles 13, 15 and 18–29 carried the bar with no such script, so it stayed
+  hidden for good (measured in a browser at 390 and 1440 px after scrolling half the page: opacity 0 on all 14).
+  Each now gets the same hero observer the other articles use; 13 and 15 also gained the `shareButtons` id. The
+  browser re-measure shows all 15 bars (with article 30's new one) visible at both widths.
+- **Article 29 and article 30 shared article 28.** Their share script hard-coded article 28's URL and title, so a
+  reader sharing either page sent a link to a different article. Both now read the page's own canonical URL and
+  `og:title`.
+- **Article 30 had no share bar at all**, only its functions. It now has the same bar as article 29, so the
+  table-of-contents button on a phone sits in a bar instead of over the text (the last of the three pages left
+  from v3.24.26).
+
+### Gate
+- `tools/test-share-bar.mjs` (wired into the ship gate): on every page that loads `styles.css`, a share bar must be
+  visible by markup, removed on purpose, or toggled by a script that references that bar; and a literal `shareUrl`
+  must equal the page's canonical. On the previous tree it reports 16 defects (the 14 hidden bars, article 29's and
+  article 30's foreign URL; article 30's bar did not exist yet); now it passes on 36 bars. Its first version accepted
+  any `.classList.add('visible')` in the page and so passed article 24 on an unrelated calculator panel; the check
+  now requires the toggle to sit in a script that names the bar.
+
 ## v3.24.26 — 2026-10-25 — "Real Phone"
 
 **Owner:** *"continue, improve more, polish more"*. The responsive gate emulated a narrow desktop window, so
