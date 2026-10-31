@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v3.24.30 — 2026-11-01 — "Cockpits on graphite"
+
+Owner: *"polish more"*, then *"continue"* — the second wave of WI-WEB-ALLPAGES-001. The nine cockpits were the last family still on the navy register.
+
+Measured with `node tools/audit-vibecode.mjs --json`: site-wide monitored findings **155 → 143**, and none of the remaining 143 are on a cockpit.
+
+### Changed
+- **The nine cockpits (`datahall`, `datahallAI`, `dc-conventional`, `chiller-plant`, `water-system`, `fire-system`, `fuel-system`, `ict`, `EPMS_Telemetry`) move from navy to graphite.** 203 navy values were rewritten to graphite at the same lightness, so contrast did not move: 140 page backgrounds, the modal surfaces built inline in script (`#0f1729` / `#2b3a52` → `#121316` / `#2a2d33`), the inline status and mode strips (datahall, ict, EPMS), the fire-system zone chips, the HMI drawing canvases in the datahallAI modals, and the datahallAI PDF figure background. Measured in a headless render of each cockpit (dark, 1440 px), counting visible elements whose computed background is navy-cast: before → after: dc-conventional 37 → 0, chiller-plant 32 → 0, fuel-system 53 → 0, datahallAI 33 → 0, ict 24 → 0, water-system 19 → 0, fire-system 16 → 0, EPMS 7 → 1, datahall 70 → 40. The 40 left on datahall are the rack units' standby LEDs (a state colour, kept); the one on EPMS is a 1 px rule drawn by `js/rz-explain.js`, which the LTC session owns. Shared: the instrument register's fallbacks for the sign-in button and user menu (`css/rz-cockpit-instrument.css`) and the slate hairline tokens on dc-conventional and ict. Functional state colours (alarm, trip, run, standby) were not touched. These are CSS-only changes: no engine, registry or computed number moved.
+- **The cookie "Accept" button** was saturated blue on seven cockpits. It now uses the site's amber with dark text.
+- **Buttons on `chiller-plant` and the root actions on `datahallAI`** were mono uppercase. They now use IBM Plex Sans at normal case, the same as the rest of the site.
+
+### Removed
+- **The KPI cards on `dc-conventional` no longer rise on hover.** Hover now changes only the border colour.
+
 ## v3.24.29 — 2026-10-31 — "Graphite"
 
 Owner: *"keep improve dan lakukan pembaharuan dan lanjutkan utk semua page, pastikan tidak ada page yang terlewat, lakukan pembaharuan untuk semuanya"* — then *"polish more"*. Tracked as harness work item WI-WEB-ALLPAGES-001 (plan by Fable, execution by Opus and Sonnet). This is the first wave; the hub and the journal were already on the register.
