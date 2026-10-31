@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v3.24.28 — 2026-10-31 — "Two cockpits"
+
+Owner, on the DC Solutions hub: *"area ini jadi terlalu rame, cukup DC AI dan DC conventional hyperscale aja. yang lain2nya itu kan ada saat setelah akses masing2 dari 2 itu. biar nggak terlihat ramai dan membingkan jadinya saat navigate ini"*
+
+### Changed
+- **The hub's Cockpits list shows the two cockpits only.** `datacenter-solutions.html` listed nine rows: DC AI (K.01), DC Conventional (K.02) and seven systems that live inside the Conventional cockpit — EPMS telemetry, data hall, chiller plant, fire, fuel, water, ICT (K.03–K.09). Those seven are removed from the hub; each is still linked once from `dc-conventional.html` (checked: 7 of 7 links present), so no page lost its entry point. Rendered at 390 px dark and 1440 px light: two rows under the ATS figure.
+- The Conventional row keeps its name. The cockpit does not call itself "hyperscale" anywhere, so the label was not changed to a claim the page does not make.
+
 ## v3.24.27 — 2026-10-26 — "Share"
 
 **Owner:** *"continue, improve more, polish more"*. Fourteen articles carried a share bar nobody could see, and two
