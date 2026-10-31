@@ -15,10 +15,12 @@
 
 /* ---- INSTRUMENT register (cockpits / SLD / labs) ---- */
 [data-rz-register="instrument"]{
-  --rz-bg:#060A0D; --rz-bg2:#0A1014; --rz-panel:#0C141A; --rz-panel2:#101C22;
-  --rz-text:#C8E6D4; --rz-text-strong:#EAFBF0; --rz-muted:#5E8472; --rz-dim:#3C5B4D;
-  --rz-accent:#22F5A8; --rz-accent2:#2BE8FF; --rz-sel:#22F5A8;
-  --rz-line:rgba(43,232,255,.12); --rz-line-strong:rgba(43,232,255,.28);
+  /* W1 (2026-10-31): graphite surfaces + one amber accent, owner register 2026-10-15
+     (was a green-cast #060A0D base with a mint accent and cyan hairlines) */
+  --rz-bg:#0b0c0e; --rz-bg2:#0e0f12; --rz-panel:#121316; --rz-panel2:#191b1f;
+  --rz-text:#CFD3DA; --rz-text-strong:#F6F7F9; --rz-muted:#8b929c; --rz-dim:#565C66;
+  --rz-accent:#E8B563; --rz-accent2:#969eaa; --rz-sel:#E8B563;
+  --rz-line:rgba(160,168,180,.13); --rz-line-strong:rgba(160,168,180,.26);
   --rz-display:'JetBrains Mono',ui-monospace,monospace;
   --rz-sans:'IBM Plex Mono',ui-monospace,monospace;
   --rz-mono:'JetBrains Mono',ui-monospace,monospace;
@@ -28,9 +30,9 @@
 [data-rz-register="editorial"]{
   --rz-bg:#0E0F12; --rz-bg2:#141519; --rz-panel:#16181D; --rz-panel2:#1C1F25;
   --rz-text:#CFD3DA; --rz-text-strong:#F6F7F9; --rz-muted:#7E8590; --rz-dim:#565C66;
-  --rz-accent:#E8B563; --rz-accent2:#6FBF9A; --rz-sel:#E8B563;
+  --rz-accent:#E8B563; --rz-accent2:#969eaa; --rz-sel:#E8B563;
   --rz-line:rgba(160,168,180,.13); --rz-line-strong:rgba(160,168,180,.26);
-  --rz-display:'Fraunces',Georgia,serif;
+  --rz-display:'IBM Plex Sans',system-ui,sans-serif; /* owner 2026-10-15: serif display = slop */
   --rz-sans:'IBM Plex Sans',system-ui,sans-serif;
   --rz-mono:'IBM Plex Mono',ui-monospace,monospace;
   --rz-radius:10px; --rz-glow:0 0 0;
@@ -54,26 +56,9 @@
 
 /* ---- atmosphere ---- */
 .rz-atmos{position:fixed;inset:0;z-index:0;pointer-events:none;}
-[data-rz-register="instrument"] .rz-atmos{
-  background:
-    repeating-linear-gradient(0deg,transparent 0 2px,rgba(43,232,255,.02) 2px 3px),
-    radial-gradient(120% 80% at 50% 0%,rgba(34,245,168,.06),transparent 60%),
-    linear-gradient(180deg,#070C10,#04080A);
-  background-size:100% 3px,100% 100%,100% 100%;
-}
-[data-rz-register="instrument"] .rz-atmos::after{
-  content:'';position:absolute;inset:0;
-  background-image:linear-gradient(rgba(43,232,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(43,232,255,.05) 1px,transparent 1px);
-  background-size:34px 34px;
-  -webkit-mask-image:radial-gradient(120% 90% at 50% 30%,#000 40%,transparent 85%);
-          mask-image:radial-gradient(120% 90% at 50% 30%,#000 40%,transparent 85%);
-}
-[data-rz-register="editorial"] .rz-atmos{
-  background:
-    radial-gradient(800px 420px at 82% -8%,rgba(232,181,99,.06),transparent 64%),
-    radial-gradient(680px 380px at 6% 4%,rgba(111,191,154,.045),transparent 66%),
-    #0C0D10;
-}
+/* W1: flat graphite — the scanlines, cyan grid and colour washes were decoration (ANTI_VIBECODE §A33) */
+[data-rz-register="instrument"] .rz-atmos{background:var(--rz-bg);}
+[data-rz-register="editorial"] .rz-atmos{background:var(--rz-bg);}
 
 /* ---- shared components ---- */
 .rz-kicker{font-family:var(--rz-mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rz-muted);font-weight:600;display:inline-flex;align-items:center;gap:.5rem;}
@@ -126,7 +111,7 @@
   --rz-elev-1:inset 0 1px 0 rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.5);
   --rz-elev-2:inset 0 1px 0 rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.5),0 14px 30px -18px rgba(0,0,0,.7);
   --rz-elev-3:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.5),0 24px 48px -22px rgba(0,0,0,.85);
-  --rz-surface-bg:linear-gradient(180deg,#161c27,#121823);
+  --rz-surface-bg:#121316;
   --rz-surface-border:rgba(255,255,255,.08);
 }
 /* opt-in utility: premium layered card surface — keeps the element's own accent + type */

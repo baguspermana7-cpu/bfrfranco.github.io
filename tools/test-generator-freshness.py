@@ -61,6 +61,7 @@ BUILDERS = [
     ("Search Console indexing list", ["python3", "tools/build-indexing-list.py", "--check"]),
     ("data/journal.json + journal grids", ["python3", "tools/build-journal.py", "--check"]),
     ("journal register sweep (article CSS)", ["python3", "tools/sweep-journal-register.py", "--check"]),
+    ("site register sweep (manual/, network/, prd/ tokens)", ["python3", "tools/sweep-site-register.py", "--check"]),
 ]
 
 

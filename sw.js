@@ -2,7 +2,7 @@
 // Cache-first for static assets, network-first for HTML pages
 // CACHE_NAME is auto-synced from js/rz-version.js by tools/sync-sw-version.py
 
-const CACHE_NAME = 'rz-cache-v3.24.28'; // version-aware: invalidates on every site bump
+const CACHE_NAME = 'rz-cache-v3.24.29'; // version-aware: invalidates on every site bump
 
 // v1.29.0 — Critical auth/config files that MUST be fetched fresh when online.
 // Cached only as offline fallback. Rescues users stranded on a stale SW
@@ -192,7 +192,7 @@ async function cacheFirst(request) {
   }
 }
 
-// Inline offline page — branded, dark, mint accent (matches site v1.4.0)
+// Inline offline page — graphite surface, one amber accent (site register, W1 2026-10-31)
 function offlineHTML() {
   return '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
@@ -200,14 +200,13 @@ function offlineHTML() {
     '<style>' +
       'body{font-family:IBM Plex Sans,-apple-system,sans-serif;display:flex;align-items:center;' +
       'justify-content:center;min-height:100vh;margin:0;' +
-      'background:linear-gradient(180deg,#0f172a 0%,#0f2a33 50%,#0f172a 100%);' +
+      'background:#0b0c0e;' +
       'color:#f1f5f9;text-align:center;padding:2rem}' +
-      'h1{background:linear-gradient(120deg,#7DDDB4 0%,#fbbf24 100%);' +
-      '-webkit-background-clip:text;background-clip:text;color:transparent;' +
+      'h1{color:#F6F7F9;font-weight:600;' +
       'font-size:2rem;margin-bottom:1rem;letter-spacing:-0.02em}' +
       'p{color:#cbd5e1;max-width:420px;line-height:1.6}' +
       '.btn{display:inline-block;margin-top:1.5rem;padding:0.75rem 1.5rem;' +
-      'background:#7DDDB4;color:#0f172a;border-radius:999px;text-decoration:none;' +
+      'background:#E8B563;color:#0b0c0e;border-radius:4px;text-decoration:none;' +
       'font-weight:600;font-size:0.9rem}' +
     '</style></head><body><div>' +
       '<h1>You\'re offline</h1>' +

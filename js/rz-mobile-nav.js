@@ -140,7 +140,7 @@
             'top:100% !important;left:0 !important;right:0 !important;bottom:auto !important;' +
             'flex-direction:column !important;align-items:stretch !important;' +
             'height:auto !important;max-height:calc(100vh - 100%);overflow-y:auto;' +
-            'background:#0f172a !important;padding:0.5rem 1.25rem 1.5rem;margin:0;' +
+            'background:#121316 !important;padding:0.5rem 1.25rem 1.5rem;margin:0;' +
             'gap:0 !important;z-index:1000;' +
             'border-top:1px solid rgba(255,255,255,0.10);}' +
             MENU.split(',').map(function(s){return s + ' a';}).join(',') + '{' +
@@ -150,6 +150,11 @@
                is room, and hiding them there serves nobody. */
             'display:block !important;padding:0.85rem 0.25rem;color:#f1f5f9;text-decoration:none;' +
             'border-bottom:1px solid rgba(255,255,255,0.10);font-size:1rem;}' +
+            /* W1 2026-10-31: per-theme graphite — the drawer was navy #0f172a in BOTH themes */
+            '[data-theme="light"] ' + MENU.split(',').join(',[data-theme="light"] ') +
+            '{background:#ffffff !important;border-top-color:rgba(18,19,22,0.10);}' +
+            '[data-theme="light"] ' + MENU.split(',').map(function(s){return s + ' a';}).join(',[data-theme="light"] ') +
+            '{color:#1a1c20;border-bottom-color:rgba(18,19,22,0.10);}' +
             'body.rz-nav-open{overflow:hidden;}';
         document.head.appendChild(style);
     }

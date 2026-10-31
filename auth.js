@@ -571,7 +571,7 @@
             '[data-theme="light"] .rz-modal-close{color:#475569;}',
             '[data-theme="light"] .rz-demo-hint{background:rgba(255,170,0,0.06) !important;border-color:rgba(255,170,0,0.15) !important;color:#475569 !important;}',
             '[data-theme="light"] .rz-demo-hint code{background:rgba(255,170,0,0.1) !important;color:#7A4800 !important;}',
-            '[data-theme="light"] .rz-demo-hint .rz-demo-label{color:#4FBF92 !important;}',
+            '[data-theme="light"] .rz-demo-hint .rz-demo-label{color:#7A4800 !important;}',
             '[data-theme="light"] .rz-pro-link{color:#4FBF92 !important;}',
             '[data-theme="light"] .rz-pro-link:hover{color:#2F7F63 !important;}',   /* v3.6.1 — was #6d28d9: the v1.134.20 mint sweep left the HOVER purple, so the one state a reader reaches by pointing at the link was the banned colour. A darker mint keeps the hover a deepening of the same hue rather than a jump to another one. */
             /* Pro link */
@@ -630,7 +630,7 @@
                         'By signing in, you agree to our <a href="terms.html">Terms</a> &amp; <a href="privacy.html">Privacy Policy</a>' +
                     '</div>' +
                     '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(255,170,0,0.12);border:1px solid rgba(255,170,0,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
-                        '<span class="rz-demo-label" style="color:#FFC44D;font-weight:600;">Demo Account:</span><br>' +
+                        '<span class="rz-demo-label" style="color:#E8B563;font-weight:600;">Demo Account:</span><br>' +
                         '<code style="background:rgba(255,170,0,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#FFAA00;">demo@resistancezero.com</code> / ' +
                         '<code style="background:rgba(255,170,0,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#FFAA00;">demo2026</code>' +
                     '</div>' +

@@ -117,28 +117,28 @@
     --medium-blue: #4a90b8;
     --light-blue: #6bb8d9;
     --accent-blue: #7cc5e6;
-    --gray-100: #1a1a2e;
-    --gray-200: #16213e;
-    --gray-300: #1f2b47;
-    --gray-400: #2a3a5c;
+    --gray-100: #202328;
+    --gray-200: #26292e;
+    --gray-300: #2e3138;
+    --gray-400: #3b3f46;
     --gray-500: #8892a6;
     --gray-600: #a8b2c3;
     --gray-700: #c8d0de;
     --gray-800: #e0e6ef;
     --gray-900: #f0f4f8;
-    --white: #0f0f1a;
+    --white: #121316;
     --black: #ffffff;
 
     /* Glassmorphism - Dark Mode */
 
     /* Dark surface + hairlines — design.md --rz-bg-elevated and the tier scale. */
-    --rz-surface-card: #111827;
+    --rz-surface-card: #121316;
     --rz-line-tier-1: rgba(255, 255, 255, 0.18);
     --rz-line-tier-2: rgba(255, 255, 255, 0.12);
     --rz-line-tier-3: rgba(255, 255, 255, 0.07);
     --rz-shadow-active: 0 1px 3px rgba(0, 0, 0, 0.35);
-    --glass-bg: rgba(15, 15, 26, 0.8);
-    --glass-border: rgba(74, 144, 184, 0.2);
+    --glass-bg: rgba(18,19,22,0.8);
+    --glass-border: rgba(255, 255, 255, 0.12);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 
     /* Shadows - Dark Mode */
@@ -148,11 +148,11 @@
     --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
 
     /* Body backgrounds - Dark Mode */
-    --body-bg: #0a0a14;
+    --body-bg: #0b0c0e;
     --body-color: #e0e6ef;
     --heading-color: #f0f4f8;
-    --card-bg: #12121f;
-    --section-alt-bg: #0f0f1a;
+    --card-bg: #16181b;
+    --section-alt-bg: #121316;
 }
 
 /* Reset & Base Styles */
@@ -245,7 +245,7 @@ a {
 }
 
 [data-theme="dark"] .navbar.scrolled {
-    background: rgba(15, 15, 26, 0.72) !important;
+    background: rgba(18,19,22,0.72) !important;
     backdrop-filter: saturate(180%) blur(14px);
     -webkit-backdrop-filter: saturate(180%) blur(14px);
     border-bottom: 1px solid rgba(255,255,255,0.06) !important;
@@ -288,12 +288,9 @@ a {
 }
 
 .nav-logo-text {
+    color: var(--heading-color); /* W1: solid text, no gradient fill (ANTI_VIBECODE §A27) */
     font-size: 1.25rem;
     font-weight: 700;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
 
 .nav-menu {
@@ -601,11 +598,8 @@ a {
     color: var(--medium-blue);
 }
 
-.ticker-item:hover .ticker-item-title {
-    background: linear-gradient(135deg, var(--dark-blue) 0%, var(--light-blue) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.ticker-item:hover .ticker-item-title {    color: var(--heading-color); /* W1: solid text, no gradient fill (ANTI_VIBECODE §A27) */
+
 }
 
 .ticker-item-badge {
@@ -739,11 +733,8 @@ a {
 }
 
 .hero-name {
+    color: var(--heading-color); /* W1: solid text, no gradient fill (ANTI_VIBECODE §A27) */
     font-size: clamp(2.5rem, 5vw, 4rem);
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     margin-bottom: 0.5rem;
 }
 
@@ -1108,13 +1099,13 @@ a {
 }
 
 [data-theme="dark"] .bento-card {
-    background: #131e2e;
+    background: #1d1f24;
     border-color: rgba(255, 255, 255, 0.07);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 [data-theme="dark"] .bento-card:hover {
-    background: #192435;
+    background: #23262b;
     border-color: rgba(74, 144, 184, 0.35);
     box-shadow: 0 10px 30px -10px rgba(74, 144, 184, 0.2);
 }
@@ -1238,7 +1229,7 @@ a {
 }
 
 [data-theme="dark"] .bento-photo-card {
-    background: #1e293b;
+    background: #282b31;
 }
 
 .bento-photo-gradient {
@@ -1250,7 +1241,7 @@ a {
 }
 
 [data-theme="dark"] .bento-photo-gradient {
-    background: linear-gradient(to top, #0f172a 0%, transparent 60%);
+    background: linear-gradient(to top, #191b1f 0%, transparent 60%);
 }
 
 .bento-photo-img {
@@ -1818,11 +1809,7 @@ section {
 }
 
 .metric-card:hover {
-    border-color: rgba(245, 158, 11, 0.5);
-    box-shadow:
-        var(--glass-shadow),
-        0 0 20px rgba(245, 158, 11, 0.25),
-        0 0 40px rgba(255, 107, 53, 0.15);
+    border-color: var(--rz-line-tier-1);
 }
 
 .metric-card:hover::before {
@@ -1847,12 +1834,9 @@ section {
 }
 
 .metric-value {
+    color: var(--heading-color); /* W1: solid text, no gradient fill (ANTI_VIBECODE §A27) */
     font-size: 3rem;
     font-weight: 700;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     margin-bottom: 0.5rem;
 }
 
@@ -2065,11 +2049,7 @@ section {
 }
 
 .case-card:hover {
-    border-color: rgba(245, 158, 11, 0.5);
-    box-shadow:
-        var(--glass-shadow),
-        0 0 20px rgba(245, 158, 11, 0.25),
-        0 0 40px rgba(255, 107, 53, 0.15);
+    border-color: var(--rz-line-tier-1);
 }
 
 .case-card:hover::before {
@@ -2089,12 +2069,9 @@ section {
 }
 
 .case-number {
+    color: var(--heading-color); /* W1: solid text, no gradient fill (ANTI_VIBECODE §A27) */
     font-size: 2.5rem;
     font-weight: 700;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     opacity: 0.3;
 }
 
@@ -2144,12 +2121,9 @@ section {
 }
 
 .stat-after {
+    color: var(--heading-color); /* W1: solid text, no gradient fill (ANTI_VIBECODE §A27) */
     font-size: 2rem;
     font-weight: 700;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
 
 .stat-label {
@@ -2385,12 +2359,11 @@ section {
     text-align: center;
     box-shadow: var(--shadow-xl);
     border: 2px solid var(--gray-200);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.3s ease;
 }
 
 .experience-card:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    border-color: var(--rz-line-tier-1);
 }
 
 .exp-number {
@@ -2527,7 +2500,7 @@ section {
 }
 
 [data-theme="dark"] .contact {
-    background: #0f172a;
+    background: #191b1f;
 }
 
 [data-theme="dark"] .contact-item:hover {
@@ -2543,19 +2516,19 @@ section {
 }
 
 [data-theme="dark"] .contact-text p a {
-    color: #38bdf8;
+    color: #E8B563;
 }
 
 [data-theme="dark"] .contact-icon {
-    background: linear-gradient(135deg, rgba(74, 144, 184, 0.15) 0%, rgba(56, 189, 248, 0.1) 100%);
+    background: #191b1f;
 }
 
 [data-theme="dark"] .contact-icon svg {
-    stroke: #38bdf8;
+    stroke: #E8B563;
 }
 
 [data-theme="dark"] .contact-form {
-    background: #1e293b;
+    background: #282b31;
 }
 
 .contact-form {
@@ -2719,21 +2692,17 @@ section {
 }
 
 /* Alternative Gradient Text */
-.gradient-text-blue {
-    background: linear-gradient(135deg, #1e3a5f 0%, #4a90b8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.gradient-text-blue {    color: var(--heading-color); /* W1: solid text, no gradient fill (ANTI_VIBECODE §A27) */
+
 }
 
 /* Card Base Styles with Enhanced Hover */
 .card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border-color: var(--rz-line-tier-1);
 }
 
 /* Slide-in Animations */
@@ -3838,7 +3807,7 @@ section {
 
 /* Fix tooltip contrast in dark mode — var(--gray-800) flips to light color */
 [data-theme="dark"] .share-btn::after {
-    background: #1e293b;
+    background: #282b31;
     color: #f1f5f9;
 }
 
@@ -4123,13 +4092,11 @@ section {
     border-radius: var(--rz-radius);
     border: 1px solid #e2e8f0;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease;
 }
 
 .related-card:hover {
-    border-color: var(--medium-blue);
-    box-shadow: 0 4px 12px rgba(45, 90, 135, 0.15);
-    transform: translateY(-2px);
+    border-color: var(--rz-line-tier-1);
 }
 
 .related-card-number {
@@ -4168,7 +4135,7 @@ section {
 }
 
 [data-theme="dark"] .navbar.scrolled {
-    background: rgba(15, 15, 26, 0.72) !important;
+    background: rgba(18,19,22,0.72) !important;
     backdrop-filter: saturate(180%) blur(14px);
     -webkit-backdrop-filter: saturate(180%) blur(14px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -4176,7 +4143,7 @@ section {
 }
 
 [data-theme="dark"] .dropdown-menu {
-    background: #12121f;
+    background: #16181b;
     border-color: rgba(74, 144, 184, 0.2);
 }
 
@@ -4185,7 +4152,7 @@ section {
 }
 
 [data-theme="dark"] .news-ticker-container {
-    background: rgba(15, 15, 26, 0.9);
+    background: rgba(18,19,22,0.9);
     border-bottom-color: rgba(74, 144, 184, 0.15);
 }
 
@@ -4195,11 +4162,8 @@ section {
 [data-theme="dark"] .ticker-item:hover {
     color: #22d3ee;
 }
-[data-theme="dark"] .ticker-item:hover .ticker-item-title {
-    background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+[data-theme="dark"] .ticker-item:hover .ticker-item-title {    color: var(--heading-color); /* W1: solid text, no gradient fill (ANTI_VIBECODE §A27) */
+
 }
 [data-theme="dark"] .ticker-item-date {
     color: #94a3b8;
@@ -4209,11 +4173,11 @@ section {
     background: #22d3ee;
 }
 [data-theme="dark"] .ticker-glow {
-    background: linear-gradient(to left, rgba(15, 15, 26, 0.95) 0%, transparent 100%);
+    background: linear-gradient(to left, rgba(18,19,22,0.95) 0%, transparent 100%);
 }
 
 [data-theme="dark"] .ticker-wrapper::before {
-    background: linear-gradient(to right, rgba(15, 15, 26, 0.9) 0%, transparent 100%);
+    background: linear-gradient(to right, rgba(18,19,22,0.9) 0%, transparent 100%);
 }
 
 [data-theme="dark"] .hero-background {
@@ -4411,7 +4375,7 @@ section {
 
    The footer takes a solid dark surface, which is what every other dark surface here already does. */
 [data-theme="dark"] .footer {
-    background: var(--gray-200, #16213e);
+    background: #121316; /* W1: graphite, as on the editorial register */
     background-image: none;
     border-top: 1px solid var(--gray-300, #1f2b47);
     /* NOT var(--white): dark theme redefines that token to #0f0f1a, so it means the page GROUND
@@ -4439,7 +4403,7 @@ section {
    for a DARK ground, so the ground is what moves: the site's own dark card surface, the same
    rgba(15,23,42,0.8) the article-body card catch-all below uses. */
 [data-theme="dark"] .author-bio {
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(25,27,31,0.8);
     border-left-color: var(--light-blue);
 }
 
@@ -4472,7 +4436,7 @@ section {
 /* Dark mode mobile menu */
 @media (max-width: 768px) {
     [data-theme="dark"] .nav-menu {
-        background: #0a0a14;
+        background: #0b0c0e;
     }
 
     [data-theme="dark"] .nav-link {
@@ -4484,7 +4448,7 @@ section {
     }
 
     [data-theme="dark"] .share-buttons {
-        background: rgba(15, 15, 26, 0.95);
+        background: rgba(18,19,22,0.95);
         border-top-color: rgba(74, 144, 184, 0.2);
     }
 }
@@ -4492,8 +4456,8 @@ section {
 /* ==========================================
    Article Content Dark Mode
    ========================================== */
-[data-theme="dark"] .article-content { background: #0f172a; }
-[data-theme="dark"] .article-body { background: #0f172a; color: #e2e8f0; }
+[data-theme="dark"] .article-content { background: #191b1f; }
+[data-theme="dark"] .article-body { background: #191b1f; color: #e2e8f0; }
 [data-theme="dark"] .article-body h2 { color: #f1f5f9; }
 [data-theme="dark"] .article-body h3 { color: #e2e8f0; }
 [data-theme="dark"] .article-body p { color: #cbd5e1; }
@@ -4505,8 +4469,8 @@ section {
 [data-theme="dark"] .article-body .info-box.success { background: transparent; border-color: rgba(16,185,129,0.3); }
 [data-theme="dark"] .article-body .info-box-title { color: #e2e8f0; background: transparent; }
 [data-theme="dark"] .article-body .key-insight-title { color: #e2e8f0; }
-[data-theme="dark"] .article-body table { background: #1e293b; }
-[data-theme="dark"] .article-body table th { background: #0f172a; color: #e2e8f0; }
+[data-theme="dark"] .article-body table { background: #282b31; }
+[data-theme="dark"] .article-body table th { background: #191b1f; color: #e2e8f0; }
 [data-theme="dark"] .article-body table td { color: #cbd5e1; border-color: rgba(255,255,255,0.1); }
 [data-theme="dark"] .article-body ul li,
 [data-theme="dark"] .article-body ol li { color: #cbd5e1; }
@@ -4530,7 +4494,7 @@ section {
 [data-theme="dark"] .article-body [class*="-box"],
 [data-theme="dark"] .article-body [class*="card-"],
 [data-theme="dark"] .article-body [class*="box-"] {
-    background: rgba(15,23,42,0.8);
+    background: rgba(25,27,31,0.8);
     border-color: rgba(255,255,255,0.1);
     color: #cbd5e1;
 }
@@ -4626,11 +4590,11 @@ section {
 }
 /* TOC section — dark mode */
 [data-theme="dark"] .toc-section {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, #191b1f 0%, #282b31 100%);
     border-color: rgba(255,255,255,0.1);
 }
 [data-theme="dark"] .toc-section .toc-item {
-    background: rgba(30,41,59,0.8);
+    background: rgba(40,43,49,0.8);
     color: #e2e8f0;
     border-color: rgba(255,255,255,0.08);
 }
@@ -4649,12 +4613,12 @@ section {
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 [data-theme="dark"] .article-body .data-table th {
-    background: #0f172a;
+    background: #191b1f;
     color: #e2e8f0;
     border-color: rgba(255,255,255,0.1);
 }
 [data-theme="dark"] .article-body .data-table td {
-    background: #1e293b;
+    background: #282b31;
     color: #cbd5e1;
     border-color: rgba(255,255,255,0.06);
 }
@@ -4668,7 +4632,7 @@ section {
 
 /* Dark mode for chart containers (used in 13+ articles) */
 [data-theme="dark"] .article-body .chart-wrap {
-    background: #1e293b;
+    background: #282b31;
     border-color: rgba(255,255,255,0.1);
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
@@ -4704,7 +4668,7 @@ section {
     border-color: rgba(239,68,68,0.3);
 }
 [data-theme="dark"] .article-body .formula-box {
-    background: rgba(15,23,42,0.8);
+    background: rgba(25,27,31,0.8);
     border-color: rgba(148,163,184,0.3);
 }
 /* Badge/tag dark mode */
@@ -4729,7 +4693,7 @@ section {
 [data-theme="dark"] .article-body .verdict-box,
 [data-theme="dark"] .article-body .tech-box,
 [data-theme="dark"] .article-body .result-box {
-    background: rgba(15,23,42,0.8);
+    background: rgba(25,27,31,0.8);
     border-color: rgba(255,255,255,0.1);
     color: #cbd5e1;
 }
@@ -4739,7 +4703,7 @@ section {
    !important beats the inline style="background:#f8fafc" on the report pages
    (infographic-*, asean-dc-report) — v1.43.x dark-mode rollout, fixes light-on-dark. */
 [data-theme="dark"] .references-section {
-    background: #0f172a !important;
+    background: #191b1f !important;
     border-color: rgba(255,255,255,0.1) !important;
 }
 /* v1.43.x dark-mode rollout — site-wide fix for the inline #64748b disclaimer + nav links
@@ -4769,7 +4733,7 @@ section {
 }
 /* Pattern 2: .references (articles 9, 10, 11, 12, 14, 16, 17) */
 [data-theme="dark"] .references {
-    background: #0f172a;
+    background: #191b1f;
     border-color: rgba(96,165,250,0.3);
 }
 [data-theme="dark"] .references h3 {
@@ -4807,7 +4771,7 @@ section {
 
 /* ── Global article-content dark mode ── */
 [data-theme="dark"] .article-content {
-    background: #0f172a;
+    background: #191b1f;
     color: #e2e8f0;
 }
 
@@ -4817,12 +4781,12 @@ section {
 [data-theme="dark"] [class*="login-input"],
 [data-theme="dark"] [class*="login-submit"],
 [data-theme="dark"] [class*="login-error"] {
-    background: rgba(15,23,42,0.9);
+    background: rgba(25,27,31,0.9);
     border-color: rgba(255,255,255,0.1);
     color: #e2e8f0;
 }
 [data-theme="dark"] [class*="login-input"] {
-    background: #1e293b;
+    background: #282b31;
     color: #e2e8f0;
     border-color: rgba(255,255,255,0.15);
 }
@@ -4873,12 +4837,12 @@ section {
 
 /* ── Timeline components (articles 14, 16, 17) ── */
 [data-theme="dark"] .timeline-content {
-    background: #1e293b !important;
+    background: #282b31 !important;
     border-color: rgba(255,255,255,0.1);
     color: #cbd5e1;
 }
 [data-theme="dark"] .timeline-year {
-    background: #0f172a !important;
+    background: #191b1f !important;
     color: #e2e8f0;
     border-color: rgba(255,255,255,0.1);
 }
@@ -4888,19 +4852,19 @@ section {
 
 /* ── Data table containers ── */
 [data-theme="dark"] .data-table-container {
-    background: #0f172a !important;
+    background: #191b1f !important;
     border-color: rgba(255,255,255,0.1);
 }
 [data-theme="dark"] .data-table {
-    background: #1e293b;
+    background: #282b31;
 }
 [data-theme="dark"] .data-table th {
-    background: #0f172a;
+    background: #191b1f;
     color: #e2e8f0;
     border-color: rgba(255,255,255,0.1);
 }
 [data-theme="dark"] .data-table td {
-    background: #1e293b;
+    background: #282b31;
     color: #cbd5e1;
     border-color: rgba(255,255,255,0.06);
 }
@@ -4912,7 +4876,7 @@ section {
 }
 [data-theme="dark"] .country-table td,
 [data-theme="dark"] .country-table th {
-    background: #1e293b;
+    background: #282b31;
     color: #cbd5e1;
     border-color: rgba(255,255,255,0.06);
 }
@@ -4921,7 +4885,7 @@ section {
 }
 [data-theme="dark"] .tariff-table td,
 [data-theme="dark"] .tariff-table th {
-    background: #1e293b;
+    background: #282b31;
     color: #cbd5e1;
     border-color: rgba(255,255,255,0.06);
 }
@@ -4936,13 +4900,13 @@ section {
 /* ── Visualization blocks ── */
 [data-theme="dark"] .forecast-viz,
 [data-theme="dark"] .investment-viz {
-    background: #0f172a !important;
+    background: #191b1f !important;
     border-color: rgba(255,255,255,0.1);
     color: #cbd5e1;
 }
 [data-theme="dark"] .forecast-bar,
 [data-theme="dark"] .investment-bar {
-    background: #1e293b !important;
+    background: #282b31 !important;
     color: #cbd5e1;
 }
 
@@ -4956,29 +4920,29 @@ section {
 
 /* ── Perspective tabs (article 14) ── */
 [data-theme="dark"] .perspective-tab {
-    background: #1e293b !important;
+    background: #282b31 !important;
     color: #cbd5e1;
     border-color: rgba(255,255,255,0.1);
 }
 [data-theme="dark"] .perspective-tabs {
-    background: #0f172a;
+    background: #191b1f;
 }
 
 /* ── Failure scenario blocks (article 13) ── */
 [data-theme="dark"] .failure-scenarios {
-    background: #0f172a !important;
+    background: #191b1f !important;
     color: #cbd5e1;
 }
 [data-theme="dark"] .failure-title {
-    background: #1e293b !important;
+    background: #282b31 !important;
     color: #e2e8f0;
 }
 [data-theme="dark"] .failure-severity {
-    background: rgba(15,23,42,0.8) !important;
+    background: rgba(25,27,31,0.8) !important;
     color: #cbd5e1;
 }
 [data-theme="dark"] .failure-sequence {
-    background: #1e293b !important;
+    background: #282b31 !important;
     color: #cbd5e1;
 }
 
@@ -4989,7 +4953,7 @@ section {
     color: #cbd5e1;
 }
 [data-theme="dark"] .article-body .article-meta {
-    background: #0f172a;
+    background: #191b1f;
 }
 [data-theme="dark"] .article-meta-item {
     color: #94a3b8;
@@ -5000,7 +4964,7 @@ section {
     color: #cbd5e1;
 }
 [data-theme="dark"] .comparison-card {
-    background: rgba(15,23,42,0.8) !important;
+    background: rgba(25,27,31,0.8) !important;
     border-color: rgba(255,255,255,0.1);
     color: #cbd5e1;
 }
@@ -5015,7 +4979,7 @@ section {
 
 /* ── Author section (articles 16, 17) ── */
 [data-theme="dark"] .author-section {
-    background: #0f172a;
+    background: #191b1f;
     border-color: rgba(255,255,255,0.1);
     color: #cbd5e1;
 }
@@ -5024,7 +4988,7 @@ section {
 [data-theme="dark"] .calc-select,
 [data-theme="dark"] [class*="region-select"],
 [data-theme="dark"] [class*="region-dropdown"] {
-    background: #1e293b;
+    background: #282b31;
     color: #e2e8f0;
     border-color: rgba(255,255,255,0.15);
 }
@@ -5045,17 +5009,17 @@ section {
 
 /* ── Catch-all: any remaining inline style[background] light elements ── */
 [data-theme="dark"] .article-body [style*="background: #f"] {
-    background: rgba(15,23,42,0.8) !important;
+    background: rgba(25,27,31,0.8) !important;
     color: #cbd5e1;
 }
 [data-theme="dark"] .article-body [style*="background:#f"] {
-    background: rgba(15,23,42,0.8) !important;
+    background: rgba(25,27,31,0.8) !important;
     color: #cbd5e1;
 }
 [data-theme="dark"] .article-body [style*="background: white"],
 [data-theme="dark"] .article-body [style*="background:#fff"],
 [data-theme="dark"] .article-body [style*="background: #fff"] {
-    background: rgba(15,23,42,0.8) !important;
+    background: rgba(25,27,31,0.8) !important;
     color: #cbd5e1;
 }
 
@@ -5540,7 +5504,7 @@ section {
 }
 
 [data-theme="dark"] .search-modal {
-    background: #1e293b;
+    background: #282b31;
     box-shadow: 0 25px 60px rgba(0,0,0,0.6);
 }
 
@@ -5701,7 +5665,7 @@ section {
     align-items: flex-start;
 }
 [data-theme="dark"] .search-preview {
-    background: #1e293b;
+    background: #282b31;
     box-shadow: 0 8px 30px rgba(0,0,0,0.5);
 }
 .search-preview-img {
@@ -6026,7 +5990,7 @@ section {
     transform: translateY(0);
 }
 [data-theme="dark"] .toc-mobile-drawer {
-    background: #1e293b;
+    background: #282b31;
     box-shadow: 0 -10px 40px rgba(0,0,0,0.4);
 }
 
@@ -6268,7 +6232,7 @@ section {
 }
 .cookie-decline:hover { background: #f3f4f6; color: #374151; }
 [data-theme="dark"] .cookie-banner {
-    background: rgba(30,41,59,0.92);
+    background: rgba(40,43,49,0.92);
     border-top-color: rgba(255,255,255,0.06);
     color: #cbd5e1;
 }
@@ -6306,7 +6270,7 @@ section {
     color: #1d4ed8 !important;
 }
 [data-theme="dark"] .calc-disclaimer {
-    background: rgba(30,41,59,0.6) !important;
+    background: rgba(40,43,49,0.6) !important;
     border-color: rgba(148,163,184,0.15) !important;
 }
 [data-theme="dark"] .calc-disclaimer .disc-title {
@@ -6379,34 +6343,34 @@ section {
 :root { color-scheme: dark light; }
 
 ::selection {
-    background: rgba(125, 221, 180, 0.32);
+    background: rgba(232, 181, 99, 0.32);
     color: #f1f5f9;
     text-shadow: none;
 }
 [data-theme="light"] ::selection {
-    background: rgba(16, 185, 129, 0.22);
+    background: rgba(232, 181, 99, 0.35);
     color: #0f172a;
 }
 
 /* Sitewide custom scrollbar — Chromium / WebKit */
 html::-webkit-scrollbar { width: 12px; height: 12px; }
-html::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+html::-webkit-scrollbar-track { background: rgba(25,27,31,0.5); }
 html::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgba(125,221,180,0.35), rgba(59,130,246,0.35));
+    background: rgba(160, 168, 180, 0.35);
     border-radius: 8px;
     border: 3px solid transparent;
     background-clip: padding-box;
 }
 html::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, rgba(125,221,180,0.55), rgba(59,130,246,0.55));
+    background: rgba(160, 168, 180, 0.55);
     background-clip: padding-box;
     border: 3px solid transparent;
 }
-[data-theme="light"] html::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.04); }
+[data-theme="light"] html::-webkit-scrollbar-track { background: rgba(25,27,31,0.04); }
 
 /* Firefox */
-html { scrollbar-width: thin; scrollbar-color: rgba(125,221,180,0.45) rgba(15,23,42,0.4); }
-[data-theme="light"] html { scrollbar-color: rgba(16,185,129,0.45) rgba(15,23,42,0.06); }
+html { scrollbar-width: thin; scrollbar-color: rgba(160,168,180,0.45) rgba(18,19,22,0.4); }
+[data-theme="light"] html { scrollbar-color: rgba(18,19,22,0.35) rgba(18,19,22,0.06); }
 
 /* ==========================================================================
    v1.5.3 — View Transitions API (Chrome 126+, Safari 18+, Edge)
@@ -6520,16 +6484,7 @@ section {
 .oe-card.visible:nth-child(7) { animation-delay: 0.48s; }
 .oe-card.visible:nth-child(8) { animation-delay: 0.56s; }
 
-/* --- #34: Metric Card Pulse on Hover --- */
-@keyframes metricPulse {
-    0%   { box-shadow: 0 0 0 0 rgba(245,158,11,0.5); }
-    50%  { box-shadow: 0 0 0 20px rgba(245,158,11,0.08); }
-    100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
-}
-.metric-card:hover {
-    animation: metricPulse 1s ease-out;
-    transform: translateY(-6px) scale(1.02);
-}
+/* --- #34: Metric Card Pulse on Hover — removed (W1 de-slop: hover is border-colour only) --- */
 
 /* --- #36: Button Liquid Fill --- */
 .btn-primary,
@@ -6733,56 +6688,7 @@ section {
     animation-delay: -3s;
 }
 
-/* --- #45: Aurora Borealis Background Orbs --- */
-@keyframes auroraFloat1 {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33%      { transform: translate(50px, -30px) scale(1.1); }
-    66%      { transform: translate(-30px, 20px) scale(0.95); }
-}
-@keyframes auroraFloat2 {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33%      { transform: translate(-40px, 40px) scale(1.05); }
-    66%      { transform: translate(60px, -20px) scale(0.9); }
-}
-@keyframes auroraFloat3 {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33%      { transform: translate(30px, 30px) scale(0.95); }
-    66%      { transform: translate(-50px, -40px) scale(1.1); }
-}
-.aurora-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.12;
-    pointer-events: none;
-    z-index: -1;
-    will-change: transform;
-}
-.aurora-orb-1 {
-    width: 500px;
-    height: 500px;
-    top: 5%;
-    left: 5%;
-    background: radial-gradient(circle, rgba(74,144,184,0.6), transparent 70%);
-    animation: auroraFloat1 15s ease-in-out infinite;
-}
-.aurora-orb-2 {
-    width: 450px;
-    height: 450px;
-    top: 35%;
-    right: 0;
-    background: radial-gradient(circle, rgba(16,185,129,0.5), transparent 70%);
-    animation: auroraFloat2 18s ease-in-out infinite;
-}
-.aurora-orb-3 {
-    width: 400px;
-    height: 400px;
-    bottom: 5%;
-    left: 25%;
-    background: radial-gradient(circle, rgba(100, 116, 139,0.4), transparent 70%);
-    animation: auroraFloat3 20s ease-in-out infinite;
-}
-[data-theme="dark"] .aurora-orb { opacity: 0.18; }
+/* --- #45: Aurora orbs — removed (W1 de-slop, ANTI_VIBECODE §A33). Any leftover .aurora-orb element is an empty, unstyled div. --- */
 
 /* --- #48: Scroll Snap disabled — conflicts with JS scroll effects --- */
 /* Keeping as reference; re-enable only without scroll-linked JS effects */
@@ -6945,7 +6851,6 @@ section {
 }
 .glitch-active {
     animation: glitchShake 0.3s ease;
-    text-shadow: 2px 0 rgba(255,0,0,0.4), -2px 0 rgba(0,255,0,0.4);
 }
 
 /* --- Section Progress Bar (#13) --- */
@@ -7039,16 +6944,7 @@ section {
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: linear-gradient(
-        var(--holo-angle, 135deg),
-        rgba(255,0,0,0.08),
-        rgba(255,136,0,0.08),
-        rgba(255,255,0,0.08),
-        rgba(0,255,0,0.08),
-        rgba(0,136,255,0.08),
-        rgba(136,0,255,0.08)
-    );
-    mix-blend-mode: overlay;
+    display: none; /* W1 de-slop: the rainbow holographic tilt sheen is decoration that follows the cursor */
     pointer-events: none;
     z-index: 5;
     opacity: 0;
@@ -7145,25 +7041,16 @@ section {
 
 /* --- Dark Mode: Enhanced Card Borders & Glow --- */
 [data-theme="dark"] .metric-card {
-    border-color: rgba(96, 165, 250, 0.12);
+    border-color: var(--rz-line-tier-2);
 }
 [data-theme="dark"] .metric-card:hover {
-    border-color: rgba(245, 158, 11, 0.3);
-    box-shadow:
-        0 2px 4px rgba(0,0,0,0.2),
-        0 4px 8px rgba(0,0,0,0.24),
-        0 8px 16px rgba(0,0,0,0.28),
-        0 16px 32px rgba(0,0,0,0.32),
-        0 0 30px rgba(245,158,11,0.15);
+    border-color: var(--rz-line-tier-1);
 }
 [data-theme="dark"] .case-card {
-    border-color: rgba(96, 165, 250, 0.1);
+    border-color: var(--rz-line-tier-2);
 }
 [data-theme="dark"] .case-card:hover {
-    border-color: rgba(96, 165, 250, 0.25);
-    box-shadow:
-        0 4px 16px rgba(0,0,0,0.3),
-        0 0 24px rgba(96, 165, 250, 0.08);
+    border-color: var(--rz-line-tier-1);
 }
 [data-theme="dark"] .oe-card {
     border-color: rgba(96, 165, 250, 0.08);
@@ -7173,13 +7060,6 @@ section {
     box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 20px rgba(96, 165, 250, 0.06);
 }
 
-/* --- Metric Value Glow on Hover --- */
-.metric-card:hover .metric-value {
-    filter: drop-shadow(0 0 8px rgba(30, 58, 95, 0.2));
-}
-[data-theme="dark"] .metric-card:hover .metric-value {
-    filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.35));
-}
 
 /* --- OE Card Number Glow on Hover --- */
 .oe-card:hover .oe-number {
@@ -7248,7 +7128,6 @@ section {
     .cursor-trail-container,
     .cursor-text-follower,
     .click-ripple,
-    .aurora-orb,
     .grid-reveal-canvas,
     .section-progress,
     .nav-indicator,
@@ -7273,7 +7152,6 @@ section {
     .cursor-trail-container,
     .cursor-text-follower,
     .click-ripple,
-    .aurora-orb,
     .grid-reveal-canvas,
     .holo-overlay,
     .tilt-reflection { display: none !important; }
@@ -7285,8 +7163,7 @@ section {
     .cursor-trail-container,
     .cursor-text-follower,
     .grid-reveal-canvas,
-    .nav-indicator,
-    .aurora-orb { display: none !important; }
+    .nav-indicator { display: none !important; }
     .floating-shape-4,
     .floating-shape-5,
     .floating-shape-6,
@@ -7349,12 +7226,12 @@ section {
 }
 
 [data-theme="dark"] .contact-form {
-    background: #1e293b !important;
+    background: #282b31 !important;
 }
 
 [data-theme="dark"] .contact-form input,
 [data-theme="dark"] .contact-form textarea {
-    background: #0f172a !important;
+    background: #191b1f !important;
     color: #e2e8f0 !important;
     border-color: #334155 !important;
 }
@@ -7400,15 +7277,15 @@ section {
 .rz-version-label{ font-weight:500; letter-spacing:0.04em; }
 .rz-version-num{
     font-family:'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
-    background: rgba(125,221,180,0.12);
-    color: #047857; /* v1.22.2: was #10b981 2.54:1 on white — light-mode WCAG-AA fix (dark override keeps #34d399) */
+    background: rgba(232,181,99,0.12);
+    color: #7A4800; /* W1: amber text token for light mode (was a mint/emerald chip) */
     padding: 2px 8px;
     border-radius:4px;
     font-size:0.7rem;
     font-weight:600;
 }
 [data-theme="dark"] .rz-version-stamp{ color:rgba(241,245,249,0.5); }
-[data-theme="dark"] .rz-version-num{ background: rgba(16,185,129,0.14); color:#34d399; }
+[data-theme="dark"] .rz-version-num{ background: rgba(232,181,99,0.14); color:#E8B563; }
 .rz-version-link{ text-decoration:none; border:none; }
 .rz-version-link:hover .rz-version-num{ opacity:0.8; }
 
@@ -7442,16 +7319,16 @@ section {
         transition: background 0.2s, border-color 0.2s;
     }
     [data-theme="light"] .rz-nav-burger {
-        background: rgba(15, 23, 42, 0.04);
+        background: rgba(25,27,31,0.04);
         border-color: rgba(15, 23, 42, 0.10);
         color: #0f172a;
     }
     .rz-nav-burger:hover {
-        background: rgba(125, 221, 180, 0.12);
-        border-color: rgba(125, 221, 180, 0.4);
+        background: rgba(232, 181, 99, 0.12);
+        border-color: rgba(232, 181, 99, 0.4);
     }
     .rz-nav-burger:focus-visible {
-        outline: 2px solid #7DDDB4;
+        outline: 2px solid #E8B563;
         outline-offset: 2px;
     }
     .rz-nav-burger span {
@@ -7480,7 +7357,7 @@ section {
         bottom: 0;
         flex-direction: column !important;
         align-items: stretch !important;
-        background: rgba(15, 23, 42, 0.97);
+        background: rgba(25,27,31,0.97);
         backdrop-filter: saturate(180%) blur(14px);
         -webkit-backdrop-filter: saturate(180%) blur(14px);
         padding: 1rem 1.25rem 4rem !important;
@@ -7521,9 +7398,13 @@ section {
     }
     body.rz-nav-open .nav-menu a:hover,
     body.rz-nav-open .nav-links a:hover {
-        background: rgba(125, 221, 180, 0.08);
-        color: #7DDDB4 !important;
+        background: rgba(232, 181, 99, 0.08);
+        color: #E8B563 !important;
         padding-left: 0.75rem !important;
+    }
+    [data-theme="light"] body.rz-nav-open .nav-menu a:hover,
+    [data-theme="light"] body.rz-nav-open .nav-links a:hover {
+        color: #7A4800 !important;
     }
     /* Dropdown items inside the drawer — show inline, indent slightly */
     body.rz-nav-open .nav-dropdown .dropdown-menu,
@@ -7611,7 +7492,7 @@ section {
     body.rz-nav-open .nav-links::-webkit-scrollbar { width: 4px; }
     body.rz-nav-open .nav-menu::-webkit-scrollbar-thumb,
     body.rz-nav-open .nav-links::-webkit-scrollbar-thumb {
-        background: rgba(125,221,180,0.4);
+        background: rgba(232,181,99,0.4);
         border-radius: 2px;
     }
 }
@@ -7642,7 +7523,7 @@ section {
         visibility: visible !important;
         padding: 0.5rem 0 0.5rem 1rem !important;
         background: rgba(255,255,255,0.02) !important;
-        border-left: 2px solid rgba(125,221,180,0.3);
+        border-left: 2px solid rgba(232,181,99,0.3);
         margin-left: 0.5rem;
     }
 
@@ -7666,7 +7547,7 @@ section {
         transform: translateY(-50%);
         font-size: 1.1rem;
         font-weight: 600;
-        color: rgba(125,221,180,0.6);
+        color: rgba(232,181,99,0.6);
         transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
     }
     body.rz-nav-open .nav-dropdown.is-mobile-open > a::after {
@@ -7701,8 +7582,8 @@ section {
 [data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
 [data-theme="dark"] input.input-field,
 [data-theme="dark"] textarea {
-    background: #1e293b !important;
-    background-color: #1e293b !important;
+    background: #282b31 !important;
+    background-color: #282b31 !important;
     color: #f1f5f9 !important;
     border-color: rgba(255,255,255,0.12) !important;
     forced-color-adjust: none;
@@ -7713,15 +7594,15 @@ section {
 
 [data-theme="dark"] select option,
 [data-theme="dark"] datalist option {
-    background: #1e293b !important;
+    background: #282b31 !important;
     color: #f1f5f9 !important;
 }
 
 [data-theme="dark"] select:focus,
 [data-theme="dark"] input:focus,
 [data-theme="dark"] textarea:focus {
-    border-color: #10b981 !important;
-    box-shadow: 0 0 0 3px rgba(16,185,129,0.18) !important;
+    border-color: #E8B563 !important;
+    box-shadow: 0 0 0 3px rgba(232,181,99,0.18) !important;
     outline: none;
 }
 
@@ -7732,8 +7613,8 @@ section {
 [data-theme="dark"] [style*="background:#fff"],
 [data-theme="dark"] [style*="background-color: white"],
 [data-theme="dark"] [style*="background-color:white"] {
-    background: #1e293b !important;
-    background-color: #1e293b !important;
+    background: #282b31 !important;
+    background-color: #282b31 !important;
     color: #f1f5f9 !important;
 }
 
@@ -7882,12 +7763,12 @@ section {
    ============================================================ */
 /* dark surfaces */
 [data-theme="dark"] .bento-card{
-  background:linear-gradient(180deg,#161c27,#121823);
+  background:linear-gradient(180deg,#191b1f,#191b1f);
   border-color:rgba(255,255,255,.08);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.5),0 14px 30px -18px rgba(0,0,0,.7);
   transition:border-color .3s ease,box-shadow .3s ease;
 }
-[data-theme="dark"] .bento-identity{background:linear-gradient(160deg,#172033,#121826 62%);}
+[data-theme="dark"] .bento-identity{background:linear-gradient(160deg,#212429,#191b1f 62%);}
 [data-theme="dark"] .bento-exp-card::before{opacity:.5;}
 [data-theme="dark"] .bento-exp-card:hover::before{opacity:1;}
 /* light surfaces */
@@ -7917,8 +7798,8 @@ section {
 /* a11y (v1.50.39): version stamp readable; in-paragraph links distinguishable without color */
 .rz-version-label { color:#5b6b82 !important; }
 [data-theme="dark"] .rz-version-label { color:#9aa8bb !important; }
-.rz-version-num { color:#0a6e52 !important; }
-[data-theme="dark"] .rz-version-num { color:#7dd3b0 !important; }
+.rz-version-num { color:#7A4800 !important; }
+[data-theme="dark"] .rz-version-num { color:#E8B563 !important; }
 p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoration: underline; text-underline-offset: 2px; }
 
 /* a11y (v1.51.13): the shared footer disclaimer carries inline #64748b terms/privacy
@@ -8036,7 +7917,7 @@ p a[href$="terms.html"], p a[href$="privacy.html"] {
 }
 [data-theme="dark"] {
   --rz-chip-info:   #00DDFF;
-  --rz-chip-good:   #00FF88;
+  --rz-chip-good:   #6fbf8e;   /* W1: muted status green — the oscilloscope neon was withdrawn by the owner 2026-10-15 */
   --rz-chip-warn:   #FFAA00;
   --rz-chip-alert:  #FF6B6B;
   --rz-chip-quiet:  #94a3b8;

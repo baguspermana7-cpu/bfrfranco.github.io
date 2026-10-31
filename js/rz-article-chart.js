@@ -28,7 +28,7 @@
 
   function isEditorial(){ return document.documentElement.getAttribute('data-rz-register') === 'editorial'; }
   /* v3.24.15 — on the editorial register the chart speaks the register: ONE amber for the lead series, neutral greys
-     for the rest, red only for a fault. The instrument palette below put neon #00FF88 and cyan #00DDFF into articles,
+     for the rest, red only for a fault. The instrument palette below put neon green and cyan #00DDFF into articles,
      and gave every series without an explicit accent the same colour (article 30's 50% and 80% bars: identical). */
   function editorialPalette(){
     var d = isDark();
@@ -56,14 +56,14 @@
       grid:  d ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)',
       tick:  d ? '#9aa8bb' : '#64748b',
       text:  d ? '#cfd3da' : '#334155',
-      tipBg: d ? '#0b1220' : '#ffffff',
-      tipBd: d ? '#334155' : '#e2e8f0',
+      tipBg: d ? '#121316' : '#ffffff',
+      tipBd: d ? 'rgba(255,255,255,0.14)' : '#e2e8f0',
       tipTx: d ? '#e2e8f0' : '#1e293b',
       cross: d ? 'rgba(255,170,0,0.55)' : 'rgba(180,83,9,0.45)',
       accents: {
         signal: d ? '#FFAA00' : '#b45309',
         info:   d ? '#00DDFF' : '#0e7490',
-        data:   d ? '#00FF88' : '#0a8a5a',
+        data:   d ? '#4FBF8A' : '#0a8a5a',
         alert:  d ? '#FF3030' : '#dc2626'
       }
     };

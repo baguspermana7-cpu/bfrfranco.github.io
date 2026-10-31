@@ -77,12 +77,12 @@ const MIME = Object.freeze({
   '.xml': 'application/xml; charset=utf-8', '.pdf': 'application/pdf',
 });
 
-/* The tokens each register is DEFINED BY, in css/rz-dark.css. Chosen because
-   they differ between the two registers, so a resolved value also proves the
-   RIGHT register arrived and not merely some stylesheet. */
+/* The tokens each register is DEFINED BY, in css/rz-dark.css. Since W1 (2026-10-31) both
+   registers share the one amber accent, so --rz-radius is the token that tells them apart and
+   proves the RIGHT register arrived, not merely some stylesheet. */
 const REGISTER_TOKENS = Object.freeze({
   editorial:  { '--rz-accent': '#E8B563', '--rz-radius': '10px' },
-  instrument: { '--rz-accent': '#22F5A8', '--rz-radius': '3px' },
+  instrument: { '--rz-accent': '#E8B563', '--rz-radius': '3px' },
 });
 
 /* Declared exemptions, each with a reason. A page may legitimately opt out of

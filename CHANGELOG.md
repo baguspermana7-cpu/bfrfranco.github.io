@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.24.29 — 2026-10-31 — "Graphite"
+
+Owner: *"keep improve dan lakukan pembaharuan dan lanjutkan utk semua page, pastikan tidak ada page yang terlewat, lakukan pembaharuan untuk semuanya"* — then *"polish more"*. Tracked as harness work item WI-WEB-ALLPAGES-001 (plan by Fable, execution by Opus and Sonnet). This is the first wave; the hub and the journal were already on the register.
+
+Measured with `node tools/audit-vibecode.mjs --json` before and after: **407 monitored findings in 237 files → 155 in 73 files.**
+
+### Changed
+- **Shared stylesheets and scripts move to graphite + one amber.** `styles.css`, `styles-index.css` (shared chrome only — navbar, drawer, dropdown, footer, cookie banner, inputs; the homepage hero and bento wait for an owner-approved mockup), `css/rz-dark.css`, `css/rz-bms-shell.css` (state colours kept), `css/rz-conv-alarm-workspace.css` (alarm states kept), `css/rz-documentation-ui.css`, `css/rz-monitor-instrument.css`, `js/rz-mobile-nav.js` (the drawer was navy in both themes; now graphite in dark, white in light), `js/rz-article-chart.js`, `js/rz-basis-drawer.js`, `js/network-anim/palette.js` (token names kept, neon toned down, canvas graphite), `rz-chat.js`, the offline page in `sw.js`. Navy backgrounds were rewritten to graphite at the same lightness, so contrast did not move; aurora orbs deleted; gradient text made solid; card hover lifts and glows replaced by a border-colour change. The light-theme "Demo Account" label in the sign-in modal was mint on cream; it is ink-amber now (`auth.js`).
+- **The 43 incident dossiers and the incident library page** drop the forest-green palette and the Fraunces serif for the journal's graphite + amber and IBM Plex Sans — changed once in `tools/build-incidents.py`, rebuilt, `--check` CURRENT.
+- **Technical manuals (39), network explainers (25), PRDs (6), and 42 content pages** (compare-*, pillar-* except fire safety, pln-*, infographic-*, cdu-*, glossary, tools, 404, privacy, terms, dashboard, achievements and others) move onto the register through one new reproducible tool, `tools/sweep-site-register.py` (exact-string rewrites per family, `--check` / `--apply`, an excluded set with a written reason for each file). `--check` reported 747 + 148 old values before `--apply` and passes after; it is wired into `tools/test-generator-freshness.py` so a regression fails the gate. Cyan chrome accents became amber, neon status green became a muted `#6aa588` that keeps its meaning, Fraunces left the font stacks and the Google Fonts URLs, 65 card hover lifts became border changes, and the keyword marquee CSS on glossary and tools was deleted.
+
+### Fixed
+- **The fixed navbar covered the breadcrumb on 36 technical manuals** (`.mn-wrap` started 2rem from the top under a ~70 px fixed header). They now clear it the way the 7 manuals that already did (5.5rem desktop, 5rem phone).
+- **The network explainers' header** ran its two links together ("Network HubCompare") and stayed transparent while the page scrolled under it — these pages do not load the shared script that adds `.scrolled`. The links have a gap and the header a solid background in both themes.
+
+### Not in this wave (recorded, not forgotten)
+- The 13 calculators and `pillar-fire-safety.html` are being refit by the parallel LTC session; the LTC lab pages and manuals are theirs too.
+- The homepage (`index.html` hero/bento) waits for a mockup the owner approves; mockup and plan artefacts are kept as evidence for the owner to decide.
+- The nine cockpits (CSS only, numbers untouched) are the next wave; stat strips on four pillar pages and the dashboard need a design decision.
+- `tools/test-network-anim-determinism.py` fails on origin/main too (`Cannot read properties of undefined (reading 'width')` in its Node canvas shim) and is not wired into the ship gate — a pre-existing defect, not caused here.
+
 ## v3.24.28 — 2026-10-31 — "Two cockpits"
 
 Owner, on the DC Solutions hub: *"area ini jadi terlalu rame, cukup DC AI dan DC conventional hyperscale aja. yang lain2nya itu kan ada saat setelah akses masing2 dari 2 itu. biar nggak terlihat ramai dan membingkan jadinya saat navigate ini"*

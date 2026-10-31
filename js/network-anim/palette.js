@@ -15,12 +15,14 @@
   window.RZNetAnim = window.RZNetAnim || {};
 
   var PALETTE = Object.freeze({
-    'instrument-cyan':    '#00DDFF',   // primary informational / data
-    'signal-amber':       '#FFAA00',   // advisory / transient pre-issuance (flow-stage tint exception only)
-    'oscilloscope-green': '#00FF88',   // healthy operating state / ACK
+    /* W1 2026-10-31: names kept, neon toned down (owner withdrew the oscilloscope neon and the
+       navy cast 2026-10-15). The four state hues stay four distinguishable hues — they are data. */
+    'instrument-cyan':    '#45C2DB',   // primary informational / data
+    'signal-amber':       '#E8B563',   // advisory / transient pre-issuance (flow-stage tint exception only)
+    'oscilloscope-green': '#4FBF8A',   // healthy operating state / ACK
     'fault-red':          '#FF3030',   // alarm / collision / drop
-    'wire-default':       '#475569',   // wire stroke base (instrumentation grey-blue)
-    'canvas-bg':          '#0F172A'    // canvas background (matches dark-mode body)
+    'wire-default':       '#5A6069',   // wire stroke base (neutral graphite grey)
+    'canvas-bg':          '#121316'    // canvas background (graphite, the elevated surface)
   });
 
   /**

@@ -147,12 +147,12 @@
         host.style.cssText = [
             'position:fixed', 'inset:0', 'z-index:9000', 'display:none',
             'align-items:center', 'justify-content:center',
-            'background:rgba(3,7,14,.62)', 'padding:16px',
+            'background:rgba(0,0,0,.62)', 'padding:16px',
             'font-family:"IBM Plex Sans",system-ui,sans-serif'
         ].join(';');
         host.innerHTML = '<div id="rz-basis-drawer-panel" style="max-width:640px;width:100%;'
-            + 'max-height:86vh;overflow:auto;background:#0f1621;color:#dbe5f0;'
-            + 'border:1px solid #2b3a52;border-radius:6px;padding:18px 20px;'
+            + 'max-height:86vh;overflow:auto;background:#121316;color:#dbe5f0;'
+            + 'border:1px solid #2e3138;border-radius:6px;padding:18px 20px;'
             + 'box-shadow:0 18px 48px rgba(0,0,0,.55)"></div>';
         document.body.appendChild(host);
 
@@ -187,7 +187,7 @@
         var target = byId(id);
         var label = target && target.label ? target.label : id;
         return '<button type="button" data-basis-goto="' + esc(id) + '" style="background:none;'
-            + 'border:none;padding:0;margin:0 8px 4px 0;color:#67b7f0;cursor:pointer;'
+            + 'border:none;padding:0;margin:0 8px 4px 0;color:#E8B563;cursor:pointer;'
             + 'font:inherit;text-decoration:underline dotted">' + esc(label) + '</button>';
     }
 
@@ -207,7 +207,7 @@
             + '<h2 id="rz-basis-drawer-title" style="margin:0;font-size:16px;flex:1">'
             + esc(p.label || p.id) + '</h2>'
             + '<span style="flex:0 0 auto;font-size:10.5px;font-weight:700;letter-spacing:.06em;'
-            + 'padding:3px 8px;border-radius:3px;color:#0f1621;background:'
+            + 'padding:3px 8px;border-radius:3px;color:#121316;background:'
             + evidenceInfo(evidence).color + '">' + esc(evidence) + '</span></div>'
             + '<div style="font-size:11.5px;color:#8fa2b8;margin-bottom:12px">' + esc(p.id) + '</div>';
 
@@ -264,15 +264,15 @@
                 + 'authority. Restore the host cockpit&apos;s requested engine version and complete schema '
                 + 'before opening <code>' + esc(id) + '</code>.</p>'
                 + '<div style="margin-top:14px;display:flex;justify-content:flex-end">'
-                + '<button type="button" data-basis-close style="background:#1c2838;color:#dbe5f0;'
-                + 'border:1px solid #2b3a52;border-radius:4px;padding:7px 14px;cursor:pointer;'
+                + '<button type="button" data-basis-close style="background:#191b1f;color:#dbe5f0;'
+                + 'border:1px solid #2e3138;border-radius:4px;padding:7px 14px;cursor:pointer;'
                 + 'font:inherit;font-size:12.5px">Close</button></div>';
             return;
         }
         var html = renderRecord(id);
         html += '<div style="margin-top:14px;display:flex;gap:10px;justify-content:flex-end">'
-            + '<button type="button" data-basis-close style="background:#1c2838;color:#dbe5f0;'
-            + 'border:1px solid #2b3a52;border-radius:4px;padding:7px 14px;cursor:pointer;'
+            + '<button type="button" data-basis-close style="background:#191b1f;color:#dbe5f0;'
+            + 'border:1px solid #2e3138;border-radius:4px;padding:7px 14px;cursor:pointer;'
             + 'font:inherit;font-size:12.5px">Close</button></div>';
 
         panel.innerHTML = html;

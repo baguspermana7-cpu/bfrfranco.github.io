@@ -53,7 +53,7 @@
       max-width: calc(100vw - 32px);
       height: 520px;
       max-height: calc(100vh - 120px);
-      background: #0f172a;
+      background: #121316;
       border: 1px solid rgba(14,116,144,0.3);
       border-radius: 16px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(14,116,144,0.15);
@@ -134,7 +134,7 @@
     }
     .rz-msg.assistant {
       align-self: flex-start;
-      background: rgba(30,41,59,0.9);
+      background: rgba(40,43,49,0.9);
       color: #cbd5e1;
       border: 1px solid rgba(14,116,144,0.15);
       border-bottom-left-radius: 3px;
