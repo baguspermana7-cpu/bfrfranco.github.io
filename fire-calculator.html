@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-rz-register="tool">
+<html lang="en" data-theme="dark" data-rz-register="tool">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,9 +29,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.min.css?v=20261031-596eb39e">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
-    <script src="js/rz-version.js?v=20261101-22a91a90" defer></script>
+    <link rel="stylesheet" href="css/rz-hub.css">
+    <link rel="stylesheet" href="css/rz-tool.css">
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="js/rz-version.js?v=20261101-732b47d5" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <script src="js/fire-model.js?v=20260920-1d3904eb" defer></script>
@@ -43,141 +45,77 @@
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},{"@type":"ListItem","position":3,"name":"Fire Safety","item":"https://resistancezero.com/pillar-fire-safety.html"},{"@type":"ListItem","position":4,"name":"Fire Calculator"}]}
     </script>
-    <style>
-        :root:not([data-theme="dark"]) { --fc-primary:#ef4444; --fc-accent:#dc2626; --fc-bg:#f8fafc; --fc-card:#ffffff; --fc-border:#e2e8f0; --fc-text:#0f172a; --fc-muted:#64748b; --fc-inset:#f1f5f9; }
-        [data-theme="dark"] { --fc-primary:#f87171; --fc-accent:#ef4444; --fc-bg:#0f172a; --fc-card:#1e293b; --fc-border:#334155; --fc-text:#f1f5f9; --fc-muted:#94a3b8; --fc-inset:#0b1220; }
-        body { font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif; background:var(--fc-bg); color:var(--fc-text); }
-        main { background:var(--fc-bg); }
-        .fc-hero { position:relative; padding:7rem 1.5rem 1.6rem; border-bottom:1px solid var(--fc-border); overflow:hidden; }
-        [data-theme="dark"] .fc-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(680px 320px at 80% -20%,rgba(239,68,68,.06),transparent 64%); pointer-events:none; }
-        .fc-hero > * { position:relative; }
-        .fc-wrap { max-width:1180px; margin:0 auto; padding:0 1.4rem; }
-        .fc-kick { font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--fc-primary); font-weight:600; }
-        .fc-hero h1 { font-size:clamp(1.8rem,4vw,2.6rem); font-weight:700; letter-spacing:-.02em; margin:.5rem 0 .5rem; line-height:1.06; }
-        .fc-hero p { color:var(--fc-muted); max-width:74ch; font-size:1.02rem; line-height:1.6; }
-        .fc-hero .crumb { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--fc-muted); margin-top:.9rem; }
-        .fc-hero .crumb a { color:var(--fc-primary); }
-        .fc-body { max-width:1180px; margin:0 auto; padding:1.8rem 1.4rem 3rem; display:grid; grid-template-columns:minmax(0,360px) 1fr; gap:1.4rem; align-items:start; }
-        .fc-presets { grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
-        .fc-presets .lbl { font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--fc-muted); margin-right:.2rem; }
-        .preset-btn { font-family:'JetBrains Mono',monospace; font-size:.74rem; font-weight:600; padding:6px 12px; border-radius:7px; border:1px solid var(--fc-border); background:var(--fc-card); color:var(--fc-text); cursor:pointer; transition:all .15s; }
-        .preset-btn:hover { border-color:var(--fc-primary); color:var(--fc-primary); }
-        .preset-btn.active { background:var(--fc-primary); border-color:var(--fc-primary); color:#fff; }
-        .fc-reset { margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:.74rem; padding:6px 12px; border-radius:7px; border:1px solid var(--fc-border); background:transparent; color:var(--fc-muted); cursor:pointer; }
-        .fc-reset:hover { color:var(--fc-text); border-color:var(--fc-muted); }
-        .fc-panel { background:var(--fc-card); border:1px solid var(--fc-border); border-radius:4px; padding:1.1rem 1.2rem; }
-        .input-section { margin-bottom:1.1rem; }
-        .input-section:last-child { margin-bottom:0; }
-        .input-section h2 { font-size:.74rem; font-family:'JetBrains Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--fc-primary); margin:0 0 .6rem; padding-bottom:.35rem; border-bottom:1px solid var(--fc-border); }
-        .input-row { margin-bottom:.7rem; }
-        .input-label { display:flex; align-items:center; font-size:.82rem; font-weight:500; margin-bottom:.3rem; color:var(--fc-text); }
-        .input-field, select.input-field { width:100%; padding:8px 10px; border:1px solid var(--fc-border); border-radius:8px; background:var(--fc-inset); color:var(--fc-text); font-size:.9rem; font-family:'JetBrains Mono',monospace; }
-        .input-field:focus { outline:2px solid var(--fc-primary); outline-offset:1px; border-color:var(--fc-primary); }
-        [data-theme="dark"] select.input-field option { background:#1e293b; color:#f1f5f9; }
-        /* production hardening: input validation error states */
-        .input-field.invalid { border-color:#b91c1c; background:rgba(239,68,68,.06); }
-        .cc-csv { font-family:'JetBrains Mono',monospace; font-size:.74rem; padding:6px 12px; border-radius:7px; border:1px solid var(--fc-border); background:transparent; color:var(--fc-muted); cursor:pointer; }
-        .cc-csv:hover { color:var(--fc-text); border-color:var(--fc-muted); }
-        .fc-validation { margin:0 0 .75rem; padding:8px 12px; border:1px solid #ef4444; border-radius:8px; background:rgba(239,68,68,.08); color:#b91c1c; font-size:.78rem; line-height:1.5; }
-        .fc-validation b { font-weight:700; }
-        [data-theme="dark"] .fc-validation { color:#fca5a5; background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.5); }
-        .tip { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; margin-left:auto; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.35); border-radius:50%; font-size:10px; color:var(--fc-primary); cursor:help; position:relative; }
-        .tip[tabindex] { cursor:help; }
-        .tip .tipbox { display:none; position:absolute; bottom:130%; right:0; width:248px; background:#0b1220; color:#e2e8f0; border:1px solid #334155; border-radius:8px; padding:.6rem .7rem; font-size:.74rem; font-weight:400; line-height:1.5; z-index:30; box-shadow:0 8px 24px rgba(0,0,0,.4); text-align:left; }
-        .tip:hover .tipbox, .tip:focus .tipbox { display:block; }
-        .tip .tipbox b { color:var(--fc-primary); }
-        .fc-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.8rem; }
-        .kpi { background:var(--fc-card); border:1px solid var(--fc-border); border-left:2px solid var(--fc-primary); border-radius:4px; padding:.85rem .95rem; }
-        .kpi.ok { border-left-color:#0a8a5a; }
-        .kpi.warn { border-left-color:#d97706; }
-        .kpi.alarm { border-left-color:#dc2626; }
-        .kpi-label { font-size:.68rem; font-family:'JetBrains Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:var(--fc-muted); display:flex; align-items:center; gap:.4rem; }
-        .kpi-val { font-size:1.32rem; font-weight:700; font-family:'JetBrains Mono',monospace; margin:.2rem 0 .1rem; font-variant-numeric:tabular-nums slashed-zero; }
-        .kpi-sub { font-size:.72rem; color:var(--fc-muted); line-height:1.4; }
-        .chip { font-family:'JetBrains Mono',monospace; font-size:.56rem; font-weight:700; letter-spacing:.06em; padding:1px 5px; border-radius:4px; text-transform:uppercase; }
-        .chip.derived { background:rgba(10,138,90,.14); color:#076445; }
-        .chip.warn { background:rgba(217,119,6,.16); color:#92400e; }
-        .chip.alarm { background:rgba(220,38,38,.16); color:#dc2626; }
-        [data-theme="dark"] .chip.derived { color:#34d399; }
-        [data-theme="dark"] .chip.warn { color:#fbbf24; }
-        [data-theme="dark"] .chip.alarm { color:#f87171; }
-        .fc-note { grid-column:1 / -1; border:1px dashed var(--fc-border); border-radius:4px; background:var(--fc-inset); padding:.9rem 1.1rem; font-size:.8rem; color:var(--fc-muted); line-height:1.6; }
-        .fc-note b { color:var(--fc-text); }
-        .fc-note a { color:var(--fc-primary); }
-        .fc-results-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:.8rem; }
-        .fc-results-head h2 { font-size:1.05rem; margin:0; }
-        .fc-results-head .vtag { font-family:'JetBrains Mono',monospace; font-size:.66rem; color:var(--fc-muted); }
-        /* v1.8.0 — mobile responsive patch */
-        @media (max-width:980px){ .fc-body { grid-template-columns:1fr; } }
-        @media (max-width:768px){
-            html, body { overflow-x:hidden; max-width:100vw; }
-            img, picture, video, svg { max-width:100%; height:auto; }
-            .fc-hero { padding:5.5rem 1rem 1.4rem; }
-            .nav-menu, .nav-links { display:none; }
-            .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
-            button, a.btn, [role="button"] { min-height:44px; }
-            .tip .tipbox { width:200px; }
-        }
-    /* a11y fc light (v1.50.39): red primary too light on white; darken in light mode only */
-:root:not([data-theme="dark"]) { --fc-primary:#b91c1c; }
-:root:not([data-theme="dark"]) .chip.alarm { color:#b91c1c; }
-:root:not([data-theme="dark"]) .fc-note, :root:not([data-theme="dark"]) .fc-note code { color:#475569; }
-/* a11y (v1.50.39): dark --fc-primary #ef4444 leaves white btn text at 2.76:1 — darken active preset */
-[data-theme="dark"] .preset-btn.active { background:#b91c1c; border-color:#b91c1c; }
-</style>
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261027-0044">
 </head>
-<body>
-    <a href="#main-content" class="skip-link">Skip to content</a>
-
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li class="nav-dropdown">
-                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li role="menuitem"><a href="datacenter-solutions.html" style="color:#b91c1c;font-weight:600;">DC Solutions Hub</a></li>
-                        <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
-                        <li role="menuitem"><a href="pillar-fire-safety.html" style="color:#b91c1c;">Fire Safety Pillar</a></li>
-                        <li role="menuitem"><a href="fire-calculator.html" style="color:#b91c1c;">Fire Calculator</a></li>
-                        <li role="menuitem"><a href="fire-system.html">Fire System (P&amp;ID)</a></li>
-                        <li role="menuitem"><a href="ltc-nfpa-fire-risk.html">NFPA Fire Risk</a></li>
-                    </ul>
-                </li>
-                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-            </ul>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+<body class="hub tool">
+<a href="#main-content" class="skip-link">Skip to content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
-
-    <header class="fc-hero">
-        <div class="fc-wrap">
-            <span class="fc-kick">Fire Safety · Clean Agent + Li-ion</span>
-            <h1>Clean-agent &amp; Li-ion fire calculator</h1>
-            <p>Size data-center fire protection from first principles &mdash; clean-agent quantity (NFPA&nbsp;2001), occupant safety vs the agent NOAEL, cylinder count, GWP footprint, smoke-detector coverage, and the <strong>lithium-ion BBU thermal-runaway off-gas risk</strong> that drives NFPA&nbsp;855 detection. Computed by the same validated engine the rest of this hub uses. Educational reference only &mdash; not a substitute for a fire-protection engineer's design.</p>
-            <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="pillar-fire-safety.html">Fire Safety</a> → Calculator</div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
         </div>
-    </header>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="nav-icon theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i class="fas fa-sun"></i></button>
+  </div>
+</nav>
 
-    <main id="main-content"><div class="fc-body">
+<main id="main-content">
 
-        <div class="fc-presets">
-            <span class="lbl">Preset:</span>
-            <button class="preset-btn active" data-preset="hall">Data hall 500 m³</button>
-            <button class="preset-btn" data-preset="small">Comms room 50 m³</button>
-            <button class="preset-btn" data-preset="battery">Battery room + NMC BBU</button>
-            <button class="fc-reset" id="fcReset">↺ Reset</button>
-            <button class="cc-csv" id="fcCsv"><i class="fas fa-file-csv"></i> Export CSV</button>
-        </div>
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow">DC Solutions · <b>Calculator</b> · Fire</p>
+    <h1>Clean-agent and Li-ion fire <span class="muted">sized by NFPA&nbsp;2001 and NFPA&nbsp;855</span></h1>
+    <p class="lede">Agent quantity, occupant safety against the NOAEL, cylinder count, detector coverage and the off-gas of a lithium-ion battery room, computed in your browser by the validated fire engine.</p>
+    <p class="basis">engine fire-engine v1.0.0 · 31/31 tests · basis NFPA 2001 · updated 2026-10</p>
+    <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="pillar-fire-safety.html">Fire safety</a> → Calculator</p>
+  </div>
+</header>
 
-        <div class="fc-panel">
-            <div class="input-section">
+<div class="wrap">
+  <div class="tool-bar" role="toolbar" aria-label="Presets and actions">
+    <span class="lbl">Preset</span>
+    <button class="chip preset-btn" data-preset="hall" aria-pressed="true">Data hall 500 m³</button>
+    <button class="chip preset-btn" data-preset="small" aria-pressed="false">Comms room 50 m³</button>
+    <button class="chip preset-btn" data-preset="battery" aria-pressed="false">Battery room + NMC</button>
+    <span class="spacer"></span>
+    <button class="tool-btn" id="fcReset">Reset</button>
+    <button class="tool-btn" id="fcCsv">Export CSV</button>
+  </div>
+
+  <div class="tool-bench">
+    <aside class="tool-inputs" aria-label="Inputs">
+
+            <div class="in-group">
                 <h2>Protected space</h2>
                 <div class="input-row">
                     <label class="input-label" for="inVol">Room volume (m³) <span class="tip" tabindex="0">?<span class="tipbox"><b>Net volume</b> of the protected enclosure. Drives clean-agent quantity directly (W &prop; V). Deduct solid obstructions; do not deduct racks.</span></span></label>
@@ -192,7 +130,7 @@
                     <input class="input-field" id="inTemp" type="number" value="20" min="0" max="55" step="1">
                 </div>
             </div>
-            <div class="input-section">
+            <div class="in-group">
                 <h2>Clean agent</h2>
                 <div class="input-row">
                     <label class="input-label" for="inAgent">Agent <span class="tip" tabindex="0">?<span class="tipbox"><b>Suppression agent.</b> Halocarbons (Novec 1230, FM-200) discharge in ≤10 s by mass; inert gases (IG-541) flood by volume. GWP differs by ~3000× — Novec 1230 GWP 1 vs FM-200 GWP 3220.</span></span></label>
@@ -203,7 +141,7 @@
                     <input class="input-field" id="inConc" type="number" value="" placeholder="default (Class-A)" min="1" max="60" step="0.1">
                 </div>
             </div>
-            <div class="input-section">
+            <div class="in-group">
                 <h2>Lithium-ion BBU (optional)</h2>
                 <div class="input-row">
                     <label class="input-label" for="inChem">Battery chemistry <span class="tip" tabindex="0">?<span class="tipbox"><b>BBU chemistry.</b> NMC (datahallAI uses 8× 1,333 kWh NMC) runs away at ~150 °C; LFP is safer (~167 °C). "None" hides the Li-ion panel.</span></span></label>
@@ -214,40 +152,63 @@
                     <input class="input-field" id="inKwh" type="number" value="333" min="0" step="10">
                 </div>
             </div>
-        </div>
+    </aside>
 
-        <div>
-            <div class="fc-results-head"><h2>Fire-protection results</h2><span class="vtag" id="fcEngTag">engine —</span></div>
-            <div class="fc-validation" id="fcValidation" role="alert" aria-live="polite" hidden></div>
-            <div class="fc-kpis" id="fcKpis"></div>
-            <div class="fc-note" style="margin-top:1rem;">
-                <b>How to read this.</b> Every figure is <span class="chip derived">Derived</span> by the validated fire engine (<code>js/fire-engine.js</code>, 31/31 tests) from your inputs. Clean-agent mass uses the NFPA&nbsp;2001 equation W&nbsp;=&nbsp;(V/s)·(C/(100−C)); inert agents use ln(100/(100−C)). A green rail = within band, amber = watch, red = out of band / hazard. <b>Occupant safety:</b> the design concentration must stay ≤ the agent NOAEL. <b>Li-ion:</b> the off-gas volume from a battery in thermal runaway vastly exceeds any room's flammable limit — so early H₂/CO off-gas detection (UL 9540A / NFPA 855) + ventilation is the primary mitigation, ahead of suppression. PG-class / cost values are illustrative. Not a substitute for a fire-protection engineer's stamped design.
-            </div>
-        </div>
+    <section class="tool-results" aria-label="Results">
+      <div class="res-head"><h2>Fire-protection results</h2><span class="basis" id="fcEngTag">engine —</span></div>
+      <div class="tool-valid" id="fcValidation" role="alert" aria-live="polite" hidden></div>
+      <div id="fcKpis"></div>
+      <p class="tool-note"><b>How to read this.</b> Every figure is derived by the fire engine (<code>js/fire-engine.js</code>, 31/31 tests) from your inputs. Clean-agent mass uses the NFPA&nbsp;2001 equation W&nbsp;=&nbsp;(V/s)·(C/(100−C)); inert agents use ln(100/(100−C)). A word appears beside a figure only when it needs attention: <b>watch</b> near a limit, <b>hazard</b> past one. <b>Occupant safety:</b> the design concentration must stay at or below the agent NOAEL. <b>Li-ion:</b> the off-gas of a battery in thermal runaway far exceeds the flammable limit of any room, so early H₂/CO off-gas detection (UL 9540A, NFPA&nbsp;855) and ventilation come before suppression. Cost-class values are illustrative. Not a substitute for a fire-protection engineer's stamped design.</p>
+    </section>
+  </div>
+</div>
 
-    </div></main>
+<section class="tool-ref" aria-labelledby="ref-h">
+  <div class="wrap">
+    <p class="eyebrow" id="ref-h">02 / Reference</p>
+    <div class="ref-grid">
+      <div>
+        <h3>Method</h3>
+        <ul class="formulas">
+          <li><span>Halocarbon mass</span><code>W = (V / s) · C / (100 − C)</code></li>
+          <li><span>Inert agent volume</span><code>X = V · ln(100 / (100 − C))</code></li>
+          <li><span>Specific volume</span><code>s = k1 + k2 · T</code></li>
+          <li><span>Occupant margin</span><code>NOAEL − C, in percentage points</code></li>
+          <li><span>Spot detectors</span><code>N = ⌈ A / 84 m² ⌉</code></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Computed against</h3>
+        <p class="against"><span>NFPA 2001</span><span>NFPA 72</span><span>NFPA 855</span><span>UL 9540A</span></p>
+        <h3>Read further</h3>
+        <p class="links"><a href="manual/fire.html">Technical manual and methodology</a><a href="pillar-fire-safety.html">Fire safety pillar</a><a href="fire-checklist.html">Fire checklist</a><a href="fire-system.html">Fire system P&amp;ID</a></p>
+        <p class="notice">Educational reference only. The engine is validated against its own worked examples; a stamped design needs a fire-protection engineer.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#475569;border-color:rgba(71,85,105,0.4)}.rz-manual-link a:hover{color:#0891b2;border-color:rgba(8,145,178,0.5)}[data-theme="dark"] .rz-manual-link a{color:#94a3b8;border-color:rgba(148,163,184,0.35)}[data-theme="dark"] .rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/fire.html">Technical Manual &amp; Methodology &#8599;</a></div>
-    <footer class="footer footer-enhanced">
-        <div class="container"><div class="footer-grid">
-            <div class="footer-brand"><p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p><p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p><p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p></div>
-            <div class="footer-nav"><h3 class="footer-heading">FIRE SAFETY</h3><ul class="footer-links"><li><a href="pillar-fire-safety.html">Fire Safety Pillar</a></li><li><a href="fire-calculator.html">Fire Calculator</a></li><li><a href="fire-system.html">Fire System P&amp;ID</a></li><li><a href="ltc-nfpa-fire-risk.html">NFPA Fire Risk</a></li></ul></div>
-            <div class="footer-connect"><h3 class="footer-heading">CONNECT</h3><ul class="footer-links"><li><a href="datacenter-solutions.html">DC Solutions</a></li><li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li><li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li></ul></div>
-        </div></div>
-    </footer>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models. Mission-critical infrastructure, documented.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
 
-    <script>
-    (function(){
-        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('theme')||'light';
-        document.documentElement.setAttribute('data-theme',theme);
-        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('theme',n); });
-        var hb=document.querySelector('.hamburger'), nm=document.querySelector('.nav-menu');
-        if(hb&&nm) hb.addEventListener('click',function(){ hb.classList.toggle('active'); nm.classList.toggle('active'); });
-        var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
-    })();
-    </script>
-
-    <script>
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  function paint(){var d=document.documentElement.getAttribute('data-theme')==='dark';var i=t&&t.querySelector('i');if(i)i.className=d?'fas fa-sun':'fas fa-moon';var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'#0b0c0e':'#F5F7FA');}
+  if(t){t.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';var n=d?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(e){}paint();});paint();}
+  var s=document.getElementById('navSearchBtn');if(s)s.addEventListener('click',function(){if(window.__rzPalette&&window.__rzPalette.open)window.__rzPalette.open();});
+})();
+</script>
+<script>
     /* Fire calculator — wires the validated fire engine to live KPIs. */
     (function(){
         var DEFAULTS = { inVol:500, inArea:170, inTemp:20, inAgent:'novec1230', inConc:'', inChem:'nmc', inKwh:333 };
@@ -286,16 +247,22 @@
             box.hidden=false;
         }
         function hideValidation(){ var box=$('fcValidation'); if(box){ box.hidden=true; box.innerHTML=''; } }
-        var __fcRows=[];
-        function kpiCard(label, value, unit, sub, state){
+        var __fcRows=[], __groups={ agent:[], detect:[], liion:[] }, __first=true;
+        var STATE_WORD={ ok:'derived', warn:'watch', alarm:'hazard' };
+        function kpiCard(group, label, value, unit, sub, state){
             try{ __fcRows.push({ label:label, value:String(value), unit:unit||'', note:sub||'' }); }catch(e){}
-            var cls = state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'ok');
-            var chip = state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'derived');
-            var clabel = state==='alarm' ? 'Hazard' : (state==='warn' ? 'Watch' : 'Derived');
-            return '<div class="kpi '+cls+'"><div class="kpi-label">'+label+' <span class="chip '+chip+'">'+clabel+'</span></div>'+
-                   '<div class="kpi-val">'+value+'<span style="font-size:.8rem;color:var(--fc-muted);font-weight:500;"> '+unit+'</span></div>'+
-                   '<div class="kpi-sub">'+sub+'</div></div>';
+            var st = state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'ok');
+            var key = __first ? ' is-key' : ''; __first=false;
+            __groups[group].push('<div class="metric-box'+key+'"><div class="metric-label">'+label+'</div>'+
+                   '<div class="metric-value">'+value+(unit?'<small>'+unit+'</small>':'')+'</div>'+
+                   '<div class="metric-sub">'+(st==='ok' ? '' : '<span class="state" data-state="'+STATE_WORD[st]+'">'+STATE_WORD[st]+'</span>')+sub+'</div></div>');
         }
+        function renderGroups(){
+            var defs=[['agent','Agent'],['detect','Detection'],['liion','Li-ion battery']], html='';
+            defs.forEach(function(d){ if(__groups[d[0]].length) html += '<div class="res-group"><h3>'+d[1]+'</h3><div data-rz-fact-list>'+__groups[d[0]].join('')+'</div></div>'; });
+            return html;
+        }
+        function resetGroups(){ __groups={ agent:[], detect:[], liion:[] }; __first=true; }
         function compute(){
             if(!window.FIRE_ENGINE || !window.FIRE_MODEL){
                 // Fallback: use RZEngine.models.fire when dedicated engine is unavailable
@@ -303,13 +270,13 @@
                     var vol=val('inVol'), temp=val('inTemp'), agent=val('inAgent'), conc=val('inConc');
                     if(!(vol>0)){ return; }
                     var rzFire = RZEngine.models.fire.agentQuantity({volumeM3:vol, agent:agent||'novec1230', tempC:temp||20, concentration:(conc===''||conc==null)?undefined:conc});
-                    var html='';
+                    resetGroups();
                     if(rzFire.type==='halocarbon'){
-                        html += kpiCard('Agent quantity', rzFire.massKg.toLocaleString(), 'kg', rzFire.agent+' · design '+rzFire.designConcentration+'%', 'ok');
+                        kpiCard('agent','Agent quantity', rzFire.massKg.toLocaleString(), 'kg', rzFire.agent+' · design '+rzFire.designConcentration+'%', 'ok');
                     } else {
-                        html += kpiCard('Agent quantity', rzFire.agentVolumeM3.toLocaleString(), 'm³ (NTP)', rzFire.agent+' · design '+rzFire.designConcentration+'%', 'ok');
+                        kpiCard('agent','Agent quantity', rzFire.agentVolumeM3.toLocaleString(), 'm³ (NTP)', rzFire.agent+' · design '+rzFire.designConcentration+'%', 'ok');
                     }
-                    $('fcKpis').innerHTML = html;
+                    $('fcKpis').innerHTML = renderGroups();
                     $('fcEngTag').textContent = 'RZEngine v'+RZEngine.version+' · '+rzFire.agent+' (basic sizing)';
                 }
                 return;
@@ -318,36 +285,35 @@
             var vres = validateInputs();
             if(!vres.ok){
                 showValidation(vres.errors);
-                $('fcKpis').innerHTML = '<div class="kpi warn" style="grid-column:1/-1"><div class="kpi-label">Awaiting valid inputs</div><div class="kpi-sub">Correct the highlighted field'+(vres.errors.length>1?'s':'')+' above to compute.</div></div>';
+                $('fcKpis').innerHTML = '<p class="tool-note">Awaiting valid inputs. Correct the highlighted field'+(vres.errors.length>1?'s':'')+' to compute.</p>';
                 return;
             }
             hideValidation();
-            __fcRows = [];
+            __fcRows = []; resetGroups();
             var vol=val('inVol'), area=val('inArea'), temp=val('inTemp'), agent=val('inAgent'),
                 conc=val('inConc'), chem=val('inChem'), kwh=val('inKwh');
             if(!(vol>0)){ return; }
             var ag = E.agentForRoom(agent, vol, temp, (conc===''||conc==null)?null:conc);
             var a = M.agents[agent];
-            var html='';
             // 1. agent quantity + cylinders
-            html += kpiCard('Agent quantity', ag.quantity.toLocaleString(), ag.unit, ag.cylinders+' cylinder'+(ag.cylinders!==1?'s':'')+(ag.kgPerM3?' · '+ag.kgPerM3+' kg/m³':''), 'ok');
+            kpiCard('agent','Agent quantity', ag.quantity.toLocaleString(), ag.unit, ag.cylinders+' cylinder'+(ag.cylinders!==1?'s':'')+(ag.kgPerM3?' · '+ag.kgPerM3+' kg/m³':''), 'ok');
             // 2. design concentration
-            html += kpiCard('Design concentration', ag.concentrationPct, '%', a.name+' · min ext '+a.minExtinguishPct+'%', 'ok');
+            kpiCard('agent','Design concentration', ag.concentrationPct, '%', a.name+' · min ext '+a.minExtinguishPct+'%', 'ok');
             // 3. occupant safety vs NOAEL
             var safeState = ag.occupiableOk ? (ag.safetyMarginPct < 1 ? 'warn' : 'ok') : 'alarm';
-            html += kpiCard('Occupant safety', (ag.safetyMarginPct>=0?'+':'')+ag.safetyMarginPct, 'pts to NOAEL', ag.occupiableOk ? 'design '+ag.concentrationPct+'% ≤ NOAEL '+ag.noaelPct+'% · occupiable' : 'EXCEEDS NOAEL '+ag.noaelPct+'% · not for occupied space', safeState);
+            kpiCard('agent','Occupant safety', (ag.safetyMarginPct>=0?'+':'')+ag.safetyMarginPct, 'pts', ag.occupiableOk ? 'margin below the NOAEL · design '+ag.concentrationPct+'% ≤ NOAEL '+ag.noaelPct+'% · occupiable' : 'EXCEEDS NOAEL '+ag.noaelPct+'% · not for occupied space', safeState);
             // 4. GWP CO2e (halocarbon only)
             if(ag.co2eTonnes != null){
                 var gwpState = a.gwp100 >= 1000 ? 'warn' : 'ok';
-                html += kpiCard('GWP footprint', ag.co2eTonnes.toLocaleString(), 't CO₂e', 'full discharge · GWP '+a.gwp100+(a.gwp100>=1000?' (high — F-Gas phase-down)':''), gwpState);
+                kpiCard('agent','GWP footprint', ag.co2eTonnes.toLocaleString(), 't CO₂e', 'full discharge · GWP '+a.gwp100+(a.gwp100>=1000?' (high — F-Gas phase-down)':''), gwpState);
             } else if(ag.residualO2Pct != null){
-                html += kpiCard('Residual O₂', ag.residualO2Pct, '%', 'inert flood · breathable but low — egress time matters', 'warn');
+                kpiCard('agent','Residual O₂', ag.residualO2Pct, '%', 'inert flood · breathable but low — egress time matters', 'warn');
             }
             // 5. detection
             var det = E.spotDetectorCount(area);
-            html += kpiCard('Spot detectors', det, 'min', 'NFPA 72 ~84 m²/detector · cross-zone for release', 'ok');
+            kpiCard('detect','Spot detectors', det, 'units', 'minimum count · NFPA 72 ~84 m² per detector · cross-zoned for release', 'ok');
             // 6. discharge band
-            html += kpiCard('Discharge time', a.type==='inert'?'≤60':'≤10', 's', 'NFPA 2001 '+(a.type==='inert'?'inert':'halocarbon')+' · hold ≥10 min (door-fan test)', 'ok');
+            kpiCard('agent','Discharge time', a.type==='inert'?'≤60':'≤10', 's', 'NFPA 2001 '+(a.type==='inert'?'inert':'halocarbon')+' · hold ≥10 min (door-fan test)', 'ok');
             // Li-ion panel
             if(chem && kwh>0){
                 var heat = E.liIonRunawayHeatMJ(kwh, chem);
@@ -355,11 +321,11 @@
                 var roomConc = E.offGasRoomConcPct(kwh, chem, vol);
                 var onset = E.runawayOnsetC(chem);
                 var lflOk = E.offGasLflMarginOk(kwh, chem, vol);
-                html += kpiCard('Li-ion runaway heat', Math.round(heat).toLocaleString(), 'MJ', M.battery[chem].name+' · onset '+onset+' °C', 'warn');
-                html += kpiCard('Off-gas volume', Math.round(gas).toLocaleString(), 'm³', 'vent gas (H₂/CO) at full runaway', 'warn');
-                html += kpiCard('Off-gas vs LFL', roomConc.toFixed(1), 'vol%', lflOk ? 'within gas-alarm band' : 'FAR exceeds LFL — early off-gas detection + ventilation essential (NFPA 855)', lflOk ? 'ok' : 'alarm');
+                kpiCard('liion','Li-ion runaway heat', Math.round(heat).toLocaleString(), 'MJ', M.battery[chem].name+' · onset '+onset+' °C', 'warn');
+                kpiCard('liion','Off-gas volume', Math.round(gas).toLocaleString(), 'm³', 'vent gas (H₂/CO) at full runaway', 'warn');
+                kpiCard('liion','Off-gas vs LFL', roomConc.toFixed(1), 'vol%', lflOk ? 'within gas-alarm band' : 'FAR exceeds LFL — early off-gas detection + ventilation essential (NFPA 855)', lflOk ? 'ok' : 'alarm');
             }
-            $('fcKpis').innerHTML = html;
+            $('fcKpis').innerHTML = renderGroups();
             $('fcEngTag').textContent = 'engine v'+E.version+' · '+a.name;
             window.__fcKpis = __fcRows.slice();
         }
@@ -383,12 +349,12 @@
         function applyPreset(p){
             var cfg = PRESETS[p]; if(!cfg) return;
             Object.keys(cfg).forEach(function(k){ var el=$(k); if(el) el.value = cfg[k]; });
-            document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-preset')===p); });
+            document.querySelectorAll('.preset-btn').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-preset')===p ? 'true' : 'false'); });
             compute();
         }
         function reset(){
             Object.keys(DEFAULTS).forEach(function(k){ var el=$(k); if(el) el.value = DEFAULTS[k]; });
-            document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-preset')==='hall'); });
+            document.querySelectorAll('.preset-btn').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-preset')==='hall' ? 'true' : 'false'); });
             compute();
         }
         function init(){
@@ -403,7 +369,6 @@
         if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
     })();
     </script>
-    <script src="auth.js?v=20261031-f01cb5a3" defer></script>
-    <script src="js/rz-manual-fab.js?v=20260920-8972ee25" defer></script>
+<script src="auth.js?v=20261031-f01cb5a3" defer></script>
 </body>
 </html>

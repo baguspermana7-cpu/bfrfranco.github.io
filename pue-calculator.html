@@ -34,7 +34,7 @@
     <meta name="keywords" content="PUE Calculator, Power Usage Effectiveness, Data Center Efficiency, DCiE, ASHRAE TC 9.9, Green Grid, Cooling Efficiency">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#06b6d4">
+    <meta name="theme-color" content="#0b0c0e">
     <link rel="canonical" href="https://resistancezero.com/pue-calculator.html">
 
     <link rel="alternate" hreflang="en" href="https://resistancezero.com/pue-calculator.html">
@@ -152,324 +152,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
-
-    <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #0e4d6e 0%, #0891b2 50%, #06b6d4 100%);
-            --secondary-gradient: linear-gradient(135deg, #0891b2 0%, #0e4d6e 100%);
-            --dark-blue: #0e4d6e;
-            --medium-blue: #0891b2;
-            --light-blue: #06b6d4;
-            --accent-cyan: #06b6d4;
-            --accent-gold: #f59e0b;
-            --accent-emerald: #10b981;
-            --accent-purple: #64748b;
-            --accent-red: #ef4444;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-tertiary: #e9ecef;
-            --text-primary: #212529;
-            --text-secondary: #495057;
-            --text-muted: #495057;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-bg-dark: rgba(14, 77, 110, 0.95);
-            --glass-border: rgba(6, 182, 212, 0.1);
-            --glass-blur: none;
-            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body { font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
-
-        .page-background {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
-            background: radial-gradient(ellipse at top right, rgba(6, 182, 212, 0.08) 0%, transparent 50%), radial-gradient(ellipse at bottom left, rgba(8, 145, 178, 0.05) 0%, transparent 50%), linear-gradient(rgba(6, 182, 212, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
-        }
-
-        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); box-shadow: var(--shadow-md); }
-        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; max-width: 1400px; margin: 0 auto; }
-        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--dark-blue); }
-        .nav-logo { width: 44px; height: 44px; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: white; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); letter-spacing: -0.5px; }
-        .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--dark-blue); }
-        .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
-        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
-        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 8px 0; transition: color 0.3s; }
-        .nav-link:hover { color: var(--dark-blue); }
-        .nav-back { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--primary-gradient); border: none; border-radius: 8px; color: white; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25); }
-        .nav-back:hover { transform: translateY(-2px); }
-
-        .nav-auth-wrap { position: relative; margin-left: 0.5rem; }
-        .nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: #64748b; border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(100, 116, 139,0.3); white-space: nowrap; }
-        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(100, 116, 139,0.4); }
-        .nav-user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: rgba(100, 116, 139,0.08); border: 1px solid rgba(100, 116, 139,0.25); border-radius: 50px; cursor: pointer; transition: all 0.3s; font-family: inherit; color: var(--text-primary); }
-        .nav-user-btn:hover { background: rgba(100, 116, 139,0.14); }
-        .nav-user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #64748b; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 700; }
-        .nav-user-email { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
-        .nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
-        .nav-user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px; z-index: 1001; overflow: hidden; }
-        .nav-user-dropdown.show { display: block; }
-        .nav-dd-header { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
-        .nav-dd-tier-badge { display: inline-flex; padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .nav-dd-tier-badge.pro { background: #64748b; color: white; }
-        .nav-dd-email { font-size: 0.78rem; color: #64748b; word-break: break-all; }
-        .nav-dd-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; border: none; background: none; font-size: 0.82rem; font-weight: 500; color: #ef4444; cursor: pointer; font-family: inherit; transition: background 0.2s; }
-        .nav-dd-logout:hover { background: #fef2f2; }
-
-        .main-content { position: relative; z-index: 10; padding-top: 80px; }
-
-        /* Hero */
-        .hero { padding: 3rem 2rem 2rem; text-align: center; max-width: 900px; margin: 0 auto; }
-        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(6, 182, 212, 0.05)); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 4px; font-size: 0.8rem; color: var(--accent-cyan); font-weight: 600; margin-bottom: 1.5rem; }
-        .hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
-        .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; }
-
-        /* Quick Stats */
-        .quick-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
-        .quick-stat { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); }
-        .quick-stat i { color: var(--accent-cyan); }
-
-        /* Calculator */
-        .calculator-section { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .calculator-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; }
-
-        /* Input Panel */
-        .input-panel { display: flex; flex-direction: column; gap: 1.5rem; }
-        .input-section { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
-        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; cursor: pointer; }
-        .section-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
-        .section-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
-        .section-subtitle { font-size: 0.72rem; color: var(--text-muted); }
-
-        .input-group { margin-bottom: 1rem; }
-        .input-group:last-child { margin-bottom: 0; }
-        .input-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
-        .input-field { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; transition: border-color 0.3s; }
-        .input-field:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1); }
-        select.input-field { cursor: pointer; }
-
-        /* Preset buttons */
-        .preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-        .preset-btn { padding: 5px 12px; border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 50px; background: rgba(6, 182, 212, 0.05); color: var(--accent-cyan); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
-        .preset-btn:hover, .preset-btn.active { background: var(--accent-cyan); color: white; border-color: var(--accent-cyan); }
-
-        /* Range slider */
-        .range-wrap { display: flex; align-items: center; gap: 12px; }
-        .range-wrap input[type="range"] { flex: 1; height: 6px; -webkit-appearance: none; background: #e2e8f0; border-radius: 3px; outline: none; }
-        .range-wrap input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-cyan); cursor: pointer; box-shadow: 0 2px 6px rgba(6, 182, 212, 0.3); }
-        .range-value { min-width: 48px; text-align: center; font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--accent-cyan); }
-
-        /* Results Panel */
-        .results-panel { position: sticky; top: 100px; }
-        .results-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1.5rem; }
-        .pue-display { text-align: center; padding: 1.5rem 0; }
-        .pue-value { font-size: 4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1; }
-        .pue-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; }
-        .pue-rating { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; margin-top: 0.75rem; }
-
-        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.25rem; }
-        .metric-box { background: rgba(6, 182, 212, 0.04); border: 1px solid rgba(6, 182, 212, 0.1); border-radius: 4px; padding: 0.75rem; text-align: center; }
-        .metric-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
-        .metric-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
-
-        /* Recommendations */
-        .rec-section { margin-top: 1.25rem; }
-        .rec-title { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; }
-        .rec-card { display: flex; gap: 10px; padding: 0.75rem; background: rgba(6, 182, 212, 0.04); border: 1px solid rgba(6, 182, 212, 0.1); border-radius: 4px; margin-bottom: 0.5rem; }
-        .rec-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(6, 182, 212, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan); font-size: 0.8rem; flex-shrink: 0; }
-        .rec-text h4 { font-size: 0.78rem; font-weight: 600; color: var(--text-primary); }
-        .rec-text p { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
-        .rec-impact { font-size: 0.65rem; font-weight: 700; color: var(--accent-emerald); background: rgba(16, 185, 129, 0.08); padding: 2px 8px; border-radius: 50px; margin-top: 4px; display: inline-block; }
-
-        /* Charts */
-        .charts-section { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .chart-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1.5rem; }
-        .chart-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
-        .chart-container { position: relative; height: 280px; }
-
-        /* Tooltip System */
-        .tooltip-trigger { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.3); border-radius: 50%; font-size: 10px; color: var(--accent-cyan); cursor: help; margin-left: auto; transition: all 0.3s; flex-shrink: 0; }
-        .tooltip-trigger:hover { background: rgba(6,182,212,0.2); transform: scale(1.1); }
-        #tooltip-container { position: fixed; width: 320px; max-width: calc(100vw - 40px); padding: 16px; background: linear-gradient(135deg, #1e3a5f, #2d5a87); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); z-index: 999999; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.15s ease; color: white; font-size: 12px; line-height: 1.5; }
-        #tooltip-container.visible { opacity: 1; visibility: visible; }
-        #tooltip-container .tooltip-title { font-size: 13px; font-weight: 700; color: #22d3ee; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        #tooltip-container .tooltip-desc { color: rgba(255,255,255,0.9); }
-        .tooltip-trigger .tooltip-content { display: none !important; position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
-
-        /* Toolbar Row */
-        .pue-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0 auto; max-width: 1400px; padding: 0 2rem 1.25rem; flex-wrap: wrap; }
-        .pue-mode-bar { display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; }
-        .pue-toolbar-btn { padding: 0.55rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.82rem; font-family: inherit; transition: all 0.25s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-        .pue-btn-free { background: transparent; color: #64748b; }
-        .pue-btn-free.active { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; box-shadow: 0 2px 8px rgba(6,182,212,0.3); }
-        .pue-btn-free:not(.active):hover { background: rgba(6,182,212,0.08); color: #0891b2; }
-        .pue-btn-pro { background: transparent; color: #64748b; }
-        .pue-btn-pro.active { background: #64748b; color: white; box-shadow: 0 2px 8px rgba(100, 116, 139,0.3); }
-        .pue-btn-pro:not(.active):hover { background: rgba(100, 116, 139,0.08); color: #64748b; }
-        .pue-btn-pro.locked-hint { position: relative; }
-        .pue-btn-pro.locked-hint::after { content: ''; position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; border: 2px solid #f1f5f9; }
-        .pue-toolbar-actions { display: flex; gap: 0.5rem; align-items: center; }
-        .pue-btn-reset { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #64748b; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
-        .pue-btn-reset:hover { border-color: #06b6d4; color: #06b6d4; background: rgba(6,182,212,0.04); }
-        .pue-btn-pdf { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.04); color: #ef4444; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
-        .pue-btn-pdf:hover { border-color: #ef4444; background: rgba(239,68,68,0.1); box-shadow: 0 2px 8px rgba(239,68,68,0.15); }
-        .pue-btn-pdf.disabled { opacity: 0.45; pointer-events: none; }
-        .pue-mode-indicator { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 50px; display: none; }
-        .pue-mode-indicator.free-active { display: inline-flex; background: rgba(6,182,212,0.1); color: #0891b2; }
-        .pue-mode-indicator.pro-active { display: inline-flex; background: rgba(100, 116, 139,0.1); color: #64748b; }
-
-        /* Print Styles */
-        @media print {
-            body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .navbar, .hero, .pue-toolbar, #loginModal, .nav-back, footer, .tooltip-trigger, .pro-overlay, .pro-badge, .preset-row { display: none !important; }
-            .main-content { padding-top: 0 !important; }
-            .calculator-section { padding: 0 !important; }
-            .calculator-grid { display: block !important; }
-            .pro-section.locked > *:not(.pro-overlay) { filter: none !important; user-select: auto !important; pointer-events: auto !important; }
-            .results-panel { position: static !important; }
-            @page { margin: 1cm; size: A4; }
-        }
-
-        /* PRO Sections */
-        .pro-section { position: relative; }
-        .pro-section.locked > *:not(.pro-overlay) { filter: blur(6px); user-select: none; pointer-events: none; }
-        .pro-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); border-radius: 16px; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; pointer-events: all; cursor: pointer; }
-        .pro-section.locked .pro-overlay { display: flex; }
-        .pro-overlay i { font-size: 2rem; color: var(--accent-purple); }
-        .pro-overlay-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
-        .pro-overlay-desc { font-size: 0.8rem; color: var(--text-muted); text-align: center; max-width: 260px; }
-        .pro-overlay-btn { padding: 8px 20px; background: #64748b; border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        .pro-overlay-btn:hover { transform: translateY(-1px); }
-        .pro-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: rgba(100,116,139,.12);border:1px solid rgba(100,116,139,.42); color:#64748b; font-size: 0.6rem; font-weight: 700; border-radius: 4px; letter-spacing: 0.5px; vertical-align: middle; }
-
-        /* Industry Comparison */
-        .comparison-bar { height: 8px; border-radius: 4px; background: #e2e8f0; position: relative; margin: 8px 0 4px; }
-        .comparison-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
-        .comparison-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); }
-
-        /* Login Modal */
-        @keyframes modalSlideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .calculator-grid { grid-template-columns: 1fr; }
-            .results-panel { position: static; }
-            .charts-grid { grid-template-columns: 1fr; }
-            .hero h1 { font-size: 1.8rem; }
-            .pue-value { font-size: 3rem; }
-            .metric-grid { grid-template-columns: 1fr; }
-        }
-        /* Calculator Disclaimer */
-        .calc-disclaimer { background: #f1f5f9 !important; border: 1px solid #cbd5e1 !important; border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1.5rem; }
-        .calc-disclaimer .disc-title { color: #1e293b !important; }
-        .calc-disclaimer .disc-text { color: #475569 !important; }
-        .calc-disclaimer .disc-text strong { color: #1e293b !important; }
-        .calc-disclaimer .disc-text a { color: #2563eb !important; }
-        .calc-disclaimer .disc-fine { color: #64748b !important; }
-            /* Cookie Banner */
-        @media (max-width: 768px) {}
-        @media print {}
-        /* ─── Dark Mode ─────────────────────────────────── */
-        [data-theme="dark"] { --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-tertiary:#334155; --text-primary:#f1f5f9; --text-secondary:#cbd5e1; --text-muted:#94a3b8; --glass-bg:rgba(15,23,42,0.92); --glass-border:rgba(6,182,212,0.2); --shadow-sm:0 2px 4px rgba(0,0,0,0.3); --shadow-md:0 4px 12px rgba(0,0,0,0.4); --shadow-lg:0 8px 30px rgba(0,0,0,0.5); }
-        [data-theme="dark"] body { background:#0f172a; }
-        [data-theme="dark"] .navbar { background:rgba(15,23,42,0.95); border-bottom-color:rgba(6,182,212,0.15); }
-        [data-theme="dark"] .input-section { background:rgba(30,41,59,0.8); border-color:rgba(6,182,212,0.15); }
-        [data-theme="dark"] .results-panel { background:rgba(30,41,59,0.8); border-color:rgba(6,182,212,0.15); }
-        [data-theme="dark"] .input-field { background:#1e293b; border-color:#334155; color:#f1f5f9; }
-        [data-theme="dark"] .input-field option { background:#1e293b; color:#f1f5f9; }
-        [data-theme="dark"] .pue-btn-reset { background:#1e293b; border-color:#334155; color:#94a3b8; }
-        [data-theme="dark"] .nav-user-dropdown { background:#1e293b; border-color:#334155; }
-        [data-theme="dark"] .nav-dd-header { border-color:#334155; }
-        [data-theme="dark"] .nav-dd-email { color:#94a3b8; }
-        [data-theme="dark"] .nav-dd-logout:hover { background:rgba(239,68,68,0.1); }
-        .nav-theme-btn { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px; border:1px solid var(--glass-border); background:transparent; color:var(--text-secondary); cursor:pointer; transition:all 0.25s; font-size:0.9rem; padding:0; }
-        .nav-theme-btn:hover { border-color:#06b6d4; color:#06b6d4; background:rgba(6,182,212,0.08); }
-        [data-theme="dark"] .nav-theme-btn { color:#f59e0b; }
-        [data-theme="dark"] .nav-theme-btn:hover { color:#fbbf24; border-color:rgba(251,191,36,0.4); background:rgba(251,191,36,0.08); }
-        /* ===== PLAN v13 DARK-MODE EXTENSIONS ===== */
-        [data-theme="dark"] .results-card { background:#1e293b; border-color:rgba(255,255,255,0.08); color:#f1f5f9; }
-        [data-theme="dark"] .chart-card { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .chart-title { color:#f1f5f9; }
-        [data-theme="dark"] .input-field { background:#1e293b; border-color:#334155; color:#f1f5f9; }
-        [data-theme="dark"] .input-field option { background:#1e293b; color:#f1f5f9; }
-        [data-theme="dark"] .pue-mode-bar { background:#0f172a; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .pue-toolbar-btn { color:#94a3b8; }
-        [data-theme="dark"] .pue-mode-indicator { color:#94a3b8; }
-        [data-theme="dark"] .breakdown-table th { background:#0f172a; color:#cbd5e1; border-bottom-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .breakdown-table td { color:#e2e8f0; border-bottom-color:rgba(255,255,255,0.06); }
-        [data-theme="dark"] .breakdown-table tr:hover td { background:rgba(255,255,255,0.02); }
-        [data-theme="dark"] .breakdown-table .amount { color:#f1f5f9; }
-        [data-theme="dark"] .breakdown-table .percent { color:#94a3b8; }
-        [data-theme="dark"] .section-title { color:#f1f5f9; }
-        [data-theme="dark"] .calc-disclaimer { background:#1e293b !important; border-color:#334155 !important; color:#cbd5e1 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-title { color:#f1f5f9 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-text { color:#cbd5e1 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-text strong { color:#f1f5f9 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-fine { color:#94a3b8 !important; }
-        [data-theme="dark"] .nav-user-dropdown { background:#1e293b; border-color:#334155; }
-        [data-theme="dark"] .kpi-card { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .kpi-label { color:#94a3b8; }
-        [data-theme="dark"] .pro-panel { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .pro-panel h3 { color:#f1f5f9; }
-        [data-theme="dark"] .narrative-card { background:rgba(6,182,212,0.05); border-color:rgba(6,182,212,0.12); color:#cbd5e1; }
-        [data-theme="dark"] .narrative-card strong { color:#f1f5f9; }
-
-        /* v1.4.1 — class-mismatch fix: HTML uses .input-field but CSS targeted page-prefix */
-        [data-theme="dark"] .input-field,
-        [data-theme="dark"] .country-select,
-        [data-theme="dark"] select.input-field,
-        [data-theme="dark"] input.input-field { background:#1e293b !important; border-color:rgba(255,255,255,0.12) !important; color:#f1f5f9 !important; }
-        [data-theme="dark"] .input-field:focus { border-color:#10b981 !important; box-shadow:0 0 0 3px rgba(16,185,129,0.18) !important; }
-        [data-theme="dark"] .input-field option,
-        [data-theme="dark"] select.input-field option { background:#1e293b !important; color:#f1f5f9 !important; }
-        [data-theme="dark"] .input-label { color:#cbd5e1; }
-
-/* a11y (v1.52.4) */
-:root:not([data-theme="dark"]) .quick-stat { color:#495057 !important; }
-[data-theme="dark"] div > p { color:#94a3b8 !important; }
-[data-theme="dark"] #cookieDecline { color:#94a3b8 !important; }
-:root:not([data-theme="dark"]) #pueAt50 { color:#92400e !important; }
-:root:not([data-theme="dark"]) #wueVal, :root:not([data-theme="dark"]) #waterVal { color:#0e7490 !important; }
-:root:not([data-theme="dark"]) [id][style*="6c757d"], :root:not([data-theme="dark"]) #energyRate, :root:not([data-theme="dark"]) #coolingEnergyFactor, :root:not([data-theme="dark"]) #freeCoolingHours { color:#495057 !important; }
-:root:not([data-theme="dark"]) div > span[style*="rgb(108, 117, 125)"] { color:#495057 !important; }
-[data-theme="dark"] #ratingText, [data-theme="dark"] .comparison-label span { color:#93c5fd !important; }
-/* accent vars: darker in light theme (inline var() usages inherit) */
-:root:not([data-theme="dark"]) { --accent-purple:#64748b; --accent-emerald:#047857; --accent-cyan:#0e7490; --accent-gold:#92400e; --accent-amber:#92400e; --accent-red:#b91c1c; --accent-blue:#1d4ed8; }
-[data-theme="dark"] { --accent-purple:#67e8f9; }
-:root:not([data-theme="dark"]) [style*="rgb(8,145,178)"] { color:#64748b !important; }
-[data-theme="dark"] [style*="rgb(8,145,178)"] { color:#67e8f9 !important; }
-:root:not([data-theme="dark"]) [style*="rgb(16, 185, 129)"] { color:#047857 !important; }
-:root:not([data-theme="dark"]) [style*="rgb(108, 117, 125)"] { color:#495057 !important; }
-:root:not([data-theme="dark"]) #upsLoadDisplay, :root:not([data-theme="dark"]) .comparison-label span { color:#0e7490 !important; }
-:root:not([data-theme="dark"]) #ratingText { color:#1d4ed8 !important; }
-:root:not([data-theme="dark"]) [style*="rgb(6, 182, 212)"] { color:#0e7490 !important; }
-.pro-overlay, .pro-overlay * { color:#1e293b !important; }
-:root:not([data-theme="dark"]) [style*="color: #64748b"], :root:not([data-theme="dark"]) [style*="color:#64748b"] { color:#64748b !important; }
-:root:not([data-theme="dark"]) [style*="color: #10b981"], :root:not([data-theme="dark"]) [style*="color:#10b981"] { color:#047857 !important; }
-:root:not([data-theme="dark"]) [style*="color: #6c757d"], :root:not([data-theme="dark"]) [style*="color:#6c757d"] { color:#495057 !important; }
-:root:not([data-theme="dark"]) #btnProMode { color:#475569 !important; }
-:root:not([data-theme="dark"]) #modeIndicator { color:#155e75 !important; }
-[data-theme="dark"] #modeIndicator { color:#22d3ee !important; }
-#btnExportPDF { opacity:1 !important; }
-:root:not([data-theme="dark"]) #btnExportPDF { color:#b91c1c !important; }
-[data-theme="dark"] #btnExportPDF { color:#f8b4b4 !important; }
-#cookieDecline { color:#475569 !important; }
-[data-theme="dark"] #cookieBanner a, [data-theme="dark"] .disc-text a { color:#93c5fd !important; }
-:root:not([data-theme="dark"]) .disc-fine a { color:#1d4ed8 !important; }
-button[onclick^="setITLoad"] { background:#0e7490 !important; border-color:#0e7490 !important; color:#fff !important; }
-[data-theme="dark"] [style*="color: #164e63"], [data-theme="dark"] [style*="color:#164e63"] { color:#67e8f9 !important; }
-[data-theme="dark"] div > h3[style] { color:#67e8f9 !important; }
-/* a11y final overrides */
-:root:not([data-theme="dark"]) span.quick-stat[class], :root:not([data-theme="dark"]) .quick-stat i { color:#495057 !important; }
-:root:not([data-theme="dark"]) #pueValue { color:#0e7490 !important; }
-</style>
-    <script src="js/rz-version.js?v=20261101-22a91a90" defer></script>
+    <script src="js/rz-version.js?v=20261101-732b47d5" defer></script>
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
@@ -516,213 +199,112 @@ button[onclick^="setITLoad"] { background:#0e7490 !important; border-color:#0e74
         ]
     }
     </script>
-
-<style id="rz-mobile-v18">
-/* v1.8.0 — mobile responsive patch */
-@media (max-width: 768px) {
-  html, body { overflow-x: hidden; max-width: 100vw; }
-  /* The toolbar carries an INLINE `padding: 0 2rem`, so a media-query padding needs !important
-     to reach it: 64px of gutter left a button row that could not wrap running past 390px. */
-  .pue-toolbar { padding: 0 1rem !important; }
-  .pue-toolbar-actions { flex-wrap: wrap; justify-content: center; }
-  img, picture, video { max-width: 100%; height: auto; display: block; }
-  .nav-menu, .nav-links { display: none; }
-  .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
-  button, a.btn, [role="button"] { min-height: 44px; }
-}
-</style>
-<style id="rz-skiplink-v1">
-.skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
-.skip-link:focus{top:0}
-[data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
-</style>
-<style id="rz-lightfix-v1">
-/* RZ-LIGHTFIX v1 — light-mode contrast restoration after the v1.19.1
-   default-theme flip to light. Scope: html:not([data-theme="dark"]) only,
-   so dark rendering is unchanged. Same-hue WCAG-AA shades. Idempotent. */
-html:not([data-theme="dark"]) .cookie-decline,
-html:not([data-theme="dark"]) .tco-cookie-decline { color:#475569 !important; }
-html:not([data-theme="dark"]) .calc-disclaimer .disc-fine,
-html:not([data-theme="dark"]) .disc-fine { color:#475569 !important; }
-html:not([data-theme="dark"]) .nav-user-email,
-html:not([data-theme="dark"]) .rz-user-email { color:#475569 !important; }
-html:not([data-theme="dark"]) .pro-badge,
-html:not([data-theme="dark"]) .nav-pro-badge { background:#64748b !important; color:#fff !important; }
-/* Per-link inline rainbow nav colours (authored for the old dark default)
-   are illegible on the white light navbar. Same-hue AA-700 shades keep the
-   colour-coded wayfinding. Safe: verified no inline border-color:#<accent>
-   or background-color:#<accent> exists on these pages, so [style*] only
-   ever matches a genuine text `color:` declaration; CSS !important beats
-   an inline declaration that carries no !important. */
-html:not([data-theme="dark"]) .nav-link[style*="#10b981"],
-html:not([data-theme="dark"]) .nav-link[style*="#22c55e"] { color:#047857 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#0d9488"],
-html:not([data-theme="dark"]) .nav-link[style*="#14b8a6"] { color:#0f766e !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#06b6d4"] { color:#0e7490 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#3b82f6"] { color:#1d4ed8 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#64748b"] { color:#64748b !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#f59e0b"],
-html:not([data-theme="dark"]) .nav-link[style*="#d97706"] { color:#b45309 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#ef4444"] { color:#b91c1c !important; }
-
-html:not([data-theme="dark"]) .hero-badge,
-html:not([data-theme="dark"]) .preset-btn,
-html:not([data-theme="dark"]) .range-value { color:#0e7490 !important; }
-html:not([data-theme="dark"]) .rec-impact,
-html:not([data-theme="dark"]) .pue-savings,
-html:not([data-theme="dark"]) .saving-value { color:#047857 !important; }
-html:not([data-theme="dark"]) .pue-btn-pdf { color:#b91c1c !important; }
-html:not([data-theme="dark"]) .pue-mode-indicator.pro-active { color:#64748b !important; }
-html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !important; }
-/* a11y last-block overrides */
-:root:not([data-theme="dark"]) span.quick-stat, :root:not([data-theme="dark"]) .hero div > span { color:#495057 !important; }
-</style>
     <!-- PLAN02 E4 — editorial chrome (dark-only, chrome only) -->
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-<style>
-/* Mobile form controls: 16px, or iOS Safari zooms the viewport on focus and does not zoom back.
-   This page does not load styles.min.css, so it carries the rule itself. */
-@media (max-width: 768px) {
-  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
-  select, textarea { font-size: 16px !important; }
-}
-</style>
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261027-0044">
+
+    <link rel="stylesheet" href="css/rz-hub.css">
+    <link rel="stylesheet" href="css/rz-tool.css">
 </head>
-<body data-rz-calc="pue">
+<body class="hub tool" data-rz-calc="pue" data-rz-account-pill="off">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
-    <div class="page-background"></div>
+    
 
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-brand">
-                <div class="nav-logo">PUE</div>
-                <div>
-                    <div class="nav-title">PUE Calculator</div>
-                    <div class="nav-subtitle">Power Usage Effectiveness</div>
-                </div>
-            </a>
-            <div class="nav-links">
-                <a href="datacenter-solutions.html" class="nav-link">DC Solutions</a>
-                <a href="capex-calculator.html" class="nav-link" style="color: #f59e0b;">CAPEX Calc</a>
-                <a href="opex-calculator.html" class="nav-link" style="color: #10b981;">OPEX Calc</a>
-                <a href="tia-942-checklist.html" class="nav-link" style="color: #10b981;">TIA-942</a>
-                <a href="dcmoc/" class="nav-link" style="color: #ef4444;">DC MOC</a>
-                <a href="tco-calculator.html" class="nav-link" style="color: #0369a1;">TCO Calc</a>
-                <a href="dc-market-tracker.html" class="nav-link" style="color: #0d9488;">Market</a>
-                <a href="glossary.html" class="nav-link" style="color: #14b8a6;">Glossary</a>
-                <button class="nav-theme-btn" id="navThemeBtn" onclick="toggleCalcTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i id="themeIcon" class="fas fa-moon"></i></button>
-                <div class="nav-auth-wrap" id="navAuthWrap">
-                    <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
-                        <i class="fas fa-user-circle"></i>
-                        <span class="nav-login-text">Login</span>
-                    </button>
-                    <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
-                        <div class="nav-user-avatar" id="navUserAvatar">U</div>
-                        <span class="nav-user-email" id="navUserEmail"></span>
-                        <i class="fas fa-chevron-down nav-user-chevron"></i>
-                    </button>
-                    <div class="nav-user-dropdown" id="navUserDropdown">
-                        <div class="nav-dd-header">
-                            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div>
-                            <div class="nav-dd-email" id="navDdEmail"></div>
-                        </div>
-                        <button class="nav-dd-logout" onclick="logoutPremium()">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </div>
-                </div>
-                <a href="datacenter-solutions.html" class="nav-back">
-                    <i class="fas fa-arrow-left"></i>
-                    Portfolio
-                </a>
-            </div>
+    <nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+          <div class="nav-auth-wrap" id="navAuthWrap">
+        <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()"><span class="nav-login-text">Login</span></button>
+        <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()"><span class="nav-user-avatar" id="navUserAvatar">U</span><span class="nav-user-email" id="navUserEmail"></span></button>
+        <div class="nav-user-dropdown" id="navUserDropdown">
+          <div class="nav-dd-header"><div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div><div class="nav-dd-email" id="navDdEmail"></div></div>
+          <a class="nav-dd-link" href="account.html">My account and saved scenarios</a>
+          <button class="nav-dd-logout" onclick="logoutPremium()">Logout</button>
+        </div>
+      </div>
+    <button class="nav-icon theme-toggle" id="navThemeBtn" onclick="toggleCalcTheme()" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i id="themeIcon" class="fas fa-moon"></i></button>
+  </div>
+</nav>
 
     <main data-explain-scan class="main-content" id="main-content">
-        <!-- Hero -->
-        <section class="hero">
-            <div class="hero-badge">
-                <i class="fas fa-tachometer-alt"></i>
-                Power Usage Effectiveness
+        <header class="tool-head">
+            <div class="wrap">
+                <p class="eyebrow">DC Solutions · <b>Calculator</b> · PUE</p>
+                <h1>Power usage effectiveness <span class="muted">from cooling, UPS and climate</span></h1>
+                <p class="lede">PUE, DCiE, facility power, annual energy and cost from IT load, rack density, cooling type, containment, UPS and climate, computed in your browser by RZEngine. Change any input and every figure follows.</p>
+                <p class="basis">engine RZEngine · basis ASHRAE TC 9.9, The Green Grid · updated 2026-10</p>
+                <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → Calculator → PUE</p>
             </div>
-            <h1>PUE Calculator</h1>
-            <p>Analyze data center power efficiency based on cooling architecture, UPS configuration, climate zone, and facility loads. Aligned with ASHRAE TC 9.9 and Green Grid standards.</p>
-            <div style="max-width:800px;margin:1.5rem auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:1px solid rgba(6,182,212,0.15);">
-                <img data-rz-hero src="assets/pue-calculator-hero.jpg" alt="PUE — Power Usage Effectiveness for Data Centers" style="width:100%;height:auto;display:block;" loading="lazy" width="1200" height="509">
-            </div>
-            <div class="rzt-explainer" style="max-width:800px;margin:0 auto 1.5rem;text-align:left;padding:1.25rem 1.5rem;background:rgba(6,182,212,0.04);border:1px solid rgba(6,182,212,0.12);border-radius:12px;">
-                <h3 style="font-size:0.95rem;font-weight:700;color:#164e63;margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-info-circle" style="color:#06b6d4;"></i> What is PUE?</h3>
-                <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.75rem 0;">
-                    <strong>Power Usage Effectiveness (PUE)</strong> is the globally accepted metric for measuring data center energy efficiency, developed by <strong>The Green Grid</strong> and standardized in <strong>ISO/IEC 30134-2</strong>. It is defined by a simple formula:
-                </p>
-                <div style="text-align:center;padding:0.75rem;background:rgba(6,182,212,0.06);border-radius:10px;margin-bottom:0.75rem;">
-                    <span style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:#164e63;">PUE = Total Facility Power / IT Equipment Power</span>
-                </div>
-                <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.5rem 0;">
-                    A <strong>PUE of 1.0</strong> means 100% of power reaches IT equipment (theoretical ideal). The <strong>global average is ~1.52</strong> (Uptime Institute 2026 survey), meaning about 34% of power is consumed by cooling, UPS losses, lighting, and other overhead. Leading hyperscalers achieve <strong>PUE 1.1-1.2</strong> through advanced cooling, economizers, and optimized power distribution.
-                </p>
-                <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0;">
-                    This calculator models PUE from <strong>first principles</strong> — accounting for cooling COP, UPS topology, transformer losses, PDU efficiency, containment strategy, climate zone, and economizer mode. It helps operators identify the highest-impact efficiency improvements and project energy costs over time.
-                </p>
-            </div>
-            <div class="quick-stats">
-                <span class="quick-stat"><i class="fas fa-snowflake"></i> 6 cooling types</span>
-                <span class="quick-stat"><i class="fas fa-globe"></i> 6 climate zones</span>
-                <span class="quick-stat"><i class="fas fa-bolt"></i> 4 UPS types</span>
-                <span class="quick-stat"><i class="fas fa-chart-bar"></i> Real-time charts</span>
-            </div>
-        </section>
+        </header>
 
-        <!-- Toolbar Row -->
-        <div class="pue-toolbar">
-            <div class="pue-mode-bar">
-                <button class="pue-toolbar-btn pue-btn-free active" id="btnFreeMode" onclick="setMode('free')">
-                    <i class="fas fa-chart-bar"></i> Free Assessment
-                </button>
-                <button class="pue-toolbar-btn pue-btn-pro locked-hint" id="btnProMode" onclick="setMode('pro')">
-                    <i class="fas fa-crown"></i> Full analysis
-                </button>
+        <div class="wrap">
+        <div class="tool-bar" role="toolbar" aria-label="Mode and actions">
+            <div class="seg" role="group" aria-label="Assessment depth">
+                <button class="pue-toolbar-btn pue-btn-free active" id="btnFreeMode" onclick="setMode('free')">Free</button>
+                <button class="pue-toolbar-btn pue-btn-pro locked-hint" id="btnProMode" onclick="setMode('pro')">Full</button>
             </div>
-            <span class="pue-mode-indicator free-active" id="modeIndicator">FREE MODE</span>
-            <div class="pue-toolbar-actions">
-                <button class="pue-btn-reset" onclick="resetDefaults()">
-                    <i class="fas fa-undo"></i> Reset
-                </button>
-                <button class="pue-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()">
-                    <i class="fas fa-file-pdf"></i> Export PDF
-                </button>
-                <button class="pue-btn-reset" id="btnExportCSV" onclick="exportPueCSV()">
-                    <i class="fas fa-file-csv"></i> Export CSV
-                </button>
-                <button id="btnSaveAccount" onclick="rzScenario&&rzScenario.saveToAccount('pue',{msgEl:'acctSaveMsg'})" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;cursor:pointer;font-weight:700;font-size:0.82rem;font-family:inherit;"><i class="fas fa-cloud"></i> Save to my account</button>
-            </div>
+            <span class="pue-mode-indicator free-active" id="modeIndicator" hidden>FREE MODE</span>
+            <span class="spacer"></span>
+            <button class="tool-btn pue-btn-reset" onclick="resetDefaults()">Reset</button>
+            <button class="tool-btn pue-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()">Export PDF</button>
+            <button class="tool-btn pue-btn-reset" id="btnExportCSV" onclick="exportPueCSV()">Export CSV</button>
+            <button class="tool-btn" id="btnSaveAccount" onclick="rzScenario&&rzScenario.saveToAccount('pue',{msgEl:'acctSaveMsg'})">Save</button>
         </div>
-        <div id="acctSaveMsg" style="display:none;margin:6px 0 0;font-size:0.72rem;text-align:center;"></div>
+        <div id="acctSaveMsg" style="display:none;"></div>
         <div class="rz-calc-validation" id="pueValidation" role="alert" aria-live="polite" hidden></div>
+        </div>
 
         <!-- Calculator -->
-        <section class="calculator-section">
-            <div class="calculator-grid">
+        <section class="calculator-section wrap">
+            <div class="calculator-grid tool-bench">
                 <!-- Input Panel -->
-                <div class="input-panel">
+                <div class="input-panel tool-inputs">
 
                     <!-- Section 1: IT Infrastructure -->
                     <div class="input-section">
                         <div class="section-header">
-                            <div class="section-icon" style="background: rgba(6,182,212,0.1); color: #06b6d4;">
-                                <i class="fas fa-server"></i>
-                            </div>
+                            
                             <div>
                                 <div class="section-title">IT Infrastructure</div>
                                 <div class="section-subtitle">Load capacity and rack configuration</div>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">IT Load (kW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-server"></i> IT Load</div><div class="tooltip-desc">Total IT power consumption in kilowatts. This is the denominator of the PUE formula (PUE = Total Facility Power / IT Load). Typical ranges: 100kW (edge) to 10MW+ (hyperscale).</div></div></span></label>
+                            <label class="input-label">IT Load (kW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">IT Load</div><div class="tooltip-desc">Total IT power consumption in kilowatts. This is the denominator of the PUE formula (PUE = Total Facility Power / IT Load). Typical ranges: 100kW (edge) to 10MW+ (hyperscale).</div></div></span></label>
                             <div class="preset-row">
                                 <button class="preset-btn" onclick="setITLoad(100)">100kW Edge</button>
                                 <button class="preset-btn" onclick="setITLoad(500)">500kW Enterprise</button>
@@ -733,7 +315,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             <input type="number" id="itLoad" class="input-field" value="1000" min="50" max="100000" step="50" oninput="calculate()" aria-label="It Load">
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Rack Density <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-th"></i> Rack Density</div><div class="tooltip-desc">Power per rack in kW. Higher density (AI/HPC 30kW+) requires more efficient cooling. Standard enterprise is 5-8 kW/rack, high-density 15kW+, AI/HPC 30kW+.</div></div></span></label>
+                            <label class="input-label">Rack Density <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Rack Density</div><div class="tooltip-desc">Power per rack in kW. Higher density (AI/HPC 30kW+) requires more efficient cooling. Standard enterprise is 5-8 kW/rack, high-density 15kW+, AI/HPC 30kW+.</div></div></span></label>
                             <select id="rackDensity" class="input-field" onchange="calculate()" aria-label="Rack Density">
                                 <option value="5">Standard (5 kW/rack)</option>
                                 <option value="8" selected>Medium (8 kW/rack)</option>
@@ -742,7 +324,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             </select>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Rack Count <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-th"></i> Rack Count</div><div class="tooltip-desc">Total number of racks in the facility. Auto-calculated from IT Load ÷ Rack Density, but can be manually overridden. Used to scale security and fire suppression facility loads (kW/rack × rack count).</div></div></span> <span style="font-weight:400;color:var(--text-muted);">(auto-calculated)</span></label>
+                            <label class="input-label">Rack Count <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Rack Count</div><div class="tooltip-desc">Total number of racks in the facility. Auto-calculated from IT Load ÷ Rack Density, but can be manually overridden. Used to scale security and fire suppression facility loads (kW/rack × rack count).</div></div></span> <span>(auto-calculated)</span></label>
                             <input type="number" id="rackCount" class="input-field" value="125" min="1" max="10000" oninput="calculate()" aria-label="Rack Count">
                         </div>
                     </div>
@@ -750,16 +332,14 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                     <!-- Section 2: Cooling System -->
                     <div class="input-section">
                         <div class="section-header">
-                            <div class="section-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
-                                <i class="fas fa-snowflake"></i>
-                            </div>
+                            
                             <div>
                                 <div class="section-title">Cooling System</div>
                                 <div class="section-subtitle">Cooling architecture and climate</div>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Cooling Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Type</div><div class="tooltip-desc">Cooling architecture determines the Coefficient of Performance (COP). Higher COP = less energy per kW of heat removed. CRAC (COP ~2.8) is least efficient; Immersion (COP ~25) is most efficient.</div></div></span></label>
+                            <label class="input-label">Cooling Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Cooling Type</div><div class="tooltip-desc">Cooling architecture determines the Coefficient of Performance (COP). Higher COP = less energy per kW of heat removed. CRAC (COP ~2.8) is least efficient; Immersion (COP ~25) is most efficient.</div></div></span></label>
                             <select id="coolingType" class="input-field" onchange="calculate()" aria-label="Cooling Type">
                                 <option value="crac">CRAC — Computer Room AC (COP ~2.8)</option>
                                 <option value="crah" selected>CRAH — Computer Room Air Handler (COP ~4.0)</option>
@@ -770,7 +350,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             </select>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Containment Strategy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-box"></i> Containment</div><div class="tooltip-desc">Airflow containment prevents hot/cold air mixing, improving cooling efficiency by 10-25%. Cold-aisle containment is most common. Chimney cabinets exhaust directly to plenum.</div></div></span></label>
+                            <label class="input-label">Containment Strategy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Containment</div><div class="tooltip-desc">Airflow containment prevents hot/cold air mixing, improving cooling efficiency by 10-25%. Cold-aisle containment is most common. Chimney cabinets exhaust directly to plenum.</div></div></span></label>
                             <select id="containment" class="input-field" onchange="calculate()" aria-label="Containment">
                                 <option value="none">None</option>
                                 <option value="hot">Hot-Aisle Containment</option>
@@ -779,7 +359,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             </select>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Climate Zone <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-globe"></i> Climate Zone</div><div class="tooltip-desc">Ambient temperature affects cooling energy. Tropical humid zones (avg 28°C+) have highest cooling overhead. Cold climates enable free cooling for 4,000+ hours/year, significantly reducing PUE.</div></div></span></label>
+                            <label class="input-label">Climate Zone <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Climate Zone</div><div class="tooltip-desc">Ambient temperature affects cooling energy. Tropical humid zones (avg 28°C+) have highest cooling overhead. Cold climates enable free cooling for 4,000+ hours/year, significantly reducing PUE.</div></div></span></label>
                             <select id="climateZone" class="input-field" onchange="calculate()" aria-label="Climate Zone">
                                 <option value="tropical_humid">Tropical Humid (e.g., Jakarta, Singapore)</option>
                                 <option value="tropical_dry">Tropical Dry (e.g., Dubai, Phoenix)</option>
@@ -794,16 +374,14 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                     <!-- Section 3: Power Distribution -->
                     <div class="input-section">
                         <div class="section-header">
-                            <div class="section-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
-                                <i class="fas fa-bolt"></i>
-                            </div>
+                            
                             <div>
                                 <div class="section-title">Power Distribution</div>
                                 <div class="section-subtitle">UPS and redundancy configuration</div>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">UPS Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bolt"></i> UPS Type</div><div class="tooltip-desc">UPS efficiency varies by topology. Double-conversion (92-96%) is most common but least efficient. Rotary/DRUPS (95-97%) and flywheel hybrid (97-99%) minimize conversion losses.</div></div></span></label>
+                            <label class="input-label">UPS Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">UPS Type</div><div class="tooltip-desc">UPS efficiency varies by topology. Double-conversion (92-96%) is most common but least efficient. Rotary/DRUPS (95-97%) and flywheel hybrid (97-99%) minimize conversion losses.</div></div></span></label>
                             <select id="upsType" class="input-field" onchange="calculate()" aria-label="UPS Type">
                                 <option value="double" selected>Double-Conversion (Online)</option>
                                 <option value="line">Line-Interactive</option>
@@ -812,14 +390,14 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             </select>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">UPS Load Factor: <span id="upsLoadDisplay" style="color:var(--accent-cyan);font-family:'JetBrains Mono',monospace;">50%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-battery-half"></i> UPS Load Factor</div><div class="tooltip-desc">Percentage of UPS rated capacity actually utilized. UPS efficiency varies with load — most units are least efficient at low loads (25-40%) and peak efficiency at 50-75%. Running at 40-60% provides optimal efficiency while maintaining headroom for growth and failover.</div></div></span></label>
+                            <label class="input-label">UPS Load Factor: <span id="upsLoadDisplay">50%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">UPS Load Factor</div><div class="tooltip-desc">Percentage of UPS rated capacity actually utilized. UPS efficiency varies with load — most units are least efficient at low loads (25-40%) and peak efficiency at 50-75%. Running at 40-60% provides optimal efficiency while maintaining headroom for growth and failover.</div></div></span></label>
                             <div class="range-wrap">
                                 <input type="range" id="upsLoadFactor" min="25" max="100" value="50" step="5" oninput="updateUpsLoad(); calculate()" aria-label="UPS Load Factor">
                                 <span class="range-value" id="upsLoadValue">50%</span>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Redundancy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Redundancy</div><div class="tooltip-desc">Higher redundancy increases reliability but adds power overhead. N = no spare, N+1 = one spare module (+2-5%), 2N = fully mirrored (+5-10%), 2N+1 = mirrored plus spare (+8-15%).</div></div></span></label>
+                            <label class="input-label">Redundancy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Redundancy</div><div class="tooltip-desc">Higher redundancy increases reliability but adds power overhead. N = no spare, N+1 = one spare module (+2-5%), 2N = fully mirrored (+5-10%), 2N+1 = mirrored plus spare (+8-15%).</div></div></span></label>
                             <select id="redundancy" class="input-field" onchange="calculate()" aria-label="Redundancy">
                                 <option value="n">N (no redundancy)</option>
                                 <option value="n1" selected>N+1</option>
@@ -832,16 +410,14 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                     <!-- Section 4: Facility Loads -->
                     <div class="input-section">
                         <div class="section-header">
-                            <div class="section-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
-                                <i class="fas fa-building"></i>
-                            </div>
+                            
                             <div>
                                 <div class="section-title">Facility Loads</div>
                                 <div class="section-subtitle">Lighting, security, and fire systems</div>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Lighting <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-lightbulb"></i> Lighting</div><div class="tooltip-desc">Lighting power density in W/m². Modern DCs use LED with occupancy sensors (3 W/m²). Standard fluorescent is 8 W/m². Typically 1-3% of total facility power.</div></div></span></label>
+                            <label class="input-label">Lighting <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Lighting</div><div class="tooltip-desc">Lighting power density in W/m². Modern DCs use LED with occupancy sensors (3 W/m²). Standard fluorescent is 8 W/m². Typically 1-3% of total facility power.</div></div></span></label>
                             <select id="lighting" class="input-field" onchange="calculate()" aria-label="Lighting">
                                 <option value="3">Minimal (3 W/m²) — LED + sensors</option>
                                 <option value="8" selected>Standard (8 W/m²)</option>
@@ -849,7 +425,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             </select>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Security Systems <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Security Systems</div><div class="tooltip-desc">Power consumed by physical security infrastructure per rack — CCTV cameras, access control readers, intrusion detection, monitoring displays, and NVR/DVR storage. Enhanced biometric systems (iris/facial recognition, man-traps) consume significantly more power. Typically 0.5-2% of total facility power.</div></div></span></label>
+                            <label class="input-label">Security Systems <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Security Systems</div><div class="tooltip-desc">Power consumed by physical security infrastructure per rack — CCTV cameras, access control readers, intrusion detection, monitoring displays, and NVR/DVR storage. Enhanced biometric systems (iris/facial recognition, man-traps) consume significantly more power. Typically 0.5-2% of total facility power.</div></div></span></label>
                             <select id="security" class="input-field" onchange="calculate()" aria-label="Security">
                                 <option value="0.2">Basic (0.2 kW/rack) — CCTV only</option>
                                 <option value="0.5" selected>Standard (0.5 kW/rack) — CCTV + Access</option>
@@ -857,7 +433,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             </select>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Fire Suppression <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-fire-extinguisher"></i> Fire Suppression</div><div class="tooltip-desc">Power for fire detection and suppression systems per rack. FM-200/Novec 1230 gaseous systems use minimal power (detection panels only). VESDA aspirating smoke detection adds continuous air sampling pumps. Water mist systems require pressurization pumps and valve actuators, consuming more power but providing unlimited discharge duration.</div></div></span></label>
+                            <label class="input-label">Fire Suppression <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Fire Suppression</div><div class="tooltip-desc">Power for fire detection and suppression systems per rack. FM-200/Novec 1230 gaseous systems use minimal power (detection panels only). VESDA aspirating smoke detection adds continuous air sampling pumps. Water mist systems require pressurization pumps and valve actuators, consuming more power but providing unlimited discharge duration.</div></div></span></label>
                             <select id="fire" class="input-field" onchange="calculate()" aria-label="Fire">
                                 <option value="0.1" selected>FM-200/Novec (0.1 kW/rack)</option>
                                 <option value="0.3">VESDA + FM-200 (0.3 kW/rack)</option>
@@ -868,30 +444,23 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
 
                     <!-- Section 5: PRO Advanced -->
                     <div class="input-section pro-section locked" id="proAdvancedSection">
-                        <div class="pro-overlay" onclick="handlePremiumTab()">
-                            <i class="fas fa-crown"></i>
-                            <div class="pro-overlay-title">Advanced parameters</div>
-                            <div class="pro-overlay-desc">Economizer, ASHRAE temp, transformer losses, PDU efficiency, and more</div>
-                            <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button>
-                        </div>
+                        <div class="pro-overlay tool-full" onclick="handlePremiumTab()"><p><b>Full analysis</b> — CO₂ per year, free-cooling hours, peer percentile and Green Grid rating</p><button class="pro-overlay-btn">Sign in</button></div>
                         <div class="section-header">
-                            <div class="section-icon" style="background: rgba(100, 116, 139,0.1); color: #64748b;">
-                                <i class="fas fa-cog"></i>
-                            </div>
+                            
                             <div>
-                                <div class="section-title">Advanced Parameters <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
+                                <div class="section-title">Advanced Parameters</div>
                                 <div class="section-subtitle">Fine-tune efficiency calculations</div>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Utilization: <span id="utilDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">70%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> IT Utilization</div><div class="tooltip-desc">Percentage of IT capacity actually in use. At low utilization (10-30%), PUE appears worse because fixed facility overhead is divided by less IT load. Most enterprise DCs run 50-70% utilization. Hyperscalers target 80%+ through workload management and dynamic provisioning.</div></div></span></label>
+                            <label class="input-label">Utilization: <span id="utilDisplay">70%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">IT Utilization</div><div class="tooltip-desc">Percentage of IT capacity actually in use. At low utilization (10-30%), PUE appears worse because fixed facility overhead is divided by less IT load. Most enterprise DCs run 50-70% utilization. Hyperscalers target 80%+ through workload management and dynamic provisioning.</div></div></span></label>
                             <div class="range-wrap">
                                 <input type="range" id="utilization" min="10" max="100" value="70" step="5" oninput="updateUtil(); calculate()" aria-label="Utilization">
                                 <span class="range-value" id="utilValue">70%</span>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Economizer Mode <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wind"></i> Economizer Mode</div><div class="tooltip-desc">Free cooling using outside air or water when ambient conditions permit. Air-side economizers filter and introduce outside air directly (saves ~15% cooling energy). Water-side economizers use cooling towers or dry coolers to pre-cool chilled water loops (saves ~25%). Effectiveness depends heavily on climate zone — cold/temperate climates benefit most (4,000-6,000+ free-cooling hours/year).</div></div></span></label>
+                            <label class="input-label">Economizer Mode <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Economizer Mode</div><div class="tooltip-desc">Free cooling using outside air or water when ambient conditions permit. Air-side economizers filter and introduce outside air directly (saves ~15% cooling energy). Water-side economizers use cooling towers or dry coolers to pre-cool chilled water loops (saves ~25%). Effectiveness depends heavily on climate zone — cold/temperate climates benefit most (4,000-6,000+ free-cooling hours/year).</div></div></span></label>
                             <select id="economizer" class="input-field" onchange="calculate()" aria-label="Economizer">
                                 <option value="none" selected>None</option>
                                 <option value="airside">Air-Side Economizer (-15% cooling)</option>
@@ -899,21 +468,21 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             </select>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">ASHRAE Supply Air Temp: <span id="tempDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">20°C</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-thermometer-half"></i> Supply Air Temperature</div><div class="tooltip-desc">Cold-aisle supply air temperature per ASHRAE TC 9.9 guidelines. Recommended range: 18-27°C (A1 class). Raising from 20°C to 25°C can reduce cooling energy by 2-4% per degree through higher chiller efficiency and extended economizer hours. Google, Facebook, and Microsoft operate at 26-27°C. Below 18°C wastes energy; above 27°C increases server fan speeds.</div></div></span></label>
+                            <label class="input-label">ASHRAE Supply Air Temp: <span id="tempDisplay">20°C</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Supply Air Temperature</div><div class="tooltip-desc">Cold-aisle supply air temperature per ASHRAE TC 9.9 guidelines. Recommended range: 18-27°C (A1 class). Raising from 20°C to 25°C can reduce cooling energy by 2-4% per degree through higher chiller efficiency and extended economizer hours. Google, Facebook, and Microsoft operate at 26-27°C. Below 18°C wastes energy; above 27°C increases server fan speeds.</div></div></span></label>
                             <div class="range-wrap">
                                 <input type="range" id="supplyTemp" min="18" max="27" value="20" step="0.5" oninput="updateTemp(); calculate()" aria-label="Supply Temp">
                                 <span class="range-value" id="tempValue">20°C</span>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Transformer Loss: <span id="txDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">1.5%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-random"></i> Transformer Loss</div><div class="tooltip-desc">Energy lost as heat during voltage transformation (typically MV→LV: 12kV→480V and 480V→208V). Standard dry-type transformers lose 1.5-2.5%. High-efficiency (DOE 2016 compliant) units achieve 0.5-1.5%. Losses are constant regardless of load, making them more impactful at lower utilization. Two transformation stages double the loss.</div></div></span></label>
+                            <label class="input-label">Transformer Loss: <span id="txDisplay">1.5%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Transformer Loss</div><div class="tooltip-desc">Energy lost as heat during voltage transformation (typically MV→LV: 12kV→480V and 480V→208V). Standard dry-type transformers lose 1.5-2.5%. High-efficiency (DOE 2016 compliant) units achieve 0.5-1.5%. Losses are constant regardless of load, making them more impactful at lower utilization. Two transformation stages double the loss.</div></div></span></label>
                             <div class="range-wrap">
                                 <input type="range" id="transformerLoss" min="0.5" max="3" value="1.5" step="0.1" oninput="updateTx(); calculate()" aria-label="Transformer Loss">
                                 <span class="range-value" id="txValue">1.5%</span>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">PDU Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-plug"></i> PDU Type</div><div class="tooltip-desc">Power Distribution Unit efficiency varies by feature level. Basic PDUs (breaker panels) are ~98% efficient. Metered PDUs add monitoring with minimal overhead (98.5%). Monitored and switched PDUs (per-outlet metering + remote switching) achieve 99% through better power factor correction. Higher-tier PDUs enable granular capacity management and reduce stranded power.</div></div></span></label>
+                            <label class="input-label">PDU Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">PDU Type</div><div class="tooltip-desc">Power Distribution Unit efficiency varies by feature level. Basic PDUs (breaker panels) are ~98% efficient. Metered PDUs add monitoring with minimal overhead (98.5%). Monitored and switched PDUs (per-outlet metering + remote switching) achieve 99% through better power factor correction. Higher-tier PDUs enable granular capacity management and reduce stranded power.</div></div></span></label>
                             <select id="pduType" class="input-field" onchange="calculate()" aria-label="Pdu Type">
                                 <option value="basic">Basic (98% efficiency)</option>
                                 <option value="metered" selected>Metered (98.5%)</option>
@@ -925,30 +494,23 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
 
                     <!-- Section 6: PRO Seasonal & Growth -->
                     <div class="input-section pro-section locked" id="proSeasonalSection">
-                        <div class="pro-overlay" onclick="handlePremiumTab()">
-                            <i class="fas fa-crown"></i>
-                            <div class="pro-overlay-title">FULL Seasonal & Growth</div>
-                            <div class="pro-overlay-desc">Monthly PUE variation, load growth projection, and Green Grid classification</div>
-                            <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button>
-                        </div>
+                        <div class="pro-overlay tool-full" onclick="handlePremiumTab()"><p><b>Full analysis</b> — CO₂ per year, free-cooling hours, peer percentile and Green Grid rating</p><button class="pro-overlay-btn">Sign in</button></div>
                         <div class="section-header">
-                            <div class="section-icon" style="background: rgba(100, 116, 139,0.1); color: #64748b;">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
+                            
                             <div>
-                                <div class="section-title">Seasonal & Growth <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
+                                <div class="section-title">Seasonal & Growth</div>
                                 <div class="section-subtitle">Projections and classification</div>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">IT Load Growth/Year: <span id="growthDisplay" style="color:var(--accent-purple);font-family:'JetBrains Mono',monospace;">10%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-line"></i> IT Load Growth</div><div class="tooltip-desc">Annual IT load growth rate for 5-year projections. Enterprise DCs typically grow 5-15%/year. AI/ML workloads can drive 20-30%+ growth. As IT load increases, cooling and power distribution must scale proportionally. Higher utilization generally improves PUE as fixed overhead is spread across more IT load.</div></div></span></label>
+                            <label class="input-label">IT Load Growth/Year: <span id="growthDisplay">10%</span> <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">IT Load Growth</div><div class="tooltip-desc">Annual IT load growth rate for 5-year projections. Enterprise DCs typically grow 5-15%/year. AI/ML workloads can drive 20-30%+ growth. As IT load increases, cooling and power distribution must scale proportionally. Higher utilization generally improves PUE as fixed overhead is spread across more IT load.</div></div></span></label>
                             <div class="range-wrap">
                                 <input type="range" id="loadGrowth" min="0" max="30" value="10" step="1" oninput="updateGrowth(); calculate()" aria-label="Load Growth">
                                 <span class="range-value" id="growthValue">10%</span>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Green Grid Measurement Level <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-ruler-combined"></i> Green Grid Level</div><div class="tooltip-desc">The Green Grid's PUE measurement classification defines measurement granularity and accuracy. L1 (Basic): annual utility meter readings — simplest but least accurate, masks seasonal variation. L2 (Intermediate): monthly sub-metered readings per major system — better for identifying waste. L3 (Advanced): continuous real-time monitoring at 15-min intervals — enables dynamic optimization and immediate anomaly detection.</div></div></span></label>
+                            <label class="input-label">Green Grid Measurement Level <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Green Grid Level</div><div class="tooltip-desc">The Green Grid's PUE measurement classification defines measurement granularity and accuracy. L1 (Basic): annual utility meter readings — simplest but least accurate, masks seasonal variation. L2 (Intermediate): monthly sub-metered readings per major system — better for identifying waste. L3 (Advanced): continuous real-time monitoring at 15-min intervals — enables dynamic optimization and immediate anomaly detection.</div></div></span></label>
                             <select id="greenGridLevel" class="input-field" onchange="calculate()" aria-label="Green Grid Level">
                                 <option value="L1" selected>L1 — Annual (utility meter)</option>
                                 <option value="L2">L2 — Monthly (sub-metering)</option>
@@ -956,7 +518,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             </select>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">ASHRAE Class <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-temperature-high"></i> ASHRAE Class</div><div class="tooltip-desc">ASHRAE TC 9.9 thermal envelope classification for IT equipment. A1: tightest range (15-32°C), standard enterprise servers. A2: wider range (10-35°C), ruggedized equipment. A3/A4: extended ranges (5-40/45°C) for hardened IT in extreme environments. Higher classes enable free cooling in hotter climates but require equipment rated for wider temperature swings. Most enterprise equipment is A1-rated.</div></div></span></label>
+                            <label class="input-label">ASHRAE Class <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">ASHRAE Class</div><div class="tooltip-desc">ASHRAE TC 9.9 thermal envelope classification for IT equipment. A1: tightest range (15-32°C), standard enterprise servers. A2: wider range (10-35°C), ruggedized equipment. A3/A4: extended ranges (5-40/45°C) for hardened IT in extreme environments. Higher classes enable free cooling in hotter climates but require equipment rated for wider temperature swings. Most enterprise equipment is A1-rated.</div></div></span></label>
                             <select id="ashraeClass" class="input-field" onchange="calculate()" aria-label="Ashrae Class">
                                 <option value="A1" selected>A1 (15-32°C, 20-80% RH)</option>
                                 <option value="A2">A2 (10-35°C, 20-80% RH)</option>
@@ -965,132 +527,94 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                             </select>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Energy Cost ($/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Energy Cost</div><div class="tooltip-desc">Blended electricity rate per kilowatt-hour including demand charges, transmission, and distribution. US average: $0.07-0.12/kWh. Europe: $0.12-0.25/kWh. Singapore: $0.15-0.20/kWh. Hyperscalers often negotiate $0.03-0.05/kWh through long-term PPAs and renewable energy contracts. Used to calculate annual energy costs and cost savings from PUE improvements.</div></div></span></label>
+                            <label class="input-label">Energy Cost ($/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Energy Cost</div><div class="tooltip-desc">Blended electricity rate per kilowatt-hour including demand charges, transmission, and distribution. US average: $0.07-0.12/kWh. Europe: $0.12-0.25/kWh. Singapore: $0.15-0.20/kWh. Hyperscalers often negotiate $0.03-0.05/kWh through long-term PPAs and renewable energy contracts. Used to calculate annual energy costs and cost savings from PUE improvements.</div></div></span></label>
                             <input type="number" id="energyCost" class="input-field" value="0.10" min="0.01" max="1.00" step="0.01" oninput="calculate()" aria-label="Energy Cost">
                         </div>
                     </div>
                 </div>
 
                 <!-- Results Panel -->
-                <div class="results-panel">
+                <div class="results-panel tool-results">
                     <div class="results-card">
-                        <div class="pue-display">
-                            <div class="pue-value" id="pueValue" style="color: #06b6d4;">1.55</div>
-                            <div class="pue-label">Power Usage Effectiveness</div>
-                            <div class="pue-rating" id="pueRating" style="background: rgba(6,182,212,0.1); color: #06b6d4;">
-                                <i class="fas fa-star"></i> <span id="ratingText">B — Good</span>
-                            </div>
-                        </div>
+                        <div class="res-head"><h2>Results</h2><span class="basis">PUE = P<sub>facility</sub> / P<sub>IT</sub></span></div>
+<div class="res-group"><h3>Headline</h3><div data-rz-fact-list><div class="metric-box is-key"><div class="metric-label">Power Usage Effectiveness</div><div class="metric-value pue-value" id="pueValue">1.55</div><div class="metric-sub pue-rating" id="pueRating"><span class="state" id="ratingText">B — Good</span></div></div></div></div>
 
-                        <div class="metric-grid">
+                        <div class="res-group"><h3>Power and energy</h3><div class="metric-grid" data-rz-fact-list>
                             <div class="metric-box">
-                                <div class="metric-label">DCiE <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> DCiE</div><div class="tooltip-desc">Data Center Infrastructure Efficiency — inverse of PUE (DCiE = 1/PUE × 100%). Shows what percentage of total power actually reaches IT equipment. Higher is better: 80%+ is excellent, 50-65% is average. DCiE = 64.5% means 35.5% of power is consumed by non-IT infrastructure.</div></div></span></div>
+                                <div class="metric-label">DCiE <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">DCiE</div><div class="tooltip-desc">Data Center Infrastructure Efficiency — inverse of PUE (DCiE = 1/PUE × 100%). Shows what percentage of total power actually reaches IT equipment. Higher is better: 80%+ is excellent, 50-65% is average. DCiE = 64.5% means 35.5% of power is consumed by non-IT infrastructure.</div></div></span></div>
                                 <div class="metric-value" id="dcieValue">64.5%</div>
                             </div>
                             <div class="metric-box">
-                                <div class="metric-label">Total Power <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-plug"></i> Total Facility Power</div><div class="tooltip-desc">Total electrical power drawn by the entire facility — IT load plus all overhead (cooling, UPS losses, lighting, security, fire suppression, transformer losses, PDU losses). This is the numerator in PUE = Total Power / IT Power.</div></div></span></div>
+                                <div class="metric-label">Total Power <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Total Facility Power</div><div class="tooltip-desc">Total electrical power drawn by the entire facility — IT load plus all overhead (cooling, UPS losses, lighting, security, fire suppression, transformer losses, PDU losses). This is the numerator in PUE = Total Power / IT Power.</div></div></span></div>
                                 <div class="metric-value" id="totalPowerValue">1,550 kW</div>
                             </div>
                             <div class="metric-box">
-                                <div class="metric-label">Annual Energy <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bolt"></i> Annual Energy</div><div class="tooltip-desc">Total annual energy consumption (Total Power × 8,760 hours). Expressed in GWh (gigawatt-hours) or MWh. This drives total electricity costs and carbon footprint. A 1 MW facility at PUE 1.5 consumes ~13.1 GWh/year.</div></div></span></div>
+                                <div class="metric-label">Annual Energy <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Annual Energy</div><div class="tooltip-desc">Total annual energy consumption (Total Power × 8,760 hours). Expressed in GWh (gigawatt-hours) or MWh. This drives total electricity costs and carbon footprint. A 1 MW facility at PUE 1.5 consumes ~13.1 GWh/year.</div></div></span></div>
                                 <div class="metric-value" id="annualEnergyValue">13.6 GWh</div>
                             </div>
                             <div class="metric-box">
-                                <div class="metric-label">Annual Cost <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Annual Cost</div><div class="tooltip-desc">Estimated annual electricity cost (Annual Energy × Energy Cost per kWh). Does not include demand charges, power factor penalties, or time-of-use rate variations. Actual costs may be 10-20% higher depending on utility tariff structure.</div></div></span></div>
+                                <div class="metric-label">Annual Cost <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Annual Cost</div><div class="tooltip-desc">Estimated annual electricity cost (Annual Energy × Energy Cost per kWh). Does not include demand charges, power factor penalties, or time-of-use rate variations. Actual costs may be 10-20% higher depending on utility tariff structure.</div></div></span></div>
                                 <div class="metric-value" id="annualCostValue">$1.36M</div>
                             </div>
                             <div class="metric-box">
-                                <div class="metric-label">Cooling Load <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Load</div><div class="tooltip-desc">Total power consumed by the cooling infrastructure — CRAC/CRAH units, chillers, cooling towers, pumps, and fans. Typically the largest non-IT load (30-50% of overhead). Cooling load = IT heat load / Cooling COP, adjusted for containment efficiency and economizer savings.</div></div></span></div>
+                                <div class="metric-label">Cooling Load <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Cooling Load</div><div class="tooltip-desc">Total power consumed by the cooling infrastructure — CRAC/CRAH units, chillers, cooling towers, pumps, and fans. Typically the largest non-IT load (30-50% of overhead). Cooling load = IT heat load / Cooling COP, adjusted for containment efficiency and economizer savings.</div></div></span></div>
                                 <div class="metric-value" id="coolingLoadValue">380 kW</div>
                             </div>
                             <div class="metric-box">
-                                <div class="metric-label">UPS Loss <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-battery-three-quarters"></i> UPS Loss</div><div class="tooltip-desc">Power lost as heat in the UPS during AC-DC-AC conversion. Varies by topology and load factor: double-conversion loses 4-8%, line-interactive 2-4%, flywheel hybrid 1-3%. UPS losses are proportional to IT load and decrease in percentage as load factor approaches optimal range (50-75%).</div></div></span></div>
+                                <div class="metric-label">UPS Loss <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">UPS Loss</div><div class="tooltip-desc">Power lost as heat in the UPS during AC-DC-AC conversion. Varies by topology and load factor: double-conversion loses 4-8%, line-interactive 2-4%, flywheel hybrid 1-3%. UPS losses are proportional to IT load and decrease in percentage as load factor approaches optimal range (50-75%).</div></div></span></div>
                                 <div class="metric-value" id="upsLossValue">96 kW</div>
                             </div>
-                        </div>
+                        </div></div>
 
                         <!-- Industry Comparison -->
-                        <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid rgba(6,182,212,0.1);">
-                            <div style="font-size:0.78rem; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem;">
-                                <i class="fas fa-chart-bar" style="color:var(--accent-cyan); margin-right:6px;"></i> Industry Comparison
-                            </div>
-                            <div id="industryComparison"></div>
-                        </div>
+                        <div class="res-group"><h3>Industry comparison</h3><div id="industryComparison" class="res-pad"></div></div>
 
                         <!-- Recommendations -->
                         <div class="rec-section">
-                            <div class="rec-title"><i class="fas fa-lightbulb" style="color: var(--accent-gold);"></i> Recommendations</div>
+                            <div class="rec-title">Recommendations</div>
                             <div id="recommendations"></div>
                         </div>
 
                         <!-- ═══ Partial-Load PUE curve + Water (RZEngine v2, free) ═══ -->
-                        <div id="pueCurvePanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid var(--bg-tertiary);border-radius:10px;padding:0.85rem 0.95rem;">
-                            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
-                                <i class="fas fa-wave-square" style="color:#06b6d4;"></i>
-                                <span style="font-weight:700;font-size:0.86rem;color:var(--text-primary);">Partial-Load PUE &amp; Water</span>
-                                <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wave-square"></i> Partial-load PUE</div><div class="tooltip-desc">PUE is quoted at full IT load, but data centers rarely run at 100%. Fixed infrastructure overhead (cooling, UPS conversion) doesn't scale down with IT load, so PUE degrades at partial load. The curve shows your effective PUE from 20–100% utilization. WUE (Water Use Effectiveness) is the water companion for your cooling type. Powered by RZEngine v2.0.</div></div></span>
-                            </div>
-                            <div style="display:flex;gap:0.5rem;margin:0.5rem 0;flex-wrap:wrap;">
-                                <div style="flex:1;min-width:80px;text-align:center;background:var(--bg-primary);border-radius:7px;padding:0.45rem;">
-                                    <div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.03em;color:var(--text-muted);">PUE @ 50% load</div>
-                                    <div id="pueAt50" style="font-size:0.95rem;font-weight:800;color:#f59e0b;font-family:'JetBrains Mono',monospace;">—</div>
-                                </div>
-                                <div style="flex:1;min-width:80px;text-align:center;background:var(--bg-primary);border-radius:7px;padding:0.45rem;">
-                                    <div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.03em;color:var(--text-muted);">WUE</div>
-                                    <div id="wueVal" style="font-size:0.95rem;font-weight:800;color:#06b6d4;font-family:'JetBrains Mono',monospace;">—</div>
-                                </div>
-                                <div style="flex:1;min-width:80px;text-align:center;background:var(--bg-primary);border-radius:7px;padding:0.45rem;">
-                                    <div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.03em;color:var(--text-muted);">Annual water</div>
-                                    <div id="waterVal" style="font-size:0.95rem;font-weight:800;color:#06b6d4;font-family:'JetBrains Mono',monospace;">—</div>
-                                </div>
-                            </div>
-                            <div id="pueCurveChart"></div>
-                            <div style="display:flex;justify-content:space-between;font-size:0.58rem;color:var(--text-muted);margin-top:0.15rem;"><span>20% load</span><span>PUE vs IT utilization</span><span>100%</span></div>
-                        </div>
+                        <div id="pueCurvePanel" class="res-group" style="display:none;"><h3>Partial load and water</h3><div data-rz-fact-list><div class="metric-box"><div class="metric-label">PUE at 50 % load</div><div class="metric-value" id="pueAt50">—</div></div><div class="metric-box"><div class="metric-label">WUE</div><div class="metric-value" id="wueVal">—</div></div><div class="metric-box"><div class="metric-label">Annual water</div><div class="metric-value" id="waterVal">—</div></div></div><figure class="fig res-fig"><div id="pueCurveChart"></div><figcaption><b>FIG. 1</b> · PUE across IT load, 20–100 % · partial-load model, RZEngine · dot = 50 % load</figcaption></figure></div>
 
                         <!-- PRO Metrics -->
-                        <div class="pro-section locked" id="proResultsSection" style="margin-top:1.25rem;">
-                            <div class="pro-overlay" onclick="handlePremiumTab()">
-                                <i class="fas fa-crown"></i>
-                                <div class="pro-overlay-title">FULL Analytics</div>
-                                <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button>
-                            </div>
-                            <div style="padding-top:1rem; border-top:1px solid rgba(100, 116, 139,0.15);">
-                                <div style="font-size:0.78rem; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem;">
-                                    <i class="fas fa-crown" style="color:#64748b; margin-right:6px;"></i> FULL Analytics
-                                </div>
-                                <div class="metric-grid">
-                                    <div class="metric-box" style="border-color:rgba(100, 116, 139,0.15);">
-                                        <div class="metric-label">CO2/Year <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-cloud"></i> Annual CO2 Emissions</div><div class="tooltip-desc">Total carbon dioxide equivalent emitted per year from facility electricity consumption. Formula: Annual Energy (MWh) x Grid Carbon Intensity (kgCO2/kWh). Reducing PUE or switching to renewables directly lowers this value.</div></div></span></div>
-                                        <div class="metric-value" id="co2Value" style="color:#64748b;">6,789 t</div>
+                        <div class="pro-section locked" id="proResultsSection">
+                            <div class="pro-overlay tool-full" onclick="handlePremiumTab()"><p><b>Full analysis</b> — CO₂ per year, free-cooling hours, peer percentile and Green Grid rating</p><button class="pro-overlay-btn">Sign in</button></div>
+                            <div>
+                                <div>Full analysis</div>
+                                <div class="metric-grid" data-rz-fact-list>
+                                    <div class="metric-box">
+                                        <div class="metric-label">CO2/Year <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Annual CO2 Emissions</div><div class="tooltip-desc">Total carbon dioxide equivalent emitted per year from facility electricity consumption. Formula: Annual Energy (MWh) x Grid Carbon Intensity (kgCO2/kWh). Reducing PUE or switching to renewables directly lowers this value.</div></div></span></div>
+                                        <div class="metric-value" id="co2Value">6,789 t</div>
                                     </div>
-                                    <div class="metric-box" style="border-color:rgba(100, 116, 139,0.15);">
-                                        <div class="metric-label">Free Cooling Hrs <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wind"></i> Free Cooling Hours</div><div class="tooltip-desc">Estimated annual hours when outside ambient conditions allow economizer mode — cooling without mechanical refrigeration. Derived from climate zone data. Cold climates yield 4,000-6,000+ hrs; tropical zones yield under 500 hrs.</div></div></span></div>
-                                        <div class="metric-value" id="freeCoolingValue" style="color:#64748b;">1,500</div>
+                                    <div class="metric-box">
+                                        <div class="metric-label">Free Cooling Hrs <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Free Cooling Hours</div><div class="tooltip-desc">Estimated annual hours when outside ambient conditions allow economizer mode — cooling without mechanical refrigeration. Derived from climate zone data. Cold climates yield 4,000-6,000+ hrs; tropical zones yield under 500 hrs.</div></div></span></div>
+                                        <div class="metric-value" id="freeCoolingValue">1,500</div>
                                     </div>
-                                    <div class="metric-box" style="border-color:rgba(100, 116, 139,0.15);">
-                                        <div class="metric-label">Percentile <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-bar"></i> Industry PUE Percentile</div><div class="tooltip-desc">Where your PUE falls within the global data center distribution. p50 = median global performance. p10 = top 10% most efficient. p90 = bottom 10%. Based on Uptime Institute and Green Grid global survey data.</div></div></span></div>
-                                        <div class="metric-value" id="percentileValue" style="color:#64748b;">p45</div>
+                                    <div class="metric-box">
+                                        <div class="metric-label">Percentile <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Industry PUE Percentile</div><div class="tooltip-desc">Where your PUE falls within the global data center distribution. p50 = median global performance. p10 = top 10% most efficient. p90 = bottom 10%. Based on Uptime Institute and Green Grid global survey data.</div></div></span></div>
+                                        <div class="metric-value" id="percentileValue">p45</div>
                                     </div>
-                                    <div class="metric-box" style="border-color:rgba(100, 116, 139,0.15);">
-                                        <div class="metric-label">Green Grid <span class="tooltip-trigger" style="width:13px;height:13px;font-size:8px;">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-leaf"></i> Green Grid Rating</div><div class="tooltip-desc">The Green Grid efficiency classification. L0 = below average (PUE above 2.0). L1 = average (1.5-2.0). L2 = good (1.3-1.5). L3 = excellent (1.2-1.3). L4 = world-class (below 1.2). Higher levels indicate less infrastructure overhead.</div></div></span></div>
-                                        <div class="metric-value" id="greenGridValue" style="color:#64748b;">L1</div>
+                                    <div class="metric-box">
+                                        <div class="metric-label">Green Grid <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Green Grid Rating</div><div class="tooltip-desc">The Green Grid efficiency classification. L0 = below average (PUE above 2.0). L1 = average (1.5-2.0). L2 = good (1.3-1.5). L3 = excellent (1.2-1.3). L4 = world-class (below 1.2). Higher levels indicate less infrastructure overhead.</div></div></span></div>
+                                        <div class="metric-value" id="greenGridValue">L1</div>
                                     </div>
                                 </div>
                                 <!-- Cost per 0.1 PUE improvement -->
-                                <div style="margin-top:0.75rem;">
-                                    <div style="font-size:0.72rem; font-weight:600; color:var(--text-muted); margin-bottom:0.5rem;">Cost per 0.1 PUE Improvement</div>
-                                    <div id="pueImprovementTable" style="font-size:0.78rem;"></div>
+                                <div>
+                                    <div>Cost per 0.1 PUE Improvement</div>
+                                    <div id="pueImprovementTable"></div>
                                 </div>
                                 <!-- What-if scenarios -->
-                                <div style="margin-top:0.75rem;">
-                                    <div style="font-size:0.72rem; font-weight:600; color:var(--text-muted); margin-bottom:0.5rem;">What-If Scenarios</div>
-                                    <div id="whatIfScenarios" style="font-size:0.78rem;"></div>
+                                <div>
+                                    <div>What-If Scenarios</div>
+                                    <div id="whatIfScenarios"></div>
                                 </div>
                                 <!-- ASHRAE Compliance -->
-                                <div style="margin-top:0.75rem;">
-                                    <div style="font-size:0.72rem; font-weight:600; color:var(--text-muted); margin-bottom:0.5rem;">ASHRAE TC 9.9 Compliance</div>
-                                    <div id="ashraeCompliance" style="font-size:0.78rem;"></div>
+                                <div>
+                                    <div>ASHRAE TC 9.9 Compliance</div>
+                                    <div id="ashraeCompliance"></div>
                                 </div>
                             </div>
                         </div>
@@ -1100,36 +624,54 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         </section>
 
         <!-- Charts -->
-        <section class="charts-section">
+        <section class="charts-section wrap">
             <div class="charts-grid">
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fas fa-chart-pie" style="color: var(--accent-cyan);"></i> Power Breakdown</div>
-                    <div class="chart-container"><canvas id="breakdownChart"></canvas></div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fas fa-chart-bar" style="color: var(--accent-cyan);"></i> PUE Comparison</div>
-                    <div class="chart-container"><canvas id="comparisonChart"></canvas></div>
-                </div>
+                <figure class="fig chart-card"><div class="chart-container"><canvas id="breakdownChart"></canvas></div><figcaption><b>FIG. 2</b> Power Breakdown · computed from the inputs above</figcaption></figure>
+                <figure class="fig chart-card"><div class="chart-container"><canvas id="comparisonChart"></canvas></div><figcaption><b>FIG. 3</b> PUE Comparison · computed from the inputs above</figcaption></figure>
             </div>
             <!-- PRO Charts -->
-            <div class="charts-grid pro-section locked" id="proChartsSection" style="margin-top:1.5rem;">
-                <div class="pro-overlay" onclick="handlePremiumTab()">
-                    <i class="fas fa-crown"></i>
-                    <div class="pro-overlay-title">Full charts</div>
-                    <div class="pro-overlay-desc">Monthly seasonal PUE, waterfall breakdown, and percentile gauge</div>
-                    <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fas fa-calendar-alt" style="color: #64748b;"></i> Monthly PUE Variation <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
-                    <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fas fa-water" style="color: #64748b;"></i> PUE Waterfall <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
-                    <div class="chart-container"><canvas id="waterfallChart"></canvas></div>
-                </div>
+            <div class="charts-grid pro-section locked" id="proChartsSection">
+                <div class="pro-overlay tool-full" onclick="handlePremiumTab()"><p><b>Full analysis</b> — CO₂ per year, free-cooling hours, peer percentile and Green Grid rating</p><button class="pro-overlay-btn">Sign in</button></div>
+                <figure class="fig chart-card"><div class="chart-container"><canvas id="monthlyChart"></canvas></div><figcaption><b>FIG. 4</b> Monthly PUE Variation · computed from the inputs above</figcaption></figure>
+                <figure class="fig chart-card"><div class="chart-container"><canvas id="waterfallChart"></canvas></div><figcaption><b>FIG. 5</b> PUE Waterfall · computed from the inputs above</figcaption></figure>
             </div>
         </section>
-    </main>
+    
+        <section class="tool-ref" aria-labelledby="ref-h">
+            <div class="wrap">
+                <p class="eyebrow" id="ref-h">02 / Reference</p>
+                <div class="ref-grid">
+                    <div>
+                        <h3>Method</h3>
+                        <ul class="formulas">
+                            <li><span>PUE</span><code>P_facility / P_IT</code></li>
+                            <li><span>P_facility</span><code>P_IT + P_cooling + P_UPS loss + P_transformer + P_PDU + P_lighting, security, fire</code></li>
+                            <li><span>UPS loss</span><code>P_IT · (1 / η(load) − 1) · redundancy factor</code></li>
+                            <li><span>DCiE</span><code>100 / PUE, in percent</code></li>
+                            <li><span>Annual energy</span><code>P_facility · 8,760 h</code></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Computed against</h3>
+                        <p class="against"><span>ASHRAE TC 9.9</span><span>The Green Grid</span><span>ISO/IEC 30134-2</span><span>Uptime Institute 2026 survey</span></p>
+                        <h3>Read further</h3>
+                        <p class="links"><a href="manual/pue.html">Technical manual and methodology</a><a href="glossary.html">Glossary</a><a href="capex-calculator.html">CAPEX calculator</a><a href="opex-calculator.html">OPEX calculator</a><a href="datacenter-solutions.html">DC Solutions</a><a href="account.html">My account and saved scenarios</a></p>
+                    </div>
+                </div>
+                <p class="notice">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. This calculator is provided for <strong>educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis. All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html">Privacy Policy</a> for details. By using this tool you agree to our <a href="terms.html">Terms</a>.</p>
+            </div>
+        </section>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models. Mission-critical infrastructure, documented.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
 
     <!-- Login Modal -->
 
@@ -1142,56 +684,12 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
      because a password manager will offer to fill it. -->
 
     
-        <!-- Independence Disclaimer -->
-        <div style="max-width:900px;margin:2rem auto 0;padding:1rem 1.5rem;text-align:center;">
-            <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#64748b;">Terms &amp; Disclaimer</a></p>
-        </div>
+        
 
 
-    <!-- Calculator Disclaimer -->
-    <div style="max-width:1400px;margin:2rem auto 0;padding:0 2rem;">
-        <div class="calc-disclaimer" style="background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;">
-            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
-                <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;"><i class="fas fa-triangle-exclamation"></i></div>
-                <div>
-                    <div class="disc-title" style="font-weight:700;font-size:0.8rem;color:#e2e8f0;margin-bottom:0.5rem;">Disclaimer &amp; Data Sources</div>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">This calculator is provided for <strong style="color:#cbd5e1;">educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis.</p>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;"><strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong> ASHRAE TC 9.9 thermal guidelines, The Green Grid PUE methodology, ISO/IEC 30134-2 data center energy efficiency standard, Uptime Institute 2026 Global Data Center Survey (average PUE 1.52).</p>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a> for details.</p>
-                    <p class="disc-fine" style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
-<!-- Footer -->
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#475569;border-color:rgba(71,85,105,0.4)}.rz-manual-link a:hover{color:#0891b2;border-color:rgba(8,145,178,0.5)}[data-theme="dark"] .rz-manual-link a{color:#94a3b8;border-color:rgba(148,163,184,0.35)}[data-theme="dark"] .rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/pue.html">Technical Manual &amp; Methodology &#8599;</a></div>
-    <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem;">
-        <div style="max-width: 1200px; margin: 0 auto;">
-            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: start;">
-                <div>
-                    <p style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; color: #64748b; line-height: 1.6; margin-bottom: 1rem;">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
-                    <p style="font-size: 0.65rem; letter-spacing: 0.1em; color: #475569; margin-bottom: 0.75rem;">ALL OPERATIONAL DATASETS PRESERVED.</p>
-                    <p style="font-size: 0.75rem; color: #64748b;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; color: #64748b; margin-bottom: 1rem;">NAVIGATION</h4>
-                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
-                        <li><a href="index.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Home Dashboard</a></li>
-                        <li><a href="articles.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Technical Journal</a></li>
-                        <li><a href="datacenter-solutions.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">DC Solutions</a></li>
-                        <li><a href="capex-calculator.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">CAPEX Calculator</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; color: #64748b; margin-bottom: 1rem;">CONNECT</h4>
-                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
-                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">LinkedIn Profile</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
+
 
     <!-- JavaScript -->
     <script>
@@ -1291,6 +789,21 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         // Map this page's cooling types → engine WUE cooling keys.
         var wueKeyMap = { crac: 'air', crah: 'air', inrow: 'air', none: 'air', rdhx: 'rearDoor', dlc: 'directToChip', immersion: 'immersion' };
         var wueKey = wueKeyMap[coolingType] || 'air';
+        function pueCurveSvg(pts, cw) {
+            // drawn at the container's own width so axis text stays 10 px on a phone (a fixed viewBox shrinks it)
+            var W = Math.max(280, Math.round(cw || 560)), H = W < 420 ? 170 : 190, L = 40, R = 12, T = 12, B = 28;
+            var ys = pts.map(function (p) { return p.y; }), mn = Math.min.apply(null, ys), mx = Math.max.apply(null, ys);
+            var step = [0.05, 0.1, 0.2, 0.25, 0.5, 1].filter(function (st) { return (mx - mn) / st <= 4; })[0] || 1;
+            var lo = Math.floor(mn / step) * step, hi = Math.ceil(mx / step) * step; if (hi === lo) hi = lo + step;
+            var sx = function (x) { return L + (x - 20) / 80 * (W - L - R); }, sy = function (y) { return T + (hi - y) / (hi - lo) * (H - T - B); };
+            var o = '<svg class="pue-curve" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="PUE across IT load from 20 to 100 percent">';
+            for (var v = lo; v <= hi + 1e-9; v += step) { var y = sy(v); o += '<line class="gr" x1="' + L + '" x2="' + (W - R) + '" y1="' + y + '" y2="' + y + '"/><text x="' + (L - 6) + '" y="' + (y + 3) + '" text-anchor="end">' + v.toFixed(Math.round(step * 100) % 10 ? 2 : 1) + '</text>'; }
+            (W < 420 ? [20, 60, 100] : [20, 40, 60, 80, 100]).forEach(function (x) { o += '<text x="' + sx(x) + '" y="' + (H - 9) + '" text-anchor="' + (x === 100 ? 'end' : x === 20 ? 'start' : 'middle') + '">' + x + ' %</text>'; });
+            o += '<polyline class="ln" points="' + pts.map(function (p) { return sx(p.x) + ',' + sy(p.y); }).join(' ') + '"/>';
+            var p50 = pts.filter(function (p) { return p.x === 50; })[0];
+            if (p50) o += '<circle class="pt" cx="' + sx(50) + '" cy="' + sy(p50.y) + '" r="3"/>';
+            return o + '</svg>';
+        }
         // Curve: PUE across 20%–100% IT utilization.
         var pts = [];
         for (var lf = 0.2; lf <= 1.001; lf += 0.1) {
@@ -1304,7 +817,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         var fmtW = function (n) { return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M m³' : n >= 1e3 ? Math.round(n / 1e3) + 'K m³' : Math.round(n) + ' m³'; };
         document.getElementById('waterVal').textContent = wue > 0 ? fmtW(waterM3) : '0 (air)';
         if (E.charts && E.charts.roiLine) {
-            document.getElementById('pueCurveChart').innerHTML = E.charts.roiLine(pts, { width: 300, height: 120, accent: '#06b6d4' });
+            document.getElementById('pueCurveChart').innerHTML = pueCurveSvg(pts, document.getElementById('pueCurveChart').clientWidth);
         }
         panel.style.display = 'block';
     }
@@ -1404,17 +917,13 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
 
         // PUE Rating
         let rating, ratingColor, ratingBg;
-        if (pue <= 1.2) { rating = 'A+ — Excellent'; ratingColor = '#10b981'; ratingBg = 'rgba(16,185,129,0.1)'; }
-        else if (pue <= 1.4) { rating = 'A — Very Good'; ratingColor = '#06b6d4'; ratingBg = 'rgba(6,182,212,0.1)'; }
-        else if (pue <= 1.6) { rating = 'B — Good'; ratingColor = '#3b82f6'; ratingBg = 'rgba(59,130,246,0.1)'; }
-        else if (pue <= 1.8) { rating = 'C — Average'; ratingColor = '#f59e0b'; ratingBg = 'rgba(245,158,11,0.1)'; }
-        else if (pue <= 2.0) { rating = 'D — Below Average'; ratingColor = '#f97316'; ratingBg = 'rgba(249,115,22,0.1)'; }
+        if (pue <= 1.2) { rating = 'A+ — Excellent'; ratingColor = '#A0AEC0'; ratingBg = 'rgba(16,185,129,0.1)'; }
+        else if (pue <= 1.4) { rating = 'A — Very Good'; ratingColor = '#D49A2A'; ratingBg = 'rgba(212,154,42,0.1)'; }
+        else if (pue <= 1.6) { rating = 'B — Good'; ratingColor = '#7D8794'; ratingBg = 'rgba(59,130,246,0.1)'; }
+        else if (pue <= 1.8) { rating = 'C — Average'; ratingColor = '#5E6673'; ratingBg = 'rgba(245,158,11,0.1)'; }
+        else if (pue <= 2.0) { rating = 'D — Below Average'; ratingColor = '#C9CFD8'; ratingBg = 'rgba(249,115,22,0.1)'; }
         else { rating = 'F — Poor'; ratingColor = '#ef4444'; ratingBg = 'rgba(239,68,68,0.1)'; }
-
-        document.getElementById('pueValue').style.color = ratingColor;
         document.getElementById('ratingText').textContent = rating;
-        document.getElementById('pueRating').style.background = ratingBg;
-        document.getElementById('pueRating').style.color = ratingColor;
 
         // Industry comparison
         renderIndustryComparison(pue);
@@ -1437,17 +946,17 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
     // Industry comparison bars
     function renderIndustryComparison(yourPue) {
         const benchmarks = [
-            { label: 'Your Facility', value: yourPue, color: '#06b6d4' },
-            { label: 'Industry Average', value: avgPue(), color: '#94a3b8' },
-            { label: 'Enterprise Target', value: 1.40, color: '#3b82f6' },
-            { label: 'Colo Best-in-Class', value: 1.20, color: '#10b981' },
-            { label: 'Hyperscale Leader', value: 1.10, color: '#22c55e' },
+            { label: 'Your Facility', value: yourPue, color: 'var(--rzt-accent)' },
+            { label: 'Industry Average', value: avgPue(), color: 'var(--rzt-muted)' },
+            { label: 'Enterprise Target', value: 1.40, color: 'var(--rzt-muted)' },
+            { label: 'Colo Best-in-Class', value: 1.20, color: 'var(--rzt-muted)' },
+            { label: 'Hyperscale Leader', value: 1.10, color: 'var(--rzt-muted)' },
         ];
         const maxPue = Math.max(2.5, yourPue + 0.3);
         let html = '';
         benchmarks.forEach(b => {
             const pct = Math.min((b.value / maxPue) * 100, 100);
-            html += '<div style="margin-bottom:8px;"><div class="comparison-label"><span>' + b.label + '</span><span style="font-family:\'JetBrains Mono\',monospace;font-weight:600;color:' + b.color + ';">' + b.value.toFixed(2) + '</span></div>';
+            html += '<div style="margin-bottom:8px;"><div class="comparison-label"><span>' + b.label + '</span><span style="font-family:\'JetBrains Mono\',monospace;font-weight:600;color:var(--rzt-text);">' + b.value.toFixed(2) + '</span></div>';
             html += '<div class="comparison-bar"><div class="comparison-fill" style="width:' + pct + '%;background:' + b.color + ';"></div></div></div>';
         });
         document.getElementById('industryComparison').innerHTML = html;
@@ -1466,10 +975,10 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         const top3 = recs.slice(0, 3);
         let html = '';
         if (top3.length === 0) {
-            html = '<div style="text-align:center;padding:1rem;color:var(--accent-emerald);font-size:0.82rem;"><i class="fas fa-check-circle" style="margin-right:6px;"></i>Excellent efficiency! No major improvements needed.</div>';
+            html = '<p class=\"tool-note\">Excellent efficiency! No major improvements needed.</p>';
         }
         top3.forEach(r => {
-            html += '<div class="rec-card"><div class="rec-icon"><i class="fas fa-' + r.icon + '"></i></div><div class="rec-text"><h4>' + r.title + '</h4><p>' + r.desc + '</p><span class="rec-impact">' + r.impact + '</span></div></div>';
+            html += '<div class="rec-card"><div class="rec-text"><h4>' + r.title + '</h4><p>' + r.desc + '</p><span class="rec-impact">' + r.impact + '</span></div></div>';
         });
         document.getElementById('recommendations').innerHTML = html;
     }
@@ -1478,7 +987,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
     function renderCharts(itLoad, cooling, ups, tx, pdu, facility, pue) {
         const labels = ['IT Load', 'Cooling', 'UPS Loss', 'Transformer', 'PDU Loss', 'Facility'];
         const data = [itLoad, cooling, ups, tx, pdu, facility];
-        const colors = ['#06b6d4', '#3b82f6', '#f59e0b', '#64748b', '#f97316', '#10b981'];
+        const colors = ['#D49A2A', '#7D8794', '#5E6673', '#64748b', '#C9CFD8', '#A0AEC0'];
 
         // Breakdown doughnut
         if (breakdownChart) breakdownChart.destroy();
@@ -1497,7 +1006,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                 datasets: [{
                     label: 'PUE',
                     data: [pue, avgPue(), 1.40, 1.20, 1.10],
-                    backgroundColor: ['#06b6d4', '#94a3b8', '#3b82f6', '#10b981', '#22c55e'],
+                    backgroundColor: ['#D49A2A', '#94a3b8', '#7D8794', '#A0AEC0', '#4A5160'],
                     borderRadius: 6,
                 }]
             },
@@ -1572,7 +1081,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
                 labels: waterfallData.map(d => d.label),
                 datasets: [
                     { label: 'Base', data: waterfallData.map((d,i) => i === 0 ? 0 : cumulative[i] - waterfallData[i].value), backgroundColor: 'transparent', borderWidth: 0 },
-                    { label: 'Addition', data: waterfallData.map(d => d.value), backgroundColor: ['#06b6d4','#3b82f6','#f59e0b','#64748b','#f97316','#10b981'], borderRadius: 4 }
+                    { label: 'Addition', data: waterfallData.map(d => d.value), backgroundColor: ['#D49A2A','#7D8794','#5E6673','#64748b','#C9CFD8','#A0AEC0'], borderRadius: 4 }
                 ]
             },
             options: {
@@ -1650,7 +1159,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
             const savings = annualCostVal - newAnnualCost;
             improvementHtml += '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:6px;padding:6px 8px;text-align:center;">';
             improvementHtml += '<div style="font-size:0.68rem;color:var(--text-muted);">-' + delta.toFixed(1) + ' PUE</div>';
-            improvementHtml += '<div style="font-size:0.82rem;font-weight:700;color:#10b981;font-family:\'JetBrains Mono\',monospace;">$' + fmt(Math.round(savings / 1000)) + 'K/yr</div>';
+            improvementHtml += '<div style="font-size:0.82rem;font-weight:700;color:var(--rzt-text);font-family:\'JetBrains Mono\',monospace;">$' + fmt(Math.round(savings / 1000)) + 'K/yr</div>';
             improvementHtml += '</div>';
         }
         improvementHtml += '</div>';
@@ -1677,7 +1186,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
             const delta = pue - s.pue;
             whatIfHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:rgba(100, 116, 139,0.04);border:1px solid rgba(100, 116, 139,0.1);border-radius:6px;">';
             whatIfHtml += '<span style="font-size:0.75rem;color:var(--text-secondary);">' + s.label + '</span>';
-            whatIfHtml += '<span style="font-size:0.78rem;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:#10b981;">' + s.pue.toFixed(2) + ' <span style="font-size:0.65rem;color:#10b981;">(-' + delta.toFixed(2) + ')</span></span>';
+            whatIfHtml += '<span style="font-size:0.78rem;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:var(--rzt-text);">' + s.pue.toFixed(2) + ' <span style="font-size:0.65rem;color:var(--rzt-text);">(-' + delta.toFixed(2) + ')</span></span>';
             whatIfHtml += '</div>';
         });
         whatIfHtml += '</div>';
@@ -1690,7 +1199,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         const range = ashraeRanges[ashraeClass];
         const isCompliant = supplyTemp >= range[0] && supplyTemp <= range[1];
         ashraeHtml = '<div style="padding:8px 10px;border-radius:8px;background:' + (isCompliant ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)') + ';border:1px solid ' + (isCompliant ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)') + ';">';
-        ashraeHtml += '<div style="font-size:0.75rem;font-weight:600;color:' + (isCompliant ? '#10b981' : '#ef4444') + ';"><i class="fas fa-' + (isCompliant ? 'check-circle' : 'exclamation-triangle') + '" style="margin-right:4px;"></i>' + (isCompliant ? 'Compliant' : 'Non-Compliant') + ' — ASHRAE Class ' + ashraeClass + '</div>';
+        ashraeHtml += '<div style="font-size:0.75rem;font-weight:600;color:' + (isCompliant ? '#A0AEC0' : '#ef4444') + ';"><i class="fas fa-' + (isCompliant ? 'check-circle' : 'exclamation-triangle') + '" style="margin-right:4px;"></i>' + (isCompliant ? 'Compliant' : 'Non-Compliant') + ' — ASHRAE Class ' + ashraeClass + '</div>';
         ashraeHtml += '<div style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;">Allowable range: ' + range[0] + '-' + range[1] + '°C | Current supply: ' + supplyTemp + '°C</div>';
         ashraeHtml += '</div>';
         document.getElementById('ashraeCompliance').innerHTML = ashraeHtml;
@@ -1917,28 +1426,28 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         var dateStr = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
         // Rating color
-        var rColor = '#06b6d4';
-        if (pue <= 1.2) rColor = '#10b981';
-        else if (pue <= 1.4) rColor = '#06b6d4';
-        else if (pue <= 1.6) rColor = '#3b82f6';
-        else if (pue <= 1.8) rColor = '#f59e0b';
-        else if (pue <= 2.0) rColor = '#f97316';
+        var rColor = '#8C96A3';
+        if (pue <= 1.2) rColor = '#374151';
+        else if (pue <= 1.4) rColor = '#8C96A3';
+        else if (pue <= 1.6) rColor = '#4B5563';
+        else if (pue <= 1.8) rColor = '#5E6673';
+        else if (pue <= 2.0) rColor = '#6B7280';
         else rColor = '#ef4444';
 
         // Generate SVG Power Breakdown Bar Chart
         var bd = getBreakdownValues();
         var itLoad = parseFloat(itLoadVal);
         var barData = [
-            { label: 'IT Load', value: itLoad, color: '#06b6d4' },
-            { label: 'Cooling', value: bd.cooling, color: '#3b82f6' },
-            { label: 'UPS Loss', value: bd.ups, color: '#f59e0b' },
+            { label: 'IT Load', value: itLoad, color: '#8C96A3' },
+            { label: 'Cooling', value: bd.cooling, color: '#4B5563' },
+            { label: 'UPS Loss', value: bd.ups, color: '#5E6673' },
             { label: 'Transformer', value: bd.tx, color: '#64748b' },
-            { label: 'PDU Loss', value: bd.pdu, color: '#f97316' },
-            { label: 'Facility', value: bd.facility, color: '#10b981' }
+            { label: 'PDU Loss', value: bd.pdu, color: '#6B7280' },
+            { label: 'Facility', value: bd.facility, color: '#374151' }
         ];
         var maxBarVal = Math.max.apply(null, barData.map(function(d){ return d.value; }));
         var svgBar = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" style="width:100%;height:auto;">';
-        svgBar += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a5f">Power Breakdown (kW)</text>';
+        svgBar += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#A0AEC0">Power Breakdown (kW)</text>';
         barData.forEach(function(d, i) {
             var barW = 42, gap = 6, startX = 18;
             var x = startX + i * (barW + gap);
@@ -1955,13 +1464,13 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         var compData = [
             { label: 'Your PUE', value: pue, color: rColor },
             { label: 'Industry Avg', value: avgPue(), color: '#94a3b8' },
-            { label: 'Enterprise', value: 1.40, color: '#3b82f6' },
-            { label: 'Colo Best', value: 1.20, color: '#10b981' },
-            { label: 'Hyperscale', value: 1.10, color: '#22c55e' }
+            { label: 'Enterprise', value: 1.40, color: '#4B5563' },
+            { label: 'Colo Best', value: 1.20, color: '#374151' },
+            { label: 'Hyperscale', value: 1.10, color: '#4A5160' }
         ];
         var maxComp = Math.max(2.2, pue + 0.3);
         var svgComp = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" style="width:100%;height:auto;">';
-        svgComp += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a5f">PUE Industry Comparison</text>';
+        svgComp += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#A0AEC0">PUE Industry Comparison</text>';
         compData.forEach(function(d, i) {
             var barW = 48, gap = 12, startX = 22;
             var x = startX + i * (barW + gap);
@@ -1982,7 +1491,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         var minMPue = Math.min.apply(null, monthlyPue) - 0.05;
         var maxMPue = Math.max.apply(null, monthlyPue) + 0.05;
         var svgMonthly = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 200" style="width:100%;height:auto;">';
-        svgMonthly += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a5f">Monthly PUE Seasonal Variation</text>';
+        svgMonthly += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#A0AEC0">Monthly PUE Seasonal Variation</text>';
         // Grid lines
         for (var gi = 0; gi <= 4; gi++) {
             var gy = 30 + gi * 35;
@@ -2012,17 +1521,17 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
 
         // Generate SVG PUE Waterfall
         var wfData = [
-            { label: 'IT Base', value: 1.0, color: '#06b6d4' },
-            { label: '+Cooling', value: bd.cooling / itLoad, color: '#3b82f6' },
-            { label: '+UPS', value: bd.ups / itLoad, color: '#f59e0b' },
+            { label: 'IT Base', value: 1.0, color: '#8C96A3' },
+            { label: '+Cooling', value: bd.cooling / itLoad, color: '#4B5563' },
+            { label: '+UPS', value: bd.ups / itLoad, color: '#5E6673' },
             { label: '+TX', value: bd.tx / itLoad, color: '#64748b' },
-            { label: '+PDU', value: bd.pdu / itLoad, color: '#f97316' },
-            { label: '+Facility', value: bd.facility / itLoad, color: '#10b981' }
+            { label: '+PDU', value: bd.pdu / itLoad, color: '#6B7280' },
+            { label: '+Facility', value: bd.facility / itLoad, color: '#374151' }
         ];
         var wfCum = [0]; wfData.forEach(function(d, i) { wfCum.push((wfCum[i] || 0) + d.value); });
         var wfMax = wfCum[wfCum.length - 1] + 0.1;
         var svgWF = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 200" style="width:100%;height:auto;">';
-        svgWF += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a5f">PUE Waterfall Breakdown</text>';
+        svgWF += '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#A0AEC0">PUE Waterfall Breakdown</text>';
         wfData.forEach(function(d, i) {
             var barW = 42, gap = 8, startX = 22;
             var x = startX + i * (barW + gap);
@@ -2071,7 +1580,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
             var title = card.querySelector('h4') ? card.querySelector('h4').textContent : '';
             var desc = card.querySelector('p') ? card.querySelector('p').textContent : '';
             var impact = card.querySelector('.rec-impact') ? card.querySelector('.rec-impact').textContent : '';
-            recsHtml += '<tr><td style="font-weight:600;">' + title + '</td><td>' + desc + '</td><td style="color:#10b981;font-weight:700;font-family:\'JetBrains Mono\',monospace;white-space:nowrap;">' + impact + '</td></tr>';
+            recsHtml += '<tr><td style="font-weight:600;">' + title + '</td><td>' + desc + '</td><td style="color:#374151;font-weight:700;font-family:\'JetBrains Mono\',monospace;white-space:nowrap;">' + impact + '</td></tr>';
         });
 
         // Build PDF HTML
@@ -2082,31 +1591,31 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
         html += '@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } @page { margin: 15mm; } }';
         html += '* { margin:0; padding:0; box-sizing:border-box; }';
         html += 'body { font-family: "IBM Plex Sans", Arial, sans-serif; max-width: 820px; margin: 0 auto; padding: 20px 30px; color: #1f2937; font-size: 12px; line-height: 1.5; }';
-        html += 'h1 { color: #1e3a5f; font-size: 20px; margin-bottom: 2px; }';
-        html += 'h2 { color: #1e3a5f; font-size: 14px; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #06b6d4; }';
+        html += 'h1 { color: #111827; font-size: 20px; margin-bottom: 2px; }';
+        html += 'h2 { color: #111827; font-size: 14px; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #8A5A00; }';
         html += 'h3 { color: #374151; font-size: 12px; margin: 12px 0 6px; }';
         html += 'p { margin: 6px 0; color: #1f2937; font-size: 11px; line-height: 1.6; }';
         html += 'table { width: 100%; border-collapse: collapse; margin: 8px 0; }';
         html += 'th { background: #f8fafc; padding: 6px 10px; text-align: left; font-size: 9px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e5e7eb; letter-spacing: 0.5px; }';
         html += 'td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; font-size: 11px; }';
-        html += '.pdf-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #06b6d4; }';
+        html += '.pdf-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #8A5A00; }';
         html += '.pdf-brand { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }';
-        html += '.pdf-brand span { color: #06b6d4; }';
+        html += '.pdf-brand span { color: #8A5A00; }';
         html += '.pdf-date { font-size: 9px; color: #94a3b8; text-align: right; }';
         html += '.pdf-score-row { display: flex; gap: 16px; margin: 12px 0; }';
-        html += '.pdf-score-card { flex: 1; text-align: center; padding: 16px; background: #ecfeff; border: 2px solid ' + rColor + '; border-radius: 12px; }';
+        html += '.pdf-score-card { flex: 1; text-align: center; padding: 16px; background: #F7F4EC; border: 2px solid ' + rColor + '; border-radius: 12px; }';
         html += '.pdf-score-value { font-size: 42px; font-weight: 800; color: ' + rColor + '; font-family: "JetBrains Mono", monospace; line-height: 1; }';
         html += '.pdf-score-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }';
         html += '.pdf-score-rating { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: 10px; font-weight: 700; margin-top: 6px; background: ' + rColor + '18; color: ' + rColor + '; }';
         html += '.pdf-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }';
         html += '.pdf-kpi-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; text-align: center; }';
-        html += '.pdf-kpi-value { font-size: 16px; font-weight: 700; color: #1e3a5f; font-family: "JetBrains Mono", monospace; }';
+        html += '.pdf-kpi-value { font-size: 16px; font-weight: 700; color: #111827; font-family: "JetBrains Mono", monospace; }';
         html += '.pdf-kpi-label { font-size: 8px; color: #94a3b8; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.3px; }';
         html += '.pdf-chart-row { display: flex; gap: 16px; margin: 12px 0; }';
         html += '.pdf-chart-row > div { flex: 1; min-width: 0; background: #fafbfc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; }';
-        html += '.pdf-narrative { background: #f8fafc; border-left: 3px solid #06b6d4; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }';
+        html += '.pdf-narrative { background: #f8fafc; border-left: 3px solid #8A5A00; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }';
         html += '.pdf-narrative p { font-size: 10.5px; color: #374151; }';
-        html += '.pdf-footer { margin-top: 20px; padding-top: 10px; border-top: 2px solid #06b6d4; text-align: center; font-size: 8px; color: #94a3b8; }';
+        html += '.pdf-footer { margin-top: 20px; padding-top: 10px; border-top: 2px solid #8A5A00; text-align: center; font-size: 8px; color: #94a3b8; }';
         html += '.pdf-rec-badge { display: inline-block; padding: 2px 8px; border-radius: 50px; font-size: 8px; font-weight: 700; }';
         html += '</style></head><body>';
         // Header
@@ -2290,10 +1799,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
 
 
 
-<!-- Scroll to Top -->
-<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-</button>
+
 
 
 
@@ -2309,7 +1815,5 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',m);else m();
 if(window.MutationObserver)new MutationObserver(m).observe(document.documentElement,{childList:true,subtree:true});})();
 </script>
-    <script src="js/rz-manual-fab.js?v=20260920-8972ee25" defer></script>
-    <script src="js/rz-hero-fit.js?v=20260920-81ad63a8" defer></script>
 </body>
 </html>
