@@ -142,10 +142,13 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body p{
   line-height:1.75 !important;
 }
 /* drop-cap on the first paragraph of the body */
-html[data-rz-register="editorial"][data-theme="dark"] .article-body > p:first-of-type::first-letter{
-  font-family:var(--rz-art-serif);
-  font-size:inherit;font-weight:inherit;float:none;line-height:inherit;
-  padding:0;color:inherit;
+/* No drop cap in the editorial register. The page-local rules set size and margin with !important
+   at phone width, so a reset without it left a 51 px letter and a gap ("A  YouTube", "F ire"). */
+html[data-rz-register="editorial"] .article-body > p:first-of-type::first-letter,
+html[data-rz-register="editorial"] article > p:first-of-type::first-letter,
+html[data-rz-register="editorial"] .article-content > p:first-of-type::first-letter{
+  font-family:inherit !important;font-size:inherit !important;font-weight:inherit !important;
+  float:none !important;line-height:inherit !important;margin:0 !important;padding:0 !important;color:inherit !important;
 }
 
 /* ---- CALLOUTS / QUOTES → editorial accent rail ---- */
@@ -292,10 +295,6 @@ html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body h2::be
 }
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body h3{
   font-family:var(--rz-art-serif) !important;font-weight:500 !important;color:var(--rz-art-strong) !important;
-}
-html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body > p:first-of-type::first-letter{
-  font-family:inherit;font-size:inherit;font-weight:inherit;float:none;line-height:inherit;
-  padding:0;color:inherit;
 }
 /* ---- CALLOUTS / QUOTES ---- */
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .quote-callout{
@@ -1618,6 +1617,13 @@ html[data-rz-register="editorial"] :is(.related-card-number, .related-card-conte
 html[data-rz-register="editorial"] :is(.rz-figcaption-note, .llm-calc-notes, .src-note, .calc-basis){border-left:0!important;padding-left:0!important}
 html[data-rz-register="editorial"] .toc-mobile-toggle{background:var(--rz-art-panel)!important;color:var(--rz-art-strong)!important;border:1px solid var(--rz-art-line)!important;box-shadow:none!important;border-radius:4px!important}
 html[data-rz-register="editorial"] .toc-mobile-toggle:hover{transform:none!important;border-color:var(--rz-art-muted)!important}
+html[data-rz-register="editorial"] .toc-mobile-drawer{background:var(--rz-art-panel)!important;border-top:1px solid var(--rz-art-line)!important;border-radius:4px 4px 0 0!important;box-shadow:none!important}
+html[data-rz-register="editorial"] .toc-drawer-header{border-color:var(--rz-art-line)!important}
+html[data-rz-register="editorial"] .toc-drawer-title{color:var(--rz-art-strong)!important}
+html[data-rz-register="editorial"] .toc-drawer-close{color:var(--rz-art-muted)!important}
+html[data-rz-register="editorial"] .toc-mobile-list a{color:var(--rz-art-text)!important;border-radius:2px!important}
+html[data-rz-register="editorial"] .toc-mobile-list a:hover,html[data-rz-register="editorial"] .toc-mobile-list a.active{background:color-mix(in srgb,var(--rz-art-accent) 9%,transparent)!important;color:var(--rz-art-strong)!important}
+html[data-rz-register="editorial"] .toc-mobile-list a.active{box-shadow:inset 2px 0 0 var(--rz-art-accent)!important}
 /* sweep 3, part 2: styles.css paints `[data-theme=dark] .article-body` #0f172a, its tables #1e293b/#0f172a,
    every `[class*=-box|card-|box-]` rgba(15,23,42,.8) and form controls #1e293b — re-registered here */
 html[data-rz-register="editorial"][data-theme="dark"] .article-body{background:transparent!important}

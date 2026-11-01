@@ -958,18 +958,18 @@ def build_html(entries):
             </svg>
           </a>
           <ul class="dropdown-menu" role="menu">
-            <li role="menuitem"><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+            <li role="menuitem"><a href="datacenter-solutions.html" style="font-weight:600;">DC Solutions Hub</a></li>
             <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
             <li role="menuitem"><a href="datahallAI.html" style="color:#64748b;">DC AI/HPC</a></li>
             <li role="menuitem"><a href="dc-conventional.html">DC Conventional</a></li>
             <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
             <li role="menuitem"><a href="tco-calculator.html" style="color:#64748b;font-weight:600;">TCO Calculator</a></li>
-            <li role="menuitem"><a href="capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
-            <li role="menuitem"><a href="opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
-            <li role="menuitem"><a href="roi-calculator.html" style="color:#3b82f6;">ROI Calculator</a></li>
+            <li role="menuitem"><a href="capex-calculator.html">CAPEX Calculator</a></li>
+            <li role="menuitem"><a href="opex-calculator.html">OPEX Calculator</a></li>
+            <li role="menuitem"><a href="roi-calculator.html">ROI Calculator</a></li>
             <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
-            <li role="menuitem"><a href="dc-market-tracker.html" style="color:#0d9488;font-weight:600;">DC Market</a></li>
-            <li role="menuitem"><a href="dcmoc/" style="color:#ef4444;font-weight:600;">DC MOC</a></li>
+            <li role="menuitem"><a href="dc-market-tracker.html" style="font-weight:600;">DC Market</a></li>
+            <li role="menuitem"><a href="dcmoc/" style="font-weight:600;">DC MOC</a></li>
           </ul>
         </li>
         <li><a href="index.html#metrics" class="nav-link">Results</a></li>
@@ -982,13 +982,13 @@ def build_html(entries):
             </svg>
           </a>
           <ul class="dropdown-menu" role="menu">
-            <li role="menuitem"><a href="articles.html" style="color:#06b6d4;font-weight:600;">Engineering Journal</a></li>
-            <li role="menuitem"><a href="geopolitics.html" style="color:#dc2626;">Global Analysis</a></li>
+            <li role="menuitem"><a href="articles.html" style="font-weight:600;">Engineering Journal</a></li>
+            <li role="menuitem"><a href="geopolitics.html">Global Analysis</a></li>
             <li role="menuitem"><a href="future-forward.html" style="color:#64748b;">Future Forward</a></li>
-            <li role="menuitem"><a href="glossary.html" style="color:#14b8a6;">Glossary</a></li>
+            <li role="menuitem"><a href="glossary.html">Glossary</a></li>
             <li role="menuitem"><a href="Apps/second brain/index.html" style="color:#64748b;font-weight:600;">&#x2022; Second Brain</a></li>
             <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
-            <li role="menuitem"><a href="changelog.html" style="color:#f59e0b;font-weight:600;">Changelog <span style="background:#f59e0b;color:#0f172a;font-size:0.58rem;font-weight:800;letter-spacing:0.1em;padding:1px 5px;border-radius:4px;vertical-align:middle;margin-left:3px;">NEW</span></a></li>
+            <li role="menuitem"><a href="changelog.html" style="font-weight:600;">Changelog <span style="background:#f59e0b;color:#0f172a;font-size:0.58rem;font-weight:800;letter-spacing:0.1em;padding:1px 5px;border-radius:4px;vertical-align:middle;margin-left:3px;">NEW</span></a></li>
             <li role="menuitem"><a href="insights.html" style="color:#64748b;font-size:0.85rem;">All Insights</a></li>
           </ul>
         </li>

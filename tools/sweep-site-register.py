@@ -14,6 +14,7 @@ Functional colours (status green/red, alarm states) keep a hue; only their neon 
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import glob
 import re
 import sys
@@ -362,6 +363,7 @@ for _name in ("term-border", "pill-color", "alpha-active", "letter-color"):
 FAMILIES["lang"] = {
     "globs": ["glossary.html", "id/index.html", "id/artikel.html", "id/glosarium.html"],
     "pairs": _accent_block("rz", "#06b6d4", None) + _accent_block("gl", "#06b6d4", None) + _GL + [
+        ('[data-theme="dark"] .term-counter strong { color:#93c5fd; }', '[data-theme="dark"] .term-counter strong { color:var(--gl-accent); }'),
         ('name="theme-color" content="#06b6d4"', f'name="theme-color" content="{DARK_BG}"'),
         ('name="msapplication-TileColor" content="#06b6d4"', f'name="msapplication-TileColor" content="{DARK_BG}"'),
         ("re", r"background:\s*radial-gradient\(circle at \d+% \d+%, rgba\(6,182,212,[^;]*;", "background: none;"),
@@ -471,11 +473,67 @@ FAMILIES["dash"] = {
 }
 
 
+# ---- "nav" family: the shared navbar's dropdown and journal links (2026-11-01) ----
+# Every item carried its own inline hue (cyan, teal, blue, emerald, orange, red ...), a rainbow menu
+# that no stylesheet overrode. The hue goes; weight and size stay; grey and the amber
+# `var(--rz-restricted)` marker are left alone.
+_NAV_HUES = "06b6d4|0d9488|3b82f6|14b8a6|10b981|f59e0b|ef4444|0891b2|d97706|047857|b91c1c|0e7490|dc2626|7dddb4|7DDDB4"
+_LTC_CALCS = ["capex-calculator", "opex-calculator", "tco-calculator", "roi-calculator", "pue-calculator",
+              "carbon-footprint", "cx-calculator", "spares-readiness-calculator", "tier-advisor",
+              "tia-942-checklist", "fire-calculator", "fire-checklist", "rfs-readiness-workbench"]
+FAMILIES["nav"] = {
+    "globs": ["*.html", "id/*.html", "manual/*.html", "network/**/*.html", "prd/*.html", "embed/*.html",
+              # changelog.html is generated: the builder's template carries the same menu
+              "tools/build-changelog-html.py"],
+    # LTC calculators (their owner rewrites them); design artefacts keep their before/after evidence
+    "skip": [f"{n}.html" for n in _LTC_CALCS] + ["*mockup*", "plan*.html", "*ltc*", "rz-skin-gallery.html",
+                                                 "rz-style-lab.html", "rz-dark-beforeafter.html", "rz-index-*.html",
+                                                 "pillar-fire-safety.html"],
+    "pairs": [
+        ("re", r'(<li(?: role="menuitem")?><a href="[^"]*") style="color: ?#(?:' + _NAV_HUES + r');? ?([^"]*)"',
+         r'\1 style="\2"'),
+        ("re", r'(<li(?: role="menuitem")?><a href="[^"]*") style=""', r"\1"),
+    ],
+}
+
+
+# ---- "cockhead" family: the header link buttons on the two cockpit landings (2026-11-01) ----
+# PRD / Manual / FAQ / Portfolio / DC Solutions were chrome links drawn in cyan, green and purple.
+# They become neutral buttons with an amber hover; the one primary action (Generate Design) keeps amber.
+# Readouts and state colours inside the cockpits are not touched.
+FAMILIES["cockhead"] = {
+    "globs": ["dc-conventional.html", "datahallAI.html"],
+    "pairs": [
+        ('#faqTrigConv{color:#155e75 !important}', '#faqTrigConv{color:#1f2329 !important}'),
+        ('>&#10067; FAQ</button>', '>FAQ</button>'),
+        ("    background: #16181b;\n    border: 1px solid #155e75;\n    border-radius: 3px;\n    color: var(--accent-cyan);",
+         "    background: #16181b;\n    border: 1px solid #2a2d33;\n    border-radius: 3px;\n    color: #cfd3da;"),
+        (".back-btn:hover {\n    background: #1d1f23;\n    border-color: var(--accent-cyan);\n}",
+         ".back-btn:hover {\n    background: #1d1f23;\n    border-color: #E8B563;\n}"),
+        ('[data-theme="light"] .back-btn { background: #f8fafc; border-color: #0e7490; }',
+         '[data-theme="light"] .back-btn { background: #f8f9fa; border-color: #cbd2da; color: #1f2329; }'),
+        ('[data-theme="light"] .back-btn:hover { background: #ecfeff; border-color: #0891b2; }',
+         '[data-theme="light"] .back-btn:hover { background: #f3f4f6; border-color: #92400e; }'),
+        (".bbtn{font-family:'JetBrains Mono';font-size:10px;padding:8px 12px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);border-radius:4px;color:var(--c);",
+         ".bbtn{font-family:'JetBrains Mono';font-size:10px;padding:8px 12px;background:#16181d;border:1px solid #2a2d33;border-radius:4px;color:#cfd3da;"),
+        (".bbtn:hover{background:rgba(6,182,212,.15)}", ".bbtn:hover{background:#1c1e23;border-color:#E8B563}"),
+        ('[data-theme="light"] .bbtn{background:rgba(6,182,212,.1);border-color:rgba(6,182,212,.3);color:#0891b2}',
+         '[data-theme="light"] .bbtn{background:#f8f9fa;border-color:#cbd2da;color:#1f2329}'),
+        ('[data-theme="light"] .bbtn:hover{background:rgba(6,182,212,.2)}', '[data-theme="light"] .bbtn:hover{background:#f3f4f6;border-color:#92400e}'),
+        (' style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.28);color:#67e8f9"', ""),
+        (' style="border-color:rgba(100, 116, 139, 0.3);color:var(--accent-purple)"', ""),
+        (' style="background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.25);color:var(--g)"', ""),
+    ],
+}
+
+
 def family_files(spec: dict[str, object]) -> list[Path]:
     files: set[Path] = set()
     for pattern in spec["globs"]:  # type: ignore[union-attr]
         files.update(Path(p) for p in glob.glob(str(ROOT / pattern), recursive=True))
-    return sorted(f for f in files if f.relative_to(ROOT).as_posix() not in EXCLUDE)
+    skip = spec.get("skip", [])  # family-only fnmatch patterns on the repo-relative path
+    return sorted(f for f in files if f.relative_to(ROOT).as_posix() not in EXCLUDE
+                  and not any(fnmatch.fnmatch(f.relative_to(ROOT).as_posix(), pat) for pat in skip))
 
 
 def sweep(apply: bool) -> int:

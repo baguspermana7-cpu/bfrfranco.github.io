@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v3.24.32 — 2026-11-01 — "One colour in the menu"
+
+Owner: *"Continue, polish more"* — WI-WEB-ALLPAGES-001, fourth wave.
+
+### Changed
+- **The navbar's dropdown and journal links were a rainbow.** Every item carried its own inline hue — DC Solutions Hub cyan, CAPEX orange, OPEX emerald, ROI blue, DC Market teal, DC MOC red, Global Analysis red, Glossary teal — and no stylesheet overrode an inline colour, so the menu rendered as up to eight colours on 75 pages. The hues are gone; items take the menu's own text colour. Font weight and size stay (the hub entries remain bold), grey items and the amber `var(--rz-restricted)` marker are untouched.
+- Done as one more family in `tools/sweep-site-register.py` (`nav`): 627 inline hues came off 75 pages (counted against the previous release); `--check` fails on the old tree, `--apply` fixes it, a second `--apply` rewrites nothing. The family also covers the embed widgets' index and the changelog builder's own template — a first pass missed both, and regenerating `changelog.html` put ten hues straight back. The 13 calculators are skipped — the LTC session's refit replaces their navbar with the hub navigation, which carries no inline hue — and so are the design mockups.
+- **The header link buttons on the two cockpit landings** (`dc-conventional`, `datahallAI`) — PRD, Manual, FAQ, Portfolio, DC Solutions — were drawn in cyan, with FAQ in sky blue, Portfolio in slate-purple and DC Solutions in green. They are neutral buttons with an amber hover now; Generate Design, the one primary action, keeps its amber. The FAQ button lost its ❓ emoji (an emoji as an icon is banned by the anti-vibecode standard; these pages load no icon font) and, in the light theme, a leftover teal from an a11y rule. Readouts and state colours inside the cockpits are not touched (family `cockhead`, 15 values).
+- **The glossary's term counter** ("Showing 449 of 449") still printed its two numbers in light blue in the dark theme, from an old contrast override that outranked the accent. It now uses the glossary accent, amber in dark (family `lang`).
+- **Articles on a phone** (reported by the LTC session): the first letter of every editorial article rendered 51 px tall and unfloated, followed by a gap — "A  YouTube", "F ire" — in both themes. The register's reset lost to the page-local drop-cap rules, which set size and margin with `!important` at phone width. The reset now wins: the first letter is 18.24 px, the paragraph's own size, margin 0 (measured on article-1, -12 and -30, both themes).
+- **The table-of-contents drawer** that opens on a phone kept the old shell: a blue title, blue hover and active links, a 20 px rounded top and a drop shadow. In the editorial register it takes the article panel colour, a hairline top, 4 px corners, a neutral title, and an amber 2 px rail on the active entry.
+
 ## v3.24.31 — 2026-11-01 — "Pillars, widgets and the Indonesian pages"
 
 Owner: *"polish more"*, then *"Continue, polish more"* — the third wave of WI-WEB-ALLPAGES-001. These are pages the first two waves did not reach: three of them (`id/`) had never been swept at all.
