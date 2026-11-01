@@ -72,6 +72,15 @@ def audit_file(path):
                  text[:5000], re.IGNORECASE):
         return {'score': 'NOINDEX', 'checks': {}}
 
+    # The docstring promised "inline styles or linked CSS"; read the page's local stylesheets too
+    # (the tool-shell calculators keep their responsive rules in css/rz-tool.css, not inline).
+    for href in re.findall(r'<link[^>]+rel=["\']stylesheet["\'][^>]*href=["\']([^"\'?#]+)', text, re.IGNORECASE):
+        if href.startswith(('http:', 'https:', '//')):
+            continue
+        css = (path.parent / href).resolve()
+        if css.is_file() and ROOT in css.parents:
+            text += '\n' + css.read_text(encoding='utf-8', errors='replace')
+
     checks = {}
     score = 0
 
@@ -113,7 +122,7 @@ def audit_file(path):
 
     # 6. Footer grid mobile
     has_footer_collapse = bool(re.search(
-        r'\.footer-grid[^{]*\{[^}]*grid-template-columns:\s*1fr',
+        r'\.(?:footer-grid|hub-foot \.cols)[^{]*\{[^}]*grid-template-columns:\s*1fr',  # hub footer: css/rz-hub.css @700px
         text
     ))
     checks['footer_collapse'] = has_footer_collapse
