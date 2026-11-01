@@ -149,10 +149,10 @@
     <link rel="stylesheet" href="styles.min.css?v=20261031-596eb39e">
 
     <style>
-        :root { --pillar-color: #10b981; --pillar-light: #34d399; --pillar-dark: #059669; --pillar-bg: rgba(16,185,129,0.08); --pillar-border: rgba(16,185,129,0.25); }
+        :root { --pillar-color: #92400e; --pillar-light: #b45309; --pillar-dark: #7a4800; --pillar-bg: rgba(146,64,14,0.07); --pillar-border: rgba(146,64,14,0.28); }
 
         .pillar-hero {
-            background: linear-gradient(135deg, #0a1f17 0%, #0d2818 40%, #052e16 100%);
+            background: #0e0f12;
             padding: 7rem 2rem 4rem;
             position: relative;
             overflow: hidden;
@@ -164,17 +164,36 @@
             right: -20%;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+            background: none;
             border-radius: 50%;
         }
         .pillar-hero-content { max-width: 900px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
         .pillar-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--pillar-bg); color: var(--pillar-color); padding: 0.5rem 1.2rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; border: 1px solid var(--pillar-border); }
         .pillar-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-family:'IBM Plex Sans',system-ui,sans-serif; font-weight:600; color: #fff; margin-bottom: 1rem; line-height: 1.2; }
+        .pillar-hero { --pillar-color: #E8B563; --pillar-bg: rgba(232,181,99,0.08); --pillar-border: rgba(232,181,99,0.28); }
         .pillar-hero h1 span { color: var(--pillar-color); }
         .pillar-hero p { font-size: 1.1rem; color: #94a3b8; max-width: 700px; margin: 0 auto 2rem; line-height: 1.7; }
-        .pillar-stat-badges { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; }
-        .pillar-stat-badge { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 1rem 1.5rem; text-align: center; min-width: 140px; }
-        .pillar-stat-badge .num { font-size: 1.8rem; font-weight: 800; color: var(--pillar-color); display: block; }
+        .pillar-stat-badges {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            row-gap: 0.5rem;
+            margin-top: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .pillar-stat-badge {
+            display: flex;
+            align-items: baseline;
+            gap: 0.45rem;
+            padding: 0 1rem;
+            border-left: 1px solid rgba(255,255,255,0.16);
+        }
+        .pillar-stat-badge:first-child { border-left: 0; }
+        .pillar-stat-badge .num {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #E8B563;
+        }
         .pillar-stat-badge .label { font-size: 0.78rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.25rem; }
 
         .pillar-diagram { padding: 4rem 2rem; background: var(--bg-primary); }
@@ -185,10 +204,10 @@
         .hub-center {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 140px; height: 140px;
-            background: linear-gradient(135deg, var(--pillar-color), var(--pillar-dark));
+            background: #7a4800;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             flex-direction: column; color: #fff; font-weight: 700; font-size: 0.82rem;
-            text-align: center; z-index: 2; box-shadow: 0 0 40px rgba(16,185,129,0.3);
+            text-align: center; z-index: 2; box-shadow: none;
         }
         .hub-center svg { width: 32px; height: 32px; margin-bottom: 6px; }
         .hub-node {
@@ -196,9 +215,9 @@
             background: var(--bg-secondary); border: 2px solid var(--pillar-border);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             text-align: center; font-size: 0.67rem; font-weight: 600; color: var(--text-primary);
-            padding: 10px; z-index: 2; transition: border-color 0.3s, transform 0.3s;
+            padding: 10px; z-index: 2; transition: border-color 0.2s;
         }
-        .hub-node:hover { border-color: var(--pillar-color); transform: scale(1.08); }
+        .hub-node:hover { border-color: var(--pillar-color); }
         .hub-node:nth-child(2) { top: 0%; left: 50%; transform: translateX(-50%); }
         .hub-node:nth-child(3) { top: 10%; right: 2%; }
         .hub-node:nth-child(4) { top: 42%; right: -3%; }
@@ -228,11 +247,25 @@
         .pillar-card-tag { display: inline-block; background: var(--pillar-bg); color: var(--pillar-color); font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 4px; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .pillar-stats { padding: 4rem 2rem; background: var(--bg-primary); }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
-        .stat-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; padding: 1.8rem; text-align: center; }
-        .stat-card-icon { width: 48px; height: 48px; background: var(--pillar-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--pillar-color); }
-        .stat-card-icon svg { width: 24px; height: 24px; }
-        .stat-card .value { font-size: 2rem; font-weight: 800; color: var(--pillar-color); margin-bottom: 0.25rem; }
+        .stats-grid {
+            max-width: 900px;
+            margin: 0 auto;
+            border-top: 1px solid var(--border-color);
+        }
+        .stat-card {
+            display: grid;
+            grid-template-columns: 9rem 1fr;
+            column-gap: 1.5rem;
+            padding: 1.1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .stat-card .value {
+            grid-row: span 2;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--pillar-color);
+        }
         .stat-card .title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
         .stat-card .desc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
 
@@ -249,7 +282,7 @@
 
         @media (max-width: 900px) {
             .pillar-cards { grid-template-columns: repeat(2, 1fr); }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat-card { grid-template-columns: 7rem 1fr; }
             .hub-visual { max-width: 400px; }
             .hub-center { width: 100px; height: 100px; font-size: 0.7rem; }
             .hub-center svg { width: 24px; height: 24px; }
@@ -257,9 +290,9 @@
         }
         @media (max-width: 600px) {
             .pillar-cards { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: 1fr; }
+            .stat-card { grid-template-columns: 1fr; } .stat-card .value { grid-row: auto; }
             .pillar-stat-badges { gap: 1rem; }
-            .pillar-stat-badge { min-width: 110px; }
+            .pillar-stat-badge { padding: 0 0.75rem; }
             .hub-visual { display: none; }
         }
     
@@ -359,11 +392,11 @@
 }
 
     /* a11y (v1.51.13): pillar accent split per theme */
-:root:not([data-theme="dark"]) { --pillar-color:#047857; }
-[data-theme="dark"] { --pillar-color:#34d399; }
+:root:not([data-theme="dark"]) { --pillar-color:#92400e; }
+[data-theme="dark"] { --pillar-color:#E8B563; --pillar-bg: rgba(232,181,99,0.08); --pillar-border: rgba(232,181,99,0.28); }
 [data-theme="dark"] p > a[href$="privacy.html"], [data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
 </style>
-    <script src="js/rz-version.js?v=20261031-8612b8f7" defer></script>
+    <script src="js/rz-version.js?v=20261101-53a80dbe" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 </head>
@@ -554,27 +587,23 @@
             <h2>Sustainability by the Numbers</h2>
             <p>Critical metrics shaping the future of data center environmental performance.</p>
         </div>
-        <div class="stats-grid">
+        <div class="stats-grid" data-rz-fact-list>
             <div class="stat-card">
-                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
                 <div class="value">1-2%</div>
                 <div class="title">Global Electricity</div>
                 <div class="desc">Data centers consume 1-2% of global electricity, a figure projected to double by 2030 as AI workloads surge. This makes energy efficiency and renewable procurement existentially important for the industry.</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg></div>
                 <div class="value">&lt;1.8</div>
                 <div class="title">WUE Target (L/kWh)</div>
                 <div class="desc">The industry target for Water Usage Effectiveness is below 1.8 liters per kWh of IT energy. Best-in-class facilities using air-cooled systems or dry coolers achieve below 0.5 L/kWh with zero evaporative water loss.</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M7 12l3.5-3.5L14 12l3.5-3.5"/></svg></div>
                 <div class="value">RE100</div>
                 <div class="title">Growing Adoption</div>
                 <div class="desc">RE100, the global initiative committing companies to 100% renewable electricity, now includes major data center operators. Google, Microsoft, and Meta have all committed to 24/7 carbon-free energy by 2030.</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
                 <div class="value">60-80%</div>
                 <div class="title">Scope 2 Share</div>
                 <div class="desc">Purchased electricity (Scope 2) accounts for 60-80% of total data center carbon emissions, making renewable energy procurement the single most impactful decarbonization lever available to operators.</div>

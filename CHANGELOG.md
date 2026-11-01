@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.24.31 — 2026-11-01 — "Pillars, widgets and the Indonesian pages"
+
+Owner: *"polish more"*, then *"Continue, polish more"* — the third wave of WI-WEB-ALLPAGES-001. These are pages the first two waves did not reach: three of them (`id/`) had never been swept at all.
+
+Measured with `node tools/audit-vibecode.mjs --json`: **143 monitored findings → 119**. What remains is `index.html` (waiting for an owner-approved mockup), design artefacts kept as evidence, and files the parallel LTC session owns.
+
+### Changed
+- **The four topic pillars** (`pillar-cooling`, `-power`, `-standards`, `-sustainability`) each had their own identity hue (cyan, orange, slate, emerald), a tinted hero gradient with a glow orb, a gradient hub centre with a glow, and three boxed badges in the hero. They now share one amber accent on a graphite hero. The hero badges are one mono line, and the "by the numbers" tiles are fact rows (value on the left, title and sentence on the right, hairline between rows) instead of four boxed tiles with icon circles. The hero is dark in both themes, so its accent is the warm amber in both; the ink amber read 2.7:1 on that hero in light mode (the warm amber reads 10.2:1) and was caught in a render, not by a gate.
+- **The three Indonesian pages** (`id/index.html`, `id/artikel.html`, `id/glosarium.html`) lose the navy-to-cyan hero, the glow orbs, the gradient-text title, the rainbow article thumbnails, the coloured feature-icon washes and the card lifts. The four big cyan numerals in the `id/index` hero are one mono line, as on the pillars.
+- **The glossary's accent** was blue (`#1d4ed8` / `#60a5fa`); it is amber now, in both languages.
+- **The embeddable widgets** (`embed/pue-widget`, `capex-widget`, `carbon-widget`, and the embed landing page) move from navy and cyan to graphite and amber. Each widget's four results read as label/value rows. The landing page's guideline sentence described the palette as "#0f172a background, #06b6d4 cyan accents"; it now names the colours the widgets actually use. The PUE rating ramp and the CAPEX category colours are data and stay.
+- **The account dashboard**: three boxed counters (saved projects, exports, calculator runs) are one line; the blue/slate accent and its gradient fills are amber, with text colours chosen per theme so the primary button stays readable.
+- **`css/rz-finance-suite.css`** (account, changelog, admin console) — surfaces graphite, identity accent amber; the state colours keep their meaning. The LTC session released this file to this wave.
+- **The admin console**'s own navy literals and its KPI hover lift; **toasts**' success colour from neon `#00FF88` to the muted status green (`js/rz-toast.js`, API unchanged).
+
+### Fixed
+- **Hub nodes on the pillars jumped on hover.** `.hub-node:hover { transform: scale(1.08) }` replaced the `translate(-50%)` that centres four of the nodes, so those moved sideways when pointed at. The hover now changes only the border colour.
+
+### How it was done
+All of it goes through `tools/sweep-site-register.py`, which gains six families (`embed`, `pillar`, `lang`, `admin`, `suite`, `dash`) and support for regex pairs whose body varies per page. Each family failed `--check` on the old tree before `--apply` (104, 90, 127, 45, 13 and 10 old values), passes after, and a second `--apply` rewrites nothing; every regex pattern excludes its own output so the check can go green. Rendered headless at 1440 px in both themes and at 390 px: no page errors, no horizontal scroll, and the fact rows measured as rows (one x position, one y per item) on all four pillars and all three widgets.
+
 ## v3.24.30 — 2026-11-01 — "Cockpits on graphite"
 
 Owner: *"polish more"*, then *"continue"* — the second wave of WI-WEB-ALLPAGES-001. The nine cockpits were the last family still on the navy register.

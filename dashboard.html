@@ -34,7 +34,7 @@
     <meta name="description" content="User dashboard for ResistanceZero. Manage your account, saved projects, and exports.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#1e3a5f">
+    <meta name="theme-color" content="#0e0f12">
     <link rel="canonical" href="https://resistancezero.com/dashboard.html">
 
     <!-- Resource Hints -->
@@ -70,11 +70,12 @@
     <style>
         /* ═══ DASHBOARD VARIABLES ═══ */
         :root {
-            --db-primary: #1e3a5f;
-            --db-accent: #3b82f6;
-            --db-accent-light: #60a5fa;
-            --db-purple: #64748b;
-            --db-purple-light: #94a3b8;
+            --db-primary: #16181d;
+            --db-accent: #92400e;
+            --db-on-accent: #ffffff;
+            --db-accent-light: #b45309;
+            --db-purple: #92400e;
+            --db-purple-light: #b45309;
             --db-emerald: #10b981;
             --db-amber: #f59e0b;
             --db-red: #ef4444;
@@ -87,6 +88,11 @@
         }
 
         [data-theme="dark"] {
+            --db-accent: #E8B563;
+            --db-accent-light: #f0c987;
+            --db-purple: #E8B563;
+            --db-purple-light: #f0c987;
+            --db-on-accent: #16181d;
             --db-bg: #0e0f12;
             --db-card: #16181d;
             --db-border: rgba(255,255,255,0.08);
@@ -136,12 +142,18 @@
             margin-bottom: 1.5rem;
         }
 
-        .db-grid-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+        .db-metabar {
+            display: flex;
+            flex-wrap: wrap;
+            row-gap: 0.35rem;
+            margin: 0 0 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--db-text-muted);
         }
+        .db-metabar span { padding: 0 1rem; border-left: 1px solid var(--db-border); }
+        .db-metabar span:first-child { padding-left: 0; border-left: 0; }
+        .db-metabar b { color: var(--db-text); font-weight: 600; margin-right: 0.35rem; }
 
         .db-grid-lists {
             display: grid;
@@ -156,15 +168,7 @@
             border: 1px solid var(--db-border);
             border-radius: 4px;
             padding: 1.5rem;
-            transition: all 0.3s;
-        }
-
-        .db-card:hover {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        }
-
-        [data-theme="dark"] .db-card:hover {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: border-color 0.2s;
         }
 
         .db-card-title {
@@ -195,13 +199,13 @@
             width: 72px;
             height: 72px;
             border-radius: 16px;
-            background: linear-gradient(135deg, var(--db-purple), var(--db-accent));
+            background: var(--db-accent);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.8rem;
             font-weight: 800;
-            color: #fff;
+            color: var(--db-on-accent);
             flex-shrink: 0;
             position: relative;
             overflow: hidden;
@@ -335,11 +339,11 @@
         }
 
         .db-btn-primary {
-            background: linear-gradient(135deg, var(--db-purple), #64748b);
-            color: #fff;
+            background: var(--db-accent);
+            color: var(--db-on-accent);
         }
 
-        .db-btn-primary:hover { box-shadow: 0 6px 20px rgba(100, 116, 139,0.3); }
+        .db-btn-primary:hover { background: var(--db-accent-light); }
 
         .db-btn-outline {
             background: transparent;
@@ -367,67 +371,6 @@
 
         .db-btn-danger:hover {
             background: rgba(239,68,68,0.08);
-        }
-
-        /* ═══ STATS CARDS ═══ */
-        .db-stat-card {
-            text-align: center;
-            padding: 1.25rem 1rem;
-        }
-
-        .db-stat-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 0.75rem;
-            font-size: 1.1rem;
-        }
-
-        .db-stat-icon.blue {
-            background: rgba(59,130,246,0.1);
-            color: var(--db-accent);
-        }
-
-        [data-theme="dark"] .db-stat-icon.blue {
-            background: rgba(59,130,246,0.15);
-        }
-
-        .db-stat-icon.purple {
-            background: rgba(100, 116, 139,0.1);
-            color: var(--db-purple);
-        }
-
-        [data-theme="dark"] .db-stat-icon.purple {
-            background: rgba(100, 116, 139,0.15);
-        }
-
-        .db-stat-icon.emerald {
-            background: rgba(16,185,129,0.1);
-            color: var(--db-emerald);
-        }
-
-        [data-theme="dark"] .db-stat-icon.emerald {
-            background: rgba(16,185,129,0.15);
-        }
-
-        .db-stat-value {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--db-text);
-            margin: 0;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .db-stat-label {
-            font-size: 0.75rem;
-            color: var(--db-text-muted);
-            margin: 0.25rem 0 0;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
         }
 
         /* ═══ LIST CARDS ═══ */
@@ -683,11 +626,6 @@
                 grid-template-columns: 1fr;
             }
 
-            .db-grid-stats {
-                grid-template-columns: 1fr 1fr 1fr;
-                gap: 0.75rem;
-            }
-
             .db-grid-lists {
                 grid-template-columns: 1fr;
             }
@@ -710,10 +648,6 @@
                 justify-content: center;
             }
 
-            .db-stat-value {
-                font-size: 1.3rem;
-            }
-
             .db-plan-table {
                 font-size: 0.78rem;
             }
@@ -725,9 +659,6 @@
         }
 
         @media (max-width: 480px) {
-            .db-grid-stats {
-                grid-template-columns: 1fr;
-            }
 
             .db-list-item {
                 flex-direction: column;
@@ -748,7 +679,7 @@
             color: #f1f5f9;
         }
     </style>
-    <script src="js/rz-version.js?v=20261031-8612b8f7" defer></script>
+    <script src="js/rz-version.js?v=20261101-53a80dbe" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="Dashboard">
 
@@ -908,29 +839,7 @@
                 </div>
 
                 <!-- Quick Stats Row -->
-                <div class="db-grid-stats">
-                    <div class="db-card db-stat-card">
-                        <div class="db-stat-icon blue">
-                            <i class="fas fa-project-diagram"></i>
-                        </div>
-                        <p class="db-stat-value" id="dbStatProjects">0</p>
-                        <p class="db-stat-label">Saved Projects</p>
-                    </div>
-                    <div class="db-card db-stat-card">
-                        <div class="db-stat-icon purple">
-                            <i class="fas fa-file-export"></i>
-                        </div>
-                        <p class="db-stat-value" id="dbStatExports">0</p>
-                        <p class="db-stat-label">Exports</p>
-                    </div>
-                    <div class="db-card db-stat-card">
-                        <div class="db-stat-icon emerald">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <p class="db-stat-value" id="dbStatCalcRuns">0</p>
-                        <p class="db-stat-label">Calculator Runs</p>
-                    </div>
-                </div>
+                <p class="db-metabar" aria-label="Account activity"><span><b id="dbStatProjects">0</b> saved projects</span><span><b id="dbStatExports">0</b> exports</span><span><b id="dbStatCalcRuns">0</b> calculator runs</span></p>
 
                 <!-- Saved Projects + Recent Exports -->
                 <div class="db-grid-lists">

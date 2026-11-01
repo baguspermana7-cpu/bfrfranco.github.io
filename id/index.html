@@ -96,8 +96,8 @@
     <meta name="twitter:image:alt" content="ResistanceZero - Platform Analisis Infrastruktur Data Center">
 
     <!-- Theme Color -->
-    <meta name="theme-color" content="#06b6d4">
-    <meta name="msapplication-TileColor" content="#06b6d4">
+    <meta name="theme-color" content="#0e0f12">
+    <meta name="msapplication-TileColor" content="#0e0f12">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="../assets/Favicon.png">
@@ -155,35 +155,39 @@
     <style>
         /* ═══ CSS Variables ═══ */
         :root {
-            --rz-accent: #06b6d4;
-            --rz-accent-light: #22d3ee;
-            --rz-accent-dark: #0891b2;
+            --rz-accent: #92400e;
+            --rz-on-accent: #ffffff;
+            --rz-accent-light: #b45309;
+            --rz-accent-dark: #7a4800;
             --rz-bg: #ffffff;
             --rz-bg-alt: #f8fafc;
-            --rz-bg-hero-start: #0f172a;
-            --rz-bg-hero-mid: #164e63;
-            --rz-bg-hero-end: #06b6d4;
+            --rz-bg-hero-start: #0e0f12;
+            --rz-bg-hero-mid: #16181d;
+            --rz-bg-hero-end: #121316;
             --rz-text: #334155;
             --rz-text-heading: #0f172a;
             --rz-text-muted: #94a3b8;
             --rz-card-bg: #ffffff;
             --rz-card-border: #e2e8f0;
             --rz-card-shadow: 0 4px 16px rgba(0,0,0,0.06);
-            --rz-footer-bg: #0f172a;
+            --rz-footer-bg: #0e0f12;
             --rz-glass-bg: rgba(255,255,255,0.85);
             --rz-glass-border: rgba(0,0,0,0.08);
         }
         [data-theme="dark"] {
-            --rz-bg: #0a0a14;
-            --rz-bg-alt: #0f0f1a;
+            --rz-accent: #E8B563;
+            --rz-accent-light: #f0c987;
+            --rz-on-accent: #16181d;
+            --rz-bg: #0e0f12;
+            --rz-bg-alt: #121316;
             --rz-text: #cbd5e1;
             --rz-text-heading: #f0f4f8;
             --rz-text-muted: #64748b;
-            --rz-card-bg: #1e293b;
-            --rz-card-border: #334155;
+            --rz-card-bg: #16181d;
+            --rz-card-border: #2a2d34;
             --rz-card-shadow: 0 4px 16px rgba(0,0,0,0.3);
-            --rz-footer-bg: #020617;
-            --rz-glass-bg: rgba(15,15,26,0.9);
+            --rz-footer-bg: #0a0b0d;
+            --rz-glass-bg: rgba(18,19,22,0.9);
             --rz-glass-border: rgba(255,255,255,0.08);
         }
 
@@ -239,7 +243,7 @@
             display: block; padding: 0.5rem 1rem; font-size: 0.85rem;
             color: var(--rz-text); transition: background 0.15s;
         }
-        .dropdown-menu a:hover { background: rgba(6,182,212,0.08); }
+        .dropdown-menu a:hover { background: rgba(232,181,99,0.08); }
         .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
         .lang-toggle {
             display: flex; align-items: center; gap: 0; border-radius: 8px; overflow: hidden;
@@ -249,7 +253,7 @@
             padding: 0.35rem 0.65rem; display: block; transition: all 0.2s;
         }
         .lang-toggle .lang-active {
-            background: var(--rz-accent); color: #fff;
+            background: var(--rz-accent); color: var(--rz-on-accent);
         }
         .lang-toggle a:not(.lang-active) {
             color: var(--rz-text-muted); background: var(--rz-card-bg);
@@ -280,9 +284,7 @@
         }
         .hero::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background:
-                radial-gradient(circle at 25% 75%, rgba(6,182,212,0.25) 0%, transparent 50%),
-                radial-gradient(circle at 75% 25%, rgba(16,185,129,0.12) 0%, transparent 50%);
+            background: none;
             z-index: 0;
         }
         .hero > * { position: relative; z-index: 1; }
@@ -290,12 +292,10 @@
             display: inline-flex; align-items: center; gap: 0.5rem;
             background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3);
             border-radius: 4px; padding: 0.4rem 1rem; font-size: 0.8rem;
-            color: #22d3ee; margin-bottom: 1.5rem;        }
+            color: #E8B563; margin-bottom: 1.5rem;        }
         .hero h1 {
             font-size: clamp(2.25rem, 5vw, 3.25rem); margin-bottom: 1rem;
-            background: linear-gradient(90deg, #fff, #67e8f9);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #f3f4f6;
         }
         .hero p {
             font-size: 1.15rem; color: rgba(255,255,255,0.8);
@@ -304,11 +304,11 @@
         .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
         .btn-primary {
             display: inline-flex; align-items: center; gap: 0.5rem;
-            background: var(--rz-accent); color: #0f172a; padding: 0.75rem 1.75rem;
+            background: var(--rz-accent); color: var(--rz-on-accent); padding: 0.75rem 1.75rem;
             border-radius: 8px; font-weight: 700; font-size: 0.9rem;
             transition: all 0.2s; border: none; cursor: pointer;
         }
-        .btn-primary:hover { background: var(--rz-accent-light); transform: translateY(-2px); }
+        .btn-primary:hover { background: var(--rz-accent-light); }
         .btn-secondary {
             display: inline-flex; align-items: center; gap: 0.5rem;
             background: transparent; color: #fff; padding: 0.75rem 1.75rem;
@@ -317,12 +317,13 @@
         }
         .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
         .hero-stats {
-            display: flex; gap: 2.5rem; justify-content: center; margin-top: 3rem;
-            flex-wrap: wrap;
+            display: flex; justify-content: center; margin-top: 2.5rem; row-gap: 0.5rem;
+            flex-wrap: wrap; font-family: 'JetBrains Mono', monospace;
         }
-        .hero-stat { text-align: center; }
-        .hero-stat-value { font-size: 2rem; font-weight: 800; color: #22d3ee; }
-        .hero-stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; }
+        .hero-stat { display: flex; align-items: baseline; gap: 0.45rem; padding: 0 1rem; border-left: 1px solid rgba(255,255,255,0.16); }
+        .hero-stat:first-child { border-left: 0; }
+        .hero-stat-value { font-size: 0.95rem; font-weight: 600; color: #E8B563; }
+        .hero-stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em; }
 
         /* ═══ Sections ═══ */
         .section { padding: 4rem 2rem; }
@@ -347,7 +348,7 @@
             display: flex; flex-direction: column;
         }
         .feature-card:hover {
-            box-shadow: var(--rz-card-shadow); transform: translateY(-4px);
+            box-shadow: none;
             border-color: var(--rz-accent);
         }
         .feature-icon {
@@ -383,7 +384,7 @@
 
         /* ═══ CTA Banner ═══ */
         .cta-banner {
-            background: linear-gradient(135deg, #0f172a, #164e63);
+            background: #16181d;
             padding: 3rem 2rem; text-align: center; color: #fff;
         }
         .cta-banner h2 { font-size: 1.75rem; margin-bottom: 0.75rem; color: #fff; }
@@ -406,7 +407,7 @@
         .footer-links a:hover { color: var(--rz-accent); }
         .footer-bottom {
             text-align: center; padding-top: 1.5rem; margin-top: 2rem;
-            border-top: 1px solid #1e293b; font-size: 0.8rem;
+            border-top: 1px solid #2a2d34; font-size: 0.8rem;
         }
 
         /* ═══ Cookie Banner ═══ */
@@ -415,11 +416,11 @@
         .scroll-top-btn {
             position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
             width: 44px; height: 44px; border-radius: 12px;
-            background: var(--rz-accent); color: #0f172a; border: none;
+            background: var(--rz-accent); color: var(--rz-on-accent); border: none;
             cursor: pointer; display: none; align-items: center; justify-content: center;
-            box-shadow: 0 4px 12px rgba(6,182,212,0.3); transition: transform 0.2s;
+            box-shadow: none; transition: transform 0.2s;
         }
-        .scroll-top-btn:hover { transform: translateY(-2px); }
+        .scroll-top-btn:hover { opacity: 0.9; }
         .scroll-top-btn.visible { display: flex; }
 
         /* ═══ Responsive ═══ */
@@ -438,19 +439,19 @@
             }
             .hero { padding: 6rem 1.25rem 3rem; }
             .hero h1 { font-size: 2rem; }
-            .hero-stats { gap: 1.5rem; }
+            .hero-stat { padding: 0 0.75rem; }
             .features-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
-    <script src="../js/rz-version.js?v=20261031-8612b8f7" defer></script>
+    <script src="../js/rz-version.js?v=20261101-53a80dbe" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
     <script>window.RZ_COOKIE_TEXT={msg:"Kami menggunakan cookie untuk analitik guna meningkatkan pengalaman Anda.",more:"Pelajari lebih lanjut",accept:"Terima",decline:"Tolak",policyHref:"../privacy.html"};</script>
     <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <a href="#main-content" class="sr-only" style="position:absolute;top:-100px;left:0;background:#06b6d4;color:#000;padding:8px 16px;z-index:10000;font-weight:700;">Lompat ke konten utama</a>
+    <a href="#main-content" class="sr-only" style="position:absolute;top:-100px;left:0;background:#E8B563;color:#000;padding:8px 16px;z-index:10000;font-weight:700;">Lompat ke konten utama</a>
 
     <!-- Navigation -->
     <nav class="navbar">
@@ -466,15 +467,15 @@
                         <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </a>
                     <ul class="dropdown-menu" role="menu">
-                        <li role="menuitem"><a href="../datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
+                        <li role="menuitem"><a href="../datacenter-solutions.html" style="font-weight:600;">DC Solutions Hub</a></li>
                         <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
                         <li role="menuitem"><a href="../datahallAI.html" style="color:#64748b;">DC AI/HPC</a></li>
                         <li role="menuitem"><a href="../dc-conventional.html">DC Conventional</a></li>
                         <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
                         <li role="menuitem"><a href="../tco-calculator.html" style="color:#0369a1;font-weight:600;">TCO Calculator</a></li>
                         <li role="menuitem"><a href="../capex-calculator.html" style="color:#f59e0b;">CAPEX Calculator</a></li>
-                        <li role="menuitem"><a href="../opex-calculator.html" style="color:#10b981;">OPEX Calculator</a></li>
-                        <li role="menuitem"><a href="../roi-calculator.html" style="color:#3b82f6;">ROI Calculator</a></li>
+                        <li role="menuitem"><a href="../opex-calculator.html">OPEX Calculator</a></li>
+                        <li role="menuitem"><a href="../roi-calculator.html">ROI Calculator</a></li>
                         <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
                         <li role="menuitem"><a href="../dc-market-tracker.html" style="color:#0d9488;font-weight:600;">Market Tracker</a></li>
                         <li role="menuitem"><a href="../dcmoc/" style="color:#ef4444;font-weight:600;">DC MOC</a></li>
@@ -486,7 +487,7 @@
                         <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="artikel.html" style="color:#06b6d4;font-weight:600;">Jurnal Teknik</a></li>
+                        <li><a href="artikel.html" style="font-weight:600;">Jurnal Teknik</a></li>
                         <li><a href="../geopolitics.html" style="color:#ef4444;">Analisis Global</a></li>
                         <li><a href="../future-forward.html" style="color:#0891b2;">Future Forward</a></li>
                         <li role="menuitem"><a href="../Apps/second brain/index.html" style="color: #64748b; font-weight: 600;">&#x2022; Second Brain</a></li>
@@ -570,7 +571,7 @@
         <div class="features-grid">
             <!-- PUE Calculator -->
             <a href="../pue-calculator.html" class="feature-card">
-                <div class="feature-icon" style="background:rgba(6,182,212,0.1);color:#06b6d4;">
+                <div class="feature-icon" style="background:rgba(127,127,127,0.10);color:var(--rz-accent);">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                 </div>
                 <h3>PUE Calculator</h3>
@@ -590,7 +591,7 @@
 
             <!-- OPEX Calculator -->
             <a href="../opex-calculator.html" class="feature-card">
-                <div class="feature-icon" style="background:rgba(16,185,129,0.1);color:#10b981;">
+                <div class="feature-icon" style="background:rgba(127,127,127,0.10);color:var(--rz-accent);">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8l-4 4-4-4"/></svg>
                 </div>
                 <h3>OPEX Calculator</h3>
@@ -600,7 +601,7 @@
 
             <!-- Cooling Guide -->
             <a href="../pillar-cooling.html" class="feature-card">
-                <div class="feature-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                <div class="feature-icon" style="background:rgba(127,127,127,0.10);color:var(--rz-accent);">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M12 2l4 4M12 2L8 4M12 22l4-4M12 22l-4-4"/></svg>
                 </div>
                 <h3>Panduan Pendinginan</h3>
@@ -630,7 +631,7 @@
 
             <!-- DC Solutions -->
             <a href="../datacenter-solutions.html" class="feature-card">
-                <div class="feature-icon" style="background:rgba(6,182,212,0.1);color:#06b6d4;">
+                <div class="feature-icon" style="background:rgba(127,127,127,0.10);color:var(--rz-accent);">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
                 </div>
                 <h3>DC Solutions Hub</h3>
@@ -640,7 +641,7 @@
 
             <!-- Air vs Liquid Cooling -->
             <a href="../compare-air-vs-liquid-cooling.html" class="feature-card">
-                <div class="feature-icon" style="background:rgba(16,185,129,0.1);color:#10b981;">
+                <div class="feature-icon" style="background:rgba(127,127,127,0.10);color:var(--rz-accent);">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
                 </div>
                 <h3>Air vs Liquid Cooling</h3>

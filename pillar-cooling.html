@@ -148,10 +148,10 @@
     <link rel="stylesheet" href="styles.min.css?v=20261031-596eb39e">
 
     <style>
-        :root { --pillar-color: #06b6d4; --pillar-light: #0ea5e9; --pillar-dark: #0891b2; --pillar-bg: rgba(6,182,212,0.08); --pillar-border: rgba(6,182,212,0.25); }
+        :root { --pillar-color: #92400e; --pillar-light: #b45309; --pillar-dark: #7a4800; --pillar-bg: rgba(146,64,14,0.07); --pillar-border: rgba(146,64,14,0.28); }
 
         .pillar-hero {
-            background: linear-gradient(135deg, #0c1829 0%, #0e2a3a 40%, #083344 100%);
+            background: #0e0f12;
             padding: 7rem 2rem 4rem;
             position: relative;
             overflow: hidden;
@@ -163,7 +163,7 @@
             right: -20%;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 70%);
+            background: none;
             border-radius: 50%;
         }
         .pillar-hero-content {
@@ -193,6 +193,7 @@
             margin-bottom: 1rem;
             line-height: 1.2;
         }
+        .pillar-hero { --pillar-color: #E8B563; --pillar-bg: rgba(232,181,99,0.08); --pillar-border: rgba(232,181,99,0.28); }
         .pillar-hero h1 span { color: var(--pillar-color); }
         .pillar-hero p {
             font-size: 1.1rem;
@@ -204,23 +205,23 @@
         .pillar-stat-badges {
             display: flex;
             justify-content: center;
-            gap: 2rem;
             flex-wrap: wrap;
+            row-gap: 0.5rem;
             margin-top: 2rem;
+            font-family: 'JetBrains Mono', monospace;
         }
         .pillar-stat-badge {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 4px;
-            padding: 1rem 1.5rem;
-            text-align: center;
-            min-width: 140px;
+            display: flex;
+            align-items: baseline;
+            gap: 0.45rem;
+            padding: 0 1rem;
+            border-left: 1px solid rgba(255,255,255,0.16);
         }
+        .pillar-stat-badge:first-child { border-left: 0; }
         .pillar-stat-badge .num {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--pillar-color);
-            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #E8B563;
         }
         .pillar-stat-badge .label {
             font-size: 0.78rem;
@@ -266,7 +267,7 @@
             transform: translate(-50%, -50%);
             width: 140px;
             height: 140px;
-            background: linear-gradient(135deg, var(--pillar-color), var(--pillar-dark));
+            background: #7a4800;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -277,7 +278,7 @@
             font-size: 0.85rem;
             text-align: center;
             z-index: 2;
-            box-shadow: 0 0 40px rgba(6,182,212,0.3);
+            box-shadow: none;
         }
         .hub-center svg { width: 32px; height: 32px; margin-bottom: 6px; }
         .hub-node {
@@ -296,9 +297,9 @@
             color: var(--text-primary);
             padding: 10px;
             z-index: 2;
-            transition: border-color 0.3s, transform 0.3s;
+            transition: border-color 0.2s;
         }
-        .hub-node:hover { border-color: var(--pillar-color); transform: scale(1.08); }
+        .hub-node:hover { border-color: var(--pillar-color); }
         .hub-node:nth-child(2) { top: 2%; left: 50%; transform: translateX(-50%); }
         .hub-node:nth-child(3) { top: 15%; right: 5%; }
         .hub-node:nth-child(4) { top: 50%; right: -2%; transform: translateY(-50%); }
@@ -413,36 +414,23 @@
             background: var(--bg-primary);
         }
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            max-width: 1100px;
+            max-width: 900px;
             margin: 0 auto;
+            border-top: 1px solid var(--border-color);
         }
         .stat-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 1.8rem;
-            text-align: center;
+            display: grid;
+            grid-template-columns: 9rem 1fr;
+            column-gap: 1.5rem;
+            padding: 1.1rem 0;
+            border-bottom: 1px solid var(--border-color);
         }
-        .stat-card-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--pillar-bg);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            color: var(--pillar-color);
-        }
-        .stat-card-icon svg { width: 24px; height: 24px; }
         .stat-card .value {
-            font-size: 2rem;
-            font-weight: 800;
+            grid-row: span 2;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.35rem;
+            font-weight: 600;
             color: var(--pillar-color);
-            margin-bottom: 0.25rem;
         }
         .stat-card .title {
             font-size: 0.9rem;
@@ -512,7 +500,7 @@
 
         @media (max-width: 900px) {
             .pillar-cards { grid-template-columns: repeat(2, 1fr); }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat-card { grid-template-columns: 7rem 1fr; }
             .hub-visual { max-width: 400px; }
             .hub-center { width: 100px; height: 100px; font-size: 0.7rem; }
             .hub-center svg { width: 24px; height: 24px; }
@@ -520,9 +508,9 @@
         }
         @media (max-width: 600px) {
             .pillar-cards { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: 1fr; }
+            .stat-card { grid-template-columns: 1fr; } .stat-card .value { grid-row: auto; }
             .pillar-stat-badges { gap: 1rem; }
-            .pillar-stat-badge { min-width: 110px; }
+            .pillar-stat-badge { padding: 0 0.75rem; }
             .hub-visual { display: none; }
         }
     
@@ -622,11 +610,11 @@
 }
 
     /* a11y (v1.51.13): pillar accent split per theme */
-:root:not([data-theme="dark"]) { --pillar-color:#0e7490; }
-[data-theme="dark"] { --pillar-color:#22d3ee; }
+:root:not([data-theme="dark"]) { --pillar-color:#92400e; }
+[data-theme="dark"] { --pillar-color:#E8B563; --pillar-bg: rgba(232,181,99,0.08); --pillar-border: rgba(232,181,99,0.28); }
 [data-theme="dark"] p > a[href$="privacy.html"], [data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
 </style>
-    <script src="js/rz-version.js?v=20261031-8612b8f7" defer></script>
+    <script src="js/rz-version.js?v=20261101-53a80dbe" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 </head>
@@ -870,35 +858,23 @@
             <h2>Cooling by the Numbers</h2>
             <p>Critical metrics that define data center thermal management performance worldwide.</p>
         </div>
-        <div class="stats-grid">
+        <div class="stats-grid" data-rz-fact-list>
             <div class="stat-card">
-                <div class="stat-card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
-                </div>
                 <div class="value">1.58</div>
                 <div class="title">Global Average PUE</div>
                 <div class="desc">The Uptime Institute's 2024 survey shows the industry average PUE has stagnated around 1.58 for years, indicating significant room for improvement in cooling efficiency.</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="10"/></svg>
-                </div>
                 <div class="value">100+</div>
                 <div class="title">kW/Rack with DLC</div>
                 <div class="desc">Direct liquid cooling enables rack power densities exceeding 100 kW, compared to 15-25 kW maximum for traditional air cooling with hot aisle containment.</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 27C18 33 6 33 6 27"/><path d="M12 3a4 4 0 0 0-4 4c0 3 4 6 4 6s4-3 4-6a4 4 0 0 0-4-4z"/></svg>
-                </div>
                 <div class="value">18-27C</div>
                 <div class="title">ASHRAE A1 Range</div>
                 <div class="desc">ASHRAE A1 recommended inlet temperature envelope is 18-27 degrees Celsius. Widening to A2-A4 allows up to 45 degrees C but increases equipment failure risk.</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </div>
                 <div class="value">30-40%</div>
                 <div class="title">Energy for Cooling</div>
                 <div class="desc">Cooling infrastructure typically consumes 30-40% of total data center energy, making it the single largest non-IT energy consumer and the primary lever for PUE reduction.</div>

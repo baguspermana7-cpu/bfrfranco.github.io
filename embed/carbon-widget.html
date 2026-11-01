@@ -15,8 +15,8 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
+            background: #0e0f12;
+            color: #cfd3da;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -31,7 +31,7 @@
         .widget-header h1 {
             font-size: 1.15rem;
             font-weight: 700;
-            color: #06b6d4;
+            color: #E8B563;
             letter-spacing: -0.3px;
         }
         .widget-header p {
@@ -47,7 +47,7 @@
             display: block;
             font-size: 0.8rem;
             font-weight: 600;
-            color: #94a3b8;
+            color: #969eaa;
             margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -56,10 +56,10 @@
         .input-group select {
             width: 100%;
             padding: 10px 14px;
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: #16181d;
+            border: 1px solid #2a2d34;
             border-radius: 8px;
-            color: #e2e8f0;
+            color: #cfd3da;
             font-size: 0.95rem;
             font-family: inherit;
             outline: none;
@@ -75,8 +75,8 @@
         }
         .input-group input:focus,
         .input-group select:focus {
-            border-color: #06b6d4;
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+            border-color: #E8B563;
+            box-shadow: 0 0 0 3px rgba(232, 181, 99, 0.15);
         }
         .input-hint {
             font-size: 0.72rem;
@@ -93,7 +93,7 @@
             flex: 1;
             -webkit-appearance: none;
             height: 6px;
-            background: #334155;
+            background: #2a2d34;
             border-radius: 3px;
             outline: none;
             border: none;
@@ -102,29 +102,29 @@
         .range-row input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 18px; height: 18px;
-            background: #06b6d4;
+            background: #E8B563;
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid #0f172a;
+            border: 2px solid #0e0f12;
         }
         .range-row input[type="range"]::-moz-range-thumb {
             width: 18px; height: 18px;
-            background: #06b6d4;
+            background: #E8B563;
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid #0f172a;
+            border: 2px solid #0e0f12;
         }
         .range-val {
             font-size: 0.9rem;
             font-weight: 700;
-            color: #06b6d4;
+            color: #E8B563;
             min-width: 40px;
             text-align: right;
         }
 
         .results-panel {
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: #16181d;
+            border: 1px solid #2a2d34;
             border-radius: 4px;
             padding: 18px;
             margin-top: 6px;
@@ -134,7 +134,7 @@
             text-align: center;
             margin-bottom: 16px;
             padding-bottom: 14px;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid #2a2d34;
         }
         .co2-value {
             font-size: 2.4rem;
@@ -161,20 +161,23 @@
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: 1fr;
+            gap: 0;
+            border-top: 1px solid #2a2d34;
         }
         .metric-card {
-            background: rgba(6, 182, 212, 0.05);
-            border: 1px solid rgba(6, 182, 212, 0.12);
-            border-radius: 4px;
-            padding: 10px 12px;
-            text-align: center;
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            padding: 7px 0;
+            border-bottom: 1px solid #2a2d34;
         }
         .metric-card .metric-val {
             font-size: 1rem;
             font-weight: 700;
-            color: #06b6d4;
+            color: #E8B563;
         }
         .metric-card .metric-lbl {
             font-size: 0.68rem;
@@ -204,14 +207,14 @@
         }
         .month-col {
             flex: 1;
-            background: rgba(6, 182, 212, 0.3);
+            background: rgba(232, 181, 99, 0.3);
             border-radius: 3px 3px 0 0;
             transition: height 0.3s;
             position: relative;
             min-height: 4px;
         }
         .month-col:hover {
-            background: #06b6d4;
+            background: #E8B563;
         }
         .month-labels {
             display: flex;
@@ -240,10 +243,10 @@
             font-weight: 500;
             transition: color 0.2s;
         }
-        .powered-by a:hover { color: #06b6d4; }
+        .powered-by a:hover { color: #E8B563; }
         .powered-by .rz-dot {
             width: 6px; height: 6px;
-            background: #06b6d4;
+            background: #E8B563;
             border-radius: 50%;
             display: inline-block;
         }
@@ -303,7 +306,7 @@
             <div class="co2-rating" id="co2Rating">C -- Average</div>
         </div>
 
-        <div class="metrics-grid">
+        <div class="metrics-grid" data-rz-fact-list>
             <div class="metric-card green">
                 <div class="metric-val" id="treesValue">157,564</div>
                 <div class="metric-lbl">Trees Equivalent</div>
@@ -396,7 +399,7 @@
         var rating, color, bg;
         if (intensityPerKWh < 0.05) { rating = 'Near Zero'; color = '#22c55e'; bg = 'rgba(34,197,94,0.15)'; }
         else if (intensityPerKWh < 0.15) { rating = 'Excellent'; color = '#10b981'; bg = 'rgba(16,185,129,0.15)'; }
-        else if (intensityPerKWh < 0.30) { rating = 'Good'; color = '#06b6d4'; bg = 'rgba(6,182,212,0.15)'; }
+        else if (intensityPerKWh < 0.30) { rating = 'Good'; color = '#E8B563'; bg = 'rgba(232,181,99,0.15)'; }
         else if (intensityPerKWh < 0.50) { rating = 'Average'; color = '#f59e0b'; bg = 'rgba(245,158,11,0.15)'; }
         else if (intensityPerKWh < 0.70) { rating = 'Below Average'; color = '#f97316'; bg = 'rgba(249,115,22,0.15)'; }
         else { rating = 'High Emissions'; color = '#ef4444'; bg = 'rgba(239,68,68,0.15)'; }

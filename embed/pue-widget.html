@@ -15,8 +15,8 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
+            background: #0e0f12;
+            color: #cfd3da;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -31,7 +31,7 @@
         .widget-header h1 {
             font-size: 1.15rem;
             font-weight: 700;
-            color: #06b6d4;
+            color: #E8B563;
             letter-spacing: -0.3px;
         }
         .widget-header p {
@@ -40,14 +40,14 @@
             margin-top: 4px;
         }
         .formula-bar {
-            background: rgba(6, 182, 212, 0.08);
-            border: 1px solid rgba(6, 182, 212, 0.2);
+            background: rgba(232, 181, 99, 0.08);
+            border: 1px solid rgba(232, 181, 99, 0.2);
             border-radius: 8px;
             padding: 8px 14px;
             text-align: center;
             font-family: 'Courier New', monospace;
             font-size: 0.82rem;
-            color: #06b6d4;
+            color: #E8B563;
             margin-bottom: 20px;
             font-weight: 600;
         }
@@ -59,7 +59,7 @@
             display: block;
             font-size: 0.8rem;
             font-weight: 600;
-            color: #94a3b8;
+            color: #969eaa;
             margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -67,18 +67,18 @@
         .input-group input {
             width: 100%;
             padding: 10px 14px;
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: #16181d;
+            border: 1px solid #2a2d34;
             border-radius: 8px;
-            color: #e2e8f0;
+            color: #cfd3da;
             font-size: 0.95rem;
             font-family: inherit;
             outline: none;
             transition: border-color 0.2s;
         }
         .input-group input:focus {
-            border-color: #06b6d4;
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+            border-color: #E8B563;
+            box-shadow: 0 0 0 3px rgba(232, 181, 99, 0.15);
         }
         .input-hint {
             font-size: 0.72rem;
@@ -87,8 +87,8 @@
         }
 
         .results-panel {
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: #16181d;
+            border: 1px solid #2a2d34;
             border-radius: 4px;
             padding: 18px;
             margin-top: 6px;
@@ -123,20 +123,23 @@
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: 1fr;
+            gap: 0;
+            border-top: 1px solid #2a2d34;
         }
         .metric-card {
-            background: rgba(6, 182, 212, 0.05);
-            border: 1px solid rgba(6, 182, 212, 0.12);
-            border-radius: 4px;
-            padding: 10px 12px;
-            text-align: center;
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            padding: 7px 0;
+            border-bottom: 1px solid #2a2d34;
         }
         .metric-card .metric-val {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #06b6d4;
+            color: #E8B563;
         }
         .metric-card .metric-lbl {
             font-size: 0.68rem;
@@ -159,7 +162,7 @@
         .bar-track {
             width: 100%;
             height: 6px;
-            background: #334155;
+            background: #2a2d34;
             border-radius: 3px;
             overflow: hidden;
         }
@@ -184,10 +187,10 @@
             font-weight: 500;
             transition: color 0.2s;
         }
-        .powered-by a:hover { color: #06b6d4; }
+        .powered-by a:hover { color: #E8B563; }
         .powered-by .rz-dot {
             width: 6px; height: 6px;
-            background: #06b6d4;
+            background: #E8B563;
             border-radius: 50%;
             display: inline-block;
         }
@@ -226,7 +229,7 @@
             <div class="rating-badge" id="ratingBadge">B -- Good</div>
         </div>
 
-        <div class="metrics-grid">
+        <div class="metrics-grid" data-rz-fact-list>
             <div class="metric-card">
                 <div class="metric-val" id="dcieValue">66.7%</div>
                 <div class="metric-lbl">DCiE</div>
@@ -301,7 +304,7 @@
 
         var rating, color, bg;
         if (pue <= 1.2) { rating = 'Excellent'; color = '#10b981'; bg = 'rgba(16,185,129,0.15)'; }
-        else if (pue <= 1.4) { rating = 'Good'; color = '#06b6d4'; bg = 'rgba(6,182,212,0.15)'; }
+        else if (pue <= 1.4) { rating = 'Good'; color = '#E8B563'; bg = 'rgba(232,181,99,0.15)'; }
         else if (pue <= 1.6) { rating = 'Average'; color = '#3b82f6'; bg = 'rgba(59,130,246,0.15)'; }
         else if (pue <= 1.8) { rating = 'Below Average'; color = '#f59e0b'; bg = 'rgba(245,158,11,0.15)'; }
         else if (pue <= 2.0) { rating = 'Poor'; color = '#f97316'; bg = 'rgba(249,115,22,0.15)'; }

@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" defer integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="css/rz-finance-suite.css?v=20260920-cf9e636d">
+    <link rel="stylesheet" href="css/rz-finance-suite.css?v=20261031-0d10bd90">
 <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         body{font-family:var(--fs-sans);background:var(--fs-bg0);color:var(--fs-t2);min-height:100vh;display:flex}
@@ -74,8 +74,8 @@
 
         /* ═══ KPI GRID ═══ */
         .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem}
-        .kpi{background:var(--fs-bg2);border:1px solid var(--fs-bd);border-radius:4px;padding:1.25rem;transition:transform 0.2s}
-        .kpi:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+        .kpi{background:var(--fs-bg2);border:1px solid var(--fs-bd);border-radius:4px;padding:1.25rem;transition:border-color 0.2s}
+        .kpi:hover{border-color:var(--fs-acc)}
         .kpi-icon{width:40px;height:40px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.95rem;margin-bottom:0.75rem}
         .kpi-label{font-size:0.68rem;color:var(--fs-t4);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
         .kpi-val{font-size:1.8rem;font-weight:800;color:var(--fs-t1);margin:0.15rem 0}
@@ -120,10 +120,10 @@
         .tier-badge.educator{background:rgba(8,145,178,0.18);color:#67e8f9}
         .tier-badge.root{background:rgba(239,68,68,0.18);color:#fca5a5}
         /* Supabase panel: instrument-style state banner (border-left color = state) */
-        .supa-status{display:flex;align-items:center;gap:9px;font-size:0.76rem;color:#cbd5e1;background:rgba(15,23,42,0.6);border:1px solid rgba(51,65,85,0.5);border-left:2px solid var(--fs-bd);border-radius:4px;padding:8px 12px;line-height:1.35}
+        .supa-status{display:flex;align-items:center;gap:9px;font-size:0.76rem;color:#cbd5e1;background:rgba(18,19,22,0.6);border:1px solid rgba(51,65,85,0.5);border-left:2px solid var(--fs-bd);border-radius:4px;padding:8px 12px;line-height:1.35}
         .supa-status i{flex:0 0 auto;font-size:0.8rem}
         .supa-status a{color:#67e8f9;text-decoration:underline}
-        #supaAccountsList .cred-row select{font-family:'JetBrains Mono',monospace;background:#0b1220;color:var(--fs-t2);border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:5px 8px;font-size:0.72rem;cursor:pointer;transition:border-color .15s}
+        #supaAccountsList .cred-row select{font-family:'JetBrains Mono',monospace;background:#121316;color:var(--fs-t2);border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:5px 8px;font-size:0.72rem;cursor:pointer;transition:border-color .15s}
         #supaAccountsList .cred-row select:hover{border-color:rgba(34,211,238,0.55)}
         #supaAccountsList .cred-row select:focus{outline:none;border-color:var(--fs-cyn)}
         #supaAccountsList .cred-row select:disabled{opacity:0.5;cursor:progress}
@@ -334,7 +334,7 @@
         .skip-link:focus{top:0}
 
         /* ═══ LOGIN PAGE ═══ */
-        .login-page{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:#050816;background-image:radial-gradient(ellipse 80% 60% at 50% 120%,rgba(14,116,144,0.15),transparent),radial-gradient(ellipse 60% 50% at 80% 0%,rgba(59,130,246,0.07),transparent),radial-gradient(ellipse 50% 40% at 10% 20%,rgba(100, 116, 139,0.06),transparent)}
+        .login-page{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:#0e0f12;background-image:radial-gradient(ellipse 80% 60% at 50% 120%,rgba(14,116,144,0.15),transparent),radial-gradient(ellipse 60% 50% at 80% 0%,rgba(59,130,246,0.07),transparent),radial-gradient(ellipse 50% 40% at 10% 20%,rgba(100, 116, 139,0.06),transparent)}
         .login-page .login-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
         .login-page .login-bg::before{content:'';position:absolute;top:-15%;right:-5%;width:700px;height:700px;background:radial-gradient(circle,rgba(14,116,144,0.10) 0%,rgba(14,116,144,0.03) 40%,transparent 65%);animation:loginOrb1 12s ease-in-out infinite alternate}
         .login-page .login-bg::after{content:'';position:absolute;bottom:-10%;left:-5%;width:600px;height:600px;background:radial-gradient(circle,rgba(59,130,246,0.08) 0%,rgba(59,130,246,0.02) 40%,transparent 65%);animation:loginOrb2 15s ease-in-out infinite alternate}
@@ -357,7 +357,7 @@
         .login-field label a:hover{color:#67e8f9;text-decoration:underline}
         .login-field-wrap{position:relative}
         .login-field-wrap .login-field-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#475569;font-size:0.82rem;pointer-events:none;transition:color 0.2s}
-        .login-field-wrap input{width:100%;padding:12px 14px 12px 42px;border-radius:10px;border:1px solid rgba(51,65,85,0.6);background:rgba(15,23,42,0.6);color:var(--fs-t1);font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;box-sizing:border-box}
+        .login-field-wrap input{width:100%;padding:12px 14px 12px 42px;border-radius:10px;border:1px solid rgba(51,65,85,0.6);background:rgba(18,19,22,0.6);color:var(--fs-t1);font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;box-sizing:border-box}
         .login-field-wrap input:focus{border-color:#64748b;box-shadow:0 0 0 3px rgba(14,116,144,0.15);background:rgba(15,23,42,0.9)}
         .login-field-wrap input:focus ~ .login-field-icon{color:var(--fs-acc2)}
         .login-field-wrap input::placeholder{color:#4b5563;font-size:0.84rem}
@@ -509,7 +509,7 @@
         body.light-mode .card{background:#fff;border-color:#e2e8f0}
         body.light-mode .card-title{color:#1e293b}
         body.light-mode .kpi{background:#fff;border-color:#e2e8f0}
-        body.light-mode .kpi:hover{box-shadow:0 8px 24px rgba(0,0,0,0.08)}
+        
         body.light-mode .kpi-val{color:#1e293b}
         body.light-mode .kpi-label{color:#64748b}
         body.light-mode .data-tbl th{color:#64748b;border-color:#e2e8f0}
@@ -569,7 +569,7 @@
         body.light-mode .health-stat{background:#f8fafc;border-color:#e2e8f0}
 
         /* ═══ MAYAR PAYMENTS ═══ */
-        .mayar-tabs{display:flex;gap:4px;margin-bottom:1.5rem;background:var(--fs-bg3);padding:4px;border-radius:10px;border:1px solid #1f2937;overflow-x:auto}
+        .mayar-tabs{display:flex;gap:4px;margin-bottom:1.5rem;background:var(--fs-bg3);padding:4px;border-radius:10px;border:1px solid #2a2d34;overflow-x:auto}
         .mayar-tab{padding:8px 16px;border-radius:8px;border:none;background:transparent;color:var(--fs-t3);font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap}
         .mayar-tab:hover{color:var(--fs-t2);background:rgba(100, 116, 139,0.08)}
         .mayar-tab.active{background:linear-gradient(135deg,#64748b,var(--fs-acc));color:#fff;box-shadow:0 2px 8px rgba(100, 116, 139,0.3)}
@@ -617,7 +617,7 @@
         body.light-mode .mayar-rate-bar{background:#e2e8f0}
 
         /* ═══ USER ACTIVITY ═══ */
-        .ua-filter-bar{display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;padding:8px 12px;background:var(--fs-bg3);border:1px solid #1f2937;border-radius:10px}
+        .ua-filter-bar{display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;padding:8px 12px;background:var(--fs-bg3);border:1px solid #2a2d34;border-radius:10px}
         .ua-filter-bar label{font-size:0.68rem;font-weight:600;color:var(--fs-t4);text-transform:uppercase;letter-spacing:0.5px}
         .ua-filter-bar input[type="date"]{padding:5px 8px;background:var(--fs-bg2);border:1px solid var(--fs-bd);border-radius:6px;color:var(--fs-t2);font-size:0.72rem;font-family:inherit;outline:none}
         .ua-filter-bar input[type="date"]:focus{border-color:var(--fs-acc)}
@@ -710,7 +710,7 @@
         body.light-mode .map-popup-row .val{color:#1e293b}
         body.light-mode #dcGlobalMap{background:#f8fafc}
     </style>
-    <script src="js/rz-version.js?v=20261031-8612b8f7" defer></script>
+    <script src="js/rz-version.js?v=20261101-53a80dbe" defer></script>
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
@@ -1035,9 +1035,9 @@
         <!-- Add-account form (root-only, hidden until toggled) -->
         <div id="supaAddForm" style="display:none;background:rgba(15,23,42,0.55);border:1px solid rgba(51,65,85,0.5);border-radius:6px;padding:12px;margin-bottom:0.7rem;">
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
-                <label style="font-size:0.66rem;color:#94a3b8;display:flex;flex-direction:column;gap:3px;flex:1 1 200px;">EMAIL<input id="supaNewEmail" type="email" autocomplete="off" placeholder="user@example.com" style="background:#0b1220;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;"></label>
-                <label style="font-size:0.66rem;color:#94a3b8;display:flex;flex-direction:column;gap:3px;flex:1 1 160px;">PASSWORD (min 8)<input id="supaNewPass" type="text" autocomplete="off" placeholder="min 8 characters" style="background:#0b1220;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;font-family:'JetBrains Mono',monospace;"></label>
-                <label style="font-size:0.66rem;color:#94a3b8;display:flex;flex-direction:column;gap:3px;">TIER<select id="supaNewTier" style="background:#0b1220;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;font-family:'JetBrains Mono',monospace;"><option value="free">free</option><option value="demo">demo</option><option value="pro">pro</option><option value="root">root</option></select></label>
+                <label style="font-size:0.66rem;color:#94a3b8;display:flex;flex-direction:column;gap:3px;flex:1 1 200px;">EMAIL<input id="supaNewEmail" type="email" autocomplete="off" placeholder="user@example.com" style="background:#121316;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;"></label>
+                <label style="font-size:0.66rem;color:#94a3b8;display:flex;flex-direction:column;gap:3px;flex:1 1 160px;">PASSWORD (min 8)<input id="supaNewPass" type="text" autocomplete="off" placeholder="min 8 characters" style="background:#121316;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;font-family:'JetBrains Mono',monospace;"></label>
+                <label style="font-size:0.66rem;color:#94a3b8;display:flex;flex-direction:column;gap:3px;">TIER<select id="supaNewTier" style="background:#121316;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;font-family:'JetBrains Mono',monospace;"><option value="free">free</option><option value="demo">demo</option><option value="pro">pro</option><option value="root">root</option></select></label>
                 <button class="btn btn-sm" onclick="submitAddAccount()" style="background:#22d3ee;color:#06202a;font-weight:700;"><i class="fas fa-check"></i> Create</button>
                 <button class="btn btn-ghost btn-sm" onclick="toggleAddAccount(false)">Cancel</button>
             </div>
@@ -1069,7 +1069,7 @@
                 <div class="features-main-header">
                     <span id="featureMatrixTitle" style="font-size:0.85rem;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace"></span>
                     <div style="display:flex;gap:0.5rem;align-items:center">
-                        <select id="featurePresetSelect" style="background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:0.72rem;padding:4px 8px;font-family:inherit;cursor:pointer;outline:none" onchange="applyFeaturePreset(this.value)" aria-label="Apply feature preset">
+                        <select id="featurePresetSelect" style="background:#121316;border:1px solid #2a2d34;border-radius:6px;color:#e2e8f0;font-size:0.72rem;padding:4px 8px;font-family:inherit;cursor:pointer;outline:none" onchange="applyFeaturePreset(this.value)" aria-label="Apply feature preset">
                             <option value="">Apply preset...</option>
                             <option value="all_free">All tiers on</option>
                             <option value="all_demo+">Demo + Full access + Root</option>
@@ -1152,7 +1152,7 @@
             <div style="font-size:0.62rem;color:#475569;margin-top:4px"><i class="fas fa-clock" style="margin-right:3px"></i>Last updated: Feb 2026 · Sources: Synergy Q3 2025, CBRE H1 2025, JLL 2026 Outlook</div>
         </div>
         <div style="display:flex;gap:0.5rem;flex-shrink:0;align-items:center;flex-wrap:wrap">
-            <div style="position:relative"><i class="fas fa-search" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#475569;font-size:0.7rem"></i><input type="text" id="dcGlobalSearch" placeholder="Search all..." style="padding:5px 8px 5px 26px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:0.72rem;font-family:inherit;outline:none;width:160px" oninput="dcGlobalSearchFilter(this.value)" aria-label="Search all..."></div>
+            <div style="position:relative"><i class="fas fa-search" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#475569;font-size:0.7rem"></i><input type="text" id="dcGlobalSearch" placeholder="Search all..." style="padding:5px 8px 5px 26px;background:#121316;border:1px solid #2a2d34;border-radius:6px;color:#e2e8f0;font-size:0.72rem;font-family:inherit;outline:none;width:160px" oninput="dcGlobalSearchFilter(this.value)" aria-label="Search all..."></div>
             <button class="btn btn-ghost btn-sm" onclick="openDcCompareMode()" title="Compare operators"><i class="fas fa-columns"></i> Compare</button>
             <button class="btn btn-green btn-sm" onclick="exportBenchmarksCSV()"><i class="fas fa-download"></i> CSV</button>
             <button class="btn btn-amber btn-sm" onclick="exportBenchJSON()" title="Export as JSON"><i class="fas fa-code"></i> JSON</button>
@@ -2010,12 +2010,12 @@
 
 <!-- ══════════════════════════════════════ FINANCE TERMINAL ══════════════════════════════════════ -->
 <div class="section" id="sec-finance-terminal">
-    <iframe id="finance-terminal-iframe" src="Apps/finance-terminal/index.html" style="width:100%;height:calc(100vh - 80px);border:none;background:#0b1120;" loading="lazy" title="Finance Terminal"></iframe>
+    <iframe id="finance-terminal-iframe" src="Apps/finance-terminal/index.html" style="width:100%;height:calc(100vh - 80px);border:none;background:#0e0f12;" loading="lazy" title="Finance Terminal"></iframe>
 </div>
 
 <!-- ══════════════════════════════════════ IDR STOCKS ══════════════════════════════════════ -->
 <div class="section" id="sec-idr-stocks">
-    <iframe id="idr-stocks-iframe" src="Apps/stock_screener/prototype/index.html" style="width:100%;height:calc(100vh - 80px);border:none;background:#0b1120;" loading="lazy" title="IDR Stocks Screener"></iframe>
+    <iframe id="idr-stocks-iframe" src="Apps/stock_screener/prototype/index.html" style="width:100%;height:calc(100vh - 80px);border:none;background:#0e0f12;" loading="lazy" title="IDR Stocks Screener"></iframe>
 </div>
 
         </div><!-- /main-content -->
@@ -3564,7 +3564,7 @@ function renderFeatures() {
     document.getElementById('userOverrides').innerHTML =
         '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem">' +
         proUsers.map(function(u) {
-            return '<div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:1rem;display:flex;align-items:center;gap:12px">' +
+            return '<div style="background:#121316;border:1px solid #2a2d34;border-radius:10px;padding:1rem;display:flex;align-items:center;gap:12px">' +
                 '<div class="cred-avatar" style="background:#64748b;width:32px;height:32px;font-size:0.6rem">' + u.name.charAt(0) + '<\/div>' +
                 '<div style="flex:1;min-width:0"><div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + u.email + '<\/div><span class="tier-badge pro" style="margin-top:4px">FULL<\/span><\/div>' +
                 '<button class="btn btn-ghost btn-sm" onclick="(window.showToast||alert)(\'Override panel for ' + u.email + ' — coming with Supabase integration\')"><i class="fas fa-sliders-h"><\/i><\/button>' +
@@ -3579,7 +3579,7 @@ function renderFeatures() {
     document.getElementById('experimentalFeatures').innerHTML =
         '<div style="display:grid;gap:0.75rem">' +
         expItems.map(function(x) {
-            return '<div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#0f172a;border:1px solid #334155;border-radius:10px">' +
+            return '<div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#121316;border:1px solid #2a2d34;border-radius:10px">' +
                 '<div><div style="font-size:0.85rem;font-weight:600;color:#e2e8f0">' + x.l + '<\/div><div style="font-size:0.72rem;color:#64748b">' + x.d + '<\/div><\/div>' +
                 '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:0.68rem;color:' + (x.s?'#34d399':'#f87171') + ';font-weight:600">' + (x.s?'ENABLED':'DISABLED') + '<\/span>' +
                 '<label class="toggle"><input type="checkbox" ' + (x.s?'checked':'') + ' onchange="toggleExperimental(\'' + x.k + '\',this.checked)"><span class="slider"><\/span><\/label><\/div>' +
@@ -4199,9 +4199,9 @@ function filterBenchCountries(){
     const hhi=Math.round(DC_COUNTRIES.reduce((s,c)=>s+Math.pow(c.mw/totalCountryMW2*100,2),0));
     document.getElementById('benchCountryTable').innerHTML=`
     <div style="display:flex;gap:1rem;margin-bottom:0.75rem;flex-wrap:wrap">
-        <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:8px 14px;font-size:0.72rem"><span style="color:#64748b">HHI Index:</span> <span style="color:${hhi>2500?'#f87171':hhi>1500?'#fbbf24':'#34d399'};font-weight:700">${hhi}</span> <span style="color:#475569">(${hhi>2500?'Highly Concentrated':hhi>1500?'Moderate':'Competitive'})</span></div>
-        <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:8px 14px;font-size:0.72rem"><span style="color:#64748b">Avg Power Cost:</span> <span style="color:#e2e8f0;font-weight:700">$${(DC_COUNTRIES.reduce((s,c)=>s+c.powerCostPerKWh,0)/DC_COUNTRIES.length).toFixed(3)}/kWh</span></div>
-        <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:8px 14px;font-size:0.72rem"><span style="color:#64748b">Avg PUE:</span> <span style="color:#e2e8f0;font-weight:700">${(DC_COUNTRIES.reduce((s,c)=>s+c.avgPUE,0)/DC_COUNTRIES.length).toFixed(2)}</span></div>
+        <div style="background:#121316;border:1px solid #2a2d34;border-radius:8px;padding:8px 14px;font-size:0.72rem"><span style="color:#64748b">HHI Index:</span> <span style="color:${hhi>2500?'#f87171':hhi>1500?'#fbbf24':'#34d399'};font-weight:700">${hhi}</span> <span style="color:#475569">(${hhi>2500?'Highly Concentrated':hhi>1500?'Moderate':'Competitive'})</span></div>
+        <div style="background:#121316;border:1px solid #2a2d34;border-radius:8px;padding:8px 14px;font-size:0.72rem"><span style="color:#64748b">Avg Power Cost:</span> <span style="color:#e2e8f0;font-weight:700">$${(DC_COUNTRIES.reduce((s,c)=>s+c.powerCostPerKWh,0)/DC_COUNTRIES.length).toFixed(3)}/kWh</span></div>
+        <div style="background:#121316;border:1px solid #2a2d34;border-radius:8px;padding:8px 14px;font-size:0.72rem"><span style="color:#64748b">Avg PUE:</span> <span style="color:#e2e8f0;font-weight:700">${(DC_COUNTRIES.reduce((s,c)=>s+c.avgPUE,0)/DC_COUNTRIES.length).toFixed(2)}</span></div>
     </div>
     <table class="bench-table"><thead><tr>
         <th onclick="sortBenchCountries('rank')" style="cursor:pointer"  scope="col">#</th><th onclick="sortBenchCountries('country')" style="cursor:pointer"  scope="col">Country</th><th scope="col">Region</th><th onclick="sortBenchCountries('mw')" style="cursor:pointer"  scope="col">Capacity</th><th onclick="sortBenchCountries('facilities')" style="cursor:pointer"  scope="col">Facilities</th><th onclick="sortBenchCountries('growth')" style="cursor:pointer"  scope="col">Growth YoY</th><th scope="col">2030 Est.</th><th onclick="sortBenchCountries('powerCostPerKWh')" style="cursor:pointer"  scope="col">$/kWh</th><th onclick="sortBenchCountries('avgPUE')" style="cursor:pointer"  scope="col">PUE</th><th onclick="sortBenchCountries('waterStress')" style="cursor:pointer"  scope="col">Water</th><th onclick="sortBenchCountries('fiberConnectivity')" style="cursor:pointer"  scope="col">Fiber</th><th scope="col">Key Cities</th>
@@ -4349,7 +4349,7 @@ function renderBenchMarket(){
             {l:'YoY Growth',v:Math.round(DC_SUMMARY.emea.yoyGrowth*100)+'%'},
             {l:'Pipeline',v:DC_SUMMARY.emea.pipelineGW+'GW'}
         ]}
-    ].map(r=>`<div style="background:#0f172a;border:1px solid #1f2937;border-radius:10px;padding:1rem">
+    ].map(r=>`<div style="background:#121316;border:1px solid #2a2d34;border-radius:10px;padding:1rem">
         <div style="font-size:0.82rem;font-weight:700;color:${r.color};margin-bottom:0.6rem"><i class="fas ${r.icon}" style="margin-right:4px"></i>${r.title}</div>
         ${r.items.map(i=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(51,65,85,0.2)"><span style="font-size:0.72rem;color:#94a3b8">${i.l}</span><span style="font-size:0.72rem;color:#e2e8f0;font-weight:600">${i.v}</span></div>`).join('')}
     </div>`).join('');
@@ -4427,7 +4427,7 @@ function showOperatorModal(rank){
             <div style="display:flex;flex-wrap:wrap;gap:4px">${o.keyMarkets.map(m=>'<span style="background:rgba(100, 116, 139,0.12);color:#94a3b8;padding:3px 10px;border-radius:12px;font-size:0.7rem;font-weight:600">'+m+'</span>').join('')}</div>
         </div>
         <div class="m-section"><h4><i class="fas fa-chart-bar"></i> Diversification Score</h4>
-            <div style="background:#0f172a;border-radius:6px;height:12px;overflow:hidden"><div style="height:100%;width:${divScore}%;background:#64748b;border-radius:6px"></div></div>
+            <div style="background:#121316;border-radius:6px;height:12px;overflow:hidden"><div style="height:100%;width:${divScore}%;background:#64748b;border-radius:6px"></div></div>
             <div style="font-size:0.68rem;color:#64748b;margin-top:4px">${divScore}% geographic diversification (${o.countries} of ${Math.max(...DC_OPERATORS.map(x=>x.countries))} max countries)</div>
         </div>
         ${opFacilities.length>0?`<div class="m-section"><h4><i class="fas fa-server"></i> Known Facilities (${opFacilities.length})</h4>
@@ -4471,7 +4471,7 @@ function openDcCompareMode(){
     let html=`<h3 style="font-size:1rem;font-weight:800;color:#f1f5f9;margin-bottom:1rem"><i class="fas fa-columns" style="margin-right:6px"></i> Compare Operators</h3>
         <p style="font-size:0.75rem;color:#64748b;margin-bottom:1rem">Select 2-5 operators to compare side-by-side</p>
         <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1rem" id="dcCompareCheckboxes">
-            ${DC_OPERATORS.slice(0,30).map(o=>`<label style="display:inline-flex;align-items:center;gap:4px;background:#0f172a;border:1px solid #1f2937;border-radius:6px;padding:4px 10px;font-size:0.72rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" value="${o.rank}" onchange="dcCompareToggle(${o.rank})" style="accent-color:#64748b">${o.company.split('(')[0].split('/')[0].trim().substring(0,20)}</label>`).join('')}
+            ${DC_OPERATORS.slice(0,30).map(o=>`<label style="display:inline-flex;align-items:center;gap:4px;background:#121316;border:1px solid #2a2d34;border-radius:6px;padding:4px 10px;font-size:0.72rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" value="${o.rank}" onchange="dcCompareToggle(${o.rank})" style="accent-color:#64748b">${o.company.split('(')[0].split('/')[0].trim().substring(0,20)}</label>`).join('')}
         </div>
         <button class="btn btn-purple btn-sm" onclick="dcRunComparison()"><i class="fas fa-chart-bar"></i> Compare Selected</button>
         <div id="dcCompareResult" style="margin-top:1rem"></div>`;
@@ -4759,16 +4759,16 @@ function renderProjectionAnalytics(){
         }).join('')}
     </tbody></table>
     <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap">
-        <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:8px 14px;font-size:0.72rem">
+        <div style="background:#121316;border:1px solid #2a2d34;border-radius:8px;padding:8px 14px;font-size:0.72rem">
             <span style="color:#64748b">Hyperscale Demand 2030:</span> <span style="color:#60a5fa;font-weight:700">${infraDemand2030.hyperscale.toFixed(0)} GW</span>
             <span style="color:#475569;margin:0 4px">vs Supply:</span> <span style="color:${infraDemand2030.hyperscale>infraSupply2030.hyperscale?'#f87171':'#34d399'};font-weight:700">${infraSupply2030.hyperscale.toFixed(0)} GW</span>
             <span style="color:${infraDemand2030.hyperscale>infraSupply2030.hyperscale?'#f87171':'#34d399'};font-weight:600;margin-left:4px">(${infraDemand2030.hyperscale>infraSupply2030.hyperscale?'DEFICIT':'OK'}: ${Math.abs(infraDemand2030.hyperscale-infraSupply2030.hyperscale).toFixed(0)} GW)</span>
         </div>
-        <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:8px 14px;font-size:0.72rem">
+        <div style="background:#121316;border:1px solid #2a2d34;border-radius:8px;padding:8px 14px;font-size:0.72rem">
             <span style="color:#64748b">Colo Demand 2030:</span> <span style="color:#94a3b8;font-weight:700">${infraDemand2030.colo.toFixed(0)} GW</span>
             <span style="color:#475569;margin:0 4px">vs Supply:</span> <span style="color:${infraDemand2030.colo>infraSupply2030.colo?'#f87171':'#34d399'};font-weight:700">${infraSupply2030.colo.toFixed(0)} GW</span>
         </div>
-        <div style="background:#0f172a;border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:8px 14px;font-size:0.72rem">
+        <div style="background:#121316;border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:8px 14px;font-size:0.72rem">
             <span style="color:#64748b">Edge Demand 2030:</span> <span style="color:#34d399;font-weight:700">${infraDemand2030.edge.toFixed(1)} GW</span>
             <span style="color:#475569;margin:0 4px">vs Supply:</span> <span style="color:#f87171;font-weight:700">${infraSupply2030.edge.toFixed(1)} GW</span>
             <span style="color:#f87171;font-weight:600;margin-left:4px">CRITICAL GAP</span>
@@ -4833,7 +4833,7 @@ function renderProjectionAnalytics(){
             <div>
                 <h5 style="font-size:0.75rem;font-weight:700;color:#94a3b8;margin-bottom:6px"><i class="fas fa-function" style="margin-right:4px"></i>Supply Projection Model</h5>
                 <div style="font-size:0.7rem;color:#94a3b8;line-height:1.6">
-                    <div style="margin-bottom:4px"><strong style="color:#e2e8f0">Formula:</strong> <code style="background:#0f172a;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.65rem">S(t) = S₀ × (1 + CAGR × 0.92^t)</code></div>
+                    <div style="margin-bottom:4px"><strong style="color:#e2e8f0">Formula:</strong> <code style="background:#121316;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.65rem">S(t) = S₀ × (1 + CAGR × 0.92^t)</code></div>
                     <div style="margin-bottom:4px">• Base: Regional installed capacity from DC_SUMMARY (Synergy/CBRE 2025)</div>
                     <div style="margin-bottom:4px">• CAGR: Americas 17%, EMEA 21%, APAC 12% from C&W/JLL data</div>
                     <div style="margin-bottom:4px">• Constraint dampening: 0.92 per year (power, permits, labor)</div>
@@ -4843,7 +4843,7 @@ function renderProjectionAnalytics(){
             <div>
                 <h5 style="font-size:0.75rem;font-weight:700;color:#f87171;margin-bottom:6px"><i class="fas fa-brain" style="margin-right:4px"></i>Demand Projection Model</h5>
                 <div style="font-size:0.7rem;color:#94a3b8;line-height:1.6">
-                    <div style="margin-bottom:4px"><strong style="color:#e2e8f0">Formula:</strong> <code style="background:#0f172a;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.65rem">D(t) = Σ P_i × (1 + g_i × 0.88^t) × R_region</code></div>
+                    <div style="margin-bottom:4px"><strong style="color:#e2e8f0">Formula:</strong> <code style="background:#121316;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.65rem">D(t) = Σ P_i × (1 + g_i × 0.88^t) × R_region</code></div>
                     <div style="margin-bottom:4px">• Per-provider growth rates from CapEx trajectory analysis</div>
                     <div style="margin-bottom:4px">• AI-native providers: 65-90% CAGR (OpenAI, Anthropic, xAI)</div>
                     <div style="margin-bottom:4px">• Hyperscalers: 20-45% CAGR (MSFT, GOOG, AWS, META, ORCL)</div>
@@ -4851,7 +4851,7 @@ function renderProjectionAnalytics(){
                 </div>
             </div>
         </div>
-        <div style="margin-top:1rem;padding:10px;background:#0f172a;border:1px solid rgba(248,113,113,0.2);border-radius:8px">
+        <div style="margin-top:1rem;padding:10px;background:#121316;border:1px solid rgba(248,113,113,0.2);border-radius:8px">
             <div style="font-size:0.7rem;color:#f87171;font-weight:600;margin-bottom:4px"><i class="fas fa-exclamation-triangle" style="margin-right:4px"></i>Key Limitation</div>
             <div style="font-size:0.68rem;color:#94a3b8;line-height:1.5">These projections use deterministic compound growth with constraint dampening. Actual outcomes will vary based on: (1) AI model efficiency improvements (reducing compute per inference), (2) Nuclear/SMR power availability post-2028, (3) Regulatory changes (EU AI Act, Singapore lifting moratorium), (4) Potential AI winter / demand correction. Infrastructure allocation (hyperscale/colo/edge mix) is estimated from provider announcements and may shift significantly.</div>
         </div>`;
@@ -4900,7 +4900,7 @@ function renderSettings(){
         {label:'Analytics',value:'Google Analytics (G-GED7FX8RTV)',icon:'fa-chart-line'}
     ];
     document.getElementById('settingsGrid').innerHTML=settings.map(s=>`
-        <div style="display:flex;align-items:center;gap:12px;padding:0.75rem;background:#0f172a;border:1px solid #334155;border-radius:8px">
+        <div style="display:flex;align-items:center;gap:12px;padding:0.75rem;background:#121316;border:1px solid #2a2d34;border-radius:8px">
             <i class="fas ${s.icon}" style="color:#64748b;width:16px;text-align:center"></i>
             <div><div style="font-size:0.68rem;color:#64748b;text-transform:uppercase;letter-spacing:0.3px">${s.label}</div><div style="font-size:0.82rem;color:#e2e8f0;font-weight:500">${s.value}</div></div>
         </div>`).join('');
@@ -6984,7 +6984,7 @@ function renderAuditV2(){
         var time = a.ts ? (new Date(a.ts).toISOString().replace('T',' ').substring(0,19)) : '';
         var beforeAfter = '';
         if (a.before || a.after){
-            beforeAfter = '<details style="margin-top:4px;font-size:0.68rem;color:#64748b"><summary style="cursor:pointer">diff</summary><pre style="font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px;margin-top:4px;overflow-x:auto">'+_v2Esc(JSON.stringify({before:a.before||null, after:a.after||null}, null, 2))+'</pre></details>';
+            beforeAfter = '<details style="margin-top:4px;font-size:0.68rem;color:#64748b"><summary style="cursor:pointer">diff</summary><pre style="font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;background:#121316;border:1px solid #2a2d34;border-radius:6px;padding:8px;margin-top:4px;overflow-x:auto">'+_v2Esc(JSON.stringify({before:a.before||null, after:a.after||null}, null, 2))+'</pre></details>';
         }
         html += '<div class="tl-item"><div class="tl-icon"><i class="fas '+icon+'"></i></div>'
             + '<div style="flex:1"><div class="tl-text"><strong>'+_v2Esc(a.actor||'(anon)')+'</strong> — '+_v2Esc(a.action||'')+(a.target?(' → '+_v2Esc(a.target)):'')+'</div>'

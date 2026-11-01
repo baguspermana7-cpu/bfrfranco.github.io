@@ -91,7 +91,7 @@
         '.rz-toast[data-kind="warn"]{--cl:#d97706}',
         '.rz-toast[data-kind="fault"]{--cl:#dc2626}',
         '.rz-toast[data-kind="info"]{--cl:#0e7490}',
-        '[data-theme="dark"] .rz-toast[data-kind="ok"]{--cl:#00FF88}',
+        '[data-theme="dark"] .rz-toast[data-kind="ok"]{--cl:#6aa588}',
         '[data-theme="dark"] .rz-toast[data-kind="warn"]{--cl:#FFAA00}',
         '[data-theme="dark"] .rz-toast[data-kind="fault"]{--cl:#FF3030}',
         '[data-theme="dark"] .rz-toast[data-kind="info"]{--cl:#00DDFF}',
