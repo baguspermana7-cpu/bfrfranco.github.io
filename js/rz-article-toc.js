@@ -43,8 +43,10 @@
     var tocData = [];
     [].forEach.call(sections, function (h2, i) {
       var id = h2.getAttribute('id');
-      var numMatch = id.match(/\d+/);
-      var num = numMatch ? numMatch[0] : String(i + 1);
+      /* Only a section-N or secN id carries its number. A digit inside any other id (an
+         auto id like key-numbers-0) printed "0." as the first entry. */
+      var numMatch = id.match(/^(?:toc-section-|section-|sec)(\d+)$/);
+      var num = numMatch ? numMatch[1] : String(i + 1);
       var text = h2.textContent.replace(/^\s*\d+[\.\s]*/, '').replace(/#\s*$/, '').trim();
       tocData.push({ id: id, num: num, text: text });
     });

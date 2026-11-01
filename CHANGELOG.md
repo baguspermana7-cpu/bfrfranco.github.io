@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v3.24.33 — 2026-11-01 — "Contents numbered from one"
+
+Owner: *"Continue"* — WI-WEB-ALLPAGES-001; defect reported by the LTC session.
+
+### Fixed
+- **The article table of contents on a phone started at "0."** and skipped 1 on `article-29` and `article-30` ("0. Key numbers", "2. …"), and `article-28` printed 1, 2, 2, 4. The shared builder `js/rz-article-toc.js` took any digit inside a heading id as the entry number, and the "Key numbers" heading carries an automatic id `key-numbers-0`. The number now comes from the id only for `toc-section-N`, `section-N` and `secN` ids; every other heading is numbered by its position.
+- Proven on all 36 pages that load the builder, each rendered at 390 px with the previous builder and with this one: exactly three pages change (28, 29, 30), all to 1…N; the other 33, including the pages whose ids run `sec0`, `sec1`…, are unchanged.
+
 ## v3.24.32 — 2026-11-01 — "One colour in the menu"
 
 Owner: *"Continue, polish more"* — WI-WEB-ALLPAGES-001, fourth wave.
