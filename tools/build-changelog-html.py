@@ -91,6 +91,10 @@ def version_tier(version_str):
 
 
 # ── Inline Markdown → HTML ─────────────────────────────────────────────────────
+ENTRY_TAGS = {'a', 'article', 'code', 'div', 'em', 'h3', 'h4', 'li', 'ol', 'p', 'pre', 'span',
+              'strong', 'table', 'tbody', 'td', 'th', 'thead', 'time', 'tr', 'ul'}
+
+
 def inline_md(text):
     """Convert minimal Markdown inline syntax to HTML."""
     # B-001 fix: pull inline-code spans out FIRST and html-escape their
@@ -103,7 +107,22 @@ def inline_md(text):
         _code_spans.append(html_mod.escape(m.group(1)))
         return '\x00C%d\x00' % (len(_code_spans) - 1)
 
-    text = re.sub(r'`([^`]+)`', _stash_code, text)
+    # A span opens with a run of N backticks and closes with a run of exactly N (CommonMark), so
+    # `` `<script src>` `` is one span. The single-backtick pattern read that as two EMPTY spans
+    # around a raw <script src>, and the page shipped a live script tag that swallowed every older
+    # entry and script.min.js with them (v3.24.35).
+    def _stash_run(m):
+        body = m.group(2)
+        if len(body) > 1 and body.startswith(' ') and body.endswith(' ') and body.strip():
+            body = body[1:-1]
+        _code_spans.append(html_mod.escape(body))
+        return '\x00C%d\x00' % (len(_code_spans) - 1)
+
+    text = re.sub(r'(?<!`)(`+)(?!`)(.+?)(?<!`)\1(?!`)', _stash_run, text)
+    # Prose is text, never markup: a code span broken across two Markdown lines left a bare
+    # `<html data-rz-register="editorial"` in body text, which the browser opened as a tag and
+    # which ate the words up to the next ">". Every tag on the page is now one this function writes.
+    text = text.replace('<', '&lt;')
     # Auto-link 40-char hex commit hashes (before other replacements)
     text = re.sub(
         r'\b([0-9a-f]{7,40})\b',
@@ -306,13 +325,6 @@ def parse_changelog(path):
 
 
 # ── Render entry card ──────────────────────────────────────────────────────────
-TIER_COLOR = {
-    # Anthropic-default violet #8b5cf6 is a hard-banned AI-design-slop tell (§A / CLAUDE.md
-    # rejected pattern 3). Amber reads as the highest of the three tiers without it.
-    'major': '#d97706',   # amber
-    'minor': '#06b6d4',   # cyan
-    'patch': '#10b981',   # emerald
-}
 TIER_LABEL = {
     'major': 'MAJOR',
     'minor': 'MINOR',
@@ -334,7 +346,6 @@ def with_unique_anchors(entries):
 
 def render_entry(entry, is_current=False):
     tier   = entry['tier']
-    color  = TIER_COLOR[tier]
     label  = TIER_LABEL[tier]
     ver    = html_mod.escape(entry['version'])
     date   = html_mod.escape(entry['date'])
@@ -354,8 +365,8 @@ def render_entry(entry, is_current=False):
     return f'''
     <article class="{cls}" id="{anchor}" data-version-tier="{tier}" data-version="{ver}">
       <div class="changelog-meta">
-        <span class="changelog-version-badge" style="--tier-color:{color};">{ver}</span>
-        <span class="changelog-tier-pill" style="--tier-color:{color};background:{color}20;color:{color};border:1px solid {color}40;">{label}</span>
+        <span class="changelog-version-badge">{ver}</span>
+        <span class="changelog-tier-pill tier-{tier}">{label}</span>
         <time class="changelog-date" datetime="{date}">{date_friendly}</time>
       </div>
       {caption_html}
@@ -519,63 +530,52 @@ def build_html(entries):
   <script src="js/rz-version.js?v={_asset_token('js/rz-version.js')}" defer></script>
 
   <style>
-    /* ── Changelog page-scoped styles ── */
+    /* ── Changelog page-scoped styles ──
+       v3.24.35: the page ran its own palette (mint, cyan, emerald on slate-navy cards, an animated
+       gradient title, aurora orbs, blurred glass). It now uses the site register: graphite, one
+       amber, hairlines. Tokens first, then the rules read only tokens. */
+    :root {{
+      --cl-bg: #0E0F12; --cl-panel: #16181D; --cl-code: #1d2026;
+      --cl-text: #CFD3DA; --cl-strong: #F6F7F9; --cl-muted: #969eaa;
+      --cl-line: rgba(160,168,180,.14); --cl-line-strong: rgba(160,168,180,.28);
+      --cl-accent: #E8B563; --cl-accent-soft: rgba(232,181,99,.12);
+    }}
+    [data-theme="light"] {{
+      --cl-bg: #f8f9fa; --cl-panel: #ffffff; --cl-code: #f1f3f5;
+      --cl-text: #343a40; --cl-strong: #1a1d23; --cl-muted: #5c6470;
+      --cl-line: rgba(40,44,52,.12); --cl-line-strong: rgba(40,44,52,.24);
+      --cl-accent: #92400e; --cl-accent-soft: rgba(146,64,14,.08);
+    }}
+    body {{ background: var(--cl-bg); color: var(--cl-text); }}
 
-    /* Aurora hero */
     .changelog-hero {{
       position: relative;
-      padding: 7rem 2rem 3.5rem;
+      padding: 7rem 2rem 3rem;
       text-align: center;
-      overflow: hidden;
+      border-bottom: 1px solid var(--cl-line);
     }}
-    .changelog-hero .aurora-orb {{
-      z-index: 0;
-    }}
-    .changelog-hero > * {{ position: relative; z-index: 1; }}
-
-    /* Gradient H1 */
     .changelog-hero h1 {{
-      font-size: clamp(2.5rem, 6vw, 4rem);
-      font-weight: 800;
+      font-size: clamp(2.25rem, 5vw, 3.25rem);
+      font-weight: 700;
       line-height: 1.1;
       letter-spacing: -0.02em;
-      background: linear-gradient(
-        120deg,
-        #f8fafc 0%,
-        #7dd5b4 25%,
-        #f59e0b 55%,
-        #f8fafc 80%
-      );
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: clNameSweep 10s ease-in-out infinite;
+      color: var(--cl-strong);
       margin: 0 0 0.75rem;
     }}
-    @keyframes clNameSweep {{
-      0%   {{ background-position: 0% 50%; }}
-      50%  {{ background-position: 100% 50%; }}
-      100% {{ background-position: 0% 50%; }}
-    }}
-    @media (prefers-reduced-motion: reduce) {{
-      .changelog-hero h1 {{ animation: none; }}
-    }}
-
-    /* Hero subtitle */
     .changelog-hero .cl-subtitle {{
-      font-size: 1.1rem;
-      color: #94a3b8;
+      font-size: 1.05rem;
+      color: var(--cl-muted);
       margin: 0 0 0.5rem;
     }}
     .changelog-hero .cl-meta {{
       font-size: 0.82rem;
-      color: #94a3b8;
+      color: var(--cl-muted);
       font-family: 'JetBrains Mono', ui-monospace, monospace;
       margin-bottom: 2rem;
     }}
+    .cl-meta strong {{ color: var(--cl-strong); }}
 
-    /* Filter chips */
+    /* Filter chips: a segmented control, one active state in amber */
     .filter-chips {{
       display: flex;
       gap: 0.5rem;
@@ -584,51 +584,31 @@ def build_html(entries):
       margin: 0;
     }}
     .filter-chip {{
-      padding: 0.45rem 1.2rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(30,41,59,0.6);
-      color: #94a3b8;
-      font-size: 0.8rem;
+      padding: 0.45rem 1.1rem;
+      border-radius: 4px;
+      border: 1px solid var(--cl-line-strong);
+      background: transparent;
+      color: var(--cl-muted);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.78rem;
       font-weight: 600;
       letter-spacing: 0.07em;
       cursor: pointer;
-      transition: all 180ms ease;
-      backdrop-filter: blur(8px);
+      transition: border-color 160ms ease, color 160ms ease;
     }}
-    .filter-chip:hover {{
-      border-color: rgba(125,221,180,0.4);
-      color: #7dd5b4;
-    }}
+    .filter-chip:hover {{ border-color: var(--cl-muted); color: var(--cl-strong); }}
     .filter-chip.active {{
-      background: rgba(125,221,180,0.15);
-      border-color: rgba(125,221,180,0.6);
-      color: #7dd5b4;
-    }}
-    .filter-chip[data-filter="major"].active {{
-      background: rgba(217,119,6,0.12);
-      border-color: rgba(217,119,6,0.5);
-      color: #f59e0b;
-    }}
-    .filter-chip[data-filter="minor"].active {{
-      background: rgba(6,182,212,0.12);
-      border-color: rgba(6,182,212,0.5);
-      color: #22d3ee;
-    }}
-    .filter-chip[data-filter="patch"].active {{
-      background: rgba(16,185,129,0.12);
-      border-color: rgba(16,185,129,0.5);
-      color: #34d399;
+      border-color: var(--cl-accent);
+      color: var(--cl-accent);
+      background: var(--cl-accent-soft);
     }}
 
-    /* Entry count badge */
     .cl-count-badge {{
       display: inline-block;
-      background: rgba(125,221,180,0.12);
-      color: #7dd5b4;
-      border: 1px solid rgba(125,221,180,0.25);
-      padding: 2px 10px;
-      border-radius: 999px;
+      color: var(--cl-text);
+      border: 1px solid var(--cl-line-strong);
+      padding: 1px 8px;
+      border-radius: 4px;
       font-size: 0.72rem;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 600;
@@ -636,50 +616,40 @@ def build_html(entries):
       vertical-align: middle;
     }}
 
-    /* List wrapper */
     .changelog-list {{
       max-width: 880px;
       margin: 2rem auto 0;
       padding: 0 1.5rem 5rem;
     }}
 
-    /* Entry card */
+    /* Entry: a panel with a hairline, no glass, no glow */
     .changelog-entry {{
-      background: rgba(30,41,59,0.5);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 2rem 2rem 1.75rem;
-      margin-bottom: 1.5rem;
-      backdrop-filter: blur(12px);
+      background: var(--cl-panel);
+      border: 1px solid var(--cl-line);
+      border-radius: 4px;
+      padding: 1.75rem 2rem 1.5rem;
+      margin-bottom: 1.25rem;
       position: relative;
-      transition: border-color 220ms ease, box-shadow 220ms ease;
+      transition: border-color 200ms ease;
       scroll-margin-top: 5rem;
     }}
-    .changelog-entry:hover {{
-      border-color: rgba(125,221,180,0.2);
-      box-shadow: 0 4px 24px rgba(125,221,180,0.05);
-    }}
-
-    /* CURRENT badge */
-    .changelog-entry.is-current {{
-      border-color: rgba(16,185,129,0.3);
-    }}
+    .changelog-entry:hover {{ border-color: var(--cl-line-strong); }}
+    .changelog-entry.is-current {{ border-color: var(--cl-accent); }}
     .changelog-entry.is-current::after {{
       content: 'CURRENT';
       position: absolute;
       top: 1.1rem;
       right: 1.1rem;
-      background: #10b981;
-      color: #fff;
-      padding: 0.2rem 0.6rem;
-      border-radius: 999px;
+      color: var(--cl-accent);
+      border: 1px solid var(--cl-accent);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
       font-size: 0.62rem;
       font-weight: 700;
       letter-spacing: 0.12em;
       font-family: 'JetBrains Mono', monospace;
     }}
 
-    /* Meta row */
     .changelog-meta {{
       display: flex;
       align-items: center;
@@ -687,47 +657,39 @@ def build_html(entries):
       flex-wrap: wrap;
       margin-bottom: 0.6rem;
     }}
-
-    /* Version badge */
     .changelog-version-badge {{
       font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 700;
-      color: var(--tier-color, #7dd5b4);
-      background: rgba(125,221,180,0.08);
-      padding: 3px 10px;
-      border-radius: 6px;
-      letter-spacing: 0.04em;
+      color: var(--cl-strong);
+      letter-spacing: 0.02em;
     }}
-
-    /* Tier pill */
+    /* tier: MAJOR carries the accent, MINOR and PATCH are neutral outlines */
     .changelog-tier-pill {{
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.62rem;
       font-weight: 700;
       letter-spacing: 0.1em;
-      padding: 2px 8px;
-      border-radius: 999px;
+      padding: 1px 7px;
+      border-radius: 4px;
+      color: var(--cl-muted);
+      border: 1px solid var(--cl-line-strong);
     }}
-
-    /* Date */
+    .changelog-tier-pill.tier-major {{ color: var(--cl-accent); border-color: var(--cl-accent); }}
     .changelog-date {{
-      color: #94a3b8;
+      color: var(--cl-muted);
       font-size: 0.82rem;
       font-family: 'JetBrains Mono', monospace;
     }}
-
-    /* Caption */
     .changelog-caption {{
-      color: #94a3b8;
+      color: var(--cl-muted);
       font-style: italic;
       font-size: 0.92rem;
       margin: 0.25rem 0 0.75rem;
     }}
 
-    /* Body content */
     .changelog-body {{
-      color: #cbd5e1;
+      color: var(--cl-text);
       /* v3.3.x — was 0.92rem, which is 14.72px on a phone: the whole public changelog sat below
          the 16px reading floor (7,722 elements at 390 and 768). This is running prose, so it gets
          reading size and grows a little on a wide screen rather than shrinking on a narrow one. */
@@ -738,181 +700,89 @@ def build_html(entries):
          the viewport on the published page. Long tokens wrap; ordinary prose is unaffected. */
       overflow-wrap: anywhere;
     }}
-    .changelog-body p {{
-      margin: 0.5rem 0;
-    }}
-    .changelog-body ul {{
-      list-style: none;
-      padding: 0;
-      margin: 0.5rem 0;
-    }}
+    .changelog-body p {{ margin: 0.5rem 0; }}
+    .changelog-body ul {{ list-style: none; padding: 0; margin: 0.5rem 0; }}
     .changelog-body ul li {{
       padding: 0.3rem 0 0.3rem 1.4rem;
       position: relative;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--cl-line);
     }}
-    .changelog-body ul li:last-child {{
-      border-bottom: none;
-    }}
+    .changelog-body ul li:last-child {{ border-bottom: none; }}
     .changelog-body ul li::before {{
       content: '';
       position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #7dd5b4;
-      opacity: 0.7;
+      left: 0.2rem;
+      top: 1.05em;
+      width: 5px;
+      height: 5px;
+      background: var(--cl-muted);
     }}
-    .changelog-body ul li.cl-sub-item::before {{
-      width: 4px;
-      height: 4px;
-      background: #64748b;
-    }}
+    .changelog-body ul li.cl-sub-item::before {{ width: 3px; height: 3px; }}
     .changelog-body h3.cl-subhead,
     .changelog-body h4.cl-subhead {{
-      color: #e2e8f0;
-      font-size: 0.88rem;
+      color: var(--cl-strong);
+      font-size: 0.85rem;
       font-weight: 700;
       margin: 1rem 0 0.4rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid var(--cl-line);
       padding-bottom: 0.3rem;
     }}
-    .changelog-body strong {{
-      color: #e2e8f0;
-      font-weight: 600;
-    }}
+    .changelog-body strong {{ color: var(--cl-strong); font-weight: 600; }}
     .changelog-body code {{
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8em;
-      background: rgba(30,41,59,0.8);
-      color: #7dd5b4;
+      font-size: 0.82em;
+      background: var(--cl-code);
+      color: var(--cl-strong);
       padding: 1px 5px;
-      border-radius: 4px;
+      border-radius: 3px;
     }}
     .changelog-body a {{
-      color: #7dd5b4;
+      color: var(--cl-accent);
       text-decoration: none;
-      border-bottom: 1px solid rgba(125,221,180,0.3);
-      transition: border-color 150ms ease;
+      border-bottom: 1px solid currentColor;
     }}
-    .changelog-body a:hover {{
-      border-color: rgba(125,221,180,0.8);
-    }}
-    .commit-link code {{
-      font-size: 0.78em;
-      background: rgba(100,116,139,0.15);
-      color: #94a3b8;
-    }}
-    .commit-link {{
-      border-bottom: none !important;
-    }}
+    .commit-link code {{ color: var(--cl-muted); }}
+    .commit-link {{ border-bottom: none !important; }}
 
-    /* Table */
-    .cl-table-wrap {{
-      overflow-x: auto;
-      margin: 0.75rem 0;
-    }}
+    .cl-table-wrap {{ overflow-x: auto; margin: 0.75rem 0; }}
     .cl-table {{
       border-collapse: collapse;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       width: 100%;
       min-width: 320px;
     }}
     .cl-table th, .cl-table td {{
       padding: 0.4rem 0.75rem;
-      border: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid var(--cl-line);
       text-align: left;
     }}
-    .cl-table th {{
-      background: rgba(30,41,59,0.7);
-      color: #cbd5e1;
-      font-weight: 600;
-    }}
-    .cl-table td {{
-      color: #94a3b8;
-    }}
+    .cl-table th {{ color: var(--cl-strong); font-weight: 600; border-bottom-color: var(--cl-line-strong); }}
+    .cl-table td {{ color: var(--cl-text); }}
 
-    /* Code block */
     .cl-code {{
-      background: rgba(15,23,42,0.8);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 8px;
+      background: var(--cl-code);
+      border: 1px solid var(--cl-line);
+      border-radius: 4px;
       padding: 1rem;
       overflow-x: auto;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-family: 'JetBrains Mono', monospace;
-      color: #94a3b8;
+      color: var(--cl-text);
       margin: 0.75rem 0;
     }}
+    .cl-code code {{ background: none; padding: 0; color: inherit; }}
 
-    /* Earlier history note */
     .cl-earlier-note {{
       text-align: center;
-      color: #475569;
+      color: var(--cl-muted);
       font-size: 0.85rem;
       padding: 2rem 0 1rem;
       font-style: italic;
     }}
-    .cl-earlier-note a {{
-      color: #7dd5b4;
-    }}
-
-    /* Light mode overrides */
-    /* v1.48.x — light-mode body was missing, so the page stayed dark under a light navbar
-       (a broken middle state). Lighten the body/surface; the hero band stays dark intentionally. */
-    [data-theme="light"] body {{
-      background: #f8fafc;
-      color: #334155;
-    }}
-    [data-theme="light"] .changelog-entry {{
-      background: rgba(248,250,252,0.8);
-      border-color: rgba(0,0,0,0.08);
-    }}
-    [data-theme="light"] .changelog-body {{ color: #334155; }}
-    [data-theme="light"] .changelog-body code {{
-      background: rgba(241,245,249,0.9);
-      color: #0f766e;
-    }}
-    [data-theme="light"] .changelog-body ul li::before {{ background: #0d9488; }}
-    [data-theme="light"] .changelog-date {{ color: #64748b; }}
-    /* a11y (v1.51.2): light-mode gaps found by the full-site axe sweep */
-    [data-theme="light"] .changelog-body h3.cl-subhead,
-    [data-theme="light"] .changelog-body h4.cl-subhead {{
-      color: #1e293b;
-      border-bottom-color: rgba(0,0,0,0.08);
-    }}
-    [data-theme="light"] .changelog-body strong {{ color: #1e293b; }}
-    [data-theme="light"] .changelog-caption {{ color: #64748b; }}
-    [data-theme="light"] .changelog-version-badge,
-    [data-theme="light"] .changelog-tier-pill {{
-      color: color-mix(in srgb, var(--tier-color, #0f766e) 55%, #000) !important;
-    }}
-    [data-theme="light"] .cl-table th {{ background: rgba(226,232,240,0.8); color: #1e293b; }}
-    [data-theme="light"] .cl-table td {{ color: #475569; }}
-    [data-theme="light"] .cl-table th, [data-theme="light"] .cl-table td {{ border-color: rgba(0,0,0,0.1); }}
-    [data-theme="light"] .navbar .nav-link, [data-theme="light"] .navbar .nav-vibrate {{ color: #334155; }}
-    [data-theme="light"] .changelog-hero .cl-subtitle,
-    [data-theme="light"] .changelog-hero .cl-meta {{ color: #64748b; }}
-    [data-theme="light"] .cl-meta strong, [data-theme="light"] .cl-count-badge {{ color: #0f766e !important; }}
-    [data-theme="light"] .changelog-body a {{ color: #0f766e; border-bottom-color: rgba(15,118,110,0.4); }}
-    [data-theme="light"] .changelog-body pre code {{ color: #115e59; }}
-    [data-theme="light"] .filter-chip {{
-      background: rgba(248,250,252,0.9);
-      border-color: rgba(0,0,0,0.1);
-      color: #64748b;
-    }}
-    [data-theme="light"] .changelog-hero h1 {{
-      background: linear-gradient(120deg, #1e3a5f 0%, #0d9488 30%, #f59e0b 60%, #1e3a5f 100%);
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }}
+    .cl-earlier-note a {{ color: var(--cl-accent); }}
+    [data-theme="light"] .navbar .nav-link, [data-theme="light"] .navbar .nav-vibrate {{ color: var(--cl-text); }}
 
     /* v1.8.0 — mobile responsive landing patch */
     @media (max-width: 768px) {{
@@ -924,10 +794,10 @@ def build_html(entries):
       .changelog-hero h1 {{ font-size: clamp(1.8rem, 7vw, 2.5rem) !important; }}
       .changelog-list {{ padding: 0 1rem 3rem !important; }}
       .changelog-entry {{ padding: 1.25rem !important; }}
+      .changelog-entry.is-current::after {{ position: static; display: inline-block; margin-bottom: 0.5rem; }}
       .filter-chips {{ gap: 0.4rem !important; padding: 0 1rem; flex-wrap: wrap; }}
       .filter-chip {{ padding: 0.4rem 0.9rem !important; font-size: 0.75rem !important; min-height: 44px; }}
       .navbar {{ padding: 0.5rem 0.75rem !important; }}
-      .nav-menu, .nav-links {{ display: none !important; }}
       .footer-grid {{
         grid-template-columns: 1fr !important;
         gap: 1.25rem !important;
@@ -936,11 +806,11 @@ def build_html(entries):
       button, a.btn, [role="button"], .nav-link {{ min-height: 44px; }}
     }}
     @media (max-width: 480px) {{
-      .changelog-hero h1 {{ font-size: 1.4rem !important; }}
+      .changelog-hero h1 {{ font-size: 1.6rem !important; }}
     }}
   </style>
 </head>
-<body data-theme="dark">
+<body>
 
   <!-- ── Navbar (mirrors articles.html) ── -->
   <nav class="navbar" id="mainNav" role="navigation" aria-label="Main navigation">
@@ -1028,17 +898,12 @@ def build_html(entries):
 
     <!-- ── Hero ── -->
     <section class="changelog-hero" aria-labelledby="cl-heading">
-      <!-- Aurora orbs (reuse global .aurora-orb classes from styles.css) -->
-      <div class="aurora-orb aurora-orb-1" aria-hidden="true"></div>
-      <div class="aurora-orb aurora-orb-2" aria-hidden="true"></div>
-      <div class="aurora-orb aurora-orb-3" aria-hidden="true"></div>
 
       <h1 id="cl-heading">Changelog</h1>
       <p class="cl-subtitle">Live release notes &mdash; every shipped version</p>
       <p class="cl-meta">
-        Latest: <strong style="color:#7dd5b4;">{latest}</strong>
-        &nbsp;&bull;&nbsp;
-        <span id="rzVersionAnchor"></span>
+        Latest: <strong>{latest}</strong>
+        &nbsp;&middot;&nbsp;
         <span class="cl-count-badge">{count} releases</span>
       </p>
 
@@ -1079,7 +944,7 @@ def build_html(entries):
             <li><a href="index.html#case-studies">Case Studies</a></li>
             <li><a href="datacenter-solutions.html">DC Solutions</a></li>
             <li><a href="glossary.html">Glossary</a></li>
-            <li><a href="changelog.html" style="color:#7dd5b4;">Changelog</a></li>
+            <li><a href="changelog.html" aria-current="page">Changelog</a></li>
           </ul>
         </div>
         <div class="footer-connect">
@@ -1096,6 +961,10 @@ def build_html(entries):
   </footer>
 
   <script src="script.min.js?v={_asset_token('script.min.js')}" defer></script>
+
+  <!-- every other page with a navbar loads this; without it the phone menu had no button (v3.24.35) -->
+
+  <script src="js/rz-mobile-nav.js?v={_asset_token('js/rz-mobile-nav.js')}" defer></script>
 
   {filter_js}
 
@@ -1156,6 +1025,17 @@ def main():
               file=sys.stderr)
         for ln in bad[:8]:
             print('  ' + ln.strip()[:140], file=sys.stderr)
+        sys.exit(1)
+
+    # The entries may only carry the tags this generator writes. The older "`<tag" check above was
+    # blind to `` `<script src>` ``, which left no backtick beside the tag and shipped a live
+    # <script> that hid every entry older than v1.19.1 and script.min.js with them (v3.24.35).
+    entries_region = html_out[html_out.find('class="changelog-entry'):html_out.rfind('</article>')]
+    stray = sorted({t.lower() for t in re.findall(r'<([a-zA-Z][a-zA-Z0-9-]*)', entries_region)}
+                   - ENTRY_TAGS)
+    if stray:
+        print('BUILD FAILED — tags no Markdown rule writes leaked into the entries: '
+              + ', '.join('<' + t + '>' for t in stray), file=sys.stderr)
         sys.exit(1)
 
     if check:
