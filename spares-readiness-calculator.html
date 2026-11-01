@@ -942,7 +942,7 @@
               <input type="number" id="h_demand_per_site" class="input-field" value="0.5" min="0.01" step="0.1" oninput="calcHub()" aria-label="Demand per site">
             </div>
             <div class="input-group">
-              <label class="input-label" for="h_target_readiness">Target Fleet Readiness (%) <span class="tip" tabindex="0" data-tip="Desired fleet-wide fill rate across all sites. Used to scale the safety factor for hub and site stock: safety factor = 1 + z(target) × 0.3. Typical: 95% for ESSENTIAL, 99% for VITAL. Higher targets require significantly more stock." aria-label="Target fleet readiness tooltip">ⓘ</span></label>
+              <label class="input-label" for="h_target_readiness">Target Fleet Readiness (%) <span class="tip" tabindex="0" data-tip="Desired fleet-wide fill rate across all sites. Used to scale the safety factor for hub and site stock: safety factor = 1 + z(target) × 0.3. Typical: 95% for ESSENTIAL, 99% for VITAL. Higher targets need more stock." aria-label="Target fleet readiness tooltip">ⓘ</span></label>
               <input type="number" id="h_target_readiness" class="input-field" value="95" min="50" max="99.9" oninput="calcHub()" aria-label="Target fleet readiness">
             </div>
           </div>
@@ -1116,7 +1116,7 @@
               <input type="number" id="ltb_demand_yr" class="input-field" value="1.2" min="0.01" step="0.1" oninput="calcLTB()" aria-label="Annual demand">
             </div>
             <div class="input-group">
-              <label class="input-label" for="ltb_onhand">On-Hand (units) <span class="tip" tabindex="0" data-tip="Units already in stock at the time of the LTB decision. Subtracted from the gross LTB quantity: net LTB = demand × support years × 1.15 − on-hand − open PO. Having 2 units on-hand can significantly reduce the LTB buy." aria-label="On-hand LTB tooltip">ⓘ</span></label>
+              <label class="input-label" for="ltb_onhand">On-Hand (units) <span class="tip" tabindex="0" data-tip="Units already in stock at the time of the LTB decision. Subtracted from the gross LTB quantity: net LTB = demand × support years × 1.15 − on-hand − open PO. Units on hand reduce the LTB buy one for one." aria-label="On-hand LTB tooltip">ⓘ</span></label>
               <input type="number" id="ltb_onhand" class="input-field" value="2" min="0" oninput="calcLTB()" aria-label="On-hand">
             </div>
           </div>
@@ -1376,7 +1376,7 @@
               <div class="metric-box"><div class="metric-label">P50 Readiness <span class="tip" tabindex="0" data-tip="Median readiness score across all MC trials. Unit: %. This is the most-likely outcome. Should exceed 90% for VITAL parts. Compare P50 vs P10 to gauge volatility. See methodology: MC percentile output." aria-label="P50 Readiness tooltip">ⓘ</span></div><div class="metric-value" id="mc_p50">—</div></div>
               <div class="metric-box"><div class="metric-label">P90 Readiness <span class="tip" tabindex="0" data-tip="90th-percentile readiness score across all MC trials. Unit: %. The optimistic scenario — only 10% of simulations beat this. Wide gap between P10 and P90 indicates high uncertainty. Target P90 above 98% for VITAL parts. See methodology: MC percentile." aria-label="P90 Readiness tooltip">ⓘ</span></div><div class="metric-value" id="mc_p90">—</div></div>
               <div class="metric-box"><div class="metric-label">Exp. Downtime Cost <span class="tip" tabindex="0" data-tip="Expected annual downtime cost averaged across all MC trials. ExpDT = mean(stockout_events x downtime_cost_per_hr x MTTR). Unit: $. Key input for ROI of increasing stock level. Multiply by years to assess NPV of stocking investment. See methodology: MC cost." aria-label="Expected Downtime Cost tooltip">ⓘ</span></div><div class="metric-value" id="mc_exp_down">—</div></div>
-              <div class="metric-box"><div class="metric-label">Worst-Case Cost <span class="tip" tabindex="0" data-tip="95th-percentile downtime cost across all MC trials. Unit: $. Represents a plausible bad year rather than the absolute extreme. Use for risk reserve or insurance sizing. Significantly higher than Exp. Cost indicates fat-tail demand risk. See methodology: MC P95 cost." aria-label="Worst Case Cost tooltip">ⓘ</span></div><div class="metric-value" id="mc_worst">—</div></div>
+              <div class="metric-box"><div class="metric-label">Worst-Case Cost <span class="tip" tabindex="0" data-tip="95th-percentile downtime cost across all MC trials. Unit: $. Represents a plausible bad year rather than the absolute extreme. Use for risk reserve or insurance sizing. Higher than Exp. Cost indicates fat-tail demand risk. See methodology: MC P95 cost." aria-label="Worst Case Cost tooltip">ⓘ</span></div><div class="metric-value" id="mc_worst">—</div></div>
             </div>
           </div>
           <div class="result-card" style="margin-top:0.85rem;">
@@ -1718,7 +1718,7 @@
           </div>
           <div class="input-row">
             <div class="input-group">
-              <label class="input-label" for="sc_quote_turn">Quote Turnaround (days, target ≤5) <span class="tip" tabindex="0" data-tip="Average business days from RFQ submission to quotation received. Slow quoting delays PO placement and pushes out delivery. Target: ≤5 days for standard parts. For emergencies, best-in-class suppliers respond same day." aria-label="Quote turnaround tooltip">ⓘ</span></label>
+              <label class="input-label" for="sc_quote_turn">Quote Turnaround (days, target ≤5) <span class="tip" tabindex="0" data-tip="Average business days from RFQ submission to quotation received. Slow quoting delays PO placement and pushes out delivery. Target: ≤5 days for standard parts. For emergencies, the fastest suppliers respond the same day." aria-label="Quote turnaround tooltip">ⓘ</span></label>
               <input type="number" id="sc_quote_turn" class="input-field" value="6" min="1" max="60" step="1" oninput="calcScorecard()" aria-label="Quote turnaround days">
             </div>
             <div class="input-group">
@@ -2163,7 +2163,7 @@
             <textarea id="sh_topic" class="input-field" rows="3" placeholder="e.g. Chiller pump motor PO 45001234 is 15 days late; site need date May 28. Requesting recovery plan and leadership visibility." aria-label="Situation or topic to communicate"></textarea>
           </div>
           <div class="input-group">
-            <label class="input-label" for="sh_need">What You Need From Stakeholders <span style="font-weight:400;color:var(--text-muted);">(overall ask)</span> <span class="tip" tabindex="0" data-tip="Your overall ask from all stakeholders combined — e.g. 'Recovery plan from supplier, budget pre-approval for expedite from Finance, engineering sign-off on alternate'. Each stakeholder's tailored message will have their specific portion of this ask extracted." aria-label="Stakeholder need tooltip">ⓘ</span></label>
+            <label class="input-label" for="sh_need">What You Need From Stakeholders <span style="font-weight:400;color:var(--text-muted);">(overall ask)</span> <span class="tip" tabindex="0" data-tip="Your overall ask from all stakeholders combined — e.g. 'Recovery plan from supplier, budget pre-approval for expedite from Finance, engineering sign-off on alternate'. Each stakeholder's message will have their specific portion of this ask extracted." aria-label="Stakeholder need tooltip">ⓘ</span></label>
             <input type="text" id="sh_need" class="input-field" value="Recovery plan confirmation, budget pre-approval for expedite, engineering sign-off on alternate part" aria-label="What you need from stakeholders">
           </div>
           <div class="input-group">

@@ -36,6 +36,7 @@
  *   T19 chart series (Chart.js datasets, inline SVG >= 40 px) amber or neutral grey; opt-out [data-rz-series-meaning]
  *   T20 signed in (long account email) the page fits a 360 px phone: scrollWidth <= 360
  *   T21 every local stylesheet / script link carries ?v= (rz-tracker.js, untokened site-wide, excepted)
+ *   T22 no filler or puffery words in the page copy (source, scripts and styles removed)
  *   T18 no logo tile (initials / icon in a filled or bordered box in the nav or beside a heading)
  *   T17 behaviour (dark 1440, once per page): every id the page JS targets (tools/extract-calc-ids.mjs) exists; each preset
  *       clicks without a page error; editing a numeric input changes the results region; the Free/Full toggle shows a full row.
@@ -427,6 +428,13 @@ for (const pg of pages) {
     const html = readFileSync(join(ROOT, pg), 'utf8');
     const bare = [...html.matchAll(/<(?:link[^>]+href|script[^>]+src)="(?!https?:|\/\/|data:)([^"?#]+\.(?:css|js))"/g)].map((m) => m[1]).filter((a) => a !== 'rz-tracker.js');
     ok(`T21 ${pg}: every local stylesheet and script is cache-tokened`, !bare.length, bare);
+  }
+  { // T22 no filler or puffery in the page copy (owner: "jangan ada kata2 filler"); domain names excepted:
+    // "Comprehensive" as an opex maintenance/insurance tier (a table cell or an option followed by "(")
+    const body = readFileSync(join(ROOT, pg), 'utf8').replace(/<(script|style)\b[\s\S]*?<\/\1>/g, ' ');
+    const FILLER = /\b(?:comprehensive(?!\s*\(|<\/td>|")|world[- ]class|best[- ]in[- ]class|cutting[- ]edge|state[- ]of[- ]the[- ]art|seamless(?:ly)?|effortless(?:ly)?|unlock\w*|empower\w*|tailored|curated|at a glance|game[- ]chang\w*|next[- ]level|industry[- ]leading|significantly|actually|Mission-critical infrastructure, documented|performed entirely in your browser)\b/gi;
+    const hits = [...body.matchAll(FILLER)].map((m) => body.slice(Math.max(0, m.index - 30), m.index + m[0].length + 10).replace(/\s+/g, ' '));
+    ok(`T22 ${pg}: no filler words in the copy`, !hits.length, hits.slice(0, 5));
   }
   for (const [theme, w] of [['dark', 1440], ['light', 1440], ['dark', 390], ['light', 390]]) {
     const ctx = await browser.createBrowserContext();
