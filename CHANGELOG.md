@@ -11,7 +11,7 @@ release sections rather than semver.
 
 ---
 
-## v3.24.34 — 2026-11-01 — "Calculators, de-slopped"
+## v3.24.36 — 2026-11-01 — "Calculators, de-slopped"
 
 Owner: *"audit total dan perbaiki semuanya … lepas dari AI design slop atau terlihat vibe coding"*, then *"continue, yang terbaik aja"* — plan `cryptic-rolling-sonnet`, phases 0–2 and 4.
 
@@ -40,6 +40,19 @@ Owner: *"audit total dan perbaiki semuanya … lepas dari AI design slop atau te
   - Wired into `ship-gate.sh` for the nine refit pages.
 - `tools/test-pillar-fire.mjs`: exit 1 with 36 findings on the old pillar page, green on the new one. Wired.
 - The four calculators not refit yet (cx, RFS, spares, fire checklist) keep their old look. Their computed styles were compared element by element before and after this release: no change.
+
+## v3.24.35 — 2026-11-01 — "The whole changelog"
+
+Owner: *"continue"* — WI-WEB-ALLPAGES-001. Found by a whole-site render scan for blue and navy: `changelog.html` was the largest offender, and opening it turned up three defects worse than the colour.
+
+### Fixed
+- **89 releases were missing from the public changelog, and the page's main script never ran.** One CHANGELOG.md line quotes HTML with a double-backtick code span (`` `<script src>` ``). The builder only knew single backticks, so it read two empty spans around a bare `<script src>` and wrote a live script tag into the page. The browser parsed everything after that tag, up to the next closing tag, as script text: every entry older than v1.21.0, and the tag that loads `script.min.js`. Rendered before: 834 of 923 entries, oldest shown v1.21.0, one stray script, `script.min.js` never requested. After: 923 of 923, oldest v1.0.0, no stray script, `script.min.js` loaded. With the script back, the navbar gains its surface when the page scrolls; before, the links sat transparently over the entries in both themes.
+- The builder now reads a code span as a run of N backticks closed by exactly N, escapes every `<` in prose (so a code span broken across two lines can no longer open a tag — two `<html …` and two other stray tags were doing that), and fails the build if the entries contain any tag its own Markdown rules do not write. The old guard only matched a backtick directly before a tag, so it passed this page. Proven red first: the previous builder with the new guard fails on `<explain>, <html>, <pue>, <script>, <style>`; the new builder passes.
+- **The light theme was half dark.** The template wrote `<body data-theme="dark">`, so every `[data-theme="dark"] …` rule in the shared stylesheet kept matching inside the body whatever the reader chose: in light, the scrolled navbar was a dark grey bar over a white page. The attribute is gone; the theme lives on `<html>` as on every other page.
+- **No menu on a phone.** The page hid the menu with `display:none !important` at phone width and did not load `js/rz-mobile-nav.js`, which every other page with a navbar loads, so the hamburger never showed. It now shows at 390 px and opens the menu (measured: button 44 px wide, menu 498 px tall when open).
+
+### Changed
+- **The changelog uses the site register.** It ran its own palette: mint version numbers, links and bullets, cyan and emerald tier pills, a green CURRENT badge, slate-navy cards with blurred glass, an animated mint-to-amber gradient title, and three aurora orbs. Now graphite with one amber: neutral version numbers and tier outlines, MAJOR and CURRENT in amber, 4 px panels with a hairline, flat code chips, a solid title, no orbs. The light theme maps onto the same tokens. The duplicate "Latest version" stamp in the hero is gone (the hero line already states it).
 
 ## v3.24.33 — 2026-11-01 — "Contents numbered from one"
 
