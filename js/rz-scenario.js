@@ -140,6 +140,7 @@
    */
   function injectAccountLink() {
     if (!(d.body && d.body.getAttribute('data-rz-calc'))) return;
+    if (d.body.getAttribute('data-rz-account-pill') === 'off') return; // the tool shell links to account.html from its own nav and reference section
     if (d.getElementById('rzAccountPill')) return;
     if (!d.getElementById('rzAccountPillCss')) {
       var st = d.createElement('style');

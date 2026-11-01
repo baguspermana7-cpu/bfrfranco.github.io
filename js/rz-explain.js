@@ -201,10 +201,22 @@
     if (window.innerWidth <= 600) { p.style.opacity = '1'; return; }   /* bottom sheet via CSS */
     var r = trigger.getBoundingClientRect();
     /* measure with REAL size after display (spares-tour lesson) */
+    p.style.maxHeight = '';
+    p.style.overflowY = '';
     var pw = p.offsetWidth, ph = p.offsetHeight;
-    var top = r.bottom + 8;
-    if (top + ph > window.innerHeight - 8) top = r.top - ph - 8;
-    if (top < 8) top = 8;
+    /* never cover the trigger: a panel over its own trigger steals the pointer, the trigger gets
+       mouseleave and the panel closes again (pue: 443 px panel, trigger mid-screen). Below if it
+       fits, else above, else the roomier side with the panel capped and scrolling. */
+    var below = window.innerHeight - r.bottom - 16, above = r.top - 16, top;
+    if (ph <= below) top = r.bottom + 8;
+    else if (ph <= above) top = r.top - ph - 8;
+    else {
+      var room = Math.max(below, above, 120);
+      p.style.boxSizing = 'border-box';   /* max-height includes the padding, or the panel still overlaps */
+      p.style.maxHeight = room + 'px';
+      p.style.overflowY = 'auto';
+      top = below >= above ? r.bottom + 8 : Math.max(8, r.top - 8 - room);
+    }
     var left = Math.min(Math.max(8, r.left), window.innerWidth - pw - 8);
     p.style.top = top + 'px';
     p.style.left = left + 'px';

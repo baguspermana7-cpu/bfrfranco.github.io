@@ -1,0 +1,851 @@
+/* ============================================================
+   rz-tool.css — the TOOL register (calculators and checklists)
+   PART 1 · REGISTER — components for the refit shell (body.hub.tool). Tokens come from css/rz-hub.css; the --rzt-* names
+   stay because pages reference them. Graphite surfaces, ONE amber accent, IBM Plex Sans, mono only for numbers, eyebrows
+   and chips, 1 px hairlines, radius <= 4 px, no gradient / glass / shadow / hover-lift / `transition: all`, nothing floating.
+   Load order on a refit page:  css/rz-hub.css, css/rz-tool.css.
+   PART 2 · LEGACY OVERRIDES — removed page by page (see the marker below). They apply only under html[data-rz-register="tool"],
+   which a refit page does not declare.
+   ============================================================ */
+
+body.tool {
+  --rzt-bg: var(--rz-bg-base); --rzt-panel: var(--rz-bg-elevated); --rzt-inset: var(--rz-bg-inset); --rzt-hover: var(--rz-bg-hover);
+  --rzt-text: var(--rz-text-primary); --rzt-text-2: var(--rz-text-secondary); --rzt-muted: var(--rz-text-muted);
+  --rzt-line: var(--rz-line-tier-2); --rzt-line-strong: var(--rz-line-tier-1); --rzt-line-soft: var(--rz-line-tier-3);
+  --rzt-accent: var(--rz-accent-signal); --rzt-accent-text: var(--rz-text-accent); --rzt-fault: var(--rz-accent-alert);
+  --rzt-sans: var(--rz-font-sans); --rzt-mono: var(--rz-font-mono);
+}
+body.tool main { display: block; }
+body.tool .mono, body.tool .num { font-family: var(--rzt-mono); font-variant-numeric: tabular-nums slashed-zero; }
+
+/* --- head: eyebrow, H1 with a muted clause, one lede, the basis line, the crumb --- */
+.tool-head { padding: var(--rz-space-10) 0 var(--rz-space-6); border-bottom: 1px solid var(--rzt-line); }
+.tool-head .eyebrow { margin: 0; }
+.tool-head h1 {
+  font-family: var(--rzt-sans); font-weight: 600; font-size: clamp(28px, 3.4vw, 44px); line-height: 1.1; letter-spacing: -.02em;
+  margin: var(--rz-space-4) 0 var(--rz-space-4); color: var(--rzt-text); max-width: 22ch;
+}
+.tool-head h1 .muted { color: var(--rzt-muted); }
+.tool-head .lede { font-size: 16px; color: var(--rzt-text-2); max-width: 62ch; margin: 0 0 var(--rz-space-4); }
+.tool-head .basis { font-family: var(--rzt-mono); font-size: 12px; color: var(--rzt-muted); margin: 0; letter-spacing: .02em; }
+.tool-head .crumb { font-family: var(--rzt-mono); font-size: 12px; color: var(--rzt-muted); margin: var(--rz-space-3) 0 0; }
+.tool-head .crumb a { color: var(--rzt-text-2); }
+.tool-head .crumb a:hover { color: var(--rzt-text); }
+
+/* --- bar: presets as chips on the left, 2-3 actions on the right --- */
+.tool-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--rz-space-2); padding: var(--rz-space-4) 0; }
+.tool-bar .spacer { margin-left: auto; }
+.tool-bar .lbl { font-family: var(--rzt-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--rzt-muted); margin-right: var(--rz-space-1); }
+.tool-bar .chip, .tool-bar .tool-btn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px;
+  font-family: var(--rzt-mono); font-size: 12px; font-weight: 500; letter-spacing: .01em; text-transform: none;
+  color: var(--rzt-text-2); background: transparent; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); cursor: pointer;
+  transition: border-color var(--rz-dur-tip) var(--rz-ease-out), color var(--rz-dur-tip) var(--rz-ease-out);
+}
+.tool-bar .chip:hover, .tool-bar .tool-btn:hover { border-color: var(--rzt-line-strong); color: var(--rzt-text); }
+.tool-bar .chip[aria-pressed="true"] { border-color: var(--rzt-accent); color: var(--rzt-text); }
+.tool-bar .tool-btn.is-primary { background: var(--rzt-accent); border-color: var(--rzt-accent); color: var(--rz-text-inverse); font-family: var(--rzt-sans); font-weight: 600; }
+.tool-bar .tool-btn.is-primary:hover { background: var(--rz-accent-signal-dim); border-color: var(--rz-accent-signal-dim); color: var(--rz-text-inverse); }
+.tool-bar .seg { display: inline-flex; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); }
+.tool-bar .seg > button { min-height: 34px; padding: 0 12px; font: 500 12px var(--rzt-mono); color: var(--rzt-text-2); background: transparent; border: 0; border-radius: 0; cursor: pointer; }
+.tool-bar .seg > button + button { border-left: 1px solid var(--rzt-line); }
+.tool-bar .seg > button[aria-pressed="true"] { color: var(--rzt-text); box-shadow: none; background: var(--rzt-hover); }
+@media (max-width: 600px) { .tool-bar .spacer { margin-left: 0; } }
+
+/* --- bench: inputs | results --- */
+.tool-bench { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: var(--rz-space-6); align-items: start; padding-bottom: var(--rz-space-10); }
+@media (max-width: 900px) { .tool-bench { grid-template-columns: minmax(0, 1fr); } }
+
+.tool-inputs, .tool-results, .fig, .tool-full { background: var(--rzt-panel); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); }
+.tool-inputs { padding: var(--rz-space-4) var(--rz-space-5); }
+.tool-inputs .in-group { margin: 0 0 var(--rz-space-5); }
+.tool-inputs .in-group:last-child { margin-bottom: 0; }
+.tool-inputs .in-group > h2 {
+  font-family: var(--rzt-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--rzt-muted);
+  margin: 0 0 var(--rz-space-3); padding-bottom: var(--rz-space-2); border-bottom: 1px solid var(--rzt-line);
+}
+.tool-inputs .input-row { margin: 0 0 var(--rz-space-3); }
+.tool-inputs .input-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--rzt-text); margin: 0 0 6px; }
+.tool-inputs .input-field {
+  display: block; width: 100%; min-height: 44px; box-sizing: border-box; padding: 0 12px;
+  font: 400 14px var(--rzt-mono); font-variant-numeric: tabular-nums; color: var(--rzt-text);
+  background: var(--rzt-inset); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius);
+  transition: border-color var(--rz-dur-tip) var(--rz-ease-out);
+}
+.tool-inputs .input-field:hover { border-color: var(--rzt-line-strong); }
+.tool-inputs .input-field:focus-visible { outline: 2px solid var(--rzt-accent); outline-offset: 1px; border-color: var(--rzt-accent); }
+.tool-inputs .input-field.invalid { border-color: var(--rzt-fault); }
+.tool-inputs select.input-field option { background: var(--rzt-panel); color: var(--rzt-text); }
+.tool-inputs .tip {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: auto; flex: none;
+  font: 500 10px var(--rzt-mono); color: var(--rzt-muted); background: transparent; border: 1px solid var(--rzt-line-strong); border-radius: var(--rz-radius); cursor: help;
+}
+.tool-inputs .tip:hover, .tool-inputs .tip:focus { color: var(--rzt-text); border-color: var(--rzt-text-2); }
+.tool-inputs .tip .tipbox {
+  display: none; position: absolute; z-index: 5; bottom: calc(100% + 6px); right: 0; width: 260px; padding: 10px 12px; text-align: left;
+  font: 400 12px/1.5 var(--rzt-sans); color: var(--rzt-text-2); background: var(--rz-bg-overlay); border: 1px solid var(--rzt-line-strong); border-radius: var(--rz-radius);
+}
+.tool-inputs .tip:hover .tipbox, .tool-inputs .tip:focus .tipbox { display: block; }
+.tool-inputs .tip .tipbox b { color: var(--rzt-text); font-weight: 600; }
+
+/* --- results: header row, groups, fact lists --- */
+.tool-results { padding: 0; }
+.tool-results .res-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--rz-space-4); padding: var(--rz-space-4) var(--rz-space-5); border-bottom: 1px solid var(--rzt-line); }
+.tool-results .res-head h2 { margin: 0; font: 600 16px var(--rzt-sans); color: var(--rzt-text); }
+.tool-results .res-head .basis { font: 400 11px var(--rzt-mono); color: var(--rzt-muted); letter-spacing: .02em; text-align: right; }
+@media (max-width: 600px) { .tool-results .res-head { flex-wrap: wrap; row-gap: 4px; } .tool-results .res-head .basis { flex-basis: 100%; text-align: left; } }
+.tool-results .res-group { padding: 0 var(--rz-space-5); }
+.tool-results .res-group > h3 {
+  margin: 0; padding: var(--rz-space-4) 0 var(--rz-space-2); font: 500 11px var(--rzt-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--rzt-muted);
+}
+.tool-results .res-group + .res-group > h3 { border-top: 1px solid var(--rzt-line); margin-top: var(--rz-space-2); }
+.tool-results .tool-valid { margin: 0; padding: var(--rz-space-3) var(--rz-space-5); border-bottom: 1px solid var(--rzt-line); font-size: 13px; color: var(--rzt-text-2); }
+.tool-results .tool-valid b { color: var(--rzt-text); }
+.tool-results .tool-valid[hidden] { display: none; }
+
+/* FACT LIST — one fact per row (copied from css/rz-article-dark.css "FACT LIST", re-pointed at the tool tokens, no !important):
+   label | figure (mono, 1.25rem) | note / state. A child's role is read from its class: value|-val|number|figure|num,
+   label|-lbl|title, sub|desc|note. */
+body.tool [data-rz-fact-list] { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; border-radius: 0; list-style: none; }
+body.tool [data-rz-fact-list] > * {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(7rem, auto) minmax(0, 1.5fr); grid-template-areas: "l v s"; column-gap: var(--rz-space-5); align-items: baseline;
+  padding: 11px 0; margin: 0; min-height: 0; width: auto; max-width: none; text-align: left;
+  border: 0; border-bottom: 1px solid var(--rzt-line-soft); border-radius: 0; background: none; box-shadow: none; transform: none;
+}
+body.tool [data-rz-fact-list] > *:last-child { border-bottom: 0; }
+body.tool [data-rz-fact-list] > * > [class*="value"], body.tool [data-rz-fact-list] > * > [class*="-val"], body.tool [data-rz-fact-list] > * > [class*="number"],
+body.tool [data-rz-fact-list] > * > [class*="figure"], body.tool [data-rz-fact-list] > * > [class*="num"] {
+  grid-area: v; font: 500 1.25rem/1.2 var(--rzt-mono); font-variant-numeric: tabular-nums slashed-zero; letter-spacing: -.01em; color: var(--rzt-text); margin: 0; text-align: right; background: none; -webkit-text-fill-color: currentColor;
+}
+body.tool [data-rz-fact-list] > .is-key > [class*="value"], body.tool [data-rz-fact-list] > .is-key > [class*="-val"] { color: var(--rzt-accent-text); }
+body.tool [data-rz-fact-list] > * > [class*="value"] small, body.tool [data-rz-fact-list] > * > [class*="value"] .unit { font: 400 12px var(--rzt-mono); color: var(--rzt-muted); margin-left: 4px; letter-spacing: 0; }
+body.tool [data-rz-fact-list] > * > [class*="label"], body.tool [data-rz-fact-list] > * > [class*="-lbl"], body.tool [data-rz-fact-list] > * > [class*="title"] {
+  grid-area: l; font: 500 14px/1.4 var(--rzt-sans); color: var(--rzt-text); text-transform: none; letter-spacing: 0; margin: 0;
+}
+body.tool [data-rz-fact-list] > * > [class*="sub"], body.tool [data-rz-fact-list] > * > [class*="desc"], body.tool [data-rz-fact-list] > * > [class*="note"] {
+  grid-area: s; font: 400 13px/1.45 var(--rzt-sans); color: var(--rzt-muted); margin: 0;
+}
+body.tool [data-rz-fact-list] > * > svg, body.tool [data-rz-fact-list] > * > i, body.tool [data-rz-fact-list] > * > [class*="icon"] { display: none; }
+/* the state is a WORD in the note cell; red text is legal only here */
+body.tool .state { font: 500 11px var(--rzt-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--rzt-text-2); margin-right: 8px; }
+body.tool .state[data-state="watch"] { color: var(--rzt-accent-text); }
+body.tool .state[data-state="hazard"] { color: var(--rzt-fault); }
+@media (max-width: 600px) {
+  body.tool [data-rz-fact-list] > * { grid-template-columns: minmax(0, 1fr) 7rem; grid-template-areas: "l v" "s s"; column-gap: var(--rz-space-3); row-gap: 2px; }
+}
+
+/* --- notes, figures, full-analysis row, reference --- */
+.tool-note { margin: 0; padding: var(--rz-space-4) var(--rz-space-5); border-top: 1px solid var(--rzt-line); font-size: 13px; line-height: 1.6; color: var(--rzt-muted); }
+.tool-note b { color: var(--rzt-text-2); font-weight: 600; }
+.tool-note code { font-family: var(--rzt-mono); font-size: 12px; color: var(--rzt-text-2); }
+.tool-note a { color: var(--rzt-text-2); text-decoration: underline; text-decoration-color: var(--rzt-line-strong); text-underline-offset: 3px; }
+.tool-note a:hover { color: var(--rzt-text); }
+
+.fig { margin: 0 0 var(--rz-space-5); padding: var(--rz-space-4); }
+.fig > figcaption { margin-top: var(--rz-space-3); font: 400 11px var(--rzt-mono); letter-spacing: .02em; color: var(--rzt-muted); }
+.fig > figcaption b { color: var(--rzt-text-2); font-weight: 500; }
+
+.tool-full { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--rz-space-4); padding: var(--rz-space-4) var(--rz-space-5); margin: 0 0 var(--rz-space-5); }
+.tool-full p { margin: 0; font-size: 14px; color: var(--rzt-text-2); }
+.tool-full p b { color: var(--rzt-text); font-weight: 600; }
+.tool-full [hidden] { display: none; }
+
+.tool-ref { padding: var(--rz-space-10) 0; border-top: 1px solid var(--rzt-line); }
+.tool-ref .eyebrow { margin: 0 0 var(--rz-space-5); }
+.tool-ref .ref-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--rz-space-8); }
+@media (max-width: 800px) { .tool-ref .ref-grid { grid-template-columns: minmax(0, 1fr); } }
+.tool-ref h3 { margin: 0 0 var(--rz-space-3); font: 500 11px var(--rzt-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--rzt-muted); }
+.tool-ref .formulas { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--rzt-line); }
+.tool-ref .formulas li { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: var(--rz-space-4); padding: 10px 0; border-bottom: 1px solid var(--rzt-line-soft); font-size: 13px; color: var(--rzt-text-2); }
+.tool-ref .formulas code { font: 400 13px var(--rzt-mono); color: var(--rzt-text); overflow-wrap: anywhere; }
+.tool-ref .against { margin: 0 0 var(--rz-space-5); padding: 10px 0; border-top: 1px solid var(--rzt-line); border-bottom: 1px solid var(--rzt-line); font: 400 12px var(--rzt-mono); letter-spacing: .02em; color: var(--rzt-text-2); }
+.tool-ref .against b { color: var(--rzt-muted); font-weight: 500; margin-right: 8px; letter-spacing: .08em; text-transform: uppercase; font-size: 11px; }
+.tool-ref .against span + span::before { content: "·"; margin: 0 8px; color: var(--rzt-muted); }
+.tool-ref .links { display: flex; flex-wrap: wrap; gap: var(--rz-space-2) var(--rz-space-5); margin: 0 0 var(--rz-space-5); }
+.tool-ref .links a { font-size: 14px; color: var(--rzt-text-2); border-bottom: 1px solid var(--rzt-line-strong); transition: color var(--rz-dur-tip) var(--rz-ease-out), border-color var(--rz-dur-tip) var(--rz-ease-out); }
+.tool-ref .links a:hover { color: var(--rzt-text); border-bottom-color: var(--rzt-accent); }
+.tool-ref .notice { margin: var(--rz-space-5) 0 0; padding: var(--rz-space-3) var(--rz-space-4); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); font-size: 12px; line-height: 1.6; color: var(--rzt-muted); }
+
+/* tabs (bespoke apps): a row of buttons, the current one underlined in amber */
+.tool-tabs { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 1px solid var(--rzt-line); }
+.tool-tabs > button { min-height: 44px; padding: 0 14px; font: 500 13px var(--rzt-sans); color: var(--rzt-text-2); background: transparent; border: 0; border-bottom: 2px solid transparent; border-radius: 0; cursor: pointer; transition: color var(--rz-dur-tip) var(--rz-ease-out), border-color var(--rz-dur-tip) var(--rz-ease-out); }
+.tool-tabs > button:hover { color: var(--rzt-text); }
+.tool-tabs > button[aria-selected="true"] { color: var(--rzt-text); border-bottom-color: var(--rzt-accent); }
+
+/* --- template family (capex, opex, pue, roi, tier, carbon, tia, tco): the classes those pages already use, on the register --- */
+body.tool .tool-inputs .input-section { margin: 0 0 var(--rz-space-5); }
+body.tool .tool-inputs .input-section:last-child { margin-bottom: 0; }
+body.tool .tool-inputs .section-header { display: block; margin: 0 0 var(--rz-space-3); padding-bottom: var(--rz-space-2); border-bottom: 1px solid var(--rzt-line); }
+body.tool .tool-inputs .section-title { font: 500 11px var(--rzt-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--rzt-muted); }
+body.tool .tool-inputs .section-subtitle { margin-top: 2px; font: 400 12px var(--rzt-sans); color: var(--rzt-muted); }
+body.tool .tool-inputs .input-group { margin: 0 0 var(--rz-space-3); }
+body.tool .tool-inputs .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 var(--rz-space-2); }
+body.tool .preset-row .preset-btn { min-height: 32px; padding: 0 10px; font: 500 12px var(--rzt-mono); color: var(--rzt-text-2); background: transparent; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); cursor: pointer; transition: border-color var(--rz-dur-tip) var(--rz-ease-out), color var(--rz-dur-tip) var(--rz-ease-out); }
+body.tool .preset-row .preset-btn:hover { border-color: var(--rzt-line-strong); color: var(--rzt-text); }
+body.tool .preset-row .preset-btn.active { border-color: var(--rzt-accent); color: var(--rzt-text); }
+body.tool .tool-bar .chip.active { border-color: var(--rzt-accent); color: var(--rzt-text); }
+body.tool .tool-bar .seg > button.active { color: var(--rzt-text); background: var(--rzt-hover); }
+body.tool .tool-btn.disabled { color: var(--rzt-muted); cursor: not-allowed; }
+body.tool .tooltip-trigger { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: auto; flex: none; font: 500 10px var(--rzt-mono); color: var(--rzt-muted); border: 1px solid var(--rzt-line-strong); border-radius: var(--rz-radius); cursor: help; }
+body.tool .metric-label .tooltip-trigger { margin-left: 8px; }
+body.tool .tooltip-trigger:hover, body.tool .tooltip-trigger:focus { color: var(--rzt-text); border-color: var(--rzt-text-2); }
+body.tool .tooltip-content { display: none; position: absolute; z-index: 5; bottom: calc(100% + 6px); right: 0; width: 260px; padding: 10px 12px; text-align: left; font: 400 12px/1.5 var(--rzt-sans); color: var(--rzt-text-2); background: var(--rz-bg-overlay); border: 1px solid var(--rzt-line-strong); border-radius: var(--rz-radius); text-transform: none; letter-spacing: 0; }
+body.tool .tooltip-trigger:hover .tooltip-content, body.tool .tooltip-trigger:focus .tooltip-content, body.tool .tooltip-trigger:focus-within .tooltip-content { display: block; }
+body.tool .tooltip-title { font-weight: 600; color: var(--rzt-text); margin-bottom: 2px; }
+body.tool .range-wrap { display: flex; align-items: center; gap: 12px; }
+body.tool .range-wrap input[type="range"] { flex: 1; accent-color: var(--rzt-accent); height: 24px; }
+body.tool .range-value { min-width: 4ch; text-align: right; font: 400 13px var(--rzt-mono); color: var(--rzt-text-2); }
+body.tool .input-label .num { font-family: var(--rzt-mono); color: var(--rzt-text-2); }
+body.tool .results-card { padding: 0; }
+body.tool [data-rz-fact-list] > *:not(:has([class*="sub"], [class*="note"])) { grid-template-columns: minmax(0, 1fr) minmax(7rem, auto); grid-template-areas: "l v"; }
+body.tool .charts-section { padding-bottom: var(--rz-space-8); }
+body.tool .charts-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--rz-space-5); }
+@media (max-width: 800px) { body.tool .charts-grid { grid-template-columns: minmax(0, 1fr); } }
+body.tool .chart-container { position: relative; height: 280px; }
+body.tool .comparison-label { display: flex; justify-content: space-between; font: 400 13px var(--rzt-sans); color: var(--rzt-text-2); margin-bottom: 4px; }
+body.tool .comparison-label span:last-child { font-family: var(--rzt-mono); color: var(--rzt-text); }
+body.tool .comparison-bar { height: 4px; background: var(--rzt-line); border-radius: 0; overflow: hidden; }
+body.tool .comparison-fill { height: 100%; border-radius: 0; }
+body.tool .res-pad { padding: var(--rz-space-4) var(--rz-space-5); }
+body.tool .rec-section { padding: var(--rz-space-4) var(--rz-space-5); border-top: 1px solid var(--rzt-line); }
+body.tool .rec-title { margin: 0 0 var(--rz-space-3); font: 500 11px var(--rzt-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--rzt-muted); }
+body.tool .rec-card { padding: 10px 0; border-bottom: 1px solid var(--rzt-line-soft); }
+body.tool .rec-card:last-child { border-bottom: 0; }
+body.tool .rec-text h4 { margin: 0 0 2px; font: 600 14px var(--rzt-sans); color: var(--rzt-text); }
+body.tool .rec-text p { margin: 0 0 4px; font-size: 13px; color: var(--rzt-muted); }
+body.tool .rec-impact { font: 400 12px var(--rzt-mono); color: var(--rzt-text-2); }
+/* Pro gating: the locked content is not drawn (never blurred); the overlay becomes one hairline row */
+body.tool .pro-section.locked > :not(.pro-overlay) { display: none; }
+body.tool .pro-section:not(.locked) > .pro-overlay { display: none; }
+body.tool .pro-section > .pro-overlay { margin: 0 0 var(--rz-space-4); cursor: pointer; }
+body.tool .pro-overlay-btn { min-height: 36px; padding: 0 14px; font: 600 13px var(--rzt-sans); color: var(--rz-text-inverse); background: var(--rzt-accent); border: 1px solid var(--rzt-accent); border-radius: var(--rz-radius); cursor: pointer; }
+body.tool .pro-overlay-btn:hover { background: var(--rz-accent-signal-dim); border-color: var(--rz-accent-signal-dim); }
+/* nav auth cluster inside the hub nav */
+body.tool .hub-nav .nav-auth-wrap { position: relative; display: flex; align-items: center; }
+body.tool .hub-nav .nav-login-btn, body.tool .hub-nav .nav-user-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; font: 500 13px var(--rzt-sans); color: var(--rzt-text-2); background: transparent; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); cursor: pointer; transition: border-color var(--rz-dur-tip) var(--rz-ease-out), color var(--rz-dur-tip) var(--rz-ease-out); }
+body.tool .hub-nav .nav-login-btn:hover, body.tool .hub-nav .nav-user-btn:hover { border-color: var(--rzt-line-strong); color: var(--rzt-text); }
+body.tool .hub-nav .nav-user-avatar { display: inline-grid; place-items: center; width: 22px; height: 22px; font: 500 11px var(--rzt-mono); border: 1px solid var(--rzt-line-strong); border-radius: var(--rz-radius); }
+body.tool .hub-nav .nav-user-email { max-width: 14ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+body.tool .hub-nav .nav-user-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; z-index: 60; background: var(--rz-bg-overlay); border: 1px solid var(--rzt-line-strong); border-radius: var(--rz-radius); }
+body.tool .hub-nav .nav-user-dropdown.show { display: block; }
+body.tool .hub-nav .nav-dd-header { padding: 12px 14px; border-bottom: 1px solid var(--rzt-line); }
+body.tool .hub-nav .nav-dd-tier-badge { font: 500 11px var(--rzt-mono); letter-spacing: .06em; color: var(--rzt-accent-text); }
+body.tool .hub-nav .nav-dd-email { font-size: 12px; color: var(--rzt-muted); word-break: break-all; }
+body.tool .hub-nav .nav-dd-logout { display: block; width: 100%; padding: 10px 14px; text-align: left; font: 500 13px var(--rzt-sans); color: var(--rzt-text-2); background: none; border: 0; cursor: pointer; }
+body.tool .hub-nav .nav-dd-logout:hover { color: var(--rzt-text); background: var(--rz-bg-hover); }
+/* auth.js injects .rz-login-btn / .rz-user-btn with its own colours (a green border in light); on the shell they are neutral chips */
+body.tool .hub-nav .rz-login-btn, body.tool .hub-nav .rz-user-btn { background: transparent; color: var(--rzt-text-2); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); font: 500 13px var(--rzt-sans); }
+body.tool .hub-nav .rz-login-btn:hover, body.tool .hub-nav .rz-user-btn:hover { background: transparent; color: var(--rzt-text); border-color: var(--rzt-line-strong); }
+/* the shell sets data-rz-account-pill="off" on <body> (js/rz-scenario.js honours it); the account link lives in the nav dropdown and .tool-ref. The dotted explain underline becomes a solid hairline */
+body.tool .hub-nav .nav-dd-link { display: block; padding: 10px 14px; font: 500 13px var(--rzt-sans); color: var(--rzt-text-2); border-bottom: 1px solid var(--rzt-line); }
+body.tool .hub-nav .nav-dd-link:hover { color: var(--rzt-text); background: var(--rz-bg-hover); }
+body.tool .rzx-trigger { border-bottom: 1px solid var(--rzt-line-strong); }
+/* a row label is as wide as its words: the explain hairline under it must not run across the whole cell */
+body.tool [data-rz-fact-list] > * > [class*="label"] { justify-self: start; }
+/* a one-row headline list whose note has no column to align with: figure right, state word under the label */
+body.tool [data-rz-fact-list]:not(:has(> :not(.is-key))) > .is-key { grid-template-columns: minmax(0, 1fr) minmax(7rem, auto); grid-template-areas: "l v" "s v"; row-gap: 2px; align-items: end; }
+body.tool [data-rz-fact-list]:not(:has(> :not(.is-key))) > .is-key > [class*="value"] { font-size: 1.75rem; }
+/* a figure inside the results panel sits on the panel, not in a second frame */
+body.tool .tool-results .res-fig { margin: 0; padding: var(--rz-space-3) var(--rz-space-5) var(--rz-space-4); border: 0; border-top: 1px solid var(--rzt-line-soft); border-radius: 0; background: none; }
+body.tool .pue-curve { display: block; width: 100%; height: auto; max-height: 220px; }
+body.tool .pue-curve .gr { stroke: var(--rzt-line-soft); stroke-width: 1; }
+body.tool .pue-curve text { fill: var(--rzt-muted); font: 400 10px var(--rzt-mono); }
+body.tool .pue-curve .ln { fill: none; stroke: var(--rzt-accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+body.tool .pue-curve .pt { fill: var(--rzt-accent); }
+/* result rows: no "?" box per label. The label itself is the hover target (same hairline as an explain trigger);
+   a label rz-explain already wires keeps only that panel, so two popups never open at once */
+body.tool [data-rz-fact-list] .metric-label:has(.tooltip-trigger) { position: relative; border-bottom: 1px solid var(--rzt-line-strong); }
+body.tool [data-rz-fact-list] .metric-label:not(.rzx-trigger) > .tooltip-trigger { position: absolute; inset: 0; width: auto; height: auto; margin: 0; border: 0; font-size: 0; color: transparent; background: none; }
+body.tool [data-rz-fact-list] .metric-label:not(.rzx-trigger) > .tooltip-trigger > .tooltip-content { top: calc(100% + 6px); bottom: auto; left: 0; right: auto; }
+body.tool [data-rz-fact-list] .metric-label.rzx-trigger > .tooltip-trigger { display: none; }
+body.tool .tool-ref .notice + .notice { margin-top: var(--rz-space-3); }
+body.tool .tool-ref .notice a { color: var(--rzt-text-2); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ============================================================
+   PART 2 · LEGACY OVERRIDES — removed page by page
+   Everything below applies only under html[data-rz-register="tool"] (the 11 pages not yet refit). Delete a block when the last
+   page that needs it moves to the shell above.
+   ============================================================ */
+
+/* ============================================================
+   rz-tool.css — the TOOL register (hub calculators and checklists)
+   Same register as the DC hub (css/rz-hub.css): graphite surfaces, ONE accent (signal amber), IBM Plex Sans,
+   mono only for numbers / eyebrows, 1 px hairlines, radius <= 4 px, no glass, no gradient fills or text,
+   no second hue in chrome (ANTI_VIBECODE_STANDARD §A27–34, UX law 14).
+   CHROME ONLY: the page's own tokens are re-pointed and its shell is flattened. Instruments — canvas charts,
+   SVG diagrams, maps, gauges — keep their colours. Activates only under html[data-rz-register="tool"]; remove
+   the attribute + this <link> to revert.
+   ============================================================ */
+
+html[data-rz-register="tool"] {
+    --rzt-bg: #F5F7FA; --rzt-panel: #FFFFFF; --rzt-inset: #EEF2F7; --rzt-hover: #E8ECF2;
+    --rzt-text: #111827; --rzt-text-2: #374151; --rzt-muted: #656B78;
+    --rzt-line: rgba(17,24,39,.14); --rzt-line-strong: rgba(17,24,39,.24);
+    --rzt-accent: #B07600; --rzt-accent-text: #7A4800; --rzt-accent-bg: rgba(204,136,0,.10);
+    --rzt-sans: 'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+    --rzt-mono: 'JetBrains Mono','IBM Plex Mono','SF Mono',Consolas,monospace;
+}
+html[data-rz-register="tool"][data-theme="dark"] {
+    --rzt-bg: #0b0c0e; --rzt-panel: #121316; --rzt-inset: #08090b; --rzt-hover: #191b1f;
+    --rzt-text: #E8EDF5; --rzt-text-2: #A0AEC0; --rzt-muted: #7D8794;
+    --rzt-line: rgba(255,255,255,.10); --rzt-line-strong: rgba(255,255,255,.18);
+    --rzt-accent: #E8B563; --rzt-accent-text: #E8B563; --rzt-accent-bg: rgba(232,181,99,.08);
+}
+
+/* --- the page template's own tokens, re-pointed (both themes) --- */
+html[data-rz-register="tool"],
+html[data-rz-register="tool"][data-theme="dark"] {
+    --bg-primary: var(--rzt-bg); --bg-secondary: var(--rzt-panel); --bg-tertiary: var(--rzt-inset);
+    --text-primary: var(--rzt-text); --text-secondary: var(--rzt-text-2); --text-muted: var(--rzt-muted);
+    --glass-bg: var(--rzt-panel); --glass-bg-dark: var(--rzt-panel); --glass-border: var(--rzt-line); --glass-blur: none;
+    --shadow-sm: none; --shadow-md: none; --shadow-lg: none;
+    --dark-blue: var(--rzt-text); --medium-blue: var(--rzt-accent); --light-blue: var(--rzt-accent);
+    --accent-cyan: var(--rzt-accent); --accent-purple: var(--rzt-muted);
+    --primary-gradient: var(--rzt-accent); --secondary-gradient: var(--rzt-accent);
+}
+
+html[data-rz-register="tool"] body { background: var(--rzt-bg); color: var(--rzt-text); font-family: var(--rzt-sans); }
+html[data-rz-register="tool"] .page-background { display: none; }
+
+/* --- navbar: one neutral link colour, amber underline for hover / current (inline per-link colours lose) --- */
+html[data-rz-register="tool"] .navbar, html[data-rz-register="tool"] .navbar.scrolled {
+    background: var(--rzt-bg) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+    border-bottom: 1px solid var(--rzt-line) !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] .navbar .nav-link { color: var(--rzt-text-2) !important; border-bottom: 1px solid transparent; transition: color var(--rz-dur-tip,160ms), border-color var(--rz-dur-tip,160ms); }
+html[data-rz-register="tool"] .navbar .nav-link:hover,
+html[data-rz-register="tool"] .navbar .nav-link[aria-current="page"] { color: var(--rzt-text) !important; border-bottom-color: var(--rzt-accent); }
+html[data-rz-register="tool"] .nav-brand,
+html[data-rz-register="tool"] .nav-title { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] .nav-logo {
+    background: var(--rzt-panel); color: var(--rzt-text); border: 1px solid var(--rzt-line-strong);
+    border-radius: 4px; box-shadow: none;
+}
+html[data-rz-register="tool"] .nav-back {
+    background: transparent; color: var(--rzt-text); border: 1px solid var(--rzt-line-strong); border-radius: 4px; box-shadow: none;
+}
+html[data-rz-register="tool"] .nav-back:hover { border-color: var(--rzt-accent); }
+html[data-rz-register="tool"] .skip-link { background: var(--rzt-panel); color: var(--rzt-text); border: 1px solid var(--rzt-line-strong); }
+
+/* --- hero: Plex Sans, solid text, no tinted badge --- */
+html[data-rz-register="tool"] .hero h1,
+html[data-rz-register="tool"] .tco-hero h1,
+html[data-rz-register="tool"] .cx-hero h1 {
+    font-family: var(--rzt-sans) !important; font-weight: 700; letter-spacing: -0.02em;
+    background: none !important; -webkit-background-clip: border-box !important; background-clip: border-box !important;
+    -webkit-text-fill-color: currentColor !important; color: var(--rzt-text) !important;
+}
+html[data-rz-register="tool"] .hero h1::after,
+html[data-rz-register="tool"] .tco-hero h1::after,
+html[data-rz-register="tool"] .cx-hero h1::after { content: none !important; }
+html[data-rz-register="tool"] .hero-badge,
+html[data-rz-register="tool"] .tco-hero-badge {
+    font-family: var(--rzt-mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
+    background: transparent !important; border: 1px solid var(--rzt-line-strong) !important; border-radius: 4px;
+    color: var(--rzt-accent-text) !important; box-shadow: none;
+}
+html[data-rz-register="tool"] .hero-badge i,
+html[data-rz-register="tool"] .tco-hero-badge i { color: var(--rzt-accent-text) !important; }
+html[data-rz-register="tool"] .rz-hero-fit { background-color: var(--rzt-inset) !important; }
+
+/* --- panels: graphite + one hairline, radius 4, no glass, no shadow --- */
+html[data-rz-register="tool"] .input-section,
+html[data-rz-register="tool"] .results-card,
+html[data-rz-register="tool"] .chart-card,
+html[data-rz-register="tool"] .simulator-container,
+html[data-rz-register="tool"] .tco-simulator-container,
+html[data-rz-register="tool"] .input-panel,
+html[data-rz-register="tool"] .results-panel {
+    background: var(--rzt-panel) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+    border: 1px solid var(--rzt-line) !important; border-radius: 4px !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] .input-field,
+html[data-rz-register="tool"] select,
+html[data-rz-register="tool"] input[type="number"],
+html[data-rz-register="tool"] input[type="text"] {
+    background: var(--rzt-inset); color: var(--rzt-text); border: 1px solid var(--rzt-line-strong); border-radius: 4px;
+}
+html[data-rz-register="tool"] .input-field:focus,
+html[data-rz-register="tool"] select:focus,
+html[data-rz-register="tool"] input:focus { outline: none; border-color: var(--rzt-accent); box-shadow: 0 0 0 2px var(--rzt-accent-bg); }
+html[data-rz-register="tool"] select option { background: var(--rzt-panel); color: var(--rzt-text); }
+html[data-rz-register="tool"] .pro-overlay { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: color-mix(in srgb, var(--rzt-bg) 88%, transparent) !important; }
+
+/* --- buttons: primary = amber fill, dark text; everything else = hairline --- */
+html[data-rz-register="tool"] .btn-primary,
+html[data-rz-register="tool"] .calculate-btn,
+html[data-rz-register="tool"] .pue-btn-free.active,
+html[data-rz-register="tool"] [class*="btn-free"].active {
+    background: var(--rzt-accent) !important; color: #0b0c0e !important; border: 1px solid var(--rzt-accent) !important;
+    box-shadow: none !important; border-radius: 4px;
+}
+html[data-rz-register="tool"] .rz-manual-fab {
+    background: var(--rzt-panel) !important; color: var(--rzt-text) !important;
+    border: 1px solid var(--rzt-line-strong) !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] .rz-manual-fab:hover { border-color: var(--rzt-accent) !important; }
+
+/* --- tooltip panel: was a blue gradient --- */
+html[data-rz-register="tool"] #tooltip-container {
+    background: var(--rzt-panel) !important; color: var(--rzt-text) !important;
+    border: 1px solid var(--rzt-line-strong) !important; box-shadow: none !important;
+}
+
+/* --- footer: inline navy gradient on these pages --- */
+html[data-rz-register="tool"] body > footer { background: var(--rzt-inset) !important; border-top: 1px solid var(--rzt-line); }
+
+/* --- inputs: the pages carry [data-theme="dark"] .input-field {... !important}; the register outranks it --- */
+html[data-rz-register="tool"][data-theme="dark"] .input-field,
+html[data-rz-register="tool"][data-theme="dark"] input.input-field,
+html[data-rz-register="tool"][data-theme="dark"] select.input-field,
+html[data-rz-register="tool"][data-theme="dark"] [class*="input-field"] {
+    background: var(--rzt-inset) !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important; border-radius: 4px !important;
+}
+html[data-rz-register="tool"][data-theme="dark"] .input-field:focus,
+html[data-rz-register="tool"][data-theme="dark"] [class*="input-field"]:focus { border-color: var(--rzt-accent) !important; box-shadow: 0 0 0 2px var(--rzt-accent-bg) !important; }
+html[data-rz-register="tool"][data-theme="dark"] .input-field option { background: var(--rzt-panel) !important; color: var(--rzt-text) !important; }
+
+/* --- presets and mode switches: hairline chips, the chosen one amber --- */
+html[data-rz-register="tool"] .preset-btn,
+html[data-rz-register="tool"] .tco-mode-btn,
+html[data-rz-register="tool"] [class*="mode-btn"] {
+    background: transparent !important; color: var(--rzt-text-2) !important; border: 1px solid var(--rzt-line-strong) !important;
+    border-radius: 4px !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] .preset-btn:hover,
+html[data-rz-register="tool"] [class*="mode-btn"]:hover { border-color: var(--rzt-accent) !important; color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] .preset-btn.active,
+html[data-rz-register="tool"] [class*="mode-btn"].active {
+    background: var(--rzt-accent-bg) !important; color: var(--rzt-accent-text) !important; border-color: var(--rzt-accent) !important;
+}
+
+/* --- result read-out: the number is text, the grade is a hairline chip (state = amber or neutral) --- */
+html[data-rz-register="tool"] #pueValue { color: var(--rzt-text) !important; background: none !important; -webkit-text-fill-color: currentColor !important; }
+html[data-rz-register="tool"] #pueRating {
+    background: transparent !important; color: var(--rzt-accent-text) !important; border: 1px solid var(--rzt-line-strong); border-radius: 4px;
+}
+
+/* --- section / card icons: muted glyph in a hairline square, no tinted tile --- */
+html[data-rz-register="tool"] .section-icon,
+html[data-rz-register="tool"] [class*="card-icon"],
+html[data-rz-register="tool"] [class*="rec-icon"] {
+    background: transparent !important; color: var(--rzt-muted) !important; border: 1px solid var(--rzt-line); border-radius: 4px !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] .section-icon i,
+html[data-rz-register="tool"] [class*="card-icon"] i { color: inherit !important; }
+
+/* --- account pill and save buttons (shared widgets, inline cyan) --- */
+html[data-rz-register="tool"] #rzAccountPill,
+html[data-rz-register="tool"] #btnSaveAccount,
+html[data-rz-register="tool"] [class*="action-btn"] {
+    background: var(--rzt-panel) !important; color: var(--rzt-text-2) !important; border: 1px solid var(--rzt-line-strong) !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] #rzAccountPill *,
+html[data-rz-register="tool"] #btnSaveAccount * { color: inherit !important; }
+
+/* --- TCO template shell --- */
+html[data-rz-register="tool"] .tco-page-background { display: none !important; }
+html[data-rz-register="tool"] .tco-hero { background: var(--rzt-bg) !important; }
+html[data-rz-register="tool"] .tco-simulator-results,
+html[data-rz-register="tool"] .tco-methodology-item,
+html[data-rz-register="tool"] .tco-disclaimer,
+html[data-rz-register="tool"] .tco-brief-card,
+html[data-rz-register="tool"] .tco-region-snapshot,
+html[data-rz-register="tool"] .tco-savings-highlight,
+html[data-rz-register="tool"] [class*="tco-"][class*="-card"] {
+    background: var(--rzt-panel) !important; border: 1px solid var(--rzt-line) !important; border-radius: 4px !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] #tcoPremiumTabBtn { border-color: var(--rzt-line-strong) !important; }
+
+/* --- explainer panel ("What is PUE?") — one panel, one hairline; the formula is an inset mono line --- */
+html[data-rz-register="tool"] .rzt-explainer { background: var(--rzt-panel) !important; border: 1px solid var(--rzt-line) !important; border-radius: 4px !important; }
+html[data-rz-register="tool"] .rzt-explainer h3 { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] .rzt-explainer h3 i { color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"] .rzt-explainer > div { background: var(--rzt-inset) !important; border: 1px solid var(--rzt-line); border-radius: 4px !important; }
+html[data-rz-register="tool"] .rzt-explainer > div span { color: var(--rzt-text) !important; }
+
+/* --- the pages colour each nav link by href, !important (html:not(dark) .nav-links a.nav-link[href=…]); outrank it --- */
+html[data-rz-register="tool"] .navbar .nav-links a.nav-link[href],
+html[data-rz-register="tool"]:not([data-theme="dark"]) .navbar .nav-links a.nav-link[href] { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"] .navbar .nav-links a.nav-link[href]:hover,
+html[data-rz-register="tool"]:not([data-theme="dark"]) .navbar .nav-links a.nav-link[href]:hover { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] .navbar .nav-link i,
+html[data-rz-register="tool"] .navbar .nav-link svg { color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"] .nav-logo[style] { background: var(--rzt-panel) !important; color: var(--rzt-text) !important; }
+
+/* --- login + premium buttons: hairline, amber on hover --- */
+html[data-rz-register="tool"] .nav-login-btn,
+html[data-rz-register="tool"] [class*="premium-tab"],
+html[data-rz-register="tool"] [id*="PremiumTabBtn"] {
+    background: transparent !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important;
+    border-radius: 4px !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] .nav-login-btn:hover,
+html[data-rz-register="tool"] [id*="PremiumTabBtn"]:hover { border-color: var(--rzt-accent) !important; }
+
+/* --- read-outs coloured by state: text, never green / blue (state = amber or neutral) --- */
+html[data-rz-register="tool"] #confidenceValue,
+html[data-rz-register="tool"] .score-item .val { color: var(--rzt-text) !important; }
+
+/* --- brief card: no coloured stripe (UX law 14) --- */
+html[data-rz-register="tool"] .tco-brief-card::before,
+html[data-rz-register="tool"] [class*="brief-card"]::before { content: none !important; display: none !important; }
+html[data-rz-register="tool"] [class*="brief-card"] { border-left-width: 1px !important; border-left-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"] [class*="brief-card"] i,
+html[data-rz-register="tool"] [class*="brief"] [class*="feature"] i { color: var(--rzt-muted) !important; }
+
+/* --- the pages pin result colours per theme with :root:not(dark) #id {… !important}; outrank both themes --- */
+html[data-rz-register="tool"]:not([data-theme="dark"]) #pueValue,
+html[data-rz-register="tool"][data-theme="dark"] #pueValue { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"]:not([data-theme="dark"]) #pueRating, html[data-rz-register="tool"]:not([data-theme="dark"]) #ratingText,
+html[data-rz-register="tool"][data-theme="dark"] #pueRating, html[data-rz-register="tool"][data-theme="dark"] #ratingText { color: var(--rzt-accent-text) !important; }
+html[data-rz-register="tool"]:not([data-theme="dark"]) .comparison-label span,
+html[data-rz-register="tool"][data-theme="dark"] .comparison-label span,
+html[data-rz-register="tool"]:not([data-theme="dark"]) #upsLoadDisplay { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"][data-theme="dark"] .kpi-card,
+html[data-rz-register="tool"] .kpi-card { background: var(--rzt-panel) !important; border: 1px solid var(--rzt-line) !important; border-radius: 4px !important; }
+
+/* --- result tiles, comparison bars, recommendations: one amber, rest neutral --- */
+html[data-rz-register="tool"] .metric-box { background: var(--rzt-panel) !important; border: 1px solid var(--rzt-line) !important; }
+html[data-rz-register="tool"] .comparison-bar { background: var(--rzt-line) !important; }
+html[data-rz-register="tool"] .comparison-fill { background: var(--rzt-muted) !important; transition: width .2s ease-out !important; }
+html[data-rz-register="tool"] #industryComparison > div:first-child .comparison-fill { background: var(--rzt-accent) !important; }
+html[data-rz-register="tool"] #industryComparison > div:first-child .comparison-label span { color: var(--rzt-text) !important; font-weight: 600; }
+html[data-rz-register="tool"] .rec-card { background: var(--rzt-panel) !important; border: 1px solid var(--rzt-line) !important; }
+html[data-rz-register="tool"] .rec-icon { background: transparent !important; border: 1px solid var(--rzt-line) !important; border-radius: 4px !important; color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"] .rec-impact { background: transparent !important; color: var(--rzt-accent-text) !important; border: 1px solid var(--rzt-line) !important; border-radius: 4px !important; font-family: var(--rzt-mono); }
+html[data-rz-register="tool"] #rzAccountPill::before { background: var(--rzt-accent) !important; }
+html[data-rz-register="tool"] .calc-disclaimer,
+html[data-rz-register="tool"][data-theme="dark"] .calc-disclaimer { background: var(--rzt-inset) !important; border: 1px solid var(--rzt-line) !important; border-radius: 4px !important; color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"] .calc-disclaimer .disc-title,
+html[data-rz-register="tool"][data-theme="dark"] .calc-disclaimer .disc-title,
+html[data-rz-register="tool"][data-theme="dark"] .calc-disclaimer .disc-text strong { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] .calc-disclaimer .disc-text,
+html[data-rz-register="tool"][data-theme="dark"] .calc-disclaimer .disc-text { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"][data-theme="dark"] .calc-disclaimer .disc-fine { color: var(--rzt-muted) !important; }
+/* tco template accent tokens (teal) fold into the one amber */
+html[data-rz-register="tool"] { --tco-primary: var(--rzt-accent-text); --tco-primary-dark: var(--rzt-accent-text); --tco-accent: var(--rzt-accent); --tco-accent-light: var(--rzt-accent); }
+/* tco: snapshot tiles, outlook panel, insight, savings line, inline bars, scroll-top button */
+html[data-rz-register="tool"] .tco-snapshot-item,
+html[data-rz-register="tool"][data-theme="dark"] .tco-snapshot-item,
+html[data-rz-register="tool"] .tco-market-chart,
+html[data-rz-register="tool"][data-theme="dark"] .tco-market-chart,
+html[data-rz-register="tool"] .tco-narrative,
+html[data-rz-register="tool"] .tco-savings-highlight { background: var(--rzt-panel) !important; border: 1px solid var(--rzt-line) !important; border-radius: 4px !important; box-shadow: none !important; }
+html[data-rz-register="tool"] .tco-savings-icon { background: transparent !important; border: 1px solid var(--rzt-line) !important; border-radius: 4px !important; color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"] .tco-savings-text strong { color: var(--rzt-accent-text) !important; }
+html[data-rz-register="tool"] .tco-inline-bar-track { background: var(--rzt-line) !important; }
+html[data-rz-register="tool"] .tco-inline-bar-fill.build,
+html[data-rz-register="tool"] .tco-inline-bar-fill.colo,
+html[data-rz-register="tool"] .tco-inline-bar-fill.cloud { background: var(--rzt-muted) !important; }
+html[data-rz-register="tool"] .tco-scroll-top-btn { background: var(--rzt-panel) !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important; border-radius: 4px !important; box-shadow: none !important; }
+html[data-rz-register="tool"] .tco-scroll-top-btn:hover { transform: none !important; border-color: var(--rzt-accent) !important; }
+/* tier advisor: subsystem score bars are one neutral scale, not five hues */
+html[data-rz-register="tool"] .subsystem-bar-bg { background: var(--rzt-line) !important; }
+html[data-rz-register="tool"] .subsystem-bar-fill { background: var(--rzt-muted) !important; }
+html[data-rz-register="tool"] .subsystem-val { color: var(--rzt-text) !important; }
+/* body links: text colour with an amber underline, never a second hue */
+html[data-rz-register="tool"] main a:not([class]), html[data-rz-register="tool"] .calc-disclaimer a,
+html[data-rz-register="tool"][data-theme="dark"] .calc-disclaimer a, html[data-rz-register="tool"] footer a:not([class]),
+html[data-rz-register="tool"] p > a:not([class]) { color: var(--rzt-text) !important; text-decoration: underline !important; text-decoration-color: var(--rzt-accent) !important; text-underline-offset: 2px; }
+html[data-rz-register="tool"] .calc-disclaimer .disc-fine a, html[data-rz-register="tool"] .calc-disclaimer .disc-text a,
+html[data-rz-register="tool"]:not([data-theme="dark"]) .calc-disclaimer .disc-fine a, html[data-rz-register="tool"]:not([data-theme="dark"]) .calc-disclaimer .disc-text a,
+html[data-rz-register="tool"][data-theme="dark"] .calc-disclaimer .disc-fine a, html[data-rz-register="tool"][data-theme="dark"] .calc-disclaimer .disc-text a { color: var(--rzt-text) !important; text-decoration-color: var(--rzt-accent) !important; }
+/* tco results column is a dark readout in both themes (its charts draw white labels): graphite, never navy */
+html[data-rz-register="tool"] .tco-simulator-results {
+    --rzt-panel: #121316; --rzt-inset: #08090b; --rzt-hover: #191b1f;
+    --rzt-text: #E8EDF5; --rzt-text-2: #A0AEC0; --rzt-muted: #7D8794;
+    --rzt-line: rgba(255,255,255,.10); --rzt-line-strong: rgba(255,255,255,.18);
+    --rzt-accent: #E8B563; --rzt-accent-text: #E8B563;
+    background: #0b0c0e !important; color: var(--rzt-text) !important;
+}
+/* phones: the two floating buttons sat over form fields and results (manual 92 px wide, account 116 px).
+   Manual becomes a 44 px icon button; the account pill keeps its name for screen readers and shows "Account". */
+@media (max-width: 768px) {
+    html[data-rz-register="tool"] .rz-manual-fab { width: 44px !important; padding: 0 !important; justify-content: center !important; }
+    html[data-rz-register="tool"] .rz-manual-fab .rz-mf-label { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    html[data-rz-register="tool"] #rzAccountPill { font-size: 0 !important; min-height: 44px; padding: 0 12px !important; gap: 6px !important; }
+    html[data-rz-register="tool"] #rzAccountPill::after { content: "Account"; font-size: 11px; letter-spacing: .08em; }
+}
+
+/* --- bespoke calculator templates: re-point their own tokens (declared on :root per theme) ---
+   specificity (0,2,1) beats :root:not([data-theme="dark"]) and [data-theme="dark"] (0,2,0 / 0,1,0) */
+html[data-rz-register="tool"]:not([data-theme="dark"]), html[data-rz-register="tool"][data-theme="dark"] {
+    /* fire calculator + fire checklist */
+    --fc-bg: var(--rzt-bg); --fc-card: var(--rzt-panel); --fc-inset: var(--rzt-inset); --fc-text: var(--rzt-text);
+    /* spares readiness: "amber" there is blue; status green folds to neutral text */
+    --bg-primary: var(--rzt-bg); --bg-secondary: var(--rzt-panel); --glass-bg: var(--rzt-panel);
+    --amber: var(--rzt-accent); --amber-light: var(--rzt-accent); --amber-dark: var(--rzt-accent-text); --amber-deeper: var(--rzt-accent-text);
+    --accent: var(--rzt-accent); --accent-light: var(--rzt-accent);
+    --sp-page: var(--rzt-bg); --sp-surface: var(--rzt-panel); --sp-surface-2: var(--rzt-inset); --sp-text: var(--rzt-text);
+    --sp-primary: var(--rzt-accent-text); --sp-primary-2: var(--rzt-accent-text); --sp-primary-soft: var(--rzt-accent-bg);
+    --sp-des: var(--rzt-text-2); --sp-green: var(--rzt-text-2); --status-green: var(--rzt-text-2);
+    /* rfs workbench */
+    --rfs-bg: var(--rzt-bg); --rfs-bg2: var(--rzt-panel); --rfs-text: var(--rzt-text);
+    --rfs-teal: var(--rzt-accent-text); --rfs-teal-light: var(--rzt-accent); --rfs-teal-dark: var(--rzt-accent-text);
+    --rfs-blue: var(--rzt-text-2); --rfs-cyan: var(--rzt-text-2); --rfs-emerald: var(--rzt-text-2);
+    /* calculator template leftovers (opex/roi/carbon) */
+    --dark-blue: var(--rzt-text); --medium-blue: var(--rzt-accent); --light-blue: var(--rzt-accent);
+    --dark-green: var(--rzt-text); --medium-green: var(--rzt-accent); --light-green: var(--rzt-accent);
+    --accent-green: var(--rzt-accent); --accent-emerald: var(--rzt-accent-text); --accent-cyan: var(--rzt-accent);
+    --accent-blue: var(--rzt-accent-text); --accent-purple: var(--rzt-muted);
+}
+
+/* --- per-template surfaces the tokens do not reach (bespoke class names, inline gradients) --- */
+html[data-rz-register="tool"] .brief-card, html[data-rz-register="tool"] .simulator-results,
+html[data-rz-register="tool"] .breakdown-card, html[data-rz-register="tool"] .scenario-card,
+html[data-rz-register="tool"] .summary-card, html[data-rz-register="tool"] #opexFreeWatermark,
+html[data-rz-register="tool"] .cf-tab-bar, html[data-rz-register="tool"] .cx-toolbar,
+html[data-rz-register="tool"] .cx-disclaimer, html[data-rz-register="tool"] .cx-glossary-toggle,
+html[data-rz-register="tool"] #cxDrawer, html[data-rz-register="tool"] #tourTooltip,
+html[data-rz-register="tool"] .rfs-card,
+html[data-rz-register="tool"][data-theme="dark"] .brief-card, html[data-rz-register="tool"][data-theme="dark"] .simulator-results,
+html[data-rz-register="tool"][data-theme="dark"] .breakdown-card, html[data-rz-register="tool"][data-theme="dark"] .scenario-card,
+html[data-rz-register="tool"][data-theme="dark"] .summary-card, html[data-rz-register="tool"][data-theme="dark"] .cf-tab-bar,
+html[data-rz-register="tool"][data-theme="dark"] .cx-toolbar, html[data-rz-register="tool"][data-theme="dark"] .cx-disclaimer,
+html[data-rz-register="tool"][data-theme="dark"] .cx-glossary-toggle, html[data-rz-register="tool"][data-theme="dark"] .rfs-card {
+    background: var(--rzt-panel) !important; border-color: var(--rzt-line) !important; box-shadow: none !important;
+    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+html[data-rz-register="tool"] #cxScenarioSelect,
+html[data-rz-register="tool"][data-theme="dark"] #cxScenarioSelect { background: var(--rzt-inset) !important; color: var(--rzt-text) !important; border-color: var(--rzt-line-strong) !important; }
+/* own navbars (cx, rfs): flat graphite, neutral links */
+html[data-rz-register="tool"] .cx-nav, html[data-rz-register="tool"] #rfsNavbar,
+html[data-rz-register="tool"][data-theme="dark"] .cx-nav, html[data-rz-register="tool"][data-theme="dark"] #rfsNavbar {
+    background: var(--rzt-bg) !important; border-bottom: 1px solid var(--rzt-line) !important; box-shadow: none !important;
+    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+html[data-rz-register="tool"] .cx-nav-link, html[data-rz-register="tool"] .cx-nav-back, html[data-rz-register="tool"] .cx-share-btn,
+html[data-rz-register="tool"][data-theme="dark"] .cx-nav-link, html[data-rz-register="tool"][data-theme="dark"] .cx-nav-back,
+html[data-rz-register="tool"][data-theme="dark"] .cx-share-btn { color: var(--rzt-text-2) !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"] .cx-pro-tag { color: var(--rzt-accent-text) !important; border-color: var(--rzt-line) !important; background: transparent !important; }
+/* heroes: page colour, no gradient, no aurora */
+html[data-rz-register="tool"] .cx-hero, html[data-rz-register="tool"] .rfs-hero,
+html[data-rz-register="tool"][data-theme="dark"] .cx-hero, html[data-rz-register="tool"][data-theme="dark"] .rfs-hero { background: var(--rzt-bg) !important; }
+html[data-rz-register="tool"] .aurora-blob { display: none !important; }
+/* buttons and chips that carried a second hue */
+html[data-rz-register="tool"] #premiumTabBtn, html[data-rz-register="tool"] .rzx-trigger, html[data-rz-register="tool"] #cxPremiumBtn,
+html[data-rz-register="tool"] #rzLoginBtn, html[data-rz-register="tool"][data-theme="dark"] #rzLoginBtn { border-color: var(--rzt-line-strong) !important; }
+html[data-rz-register="tool"] #btnSaveOpexA, html[data-rz-register="tool"] .rfs-btn, html[data-rz-register="tool"] .rfs-btn-free,
+html[data-rz-register="tool"] .share-btn,
+html[data-rz-register="tool"][data-theme="dark"] #btnSaveOpexA, html[data-rz-register="tool"][data-theme="dark"] .rfs-btn,
+html[data-rz-register="tool"][data-theme="dark"] .share-btn {
+    background: var(--rzt-panel) !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] #btnSaveOpexA *, html[data-rz-register="tool"] .rfs-btn *, html[data-rz-register="tool"] .share-btn * { color: inherit !important; }
+html[data-rz-register="tool"] .nav-theme-btn, html[data-rz-register="tool"][data-theme="dark"] .nav-theme-btn { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"] .roi-benchmark-tag, html[data-rz-register="tool"] .cf-benchmark-tag,
+html[data-rz-register="tool"] .chip, html[data-rz-register="tool"][data-theme="dark"] .chip { color: var(--rzt-text-2) !important; }
+
+/* --- template toolbars, headings, tips, readouts (probe 2026-10-25) --- */
+html[data-rz-register="tool"] main h2, html[data-rz-register="tool"] main h3, html[data-rz-register="tool"] main h4,
+html[data-rz-register="tool"] section h2, html[data-rz-register="tool"] section h3, html[data-rz-register="tool"] section h4 { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] [class*="-mode-bar"], html[data-rz-register="tool"][data-theme="dark"] [class*="-mode-bar"] { background: var(--rzt-panel) !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"] [class*="-mode-indicator"], html[data-rz-register="tool"][data-theme="dark"] [class*="-mode-indicator"] { color: var(--rzt-accent-text) !important; background: transparent !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"] [class*="-btn-reset"], html[data-rz-register="tool"][data-theme="dark"] [class*="-btn-reset"],
+html[data-rz-register="tool"] .cx-scenario-bar button, html[data-rz-register="tool"][data-theme="dark"] .cx-scenario-bar button {
+    background: var(--rzt-panel) !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important; }
+html[data-rz-register="tool"] .tip, html[data-rz-register="tool"][data-theme="dark"] .tip { color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"] .cx-currency-sel, html[data-rz-register="tool"] .cx-benchmark-tag,
+html[data-rz-register="tool"][data-theme="dark"] .cx-currency-sel, html[data-rz-register="tool"][data-theme="dark"] .cx-benchmark-tag {
+    background: var(--rzt-inset) !important; color: var(--rzt-text-2) !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"] .cx-range-val, html[data-rz-register="tool"] #opexP10, html[data-rz-register="tool"] #opexP50,
+html[data-rz-register="tool"] #opexP90, html[data-rz-register="tool"] .cat-bar-pct { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] .cx-privacy-badge { color: var(--rzt-text-2) !important; background: transparent !important; border-color: var(--rzt-line) !important; }
+/* TIA category bars: one neutral scale (same rule as the PUE comparison) */
+html[data-rz-register="tool"] .cat-bar-track { background: var(--rzt-line) !important; }
+html[data-rz-register="tool"] .cat-bar-fill { background: var(--rzt-muted) !important; }
+/* fire checklist source tags: STANDARD neutral, TYPICAL amber; the word carries the meaning */
+html[data-rz-register="tool"] .src.std, html[data-rz-register="tool"][data-theme="dark"] .src.std { color: var(--rzt-text-2) !important; background: transparent !important; border-color: var(--rzt-line-strong) !important; }
+html[data-rz-register="tool"] .src.typ, html[data-rz-register="tool"][data-theme="dark"] .src.typ { color: var(--rzt-accent-text) !important; background: transparent !important; border-color: var(--rzt-line-strong) !important; }
+/* opex: sliders and staffing model cards */
+html[data-rz-register="tool"] input.slider, html[data-rz-register="tool"][data-theme="dark"] input.slider { background: var(--rzt-line-strong) !important; }
+html[data-rz-register="tool"] .model-card, html[data-rz-register="tool"][data-theme="dark"] .model-card { background: var(--rzt-panel) !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"] .model-card.active, html[data-rz-register="tool"] .model-card.selected { border-color: var(--rzt-accent) !important; }
+/* rfs: hero badge and the FREE / PRO mode switch */
+html[data-rz-register="tool"] .rfs-hero-badge { color: var(--rzt-accent-text) !important; background: transparent !important; border-color: var(--rzt-line-strong) !important; }
+html[data-rz-register="tool"] .rfs-btn-free.active, html[data-rz-register="tool"][data-theme="dark"] .rfs-btn-free.active { background: var(--rzt-accent-bg) !important; color: var(--rzt-accent-text) !important; border-color: var(--rzt-accent) !important; }
+/* headings outside main/section (calculator "About" blocks) */
+/* pages pin `[data-theme="dark"] div > h3[style] {color:… !important}` (0,2,2) */
+html[data-rz-register="tool"] body h2, html[data-rz-register="tool"] body h3, html[data-rz-register="tool"] body h4,
+html[data-rz-register="tool"] body :is(h2, h3, h4)[style], html[data-rz-register="tool"] body :is(h2, h3, h4)[style] > i { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] .category-icon, html[data-rz-register="tool"] .category-icon .fas { color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"] .nav-theme-btn, html[data-rz-register="tool"][data-theme="dark"] .nav-theme-btn { border-color: var(--rzt-line-strong) !important; }
+html[data-rz-register="tool"] .cx-drawer-tab { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"] .cx-drawer-tab.active { color: var(--rzt-text) !important; border-bottom-color: var(--rzt-accent) !important; }
+html[data-rz-register="tool"] #rfsBtnFree, html[data-rz-register="tool"] .rfs-btn-free.active { background: var(--rzt-accent-bg) !important; color: var(--rzt-accent-text) !important; border-color: var(--rzt-accent) !important; }
+html[data-rz-register="tool"] button[onclick="RfsUI.saveSetup()"] { background: var(--rzt-accent) !important; color: #111 !important; border-color: var(--rzt-accent) !important; }
+/* every text-like field, not only .input-field (fire checklist, cx, rfs forms) */
+html[data-rz-register="tool"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="button"], [type="submit"]), select, textarea),
+/* a site rule `[data-theme="dark"] input:not(..):not(..):not(..)…` weighs (0,6,1); :is(#rzt-weight) lends this one ID weight */
+html[data-rz-register="tool"]:is([data-theme="dark"], #rzt-weight) :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="button"], [type="submit"]), select, textarea) {
+    background-color: var(--rzt-inset) !important; color: var(--rzt-text) !important; border-color: var(--rzt-line-strong) !important;
+}
+
+/* --- dark readouts: panels the templates draw dark in BOTH themes, with white text and white chart labels.
+   Flattening them to the light panel left their numbers invisible (gate T6). Keep them graphite. --- */
+html[data-rz-register="tool"] .simulator-results,
+html[data-rz-register="tool"] .summary-card,
+html[data-rz-register="tool"] .tco-footer,
+html[data-rz-register="tool"] footer:has(.footer-brand) {
+    --rzt-panel: #121316; --rzt-inset: #08090b; --rzt-hover: #191b1f;
+    --rzt-text: #E8EDF5; --rzt-text-2: #A0AEC0; --rzt-muted: #7D8794;
+    --rzt-line: rgba(255,255,255,.10); --rzt-line-strong: rgba(255,255,255,.18);
+    --rzt-accent: #E8B563; --rzt-accent-text: #E8B563; --rzt-accent-bg: rgba(232,181,99,.08);
+    --text-primary: #E8EDF5; --text-secondary: #A0AEC0; --text-muted: #7D8794;
+    --bg-primary: #0b0c0e; --bg-secondary: #08090b; --bg-tertiary: #191b1f; --bg-card: #121316;
+}
+html[data-rz-register="tool"] .tco-footer, html[data-rz-register="tool"] footer:has(.footer-brand) { background: #0b0c0e !important; }
+/* locked "pro" veil: a translucent white sheet in dark mode made its text invisible */
+html[data-rz-register="tool"] .pro-overlay { background: color-mix(in srgb, var(--rzt-panel) 88%, transparent) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+html[data-rz-register="tool"] .pro-overlay i { color: var(--rzt-muted) !important; }
+/* TIA tier selector: the active button was white with "dark green" text, which the register maps to light text */
+html[data-rz-register="tool"] .tier-btn { background: transparent !important; color: var(--rzt-text-2) !important; border: 1px solid var(--rzt-line) !important; border-radius: 4px !important; box-shadow: none !important; }
+html[data-rz-register="tool"] .tier-btn.active { background: var(--rzt-accent-bg) !important; color: var(--rzt-accent-text) !important; border-color: var(--rzt-accent) !important; }
+html[data-rz-register="tool"] .tier-btn:not(.active):hover { color: var(--rzt-text) !important; border-color: var(--rzt-line-strong) !important; }
+/* text on surfaces the register flattened: own navbars, heroes, disclaimers, tabs, tour */
+html[data-rz-register="tool"] .cx-nav-title, html[data-rz-register="tool"] .cx-disc-title,
+html[data-rz-register="tool"] .rfs-hero h1, html[data-rz-register="tool"] .rfs-hero h2 { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] .cx-disc-text, html[data-rz-register="tool"] .cx-disc-text *,
+html[data-rz-register="tool"] .rfs-hero p, html[data-rz-register="tool"] .rfs-breadcrumb .sep,
+html[data-rz-register="tool"] .cf-tab-btn, html[data-rz-register="tool"] .tour-tooltip-body { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"] .cf-tab-btn.active { color: var(--rzt-text) !important; border-bottom-color: var(--rzt-accent) !important; }
+html[data-rz-register="tool"] input[type="range"] { accent-color: var(--rzt-accent); }
+/* gate T6 round 2: pro veil text was pinned slate, carbon's active tab sat white on amber, cx glossary toggle pinned light text */
+html[data-rz-register="tool"] .pro-overlay-title { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] .pro-overlay-desc { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"] .cf-tab-btn.active { background: transparent !important; }
+html[data-rz-register="tool"] .cx-glossary-toggle { color: var(--rzt-text) !important; }
+/* --- montage round: decoration that still carried a hue per category. The label beside each item already names it,
+   so colour adds nothing; the largest cost (first, sorted) keeps the amber. --- */
+html[data-rz-register="tool"] .cost-icon { background: transparent !important; color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"] .cost-bar { background: var(--rzt-text-2) !important; opacity: .55; }
+html[data-rz-register="tool"] .cost-item:first-child .cost-bar { background: var(--rzt-accent) !important; opacity: 1; }
+html[data-rz-register="tool"] label:has(#deepSeaEnable) { background: transparent !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"] #deepSeaConfig, html[data-rz-register="tool"] #deepSeaPanel { border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"] :is(label, [class*="-label"], .section-header, .rfs-archetype-icon) i:is(.fas, .far, .fa) { color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"] .input-section[style] { border-left-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"] .section-header[style] { background: transparent !important; }
+html[data-rz-register="tool"] input[type="checkbox"] { accent-color: var(--rzt-accent); }
+/* --- gradient fills on buttons and logos are a second accent at any size (gate T3 now checks chrome) --- */
+html[data-rz-register="tool"] .radio-option input:checked + label { background: var(--rzt-accent-bg) !important; }
+html[data-rz-register="tool"] .cx-nav-logo, html[data-rz-register="tool"] .rfs-nav-logo {
+    background: var(--rzt-panel) !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] .cx-btn-primary {
+    background: var(--rzt-accent) !important; color: #0b0c0e !important; box-shadow: none !important; transform: none !important;
+}
+html[data-rz-register="tool"] .cx-btn-primary:hover { background: color-mix(in srgb, var(--rzt-accent) 88%, #fff) !important; }
+html[data-rz-register="tool"] [class*="cx-btn-export"], html[data-rz-register="tool"] .rfs-btn-pro {
+    background: transparent !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important; box-shadow: none !important;
+}
+/* table headers were pinned navy in dark (breakdown tables); at 390 px they wrap tall enough to read as a navy band */
+html[data-rz-register="tool"] :is(main, section, body) table th { background: var(--rzt-inset) !important; color: var(--rzt-text-2) !important; border-bottom-color: var(--rzt-line) !important; }
+/* cx back-to-top is built in JS with an inline teal fill and no class; Export PDF carried a red outline as decoration */
+html[data-rz-register="tool"] body > button:is([style*="14, 116, 144"], [style*="14,116,144"]) {
+    background: var(--rzt-panel) !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important; box-shadow: none !important;
+}
+html[data-rz-register="tool"] .cx-btn-pdf { background: transparent !important; color: var(--rzt-text-2) !important; border: 1px solid var(--rzt-line) !important; }
+html[data-rz-register="tool"] .cx-btn-pdf i { color: var(--rzt-muted) !important; }
+/* --- Round 2: second-hue text and small navy surfaces (gate T7: every non-instrument element, not only chrome).
+   The pages pin these with ID rules (`:root:not([data-theme="dark"]) #id {… !important}` weighs 1,2,0, `#modeIndicator`
+   in dark) and inline colours; `:is(:root, #rzt-weight)` lends ID weight in both themes. Read-out values are text;
+   the one winner keeps the amber; badges, tips and indicators are secondary text; category bars are one neutral scale. --- */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(#uptimeValue, #uncP10, #wueVal, #waterVal, #primaryValue, #scoreValue, #confidenceValue, #gradeText,
+    .range-value, .slider-value, .rfs-hero-kpi-value, .tco-kpi-value) { color: var(--rzt-text) !important; }
+/* keep this AFTER the primary-text ID list above: both weigh (2,1,1), so source order decides. #rzt-weight inside :is() matches nothing; it only lends the ID weight */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.tco-kpi-value.tco-winner, .tco-winner-cell, #rzt-weight) { color: var(--rzt-accent-text) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is([class*="-mode-indicator"], #modeIndicator) { color: var(--rzt-text-2) !important; background: transparent !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.tco-privacy-badge, .cx-privacy-badge, .rfs-tip, code.rz-version-num, #tcoRegionDetails) { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"] :is(.tco-privacy-badge, .rfs-tip) { background: transparent !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .section-title { color: var(--rzt-text) !important; }
+html[data-rz-register="tool"] .progress-fill { background: var(--rzt-text-2) !important; opacity: .55; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.tco-market-chip, .cx-drawer-close, .cad) {
+    background: var(--rzt-inset) !important; color: var(--rzt-text-2) !important; border: 1px solid var(--rzt-line) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .tour-btn-next { color: #0b0c0e !important; }
+/* opex breakdown table: the spare-parts sub-header row is inline teal (#0e7490, re-pinned cyan in dark) */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) tr > td[style*="0e7490"], html[data-rz-register="tool"]:is(:root, #rzt-weight) tr > td[style*="0e7490"] i { color: var(--rzt-text-2) !important; }
+/* fire pages: the phone hamburger bars were blue */
+html[data-rz-register="tool"] .hamburger .bar { background: var(--rzt-text) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .tco-methodology-item-title { color: var(--rzt-text) !important; }
+/* opex category icons carried an inline per-category tint (`background: ${color}20`); help "?" marks a cyan ring */
+html[data-rz-register="tool"] .category-icon { background: transparent !important; border: 1px solid var(--rzt-line) !important; }
+html[data-rz-register="tool"] .tooltip-trigger { background: transparent !important; border-color: var(--rzt-line-strong) !important; color: var(--rzt-muted) !important; }
+/* --- Round 2b: opex distribution table marks its first row (Energy, fixed order) amber like capex; pue's inline label value is
+   secondary text in both themes (the right-hand .range-value keeps the one amber per row) --- */
+html[data-rz-register="tool"] #breakdownTableBody tr:first-child .progress-fill { background: var(--rzt-accent) !important; opacity: 1; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) #upsLoadDisplay { color: var(--rzt-text-2) !important; }
+/* --- Round 2c: tinted fills, icon and input colours (gate T7 now counts fills down to alpha .05, icon glyphs and fields).
+   Help marks, badges, source tags and info panels lose their teal/green/blue film; icons are muted ink; the one selected
+   item (archetype card, active staffing model) keeps the amber. --- */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.info-tooltip, .tip, .fte-badge, .chip.derived, .tco-source-tag, .tco-region-indicator,
+    .tco-market-info, .tco-methodology, code.rz-version-num, [class*="-privacy-badge"], [class*="-benchmark-tag"], .cx-share-btn, .cx-scenario-bar, .cat-icon) {
+    background: transparent !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.info-tooltip, .info-tooltip i, .tip, .cat-icon, .cat-icon i, .model-card i) { color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .model-card.active i { color: var(--rzt-accent-text) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .rfs-archetype-card.selected { background: var(--rzt-accent-bg) !important; border-color: var(--rzt-accent) !important; }
+/* inline-coloured glyphs (capex/pue explainer headings, cx glossary toggle): muted ink */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) i:is(.fas, .far, .fab, .fa)[style*="color"] { color: var(--rzt-muted) !important; }
+/* opex maintenance table: spare-parts sub-header row carried an inline teal film */
+html[data-rz-register="tool"] #maintTableBody tr[style*="14,116,144"] { background: var(--rzt-inset) !important; }
+/* seen in the 2c montages, below the gate's reach: rfs narrative film is alpha .05 (gate counts > .05); opex P50 tile has a green border */
+html[data-rz-register="tool"] .rfs-narrative { background: var(--rzt-inset) !important; border-left-color: var(--rzt-line-strong) !important; }
+html[data-rz-register="tool"] div:has(> #opexP50) { border-color: var(--rzt-line-strong) !important; }
+/* --- Round 3: borders and light-mode contrast (gate T8: any visible border or outline in a second hue, alpha >= .05).
+   Hairlines are --rzt-line; the one active item keeps the amber. --- */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) section.hero > div[style*="max-width:800px"] { background: var(--rzt-panel) !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .cx-hero { border-bottom-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .results-card div[style*="border-top"] { border-top-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) #tcoCompareBody tr[style*="border-top"] { border-top-color: var(--rzt-line-strong) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .kpi.ok { border-left-color: var(--rzt-line-strong) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .dctype-btn.active { border-color: var(--rzt-accent) !important; background: var(--rzt-accent-bg) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .hamburger { border-color: var(--rzt-line-strong) !important; }
+/* cx Export PDF: pink text on white (1.72:1) — secondary-button idiom */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .cx-btn-pdf { background: transparent !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .cx-btn-pdf i { color: var(--rzt-text-2) !important; }
+/* cx pins #cxGeneratorType{color:#cbd5e1 !important} in both themes (1,1,0 via [id]): pale text on the light field (1.28:1) */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) #cxGeneratorType { color: var(--rzt-text) !important; }
+/* cx light: field labels and the secondary toolbar buttons were slate #94a3b8 on white (2.2–2.6:1) */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .cx-input-label,
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.cx-btn-pro, .cx-btn-manual, .cx-btn-faq) { color: var(--rzt-text-2) !important; }
+/* --- Round 4: text contrast (gate T9: own text >= 4.5:1, large text >= 3:1, translucent ink composited).
+   Tokens first: light --rzt-muted #6B7280 -> #656B78 (4.30 -> 4.76 on inset, 4.08 -> 4.51 on hover); light --rzt-accent
+   #A66E00 -> #B07600 so dark text on an amber fill reads (4.52 -> 5.07); accent as TEXT is --rzt-accent-text (7.1:1). --- */
+html[data-rz-register="tool"]:not([data-theme="dark"]), html[data-rz-register="tool"][data-theme="dark"] {
+    --fc-muted: var(--rzt-muted); --sp-muted: var(--rzt-muted); --sp-text-2: var(--rzt-text-2);
+    --rfs-text2: var(--rzt-text-2); --rfs-text3: var(--rzt-muted); --text-muted: var(--rzt-muted);
+}
+/* dark readout panels: page tokens declared as var(--rzt-*) on html resolve there, so re-declare them inside the scope */
+html[data-rz-register="tool"] :is(.simulator-results, .summary-card, .tco-footer, footer:has(.footer-brand), .tco-simulator-results) {
+    --tco-primary: #E8B563; --tco-primary-dark: #E8B563; --tco-accent: #E8B563; --tco-accent-light: #E8B563;
+    --accent-cyan: #E8B563; --medium-blue: #E8B563; --light-blue: #E8B563; --accent-blue: #E8B563;
+}
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.tco-narrative-title, .tco-region-indicator, #tcoRegionLabel) { color: var(--rzt-accent-text) !important; }
+html[data-rz-register="tool"] .tco-simulator-results { --rzt-accent-text: #E8B563; --rzt-muted: #7D8794; --rzt-text-2: #A0AEC0; --rzt-text: #E8EDF5; }
+/* inline slate text (#64748b / #94a3b8 / #475569) and page rules that pin it */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :not(svg, svg *):is([style*="color:#64748b"], [style*="color: #64748b"], [style*="color:#94a3b8"], [style*="color: #94a3b8"], [style*="color:#475569"]) { color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) #uncertaintyPanel > div,
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.metric-value[style*="64748b"], #uncP50, #uncP90, #uncSpread, #btnPdfLabel) { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.cx-nav-subtitle, .cx-hero p, .cx-scenario-bar label, .cx-disc-fine, .tco-snapshot-label, .pro-badge,
+    .summary-strip-title, .method-note, .footer-col p, .footer-bottom span, .sp-engine-stamp, .rfs-disclaimer, .rfs-footer p,
+    .fc-wrap > p, .crumb, .fc-presets .lbl, .fc-reset, .cc-csv, .vtag, .ck-wrap .lead, .ck-sec .lead, .ck-progress, .tour-step-count, .tour-btn-skip,
+    .tia-toolbar-btn.locked-hint, .check-weight, #metricWeakest) { color: var(--rzt-muted) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.sp-breadcrumb .sep, .footer-copyright, .footer-tagline-sub) { color: var(--rzt-muted) !important; opacity: 1 !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.summary-kpi-value.st-amber, .btn-scenario, .module-flow-col h4, .module-flow-arrow, .tour-tooltip-title) { color: var(--rzt-accent-text) !important; }
+/* amber fills carry dark text (spares run button + active tab, pro veil sign-in); the tip inside a primary button inherits it */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.sp-run-btn, .tab-btn.active, .pro-overlay-btn) { background: var(--rzt-accent) !important; color: #0b0c0e !important; border-color: var(--rzt-accent) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .rfs-btn-primary .rfs-tip { color: inherit !important; border-color: currentColor !important; }
+/* fire checklist Export PDF was a red fill: secondary-button idiom */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .btn-print { background: transparent !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important; }
+/* tia tier bar was pinned light grey in dark mode */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .tier-bar { background: var(--rzt-inset) !important; }
+/* opex nav Logout was fault red; red is for faults only — secondary text, amber on hover like the nav links */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .nav-dd-logout, html[data-rz-register="tool"]:is(:root, #rzt-weight) .nav-dd-logout i { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .nav-dd-logout:hover { color: var(--rzt-text) !important; background: transparent !important; box-shadow: inset 0 -1px 0 var(--rzt-accent) !important; }
+/* roi/carbon footer.footer inherits slate #94a3b8 on the light inset (2.28:1); its logo tile was a blue/green gradient */
+html[data-rz-register="tool"]:is(:root, #rzt-weight) footer.footer { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) footer.footer div[style*="height:40px;background:linear-gradient"] {
+    background: var(--rzt-panel) !important; color: var(--rzt-text) !important; border: 1px solid var(--rzt-line-strong) !important; border-radius: 4px !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) .pro-badge { background: transparent !important; border-color: var(--rzt-line) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) #opexFreeWatermark { color: var(--rzt-text-2) !important; }
+html[data-rz-register="tool"]:is(:root, #rzt-weight) :is(.rfs-btn-primary, #rzt-weight) .rfs-tip { color: inherit !important; border-color: currentColor !important; }
