@@ -292,7 +292,7 @@
                         </div>
                         <input type="number" class="input-field" id="itLoad" value="1000" min="50" max="100000" step="10" oninput="calculate()" aria-label="It Load">
 
-                        <label class="input-label">Power Usage Effectiveness (PUE) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">PUE Rating</div><div class="tooltip-desc">Ratio of total facility power to IT equipment power. A PUE of 1.0 means all energy goes to IT; 2.0 means 50% is overhead. Global average is ~1.52 (Uptime Institute 2026). Best-in-class hyperscalers achieve 1.1-1.2.</div></div></span></label>
+                        <label class="input-label">Power Usage Effectiveness (PUE) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">PUE Rating</div><div class="tooltip-desc">Ratio of total facility power to IT equipment power. A PUE of 1.0 means all energy goes to IT; 2.0 means 50% is overhead. Global average is ~1.52 (Uptime Institute 2026). Hyperscale sites report 1.1-1.2.</div></div></span></label>
                         <div class="preset-group">
                             <button class="preset-btn" onclick="setPreset('pueValue',1.2)">1.2 Best</button>
                             <button class="preset-btn" onclick="setPreset('pueValue',1.4)">1.4 Good</button>
@@ -444,7 +444,7 @@
                         <label class="input-label">Facility Size (MW IT) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Facility IT Capacity</div><div class="tooltip-desc">Total IT power capacity in megawatts. This is linked to the IT Load value from the Operational tab and determines the building footprint, structural steel, and concrete quantities for embodied carbon calculations per EN 15978 LCA stages A1-A5.</div></div></span></label>
                         <input type="number" class="input-field" id="facilityMW" value="1" min="0.1" max="200" step="0.1" oninput="calculate()" aria-label="Facility MW">
 
-                        <label class="input-label">Building Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Construction Type</div><div class="tooltip-desc">The type of building construction affects embodied carbon significantly. Purpose-built data centers use optimized designs. Converted warehouses reuse existing structures (lower embodied carbon). Modular/prefab facilities are manufactured off-site with standardized components.</div></div></span></label>
+                        <label class="input-label">Building Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Construction Type</div><div class="tooltip-desc">The type of building construction affects embodied carbon. Purpose-built data centers use optimized designs. Converted warehouses reuse existing structures (lower embodied carbon). Modular/prefab facilities are manufactured off-site with standardized components.</div></div></span></label>
                         <select class="input-field" id="buildingType" onchange="calculate()" aria-label="Building Type">
                             <option value="purpose_built">Purpose-built</option>
                             <option value="converted">Converted warehouse</option>
@@ -458,14 +458,14 @@
                             <option value="lowcarbon">Low-carbon 50% GGBS (100 kgCO&#8322;e/ton)</option>
                         </select>
 
-                        <label class="input-label">Steel Sourcing <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Structural Steel Source</div><div class="tooltip-desc">Steel production method significantly impacts embodied carbon. World average (30% recycled) emits 1850 kgCO2e/ton. Electric Arc Furnace (EAF) with 90%+ recycled content emits only 500 kgCO2e/ton. Virgin Basic Oxygen Furnace (BOF) steel emits 2200 kgCO2e/ton. Data from ICE Database v4.1.</div></div></span></label>
+                        <label class="input-label">Steel Sourcing <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Structural Steel Source</div><div class="tooltip-desc">Steel production method changes embodied carbon. World average (30% recycled) emits 1850 kgCO2e/ton. Electric Arc Furnace (EAF) with 90%+ recycled content emits only 500 kgCO2e/ton. Virgin Basic Oxygen Furnace (BOF) steel emits 2200 kgCO2e/ton. Data from ICE Database v4.1.</div></div></span></label>
                         <select class="input-field" id="steelSource" onchange="calculate()" aria-label="Steel Source">
                             <option value="world_avg">World average 30% recycled (1850 kgCO&#8322;e/ton)</option>
                             <option value="eaf">EAF recycled 90%+ (500 kgCO&#8322;e/ton)</option>
                             <option value="bof">Virgin BOF (2200 kgCO&#8322;e/ton)</option>
                         </select>
 
-                        <label class="input-label">Seismic Zone <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Seismic Design Category</div><div class="tooltip-desc">Higher seismic zones require more structural reinforcement, increasing steel and concrete quantities by 10-40%. Zone 0 has no seismic requirements. Zone 4 (very high) requires base isolation, moment frames, and additional structural mass, significantly increasing embodied carbon.</div></div></span></label>
+                        <label class="input-label">Seismic Zone <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Seismic Design Category</div><div class="tooltip-desc">Higher seismic zones require more structural reinforcement, increasing steel and concrete quantities by 10-40%. Zone 0 has no seismic requirements. Zone 4 (very high) requires base isolation, moment frames, and additional structural mass, which adds embodied carbon.</div></div></span></label>
                         <select class="input-field" id="seismicZone" onchange="calculate()" aria-label="Seismic Zone">
                             <option value="0">0 - None</option>
                             <option value="1">1 - Low</option>
@@ -621,7 +621,7 @@
                         <label class="input-label">NDC Reduction Target <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Emissions Reduction Pledge</div><div class="tooltip-desc">The country's pledged percentage reduction in greenhouse gas emissions compared to a baseline year (varies by country). For example, the US targets 50-52% below 2005 levels by 2030. The EU targets 55% below 1990 levels by 2030.</div></div></span></label>
                         <input type="text" class="input-field" id="ndcTarget" value="50-52% below 2005 levels" readonly aria-label="Ndc Target">
 
-                        <label class="input-label">Current Total Emissions (MtCO&#8322;) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">National GHG Emissions</div><div class="tooltip-desc">The country's total annual greenhouse gas emissions in megatons of CO2 equivalent. This provides context for the data center sector's proportional share of national emissions and helps assess sector-level carbon budget allocation.</div></div></span></label>
+                        <label class="input-label">Current Total Emissions (MtCO&#8322;) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">National GHG Emissions</div><div class="tooltip-desc">The country's total annual greenhouse gas emissions in megatons of CO2 equivalent. This provides context for the data center sector's proportional share of national emissions, for sector-level carbon budget allocation.</div></div></span></label>
                         <input type="number" class="input-field" id="totalEmissions" value="5222" readonly aria-label="Total Emissions">
 
                         <label class="input-label">DC Sector Share: <span id="dcShareVal">3.5</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Data Center Energy Share</div><div class="tooltip-desc">Estimated percentage of national electricity consumption attributed to data centers. Globally this ranges from 1-4%, but in data center hubs like Ireland (18%), Singapore (7%), or Virginia (25%+ of local grid), the share is much higher. This determines the DC sector's fair share of the national carbon budget.</div></div></span></label>
@@ -809,14 +809,14 @@
                         <p class="links"><a href="manual/carbon.html">Technical manual and methodology</a><a href="glossary.html">Glossary</a><a href="pue-calculator.html">PUE calculator</a><a href="capex-calculator.html">CAPEX calculator</a><a href="opex-calculator.html">OPEX calculator</a><a href="datacenter-solutions.html">DC Solutions</a><a href="account.html">My account and saved scenarios</a></p>
                     </div>
                 </div>
-                <p class="notice">This calculator is provided for <strong>educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis. All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html">Privacy Policy</a> for details. By using this tool you agree to our <a href="terms.html">Terms of Service</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
+                <p class="notice">Estimates for education and planning, built from public industry benchmarks. Not a basis for investment, procurement or engineering decisions; confirm site-specific figures with a qualified engineer. Runs in your browser; nothing is sent to a server. Independent research; not affiliated with any current or former employer. <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a>.</p>
             </div>
         </section>
 </main>
 <footer class="hub-foot">
   <div class="wrap">
     <div class="cols">
-      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models. Mission-critical infrastructure, documented.</p></div>
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
       <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
       <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
     </div>
