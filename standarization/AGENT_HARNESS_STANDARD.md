@@ -289,5 +289,5 @@ of the evidence history and must remain distinguishable from the final PASS.
 | P10 | The documented gate command failed as written | An unrelated test needed a missing package | Suite runs from an allow-list in an isolated unit | the §8 commands above |
 
 Result: the daemon verifies WI-HARNESS-002 through its own machinery. The last criterion, A15, is this
-standard, the changelog and the site version shipping together, in site release v3.24.34.
+standard, the changelog and the site version shipping together, in site release v3.24.36.
 

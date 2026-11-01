@@ -4,7 +4,7 @@
 version that closed it AND the gate that keeps it closed; a finding with no gate stays OPEN and says
 why. Re-measure before trusting a row.
 
-- Audit opened **2026-10-03** (site v3.11.11) · last updated **2026-11-01** (site v3.24.34)
+- Audit opened **2026-10-03** (site v3.11.11) · last updated **2026-11-01** (site v3.24.36)
 - Population: the **74 pages that declare `data-rz-register="editorial"`**, measured from the
   filesystem, not the 29 `article-*.html` files. The instrument register is 18 further pages and is
   out of scope for this round.
@@ -115,22 +115,22 @@ height past 32px — because the first version of this exemption checked the rad
 exemption written to stop exactly that.
 
 
-## Calculator family — tool register (v3.24.34, 2026-11-01)
+## Calculator family — tool register (v3.24.36, 2026-11-01)
 
 Trigger: owner, "audit total dan perbaiki semuanya … lepas dari AI design slop atau terlihat vibe coding". The example given was fire-calculator. Population: the 13 pages on `tools/apply-tool-register.py`'s list, measured as rendered pages in both themes at 1440 and 390 px.
 
 | Finding | Pages | Status | Closed by / kept closed by |
 |---|---|---|---|
-| Hero photo, badge pill, quick-stat chips and an explainer panel inside the hero | 10 of 13 | CLOSED for 9 (v3.24.34); OPEN for cx, RFS, spares | `test-tool-register` T12 |
+| Hero photo, badge pill, quick-stat chips and an explainer panel inside the hero | 10 of 13 | CLOSED for 9 (v3.24.36); OPEN for cx, RFS, spares | `test-tool-register` T12 |
 | Toolbars of 6–18 buttons and mode pills (FREE MODE / FULL ACCESS) | 7 | CLOSED for 9; OPEN for cx, RFS, spares | T13 |
 | KPI tile strips with DERIVED/WATCH/HAZARD pills and coloured rails | 6 | CLOSED for 9; OPEN for cx, RFS, spares | T10, T14 |
 | Pro gating drawn as blurred panels, a lock icon and an Unlock button | 10 | CLOSED for 9 (hidden, one Sign in row) | T13, T17 Free/Full |
 | Floating widgets: manual FAB, scroll-top, share rail, watermark, account pill | 11 | CLOSED for 9; OPEN for cx, RFS, spares | T4, T11, T17 pill |
 | Page-owned gradient footers, own navbars | 12 | CLOSED for 9 | T16 |
 | Chart series in cyan, blue, green or navy | 9 | CLOSED for 9 (amber + greys, meaning opt-out) | T19 |
-| Explain panel covering its own trigger on short viewports (site-wide `js/rz-explain.js`) | all pages using it | CLOSED v3.24.34 | T17 600 px cover check, mutant red |
-| Signed-in phone overflow (account e-mail in the nav) | capex, PUE | CLOSED v3.24.34 | T20, mutant red at 461 px |
-| `pillar-fire-safety.html`: filler copy, cards, no sources or figures | 1 | CLOSED v3.24.34 (rewrite) | `test-pillar-fire.mjs`, red on the old page (36 findings) |
+| Explain panel covering its own trigger on short viewports (site-wide `js/rz-explain.js`) | all pages using it | CLOSED v3.24.36 | T17 600 px cover check, mutant red |
+| Signed-in phone overflow (account e-mail in the nav) | capex, PUE | CLOSED v3.24.36 | T20, mutant red at 461 px |
+| `pillar-fire-safety.html`: filler copy, cards, no sources or figures | 1 | CLOSED v3.24.36 (rewrite) | `test-pillar-fire.mjs`, red on the old page (36 findings) |
 | Phone TOC numbered from 0 / skipping 1 | articles 28–30 | CLOSED v3.24.33 (LTC session) | render diff, 36 pages |
 
 The un-refit four (cx, RFS, spares, fire checklist): their computed style per element was compared under the old and the new `rz-tool.css`. There was no change. The PART 2 overrides now skip `body.tool` pages through a zero-specificity `:where()`.
