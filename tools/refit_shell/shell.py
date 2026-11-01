@@ -67,6 +67,17 @@ def hub_footer():
     return HUB[c:HUB.index('</footer>', c) + 9]
 
 
+def asset_token(rel):
+    """cache token for a stylesheet the shell links: <date>-<sha256[:8]> (tools/test-asset-cache-tokens.mjs).
+    The date is adopted from a page that already carries this hash, so one asset keeps one token; today if none does."""
+    import datetime, hashlib, pathlib, subprocess
+    root = pathlib.Path(__file__).resolve().parents[2]
+    h = hashlib.sha256((root / rel).read_bytes()).hexdigest()[:8]
+    found = subprocess.run(['git', 'grep', '-h', '-o', '-m1', '-E', re.escape(rel) + r'\?v=[0-9]{8}-' + h, '--', '*.html'],
+                           cwd=root, capture_output=True, text=True).stdout.split()
+    return found[0].split('?v=')[1] if found else datetime.date.today().strftime('%Y%m%d') + '-' + h
+
+
 # ---------------------------------------------------------------- steps
 
 def step_head(s, cfg, noindex):
@@ -81,7 +92,8 @@ def step_head(s, cfg, noindex):
     head = re.sub(r'\s*<style\b[^>]*>.*?</style>', '', head, flags=re.S)
     for pat in cfg.get('head_drop', ()):
         head = re.sub(pat, '', head, flags=re.S)
-    head += '\n    <link rel="stylesheet" href="css/rz-hub.css">\n    <link rel="stylesheet" href="css/rz-tool.css">\n'
+    head += '\n    <link rel="stylesheet" href="css/rz-hub.css?v=%s">\n    <link rel="stylesheet" href="css/rz-tool.css?v=%s">\n' % (
+        asset_token('css/rz-hub.css'), asset_token('css/rz-tool.css'))
     if noindex:
         head = re.sub(r'<meta name="robots" content="[^"]*">', '<meta name="robots" content="noindex, nofollow">', head)
     desc = re.search(r'<meta name="description" content="([^"]*)"', head).group(1)

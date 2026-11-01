@@ -513,6 +513,8 @@
   <li><strong>A signed-in phone overflowed</strong>: a long account e-mail widened capex to 461 px and pushed the menu button off-screen. On phones the account button now shows only the initial.</li>
   <li><strong>The tier page's IT load drove nothing</strong>; it now feeds a "Facility assessed" row. <strong>Opex free-tier tables</strong> were refilled with dollar figures on every re-render, so free users saw them anyway; they are now hidden.</li>
   <li>FM-200's GWP of 3,220 is the IPCC <strong>AR4</strong> value; the dataset said AR6.</li>
+  <li><strong>The refit pages linked <code>css/rz-hub.css</code> and <code>css/rz-tool.css</code> without a cache token</strong>, so a returning visitor would have kept the old stylesheet. Both links now carry the site's token, the refit tool emits it, and gate T21 fails any untokened local stylesheet or script on a tool page (red on the previous capex page).</li>
+  <li><strong><code>audit-mobile-responsive</code> read only inline styles</strong>, though its docstring says linked CSS too, so it scored five refit calculators 2/10. It now reads the page's local stylesheets and recognises the hub footer's one-column collapse. Scores only rise (184 pass, 0 fail); tool pages also cap image width at 100 %.</li>
 </ul>
 <h3 class="cl-subhead">Gates</h3>
 <ul>

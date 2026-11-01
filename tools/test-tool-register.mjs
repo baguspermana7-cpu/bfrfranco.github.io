@@ -34,6 +34,7 @@
  *   T16 one nav.hub-nav, one footer.hub-foot, no inline style in the footer, no other navbar / footer
  *   T19 chart series (Chart.js datasets, inline SVG >= 40 px) amber or neutral grey; opt-out [data-rz-series-meaning]
  *   T20 signed in (long account email) the page fits a 360 px phone: scrollWidth <= 360
+ *   T21 every local stylesheet / script link carries ?v= (rz-tracker.js, untokened site-wide, excepted)
  *   T18 no logo tile (initials / icon in a filled or bordered box in the nav or beside a heading)
  *   T17 behaviour (dark 1440, once per page): every id the page JS targets (tools/extract-calc-ids.mjs) exists; each preset
  *       clicks without a page error; editing a numeric input changes the results region; the Free/Full toggle shows a full row.
@@ -415,6 +416,11 @@ async function behaviour(pg) {
 }
 
 for (const pg of pages) {
+  { // T21 every local stylesheet / script carries a ?v= token, or a returning visitor keeps the old file
+    const html = readFileSync(join(ROOT, pg), 'utf8');
+    const bare = [...html.matchAll(/<(?:link[^>]+href|script[^>]+src)="(?!https?:|\/\/|data:)([^"?#]+\.(?:css|js))"/g)].map((m) => m[1]).filter((a) => a !== 'rz-tracker.js');
+    ok(`T21 ${pg}: every local stylesheet and script is cache-tokened`, !bare.length, bare);
+  }
   for (const [theme, w] of [['dark', 1440], ['light', 1440], ['dark', 390], ['light', 390]]) {
     const ctx = await browser.createBrowserContext();
     const p = await ctx.newPage();
