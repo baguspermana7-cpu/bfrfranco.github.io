@@ -9,7 +9,7 @@
  *     manual/<slug>.html, stacked ABOVE the scroll-top / night-mode toggles;
  *   - injects its own guarded <style> so it looks identical even on pages that
  *     do not load styles.css (e.g. dc-market-tracker inline styling).
- * Instrument aesthetic: instrument-cyan, thin border, JetBrains Mono label,
+ * Neutral outline, one amber on hover (site register; was instrument-cyan), JetBrains Mono label,
  * dark-mode override, prefers-reduced-motion safe, hidden on print.
  * Standard: standarization/UI_FEATURES_STANDARD.md (Floating Technical-Manual button).
  * ==========================================================================*/
@@ -50,20 +50,21 @@
     if (d.getElementById('rzManualFabStyle')) { return; }
     var css =
       '.rz-manual-fab{position:fixed;right:20px;bottom:140px;z-index:600;display:inline-flex;' +
-      'align-items:center;gap:6px;min-height:44px;box-sizing:border-box;padding:8px 12px;border-radius:10px;text-decoration:none;' +
+      'align-items:center;gap:6px;min-height:44px;box-sizing:border-box;padding:8px 12px;border-radius:4px;text-decoration:none;' +
       "font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.72rem;" +
-      'font-weight:600;letter-spacing:0.04em;line-height:1;color:#0b0f14;background:#00DDFF;' +
-      'border:1px solid #00DDFF;box-shadow:0 4px 14px rgba(0,221,255,0.28);' +
-      'transition:transform .18s ease,box-shadow .18s ease,background .18s ease;}' +
-      '.rz-manual-fab:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,221,255,0.42);background:#22e6ff;}' +
+      'font-weight:600;letter-spacing:0.04em;line-height:1;color:#1a1d23;background:#ffffff;' +
+      'border:1px solid rgba(40,44,52,0.24);' +
+      'transition:border-color .16s ease,color .16s ease;}' +
+      '.rz-manual-fab:hover{border-color:#92400e;color:#92400e;}' +
       '.rz-manual-fab svg{width:15px;height:15px;flex:0 0 auto;}' +
       '.rz-manual-fab .rz-mf-label{white-space:nowrap;}' +
-      '[data-theme="dark"] .rz-manual-fab{color:#031016;background:#00DDFF;border-color:#00DDFF;' +
-      'box-shadow:0 4px 14px rgba(0,221,255,0.22);}' +
-      '[data-theme="dark"] .rz-manual-fab:hover{background:#22e6ff;}' +
+      /* site register: was a filled instrument-cyan pill with a glow and a hover lift on 32 pages;
+         a neutral outline with the one accent on hover, like every other secondary control */
+      '[data-theme="dark"] .rz-manual-fab{color:#F6F7F9;background:#16181D;border-color:rgba(160,168,180,0.28);}' +
+      '[data-theme="dark"] .rz-manual-fab:hover{border-color:#E8B563;color:#E8B563;}' +
       'body.locked .rz-manual-fab{z-index:90001;}' +
       '@media (max-width:768px){.rz-manual-fab{right:14px;bottom:150px;padding:7px 10px;font-size:0.68rem;}}' +
-      '@media (prefers-reduced-motion:reduce){.rz-manual-fab{transition:none;}.rz-manual-fab:hover{transform:none;}}' +
+      '@media (prefers-reduced-motion:reduce){.rz-manual-fab{transition:none;}}' +
       '@media print{.rz-manual-fab{display:none !important;}}';
     var s = d.createElement('style');
     s.id = 'rzManualFabStyle';

@@ -527,6 +527,33 @@ FAMILIES["cockhead"] = {
 }
 
 
+# ---- "mlink" family: the "Technical manual" link block injected into 35 pages (2026-11-01) ----
+# A neutral outline whose hover turned instrument cyan (#0891b2 light, #67e8f9 dark) on a slate base.
+# Hover takes the one accent, the base takes the register greys, the 6px radius goes to 4px.
+_MLINK_BASE = ("display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;"
+               "letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:")
+FAMILIES["mlink"] = {
+    "globs": ["*.html", "id/*.html"],
+    "skip": FAMILIES["nav"]["skip"],
+    "pairs": [
+        (".rz-manual-link a{" + _MLINK_BASE + "6px;padding:0.45rem 0.85rem;color:#475569;border-color:rgba(71,85,105,0.4)}",
+         ".rz-manual-link a{" + _MLINK_BASE + "4px;padding:0.45rem 0.85rem;color:#5c6470;border-color:rgba(40,44,52,0.28)}"),
+        (".rz-manual-link a{" + _MLINK_BASE + "6px;padding:0.45rem 0.85rem;color:#475569;border-color:rgba(92,100,112,0.4)}",
+         ".rz-manual-link a{" + _MLINK_BASE + "4px;padding:0.45rem 0.85rem;color:#5c6470;border-color:rgba(40,44,52,0.28)}"),
+        (".rz-manual-link a{" + _MLINK_BASE + "6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}",
+         ".rz-manual-link a{" + _MLINK_BASE + "4px;padding:0.45rem 0.85rem;color:#969eaa;border-color:rgba(160,168,180,0.35)}"),
+        (".rz-manual-link a:hover{color:#0891b2;border-color:rgba(8,145,178,0.5)}",
+         ".rz-manual-link a:hover{color:" + AMBER_LIGHT + ";border-color:rgba(" + AMBER_LIGHT_RGB + ",0.5)}"),
+        ('[data-theme="dark"] .rz-manual-link a{color:#94a3b8;border-color:rgba(148,163,184,0.35)}',
+         '[data-theme="dark"] .rz-manual-link a{color:#969eaa;border-color:rgba(160,168,180,0.35)}'),
+        ('[data-theme="dark"] .rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}',
+         '[data-theme="dark"] .rz-manual-link a:hover{color:' + AMBER_DARK + ';border-color:rgba(' + AMBER_DARK_RGB + ',0.5)}'),
+        # pages with no light rule: the base hover is the dark one
+        (".rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}",
+         ".rz-manual-link a:hover{color:" + AMBER_DARK + ";border-color:rgba(" + AMBER_DARK_RGB + ",0.5)}"),
+    ],
+}
+
 def family_files(spec: dict[str, object]) -> list[Path]:
     files: set[Path] = set()
     for pattern in spec["globs"]:  # type: ignore[union-attr]

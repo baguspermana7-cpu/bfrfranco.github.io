@@ -1584,3 +1584,34 @@ window.showToast = window.showToast || function(msg, opts) {
         setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
     }, opts.duration || 3000);
 };
+
+/* ==========================================
+   Back-to-top button (site register)
+   41 pages carried #scrollTopBtn with nothing to show it or make it scroll,
+   so it was either a dead grey button (index) or never visible (articles,
+   pillars). One wiring here. Pages that also wire it inline (glossary, the
+   hubs) get the same visible class and the same scroll, so the two agree.
+   ========================================== */
+(function () {
+  function wire() {
+    var btn = document.getElementById('scrollTopBtn');
+    if (!btn || btn.dataset.rzWired) return;
+    btn.dataset.rzWired = '1';
+    var ticking = false;
+    function sync() {
+        btn.classList.toggle('visible', window.scrollY > 500);
+        ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(sync); }
+    }, { passive: true });
+    btn.addEventListener('click', function () {
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+    sync();
+  }
+  // Articles load this script before the button exists in the DOM.
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+})();

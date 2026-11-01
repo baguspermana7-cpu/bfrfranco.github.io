@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v3.24.37 — 2026-11-02 — "The shared controls, on the register"
+
+Owner: *"continue"* — WI-WEB-ALLPAGES-001. The whole-site render scan for blue and navy found the controls every page shares still in the old palette, after the pages around them had moved to graphite and one amber.
+
+### Changed
+- **Keyboard focus ring.** It was steel blue on every page; it is now the one accent: 2px `#92400e` in light, `#E8B563` in dark (`styles.css`, `styles-index.css`).
+- **Skip link.** The blue skip-to-content chip is ink `#1a1d23` in light and amber with graphite text in dark.
+- **Theme toggle.** It was a 12px glass pill with a navy hairline that grew and cast a shadow on hover. It is now a 4px square: white with a neutral hairline in light, a faint graphite fill in dark, and the hover changes the border only.
+- **Back-to-top button.** It was a filled blue disc with a blue glow on the 53 pages that carry it. It is now a neutral 4px square, with amber on hover.
+- **Manual button** (`js/rz-manual-fab.js`). It was instrument-cyan with a shadow and a lift on hover; it is now a neutral outline with amber on hover. The refit calculators no longer carry it and do not get it back.
+- **"Technical manual" links** (`.rz-manual-link`). The slate box with a cyan hover moves to the register on 20 pages, enforced by a new `mlink` family in `tools/sweep-site-register.py`: `--check` reported 68 old values on the previous tree, `--apply` rewrote 67, and a second apply rewrote 0.
+- **`ai-engineering-maintenance.html`** had its own cyan, slate and navy palette with gradient fills. Its tokens are remapped to graphite with one amber; the diagram fills are flat.
+
+### Fixed
+- **The homepage back-to-top button had no style at all.** `index.html` loads `styles-index.css` since the CSS split, and that file never carried the button's base rule, so it rendered as an unstyled browser button. The rule is now in both stylesheets.
+- **On 41 pages the back-to-top button did nothing.** Every article, the pillars, the comparison pages and the homepage carried `#scrollTopBtn` but no script that shows it after scrolling or scrolls on click; only pages with their own inline wiring (glossary, the hubs) worked. `script.js` now wires it once: it appears past 500 px of scroll and returns to the top (instantly under reduced motion).
 ## v3.24.36 — 2026-11-01 — "Calculators, de-slopped"
 
 Owner: *"audit total dan perbaiki semuanya … lepas dari AI design slop atau terlihat vibe coding"*, then *"continue, yang terbaik aja"* — plan `cryptic-rolling-sonnet`, phases 0–2 and 4.
