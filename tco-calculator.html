@@ -36,7 +36,7 @@
     <meta name="keywords" content="Data Center TCO, Total Cost of Ownership, Build vs Colo vs Cloud, Colocation Cost, Cloud Cost, Data Center Construction, TCO Calculator">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0f766e">
+    <meta name="theme-color" content="#0b0c0e">
     <link rel="canonical" href="https://resistancezero.com/tco-calculator.html">
 
     <link rel="alternate" hreflang="en" href="https://resistancezero.com/tco-calculator.html">
@@ -175,1851 +175,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
-
-    <style>
-        /* ═══════════════════════════════════════════════════════
-           TCO CALCULATOR — CSS (prefix: tco-)
-           Theme: Teal #0f766e / Accent #2dd4bf (v3.6.1 — was Indigo #0369a1/#22d3ee; indigo-600 is the AI-default family, and every other calculator already carries a hue from the site palette)
-           ═══════════════════════════════════════════════════════ */
-
-        :root {
-            --tco-primary: #0f766e;
-            --tco-primary-dark: #115e59;
-            --tco-accent: #2dd4bf;
-            --tco-accent-light: #5eead4;
-            --tco-gradient: #2dd4bf;
-            --tco-gradient-dark: #64748b;
-            --primary-gradient: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3a7ca5 100%);
-            --secondary-gradient: linear-gradient(135deg, #2d5a87 0%, #1e3a5f 100%);
-            --dark-blue: #1e3a5f;
-            --medium-blue: #2d5a87;
-            --light-blue: #4a90b8;
-            --accent-gold: #f59e0b;
-            --accent-amber: #fbbf24;
-            --accent-emerald: #10b981;
-            --accent-cyan: #06b6d4;
-            --accent-purple: #64748b;
-            --accent-red: #ef4444;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-tertiary: #e9ecef;
-            --text-primary: #212529;
-            --text-secondary: #495057;
-            --text-muted: #6c757d;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-bg-dark: rgba(30, 58, 95, 0.95);
-            --glass-border: rgba(30, 58, 95, 0.1);
-            --glass-blur: none;
-            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        /* Background */
-        .tco-page-background {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            background:
-                radial-gradient(ellipse at top right, rgba(15, 118, 110, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom left, rgba(45, 212, 191, 0.05) 0%, transparent 50%),
-                linear-gradient(rgba(15, 118, 110, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(15, 118, 110, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
-        }
-
-        /* Skip Link */
-        .skip-link {
-            position: absolute;
-            top: -100px;
-            left: 16px;
-            background: var(--tco-primary);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 0 0 8px 8px;
-            z-index: 10001;
-            font-size: 0.85rem;
-            text-decoration: none;
-            transition: top 0.3s;
-        }
-        .skip-link:focus { top: 0; }
-
-        /* ═══ Navigation ═══ */
-        .navbar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-md);
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: var(--dark-blue);
-        }
-
-        .nav-logo {
-            width: 44px; height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 13px;
-            color: white;
-            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
-        }
-
-        .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--dark-blue); }
-        .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
-
-        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
-
-        .nav-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 8px 0;
-            transition: color 0.3s;
-        }
-
-        .nav-link:hover { color: var(--dark-blue); }
-
-        .nav-back {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            background: var(--tco-gradient);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
-        }
-
-        .nav-back:hover { transform: translateY(-2px); }
-
-        /* Navbar Auth */
-        .nav-auth-wrap { position: relative; margin-left: 0.5rem; }
-        .nav-login-btn {
-            display: flex; align-items: center; gap: 6px;
-            padding: 8px 18px;
-            background: #64748b;
-            border: none; border-radius: 8px;
-            color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit;
-            cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 3px 10px rgba(100, 116, 139,0.3);
-            white-space: nowrap;
-        }
-        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(100, 116, 139,0.4); filter: brightness(1.08); }
-
-        .nav-user-btn {
-            display: flex; align-items: center; gap: 8px;
-            padding: 6px 12px 6px 6px;
-            background: rgba(100, 116, 139,0.08);
-            border: 1px solid rgba(100, 116, 139,0.25);
-            border-radius: 50px;
-            cursor: pointer; transition: all 0.3s;
-            font-family: inherit;
-            color: var(--text-primary);
-        }
-        .nav-user-btn:hover { background: rgba(100, 116, 139,0.14); border-color: rgba(100, 116, 139,0.4); }
-
-        .nav-user-avatar {
-            width: 30px; height: 30px; border-radius: 50%;
-            background: #64748b;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 0.7rem; font-weight: 700;
-        }
-        .nav-user-email {
-            font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);
-            max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        .nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
-        .nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
-
-        .nav-user-dropdown {
-            display: none; position: absolute; top: calc(100% + 8px); right: 0;
-            background: white; border-radius: 12px; border: 1px solid #e2e8f0;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px;
-            z-index: 1001; overflow: hidden;
-            animation: dropdownSlideIn 0.2s ease;
-        }
-        .nav-user-dropdown.show { display: block; }
-        @keyframes dropdownSlideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
-
-        .nav-dd-header { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
-        .nav-dd-tier-badge {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 3px 10px; border-radius: 50px;
-            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }
-        .nav-dd-tier-badge.pro { background: #64748b; color: white; }
-        .nav-dd-email { font-size: 0.78rem; color: #64748b; word-break: break-all; }
-        .nav-dd-logout {
-            display: flex; align-items: center; gap: 8px;
-            width: 100%; padding: 12px 16px; border: none; background: none;
-            font-size: 0.82rem; font-weight: 500; color: #ef4444;
-            cursor: pointer; font-family: inherit; transition: background 0.2s;
-        }
-        .nav-dd-logout:hover { background: #fef2f2; }
-
-        /* ═══ Main Content ═══ */
-        .tco-main-content {
-            position: relative;
-            z-index: 10;
-            padding-top: 80px;
-        }
-
-        /* ═══ Hero ═══ */
-        .tco-hero {
-            padding: 3rem 2rem 2.5rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(135deg, rgba(15,23,42,0.88) 0%, rgba(19, 78, 74,0.85) 50%, rgba(15, 118, 110,0.75) 100%),
-                        url('assets/tco-hero.webp') center/cover no-repeat;
-            color: #fff;
-        }
-        .tco-hero > * {
-            position: relative;
-            z-index: 1;
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .tco-hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: linear-gradient(135deg, rgba(15, 118, 110, 0.1), rgba(15, 118, 110, 0.05));
-            border: 1px solid rgba(15, 118, 110, 0.3);
-            border-radius: 4px;
-            font-size: 0.8rem;
-            color: var(--tco-primary);
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-
-        .tco-hero h1 {
-            font-size: clamp(2rem, 4vw, 2.8rem);
-            font-weight: 800;
-            background: var(--tco-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-        }
-
-        .tco-hero p {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        /* ═══ Brief Section ═══ */
-        .tco-brief-section {
-            max-width: 860px;
-            margin: -0.5rem auto 1rem;
-            padding: 0 2rem;
-        }
-
-        .tco-brief-card {
-            background: linear-gradient(135deg, rgba(15, 118, 110, 0.04), rgba(30, 58, 95, 0.06));
-            border: 1px solid rgba(15, 118, 110, 0.15);
-            border-radius: 4px;
-            padding: 1.5rem 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tco-brief-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 4px; height: 100%;
-            background: var(--tco-gradient);
-            border-radius: 4px 0 0 4px;
-        }
-
-        .tco-brief-lead {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-            line-height: 1.5;
-        }
-
-        .tco-brief-body {
-            font-size: 0.92rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 0.75rem;
-        }
-
-        .tco-brief-stats {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(0,0,0,0.06);
-        }
-
-        .tco-brief-stat {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .tco-brief-stat i { color: var(--tco-primary); font-size: 0.75rem; }
-
-        .tco-brief-note {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-style: italic;
-            margin-top: 0.5rem;
-        }
-
-        /* ═══ Calculator Section ═══ */
-        .tco-calculator-section {
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .tco-simulator-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 2.5rem;
-            box-shadow: var(--shadow-lg);
-        }
-
-        @media (max-width: 1024px) {
-            .tco-simulator-container { grid-template-columns: 1fr; }
-        }
-
-        .tco-simulator-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            min-height: 0;
-        }
-
-        /* Region Snapshot filler card */
-        .tco-region-snapshot {
-            flex: 0 0 auto;
-            min-height: 120px;
-            border-radius: 14px;
-            border: 1px solid rgba(15, 118, 110,0.15);
-            background: linear-gradient(135deg, rgba(15, 118, 110,0.04), rgba(30,58,95,0.06));
-            padding: 1.25rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .tco-snapshot-title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--tco-primary);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tco-snapshot-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-        }
-
-        .tco-snapshot-item {
-            background: rgba(15, 118, 110,0.06);
-            border: 1px solid rgba(15, 118, 110,0.1);
-            border-radius: 4px;
-            padding: 0.6rem 0.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        /* market-outlook chart fills the remaining left-column height with real analysis
-           (no more stretched empty KPI cards) */
-        .tco-market-chart {
-            flex: 0 0 auto; height: 250px; margin-top: 0.9rem;
-            border-radius: 14px; border: 1px solid var(--tco-line, rgba(15, 118, 110,0.15));
-            background: var(--tco-surface, #ffffff); padding: 1rem 1.15rem 0.75rem;
-            display: flex; flex-direction: column; gap: 0.5rem;
-        }
-        [data-theme="dark"] .tco-market-chart { background: #0e1626; border-color: rgba(148,163,184,0.14); }
-        .tco-market-chart-title { font-size: 0.72rem; font-weight: 700; color: var(--tco-primary); text-transform: uppercase; letter-spacing: 0.7px; display:flex; align-items:center; gap:6px; }
-        .tco-market-chart-body { flex: 1; min-height: 150px; position: relative; }
-        .tco-market-chart-body canvas { position:absolute; inset:0; width:100%!important; height:100%!important; }
-
-        .tco-snapshot-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-
-        .tco-snapshot-value {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* Provenance chip — shown for engine-derived (country:XX) records; pinned toward
-           the bottom of the card via margin-top:auto so the snapshot fills the flex:1
-           height with no dead whitespace band. */
-        .tco-snapshot-provenance {
-            font-size: 0.64rem;
-            color: var(--tco-primary);
-            line-height: 1.45;
-            border-top: 1px dashed rgba(15, 118, 110,0.2);
-            padding-top: 0.6rem;
-        }
-        .tco-snapshot-provenance:empty { display: none; }
-
-        .tco-snapshot-note {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-            font-style: italic;
-        }
-
-        [data-theme="dark"] .tco-region-snapshot {
-            background: linear-gradient(135deg, rgba(15, 118, 110,0.08), rgba(30,58,95,0.12));
-            border-color: rgba(15, 118, 110,0.2);
-        }
-
-        [data-theme="dark"] .tco-snapshot-item {
-            background: rgba(15, 118, 110,0.1);
-            border-color: rgba(15, 118, 110,0.18);
-        }
-
-        [data-theme="dark"] .tco-snapshot-value { color: #f1f5f9; }
-        [data-theme="dark"] .tco-snapshot-label { color: #64748b; }
-        [data-theme="dark"] .tco-snapshot-provenance {
-            color: #5eead4;
-            border-top-color: rgba(13, 148, 136,0.28);
-        }
-
-        .tco-input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 600px) {
-            .tco-input-row { grid-template-columns: 1fr; }
-        }
-
-        .tco-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .tco-input-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tco-input-label i { color: var(--tco-primary); }
-
-
-        /* ═══ Input Fields ═══ */
-        .tco-input-field {
-            background: var(--bg-secondary);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 14px 16px;
-            color: var(--text-primary);
-            font-size: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            transition: all 0.3s;
-            width: 100%;
-        }
-
-        .tco-input-field:focus {
-            outline: none;
-            border-color: var(--tco-primary);
-            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
-        }
-
-        select.tco-input-field {
-            cursor: pointer;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            background-size: 12px 12px;
-            padding-right: 40px;
-        }
-
-        /* ═══ Section Divider ═══ */
-        .tco-section-divider {
-            border-top: 1px solid rgba(15, 118, 110, 0.2);
-            padding-top: 1.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .tco-section-heading {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--tco-primary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* ═══ Results Panel ═══ */
-        .tco-simulator-results {
-            /* flat instrument surface (was a saturated indigo gradient — CLAUDE.md rejected #7) */
-            background: #0e1626;
-            border: 1px solid rgba(148,163,184,0.14);
-            border-radius: 16px;
-            padding: 2rem;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-            min-height: 0;
-        }
-
-        .tco-results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
-        }
-
-        .tco-results-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tco-results-total { text-align: right; }
-
-        .tco-total-label {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.7);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .tco-total-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--tco-accent-light);
-            font-family: 'JetBrains Mono', monospace;
-            text-shadow: 0 0 20px rgba(45, 212, 191, 0.3);
-        }
-
-        /* ═══ KPI Cards Grid ═══ */
-        .tco-kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.75rem;
-        }
-
-        @media (max-width: 900px) { .tco-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 480px) { .tco-kpi-grid { grid-template-columns: 1fr; } }
-
-        .tco-kpi-card {
-            background: rgba(255,255,255,0.08);
-            border-radius: 4px;
-            padding: 1rem;
-            text-align: center;
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        .tco-kpi-card:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
-
-        .tco-kpi-card.tco-best {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .tco-kpi-label {
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.6);
-            text-transform: uppercase;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        /* ── Output card tooltips ── */
-        @media (max-width: 768px) { }
-
-        .tco-kpi-value {
-            font-size: 1.2rem;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            color: white;
-        }
-
-        .tco-kpi-value.tco-build { color: #f97316; }
-        .tco-kpi-value.tco-colo { color: #06b6d4; }
-        .tco-kpi-value.tco-cloud { color: #94a3b8; }
-        .tco-kpi-value.tco-winner { color: #34d399; }
-        .tco-kpi-value.tco-capex { color: #fbbf24; }
-        .tco-kpi-value.tco-opex { color: #38bdf8; }
-        .tco-kpi-value.tco-perkw { color: #2dd4bf; }
-        .tco-kpi-value.tco-breakeven { color: #fb923c; }
-
-        .tco-kpi-sub {
-            font-size: 0.68rem;
-            color: rgba(255,255,255,0.5);
-            margin-top: 2px;
-        }
-
-        /* ═══ Chart Area ═══ */
-        .tco-chart-container {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 1.25rem;
-            position: relative;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 320px;
-        }
-
-        .tco-chart-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.8);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .tco-chart-canvas-wrap {
-            position: relative;
-            /* fixed deterministic height — breaks the Chart.js responsive resize
-               feedback loop (flex:1 + height:100% inside an unbounded flex parent
-               grew the canvas indefinitely on hover). Mirrors the proven
-               .chart-container{height:280px} pattern used by opex/pue/roi. */
-            height: 340px;
-            max-height: 340px;
-        }
-
-        .tco-chart-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
-
-        /* ═══ Narrative ═══ */
-        .tco-narrative {
-            background: rgba(15, 118, 110, 0.12);
-            border: 1px solid rgba(45, 212, 191, 0.25);
-            border-radius: 12px;
-            padding: 1.25rem;
-        }
-
-        .tco-narrative-title {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--tco-accent-light);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tco-narrative-text {
-            font-size: 0.88rem;
-            color: rgba(255,255,255,0.85);
-            line-height: 1.7;
-        }
-
-        /* ═══ Action Buttons ═══ */
-        .tco-action-row {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .tco-action-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            border-radius: 10px;
-            border: 1px solid;
-            font-size: 0.82rem;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-        .tco-action-btn-pdf {
-            background: rgba(239,68,68,0.12);
-            border-color: rgba(239,68,68,0.35);
-            color: #fca5a5;
-        }
-        .tco-action-btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 4px 18px rgba(239,68,68,0.3); border-color: rgba(239,68,68,0.7); }
-
-        .tco-action-btn-reset {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.7);
-        }
-        .tco-action-btn-reset:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
-
-        /* ═══ Privacy Badge ═══ */
-        .tco-privacy-badge {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.25);
-            border-radius: 4px;
-            font-size: 0.72rem;
-            color: #34d399;
-            text-align: center;
-        }
-
-        /* ═══ Premium Output Panels ═══ */
-        .tco-premium-section {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem 2rem;
-        }
-
-        .tco-premium-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 1024px) { .tco-premium-grid { grid-template-columns: 1fr; } }
-
-        .tco-pro-panel {
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border);
-            border-radius: 4px;
-            padding: 2rem;
-            box-shadow: var(--shadow-md);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .tco-pro-panel-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(15, 118, 110, 0.15);
-            flex-shrink: 0;
-        }
-
-        .tco-pro-panel-icon {
-            width: 36px; height: 36px;
-            border-radius: 4px;
-            background: var(--tco-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.9rem;
-        }
-
-        .tco-pro-panel-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .tco-pro-panel-subtitle {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .tco-pro-chart-wrap {
-            position: relative;
-            height: 300px;
-            max-height: 300px;
-        }
-
-        .tco-pro-chart-wrap canvas { width: 100% !important; height: 100% !important; }
-
-        /* Pro KPI row inside panels */
-        .tco-pro-kpi-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-            flex-shrink: 0;
-        }
-
-        .tco-pro-kpi {
-            background: rgba(15, 118, 110, 0.06);
-            border: 1px solid rgba(15, 118, 110, 0.12);
-            border-radius: 4px;
-            padding: 0.75rem;
-            text-align: center;
-        }
-
-        .tco-pro-kpi-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .tco-pro-kpi-val {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--tco-primary);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* Tornado bar */
-        .tco-tornado-bar-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
-        }
-
-        .tco-tornado-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            min-width: 120px;
-            text-align: right;
-            font-weight: 500;
-        }
-
-        .tco-tornado-bar-area {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            height: 28px;
-            position: relative;
-        }
-
-        .tco-tornado-bar-neg {
-            height: 100%;
-            background: #ef4444;
-            border-radius: 4px 0 0 4px;
-            position: absolute;
-            right: 50%;
-        }
-
-        .tco-tornado-bar-pos {
-            height: 100%;
-            background: #34d399;
-            border-radius: 0 4px 4px 0;
-            position: absolute;
-            left: 50%;
-        }
-
-        .tco-tornado-center-line {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            width: 1px;
-            height: 100%;
-            background: rgba(0,0,0,0.15);
-        }
-
-        .tco-tornado-val {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-            min-width: 60px;
-        }
-
-        /* Strategic Narrative Panel */
-        .tco-strategy-block {
-            margin-bottom: 1rem;
-        }
-
-        .tco-strategy-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tco-priority-badge {
-            display: inline-flex;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .tco-priority-badge.p1 { background: rgba(239,68,68,0.12); color: #ef4444; }
-        .tco-priority-badge.p2 { background: rgba(245,158,11,0.12); color: #f59e0b; }
-        .tco-priority-badge.p3 { background: rgba(16,185,129,0.12); color: #10b981; }
-
-        .tco-strategy-text {
-            font-size: 0.88rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-        }
-
-        .tco-roadmap-item {
-            display: flex;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-
-        .tco-roadmap-step {
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            background: var(--tco-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-
-        .tco-roadmap-content {
-            flex: 1;
-        }
-
-        .tco-roadmap-label {
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .tco-roadmap-desc {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        /* ═══ Disclaimer ═══ */
-        .tco-disclaimer {
-            max-width: 1400px;
-            margin: 1.5rem auto 2rem;
-            padding: 1.5rem 2rem;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 14px;
-            font-size: 0.84rem;
-            color: #475569;
-            line-height: 1.7;
-        }
-
-        .tco-disclaimer i { color: var(--tco-primary); margin-right: 6px; }
-        .tco-disclaimer strong { color: #1e293b; }
-
-        /* ═══ Footer ═══ */
-        .tco-footer {
-            background: #64748b;
-            color: white;
-            padding: 3rem 2rem 1.5rem;
-            margin-top: 3rem;
-        }
-
-        .tco-footer-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        @media (max-width: 768px) {
-            .tco-footer-grid { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        }
-        @media (max-width: 480px) {
-            .tco-footer-grid { grid-template-columns: 1fr; }
-        }
-
-        .tco-footer-brand-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .tco-footer-brand-desc {
-            font-size: 0.82rem;
-            color: rgba(255,255,255,0.6);
-            line-height: 1.6;
-        }
-
-        .tco-footer-heading {
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 1rem;
-        }
-
-        .tco-footer-link {
-            display: block;
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            font-size: 0.85rem;
-            padding: 4px 0;
-            transition: color 0.2s;
-        }
-
-        .tco-footer-link:hover { color: white; }
-
-        .tco-footer-bottom {
-            max-width: 1200px;
-            margin: 1.5rem auto 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .tco-footer-bottom p {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.5);
-        }
-
-        .tco-footer-bottom-links {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .tco-footer-bottom-links a {
-            color: rgba(255,255,255,0.5);
-            text-decoration: none;
-            font-size: 0.8rem;
-            transition: color 0.2s;
-        }
-
-        .tco-footer-bottom-links a:hover { color: white; }
-
-        /* ═══ Mode Tabs ═══ */
-        .tco-mode-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            align-items: center;
-            max-width: 1400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .tco-mode-btn {
-            padding: 0.6rem 1.2rem;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: transparent;
-            color: #94a3b8;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.9rem;
-            font-family: inherit;
-            transition: all 0.3s;
-        }
-
-        .tco-mode-btn.active {
-            border: 1px solid rgba(15, 118, 110, 0.4);
-            background: rgba(15, 118, 110, 0.15);
-            color: var(--tco-primary);
-            font-weight: 600;
-        }
-
-        .tco-mode-btn:hover:not(.active) {
-            border-color: rgba(15, 118, 110, 0.25);
-            color: var(--tco-accent);
-        }
-
-        /* ═══ Gating Styles ═══ */
-        .tco-gated-overlay { position: relative; cursor: pointer; }
-        .tco-gated-overlay::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            border-radius: inherit;
-            z-index: 10;
-        }
-        .tco-gated-overlay::before {
-            content: '\f521';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            color: #94a3b8;
-            font-size: 1.2rem;
-            z-index: 11;
-            text-shadow: 0 2px 8px rgba(100, 116, 139,0.5);
-        }
-
-        .tco-gated-badge {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 2px 8px; border-radius: 6px;
-            background: linear-gradient(135deg, rgba(100, 116, 139,0.2), rgba(14, 116, 144,0.1));
-            border: 1px solid rgba(100, 116, 139,0.3);
-            color: #94a3b8; font-size: 0.65rem; font-weight: 700;
-            letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s;
-        }
-        .tco-gated-badge:hover { background: linear-gradient(135deg, rgba(100, 116, 139,0.3), rgba(14, 116, 144,0.2)); transform: translateY(-1px); }
-
-        .tco-free-watermark {
-            text-align: center; padding: 8px 16px; margin-top: 0.75rem;
-            border-radius: 8px;
-            background: rgba(100, 116, 139, 0.08);
-            border: 1px dashed rgba(100, 116, 139, 0.25);
-            font-size: 0.7rem; color: #94a3b8; letter-spacing: 0.3px;
-        }
-
-        /* ═══ Cookie Banner ═══ */
-        .tco-cookie-banner {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 10002;
-            display: flex; align-items: center; justify-content: center; gap: 1.5rem;
-            padding: 1rem 2rem;
-            background: rgba(255,255,255,0.92);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 -2px 16px rgba(0,0,0,0.06);
-            font-size: 0.85rem; color: #374151;
-            transform: translateY(0); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
-        }
-        .tco-cookie-banner.hidden { transform: translateY(100%); pointer-events: none; }
-        .tco-cookie-banner p { margin: 0; line-height: 1.5; }
-        .tco-cookie-banner a { color: #2563eb; text-decoration: underline; }
-        .tco-cookie-actions { display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0; }
-        .tco-cookie-accept { padding: 0.45rem 1.2rem; background: var(--tco-primary); color: #fff; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        .tco-cookie-accept:hover { background: var(--tco-primary-dark); }
-        .tco-cookie-decline { padding: 0.45rem 1.2rem; background: transparent; color: #94a3b8; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
-        .tco-cookie-decline:hover { background: #f3f4f6; color: #374151; }
-        @media (max-width: 768px) { .tco-cookie-banner { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1rem; } }
-
-        /* ═══ Scroll to Top ═══ */
-        .tco-scroll-top-btn {
-            position: fixed; bottom: 80px; right: 24px; z-index: 9999;
-            width: 44px; height: 44px; border-radius: 50%;
-            background: var(--tco-gradient); color: white;
-            border: none; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 16px rgba(15, 118, 110, 0.3);
-            opacity: 0; visibility: hidden; transform: translateY(10px);
-            transition: all 0.3s;
-        }
-        .tco-scroll-top-btn.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-        .tco-scroll-top-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(15, 118, 110, 0.4); }
-
-        /* ═══ Login Modal ═══ */
-        @keyframes tcoModalSlideIn { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes tcoPremiumGlow { 0%,100% { box-shadow:0 2px 12px rgba(100, 116, 139,0.35); } 50% { box-shadow:0 2px 20px rgba(100, 116, 139,0.55); } }
-        #tcoLoginModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:99999; align-items:center; justify-content:center; }
-
-        #tcoPremiumTabBtn { animation: tcoPremiumGlow 2.5s ease-in-out infinite; }
-        #tcoPremiumTabBtn:hover { transform:translateY(-2px); box-shadow:0 4px 24px rgba(100, 116, 139,0.5) !important; filter:brightness(1.1); }
-        #tcoPremiumTabBtn.premium-active { animation:none !important; background:linear-gradient(135deg,rgba(100, 116, 139,0.2),rgba(14, 116, 144,0.15)) !important; color:#5eead4 !important; border-color:rgba(100, 116, 139,0.5) !important; box-shadow:0 2px 8px rgba(100, 116, 139,0.2) !important; }
-        #tcoPremiumTabBtn.premium-active:hover { transform:translateY(-1px); }
-
-        /* ═══ Comparison Table ═══ */
-        .tco-compare-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-            margin-top: 1rem;
-        }
-
-        .tco-compare-table th {
-            background: rgba(15, 118, 110, 0.08);
-            padding: 10px 12px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-primary);
-            border-bottom: 2px solid rgba(15, 118, 110, 0.15);
-        }
-
-        .tco-compare-table td {
-            padding: 8px 12px;
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            color: var(--text-secondary);
-        }
-
-        .tco-compare-table td:first-child {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .tco-compare-table tr:hover td {
-            background: rgba(15, 118, 110, 0.03);
-        }
-
-        .tco-compare-table .tco-winner-cell {
-            color: #10b981;
-            font-weight: 700;
-        }
-
-        /* ═══ Market Info Badge ═══ */
-        .tco-market-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            padding: 1rem;
-            background: rgba(15, 118, 110, 0.05);
-            border: 1px solid rgba(15, 118, 110, 0.12);
-            border-radius: 12px;
-        }
-
-        .tco-market-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: white;
-            border: 1px solid rgba(15, 118, 110, 0.15);
-            border-radius: 4px;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .tco-market-chip i {
-            color: var(--tco-primary);
-            font-size: 0.7rem;
-        }
-
-        .tco-market-chip strong {
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* ═══ Benchmark Source Tags ═══ */
-        .tco-benchmark-sources {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-        }
-
-        .tco-source-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
-            background: rgba(15, 118, 110, 0.06);
-            border: 1px solid rgba(15, 118, 110, 0.12);
-            border-radius: 6px;
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            letter-spacing: 0.3px;
-        }
-
-        .tco-source-tag i { font-size: 0.6rem; color: var(--tco-primary); }
-
-        /* ═══ Cost Comparison Bars (inline in results) ═══ */
-        .tco-inline-bar-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .tco-inline-bar-label {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.8);
-            min-width: 50px;
-        }
-
-        .tco-inline-bar-track {
-            flex: 1;
-            height: 8px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .tco-inline-bar-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.6s ease;
-        }
-
-        .tco-inline-bar-fill.build { background: #f97316; }
-        .tco-inline-bar-fill.colo { background: #06b6d4; }
-        .tco-inline-bar-fill.cloud { background: #64748b; }
-
-        .tco-inline-bar-value {
-            font-size: 0.78rem;
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-            color: rgba(255,255,255,0.7);
-            min-width: 70px;
-            text-align: right;
-        }
-
-        /* ═══ Assumptions Panel ═══ */
-        .tco-assumptions {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .tco-assumptions-title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: rgba(255,255,255,0.5);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
-        }
-
-        .tco-assumption-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            font-size: 0.72rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .tco-assumption-item span:first-child { color: rgba(255,255,255,0.6); }
-        .tco-assumption-item span:last-child { color: rgba(255,255,255,0.8); font-family: 'JetBrains Mono', monospace; }
-
-        /* ═══ Year-by-Year Table (Pro) ═══ */
-        .tco-yearly-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.72rem;
-            margin-top: 1rem;
-        }
-
-        .tco-yearly-table th {
-            background: rgba(15, 118, 110, 0.08);
-            padding: 8px;
-            text-align: right;
-            font-weight: 600;
-            font-size: 0.7rem;
-            color: var(--text-primary);
-            border-bottom: 2px solid rgba(15, 118, 110, 0.15);
-        }
-
-        .tco-yearly-table th:first-child { text-align: left; }
-
-        .tco-yearly-table td {
-            padding: 6px 8px;
-            text-align: right;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-secondary);
-        }
-
-        .tco-yearly-table td:first-child {
-            text-align: left;
-            font-family: "IBM Plex Sans", sans-serif;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .tco-yearly-table tr:hover td { background: rgba(15, 118, 110, 0.03); }
-        .tco-yearly-table .tco-yr-winner { color: #10b981; font-weight: 700; }
-
-        /* ═══ Pro Panel Tabs ═══ */
-        .tco-pro-tab-row {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid rgba(15, 118, 110, 0.12);
-            padding-bottom: 0.5rem;
-        }
-
-        .tco-pro-tab {
-            padding: 6px 14px;
-            border-radius: 8px 8px 0 0;
-            border: none;
-            background: transparent;
-            color: var(--text-muted);
-            font-size: 0.78rem;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .tco-pro-tab.active {
-            background: rgba(15, 118, 110, 0.1);
-            color: var(--tco-primary);
-            font-weight: 600;
-        }
-
-        .tco-pro-tab:hover:not(.active) { color: var(--tco-accent); }
-
-        /* ═══ Confidence Interval Badge ═══ */
-        .tco-ci-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
-            border-radius: 6px;
-            font-size: 0.68rem;
-            font-weight: 600;
-        }
-
-        .tco-ci-badge.green { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-        .tco-ci-badge.amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
-        .tco-ci-badge.red { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-
-        /* ═══ Loading Spinner ═══ */
-        .tco-spinner {
-            display: inline-block;
-            width: 20px; height: 20px;
-            border: 2px solid rgba(15, 118, 110, 0.2);
-            border-top-color: var(--tco-primary);
-            border-radius: 50%;
-            animation: tcoSpin 0.6s linear infinite;
-        }
-
-        @keyframes tcoSpin { to { transform: rotate(360deg); } }
-
-        /* ═══ Pulse Animation for Best Option ═══ */
-        @keyframes tcoPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.3); }
-            50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-        }
-
-        .tco-kpi-card.tco-best { animation: tcoPulse 2s ease-in-out infinite; }
-
-        /* ═══ Region Flag Indicator ═══ */
-        .tco-region-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            background: rgba(15, 118, 110, 0.08);
-            border: 1px solid rgba(15, 118, 110, 0.15);
-            border-radius: 10px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: var(--tco-primary);
-            margin-bottom: 1rem;
-        }
-
-        .tco-region-indicator i { font-size: 1rem; }
-
-        /* ═══ Savings Highlight ═══ */
-        .tco-savings-highlight {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.06));
-            border: 1px solid rgba(16, 185, 129, 0.25);
-            border-radius: 4px;
-            margin-top: 0.75rem;
-        }
-
-        .tco-savings-icon {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            background: rgba(16, 185, 129, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #34d399;
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
-
-        .tco-savings-text {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.85);
-            line-height: 1.5;
-        }
-
-        .tco-savings-text strong { color: #34d399; }
-
-        /* ═══ Methodology Note ═══ */
-        .tco-methodology {
-            margin-top: 1.5rem;
-            padding: 1.25rem;
-            background: rgba(15, 118, 110, 0.04);
-            border: 1px solid rgba(15, 118, 110, 0.1);
-            border-radius: 12px;
-        }
-
-        .tco-methodology-title {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tco-methodology-title i { color: var(--tco-primary); }
-
-        .tco-methodology-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .tco-methodology-grid { grid-template-columns: 1fr; }
-        }
-
-        .tco-methodology-item {
-            padding: 0.75rem;
-            background: white;
-            border-radius: 4px;
-            border: 1px solid rgba(0,0,0,0.06);
-        }
-
-        .tco-methodology-item-title {
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--tco-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .tco-methodology-item-desc {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        /* ═══ Export Button States ═══ */
-        .tco-action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .tco-action-btn.loading {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        /* ═══ Input Range Slider ═══ */
-        .tco-range-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .tco-range-row input[type="range"] {
-            flex: 1;
-            height: 6px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: rgba(15, 118, 110, 0.15);
-            border-radius: 3px;
-            outline: none;
-        }
-
-        .tco-range-row input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px; height: 18px;
-            border-radius: 50%;
-            background: var(--tco-primary);
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(15, 118, 110, 0.3);
-        }
-
-        .tco-range-value {
-            min-width: 50px;
-            text-align: right;
-            font-size: 0.85rem;
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--tco-primary);
-        }
-
-        /* ═══ Collapsible Sections ═══ */
-        .tco-collapsible-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 0;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .tco-collapsible-header i.tco-chevron {
-            transition: transform 0.3s;
-            color: var(--text-muted);
-            font-size: 0.7rem;
-        }
-
-        .tco-collapsible-header.open i.tco-chevron {
-            transform: rotate(180deg);
-        }
-
-        .tco-collapsible-body {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .tco-collapsible-body.open {
-            max-height: 2000px;
-        }
-
-        /* ═══ Custom Scrollbar ═══ */
-        .tco-simulator-results::-webkit-scrollbar { width: 6px; }
-        .tco-simulator-results::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
-        .tco-simulator-results::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
-        .tco-simulator-results::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
-
-        /* ═══ Dark Mode ═══ */
-        [data-theme="dark"] {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-            --glass-bg: rgba(15, 23, 42, 0.85);
-            --glass-border: rgba(255,255,255,0.08);
-        }
-
-        [data-theme="dark"] .tco-page-background {
-            background:
-                radial-gradient(ellipse at top right, rgba(15, 118, 110, 0.12) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom left, rgba(45, 212, 191, 0.08) 0%, transparent 50%),
-                linear-gradient(rgba(15, 118, 110, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(15, 118, 110, 0.04) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
-        }
-
-        [data-theme="dark"] .tco-disclaimer { background: #1e293b; border-color: #334155; color: #cbd5e1; }
-        [data-theme="dark"] .tco-disclaimer strong { color: #f1f5f9; }
-
-        [data-theme="dark"] .tco-pro-panel {
-            background: rgba(15, 23, 42, 0.85);
-            border-color: rgba(255,255,255,0.08);
-        }
-
-        [data-theme="dark"] .tco-pro-panel-title { color: #f1f5f9; }
-        [data-theme="dark"] .tco-pro-panel-subtitle { color: #94a3b8; }
-
-        [data-theme="dark"] .tco-pro-kpi {
-            background: rgba(15, 118, 110, 0.12);
-            border-color: rgba(15, 118, 110, 0.2);
-        }
-
-        [data-theme="dark"] .tco-pro-kpi-label { color: #94a3b8; }
-
-        [data-theme="dark"] .nav-user-dropdown {
-            background: #1e293b;
-            border-color: #334155;
-        }
-
-        [data-theme="dark"] .nav-dd-header { border-color: #334155; }
-        [data-theme="dark"] .nav-dd-email { color: #94a3b8; }
-        [data-theme="dark"] .nav-dd-logout:hover { background: rgba(239,68,68,0.1); }
-
-        [data-theme="dark"] .tco-brief-card {
-            background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(30, 58, 95, 0.12));
-            border-color: rgba(15, 118, 110, 0.2);
-        }
-
-        [data-theme="dark"] .tco-brief-lead { color: #f1f5f9; }
-        [data-theme="dark"] .tco-brief-body { color: #cbd5e1; }
-
-        [data-theme="dark"] .tco-input-field {
-            background-color: #1e293b;
-            border-color: rgba(255,255,255,0.1);
-            color: #f1f5f9;
-        }
-
-        [data-theme="dark"] .tco-input-field:focus {
-            border-color: var(--tco-accent);
-            box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
-        }
-
-        [data-theme="dark"] select.tco-input-field {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            background-size: 12px 12px;
-        }
-
-        /* Dropdown option list dark-mode styling — harmonizes .tco-input-field selects
-           with the canonical .input-field look used on capex/opex/roi (which style the
-           <option> element). Without this the open option list rendered with the OS
-           default (white) background in dark mode. */
-        [data-theme="dark"] .tco-input-field option,
-        [data-theme="dark"] select.tco-input-field option {
-            background: #1e293b;
-            color: #f1f5f9;
-        }
-
-        [data-theme="dark"] .tco-market-info { background: rgba(15, 118, 110, 0.1); border-color: rgba(15, 118, 110, 0.2); }
-        [data-theme="dark"] .tco-market-chip { background: #1e293b; border-color: rgba(255,255,255,0.1); color: #cbd5e1; }
-        [data-theme="dark"] .tco-market-chip strong { color: #f1f5f9; }
-
-        [data-theme="dark"] .tco-methodology { background: rgba(15, 118, 110, 0.08); border-color: rgba(15, 118, 110, 0.15); }
-        [data-theme="dark"] .tco-methodology-item { background: #1e293b; border-color: rgba(255,255,255,0.06); }
-        [data-theme="dark"] .tco-methodology-item-desc { color: #94a3b8; }
-
-        [data-theme="dark"] .tco-compare-table th { background: rgba(15, 118, 110, 0.15); color: #f1f5f9; }
-        [data-theme="dark"] .tco-compare-table td { border-color: rgba(255,255,255,0.05); color: #cbd5e1; }
-        [data-theme="dark"] .tco-compare-table td:first-child { color: #f1f5f9; }
-        [data-theme="dark"] .tco-compare-table tr:hover td { background: rgba(15, 118, 110, 0.06); }
-
-        [data-theme="dark"] .tco-yearly-table th { background: rgba(15, 118, 110, 0.15); color: #f1f5f9; }
-        [data-theme="dark"] .tco-yearly-table td { border-color: rgba(255,255,255,0.05); color: #cbd5e1; }
-        [data-theme="dark"] .tco-yearly-table td:first-child { color: #f1f5f9; }
-
-        [data-theme="dark"] .tco-tornado-label { color: #cbd5e1; }
-        [data-theme="dark"] .tco-tornado-val { color: #94a3b8; }
-        [data-theme="dark"] .tco-tornado-center-line { background: rgba(255,255,255,0.15); }
-
-        [data-theme="dark"] .tco-strategy-title { color: #f1f5f9; }
-        [data-theme="dark"] .tco-strategy-text { color: #cbd5e1; }
-        [data-theme="dark"] .tco-roadmap-label { color: #f1f5f9; }
-        [data-theme="dark"] .tco-roadmap-desc { color: #94a3b8; }
-        [data-theme="dark"] .tco-roadmap-item { border-color: rgba(255,255,255,0.06); }
-
-        [data-theme="dark"] .tco-cookie-banner {
-            background: rgba(15, 23, 42, 0.92);
-            border-color: rgba(255,255,255,0.08);
-            color: #cbd5e1;
-        }
-
-        [data-theme="dark"] .tco-source-tag { background: rgba(15, 118, 110, 0.12); border-color: rgba(15, 118, 110, 0.2); color: #94a3b8; }
-
-        [data-theme="dark"] .tco-region-indicator { background: rgba(15, 118, 110, 0.15); border-color: rgba(15, 118, 110, 0.25); }
-
-        /* ═══ Print ═══ */
-        @media print {
-            body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .navbar, .tco-hero, .tco-brief-section, .tco-mode-tabs, #tcoLoginModal, .nav-back, .tco-footer,
-            .tco-free-watermark, .tco-gated-badge, .tco-cookie-banner, .tco-scroll-top-btn,
-            .tco-action-row, .tco-region-snapshot { display: none !important; }
-            .tco-main-content { padding-top: 0 !important; }
-            .tco-calculator-section { padding: 0 !important; }
-            .tco-simulator-container { display: block !important; }
-            @page { margin: 1cm; size: A4; }
-        }
-
-        /* ═══ Responsive ═══ */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .tco-calculator-section { padding: 1rem; }
-            .tco-simulator-container { padding: 1.5rem; }
-            .tco-kpi-grid { grid-template-columns: repeat(2, 1fr); }
-            .nav-user-email { display: none; }
-            .nav-login-btn .nav-login-text { display: none; }
-            .nav-login-btn { padding: 8px 12px; }
-            .tco-brief-section { padding: 0 1rem; }
-            .tco-brief-card { padding: 1.25rem 1.25rem 1.25rem 1.5rem; }
-            .tco-premium-section { padding: 0 1rem 2rem; }
-        }
-
-        @media (max-width: 600px) {
-            .tco-hero { padding: 2rem 1rem 1.5rem; }
-            .tco-hero h1 { font-size: 1.6rem; }
-        }
-        .nav-theme-btn { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px; border:1px solid rgba(74,144,184,0.25); background:transparent; color:#94a3b8; cursor:pointer; transition:all 0.25s; font-size:0.9rem; padding:0; }
-        .nav-theme-btn:hover { border-color:#4a90b8; color:#4a90b8; background:rgba(74,144,184,0.08); }
-        [data-theme="dark"] .nav-theme-btn { color:#f59e0b; }
-        [data-theme="dark"] .nav-theme-btn:hover { color:#fbbf24; border-color:rgba(251,191,36,0.4); background:rgba(251,191,36,0.08); }
-    [data-theme="dark"] .active[class] { color:#5eead4 !important; }
-/* a11y (v1.52.7) */
-[data-theme="dark"] .summary-strip-title, [data-theme="dark"] #tourStepCount, [data-theme="dark"] .crosslink-bar-label, [data-theme="dark"] .rfs-card-subtitle, [data-theme="dark"] .rfs-nav-subtitle, [data-theme="dark"] .scenario-bar-label, [data-theme="dark"] .rfs-archetype-desc, [data-theme="dark"] .use-when, [data-theme="dark"] .use-when strong, [data-theme="dark"] #rfsBreadcrumb span, [data-theme="dark"] #methodNote, [data-theme="dark"] #methodNoteCatalogCount, [data-theme="dark"] div > p { color:#94a3b8 !important; }
-[data-theme="dark"] .disc-text a, [data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
-:root:not([data-theme="dark"]) .disc-fine a { color:#1d4ed8 !important; }
-#btnExportPDF { opacity:1 !important; }
-:root:not([data-theme="dark"]) #btnExportPDF { color:#b91c1c !important; }
-[data-theme="dark"] #btnExportPDF { color:#f8b4b4 !important; }
-[data-theme="dark"] a[href$="changelog.html"] { color:#94a3b8 !important; }
-[data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
-
-:root:not([data-theme="dark"]) .tco-source-tag { color:#495057 !important; }
-:root:not([data-theme="dark"]) .tco-disclaimer span { color:#475569 !important; }
-[data-theme="dark"] .tco-disclaimer span { color:#94a3b8 !important; }
-[data-theme="dark"] .tco-methodology-item-title { color:#5eead4 !important; }
-</style>
-    <script src="js/rz-version.js?v=20261101-22a91a90" defer></script>
+    <script src="js/rz-version.js?v=20261101-732b47d5" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
@@ -2058,179 +214,111 @@
         ]
     }
     </script>
-
-<style id="rz-mobile-v18">
-/* v1.8.0 — mobile responsive patch */
-@media (max-width: 768px) {
-  html, body { overflow-x: hidden; max-width: 100vw; }
-  img, picture, video { max-width: 100%; height: auto; display: block; }
-  .nav-menu, .nav-links { display: none; }
-  .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
-  button, a.btn, [role="button"] { min-height: 44px; }
-}
-</style>
-<style id="rz-lightfix-v1">
-/* RZ-LIGHTFIX v1 — light-mode contrast restoration after the v1.19.1
-   default-theme flip to light. Scope: html:not([data-theme="dark"]) only,
-   so dark rendering is unchanged. Same-hue WCAG-AA shades. Idempotent. */
-html:not([data-theme="dark"]) .cookie-decline,
-html:not([data-theme="dark"]) .tco-cookie-decline { color:#475569 !important; }
-html:not([data-theme="dark"]) .calc-disclaimer .disc-fine,
-html:not([data-theme="dark"]) .disc-fine { color:#475569 !important; }
-html:not([data-theme="dark"]) .nav-user-email,
-html:not([data-theme="dark"]) .rz-user-email { color:#475569 !important; }
-html:not([data-theme="dark"]) .pro-badge,
-html:not([data-theme="dark"]) .nav-pro-badge { background:#64748b !important; color:#fff !important; }
-/* Per-link inline rainbow nav colours (authored for the old dark default)
-   are illegible on the white light navbar. Same-hue AA-700 shades keep the
-   colour-coded wayfinding. Safe: verified no inline border-color:#<accent>
-   or background-color:#<accent> exists on these pages, so [style*] only
-   ever matches a genuine text `color:` declaration; CSS !important beats
-   an inline declaration that carries no !important. */
-html:not([data-theme="dark"]) .nav-link[style*="#10b981"],
-html:not([data-theme="dark"]) .nav-link[style*="#22c55e"] { color:#047857 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#0d9488"],
-html:not([data-theme="dark"]) .nav-link[style*="#14b8a6"] { color:#0f766e !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#06b6d4"] { color:#0e7490 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#3b82f6"] { color:#1d4ed8 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#64748b"] { color:#64748b !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#f59e0b"],
-html:not([data-theme="dark"]) .nav-link[style*="#d97706"] { color:#b45309 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#ef4444"] { color:#b91c1c !important; }
-
-html:not([data-theme="dark"]) .tco-priority-badge.p2 { color:#b45309 !important; }
-html:not([data-theme="dark"]) .tco-priority-badge.p3,
-html:not([data-theme="dark"]) td.tco-winner-cell,
-html:not([data-theme="dark"]) td.tco-yr-winner { color:#047857 !important; }
-html:not([data-theme="dark"]) .tco-priority-badge.p1 { color:#b91c1c !important; }
-html:not([data-theme="dark"]) .tco-mode-btn { color:#475569 !important; }
-html:not([data-theme="dark"]) .tco-gated-badge,
-html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; }
-</style>
     <!-- PLAN02 E4 — editorial chrome (dark-only, chrome only) -->
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-<style>
-/* Mobile form controls: 16px, or iOS Safari zooms the viewport on focus and does not zoom back.
-   This page does not load styles.min.css, so it carries the rule itself. */
-@media (max-width: 768px) {
-  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
-  select, textarea { font-size: 16px !important; }
-}
-</style>
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261027-0044">
+
+    <link rel="stylesheet" href="css/rz-hub.css">
+    <link rel="stylesheet" href="css/rz-tool.css">
 </head>
-<body data-rz-calc="tco">
+<body class="hub tool" data-rz-calc="tco" data-rz-account-pill="off">
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <a href="#tco-main-content" class="skip-link">Skip to main content</a>
-    <div class="tco-page-background"></div>
 
 
-    <!-- ═══ Navigation ═══ -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-brand">
-                <div class="nav-logo" style="background:#2dd4bf;">TCO</div>
-                <div>
-                    <div class="nav-title">TCO Calculator</div>
-                    <div class="nav-subtitle">Build vs. Colo vs. Cloud</div>
-                </div>
-            </a>
-            <div class="nav-links">
-                <a href="pue-calculator.html" class="nav-link" style="color:#06b6d4;">PUE Calc</a>
-                <a href="capex-calculator.html" class="nav-link" style="color:#f59e0b;">CAPEX Calc</a>
-                <a href="opex-calculator.html" class="nav-link" style="color:#10b981;">OPEX Calc</a>
-                <a href="roi-calculator.html" class="nav-link" style="color:#3b82f6;">ROI Calc</a>
-                <a href="dc-market-tracker.html" class="nav-link" style="color:#0d9488;">DC Market</a>
-                <a href="glossary.html" class="nav-link" style="color: #14b8a6;">Glossary</a>
-                <button class="nav-theme-btn" id="navThemeBtn" onclick="toggleCalcTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i id="themeIcon" class="fas fa-moon"></i></button>
-                <div class="nav-auth-wrap" id="navAuthWrap">
-                    <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
-                        <i class="fas fa-user-circle"></i>
-                        <span class="nav-login-text">Login</span>
-                    </button>
-                    <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
-                        <div class="nav-user-avatar" id="navUserAvatar">U</div>
-                        <span class="nav-user-email" id="navUserEmail"></span>
-                        <i class="fas fa-chevron-down nav-user-chevron"></i>
-                    </button>
-                    <div class="nav-user-dropdown" id="navUserDropdown">
-                        <div class="nav-dd-header">
-                            <div class="nav-dd-tier-badge" id="navDdTierBadge">FULL</div>
-                            <div class="nav-dd-email" id="navDdEmail"></div>
-                        </div>
-                        <button class="nav-dd-logout" onclick="logoutPremium()">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <a href="datacenter-solutions.html" class="nav-back">
-                <i class="fas fa-arrow-left"></i> Back
-            </a>
+    <nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+          <div class="nav-auth-wrap" id="navAuthWrap">
+        <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()"><span class="nav-login-text">Login</span></button>
+        <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()"><span class="nav-user-avatar" id="navUserAvatar">U</span><span class="nav-user-email" id="navUserEmail"></span></button>
+        <div class="nav-user-dropdown" id="navUserDropdown">
+          <div class="nav-dd-header"><div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div><div class="nav-dd-email" id="navDdEmail"></div></div>
+          <a class="nav-dd-link" href="account.html">My account and saved scenarios</a>
+          <button class="nav-dd-logout" onclick="logoutPremium()">Logout</button>
+        </div>
+      </div>
+    <button class="nav-icon theme-toggle" id="navThemeBtn" onclick="toggleCalcTheme()" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i id="themeIcon" class="fas fa-moon"></i></button>
+  </div>
+</nav>
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
     <!-- ═══ Main Content ═══ -->
     <main id="tco-main-content" class="tco-main-content">
 
-        <!-- Hero -->
-        <section class="tco-hero">
-            <div class="tco-hero-badge">
-                <i class="fas fa-scale-balanced"></i>
-                Total Cost of Ownership Analysis
+        <header class="tool-head">
+            <div class="wrap">
+                <p class="eyebrow">DC Solutions · <b>Calculator</b> · TCO</p>
+                <h1>Total cost of ownership <span class="muted">build, colocation or cloud</span></h1>
+                <p class="lede">Five- or ten-year cost of building your own facility, leasing colocation or running in the cloud, from IT load, country, tier, PUE, utilisation, cooling and growth, with each country priced from the engine reference data. Computed in your browser; every figure follows the inputs.</p>
+                <p class="basis">engine RZEngine country reference · basis Turner &amp; Townsend DCCI 2025, CBRE H1 2025, IEA Electricity 2025 · updated 2026-10</p>
+                <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → Calculator → TCO</p>
             </div>
-            <h1>Build vs. Colo vs. Cloud</h1>
-            <p>Compare 5-year and 10-year Total Cost of Ownership across deployment models with real market data from 12 global regions</p>
-        </section>
-
-        <!-- Brief -->
-        <section class="tco-brief-section">
-            <div class="tco-brief-card">
-                <p class="tco-brief-lead">The "build or buy" decision can swing tens of millions of dollars over a decade &mdash; and most spreadsheet models quietly ignore half the variables.</p>
-                <p class="tco-brief-body">Should you build your own facility, lease colocation space, or go all-in on cloud? The answer depends on scale, growth trajectory, region, and dozens of cost levers most models skip. This calculator uses 2025-2026 market data from Turner &amp; Townsend, CBRE, Cushman &amp; Wakefield, and IEA to model construction costs, wholesale colo rates, cloud pricing, and year-over-year inflation for power, staffing, and maintenance. Pick your region, set your capacity, and see which model wins &mdash; and more importantly, when the crossover happens.</p>
-                <div class="tco-brief-stats">
-                    <span class="tco-brief-stat"><i class="fas fa-globe-americas"></i> 12 global markets</span>
-                    <span class="tco-brief-stat"><i class="fas fa-layer-group"></i> 3 deployment models</span>
-                    <span class="tco-brief-stat"><i class="fas fa-chart-bar"></i> Stacked cost breakdown</span>
-                    <span class="tco-brief-stat"><i class="fas fa-dice"></i> Monte Carlo simulation (Full access)</span>
-                </div>
-                <p class="tco-brief-note">General-purpose estimate &mdash; actual costs depend on vendor negotiations, site conditions, and procurement timing. Consult qualified professionals for investment decisions.</p>
-            </div>
-        </section>
+        </header>
 
         <!-- Calculator Section -->
-        <section class="tco-calculator-section">
+        <section class="tco-calculator-section wrap">
 
-            <!-- Mode Tabs -->
-            <div class="tco-mode-tabs" id="tcoModeTabs">
-                <button type="button" class="tco-mode-btn active" data-mode="free" onclick="setMode('free')">
-                    <i class="fas fa-sliders-h" style="margin-right:6px;"></i>Free
-                </button>
-                <button type="button" class="tco-mode-btn" data-mode="pro" onclick="setMode('pro')">
-                    <i class="fas fa-cogs" style="margin-right:6px;"></i>Full access
-                </button>
-                <div style="margin-left:auto;display:flex;align-items:center;gap:0.5rem;">
-                    <span id="tcoPremiumBadge" style="display:none;padding:4px 12px;border-radius:50px;background:#64748b;color:white;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;">FULL ACCESS</span>
-                    <button type="button" id="tcoPremiumTabBtn" onclick="handlePremiumTab()" style="padding:0.6rem 1.4rem;border-radius:10px;border:1px solid rgba(14, 116, 144,0.6);background:#64748b;color:white;cursor:pointer;font-weight:700;font-size:0.9rem;font-family:inherit;transition:all 0.3s;box-shadow:0 2px 12px rgba(100, 116, 139,0.35);position:relative;overflow:hidden;">
-                        <i class="fas fa-crown" style="margin-right:6px;"></i>Full access
-                    </button>
+            <div class="tool-bar" role="toolbar" aria-label="Mode and actions">
+                <div class="seg" role="group" aria-label="Assessment depth" id="tcoModeTabs">
+                    <button type="button" class="tco-mode-btn active" data-mode="free" aria-pressed="true" onclick="setMode('free')">Free</button>
+                    <button type="button" class="tco-mode-btn" data-mode="pro" aria-pressed="false" onclick="setMode('pro')">Full</button>
                 </div>
+                <span id="tcoPremiumBadge" hidden></span>
+                <span class="spacer"></span>
+                <button type="button" class="tool-btn" id="tcoExportPdf" onclick="exportPDF()">Export PDF</button>
+                <button type="button" class="tool-btn" onclick="exportTcoCSV()">Export CSV</button>
+                <button type="button" class="tool-btn" id="btnSaveAccount" onclick="rzScenario&&rzScenario.saveToAccount('tco',{msgEl:'acctSaveMsg'})">Save</button>
+                <button type="button" class="tool-btn" onclick="resetInputs()">Reset</button>
             </div>
+            <p class="tool-msg" id="acctSaveMsg" style="display:none;"></p>
 
             <!-- Login handled by shared auth.js modal (window._rzAuth.showModal) -->
 
             <!-- Calculator Grid -->
-            <div class="tco-simulator-container">
+            <div class="tco-simulator-container tool-bench">
 
                 <!-- ═══ INPUT SIDE ═══ -->
-                <div class="tco-simulator-inputs" data-explain-scan>
+                <div class="tco-simulator-inputs tool-inputs" data-explain-scan>
 
                     <!-- Row 1: Region + IT Load -->
                     <div class="tco-input-row">
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="tco-deployment-region">
-                                <i class="fas fa-globe-americas"></i> Region
+                                Region
                             </label>
                             <!-- Region → Country cascade (region dulu baru negara). Options populated on load
                                  from RZEngine.data.countries grouped by .region; #tcoCountry filtered per region. -->
@@ -2245,7 +333,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="tco-deployment-region">
-                                <i class="fas fa-map-marker-alt"></i> Country / Location
+                                Country / Location
                             </label>
                             <select class="tco-input-field" id="tcoCountry" aria-label="TCO Country / Location">
                                 <!-- populated by populateCountrySelect() on load -->
@@ -2253,10 +341,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
                     </div>
                     <!-- IT Load spans full width (its former row-mate, Region, is now paired with Country) -->
-                    <div class="tco-input-row" style="grid-template-columns:1fr;">
+                    <div class="tco-input-row">
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="it-load">
-                                <i class="fas fa-bolt"></i> IT Load (MW)
+                                IT Load (MW)
                             </label>
                             <input type="number" class="tco-input-field" id="tcoItLoad" value="5" min="1" max="100" step="0.5" aria-label="TCO It Load">
                         </div>
@@ -2266,7 +354,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                     <div class="tco-input-row">
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="tco-analysis-period">
-                                <i class="fas fa-calendar-alt"></i> Analysis Period
+                                Analysis Period
                             </label>
                             <select class="tco-input-field" id="tcoPeriod" aria-label="TCO Period">
                                 <option value="5" selected>5 Years</option>
@@ -2275,7 +363,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="tier-class">
-                                <i class="fas fa-shield-alt"></i> Tier Level
+                                Tier Level
                             </label>
                             <select class="tco-input-field" id="tcoTier" aria-label="TCO Tier">
                                 <option value="tier-2">Tier II (99.741%)</option>
@@ -2289,13 +377,13 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                     <div class="tco-input-row">
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="pue">
-                                <i class="fas fa-tachometer-alt"></i> PUE Target
+                                PUE Target
                             </label>
                             <input type="number" class="tco-input-field" id="tcoPue" value="1.3" min="1.1" max="2.0" step="0.05" aria-label="TCO PUE">
                         </div>
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="utilization">
-                                <i class="fas fa-percentage"></i> Power Utilization %
+                                Power Utilization %
                             </label>
                             <input type="number" class="tco-input-field" id="tcoUtil" value="70" min="40" max="100" step="5" aria-label="TCO Util">
                         </div>
@@ -2305,7 +393,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                     <div class="tco-input-row">
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="cooling-type">
-                                <i class="fas fa-snowflake"></i> Cooling Type
+                                Cooling Type
                             </label>
                             <select class="tco-input-field" id="tcoCooling" aria-label="TCO Cooling">
                                 <option value="air">Air Cooled (PUE ~1.40)</option>
@@ -2316,31 +404,26 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
                         <div class="tco-input-group">
                             <label class="tco-input-label" data-explain="tco-growth-rate">
-                                <i class="fas fa-chart-line"></i> Annual Growth Rate %
+                                Annual Growth Rate %
                             </label>
                             <input type="number" class="tco-input-field" id="tcoGrowth" value="10" min="0" max="30" step="1" aria-label="TCO Growth">
                         </div>
                     </div>
 
                     <!-- ═══ PRO MODE INPUTS (hidden) ═══ -->
-                    <div id="tcoProInputs" style="display:none;flex-direction:column;gap:1.5rem;">
-                        <div class="tco-section-divider">
-                            <div class="tco-section-heading">
-                                <i class="fas fa-crown"></i> Full access Overrides
-                                <span class="tco-gated-badge" onclick="handlePremiumTab()"><i class="fas fa-lock"></i> FULL</span>
-                            </div>
-                        </div>
+                    <div id="tcoProInputs" style="display:none;">
+                        <div class="section-header"><span class="section-title">Full analysis inputs</span></div>
 
                         <div class="tco-input-row">
                             <div class="tco-input-group">
                                 <label class="tco-input-label" data-explain="tco-land-cost">
-                                    <i class="fas fa-map-marker-alt"></i> Land Cost Override ($/sqft)
+                                    Land Cost Override ($/sqft)
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoLandOverride" placeholder="Auto from region" min="0" step="1" aria-label="Auto from region">
                             </div>
                             <div class="tco-input-group">
                                 <label class="tco-input-label" data-explain="tco-power-rate">
-                                    <i class="fas fa-plug"></i> Custom Power Rate ($/kWh)
+                                    Custom Power Rate ($/kWh)
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoPowerOverride" placeholder="Auto from region" min="0" step="0.001" aria-label="Auto from region">
                             </div>
@@ -2349,13 +432,13 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         <div class="tco-input-row">
                             <div class="tco-input-group">
                                 <label class="tco-input-label" data-explain="tco-staff-count">
-                                    <i class="fas fa-users"></i> Staff Count Override
+                                    Staff Count Override
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoStaffOverride" placeholder="Auto from tier" min="1" step="1" aria-label="Auto from tier">
                             </div>
                             <div class="tco-input-group">
                                 <label class="tco-input-label" data-explain="escalation">
-                                    <i class="fas fa-arrow-trend-up"></i> Colo Escalation %/yr
+                                    Colo Escalation %/yr
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoColoEsc" value="3" min="0" max="10" step="0.5" aria-label="TCO Colo Esc">
                             </div>
@@ -2364,13 +447,13 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         <div class="tco-input-row">
                             <div class="tco-input-group">
                                 <label class="tco-input-label" data-explain="tco-cloud-discount">
-                                    <i class="fas fa-cloud"></i> Cloud Discount %
+                                    Cloud Discount %
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoCloudDiscount" value="30" min="0" max="60" step="5" aria-label="TCO Cloud Discount">
                             </div>
                             <div class="tco-input-group">
                                 <label class="tco-input-label" data-explain="debt-ratio-leverage">
-                                    <i class="fas fa-university"></i> Debt/Equity Ratio %
+                                    Debt/Equity Ratio %
                                 </label>
                                 <input type="number" class="tco-input-field" id="tcoDebtEquity" value="60" min="0" max="100" step="5" aria-label="TCO Debt Equity">
                             </div>
@@ -2379,387 +462,150 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
                     <!-- Region Snapshot — fills remaining height in inputs column -->
                     <div class="tco-region-snapshot" id="tcoRegionSnapshot">
-                        <div class="tco-snapshot-title">
-                            <i class="fas fa-globe-americas"></i>
-                            <span id="snapshotRegionName">N. Virginia</span> — Market Data
+                        <div class="section-header"><span class="section-title"><span id="snapshotRegionName">N. Virginia</span> · market data</span></div>
+                        <div class="kv-list" data-rz-fact-list>
+                            <div class="metric-box"><div class="metric-label">Build cost</div><div class="metric-value" id="snapshotBuild">--</div></div>
+                            <div class="metric-box"><div class="metric-label">Colocation rate</div><div class="metric-value" id="snapshotColo">--</div></div>
+                            <div class="metric-box"><div class="metric-label">Power rate</div><div class="metric-value" id="snapshotPower">--</div></div>
+                            <div class="metric-box"><div class="metric-label">Staff cost</div><div class="metric-value" id="snapshotStaff">--</div></div>
+                            <div class="metric-box"><div class="metric-label">Land cost</div><div class="metric-value" id="snapshotLand">--</div></div>
+                            <div class="metric-box"><div class="metric-label">Market growth</div><div class="metric-value" id="snapshotCagr">--</div></div>
+                            <div class="metric-box"><div class="metric-label">Corporate tax</div><div class="metric-value" id="snapshotTax">--</div></div>
+                            <div class="metric-box"><div class="metric-label">Currency</div><div class="metric-value" id="snapshotCurrency">--</div></div>
                         </div>
-                        <div class="tco-snapshot-grid">
-                            <div class="tco-snapshot-item">
-                                <span class="tco-snapshot-label"><i class="fas fa-hammer" style="margin-right:3px;"></i>Build Cost</span>
-                                <span class="tco-snapshot-value" id="snapshotBuild">--</span>
-                            </div>
-                            <div class="tco-snapshot-item">
-                                <span class="tco-snapshot-label"><i class="fas fa-server" style="margin-right:3px;"></i>Colo Rate</span>
-                                <span class="tco-snapshot-value" id="snapshotColo">--</span>
-                            </div>
-                            <div class="tco-snapshot-item">
-                                <span class="tco-snapshot-label"><i class="fas fa-bolt" style="margin-right:3px;"></i>Power Rate</span>
-                                <span class="tco-snapshot-value" id="snapshotPower">--</span>
-                            </div>
-                            <div class="tco-snapshot-item">
-                                <span class="tco-snapshot-label"><i class="fas fa-users" style="margin-right:3px;"></i>Staff Cost</span>
-                                <span class="tco-snapshot-value" id="snapshotStaff">--</span>
-                            </div>
-                            <div class="tco-snapshot-item">
-                                <span class="tco-snapshot-label"><i class="fas fa-map-marker-alt" style="margin-right:3px;"></i>Land Cost</span>
-                                <span class="tco-snapshot-value" id="snapshotLand">--</span>
-                            </div>
-                            <div class="tco-snapshot-item">
-                                <span class="tco-snapshot-label"><i class="fas fa-chart-line" style="margin-right:3px;"></i>DC CAGR</span>
-                                <span class="tco-snapshot-value" id="snapshotCagr">--</span>
-                            </div>
-                            <div class="tco-snapshot-item">
-                                <span class="tco-snapshot-label"><i class="fas fa-percent" style="margin-right:3px;"></i>Corp. Tax</span>
-                                <span class="tco-snapshot-value" id="snapshotTax">--</span>
-                            </div>
-                            <div class="tco-snapshot-item">
-                                <span class="tco-snapshot-label"><i class="fas fa-coins" style="margin-right:3px;"></i>Currency</span>
-                                <span class="tco-snapshot-value" id="snapshotCurrency">--</span>
-                            </div>
-                        </div>
-                        <div class="tco-market-chart">
-                            <div class="tco-market-chart-title"><i class="fas fa-chart-area"></i> Market Rate Outlook <span id="marketChartRegion" style="font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;"></span></div>
-                            <div class="tco-market-chart-body"><canvas id="tcoMarketChart"></canvas></div>
-                            <div style="font-size:0.62rem;color:var(--text-muted);text-align:right;">Indexed to Year 1 = 100 · build / colo / power trajectory</div>
-                        </div>
-                        <div class="tco-snapshot-provenance" id="snapshotProvenance"></div>
-                        <div class="tco-snapshot-note" id="snapshotNote">
-                            Source: Turner &amp; Townsend DCCI 2025, CBRE H1 2025, IEA Electricity 2025
-                        </div>
+                        <figure class="fig tco-mkt-fig"><div class="tco-market-chart-body"><canvas id="tcoMarketChart" role="img" aria-label="Build, colocation and power rates indexed to year 1"></canvas></div><figcaption><b>FIG. 1</b> · Market rate outlook <span id="marketChartRegion"></span> · indexed to year 1 = 100</figcaption></figure>
+                        <p class="in-note" id="snapshotProvenance"></p>
+                        <p class="in-note" id="snapshotNote">Source: Turner &amp; Townsend DCCI 2025, CBRE H1 2025, IEA Electricity 2025</p>
                     </div>
 
                 </div>
 
                 <!-- ═══ RESULTS SIDE ═══ -->
-                <div class="tco-simulator-results">
-                    <div class="tco-results-header">
-                        <span class="tco-results-title"><i class="fas fa-scale-balanced"></i> TCO Comparison</span>
-                        <div class="tco-results-total">
-                            <div class="tco-total-label">Best Option</div>
-                            <div class="tco-total-value" id="tcoBestValue">--</div>
-                        </div>
-                    </div>
-
-                    <!-- Region Indicator -->
-                    <div class="tco-region-indicator" id="tcoRegionIndicator">
-                        <i class="fas fa-globe-americas"></i>
-                        <span id="tcoRegionLabel">N. Virginia</span> &mdash;
-                        <span id="tcoRegionDetails" style="font-weight:400;font-size:0.78rem;color:rgba(15, 118, 110,0.7);">5 MW, 5 years, Tier III</span>
-                    </div>
-
-                    <!-- KPI Cards -->
-                    <div class="tco-kpi-grid" id="tcoKpiGrid">
-                        <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Build TCO <span data-explain="tco-build-tco">?</span></div>
-                            <div class="tco-kpi-value tco-build" id="kpiBuildTco">--</div>
-                            <div class="tco-kpi-sub" id="kpiBuildSub"></div>
-                        </div>
-                        <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Colo TCO <span data-explain="tco-colo-tco">?</span></div>
-                            <div class="tco-kpi-value tco-colo" id="kpiColoTco">--</div>
-                            <div class="tco-kpi-sub" id="kpiColoSub"></div>
-                        </div>
-                        <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Cloud TCO <span data-explain="tco-cloud-tco">?</span></div>
-                            <div class="tco-kpi-value tco-cloud" id="kpiCloudTco">--</div>
-                            <div class="tco-kpi-sub" id="kpiCloudSub"></div>
-                        </div>
-                        <div class="tco-kpi-card tco-best" id="kpiBestCard">
-                            <div class="tco-kpi-label">Best Option <span data-explain="tco-best-option">?</span></div>
-                            <div class="tco-kpi-value tco-winner" id="kpiBestOption">--</div>
-                            <div class="tco-kpi-sub" id="kpiBestSub"></div>
-                        </div>
-                        <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Build CAPEX <span data-explain="tco-build-capex">?</span></div>
-                            <div class="tco-kpi-value tco-capex" id="kpiBuildCapex">--</div>
-                            <div class="tco-kpi-sub">Initial investment</div>
-                        </div>
-                        <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Yr 1 OPEX (Build) <span data-explain="tco-yr-1-opex-build">?</span></div>
-                            <div class="tco-kpi-value tco-opex" id="kpiAnnualOpex">--</div>
-                            <div class="tco-kpi-sub">Annual operating cost</div>
-                        </div>
-                        <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Cost per kW <span data-explain="tco-cost-per-kw">?</span></div>
-                            <div class="tco-kpi-value tco-perkw" id="kpiCostPerKw">--</div>
-                            <div class="tco-kpi-sub" id="kpiCostPerKwSub">Best option effective</div>
-                        </div>
-                        <div class="tco-kpi-card">
-                            <div class="tco-kpi-label">Breakeven Year <span data-explain="tco-breakeven-year">?</span></div>
-                            <div class="tco-kpi-value tco-breakeven" id="kpiBreakeven">--</div>
-                            <div class="tco-kpi-sub">Build vs. Colo crossover</div>
-                        </div>
-                    </div>
-
-                    <!-- Chart -->
-                    <div class="tco-chart-container">
-                        <div class="tco-chart-title"><i class="fas fa-chart-bar"></i> TCO Breakdown by Category</div>
-                        <div class="tco-chart-canvas-wrap">
-                            <canvas id="tcoStackedChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Narrative -->
-                    <div class="tco-narrative" id="tcoNarrative">
-                        <div class="tco-narrative-title"><i class="fas fa-lightbulb"></i> Dynamic Insight</div>
-                        <div class="tco-narrative-text" id="tcoNarrativeText">Adjust the inputs to see a cost comparison...</div>
-                    </div>
-
-                    <!-- Inline Comparison Bars -->
-                    <div id="tcoInlineBars" style="margin-top:0.5rem;"></div>
-
-                    <!-- Savings Highlight -->
-                    <div class="tco-savings-highlight" id="tcoSavingsHighlight" style="display:none;">
-                        <div class="tco-savings-icon"><i class="fas fa-piggy-bank"></i></div>
-                        <div class="tco-savings-text" id="tcoSavingsText"></div>
-                    </div>
-
-                    <!-- Key Assumptions -->
-                    <div class="tco-assumptions" id="tcoAssumptions">
-                        <div class="tco-assumptions-title">Key Assumptions</div>
-                        <div id="tcoAssumptionsList"></div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="tco-action-row">
-                        <button class="tco-action-btn tco-action-btn-pdf" id="tcoExportPdf" onclick="exportPDF()">
-                            <i class="fas fa-file-pdf"></i> Export PDF
-                        </button>
-                        <button class="tco-action-btn tco-action-btn-reset" onclick="exportTcoCSV()">
-                            <i class="fas fa-file-csv"></i> Export CSV
-                        </button>
-                        <button id="btnSaveAccount" class="tco-action-btn" onclick="rzScenario&&rzScenario.saveToAccount('tco',{msgEl:'acctSaveMsg'})" style="border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;">
-                            <i class="fas fa-cloud"></i> Save to my account
-                        </button>
-                        <div id="acctSaveMsg" style="display:none;font-size:0.72rem;text-align:center;flex-basis:100%;"></div>
-                        <button class="tco-action-btn tco-action-btn-reset" onclick="resetInputs()">
-                            <i class="fas fa-redo"></i> Reset
-                        </button>
-                    </div>
-                    <div class="rz-calc-validation" id="tcoValidation" role="alert" aria-live="polite" hidden></div>
-
-                    <!-- Privacy Badge -->
-                    <div class="tco-privacy-badge">
-                        <i class="fas fa-shield-alt"></i> All calculations performed client-side. No data leaves your browser.
-                    </div>
-
-                    <div class="tco-free-watermark" id="tcoFreeWatermark">
-                        <i class="fas fa-lock" style="margin-right:4px;"></i> Sign in for Monte Carlo, Sensitivity Tornado, Multi-Period Projections &amp; Strategic Narrative with <strong>Full access</strong>
-                    </div>
+                <div class="tco-simulator-results tool-results">
+                    <div class="res-head"><h2>Results</h2><span class="basis">TCO = CAPEX or setup + Σ yearly OPEX</span></div>
+                    <p class="tool-note tco-where" id="tcoRegionIndicator"><span id="tcoRegionLabel">N. Virginia</span> · <span id="tcoRegionDetails">5 MW, 5 years, Tier III</span></p>
+                    <div class="res-group"><h3>Headline</h3><div data-rz-fact-list>
+                        <div class="metric-box is-key" id="kpiBestCard"><div class="metric-label" data-explain="tco-best-option">Lowest TCO</div><div class="metric-value" id="tcoBestValue">--</div><div class="metric-sub"><span id="kpiBestOption">--</span> · <span id="kpiBestSub"></span></div></div>
+                    </div></div>
+                    <div class="res-group"><h3>By option</h3><div id="tcoKpiGrid" data-rz-fact-list>
+                        <div class="metric-box"><div class="metric-label" data-explain="tco-build-tco">Build TCO</div><div class="metric-value" id="kpiBuildTco">--</div><div class="metric-sub" id="kpiBuildSub"></div></div>
+                        <div class="metric-box"><div class="metric-label" data-explain="tco-colo-tco">Colocation TCO</div><div class="metric-value" id="kpiColoTco">--</div><div class="metric-sub" id="kpiColoSub"></div></div>
+                        <div class="metric-box"><div class="metric-label" data-explain="tco-cloud-tco">Cloud TCO</div><div class="metric-value" id="kpiCloudTco">--</div><div class="metric-sub" id="kpiCloudSub"></div></div>
+                        <div class="metric-box"><div class="metric-label" data-explain="tco-build-capex">Build CAPEX</div><div class="metric-value" id="kpiBuildCapex">--</div><div class="metric-sub">initial investment</div></div>
+                        <div class="metric-box"><div class="metric-label" data-explain="tco-yr-1-opex-build">Year 1 OPEX, build</div><div class="metric-value" id="kpiAnnualOpex">--</div><div class="metric-sub">annual operating cost</div></div>
+                        <div class="metric-box"><div class="metric-label" data-explain="tco-cost-per-kw">Cost per kW</div><div class="metric-value" id="kpiCostPerKw">--</div><div class="metric-sub" id="kpiCostPerKwSub">lowest option, effective</div></div>
+                        <div class="metric-box"><div class="metric-label" data-explain="tco-breakeven-year">Breakeven year</div><div class="metric-value" id="kpiBreakeven">--</div><div class="metric-sub">build against colocation</div></div>
+                    </div></div>
+                    <div class="res-group"><h3>Period total</h3><div id="tcoInlineBars"></div></div>
+                    <figure class="fig res-fig"><div class="chart-container tco-chart-canvas-wrap"><canvas id="tcoStackedChart" role="img" aria-label="TCO by cost category for build, colocation and cloud"></canvas></div><figcaption><b>FIG. 2</b> · TCO by cost category over the period · amber = CAPEX or setup</figcaption></figure>
+                    <p class="tool-note" id="tcoNarrative"><span id="tcoNarrativeText">Change any input to compare the options.</span></p>
+                    <p class="tool-note" id="tcoSavingsHighlight" style="display:none;"><span id="tcoSavingsText"></span></p>
+                    <div class="res-group" id="tcoAssumptions"><h3>Key assumptions</h3><div id="tcoAssumptionsList" class="kv-list" data-rz-fact-list></div></div>
+                    <div class="rz-calc-validation tool-valid" id="tcoValidation" role="alert" aria-live="polite" hidden></div>
+                    <div class="tool-full" id="tcoFreeWatermark"><p><b>Full analysis</b> — Monte Carlo range, cumulative cost by year, sensitivity, strategy and roadmap</p><button type="button" class="pro-overlay-btn" id="tcoPremiumTabBtn" onclick="handlePremiumTab()">Sign in</button></div>
                 </div>
             </div>
         </section>
 
         <!-- ═══ PRO PANELS ═══ -->
-        <section class="tco-premium-section" id="tcoPremiumOutput" style="display:none;">
+        <section class="tco-premium-section wrap" id="tcoPremiumOutput" style="display:none;">
             <div class="tco-premium-grid">
-
-                <!-- Panel 1: Monte Carlo -->
-                <div class="tco-pro-panel" id="tcoMcPanel">
-                    <div class="tco-pro-panel-header">
-                        <div class="tco-pro-panel-icon"><i class="fas fa-dice"></i></div>
-                        <div>
-                            <div class="tco-pro-panel-title">Monte Carlo TCO Distribution</div>
-                            <div class="tco-pro-panel-subtitle">10,000 iterations with variable uncertainty</div>
-                        </div>
-                    </div>
-                    <div class="tco-pro-kpi-row" id="tcoMcKpis">
-                        <div class="tco-pro-kpi"><div class="tco-pro-kpi-label">P5 (Best Case)</div><div class="tco-pro-kpi-val" id="mcP5">--</div></div>
-                        <div class="tco-pro-kpi"><div class="tco-pro-kpi-label">P50 (Median)</div><div class="tco-pro-kpi-val" id="mcP50">--</div></div>
-                        <div class="tco-pro-kpi"><div class="tco-pro-kpi-label">P95 (Worst Case)</div><div class="tco-pro-kpi-val" id="mcP95">--</div></div>
-                    </div>
-                    <div class="tco-pro-chart-wrap"><canvas id="tcoMcChart"></canvas></div>
+                <div class="tco-pro-panel tool-results" id="tcoMcPanel">
+                    <div class="res-head"><h2>TCO range</h2><span class="basis">10,000 Monte Carlo runs, lowest option</span></div>
+                    <div class="res-group"><div id="tcoMcKpis" data-rz-fact-list>
+                        <div class="metric-box"><div class="metric-label">P5, low case</div><div class="metric-value" id="mcP5">--</div></div>
+                        <div class="metric-box is-key"><div class="metric-label">P50, median</div><div class="metric-value" id="mcP50">--</div></div>
+                        <div class="metric-box"><div class="metric-label">P95, high case</div><div class="metric-value" id="mcP95">--</div></div>
+                    </div></div>
+                    <figure class="fig res-fig"><div class="chart-container"><canvas id="tcoMcChart" role="img" aria-label="Distribution of TCO over 10,000 runs"></canvas></div><figcaption><b>FIG. 3</b> · TCO of the lowest option over 10,000 runs · amber = above P95</figcaption></figure>
                 </div>
-
-                <!-- Panel 2: Multi-Period Projection -->
-                <div class="tco-pro-panel" id="tcoProjectionPanel">
-                    <div class="tco-pro-panel-header">
-                        <div class="tco-pro-panel-icon"><i class="fas fa-chart-area"></i></div>
-                        <div>
-                            <div class="tco-pro-panel-title">Multi-Period Projection</div>
-                            <div class="tco-pro-panel-subtitle">Cumulative TCO with crossover analysis</div>
-                        </div>
-                    </div>
-                    <div class="tco-pro-kpi-row" id="tcoProjectionKpis">
-                        <div class="tco-pro-kpi"><div class="tco-pro-kpi-label">Breakeven Year</div><div class="tco-pro-kpi-val" id="projBreakeven">--</div></div>
-                        <div class="tco-pro-kpi"><div class="tco-pro-kpi-label">10-Yr Savings</div><div class="tco-pro-kpi-val" id="projSavings">--</div></div>
-                        <div class="tco-pro-kpi"><div class="tco-pro-kpi-label">NPV Difference</div><div class="tco-pro-kpi-val" id="projNpv">--</div></div>
-                    </div>
-                    <div class="tco-pro-chart-wrap"><canvas id="tcoProjectionChart"></canvas></div>
-                    <!-- Year-by-Year Table -->
-                    <div style="margin-top:1rem;overflow-x:auto;">
-                        <table class="tco-yearly-table" id="tcoYearlyTable">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Year</th>
-                                    <th scope="col">Build (Cumulative)</th>
-                                    <th scope="col">Colo (Cumulative)</th>
-                                    <th scope="col">Cloud (Cumulative)</th>
-                                    <th scope="col">Best</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tcoYearlyBody"></tbody>
-                        </table>
-                    </div>
+                <div class="tco-pro-panel tool-results" id="tcoProjectionPanel">
+                    <div class="res-head"><h2>Cumulative cost by year</h2><span class="basis">WACC-adjusted NPV</span></div>
+                    <div class="res-group"><div id="tcoProjectionKpis" data-rz-fact-list>
+                        <div class="metric-box"><div class="metric-label">Breakeven year</div><div class="metric-value" id="projBreakeven">--</div></div>
+                        <div class="metric-box is-key"><div class="metric-label">10-year saving</div><div class="metric-value" id="projSavings">--</div></div>
+                        <div class="metric-box"><div class="metric-label">NPV difference</div><div class="metric-value" id="projNpv">--</div></div>
+                    </div></div>
+                    <figure class="fig res-fig"><div class="chart-container"><canvas id="tcoProjectionChart" role="img" aria-label="Cumulative cost of build, colocation and cloud by year"></canvas></div><figcaption><b>FIG. 4</b> · Cumulative cost by year · amber = build</figcaption></figure>
+                    <div class="tco-tbl"><table class="tco-yearly-table" id="tcoYearlyTable">
+                        <thead><tr><th scope="col">Year</th><th scope="col">Build</th><th scope="col">Colocation</th><th scope="col">Cloud</th><th scope="col">Lowest</th></tr></thead>
+                        <tbody id="tcoYearlyBody"></tbody>
+                    </table></div>
                 </div>
-
-                <!-- Panel 3: Sensitivity Tornado -->
-                <div class="tco-pro-panel" id="tcoTornadoPanel">
-                    <div class="tco-pro-panel-header">
-                        <div class="tco-pro-panel-icon"><i class="fas fa-wind"></i></div>
-                        <div>
-                            <div class="tco-pro-panel-title">Sensitivity Tornado</div>
-                            <div class="tco-pro-panel-subtitle">Impact of &plusmn;20% variable changes on TCO difference</div>
-                        </div>
-                    </div>
+                <div class="tco-pro-panel tool-results" id="tcoTornadoPanel">
+                    <div class="res-head"><h2>Sensitivity</h2><span class="basis">each input ±20 %, effect on the gap between options</span></div>
                     <div id="tcoTornadoBars"></div>
-                    <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid rgba(15, 118, 110,0.12);display:flex;gap:1.5rem;flex-wrap:wrap;font-size:0.72rem;color:var(--text-muted);">
-                        <span style="display:flex;align-items:center;gap:6px;"><span style="width:20px;height:10px;border-radius:3px;background:linear-gradient(90deg,#ef4444,#f87171);display:inline-block;"></span> Higher cost vs. baseline</span>
-                        <span style="display:flex;align-items:center;gap:6px;"><span style="width:20px;height:10px;border-radius:3px;background:linear-gradient(90deg,#34d399,#10b981);display:inline-block;"></span> Lower cost vs. baseline</span>
-                        <span style="color:var(--text-muted);font-style:italic;">±20% swing on each variable</span>
-                    </div>
-                    <div style="margin-top:0.75rem;padding:0.75rem;background:rgba(15, 118, 110,0.05);border-radius:8px;font-size:0.75rem;color:var(--text-secondary);line-height:1.6;" id="tcoTornadoInsight">
-                        <i class="fas fa-lightbulb" style="color:var(--tco-primary);margin-right:4px;"></i>
-                        Run the calculation to see which variables have the greatest impact on your TCO decision.
-                    </div>
+                    <p class="res-fine">Left bar (amber): the ±20 % end that widens the cost gap between options. Right bar (grey): the end that narrows it.</p>
+                    <p class="tool-note" id="tcoTornadoInsight">Run the calculation to see which variables have the greatest impact on your TCO decision.</p>
                 </div>
-
-                <!-- Panel 4: Strategic Narrative -->
-                <div class="tco-pro-panel" id="tcoStrategyPanel">
-                    <div class="tco-pro-panel-header">
-                        <div class="tco-pro-panel-icon"><i class="fas fa-route"></i></div>
-                        <div>
-                            <div class="tco-pro-panel-title">Strategic Narrative &amp; Roadmap</div>
-                            <div class="tco-pro-panel-subtitle">Actionable recommendations based on your scenario</div>
-                        </div>
-                    </div>
+                <div class="tco-pro-panel tool-results" id="tcoStrategyPanel">
+                    <div class="res-head"><h2>Strategy and roadmap</h2><span class="basis">for the lowest-cost option</span></div>
                     <div id="tcoStrategyContent"></div>
                 </div>
-
             </div>
         </section>
 
         <!-- Market Data Section -->
-        <section class="tco-calculator-section" id="tcoMarketDataSection" style="padding-top:0;">
-            <div class="tco-market-info" id="tcoMarketInfo">
-                <div class="tco-market-chip"><i class="fas fa-hammer"></i> Build: <strong id="mktBuildCost">--</strong>/MW</div>
-                <div class="tco-market-chip"><i class="fas fa-server"></i> Colo: <strong id="mktColoRate">--</strong>/kW/mo</div>
-                <div class="tco-market-chip"><i class="fas fa-bolt"></i> Power: <strong id="mktPowerRate">--</strong>/kWh</div>
-                <div class="tco-market-chip"><i class="fas fa-users"></i> Staff: <strong id="mktStaffCost">--</strong>/yr</div>
-                <div class="tco-market-chip"><i class="fas fa-map-marker-alt"></i> Land: <strong id="mktLandCost">--</strong>/sqft</div>
-                <div class="tco-market-chip"><i class="fas fa-chart-line"></i> CAGR: <strong id="mktCagr">--</strong></div>
-            </div>
-            <div class="tco-benchmark-sources">
-                <span class="tco-source-tag"><i class="fas fa-book"></i> Turner &amp; Townsend DCCI 2025</span>
-                <span class="tco-source-tag"><i class="fas fa-book"></i> CBRE H1 2025</span>
-                <span class="tco-source-tag"><i class="fas fa-book"></i> Cushman &amp; Wakefield 2025</span>
-                <span class="tco-source-tag"><i class="fas fa-book"></i> IEA Electricity 2025-2026</span>
-                <span class="tco-source-tag"><i class="fas fa-book"></i> Glassdoor / PayScale 2025</span>
-            </div>
-        </section>
+        <div id="tcoMarketDataSection" hidden><span id="mktBuildCost"></span><span id="mktColoRate"></span><span id="mktPowerRate"></span><span id="mktStaffCost"></span><span id="mktLandCost"></span><span id="mktCagr"></span></div>
 
         <!-- Comparison Table Section -->
-        <section class="tco-calculator-section" id="tcoCompareSection" style="padding-top:0;">
-            <div style="background:var(--glass-bg);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:20px;padding:2rem;box-shadow:var(--shadow-md);">
-                <h3 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
-                    <i class="fas fa-table" style="color:var(--tco-primary);"></i> Detailed Cost Comparison
-                </h3>
-                <div style="overflow-x:auto;">
-                    <table class="tco-compare-table" id="tcoCompareTable">
-                        <thead>
-                            <tr>
-                                <th scope="col">Cost Category</th>
-                                <th style="text-align:right;"  scope="col">Build</th>
-                                <th style="text-align:right;"  scope="col">Colo</th>
-                                <th style="text-align:right;"  scope="col">Cloud</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tcoCompareBody">
-                            <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:0.75rem 2rem;font-size:0.82rem;"><i class="fas fa-calculator" style="margin-right:6px;opacity:0.4;"></i>Adjust inputs above to see detailed cost comparison</td></tr>
+        <section class="tco-calculator-section wrap" id="tcoCompareSection">
+            <div class="tool-results">
+                <div class="res-head"><h2>Cost by category</h2><span class="basis">period totals, lowest option per row in bold</span></div>
+                <div class="tco-tbl"><table class="tco-compare-table" id="tcoCompareTable">
+                    <thead><tr><th scope="col">Cost category</th><th scope="col" class="num">Build</th><th scope="col" class="num">Colocation</th><th scope="col" class="num">Cloud</th></tr></thead>
+                    <tbody id="tcoCompareBody">
+                            <tr><td colspan="4">Adjust inputs above to see detailed cost comparison</td></tr>
                         </tbody>
-                    </table>
-                </div>
+                </table></div>
             </div>
         </section>
 
         <!-- Methodology Section -->
-        <section class="tco-calculator-section" id="tcoMethodologySection" style="padding-top:0;">
-            <div class="tco-methodology">
-                <div class="tco-methodology-title"><i class="fas fa-flask"></i> Methodology &amp; Assumptions</div>
-                <div class="tco-methodology-grid">
-                    <div class="tco-methodology-item">
-                        <div class="tco-methodology-item-title">Build Model</div>
-                        <div class="tco-methodology-item-desc">CAPEX = IT Load (MW) &times; Regional Cost/MW &times; Tier Multiplier. Annual OPEX includes power (IT &times; PUE &times; 8,760h &times; $/kWh), staffing (headcount &times; salary), maintenance (3% of CAPEX), insurance (0.7% of CAPEX), network ($20K/MW/mo), and overhead (4% of OPEX). Inflation applied per-category annually.</div>
+        
+
+        
+        
+    
+        <section class="tool-ref" aria-labelledby="ref-h">
+            <div class="wrap">
+                <p class="eyebrow" id="ref-h">02 / Reference</p>
+                <div class="ref-grid">
+                    <div>
+                        <h3>Method</h3>
+                        <ul class="formulas">
+                            <li><span>Build CAPEX</span><code>P_IT (MW) · regional cost/MW · tier multiplier (II 0.85, III 1.0, IV 1.35)</code></li>
+                            <li><span>Build OPEX</span><code>power P_IT · PUE · 8,760 h · $/kWh + staff · salary + maintenance 3 % and insurance 0.7 % of CAPEX + network $20k/MW/mo + 4 % overhead</code></li>
+                            <li><span>Colocation</span><code>P_IT (kW) · wholesale $/kW/mo · 12 + setup $50k/MW + 1.5 FTE/MW + network $15k/MW/mo + 3 % overhead, escalated yearly</code></li>
+                            <li><span>Cloud</span><code>P_IT (kW) · $420/kW/mo · 12 · (1 − discount) · (1 + 15 % egress + 10 % support + 2 % other), +2.5 %/yr</code></li>
+                            <li><span>Growth</span><code>capacity compounds at the growth rate; costs inflate per category each year</code></li>
+                            <li><span>Breakeven</span><code>first year cumulative build ≤ cumulative colocation</code></li>
+                        </ul>
                     </div>
-                    <div class="tco-methodology-item">
-                        <div class="tco-methodology-item-title">Colo Model</div>
-                        <div class="tco-methodology-item-desc">Annual lease = IT Load (kW) &times; Wholesale Rate ($/kW/mo) &times; 12 months. Includes setup fees ($50K/MW), reduced staffing (1.5 FTE/MW), network connectivity ($15K/MW/mo), and 3% overhead. Annual escalation of 3% applied to lease costs. Growth rate scales capacity requirements.</div>
-                    </div>
-                    <div class="tco-methodology-item">
-                        <div class="tco-methodology-item-title">Cloud Model</div>
-                        <div class="tco-methodology-item-desc">Annual compute = IT Load (kW) &times; Cloud Rate ($420/kW/mo) &times; 12 &times; (1 - discount). Adds 15% for data egress, 10% for support tier, and 2% miscellaneous. Cloud inflation at 2.5% p.a. Growth rate compounds capacity. No CAPEX or staff required.</div>
+                    <div>
+                        <h3>Computed against</h3>
+                        <p class="against"><span>Turner &amp; Townsend DCCI 2025</span><span>CBRE H1 2025</span><span>Cushman &amp; Wakefield 2025</span><span>IEA Electricity 2025–2026</span><span>Glassdoor / PayScale 2025</span><span>Uptime Institute Tier II–IV</span></p>
+                        <h3>Read further</h3>
+                        <p class="links"><a href="manual/tco.html">Technical manual and methodology</a><a href="glossary.html">Glossary</a><a href="capex-calculator.html">CAPEX calculator</a><a href="opex-calculator.html">OPEX calculator</a><a href="roi-calculator.html">ROI calculator</a><a href="dc-market-tracker.html">DC market tracker</a><a href="datacenter-solutions.html">DC Solutions</a><a href="account.html">My account and saved scenarios</a></p>
                     </div>
                 </div>
+                <p class="notice">This calculator provides estimates based on publicly available market data from Turner &amp; Townsend, CBRE, Cushman &amp; Wakefield, IEA, and industry benchmarks (2025-2026). Actual costs vary significantly based on specific site conditions, vendor negotiations, and market timing. Always consult with qualified professionals for investment decisions. Data vintage: 2025–2026 market benchmarks. For investment decisions, consult a qualified data center infrastructure advisor.</p>
             </div>
         </section>
-
-        <!-- Disclaimer -->
-        <div class="tco-disclaimer" style="max-width:1400px;margin:1.5rem auto 2rem;">
-            <i class="fas fa-info-circle"></i>
-            <strong>Disclaimer:</strong> This calculator provides estimates based on publicly available market data from Turner &amp; Townsend, CBRE, Cushman &amp; Wakefield, IEA, and industry benchmarks (2025-2026). Actual costs vary significantly based on specific site conditions, vendor negotiations, and market timing. Always consult with qualified professionals for investment decisions.
-            <div style="margin-top:0.75rem;display:flex;gap:2rem;flex-wrap:wrap;font-size:0.78rem;color:#64748b;">
-                <span><i class="fas fa-database" style="margin-right:4px;color:var(--tco-primary);"></i>Sources: Turner &amp; Townsend H1 2025, CBRE DC Trends 2025, IEA Energy Outlook</span>
-                <span><i class="fas fa-calendar-alt" style="margin-right:4px;color:var(--tco-primary);"></i>Data vintage: 2025–2026 market benchmarks</span>
-                <span><i class="fas fa-user-tie" style="margin-right:4px;color:var(--tco-primary);"></i>For investment decisions, consult a qualified DC infrastructure advisor</span>
-            </div>
-        </div>
-    </main>
-
-    <!-- ═══ Footer ═══ -->
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#475569;border-color:rgba(71,85,105,0.4)}.rz-manual-link a:hover{color:#0891b2;border-color:rgba(8,145,178,0.5)}[data-theme="dark"] .rz-manual-link a{color:#94a3b8;border-color:rgba(148,163,184,0.35)}[data-theme="dark"] .rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/tco.html">Technical Manual &amp; Methodology &#8599;</a></div>
-    <footer class="tco-footer">
-        <div class="tco-footer-grid">
-            <div>
-                <div class="tco-footer-brand-name">ResistanceZero</div>
-                <p class="tco-footer-brand-desc">Data center engineering tools, market intelligence, and analytical content for infrastructure professionals.</p>
-            </div>
-            <div>
-                <div class="tco-footer-heading">Calculators</div>
-                <a href="capex-calculator.html" class="tco-footer-link">CAPEX Calculator</a>
-                <a href="opex-calculator.html" class="tco-footer-link">OPEX Calculator</a>
-                <a href="pue-calculator.html" class="tco-footer-link">PUE Calculator</a>
-                <a href="roi-calculator.html" class="tco-footer-link">ROI Calculator</a>
-                <a href="tco-calculator.html" class="tco-footer-link">TCO Calculator</a>
-            </div>
-            <div>
-                <div class="tco-footer-heading">Resources</div>
-                <a href="articles.html" class="tco-footer-link">Articles</a>
-                <a href="insights.html" class="tco-footer-link">Insights</a>
-                <a href="dc-market-tracker.html" class="tco-footer-link">DC Market</a>
-                <a href="glossary.html" class="tco-footer-link">Glossary</a>
-            </div>
-            <div>
-                <div class="tco-footer-heading">Company</div>
-                <a href="index.html" class="tco-footer-link">Home</a>
-                <a href="terms.html" class="tco-footer-link">Terms of Service</a>
-                <a href="privacy.html" class="tco-footer-link">Privacy Policy</a>
-            </div>
-        </div>
-        <div class="tco-footer-bottom">
-            <p>&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
-            <div class="tco-footer-bottom-links">
-                <a href="terms.html">Terms</a>
-                <a href="privacy.html">Privacy</a>
-            </div>
-        </div>
-    </footer>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models. Mission-critical infrastructure, documented.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+    <div id="rzVersionAnchor" hidden></div>
 
     
-
-    <!-- Scroll to Top -->
-    <button class="tco-scroll-top-btn" id="tcoScrollTopBtn" aria-label="Scroll to top">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-    </button>
 
     <!-- ═══ Global scripts ═══ -->
     <script src="script.min.js?v=20260920-0e1dd953"></script>
@@ -3609,13 +1455,13 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             var pj = mkt.projections || {};
             var labels = []; for (var y = 1; y <= years; y++) labels.push('Y' + y);
             var line = function (name, data, color) {
-                return { label: name, data: data, borderColor: color, backgroundColor: color + '22',
+                return { label: name, data: data, borderColor: color, backgroundColor: 'rgba(0, 0, 0, 0)',
                     borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.3, fill: false };
             };
             var ds = [
-                line('Build $/MW', idxSeries(pj.buildCostByYear, mkt.buildCost), '#f59e0b'),
-                line('Colo $/kW', idxSeries(pj.coloPriceByYear, mkt.coloKW), '#0f766e'),
-                line('Power $/kWh', idxSeries(pj.powerCostByYear, mkt.power), '#14b8a6'),
+                line('Build $/MW', idxSeries(pj.buildCostByYear, mkt.buildCost), 'rgb(212, 154, 42)'),
+                line('Colo $/kW', idxSeries(pj.coloPriceByYear, mkt.coloKW), 'rgb(160, 174, 192)'),
+                line('Power $/kWh', idxSeries(pj.powerCostByYear, mkt.power), 'rgb(94, 102, 115)'),
             ];
             if (el('marketChartRegion')) el('marketChartRegion').textContent = '· ' + (mkt.label || '') + ' · ' + years + 'yr';
             if (marketChartInstance) { marketChartInstance.destroy(); marketChartInstance = null; }
@@ -3655,26 +1501,25 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             var html = '';
             rows.forEach(function(row) {
                 var minVal = Math.min(row.build || Infinity, row.colo || Infinity, row.cloud || Infinity);
-                var style = row.isTotal ? 'font-weight:700;border-top:2px solid rgba(15, 118, 110,0.2);' : '';
-
-                html += '<tr style="' + style + '">';
+                
+                html += '<tr' + (row.isTotal ? ' class="is-total"' : '') + '>';
                 html += '<td>' + row.label + '</td>';
 
                 [row.build, row.colo, row.cloud].forEach(function(val) {
                     var cls = (row.isTotal && val === minVal && val > 0) ? ' class="tco-winner-cell"' : '';
-                    html += '<td style="text-align:right;font-family:JetBrains Mono,monospace;"' + cls + '>' + (val > 0 ? fmtM(val) : '--') + '</td>';
+                    html += '<td class="num' + (cls ? ' tco-winner-cell' : '') + '">' + (val > 0 ? fmtM(val) : '--') + '</td>';
                 });
 
                 html += '</tr>';
             });
 
             // Percentage row
-            html += '<tr style="font-size:0.72rem;color:var(--text-muted);">';
+            html += '<tr class="is-pct">';
             html += '<td>% of Best Option</td>';
             var best = r.winner.tco;
             [r.buildTotal, r.coloTotal, r.cloudTotal].forEach(function(val) {
                 var pct = (val / best * 100).toFixed(1);
-                html += '<td style="text-align:right;font-family:JetBrains Mono,monospace;">' + pct + '%</td>';
+                html += '<td class="num">' + pct + '%</td>';
             });
             html += '</tr>';
 
@@ -3694,13 +1539,13 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             el('kpiCloudTco').textContent = fmtM(r.cloudTotal);
             el('kpiCloudSub').textContent = r.years + '-year total';
             el('kpiBestOption').textContent = r.winner.name;
-            el('kpiBestSub').textContent = r.savingsPct.toFixed(1) + '% cheaper than #2';
+            el('kpiBestSub').textContent = r.savingsPct.toFixed(1) + ' % below the next option';
             el('kpiBuildCapex').textContent = fmtM(r.capex);
             el('kpiAnnualOpex').textContent = fmtM(r.yr1Opex);
             el('kpiCostPerKw').textContent = '$' + r.costPerKw.toFixed(0) + '/kW/yr';
             el('kpiCostPerKwSub').textContent = r.winner.name + ' effective cost';
             el('kpiBreakeven').textContent = r.breakevenYear ? 'Year ' + r.breakevenYear : 'N/A';
-            el('tcoBestValue').textContent = r.winner.name + ' ' + fmtM(r.winner.tco);
+            el('tcoBestValue').textContent = fmtM(r.winner.tco);
 
             // Region indicator
             var regionLabel = r.mkt.label || r.region;
@@ -3741,7 +1586,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             var sortedOpts = r.sortedOptions;
             var savingsAmt = sortedOpts[1].tco - sortedOpts[0].tco;
             if (savingsAmt > 0) {
-                savingsEl.style.display = 'flex';
+                savingsEl.style.display = 'block';
                 el('tcoSavingsText').innerHTML = 'Choosing <strong>' + r.winner.name + '</strong> saves <strong>' + fmtM(savingsAmt) + '</strong> (' + r.savingsPct.toFixed(1) + '%) compared to ' + sortedOpts[1].name + ' over ' + r.years + ' years.';
             } else {
                 savingsEl.style.display = 'none';
@@ -3763,7 +1608,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 ['Growth Rate', (r.growthRate * 100).toFixed(0) + '%/yr']
             ];
             assumptions.forEach(function(a) {
-                assHtml += '<div class="tco-assumption-item"><span>' + a[0] + '</span><span>' + a[1] + '</span></div>';
+                assHtml += '<div class="metric-box"><div class="metric-label">' + a[0] + '</div><div class="metric-value">' + a[1] + '</div></div>';
             });
             el('tcoAssumptionsList').innerHTML = assHtml;
 
@@ -3786,38 +1631,38 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 {
                     label: 'CAPEX / Setup',
                     data: [r.buildBreakdown.capex, r.coloBreakdown.capex, r.cloudBreakdown.capex],
-                    backgroundColor: 'rgba(251, 191, 36, 0.85)',
-                    borderRadius: 4
+                    backgroundColor: 'rgba(212, 154, 42, 0.9)',
+                    borderRadius: 0
                 },
                 {
                     label: 'Power / Compute',
                     data: [r.buildBreakdown.power, r.coloBreakdown.maint, r.cloudBreakdown.maint],
-                    backgroundColor: 'rgba(59, 130, 246, 0.85)',
-                    borderRadius: 4
+                    backgroundColor: 'rgba(125, 135, 148, 0.9)',
+                    borderRadius: 0
                 },
                 {
                     label: 'Staffing',
                     data: [r.buildBreakdown.staff, r.coloBreakdown.staff, r.cloudBreakdown.staff],
-                    backgroundColor: 'rgba(16, 185, 129, 0.85)',
-                    borderRadius: 4
+                    backgroundColor: 'rgba(160, 174, 192, 0.9)',
+                    borderRadius: 0
                 },
                 {
                     label: 'Maintenance / Insurance',
                     data: [r.buildBreakdown.maint, 0, 0],
-                    backgroundColor: 'rgba(14, 116, 144, 0.85)',
-                    borderRadius: 4
+                    backgroundColor: 'rgba(94, 102, 115, 0.9)',
+                    borderRadius: 0
                 },
                 {
                     label: 'Network / Egress',
                     data: [r.buildBreakdown.network, r.coloBreakdown.network, r.cloudBreakdown.network],
-                    backgroundColor: 'rgba(6, 182, 212, 0.85)',
-                    borderRadius: 4
+                    backgroundColor: 'rgba(201, 207, 216, 0.9)',
+                    borderRadius: 0
                 },
                 {
                     label: 'Other',
                     data: [r.buildBreakdown.other, r.coloBreakdown.other, r.cloudBreakdown.other],
-                    backgroundColor: 'rgba(156, 163, 175, 0.85)',
-                    borderRadius: 4
+                    backgroundColor: 'rgba(74, 81, 96, 0.9)',
+                    borderRadius: 0
                 }
             ];
 
@@ -3831,7 +1676,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { color: 'rgba(255,255,255,0.7)', font: { size: 11 }, padding: 12, boxWidth: 12, boxHeight: 3 }
+                            labels: { color: '#8C96A3', font: { size: 11 }, padding: 12, boxWidth: 12, boxHeight: 3 }
                         },
                         tooltip: {
                             callbacks: {
@@ -3842,16 +1687,16 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                     scales: {
                         x: {
                             stacked: true,
-                            ticks: { color: 'rgba(255,255,255,0.7)', font: { weight: 600 } },
+                            ticks: { color: '#8C96A3', font: { weight: 600 } },
                             grid: { display: false }
                         },
                         y: {
                             stacked: true,
                             ticks: {
-                                color: 'rgba(255,255,255,0.5)',
+                                color: '#8C96A3',
                                 callback: function(v) { return fmtM(v); }
                             },
-                            grid: { color: 'rgba(255,255,255,0.05)' }
+                            grid: { color: 'rgba(140,150,163,0.15)' }
                         }
                     }
                 }
@@ -4003,9 +1848,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             // Color zones
             var colors = counts.map(function(_, idx) {
                 var val = min + step * idx;
-                if (val <= p5) return 'rgba(52, 211, 153, 0.7)';
-                if (val >= p95) return 'rgba(239, 68, 68, 0.7)';
-                return 'rgba(45, 212, 191, 0.7)';
+                if (val >= p95) return 'rgb(212, 154, 42)';
+                return val <= p5 ? 'rgba(125, 135, 148, 0.85)' : 'rgba(125, 135, 148, 0.5)';
             });
 
             var ctx = el('tcoMcChart');
@@ -4158,7 +2002,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 yrHtml += '<td' + (bv === minV ? ' class="tco-yr-winner"' : '') + '>' + fmtM(bv) + '</td>';
                 yrHtml += '<td' + (cv === minV ? ' class="tco-yr-winner"' : '') + '>' + fmtM(cv) + '</td>';
                 yrHtml += '<td' + (clv === minV ? ' class="tco-yr-winner"' : '') + '>' + fmtM(clv) + '</td>';
-                yrHtml += '<td style="font-weight:600;color:#10b981;">' + bestName + '</td>';
+                yrHtml += '<td class="tco-yr-best">' + bestName + '</td>';
                 yrHtml += '</tr>';
             }
             var yrBody = el('tcoYearlyBody');
@@ -4175,8 +2019,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         {
                             label: 'Build',
                             data: buildCum,
-                            borderColor: '#f97316',
-                            backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                            borderColor: 'rgb(212, 154, 42)',
+                            backgroundColor: 'rgba(212, 154, 42, 0.08)',
                             fill: true,
                             tension: 0.3,
                             pointRadius: 3,
@@ -4185,8 +2029,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         {
                             label: 'Colo',
                             data: coloCum,
-                            borderColor: '#06b6d4',
-                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            borderColor: 'rgb(160, 174, 192)',
+                            backgroundColor: 'rgba(160, 174, 192, 0.05)',
                             fill: true,
                             tension: 0.3,
                             pointRadius: 3,
@@ -4195,8 +2039,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         {
                             label: 'Cloud',
                             data: cloudCum,
-                            borderColor: '#94a3b8',
-                            backgroundColor: 'rgba(148, 163, 184, 0.1)',
+                            borderColor: 'rgb(94, 102, 115)',
+                            backgroundColor: 'rgba(94, 102, 115, 0.05)',
                             fill: true,
                             tension: 0.3,
                             pointRadius: 3,
@@ -4349,8 +2193,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             var topBar = bars[0];
             var insightEl = el('tcoTornadoInsight');
             if (insightEl && topBar) {
-                insightEl.innerHTML = '<i class="fas fa-lightbulb" style="color:var(--tco-primary);margin-right:4px;"></i>'
-                    + '<strong>' + topBar.label + '</strong> is the biggest cost driver (' + fmtM(topBar.absImpact) + ' swing). '
+                insightEl.innerHTML = '<strong>' + topBar.label + '</strong> is the biggest cost driver (' + fmtM(topBar.absImpact) + ' swing). '
                     + 'A ±20% change in ' + topBar.label.toLowerCase() + ' shifts the TCO gap between deployment options by the most. '
                     + 'Lock in favorable rates here first before comparing other variables.';
             }
@@ -4410,8 +2253,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             }
 
             // Roadmap
-            html += '<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(0,0,0,0.08);">';
-            html += '<div class="tco-strategy-title" style="margin-bottom:1rem;"><i class="fas fa-route"></i> Implementation Roadmap</div>';
+            html += '<div class="tco-roadmap">';
+            html += '<h3 class="res-sub">Implementation roadmap</h3>';
 
             var steps;
             if (winner === 'Build') {
@@ -4459,6 +2302,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             var btns = document.querySelectorAll('.tco-mode-btn');
             btns.forEach(function(b) {
                 b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+                b.setAttribute('aria-pressed', b.getAttribute('data-mode') === mode ? 'true' : 'false');
             });
 
             if (mode === 'pro') {
@@ -4471,7 +2315,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             } else {
                 el('tcoProInputs').style.display = 'none';
                 if (!isPremiumUser) {
-                    el('tcoFreeWatermark').style.display = 'block';
+                    el('tcoFreeWatermark').style.display = '';
                     el('tcoPremiumOutput').style.display = 'none';
                 }
             }
@@ -4514,14 +2358,14 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             var regionLabel = r.mkt.label || r.region;
             var kpiHtml = '';
             var kpis = [
-                { label: 'Build TCO', value: fmtM(r.buildTotal), color: '#f97316' },
-                { label: 'Colo TCO', value: fmtM(r.coloTotal), color: '#06b6d4' },
+                { label: 'Build TCO', value: fmtM(r.buildTotal), color: '#6B7280' },
+                { label: 'Colo TCO', value: fmtM(r.coloTotal), color: '#A0AEC0' },
                 { label: 'Cloud TCO', value: fmtM(r.cloudTotal), color: '#94a3b8' },
-                { label: 'Best Option', value: r.winner.name + ' (' + r.savingsPct.toFixed(1) + '% savings)', color: '#10b981' },
-                { label: 'Build CAPEX', value: fmtM(r.capex), color: '#fbbf24' },
-                { label: 'Yr 1 OPEX', value: fmtM(r.yr1Opex), color: '#38bdf8' },
-                { label: 'Cost per kW', value: '$' + r.costPerKw.toFixed(0) + '/kW/yr', color: '#2dd4bf' },
-                { label: 'Breakeven', value: r.breakevenYear ? 'Year ' + r.breakevenYear : 'N/A', color: '#fb923c' }
+                { label: 'Best Option', value: r.winner.name + ' (' + r.savingsPct.toFixed(1) + '% savings)', color: '#374151' },
+                { label: 'Build CAPEX', value: fmtM(r.capex), color: '#7D8794' },
+                { label: 'Yr 1 OPEX', value: fmtM(r.yr1Opex), color: '#5E6673' },
+                { label: 'Cost per kW', value: '$' + r.costPerKw.toFixed(0) + '/kW/yr', color: '#C9CFD8' },
+                { label: 'Breakeven', value: r.breakevenYear ? 'Year ' + r.breakevenYear : 'N/A', color: '#4A5160' }
             ];
 
             kpis.forEach(function(k) {
@@ -4535,8 +2379,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             var gap = 60;
             var svgW = barW * 3 + gap * 4;
             var models = [
-                { name: 'Build', total: r.buildTotal, color: '#f97316' },
-                { name: 'Colo', total: r.coloTotal, color: '#06b6d4' },
+                { name: 'Build', total: r.buildTotal, color: '#6B7280' },
+                { name: 'Colo', total: r.coloTotal, color: '#A0AEC0' },
                 { name: 'Cloud', total: r.cloudTotal, color: '#94a3b8' }
             ];
 
@@ -4556,10 +2400,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
             var doc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TCO Comparison Report - ' + regionLabel + '</title>';
             doc += '<style>body{font-family:"IBM Plex Sans",Helvetica,Arial,sans-serif;color:#1f2937;max-width:900px;margin:0 auto;padding:40px;line-height:1.6;}';
-            doc += 'h1{color:#1e3a5f;font-size:24px;margin-bottom:4px;} h2{color:#0f766e;font-size:16px;margin-top:32px;margin-bottom:12px;border-bottom:2px solid #0f766e;padding-bottom:4px;}';
+            doc += 'h1{color:#111827;font-size:24px;margin-bottom:4px;} h2{color:#8A5A00;font-size:16px;margin-top:32px;margin-bottom:12px;border-bottom:2px solid #8A5A00;padding-bottom:4px;}';
             doc += '.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0;}';
             doc += '.chart-row{display:flex;gap:24px;margin:24px 0;} .chart-box{flex:1;text-align:center;}';
-            doc += '.narrative{background:#f0f0ff;border-left:4px solid #0f766e;padding:16px;border-radius:0 8px 8px 0;margin:20px 0;font-size:13px;}';
+            doc += '.narrative{background:#f0f0ff;border-left:4px solid #8A5A00;padding:16px;border-radius:0 8px 8px 0;margin:20px 0;font-size:13px;}';
             doc += '.footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between;}';
             doc += '@media print{body{padding:20px;} @page{margin:1cm;}}</style></head><body>';
             doc += '<h1>Data Center TCO Comparison Report</h1>';
@@ -4589,7 +2433,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             // Comparison table in PDF
             doc += '<h2>Cost Breakdown Comparison</h2>';
             doc += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-            doc += '<tr style="background:#f0f4ff;"><th style="padding:8px;text-align:left;border-bottom:2px solid #0f766e;"  scope="col">Category</th><th style="padding:8px;text-align:right;border-bottom:2px solid #0f766e;"  scope="col">Build</th><th style="padding:8px;text-align:right;border-bottom:2px solid #0f766e;"  scope="col">Colo</th><th style="padding:8px;text-align:right;border-bottom:2px solid #0f766e;"  scope="col">Cloud</th></tr>';
+            doc += '<tr style="background:#f0f4ff;"><th style="padding:8px;text-align:left;border-bottom:2px solid #8A5A00;"  scope="col">Category</th><th style="padding:8px;text-align:right;border-bottom:2px solid #8A5A00;"  scope="col">Build</th><th style="padding:8px;text-align:right;border-bottom:2px solid #8A5A00;"  scope="col">Colo</th><th style="padding:8px;text-align:right;border-bottom:2px solid #8A5A00;"  scope="col">Cloud</th></tr>';
 
             var pdfRows = [
                 ['CAPEX / Setup', r.buildBreakdown.capex, r.coloBreakdown.capex, r.cloudBreakdown.capex],
@@ -4609,11 +2453,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 doc += '</tr>';
             });
 
-            doc += '<tr style="font-weight:700;border-top:2px solid #0f766e;">';
+            doc += '<tr style="font-weight:700;border-top:2px solid #8A5A00;">';
             doc += '<td style="padding:8px;">TOTAL</td>';
-            doc += '<td style="padding:8px;text-align:right;font-family:monospace;color:' + (r.winner.name === 'Build' ? '#10b981' : '#1f2937') + ';">' + fmtM(r.buildTotal) + '</td>';
-            doc += '<td style="padding:8px;text-align:right;font-family:monospace;color:' + (r.winner.name === 'Colo' ? '#10b981' : '#1f2937') + ';">' + fmtM(r.coloTotal) + '</td>';
-            doc += '<td style="padding:8px;text-align:right;font-family:monospace;color:' + (r.winner.name === 'Cloud' ? '#10b981' : '#1f2937') + ';">' + fmtM(r.cloudTotal) + '</td>';
+            doc += '<td style="padding:8px;text-align:right;font-family:monospace;color:' + (r.winner.name === 'Build' ? '#374151' : '#1f2937') + ';">' + fmtM(r.buildTotal) + '</td>';
+            doc += '<td style="padding:8px;text-align:right;font-family:monospace;color:' + (r.winner.name === 'Colo' ? '#374151' : '#1f2937') + ';">' + fmtM(r.coloTotal) + '</td>';
+            doc += '<td style="padding:8px;text-align:right;font-family:monospace;color:' + (r.winner.name === 'Cloud' ? '#374151' : '#1f2937') + ';">' + fmtM(r.cloudTotal) + '</td>';
             doc += '</tr></table>';
 
             // Market data section
@@ -4685,9 +2529,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 localStorage.removeItem('rz_premium_session');
                 var premBtn = el('tcoPremiumTabBtn');
                 premBtn.classList.remove('premium-active');
-                premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium';
+                premBtn.textContent = 'Sign in';
                 el('tcoPremiumBadge').style.display = 'none';
-                el('tcoFreeWatermark').style.display = 'block';
+                el('tcoFreeWatermark').style.display = '';
                 el('tcoPremiumOutput').style.display = 'none';
                 el('tcoProInputs').style.display = 'none';
                 setMode('free');
@@ -4708,13 +2552,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
         function activatePremiumUI() {
             var premBtn = el('tcoPremiumTabBtn');
             premBtn.classList.add('premium-active');
-            premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium Active';
-
-            var premBadge = el('tcoPremiumBadge');
-            premBadge.textContent = 'PRO ACTIVE';
-            premBadge.style.display = 'inline-flex';
-            premBadge.style.background = '#64748b';
-            premBadge.style.color = 'white';
+            premBtn.textContent = 'Full analysis on';
 
             el('tcoFreeWatermark').style.display = 'none';
 
@@ -4734,9 +2572,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
             var premBtn = el('tcoPremiumTabBtn');
             premBtn.classList.remove('premium-active');
-            premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium';
+            premBtn.textContent = 'Sign in';
             el('tcoPremiumBadge').style.display = 'none';
-            el('tcoFreeWatermark').style.display = 'block';
+            el('tcoFreeWatermark').style.display = '';
             el('tcoPremiumOutput').style.display = 'none';
             el('tcoProInputs').style.display = 'none';
 
@@ -4846,49 +2684,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
     })();
     </script>
 
-    <!-- ═══ Cookie + Scroll IIFE ═══ -->
     <script>
-    (function(){
-        // Cookie Banner
-        var cb = document.getElementById('tcoCookieBanner');
-        var consent = localStorage.getItem('rz_cookie_consent');
-        if (!consent && cb) {
-            cb.classList.remove('hidden');
-        }
-        var acceptBtn = document.getElementById('tcoCookieAccept');
-        var declineBtn = document.getElementById('tcoCookieDecline');
-        if (acceptBtn) acceptBtn.addEventListener('click', function(){
-            localStorage.setItem('rz_cookie_consent', 'accepted');
-            cb.classList.add('hidden');
-        });
-        if (declineBtn) declineBtn.addEventListener('click', function(){
-            localStorage.setItem('rz_cookie_consent', 'declined');
-            cb.classList.add('hidden');
-            window['ga-disable-G-GED7FX8RTV'] = true;
-        });
-
-        // Scroll to Top
-        var sBtn = document.getElementById('tcoScrollTopBtn');
-        if (sBtn) {
-            var ticking = false;
-            window.addEventListener('scroll', function(){
-                if (!ticking) {
-                    window.requestAnimationFrame(function(){
-                        if (window.scrollY > 500) {
-                            sBtn.classList.add('visible');
-                        } else {
-                            sBtn.classList.remove('visible');
-                        }
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            });
-            sBtn.addEventListener('click', function(){
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-    })();
     // ── Dark Mode Toggle ──
     function toggleCalcTheme() {
         var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -4916,6 +2712,5 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',m);else m();
 if(window.MutationObserver)new MutationObserver(m).observe(document.documentElement,{childList:true,subtree:true});})();
 </script>
-    <script src="js/rz-manual-fab.js?v=20260920-8972ee25" defer></script>
 </body>
 </html>

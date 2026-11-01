@@ -33,7 +33,7 @@
     <meta name="keywords" content="TIA-942, Data Center Compliance, Tier Classification, Infrastructure Standard, ANSI/TIA-942-C, Compliance Checklist, Enterprise, Colocation, Hyperscale, Edge, Modular">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#10b981">
+    <meta name="theme-color" content="#0b0c0e">
     <link rel="canonical" href="https://resistancezero.com/tia-942-checklist.html">
     <link rel="alternate" hreflang="en" href="https://resistancezero.com/tia-942-checklist.html">
     <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/tia-942-checklist.html">
@@ -89,300 +89,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
-    <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%);
-            --secondary-gradient: linear-gradient(135deg, #059669 0%, #065f46 100%);
-            --dark-green: #065f46;
-            --medium-green: #059669;
-            --light-green: #10b981;
-            --accent-emerald: #10b981;
-            --accent-gold: #f59e0b;
-            --accent-cyan: #06b6d4;
-            --accent-purple: #64748b;
-            --accent-red: #ef4444;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-tertiary: #e9ecef;
-            --text-primary: #212529;
-            --text-secondary: #495057;
-            --text-muted: #6c757d;
-            --glass-bg: #ffffff;
-            --glass-bg-dark: rgba(6,95,70,0.95);
-            --glass-border: rgba(16,185,129,0.1);
-            --glass-blur: none;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
-        }
-        /* v1.47.x dark-mode fix — :root only had a light palette, so body/cards stayed white in dark.
-           Redefine the surface/text vars for dark (the page's rules already consume them). */
-        [data-theme="dark"] {
-            --bg-primary: #0E0F12;
-            --bg-secondary: #16181D;
-            --bg-tertiary: #1e2530;
-            --text-primary: #CFD3DA;
-            --text-secondary: #9aa8bb;
-            --text-muted: #7E8590;
-            --glass-bg: #16181d;
-            --glass-border: rgba(255,255,255,0.08);
-        }
-        [data-theme="dark"] .calc-disclaimer { background: #16181D !important; color: #9aa8bb !important; border-color: rgba(255,255,255,0.08) !important; }
-        *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-        body{font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;line-height:1.6}
-        .page-background{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;background:radial-gradient(ellipse at top right,rgba(16,185,129,0.08) 0%,transparent 50%),radial-gradient(ellipse at bottom left,rgba(5,150,105,0.05) 0%,transparent 50%),linear-gradient(rgba(16,185,129,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(16,185,129,0.02) 1px,transparent 1px);background-size:100% 100%,100% 100%,50px 50px,50px 50px}
-
-        /* Navbar */
-        .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--glass-bg);backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border);box-shadow:var(--shadow-md)}
-        .nav-container{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;max-width:1400px;margin:0 auto}
-        .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--dark-green)}
-        .nav-logo{width:44px;height:44px;background:linear-gradient(135deg,#10b981,#059669);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;color:white;box-shadow:0 4px 12px rgba(16,185,129,0.3);letter-spacing:-0.5px}
-        .nav-title{font-weight:700;font-size:1.1rem;color:var(--dark-green)}
-        .nav-subtitle{font-size:0.75rem;color:var(--text-muted)}
-        .nav-links{display:flex;gap:1.5rem;align-items:center}
-        .nav-link{color:var(--text-secondary);text-decoration:none;font-size:0.9rem;font-weight:500;padding:8px 0;transition:color 0.3s}
-        .nav-link:hover{color:var(--dark-green)}
-        .nav-back{display:flex;align-items:center;gap:8px;padding:10px 20px;background:var(--primary-gradient);border:none;border-radius:8px;color:white;text-decoration:none;font-size:0.85rem;font-weight:600;transition:all 0.3s;box-shadow:0 4px 12px rgba(16,185,129,0.25)}
-        .nav-back:hover{transform:translateY(-2px)}
-
-        .nav-auth-wrap{position:relative;margin-left:0.5rem}
-        .nav-login-btn{display:flex;align-items:center;gap:6px;padding:8px 18px;background:#64748b;border:none;border-radius:8px;color:white;font-size:0.82rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.3s;box-shadow:0 3px 10px rgba(100, 116, 139,0.3);white-space:nowrap}
-        .nav-login-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(100, 116, 139,0.4)}
-        .nav-user-btn{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;background:rgba(100, 116, 139,0.08);border:1px solid rgba(100, 116, 139,0.25);border-radius:50px;cursor:pointer;transition:all 0.3s;font-family:inherit;color:var(--text-primary)}
-        .nav-user-btn:hover{background:rgba(100, 116, 139,0.14)}
-        .nav-user-avatar{width:30px;height:30px;border-radius:50%;background:#64748b;display:flex;align-items:center;justify-content:center;color:white;font-size:0.7rem;font-weight:700}
-        .nav-user-email{font-size:0.8rem;font-weight:500;color:var(--text-secondary);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .nav-user-chevron{font-size:0.6rem;color:var(--text-muted);transition:transform 0.3s}
-        .nav-user-btn.open .nav-user-chevron{transform:rotate(180deg)}
-        .nav-user-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;background:white;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 12px 40px rgba(0,0,0,0.12);min-width:220px;z-index:1001;overflow:hidden}
-        .nav-user-dropdown.show{display:block}
-        .nav-dd-header{padding:14px 16px;border-bottom:1px solid #f1f5f9}
-        .nav-dd-tier-badge{display:inline-flex;padding:3px 10px;border-radius:50px;font-size:0.65rem;font-weight:700;letter-spacing:0.5px;margin-bottom:6px}
-        .nav-dd-tier-badge.pro{background:#64748b;color:white}
-        .nav-dd-email{font-size:0.78rem;color:#64748b;word-break:break-all}
-        .nav-dd-logout{display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;border:none;background:none;font-size:0.82rem;font-weight:500;color:#ef4444;cursor:pointer;font-family:inherit;transition:background 0.2s}
-        .nav-dd-logout:hover{background:#fef2f2}
-
-        .main-content{position:relative;z-index:10;padding-top:80px}
-
-        /* Hero */
-        .hero{padding:3rem 2rem 2rem;text-align:center;max-width:900px;margin:0 auto}
-        .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(16,185,129,0.05));border:1px solid rgba(16,185,129,0.3);border-radius:4px;font-size:0.8rem;color:var(--accent-emerald);font-weight:600;margin-bottom:1.5rem}
-        .hero h1{font-size:clamp(2rem,4vw,2.8rem);font-weight:800;background:linear-gradient(135deg,#10b981,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
-        .hero p{font-size:1.1rem;color:var(--text-secondary);max-width:700px;margin:0 auto}
-        .quick-stats{display:flex;justify-content:center;gap:2rem;margin-top:1.5rem;flex-wrap:wrap}
-        .quick-stat{display:flex;align-items:center;gap:6px;font-size:0.82rem;color:var(--text-muted)}
-        .quick-stat i{color:var(--accent-emerald)}
-
-        /* Toolbar */
-        .tia-toolbar{display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin:0 auto;max-width:1400px;padding:0 2rem 1.25rem;flex-wrap:wrap}
-        .tia-mode-bar{display:flex;gap:0;background:#f1f5f9;border-radius:10px;padding:3px;border:1px solid #e2e8f0}
-        .tia-toolbar-btn{padding:0.55rem 1.2rem;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:0.82rem;font-family:inherit;transition:all 0.25s;display:flex;align-items:center;gap:6px;white-space:nowrap}
-        .tia-btn-free{background:transparent;color:#64748b}
-        .tia-btn-free.active{background:linear-gradient(135deg,#10b981,#059669);color:white;box-shadow:0 2px 8px rgba(16,185,129,0.3)}
-        .tia-btn-free:not(.active):hover{background:rgba(16,185,129,0.08);color:#059669}
-        .tia-btn-pro{background:transparent;color:#475569}
-        .tia-btn-pro.active{background:#64748b;color:white;box-shadow:0 2px 8px rgba(100, 116, 139,0.3)}
-        .tia-btn-pro:not(.active):hover{background:rgba(100, 116, 139,0.08);color:#64748b}
-        .tia-btn-pro.locked-hint{position:relative}
-        .tia-btn-pro.locked-hint::after{content:'';position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#f59e0b;border-radius:50%;border:2px solid #f1f5f9}
-        .tia-toolbar-actions{display:flex;gap:0.5rem;align-items:center}
-        .tia-btn-reset{padding:0.55rem 1rem;border-radius:10px;border:1px solid #e2e8f0;background:white;color:#64748b;cursor:pointer;font-weight:600;font-size:0.82rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;gap:6px}
-        /* v1.43.x dark-mode rollout — chrome elements were white on dark */
-        [data-theme="dark"] .tia-btn-reset{background:#1e293b;color:#cbd5e1;border-color:rgba(255,255,255,0.14)}
-        [data-theme="dark"] .nav-user-dropdown{background:#1e293b;border-color:rgba(255,255,255,0.14)}
-        .tia-btn-reset:hover{border-color:#10b981;color:#10b981;background:rgba(16,185,129,0.04)}
-        .tia-btn-pdf{padding:0.55rem 1rem;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.04);color:#ef4444;cursor:pointer;font-weight:600;font-size:0.82rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;gap:6px}
-        .tia-btn-pdf:hover{border-color:#ef4444;background:rgba(239,68,68,0.1);box-shadow:0 2px 8px rgba(239,68,68,0.15)}
-        .tia-btn-pdf.disabled{opacity:1;color:#b91c1c;pointer-events:none}
-        .tia-mode-indicator{font-size:0.72rem;font-weight:700;letter-spacing:0.5px;padding:3px 10px;border-radius:50px;display:none}
-        .tia-mode-indicator.free-active{display:inline-flex;background:rgba(16,185,129,0.1);color:#059669}
-        .tia-mode-indicator.pro-active{display:inline-flex;background:rgba(100, 116, 139,0.1);color:#64748b}
-
-        /* Tier Selector */
-        .tier-selector{max-width:1400px;margin:0 auto;padding:0 2rem 1.5rem}
-        .tier-bar{display:flex;gap:0;background:#f1f5f9;border-radius:12px;padding:4px;border:1px solid #e2e8f0}
-        .tier-btn{flex:1;padding:0.6rem 1rem;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:0.82rem;font-family:inherit;transition:all 0.25s;text-align:center;color:#475569;background:transparent}
-        .tier-btn.active{background:white;color:var(--dark-green);box-shadow:var(--shadow-sm);border:1px solid rgba(16,185,129,0.2)}
-        .tier-btn:not(.active):hover{background:rgba(16,185,129,0.06);color:#059669}
-        .tier-num{font-weight:800;margin-right:4px}
-
-        /* DC Type Selector */
-        .dctype-selector{max-width:1400px;margin:0 auto;padding:0 2rem 1.5rem}
-        .dctype-label{font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;display:flex;align-items:center;gap:6px}
-        .dctype-label i{color:var(--accent-emerald);font-size:0.8rem}
-        .dctype-bar{display:flex;gap:0;background:#f1f5f9;border-radius:12px;padding:4px;border:1px solid #e2e8f0;flex-wrap:wrap}
-        .dctype-btn{flex:1;padding:0.5rem 0.75rem;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:0.78rem;font-family:inherit;transition:all 0.25s;text-align:center;color:#475569;background:transparent;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;min-width:0}
-        .dctype-btn.active{background:white;color:#1e293b;box-shadow:var(--shadow-sm);border:1px solid rgba(16,185,129,0.2)}
-        .dctype-btn:not(.active):hover{background:rgba(16,185,129,0.06);color:#059669}
-        .dctype-btn i{font-size:0.72rem}
-
-        /* Calculator Grid */
-        .calculator-section{max-width:1400px;margin:2rem auto;padding:0 2rem}
-        .calculator-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:2rem}
-
-        /* Checklist Panel */
-        .checklist-panel{display:flex;flex-direction:column;gap:1rem}
-        .checklist-category{background:var(--glass-bg);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:16px;overflow:hidden;transition:box-shadow 0.3s}
-        .checklist-category:hover{box-shadow:var(--shadow-md)}
-        .cat-header{display:flex;align-items:center;gap:12px;padding:1rem 1.25rem;cursor:pointer;user-select:none;transition:background 0.2s}
-        .cat-header:hover{background:rgba(16,185,129,0.03)}
-        .cat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0}
-        .cat-info{flex:1}
-        .cat-title{font-size:0.95rem;font-weight:700;color:var(--text-primary)}
-        .cat-progress-wrap{display:flex;align-items:center;gap:8px;margin-top:4px}
-        .cat-progress-bar{flex:1;height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden}
-        .cat-progress-fill{height:100%;border-radius:2px;transition:width 0.4s ease;width:0%}
-        .cat-count{font-size:0.72rem;font-weight:600;color:var(--text-muted);white-space:nowrap;font-family:'JetBrains Mono',monospace}
-        .cat-chevron{font-size:0.75rem;color:var(--text-muted);transition:transform 0.3s}
-        .cat-header.open .cat-chevron{transform:rotate(180deg)}
-        .cat-body{max-height:0;overflow:hidden;transition:max-height 0.4s ease}
-        .cat-body.open{max-height:3000px}
-        .cat-items{padding:0 1.25rem 1rem}
-        .check-item{display:flex;align-items:center;gap:10px;padding:0.6rem 0;border-bottom:1px solid rgba(0,0,0,0.04)}
-        .check-item:last-child{border-bottom:none}
-        .check-item input[type="checkbox"]{width:18px;height:18px;accent-color:#10b981;cursor:pointer;flex-shrink:0}
-        .check-label{flex:1;font-size:0.85rem;color:var(--text-primary);cursor:pointer}
-        .check-weight{padding:2px 8px;border-radius:50px;font-size:0.65rem;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap}
-        .check-weight.w3{background:rgba(239,68,68,0.1);color:#ef4444}
-        .check-weight.w2{background:rgba(245,158,11,0.1);color:#f59e0b}
-        .check-weight.w1{background:rgba(107,114,128,0.1);color:#94a3b8}
-        .check-ref{font-size:0.68rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;white-space:nowrap}
-
-        /* Tooltips */
-        .tooltip-trigger{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:50%;font-size:10px;color:var(--accent-emerald);cursor:help;margin-left:auto;transition:all 0.3s;flex-shrink:0}
-        .tooltip-trigger:hover{background:rgba(16,185,129,0.2);transform:scale(1.1)}
-        #tooltip-container{position:fixed;width:340px;max-width:calc(100vw - 40px);padding:16px;background:linear-gradient(135deg,#064e3b,#065f46);border:1px solid rgba(255,255,255,0.15);border-radius:12px;box-shadow:0 15px 50px rgba(0,0,0,0.5);z-index:999999;pointer-events:none;opacity:0;visibility:hidden;transition:opacity 0.15s ease;color:white;font-size:12px;line-height:1.6}
-        #tooltip-container.visible{opacity:1;visibility:visible}
-        #tooltip-container .tip-title{font-size:13px;font-weight:700;color:#34d399;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-        #tooltip-container .tip-desc{color:rgba(255,255,255,0.9)}
-        #tooltip-container .tip-meta{display:flex;gap:10px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.12);font-size:10px;color:rgba(255,255,255,0.6)}
-        #tooltip-container .tip-meta span{display:flex;align-items:center;gap:4px}
-        .tooltip-trigger .tooltip-data{display:none}
-
-        /* Results Panel */
-        .results-panel{position:sticky;top:100px}
-        .results-card{background:var(--glass-bg);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:4px;padding:1.5rem}
-        .score-display{text-align:center;padding:1.5rem 0}
-        .score-value{font-size:4rem;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1}
-        .score-label{font-size:0.8rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:0.5rem}
-        .score-grade{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:50px;font-size:0.75rem;font-weight:700;margin-top:0.75rem}
-        .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1.25rem}
-        .metric-box{background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.1);border-radius:4px;padding:0.75rem;text-align:center}
-        .metric-label{font-size:0.68rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
-        .metric-value{font-size:1.1rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text-primary);margin-top:2px}
-
-        /* Category Bars */
-        .cat-bars{margin-top:1.25rem}
-        .cat-bars-title{font-size:0.78rem;font-weight:700;color:var(--text-primary);margin-bottom:0.75rem}
-        .cat-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:0.5rem}
-        .cat-bar-label{font-size:0.72rem;color:var(--text-muted);width:10em;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}   /* 80px clipped "Telecommunications" by 27px (v3.24.24) */
-        .cat-bar-track{flex:1;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden}
-        .cat-bar-fill{height:100%;border-radius:4px;transition:width 0.5s ease}
-        .cat-bar-pct{font-size:0.72rem;font-weight:600;font-family:'JetBrains Mono',monospace;width:38px;text-align:right}
-
-        /* Recommendations */
-        .rec-section{margin-top:1.25rem}
-        .rec-title{font-size:0.78rem;font-weight:700;color:var(--text-primary);margin-bottom:0.75rem;display:flex;align-items:center;gap:6px}
-        .rec-card{display:flex;gap:10px;padding:0.75rem;background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.1);border-radius:4px;margin-bottom:0.5rem}
-        .rec-icon{width:32px;height:32px;border-radius:8px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;color:var(--accent-emerald);font-size:0.8rem;flex-shrink:0}
-        .rec-text h4{font-size:0.78rem;font-weight:600;color:var(--text-primary)}
-        .rec-text p{font-size:0.72rem;color:var(--text-muted);margin-top:2px}
-
-        /* Charts */
-        .charts-section{max-width:1400px;margin:2rem auto;padding:0 2rem}
-        .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-        .chart-card{background:var(--glass-bg);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:4px;padding:1.5rem}
-        .chart-title{font-size:0.85rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;display:flex;align-items:center;gap:8px}
-        .chart-container{position:relative;height:280px}
-
-        /* PRO Sections */
-        .pro-section{position:relative}
-        .pro-section.locked>*:not(.pro-overlay){filter:blur(6px);user-select:none;pointer-events:none}
-        .pro-overlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;background:rgba(255,255,255,0.7);backdrop-filter:blur(2px);border-radius:16px;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;pointer-events:all;cursor:pointer}
-        .pro-section.locked .pro-overlay{display:flex}
-        .pro-overlay i{font-size:2rem;color:var(--accent-purple)}
-        .pro-overlay-title{font-size:1rem;font-weight:700;color:var(--text-primary)}
-        .pro-overlay-desc{font-size:0.8rem;color:var(--text-muted);text-align:center;max-width:260px}
-        .pro-overlay-btn{padding:8px 20px;background:#64748b;border:none;border-radius:8px;color:white;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s}
-        .pro-overlay-btn:hover{transform:translateY(-1px)}
-        .pro-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:rgba(100,116,139,.12);border:1px solid rgba(100,116,139,.42);color:#64748b;font-size:0.6rem;font-weight:700;border-radius:4px;letter-spacing:0.5px;vertical-align:middle}
-
-        /* Pro Panel Cards */
-        .pro-panel{background:var(--glass-bg);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:4px;padding:1.5rem;margin-bottom:1.5rem}
-        .pro-panel h3{font-size:0.95rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
-        .gap-table{width:100%;border-collapse:collapse;font-size:0.8rem}
-        .gap-table th{text-align:left;padding:8px 10px;background:rgba(16,185,129,0.05);border-bottom:2px solid rgba(16,185,129,0.15);font-size:0.72rem;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.3px}
-        .gap-table td{padding:6px 10px;border-bottom:1px solid rgba(0,0,0,0.04);font-size:0.8rem}
-        .priority-badge{padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:700}
-        .priority-badge.p1{background:rgba(239,68,68,0.1);color:#ef4444}
-        .priority-badge.p2{background:rgba(245,158,11,0.1);color:#f59e0b}
-        .priority-badge.p3{background:rgba(107,114,128,0.1);color:#94a3b8}
-
-        /* Login Modal */
-        @keyframes modalSlideIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-
-        /* Print */
-        @media print{
-            body{background:white !important;color:#1e293b !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-            .navbar,.hero,.tia-toolbar,.tier-selector,.dctype-selector,#loginModal,.nav-back,footer,.pro-overlay,.pro-badge{display:none !important}
-            .main-content{padding-top:0 !important}
-            .calculator-section{padding:0 !important}
-            .calculator-grid{display:block !important}
-            .pro-section.locked>*:not(.pro-overlay){filter:none !important;user-select:auto !important;pointer-events:auto !important}
-            .results-panel{position:static !important}
-            @page{margin:1cm;size:A4}
-        }
-
-        /* Responsive */
-        @media(max-width:768px){
-            .nav-links{display:none}
-            .calculator-grid{grid-template-columns:1fr}
-            .results-panel{position:static}
-            .charts-grid{grid-template-columns:minmax(0,1fr)}.chart-card{min-width:0}
-            .hero h1{font-size:1.8rem}
-            .score-value{font-size:3rem}
-            .metric-grid{grid-template-columns:1fr}
-            .tier-bar{flex-wrap:wrap}
-            .tier-btn{flex:none;width:calc(50% - 2px)}
-            .dctype-bar{flex-wrap:wrap}
-            .dctype-btn{flex:none;width:calc(50% - 2px)}
-            /* v1.49.8 — wide gap table scrolls instead of overflowing the viewport */
-            .gap-table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-        }
-        /* Calculator Disclaimer */
-        .calc-disclaimer { background: #f1f5f9 !important; border: 1px solid #cbd5e1 !important; border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1.5rem; }
-        .calc-disclaimer .disc-title { color: #1e293b !important; }
-        .calc-disclaimer .disc-text { color: #475569 !important; }
-        .calc-disclaimer .disc-text strong { color: #1e293b !important; }
-        .calc-disclaimer .disc-text a { color: #2563eb !important; }
-        .calc-disclaimer .disc-fine { color: #475569 !important; }
-        html:not([data-theme="dark"]) .disc-fine a { color: #1d4ed8 !important; }
-        [data-theme="dark"] .disc-fine a { color: #93c5fd !important; }
-        /* a11y dark: disclaimer text sits on a dark surface in dark mode */
-        [data-theme="dark"] .calc-disclaimer .disc-title { color: #e2e8f0 !important; }
-        /* a11y dark: pro-overlay was a white wash over dark content — flip to a dark wash */
-        [data-theme="dark"] .pro-overlay { background: rgba(10,13,18,0.85); }
-        [data-theme="dark"] .pro-overlay-title { color: #f1f5f9; }
-        [data-theme="dark"] .pro-overlay-desc { color: #94a3b8; }
-        [data-theme="dark"] .calc-disclaimer .disc-text { color: #94a3b8 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-text strong { color: #cbd5e1 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-text a { color: #93c5fd !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-fine { color: #94a3b8 !important; }
-        [data-theme="dark"] [style*="color:#065f46"] { color: #6ee7b7 !important; }
-        /* a11y: score readouts (JS sets inline colors too light/dim for the light card) */
-        html:not([data-theme="dark"]) #scoreValue { color: #047857 !important; }
-        html:not([data-theme="dark"]) #scoreGrade { color: #475569 !important; }
-        /* a11y: mode indicator + selector buttons on the light bars */
-        html:not([data-theme="dark"]) .tia-mode-indicator.free-active { color: #047857; }
-        [data-theme="dark"] .tia-mode-indicator.free-active { color: #34d399; }
-        [data-theme="dark"] .tia-btn-pdf { color: #f87171; }
-        [data-theme="dark"] .tia-btn-pdf.disabled { color: #f87171; }
-            /* Cookie Banner */
-        @media (max-width: 768px) {}
-        @media print {}
-</style>
-    <script src="js/rz-version.js?v=20261101-22a91a90" defer></script>
+    <script src="js/rz-version.js?v=20261101-732b47d5" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <!-- Structured Data - HowTo -->
@@ -434,277 +141,224 @@
     }
     </script>    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">
 
-
-
-<style id="rz-skiplink-v1">
-.skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
-.skip-link:focus{top:0}
-[data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
-</style>
-<style>
-/* Mobile form controls: 16px, or iOS Safari zooms the viewport on focus and does not zoom back.
-   This page does not load styles.min.css, so it carries the rule itself. */
-@media (max-width: 768px) {
-  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
-  select, textarea { font-size: 16px !important; }
-}
-</style>
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261027-0044">
+    <link rel="stylesheet" href="css/rz-hub.css">
+    <link rel="stylesheet" href="css/rz-tool.css">
 </head>
-<body>
+<body class="hub tool" data-rz-calc="tia" data-rz-account-pill="off">
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <div class="page-background"></div>
+    
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-brand">
-                <div class="nav-logo">TIA</div>
-                <div>
-                    <div class="nav-title">TIA-942 Checklist</div>
-                    <div class="nav-subtitle">Compliance Assessment</div>
-                </div>
-            </a>
-            <div class="nav-links">
-                <a href="datacenter-solutions.html" class="nav-link">DC Solutions</a>
-                <a href="capex-calculator.html" class="nav-link" style="color:#f59e0b;">CAPEX Calc</a>
-                <a href="opex-calculator.html" class="nav-link" style="color:#10b981;">OPEX Calc</a>
-                <a href="pue-calculator.html" class="nav-link" style="color:#06b6d4;">PUE Calc</a>
-                <a href="dcmoc/" class="nav-link" style="color:#ef4444;">DC MOC</a>
-                <a href="glossary.html" class="nav-link" style="color: #14b8a6;">Glossary</a>
-                <div class="nav-auth-wrap" id="navAuthWrap">
-                    <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
-                        <i class="fas fa-user-circle"></i>
-                        <span class="nav-login-text">Login</span>
-                    </button>
-                    <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
-                        <div class="nav-user-avatar" id="navUserAvatar">U</div>
-                        <span class="nav-user-email" id="navUserEmail"></span>
-                        <i class="fas fa-chevron-down nav-user-chevron"></i>
-                    </button>
-                    <div class="nav-user-dropdown" id="navUserDropdown">
-                        <div class="nav-dd-header">
-                            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div>
-                            <div class="nav-dd-email" id="navDdEmail"></div>
-                        </div>
-                        <button class="nav-dd-logout" onclick="logoutPremium()">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </div>
-                </div>
-                <a href="index.html" class="nav-back">
-                    <i class="fas fa-arrow-left"></i>
-                    Portfolio
-                </a>
-            </div>
+    <nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+          <div class="nav-auth-wrap" id="navAuthWrap">
+        <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()"><span class="nav-login-text">Login</span></button>
+        <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()"><span class="nav-user-avatar" id="navUserAvatar">U</span><span class="nav-user-email" id="navUserEmail"></span></button>
+        <div class="nav-user-dropdown" id="navUserDropdown">
+          <div class="nav-dd-header"><div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div><div class="nav-dd-email" id="navDdEmail"></div></div>
+          <a class="nav-dd-link" href="account.html">My account and saved scenarios</a>
+          <button class="nav-dd-logout" onclick="logoutPremium()">Logout</button>
+        </div>
+      </div>
+    <button class="nav-icon theme-toggle" id="navThemeBtn" onclick="toggleCalcTheme()" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i id="themeIcon" class="fas fa-moon"></i></button>
+  </div>
+</nav>
 
     <main class="main-content" id="main-content">
-        <section class="hero">
-            <div class="hero-badge"><i class="fas fa-certificate"></i> TIA-942-C Compliance</div>
-            <h1>TIA-942 Compliance Checklist</h1>
-            <p>Assess your data center infrastructure against TIA-942-C (2024) requirements. Evaluate 80+ items across 6 categories with tier-specific and facility-type filtering for enterprise, colocation, hyperscale, edge, and modular data centers.</p>
-            <div style="max-width:800px;margin:1.5rem auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:1px solid rgba(16,185,129,0.15);">
-                <img data-rz-hero src="assets/tia-942-hero.jpg" alt="TIA-942 Data Center Infrastructure Standard" style="width:100%;height:auto;display:block;" loading="lazy" width="1200" height="509">
+        <header class="tool-head">
+            <div class="wrap">
+                <p class="eyebrow">DC Solutions · <b>Checklist</b> · TIA-942</p>
+                <h1>TIA-942-C compliance <span class="muted">by tier and facility type</span></h1>
+                <p class="lede">Tick what the facility has against ANSI/TIA-942-C (2024) across site and architecture, electrical, mechanical, telecommunications, fire protection and physical security. The items shown follow the tier and facility type you pick; each item weighs W1 to W3 and each category by its share of risk. Scored in your browser.</p>
+                <p class="basis">basis ANSI/TIA-942-C (2024) · <span id="statItemCount">56</span> items for this tier and facility type · facility <span id="statDcType">Enterprise</span> · updated 2026-10</p>
+                <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → Checklist → TIA-942</p>
             </div>
-            <div style="max-width:800px;margin:0 auto 1.5rem;text-align:left;padding:1.25rem 1.5rem;background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.12);border-radius:12px;">
-                <h3 style="font-size:0.95rem;font-weight:700;color:#065f46;margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-info-circle" style="color:#10b981;"></i> About TIA-942</h3>
-                <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0;">
-                    <strong>ANSI/TIA-942-C</strong> (May 2024, superseding TIA-942-B) is the telecommunications infrastructure standard for data centers published by the Telecommunications Industry Association (TIA). It defines requirements across <strong>six critical domains</strong> — site/architecture, electrical, mechanical/cooling, telecommunications, fire protection, and physical security — organized into <strong>four tier levels</strong> of increasing redundancy and fault tolerance. <strong>Tier 1</strong> (Basic) provides a single path for power and cooling with no redundancy. <strong>Tier 2</strong> (Redundant Components) adds N+1 redundancy. <strong>Tier 3</strong> (Concurrently Maintainable) ensures any component can be serviced without IT interruption. <strong>Tier 4</strong> (Fault Tolerant) provides 2N fully independent infrastructure paths, tolerating any single fault with zero impact. This tool assesses compliance using <strong>weighted scoring</strong> with category importance factors reflecting real-world criticality.
-                </p>
-            </div>
-            <div class="quick-stats">
-                <span class="quick-stat"><i class="fas fa-clipboard-check"></i> <span id="statItemCount">56</span> checklist items</span>
-                <span class="quick-stat"><i class="fas fa-layer-group"></i> 4 tier levels</span>
-                <span class="quick-stat"><i class="fas fa-th-large"></i> 6 categories</span>
-                <span class="quick-stat"><i class="fas fa-server"></i> <span id="statDcType">Enterprise</span></span>
-            </div>
-        </section>
+        </header>
 
-        <!-- Toolbar -->
-        <div class="tia-toolbar">
-            <div class="tia-mode-bar">
-                <button class="tia-toolbar-btn tia-btn-free active" id="btnFreeMode" onclick="setMode('free')">
-                    <i class="fas fa-chart-bar"></i> Free Assessment
-                </button>
-                <button class="tia-toolbar-btn tia-btn-pro locked-hint" id="btnProMode" onclick="setMode('pro')">
-                    <i class="fas fa-crown"></i> Full analysis
-                </button>
+        <div class="wrap">
+        <div class="tool-bar" role="toolbar" aria-label="Mode and actions">
+            <div class="seg" role="group" aria-label="Assessment depth">
+                <button type="button" class="tia-toolbar-btn tia-btn-free active" id="btnFreeMode" aria-pressed="true" onclick="setMode('free')">Free</button>
+                <button type="button" class="tia-toolbar-btn tia-btn-pro locked-hint" id="btnProMode" aria-pressed="false" onclick="setMode('pro')">Full</button>
             </div>
-            <span class="tia-mode-indicator free-active" id="modeIndicator">FREE MODE</span>
-            <div class="tia-toolbar-actions">
-                <button class="tia-btn-reset" onclick="resetChecklist()">
-                    <i class="fas fa-undo"></i> Reset
-                </button>
-                <button class="tia-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()">
-                    <i class="fas fa-file-pdf"></i> Export PDF
-                </button>
-            </div>
+            <span class="tia-mode-indicator free-active" id="modeIndicator" hidden>FREE MODE</span>
+            <span class="spacer"></span>
+            <button type="button" class="tool-btn tia-btn-reset" onclick="resetChecklist()">Reset</button>
+            <button type="button" class="tool-btn tia-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()">Export PDF</button>
         </div>
-
-        <!-- Tier Selector -->
-        <div class="tier-selector">
-            <div class="dctype-label"><i class="fas fa-layer-group"></i> Tier Level</div>
-            <div class="tier-bar">
-                <button class="tier-btn" onclick="setTier(1)"><span class="tier-num">1</span> Basic</button>
-                <button class="tier-btn" onclick="setTier(2)"><span class="tier-num">2</span> Redundant</button>
-                <button class="tier-btn active" onclick="setTier(3)"><span class="tier-num">3</span> Concurrently Maintainable</button>
-                <button class="tier-btn" onclick="setTier(4)"><span class="tier-num">4</span> Fault Tolerant</button>
-            </div>
-        </div>
-
-        <!-- DC Type Selector -->
-        <div class="dctype-selector">
-            <div class="dctype-label"><i class="fas fa-server"></i> Facility Type</div>
-            <div class="dctype-bar">
-                <button class="dctype-btn active" onclick="setDcType('ent')" data-dc="ent"><i class="fas fa-building"></i> Enterprise</button>
-                <button class="dctype-btn" onclick="setDcType('colo')" data-dc="colo"><i class="fas fa-city"></i> Colocation</button>
-                <button class="dctype-btn" onclick="setDcType('hyper')" data-dc="hyper"><i class="fas fa-cloud"></i> Hyperscale</button>
-                <button class="dctype-btn" onclick="setDcType('edge')" data-dc="edge"><i class="fas fa-microchip"></i> Edge</button>
-                <button class="dctype-btn" onclick="setDcType('mod')" data-dc="mod"><i class="fas fa-cube"></i> Modular</button>
-            </div>
         </div>
 
         <!-- Calculator Grid -->
-        <section class="calculator-section">
-            <div class="calculator-grid">
-                <div class="checklist-panel" id="checklistPanel"></div>
-                <div class="results-panel">
-                    <div class="results-card">
-                        <div class="score-display">
-                            <div class="score-value" id="scoreValue" style="color:#10b981;">0%</div>
-                            <div class="score-label">Overall Compliance</div>
-                            <div class="score-grade" id="scoreGrade" style="background:rgba(107,114,128,0.1);color:#94a3b8;">F — Incomplete</div>
-                        </div>
-                        <div class="metric-grid">
-                            <div class="metric-box"><div class="metric-label">Checked</div><div class="metric-value" id="metricChecked">0</div></div>
-                            <div class="metric-box"><div class="metric-label">Applicable</div><div class="metric-value" id="metricApplicable">0</div></div>
-                            <div class="metric-box"><div class="metric-label">Risk Index</div><div class="metric-value" id="metricCRI">0</div></div>
-                            <div class="metric-box"><div class="metric-label">Tier Level</div><div class="metric-value" id="metricTier">3</div></div>
-                            <div class="metric-box"><div class="metric-label">Weakest Cat.</div><div class="metric-value" id="metricWeakest">0%</div></div>
-                            <div class="metric-box"><div class="metric-label">Maturity</div><div class="metric-value" id="metricMaturity" style="font-size:0.85rem;">L1</div></div>
-                            <div class="metric-box" style="grid-column:span 2;"><div class="metric-label">Facility Type</div><div class="metric-value" id="metricDcType" style="font-size:0.85rem;">Enterprise</div></div>
-                        </div>
-                        <div class="cat-bars" id="catBars">
-                            <div class="cat-bars-title"><i class="fas fa-chart-bar" style="color:var(--accent-emerald);"></i> Category Scores</div>
-                        </div>
-                        <div class="rec-section" id="recSection">
-                            <div class="rec-title"><i class="fas fa-lightbulb" style="color:var(--accent-emerald);"></i> Top Gaps</div>
-                            <div id="recCards"></div>
-                        </div>
-                    </div>
+        <section class="calculator-section wrap">
+            <div class="calculator-grid tool-bench">
+                <div class="tool-inputs tia-inputs">
+                    <div class="input-section"><div class="section-header"><span class="section-title">Tier level</span></div>
+                        <div class="preset-row tier-bar" role="group" aria-label="Tier level">
+                            <button type="button" class="preset-btn tier-btn" aria-pressed="false" onclick="setTier(1)">Tier 1 · Basic</button>
+                            <button type="button" class="preset-btn tier-btn" aria-pressed="false" onclick="setTier(2)">Tier 2 · Redundant</button>
+                            <button type="button" class="preset-btn tier-btn active" aria-pressed="true" onclick="setTier(3)">Tier 3 · Concurrently maintainable</button>
+                            <button type="button" class="preset-btn tier-btn" aria-pressed="false" onclick="setTier(4)">Tier 4 · Fault tolerant</button>
+                        </div></div>
+                    <div class="input-section"><div class="section-header"><span class="section-title">Facility type</span></div>
+                        <div class="preset-row dctype-bar" role="group" aria-label="Facility type">
+                            <button type="button" class="preset-btn dctype-btn active" aria-pressed="true" onclick="setDcType('ent')" data-dc="ent">Enterprise</button>
+                            <button type="button" class="preset-btn dctype-btn" aria-pressed="false" onclick="setDcType('colo')" data-dc="colo">Colocation</button>
+                            <button type="button" class="preset-btn dctype-btn" aria-pressed="false" onclick="setDcType('hyper')" data-dc="hyper">Hyperscale</button>
+                            <button type="button" class="preset-btn dctype-btn" aria-pressed="false" onclick="setDcType('edge')" data-dc="edge">Edge</button>
+                            <button type="button" class="preset-btn dctype-btn" aria-pressed="false" onclick="setDcType('mod')" data-dc="mod">Modular</button>
+                        </div></div>
+                    <div class="input-section"><div class="section-header"><span class="section-title">Checklist</span><div class="section-subtitle">Tick what the facility has. W3 critical, W2 important, W1 standard.</div></div>
+                        <div class="checklist-panel" id="checklistPanel"></div></div>
+                </div>
+                <div class="results-panel tool-results">
+                    <div class="res-head"><h2>Results</h2><span class="basis">score = Σ category % · weight / Σ weights</span></div>
+                    <div class="res-group"><h3>Headline</h3><div data-rz-fact-list>
+                        <div class="metric-box is-key"><div class="metric-label">Overall compliance</div><div class="metric-value" id="scoreValue">0%</div><div class="metric-sub"><span class="state" id="scoreGrade">F — Incomplete</span></div></div>
+                    </div></div>
+                    <div class="res-group"><h3>Detail</h3><div class="metric-grid" data-rz-fact-list>
+                        <div class="metric-box"><div class="metric-label">Items checked</div><div class="metric-value" id="metricChecked">0</div></div>
+                        <div class="metric-box"><div class="metric-label">Items applicable</div><div class="metric-value" id="metricApplicable">0</div></div>
+                        <div class="metric-box"><div class="metric-label">Risk index</div><div class="metric-value" id="metricCRI">0</div></div>
+                        <div class="metric-box"><div class="metric-label">Tier level</div><div class="metric-value" id="metricTier">3</div></div>
+                        <div class="metric-box"><div class="metric-label">Weakest category</div><div class="metric-value" id="metricWeakest">0%</div></div>
+                        <div class="metric-box"><div class="metric-label">Maturity</div><div class="metric-value" id="metricMaturity">L1</div></div>
+                        <div class="metric-box"><div class="metric-label">Facility type</div><div class="metric-value" id="metricDcType">Enterprise</div></div>
+                    </div></div>
+                    <div class="res-group"><h3>Category scores</h3><div class="cat-bars" id="catBars"></div></div>
+                    <div class="rec-section" id="recSection"><div class="rec-title">Top gaps</div><div id="recCards"></div></div>
                 </div>
             </div>
         </section>
 
         <!-- Charts -->
-        <section class="charts-section">
+        <section class="charts-section wrap">
             <div class="charts-grid">
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fas fa-chart-pie" style="color:var(--accent-emerald);"></i> Compliance Overview</div>
-                    <div class="chart-container"><canvas id="doughnutChart"></canvas></div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fas fa-chart-bar" style="color:var(--accent-emerald);"></i> Category Comparison</div>
-                    <div class="chart-container"><canvas id="barChart"></canvas></div>
-                </div>
+                <figure class="fig chart-card"><div class="chart-container"><canvas id="doughnutChart"></canvas></div><figcaption><b>FIG. 1</b> Share of weighted items in place · computed from the inputs above</figcaption></figure>
+                <figure class="fig chart-card"><div class="chart-container"><canvas id="barChart"></canvas></div><figcaption><b>FIG. 2</b> Score by category against the 75 % target · amber = weakest · computed from the inputs above</figcaption></figure>
             </div>
             <!-- Pro Charts -->
-            <div class="charts-grid pro-section locked" id="proChartsSection" style="margin-top:1.5rem;">
-                <div class="pro-overlay" onclick="handlePremiumTab()">
-                    <i class="fas fa-crown"></i>
-                    <div class="pro-overlay-title">Full charts</div>
-                    <div class="pro-overlay-desc">Multi-tier radar comparison and Monte Carlo risk distribution</div>
-                    <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fas fa-spider" style="color:var(--accent-purple);"></i> Tier Radar <span class="pro-badge"><i class="fas fa-crown"></i> FULL</span></div>
-                    <div class="chart-container"><canvas id="radarChart"></canvas></div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title"><i class="fas fa-chart-area" style="color:var(--accent-purple);"></i> Monte Carlo Distribution <span class="pro-badge"><i class="fas fa-crown"></i> FULL</span></div>
-                    <div class="chart-container"><canvas id="mcChart"></canvas></div>
-                </div>
+            <div class="charts-grid pro-section locked" id="proChartsSection">
+                <div class="pro-overlay tool-full" onclick="handlePremiumTab()"><p><b>Full analysis</b> — tier radar, Monte Carlo range, gap analysis, score by tier, remediation roadmap and sensitivity</p><button class="pro-overlay-btn">Sign in</button></div>
+                <figure class="fig chart-card"><div class="chart-container"><canvas id="radarChart"></canvas></div><figcaption><b>FIG. 3</b> Score by category for each tier · amber = selected tier · computed from the inputs above</figcaption></figure>
+                <figure class="fig chart-card"><div class="chart-container"><canvas id="mcChart"></canvas></div><figcaption><b>FIG. 4</b> Compliance score over 10,000 runs · amber = median bin · computed from the inputs above</figcaption></figure>
             </div>
         </section>
 
         <!-- Pro Panels -->
-        <section class="charts-section">
+        <section class="charts-section wrap">
             <!-- Gap Analysis -->
             <div class="pro-section locked" id="proGapSection">
-                <div class="pro-overlay" onclick="handlePremiumTab()">
-                    <i class="fas fa-crown"></i>
-                    <div class="pro-overlay-title">FULL Gap Analysis</div>
-                    <div class="pro-overlay-desc">Prioritized list of unchecked items with remediation guidance</div>
-                    <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button>
-                </div>
-                <div class="pro-panel">
-                    <h3><i class="fas fa-search" style="color:var(--accent-emerald);"></i> Gap Analysis <span class="pro-badge"><i class="fas fa-crown"></i> FULL</span></h3>
-                    <table class="gap-table" id="gapTable">
+                <div class="pro-panel tool-results"><div class="res-head"><h2>Gap analysis · unchecked items by priority</h2></div>
+                    <div class="tia-tbl"><table class="gap-table" id="gapTable">
                         <thead><tr><th scope="col">Priority</th><th scope="col">Item</th><th scope="col">Category</th><th scope="col">Weight</th><th scope="col">Reference</th></tr></thead>
                         <tbody id="gapTableBody"></tbody>
-                    </table>
+                    </table></div>
                 </div>
             </div>
             <!-- Monte Carlo -->
             <div class="pro-section locked" id="proMCSection">
-                <div class="pro-overlay" onclick="handlePremiumTab()">
-                    <i class="fas fa-crown"></i>
-                    <div class="pro-overlay-title">FULL Monte Carlo Risk</div>
-                    <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button>
-                </div>
-                <div class="pro-panel">
-                    <h3><i class="fas fa-dice" style="color:var(--accent-purple);"></i> Monte Carlo Simulation <span class="pro-badge"><i class="fas fa-crown"></i> FULL</span></h3>
-                    <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">10,000 iterations with ±15% weight variance. Shows probability distribution of compliance scores.</p>
-                    <div id="mcResults" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;"></div>
+                <div class="pro-panel tool-results"><div class="res-head"><h2>Monte Carlo range</h2></div>
+                    <p class="res-fine">10,000 runs, each item weight varied ±15 %. The spread of the compliance score.</p><div id="mcResults" data-rz-fact-list></div>
                 </div>
             </div>
             <!-- Tier Comparison -->
             <div class="pro-section locked" id="proTierSection">
-                <div class="pro-overlay" onclick="handlePremiumTab()"><i class="fas fa-crown"></i><div class="pro-overlay-title">FULL Tier Comparison</div><button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button></div>
-                <div class="pro-panel">
-                    <h3><i class="fas fa-columns" style="color:var(--accent-cyan);"></i> Tier Comparison <span class="pro-badge"><i class="fas fa-crown"></i> FULL</span></h3>
+                <div class="pro-panel tool-results"><div class="res-head"><h2>Score by tier</h2></div>
                     <div id="tierCompare"></div>
                 </div>
             </div>
             <!-- Roadmap -->
             <div class="pro-section locked" id="proRoadmapSection">
-                <div class="pro-overlay" onclick="handlePremiumTab()"><i class="fas fa-crown"></i><div class="pro-overlay-title">FULL Remediation Roadmap</div><button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button></div>
-                <div class="pro-panel">
-                    <h3><i class="fas fa-road" style="color:var(--accent-gold);"></i> Remediation Roadmap <span class="pro-badge"><i class="fas fa-crown"></i> FULL</span></h3>
-                    <table class="gap-table" id="roadmapTable">
+                <div class="pro-panel tool-results"><div class="res-head"><h2>Remediation roadmap · first 15 gaps</h2></div>
+                    <div class="tia-tbl"><table class="gap-table" id="roadmapTable">
                         <thead><tr><th scope="col">Item</th><th scope="col">Effort</th><th scope="col">Est. Cost</th><th scope="col">Timeline</th><th scope="col">Impact</th></tr></thead>
                         <tbody id="roadmapBody"></tbody>
-                    </table>
+                    </table></div>
                 </div>
             </div>
             <!-- Sensitivity -->
             <div class="pro-section locked" id="proSensSection">
-                <div class="pro-overlay" onclick="handlePremiumTab()"><i class="fas fa-crown"></i><div class="pro-overlay-title">FULL Sensitivity Analysis</div><button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button></div>
-                <div class="pro-panel">
-                    <h3><i class="fas fa-chart-line" style="color:var(--accent-red);"></i> Sensitivity — Top 10 Impact Items <span class="pro-badge"><i class="fas fa-crown"></i> FULL</span></h3>
+                <div class="pro-panel tool-results"><div class="res-head"><h2>Sensitivity · the ten items that move the score most</h2></div>
                     <div id="sensitivityBars"></div>
                 </div>
             </div>
         </section>
     
-    <!-- Calculator Disclaimer -->
-    <div style="max-width:1400px;margin:2rem auto 0;padding:0 2rem;">
-        <div class="calc-disclaimer" style="background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;">
-            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
-                <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;"><i class="fas fa-triangle-exclamation"></i></div>
-                <div>
-                    <div class="disc-title" style="font-weight:700;font-size:0.8rem;color:#e2e8f0;margin-bottom:0.5rem;">Disclaimer &amp; Data Sources</div>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">This calculator is provided for <strong style="color:#cbd5e1;">educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis.</p>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;"><strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong> ANSI/TIA-942-C Telecommunications Infrastructure Standard for Data Centers (May 2024, supersedes TIA-942-B 2017; changes per TIA's TIA-942-C white paper), clause numbers shown follow the TIA-942-B numbering and are indicative, Uptime Institute Tier Classification System, ANSI/BICSI 002-2024 Data Center Design and Implementation Best Practices (May 2024).</p>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a> for details.</p>
-                    <p class="disc-fine" style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms of Service</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    
+    
 
-    </main>
+    
+        <section class="tool-ref" aria-labelledby="ref-h">
+            <div class="wrap">
+                <p class="eyebrow" id="ref-h">02 / Reference</p>
+                <div class="ref-grid">
+                    <div>
+                        <h3>Method</h3>
+                        <ul class="formulas">
+                            <li><span>Category score</span><code>Σ w (checked) / Σ w (applicable) · 100, w = 1 to 3</code></li>
+                            <li><span>Overall</span><code>Σ (category score · category weight) / Σ category weights</code></li>
+                            <li><span>Category weight</span><code>electrical 1.5, mechanical 1.3, fire 1.1, site 1.0, telecom 1.0, security 0.9</code></li>
+                            <li><span>Risk index</span><code>overall · (1 − min(0.15, σ of category scores / 200))</code></li>
+                            <li><span>Maturity</span><code>L2 at risk index ≥ 40, L3 ≥ 60, L4 ≥ 80, L5 ≥ 95</code></li>
+                            <li><span>Grade</span><code>A+ ≥ 95, A ≥ 85, B ≥ 75, C ≥ 65, D ≥ 50, else F</code></li>
+                            <li><span>Monte Carlo</span><code>10,000 runs, each item weight · U(0.85, 1.15)</code></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Computed against</h3>
+                        <p class="against"><span>ANSI/TIA-942-C (2024)</span><span>Uptime Institute Tier Classification</span><span>ANSI/BICSI 002-2024</span><span>clause numbers follow TIA-942-B and are indicative</span></p>
+                        <h3>Read further</h3>
+                        <p class="links"><a href="manual/tia-942-checklist.html">Technical manual and methodology</a><a href="glossary.html">Glossary</a><a href="tier-advisor.html">Tier advisor</a><a href="capex-calculator.html">CAPEX calculator</a><a href="pue-calculator.html">PUE calculator</a><a href="datacenter-solutions.html">DC Solutions</a><a href="account.html">My account and saved scenarios</a></p>
+                    </div>
+                </div>
+                <p class="notice">This calculator is provided for <strong>educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis. All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html">Privacy Policy</a> for details. By using this tool you agree to our <a href="terms.html">Terms of Service</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
+            </div>
+        </section>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models. Mission-critical infrastructure, documented.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
 
     <!-- Login Modal -->
 
@@ -719,19 +373,19 @@
     <script>
     // ═══ DATA MODEL ═══
     const CATEGORIES = [
-        { id:'site', label:'Site & Architecture', icon:'fa-building', color:'#10b981', weight:1.0 },
-        { id:'elec', label:'Electrical', icon:'fa-bolt', color:'#f59e0b', weight:1.5 },
-        { id:'mech', label:'Mechanical / Cooling', icon:'fa-snowflake', color:'#06b6d4', weight:1.3 },
-        { id:'tel', label:'Telecommunications', icon:'fa-network-wired', color:'#3b82f6', weight:1.0 },
+        { id:'site', label:'Site & Architecture', icon:'fa-building', color:'#D49A2A', weight:1.0 },
+        { id:'elec', label:'Electrical', icon:'fa-bolt', color:'#A0AEC0', weight:1.5 },
+        { id:'mech', label:'Mechanical / Cooling', icon:'fa-snowflake', color:'#7D8794', weight:1.3 },
+        { id:'tel', label:'Telecommunications', icon:'fa-network-wired', color:'#5E6673', weight:1.0 },
         { id:'fire', label:'Fire Protection', icon:'fa-fire-extinguisher', color:'#ef4444', weight:1.1 },
         { id:'sec', label:'Physical Security', icon:'fa-shield-alt', color:'#64748b', weight:0.9 }
     ];
     const DC_TYPES = [
-        {id:'ent', label:'Enterprise', icon:'fa-building', color:'#3b82f6'},
+        {id:'ent', label:'Enterprise', icon:'fa-building', color:'#5E6673'},
         {id:'colo', label:'Colocation', icon:'fa-city', color:'#64748b'},
-        {id:'hyper', label:'Hyperscale/Cloud', icon:'fa-cloud', color:'#06b6d4'},
-        {id:'edge', label:'Edge/Micro', icon:'fa-microchip', color:'#f59e0b'},
-        {id:'mod', label:'Modular/Prefab', icon:'fa-cube', color:'#10b981'}
+        {id:'hyper', label:'Hyperscale/Cloud', icon:'fa-cloud', color:'#7D8794'},
+        {id:'edge', label:'Edge/Micro', icon:'fa-microchip', color:'#A0AEC0'},
+        {id:'mod', label:'Modular/Prefab', icon:'fa-cube', color:'#D49A2A'}
     ];
     const DC_ALL = ['ent','colo','hyper','edge','mod'];
     const ITEMS = [
@@ -961,11 +615,11 @@
             var headerOpen = ci < 2 ? ' open' : '';
             var bodyOpen = ci < 2 ? ' open' : '';
             div.innerHTML = '<div class="cat-header' + headerOpen + '" onclick="toggleCat(this)">' +
-                '<div class="cat-icon" style="background:' + cat.color + '18;color:' + cat.color + ';"><i class="fas ' + cat.icon + '"></i></div>' +
+                
                 '<div class="cat-info"><div class="cat-title">' + cat.label + '</div>' +
-                '<div class="cat-progress-wrap"><div class="cat-progress-bar"><div class="cat-progress-fill" style="width:' + (items.length ? (checked/items.length*100) : 0) + '%;background:' + cat.color + ';"></div></div>' +
+                '<div class="cat-progress-wrap"><div class="cat-progress-bar"><div class="cat-progress-fill" style="width:' + (items.length ? (checked/items.length*100) : 0) + '%;"></div></div>' +
                 '<span class="cat-count" data-cat="' + cat.id + '">' + checked + '/' + items.length + '</span></div></div>' +
-                '<i class="fas fa-chevron-down cat-chevron"></i></div>' +
+                '<span class="cat-chevron" aria-hidden="true"></span></div>' +
                 '<div class="cat-body' + bodyOpen + '"><div class="cat-items" id="cat-items-' + cat.id + '"></div></div>';
             panel.appendChild(div);
             var itemsDiv = div.querySelector('#cat-items-' + cat.id);
@@ -974,7 +628,7 @@
                 var wClass = 'w' + it.w;
                 var wLabel = it.w === 3 ? 'Critical' : (it.w === 2 ? 'Important' : 'Standard');
                 var catObj = CATEGORIES.find(function(c){return c.id===it.cat;});
-                var tipHtml = it.tip ? '<span class="tooltip-trigger">?<div class="tooltip-data" data-title="' + it.label.replace(/"/g,'&quot;') + '" data-desc="' + it.tip.replace(/"/g,'&quot;') + '" data-ref="' + it.ref + '" data-weight="W' + it.w + ' — ' + wLabel + '" data-icon="' + catObj.icon + '"></div></span>' : '';
+                var tipHtml = it.tip ? '<span class="tooltip-trigger" tabindex="0">?<span class="tooltip-content"><span class="tooltip-title">' + it.label + '</span>' + it.tip + '<span class="tip-meta">' + it.ref + ' · W' + it.w + ' ' + wLabel.toLowerCase() + '</span></span></span>' : '';
                 itemsDiv.innerHTML += '<div class="check-item">' +
                     '<input type="checkbox" id="chk-' + it.id + '"' + isChecked + ' onchange="onCheck(\'' + it.id + '\',this.checked)">' +
                     '<label class="check-label" for="chk-' + it.id + '">' + it.label + '</label>' +
@@ -1025,22 +679,20 @@
         var maturityLabels = {1:'Initial',2:'Developing',3:'Defined',4:'Managed',5:'Optimized'};
 
         var grade, gradeColor;
-        if (overall >= 95) { grade = 'A+'; gradeColor = '#10b981'; }
-        else if (overall >= 85) { grade = 'A'; gradeColor = '#10b981'; }
-        else if (overall >= 75) { grade = 'B'; gradeColor = '#06b6d4'; }
-        else if (overall >= 65) { grade = 'C'; gradeColor = '#f59e0b'; }
-        else if (overall >= 50) { grade = 'D'; gradeColor = '#f97316'; }
+        if (overall >= 95) { grade = 'A+'; gradeColor = '#D49A2A'; }
+        else if (overall >= 85) { grade = 'A'; gradeColor = '#D49A2A'; }
+        else if (overall >= 75) { grade = 'B'; gradeColor = '#7D8794'; }
+        else if (overall >= 65) { grade = 'C'; gradeColor = '#A0AEC0'; }
+        else if (overall >= 50) { grade = 'D'; gradeColor = '#C9CFD8'; }
         else { grade = 'F'; gradeColor = '#ef4444'; }
         var gradeLabels = {'A+':'Excellent','A':'Very Good','B':'Good','C':'Fair','D':'Below Standard','F':'Incomplete'};
 
         // Update UI
         var sv = document.getElementById('scoreValue');
         sv.textContent = Math.round(overall) + '%';
-        sv.style.color = gradeColor;
         var sg = document.getElementById('scoreGrade');
         sg.textContent = grade + ' — ' + gradeLabels[grade];
-        sg.style.background = gradeColor + '18';
-        sg.style.color = gradeColor;
+        sg.setAttribute('data-state', overall >= 75 ? 'ok' : overall >= 50 ? 'watch' : 'hazard');
 
         var totalChecked = 0, totalApplicable = 0, totalCheckedWeight = 0;
         CATEGORIES.forEach(function(cat) {
@@ -1055,7 +707,6 @@
         document.getElementById('metricCRI').textContent = Math.round(cri);
         document.getElementById('metricTier').textContent = currentTier;
         document.getElementById('metricWeakest').textContent = Math.round(weakestLink) + '%';
-        document.getElementById('metricWeakest').style.color = weakestLink >= 75 ? '#10b981' : (weakestLink >= 50 ? '#f59e0b' : '#ef4444');
         document.getElementById('metricMaturity').textContent = 'L' + maturity;
         document.getElementById('metricMaturity').title = maturityLabels[maturity];
         var dcObj = DC_TYPES.find(function(d){return d.id===currentDcType;});
@@ -1063,12 +714,12 @@
         if (metricDcEl && dcObj) metricDcEl.textContent = dcObj.label;
 
         // Category bars
-        var barsHtml = '<div class="cat-bars-title"><i class="fas fa-chart-bar" style="color:var(--accent-emerald);"></i> Category Scores</div>';
+        var barsHtml = '', _weak = Math.min.apply(null, CATEGORIES.map(function(c) { return catScores[c.id].pct; }));
         CATEGORIES.forEach(function(cat) {
             var s = catScores[cat.id];
-            barsHtml += '<div class="cat-bar-row"><span class="cat-bar-label" title="' + cat.label + '">' + cat.label.split('/')[0].split('&')[0].trim() + '</span>' +
-                '<div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + s.pct + '%;background:' + cat.color + ';"></div></div>' +
-                '<span class="cat-bar-pct" style="color:' + cat.color + ';">' + Math.round(s.pct) + '%</span></div>';
+            barsHtml += '<div class="cat-bar-row' + (s.pct === _weak ? ' is-weak' : '') + '"><span class="cat-bar-label" title="' + cat.label + '">' + cat.label.split('/')[0].split('&')[0].trim() + '</span>' +
+                '<div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + s.pct + '%;"></div></div>' +
+                '<span class="cat-bar-pct">' + Math.round(s.pct) + '%</span></div>';
         });
         document.getElementById('catBars').innerHTML = barsHtml;
 
@@ -1086,10 +737,10 @@
         var recHtml = '';
         gaps.slice(0, 3).forEach(function(it) {
             var cat = CATEGORIES.find(function(c) { return c.id === it.cat; });
-            recHtml += '<div class="rec-card"><div class="rec-icon" style="background:' + cat.color + '15;color:' + cat.color + ';"><i class="fas ' + cat.icon + '"></i></div>' +
+            recHtml += '<div class="rec-card">' +
                 '<div class="rec-text"><h4>' + it.label + '</h4><p>' + cat.label + ' · Weight ' + it.w + ' · ' + it.ref + '</p></div></div>';
         });
-        document.getElementById('recCards').innerHTML = recHtml || '<p style="font-size:0.82rem;color:var(--text-muted);">All items checked!</p>';
+        document.getElementById('recCards').innerHTML = recHtml || '<p class="res-fine">Every applicable item is checked.</p>';
 
         updateCharts(catScores, overall);
         if (isPremiumUser) updateProPanels(catScores, gaps, overall);
@@ -1141,7 +792,7 @@
         var pcts = CATEGORIES.map(function(c) { return Math.round(catScores[c.id].pct); });
         var colors = CATEGORIES.map(function(c) { return c.color; });
 
-        var gradeColor = overall >= 85 ? '#10b981' : (overall >= 65 ? '#f59e0b' : '#ef4444');
+        var gradeColor = overall >= 85 ? '#D49A2A' : (overall >= 65 ? '#A0AEC0' : '#ef4444');
 
         // Doughnut with center text
         var dCtx = document.getElementById('doughnutChart').getContext('2d');
@@ -1150,14 +801,14 @@
             type: 'doughnut',
             data: { labels: ['Compliant', 'Non-Compliant'], datasets: [{
                 data: [Math.round(overall), Math.round(100 - overall)],
-                backgroundColor: [gradeColor, '#e5e7eb'],
-                hoverBackgroundColor: [gradeColor + 'dd', '#d1d5db'],
-                borderWidth: 0, borderRadius: 4
+                backgroundColor: ['rgb(212, 154, 42)', 'rgba(140, 150, 163, 0.25)'],
+                hoverBackgroundColor: ['rgb(212, 154, 42)', 'rgba(140, 150, 163, 0.35)'],
+                borderWidth: 0, borderRadius: 0
             }] },
             options: { responsive: true, interaction:{intersect:false}, maintainAspectRatio: false, cutout: '72%',
                 plugins: {
                     legend: { position: 'bottom', labels: { font: { family: 'IBM Plex Sans', size: 12 }, padding: 16 } },
-                    centerText: { text: Math.round(overall) + '%', color: gradeColor, sub: 'Compliance' }
+                    centerText: { text: Math.round(overall) + '%', color: getComputedStyle(document.body).color, sub: 'Compliance' }
                 },
                 animation: { animateRotate: true, duration: 800 }
             }
@@ -1166,15 +817,13 @@
         // Bar with threshold line + data labels
         var bCtx = document.getElementById('barChart').getContext('2d');
         if (barChart) barChart.destroy();
-        var bgColors = pcts.map(function(p, i) {
-            var c = colors[i];
-            return p >= 75 ? c + '50' : (p >= 50 ? c + '35' : c + '20');
-        });
+        var _minP = Math.min.apply(null, pcts);
+        var bgColors = pcts.map(function(p) { return p === _minP ? 'rgb(212, 154, 42)' : 'rgba(125, 135, 148, 0.55)'; });
         barChart = new Chart(bCtx, {
             type: 'bar',
             data: { labels: labels, datasets: [{
                 label: 'Score %', data: pcts,
-                backgroundColor: bgColors, borderColor: colors, borderWidth: 2, borderRadius: 8
+                backgroundColor: bgColors, borderWidth: 0, borderRadius: 0
             }] },
             options: { responsive: true, interaction:{mode:'index',intersect:false}, maintainAspectRatio: false,
                 scales: {
@@ -1184,7 +833,7 @@
                 },
                 plugins: {
                     legend: { display: false },
-                    thresholdLine: { value: 75, color: 'rgba(239,68,68,0.45)', label: '75% Target' },
+                    thresholdLine: { value: 75, color: 'rgba(140,150,163,0.9)', label: '75 % target' },
                     tooltip: { callbacks: { label: function(ctx) { return ctx.parsed.y + '% compliance'; } } }
                 },
                 animation: { duration: 600 }
@@ -1206,29 +855,26 @@
 
         // Monte Carlo
         var mcResults = runMonteCarlo(10000);
-        var mcColor = function(v){return v>=85?'#10b981':(v>=65?'#f59e0b':'#ef4444');};
+        var mcColor = function(v){return v>=85?'#D49A2A':(v>=65?'#A0AEC0':'#ef4444');};
         document.getElementById('mcResults').innerHTML =
-            '<div class="metric-box"><div class="metric-label">Mean</div><div class="metric-value" style="color:'+mcColor(mcResults.mean)+'">' + mcResults.mean.toFixed(1) + '%</div></div>' +
-            '<div class="metric-box"><div class="metric-label">Std Dev</div><div class="metric-value">±' + mcResults.stddev.toFixed(1) + '%</div></div>' +
-            '<div class="metric-box"><div class="metric-label">P5 (Worst)</div><div class="metric-value" style="color:'+mcColor(mcResults.p5)+'">' + mcResults.p5.toFixed(1) + '%</div></div>' +
-            '<div class="metric-box"><div class="metric-label">P95 (Best)</div><div class="metric-value" style="color:'+mcColor(mcResults.p95)+'">' + mcResults.p95.toFixed(1) + '%</div></div>' +
+            '<div class="metric-box"><div class="metric-label">Mean</div><div class="metric-value">' + mcResults.mean.toFixed(1) + '%</div></div>' +
+            '<div class="metric-box"><div class="metric-label">Standard deviation</div><div class="metric-value">±' + mcResults.stddev.toFixed(1) + '%</div></div>' +
+            '<div class="metric-box"><div class="metric-label">P5, low case</div><div class="metric-value">' + mcResults.p5.toFixed(1) + '%</div></div>' +
             '<div class="metric-box"><div class="metric-label">P25</div><div class="metric-value">' + mcResults.p25.toFixed(1) + '%</div></div>' +
-            '<div class="metric-box"><div class="metric-label">Median (P50)</div><div class="metric-value" style="font-weight:800;">' + mcResults.p50.toFixed(1) + '%</div></div>' +
+            '<div class="metric-box is-key"><div class="metric-label">P50, median</div><div class="metric-value">' + mcResults.p50.toFixed(1) + '%</div></div>' +
             '<div class="metric-box"><div class="metric-label">P75</div><div class="metric-value">' + mcResults.p75.toFixed(1) + '%</div></div>' +
-            '<div class="metric-box"><div class="metric-label">90% CI Range</div><div class="metric-value" style="font-size:0.85rem;">' + mcResults.p5.toFixed(0) + '-' + mcResults.p95.toFixed(0) + '%</div></div>';
+            '<div class="metric-box"><div class="metric-label">P95, high case</div><div class="metric-value">' + mcResults.p95.toFixed(1) + '%</div></div>' +
+            '<div class="metric-box"><div class="metric-label">90 % interval</div><div class="metric-value">' + mcResults.p5.toFixed(0) + '–' + mcResults.p95.toFixed(0) + '%</div></div>';
 
         // MC Chart — color-coded bins
         var mcCtx = document.getElementById('mcChart').getContext('2d');
         if (mcChart) mcChart.destroy();
         var binColors = mcResults.bins.map(function(b) {
-            var mid = parseInt(b.label); return mid >= 85 ? 'rgba(16,185,129,0.5)' : (mid >= 65 ? 'rgba(245,158,11,0.5)' : (mid >= 50 ? 'rgba(249,115,22,0.5)' : 'rgba(239,68,68,0.4)'));
-        });
-        var binBorders = mcResults.bins.map(function(b) {
-            var mid = parseInt(b.label); return mid >= 85 ? '#10b981' : (mid >= 65 ? '#f59e0b' : (mid >= 50 ? '#f97316' : '#ef4444'));
+            var lo = parseInt(b.label); return (mcResults.p50 >= lo && mcResults.p50 < lo + 10) || (lo === 90 && mcResults.p50 >= 90) ? 'rgb(212, 154, 42)' : 'rgba(125, 135, 148, 0.55)';
         });
         mcChart = new Chart(mcCtx, {
             type: 'bar',
-            data: { labels: mcResults.bins.map(function(b) { return b.label; }), datasets: [{ label: 'Frequency', data: mcResults.bins.map(function(b) { return b.count; }), backgroundColor: binColors, borderColor: binBorders, borderWidth: 1.5, borderRadius: 3 }] },
+            data: { labels: mcResults.bins.map(function(b) { return b.label; }), datasets: [{ label: 'Frequency', data: mcResults.bins.map(function(b) { return b.count; }), backgroundColor: binColors, borderWidth: 0, borderRadius: 0 }] },
             options: { responsive: true, interaction:{mode:'index',intersect:false}, maintainAspectRatio: false,
                 plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx){return ctx.parsed.y + ' iterations (' + (ctx.parsed.y/100).toFixed(1) + '%)';} } } },
                 scales: { y: { ticks: { font: { size: 9 } }, title: { display: true, text: 'Frequency', font: { size: 10 } } }, x: { ticks: { font: { size: 8 }, maxRotation: 45 }, title: { display: true, text: 'Score Range', font: { size: 10 } } } }
@@ -1245,8 +891,8 @@
                 items.forEach(function(it) { tw += it.w; if (checkedItems[it.id]) cw += it.w; });
                 return tw > 0 ? Math.round(cw / tw * 100) : 0;
             });
-            var colors = ['rgba(107,114,128,','rgba(59,130,246,','rgba(16,185,129,','rgba(100, 116, 139,'];
-            return { label: 'Tier ' + t, data: ds, borderColor: colors[t-1] + '0.8)', backgroundColor: colors[t-1] + '0.1)', borderWidth: t === currentTier ? 3 : 1.5, pointRadius: t === currentTier ? 4 : 2 };
+            var rgb = t === currentTier ? 'rgba(212,154,42,' : 'rgba(125,135,148,';
+            return { label: 'Tier ' + t, data: ds, borderColor: rgb + (t === currentTier ? '1)' : '0.6)'), backgroundColor: rgb + (t === currentTier ? '0.12)' : '0.04)'), pointBackgroundColor: rgb + '1)', borderWidth: t === currentTier ? 3 : 1.5, pointRadius: t === currentTier ? 4 : 2 };
         });
         radarChart = new Chart(radarCtx, {
             type: 'radar',
@@ -1257,14 +903,13 @@
         // Tier Comparison table
         var tcHtml = '<table class="gap-table"><thead><tr><th scope="col">Category</th><th scope="col">Tier 1</th><th scope="col">Tier 2</th><th scope="col">Tier 3</th><th scope="col">Tier 4</th></tr></thead><tbody>';
         CATEGORIES.forEach(function(cat) {
-            tcHtml += '<tr><td style="font-weight:600;">' + cat.label + '</td>';
+            tcHtml += '<tr><td>' + cat.label + '</td>';
             [1,2,3,4].forEach(function(t) {
                 var items = ITEMS.filter(function(it) { return it.cat === cat.id && it.tiers.indexOf(t) !== -1 && it.dcTypes.indexOf(currentDcType) !== -1; });
                 var cw = 0, tw = 0;
                 items.forEach(function(it) { tw += it.w; if (checkedItems[it.id]) cw += it.w; });
                 var pct = tw > 0 ? Math.round(cw / tw * 100) : 0;
-                var col = pct >= 80 ? '#10b981' : (pct >= 50 ? '#f59e0b' : '#ef4444');
-                tcHtml += '<td style="font-family:\'JetBrains Mono\',monospace;color:' + col + ';font-weight:600;">' + pct + '%</td>';
+                tcHtml += '<td class="num' + (t === currentTier ? ' is-cur' : '') + '">' + pct + '%</td>';
             });
             tcHtml += '</tr>';
         });
@@ -1302,15 +947,12 @@
         var maxImpact = sensItems.length ? sensItems[0].impact : 1;
         sensItems.slice(0, 10).forEach(function(s, idx) {
             var barW = maxImpact > 0 ? Math.min(100, s.impact / maxImpact * 100) : 0;
-            var pBadge = s.item.w === 3 ? '<span style="padding:1px 6px;border-radius:50px;font-size:0.6rem;font-weight:700;background:rgba(239,68,68,0.1);color:#ef4444;margin-left:6px;">P1</span>'
-                       : (s.item.w === 2 ? '<span style="padding:1px 6px;border-radius:50px;font-size:0.6rem;font-weight:700;background:rgba(245,158,11,0.1);color:#f59e0b;margin-left:6px;">P2</span>' : '');
-            sensHtml += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
-                '<span style="font-size:0.72rem;color:#94a3b8;width:16px;text-align:right;flex-shrink:0;">' + (idx+1) + '</span>' +
-                '<span style="font-size:0.75rem;width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + s.item.label + pBadge + '</span>' +
-                '<div style="flex:1;height:18px;background:#f1f5f9;border-radius:4px;overflow:hidden;position:relative;"><div style="height:100%;width:' + barW + '%;background:linear-gradient(90deg,' + s.cat.color + '40,' + s.cat.color + ');border-radius:4px;transition:width 0.4s;"></div></div>' +
-                '<span style="font-size:0.72rem;font-weight:700;font-family:\'JetBrains Mono\',monospace;width:55px;text-align:right;color:' + s.cat.color + ';">+' + s.impact.toFixed(2) + '%</span></div>';
+            sensHtml += '<div class="sens-row' + (idx === 0 ? ' is-key' : '') + '"><span class="sens-n">' + (idx + 1) + '</span>' +
+                '<span class="sens-item">' + s.item.label + (s.item.w === 3 ? ' <small>P1</small>' : (s.item.w === 2 ? ' <small>P2</small>' : '')) + '</span>' +
+                '<span class="sens-track"><span class="sens-fill" style="width:' + barW + '%"></span></span>' +
+                '<span class="sens-val">+' + s.impact.toFixed(2) + ' %</span></div>';
         });
-        document.getElementById('sensitivityBars').innerHTML = sensHtml || '<p style="color:var(--text-muted);font-size:0.82rem;">No gaps to analyze.</p>';
+        document.getElementById('sensitivityBars').innerHTML = sensHtml || '<p class="res-fine">No gaps to analyse.</p>';
     }
 
     // ═══ MONTE CARLO ═══
@@ -1347,7 +989,7 @@
     // ═══ TIER SELECTOR ═══
     function setTier(t) {
         currentTier = t;
-        document.querySelectorAll('.tier-btn').forEach(function(b, i) { b.classList.toggle('active', i + 1 === t); });
+        document.querySelectorAll('.tier-btn').forEach(function(b, i) { b.classList.toggle('active', i + 1 === t); b.setAttribute('aria-pressed', i + 1 === t ? 'true' : 'false'); });
         renderChecklist();
         calculate();
     }
@@ -1357,6 +999,7 @@
         currentDcType = type;
         document.querySelectorAll('.dctype-btn').forEach(function(b) {
             b.classList.toggle('active', b.getAttribute('data-dc') === type);
+            b.setAttribute('aria-pressed', b.getAttribute('data-dc') === type ? 'true' : 'false');
         });
         var dcObj = DC_TYPES.find(function(d){return d.id===type;});
         var statEl = document.getElementById('statDcType');
@@ -1374,11 +1017,11 @@
         var indicator = document.getElementById('modeIndicator');
         var btnPdf = document.getElementById('btnExportPDF');
         if (mode === 'pro') {
-            btnFree.classList.remove('active'); btnPro.classList.add('active');
+            btnFree.classList.remove('active'); btnPro.classList.add('active'); btnFree.setAttribute('aria-pressed', 'false'); btnPro.setAttribute('aria-pressed', 'true');
             indicator.className = 'tia-mode-indicator pro-active'; indicator.textContent = 'PRO MODE';
             btnPdf.classList.remove('disabled');
         } else {
-            btnFree.classList.add('active'); btnPro.classList.remove('active');
+            btnFree.classList.add('active'); btnPro.classList.remove('active'); btnFree.setAttribute('aria-pressed', 'true'); btnPro.setAttribute('aria-pressed', 'false');
             indicator.className = 'tia-mode-indicator free-active'; indicator.textContent = 'FREE MODE';
             if (!isPremiumUser) btnPdf.classList.add('disabled');
         }
@@ -1484,13 +1127,13 @@
         var checked = document.getElementById('metricChecked').textContent;
         var applicable = document.getElementById('metricApplicable').textContent;
         var weighted = document.getElementById('metricCRI').textContent;
-        var gColor = overall >= 85 ? '#10b981' : (overall >= 65 ? '#f59e0b' : '#ef4444');
+        var gColor = overall >= 85 ? '#4A5160' : (overall >= 65 ? '#A0AEC0' : '#ef4444');
 
         var dcTypeLabel = (DC_TYPES.find(function(d){return d.id===currentDcType;}) || {}).label || 'Enterprise';
 
         // SVG Category Bar
         var svgBar = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" style="width:100%;height:auto;">';
-        svgBar += '<text x="200" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#1e3a5f">Category Compliance Scores</text>';
+        svgBar += '<text x="200" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#8C96A3">Category Compliance Scores</text>';
         CATEGORIES.forEach(function(cat, i) {
             var items = getFilteredItems(cat.id);
             var cw = 0, tw = 0;
@@ -1512,7 +1155,7 @@
         gaps.forEach(function(it) {
             var cat = CATEGORIES.find(function(c) { return c.id === it.cat; });
             var pLabel = it.w === 3 ? 'P1' : (it.w === 2 ? 'P2' : 'P3');
-            var pColor = it.w === 3 ? '#ef4444' : (it.w === 2 ? '#f59e0b' : '#6b7280');
+            var pColor = it.w === 3 ? '#ef4444' : (it.w === 2 ? '#A0AEC0' : '#6b7280');
             gapRows += '<tr><td style="color:'+pColor+';font-weight:700;">'+pLabel+'</td><td>'+it.label+'</td><td>'+cat.label+'</td><td>W'+it.w+'</td><td>'+it.ref+'</td></tr>';
         });
 
@@ -1520,20 +1163,20 @@
         html += '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">';
         html += '<style>@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:15mm}}';
         html += '*{margin:0;padding:0;box-sizing:border-box}body{font-family:"IBM Plex Sans",Arial,sans-serif;max-width:820px;margin:0 auto;padding:20px 30px;color:#1f2937;font-size:12px;line-height:1.5}';
-        html += 'h1{color:#065f46;font-size:20px;margin-bottom:2px}h2{color:#065f46;font-size:14px;margin:16px 0 8px;padding-bottom:4px;border-bottom:2px solid #10b981}';
+        html += 'h1{color:#111827;font-size:20px;margin-bottom:2px}h2{color:#111827;font-size:14px;margin:16px 0 8px;padding-bottom:4px;border-bottom:2px solid #8A5A00}';
         html += 'table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f8fafc;padding:6px 10px;text-align:left;font-size:9px;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e5e7eb;letter-spacing:0.5px}';
         html += 'td{padding:6px 10px;border-bottom:1px solid #e5e7eb;font-size:11px}';
-        html += '.pdf-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #10b981}';
-        html += '.pdf-brand{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:1px;font-weight:700}.pdf-brand span{color:#10b981}';
+        html += '.pdf-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #8A5A00}';
+        html += '.pdf-brand{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:1px;font-weight:700}.pdf-brand span{color:#8A5A00}';
         html += '.pdf-date{font-size:9px;color:#94a3b8;text-align:right}';
         html += '.pdf-score-row{display:flex;gap:16px;margin:12px 0}.pdf-score-card{flex:1;text-align:center;padding:16px;background: rgba(16, 185, 129, 0.10);border:2px solid '+gColor+';border-radius:12px}';
         html += '.pdf-score-value{font-size:42px;font-weight:800;color:'+gColor+';font-family:"JetBrains Mono",monospace;line-height:1}';
         html += '.pdf-score-label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:4px}';
         html += '.pdf-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}';
         html += '.pdf-kpi-card{background:#f8fafc;border:1px solid #e5e7eb;border-radius:6px;padding:10px;text-align:center}';
-        html += '.pdf-kpi-value{font-size:16px;font-weight:700;color:#065f46;font-family:"JetBrains Mono",monospace}';
+        html += '.pdf-kpi-value{font-size:16px;font-weight:700;color:#111827;font-family:"JetBrains Mono",monospace}';
         html += '.pdf-kpi-label{font-size:8px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:0.3px}';
-        html += '.pdf-footer{margin-top:20px;padding-top:10px;border-top:2px solid #10b981;text-align:center;font-size:8px;color:#94a3b8}';
+        html += '.pdf-footer{margin-top:20px;padding-top:10px;border-top:2px solid #8A5A00;text-align:center;font-size:8px;color:#94a3b8}';
         html += `
 /* v1.8.0 — mobile utility responsive patch */
 @media (max-width: 768px) {
@@ -1730,15 +1373,8 @@
         renderChecklist();
         calculate();
         updateNavbarAuthUI();
-        initTooltipSystem();
     });
     </script>
     <script src="rz-tracker.js" defer></script>
-
-    
-    
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/tia-942-checklist.html">Technical Manual &amp; Methodology &#8599;</a></div>
-    <script src="js/rz-manual-fab.js?v=20260920-8972ee25" defer></script>
-    <script src="js/rz-hero-fit.js?v=20260920-81ad63a8" defer></script>
 </body>
 </html>

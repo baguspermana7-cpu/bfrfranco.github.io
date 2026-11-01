@@ -34,7 +34,7 @@
     <meta name="keywords" content="Data Center ROI, NPV Calculator, IRR Analysis, Payback Period, Investment Return, CAPEX OPEX, Data Center Investment, Profitability Index">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#3b82f6">
+    <meta name="theme-color" content="#0b0c0e">
     <link rel="canonical" href="https://resistancezero.com/roi-calculator.html">
 
     <link rel="alternate" hreflang="en" href="https://resistancezero.com/roi-calculator.html">
@@ -166,393 +166,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
-
-    <style>
-        /* ═══════════════════════════════════════════════════
-           ROI CALCULATOR — BLUE THEME
-           Prefix: roi-
-           ═══════════════════════════════════════════════════ */
-
-        :root {
-            --primary-gradient: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
-            --secondary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            --dark-blue: #1d4ed8;
-            --medium-blue: #2563eb;
-            --light-blue: #3b82f6;
-            --accent-blue: #3b82f6;
-            --accent-gold: #f59e0b;
-            --accent-emerald: #10b981;
-            --accent-cyan: #06b6d4;
-            --accent-purple: #64748b;
-            --accent-red: #ef4444;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-tertiary: #e9ecef;
-            --text-primary: #212529;
-            --text-secondary: #495057;
-            --text-muted: #6c757d;
-            --glass-bg: #ffffff;
-            --glass-bg-dark: rgba(29, 78, 216, 0.95);
-            --glass-border: rgba(59, 130, 246, 0.1);
-            --glass-blur: none;
-            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body { font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
-
-        /* ═══ PAGE BACKGROUND ═══ */
-        .page-background {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
-            background:
-                radial-gradient(ellipse at top right, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom left, rgba(37, 99, 235, 0.05) 0%, transparent 50%),
-                linear-gradient(rgba(59, 130, 246, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
-        }
-
-        /* ═══ NAVIGATION ═══ */
-        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); box-shadow: var(--shadow-md); }
-        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; max-width: 1400px; margin: 0 auto; }
-        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--dark-blue); }
-        .nav-logo { width: 44px; height: 44px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); letter-spacing: -0.5px; }
-        .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--dark-blue); }
-        .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
-        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
-        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 8px 0; transition: color 0.3s; }
-        .nav-link:hover { color: var(--dark-blue); }
-        .nav-back { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--primary-gradient); border: none; border-radius: 8px; color: white; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25); }
-        .nav-back:hover { transform: translateY(-2px); }
-
-        /* ═══ NAVBAR AUTH ═══ */
-        .nav-auth-wrap { position: relative; margin-left: 0.5rem; }
-        .nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: #64748b; border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(100, 116, 139,0.3); white-space: nowrap; }
-        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(100, 116, 139,0.4); }
-        .nav-user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: rgba(100, 116, 139,0.08); border: 1px solid rgba(100, 116, 139,0.25); border-radius: 50px; cursor: pointer; transition: all 0.3s; font-family: inherit; color: var(--text-primary); }
-        .nav-user-btn:hover { background: rgba(100, 116, 139,0.14); }
-        .nav-user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #64748b; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 700; }
-        .nav-user-email { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
-        .nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
-        .nav-user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px; z-index: 1001; overflow: hidden; }
-        .nav-user-dropdown.show { display: block; }
-        .nav-dd-header { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
-        .nav-dd-tier-badge { display: inline-flex; padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .nav-dd-tier-badge.pro { background: #64748b; color: white; }
-        .nav-dd-email { font-size: 0.78rem; color: #64748b; word-break: break-all; }
-        .nav-dd-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; border: none; background: none; font-size: 0.82rem; font-weight: 500; color: #ef4444; cursor: pointer; font-family: inherit; transition: background 0.2s; }
-        .nav-dd-logout:hover { background: #fef2f2; }
-
-        /* ═══ MAIN CONTENT ═══ */
-        .main-content { position: relative; z-index: 10; padding-top: 80px; }
-
-        /* ═══ HERO ═══ */
-        .hero { padding: 3rem 2rem 2rem; text-align: center; max-width: 900px; margin: 0 auto; }
-        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 4px; font-size: 0.8rem; color: var(--accent-blue); font-weight: 600; margin-bottom: 1.5rem; }
-        .hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
-        .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; }
-
-        /* ═══ QUICK STATS ═══ */
-        .quick-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
-        .quick-stat { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); }
-        .quick-stat i { color: var(--accent-blue); }
-
-        /* ═══ CALCULATOR LAYOUT ═══ */
-        .calculator-section { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .calculator-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; }
-
-        /* ═══ INPUT PANEL ═══ */
-        .input-panel { display: flex; flex-direction: column; gap: 1.5rem; }
-        .input-section { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
-        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
-        .section-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
-        .section-subtitle { font-size: 0.72rem; color: var(--text-muted); }
-
-        /* ═══ INPUT FIELDS ═══ */
-        .input-group { margin-bottom: 1rem; }
-        .input-group:last-child { margin-bottom: 0; }
-        .input-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
-        .input-field { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; transition: border-color 0.3s; }
-        .input-field:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        select.input-field { cursor: pointer; }
-
-        /* ═══ PRESET BUTTONS ═══ */
-        .preset-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-        .preset-btn { padding: 5px 12px; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 50px; background: rgba(59, 130, 246, 0.05); color: var(--accent-blue); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
-        .preset-btn:hover, .preset-btn.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
-
-        /* ═══ RANGE SLIDER ═══ */
-        .range-wrap { display: flex; align-items: center; gap: 12px; }
-        .range-wrap input[type="range"] { flex: 1; height: 6px; -webkit-appearance: none; background: #e2e8f0; border-radius: 3px; outline: none; }
-        .range-wrap input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-blue); cursor: pointer; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); }
-        .range-wrap input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent-blue); cursor: pointer; border: none; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); }
-        .range-value { min-width: 48px; text-align: center; font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--accent-blue); }
-
-        /* ═══ TOOLTIP SYSTEM ═══ */
-        .tooltip-trigger { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 50%; font-size: 10px; color: var(--accent-blue); cursor: help; margin-left: auto; transition: all 0.3s; flex-shrink: 0; }
-        .tooltip-trigger:hover { background: rgba(59,130,246,0.2); transform: scale(1.1); }
-        .tooltip-trigger .tooltip-content { display: none !important; position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
-
-        #tooltip-container { position: fixed; width: 320px; max-width: calc(100vw - 40px); padding: 16px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); z-index: 999999; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.15s ease; color: white; font-size: 12px; line-height: 1.5; }
-        #tooltip-container.visible { opacity: 1; visibility: visible; }
-        #tooltip-container .tooltip-title { font-size: 13px; font-weight: 700; color: #bfdbfe; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        #tooltip-container .tooltip-desc { color: rgba(255,255,255,0.9); }
-
-        /* ═══ RESULTS PANEL ═══ */
-        .results-panel { position: sticky; top: 100px; }
-        .results-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1.5rem; }
-
-        /* ═══ SCORE DISPLAY ═══ */
-        .score-display { text-align: center; padding: 1.5rem 0; }
-        .score-value { font-size: 3.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1; }
-        .score-unit { font-size: 1rem; font-weight: 600; color: var(--text-muted); }
-        .score-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; }
-        .score-grade { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; margin-top: 0.75rem; }
-
-        /* ═══ METRIC GRID ═══ */
-        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.25rem; }
-        .metric-box { background: rgba(59, 130, 246, 0.04); border: 1px solid rgba(59, 130, 246, 0.1); border-radius: 4px; padding: 0.75rem; text-align: center; }
-        .metric-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
-        .metric-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
-
-        /* ── Output card tooltips ── */
-        .tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: rgba(59,130,246,0.15); color: #3b82f6; font-size: 0.65rem; font-weight: 700; cursor: help; flex-shrink: 0; position: relative; vertical-align: middle; margin-left: 3px; border: 1px solid rgba(59,130,246,0.3); transition: background 0.2s; user-select: none; }
-        .tip:hover, .tip:focus, .tip.tip-open { background: #3b82f6; color: #fff; outline: none; }
-        .tip::after { content: attr(data-tip); display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1e293b; color: #f1f5f9; font-size: 0.72rem; font-weight: 400; line-height: 1.55; padding: 8px 10px; border-radius: 8px; width: 270px; max-width: 85vw; white-space: normal; z-index: 9000; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; border: 1px solid rgba(59,130,246,0.25); }
-        .tip::before { content: ''; display: none; position: absolute; bottom: calc(100% + 1px); left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #1e293b; z-index: 9001; pointer-events: none; }
-        .tip:hover::after, .tip:focus::after, .tip.tip-open::after { display: block; }
-        .tip:hover::before, .tip:focus::before, .tip.tip-open::before { display: block; }
-        [data-theme="dark"] .tip { background: rgba(59,130,246,0.12); color: #60a5fa; border-color: rgba(59,130,246,0.25); }
-        [data-theme="dark"] .tip:hover, [data-theme="dark"] .tip:focus, [data-theme="dark"] .tip.tip-open { background: #3b82f6; color: #fff; }
-        @media (max-width: 768px) { .tip::after { width: 220px; font-size: 0.70rem; } }
-
-        /* ═══ TOOLBAR ═══ */
-        .roi-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0 auto; max-width: 1400px; padding: 0 2rem 1.25rem; flex-wrap: wrap; }
-        .roi-mode-bar { display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; }
-        .roi-toolbar-btn { padding: 0.55rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.82rem; font-family: inherit; transition: all 0.25s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-        .roi-btn-free { background: transparent; color: #64748b; }
-        .roi-btn-free.active { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; box-shadow: 0 2px 8px rgba(6,182,212,0.3); }
-        .roi-btn-free:not(.active):hover { background: rgba(6,182,212,0.08); color: #0891b2; }
-        .roi-btn-pro { background: transparent; color: #64748b; }
-        .roi-btn-pro.active { background: #64748b; color: white; box-shadow: 0 2px 8px rgba(100, 116, 139,0.3); }
-        .roi-btn-pro:not(.active):hover { background: rgba(100, 116, 139,0.08); color: #64748b; }
-        .roi-btn-pro.locked-hint { position: relative; }
-        .roi-btn-pro.locked-hint::after { content: ''; position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; border: 2px solid #f1f5f9; }
-
-        /* ═══ MODE INDICATOR ═══ */
-        .roi-mode-indicator { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 50px; display: none; }
-        .roi-mode-indicator.free-active { display: inline-flex; background: rgba(6,182,212,0.1); color: #0891b2; }
-        .roi-mode-indicator.pro-active { display: inline-flex; background: rgba(100, 116, 139,0.1); color: #64748b; }
-
-        /* ═══ TOOLBAR ACTIONS ═══ */
-        .roi-toolbar-actions { display: flex; gap: 0.5rem; align-items: center; }
-        .roi-btn-reset { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #64748b; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
-        .roi-btn-reset:hover { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(59,130,246,0.04); }
-        .roi-btn-pdf { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.04); color: #ef4444; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
-        .roi-btn-pdf:hover { border-color: #ef4444; background: rgba(239,68,68,0.1); box-shadow: 0 2px 8px rgba(239,68,68,0.15); }
-        .roi-btn-pdf.disabled { opacity: 0.45; pointer-events: none; }
-
-        /* ═══ PRO SECTIONS ═══ */
-        .pro-section { position: relative; }
-        .pro-section.locked > *:not(.pro-overlay) { filter: blur(6px); user-select: none; pointer-events: none; }
-        .pro-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); border-radius: 16px; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; pointer-events: all; cursor: pointer; }
-        .pro-section.locked .pro-overlay { display: flex; }
-        .pro-overlay i { font-size: 2rem; color: var(--accent-purple); }
-        .pro-overlay-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
-        .pro-overlay-desc { font-size: 0.8rem; color: var(--text-muted); text-align: center; max-width: 260px; }
-        .pro-overlay-btn { padding: 8px 20px; background: #64748b; border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        .pro-overlay-btn:hover { transform: translateY(-1px); }
-        .pro-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: rgba(100,116,139,.12);border:1px solid rgba(100,116,139,.42); color:#64748b; font-size: 0.6rem; font-weight: 700; border-radius: 4px; letter-spacing: 0.5px; vertical-align: middle; }
-
-        /* ═══ PRO PANEL ═══ */
-        .roi-pro-panel { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1.5rem; margin-top: 1.5rem; }
-        .roi-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
-        .roi-kpi-card { background: rgba(59, 130, 246, 0.04); border: 1px solid rgba(59, 130, 246, 0.1); border-radius: 4px; padding: 1rem; text-align: center; transition: all 0.3s; }
-        .roi-kpi-card:hover { border-color: rgba(59, 130, 246, 0.25); box-shadow: 0 4px 12px rgba(59,130,246,0.08); }
-        .roi-kpi-value { font-size: 1.4rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--dark-blue); line-height: 1.2; }
-        .roi-kpi-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 4px; }
-
-        /* ═══ NARRATIVE ═══ */
-        .roi-narrative { border-left: 3px solid var(--accent-blue); background: rgba(59, 130, 246, 0.04); padding: 1rem 1.25rem; border-radius: 0 10px 10px 0; margin-top: 1rem; }
-        .roi-narrative p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
-        .roi-narrative strong { color: var(--dark-blue); }
-
-        /* ═══ CHART CONTAINERS ═══ */
-        .charts-section { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .chart-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1.5rem; }
-        .chart-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
-        /* A <canvas> carries intrinsic width from its width= attribute, and that width is the
-           element's min-content contribution. The PRO charts (600px) are never instantiated for
-           a free reader, so Chart.js never resizes them and the calculator column resolved to
-           450-600px on a 390px screen — cut off with nothing to scroll to (body clips
-           overflow-x, so the responsive-layout gate read scrollX = 0). Same fix as
-           carbon-footprint.html. */
-        .chart-container { position: relative; height: 280px; width: 100%; }
-        .chart-container canvas { max-width: 100%; }
-
-        /* ═══ CASHFLOW TABLE ═══ */
-        .cashflow-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 0.75rem; }
-        .cashflow-table th { background: #f8fafc; padding: 8px 10px; text-align: right; font-weight: 700; color: #64748b; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.3px; border-bottom: 2px solid #e5e7eb; }
-        .cashflow-table th:first-child { text-align: center; }
-        .cashflow-table td { padding: 6px 10px; border-bottom: 1px solid #f1f5f9; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
-        .cashflow-table td:first-child { text-align: center; font-weight: 600; color: var(--accent-blue); }
-        .cashflow-table tr:hover td { background: rgba(59,130,246,0.03); }
-        .cashflow-table .negative { color: #ef4444; }
-        .cashflow-table .positive { color: #10b981; }
-
-        /* ═══ PRIVACY BADGE ═══ */
-        .roi-privacy-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.15); border-radius: 4px; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.75rem; }
-        .roi-privacy-badge i { color: var(--accent-blue); font-size: 0.7rem; }
-
-        /* ═══ BENCHMARK META ═══ */
-        .roi-benchmark-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
-        .roi-benchmark-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.15); border-radius: 4px; font-size: 0.68rem; font-weight: 600; color: var(--medium-blue); }
-
-        /* ═══ COOKIE BANNER ═══ */
-
-        /* ═══ SCROLL TO TOP ═══ */
-        .scroll-top-btn { position: fixed; bottom: 24px; right: 24px; z-index: 200; width: 44px; height: 44px; border-radius: 12px; border: none; background: var(--medium-blue); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(37,99,235,0.35); opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity 0.3s, visibility 0.3s, transform 0.3s, background 0.2s; }
-        .scroll-top-btn.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-        .scroll-top-btn:hover { background: var(--dark-blue); box-shadow: 0 4px 16px rgba(29,78,216,0.45); }
-
-        /* ═══ FOOTER ═══ */
-        .footer { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem; }
-
-        /* ═══ PRINT STYLES ═══ */
-        @media print {
-            body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .main-content { padding-top: 0 !important; }
-            .calculator-grid { display: block !important; }
-            .pro-section.locked > *:not(.pro-overlay) { filter: none !important; user-select: auto !important; pointer-events: auto !important; }
-            .results-panel { position: static !important; }
-            @page { margin: 1cm; size: A4; }
-        }
-
-        /* ═══ RESPONSIVE: 1024px ═══ */
-        @media (max-width: 1024px) {
-            .calculator-grid { grid-template-columns: 1fr; }
-            .results-panel { position: static; }
-            .charts-grid { grid-template-columns: 1fr; }
-            .scroll-top-btn { bottom: 90px; right: 16px; }
-        }
-
-        /* ═══ RESPONSIVE: 768px ═══ */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .hero h1 { font-size: 1.8rem; }
-            .score-value { font-size: 2.8rem; }
-            .metric-grid { grid-template-columns: 1fr; }
-            .roi-kpi-grid { grid-template-columns: 1fr 1fr; }
-            .nav-user-email { display: none; }
-            .nav-login-btn .nav-login-text { display: none; }
-            .nav-login-btn { padding: 8px 12px; }
-        }
-
-        /* ═══ RESPONSIVE: 600px ═══ */
-        @media (max-width: 600px) {
-            .roi-toolbar { flex-direction: column; align-items: stretch; gap: 0.5rem; }
-            .roi-mode-bar { width: 100%; }
-            .roi-toolbar-btn { flex: 1; justify-content: center; }
-            /* The toolbar carries an INLINE `padding: 0 2rem`, so a media-query padding needs
-               !important to reach it: 64px of gutter left a button row that could not wrap
-               running past a 390px screen. */
-            .roi-toolbar { padding: 0 1rem !important; }
-            .roi-toolbar-actions { justify-content: center; flex-wrap: wrap; }
-            .preset-btn { padding: 4px 8px; font-size: 0.68rem; }
-            .quick-stats { gap: 1rem; }
-            .roi-kpi-grid { grid-template-columns: 1fr; }
-            .hero { padding: 2rem 1rem 1.5rem; }
-            .calculator-section { padding: 0 1rem; }
-            .cashflow-table { font-size: 0.7rem; }
-            .cashflow-table th, .cashflow-table td { padding: 4px 6px; }
-        }
-
-        /* Calculator Disclaimer */
-        .calc-disclaimer { background: #f1f5f9 !important; border: 1px solid #cbd5e1 !important; border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1.5rem; }
-        .calc-disclaimer .disc-title { color: #1e293b !important; }
-        .calc-disclaimer .disc-text { color: #475569 !important; }
-        .calc-disclaimer .disc-text strong { color: #1e293b !important; }
-        .calc-disclaimer .disc-text a { color: #2563eb !important; }
-        .calc-disclaimer .disc-fine { color: #64748b !important; }
-        /* ─── Dark Mode ─────────────────────────────────── */
-        [data-theme="dark"] { --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-tertiary:#334155; --text-primary:#f1f5f9; --text-secondary:#cbd5e1; --text-muted:#94a3b8; --glass-bg:#0f172a; --glass-border:rgba(100, 116, 139,0.2); --shadow-sm:0 2px 4px rgba(0,0,0,0.3); --shadow-md:0 4px 12px rgba(0,0,0,0.4); --shadow-lg:0 8px 30px rgba(0,0,0,0.5); }
-        [data-theme="dark"] body { background:#0f172a; }
-        [data-theme="dark"] .navbar { background:rgba(15,23,42,0.95); border-bottom-color:rgba(100, 116, 139,0.15); }
-        [data-theme="dark"] .input-section { background:rgba(30,41,59,0.8); border-color:rgba(100, 116, 139,0.15); }
-        [data-theme="dark"] .results-panel { background:rgba(30,41,59,0.8); border-color:rgba(100, 116, 139,0.15); }
-        [data-theme="dark"] .input-field { background:#1e293b; border-color:#334155; color:#f1f5f9; }
-        [data-theme="dark"] .input-field option { background:#1e293b; color:#f1f5f9; }
-        [data-theme="dark"] .nav-user-dropdown { background:#1e293b; border-color:#334155; }
-        [data-theme="dark"] .nav-dd-header { border-color:#334155; }
-        [data-theme="dark"] .nav-dd-email { color:#94a3b8; }
-        [data-theme="dark"] .nav-dd-logout:hover { background:rgba(239,68,68,0.1); }
-        .nav-theme-btn { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px; border:1px solid var(--glass-border); background:transparent; color:var(--text-secondary); cursor:pointer; transition:all 0.25s; font-size:0.9rem; padding:0; }
-        .nav-theme-btn:hover { border-color:#64748b; color:#64748b; background:rgba(100, 116, 139,0.08); }
-        [data-theme="dark"] .nav-theme-btn { color:#94a3b8; }
-        [data-theme="dark"] .nav-theme-btn:hover { color:#67e8f9; border-color:rgba(103,232,249,0.4); background:rgba(103,232,249,0.08); }
-        /* ===== PLAN v13 DARK-MODE EXTENSIONS ===== */
-        [data-theme="dark"] .results-card { background:#1e293b; border-color:rgba(255,255,255,0.08); color:#f1f5f9; }
-        [data-theme="dark"] .chart-card { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .chart-title { color:#f1f5f9; }
-        [data-theme="dark"] .input-field { background:#1e293b; border-color:#334155; color:#f1f5f9; }
-        [data-theme="dark"] .input-field option { background:#1e293b; color:#f1f5f9; }
-        [data-theme="dark"] .roi-mode-bar { background:#0f172a; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .roi-toolbar-btn { color:#94a3b8; }
-        [data-theme="dark"] .roi-btn-reset { background:#1e293b; border-color:#334155; color:#94a3b8; }
-        [data-theme="dark"] .cashflow-table th { background:#0f172a; color:#94a3b8; border-bottom-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .cashflow-table td { border-color:rgba(255,255,255,0.06); color:#e2e8f0; }
-        [data-theme="dark"] .cashflow-table tr:hover td { background:rgba(255,255,255,0.02); }
-        [data-theme="dark"] .breakdown-table th { background:#0f172a; color:#cbd5e1; border-bottom-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .breakdown-table td { color:#e2e8f0; border-bottom-color:rgba(255,255,255,0.06); }
-        [data-theme="dark"] .breakdown-table tr:hover td { background:rgba(255,255,255,0.02); }
-        [data-theme="dark"] .section-title { color:#f1f5f9; }
-        [data-theme="dark"] .calc-disclaimer { background:#1e293b !important; border-color:#334155 !important; color:#cbd5e1 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-title { color:#f1f5f9 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-text { color:#cbd5e1 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-text strong { color:#f1f5f9 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-fine { color:#94a3b8 !important; }
-        [data-theme="dark"] .nav-user-dropdown { background:#1e293b; border-color:#334155; }
-        [data-theme="dark"] .kpi-card { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .kpi-label { color:#94a3b8; }
-        [data-theme="dark"] .narrative-card { background:rgba(100, 116, 139,0.05); border-color:rgba(100, 116, 139,0.12); color:#cbd5e1; }
-        [data-theme="dark"] .narrative-card strong { color:#f1f5f9; }
-        [data-theme="dark"] .pro-panel { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-    
-        /* v1.4.1 — class-mismatch fix: HTML uses .input-field but CSS targeted page-prefix */
-        [data-theme="dark"] .input-field,
-        [data-theme="dark"] .country-select,
-        [data-theme="dark"] select.input-field,
-        [data-theme="dark"] input.input-field { background:#1e293b !important; border-color:rgba(255,255,255,0.12) !important; color:#f1f5f9 !important; }
-        [data-theme="dark"] .input-field:focus { border-color:#10b981 !important; box-shadow:0 0 0 3px rgba(16,185,129,0.18) !important; }
-        [data-theme="dark"] .input-field option,
-        [data-theme="dark"] select.input-field option { background:#1e293b !important; color:#f1f5f9 !important; }
-        [data-theme="dark"] .input-label { color:#cbd5e1; }
-
-/* a11y (v1.52.4) */
-.preset-bar .preset-btn, button[onclick^="setPreset"] { color:#ffffff !important; }
-.preset-bar .preset-btn, button[onclick^="setPreset"], button[onclick^="setRampProfile"] { background:#1d4ed8 !important; border-color:#1d4ed8 !important; color:#fff !important; }
-[data-theme="dark"] .roi-benchmark-tag { color:#93c5fd !important; }
-[data-theme="dark"] #modeIndicator { color:#22d3ee !important; }
-[data-theme="dark"] div > h3[style], [data-theme="dark"] #narrativeBox strong { color:#93c5fd !important; }
-[data-theme="dark"] [style*="color: #1d4ed8"], [data-theme="dark"] [style*="color:#1d4ed8"], [data-theme="dark"] [style*="color: #2563eb"], [data-theme="dark"] [style*="color:#2563eb"] { color:#93c5fd !important; }
-[data-theme="dark"] #cookieBanner a, [data-theme="dark"] .disc-text a { color:#93c5fd !important; }
-:root:not([data-theme="dark"]) #gradeText { color:#9a3412 !important; }
-:root:not([data-theme="dark"]) .roi-privacy-badge { color:#495057 !important; }
-:root:not([data-theme="dark"]) .disc-fine a { color:#1d4ed8 !important; }
-#cookieDecline { color:#475569 !important; }
-#btnExportPDF { opacity:1 !important; }
-:root:not([data-theme="dark"]) #btnExportPDF { color:#b91c1c !important; }
-[data-theme="dark"] #btnExportPDF { color:#f8b4b4 !important; }
-:root:not([data-theme="dark"]) .metric-box .metric-label { color:#495057 !important; }
-:root:not([data-theme="dark"]) #btnProMode { color:#475569 !important; }
-:root:not([data-theme="dark"]) #modeIndicator { color:#155e75 !important; }
-</style>
-    <script src="js/rz-version.js?v=20261101-22a91a90" defer></script>
+    <script src="js/rz-version.js?v=20261101-732b47d5" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
@@ -589,189 +203,110 @@
         ]
     }
     </script>
-
-<style id="rz-mobile-v18">
-/* v1.8.0 — mobile responsive patch */
-@media (max-width: 768px) {
-  html, body { overflow-x: hidden; max-width: 100vw; }
-  img, picture, video { max-width: 100%; height: auto; display: block; }
-  .nav-menu, .nav-links { display: none; }
-  .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
-  button, a.btn, [role="button"] { min-height: 44px; }
-}
-</style>
-<style id="rz-skiplink-v1">
-.skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
-.skip-link:focus{top:0}
-[data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
-</style>
-<style id="rz-lightfix-v1">
-/* RZ-LIGHTFIX v1 — light-mode contrast restoration after the v1.19.1
-   default-theme flip to light. Scope: html:not([data-theme="dark"]) only,
-   so dark rendering is unchanged. Same-hue WCAG-AA shades. Idempotent. */
-html:not([data-theme="dark"]) .cookie-decline,
-html:not([data-theme="dark"]) .tco-cookie-decline { color:#475569 !important; }
-html:not([data-theme="dark"]) .calc-disclaimer .disc-fine,
-html:not([data-theme="dark"]) .disc-fine { color:#475569 !important; }
-html:not([data-theme="dark"]) .nav-user-email,
-html:not([data-theme="dark"]) .rz-user-email { color:#475569 !important; }
-html:not([data-theme="dark"]) .pro-badge,
-html:not([data-theme="dark"]) .nav-pro-badge { background:#64748b !important; color:#fff !important; }
-/* Per-link inline rainbow nav colours (authored for the old dark default)
-   are illegible on the white light navbar. Same-hue AA-700 shades keep the
-   colour-coded wayfinding. Safe: verified no inline border-color:#<accent>
-   or background-color:#<accent> exists on these pages, so [style*] only
-   ever matches a genuine text `color:` declaration; CSS !important beats
-   an inline declaration that carries no !important. */
-html:not([data-theme="dark"]) .nav-link[style*="#10b981"],
-html:not([data-theme="dark"]) .nav-link[style*="#22c55e"] { color:#047857 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#0d9488"],
-html:not([data-theme="dark"]) .nav-link[style*="#14b8a6"] { color:#0f766e !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#06b6d4"] { color:#0e7490 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#3b82f6"] { color:#1d4ed8 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#64748b"] { color:#64748b !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#f59e0b"],
-html:not([data-theme="dark"]) .nav-link[style*="#d97706"] { color:#b45309 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#ef4444"] { color:#b91c1c !important; }
-
-html:not([data-theme="dark"]) .hero-badge,
-html:not([data-theme="dark"]) .preset-btn,
-html:not([data-theme="dark"]) td.neutral-accent { color:#1d4ed8 !important; }
-html:not([data-theme="dark"]) td.positive { color:#047857 !important; }
-html:not([data-theme="dark"]) td.negative,
-html:not([data-theme="dark"]) .roi-btn-pdf { color:#b91c1c !important; }
-html:not([data-theme="dark"]) .roi-toolbar-btn.roi-btn-free { color:#475569 !important; }
-html:not([data-theme="dark"]) .roi-mode-indicator.pro-active { color:#64748b !important; }
-html:not([data-theme="dark"]) #scoreGrade[style*="#f97316"] { color:#c2410c !important; }
-html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !important; }
-</style>
     <!-- PLAN02 E4 — editorial chrome (dark-only, chrome only) -->
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-<style>
-/* Mobile form controls: 16px, or iOS Safari zooms the viewport on focus and does not zoom back.
-   This page does not load styles.min.css, so it carries the rule itself. */
-@media (max-width: 768px) {
-  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
-  select, textarea { font-size: 16px !important; }
-}
-</style>
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261027-0044">
+
+    <link rel="stylesheet" href="css/rz-hub.css">
+    <link rel="stylesheet" href="css/rz-tool.css">
 </head>
-<body data-rz-calc="roi">
+<body class="hub tool" data-rz-calc="roi" data-rz-account-pill="off">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
-    <div class="page-background"></div>
+    
 
-    <!-- ═══ NAVBAR ═══ -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-brand">
-                <div class="nav-logo">ROI</div>
-                <div>
-                    <div class="nav-title">ROI Calculator</div>
-                    <div class="nav-subtitle">Investment Return Analysis</div>
-                </div>
-            </a>
-            <div class="nav-links">
-                <a href="datacenter-solutions.html" class="nav-link">DC Solutions</a>
-                <a href="pue-calculator.html" class="nav-link" style="color: #06b6d4;">PUE Calc</a>
-                <a href="capex-calculator.html" class="nav-link" style="color: #f59e0b;">CAPEX Calc</a>
-                <a href="opex-calculator.html" class="nav-link" style="color: #10b981;">OPEX Calc</a>
-                <a href="carbon-footprint.html" class="nav-link" style="color: #22c55e;">Carbon Calc</a>
-                <a href="dcmoc/" class="nav-link" style="color: #ef4444;">DC MOC</a>
-                <a href="tco-calculator.html" class="nav-link" style="color: #0369a1;">TCO Calc</a>
-                <a href="dc-market-tracker.html" class="nav-link" style="color: #0d9488;">Market</a>
-                <a href="glossary.html" class="nav-link" style="color: #14b8a6;">Glossary</a>
-                <button class="nav-theme-btn" id="navThemeBtn" onclick="toggleCalcTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i id="themeIcon" class="fas fa-moon"></i></button>
-                <div class="nav-auth-wrap" id="navAuthWrap">
-                    <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
-                        <i class="fas fa-user-circle"></i><span class="nav-login-text">Login</span>
-                    </button>
-                    <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
-                        <div class="nav-user-avatar" id="navUserAvatar">U</div>
-                        <span class="nav-user-email" id="navUserEmail"></span>
-                        <i class="fas fa-chevron-down nav-user-chevron"></i>
-                    </button>
-                    <div class="nav-user-dropdown" id="navUserDropdown">
-                        <div class="nav-dd-header">
-                            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div>
-                            <div class="nav-dd-email" id="navDdEmail"></div>
-                        </div>
-                        <button class="nav-dd-logout" onclick="logoutPremium()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                    </div>
-                </div>
-                <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Portfolio</a>
-            </div>
+    <nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+          <div class="nav-auth-wrap" id="navAuthWrap">
+        <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()"><span class="nav-login-text">Login</span></button>
+        <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()"><span class="nav-user-avatar" id="navUserAvatar">U</span><span class="nav-user-email" id="navUserEmail"></span></button>
+        <div class="nav-user-dropdown" id="navUserDropdown">
+          <div class="nav-dd-header"><div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div><div class="nav-dd-email" id="navDdEmail"></div></div>
+          <a class="nav-dd-link" href="account.html">My account and saved scenarios</a>
+          <button class="nav-dd-logout" onclick="logoutPremium()">Logout</button>
+        </div>
+      </div>
+    <button class="nav-icon theme-toggle" id="navThemeBtn" onclick="toggleCalcTheme()" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i id="themeIcon" class="fas fa-moon"></i></button>
+  </div>
+</nav>
 
     <!-- ═══ MAIN CONTENT ═══ -->
     <main id="main-content">
 
-    <!-- ═══ HERO ═══ -->
-    <section class="hero">
-        <div class="hero-badge"><i class="fas fa-chart-line"></i> Financial Analysis Tool</div>
-        <h1>DC ROI Calculator</h1>
-        <p>Comprehensive investment return analysis with NPV, IRR, payback period, and year-by-year cashflow projections for data center investments</p>
-        <div style="max-width:800px;margin:1.5rem auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:1px solid rgba(59,130,246,0.15);">
-            <img data-rz-hero src="assets/roi-calculator-hero.webp" alt="Data Center ROI Calculator — NPV, IRR and Cashflow Analysis" style="width:100%;height:auto;display:block;" loading="lazy" width="2816" height="1536">
-        </div>
-        <div style="max-width:800px;margin:0 auto 1.5rem;text-align:left;padding:1.25rem 1.5rem;background:rgba(59,130,246,0.04);border:1px solid rgba(59,130,246,0.12);border-radius:12px;">
-            <h3 style="font-size:0.95rem;font-weight:700;color:#1d4ed8;margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-info-circle" style="color:#3b82f6;"></i> About This Calculator</h3>
-            <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.75rem 0;">
-                Data center investments range from <strong>$10M to $1B+</strong> with 15-25 year asset lifespans, making rigorous financial modeling essential. This calculator projects <strong>Net Present Value (NPV)</strong>, <strong>Internal Rate of Return (IRR)</strong>, <strong>Profitability Index</strong>, and <strong>payback period</strong> using discounted cash flow analysis tailored to data center economics.
-            </p>
-            <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.5rem 0;">
-                The model accounts for <strong>occupancy ramp-up curves</strong>, tiered pricing, power cost escalation, and operational expenditure growth. Revenue inputs support colocation pricing (per kW/month) and wholesale lease structures. The <strong>Monte Carlo simulation</strong> (FULL) runs 10,000 iterations with variance on occupancy, pricing, and OPEX to quantify investment risk and generate probability distributions for key financial metrics.
-            </p>
-            <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0;">
-                Financial assumptions follow industry conventions for <strong>WACC (8-12%)</strong>, depreciation schedules, and terminal value calculations. Results should be validated against site-specific feasibility studies and reviewed by qualified financial professionals.
-            </p>
-        </div>
-        <div class="quick-stats">
-            <span class="quick-stat"><i class="fas fa-calculator"></i> NPV / IRR / PI</span>
-            <span class="quick-stat"><i class="fas fa-chart-area"></i> Year-by-year cashflow</span>
-            <span class="quick-stat"><i class="fas fa-building"></i> Occupancy ramp</span>
-            <span class="quick-stat"><i class="fas fa-dice"></i> Monte Carlo risk</span>
-        </div>
-    </section>
+    <header class="tool-head">
+            <div class="wrap">
+                <p class="eyebrow">DC Solutions · <b>Calculator</b> · ROI</p>
+                <h1>Data center investment return <span class="muted">NPV, IRR and payback from a cashflow model</span></h1>
+                <p class="lede">Net present value, IRR, payback, profitability index and a year-by-year cashflow from CAPEX, IT capacity, revenue per kW, operating costs, the occupancy ramp, financing and tax. Computed in your browser; every figure follows the inputs.</p>
+                <p class="basis">model discounted cashflow, IRR by Newton-Raphson · basis Uptime Institute, JLL, CBRE benchmarks · updated 2026-10</p>
+                <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → Calculator → ROI</p>
+            </div>
+        </header>
 
-    <!-- ═══ TOOLBAR ═══ -->
-    <div class="roi-toolbar">
-        <div class="roi-mode-bar">
-            <button class="roi-toolbar-btn roi-btn-free active" id="btnFreeMode" onclick="setMode('free')">
-                <i class="fas fa-chart-bar"></i> Free Analysis
-            </button>
-            <button class="roi-toolbar-btn roi-btn-pro locked-hint" id="btnProMode" onclick="setMode('pro')">
-                <i class="fas fa-crown"></i> Full analysis
-            </button>
+    <div class="wrap">
+        <div class="tool-bar" role="toolbar" aria-label="Mode and actions">
+            <div class="seg" role="group" aria-label="Assessment depth">
+                <button class="roi-toolbar-btn roi-btn-free active" id="btnFreeMode" onclick="setMode('free')">Free</button>
+                <button class="roi-toolbar-btn roi-btn-pro locked-hint" id="btnProMode" onclick="setMode('pro')">Full</button>
+            </div>
+            <span class="roi-mode-indicator free-active" id="modeIndicator" hidden>FREE MODE</span>
+            <span class="spacer"></span>
+            <button class="tool-btn roi-btn-reset" onclick="resetDefaults()">Reset</button>
+            <button class="tool-btn roi-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()">Export PDF</button>
+            <button class="tool-btn roi-btn-pdf" id="btnExportCSV" onclick="exportRoiCSV()">Export CSV</button>
+            <button class="tool-btn" id="btnSaveAccount" onclick="rzScenario&&rzScenario.saveToAccount('roi',{msgEl:'acctSaveMsg'})">Save</button>
         </div>
-        <span class="roi-mode-indicator free-active" id="modeIndicator">FREE MODE</span>
-        <div class="roi-toolbar-actions">
-            <button class="roi-btn-reset" onclick="resetDefaults()"><i class="fas fa-undo"></i> Reset</button>
-            <button class="roi-btn-pdf disabled" id="btnExportPDF" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
-            <button class="roi-btn-pdf" id="btnExportCSV" onclick="exportRoiCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
-            <button id="btnSaveAccount" onclick="rzScenario&&rzScenario.saveToAccount('roi',{msgEl:'acctSaveMsg'})" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;cursor:pointer;font-weight:700;font-size:0.82rem;font-family:inherit;"><i class="fas fa-cloud"></i> Save to my account</button>
+        <p class="tool-msg" id="acctSaveMsg" style="display:none;"></p>
+        <div class="rz-calc-validation tool-valid" id="roiValidation" role="alert" aria-live="polite" hidden></div>
         </div>
-        <div id="acctSaveMsg" style="display:none;margin:6px 0 0;font-size:0.72rem;text-align:center;"></div>
-    </div>
-    <div class="rz-calc-validation" id="roiValidation" role="alert" aria-live="polite" hidden></div>
 
     <!-- ═══ CALCULATOR GRID ═══ -->
-    <section class="calculator-section">
-        <div class="calculator-grid">
+    <section class="calculator-section wrap">
+        <div class="calculator-grid tool-bench">
 
             <!-- ═══ INPUT PANEL ═══ -->
-            <div class="input-panel">
+            <div class="input-panel tool-inputs">
 
                 <!-- Section 1: Investment Parameters -->
-                <div class="input-section" style="border-left:3px solid #3b82f6;">
-                    <div class="section-header" style="background:rgba(59,130,246,0.1);">
-                        <i class="fas fa-money-bill-wave" style="color:#3b82f6;"></i> Investment Parameters
-                    </div>
+                <div class="input-section">
+                    <div class="section-header"><span class="section-title">Investment Parameters</span></div>
 
-                    <label class="input-label">Total CAPEX ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-money-bill-wave"></i> Capital Expenditure</div><div class="tooltip-desc">Total upfront capital investment including land, building, MEP systems, IT infrastructure, and soft costs. Typical data center construction costs range from $8-15M per MW for conventional and $15-25M per MW for AI-optimized facilities.</div></div></span></label>
-                    <div class="preset-bar">
+                    <label class="input-label">Total CAPEX ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Capital Expenditure</div><div class="tooltip-desc">Total upfront capital investment including land, building, MEP systems, IT infrastructure, and soft costs. Typical data center construction costs range from $8-15M per MW for conventional and $15-25M per MW for AI-optimized facilities.</div></div></span></label>
+                    <div class="preset-bar preset-row">
                         <button class="preset-btn" onclick="setPreset('totalCapex',25)">$25M Small</button>
                         <button class="preset-btn active" onclick="setPreset('totalCapex',80)">$80M Mid</button>
                         <button class="preset-btn" onclick="setPreset('totalCapex',200)">$200M Large</button>
@@ -779,8 +314,8 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                     </div>
                     <input type="number" class="input-field" id="totalCapex" value="100" min="1" max="5000" step="1" oninput="calculate()" aria-label="Total CAPEX">
 
-                    <label class="input-label">IT Capacity (MW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-server"></i> IT Power Capacity</div><div class="tooltip-desc">Total IT power capacity available for lease or use. This determines your revenue potential. A 10MW facility at $150/kW/month generates up to $18M annually at full occupancy. AI-optimized facilities can command $200-350/kW/month.</div></div></span></label>
-                    <div class="preset-bar">
+                    <label class="input-label">IT Capacity (MW) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">IT Power Capacity</div><div class="tooltip-desc">Total IT power capacity available for lease or use. This determines your revenue potential. A 10MW facility at $150/kW/month generates up to $18M annually at full occupancy. AI-optimized facilities can command $200-350/kW/month.</div></div></span></label>
+                    <div class="preset-bar preset-row">
                         <button class="preset-btn" onclick="setPreset('itCapacity',2)">2MW Edge</button>
                         <button class="preset-btn" onclick="setPreset('itCapacity',5)">5MW Enterprise</button>
                         <button class="preset-btn active" onclick="setPreset('itCapacity',10)">10MW Colo</button>
@@ -788,7 +323,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                     </div>
                     <input type="number" class="input-field" id="itCapacity" value="10" min="0.5" max="500" step="0.5" oninput="calculate()" aria-label="It Capacity">
 
-                    <label class="input-label">Project Lifetime (years) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-calendar-alt"></i> Investment Horizon</div><div class="tooltip-desc">Total project analysis period in years. Data center buildings typically have a 20-25 year economic life. Shorter horizons (10-15 years) are common for colocation and leased facilities. IT equipment refreshes every 4-5 years within this period.</div></div></span></label>
+                    <label class="input-label">Project Lifetime (years) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Investment Horizon</div><div class="tooltip-desc">Total project analysis period in years. Data center buildings typically have a 20-25 year economic life. Shorter horizons (10-15 years) are common for colocation and leased facilities. IT equipment refreshes every 4-5 years within this period.</div></div></span></label>
                     <select class="input-field" id="projectLife" onchange="calculate()" aria-label="Project Life">
                         <option value="10">10 years</option>
                         <option value="15">15 years</option>
@@ -796,7 +331,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                         <option value="25">25 years</option>
                     </select>
 
-                    <label class="input-label">Construction Period (months) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-hard-hat"></i> Build Duration</div><div class="tooltip-desc">Time from ground-breaking to first revenue. During construction, CAPEX is deployed but no revenue is generated. Modular builds can achieve 12-18 months; traditional purpose-built facilities typically require 18-30 months.</div></div></span></label>
+                    <label class="input-label">Construction Period (months) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Build Duration</div><div class="tooltip-desc">Time from ground-breaking to first revenue. During construction, CAPEX is deployed but no revenue is generated. Modular builds can achieve 12-18 months; traditional purpose-built facilities typically require 18-30 months.</div></div></span></label>
                     <select class="input-field" id="constructionMonths" onchange="calculate()" aria-label="Construction Months">
                         <option value="12">12 months (Modular)</option>
                         <option value="18" selected>18 months (Standard)</option>
@@ -806,25 +341,23 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                 </div>
 
                 <!-- Section 2: Revenue Projections -->
-                <div class="input-section" style="border-left:3px solid #10b981;">
-                    <div class="section-header" style="background:rgba(16,185,129,0.1);">
-                        <i class="fas fa-chart-line" style="color:#10b981;"></i> Revenue Projections
-                    </div>
+                <div class="input-section">
+                    <div class="section-header"><span class="section-title">Revenue Projections</span></div>
 
-                    <label class="input-label">Revenue Model <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-store"></i> Business Model</div><div class="tooltip-desc">Colocation charges per kW/month for power and space. Wholesale offers lower rates ($100-140/kW) for large deployments. Retail commands premium pricing ($150-250/kW) for smaller, managed deployments. Hyperscale/AI can reach $200-400/kW for liquid-cooled, high-density capacity.</div></div></span></label>
+                    <label class="input-label">Revenue Model <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Business Model</div><div class="tooltip-desc">Colocation charges per kW/month for power and space. Wholesale offers lower rates ($100-140/kW) for large deployments. Retail commands premium pricing ($150-250/kW) for smaller, managed deployments. Hyperscale/AI can reach $200-400/kW for liquid-cooled, high-density capacity.</div></div></span></label>
                     <select class="input-field" id="revenueModel" onchange="onRevenueModelChange();calculate()" aria-label="Revenue Model">
                         <option value="wholesale">Wholesale Colo ($100-140/kW/mo)</option>
                         <option value="retail" selected>Retail Colo ($150-250/kW/mo)</option>
                         <option value="hyperscale">Hyperscale/AI ($200-400/kW/mo)</option>
                     </select>
 
-                    <label class="input-label">Avg Revenue per kW/month ($) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-dollar-sign"></i> Monthly Revenue Rate</div><div class="tooltip-desc">Average monthly revenue per kilowatt of IT capacity sold. This is the primary revenue driver. Blended rates account for different contract sizes and service levels. Industry average is $130-180/kW/month for retail colocation in developed markets.</div></div></span></label>
+                    <label class="input-label">Avg Revenue per kW/month ($) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Monthly Revenue Rate</div><div class="tooltip-desc">Average monthly revenue per kilowatt of IT capacity sold. This is the primary revenue driver. Blended rates account for different contract sizes and service levels. Industry average is $130-180/kW/month for retail colocation in developed markets.</div></div></span></label>
                     <input type="number" class="input-field" id="revenuePerKw" value="185" min="50" max="500" step="5" oninput="calculate()" aria-label="Revenue Per kW">
 
-                    <label class="input-label">Annual Price Escalation: <span id="escalationVal">3</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-arrow-trend-up"></i> Annual Price Growth</div><div class="tooltip-desc">Annual percentage increase in revenue per kW. Most colocation contracts include 2-5% annual escalators. Power-pass-through models may have higher effective escalation if electricity prices rise. Negative values model price compression from competition.</div></div></span></label>
+                    <label class="input-label">Annual Price Escalation: <span id="escalationVal">3</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Annual Price Growth</div><div class="tooltip-desc">Annual percentage increase in revenue per kW. Most colocation contracts include 2-5% annual escalators. Power-pass-through models may have higher effective escalation if electricity prices rise. Negative values model price compression from competition.</div></div></span></label>
                     <input type="range" id="escalation" min="-2" max="8" value="3" step="0.5" oninput="document.getElementById('escalationVal').textContent=this.value;calculate()" aria-label="Escalation">
 
-                    <label class="input-label">Ancillary Revenue (% of base) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-puzzle-piece"></i> Additional Services Revenue</div><div class="tooltip-desc">Revenue from cross-connects, remote hands, managed services, network services, and other value-added offerings as a percentage of base colocation revenue. Mature operators typically generate 15-25% ancillary revenue on top of base power/space charges.</div></div></span></label>
+                    <label class="input-label">Ancillary Revenue (% of base) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Additional Services Revenue</div><div class="tooltip-desc">Revenue from cross-connects, remote hands, managed services, network services, and other value-added offerings as a percentage of base colocation revenue. Mature operators typically generate 15-25% ancillary revenue on top of base power/space charges.</div></div></span></label>
                     <select class="input-field" id="ancillaryPct" onchange="calculate()" aria-label="Ancillary Pct">
                         <option value="5">5% — Minimal services</option>
                         <option value="10">10% — Basic cross-connects</option>
@@ -834,22 +367,20 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                 </div>
 
                 <!-- Section 3: Operating Costs -->
-                <div class="input-section" style="border-left:3px solid #f59e0b;">
-                    <div class="section-header" style="background:rgba(245,158,11,0.1);">
-                        <i class="fas fa-cogs" style="color:#f59e0b;"></i> Operating Costs
-                    </div>
+                <div class="input-section">
+                    <div class="section-header"><span class="section-title">Operating Costs</span></div>
 
-                    <label class="input-label">Electricity Rate ($/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-plug"></i> Electricity Unit Cost</div><div class="tooltip-desc">Industrial electricity rate including demand charges, transmission, and distribution. Ranges from $0.03/kWh in low-cost markets (Qatar, Saudi Arabia) to $0.25/kWh in premium markets (Germany, Japan). This is typically the largest OPEX component at 40-60% of total operating costs.</div></div></span></label>
-                    <div class="preset-bar">
+                    <label class="input-label">Electricity Rate ($/kWh) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Electricity Unit Cost</div><div class="tooltip-desc">Industrial electricity rate including demand charges, transmission, and distribution. Ranges from $0.03/kWh in low-cost markets (Qatar, Saudi Arabia) to $0.25/kWh in premium markets (Germany, Japan). This is typically the largest OPEX component at 40-60% of total operating costs.</div></div></span></label>
+                    <div class="preset-bar preset-row">
                         <button class="preset-btn" onclick="setPreset('electricityRate',0.05)">$0.05 Low</button>
                         <button class="preset-btn active" onclick="setPreset('electricityRate',0.08)">$0.08 Mid</button>
                         <button class="preset-btn" onclick="setPreset('electricityRate',0.12)">$0.12 High</button>
-                        <button class="preset-btn" onclick="setPreset('electricityRate',0.20)">$0.20 Full access</button>
+                        <button class="preset-btn" onclick="setPreset('electricityRate',0.20)">$0.20 Very high</button>
                     </div>
                     <input type="number" class="input-field" id="electricityRate" value="0.08" min="0.02" max="0.40" step="0.005" oninput="calculate()" aria-label="Electricity Rate">
 
-                    <label class="input-label">PUE <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-tachometer-alt"></i> Power Usage Effectiveness</div><div class="tooltip-desc">Ratio of total facility power to IT load. Directly impacts electricity OPEX — a PUE of 1.5 means 50% overhead power for cooling, lighting, and losses. Improving PUE from 1.5 to 1.3 on a 10MW facility saves ~$1.4M/year at $0.08/kWh.</div></div></span></label>
-                    <div class="preset-bar">
+                    <label class="input-label">PUE <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Power Usage Effectiveness</div><div class="tooltip-desc">Ratio of total facility power to IT load. Directly impacts electricity OPEX — a PUE of 1.5 means 50% overhead power for cooling, lighting, and losses. Improving PUE from 1.5 to 1.3 on a 10MW facility saves ~$1.4M/year at $0.08/kWh.</div></div></span></label>
+                    <div class="preset-bar preset-row">
                         <button class="preset-btn" onclick="setPreset('pueValue',1.2)">1.2 Best</button>
                         <button class="preset-btn active" onclick="setPreset('pueValue',1.4)">1.4 Good</button>
                         <button class="preset-btn" onclick="setPreset('pueValue',1.52)">1.52 Avg</button>
@@ -857,34 +388,32 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                     </div>
                     <input type="number" class="input-field" id="pueValue" value="1.4" min="1.05" max="2.5" step="0.01" oninput="calculate()" aria-label="PUE Value">
 
-                    <label class="input-label">Annual Staffing ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-users"></i> Personnel Costs</div><div class="tooltip-desc">Total annual cost for facility operations staff including engineers, technicians, security, and management. Typical staffing ratios are 1 FTE per 2-5 MW for colocation. A 10MW facility typically requires 15-25 staff at $2-4M total annual cost depending on market.</div></div></span></label>
+                    <label class="input-label">Annual Staffing ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Personnel Costs</div><div class="tooltip-desc">Total annual cost for facility operations staff including engineers, technicians, security, and management. Typical staffing ratios are 1 FTE per 2-5 MW for colocation. A 10MW facility typically requires 15-25 staff at $2-4M total annual cost depending on market.</div></div></span></label>
                     <input type="number" class="input-field" id="staffingCost" value="3" min="0.5" max="20" step="0.25" oninput="calculate()" aria-label="Staffing Cost">
 
-                    <label class="input-label">Annual Maintenance ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-wrench"></i> Maintenance & Repairs</div><div class="tooltip-desc">Annual cost for preventive and corrective maintenance of MEP systems, generators, UPS, cooling, fire suppression, and building fabric. Typically 1.5-3% of MEP CAPEX per year. Includes OEM service contracts, spare parts, and third-party maintenance.</div></div></span></label>
+                    <label class="input-label">Annual Maintenance ($M) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Maintenance & Repairs</div><div class="tooltip-desc">Annual cost for preventive and corrective maintenance of MEP systems, generators, UPS, cooling, fire suppression, and building fabric. Typically 1.5-3% of MEP CAPEX per year. Includes OEM service contracts, spare parts, and third-party maintenance.</div></div></span></label>
                     <input type="number" class="input-field" id="maintenanceCost" value="1.5" min="0.1" max="15" step="0.1" oninput="calculate()" aria-label="Maintenance Cost">
 
-                    <label class="input-label">Insurance & Other ($M/yr) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-shield-alt"></i> Insurance & Overhead</div><div class="tooltip-desc">Annual property insurance, liability insurance, property taxes, SGA expenses, and other overhead costs. Typically 0.5-1.5% of total asset value per year. Includes business interruption insurance, which is critical for data center operations.</div></div></span></label>
+                    <label class="input-label">Insurance & Other ($M/yr) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Insurance & Overhead</div><div class="tooltip-desc">Annual property insurance, liability insurance, property taxes, SGA expenses, and other overhead costs. Typically 0.5-1.5% of total asset value per year. Includes business interruption insurance, which is critical for data center operations.</div></div></span></label>
                     <input type="number" class="input-field" id="insuranceCost" value="0.8" min="0.1" max="10" step="0.1" oninput="calculate()" aria-label="Insurance Cost">
 
-                    <label class="input-label">Annual OPEX Escalation: <span id="opexEscVal">2.5</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-arrow-up"></i> Cost Inflation Rate</div><div class="tooltip-desc">Annual increase in operating costs driven by labor inflation, electricity price changes, and general cost escalation. Electricity costs may escalate faster (3-5%) while maintenance costs typically grow at 2-3%. This applies to all non-electricity OPEX components.</div></div></span></label>
+                    <label class="input-label">Annual OPEX Escalation: <span id="opexEscVal">2.5</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Cost Inflation Rate</div><div class="tooltip-desc">Annual increase in operating costs driven by labor inflation, electricity price changes, and general cost escalation. Electricity costs may escalate faster (3-5%) while maintenance costs typically grow at 2-3%. This applies to all non-electricity OPEX components.</div></div></span></label>
                     <input type="range" id="opexEscalation" min="0" max="6" value="2.5" step="0.5" oninput="document.getElementById('opexEscVal').textContent=this.value;calculate()" aria-label="OPEX Escalation">
                 </div>
 
                 <!-- Section 4: Occupancy Ramp -->
-                <div class="input-section" style="border-left:3px solid #64748b;">
-                    <div class="section-header" style="background:rgba(100, 116, 139,0.1);">
-                        <i class="fas fa-layer-group" style="color:#64748b;"></i> Occupancy Ramp
-                    </div>
+                <div class="input-section">
+                    <div class="section-header"><span class="section-title">Occupancy Ramp</span></div>
 
-                    <label class="input-label">Ramp Profile <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-area"></i> Leasing Velocity</div><div class="tooltip-desc">How quickly the facility fills with paying customers after construction. Conservative assumes 5-7 years to full occupancy. Moderate targets 3-5 years. Aggressive assumes 2-3 years (pre-leased anchor tenants). Custom allows manual year-by-year entry.</div></div></span></label>
-                    <div class="preset-bar">
+                    <label class="input-label">Ramp Profile <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Leasing Velocity</div><div class="tooltip-desc">How quickly the facility fills with paying customers after construction. Conservative assumes 5-7 years to full occupancy. Moderate targets 3-5 years. Aggressive assumes 2-3 years (pre-leased anchor tenants). Custom allows manual year-by-year entry.</div></div></span></label>
+                    <div class="preset-bar preset-row">
                         <button class="preset-btn" onclick="setRampProfile('conservative')">Conservative</button>
                         <button class="preset-btn active" onclick="setRampProfile('moderate')">Moderate</button>
                         <button class="preset-btn" onclick="setRampProfile('aggressive')">Aggressive</button>
                         <button class="preset-btn" onclick="setRampProfile('custom')">Custom</button>
                     </div>
 
-                    <label class="input-label">Year 1 Occupancy: <span id="occ1Val">25</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-door-open"></i> First Year Fill Rate</div><div class="tooltip-desc">Percentage of IT capacity occupied in the first year of operation (after construction). Pre-leased facilities may start at 40-60%. Speculative builds often start at 10-20%. This directly impacts first-year revenue and cash flow.</div></div></span></label>
+                    <label class="input-label">Year 1 Occupancy: <span id="occ1Val">25</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">First Year Fill Rate</div><div class="tooltip-desc">Percentage of IT capacity occupied in the first year of operation (after construction). Pre-leased facilities may start at 40-60%. Speculative builds often start at 10-20%. This directly impacts first-year revenue and cash flow.</div></div></span></label>
                     <input type="range" id="occYear1" min="0" max="100" value="25" step="5" oninput="document.getElementById('occ1Val').textContent=this.value;calculate()" aria-label="Occ Year1">
 
                     <label class="input-label">Year 3 Occupancy: <span id="occ3Val">60</span>%</label>
@@ -893,17 +422,15 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                     <label class="input-label">Year 5 Occupancy: <span id="occ5Val">85</span>%</label>
                     <input type="range" id="occYear5" min="0" max="100" value="85" step="5" oninput="document.getElementById('occ5Val').textContent=this.value;calculate()" aria-label="Occ Year5">
 
-                    <label class="input-label">Steady-State Occupancy: <span id="occMaxVal">92</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-bullseye"></i> Maximum Occupancy</div><div class="tooltip-desc">Peak occupancy rate the facility achieves and maintains long-term. Most operators target 85-95% rather than 100% to maintain flexibility for customer growth and churn replacement. A buffer of 5-10% accounts for stranded capacity and power density mismatches.</div></div></span></label>
+                    <label class="input-label">Steady-State Occupancy: <span id="occMaxVal">92</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Maximum Occupancy</div><div class="tooltip-desc">Peak occupancy rate the facility achieves and maintains long-term. Most operators target 85-95% rather than 100% to maintain flexibility for customer growth and churn replacement. A buffer of 5-10% accounts for stranded capacity and power density mismatches.</div></div></span></label>
                     <input type="range" id="occMax" min="60" max="100" value="92" step="1" oninput="document.getElementById('occMaxVal').textContent=this.value;calculate()" aria-label="Occ Max">
                 </div>
 
                 <!-- Section 5: Financing -->
-                <div class="input-section" style="border-left:3px solid #ef4444;">
-                    <div class="section-header" style="background:rgba(239,68,68,0.1);">
-                        <i class="fas fa-university" style="color:#ef4444;"></i> Financing
-                    </div>
+                <div class="input-section">
+                    <div class="section-header"><span class="section-title">Financing</span></div>
 
-                    <label class="input-label">Debt/Equity Split <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-balance-scale"></i> Capital Structure</div><div class="tooltip-desc">Proportion of CAPEX funded by debt vs equity. Higher leverage (70-80% debt) amplifies equity returns but increases financial risk. Data center projects typically attract 60-75% LTV (loan-to-value) from lenders due to strong, contracted cashflows.</div></div></span></label>
+                    <label class="input-label">Debt/Equity Split <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Capital Structure</div><div class="tooltip-desc">Proportion of CAPEX funded by debt vs equity. Higher leverage (70-80% debt) amplifies equity returns but increases financial risk. Data center projects typically attract 60-75% LTV (loan-to-value) from lenders due to strong, contracted cashflows.</div></div></span></label>
                     <select class="input-field" id="debtRatio" onchange="calculate()" aria-label="Debt Ratio">
                         <option value="0">100% Equity (No Debt)</option>
                         <option value="50">50/50 Debt/Equity</option>
@@ -912,10 +439,10 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                         <option value="80">80/20 Debt/Equity</option>
                     </select>
 
-                    <label class="input-label">Interest Rate (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Cost of Debt</div><div class="tooltip-desc">Annual interest rate on project debt. Data center project finance typically achieves SOFR + 200-350 bps for investment-grade borrowers. Current rates range from 5-8% depending on credit quality, leverage, and market conditions.</div></div></span></label>
+                    <label class="input-label">Interest Rate (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Cost of Debt</div><div class="tooltip-desc">Annual interest rate on project debt. Data center project finance typically achieves SOFR + 200-350 bps for investment-grade borrowers. Current rates range from 5-8% depending on credit quality, leverage, and market conditions.</div></div></span></label>
                     <input type="number" class="input-field" id="interestRate" value="6" min="2" max="15" step="0.25" oninput="calculate()" aria-label="Interest Rate">
 
-                    <label class="input-label">Loan Term (years) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-hourglass"></i> Debt Maturity</div><div class="tooltip-desc">Duration of the loan repayment period. Longer terms reduce annual debt service but increase total interest paid. Data center project loans typically have 7-15 year terms with 20-25 year amortization schedules.</div></div></span></label>
+                    <label class="input-label">Loan Term (years) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Debt Maturity</div><div class="tooltip-desc">Duration of the loan repayment period. Longer terms reduce annual debt service but increase total interest paid. Data center project loans typically have 7-15 year terms with 20-25 year amortization schedules.</div></div></span></label>
                     <select class="input-field" id="loanTerm" onchange="calculate()" aria-label="Loan Term">
                         <option value="7">7 years</option>
                         <option value="10" selected>10 years</option>
@@ -923,197 +450,141 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                         <option value="20">20 years</option>
                     </select>
 
-                    <label class="input-label">Discount Rate / WACC (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-pie"></i> Weighted Average Cost of Capital</div><div class="tooltip-desc">The rate used to discount future cashflows to present value for NPV calculation. Represents the blended cost of debt and equity capital. Typical data center WACC ranges from 7-12%. Higher discount rates produce lower NPV, reflecting higher required returns or risk.</div></div></span></label>
+                    <label class="input-label">Discount Rate / WACC (%) <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Weighted Average Cost of Capital</div><div class="tooltip-desc">The rate used to discount future cashflows to present value for NPV calculation. Represents the blended cost of debt and equity capital. Typical data center WACC ranges from 7-12%. Higher discount rates produce lower NPV, reflecting higher required returns or risk.</div></div></span></label>
                     <input type="number" class="input-field" id="discountRate" value="8" min="3" max="25" step="0.5" oninput="calculate()" aria-label="Discount Rate">
                 </div>
 
                 <!-- Section 6: Tax & Depreciation -->
-                <div class="input-section" style="border-left:3px solid #06b6d4;">
-                    <div class="section-header" style="background:rgba(6,182,212,0.1);">
-                        <i class="fas fa-receipt" style="color:#06b6d4;"></i> Tax &amp; Depreciation
-                    </div>
+                <div class="input-section">
+                    <div class="section-header"><span class="section-title">Tax and Depreciation</span></div>
 
-                    <label class="input-label">Corporate Tax Rate: <span id="taxRateVal">25</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-landmark"></i> Effective Tax Rate</div><div class="tooltip-desc">Effective corporate income tax rate applied to operating profit. Varies by jurisdiction: US (21% federal + state), Singapore (17%), Ireland (12.5%), UAE (9%). Many data center markets offer tax incentives, holidays, or accelerated depreciation that reduce the effective rate.</div></div></span></label>
+                    <label class="input-label">Corporate Tax Rate: <span id="taxRateVal">25</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Effective Tax Rate</div><div class="tooltip-desc">Effective corporate income tax rate applied to operating profit. Varies by jurisdiction: US (21% federal + state), Singapore (17%), Ireland (12.5%), UAE (9%). Many data center markets offer tax incentives, holidays, or accelerated depreciation that reduce the effective rate.</div></div></span></label>
                     <input type="range" id="taxRate" min="0" max="40" value="25" step="1" oninput="document.getElementById('taxRateVal').textContent=this.value;calculate()" aria-label="Tax Rate">
 
-                    <label class="input-label">Depreciation Method <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-chart-line"></i> Asset Depreciation</div><div class="tooltip-desc">Method for depreciating capital assets for tax purposes. Straight-line spreads the deduction evenly. Accelerated (MACRS) front-loads deductions, improving early cash flows. Bonus depreciation allows 100% deduction in year one (available in some jurisdictions).</div></div></span></label>
+                    <label class="input-label">Depreciation Method <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Asset Depreciation</div><div class="tooltip-desc">Method for depreciating capital assets for tax purposes. Straight-line spreads the deduction evenly. Accelerated (MACRS) front-loads deductions, improving early cash flows. Bonus depreciation allows 100% deduction in year one (available in some jurisdictions).</div></div></span></label>
                     <select class="input-field" id="depreciationMethod" onchange="calculate()" aria-label="Depreciation Method">
                         <option value="straight" selected>Straight-line (20 years)</option>
                         <option value="accelerated">Accelerated (MACRS 15yr)</option>
                         <option value="bonus">Bonus depreciation (100% Y1)</option>
                     </select>
 
-                    <label class="input-label">Terminal Value Method <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-building"></i> Exit Valuation</div><div class="tooltip-desc">How the residual value of the asset is calculated at the end of the analysis period. Cap rate method values the asset as a multiple of final-year NOI. Book value uses remaining depreciated value. None assumes zero terminal value (conservative). Data centers typically trade at 5-8% cap rates.</div></div></span></label>
+                    <label class="input-label">Terminal Value Method <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Exit Valuation</div><div class="tooltip-desc">How the residual value of the asset is calculated at the end of the analysis period. Cap rate method values the asset as a multiple of final-year NOI. Book value uses remaining depreciated value. None assumes zero terminal value (conservative). Data centers typically trade at 5-8% cap rates.</div></div></span></label>
                     <select class="input-field" id="terminalMethod" onchange="calculate()" aria-label="Terminal Method">
                         <option value="none">None (Conservative)</option>
                         <option value="caprate" selected>Cap Rate (NOI / Cap Rate)</option>
                         <option value="book">Book Value</option>
                     </select>
 
-                    <label class="input-label">Exit Cap Rate: <span id="capRateVal">6</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-percentage"></i> Capitalization Rate</div><div class="tooltip-desc">The capitalization rate used to value the property at exit. Lower cap rates imply higher valuations. Data center cap rates have compressed from 7-9% historically to 5-7% currently due to strong institutional demand. AI-ready facilities may trade at even tighter caps.</div></div></span></label>
+                    <label class="input-label">Exit Cap Rate: <span id="capRateVal">6</span>% <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title">Capitalization Rate</div><div class="tooltip-desc">The capitalization rate used to value the property at exit. Lower cap rates imply higher valuations. Data center cap rates have compressed from 7-9% historically to 5-7% currently due to strong institutional demand. AI-ready facilities may trade at even tighter caps.</div></div></span></label>
                     <input type="range" id="exitCapRate" min="4" max="12" value="5.5" step="0.25" oninput="document.getElementById('capRateVal').textContent=this.value;calculate()" aria-label="Exit Cap Rate">
                 </div>
 
             </div><!-- /input-panel -->
 
             <!-- ═══ RESULTS PANEL ═══ -->
-            <div class="results-panel">
-                <div class="results-card">
-                    <div class="score-display">
-                        <div class="score-value" id="primaryValue" style="color: #3b82f6;">$0</div>
-                        <div class="score-unit" id="primaryUnit">NPV ($M)</div>
-                        <div class="score-label" id="primaryLabel">Net Present Value</div>
-                        <div class="score-grade" id="scoreGrade" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
-                            <i class="fas fa-chart-line"></i> <span id="gradeText">--</span>
-                        </div>
-                    </div>
-                    <div class="metric-grid" id="metricGrid">
-                        <div class="metric-box"><div class="metric-value" id="metIRR">--</div><div class="metric-label">IRR <span class="tip" tabindex="0" data-tip="Internal Rate of Return — the discount rate at which NPV equals zero. Above your cost of capital means the project creates value. DC projects typically target IRR of 12-20%. Formula: solve NPV(IRR)=0 over the cashflow series." aria-label="IRR tooltip">ⓘ</span></div></div>
-                        <div class="metric-box"><div class="metric-value" id="metPayback">--</div><div class="metric-label">Payback (yrs) <span class="tip" tabindex="0" data-tip="Simple payback period: years until cumulative net cashflow turns positive. Does not account for time value of money. Typical DC payback is 6-12 years. Shorter payback reduces investment risk and exposure to technology obsolescence." aria-label="Payback tooltip">ⓘ</span></div></div>
-                        <div class="metric-box"><div class="metric-value" id="metPI">--</div><div class="metric-label">Profitability Index <span class="tip" tabindex="0" data-tip="Ratio of NPV to initial investment (PI = 1 + NPV / CAPEX). PI above 1.0 signals value creation. Used to rank competing projects when capital is constrained. PI of 1.25 means every $1 invested returns $1.25 in present value." aria-label="Profitability Index tooltip">ⓘ</span></div></div>
-                        <div class="metric-box"><div class="metric-value" id="metROIC">--</div><div class="metric-label">ROIC <span class="tip" tabindex="0" data-tip="Return on Invested Capital — peak-year NOI divided by total capital invested including CAPEX. Measures operational efficiency of deployed capital. A ROIC above WACC confirms the project earns above its cost of capital." aria-label="ROIC tooltip">ⓘ</span></div></div>
-                        <div class="metric-box"><div class="metric-value" id="metRevenue">--</div><div class="metric-label">Peak Revenue <span class="tip" tabindex="0" data-tip="Maximum annual gross revenue at full stabilized occupancy. Equals IT capacity (kW) x utilization rate x colocation price per kW per month x 12. Drives the ceiling on NOI and terminal value." aria-label="Peak Revenue tooltip">ⓘ</span></div></div>
-                        <div class="metric-box"><div class="metric-value" id="metNOI">--</div><div class="metric-label">Peak NOI <span class="tip" tabindex="0" data-tip="Net Operating Income at stabilization — peak revenue minus total annual OPEX (energy, staffing, maintenance, insurance). Excludes debt service and depreciation. NOI is the primary driver of asset valuation using cap rate pricing." aria-label="Peak NOI tooltip">ⓘ</span></div></div>
-                        <div class="metric-box"><div class="metric-value" id="metYield">--</div><div class="metric-label">Yield on Cost <span class="tip" tabindex="0" data-tip="Stabilized NOI divided by total project cost (CAPEX). Shows the unleveraged yield the project produces on cost. A yield-on-cost spread of 150-300 bps above the prevailing cap rate indicates a value-creation development margin." aria-label="Yield on Cost tooltip">ⓘ</span></div></div>
-                        <div class="metric-box"><div class="metric-value" id="metTerminal">--</div><div class="metric-label">Terminal Value <span class="tip" tabindex="0" data-tip="Estimated sale value of the asset at the end of the hold period. Calculated as stabilized NOI divided by the exit cap rate. Terminal value often represents 50-70% of total project return in DC investments held 10+ years." aria-label="Terminal Value tooltip">ⓘ</span></div></div>
-                    </div>
-                </div>
-                <!-- Cashflow Chart -->
-                <div class="results-card" style="margin-top:1rem;">
-                    <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;"><i class="fas fa-chart-area" style="color:#3b82f6;margin-right:6px;"></i>Annual Cashflow</div>
-                    <div class="chart-container"><canvas id="cashflowChart" width="400" height="300"></canvas></div>
-                </div>
-                <!-- Revenue vs OPEX Chart -->
-                <div class="results-card" style="margin-top:1rem;">
-                    <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;"><i class="fas fa-chart-bar" style="color:#3b82f6;margin-right:6px;"></i>Revenue vs OPEX</div>
-                    <div class="chart-container"><canvas id="revenueChart" width="400" height="250"></canvas></div>
-                </div>
+            <div class="results-panel tool-results">
+                <div class="res-head"><h2>Results</h2><span class="basis">NPV = Σ CF_t / (1 + WACC)^t − CAPEX</span></div>
+                <div class="res-group"><h3>Headline</h3><div data-rz-fact-list>
+                    <div class="metric-box is-key"><div class="metric-label" id="primaryLabel">Net present value</div><div class="metric-value" id="primaryValue">$0</div><div class="metric-sub"><span id="primaryUnit" hidden>NPV ($M)</span><span class="state" id="scoreGrade"><span id="gradeText">--</span></span></div></div>
+                </div></div>
+                <div class="res-group"><h3>Returns and income</h3><div class="metric-grid" id="metricGrid" data-rz-fact-list>
+                    <div class="metric-box"><div class="metric-label">IRR <span class="tooltip-trigger">?<span class="tooltip-content">Internal Rate of Return — the discount rate at which NPV equals zero. Above your cost of capital means the project creates value. DC projects typically target IRR of 12-20%. Formula: solve NPV(IRR)=0 over the cashflow series.</span></span></div><div class="metric-value" id="metIRR">--</div></div>
+                    <div class="metric-box"><div class="metric-label">Payback, years <span class="tooltip-trigger">?<span class="tooltip-content">Simple payback period: years until cumulative net cashflow turns positive. Does not account for time value of money. Typical DC payback is 6-12 years. Shorter payback reduces investment risk and exposure to technology obsolescence.</span></span></div><div class="metric-value" id="metPayback">--</div></div>
+                    <div class="metric-box"><div class="metric-label">Profitability index <span class="tooltip-trigger">?<span class="tooltip-content">Ratio of NPV to initial investment (PI = 1 + NPV / CAPEX). PI above 1.0 signals value creation. Used to rank competing projects when capital is constrained. PI of 1.25 means every $1 invested returns $1.25 in present value.</span></span></div><div class="metric-value" id="metPI">--</div></div>
+                    <div class="metric-box"><div class="metric-label">ROIC <span class="tooltip-trigger">?<span class="tooltip-content">Return on Invested Capital — peak-year NOI divided by total capital invested including CAPEX. Measures operational efficiency of deployed capital. A ROIC above WACC confirms the project earns above its cost of capital.</span></span></div><div class="metric-value" id="metROIC">--</div></div>
+                    <div class="metric-box"><div class="metric-label">Peak revenue <span class="tooltip-trigger">?<span class="tooltip-content">Maximum annual gross revenue at full stabilized occupancy. Equals IT capacity (kW) x utilization rate x colocation price per kW per month x 12. Drives the ceiling on NOI and terminal value.</span></span></div><div class="metric-value" id="metRevenue">--</div></div>
+                    <div class="metric-box"><div class="metric-label">Peak NOI <span class="tooltip-trigger">?<span class="tooltip-content">Net Operating Income at stabilization — peak revenue minus total annual OPEX (energy, staffing, maintenance, insurance). Excludes debt service and depreciation. NOI is the primary driver of asset valuation using cap rate pricing.</span></span></div><div class="metric-value" id="metNOI">--</div></div>
+                    <div class="metric-box"><div class="metric-label">Yield on cost <span class="tooltip-trigger">?<span class="tooltip-content">Stabilized NOI divided by total project cost (CAPEX). Shows the unleveraged yield the project produces on cost. A yield-on-cost spread of 150-300 bps above the prevailing cap rate indicates a value-creation development margin.</span></span></div><div class="metric-value" id="metYield">--</div></div>
+                    <div class="metric-box"><div class="metric-label">Terminal value <span class="tooltip-trigger">?<span class="tooltip-content">Estimated sale value of the asset at the end of the hold period. Calculated as stabilized NOI divided by the exit cap rate. Terminal value often represents 50-70% of total project return in DC investments held 10+ years.</span></span></div><div class="metric-value" id="metTerminal">--</div></div>
+                </div></div>
+                <figure class="fig res-fig chart-card" data-rz-series-meaning><div class="chart-container"><canvas id="cashflowChart" width="400" height="300"></canvas></div><figcaption><b>FIG. 1</b> · Net cashflow per year (grey bars, red = a negative year) and cumulative cashflow (amber line), USD M · computed from the inputs above</figcaption></figure>
+                <figure class="fig res-fig chart-card"><div class="chart-container"><canvas id="revenueChart" width="400" height="250"></canvas></div><figcaption><b>FIG. 2</b> · Revenue (amber) against OPEX (grey) per year, USD M · computed from the inputs above</figcaption></figure>
             </div><!-- /results-panel -->
 
         </div><!-- /calculator-grid -->
     </section>
 
     <!-- ═══ PRO PANELS ═══ -->
-    <section class="charts-section pro-section locked" id="proPanelsSection" style="max-width:1400px;margin:2rem auto;padding:0 2rem;">
-        <div class="pro-overlay" onclick="handlePremiumTab()">
-            <i class="fas fa-crown"></i>
-            <div class="pro-overlay-title">Full analysis Panels</div>
-            <div class="pro-overlay-desc">Monte Carlo simulation, sensitivity tornado, scenario analysis, and detailed cashflow table</div>
-            <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button>
-        </div>
-        <div class="charts-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-            <!-- Panel 1: Monte Carlo -->
-            <div class="roi-pro-panel" id="panelMonteCarlo">
-                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-dice" style="color:#64748b;margin-right:6px;"></i>Monte Carlo NPV Distribution <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
-                <div class="roi-kpi-grid" id="mcKpiGrid">
-                    <div class="roi-kpi-card"><div class="roi-kpi-value" id="mcP5">--</div><div class="roi-kpi-label">P5 (Best)</div></div>
-                    <div class="roi-kpi-card"><div class="roi-kpi-value" id="mcP50">--</div><div class="roi-kpi-label">P50 (Median)</div></div>
-                    <div class="roi-kpi-card"><div class="roi-kpi-value" id="mcP95">--</div><div class="roi-kpi-label">P95 (Worst)</div></div>
-                    <div class="roi-kpi-card"><div class="roi-kpi-value" id="mcProbPositive">--</div><div class="roi-kpi-label">P(NPV>0)</div></div>
+    <section class="charts-section pro-section locked wrap" id="proPanelsSection">
+        <div class="pro-overlay tool-full" onclick="handlePremiumTab()"><p><b>Full analysis</b> — Monte Carlo NPV distribution, sensitivity, scenarios, the year-by-year cashflow table and the PDF report</p><button class="pro-overlay-btn">Sign in</button></div>
+        <div class="charts-grid">
+            <div class="roi-pro-panel" id="panelMonteCarlo"><h2 class="pro-h">Monte Carlo NPV distribution</h2>
+                <div id="mcKpiGrid" data-rz-fact-list>
+                    <div class="metric-box"><div class="metric-label">P5, best</div><div class="metric-value" id="mcP5">--</div></div>
+                    <div class="metric-box"><div class="metric-label">P50, median</div><div class="metric-value" id="mcP50">--</div></div>
+                    <div class="metric-box"><div class="metric-label">P95, worst</div><div class="metric-value" id="mcP95">--</div></div>
+                    <div class="metric-box"><div class="metric-label">Probability NPV &gt; 0</div><div class="metric-value" id="mcProbPositive">--</div></div>
                 </div>
-                <div class="chart-container"><canvas id="histogramChart" width="600" height="280"></canvas></div>
+                <figure class="fig res-fig chart-card" data-rz-series-meaning><div class="chart-container"><canvas id="histogramChart" width="600" height="280"></canvas></div><figcaption><b>FIG. 3</b> · NPV over 10,000 Monte Carlo runs · red bins = NPV below zero · RZEngine sim</figcaption></figure>
             </div>
-            <!-- Panel 2: Sensitivity Tornado -->
-            <div class="roi-pro-panel" id="panelTornado">
-                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-wind" style="color:#f59e0b;margin-right:6px;"></i>Sensitivity Tornado <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
-                <div class="chart-container"><canvas id="tornadoChart" width="600" height="350"></canvas></div>
+            <div class="roi-pro-panel" id="panelTornado"><h2 class="pro-h">Sensitivity</h2>
+                <figure class="fig res-fig chart-card"><div class="chart-container"><canvas id="tornadoChart" width="600" height="350"></canvas></div><figcaption><b>FIG. 4</b> · NPV swing per driver, USD M · the largest driver in amber</figcaption></figure>
             </div>
-            <!-- Panel 3: Scenario Analysis -->
-            <div class="roi-pro-panel" id="panelScenarios">
-                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-route" style="color:#3b82f6;margin-right:6px;"></i>Scenario Analysis <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
+            <div class="roi-pro-panel" id="panelScenarios"><h2 class="pro-h">Scenarios</h2>
                 <div id="scenarioResults"></div>
             </div>
-            <!-- Panel 4: Cashflow Table -->
-            <div class="roi-pro-panel" id="panelCashflow">
-                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-table" style="color:#06b6d4;margin-right:6px;"></i>Year-by-Year Cashflow <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
-                <div style="overflow-x:auto;" id="cashflowTableWrap"></div>
+            <div class="roi-pro-panel" id="panelCashflow"><h2 class="pro-h">Year-by-year cashflow</h2>
+                <div class="tbl-wrap" id="cashflowTableWrap"></div>
                 <div class="roi-narrative" id="narrativeBox">
-                    <p><strong>Executive Summary:</strong> Complete the calculation to generate your personalized investment narrative.</p>
+                    <p><b>Summary.</b> Complete the calculation to generate the investment narrative.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ═══ PRIVACY BADGE + BENCHMARK META ═══ -->
-    <div style="max-width:1400px;margin:1.5rem auto;padding:0 2rem;">
-        <div class="roi-privacy-badge"><i class="fas fa-shield-halved"></i> PDF generated in your browser — no data is sent to any server</div>
-        <div class="roi-benchmark-meta">
-            <span class="roi-benchmark-tag"><i class="fas fa-code-branch"></i> Model v1.0</span>
-            <span class="roi-benchmark-tag"><i class="fas fa-calendar"></i> Updated Feb 2026</span>
-            <span class="roi-benchmark-tag"><i class="fas fa-book"></i> Sources: Industry benchmarks, Uptime Institute, JLL, CBRE</span>
-            <span class="roi-benchmark-tag"><i class="fas fa-info-circle"></i> NPV + IRR + Payback + PI + Cashflow</span>
-        </div>
+    
+        <section class="tool-ref" aria-labelledby="ref-h">
+            <div class="wrap">
+                <p class="eyebrow" id="ref-h">02 / Reference</p>
+                <div class="ref-grid">
+                    <div>
+                        <h3>Method</h3>
+                        <ul class="formulas">
+                            <li><span>Revenue_t</span><code>P_IT · occupancy_t · revenue per kW · 12 · (1 + escalation)^t · (1 + ancillary)</code></li>
+                            <li><span>OPEX_t</span><code>(energy + staffing + maintenance + insurance) · (1 + OPEX escalation)^t</code></li>
+                            <li><span>Energy_t</span><code>P_IT · occupancy_t · PUE · 8,760 h · tariff</code></li>
+                            <li><span>NOI_t</span><code>Revenue_t − OPEX_t</code></li>
+                            <li><span>CF_t</span><code>NOI_t − debt service_t − tax_t (+ terminal value in the last year)</code></li>
+                            <li><span>NPV</span><code>Σ CF_t / (1 + WACC)^t − equity</code></li>
+                            <li><span>IRR</span><code>rate r where Σ CF_t / (1 + r)^t = 0, Newton-Raphson</code></li>
+                            <li><span>PI</span><code>1 + NPV / CAPEX</code></li>
+                            <li><span>Terminal value</span><code>NOI_final / exit cap rate</code></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Computed against</h3>
+                        <p class="against"><span>Uptime Institute</span><span>JLL Data Center Outlook</span><span>CBRE data center benchmarks</span><span>discounted cashflow practice</span></p>
+                        <h3>Read further</h3>
+                        <p class="links"><a href="manual/roi.html">Technical manual and methodology</a><a href="glossary.html">Glossary</a><a href="capex-calculator.html">CAPEX calculator</a><a href="opex-calculator.html">OPEX calculator</a><a href="tco-calculator.html">TCO calculator</a><a href="datacenter-solutions.html">DC Solutions</a><a href="account.html">My account and saved scenarios</a></p>
+                    </div>
+                </div>
+                <p class="notice">This calculator is provided for <strong>educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis. All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html">Privacy Policy</a> for details. By using this tool you agree to our <a href="terms.html">Terms of Service</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
+            </div>
+        </section>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models. Mission-critical infrastructure, documented.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
     </div>
-
-    </main>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
 
     
-    <!-- Calculator Disclaimer -->
-    <div style="max-width:1400px;margin:2rem auto 0;padding:0 2rem;">
-        <div class="calc-disclaimer" style="background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;">
-            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
-                <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;"><i class="fas fa-triangle-exclamation"></i></div>
-                <div>
-                    <div class="disc-title" style="font-weight:700;font-size:0.8rem;color:#e2e8f0;margin-bottom:0.5rem;">Disclaimer &amp; Data Sources</div>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">This calculator is provided for <strong style="color:#cbd5e1;">educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis.</p>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;"><strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong> NPV discounted cashflow methodology, IRR via Newton-Raphson iterative algorithm, Uptime Institute facility economics, JLL Data Center Outlook, CBRE market analytics, standard financial modeling practices (WACC, PI, payback).</p>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a> for details.</p>
-                    <p class="disc-fine" style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms of Service</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    
+    
 
-    <!-- ═══ FOOTER ═══ -->
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#475569;border-color:rgba(71,85,105,0.4)}.rz-manual-link a:hover{color:#0891b2;border-color:rgba(8,145,178,0.5)}[data-theme="dark"] .rz-manual-link a{color:#94a3b8;border-color:rgba(148,163,184,0.35)}[data-theme="dark"] .rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/roi.html">Technical Manual &amp; Methodology &#8599;</a></div>
-    <footer class="footer">
-        <div style="max-width:1400px;margin:0 auto;padding:0 2rem;">
-            <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:2rem;margin-bottom:2rem;">
-                <div>
-                    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
-                        <div style="width:40px;height:40px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.75rem;color:white;">ROI</div>
-                        <div>
-                            <div style="font-weight:700;font-size:1rem;">ROI Calculator</div>
-                            <div style="font-size:0.78rem;color:#94a3b8;">NPV + IRR + Payback + Year-by-Year Cashflow</div>
-                        </div>
-                    </div>
-                    <p style="font-size:0.82rem;color:#94a3b8;line-height:1.6;max-width:400px;">Comprehensive data center investment return analysis tool. Calculate NPV, IRR, payback period, and profitability index with occupancy ramp modeling and financing structures.</p>
-                </div>
-                <div>
-                    <div style="font-weight:600;margin-bottom:0.75rem;font-size:0.85rem;">Calculators</div>
-                    <div style="display:flex;flex-direction:column;gap:0.4rem;">
-                        <a href="pue-calculator.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">PUE Calculator</a>
-                        <a href="capex-calculator.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">CAPEX Calculator</a>
-                        <a href="opex-calculator.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">OPEX Calculator</a>
-                        <a href="carbon-footprint.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">Carbon Footprint</a>
-                        <a href="tia-942-checklist.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">TIA-942 Checklist</a>
-                    </div>
-                </div>
-                <div>
-                    <div style="font-weight:600;margin-bottom:0.75rem;font-size:0.85rem;">Legal</div>
-                    <div style="display:flex;flex-direction:column;gap:0.4rem;">
-                        <a href="privacy.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">Privacy Policy</a>
-                        <a href="terms.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">Terms of Service</a>
-                        <a href="index.html" style="color:#94a3b8;text-decoration:none;font-size:0.82rem;">Back to Portfolio</a>
-                    </div>
-                </div>
-            </div>
-            <div style="border-top:1px solid rgba(148,163,184,0.1);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
-                <div style="font-size:0.78rem;color:#64748b;">&copy; 2026 Resistance Zero. All rights reserved. For educational purposes only.</div>
-                <div style="font-size:0.75rem;color:#64748b;">Data sources: Uptime Institute, JLL Data Center Outlook, CBRE, industry benchmarks</div>
-            </div>
-        </div>
-    </footer>
+    
 
     <!-- ═══ LOGIN MODAL ═══ -->
     <!-- Login handled by shared auth.js modal (window._rzAuth.showModal) -->
 
 
 
-    <!-- ═══ SCROLL TO TOP ═══ -->
-    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-    </button>
+    
 
     <!-- ═══ JAVASCRIPT ═══ -->
     <script>
@@ -1530,19 +1001,17 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
 
         // Investment Grade Rating
         var rating, ratingColor;
-        if (irr > 0.25) { rating = 'Exceptional'; ratingColor = '#10b981'; }
-        else if (irr > 0.18) { rating = 'Strong'; ratingColor = '#22c55e'; }
-        else if (irr > 0.12) { rating = 'Good'; ratingColor = '#3b82f6'; }
-        else if (irr > 0.08) { rating = 'Moderate'; ratingColor = '#f59e0b'; }
-        else if (irr > 0.04) { rating = 'Marginal'; ratingColor = '#f97316'; }
+        if (irr > 0.25) { rating = 'Exceptional'; ratingColor = '#A0AEC0'; }
+        else if (irr > 0.18) { rating = 'Strong'; ratingColor = '#7D8794'; }
+        else if (irr > 0.12) { rating = 'Good'; ratingColor = '#D49A2A'; }
+        else if (irr > 0.08) { rating = 'Moderate'; ratingColor = '#5E6673'; }
+        else if (irr > 0.04) { rating = 'Marginal'; ratingColor = '#C9CFD8'; }
         else { rating = 'Below Threshold'; ratingColor = '#ef4444'; }
 
         // === UPDATE UI ===
         var npvM = npv / 1e6;
         document.getElementById('primaryValue').textContent = (npvM >= 0 ? '$' : '-$') + Math.abs(npvM).toFixed(1) + 'M';
-        document.getElementById('primaryValue').style.color = npv >= 0 ? '#10b981' : '#ef4444';
-        document.getElementById('scoreGrade').style.background = ratingColor + '18';
-        document.getElementById('scoreGrade').style.color = ratingColor;
+        document.getElementById('scoreGrade').setAttribute('data-state', irr > 0.08 ? 'ok' : irr > 0.04 ? 'watch' : 'hazard');
         document.getElementById('gradeText').textContent = rating + ' — IRR ' + (irr * 100).toFixed(1) + '%';
 
         document.getElementById('metIRR').textContent = (irr * 100).toFixed(1) + '%';
@@ -1599,7 +1068,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                     {
                         label: 'Net Cashflow ($M)',
                         data: netCF.map(function(v) { return +(v / 1e6).toFixed(2); }),
-                        backgroundColor: netCF.map(function(v) { return v >= 0 ? 'rgba(16,185,129,0.6)' : 'rgba(239,68,68,0.6)'; }),
+                        backgroundColor: netCF.map(function(v) { return v >= 0 ? 'rgba(125,135,148,0.75)' : 'rgba(220,38,38,0.7)'; }),
                         borderRadius: 4,
                         yAxisID: 'y'
                     },
@@ -1607,8 +1076,8 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                         label: 'Cumulative ($M)',
                         data: cumCF.map(function(v) { return +(v / 1e6).toFixed(2); }),
                         type: 'line',
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59,130,246,0.1)',
+                        borderColor: '#D49A2A',
+                        backgroundColor: 'rgba(212,154,42,0.08)',
                         fill: true,
                         tension: 0.3,
                         pointRadius: 2,
@@ -1617,7 +1086,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                 ]
             },
             options: {
-                responsive: true, maintainAspectRatio: true,
+                responsive: true, maintainAspectRatio: false, animation: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: { legend: { position: 'bottom', labels: { font: { size: 10, family: 'IBM Plex Sans' } } } },
                 scales: { y: { grid: { color: 'rgba(0,0,0,0.05)' } } }
@@ -1634,12 +1103,12 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
             data: {
                 labels: years.map(function(y) { return 'Y' + y; }),
                 datasets: [
-                    { label: 'Revenue ($M)', data: revenues.map(function(v) { return +(v / 1e6).toFixed(2); }), backgroundColor: 'rgba(59,130,246,0.5)', borderRadius: 4 },
-                    { label: 'OPEX ($M)', data: opexes.map(function(v) { return +(v / 1e6).toFixed(2); }), backgroundColor: 'rgba(245,158,11,0.5)', borderRadius: 4 }
+                    { label: 'Revenue ($M)', data: revenues.map(function(v) { return +(v / 1e6).toFixed(2); }), backgroundColor: 'rgba(212,154,42,0.6)', borderRadius: 0 },
+                    { label: 'OPEX ($M)', data: opexes.map(function(v) { return +(v / 1e6).toFixed(2); }), backgroundColor: 'rgba(125,135,148,0.6)', borderRadius: 0 }
                 ]
             },
             options: {
-                responsive: true,
+                responsive: true, maintainAspectRatio: false, animation: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: { legend: { position: 'bottom', labels: { font: { size: 10, family: 'IBM Plex Sans' } } } },
                 scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } } }
@@ -1653,7 +1122,7 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
     function updateProPanels(projectCF, npv, irr, years, revenues, opexes, nois, netCF, debtSvc, taxes, cumCF, totalCapex, terminalVal, rating, ratingColor, paybackYr, pi, yoc) {
         runMonteCarlo(projectCF);
         runSensitivity(npv);
-        runScenarios(npv, irr);
+        runScenarios(projectCF, revenues);
         buildCashflowTable(years, revenues, opexes, nois, debtSvc, taxes, netCF, cumCF);
         generateNarrative(npv, irr, paybackYr, pi, yoc, totalCapex, terminalVal, rating);
     }
@@ -1735,13 +1204,13 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
         var colors = labels.map(function(v, i) {
             var val = min + i * binWidth;
             if (val < 0) return 'rgba(239,68,68,0.5)';
-            return 'rgba(59,130,246,0.4)';
+            return 'rgba(212,154,42,0.55)';
         });
 
         window._histChart = new Chart(ctx.getContext('2d'), {
             type: 'bar',
-            data: { labels: labels, datasets: [{ data: counts, backgroundColor: colors, borderRadius: 2 }] },
-            options: { responsive: true, interaction: { intersect: false }, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+            data: { labels: labels, datasets: [{ data: counts, backgroundColor: colors, borderRadius: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { intersect: false }, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
         });
     }
 
@@ -1779,35 +1248,35 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
                 datasets: [{
                     label: 'NPV Impact ($M)',
                     data: sorted.map(function(s) { return +(s.impact / 1e6).toFixed(1); }),
-                    backgroundColor: sorted.map(function(s, i) { return i < 2 ? '#ef4444' : i < 4 ? '#f59e0b' : '#3b82f6'; }),
-                    borderRadius: 4
+                    backgroundColor: sorted.map(function(s, i) { return i === 0 ? 'rgb(212,154,42)' : '#7D8794'; }),
+                    borderRadius: 0
                 }]
             },
-            options: { indexAxis: 'y', responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
         });
     }
 
     // ══════════════════════════════════════════════════════════════
     // 13. SCENARIO ANALYSIS
     // ══════════════════════════════════════════════════════════════
-    function runScenarios(baseNPV, baseIRR) {
+    function runScenarios(projectCF, revenues) {
+        // Each scenario re-runs the project cashflow: revenue scaled year by year (pre-tax), or the discount rate moved.
+        // (It used to multiply the base NPV by a factor, so a negative base made "Bull" worse than "Base".)
+        var dr = (parseFloat(document.getElementById('discountRate').value) || 10) / 100;
+        var off = projectCF.length - revenues.length;
         var scenarios = [
-            { name: 'Base Case', npvMult: 1.0, irrMult: 1.0, color: '#3b82f6' },
-            { name: 'Bull (High Demand)', npvMult: 1.5, irrMult: 1.25, color: '#10b981' },
-            { name: 'Bear (Slow Fill)', npvMult: 0.4, irrMult: 0.7, color: '#ef4444' },
-            { name: 'AI Boom (+50% Rev)', npvMult: 2.0, irrMult: 1.4, color: '#64748b' },
-            { name: 'Rate Shock (+200bp)', npvMult: 0.7, irrMult: 0.85, color: '#f59e0b' }
+            { name: 'Base case', rev: 1.0, dr: 0, note: 'inputs as entered' },
+            { name: 'Bull (high demand)', rev: 1.15, dr: 0, note: 'revenue +15 %' },
+            { name: 'Bear (slow fill)', rev: 0.75, dr: 0, note: 'revenue −25 %' },
+            { name: 'AI boom', rev: 1.5, dr: 0, note: 'revenue +50 %' },
+            { name: 'Rate shock', rev: 1.0, dr: 0.02, note: 'discount rate +200 bp' }
         ];
-
-        var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">';
+        var html = '<div data-rz-fact-list>';
         scenarios.forEach(function(s) {
-            var scenNPV = baseNPV * s.npvMult;
-            var scenIRR = baseIRR * s.irrMult;
-            html += '<div style="padding:10px 12px;background:' + s.color + '10;border-radius:8px;border-left:3px solid ' + s.color + ';">';
-            html += '<div style="font-weight:600;font-size:0.82rem;color:' + s.color + ';">' + s.name + '</div>';
-            html += '<div style="font-size:0.9rem;font-weight:700;font-family:JetBrains Mono,monospace;">' + (scenNPV >= 0 ? '$' : '-$') + Math.abs(scenNPV / 1e6).toFixed(1) + 'M NPV</div>';
-            html += '<div style="font-size:0.75rem;color:#64748b;">IRR: ' + (scenIRR * 100).toFixed(1) + '%</div>';
-            html += '</div>';
+            var cf = projectCF.map(function(c, i) { return i < off ? c : c + (s.rev - 1) * revenues[i - off]; });
+            var scenNPV = calcNPV(dr + s.dr, cf);
+            var scenIRR = calcIRR(cf, 0.12);
+            html += '<div class="metric-box"><div class="metric-label">' + s.name + '</div><div class="metric-value">' + (scenNPV >= 0 ? '$' : '-$') + Math.abs(scenNPV / 1e6).toFixed(1) + 'M</div><div class="metric-sub">IRR ' + (isFinite(scenIRR) ? (scenIRR * 100).toFixed(1) + '%' : 'n/a') + ' · ' + s.note + '</div></div>';
         });
         html += '</div>';
         document.getElementById('scenarioResults').innerHTML = html;
@@ -1841,15 +1310,15 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
     // ══════════════════════════════════════════════════════════════
     function generateNarrative(npv, irr, paybackYr, pi, yoc, totalCapex, terminalVal, rating) {
         var html = '';
-        html += '<p><strong>Investment Summary:</strong> This $' + (totalCapex / 1e6).toFixed(0) + 'M data center investment generates a Net Present Value of ' + (npv >= 0 ? '$' : '-$') + Math.abs(npv / 1e6).toFixed(1) + 'M with an Internal Rate of Return of ' + (irr * 100).toFixed(1) + '%, rated as <strong>' + rating + '</strong>. ';
+        html += '<p><b>Investment summary.</b> This $' + (totalCapex / 1e6).toFixed(0) + 'M data center investment generates a Net Present Value of ' + (npv >= 0 ? '$' : '-$') + Math.abs(npv / 1e6).toFixed(1) + 'M with an Internal Rate of Return of ' + (irr * 100).toFixed(1) + '%, rated as <strong>' + rating + '</strong>. ';
         html += 'The investment achieves payback in ' + (paybackYr ? paybackYr + ' years' : 'beyond the analysis period') + ' with a Profitability Index of ' + pi.toFixed(2) + 'x.</p>';
-        html += '<p><strong>Return Analysis:</strong> Yield on cost of ' + yoc.toFixed(1) + '% ' + (yoc > 8 ? 'exceeds typical market cap rates, indicating strong value creation.' : 'is in line with current market cap rates.') + ' ';
+        html += '<p><b>Returns.</b> Yield on cost of ' + yoc.toFixed(1) + '% ' + (yoc > 8 ? 'exceeds typical market cap rates, indicating strong value creation.' : 'is in line with current market cap rates.') + ' ';
         if (terminalVal > 0) {
             html += 'Terminal value of $' + (terminalVal / 1e6).toFixed(0) + 'M represents ' + Math.round(terminalVal / (totalCapex + npv + totalCapex) * 100) + '% of total investment returns.</p>';
         } else {
             html += 'No terminal value was assumed (conservative analysis).</p>';
         }
-        html += '<p><strong>Risk Factors:</strong> Key sensitivities include occupancy ramp velocity, electricity cost escalation, and interest rate movements. Monte Carlo analysis quantifies the probability distribution of returns under uncertain conditions.</p>';
+        html += '<p><b>Risk.</b> Key sensitivities include occupancy ramp velocity, electricity cost escalation, and interest rate movements. Monte Carlo analysis quantifies the probability distribution of returns under uncertain conditions.</p>';
         document.getElementById('narrativeBox').innerHTML = html;
     }
 
@@ -1922,27 +1391,27 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
         html += '@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } @page { margin: 15mm; } }';
         html += '* { margin:0; padding:0; box-sizing:border-box; }';
         html += 'body { font-family: "IBM Plex Sans", Arial, sans-serif; max-width: 820px; margin: 0 auto; padding: 20px 30px; color: #1f2937; font-size: 12px; line-height: 1.5; }';
-        html += 'h1 { color: #1e3a5f; font-size: 20px; margin-bottom: 2px; }';
-        html += 'h2 { color: #1e3a5f; font-size: 14px; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #3b82f6; }';
+        html += 'h1 { color: #111827; font-size: 20px; margin-bottom: 2px; }';
+        html += 'h2 { color: #111827; font-size: 14px; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #4B5563; }';
         html += 'table { width: 100%; border-collapse: collapse; margin: 8px 0; }';
         html += 'th { background: #f8fafc; padding: 6px 10px; text-align: left; font-size: 9px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e5e7eb; }';
         html += 'td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; font-size: 11px; }';
-        html += '.pdf-header { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #3b82f6; }';
+        html += '.pdf-header { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #4B5563; }';
         html += '.pdf-brand { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }';
-        html += '.pdf-brand span { color: #3b82f6; }';
+        html += '.pdf-brand span { color: #4B5563; }';
         html += '.pdf-date { font-size: 9px; color: #94a3b8; text-align: right; }';
         html += '.pdf-score-row { display: flex; gap: 16px; margin: 12px 0; }';
-        html += '.pdf-score-card { flex: 1; text-align: center; padding: 16px; background: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px; }';
-        html += '.pdf-score-value { font-size: 38px; font-weight: 800; color: ' + (r.npv >= 0 ? '#10b981' : '#ef4444') + '; font-family: "JetBrains Mono", monospace; }';
+        html += '.pdf-score-card { flex: 1; text-align: center; padding: 16px; background: #eff6ff; border: 2px solid #4B5563; border-radius: 12px; }';
+        html += '.pdf-score-value { font-size: 38px; font-weight: 800; color: ' + (r.npv >= 0 ? '#374151' : '#ef4444') + '; font-family: "JetBrains Mono", monospace; }';
         html += '.pdf-score-label { font-size: 10px; color: #64748b; text-transform: uppercase; margin-top: 4px; }';
         html += '.pdf-score-rating { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: 10px; font-weight: 700; background: ' + r.ratingColor + '18; color: ' + r.ratingColor + '; margin-top: 6px; }';
         html += '.pdf-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }';
         html += '.pdf-kpi-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; text-align: center; }';
-        html += '.pdf-kpi-value { font-size: 16px; font-weight: 700; color: #1e3a5f; font-family: "JetBrains Mono", monospace; }';
+        html += '.pdf-kpi-value { font-size: 16px; font-weight: 700; color: #111827; font-family: "JetBrains Mono", monospace; }';
         html += '.pdf-kpi-label { font-size: 8px; color: #94a3b8; margin-top: 3px; text-transform: uppercase; }';
-        html += '.pdf-narrative { background: #f8fafc; border-left: 3px solid #3b82f6; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }';
+        html += '.pdf-narrative { background: #f8fafc; border-left: 3px solid #4B5563; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }';
         html += '.pdf-narrative p { font-size: 10.5px; color: #374151; margin-bottom: 8px; }';
-        html += '.pdf-footer { margin-top: 20px; padding-top: 10px; border-top: 2px solid #3b82f6; text-align: center; font-size: 8px; color: #94a3b8; }';
+        html += '.pdf-footer { margin-top: 20px; padding-top: 10px; border-top: 2px solid #4B5563; text-align: center; font-size: 8px; color: #94a3b8; }';
         html += '</style></head><body>';
         // Header
         html += '<div class="pdf-header"><div><h1>DC ROI Analysis Report</h1><div class="pdf-brand"><span>RESISTANCE</span>ZERO \u2014 Full analysis</div></div>';
@@ -1983,9 +1452,9 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
             html += '<tr><td>' + r.years[i] + '</td>';
             html += '<td style="text-align:right;">$' + (r.revenues[i] / 1e6).toFixed(2) + 'M</td>';
             html += '<td style="text-align:right;">$' + (r.opexes[i] / 1e6).toFixed(2) + 'M</td>';
-            html += '<td style="text-align:right;color:' + (r.nois[i] >= 0 ? '#10b981' : '#ef4444') + ';">$' + (r.nois[i] / 1e6).toFixed(2) + 'M</td>';
-            html += '<td style="text-align:right;color:' + (r.netCashflows[i] >= 0 ? '#10b981' : '#ef4444') + ';">$' + (r.netCashflows[i] / 1e6).toFixed(2) + 'M</td>';
-            html += '<td style="text-align:right;color:' + (r.cumulativeCF[i] >= 0 ? '#10b981' : '#ef4444') + ';">$' + (r.cumulativeCF[i] / 1e6).toFixed(1) + 'M</td></tr>';
+            html += '<td style="text-align:right;color:' + (r.nois[i] >= 0 ? '#374151' : '#ef4444') + ';">$' + (r.nois[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td style="text-align:right;color:' + (r.netCashflows[i] >= 0 ? '#374151' : '#ef4444') + ';">$' + (r.netCashflows[i] / 1e6).toFixed(2) + 'M</td>';
+            html += '<td style="text-align:right;color:' + (r.cumulativeCF[i] >= 0 ? '#374151' : '#ef4444') + ';">$' + (r.cumulativeCF[i] / 1e6).toFixed(1) + 'M</td></tr>';
         }
         html += '</tbody></table>';
 
@@ -2145,8 +1614,6 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>
 <script src="js/rz-scenario.js?v=20260920-9c559f43"></script>
 <script type="module" src="js/rz-supabase.js?v=20260920-90bd6417"></script>
-    <script src="js/rz-manual-fab.js?v=20260920-8972ee25" defer></script>
-    <script src="js/rz-hero-fit.js?v=20260920-81ad63a8" defer></script>
 
 <script>
     // The navbar theme button (id="navThemeBtn", onclick="toggleCalcTheme()") called a

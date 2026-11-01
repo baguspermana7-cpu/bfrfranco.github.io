@@ -357,6 +357,238 @@ body.tool .capex-fig .b { fill: var(--rzt-muted); }
 body.tool .capex-fig .mk { stroke: var(--rzt-text-2); stroke-width: 1; }
 body.tool .capex-fig .mk.key { stroke: var(--rzt-accent); stroke-width: 1.5; }
 
+/* opex — what the OPEX page still draws once its page <style> blocks are gone (tools/refit_shell/opex.py) */
+body.tool .tool-bar .tool-acts { display: flex; flex-wrap: wrap; gap: var(--rz-space-2); }
+body.tool #tooltip-container { display: none; }
+body.tool .tool-inputs .input-section > .section-title { display: flex; align-items: center; gap: 8px; margin: 0 0 var(--rz-space-3); padding-bottom: var(--rz-space-2); border-bottom: 1px solid var(--rzt-line); }
+body.tool .tool-inputs .slider-header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--rz-space-3); }
+body.tool .tool-inputs .slider-header .input-label { flex: 1; }
+body.tool .tool-inputs .slider-value { font: 400 13px var(--rzt-mono); color: var(--rzt-text-2); }
+body.tool .tool-inputs .range-ends, body.tool .tool-inputs .partial-labels { display: flex; justify-content: space-between; gap: var(--rz-space-3); font: 400 11px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool .tool-inputs .partial-labels { font-size: 12px; color: var(--rzt-text-2); margin-bottom: 4px; }
+body.tool .tool-inputs .country-flag { display: none; }
+body.tool .tool-inputs .staffing-models { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 0 0 var(--rz-space-3); }
+body.tool .tool-inputs .model-card {
+  position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 52px; padding: 6px 24px 6px 10px; box-sizing: border-box;
+  border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); cursor: pointer; transition: border-color var(--rz-dur-tip) var(--rz-ease-out);
+}
+body.tool .tool-inputs .model-card:hover { border-color: var(--rzt-line-strong); }
+body.tool .tool-inputs .model-card.active { border-color: var(--rzt-accent); }
+body.tool .tool-inputs .model-name { font: 500 13px/1.3 var(--rzt-sans); color: var(--rzt-text); }
+body.tool .tool-inputs .model-desc { font: 400 11px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool .tool-inputs .model-card > .tooltip-trigger { position: absolute; top: 6px; right: 6px; margin: 0; }
+body.tool .tool-inputs .partial-controls { display: none; }
+body.tool .tool-inputs .partial-controls.active { display: block; }
+body.tool .tool-inputs #countryInfo, body.tool .tool-inputs #climateInfo { margin: var(--rz-space-2) 0 0; }
+body.tool .tool-inputs #countryInfo strong, body.tool .tool-inputs #climateInfo strong { color: var(--rzt-text-2); font-weight: 500; }
+body.tool .tool-results .res-group.charts-grid { display: block; }
+body.tool .tool-results .res-group > h3 .tooltip-trigger { margin-left: 8px; vertical-align: middle; }
+body.tool .scenario-card.current > .metric-label::after { content: " · current"; color: var(--rzt-muted); font-weight: 400; }
+body.tool .tbl-wrap { overflow-x: auto; margin: 0 0 var(--rz-space-3); }
+body.tool .tbl-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+body.tool .tbl-wrap th { padding: 8px 10px 8px 0; text-align: left; white-space: nowrap; font: 500 11px var(--rzt-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--rzt-muted); background: none; border-bottom: 1px solid var(--rzt-line); }
+body.tool .tbl-wrap td { padding: 8px 10px 8px 0; vertical-align: middle; line-height: 1.4; color: var(--rzt-text-2); background: none; border-bottom: 1px solid var(--rzt-line-soft); }
+body.tool .tbl-wrap td:first-child { color: var(--rzt-text); }
+body.tool .tbl-wrap td.amount, body.tool .tbl-wrap td.percent, body.tool .tbl-wrap td.cost, body.tool .tbl-wrap tfoot td { font-family: var(--rzt-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+body.tool .tbl-wrap tfoot td { color: var(--rzt-text); font-weight: 500; border-top: 1px solid var(--rzt-line); border-bottom: 0; }
+body.tool .tbl-wrap tfoot td strong { font: 500 11px var(--rzt-mono); letter-spacing: .06em; color: var(--rzt-muted); }
+body.tool .tbl-wrap tr.sub-head td { padding-top: var(--rz-space-4); font: 500 11px var(--rzt-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--rzt-muted); }
+body.tool .tbl-wrap .progress-bar { min-width: 64px; height: 4px; background: var(--rzt-line-soft); }
+body.tool .tbl-wrap .progress-fill { height: 100%; background: var(--rzt-muted); }
+body.tool .tbl-wrap .fte-badge { font-family: var(--rzt-mono); color: var(--rzt-text); }
+
+/* roi — what the ROI page still draws once its page <style> blocks are gone (tools/refit_shell/roi.py) */
+body.tool .tool-inputs .input-section > .input-field, body.tool .tool-inputs .input-section > input[type="range"] { margin-bottom: var(--rz-space-3); }
+body.tool .tool-inputs .input-section > .input-label .tooltip-trigger { margin-left: auto; }
+body.tool .tool-inputs .input-section > .input-label > span[id$="Val"] { margin-left: 0; margin-right: -6px; }
+body.tool .tool-results > .res-fig .chart-container { height: 240px; }
+body.tool .pro-section > .charts-grid { padding-bottom: var(--rz-space-6); }
+body.tool .roi-pro-panel { min-width: 0; padding: var(--rz-space-4) var(--rz-space-5); background: var(--rzt-panel); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); }
+body.tool .roi-pro-panel > .pro-h { margin: 0 0 var(--rz-space-2); font: 500 11px var(--rzt-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--rzt-muted); }
+body.tool .roi-pro-panel > .res-fig { margin: var(--rz-space-3) 0 0; padding: var(--rz-space-3) 0 0; background: none; border: 0; border-top: 1px solid var(--rzt-line-soft); border-radius: 0; }
+body.tool .pro-section > .charts-grid { align-items: start; }
+body.tool .roi-narrative p { margin: var(--rz-space-3) 0 0; font-size: 13px; line-height: 1.6; color: var(--rzt-text-2); }
+body.tool .roi-narrative b { color: var(--rzt-text); font-weight: 600; }
+body.tool .tbl-wrap td.negative { color: var(--rzt-fault); }
+body.tool .cashflow-table td { font-family: var(--rzt-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* tier — what the tier advisor still draws once its page <style> blocks are gone (tools/refit_shell/tier.py) */
+body.tool .subsystem-scores { padding-bottom: var(--rz-space-3); }
+body.tool .subsystem-row { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 2.5rem; gap: var(--rz-space-3); align-items: center; padding: 6px 0; }
+body.tool .subsystem-label { font: 400 14px var(--rzt-sans); color: var(--rzt-text); }
+body.tool .subsystem-bar-bg { height: 4px; background: var(--rzt-line-soft); }
+body.tool .subsystem-bar-fill { height: 100%; background: var(--rzt-muted); }
+body.tool .subsystem-val { text-align: right; font: 500 14px var(--rzt-mono); font-variant-numeric: tabular-nums; color: var(--rzt-text); }
+body.tool #gapContent p, body.tool #recommendations .res-fine { margin: 0 0 var(--rz-space-2); font-size: 13px; line-height: 1.5; color: var(--rzt-text-2); }
+body.tool .gap-list { margin: 0 0 var(--rz-space-3); padding: 0 0 0 1.1rem; }
+body.tool .gap-list li { padding: 3px 0; font-size: 13px; line-height: 1.5; color: var(--rzt-text-2); }
+body.tool .rec-priority { font: 500 11px var(--rzt-mono); letter-spacing: .04em; color: var(--rzt-muted); }
+body.tool .rec-priority.rec-p1 { color: var(--rzt-fault); }
+body.tool .charts-section > .charts-grid > .chart-card:not(figure) { min-width: 0; padding: var(--rz-space-4) var(--rz-space-5); background: var(--rzt-panel); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); }
+body.tool .charts-section .chart-card > .chart-title { margin: 0 0 var(--rz-space-3); font: 500 11px var(--rzt-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--rzt-muted); }
+body.tool #costEstimatorContent { overflow-x: auto; }
+body.tool #costEstimatorContent table { width: 100%; border-collapse: collapse; font-size: 13px; }
+body.tool #costEstimatorContent th { padding: 8px 10px 8px 0; text-align: left; font: 500 11px var(--rzt-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--rzt-muted); border-bottom: 1px solid var(--rzt-line); }
+body.tool #costEstimatorContent td { color: var(--rzt-text-2); border-bottom: 1px solid var(--rzt-line-soft); }
+body.tool #costTotal { margin-top: var(--rz-space-3); font-size: 13px; color: var(--rzt-text); }
+body.tool #regionalComplianceContent { font-size: 13px; color: var(--rzt-text-2); }
+body.tool #regionalComplianceContent .state { min-width: 3.5em; }
+body.tool .charts-section + .charts-section, body.tool .charts-grid + .charts-grid { margin-top: var(--rz-space-5); }
+
+/* carbon — what the carbon footprint page still draws once its page <style> blocks are gone (tools/refit_shell/carbon.py) */
+body.tool[data-rz-calc="carbon"] .tool-tabs { margin: 0 0 var(--rz-space-4); }
+body.tool[data-rz-calc="carbon"] .tool-tabs > button.active { color: var(--rzt-text); border-bottom-color: var(--rzt-accent); }
+body.tool[data-rz-calc="carbon"] .cf-tab-content { display: none; }
+body.tool[data-rz-calc="carbon"] .cf-tab-content.active { display: block; }
+body.tool[data-rz-calc="carbon"] .tool-inputs .section-header { font: 500 11px var(--rzt-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--rzt-muted); }
+body.tool[data-rz-calc="carbon"] .tool-inputs .input-label { margin-top: var(--rz-space-3); }
+body.tool[data-rz-calc="carbon"] .tool-inputs .section-header + .input-label, body.tool[data-rz-calc="carbon"] .tool-inputs .section-header + .in-note { margin-top: 0; }
+body.tool[data-rz-calc="carbon"] .tool-inputs .input-label > span[id$="Val"] { font-family: var(--rzt-mono); color: var(--rzt-text-2); }
+body.tool[data-rz-calc="carbon"] .tool-inputs .input-field[readonly] { color: var(--rzt-text-2); background: transparent; cursor: not-allowed; }
+body.tool[data-rz-calc="carbon"] .preset-group { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 var(--rz-space-2); }
+body.tool[data-rz-calc="carbon"] .preset-group .preset-btn { min-height: 32px; padding: 0 10px; font: 500 12px var(--rzt-mono); color: var(--rzt-text-2); background: transparent; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); cursor: pointer; transition: border-color var(--rz-dur-tip) var(--rz-ease-out), color var(--rz-dur-tip) var(--rz-ease-out); }
+body.tool[data-rz-calc="carbon"] .preset-group .preset-btn:hover { border-color: var(--rzt-line-strong); color: var(--rzt-text); }
+body.tool[data-rz-calc="carbon"] .preset-group .preset-btn.active { border-color: var(--rzt-accent); color: var(--rzt-text); }
+body.tool[data-rz-calc="carbon"] .range-slider { display: block; width: 100%; height: 24px; margin: 0; accent-color: var(--rzt-accent); }
+body.tool[data-rz-calc="carbon"] .range-labels { display: flex; justify-content: space-between; font: 400 11px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool[data-rz-calc="carbon"] #workloadTotalBar { display: flex; justify-content: space-between; align-items: baseline; margin-top: var(--rz-space-3); padding: 8px 0; border-top: 1px solid var(--rzt-line); font: 500 13px var(--rzt-sans); color: var(--rzt-text); }
+body.tool[data-rz-calc="carbon"] #workloadTotalValue { font: 500 14px var(--rzt-mono); }
+body.tool[data-rz-calc="carbon"] #workloadTotalBar[data-state="hazard"] #workloadTotalValue { color: var(--rzt-fault); }
+body.tool[data-rz-calc="carbon"] .tool-results .chart-container { height: 260px; }
+body.tool[data-rz-calc="carbon"] .charts-grid { align-items: start; }
+body.tool[data-rz-calc="carbon"] .charts-grid > .tool-results { min-width: 0; }
+body.tool[data-rz-calc="carbon"] .cf-narrative { padding: var(--rz-space-3) var(--rz-space-5) var(--rz-space-4); border-top: 1px solid var(--rzt-line-soft); font-size: 13px; line-height: 1.6; color: var(--rzt-text-2); }
+body.tool[data-rz-calc="carbon"] .cf-narrative p { margin: 0 0 var(--rz-space-2); }
+body.tool[data-rz-calc="carbon"] .cf-narrative strong { color: var(--rzt-text); font-weight: 600; }
+
+/* tia — what the TIA-942 checklist still draws once its page <style> blocks are gone (tools/refit_shell/tia.py) */
+body.tool[data-rz-calc="tia"] .tool-head .basis span { color: var(--rzt-text-2); }
+body.tool[data-rz-calc="tia"] .checklist-category { border-top: 1px solid var(--rzt-line-soft); }
+body.tool[data-rz-calc="tia"] .checklist-category:first-child { border-top: 0; }
+body.tool[data-rz-calc="tia"] .cat-header { display: grid; grid-template-columns: minmax(0, 1fr) 20px; align-items: center; gap: var(--rz-space-3); min-height: 44px; padding: 8px 0; cursor: pointer; }
+body.tool[data-rz-calc="tia"] .cat-title { font: 500 14px/1.3 var(--rzt-sans); color: var(--rzt-text); }
+body.tool[data-rz-calc="tia"] .cat-progress-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 3.5rem; align-items: center; gap: var(--rz-space-3); margin-top: 6px; }
+body.tool[data-rz-calc="tia"] .cat-progress-bar { height: 4px; background: var(--rzt-line-soft); }
+body.tool[data-rz-calc="tia"] .cat-progress-fill { height: 100%; background: var(--rzt-muted); }
+body.tool[data-rz-calc="tia"] .cat-count { text-align: right; font: 400 12px var(--rzt-mono); color: var(--rzt-text-2); }
+body.tool[data-rz-calc="tia"] .cat-chevron::before { content: "+"; font: 400 16px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool[data-rz-calc="tia"] .cat-header.open .cat-chevron::before { content: "−"; }
+body.tool[data-rz-calc="tia"] .cat-body { display: none; padding: 0 0 var(--rz-space-3); }
+body.tool[data-rz-calc="tia"] .cat-body.open { display: block; }
+body.tool[data-rz-calc="tia"] .check-item { display: grid; grid-template-columns: 16px minmax(0, 1fr) 16px auto; grid-template-areas: "c l t w" ". r r r"; align-items: start; column-gap: 10px; row-gap: 2px; padding: 8px 0; border-top: 1px solid var(--rzt-line-soft); }
+body.tool[data-rz-calc="tia"] .check-item input[type="checkbox"] { grid-area: c; width: 16px; height: 16px; margin: 2px 0 0; accent-color: var(--rzt-accent); }
+body.tool[data-rz-calc="tia"] .check-label { grid-area: l; font: 400 13px/1.45 var(--rzt-sans); color: var(--rzt-text); cursor: pointer; }
+body.tool[data-rz-calc="tia"] .check-item .tooltip-trigger { grid-area: t; margin: 2px 0 0; }
+body.tool[data-rz-calc="tia"] .check-weight { grid-area: w; font: 500 11px var(--rzt-mono); color: var(--rzt-text-2); }
+body.tool[data-rz-calc="tia"] .check-weight.w1 { color: var(--rzt-muted); }
+body.tool[data-rz-calc="tia"] .check-ref { grid-area: r; font: 400 11px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool[data-rz-calc="tia"] .tooltip-content .tooltip-title { display: block; }
+body.tool[data-rz-calc="tia"] .tooltip-content .tip-meta { display: block; margin-top: 6px; font: 400 11px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool[data-rz-calc="tia"] .cat-bars { padding: 0 0 var(--rz-space-3); }
+body.tool[data-rz-calc="tia"] .cat-bar-row { display: grid; grid-template-columns: 9rem minmax(0, 1fr) 3rem; align-items: center; column-gap: var(--rz-space-3); padding: 7px 0; border-bottom: 1px solid var(--rzt-line-soft); }
+body.tool[data-rz-calc="tia"] .cat-bar-row:last-child { border-bottom: 0; }
+body.tool[data-rz-calc="tia"] .cat-bar-label { font: 400 13px var(--rzt-sans); color: var(--rzt-text); }
+body.tool[data-rz-calc="tia"] .cat-bar-track { height: 4px; background: var(--rzt-line-soft); }
+body.tool[data-rz-calc="tia"] .cat-bar-fill { height: 100%; background: var(--rzt-muted); }
+body.tool[data-rz-calc="tia"] .cat-bar-row.is-weak .cat-bar-fill { background: var(--rzt-accent); }
+body.tool[data-rz-calc="tia"] .cat-bar-pct { text-align: right; font: 500 13px var(--rzt-mono); color: var(--rzt-text); }
+body.tool[data-rz-calc="tia"] .charts-grid > .tool-full { grid-column: 1 / -1; }
+body.tool[data-rz-calc="tia"] .charts-section { padding-bottom: var(--rz-space-6); }
+body.tool[data-rz-calc="tia"] .pro-section + .pro-section > .pro-panel { margin-top: var(--rz-space-5); }
+body.tool[data-rz-calc="tia"] .pro-panel > .res-fine, body.tool[data-rz-calc="tia"] .pro-panel > [data-rz-fact-list], body.tool[data-rz-calc="tia"] .pro-panel > .tia-tbl,
+body.tool[data-rz-calc="tia"] .pro-panel > #tierCompare, body.tool[data-rz-calc="tia"] .pro-panel > #sensitivityBars { margin: 0; padding: var(--rz-space-3) var(--rz-space-5) var(--rz-space-4); }
+body.tool[data-rz-calc="tia"] .pro-panel > .res-fine + [data-rz-fact-list] { padding-top: 0; }
+body.tool[data-rz-calc="tia"] .tia-tbl, body.tool[data-rz-calc="tia"] #tierCompare { overflow-x: auto; }
+body.tool[data-rz-calc="tia"] .gap-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+body.tool[data-rz-calc="tia"] .gap-table th { padding: 8px 12px 8px 0; text-align: left; white-space: nowrap; font: 500 11px var(--rzt-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--rzt-muted); border-bottom: 1px solid var(--rzt-line); }
+body.tool[data-rz-calc="tia"] .gap-table td { padding: 8px 12px 8px 0; vertical-align: top; line-height: 1.4; color: var(--rzt-text-2); border-bottom: 1px solid var(--rzt-line-soft); }
+body.tool[data-rz-calc="tia"] .gap-table td:first-child { color: var(--rzt-text); }
+body.tool[data-rz-calc="tia"] .gap-table td.num { font-family: var(--rzt-mono); font-variant-numeric: tabular-nums; }
+body.tool[data-rz-calc="tia"] .gap-table td.is-cur { color: var(--rzt-text); font-weight: 600; }
+body.tool[data-rz-calc="tia"] .priority-badge { font: 500 11px var(--rzt-mono); white-space: nowrap; color: var(--rzt-text-2); }
+body.tool[data-rz-calc="tia"] .priority-badge.p1 { color: var(--rzt-text); }
+body.tool[data-rz-calc="tia"] .sens-row { display: grid; grid-template-columns: 1.5rem minmax(0, 1.6fr) minmax(0, 1fr) 4.5rem; align-items: center; column-gap: var(--rz-space-3); padding: 7px 0; border-bottom: 1px solid var(--rzt-line-soft); }
+body.tool[data-rz-calc="tia"] .sens-row:last-child { border-bottom: 0; }
+body.tool[data-rz-calc="tia"] .sens-n { font: 400 11px var(--rzt-mono); color: var(--rzt-muted); text-align: right; }
+body.tool[data-rz-calc="tia"] .sens-item { font: 400 13px/1.35 var(--rzt-sans); color: var(--rzt-text); }
+body.tool[data-rz-calc="tia"] .sens-item small { font: 500 10px var(--rzt-mono); color: var(--rzt-muted); margin-left: 4px; }
+body.tool[data-rz-calc="tia"] .sens-track { display: block; height: 4px; background: var(--rzt-line-soft); }
+body.tool[data-rz-calc="tia"] .sens-fill { display: block; height: 100%; background: var(--rzt-muted); }
+body.tool[data-rz-calc="tia"] .sens-row.is-key .sens-fill { background: var(--rzt-accent); }
+body.tool[data-rz-calc="tia"] .sens-val { text-align: right; font: 500 13px var(--rzt-mono); color: var(--rzt-text); }
+@media (max-width: 600px) {
+  body.tool[data-rz-calc="tia"] .cat-bar-row { grid-template-columns: 7rem minmax(0, 1fr) 2.75rem; }
+  body.tool[data-rz-calc="tia"] .sens-row { grid-template-columns: 1.25rem minmax(0, 1fr) 4rem; grid-template-areas: "n i v" ". t t"; row-gap: 4px; }
+  body.tool[data-rz-calc="tia"] .sens-n { grid-area: n; } body.tool[data-rz-calc="tia"] .sens-item { grid-area: i; }
+  body.tool[data-rz-calc="tia"] .sens-track { grid-area: t; } body.tool[data-rz-calc="tia"] .sens-val { grid-area: v; }
+}
+
+/* tco — what the TCO page still draws once its page <style> blocks are gone (tools/refit_shell/tco.py) */
+body.tool[data-rz-calc="tco"] .tool-inputs .tco-input-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--rz-space-3); margin: 0 0 var(--rz-space-3); }
+body.tool[data-rz-calc="tco"] .tool-inputs .tco-input-row:has(> .tco-input-group:only-child), body.tool[data-rz-calc="tco"] .tool-inputs .tco-input-row:has(select) { grid-template-columns: minmax(0, 1fr); }
+body.tool[data-rz-calc="tco"] .tool-inputs .tco-input-group { min-width: 0; }
+body.tool[data-rz-calc="tco"] .tool-inputs .tco-input-label { display: block; width: fit-content; margin: 0 0 6px; font: 500 13px var(--rzt-sans); color: var(--rzt-text); }
+body.tool[data-rz-calc="tco"] .tool-inputs .tco-input-field {
+  display: block; width: 100%; min-height: 44px; box-sizing: border-box; padding: 0 12px;
+  font: 400 14px var(--rzt-mono); font-variant-numeric: tabular-nums; color: var(--rzt-text);
+  background: var(--rzt-inset); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); transition: border-color var(--rz-dur-tip) var(--rz-ease-out);
+}
+body.tool[data-rz-calc="tco"] .tool-inputs .tco-input-field:hover { border-color: var(--rzt-line-strong); }
+body.tool[data-rz-calc="tco"] .tool-inputs .tco-input-field:focus-visible { outline: 2px solid var(--rzt-accent); outline-offset: 1px; border-color: var(--rzt-accent); }
+body.tool[data-rz-calc="tco"] .tool-inputs select.tco-input-field option { background: var(--rzt-panel); color: var(--rzt-text); }
+@media (max-width: 600px) { body.tool[data-rz-calc="tco"] .tool-inputs .tco-input-row { grid-template-columns: minmax(0, 1fr); } }
+body.tool[data-rz-calc="tco"] #tcoProInputs { flex-direction: column; gap: 0; margin-top: var(--rz-space-5); }
+body.tool[data-rz-calc="tco"] .tco-region-snapshot { margin-top: var(--rz-space-5); }
+body.tool[data-rz-calc="tco"] .tco-region-snapshot .kv-list > * > [class*="value"] { font-size: 14px; }
+body.tool[data-rz-calc="tco"] .tco-mkt-fig { margin: var(--rz-space-3) 0 0; padding: var(--rz-space-3) 0 0; border: 0; border-top: 1px solid var(--rzt-line-soft); border-radius: 0; background: none; }
+body.tool[data-rz-calc="tco"] .tco-market-chart-body { position: relative; height: 180px; }
+body.tool[data-rz-calc="tco"] .tco-where { border-top: 0; border-bottom: 1px solid var(--rzt-line); padding: var(--rz-space-3) var(--rz-space-5); }
+body.tool[data-rz-calc="tco"] .tco-inline-bar-row { display: grid; grid-template-columns: 6rem minmax(0, 1fr) 6rem; align-items: center; column-gap: var(--rz-space-3); padding: 7px 0; border-bottom: 1px solid var(--rzt-line-soft); }
+body.tool[data-rz-calc="tco"] .tco-inline-bar-row:last-child { border-bottom: 0; }
+body.tool[data-rz-calc="tco"] .tco-inline-bar-label { font: 400 13px var(--rzt-sans); color: var(--rzt-text); }
+body.tool[data-rz-calc="tco"] .tco-inline-bar-track { height: 4px; background: var(--rzt-line-soft); }
+body.tool[data-rz-calc="tco"] .tco-inline-bar-fill { height: 100%; background: var(--rzt-muted); }
+body.tool[data-rz-calc="tco"] .tco-inline-bar-value { text-align: right; font: 500 13px var(--rzt-mono); color: var(--rzt-text); }
+body.tool[data-rz-calc="tco"] #tcoInlineBars { padding: 0 0 var(--rz-space-3); }
+body.tool[data-rz-calc="tco"] .tco-premium-section, body.tool[data-rz-calc="tco"] #tcoCompareSection { padding-bottom: var(--rz-space-8); }
+body.tool[data-rz-calc="tco"] .tco-premium-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--rz-space-5); align-items: start; }
+@media (max-width: 900px) { body.tool[data-rz-calc="tco"] .tco-premium-grid { grid-template-columns: minmax(0, 1fr); } }
+body.tool[data-rz-calc="tco"] .tco-tbl { overflow-x: auto; padding: var(--rz-space-3) var(--rz-space-5) var(--rz-space-4); }
+body.tool[data-rz-calc="tco"] .tco-tbl table { width: 100%; border-collapse: collapse; font-size: 13px; }
+body.tool[data-rz-calc="tco"] .tco-tbl th { padding: 8px 12px 8px 0; text-align: left; white-space: nowrap; font: 500 11px var(--rzt-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--rzt-muted); border-bottom: 1px solid var(--rzt-line); }
+body.tool[data-rz-calc="tco"] .tco-tbl td { padding: 8px 12px 8px 0; color: var(--rzt-text-2); border-bottom: 1px solid var(--rzt-line-soft); font-family: var(--rzt-mono); font-variant-numeric: tabular-nums; }
+body.tool[data-rz-calc="tco"] .tco-tbl td:first-child { font-family: var(--rzt-sans); color: var(--rzt-text); white-space: nowrap; }
+body.tool[data-rz-calc="tco"] .tco-tbl .num { text-align: right; }
+body.tool[data-rz-calc="tco"] .tco-tbl tr.is-total td { color: var(--rzt-text); font-weight: 600; border-top: 1px solid var(--rzt-line); }
+body.tool[data-rz-calc="tco"] .tco-tbl tr.is-pct td { font-size: 12px; color: var(--rzt-muted); }
+body.tool[data-rz-calc="tco"] .tco-tbl .tco-winner-cell, body.tool[data-rz-calc="tco"] .tco-tbl .tco-yr-winner { color: var(--rzt-text); font-weight: 600; }
+body.tool[data-rz-calc="tco"] .tco-tbl .tco-yr-best { font-family: var(--rzt-sans); color: var(--rzt-text); }
+body.tool[data-rz-calc="tco"] #tcoTornadoBars { padding: var(--rz-space-3) var(--rz-space-5) 0; }
+body.tool[data-rz-calc="tco"] .tco-tornado-bar-wrap { display: grid; grid-template-columns: 9rem minmax(0, 1fr) 5rem; align-items: center; column-gap: var(--rz-space-3); padding: 6px 0; }
+body.tool[data-rz-calc="tco"] .tco-tornado-label { font: 400 13px var(--rzt-sans); color: var(--rzt-text); text-align: right; }
+body.tool[data-rz-calc="tco"] .tco-tornado-bar-area { position: relative; height: 14px; }
+body.tool[data-rz-calc="tco"] .tco-tornado-center-line { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--rzt-line-strong); }
+body.tool[data-rz-calc="tco"] .tco-tornado-bar-neg { position: absolute; right: 50%; height: 100%; background: var(--rzt-accent); }
+body.tool[data-rz-calc="tco"] .tco-tornado-bar-pos { position: absolute; left: 50%; height: 100%; background: var(--rzt-muted); }
+body.tool[data-rz-calc="tco"] .tco-tornado-val { text-align: right; font: 500 13px var(--rzt-mono); color: var(--rzt-text); }
+body.tool[data-rz-calc="tco"] #tcoTornadoPanel > .res-fine { padding: 0 var(--rz-space-5); }
+body.tool[data-rz-calc="tco"] #tcoStrategyContent { padding: var(--rz-space-3) var(--rz-space-5) var(--rz-space-4); }
+body.tool[data-rz-calc="tco"] .tco-strategy-block { padding: 10px 0; border-bottom: 1px solid var(--rzt-line-soft); }
+body.tool[data-rz-calc="tco"] .tco-strategy-title { margin: 0 0 4px; font: 600 14px var(--rzt-sans); color: var(--rzt-text); }
+body.tool[data-rz-calc="tco"] .tco-priority-badge { margin-right: 6px; font: 500 11px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool[data-rz-calc="tco"] .tco-strategy-text { margin: 0; font-size: 13px; line-height: 1.55; color: var(--rzt-text-2); }
+body.tool[data-rz-calc="tco"] .tco-roadmap-item { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr); column-gap: var(--rz-space-3); padding: 8px 0; border-bottom: 1px solid var(--rzt-line-soft); }
+body.tool[data-rz-calc="tco"] .tco-roadmap-item:last-child { border-bottom: 0; }
+body.tool[data-rz-calc="tco"] .tco-roadmap-step { font: 500 12px var(--rzt-mono); color: var(--rzt-muted); text-align: right; }
+body.tool[data-rz-calc="tco"] .tco-roadmap-label { font: 500 13px var(--rzt-sans); color: var(--rzt-text); }
+body.tool[data-rz-calc="tco"] .tco-roadmap-desc { font-size: 13px; color: var(--rzt-muted); }
+@media (max-width: 600px) {
+  body.tool[data-rz-calc="tco"] .tco-tornado-bar-wrap { grid-template-columns: minmax(0, 1fr) 4.5rem; grid-template-areas: "l v" "b b"; row-gap: 4px; }
+  body.tool[data-rz-calc="tco"] .tco-tornado-label { grid-area: l; text-align: left; } body.tool[data-rz-calc="tco"] .tco-tornado-bar-area { grid-area: b; }
+  body.tool[data-rz-calc="tco"] .tco-tornado-val { grid-area: v; }
+  body.tool[data-rz-calc="tco"] .tco-inline-bar-row { grid-template-columns: 4.5rem minmax(0, 1fr) 5rem; }
+}
+
 /* ============================================================
    PART 2 · LEGACY OVERRIDES — removed page by page
    Everything below applies only under html[data-rz-register="tool"] on a page NOT yet on the shell: every selector carries
