@@ -10073,6 +10073,15 @@ if(window.MutationObserver)new MutationObserver(m).observe(document.documentElem
     el.classList.toggle('sp-kpi-txt', isWord);
     if(id==='sum_readiness'||id==='sum_hub_read'){ if(n!==null) el.classList.add(n>=95?'st-green':(n>=80?'st-amber':'st-red')); }
     else if(id==='sum_pstockout'){ if(n!==null) el.classList.add(n<5?'st-green':(n<15?'st-amber':'st-red')); }
+    // the band is shown as a word in the row's note cell; the value itself stays neutral
+    var note=el.parentElement && el.parentElement.querySelector('.sk-note');
+    if(note && id!=='sum_tier'){
+      if(note.dataset.base===undefined) note.dataset.base=note.textContent;
+      var st=el.classList.contains('st-red')?['st-red','out of band']:el.classList.contains('st-amber')?['st-amber','watch']:el.classList.contains('st-green')?['st-green','within band']:null;
+      note.textContent='';
+      if(st){ var w=document.createElement('span'); w.className='sk-state '+st[0]; w.textContent=st[1]; note.appendChild(w); note.appendChild(document.createTextNode(' · ')); }
+      note.appendChild(document.createTextNode(note.dataset.base));
+    }
     else if(id==='sum_tier'){ if(t.indexOf('VITAL')>=0) el.classList.add('st-red'); else if(t.indexOf('ESSENTIAL')>=0) el.classList.add('st-amber'); else if(t.indexOf('DESIR')>=0) el.classList.add('st-green'); }
   }
   function watchKpis(){

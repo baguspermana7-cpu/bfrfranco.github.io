@@ -29,7 +29,8 @@
  *   T11 no position:fixed element except the nav, .rz-toast*, .rz-sheet*
  *   T12 the page head (header / hero) carries no <img>, no background-image, no radius > 4 px, no badge / pill
  *   T13 the bar (.tool-bar, else the innermost container between head and first field holding >= 3 buttons/selects) has <= 6 controls (aria-pressed chips = 1 group); no FREE MODE / FULL ACCESS / PRO ACTIVE text pill anywhere
- *   T14 no second hue (red included) on labels, eyebrows, headings, crumbs; red only inside a .tool-results note cell
+ *   T14 no second hue (red included) on labels, eyebrows, headings, crumbs; red only inside a .tool-results note cell,
+ *       never on a fact-list value
  *   T15 no dashed/dotted border, no box-shadow, no `transition: all`, no :hover transform, radius <= 4 px on panels
  *   T16 one nav.hub-nav, one footer.hub-foot, no inline style in the footer, no other navbar / footer
  *   T19 chart series (Chart.js datasets, inline SVG >= 40 px) amber or neutral grey; opt-out [data-rz-series-meaning]
@@ -245,6 +246,12 @@ function scan2() {
     if (![...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
     const c = col(getComputedStyle(e).color); if (!c) continue; const [h, s, l] = c.hsl;
     if (s > .45 && l > .15 && l < .9 && !(h >= 20 && h <= 45)) o.hue.push(nm(e) + ':' + Math.round(h));
+  }
+  // T14 also: a readout VALUE is never red; red is a state word in the note cell
+  for (const e of document.querySelectorAll('[data-rz-fact-list] [class*="value"], [data-rz-fact-list] [class*="val"]')) {
+    if (!vis(e) || e.closest('[class*="note"], [class*="state"]')) continue;
+    const c = col(getComputedStyle(e).color); if (!c) continue; const [h, s, l] = c.hsl;
+    if (s > .45 && l > .15 && l < .9 && (h <= 15 || h >= 345)) o.hue.push('red value ' + nm(e));
   }
 
   // T15 dashed / shadow / transition:all / hover transform / radius on panels
