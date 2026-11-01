@@ -79,6 +79,11 @@ ok(rs.spotDetectors === 1, 'Ex10 roomState 33 m2 -> 1 detector');
 approx(rs.safetyMargin.value, 5.3, 0.01, 'Ex10 roomState safety margin 5.3');
 ok(rs.liIon && rs.liIon.runawayOnsetC === 150, 'Ex10 roomState Li-ion onset 150C present');
 
+/* Residual O2 after an inert flood follows the concentration: 20.9 x (1 - C/100) (free-efflux dilution) */
+approx(E.agentForRoom('ig541', 100, 21).residualO2Pct, 13.1, 0.05, 'O2a IG-541 at its 37.5 % design leaves 13.1 % O2');
+approx(E.agentForRoom('ig541', 100, 21, 40).residualO2Pct, 12.5, 0.05, 'O2b IG-541 at 40 % leaves 12.5 % O2 (override moves the figure)');
+approx(E.agentForRoom('ig541', 100, 21, 43).residualO2Pct, 11.9, 0.05, 'O2c IG-541 at its 43 % NOAEL leaves 11.9 % O2');
+
 /* Integrity */
 function deepFrozen(o){ if(o===null||typeof o!=='object')return true; if(!Object.isFrozen(o))return false; return Object.keys(o).every(k=>deepFrozen(o[k])); }
 ok(deepFrozen(M), 'Integrity: FIRE_MODEL deep-frozen');

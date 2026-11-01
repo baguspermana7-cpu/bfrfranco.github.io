@@ -61,7 +61,7 @@
         out.quantity = round(inertAgentM3(volM3, C), 1);
         out.unit = 'm3 (NTP)';
         out.cylinders = Math.ceil(posDiv(out.quantity, a.cylinderFillM3Typical));
-        out.residualO2Pct = a.o2AtDesignPct;
+        out.residualO2Pct = round(20.9 * (100 - C) / 100, 1);   // free-efflux dilution of 20.9 % air; follows C, incl. an override
       } else {
         out.quantity = round(halocarbonAgentKg(volM3, C, tempC, a.k1, a.k2), 1);
         out.unit = 'kg';

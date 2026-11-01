@@ -57,7 +57,7 @@
       designConcClassA: 7.0,            // source: NFPA 2001 (min ext ~5.8, design ~6.25-7) ; STANDARD
       minExtinguishPct: 5.8,            // source: NFPA 2001 ; STANDARD
       noaelPct: 9.0, loaelPct: 10.5,    // source: NFPA 2001 A.1.5 ; STANDARD
-      gwp100: 3220, atmosphericLifeYr: 36, // source: IPCC AR5/AR6 ; STANDARD
+      gwp100: 3220, atmosphericLifeYr: 36, // source: IPCC AR4 GWP-100 (3220), AR6 lifetime ; STANDARD
       cylinderFillKgTypical: 120,       // ILLUSTRATIVE
       priceUsdPerKg: 35                 // ILLUSTRATIVE
     },
@@ -66,7 +66,6 @@
       designConcClassA: 37.5,           // source: NFPA 2001 (design ~37.5-43%) ; STANDARD
       minExtinguishPct: 34.2,           // source: NFPA 2001 ; STANDARD
       noaelPct: 43, loaelPct: 52,       // source: NFPA 2001 A.1.5 ; STANDARD
-      o2AtDesignPct: 12.5,              // source: NFPA 2001 (residual O2 ~12.5%) ; STANDARD
       gwp100: 0, atmosphericLifeYr: 0,
       cylinderFillM3Typical: 22.3,      // source: typical 80 L @150 bar ~22 m3 NTP ; ILLUSTRATIVE
       priceUsdPerM3: 4                  // ILLUSTRATIVE
