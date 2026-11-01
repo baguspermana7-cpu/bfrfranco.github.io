@@ -1000,6 +1000,126 @@ const AGENTIC_FIGURES = [
   }
 ];
 
+/* ==========================================================================
+ * pillar-fire-safety.html — the fire-protection reference (three figures)
+ * ----------------------------------------------------------------------------
+ * Same grid method as articles 29 and 30. Convention: the hazard path is
+ * accent + paper-2, equipment and logic are ink, the one human decision
+ * (abort, manual release) is alarm-caution and dashed. Every number in a node
+ * or caption comes from data/fire/*.csv [S1]-[S3], js/fire-model.js [S4] or
+ * fire-checklist.html [S5]; derived values say so.
+ * ======================================================================== */
+const PILLAR_FIRE_FIGURES = [
+  {
+    id: 'fire-d1', page: 'pillar-fire-safety.html',
+    caption:
+      'From first smoke to agent release. One zone in alarm only alarms; two independent zones start the ' +
+      'pre-discharge sequence, which shuts the air handlers and dampers and runs a time delay (typ. 30 s [S5]) that the ' +
+      'abort switch can hold. Halocarbon discharge completes in 10 s or less and the room must hold the concentration ' +
+      'for at least 10 min [S1][S4].',
+    because:
+      'the release logic is an AND gate with a human hold on one branch; a paragraph lists the steps, the drawing ' +
+      'shows that a single detector cannot reach the solenoid and where the abort switch acts.',
+    build: () => gridFigure({
+      phone: { order: ['asd', 'spot', 'facp', 'pre', 'abort', 'dly', 'man', 'rel', 'dis'], gapY: 34,
+        edges: { 0: { fs: 'r', ts: 'r' }, 3: { fs: 'l', ts: 'l' }, 5: { fs: 'r', ts: 'r' } } },
+      slug: 'fire1', title: 'From first smoke to agent release',
+      desc: 'Two detection zones feed the fire alarm panel; release needs both, then a pre-discharge delay that an abort switch can hold.',
+      gaps: [64, 64], gapY: 30,
+      nodes: [
+        { id: 'asd', col: 0, row: 0, symbol: 'aspirating', name: 'Aspirating detector', sub: 'zone 1 · pipe network' },
+        { id: 'spot', col: 0, row: 1, name: 'Spot smoke detector', sub: 'zone 2 · 84 m² each' },
+        { id: 'facp', col: 1, row: 0, name: 'Fire alarm panel', sub: '1 zone: alarm only', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Decision logic' },
+        { id: 'pre', col: 2, row: 0, name: 'Pre-discharge alarm', sub: 'HVAC off · dampers shut' },
+        { id: 'abort', col: 1, row: 1, name: 'Abort switch', sub: 'holds the delay', stroke: 'alarm-caution', dashed: true, legend: 'Human action' },
+        { id: 'dly', col: 2, row: 1, tag: 'typ. 30 s', name: 'Time delay', sub: 'occupants leave' },
+        { id: 'man', col: 0, row: 2, name: 'Manual release', sub: 'station at the exit', stroke: 'alarm-caution', dashed: true },
+        { id: 'rel', col: 2, row: 2, symbol: 'valve', name: 'Release solenoid', sub: 'opens cylinders' },
+        { id: 'dis', col: 2, row: 3, tag: '≤ 10 s · hold ≥ 10 min', name: 'Agent discharge', stroke: 'accent', fill: 'paper-2', tier: 1 }
+      ],
+      edges: [
+        { a: 'asd', b: 'facp' }, { a: 'spot', b: 'facp', fs: 'r', ts: 'b' },
+        { a: 'facp', b: 'pre', label: '2 zones' }, { a: 'pre', b: 'dly' },
+        { a: 'abort', b: 'dly', label: 'hold', stroke: 'muted', pattern: 'dashed' },
+        { a: 'dly', b: 'rel' },
+        { a: 'man', b: 'rel', label: 'direct', stroke: 'muted', pattern: 'dashed' },
+        { a: 'rel', b: 'dis' }
+      ]
+    })
+  },
+  {
+    id: 'fire-d2', page: 'pillar-fire-safety.html',
+    caption:
+      'A clean-agent room is a sealed volume. The agent mass is sized to the whole protected volume, discharged in ' +
+      '10 s or less, and must stay at concentration for at least 10 min while it leaks out through penetrations [S1][S4]. ' +
+      'The door-fan test measures that leakage and predicts the hold time before any agent is used (NFPA 2001 Annex C).',
+    because:
+      'hold time is a property of the room, not of the agent; the drawing puts the leak paths, the dampers and the ' +
+      'relief vent on the same boundary the door-fan test measures.',
+    build: () => gridFigure({
+      phone: { order: ['cyl', 'noz', 'mix', 'damp', 'vent', 'leak', 'fan', 'hold'], gapY: 30,
+        zones: [{ ids: ['noz', 'mix', 'damp', 'vent', 'leak'], label: 'Protected volume V' }],
+        edges: { 4: { fs: 'r', ts: 'r' }, 6: { fs: 'l', ts: 'l' } } },
+      slug: 'fire2', title: 'Clean-agent room: volume, discharge, hold',
+      desc: 'Cylinders discharge through nozzles into the sealed room; agent leaks out through penetrations; a door-fan test measures the leakage and predicts the hold time.',
+      gaps: [72, 64], gapY: 30,
+      nodes: [
+        { id: 'cyl', col: 0, row: 0, tag: 'W = (V/s)·C/(100−C)', name: 'Agent cylinders', sub: 'mass per NFPA 2001' },
+        { id: 'noz', col: 1, row: 0, tag: '≤ 10 s halocarbon', name: 'Discharge nozzles', sub: '≤ 60 s inert gas' },
+        { id: 'mix', col: 1, row: 1, name: 'Agent–air mixture', sub: 'design C ≤ NOAEL', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Agent' },
+        { id: 'damp', col: 2, row: 0, name: 'HVAC dampers', sub: 'closed on release' },
+        { id: 'vent', col: 2, row: 1, name: 'Pressure relief vent', sub: 'limits room pressure' },
+        { id: 'leak', col: 1, row: 2, name: 'Leak paths', sub: 'cables · doors · voids' },
+        { id: 'fan', col: 0, row: 2, tag: 'NFPA 2001 Annex C', name: 'Door-fan test', sub: 'measures leakage area', stroke: 'ink', dashed: true, legend: 'Test, not in service' },
+        { id: 'hold', col: 0, row: 1, tag: '≥ 10 min', name: 'Predicted hold time', sub: 'pass or seal and re-test' }
+      ],
+      edges: [
+        { a: 'cyl', b: 'noz' }, { a: 'noz', b: 'mix' },
+        { a: 'damp', b: 'mix', label: 'sealed', stroke: 'muted', fs: 'b', ts: 'r' },
+        { a: 'mix', b: 'vent', stroke: 'muted', pattern: 'dashed' },
+        { a: 'mix', b: 'leak', label: 'agent drains out', stroke: 'accent', pattern: 'dashed', legend: 'Agent loss' },
+        { a: 'fan', b: 'leak', label: 'measures', stroke: 'muted' },
+        { a: 'fan', b: 'hold', label: 'predicts' }
+      ],
+      zones: [{ ids: ['noz', 'mix', 'damp', 'vent', 'leak'], label: 'Protected volume V' }]
+    })
+  },
+  {
+    id: 'fire-d3', page: 'pillar-fire-safety.html',
+    caption:
+      'Lithium-ion off-gas against the lower flammable limit (LFL). Detection and exhaust must act at 25 % of the LFL, ' +
+      'which for hydrogen is 1.0 % by volume [S2][S3]. One 1,333 kWh NMC pack can vent 5,332 m³ of gas, enough to bring ' +
+      '88,900 m³ of mixture to the LFL (derived from [S2]): no battery room is that large, so ventilation, not volume, keeps it safe.',
+    because:
+      'the order matters: cell monitoring, then gas alarm and exhaust, then explosion control, and suppression last. ' +
+      'A list of layers hides that each threshold is a fraction of one number, the LFL.',
+    build: () => gridFigure({
+      phone: { order: ['cell', 'bms', 'vent', 'lfl25', 'exh', 'lfl100', 'exp', 'tr', 'cool'], gapY: 30,
+        edges: { 1: { fs: 'r', ts: 'r' }, 4: { fs: 'l', ts: 'l', label: undefined }, 6: { fs: 'l', ts: 'l' } } },
+      slug: 'fire3', title: 'Li-ion off-gas against the LFL',
+      desc: 'Concentration rises from cell venting to 25 % of the LFL, where gas detection starts exhaust, and to 100 % of the LFL, where a deflagration becomes possible.',
+      gaps: [64], gapY: 26,
+      nodes: [
+        { id: 'cell', col: 0, row: 0, tag: 'onset 150–167 °C', name: 'Cell overheats', sub: 'NMC 150 · LFP 166.8 °C' },
+        { id: 'bms', col: 1, row: 0, tag: 'IEC 62619', name: 'BMS alarm', sub: 'isolate the string' },
+        { id: 'vent', col: 0, row: 1, name: 'Cell vents gas', sub: 'H₂ · CO · CO₂ · vapour', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Rising gas concentration' },
+        { id: 'lfl25', col: 0, row: 2, tag: '1.0 % H₂ by volume', name: '25 % of LFL', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'exh', col: 1, row: 2, tag: 'NFPA 855', name: 'Gas alarm + exhaust', sub: 'H₂ / CO sensors trip', legend: 'Action' },
+        { id: 'lfl100', col: 0, row: 3, tag: '4.0 % H₂ by volume', name: '100 % of LFL', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'exp', col: 1, row: 3, tag: 'NFPA 68 / 69', name: 'Explosion control', sub: 'vent or prevent' },
+        { id: 'tr', col: 0, row: 4, name: 'Runaway spreads', sub: 'cell to cell', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'cool', col: 1, row: 4, name: 'Water cooling', sub: 'gas agent cannot stop it' }
+      ],
+      edges: [
+        { a: 'cell', b: 'bms' }, { a: 'cell', b: 'vent', stroke: 'accent' },
+        { a: 'vent', b: 'lfl25', stroke: 'accent' }, { a: 'lfl25', b: 'exh', label: 'trip' },
+        { a: 'lfl25', b: 'lfl100', stroke: 'accent', label: 'exhaust fails' }, { a: 'lfl100', b: 'exp' },
+        { a: 'lfl100', b: 'tr', stroke: 'accent' }, { a: 'tr', b: 'cool' }
+      ]
+    })
+  }
+];
+
 const FIGURES = [
   {
     id: 'method-assessment',
@@ -1837,7 +1957,9 @@ const FIGURES = [
   /* article 29 — see the grid helper above */
   ...LLM_FIGURES,
   /* article 30 */
-  ...AGENTIC_FIGURES
+  ...AGENTIC_FIGURES,
+  /* pillar-fire-safety.html */
+  ...PILLAR_FIRE_FIGURES
 ];
 
 /* ==========================================================================
@@ -1967,7 +2089,7 @@ const WIDTH_FAIL_RATIO = 2.0;   // past 2x, more of the figure is hidden than sh
  * (2026-10-25, article-30: "terpotong dan aneh sekali"), so on these pages any figure wider
  * than the column fails the build. FLIP: add a page here once its figures are refit; the
  * remaining overflow list printed below is the backlog. */
-const FIT_TO_COLUMN_PAGES = new Set(['article-30.html']);
+const FIT_TO_COLUMN_PAGES = new Set(['article-30.html', 'pillar-fire-safety.html']);
 
 const findings = [];
 /* Two boxes the composition placed on top of each other. The engine warns about

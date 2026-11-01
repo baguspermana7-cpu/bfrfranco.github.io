@@ -37,7 +37,7 @@
     <meta name="keywords" content="Data Center CAPEX, Construction Cost Calculator, Data Center Cost, Tier III Cost, UPS Cost, Generator Cost, Cooling System Cost">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0066cc">
+    <meta name="theme-color" content="#0b0c0e">
     <link rel="canonical" href="https://resistancezero.com/capex-calculator.html">
 
     <link rel="alternate" hreflang="en" href="https://resistancezero.com/capex-calculator.html">
@@ -175,765 +175,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
-    <link rel="preload" as="image" href="assets/capex-og.jpg">
-
-    <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3a7ca5 100%);
-            --secondary-gradient: linear-gradient(135deg, #2d5a87 0%, #1e3a5f 100%);
-            --dark-blue: #1e3a5f;
-            --medium-blue: #2d5a87;
-            --light-blue: #4a90b8;
-            --accent-gold: #f59e0b;
-            --accent-amber: #fbbf24;
-            --accent-emerald: #10b981;
-            --accent-cyan: #06b6d4;
-            --accent-purple: #64748b;
-            --accent-red: #ef4444;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-tertiary: #e9ecef;
-            --text-primary: #212529;
-            --text-secondary: #495057;
-            --text-muted: #6c757d;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-bg-dark: rgba(30, 58, 95, 0.95);
-            --glass-border: rgba(30, 58, 95, 0.1);
-            --glass-blur: blur(20px);
-            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        /* Background */
-        .page-background {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            background:
-                radial-gradient(ellipse at top right, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom left, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
-                linear-gradient(rgba(30, 58, 95, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(30, 58, 95, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
-        }
-
-        /* Navigation */
-        .navbar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-md);
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: var(--dark-blue);
-        }
-
-        .nav-logo {
-            width: 44px; height: 44px;
-            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            color: white;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-        }
-
-        .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--dark-blue); }
-        .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
-
-        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
-
-        .nav-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 8px 0;
-            transition: color 0.3s;
-        }
-
-        .nav-link:hover { color: var(--dark-blue); }
-
-        .nav-back {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            background: var(--primary-gradient);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
-        }
-
-        .nav-back:hover { transform: translateY(-2px); }
-
-        /* Main Content */
-        .main-content {
-            position: relative;
-            z-index: 10;
-            padding-top: 80px;
-        }
-
-        /* Hero */
-        .hero {
-            padding: 3rem 2rem 2rem;
-            text-align: center;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 4px;
-            font-size: 0.8rem;
-            color: var(--accent-gold);
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero h1 {
-            font-size: clamp(2rem, 4vw, 2.8rem);
-            font-weight: 800;
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-        }
-
-        .hero p {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        /* Brief Section */
-        .brief-section {
-            max-width: 860px;
-            margin: -0.5rem auto 2rem;
-            padding: 0 2rem;
-        }
-
-        .brief-card {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.04), rgba(30, 58, 95, 0.06));
-            border: 1px solid rgba(245, 158, 11, 0.15);
-            border-radius: 4px;
-            padding: 1.5rem 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .brief-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: #f59e0b;
-            border-radius: 4px 0 0 4px;
-        }
-
-        .brief-hero-img {
-            width: 100%;
-            border-radius: 12px;
-            margin-bottom: 1.25rem;
-            border: 1px solid rgba(245, 158, 11, 0.12);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        .brief-lead {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-            line-height: 1.5;
-        }
-
-        .brief-body {
-            font-size: 0.92rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 0.75rem;
-        }
-
-        .brief-stats {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(0,0,0,0.06);
-        }
-
-        .brief-stat {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .brief-stat i {
-            color: var(--accent-gold);
-            font-size: 0.75rem;
-        }
-
-        .brief-note {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-style: italic;
-            margin-top: 0.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .brief-section { padding: 0 1rem; }
-            .brief-card { padding: 1.25rem 1.25rem 1.25rem 1.5rem; }
-            .brief-stats { gap: 1rem; }
-        }
-
-        /* Calculator Container */
-        .calculator-section {
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .simulator-container {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 2rem;
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 2.5rem;
-            box-shadow: var(--shadow-lg);
-        }
-
-        @media (max-width: 1024px) {
-            .simulator-container {
-                grid-template-columns: minmax(0, 1fr);
-            }
-            .simulator-inputs, .simulator-results { min-width: 0; }
-        }
-
-        .simulator-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 600px) {
-            .input-row {
-                grid-template-columns: minmax(0, 1fr);
-            }
-            .input-group, .input-row .input-field { min-width: 0; max-width: 100%; } /* a long <select> option set the track's min-content width */
-            .simulator-inputs select { width: 100%; max-width: 100%; min-width: 0; } /* inline-block select sized to its longest option (refrigerant list: 327 px in a 278 px column) */
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .input-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .input-label i {
-            color: var(--accent-gold);
-        }
-
-        /* Tooltip Styles - Fixed positioning to escape overflow */
-
-
-        /* Legacy tooltip CSS removed v1.59.0 — RZExplain owns tooltips (js/rz-explain.js) */
-
-        .input-field {
-            background: var(--bg-secondary);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 14px 16px;
-            color: var(--text-primary);
-            font-size: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            transition: all 0.3s;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
-        }
-
-        select.input-field {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            padding-right: 40px;
-        }
-
-        .radio-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .radio-option {
-            flex: 1;
-            min-width: 80px;
-        }
-
-        .radio-option input {
-            display: none;
-        }
-
-        .radio-option label {
-            display: block;
-            padding: 10px 12px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            text-align: center;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .radio-option label small {
-            display: block;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .radio-option input:checked + label {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1));
-            border-color: var(--accent-gold);
-            color: var(--accent-gold);
-        }
-
-        .radio-option label:hover {
-            border-color: var(--accent-gold);
-        }
-
-        /* Cost Results */
-        .simulator-results {
-            background: linear-gradient(135deg, var(--dark-blue), var(--medium-blue));
-            border-radius: 20px;
-            padding: 2rem;
-            color: white;
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
-        }
-
-        .results-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .results-total {
-            text-align: right;
-        }
-
-        .total-label {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.7);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .total-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-amber);
-            font-family: 'JetBrains Mono', monospace;
-            text-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
-        }
-
-        .cost-breakdown {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .cost-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .cost-name {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-        }
-
-        .cost-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-        }
-
-        .cost-bar-container {
-            flex: 1;
-            margin: 0 12px;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .cost-bar {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.5s ease;
-        }
-
-        .cost-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            font-weight: 600;
-            min-width: 80px;
-            text-align: right;
-        }
-
-        .cost-percent {
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.6);
-            min-width: 35px;
-            text-align: right;
-        }
-
-        /* Metrics Display */
-        .per-kw-display {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: rgba(251, 191, 36, 0.15);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .per-kw-label {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .per-kw-value {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--accent-amber);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .metrics-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .metric-box {
-            background: rgba(255,255,255,0.08);
-            border-radius: 4px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .metric-label {
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.6);
-            text-transform: uppercase;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        .metric-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .metric-value.tier { color: #94a3b8; }
-        .metric-value.pue { color: #22d3ee; }
-        .metric-value.uptime { color: #34d399; }
-        .metric-value.energy { color: #fbbf24; }
-
-        /* Footer */
-        .footer {
-            background: var(--dark-blue);
-            color: white;
-            text-align: center;
-            padding: 2rem;
-            margin-top: 3rem;
-        }
-
-        .footer p {
-            opacity: 0.8;
-            font-size: 0.9rem;
-        }
-
-        /* Navbar Auth */
-        .nav-auth-wrap {
-            position: relative;
-            margin-left: 0.5rem;
-        }
-        .nav-login-btn {
-            display: flex; align-items: center; gap: 6px;
-            padding: 8px 18px;
-            background: #64748b;
-            border: none; border-radius: 8px;
-            color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit;
-            cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 3px 10px rgba(100, 116, 139,0.3);
-            white-space: nowrap;
-        }
-        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(100, 116, 139,0.4); filter: brightness(1.08); }
-
-        .nav-user-btn {
-            display: flex; align-items: center; gap: 8px;
-            padding: 6px 12px 6px 6px;
-            background: rgba(100, 116, 139,0.08);
-            border: 1px solid rgba(100, 116, 139,0.25);
-            border-radius: 50px;
-            cursor: pointer; transition: all 0.3s;
-            font-family: inherit;
-            color: var(--text-primary);
-        }
-        .nav-user-btn:hover { background: rgba(100, 116, 139,0.14); border-color: rgba(100, 116, 139,0.4); }
-
-        .nav-user-avatar {
-            width: 30px; height: 30px; border-radius: 50%;
-            background: #64748b;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 0.7rem; font-weight: 700;
-        }
-        .nav-user-email {
-            font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);
-            max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        .nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
-        .nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
-
-        .nav-user-dropdown {
-            display: none; position: absolute; top: calc(100% + 8px); right: 0;
-            background: white; border-radius: 12px; border: 1px solid #e2e8f0;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px;
-            z-index: 1001; overflow: hidden;
-            animation: dropdownSlideIn 0.2s ease;
-        }
-        .nav-user-dropdown.show { display: block; }
-        @keyframes dropdownSlideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
-
-        .nav-dd-header {
-            padding: 14px 16px; border-bottom: 1px solid #f1f5f9;
-        }
-        .nav-dd-tier-badge {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 3px 10px; border-radius: 50px;
-            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }
-        .nav-dd-tier-badge.pro { background: #64748b; color: white; }
-        .nav-dd-email {
-            font-size: 0.78rem; color: #64748b; word-break: break-all;
-        }
-        .nav-dd-logout {
-            display: flex; align-items: center; gap: 8px;
-            width: 100%; padding: 12px 16px; border: none; background: none;
-            font-size: 0.82rem; font-weight: 500; color: #ef4444;
-            cursor: pointer; font-family: inherit; transition: background 0.2s;
-        }
-        .nav-dd-logout:hover { background: #fef2f2; }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .calculator-section { padding: 1rem; }
-            .simulator-container { padding: 1.5rem; }
-            #compareGrid { grid-template-columns: 1fr !important; }
-            #deltaColumn { flex-direction: row !important; width: 100%; justify-content: center !important; }
-            .nav-user-email { display: none; }
-            .nav-login-btn .nav-login-text { display: none; }
-            .nav-login-btn { padding: 8px 12px; }
-        }
-        /* Calculator Disclaimer */
-        .calc-disclaimer { background: #f1f5f9 !important; border: 1px solid #cbd5e1 !important; border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1.5rem; }
-        .calc-disclaimer .disc-title { color: #1e293b !important; }
-        .calc-disclaimer .disc-text { color: #475569 !important; }
-        .calc-disclaimer .disc-text strong { color: #1e293b !important; }
-        .calc-disclaimer .disc-text a { color: #2563eb !important; }
-        .calc-disclaimer .disc-fine { color: #64748b !important; }
-            /* Cookie Banner */
-        @media (max-width: 768px) {}
-        @media print {}
-        /* ─── Dark Mode ─────────────────────────────────── */
-        [data-theme="dark"] { --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-tertiary:#334155; --text-primary:#f1f5f9; --text-secondary:#cbd5e1; --text-muted:#94a3b8; --glass-bg:rgba(15,23,42,0.92); --glass-border:rgba(58,124,165,0.2); --shadow-sm:0 2px 4px rgba(0,0,0,0.3); --shadow-md:0 4px 12px rgba(0,0,0,0.4); --shadow-lg:0 8px 30px rgba(0,0,0,0.5); }
-        [data-theme="dark"] body { background:#0f172a; }
-        [data-theme="dark"] .navbar { background:rgba(15,23,42,0.95); border-bottom-color:rgba(58,124,165,0.2); }
-        [data-theme="dark"] .input-section { background:rgba(30,41,59,0.8); border-color:rgba(58,124,165,0.15); }
-        [data-theme="dark"] .results-panel { background:rgba(30,41,59,0.8); border-color:rgba(58,124,165,0.15); }
-        [data-theme="dark"] .input-field { background:#1e293b; border-color:#334155; color:#f1f5f9; }
-        [data-theme="dark"] .input-field option { background:#1e293b; color:#f1f5f9; }
-        [data-theme="dark"] .nav-user-dropdown { background:#1e293b; border-color:#334155; }
-        [data-theme="dark"] .nav-dd-header { border-color:#334155; }
-        [data-theme="dark"] .nav-dd-email { color:#94a3b8; }
-        [data-theme="dark"] .nav-dd-logout:hover { background:rgba(239,68,68,0.1); }
-        .nav-theme-btn { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px; border:1px solid var(--glass-border); background:transparent; color:var(--text-secondary); cursor:pointer; transition:all 0.25s; font-size:0.9rem; padding:0; }
-        .nav-theme-btn:hover { border-color:#f59e0b; color:#f59e0b; background:rgba(245,158,11,0.08); }
-        [data-theme="dark"] .nav-theme-btn { color:#f59e0b; }
-        [data-theme="dark"] .nav-theme-btn:hover { color:#fbbf24; border-color:rgba(251,191,36,0.4); background:rgba(251,191,36,0.08); }
-        /* ===== PLAN v13 DARK-MODE EXTENSIONS ===== */
-        [data-theme="dark"] .results-card { background:#1e293b; border-color:rgba(255,255,255,0.08); color:#f1f5f9; }
-        [data-theme="dark"] .chart-card { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .chart-title { color:#f1f5f9; }
-        [data-theme="dark"] .breakdown-card { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .breakdown-table { background:transparent; }
-        [data-theme="dark"] .breakdown-table th { background:#0f172a; color:#cbd5e1; border-bottom-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .breakdown-table td { color:#e2e8f0; border-bottom-color:rgba(255,255,255,0.06); }
-        [data-theme="dark"] .breakdown-table tr:hover td { background:rgba(255,255,255,0.02); }
-        [data-theme="dark"] .breakdown-table .amount { color:#f1f5f9; }
-        [data-theme="dark"] .breakdown-table .percent { color:#94a3b8; }
-        [data-theme="dark"] .section-title { color:#f1f5f9; }
-        [data-theme="dark"] .input-field { background:#1e293b; border-color:#334155; color:#f1f5f9; }
-        [data-theme="dark"] .input-field option { background:#1e293b; color:#f1f5f9; }
-        [data-theme="dark"] .calc-disclaimer { background:#1e293b !important; border-color:#334155 !important; color:#cbd5e1 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-title { color:#f1f5f9 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-text { color:#cbd5e1 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-text strong { color:#f1f5f9 !important; }
-        [data-theme="dark"] .calc-disclaimer .disc-fine { color:#94a3b8 !important; }
-        [data-theme="dark"] .nav-user-dropdown { background:#1e293b; border-color:#334155; }
-        [data-theme="dark"] .tab-bar { background:#0f172a; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .tab-btn { color:#94a3b8; }
-        [data-theme="dark"] .results-panel { background:rgba(30,41,59,0.8); border-color:rgba(58,124,165,0.15); }
-        [data-theme="dark"] .kpi-card { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .kpi-label { color:#94a3b8; }
-        [data-theme="dark"] .narrative-card { background:rgba(245,158,11,0.05); border-color:rgba(245,158,11,0.12); color:#cbd5e1; }
-        [data-theme="dark"] .narrative-card strong { color:#f1f5f9; }
-        /* v1.2.2 fix — brief-card hero block was invisible on dark mode (transparent gradient) */
-        [data-theme="dark"] .brief-card { background:linear-gradient(135deg, rgba(245,158,11,0.08), rgba(30,41,59,0.6)); border-color:rgba(245,158,11,0.22); }
-        [data-theme="dark"] .brief-lead { color:#f1f5f9; }
-        [data-theme="dark"] .brief-body { color:#cbd5e1; }
-        [data-theme="dark"] .brief-stats { border-top-color:rgba(255,255,255,0.08); }
-        [data-theme="dark"] .brief-stat { color:#cbd5e1; }
-        [data-theme="dark"] .brief-stat-icon { color:#f59e0b; }
-        [data-theme="dark"] .brief-disclaimer { color:#94a3b8; border-top-color:rgba(255,255,255,0.06); }
-        [data-theme="dark"] .brief-hero-img { border-color:rgba(245,158,11,0.2); }
-
-        /* v1.4.1 — class-mismatch fix: HTML uses .input-field but CSS targeted page-prefix */
-        [data-theme="dark"] .input-field,
-        [data-theme="dark"] .country-select,
-        [data-theme="dark"] select.input-field,
-        [data-theme="dark"] input.input-field { background:#1e293b !important; border-color:rgba(255,255,255,0.12) !important; color:#f1f5f9 !important; }
-        [data-theme="dark"] .input-field:focus { border-color:#10b981 !important; box-shadow:0 0 0 3px rgba(16,185,129,0.18) !important; }
-        [data-theme="dark"] .input-field option,
-        [data-theme="dark"] select.input-field option { background:#1e293b !important; color:#f1f5f9 !important; }
-        [data-theme="dark"] .input-label { color:#cbd5e1; }
-
-/* a11y (v1.52.7) */
-:root:not([data-theme="dark"]) #uncP50 { color:#64748b !important; }
-:root:not([data-theme="dark"]) div > p > a[href$="terms.html"], :root:not([data-theme="dark"]) div > p > a[href$="privacy.html"] { color:#64748b !important; }
-[data-theme="dark"] div > p > a[href$="terms.html"], [data-theme="dark"] div > p > a[href$="privacy.html"] { color:#67e8f9 !important; }
-[data-theme="dark"] .uncertainty-panel span, [data-theme="dark"] #uncertaintyPanel span, [data-theme="dark"] div > span[style*="rgb"] { color:#9aa8bb !important; }
-
-[data-theme="dark"] .summary-strip-title, [data-theme="dark"] #tourStepCount, [data-theme="dark"] .crosslink-bar-label, [data-theme="dark"] .rfs-card-subtitle, [data-theme="dark"] .rfs-nav-subtitle, [data-theme="dark"] .scenario-bar-label, [data-theme="dark"] .rfs-archetype-desc, [data-theme="dark"] .use-when, [data-theme="dark"] .use-when strong, [data-theme="dark"] #rfsBreadcrumb span, [data-theme="dark"] #methodNote, [data-theme="dark"] #methodNoteCatalogCount, [data-theme="dark"] div > p { color:#94a3b8 !important; }
-:root:not([data-theme="dark"]) .active[class] { color:#92400e !important; }
-[data-theme="dark"] .active[class] { color:#67e8f9 !important; }
-:root:not([data-theme="dark"]) #uncP10 { color:#166534 !important; }
-[data-theme="dark"] #uncP50 { color:#94a3b8 !important; }
-[data-theme="dark"] [style*="rgb(124, 139, 159)"], [data-theme="dark"] [style*="#7c8b9f"] { color:#9aa8bb !important; }
-#btnExportPDF { opacity:1 !important; }
-:root:not([data-theme="dark"]) #btnExportPDF { color:#b91c1c !important; }
-[data-theme="dark"] #btnExportPDF { color:#f8b4b4 !important; }
-[data-theme="dark"] a[href$="changelog.html"] { color:#94a3b8 !important; }
-[data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
-
-button[onclick^="setPreset"] { background:#166534 !important; border-color:#166534 !important; color:#fff !important; }
-:root:not([data-theme="dark"]) #uncertaintyPanel > div { color:#495057 !important; }
-[data-theme="dark"] #uncP90 { color:#f87171 !important; }
-</style>
-    <script src="js/rz-version.js?v=20261101-22a91a90" defer></script>
+    <script src="js/rz-version.js?v=20261101-732b47d5" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
@@ -980,296 +222,113 @@ button[onclick^="setPreset"] { background:#166534 !important; border-color:#1665
         ]
     }
     </script>
-
-<style id="rz-skiplink-v1">
-.skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
-.skip-link:focus{top:0}
-[data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
-</style>
-<style id="rz-lightfix-v1">
-/* RZ-LIGHTFIX v1 — light-mode contrast restoration after the v1.19.1
-   default-theme flip to light. Scope: html:not([data-theme="dark"]) only,
-   so dark rendering is unchanged. Same-hue WCAG-AA shades. Idempotent. */
-html:not([data-theme="dark"]) .cookie-decline,
-html:not([data-theme="dark"]) .tco-cookie-decline { color:#475569 !important; }
-html:not([data-theme="dark"]) .calc-disclaimer .disc-fine,
-html:not([data-theme="dark"]) .disc-fine { color:#475569 !important; }
-html:not([data-theme="dark"]) .nav-user-email,
-html:not([data-theme="dark"]) .rz-user-email { color:#475569 !important; }
-html:not([data-theme="dark"]) .pro-badge,
-html:not([data-theme="dark"]) .nav-pro-badge { background:#64748b !important; color:#fff !important; }
-/* Per-link inline rainbow nav colours (authored for the old dark default)
-   are illegible on the white light navbar. Same-hue AA-700 shades keep the
-   colour-coded wayfinding. Safe: verified no inline border-color:#<accent>
-   or background-color:#<accent> exists on these pages, so [style*] only
-   ever matches a genuine text `color:` declaration; CSS !important beats
-   an inline declaration that carries no !important. */
-html:not([data-theme="dark"]) .nav-link[style*="#10b981"],
-html:not([data-theme="dark"]) .nav-link[style*="#22c55e"] { color:#047857 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#0d9488"],
-html:not([data-theme="dark"]) .nav-link[style*="#14b8a6"] { color:#0f766e !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#06b6d4"] { color:#0e7490 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#3b82f6"] { color:#1d4ed8 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#64748b"] { color:#64748b !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#f59e0b"],
-html:not([data-theme="dark"]) .nav-link[style*="#d97706"] { color:#b45309 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#ef4444"] { color:#b91c1c !important; }
-
-html:not([data-theme="dark"]) .radio-option label,
-html:not([data-theme="dark"]) .radio-option label small { color:#334155 !important; }
-html:not([data-theme="dark"]) .radio-option input:checked + label { color:#b45309 !important; }
-/* Inline amber section-divider headers. Safe: verified zero inline
-   border-color:#f59e0b / background-color:#f59e0b on this page, so the
-   uppercase+#f59e0b signature only ever matches a text colour. */
-html:not([data-theme="dark"]) div[style*="text-transform:uppercase"][style*="color:#f59e0b"] { color:#b45309 !important; }
-html:not([data-theme="dark"]) .hero-badge,
-html:not([data-theme="dark"]) .capex-mode-btn.active { color:#b45309 !important; }
-html:not([data-theme="dark"]) .capex-mode-btn { color:#475569 !important; }
-html:not([data-theme="dark"]) #premiumTabBtn.premium-active,
-html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; }
-</style>
     <!-- PLAN02 E4 — editorial chrome (dark-only, chrome only) -->
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-<style>
-/* Mobile form controls: 16px, or iOS Safari zooms the viewport on focus and does not zoom back.
-   This page does not load styles.min.css, so it carries the rule itself. */
-@media (max-width: 768px) {
-  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
-  select, textarea { font-size: 16px !important; }
-}
-</style>
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261027-0044">
+
+    <link rel="stylesheet" href="css/rz-hub.css">
+    <link rel="stylesheet" href="css/rz-tool.css">
 </head>
-<body data-rz-calc="capex">
+<body class="hub tool" data-rz-calc="capex" data-rz-account-pill="off">
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <div class="page-background"></div>
+    
 
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-brand">
-                <div class="nav-logo">CAPEX</div>
-                <div>
-                    <div class="nav-title">CAPEX Calculator</div>
-                    <div class="nav-subtitle">Capital Expenditure Analysis</div>
-                </div>
-            </a>
-            <div class="nav-links">
-                <a href="datacenter-solutions.html" class="nav-link">DC Solutions</a>
-                <a href="datahallAI.html" class="nav-link" style="color: #64748b;" title="Root & Educator access only">🔒 DC AI/HPC</a>
-                <a href="dc-conventional.html" class="nav-link" title="Root & Educator access only">🔒 DC Conventional</a>
-                <a href="opex-calculator.html" class="nav-link" style="color: #10b981;">OPEX Calc</a>
-                <a href="tia-942-checklist.html" class="nav-link" style="color: #10b981;">TIA-942</a>
-                <a href="tco-calculator.html" class="nav-link" style="color: #0369a1;">TCO Calc</a>
-                <a href="dc-market-tracker.html" class="nav-link" style="color: #0d9488;">Market</a>
-                <a href="glossary.html" class="nav-link" style="color: #14b8a6;">Glossary</a>
-                <!-- Auth Button -->
-                <button class="nav-theme-btn" id="navThemeBtn" onclick="toggleCalcTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i id="themeIcon" class="fas fa-moon"></i></button>
-                <div class="nav-auth-wrap" id="navAuthWrap">
-                    <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
-                        <i class="fas fa-user-circle"></i>
-                        <span class="nav-login-text">Login</span>
-                    </button>
-                    <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
-                        <div class="nav-user-avatar" id="navUserAvatar">U</div>
-                        <span class="nav-user-email" id="navUserEmail"></span>
-                        <i class="fas fa-chevron-down nav-user-chevron"></i>
-                    </button>
-                    <div class="nav-user-dropdown" id="navUserDropdown">
-                        <div class="nav-dd-header">
-                            <div class="nav-dd-tier-badge" id="navDdTierBadge">FULL</div>
-                            <div class="nav-dd-email" id="navDdEmail"></div>
-                        </div>
-                        <button class="nav-dd-logout" onclick="logoutPremium()">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </div>
-                </div>
-                <a href="datacenter-solutions.html" class="nav-back">
-                    <i class="fas fa-arrow-left"></i>
-                    Portfolio
-                </a>
-            </div>
+    <nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+          <div class="nav-auth-wrap" id="navAuthWrap">
+        <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()"><span class="nav-login-text">Login</span></button>
+        <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()"><span class="nav-user-avatar" id="navUserAvatar">U</span><span class="nav-user-email" id="navUserEmail"></span></button>
+        <div class="nav-user-dropdown" id="navUserDropdown">
+          <div class="nav-dd-header"><div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div><div class="nav-dd-email" id="navDdEmail"></div></div>
+          <a class="nav-dd-link" href="account.html">My account and saved scenarios</a>
+          <button class="nav-dd-logout" onclick="logoutPremium()">Logout</button>
+        </div>
+      </div>
+    <button class="nav-icon theme-toggle" id="navThemeBtn" onclick="toggleCalcTheme()" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i id="themeIcon" class="fas fa-moon"></i></button>
+  </div>
+</nav>
 
     <!-- Main Content -->
     <main id="main-content" class="main-content">
-        <!-- Hero -->
-        <section class="hero">
-            <div class="hero-badge">
-                <i class="fas fa-calculator"></i>
-                Capital Expenditure Analysis
+        <header class="tool-head">
+            <div class="wrap">
+                <p class="eyebrow">DC Solutions · <b>Calculator</b> · CAPEX</p>
+                <h1>Data center construction cost <span class="muted">by system, tier and region</span></h1>
+                <p class="lede">Total CAPEX and its split by system — electrical, cooling, building, UPS, generators, fire, BMS, network and the rest — from IT load, rack density, cooling, redundancy, building type, seismic zone and region. RZEngine computes it in your browser; every figure follows the inputs.</p>
+                <p class="basis">engine RZEngine capex.detailed · basis Turner &amp; Townsend, JLL, CBRE cost benchmarks, Uptime Tier I–IV · updated 2026-10</p>
+                <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → Calculator → CAPEX</p>
             </div>
-            <h1>Data Center CAPEX Calculator</h1>
-            <p>Calculate comprehensive construction costs with detailed breakdown of electrical, cooling, civil, and infrastructure components</p>
-        </section>
-
-        <!-- Brief -->
-        <section class="brief-section">
-            <div class="brief-card">
-                <img src="assets/capex-og.jpg" alt="Data Center CAPEX Calculator — capital expenditure breakdown for construction, electrical, cooling, and infrastructure" class="brief-hero-img" loading="eager" width="1139" height="471">
-                <p class="brief-lead">Building a data center is not a spreadsheet exercise &mdash; it's a bet worth millions where every wrong assumption compounds.</p>
-                <p class="brief-body">A 10 MW facility can swing between $80M and $200M+ depending on cooling architecture, redundancy tier, seismic zone, and dozens of other variables most cost models quietly ignore. This calculator won't replace a detailed engineering estimate &mdash; but it will give you a defensible starting point in under 60 seconds. Adjust IT load, pick your cooling strategy, set your redundancy level, and watch how each decision moves the total. Use it to sanity-check vendor quotes, benchmark across regions, or build a rough business case before the first shovel hits the ground.</p>
-                <div class="brief-stats">
-                    <span class="brief-stat"><i class="fas fa-sliders-h"></i> 12+ configurable variables</span>
-                    <span class="brief-stat"><i class="fas fa-globe-americas"></i> Location factor adjustments</span>
-                    <span class="brief-stat"><i class="fas fa-layer-group"></i> Tier I &ndash; IV redundancy</span>
-                    <span class="brief-stat"><i class="fas fa-snowflake"></i> 4 cooling architectures</span>
-                </div>
-                <p class="brief-note">General-purpose estimate &mdash; actual costs depend on site-specific engineering, local regulations, and procurement strategy. Need a deeper analysis? Let's talk.</p>
-            </div>
-        </section>
+        </header>
 
         <!-- Calculator -->
-        <section class="calculator-section" data-explain-scan>
-            <!-- Mode Tabs -->
-            <div id="capexModeTabs" style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;max-width:1400px;margin-left:auto;margin-right:auto;">
-                <button type="button" class="capex-mode-btn active" data-mode="simple" onclick="switchCapexMode('simple')" style="padding:0.6rem 1.2rem;border-radius:10px;border:1px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.15);color:#f59e0b;cursor:pointer;font-weight:600;font-size:0.9rem;font-family:inherit;transition:all 0.3s;">
-                    <i class="fas fa-sliders-h" style="margin-right:6px;"></i>Simple
-                </button>
-                <button type="button" class="capex-mode-btn" data-mode="advanced" onclick="switchCapexMode('advanced')" style="padding:0.6rem 1.2rem;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#94a3b8;cursor:pointer;font-weight:500;font-size:0.9rem;font-family:inherit;transition:all 0.3s;">
-                    <i class="fas fa-cogs" style="margin-right:6px;"></i>Advanced
-                </button>
-                <!-- Separator + Premium button (right-aligned) -->
-                <div style="margin-left:auto;display:flex;align-items:center;gap:0.5rem;">
-                    <span id="premiumBadge" style="display:none;padding:4px 12px;border-radius:50px;background:#64748b;color:white;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;">FULL ACCESS</span>
-                    <button type="button" id="premiumTabBtn" onclick="handlePremiumTab()" style="padding:0.6rem 1.4rem;border-radius:10px;border:1px solid rgba(8,145,178,0.6);background:#64748b;color:white;cursor:pointer;font-weight:700;font-size:0.9rem;font-family:inherit;transition:all 0.3s;box-shadow:0 2px 12px rgba(100, 116, 139,0.35);position:relative;overflow:hidden;">
-                        <i class="fas fa-crown" style="margin-right:6px;"></i>Full access
-                    </button>
+        <section class="calculator-section wrap" data-explain-scan>
+            <div class="tool-bar" role="toolbar" aria-label="Input depth and actions">
+                <div class="seg" role="group" aria-label="Input depth" id="capexModeTabs">
+                    <button type="button" class="capex-mode-btn active" data-mode="simple" aria-pressed="true" onclick="switchCapexMode('simple')">Simple</button>
+                    <button type="button" class="capex-mode-btn" data-mode="advanced" aria-pressed="false" onclick="switchCapexMode('advanced')">Advanced</button>
                 </div>
+                <span id="premiumBadge" hidden></span>
+                <span class="spacer"></span>
+                <button type="button" class="tool-btn" id="btnSaveA" onclick="gatedAction('save')"><span id="btnSaveLabel">Save as A</span></button>
+                <button type="button" class="tool-btn" id="btnExportPDF" onclick="gatedAction('pdf')"><span id="btnPdfLabel">Export PDF</span></button>
+                <button type="button" class="tool-btn" id="btnExportCSV" onclick="exportCapexCSV()">Export CSV</button>
+                <button type="button" class="tool-btn" id="btnSaveAccount" onclick="saveToAccount()"><span id="btnSaveAccountLabel">Save</span></button>
             </div>
+            <p class="tool-msg" id="acctSaveMsg" style="display:none;"></p>
 
             <!-- Login handled by shared auth.js modal (window._rzAuth.showModal) -->
-            <style>
-                @keyframes modalSlideIn { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
-                @keyframes premiumGlow { 0%,100% { box-shadow:0 2px 12px rgba(100, 116, 139,0.35); } 50% { box-shadow:0 2px 20px rgba(100, 116, 139,0.55); } }
-                #premiumTabBtn { animation: premiumGlow 2.5s ease-in-out infinite; }
-                #premiumTabBtn:hover { transform:translateY(-2px); box-shadow:0 4px 24px rgba(100, 116, 139,0.5) !important; filter:brightness(1.1); }
-                #premiumTabBtn.premium-active { animation:none !important; background:linear-gradient(135deg,rgba(100, 116, 139,0.2),rgba(8,145,178,0.15)) !important; color:#67e8f9 !important; border-color:rgba(100, 116, 139,0.5) !important; box-shadow:0 2px 8px rgba(100, 116, 139,0.2) !important; }
-                #premiumTabBtn.premium-active:hover { transform:translateY(-1px); }
 
-                /* Feature Gating Styles */
-                .gated-overlay {
-                    position: relative;
-                    cursor: pointer;
-                }
-                .gated-overlay::after {
-                    content: '';
-                    position: absolute;
-                    top: 0; left: 0; right: 0; bottom: 0;
-                    background: rgba(15, 23, 42, 0.6);
-                    backdrop-filter: blur(6px);
-                    -webkit-backdrop-filter: blur(6px);
-                    border-radius: inherit;
-                    z-index: 10;
-                }
-                .gated-overlay::before {
-                    content: '\f521';
-                    font-family: 'Font Awesome 5 Free';
-                    font-weight: 900;
-                    position: absolute;
-                    top: 50%; left: 50%;
-                    transform: translate(-50%, -50%);
-                    color: #94a3b8;
-                    font-size: 1.2rem;
-                    z-index: 11;
-                    text-shadow: 0 2px 8px rgba(100, 116, 139,0.5);
-                }
-                .gated-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 4px;
-                    padding: 2px 8px;
-                    border-radius: 6px;
-                    background: linear-gradient(135deg, rgba(100, 116, 139,0.2), rgba(8,145,178,0.1));
-                    border: 1px solid rgba(100, 116, 139,0.3);
-                    color: #94a3b8;
-                    font-size: 0.65rem;
-                    font-weight: 700;
-                    letter-spacing: 0.5px;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                .gated-badge:hover {
-                    background: linear-gradient(135deg, rgba(100, 116, 139,0.3), rgba(8,145,178,0.2));
-                    transform: translateY(-1px);
-                }
-                .gated-btn {
-                    opacity: 0.5;
-                    pointer-events: none;
-                    position: relative;
-                }
-                .gated-btn.clickable {
-                    opacity: 0.7;
-                    pointer-events: auto;
-                    cursor: pointer;
-                }
-                .free-watermark {
-                    text-align: center;
-                    padding: 8px 16px;
-                    margin-top: 0.75rem;
-                    border-radius: 8px;
-                    background: rgba(100, 116, 139, 0.08);
-                    border: 1px dashed rgba(100, 116, 139, 0.25);
-                    font-size: 0.7rem;
-                    color: #94a3b8;
-                    letter-spacing: 0.3px;
-                }
-                .cost-value-hidden {
-                    filter: blur(5px);
-                    user-select: none;
-                    pointer-events: none;
-                }
-
-                /* Action button hover effects */
-                .action-btn-save:hover { transform: translateY(-2px); box-shadow: 0 4px 18px rgba(245,158,11,0.35) !important; border-color: rgba(251,191,36,0.8) !important; }
-                .action-btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 4px 18px rgba(239,68,68,0.3) !important; border-color: rgba(239,68,68,0.7) !important; }
-
-                /* Print / PDF Styles */
-                @media print {
-                    body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    .navbar, .hero, .brief-section, #capexModeTabs, #loginModal, .nav-back, footer,
-                    #freeWatermark, #btnSaveA, #btnExportPDF, #btnClearCompare, #scenarioBBanner,
-                    .main-content { padding-top: 0 !important; }
-                    .calculator-section { padding: 0 !important; }
-                    .simulator-container { display: block !important; max-width: 100% !important; }
-                    .simulator-inputs { margin-bottom: 2rem; }
-                    .simulator-results { background: #f8fafc !important; color: #1e293b !important; border: 1px solid #e2e8f0; }
-                    .results-header { background: linear-gradient(135deg, #1e3a5f, #2d5a87) !important; }
-                    .cost-item { border-color: #e2e8f0 !important; }
-                    .cost-value, .cost-percent { color: #334155 !important; filter: none !important; }
-                    .cost-name { color: #475569 !important; }
-                    #premiumOutput { display: flex !important; }
-                    #premiumOutput > div { border-color: #e2e8f0 !important; background: #f8fafc !important; }
-                    .gated-overlay::after, .gated-overlay::before { display: none !important; }
-                    .cost-value-hidden { filter: none !important; user-select: auto !important; }
-                    @page { margin: 1cm; size: A4; }
-                }
-            </style>
-
-            <div class="simulator-container">
+            <div class="simulator-container tool-bench">
                 <!-- Input Side -->
-                <div class="simulator-inputs" data-explain-scan>
+                <div class="simulator-inputs tool-inputs" data-explain-scan>
                     <!-- Scenario B indicator (shown after Save Scenario A) -->
-                    <div id="scenarioBBanner" style="display:none;padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(16,185,129,0.08));border:1.5px solid rgba(16,185,129,0.4);margin-bottom:0.75rem;display:none;align-items:center;gap:10px;">
-                        <span style="width:28px;height:28px;border-radius:8px;background:rgba(52,211,153,0.2);color:#34d399;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0;">B</span>
-                        <div>
-                            <div style="font-size:0.85rem;font-weight:600;color:#059669;">Scenario B Input</div>
-                            <div style="font-size:0.72rem;color:#94a3b8;">Modify the inputs below to configure Scenario B for comparison</div>
-                        </div>
-                    </div>
+                    <p id="scenarioBBanner" class="in-note" style="display:none;"><b>Scenario B.</b> Change the inputs below; the comparison with A updates under the results.</p>
+                    <div class="section-header"><span class="section-title">Load and building</span></div>
                     <div class="input-row">
                         <div class="input-group">
                             <label class="input-label">
-                                <i class="fas fa-bolt"></i> IT Load (kW)
+                                IT Load (kW)
                             </label>
                             <input type="number" class="input-field" id="itLoad" value="1000" min="100" max="100000" aria-label="It Load">
                         </div>
                         <div class="input-group">
                             <label class="input-label">
-                                <i class="fas fa-gas-pump"></i> Fuel Autonomy (hours)
+                                Fuel Autonomy (hours)
                             </label>
                             <input type="number" class="input-field" id="fuelHours" value="48" min="8" max="168" aria-label="Fuel Hours">
                         </div>
@@ -1278,7 +337,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                     <div class="input-row">
                         <div class="input-group">
                             <label class="input-label">
-                                <i class="fas fa-building"></i> Building Type
+                                Building Type
                             </label>
                             <select class="input-field" id="buildingType" aria-label="Building Type">
                                 <option value="warehouse">Warehouse Conversion (0.70x)</option>
@@ -1289,7 +348,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
                         <div class="input-group">
                             <label class="input-label">
-                                <i class="fas fa-mountain"></i> Seismic Zone
+                                Seismic Zone
                             </label>
                             <select class="input-field" id="seismicZone" aria-label="Seismic Zone">
                                 <option value="zone0">Zone 0 - No Seismic Risk</option>
@@ -1301,9 +360,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
                     </div>
 
+                    <div class="section-header"><span class="section-title">Density, cooling and redundancy</span></div>
                     <div class="input-group">
                         <label class="input-label">
-                            <i class="fas fa-server"></i> Rack Density
+                            Rack Density
                         </label>
                         <div class="radio-group">
                             <div class="radio-option">
@@ -1327,7 +387,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
                     <div class="input-group">
                         <label class="input-label">
-                            <i class="fas fa-snowflake"></i> Cooling Type
+                            Cooling Type
                         </label>
                         <div class="radio-group">
                             <div class="radio-option">
@@ -1349,36 +409,36 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
 
                         <!-- ═══ v1.58.0 — Deep Sea Water Cooling (chiller-less, engine physics) ═══ -->
-                        <label style="display:flex;align-items:center;gap:0.55rem;margin-top:0.8rem;padding:0.6rem 0.75rem;border:1px solid rgba(14,165,233,0.35);border-radius:10px;cursor:pointer;background:rgba(14,165,233,0.06);">
-                            <input type="checkbox" id="deepSeaEnable" onchange="toggleDeepSea()" style="width:16px;height:16px;accent-color:#0ea5e9;">
-                            <span style="font-size:0.85rem;font-weight:600;"><i class="fas fa-water" style="color:#0ea5e9;"></i> Deep Sea Water Cooling System</span>
+                        <label>
+                            <input type="checkbox" id="deepSeaEnable" onchange="toggleDeepSea()">
+                            <span>Deep Sea Water Cooling System</span>
                         </label>
-                        <div id="deepSeaConfig" style="display:none;margin-top:0.6rem;padding:0.75rem;border:1px dashed rgba(14,165,233,0.35);border-radius:10px;">
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+                        <div id="deepSeaConfig" style="display:none;">
+                            <div>
                                 <div>
-                                    <label class="input-label" for="dsDepth" style="font-size:0.72rem;">Intake Depth (m)</label>
+                                    <label class="input-label" for="dsDepth">Intake Depth (m)</label>
                                     <input class="input-field" type="number" id="dsDepth" value="900" min="300" max="1200" step="50" oninput="calculateCosts()" aria-label="Intake depth meters">
                                 </div>
                                 <div>
-                                    <label class="input-label" for="dsPipeline" style="font-size:0.72rem;">Pipeline to Shore (km)</label>
+                                    <label class="input-label" for="dsPipeline">Pipeline to Shore (km)</label>
                                     <input class="input-field" type="number" id="dsPipeline" value="3" min="0.5" max="15" step="0.5" oninput="calculateCosts()" aria-label="Pipeline length kilometers">
                                 </div>
                                 <div>
-                                    <label class="input-label" for="dsDeltaT" style="font-size:0.72rem;">Seawater ΔT (°C)</label>
+                                    <label class="input-label" for="dsDeltaT">Seawater ΔT (°C)</label>
                                     <input class="input-field" type="number" id="dsDeltaT" value="5" min="3" max="7" step="0.5" oninput="calculateCosts()" aria-label="Seawater delta T">
                                 </div>
                                 <div>
-                                    <label class="input-label" for="dsTrimPct" style="font-size:0.72rem;">Trim Chiller Capacity (%)</label>
+                                    <label class="input-label" for="dsTrimPct">Trim Chiller Capacity (%)</label>
                                     <input class="input-field" type="number" id="dsTrimPct" value="35" min="0" max="100" step="5" oninput="calculateCosts()" aria-label="Trim chiller capacity percent">
                                 </div>
                             </div>
-                            <div id="dsIntakeNote" style="font-size:0.68rem;color:var(--text-secondary);margin-top:0.5rem;"></div>
+                            <div id="dsIntakeNote"></div>
                         </div>
 
                         <!-- ═══ v1.58.0 — Refrigerant selection (chiller/CRAC path) ═══ -->
-                        <div style="margin-top:0.8rem;">
-                            <label class="input-label" for="refrigerantType" style="font-size:0.8rem;">
-                                <i class="fas fa-flask"></i> Refrigerant
+                        <div>
+                            <label class="input-label" for="refrigerantType">
+                                Refrigerant
                             </label>
                             <select class="input-field" id="refrigerantType" onchange="calculateCosts()" aria-label="Refrigerant type">
                                 <option value="auto" selected>Auto (by cooling type)</option>
@@ -1397,7 +457,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
                     <div class="input-group">
                         <label class="input-label">
-                            <i class="fas fa-shield-alt"></i> Redundancy
+                            Redundancy
                         </label>
                         <div class="radio-group">
                             <div class="radio-option">
@@ -1414,15 +474,16 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                             </div>
                             <div class="radio-option">
                                 <input type="radio" name="redundancy" id="red2N1" value="2n1">
-                                <label for="red2N1">2N+1<small>Full access</small></label>
+                                <label for="red2N1">2N+1<small>Full + spare</small></label>
                             </div>
                         </div>
                     </div>
 
+                    <div class="section-header"><span class="section-title">Fire, UPS and generators</span></div>
                     <div class="input-row">
                         <div class="input-group">
                             <label class="input-label">
-                                <i class="fas fa-fire-extinguisher"></i> Fire Suppression
+                                Fire Suppression
                             </label>
                             <select class="input-field" id="fireType" aria-label="Fire Type">
                                 <option value="fm200">FM200 / HFC-227ea</option>
@@ -1434,7 +495,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
                         <div class="input-group">
                             <label class="input-label">
-                                <i class="fas fa-bell"></i> Fire Alarm System
+                                Fire Alarm System
                             </label>
                             <select class="input-field" id="alarmType" aria-label="Alarm Type">
                                 <option value="conventional">Conventional</option>
@@ -1448,7 +509,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                     <div class="input-row">
                         <div class="input-group">
                             <label class="input-label">
-                                <i class="fas fa-battery-full"></i> UPS Type
+                                UPS Type
                             </label>
                             <select class="input-field" id="upsType" aria-label="UPS Type">
                                 <option value="standalone">Standalone</option>
@@ -1459,7 +520,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
                         <div class="input-group">
                             <label class="input-label">
-                                <i class="fas fa-plug"></i> Generator Type
+                                Generator Type
                             </label>
                             <select class="input-field" id="genType" aria-label="Gen Type">
                                 <option value="diesel" selected>Diesel</option>
@@ -1470,10 +531,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
                     </div>
 
+                    <div class="section-header"><span class="section-title">Location</span></div>
                     <div class="input-row">
                         <div class="input-group">
                             <label class="input-label">
-                                <i class="fas fa-globe"></i> Region
+                                Region
                             </label>
                             <select class="input-field" id="locationFactor" aria-label="Location Factor">
                                 <option value="americas" selected>Americas (1.00x)</option>
@@ -1484,7 +546,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
                         <div class="input-group">
                             <label class="input-label">
-                                <i class="fas fa-city"></i> City / Market
+                                City / Market
                             </label>
                             <select class="input-field" id="cityMarket" aria-label="City Market">
                                 <option value="none">-- Select City (optional) --</option>
@@ -1493,16 +555,14 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                     </div>
 
                     <!-- ═══ ADVANCED MODE SECTIONS (hidden by default) ═══ -->
-                    <div id="advancedInputs" style="display:none;flex-direction:column;gap:1.5rem;">
+                    <div id="advancedInputs" style="display:none;">
 
                         <!-- A. Year & Escalation -->
-                        <div style="border-top:1px solid rgba(245,158,11,0.2);padding-top:1.5rem;margin-top:0.5rem;">
-                            <div style="font-size:0.8rem;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
-                                <i class="fas fa-calendar-alt"></i> Year & Escalation
-                            </div>
+                        <div class="input-section adv-section">
+                            <div class="section-header"><span class="section-title">Year and Escalation</span></div>
                             <div class="input-group">
                                 <label class="input-label">
-                                    <i class="fas fa-calendar"></i> Projection Year
+                                    Projection Year
                                 </label>
                                 <select class="input-field" id="projYear" aria-label="Proj Year">
                                     <option value="2025" selected>2025 (Baseline)</option>
@@ -1516,20 +576,18 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
 
                         <!-- B. Front-of-Meter / Utility Interconnection -->
-                        <div style="border-top:1px solid rgba(59,130,246,0.2);padding-top:1.5rem;">
-                            <div style="font-size:0.8rem;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
-                                <i class="fas fa-plug"></i> Front-of-Meter / Utility
-                            </div>
-                            <div class="input-group" style="margin-bottom:1rem;">
-                                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.9rem;font-weight:500;color:var(--text-secondary);">
-                                    <input type="checkbox" id="includeFOM" style="width:18px;height:18px;accent-color:#3b82f6;cursor:pointer;" aria-label="Include FOM">
+                        <div class="input-section adv-section">
+                            <div class="section-header"><span class="section-title">Front-of-Meter and Utility</span></div>
+                            <div class="input-group">
+                                <label>
+                                    <input type="checkbox" id="includeFOM" aria-label="Include FOM">
                                     Include Front-of-Meter Costs
                                 </label>
                             </div>
-                            <div id="fomInputs" style="display:none;flex-direction:column;gap:1rem;">
+                            <div id="fomInputs" style="display:none;">
                                 <div class="input-row">
                                     <div class="input-group">
-                                        <label class="input-label"><i class="fas fa-industry"></i> Substation Type</label>
+                                        <label class="input-label">Substation Type</label>
                                         <select class="input-field" id="substationType" aria-label="Substation Type">
                                             <option value="shared">Shared Utility ($0.5-1.5M)</option>
                                             <option value="dedicated_33kv" selected>Dedicated 33kV ($3-5M)</option>
@@ -1537,7 +595,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                         </select>
                                     </div>
                                     <div class="input-group">
-                                        <label class="input-label"><i class="fas fa-bolt"></i> Transformer Lead Time</label>
+                                        <label class="input-label">Transformer Lead Time</label>
                                         <select class="input-field" id="transformerLead" aria-label="Transformer Lead">
                                             <option value="standard" selected>Standard (18-24 mo)</option>
                                             <option value="extended">Extended (24-36 mo, +15%)</option>
@@ -1546,21 +604,19 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                     </div>
                                 </div>
                                 <div class="input-group">
-                                    <label class="input-label"><i class="fas fa-percentage"></i> Utility Rate of Return: <span id="utilRateVal" style="color:#3b82f6;font-family:'JetBrains Mono',monospace;">9%</span></label>
-                                    <input type="range" id="utilityRate" min="7" max="12" value="9" step="0.5" style="width:100%;accent-color:#3b82f6;" aria-label="Utility Rate">
+                                    <label class="input-label">Utility Rate of Return: <span id="utilRateVal">9%</span></label>
+                                    <input type="range" id="utilityRate" min="7" max="12" value="9" step="0.5" aria-label="Utility Rate">
                                 </div>
                             </div>
                         </div>
 
                         <!-- C. Vendor & Market Factors -->
-                        <div style="border-top:1px solid rgba(100, 116, 139,0.2);padding-top:1.5rem;">
-                            <div style="font-size:0.8rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
-                                <i class="fas fa-handshake"></i> Vendor & Market Factors
-                            </div>
+                        <div class="input-section adv-section">
+                            <div class="section-header"><span class="section-title">Vendor and Market Factors</span></div>
                             <div class="input-row">
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-chart-line"></i> Market Conditions
+                                        Market Conditions
                                     </label>
                                     <select class="input-field" id="marketCondition" aria-label="Market Condition">
                                         <option value="buyer">Buyer's Market (-5%)</option>
@@ -1570,7 +626,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                 </div>
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-truck"></i> Delivery Method
+                                        Delivery Method
                                     </label>
                                     <select class="input-field" id="deliveryMethod" aria-label="Delivery Method">
                                         <option value="dbb" selected>Design-Bid-Build (baseline)</option>
@@ -1580,9 +636,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                     </select>
                                 </div>
                             </div>
-                            <div class="input-group" style="margin-top:1rem;">
+                            <div class="input-group">
                                 <label class="input-label">
-                                    <i class="fas fa-hard-hat"></i> Contractor Availability
+                                    Contractor Availability
                                 </label>
                                 <select class="input-field" id="contractorAvail" aria-label="Contractor Avail">
                                     <option value="high">High Availability (+0%)</option>
@@ -1593,35 +649,31 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
 
                         <!-- D. Professional Fees & Soft Costs -->
-                        <div style="border-top:1px solid rgba(16,185,129,0.2);padding-top:1.5rem;">
-                            <div style="font-size:0.8rem;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
-                                <i class="fas fa-file-invoice-dollar"></i> Professional Fees & Soft Costs
-                            </div>
+                        <div class="input-section adv-section">
+                            <div class="section-header"><span class="section-title">Professional Fees and Soft Costs</span></div>
                             <div class="input-row">
                                 <div class="input-group">
-                                    <label class="input-label"><i class="fas fa-drafting-compass"></i> Design & Engineering: <span id="designFeeVal" style="color:#10b981;font-family:'JetBrains Mono',monospace;">8%</span></label>
-                                    <input type="range" id="designFee" min="5" max="12" value="8" step="0.5" style="width:100%;accent-color:#10b981;" aria-label="Design Fee">
+                                    <label class="input-label">Design & Engineering: <span id="designFeeVal">8%</span></label>
+                                    <input type="range" id="designFee" min="5" max="12" value="8" step="0.5" aria-label="Design Fee">
                                 </div>
                                 <div class="input-group">
-                                    <label class="input-label"><i class="fas fa-tasks"></i> Project Management: <span id="pmFeeVal" style="color:#10b981;font-family:'JetBrains Mono',monospace;">5%</span></label>
-                                    <input type="range" id="pmFee" min="3" max="8" value="5" step="0.5" style="width:100%;accent-color:#10b981;" aria-label="Pm Fee">
+                                    <label class="input-label">Project Management: <span id="pmFeeVal">5%</span></label>
+                                    <input type="range" id="pmFee" min="3" max="8" value="5" step="0.5" aria-label="Pm Fee">
                                 </div>
                             </div>
-                            <div class="input-group" style="margin-top:1rem;">
-                                <label class="input-label"><i class="fas fa-exclamation-triangle"></i> Contingency: <span id="contingencyVal" style="color:#10b981;font-family:'JetBrains Mono',monospace;">10%</span></label>
-                                <input type="range" id="contingencyAdv" min="5" max="20" value="10" step="1" style="width:100%;accent-color:#10b981;" aria-label="Contingency Adv">
+                            <div class="input-group">
+                                <label class="input-label">Contingency: <span id="contingencyVal">10%</span></label>
+                                <input type="range" id="contingencyAdv" min="5" max="20" value="10" step="1" aria-label="Contingency Adv">
                             </div>
                         </div>
 
                         <!-- E. Electrical Distribution -->
-                        <div style="border-top:1px solid rgba(234,179,8,0.2);padding-top:1.5rem;">
-                            <div style="font-size:0.8rem;font-weight:700;color:#eab308;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
-                                <i class="fas fa-bolt"></i> Electrical Distribution
-                            </div>
+                        <div class="input-section adv-section">
+                            <div class="section-header"><span class="section-title">Electrical Distribution</span></div>
                             <div class="input-row">
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-ethernet"></i> Power Distribution
+                                        Power Distribution
                                     </label>
                                     <select class="input-field" id="powerDistribution" aria-label="Power Distribution">
                                         <option value="overhead">Overhead Cable Tray (-8%)</option>
@@ -1632,7 +684,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                 </div>
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-random"></i> Transformer Type
+                                        Transformer Type
                                     </label>
                                     <select class="input-field" id="transformerType" aria-label="Transformer Type">
                                         <option value="oil">Oil-Filled Outdoor (-10%)</option>
@@ -1641,10 +693,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                     </select>
                                 </div>
                             </div>
-                            <div class="input-row" style="margin-top:1rem;">
+                            <div class="input-row">
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-plug"></i> PDU Type
+                                        PDU Type
                                     </label>
                                     <select class="input-field" id="pduType" aria-label="Pdu Type">
                                         <option value="basic">Basic Metered ($800/rack)</option>
@@ -1654,7 +706,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                 </div>
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-network-wired"></i> Structured Cabling
+                                        Structured Cabling
                                     </label>
                                     <select class="input-field" id="cablingType" aria-label="Cabling Type">
                                         <option value="copper">Cat6A Copper ($600/rack)</option>
@@ -1666,14 +718,12 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
 
                         <!-- F. Site & Civil -->
-                        <div style="border-top:1px solid rgba(244,63,94,0.2);padding-top:1.5rem;">
-                            <div style="font-size:0.8rem;font-weight:700;color:#f43f5e;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
-                                <i class="fas fa-building"></i> Site & Civil
-                            </div>
+                        <div class="input-section adv-section">
+                            <div class="section-header"><span class="section-title">Site and Civil</span></div>
                             <div class="input-row">
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-layer-group"></i> Floor Construction
+                                        Floor Construction
                                     </label>
                                     <select class="input-field" id="floorType" aria-label="Floor Type">
                                         <option value="slab">Slab / Overhead (-5%)</option>
@@ -1684,7 +734,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                 </div>
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-hard-hat"></i> Site Condition
+                                        Site Condition
                                     </label>
                                     <select class="input-field" id="siteCondition" aria-label="Site Condition">
                                         <option value="greenfield">Greenfield (+6%)</option>
@@ -1693,10 +743,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                     </select>
                                 </div>
                             </div>
-                            <div class="input-row" style="margin-top:1rem;">
+                            <div class="input-row">
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-shield-alt"></i> Security Level
+                                        Security Level
                                     </label>
                                     <select class="input-field" id="securityLevel" aria-label="Security Level">
                                         <option value="standard" selected>Standard (CCTV + Access Control)</option>
@@ -1706,7 +756,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                 </div>
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-satellite-dish"></i> Fiber Entry
+                                        Fiber Entry
                                     </label>
                                     <select class="input-field" id="fiberEntry" aria-label="Fiber Entry">
                                         <option value="single">Single Path ($150K)</option>
@@ -1718,14 +768,12 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </div>
 
                         <!-- G. Sustainability & Certification -->
-                        <div style="border-top:1px solid rgba(34,197,94,0.2);padding-top:1.5rem;">
-                            <div style="font-size:0.8rem;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
-                                <i class="fas fa-leaf"></i> Sustainability & Certification
-                            </div>
+                        <div class="input-section adv-section">
+                            <div class="section-header"><span class="section-title">Sustainability and Certification</span></div>
                             <div class="input-row">
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-certificate"></i> Green Certification
+                                        Green Certification
                                     </label>
                                     <select class="input-field" id="greenCert" aria-label="Green Cert">
                                         <option value="none" selected>None</option>
@@ -1736,20 +784,20 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                                 </div>
                                 <div class="input-group">
                                     <label class="input-label">
-                                        <i class="fas fa-solar-panel"></i> On-Site Renewable
+                                        On-Site Renewable
                                     </label>
                                     <select class="input-field" id="renewableOption" aria-label="Renewable Option" onchange="toggleRenewableSizing();calculateCosts()">
                                         <option value="none" selected>None</option>
                                         <option value="solar">Rooftop Solar (~$1.2M/MW)</option>
                                         <option value="solar_bess">Solar + Battery Storage (~$2.5M/MW)</option>
                                     </select>
-                                    <div id="renewSizing" style="display:none;margin-top:0.5rem;gap:0.5rem;grid-template-columns:1fr 1fr;">
+                                    <div id="renewSizing" style="display:none;">
                                         <div>
-                                            <label class="input-label" for="renewSolarMwp" style="font-size:0.7rem;">Solar (MWp)</label>
+                                            <label class="input-label" for="renewSolarMwp">Solar (MWp)</label>
                                             <input class="input-field" type="number" id="renewSolarMwp" value="10" min="0" max="500" step="1" oninput="calculateCosts()" aria-label="Solar MWp">
                                         </div>
                                         <div>
-                                            <label class="input-label" for="renewBessMwh" style="font-size:0.7rem;">BESS (MWh)</label>
+                                            <label class="input-label" for="renewBessMwh">BESS (MWh)</label>
                                             <input class="input-field" type="number" id="renewBessMwh" value="20" min="0" max="2000" step="5" oninput="calculateCosts()" aria-label="BESS MWh">
                                         </div>
                                     </div>
@@ -1762,285 +810,112 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 </div>
 
                 <!-- Results Side -->
-                <div class="simulator-results">
-                    <div class="results-header">
-                        <span class="results-title"><i class="fas fa-chart-pie"></i> Cost Breakdown <span id="advInfoBadge" style="display:none;font-size:0.65rem;background:rgba(245,158,11,0.2);color:#fbbf24;padding:2px 8px;border-radius:6px;font-weight:500;margin-left:6px;"></span></span>
-                        <div class="results-total">
-                            <div class="total-label">Total CAPEX</div>
-                            <div class="total-value" id="totalCost">$12,500,000</div>
-                        </div>
+                <div class="simulator-results tool-results">
+                    <div class="res-head"><h2>Results</h2><span class="basis">total = Σ system cost + soft costs + contingency</span></div>
+                    <div class="rz-calc-validation tool-valid" id="capexValidation" role="alert" aria-live="polite" hidden></div>
+                    <div class="res-group"><h3>Headline</h3><div data-rz-fact-list>
+                        <div class="metric-box is-key"><div class="metric-label">Total CAPEX</div><div class="metric-value total-value" id="totalCost">$12,500,000</div><div class="metric-sub" id="advInfoBadge" style="display:none;"></div></div>
+                    </div></div>
+                    <p id="savedIndicator" class="tool-note" style="display:none;">Scenario A saved. Change the inputs to build scenario B; the comparison is under the results.</p>
+                    <div class="res-group"><h3>Per kW, tier and energy</h3><div data-rz-fact-list>
+                        <div class="metric-box is-gated" id="perKwSection" onclick="if(!isPremiumUser)handlePremiumTab()"><div class="metric-label">Cost per kW of IT load</div><div class="metric-value per-kw-value" id="perKwCost">$12,500/kW</div><div class="metric-sub"><span id="perKwGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()">Sign in to see</span></div></div>
+                        <div class="metric-box"><div class="metric-label" data-explain="tier">Tier classification</div><div class="metric-value" id="tierClass">Tier III</div></div>
+                        <div class="metric-box"><div class="metric-label" data-explain="pue">Estimated PUE</div><div class="metric-value" id="pueValue">1.45</div></div>
+                        <div class="metric-box"><div class="metric-label" data-explain="uptime">Legacy tier availability</div><div class="metric-value" id="uptimeValue">99.982%</div></div>
+                        <div class="metric-box is-gated" id="energySection" onclick="if(!isPremiumUser)handlePremiumTab()"><div class="metric-label" data-explain="annual-energy">Annual energy cost</div><div class="metric-value" id="energyCost">$1.2M</div><div class="metric-sub"><span id="energyGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()">Sign in to see</span></div></div>
+                    </div></div>
+                    <div class="res-group"><h3>Cost by system</h3><div class="cost-breakdown" id="costBreakdown"></div></div>
+                    <div class="res-group" id="spacePanel" style="display:none;"><h3>Rack density and white space</h3><div id="spaceGrid" class="kv-list" data-rz-fact-list></div></div>
+                    <div class="res-group" id="refrigerantPanel" style="display:none;"><h3>Refrigerant</h3><div id="refGrid" class="kv-list" data-rz-fact-list></div><div id="refFlags" class="res-fine"></div></div>
+                    <div class="res-group" id="deepSeaPanel" style="display:none;"><h3>Deep sea water cooling — design</h3>
+                        <p class="res-states"><span class="state" id="dsEnvChip">ΔT ≤ 5 °C compliant</span><span class="state">WUE ≈ 0</span></p>
+                        <div id="dsGrid" class="kv-list" data-rz-fact-list></div>
+                        <div id="dsCapexRows"></div>
+                        <div id="dsWarnings" class="res-fine"></div>
+                        <p class="res-fine">Three separated loops: rack CDU (direct-to-chip, 20–25 °C), closed facility water, open seawater through titanium Gr2 plate exchangers. N+1 pumps, filters and exchangers; trim chillers as backup. A budgetary estimate, not a marine engineering design.</p>
                     </div>
-
-                    <!-- Action Toolbar — right under total for visibility -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-top:0.75rem;">
-                        <button onclick="gatedAction('save')" id="btnSaveA" class="action-btn-save" style="padding:10px 8px;border-radius:10px;border:2px solid rgba(251,191,36,0.5);background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(245,158,11,0.1));color:#fbbf24;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(245,158,11,0.15);">
-                            <i class="fas fa-bookmark"></i> <span id="btnSaveLabel">Save A</span>
-                        </button>
-                        <button onclick="gatedAction('pdf')" id="btnExportPDF" class="action-btn-pdf" style="padding:10px 8px;border-radius:10px;border:2px solid rgba(239,68,68,0.4);background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08));color:#f87171;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(239,68,68,0.12);">
-                            <i class="fas fa-file-pdf"></i> <span id="btnPdfLabel">Export PDF</span>
-                        </button>
-                        <button onclick="exportCapexCSV()" id="btnExportCSV" class="action-btn-pdf" style="padding:10px 8px;border-radius:10px;border:2px solid rgba(239,68,68,0.4);background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.08));color:#f87171;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(239,68,68,0.12);">
-                            <i class="fas fa-file-csv"></i> Export CSV
-                        </button>
-                        <div style="display:none;" id="btnClearRow">
-                            <button onclick="clearComparison()" id="btnClearCompare" style="width:100%;padding:10px 8px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(239,68,68,0.04));color:#f87171;cursor:pointer;font-weight:600;font-size:0.75rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:5px;">
-                                <i class="fas fa-times"></i> Clear
-                            </button>
+                    <div class="res-group" id="renewPanel" style="display:none;"><h3>On-site renewables screen</h3><div id="renewGrid" class="kv-list" data-rz-fact-list></div><p class="res-fine">Screening-level day and night simplification; not an interconnection or reliability study.</p></div>
+                    <div class="res-group" id="uncertaintyPanel" style="display:none;"><h3>Cost uncertainty</h3>
+                        <div data-rz-fact-list>
+                            <div class="metric-box"><div class="metric-label">P10, optimistic</div><div class="metric-value" id="uncP10">—</div></div>
+                            <div class="metric-box"><div class="metric-label">P50, median</div><div class="metric-value" id="uncP50">—</div></div>
+                            <div class="metric-box"><div class="metric-label">P90, conservative</div><div class="metric-value" id="uncP90">—</div></div>
+                            <div class="metric-box"><div class="metric-label">P90 to P10 spread</div><div class="metric-value" id="uncSpread">—</div></div>
                         </div>
+                        <figure class="fig res-fig"><div id="uncHist"></div><figcaption><b>FIG. 1</b> · Total CAPEX over 4,000 seeded Monte Carlo runs · bid spread, escalation and scope growth around the point estimate · RZEngine sim</figcaption></figure>
+                        <figure class="fig res-fig"><div id="uncTornado"></div><figcaption><b>FIG. 2</b> · What moves total CAPEX most · one driver at a time across its range, the others at base</figcaption></figure>
                     </div>
-                    <!-- Save to Supabase account (cross-device) — additive; independent of the compare "Save A" -->
-                    <button onclick="saveToAccount()" id="btnSaveAccount" style="width:100%;margin-top:0.5rem;padding:10px 8px;border-radius:10px;border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:inherit;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:6px;">
-                        <i class="fas fa-cloud"></i> <span id="btnSaveAccountLabel">Save to my account</span>
-                    </button>
-                    <div id="acctSaveMsg" style="display:none;margin-top:0.4rem;font-size:0.72rem;text-align:center;"></div>
-                    <div class="rz-calc-validation" id="capexValidation" role="alert" aria-live="polite" hidden></div>
-                    <!-- Saved indicator -->
-                    <div id="savedIndicator" style="display:none;margin-top:0.5rem;padding:6px 10px;border-radius:8px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);font-size:0.7rem;color:#34d399;text-align:center;">
-                        <i class="fas fa-check-circle" style="margin-right:4px;"></i> Scenario A saved — change inputs for Scenario B
+                    <div id="freeWatermark" class="tool-full"><p><b>Full analysis</b> — rack count, white space, build schedule, $/kW benchmark, sustainability, scenario comparison and the PDF report</p><button type="button" class="pro-overlay-btn" id="premiumTabBtn" onclick="handlePremiumTab()">Sign in</button></div>
+                    <div class="res-group" id="comparePanel" style="display:none;"><h3>Scenario comparison</h3>
+                        <div id="compareGrid" class="cmp-grid"><div id="scenarioACard" class="cmp-card"></div><div id="deltaColumn" class="cmp-delta"></div><div id="scenarioBCard" class="cmp-card"></div></div>
+                        <div id="btnClearRow" class="cmp-clear" style="display:none;"><button type="button" class="tool-btn" id="btnClearCompare" onclick="clearComparison()">Clear comparison</button></div>
                     </div>
-
-                    <div class="cost-breakdown" id="costBreakdown">
-                        <!-- Cost items populated by JS -->
+                    <div class="res-group" id="premiumOutput" style="display:none;"><h3>Full analysis</h3>
+                        <div data-rz-fact-list id="premiumKpiGrid">
+                            <div class="metric-box"><div class="metric-label">Estimated racks</div><div class="metric-value" id="premRackCount">167</div></div>
+                            <div class="metric-box"><div class="metric-label">White space</div><div class="metric-value" id="premFloorSpace">418 m²</div></div>
+                            <div class="metric-box"><div class="metric-label">Design to COD</div><div class="metric-value" id="premTimeline">29 mo</div></div>
+                        </div>
+                        <h3>$/kW against the industry range</h3>
+                        <div class="bench"><div id="benchmarkBar" class="bench-track"><div id="benchmarkMarker" class="bench-mark"></div><div id="benchmarkLabel" class="bench-label"></div></div>
+                            <div class="bench-scale"><span>$5k/kW low</span><span>$15k/kW typical</span><span>$30k/kW high</span></div></div>
+                        <h3>Construction timeline</h3>
+                        <div id="timelineChart" class="gantt"></div>
+                        <h3>Sustainability and efficiency</h3>
+                        <div id="sustainMetrics" data-rz-fact-list></div>
+                        <p class="res-fine">Full report · resistancezero.com · generated <span id="premReportDate"></span></p>
                     </div>
-
-                    <div class="per-kw-display" id="perKwSection" onclick="if(!isPremiumUser)handlePremiumTab()">
-                        <span class="per-kw-label">Cost per kW IT Load
-                        <span id="perKwGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()"><i class="fas fa-crown"></i> FULL</span>
-                        </span>
-                        <span class="per-kw-value" id="perKwCost">$12,500/kW</span>
-                    </div>
-
-                    <div class="metrics-row">
-                        <div class="metric-box">
-                            <div class="metric-label" data-explain="tier">Tier Classification</div>
-                            <div class="metric-value tier" id="tierClass">Tier III</div>
-                        </div>
-                        <div class="metric-box">
-                            <div class="metric-label" data-explain="pue">Estimated PUE</div>
-                            <div class="metric-value pue" id="pueValue">1.45</div>
-                        </div>
-                    </div>
-
-                    <div class="metrics-row">
-                        <div class="metric-box">
-                            <div class="metric-label" data-explain="uptime">Legacy Tier Availability</div>
-                            <div class="metric-value uptime" id="uptimeValue">99.982%</div>
-                        </div>
-                        <div class="metric-box" id="energySection" onclick="if(!isPremiumUser)handlePremiumTab()">
-                            <div class="metric-label" data-explain="annual-energy">Annual Energy <span id="energyGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()"><i class="fas fa-crown"></i> FULL</span></div>
-                            <div class="metric-value energy" id="energyCost">$1.2M</div>
-                        </div>
-                    </div>
-
-                    <!-- ═══ v1.58.0 — Deep Sea Water Cooling design output (engine physics) ═══ -->
-                    <div id="deepSeaPanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid rgba(14,165,233,0.35);border-radius:12px;padding:1rem 1.1rem;">
-                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;flex-wrap:wrap;">
-                            <i class="fas fa-water" style="color:#0ea5e9;"></i>
-                            <span style="font-weight:700;font-size:0.9rem;color:var(--text-primary);">Deep Sea Water Cooling — Engineering Design</span>
-                            <span id="dsEnvChip" style="font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(16,185,129,0.15);color:#059669;">ΔT ≤ 5 °C COMPLIANT</span>
-                            <span style="font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(14,165,233,0.15);color:#0284c7;">WUE ≈ 0</span>
-                        </div>
-                        <div id="dsGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.5rem;font-size:0.78rem;"></div>
-                        <div id="dsCapexRows" style="margin-top:0.7rem;"></div>
-                        <div id="dsWarnings" style="margin-top:0.5rem;font-size:0.72rem;color:#b45309;"></div>
-                        <div style="font-size:0.62rem;color:var(--text-secondary);margin-top:0.6rem;font-style:italic;">3 separated loops: rack CDU (D2C 20–25 °C) → facility water (closed) → seawater (open, titanium Gr2 PHE). N+1 pumps/filters/HX · trim chillers backup · budgetary estimate, not detailed marine engineering.</div>
-                    </div>
-
-                    <!-- ═══ v1.58.0 — Rack density & white space (engine space model) ═══ -->
-                    <div id="spacePanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid var(--bg-tertiary);border-radius:12px;padding:1rem 1.1rem;">
-                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
-                            <i class="fas fa-ruler-combined" style="color:#64748b;"></i>
-                            <span style="font-weight:700;font-size:0.9rem;color:var(--text-primary);">Rack Density &amp; White Space</span>
-                        </div>
-                        <div id="spaceGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.5rem;font-size:0.78rem;"></div>
-                    </div>
-
-                    <!-- ═══ v1.58.0 — Refrigerant impact ═══ -->
-                    <div id="refrigerantPanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid var(--bg-tertiary);border-radius:12px;padding:1rem 1.1rem;">
-                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
-                            <i class="fas fa-flask" style="color:#14b8a6;"></i>
-                            <span style="font-weight:700;font-size:0.9rem;color:var(--text-primary);">Refrigerant Impact</span>
-                        </div>
-                        <div id="refGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.5rem;font-size:0.78rem;"></div>
-                        <div id="refFlags" style="margin-top:0.5rem;font-size:0.7rem;color:var(--text-secondary);"></div>
-                    </div>
-
-                    <!-- ═══ v1.58.0 — On-site renewables screen ═══ -->
-                    <div id="renewPanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid var(--bg-tertiary);border-radius:12px;padding:1rem 1.1rem;">
-                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
-                            <i class="fas fa-solar-panel" style="color:#f97316;"></i>
-                            <span style="font-weight:700;font-size:0.9rem;color:var(--text-primary);">On-Site Renewables Screen</span>
-                        </div>
-                        <div id="renewGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.5rem;font-size:0.78rem;"></div>
-                        <div style="font-size:0.62rem;color:var(--text-secondary);margin-top:0.5rem;font-style:italic;">Screening-level day/night simplification — not an interconnection or reliability study.</div>
-                    </div>
-
-                    <!-- ═══ Uncertainty & Sensitivity (RZEngine v2 Monte-Carlo) ═══ -->
-                    <div id="uncertaintyPanel" style="display:none;margin-top:1rem;background:var(--bg-secondary);border:1px solid var(--bg-tertiary);border-radius:12px;padding:1rem 1.1rem;">
-                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
-                            <i class="fas fa-chart-area" style="color:#64748b;"></i>
-                            <span style="font-weight:700;font-size:0.9rem;color:var(--text-primary);">Cost Uncertainty &amp; Sensitivity</span>
-                        </div>
-                        <div style="display:flex;gap:0.5rem;margin:0.6rem 0 0.5rem;flex-wrap:wrap;">
-                            <div style="flex:1;min-width:90px;text-align:center;background:var(--bg-primary);border-radius:8px;padding:0.5rem;">
-                                <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);">P10 · Optimistic</div>
-                                <div id="uncP10" style="font-size:1.05rem;font-weight:800;color:#16a34a;font-family:'JetBrains Mono',monospace;">—</div>
-                            </div>
-                            <div style="flex:1;min-width:90px;text-align:center;background:var(--bg-primary);border-radius:8px;padding:0.5rem;border:1px solid rgba(100, 116, 139,0.4);">
-                                <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);">P50 · Median</div>
-                                <div id="uncP50" style="font-size:1.05rem;font-weight:800;color:#64748b;font-family:'JetBrains Mono',monospace;">—</div>
-                            </div>
-                            <div style="flex:1;min-width:90px;text-align:center;background:var(--bg-primary);border-radius:8px;padding:0.5rem;">
-                                <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);">P90 · Conservative</div>
-                                <div id="uncP90" style="font-size:1.05rem;font-weight:800;color:#dc2626;font-family:'JetBrains Mono',monospace;">—</div>
-                            </div>
-                        </div>
-                        <div id="uncHist" style="margin:0.2rem 0 0.3rem;"></div>
-                        <div style="font-size:0.66rem;color:var(--text-muted);margin:0.5rem 0 0.25rem;font-weight:600;">Sensitivity — what moves total CAPEX most</div>
-                        <div id="uncTornado"></div>
-                        <div style="font-size:0.6rem;color:var(--text-muted);margin-top:0.4rem;">P90/P10 spread <span id="uncSpread">—</span> · seeded &amp; reproducible · <span>RZEngine v2.0 sim</span></div>
-                    </div>
-
-                    <!-- Free Tier Watermark -->
-                    <div id="freeWatermark" class="free-watermark" onclick="handlePremiumTab()">
-                        <i class="fas fa-crown" style="margin-right:4px;"></i> Free Estimate &mdash; resistancezero.com &mdash; <strong style="cursor:pointer;text-decoration:underline;">Sign in for the full analysis — Rp 199K/bulan</strong>
-                    </div>
-
-                    <!-- ═══ COMPARE MODE: Side-by-side cards ═══ -->
-                    <div id="comparePanel" style="display:none;margin-top:1rem;">
-                        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:16px;padding:1.25rem;">
-                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-                                <h3 style="font-size:0.95rem;font-weight:700;color:var(--dark-blue);display:flex;align-items:center;gap:8px;margin:0;">
-                                    <i class="fas fa-columns" style="color:#f59e0b;"></i> Scenario Comparison
-                                </h3>
-                            </div>
-                            <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:stretch;" id="compareGrid">
-                                <div id="scenarioACard" style="background:linear-gradient(135deg,#1e3a5f,#2d5a87);border-radius:12px;padding:1.25rem;color:white;"></div>
-                                <div id="deltaColumn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0.75rem 0.25rem;gap:0.5rem;min-width:80px;"></div>
-                                <div id="scenarioBCard" style="background:linear-gradient(135deg,#1a4731,#2d6a4f);border-radius:12px;padding:1.25rem;color:white;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ═══ PREMIUM OUTPUT SECTION ═══ -->
-                    <div id="premiumOutput" style="display:none;margin-top:1.5rem;flex-direction:column;gap:1rem;">
-
-                        <!-- Premium KPI Cards -->
-                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;" id="premiumKpiGrid">
-                            <div style="background:#64748b;border-radius:12px;padding:1rem;text-align:center;box-shadow:0 2px 8px rgba(100, 116, 139,0.25);">
-                                <div style="font-size:0.65rem;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Est. Racks</div>
-                                <div style="font-size:1.5rem;font-weight:800;color:#ffffff;margin-top:4px;" id="premRackCount">167</div>
-                            </div>
-                            <div style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:12px;padding:1rem;text-align:center;box-shadow:0 2px 8px rgba(59,130,246,0.25);">
-                                <div style="font-size:0.65rem;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Floor Space</div>
-                                <div style="font-size:1.5rem;font-weight:800;color:#ffffff;margin-top:4px;" id="premFloorSpace">418 m²</div>
-                            </div>
-                            <div style="background:linear-gradient(135deg,#047857,#10b981);border-radius:12px;padding:1rem;text-align:center;box-shadow:0 2px 8px rgba(16,185,129,0.25);">
-                                <div style="font-size:0.65rem;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Build Time</div>
-                                <div style="font-size:1.5rem;font-weight:800;color:#ffffff;margin-top:4px;" id="premTimeline">29 mo</div>
-                            </div>
-                        </div>
-
-                        <!-- $/kW Benchmark Bar -->
-                        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(100, 116, 139,0.2);border-radius:12px;padding:1rem 1.25rem;">
-                            <div style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:1rem;display:flex;align-items:center;gap:6px;">
-                                <i class="fas fa-chart-bar"></i> $/kW Industry Benchmark
-                            </div>
-                            <div id="benchmarkBar" style="position:relative;height:28px;background:linear-gradient(90deg,#10b981 0%,#f59e0b 50%,#ef4444 100%);border-radius:8px;overflow:visible;margin-bottom:1.75rem;">
-                                <div id="benchmarkMarker" style="position:absolute;top:-4px;width:3px;height:36px;background:white;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,0.5);transition:left 0.5s ease;"></div>
-                                <div id="benchmarkLabel" style="position:absolute;bottom:-24px;transform:translateX(-50%);font-size:0.72rem;font-weight:800;color:#fbbf24;white-space:nowrap;transition:left 0.5s ease;background:rgba(251,191,36,0.12);padding:2px 8px;border-radius:6px;border:1px solid rgba(251,191,36,0.3);"></div>
-                            </div>
-                            <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:#64748b;">
-                                <span>$5K/kW (Low)</span>
-                                <span>$15K/kW (Avg)</span>
-                                <span>$30K/kW (Full access)</span>
-                            </div>
-                        </div>
-
-
-                        <!-- Construction Timeline -->
-                        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(100, 116, 139,0.2);border-radius:12px;padding:1rem 1.25rem;">
-                            <div style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.75rem;display:flex;align-items:center;gap:6px;">
-                                <i class="fas fa-project-diagram"></i> Estimated Construction Timeline
-                            </div>
-                            <div id="timelineChart" style="display:flex;flex-direction:column;gap:4px;"></div>
-                        </div>
-
-                        <!-- Sustainability Metrics -->
-                        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:1rem 1.25rem;">
-                            <div style="font-size:0.72rem;font-weight:700;color:#6ee7b7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.75rem;display:flex;align-items:center;gap:6px;">
-                                <i class="fas fa-leaf"></i> Sustainability & Efficiency Metrics
-                            </div>
-                            <div id="sustainMetrics" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;"></div>
-                        </div>
-
-                        <!-- Pro watermark -->
-                        <div style="text-align:center;padding:6px;font-size:0.6rem;color:rgba(100, 116, 139,0.5);letter-spacing:0.3px;">
-                            <i class="fas fa-crown" style="margin-right:3px;"></i> Full report — resistancezero.com — Generated <span id="premReportDate"></span>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </section>
-    </main>
+    
+        <section class="tool-ref" aria-labelledby="ref-h">
+            <div class="wrap">
+                <p class="eyebrow" id="ref-h">02 / Reference</p>
+                <div class="ref-grid">
+                    <div>
+                        <h3>Method</h3>
+                        <ul class="formulas">
+                            <li><span>System cost</span><code>C_i = f_i ($/kW) · P_IT · M_location · M_i</code></li>
+                            <li><span>M_electrical</span><code>M_redundancy · M_rack · M_distribution · M_transformer</code></li>
+                            <li><span>M_cooling</span><code>M_cooling type · M_rack</code></li>
+                            <li><span>M_generator</span><code>M_redundancy · (1 + 0.008 · (h_fuel − 24)) · M_fuel type</code></li>
+                            <li><span>M_location</span><code>region factor, or city $/W ÷ 4.65 $/W</code></li>
+                            <li><span>Contingency</span><code>(Σ C_i + design + PM) · 5 % simple, slider in advanced (10 % default)</code></li>
+                            <li><span>Total</span><code>Σ C_i + design + PM + contingency + front-of-meter + renewables</code></li>
+                            <li><span>Energy cost</span><code>P_IT · PUE(cooling, rack) · 8,760 h · tariff</code></li>
+                            <li><span>Cost per kW</span><code>total / P_IT</code></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Computed against</h3>
+                        <p class="against"><span>Turner &amp; Townsend Data Centre Cost Index</span><span>JLL Data Center Outlook</span><span>CBRE data center benchmarks</span><span>Uptime Institute Tier I–IV</span><span>ASHRAE 34 refrigerant safety</span></p>
+                        <h3>Read further</h3>
+                        <p class="links"><a href="manual/capex.html">Technical manual and methodology</a><a href="glossary.html">Glossary</a><a href="opex-calculator.html">OPEX calculator</a><a href="tco-calculator.html">TCO calculator</a><a href="pue-calculator.html">PUE calculator</a><a href="datacenter-solutions.html">DC Solutions</a><a href="account.html">My account and saved scenarios</a></p>
+                    </div>
+                </div>
+                <p class="notice">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. This calculator is provided for <strong>educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis. All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html">Privacy Policy</a> for details. By using this tool you agree to our <a href="terms.html">Terms</a>.</p>
+            </div>
+        </section>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models. Mission-critical infrastructure, documented.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
 
     
-        <!-- Independence Disclaimer -->
-        <div style="max-width:900px;margin:2rem auto 0;padding:1rem 1.5rem;text-align:center;">
-            <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#64748b;">Terms &amp; Disclaimer</a></p>
-        </div>
+        
 
 
-    <!-- Calculator Disclaimer -->
-    <div style="max-width:1400px;margin:2rem auto 0;padding:0 2rem;">
-        <div class="calc-disclaimer" style="background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;">
-            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
-                <div style="color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;"><i class="fas fa-triangle-exclamation"></i></div>
-                <div>
-                    <div class="disc-title" style="font-weight:700;font-size:0.8rem;color:#e2e8f0;margin-bottom:0.5rem;">Disclaimer &amp; Data Sources</div>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">This calculator is provided for <strong style="color:#cbd5e1;">educational and estimation purposes only</strong>. Results are approximations based on industry benchmarks and publicly available data. They should not be used as the sole basis for investment, procurement, or engineering decisions. Always consult qualified professionals for site-specific analysis.</p>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;"><strong style="color:#cbd5e1;">Algorithm &amp; methodology sources:</strong> Turner & Townsend Data Centre Cost Index, JLL Data Center Outlook, Uptime Institute Tier Standards (Tier I-IV topology), CBRE Data Center Solutions benchmarks, industry construction cost databases.</p>
-                    <p class="disc-text" style="font-size:0.72rem;color:#94a3b8;line-height:1.65;margin:0 0 0.5rem 0;">All calculations are performed entirely in your browser. No data is transmitted to any server. See our <a href="privacy.html" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a> for details.</p>
-                    <p class="disc-fine" style="font-size:0.68rem;color:#64748b;line-height:1.5;margin:0;">By using this tool you agree to our <a href="terms.html" style="color:#60a5fa;text-decoration:underline;">Terms</a>. All content on ResistanceZero is independent personal research. This site does not represent any current or former employer.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
-<!-- Footer -->
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#475569;border-color:rgba(71,85,105,0.4)}.rz-manual-link a:hover{color:#0891b2;border-color:rgba(8,145,178,0.5)}[data-theme="dark"] .rz-manual-link a{color:#94a3b8;border-color:rgba(148,163,184,0.35)}[data-theme="dark"] .rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/capex.html">Technical Manual &amp; Methodology &#8599;</a></div>
-    <style>@media (max-width: 768px){footer > div > div[style*="grid-template-columns"]{grid-template-columns:minmax(0,1fr)!important}}</style><!-- the inline 2fr 1fr 1fr footer grid has no class, so no .footer-grid rule reaches it on a phone -->
-    <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #94a3b8; padding: 3rem 2rem; margin-top: 3rem;">
-        <div style="max-width: 1200px; margin: 0 auto;">
-            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: start;">
-                <div>
-                    <p style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; color: #64748b; line-height: 1.6; margin-bottom: 1rem;">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
-                    <p style="font-size: 0.65rem; letter-spacing: 0.1em; color: #475569; margin-bottom: 0.75rem;">ALL OPERATIONAL DATASETS PRESERVED.</p>
-                    <p style="font-size: 0.75rem; color: #64748b;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; color: #64748b; margin-bottom: 1rem;">NAVIGATION</h4>
-                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
-                        <li><a href="index.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Home Dashboard</a></li>
-                        <li><a href="articles.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Technical Journal</a></li>
-                        <li><a href="index.html#case-studies" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Case Studies</a></li>
-                        <li><a href="datacenter-solutions.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">DC Solutions</a></li>
-                        <li><a href="glossary.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Glossary</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; color: #64748b; margin-bottom: 1rem;">CONNECT</h4>
-                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
-                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">LinkedIn Profile</a></li>
-                        <li><a href="articles.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Technical Journal</a></li>
-                        <li><a href="mailto:baguspermana7@gmail.com" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Direct Contact</a></li>
-                        <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">GitHub</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
+
 
     <script>
         // Cost Simulator Logic — v1.58.0: ALL numeric cost tables live in RZEngine
@@ -2050,19 +925,19 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
         const costMeta = {
             building: { label: 'Building & Civil', icon: 'fa-building', color: '#64748b' },
             seismic: { label: 'Seismic Protection', icon: 'fa-mountain', color: '#78716c' },
-            electrical: { label: 'Electrical (MV/LV)', icon: 'fa-bolt', color: '#3b82f6' },
+            electrical: { label: 'Electrical (MV/LV)', icon: 'fa-bolt', color: '#A0AEC0' },
             ups: { label: 'UPS Systems', icon: 'fa-battery-full', color: '#64748b' },
-            generator: { label: 'Generator & Fuel', icon: 'fa-gas-pump', color: '#f59e0b' },
-            cooling: { label: 'Cooling Systems', icon: 'fa-snowflake', color: '#06b6d4' },
-            deepSeaCooling: { label: 'Deep Sea Water Cooling', icon: 'fa-water', color: '#0ea5e9' },
+            generator: { label: 'Generator & Fuel', icon: 'fa-gas-pump', color: '#7D8794' },
+            cooling: { label: 'Cooling Systems', icon: 'fa-snowflake', color: '#D49A2A' },
+            deepSeaCooling: { label: 'Deep Sea Water Cooling', icon: 'fa-water', color: '#5E6673' },
             fireSuppression: { label: 'Fire Suppression', icon: 'fa-fire-extinguisher', color: '#ef4444' },
-            fireAlarm: { label: 'Fire Alarm System', icon: 'fa-bell', color: '#f97316' },
-            bms: { label: 'BMS / DCIM', icon: 'fa-desktop', color: '#10b981' },
-            network: { label: 'Network Infra', icon: 'fa-network-wired', color: '#0891b2' },
-            security: { label: 'Security Systems', icon: 'fa-shield-alt', color: '#0e7490' },
-            commissioning: { label: 'Cx Agent & Startup', icon: 'fa-clipboard-check', color: '#14b8a6' },
-            testing: { label: 'Testing & Compliance', icon: 'fa-certificate', color: '#0ea5e9' },
-            permits: { label: 'Permits & Approvals', icon: 'fa-file-contract', color: '#84cc16' }
+            fireAlarm: { label: 'Fire Alarm System', icon: 'fa-bell', color: '#C9CFD8' },
+            bms: { label: 'BMS / DCIM', icon: 'fa-desktop', color: '#4A5160' },
+            network: { label: 'Network Infra', icon: 'fa-network-wired', color: '#8C96A3' },
+            security: { label: 'Security Systems', icon: 'fa-shield-alt', color: '#A0AEC0' },
+            commissioning: { label: 'Cx Agent & Startup', icon: 'fa-clipboard-check', color: '#7D8794' },
+            testing: { label: 'Testing & Compliance', icon: 'fa-certificate', color: '#5E6673' },
+            permits: { label: 'Permits & Approvals', icon: 'fa-file-contract', color: '#5E6673' }
         };
         // Backward-compat alias for the PDF/premium helpers that read costFactors[key].label
         const costFactors = costMeta;
@@ -2294,11 +1169,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 totalMonths,
                 phases: [
                     { name: 'Design & Engineering', start: 0, end: designEnd, color: '#64748b' },
-                    { name: 'Permitting & Approvals', start: permitStart, end: permitEnd, color: '#f59e0b' },
-                    { name: 'Procurement (Long-Lead)', start: procStart, end: procEnd, color: '#ec4899' },
-                    { name: 'Civil & Structural', start: civilStart, end: civilEnd, color: '#3b82f6' },
-                    { name: 'MEP Installation', start: mepStart, end: mepEnd, color: '#10b981' },
-                    { name: 'Testing & Commissioning', start: commStart, end: commStart + commission, color: '#06b6d4' }
+                    { name: 'Permitting & Approvals', start: permitStart, end: permitEnd, color: '#7D8794' },
+                    { name: 'Procurement (Long-Lead)', start: procStart, end: procEnd, color: '#C9CFD8' },
+                    { name: 'Civil & Structural', start: civilStart, end: civilEnd, color: '#A0AEC0' },
+                    { name: 'MEP Installation', start: mepStart, end: mepEnd, color: '#4A5160' },
+                    { name: 'Testing & Commissioning', start: commStart, end: commStart + commission, color: '#D49A2A' }
                 ]
             };
         }
@@ -2317,14 +1192,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             document.querySelectorAll('.capex-mode-btn').forEach(btn => {
                 if (btn.id === 'premiumTabBtn') return; // Skip — Premium has its own styling
                 const isActive = btn.dataset.mode === mode;
-                btn.style.background = isActive ? 'rgba(245,158,11,0.15)' : 'transparent';
-                btn.style.borderColor = isActive ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.15)';
-                btn.style.color = isActive ? '#f59e0b' : '#94a3b8';
-                btn.style.fontWeight = isActive ? '600' : '500';
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
                 btn.classList.toggle('active', isActive);
             });
             const advPanel = document.getElementById('advancedInputs');
-            advPanel.style.display = mode === 'advanced' ? 'flex' : 'none';
+            advPanel.style.display = mode === 'advanced' ? 'block' : 'none';
             calculateCosts();
             // Re-init tooltips for newly visible elements
             /* initTooltipSystem removed v1.59.0 — RZExplain owns tooltips */
@@ -2332,7 +1204,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
         // FOM toggle
         document.getElementById('includeFOM').addEventListener('change', function() {
-            document.getElementById('fomInputs').style.display = this.checked ? 'flex' : 'none';
+            document.getElementById('fomInputs').style.display = this.checked ? 'block' : 'none';
             calculateCosts();
         });
 
@@ -2523,11 +1395,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 breakdownEl.innerHTML += `
                     <div class="cost-item">
                         <div class="cost-name">
-                            <div class="cost-icon" style="background: ${factor.color}30; color: ${factor.color};"><i class="fas ${factor.icon}"></i></div>
                             ${factor.label}
                         </div>
                         <div class="cost-bar-container">
-                            <div class="cost-bar" style="width: ${barWidth}%; background: ${factor.color};"></div>
+                            <div class="cost-bar" style="width: ${barWidth}%;"></div>
                         </div>
                         <span class="cost-value">${formatCurrency(cost)}</span>
                         <span class="cost-percent">${percent}%</span>
@@ -2536,26 +1407,25 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
             // Soft cost rows (advanced)
             if (softCosts.design) {
-                breakdownEl.innerHTML += renderExtraRow('fa-drafting-compass', 'Design & Engineering', softCosts.design, '#10b981', maxCost, total);
+                breakdownEl.innerHTML += renderExtraRow('fa-drafting-compass', 'Design & Engineering', softCosts.design, '#4A5160', maxCost, total);
             }
             if (softCosts.pm) {
-                breakdownEl.innerHTML += renderExtraRow('fa-tasks', 'Project Management', softCosts.pm, '#059669', maxCost, total);
+                breakdownEl.innerHTML += renderExtraRow('fa-tasks', 'Project Management', softCosts.pm, '#4A5160', maxCost, total);
             }
 
             // FOM row
             if (fomIncluded) {
-                breakdownEl.innerHTML += renderExtraRow('fa-plug', 'Front-of-Meter / Utility', fomTotal, '#3b82f6', maxCost, total);
+                breakdownEl.innerHTML += renderExtraRow('fa-plug', 'Front-of-Meter / Utility', fomTotal, '#A0AEC0', maxCost, total);
             }
 
             // Contingency row
             breakdownEl.innerHTML += `
-                <div class="cost-item" style="opacity: 0.7;">
+                <div class="cost-item is-soft">
                     <div class="cost-name">
-                        <div class="cost-icon" style="background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8);"><i class="fas fa-plus-circle"></i></div>
                         Contingency (${contingencyPct}%)
                     </div>
                     <div class="cost-bar-container">
-                        <div class="cost-bar" style="width: ${(contingency / maxCost) * 100}%; background: rgba(255,255,255,0.5);"></div>
+                        <div class="cost-bar" style="width: ${(contingency / maxCost) * 100}%;"></div>
                     </div>
                     <span class="cost-value">${formatCurrency(contingency)}</span>
                     <span class="cost-percent">${contingencyPct}.0%</span>
@@ -2564,10 +1434,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             // Green cert and renewable rows
             if (isAdv && greenM > 1.0) {
                 const greenPremium = (total - contingency) * (greenM - 1.0); // approx
-                breakdownEl.innerHTML += renderExtraRow('fa-certificate', 'Green Certification (' + document.getElementById('greenCert').selectedOptions[0].text.split('(')[0].trim() + ')', greenPremium, '#22c55e', maxCost, total);
+                breakdownEl.innerHTML += renderExtraRow('fa-certificate', 'Green Certification (' + document.getElementById('greenCert').selectedOptions[0].text.split('(')[0].trim() + ')', greenPremium, '#8C96A3', maxCost, total);
             }
             if (isAdv && renewableCost > 0) {
-                breakdownEl.innerHTML += renderExtraRow('fa-solar-panel', 'On-Site Renewable', renewableCost * advGlobalMult, '#f97316', maxCost, total);
+                breakdownEl.innerHTML += renderExtraRow('fa-solar-panel', 'On-Site Renewable', renewableCost * advGlobalMult, '#C9CFD8', maxCost, total);
             }
 
             // Advanced info badge
@@ -2677,7 +1547,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             // "white-space", "rack-density") so every generated parameter carries a
             // tooltip trigger. RZExplain renders nothing when the key is absent.
             var _ek = label.toLowerCase().replace(/%/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-            return '<div style="background:var(--bg-primary);border:1px solid var(--bg-tertiary);border-radius:8px;padding:0.5rem 0.6rem;"><div class="metric-label" data-explain="' + _ek + '" style="font-size:0.62rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</div><div style="font-weight:700;font-family:\'JetBrains Mono\',monospace;font-size:0.85rem;color:var(--text-primary);">' + value + '</div></div>';
+            return '<div class="metric-box"><div class="metric-label" data-explain="' + _ek + '">' + label + '</div><div class="metric-value">' + value + '</div></div>';
         }
         function renderEnginePanels(result) {
             // Deep-sea design panel
@@ -2701,10 +1571,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         _kv('Marine OPEX', formatCurrency(ds.opex.totalYr) + '/yr');
                     const cap = ds.capex;
                     const rows = [['Intake + outfall pipeline (HDPE, marine install)', cap.pipeline], ['Intake structure + diffuser', cap.intakeStructure], ['Titanium Gr2 plate HX (N+1)', cap.phe], ['Seawater pump station (N+1, VFD)', cap.pumpStation], ['5-stage filtration (N+1)', cap.filtration], ['Trim chillers (backup, N+1)', cap.trimChillers], ['Controls / BMS integration (2N)', cap.controls], ['Marine contingency (15%)', cap.contingency]];
-                    document.getElementById('dsCapexRows').innerHTML = '<div style="font-size:0.68rem;color:var(--text-secondary);margin-bottom:0.3rem;font-weight:700;">DEEP-SEA CAPEX BREAKDOWN</div>' + rows.map(r => '<div style="display:flex;justify-content:space-between;font-size:0.74rem;padding:2px 0;border-bottom:1px dashed var(--bg-tertiary);color:var(--text-primary);"><span>' + r[0] + '</span><span style="font-family:\'JetBrains Mono\',monospace;font-weight:600;">' + formatCurrency(r[1]) + '</span></div>').join('');
-                    document.getElementById('dsWarnings').innerHTML = (ds.warnings || []).map(w => '<div>⚠ ' + w + '</div>').join('');
+                    document.getElementById('dsCapexRows').innerHTML = '<h4 class="res-sub">Deep-sea CAPEX by item</h4><div class="kv-list" data-rz-fact-list>' + rows.map(r => '<div class="metric-box"><div class="metric-label">' + r[0] + '</div><div class="metric-value">' + formatCurrency(r[1]) + '</div></div>').join('') + '</div>';
+                    document.getElementById('dsWarnings').innerHTML = (ds.warnings || []).map(w => '<p>' + w + '</p>').join('');
                     const chip = document.getElementById('dsEnvChip');
-                    if (chip) { chip.textContent = ds.env.deltaTCompliant ? 'ΔT ≤ 5 °C COMPLIANT' : 'ΔT EXCEEDS ENV LIMIT'; chip.style.background = ds.env.deltaTCompliant ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'; chip.style.color = ds.env.deltaTCompliant ? '#059669' : '#dc2626'; }
+                    if (chip) { chip.textContent = ds.env.deltaTCompliant ? 'ΔT ≤ 5 °C compliant' : 'ΔT over the environmental limit'; chip.setAttribute('data-state', ds.env.deltaTCompliant ? 'ok' : 'hazard'); }
                 } else dsp.style.display = 'none';
             }
             // Space panel (always on — owner mandate: rack density + white space)
@@ -2776,6 +1646,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             if (!panel) return;
             var E = window.RZEngine;
             if (!E || !E.models || !E.models.sim || !result || !(result.total > 0)) { panel.style.display = 'none'; return; }
+            panel.style.display = 'block';
             var base = result.total;
             // Cost drivers as multiplicative factors on the point estimate (engine-agnostic model).
             var f = function (s) {
@@ -2793,26 +1664,68 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             document.getElementById('uncP90').textContent = fmt(mc.p90);
             document.getElementById('uncSpread').textContent = mc.p10 > 0 ? '±' + Math.round((mc.p90 - mc.p10) / (2 * mc.p50) * 100) + '%' : '—';
             if (E.charts && E.charts.histogram) {
-                document.getElementById('uncHist').innerHTML = E.charts.histogram(mc.samples, { width: 440, height: 150, accent: '#64748b', bins: 26 });
+                document.getElementById('uncHist').innerHTML = capexHistSvg(mc.samples, mc, document.getElementById('uncHist').clientWidth);
             }
             if (E.charts && E.charts.tornado) {
                 var tor = E.models.sim.tornado(f, { cost: 1.0, escalation: 0.04, scope: 0.04 },
                     { cost: { lo: 0.90, hi: 1.15 }, escalation: { lo: 0.01, hi: 0.09 }, scope: { lo: 0.0, hi: 0.08 } });
                 var labelMap = { cost: 'Construction cost', escalation: 'Escalation', scope: 'Scope growth' };
                 tor.forEach(function (r) { r.key = labelMap[r.key] || r.key; });
-                document.getElementById('uncTornado').innerHTML = E.charts.tornado(tor, { width: 440, accent: '#64748b' });
+                tor.sort(function (x, y) { return Math.abs(y.high - y.low) - Math.abs(x.high - x.low); });
+                document.getElementById('uncTornado').innerHTML = capexTornadoSvg(tor, document.getElementById('uncTornado').clientWidth);
             }
             panel.style.display = 'block';
+        }
+
+        // FIG. 1 / FIG. 2 — drawn at the container's own width so the 10 px axis text stays 10 px on a phone
+        function capexHistSvg(samples, mc, cw) {
+            var W = Math.max(280, Math.round(cw || 480)), H = W < 420 ? 164 : 184, L = 8, R = 8, T = 32, B = 24, bins = W < 420 ? 20 : 28;
+            if (!samples || !samples.length) return '';
+            var lo = samples[0], hi = samples[samples.length - 1], span = (hi - lo) || 1, counts = [], i;
+            for (i = 0; i < bins; i++) counts.push(0);
+            samples.forEach(function (v) { counts[Math.min(bins - 1, Math.floor((v - lo) / span * bins))]++; });
+            var mx = Math.max.apply(null, counts) || 1, bw = (W - L - R) / bins, sx = function (v) { return L + (v - lo) / span * (W - L - R); };
+            var o = '<svg class="capex-fig" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Distribution of total CAPEX over 4,000 Monte Carlo runs with P10, P50 and P90 marked">';
+            o += '<line class="gr" x1="' + L + '" x2="' + (W - R) + '" y1="' + (H - B) + '" y2="' + (H - B) + '"/>';
+            for (i = 0; i < bins; i++) { var bh = counts[i] / mx * (H - T - B); o += '<rect class="b" x="' + (L + i * bw + 0.5).toFixed(1) + '" y="' + (H - B - bh).toFixed(1) + '" width="' + Math.max(1, bw - 1).toFixed(1) + '" height="' + bh.toFixed(1) + '"/>'; }
+            // P50 on its own line, centred; P10 runs left of its marker, P90 right of it: the three labels never collide
+            [['P10', mc.p10, 'end', 24], ['P50', mc.p50, 'middle', 10], ['P90', mc.p90, 'start', 24]].forEach(function (p) {
+                var x = sx(p[1]), t = p[0] + ' ' + formatCurrency(p[1]), tw = t.length * 6.1, tx = x;
+                if (p[2] === 'end') tx = Math.max(L + tw, x - 3); else if (p[2] === 'start') tx = Math.min(W - R - tw, x + 3); else tx = Math.min(W - R - tw / 2, Math.max(L + tw / 2, x));
+                o += '<line class="' + (p[0] === 'P50' ? 'mk key' : 'mk') + '" x1="' + x.toFixed(1) + '" x2="' + x.toFixed(1) + '" y1="' + (p[3] + 4) + '" y2="' + (H - B) + '"/>';
+                o += '<text x="' + tx.toFixed(1) + '" y="' + p[3] + '" text-anchor="' + p[2] + '">' + t + '</text>';
+            });
+            o += '<text x="' + L + '" y="' + (H - 7) + '" text-anchor="start">' + formatCurrency(lo) + '</text><text x="' + (W - R) + '" y="' + (H - 7) + '" text-anchor="end">' + formatCurrency(hi) + '</text>';
+            return o + '</svg>';
+        }
+        function capexTornadoSvg(rows, cw) {
+            var W = Math.max(280, Math.round(cw || 480)), LBL = W < 420 ? 104 : 136, R = 8, rh = 18, gap = 14, T = 6;
+            if (!rows || !rows.length) return '';
+            var H = T + rows.length * (rh + gap) + 18, base = rows[0].base;
+            var sw = Math.max.apply(null, rows.map(function (r) { return Math.max(Math.abs(r.high - base), Math.abs(r.low - base)); })) || 1;
+            var half = (W - LBL - R - 8) / 2, mid = LBL + 8 + half;
+            var o = '<svg class="capex-fig" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Sensitivity of total CAPEX to each cost driver">';
+            rows.forEach(function (r, k) {
+                var y = T + k * (rh + gap), a = mid + (Math.min(r.low, r.high) - base) / sw * half, b = mid + (Math.max(r.low, r.high) - base) / sw * half;
+                o += '<text class="lb" x="' + (LBL - 4) + '" y="' + (y + rh / 2 + 4) + '" text-anchor="end">' + r.key + '</text>';
+                o += '<rect class="b" x="' + a.toFixed(1) + '" y="' + y + '" width="' + Math.max(1, b - a).toFixed(1) + '" height="' + rh + '"/>';
+                // one range label under the bar, centred on it and kept inside the plot: two end labels collide on a short bar
+                var rg = formatCurrency(Math.min(r.low, r.high)) + ' – ' + formatCurrency(Math.max(r.low, r.high)), rw = rg.length * 6.1;
+                var cx = Math.min(W - R - rw / 2, Math.max(LBL + 8 + rw / 2, (a + b) / 2));
+                o += '<text x="' + cx.toFixed(1) + '" y="' + (y + rh + 11) + '" text-anchor="middle">' + rg + '</text>';
+            });
+            // the base line runs through the bar rows only, never through a range label
+            rows.forEach(function (r, k) { var y = T + k * (rh + gap); o += '<line class="gr" x1="' + mid + '" x2="' + mid + '" y1="' + (y - 3) + '" y2="' + (y + rh + 2) + '"/>'; });
+            return o + '</svg>';
         }
 
         function renderExtraRow(icon, label, cost, color, maxCost, total) {
             return `<div class="cost-item">
                 <div class="cost-name">
-                    <div class="cost-icon" style="background: ${color}30; color: ${color};"><i class="fas ${icon}"></i></div>
                     ${label}
                 </div>
                 <div class="cost-bar-container">
-                    <div class="cost-bar" style="width: ${(cost / maxCost) * 100}%; background: ${color};"></div>
+                    <div class="cost-bar" style="width: ${(cost / maxCost) * 100}%;"></div>
                 </div>
                 <span class="cost-value">${formatCurrency(cost)}</span>
                 <span class="cost-percent">${((cost / total) * 100).toFixed(1)}%</span>
@@ -2892,17 +1805,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             savedScenario = JSON.parse(JSON.stringify(lastResult));
             document.getElementById('comparePanel').style.display = 'block';
             document.getElementById('savedIndicator').style.display = 'block';
-            document.getElementById('scenarioBBanner').style.display = 'flex';
+            document.getElementById('scenarioBBanner').style.display = 'block';
             document.getElementById('btnClearRow').style.display = 'block';
             const btn = document.getElementById('btnSaveA');
-            btn.innerHTML = '<i class="fas fa-check-circle"></i> Scenario A Saved';
-            btn.style.background = 'linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1))';
-            btn.style.borderColor = 'rgba(16,185,129,0.5)';
-            btn.style.color = '#34d399';
+            btn.innerHTML = '<span id="btnSaveLabel">A saved</span>';
             btn.disabled = true;
-            btn.style.opacity = '0.5';
-            btn.style.pointerEvents = 'none';
-            btn.style.cursor = 'default';
             renderComparison();
             // Scroll to input top so user sees Scenario B banner
             setTimeout(() => document.getElementById('scenarioBBanner').scrollIntoView({ behavior:'smooth', block:'start' }), 100);
@@ -2915,14 +1822,8 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             document.getElementById('scenarioBBanner').style.display = 'none';
             document.getElementById('btnClearRow').style.display = 'none';
             const btn = document.getElementById('btnSaveA');
-            btn.innerHTML = '<i class="fas fa-bookmark"></i> Save Scenario A';
-            btn.style.background = 'linear-gradient(135deg,rgba(251,191,36,0.25),rgba(245,158,11,0.15))';
-            btn.style.borderColor = 'rgba(251,191,36,0.6)';
-            btn.style.color = '#fbbf24';
+            btn.innerHTML = '<span id="btnSaveLabel">Save as A</span>';
             btn.disabled = false;
-            btn.style.opacity = '1';
-            btn.style.pointerEvents = 'auto';
-            btn.style.cursor = 'pointer';
         }
 
         function renderComparison() {
@@ -2930,61 +1831,28 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             const b = lastResult;
             const a = savedScenario;
             const delta = ((b.total - a.total) / a.total * 100);
-            const deltaSign = delta >= 0 ? '+' : '';
-            const deltaColor = delta > 0 ? '#ef4444' : '#10b981';
-
-            document.getElementById('scenarioACard').innerHTML = renderScenarioCard('A', a, '#fbbf24');
-            document.getElementById('scenarioBCard').innerHTML = renderScenarioCard('B', b, '#34d399');
-
-            document.getElementById('deltaColumn').innerHTML = `
-                <div style="text-align:center;padding:0.5rem;">
-                    <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Delta</div>
-                    <div style="font-size:1.6rem;font-weight:700;color:${deltaColor};font-family:'JetBrains Mono',monospace;">${deltaSign}${delta.toFixed(1)}%</div>
-                    <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:4px;">${deltaSign}${formatCurrency(b.total - a.total)}</div>
-                </div>
-                <div style="width:2px;height:60px;background:linear-gradient(180deg,${deltaColor},transparent);border-radius:1px;"></div>
-                <div style="text-align:center;">
-                    <div style="font-size:0.7rem;color:var(--text-muted);">$/kW Delta</div>
-                    <div style="font-size:0.95rem;font-weight:600;color:${deltaColor};font-family:'JetBrains Mono',monospace;">${deltaSign}${formatCurrency((b.total/b.itLoad) - (a.total/a.itLoad))}</div>
-                </div>`;
+            const sign = delta >= 0 ? '+' : '−';
+            const dKw = (b.total / b.itLoad) - (a.total / a.itLoad);
+            document.getElementById('scenarioACard').innerHTML = renderScenarioCard('A', a);
+            document.getElementById('scenarioBCard').innerHTML = renderScenarioCard('B', b);
+            document.getElementById('deltaColumn').innerHTML = '<h4 class="res-sub">B against A</h4><div data-rz-fact-list>' +
+                '<div class="metric-box"><div class="metric-label">Total CAPEX</div><div class="metric-value">' + sign + Math.abs(delta).toFixed(1) + '%</div><div class="metric-sub">' + sign + formatCurrency(Math.abs(b.total - a.total)) + '</div></div>' +
+                '<div class="metric-box"><div class="metric-label">Cost per kW</div><div class="metric-value">' + (dKw >= 0 ? '+' : '−') + formatCurrency(Math.abs(dKw)) + '</div></div></div>';
         }
 
         // Fixed order for consistent comparison display
         const costKeyOrder = ['electrical','cooling','building','ups','generator','fireSuppression','fireAlarm','bms','network','security','seismic','commissioning','testing','permits'];
 
-        function renderScenarioCard(label, data, accent) {
-            // Use fixed key order, show top items by value but in consistent order
-            const allEntries = costKeyOrder.map(k => [k, data.costs[k] || 0]).filter(([,v]) => v > 0);
-            const topKeys = Object.entries(data.costs).sort((a,b) => b[1] - a[1]).slice(0, 5).map(e => e[0]);
+        function renderScenarioCard(label, data) {
+            // the five largest systems, shown in a fixed order so A and B line up row for row
+            const topKeys = Object.entries(data.costs).sort((a, b) => b[1] - a[1]).slice(0, 5).map(e => e[0]);
             const topCosts = costKeyOrder.filter(k => topKeys.includes(k)).map(k => [k, data.costs[k]]);
-            const maxC = Math.max(...topCosts.map(e => e[1]));
-            let barsHTML = topCosts.map(([key, cost]) => {
-                const f = costFactors[key];
-                return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                    <span style="font-size:0.7rem;min-width:90px;color:rgba(255,255,255,0.7);">${f.label}</span>
-                    <div style="flex:1;height:5px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;">
-                        <div style="width:${(cost/maxC)*100}%;height:100%;background:${f.color};border-radius:3px;"></div>
-                    </div>
-                    <span style="font-size:0.75rem;font-family:'JetBrains Mono',monospace;min-width:60px;text-align:right;">${formatCurrency(cost)}</span>
-                </div>`;
-            }).join('');
             let metaInfo = data.tierInfo.tier + ' · PUE ' + data.pue;
             if (data.yearLabel !== '2025') metaInfo += ' · ' + data.yearLabel;
             if (data.cityLabel) metaInfo += ' · ' + data.cityLabel;
-            return `
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid rgba(255,255,255,0.15);">
-                    <span style="font-size:0.85rem;font-weight:600;display:flex;align-items:center;gap:6px;">
-                        <span style="width:24px;height:24px;border-radius:6px;background:${accent}30;color:${accent};display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;">${label}</span>
-                        Scenario ${label}
-                    </span>
-                    <span style="font-size:0.7rem;color:rgba(255,255,255,0.5);">${metaInfo}</span>
-                </div>
-                <div style="text-align:center;margin-bottom:1rem;">
-                    <div style="font-size:0.7rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.5px;">Total CAPEX</div>
-                    <div style="font-size:1.8rem;font-weight:700;color:${accent};font-family:'JetBrains Mono',monospace;">${formatCurrency(data.total)}</div>
-                    <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);font-family:'JetBrains Mono',monospace;">${formatCurrency(data.total/data.itLoad)}/kW · ${data.itLoad.toLocaleString()} kW</div>
-                </div>
-                <div style="margin-top:0.75rem;">${barsHTML}</div>`;
+            return '<h4 class="res-sub">Scenario ' + label + ' · ' + metaInfo + '</h4><div data-rz-fact-list>' +
+                '<div class="metric-box"><div class="metric-label">Total CAPEX</div><div class="metric-value">' + formatCurrency(data.total) + '</div><div class="metric-sub">' + formatCurrency(data.total / data.itLoad) + '/kW · ' + data.itLoad.toLocaleString() + ' kW</div></div>' +
+                topCosts.map(([key, cost]) => '<div class="metric-box"><div class="metric-label">' + costFactors[key].label + '</div><div class="metric-value">' + formatCurrency(cost) + '</div></div>').join('') + '</div>';
         }
 
         // ═══ TIMELINE GANTT HTML BUILDER (for PDF) ═══
@@ -3380,7 +2248,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             const dFmt = (aV, bV, unit) => {
                 if (!aV && !bV) return '';
                 const d = ((bV - aV) / (aV || 1) * 100);
-                const clr = d > 0 ? '#ef4444' : d < 0 ? '#10b981' : '#6b7280';
+                const clr = d > 0 ? '#ef4444' : d < 0 ? '#4A5160' : '#6b7280';
                 return '<span style="color:' + clr + ';font-weight:600;">' + (d >= 0 ? '+' : '') + d.toFixed(1) + '% ' + (unit || '') + '</span>';
             };
 
@@ -3507,9 +2375,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
             // $/kW benchmarking
             let costProfile;
-            if (perKW < 8000) costProfile = { label: 'Ultra-Lean', color: '#059669', desc: 'well below industry average. This may indicate a lean facility design (warehouse conversion, air-cooled, lower redundancy) or favorable market conditions. Verify that reliability and quality standards are not compromised.' };
-            else if (perKW < 12000) costProfile = { label: 'Cost-Efficient', color: '#0284c7', desc: 'below the industry midpoint for ' + tier + ' facilities. The design achieves good value through efficient component selection and/or favorable location factors.' };
-            else if (perKW < 18000) costProfile = { label: 'Market Rate', color: '#d97706', desc: 'within the typical range for ' + tier + ' data center construction. Cost is consistent with current market conditions for ' + (cfg.buildingType || 'standard') + ' facilities with ' + (cfg.coolingType || 'standard') + ' cooling.' };
+            if (perKW < 8000) costProfile = { label: 'Ultra-Lean', color: '#4A5160', desc: 'well below industry average. This may indicate a lean facility design (warehouse conversion, air-cooled, lower redundancy) or favorable market conditions. Verify that reliability and quality standards are not compromised.' };
+            else if (perKW < 12000) costProfile = { label: 'Cost-Efficient', color: '#A0AEC0', desc: 'below the industry midpoint for ' + tier + ' facilities. The design achieves good value through efficient component selection and/or favorable location factors.' };
+            else if (perKW < 18000) costProfile = { label: 'Market Rate', color: '#7D8794', desc: 'within the typical range for ' + tier + ' data center construction. Cost is consistent with current market conditions for ' + (cfg.buildingType || 'standard') + ' facilities with ' + (cfg.coolingType || 'standard') + ' cooling.' };
             else if (perKW < 25000) costProfile = { label: 'Premium Build', color: '#dc2626', desc: 'above average, typical for purpose-built facilities with high redundancy, premium cooling (RDHX/DLC), and comprehensive infrastructure. The premium reflects higher reliability and operational efficiency.' };
             else costProfile = { label: 'Hyperscale/Complex', color: '#64748b', desc: 'in the upper range, consistent with large-scale, mission-critical deployments requiring maximum redundancy, liquid cooling, extensive utility infrastructure, and stringent compliance.' };
 
@@ -3550,7 +2418,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             risks.push({ level: 'LOW', text: '<strong>Annual Review:</strong> Re-run this analysis with updated market conditions, commodity prices, and regulatory requirements before final procurement decisions.' });
 
             const riskHTML = risks.map(r => {
-                const c = r.level === 'HIGH' ? '#dc2626' : r.level === 'MEDIUM' ? '#d97706' : '#059669';
+                const c = r.level === 'HIGH' ? '#dc2626' : r.level === 'MEDIUM' ? '#7D8794' : '#4A5160';
                 return '<tr><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;"><span style="display:inline-block;padding:2px 8px;border-radius:4px;background:' + c + ';color:white;font-size:9px;font-weight:700;">' + r.level + '</span></td><td style="padding:5px 8px;border-bottom:1px solid #e5e7eb;font-size:11px;">' + r.text + '</td></tr>';
             }).join('');
 
@@ -3749,7 +2617,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 const b = result;
                 const totalDelta = ((b.total - a.total) / a.total * 100);
                 const totalSign = totalDelta >= 0 ? '+' : '';
-                const dClr = (v) => v > 0 ? '#ef4444' : v < 0 ? '#10b981' : '#6b7280';
+                const dClr = (v) => v > 0 ? '#ef4444' : v < 0 ? '#374151' : '#6b7280';
                 const dFmt = (aVal, bVal) => {
                     if (!aVal && !bVal) return '—';
                     if (!aVal) return '<span style="color:#ef4444;">NEW</span>';
@@ -3762,10 +2630,10 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 const deltaR = cellSt + 'text-align:right;';
 
                 // ── Visual summary cards (like the web) ──
-                const cardSt = 'flex:1;background:#1e3a5f;color:white;border-radius:10px;padding:16px 20px;text-align:center;';
+                const cardSt = 'flex:1;background:#111827;color:white;border-radius:10px;padding:16px 20px;text-align:center;';
                 compareSummaryHTML = `
                 <div style="margin-bottom:24px;">
-                    <h2 style="font-size:15px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:14px;">Scenario Comparison</h2>
+                    <h2 style="font-size:15px;color:#111827;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:14px;">Scenario Comparison</h2>
                     <div style="display:flex;gap:12px;align-items:stretch;">
                         <div style="${cardSt}">
                             <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.6);margin-bottom:2px;">Scenario A</div>
@@ -3819,14 +2687,14 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 configMetricsHTML = `
                 <div style="display:flex;gap:16px;margin-bottom:20px;">
                     <div style="flex:1.2;min-width:0;">
-                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Configuration Comparison</h2>
+                        <h2 style="font-size:13px;color:#111827;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Configuration Comparison</h2>
                         <table style="width:100%;border-collapse:collapse;font-size:11px;">
-                            <tr style="background:#1e3a5f;color:white;"><th style="padding:6px 8px;text-align:left;"  scope="col">Parameter</th><th style="padding:6px 8px;text-align:left;"  scope="col">Scenario A</th><th style="padding:6px 8px;text-align:left;"  scope="col">Scenario B</th></tr>
+                            <tr style="background:#111827;color:white;"><th style="padding:6px 8px;text-align:left;"  scope="col">Parameter</th><th style="padding:6px 8px;text-align:left;"  scope="col">Scenario A</th><th style="padding:6px 8px;text-align:left;"  scope="col">Scenario B</th></tr>
                             ${cfgRows}
                         </table>
                     </div>
                     <div style="flex:0.8;min-width:0;">
-                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Key Metrics</h2>
+                        <h2 style="font-size:13px;color:#111827;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Key Metrics</h2>
                         <table style="width:100%;font-size:11.5px;">
                             <tr><td style="padding:5px 0;color:#94a3b8;"></td><td style="padding:5px 0;font-weight:600;color:#94a3b8;font-size:10px;">Scenario A</td><td style="padding:5px 0;font-weight:600;color:#94a3b8;font-size:10px;">Scenario B</td></tr>
                             <tr><td style="padding:5px 0;color:#94a3b8;">Total CAPEX</td><td style="padding:5px 0;font-weight:700;color:#fbbf24;font-family:monospace;">${formatCurrency(a.total)}</td><td style="padding:5px 0;font-weight:700;color:#34d399;font-family:monospace;">${formatCurrency(b.total)}</td></tr>
@@ -3860,13 +2728,13 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 }
                 cmpRows += `<tr><td style="${cellSt}">Contingency</td><td style="${monoR}">${formatCurrency(a.contingency)} (${a.contingencyPct}%)</td><td style="${monoR}">${formatCurrency(b.contingency)} (${b.contingencyPct}%)</td><td style="${deltaR}">${dFmt(a.contingency, b.contingency)}</td></tr>`;
 
-                cmpRows += `<tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:10px;">TOTAL</td><td style="padding:10px;text-align:right;font-family:monospace;">${formatCurrency(a.total)}</td><td style="padding:10px;text-align:right;font-family:monospace;">${formatCurrency(b.total)}</td><td style="padding:10px;text-align:right;">${totalSign}${totalDelta.toFixed(1)}%<br><span style="font-size:11px;font-weight:400;">${totalSign}${formatCurrency(b.total - a.total)}</span></td></tr>`;
+                cmpRows += `<tr style="background:#111827;color:white;font-weight:700;"><td style="padding:10px;">TOTAL</td><td style="padding:10px;text-align:right;font-family:monospace;">${formatCurrency(a.total)}</td><td style="padding:10px;text-align:right;font-family:monospace;">${formatCurrency(b.total)}</td><td style="padding:10px;text-align:right;">${totalSign}${totalDelta.toFixed(1)}%<br><span style="font-size:11px;font-weight:400;">${totalSign}${formatCurrency(b.total - a.total)}</span></td></tr>`;
 
                 compareBreakdownHTML = `
                 <div style="margin-top:24px;">
-                    <h2 style="font-size:15px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:14px;">Detailed Comparison</h2>
+                    <h2 style="font-size:15px;color:#111827;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin-bottom:14px;">Detailed Comparison</h2>
                     <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
-                        <tr style="background:#1e3a5f;color:white;"><th style="padding:8px 10px;text-align:left;"  scope="col">Component</th><th style="padding:8px 10px;text-align:right;min-width:90px;"  scope="col">Scenario A</th><th style="padding:8px 10px;text-align:right;min-width:90px;"  scope="col">Scenario B</th><th style="padding:8px 10px;text-align:right;min-width:60px;"  scope="col">Delta</th></tr>
+                        <tr style="background:#111827;color:white;"><th style="padding:8px 10px;text-align:left;"  scope="col">Component</th><th style="padding:8px 10px;text-align:right;min-width:90px;"  scope="col">Scenario A</th><th style="padding:8px 10px;text-align:right;min-width:90px;"  scope="col">Scenario B</th><th style="padding:8px 10px;text-align:right;min-width:60px;"  scope="col">Delta</th></tr>
                         ${cmpRows}
                     </table>
                 </div>`;
@@ -3895,11 +2763,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 configMetricsHTML = `
                 <div style="display:flex;gap:16px;margin-bottom:20px;">
                     <div style="flex:1;min-width:0;">
-                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Configuration</h2>
+                        <h2 style="font-size:13px;color:#111827;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Configuration</h2>
                         <table style="width:100%;font-size:11.5px;">${singleConfigHTML}</table>
                     </div>
                     <div style="flex:1;min-width:0;">
-                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Key Metrics</h2>
+                        <h2 style="font-size:13px;color:#111827;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Key Metrics</h2>
                         <table style="width:100%;font-size:11.5px;">
                             <tr><td style="padding:5px 0;color:#94a3b8;">Total CAPEX</td><td style="padding:5px 0;font-weight:700;color:#f59e0b;font-family:monospace;">${formatCurrency(result.total)}</td></tr>
                             <tr><td style="padding:5px 0;color:#94a3b8;">Annual Energy</td><td style="padding:5px 0;font-weight:600;font-family:monospace;">${formatCurrency(result.annualEnergy)}/yr</td></tr>
@@ -3907,11 +2775,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         </table>
                     </div>
                     <div style="flex:1.2;min-width:0;">
-                        <h2 style="font-size:13px;color:#1e3a5f;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Cost Breakdown</h2>
+                        <h2 style="font-size:13px;color:#111827;border-bottom:2px solid #f59e0b;padding-bottom:5px;margin-bottom:10px;">Cost Breakdown</h2>
                         <table style="width:100%;border-collapse:collapse;font-size:11px;">
-                            <tr style="background:#1e3a5f;color:white;"><th style="padding:6px 8px;text-align:left;"  scope="col">Component</th><th style="padding:6px 8px;text-align:right;"  scope="col">Cost</th><th style="padding:6px 8px;text-align:right;"  scope="col">%</th></tr>
+                            <tr style="background:#111827;color:white;"><th style="padding:6px 8px;text-align:left;"  scope="col">Component</th><th style="padding:6px 8px;text-align:right;"  scope="col">Cost</th><th style="padding:6px 8px;text-align:right;"  scope="col">%</th></tr>
                             ${rowsHTML}
-                            <tr style="background:#1e3a5f;color:white;font-weight:700;"><td style="padding:6px 8px;">TOTAL</td><td style="padding:6px 8px;text-align:right;font-family:monospace;">${formatCurrency(result.total)}</td><td style="padding:6px 8px;text-align:right;">100%</td></tr>
+                            <tr style="background:#111827;color:white;font-weight:700;"><td style="padding:6px 8px;">TOTAL</td><td style="padding:6px 8px;text-align:right;font-family:monospace;">${formatCurrency(result.total)}</td><td style="padding:6px 8px;text-align:right;">100%</td></tr>
                         </table>
                     </div>
                 </div>`;
@@ -4157,9 +3025,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
 </style></head>
             <body style="font-family:Arial,Helvetica,sans-serif;max-width:820px;margin:0 auto;padding:36px;color:#1f2937;">
-                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:14px;margin-bottom:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #111827;padding-bottom:14px;margin-bottom:20px;">
                     <div>
-                        <h1 style="font-size:20px;color:#1e3a5f;margin:0;">Data Center CAPEX Report${savedScenario ? ' — Scenario Comparison' : ''}</h1>
+                        <h1 style="font-size:20px;color:#111827;margin:0;">Data Center CAPEX Report${savedScenario ? ' — Scenario Comparison' : ''}</h1>
                         <p style="font-size:11px;color:#94a3b8;margin:4px 0 0;">Generated ${dateStr} · resistancezero.com</p>
                     </div>
                     ${savedScenario ? `
@@ -4203,7 +3071,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 document.getElementById('premiumOutput').style.display = 'none';
                 return;
             }
-            document.getElementById('premiumOutput').style.display = 'flex';
+            document.getElementById('premiumOutput').style.display = 'block';
 
             const r = lastResult;
             const itLoad = r.itLoad;
@@ -4232,7 +3100,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             const perKw = r.total / itLoad;
             const pct = Math.min(Math.max((perKw - 5000) / 25000, 0), 1) * 100;
             document.getElementById('benchmarkMarker').style.left = pct + '%';
-            document.getElementById('benchmarkLabel').style.left = pct + '%';
+            document.getElementById('benchmarkLabel').style.left = Math.min(86, Math.max(14, pct)) + '%';
             document.getElementById('benchmarkLabel').textContent = '$' + Math.round(perKw).toLocaleString() + '/kW';
 
             // 3. Construction Timeline (Gantt-style bars with parallel model)
@@ -4248,48 +3116,21 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 coolingType === 'liquid' ? 'DLC pipework +30%' : coolingType === 'rdhx' ? 'RDHX plumbing +15%' : '',
                 redundancy === '2n1' ? 'Full IST/ISST' : redundancy === '2n' ? 'IST required' : ''
             ];
-            let tlHTML = '';
-            // Improved Gantt: month-scale axis header
+            // Gantt: one row per phase (parallel model), month ticks, the total on the last row
             const _gStep = totalMonths <= 18 ? 3 : totalMonths <= 30 ? 6 : 12;
             let _axis = '';
-            for (let m = 0; m <= totalMonths; m += _gStep) { _axis += `<span style="flex:1;font-size:0.55rem;color:#64748b;text-align:left;">M${m}</span>`; }
-            tlHTML += `<div style="display:grid;grid-template-columns:140px 1fr 50px;gap:8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.08);"><div style="font-size:0.55rem;color:#64748b;font-weight:600;">PHASE</div><div style="display:flex;">${_axis}</div><div style="font-size:0.55rem;color:#64748b;text-align:right;">DUR</div></div>`;
+            for (let m = 0; m <= totalMonths; m += _gStep) { _axis += '<span style="left:' + (m / totalMonths * 100).toFixed(1) + '%">M' + m + '</span>'; }
+            let tlHTML = '<div class="gantt-row gantt-head"><div class="gantt-name">Phase</div><div class="gantt-axis">' + _axis + '</div><div class="gantt-dur">Months</div></div>';
             phases.phases.forEach((p, i) => {
                 const leftPct = (p.start / totalMonths * 100).toFixed(1);
                 const widthPct = ((p.end - p.start) / totalMonths * 100).toFixed(1);
-                const dur = p.end - p.start;
-                tlHTML += `<div style="display:grid;grid-template-columns:140px 1fr 50px;gap:8px;align-items:center;font-size:0.7rem;">
-                    <div style="color:#e2e8f0;display:flex;align-items:center;gap:6px;font-weight:500;"><i class="fas ${icons[i]}" style="color:${p.color};width:14px;text-align:center;"></i>${p.name.length > 18 ? p.name.substring(0,16) + '..' : p.name}</div>
-                    <div style="position:relative;height:20px;background:rgba(255,255,255,0.06);border-radius:4px;">
-                        <div style="position:absolute;left:${leftPct}%;width:${widthPct}%;height:100%;background:linear-gradient(90deg,${p.color},${p.color}cc);border-radius:4px;display:flex;align-items:center;padding-left:6px;overflow:hidden;">
-                            ${notes[i] ? `<span style="font-size:0.5rem;color:rgba(255,255,255,0.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">${notes[i]}</span>` : ''}
-                        </div>
-                    </div>
-                    <div style="color:${p.color};font-weight:700;text-align:right;">${dur} mo</div>
-                </div>`;
+                tlHTML += '<div class="gantt-row"><div class="gantt-name">' + p.name + (notes[i] ? '<small>' + notes[i] + '</small>' : '') + '</div>' +
+                    '<div class="gantt-track"><div class="gantt-bar" style="left:' + leftPct + '%;width:' + widthPct + '%"></div></div><div class="gantt-dur">' + (p.end - p.start) + '</div></div>';
             });
-            // Total row
             const serialTotal = phases.design + phases.permit + phases.procurement + phases.civil + phases.mep + phases.commission;
             const savedPct = Math.round((serialTotal - totalMonths) / serialTotal * 100);
-            tlHTML += `<div style="display:grid;grid-template-columns:140px 1fr 50px;gap:8px;align-items:center;font-size:0.7rem;margin-top:4px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1);">
-                <div style="color:#fbbf24;font-weight:700;">Total (Design→COD)</div>
-                <div style="height:3px;background:linear-gradient(90deg,#64748b,#f59e0b,#ec4899,#3b82f6,#10b981,#06b6d4);border-radius:2px;"></div>
-                <div style="color:#fbbf24;font-weight:800;text-align:right;">${totalMonths} mo</div>
-            </div>`;
-            if (savedPct > 0) {
-                tlHTML += `<div style="font-size:0.55rem;color:#94a3b8;text-align:right;margin-top:2px;">Parallel model saves ~${savedPct}% vs serial execution</div>`;
-            }
-            // Improved Gantt: milestone diamonds (Design → COD)
-            const _find = (re) => { const p = phases.phases.find(x => re.test(x.name)); return p ? p.end : null; };
-            const _ms = [
-                { m: _find(/design/i) ?? phases.design ?? 0, label: 'Design ✓', color: '#64748b' },
-                { m: _find(/permit/i) ?? 0, label: 'Permits ✓', color: '#f59e0b' },
-                { m: _find(/civil|construction|building/i) ?? 0, label: 'Building', color: '#3b82f6' },
-                { m: _find(/mep|fit-?out/i) ?? 0, label: 'MEP ✓', color: '#10b981' },
-                { m: totalMonths, label: 'COD / RFS', color: '#ec4899' },
-            ].filter(x => x.m > 0);
-            const _msHTML = _ms.map(x => `<div style="position:absolute;left:${(x.m / totalMonths * 100).toFixed(1)}%;transform:translateX(-50%);text-align:center;top:0;"><div style="width:9px;height:9px;background:${x.color};transform:rotate(45deg);margin:0 auto;box-shadow:0 0 6px ${x.color}80;"></div><div style="font-size:0.5rem;color:${x.color};white-space:nowrap;margin-top:3px;font-weight:600;">${x.label}<br><span style="color:#64748b;">M${x.m}</span></div></div>`).join('');
-            tlHTML += `<div style="display:grid;grid-template-columns:140px 1fr 50px;gap:8px;margin-top:10px;align-items:start;"><div style="font-size:0.55rem;color:#64748b;font-weight:600;">MILESTONES</div><div style="position:relative;height:34px;">${_msHTML}</div><div></div></div>`;
+            tlHTML += '<div class="gantt-row is-total"><div class="gantt-name">Design to COD' + (savedPct > 0 ? '<small>parallel phases save about ' + savedPct + '% against serial</small>' : '') + '</div>' +
+                '<div class="gantt-track"><div class="gantt-bar" style="left:0;width:100%"></div></div><div class="gantt-dur">' + totalMonths + '</div></div>';
             tlEl.innerHTML = tlHTML;
 
             // 5. Sustainability Metrics (region-specific)
@@ -4301,27 +3142,12 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             const waterM3 = wue * itLoad * r.pue * 8760 / 1000;
             const dcie = (1 / r.pue * 100).toFixed(1);
             const refrig = refrigerantData[coolingType] || refrigerantData.air;
-            smEl.innerHTML = `
-                <div style="padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#047857,#10b981);box-shadow:0 2px 6px rgba(16,185,129,0.2);">
-                    <div style="font-size:0.6rem;color:rgba(255,255,255,0.7);font-weight:600;">PUE / DCiE</div>
-                    <div style="font-size:1.2rem;font-weight:800;color:#ffffff;">${r.pue.toFixed(2)}</div>
-                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.6);">DCiE ${dcie}% · ${r.pue <= 1.3 ? 'Excellent' : r.pue <= 1.5 ? 'Good' : r.pue <= 1.7 ? 'Average' : 'Below Average'}</div>
-                </div>
-                <div style="padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);box-shadow:0 2px 6px rgba(59,130,246,0.2);">
-                    <div style="font-size:0.6rem;color:rgba(255,255,255,0.7);font-weight:600;">Annual Energy</div>
-                    <div style="font-size:1.2rem;font-weight:800;color:#ffffff;">${(annualMWh / 1000).toFixed(1)} GWh</div>
-                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.6);">${annualMWh.toLocaleString(undefined,{maximumFractionDigits:0})} MWh/yr</div>
-                </div>
-                <div style="padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#b45309,#f59e0b);box-shadow:0 2px 6px rgba(245,158,11,0.2);">
-                    <div style="font-size:0.6rem;color:rgba(255,255,255,0.7);font-weight:600;">Scope 2 CO₂</div>
-                    <div style="font-size:1.2rem;font-weight:800;color:#ffffff;">${co2Tons >= 1000 ? (co2Tons / 1000).toFixed(1) + 'K' : Math.round(co2Tons)} t</div>
-                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.6);">${emFactor.toFixed(2)} tCO₂/MWh (${(effRegion||'avg').toUpperCase()})</div>
-                </div>
-                <div style="padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#0e7490,#06b6d4);box-shadow:0 2px 6px rgba(6,182,212,0.2);">
-                    <div style="font-size:0.6rem;color:rgba(255,255,255,0.7);font-weight:600;">Water / Refrigerant</div>
-                    <div style="font-size:1.2rem;font-weight:800;color:#ffffff;">WUE ${wue.toFixed(1)}</div>
-                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.6);">${refrig.type}${refrig.gwp > 0 ? ' GWP ' + refrig.gwp : ''}</div>
-                </div>`;
+            smEl.innerHTML = [
+                ['PUE', r.pue.toFixed(2), 'DCiE ' + dcie + '% · ' + (r.pue <= 1.3 ? 'excellent' : r.pue <= 1.5 ? 'good' : r.pue <= 1.7 ? 'average' : 'below average')],
+                ['Annual energy', (annualMWh / 1000).toFixed(1) + ' GWh', annualMWh.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' MWh/yr'],
+                ['Scope 2 CO₂', (co2Tons >= 1000 ? (co2Tons / 1000).toFixed(1) + 'k' : Math.round(co2Tons)) + ' t', emFactor.toFixed(2) + ' tCO₂/MWh, ' + (effRegion || 'avg').toUpperCase()],
+                ['Water and refrigerant', 'WUE ' + wue.toFixed(1), refrig.type + (refrig.gwp > 0 ? ', GWP ' + refrig.gwp : '')]
+            ].map(function (k) { return '<div class="metric-box"><div class="metric-label">' + k[0] + '</div><div class="metric-value">' + k[1] + '</div><div class="metric-sub">' + k[2] + '</div></div>'; }).join('');
 
             // Report date
             document.getElementById('premReportDate').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -4390,27 +3216,27 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             const btnPdfLabel = document.getElementById('btnPdfLabel');
             const lockActions = !isFullPremium; // free locked
             if (lockActions) {
-                if (btnSave) { btnSave.classList.add('gated-btn','clickable'); btnSave.style.opacity = '0.6'; }
-                if (btnPdf) { btnPdf.classList.add('gated-btn','clickable'); btnPdf.style.opacity = '0.6'; }
-                if (btnSaveLabel) btnSaveLabel.innerHTML = '<i class="fas fa-lock" style="font-size:0.65rem;margin-right:3px;color:#94a3b8;"></i>Save Scenario A';
-                if (btnPdfLabel) btnPdfLabel.innerHTML = '<i class="fas fa-lock" style="font-size:0.65rem;margin-right:3px;color:#94a3b8;"></i>Export PDF';
+                if (btnSave) btnSave.classList.add('gated-btn');
+                if (btnPdf) btnPdf.classList.add('gated-btn');
+                if (btnSaveLabel) btnSaveLabel.textContent = 'Save as A · Full';
+                if (btnPdfLabel) btnPdfLabel.textContent = 'Export PDF · Full';
             } else {
-                if (btnSave) { btnSave.classList.remove('gated-btn','clickable'); btnSave.style.opacity = '1'; }
-                if (btnPdf) { btnPdf.classList.remove('gated-btn','clickable'); btnPdf.style.opacity = '1'; }
-                if (btnSaveLabel) btnSaveLabel.textContent = 'Save Scenario A';
+                if (btnSave) btnSave.classList.remove('gated-btn');
+                if (btnPdf) btnPdf.classList.remove('gated-btn');
+                if (btnSaveLabel) btnSaveLabel.textContent = 'Save as A';
                 if (btnPdfLabel) btnPdfLabel.textContent = 'Export PDF';
             }
 
             // 5. Watermark — show for free only
             const watermark = document.getElementById('freeWatermark');
-            if (watermark) watermark.style.display = isFree ? 'block' : 'none';
+            if (watermark) watermark.style.display = isFree ? '' : 'none';
 
             // 6. Advanced tab — add lock icon for free only
             const advBtn = document.querySelector('.capex-mode-btn[data-mode="advanced"]');
             if (advBtn) {
                 if (isFree) {
                     if (!advBtn.querySelector('.gate-lock-icon')) {
-                        advBtn.insertAdjacentHTML('beforeend', '<i class="fas fa-lock gate-lock-icon" style="margin-left:6px;font-size:0.65rem;color:#94a3b8;"></i>');
+                        advBtn.insertAdjacentHTML('beforeend', '<span class="gate-lock-icon"> · Full</span>');
                     }
                 } else {
                     const lockIcon = advBtn.querySelector('.gate-lock-icon');
@@ -4422,13 +3248,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             const compareGrid = document.getElementById('compareGrid');
             if (compareGrid) {
                 if (!isFullPremium) {
-                    compareGrid.style.filter = 'blur(4px)';
-                    compareGrid.style.pointerEvents = 'none';
-                    compareGrid.style.opacity = '0.5';
+                    compareGrid.hidden = true;
                 } else {
-                    compareGrid.style.filter = 'none';
-                    compareGrid.style.pointerEvents = 'auto';
-                    compareGrid.style.opacity = '1';
+                    compareGrid.hidden = false;
                 }
             }
         }
@@ -4479,7 +3301,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 localStorage.removeItem('rz_premium_session');
                 var premBtn = document.getElementById('premiumTabBtn');
                 premBtn.classList.remove('premium-active');
-                premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium';
+                premBtn.textContent = 'Sign in';
                 document.getElementById('premiumBadge').style.display = 'none';
                 switchCapexMode('simple');
                 applyFeatureGating();
@@ -4501,13 +3323,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
         function activatePremiumUI() {
             const premBtn = document.getElementById('premiumTabBtn');
             premBtn.classList.add('premium-active');
-            premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium Active';
-            // Show tier badge
-            const premBadge = document.getElementById('premiumBadge');
-            premBadge.textContent = 'PRO ACTIVE';
-            premBadge.style.display = 'inline-flex';
-            premBadge.style.background = '#64748b';
-            premBadge.style.color = 'white';
+            premBtn.textContent = 'Full analysis on';
 
             // Enable advanced mode and apply gating
             switchCapexMode('advanced');
@@ -4526,7 +3342,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
             const premBtn = document.getElementById('premiumTabBtn');
             premBtn.classList.remove('premium-active');
-            premBtn.innerHTML = '<i class="fas fa-crown" style="margin-right:6px;"></i>Premium';
+            premBtn.textContent = 'Sign in';
             // Hide badge
             document.getElementById('premiumBadge').style.display = 'none';
 
@@ -4614,10 +3430,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
 
 
-<!-- Scroll to Top -->
-<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-</button>
+
 
 
 
@@ -4633,7 +3446,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
   // Independent of the site's existing Pro-gating — any signed-in Supabase user can save.
   async function saveToAccount() {
     var msg = document.getElementById('acctSaveMsg');
-    var show = function (t, ok) { msg.style.display = 'block'; msg.style.color = ok ? '#34d399' : '#f87171'; msg.textContent = t; };
+    var show = function (t, ok) { msg.style.display = 'block'; msg.textContent = t; };
     if (!window.rzSupa || !window.rzSupa.configured) { show('Cloud save unavailable (config missing).', false); return; }
     try {
       var user = await window.rzSupa.getUser();
@@ -4663,7 +3476,5 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',m);else m();
 if(window.MutationObserver)new MutationObserver(m).observe(document.documentElement,{childList:true,subtree:true});})();
 </script>
-    <script src="js/rz-manual-fab.js?v=20260920-8972ee25" defer></script>
-    <script src="js/rz-hero-fit.js?v=20260920-81ad63a8" defer></script>
 </body>
 </html>

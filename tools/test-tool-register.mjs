@@ -33,6 +33,7 @@
  *   T15 no dashed/dotted border, no box-shadow, no `transition: all`, no :hover transform, radius <= 4 px on panels
  *   T16 one nav.hub-nav, one footer.hub-foot, no inline style in the footer, no other navbar / footer
  *   T19 chart series (Chart.js datasets, inline SVG >= 40 px) amber or neutral grey; opt-out [data-rz-series-meaning]
+ *   T20 signed in (long account email) the page fits a 360 px phone: scrollWidth <= 360
  *   T18 no logo tile (initials / icon in a filled or bordered box in the nav or beside a heading)
  *   T17 behaviour (dark 1440, once per page): every id the page JS targets (tools/extract-calc-ids.mjs) exists; each preset
  *       clicks without a page error; editing a numeric input changes the results region; the Free/Full toggle shows a full row.
@@ -461,6 +462,18 @@ for (const pg of pages) {
   }
   if (b.explain !== null) ok(`T17 ${pg}: hovering an explain trigger opens the panel`, b.explain === true, { explain: b.explain, top: b.explainTop });
   if (b.explainCover !== null) ok(`T17 ${pg}: the explain panel never covers its trigger (600 px viewport)`, b.explainCover === 'clear', { cover: b.explainCover });
+  // T20 signed in on a phone: a long account email widened capex to 461 px and pushed the menu button off-screen
+  {
+    const ctx = await browser.createBrowserContext();
+    const p = await ctx.newPage();
+    await p.setViewport({ width: 360, height: 800, isMobile: true, hasTouch: true });
+    await p.evaluateOnNewDocument(() => { try { localStorage.setItem('rz_cookie_consent', 'declined'); localStorage.setItem('rz_premium_session', JSON.stringify({ email: 'a.very.long.address@example.com', tier: 'pro', expires: Date.now() + 864e5 })); } catch (e) {} });
+    try { await p.goto(base + pg, { waitUntil: 'networkidle2', timeout: 60000 }); } catch (e) {}
+    await new Promise((r) => setTimeout(r, 1200));
+    const sw = await p.evaluate(() => document.documentElement.scrollWidth);
+    await ctx.close();
+    ok(`T20 ${pg}: signed in, the page fits a 360 px phone`, sw <= 360, { scrollWidth: sw });
+  }
 }
 await browser.close();
 server.close();
