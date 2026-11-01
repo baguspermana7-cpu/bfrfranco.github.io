@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-rz-register="tool">
+<html lang="en" data-theme="dark" data-rz-register="tool">
 <head>
 <!-- Google tag (gtag.js) -->
 <!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
@@ -35,7 +35,7 @@
 <meta name="keywords" content="Data Center Commissioning, L0-L6, IST, Integrated Systems Testing, Commissioning Cost, Cx Calculator, FAT, Factory Witness Testing, AI Factory, Hyperscale, DLC, RFS, Turnover, ASHRAE Guideline 0">
 <meta name="author" content="Bagus Dwi Permana">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#0e7490">
+<meta name="theme-color" content="#0b0c0e">
 <link rel="canonical" href="https://resistancezero.com/cx-calculator.html">
 <link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-calculator.html">
 <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-calculator.html">
@@ -126,686 +126,105 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
-<link rel="preload" as="image" href="assets/cx-calculator-hero.webp">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Data Center Commissioning Calculator","description":"Estimate commissioning costs and schedules for L0-L6 data center commissioning levels — from design planning through integrated systems testing and turnover. Supports enterprise, colo, hyperscale, and AI factory archetypes.","url":"https://resistancezero.com/cx-calculator.html","applicationCategory":"BusinessApplication","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Bagus Dwi Permana"},"dateModified":"2026-03-18"}</script>
-<style>
-/* ===== CX CALCULATOR STYLES ===== */
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.6;overflow-x:hidden;}
-a{color:#22d3ee;text-decoration:none;}
-a:hover{text-decoration:underline;}
-
-/* Navbar */
-.cx-nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(148,163,184,0.1);position:sticky;top:0;z-index:1000;padding:0 1.5rem;}
-.cx-nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;}
-.cx-nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#e2e8f0;}
-.cx-nav-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0e7490,#22d3ee);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.65rem;color:#fff;letter-spacing:0.5px;}
-.cx-nav-title{font-weight:700;font-size:0.95rem;color:#f1f5f9;}
-.cx-nav-subtitle{font-size:0.68rem;color:#64748b;letter-spacing:0.3px;}
-.cx-nav-links{display:flex;align-items:center;gap:0.5rem;}
-.cx-nav-link{padding:6px 12px;border-radius:8px;font-size:0.78rem;font-weight:500;color:#94a3b8;transition:all 0.2s;white-space:nowrap;}
-.cx-nav-link:hover{color:#e2e8f0;background:rgba(255,255,255,0.05);text-decoration:none;}
-.cx-nav-back{padding:6px 14px;border-radius:8px;font-size:0.78rem;font-weight:600;color:#22d3ee;border:1px solid rgba(34,211,238,0.3);transition:all 0.2s;display:flex;align-items:center;gap:6px;}
-.cx-nav-back:hover{background:rgba(34,211,238,0.08);text-decoration:none;}
-
-/* Hero */
-.cx-hero{background:linear-gradient(135deg,rgba(12,74,110,0.88) 0%,rgba(22,78,99,0.85) 50%,rgba(15,23,42,0.92) 100%),url('assets/cx-calculator-hero.webp') center/cover no-repeat;padding:3rem 2rem 2.5rem;text-align:center;border-bottom:1px solid rgba(34,211,238,0.15);}
-.cx-hero h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#22d3ee,#06b6d4,#0891b2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem;}
-.cx-hero p{font-size:0.95rem;color:#94a3b8;max-width:700px;margin:0 auto;}
-
-/* Main Container */
-.cx-main{max-width:1400px;margin:0 auto;padding:2rem 1.5rem;}
-
-/* (Toolbar styles moved to standard section below) */
-
-/* Scenario Bar */
-.cx-scenario-bar{display:flex;gap:0.75rem;align-items:center;margin-bottom:1.5rem;padding:1rem 1.25rem;background:rgba(14,116,144,0.08);border:1px solid rgba(34,211,238,0.15);border-radius:12px;}
-.cx-scenario-bar label{font-size:0.82rem;font-weight:600;color:#94a3b8;white-space:nowrap;}
-.cx-scenario-bar select{flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,0.2);background:#1e293b;color:#e2e8f0;font-family:'JetBrains Mono',monospace;font-size:0.82rem;outline:none;}
-.cx-scenario-bar select:focus{border-color:#22d3ee;}
-.cx-scenario-bar button{padding:8px 18px;border-radius:8px;border:none;background:#0e7490;color:white;font-weight:600;font-size:0.82rem;font-family:inherit;cursor:pointer;transition:all 0.2s;}
-.cx-scenario-bar button:hover{background:#0891b2;}
-
-/* Input Grid */
-.cx-inputs{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
-.cx-input-group{display:flex;flex-direction:column;gap:6px;}
-.cx-input-group.cx-pro-input{opacity:0.9;filter:grayscale(1);position:relative;pointer-events:none;}
-.cx-input-group.cx-pro-input.unlocked{opacity:1;pointer-events:auto;}
-.cx-input-label{font-size:0.78rem;font-weight:600;color:#94a3b8;display:flex;align-items:center;gap:6px;}
-.cx-input-label .cx-pro-tag{font-size:0.6rem;padding:2px 6px;border-radius:4px;background:rgba(8,145,178,0.2);color:#0891b2;font-weight:700;letter-spacing:0.5px;}
-.cx-input-field{padding:10px 12px;border-radius:10px;border:1px solid rgba(148,163,184,0.2);background:#1e293b;color:#e2e8f0;font-family:'JetBrains Mono',monospace;font-size:0.88rem;outline:none;transition:border-color 0.2s;width:100%;}
-.cx-input-field:focus{border-color:#22d3ee;}
-.cx-input-range{width:100%;margin-top:4px;accent-color:#22d3ee;}
-.cx-range-val{font-size:0.75rem;color:#22d3ee;font-family:'JetBrains Mono',monospace;font-weight:600;}
-
-/* Action Bar */
-.cx-actions{display:flex;gap:0.75rem;margin-bottom:2rem;flex-wrap:wrap;}
-.cx-btn-primary{padding:12px 28px;border-radius:12px;border:none;background:linear-gradient(135deg,#0e7490,#06b6d4);color:white;font-weight:700;font-size:0.95rem;font-family:inherit;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 15px rgba(14,116,144,0.4);}
-.cx-btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(14,116,144,0.5);}
-.cx-btn-secondary{padding:12px 20px;border-radius:12px;border:1px solid rgba(148,163,184,0.2);background:transparent;color:#94a3b8;font-weight:600;font-size:0.88rem;font-family:inherit;cursor:pointer;transition:all 0.2s;}
-.cx-btn-secondary:hover{border-color:#22d3ee;color:#22d3ee;}
-
-/* Results Section */
-.cx-results{display:none;margin-bottom:2rem;}
-
-/* KPI Grid */
-.cx-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
-.cx-kpi-card{background:rgba(30,41,59,0.8);border:1px solid rgba(148,163,184,0.1);border-radius:4px;padding:1.25rem;text-align:center;transition:border-color 0.2s;}
-.cx-kpi-card:hover{border-color:rgba(34,211,238,0.3);}
-.cx-kpi-value{font-size:1.5rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:#22d3ee;margin-bottom:4px;}
-.cx-kpi-label{font-size:0.72rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;}
-.cx-kpi-sub{font-size:0.7rem;color:#475569;margin-top:2px;}
-
-/* ── Output card tooltips ── */
-@media(max-width:768px){}
-
-/* Charts Row */
-.cx-charts-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
-.cx-chart-box{background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.1);border-radius:4px;padding:1.25rem;}
-.cx-chart-box h3{font-size:0.88rem;font-weight:700;color:#e2e8f0;margin-bottom:1rem;}
-.cx-chart-box canvas{width:100%!important;max-height:280px;}
-
-/* Narrative */
-.cx-narrative{background:rgba(14,116,144,0.06);border-left:4px solid #0e7490;border-radius:0 12px 12px 0;padding:1.25rem 1.5rem;margin-bottom:1.5rem;font-size:0.85rem;color:#94a3b8;line-height:1.75;}
-.cx-narrative p{margin-bottom:0.75rem;}
-.cx-narrative p:last-child{margin-bottom:0;}
-.cx-narrative strong{color:#e2e8f0;}
-
-/* Pro Panels */
-.cx-pro-section{margin-bottom:2rem;}
-.cx-pro-panel{background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.1);border-radius:4px;padding:1.5rem;margin-bottom:1.25rem;position:relative;overflow:hidden;}
-.cx-pro-panel.gated{filter:blur(3px);pointer-events:none;user-select:none;}
-.cx-pro-panel.gated.unlocked{filter:none;pointer-events:auto;user-select:auto;}
-.cx-gate-overlay{display:none;position:absolute;inset:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(4px);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:0.75rem;border-radius:14px;}
-.cx-pro-panel.gated:not(.unlocked) .cx-gate-overlay{display:flex;}
-.cx-gate-overlay i{font-size:1.5rem;color:#0891b2;}
-.cx-gate-overlay span{font-size:0.82rem;color:#cbd5e1;font-weight:600;}
-.cx-gate-overlay button{padding:8px 20px;border-radius:8px;border:none;background:#64748b;color:white;font-weight:600;font-size:0.82rem;font-family:inherit;cursor:pointer;}
-.cx-pro-panel h3{font-size:0.95rem;font-weight:700;color:#e2e8f0;margin-bottom:1rem;display:flex;align-items:center;gap:8px;}
-.cx-pro-panel h3 .fa-crown{color:#0891b2;font-size:0.8rem;}
-.cx-kpi-grid-6{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1rem;}
-.cx-kpi-mini{background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.08);border-radius:4px;padding:0.75rem;text-align:center;}
-.cx-kpi-mini .cx-kpi-value{font-size:1.1rem;}
-.cx-kpi-mini .cx-kpi-label{font-size:0.65rem;}
-
-/* Gantt Chart */
-.cx-gantt-section{margin-bottom:2rem;}
-.cx-gantt-section h3{font-size:1.1rem;font-weight:700;color:#e2e8f0;margin-bottom:1rem;}
-.cx-gantt-wrap{background:rgba(15,23,42,0.8);border:1px solid rgba(148,163,184,0.1);border-radius:12px;overflow-x:auto;}
-.cx-gantt-table{width:100%;min-width:900px;border-collapse:collapse;}
-.cx-gantt-header{display:flex;border-bottom:2px solid rgba(148,163,184,0.15);background:rgba(30,41,59,0.5);}
-.cx-gantt-row{display:flex;align-items:center;border-bottom:1px solid rgba(148,163,184,0.06);min-height:30px;transition:background 0.15s;cursor:pointer;}
-.cx-gantt-row:hover{background:rgba(255,255,255,0.02);}
-.cx-gantt-row[data-level="1"]{background:rgba(14,116,144,0.06);font-weight:700;min-height:36px;}
-.cx-gantt-row[data-level="2"]{font-weight:600;}
-.cx-gantt-row.cx-hidden{display:none;}
-.cx-gantt-label{width:320px;min-width:320px;padding:4px 8px;font-size:0.8rem;display:flex;align-items:center;gap:4px;color:#e2e8f0;border-right:1px solid rgba(148,163,184,0.08);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.cx-gantt-label[data-level="2"]{padding-left:24px;}
-.cx-gantt-label[data-level="3"]{padding-left:44px;font-size:0.78rem;}
-.cx-gantt-label[data-level="4"]{padding-left:64px;font-size:0.75rem;color:#94a3b8;}
-.cx-gantt-label[data-level="5"]{padding-left:84px;font-size:0.72rem;color:#64748b;}
-.cx-gantt-label[data-level="6"]{padding-left:104px;font-size:0.7rem;color:#475569;}
-.cx-gantt-label[data-level="7"]{padding-left:120px;font-size:0.68rem;color:#475569;font-style:italic;}
-.cx-gantt-chevron{width:14px;height:14px;transition:transform 0.2s;flex-shrink:0;color:#64748b;font-size:0.6rem;}
-.cx-gantt-chevron.expanded{transform:rotate(90deg);}
-.cx-gantt-bars{flex:1;position:relative;height:26px;overflow:hidden;}
-.cx-gantt-bar{position:absolute;height:16px;top:5px;border-radius:3px;opacity:0.85;transition:opacity 0.15s;}
-.cx-gantt-bar:hover{opacity:1;}
-.cx-gantt-bar[data-phase="L0"]{background:#64748b;}
-.cx-gantt-bar[data-phase="L1"]{background:#3b82f6;}
-.cx-gantt-bar[data-phase="L2"]{background:#10b981;}
-.cx-gantt-bar[data-phase="L3"]{background:#f59e0b;}
-.cx-gantt-bar[data-phase="L4"]{background:#64748b;}
-.cx-gantt-bar[data-phase="L5"]{background:#ef4444;}
-.cx-gantt-bar[data-phase="L6"]{background:#f97316;}
-.cx-gantt-bar.critical{box-shadow:0 0 0 2px #fbbf24;}
-.cx-gantt-time-header{display:flex;height:28px;border-bottom:1px solid rgba(148,163,184,0.1);}
-.cx-gantt-week{flex:1;text-align:center;font-size:0.6rem;color:#475569;border-right:1px solid rgba(148,163,184,0.05);line-height:28px;}
-.cx-gantt-legend{display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap;}
-.cx-gantt-legend-item{display:flex;align-items:center;gap:6px;font-size:0.72rem;color:#94a3b8;}
-.cx-gantt-legend-color{width:14px;height:10px;border-radius:2px;}
-
-/* Gantt Toolbar */
-.cx-gantt-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:0.75rem;flex-wrap:wrap;}
-.cx-gantt-toolbar button,.cx-gantt-toolbar select{padding:5px 10px;border-radius:6px;border:1px solid rgba(148,163,184,0.15);background:rgba(30,41,59,0.7);color:#e2e8f0;font-size:0.72rem;cursor:pointer;font-family:inherit;transition:background 0.15s,border-color 0.15s;}
-.cx-gantt-toolbar button:hover{background:rgba(14,116,144,0.15);border-color:rgba(34,211,238,0.3);}
-.cx-gantt-toolbar button.active{background:rgba(14,116,144,0.2);border-color:#0e7490;}
-.cx-gantt-toolbar input[type="text"]{padding:5px 10px;border-radius:6px;border:1px solid rgba(148,163,184,0.15);background:rgba(15,23,42,0.6);color:#e2e8f0;font-size:0.72rem;width:180px;font-family:inherit;outline:none;}
-.cx-gantt-toolbar input[type="text"]:focus{border-color:rgba(34,211,238,0.4);}
-.cx-gantt-toolbar .cx-gantt-sep{width:1px;height:20px;background:rgba(148,163,184,0.15);margin:0 4px;}
-.cx-gantt-progress{display:flex;gap:6px;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;}
-.cx-gantt-progress-item{display:flex;align-items:center;gap:4px;font-size:0.68rem;color:#94a3b8;}
-.cx-gantt-progress-bar{width:60px;height:4px;background:rgba(148,163,184,0.1);border-radius:2px;overflow:hidden;}
-.cx-gantt-progress-fill{height:100%;border-radius:2px;transition:width 0.3s;}
-.cx-gantt-row .cx-act-btn{display:none;margin-left:auto;padding:2px 6px;font-size:0.6rem;border-radius:4px;border:1px solid rgba(34,211,238,0.3);background:rgba(14,116,144,0.1);color:#22d3ee;cursor:pointer;white-space:nowrap;flex-shrink:0;}
-.cx-gantt-row:hover .cx-act-btn{display:inline-flex;}
-.cx-gantt-row .cx-witness-badge{font-size:0.55rem;padding:1px 4px;border-radius:3px;font-weight:700;flex-shrink:0;margin-left:4px;}
-.cx-witness-H{background:rgba(239,68,68,0.15);color:#f87171;}
-.cx-witness-W{background:rgba(245,158,11,0.15);color:#fbbf24;}
-.cx-witness-R{background:rgba(34,211,238,0.15);color:#22d3ee;}
-
-/* Activity Drawer */
-.cx-drawer-backdrop{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:99990;}
-.cx-drawer-backdrop.active{display:block;}
-.cx-drawer{position:fixed;top:0;right:-520px;width:500px;max-width:90vw;height:100vh;background:linear-gradient(180deg,#0f172a 0%,#1e293b 100%);border-left:1px solid rgba(34,211,238,0.15);z-index:99991;transition:right 0.3s ease;overflow-y:auto;display:flex;flex-direction:column;}
-.cx-drawer.open{right:0;}
-.cx-drawer-header{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(148,163,184,0.1);display:flex;align-items:flex-start;gap:12px;flex-shrink:0;}
-.cx-drawer-header h3{font-size:0.95rem;font-weight:700;color:#e2e8f0;flex:1;line-height:1.4;}
-.cx-drawer-close{width:32px;height:32px;border-radius:8px;border:1px solid rgba(148,163,184,0.15);background:rgba(30,41,59,0.6);color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;}
-.cx-drawer-close:hover{color:#e2e8f0;border-color:rgba(239,68,68,0.4);}
-.cx-drawer-tabs{display:flex;border-bottom:1px solid rgba(148,163,184,0.1);flex-shrink:0;overflow-x:auto;}
-.cx-drawer-tab{padding:10px 16px;font-size:0.75rem;font-weight:600;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color 0.15s,border-color 0.15s;}
-.cx-drawer-tab:hover{color:#94a3b8;}
-.cx-drawer-tab.active{color:#22d3ee;border-bottom-color:#22d3ee;}
-.cx-drawer-body{flex:1;overflow-y:auto;padding:1.25rem 1.5rem;}
-.cx-drawer-body h4{font-size:0.82rem;font-weight:700;color:#e2e8f0;margin-bottom:0.75rem;display:flex;align-items:center;gap:6px;}
-.cx-drawer-body h4 i{color:#22d3ee;font-size:0.75rem;}
-.cx-drawer-body ol,.cx-drawer-body ul{margin:0 0 1rem 1.25rem;font-size:0.78rem;color:#94a3b8;line-height:1.7;}
-.cx-drawer-body li{margin-bottom:4px;}
-.cx-drawer-body p{font-size:0.78rem;color:#94a3b8;line-height:1.65;margin-bottom:0.75rem;}
-/* Editorial callout language, not the rejected slab. These three carried a
-   translucent wash plus a 3px saturated accent border -- the pattern recorded as
-   rejected in CLAUDE.md ("Saturated gradient callout fills + 3-4px accent
-   borders") and flagged by audit-vibecode's colored-left-stripe rule once that
-   rule stopped exempting anything nested under a drawer. Replacement is the same
-   language css/rz-article-dark.css applies to article callouts: flat color-mix
-   tint, 1px hairline, a 2px semantic rail carried by a local --cl. The accent
-   values are the editorial semantic set, not the Tailwind defaults that were
-   here (#10b981 / #ef4444 / #3b82f6). */
-.cx-drawer-body .cx-acc-box,
-.cx-drawer-body .cx-safety-box,
-.cx-drawer-body .cx-tools-box{
-  background:color-mix(in srgb, var(--cl) 6%, transparent);
-  border:1px solid color-mix(in srgb, var(--cl) 22%, transparent);
-  border-left:2px solid var(--cl);
-  border-radius:4px;padding:12px 14px;margin-bottom:1rem;
-}
-.cx-drawer-body .cx-acc-box{ --cl:#0a8a5a; }
-.cx-drawer-body .cx-safety-box{ --cl:#dc2626; }
-.cx-drawer-body .cx-tools-box{ --cl:#1d4ed8; }
-.cx-drawer-body .cx-acc-box strong{color:#6ee7b7;font-size:0.75rem;}
-.cx-drawer-body .cx-acc-box p{color:#94a3b8;margin-bottom:4px;font-size:0.75rem;}
-.cx-drawer-body .cx-safety-box li{color:#fca5a5;font-size:0.75rem;}
-.cx-drawer-body .cx-tools-box li{color:#93c5fd;font-size:0.75rem;}
-.cx-drawer-logsheet{width:100%;border-collapse:collapse;margin-bottom:1rem;}
-.cx-drawer-logsheet th{background:rgba(30,41,59,0.8);padding:8px 10px;text-align:left;font-size:0.7rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;border-bottom:1px solid rgba(148,163,184,0.1);}
-.cx-drawer-logsheet td{padding:6px 10px;font-size:0.75rem;color:#94a3b8;border-bottom:1px solid rgba(148,163,184,0.05);}
-.cx-drawer-logsheet .cx-ls-field{color:#e2e8f0;font-weight:500;}
-.cx-drawer-logsheet .cx-ls-input{background:rgba(15,23,42,0.4);border:1px dashed rgba(148,163,184,0.15);border-radius:4px;padding:4px 8px;min-width:120px;color:#475569;font-style:italic;}
-.cx-drawer-footer{padding:1rem 1.5rem;border-top:1px solid rgba(148,163,184,0.1);display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;}
-.cx-drawer-footer button{padding:8px 16px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;display:flex;align-items:center;gap:6px;}
-.cx-drawer-footer .cx-btn-export-proc{background:linear-gradient(135deg,#0e7490,#06b6d4);color:white;}
-.cx-drawer-footer .cx-btn-export-log{background:#64748b;color:white;}
-.cx-drawer-footer .cx-btn-export-pkg{background:linear-gradient(135deg,#059669,#10b981);color:white;}
-
-/* Resource Histogram */
-.cx-resource-histogram{margin-top:1rem;background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.1);border-radius:12px;padding:1rem;}
-.cx-resource-histogram h4{font-size:0.82rem;font-weight:700;color:#e2e8f0;margin-bottom:0.75rem;}
-
-/* Disclaimer */
-.cx-disclaimer{background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem;}
-.cx-disclaimer-inner{display:flex;align-items:flex-start;gap:0.75rem;}
-.cx-disclaimer-icon{color:#f59e0b;font-size:1rem;margin-top:2px;flex-shrink:0;}
-.cx-disc-title{font-weight:700;font-size:0.8rem;color:#e2e8f0;margin-bottom:0.5rem;}
-.cx-disc-text{font-size:0.72rem;color:#94a3b8;line-height:1.65;margin-bottom:0.5rem;}
-.cx-disc-text strong{color:#cbd5e1;}
-.cx-disc-text a{color:#22d3ee;text-decoration:underline;}
-.cx-disc-fine{font-size:0.68rem;color:#64748b;line-height:1.5;}
-
-/* Auth Modal */
-.cx-modal-backdrop{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;}
-.cx-modal-backdrop.active{display:flex;}
-.cx-modal{background:white;border-radius:20px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;animation:cxModalIn 0.3s ease;}
-@keyframes cxModalIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-
-/* Footer */
-.cx-footer{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);color:#94a3b8;padding:3rem 2rem;margin-top:2rem;}
-.cx-footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:2rem;align-items:start;}
-.cx-footer a{color:#94a3b8;text-decoration:none;font-size:0.8rem;}
-.cx-footer a:hover{color:#e2e8f0;}
-.cx-footer h4{font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:#64748b;margin-bottom:1rem;}
-.cx-footer ul{list-style:none;display:flex;flex-direction:column;gap:0.5rem;}
-
-/* Responsive */
-@media(max-width:1024px){.cx-inputs{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:768px){
-  .cx-nav-links{display:none;}
-  .cx-inputs{grid-template-columns:1fr;}
-  .cx-kpi-grid{grid-template-columns:repeat(2,1fr);}
-  .cx-charts-row{grid-template-columns:1fr;}
-  .cx-kpi-grid-6{grid-template-columns:repeat(2,1fr);}
-  .cx-footer-inner{grid-template-columns:1fr;}
-  .cx-gantt-label{width:200px;min-width:200px;}
-}
-@media(max-width:480px){
-  .cx-hero h1{font-size:1.4rem;}
-  .cx-kpi-grid{grid-template-columns:1fr;}
-  .cx-gantt-label{width:160px;min-width:160px;}
-  .cx-gantt-label[data-level="4"],.cx-gantt-label[data-level="5"],.cx-gantt-label[data-level="6"],.cx-gantt-label[data-level="7"]{font-size:0.68rem;padding-left:40px;}
-}
-
-/* ===== STANDARD TOOLBAR ===== */
-.cx-toolbar{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;margin-bottom:1.5rem;background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.1);border-radius:12px;flex-wrap:wrap;gap:0.75rem;}
-.cx-mode-bar{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;}
-.cx-toolbar-actions{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;}
-.cx-toolbar-btn{padding:0.55rem 1.1rem;border-radius:10px;border:1px solid rgba(148,163,184,0.15);background:transparent;color:#94a3b8;cursor:pointer;font-weight:600;font-size:0.85rem;font-family:inherit;transition:all 0.3s;white-space:nowrap;}
-.cx-toolbar-btn:hover{border-color:rgba(34,211,238,0.3);color:#e2e8f0;}
-.cx-toolbar-btn.active{border-color:rgba(34,211,238,0.5);background:linear-gradient(135deg,rgba(14,116,144,0.3),rgba(6,182,212,0.15));color:#22d3ee;box-shadow:0 2px 12px rgba(14,116,144,0.2);}
-.cx-btn-pro.active{border-color:rgba(8,145,178,0.5);background:linear-gradient(135deg,rgba(14,116,144,0.3),rgba(8,145,178,0.15));color:#0891b2;box-shadow:0 2px 12px rgba(100, 116, 139,0.2);}
-.cx-btn-reset{padding:0.5rem 1rem;border-radius:8px;border:1px solid rgba(148,163,184,0.15);background:transparent;color:#94a3b8;cursor:pointer;font-weight:500;font-size:0.82rem;font-family:inherit;transition:all 0.2s;}
-.cx-btn-reset:hover{border-color:#f59e0b;color:#f59e0b;}
-.cx-btn-pdf{padding:0.5rem 1rem;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;cursor:pointer;font-weight:600;font-size:0.82rem;font-family:inherit;transition:all 0.2s;}
-.cx-btn-pdf:hover{background:rgba(239,68,68,0.15);box-shadow:0 2px 8px rgba(239,68,68,0.2);}
-.cx-premium-btn{padding:0.5rem 1rem;border-radius:8px;border:1px solid rgba(8,145,178,0.5);background:#64748b;color:white;cursor:pointer;font-weight:700;font-size:0.82rem;font-family:inherit;transition:all 0.3s;box-shadow:0 2px 12px rgba(100, 116, 139,0.35);}
-.cx-premium-btn:hover{box-shadow:0 4px 20px rgba(100, 116, 139,0.5);transform:translateY(-1px);}
-.cx-premium-badge{display:none;padding:4px 12px;border-radius:4px;background:rgba(100,116,139,.12);border:1px solid rgba(100,116,139,.42);color:#64748b;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;}
-
-/* Legacy tooltip CSS removed — RZExplain owns tooltips (js/rz-explain.js) */
-
-/* ===== PRIVACY BADGE + BENCHMARK META ===== */
-.cx-privacy-badge{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:4px;margin-bottom:1rem;font-size:0.78rem;color:#10b981;font-weight:500;}
-.cx-benchmark-meta{display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.5rem;}
-.cx-benchmark-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.1);border-radius:4px;font-size:0.72rem;color:#94a3b8;}
-.cx-benchmark-tag i{font-size:0.65rem;color:#64748b;}
-
-/* ===== GLOSSARY ===== */
-.cx-glossary{margin-bottom:2rem;}
-.cx-glossary-toggle{display:flex;align-items:center;gap:8px;padding:12px 16px;background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.1);border-radius:12px;cursor:pointer;font-size:0.88rem;font-weight:600;color:#e2e8f0;width:100%;border:1px solid rgba(148,163,184,0.1);transition:all 0.2s;}
-.cx-glossary-toggle:hover{border-color:rgba(34,211,238,0.3);}
-.cx-glossary-toggle .cx-chevron{transition:transform 0.3s;font-size:0.7rem;margin-left:auto;color:#64748b;}
-.cx-glossary-toggle.open .cx-chevron{transform:rotate(90deg);}
-.cx-glossary-body{display:none;padding:1rem 1.25rem;background:rgba(30,41,59,0.4);border:1px solid rgba(148,163,184,0.08);border-top:none;border-radius:0 0 12px 12px;margin-top:-1px;}
-.cx-glossary-body.open{display:block;}
-.cx-glossary-item{padding:8px 0;border-bottom:1px solid rgba(148,163,184,0.06);font-size:0.8rem;}
-.cx-glossary-item:last-child{border-bottom:none;}
-.cx-glossary-term{font-weight:700;color:#22d3ee;margin-right:6px;}
-.cx-glossary-def{color:#94a3b8;}
-
-/* ===== LOADING SPINNER ===== */
-.cx-loading{display:none;text-align:center;padding:2rem;color:#94a3b8;font-size:0.85rem;}
-.cx-loading.active{display:block;}
-.cx-spinner{display:inline-block;width:24px;height:24px;border:3px solid rgba(34,211,238,0.2);border-top-color:#22d3ee;border-radius:50%;animation:cxSpin 0.8s linear infinite;margin-right:8px;vertical-align:middle;}
-@keyframes cxSpin{to{transform:rotate(360deg);}}
-
-/* ===== KPI ANIMATION ===== */
-@keyframes cxFadeInUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
-.cx-kpi-card{animation:cxFadeInUp 0.4s ease forwards;}
-.cx-kpi-card:nth-child(2){animation-delay:0.05s;}
-.cx-kpi-card:nth-child(3){animation-delay:0.1s;}
-.cx-kpi-card:nth-child(4){animation-delay:0.15s;}
-
-/* ===== RISK SCORE BADGE ===== */
-.cx-risk-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:4px;font-size:0.78rem;font-weight:700;letter-spacing:0.3px;}
-.cx-risk-low{background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);}
-.cx-risk-moderate{background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);}
-.cx-risk-high{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);}
-.cx-risk-very-high{background:rgba(220,38,38,0.2);color:#dc2626;border:1px solid rgba(220,38,38,0.4);}
-
-/* ===== RESOURCE PANEL ===== */
-.cx-resource-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-top:0.75rem;}
-.cx-resource-table th{background:rgba(14,116,144,0.15);color:#22d3ee;padding:8px 12px;text-align:left;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.3px;}
-.cx-resource-table td{padding:6px 12px;border-bottom:1px solid rgba(148,163,184,0.06);color:#cbd5e1;}
-.cx-resource-table tr:hover td{background:rgba(255,255,255,0.02);}
-
-/* ===== EQUIPMENT SUMMARY ===== */
-.cx-equip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:0.75rem;}
-.cx-equip-item{background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.06);border-radius:6px;padding:6px 10px;text-align:center;}
-.cx-equip-count{font-size:1rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:#22d3ee;}
-.cx-equip-name{font-size:0.65rem;color:#64748b;margin-top:2px;}
-
-/* ===== PHASE GATE INDICATORS ===== */
-.cx-phase-gates{display:flex;gap:4px;margin-top:0.75rem;flex-wrap:wrap;}
-.cx-phase-gate{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:0.7rem;font-weight:600;}
-.cx-gate-pass{background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);}
-.cx-gate-pending{background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);}
-.cx-gate-blocked{background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.2);}
-
-/* ===== PRINT STYLESHEET ===== */
-@media print{
-  body{background:white!important;color:#1f2937!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .cx-nav,.cx-footer,.cx-modal-backdrop,.cx-actions,.cx-scenario-bar,.cx-toolbar,.cx-premium-btn,.cx-premium-badge{display:none!important;}
-  .cx-results{display:block!important;}
-  .cx-pro-panel.gated{filter:none!important;}
-  .cx-gate-overlay{display:none!important;}
-  @page{margin:15mm;size:A4;}
-}
-
-/* ===== MOBILE REFINEMENTS ===== */
-@media(max-width:600px){
-  .cx-toolbar{flex-direction:column;align-items:stretch;}
-  .cx-mode-bar{justify-content:center;flex-wrap:wrap;}
-  .cx-toolbar-actions{justify-content:center;}
-  .cx-toolbar-btn{font-size:0.78rem;padding:0.5rem 0.75rem;}
-  .cx-equip-grid{grid-template-columns:repeat(2,1fr);}
-  .cx-benchmark-meta{flex-direction:column;gap:0.5rem;}
-  .cx-faq-section,.cx-manual-section{padding:0.75rem;}
-  .cx-manual-nav{flex-direction:column;}
-  .cx-manual-sidebar{width:100%;max-height:200px;overflow-y:auto;}
-  .cx-comparison-grid{grid-template-columns:1fr!important;}
-}
-
-/* ===== FAQ SECTION ===== */
-.cx-faq-section{display:none;max-width:1200px;margin:0 auto;padding:1.5rem;}
-.cx-faq-section.active{display:block;}
-.cx-faq-header{text-align:center;margin-bottom:2rem;}
-.cx-faq-header h2{font-size:1.6rem;font-weight:800;color:#f1f5f9;margin-bottom:0.5rem;}
-.cx-faq-header p{font-size:0.9rem;color:#94a3b8;}
-.cx-faq-search{width:100%;max-width:500px;margin:1rem auto;display:block;padding:12px 18px;border-radius:12px;border:2px solid rgba(148,163,184,0.15);background:rgba(30,41,59,0.6);color:#e2e8f0;font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s;}
-.cx-faq-search:focus{border-color:#0e7490;}
-.cx-faq-search::placeholder{color:#64748b;}
-.cx-faq-count{text-align:center;font-size:0.78rem;color:#64748b;margin-bottom:1.5rem;}
-.cx-faq-category{margin-bottom:1.5rem;border-radius:12px;background:rgba(30,41,59,0.4);border:1px solid rgba(148,163,184,0.08);overflow:hidden;}
-.cx-faq-cat-header{padding:1rem 1.25rem;background:rgba(14,116,144,0.08);cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:700;font-size:0.95rem;color:#e2e8f0;transition:background 0.2s;user-select:none;}
-.cx-faq-cat-header:hover{background:rgba(14,116,144,0.15);}
-.cx-faq-cat-header i:first-child{color:#22d3ee;width:20px;text-align:center;}
-.cx-faq-cat-chevron{margin-left:auto;transition:transform 0.3s;color:#64748b;font-size:0.8rem;}
-.cx-faq-cat-header.open .cx-faq-cat-chevron{transform:rotate(90deg);}
-.cx-faq-cat-body{display:none;padding:0.5rem 0;}
-.cx-faq-cat-header.open+.cx-faq-cat-body{display:block;}
-.cx-faq-item{border-bottom:1px solid rgba(148,163,184,0.06);}
-.cx-faq-item:last-child{border-bottom:none;}
-.cx-faq-q{padding:0.85rem 1.25rem;cursor:pointer;display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;font-weight:600;color:#cbd5e1;transition:color 0.2s;user-select:none;}
-.cx-faq-q:hover{color:#22d3ee;}
-.cx-faq-q-icon{color:#0e7490;font-size:0.75rem;margin-top:3px;flex-shrink:0;}
-.cx-faq-q-chevron{margin-left:auto;transition:transform 0.3s;color:#475569;font-size:0.7rem;flex-shrink:0;margin-top:3px;}
-.cx-faq-q.open .cx-faq-q-chevron{transform:rotate(90deg);}
-.cx-faq-a{display:none;padding:0 1.25rem 1rem 2.5rem;font-size:0.84rem;color:#94a3b8;line-height:1.7;}
-.cx-faq-q.open+.cx-faq-a{display:block;}
-.cx-faq-a code{background:rgba(14,116,144,0.15);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:#22d3ee;}
-.cx-faq-a strong{color:#cbd5e1;}
-.cx-faq-a ul,.cx-faq-a ol{margin:0.5rem 0;padding-left:1.5rem;}
-.cx-faq-a li{margin-bottom:0.3rem;}
-.cx-faq-highlight{background:rgba(234,179,8,0.25);padding:1px 3px;border-radius:3px;}
-.cx-faq-back{display:flex;align-items:center;gap:8px;margin-bottom:1.5rem;padding:8px 16px;border-radius:8px;background:rgba(14,116,144,0.1);border:1px solid rgba(14,116,144,0.3);color:#22d3ee;font-size:0.85rem;font-weight:600;cursor:pointer;transition:background 0.2s;width:fit-content;}
-.cx-faq-back:hover{background:rgba(14,116,144,0.2);}
-
-/* ===== MANUAL SECTION ===== */
-.cx-manual-section{display:none;max-width:1400px;margin:0 auto;padding:1.5rem;}
-.cx-manual-section.active{display:block;}
-.cx-manual-header{text-align:center;margin-bottom:2rem;}
-.cx-manual-header h2{font-size:1.6rem;font-weight:800;color:#f1f5f9;margin-bottom:0.5rem;}
-.cx-manual-header p{font-size:0.9rem;color:#94a3b8;}
-.cx-manual-nav{display:flex;gap:1.5rem;align-items:flex-start;}
-.cx-manual-sidebar{width:260px;flex-shrink:0;position:sticky;top:72px;max-height:calc(100vh - 100px);overflow-y:auto;background:rgba(30,41,59,0.5);border-radius:12px;border:1px solid rgba(148,163,184,0.08);padding:0.75rem 0;}
-.cx-manual-sidebar::-webkit-scrollbar{width:4px;}
-.cx-manual-sidebar::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.2);border-radius:2px;}
-.cx-manual-toc-item{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:0.82rem;color:#94a3b8;cursor:pointer;transition:all 0.2s;border-left:2px solid transparent;}
-.cx-manual-toc-item:hover{color:#e2e8f0;background:rgba(255,255,255,0.03);}
-.cx-manual-toc-item.active{color:#22d3ee;background:rgba(14,116,144,0.08);border-left-color:#22d3ee;font-weight:600;}
-.cx-manual-toc-num{width:22px;height:22px;border-radius:6px;background:rgba(14,116,144,0.15);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:#22d3ee;flex-shrink:0;}
-.cx-manual-content{flex:1;min-width:0;}
-.cx-manual-chapter{margin-bottom:2rem;background:rgba(30,41,59,0.4);border-radius:12px;border:1px solid rgba(148,163,184,0.08);overflow:hidden;}
-.cx-manual-chapter-head{padding:1.25rem 1.5rem;background:rgba(14,116,144,0.06);border-bottom:1px solid rgba(148,163,184,0.06);}
-.cx-manual-chapter-head h3{font-size:1.1rem;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:10px;}
-.cx-manual-chapter-head h3 i{color:#22d3ee;}
-.cx-manual-chapter-head p{font-size:0.82rem;color:#64748b;margin-top:0.3rem;}
-.cx-manual-chapter-body{padding:1.25rem 1.5rem;}
-.cx-manual-step{display:flex;gap:12px;margin-bottom:1rem;padding:0.75rem;border-radius:8px;background:rgba(15,23,42,0.4);border:1px solid rgba(148,163,184,0.05);}
-.cx-manual-step-num{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0e7490,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0;}
-.cx-manual-step-text{font-size:0.85rem;color:#cbd5e1;line-height:1.6;}
-.cx-manual-step-text strong{color:#f1f5f9;}
-.cx-manual-step-text code{background:rgba(14,116,144,0.15);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:#22d3ee;}
-.cx-manual-note{display:flex;gap:10px;padding:0.75rem 1rem;border-radius:4px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);margin:0.75rem 0;font-size:0.82rem;color:#fbbf24;line-height:1.6;}
-.cx-manual-note i{margin-top:2px;flex-shrink:0;}
-.cx-manual-tip{display:flex;gap:10px;padding:0.75rem 1rem;border-radius:8px;background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.2);margin:0.75rem 0;font-size:0.82rem;color:#22d3ee;line-height:1.6;}
-.cx-manual-tip i{margin-top:2px;flex-shrink:0;}
-.cx-manual-table{width:100%;border-collapse:collapse;font-size:0.82rem;margin:0.75rem 0;}
-.cx-manual-table th{background:rgba(14,116,144,0.1);color:#22d3ee;font-weight:600;padding:8px 12px;text-align:left;border:1px solid rgba(148,163,184,0.08);}
-.cx-manual-table td{padding:8px 12px;color:#cbd5e1;border:1px solid rgba(148,163,184,0.06);}
-.cx-manual-table tr:nth-child(even) td{background:rgba(15,23,42,0.3);}
-.cx-manual-kbd{display:inline-flex;padding:2px 8px;border-radius:4px;background:rgba(148,163,184,0.1);border:1px solid rgba(148,163,184,0.2);font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#94a3b8;margin:0 2px;}
-.cx-manual-back{display:flex;align-items:center;gap:8px;margin-bottom:1.5rem;padding:8px 16px;border-radius:8px;background:rgba(14,116,144,0.1);border:1px solid rgba(14,116,144,0.3);color:#22d3ee;font-size:0.85rem;font-weight:600;cursor:pointer;transition:background 0.2s;width:fit-content;}
-.cx-manual-back:hover{background:rgba(14,116,144,0.2);}
-
-/* ===== COMPARISON TABLE ===== */
-.cx-comparison-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0;}
-.cx-comparison-card{background:rgba(30,41,59,0.5);border-radius:4px;border:1px solid rgba(148,163,184,0.08);padding:1rem;}
-.cx-comparison-card h4{font-size:0.9rem;font-weight:700;color:#f1f5f9;margin-bottom:0.5rem;}
-
-/* ===== ENHANCED KPI ANIMATION ===== */
-.cx-kpi-card{transition:transform 0.2s,box-shadow 0.2s;}
-.cx-kpi-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
-
-/* ===== TOOLBAR EXTENSION ===== */
-.cx-btn-faq,.cx-btn-manual{background:transparent;border:1px solid rgba(148,163,184,0.15);color:#94a3b8;transition:all 0.2s;}
-.cx-btn-faq:hover,.cx-btn-manual:hover{color:#22d3ee;border-color:rgba(34,211,238,0.3);background:rgba(14,116,144,0.08);}
-.cx-btn-faq.active{color:#22d3ee;border-color:rgba(34,211,238,0.4);background:rgba(14,116,144,0.15);}
-.cx-btn-manual.active{color:#22d3ee;border-color:rgba(34,211,238,0.4);background:rgba(14,116,144,0.15);}
-
-/* ===== CURRENCY SELECTOR ===== */
-.cx-currency-sel{padding:4px 8px;border-radius:6px;background:rgba(30,41,59,0.6);border:1px solid rgba(148,163,184,0.15);color:#94a3b8;font-size:0.75rem;font-family:inherit;cursor:pointer;outline:none;}
-.cx-currency-sel:focus{border-color:#0e7490;}
-
-/* ===== SHARE URL ===== */
-.cx-share-btn{padding:4px 10px;border-radius:6px;background:rgba(14,116,144,0.1);border:1px solid rgba(14,116,144,0.3);color:#22d3ee;font-size:0.75rem;font-weight:600;cursor:pointer;transition:background 0.2s;display:inline-flex;align-items:center;gap:4px;}
-.cx-share-btn:hover{background:rgba(14,116,144,0.2);}
-
-/* ===== PHASE PROGRESS MINI ===== */
-.cx-phase-mini{display:flex;gap:4px;margin-top:6px;}
-.cx-phase-mini-bar{height:4px;border-radius:2px;flex:1;background:rgba(148,163,184,0.15);}
-.cx-phase-mini-bar.filled{background:#0e7490;}
-
-/* ===== ADDITIONAL RESPONSIVE ===== */
-@media(max-width:768px){
-  .cx-manual-nav{flex-direction:column;}
-  .cx-manual-sidebar{width:100%;position:static;max-height:none;}
-  .cx-faq-header h2,.cx-manual-header h2{font-size:1.3rem;}
-}
-
-/* ===== PLAN v13 DARK-MODE OVERRIDES (cx is dark-first; these reinforce for data-theme consistency) ===== */
-[data-theme="dark"] body { background:#0f172a; color:#e2e8f0; }
-[data-theme="dark"] .cx-nav { background:rgba(15,23,42,0.95); border-bottom-color:rgba(148,163,184,0.1); }
-[data-theme="dark"] .cx-card { background:#1e293b; border-color:rgba(255,255,255,0.08); color:#f1f5f9; }
-[data-theme="dark"] .cx-input-field { background:#0f172a; color:#f1f5f9; border-color:rgba(255,255,255,0.12); }
-[data-theme="dark"] .cx-input-label { color:#cbd5e1; }
-[data-theme="dark"] .cx-input-section { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-[data-theme="dark"] .cx-results-panel { background:#1e293b; border-color:rgba(255,255,255,0.08); }
-[data-theme="dark"] .cx-kpi-card { background:rgba(30,41,59,0.8); border-color:rgba(148,163,184,0.1); }
-[data-theme="dark"] .cx-kpi-label { color:#64748b; }
-[data-theme="dark"] .cx-kpi-sub { color:#475569; }
-[data-theme="dark"] .cx-chart-box { background:rgba(30,41,59,0.6); border-color:rgba(148,163,184,0.1); }
-[data-theme="dark"] .cx-chart-box h3 { color:#e2e8f0; }
-[data-theme="dark"] .cx-narrative { background:rgba(14,116,144,0.06); border-left-color:#0e7490; color:#94a3b8; }
-[data-theme="dark"] .cx-narrative strong { color:#e2e8f0; }
-[data-theme="dark"] .cx-pro-panel { background:rgba(30,41,59,0.6); border-color:rgba(148,163,184,0.1); }
-[data-theme="dark"] .cx-pro-panel h3 { color:#e2e8f0; }
-[data-theme="dark"] .cx-kpi-mini { background:rgba(15,23,42,0.5); border-color:rgba(148,163,184,0.08); }
-[data-theme="dark"] .cx-gantt-wrap { background:rgba(15,23,42,0.8); border-color:rgba(148,163,184,0.1); }
-[data-theme="dark"] .cx-gantt-header { background:rgba(30,41,59,0.5); border-bottom-color:rgba(148,163,184,0.15); }
-[data-theme="dark"] .cx-gantt-label { color:#e2e8f0; }
-[data-theme="dark"] .cx-gantt-legend-item { color:#94a3b8; }
-[data-theme="dark"] .cx-gantt-toolbar button,
-[data-theme="dark"] .cx-gantt-toolbar select { background:rgba(30,41,59,0.7); color:#e2e8f0; border-color:rgba(148,163,184,0.15); }
-[data-theme="dark"] .cx-modal { background:#1e293b; color:#f1f5f9; }
-[data-theme="dark"] .cx-scenario-bar { background:rgba(14,116,144,0.08); border-color:rgba(34,211,238,0.15); }
-[data-theme="dark"] .cx-scenario-bar label { color:#94a3b8; }
-[data-theme="dark"] .cx-scenario-bar select { background:#1e293b; color:#e2e8f0; border-color:rgba(148,163,184,0.2); }
-[data-theme="dark"] .cx-manual-chapter { background:rgba(30,41,59,0.4); border-color:rgba(148,163,184,0.08); }
-[data-theme="dark"] .cx-manual-chapter-head { background:rgba(14,116,144,0.06); border-bottom-color:rgba(148,163,184,0.06); }
-[data-theme="dark"] .cx-manual-chapter-head h3 { color:#f1f5f9; }
-[data-theme="dark"] .cx-manual-chapter-head p { color:#64748b; }
-[data-theme="dark"] .cx-manual-step { background:rgba(15,23,42,0.4); border-color:rgba(148,163,184,0.05); }
-[data-theme="dark"] .cx-manual-step-text { color:#cbd5e1; }
-[data-theme="dark"] .cx-manual-step-text strong { color:#f1f5f9; }
-[data-theme="dark"] .cx-comparison-card { background:rgba(30,41,59,0.5); border-color:rgba(148,163,184,0.08); }
-[data-theme="dark"] .cx-comparison-card h4 { color:#f1f5f9; }
-[data-theme="dark"] .cx-manual-table th { background:rgba(14,116,144,0.1); color:#22d3ee; border-color:rgba(148,163,184,0.08); }
-[data-theme="dark"] .cx-manual-table td { color:#cbd5e1; border-color:rgba(148,163,184,0.06); }
-[data-theme="dark"] .cx-currency-sel { background:rgba(30,41,59,0.6); color:#94a3b8; border-color:rgba(148,163,184,0.15); }
-/* a11y (v1.52.4) */
-[data-theme="dark"] a[href$="opex-calculator.html"], a[href$="opex-calculator.html"] { color:#34d399 !important; }
-#cxExportBtn { color:#f8b4b4 !important; }
-#cxExportBtn { color:#b91c1c !important; }
-#cxGeneratorType { color:#cbd5e1 !important; }
-#cxGeneratorType { color:#334155 !important; }
-[id^="cxProInput"] .cx-input-label { color:#94a3b8 !important; opacity:1 !important; }
-.cx-pro-tag { color:#67e8f9 !important; opacity:1 !important; }
-.cx-nav-subtitle { color:#94a3b8 !important; }
-[data-theme="dark"] div > p { color:#94a3b8; }
-[data-theme="dark"] a[href$="opex-calculator.html"] { color:#34d399 !important; }
-[data-theme="dark"] #cookieDecline { color:#94a3b8 !important; }
-/* The block that used to sit here had NO SELECTOR -- `{ --accent-purple:...; }`
-   straight after a comment -- so the browser discarded the whole rule and none of
-   those tokens was ever defined. Removed rather than given a selector, because
-   `var(--accent-` appears zero times on this page: they were dead either way. */
-[data-theme="dark"] { --accent-purple:#67e8f9; }
-[style*="rgb(8,145,178)"] { color:#64748b !important; }
-[data-theme="dark"] [style*="rgb(8,145,178)"] { color:#67e8f9 !important; }
-[style*="rgb(16, 185, 129)"] { color:#047857 !important; }
-[style*="rgb(108, 117, 125)"] { color:#495057 !important; }
-[style*="color: #64748b"], [style*="color:#64748b"] { color:#64748b !important; }
-[style*="color: #10b981"], [style*="color:#10b981"] { color:#047857 !important; }
-[style*="color: #6c757d"], [style*="color:#6c757d"] { color:#495057 !important; }
-#btnProMode { color:#475569 !important; }
-#modeIndicator { color:#155e75 !important; }
-[data-theme="dark"] #modeIndicator { color:#22d3ee !important; }
-#btnExportPDF { opacity:1 !important; }
-#btnExportPDF { color:#b91c1c !important; }
-[data-theme="dark"] #btnExportPDF { color:#f8b4b4 !important; }
-#cookieDecline { color:#475569 !important; }
-[data-theme="dark"] #cookieBanner a, [data-theme="dark"] .disc-text a { color:#93c5fd !important; }
-.disc-fine a { color:#1d4ed8 !important; }
-/* a11y final overrides */
-a[href$="opex-calculator.html"][href] { color:#34d399 !important; }
-#cxExportBtn[id] { color:#f8b4b4 !important; }
-#cxGeneratorType[id] { color:#cbd5e1 !important; }
-.cx-disc-fine[class] { color:#94a3b8 !important; }
-.cx-disc-fine a { text-decoration:underline !important; text-underline-offset:2px; color:#93c5fd !important; }
-</style>
-    <script src="js/rz-version.js?v=20261102-c14c0a29" defer></script>
+    <script src="js/rz-version.js?v=20261101-da8f0745" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
     <script src="js/rz-explain.js?v=20261101-97595a7c" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
-    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>    <meta property="og:image:alt" content="Data Center Commissioning Calculator | L0-L6 Cost & Schedule">
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>    <meta property="og:image:alt" content="Data Center Commissioning Calculator | L0-L6 Cost & Schedule">
 
-<style id="rz-skiplink-v1">
-.skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
-.skip-link:focus{top:0}
-[data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
-</style>
-<style id="b016-mobile-overflow-fix">
-/* B-016 mobile overflow fix — eliminate 390px horizontal scroll.
-   Root cause: the closed off-canvas .cx-drawer uses `right:-520px`
-   on a position:fixed box (width 500px / max 90vw), so its layout
-   box extends ~520px past the right viewport edge and that distance
-   is counted in document scrollWidth even though it is visually
-   off-screen. At <=768px we anchor the closed drawer at right:0 and
-   slide it out via transform:translateX (transforms do NOT enlarge
-   the scrollable area), so closed = no overflow, open = visible.
-   Open/close still toggled by the existing `.open` class. Also drop
-   the min-content floor on the scenario <select> and clip the shared
-   auth dropdown. Scoped <=768px — desktop drawer animation untouched. */
-@media (max-width: 768px) {
-    .cx-drawer {
-        right: 0;
-        max-width: 92vw;
-        transform: translateX(105%);
-        transition: transform 0.3s ease;
-    }
-    .cx-drawer.open {
-        right: 0;
-        transform: translateX(0);
-    }
-    .cx-scenario-bar {
-        flex-wrap: wrap;
-    }
-    .cx-scenario-bar select,
-    #cxScenarioSelect {
-        min-width: 0;
-        max-width: 100%;
-    }
-    .rz-user-dropdown {
-        max-width: calc(100vw - 24px);
-    }
-}
-/* a11y last-block overrides */
-a[href$="opex-calculator.html"] { color:#34d399 !important; }
-#cxExportBtn { color:#f8b4b4 !important; }
-#cxGeneratorType { color:#cbd5e1 !important; }
-</style>
-    <!-- PLAN02 E4 — editorial chrome (dark-only, chrome only) -->
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-<style>
-/* Mobile form controls: 16px, or iOS Safari zooms the viewport on focus and does not zoom back.
-   This page does not load styles.min.css, so it carries the rule itself. */
-@media (max-width: 768px) {
-  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
-  select, textarea { font-size: 16px !important; }
-}
-</style>
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261101-904870bb">
+    <link rel="stylesheet" href="css/rz-hub.css">
+    <link rel="stylesheet" href="css/rz-tool.css">
 </head>
-<body data-rz-calc="cx">
+<body class="hub tool" data-rz-calc="cx" data-rz-account-pill="off">
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-<!-- Navigation -->
-<nav class="cx-nav">
-  <div class="cx-nav-inner">
-    <a href="datacenter-solutions.html" class="cx-nav-brand">
-      <div class="cx-nav-logo">Cx</div>
-      <div>
-        <div class="cx-nav-title">Commissioning Calculator</div>
-        <div class="cx-nav-subtitle">L0–L6 Full Lifecycle</div>
-      </div>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
     </a>
-    <div class="cx-nav-links">
-      <a href="datacenter-solutions.html" class="cx-nav-link">DC Solutions</a>
-      <a href="capex-calculator.html" class="cx-nav-link" style="color:#f59e0b;">CAPEX</a>
-      <a href="opex-calculator.html" class="cx-nav-link" style="color:#10b981;">OPEX</a>
-      <a href="tier-advisor.html" class="cx-nav-link">Tier Advisor</a>
-      <a href="tia-942-checklist.html" class="cx-nav-link">TIA-942</a>
-      <button class="nav-theme-btn" id="navThemeBtn" onclick="toggleCalcTheme()" title="Toggle dark mode" aria-label="Toggle dark mode" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid rgba(148,163,184,0.15);background:transparent;color:#94a3b8;cursor:pointer;transition:all 0.25s;font-size:0.9rem;padding:0;flex-shrink:0;"><i id="themeIcon" class="fas fa-moon"></i></button>
-      <a href="index.html" class="cx-nav-back"><i class="fas fa-arrow-left"></i> Portfolio</a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
     </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+          <div class="nav-auth-wrap" id="navAuthWrap">
+        <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()"><span class="nav-login-text">Login</span></button>
+        <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()"><span class="nav-user-avatar" id="navUserAvatar">U</span><span class="nav-user-email" id="navUserEmail"></span></button>
+        <div class="nav-user-dropdown" id="navUserDropdown">
+          <div class="nav-dd-header"><div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div><div class="nav-dd-email" id="navDdEmail"></div></div>
+          <a class="nav-dd-link" href="account.html">My account and saved scenarios</a>
+          <button class="nav-dd-logout" onclick="logoutPremium()">Logout</button>
+        </div>
+      </div>
+    <button class="nav-icon theme-toggle" id="navThemeBtn" onclick="toggleCalcTheme()" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i id="themeIcon" class="fas fa-moon"></i></button>
   </div>
 </nav>
-    <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
-<!-- Hero -->
-<section class="cx-hero">
-  <h1><i class="fas fa-clipboard-check" style="margin-right:10px;"></i>Data Center Commissioning Calculator</h1>
-  <p>Estimate commissioning cost, schedule, and resource requirements across the full lifecycle — from Design Planning (L0) through Integrated Systems Testing (L5) to Turnover &amp; Closeout (L6). Supports enterprise, colo, hyperscale, and AI factory archetypes.</p>
-</section>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow">DC Solutions · <b>Calculator</b> · Commissioning</p>
+    <h1>Commissioning cost and schedule <span class="muted">from design review to turnover, L0 to L6</span></h1>
+    <p class="lede">Cost, duration, cost per kW and share of CAPEX for commissioning a data centre, with a schedule of every test activity. Each leaf activity opens its procedure, acceptance criteria, logsheet and tools. Computed in your browser from the inputs on the left.</p>
+    <p class="basis">model v2.0 · basis ASHRAE Guideline 0-2019, NETA ATS-2025, BSRIA BG 49:2023 · 30 regions, 8 archetypes · updated 2026-03</p>
+    <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → Calculators → Commissioning</p>
+  </div>
+</header>
 
-<!-- Main Calculator -->
-<div class="cx-main">
-
-  <!-- Toolbar (Standard: Free Assessment + Pro Analysis + Reset + Export PDF) -->
-  <div class="cx-toolbar">
-    <div class="cx-mode-bar">
-      <button type="button" class="cx-toolbar-btn cx-btn-free active" onclick="cxSwitchMode('free')"><i class="fas fa-chart-bar" style="margin-right:6px;"></i>Free Assessment</button>
-      <button type="button" class="cx-toolbar-btn cx-btn-pro" onclick="cxSwitchMode('pro')"><i class="fas fa-crown" style="margin-right:6px;"></i>Full analysis</button>
-      <span id="cxPremiumBadge" class="cx-premium-badge">FULL ACCESS</span>
-      <div style="width:1px;height:24px;background:rgba(148,163,184,0.15);margin:0 4px;"></div>
-      <button type="button" class="cx-toolbar-btn cx-btn-manual" onclick="cxSwitchMode('manual')"><i class="fas fa-book" style="margin-right:6px;"></i>Manual</button>
-      <button type="button" class="cx-toolbar-btn cx-btn-faq" onclick="cxSwitchMode('faq')"><i class="fas fa-circle-question" style="margin-right:6px;"></i>FAQ</button>
+<div class="wrap">
+  <div class="tool-bar" role="toolbar" aria-label="Mode and actions">
+    <div class="seg" role="group" aria-label="Analysis depth">
+      <button type="button" class="cx-toolbar-btn cx-btn-free active" aria-pressed="true" onclick="cxSwitchMode('free')">Free</button>
+      <button type="button" class="cx-toolbar-btn cx-btn-pro" data-mode="pro" aria-pressed="false" onclick="cxSwitchMode('pro')">Full</button>
     </div>
+    <span id="cxPremiumBadge" class="cx-premium-badge" hidden></span>
+    <span class="spacer"></span>
     <div class="cx-toolbar-actions">
-      <select class="cx-currency-sel" id="cxCurrency" onchange="cxSetCurrency(this.value)" title="Display Currency" aria-label="CX Currency">
-        <option value="USD">USD $</option>
-        <option value="EUR">EUR &euro;</option>
-        <option value="GBP">GBP &pound;</option>
-        <option value="AUD">AUD A$</option>
-        <option value="SGD">SGD S$</option>
-        <option value="JPY">JPY &yen;</option>
-        <option value="AED">AED د.إ</option>
-        <option value="INR">INR &#8377;</option>
-      </select>
-      <button type="button" class="cx-share-btn" onclick="cxShareConfig()" title="Copy shareable link"><i class="fas fa-share-nodes"></i> Share</button>
-      <button type="button" class="cx-btn-reset" onclick="cxReset()"><i class="fas fa-undo" style="margin-right:6px;"></i>Reset</button>
-      <button type="button" class="cx-btn-pdf" onclick="cxExportPDF()" id="cxExportBtn"><i class="fas fa-file-pdf" style="margin-right:6px;"></i>Export PDF</button>
-      <button type="button" id="btnSaveAccount" onclick="rzScenario&&rzScenario.saveToAccount('cx',{msgEl:'acctSaveMsg'})" style="padding:12px 20px;border-radius:12px;border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;font-weight:700;font-size:0.88rem;font-family:inherit;cursor:pointer;"><i class="fas fa-cloud" style="margin-right:6px;"></i>Save to my account</button>
-      <button type="button" id="cxPremiumBtn" class="cx-premium-btn" onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:6px;"></i>Sign in</button>
+      <button type="button" class="tool-btn cx-share-btn" onclick="cxShareConfig()" title="Copy a link to this configuration">Share</button>
+      <button type="button" class="tool-btn cx-btn-reset" onclick="cxReset()">Reset</button>
+      <button type="button" class="tool-btn" id="btnSaveAccount" onclick="rzScenario&&rzScenario.saveToAccount('cx',{msgEl:'acctSaveMsg'})">Save</button>
+      <button type="button" class="tool-btn cx-btn-pdf" onclick="cxExportPDF()" id="cxExportBtn">Export PDF</button>
     </div>
-    <div id="acctSaveMsg" style="display:none;margin-top:6px;font-size:0.72rem;text-align:center;"></div>
+    <div id="acctSaveMsg" class="cx-save-msg" style="display:none;"></div>
   </div>
 
-  <!-- Scenario Presets -->
-  <div class="cx-scenario-bar">
-    <label><i class="fas fa-layer-group" style="margin-right:6px;"></i>Scenario Preset:</label>
-    <select id="cxScenarioSelect" aria-label="CX Scenario Select">
+  <div class="tool-bench">
+    <aside class="tool-inputs cx-inputs" id="cxInputsGrid" data-explain-scan aria-label="Inputs">
+      <div class="in-group cx-scenario-bar">
+        <h2>Scenario</h2>
+        <div class="cx-scenario-row">
+          <select id="cxScenarioSelect" class="cx-scenario-sel" aria-label="Scenario preset">
       <option value="">— Custom Configuration —</option>
       <option value="enterprise_2mw">Enterprise DC — 2MW Tier III</option>
       <option value="colo_10mw">Colocation — 10MW Tier III+</option>
@@ -816,23 +235,22 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       <option value="fast_track">Fast-Track Repurposed — 10MW Warehouse</option>
       <option value="recommission">Recommissioning — 3MW Existing</option>
     </select>
-    <button onclick="cxLoadScenario()">Load</button>
-  </div>
+          <button type="button" class="tool-btn" onclick="cxLoadScenario()">Load</button>
+        </div>
+      </div>
+      <div class="in-group">
+        <h2>Facility</h2>
 
-  <!-- Inputs Grid -->
-  <div class="cx-inputs" id="cxInputsGrid" data-explain-scan>
-    <!-- Input 1: IT Load -->
     <div class="cx-input-group">
-      <label class="cx-input-label" data-explain="it-load"><i class="fas fa-bolt" style="color:#f59e0b;"></i> IT Load Capacity</label>
+      <label class="cx-input-label" data-explain="it-load">IT Load Capacity</label>
       <input type="range" id="cxItLoad" class="cx-input-range" min="100" max="100000" step="100" value="2000" oninput="document.getElementById('cxItLoadVal').textContent=this.value+' kW';document.getElementById('cxItLoadNum').value=this.value;" aria-label="CX It Load">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div class="cx-range-row">
         <span class="cx-range-val" id="cxItLoadVal">2000 kW</span>
-        <input type="number" id="cxItLoadNum" class="cx-input-field" style="width:110px;text-align:right;padding:6px 8px;font-size:0.8rem;" value="2000" min="100" max="100000" step="100" oninput="document.getElementById('cxItLoad').value=this.value;document.getElementById('cxItLoadVal').textContent=this.value+' kW';" aria-label="CX It Load Num">
+        <input type="number" id="cxItLoadNum" class="cx-input-field" value="2000" min="100" max="100000" step="100" oninput="document.getElementById('cxItLoad').value=this.value;document.getElementById('cxItLoadVal').textContent=this.value+' kW';" aria-label="CX It Load Num">
       </div>
     </div>
-    <!-- Input 2: Cooling Type -->
     <div class="cx-input-group">
-      <label class="cx-input-label" data-explain="cooling-type"><i class="fas fa-snowflake" style="color:#22d3ee;"></i> Cooling Type</label>
+      <label class="cx-input-label" data-explain="cooling-type">Cooling Type</label>
       <select id="cxCoolingType" class="cx-input-field" aria-label="CX Cooling Type">
         <option value="air">Raised Floor CRAC/CRAH</option>
         <option value="inrow">In-Row Precision</option>
@@ -841,9 +259,8 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
         <option value="immersion">Immersion Cooling</option>
       </select>
     </div>
-    <!-- Input 3: Redundancy -->
     <div class="cx-input-group">
-      <label class="cx-input-label" data-explain="redundancy"><i class="fas fa-shield-halved" style="color:#10b981;"></i> Redundancy Level</label>
+      <label class="cx-input-label" data-explain="redundancy">Redundancy Level</label>
       <select id="cxRedundancy" class="cx-input-field" aria-label="CX Redundancy">
         <option value="N">N (No Redundancy)</option>
         <option value="N+1" selected>N+1 (Component)</option>
@@ -851,9 +268,8 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
         <option value="2N+1">2N+1 (System + Component)</option>
       </select>
     </div>
-    <!-- Input 4: Rack Density -->
     <div class="cx-input-group">
-      <label class="cx-input-label" data-explain="rack-density"><i class="fas fa-server" style="color:#64748b;"></i> Rack Density</label>
+      <label class="cx-input-label" data-explain="rack-density">Rack Density</label>
       <select id="cxRackDensity" class="cx-input-field" aria-label="CX Rack Density">
         <option value="standard">Standard (5–7 kW/rack)</option>
         <option value="medium">Medium (10–15 kW/rack)</option>
@@ -861,9 +277,8 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
         <option value="ai_hpc">AI/HPC (50–100 kW/rack)</option>
       </select>
     </div>
-    <!-- Input 5: Building Type -->
     <div class="cx-input-group">
-      <label class="cx-input-label" data-explain="building-type"><i class="fas fa-building" style="color:#64748b;"></i> Building Type</label>
+      <label class="cx-input-label" data-explain="building-type">Building Type</label>
       <select id="cxBuildingType" class="cx-input-field" aria-label="CX Building Type">
         <option value="warehouse">Converted Warehouse</option>
         <option value="modular">Modular / Prefab</option>
@@ -871,9 +286,8 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
         <option value="highrise">Multi-Story</option>
       </select>
     </div>
-    <!-- Input 6: Fire Suppression -->
     <div class="cx-input-group">
-      <label class="cx-input-label" data-explain="fire-suppression"><i class="fas fa-fire-extinguisher" style="color:#ef4444;"></i> Fire Suppression</label>
+      <label class="cx-input-label" data-explain="fire-suppression">Fire Suppression</label>
       <select id="cxFireSuppression" class="cx-input-field" aria-label="CX Fire Suppression">
         <option value="fm200">FM-200 (HFC-227ea)</option>
         <option value="novec" selected>Novec 1230</option>
@@ -883,9 +297,8 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
         <option value="water_mist">Water Mist</option>
       </select>
     </div>
-    <!-- Input 7: UPS Type -->
     <div class="cx-input-group">
-      <label class="cx-input-label" data-explain="ups-type"><i class="fas fa-car-battery" style="color:#f59e0b;"></i> UPS Type</label>
+      <label class="cx-input-label" data-explain="ups-type">UPS Type</label>
       <select id="cxUpsType" class="cx-input-field" aria-label="CX UPS Type">
         <option value="standalone">Standalone (Legacy)</option>
         <option value="modular" selected>Modular (Hot-Swap)</option>
@@ -893,9 +306,8 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
         <option value="rotary">Rotary (DRUPS)</option>
       </select>
     </div>
-    <!-- Input 8: Region -->
     <div class="cx-input-group">
-      <label class="cx-input-label" data-explain="region-location"><i class="fas fa-globe" style="color:#3b82f6;"></i> Region</label>
+      <label class="cx-input-label" data-explain="region-location">Region</label>
       <select id="cxRegion" class="cx-input-field" aria-label="CX Region">
         <optgroup label="North America">
           <option value="us_virginia" selected>Northern Virginia (Ashburn)</option>
@@ -938,10 +350,11 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
         </optgroup>
       </select>
     </div>
-
-    <!-- Pro Inputs (9-14) -->
-    <div class="cx-input-group cx-pro-input" id="cxProInput9">
-      <label class="cx-input-label" data-explain="generator-type"><i class="fas fa-gas-pump" style="color:#94a3b8;"></i> Generator Type <span class="cx-pro-tag">FULL</span></label>
+      </div>
+      <div class="in-group cx-pro-group">
+        <h2>Full analysis inputs</h2>
+<div class="cx-input-group cx-pro-input" id="cxProInput9">
+      <label class="cx-input-label" data-explain="generator-type">Generator Type</label>
       <select id="cxGeneratorType" class="cx-input-field" aria-label="CX Generator Type">
         <option value="diesel" selected>Diesel</option>
         <option value="gas">Natural Gas</option>
@@ -950,7 +363,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput10">
-      <label class="cx-input-label" data-explain="seismic-zone"><i class="fas fa-mountain" style="color:#94a3b8;"></i> Seismic Zone <span class="cx-pro-tag">FULL</span></label>
+      <label class="cx-input-label" data-explain="seismic-zone">Seismic Zone</label>
       <select id="cxSeismicZone" class="cx-input-field" aria-label="CX Seismic Zone">
         <option value="0">Zone 0 — No Risk</option>
         <option value="1" selected>Zone 1 — Low</option>
@@ -960,7 +373,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput11">
-      <label class="cx-input-label" data-explain="cx-scope"><i class="fas fa-list-check" style="color:#94a3b8;"></i> Cx Scope <span class="cx-pro-tag">FULL</span></label>
+      <label class="cx-input-label" data-explain="cx-scope">Cx Scope</label>
       <select id="cxScope" class="cx-input-field" aria-label="CX Scope">
         <option value="new_build" selected>New Build (Full L1-L5)</option>
         <option value="retrofit">Retrofit / Upgrade</option>
@@ -969,7 +382,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput12">
-      <label class="cx-input-label" data-explain="substation-type"><i class="fas fa-plug-circle-bolt" style="color:#94a3b8;"></i> Substation <span class="cx-pro-tag">FULL</span></label>
+      <label class="cx-input-label" data-explain="substation-type">Substation</label>
       <select id="cxSubstation" class="cx-input-field" aria-label="CX Substation">
         <option value="utility_fed">Utility-Fed (No HV)</option>
         <option value="single_sub" selected>Single Substation</option>
@@ -978,7 +391,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput13">
-      <label class="cx-input-label" data-explain="cx-bms-dcim"><i class="fas fa-network-wired" style="color:#94a3b8;"></i> BMS/DCIM <span class="cx-pro-tag">FULL</span></label>
+      <label class="cx-input-label" data-explain="cx-bms-dcim">BMS/DCIM</label>
       <select id="cxBmsComplexity" class="cx-input-field" aria-label="CX Bms Complexity">
         <option value="basic">Basic BMS</option>
         <option value="standard" selected>Standard BMS + Head-End</option>
@@ -987,7 +400,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput14">
-      <label class="cx-input-label" data-explain="delivery-method"><i class="fas fa-truck-fast" style="color:#94a3b8;"></i> Delivery Method <span class="cx-pro-tag">FULL</span></label>
+      <label class="cx-input-label" data-explain="delivery-method">Delivery Method</label>
       <select id="cxDeliveryMethod" class="cx-input-field" aria-label="CX Delivery Method">
         <option value="traditional" selected>Traditional (DBB)</option>
         <option value="design_build">Design-Build</option>
@@ -995,50 +408,60 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
         <option value="modular_pod">Modular / Pod</option>
       </select>
     </div>
+      </div>
+      <div class="in-group">
+        <h2>Display</h2>
+        <div class="cx-input-group">
+          <label class="cx-input-label" for="cxCurrency">Currency</label>
+          <select class="cx-currency-sel cx-input-field" id="cxCurrency" onchange="cxSetCurrency(this.value)" aria-label="Display currency">
+        <option value="USD">USD $</option>
+        <option value="EUR">EUR &euro;</option>
+        <option value="GBP">GBP &pound;</option>
+        <option value="AUD">AUD A$</option>
+        <option value="SGD">SGD S$</option>
+        <option value="JPY">JPY &yen;</option>
+        <option value="AED">AED د.إ</option>
+        <option value="INR">INR &#8377;</option>
+      </select>
+        </div>
+      </div>
+      <div class="cx-actions">
+        <button type="button" class="tool-btn cx-btn-primary" onclick="cxCalculate(true)">Calculate</button>
+      </div>
+    </aside>
+
+    <section class="tool-results cx-results" id="cxResults" aria-label="Results">
+      <div class="res-head"><h2>Commissioning estimate</h2><span class="basis">L0 to L6 · 15 % contingency included</span></div>
+      <div class="rz-calc-validation tool-valid" id="cxValidation" role="alert" aria-live="polite" hidden></div>
+      <div class="res-group"><h3>Headline</h3>
+      <div class="cx-kpi-grid" id="cxKpiGrid" data-rz-fact-list>
+      <div class="cx-kpi-card is-key"><div class="cx-kpi-value" id="cxKpiTotal">—</div><div class="cx-kpi-label" data-explain="cx-total-cx-cost">Total commissioning cost</div><div class="cx-kpi-sub" id="cxKpiTotalSub"></div></div>
+      <div class="cx-kpi-card"><div class="cx-kpi-value" id="cxKpiWeeks">—</div><div class="cx-kpi-label" data-explain="cx-duration-weeks">Duration, weeks</div><div class="cx-kpi-sub" id="cxKpiWeeksSub"></div></div>
+      <div class="cx-kpi-card"><div class="cx-kpi-value" id="cxKpiPerKw">—</div><div class="cx-kpi-label" data-explain="cx-cost-per-kw">Cost per kW of IT load</div><div class="cx-kpi-sub" id="cxKpiPerKwSub"></div></div>
+      <div class="cx-kpi-card"><div class="cx-kpi-value" id="cxKpiCapex">—</div><div class="cx-kpi-label" data-explain="cx-of-capex">Share of CAPEX</div><div class="cx-kpi-sub" id="cxKpiCapexSub"></div></div>
+    </div>
+      </div>
+      <figure class="fig res-fig cx-chart-box"><canvas id="cxChartLevel" aria-label="Cost by commissioning level"></canvas><figcaption><b>FIG. 1</b> Cost by commissioning level · amber = L5 integrated systems test</figcaption></figure>
+      <figure class="fig res-fig cx-chart-box"><canvas id="cxChartSchedule" aria-label="Schedule by level in weeks"></canvas><figcaption><b>FIG. 2</b> Duration by level, weeks · computed from the inputs</figcaption></figure>
+      <div class="tool-note cx-narrative" id="cxNarrative"></div>
+      <div class="cx-loading tool-note" id="cxLoading">Running the Monte Carlo simulation, 10,000 runs.</div>
+    </section>
   </div>
 
-  <!-- Calculate Button -->
-  <div class="cx-actions">
-    <button class="cx-btn-primary" onclick="cxCalculate()"><i class="fas fa-calculator" style="margin-right:8px;"></i>Calculate Commissioning Cost</button>
-  </div>
-
-  <div class="rz-calc-validation" id="cxValidation" role="alert" aria-live="polite" hidden></div>
-
-  <!-- Loading Spinner -->
-  <div class="cx-loading" id="cxLoading"><span class="cx-spinner"></span>Running Monte Carlo simulation (10,000 iterations)...</div>
-
-  <!-- Free Results -->
-  <div class="cx-results" id="cxResults">
-    <div class="cx-kpi-grid" id="cxKpiGrid">
-      <div class="cx-kpi-card"><div class="cx-kpi-value" id="cxKpiTotal">—</div><div class="cx-kpi-label">Total Cx Cost <span data-explain="cx-total-cx-cost">?</span></div><div class="cx-kpi-sub" id="cxKpiTotalSub"></div></div>
-      <div class="cx-kpi-card"><div class="cx-kpi-value" id="cxKpiWeeks">—</div><div class="cx-kpi-label">Duration (Weeks) <span data-explain="cx-duration-weeks">?</span></div><div class="cx-kpi-sub" id="cxKpiWeeksSub"></div></div>
-      <div class="cx-kpi-card"><div class="cx-kpi-value" id="cxKpiPerKw">—</div><div class="cx-kpi-label">Cost per kW <span data-explain="cx-cost-per-kw">?</span></div><div class="cx-kpi-sub" id="cxKpiPerKwSub"></div></div>
-      <div class="cx-kpi-card"><div class="cx-kpi-value" id="cxKpiCapex">—</div><div class="cx-kpi-label">% of CAPEX <span data-explain="cx-of-capex">?</span></div><div class="cx-kpi-sub" id="cxKpiCapexSub"></div></div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="cx-charts-row">
-      <div class="cx-chart-box"><h3><i class="fas fa-chart-bar" style="color:#22d3ee;margin-right:8px;"></i>Cost by Commissioning Level</h3><canvas id="cxChartLevel"></canvas></div>
-      <div class="cx-chart-box"><h3><i class="fas fa-clock" style="color:#64748b;margin-right:8px;"></i>Schedule by Level (Weeks)</h3><canvas id="cxChartSchedule"></canvas></div>
-    </div>
-
-    <!-- Narrative -->
-    <div class="cx-narrative" id="cxNarrative"></div>
-
-    <!-- Gantt Chart -->
-    <div class="cx-gantt-section" id="cxGanttSection">
-      <h3><i class="fas fa-diagram-project" style="color:#22d3ee;margin-right:8px;"></i>Interactive Commissioning Schedule</h3>
+  <div class="cx-below">
+    <figure class="fig cx-gantt-section" id="cxGanttSection">
+      <div class="cx-gantt-head"><h2>Commissioning schedule</h2><span class="basis">click a level to expand it · Detail opens the procedure</span></div>
       <div class="cx-gantt-toolbar" id="cxGanttToolbar">
-        <input type="text" id="cxGanttSearch" placeholder="Search activities..." oninput="cxFilterGantt(this.value)" aria-label="Search activities...">
+        <input type="text" id="cxGanttSearch" placeholder="Search activities..." oninput="cxFilterGantt(this.value)" aria-label="Search activities">
         <div class="cx-gantt-sep"></div>
-        <button onclick="cxExpandAllGantt()" title="Expand All"><i class="fas fa-expand"></i> Expand</button>
-        <button onclick="cxCollapseAllGantt()" title="Collapse All"><i class="fas fa-compress"></i> Collapse</button>
+        <button type="button" onclick="cxExpandAllGantt()" title="Expand All">Expand</button>
+        <button type="button" onclick="cxCollapseAllGantt()" title="Collapse All">Collapse</button>
         <div class="cx-gantt-sep"></div>
-        <button onclick="cxGanttZoom('day')" id="cxZoomDay" title="Day view">Day</button>
-        <button onclick="cxGanttZoom('week')" id="cxZoomWeek" class="active" title="Week view">Week</button>
-        <button onclick="cxGanttZoom('month')" id="cxZoomMonth" title="Month view">Month</button>
+        <button type="button" onclick="cxGanttZoom('day')" id="cxZoomDay" title="Day view">Day</button>
+        <button type="button" onclick="cxGanttZoom('week')" id="cxZoomWeek" class="active" title="Week view">Week</button>
+        <button type="button" onclick="cxGanttZoom('month')" id="cxZoomMonth" title="Month view">Month</button>
         <div class="cx-gantt-sep"></div>
-        <select id="cxGanttPhaseFilter" onchange="cxFilterGanttPhase(this.value)" aria-label="CX Gantt Phase Filter">
+        <select id="cxGanttPhaseFilter" onchange="cxFilterGanttPhase(this.value)" aria-label="Filter by level">
           <option value="all">All Phases</option>
           <option value="L0">L0 — Planning</option>
           <option value="L1">L1 — FAT</option>
@@ -1049,239 +472,178 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
           <option value="L6">L6 — Turnover</option>
         </select>
         <div class="cx-gantt-sep"></div>
-        <button onclick="cxExportGanttCSV()" title="Export CSV"><i class="fas fa-file-csv"></i> CSV</button>
-        <button onclick="cxExportBulkProcedures()" title="Export All Procedures"><i class="fas fa-book"></i> Procedures</button>
+        <button type="button" onclick="cxExportGanttCSV()" title="Export CSV">CSV</button>
+        <button type="button" onclick="cxExportBulkProcedures()" title="Export All Procedures">Procedures</button>
       </div>
       <div class="cx-gantt-progress" id="cxGanttProgress"></div>
       <div class="cx-gantt-wrap" id="cxGanttWrap"></div>
       <div class="cx-gantt-legend">
-        <div class="cx-gantt-legend-item"><div class="cx-gantt-legend-color" style="background:#64748b;"></div>L0 — Design &amp; Planning</div>
-        <div class="cx-gantt-legend-item"><div class="cx-gantt-legend-color" style="background:#3b82f6;"></div>L1 — FAT</div>
-        <div class="cx-gantt-legend-item"><div class="cx-gantt-legend-color" style="background:#10b981;"></div>L2 — Installation</div>
-        <div class="cx-gantt-legend-item"><div class="cx-gantt-legend-color" style="background:#f59e0b;"></div>L3 — Startup</div>
-        <div class="cx-gantt-legend-item"><div class="cx-gantt-legend-color" style="background:#64748b;"></div>L4 — Performance</div>
-        <div class="cx-gantt-legend-item"><div class="cx-gantt-legend-color" style="background:#ef4444;"></div>L5 — IST</div>
-        <div class="cx-gantt-legend-item"><div class="cx-gantt-legend-color" style="background:#f97316;"></div>L6 — Turnover &amp; Closeout</div>
+        <div class="cx-gantt-legend-item"><span class="cx-gantt-legend-color" data-phase="L0"></span>L0 Design and planning</div>
+        <div class="cx-gantt-legend-item"><span class="cx-gantt-legend-color" data-phase="L1"></span>L1 Factory witness test</div>
+        <div class="cx-gantt-legend-item"><span class="cx-gantt-legend-color" data-phase="L2"></span>L2 Installation</div>
+        <div class="cx-gantt-legend-item"><span class="cx-gantt-legend-color" data-phase="L3"></span>L3 Start-up</div>
+        <div class="cx-gantt-legend-item"><span class="cx-gantt-legend-color" data-phase="L4"></span>L4 Performance</div>
+        <div class="cx-gantt-legend-item"><span class="cx-gantt-legend-color" data-phase="L5"></span>L5 Integrated systems test</div>
+        <div class="cx-gantt-legend-item"><span class="cx-gantt-legend-color" data-phase="L6"></span>L6 Turnover and close-out</div>
       </div>
+      <figcaption><b>FIG. 3</b> Commissioning schedule by level and activity · amber = L5 integrated systems test · H hold point, W witness point, R review</figcaption>
+    </figure>
+
+    <div class="tool-full" id="cxFullRow">
+      <p><b>Full analysis</b> — six more inputs (generator, seismic zone, scope, substation, BMS, delivery method) and 20 panels: cost by discipline, Monte Carlo P5 to P95, sensitivity, risk score, resources by phase, witness matrix, milestones, team and regional benchmark.</p>
+      <button type="button" id="cxPremiumBtn" class="pro-overlay-btn cx-premium-btn" onclick="cxHandlePremium()">Sign in</button>
     </div>
 
-    <!-- Pro Panels -->
     <div class="cx-pro-section" id="cxProSection">
-      <!-- Panel 1: Cost by Discipline -->
       <div class="cx-pro-panel gated" id="cxPanelDiscipline">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Cost Breakdown by Discipline</h3>
-        <div class="cx-kpi-grid-6" id="cxDisciplineKpis"></div>
-        <div class="cx-chart-box" style="background:transparent;border:none;padding:0;"><canvas id="cxChartDiscipline"></canvas></div>
+        <h3>Cost Breakdown by Discipline</h3>
+        <div class="cx-kpi-grid-6" id="cxDisciplineKpis" data-rz-fact-list></div>
+        <div class="cx-chart-box"><canvas id="cxChartDiscipline"></canvas></div>
       </div>
-      <!-- Panel 2: Resource Loading -->
       <div class="cx-pro-panel gated" id="cxPanelResources">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Resource Loading &amp; Personnel</h3>
-        <div class="cx-kpi-grid-6" id="cxResourceKpis"></div>
+        <h3>Resource Loading &amp; Personnel</h3>
+        <div class="cx-kpi-grid-6" id="cxResourceKpis" data-rz-fact-list></div>
       </div>
-      <!-- Panel 3: Monte Carlo -->
       <div class="cx-pro-panel gated" id="cxPanelMC">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Monte Carlo Distribution (n=10,000)</h3>
-        <div class="cx-kpi-grid-6" id="cxMcKpis"></div>
-        <div class="cx-chart-box" style="background:transparent;border:none;padding:0;"><canvas id="cxChartMC"></canvas></div>
+        <h3>Monte Carlo Distribution (n=10,000)</h3>
+        <div class="cx-kpi-grid-6" id="cxMcKpis" data-rz-fact-list></div>
+        <div class="cx-chart-box"><canvas id="cxChartMC"></canvas></div>
       </div>
-      <!-- Panel 4: Sensitivity Tornado -->
       <div class="cx-pro-panel gated" id="cxPanelTornado">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Sensitivity Analysis — Top Drivers</h3>
-        <div class="cx-chart-box" style="background:transparent;border:none;padding:0;"><canvas id="cxChartTornado"></canvas></div>
+        <h3>Sensitivity Analysis — Top Drivers</h3>
+        <div class="cx-chart-box"><canvas id="cxChartTornado"></canvas></div>
       </div>
-      <!-- Panel 5: Executive Assessment -->
       <div class="cx-pro-panel gated" id="cxPanelExec">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Executive Intelligence Brief</h3>
-        <div class="cx-narrative" id="cxExecNarrative" style="border-left-color:#0891b2;background:rgba(100, 116, 139,0.04);"></div>
+        <h3>Executive Intelligence Brief</h3>
+        <div class="cx-narrative" id="cxExecNarrative"></div>
       </div>
-      <!-- Panel 6: Equipment Summary -->
       <div class="cx-pro-panel gated" id="cxPanelEquip">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Equipment Count Summary</h3>
-        <div class="cx-equip-grid" id="cxEquipGrid"></div>
+        <h3>Equipment Count Summary</h3>
+        <div class="cx-equip-grid" id="cxEquipGrid" data-rz-fact-list></div>
       </div>
-      <!-- Panel 7: Commissioning Risk Score -->
       <div class="cx-pro-panel gated" id="cxPanelRisk">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Commissioning Risk Assessment</h3>
+        <h3>Commissioning Risk Assessment</h3>
         <div id="cxRiskContent"></div>
       </div>
-      <!-- Panel 8: Resource Loading Table -->
       <div class="cx-pro-panel gated" id="cxPanelResTable">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Resource Loading by Phase</h3>
-        <table class="cx-resource-table" id="cxResTable">
+        <h3>Resource Loading by Phase</h3>
+        <div class="cx-scroll"><table class="cx-resource-table" id="cxResTable">
           <thead><tr><th scope="col">Phase</th><th scope="col">CxA Days</th><th scope="col">Field Tech Days</th><th scope="col">OEM Days</th><th scope="col">Witness Days</th><th scope="col">Est. Cost</th></tr></thead>
           <tbody id="cxResTableBody"></tbody>
-        </table>
+        </table></div>
       </div>
-      <!-- Panel 9: Phase Gate Readiness -->
       <div class="cx-pro-panel gated" id="cxPanelGates">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Phase Gate Checklist Preview</h3>
+        <h3>Phase Gate Checklist Preview</h3>
         <div class="cx-phase-gates" id="cxPhaseGates"></div>
       </div>
-      <!-- Panel 10: Resource Histogram -->
       <div class="cx-pro-panel gated" id="cxPanelHistogram">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Resource Histogram — Person-Days/Week</h3>
-        <div class="cx-chart-box" style="background:transparent;border:none;padding:0;"><canvas id="cxChartHistogram"></canvas></div>
+        <h3>Resource Histogram — Person-Days/Week</h3>
+        <div class="cx-chart-box"><canvas id="cxChartHistogram"></canvas></div>
       </div>
-      <!-- Panel 11: Witness Hold Point Matrix -->
       <div class="cx-pro-panel gated" id="cxPanelWitness">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Witness / Hold Point Matrix</h3>
-        <div id="cxWitnessMatrix" style="overflow-x:auto;"></div>
+        <h3>Witness / Hold Point Matrix</h3>
+        <div class="cx-scroll" id="cxWitnessMatrix"></div>
       </div>
-      <!-- Panel 12: Cost Adjustment Factors -->
       <div class="cx-pro-panel gated" id="cxPanelAdjust">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Cost Adjustment Factors</h3>
-        <div class="cx-kpi-grid-6" id="cxAdjustKpis"></div>
-        <div id="cxAdjustNarrative" style="font-size:0.78rem;color:#94a3b8;line-height:1.7;margin-top:0.75rem;"></div>
+        <h3>Cost Adjustment Factors</h3>
+        <div class="cx-kpi-grid-6" id="cxAdjustKpis" data-rz-fact-list></div>
+        <div class="cx-sub-note" id="cxAdjustNarrative"></div>
       </div>
-      <!-- Panel 13: Test Instrument Inventory -->
       <div class="cx-pro-panel gated" id="cxPanelInstruments">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Required Test Instruments</h3>
-        <div id="cxInstrumentsList" style="overflow-x:auto;"></div>
+        <h3>Required Test Instruments</h3>
+        <div class="cx-scroll" id="cxInstrumentsList"></div>
       </div>
-      <!-- Panel 14: Commissioning KPI Dashboard -->
       <div class="cx-pro-panel gated" id="cxPanelDashboard">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Commissioning Program KPI Dashboard</h3>
-        <div class="cx-kpi-grid-6" id="cxDashboardKpis"></div>
+        <h3>Commissioning Program KPI Dashboard</h3>
+        <div class="cx-kpi-grid-6" id="cxDashboardKpis" data-rz-fact-list></div>
       </div>
-      <!-- Panel 15: Scenario Comparison -->
       <div class="cx-pro-panel gated" id="cxPanelComparison">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Scenario Comparison</h3>
-        <p style="font-size:0.8rem;color:#64748b;margin:0.5rem 0;">Compare your current configuration against preset archetypes</p>
+        <h3>Scenario Comparison</h3>
+        <p class="cx-sub-note">Compare your current configuration against preset archetypes</p>
         <div id="cxComparisonContent"></div>
       </div>
-      <!-- Panel 16: Cost Waterfall -->
       <div class="cx-pro-panel gated" id="cxPanelWaterfall">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Cost Waterfall Analysis</h3>
+        <h3>Cost Waterfall Analysis</h3>
         <div id="cxWaterfallContent"></div>
       </div>
-      <!-- Panel 17: Timeline Milestones -->
       <div class="cx-pro-panel gated" id="cxPanelMilestones">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Key Milestones &amp; Decision Points</h3>
+        <h3>Key Milestones &amp; Decision Points</h3>
         <div id="cxMilestonesContent"></div>
       </div>
-      <!-- Panel 18: Team Org Chart -->
       <div class="cx-pro-panel gated" id="cxPanelTeam">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Recommended CxA Team Composition</h3>
+        <h3>Recommended CxA Team Composition</h3>
         <div id="cxTeamContent"></div>
       </div>
-      <!-- Panel 19: Regional Benchmark -->
       <div class="cx-pro-panel gated" id="cxPanelBenchmark">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Regional Benchmark Comparison</h3>
+        <h3>Regional Benchmark Comparison</h3>
         <div id="cxBenchmarkContent"></div>
       </div>
-      <!-- Panel 20: Environmental Impact -->
       <div class="cx-pro-panel gated" id="cxPanelEnvironmental">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
-        <h3><i class="fas fa-crown"></i> Commissioning Environmental Impact</h3>
+        <h3>Commissioning Environmental Impact</h3>
         <div id="cxEnvironmentalContent"></div>
       </div>
     </div>
   </div>
-
-  <!-- Disclaimer -->
-  <div class="cx-disclaimer">
-    <div class="cx-disclaimer-inner">
-      <div class="cx-disclaimer-icon"><i class="fas fa-triangle-exclamation"></i></div>
-      <div>
-        <div class="cx-disc-title">Disclaimer &amp; Data Sources</div>
-        <p class="cx-disc-text">This calculator provides <strong>budgetary estimates only</strong>. Actual commissioning costs and schedules vary based on local conditions, contractor availability, regulatory requirements, and project-specific complexity. Not for contractual or procurement use.</p>
-        <p class="cx-disc-text"><strong>Standards &amp; Sources:</strong> ASHRAE Guideline 0-2019 (lifecycle commissioning process backbone — L0-L6 are project-delivery levels, not ASHRAE-defined hierarchy), NETA ECS/ATS-2025, BSRIA BG 49:2023, Uptime Institute Tier Standard 2024, IEEE 519-2022, NFPA 72/75/76/2001, TIA-942-B, IEC 62305/60076, RSMeans 2025, industry benchmarks (n=50+, 2021-2026).</p>
-        <p class="cx-disc-text"><strong>Source confidence:</strong> Regional labor rates and equipment multipliers combine publicly sourced data (BSRIA, RSMeans, Uptime surveys) with expert assumptions. Hard numbers are best-available estimates, not exact contractual values. All calculations client-side; no data transmitted. <a href="privacy.html">Privacy Policy</a></p>
-        <p class="cx-disc-fine">By using this tool you agree to our <a href="terms.html" style="color:#22d3ee;">Terms</a>. &copy; 2026 Bagus Dwi Permana.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Privacy Badge (Standard) -->
-  <div class="cx-privacy-badge">
-    <i class="fas fa-shield-halved"></i> All calculations performed in your browser — no data is sent to any server. PDF generated client-side.
-  </div>
-
-  <!-- Benchmark Meta (Standard) -->
-  <div class="cx-benchmark-meta">
-    <span class="cx-benchmark-tag"><i class="fas fa-code-branch"></i> Model v2.0 — L0-L6 Full Lifecycle</span>
-    <span class="cx-benchmark-tag"><i class="fas fa-calendar"></i> Updated March 2026</span>
-    <span class="cx-benchmark-tag"><i class="fas fa-book"></i> Sources: ASHRAE G0-2019, BSRIA BG 49:2023, NETA ECS/ATS-2025, Uptime Institute, RSMeans 2025</span>
-    <span class="cx-benchmark-tag"><i class="fas fa-info-circle"></i> 7-level commissioning model, 30 regions, 8 archetypes, 14 input parameters</span>
-  </div>
-
-  <!-- Commissioning Glossary -->
-  <div class="cx-glossary">
-    <button class="cx-glossary-toggle" onclick="this.classList.toggle('open');document.getElementById('cxGlossary').classList.toggle('open');">
-      <i class="fas fa-book-open" style="color:#22d3ee;"></i> Commissioning Glossary &amp; Phase Definitions
-      <i class="fas fa-chevron-right cx-chevron"></i>
-    </button>
-    <div class="cx-glossary-body" id="cxGlossary">
-      <div class="cx-glossary-item"><span class="cx-glossary-term">L0 — Design &amp; Cx Planning:</span><span class="cx-glossary-def">OPR/BOD review, Cx plan development, points list creation, testability review, energization strategy, cause-and-effect matrix review, RFS definition workshop.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">L1 — Factory Witness Testing (FAT):</span><span class="cx-glossary-def">Witnessing equipment tests at manufacturer — switchgear, transformers, generators, UPS, chillers. Ensures spec compliance before shipping.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">L2 — Installation Verification:</span><span class="cx-glossary-def">Static testing of installed equipment — insulation resistance, grounding, piping pressure, wiring verification per NETA standards.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">L3 — Component Startup:</span><span class="cx-glossary-def">First energization, individual equipment startup. Generator load bank, chiller OEM startup, BMS point-to-point verification.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">L4 — Functional Performance Testing:</span><span class="cx-glossary-def">Full-load testing of individual systems. Power path verification, CHW performance, air distribution balance, control sequence validation.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">L5 — Integrated Systems Testing (IST):</span><span class="cx-glossary-def">Failure scenario testing across integrated systems. Black start, generator fail-to-start, UPS bypass, cooling failure, concurrent maintenance, fault tolerance, 72-hour extended load test.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">L6 — Turnover &amp; Closeout:</span><span class="cx-glossary-def">Punch list resolution, residual risk register, operations training, spare parts confirmation, systems manuals, final Cx report, formal turnover sign-off.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">CxA:</span><span class="cx-glossary-def">Commissioning Authority — independent party responsible for developing and executing the commissioning plan.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">OPR:</span><span class="cx-glossary-def">Owner's Project Requirements — document defining the owner's functional and performance criteria for the facility.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">BOD:</span><span class="cx-glossary-def">Basis of Design — document describing how the design meets the OPR. Alignment between OPR and BOD is verified during L0.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">IST:</span><span class="cx-glossary-def">Integrated Systems Testing — the most critical and expensive phase (L5) where all systems are tested together under simulated failure conditions.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">RFS:</span><span class="cx-glossary-def">Ready for Service — the formal milestone where the facility is accepted by operations after successful L5 completion and L6 closeout.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">DLC:</span><span class="cx-glossary-def">Direct Liquid Cooling — coolant delivered directly to server components via CDUs, manifolds, and quick-disconnect fittings. Adds ~45% to Cx cost.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">CDU:</span><span class="cx-glossary-def">Coolant Distribution Unit — pumps and heat exchangers that circulate liquid coolant to IT racks. Requires redundancy and failover testing.</span></div>
-      <div class="cx-glossary-item"><span class="cx-glossary-term">CVaR-95:</span><span class="cx-glossary-def">Conditional Value at Risk at 95% — the expected cost given that costs exceed the P95 percentile. Represents tail-risk exposure.</span></div>
-    </div>
-  </div>
-
-  <!-- ===== FAQ SECTION ===== -->
-  <div class="cx-faq-section" id="cxFaqSection"></div>
-
-  <!-- ===== MANUAL SECTION ===== -->
-  <div class="cx-manual-section" id="cxManualSection"></div>
-
 </div>
 
-<!-- Footer -->
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/cx.html">Technical Manual &amp; Methodology &#8599;</a></div>
-<footer class="cx-footer">
-  <div class="cx-footer-inner">
-    <div>
-      <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.15em;color:#64748b;line-height:1.6;margin-bottom:1rem;">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
-      <p style="font-size:0.75rem;color:#64748b;">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
+<section class="tool-ref" aria-labelledby="ref-h">
+  <div class="wrap">
+    <p class="eyebrow" id="ref-h">02 / Reference</p>
+    <div class="ref-grid">
+      <div>
+        <h3>Method</h3>
+        <ul class="formulas">
+          <li><span>Level cost</span><code>days per level (equipment counts, redundancy, scope) · regional day rate</code></li>
+          <li><span>Floor</span><code>subtotal = max(base $/kW · IT kW · m^0.45, Σ level costs)</code></li>
+          <li><span>Multiplier m</span><code>cooling · redundancy · building · seismic · substation · BMS · delivery · fire · UPS · generator · density</code></li>
+          <li><span>Additions</span><code>documents 5 $/kW, travel = Σ days · per diem · 3, campus +8 % at 50 MW, +5 % at 100 MW</code></li>
+          <li><span>Total</span><code>(subtotal + additions) · regional multiplier · 1.15 contingency</code></li>
+          <li><span>Level split</span><code>L0 3, L1 4, L2 10, L3 22, L4 20, L5 32, L6 9 % of total</code></li>
+          <li><span>Share of CAPEX</span><code>total / (IT kW · 10,500 $/kW; 13,000 high density; 16,000 AI/HPC)</code></li>
+          <li><span>Monte Carlo</span><code>10,000 runs, IT load ± 7.5 % (1σ), price ± 5 % (1σ, clipped ± 15 %)</code></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Computed against</h3>
+        <p class="against"><span>ASHRAE Guideline 0-2019</span><span>NETA ECS/ATS-2025</span><span>BSRIA BG 49:2023</span><span>Uptime Institute Tier Standard 2024</span><span>NFPA 72/75/76/2001</span><span>TIA-942-B</span><span>RSMeans 2025</span></p>
+        <h3>Read further</h3>
+        <p class="links"><a href="manual/cx.html">Technical manual and methodology</a><a href="#cxManualSection" onclick="cxOpenRef('manual');return false;">User guide</a><a href="#cxFaqSection" onclick="cxOpenRef('faq');return false;">FAQ</a><a href="#cxGlossary">Glossary</a><a href="capex-calculator.html">CAPEX calculator</a><a href="tia-942-checklist.html">TIA-942 checklist</a><a href="rfs-readiness-workbench.html">RFS workbench</a><a href="account.html">My account and saved scenarios</a></p>
+      </div>
     </div>
-    <div>
-      <h4>NAVIGATION</h4>
-      <ul>
-        <li><a href="index.html">Home Dashboard</a></li>
-        <li><a href="articles.html">Technical Journal</a></li>
-        <li><a href="datacenter-solutions.html">DC Solutions</a></li>
-        <li><a href="capex-calculator.html">CAPEX Calculator</a></li>
-      </ul>
+    <div class="cx-ref-block">
+      <h3>Glossary and level definitions</h3>
+      <dl class="cx-glossary-body cx-gloss open" id="cxGlossary">
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">L0 — Design &amp; Cx Planning</dt><dd class="cx-glossary-def">OPR/BOD review, Cx plan development, points list creation, testability review, energization strategy, cause-and-effect matrix review, RFS definition workshop.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">L1 — Factory Witness Testing (FAT)</dt><dd class="cx-glossary-def">Witnessing equipment tests at manufacturer — switchgear, transformers, generators, UPS, chillers. Ensures spec compliance before shipping.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">L2 — Installation Verification</dt><dd class="cx-glossary-def">Static testing of installed equipment — insulation resistance, grounding, piping pressure, wiring verification per NETA standards.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">L3 — Component Startup</dt><dd class="cx-glossary-def">First energization, individual equipment startup. Generator load bank, chiller OEM startup, BMS point-to-point verification.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">L4 — Functional Performance Testing</dt><dd class="cx-glossary-def">Full-load testing of individual systems. Power path verification, CHW performance, air distribution balance, control sequence validation.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">L5 — Integrated Systems Testing (IST)</dt><dd class="cx-glossary-def">Failure scenario testing across integrated systems. Black start, generator fail-to-start, UPS bypass, cooling failure, concurrent maintenance, fault tolerance, 72-hour extended load test.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">L6 — Turnover &amp; Closeout</dt><dd class="cx-glossary-def">Punch list resolution, residual risk register, operations training, spare parts confirmation, systems manuals, final Cx report, formal turnover sign-off.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">CxA</dt><dd class="cx-glossary-def">Commissioning Authority — independent party responsible for developing and executing the commissioning plan.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">OPR</dt><dd class="cx-glossary-def">Owner's Project Requirements — document defining the owner's functional and performance criteria for the facility.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">BOD</dt><dd class="cx-glossary-def">Basis of Design — document describing how the design meets the OPR. Alignment between OPR and BOD is verified during L0.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">IST</dt><dd class="cx-glossary-def">Integrated Systems Testing — the most critical and expensive phase (L5) where all systems are tested together under simulated failure conditions.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">RFS</dt><dd class="cx-glossary-def">Ready for Service — the formal milestone where the facility is accepted by operations after successful L5 completion and L6 closeout.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">DLC</dt><dd class="cx-glossary-def">Direct Liquid Cooling — coolant delivered directly to server components via CDUs, manifolds, and quick-disconnect fittings. Adds ~45% to Cx cost.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">CDU</dt><dd class="cx-glossary-def">Coolant Distribution Unit — pumps and heat exchangers that circulate liquid coolant to IT racks. Requires redundancy and failover testing.</dd></div>
+          <div class="cx-glossary-item"><dt class="cx-glossary-term">CVaR-95</dt><dd class="cx-glossary-def">Conditional Value at Risk at 95% — the expected cost given that costs exceed the P95 percentile. Represents tail-risk exposure.</dd></div>
+        </dl>
     </div>
-    <div>
-      <h4>CONNECT</h4>
-      <ul>
-        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
-        <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-      </ul>
+    <div class="cx-faq-section" id="cxFaqSection"></div>
+    <div class="cx-manual-section" id="cxManualSection"></div>
+    <p class="notice">Budgetary estimates only, not for contract pricing or procurement. Commissioning cost and schedule vary with local conditions, contractor availability, regulation and project complexity. Regional labour rates and equipment multipliers combine published data (BSRIA, RSMeans, Uptime surveys) with expert assumptions; L0 to L6 are project-delivery levels used in industry practice, not an ASHRAE numbering. Calculated in your browser; your last inputs are kept in this browser and nothing is sent to a server. See the <a href="privacy.html">Privacy Policy</a>; by using this tool you agree to the <a href="terms.html">Terms</a>. Independent personal research; this site does not represent any current or former employer.</p>
+  </div>
+</section>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models. Mission-critical infrastructure, documented.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
     </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
   </div>
 </footer>
 
@@ -1292,6 +654,8 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
 
 <script>
+if(window.Chart){Chart.defaults.color='#8C96A3';Chart.defaults.borderColor='rgba(140,150,163,0.18)';Chart.defaults.font.family="'IBM Plex Sans',system-ui,sans-serif";}
+
 // ============================================================
 // DATA CENTER COMMISSIONING CALCULATOR — ENGINE
 // ============================================================
@@ -2534,7 +1898,7 @@ function cxBuildGantt(inp,res){
   var hasCompressedAir=isDLC;
   var phases=[
     // ========== L0 — DESIGN & CX PLANNING ==========
-    {id:'L0',name:'L0 — Design & Cx Planning',dur:d.l0,color:'#64748b',children:[
+    {id:'L0',name:'L0 — Design & Cx Planning',dur:d.l0,color:'#5E6673',children:[
       {id:'L0_P',name:'Cx Planning & Documentation',lvl:2,dur:Math.ceil(d.l0*0.5),children:[
         {id:'L0_P_OPR',name:'OPR/BOD/SOO Review',lvl:3,dur:Math.max(2,Math.ceil(d.l0*0.2)),children:[
           {id:'L0_P_OPR_R',name:'Owner Project Requirements',lvl:4,dur:1,children:[
@@ -2601,7 +1965,7 @@ function cxBuildGantt(inp,res){
       ]}
     ]},
     // ========== L1 — FACTORY WITNESS TESTING ==========
-    {id:'L1',name:'L1 — Factory Witness Testing',dur:d.l1,color:'#3b82f6',children:[
+    {id:'L1',name:'L1 — Factory Witness Testing',dur:d.l1,color:'#7D8794',children:[
       {id:'L1_E',name:'Electrical FAT',lvl:2,dur:Math.ceil(d.l1*0.6),children:[
         {id:'L1_E_SW',name:'HV/MV Switchgear FAT (×'+eq.switchgear+')',lvl:3,dur:Math.max(1,eq.switchgear*2),children:[
           {id:'L1_E_SW_IR',name:'Insulation Resistance (Megger)',lvl:4,dur:0.5,children:[
@@ -2777,7 +2141,7 @@ function cxBuildGantt(inp,res){
       ].filter(Boolean)}
     ]},
     // ========== L2 — INSTALLATION VERIFICATION ==========
-    {id:'L2',name:'L2 — Installation Verification',dur:d.l2,color:'#10b981',children:[
+    {id:'L2',name:'L2 — Installation Verification',dur:d.l2,color:'#A0AEC0',children:[
       {id:'L2_E',name:'Electrical Verification',lvl:2,dur:Math.ceil(d.l2*0.45),children:[
         {id:'L2_E_SW',name:'Switchgear Installation (×'+eq.switchgear+')',lvl:3,dur:Math.max(1,Math.ceil(eq.switchgear*1.5)),children:[
           {id:'L2_E_SW_MG',name:'Megger Test (all buses)',lvl:4,dur:0.3,children:[
@@ -3000,7 +2364,7 @@ function cxBuildGantt(inp,res){
       ].filter(Boolean)}
     ]},
     // ========== L3 — COMPONENT STARTUP ==========
-    {id:'L3',name:'L3 — Component Startup',dur:d.l3,color:'#f59e0b',children:[
+    {id:'L3',name:'L3 — Component Startup',dur:d.l3,color:'#8C96A3',children:[
       {id:'L3_E',name:'Electrical Startup',lvl:2,dur:Math.ceil(d.l3*0.45),children:[
         {id:'L3_E_SW',name:'Switchgear Energization',lvl:3,dur:Math.max(1,eq.switchgear*2),children:[
           {id:'L3_E_SW_PF',name:'Pre-flight checklist review',lvl:4,dur:0.2},
@@ -3227,7 +2591,7 @@ function cxBuildGantt(inp,res){
       ].filter(Boolean)}
     ]},
     // ========== L4 — PERFORMANCE TESTING ==========
-    {id:'L4',name:'L4 — Performance Testing',dur:d.l4,color:'#64748b',children:[
+    {id:'L4',name:'L4 — Performance Testing',dur:d.l4,color:'#C9CFD8',children:[
       {id:'L4_E',name:'Electrical Performance',lvl:2,dur:Math.ceil(d.l4*0.4),children:[
         {id:'L4_E_PA',name:'Power Path A — Full Load Test',lvl:3,dur:3,children:[
           {id:'L4_E_PA_LB',name:'Load bank ramp to 100% design',lvl:4,dur:1,children:[
@@ -3383,7 +2747,7 @@ function cxBuildGantt(inp,res){
       ].filter(Boolean)}
     ]},
     // ========== L5 — INTEGRATED SYSTEMS TESTING ==========
-    {id:'L5',name:'L5 — Integrated Systems Testing',dur:d.l5,color:'#ef4444',children:[
+    {id:'L5',name:'L5 — Integrated Systems Testing',dur:d.l5,color:'#D49A2A',children:[
       {id:'L5_P',name:'IST Preparation',lvl:2,dur:Math.max(1,Math.ceil(d.l5*0.08)),children:[
         {id:'L5_P_RR',name:'IST Readiness Review',lvl:3,dur:0.5,children:[
           {id:'L5_P_RR1',name:'L4 completion sign-off',lvl:4,dur:0.1},
@@ -3519,7 +2883,7 @@ function cxBuildGantt(inp,res){
       ].filter(Boolean)}
     ]},
     // ========== L6 — TURNOVER & CLOSEOUT ==========
-    {id:'L6',name:'L6 — Turnover & Closeout',dur:d.l6,color:'#f97316',children:[
+    {id:'L6',name:'L6 — Turnover & Closeout',dur:d.l6,color:'#4A5160',children:[
       {id:'L6_D',name:'Defect & Risk Closure',lvl:2,dur:Math.ceil(d.l6*0.35),children:[
         {id:'L6_D_PL',name:'Punch List Resolution',lvl:3,dur:Math.max(1,Math.ceil(d.l6*0.15)),children:[
           {id:'L6_D_PL_CR',name:'Critical defect remediation',lvl:4,dur:Math.max(0.5,Math.ceil(d.l6*0.05)),children:[
@@ -3753,7 +3117,7 @@ function cxRenderDrawerContent(tab){
   var body=document.getElementById('cxDrawerBody');
   var proc=cxGetProcedure(cxDrawerActId);
   if(!proc){
-    body.innerHTML='<p style="color:#64748b;padding:2rem;text-align:center;"><i class="fas fa-info-circle" style="margin-right:6px;"></i>This is a parent/grouping activity. Click a leaf-level activity to view its detailed procedure, acceptance criteria, and logsheet.</p><p style="font-size:0.72rem;color:#475569;text-align:center;margin-top:1rem;">Tip: Expand the Gantt chart to reach the smallest (leaf) activities which have full commissioning documentation attached.</p>';
+    body.innerHTML='<p style="color:var(--rzt-muted);padding:2rem;text-align:center;"><i class="fas fa-info-circle" style="margin-right:6px;"></i>This is a parent/grouping activity. Click a leaf-level activity to view its detailed procedure, acceptance criteria, and logsheet.</p><p style="font-size:0.72rem;color:var(--rzt-muted);text-align:center;margin-top:1rem;">Tip: Expand the Gantt chart to reach the smallest (leaf) activities which have full commissioning documentation attached.</p>';
     return;
   }
   var html='';
@@ -3761,22 +3125,22 @@ function cxRenderDrawerContent(tab){
     html+='<h4><i class="fas fa-clipboard-list"></i> Test Procedure: '+proc.title+'</h4>';
     if(proc.witness){
       var wl={H:'Hold Point — CxA/Owner must witness',W:'Witness Point — CxA observes',R:'Review Point — CxA reviews documentation'};
-      var wc={H:'#ef4444',W:'#f59e0b',R:'#22d3ee'};
-      html+='<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;background:rgba('+(proc.witness==='H'?'239,68,68':proc.witness==='W'?'245,158,11':'34,211,238')+',0.08);margin-bottom:1rem;font-size:0.72rem;color:'+(wc[proc.witness]||'#94a3b8')+'"><i class="fas fa-'+(proc.witness==='H'?'hand':proc.witness==='W'?'eye':'file-lines')+'"></i> '+(wl[proc.witness]||'')+'</div>';
+      var wc={H:'var(--rzt-accent-text)',W:'var(--rzt-text)',R:'var(--rzt-text-2)'};
+      html+='<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;border:1px solid var(--rzt-line);margin-bottom:1rem;font-size:0.72rem;color:'+(wc[proc.witness]||'#94a3b8')+'"><i class="fas fa-'+(proc.witness==='H'?'hand':proc.witness==='W'?'eye':'file-lines')+'"></i> '+(wl[proc.witness]||'')+'</div>';
     }
-    if(proc.duration_note)html+='<p style="font-size:0.72rem;color:#64748b;margin-bottom:0.75rem;"><i class="fas fa-clock" style="margin-right:4px;"></i> '+proc.duration_note+'</p>';
+    if(proc.duration_note)html+='<p style="font-size:0.72rem;color:var(--rzt-muted);margin-bottom:0.75rem;"><i class="fas fa-clock" style="margin-right:4px;"></i> '+proc.duration_note+'</p>';
     html+='<ol>';
     proc.procedure.forEach(function(step){html+='<li>'+step+'</li>';});
     html+='</ol>';
   }else if(tab==='acceptance'){
     html+='<h4><i class="fas fa-check-circle"></i> Acceptance Criteria</h4>';
     html+='<div class="cx-acc-box"><strong>Criteria</strong><p>'+proc.acceptance.criteria+'</p></div>';
-    html+='<div class="cx-acc-box" style="border-left-color:#3b82f6;background:rgba(59,130,246,0.06);"><strong style="color:#93c5fd;">Standard Reference</strong><p>'+proc.acceptance.standard+'</p></div>';
+    html+='<div class="cx-acc-box"><strong>Standard reference</strong><p>'+proc.acceptance.standard+'</p></div>';
     html+='<h4 style="margin-top:1rem;"><i class="fas fa-gavel"></i> Justification</h4>';
     html+='<p>'+proc.acceptance.justification+'</p>';
   }else if(tab==='logsheet'){
     html+='<h4><i class="fas fa-table"></i> Commissioning Logsheet: '+proc.title+'</h4>';
-    html+='<p style="font-size:0.72rem;color:#64748b;margin-bottom:1rem;"><i class="fas fa-info-circle" style="margin-right:4px;"></i>This logsheet template is generated based on industry standards. Export as PDF for field use.</p>';
+    html+='<p style="font-size:0.72rem;color:var(--rzt-muted);margin-bottom:1rem;"><i class="fas fa-info-circle" style="margin-right:4px;"></i>This logsheet template is generated based on industry standards. Export as PDF for field use.</p>';
     html+='<table class="cx-drawer-logsheet"><thead><tr><th style="width:45%;"  scope="col">Field</th><th scope="col">Type</th><th scope="col">Value</th></tr></thead><tbody>';
     proc.logsheet.forEach(function(f){
       var typeLabel={text:'Text',number:'Number',date:'Date',textarea:'Multi-line',select:'Selection',calc:'Calculated',sign:'Signature'}[f.t]||f.t;
@@ -3802,7 +3166,7 @@ function cxRenderDrawerContent(tab){
       html+='<h4 style="margin-top:1rem;"><i class="fas fa-user-check"></i> Witness Classification</h4>';
       var wmap={H:{name:'Hold Point',desc:'Work must STOP until CxA/Owner witnesses the test. No proceeding without witness sign-off.',color:'#ef4444'},W:{name:'Witness Point',desc:'CxA is invited to observe. Work may proceed if witness is unavailable but must be documented.',color:'#f59e0b'},R:{name:'Review Point',desc:'CxA reviews documentation/results after completion. No on-site presence required.',color:'#22d3ee'}};
       var w=wmap[proc.witness]||wmap.R;
-      html+='<div style="padding:12px;border-radius:8px;border:1px solid '+w.color+'33;background:'+w.color+'08;"><strong style="color:'+w.color+';font-size:0.8rem;">'+w.name+'</strong><p style="font-size:0.75rem;margin-top:4px;">'+w.desc+'</p></div>';
+      html+='<div style="padding:12px;border-radius:4px;border:1px solid var(--rzt-line);"><strong style="color:var(--rzt-text);font-size:0.8rem;">'+w.name+'</strong><p style="font-size:0.75rem;margin-top:4px;">'+w.desc+'</p></div>';
     }
   }
   body.innerHTML=html;
@@ -3939,7 +3303,7 @@ function cxFilterGanttPhase(phase){
 
 function cxRenderGanttProgress(ganttData){
   var phaseCounts={L0:{total:0,leaf:0},L1:{total:0,leaf:0},L2:{total:0,leaf:0},L3:{total:0,leaf:0},L4:{total:0,leaf:0},L5:{total:0,leaf:0},L6:{total:0,leaf:0}};
-  var colors={L0:'#64748b',L1:'#3b82f6',L2:'#10b981',L3:'#f59e0b',L4:'#64748b',L5:'#ef4444',L6:'#f97316'};
+  var colors={L0:'var(--rzt-text-2)',L1:'var(--rzt-text-2)',L2:'var(--rzt-text-2)',L3:'var(--rzt-text-2)',L4:'var(--rzt-text-2)',L5:'var(--rzt-accent-text)',L6:'var(--rzt-text-2)'};
   ganttData.items.forEach(function(item){
     var ph=item.phase;if(phaseCounts[ph]){phaseCounts[ph].total++;if(!item.hasChildren)phaseCounts[ph].leaf++;}
   });
@@ -3952,7 +3316,7 @@ function cxRenderGanttProgress(ganttData){
     html+='<span>'+c.total+' activities ('+c.leaf+' tests)</span></div>';
   });
   var totalLeaf=0;Object.values(phaseCounts).forEach(function(c){totalLeaf+=c.leaf;});
-  html+='<div class="cx-gantt-progress-item" style="margin-left:auto;font-weight:700;color:#e2e8f0;"><i class="fas fa-list-check" style="margin-right:4px;color:#22d3ee;"></i>'+totalLeaf+' total test activities</div>';
+  html+='<div class="cx-gantt-progress-item cx-gantt-total">'+totalLeaf+' test activities</div>';
   el.innerHTML=html;
 }
 
@@ -4042,7 +3406,7 @@ function cxRenderChartLevel(res){
     type:'bar',
     data:{labels:['L0 Plan','L1 FAT','L2 Install','L3 Startup','L4 Perform','L5 IST','L6 Turnover'],datasets:[{
       data:[res.levels.l0,res.levels.l1,res.levels.l2,res.levels.l3,res.levels.l4,res.levels.l5,res.levels.l6],
-      backgroundColor:['#64748b','#3b82f6','#10b981','#f59e0b','#64748b','#ef4444','#f97316'],borderRadius:4
+      backgroundColor:['#5E6673','#7D8794','#A0AEC0','#8C96A3','#C9CFD8','#D49A2A','#4A5160'],borderRadius:0
     }]},
     options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return cxFmt(c.raw);}}}},scales:{y:{ticks:{callback:function(v){return cxFmt(v);}},grid:{color:'rgba(148,163,184,0.08)'}},x:{grid:{display:false}}}}
   });
@@ -4055,7 +3419,7 @@ function cxRenderChartSchedule(res){
     type:'bar',
     data:{labels:['L0 Plan','L1 FAT','L2 Install','L3 Startup','L4 Perform','L5 IST','L6 Turnover'],datasets:[{
       data:[Math.ceil(res.duration.l0/5),Math.ceil(res.duration.l1/5),Math.ceil(res.duration.l2/5),Math.ceil(res.duration.l3/5),Math.ceil(res.duration.l4/5),Math.ceil(res.duration.l5/5),Math.ceil(res.duration.l6/5)],
-      backgroundColor:['#64748b','#3b82f6','#10b981','#f59e0b','#64748b','#ef4444','#f97316'],borderRadius:4
+      backgroundColor:['#5E6673','#7D8794','#A0AEC0','#8C96A3','#C9CFD8','#D49A2A','#4A5160'],borderRadius:0
     }]},
     options:{responsive:true,interaction:{mode:'index',intersect:false},indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+' weeks';}}}},scales:{x:{ticks:{callback:function(v){return v+'w';}},grid:{color:'rgba(148,163,184,0.08)'}},y:{grid:{display:false}}}}
   });
@@ -4069,7 +3433,7 @@ function cxRenderChartDiscipline(res){
     type:'doughnut',
     data:{labels:['Electrical','Mechanical','Fire','Security','IT','Controls','Building','Management'],datasets:[{
       data:[d.electrical,d.mechanical,d.fire,d.security,d.it,d.controls,d.building,d.management],
-      backgroundColor:['#3b82f6','#22d3ee','#ef4444','#f59e0b','#64748b','#10b981','#64748b','#f97316']
+      backgroundColor:['#D49A2A','#A0AEC0','#7D8794','#5E6673','#C9CFD8','#4A5160','#8C96A3','#6B7280'],borderColor:'rgba(0,0,0,0)'
     }]},
     options:{responsive:true,interaction:{intersect:false},plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11}}},tooltip:{callbacks:{label:function(c){return c.label+': '+cxFmt(c.raw)+' ('+cxPct(c.raw,res.grandTotal)+')';}}}}}
   });
@@ -4085,7 +3449,7 @@ function cxRenderChartMC(mc){
   var labels=[];for(var i=0;i<bins;i++){labels.push(cxFmt(mc.min+i*bw));}
   cxChartInstances.mc=new Chart(ctx,{
     type:'bar',
-    data:{labels:labels,datasets:[{data:counts,backgroundColor:'rgba(59,130,246,0.6)',borderRadius:1}]},
+    data:{labels:labels,datasets:[{data:counts,backgroundColor:'rgba(212,154,42,0.75)',borderRadius:0}]},
     options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(148,163,184,0.08)'}},x:{display:false}}}
   });
 }
@@ -4101,8 +3465,8 @@ function cxRenderChartTornado(sens,baseCost){
   cxChartInstances.tornado=new Chart(ctx,{
     type:'bar',
     data:{labels:labels,datasets:[
-      {label:'Low (-20%)',data:lows,backgroundColor:'rgba(16,185,129,0.7)',borderRadius:3},
-      {label:'High (+20%)',data:highs,backgroundColor:'rgba(239,68,68,0.7)',borderRadius:3}
+      {label:'Low (-20%)',data:lows,backgroundColor:'rgba(160,174,192,0.75)',borderRadius:0},
+      {label:'High (+20%)',data:highs,backgroundColor:'rgba(212,154,42,0.8)',borderRadius:0}
     ]},
     options:{responsive:true,interaction:{mode:'index',intersect:false},indexAxis:'y',plugins:{legend:{labels:{color:'#94a3b8'}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+cxFmt(c.raw);}}}},scales:{x:{ticks:{callback:function(v){return cxFmt(v);}},grid:{color:'rgba(148,163,184,0.08)'}},y:{grid:{display:false}}}}
   });
@@ -4992,17 +4356,17 @@ function cxRenderWitnessMatrix(ganttData){
     var ph=item.phase;
     if(counts[w]&&counts[w][ph]!==undefined)counts[w][ph]++;
   });
-  var html='<table style="width:100%;border-collapse:collapse;font-size:0.75rem;"><thead><tr><th style="padding:6px 8px;text-align:left;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">Type</th>';
-  ['L0','L1','L2','L3','L4','L5','L6'].forEach(function(p){html+='<th style="padding:6px 8px;text-align:center;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">'+p+'</th>';});
-  html+='<th style="padding:6px 8px;text-align:center;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">Total</th></tr></thead><tbody>';
-  [{k:'H',n:'Hold Point',c:'#ef4444'},{k:'W',n:'Witness Point',c:'#f59e0b'},{k:'R',n:'Review Point',c:'#22d3ee'}].forEach(function(row){
+  var html='<table style="width:100%;border-collapse:collapse;font-size:0.75rem;"><thead><tr><th style="padding:6px 8px;text-align:left;border-bottom:1px solid var(--rzt-line);color:var(--rzt-muted);"  scope="col">Type</th>';
+  ['L0','L1','L2','L3','L4','L5','L6'].forEach(function(p){html+='<th style="padding:6px 8px;text-align:center;border-bottom:1px solid var(--rzt-line);color:var(--rzt-muted);"  scope="col">'+p+'</th>';});
+  html+='<th style="padding:6px 8px;text-align:center;border-bottom:1px solid var(--rzt-line);color:var(--rzt-muted);"  scope="col">Total</th></tr></thead><tbody>';
+  [{k:'H',n:'Hold Point',c:'var(--rzt-accent-text)'},{k:'W',n:'Witness Point',c:'var(--rzt-text)'},{k:'R',n:'Review Point',c:'var(--rzt-text)'}].forEach(function(row){
     var total=0;
     html+='<tr><td style="padding:6px 8px;color:'+row.c+';font-weight:700;">'+row.n+'</td>';
     ['L0','L1','L2','L3','L4','L5','L6'].forEach(function(p){
       var v=counts[row.k][p];total+=v;
-      html+='<td style="padding:6px 8px;text-align:center;color:#e2e8f0;">'+(v||'-')+'</td>';
+      html+='<td style="padding:6px 8px;text-align:center;color:var(--rzt-text);">'+(v||'-')+'</td>';
     });
-    html+='<td style="padding:6px 8px;text-align:center;color:#e2e8f0;font-weight:700;">'+total+'</td></tr>';
+    html+='<td style="padding:6px 8px;text-align:center;color:var(--rzt-text);font-weight:700;">'+total+'</td></tr>';
   });
   html+='</tbody></table>';
   el.innerHTML=html;
@@ -5047,10 +4411,10 @@ function cxRenderResourceHistogram(res,inp){
   cxChartInstances.histogram=new Chart(ctx.getContext('2d'),{
     type:'bar',
     data:{labels:labels,datasets:[
-      {label:'CxA Engineers',data:cxaData,backgroundColor:'#22d3ee'},
-      {label:'Field Technicians',data:fieldData,backgroundColor:'#10b981'},
-      {label:'OEM Specialists',data:oemData,backgroundColor:'#f59e0b'},
-      {label:'Witnesses',data:witnessData,backgroundColor:'#0891b2'}
+      {label:'CxA Engineers',data:cxaData,backgroundColor:'#D49A2A'},
+      {label:'Field Technicians',data:fieldData,backgroundColor:'#A0AEC0'},
+      {label:'OEM Specialists',data:oemData,backgroundColor:'#7D8794'},
+      {label:'Witnesses',data:witnessData,backgroundColor:'#4A5160'}
     ]},
     options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#64748b',font:{size:8}}},y:{stacked:true,title:{display:true,text:'Person-Days',color:'#64748b'},ticks:{color:'#64748b'},grid:{color:'rgba(148,163,184,0.08)'}}}}
   });
@@ -5077,11 +4441,11 @@ function cxRenderAdjustFactors(inp,res){
   ];
   el.innerHTML='';
   items.forEach(function(i){
-    el.innerHTML+='<div class="cx-kpi-mini"><div class="cx-kpi-value" style="font-size:0.95rem;">'+i[1]+'</div><div class="cx-kpi-label">'+i[0]+'</div><div style="font-size:0.6rem;color:#475569;margin-top:2px;">'+i[2]+'</div></div>';
+    el.innerHTML+='<div class="cx-kpi-mini"><div class="cx-kpi-value">'+i[1]+'</div><div class="cx-kpi-label">'+i[0]+'</div><div class="cx-kpi-sub">'+i[2]+'</div></div>';
   });
   if(nar){
     var totalAdj=travel+instruments+(res.grandTotal*(overtime-1))+(res.grandTotal*(weather-1));
-    nar.innerHTML='<strong style="color:#e2e8f0;">Total supplementary costs: '+cxFmt(totalAdj)+'</strong> — includes overtime premium, weather delays, travel/per diem for the commissioning team, and calibrated test instrument rental. These are NOT included in the base estimate above but represent real project costs that should be budgeted.';
+    nar.innerHTML='<strong style="color:var(--rzt-text);">Total supplementary costs: '+cxFmt(totalAdj)+'</strong> — includes overtime premium, weather delays, travel/per diem for the commissioning team, and calibrated test instrument rental. These are NOT included in the base estimate above but represent real project costs that should be budgeted.';
   }
 }
 
@@ -5102,15 +4466,15 @@ function cxRenderInstruments(ganttData){
   });
   var sorted=Object.keys(instruments).sort(function(a,b){return instruments[b].count-instruments[a].count;});
   var html='<table style="width:100%;border-collapse:collapse;font-size:0.75rem;"><thead><tr>';
-  html+='<th style="padding:6px 8px;text-align:left;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">Instrument</th>';
-  html+='<th style="padding:6px 8px;text-align:center;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">Uses</th>';
-  html+='<th style="padding:6px 8px;text-align:left;border-bottom:2px solid rgba(148,163,184,0.15);color:#64748b;"  scope="col">Phases</th>';
+  html+='<th style="padding:6px 8px;text-align:left;border-bottom:1px solid var(--rzt-line);color:var(--rzt-muted);"  scope="col">Instrument</th>';
+  html+='<th style="padding:6px 8px;text-align:center;border-bottom:1px solid var(--rzt-line);color:var(--rzt-muted);"  scope="col">Uses</th>';
+  html+='<th style="padding:6px 8px;text-align:left;border-bottom:1px solid var(--rzt-line);color:var(--rzt-muted);"  scope="col">Phases</th>';
   html+='</tr></thead><tbody>';
   sorted.slice(0,20).forEach(function(k){
     var inst=instruments[k];
-    html+='<tr><td style="padding:6px 8px;color:#e2e8f0;">'+k+'</td>';
-    html+='<td style="padding:6px 8px;text-align:center;color:#22d3ee;font-weight:700;">'+inst.count+'</td>';
-    html+='<td style="padding:6px 8px;color:#94a3b8;">'+Object.keys(inst.phases).join(', ')+'</td></tr>';
+    html+='<tr><td style="padding:6px 8px;color:var(--rzt-text);">'+k+'</td>';
+    html+='<td style="padding:6px 8px;text-align:center;color:var(--rzt-accent-text);font-weight:700;">'+inst.count+'</td>';
+    html+='<td style="padding:6px 8px;color:var(--rzt-muted);">'+Object.keys(inst.phases).join(', ')+'</td></tr>';
   });
   html+='</tbody></table>';
   el.innerHTML=html;
@@ -5144,11 +4508,11 @@ function cxRenderDashboard(inp,res,ganttData){
   ];
   el.innerHTML='';
   items.forEach(function(i){
-    el.innerHTML+='<div class="cx-kpi-mini"><div class="cx-kpi-value" style="font-size:0.95rem;">'+i[1]+'</div><div class="cx-kpi-label">'+i[0]+'</div><div style="font-size:0.6rem;color:#475569;margin-top:2px;">'+i[2]+'</div></div>';
+    el.innerHTML+='<div class="cx-kpi-mini"><div class="cx-kpi-value">'+i[1]+'</div><div class="cx-kpi-label">'+i[0]+'</div><div class="cx-kpi-sub">'+i[2]+'</div></div>';
   });
 }
 
-function cxCalculate(){
+function cxCalculate(scrollToResults){
   if(window.RZCalc){var _vr=RZCalc.validateNumbers([{id:'cxItLoadNum',label:'IT load (kW)'}]);RZCalc.showErrors('cxValidation',_vr.errors);}
   var inp=cxReadInputs();
   cxLastInputs=inp;
@@ -5186,7 +4550,7 @@ function cxCalculate(){
   // Pro section visibility based on mode
   var proSec=document.getElementById('cxProSection');
   if(proSec){
-    if(cxCurrentMode==='pro'&&cxIsPremium){proSec.style.display='block';}
+    if(cxCurrentMode==='pro'&&cxIsPremium){proSec.style.display='grid';}
     else{proSec.style.display='none';}
   }
 
@@ -5240,7 +4604,7 @@ function cxCalculate(){
       var eq=res.equipment;
       var eqItems=[['Switchgear',eq.switchgear],['Transformers',eq.transformers],['Generators',eq.generators],['UPS Modules',eq.ups_modules],['Cooling Units',eq.cooling_units],['PDUs',eq.pdus],['STS',eq.sts],['Chillers',eq.chillers],['Pumps',eq.pumps],['Racks',eq.racks],['Fire Zones',eq.fireZones],['BMS Points',CX_BMS[inp.bmsComplexity].pts]];
       eqItems.forEach(function(e){
-        eg.innerHTML+='<div class="cx-equip-item"><div class="cx-equip-count">'+e[1].toLocaleString()+'</div><div class="cx-equip-name">'+e[0]+'</div></div>';
+        eg.innerHTML+='<div class="cx-equip-item"><div class="cx-equip-name cx-kpi-label">'+e[0]+'</div><div class="cx-equip-count cx-kpi-value">'+e[1].toLocaleString()+'</div></div>';
       });
 
       // Risk Score (Panel 7)
@@ -5248,8 +4612,8 @@ function cxCalculate(){
       var riskClass=riskScore<30?'cx-risk-low':riskScore<55?'cx-risk-moderate':riskScore<75?'cx-risk-high':'cx-risk-very-high';
       var riskLabel=riskScore<30?'Low':riskScore<55?'Moderate':riskScore<75?'High':'Very High';
       var rc=document.getElementById('cxRiskContent');
-      rc.innerHTML='<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;"><div style="font-size:2rem;font-weight:800;font-family:JetBrains Mono,monospace;color:#22d3ee;">'+riskScore+'<span style="font-size:0.8rem;color:#64748b;">/100</span></div><span class="cx-risk-badge '+riskClass+'">'+riskLabel+' Risk</span></div>';
-      rc.innerHTML+='<div style="font-size:0.8rem;color:#94a3b8;line-height:1.7;">'+cxGenRiskNarrative(inp,riskScore)+'</div>';
+      rc.innerHTML='<div class="cx-risk-head"><div class="cx-risk-score">'+riskScore+'<span>/100</span></div><span class="cx-risk-badge '+riskClass+'">'+riskLabel+' Risk</span></div>';
+      rc.innerHTML+='<div style="font-size:0.8rem;color:var(--rzt-muted);line-height:1.7;">'+cxGenRiskNarrative(inp,riskScore)+'</div>';
 
       // Resource Table (Panel 8)
       var rtb=document.getElementById('cxResTableBody');
@@ -5273,7 +4637,7 @@ function cxCalculate(){
       pg.innerHTML='';
       var gates=['L0→L1: Cx Plan Approved','L1→L2: FAT Complete','L2→L3: Installation Verified','L3→L4: All Systems Energized','L4→L5: Performance Validated','L5→L6: IST Complete','L6→RFS: Turnover Accepted'];
       gates.forEach(function(g){
-        pg.innerHTML+='<span class="cx-phase-gate cx-gate-pending"><i class="fas fa-circle" style="font-size:6px;"></i>'+g+'</span>';
+        pg.innerHTML+='<span class="cx-phase-gate cx-gate-pending">'+g+'</span>';
       });
 
       // Panel 10: Resource Histogram
@@ -5313,8 +4677,8 @@ function cxCalculate(){
     },50); // Small delay to allow loading spinner to render
   }
 
-  // Scroll to results
-  document.getElementById('cxResults').scrollIntoView({behavior:'smooth',block:'start'});
+  // Scroll to results only when the Calculate button asked for it (live recalculation keeps the reader where they are)
+  if(scrollToResults===true)document.getElementById('cxResults').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function cxReset(){
@@ -5335,8 +4699,8 @@ function cxReset(){
   document.getElementById('cxBmsComplexity').value='standard';
   document.getElementById('cxDeliveryMethod').value='traditional';
   document.getElementById('cxScenarioSelect').value='';
-  document.getElementById('cxResults').style.display='none';
   cxLastResults=null;cxLastMC=null;cxLastSens=null;cxLastInputs=null;
+  cxCalculate();
 }
 
 function cxLoadScenario(){
@@ -5373,7 +4737,7 @@ function cxSwitchMode(mode){
   var proBtn=document.querySelector('.cx-btn-pro');
   var faqBtn=document.querySelector('.cx-btn-faq');
   var manualBtn=document.querySelector('.cx-btn-manual');
-  [freeBtn,proBtn,faqBtn,manualBtn].forEach(function(b){if(b)b.classList.remove('active');});
+  [freeBtn,proBtn,faqBtn,manualBtn].forEach(function(b){if(b){b.classList.remove('active');b.setAttribute('aria-pressed','false');}});
   // Calculator sections
   var calcEls=['cxInputsGrid','cxScenarioSelect','cxResults','cxLoading'];
   var scenarioBar=document.querySelector('.cx-scenario-bar');
@@ -5390,8 +4754,8 @@ function cxSwitchMode(mode){
   // Helper to show/hide calculator chrome
   function showCalc(v){
     var d=v?'':'none';
-    if(scenarioBar)scenarioBar.style.display=v?'flex':'none';
-    if(inputsGrid)inputsGrid.style.display=v?'grid':'none';
+    if(scenarioBar)scenarioBar.style.display=v?'':'none';
+    if(inputsGrid)inputsGrid.style.display=v?'':'none';
     if(resultsEl)resultsEl.style.display=v?'block':'none';
     if(disclaimerEl)disclaimerEl.style.display=v?'flex':'none';
     if(privacyEl)privacyEl.style.display=v?'flex':'none';
@@ -5420,13 +4784,13 @@ function cxSwitchMode(mode){
   if(faqSec)faqSec.classList.remove('active');
   if(manualSec)manualSec.classList.remove('active');
   if(mode==='free'){
-    if(freeBtn)freeBtn.classList.add('active');
+    if(freeBtn){freeBtn.classList.add('active');freeBtn.setAttribute('aria-pressed','true');}
   } else {
-    if(proBtn)proBtn.classList.add('active');
+    if(proBtn){proBtn.classList.add('active');proBtn.setAttribute('aria-pressed','true');}
   }
   // Toggle pro section visibility
   if(proSec){
-    if(mode==='pro'&&cxIsPremium){proSec.style.display='block';}
+    if(mode==='pro'&&cxIsPremium){proSec.style.display='grid';}
     else{proSec.style.display='none';}
   }
   // Toggle pro inputs
@@ -5442,8 +4806,8 @@ function cxSwitchMode(mode){
   // Update PDF button label
   var pdfBtn=document.querySelector('.cx-btn-pdf');
   if(pdfBtn){
-    if(mode==='pro'&&cxIsPremium){pdfBtn.innerHTML='<i class="fas fa-file-pdf" style="margin-right:6px;"></i>Export Full Report';}
-    else{pdfBtn.innerHTML='<i class="fas fa-file-pdf" style="margin-right:6px;"></i>Export PDF';}
+    if(mode==='pro'&&cxIsPremium){pdfBtn.textContent='Export full report';}
+    else{pdfBtn.textContent='Export PDF';}
   }
   // Recalculate if results exist
   if(cxLastResults)cxCalculate();
@@ -5520,35 +4884,33 @@ window.addEventListener('rz-auth-change',function(e){
 
 function cxActivatePremiumUI(){
   cxCurrentMode='pro';
-  document.getElementById('cxPremiumBadge').style.display='inline-block';
-  document.getElementById('cxPremiumBtn').style.display='none';
+  document.getElementById('cxFullRow').hidden=true;
   var proBtn=document.querySelector('.cx-btn-pro');
-  if(proBtn){proBtn.classList.add('active');proBtn.innerHTML='<i class="fas fa-crown" style="margin-right:6px;"></i>Pro Active';}
+  if(proBtn){proBtn.classList.add('active');proBtn.setAttribute('aria-pressed','true');}
   var freeBtn=document.querySelector('.cx-btn-free');
-  if(freeBtn)freeBtn.classList.remove('active');
+  if(freeBtn){freeBtn.classList.remove('active');freeBtn.setAttribute('aria-pressed','false');}
   document.querySelectorAll('.cx-pro-input').forEach(function(el){el.classList.add('unlocked');});
   document.querySelectorAll('.cx-pro-panel.gated').forEach(function(el){el.classList.add('unlocked');});
   var proSec=document.getElementById('cxProSection');
-  if(proSec)proSec.style.display='block';
+  if(proSec)proSec.style.display='grid';
   // Update PDF button
   var pdfBtn=document.querySelector('.cx-btn-pdf');
-  if(pdfBtn)pdfBtn.innerHTML='<i class="fas fa-file-pdf" style="margin-right:6px;"></i>Export Full Report';
+  if(pdfBtn)pdfBtn.textContent='Export full report';
 }
 function cxDeactivatePremiumUI(){
   cxCurrentMode='free';
-  document.getElementById('cxPremiumBadge').style.display='none';
-  document.getElementById('cxPremiumBtn').style.display='inline-flex';
+  document.getElementById('cxFullRow').hidden=false;
   var proBtn=document.querySelector('.cx-btn-pro');
-  if(proBtn){proBtn.classList.remove('active');proBtn.innerHTML='<i class="fas fa-crown" style="margin-right:6px;"></i>Pro Analysis';}
+  if(proBtn){proBtn.classList.remove('active');proBtn.setAttribute('aria-pressed','false');}
   var freeBtn=document.querySelector('.cx-btn-free');
-  if(freeBtn)freeBtn.classList.add('active');
+  if(freeBtn){freeBtn.classList.add('active');freeBtn.setAttribute('aria-pressed','true');}
   document.querySelectorAll('.cx-pro-input').forEach(function(el){el.classList.remove('unlocked');});
   document.querySelectorAll('.cx-pro-panel.gated').forEach(function(el){el.classList.remove('unlocked');});
   var proSec=document.getElementById('cxProSection');
   if(proSec)proSec.style.display='none';
   // Reset PDF button
   var pdfBtn=document.querySelector('.cx-btn-pdf');
-  if(pdfBtn)pdfBtn.innerHTML='<i class="fas fa-file-pdf" style="margin-right:6px;"></i>Export PDF';
+  if(pdfBtn)pdfBtn.textContent='Export PDF';
 }
 
 function cxHandlePremium(){
@@ -5593,7 +4955,7 @@ function cxRenderFaq(){
       {q:'What are the Scenario Presets?',a:'Eight pre-configured archetypes with industry-standard parameters:<ol><li><strong>Enterprise 2MW</strong> — Tier III, N+1, air cooling</li><li><strong>Colocation 10MW</strong> — Tier III+, 2N, in-row</li><li><strong>Hyperscale 50MW</strong> — 2N+1, DLC</li><li><strong>AI Factory 100MW</strong> — 2N+1, DLC, ultra-high density (2026)</li><li><strong>Edge 500kW</strong> — Tier II, N+1, modular</li><li><strong>Modular 5MW</strong> — Prefab pods, RDHX</li><li><strong>Fast-Track 10MW</strong> — Repurposed warehouse</li><li><strong>Recommissioning 3MW</strong> — Existing facility upgrade</li></ol>Load a preset to auto-fill all inputs, then customize as needed.'},
       {q:'What Full access inputs are available?',a:'Full access mode adds 6 additional parameters:<ul><li><strong>Generator Type</strong> — Diesel, gas, dual-fuel, BESS (affects FAT and startup testing)</li><li><strong>Seismic Zone</strong> — 0 to 4 (adds anchor bolt, rack seismic, isolation testing)</li><li><strong>Cx Scope</strong> — New build, retrofit, expansion, recommissioning</li><li><strong>Substation Config</strong> — Utility-fed, ring bus, dual sub (ring bus adds 80-110%)</li><li><strong>BMS/DCIM Complexity</strong> — Basic to AI-driven (doubles controls Cx scope)</li><li><strong>Delivery Method</strong> — Traditional, design-build, EPC, fast-track</li></ul>'},
       {q:'What does Region selection affect?',a:'Region determines <strong>labor day rates</strong> for 5 role types: CxA (Commissioning Authority), Field Technician, OEM Specialist, Witness Engineer, and Per Diem. 30 regions are available spanning North America, Europe, Asia-Pacific, Middle East, and emerging markets. Example: Northern Virginia CxA rate ~$2,400/day vs Jakarta ~$800/day.'},
-      {q:'Why do some inputs show a lock icon?',a:'Inputs marked with <i class="fas fa-crown" style="color:#0891b2;"></i> are Full access-only features. They are visible but locked in Free mode. Sign in with a Full access account to unlock them. Full access inputs significantly affect cost accuracy for complex facilities.'}
+      {q:'Why do some inputs show a lock icon?',a:'Inputs marked with <i class="fas fa-crown" style="color:var(--rzt-accent-text);"></i> are Full access-only features. They are visible but locked in Free mode. Sign in with a Full access account to unlock them. Full access inputs significantly affect cost accuracy for complex facilities.'}
     ]},
     {cat:'Calculation & Results',icon:'fa-calculator',items:[
       {q:'How is the total commissioning cost calculated?',a:'The calculator uses a <strong>parametric model</strong>:<ol><li>Base cost per kW per discipline (electrical, mechanical, controls, fire, building) from BSRIA/RSMeans data</li><li>Scaled by IT load capacity</li><li>Multiplied by 12+ adjustment factors: cooling type, redundancy, building type, seismic zone, substation, BMS, delivery method, fire suppression, UPS type, generator type, density, scope</li><li>Distributed across 7 phases (L0-L6) using phase allocation percentages</li><li>Regional labor rates applied to person-day estimates</li></ol>Full access mode adds: overtime premium, weather delay, learning curve, travel cost, instrument rental, and escalation factors.'},
@@ -5634,13 +4996,13 @@ function cxRenderFaq(){
       {q:'What is IST and why is it the most expensive phase?',a:'<strong>Integrated Systems Testing (L5)</strong> tests all facility systems together under simulated failure conditions. It is the most expensive phase (typically 20-25% of total Cx cost) because it requires:<ul><li>Full facility power and cooling operational</li><li>Load banks simulating IT load</li><li>Multiple simultaneous teams for concurrent failure scenarios</li><li>72-hour extended run tests</li><li>OEM specialists on standby</li><li>Witness engineers for every Hold point</li></ul>IST scenarios include: black start, generator fail-to-start, UPS bypass, cooling failure, concurrent maintenance (Tier III), and fault tolerance (Tier IV).'}
     ]}
   ];
-  var html='<button class="cx-faq-back" onclick="cxSwitchMode(\'free\')"><i class="fas fa-arrow-left"></i> Back to Calculator</button>';
-  html+='<div class="cx-faq-header"><h2><i class="fas fa-circle-question" style="color:#22d3ee;margin-right:10px;"></i>Frequently Asked Questions</h2><p>'+faqData.reduce(function(n,c){return n+c.items.length;},0)+' answers across '+faqData.length+' categories — everything you need to know about the Cx Calculator</p></div>';
+  var html='<button type="button" class="tool-btn cx-faq-back" onclick="cxCloseRef()">Close FAQ</button>';
+  html+='<div class="cx-faq-header"><h2>Frequently asked questions</h2><p>'+faqData.reduce(function(n,c){return n+c.items.length;},0)+' answers across '+faqData.length+' categories — everything you need to know about the Cx Calculator</p></div>';
   html+='<input type="text" class="cx-faq-search" id="cxFaqSearch" placeholder="Search FAQ..." oninput="cxFilterFaq(this.value)" aria-label="Search FAQ...">';
   html+='<div class="cx-faq-count" id="cxFaqCount"></div>';
   faqData.forEach(function(cat,ci){
     html+='<div class="cx-faq-category" data-faqcat="'+ci+'">';
-    html+='<div class="cx-faq-cat-header open" onclick="this.classList.toggle(\'open\')"><i class="fas '+cat.icon+'"></i>'+cat.cat+' <span style="font-weight:400;color:#64748b;font-size:0.82rem;">('+cat.items.length+')</span><i class="fas fa-chevron-right cx-faq-cat-chevron"></i></div>';
+    html+='<div class="cx-faq-cat-header open" onclick="this.classList.toggle(\'open\')"><i class="fas '+cat.icon+'"></i>'+cat.cat+' <span style="font-weight:400;color:var(--rzt-muted);font-size:0.82rem;">('+cat.items.length+')</span><i class="fas fa-chevron-right cx-faq-cat-chevron"></i></div>';
     html+='<div class="cx-faq-cat-body">';
     cat.items.forEach(function(item,ii){
       html+='<div class="cx-faq-item" data-faqq="'+cat.cat.toLowerCase()+' '+item.q.toLowerCase()+'">';
@@ -5728,12 +5090,12 @@ function cxRenderManual(){
       tip('Load a preset first, then customize individual parameters. This is the fastest way to get an accurate estimate for your specific project.');
     }},
     {id:'results',title:'Understanding Results',icon:'fa-chart-bar',desc:'How to interpret KPIs, charts, and narrative',body:function(){
-      return '<h4 style="color:#f1f5f9;margin-bottom:0.5rem;">KPI Cards</h4>'+
+      return '<h4 style="color:var(--rzt-text);margin-bottom:0.5rem;">KPI Cards</h4>'+
       s(1,'Total Cx Cost','The estimated total commissioning program cost in USD. This includes all phases (L0-L6), all disciplines, labor, equipment rental, travel, and overhead. <strong>Does not include</strong> construction cost, equipment purchase, or facility fit-out.')+
       s(2,'Duration (Weeks)','Total estimated program duration from L0 kickoff to L6 closeout. Phases may overlap in practice (e.g., L1 FAT can start while L0 planning continues). The Gantt chart shows the detailed phase sequencing.')+
       s(3,'Cost per kW','Total Cx cost divided by IT load capacity. This normalized metric allows comparison across different facility sizes. Industry benchmarks: enterprise $120-180/kW, hyperscale $100-200/kW, AI factory $150-300/kW.')+
       s(4,'% of CAPEX','Commissioning cost as a percentage of estimated total facility CAPEX. The CAPEX estimate uses RSMeans 2025 data scaled by facility type and cooling. Typical range: 2-5% of CAPEX.')+
-      '<h4 style="color:#f1f5f9;margin:1rem 0 0.5rem;">Charts</h4>'+
+      '<h4 style="color:var(--rzt-text);margin:1rem 0 0.5rem;">Charts</h4>'+
       s(5,'Cost by Level','Bar chart showing the cost allocation across L0-L6. L5 (IST) is typically the most expensive phase at 20-25% of total cost. L2 (Installation Verification) is usually the second-largest.')+
       s(6,'Schedule by Level','Horizontal bar chart showing duration in weeks per phase. Hover over bars to see exact values. Note that real-world phases may overlap.');
     }},
@@ -5745,15 +5107,15 @@ function cxRenderManual(){
       s(5,'View activity details','Click any <strong>leaf activity</strong> (no expand arrow) to open the Activity Detail Drawer. The drawer shows 4 tabs: Procedure, Acceptance, Logsheet, and Tools &amp; Safety.')+
       s(6,'Export','Use <strong>CSV</strong> to download the schedule as a spreadsheet. Use <strong>Procedures</strong> to bulk-export all mapped procedures as a single PDF document.')+
       note('Activity durations are calculated from equipment quantities, which are derived from your IT load input. Changing the IT load will update all activity durations proportionally.')+
-      '<h4 style="color:#f1f5f9;margin:1rem 0 0.5rem;">Phase Color Legend</h4>'+
+      '<h4 style="color:var(--rzt-text);margin:1rem 0 0.5rem;">Phase Color Legend</h4>'+
       '<table class="cx-manual-table"><thead><tr><th scope="col">Color</th><th scope="col">Phase</th><th scope="col">Typical %</th></tr></thead><tbody>'+
-      '<tr><td style="color:#64748b;">Gray</td><td>L0 — Design &amp; Planning</td><td>8%</td></tr>'+
-      '<tr><td style="color:#3b82f6;">Blue</td><td>L1 — FAT</td><td>12%</td></tr>'+
-      '<tr><td style="color:#10b981;">Green</td><td>L2 — Installation</td><td>20%</td></tr>'+
-      '<tr><td style="color:#f59e0b;">Amber</td><td>L3 — Startup</td><td>18%</td></tr>'+
-      '<tr><td style="color:#64748b;">Purple</td><td>L4 — Performance</td><td>15%</td></tr>'+
-      '<tr><td style="color:#ef4444;">Red</td><td>L5 — IST</td><td>22%</td></tr>'+
-      '<tr><td style="color:#f97316;">Orange</td><td>L6 — Turnover</td><td>5%</td></tr>'+
+      '<tr><td>Dark grey</td><td>L0 — Design &amp; Planning</td><td>8%</td></tr>'+
+      '<tr><td>Grey</td><td>L1 — FAT</td><td>12%</td></tr>'+
+      '<tr><td>Light grey</td><td>L2 — Installation</td><td>20%</td></tr>'+
+      '<tr><td>Mid grey</td><td>L3 — Startup</td><td>18%</td></tr>'+
+      '<tr><td>Pale grey</td><td>L4 — Performance</td><td>15%</td></tr>'+
+      '<tr><td>Amber</td><td>L5 — IST</td><td>22%</td></tr>'+
+      '<tr><td>Darkest grey</td><td>L6 — Turnover</td><td>5%</td></tr>'+
       '</tbody></table>';
     }},
     {id:'procedures',title:'Activity Procedures',icon:'fa-clipboard-list',desc:'Commissioning procedures, acceptance criteria, and logsheets',body:function(){
@@ -5766,7 +5128,7 @@ function cxRenderManual(){
       tip('Use "Full Package" export to generate complete test documentation for each commissioning activity. This can be used as a starting template for actual project commissioning procedures.');
     }},
     {id:'pro-features',title:'Full-access features',icon:'fa-crown',desc:'Advanced analytics, Monte Carlo, sensitivity, and more',body:function(){
-      return '<p style="color:#94a3b8;font-size:0.85rem;margin-bottom:1rem;">Full access mode unlocks 6 additional input parameters and 14 advanced analysis panels. Access with demo credentials: <code>demo@resistancezero.com</code> / <code>demo2026</code></p>'+
+      return '<p style="color:var(--rzt-muted);font-size:0.85rem;margin-bottom:1rem;">Full access mode unlocks 6 additional input parameters and 14 advanced analysis panels. Access with demo credentials: <code>demo@resistancezero.com</code> / <code>demo2026</code></p>'+
       s(1,'Monte Carlo Simulation','Runs 10,000 random iterations varying IT load by ±7.5% standard deviation. Produces a probability distribution of commissioning costs with P5/P25/P50/P75/P95 percentiles and CVaR-95 tail risk metric.')+
       s(2,'Sensitivity Analysis','Tests 7 parameters individually between extreme values. The tornado chart shows which parameters have the largest impact on total cost — crucial for risk-focused budgeting.')+
       s(3,'Cost by Discipline','Doughnut chart breaking down costs into 5 disciplines: Electrical, Mechanical, Controls/BMS, Fire/Life Safety, and Building/Architectural.')+
@@ -5840,8 +5202,8 @@ function cxRenderManual(){
   function s(n,title,desc){return '<div class="cx-manual-step"><div class="cx-manual-step-num">'+n+'</div><div class="cx-manual-step-text"><strong>'+title+'</strong><br>'+desc+'</div></div>';}
   function note(t){return '<div class="cx-manual-note"><i class="fas fa-triangle-exclamation"></i><div>'+t+'</div></div>';}
   function tip(t){return '<div class="cx-manual-tip"><i class="fas fa-lightbulb"></i><div>'+t+'</div></div>';}
-  var html='<button class="cx-manual-back" onclick="cxSwitchMode(\'free\')"><i class="fas fa-arrow-left"></i> Back to Calculator</button>';
-  html+='<div class="cx-manual-header"><h2><i class="fas fa-book" style="color:#22d3ee;margin-right:10px;"></i>User Manual</h2><p>Comprehensive guide to the Data Center Commissioning Calculator — '+chapters.length+' chapters</p></div>';
+  var html='<button type="button" class="tool-btn cx-manual-back" onclick="cxCloseRef()">Close guide</button>';
+  html+='<div class="cx-manual-header"><h2>User guide</h2><p>Comprehensive guide to the Data Center Commissioning Calculator — '+chapters.length+' chapters</p></div>';
   html+='<div class="cx-manual-nav">';
   // Sidebar TOC
   html+='<div class="cx-manual-sidebar">';
@@ -5922,7 +5284,7 @@ function cxRenderComparison(inp,res){
   var el=document.getElementById('cxComparisonContent');
   if(!el)return;
   var presets=['enterprise_2mw','colo_10mw','hyperscale_50mw','ai_factory_100mw','modular_5mw','fast_track'];
-  var html='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th scope="col">Metric</th><th style="color:#22d3ee;"  scope="col">Your Config</th>';
+  var html='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th scope="col">Metric</th><th style="color:var(--rzt-accent-text);"  scope="col">Your Config</th>';
   var compResults=[];
   presets.forEach(function(pk){
     var s=CX_SCENARIOS[pk];
@@ -5940,7 +5302,7 @@ function cxRenderComparison(inp,res){
     ['Risk Score',function(r,i){return cxCalcRiskScore(i,r)+'/100';}]
   ];
   rows.forEach(function(row){
-    html+='<tr><td><strong>'+row[0]+'</strong></td><td style="color:#22d3ee;font-weight:600;">'+row[1](res,inp)+'</td>';
+    html+='<tr><td><strong>'+row[0]+'</strong></td><td style="color:var(--rzt-accent-text);font-weight:600;">'+row[1](res,inp)+'</td>';
     compResults.forEach(function(c){html+='<td>'+row[1](c.res,c.inp)+'</td>';});
     html+='</tr>';
   });
@@ -5953,15 +5315,15 @@ function cxRenderWaterfall(res,inp){
   var el=document.getElementById('cxWaterfallContent');
   if(!el)return;
   var items=[
-    {label:'Base (Electrical)',val:res.disciplines.electrical,color:'#3b82f6'},
-    {label:'+ Mechanical',val:res.disciplines.mechanical,color:'#10b981'},
-    {label:'+ Controls/BMS',val:res.disciplines.controls,color:'#64748b'},
-    {label:'+ Fire/Life Safety',val:res.disciplines.fire,color:'#ef4444'},
-    {label:'+ Security',val:res.disciplines.security,color:'#f59e0b'},
-    {label:'+ IT/Network',val:res.disciplines.it,color:'#06b6d4'},
-    {label:'+ Building',val:res.disciplines.building,color:'#64748b'},
-    {label:'+ Management',val:res.disciplines.management,color:'#0891b2'},
-    {label:'+ Contingency (15%)',val:res.contingency,color:'#f97316'}
+    {label:'Base (Electrical)',val:res.disciplines.electrical,color:'#A0AEC0'},
+    {label:'+ Mechanical',val:res.disciplines.mechanical,color:'#8C96A3'},
+    {label:'+ Controls/BMS',val:res.disciplines.controls,color:'#7D8794'},
+    {label:'+ Fire/Life Safety',val:res.disciplines.fire,color:'#6B7280'},
+    {label:'+ Security',val:res.disciplines.security,color:'#5E6673'},
+    {label:'+ IT/Network',val:res.disciplines.it,color:'#C9CFD8'},
+    {label:'+ Building',val:res.disciplines.building,color:'#4A5160'},
+    {label:'+ Management',val:res.disciplines.management,color:'#7D8794'},
+    {label:'+ Contingency (15%)',val:res.contingency,color:'#5E6673'}
   ];
   var cumul=0;
   var maxVal=res.grandTotal;
@@ -5971,18 +5333,18 @@ function cxRenderWaterfall(res,inp){
     var pct=(it.val/maxVal)*barW;
     var leftPct=(cumul/maxVal)*barW;
     html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
-    html+='<div style="width:140px;text-align:right;color:#94a3b8;font-size:0.75rem;flex-shrink:0;">'+it.label+'</div>';
-    html+='<div style="flex:1;height:22px;background:rgba(148,163,184,0.06);border-radius:4px;position:relative;overflow:hidden;">';
+    html+='<div style="width:140px;text-align:right;color:var(--rzt-muted);font-size:0.75rem;flex-shrink:0;">'+it.label+'</div>';
+    html+='<div style="flex:1;height:22px;background:none;border-radius:4px;position:relative;overflow:hidden;">';
     html+='<div style="position:absolute;left:'+leftPct+'%;width:'+Math.max(pct,0.5)+'%;height:100%;background:'+it.color+';border-radius:3px;"></div>';
     html+='</div>';
-    html+='<div style="width:80px;text-align:right;color:#cbd5e1;font-weight:600;">'+cxFmtCur(it.val)+'</div>';
+    html+='<div style="width:80px;text-align:right;color:var(--rzt-text);font-weight:600;">'+cxFmtCur(it.val)+'</div>';
     html+='</div>';
     cumul+=it.val;
   });
-  html+='<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(148,163,184,0.1);">';
-  html+='<div style="width:140px;text-align:right;color:#22d3ee;font-weight:700;">= Grand Total</div>';
-  html+='<div style="flex:1;height:26px;background:rgba(14,116,144,0.15);border-radius:4px;"></div>';
-  html+='<div style="width:80px;text-align:right;color:#22d3ee;font-weight:700;">'+cxFmtCur(res.grandTotal)+'</div>';
+  html+='<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--rzt-line);">';
+  html+='<div style="width:140px;text-align:right;color:var(--rzt-accent-text);font-weight:700;">= Grand Total</div>';
+  html+='<div style="flex:1;height:26px;background:var(--rzt-accent);opacity:.35;"></div>';
+  html+='<div style="width:80px;text-align:right;color:var(--rzt-accent-text);font-weight:700;">'+cxFmtCur(res.grandTotal)+'</div>';
   html+='</div></div>';
   el.innerHTML=html;
 }
@@ -5993,23 +5355,23 @@ function cxRenderMilestones(res,inp){
   if(!el)return;
   var totalWeeks=res.duration.weeks;
   var milestones=[
-    {week:0,label:'Project Kickoff',desc:'Cx plan approved, CxA mobilized',icon:'fa-flag',color:'#64748b'},
-    {week:Math.round(totalWeeks*0.05),label:'L0 Complete',desc:'OPR/BOD aligned, energization strategy approved',icon:'fa-clipboard-check',color:'#64748b'},
-    {week:Math.round(totalWeeks*0.12),label:'FAT Complete',desc:'All factory witness testing signed off',icon:'fa-industry',color:'#3b82f6'},
-    {week:Math.round(totalWeeks*0.30),label:'Installation Verified',desc:'All L2 static tests pass, ready for energization',icon:'fa-wrench',color:'#10b981'},
-    {week:Math.round(totalWeeks*0.50),label:'All Systems Energized',desc:'First power-on complete, BMS functional',icon:'fa-bolt',color:'#f59e0b'},
-    {week:Math.round(totalWeeks*0.70),label:'Performance Validated',desc:'All systems pass individual performance tests',icon:'fa-chart-line',color:'#64748b'},
-    {week:Math.round(totalWeeks*0.85),label:'IST Start',desc:'Integrated failure scenario testing begins',icon:'fa-triangle-exclamation',color:'#ef4444'},
-    {week:Math.round(totalWeeks*0.95),label:'IST Complete',desc:'All failure scenarios tested, 72-hr load test pass',icon:'fa-check-double',color:'#ef4444'},
-    {week:totalWeeks,label:'RFS / Turnover',desc:'Facility accepted, operations handover complete',icon:'fa-flag-checkered',color:'#22d3ee'}
+    {week:0,label:'Project Kickoff',desc:'Cx plan approved, CxA mobilized',icon:'fa-flag',color:'var(--rzt-line-strong)'},
+    {week:Math.round(totalWeeks*0.05),label:'L0 Complete',desc:'OPR/BOD aligned, energization strategy approved',icon:'fa-clipboard-check',color:'var(--rzt-line-strong)'},
+    {week:Math.round(totalWeeks*0.12),label:'FAT Complete',desc:'All factory witness testing signed off',icon:'fa-industry',color:'var(--rzt-line-strong)'},
+    {week:Math.round(totalWeeks*0.30),label:'Installation Verified',desc:'All L2 static tests pass, ready for energization',icon:'fa-wrench',color:'var(--rzt-line-strong)'},
+    {week:Math.round(totalWeeks*0.50),label:'All Systems Energized',desc:'First power-on complete, BMS functional',icon:'fa-bolt',color:'var(--rzt-line-strong)'},
+    {week:Math.round(totalWeeks*0.70),label:'Performance Validated',desc:'All systems pass individual performance tests',icon:'fa-chart-line',color:'var(--rzt-line-strong)'},
+    {week:Math.round(totalWeeks*0.85),label:'IST Start',desc:'Integrated failure scenario testing begins',icon:'fa-triangle-exclamation',color:'var(--rzt-line-strong)'},
+    {week:Math.round(totalWeeks*0.95),label:'IST Complete',desc:'All failure scenarios tested, 72-hr load test pass',icon:'fa-check-double',color:'var(--rzt-line-strong)'},
+    {week:totalWeeks,label:'RFS / Turnover',desc:'Facility accepted, operations handover complete',icon:'fa-flag-checkered',color:'var(--rzt-accent)'}
   ];
   var html='<div style="position:relative;padding-left:30px;">';
-  html+='<div style="position:absolute;left:14px;top:0;bottom:0;width:2px;background:rgba(148,163,184,0.15);"></div>';
+  html+='<div style="position:absolute;left:14px;top:0;bottom:0;width:2px;background:none;"></div>';
   milestones.forEach(function(m){
     html+='<div style="position:relative;margin-bottom:1rem;display:flex;gap:12px;align-items:flex-start;">';
-    html+='<div style="position:absolute;left:-24px;width:20px;height:20px;border-radius:50%;background:'+m.color+';display:flex;align-items:center;justify-content:center;z-index:1;"><i class="fas '+m.icon+'" style="font-size:0.55rem;color:#fff;"></i></div>';
-    html+='<div><div style="font-size:0.82rem;font-weight:700;color:#e2e8f0;">Week '+m.week+' — '+m.label+'</div>';
-    html+='<div style="font-size:0.78rem;color:#94a3b8;">'+m.desc+'</div></div>';
+    html+='<div style="position:absolute;left:-24px;width:10px;height:10px;left:-19px;margin-top:5px;background:'+m.color+';display:flex;align-items:center;justify-content:center;z-index:1;"></div>';
+    html+='<div><div style="font-size:0.82rem;font-weight:700;color:var(--rzt-text);">Week '+m.week+' — '+m.label+'</div>';
+    html+='<div style="font-size:0.78rem;color:var(--rzt-muted);">'+m.desc+'</div></div>';
     html+='</div>';
   });
   html+='</div>';
@@ -6035,10 +5397,10 @@ function cxRenderTeam(res,inp){
     {role:'Project Manager',count:load>=50000?2:1,phase:'L0-L6',note:'Schedule, cost, resource coordination'}
   ];
   var total=roles.reduce(function(s,r){return s+Math.ceil(r.count);},0);
-  var html='<div style="font-size:0.78rem;margin-bottom:0.75rem;color:#94a3b8;">Recommended team: <strong style="color:#22d3ee;">'+total+' personnel</strong> (peak deployment during L3-L5)</div>';
+  var html='<div style="font-size:0.78rem;margin-bottom:0.75rem;color:var(--rzt-muted);">Recommended team: <strong style="color:var(--rzt-accent-text);">'+total+' personnel</strong> (peak deployment during L3-L5)</div>';
   html+='<table class="cx-resource-table" style="font-size:0.78rem;"><thead><tr><th scope="col">Role</th><th scope="col">Count</th><th scope="col">Phases</th><th scope="col">Responsibility</th></tr></thead><tbody>';
   roles.forEach(function(r){
-    html+='<tr><td><strong>'+r.role+'</strong></td><td style="text-align:center;color:#22d3ee;font-weight:600;">'+Math.ceil(r.count)+'</td><td>'+r.phase+'</td><td style="color:#94a3b8;">'+r.note+'</td></tr>';
+    html+='<tr><td><strong>'+r.role+'</strong></td><td style="text-align:center;color:var(--rzt-accent-text);font-weight:600;">'+Math.ceil(r.count)+'</td><td>'+r.phase+'</td><td style="color:var(--rzt-muted);">'+r.note+'</td></tr>';
   });
   html+='</tbody></table>';
   el.innerHTML=html;
@@ -6058,15 +5420,15 @@ function cxRenderBenchmarkPanel(res,inp){
     var tr=cxCalcTotalCost(ti);
     var idx=((tr.grandTotal/baseTotal)*100).toFixed(0);
     var hi=rk===inp.region;
-    html+='<tr'+(hi?' style="background:rgba(14,116,144,0.1);"':'')+'>';
-    html+='<td>'+(hi?'<strong style="color:#22d3ee;">':'')+(rate.name||rk)+(hi?' (Current)</strong>':'')+'</td>';
+    html+='<tr'+(hi?' style="background:none;"':'')+'>';
+    html+='<td>'+(hi?'<strong style="color:var(--rzt-accent-text);">':'')+(rate.name||rk)+(hi?' (Current)</strong>':'')+'</td>';
     html+='<td>'+cxFmtCur(rate.cxDay)+'/day</td>';
     html+='<td>'+cxFmtCur(tr.grandTotal)+'</td>';
-    html+='<td>'+(idx>110?'<span style="color:#ef4444;">':idx<90?'<span style="color:#10b981;">':'<span style="color:#94a3b8;">')+idx+'%</span></td>';
+    html+='<td>'+(idx>110?'<span class="state" data-state="watch">':'<span>')+idx+'%</span>'+(idx>110?' dearer':idx<90?' cheaper':'')+'</td>';
     html+='</tr>';
   });
   html+='</tbody></table>';
-  html+='<div style="font-size:0.72rem;color:#64748b;margin-top:0.5rem;">Cost Index: 100% = your current region. Values &gt;110% are more expensive; &lt;90% are cheaper.</div>';
+  html+='<div style="font-size:0.72rem;color:var(--rzt-muted);margin-top:0.5rem;">Cost Index: 100% = your current region. Values &gt;110% are more expensive; &lt;90% are cheaper.</div>';
   el.innerHTML=html;
 }
 
@@ -6101,14 +5463,14 @@ function cxRenderEnvironmental(res,inp){
   var html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem;">';
   items.forEach(function(it){
     var isTotal=it.label.indexOf('Total')>-1;
-    html+='<div style="padding:0.75rem;border-radius:8px;background:'+(isTotal?'rgba(14,116,144,0.1)':'rgba(15,23,42,0.4)')+';border:1px solid '+(isTotal?'rgba(14,116,144,0.3)':'rgba(148,163,184,0.06)')+';">';
-    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><i class="fas '+it.icon+'" style="color:'+(isTotal?'#22d3ee':'#64748b')+';font-size:0.8rem;"></i><span style="font-size:0.82rem;font-weight:700;color:'+(isTotal?'#22d3ee':'#e2e8f0')+';">'+it.val+'</span></div>';
-    html+='<div style="font-size:0.75rem;color:#94a3b8;">'+it.label+'</div>';
-    html+='<div style="font-size:0.72rem;color:#64748b;">'+it.desc+'</div>';
+    html+='<div style="padding:0.75rem;border-radius:4px;border:1px solid '+(isTotal?'var(--rzt-accent)':'var(--rzt-line)')+';">';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-family:var(--rzt-mono);font-size:0.95rem;font-weight:500;color:'+(isTotal?'var(--rzt-accent-text)':'var(--rzt-text)')+';">'+it.val+'</span></div>';
+    html+='<div style="font-size:0.75rem;color:var(--rzt-muted);">'+it.label+'</div>';
+    html+='<div style="font-size:0.72rem;color:var(--rzt-muted);">'+it.desc+'</div>';
     html+='</div>';
   });
   html+='</div>';
-  html+='<div style="font-size:0.72rem;color:#64748b;margin-top:0.75rem;">Estimates based on industry averages. Actual emissions depend on local grid mix, transport methods, and testing protocols. Consider carbon offsets for large commissioning programs.</div>';
+  html+='<div style="font-size:0.72rem;color:var(--rzt-muted);margin-top:0.75rem;">Estimates based on industry averages. Actual emissions depend on local grid mix, transport methods, and testing protocols. Consider carbon offsets for large commissioning programs.</div>';
   el.innerHTML=html;
 }
 
@@ -6140,7 +5502,7 @@ var _cxLastSaveEl=null;
 function cxShowLastSaved(){
   if(!_cxLastSaveEl){
     _cxLastSaveEl=document.createElement('span');
-    _cxLastSaveEl.style.cssText='font-size:0.68rem;color:#64748b;margin-left:8px;';
+    _cxLastSaveEl.style.cssText='font-size:0.68rem;color:var(--rzt-muted);margin-left:8px;';
     var actions=document.querySelector('.cx-toolbar-actions');
     if(actions)actions.appendChild(_cxLastSaveEl);
   }
@@ -6167,9 +5529,9 @@ function cxRenderGanttStats(ganttData){
   }
   walk(ganttData.items);
   var pct=total>0?Math.round((mapped/total)*100):0;
-  var html='<div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.78rem;color:#94a3b8;">';
-  html+='<span><strong style="color:#22d3ee;">'+total+'</strong> activities</span>';
-  html+='<span><strong style="color:#10b981;">'+mapped+'</strong> with procedures ('+pct+'%)</span>';
+  var html='<div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.78rem;color:var(--rzt-muted);">';
+  html+='<span><strong style="color:var(--rzt-accent-text);">'+total+'</strong> activities</span>';
+  html+='<span><strong style="color:var(--rzt-text-2);">'+mapped+'</strong> with procedures ('+pct+'%)</span>';
   Object.keys(phases).sort().forEach(function(ph){
     html+='<span>'+ph+': <strong>'+phases[ph]+'</strong></span>';
   });
@@ -6200,10 +5562,10 @@ function cxValidateInputs(){
   if(warnings.length>0){
     var div=document.createElement('div');
     div.id='cxValidationWarn';
-    div.style.cssText='margin:0.5rem 0;padding:0.75rem 1rem;border-radius:8px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);font-size:0.8rem;color:#fbbf24;';
-    div.innerHTML='<i class="fas fa-triangle-exclamation" style="margin-right:6px;"></i>'+warnings.join('<br><i class="fas fa-triangle-exclamation" style="margin-right:6px;"></i>');
+    div.className='tool-note cx-warn';
+    div.innerHTML='<b>Check</b> '+warnings.join('<br><b>Check</b> ');
     var inputGrid=document.getElementById('cxInputsGrid');
-    if(inputGrid)inputGrid.parentNode.insertBefore(div,inputGrid.nextSibling);
+    if(inputGrid)inputGrid.appendChild(div);
   }
 }
 
@@ -6212,10 +5574,10 @@ document.addEventListener('keydown',function(e){
   // Don't intercept when in input/modal
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA')return;
   if(e.target.closest('.cx-modal'))return;
-  if(e.key==='Enter')cxCalculate();
+  if(e.key==='Enter')cxCalculate(true);
   if(e.key==='Escape'){cxCloseDrawer();}
-  if(e.key==='?'||e.key==='/'){e.preventDefault();cxSwitchMode('faq');}
-  if(e.key==='m'&&!e.ctrlKey&&!e.metaKey){cxSwitchMode('manual');}
+  if(e.key==='?'){e.preventDefault();cxOpenRef('faq');}
+  if(e.key==='m'&&!e.ctrlKey&&!e.metaKey){cxOpenRef('manual');}
   if(e.key==='f'&&!e.ctrlKey&&!e.metaKey){cxSwitchMode('free');}
   if(e.key==='p'&&!e.ctrlKey&&!e.metaKey){cxSwitchMode('pro');}
   if(e.key==='r'&&!e.ctrlKey&&!e.metaKey){cxReset();}
@@ -6284,13 +5646,6 @@ document.addEventListener('mousedown',function(){
   document.body.classList.remove('cx-keyboard-nav');
 });
 
-// --- SCROLL TO TOP ---
-var cxScrollBtn=document.createElement('button');
-cxScrollBtn.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>';
-cxScrollBtn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:12px;background:rgba(14,116,144,0.9);border:none;color:white;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
-document.body.appendChild(cxScrollBtn);
-cxScrollBtn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
-window.addEventListener('scroll',function(){cxScrollBtn.style.display=window.scrollY>300?'flex':'none';});
 
 
 // v1.17.2 STABILIZATION: expose inline-onclick handlers on window
@@ -6320,6 +5675,26 @@ try {
   window.toggleCalcTheme       = toggleCalcTheme;
 } catch(e) { if(window.console)console.warn('v1.17.2 export block error:',e); }
 
+
+// --- tool shell: hub-nav account cluster (auth.js keeps the ids in sync), reference sections, first compute ---
+function handlePremiumTab(){ cxHandlePremium(); }
+function logoutPremium(){ cxLogout(); var dd=document.getElementById('navUserDropdown'); if(dd)dd.classList.remove('show'); }
+function toggleUserDropdown(){ var dd=document.getElementById('navUserDropdown'); if(dd)dd.classList.toggle('show'); }
+document.addEventListener('click',function(e){ var w=document.getElementById('navAuthWrap'); var dd=document.getElementById('navUserDropdown'); if(w&&dd&&!w.contains(e.target))dd.classList.remove('show'); });
+function cxOpenRef(kind){
+  var f=document.getElementById('cxFaqSection'),m=document.getElementById('cxManualSection');
+  var el=kind==='faq'?f:m,other=kind==='faq'?m:f;
+  if(kind==='faq')cxRenderFaq();else cxRenderManual();
+  if(other)other.classList.remove('active');
+  if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'start'});}
+}
+function cxCloseRef(){
+  ['cxFaqSection','cxManualSection'].forEach(function(i){var e=document.getElementById(i);if(e)e.classList.remove('active');});
+  var r=document.getElementById('ref-h');if(r)r.scrollIntoView({block:'start'});
+}
+window.cxOpenRef=cxOpenRef;window.cxCloseRef=cxCloseRef;window.handlePremiumTab=handlePremiumTab;window.logoutPremium=logoutPremium;window.toggleUserDropdown=toggleUserDropdown;
+if(!new URLSearchParams(window.location.search).has('itLoad')){ try{ cxCalculate(); }catch(e){ if(window.console)console.error('cx first compute',e); } }
+
 // --- THEME TOGGLE ---
 function toggleCalcTheme() {
     var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -6337,22 +5712,22 @@ function toggleCalcTheme() {
 
 <!-- Activity Detail Drawer -->
 <div class="cx-drawer-backdrop" id="cxDrawerBackdrop" onclick="cxCloseDrawer()"></div>
-<div class="cx-drawer" id="cxDrawer">
+<div class="cx-drawer" id="cxDrawer" role="dialog" aria-modal="true" aria-labelledby="cxDrawerTitle">
   <div class="cx-drawer-header">
     <h3 id="cxDrawerTitle">Activity Detail</h3>
-    <button class="cx-drawer-close" onclick="cxCloseDrawer()">&times;</button>
+    <button type="button" class="cx-drawer-close" onclick="cxCloseDrawer()" aria-label="Close">&times;</button>
   </div>
   <div class="cx-drawer-tabs">
-    <div class="cx-drawer-tab active" onclick="cxDrawerTab('procedure')"><i class="fas fa-clipboard-list" style="margin-right:4px;"></i>Procedure</div>
-    <div class="cx-drawer-tab" onclick="cxDrawerTab('acceptance')"><i class="fas fa-check-circle" style="margin-right:4px;"></i>Acceptance</div>
-    <div class="cx-drawer-tab" onclick="cxDrawerTab('logsheet')"><i class="fas fa-table" style="margin-right:4px;"></i>Logsheet</div>
-    <div class="cx-drawer-tab" onclick="cxDrawerTab('tools')"><i class="fas fa-toolbox" style="margin-right:4px;"></i>Tools & Safety</div>
+    <div class="cx-drawer-tab active" onclick="cxDrawerTab('procedure')" role="tab">Procedure</div>
+    <div class="cx-drawer-tab" onclick="cxDrawerTab('acceptance')" role="tab">Acceptance</div>
+    <div class="cx-drawer-tab" onclick="cxDrawerTab('logsheet')" role="tab">Logsheet</div>
+    <div class="cx-drawer-tab" onclick="cxDrawerTab('tools')" role="tab">Tools & Safety</div>
   </div>
   <div class="cx-drawer-body" id="cxDrawerBody"></div>
   <div class="cx-drawer-footer">
-    <button class="cx-btn-export-proc" onclick="cxExportActivityPDF('procedure')"><i class="fas fa-file-pdf"></i> Export Procedure</button>
-    <button class="cx-btn-export-log" onclick="cxExportActivityPDF('logsheet')"><i class="fas fa-file-pdf"></i> Export Logsheet</button>
-    <button class="cx-btn-export-pkg" onclick="cxExportActivityPDF('package')"><i class="fas fa-file-pdf"></i> Full Package</button>
+    <button type="button" class="tool-btn is-primary cx-btn-export-proc" onclick="cxExportActivityPDF('procedure')">Export procedure</button>
+    <button type="button" class="tool-btn cx-btn-export-log" onclick="cxExportActivityPDF('logsheet')">Export logsheet</button>
+    <button type="button" class="tool-btn cx-btn-export-pkg" onclick="cxExportActivityPDF('package')">Full package</button>
   </div>
 </div>
 
@@ -6363,6 +5738,5 @@ function toggleCalcTheme() {
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>
 <script src="js/rz-scenario.js?v=20261101-8cfec3e0"></script>
 <script type="module" src="js/rz-supabase.js?v=20260920-90bd6417"></script>
-    <script src="js/rz-manual-fab.js?v=20261101-1ada3636" defer></script>
 </body>
 </html>

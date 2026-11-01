@@ -32,7 +32,7 @@
 <meta name="keywords" content="critical spares calculator, FMECA criticality, newsvendor model, spare parts optimization, supplier risk index, Kraljic matrix, DMSMS, last-time-buy, data center M&amp;E spares, METRIC VARI-METRIC, spare parts management">
 <meta name="author" content="Bagus Dwi Permana">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#f59e0b">
+<meta name="theme-color" content="#0b0c0e">
 <link rel="canonical" href="https://resistancezero.com/spares-readiness-calculator.html">
 <link rel="alternate" hreflang="en" href="https://resistancezero.com/spares-readiness-calculator.html">
 <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/spares-readiness-calculator.html">
@@ -58,1263 +58,25 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
-<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
 <!-- Chart.js loaded blocking (non-deferred) per site convention to avoid sync init issues -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
-<style>
-:root {
-  --amber: #f59e0b;
-  --amber-light: #fbbf24;
-  --amber-dark: #d97706;
-  --amber-deeper: #b45309;
-  --primary-gradient: linear-gradient(135deg,#d97706 0%,#f59e0b 50%,#fbbf24 100%);
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --bg-tertiary: #e9ecef;
-  --text-primary: #212529;
-  --text-secondary: #495057;
-  --text-muted: #6c757d;
-  --glass-bg: rgba(255,255,255,0.85);
-  --glass-border: rgba(245,158,11,0.12);
-  --glass-blur: none;
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
-  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
-  --accent: #f59e0b;
-  --accent-light: #fbbf24;
-  --status-green: #10b981;
-  --status-yellow: #f59e0b;
-  --status-red: #ef4444;
-}
-[data-theme="dark"] {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --glass-bg: rgba(30,41,59,0.85);
-  --glass-border: rgba(245,158,11,0.18);
-}
-[data-theme="dark"] .navbar { background: rgba(15,23,42,0.92); }
-[data-theme="dark"] .input-field { background: #1e293b; border-color: #334155; color: #f1f5f9; }
-[data-theme="dark"] .input-field:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
-[data-theme="dark"] .tab-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
-[data-theme="dark"] .tab-btn.active { background: var(--amber); color: #0f172a; border-color: var(--amber); }
-[data-theme="dark"] .result-card, [data-theme="dark"] .module-card { background: #1e293b; border-color: #334155; }
-[data-theme="dark"] .info-box { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
-[data-theme="dark"] .status-red { background: rgba(239,68,68,0.15); color: #f87171; }
-[data-theme="dark"] .status-yellow { background: rgba(245,158,11,0.15); color: #fbbf24; }
-[data-theme="dark"] .status-green { background: rgba(16,185,129,0.15); color: #34d399; }
-[data-theme="dark"] .calc-disclaimer { background: #1e293b !important; border-color: #334155 !important; }
-[data-theme="dark"] .calc-disclaimer .disc-title { color: #f1f5f9 !important; }
-[data-theme="dark"] .calc-disclaimer .disc-text { color: #94a3b8 !important; }
-[data-theme="dark"] select option { background: #1e293b; color: #f1f5f9; }
-[data-theme="dark"] .faq-item { background: #1e293b; border-color: #334155; }
-[data-theme="dark"] .faq-item summary { color: #f1f5f9; }
-[data-theme="dark"] .faq-item[open] summary { color: var(--amber-light); }
-[data-theme="dark"] .metric-box { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.15); }
-[data-theme="dark"] .nav-user-dropdown { background: #1e293b; border-color: #334155; }
-[data-theme="dark"] .nav-dd-logout:hover { background: rgba(239,68,68,0.1); }
-[data-theme="dark"] #loginModal > div { background: #1e293b; color: #f1f5f9; }
-[data-theme="dark"] #loginModal label { color: #94a3b8; }
-[data-theme="dark"] #loginModal input { background: #0f172a; border-color: #334155; color: #f1f5f9; }
-[data-theme="dark"] .table-sm th { background: rgba(245,158,11,0.12); color: #fbbf24; }
-[data-theme="dark"] .table-sm td { border-color: #334155; }
-[data-theme="dark"] .table-sm tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
-[data-theme="dark"] .carrier-banner { background: rgba(245,158,11,0.10); border-color: rgba(245,158,11,0.3); color: #fbbf24; }
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
-
-/* Skip link */
-.skip-link { position: absolute; top: -40px; left: 0; background: var(--amber); color: #000; padding: 8px 16px; border-radius: 0 0 8px 0; font-weight: 700; font-size: 0.85rem; z-index: 9999; transition: top 0.2s; }
-.skip-link:focus { top: 0; }
-
-/* Page background */
-.page-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
-  background: radial-gradient(ellipse at top right, rgba(245,158,11,0.07) 0%, transparent 50%),
-              radial-gradient(ellipse at bottom left, rgba(217,119,6,0.04) 0%, transparent 50%); }
-
-/* Navbar */
-.navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); box-shadow: var(--shadow-md); }
-.nav-container { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 2rem; max-width: 1440px; margin: 0 auto; }
-.nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-.nav-logo { width: 44px; height: 44px; background: var(--primary-gradient); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px; color: #0f172a; box-shadow: 0 4px 12px rgba(245,158,11,0.35); letter-spacing: -0.5px; text-align: center; line-height: 1.1; }
-.nav-title { font-weight: 700; font-size: 1.0rem; color: var(--text-primary); }
-.nav-subtitle { font-size: 0.7rem; color: var(--text-muted); }
-.nav-links { display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
-.nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.88rem; font-weight: 500; padding: 6px 0; transition: color 0.3s; position: relative; }
-.nav-link:hover { color: var(--amber); }
-.nav-dropdown { position: relative; }
-.nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 0; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: var(--shadow-lg); min-width: 200px; z-index: 100; padding: 6px 0; }
-.nav-dropdown:hover .nav-dropdown-menu { display: block; }
-.nav-dropdown-menu a { display: block; padding: 8px 16px; font-size: 0.83rem; color: var(--text-secondary); text-decoration: none; transition: background 0.2s,color 0.2s; }
-.nav-dropdown-menu a:hover { background: rgba(245,158,11,0.08); color: var(--amber); }
-.nav-dropdown-toggle { cursor: default; }
-.nav-right { display: flex; align-items: center; gap: 0.75rem; }
-.nav-theme-btn { background: none; border: 1px solid var(--glass-border); border-radius: 8px; padding: 8px 10px; cursor: pointer; color: var(--text-muted); font-size: 1rem; transition: all 0.3s; }
-.nav-theme-btn:hover { color: var(--amber); border-color: var(--amber); }
-.nav-back { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--primary-gradient); border: none; border-radius: 8px; color: #0f172a; text-decoration: none; font-size: 0.82rem; font-weight: 700; transition: all 0.3s; box-shadow: 0 3px 10px rgba(245,158,11,0.3); }
-.nav-back:hover { transform: translateY(-2px); }
-.nav-auth-wrap { position: relative; }
-.nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: linear-gradient(135deg,#d97706,#f59e0b); border: none; border-radius: 8px; color: #0f172a; font-size: 0.82rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(245,158,11,0.3); white-space: nowrap; }
-.nav-login-btn:hover { transform: translateY(-1px); }
-.nav-user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 50px; cursor: pointer; transition: all 0.3s; font-family: inherit; color: var(--text-primary); }
-.nav-user-btn:hover { background: rgba(245,158,11,0.14); }
-.nav-user-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; color: #0f172a; font-size: 0.7rem; font-weight: 700; }
-.nav-user-email { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
-.nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
-.nav-user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.12); min-width: 220px; z-index: 1001; overflow: hidden; }
-.nav-user-dropdown.show { display: block; }
-.nav-dd-header { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
-.nav-dd-tier-badge { display: inline-flex; padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px; }
-.nav-dd-tier-badge.pro { background: var(--primary-gradient); color: #0f172a; }
-.nav-dd-email { font-size: 0.78rem; color: #64748b; word-break: break-all; }
-.nav-dd-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; border: none; background: none; font-size: 0.82rem; font-weight: 500; color: #ef4444; cursor: pointer; font-family: inherit; transition: background 0.2s; }
-.nav-dd-logout:hover { background: #fef2f2; }
-
-/* Main layout */
-.main-content { position: relative; z-index: 10; padding-top: 80px; }
-.hero { padding: 2.5rem 2rem 1.5rem; text-align: center; max-width: 960px; margin: 0 auto; }
-.hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px; background: linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.35); border-radius: 4px; font-size: 0.78rem; color: var(--amber); font-weight: 700; margin-bottom: 1.25rem; }
-.hero h1 { font-size: clamp(1.8rem,3.5vw,2.6rem); font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.85rem; }
-.hero p { font-size: 1rem; color: var(--text-secondary); max-width: 720px; margin: 0 auto; }
-.hero-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.25rem; flex-wrap: wrap; }
-.hero-stat { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-muted); }
-.hero-stat i { color: var(--amber); }
-
-/* Carrier banner (deep-link from other calcs) */
-.carrier-banner { display: none; max-width: 1100px; margin: 0 auto 1rem; padding: 0.65rem 1.25rem; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 10px; font-size: 0.82rem; color: var(--amber-dark); font-weight: 600; }
-.carrier-banner.visible { display: flex; align-items: center; gap: 8px; }
-
-/* Tabs */
-.tabs-wrap { max-width: 1100px; margin: 0 auto 0; padding: 0 2rem; }
-.tabs-group-label { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); opacity: 1; padding: 0 4px; align-self: flex-end; margin-bottom: 4px; flex-shrink: 0; }
-.tabs-row { display: flex; gap: 4px; flex-wrap: wrap; padding-bottom: 0; border-bottom: 2px solid rgba(245,158,11,0.15); align-items: flex-end; }
-.tab-btn { padding: 9px 16px; border: 1px solid #e2e8f0; border-bottom: none; border-radius: 10px 10px 0 0; background: var(--bg-secondary); color: var(--text-muted); font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
-.tab-btn:hover { color: var(--amber); border-color: rgba(245,158,11,0.3); }
-.tab-btn.active { background: var(--amber); color: #0f172a; border-color: var(--amber); font-weight: 700; }
-
-/* Module container */
-.module-wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 2rem; }
-.module-pane { display: none; }
-.module-pane.active { display: block; }
-
-/* Cards & panels */
-.module-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.5rem; }
-.module-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1.5rem; }
-.card-title { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
-.card-title i { color: var(--amber); }
-.input-group { margin-bottom: 0.9rem; }
-.input-group:last-child { margin-bottom: 0; }
-.input-label { display: flex; align-items: center; gap: 5px; font-size: 0.76rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; }
-.input-field { width: 100%; padding: 9px 13px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.88rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; transition: border-color 0.3s; }
-.input-field:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
-select.input-field { cursor: pointer; }
-.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-.result-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1.5rem; }
-.result-title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 0.6rem; }
-.result-big { font-size: 2.2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); line-height: 1; }
-.result-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
-.metric-box { background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.12); border-radius: 4px; padding: 0.75rem; text-align: center; }
-.metric-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
-.metric-value { font-size: 1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
-.metric-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin: 1rem 0; }
-.metric-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; margin: 1rem 0; }
-.metric-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.6rem; margin: 1rem 0; }
-
-/* Status badges */
-.status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; }
-.status-red { background: rgba(239,68,68,0.1); color: #ef4444; }
-.status-yellow { background: rgba(245,158,11,0.1); color: #d97706; }
-.status-green { background: rgba(16,185,129,0.1); color: #059669; }
-.status-blue { background: rgba(59,130,246,0.1); color: #3b82f6; }
-.tier-vital { background: rgba(239,68,68,0.1); color: #ef4444; font-weight: 800; }
-.tier-essential { background: rgba(245,158,11,0.1); color: #d97706; font-weight: 800; }
-.tier-desirable { background: rgba(16,185,129,0.1); color: #059669; font-weight: 800; }
-
-/* Info box */
-.info-box { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2); border-radius: 4px; padding: 0.9rem 1rem; margin-top: 0.85rem; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.55; }
-.info-box summary { cursor: pointer; font-weight: 700; color: var(--amber-dark); list-style: none; display: flex; align-items: center; gap: 6px; }
-.info-box summary::before { content: 'ⓘ'; }
-.info-box summary::-webkit-details-marker { display: none; }
-.info-box[open] summary::before { content: '▾'; }
-.info-box p, .info-box ul { margin-top: 0.6rem; }
-.info-box code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(245,158,11,0.1); padding: 1px 5px; border-radius: 4px; }
-
-/* Action list */
-.action-list { list-style: none; padding: 0; margin-top: 0.75rem; }
-.action-list li { display: flex; gap: 8px; padding: 5px 0; font-size: 0.78rem; color: var(--text-secondary); border-bottom: 1px solid rgba(0,0,0,0.04); }
-.action-list li:last-child { border-bottom: none; }
-.action-list .act-tag { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap; align-self: flex-start; margin-top: 1px; }
-.act-immediate { background: rgba(239,68,68,0.1); color: #ef4444; }
-.act-week { background: rgba(245,158,11,0.1); color: #d97706; }
-.act-month { background: rgba(59,130,246,0.1); color: #3b82f6; }
-
-/* Risk flags */
-.risk-flag { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 0.77rem; color: var(--text-secondary); border-bottom: 1px solid rgba(0,0,0,0.04); }
-.risk-flag:last-child { border-bottom: none; }
-.risk-flag i { color: #ef4444; flex-shrink: 0; margin-top: 1px; }
-
-/* Chart containers */
-.chart-wrap { position: relative; height: 240px; margin-top: 1rem; }
-.chart-wrap-sm { position: relative; height: 180px; margin-top: 0.75rem; }
-.chart-wrap-lg { position: relative; height: 300px; margin-top: 1rem; }
-
-/* Table */
-.table-sm { width: 100%; border-collapse: collapse; font-size: 0.77rem; margin-top: 0.75rem; }
-.table-sm th { padding: 6px 10px; background: rgba(245,158,11,0.08); color: var(--amber-dark); font-weight: 700; text-align: left; }
-.table-sm td { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.06); }
-.table-sm tr:nth-child(even) td { background: rgba(245,158,11,0.02); }
-.highlight-row td { font-weight: 700; color: var(--amber-dark); }
-
-/* Radar / bar score */
-.score-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.score-bar-label { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); min-width: 120px; }
-.score-bar-bg { flex: 1; height: 7px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
-.score-bar-fill { height: 100%; border-radius: 4px; background: var(--amber); transition: width 0.5s ease; }
-.score-bar-val { font-size: 0.72rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 32px; text-align: right; }
-
-/* Kraljic 2x2 */
-.kraljic-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 6px; margin: 1rem 0; border: 2px solid rgba(245,158,11,0.2); border-radius: 10px; overflow: hidden; }
-.kq-cell { padding: 0.85rem; font-size: 0.75rem; line-height: 1.4; transition: all 0.3s; }
-.kq-cell-title { font-weight: 800; font-size: 0.8rem; margin-bottom: 3px; }
-.kq-strategic { background: rgba(239,68,68,0.08); border-right: 1px solid rgba(245,158,11,0.1); border-bottom: 1px solid rgba(245,158,11,0.1); }
-.kq-bottleneck { background: rgba(245,158,11,0.08); border-bottom: 1px solid rgba(245,158,11,0.1); }
-.kq-leverage { background: rgba(59,130,246,0.07); border-right: 1px solid rgba(245,158,11,0.1); }
-.kq-noncritical { background: rgba(16,185,129,0.06); }
-.kq-active { outline: 3px solid var(--amber); outline-offset: -3px; }
-
-/* FAQ */
-.faq-grid { display: flex; flex-direction: column; gap: 0.6rem; }
-.faq-cat-filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
-.faq-cat-btn { padding: 5px 14px; border: 1px solid #e2e8f0; border-radius: 50px; background: var(--bg-secondary); color: var(--text-muted); font-size: 0.75rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-.faq-cat-btn:hover, .faq-cat-btn.active { background: var(--amber); color: #0f172a; border-color: var(--amber); }
-.faq-item { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 4px; overflow: hidden; }
-.faq-item summary { padding: 0.85rem 1rem; cursor: pointer; font-size: 0.84rem; font-weight: 600; color: var(--text-primary); list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.faq-item summary::-webkit-details-marker { display: none; }
-.faq-item summary::after { content: '+'; font-size: 1.1rem; color: var(--amber); flex-shrink: 0; }
-.faq-item[open] summary::after { content: '−'; }
-.faq-item[open] summary { color: var(--amber-dark); }
-.faq-body { padding: 0 1rem 0.85rem; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.65; }
-.faq-body p { margin-bottom: 0.5rem; }
-.faq-body strong { color: var(--text-primary); }
-.faq-body a { color: var(--amber-dark); }
-.faq-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(245,158,11,0.1); padding: 1px 5px; border-radius: 4px; }
-
-/* Monte-Carlo range inputs */
-.range-wrap { display: flex; align-items: center; gap: 10px; }
-.range-wrap input[type=range] { flex: 1; accent-color: var(--amber); }
-.range-val { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; min-width: 44px; text-align: right; font-weight: 700; color: var(--amber-dark); }
-
-/* Strategy text block */
-.strategy-block { background: rgba(245,158,11,0.05); border-left: 2px solid var(--amber); border-radius: 0 4px 4px 0; padding: 0.9rem 1rem; margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; }
-.strategy-block strong { color: var(--text-primary); }
-
-/* Calc disclaimer */
-.calc-disclaimer { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 12px; padding: 1.1rem 1.4rem; margin-top: 1.5rem; }
-.disc-title { font-size: 0.78rem; font-weight: 700; color: #1e293b; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 6px; }
-.disc-text { font-size: 0.74rem; color: #475569; line-height: 1.55; }
-.disc-fine { font-size: 0.68rem; color: #64748b; margin-top: 0.4rem; }
-
-/* Cookie banner */
-
-/* Share buttons */
-.share-buttons { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 500; opacity: 0; visibility: hidden; transition: opacity 0.4s,visibility 0.4s; }
-.share-buttons.visible { opacity: 1; visibility: visible; }
-.share-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; text-decoration: none; transition: transform 0.2s,box-shadow 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-.share-btn:hover { transform: scale(1.12); box-shadow: 0 4px 14px rgba(0,0,0,0.22); }
-.sb-linkedin { background: #0a66c2; }
-.sb-x { background: #000; }
-.sb-whatsapp { background: #25d366; }
-.sb-instagram { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
-.sb-facebook { background: #1877f2; }
-
-/* Footer */
-.site-footer { background: #0f172a; color: #94a3b8; padding: 3rem 2rem 1.5rem; margin-top: 3rem; }
-.footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 2rem; max-width: 1100px; margin: 0 auto 2rem; }
-.footer-col h4 { color: #f1f5f9; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem; }
-.footer-col p { font-size: 0.8rem; line-height: 1.6; }
-.footer-col a { display: block; color: #94a3b8; text-decoration: none; font-size: 0.8rem; padding: 2px 0; transition: color 0.2s; }
-.footer-col a:hover { color: var(--amber-light); }
-.footer-bottom { max-width: 1100px; margin: 0 auto; border-top: 1px solid #1e293b; padding-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.75rem; }
-.version-stamp { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #475569; }
-
-/* PDF export button */
-.btn-pdf { padding: 0.5rem 1rem; border: 1px solid rgba(245,158,11,0.35); background: rgba(245,158,11,0.05); color: var(--amber-dark); border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; font-family: inherit; transition: all 0.25s; display: inline-flex; align-items: center; gap: 6px; }
-.btn-pdf:hover { background: rgba(245,158,11,0.12); border-color: var(--amber); }
-.btn-primary { padding: 0.6rem 1.4rem; background: var(--primary-gradient); border: none; border-radius: 10px; color: #0f172a; font-size: 0.86rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.25s; box-shadow: 0 3px 10px rgba(245,158,11,0.3); }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(245,158,11,0.4); }
-.btn-row { display: flex; gap: 0.6rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap; }
-.btn-reset-module { background: none; border: none; padding: 0; color: var(--text-muted); font-size: 0.73rem; cursor: pointer; font-family: inherit; text-decoration: underline; text-underline-offset: 2px; margin-left: auto; transition: color 0.2s; }
-.btn-reset-module:hover { color: var(--amber); }
-
-/* Toggle switch */
-.toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; }
-.toggle-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); }
-.toggle-switch { position: relative; width: 44px; height: 24px; }
-.toggle-switch input { opacity: 0; width: 0; height: 0; }
-.toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #cbd5e1; border-radius: 24px; transition: 0.3s; }
-.toggle-slider:before { position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
-input:checked + .toggle-slider { background: var(--amber); }
-input:checked + .toggle-slider:before { transform: translateX(20px); }
-
-/* Summary Dashboard strip */
-.summary-strip { max-width: 1100px; margin: 0 auto 0; padding: 0 2rem 0.5rem; }
-.summary-strip-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 6px; }
-.summary-strip-title i { color: var(--amber); }
-.summary-kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; }
-.summary-kpi { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 4px; padding: 0.65rem 0.75rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
-.summary-kpi::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.06) 50%,transparent 70%); transform: translateX(-100%); transition: transform 0.6s ease; }
-.summary-kpi:hover::after { transform: translateX(100%); }
-.summary-kpi:hover { border-color: var(--amber); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.summary-kpi-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin-bottom: 3px; }
-.summary-kpi-value { font-size: 0.88rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
-.summary-kpi-module { font-size: 0.58rem; color: var(--amber-dark); font-weight: 600; margin-top: 2px; }
-[data-theme="dark"] .summary-kpi { background: rgba(30,41,59,0.7); border-color: rgba(245,158,11,0.12); }
-[data-theme="dark"] .summary-kpi:hover { border-color: var(--amber); }
-
-/* Save/Load scenario bar */
-.scenario-bar { display: flex; align-items: center; gap: 0.5rem; max-width: 1100px; margin: 0 auto 0.5rem; padding: 0 2rem; flex-wrap: wrap; }
-.scenario-bar-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
-.btn-scenario { padding: 5px 12px; border: 1px solid rgba(245,158,11,0.3); background: transparent; border-radius: 7px; color: var(--amber-dark); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-.btn-scenario:hover { background: rgba(245,158,11,0.08); border-color: var(--amber); }
-.btn-scenario.danger { border-color: rgba(239,68,68,0.3); color: #ef4444; }
-.btn-scenario.danger:hover { background: rgba(239,68,68,0.06); }
-.scenario-saved-msg { font-size: 0.68rem; color: var(--status-green); font-weight: 600; opacity: 0; transition: opacity 0.5s; }
-.scenario-saved-msg.show { opacity: 1; }
-[data-theme="dark"] .btn-scenario { color: #fbbf24; }
-
-/* Cross-link bar */
-.crosslink-bar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
-.crosslink-bar-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
-.crosslink-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2); border-radius: 4px; font-size: 0.72rem; color: var(--amber-dark); text-decoration: none; font-weight: 600; transition: all 0.2s; }
-.crosslink-pill:hover { background: rgba(245,158,11,0.12); border-color: var(--amber); transform: translateY(-1px); }
-[data-theme="dark"] .crosslink-pill { color: #fbbf24; }
-
-/* Commodity hint note */
-.commodity-hint { font-size: 0.68rem; color: var(--text-muted); font-style: italic; margin-top: 3px; line-height: 1.4; }
-.prov-chip { display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; font-style: normal; font-family: 'IBM Plex Mono', monospace; vertical-align: baseline; }
-.prov-chip.prov-screening { background: rgba(148,163,184,0.18); color: #64748b; border: 1px solid rgba(148,163,184,0.35); }
-.prov-chip.prov-catalog { background: rgba(8,145,178,0.16); color: #0e7490; border: 1px solid rgba(8,145,178,0.4); }
-[data-theme="dark"] .prov-chip.prov-screening { background: rgba(148,163,184,0.16); color: #94a3b8; }
-[data-theme="dark"] .prov-chip.prov-catalog { background: rgba(34,211,238,0.14); color: #67e8f9; border-color: rgba(34,211,238,0.4); }
-
-/* Operating Engine tab divider */
-.tab-divider { display: flex; align-items: center; color: var(--text-muted); font-size: 0.9rem; opacity: 0.4; padding: 0 2px; align-self: center; }
-.tab-btn-ops { border-color: rgba(245,158,11,0.25) !important; }
-.tab-btn-ops.active { background: var(--amber-dark) !important; }
-
-/* Ops-tab placeholder ("click Generate…") */
-.ops-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 1.5rem; border: 2px dashed rgba(245,158,11,0.25); border-radius: 14px; text-align: center; color: var(--text-muted); gap: 0.5rem; }
-.ops-placeholder i { font-size: 2rem; color: rgba(245,158,11,0.35); }
-.ops-placeholder p { font-size: 0.82rem; line-height: 1.5; max-width: 320px; }
-
-/* Preset dropdown */
-.preset-select { padding: 5px 10px; border: 1px solid rgba(245,158,11,0.3); background: transparent; border-radius: 7px; color: var(--amber-dark); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; max-width: 220px; }
-.preset-select:hover { background: rgba(245,158,11,0.08); border-color: var(--amber); }
-[data-theme="dark"] .preset-select { color: #fbbf24; background: #1e293b; border-color: #334155; }
-[data-theme="dark"] .preset-select option { background: #1e293b; color: #f1f5f9; }
-
-/* Summary KPI 8-col layout */
-.summary-kpi-grid-8 { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.5rem; }
-
-/* Operating Engine intro banner */
-.ops-intro { background: linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.03)); border: 1px solid rgba(245,158,11,0.2); border-radius: 12px; padding: 0.85rem 1.1rem; margin-bottom: 1.25rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.55; }
-.ops-intro strong { color: var(--amber-dark); }
-[data-theme="dark"] .ops-intro { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.18); }
-
-/* Operating Engine cards */
-.ops-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin: 0.5rem 0; }
-.ops-table th { padding: 5px 8px; background: rgba(245,158,11,0.08); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); }
-.ops-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: top; }
-[data-theme="dark"] .ops-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
-[data-theme="dark"] .ops-table td { border-color: #334155; color: #cbd5e1; }
-.ops-status-strip { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.82rem; font-weight: 700; }
-.ops-status-red { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
-.ops-status-yellow { background: rgba(245,158,11,0.1); color: #d97706; border: 1px solid rgba(245,158,11,0.25); }
-.ops-status-green { background: rgba(16,185,129,0.1); color: #059669; border: 1px solid rgba(16,185,129,0.25); }
-[data-theme="dark"] .ops-status-red { background: rgba(239,68,68,0.15); color: #f87171; }
-[data-theme="dark"] .ops-status-yellow { background: rgba(245,158,11,0.15); color: #fbbf24; }
-[data-theme="dark"] .ops-status-green { background: rgba(16,185,129,0.15); color: #34d399; }
-
-/* Ops output block */
-.ops-output { background: var(--bg-secondary); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; margin-top: 1rem; }
-.ops-output-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--amber-dark); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; }
-[data-theme="dark"] .ops-output { background: #1e293b; border-color: #334155; }
-[data-theme="dark"] .ops-output-title { color: #fbbf24; }
-
-/* Generated text block */
-.gen-text-block { background: var(--bg-primary); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1rem; font-size: 0.8rem; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap; font-family: inherit; word-break: break-word; }
-[data-theme="dark"] .gen-text-block { background: #0f172a; border-color: #334155; color: #94a3b8; }
-
-/* RAG indicator */
-.rag-green { color: #059669; font-weight: 700; }
-.rag-yellow { color: #d97706; font-weight: 700; }
-.rag-red { color: #ef4444; font-weight: 700; }
-[data-theme="dark"] .rag-green { color: #34d399; }
-[data-theme="dark"] .rag-yellow { color: #fbbf24; }
-[data-theme="dark"] .rag-red { color: #f87171; }
-
-/* Radar chart for scorecard */
-.ops-radar-wrap { position: relative; height: 260px; margin-top: 1rem; }
-
-/* Leverages list */
-/* v1.17.2 — leverage levers must wrap; original .leverage-list rendered 12 long pills in a flat row causing horizontal overflow that pushed the input pane off-screen on the left */
-.leverage-list { list-style: none; padding: 0; margin: 0.5rem 0; display: flex; flex-wrap: wrap; gap: 6px; max-width: 100%; }
-.leverage-list li { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; font-size: 0.78rem; color: var(--text-secondary); border-bottom: 1px solid rgba(0,0,0,0.04); }
-.leverage-list li:last-child { border-bottom: none; }
-.lev-tag { font-size: 0.65rem; font-weight: 700; padding: 3px 9px; border-radius: 4px; white-space: nowrap; align-self: flex-start; margin-top: 1px; display: inline-block; }
-/* v1.17.2 — guarantee no module-pane content overflows the viewport */
-.module-pane { max-width: 100%; }
-.module-pane.active { display: block; max-width: 100%; overflow-x: hidden; }
-.ops-output { max-width: 100%; overflow-x: auto; }
-.gen-text-block { max-width: 100%; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; }
-.ops-table { table-layout: auto; }
-.ops-table-wrap { overflow-x: auto; max-width: 100%; }
-.lev-strong { background: rgba(16,185,129,0.1); color: #059669; }
-.lev-moderate { background: rgba(245,158,11,0.1); color: #d97706; }
-.lev-weak { background: rgba(239,68,68,0.1); color: #ef4444; }
-
-/* v1.17.3 — per-module workflow visualization */
-.module-summary-card {
-  background: var(--glass-bg);
-  border-left: 2px solid var(--amber);
-  border-radius: 0 4px 4px 0;
-  padding: 1rem 1.25rem;
-  margin: 0 0 1rem 0;
-  font-size: 0.85rem;
-  line-height: 1.6;
-}
-.module-summary-card .q { color: var(--amber-dark); font-weight: 700; display: block; margin-bottom: 0.3rem; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
-.module-summary-card .a { color: var(--text-primary); margin-bottom: 0.4rem; }
-.module-summary-card .output { color: var(--text-secondary); font-size: 0.78rem; }
-.module-summary-card .use-when { color: var(--text-muted); font-size: 0.76rem; font-style: italic; margin-top: 0.4rem; }
-[data-theme="dark"] .module-summary-card { background: rgba(245,158,11,0.05); }
-
-.module-flow-card {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
-  gap: 0.5rem;
-  align-items: stretch;
-  padding: 1rem 1.25rem;
-  margin: 0 0 1.25rem 0;
-  background: rgba(245,158,11,0.04);
-  border: 1px solid rgba(245,158,11,0.2);
-  border-radius: 4px;
-  font-size: 0.74rem;
-}
-.module-flow-col h4 { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--amber-dark); margin: 0 0 0.5rem; }
-.module-flow-col ul { list-style: none; padding: 0; margin: 0; }
-.module-flow-col li { padding: 2px 0; color: var(--text-secondary); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.72rem; }
-.module-flow-col li a { color: var(--amber); cursor: pointer; text-decoration: none; }
-.module-flow-col li a:hover { text-decoration: underline; }
-.module-flow-arrow { display: flex; align-items: center; justify-content: center; color: var(--amber); font-weight: 700; font-size: 1rem; }
-[data-theme="dark"] .module-flow-card { background: rgba(245,158,11,0.06); }
-@media (max-width: 768px) {
-  .module-flow-card { grid-template-columns: 1fr; gap: 0.25rem; padding: 0.85rem; }
-  .module-flow-arrow { transform: rotate(90deg); padding: 4px 0; }
-}
-
-.workflow-flowchart-wrap {
-  margin: 1.25rem 0;
-  padding: 1rem 1.25rem;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-}
-.workflow-flowchart-summary {
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-  padding: 0.25rem 0;
-  list-style: none;
-}
-.workflow-flowchart-summary::-webkit-details-marker { display: none; }
-.workflow-flowchart-summary i { color: var(--amber); margin-right: 0.4rem; }
-.workflow-flowchart { margin-top: 1rem; overflow-x: auto; }
-.workflow-svg { width: 100%; height: auto; min-width: 700px; max-width: 1200px; }
-.workflow-svg text { font-family: 'JetBrains Mono', ui-monospace, monospace; }
-.workflow-svg text.module-label { cursor: pointer; fill: var(--text-secondary, #64748b); font-size: 11px; }
-.workflow-svg text.module-label:hover { fill: var(--amber, #f59e0b); }
-.workflow-svg .group-header { font-size: 13px; font-weight: 700; fill: var(--amber-dark, #d97706); letter-spacing: 0.1em; }
-.workflow-svg .flow-line-tier1 { stroke: var(--amber, #f59e0b); stroke-width: 1.4; fill: none; }
-.workflow-svg .flow-line-tier2 { stroke: var(--text-muted, #94a3b8); stroke-width: 1; stroke-dasharray: 4 3; fill: none; opacity: 0.5; }
-.workflow-svg .group-box { fill: rgba(245,158,11,0.04); stroke: rgba(245,158,11,0.25); stroke-width: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .workflow-svg .flow-line-tier1, .workflow-svg .flow-line-tier2 { animation: none; }
-}
-
-/* v1.17.3 — Influence × Impact 2×2 matrix grid */
-.influence-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0.75rem 0; }
-.influence-quad { border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.74rem; }
-.influence-quad .quad-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; display: block; }
-.influence-quad .quad-names { color: var(--text-secondary); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.71rem; }
-.iq-manage { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); }
-.iq-manage .quad-label { color: var(--amber-dark); }
-.iq-satisfy { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); }
-.iq-satisfy .quad-label { color: #059669; }
-.iq-inform { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); }
-.iq-inform .quad-label { color: #2563eb; }
-.iq-monitor { background: rgba(148,163,184,0.08); border: 1px solid rgba(148,163,184,0.25); }
-.iq-monitor .quad-label { color: var(--text-muted); }
-[data-theme="dark"] .iq-manage { background: rgba(245,158,11,0.10); }
-[data-theme="dark"] .iq-satisfy { background: rgba(16,185,129,0.07); }
-[data-theme="dark"] .iq-inform { background: rgba(59,130,246,0.07); }
-[data-theme="dark"] .iq-monitor { background: rgba(148,163,184,0.05); }
-
-/* Contract checklist */
-.contract-row-flagged td { background: rgba(245,158,11,0.06); }
-[data-theme="dark"] .contract-row-flagged td { background: rgba(245,158,11,0.08); }
-[data-theme="dark"] .sh-checkbox-label { color: #cbd5e1; }
-[data-theme="dark"] input[type="checkbox"] { accent-color: var(--amber); }
-
-/* Process Improvement RACI */
-.raci-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; margin-top: 0.75rem; }
-.raci-table th { padding: 5px 8px; background: rgba(245,158,11,0.08); color: var(--amber-dark); font-weight: 700; text-align: left; }
-.raci-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-[data-theme="dark"] .raci-table th { background: rgba(245,158,11,0.12); }
-[data-theme="dark"] .raci-table td { border-color: #334155; }
-
-/* Meeting sub-mode toggle */
-.sub-mode-bar { display: flex; gap: 6px; margin-bottom: 1rem; }
-.sub-mode-btn { padding: 6px 16px; border: 1px solid var(--glass-border); border-radius: 8px; background: var(--bg-secondary); color: var(--text-muted); font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-.sub-mode-btn.active { background: var(--amber); color: #0f172a; border-color: var(--amber); }
-[data-theme="dark"] .sub-mode-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
-[data-theme="dark"] .sub-mode-btn.active { background: var(--amber); color: #0f172a; }
-
-/* ── BUG 3: Input Tooltips ── */
-.tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: rgba(245,158,11,0.15); color: var(--amber-dark); font-size: 0.65rem; font-weight: 700; cursor: help; flex-shrink: 0; position: relative; vertical-align: middle; margin-left: 3px; border: 1px solid rgba(245,158,11,0.3); transition: background 0.2s; user-select: none; }
-.tip:hover, .tip:focus, .tip.tip-open { background: var(--amber); color: #0f172a; outline: none; }
-.tip::after { content: attr(data-tip); display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1e293b; color: #f1f5f9; font-size: 0.72rem; font-weight: 400; line-height: 1.55; padding: 8px 10px; border-radius: 8px; width: 270px; max-width: 85vw; white-space: normal; z-index: 9000; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; border: 1px solid rgba(245,158,11,0.25); }
-.tip::before { content: ''; display: none; position: absolute; bottom: calc(100% + 1px); left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #1e293b; z-index: 9001; pointer-events: none; }
-.tip:hover::after, .tip:focus::after, .tip.tip-open::after { display: block; }
-.tip:hover::before, .tip:focus::before, .tip.tip-open::before { display: block; }
-/* Flip tooltip down if near top of viewport */
-.tip.tip-below::after { top: calc(100% + 6px); bottom: auto; }
-.tip.tip-below::before { top: calc(100% + 1px); bottom: auto; border-top-color: transparent; border-bottom-color: #1e293b; }
-[data-theme="dark"] .tip { background: rgba(245,158,11,0.12); color: #fbbf24; border-color: rgba(245,158,11,0.25); }
-[data-theme="dark"] .tip:hover, [data-theme="dark"] .tip:focus, [data-theme="dark"] .tip.tip-open { background: var(--amber); color: #0f172a; }
-@media (max-width: 768px) { .tip::after { width: 220px; font-size: 0.70rem; } }
-
-/* Copy button */
-.btn-copy { padding: 0.5rem 1rem; border: 1px solid rgba(59,130,246,0.35); background: rgba(59,130,246,0.05); color: #3b82f6; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; font-family: inherit; transition: all 0.25s; display: inline-flex; align-items: center; gap: 6px; }
-.btn-copy:hover { background: rgba(59,130,246,0.12); border-color: #3b82f6; }
-[data-theme="dark"] .btn-copy { color: #60a5fa; border-color: rgba(59,130,246,0.3); }
-
-/* Add row button */
-.btn-add-row { padding: 4px 10px; border: 1px dashed rgba(245,158,11,0.4); background: transparent; color: var(--amber-dark); border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 600; font-family: inherit; transition: all 0.2s; margin-top: 6px; }
-.btn-add-row:hover { background: rgba(245,158,11,0.08); }
-
-/* Editable table cell */
-.editable-cell { border: none; background: transparent; font-size: 0.77rem; font-family: inherit; color: var(--text-primary); width: 100%; outline: none; padding: 2px 4px; }
-.editable-cell:focus { background: rgba(245,158,11,0.06); border-radius: 4px; }
-[data-theme="dark"] .editable-cell { color: #f1f5f9; }
-[data-theme="dark"] .editable-cell:focus { background: rgba(245,158,11,0.1); }
-
-/* v1.8.0 — mobile responsive patch */
-@media (max-width: 768px) {
-  html, body { overflow-x: hidden; max-width: 100vw; }
-  img { max-width: 100%; height: auto; display: block; }
-  .nav-links { display: none; }
-  .nav-dropdown-menu { display: none !important; }
-  .module-grid { grid-template-columns: 1fr; }
-  .input-row { grid-template-columns: 1fr; }
-  .metric-grid-3, .metric-grid-4 { grid-template-columns: 1fr 1fr; }
-  .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
-  /* Tab bar — scroll horizontally on narrow screens, no wrapping */
-  .tabs-row { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 2px; padding-bottom: 2px; }
-  .tabs-row::-webkit-scrollbar { height: 3px; }
-  .tabs-row::-webkit-scrollbar-thumb { background: rgba(245,158,11,0.35); border-radius: 3px; }
-  .tabs-group-label { display: none; }
-  .tab-btn { padding: 7px 10px; font-size: 0.72rem; }
-  .module-wrap { padding: 1rem; }
-  .tabs-wrap { padding: 0 1rem; }
-  button, a.btn, [role="button"] { min-height: 44px; }
-  .hero { padding: 2rem 1rem 1rem; }
-  .hero h1 { font-size: 1.6rem; }
-  /* Bug 1 fix: hide floating share column on mobile — footer has share/contact links */
-  #pageShare.share-buttons { display: none !important; }
-  .share-btn { width: 34px; height: 34px; font-size: 0.78rem; }
-  .summary-kpi-grid { grid-template-columns: repeat(3, 1fr); }
-  .summary-kpi-grid-8 { grid-template-columns: repeat(4, 1fr); }
-  .summary-strip { padding: 0 1rem 0.5rem; }
-  .scenario-bar { padding: 0 1rem; }
-  .crosslink-bar { padding: 0 1rem; }
-}
-@media (max-width: 480px) {
-  .summary-kpi-grid { grid-template-columns: repeat(2, 1fr); }
-  .summary-kpi-grid-8 { grid-template-columns: repeat(2, 1fr); }
-}
-@media print {.main-content { padding-top: 0 !important; } }
-
-/* ── CATALOG TAB ── */
-.catalog-header { background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.18); border-radius: 12px; padding: 0.85rem 1.1rem; margin-bottom: 1.25rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.55; }
-.catalog-header strong { color: var(--amber-dark); }
-.catalog-filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.9rem 1rem; }
-.catalog-filter-group { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.catalog-filter-label { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
-.catalog-filter-select { padding: 6px 9px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.76rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; transition: border-color 0.2s; cursor: pointer; max-width: 160px; }
-.catalog-filter-select:focus { border-color: var(--amber); }
-.catalog-search { flex: 1; min-width: 140px; }
-.catalog-search input { width: 100%; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.76rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; transition: border-color 0.2s; }
-.catalog-search input:focus { border-color: var(--amber); }
-.catalog-filter-range { display: flex; flex-direction: column; gap: 3px; }
-.catalog-filter-range .range-wrap { gap: 6px; }
-.catalog-filter-range .range-val { font-size: 0.72rem; min-width: 30px; }
-.catalog-clear-btn { padding: 6px 12px; border: 1px solid rgba(245,158,11,0.35); background: transparent; border-radius: 8px; color: var(--amber-dark); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; align-self: flex-end; white-space: nowrap; }
-.catalog-clear-btn:hover { background: rgba(245,158,11,0.1); border-color: var(--amber); }
-.catalog-count { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem; }
-.catalog-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--glass-border); }
-.catalog-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; min-width: 900px; }
-.catalog-table th { padding: 7px 10px; background: rgba(245,158,11,0.1); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); white-space: nowrap; cursor: pointer; user-select: none; transition: background 0.2s; }
-.catalog-table th:hover { background: rgba(245,158,11,0.18); }
-.catalog-table th.sort-asc::after { content: ' ↑'; }
-.catalog-table th.sort-desc::after { content: ' ↓'; }
-.catalog-table td { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; }
-.catalog-table tr:nth-child(even) td { background: rgba(245,158,11,0.018); }
-.catalog-table tr:hover td { background: rgba(245,158,11,0.04); }
-.catalog-life-active { color: #059669; font-weight: 700; font-size: 0.68rem; }
-.catalog-life-nrnd { color: #d97706; font-weight: 700; font-size: 0.68rem; }
-.catalog-life-ltb { color: #ea580c; font-weight: 700; font-size: 0.68rem; }
-.catalog-life-obsolete { color: #ef4444; font-weight: 700; font-size: 0.68rem; }
-.catalog-eol-low { color: #059669; }
-.catalog-eol-med { color: #d97706; }
-.catalog-eol-high { color: #ef4444; font-weight: 700; }
-.btn-use-part { padding: 4px 10px; border: 1px solid rgba(245,158,11,0.5); background: rgba(245,158,11,0.08); border-radius: 6px; color: var(--amber-dark); font-size: 0.68rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.18s; white-space: nowrap; }
-.btn-use-part:hover { background: rgba(245,158,11,0.18); border-color: var(--amber); }
-.catalog-loaded-banner { display: none; padding: 0.6rem 1rem; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; font-size: 0.78rem; color: #059669; font-weight: 600; margin-bottom: 0.85rem; }
-.catalog-loaded-banner.show { display: block; }
-.catalog-subview-toggle { display: flex; gap: 6px; margin: 1.25rem 0 0.6rem; }
-.catalog-subview-btn { padding: 5px 14px; border: 1px solid var(--glass-border); border-radius: 8px; background: var(--bg-secondary); color: var(--text-muted); font-size: 0.76rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-.catalog-subview-btn.active { background: var(--amber); color: #0f172a; border-color: var(--amber); }
-.catalog-subview { display: none; }
-.catalog-subview.active { display: block; }
-.oem-table-wrap, .facility-cards-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--glass-border); margin-top: 0.5rem; }
-.oem-table { width: 100%; border-collapse: collapse; font-size: 0.73rem; min-width: 700px; }
-.oem-table th { padding: 7px 10px; background: rgba(245,158,11,0.1); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); }
-.oem-table td { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: top; }
-.oem-table tr:nth-child(even) td { background: rgba(245,158,11,0.018); }
-.ssr-low { color: #059669; font-weight: 700; }
-.ssr-medium { color: #d97706; font-weight: 700; }
-.ssr-high { color: #ef4444; font-weight: 700; }
-.facility-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-top: 0.5rem; }
-.facility-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1rem; }
-.facility-card-name { font-weight: 800; font-size: 0.88rem; color: var(--amber-dark); margin-bottom: 4px; }
-.facility-card-era { font-size: 0.68rem; color: var(--text-muted); margin-bottom: 6px; }
-.facility-card-row { font-size: 0.74rem; color: var(--text-secondary); padding: 2px 0; display: flex; gap: 6px; }
-.facility-card-row strong { color: var(--text-primary); min-width: 80px; flex-shrink: 0; }
-.catalog-csv-btn { padding: 0.5rem 1rem; border: 1px solid rgba(16,185,129,0.35); background: rgba(16,185,129,0.05); color: #059669; border-radius: 8px; cursor: pointer; font-size: 0.78rem; font-weight: 600; font-family: inherit; transition: all 0.25s; display: inline-flex; align-items: center; gap: 6px; }
-.catalog-csv-btn:hover { background: rgba(16,185,129,0.1); border-color: #059669; }
-.catalog-commodity-link { display: inline-block; font-size: 0.68rem; color: var(--amber-dark); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; margin-top: 3px; transition: color 0.2s; }
-.catalog-commodity-link:hover { color: var(--amber); }
-/* Dark mode for catalog */
-[data-theme="dark"] .catalog-header { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.18); }
-[data-theme="dark"] .catalog-filter-bar { background: rgba(30,41,59,0.85); border-color: #334155; }
-[data-theme="dark"] .catalog-filter-select { background: #1e293b; color: #f1f5f9; border-color: #334155; }
-[data-theme="dark"] .catalog-search input { background: #1e293b; color: #f1f5f9; border-color: #334155; }
-[data-theme="dark"] .catalog-table-wrap { border-color: #334155; }
-[data-theme="dark"] .catalog-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
-[data-theme="dark"] .catalog-table td { border-color: #334155; color: #cbd5e1; }
-[data-theme="dark"] .catalog-table tr:nth-child(even) td { background: rgba(255,255,255,0.025); }
-[data-theme="dark"] .catalog-table tr:hover td { background: rgba(245,158,11,0.06); }
-[data-theme="dark"] .oem-table-wrap, [data-theme="dark"] .facility-cards-wrap { border-color: #334155; }
-[data-theme="dark"] .oem-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
-[data-theme="dark"] .oem-table td { border-color: #334155; color: #cbd5e1; }
-[data-theme="dark"] .oem-table tr:nth-child(even) td { background: rgba(255,255,255,0.025); }
-[data-theme="dark"] .facility-card { background: rgba(30,41,59,0.85); border-color: #334155; }
-[data-theme="dark"] .catalog-loaded-banner { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); }
-[data-theme="dark"] .catalog-subview-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
-[data-theme="dark"] .catalog-subview-btn.active { background: var(--amber); color: #0f172a; }
-[data-theme="dark"] .btn-use-part { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.35); color: #fbbf24; }
-[data-theme="dark"] .btn-use-part:hover { background: rgba(245,158,11,0.2); }
-[data-theme="dark"] .catalog-csv-btn { background: rgba(16,185,129,0.07); color: #34d399; border-color: rgba(16,185,129,0.3); }
-/* Mobile catalog */
-@media (max-width: 768px) {
-  .catalog-filter-bar { gap: 0.4rem; padding: 0.75rem; }
-  .catalog-filter-select { max-width: 130px; }
-  .facility-cards { grid-template-columns: 1fr; }
-}
-@media (max-width: 480px) {
-  .facility-cards { grid-template-columns: 1fr; }
-  .catalog-filter-group { width: 100%; }
-  .catalog-filter-select { max-width: 100%; }
-}
-/* ── METHODOLOGY NOTE ── */
-.method-note { max-width: 1100px; margin: 2rem auto 0; padding: 0.75rem 2rem; font-size: 0.72rem; color: #64748b; line-height: 1.6; text-align: center; border-top: 1px solid rgba(148,163,184,0.12); }
-[data-theme="dark"] .method-note { color: #475569; border-top-color: rgba(255,255,255,0.06); }
-@media (max-width: 768px) { .method-note { padding: 0.75rem 1rem; font-size: 0.68rem; } }
-
-/* ═══════════════════════════════════════════════
-   UI/UX UPGRADE v2 — aurora, card-shine, transitions, onboarding
-   ═══════════════════════════════════════════════ */
-
-/* 1. Aurora hero mesh */
-.aurora-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
-.aurora-blob { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; }
-.aurora-blob-1 { width: 700px; height: 700px; background: radial-gradient(ellipse at center, rgba(245,158,11,0.065) 0%, transparent 70%); top: -200px; right: -100px; animation: aurora-drift-1 22s ease-in-out infinite alternate; }
-.aurora-blob-2 { width: 600px; height: 600px; background: radial-gradient(ellipse at center, rgba(14,116,144,0.045) 0%, transparent 70%); bottom: -100px; left: -150px; animation: aurora-drift-2 28s ease-in-out infinite alternate; }
-.aurora-blob-3 { width: 400px; height: 400px; background: radial-gradient(ellipse at center, rgba(217,119,6,0.04) 0%, transparent 70%); top: 40%; left: 30%; animation: aurora-drift-3 35s ease-in-out infinite alternate; }
-@keyframes aurora-drift-1 { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(60px,40px) scale(1.08);} }
-@keyframes aurora-drift-2 { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(-40px,60px) scale(1.06);} }
-@keyframes aurora-drift-3 { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(30px,-50px) scale(0.94);} }
-@media (prefers-reduced-motion: reduce) { .aurora-blob { animation: none !important; } }
-
-/* 2. Enhanced buttons */
-.btn-primary { background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%) !important; transition: transform 0.18s ease, box-shadow 0.18s ease !important; }
-.btn-primary:hover { transform: translateY(-1px) !important; box-shadow: 0 6px 20px rgba(245,158,11,0.45) !important; }
-.btn-primary:focus-visible { outline: 3px solid rgba(245,158,11,0.6); outline-offset: 2px; }
-.btn-pdf:focus-visible, .btn-scenario:focus-visible, .catalog-csv-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-
-/* 3. Card shine sweep on result/KPI cards */
-.result-card, .module-card, .summary-kpi {
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 0 0 1px rgba(255,255,255,0.08);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-.result-card::after, .module-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.055) 50%, transparent 70%);
-  transform: translateX(-100%);
-  transition: transform 0.9s cubic-bezier(0.4,0,0.2,1);
-  pointer-events: none;
-}
-.result-card:hover::after, .module-card:hover::after { transform: translateX(100%); }
-.result-card:hover, .module-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 0 0 1px rgba(245,158,11,0.12); }
-[data-theme="dark"] .result-card, [data-theme="dark"] .module-card { box-shadow: 0 1px 3px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.06); }
-[data-theme="dark"] .result-card::after, [data-theme="dark"] .module-card::after { background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.04) 50%, transparent 70%); }
-
-/* 4. Monospace KPI numbers */
-.result-big, .metric-value { font-family: 'JetBrains Mono', 'Courier New', monospace !important; letter-spacing: -0.02em; }
-.result-big { font-size: clamp(1.9rem, 4vw, 2.6rem) !important; line-height: 1 !important; }
-
-/* 5. Tab transitions */
-.module-pane { opacity: 0; transition: opacity 0.2s ease; display: none; }
-.module-pane.active { display: block; opacity: 1; animation: pane-fadein 0.2s ease forwards; }
-@keyframes pane-fadein { 0%{opacity:0;transform:translateY(4px);} 100%{opacity:1;transform:translateY(0);} }
-/* Active tab pill underline */
-/* v1.17.2 — active tab MUST be visibly amber-filled (user complaint: "tidak ada indicative sedang active"). Previous rule was underline-only which stole the cascade from the line-203 fill. Now: amber fill + bolder + underline accent via ::after. */
-.tab-btn.active { background: var(--amber) !important; color: #0f172a !important; border-color: var(--amber) !important; font-weight: 700 !important; position: relative; }
-.tab-btn.active::after { content: ''; position: absolute; left: 10%; right: 10%; bottom: -4px; height: 2px; background: var(--amber-light); border-radius: 2px; }
-
-/* 6. Sticky headline sub-bar for analytical tabs */
-.module-sticky-bar { position: sticky; top: 72px; z-index: 90; background: var(--glass-bg); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); padding: 6px 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; border-radius: 0 0 10px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.msb-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
-.msb-value { font-size: 1.1rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
-.msb-badge { }
-[data-theme="dark"] .module-sticky-bar { background: rgba(15,23,42,0.88); border-color: rgba(245,158,11,0.15); }
-@media (max-width: 768px) { .module-sticky-bar { top: 60px; padding: 5px 0.75rem; gap: 0.5rem; } }
-
-/* 7. Onboarding tour */
-.tour-overlay { position: fixed; inset: 0; z-index: 8000; pointer-events: auto; cursor: pointer; }
-.tour-spotlight { position: absolute; border-radius: 12px; pointer-events: none; box-shadow: 0 0 0 9999px rgba(0,0,0,0.55); transition: all 0.35s ease; }
-.tour-tooltip { position: fixed; z-index: 8001; background: #1e293b; color: #f1f5f9; border-radius: 14px; padding: 1.1rem 1.25rem; max-width: 320px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); border: 1px solid rgba(245,158,11,0.25); }
-.tour-tooltip-title { font-size: 0.78rem; font-weight: 800; color: var(--amber-light); margin-bottom: 0.45rem; }
-.tour-tooltip-body { font-size: 0.78rem; line-height: 1.55; color: #cbd5e1; }
-.tour-tooltip-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 0.9rem; gap: 0.5rem; }
-.tour-step-count { font-size: 0.68rem; color: #64748b; }
-.tour-btn-next { padding: 6px 16px; background: var(--amber); color: #0f172a; border: none; border-radius: 7px; font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: inherit; }
-.tour-btn-skip { padding: 6px 10px; background: none; color: #64748b; border: none; font-size: 0.72rem; cursor: pointer; font-family: inherit; }
-.tour-help-btn { position: fixed; bottom: 80px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); color: var(--amber-dark); font-size: 0.9rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 500; transition: all 0.2s; font-family: inherit; }
-.tour-help-btn:hover { background: rgba(245,158,11,0.22); transform: scale(1.1); }
-[data-theme="dark"] .tour-help-btn { background: rgba(245,158,11,0.1); color: #fbbf24; }
-
-/* 8. Mobile accordion inputs */
-.mobile-accordion-toggle { display: none; width: 100%; padding: 0.65rem 1rem; background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2); border-radius: 10px; color: var(--amber-dark); font-size: 0.8rem; font-weight: 700; font-family: inherit; cursor: pointer; text-align: left; margin-bottom: 0.75rem; }
-.mobile-accordion-toggle::before { content: '▸ '; }
-.mobile-accordion-toggle.open::before { content: '▾ '; }
-@media (max-width: 768px) {
-  .mobile-accordion-toggle { display: block; }
-  .mobile-accordion-content { display: none; }
-  .mobile-accordion-content.open { display: block; }
-  /* Jump-to select */
-  .tab-jump-select-wrap { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; margin-bottom: 0.5rem; }
-  .tab-jump-select { flex: 1; padding: 7px 10px; border: 1px solid rgba(245,158,11,0.3); background: var(--bg-secondary); color: var(--amber-dark); border-radius: 8px; font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer; }
-  [data-theme="dark"] .tab-jump-select { background: #1e293b; border-color: #334155; color: #fbbf24; }
-}
-@media (min-width: 769px) { .tab-jump-select-wrap { display: none !important; } }
-
-/* ═══════════════════════════════════════════════
-   CATALOG ANALYTICS TAB STYLES
-   ═══════════════════════════════════════════════ */
-.ca-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-bottom: 1.25rem; }
-.ca-kpi { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 4px; padding: 0.75rem 0.85rem; position: relative; overflow: hidden; }
-.ca-kpi::after { content:''; position:absolute; inset:0; background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.05) 50%,transparent 70%); transform:translateX(-100%); transition:transform 0.8s ease; }
-.ca-kpi:hover::after { transform:translateX(100%); }
-.ca-kpi-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin-bottom: 3px; }
-.ca-kpi-value { font-size: 1.3rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); line-height: 1; }
-.ca-kpi-sub { font-size: 0.62rem; color: var(--text-muted); margin-top: 3px; }
-.ca-kpi-alert { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.04); }
-.ca-kpi-alert .ca-kpi-value { color: #ef4444; }
-.ca-kpi-good { border-color: rgba(16,185,129,0.25); background: rgba(16,185,129,0.04); }
-.ca-kpi-good .ca-kpi-value { color: #059669; }
-[data-theme="dark"] .ca-kpi { background: rgba(30,41,59,0.7); border-color: rgba(245,158,11,0.1); }
-[data-theme="dark"] .ca-kpi-alert { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.25); }
-[data-theme="dark"] .ca-kpi-alert .ca-kpi-value { color: #f87171; }
-[data-theme="dark"] .ca-kpi-good { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.2); }
-[data-theme="dark"] .ca-kpi-good .ca-kpi-value { color: #34d399; }
-.ca-scope-bar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
-.ca-scope-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
-.ca-scope-select { padding: 5px 10px; border: 1px solid rgba(245,158,11,0.3); background: transparent; border-radius: 7px; color: var(--amber-dark); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; max-width: 200px; }
-[data-theme="dark"] .ca-scope-select { background: #1e293b; border-color: #334155; color: #fbbf24; }
-.ca-blind-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; }
-.ca-blind-table th { padding: 6px 10px; background: rgba(239,68,68,0.1); color: #ef4444; font-weight: 700; text-align: left; border-bottom: 2px solid rgba(239,68,68,0.2); }
-.ca-blind-table td { padding: 5px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-.ca-blind-table tr:hover td { background: rgba(239,68,68,0.03); }
-[data-theme="dark"] .ca-blind-table th { background: rgba(239,68,68,0.15); color: #f87171; }
-[data-theme="dark"] .ca-blind-table td { border-color: #334155; }
-.ca-opp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 0.75rem; }
-.ca-opp-card { background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.15); border-radius: 4px; padding: 0.85rem; }
-.ca-opp-title { font-size: 0.75rem; font-weight: 800; color: var(--amber-dark); margin-bottom: 0.4rem; }
-.ca-opp-count { font-size: 1.4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
-.ca-opp-list { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.4rem; line-height: 1.5; }
-[data-theme="dark"] .ca-opp-card { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.18); }
-.ca-scatter-legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.68rem; margin-top: 0.4rem; }
-.ca-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; }
-.ca-csv-btn { padding: 0.45rem 1rem; border: 1px solid rgba(16,185,129,0.35); background: rgba(16,185,129,0.05); color: #059669; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; font-family: inherit; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
-.ca-csv-btn:hover { background: rgba(16,185,129,0.12); }
-[data-theme="dark"] .ca-csv-btn { color: #34d399; border-color: rgba(16,185,129,0.3); }
-@media (max-width: 768px) {
-  .ca-kpi-grid { grid-template-columns: repeat(2, 1fr); }
-  .ca-opp-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 480px) { .ca-kpi-grid { grid-template-columns: 1fr 1fr; } }
-
-/* ═══════════════════════════════════════════════
-   FLEET / PORTFOLIO TAB STYLES
-   ═══════════════════════════════════════════════ */
-.fleet-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.25rem; }
-.fleet-kpi { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 4px; padding: 0.75rem 0.85rem; }
-.fleet-kpi-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin-bottom: 3px; }
-.fleet-kpi-value { font-size: 1.15rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
-.fleet-kpi-sub { font-size: 0.62rem; color: var(--text-muted); margin-top: 2px; }
-[data-theme="dark"] .fleet-kpi { background: rgba(30,41,59,0.7); border-color: rgba(245,158,11,0.1); }
-.fleet-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--glass-border); margin-top: 0.75rem; }
-.fleet-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; min-width: 1100px; }
-.fleet-table th { padding: 6px 8px; background: rgba(245,158,11,0.1); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); white-space: nowrap; }
-.fleet-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; }
-.fleet-table td.ft-desc { font-family: inherit; font-size: 0.72rem; }
-.fleet-table tr:hover td { background: rgba(245,158,11,0.04); }
-[data-theme="dark"] .fleet-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
-[data-theme="dark"] .fleet-table td { border-color: #334155; color: #cbd5e1; }
-[data-theme="dark"] .fleet-table tr:hover td { background: rgba(245,158,11,0.06); }
-.fleet-readiness-high { color: #059669; font-weight: 700; }
-.fleet-readiness-med { color: #d97706; font-weight: 700; }
-.fleet-readiness-low { color: #ef4444; font-weight: 700; }
-[data-theme="dark"] .fleet-readiness-high { color: #34d399; }
-[data-theme="dark"] .fleet-readiness-med { color: #fbbf24; }
-[data-theme="dark"] .fleet-readiness-low { color: #f87171; }
-.fleet-add-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.75rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.85rem 1rem; }
-.fleet-add-select { flex: 1; min-width: 180px; padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.76rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; }
-.fleet-add-select:focus { border-color: var(--amber); }
-[data-theme="dark"] .fleet-add-select { background: #1e293b; border-color: #334155; color: #f1f5f9; }
-.fleet-preset-btn { padding: 6px 12px; border: 1px solid rgba(245,158,11,0.35); background: rgba(245,158,11,0.06); border-radius: 7px; color: var(--amber-dark); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; transition: all 0.2s; }
-.fleet-preset-btn:hover { background: rgba(245,158,11,0.12); border-color: var(--amber); }
-[data-theme="dark"] .fleet-preset-btn { color: #fbbf24; border-color: rgba(245,158,11,0.3); }
-.btn-remove-fleet { padding: 2px 8px; border: 1px solid rgba(239,68,68,0.35); background: rgba(239,68,68,0.06); border-radius: 5px; color: #ef4444; font-size: 0.68rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
-.btn-remove-fleet:hover { background: rgba(239,68,68,0.14); }
-.fleet-qty-input { width: 56px; padding: 3px 6px; border: 1px solid #e2e8f0; border-radius: 5px; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); background: white; outline: none; }
-.fleet-qty-input:focus { border-color: var(--amber); }
-[data-theme="dark"] .fleet-qty-input { background: #0f172a; border-color: #334155; color: #f1f5f9; }
-.abc-xyz-quad { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 0; border: 2px solid rgba(245,158,11,0.25); border-radius: 10px; overflow: hidden; font-size: 0.7rem; }
-.abc-xyz-cell { padding: 0.55rem 0.65rem; }
-.abc-xyz-cell .abc-label { font-weight: 800; font-size: 0.75rem; margin-bottom: 2px; }
-.abc-x { background: rgba(16,185,129,0.07); border-right: 1px solid rgba(245,158,11,0.12); border-bottom: 1px solid rgba(245,158,11,0.12); }
-.abc-az { background: rgba(245,158,11,0.07); border-bottom: 1px solid rgba(245,158,11,0.12); }
-.abc-cx { background: rgba(59,130,246,0.06); border-right: 1px solid rgba(245,158,11,0.12); }
-.abc-cz { background: rgba(239,68,68,0.05); }
-.pareto-line { border-top: 2px dashed rgba(239,68,68,0.6); }
-@media (max-width: 768px) {
-  .fleet-kpi-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 480px) { .fleet-kpi-grid { grid-template-columns: 1fr 1fr; } }
-
-/* ═══════════════════════════════════════════════
-   SUPPLY CHAIN & TRANSPORT TAB STYLES
-   ═══════════════════════════════════════════════ */
-.sc-section-title { font-size: 0.82rem; font-weight: 800; color: var(--amber-dark); margin: 1.1rem 0 0.5rem; display: flex; align-items: center; gap: 6px; border-left: 3px solid var(--amber); padding-left: 8px; }
-.sc-mode-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; margin-top: 0.6rem; }
-.sc-mode-table th { padding: 6px 8px; background: rgba(245,158,11,0.1); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); white-space: nowrap; }
-.sc-mode-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; }
-.sc-mode-table tr:nth-child(even) td { background: rgba(245,158,11,0.018); }
-.sc-row-cheapest td { background: rgba(16,185,129,0.06) !important; font-weight: 700; }
-.sc-row-fastest td { background: rgba(59,130,246,0.06) !important; font-weight: 700; }
-.sc-row-infeasible td { opacity: 0.4; }
-.sc-badge-cheapest { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; background: rgba(16,185,129,0.12); color: #059669; border-radius: 4px; font-size: 0.62rem; font-weight: 700; }
-.sc-badge-fastest { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; background: rgba(59,130,246,0.12); color: #3b82f6; border-radius: 4px; font-size: 0.62rem; font-weight: 700; }
-.sc-co2-bar { display: inline-block; height: 8px; border-radius: 4px; background: rgba(245,158,11,0.5); }
-.sc-incoterm-panel { background: rgba(245,158,11,0.04); border: 1px solid rgba(245,158,11,0.15); border-radius: 4px; padding: 0.85rem 1rem; margin-top: 0.75rem; }
-.sc-incoterm-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; margin-top: 0.4rem; }
-.sc-incoterm-table th { padding: 4px 8px; background: rgba(245,158,11,0.08); color: var(--amber-dark); font-weight: 700; text-align: left; }
-.sc-incoterm-table td { padding: 4px 8px; border-bottom: 1px solid rgba(0,0,0,0.04); }
-.sc-reroute-panel { background: rgba(59,130,246,0.04); border: 1px solid rgba(59,130,246,0.18); border-radius: 4px; padding: 0.85rem 1rem; margin-top: 0.75rem; font-size: 0.78rem; }
-[data-theme="dark"] .sc-mode-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
-[data-theme="dark"] .sc-mode-table td { border-color: #334155; color: #cbd5e1; }
-[data-theme="dark"] .sc-incoterm-panel { background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.2); }
-[data-theme="dark"] .sc-reroute-panel { background: rgba(59,130,246,0.06); border-color: rgba(59,130,246,0.25); color: #93c5fd; }
-[data-theme="dark"] .sc-row-cheapest td { background: rgba(16,185,129,0.1) !important; }
-[data-theme="dark"] .sc-row-fastest td { background: rgba(59,130,246,0.1) !important; }
-
-/* Risk radar dimensions */
-.sc-risk-band { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 800; }
-.sc-risk-low { background: rgba(16,185,129,0.1); color: #059669; }
-.sc-risk-medium { background: rgba(245,158,11,0.1); color: #d97706; }
-.sc-risk-high { background: rgba(239,68,68,0.1); color: #ef4444; }
-.sc-risk-critical { background: rgba(239,68,68,0.18); color: #dc2626; }
-[data-theme="dark"] .sc-risk-low { background: rgba(16,185,129,0.15); color: #34d399; }
-[data-theme="dark"] .sc-risk-medium { background: rgba(245,158,11,0.15); color: #fbbf24; }
-[data-theme="dark"] .sc-risk-high { background: rgba(239,68,68,0.15); color: #f87171; }
-[data-theme="dark"] .sc-risk-critical { background: rgba(239,68,68,0.2); color: #fca5a5; }
-
-.sc-mit-list { list-style: none; padding: 0; margin: 0.5rem 0; }
-.sc-mit-list li { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; font-size: 0.77rem; color: var(--text-secondary); border-bottom: 1px solid rgba(0,0,0,0.04); }
-.sc-mit-list li:last-child { border-bottom: none; }
-.sc-effort-low { font-size: 0.63rem; font-weight: 700; padding: 1px 7px; border-radius: 50px; background: rgba(16,185,129,0.1); color: #059669; white-space: nowrap; }
-.sc-effort-med { font-size: 0.63rem; font-weight: 700; padding: 1px 7px; border-radius: 50px; background: rgba(245,158,11,0.1); color: #d97706; white-space: nowrap; }
-.sc-effort-high { font-size: 0.63rem; font-weight: 700; padding: 1px 7px; border-radius: 50px; background: rgba(239,68,68,0.1); color: #ef4444; white-space: nowrap; }
-
-/* Disruption sim */
-.sc-tornado-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-.sc-tornado-label { font-size: 0.71rem; font-weight: 600; color: var(--text-secondary); min-width: 140px; }
-.sc-tornado-bar-bg { flex: 1; height: 12px; background: rgba(0,0,0,0.04); border-radius: 6px; overflow: hidden; position: relative; }
-.sc-tornado-bar-fill { height: 100%; border-radius: 6px; position: absolute; left: 0; transition: width 0.4s ease; }
-.sc-tornado-val { font-size: 0.7rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 36px; text-align: right; color: var(--amber-dark); }
-[data-theme="dark"] .sc-tornado-val { color: #fbbf24; }
-
-/* Expedite options table */
-.sc-exp-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; margin-top: 0.6rem; }
-.sc-exp-table th { padding: 6px 8px; background: rgba(245,158,11,0.1); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); white-space: nowrap; }
-.sc-exp-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; }
-.sc-exp-table tr:nth-child(even) td { background: rgba(245,158,11,0.018); }
-.sc-exp-row-rec td { background: rgba(16,185,129,0.07) !important; font-weight: 700; }
-.sc-exp-closes-y { color: #059669; font-weight: 700; }
-.sc-exp-closes-n { color: #ef4444; font-weight: 700; }
-[data-theme="dark"] .sc-exp-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
-[data-theme="dark"] .sc-exp-table td { border-color: #334155; color: #cbd5e1; }
-[data-theme="dark"] .sc-exp-row-rec td { background: rgba(16,185,129,0.1) !important; }
-
-/* SC lane risk table */
-.sc-lane-risk-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; margin-top: 0.5rem; }
-.sc-lane-risk-table th { padding: 5px 8px; background: rgba(245,158,11,0.1); color: var(--amber-dark); font-weight: 700; text-align: left; border-bottom: 2px solid rgba(245,158,11,0.2); }
-.sc-lane-risk-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-[data-theme="dark"] .sc-lane-risk-table th { background: rgba(245,158,11,0.12); color: #fbbf24; }
-[data-theme="dark"] .sc-lane-risk-table td { border-color: #334155; }
-
-/* chart wrappers for SC tabs */
-.sc-chart-wrap { position: relative; height: 220px; margin-top: 0.75rem; }
-.sc-chart-wrap-sm { position: relative; height: 160px; margin-top: 0.5rem; }
-.sc-chart-wrap-lg { position: relative; height: 280px; margin-top: 0.75rem; }
-@media (max-width: 768px) {
-  .sc-mode-table, .sc-incoterm-table, .sc-exp-table, .sc-lane-risk-table { font-size: 0.65rem; }
-  .sc-mode-table th, .sc-exp-table th, .sc-lane-risk-table th { font-size: 0.65rem; padding: 4px 5px; }
-  .sc-mode-table td, .sc-exp-table td, .sc-lane-risk-table td { padding: 4px 5px; }
-  .sc-tornado-label { min-width: 90px; font-size: 0.65rem; }
-}
-/* a11y (v1.52.7) */
-.tabs-group-label { color:#64748b !important; }
-[data-theme="dark"] .tabs-group-label { color:#b6c2d1 !important; }
-#tourStepCount[id] { color:#94a3b8 !important; }
-.tour-btn-skip { color:#94a3b8 !important; }
-a[href$="changelog.html"] { color:#94a3b8 !important; }
-[data-theme="dark"] .disc-fine { color:#94a3b8 !important; }
-
-[data-theme="dark"] .summary-strip-title, [data-theme="dark"] #tourStepCount, [data-theme="dark"] .crosslink-bar-label, [data-theme="dark"] .rfs-card-subtitle, [data-theme="dark"] .rfs-nav-subtitle, [data-theme="dark"] .scenario-bar-label, [data-theme="dark"] .rfs-archetype-desc, [data-theme="dark"] .use-when, [data-theme="dark"] .use-when strong, [data-theme="dark"] #rfsBreadcrumb span, [data-theme="dark"] #methodNote, [data-theme="dark"] #methodNoteCatalogCount, [data-theme="dark"] div > p { color:#94a3b8 !important; }
-.tabs-group-label { color:#64748b !important; }
-[data-theme="dark"] .tabs-group-label { color:#8b98ac !important; }
-[data-theme="dark"] .info-box summary, [data-theme="dark"] .module-summary-card .q { color:#fbbf24 !important; }
-#btnExportPDF { opacity:1 !important; }
-:root:not([data-theme="dark"]) #btnExportPDF { color:#b91c1c !important; }
-[data-theme="dark"] #btnExportPDF { color:#f8b4b4 !important; }
-[data-theme="dark"] a[href$="changelog.html"] { color:#94a3b8 !important; }
-[data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
-
-:root:not([data-theme="dark"]) [style*="color: #d97706"], :root:not([data-theme="dark"]) [style*="color:#d97706"], :root:not([data-theme="dark"]) #presetSelect, :root:not([data-theme="dark"]) .module-summary-card .q, :root:not([data-theme="dark"]) .info-box summary { color:#92400e !important; }
-[data-theme="dark"] [style*="color: #d97706"], [data-theme="dark"] [style*="color:#d97706"] { color:#fbbf24 !important; }
-.workflow-flowchart { }
-</style>
-<script src="js/rz-version.js?v=20261102-c14c0a29" defer></script>
+<script src="js/rz-version.js?v=20261101-da8f0745" defer></script>
 <script src="js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
 <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 <script src="js/spares-parts-catalog.js?v=20260920-1487b6d8" defer></script>    <meta property="og:image:alt" content="Critical Spares Engine | DC M&amp;E Spares Readiness Calculator">
 
-<style id="rz-lightfix-v1">
-/* RZ-LIGHTFIX v1 — light-mode contrast restoration after the v1.19.1
-   default-theme flip to light. Scope: html:not([data-theme="dark"]) only,
-   so dark rendering is unchanged. Same-hue WCAG-AA shades. Idempotent. */
-html:not([data-theme="dark"]) .cookie-decline,
-html:not([data-theme="dark"]) .tco-cookie-decline { color:#475569 !important; }
-html:not([data-theme="dark"]) .calc-disclaimer .disc-fine,
-html:not([data-theme="dark"]) .disc-fine { color:#475569 !important; }
-html:not([data-theme="dark"]) .nav-user-email,
-html:not([data-theme="dark"]) .rz-user-email { color:#475569 !important; }
-html:not([data-theme="dark"]) .pro-badge,
-html:not([data-theme="dark"]) .nav-pro-badge { background:#64748b !important; color:#fff !important; }
-/* Per-link inline rainbow nav colours (authored for the old dark default)
-   are illegible on the white light navbar. Same-hue AA-700 shades keep the
-   colour-coded wayfinding. Safe: verified no inline border-color:#<accent>
-   or background-color:#<accent> exists on these pages, so [style*] only
-   ever matches a genuine text `color:` declaration; CSS !important beats
-   an inline declaration that carries no !important. */
-html:not([data-theme="dark"]) .nav-link[style*="#10b981"],
-html:not([data-theme="dark"]) .nav-link[style*="#22c55e"] { color:#047857 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#0d9488"],
-html:not([data-theme="dark"]) .nav-link[style*="#14b8a6"] { color:#0f766e !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#06b6d4"] { color:#0e7490 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#3b82f6"] { color:#1d4ed8 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#64748b"] { color:#64748b !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#f59e0b"],
-html:not([data-theme="dark"]) .nav-link[style*="#d97706"] { color:#b45309 !important; }
-html:not([data-theme="dark"]) .nav-link[style*="#ef4444"] { color:#b91c1c !important; }
 
-html:not([data-theme="dark"]) .hero-badge { color:#b45309 !important; }
-html:not([data-theme="dark"]) .module-flow-col h4 { color:#b45309 !important; }
-html:not([data-theme="dark"]) .module-flow-col li a,
-html:not([data-theme="dark"]) .module-flow-arrow { color:#b45309 !important; }
-html:not([data-theme="dark"]) .summary-kpi-module,
-html:not([data-theme="dark"]) .crosslink-pill,
-html:not([data-theme="dark"]) .btn-pdf,
-html:not([data-theme="dark"]) .btn-scenario { color:#b45309 !important; }
-html:not([data-theme="dark"]) .btn-scenario.danger { color:#b91c1c !important; }
-html:not([data-theme="dark"]) .tab-btn:not(.active) { color:#475569 !important; }
-</style>
-    <!-- PLAN02 E4 — editorial chrome (dark-only, chrome only) -->
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-<!-- ============================================================================
-     SPARES REVAMP v1 — "Critical Spares Engine" reference design system (day+night).
-     Re-points the page's accent tokens to instrument-blue + reference surfaces,
-     then restyles hero / KPI strip / tabs / cards / tables / badges to match the
-     reference screenshots. Loaded LAST so it wins the cascade.
-     ============================================================================ -->
-<style id="sp-revamp">
-:root{
-  /* re-point existing amber accent tokens -> reference instrument-blue (whole page shifts at once) */
-  --amber:#2563eb; --amber-light:#3b82f6; --amber-dark:#1d4ed8; --amber-deeper:#1e40af;
-  --accent:#2563eb; --accent-light:#3b82f6;
-  --primary-gradient:linear-gradient(135deg,#2563eb 0%,#3b82f6 100%);
-  --status-green:#059669; --status-yellow:#d97706; --status-red:#dc2626;
-  /* reference DAY surfaces */
-  --sp-page:#f6f7f9; --sp-surface:#ffffff; --sp-surface-2:#f8fafc;
-  --sp-line:#e6e8ec; --sp-line-strong:#d4d8df;
-  --sp-text:#1c2534; --sp-text-2:#475569; --sp-muted:#64748b;
-  --sp-primary:#2563eb; --sp-primary-2:#1d4ed8; --sp-primary-soft:#eef4ff;
-  --sp-vital:#dc2626; --sp-ess:#d97706; --sp-des:#0891b2;
-  --sp-red:#dc2626; --sp-amber:#d97706; --sp-green:#059669;
-  --sp-radius:12px;
-  --sp-shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.05);
-  --sp-shadow-hover:0 4px 14px rgba(16,24,40,.10);
-  /* re-point the page's own generic tokens */
-  --bg-primary:var(--sp-page); --bg-secondary:var(--sp-surface); --bg-tertiary:var(--sp-surface-2);
-  --text-primary:var(--sp-text); --text-secondary:var(--sp-text-2); --text-muted:var(--sp-muted);
-  --glass-bg:rgba(255,255,255,.9); --glass-border:var(--sp-line);
+<style id="rz-mobile-v18">
+/* v1.8.0 — mobile responsive patch */
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden; max-width: 100vw; }
+  img, picture, video { max-width: 100%; height: auto; display: block; }
+  .nav-menu, .nav-links { display: none; }
+  .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
+  button, a.btn, [role="button"] { min-height: 44px; }
 }
-[data-theme="dark"]{
-  --amber:#3b82f6; --amber-light:#60a5fa; --amber-dark:#2563eb; --amber-deeper:#1d4ed8;
-  --accent:#3b82f6; --accent-light:#60a5fa;
-  --primary-gradient:linear-gradient(135deg,#2563eb 0%,#3b82f6 100%);
-  --status-green:#34d399; --status-yellow:#fbbf24; --status-red:#f87171;
-  /* reference NIGHT surfaces (sampled from uiux_night.png) */
-  --sp-page:#061119; --sp-surface:#0c1826; --sp-surface-2:#0a1420;
-  --sp-line:rgba(148,163,184,.14); --sp-line-strong:rgba(148,163,184,.24);
-  --sp-text:#f1f5f9; --sp-text-2:#94a3b8; --sp-muted:#7c8aa0;
-  --sp-primary:#3b82f6; --sp-primary-2:#60a5fa; --sp-primary-soft:rgba(59,130,246,.14);
-  --sp-vital:#f87171; --sp-ess:#fbbf24; --sp-des:#22d3ee;
-  --sp-red:#f87171; --sp-amber:#fbbf24; --sp-green:#34d399;
-  --sp-shadow:0 1px 2px rgba(0,0,0,.45);
-  --sp-shadow-hover:0 6px 20px rgba(0,0,0,.5);
-  --bg-primary:var(--sp-page); --bg-secondary:var(--sp-surface); --bg-tertiary:var(--sp-surface-2);
-  --text-primary:var(--sp-text); --text-secondary:var(--sp-text-2); --text-muted:var(--sp-muted);
-  --glass-bg:rgba(12,24,38,.9); --glass-border:var(--sp-line);
-}
-body{ background:var(--sp-page)!important; color:var(--sp-text); }
-
-/* ---------- HERO -> reference analysis header (breadcrumb + title + meta trio) ---------- */
-.hero{ background:var(--sp-surface)!important; border-bottom:1px solid var(--sp-line); text-align:left!important;
-  padding:1.5rem 2rem 1.4rem!important; max-width:none!important; }
-.sp-breadcrumb{ display:flex; align-items:center; gap:.4rem; font-size:.76rem; color:var(--sp-muted); margin-bottom:1rem; flex-wrap:wrap; }
-.sp-breadcrumb a{ color:var(--sp-muted); text-decoration:none; }
-.sp-breadcrumb a:hover{ color:var(--sp-primary); }
-.sp-breadcrumb .sep{ opacity:.5; }
-.sp-head-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:2rem; flex-wrap:wrap; max-width:1360px; }
-.sp-head-left{ min-width:280px; }
-.sp-title-line{ display:flex; align-items:center; gap:.85rem; flex-wrap:wrap; }
-.hero h1{ font-size:1.9rem!important; font-weight:800; letter-spacing:-.02em; color:var(--sp-text)!important;
-  -webkit-text-fill-color:var(--sp-text)!important; background:none!important; -webkit-background-clip:border-box!important; background-clip:border-box!important; margin:0!important; }
-.sp-analysis-badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 11px; border-radius:6px;
-  background:var(--sp-primary-soft); color:var(--sp-primary); border:1px solid color-mix(in srgb,var(--sp-primary) 24%,transparent);
-  font-size:.68rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
-.hero .sp-subtitle{ font-size:.9rem; color:var(--sp-muted); margin:.55rem 0 0!important; max-width:640px; line-height:1.55; }
-.hero-badge, .hero-stats, .hero p:not(.sp-subtitle){ display:none!important; }
-.sp-meta-trio{ display:flex; gap:2.4rem; flex-wrap:wrap; }
-.sp-meta{ display:flex; flex-direction:column; gap:2px; }
-.sp-meta .k{ font-size:.66rem; letter-spacing:.05em; text-transform:uppercase; color:var(--sp-muted); }
-.sp-meta .v{ font-size:.86rem; font-weight:700; color:var(--sp-text); font-variant-numeric:tabular-nums; }
-
-/* ---------- KPI STRIP -> reference 8-module cards ---------- */
-.summary-strip{ background:transparent!important; border:none!important; box-shadow:none!important; padding:1.4rem 2rem .4rem!important; max-width:1360px; margin:0 auto!important; }
-.summary-strip-title{ font-size:.72rem!important; letter-spacing:.06em; text-transform:uppercase; color:var(--sp-muted)!important; font-weight:700!important; margin-bottom:.8rem!important; }
-/* 4×2 so each card is wide enough for one-line values (ESSENTIAL/STRATEGIC/CRITICAL); 8-across only on very wide viewports */
-.summary-kpi-grid-8{ display:grid!important; grid-template-columns:repeat(4,1fr)!important; gap:.7rem!important; }
-@media(min-width:1650px){ .summary-kpi-grid-8{ grid-template-columns:repeat(8,1fr)!important; } }
-@media(max-width:640px){ .summary-kpi-grid-8{ grid-template-columns:repeat(2,1fr)!important; } }
-.summary-kpi{ background:var(--sp-surface)!important; border:1px solid var(--sp-line)!important; border-radius:4px !important;
-  padding:.85rem .8rem!important; box-shadow:var(--sp-shadow)!important; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; position:relative; overflow:hidden; }
-.summary-kpi:hover{ transform:translateY(-2px); box-shadow:var(--sp-shadow-hover)!important; border-color:var(--sp-line-strong)!important; }
-.summary-kpi.sp-active{ border-color:var(--sp-primary)!important; box-shadow:0 0 0 1px var(--sp-primary)!important; }
-.summary-kpi-label{ font-size:.68rem!important; color:var(--sp-muted)!important; font-weight:600!important; display:flex; align-items:center; gap:4px; margin-bottom:.35rem; }
-.summary-kpi-value{ font-size:1.5rem!important; font-weight:800!important; color:var(--sp-text)!important; line-height:1.08; font-variant-numeric:tabular-nums; letter-spacing:-.02em; white-space:nowrap; }
-/* text values (tier/quadrant/status words) sit a touch smaller so long words fit one line in the 4-wide cards */
-.summary-kpi-value.sp-kpi-txt{ font-size:1.15rem!important; letter-spacing:0; }
-.summary-kpi-module{ font-size:.64rem!important; color:var(--sp-primary)!important; font-weight:700!important; margin-top:.3rem; letter-spacing:.02em; }
-
-/* ---------- TABS -> clean reference tabs ---------- */
-.tabs-wrap{ background:var(--sp-surface)!important; border:1px solid var(--sp-line); border-radius:var(--sp-radius); box-shadow:var(--sp-shadow); }
-.tabs-row{ gap:.25rem!important; padding:.35rem!important; }
-/* group labels read as clear section chips separating the tab groups */
-.tabs-group-label{ color:var(--sp-primary)!important; font-size:.58rem!important; letter-spacing:.08em; font-weight:800!important;
-  background:var(--sp-primary-soft)!important; border:1px solid color-mix(in srgb,var(--sp-primary) 20%,transparent); border-radius:5px; padding:2px 7px!important; align-self:center!important; margin:0 .15rem!important; }
-.tab-divider{ display:none!important; }
-.tab-btn{ background:transparent!important; border:1px solid transparent!important; color:var(--sp-text-2)!important;
-  border-radius:8px!important; font-size:.78rem!important; font-weight:600!important; padding:.5rem .8rem!important; transition:background .15s, color .15s; }
-.tab-btn:hover{ background:var(--sp-surface-2)!important; color:var(--sp-text)!important; }
-.tab-btn.active{ background:var(--sp-primary)!important; color:#fff!important; border-color:var(--sp-primary)!important; box-shadow:0 1px 3px rgba(37,99,235,.3); }
-.tab-divider{ color:var(--sp-line-strong)!important; }
-
-/* ---------- CARDS -> flat reference surfaces ---------- */
-.module-card, .result-card, .module-summary-card, .module-flow-card, .metric-box, .faq-item, .info-box{
-  background:var(--sp-surface)!important; border:1px solid var(--sp-line)!important; border-radius:4px !important;
-  box-shadow:var(--sp-shadow)!important; }
-.module-card:hover{ border-color:var(--sp-line-strong)!important; }
-.card-title{ color:var(--sp-text)!important; font-weight:700!important; }
-.card-title i{ color:var(--sp-primary)!important; }
-.module-summary-card{ border-left:2px solid var(--sp-primary)!important; }
-.module-summary-card .q{ color:var(--sp-text)!important; font-weight:700; }
-.module-flow-card{ background:var(--sp-surface-2)!important; }
-.module-flow-col h4{ color:var(--sp-primary)!important; }
-.module-flow-arrow{ color:var(--sp-primary)!important; }
-
-/* ---------- INPUTS ---------- */
-.input-field, select.input-field{ background:var(--sp-surface)!important; border:1px solid var(--sp-line-strong)!important;
-  color:var(--sp-text)!important; border-radius:8px!important; }
-.input-field:focus{ border-color:var(--sp-primary)!important; box-shadow:0 0 0 3px color-mix(in srgb,var(--sp-primary) 15%,transparent)!important; }
-.input-label{ color:var(--sp-text-2)!important; }
-[data-theme="dark"] select option{ background:var(--sp-surface)!important; color:var(--sp-text)!important; }
-
-/* ---------- BADGES / STATUS ---------- */
-.status-red,.tier-vital{ background:color-mix(in srgb,var(--sp-red) 12%,transparent)!important; color:var(--sp-red)!important; }
-.status-yellow,.tier-essential{ background:color-mix(in srgb,var(--sp-amber) 14%,transparent)!important; color:var(--sp-amber)!important; }
-.status-green,.tier-desirable{ background:color-mix(in srgb,var(--sp-green) 14%,transparent)!important; color:var(--sp-green)!important; }
-
-/* ---------- TABLES ---------- */
-.table-sm th{ background:var(--sp-surface-2)!important; color:var(--sp-primary)!important; border-bottom:1px solid var(--sp-line)!important; }
-.table-sm td{ border-color:var(--sp-line)!important; color:var(--sp-text)!important; }
-.table-sm tr:nth-child(even) td{ background:color-mix(in srgb,var(--sp-muted) 5%,transparent)!important; }
-
-/* ---------- SCENARIO BAR / BUTTONS ---------- */
-.scenario-bar{ background:var(--sp-surface)!important; border:1px solid var(--sp-line)!important; border-radius:var(--sp-radius)!important; box-shadow:var(--sp-shadow)!important; }
-.btn-scenario{ background:var(--sp-surface-2)!important; border:1px solid var(--sp-line-strong)!important; color:var(--sp-text)!important; border-radius:8px!important; font-weight:600!important; }
-.btn-scenario:hover{ border-color:var(--sp-primary)!important; color:var(--sp-primary)!important; }
-
-/* ---------- RUN / primary action + footer stamp ---------- */
-.sp-run-btn{ display:inline-flex; align-items:center; gap:.5rem; background:var(--sp-primary); color:#fff; border:none;
-  border-radius:9px; padding:.7rem 1.3rem; font-weight:700; font-size:.9rem; cursor:pointer; box-shadow:0 1px 3px rgba(37,99,235,.35); transition:background .15s, transform .12s; }
-.sp-run-btn:hover{ background:var(--sp-primary-2); }
-.sp-run-btn:active{ transform:translateY(1px); }
-.sp-engine-stamp{ display:flex; align-items:center; justify-content:center; gap:.5rem; padding:1rem; font-size:.72rem; color:var(--sp-muted);
-  border-top:1px solid var(--sp-line); margin-top:1.5rem; }
-.sp-engine-stamp .dot{ width:6px; height:6px; border-radius:50%; background:var(--sp-green); }
-
-/* ---------- micro-interactions ---------- */
-@keyframes sp-fade-up{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none;} }
-.module-pane.active{ animation:sp-fade-up .28s ease both; }
-.summary-kpi-value.sp-flash{ animation:sp-num .5s ease; }
-@keyframes sp-num{ 0%{ color:var(--sp-primary);} 100%{ color:var(--sp-text);} }
-@media(prefers-reduced-motion:reduce){ .module-pane.active,.summary-kpi-value.sp-flash{ animation:none!important; } .summary-kpi{ transition:none; } }
-
-/* ===== HERO BANNER ===== */
-.sp-hero-banner{ position:relative; width:100%; height:170px; overflow:hidden; background:#0b1220; }
-.sp-hero-banner img{ width:100%; height:100%; object-fit:cover; display:block; }
-.sp-hero-banner::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,17,25,.10),rgba(6,17,25,.55)); pointer-events:none; }
-/* No hero image yet -> collapse the band entirely (no dark void). Shows automatically once the webp exists. */
-.sp-hero-noimg{ display:none !important; }
-
-/* ===== 3-COLUMN SHELL ===== */
-.sp-shell{ display:grid; grid-template-columns:264px minmax(0,1fr) 312px; gap:1.25rem; align-items:start;
-  max-width:1460px; margin:0 auto; padding:1.25rem 1.5rem 0; }
-.sp-setup, .sp-rail{ position:sticky; top:76px; align-self:start; display:flex; flex-direction:column; gap:1rem; }
-.sp-setup{ background:var(--sp-surface); border:1px solid var(--sp-line); border-radius:12px; padding:1rem; box-shadow:var(--sp-shadow); }
-.sp-center{ min-width:0; }
-@media(max-width:1180px){ .sp-shell{ grid-template-columns:1fr; } .sp-setup,.sp-rail{ position:static; } }
-
-/* the center's inner strips were max-width:1100px centered — let them fill the column now */
-.sp-center .summary-strip,.sp-center .scenario-bar,.sp-center .tabs-wrap,.sp-center .module-wrap{ max-width:none!important; }
-.sp-center .summary-strip,.sp-center .scenario-bar{ padding-left:0!important; padding-right:0!important; }
-.sp-center .module-wrap{ padding-left:0!important; padding-right:0!important; }
-@media(max-width:1180px){ .sp-center .summary-strip,.sp-center .scenario-bar,.sp-center .module-wrap{ padding-left:.5rem!important; padding-right:.5rem!important; } }
-
-/* ----- LEFT RAIL: Analysis Setup ----- */
-.sp-setup-head{ font-size:.82rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--sp-text);
-  display:flex; align-items:center; gap:.5rem; padding-bottom:.6rem; border-bottom:1px solid var(--sp-line); }
-.sp-setup-head i{ color:var(--sp-primary); }
-.sp-setup-sec{ display:flex; flex-direction:column; gap:.5rem; }
-.sp-setup-num{ font-size:.7rem; font-weight:700; letter-spacing:.03em; color:var(--sp-text-2); text-transform:uppercase; }
-.sp-setup .input-field{ width:100%; font-size:.82rem; padding:.4rem .5rem!important; }
-.sp-rail-row{ display:flex; flex-direction:column; gap:.2rem; }
-.sp-rail-row label{ font-size:.68rem; color:var(--sp-muted); font-weight:600; }
-.sp-editall{ font-size:.72rem; font-weight:700; color:var(--sp-primary); text-decoration:none; margin-top:.35rem; }
-.sp-editall:hover{ text-decoration:underline; }
-.sp-scenario{ border-top:1px solid var(--sp-line); padding-top:.85rem; gap:.6rem; }
-.sp-scenario-top{ display:flex; align-items:center; }
-.sp-scenario-pill{ display:inline-flex; align-items:center; gap:6px; font-size:.68rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
-  color:var(--sp-green); background:color-mix(in srgb,var(--sp-green) 12%,transparent); border:1px solid color-mix(in srgb,var(--sp-green) 30%,transparent);
-  border-radius:4px; padding:3px 10px; }
-.sp-scenario-pill .dot{ width:6px; height:6px; border-radius:50%; background:var(--sp-green); }
-.sp-run-full{ width:100%; justify-content:center; }
-.sp-lastrun{ font-size:.66rem; color:var(--sp-muted); text-align:center; }
-
-/* ----- RIGHT RAIL ----- */
-.sp-rail-method{ font-size:.74rem; font-weight:700; color:var(--sp-primary); text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
-.sp-rail-method:hover{ text-decoration:underline; }
-.sp-rail-card{ background:var(--sp-surface); border:1px solid var(--sp-line); border-radius:4px; padding:1rem; box-shadow:var(--sp-shadow); }
-.sp-rail-title{ font-size:.74rem; font-weight:800; letter-spacing:.03em; text-transform:uppercase; color:var(--sp-text);
-  display:flex; align-items:center; gap:.5rem; margin-bottom:.7rem; }
-.sp-rail-title i{ color:var(--sp-primary); }
-.sp-rail-scope{ margin-left:auto; font-size:.6rem; font-weight:600; letter-spacing:.02em; text-transform:none; color:var(--sp-muted);
-  background:var(--sp-surface-2); border:1px solid var(--sp-line); border-radius:999px; padding:1px 7px; }
-.sp-rail-metric{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.28rem 0; border-bottom:1px dashed var(--sp-line); }
-.sp-rail-metric:last-child{ border-bottom:none; }
-.sp-rail-metric .k{ font-size:.72rem; color:var(--sp-muted); }
-.sp-rail-metric .v{ font-size:.82rem; font-weight:700; color:var(--sp-text); font-variant-numeric:tabular-nums; text-align:right; }
-.sp-heat{ display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
-.sp-heat-cell{ aspect-ratio:1; border-radius:6px; position:relative; opacity:.42; transition:opacity .18s, transform .12s; cursor:help; }
-.sp-heat-cell.g{ background:var(--sp-green); }
-.sp-heat-cell.a{ background:var(--sp-amber); }
-.sp-heat-cell.r{ background:var(--sp-red); }
-.sp-heat-cell:hover, .sp-heat-cell:focus-visible{ opacity:.9; transform:scale(1.06); outline:none; z-index:5; }
-.sp-heat-cell.sp-heat-on{ opacity:1; box-shadow:0 0 0 2px var(--sp-surface),0 0 0 4px var(--sp-text); }
-.sp-heat-cell.sp-heat-on::before{ content:'●'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:.6rem; text-shadow:0 1px 2px rgba(0,0,0,.5); }
-/* value-on-hover tooltip for heat-map + kraljic cells (mirrors the .tip::after engine) */
-.sp-heat-cell[data-tip]::after, .kq-cell[data-tip]::after{ content:attr(data-tip); display:none; position:absolute; bottom:calc(100% + 8px); right:0; background:#0f172a; color:#f1f5f9; font-size:.7rem; font-weight:400; line-height:1.5; padding:8px 10px; border-radius:8px; width:230px; max-width:80vw; white-space:normal; z-index:9000; box-shadow:0 6px 20px rgba(0,0,0,.35); border:1px solid rgba(148,163,184,.25); text-align:left; pointer-events:none; }
-.sp-heat-cell:hover[data-tip]::after, .sp-heat-cell:focus-visible[data-tip]::after, .sp-heat-cell.sp-tip-open[data-tip]::after, .kq-cell:hover[data-tip]::after, .kq-cell:focus-visible[data-tip]::after, .kq-cell.sp-tip-open[data-tip]::after{ display:block; }
-.kq-cell{ position:relative; cursor:help; }
-/* smooth number-settle underline instead of the old color flash */
-.summary-kpi-value.sp-flash{ animation:none; }
-.summary-kpi-value{ position:relative; }
-.summary-kpi-value.sp-settle::after{ content:''; position:absolute; left:0; right:0; bottom:-3px; height:2px; background:var(--sp-primary); border-radius:2px; transform-origin:left; animation:sp-settle-sweep .5s cubic-bezier(.22,.61,.36,1); }
-@keyframes sp-settle-sweep{ 0%{ transform:scaleX(0); opacity:.9; } 100%{ transform:scaleX(1); opacity:0; } }
-/* status color on KPI values */
-.summary-kpi-value.st-red{ color:var(--sp-red)!important; } .summary-kpi-value.st-amber{ color:var(--sp-amber)!important; } .summary-kpi-value.st-green{ color:var(--sp-green)!important; }
-.sp-heat-axis{ display:flex; justify-content:space-between; font-size:.62rem; color:var(--sp-muted); margin-top:.4rem; }
-.sp-qa{ width:100%; justify-content:center; text-align:center; margin-top:.4rem; }
-.sp-qa:first-of-type{ margin-top:0; }
 </style>
 <style>
 /* Mobile form controls: 16px, or iOS Safari zooms the viewport on focus and does not zoom back.
@@ -1324,9 +86,10 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
   select, textarea { font-size: 16px !important; }
 }
 </style>
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261101-904870bb">
+    <link rel="stylesheet" href="css/rz-hub.css">
+    <link rel="stylesheet" href="css/rz-tool.css">
 </head>
-<body>
+<body class="hub tool" data-rz-calc="spares" data-rz-account-pill="off">
 <script>
 (function(){
   var t = localStorage.getItem('theme');
@@ -1334,104 +97,87 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
 })();
 </script>
 <a class="skip-link" href="#main-content">Skip to main content</a>
-<div class="page-background"></div>
-<!-- Aurora hero mesh -->
-<div class="aurora-mesh" aria-hidden="true">
-  <div class="aurora-blob aurora-blob-1"></div>
-  <div class="aurora-blob aurora-blob-2"></div>
-  <div class="aurora-blob aurora-blob-3"></div>
-</div>
-
-<!-- Navbar -->
-<nav class="navbar">
-  <div class="nav-container">
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
     <a href="index.html" class="nav-brand">
-      <div class="nav-logo">CSE</div>
-      <div>
-        <div class="nav-title">Critical Spares Engine</div>
-        <div class="nav-subtitle">M&amp;E Spares Readiness · Sourcing · Obsolescence</div>
-      </div>
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
     </a>
     <div class="nav-links" id="navLinks">
-      <div class="nav-dropdown">
-        <span class="nav-link nav-dropdown-toggle">Calculators ▾</span>
-        <div class="nav-dropdown-menu">
-          <a href="pue-calculator.html">PUE Calculator</a>
-          <a href="capex-calculator.html">CAPEX Calculator</a>
-          <a href="opex-calculator.html">OPEX Calculator</a>
-          <a href="roi-calculator.html">ROI Calculator</a>
-          <a href="tco-calculator.html">TCO Calculator</a>
-          <a href="cx-calculator.html">CX Calculator</a>
-          <a href="carbon-footprint.html">Carbon Footprint</a>
-          <a href="tier-advisor.html">Tier Advisor</a>
-          <a href="spares-readiness-calculator.html" style="color:var(--amber);font-weight:700;">Critical Spares Engine</a>
-        </div>
-      </div>
-      <div class="nav-dropdown">
-        <span class="nav-link nav-dropdown-toggle">Markets ▾</span>
-        <div class="nav-dropdown-menu">
-          <a href="dc-market-tracker.html">Global Market Tracker</a>
-          <a href="datacenter-solutions.html">DC Solutions Hub</a>
-        </div>
-      </div>
       <a href="glossary.html" class="nav-link">Glossary</a>
-      <div class="nav-auth-wrap" id="navAuthWrap">
-        <button class="nav-login-btn" id="navLoginBtn" onclick="if(window._rzAuth)_rzAuth.showModal();else console.warn('[CSE] auth.js not loaded');" aria-label="Login or sign up"><i class="fas fa-user-circle"></i><span class="nav-login-text">Login</span></button>
-        <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()">
-          <div class="nav-user-avatar" id="navUserAvatar">U</div>
-          <span class="nav-user-email" id="navUserEmail"></span>
-          <i class="fas fa-chevron-down nav-user-chevron"></i>
-        </button>
-        <div class="nav-user-dropdown" id="navUserDropdown">
-          <div class="nav-dd-header">
-            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div>
-            <div class="nav-dd-email" id="navDdEmail"></div>
-          </div>
-          <button class="nav-dd-logout" onclick="logoutPremium()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
       </div>
-      <button class="nav-theme-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
-      <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Portfolio</a>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
     </div>
-    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu"><span></span><span></span><span></span></button>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+          <div class="nav-auth-wrap" id="navAuthWrap">
+        <button class="nav-login-btn" id="navLoginBtn" onclick="if(window._rzAuth)_rzAuth.showModal();"><span class="nav-login-text">Login</span></button>
+        <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()"><span class="nav-user-avatar" id="navUserAvatar">U</span><span class="nav-user-email" id="navUserEmail"></span></button>
+        <div class="nav-user-dropdown" id="navUserDropdown">
+          <div class="nav-dd-header"><div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div><div class="nav-dd-email" id="navDdEmail"></div></div>
+          <a class="nav-dd-link" href="account.html">My account and saved scenarios</a>
+          <button class="nav-dd-logout" onclick="logoutPremium()">Logout</button>
+        </div>
+      </div>
+    <button class="nav-icon theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i class="fas fa-moon"></i></button>
   </div>
 </nav>
 
 <main class="main-content" id="main-content">
-  <!-- Hero banner — hidden by default; reveals ONLY when the cover image actually loads
-       (owner drops assets/spares-readiness-calculator-hero.webp). No image = no band, no dark box. -->
-  <div class="sp-hero-banner" style="display:none">
-    <img class="sp-hero-img" src="assets/spares-readiness-calculator-hero.webp" alt="Data center campus at dusk" loading="eager"
-         onload="var p=this.closest('.sp-hero-banner'); if(this.naturalWidth>1){p.style.display='block';}"
-         onerror="var p=this.closest('.sp-hero-banner'); if(p) p.remove();">
-  </div>
-
-  <!-- Deep-link carrier banner -->
-  <div class="carrier-banner" id="carrierBanner"><i class="fas fa-link"></i> <span id="carrierBannerText">Your config carried over from another calculator.</span></div>
-
-  <!-- Hero — reference analysis header -->
-  <section class="hero">
-    <nav class="sp-breadcrumb" aria-label="Breadcrumb">
-      <a href="index.html">Home</a><span class="sep">›</span>
-      <a href="datacenter-solutions.html">DC Solutions</a><span class="sep">›</span>
-      <a href="manual/index.html">Technical Manuals</a><span class="sep">›</span>
-      <span aria-current="page" style="color:var(--sp-text);font-weight:600;">Critical Spares Engine</span>
-    </nav>
-    <div class="sp-head-row">
-      <div class="sp-head-left">
-        <div class="sp-title-line">
-          <h1>Critical Spares Engine</h1>
-          <span class="sp-analysis-badge"><i class="fas fa-layer-group"></i> Analysis Summary</span>
-        </div>
-        <p class="sp-subtitle">Eight analytical modules. One intelligent engine. Optimise spare-parts strategy, cost, and availability for data-center M&amp;E equipment.</p>
-      </div>
-      <div class="sp-meta-trio">
-        <div class="sp-meta"><span class="k">Analysis ID</span><span class="v" id="sp_meta_id">SP-000000-001</span></div>
-        <div class="sp-meta"><span class="k">Created</span><span class="v" id="sp_meta_created">—</span></div>
-        <div class="sp-meta"><span class="k">Scenario</span><span class="v" id="sp_meta_scenario">Production DC (Base Case)</span></div>
-      </div>
+  <header class="tool-head">
+    <div class="wrap">
+      <p class="eyebrow">DC Solutions · <b>Calculator</b> · Critical spares</p>
+      <h1>Critical spares readiness <span class="muted">for data-center M&amp;E equipment</span></h1>
+      <p class="lede">Which spare parts to stock, how many and where: FMECA criticality, supply readiness, newsvendor stock level, two-echelon allocation, supplier risk, last-time-buy and Kraljic sourcing, for one part or a fleet. RZEngine computes every module in your browser.</p>
+      <p class="basis">engine RZEngine spares · analysis <span id="sp_meta_id">SP-000000-001</span> · created <span id="sp_meta_created">—</span> · scenario <span id="sp_meta_scenario">Production DC (Base Case)</span></p>
+      <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → Calculator → Critical spares</p>
     </div>
-  </section>
+  </header>
+
+  <div class="wrap">
+  <div class="carrier-banner" id="carrierBanner"><i class="fas fa-link"></i> <span id="carrierBannerText">Your config carried over from another calculator.</span></div>
+  <div class="tool-bar" role="toolbar" aria-label="Scenario">
+    <button type="button" class="tool-btn" onclick="saveScenario()" aria-label="Save current scenario to browser storage">Save</button>
+    <button type="button" class="tool-btn" onclick="loadScenario()" aria-label="Load saved scenario from browser storage">Load</button>
+    <button type="button" class="tool-btn" onclick="shareScenario()" aria-label="Copy shareable URL with current inputs">Share URL</button>
+    <button type="button" class="tool-btn" onclick="resetDefaults()" aria-label="Reset all inputs to defaults">Reset</button>
+    <select class="tool-btn preset-select" id="presetSelect" onchange="loadPreset(this.value);this.value=''" aria-label="Load a sample scenario preset">
+      <option value="">Load a sample scenario…</option>
+      <option value="chiller_crisis">1. Chiller compressor crisis — single-source, P1 escalation</option>
+      <option value="mv_eol">2. MV switchgear breaker — EOL announced, LTB decision</option>
+      <option value="crac_hub">3. CRAC fan motor — multi-site hub optimisation</option>
+      <option value="gen_negotiation">4. Generator parts — supplier +12% price increase, Leverage</option>
+      <option value="undefined_ask">5. Undefined ask — improve spares readiness, 30/60/90 plan</option>
+    </select>
+    <span class="spacer"></span>
+    <span class="scenario-saved-msg" id="scenarioMsg"></span>
+    <button type="button" class="tool-btn" onclick="exportFullReportPDF()" aria-label="Export full analytical report as PDF">Export PDF</button>
+  </div>
+  </div>
 
   <!-- ===== 3-COLUMN ANALYST SHELL (v1.111.x) ===== -->
   <div class="sp-shell">
@@ -1574,71 +320,21 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
   </details>
   </div>
 
-  <!-- Summary Dashboard strip -->
-  <div class="summary-strip" id="summaryStrip">
-    <div class="summary-strip-title"><i class="fas fa-gauge-high"></i> One-Glance Dashboard — click any card to jump to module</div>
-    <div class="summary-kpi-grid-8">
-      <div class="summary-kpi" onclick="switchTab('criticality')" title="Jump to Criticality module" role="button" aria-label="Go to Criticality tab">
-        <div class="summary-kpi-label">Criticality Tier <span class="tip" tabindex="0" data-tip="FMECA criticality tier for this part. VITAL = stockout causes immediate downtime. ESSENTIAL = impacts mission. DESIRABLE = nice-to-have. Drives stock policy and supplier priority. See M1 Criticality." aria-label="Criticality Tier tooltip">ⓘ</span></div>
-        <div class="summary-kpi-value" id="sum_tier">—</div>
-        <div class="summary-kpi-module">M1 · FMECA</div>
-      </div>
-      <div class="summary-kpi" onclick="switchTab('readiness')" title="Jump to Readiness module" role="button" aria-label="Go to Readiness tab">
-        <div class="summary-kpi-label">Readiness % <span class="tip" tabindex="0" data-tip="Supply readiness percentage for the planning horizon. 100% = all demand covered by confirmed supply. Below 80% = significant gap requiring immediate procurement action. See M2 Readiness." aria-label="Readiness % tooltip">ⓘ</span></div>
-        <div class="summary-kpi-value" id="sum_readiness">—</div>
-        <div class="summary-kpi-module">M2 · Gauge</div>
-      </div>
-      <div class="summary-kpi" onclick="switchTab('stock')" title="Jump to Optimal Stock module" role="button" aria-label="Go to Optimal Stock tab">
-        <div class="summary-kpi-label">Rec. Stock Q* <span class="tip" tabindex="0" data-tip="Recommended stocking level from the Newsvendor critical-fractile model. Unit: units. This is the Q* that minimises total cost of over- and under-stocking. See M3 Optimal Stock." aria-label="Recommended Stock Q* tooltip">ⓘ</span></div>
-        <div class="summary-kpi-value" id="sum_qstar">—</div>
-        <div class="summary-kpi-module">M3 · Newsvendor</div>
-      </div>
-      <div class="summary-kpi" onclick="switchTab('hub')" title="Jump to Hub Positioning module" role="button" aria-label="Go to Hub Positioning tab">
-        <div class="summary-kpi-label">Fleet Readiness <span class="tip" tabindex="0" data-tip="Percentage of fleet assets serviceable within MTTR given current hub stock allocation. Target above 95% for critical DC parts. Driven by hub and site stock levels. See M4 Hub/MEIO." aria-label="Fleet Readiness tooltip">ⓘ</span></div>
-        <div class="summary-kpi-value" id="sum_hub_read">—</div>
-        <div class="summary-kpi-module">M4 · MEIO/Hub</div>
-      </div>
-      <div class="summary-kpi" onclick="switchTab('supplier')" title="Jump to Supplier Risk module" role="button" aria-label="Go to Supplier Risk tab">
-        <div class="summary-kpi-label">Supplier Risk <span class="tip" tabindex="0" data-tip="Composite supplier risk rating (Low/Medium/High/Critical). Derived from OTIF%, financial stability, single-source exposure, and CA closure rate. Drives strategic sourcing action. See M5 Supplier Risk." aria-label="Supplier Risk tooltip">ⓘ</span></div>
-        <div class="summary-kpi-value" id="sum_supplier">—</div>
-        <div class="summary-kpi-module">M5 · Composite</div>
-      </div>
-      <div class="summary-kpi" onclick="switchTab('ltb')" title="Jump to Last-Time-Buy module" role="button" aria-label="Go to Last-Time-Buy tab">
-        <div class="summary-kpi-label">EOL Exposure <span class="tip" tabindex="0" data-tip="End-of-Life exposure band (Low/Medium/High/Critical) based on DMSMS score. Reflects criticality, years to EOL, and alternate availability. Critical band means LTB or requalification required urgently. See M6 DMSMS." aria-label="EOL Exposure tooltip">ⓘ</span></div>
-        <div class="summary-kpi-value" id="sum_ltb">—</div>
-        <div class="summary-kpi-module">M6 · DMSMS</div>
-      </div>
-      <div class="summary-kpi" onclick="switchTab('kraljic')" title="Jump to Kraljic module" role="button" aria-label="Go to Kraljic tab">
-        <div class="summary-kpi-label">Sourcing Quad. <span class="tip" tabindex="0" data-tip="Kraljic sourcing quadrant: Strategic / Leverage / Bottleneck / Non-critical. Determined by supply risk vs. spend impact. Strategic = partnership; Bottleneck = secure supply; Leverage = competitive bidding. See M7 Kraljic." aria-label="Sourcing Quadrant tooltip">ⓘ</span></div>
-        <div class="summary-kpi-value" id="sum_kraljic">—</div>
-        <div class="summary-kpi-module">M7 · Kraljic</div>
-      </div>
-      <div class="summary-kpi" onclick="switchTab('montecarlo')" title="Jump to Monte-Carlo module" role="button" aria-label="Go to Monte-Carlo tab">
-        <div class="summary-kpi-label">P(Stockout) <span class="tip" tabindex="0" data-tip="Monte-Carlo simulated probability of stockout during the planning horizon. Unit: %. Target below 5% for VITAL parts. Run the M8 Monte-Carlo simulation to populate this value." aria-label="P(Stockout) tooltip">ⓘ</span></div>
-        <div class="summary-kpi-value" id="sum_pstockout">Run →</div>
-        <div class="summary-kpi-module">M8 · Monte-Carlo</div>
+  <section class="tool-results sp-summary" id="summaryStrip" aria-labelledby="spSumH">
+    <div class="res-head"><h2 id="spSumH">Analysis summary</h2><span class="basis">select a row to open its module</span></div>
+    <div class="res-group">
+      <div data-rz-fact-list class="summary-kpi-grid-8">
+        <div class="summary-kpi" onclick="switchTab('criticality')" title="Jump to Criticality module" role="button" tabindex="0" aria-label="Go to Criticality tab"><div class="summary-kpi-label">Criticality Tier <span class="tip" tabindex="0" data-tip="FMECA criticality tier for this part. VITAL = stockout causes immediate downtime. ESSENTIAL = impacts mission. DESIRABLE = nice-to-have. Drives stock policy and supplier priority. See M1 Criticality." aria-label="Criticality Tier tooltip">ⓘ</span></div><div class="summary-kpi-value" id="sum_tier">—</div><div class="summary-kpi-module sk-note">M1 · FMECA</div></div>
+        <div class="summary-kpi is-key" onclick="switchTab('readiness')" title="Jump to Readiness module" role="button" tabindex="0" aria-label="Go to Readiness tab"><div class="summary-kpi-label">Readiness % <span class="tip" tabindex="0" data-tip="Supply readiness percentage for the planning horizon. 100% = all demand covered by confirmed supply. Below 80% = significant gap requiring immediate procurement action. See M2 Readiness." aria-label="Readiness % tooltip">ⓘ</span></div><div class="summary-kpi-value" id="sum_readiness">—</div><div class="summary-kpi-module sk-note">M2 · Gauge</div></div>
+        <div class="summary-kpi" onclick="switchTab('stock')" title="Jump to Optimal Stock module" role="button" tabindex="0" aria-label="Go to Optimal Stock tab"><div class="summary-kpi-label">Rec. Stock Q* <span class="tip" tabindex="0" data-tip="Recommended stocking level from the Newsvendor critical-fractile model. Unit: units. This is the Q* that minimises total cost of over- and under-stocking. See M3 Optimal Stock." aria-label="Recommended Stock Q* tooltip">ⓘ</span></div><div class="summary-kpi-value" id="sum_qstar">—</div><div class="summary-kpi-module sk-note">M3 · Newsvendor</div></div>
+        <div class="summary-kpi" onclick="switchTab('hub')" title="Jump to Hub Positioning module" role="button" tabindex="0" aria-label="Go to Hub Positioning tab"><div class="summary-kpi-label">Fleet Readiness <span class="tip" tabindex="0" data-tip="Percentage of fleet assets serviceable within MTTR given current hub stock allocation. Target above 95% for critical DC parts. Driven by hub and site stock levels. See M4 Hub/MEIO." aria-label="Fleet Readiness tooltip">ⓘ</span></div><div class="summary-kpi-value" id="sum_hub_read">—</div><div class="summary-kpi-module sk-note">M4 · MEIO/Hub</div></div>
+        <div class="summary-kpi" onclick="switchTab('supplier')" title="Jump to Supplier Risk module" role="button" tabindex="0" aria-label="Go to Supplier Risk tab"><div class="summary-kpi-label">Supplier Risk <span class="tip" tabindex="0" data-tip="Composite supplier risk rating (Low/Medium/High/Critical). Derived from OTIF%, financial stability, single-source exposure, and CA closure rate. Drives strategic sourcing action. See M5 Supplier Risk." aria-label="Supplier Risk tooltip">ⓘ</span></div><div class="summary-kpi-value" id="sum_supplier">—</div><div class="summary-kpi-module sk-note">M5 · Composite</div></div>
+        <div class="summary-kpi" onclick="switchTab('ltb')" title="Jump to Last-Time-Buy module" role="button" tabindex="0" aria-label="Go to Last-Time-Buy tab"><div class="summary-kpi-label">EOL Exposure <span class="tip" tabindex="0" data-tip="End-of-Life exposure band (Low/Medium/High/Critical) based on DMSMS score. Reflects criticality, years to EOL, and alternate availability. Critical band means LTB or requalification required urgently. See M6 DMSMS." aria-label="EOL Exposure tooltip">ⓘ</span></div><div class="summary-kpi-value" id="sum_ltb">—</div><div class="summary-kpi-module sk-note">M6 · DMSMS</div></div>
+        <div class="summary-kpi" onclick="switchTab('kraljic')" title="Jump to Kraljic module" role="button" tabindex="0" aria-label="Go to Kraljic tab"><div class="summary-kpi-label">Sourcing Quad. <span class="tip" tabindex="0" data-tip="Kraljic sourcing quadrant: Strategic / Leverage / Bottleneck / Non-critical. Determined by supply risk vs. spend impact. Strategic = partnership; Bottleneck = secure supply; Leverage = competitive bidding. See M7 Kraljic." aria-label="Sourcing Quadrant tooltip">ⓘ</span></div><div class="summary-kpi-value" id="sum_kraljic">—</div><div class="summary-kpi-module sk-note">M7 · Kraljic</div></div>
+        <div class="summary-kpi" onclick="switchTab('montecarlo')" title="Jump to Monte-Carlo module" role="button" tabindex="0" aria-label="Go to Monte-Carlo tab"><div class="summary-kpi-label">P(Stockout) <span class="tip" tabindex="0" data-tip="Monte-Carlo simulated probability of stockout during the planning horizon. Unit: %. Target below 5% for VITAL parts. Run the M8 Monte-Carlo simulation to populate this value." aria-label="P(Stockout) tooltip">ⓘ</span></div><div class="summary-kpi-value" id="sum_pstockout">Run →</div><div class="summary-kpi-module sk-note">M8 · Monte-Carlo</div></div>
       </div>
     </div>
-  </div>
-
-  <!-- Save / Load Scenario bar -->
-  <div class="scenario-bar">
-    <span class="scenario-bar-label"><i class="fas fa-floppy-disk"></i> Scenario:</span>
-    <button class="btn-scenario" onclick="saveScenario()" aria-label="Save current scenario to browser storage">Save</button>
-    <button class="btn-scenario" onclick="loadScenario()" aria-label="Load saved scenario from browser storage">Load</button>
-    <button class="btn-scenario" onclick="shareScenario()" aria-label="Copy shareable URL with current inputs"><i class="fas fa-link"></i> Share URL</button>
-    <button class="btn-scenario danger" onclick="resetDefaults()" aria-label="Reset all inputs to defaults">Reset</button>
-    <select class="preset-select" id="presetSelect" onchange="loadPreset(this.value);this.value=''" aria-label="Load a sample scenario preset">
-      <option value="">Load a sample scenario…</option>
-      <option value="chiller_crisis">1. Chiller compressor crisis — single-source, P1 escalation</option>
-      <option value="mv_eol">2. MV switchgear breaker — EOL announced, LTB decision</option>
-      <option value="crac_hub">3. CRAC fan motor — multi-site hub optimisation</option>
-      <option value="gen_negotiation">4. Generator parts — supplier +12% price increase, Leverage</option>
-      <option value="undefined_ask">5. Undefined ask — improve spares readiness, 30/60/90 plan</option>
-    </select>
-    <button class="btn-scenario" onclick="exportFullReportPDF()" aria-label="Export full analytical report as PDF" style="border-color:rgba(239,68,68,0.35);color:#ef4444;" title="Export all 8 analytical modules as one PDF report"><i class="fas fa-file-pdf"></i> Full Report PDF</button>
-    <span class="scenario-saved-msg" id="scenarioMsg"></span>
-  </div>
+  </section>
 
   <!-- Mobile: jump-to-module select -->
   <div class="tab-jump-select-wrap" aria-label="Jump to module (mobile)">
@@ -1684,7 +380,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
 
   <!-- Tabs -->
   <div class="tabs-wrap">
-    <div class="tabs-row" role="tablist" id="tabsRow">
+    <div class="tool-tabs tabs-row" role="tablist" id="tabsRow" aria-label="Modules">
       <span class="tabs-group-label" aria-hidden="true">Analytical</span>
       <button class="tab-btn active" onclick="switchTab('criticality')" role="tab" aria-selected="true" aria-controls="pane-criticality">1 · Criticality</button>
       <button class="tab-btn" onclick="switchTab('readiness')" role="tab" aria-selected="false" aria-controls="pane-readiness">2 · Readiness</button>
@@ -1698,7 +394,6 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
       <button class="tab-btn" onclick="switchTab('sensitivity')" role="tab" aria-selected="false" aria-controls="pane-sensitivity">10 · Sensitivity</button>
       <button class="tab-btn" onclick="switchTab('projection')" role="tab" aria-selected="false" aria-controls="pane-projection">11 · 5-Yr Spend Projection</button>
       <button class="tab-btn" onclick="switchTab('fleet')" role="tab" aria-selected="false" aria-controls="pane-fleet">Fleet / Portfolio</button>
-      <span class="tab-divider" aria-hidden="true">|</span>
       <span class="tabs-group-label" aria-hidden="true">Operating Engine</span>
       <button class="tab-btn tab-btn-ops" onclick="switchTab('pm-ops')" role="tab" aria-selected="false" aria-controls="pane-pm-ops">A · Daily PM Ops</button>
       <button class="tab-btn tab-btn-ops" onclick="switchTab('scorecard')" role="tab" aria-selected="false" aria-controls="pane-scorecard">B · Scorecard</button>
@@ -1710,17 +405,15 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
       <button class="tab-btn tab-btn-ops" onclick="switchTab('eol')" role="tab" aria-selected="false" aria-controls="pane-eol">H · EOL Response</button>
       <button class="tab-btn tab-btn-ops" onclick="switchTab('ambiguity')" role="tab" aria-selected="false" aria-controls="pane-ambiguity">I · Ambiguity</button>
       <button class="tab-btn tab-btn-ops" onclick="switchTab('star')" role="tab" aria-selected="false" aria-controls="pane-star">J · STAR Builder</button>
-      <span class="tab-divider" aria-hidden="true">|</span>
       <span class="tabs-group-label" aria-hidden="true">Reference</span>
-      <button class="tab-btn" onclick="switchTab('catalog')" role="tab" aria-selected="false" aria-controls="pane-catalog"><i class="fas fa-book"></i>Parts Catalog</button>
-      <button class="tab-btn" onclick="switchTab('catalog-analytics')" role="tab" aria-selected="false" aria-controls="pane-catalog-analytics"><i class="fas fa-chart-column"></i>Catalog Analytics</button>
+      <button class="tab-btn" onclick="switchTab('catalog')" role="tab" aria-selected="false" aria-controls="pane-catalog">Parts Catalog</button>
+      <button class="tab-btn" onclick="switchTab('catalog-analytics')" role="tab" aria-selected="false" aria-controls="pane-catalog-analytics">Catalog Analytics</button>
       <button class="tab-btn" onclick="switchTab('faq')" role="tab" aria-selected="false" aria-controls="pane-faq">9 · Methodology</button>
-      <span class="tab-divider" aria-hidden="true">|</span>
       <span class="tabs-group-label" aria-hidden="true">Supply Chain &amp; Transport</span>
-      <button class="tab-btn" onclick="switchTab('sc-lane')" role="tab" aria-selected="false" aria-controls="pane-sc-lane"><i class="fas fa-ship"></i> Lane &amp; Mode</button>
-      <button class="tab-btn" onclick="switchTab('sc-risk')" role="tab" aria-selected="false" aria-controls="pane-sc-risk"><i class="fas fa-map"></i> SC Risk Map</button>
-      <button class="tab-btn" onclick="switchTab('sc-sim')" role="tab" aria-selected="false" aria-controls="pane-sc-sim"><i class="fas fa-tornado"></i> Disruption Sim</button>
-      <button class="tab-btn" onclick="switchTab('sc-expedite')" role="tab" aria-selected="false" aria-controls="pane-sc-expedite">✈️ Expedite Calc</button>
+      <button class="tab-btn" onclick="switchTab('sc-lane')" role="tab" aria-selected="false" aria-controls="pane-sc-lane">Lane &amp; Mode</button>
+      <button class="tab-btn" onclick="switchTab('sc-risk')" role="tab" aria-selected="false" aria-controls="pane-sc-risk">SC Risk Map</button>
+      <button class="tab-btn" onclick="switchTab('sc-sim')" role="tab" aria-selected="false" aria-controls="pane-sc-sim">Disruption Sim</button>
+      <button class="tab-btn" onclick="switchTab('sc-expedite')" role="tab" aria-selected="false" aria-controls="pane-sc-expedite">Expedite Calc</button>
     </div>
   </div>
 
@@ -1825,7 +518,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
               <span class="status-badge" id="c1_tier_badge">—</span>
               <span class="status-badge" id="c1_decision_badge">—</span>
             </div>
-            <div class="metric-grid-2" style="margin-top:0.85rem;">
+            <div class="metric-grid-2" data-rz-fact-list style="margin-top:0.85rem;">
               <div class="metric-box"><div class="metric-label">Risk Priority Number <span class="tip" tabindex="0" data-tip="FMECA composite score. RPN = S_eff x Detectability x (lambda x 10), capped at 1000. Range 1-1000. Above 100 flags VITAL stocking decision. Higher = higher risk priority. See methodology: FMEA RPN." aria-label="Risk Priority Number tooltip">ⓘ</span></div><div class="metric-value" id="c1_rpn">—</div></div>
               <div class="metric-box"><div class="metric-label">Effective Severity <span class="tip" tabindex="0" data-tip="Raw severity score reduced by redundancy buffer. Scale 1-10. S_eff = max(1, S - redundancy_adj). Lower redundancy = S_eff approaches raw severity. Drives RPN and criticality tier. See methodology: FMECA Cm formula." aria-label="Effective Severity tooltip">ⓘ</span></div><div class="metric-value" id="c1_eff_sev">—</div></div>
               <div class="metric-box"><div class="metric-label">Fleet Exp. Failures/yr <span class="tip" tabindex="0" data-tip="Expected annual failures across the installed base. Formula: lambda x N (fleet size). Unit: failures/yr. Range typically 0.01-10. Higher = more demand pressure on stock. See methodology: FMECA Cm." aria-label="Fleet Expected Failures per year tooltip">ⓘ</span></div><div class="metric-value" id="c1_fleet_fail">—</div></div>
@@ -1941,7 +634,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
               <span id="r_slack_text" style="font-size:0.78rem;color:var(--text-muted);"></span>
             </div>
             <div class="chart-wrap-sm"><canvas id="chart_readiness"></canvas></div>
-            <div class="metric-grid-2" style="margin-top:0.85rem;">
+            <div class="metric-grid-2" data-rz-fact-list style="margin-top:0.85rem;">
               <div class="metric-box"><div class="metric-label">Confirmed Supply <span class="tip" tabindex="0" data-tip="Units reliably available within the planning horizon (on-hand + confirmed POs due before need date). Unit: units. Must meet or exceed demand. If below demand, Gap > 0 triggers a readiness flag. See methodology: Readiness gauge." aria-label="Confirmed Supply tooltip">ⓘ</span></div><div class="metric-value" id="r_confirmed">—</div></div>
               <div class="metric-box"><div class="metric-label">Gap <span class="tip" tabindex="0" data-tip="Shortfall between demand and confirmed supply. Gap = max(0, demand - confirmed_supply). Unit: units. Gap > 0 = stock action required immediately. Gap = 0 = no shortfall in current horizon. See methodology: Readiness gauge." aria-label="Readiness Gap tooltip">ⓘ</span></div><div class="metric-value" id="r_gap">—</div></div>
               <div class="metric-box"><div class="metric-label">Date Slack (days) <span class="tip" tabindex="0" data-tip="Buffer in calendar days between today and the latest safe-order date. Positive = still time to order. Zero or negative = order now or accept stockout risk. Slack = need_date - (today + lead_time). See methodology: Readiness gauge." aria-label="Date Slack tooltip">ⓘ</span></div><div class="metric-value" id="r_slack_days">—</div></div>
@@ -2051,7 +744,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
         <div>
           <div class="result-card">
             <div class="result-title">Optimal Stock Recommendation</div>
-            <div class="metric-grid-2">
+            <div class="metric-grid-2" data-rz-fact-list>
               <div class="metric-box"><div class="metric-label">Newsvendor Q* <span class="tip" tabindex="0" data-tip="Optimal order quantity from the Newsvendor critical-fractile model. Q* = F_inv(CR) over Poisson demand. Unit: units. Higher Cu or lower Co shifts Q* upward. This is the recommended stocking level to minimise total cost. See methodology: Newsvendor critical fractile." aria-label="Newsvendor Q* tooltip">ⓘ</span></div><div class="metric-value" id="s_qstar">—</div></div>
               <div class="metric-box"><div class="metric-label">Safety Stock SS <span class="tip" tabindex="0" data-tip="Buffer stock above average demand to absorb demand and lead-time variability. SS = z x sigma_demand. Unit: units. Typical range 0-5 for low-demand spare parts. Higher service-level z increases SS. See methodology: SS formula." aria-label="Safety Stock tooltip">ⓘ</span></div><div class="metric-value" id="s_ss">—</div></div>
               <div class="metric-box"><div class="metric-label">Reorder Point ROP <span class="tip" tabindex="0" data-tip="Stock level at which a replenishment order should be triggered. ROP = (lambda x lead_time_yr x 365) + SS. Unit: units. Falling below ROP without ordering risks stockout before resupply. See methodology: ROP formula." aria-label="Reorder Point tooltip">ⓘ</span></div><div class="metric-value" id="s_rop">—</div></div>
@@ -2162,7 +855,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
         <div>
           <div class="result-card">
             <div class="result-title">MEIO Optimal Allocation</div>
-            <div class="metric-grid-2">
+            <div class="metric-grid-2" data-rz-fact-list>
               <div class="metric-box"><div class="metric-label">Regional Stock s&#8321;* <span class="tip" tabindex="0" data-tip="Optimal echelon-1 stock at the regional hub. Computed by MEIO iterative optimisation to minimise total network cost while achieving target fill rate across all sites. Unit: units. Lower s1* indicates sites carry more locally. See methodology: MEIO two-echelon." aria-label="Regional Stock s1 star tooltip">ⓘ</span></div><div class="metric-value" id="meio_s1_star">—</div></div>
               <div class="metric-box"><div class="metric-label">Site Stock s&#8322;* <span class="tip" tabindex="0" data-tip="Optimal echelon-2 stock held at each individual site. Derived from MEIO to balance local fill rate vs. hub response time. Unit: units per site. Higher s2* means sites are more self-sufficient; lower relies more on hub replenishment. See methodology: MEIO." aria-label="Site Stock s2 star tooltip">ⓘ</span></div><div class="metric-value" id="meio_s2_star">—</div></div>
               <div class="metric-box"><div class="metric-label">Site Fill Rate <span class="tip" tabindex="0" data-tip="Fraction of site-level demand events met immediately from site stock (s2*) or within hub replenishment time. Unit: %. Target typically 90-99% for critical DC parts. Computed via Poisson-CDF at s2*. See methodology: Poisson-CDF site fill." aria-label="Site Fill Rate tooltip">ⓘ</span></div><div class="metric-value" id="meio_fill_achieved">—</div></div>
@@ -2261,12 +954,12 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
         <div>
           <div class="result-card">
             <div class="result-title">Hub Positioning Recommendation</div>
-            <div class="metric-grid-3">
+            <div class="metric-grid-3" data-rz-fact-list>
               <div class="metric-box"><div class="metric-label">Central Depot <span class="tip" tabindex="0" data-tip="Recommended units to hold at the central depot (echelon 1). Acts as buffer and emergency backstop for all regional hubs. Unit: units. Lower depot stock is safe only when regional hubs are well-stocked. See methodology: MEIO Hub positioning." aria-label="Central Depot stock tooltip">ⓘ</span></div><div class="metric-value" id="h_depot">—</div></div>
               <div class="metric-box"><div class="metric-label">Regional Hub <span class="tip" tabindex="0" data-tip="Recommended units at the regional hub (echelon 2). Pooled across sites served by this hub to reduce total inventory vs. holding independently at each site. Unit: units. Drives response time to site failures. See methodology: MEIO Hub positioning." aria-label="Regional Hub stock tooltip">ⓘ</span></div><div class="metric-value" id="h_hub">—</div></div>
               <div class="metric-box"><div class="metric-label">At Sites <span class="tip" tabindex="0" data-tip="Recommended units held locally at each site (echelon 3). Site stock enables immediate response without waiting for hub. Unit: units per site. Higher criticality or longer hub-to-site transit warrants more site stock. See methodology: MEIO Hub." aria-label="At Sites stock tooltip">ⓘ</span></div><div class="metric-value" id="h_sites_stock">—</div></div>
             </div>
-            <div class="metric-grid-3" style="margin-top:0.6rem;">
+            <div class="metric-grid-3" data-rz-fact-list style="margin-top:0.6rem;">
               <div class="metric-box"><div class="metric-label">Fleet Readiness <span class="tip" tabindex="0" data-tip="Percentage of fleet assets that could be returned to service within MTTR given current hub stock allocation. Unit: %. Target above 95% for VITAL parts. Low fleet readiness triggers hub rebalancing recommendation. See methodology: Hub readiness calc." aria-label="Fleet Readiness tooltip">ⓘ</span></div><div class="metric-value" id="h_fleet_read">—</div></div>
               <div class="metric-box"><div class="metric-label">Hub Delta <span class="tip" tabindex="0" data-tip="Difference in fleet readiness between hub strategy and no-hub (all-site-stock) baseline. Unit: percentage points. Positive delta = hub adds readiness. Negative delta is rare and indicates hub transit time exceeds benefit. See methodology: Hub delta." aria-label="Hub Delta tooltip">ⓘ</span></div><div class="metric-value" id="h_hub_delta">—</div></div>
               <div class="metric-box"><div class="metric-label">Hub Extra $ <span class="tip" tabindex="0" data-tip="Additional annual cost of operating the hub strategy vs. storing all stock at sites. Includes hub holding cost minus site holding cost savings from pooling. Unit: $. Positive = hub costs more but improves readiness. Compare to downtime cost saved." aria-label="Hub Extra Cost tooltip">ⓘ</span></div><div class="metric-value" id="h_hub_cost">—</div></div>
@@ -2480,7 +1173,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
         <div>
           <div class="result-card">
             <div class="result-title">LTB Recommendation</div>
-            <div class="metric-grid-2">
+            <div class="metric-grid-2" data-rz-fact-list>
               <div class="metric-box"><div class="metric-label">LTB Qty (units) <span class="tip" tabindex="0" data-tip="Recommended Last-Time-Buy quantity. Formula: lambda x remaining_service_yrs + safety_buffer, rounded up. Unit: units. Undershooting forces costly emergency sourcing; overshooting increases carry cost and obsolescence risk. See methodology: DMSMS LTB sizing." aria-label="LTB Quantity tooltip">ⓘ</span></div><div class="metric-value" id="ltb_qty">—</div></div>
               <div class="metric-box"><div class="metric-label">LTB Total $ <span class="tip" tabindex="0" data-tip="Total upfront procurement cost for the recommended LTB quantity. LTB$ = ltb_qty x unit_cost. Unit: $. This is the capital committed at time of LTB. Compare to NPV Option A to assess net benefit vs. carrying risk. See methodology: DMSMS cost." aria-label="LTB Total Cost tooltip">ⓘ</span></div><div class="metric-value" id="ltb_total">—</div></div>
               <div class="metric-box"><div class="metric-label">Cumulative Carry Cost <span class="tip" tabindex="0" data-tip="Total holding cost accumulated over the remaining service life for the LTB quantity. Carry = ltb_total x carry_rate x avg_hold_yrs. Unit: $. Major LTB cost driver alongside obsolescence risk. Included in NPV Option A calculation. See methodology: DMSMS NPV." aria-label="Cumulative Carrying Cost tooltip">ⓘ</span></div><div class="metric-value" id="ltb_carry">—</div></div>
@@ -2493,7 +1186,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
           </div>
           <div class="result-card" style="margin-top:0.85rem;">
             <div class="card-title"><i class="fas fa-chart-bar"></i> NPV: Option A (LTB Stock) vs Option B (Requalify)</div>
-            <div class="metric-grid-2">
+            <div class="metric-grid-2" data-rz-fact-list>
               <div class="metric-box"><div class="metric-label">NPV Option A (LTB) <span class="tip" tabindex="0" data-tip="Net present value of the Last-Time-Buy strategy: upfront LTB cost + cumulative carry cost + residual, discounted to today. Unit: $ (negative = net outflow). Lower (less negative) vs Option B = LTB is the better financial choice. See methodology: DMSMS NPV comparison." aria-label="NPV Option A LTB tooltip">ⓘ</span></div><div class="metric-value" id="ltb_npv_a">—</div></div>
               <div class="metric-box"><div class="metric-label">NPV Option B (Requalify) <span class="tip" tabindex="0" data-tip="NPV of requalifying an alternate supplier or part: requalification cost + ongoing procurement cost over service life, discounted. Unit: $. If NPV B is lower (less negative) than NPV A, requalification is financially preferable. See methodology: DMSMS NPV." aria-label="NPV Option B Requalify tooltip">ⓘ</span></div><div class="metric-value" id="ltb_npv_b">—</div></div>
             </div>
@@ -2677,7 +1370,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
         <div>
           <div class="result-card">
             <div class="result-title">Monte-Carlo Results</div>
-            <div class="metric-grid-2" id="mc_results_grid">
+            <div class="metric-grid-2" data-rz-fact-list id="mc_results_grid">
               <div class="metric-box"><div class="metric-label">P(Stockout) <span class="tip" tabindex="0" data-tip="Simulated probability that demand exceeds stock during the planning horizon across 10,000 Monte-Carlo trials. Unit: %. Target below 5% for VITAL parts. Accounts for demand variability, lead-time jitter, and supplier reliability uncertainty. See methodology: MC simulation." aria-label="Probability of Stockout tooltip">ⓘ</span></div><div class="metric-value" id="mc_pstockout">—</div></div>
               <div class="metric-box"><div class="metric-label">P10 Readiness <span class="tip" tabindex="0" data-tip="10th-percentile readiness score across all MC trials. Unit: %. The pessimistic scenario — 90% of simulations perform better than this. Low P10 (below 70%) indicates high tail risk even with adequate average stock. See methodology: MC percentile output." aria-label="P10 Readiness tooltip">ⓘ</span></div><div class="metric-value" id="mc_p10">—</div></div>
               <div class="metric-box"><div class="metric-label">P50 Readiness <span class="tip" tabindex="0" data-tip="Median readiness score across all MC trials. Unit: %. This is the most-likely outcome. Should exceed 90% for VITAL parts. Compare P50 vs P10 to gauge volatility. See methodology: MC percentile output." aria-label="P50 Readiness tooltip">ⓘ</span></div><div class="metric-value" id="mc_p50">—</div></div>
@@ -2795,7 +1488,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
         <div>
           <div class="result-card">
             <div class="result-title">Sensitivity Results</div>
-            <div class="metric-grid-2">
+            <div class="metric-grid-2" data-rz-fact-list>
               <div class="metric-box"><div class="metric-label">Most Sensitive Variable <span class="tip" tabindex="0" data-tip="The axis (X or Y variable) whose sweep produces the larger range of the output metric. Computed as max(range_across_x_axis, range_across_y_axis). The axis with greater spread is the highest-leverage input to target for improvement." aria-label="Most sensitive variable tooltip">ⓘ</span></div><div class="metric-value" id="sens_most_sensitive_var">—</div></div>
               <div class="metric-box"><div class="metric-label">Range Across Grid <span class="tip" tabindex="0" data-tip="Difference between the maximum and minimum metric value across the full N×N grid. Wider range = higher overall sensitivity to the two selected variables. Unit matches the output metric (% for fill rate, $ for cost, unitless for RPN)." aria-label="Range across grid tooltip">ⓘ</span></div><div class="metric-value" id="sens_metric_range">—</div></div>
               <div class="metric-box"><div class="metric-label">X at Extremum <span class="tip" tabindex="0" data-tip="Value of the X-axis variable at the grid cell that produces the maximum metric. For fill rate this is the (lambda, lead_time) combination that maximises fill rate — typically the lowest lambda and shortest lead time in the sweep range." aria-label="X at extremum tooltip">ⓘ</span></div><div class="metric-value" id="sens_extremum_x">—</div></div>
@@ -2890,7 +1583,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
         <div>
           <div class="result-card">
             <div class="result-title">5-Year Spend Summary</div>
-            <div class="metric-grid-2">
+            <div class="metric-grid-2" data-rz-fact-list>
               <div class="metric-box"><div class="metric-label">Total Spend (Horizon) <span class="tip" tabindex="0" data-tip="Sum of all annual spend (replacement + maintenance) across the full forecast horizon for all 8 commodity classes. Unit: $. This is the undiscounted cumulative spend number to use in CAPEX budget requests." aria-label="Total spend horizon tooltip">ⓘ</span></div><div class="metric-value" id="proj_5yr_total">—</div></div>
               <div class="metric-box"><div class="metric-label">Year-N Annual Spend <span class="tip" tabindex="0" data-tip="Projected total annual spend in the final year of the horizon. Shows the run-rate you will need to budget for by the end of the planning period. Driven by compounding growth, failure rate drift, and cost inflation." aria-label="Year N annual spend tooltip">ⓘ</span></div><div class="metric-value" id="proj_year_5">—</div></div>
               <div class="metric-box"><div class="metric-label">Growth vs Year 0 <span class="tip" tabindex="0" data-tip="Percentage increase in annual spend from Year 0 baseline to the final year. Combines fleet growth, failure rate drift, and cost inflation compounding effects. Useful for presenting the budget escalation story." aria-label="Growth vs year 0 tooltip">ⓘ</span></div><div class="metric-value" id="proj_growth_vs_y0">—</div></div>
@@ -3076,11 +1769,8 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
             <div class="ops-output-title"><i class="fas fa-list-check"></i> Agenda Template</div>
             <pre class="gen-text-block" id="sc_agenda_text"></pre>
           </div>
-          <div class="ops-output" style="margin-top:0.75rem;">
-            <div class="ops-output-title"><i class="fas fa-chart-radar"></i> Performance Radar</div>
-            <div class="ops-radar-wrap"><canvas id="chart_scorecard"></canvas></div>
-          </div>
         </div>
+        <figure class="fig sp-fig"><div class="ops-radar-wrap"><canvas id="chart_scorecard" aria-label="Supplier performance radar"></canvas></div><figcaption><b>FIG. 1</b> · Supplier performance, eight measures scaled 0–100 (higher is better)</figcaption></figure>
       </div>
       <details class="info-box" style="margin-top:1rem;">
         <summary>ⓘ RAG logic and cadence derivation</summary>
@@ -3928,7 +2618,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
       </div>
 
       <!-- KPI strip -->
-      <div class="ca-kpi-grid" id="ca_kpi_grid">
+      <div class="ca-kpi-grid" id="ca_kpi_grid" data-rz-fact-list>
         <div class="ca-kpi"><div class="ca-kpi-label">Parts in catalog</div><div class="ca-kpi-value" id="ca_kpi_parts">—</div><div class="ca-kpi-sub">in scope</div></div>
         <div class="ca-kpi"><div class="ca-kpi-label">OEMs covered</div><div class="ca-kpi-value" id="ca_kpi_oems">—</div><div class="ca-kpi-sub">suppliers</div></div>
         <div class="ca-kpi"><div class="ca-kpi-label">Systems / Subsystems</div><div class="ca-kpi-value" id="ca_kpi_sys">—</div><div class="ca-kpi-sub">taxonomy nodes</div></div>
@@ -4014,7 +2704,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
         <div class="card-title"><i class="fas fa-globe"></i> Supply-Chain Exposure <span class="tip" tabindex="0" data-tip="Trade lanes ranked by composite supply-chain risk (congestion + geopolitical + volatility + tariff). China transformer-dependency and 2026 tariff context highlighted." aria-label="SC exposure tooltip">ⓘ</span></div>
         <div class="module-grid" style="margin-bottom:0.75rem;">
           <div>
-            <div class="ca-kpi-grid" style="grid-template-columns:repeat(2,1fr);gap:0.5rem;margin-bottom:0.75rem;">
+            <div class="ca-kpi-grid" data-rz-fact-list>
               <div class="ca-kpi ca-kpi-alert">
                 <div class="ca-kpi-label">CN Transformer share</div>
                 <div class="ca-kpi-value">~60%</div>
@@ -4124,7 +2814,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
       </div>
 
       <!-- Fleet KPIs -->
-      <div class="fleet-kpi-grid" id="fleet_kpi_grid">
+      <div class="fleet-kpi-grid" id="fleet_kpi_grid" data-rz-fact-list>
         <div class="fleet-kpi"><div class="fleet-kpi-label">Total Inventory $ at Rec. Stock</div><div class="fleet-kpi-value" id="fl_kpi_total_inv">$—</div><div class="fleet-kpi-sub">all parts at recommended SS</div></div>
         <div class="fleet-kpi"><div class="fleet-kpi-label">Weighted Fleet Readiness %</div><div class="fleet-kpi-value" id="fl_kpi_readiness">—</div><div class="fleet-kpi-sub">weighted by criticality</div></div>
         <div class="fleet-kpi"><div class="fleet-kpi-label">Critical-at-Risk Parts</div><div class="fleet-kpi-value" id="fl_kpi_atrisk">0</div><div class="fleet-kpi-sub">crit≥7 AND readiness&lt;90%</div></div>
@@ -4480,7 +3170,7 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
         <div class="result-card">
           <div class="card-title"><i class="fas fa-gauge-high"></i> Composite SC Risk Score</div>
           <div id="scrisk_output_text">
-            <div class="metric-grid-2" style="margin-bottom:0.75rem;">
+            <div class="metric-grid-2" data-rz-fact-list style="margin-bottom:0.75rem;">
               <div class="metric-box">
                 <div class="metric-label">SC Risk Score <span class="tip" tabindex="0" data-tip="Composite supply-chain risk score (0-100). Weighted sum across 6 dimensions: geopolitical, supplier concentration, lead-time volatility, quality, financial stability, and single-source exposure. Above 70 = High risk; above 85 = Critical. See methodology: SC risk composite." aria-label="SC Risk Score tooltip">ⓘ</span></div>
                 <div class="metric-value" id="scrisk_score" style="font-size:1.8rem;">—</div>
@@ -4735,22 +3425,6 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
     </div>
     <!-- ===== END SC TAB 4 ===== -->
 
-    <!-- Cross-calc links -->
-    <div class="crosslink-bar" style="margin-bottom:0.75rem;">
-      <span class="crosslink-bar-label">Continue analysis in:</span>
-      <a href="tco-calculator.html" class="crosslink-pill" id="link_tco" title="Open TCO Calculator — factors spares carrying cost into 10-yr TCO"><i class="fas fa-arrow-right"></i> TCO Calculator</a>
-      <a href="opex-calculator.html" class="crosslink-pill" id="link_opex" title="Open OPEX Calculator — feed downtime cost and MTBF inputs"><i class="fas fa-arrow-right"></i> OPEX Calculator</a>
-      <a href="roi-calculator.html" class="crosslink-pill" id="link_roi" title="Open ROI Calculator — model spares investment return"><i class="fas fa-arrow-right"></i> ROI Calculator</a>
-      <a href="tier-advisor.html" class="crosslink-pill" title="Open Tier Advisor — check redundancy design supports spares posture"><i class="fas fa-arrow-right"></i> Tier Advisor</a>
-    </div>
-
-    <!-- Disclaimer -->
-    <div class="calc-disclaimer">
-      <div class="disc-title"><i class="fas fa-circle-info"></i> Calculator Disclaimer</div>
-      <div class="disc-text">These are illustrative models using industry-typical default parameters. <strong>They are not a substitute for a full supply-chain analysis, professional procurement advice, or certified reliability engineering.</strong> All formulas are transparent and documented; always validate outputs against your site-specific data, supplier agreements, and failure history before making procurement decisions.</div>
-      <div class="disc-fine">Methodologies: FMECA (MIL-STD-1629A), Newsvendor / Critical-Fractile, Fill-Rate Safety Stock, METRIC/VARI-METRIC (Sherbrooke 1968/Slay 1984), Kraljic Matrix (HBR 1983), DMSMS lifecycle management. Citations shown in each module's methodology notes.</div>
-    </div>
-
   </div><!-- /module-wrap -->
 
   </div><!-- /.sp-center -->
@@ -4784,31 +3458,61 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
       <div class="sp-heat-axis"><span>Low RPN</span><span>High RPN →</span></div>
     </div>
 
-    <div class="sp-rail-card">
-      <div class="sp-rail-title"><i class="fas fa-bolt"></i> Quick Actions</div>
-      <button class="btn-scenario sp-qa" onclick="exportFullReportPDF()"><i class="fas fa-file-pdf"></i> Export Full Report</button>
-      <button class="btn-scenario sp-qa" onclick="saveScenario()"><i class="fas fa-floppy-disk"></i> Save</button>
-      <button class="btn-scenario sp-qa danger" onclick="resetDefaults()"><i class="fas fa-rotate-left"></i> Reset</button>
-    </div>
   </aside>
 
   </div><!-- /.sp-shell -->
+
+  <section class="tool-ref" aria-labelledby="ref-h">
+    <div class="wrap">
+      <p class="eyebrow" id="ref-h">02 / Reference</p>
+      <div class="ref-grid">
+        <div>
+          <h3>Method</h3>
+          <ul class="formulas">
+            <li><span>Criticality</span><code>Cm = (S_eff/10) × (D/10) × λ × N × (oh/8760); VITAL ≥ 0.5, ESSENTIAL 0.1–0.5</code></li>
+            <li><span>RPN</span><code>S_eff × D × (λ × 10), capped at 1,000</code></li>
+            <li><span>Readiness</span><code>min(100, confirmed supply ÷ required × 100)</code></li>
+            <li><span>Lead-time demand</span><code>μ_LT = μ_annual × L/52; σ_LT = √((L/52)·σ_D² + μ_annual²·(σ_L/52)²)</code></li>
+            <li><span>Stock level</span><code>Q* = max(0, ⌈μ_LT + Φ⁻¹(CR) × σ_LT⌉), CR = Cu ÷ (Cu + Co)</code></li>
+            <li><span>Safety stock</span><code>SS = max(0, ⌈Φ⁻¹(FR) × σ_LT⌉); ROP = ⌈μ_LT + SS⌉</code></li>
+            <li><span>Hub fill</span><code>1 − Σ_{k=0}^{S−1} e^{−λ_LT} λ_LT^k / k!</code></li>
+            <li><span>Last-time buy</span><code>max(0, ⌈annual demand × support years × 1.15 − on hand − open PO⌉)</code></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Computed against</h3>
+          <p class="against"><span>MIL-STD-1629A FMECA</span><span>Sherbrooke METRIC / Slay VARI-METRIC</span><span>Newsvendor critical fractile</span><span>Kraljic matrix (HBR 1983)</span><span>DMSMS lifecycle practice</span></p>
+          <h3>Read further</h3>
+          <p class="links"><a href="manual/spares.html">Technical manual and methodology</a><a href="tco-calculator.html" id="link_tco">TCO Calculator</a><a href="opex-calculator.html" id="link_opex">OPEX Calculator</a><a href="roi-calculator.html" id="link_roi">ROI Calculator</a><a href="tier-advisor.html">Tier Advisor</a><a href="glossary.html">Glossary</a><a href="datacenter-solutions.html">DC Solutions</a></p>
+          <p class="sp-engine-line">Engine <span id="sp_engine_ver">RZEngine</span> · rz-engine.js · catalog 2026-Q1, <span id="methodNoteCatalogCount">445</span> curated parts</p>
+        </div>
+      </div>
+      <details class="sp-howto">
+        <summary>How to use</summary>
+        <ol>
+          <li><b>Pick a commodity.</b> Select it under Analysis setup (Chiller, Switchgear, UPS …): realistic M&amp;E defaults load into every module.</li>
+          <li><b>Or load a sample scenario.</b> The scenario list in the bar above (for example "Chiller compressor crisis" or "MV switchgear EOL") sets all modules in one step.</li>
+          <li><b>Browse the parts catalog.</b> The Parts Catalog tab holds 445+ curated DC M&amp;E spare parts; "Use" loads one into Criticality and Optimal Stock. Catalog Analytics charts the whole database.</li>
+          <li><b>Export or share.</b> Export PDF writes the analytical modules as one report; Share URL copies a link with your inputs encoded.</li>
+        </ol>
+      </details>
+      <p class="notice">All content on ResistanceZero is independent personal research derived from publicly available sources and does not represent any current or former employer. These are illustrative models using industry-typical default parameters. <strong>They are not a substitute for a full supply-chain analysis, professional procurement advice, or certified reliability engineering.</strong> All formulas are transparent and documented; always validate outputs against your site-specific data, supplier agreements, and failure history before making procurement decisions. Methodologies: FMECA (MIL-STD-1629A), Newsvendor / Critical-Fractile, Fill-Rate Safety Stock, METRIC/VARI-METRIC (Sherbrooke 1968/Slay 1984), Kraljic Matrix (HBR 1983), DMSMS lifecycle management. Citations shown in each module's methodology notes. Catalog data vintage 2026-Q1: curated parts, 7 transport modes, 13 trade lanes and 16 country-risk profiles. All calculations run in your browser. See the <a href="privacy.html">Privacy Policy</a> and <a href="terms.html">Terms</a>.</p>
+    </div>
+  </section>
 </main>
 
-<!-- Share buttons -->
-<aside class="share-buttons" id="pageShare" aria-label="Share this page">
-  <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fresistancezero.com%2Fspares-readiness-calculator.html" target="_blank" rel="noopener" class="share-btn sb-linkedin" aria-label="Share on LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-  <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fresistancezero.com%2Fspares-readiness-calculator.html&text=Critical+Spares+Engine+%E2%80%94+FMECA+criticality%2C+newsvendor+stock%2C+supplier+risk%2C+LTB+economics+for+DC+M%26E+spares" target="_blank" rel="noopener" class="share-btn sb-x" aria-label="Share on X (Twitter)"><i class="fab fa-x-twitter"></i></a>
-  <a href="https://wa.me/?text=Critical+Spares+Engine+for+DC+M%26E+spare+parts+https%3A%2F%2Fresistancezero.com%2Fspares-readiness-calculator.html" target="_blank" rel="noopener" class="share-btn sb-whatsapp" aria-label="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
-  <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="share-btn sb-instagram" aria-label="Share on Instagram"><i class="fab fa-instagram"></i></a>
-  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fresistancezero.com%2Fspares-readiness-calculator.html" target="_blank" rel="noopener" class="share-btn sb-facebook" aria-label="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
-</aside>
+<span id="pageShare" hidden></span>
 
-<!-- Tour overlay -->
-<div class="tour-overlay" id="tourOverlay" aria-hidden="true" style="display:none;">
+
+
+
+
+<span id="rzVersionStamp" hidden></span>
+<!-- Tour elements kept for the tour script (ids bound); the tour itself is retired: the steps live in "How to use" -->
+<div class="tour-overlay" id="tourOverlay" aria-hidden="true" hidden>
   <div class="tour-spotlight" id="tourSpotlight"></div>
 </div>
-<div class="tour-tooltip" id="tourTooltip" role="dialog" aria-label="Onboarding tour" style="display:none;">
+<div class="tour-tooltip" id="tourTooltip" role="dialog" aria-label="Onboarding tour" hidden>
   <div class="tour-tooltip-title" id="tourTitle"></div>
   <div class="tour-tooltip-body" id="tourBody"></div>
   <div class="tour-tooltip-footer">
@@ -4820,49 +3524,15 @@ body{ background:var(--sp-page)!important; color:var(--sp-text); }
   </div>
 </div>
 <!-- Tour help button -->
-<button class="tour-help-btn" id="tourHelpBtn" onclick="tourStart()" title="Relaunch onboarding tour" aria-label="Launch onboarding tour">?</button>
-
-
-
-<!-- Methodology note -->
-<div class="method-note" id="methodNote">
-  Models: FMECA (MIL-STD-1629A) &middot; METRIC/VARI-METRIC (Sherbrooke/Slay) &middot; newsvendor critical-fractile &middot; Kraljic matrix (HBR&nbsp;1983) &middot; DMSMS lifecycle &middot; MEIO &middot; ABC-XYZ demand-variability matrix &middot; Pareto stockout-risk ranking &middot; Incoterms 2020 (ICC) &middot; multi-modal freight cost indices &middot; World Bank LPI country risk.
-  Catalog data vintage: 2026-Q1 &middot; <span id="methodNoteCatalogCount">445</span> curated parts · 7 transport modes · 13 trade lanes · 16 country-risk profiles from a ~1,400-row database.
-  Illustrative &mdash; not a substitute for a full supply-chain analysis.
-</div>
-
-<!-- Footer -->
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#475569;border-color:rgba(71,85,105,0.4)}.rz-manual-link a:hover{color:#0891b2;border-color:rgba(8,145,178,0.5)}[data-theme="dark"] .rz-manual-link a{color:#94a3b8;border-color:rgba(148,163,184,0.35)}[data-theme="dark"] .rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/spares.html">Technical Manual &amp; Methodology &#8599;</a></div>
-<footer class="site-footer">
-  <div class="footer-grid">
-    <div class="footer-col">
-      <h4>Critical Spares Engine</h4>
-      <p>Quantify spare-parts readiness, optimal stock levels, supplier risk, and last-time-buy economics for data-center M&amp;E equipment. Part of the resistancezero.com DC engineering toolkit.</p>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models. Mission-critical infrastructure, documented.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
     </div>
-    <div class="footer-col">
-      <h4>Calculators</h4>
-      <a href="pue-calculator.html">PUE Calculator</a>
-      <a href="capex-calculator.html">CAPEX Calculator</a>
-      <a href="opex-calculator.html">OPEX Calculator</a>
-      <a href="roi-calculator.html">ROI Calculator</a>
-      <a href="tco-calculator.html">TCO Calculator</a>
-      <a href="tier-advisor.html">Tier Advisor</a>
-    </div>
-    <div class="footer-col">
-      <h4>Resources</h4>
-      <a href="datacenter-solutions.html">DC Solutions Hub</a>
-      <a href="glossary.html">Glossary</a>
-      <a href="articles.html">Technical Articles</a>
-      <a href="privacy.html">Privacy Policy</a>
-      <a href="terms.html">Terms of Use</a>
-      <a href="index.html">Portfolio</a>
-    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
   </div>
-  <div class="footer-bottom">
-    <span>&copy; 2026 Bagus Dwi Permana · resistancezero.com</span>
-    <span class="version-stamp" id="rzVersionStamp"><a href="changelog.html" style="color:#475569;text-decoration:none;">v—</a></span>
-  </div>
-  <div class="sp-engine-stamp"><span class="dot"></span> Powered by <strong id="sp_engine_ver" style="color:var(--sp-text-2);">RZEngine</strong> · <span style="font-family:'IBM Plex Mono',monospace;">rz-engine.js</span> · all calculations follow the methodologies in the Technical Manual — for planning &amp; decision support only.</div>
 </footer>
 
 <!-- Scripts -->
@@ -4994,8 +3664,29 @@ function getOrCreateChart(id, type, data, options) {
   if (charts[id]) { charts[id].destroy(); }
   var ctx = document.getElementById(id);
   if (!ctx) return null;
+  spRegisterSeries(data);
   charts[id] = new Chart(ctx, { type: type, data: data, options: options });
   return charts[id];
+}
+/* chart series on the register: amber stays amber, every other hue becomes a neutral grey (alpha kept) */
+function spInk(c) {
+  if (typeof c !== 'string') return c;
+  var r, g, b, a = 1, m = c.match(/^#([0-9a-f]{6})([0-9a-f]{2})?$/i);
+  if (m) { var n = parseInt(m[1], 16); r = n >> 16; g = (n >> 8) & 255; b = n & 255; if (m[2]) a = parseInt(m[2], 16) / 255; }
+  else { m = c.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?/); if (!m) return c; r = +m[1]; g = +m[2]; b = +m[3]; if (m[4] !== undefined) a = +m[4]; }
+  var mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+  if (mx - mn < 40) return c;
+  var d = mx - mn, h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h = (h * 60 + 360) % 360;
+  if (h >= 28 && h <= 50) return c;
+  return 'rgba(138,143,152,' + Math.round(a * 100) / 100 + ')';
+}
+function spRegisterSeries(data) {
+  ((data && data.datasets) || []).forEach(function(ds) {
+    ['borderColor', 'backgroundColor', 'pointBackgroundColor', 'pointBorderColor'].forEach(function(k) {
+      if (Array.isArray(ds[k])) ds[k] = ds[k].map(spInk); else if (ds[k] !== undefined) ds[k] = spInk(ds[k]);
+    });
+  });
+  return data;
 }
 
 var amberColor = '#f59e0b';
@@ -7284,8 +5975,9 @@ function calcScorecard() {
   var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   var gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
   var labelColor = isDark ? '#94a3b8' : '#475569';
-  var radarColor = overallRAG === 'RED' ? 'rgba(220,38,38,0.4)' : overallRAG === 'YELLOW' ? 'rgba(245,158,11,0.4)' : 'rgba(16,163,127,0.4)';
-  var radarBorder = overallRAG === 'RED' ? '#dc2626' : overallRAG === 'YELLOW' ? '#f59e0b' : '#10a37f';
+  // one amber series; the RAG verdict is the word in the status line above, not the chart colour
+  var radarColor = 'rgba(245,158,11,0.25)';
+  var radarBorder = '#f59e0b';
 
   if (_scorecardChart) { _scorecardChart.destroy(); _scorecardChart = null; }
   _scorecardChart = new Chart(ctx, {
@@ -8451,7 +7143,7 @@ function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
   var pane = document.getElementById('pane-' + name);
   if (pane) pane.classList.add('active');
-  var btn = document.querySelector('[onclick="switchTab(\'' + name + '\')"]');
+  var btn = document.querySelector('.tab-btn[onclick="switchTab(\'' + name + '\')"]');
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected','true'); btn.focus(); }
   var calcs = {
     criticality: calcCriticality, readiness: calcReadiness, stock: calcStock,
@@ -9602,8 +8294,8 @@ var tourStep = 0;
 
 function tourStart() {
   if (typeof localStorage !== 'undefined') localStorage.setItem('cse_tour_done', '1');
-  tourStep = 0;
-  tourShow();
+  var how = document.querySelector('.sp-howto');
+  if (how) { how.open = true; how.scrollIntoView({ block: 'start' }); }
 }
 
 function tourShow() {
@@ -9675,17 +8367,7 @@ function tourEnd() {
   var ovEl = document.getElementById('tourOverlay');
   if (ovEl) ovEl.addEventListener('click', function(e) { if (e.target === ovEl) tourEnd(); });
   try {
-    if (localStorage.getItem('cse_tour_done')) return;
-    if (localStorage.getItem('rz_cookie_consent')) {
-      setTimeout(tourStart, 1200);
-    } else {
-      var launched = false;
-      document.addEventListener('rz-cookie-consent', function() {
-        if (launched) return;
-        launched = true;
-        setTimeout(tourStart, 600);
-      });
-    }
+    /* the floating first-visit tour is retired: its four steps are the "How to use" list in the reference section */
   } catch(e) {}
 })();
 
@@ -10380,12 +9062,12 @@ function runSCSim() {
   function fmtK(v){ return '$'+(v>=1000000?(v/1000000).toFixed(2)+'M':v>=1000?(v/1000).toFixed(1)+'K':v.toFixed(0)); }
 
   // Output HTML
-  var html = '<div class="metric-grid-3" style="margin-bottom:0.75rem;">' +
+  var html = '<div class="metric-grid-3" data-rz-fact-list style="margin-bottom:0.75rem;">' +
     '<div class="metric-box"><div class="metric-label">P10 Lead Time <span class="tip" tabindex="0" data-tip="10th-percentile simulated lead time across disruption scenarios. Unit: weeks. Optimistic bound — 90% of scenarios are slower. Wide P10-P90 spread indicates high lead-time volatility. See methodology: Disruption Sim." aria-label="P10 Lead Time tooltip">ⓘ</span></div><div class="metric-value">'+p10.toFixed(1)+' wk</div></div>' +
     '<div class="metric-box"><div class="metric-label">P50 Lead Time <span class="tip" tabindex="0" data-tip="Median simulated lead time. Unit: weeks. Most-likely delivery window under current disruption scenario. Use this as baseline for ROP and safety stock calculations. See methodology: Disruption Sim." aria-label="P50 Lead Time tooltip">ⓘ</span></div><div class="metric-value">'+p50.toFixed(1)+' wk</div></div>' +
     '<div class="metric-box"><div class="metric-label">P90 Lead Time <span class="tip" tabindex="0" data-tip="90th-percentile simulated lead time. Unit: weeks. Pessimistic scenario — only 10% of runs are slower. Use P90 for conservative safety-stock sizing when part is VITAL. See methodology: Disruption Sim." aria-label="P90 Lead Time tooltip">ⓘ</span></div><div class="metric-value">'+p90.toFixed(1)+' wk</div></div>' +
     '</div>' +
-    '<div class="metric-grid-3" style="margin-bottom:0.75rem;">' +
+    '<div class="metric-grid-3" data-rz-fact-list style="margin-bottom:0.75rem;">' +
     '<div class="metric-box"><div class="metric-label">% On-Time <span class="tip" tabindex="0" data-tip="Percentage of simulated lanes that deliver within the contracted lead time. Unit: %. Target above 80% (green). 50-80% = amber, below 50% = red. Reflects combined effect of carrier reliability and disruption frequency. See methodology: Disruption Sim." aria-label="On-Time Percent tooltip">ⓘ</span></div><div class="metric-value '+(parseFloat(onTimePct)>=80?'rag-green':parseFloat(onTimePct)>=50?'rag-yellow':'rag-red')+'">'+onTimePct+'%</div></div>' +
     '<div class="metric-box"><div class="metric-label">Expected Expedite $ <span class="tip" tabindex="0" data-tip="Mean annual expedite cost across simulated scenarios. Unit: $. Incurred when standard lead time is exceeded and air-freight or courier is used. High expedite cost signals a lane or supplier needing structural fix. See methodology: Logistics Cost sim." aria-label="Expected Expedite Cost tooltip">ⓘ</span></div><div class="metric-value">'+fmtK(expExp)+'</div></div>' +
     '<div class="metric-box"><div class="metric-label">Expected Downtime $ <span class="tip" tabindex="0" data-tip="Mean annual downtime cost when late delivery causes a parts stockout. ExpDT = P(late) x P(stockout|late) x downtime_cost_per_hr x MTTR. Unit: $. Drives the ROI case for improving lane reliability or increasing buffer stock. See methodology: Logistics Cost sim." aria-label="Expected Downtime Cost tooltip">ⓘ</span></div><div class="metric-value">'+fmtK(expDt)+'</div></div>' +
@@ -11306,7 +9988,6 @@ try {
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',m);else m();
 if(window.MutationObserver)new MutationObserver(m).observe(document.documentElement,{childList:true,subtree:true});})();
 </script>
-    <script src="js/rz-manual-fab.js?v=20261101-1ada3636" defer></script>
 
 <!-- SPARES REVAMP — analysis header meta, engine stamp, active-KPI sync, count-up (no sound) -->
 <script>
