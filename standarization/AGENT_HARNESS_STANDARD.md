@@ -58,6 +58,15 @@ RZ-HARNESS · PRJ-… · WI-… · EVALUATING · phase VERIFY · attempt 2/5 · 
 The full handoff and the compact line must be derived from one checkpoint model;
 UI, daemon, and provider-specific hooks may not invent separate status.
 
+Since WI-HARNESS-002 (2026-10-31) the checkpoint is per criterion, not a count.
+Each acceptance criterion stores its status, its verification command and its
+latest evidence. The count shown on the compact line is derived from those
+records. `phase` is an enum: `CONTRACT`, `BUILD`, `VERIFY`, `EVALUATE`,
+`RECOVERY` or `BLOCKED`; it is never free text. A lower count may be recorded,
+and must be, when a pass turns out false: the write carries a
+`regression_reason`, and the history keeps both values visible. One formatter
+renders the compact line for every surface.
+
 ## 4. Always-on controller
 
 - One user-scoped controller runs continuously under the host service manager.
@@ -70,6 +79,15 @@ UI, daemon, and provider-specific hooks may not invent separate status.
   overwrite one another.
 - Codex, Claude, and the local chat CLI load the same checkpoint at session
   start. Claude's status line also exposes it continuously.
+- Verification runs inside the controller, from an allow-list of check
+  commands, never from a command string supplied at run time. A work item's
+  criteria are re-verified on demand (`rzharness verify`) and before any
+  checkpoint is advanced. A verdict with an unchecked criterion is INCONCLUSIVE,
+  not PASS.
+- `doctor` fails, not warns, on a checkpoint older than 7 days, on a request
+  receipt stuck in `pending`, on history drift and on leftover staging files.
+  A green heartbeat proves liveness only. Stuck receipts are cleared with
+  `rzharness repair receipts`, never by editing state files.
 
 ## 5. Approval and permission policy
 
@@ -167,8 +185,14 @@ command runs from the public RZ website checkout:
 ```bash
 python3 -m unittest discover -s tests -q
 node tools/manual_harness_test.mjs
+rzharness verify --local
+rzharness doctor
 task verify
 ```
+
+`rzharness verify --local` re-runs every criterion of the frozen work item and
+prints one status per criterion. `rzharness doctor` must exit 0, which needs no
+stale checkpoint, no stuck receipt, no history drift and no staging leftovers.
 
 The Session Manager suite covers private-state containment, path/symlink
 defences, redaction, authorization, lifecycle, bridge, and manual parity. The
@@ -248,3 +272,22 @@ of the evidence history and must remain distinguishable from the final PASS.
 | A fresh third-party CLI credential database existed but had no schema, so the first adapter write failed. | The adapter treated file presence as proof that the CLI had completed its own storage lifecycle. | Bootstrap the CLI through its official local initialization path before adapter writes, then verify only provider/count/health metadata and never print credential values. | File existence is not schema readiness; external tools own their migrations and should initialize themselves. |
 | A postinstall repair emitted a missing-native-module warning even though the module loaded normally. | The check assumed a legacy unsuffixed binary name while current packages publish libc- or toolchain-suffixed filenames. | Resolve the package's GNU, musl, MSVC, and legacy filename variants, attempt only exact platform/architecture candidates, and regression-test the candidate list on every supported family. | Native-module health must be proven by loading a published candidate, not inferred from one historical filename. |
 | A fully tested candidate was easy to describe as accepted before an independent evaluator had pinned it. | Candidate evidence and terminal acceptance were treated as one milestone in status prose. | Keep candidate and accepted revisions separate in every CLI/UI checkpoint. A terminal `PASSED` state requires the evaluator manifest, reviewer quorum, gates, and the exact accepted revision; the current completion checkpoint therefore remains `EVALUATING` until that record exists. | Honest incomplete state is safer than a synthetic green status. |
+
+### 2026-10-31 — WI-HARNESS-002: the checkpoint could not recover work
+
+| # | Symptom (measured) | Root cause | Fix | Kept by |
+|---|---|---|---|---|
+| P1 | After a compaction the checkpoint said only "12 / 18" | Counts only; no status, command or evidence per criterion | Per-criterion records; the count is derived from them | unit suite + `rzharness verify` |
+| P2 | The checkpoint went 70 days without moving while the loop was "healthy" | The loop wrote a heartbeat and nothing else | Verification advances the checkpoint inside the controller | daemon verify run |
+| P3 | `doctor` passed with a 70-day-old checkpoint and 2 stuck receipts | Liveness was the only check | Doctor fails on age > 7 d, stuck receipts, drift, staging | doctor tests |
+| P4 | A crash between `pending` and `complete` poisoned a request forever | Only one command type could recover a pending receipt | Recovery for every command + `repair receipts` | receipt tests |
+| P5 | A crash mid-checkpoint could leave orphan evidence | Five writes, no transaction | Staged write, then one atomic rename; startup repair | atomicity tests |
+| P6 | An honest lower count was rejected | "Progress cannot regress" rule | Lower count allowed with `regression_reason`, kept in history | regression tests |
+| P7 | Two compact-line formatters could drift | Duplicate code | One formatter | parity test |
+| P8 | Work-item and project state were parsed but never stored | Dead schema fields | Persisted, with transitions run by the controller | lifecycle tests |
+| P9 | Standard rules with no code (baseline before build, sync gate, pause) | Spec ahead of implementation | Implemented, or the rule now names its check | `test-agent-harness-standard.mjs` |
+| P10 | The documented gate command failed as written | An unrelated test needed a missing package | Suite runs from an allow-list in an isolated unit | the §8 commands above |
+
+Result: the daemon verifies WI-HARNESS-002 through its own machinery. The last criterion, A15, is this
+standard, the changelog and the site version shipping together, in site release v3.24.34.
+

@@ -56,7 +56,7 @@ Benchmark sources:  [cite 2-3 sources that inform default values]
 ### 3.1 Free Mode (always available, no auth required)
 
 - **Minimum 6–8 input fields**, each with a tooltip (see Section 5)
-- **4-8 result metric cards** — dark gradient background (`#1e293b`), accent-colored values, muted labels. Include domain-specific KPIs (e.g., Cost per Token, Carbon Footprint, GPUs Required)
+- **4-8 result figures as rows** (superseded v3.24.34: no metric cards, no navy `#1e293b`, no gradients). Results are a `[data-rz-fact-list]` panel, one row per figure: label, mono value with its unit, and a note or state word. One amber headline figure per panel. Shell, components and gate: `css/rz-tool.css` PART 1 and `tools/test-tool-register.mjs` T0–T20. The navy and gradient snippets further down this file are legacy and must not be copied into new pages. Include domain-specific KPIs (e.g., Cost per Token, Carbon Footprint, GPUs Required).
 - **Dynamic narrative block** — 2–3 sentences that update on every input change, referencing actual calculated values
 - No login gate
 

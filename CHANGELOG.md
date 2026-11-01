@@ -11,18 +11,33 @@ release sections rather than semver.
 
 ---
 
-## v3.24.35 — 2026-11-01 — "The whole changelog"
+## v3.24.34 — 2026-11-01 — "Calculators, de-slopped"
 
-Owner: *"continue"* — WI-WEB-ALLPAGES-001. Found by a whole-site render scan for blue and navy: `changelog.html` was the largest offender, and opening it turned up three defects worse than the colour.
-
-### Fixed
-- **89 releases were missing from the public changelog, and the page's main script never ran.** One CHANGELOG.md line quotes HTML with a double-backtick code span (`` `<script src>` ``). The builder only knew single backticks, so it read two empty spans around a bare `<script src>` and wrote a live script tag into the page. The browser parsed everything after that tag, up to the next closing tag, as script text: every entry older than v1.21.0, and the tag that loads `script.min.js`. Rendered before: 834 of 923 entries, oldest shown v1.21.0, one stray script, `script.min.js` never requested. After: 923 of 923, oldest v1.0.0, no stray script, `script.min.js` loaded. With the script back, the navbar gains its surface when the page scrolls; before, the links sat transparently over the entries in both themes.
-- The builder now reads a code span as a run of N backticks closed by exactly N, escapes every `<` in prose (so a code span broken across two lines can no longer open a tag — two `<html …` and two other stray tags were doing that), and fails the build if the entries contain any tag its own Markdown rules do not write. The old guard only matched a backtick directly before a tag, so it passed this page. Proven red first: the previous builder with the new guard fails on `<explain>, <html>, <pue>, <script>, <style>`; the new builder passes.
-- **The light theme was half dark.** The template wrote `<body data-theme="dark">`, so every `[data-theme="dark"] …` rule in the shared stylesheet kept matching inside the body whatever the reader chose: in light, the scrolled navbar was a dark grey bar over a white page. The attribute is gone; the theme lives on `<html>` as on every other page.
-- **No menu on a phone.** The page hid the menu with `display:none !important` at phone width and did not load `js/rz-mobile-nav.js`, which every other page with a navbar loads, so the hamburger never showed. It now shows at 390 px and opens the menu (measured: button 44 px wide, menu 498 px tall when open).
+Owner: *"audit total dan perbaiki semuanya … lepas dari AI design slop atau terlihat vibe coding"*, then *"continue, yang terbaik aja"* — plan `cryptic-rolling-sonnet`, phases 0–2 and 4.
 
 ### Changed
-- **The changelog uses the site register.** It ran its own palette: mint version numbers, links and bullets, cyan and emerald tier pills, a green CURRENT badge, slate-navy cards with blurred glass, an animated mint-to-amber gradient title, and three aurora orbs. Now graphite with one amber: neutral version numbers and tier outlines, MAJOR and CURRENT in amber, 4 px panels with a hairline, flat code chips, a solid title, no orbs. The light theme maps onto the same tokens. The duplicate "Latest version" stamp in the hero is gone (the hero line already states it).
+- **Nine calculators move to one tool page shell**: capex, opex, PUE, ROI, tier, carbon, TIA-942, TCO and fire. Each page now has the hub nav and the hub footer. The header is plain: an eyebrow, a title, one lede and a basis line. The toolbar has six controls or fewer. Results are rows, with label, value and note, and one amber figure per panel. Every figure carries a numbered caption. Full analysis is one row with one Sign in button; locked content is hidden, not blurred. A reference section holds the method formulas, the standards each page computes against, and one disclaimer notice.
+- Removed from those pages: hero photos, badge pills, the KPI tile strips with coloured rails, the floating manual button, scroll-to-top button and watermark, gradient footers, dashed "how to read" boxes and the duplicate cookie banner (TCO). Chart series are amber and greys unless a colour carries meaning (ROI's red loss years).
+- The refit is reproducible: `tools/refit-tool-shell.py` with one module per page in `tools/refit_shell/`. It rebuilds each page from its previous source, and re-running it changes nothing.
+- **`pillar-fire-safety.html` rewritten.** It has eight plain sections: what burns and where, detection, suppression, lithium-ion, standards, inspection, incidents, and tools. Three tables are filled row by row from `data/fire/*.csv`, and three diagrams come from the diagram engine. Every number cites a dataset row, the fire engine, a standard or an incident dossier.
+
+### Fixed
+- **IG-541 residual oxygen** was a fixed 12.5 % whatever the concentration. It is now computed from the concentration: 20.9 × (1 − C/100), which gives 13.1 % at the 37.5 % design and moves when the concentration is overridden (`js/fire-engine.js`, three new cases in `test-fire-calc.mjs`).
+- **ROI scenarios** multiplied the base NPV by a factor, so with a negative base "Bull" came out worse than "Base" (−$62.1M against −$41.4M). Each scenario now re-runs the yearly cashflow (revenue +15 %, −25 % or +50 %, or the discount rate +200 bp). Bull is now −$8.6M at the default inputs.
+- **The explain panel (`js/rz-explain.js`) covered its own trigger** on short viewports. It now opens below the trigger, or above it, or scrolls inside the larger side.
+- **A signed-in phone overflowed**: a long account e-mail widened capex to 461 px and pushed the menu button off-screen. On phones the account button now shows only the initial.
+- **The tier page's IT load drove nothing**; it now feeds a "Facility assessed" row. **Opex free-tier tables** were refilled with dollar figures on every re-render, so free users saw them anyway; they are now hidden.
+- FM-200's GWP of 3,220 is the IPCC **AR4** value; the dataset said AR6.
+
+### Gates
+- `tools/test-tool-register.mjs`:
+  - T10–T18 check the rendered structure: no tiles, nothing floating, a plain header, a toolbar of six or fewer controls, no second hue, no shadows or dashes, hub nav and footer, no logo tile.
+  - T17 checks behaviour: every JS-bound id exists, presets click cleanly, the first input changes the results, the explain panel opens and never covers its trigger, Free/Full works, Save works.
+  - T19 checks that chart series are amber or grey. T20 checks that a signed-in page fits a 360 px phone.
+  - Each check was red on the old pages: 323 failures across 13 pages.
+  - Wired into `ship-gate.sh` for the nine refit pages.
+- `tools/test-pillar-fire.mjs`: exit 1 with 36 findings on the old pillar page, green on the new one. Wired.
+- The four calculators not refit yet (cx, RFS, spares, fire checklist) keep their old look. Their computed styles were compared element by element before and after this release: no change.
 
 ## v3.24.33 — 2026-11-01 — "Contents numbered from one"
 
