@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>19 Air side and liquid cooling | Cx Field Manual R01</title>
+<meta name="description" content="This chapter covers the cooling equipment inside a data hall.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/19-air-side-liquid-cooling-tab.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/19-air-side-liquid-cooling-tab.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/19-air-side-liquid-cooling-tab.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/19-air-side-liquid-cooling-tab.html">
+<meta property="og:title" content="19 Air side and liquid cooling | Cx Field Manual R01">
+<meta property="og:description" content="This chapter covers the cooling equipment inside a data hall.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="19 Air side and liquid cooling | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter covers the cooling equipment inside a data hall.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"19 Air side and liquid cooling: CRAH, fan walls, CDU and technology cooling loops, testing and balancing","name":"Air side and liquid cooling: CRAH, fan walls, CDU and technology cooling loops, testing and balancing","description":"This chapter covers the cooling equipment inside a data hall.","url":"https://resistancezero.com/cx-handbook/19-air-side-liquid-cooling-tab.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/19-air-side-liquid-cooling-tab.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":12481,"position":19,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"19 Air side and liquid cooling","item":"https://resistancezero.com/cx-handbook/19-air-side-liquid-cooling-tab.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part D · Mechanical and fire commissioning</p>
+    <h1><span class="num">19</span>Air side and liquid cooling: CRAH, fan walls, CDU and technology cooling loops, testing and balancing</h1>
+    <p class="lede">This chapter covers the cooling equipment inside a data hall.</p>
+    <p class="basis">Chapter 19 of 32 · 19 sections · 8 figures · 12,481 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 19</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 19</summary>
+<ol><li><a href="#s19-0"><span class="n">19.0</span>Scope of this chapter</a></li><li><a href="#s19-1"><span class="n">19.1</span>Air and liquid heat paths in a liquid-cooled hall</a><ol><li><a href="#s19-1-1"><span class="n">19.1.1</span>How the heat leaves a rack</a></li><li><a href="#s19-1-2"><span class="n">19.1.2</span>Flow formulas used in every test</a></li><li><a href="#s19-1-3"><span class="n">19.1.3</span>Interfaces of the hall cooling scope</a></li></ol></li><li><a href="#s19-2"><span class="n">19.2</span>Thermal envelopes: ASHRAE TC 9.9 air classes and liquid W-classes</a><ol><li><a href="#s19-2-1"><span class="n">19.2.1</span>Air-cooling classes</a></li><li><a href="#s19-2-2"><span class="n">19.2.2</span>Liquid-cooling classes</a></li><li><a href="#s19-2-3"><span class="n">19.2.3</span>Where to measure</a></li></ol></li><li><a href="#s19-3"><span class="n">19.3</span>CRAH and fan wall units: construction, pre-functional checks and start-up</a><ol><li><a href="#s19-3-1"><span class="n">19.3.1</span>What the units are</a></li><li><a href="#s19-3-2"><span class="n">19.3.2</span>Pre-functional (Level 3) checks</a></li><li><a href="#s19-3-3"><span class="n">19.3.3</span>Start-up (Level 3)</a></li></ol></li><li><a href="#s19-4"><span class="n">19.4</span>Airflow measurement methods and instruments</a><ol><li><a href="#s19-4-1"><span class="n">19.4.1</span>Methods</a></li><li><a href="#s19-4-2"><span class="n">19.4.2</span>Pitot-tube traverse procedure</a></li><li><a href="#s19-4-3"><span class="n">19.4.3</span>Fan inlet-ring (k-factor) method for fan walls</a></li><li><a href="#s19-4-4"><span class="n">19.4.4</span>Airflow record fields</a></li></ol></li><li><a href="#s19-5"><span class="n">19.5</span>Testing, adjusting and balancing of air systems</a><ol><li><a href="#s19-5-1"><span class="n">19.5.1</span>What TAB is and who certifies it</a></li><li><a href="#s19-5-2"><span class="n">19.5.2</span>Tolerances</a></li><li><a href="#s19-5-3"><span class="n">19.5.3</span>TAB procedure for a data hall air system</a></li></ol></li><li><a href="#s19-6"><span class="n">19.6</span>Containment and leakage testing</a><ol><li><a href="#s19-6-1"><span class="n">19.6.1</span>Why containment is tested</a></li><li><a href="#s19-6-2"><span class="n">19.6.2</span>Test methods</a></li><li><a href="#s19-6-3"><span class="n">19.6.3</span>Aisle pressurisation test procedure</a></li><li><a href="#s19-6-4"><span class="n">19.6.4</span>Containment pressure control</a></li></ol></li><li><a href="#s19-7"><span class="n">19.7</span>CRAH and fan wall functional performance tests</a><ol><li><a href="#s19-7-1"><span class="n">19.7.1</span>Tests in the functional performance test (FPT) script</a></li><li><a href="#s19-7-2"><span class="n">19.7.2</span>Capacity test procedure</a></li><li><a href="#s19-7-3"><span class="n">19.7.3</span>FPT record for one fan wall (filled)</a></li></ol></li><li><a href="#s19-8"><span class="n">19.8</span>The technology cooling system and CDU: design basis</a><ol><li><a href="#s19-8-1"><span class="n">19.8.1</span>What the TCS and the CDU are</a></li><li><a href="#s19-8-2"><span class="n">19.8.2</span>MSC-1 TCS design values</a></li><li><a href="#s19-8-3"><span class="n">19.8.3</span>Coolant quality limits</a></li></ol></li><li><a href="#s19-9"><span class="n">19.9</span>TCS pipework pressure testing</a><ol><li><a href="#s19-9-1"><span class="n">19.9.1</span>Test sequence</a></li><li><a href="#s19-9-2"><span class="n">19.9.2</span>Hydrostatic test procedure</a></li><li><a href="#s19-9-3"><span class="n">19.9.3</span>Pressure test record fields</a></li></ol></li><li><a href="#s19-10"><span class="n">19.10</span>TCS cleaning, flushing and water quality</a><ol><li><a href="#s19-10-1"><span class="n">19.10.1</span>Procedure water</a></li><li><a href="#s19-10-2"><span class="n">19.10.2</span>Flushing velocity</a></li><li><a href="#s19-10-3"><span class="n">19.10.3</span>Cleaning and flushing procedure</a></li><li><a href="#s19-10-4"><span class="n">19.10.4</span>Flushing record (filled example)</a></li><li><a href="#s19-10-5"><span class="n">19.10.5</span>Common errors in cleaning and flushing</a></li></ol></li><li><a href="#s19-11"><span class="n">19.11</span>CDU commissioning: fill, vent, start-up and filtration</a><ol><li><a href="#s19-11-1"><span class="n">19.11.1</span>Pre-functional checks</a></li><li><a href="#s19-11-2"><span class="n">19.11.2</span>Fill and vent procedure</a></li><li><a href="#s19-11-3"><span class="n">19.11.3</span>Start-up and calibration checks</a></li><li><a href="#s19-11-4"><span class="n">19.11.4</span>CDU commissioning record fields</a></li></ol></li><li><a href="#s19-12"><span class="n">19.12</span>Leak detection and flow per rack</a><ol><li><a href="#s19-12-1"><span class="n">19.12.1</span>Leak detection</a></li><li><a href="#s19-12-2"><span class="n">19.12.2</span>Flow per rack</a></li></ol></li><li><a href="#s19-13"><span class="n">19.13</span>CDU functional tests and failover</a></li><li><a href="#s19-14"><span class="n">19.14</span>Heat-load testing with load banks</a><ol><li><a href="#s19-14-1"><span class="n">19.14.1</span>What the heat-load test proves</a></li><li><a href="#s19-14-2"><span class="n">19.14.2</span>Load equipment for an MSC-1 hall</a></li><li><a href="#s19-14-3"><span class="n">19.14.3</span>Sensor layout</a></li><li><a href="#s19-14-4"><span class="n">19.14.4</span>Heat-load test procedure</a></li><li><a href="#s19-14-5"><span class="n">19.14.5</span>Acceptance values</a></li><li><a href="#s19-14-6"><span class="n">19.14.6</span>Energy balance</a></li><li><a href="#s19-14-7"><span class="n">19.14.7</span>Trend record</a></li><li><a href="#s19-14-8"><span class="n">19.14.8</span>Heat-load test record fields</a></li><li><a href="#s19-14-9"><span class="n">19.14.9</span>Abort criteria</a></li></ol></li><li><a href="#s19-15"><span class="n">19.15</span>Energy metrics: ASHRAE 90.4 MLC and fan and pump power</a><ol><li><a href="#s19-15-1"><span class="n">19.15.1</span>Mechanical load component</a></li><li><a href="#s19-15-2"><span class="n">19.15.2</span>Fan and pump power checks</a></li></ol></li><li><a href="#s19-16"><span class="n">19.16</span>Common errors and how to detect them before the witness test</a></li><li><a href="#s19-17"><span class="n">19.17</span>Checklist for site use</a></li><li><a href="#s19-18"><span class="n">19.18</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="18-chw-plant-heat-rejection-flushing.html"><span>Previous</span>18 Chilled-water and heat-rejection plant</a><a href="20-fire-life-safety-cause-effect.html"><span>Next</span>20 Fire detection, suppression and life-safety interfaces</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s19-0"><span class="n">19.0</span>Scope of this chapter</h2>
+<p>This chapter covers the cooling equipment inside a data hall. It covers the air-side units that cool the room air, and the liquid-cooling equipment that carries heat away from cold plates on the servers. It gives the commissioning manager the tests, instruments, applied values, acceptance values and records needed to witness and sign each step from start-up to the heat-load test.</p>
+<ol>
+<li><strong>Heat paths in the hall.</strong> How the heat of a 120 kW rack splits between air and liquid, and the flows that result.</li>
+<li><strong>Thermal envelopes.</strong> The ASHRAE Technical Committee 9.9 (TC 9.9) air classes A1 to A4 and H1, the 2021 recommended range, and the liquid classes W17 to W+.</li>
+<li><strong>Computer room air handlers (CRAH) and fan walls.</strong> Construction, pre-functional checks and start-up.</li>
+<li><strong>Airflow measurement.</strong> Pitot-tube traverses, fan inlet-ring (k-factor) readings, capture hoods and velocity grids, with instrument accuracy.</li>
+<li><strong>Testing, adjusting and balancing (TAB).</strong> The process of the National Environmental Balancing Bureau (NEBB) and the Associated Air Balance Council (AABC), CIBSE Commissioning Code A and BSRIA BG 49, and the tolerances.</li>
+<li><strong>Containment.</strong> Aisle containment leakage testing and pressure control.</li>
+<li><strong>Functional performance tests of air units.</strong> Capacity, redundancy and control tests.</li>
+<li><strong>Technology cooling system (TCS) and coolant distribution unit (CDU).</strong> Design basis, pressure testing, cleaning, flushing, water quality, filling, venting, filtration, leak detection, flow per rack and failover.</li>
+<li><strong>Heat-load testing.</strong> Air and liquid load banks, load steps, stabilisation, energy balance and the trend records.</li>
+<li><strong>Energy checks.</strong> The ASHRAE Standard 90.4 mechanical load component (MLC) and the fan and pump power records.</li>
+</ol>
+<p>Documents and standards used: ASHRAE Thermal Guidelines for Data Processing Environments, 5th edition (2021) and its ASHRAE Technical Committee (TC) 9.9 reference card. The balancing documents are ANSI/ASHRAE Standard 111-2008 (measurement, testing, adjusting and balancing) and the NEBB Procedural Standard for Testing, Adjusting and Balancing of Environmental Systems, 9th edition (2019). The other air-side documents are the AABC National Standards for Total System Balance, 7th edition; CIBSE Commissioning Code A: Air distribution systems (2024); BSRIA BG 49/2024 Commissioning air systems. The cleaning and liquid-cooling documents are BSRIA BG 29 Pre-commission cleaning of pipework systems (amended 6th edition, 2021) and Open Compute Project (OCP) Guidelines for pre-commission preparation of TCS row manifolds (January 2025). The OCP documents also include the OCP Base specification for single-phase water-based cold plate coolants v1.3 (2026); OCP Base specification for PG25 coolant v1.0; OCP Liquid-to-liquid CDU test methodology and performance rating rev 1.0 (2024). The equipment and instrument documents are AHRI Standard 1360 (rating of computer room air conditioners and CRAH units); ANSI/ASHRAE/IES Standard 90.4 (energy standard for data centres); ASME B31.3 and B31.9 (piping pressure tests); IEC 60751 (platinum resistance thermometers); ASTM E230 (thermocouple tolerances); ISO 8573-1 (compressed air purity). Chapter 18 covers the chilled-water and facility-water plant upstream of the CDUs, and chapter 28 covers the integrated systems tests that use the results of this chapter.</p>
+<h2 id="s19-1"><span class="n">19.1</span>Air and liquid heat paths in a liquid-cooled hall</h2>
+
+<figure class="sheet" id="F19-1"><a href="../data/cx-handbook/figures/F19-1.svg" title="Open drawing F19-1 at full size"><img src="../data/cx-handbook/figures/F19-1.svg" alt="F19-1: Heat paths of one MSC-1 hall: air through fan walls and liquid through CDUs" width="1400" height="972" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F19-1</span> — <b>Heat paths of one MSC-1 hall: air through fan walls and liquid through CDUs</b>. Air path (top): fan wall, cold side, rack inlet, hot aisle containment, ceiling return. Liquid path (bottom): cold plate, row manifold, CDU heat exchanger, facility water to the plant of chapter 18.</figcaption></figure>
+<h3 id="s19-1-1"><span class="n">19.1.1</span>How the heat leaves a rack</h3>
+<p>A rack with liquid-cooled servers still rejects part of its heat to air. The cold plates on the processors and accelerators take most of the heat into the coolant. Power supplies, memory, drives, network cards and the server fans reject the rest to the room air. The fraction captured by the liquid is the capture ratio.</p>
+<p>Figure <a class="figref" href="#F19-1">F19-1</a> shows both paths for one hall. In the MSC-1 worked example a hall has 100 racks of 120 kW and a capture ratio of 0.8. The TCS runs at 45 °C supply and 55 °C return, and the facility water (FWS) at 35 °C supply and 45 °C return. The air side uses chilled water (CHW) at 18 °C supply and 24 °C return.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Per rack</th>
+<th>Per zone (25 racks)</th>
+<th>Per hall (100 racks)</th>
+<th>How it is derived</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IT load</td>
+<td>120 kW</td>
+<td>3.0 MW</td>
+<td>12.0 MW</td>
+<td>case ledger</td>
+</tr>
+<tr>
+<td>Heat to liquid (capture 0.8)</td>
+<td>96 kW</td>
+<td>2.4 MW</td>
+<td>9.6 MW</td>
+<td>120 × 0.8</td>
+</tr>
+<tr>
+<td>Heat to air</td>
+<td>24 kW</td>
+<td>0.6 MW</td>
+<td>2.4 MW</td>
+<td>120 × 0.2</td>
+</tr>
+<tr>
+<td>TCS flow at 10 K</td>
+<td>139.2 L/min (2.32 L/s)</td>
+<td>58.0 L/s</td>
+<td>232.0 L/s</td>
+<td>24.17 L/s per MW</td>
+</tr>
+<tr>
+<td>Airflow at 11.8 K</td>
+<td>1.685 m³/s</td>
+<td>42.1 m³/s</td>
+<td>168.5 m³/s</td>
+<td>case ledger 168.48 m³/s</td>
+</tr>
+<tr>
+<td>CDUs</td>
+<td>—</td>
+<td>4 of 1 MW (N+1)</td>
+<td>16</td>
+<td>case ledger</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-1-2"><span class="n">19.1.2</span>Flow formulas used in every test</h3>
+<ol>
+<li><strong>Liquid heat.</strong> Heat (kW) = ρ × cp × Q × ΔT, with Q in m³/s, ρ × cp in kJ/(m³·K) and ΔT in K. For water at 50 °C, ρ × cp is about 4,138 kJ/(m³·K), which gives 24.17 L/s per MW at 10 K. For PG25 the value is lower by up to 10 %, so the flow per MW rises by the same amount.</li>
+<li><strong>Air heat.</strong> Heat (kW) = ρ × cp × V × ΔT, with V in m³/s. For air at 1.2 kg/m³ and 1.005 kJ/(kg·K), ρ × cp is 1.206 kJ/(m³·K). The MSC-1 hall air load of 2,400 kW at 168.48 m³/s gives ΔT = 2,400 / (1.206 × 168.48) = <mark>11.8 K across the racks</mark>.</li>
+<li><strong>Flow per kW.</strong> The TCS flow of 139.2 L/min for 96 kW is 1.45 L/min per kW. The OCP liquid-to-liquid CDU test methodology rates CDUs at 1.5 L/min per kW, so the MSC-1 design sits close to that rating point.</li>
+<li><strong>Approach temperature difference (ATD).</strong> The OCP CDU methodology defines ATD as TCS supply temperature minus FWS supply temperature. MSC-1 has ATD = 45 − 35 = 10 K. OCP rates CDU capacity at ATD 5 K, so a CDU rated 1 MW at 5 K has margin at the MSC-1 condition.</li>
+</ol>
+<p><strong>Worked example:</strong> In the MSC-1 worked example, zone Z2 of hall B2-DH3 carries 25 racks at 96 kW liquid load, 2,400 kW in total. The TCS flow at a 10 K rise is 2,400 / (4.138 × 10) = 58.0 L/s. With four CDUs running, each delivers 14.5 L/s (870 L/min) and 600 kW. With one CDU stopped, each of the remaining three delivers 19.33 L/s (1,160 L/min) and 800 kW, which is 80 % of the 1 MW rating. The FWS side of each CDU at 600 kW and a 10 K rise needs 600 / (4.146 × 10) = 14.5 L/s.</p>
+<h3 id="s19-1-3"><span class="n">19.1.3</span>Interfaces of the hall cooling scope</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>Provided by</th>
+<th>Needed by this chapter</th>
+<th>Record that closes it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CHW at 18 °C to fan wall coils</td>
+<td>chapter 18 plant, mechanical contractor</td>
+<td>CRAH capacity tests</td>
+<td>CHW plant L4 certificate</td>
+</tr>
+<tr>
+<td>FWS at 35 °C to CDU primary</td>
+<td>chapter 18 plant</td>
+<td>CDU tests</td>
+<td>FWS flushing certificate and water analysis</td>
+</tr>
+<tr>
+<td>Power A and B to fan walls and CDUs</td>
+<td>electrical contractor</td>
+<td>all functional tests</td>
+<td>L3 electrical checklists</td>
+</tr>
+<tr>
+<td>building management system (BMS) points for fans, valves, CDUs, leak detection</td>
+<td>BMS contractor (chapter 22)</td>
+<td>sequence tests</td>
+<td>BMS point-to-point record</td>
+</tr>
+<tr>
+<td>Rack manifolds and hoses</td>
+<td>rack integrator or owner IT</td>
+<td>flushing, fill, flow per rack</td>
+<td>manifold pressure test record</td>
+</tr>
+<tr>
+<td>Load banks and liquid load units</td>
+<td>load bank supplier</td>
+<td>heat-load test</td>
+<td>load bank calibration certificates</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s19-2"><span class="n">19.2</span>Thermal envelopes: ASHRAE TC 9.9 air classes and liquid W-classes</h2>
+<h3 id="s19-2-1"><span class="n">19.2.1</span>Air-cooling classes</h3>
+<p>ASHRAE TC 9.9 publishes the environmental classes for information technology equipment (ITE). The commissioning manager uses them to set the acceptance limits for rack inlet air during the heat-load test and the integrated systems test. The values below are from Table 2.1 of the 2021 Thermal Guidelines (5th edition) reference card.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Dry bulb (°C)</th>
+<th>Humidity range, non-condensing</th>
+<th>Max. dew point (°C)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recommended, A1 to A4</td>
+<td>18 to 27</td>
+<td>−9 °C dew point (DP) to 15 °C DP and 70 % relative humidity (RH) (or 50 % RH)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>A1 allowable</td>
+<td>15 to 32</td>
+<td>−12 °C DP and 8 % RH to 17 °C DP and 80 % RH</td>
+<td>17</td>
+</tr>
+<tr>
+<td>A2 allowable</td>
+<td>10 to 35</td>
+<td>−12 °C DP and 8 % RH to 21 °C DP and 80 % RH</td>
+<td>21</td>
+</tr>
+<tr>
+<td>A3 allowable</td>
+<td>5 to 40</td>
+<td>−12 °C DP and 8 % RH to 24 °C DP and 85 % RH</td>
+<td>24</td>
+</tr>
+<tr>
+<td>A4 allowable</td>
+<td>5 to 45</td>
+<td>−12 °C DP and 8 % RH to 24 °C DP and 90 % RH</td>
+<td>24</td>
+</tr>
+<tr>
+<td>H1 recommended / allowable</td>
+<td>18 to 22 / 15 to 25</td>
+<td>as recommended / as A1</td>
+<td>17</td>
+</tr>
+</tbody>
+</table></div>
+<ol>
+<li><strong>The 70 % or 50 % RH limit.</strong> The recommended upper humidity is 70 % RH when copper and silver coupon tests show corrosion below 300 and 200 Å per month. Where coupons exceed these rates, the limit is <mark>50 % RH</mark>. Jakarta sites with traffic and industrial pollution need the coupon test before the 70 % value is used.</li>
+<li><strong>Temperature change limit.</strong> For ITE other than tape, the inlet temperature may change by no more than <mark>20 °C in one hour and 5 °C in any 15-minute period</mark>. ASHRAE defines each value as the difference between the highest and lowest inlet temperature within the stated time window. This limit is the acceptance value for transients in failover tests.</li>
+<li><strong>Altitude derating.</strong> A1 and A2 lose 1 °C of maximum allowable dry bulb per 300 m above 900 m. Jakarta sites sit below 900 m, so no derating applies.</li>
+<li><strong>Class H1.</strong> H1 is a zone for high-density air-cooled products with a recommended range of 18 to 22 °C. Liquid-cooled racks that still need air for 20 % of their heat follow the original equipment manufacturer (OEM) rack specification, which may be H1 or A1.</li>
+</ol>
+<h3 id="s19-2-2"><span class="n">19.2.2</span>Liquid-cooling classes</h3>
+<p>The 2021 Thermal Guidelines Table 3.1 defines liquid-cooling classes by facility water supply temperature. The minimum water temperature for all classes is 2 °C. Operating within a class means the equipment runs at full performance over the whole range of the class.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Facility water supply (°C)</th>
+<th>Typical primary plant</th>
+<th>Typical supplemental plant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>W17</td>
+<td>17</td>
+<td>chiller and cooling tower</td>
+<td>water-side economiser</td>
+</tr>
+<tr>
+<td>W27</td>
+<td>27</td>
+<td>chiller and cooling tower</td>
+<td>water-side economiser</td>
+</tr>
+<tr>
+<td>W32</td>
+<td>32</td>
+<td>cooling tower</td>
+<td>chiller or district heating</td>
+</tr>
+<tr>
+<td>W40</td>
+<td>40</td>
+<td>cooling tower</td>
+<td>chiller or district heating</td>
+</tr>
+<tr>
+<td>W45</td>
+<td>45</td>
+<td>cooling tower</td>
+<td>district heating</td>
+</tr>
+<tr>
+<td>W+</td>
+<td>above 45</td>
+<td>cooling tower</td>
+<td>district heating</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> In the MSC-1 worked example the FWS supply is 35 °C, so the facility side meets class W40 (supply up to 40 °C) and is outside W32. The servers must be specified as W40 or W45 equipment. The TCS supply of 45 °C is the secondary loop temperature at the cold plate, and the server OEM sets it. The commissioning manager records the OEM limit as the acceptance limit for the heat-load and failover tests (for example, maximum TCS supply 45 °C, maximum rate of change 3 K per minute; the values come from the OEM liquid-cooling specification).</p>
+<h3 id="s19-2-3"><span class="n">19.2.3</span>Where to measure</h3>
+<ol>
+<li><strong>Rack inlet air.</strong> Measure at the server air inlet face, at three heights (low, middle, top), 50 mm in front of the rack door. ASHRAE defines the inlet as the conditions at the ITE inlet; a reading in the middle of the cold aisle does not meet this definition.</li>
+<li><strong>TCS supply at the rack.</strong> Measure at the rack manifold supply, as close as possible to the quick disconnects (QD). The CDU outlet sensor reads lower than the rack supply when the pipe gains heat from a hot aisle.</li>
+<li><strong>Dew point in the hall.</strong> Measure in the cold aisle and in the return path. The TCS and FWS pipes at 35 to 45 °C sit far above the hall dew point, so condensation risk exists only on the 18 °C CHW pipes and coils.</li>
+</ol>
+<h2 id="s19-3"><span class="n">19.3</span>CRAH and fan wall units: construction, pre-functional checks and start-up</h2>
+<h3 id="s19-3-1"><span class="n">19.3.1</span>What the units are</h3>
+<p>A computer room air handler (CRAH) is a fan and a chilled-water coil in one cabinet, placed in the hall or in a gallery. A fan wall is a large air handler built into the wall of a service gallery. It has a bank of electronically commutated (EC) fans, a filter bank and a chilled-water coil, and blows air directly into the cold aisle or into the hall. On MSC-1 the air-side units are fan walls in two galleries on each side of the hall. The fan-wall units are the hall's CRAH units counted in chapter 21, and they carry the same tags B2-DH3-FW-nn. The BMS points list in chapter 21 and the asset register in chapter 27 count the same 13 devices per hall (39 per building). AHRI Standard 1360 is the rating standard for computer and data processing room air conditioners and covers the CRAH rating conditions.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>MSC-1 example value</th>
+<th>Source of the value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fan wall units per hall</td>
+<td>13 installed, 11 needed (N+2)</td>
+<td>design basis (example)</td>
+</tr>
+<tr>
+<td>Fans per unit</td>
+<td>12 EC fans</td>
+<td>OEM data (example)</td>
+</tr>
+<tr>
+<td>Normal airflow per unit</td>
+<td>12.96 m³/s (168.48 / 13)</td>
+<td>case ledger and design basis</td>
+</tr>
+<tr>
+<td>Airflow per unit with 2 units out</td>
+<td>15.32 m³/s</td>
+<td>168.48 / 11</td>
+</tr>
+<tr>
+<td>Design duty per unit</td>
+<td>184.6 kW normal, 218.2 kW with 2 out</td>
+<td>2,400 kW / 13 and / 11</td>
+</tr>
+<tr>
+<td>CHW flow per unit at 184.6 kW, 6 K</td>
+<td>7.38 L/s</td>
+<td>184.6 / (4.18 × 6 × 0.998)</td>
+</tr>
+<tr>
+<td>Cold-aisle supply set point</td>
+<td>24 °C</td>
+<td>inside 18 to 27 °C recommended</td>
+</tr>
+<tr>
+<td>Hot-aisle temperature</td>
+<td>35.8 °C</td>
+<td>24 + 11.8 K</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-3-2"><span class="n">19.3.2</span>Pre-functional (Level 3) checks</h3>
+<p><strong>Purpose:</strong> Prove each fan wall is installed, wired and set up per the drawings and the OEM manual before the OEM start-up engineer energises it.</p>
+<p><strong>Owner:</strong> Mechanical contractor, witnessed by the commissioning authority (CxA).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Check the nameplate.</strong> Record model, serial number, coil rows, fan count and motor rating against the approved submittal. A mismatch is a non-conformance report (NCR) before start-up.</li>
+<li><strong>Check fan installation.</strong> Confirm each EC fan is fixed, the inlet ring is clean and the guard is fitted. Turn each impeller by hand with the unit isolated; it must turn freely.</li>
+<li><strong>Check the filter bank.</strong> Confirm the filter grade (for example ISO 16890 ePM1 50 % or as specified), that every frame is full, and that the seals have no gaps. Record the clean-filter pressure drop given by the OEM (for example 60 Pa; the value comes from the filter OEM data).</li>
+<li><strong>Check the coil.</strong> Confirm the coil fins are undamaged (combed where bent) and the vent and drain valves are fitted. Confirm the CHW connections carry the flexible connectors and isolating valves shown on the drawing.</li>
+<li><strong>Check the control valve.</strong> Confirm the valve body size, the actuator type and the fail position (for example fail-open on loss of signal) against the valve schedule.</li>
+<li><strong>Check sensors.</strong> Confirm supply-air and return-air temperature sensors, filter differential pressure switch, fan alarm contacts and the containment differential pressure sensor are installed at the drawing locations.</li>
+<li><strong>Check power.</strong> Confirm the A and B supplies, the automatic transfer device if fitted, the earthing and the cable labels. Record insulation resistance per chapter 14.</li>
+<li><strong>Check controls wiring.</strong> Confirm the fan Modbus or analogue wiring and the BMS points per the points list (chapter 21), with each fan address unique.</li>
+<li><strong>Check cleanliness.</strong> Confirm the plenum, gallery and hall floor are clean and vacuumed. Construction dust drawn into the coil and the servers is the most frequent defect found at start-up.</li>
+</ol>
+<p><strong>Records:</strong> L3 checklist MEC-L3-FW-nn with one row per check, the photos of the nameplate and filter bank, and the sensor calibration certificates.</p>
+<h3 id="s19-3-3"><span class="n">19.3.3</span>Start-up (Level 3)</h3>
+<ol>
+<li><strong>Prerequisites.</strong> The CHW loop is flushed and certified (chapter 18) and the CHW is at 18 °C. Power is available on both feeds, and the BMS point-to-point test for the unit is done.</li>
+<li><strong>Vent the coil.</strong> Open the coil vent until water runs without air, then close it. Record the time and the person.</li>
+<li><strong>Energise the controller.</strong> Check the firmware version against the approved version list and record it.</li>
+<li><strong>Run each fan.</strong> Start each fan alone at 30 % speed and check the rotation direction, noise and vibration. Then run all fans at 100 % for 15 minutes.</li>
+<li><strong>Read fan data.</strong> Record speed (rpm), power (W) and current per fan from the fan controller. Check any fan more than 10 % away from the mean power at the same speed for a blocked inlet or a damaged impeller (project tolerance from the project specification).</li>
+<li><strong>Stroke the valve.</strong> Command the CHW valve to 0, 50 and 100 % and record the actuator feedback. Feedback must be within ±5 % of command (project tolerance).</li>
+<li><strong>Test alarms.</strong> Simulate fan failure, filter high pressure drop and supply air high temperature. Confirm each alarm at the unit display and at the BMS, and record it on the L3 checklist MEC-L3-FW-nn.</li>
+<li><strong>Hand over the start-up report.</strong> The OEM start-up engineer signs the start-up sheet. The CxA attaches it to the L3 record.</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Fans with duplicate addresses.</strong> Two fans with the same Modbus address make the controller read one fan twice and miss another. Check the address list against the fan count on the controller screen.</li>
+<li><strong>Coil left air-bound.</strong> An air-locked coil gives low capacity on the functional test. Vent again and repeat the reading before raising a capacity NCR.</li>
+<li><strong>Sensors swapped.</strong> Supply and return sensors swapped give an apparent negative ΔT. Check with a reference thermometer at each sensor.</li>
+</ol>
+<h2 id="s19-4"><span class="n">19.4</span>Airflow measurement methods and instruments</h2>
+
+<figure class="sheet" id="F19-2"><a href="../data/cx-handbook/figures/F19-2.svg" title="Open drawing F19-2 at full size"><img src="../data/cx-handbook/figures/F19-2.svg" alt="F19-2: Pitot-tube traverse of duct B2-MAU-01: 42 log-Tchebycheff points on a 1,200 × 800 mm section" width="1000" height="932" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F19-2</span> — <b>Pitot-tube traverse of duct B2-MAU-01: 42 log-Tchebycheff points on a 1,200 × 800 mm section</b>. Points sit at the log-Tchebycheff fractions of each side that ASHRAE 111 takes from ISO 3966. Plane: 10 equivalent diameters of straight duct upstream and 3 downstream.</figcaption></figure>
+<h3 id="s19-4-1"><span class="n">19.4.1</span>Methods</h3>
+<p>Airflow is measured to set the fan speed, to prove the unit capacity and to balance the supply to the racks.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Where used</th>
+<th>Instrument</th>
+<th>Typical accuracy</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pitot-tube duct traverse</td>
+<td>ducts of make-up air and pressurisation units</td>
+<td>Pitot-static tube with digital micromanometer</td>
+<td>±2 to 3 % of flow when the traverse plane is good; instrument accuracy from the instrument certificate (confirm the method uncertainty against ASHRAE Standard 111)</td>
+<td>reference method in ASHRAE Standard 111</td>
+</tr>
+<tr>
+<td>Fan inlet-ring (k-factor)</td>
+<td>EC fans of fan walls and CRAH</td>
+<td>pressure taps on the fan inlet ring, micromanometer</td>
+<td>per fan OEM data sheet</td>
+<td>Q = k × √Δp</td>
+</tr>
+<tr>
+<td>Velocity grid at an opening</td>
+<td>fan wall discharge face, perforated tiles</td>
+<td>rotating vane anemometer or hot-wire anemometer</td>
+<td>about ±5 % for hot-wire; accuracy from the instrument certificate</td>
+<td>needs a grid of points</td>
+</tr>
+<tr>
+<td>Capture hood</td>
+<td>perforated tiles, grilles</td>
+<td>flow hood with back-pressure compensation</td>
+<td>±3 % of reading ±7 L/s typical; accuracy from the hood certificate</td>
+<td>used for floor tiles in raised-floor halls</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-4-2"><span class="n">19.4.2</span>Pitot-tube traverse procedure</h3>
+<p><strong>Purpose:</strong> Measure the airflow in a duct with the reference method.</p>
+<p><strong>Inputs:</strong> Duct dimensions from the drawing, design airflow, instrument calibration certificate (12 months or less).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Choose the traverse plane.</strong> Place the plane in a straight duct with <mark>10 equivalent diameters upstream and 3 downstream</mark>; a plane with 5 diameters upstream and 1 downstream may give adequate results. Equivalent diameter = √(4 × H × W / π).</li>
+<li><strong>Set the number of points.</strong> <mark>Use at least 25 points</mark>. For rectangular ducts use 5 traverse lines per side for sides below 762 mm (30 in). Use 6 lines for 762 to 914 mm (30 to 36 in), and 7 lines above 914 mm (36 in).</li>
+<li><strong>Locate the points.</strong> Use the log-Tchebycheff positions that ASHRAE 111 takes from ISO 3966. The positions, as fractions of the side, are:
+   - 5 lines: 0.074, 0.288, 0.500, 0.712 and 0.926;
+   - 6 lines: 0.061, 0.235, 0.437, 0.563, 0.765 and 0.939;
+   - 7 lines: 0.053, 0.203, 0.366, 0.500, 0.634, 0.797 and 0.947.</li>
+<li><strong>Drill and plug.</strong> Drill test holes of the probe diameter, and fit plugs after the test. Record the hole location on the TAB drawing.</li>
+<li><strong>Zero the manometer.</strong> Zero with both ports open to the same air, and set the air density for the measured temperature and the site barometric pressure.</li>
+<li><strong>Read the velocity pressure.</strong> Read Pv at each point, holding the tip parallel to the flow within ±10° (confirm the alignment limit in the pitot traverse procedure of ASHRAE Standard 111). Record the static pressure at the centre.</li>
+<li><strong>Convert to velocity.</strong> v = √(2 × Pv / ρ). Average the velocities. An average of the pressures gives a higher, wrong flow.</li>
+<li><strong>Calculate flow.</strong> Q = v_mean × A. Record the result against the design value.</li>
+</ol>
+<p><strong>Worked example:</strong> Duct of the hall make-up air unit B2-MAU-01, 1,200 × 800 mm. Long side 1,200 mm (above 914 mm) needs 7 lines; short side 800 mm (762 to 914 mm) needs 6 lines, so 42 points. The mean of the 42 velocities is 6.42 m/s at ρ = 1.16 kg/m³ (32 °C, 1,010 hPa). Area is 0.96 m², so Q = 6.42 × 0.96 = 6.16 m³/s against a design of 6.00 m³/s: +2.7 %, inside the ±10 % specification band. Figure <a class="figref" href="#F19-2">F19-2</a> shows the 42 points and their distances from the inner wall.</p>
+<h3 id="s19-4-3"><span class="n">19.4.3</span>Fan inlet-ring (k-factor) method for fan walls</h3>
+<p>Most EC plug fans carry pressure taps on the inlet ring. The fan OEM publishes a k-factor so that Q = k × √Δp, where Δp is the pressure difference between the inlet ring tap and the inlet chamber. The fan controller can calculate the airflow from this reading.</p>
+<ol>
+<li><strong>Get the k-factor.</strong> Take the k-factor from the fan OEM data sheet for the exact fan size, in the unit the controller uses (for example m³/h per √Pa).</li>
+<li><strong>Check the taps.</strong> Confirm the tubes from the taps to the transmitter are connected, free of kinks and on the correct ports.</li>
+<li><strong>Read Δp.</strong> Read Δp with a calibrated micromanometer at the tap and compare with the controller value. <mark>They must agree within ±5 %</mark> (project tolerance).</li>
+<li><strong>Sum the fans.</strong> Unit airflow = the sum of the fan airflows. Check one unit per hall with an independent velocity grid on the discharge face.</li>
+</ol>
+<p><strong>Worked example:</strong> Fan wall B2-DH3-FW-04 has 12 fans. Design flow per fan at normal duty is 12.96 / 12 = 1.080 m³/s = 3,888 m³/h. With an example k-factor of 280 m³/h per √Pa (the project value is on the fan data sheet), the required Δp is (3,888 / 280)² = 193 Pa. The measured Δp values give a sum of 13.21 m³/s, +1.9 % on design. The velocity grid on the 3.6 × 3.0 m discharge face (48 points, mean 1.21 m/s, 10.8 m²) gives 13.06 m³/s; the two methods agree within 1.1 %.</p>
+<h3 id="s19-4-4"><span class="n">19.4.4</span>Airflow record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit tag</td>
+<td>text</td>
+<td>B2-DH3-FW-04</td>
+</tr>
+<tr>
+<td>Method</td>
+<td>list</td>
+<td>k-factor and velocity grid</td>
+</tr>
+<tr>
+<td>Instrument and serial number</td>
+<td>text</td>
+<td>micromanometer MM-0231, vane anemometer VA-0117</td>
+</tr>
+<tr>
+<td>Calibration due date</td>
+<td>date</td>
+<td>2027-03-14</td>
+</tr>
+<tr>
+<td>Air temperature and barometric pressure</td>
+<td>number</td>
+<td>24.1 °C, 1,009 hPa</td>
+</tr>
+<tr>
+<td>Number of points</td>
+<td>integer</td>
+<td>48</td>
+</tr>
+<tr>
+<td>Design airflow</td>
+<td>m³/s</td>
+<td>12.96</td>
+</tr>
+<tr>
+<td>Measured airflow</td>
+<td>m³/s</td>
+<td>13.21 (k-factor), 13.06 (grid)</td>
+</tr>
+<tr>
+<td>Deviation from design</td>
+<td>%</td>
+<td>+1.9</td>
+</tr>
+<tr>
+<td>Tolerance and source</td>
+<td>text</td>
+<td>±10 %, project specification 23 05 93</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass / fail</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>TAB technician and CxA witness</td>
+<td>name, date</td>
+<td>A. Rahman, 2026-11-18</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s19-5"><span class="n">19.5</span>Testing, adjusting and balancing of air systems</h2>
+<h3 id="s19-5-1"><span class="n">19.5.1</span>What TAB is and who certifies it</h3>
+<p>Testing, adjusting and balancing (TAB) is the process of measuring the flows in an air or water system and adjusting fans, dampers and valves until each flow meets design. The TAB contractor then reports the result. Two certifying bodies publish TAB procedures in North America: NEBB and AABC. The NEBB Procedural Standard for TAB of Environmental Systems 2019 (9th edition) applies to NEBB reports issued after 1 January 2020. The AABC National Standards for Total System Balance are in the 7th edition. In the United Kingdom CIBSE Commissioning Code A (2024) states what must be commissioned on air systems, and BSRIA BG 49/2024 explains how to do it; BG 49/2024 follows Code A 2024.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Document</th>
+<th>Edition</th>
+<th>What the commissioning manager takes from it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ANSI/ASHRAE Standard 111</td>
+<td>2008</td>
+<td>measurement methods, traverse rules, instrument requirements</td>
+</tr>
+<tr>
+<td>NEBB Procedural Standard for TAB</td>
+<td>2019, 9th edition</td>
+<td>TAB procedure, report format, instrument calibration intervals</td>
+</tr>
+<tr>
+<td>AABC National Standards</td>
+<td>7th edition</td>
+<td>TAB procedure, tolerances, report format</td>
+</tr>
+<tr>
+<td>CIBSE Commissioning Code A</td>
+<td>2024</td>
+<td>what to commission on air distribution systems</td>
+</tr>
+<tr>
+<td>BSRIA BG 49</td>
+<td>2024</td>
+<td>step-by-step regulating methods, proportional balancing</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-5-2"><span class="n">19.5.2</span>Tolerances</h3>
+<p>The engineer of record (EoR) sets the tolerances in the specification. The common default in North American specifications is ±10 % of design flow. The commissioning manager uses the project specification value and records its clause in every TAB record.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Typical specification tolerance</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fans and air handling units</td>
+<td><mark>0 to +10 % of design airflow</mark></td>
+<td>no negative tolerance, so that redundancy is kept</td>
+</tr>
+<tr>
+<td>Air terminals, grilles, tiles</td>
+<td>±10 %, tightened to ±5 % in critical spaces</td>
+<td>per project specification</td>
+</tr>
+<tr>
+<td>Pumps</td>
+<td>0 to +10 %</td>
+<td>water side, chapter 18</td>
+</tr>
+<tr>
+<td>Coils and heat exchangers</td>
+<td>±5 % of design water flow</td>
+<td>per project specification</td>
+</tr>
+</tbody>
+</table></div>
+<p>These tolerances appear in published university and federal TAB specifications that cite NEBB and AABC; confirm against the current edition of the NEBB Procedural Standard and AABC National Standards and the project specification before use.</p>
+<h3 id="s19-5-3"><span class="n">19.5.3</span>TAB procedure for a data hall air system</h3>
+<p><strong>Trigger:</strong> Fan walls started (19.3.3), containment installed, blanking panels and load banks or racks in place, BMS fan speed control available in manual.</p>
+<p><strong>Owner:</strong> TAB contractor (NEBB or AABC certified), with the CxA witnessing 10 to 20 % of readings and 100 % of the fan unit totals.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Review the design (2 working days).</strong> The TAB contractor reviews drawings, schedules and the controls sequence and issues a TAB plan with instrument list and calibration certificates. The CxA approves it.</li>
+<li><strong>Inspect the system (1 day per hall).</strong> Check dampers open, filters clean, containment doors closed and blanking panels fitted.</li>
+<li><strong>Measure the fan units (1 day per hall).</strong> Measure each fan wall airflow by k-factor and confirm one per hall by velocity grid.</li>
+<li><strong>Set the total flow (0.5 day).</strong> Adjust the fan speed set point until the hall total airflow equals design within 0 to +10 %.</li>
+<li><strong>Balance terminals (1 day per hall where used).</strong> In raised-floor or ducted halls, balance tiles or grilles proportionally per BG 49 so that each is within tolerance.</li>
+<li><strong>Record the containment pressure (0.5 day).</strong> Record the differential pressure across the containment at design flow (19.6).</li>
+<li><strong>Record fan power (0.5 day).</strong> Record kW per unit at design flow for the energy check (19.15).</li>
+<li><strong>Mark the settings.</strong> Mark damper positions and record the final fan speed set points in the BMS.</li>
+<li><strong>Issue the report (5 working days).</strong> Issue the certified TAB report. The CxA reviews it and spot-checks 10 % of readings with an independent instrument; a <mark>spot-check deviation above 5 % triggers a re-test</mark> of the whole set (project rule).</li>
+</ol>
+<p><strong>Records:</strong> Certified TAB report with the cover certificate signed by the certified TAB supervisor, instrument list with calibration dates, readings sheets and the CxA spot-check sheet.</p>
+<h2 id="s19-6"><span class="n">19.6</span>Containment and leakage testing</h2>
+
+<figure class="sheet" id="F19-6"><a href="../data/cx-handbook/figures/F19-6.svg" title="Open drawing F19-6 at full size"><img src="../data/cx-handbook/figures/F19-6.svg" alt="F19-6: Aisle pressurisation test of hot aisle HA-Z2: leakage curve against the project limit" width="1000" height="920" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F19-6</span> — <b>Aisle pressurisation test of hot aisle HA-Z2: leakage curve against the project limit</b>. The portable calibrated fan holds each pressure step for 2 minutes. The fitted exponent n = 0.53 is typical of orifice-type leaks through gaps and cable entries.</figcaption></figure>
+<h3 id="s19-6-1"><span class="n">19.6.1</span>Why containment is tested</h3>
+<p>Containment separates the cold supply air from the hot exhaust air. Leakage through gaps under doors, around cable entries, through empty rack U-spaces and between racks lets air bypass the servers or lets hot air recirculate to the inlets. A University of Leeds study found that up to about 20 % of the supply air can bypass the servers through the racks at typical cold-aisle pressures. No single standard test exists for containment leakage, so the method and the acceptance value come from the project specification.</p>
+<h3 id="s19-6-2"><span class="n">19.6.2</span>Test methods</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Applied value</th>
+<th>Result</th>
+<th>When used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Visual and smoke survey</td>
+<td>smoke pencil at every joint with fans running</td>
+<td>list of leak points</td>
+<td>every aisle, before any other test</td>
+</tr>
+<tr>
+<td>Infrared survey</td>
+<td>heat load on, thermal camera at the cold side</td>
+<td>hot spots at leak points</td>
+<td>during the heat-load test</td>
+</tr>
+<tr>
+<td>Aisle pressurisation test</td>
+<td>portable calibrated fan raises aisle to 5, 10, 15, 20 Pa</td>
+<td>leakage flow curve Q = C × Δp^n</td>
+<td>one aisle per hall type, and any aisle that fails the survey</td>
+</tr>
+<tr>
+<td>Operating pressure check</td>
+<td>fan walls at design flow</td>
+<td>aisle Δp versus set point</td>
+<td>every aisle, during TAB</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-6-3"><span class="n">19.6.3</span>Aisle pressurisation test procedure</h3>
+<p><strong>Inputs:</strong> Calibrated portable fan with a flow-measuring inlet (accuracy ±3 % of flow, from the instrument certificate), digital micromanometer (resolution 0.1 Pa).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Prepare the aisle.</strong> Install all blanking panels, close the containment doors and seal the rack positions without equipment with blanking. Load bank fans stay off.</li>
+<li><strong>Fit the fan.</strong> The TAB contractor fits the portable fan in a temporary panel in one containment door, sealed with tape.</li>
+<li><strong>Place the pressure tubes.</strong> Place one tube inside the aisle away from the fan jet and one outside at the same height.</li>
+<li><strong>Apply the pressure steps.</strong> Raise the aisle pressure to 5, 10, 15 and 20 Pa. Hold each step for 2 minutes and record the mean flow.</li>
+<li><strong>Fit the curve.</strong> <mark>Fit Q = C × Δp^n</mark> by least squares. A value of n between 0.5 and 0.65 indicates orifice-type leakage.</li>
+<li><strong>Calculate leakage at the operating pressure.</strong> Calculate Q at the operating differential pressure and at 5 Pa, and express it as a percentage of the aisle design airflow.</li>
+<li><strong>Locate the leaks.</strong> If the leakage exceeds the acceptance value, survey with smoke at 10 Pa, seal, and repeat.</li>
+</ol>
+<p><strong>Acceptance:</strong> Project value from the project specification, for example leakage at 5 Pa ≤ 3 % of aisle design airflow.</p>
+<p><strong>Worked example:</strong> Hot aisle HA-Z2 of hall B2-DH3 serves 25 racks at 1.685 m³/s each, 42.1 m³/s design airflow. The 3 % limit is 1.26 m³/s at 5 Pa. Measured flows: 0.55 m³/s at 5 Pa, 0.80 m³/s at 10 Pa, 0.99 m³/s at 15 Pa and 1.15 m³/s at 20 Pa. The fit gives n = 0.53 and C = 0.234. Leakage at 5 Pa is 0.55 / 42.1 = <mark>1.3 % of design airflow: pass</mark>. Figure <a class="figref" href="#F19-6">F19-6</a> shows the curve.</p>
+<h3 id="s19-6-4"><span class="n">19.6.4</span>Containment pressure control</h3>
+<ol>
+<li><strong>Control variable.</strong> Fan walls control speed to hold a small differential pressure between the cold side and the hot aisle, for example +2 Pa cold side (project value from the controls sequence). The pressure sensor is a low-range transmitter (0 to ±25 Pa).</li>
+<li><strong>Sensor placement.</strong> Place the hot-aisle tap away from load bank or server exhaust jets, and the cold-side tap away from the fan wall discharge.</li>
+<li><strong>Acceptance.</strong> Held within ±1 Pa of set point over 30 minutes at steady load (project value).</li>
+<li><strong>Common error.</strong> A tap in a jet reads velocity pressure and the fans hunt. Move the tap and repeat.</li>
+</ol>
+<h2 id="s19-7"><span class="n">19.7</span>CRAH and fan wall functional performance tests</h2>
+<h3 id="s19-7-1"><span class="n">19.7.1</span>Tests in the functional performance test (FPT) script</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Applied condition</th>
+<th>Measured quantity</th>
+<th>Acceptance (example)</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capacity at design</td>
+<td>design airflow, CHW 18 °C, return air 35.8 °C</td>
+<td>air-side and water-side kW</td>
+<td><mark>≥ 95 % of rated kW</mark>, air and water sides agree within 10 %</td>
+<td>AHRI 1360-2022 section 6.10 Table 8: a verification test passes at ≥ 95 % of rated net sensible capacity; the project specification applies the limit on site</td>
+</tr>
+<tr>
+<td>Supply air temperature control</td>
+<td>step change of set point 24 to 22 °C</td>
+<td>supply temperature</td>
+<td>settles within ±0.5 K in 10 minutes, no hunting</td>
+<td>controls sequence</td>
+</tr>
+<tr>
+<td>Fan failure</td>
+<td>stop 1 fan of 12</td>
+<td>unit airflow</td>
+<td>airflow held within −5 % in 60 s</td>
+<td>OEM data and sequence</td>
+</tr>
+<tr>
+<td>Unit failure</td>
+<td>stop 2 of 13 units</td>
+<td>hall airflow and rack inlet temperature</td>
+<td>inlet ≤ 27 °C, change ≤ 5 K in 15 min</td>
+<td>ASHRAE TC 9.9</td>
+</tr>
+<tr>
+<td>Power feed loss</td>
+<td>open feed A</td>
+<td>unit running on feed B</td>
+<td>no stop</td>
+<td>design basis</td>
+</tr>
+<tr>
+<td>CHW valve failure</td>
+<td>remove valve signal</td>
+<td>valve to fail position</td>
+<td>valve fails open</td>
+<td>valve schedule</td>
+</tr>
+<tr>
+<td>Filter alarm</td>
+<td>simulate high Δp</td>
+<td>BMS alarm</td>
+<td>alarm within 30 s</td>
+<td>points list</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-7-2"><span class="n">19.7.2</span>Capacity test procedure</h3>
+<p><strong>Inputs:</strong></p>
+<ul>
+<li>Four resistance temperature detectors (RTD) of class A per IEC 60751 (±(0.15 + 0.002 × |t|) °C), or a thermocouple grid of type T to special limits (±0.5 °C or 0.4 % per ASTM E230, vendor reproduction; confirm against the tolerance table of ASTM E230/E230M-23a).</li>
+<li>A clamp-on ultrasonic flow meter (±1 to 2 % of reading, from the meter certificate).</li>
+<li>A data logger at 10 s intervals.</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Set the load.</strong> Run the heat-load test at the step that gives design return air temperature (19.14).</li>
+<li><strong>Fix the airflow.</strong> Run the unit at design airflow measured in 19.4.</li>
+<li><strong>Place air sensors.</strong> Place a 9-point grid of sensors on the coil entering face and on the leaving face.</li>
+<li><strong>Place water sensors.</strong> Place the RTDs in thermowells or strap them on the CHW supply and return pipes under insulation. Fit the flow meter on a straight pipe length per the meter manual (for example 10 diameters upstream, 5 downstream).</li>
+<li><strong>Log for 30 minutes.</strong> Log at steady state for 30 minutes after stabilisation.</li>
+<li><strong>Calculate.</strong> Air side Q_air = 1.206 × V × (T_return − T_supply). Water side Q_w = ρ × cp × Q × (T_CHWR − T_CHWS).</li>
+<li><strong>Compare.</strong> Compare both against the rated capacity at the same conditions. Accept at ≥ 95 % of rating with the air and water sides within 10 % (19.7.1), and record the values in the functional performance test (FPT) record (19.7.3).</li>
+</ol>
+<p><strong>Worked example:</strong> Fan wall B2-DH3-FW-04 at 13.21 m³/s, entering air 35.7 °C, leaving air 24.1 °C: Q_air = 1.206 × 13.21 × 11.6 = 184.8 kW. CHW 7.34 L/s, 18.1 °C supply, 24.0 °C return: Q_w = 4.17 × 7.34 × 5.9 = 180.6 kW. The sides agree within 2.3 %. The rated capacity at these conditions is 189 kW (example OEM selection), so the measured value is <mark>97.8 % of rating</mark>: pass against the ≥ 95 % example criterion.</p>
+<h3 id="s19-7-3"><span class="n">19.7.3</span>FPT record for one fan wall (filled)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Expected</th>
+<th>Measured</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Capacity at design</td>
+<td>≥ 179.6 kW (95 % of 189)</td>
+<td>184.8 kW air, 180.6 kW water</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Set point 24 to 22 °C</td>
+<td>stable ±0.5 K in 10 min</td>
+<td>stable ±0.3 K at 7 min</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Stop fan 7</td>
+<td>flow ≥ 12.31 m³/s in 60 s</td>
+<td>12.95 m³/s at 38 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Feed A open</td>
+<td>unit runs</td>
+<td>unit runs, alarm "feed A lost" at BMS in 4 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Valve signal removed</td>
+<td>valve 100 % open</td>
+<td>100 % at 52 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Filter Δp simulated</td>
+<td>BMS alarm ≤ 30 s</td>
+<td>12 s</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s19-8"><span class="n">19.8</span>The technology cooling system and CDU: design basis</h2>
+
+<figure class="sheet" id="F19-3"><a href="../data/cx-handbook/figures/F19-3.svg" title="Open drawing F19-3 at full size"><img src="../data/cx-handbook/figures/F19-3.svg" alt="F19-3: CDU B2-DH3-Z2-CDU-03 P&amp;ID with the commissioning test points" width="1400" height="1208" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F19-3</span> — <b>CDU B2-DH3-Z2-CDU-03 P&amp;ID with the commissioning test points</b>. Facility water (top) passes the strainer and isolating valve into the heat exchanger and leaves through the control valve. The TCS (bottom) leaves the heat exchanger through the duty or standby pump, the 25 µm filter and the flow, temperature and pressure test points to the row manifold.</figcaption></figure>
+<h3 id="s19-8-1"><span class="n">19.8.1</span>What the TCS and the CDU are</h3>
+<p>The technology cooling system (TCS) is the secondary liquid loop. It runs from the coolant distribution unit (CDU) through the row manifolds and hoses to the cold plates in the servers. The CDU separates the TCS from the facility water system (FWS). It contains a liquid-to-liquid plate heat exchanger, the TCS pumps (N+1 in the MSC-1 design), <mark>filters, an expansion vessel</mark>, a fill and make-up connection, sensors and a controller. The FWS side of the heat exchanger takes heat away to the dry coolers or chillers of chapter 18.</p>
+<p>Figure <a class="figref" href="#F19-3">F19-3</a> shows the CDU and its test points. The TCS is a clean, closed loop with narrow cold plate channels of about 100 µm. The OCP pre-commission guideline states that pipework cleaning and flushing are needed to keep corrosion products, dirt and construction debris out of these channels.</p>
+<h3 id="s19-8-2"><span class="n">19.8.2</span>MSC-1 TCS design values</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>MSC-1 example value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CDU capacity</td>
+<td>1 MW each, 4 per zone, 16 per hall</td>
+<td>case ledger</td>
+</tr>
+<tr>
+<td>Redundancy</td>
+<td>N+1 per zone (3 needed for 2.4 MW)</td>
+<td>case ledger</td>
+</tr>
+<tr>
+<td>TCS supply / return</td>
+<td>45 / 55 °C</td>
+<td>case ledger</td>
+</tr>
+<tr>
+<td>FWS supply / return</td>
+<td>35 / 45 °C</td>
+<td>case ledger</td>
+</tr>
+<tr>
+<td>TCS flow per rack</td>
+<td>139.2 L/min (2.32 L/s)</td>
+<td>case ledger</td>
+</tr>
+<tr>
+<td>TCS flow per CDU, normal / N</td>
+<td>14.5 / 19.33 L/s</td>
+<td>19.1.2</td>
+</tr>
+<tr>
+<td>Coolant</td>
+<td>treated water per the OCP water-based coolant specification, or PG25</td>
+<td>project choice</td>
+</tr>
+<tr>
+<td>TCS filtration</td>
+<td>25 µm in the CDU (OCP: 25 to 50 µm TCS, 150 to 250 µm facility side)</td>
+<td>OCP liquid-to-liquid CDU methodology</td>
+</tr>
+<tr>
+<td>Working pressure at the lowest point</td>
+<td>6 bar g (example)</td>
+<td>design basis</td>
+</tr>
+<tr>
+<td>Component pressure rating</td>
+<td>10 bar g (example)</td>
+<td>OEM data</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-8-3"><span class="n">19.8.3</span>Coolant quality limits</h3>
+<p>The OCP Base specification for single-phase water-based cold plate coolants v1.3 (effective 6 August 2026) gives the limits below for a fresh treated-water coolant. The procedure water used for cleaning and flushing has its own lower limits (19.10).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Limit (fresh coolant)</th>
+<th>Test method or instrument</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pH</td>
+<td><mark>8.0 to 10.5</mark></td>
+<td>calibrated pH meter</td>
+</tr>
+<tr>
+<td>Conductivity</td>
+<td>&lt; 2,000 µS/cm</td>
+<td>conductivity meter (ASTM D1125)</td>
+</tr>
+<tr>
+<td>Total suspended solids</td>
+<td>&lt; 5 ppm</td>
+<td>laboratory</td>
+</tr>
+<tr>
+<td>Total hardness as CaCO3</td>
+<td>&lt; 30 ppm</td>
+<td>laboratory or test kit</td>
+</tr>
+<tr>
+<td>Turbidity</td>
+<td>&lt; 5 NTU</td>
+<td>turbidity meter</td>
+</tr>
+<tr>
+<td>Total viable count (bacteria)</td>
+<td><mark>&lt; 1 CFU/ml</mark></td>
+<td>R2A agar or equivalent, laboratory</td>
+</tr>
+<tr>
+<td>Copper corrosion rate</td>
+<td>&lt; 0.1 mpy</td>
+<td>coupon test</td>
+</tr>
+</tbody>
+</table></div>
+<ol>
+<li><strong>Glycol coolant.</strong> Where the project uses PG25, the OCP PG25 specification calls for a high-purity inhibited propylene glycol at 25 to 28 %. It calls for filters of <mark>50 µm or finer, with 25 µm preferred</mark>. Glycol lowers the specific heat by up to 10 %, so the flow per kW and the pump duty rise.</li>
+<li><strong>Bacteria.</strong> The coolant limit of &lt; 1 CFU/ml is much lower than the procedure water limit of 1,000 CFU/ml. Dip slides need 48 hours to give a result, so the sample plan must allow for that delay before the fill is accepted.</li>
+<li><strong>Baseline.</strong> Take a baseline sample at fill and repeat at 30 days. Rising iron, copper or aluminium shows corrosion; rising turbidity shows debris.</li>
+</ol>
+<h2 id="s19-9"><span class="n">19.9</span>TCS pipework pressure testing</h2>
+<h3 id="s19-9-1"><span class="n">19.9.1</span>Test sequence</h3>
+<p>The OCP guideline assumes that a compressed-air or other gas pressure test of the row manifold has been done before the hydrostatic test. It then sets the hydrostatic test as a proof-pressure test at <mark>1.3 to 1.5 times the anticipated working pressure</mark>, with the exact value in the design documents. It refers to ASME B31.3 for the method. Facility pipework in chapter 18 is tested to ASME B31.9 or the project specification.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Medium</th>
+<th>Applied value (example)</th>
+<th>Hold</th>
+<th>Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gas tightness check of row manifold</td>
+<td>dry nitrogen</td>
+<td>1.5 bar g (project value)</td>
+<td>30 minutes after stabilisation</td>
+<td>no audible leak, no bubbles at joints with leak-detection fluid, no pressure drop beyond temperature effect</td>
+</tr>
+<tr>
+<td>Hydrostatic proof test</td>
+<td>procedure water (19.10)</td>
+<td>1.5 × 6 = 9.0 bar g at the lowest point, below the 10 bar g component rating</td>
+<td>2 hours after stabilisation (project value from the project specification; ASME B31.9 and B31.3 set a 10-minute minimum, section 18.3.2)</td>
+<td>no visible leak, no pressure drop beyond temperature effect</td>
+</tr>
+<tr>
+<td>Repeat test</td>
+<td>procedure water</td>
+<td>same</td>
+<td>same</td>
+<td>required if any tested joint is opened</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-9-2"><span class="n">19.9.2</span>Hydrostatic test procedure</h3>
+<p><strong>Inputs:</strong></p>
+<ul>
+<li>Two pressure gauges or transmitters of class 0.25 % full scale or better, range about 1.5 to 2 times the test pressure (0 to 16 bar), calibrated within 12 months.</li>
+<li>One temperature sensor on the pipe.</li>
+<li>A hand or electric test pump with a relief valve set just above the test pressure.</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Isolate.</strong> Lock out pumps and electrical supplies per the permit to work (chapter 10). Close the valves to the rack drops and isolate the CDU if it is not part of the test.</li>
+<li><strong>Fit the connections.</strong> Fit the test connection at the high point of the supply near the future CDU position, as the OCP guideline recommends, and fit loop-backs between the hot and cold drops.</li>
+<li><strong>Fill slowly.</strong> Fill gradually from the low point with procedure water while venting at the high points, until water runs without air at every vent.</li>
+<li><strong>Raise the pressure.</strong> Raise the pressure in steps of 25 % of the test pressure, holding 5 minutes at each step to check for leaks.</li>
+<li><strong>Stabilise.</strong> Hold at 9.0 bar g for 15 minutes to let the water temperature and the hose stretch settle. Re-pressurise to 9.0 bar g.</li>
+<li><strong>Hold and record.</strong> <mark>Hold for the specified period and record pressure and pipe temperature every 15 minutes</mark>.</li>
+<li><strong>Inspect.</strong> The CxA inspects every joint, QD and valve gland and records leaks found on the pressure test record (19.9.3).</li>
+<li><strong>Release.</strong> Release the pressure slowly to a drain, keeping the system full if cleaning follows immediately.</li>
+</ol>
+<p><strong>Check:</strong> Water in a rigid steel pipe changes pressure by <mark>several bar per kelvin</mark> when the temperature changes. A pressure change during the hold is accepted only when it matches the recorded temperature change; the record shows both. Test early in the morning or with the hall air conditioning stable, and record the temperature at the start and the end.</p>
+<p><strong>Worked example:</strong> Row manifold B2-DH3-Z2-RM-A, test pressure 9.0 bar g. Start of hold 09:10 at 9.02 bar g and 26.4 °C; end of hold 11:10 at 8.97 bar g and 26.3 °C. The change is −0.05 bar with −0.1 K. The temperature fell slightly and no joint showed water. Result: pass, signed by the mechanical contractor and witnessed by the CxA.</p>
+<h3 id="s19-9-3"><span class="n">19.9.3</span>Pressure test record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Test number</td>
+<td>text</td>
+<td>PT-B2-DH3-Z2-RM-A-01</td>
+</tr>
+<tr>
+<td>Section under test</td>
+<td>text</td>
+<td>row manifold A, zone Z2, racks 01 to 13</td>
+</tr>
+<tr>
+<td>Design working pressure</td>
+<td>bar g</td>
+<td>6.0</td>
+</tr>
+<tr>
+<td>Test pressure and basis</td>
+<td>bar g, text</td>
+<td>9.0, 1.5 × working per design basis</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>list</td>
+<td>procedure water</td>
+</tr>
+<tr>
+<td>Gauge serial and calibration date</td>
+<td>text</td>
+<td>PG-1123 cal 2026-06-02</td>
+</tr>
+<tr>
+<td>Start time, pressure, temperature</td>
+<td>time, bar g, °C</td>
+<td>09:10, 9.02, 26.4</td>
+</tr>
+<tr>
+<td>End time, pressure, temperature</td>
+<td>time, bar g, °C</td>
+<td>11:10, 8.97, 26.3</td>
+</tr>
+<tr>
+<td>Leaks found</td>
+<td>text</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass / fail</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>name, date</td>
+<td>contractor, CxA, owner representative</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s19-10"><span class="n">19.10</span>TCS cleaning, flushing and water quality</h2>
+
+<figure class="sheet" id="F19-7"><a href="../data/cx-handbook/figures/F19-7.svg" title="Open drawing F19-7 at full size"><img src="../data/cx-handbook/figures/F19-7.svg" alt="F19-7: Minimum flushing velocity and flow by pipe size for TCS pipework (BSRIA BG 29 via OCP)" width="1000" height="874" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F19-7</span> — <b>Minimum flushing velocity and flow by pipe size for TCS pipework (BSRIA BG 29 via OCP)</b>. The flushing skid is sized for the largest pipe flushed at one time; smaller drops are flushed in valve groups so that each leg reaches its minimum velocity.</figcaption></figure>
+<h3 id="s19-10-1"><span class="n">19.10.1</span>Procedure water</h3>
+<p>The OCP guideline calls the base water for all cleaning and flushing "procedure water". Reverse-osmosis permeate or deionised water that has been disinfected meets its limits. If site water is used instead, its quality is documented against the same parameters.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Limit for procedure water</th>
+<th>Instrument</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conductivity</td>
+<td><mark>≤ 50 µS/cm</mark></td>
+<td>calibrated conductivity meter</td>
+</tr>
+<tr>
+<td>pH</td>
+<td>≥ 6</td>
+<td>calibrated pH meter</td>
+</tr>
+<tr>
+<td>Total aerobic bacteria</td>
+<td>≤ 1,000 CFU/ml</td>
+<td>dip slide, 48 h incubation</td>
+</tr>
+</tbody>
+</table></div>
+<p>Keep a small residual of oxidising biocide (bleach or peroxide, as the water treatment provider directs) in the storage tank. The dip slide result arrives only after 48 hours.</p>
+<h3 id="s19-10-2"><span class="n">19.10.2</span>Flushing velocity</h3>
+<p>The OCP guideline reproduces the BSRIA BG 29 (amended 6th edition, 2021) minimum flushing velocities. A flushing velocity of about 1 to 1.3 m/s is needed to lift sand and clay particles and to give enough shear at the pipe wall. Figure <a class="figref" href="#F19-7">F19-7</a> lists the values.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Nominal size (mm)</th>
+<th>Minimum velocity (m/s)</th>
+<th>Flow (L/s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>25</td>
+<td>1.03</td>
+<td>0.60</td>
+</tr>
+<tr>
+<td>32</td>
+<td>1.06</td>
+<td>1.08</td>
+</tr>
+<tr>
+<td>40</td>
+<td>1.08</td>
+<td>1.49</td>
+</tr>
+<tr>
+<td>50</td>
+<td>1.11</td>
+<td>2.47</td>
+</tr>
+<tr>
+<td>65</td>
+<td>1.15</td>
+<td>4.29</td>
+</tr>
+<tr>
+<td>80</td>
+<td>1.17</td>
+<td>6.01</td>
+</tr>
+<tr>
+<td>100</td>
+<td>1.21</td>
+<td>10.50</td>
+</tr>
+<tr>
+<td>125</td>
+<td>1.24</td>
+<td>16.40</td>
+</tr>
+<tr>
+<td>150</td>
+<td>1.26</td>
+<td>23.80</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> The zone Z2 row manifold header is DN100 and the rack drops are DN50 (example sizes). The flushing skid must deliver <mark>10.50 L/s through the DN100 header</mark>. The drops are flushed in groups. Each DN50 drop needs 2.47 L/s, so the skid at 10.5 L/s flushes 4 drops at a time (4 × 2.47 = 9.88 L/s), with the other drop valves closed. A 13-rack row needs 4 valve groups (4 + 3 + 3 + 3 drops) to reach the velocity in every leg. The normal operating flow of 58.0 L/s for the zone in DN150 pipe is 3.1 m/s, above the flushing velocity. The CDU pumps are still never used for flushing, because debris would reach the CDU heat exchanger.</p>
+<h3 id="s19-10-3"><span class="n">19.10.3</span>Cleaning and flushing procedure</h3>
+<p><strong>Owner:</strong> Mechanical contractor with the water treatment specialist; CxA witnesses the end-point samples.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Connect the flushing skid.</strong> Connect the skid with its own pump and filter vessel at the high-point connection used for the hydrostatic test. The CDU and the racks stay isolated; loop-backs connect the hot and cold drops.</li>
+<li><strong>Recirculate with coarse filtration.</strong> Recirculate procedure water through the skid filter with a nominal <mark>50 to 100 µm</mark> element for at least 3 system volumes. The step ends when there are no visible particles, turbidity is below 20 NTU and conductivity is below 60 µS/cm.</li>
+<li><strong>Clean with chemical.</strong> Add the cleaning chemical, for example an inorganic caustic cleaner with surfactant, with copper inhibitor where copper is present. Circulate it <mark>for at least 4 hours</mark> through every leg, using the valve groups from 19.10.2.</li>
+<li><strong>Watch the filter.</strong> Record flow, pump speed and filter ΔP. Change the element when ΔP reaches about 10 psi (0.69 bar). A ΔP of zero can mean a breached filter. The cleaning step ends when the filter ΔP shows <mark>no rise for 1 hour</mark>.</li>
+<li><strong>Drain.</strong> Drain completely through the low points. Nitrogen at less than 5 psig (0.34 bar g) may be used to push water out; compressed air is used only if it meets ISO 8573-1 Class 2.</li>
+<li><strong>Flush.</strong> Fill with procedure water, recirculate and drain, and repeat until the outlet conductivity is within 10 to 20 µS/cm of the procedure water or <mark>below 60 µS/cm. Final turbidity is below 5 NTU</mark>.</li>
+<li><strong>Flush the dead legs.</strong> Open each future connection outlet and flush to a bucket under continuous pressure and flow. Record each outlet on the flushing record (19.10.4).</li>
+<li><strong>Take the final sample.</strong> Send a final sample to the laboratory for conductivity, turbidity, pH and total aerobic bacteria.</li>
+<li><strong>Fill or lay up.</strong> Fill with coolant immediately (19.11) or lay up dry. To lay up dry, circulate biocide for 6 to 12 hours (bacteria below 1,000 CFU/ml), drain, dry with clean air and seal with a nitrogen blanket.</li>
+</ol>
+<p><strong>Check:</strong> The OCP guideline warns against leaving water in the system without circulation for <mark>more than 24 hours</mark> without chemical treatment, because of microbial growth. The cleaning step follows the hydrostatic test directly, and the flushing step follows the cleaning step directly.</p>
+<h3 id="s19-10-4"><span class="n">19.10.4</span>Flushing record (filled example)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Time</th>
+<th>Stage</th>
+<th>Flow (L/s)</th>
+<th>Filter ΔP (bar)</th>
+<th>Turbidity (NTU)</th>
+<th>Conductivity (µS/cm)</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>08:00</td>
+<td>recirculate, 100 µm</td>
+<td>10.4</td>
+<td>0.12</td>
+<td>46</td>
+<td>41</td>
+<td>start, group 1</td>
+</tr>
+<tr>
+<td>10:30</td>
+<td>recirculate, 50 µm</td>
+<td>10.5</td>
+<td>0.55</td>
+<td>18</td>
+<td>44</td>
+<td>3 volumes done</td>
+</tr>
+<tr>
+<td>11:00</td>
+<td>clean, chemical added</td>
+<td>10.5</td>
+<td>0.20</td>
+<td>22</td>
+<td>410</td>
+<td>element changed at 0.66 bar</td>
+</tr>
+<tr>
+<td>15:00</td>
+<td>clean</td>
+<td>10.5</td>
+<td>0.31</td>
+<td>12</td>
+<td>405</td>
+<td>ΔP steady since 14:00</td>
+</tr>
+<tr>
+<td>15:30</td>
+<td>drain</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>N2 at 0.3 bar g</td>
+</tr>
+<tr>
+<td>16:30</td>
+<td>flush 1</td>
+<td>10.5</td>
+<td>0.25</td>
+<td>9</td>
+<td>128</td>
+<td>drain and refill</td>
+</tr>
+<tr>
+<td>18:00</td>
+<td>flush 2</td>
+<td>10.5</td>
+<td>0.24</td>
+<td>4.1</td>
+<td>58</td>
+<td>end point met (≤ 60)</td>
+</tr>
+<tr>
+<td>18:30</td>
+<td>lab sample</td>
+<td>—</td>
+<td>—</td>
+<td>3.8</td>
+<td>57</td>
+<td>sample LS-0412 sent</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-10-5"><span class="n">19.10.5</span>Common errors in cleaning and flushing</h3>
+<ol>
+<li><strong>Flushing through the CDU.</strong> Debris collects in the plate heat exchanger. Keep the CDU isolated and use the skid.</li>
+<li><strong>One open path.</strong> With all drops open the velocity in each drop falls below the minimum. Use valve groups and record which group was flushed.</li>
+<li><strong>Standing water.</strong> A fill left without circulation over a weekend grows bacteria. Plan the cleaning, flushing and fill without a gap, or lay up dry.</li>
+<li><strong>No filter ΔP.</strong> A filter showing zero ΔP is breached or bypassed. Stop and inspect the element.</li>
+<li><strong>Contaminated test equipment.</strong> A test pump or rental skid that was not cleaned brings debris in. The OCP guideline requires rental skids to be hydrotested and cleaned before use.</li>
+</ol>
+<h2 id="s19-11"><span class="n">19.11</span>CDU commissioning: fill, vent, start-up and filtration</h2>
+<h3 id="s19-11-1"><span class="n">19.11.1</span>Pre-functional checks</h3>
+<ol>
+<li><strong>Check placement.</strong> Confirm the CDU is level, anchored, on its drip tray and at the clearances in the OEM manual.</li>
+<li><strong>Check connections.</strong> Confirm FWS and TCS connections, isolating valves, strainers and flexible connectors match the P&amp;ID (<a class="figref" href="#F19-3">F19-3</a>).</li>
+<li><strong>Check filters.</strong> Confirm the TCS filter element is the specified rating (25 µm on MSC-1) and the FWS strainer is fitted (150 to 250 µm per the OCP CDU methodology).</li>
+<li><strong>Check instruments.</strong> Confirm each pressure transmitter (PT), temperature transmitter (TT) and flow meter is installed and its calibration certificate is on file.</li>
+<li><strong>Check power.</strong> Confirm both power feeds, the pump drives and the earthing.</li>
+<li><strong>Check the controller.</strong> Confirm firmware version, network address and BMS point list.</li>
+<li><strong>Check leak sensors.</strong> Confirm the drip-tray spot sensor and the rope sensor under the row manifold are installed and wired (19.12).</li>
+</ol>
+<h3 id="s19-11-2"><span class="n">19.11.2</span>Fill and vent procedure</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Confirm the coolant.</strong> Check the coolant batch certificate against the OCP limits (19.8.3) and keep a retained sample.</li>
+<li><strong>Fill slowly from the low point.</strong> Fill through the CDU fill connection at a rate the vents can follow. Fit a filter in the fill line (for example 1 µm for make-up water, as the OCP modular TCS paper suggests where possible).</li>
+<li><strong>Vent.</strong> The mechanical contractor vents at every high point of the manifold and at the CDU until coolant runs without bubbles, and records each vent on the vent log.</li>
+<li><strong>Set the expansion vessel.</strong> Set the vessel pre-charge to the design value before filling (for example 0.3 bar below the static fill pressure; the value comes from the CDU OEM manual).</li>
+<li><strong>Run the pumps at low speed.</strong> Run one pump at 30 % speed for 30 minutes to move trapped air to the vents. Vent again.</li>
+<li><strong>Raise the speed.</strong> Raise to design flow and run for 2 hours. Vent until no air appears and the pressure is steady.</li>
+<li><strong>Check the TCS filter ΔP.</strong> Record the clean-element ΔP at design flow. A rising ΔP in the first days is normal; change the element at the OEM limit.</li>
+<li><strong>Sample.</strong> Take the first coolant sample after 24 hours of circulation.</li>
+</ol>
+<h3 id="s19-11-3"><span class="n">19.11.3</span>Start-up and calibration checks</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Instrument</th>
+<th>Applied value</th>
+<th>Acceptance (example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCS flow meter</td>
+<td>clamp-on ultrasonic reference</td>
+<td>design flow 14.5 L/s</td>
+<td>CDU meter within ±3 % of reference</td>
+</tr>
+<tr>
+<td>TCS supply temperature sensor</td>
+<td>RTD class A reference in thermowell</td>
+<td>normal operation</td>
+<td>within ±0.3 K</td>
+</tr>
+<tr>
+<td>TCS differential pressure</td>
+<td>calibrated gauge pair</td>
+<td>design flow</td>
+<td>within ±2 % of span</td>
+</tr>
+<tr>
+<td>Pump changeover</td>
+<td>controller command</td>
+<td>duty pump stop</td>
+<td><mark>standby running within 10 s</mark> (OEM value from the CDU OEM manual)</td>
+</tr>
+<tr>
+<td>Leak sensor in drip tray</td>
+<td>water on sensor</td>
+<td>50 ml</td>
+<td>CDU alarm and BMS alarm within 10 s</td>
+</tr>
+<tr>
+<td>FWS control valve</td>
+<td>controller command 0, 50, 100 %</td>
+<td>stroke</td>
+<td>feedback within ±5 %</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-11-4"><span class="n">19.11.4</span>CDU commissioning record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CDU tag</td>
+<td>text</td>
+<td>B2-DH3-Z2-CDU-03</td>
+</tr>
+<tr>
+<td>Serial number and firmware</td>
+<td>text</td>
+<td>SN 24-118-0567, FW 3.4.2</td>
+</tr>
+<tr>
+<td>Coolant type and batch</td>
+<td>text</td>
+<td>treated water, batch CW-2611-07</td>
+</tr>
+<tr>
+<td>Fill volume</td>
+<td>litres</td>
+<td>1,840</td>
+</tr>
+<tr>
+<td>Expansion vessel pre-charge</td>
+<td>bar g</td>
+<td>1.2</td>
+</tr>
+<tr>
+<td>TCS filter rating and clean ΔP</td>
+<td>µm, kPa</td>
+<td>25, 18</td>
+</tr>
+<tr>
+<td>TCS flow (CDU / reference)</td>
+<td>L/s</td>
+<td>14.6 / 14.4</td>
+</tr>
+<tr>
+<td>TCS supply temperature (CDU / reference)</td>
+<td>°C</td>
+<td>45.1 / 45.0</td>
+</tr>
+<tr>
+<td>Pump changeover time</td>
+<td>s</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Leak alarm time</td>
+<td>s</td>
+<td>4</td>
+</tr>
+<tr>
+<td>First coolant sample number</td>
+<td>text</td>
+<td>LS-0431</td>
+</tr>
+<tr>
+<td>Result and signatures</td>
+<td>text</td>
+<td>pass, OEM start-up engineer and CxA</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s19-12"><span class="n">19.12</span>Leak detection and flow per rack</h2>
+<h3 id="s19-12-1"><span class="n">19.12.1</span>Leak detection</h3>
+<p>Leak detection on a liquid-cooled hall uses three sensor types. They are rope (cable) sensors along the row manifolds and under the CDUs, spot sensors in drip trays, and the internal leak sensors of the CDU and the rack. The OCP CDU methodology states that leak sensor routing must follow the coolant flow path. It also states that the CDU may have automated safety actions such as stopping the pump or closing a valve.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>List the sensors.</strong> List every sensor zone with its location and the expected BMS alarm text.</li>
+<li><strong>Wet each rope sensor.</strong> Wet each rope sensor at three points (start, middle, end) with a damp cloth or 50 ml of water.</li>
+<li><strong>Check the location reading.</strong> On locating rope systems, check the distance displayed against the measured distance on the drawing. Acceptance: <mark>within ±1 m</mark> (project value; the OEM data of the locating rope system gives the location accuracy).</li>
+<li><strong>Check the alarm times.</strong> Check the alarm at the local panel and the BMS within 10 s (project value).</li>
+<li><strong>Check the actions.</strong> Check the action that the cause-and-effect matrix gives for each sensor. For example, a leak in a CDU drip tray raises an alarm only. A leak inside the CDU cabinet stops the pumps of that CDU only when the matrix says so.</li>
+<li><strong>Dry and reset.</strong> Dry each sensor and reset it. Confirm the alarm clears and record the result in the leak test table.</li>
+<li><strong>Check the cable fault alarm.</strong> Disconnect the rope at the end and confirm the "cable break" alarm.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Sensor</th>
+<th>Location</th>
+<th>Wet point</th>
+<th>Expected</th>
+<th>Measured</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LD-Z2-RM-A</td>
+<td>under row manifold A</td>
+<td>2 m</td>
+<td>alarm, 2 m</td>
+<td>alarm 4 s, 2.3 m</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>LD-Z2-RM-A</td>
+<td>under row manifold A</td>
+<td>9 m</td>
+<td>alarm, 9 m</td>
+<td>alarm 5 s, 9.4 m</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>LD-Z2-RM-A</td>
+<td>under row manifold A</td>
+<td>16 m</td>
+<td>alarm, 16 m</td>
+<td>alarm 4 s, 16.6 m</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>LD-Z2-CDU-03-T</td>
+<td>drip tray CDU-03</td>
+<td>spot</td>
+<td>alarm</td>
+<td>alarm 3 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>LD-Z2-RM-A</td>
+<td>end disconnected</td>
+<td>—</td>
+<td>cable break alarm</td>
+<td>alarm 6 s</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-12-2"><span class="n">19.12.2</span>Flow per rack</h3>
+<p><strong>Purpose:</strong> Prove each rack receives its design flow, so that no rack runs short of cooling at full load.</p>
+<p><strong>Inputs:</strong> Clamp-on ultrasonic flow meter suited to the hose or pipe material (accuracy ±2 % of reading, from the meter certificate). The rack-level flow sensor may be used if fitted, after it is verified against the clamp-on meter.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Run design flow.</strong> Run all four CDUs of the zone at design total flow 58.0 L/s.</li>
+<li><strong>Measure each rack.</strong> Measure each rack supply flow. Record the CDU differential pressure and the pressure at the farthest rack.</li>
+<li><strong>Compare.</strong> Compare each flow with 139.2 L/min. Acceptance: <mark>±10 % (125.3 to 153.1 L/min</mark>; project value from the rack OEM specification).</li>
+<li><strong>Adjust.</strong> If a rack is outside tolerance, check the QD is fully engaged and the rack valve is open, then adjust the balancing valve if fitted.</li>
+<li><strong>Repeat with one CDU stopped.</strong> Stop one CDU and repeat the readings at the farthest and nearest racks.</li>
+</ol>
+<p><strong>Worked example:</strong> Zone Z2, 25 racks. Measured flows ranged from 131.8 L/min (rack Z2-R25, farthest) to 147.6 L/min (rack Z2-R01, nearest); the sum was 3,486 L/min against the CDU total of 3,480 L/min. All racks are inside the ±10 % band. Rack Z2-R18 first read 112 L/min; the cause was <mark>a QD not fully latched</mark>, and after re-engagement it read 139.0 L/min.</p>
+<h2 id="s19-13"><span class="n">19.13</span>CDU functional tests and failover</h2>
+<p>Figure <a class="figref" href="#F19-8">F19-8</a> shows the recorded TCS supply temperature of the CDU stop test in the worked example below, with the example acceptance limits.</p>
+<figure class="sheet" id="F19-8"><a href="../data/cx-handbook/figures/F19-8.svg" title="Open drawing F19-8 at full size"><img src="../data/cx-handbook/figures/F19-8.svg" alt="F19-8: CDU stop test in zone Z2: TCS supply temperature at the farthest rack" width="1000" height="900" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F19-8</span> — <b>CDU stop test in zone Z2: TCS supply temperature at the farthest rack</b>. Recorded points of the worked example joined by straight lines; the trend logged at 1 s gives the full curve. Limits are the example acceptance values of the 19.13 table: rise ≤ 2 K, back within ±0.5 K of 45 °C in 3 min.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Initiation</th>
+<th>Expected response</th>
+<th>Measured quantity</th>
+<th>Acceptance (example; project values from the controls sequence and OEM data)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Duty pump trip</td>
+<td>open pump drive breaker</td>
+<td>standby pump starts</td>
+<td>TCS flow, time</td>
+<td>flow back to ≥ 95 % in 15 s</td>
+</tr>
+<tr>
+<td>CDU stop</td>
+<td>stop CDU-03 of 4</td>
+<td>3 CDUs raise flow to 19.33 L/s each</td>
+<td>zone flow, TCS supply temperature</td>
+<td>zone flow ≥ 58.0 L/s in 30 s; TCS supply rise ≤ 2 K, back within ±0.5 K in 3 min</td>
+</tr>
+<tr>
+<td>CDU power feed loss</td>
+<td>open feed A</td>
+<td>CDU runs on feed B</td>
+<td>pump running</td>
+<td>no stop</td>
+</tr>
+<tr>
+<td>Controller failure</td>
+<td>power off controller</td>
+<td>pumps continue at last speed or default speed</td>
+<td>TCS flow</td>
+<td>flow kept per sequence</td>
+</tr>
+<tr>
+<td>FWS valve failure</td>
+<td>remove valve signal</td>
+<td>valve to fail position</td>
+<td>TCS supply temperature</td>
+<td>fail-open, no overheating</td>
+</tr>
+<tr>
+<td>FWS high temperature</td>
+<td>raise FWS to 38 °C (with the plant)</td>
+<td>CDU holds TCS supply</td>
+<td>TCS supply</td>
+<td>45 ±0.5 °C while ATD ≥ 5 K</td>
+</tr>
+<tr>
+<td>Low coolant level</td>
+<td>drain to low-level switch</td>
+<td>alarm, then pump stop at low-low</td>
+<td>alarm time</td>
+<td>alarm within 10 s</td>
+</tr>
+<tr>
+<td>Communication loss</td>
+<td>unplug BMS link</td>
+<td>CDU runs locally, BMS alarm</td>
+<td>alarm</td>
+<td>alarm within 60 s</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> CDU stop test in zone Z2 at 100 % liquid load (2,400 kW). Before the test each CDU delivered 14.5 L/s. At t = 0 CDU-03 was stopped. The other three reached 19.4 L/s each at t = 22 s. The TCS supply temperature at the farthest rack rose from 45.0 °C to a peak of 46.4 °C at t = 70 s. It was back to 45.3 °C at t = 160 s. The OEM rack limit was 45 °C nominal with an alarm at 48 °C (example). <mark>Rise 1.4 K ≤ 2 K</mark> and recovery inside 3 minutes: pass.</p>
+<h2 id="s19-14"><span class="n">19.14</span>Heat-load testing with load banks</h2>
+
+<figure class="sheet" id="F19-4"><a href="../data/cx-handbook/figures/F19-4.svg" title="Open drawing F19-4 at full size"><img src="../data/cx-handbook/figures/F19-4.svg" alt="F19-4: Heat-load test layout of hall B2-DH3: air load banks, liquid load units, power and loggers" width="1400" height="972" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F19-4</span> — <b>Heat-load test layout of hall B2-DH3: air load banks, liquid load units, power and loggers</b>. Each rack position carries one air load bank and one liquid load unit on the rack manifold quick disconnects. Power comes from the zone busway through the rack power distribution of chapter 16.</figcaption></figure>
+
+<figure class="sheet" id="F19-5"><a href="../data/cx-handbook/figures/F19-5.svg" title="Open drawing F19-5 at full size"><img src="../data/cx-handbook/figures/F19-5.svg" alt="F19-5: Hall B2-DH3 temperatures during the heat-load test steps 25, 50, 75 and 100 %" width="1400" height="920" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F19-5</span> — <b>Hall B2-DH3 temperatures during the heat-load test steps 25, 50, 75 and 100 %</b>. Each step is stable when every logger changes by no more than 0.5 K in 15 minutes. The TCS return rises 2.5 K per step at constant flow, while the TCS supply stays within 0.2 K of 45 °C.</figcaption></figure>
+<h3 id="s19-14-1"><span class="n">19.14.1</span>What the heat-load test proves</h3>
+<p>The heat-load test puts the design heat into the hall before the servers arrive. It proves that the fan walls, the CDUs, the TCS and the plant of chapter 18 remove the heat at design conditions. It also proves that the rack inlet air and the TCS supply stay inside their limits. It also gives the steady-state data for the capacity tests in 19.7 and 19.13, and the starting state for the integrated systems test (IST) in chapter 28.</p>
+<p>Published IST practice starts at <mark>no more than 10 % load</mark> and lets the facility stabilise before each step. Load banks of 100 to 500 kW are common in Europe and North America. Rack-mounted load banks are used where the airflow at each rack position must match the IT design.</p>
+<h3 id="s19-14-2"><span class="n">19.14.2</span>Load equipment for an MSC-1 hall</h3>
+<p>Figure <a class="figref" href="#F19-4">F19-4</a> shows the layout.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Equipment</th>
+<th>Quantity per hall</th>
+<th>Setting</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rack-mounted air load bank, 25 kW with integral fans</td>
+<td>100, one per rack position</td>
+<td>24 kW, airflow about 1.69 m³/s per rack (OEM fan setting)</td>
+<td>air-side heat 2.4 MW</td>
+</tr>
+<tr>
+<td>Liquid load unit (electric heater skid on TCS QDs), 100 kW</td>
+<td>100, one per rack position</td>
+<td>96 kW, 139.2 L/min</td>
+<td>liquid heat 9.6 MW</td>
+</tr>
+<tr>
+<td>Power analyser, class A</td>
+<td>4 (one per zone busway)</td>
+<td>logging at 1 s</td>
+<td>electrical input</td>
+</tr>
+<tr>
+<td>Temperature loggers, type T thermocouples or RTDs</td>
+<td>about 450 channels</td>
+<td>10 s logging</td>
+<td>inlet, hot aisle, TCS, FWS, CHW</td>
+</tr>
+<tr>
+<td>Clamp-on ultrasonic flow meters</td>
+<td>4</td>
+<td>TCS zone headers</td>
+<td>energy balance</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> In the MSC-1 worked example a hall takes 12.0 MW of electrical input: 9.6 MW into the liquid load units and 2.4 MW into the air load banks. Each zone busway carries 3.0 MW. The load is applied from the rack power distribution of chapter 16, so the test also proves the busway and rack feeds at full load. A 120 kW position at 415 V and power factor 1.0 draws 120,000 / (√3 × 415) = 167 A per phase.</p>
+<h3 id="s19-14-3"><span class="n">19.14.3</span>Sensor layout</h3>
+<ol>
+<li><strong>Rack inlet air.</strong> Three sensors (low, middle, top) on the inlet face of every rack position: 300 channels per hall.</li>
+<li><strong>Hot aisle.</strong> One sensor at 2 m height for every 5 racks: 20 channels.</li>
+<li><strong>TCS.</strong> Supply and return at every CDU (32 channels) and at the farthest and nearest rack of every row (32 channels).</li>
+<li><strong>FWS.</strong> Supply and return at every CDU (32 channels).</li>
+<li><strong>CHW.</strong> Supply and return at every fan wall (26 channels).</li>
+<li><strong>Hall humidity and dew point.</strong> Four sensors.</li>
+<li><strong>Accuracy.</strong> Type T thermocouples to special limits (±0.5 °C or 0.4 %, vendor reproduction; confirm against the tolerance table of ASTM E230/E230M-23a) or class A RTDs per IEC 60751. Check every sensor in an ice-point bath or against a reference thermometer before installation; reject sensors more than ±0.3 K from the reference (project value).</li>
+<li><strong>Time base.</strong> Synchronise all loggers to the same time source within 1 s, so that trends from the loggers, the BMS and the electrical power monitoring system (EPMS) can be overlaid (chapter 24).</li>
+</ol>
+<h3 id="s19-14-4"><span class="n">19.14.4</span>Heat-load test procedure</h3>
+<p><strong>Trigger:</strong> L4 functional tests of fan walls (19.7), CDUs (19.13) and the chapter 18 plant are signed; the rack power distribution is energised; load banks are installed and checked.</p>
+<p><strong>Owner:</strong> Commissioning manager runs the test; load bank supplier operates the load; mechanical and electrical contractors stand by; BMS and EPMS operators record alarms.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Hold the pre-test briefing (30 minutes).</strong> Brief roles, the step plan, the abort criteria and the emergency stop of the load banks.</li>
+<li><strong>Start the loggers (30 minutes before load).</strong> Record baseline values with cooling running and load off.</li>
+<li><strong>Apply 25 % load (3.0 MW).</strong> Apply in groups of zones. Hold until stable and for at least 30 minutes.</li>
+<li><strong>Apply 50 % load (6.0 MW).</strong> Hold as above.</li>
+<li><strong>Apply 75 % load (9.0 MW).</strong> Hold as above.</li>
+<li><strong>Apply 100 % load (12.0 MW).</strong> Hold at stable conditions for <mark>4 hours</mark> (project value from the project commissioning (Cx) specification; many specifications ask for 12 to 24 hours).</li>
+<li><strong>Run the capacity readings.</strong> During the 100 % hold, take the fan wall capacity readings (19.7.2) and the energy balance (19.14.6).</li>
+<li><strong>Run the failure tests.</strong> If the script includes them, run CDU stop, fan wall stop and pump trip tests at 100 % load (19.13; integrated scenarios in chapter 28).</li>
+<li><strong>Remove the load.</strong> Step down in 25 % steps, at least 10 minutes apart, to avoid a large step on the plant.</li>
+<li><strong>Download the data.</strong> Download logger, BMS and EPMS data the same day and issue the preliminary result within 2 working days.</li>
+</ol>
+<p><strong>Acceptance:</strong> A step is stable when every logger channel changes by no more than <mark>0.5 K over 15 minutes</mark>. The load must also be within ±2 % of the step value (project value from the project Cx specification).</p>
+<h3 id="s19-14-5"><span class="n">19.14.5</span>Acceptance values</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Acceptance</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rack inlet air, every sensor</td>
+<td>18 to 27 °C at every step</td>
+<td>ASHRAE TC 9.9 recommended range</td>
+</tr>
+<tr>
+<td>Rack inlet change during failure tests</td>
+<td>≤ 5 K in any 15 minutes, ≤ 20 K in 1 hour</td>
+<td>ASHRAE TC 9.9 note f</td>
+</tr>
+<tr>
+<td>Hall dew point</td>
+<td>−9 to 15 °C</td>
+<td>ASHRAE TC 9.9</td>
+</tr>
+<tr>
+<td>TCS supply at farthest rack</td>
+<td>45 ±1 °C steady; OEM alarm limit not reached in transients</td>
+<td>design basis and server OEM</td>
+</tr>
+<tr>
+<td>TCS return</td>
+<td>≤ 55 °C at 100 %</td>
+<td>design basis</td>
+</tr>
+<tr>
+<td>Containment differential pressure</td>
+<td>set point ±1 Pa</td>
+<td>19.6.4</td>
+</tr>
+<tr>
+<td>Energy balance, liquid side</td>
+<td>heat removed <mark>within ±5 % of electrical input</mark></td>
+<td>project value</td>
+</tr>
+<tr>
+<td>Alarms</td>
+<td>no unplanned alarms; planned alarms logged</td>
+<td>BMS alarm list</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-14-6"><span class="n">19.14.6</span>Energy balance</h3>
+<p><strong>Worked example:</strong> Zone Z2 at 100 % load. The power analyser on the zone liquid load units reads 2,400 kW. The clamp-on meter on the zone TCS header reads 58.1 L/s, and the mean TCS ΔT is 9.92 K. Heat removed = 4.138 × 58.1 × 9.92 = 2,385 kW, which is −0.6 % of the input: pass. On the air side, the CHW heat removed by the 13 fan walls is 2,590 kW. The heat input is 2,400 kW of air load banks plus 205 kW of fan power that also ends up in the air, 2,605 kW in total, so the balance is −0.6 %. Forgetting the fan power would show an <mark>apparent +7.9 % error</mark>.</p>
+<h3 id="s19-14-7"><span class="n">19.14.7</span>Trend record</h3>
+<p>Figure <a class="figref" href="#F19-5">F19-5</a> shows the hall trends during the load steps.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Load (MW)</th>
+<th>Time stable (h:min)</th>
+<th>Max rack inlet (°C)</th>
+<th>Mean hot aisle (°C)</th>
+<th>TCS supply (°C)</th>
+<th>TCS return (°C)</th>
+<th>FWS supply (°C)</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>25 %</td>
+<td>3.0</td>
+<td>0:55</td>
+<td>23.4</td>
+<td>30.5</td>
+<td>45.0</td>
+<td>47.5</td>
+<td>35.0</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>50 %</td>
+<td>6.0</td>
+<td>0:50</td>
+<td>23.8</td>
+<td>33.0</td>
+<td>45.1</td>
+<td>50.0</td>
+<td>35.0</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>75 %</td>
+<td>9.0</td>
+<td>0:55</td>
+<td>24.3</td>
+<td>34.6</td>
+<td>45.1</td>
+<td>52.5</td>
+<td>35.1</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>100 %</td>
+<td>12.0</td>
+<td>1:05, then 4 h hold</td>
+<td>24.9</td>
+<td>35.9</td>
+<td>45.2</td>
+<td>55.0</td>
+<td>35.2</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-14-8"><span class="n">19.14.8</span>Heat-load test record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Test number</td>
+<td>text</td>
+<td>HLT-B2-DH3-01</td>
+</tr>
+<tr>
+<td>Script revision</td>
+<td>text</td>
+<td>rev C, approved 2026-11-25</td>
+</tr>
+<tr>
+<td>Load step and set value</td>
+<td>%, MW</td>
+<td>100 %, 12.0</td>
+</tr>
+<tr>
+<td>Measured electrical input</td>
+<td>MW</td>
+<td>12.02</td>
+</tr>
+<tr>
+<td>Step start and stable times</td>
+<td>time</td>
+<td>13:30, 14:35</td>
+</tr>
+<tr>
+<td>Max rack inlet and its location</td>
+<td>°C, text</td>
+<td>24.9, Z4-R25 top</td>
+</tr>
+<tr>
+<td>Energy balance per zone</td>
+<td>%</td>
+<td>−0.6, −1.1, +0.4, −0.9</td>
+</tr>
+<tr>
+<td>Alarms raised</td>
+<td>list</td>
+<td>planned: 3; unplanned: 0</td>
+</tr>
+<tr>
+<td>Abort criteria reached</td>
+<td>yes / no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Deviations and NCR numbers</td>
+<td>text</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>name, date</td>
+<td>commissioning manager, CxA, contractor, owner operations</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s19-14-9"><span class="n">19.14.9</span>Abort criteria</h3>
+<ol>
+<li><strong>Rack inlet high.</strong> Any rack inlet sensor reaches <mark>32 °C (A1 allowable maximum)</mark> for 2 minutes: remove load in that zone.</li>
+<li><strong>TCS supply high.</strong> TCS supply at any rack reaches the server OEM alarm value: remove liquid load in that zone.</li>
+<li><strong>Leak.</strong> Any leak alarm that is confirmed by sight: stop the liquid load units of that row and isolate the row.</li>
+<li><strong>Electrical.</strong> Any busway or breaker temperature above the limit of chapter 16, or any protection trip: stop the test at that zone.</li>
+<li><strong>Load bank fault.</strong> A load bank with a fan failure alarm: switch off that load bank.</li>
+</ol>
+<h2 id="s19-15"><span class="n">19.15</span>Energy metrics: ASHRAE 90.4 MLC and fan and pump power</h2>
+<h3 id="s19-15-1"><span class="n">19.15.1</span>Mechanical load component</h3>
+<p>ASHRAE Standard 90.4 sets maximum values of the mechanical load component (MLC) for each climate zone. The design MLC is the sum of the design cooling power, pump power, heat rejection fan power and air handler fan power, divided by the design ITE power. The annualised MLC is calculated at 25, 50, 75 and 100 % ITE load. The EoR runs the compliance calculation. Commissioning gives the measured powers at the same load points from the heat-load test.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Measured at 100 % (example, one hall)</th>
+<th>Instrument</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fan walls (13 units)</td>
+<td>205 kW (15.8 kW per unit)</td>
+<td>fan controller kW, checked with power analyser on 2 units</td>
+</tr>
+<tr>
+<td>CDU pumps (16 units)</td>
+<td>96 kW</td>
+<td>CDU kW readings, EPMS</td>
+</tr>
+<tr>
+<td>Hall share of FWS pumps</td>
+<td>120 kW</td>
+<td>EPMS</td>
+</tr>
+<tr>
+<td>Hall share of dry cooler fans</td>
+<td>260 kW</td>
+<td>EPMS</td>
+</tr>
+<tr>
+<td>Hall share of the air-hall CHW plant chillers (separate from the chapter 18 trim chillers)</td>
+<td>433 kW</td>
+<td>EPMS</td>
+</tr>
+<tr>
+<td>Total mechanical</td>
+<td>1,114 kW</td>
+<td>sum</td>
+</tr>
+<tr>
+<td>ITE (load bank) power</td>
+<td>12,000 kW</td>
+<td>power analysers</td>
+</tr>
+<tr>
+<td>MLC at 100 %</td>
+<td>0.093</td>
+<td>1,114 / 12,000</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> The measured MLC of 0.093 at 100 % load is reported to the designer with the 25, 50 and 75 % values from the same test. The designer compares the annualised value with the 90.4 limit for the site climate zone. Jakarta is in ASHRAE climate zone 0A ( confirm the 0A subzone in the climate data of ASHRAE Standard 169-2013 or later and the limit in ANSI/ASHRAE 90.4-2025; the 2022 edition is the one many adopted codes still reference).</p>
+<h3 id="s19-15-2"><span class="n">19.15.2</span>Fan and pump power checks</h3>
+<ol>
+<li><strong>Fan power at design airflow.</strong> Record kW per fan wall at design airflow. A unit more than 10 % above the others at the same flow points to a dirty filter, a blocked inlet or wrong fan speed control.</li>
+<li><strong>Pump power.</strong> Record CDU pump kW at design flow and compare with the OEM curve. A high value at design flow points to a partly closed valve or a dirty filter.</li>
+<li><strong>Specific fan power.</strong> Fan kW per m³/s gives a quick check between halls: 205 / 168.5 = <mark>1.22 kW per m³/s</mark> in the example.</li>
+</ol>
+<h2 id="s19-16"><span class="n">19.16</span>Common errors and how to detect them before the witness test</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Symptom at the witness test</th>
+<th>Detection before the test</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rack inlet sensors placed mid-aisle</td>
+<td>inlet values look low, hot spots missed</td>
+<td>photo of each sensor position, check against the layout</td>
+<td>move to 50 mm in front of the inlet face</td>
+</tr>
+<tr>
+<td>Blanking panels missing</td>
+<td>hot recirculation at top of racks</td>
+<td>walk-down with smoke pencil</td>
+<td>fit blanking before the test</td>
+</tr>
+<tr>
+<td>Load bank airflow not matched to IT airflow</td>
+<td>containment pressure wrong, fan walls run at wrong speed</td>
+<td>check load bank fan setting against design m³/s per rack</td>
+<td>set load bank fans to design</td>
+</tr>
+<tr>
+<td>TCS flow per rack low</td>
+<td>high TCS return at one rack</td>
+<td>flow per rack test (19.12.2)</td>
+<td>check QD engagement and valves</td>
+</tr>
+<tr>
+<td>Air in the TCS</td>
+<td>flow fluctuates, pump noise</td>
+<td>vent log, pressure steady for 2 hours</td>
+<td>vent again at low speed</td>
+</tr>
+<tr>
+<td>Filter element of wrong rating</td>
+<td>high ΔP or particles at cold plates</td>
+<td>check element label against the submittal</td>
+<td>replace</td>
+</tr>
+<tr>
+<td>Logger clocks not synchronised</td>
+<td>trends cannot be overlaid</td>
+<td>compare logger time to time server before the test</td>
+<td>sync all loggers</td>
+</tr>
+<tr>
+<td>Fan power left out of the air energy balance</td>
+<td>+8 % apparent error</td>
+<td>include fan kW in the calculation</td>
+<td>correct the calculation</td>
+</tr>
+<tr>
+<td>Pressure test result read without temperature</td>
+<td>false fail or false pass</td>
+<td>record temperature at start and end</td>
+<td>repeat at stable temperature</td>
+</tr>
+<tr>
+<td>Coolant sample not taken at fill</td>
+<td>no baseline for later corrosion trend</td>
+<td>sample plan in the fill procedure</td>
+<td>take the sample at fill and at 30 days</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s19-17"><span class="n">19.17</span>Checklist for site use</h2>
+<ol>
+<li><strong>Thermal limits.</strong> The heat-load and IST scripts state the rack inlet acceptance (18 to 27 °C) and the transient limit (5 K in 15 minutes, 20 K in 1 hour). They also state the server OEM TCS limit.</li>
+<li><strong>Fan wall L3.</strong> Nameplate, fans, filters, coil, valve, sensors, power and BMS points are checked and recorded for every unit.</li>
+<li><strong>Fan wall start-up.</strong> OEM start-up sheets are signed and attached; firmware versions are recorded.</li>
+<li><strong>Airflow.</strong> Each fan wall airflow is measured by k-factor and one unit per hall by velocity grid; deviations are inside the specification band.</li>
+<li><strong>TAB report.</strong> The certified TAB report is issued and the CxA spot-check of 10 % of readings is inside 5 %.</li>
+<li><strong>Containment.</strong> Smoke survey done on every aisle; pressurisation test done on one aisle per type; leakage below the project limit.</li>
+<li><strong>Pressure control.</strong> Containment differential pressure is <mark>held within ±1 Pa of set point</mark> for 30 minutes.</li>
+<li><strong>Fan wall FPT.</strong> Capacity, set-point change, fan failure, feed loss, valve failure and alarm tests are recorded.</li>
+<li><strong>TCS pressure test.</strong> Gas tightness check and hydrostatic test at 1.3 to 1.5 × working pressure are recorded with pressure and temperature.</li>
+<li><strong>Cleaning.</strong> Recirculation, chemical cleaning (≥ 4 hours, filter ΔP flat for 1 hour) and drain are recorded with filter ΔP and turbidity.</li>
+<li><strong>Flushing.</strong> Flushing velocity per BG 29 is reached in every valve group; outlet conductivity ≤ 60 µS/cm and turbidity &lt; 5 NTU.</li>
+<li><strong>No standing water.</strong> No fill stood without circulation or treatment for more than 24 hours.</li>
+<li><strong>Coolant.</strong> Batch certificate checked against OCP limits; baseline sample taken at fill.</li>
+<li><strong>CDU fill and vent.</strong> Fill log, vessel pre-charge and vent log are signed.</li>
+<li><strong>CDU instruments.</strong> Flow, temperature and pressure readings agree with reference instruments within the record tolerances.</li>
+<li><strong>Leak detection.</strong> Every rope sensor wetted at three points and every spot sensor tested; alarms and actions match the cause-and-effect matrix.</li>
+<li><strong>Flow per rack.</strong> Every rack inside ±10 % of 139.2 L/min with four CDUs running, and the far rack checked with one CDU stopped.</li>
+<li><strong>CDU FPT.</strong> Pump trip, CDU stop, feed loss, controller failure, valve failure and low-level tests are recorded.</li>
+<li><strong>Heat-load test.</strong> Steps 25, 50, 75 and 100 % held to the stabilisation criterion; 100 % held for the specified hours; energy balance within ±5 %.</li>
+<li><strong>Energy data.</strong> Fan, pump and plant powers at each load step are sent to the designer for the 90.4 check.</li>
+<li><strong>Records filed.</strong> All records are uploaded to the common data environment (chapter 04) with the test numbers used in this chapter.</li>
+</ol>
+<h2 id="s19-18"><span class="n">19.18</span>Sources</h2>
+<ol>
+<li>Thermal Guidelines for Data Processing Environments, 5th edition, reference card (Tables 2.1, 2.2 and 3.1). ASHRAE TC 9.9, 2021 (card 2024). <a href="https://www.ashrae.org/file%20library/technical%20resources/bookstore/supplemental%20files/therm-gdlns-5th-r-e-refcard.pdf" rel="noopener">https://www.ashrae.org/file%20library/technical%20resources/bookstore/supplemental%20files/therm-gdlns-5th-r-e-refcard.pdf</a></li>
+<li>Thermal Guidelines for Data Processing Environments, 5th edition. ASHRAE, 2021. <a href="https://www.ashrae.org/technical-resources/bookstore/datacom-series" rel="noopener">https://www.ashrae.org/technical-resources/bookstore/datacom-series</a></li>
+<li>Guidelines for pre-commission preparation of technology cooling system (TCS) row manifolds in liquid cooled data centers. Open Compute Project, 27 January 2025. <a href="https://www.opencompute.org/documents/ocp-document-submission-guidelines-for-pre-commission-preparation-of-technology-cooling-system-tcs-row-manifolds-revq-pdf-1/" rel="noopener">https://www.opencompute.org/documents/ocp-document-submission-guidelines-for-pre-commission-preparation-of-technology-cooling-system-tcs-row-manifolds-revq-pdf-1/</a></li>
+<li>Base specification for single phase water-based cold plate coolants, version 1.3. Open Compute Project, 2026. <a href="https://www.opencompute.org/documents/base-specification-for-single-phase-water-based-cold-plate-coolant-v1-3-final-pdf/" rel="noopener">https://www.opencompute.org/documents/base-specification-for-single-phase-water-based-cold-plate-coolant-v1-3-final-pdf/</a></li>
+<li>Base specification for single-phase propylene glycol-based cold plate coolant (PG25), version 1.0. Open Compute Project. <a href="https://www.opencompute.org/documents/ocp-base-specification-pg25-v1-0-0-final-pdf/" rel="noopener">https://www.opencompute.org/documents/ocp-base-specification-pg25-v1-0-0-final-pdf/</a></li>
+<li>Modular technology cooling system for cloud scale. Open Compute Project, 25 August 2025. <a href="https://www.opencompute.org/documents/ocp-modular-tcs-rev-1-final-2025-pdf" rel="noopener">https://www.opencompute.org/documents/ocp-modular-tcs-rev-1-final-2025-pdf</a></li>
+<li>Liquid to liquid CDU test methodology and performance rating, revision 1.0. Open Compute Project, 2024. <a href="https://www.opencompute.org/documents/ocp-wp-l-lcdu-test-methodology-performance-rating-r1-pdf/" rel="noopener">https://www.opencompute.org/documents/ocp-wp-l-lcdu-test-methodology-performance-rating-r1-pdf/</a></li>
+<li>BG 29 Pre-commission cleaning of pipework systems, amended 6th edition. BSRIA, 2021 (values as reproduced in source 3). <a href="https://www.bsria.com/uk/product/" rel="noopener">https://www.bsria.com/uk/product/</a></li>
+<li>BG 49/2024 Commissioning air systems. BSRIA, 2024. <a href="https://www.designingbuildings.co.uk/wiki/Commissioning%20Air%20Systems%20BG%2049/2024" rel="noopener">https://www.designingbuildings.co.uk/wiki/Commissioning%20Air%20Systems%20BG%2049/2024</a></li>
+<li>Commissioning Code A: Air distribution systems. CIBSE, 2024. <a href="https://cibse.org/knowledge-research/knowledge-portal/cca-commissioning-code-a-air-distribution-systems-2024-pdf/" rel="noopener">https://cibse.org/knowledge-research/knowledge-portal/cca-commissioning-code-a-air-distribution-systems-2024-pdf/</a></li>
+<li>Procedural Standard for Testing, Adjusting and Balancing of Environmental Systems, 9th edition. NEBB, 2019. <a href="https://www.nebb.org/?p=11288" rel="noopener">https://www.nebb.org/?p=11288</a></li>
+<li>National Standards for Total System Balance, 7th edition. AABC (summary presentation). <a href="https://www.commissioning.org/wp-content/downloads/2016/Richardson_AABCNationalStandards.pdf" rel="noopener">https://www.commissioning.org/wp-content/downloads/2016/Richardson_AABCNationalStandards.pdf</a></li>
+<li>Section 23 05 93 Testing, adjusting and balancing for HVAC (tolerance example). Johns Hopkins University facilities, 2024. <a href="https://jhfre.jhu.edu/wp-content/uploads/2024/12/SECTION-230593-Testing-Adjusting-and-Balancing-for-HVAC.pdf" rel="noopener">https://jhfre.jhu.edu/wp-content/uploads/2024/12/SECTION-230593-Testing-Adjusting-and-Balancing-for-HVAC.pdf</a></li>
+<li>ANSI/ASHRAE Standard 111-2008, Measurement, testing, adjusting, and balancing of building HVAC systems. ASHRAE, 2008. <a href="https://www.ashrae.org/technical-resources/standards-and-guidelines" rel="noopener">https://www.ashrae.org/technical-resources/standards-and-guidelines</a></li>
+<li>Duct traversal airflow measurement. Fluke Corporation. <a href="https://www.fluke.com/en-us/learn/blog/hvac/duct-traversal-airflow-measurement" rel="noopener">https://www.fluke.com/en-us/learn/blog/hvac/duct-traversal-airflow-measurement</a></li>
+<li>ISO 3966, Measurement of fluid flow in closed conduits: velocity area method using Pitot static tubes. ISO. <a href="https://www.iso.org/standard/41681.html" rel="noopener">https://www.iso.org/standard/41681.html</a></li>
+<li>AHRI Standard 1360, Performance rating of computer and data processing room air conditioners. AHRI. <a href="https://www.ahrinet.org/" rel="noopener">https://www.ahrinet.org/</a></li>
+<li>ASHRAE's new energy standard for data centers (ASHRAE 90.4 MLC). Consulting-Specifying Engineer. <a href="https://www.csemag.com/ashraes-new-energy-standard-for-data-centers/" rel="noopener">https://www.csemag.com/ashraes-new-energy-standard-for-data-centers/</a></li>
+<li>ASHRAE 90.4 data center standards (annualised MLC at 25, 50, 75, 100 %). SimScale. <a href="https://www.simscale.com/blog/ashrae-90-4-data-center-standards/" rel="noopener">https://www.simscale.com/blog/ashrae-90-4-data-center-standards/</a></li>
+<li>Measuring the different levels of data center air containment. The Green Grid. <a href="https://www.thegreengrid.org/en/node/2425" rel="noopener">https://www.thegreengrid.org/en/node/2425</a></li>
+<li>Tatchell-Evans et al., The interaction between data centre airflow and containment leakage. University of Leeds, Applied Energy, 2017. <a href="https://eprints.whiterose.ac.uk/101005/" rel="noopener">https://eprints.whiterose.ac.uk/101005/</a></li>
+<li>IST for a new data centre, case study (load-step practice). Aggreko. <a href="https://www.aggreko.com/en-us/case-studies/data-centres" rel="noopener">https://www.aggreko.com/en-us/case-studies/data-centres</a></li>
+<li>Structured testing of data centres. Modern Building Services. <a href="https://modbs.co.uk/news/fullstory.php/aid/15659/Structured_testing_of_data_centres.html" rel="noopener">https://modbs.co.uk/news/fullstory.php/aid/15659/Structured_testing_of_data_centres.html</a></li>
+<li>Air flow measurement methods for ducts and diffusers (instrument accuracy, unverified secondary). Industrial Monitor Direct. <a href="https://industrialmonitordirect.com/blogs/knowledgebase/air-flow-measurement-methods-for-ducts-and-diffusers" rel="noopener">https://industrialmonitordirect.com/blogs/knowledgebase/air-flow-measurement-methods-for-ducts-and-diffusers</a></li>
+<li>ASME B31.3 Process piping and ASME B31.9 Building services piping. ASME. <a href="https://www.asme.org/codes-standards" rel="noopener">https://www.asme.org/codes-standards</a></li>
+<li>IEC 60751 Industrial platinum resistance thermometers and platinum temperature sensors. IEC. <a href="https://webstore.iec.ch/" rel="noopener">https://webstore.iec.ch/</a></li>
+<li>ISO 8573-1 Compressed air: contaminants and purity classes. ISO. <a href="https://www.iso.org/standard/46418.html" rel="noopener">https://www.iso.org/standard/46418.html</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="18-chw-plant-heat-rejection-flushing.html"><span>Previous · 18</span><span class="t">Chilled-water and heat-rejection plant</span></a><a class="next" href="20-fire-life-safety-cause-effect.html"><span>Next · 20</span><span class="t">Fire detection, suppression and life-safety interfaces</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

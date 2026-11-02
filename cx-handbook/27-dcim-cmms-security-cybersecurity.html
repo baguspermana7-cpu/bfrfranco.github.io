@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>27 DCIM, CMMS, security and access control, and OT cybersecurity | Cx Field Manual R01</title>
+<meta name="description" content="This chapter covers four systems that sit on top of the electrical, mechanical and controls systems of a data-centre campus.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/27-dcim-cmms-security-cybersecurity.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/27-dcim-cmms-security-cybersecurity.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/27-dcim-cmms-security-cybersecurity.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/27-dcim-cmms-security-cybersecurity.html">
+<meta property="og:title" content="27 DCIM, CMMS, security and access control, and OT cybersecurity | Cx Field Manual R01">
+<meta property="og:description" content="This chapter covers four systems that sit on top of the electrical, mechanical and controls systems of a data-centre campus.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="27 DCIM, CMMS, security and access control, and OT cybersecurity | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter covers four systems that sit on top of the electrical, mechanical and controls systems of a data-centre campus.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"27 DCIM, CMMS, security and access control, and OT cybersecurity","name":"DCIM, CMMS, security and access control, and OT cybersecurity","description":"This chapter covers four systems that sit on top of the electrical, mechanical and controls systems of a data-centre campus.","url":"https://resistancezero.com/cx-handbook/27-dcim-cmms-security-cybersecurity.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/27-dcim-cmms-security-cybersecurity.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":12318,"position":27,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"27 DCIM, CMMS, security and access control, and OT cybersecurity","item":"https://resistancezero.com/cx-handbook/27-dcim-cmms-security-cybersecurity.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part E · Controls, monitoring, integration and networks</p>
+    <h1><span class="num">27</span>DCIM, CMMS, security and access control, and OT cybersecurity</h1>
+    <p class="lede">This chapter covers four systems that sit on top of the electrical, mechanical and controls systems of a data-centre campus.</p>
+    <p class="basis">Chapter 27 of 32 · 21 sections · 7 figures · 12,318 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 27</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 27</summary>
+<ol><li><a href="#s27-0"><span class="n">27.0</span>Scope of this chapter</a></li><li><a href="#s27-1"><span class="n">27.1</span>DCIM: purpose, functions and data sources</a><ol><li><a href="#s27-1-1"><span class="n">27.1.1</span>What DCIM is</a></li><li><a href="#s27-1-2"><span class="n">27.1.2</span>DCIM functions</a></li><li><a href="#s27-1-3"><span class="n">27.1.3</span>Data sources and protocols</a></li><li><a href="#s27-1-4"><span class="n">27.1.4</span>Where DCIM sits in the commissioning programme</a></li></ol></li><li><a href="#s27-2"><span class="n">27.2</span>DCIM data model</a><ol><li><a href="#s27-2-1"><span class="n">27.2.1</span>Objects and relations</a></li><li><a href="#s27-2-2"><span class="n">27.2.2</span>Capacity fields</a></li><li><a href="#s27-2-3"><span class="n">27.2.3</span>Naming convention rules</a></li><li><a href="#s27-2-4"><span class="n">27.2.4</span>Common errors in the DCIM data model</a></li></ol></li><li><a href="#s27-3"><span class="n">27.3</span>DCIM commissioning procedure</a><ol><li><a href="#s27-3-1"><span class="n">27.3.1</span>Prerequisites</a></li><li><a href="#s27-3-2"><span class="n">27.3.2</span>Point-to-point verification steps</a></li><li><a href="#s27-3-3"><span class="n">27.3.3</span>DCIM point-to-point log fields</a></li></ol></li><li><a href="#s27-4"><span class="n">27.4</span>CMMS asset register and asset hierarchy</a><ol><li><a href="#s27-4-1"><span class="n">27.4.1</span>What a CMMS is</a></li><li><a href="#s27-4-2"><span class="n">27.4.2</span>The ISO 14224 hierarchy</a></li><li><a href="#s27-4-3"><span class="n">27.4.3</span>Asset register fields</a></li><li><a href="#s27-4-4"><span class="n">27.4.4</span>Asset data rules</a></li><li><a href="#s27-4-5"><span class="n">27.4.5</span>Asset counts for one MSC-1 building</a></li></ol></li><li><a href="#s27-5"><span class="n">27.5</span>Asset data handover flow and PM schedules</a><ol><li><a href="#s27-5-1"><span class="n">27.5.1</span>The handover flow</a></li><li><a href="#s27-5-2"><span class="n">27.5.2</span>Asset data check procedure</a></li><li><a href="#s27-5-3"><span class="n">27.5.3</span>PM schedule fields</a></li><li><a href="#s27-5-4"><span class="n">27.5.4</span>PM schedule rules</a></li></ol></li><li><a href="#s27-6"><span class="n">27.6</span>Access control system</a><ol><li><a href="#s27-6-1"><span class="n">27.6.1</span>What the access control system does</a></li><li><a href="#s27-6-2"><span class="n">27.6.2</span>Security layers on a data-centre campus</a></li><li><a href="#s27-6-3"><span class="n">27.6.3</span>Fail-safe and fail-secure locks</a></li><li><a href="#s27-6-4"><span class="n">27.6.4</span>Interlocked entry (mantrap)</a></li><li><a href="#s27-6-5"><span class="n">27.6.5</span>Access control data fields</a></li></ol></li><li><a href="#s27-7"><span class="n">27.7</span>CCTV and intrusion detection</a><ol><li><a href="#s27-7-1"><span class="n">27.7.1</span>CCTV system parts</a></li><li><a href="#s27-7-2"><span class="n">27.7.2</span>Storage calculation</a></li><li><a href="#s27-7-3"><span class="n">27.7.3</span>Intrusion detection</a></li></ol></li><li><a href="#s27-8"><span class="n">27.8</span>Physical security integration tests</a><ol><li><a href="#s27-8-1"><span class="n">27.8.1</span>Interfaces of the access control system</a></li><li><a href="#s27-8-2"><span class="n">27.8.2</span>Door test procedure</a></li><li><a href="#s27-8-3"><span class="n">27.8.3</span>Common errors found in door tests</a></li></ol></li><li><a href="#s27-9"><span class="n">27.9</span>OT cybersecurity: IEC 62443 and NIST SP 800-82</a><ol><li><a href="#s27-9-1"><span class="n">27.9.1</span>Why OT cybersecurity is part of commissioning</a></li><li><a href="#s27-9-2"><span class="n">27.9.2</span>The IEC 62443 series</a></li><li><a href="#s27-9-3"><span class="n">27.9.3</span>The seven foundational requirements</a></li><li><a href="#s27-9-4"><span class="n">27.9.4</span>Security levels</a></li><li><a href="#s27-9-5"><span class="n">27.9.5</span>NIST SP 800-82 Rev. 3</a></li></ol></li><li><a href="#s27-10"><span class="n">27.10</span>Zones, conduits and security levels</a><ol><li><a href="#s27-10-1"><span class="n">27.10.1</span>Definitions</a></li><li><a href="#s27-10-2"><span class="n">27.10.2</span>Risk assessment steps of IEC 62443-3-2</a></li><li><a href="#s27-10-3"><span class="n">27.10.3</span>Zone model of an MSC-1 building</a></li><li><a href="#s27-10-4"><span class="n">27.10.4</span>Conduit table</a></li><li><a href="#s27-10-5"><span class="n">27.10.5</span>Conduit verification test</a></li></ol></li><li><a href="#s27-11"><span class="n">27.11</span>Hardening checklist</a><ol><li><a href="#s27-11-1"><span class="n">27.11.1</span>What hardening means</a></li><li><a href="#s27-11-2"><span class="n">27.11.2</span>Hardening items per device type</a></li><li><a href="#s27-11-3"><span class="n">27.11.3</span>Hardening check procedure</a></li><li><a href="#s27-11-4"><span class="n">27.11.4</span>Hardening check record fields</a></li></ol></li><li><a href="#s27-12"><span class="n">27.12</span>Accounts and privileged access</a><ol><li><a href="#s27-12-1"><span class="n">27.12.1</span>Account register</a></li><li><a href="#s27-12-2"><span class="n">27.12.2</span>Account rules</a></li></ol></li><li><a href="#s27-13"><span class="n">27.13</span>Patching and vulnerability management</a><ol><li><a href="#s27-13-1"><span class="n">27.13.1</span>Patch process during construction and handover</a></li><li><a href="#s27-13-2"><span class="n">27.13.2</span>Vulnerability register fields</a></li></ol></li><li><a href="#s27-14"><span class="n">27.14</span>Backups and restore tests</a><ol><li><a href="#s27-14-1"><span class="n">27.14.1</span>What is backed up</a></li><li><a href="#s27-14-2"><span class="n">27.14.2</span>Restore test procedure</a></li></ol></li><li><a href="#s27-15"><span class="n">27.15</span>Remote access</a></li><li><a href="#s27-16"><span class="n">27.16</span>Protocol security: BACnet, Modbus and SNMP</a><ol><li><a href="#s27-16-1"><span class="n">27.16.1</span>Protocol risks and controls</a></li><li><a href="#s27-16-2"><span class="n">27.16.2</span>BACnet Secure Connect</a></li></ol></li><li><a href="#s27-17"><span class="n">27.17</span>Cybersecurity acceptance tests and records</a><ol><li><a href="#s27-17-1"><span class="n">27.17.1</span>Acceptance test list</a></li><li><a href="#s27-17-2"><span class="n">27.17.2</span>Blocking rules</a></li></ol></li><li><a href="#s27-18"><span class="n">27.18</span>KPIs for DCIM, CMMS, security and OT cybersecurity</a></li><li><a href="#s27-19"><span class="n">27.19</span>Checklist for site use</a></li><li><a href="#s27-20"><span class="n">27.20</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="26-ot-network-fibre-copper.html"><span>Previous</span>26 OT network, fibre optic and copper cabling</a><a href="28-integrated-systems-testing.html"><span>Next</span>28 Integrated systems testing (L5)</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s27-0"><span class="n">27.0</span>Scope of this chapter</h2>
+<p>This chapter covers four systems that sit on top of the electrical, mechanical and controls systems of a data-centre campus. The data centre infrastructure management (DCIM) system holds the inventory of the white space and shows capacity. The computerised maintenance management system (CMMS) holds the asset register and the planned maintenance (PM) schedules that the operations team uses from the first day after handover. The physical security systems (access control, closed-circuit television (CCTV) and intrusion detection) control who enters which room. The operational technology (OT) cybersecurity programme protects the building management system (BMS), the electrical power monitoring system (EPMS) and every other control network from misuse.</p>
+<ol>
+<li><strong>DCIM functions.</strong> What a DCIM system does, the data sources it reads, and the products in common use.</li>
+<li><strong>DCIM data model.</strong> Sites, rooms, cabinets, devices, power chains, sensors and the relations between them.</li>
+<li><strong>DCIM commissioning.</strong> The point-to-point verification of DCIM data against the field, with a worked example.</li>
+<li><strong>CMMS asset register.</strong> The asset hierarchy based on ISO 14224, the asset data fields and the naming rules.</li>
+<li><strong>Asset data handover.</strong> The flow from the equipment schedule to the CMMS, the PM schedules and the acceptance of the asset data.</li>
+<li><strong>Access control.</strong> Readers, controllers, door types, fail-safe and fail-secure locking, and the fire alarm release.</li>
+<li><strong>CCTV and intrusion detection.</strong> Camera coverage, recording, retention and alarm handling.</li>
+<li><strong>Physical security tests.</strong> The door interlock test, the fire release test, the CCTV coverage test and the interface tests with the BMS and the fire alarm system.</li>
+<li><strong>IEC 62443 and NIST SP 800-82.</strong> What each document requires and how they apply to a data-centre OT network. NIST is the National Institute of Standards and Technology (NIST).</li>
+<li><strong>Zones, conduits and security levels.</strong> The zone model of an MSC-1 building, the conduit table and the target security level for each zone.</li>
+<li><strong>Hardening.</strong> The hardening checklist for servers, workstations, controllers, switches and firewalls.</li>
+<li><strong>Accounts, patching, backups and remote access.</strong> The account register, the patch process, the backup and restore test and the remote access path.</li>
+<li><strong>Protocol security.</strong> BACnet Secure Connect (BACnet/SC), Modbus, Simple Network Management Protocol version 3 (SNMPv3) and the risks of each protocol.</li>
+<li><strong>Cybersecurity acceptance.</strong> The tests, the records and the key performance indicators (KPIs) that close the scope.</li>
+</ol>
+<p>Cybersecurity documents used: IEC 62443-2-1:2024 (security programme requirements for asset owners), IEC 62443-3-2:2020 (security risk assessment for system design), IEC 62443-3-3:2013 (system security requirements and security levels) and IEC 62443-4-2:2019 (component requirements). Also NIST SP 800-82 Rev. 3 (Guide to Operational Technology Security, September 2023) and the Cybersecurity and Infrastructure Security Agency (CISA) industrial control systems (ICS) advisories. Other documents used: ANSI/ASHRAE 135 (BACnet, Annex AB for BACnet/SC), ISO 14224:2016 (collection and exchange of reliability and maintenance data), ANSI/TIA-942-C (May 2024), NFPA 101 and NFPA 80 (life safety and fire doors), and the DCIM vendor help pages of Schneider Electric EcoStruxure IT.</p>
+<h2 id="s27-1"><span class="n">27.1</span>DCIM: purpose, functions and data sources</h2>
+<h3 id="s27-1-1"><span class="n">27.1.1</span>What DCIM is</h3>
+<p>A DCIM system is a software platform that holds an accurate model of the physical data centre. The model holds every room, every cabinet, every device in every cabinet, every power connection from the utility to the rack power distribution unit (rPDU), and every sensor. It reads live values from the power and cooling equipment and compares them with the capacity of each part of the model. Before any installation, the operations team uses DCIM to find a position with free space, power and cooling.</p>
+<p>The BMS holds the computer room air handler (CRAH) and coolant distribution unit (CDU) data, and the EPMS holds the switchboard and uninterruptible power supply (UPS) data. DCIM joins them with the cabinet, rPDU outlet and reserved-power data that neither system holds.</p>
+<h3 id="s27-1-2"><span class="n">27.1.2</span>DCIM functions</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it does</th>
+<th>Data it needs</th>
+<th>Who uses it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Asset inventory</td>
+<td>holds every cabinet and device with position (rack unit)</td>
+<td>cabinet layout, device list, serial numbers</td>
+<td>operations, customer engineers</td>
+</tr>
+<tr>
+<td>Power chain</td>
+<td>models the path utility, transformer, switchboard, UPS, power distribution unit (PDU), rPDU, outlet</td>
+<td>single-line diagram, panel schedules</td>
+<td>capacity planner</td>
+</tr>
+<tr>
+<td>Capacity management</td>
+<td>compares design, reserved and measured load for space, power and cooling</td>
+<td>ratings, live readings</td>
+<td>capacity planner</td>
+</tr>
+<tr>
+<td>Monitoring</td>
+<td>reads live values and alarms from rPDU, UPS, sensors</td>
+<td>Simple Network Management Protocol (SNMP), Modbus Transmission Control Protocol (TCP), BACnet or application programming interface (API) from BMS and EPMS</td>
+<td>operations centre</td>
+</tr>
+<tr>
+<td>Change management</td>
+<td>records moves, adds and changes with work orders</td>
+<td>change requests</td>
+<td>operations</td>
+</tr>
+<tr>
+<td>Environmental view</td>
+<td>shows temperature and humidity per cabinet inlet</td>
+<td>sensor positions and readings</td>
+<td>operations, mechanical engineer</td>
+</tr>
+<tr>
+<td>Reports</td>
+<td>load per hall, power usage effectiveness (PUE) inputs, stranded capacity</td>
+<td>all of the above</td>
+<td>management</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-1-3"><span class="n">27.1.3</span>Data sources and protocols</h3>
+<p>DCIM reads data from devices directly or from the BMS and EPMS servers. The integration method is fixed in the interface control document (ICD) for the DCIM interface (chapter 25).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Typical protocol</th>
+<th>Points read</th>
+<th>Poll interval (example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rPDU (intelligent)</td>
+<td>SNMPv3</td>
+<td>outlet current, inlet power, energy, alarms</td>
+<td>60 s</td>
+</tr>
+<tr>
+<td>UPS network management card</td>
+<td>SNMPv3 or Modbus TCP</td>
+<td>load %, battery time, alarms</td>
+<td>30 s</td>
+</tr>
+<tr>
+<td>EPMS server (PME)</td>
+<td>database view, Open Platform Communications Unified Architecture (OPC UA) or representational state transfer (REST) API</td>
+<td>feeder power and energy per PDU</td>
+<td>300 s</td>
+</tr>
+<tr>
+<td>BMS server</td>
+<td>BACnet/IP read or API</td>
+<td>CRAH supply air, CDU supply temperature, alarms</td>
+<td>60 s</td>
+</tr>
+<tr>
+<td>Rack sensors</td>
+<td>SNMP through a sensor hub</td>
+<td>inlet temperature at top, middle, bottom; door state</td>
+<td>60 s</td>
+</tr>
+<tr>
+<td>Asset scanner</td>
+<td>barcode or radio-frequency identification (RFID) upload</td>
+<td>asset tag, serial, position</td>
+<td>on each audit</td>
+</tr>
+</tbody>
+</table></div>
+<p>The Schneider EcoStruxure IT Data Center Expert (DCE) help pages describe discovery processes for SNMPv1, SNMPv3, NetBotz appliances and Modbus TCP devices. A Modbus TCP discovery cannot be scheduled, and every third-party device needs a <mark>device definition file (DDF)</mark> before its sensors and alarms show correctly. For slow SNMP devices the vendor advice is to raise the timeout to <mark>10 s and the retries to 5</mark>. The DCE discovery help lists no BACnet discovery process, and Schneider frequently asked questions (FAQ) page FA383264 states that BACnet is not supported (the FAQ names no version). The supported-device list in the release notes of the installed DCE version is the project record for this point. On MSC-1, BMS data reaches DCE through the BMS server API or a gateway, never by direct BACnet reads.</p>
+<p>Other DCIM products in use on hyperscale and colocation sites include Nlyte, Sunbird dcTrack and Power IQ, and the Vertiv Environet and Trellis family. Confirm the features of each product against the vendor documentation for the release bought on the project.</p>
+<h3 id="s27-1-4"><span class="n">27.1.4</span>Where DCIM sits in the commissioning programme</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>DCIM activity</th>
+<th>Owner</th>
+<th>Exit record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Design</td>
+<td>DCIM data model agreed, naming convention approved</td>
+<td>DCIM integrator, owner's data-centre operations (DCOps) lead</td>
+<td>DCIM data model document DCIM-DM-01</td>
+</tr>
+<tr>
+<td>Construction</td>
+<td>cabinet layout, power chain and asset list loaded from as-built drawings</td>
+<td>DCIM integrator</td>
+<td>DCIM load report</td>
+</tr>
+<tr>
+<td>Level 3 (L3)</td>
+<td>device integration tested per device type</td>
+<td>DCIM integrator, BMS and EPMS contractors</td>
+<td>DCIM device type test sheet</td>
+</tr>
+<tr>
+<td>Level 4 (L4)</td>
+<td>point-to-point verification of every monitored point</td>
+<td>commissioning authority (CxA) witness</td>
+<td>DCIM point-to-point log</td>
+</tr>
+<tr>
+<td>Level 5 (L5)</td>
+<td>DCIM shows the correct alarms and loads during integrated systems testing (IST)</td>
+<td>CxA</td>
+<td>IST script DCIM observations</td>
+</tr>
+<tr>
+<td>Handover</td>
+<td>DCIM accepted, accounts handed over, backup taken</td>
+<td>DCOps lead</td>
+<td>DCIM acceptance certificate</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s27-2"><span class="n">27.2</span>DCIM data model</h2>
+
+<figure class="sheet" id="F27-2"><a href="../data/cx-handbook/figures/F27-2.svg" title="Open drawing F27-2 at full size"><img src="../data/cx-handbook/figures/F27-2.svg" alt="F27-2: DCIM data model: location tree, power chain and sensors for cabinet B2-DH3-R05-C12" width="1400" height="934" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F27-2</span> — <b>DCIM data model: location tree, power chain and sensors for cabinet B2-DH3-R05-C12</b>. Solid arrows are &quot;contains&quot; relations of the location tree; dashed arrows are &quot;feeds&quot; relations of the power chain; each object carries the same name in DCIM, CMMS, BMS and on the label.</figcaption></figure>
+<h3 id="s27-2-1"><span class="n">27.2.1</span>Objects and relations</h3>
+<p>Figure <a class="figref" href="#F27-2">F27-2</a> shows the DCIM data model. Each object has a unique identifier, a parent, and a set of attributes. The power chain is a set of "feeds" relations from an upstream object to a downstream object.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Parent</th>
+<th>Example identifier</th>
+<th>Main attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Site</td>
+<td>none</td>
+<td>MSC-1</td>
+<td>address, time zone</td>
+</tr>
+<tr>
+<td>Building</td>
+<td>site</td>
+<td>B2</td>
+<td>gross area, design IT load 36 MW</td>
+</tr>
+<tr>
+<td>Room (data hall)</td>
+<td>building</td>
+<td>B2-DH3</td>
+<td>floor area, design IT load 12 MW, cooling type</td>
+</tr>
+<tr>
+<td>Row</td>
+<td>room</td>
+<td>B2-DH3-R05</td>
+<td>number of cabinets, containment type</td>
+</tr>
+<tr>
+<td>Cabinet</td>
+<td>row</td>
+<td>B2-DH3-R05-C12</td>
+<td>height 48U, rated power 120 kW, weight limit</td>
+</tr>
+<tr>
+<td>Device</td>
+<td>cabinet</td>
+<td>B2-DH3-R05-C12-U20</td>
+<td>make, model, serial, rack unit, power draw</td>
+</tr>
+<tr>
+<td>rPDU</td>
+<td>cabinet</td>
+<td>B2-DH3-R05-C12-PDU-A</td>
+<td>inlet rating, outlet count, Internet Protocol (IP) address</td>
+</tr>
+<tr>
+<td>Power panel or busway tap-off</td>
+<td>room</td>
+<td>B2-DH3-PDU-A1-TO05</td>
+<td>rating, upstream UPS</td>
+</tr>
+<tr>
+<td>UPS</td>
+<td>building</td>
+<td>B2-UPS-A1</td>
+<td>rating 2.5 MW, module count</td>
+</tr>
+<tr>
+<td>Sensor</td>
+<td>cabinet or room</td>
+<td>B2-DH3-R05-C12-TS-TOP</td>
+<td>type, position, limits</td>
+</tr>
+<tr>
+<td>CDU</td>
+<td>room</td>
+<td>B2-DH3-CDU-04</td>
+<td>rated 1.0 MW, loop served</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-2-2"><span class="n">27.2.2</span>Capacity fields</h3>
+<p>Each capacity object carries four values. DCIM compares them and reports stranded capacity, which is capacity that exists but cannot be used because another resource is full.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example (cabinet B2-DH3-R05-C12)</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Design capacity</td>
+<td>kW</td>
+<td>120.0</td>
+<td>from the basis of design (BOD)</td>
+</tr>
+<tr>
+<td>Reserved capacity</td>
+<td>kW</td>
+<td>110.0</td>
+<td>sum of approved customer orders</td>
+</tr>
+<tr>
+<td>Measured peak (30 days)</td>
+<td>kW</td>
+<td>84.6</td>
+<td>from rPDU inlet power</td>
+</tr>
+<tr>
+<td>Available</td>
+<td>kW</td>
+<td>10.0</td>
+<td>design minus reserved</td>
+</tr>
+<tr>
+<td>Space used</td>
+<td>U</td>
+<td>40 of 48</td>
+<td>from device positions</td>
+</tr>
+<tr>
+<td>Cooling capacity share</td>
+<td>kW</td>
+<td>120.0</td>
+<td>from CDU and CRAH allocation</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>list</td>
+<td>in service</td>
+<td>planned, installed, in service, decommissioned</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Capacity of row B2-DH3-R05. The row has 20 cabinets at the <mark>120 kW rack design load</mark> of the MSC-1 worked example, so the row design is 2,400 kW. Customer orders reserve 2,180 kW. The 30-day measured peak is 1,712 kW, which is 78.5 % of the reserved value. The available capacity is 2,400 − 2,180 = 220 kW. Three cabinets have 16 U empty each but only 4 kW unreserved power each: their space is stranded. DCIM reports 48 U of stranded space and 0 kW of stranded power for the row. The capacity planner uses this report to place the next devices of up to 4 kW per cabinet in these three positions. The planner can also release reserved power from other cabinets of the row.</p>
+<h3 id="s27-2-3"><span class="n">27.2.3</span>Naming convention rules</h3>
+<ol>
+<li><strong>One name per object.</strong> The DCIM name equals the tag on the as-built drawing, the BMS point name prefix and the CMMS asset identifier. A cabinet named B2-DH3-R05-C12 in DCIM is B2-DH3-R05-C12 on the floor label.</li>
+<li><strong>Fixed segment order.</strong> Building, room, row, cabinet, device. The segments are separated by hyphens and never by spaces.</li>
+<li><strong>Fixed length segments.</strong> Row and cabinet numbers use two digits (R05, C12) so that lists sort correctly.</li>
+<li><strong>No reuse after decommission.</strong> A removed cabinet keeps its identifier in the history and the identifier is not given to a new cabinet.</li>
+<li><strong>Power side letters.</strong> A and B feeds use the letters A and B in every system. A cabinet fed from UPS-A1 and UPS-B1 has rPDUs PDU-A and PDU-B.</li>
+<li><strong>Approval.</strong> The naming convention is a controlled document. The commissioning manager checks it against the BMS points list naming (chapter 21) before the DCIM integrator loads any data.</li>
+</ol>
+<h3 id="s27-2-4"><span class="n">27.2.4</span>Common errors in the DCIM data model</h3>
+<ol>
+<li><strong>Power chain drawn from design drawings.</strong> The integrator loads the power chain from the issued-for-construction drawings. Tap-off positions change during installation, so the model is wrong. Load from the as-built panel schedules and verify by the A and B feed test in 27.3.</li>
+<li><strong>rPDU outlets not mapped to devices.</strong> The rPDU reads outlet current, but DCIM cannot show device power. Map each outlet to a device during the cabinet installation and verify by switching one outlet off in the test in 27.3.</li>
+<li><strong>Sensor positions unknown.</strong> A temperature sensor reads 27 °C but no one knows whether it is at the top or the bottom of the cabinet. The sensor object carries a position attribute and the label on the sensor shows the same position.</li>
+<li><strong>Duplicate assets.</strong> The same device is loaded twice, once by the asset scanner and once from the purchase list. Run the duplicate serial number report before L4.</li>
+</ol>
+<h2 id="s27-3"><span class="n">27.3</span>DCIM commissioning procedure</h2>
+<h3 id="s27-3-1"><span class="n">27.3.1</span>Prerequisites</h3>
+<ol>
+<li><strong>Network ready.</strong> The DCIM virtual local area network (VLAN), the firewall rules from the conduit table (27.10) and the SNMPv3 credentials are in place. The network contractor has issued the switch configuration backup.</li>
+<li><strong>Data loaded.</strong> The room, row, cabinet and power chain objects are loaded from the as-built drawings. The DCIM integrator issues the load report with object counts.</li>
+<li><strong>Device templates.</strong> Each device type has a tested template or DDF. The template test sheet for each type is signed at L3.</li>
+<li><strong>Upstream systems.</strong> The BMS and the EPMS have passed their own L4 point-to-point tests for the points that DCIM reads (chapters 22 and 24).</li>
+<li><strong>Test instruments.</strong> A calibrated clamp meter (accuracy ±2 % of reading or better) and a calibrated reference thermometer (±0.3 °C) are available for the field comparison.</li>
+</ol>
+<h3 id="s27-3-2"><span class="n">27.3.2</span>Point-to-point verification steps</h3>
+<p><strong>Purpose:</strong> Prove that each value and each alarm shown in DCIM comes from the correct device and has the correct value, unit and name.</p>
+<p><strong>Owner:</strong> The DCIM integrator tests the points. The CxA witnesses a sample and signs.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Select the sample.</strong> The CxA selects the points to witness. On MSC-1 the rule is 100 % of alarm points and 100 % of UPS and PDU feed points. For rPDU outlet points the sample is 10 %, with at least one outlet per cabinet. Time limit: the sample list is issued 2 working days before the test.</li>
+<li><strong>Compare the identity.</strong> The tester reads the device serial number and IP address in DCIM and on the device display. They must match. A mismatch is a category B issue.</li>
+<li><strong>Compare the value.</strong> For a power point, the tester measures the current with the clamp meter at the same time as DCIM shows the value. The acceptance value on MSC-1 is <mark>within ±3 % of the clamp reading or ±0.2 A</mark>, whichever is larger (project value; the rPDU accuracy class on its data sheet governs).</li>
+<li><strong>Compare the temperature.</strong> The tester places the reference thermometer next to the rack sensor for 5 minutes. The acceptance value is ±1.0 °C (project value).</li>
+<li><strong>Test the A and B feed.</strong> The electrician opens the breaker of PDU-A in one cabinet with the customer's written permission or before IT load is installed. DCIM must show PDU-A at 0 A and PDU-B carrying the full cabinet load within one poll interval. This proves the power chain mapping.</li>
+<li><strong>Test each alarm.</strong> The tester creates the alarm at the source (for example, a high temperature limit lowered on the sensor, or a test alarm from the UPS card). DCIM must show the alarm with the correct name and severity within <mark>2 poll intervals</mark>.</li>
+<li><strong>Test the loss of communication.</strong> The tester unplugs the network cable of one rPDU. DCIM must raise a communication loss alarm within the configured time (for example 180 s).</li>
+<li><strong>Record the results.</strong> Each point gets one line in the DCIM point-to-point log with pass or fail.</li>
+<li><strong>Raise issues.</strong> Each failed point is raised in the issue log within 1 working day with the category.</li>
+<li><strong>Retest.</strong> Failed points are retested after the fix and the retest result is added to the same log line.</li>
+</ol>
+<p><strong>Records:</strong> DCIM point-to-point log DCIM-P2P-B2-DH3, issue log entries, clamp meter calibration certificate.</p>
+<h3 id="s27-3-3"><span class="n">27.3.3</span>DCIM point-to-point log fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Log line ID</td>
+<td>text</td>
+<td>DCIM-P2P-B2-DH3-0412</td>
+</tr>
+<tr>
+<td>DCIM object</td>
+<td>text</td>
+<td>B2-DH3-R05-C12-PDU-A</td>
+</tr>
+<tr>
+<td>Point</td>
+<td>text</td>
+<td>inlet current phase L1</td>
+</tr>
+<tr>
+<td>Source protocol</td>
+<td>list</td>
+<td>SNMPv3</td>
+</tr>
+<tr>
+<td>Field value</td>
+<td>number with unit</td>
+<td>41.8 A (clamp meter SN 4471)</td>
+</tr>
+<tr>
+<td>DCIM value</td>
+<td>number with unit</td>
+<td>42.3 A</td>
+</tr>
+<tr>
+<td>Deviation</td>
+<td>%</td>
+<td>+1.2 %</td>
+</tr>
+<tr>
+<td>Acceptance</td>
+<td>text</td>
+<td>±3 % or ±0.2 A</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>list</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Tester and witness</td>
+<td>text</td>
+<td>DCIM integrator R. Hadi, CxA L. Tan</td>
+</tr>
+<tr>
+<td>Date and time</td>
+<td>date-time</td>
+<td>2026-11-18 10:42</td>
+</tr>
+<tr>
+<td>Issue reference</td>
+<td>text</td>
+<td>none</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Alarm latency test in hall B2-DH3. The rPDU polling interval is 60 s and DCE is registered as the SNMP notification receiver of the APC devices (priority scanning). The tester lowers the inlet temperature high limit of sensor B2-DH3-R05-C12-TS-TOP from 32 °C to 20 °C at 10:15:00. DCIM shows the alarm at 10:15:09, which is 9 s, well inside the 2-poll limit of 120 s. For a third-party sensor without priority scanning, the alarm appears at 10:16:02, which is 62 s and still inside the limit. Both lines pass. The log records both times and the configured poll interval, so that the operations team can compare later alarms against the same values.</p>
+<h2 id="s27-4"><span class="n">27.4</span>CMMS asset register and asset hierarchy</h2>
+<h3 id="s27-4-1"><span class="n">27.4.1</span>What a CMMS is</h3>
+<p>A CMMS is the software that the operations and maintenance team uses to plan and record maintenance. It holds the asset register (one record for each maintainable asset), the PM schedules (what task, at what interval, which skill), the work orders, the spare parts and the maintenance history. Common products are IBM Maximo, SAP Plant Maintenance, Infor EAM, ServiceNow and smaller cloud products. The commissioning team supplies the asset data and the first PM schedules; the operations team runs the CMMS. If the data is incomplete at handover, the first PM tasks are not generated and warranty-required maintenance is missed.</p>
+<h3 id="s27-4-2"><span class="n">27.4.2</span>The ISO 14224 hierarchy</h3>
+<p>ISO 14224 defines a taxonomy with nine levels. Levels 1 to 5 describe the use and location. Levels 6 to 9 describe the equipment subdivision. The equipment unit at level 6 is the reporting level for failure data. Figure <a class="figref" href="#F27-6">F27-6</a> shows the nine levels for UPS B2-UPS-A1 and marks the level at which each item is held in the CMMS.</p>
+<figure class="sheet" id="F27-6"><a href="../data/cx-handbook/figures/F27-6.svg" title="Open drawing F27-6 at full size"><img src="../data/cx-handbook/figures/F27-6.svg" alt="F27-6: ISO 14224 levels for UPS B2-UPS-A1 and where each level sits in the CMMS" width="1000" height="992" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F27-6</span> — <b>ISO 14224 levels for UPS B2-UPS-A1 and where each level sits in the CMMS</b>. Every maintainable asset is a level 6 record; a subunit gets its own record only when it has its own maintenance task, and parts are held as spares linked to the asset.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>ISO 14224 name</th>
+<th>Data-centre meaning</th>
+<th>MSC-1 example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Industry</td>
+<td>data centres</td>
+<td>data centre</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Business category</td>
+<td>owner business unit</td>
+<td>campus operations</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Installation</td>
+<td>campus</td>
+<td>MSC-1</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Plant or unit</td>
+<td>building</td>
+<td>B2</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Section or system</td>
+<td>system</td>
+<td>B2 low-voltage power, B2 chilled water</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Equipment unit</td>
+<td>one piece of equipment</td>
+<td>B2-UPS-A1</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Subunit</td>
+<td>major part</td>
+<td>UPS module 3, battery string 2</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Component or maintainable item</td>
+<td>part replaced in maintenance</td>
+<td>direct-current (DC) capacitor bank, fan assembly</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Part</td>
+<td>small part</td>
+<td>fuse, filter element</td>
+</tr>
+</tbody>
+</table></div>
+<p>On most projects the CMMS holds records down to level 6 for every asset. Assets with separate maintenance tasks (battery strings, generator engines and alternators, chiller compressors) go down to level 7 or 8. Level 9 items are held as spare parts linked to the asset. The owner's CMMS data standard sets the final depth for each equipment class.</p>
+<h3 id="s27-4-3"><span class="n">27.4.3</span>Asset register fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Mandatory</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Asset ID</td>
+<td>text</td>
+<td>yes</td>
+<td>B2-UPS-A1</td>
+</tr>
+<tr>
+<td>Description</td>
+<td>text</td>
+<td>yes</td>
+<td>UPS 2,500 kW, 5 modules</td>
+</tr>
+<tr>
+<td>Parent asset or location</td>
+<td>text</td>
+<td>yes</td>
+<td>B2-ER-UPS-A (UPS room A)</td>
+</tr>
+<tr>
+<td>System</td>
+<td>list</td>
+<td>yes</td>
+<td>low-voltage power</td>
+</tr>
+<tr>
+<td>Equipment class</td>
+<td>list (ISO 14224 style)</td>
+<td>yes</td>
+<td>UPS</td>
+</tr>
+<tr>
+<td>Manufacturer</td>
+<td>text</td>
+<td>yes</td>
+<td>(original equipment manufacturer (OEM) name)</td>
+</tr>
+<tr>
+<td>Model</td>
+<td>text</td>
+<td>yes</td>
+<td>(model number)</td>
+</tr>
+<tr>
+<td>Serial number</td>
+<td>text</td>
+<td>yes</td>
+<td>(from nameplate)</td>
+</tr>
+<tr>
+<td>Rating</td>
+<td>number with unit</td>
+<td>yes</td>
+<td>2,500 kW</td>
+</tr>
+<tr>
+<td>Install date</td>
+<td>date</td>
+<td>yes</td>
+<td>2026-08-14</td>
+</tr>
+<tr>
+<td>Commissioning date (L4 pass)</td>
+<td>date</td>
+<td>yes</td>
+<td>2026-10-02</td>
+</tr>
+<tr>
+<td>Warranty start and end</td>
+<td>date</td>
+<td>yes</td>
+<td>2026-12-01 to 2028-11-30</td>
+</tr>
+<tr>
+<td>Criticality</td>
+<td>list A, B, C</td>
+<td>yes</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Room and grid</td>
+<td>text</td>
+<td>yes</td>
+<td>B2 level 1, grid D-7</td>
+</tr>
+<tr>
+<td>Drawing references</td>
+<td>text</td>
+<td>yes</td>
+<td>B2-E-SLD-201, B2-E-LAY-110</td>
+</tr>
+<tr>
+<td>Operation and maintenance (O&amp;M) manual reference</td>
+<td>text</td>
+<td>yes</td>
+<td>O&amp;M volume 4, section 2</td>
+</tr>
+<tr>
+<td>PM schedule IDs</td>
+<td>list</td>
+<td>yes</td>
+<td>PM-UPS-Q, PM-UPS-A</td>
+</tr>
+<tr>
+<td>Spare parts list</td>
+<td>link</td>
+<td>for criticality A</td>
+<td>SP-UPS-A1</td>
+</tr>
+<tr>
+<td>Barcode or quick response (QR) code label</td>
+<td>text</td>
+<td>yes</td>
+<td>QR printed on label 50 × 30 mm</td>
+</tr>
+<tr>
+<td>Photo of nameplate</td>
+<td>file</td>
+<td>yes</td>
+<td>B2-UPS-A1_nameplate.jpg</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-4-4"><span class="n">27.4.4</span>Asset data rules</h3>
+<ol>
+<li><strong>One record per maintainable asset.</strong> If the maintenance team does a separate task on an item, the item has its own record. A battery string with its own quarterly impedance test is its own record under the UPS.</li>
+<li><strong>Serial number from the nameplate.</strong> The serial number is read from the nameplate on site and photographed. A serial number copied from the delivery note can be wrong because the delivery note lists the shipping crate.</li>
+<li><strong>Same ID in all systems.</strong> The CMMS asset ID equals the DCIM object name, the BMS or EPMS device name and the label on the equipment.</li>
+<li><strong>Criticality by consequence.</strong> Criticality A is an asset whose failure can interrupt IT load or life safety (UPS, switchboards, generators, CDU, fire panels). Criticality B is an asset whose failure reduces redundancy. Criticality C is the rest.</li>
+<li><strong>No placeholder values.</strong> "TBC" (to be confirmed), "N/A" (not applicable) and blank are not accepted for mandatory fields. A missing value is raised as a documentation issue against the contractor.</li>
+</ol>
+<h3 id="s27-4-5"><span class="n">27.4.5</span>Asset counts for one MSC-1 building</h3>
+<p><strong>Worked example:</strong> Asset count for building B2. Building B2 has 3 data halls of 12 MW IT each. Chapter 23 counts 414 EPMS Ethernet devices for the building. The CMMS register for the same building counts the following groups at level 6. The power groups are 17 generators (with 17 engine and 17 alternator subunits at level 7) and 24 UPS systems of 2.5 MW (8 per hall) with 120 modules and 48 battery strings. The cooling groups are 48 CDUs (16 per hall) and 39 CRAH units for the 3 × 2.4 MW of air cooling (13 per hall, as in chapter 21). The other groups are 96 low-voltage switchboard sections, 144 busway runs, 600 rPDUs (2 for each of the 300 cabinets) and about 1,900 fire, valve, damper and sensor items. The level 6 total is 17 + 24 + 48 + 39 + 96 + 144 + 600 + 1,900 = <mark>2,868 records</mark>. The level 7 total is 17 + 17 + 120 + 48 = 202 records. At a data collection rate of 120 records per person per day, the 3,070 records take 26 person-days to collect and verify. The contractor starts collection at Level 2 (L2) and finishes it before the L4 tests of each system. The commissioning manager puts this collection as a line in the look-ahead schedule.</p>
+<h2 id="s27-5"><span class="n">27.5</span>Asset data handover flow and PM schedules</h2>
+
+<figure class="sheet" id="F27-3"><a href="../data/cx-handbook/figures/F27-3.svg" title="Open drawing F27-3 at full size"><img src="../data/cx-handbook/figures/F27-3.svg" alt="F27-3: Asset data handover flow: from the design equipment schedule to work orders in the CMMS" width="1400" height="774" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F27-3</span> — <b>Asset data handover flow: from the design equipment schedule to work orders in the CMMS</b>. Data is added in the order it becomes known: tags at design, model at submittal, serial number at installation, dates at commissioning; the CMMS load is the last step and is tested by generating work orders.</figcaption></figure>
+<h3 id="s27-5-1"><span class="n">27.5.1</span>The handover flow</h3>
+<p>Figure <a class="figref" href="#F27-3">F27-3</a> shows the flow of asset data from design to the live CMMS. The data starts in the equipment schedules of the design and the contractor completes it during installation. The commissioning team checks it against the field, and the owner's CMMS administrator loads it into the CMMS.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Input</th>
+<th>Output</th>
+<th>Owner</th>
+<th>Time limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Template issue</td>
+<td>owner CMMS data standard</td>
+<td>asset data template (spreadsheet) with mandatory fields</td>
+<td>owner CMMS administrator</td>
+<td>at contract award</td>
+</tr>
+<tr>
+<td>2 Design schedules</td>
+<td>equipment schedules, drawing tags</td>
+<td>template rows with ID, description, rating, location</td>
+<td>designer</td>
+<td>at issued-for-construction</td>
+</tr>
+<tr>
+<td>3 Submittal data</td>
+<td>approved submittals</td>
+<td>manufacturer and model filled</td>
+<td>contractor</td>
+<td>within 10 working days of submittal approval</td>
+</tr>
+<tr>
+<td>4 Field data</td>
+<td>nameplate photos at delivery and installation</td>
+<td>serial number, install date filled</td>
+<td>contractor</td>
+<td>within 5 working days of installation</td>
+</tr>
+<tr>
+<td>5 Commissioning dates</td>
+<td>L4 pass records</td>
+<td>commissioning date and warranty start filled</td>
+<td>contractor with CxA</td>
+<td>within 5 working days of L4 pass</td>
+</tr>
+<tr>
+<td>6 Field check</td>
+<td>template, labels on site</td>
+<td>asset data check record</td>
+<td>CxA</td>
+<td>sample before handover</td>
+</tr>
+<tr>
+<td>7 PM schedules</td>
+<td>O&amp;M manuals, OEM maintenance tables</td>
+<td>PM schedule template rows</td>
+<td>contractor, reviewed by operations</td>
+<td>30 working days before handover</td>
+</tr>
+<tr>
+<td>8 Load and test</td>
+<td>accepted template</td>
+<td>records in CMMS, test work orders generated</td>
+<td>owner CMMS administrator</td>
+<td>10 working days before handover</td>
+</tr>
+<tr>
+<td>9 Acceptance</td>
+<td>load report, check record</td>
+<td>asset data acceptance certificate</td>
+<td>DCOps lead</td>
+<td>at handover</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-5-2"><span class="n">27.5.2</span>Asset data check procedure</h3>
+<p><strong>Purpose:</strong> Prove that the asset data matches the installed equipment before it is loaded into the CMMS.</p>
+<p><strong>Owner:</strong> The CxA checks the data. The contractor's document controller corrects the template.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Run the completeness check.</strong> The CxA runs a script or spreadsheet filter on the template for blank, "TBC" and "N/A" values in mandatory fields. The acceptance value is <mark>0 blank mandatory fields</mark> for criticality A assets and less than 1 % for B and C assets at the first check.</li>
+<li><strong>Run the uniqueness check.</strong> The CxA sorts by asset ID and by serial number and lists duplicates. The acceptance value is <mark>0 duplicates</mark>.</li>
+<li><strong>Run the cross-system check.</strong> The CxA compares the asset IDs with the BMS points list, the EPMS device list and the DCIM object list. Each criticality A asset that has a controller or meter must appear in the matching system with the same name.</li>
+<li><strong>Select the field sample.</strong> The CxA selects 100 % of criticality A assets and 10 % of the others (minimum 20 per system).</li>
+<li><strong>Check on site.</strong> For each sampled asset, the CxA compares the label, nameplate serial number, model and location with the template. Each mismatch is recorded.</li>
+<li><strong>Judge the result.</strong> If <mark>more than 2 % of the sample</mark> has a mismatch, the contractor rechecks the whole system and the CxA repeats the sample.</li>
+<li><strong>Issue the record.</strong> The CxA issues the asset data check record with the counts and the mismatch list within 3 working days of the site check.</li>
+</ol>
+<p><strong>Records:</strong> Asset data check record ADC-B2-ELE-01, the corrected template revision, the mismatch list in the issue log.</p>
+<h3 id="s27-5-3"><span class="n">27.5.3</span>PM schedule fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PM ID</td>
+<td>text</td>
+<td>PM-UPS-Q</td>
+</tr>
+<tr>
+<td>Asset class</td>
+<td>list</td>
+<td>UPS</td>
+</tr>
+<tr>
+<td>Task description</td>
+<td>text</td>
+<td>quarterly inspection: alarm log review, fan check, thermal scan of terminations</td>
+</tr>
+<tr>
+<td>Frequency</td>
+<td>list</td>
+<td>3 months</td>
+</tr>
+<tr>
+<td>Trigger type</td>
+<td>list</td>
+<td>calendar or run hours</td>
+</tr>
+<tr>
+<td>Skill</td>
+<td>list</td>
+<td>UPS technician, OEM</td>
+</tr>
+<tr>
+<td>Duration</td>
+<td>hours</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Isolation required</td>
+<td>yes or no</td>
+<td>no (module maintenance by OEM procedure)</td>
+</tr>
+<tr>
+<td>Method statement reference</td>
+<td>text</td>
+<td>MS-OPS-UPS-002</td>
+</tr>
+<tr>
+<td>Source of task</td>
+<td>text</td>
+<td>OEM O&amp;M manual section 9, warranty condition</td>
+</tr>
+<tr>
+<td>Warranty-critical</td>
+<td>yes or no</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Spare parts</td>
+<td>list</td>
+<td>air filters set</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-5-4"><span class="n">27.5.4</span>PM schedule rules</h3>
+<ol>
+<li><strong>Source every task.</strong> Each PM task names its source: the OEM maintenance table in the O&amp;M manual, a warranty condition, a statutory requirement or the owner's standard. An example of a statutory requirement is the periodic inspection of lifting equipment and pressure vessels under Indonesian regulations.</li>
+<li><strong>Warranty tasks first.</strong> Tasks that the OEM names as conditions of warranty are flagged. A missed warranty task can void the warranty, so these tasks are loaded and tested before any other task.</li>
+<li><strong>Start dates from commissioning.</strong> The first due date is calculated from the L4 pass date or the energisation date, whichever the OEM uses. A generator with a monthly run test is due one month after its L4 load test.</li>
+<li><strong>Run-hour triggers.</strong> Generators, pumps and fans with run-hour triggers have their run-hour meters read at handover and the reading entered in the CMMS.</li>
+<li><strong>Test the generation.</strong> The CMMS administrator runs the work order generation for the next 90 days and the DCOps lead checks that the expected work orders appear.</li>
+</ol>
+<p><strong>Worked example:</strong> PM generation test for building B2. The PM schedule has 214 PM templates across the 2,868 level 6 assets. The CMMS generates 3,960 work orders for the first 90 days. The DCOps lead checks three classes. For the 17 generators with a monthly no-load run, 17 × 3 = 51 work orders are expected and 51 appear. For the 48 battery strings with a quarterly impedance test, 48 are expected and 48 appear. For the 39 CRAH units with a 3-month filter change, 39 are expected but only 26 appear: the 13 CRAHs of hall B2-DH3 have no PM link. The DH3 CRAH records were loaded after the PM link was made. The issue is raised as category B, the link is added, and the test is repeated with 39 work orders.</p>
+<h2 id="s27-6"><span class="n">27.6</span>Access control system</h2>
+<h3 id="s27-6-1"><span class="n">27.6.1</span>What the access control system does</h3>
+<p>The electronic access control system (ACS) decides which person may open which door at which time, and it records every event. A person presents a credential (card, personal identification number (PIN) or biometric) at a reader. The door controller checks the credential against its local database and, if allowed, releases the lock for a set time. The door contact reports whether the door is open, and the request-to-exit (REX) device allows exit from inside. The ACS server holds the cardholder database, the access levels and the event log. It sends the database to the door controllers, so that each controller can decide alone when the network is down.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Function</th>
+<th>Typical test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reader</td>
+<td>reads the credential (card, PIN, biometric)</td>
+<td>valid, invalid and expired card</td>
+</tr>
+<tr>
+<td>Door controller</td>
+<td>decides access, drives the lock, stores events offline</td>
+<td>network loss test</td>
+</tr>
+<tr>
+<td>Lock (maglock, electric strike, electrified lock)</td>
+<td>holds or releases the door</td>
+<td>power loss test, fire release test</td>
+</tr>
+<tr>
+<td>Door position switch</td>
+<td>reports door open or closed</td>
+<td>forced door and door held open alarms</td>
+</tr>
+<tr>
+<td>Request-to-exit (REX)</td>
+<td>releases lock or shunts alarm on exit</td>
+<td>exit without alarm</td>
+</tr>
+<tr>
+<td>Break-glass or emergency release</td>
+<td>releases a fail-safe lock by cutting its power</td>
+<td>manual release test</td>
+</tr>
+<tr>
+<td>ACS server and workstation</td>
+<td>database, access levels, event log, alarms</td>
+<td>failover and backup test</td>
+</tr>
+<tr>
+<td>Interface to CCTV</td>
+<td>calls camera view on alarm</td>
+<td>alarm-to-video test</td>
+</tr>
+<tr>
+<td>Interface to fire alarm</td>
+<td>releases egress doors on fire alarm</td>
+<td>fire release test</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-6-2"><span class="n">27.6.2</span>Security layers on a data-centre campus</h3>
+<p>Hyperscale programmes divide the campus into layers. Each inner layer needs a stronger credential check than the outer one. ANSI/TIA-942-C (May 2024) includes physical security requirements tied to its rating levels (confirm the per-rating requirements in the security tables of ANSI/TIA-942-C).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Example area</th>
+<th>Typical control</th>
+<th>Typical alarm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Perimeter</td>
+<td>fence, vehicle gate</td>
+<td>guard house, vehicle barrier, perimeter intrusion detection, CCTV</td>
+<td>fence intrusion, gate forced</td>
+</tr>
+<tr>
+<td>2 Building entry</td>
+<td>lobby</td>
+<td>card plus guard check, visitor registration</td>
+<td>door forced, door held</td>
+</tr>
+<tr>
+<td>3 Secure corridor</td>
+<td>inside the building</td>
+<td>card reader on each door, anti-passback</td>
+<td>tailgating, anti-passback violation</td>
+</tr>
+<tr>
+<td>4 Data hall</td>
+<td>white space</td>
+<td>interlocked entry (mantrap) with card plus PIN or biometric</td>
+<td>interlock fault, door held</td>
+</tr>
+<tr>
+<td>5 Critical rooms</td>
+<td>UPS rooms, medium-voltage (MV) rooms, fire control room</td>
+<td>card plus PIN, restricted access level</td>
+<td>out-of-hours access</td>
+</tr>
+<tr>
+<td>6 Cabinet</td>
+<td>customer cabinet</td>
+<td>cabinet lock with electronic handle and audit</td>
+<td>cabinet door open</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-6-3"><span class="n">27.6.3</span>Fail-safe and fail-secure locks</h3>
+<p>A <mark>fail-safe lock unlocks</mark> when its power is removed. A <mark>fail-secure lock stays locked</mark> when its power is removed, and a person can still exit from inside with the mechanical handle. The choice depends on the door function and the fire code.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Lock type</th>
+<th>Behaviour on power loss</th>
+<th>Typical use</th>
+<th>Code note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Electromagnetic lock (maglock)</td>
+<td>always fail-safe: releases</td>
+<td>egress doors with a separate free exit device</td>
+<td>needs REX and power release on fire alarm</td>
+</tr>
+<tr>
+<td>Electric strike, fail-safe</td>
+<td>releases</td>
+<td>stairwell doors where re-entry is required</td>
+<td>not allowed on fire-rated doors because it gives no positive latching</td>
+</tr>
+<tr>
+<td>Electric strike, fail-secure</td>
+<td>stays latched on the outside; mechanical free exit inside</td>
+<td>fire-rated doors, data hall doors</td>
+<td>positive latching meets NFPA 80</td>
+</tr>
+<tr>
+<td>Electrified mortise lock</td>
+<td>either version</td>
+<td>high-security doors</td>
+<td>mechanical free egress from inside</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allegion states that electromagnetic locks are only available fail-safe and that fire-rated doors need fail-secure strikes. Under NFPA 101 a door on an egress path with a fail-safe lock must unlock on actuation of the sprinkler or fire alarm system and on loss of power to the lock. A delayed-egress lock releases <mark>15 s</mark> after a person pushes the exit device, or 30 s where the authority having jurisdiction approves. The source is NFPA 101, 7.2.1.6.1, as summarised by idighardware.com and state fire marshal guides. The door carries a sign that starts "PUSH UNTIL ALARM SOUNDS". The NFPA 101 edition adopted by the local authority and the Indonesian fire regulation that the authority enforces govern on the project.</p>
+<h3 id="s27-6-4"><span class="n">27.6.4</span>Interlocked entry (mantrap)</h3>
+<p>An interlocked entry has two doors. The inner door cannot open while the outer door is open, and the reverse. Some designs add a weight sensor or a people-counting sensor so that only one person passes per credential.</p>
+<ol>
+<li><strong>Interlock logic.</strong> Door 1 open or not locked blocks the release of door 2. Door 2 open or not locked blocks the release of door 1.</li>
+<li><strong>Fire alarm mode.</strong> On a fire alarm from the zone, both doors release so that people inside can leave. The interlock is suspended.</li>
+<li><strong>Power loss mode.</strong> The design states whether the mantrap doors fail-safe or fail-secure. If fail-secure, a mechanical free exit from inside must exist on both doors.</li>
+<li><strong>Emergency release.</strong> A break-glass unit inside the mantrap cuts lock power on both doors.</li>
+<li><strong>Alarm on fault.</strong> If both doors show open at the same time, the ACS raises an interlock fault alarm to the security control room.</li>
+</ol>
+<h3 id="s27-6-5"><span class="n">27.6.5</span>Access control data fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Door ID</td>
+<td>text</td>
+<td>B2-L1-D-DH3-01</td>
+</tr>
+<tr>
+<td>Door description</td>
+<td>text</td>
+<td>data hall 3 entry mantrap, outer door</td>
+</tr>
+<tr>
+<td>Reader type</td>
+<td>list</td>
+<td>card plus PIN</td>
+</tr>
+<tr>
+<td>Lock type</td>
+<td>list</td>
+<td>fail-secure electric strike</td>
+</tr>
+<tr>
+<td>Fire release</td>
+<td>yes or no</td>
+<td>yes, on fire zone B2-FZ-DH3</td>
+</tr>
+<tr>
+<td>Access level group</td>
+<td>text</td>
+<td>AL-DH3-OPS</td>
+</tr>
+<tr>
+<td>Door held open time</td>
+<td>seconds</td>
+<td>30</td>
+</tr>
+<tr>
+<td>Unlock time</td>
+<td>seconds</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Interlock partner</td>
+<td>text</td>
+<td>B2-L1-D-DH3-02</td>
+</tr>
+<tr>
+<td>CCTV camera on alarm</td>
+<td>text</td>
+<td>B2-L1-CAM-041</td>
+</tr>
+<tr>
+<td>Power supply and battery</td>
+<td>text</td>
+<td>PSU-B2-L1-03, 4 h battery</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s27-7"><span class="n">27.7</span>CCTV and intrusion detection</h2>
+<h3 id="s27-7-1"><span class="n">27.7.1</span>CCTV system parts</h3>
+<p>A CCTV system has cameras, a network that carries the video, recorders or a video management system (VMS) with storage, and operator workstations. On a campus the cameras are IP cameras powered by Power over Ethernet (PoE) from access switches in the security network zone.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Design value to check (example)</th>
+<th>How to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Camera position and field of view</td>
+<td>covers each door, each corridor, each aisle end</td>
+<td>coverage test with test person</td>
+</tr>
+<tr>
+<td>Resolution at target</td>
+<td>enough pixels to identify a person at the door (operator requirement, for example 250 pixels per metre)</td>
+<td>test chart or test person at the stated distance</td>
+</tr>
+<tr>
+<td>Frame rate</td>
+<td>15 frames per second for doors (project value)</td>
+<td>VMS stream statistics</td>
+</tr>
+<tr>
+<td>Recording</td>
+<td>continuous or on motion, per camera</td>
+<td>VMS settings and playback</td>
+</tr>
+<tr>
+<td>Retention</td>
+<td>90 days (project value; the standard gives no single figure)</td>
+<td>storage calculation and a playback of the oldest recording</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>camera and VMS time from the site Network Time Protocol (NTP) server</td>
+<td>compare on-screen time with reference clock</td>
+</tr>
+<tr>
+<td>Night view</td>
+<td>infrared or low-light performance at perimeter</td>
+<td>night test</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-7-2"><span class="n">27.7.2</span>Storage calculation</h3>
+<p><strong>Worked example:</strong> CCTV storage for building B2. The building has 420 cameras. Each camera streams at an average of 4 Mbit/s at the set resolution and frame rate (value from the camera bit-rate calculator and the VMS vendor data). The retention is <mark>90 days of continuous recording</mark>.</p>
+<ol>
+<li><strong>Bit rate.</strong> 420 × 4 Mbit/s = 1,680 Mbit/s = 210 MB/s.</li>
+<li><strong>Per day.</strong> 210 MB/s × 86,400 s = 18,144,000 MB = 18.1 TB per day.</li>
+<li><strong>For 90 days.</strong> 18.1 × 90 = 1,633 TB, about <mark>1.63 PB of usable storage</mark>.</li>
+<li><strong>With redundancy.</strong> With redundant array of independent disks (RAID) 6 overhead of about 20 % the raw storage is 1.63 / 0.8 = 2.04 PB.</li>
+</ol>
+<p>The test of this value is a playback of the oldest recording on day 91 of operation. Before handover, the test is a check that the storage pool shows the calculated retention estimate in the VMS.</p>
+<h3 id="s27-7-3"><span class="n">27.7.3</span>Intrusion detection</h3>
+<p>Intrusion detection covers the perimeter fence (fence-mounted sensors, buried cable or microwave barriers), doors in areas without card readers, and roof hatches. Test each zone by a walk or a physical disturbance. The alarm must appear at the security control room with the correct zone name and the linked camera view.</p>
+<h2 id="s27-8"><span class="n">27.8</span>Physical security integration tests</h2>
+
+<figure class="sheet" id="F27-5"><a href="../data/cx-handbook/figures/F27-5.svg" title="Open drawing F27-5 at full size"><img src="../data/cx-handbook/figures/F27-5.svg" alt="F27-5: Access control interface test: mantrap doors of hall B2-DH3 with fire release, CCTV and power" width="1400" height="834" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F27-5</span> — <b>Access control interface test: mantrap doors of hall B2-DH3 with fire release, CCTV and power</b>. The fire alarm panel acts on the lock power supply directly, so the doors release even when the ACS server or network is down; the ACS server receives fire mode as a status only.</figcaption></figure>
+<h3 id="s27-8-1"><span class="n">27.8.1</span>Interfaces of the access control system</h3>
+<p>Figure <a class="figref" href="#F27-5">F27-5</a> shows the access control interfaces that are tested on a data-centre project.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>From</th>
+<th>To</th>
+<th>Signal</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fire release</td>
+<td>fire alarm panel relay per zone</td>
+<td>ACS lock power supply</td>
+<td>dry contact, fail-safe (relay opens to release)</td>
+<td>fire alarm in zone releases all egress doors in that zone</td>
+</tr>
+<tr>
+<td>Fire status</td>
+<td>fire alarm panel</td>
+<td>ACS server</td>
+<td>contact or high-level interface</td>
+<td>ACS shows "fire mode"</td>
+</tr>
+<tr>
+<td>Alarm video</td>
+<td>ACS server</td>
+<td>VMS</td>
+<td>software integration</td>
+<td>forced door calls camera to the operator screen</td>
+</tr>
+<tr>
+<td>Door status to BMS</td>
+<td>ACS server</td>
+<td>BMS</td>
+<td>BACnet or contact (only where needed, for example UPS room doors)</td>
+<td>BMS shows door open</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>site NTP server</td>
+<td>ACS, VMS, controllers</td>
+<td>NTP</td>
+<td>event times agree within 1 s</td>
+</tr>
+<tr>
+<td>Power</td>
+<td>UPS-backed supply</td>
+<td>door controllers and lock power supplies</td>
+<td>230 V alternating current (AC) or 24 V DC with battery</td>
+<td>loss of mains test</td>
+</tr>
+<tr>
+<td>Visitor management</td>
+<td>visitor system</td>
+<td>ACS</td>
+<td>API</td>
+<td>temporary card works only for the booked time</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-8-2"><span class="n">27.8.2</span>Door test procedure</h3>
+<p><strong>Purpose:</strong> Prove each door works as designed in normal, alarm, fire and power-loss modes.</p>
+<p><strong>Owner:</strong> The security contractor tests each door. The CxA witnesses. The fire alarm contractor is present for the fire release step. The owner's security manager attends for the critical rooms.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Valid card.</strong> Present a card with the correct access level. The door releases for the set unlock time (for example 5 s), the event shows "access granted" with the card number and door ID at the ACS workstation.</li>
+<li><strong>Invalid card.</strong> Present a card without the access level. The door stays locked. The event shows "access denied".</li>
+<li><strong>Expired card.</strong> Present a card past its end date. The door stays locked.</li>
+<li><strong>Door forced.</strong> Open the door with the mechanical key without a card. The ACS raises "door forced" within 2 s and the linked camera view opens on the operator screen.</li>
+<li><strong>Door held open.</strong> Open with a valid card and hold the door. After the held-open time (for example 30 s) the ACS raises "door held" and the local sounder operates.</li>
+<li><strong>Exit.</strong> Exit from inside with the REX or handle. No alarm is raised.</li>
+<li><strong>Interlock.</strong> On a mantrap, open door 1 and try door 2 with a valid card. Door 2 stays locked. Close door 1 and repeat. Door 2 opens.</li>
+<li><strong>Network loss.</strong> Disconnect the controller network cable. Valid cards still open the door from the local database. Events are stored and appear at the server after the network is restored, with the original time stamps.</li>
+<li><strong>Fire release.</strong> The fire alarm contractor activates a detector in the zone. All egress doors in the zone release within <mark>1 s of the fire relay change</mark> (project value), the mantrap interlock is suspended, and the ACS shows fire mode. Fire-rated doors with fail-secure strikes stay latched but open from inside by the handle.</li>
+<li><strong>Fire reset.</strong> After the fire panel resets, the doors lock again and the ACS returns to normal mode.</li>
+<li><strong>Power loss.</strong> Switch off the mains supply to the lock power supply. A fail-safe lock releases. A fail-secure lock stays locked. The battery supports the controller for the design time (for example 4 h, tested by a discharge test on a sample).</li>
+<li><strong>Emergency release.</strong> Operate the break-glass unit. The fail-safe lock releases and the ACS records the event.</li>
+<li><strong>Record.</strong> Each step gets pass or fail on the door test sheet with the time stamps from the ACS event log.</li>
+</ol>
+<p><strong>Records:</strong> Door test sheet per door (ACS-DT-B2-xxx), ACS event log export for the test day, fire alarm event log for the release step.</p>
+<h3 id="s27-8-3"><span class="n">27.8.3</span>Common errors found in door tests</h3>
+<ol>
+<li><strong>Fire relay wired fail-unsafe.</strong> The fire panel relay closes on alarm to release the door. A cut wire then never releases the door. The relay must <mark>open on alarm</mark>, so that a broken wire releases the door. The CxA checks the relay wiring drawing before the test.</li>
+<li><strong>Lock power from a non-released supply.</strong> The fire relay cuts the controller output, but the maglock takes its power from a separate supply that the fire relay does not cut. The test in step 9 finds this.</li>
+<li><strong>REX shunts the alarm but does not release a maglock.</strong> A maglock door needs the REX to cut the lock power. Where the code requires it, the door also needs a mechanical free exit device.</li>
+<li><strong>Time not synchronised.</strong> ACS and VMS times differ by 3 minutes, so the video of a forced door does not match the event time. Check NTP on every server before the test.</li>
+<li><strong>Wrong access levels.</strong> Contractors' temporary cards still have data hall access after their work ends. The security manager reviews the access level report weekly.</li>
+</ol>
+<p><strong>Worked example:</strong> Fire release test in hall B2-DH3. The hall has 14 doors in fire zone B2-FZ-DH3: 2 mantrap doors (fail-safe maglocks with free exit), 8 corridor doors (fail-secure strikes on fire-rated doors) and 4 emergency exits (fail-safe with delayed egress). The fire contractor activates detector B2-DH3-SD-112 at 14:02:10. The fire panel relay opens at 14:02:11. The ACS event log shows the release of all 6 fail-safe doors between 14:02:11.2 and 14:02:11.6, which is inside the 1 s limit. The 8 fail-secure doors stay latched and each opens from inside with the handle, which the tester checks by walking through each one. The tester also pushes the exit device of one delayed-egress door: it opens at once, because the fire alarm cancels the 15 s delay. The result is pass for 14 of 14 doors. The test sheet lists each door with its time.</p>
+<h2 id="s27-9"><span class="n">27.9</span>OT cybersecurity: IEC 62443 and NIST SP 800-82</h2>
+<h3 id="s27-9-1"><span class="n">27.9.1</span>Why OT cybersecurity is part of commissioning</h3>
+<p>The BMS, the EPMS, the CDU programmable logic controllers (PLCs), the generator controllers and the UPS network cards are computers on a network. A person who reaches them can open a breaker, stop a pump or change a set point. Find default passwords, open ports and unpatched servers before handover.</p>
+<p>Public advisories show that data-centre OT products have real vulnerabilities. CISA has published several advisories for Schneider Electric EcoStruxure Power Monitoring Expert (PME). Advisory ICSA-23-290-01 covers a deserialization vulnerability listed as Common Vulnerabilities and Exposures (CVE) entry CVE-2023-5391. Its Common Vulnerability Scoring System (CVSS) v3 base score is <mark>9.8</mark>, and a hotfix fixes it. Advisory ICSA-25-037-01 covers CVE-2024-9005 and notes that PME 2021 and earlier versions have reached end of life. Advisory ICSA-25-224-03 covers a directory traversal and a pre-authentication server-side request forgery in PME. Researchers have also found BACnet devices that were reachable from the internet on User Datagram Protocol (UDP) port 47808. Before acceptance, check the PME version and hotfix level and the BMS controller firmware against the current advisories.</p>
+<h3 id="s27-9-2"><span class="n">27.9.2</span>The IEC 62443 series</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Title (short)</th>
+<th>Who uses it</th>
+<th>What it gives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>62443-2-1:2024</td>
+<td>security programme requirements for asset owners</td>
+<td>owner, operator</td>
+<td>security programme elements and a maturity model</td>
+</tr>
+<tr>
+<td>62443-2-4</td>
+<td>requirements for service providers</td>
+<td>integrators, maintenance contractors</td>
+<td>what the integrator must do (account handling, patching, documentation)</td>
+</tr>
+<tr>
+<td>62443-3-2:2020</td>
+<td>security risk assessment for system design</td>
+<td>designer, owner</td>
+<td>zones, conduits, target security level per zone</td>
+</tr>
+<tr>
+<td>62443-3-3:2013</td>
+<td>system security requirements and security levels</td>
+<td>system integrator</td>
+<td>7 foundational requirements (FR) and the system requirements for security levels (SL) SL1 to SL4</td>
+</tr>
+<tr>
+<td>62443-4-1</td>
+<td>secure product development lifecycle</td>
+<td>product vendors</td>
+<td>how the vendor develops products</td>
+</tr>
+<tr>
+<td>62443-4-2:2019</td>
+<td>technical security requirements for components</td>
+<td>product vendors</td>
+<td>requirements for controllers, servers, switches</td>
+</tr>
+</tbody>
+</table></div>
+<p>IEC 62443-2-1 edition 2.0 was published on 7 August 2024. It sorts the requirements into security programme elements, removes overlap with an information security management system, and defines a maturity model. It allows compensating measures for legacy systems that cannot meet a requirement, for example where software is no longer supported and cannot be patched.</p>
+<h3 id="s27-9-3"><span class="n">27.9.3</span>The seven foundational requirements</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>FR</th>
+<th>Name</th>
+<th>Meaning on a data-centre OT network</th>
+<th>Example check at commissioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR1</td>
+<td>Identification and authentication control</td>
+<td>every user and device is identified before access</td>
+<td>no shared "admin" account on the BMS server</td>
+</tr>
+<tr>
+<td>FR2</td>
+<td>Use control</td>
+<td>each user can do only what the role allows</td>
+<td>an operator account cannot change programmable logic controller (PLC) logic</td>
+</tr>
+<tr>
+<td>FR3</td>
+<td>System integrity</td>
+<td>software and data are protected from change</td>
+<td>controller firmware signed; file integrity monitoring on servers</td>
+</tr>
+<tr>
+<td>FR4</td>
+<td>Data confidentiality</td>
+<td>data is protected from reading by others</td>
+<td>SNMPv3 with privacy, Transport Layer Security (TLS) on web interfaces</td>
+</tr>
+<tr>
+<td>FR5</td>
+<td>Restricted data flow</td>
+<td>zones are separated and flows are limited</td>
+<td>firewall rule base equals the conduit table</td>
+</tr>
+<tr>
+<td>FR6</td>
+<td>Timely response to events</td>
+<td>events are logged and reviewed</td>
+<td>syslog from switches and servers reaches the log server</td>
+</tr>
+<tr>
+<td>FR7</td>
+<td>Resource availability</td>
+<td>the system stays available under load and attack</td>
+<td>backups restored, rate limits, redundant servers</td>
+</tr>
+</tbody>
+</table></div>
+<p>The security level of a zone is a vector of seven values, one for each FR. A zone can have SL2 for FR4 and SL3 for FR5, for example. IEC 62443-3-3:2013 has 51 system requirements (SR), SR 1.1 to SR 7.8 in clauses 5 to 11, with requirement enhancements for the higher levels.</p>
+<h3 id="s27-9-4"><span class="n">27.9.4</span>Security levels</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Protection against (IEC 62443 definition, short form)</th>
+<th>Data-centre example of the attacker</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SL1</td>
+<td>casual or coincidental violation</td>
+<td>a technician who connects a laptop to the wrong port</td>
+</tr>
+<tr>
+<td>SL2</td>
+<td>intentional violation with simple means, low resources, generic skills</td>
+<td>a person who uses public tools against a default password</td>
+</tr>
+<tr>
+<td>SL3</td>
+<td>intentional violation with sophisticated means, moderate resources, OT-specific skills</td>
+<td>an organised group that studies BMS protocols</td>
+</tr>
+<tr>
+<td>SL4</td>
+<td>intentional violation with sophisticated means, extended resources, high motivation</td>
+<td>a state-sponsored group</td>
+</tr>
+</tbody>
+</table></div>
+<p>The standard uses three forms of the level. The target level (SL-T) is chosen in the risk assessment. The capability level (SL-C) is what a product or system can give when configured correctly. The achieved level (SL-A) is measured on the installed system. Commissioning proves the achieved level against the target. The ISA-62443-3-3 preview uses the same three terms. It states that the standard covers the capability level SL-C, and that SL-T and SL-A are out of its scope.</p>
+<h3 id="s27-9-5"><span class="n">27.9.5</span>NIST SP 800-82 Rev. 3</h3>
+<p>NIST SP 800-82 Rev. 3, "Guide to Operational Technology (OT) Security", was published in September 2023 and replaced Rev. 2 of 2015. It describes OT system types and topologies, typical threats and vulnerabilities, and recommended safeguards. It contains an OT overlay of the NIST SP 800-53 Rev. 5 controls, with tailored baselines for low, moderate and high impact OT systems. On a data-centre project, NIST SP 800-82 guides the security programme and the network architecture. IEC 62443-3-3 is the requirement set in the specification, because it gives testable requirements per security level.</p>
+<h2 id="s27-10"><span class="n">27.10</span>Zones, conduits and security levels</h2>
+
+<figure class="sheet" id="F27-1"><a href="../data/cx-handbook/figures/F27-1.svg" title="Open drawing F27-1 at full size"><img src="../data/cx-handbook/figures/F27-1.svg" alt="F27-1: Zones and conduits of one MSC-1 building (IEC 62443-3-2) with the target security level of each zone" width="1400" height="984" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F27-1</span> — <b>Zones and conduits of one MSC-1 building (IEC 62443-3-2) with the target security level of each zone</b>. Every arrow is one conduit from the conduit table in 27.10.4; a flow that has no arrow on this sheet is blocked by the firewall and logged.</figcaption></figure>
+<h3 id="s27-10-1"><span class="n">27.10.1</span>Definitions</h3>
+<p>A zone is a group of assets that share the same security requirements, for example all EPMS meters and relays of one building. A conduit is the set of communication paths between two zones, together with the security controls on those paths (firewalls, encrypted tunnels, data diodes). IEC 62443-3-2 requires the asset owner to divide the system under consideration into zones and conduits. The owner then assesses the risk of each and sets a target security level for each.</p>
+<h3 id="s27-10-2"><span class="n">27.10.2</span>Risk assessment steps of IEC 62443-3-2</h3>
+<p>The steps below follow the seven zone and conduit requirements (ZCR 1 to ZCR 7) of IEC 62443-3-2:2020, clauses 4.2 to 4.8, as listed in the ISA-62443-3-2 table of contents.</p>
+<ol>
+<li><strong>Identify the system under consideration (ZCR 1).</strong> List the systems in scope (BMS, EPMS, CDU PLCs, generator controls, fire alarm interfaces, access control, CCTV, DCIM) and their boundaries. Owner: OT security lead. Record: system under consideration document.</li>
+<li><strong>Initial risk assessment (ZCR 2).</strong> Assess the worst consequence of a compromise of each system, without counting controls. A compromised EPMS that can open MV breakers has a consequence of loss of IT load in a hall.</li>
+<li><strong>Partition into zones and conduits (ZCR 3).</strong> Group assets by consequence and by function. Draw the zone and conduit diagram (Figure <a class="figref" href="#F27-1">F27-1</a>).</li>
+<li><strong>Compare with tolerable risk (ZCR 4).</strong> If the initial risk of a zone is above the owner's tolerable risk, continue with a detailed assessment.</li>
+<li><strong>Detailed risk assessment (ZCR 5).</strong> For each zone, list threats, vulnerabilities and existing controls, and decide the target security level per FR (ZCR 5.6, determine SL-T).</li>
+<li><strong>Document the requirements (ZCR 6).</strong> Write the cybersecurity requirements specification: zone list, conduit list, SL-T per zone, assumptions and constraints.</li>
+<li><strong>Asset owner approval (ZCR 7).</strong> The owner signs the cybersecurity requirements specification before the integrators finalise their designs.</li>
+</ol>
+<h3 id="s27-10-3"><span class="n">27.10.3</span>Zone model of an MSC-1 building</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>Assets</th>
+<th>Consequence of compromise</th>
+<th>SL-T (example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Z1 Enterprise</td>
+<td>corporate network, email, office PCs</td>
+<td>business data loss, no direct control of plant</td>
+<td>outside OT scope</td>
+</tr>
+<tr>
+<td>Z2 OT demilitarised zone (DMZ)</td>
+<td>historian replica, jump host, patch server, antivirus server</td>
+<td>entry point to OT</td>
+<td>SL3</td>
+</tr>
+<tr>
+<td>Z3 OT servers</td>
+<td>BMS servers, PME servers, DCIM server, ACS server, VMS</td>
+<td>loss of monitoring and control of a building</td>
+<td>SL3</td>
+</tr>
+<tr>
+<td>Z4 EPMS field</td>
+<td>meters, protection relays, breaker trip units, gateways</td>
+<td>wrong breaker operation, loss of power to halls</td>
+<td>SL3</td>
+</tr>
+<tr>
+<td>Z5 BMS field</td>
+<td>BMS controllers, CDU PLCs, CRAH controllers, chiller panels</td>
+<td>loss of cooling to halls</td>
+<td>SL3</td>
+</tr>
+<tr>
+<td>Z6 Safety and fire</td>
+<td>fire alarm panels, gas suppression panels, leak detection</td>
+<td>life safety; read-only to OT</td>
+<td>SL3 for FR5, isolated by design</td>
+</tr>
+<tr>
+<td>Z7 Security</td>
+<td>access control controllers, cameras</td>
+<td>unauthorised entry, loss of video</td>
+<td>SL2</td>
+</tr>
+<tr>
+<td>Z8 Vendor equipment</td>
+<td>UPS cards, generator controllers, chiller vendor gateways</td>
+<td>as Z4 and Z5</td>
+<td>SL2 to SL3 according to function</td>
+</tr>
+<tr>
+<td>Z9 Management</td>
+<td>switch and firewall management interfaces</td>
+<td>change of the network itself</td>
+<td>SL3</td>
+</tr>
+</tbody>
+</table></div>
+<p>The SL-T values above are an example for a hyperscale building. Each project sets its own values in the approved risk assessment.</p>
+<h3 id="s27-10-4"><span class="n">27.10.4</span>Conduit table</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Conduit</th>
+<th>From zone</th>
+<th>To zone</th>
+<th>Protocol and port</th>
+<th>Direction</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td>Z1</td>
+<td>Z2</td>
+<td>Hypertext Transfer Protocol Secure (HTTPS) 443 to historian replica; Remote Desktop Protocol (RDP) gateway 443</td>
+<td>Z1 initiates to Z2 only</td>
+<td>firewall 1, multi-factor authentication (MFA) on jump host</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>Z2</td>
+<td>Z3</td>
+<td>historian replication; patch distribution</td>
+<td>Z3 initiates to Z2 for replication</td>
+<td>firewall 2, logging</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>Z3</td>
+<td>Z4</td>
+<td>Modbus TCP 502, ION 7700, Precision Time Protocol (PTP)</td>
+<td>Z3 initiates</td>
+<td>firewall or access list on the virtual routing and forwarding (VRF) instance, rate limit</td>
+</tr>
+<tr>
+<td>C4</td>
+<td>Z3</td>
+<td>Z5</td>
+<td>BACnet/IP UDP 47808 or BACnet/SC TLS</td>
+<td>Z3 and Z5 both</td>
+<td>firewall, BACnet broadcast management device (BBMD) limits</td>
+</tr>
+<tr>
+<td>C5</td>
+<td>Z6</td>
+<td>Z3</td>
+<td>BACnet or Modbus read-only gateway</td>
+<td>Z6 to Z3 values only</td>
+<td>read-only gateway, no write function codes</td>
+</tr>
+<tr>
+<td>C6</td>
+<td>Z3</td>
+<td>Z7</td>
+<td>ACS and VMS server to controllers and cameras</td>
+<td>Z3 initiates</td>
+<td>separate VLAN</td>
+</tr>
+<tr>
+<td>C7</td>
+<td>Z9</td>
+<td>all network devices</td>
+<td>Secure Shell (SSH) 22, SNMPv3 161</td>
+<td>Z9 initiates</td>
+<td>out-of-band management</td>
+</tr>
+<tr>
+<td>C8</td>
+<td>Z3</td>
+<td>Z8</td>
+<td>SNMPv3 to UPS cards, Modbus TCP to generator controllers</td>
+<td>Z3 initiates</td>
+<td>firewall, credentials per device</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-10-5"><span class="n">27.10.5</span>Conduit verification test</h3>
+<p><strong>Purpose:</strong> Prove that the firewalls allow only the flows in the conduit table.</p>
+<p><strong>Owner:</strong> The network contractor runs the test. The OT security lead or an independent tester witnesses.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Export the rule base.</strong> The network contractor exports the firewall rule base. The OT security lead compares each rule with the conduit table. Each rule without a conduit line is an issue. Rules with <mark>"any" in source, destination or service</mark> are rejected.</li>
+<li><strong>Test allowed flows.</strong> From a test laptop placed in the source zone, the tester opens each allowed flow, for example a Modbus TCP read from the PME server address to a meter. Each allowed flow works.</li>
+<li><strong>Test denied flows.</strong> From the same laptop, the tester tries flows that are not in the table: Z1 to Z4 directly, Z7 to Z4, Z5 to Z4 Modbus write. Each denied flow fails and appears in the firewall log within 60 s.</li>
+<li><strong>Scan.</strong> The tester runs a port scan of each zone from each other zone with a tool and settings approved in the test method statement. A scan of field devices must use a <mark>low rate (for example one probe per second)</mark> because some controllers stop responding under fast scans. The open ports must match the conduit table.</li>
+<li><strong>Record.</strong> The results go to the conduit test record with each flow, expected result, actual result and the log reference.</li>
+</ol>
+<p><strong>Records:</strong> Conduit test record OT-CT-B2-01, firewall rule base export with checksum, scan output files.</p>
+<p><strong>Worked example:</strong> Conduit C5 read-only test. The fire alarm gateway in Z6 is configured to allow reads only. The tester sends a Modbus function code 03 (read holding registers) from the BMS server: the gateway returns the values. The tester sends function code 06 (write single register) to the same register: the gateway returns <mark>exception 01 (illegal function)</mark>. The tester sends a BACnet WriteProperty to the gateway's BACnet object: the gateway rejects it with an error. The firewall log shows 3 allowed flows and 0 denied, because the rejection was made by the gateway. The OT security lead accepts the result. As a second layer, the lead adds a firewall rule that blocks Modbus function codes 05, 06, 15 and 16 toward Z6, using the deep packet inspection function of the firewall. The data sheet of the installed firewall model states whether its Modbus inspection filters by function code; the OT security lead files that page with the rule base export.</p>
+<h2 id="s27-11"><span class="n">27.11</span>Hardening checklist</h2>
+
+<figure class="sheet" id="F27-4"><a href="../data/cx-handbook/figures/F27-4.svg" title="Open drawing F27-4 at full size"><img src="../data/cx-handbook/figures/F27-4.svg" alt="F27-4: Hardening checklist matrix: controls by device type and the result of the B2 sample check" width="1400" height="538" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F27-4</span> — <b>Hardening checklist matrix: controls by device type and the result of the B2 sample check</b>. Each cell is one check in the hardening check record; a &quot;not supported&quot; answer from the integrator is checked against the product manual before it is accepted.</figcaption></figure>
+<h3 id="s27-11-1"><span class="n">27.11.1</span>What hardening means</h3>
+<p>Hardening is the removal of every function, account, service and port that the system does not need, and the setting of the security options that the product supports. Figure <a class="figref" href="#F27-4">F27-4</a> shows the hardening checklist as a matrix of device types and controls. The integrator does the hardening. The commissioning team checks it with a sample and records the result.</p>
+<h3 id="s27-11-2"><span class="n">27.11.2</span>Hardening items per device type</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Servers and workstations</th>
+<th>Controllers and PLCs</th>
+<th>Switches and firewalls</th>
+<th>Meters and vendor cards</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Default passwords changed</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Unused accounts removed or disabled</td>
+<td>yes</td>
+<td>where supported</td>
+<td>yes</td>
+<td>where supported</td>
+</tr>
+<tr>
+<td>Unused services and ports closed</td>
+<td>yes</td>
+<td>yes (File Transfer Protocol (FTP), Telnet, Hypertext Transfer Protocol (HTTP) off)</td>
+<td>yes</td>
+<td>yes (Telnet, FTP, HTTP off)</td>
+</tr>
+<tr>
+<td>Encrypted management (SSH, HTTPS)</td>
+<td>yes</td>
+<td>where supported</td>
+<td>yes</td>
+<td>where supported</td>
+</tr>
+<tr>
+<td>Firmware or operating system (OS) at approved version</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Logging to central syslog</td>
+<td>yes</td>
+<td>where supported</td>
+<td>yes</td>
+<td>where supported</td>
+</tr>
+<tr>
+<td>USB and removable media blocked</td>
+<td>yes</td>
+<td>physical port covers</td>
+<td>console port locked</td>
+<td>not applicable</td>
+</tr>
+<tr>
+<td>Antivirus or application allow-listing</td>
+<td>yes</td>
+<td>not applicable</td>
+<td>not applicable</td>
+<td>not applicable</td>
+</tr>
+<tr>
+<td>Time from site NTP</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Configuration backed up</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Unused switch ports shut down</td>
+<td>not applicable</td>
+<td>not applicable</td>
+<td>yes</td>
+<td>not applicable</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-11-3"><span class="n">27.11.3</span>Hardening check procedure</h3>
+<ol>
+<li><strong>Receive the hardening record.</strong> The integrator submits a hardening record per device with each item answered "done", "not supported" or "not applicable", with a reason for each "not supported".</li>
+<li><strong>Check the "not supported" items.</strong> The OT security lead checks each "not supported" item against the product manual. If the product supports it, the item goes back to the integrator.</li>
+<li><strong>Sample the devices.</strong> The CxA and OT security lead select 100 % of servers, firewalls and core switches. They select 10 % of each type of field device (minimum 3 per type).</li>
+<li><strong>Test default passwords.</strong> The tester tries the vendor default credentials from the product manual on each sampled device. <mark>Any successful login with a default credential is a category A issue</mark>.</li>
+<li><strong>Test closed services.</strong> The tester checks with a port scan that Telnet (23), FTP (21) and HTTP (80) are closed where the product supports their removal.</li>
+<li><strong>Check versions.</strong> The tester reads the firmware or software version on each sampled device and compares it with the approved version list.</li>
+<li><strong>Check logs.</strong> The tester logs in with a wrong password three times on a sampled device and checks that the events appear on the syslog server within 60 s.</li>
+<li><strong>Record.</strong> Each sampled device gets one line in the hardening check record.</li>
+</ol>
+<h3 id="s27-11-4"><span class="n">27.11.4</span>Hardening check record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Device ID</td>
+<td>text</td>
+<td>B2-ER-A1-PM8000-07</td>
+</tr>
+<tr>
+<td>Device type</td>
+<td>list</td>
+<td>power meter</td>
+</tr>
+<tr>
+<td>Firmware version found</td>
+<td>text</td>
+<td>3.2.1 (example)</td>
+</tr>
+<tr>
+<td>Approved version</td>
+<td>text</td>
+<td>3.2.1</td>
+</tr>
+<tr>
+<td>Default credential test</td>
+<td>list</td>
+<td>pass (rejected)</td>
+</tr>
+<tr>
+<td>Open ports found</td>
+<td>text</td>
+<td>502, 443</td>
+</tr>
+<tr>
+<td>Open ports allowed</td>
+<td>text</td>
+<td>502, 443</td>
+</tr>
+<tr>
+<td>Syslog test</td>
+<td>list</td>
+<td>not supported (meter), event logged at PME instead</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>list</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Tester</td>
+<td>text</td>
+<td>OT security lead S. Wijaya</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>date</td>
+<td>2026-12-03</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s27-12"><span class="n">27.12</span>Accounts and privileged access</h2>
+<h3 id="s27-12-1"><span class="n">27.12.1</span>Account register</h3>
+<p>Every account on every OT system is listed in an account register before handover. The register is a controlled document held by the owner's OT security lead.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Account name</td>
+<td>text</td>
+<td>bms.ops.rhadi</td>
+</tr>
+<tr>
+<td>System</td>
+<td>text</td>
+<td>BMS server B2-BMS-SRV-01</td>
+</tr>
+<tr>
+<td>Account type</td>
+<td>list</td>
+<td>named user, service, emergency</td>
+</tr>
+<tr>
+<td>Role</td>
+<td>list</td>
+<td>operator, engineer, administrator</td>
+</tr>
+<tr>
+<td>Owner (person)</td>
+<td>text</td>
+<td>R. Hadi, operations</td>
+</tr>
+<tr>
+<td>Authentication</td>
+<td>list</td>
+<td>domain account with MFA</td>
+</tr>
+<tr>
+<td>Created</td>
+<td>date</td>
+<td>2026-11-20</td>
+</tr>
+<tr>
+<td>Review date</td>
+<td>date</td>
+<td>2027-02-20</td>
+</tr>
+<tr>
+<td>Status at handover</td>
+<td>list</td>
+<td>active</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-12-2"><span class="n">27.12.2</span>Account rules</h3>
+<ol>
+<li><strong>Named accounts.</strong> Each person has a <mark>named account</mark>. Shared accounts such as "admin" or "operator" are disabled. Where a product supports only one administrator account, its password is held in a password vault and each use is logged.</li>
+<li><strong>Least privilege.</strong> Operators can acknowledge alarms and change set points inside the limits. Engineers can change logic and graphics. Administrators manage accounts. One person holds one role per system unless the owner approves an exception in writing.</li>
+<li><strong>Contractor accounts removed.</strong> At handover <mark>all contractor and commissioning accounts are disabled</mark>. The OEM support accounts that remain are listed, have an end date and are disabled until a support request opens them.</li>
+<li><strong>Emergency account.</strong> One emergency ("break-glass") account per system is kept in a sealed envelope or a vault. Its use raises an alarm and is reviewed within 1 working day.</li>
+<li><strong>Password length.</strong> Passwords meet the owner's policy; where the product allows, at least 12 characters (project value from the owner's password policy).</li>
+<li><strong>Review.</strong> The account register is reviewed every 3 months. The first review is in the first quarter after handover.</li>
+</ol>
+<p><strong>Worked example:</strong> Account clean-up before handover of building B2. The account export from the BMS server lists 64 accounts. Of these, 41 belong to the BMS contractor and commissioning staff and 12 to the owner's operations team; 6 are service accounts and 5 are built-in accounts. The OT security lead disables the 41 contractor accounts and keeps 12 named operations accounts with MFA. The lead documents the 6 service accounts with their purpose and disables 4 of the 5 built-in accounts. The fifth is the product's local administrator, which cannot be removed, so its password is changed to a vault-held value of 20 characters. The result is <mark>19 active accounts</mark> (12 named, 6 service and the local administrator), each with an owner in the account register.</p>
+<h2 id="s27-13"><span class="n">27.13</span>Patching and vulnerability management</h2>
+<h3 id="s27-13-1"><span class="n">27.13.1</span>Patch process during construction and handover</h3>
+<ol>
+<li><strong>Approved version list.</strong> At the start of L3, the OT security lead issues the approved version list: the operating system, software and firmware version for every product. The integrator installs these versions.</li>
+<li><strong>Advisory review.</strong> Every 2 weeks during commissioning, the OT security lead checks the CISA ICS advisories for every product in the list. The lead also checks the vendor security notification pages, for example Schneider Electric security notifications.</li>
+<li><strong>Assess each advisory.</strong> For each advisory that affects an installed version, the lead records the CVE, the CVSS score and whether the vulnerable function is reachable through the conduits. The lead then records the decision: patch now, patch at a planned window, or apply a compensating control.</li>
+<li><strong>Test before install.</strong> A patch is installed first on a test server or one controller, then on the rest. The BMS or EPMS L4 tests for the affected functions are repeated on the first device.</li>
+<li><strong>Freeze before IST.</strong> The approved version list is frozen <mark>10 working days before IST</mark>. A patch after the freeze needs the commissioning manager's approval, because it can invalidate IST results.</li>
+<li><strong>Handover list.</strong> At handover, the approved version list is updated with the installed versions and every open advisory with its decision.</li>
+</ol>
+<h3 id="s27-13-2"><span class="n">27.13.2</span>Vulnerability register fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Advisory</td>
+<td>text</td>
+<td>CISA ICSA-23-290-01</td>
+</tr>
+<tr>
+<td>CVE</td>
+<td>text</td>
+<td>CVE-2023-5391</td>
+</tr>
+<tr>
+<td>Product and version</td>
+<td>text</td>
+<td>EcoStruxure Power Monitoring Expert 2022</td>
+</tr>
+<tr>
+<td>CVSS base score</td>
+<td>number</td>
+<td>9.8</td>
+</tr>
+<tr>
+<td>Reachable through a conduit</td>
+<td>yes or no</td>
+<td>yes, from Z3</td>
+</tr>
+<tr>
+<td>Decision</td>
+<td>list</td>
+<td>patch now</td>
+</tr>
+<tr>
+<td>Fix</td>
+<td>text</td>
+<td>vendor hotfix named in the advisory</td>
+</tr>
+<tr>
+<td>Planned date</td>
+<td>date</td>
+<td>2026-11-25</td>
+</tr>
+<tr>
+<td>Retest</td>
+<td>text</td>
+<td>PME L4 alarm and report tests repeated, pass</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>list</td>
+<td>closed</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s27-14"><span class="n">27.14</span>Backups and restore tests</h2>
+<h3 id="s27-14-1"><span class="n">27.14.1</span>What is backed up</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Content</th>
+<th>Frequency at handover (example)</th>
+<th>Storage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BMS servers</td>
+<td>full image and database</td>
+<td>daily database, weekly image</td>
+<td>backup server in Z3, copy offline monthly</td>
+</tr>
+<tr>
+<td>PME servers</td>
+<td>databases (ION_Data, ION_Network), configuration</td>
+<td>daily database</td>
+<td>same</td>
+</tr>
+<tr>
+<td>DCIM server</td>
+<td>database and configuration</td>
+<td>daily</td>
+<td>same</td>
+</tr>
+<tr>
+<td>Controller programs</td>
+<td>PLC and BMS controller programs, set points</td>
+<td>at each change and at handover</td>
+<td>engineering repository with version numbers</td>
+</tr>
+<tr>
+<td>Switch and firewall configurations</td>
+<td>running configuration</td>
+<td>at each change, weekly automatic</td>
+<td>management server in Z9</td>
+</tr>
+<tr>
+<td>ACS and VMS</td>
+<td>cardholder database, configuration</td>
+<td>daily</td>
+<td>security server</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-14-2"><span class="n">27.14.2</span>Restore test procedure</h3>
+<ol>
+<li><strong>Choose the item.</strong> The CxA chooses one server backup and two controller programs for the restore test.</li>
+<li><strong>Restore the server.</strong> The integrator restores the server backup to a spare virtual machine on an isolated network. The server starts and the application opens.</li>
+<li><strong>Compare.</strong> The tester compares point counts, alarm counts and the last recorded values with the live server. The acceptance value is the same point count and data up to the backup time.</li>
+<li><strong>Restore a controller.</strong> The integrator downloads the backup program to a spare or test controller of the same type. The program version and checksum equal the repository record.</li>
+<li><strong>Time the restore.</strong> The tester records the time from start to working system. The owner uses this time for the recovery time objective in the operations plan.</li>
+<li><strong>Record.</strong> The restore test record lists items, times and results.</li>
+</ol>
+<p><strong>Worked example:</strong> BMS server restore test for building B2. The backup of 2026-12-08 02:00 is restored to a test virtual machine. Restore of the image takes 46 minutes and the database restore takes 18 minutes. The restored server shows 38,412 points, equal to the live server, and alarm history up to 01:59. The restore time of 64 minutes is recorded against the owner's recovery time objective of <mark>4 hours</mark> (project value). The result is pass.</p>
+<h2 id="s27-15"><span class="n">27.15</span>Remote access</h2>
+<p>Remote access is the conduit with the highest risk, because it starts outside the OT zones. Figure <a class="figref" href="#F27-7">F27-7</a> shows the one permitted path from a vendor laptop through the jump host to an OT server. It also shows the path that is not allowed and the three login cases of the commissioning test.</p>
+<figure class="sheet" id="F27-7"><a href="../data/cx-handbook/figures/F27-7.svg" title="Open drawing F27-7 at full size"><img src="../data/cx-handbook/figures/F27-7.svg" alt="F27-7: Remote access to OT: one path through the jump host, three login tests" width="1000" height="707" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F27-7</span> — <b>Remote access to OT: one path through the jump host, three login tests</b>. Every remote session crosses two firewalls and the jump host; a path that bypasses the jump host is a finding, not a conduit, unless the risk assessment lists it.</figcaption></figure>
+
+<ol>
+<li><strong>One path only.</strong> Remote access to OT goes through the jump host in the OT DMZ. No modem, cellular router or vendor cloud connection is allowed in any OT zone unless the owner approves it in the risk assessment and it is listed as a conduit.</li>
+<li><strong>Multi-factor authentication.</strong> Every remote session needs <mark>MFA on the jump host</mark>.</li>
+<li><strong>Session approval.</strong> A vendor session is opened by the operations team for a work order with a start and end time. The account is disabled outside the window.</li>
+<li><strong>Recording.</strong> Remote sessions are recorded where the jump host supports it, and the recording is kept for the owner's retention period.</li>
+<li><strong>No file transfer by default.</strong> File transfer to OT goes through the patch server with a malware scan.</li>
+<li><strong>Test.</strong> The tester tries a remote login with a disabled vendor account (must fail) and with an enabled account without MFA (must fail). The tester then logs in with an enabled account with MFA inside the window (must work and be logged).</li>
+<li><strong>Search for unlisted paths.</strong> The tester checks each OT switch for unknown media access control (MAC) addresses. The tester also walks each electrical and mechanical room to look for cellular routers or modems in vendor panels. Vendor panels of chillers and generators sometimes arrive with a cellular modem for the vendor's remote service.</li>
+</ol>
+<h2 id="s27-16"><span class="n">27.16</span>Protocol security: BACnet, Modbus and SNMP</h2>
+<h3 id="s27-16-1"><span class="n">27.16.1</span>Protocol risks and controls</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Protocol</th>
+<th>Built-in security</th>
+<th>Main risk</th>
+<th>Control on the project</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BACnet/IP (UDP 47808)</td>
+<td>none in the base protocol</td>
+<td>any host on the network can read and write objects</td>
+<td>separate zone, firewall, limit BBMD broadcast distribution tables, write priority checks</td>
+</tr>
+<tr>
+<td>BACnet/SC</td>
+<td>TLS 1.3 with X.509 certificates on both ends</td>
+<td>certificate expiry and management</td>
+<td>certificate register, expiry alarms</td>
+</tr>
+<tr>
+<td>BACnet master-slave/token-passing (MS/TP)</td>
+<td>none</td>
+<td>physical access to the RS-485 trunk</td>
+<td>locked panels</td>
+</tr>
+<tr>
+<td>Modbus TCP (502)</td>
+<td>none</td>
+<td>any host can read and write registers</td>
+<td>firewall per source address, function code filtering</td>
+</tr>
+<tr>
+<td>Modbus remote terminal unit (RTU)</td>
+<td>none</td>
+<td>physical access</td>
+<td>locked panels</td>
+</tr>
+<tr>
+<td>SNMPv1 and v2c</td>
+<td>community string in clear text</td>
+<td>read and write with the community string</td>
+<td>disable v1 and v2c, use SNMPv3</td>
+</tr>
+<tr>
+<td>SNMPv3</td>
+<td>authentication and privacy</td>
+<td>weak passwords, no privacy mode</td>
+<td>authPriv with Secure Hash Algorithm (SHA) authentication and Advanced Encryption Standard (AES) privacy, unique credentials per device class</td>
+</tr>
+<tr>
+<td>HTTP device web pages</td>
+<td>none</td>
+<td>passwords in clear text</td>
+<td>disable HTTP, use HTTPS</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-16-2"><span class="n">27.16.2</span>BACnet Secure Connect</h3>
+<p>BACnet/SC is defined in Annex AB of ANSI/ASHRAE 135. It carries BACnet messages over WebSocket connections secured with TLS 1.3, and each device holds an operational X.509 certificate and the issuer certificates that it trusts. Devices connect to a hub (primary and failover hub), so a BACnet/SC network does not need broadcasts or BBMDs. The standard does not fix a port; <mark>443 is common</mark> because firewalls allow it. One vendor knowledge base reports that a BACnet/SC hub did not start on port 443 on one controller model, because the controller web server already used the port. The fix was to move HTTPS to port 8443.</p>
+<p>Commissioning checks for BACnet/SC:</p>
+<ol>
+<li><strong>Certificate register.</strong> Each device certificate is listed with its expiry date. The BMS raises an alarm <mark>60 days before expiry</mark> (project value).</li>
+<li><strong>Hub failover.</strong> The tester stops the primary hub. Devices reconnect to the failover hub and the BMS shows all points within the time set in the specification.</li>
+<li><strong>Rejected device.</strong> The tester connects a device with a certificate from an untrusted issuer. The hub rejects the connection and logs it.</li>
+</ol>
+<h2 id="s27-17"><span class="n">27.17</span>Cybersecurity acceptance tests and records</h2>
+<h3 id="s27-17-1"><span class="n">27.17.1</span>Acceptance test list</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Section</th>
+<th>Acceptance</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conduit verification</td>
+<td>27.10.5</td>
+<td>rule base equals conduit table; denied flows blocked and logged</td>
+<td>OT-CT-B2-01</td>
+</tr>
+<tr>
+<td>Hardening check</td>
+<td>27.11.3</td>
+<td>0 default credentials; versions equal approved list</td>
+<td>OT-HC-B2-01</td>
+</tr>
+<tr>
+<td>Account register review</td>
+<td>27.12</td>
+<td>0 contractor accounts active; every account has an owner</td>
+<td>OT-AR-B2-01</td>
+</tr>
+<tr>
+<td>Vulnerability register</td>
+<td>27.13</td>
+<td>every advisory has a decision; no open CVSS ≥ 9.0 without a compensating control</td>
+<td>OT-VR-B2-01</td>
+</tr>
+<tr>
+<td>Backup and restore</td>
+<td>27.14</td>
+<td>restore works; time recorded</td>
+<td>OT-BR-B2-01</td>
+</tr>
+<tr>
+<td>Remote access</td>
+<td>27.15</td>
+<td>three test cases pass; no unlisted path</td>
+<td>OT-RA-B2-01</td>
+</tr>
+<tr>
+<td>BACnet/SC</td>
+<td>27.16.2</td>
+<td>certificates registered; hub failover works</td>
+<td>OT-SC-B2-01</td>
+</tr>
+<tr>
+<td>Logging</td>
+<td>27.11.3</td>
+<td>events from servers and switches reach syslog in 60 s</td>
+<td>OT-LG-B2-01</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-17-2"><span class="n">27.17.2</span>Blocking rules</h3>
+<ol>
+<li><strong>Before energisation of the EPMS network.</strong> The conduit C3 rules and the Z4 hardening of protection relays are complete. A relay with a default password is never connected to a network that reaches a server.</li>
+<li><strong>Before IST.</strong> The conduit test, the hardening check and the version freeze are complete. Any <mark>category A cybersecurity issue blocks IST</mark>.</li>
+<li><strong>Before handover.</strong> All acceptance tests in 27.17.1 have passed, and the account register shows 0 active contractor accounts.</li>
+</ol>
+<h2 id="s27-18"><span class="n">27.18</span>KPIs for DCIM, CMMS, security and OT cybersecurity</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Formula</th>
+<th>Target (example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DCIM point-to-point pass rate</td>
+<td>passed points ÷ tested points × 100</td>
+<td>≥ 98 % at first test</td>
+</tr>
+<tr>
+<td>Asset data completeness</td>
+<td>mandatory fields filled ÷ mandatory fields × 100</td>
+<td>100 % for criticality A</td>
+</tr>
+<tr>
+<td>Asset data field accuracy</td>
+<td>sampled assets without mismatch ÷ sampled assets × 100</td>
+<td>≥ 98 %</td>
+</tr>
+<tr>
+<td>PM link coverage</td>
+<td>assets with at least one PM ÷ maintainable assets × 100</td>
+<td>100 % for criticality A and B</td>
+</tr>
+<tr>
+<td>Door test first-pass rate</td>
+<td>doors passed at first test ÷ doors tested × 100</td>
+<td>≥ 95 %</td>
+</tr>
+<tr>
+<td>Default credential findings</td>
+<td>count of devices that accept a default credential</td>
+<td>0 at handover</td>
+</tr>
+<tr>
+<td>Open critical advisories</td>
+<td>count of CVSS ≥ 9.0 advisories without decision</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Account register accuracy</td>
+<td>accounts found on systems that are in the register ÷ accounts found × 100</td>
+<td>100 %</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s27-19"><span class="n">27.19</span>Checklist for site use</h2>
+<ol>
+<li><strong>DCIM naming.</strong> The DCIM naming convention equals the drawing tags, the BMS names and the CMMS IDs.</li>
+<li><strong>DCIM power chain.</strong> The power chain is loaded from as-built panel schedules and proved by the A and B feed test.</li>
+<li><strong>DCIM points.</strong> The point-to-point log covers 100 % of alarms and feeds and the sample of rPDU outlets; values inside ±3 % or ±0.2 A.</li>
+<li><strong>DCIM alarm time.</strong> Alarms appear within 2 poll intervals and communication loss alarms within the set time.</li>
+<li><strong>Asset template.</strong> The asset data template follows the owner's CMMS data standard and the ISO 14224 levels.</li>
+<li><strong>Asset data check.</strong> Completeness, uniqueness, cross-system and field sample checks are recorded; mismatch below 2 %.</li>
+<li><strong>PM schedules.</strong> Each PM task has a source; warranty tasks flagged; the 90-day work order generation is tested.</li>
+<li><strong>Run hours.</strong> Run-hour readings at handover are entered for generators, pumps and fans.</li>
+<li><strong>Door tests.</strong> Each door passes the 13 steps in 27.8.2, including the fire release and the power loss steps.</li>
+<li><strong>Fire relay wiring.</strong> The fire release relay opens on alarm, so a broken wire releases the doors.</li>
+<li><strong>Mantraps.</strong> Interlock, fire mode, power loss mode and emergency release are tested.</li>
+<li><strong>CCTV.</strong> Coverage, resolution, frame rate, time synchronisation and the retention estimate are recorded.</li>
+<li><strong>Zones and conduits.</strong> The cybersecurity requirements specification is approved; the zone diagram and conduit table are current.</li>
+<li><strong>Conduit test.</strong> Allowed flows work; denied flows are blocked and logged; no "any" rules.</li>
+<li><strong>Hardening.</strong> No device accepts a default credential; versions equal the approved list.</li>
+<li><strong>Accounts.</strong> Contractor accounts are disabled; every active account has an owner.</li>
+<li><strong>Advisories.</strong> The vulnerability register is current at handover with a decision for each advisory.</li>
+<li><strong>Backups.</strong> The restore test is done and the time is recorded.</li>
+<li><strong>Remote access.</strong> One path through the jump host with MFA; no modem or cellular router in OT panels.</li>
+<li><strong>BACnet/SC.</strong> Certificates are registered with expiry dates; hub failover is tested.</li>
+</ol>
+<h2 id="s27-20"><span class="n">27.20</span>Sources</h2>
+<ol>
+<li>IEC, "IEC 62443 Background", Systems Committee Smart Energy, accessed 31 October 2026. <a href="https://syc-se.iec.ch/deliveries/cybersecurity-guidelines/security-standards-and-best-practices/iec-62443/" rel="noopener">https://syc-se.iec.ch/deliveries/cybersecurity-guidelines/security-standards-and-best-practices/iec-62443/</a></li>
+<li>IEC 62443-3-3:2013, Industrial communication networks, Network and system security, Part 3-3: System security requirements and security levels, IEC. <a href="https://webstore.iec.ch/en/publication/7033" rel="noopener">https://webstore.iec.ch/en/publication/7033</a></li>
+<li>IEC 62443-3-2:2020, Security for industrial automation and control systems, Part 3-2: Security risk assessment for system design, IEC. <a href="https://webstore.iec.ch/en/publication/30727" rel="noopener">https://webstore.iec.ch/en/publication/30727</a></li>
+<li>IEC 62443-2-1:2024 (edition 2.0), Security programme requirements for IACS asset owners, IEC. <a href="https://webstore.iec.ch/en/publication/62883" rel="noopener">https://webstore.iec.ch/en/publication/62883</a></li>
+<li>ISA, ISA-62443-3-2 table of contents, accessed 31 October 2026. <a href="https://www.isa.org/getmedia/4cfc5f8a-1f19-4e97-9382-c7d46e3b04a5/isa-62443-3-2-toc.pdf" rel="noopener">https://www.isa.org/getmedia/4cfc5f8a-1f19-4e97-9382-c7d46e3b04a5/isa-62443-3-2-toc.pdf</a></li>
+<li>NIST SP 800-82 Rev. 3, Guide to Operational Technology (OT) Security, September 2023. <a href="https://csrc.nist.gov/pubs/sp/800/82/r3/final" rel="noopener">https://csrc.nist.gov/pubs/sp/800/82/r3/final</a></li>
+<li>CISA, ICS Advisory ICSA-23-290-01, Schneider Electric EcoStruxure Power Monitoring Expert, accessed 31 October 2026. <a href="https://cisa.gov/news-events/ics-advisories/icsa-23-290-01" rel="noopener">https://cisa.gov/news-events/ics-advisories/icsa-23-290-01</a></li>
+<li>CISA, ICS Advisory ICSA-25-037-01 (Update B), Schneider Electric EcoStruxure Power Monitoring Expert, accessed 31 October 2026. <a href="https://www.cisa.gov/news-events/ics-advisories/icsa-25-037-01" rel="noopener">https://www.cisa.gov/news-events/ics-advisories/icsa-25-037-01</a></li>
+<li>CISA, ICS Advisory ICSA-25-224-03, Schneider Electric EcoStruxure Power Monitoring Expert, accessed 31 October 2026. <a href="https://www.cisa.gov/news-events/ics-advisories/icsa-25-224-03" rel="noopener">https://www.cisa.gov/news-events/ics-advisories/icsa-25-224-03</a></li>
+<li>CISA, ICS Advisory ICSA-25-203-03, Schneider Electric EcoStruxure, accessed 31 October 2026. <a href="https://cisa.gov/news-events/ics-advisories/icsa-25-203-03" rel="noopener">https://cisa.gov/news-events/ics-advisories/icsa-25-203-03</a></li>
+<li>DIVD, "Exposed BACnet Devices", case report 2022-00005, accessed 31 October 2026. <a href="https://vintage.divd.nl/reports/2022-00005%20-%20Exposed%20BACnet%20Devices" rel="noopener">https://vintage.divd.nl/reports/2022-00005%20-%20Exposed%20BACnet%20Devices</a></li>
+<li>Dragos, "Assessing the BACnet Control System Vulnerability", accessed 31 October 2026. <a href="https://www.dragos.com/blog/assessing-the-bacnet-control-system-vulnerability" rel="noopener">https://www.dragos.com/blog/assessing-the-bacnet-control-system-vulnerability</a></li>
+<li>Chipkin, "What BACnet Secure Connect Is", accessed 31 October 2026. <a href="https://docs.chipkin.com/protocols/bacnet/secure-connect/" rel="noopener">https://docs.chipkin.com/protocols/bacnet/secure-connect/</a></li>
+<li>ASHRAE, "Protecting Building Automation Systems with BACnet Secure Connect", accessed 31 October 2026. <a href="https://www.ashrae.org/news/esociety/protecting-building-automation-systems-with-bacnet-secure-connect" rel="noopener">https://www.ashrae.org/news/esociety/protecting-building-automation-systems-with-bacnet-secure-connect</a></li>
+<li>Forest Rock, "BACnet Secure Connect (BACnet SC)" knowledge base, accessed 31 October 2026. <a href="https://docs.forestrock.co.uk/bacnet-secure-connect-bacnet-sc" rel="noopener">https://docs.forestrock.co.uk/bacnet-secure-connect-bacnet-sc</a></li>
+<li>Schneider Electric EcoStruxure IT, "Device discovery processes", Data Center Expert help, accessed 31 October 2026. <a href="https://dcimsupport.ecostruxureit.com/hc/en-us/articles/360038795874-Device-discovery-processes" rel="noopener">https://dcimsupport.ecostruxureit.com/hc/en-us/articles/360038795874-Device-discovery-processes</a></li>
+<li>Schneider Electric, FAQ FA383264, third-party devices and DDF files in Data Center Expert, accessed 31 October 2026. <a href="https://www.se.com/eg/en/faqs/FA383264/" rel="noopener">https://www.se.com/eg/en/faqs/FA383264/</a></li>
+<li>CPCON Group, "ISO 14224 Equipment Taxonomy", accessed 31 October 2026. <a href="https://cpcongroup.com/insights/article/iso-14224-equipment-taxonomy/" rel="noopener">https://cpcongroup.com/insights/article/iso-14224-equipment-taxonomy/</a></li>
+<li>Accendo Reliability, "Setting up an asset hierarchy", accessed 31 October 2026. <a href="https://accendoreliability.com/setup-asset-hierarchy/" rel="noopener">https://accendoreliability.com/setup-asset-hierarchy/</a></li>
+<li>Allegion, "Fail Safe and Fail Secure" article 112140, accessed 31 October 2026. <a href="https://www.allegion.ca/content/dam/allegion-us-2/web-documents-2/Article/Allegion_Fail_Safe_Fail_Secure_Article_112140.pdf" rel="noopener">https://www.allegion.ca/content/dam/allegion-us-2/web-documents-2/Article/Allegion_Fail_Safe_Fail_Secure_Article_112140.pdf</a></li>
+<li>SecurityInfoWatch, "Know Your Codes: IBC and NFPA access control hardware requirements", accessed 31 October 2026. <a href="https://www.securityinfowatch.com/access-identity/access-control/door-hardware/article/10754829/ibc-and-nfpa-access-control-hardware-requirements" rel="noopener">https://www.securityinfowatch.com/access-identity/access-control/door-hardware/article/10754829/ibc-and-nfpa-access-control-hardware-requirements</a></li>
+<li>TIA-942 summary (ANSI/TIA-942-C, May 2024), Wikipedia, accessed 31 October 2026. <a href="https://en.wikipedia.org/wiki/TIA-942" rel="noopener">https://en.wikipedia.org/wiki/TIA-942</a></li>
+<li>Uptime Institute, "Uptime Announces Annual Outage Analysis Report 2025", press release, accessed 31 October 2026. <a href="https://uptimeinstitute.com/about-ui/press-releases/uptime-announces-annual-outage-analysis-report-2025" rel="noopener">https://uptimeinstitute.com/about-ui/press-releases/uptime-announces-annual-outage-analysis-report-2025</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="26-ot-network-fibre-copper.html"><span>Previous · 26</span><span class="t">OT network, fibre optic and copper cabling</span></a><a class="next" href="28-integrated-systems-testing.html"><span>Next · 28</span><span class="t">Integrated systems testing (L5)</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

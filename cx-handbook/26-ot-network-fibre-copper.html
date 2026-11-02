@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>26 OT network, fibre optic and copper cabling | Cx Field Manual R01</title>
+<meta name="description" content="This chapter covers the operational technology (OT) network on a data-centre campus and the fibre and copper cabling under it.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/26-ot-network-fibre-copper.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/26-ot-network-fibre-copper.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/26-ot-network-fibre-copper.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/26-ot-network-fibre-copper.html">
+<meta property="og:title" content="26 OT network, fibre optic and copper cabling | Cx Field Manual R01">
+<meta property="og:description" content="This chapter covers the operational technology (OT) network on a data-centre campus and the fibre and copper cabling under it.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="26 OT network, fibre optic and copper cabling | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter covers the operational technology (OT) network on a data-centre campus and the fibre and copper cabling under it.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"26 OT network, fibre optic and copper cabling: design, testing and acceptance","name":"OT network, fibre optic and copper cabling: design, testing and acceptance","description":"This chapter covers the operational technology (OT) network on a data-centre campus and the fibre and copper cabling under it.","url":"https://resistancezero.com/cx-handbook/26-ot-network-fibre-copper.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/26-ot-network-fibre-copper.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":9169,"position":26,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"26 OT network, fibre optic and copper cabling","item":"https://resistancezero.com/cx-handbook/26-ot-network-fibre-copper.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part E · Controls, monitoring, integration and networks</p>
+    <h1><span class="num">26</span>OT network, fibre optic and copper cabling: design, testing and acceptance</h1>
+    <p class="lede">This chapter covers the operational technology (OT) network on a data-centre campus and the fibre and copper cabling under it.</p>
+    <p class="basis">Chapter 26 of 32 · 18 sections · 8 figures · 9,169 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 26</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 26</summary>
+<ol><li><a href="#s26-0"><span class="n">26.0</span>Scope of this chapter</a></li><li><a href="#s26-1"><span class="n">26.1</span>OT network architecture</a><ol><li><a href="#s26-1-1"><span class="n">26.1.1</span>Layers and zones</a></li><li><a href="#s26-1-2"><span class="n">26.1.2</span>Design rules for a data-centre OT network</a></li><li><a href="#s26-1-3"><span class="n">26.1.3</span>Switch count for one building</a></li></ol></li><li><a href="#s26-2"><span class="n">26.2</span>Redundancy protocols and recovery time</a><ol><li><a href="#s26-2-1"><span class="n">26.2.1</span>Choosing the protocol</a></li><li><a href="#s26-2-2"><span class="n">26.2.2</span>MRP roles</a></li></ol></li><li><a href="#s26-3"><span class="n">26.3</span>VLANs, IP plan and naming</a><ol><li><a href="#s26-3-1"><span class="n">26.3.1</span>VLAN plan (example for building B2)</a></li><li><a href="#s26-3-2"><span class="n">26.3.2</span>IP plan rules</a></li></ol></li><li><a href="#s26-4"><span class="n">26.4</span>Cabling media and components</a><ol><li><a href="#s26-4-1"><span class="n">26.4.1</span>Fibre types</a></li><li><a href="#s26-4-2"><span class="n">26.4.2</span>Connectors and trunks</a></li><li><a href="#s26-4-3"><span class="n">26.4.3</span>Copper</a></li><li><a href="#s26-4-4"><span class="n">26.4.4</span>Installation checks before any test</a></li></ol></li><li><a href="#s26-5"><span class="n">26.5</span>Loss budget: TIA-568.3-D maximum values and worked examples</a><ol><li><a href="#s26-5-1"><span class="n">26.5.1</span>Maximum values</a></li><li><a href="#s26-5-2"><span class="n">26.5.2</span>Loss budget formula</a></li><li><a href="#s26-5-3"><span class="n">26.5.3</span>Steps to calculate and use a loss budget</a></li></ol></li><li><a href="#s26-6"><span class="n">26.6</span>Polarity methods</a><ol><li><a href="#s26-6-1"><span class="n">26.6.1</span>Rules for polarity on a project</a></li><li><a href="#s26-6-2"><span class="n">26.6.2</span>Polarity test</a></li></ol></li><li><a href="#s26-7"><span class="n">26.7</span>End-face inspection and cleaning</a><ol><li><a href="#s26-7-1"><span class="n">26.7.1</span>Why inspection comes first</a></li><li><a href="#s26-7-2"><span class="n">26.7.2</span>IEC 61300-3-35 zones</a></li><li><a href="#s26-7-3"><span class="n">26.7.3</span>Inspection equipment</a></li><li><a href="#s26-7-4"><span class="n">26.7.4</span>Cleaning procedure</a></li></ol></li><li><a href="#s26-8"><span class="n">26.8</span>Tier 1 testing: optical loss test set and reference methods</a><ol><li><a href="#s26-8-1"><span class="n">26.8.1</span>What Tier 1 measures</a></li><li><a href="#s26-8-2"><span class="n">26.8.2</span>Reference methods</a></li><li><a href="#s26-8-3"><span class="n">26.8.3</span>Encircled flux for multimode</a></li><li><a href="#s26-8-4"><span class="n">26.8.4</span>OLTS procedure</a></li><li><a href="#s26-8-5"><span class="n">26.8.5</span>Tier 1 test record fields</a></li></ol></li><li><a href="#s26-9"><span class="n">26.9</span>Tier 2 testing: OTDR</a><ol><li><a href="#s26-9-1"><span class="n">26.9.1</span>What the OTDR shows</a></li><li><a href="#s26-9-2"><span class="n">26.9.2</span>Set-up</a></li><li><a href="#s26-9-3"><span class="n">26.9.3</span>Dead zones</a></li><li><a href="#s26-9-4"><span class="n">26.9.4</span>Reading a trace</a></li><li><a href="#s26-9-5"><span class="n">26.9.5</span>Ghosts, gainers and bidirectional averaging</a></li><li><a href="#s26-9-6"><span class="n">26.9.6</span>Worked trace interpretation</a></li><li><a href="#s26-9-7"><span class="n">26.9.7</span>OTDR event table fields</a></li></ol></li><li><a href="#s26-10"><span class="n">26.10</span>Copper certification</a><ol><li><a href="#s26-10-1"><span class="n">26.10.1</span>Permanent link and channel</a></li><li><a href="#s26-10-2"><span class="n">26.10.2</span>Parameters</a></li><li><a href="#s26-10-3"><span class="n">26.10.3</span>Copper test procedure</a></li></ol></li><li><a href="#s26-11"><span class="n">26.11</span>Labelling and records (ANSI/TIA-606-C)</a><ol><li><a href="#s26-11-1"><span class="n">26.11.1</span>Identifiers</a></li><li><a href="#s26-11-2"><span class="n">26.11.2</span>Label rules</a></li></ol></li><li><a href="#s26-12"><span class="n">26.12</span>Common fibre faults: symptoms, causes and fixes</a></li><li><a href="#s26-13"><span class="n">26.13</span>Network commissioning</a><ol><li><a href="#s26-13-1"><span class="n">26.13.1</span>Switch configuration verification</a></li><li><a href="#s26-13-2"><span class="n">26.13.2</span>Ring failover test</a></li><li><a href="#s26-13-3"><span class="n">26.13.3</span>Interfaces to other contractors</a></li></ol></li><li><a href="#s26-14"><span class="n">26.14</span>Acceptance and handover</a></li><li><a href="#s26-15"><span class="n">26.15</span>Common errors in cabling and network tests</a></li><li><a href="#s26-16"><span class="n">26.16</span>Checklist for site use</a></li><li><a href="#s26-17"><span class="n">26.17</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="25-integration-points.html"><span>Previous</span>25 Integration points</a><a href="27-dcim-cmms-security-cybersecurity.html"><span>Next</span>27 DCIM, CMMS, security and access control, and OT cybersecurity</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s26-0"><span class="n">26.0</span>Scope of this chapter</h2>
+<p>This chapter covers the operational technology (OT) network on a data-centre campus and the fibre and copper cabling under it. The network carries the electrical power monitoring system (EPMS), building management system (BMS), security and fire data. It gives the design rules, the loss budget method, the field tests and the acceptance values that a commissioning manager needs to witness and sign the cabling and network tests.</p>
+<ol>
+<li><strong>Network architecture.</strong> Core, distribution and access layers, separate rings per system, the OT demilitarised zone (DMZ) and firewalls.</li>
+<li><strong>Redundancy protocols.</strong> Rapid Spanning Tree Protocol (RSTP), Media Redundancy Protocol (MRP), Parallel Redundancy Protocol (PRP) and the ring form of PRP (HSR), with their recovery times. HSR uses the same duplicate-frame method as PRP. PRP and HSR are both defined in IEC 62439-3.</li>
+<li><strong>Addressing.</strong> Virtual local area networks (VLANs), the Internet Protocol (IP) address plan and naming.</li>
+<li><strong>Cabling media.</strong> OM3, OM4, OM5 and OS2 fibre, multi-fibre push-on (MPO) and LC connectors, pre-terminated trunks and Category 6A copper.</li>
+<li><strong>Loss budgets.</strong> The ANSI/TIA-568.3-D maximum values and two worked loss-budget calculations.</li>
+<li><strong>Polarity.</strong> Methods A, B and C for duplex and parallel signals.</li>
+<li><strong>End-face inspection and cleaning.</strong> IEC 61300-3-35 zones and the inspect, clean, inspect routine.</li>
+<li><strong>Tier 1 testing.</strong> Optical loss test sets (OLTS), reference methods and encircled flux.</li>
+<li><strong>Tier 2 testing.</strong> Optical time-domain reflectometer (OTDR) set-up, dead zones, trace reading, ghosts, gainers, bidirectional averaging and a worked trace interpretation.</li>
+<li><strong>Copper certification.</strong> Permanent link and channel, parameters and common failures.</li>
+<li><strong>Labelling and records.</strong> ANSI/TIA-606-C identifiers and the test record formats.</li>
+<li><strong>Faults.</strong> Common fibre faults with symptoms and fixes.</li>
+<li><strong>Network commissioning.</strong> Switch configuration and backup, ring failover test, port security, Simple Network Management Protocol (SNMP), syslog, Network Time Protocol (NTP) and Precision Time Protocol (PTP).</li>
+<li><strong>Acceptance.</strong> The records that close the cabling and network scope.</li>
+</ol>
+<p>Cabling standards used: ANSI/TIA-568.3-D (optical fibre cabling components; check the -E revision for changed values), ANSI/TIA-568.2-D and -E (balanced twisted-pair), ANSI/TIA-606-C (administration) and ANSI/TIA-526-14-C and ANSI/TIA-526-7-A (loss measurement). Test and network standards used: ISO/IEC 14763-3 (testing of optical fibre cabling), IEC 61280-4-1 and IEC 61280-4-2 (installed cabling attenuation), IEC 61300-3-35:2022 (end-face visual inspection), IEC 62439-2:2021 (MRP) and IEC 62439-3:2021 (PRP and HSR). Also IEEE 802.1Q (RSTP), IEEE 802.3 (Ethernet physical layers), IEC 62443-3-3, and test-equipment guides from Fluke Networks, EXFO and VIAVI.</p>
+<h2 id="s26-1"><span class="n">26.1</span>OT network architecture</h2>
+
+<figure class="sheet" id="F26-1"><a href="../data/cx-handbook/figures/F26-1.svg" title="Open drawing F26-1 at full size"><img src="../data/cx-handbook/figures/F26-1.svg" alt="F26-1: OT network for one MSC-1 building: core, distribution rings, access switches and the DMZ" width="1400" height="1032" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F26-1</span> — <b>OT network for one MSC-1 building: core, distribution rings, access switches and the DMZ</b>. Each system keeps its own ring; the only path between OT and enterprise IT passes through the OT DMZ, where historian replicas, jump hosts and patch servers sit.</figcaption></figure>
+<h3 id="s26-1-1"><span class="n">26.1.1</span>Layers and zones</h3>
+<p>Figure <a class="figref" href="#F26-1">F26-1</a> shows the OT network of one MSC-1 building.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Equipment</th>
+<th>Function</th>
+<th>Redundancy</th>
+<th>What to check at commissioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Enterprise IT (levels 4 and 5)</td>
+<td>corporate network</td>
+<td>business systems, remote users</td>
+<td>outside the OT scope</td>
+<td>no OT device has a route to it (26.1.2 rule 5)</td>
+</tr>
+<tr>
+<td>OT DMZ (level 3.5)</td>
+<td>two firewall layers, historian replica, jump host, patch server</td>
+<td>the only path between IT and OT</td>
+<td>firewall pair, active-standby</td>
+<td>firewall rule export and conduit table</td>
+</tr>
+<tr>
+<td>OT core</td>
+<td>two layer 3 switches</td>
+<td>routing between OT VLANs, virtual routing and forwarding (VRF) per system</td>
+<td>pair, with redundant links to each ring</td>
+<td>VRF per system; both links to each ring up</td>
+</tr>
+<tr>
+<td>Distribution rings</td>
+<td>managed industrial or data-centre switches per electrical or mechanical room</td>
+<td>one ring per system (EPMS, BMS, security and fire)</td>
+<td>ring protocol (RSTP or MRP), diverse fibre routes</td>
+<td>ring failover test (26.13.2)</td>
+</tr>
+<tr>
+<td>Access</td>
+<td>switch ports to devices</td>
+<td>meters, relays, controllers</td>
+<td>single attachment, or PRP for protection relays</td>
+<td>each port in the VLAN of the IP plan; unused ports shut</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s26-1-2"><span class="n">26.1.2</span>Design rules for a data-centre OT network</h3>
+<ol>
+<li><strong>One ring per system.</strong> EPMS, BMS and security each have their own switches. <mark>A fault or a broadcast storm in the BMS network does not reach the protection relays</mark> on the EPMS ring.</li>
+<li><strong>Diverse routes.</strong> The two halves of a ring use different risers and cable trays (east and west). A single cable cut or fire in one riser breaks the ring at one point only.</li>
+<li><strong>Power to switches.</strong> Each ring switch is fed from a supply backed by an uninterruptible power supply (UPS), with two supply inputs from different sources where the switch accepts them.</li>
+<li><strong>Zones and conduits.</strong> IEC 62443-3-3 practice: each system is a zone, and every flow between zones is listed in a conduit table and enforced by a firewall.</li>
+<li><strong>No direct IT path.</strong> <mark>No OT device has a route to the enterprise network</mark>. Remote access goes through the jump host in the DMZ with multi-factor authentication.</li>
+<li><strong>Time.</strong> Switches on the EPMS ring support Precision Time Protocol (PTP) as a boundary or transparent clock when the EPMS uses PTP (chapter 23.7).</li>
+<li><strong>Out-of-band management.</strong> Switch management interfaces sit in a management VLAN reachable only from the jump host.</li>
+</ol>
+<h3 id="s26-1-3"><span class="n">26.1.3</span>Switch count for one building</h3>
+<p><strong>Worked example:</strong> EPMS network of building B2. Chapter 23.15 gives 414 Ethernet devices and 3 gateways in 12 electrical rooms, about 35 ports per room. With 24-port access switches and 4 ports reserved for ring and uplinks, each switch gives 20 device ports, so each room needs 2 switches: 24 EPMS access switches per building. Two rings of 12 switches each (one per building half) keep each ring within the <mark>14-switch limit for the 10 ms MRP profile</mark>. They are also inside the 50-switch limit for the other profiles. The BMS network is counted the same way from the BMS points list.</p>
+<h2 id="s26-2"><span class="n">26.2</span>Redundancy protocols and recovery time</h2>
+<p>Figure <a class="figref" href="#F26-2">F26-2</a> shows the traffic loss measured in a ring failover test for three protocols.</p>
+<figure class="sheet" id="F26-2"><a href="../data/cx-handbook/figures/F26-2.svg" title="Open drawing F26-2 at full size"><img src="../data/cx-handbook/figures/F26-2.svg" alt="F26-2: Ring failover test: traffic loss after a fibre cut for RSTP, MRP and PRP (example results)" width="1400" height="730" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F26-2</span> — <b>Ring failover test: traffic loss after a fibre cut for RSTP, MRP and PRP (example results)</b>. Bars show the interval with no received frames after the fibre is pulled; the ring heals and traffic resumes at the end of each bar.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Protocol</th>
+<th>Standard</th>
+<th>Topology</th>
+<th>Recovery after one link failure</th>
+<th>Typical use on MSC-1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RSTP</td>
+<td>IEEE 802.1Q (RSTP was IEEE 802.1w)</td>
+<td>ring or mesh</td>
+<td>no fixed bound; hundreds of milliseconds to seconds, by topology and bridge settings</td>
+<td>BMS rings, security</td>
+</tr>
+<tr>
+<td>MRP</td>
+<td>IEC 62439-2:2021</td>
+<td>ring</td>
+<td>worst case 500, 200 or 30 ms for rings up to 50 switches, and 10 ms for rings up to 14 switches, by profile</td>
+<td>EPMS rings</td>
+</tr>
+<tr>
+<td>PRP</td>
+<td>IEC 62439-3:2021</td>
+<td>two independent local area networks (LAN A and LAN B)</td>
+<td>zero recovery time; each frame sent on both networks</td>
+<td>protection relays (Easergy P3 supports PRP)</td>
+</tr>
+<tr>
+<td>HSR</td>
+<td>IEC 62439-3:2021</td>
+<td>ring with duplicated frames in both directions</td>
+<td>zero recovery time</td>
+<td>relays that support HSR</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> IEC 62439-2 recovery times as summarised in the Wikipedia article "Media Redundancy Protocol"; IEC 62439-3 abstract (26.17, items 12 and 13).</p>
+<h3 id="s26-2-1"><span class="n">26.2.1</span>Choosing the protocol</h3>
+<ol>
+<li><strong>Protection relays.</strong> Where relays exchange IEC 61850 generic object-oriented substation event (GOOSE) messages for interlocking or tripping, use <mark>PRP or HSR</mark>, because any frame loss delays a trip signal.</li>
+<li><strong>Metering and EPMS.</strong> MRP gives a known worst case, which the alarm delays in Power Monitoring Expert (PME) (chapter 23.10) can be set against. A <mark>200 ms profile</mark> is common.</li>
+<li><strong>BMS.</strong> RSTP is acceptable when the BMS controllers tolerate a loss of communication of a few seconds without changing state. The BMS specification states the tolerance.</li>
+<li><strong>One protocol per ring.</strong> Most switches do not support RSTP and MRP on one ring. The ring uses one protocol, and the core links use link aggregation or a routing protocol.</li>
+</ol>
+<h3 id="s26-2-2"><span class="n">26.2.2</span>MRP roles</h3>
+<p>An MRP ring has one media redundancy manager (MRM) and the other switches are media redundancy clients (MRC). The MRM blocks one of its ring ports in normal operation and opens it when the ring breaks. The commissioning record lists which switch is the MRM, its ring ports and the profile.</p>
+<h2 id="s26-3"><span class="n">26.3</span>VLANs, IP plan and naming</h2>
+<h3 id="s26-3-1"><span class="n">26.3.1</span>VLAN plan (example for building B2)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>VLAN</th>
+<th>Name</th>
+<th>Subnet</th>
+<th>Gateway</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>110</td>
+<td>B2-EPMS-DEV</td>
+<td>10.21.10.0/24</td>
+<td>10.21.10.1</td>
+<td>meters, relays, trip units, UPS cards, gateways</td>
+</tr>
+<tr>
+<td>111</td>
+<td>B2-EPMS-SRV</td>
+<td>10.21.11.0/27</td>
+<td>10.21.11.1</td>
+<td>PME server, time server management</td>
+</tr>
+<tr>
+<td>120</td>
+<td>B2-BMS-DEV</td>
+<td>10.21.20.0/23</td>
+<td>10.21.20.1</td>
+<td>BMS controllers, coolant distribution unit (CDU) and computer room air handler (CRAH) controllers</td>
+</tr>
+<tr>
+<td>121</td>
+<td>B2-BMS-SRV</td>
+<td>10.21.22.0/27</td>
+<td>10.21.22.1</td>
+<td>BMS servers</td>
+</tr>
+<tr>
+<td>130</td>
+<td>B2-SEC</td>
+<td>10.21.30.0/24</td>
+<td>10.21.30.1</td>
+<td>access control panels, cameras (or a separate camera VLAN)</td>
+</tr>
+<tr>
+<td>199</td>
+<td>B2-OT-MGMT</td>
+<td>10.21.99.0/24</td>
+<td>10.21.99.1</td>
+<td>switch management interfaces</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s26-3-2"><span class="n">26.3.2</span>IP plan rules</h3>
+<ol>
+<li><strong>Reserve ranges.</strong> Within each device subnet, reserve ranges by device type (for example .10 to .39 relays, .40 to .99 low-voltage (LV) meters, .200 to .219 gateways). Address growth then does not mix types.</li>
+<li><strong>Static addresses.</strong> OT devices use <mark>static addresses</mark> recorded in the IP plan. Dynamic addressing is not used for devices that PME or the BMS reach by address.</li>
+<li><strong>One owner.</strong> The network contractor owns the IP plan document; device contractors request addresses through it.</li>
+<li><strong>Record fields.</strong> The IP plan lists address, mask, gateway, VLAN, device tag, switch and port, and the contractor responsible.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IP address</td>
+<td>dotted decimal</td>
+<td>10.21.10.41</td>
+</tr>
+<tr>
+<td>Mask</td>
+<td>prefix</td>
+<td>/24</td>
+</tr>
+<tr>
+<td>Gateway</td>
+<td>dotted decimal</td>
+<td>10.21.10.1</td>
+</tr>
+<tr>
+<td>VLAN</td>
+<td>number</td>
+<td>110</td>
+</tr>
+<tr>
+<td>Device tag</td>
+<td>text</td>
+<td>B2-DH3-LVMSB-A1-Q1-PM</td>
+</tr>
+<tr>
+<td>Switch and port</td>
+<td>text</td>
+<td>B2-ER2-EPMS-SW01 Gi1/0/7</td>
+</tr>
+<tr>
+<td>Contractor</td>
+<td>text</td>
+<td>EPMS contractor</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>planned, configured, tested</td>
+<td>tested</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s26-4"><span class="n">26.4</span>Cabling media and components</h2>
+<h3 id="s26-4-1"><span class="n">26.4.1</span>Fibre types</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Core / cladding (µm)</th>
+<th>Typical use on a campus</th>
+<th>Wavelengths for testing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OM3</td>
+<td>50 / 125, laser-optimised</td>
+<td>short links inside rooms (legacy)</td>
+<td>850 and 1300 nm</td>
+</tr>
+<tr>
+<td>OM4</td>
+<td>50 / 125, higher bandwidth</td>
+<td>links inside a building up to a few hundred metres</td>
+<td>850 and 1300 nm</td>
+</tr>
+<tr>
+<td>OM5</td>
+<td>50 / 125, wideband (850 to 953 nm)</td>
+<td>short-wavelength multiplexing applications</td>
+<td>850 and 1300 nm (953 nm where specified)</td>
+</tr>
+<tr>
+<td>OS2</td>
+<td>9 / 125 (mode field about 9.2 µm at 1310 nm)</td>
+<td>risers, building to building, campus</td>
+<td>1310 and 1550 nm</td>
+</tr>
+</tbody>
+</table></div>
+<p>Hyperscale campuses use OS2 for all links between rooms and buildings. Single-mode transceivers cover all lengths on the campus, and the same fibre carries future higher speeds. OM4 is used for short links inside a room where multimode transceivers are cheaper.</p>
+<h3 id="s26-4-2"><span class="n">26.4.2</span>Connectors and trunks</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Description</th>
+<th>Where used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LC duplex</td>
+<td>small form-factor connector, two fibres</td>
+<td>switch ports, patch panels</td>
+</tr>
+<tr>
+<td>MPO (12 or 24 fibres; 8 used for some parallel optics)</td>
+<td>multi-fibre push-on connector with alignment pins on the male side</td>
+<td>pre-terminated trunks between rooms, parallel optics</td>
+</tr>
+<tr>
+<td>Cassette</td>
+<td>MPO at the back, LC at the front</td>
+<td>patch panels</td>
+</tr>
+<tr>
+<td>Pre-terminated trunk</td>
+<td>factory-terminated MPO to MPO cable with a factory test report</td>
+<td>risers and rows</td>
+</tr>
+<tr>
+<td>Fusion splice</td>
+<td>fibres joined by an electric arc in a splice tray</td>
+<td>long links, repairs, pigtails</td>
+</tr>
+<tr>
+<td>UPC and APC polish</td>
+<td>ultra physical contact (UPC), flat, and angled physical contact (8°) end faces</td>
+<td>APC for single-mode where low reflectance is needed; <mark>never mate APC with UPC</mark></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s26-4-3"><span class="n">26.4.3</span>Copper</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Rule (TIA-568.2-D practice)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Category</td>
+<td>Category 6A for new device links; supports 10GBASE-T to 100 m and Power over Ethernet (PoE)</td>
+</tr>
+<tr>
+<td>Permanent link</td>
+<td>fixed cable between the patch panel and the outlet, maximum 90 m</td>
+</tr>
+<tr>
+<td>Channel</td>
+<td>permanent link plus patch cords, maximum 100 m (90 m plus 10 m of cords)</td>
+</tr>
+<tr>
+<td>Shielding</td>
+<td>U/UTP (unshielded) or F/UTP (overall foil screen) as specified; shielded systems need a continuous bond to the rack earth</td>
+</tr>
+<tr>
+<td>Bend radius</td>
+<td>at least 4 times the cable outer diameter for installed 4-pair cable (ANSI/TIA-568.0-D, as quoted by Cabling Installation &amp; Maintenance); the cable datasheet may set a larger value</td>
+</tr>
+<tr>
+<td>Revision</td>
+<td>ANSI/TIA-568.2-E (October 2024) replaced -D; the project specification states which revision applies</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s26-4-4"><span class="n">26.4.4</span>Installation checks before any test</h3>
+<p>Make these checks during the Level 2 (L2) walkdown, before the tests in 26.8 to 26.10 measure the cabling. A visual check finds an installation fault faster than a failed test does.</p>
+<ol>
+<li><strong>Pathway fill.</strong> Cable trays and conduits are filled to no more than the fill ratio in the specification (for example 40 to 50 %). Overfilled trays crush cables at the bottom and raise copper alien crosstalk.</li>
+<li><strong>Bend radius.</strong> Fibre cables follow the minimum bend radius in the cable datasheet. The typical value is 10 times the cable diameter when not under tension and 20 times during pulling; the cable datasheet value governs. Slack loops in trays are coiled at or above that radius.</li>
+<li><strong>Separation from power.</strong> Copper data cables keep the separation from power cables stated in the specification. ISO/IEC 14763-2 and EN 50174-2 give tables by cable type; the project specification states the values used.</li>
+<li><strong>Fire stopping.</strong> Every penetration of a fire-rated wall or floor is sealed with the approved system and labelled with its system number.</li>
+<li><strong>Earthing and bonding.</strong> Racks, trays and shielded panels are bonded to the telecommunications bonding backbone. Record the bond resistance where the specification asks (for example below 0.1 Ω to the bonding bar).</li>
+<li><strong>Strain relief and cable ties.</strong> No cable tie is tight enough to deform the cable jacket; hook-and-loop ties are used on fibre bundles.</li>
+<li><strong>Dust caps.</strong> Every unterminated connector and adapter has a dust cap.</li>
+<li><strong>Labels.</strong> Labels fitted before testing, so that test files are saved under the final identifier.</li>
+</ol>
+<p><strong>Records:</strong> L2 cabling checklist per room, with photographs of trays, splice closures and patch panels.</p>
+<h2 id="s26-5"><span class="n">26.5</span>Loss budget: TIA-568.3-D maximum values and worked examples</h2>
+
+<figure class="sheet" id="F26-3"><a href="../data/cx-handbook/figures/F26-3.svg" title="Open drawing F26-3 at full size"><img src="../data/cx-handbook/figures/F26-3.svg" alt="F26-3: Loss budget of an OS2 campus link: maximum values of ANSI/TIA-568.3-D against the measured loss" width="1400" height="746" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F26-3</span> — <b>Loss budget of an OS2 campus link: maximum values of ANSI/TIA-568.3-D against the measured loss</b>. The staircase shows cumulative maximum loss along the link: each connector pair adds 0.75 dB, each splice 0.3 dB and the fibre 0.5 dB per km; the measured value must be at or below the budget.</figcaption></figure>
+<h3 id="s26-5-1"><span class="n">26.5.1</span>Maximum values</h3>
+<p>The loss budget uses the maximum component values of ANSI/TIA-568.3-D unless the project specification sets lower values. ANSI/TIA-568.3-E, approved 29 September 2022, replaces -D. Fluke Networks reproduces the 0.75 dB mated connector pair limit for -E; the other values in this section are -D values to check against -E.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Maximum value</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mated connector pair (standard grade)</td>
+<td><mark>0.75 dB</mark></td>
+<td>includes MPO and LC</td>
+</tr>
+<tr>
+<td>Splice (fusion or mechanical)</td>
+<td><mark>0.3 dB</mark></td>
+<td>a good fusion splice is below 0.1 dB</td>
+</tr>
+<tr>
+<td>Multimode 50/125 cable (OM3, OM4, OM5) at 850 nm</td>
+<td><mark>3.0 dB/km</mark></td>
+<td>3.5 dB/km in TIA-568-C.3 and earlier</td>
+</tr>
+<tr>
+<td>Multimode 50/125 cable at 1300 nm</td>
+<td>1.5 dB/km</td>
+<td></td>
+</tr>
+<tr>
+<td>Single-mode inside-plant cable at 1310 and 1550 nm</td>
+<td>1.0 dB/km</td>
+<td></td>
+</tr>
+<tr>
+<td>Single-mode indoor-outdoor and outside-plant cable at 1310 and 1550 nm</td>
+<td>0.5 dB/km</td>
+<td>one secondary source lists 0.4 dB/km for outside plant (confirm against the outside-plant row of ANSI/TIA-568.3-E)</td>
+</tr>
+<tr>
+<td>Reference-grade to standard-grade mated pair (ISO/IEC 14763-3)</td>
+<td>0.30 dB multimode, 0.50 dB single-mode</td>
+<td>used for the test-cord connections</td>
+</tr>
+<tr>
+<td>Reference-grade to reference-grade mated pair</td>
+<td>0.10 dB multimode, 0.20 dB single-mode</td>
+<td>used for the reference check</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> TIA-568.3-D values as reported by Fluke Networks, the Fiber Optic Association, Hexatronic and Corning (26.17, items 1 to 5). The project checks these values against the purchased ANSI/TIA-568.3-E before contract use.</p>
+<h3 id="s26-5-2"><span class="n">26.5.2</span>Loss budget formula</h3>
+<p>Link loss budget (dB) = cable attenuation coefficient (dB/km) × length (km) + number of mated connector pairs × 0.75 dB + number of splices × 0.3 dB.</p>
+<p>A link as defined in TIA-568.3-D includes the connectors at both ends of the permanent cabling. Patch cords at the equipment are part of the channel and are tested separately or included in the application check.</p>
+<h3 id="s26-5-3"><span class="n">26.5.3</span>Steps to calculate and use a loss budget</h3>
+<ol>
+<li><strong>Draw the link.</strong> From the as-built drawings, list every connector pair, splice and the cable length with its type (inside plant or indoor-outdoor).</li>
+<li><strong>Take the length from the cable.</strong> Use the sheath length markings at both ends, or the OTDR length. The drawing length is used only as a check.</li>
+<li><strong>Calculate at both wavelengths.</strong> Multimode at 850 and 1300 nm; single-mode at 1310 and 1550 nm.</li>
+<li><strong>Enter the limit in the tester.</strong> Program the OLTS with the connector, splice and fibre values so that it calculates the limit per link.</li>
+<li><strong>Check the application.</strong> Compare the budget with the channel insertion-loss limit of the Ethernet application. The lower of the two governs.</li>
+<li><strong>Record.</strong> The loss budget per link is part of the test record.</li>
+</ol>
+<p><strong>Worked example:</strong> OS2 campus link from the building B2 main distribution frame (MDF) to the campus core. Figure <a class="figref" href="#F26-3">F26-3</a> shows the result.</p>
+<ol>
+<li><strong>Inputs.</strong> Length 1.20 km of indoor-outdoor OS2 cable and 2 mated connector pairs (the patch panels at each end). The link has 2 fusion splices, one at each building entrance where the outdoor cable meets an indoor pigtail.</li>
+<li><strong>Fibre.</strong> 1.20 km × 0.5 dB/km = 0.60 dB.</li>
+<li><strong>Connectors.</strong> 2 × 0.75 dB = 1.50 dB.</li>
+<li><strong>Splices.</strong> 2 × 0.3 dB = 0.60 dB.</li>
+<li><strong>Budget.</strong> 0.60 + 1.50 + 0.60 = <mark>2.70 dB</mark> at 1310 nm and at 1550 nm.</li>
+<li><strong>Application check.</strong> 10GBASE-LR allows a channel insertion loss of 6.2 dB over 10 km (secondary summaries; confirm against the 10GBASE-LR link power budget table of IEEE 802.3 clause 52). The TIA budget of 2.70 dB is lower, so the TIA budget governs.</li>
+<li><strong>Measured.</strong> OLTS one-jumper reference: 1.26 dB at 1310 nm and 1.42 dB at 1550 nm (Figure <a class="figref" href="#F26-3">F26-3</a>). Both pass with margin.</li>
+<li><strong>Observation.</strong> The 1550 nm loss is higher than the 1310 nm loss on a fibre whose attenuation is lower at 1550 nm. <mark>Loss that rises with wavelength points to a bend</mark>; the OTDR test (26.9.5) locates it.</li>
+</ol>
+<p><strong>Worked example:</strong> OM4 link inside electrical room ER2 through an MPO trunk with two cassettes.</p>
+<ol>
+<li><strong>Inputs.</strong> Length 90 m of OM4 and no splices. Each cassette has an LC connection at the front and an MPO connection at the back. The two cassettes give 4 mated connector pairs.</li>
+<li><strong>Fibre at 850 nm.</strong> 0.090 km × 3.0 dB/km = 0.27 dB.</li>
+<li><strong>Connectors.</strong> 4 × 0.75 dB = 3.00 dB.</li>
+<li><strong>Budget at 850 nm.</strong> 3.27 dB. At 1300 nm: 0.090 × 1.5 + 3.00 = 3.14 dB.</li>
+<li><strong>Application check.</strong> The maximum channel insertion loss on OM4 is 1.5 dB over 150 m for 40GBASE-SR4 (IEEE 802.3ba draft Table 86-9) and 1.9 dB over 100 m for 100GBASE-SR4 (IEEE 802.3bm draft Table 95-8). Both tables are illustrative link power budgets. For 10GBASE-SR on OM4, transceiver data sheets quote 2.9 dB over 400 m (confirm against the OM4 row of the 10GBASE-S operating range, Table 52-6, and the link power budget of IEEE 802.3 clause 52). <mark>The TIA maximum budget of 3.27 dB is higher than the application limit</mark>. A link that passes the TIA limit can still fail to carry 40 or 100 Gbit/s.</li>
+<li><strong>Engineered budget.</strong> The specification sets an engineered budget from the manufacturer's low-loss values, for example 0.35 dB per MPO pair and 0.15 dB per LC pair. The budget is 0.27 + 2 × 0.35 + 2 × 0.15 = 1.27 dB at 850 nm.</li>
+<li><strong>Measured.</strong> 0.82 dB at 850 nm and 0.71 dB at 1300 nm. Pass against the engineered budget of 1.27 dB.</li>
+<li><strong>Record.</strong> Both the TIA budget and the engineered budget are written on the test record, and the engineered budget is the pass/fail limit programmed in the tester.</li>
+</ol>
+<h2 id="s26-6"><span class="n">26.6</span>Polarity methods</h2>
+<p>Polarity makes the transmitter at one end connect to the receiver at the other. ANSI/TIA-568.3-D defines three connectivity methods for MPO-based cabling. Figure <a class="figref" href="#F26-4">F26-4</a> traces one duplex channel through each method.</p>
+<figure class="sheet" id="F26-4"><a href="../data/cx-handbook/figures/F26-4.svg" title="Open drawing F26-4 at full size"><img src="../data/cx-handbook/figures/F26-4.svg" alt="F26-4: Polarity of one duplex channel through an MPO trunk: methods A, B and C of ANSI/TIA-568.3-D" width="1400" height="859" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F26-4</span> — <b>Polarity of one duplex channel through an MPO trunk: methods A, B and C of ANSI/TIA-568.3-D</b>. Each row follows fibre position 1 from the transmitter to the receiver; the cross-over happens once, in the cord, the trunk or the pair flip.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Trunk type</th>
+<th>Array adapters</th>
+<th>Duplex cords</th>
+<th>Fibre position 1 at end 1 arrives at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Type A: key up to key down, position 1 to position 1</td>
+<td>Type A (key up to key down)</td>
+<td>one A-to-B cord at one end, one A-to-A cord at the other</td>
+<td>position 1</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Type B: key up to key up, position 1 to position 12</td>
+<td>Type B (key up to key up)</td>
+<td>A-to-B cords at both ends</td>
+<td>position 12</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Type C: key up to key down with pairs flipped (1 to 2, 2 to 1)</td>
+<td>Type A</td>
+<td>A-to-B cords at both ends</td>
+<td>position 2</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> FS.com white paper "Understanding fiber polarity", citing TIA-568.3-D (26.17, item 9).</p>
+<h3 id="s26-6-1"><span class="n">26.6.1</span>Rules for polarity on a project</h3>
+<ol>
+<li><strong>One method per site.</strong> The design states <mark>one polarity method for all trunks</mark>. Mixing methods produces links that need special cords.</li>
+<li><strong>Cassettes.</strong> Cassettes are ordered to suit the method. A Method A design without A-to-A cords uses one pair-flipped cassette (Type AF) at one end.</li>
+<li><strong>Method B and single-mode.</strong> Key-up to key-up adapters do not support angle-polished single-mode MPO end faces, so Method B is used for multimode.</li>
+<li><strong>Parallel optics.</strong> For 40 and 100 Gbit/s parallel transceivers (SR4), the trunk and array cords must deliver transmit lanes to receive lanes. The white paper tables give the array cord types for each method.</li>
+<li><strong>Labels.</strong> The polarity method and the cord type are written on the panel labels and in the cabling record.</li>
+</ol>
+<h3 id="s26-6-2"><span class="n">26.6.2</span>Polarity test</h3>
+<ol>
+<li><strong>Use the OLTS.</strong> A duplex OLTS reports the fibre pair as crossed or straight. The expected result is set in the tester from the design method.</li>
+<li><strong>Use a visual fault locator for single links.</strong> Inject red light at the transmit (Tx) port of end 1 and see which LC position lights at end 2.</li>
+<li><strong>Use an MPO tester for trunks.</strong> An MPO tester with a polarity function maps all 12 or 24 positions.</li>
+<li><strong>Record.</strong> The polarity result is a field on the test record (pass, or the mapping found).</li>
+</ol>
+<h2 id="s26-7"><span class="n">26.7</span>End-face inspection and cleaning</h2>
+
+<figure class="sheet" id="F26-5"><a href="../data/cx-handbook/figures/F26-5.svg" title="Open drawing F26-5 at full size"><img src="../data/cx-handbook/figures/F26-5.svg" alt="F26-5: Single-mode connector end face: inspection zones of IEC 61300-3-35 (2022) and the decision" width="1400" height="704" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F26-5</span> — <b>Single-mode connector end face: inspection zones of IEC 61300-3-35 (2022) and the decision</b>. Diameters are drawn to scale (1 µm = 1.1 px). The core zone is where any scratch or defect changes the loss and return loss; debris in the contact zone can migrate to the core when the connector is mated.</figcaption></figure>
+<h3 id="s26-7-1"><span class="n">26.7.1</span>Why inspection comes first</h3>
+<p>Contamination is the most common cause of high loss and high reflectance in new fibre installations. A dirty connector also transfers dirt to the clean connector it is mated with, including the test reference cords. The routine is <mark>inspect, clean if needed, re-inspect, then mate</mark>. This applies to every connector, including those on new patch cords and on the tester.</p>
+<h3 id="s26-7-2"><span class="n">26.7.2</span>IEC 61300-3-35 zones</h3>
+<p>Figure <a class="figref" href="#F26-5">F26-5</a> shows the zones of a single-mode end face. IEC 61300-3-35:2022 (Edition 3) grades zones A (core) and B (cladding). Zones C (adhesive) and D (contact) were removed from the pass/fail criteria, and the outer edge of zone B moved from 115 µm to 110 µm.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>Diameter (single-mode, µm)</th>
+<th>Graded in the 2022 edition</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A core</td>
+<td>0 to 25</td>
+<td>yes</td>
+<td>the 2015 edition allowed no scratch or defect in the single-mode core zone</td>
+</tr>
+<tr>
+<td>B cladding</td>
+<td>25 to 110</td>
+<td>yes</td>
+<td>defects limited by size and count</td>
+</tr>
+<tr>
+<td>C adhesive</td>
+<td>110 to 135</td>
+<td>no</td>
+<td>clean loose debris</td>
+</tr>
+<tr>
+<td>D contact</td>
+<td>135 to 250</td>
+<td>no</td>
+<td>clean before mating; debris migrates to the core</td>
+</tr>
+</tbody>
+</table></div>
+<p>The exact count and size limits per zone depend on the connector type (single-mode UPC, APC, multimode) and are built into inspection probes as grading profiles. <mark>Set the probe to the IEC 61300-3-35 profile for the connector type</mark> and save the image with the result. Confirm the numeric limits against the current edition of IEC 61300-3-35 when a result is disputed.</p>
+<h3 id="s26-7-3"><span class="n">26.7.3</span>Inspection equipment</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Equipment</th>
+<th>Requirement</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Video inspection probe, small field of view</td>
+<td>at least 250 µm field; detects 2 µm defects and 3 µm scratches</td>
+<td>single-fibre connectors, each fibre of an MPO</td>
+</tr>
+<tr>
+<td>Video probe, large field of view</td>
+<td>at least 6.4 × 2.5 mm; detects 10 µm debris</td>
+<td>whole MPO ferrule</td>
+</tr>
+<tr>
+<td>Automatic grading software</td>
+<td>IEC 61300-3-35 profiles</td>
+<td>pass/fail without operator judgement</td>
+</tr>
+<tr>
+<td>Tips</td>
+<td>one per connector type (LC UPC, LC APC, MPO, bulkhead)</td>
+<td>correct focus and angle</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s26-7-4"><span class="n">26.7.4</span>Cleaning procedure</h3>
+<ol>
+<li><strong>Inspect.</strong> Inspect the end face with the probe and grade it.</li>
+<li><strong>Dry clean.</strong> If it fails, clean with a one-click cleaner (bulkhead) or a cassette cleaner (cord).</li>
+<li><strong>Re-inspect.</strong> Grade again.</li>
+<li><strong>Wet-to-dry clean.</strong> If it still fails, clean with a lint-free wipe moistened with fibre cleaning solvent, then dry wipe, then re-inspect.</li>
+<li><strong>Replace.</strong> If a scratch or pit remains in zone A or B after two cleaning cycles, replace the cord or re-terminate the connector.</li>
+<li><strong>Cap.</strong> Fit dust caps on every connector not in use. Caps are not clean; inspect again before mating.</li>
+<li><strong>Record.</strong> Save the final image with the link record for panel connectors.</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Cleaning without inspecting.</strong> A cleaner can move debris from the cladding to the core. Always inspect after cleaning.</li>
+<li><strong>Mating to check.</strong> Mating a dirty connector to the tester contaminates the test reference cord. Every later result is then wrong.</li>
+<li><strong>Using alcohol wipes from a general kit.</strong> Residue leaves a film; use the solvent and wipes specified for fibre.</li>
+</ol>
+<h2 id="s26-8"><span class="n">26.8</span>Tier 1 testing: optical loss test set and reference methods</h2>
+
+<figure class="sheet" id="F26-7"><a href="../data/cx-handbook/figures/F26-7.svg" title="Open drawing F26-7 at full size"><img src="../data/cx-handbook/figures/F26-7.svg" alt="F26-7: Tier 1 loss test reference methods: one-jumper, two-jumper and three-jumper (TIA-526 names)" width="1400" height="922" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F26-7</span> — <b>Tier 1 loss test reference methods: one-jumper, two-jumper and three-jumper (TIA-526 names)</b>. The reference sets 0 dB with the cords shown in the top row of each method; the link is then inserted between the cords shown in the bottom row.</figcaption></figure>
+<h3 id="s26-8-1"><span class="n">26.8.1</span>What Tier 1 measures</h3>
+<p>Tier 1 (basic) certification measures the insertion loss of each fibre with a light source and a power meter, or an OLTS that combines both, and checks length and polarity. ISO/IEC 14763-3 and IEC 61280-4-1 (multimode) and IEC 61280-4-2 (single-mode) define the methods; ANSI/TIA-526-14-C and ANSI/TIA-526-7-A are the TIA versions.</p>
+<h3 id="s26-8-2"><span class="n">26.8.2</span>Reference methods</h3>
+<p>The reference sets 0 dB on the power meter before the link is measured. The method decides how many end connections are included in the result. Figure <a class="figref" href="#F26-7">F26-7</a> shows the three methods. TIA-526 calls them one-jumper, two-jumper and three-jumper reference (formerly Method B, Method A and Method C).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Reference method</th>
+<th>Former TIA name</th>
+<th>End connections included in the result</th>
+<th>When used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One-jumper</td>
+<td>Method B</td>
+<td>both</td>
+<td>preferred for links with connectors of the same type as the tester ports; matches the TIA link definition</td>
+</tr>
+<tr>
+<td>Two-jumper</td>
+<td>Method A</td>
+<td>one</td>
+<td>when the one-jumper method cannot be used (connector mismatch); add one connection allowance</td>
+</tr>
+<tr>
+<td>Three-jumper</td>
+<td>Method C</td>
+<td>none</td>
+<td>when testing a link that will be used with equipment cords; the result excludes the end connections</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> A reference set through an adapter (two jumpers joined) and then called a one-jumper result removes one connection from the measurement. Every link then looks up to <mark>0.75 dB better</mark>. Fluke Networks notes that a reference set through a bulkhead adapter adds uncertainty of up to 1.5 dB. Watch the reference step during the witness test.</p>
+<h3 id="s26-8-3"><span class="n">26.8.3</span>Encircled flux for multimode</h3>
+<p>A multimode source can launch light into more or fewer modes. An overfilled launch gives a pessimistic (high) loss; an underfilled launch gives an optimistic (low) loss. Encircled flux (EF) defines the launch condition so that results from different testers agree. ANSI/TIA-568.3-E and ISO/IEC 11801 defer launch conditions to ANSI/TIA-526-14-C and IEC 61280-4-1. ANSI/TIA-526-14-C requires EF at 850 nm on 50/125 µm fibre and recommends it at 1300 nm; IEC 61280-4-1 requires EF at both wavelengths.</p>
+<ol>
+<li><strong>Use an EF-compliant source and cord.</strong> Either a launch conditioner on a light-emitting diode (LED) source, or a matched source and test reference cord (the two options of TIA-TSB-4979).</li>
+<li><strong>Do not use a mandrel as an EF device.</strong> A mandrel wrap reduces overfill but does not guarantee EF compliance.</li>
+<li><strong>Record the method.</strong> The test record names the source, the cord and the EF method.</li>
+</ol>
+<h3 id="s26-8-4"><span class="n">26.8.4</span>OLTS procedure</h3>
+<p><strong>Purpose:</strong> Measure insertion loss, length and polarity of every fibre and compare with the limit.</p>
+<p><strong>Trigger:</strong> Link installed, terminated, labelled and end faces inspected.</p>
+<p><strong>Owner:</strong> Cabling contractor technician; the commissioning authority (CxA) witnesses a sample (for example 10 % of links, including all campus links).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Check the tester.</strong> Calibration within 12 months; firmware recorded; test limit set to the project limit (TIA budget or engineered budget).</li>
+<li><strong>Warm up.</strong> Switch the sources on for at least 5 minutes before setting the reference (or the time in the tester manual).</li>
+<li><strong>Inspect and clean the test cords.</strong> Grade the test reference cord (TRC) end faces.</li>
+<li><strong>Set the reference.</strong> One-jumper method: connect TRC 1 from the source port directly to the meter port; set reference.</li>
+<li><strong>Verify the reference.</strong> Disconnect TRC 1 from the meter, connect TRC 2 to the meter, join TRC 1 and TRC 2 with an adapter. Reading must be at or below <mark>0.10 dB (multimode) or 0.20 dB (single-mode)</mark> for reference-grade cords. If higher, clean and repeat from step 4.</li>
+<li><strong>Keep TRC 1 on the source.</strong> <mark>Disconnecting TRC 1 from the source invalidates the reference</mark>.</li>
+<li><strong>Connect to the link.</strong> TRC 1 to end 1 of the link, TRC 2 from end 2 to the meter (or the remote unit).</li>
+<li><strong>Test at two wavelengths.</strong> 850 and 1300 nm for multimode; 1310 and 1550 nm for single-mode.</li>
+<li><strong>Test both directions where specified.</strong> Swap the main and remote units or use a bidirectional tester.</li>
+<li><strong>Save with the label name.</strong> Use the TIA-606 identifier of the link (26.11).</li>
+<li><strong>Re-check the reference.</strong> Every 4 hours, after a temperature change of more than 10 °C, and before the last link of each working day.</li>
+</ol>
+<p><strong>Acceptance:</strong> Every fibre at or below the loss limit at both wavelengths; polarity as designed; length within the drawing tolerance (for example ±5 %).</p>
+<h3 id="s26-8-5"><span class="n">26.8.5</span>Tier 1 test record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Link ID</td>
+<td>TIA-606 identifier</td>
+<td>B2-MDF.R03-U40:01 to CAMPUS-CORE.R11-U38:01</td>
+</tr>
+<tr>
+<td>Fibre type</td>
+<td>text</td>
+<td>OS2 indoor-outdoor</td>
+</tr>
+<tr>
+<td>Length</td>
+<td>m</td>
+<td>1,204</td>
+</tr>
+<tr>
+<td>Reference method</td>
+<td>text</td>
+<td>one-jumper</td>
+</tr>
+<tr>
+<td>Test cords</td>
+<td>serial numbers</td>
+<td>TRC-SM-014, TRC-SM-015</td>
+</tr>
+<tr>
+<td>Limit</td>
+<td>dB per wavelength</td>
+<td>2.70 / 2.70</td>
+</tr>
+<tr>
+<td>Loss 1310 nm / 1550 nm</td>
+<td>dB</td>
+<td>1.26 / 1.42</td>
+</tr>
+<tr>
+<td>Margin</td>
+<td>dB</td>
+<td>1.44 / 1.28</td>
+</tr>
+<tr>
+<td>Polarity</td>
+<td>text</td>
+<td>A-to-B, as designed</td>
+</tr>
+<tr>
+<td>Tester</td>
+<td>model, serial, calibration date</td>
+<td>per certificate</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass / fail</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Operator, date</td>
+<td>text</td>
+<td>cabling technician, 2026-11-03</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s26-9"><span class="n">26.9</span>Tier 2 testing: OTDR</h2>
+
+<figure class="sheet" id="F26-6"><a href="../data/cx-handbook/figures/F26-6.svg" title="Open drawing F26-6 at full size"><img src="../data/cx-handbook/figures/F26-6.svg" alt="F26-6: OTDR trace at 1550 nm of the 1.20 km OS2 link with 500 m launch and tail cords, and the event table" width="1400" height="711" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F26-6</span> — <b>OTDR trace at 1550 nm of the 1.20 km OS2 link with 500 m launch and tail cords, and the event table</b>. Backscatter level falls with distance at the fibre attenuation; reflective connectors show a spike and a step, splices and bends show a step only; the ghost appears beyond the end at a distance equal to a multiple of a strong reflection.</figcaption></figure>
+<h3 id="s26-9-1"><span class="n">26.9.1</span>What the OTDR shows</h3>
+<p>An OTDR sends light pulses into the fibre and measures the light scattered back (backscatter) and reflected from connectors and ends. It plots the returned level against distance. The trace shows the loss of each splice, connector and bend, and where each one is. Tier 2 (extended) certification adds an OTDR trace to the Tier 1 result; the OTDR does not replace the OLTS loss measurement for acceptance.</p>
+<h3 id="s26-9-2"><span class="n">26.9.2</span>Set-up</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Typical value</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wavelengths</td>
+<td>1310 and 1550 nm (single-mode); 850 and 1300 nm (multimode)</td>
+<td>bends show more loss at the longer wavelength</td>
+</tr>
+<tr>
+<td>Pulse width</td>
+<td>10 to 30 ns for links up to 2 km; longer for long links</td>
+<td>short pulses give small dead zones; long pulses give more range</td>
+</tr>
+<tr>
+<td>Range</td>
+<td>2 to 3 times the link length including cords</td>
+<td>the end and any ghost must be on screen</td>
+</tr>
+<tr>
+<td>Averaging time</td>
+<td>15 to 30 s</td>
+<td>lower noise</td>
+</tr>
+<tr>
+<td>Index of refraction (IOR)</td>
+<td>from the cable datasheet, for example 1.4676 at 1310 nm and 1.4682 at 1550 nm (Corning SMF-28 Ultra, PI 1424)</td>
+<td>correct distance</td>
+</tr>
+<tr>
+<td>Launch cord</td>
+<td>500 m to 1 km for single-mode, 100 to 300 m for multimode, and at least twice the attenuation dead zone</td>
+<td>moves the dead zone off the first connector</td>
+</tr>
+<tr>
+<td>Tail (receive) cord</td>
+<td>same type and length as the launch cord</td>
+<td>lets the far-end connector be measured</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s26-9-3"><span class="n">26.9.3</span>Dead zones</h3>
+<ol>
+<li><strong>Event dead zone.</strong> The minimum distance after a reflective event at which the OTDR can see a second event. Fluke Networks gives 3.7 m at 850 nm with a 20 ns pulse for one module.</li>
+<li><strong>Attenuation dead zone.</strong> The minimum distance after a reflective event at which the OTDR can measure the loss of a second event. The same module: 10 m at 850 nm with a 20 ns pulse.</li>
+<li><strong>Effect of pulse width.</strong> A wider pulse gives a larger dead zone. Two connectors closer together than the attenuation dead zone <mark>appear as one event</mark> with their losses combined.</li>
+<li><strong>Effect of reflectance.</strong> A highly reflective event (a dirty or air-gapped connector) gives a longer dead zone.</li>
+</ol>
+<h3 id="s26-9-4"><span class="n">26.9.4</span>Reading a trace</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Feature on the trace</th>
+<th>What it means</th>
+<th>How to confirm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Straight sloping line</td>
+<td>fibre backscatter; the slope is the attenuation in dB/km</td>
+<td>slope near the datasheet value: Corning SMF-28 Ultra (PI 1424) lists a maximum of 0.32 dB/km at 1310 nm and 0.18 dB/km at 1550 nm; use the datasheet of the installed cable</td>
+</tr>
+<tr>
+<td>Spike followed by a step down</td>
+<td>reflective event: connector or mechanical splice</td>
+<td>position matches a patch panel on the drawing</td>
+</tr>
+<tr>
+<td>Step down without a spike</td>
+<td>non-reflective event: fusion splice or bend</td>
+<td>compare 1310 and 1550 nm: a bend has more loss at 1550 nm</td>
+</tr>
+<tr>
+<td>Step up</td>
+<td>gainer: a splice between fibres with different backscatter</td>
+<td>test from the other end and average</td>
+</tr>
+<tr>
+<td>Large spike then noise</td>
+<td>the end of the fibre or a break</td>
+<td>distance compared with the link length</td>
+</tr>
+<tr>
+<td>Spike beyond the end, in the noise</td>
+<td>ghost: a second reflection of a strong reflective event</td>
+<td>appears at a multiple of the distance of a strong reflection; no loss step after it</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s26-9-5"><span class="n">26.9.5</span>Ghosts, gainers and bidirectional averaging</h3>
+<ol>
+<li><strong>Ghosts.</strong> A strong reflection travels back to the OTDR, reflects at the OTDR connector and travels out again. The OTDR sees it as a second event at twice the distance of the original reflection (or at the sum of distances of two reflective events). A ghost has no loss step after it and can sit beyond the fibre end. The fix is to clean the connector that causes the strong reflection or to use a launch cord with an angled connector at the OTDR.</li>
+<li><strong>Gainers.</strong> At a splice between fibres with different mode field diameter or backscatter coefficient, the backscatter level after the splice can be higher than before. The OTDR then shows a gain. Fluke Networks explains that the OTDR shows a loss value lower than the real value. Tested from the other end, the same splice shows a loss larger than the real value. EXFO gives an example of -0.25 dB one way and +0.35 dB the other.</li>
+<li><strong>Bidirectional averaging.</strong> The real splice loss is <mark>the average of the two directions</mark>: (loss A to B + loss B to A) / 2. The specification should require bidirectional OTDR testing for single-mode links with splices. EXFO notes that this averaging applies to single-mode fibre.</li>
+</ol>
+<h3 id="s26-9-6"><span class="n">26.9.6</span>Worked trace interpretation</h3>
+<p>Figure <a class="figref" href="#F26-6">F26-6</a> shows the trace of the 1.20 km OS2 link of 26.5.3, taken at 1550 nm from end A. The test used a 500 m launch cord and a 500 m tail cord.</p>
+<p><strong>Worked example:</strong> Reading the OTDR trace of link B2-MDF to CAMPUS-CORE, fibre 01.</p>
+<ol>
+<li><strong>Launch dead zone.</strong> The large spike at 0 km is the OTDR connector. The launch cord moves the first link connector to 0.50 km, outside the dead zone.</li>
+<li><strong>E1 at 0.50 km.</strong> Spike and step: the near-end panel connector. Loss 0.32 dB, below 0.75 dB. Reflectance recorded by the tester (for example -52 dB for UPC; the project specification sets the reflectance limit).</li>
+<li><strong>E2 at 0.82 km (0.32 km into the link).</strong> Step without spike: building-entrance fusion splice. Loss 0.06 dB, below 0.3 dB.</li>
+<li><strong>E3 at 1.35 km (0.85 km into the link).</strong> Step up of 0.06 dB: a gainer. From end B the same splice reads +0.18 dB. Bidirectional average: (-0.06 + 0.18) / 2 = <mark>0.06 dB</mark>, below 0.3 dB. The splice is accepted.</li>
+<li><strong>E4 at 1.50 km (1.00 km into the link).</strong> Step without spike, 0.45 dB at 1550 nm. At 1310 nm the same event is 0.12 dB. Loss that is much larger at 1550 nm is the signature of a macrobend. The drawing shows a splice closure tray at that position. The team opens the tray, finds a fibre routed tighter than the minimum bend radius, re-routes it and re-tests: 0.04 dB at 1550 nm.</li>
+<li><strong>E5 at 1.70 km.</strong> Spike and step: the far-end panel connector. Loss 0.30 dB.</li>
+<li><strong>Tail and end.</strong> The tail cord runs to 2.20 km, where the end reflection appears and the trace drops into noise.</li>
+<li><strong>Ghost at 3.40 km.</strong> A spike in the noise with no step after it. Its distance is twice the distance of the strong reflection at E5 (2 × 1.70 = 3.40 km), so it is an echo of that reflection. No action other than recording it; cleaning E5 reduces it.</li>
+<li><strong>Totals.</strong> Link loss from E1 to E5 including both connectors is read from the trace, with E3 taken as its bidirectional average. The sum is 0.32 + 0.06 + 0.06 + 0.45 + 0.30 + 1.20 km × 0.19 dB/km = 1.42 dB at 1550 nm. This matches the OLTS result of 26.5.3. After the bend repair: 1.01 dB.</li>
+</ol>
+<p><strong>Records:</strong> The OTDR file (Standard OTDR Record (SOR) format or the tester native format) for both directions and both wavelengths, the event table, and the bidirectional average for each splice.</p>
+<h3 id="s26-9-7"><span class="n">26.9.7</span>OTDR event table fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Link ID and fibre</td>
+<td>text</td>
+<td>B2-MDF to CAMPUS-CORE, fibre 01</td>
+</tr>
+<tr>
+<td>Direction</td>
+<td>A to B, B to A</td>
+<td>A to B</td>
+</tr>
+<tr>
+<td>Wavelength and pulse</td>
+<td>nm, ns</td>
+<td>1550 nm, 30 ns</td>
+</tr>
+<tr>
+<td>Launch and tail cord</td>
+<td>m, serial number</td>
+<td>500 m LC-SM-L07, 500 m LC-SM-T07</td>
+</tr>
+<tr>
+<td>IOR</td>
+<td>number</td>
+<td>1.4682 (from the cable datasheet)</td>
+</tr>
+<tr>
+<td>Event number and distance</td>
+<td>km</td>
+<td>E3, 1.35 km</td>
+</tr>
+<tr>
+<td>Event type</td>
+<td>connector, splice, bend, gainer, end, ghost</td>
+<td>gainer</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>dB</td>
+<td>-0.06 (A to B), +0.18 (B to A)</td>
+</tr>
+<tr>
+<td>Bidirectional average</td>
+<td>dB</td>
+<td>0.06</td>
+</tr>
+<tr>
+<td>Reflectance</td>
+<td>dB</td>
+<td>not applicable for a splice</td>
+</tr>
+<tr>
+<td>Limit</td>
+<td>dB</td>
+<td>0.3</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass / fail</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s26-10"><span class="n">26.10</span>Copper certification</h2>
+<h3 id="s26-10-1"><span class="n">26.10.1</span>Permanent link and channel</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>What is tested</th>
+<th>Length limit</th>
+<th>Test adapter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Permanent link</td>
+<td>fixed cable from patch panel to outlet including both connectors, without patch cords</td>
+<td>90 m</td>
+<td>permanent link adapters; the adapter cords are excluded from the result</td>
+</tr>
+<tr>
+<td>Channel</td>
+<td>permanent link plus equipment and patch cords</td>
+<td>100 m</td>
+<td>channel adapters; the end plugs of the cords are excluded</td>
+</tr>
+</tbody>
+</table></div>
+<p>Installers <mark>certify the permanent link at handover</mark>, because the patch cords change during operation. The permanent link limits are tighter than the channel limits for the same category.</p>
+<h3 id="s26-10-2"><span class="n">26.10.2</span>Parameters</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>What it measures</th>
+<th>Typical cause of failure</th>
+<th>Action on failure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wire map</td>
+<td>each conductor to the right pin, no opens, shorts, reversed, crossed or split pairs</td>
+<td>termination error</td>
+<td>re-terminate, re-test</td>
+</tr>
+<tr>
+<td>Length</td>
+<td>electrical length from propagation delay</td>
+<td>cable over 90 m in the permanent link</td>
+<td>re-route or move the outlet</td>
+</tr>
+<tr>
+<td>Insertion loss</td>
+<td>signal loss over frequency</td>
+<td>length, poor cable, high temperature</td>
+<td>check length and cable type; re-test</td>
+</tr>
+<tr>
+<td>NEXT and PSNEXT</td>
+<td>near-end crosstalk (NEXT) between pairs, and its power sum (PSNEXT)</td>
+<td>untwisting at the termination</td>
+<td>re-terminate with the pair twist kept to the termination</td>
+</tr>
+<tr>
+<td>ACR-F and PSACR-F</td>
+<td>attenuation-to-crosstalk ratio, far end (ACR-F): far-end crosstalk relative to the received signal, and its power sum (PSACR-F)</td>
+<td>poor cable or connectors</td>
+<td>replace the connectors; re-test</td>
+</tr>
+<tr>
+<td>Return loss</td>
+<td>reflected signal from impedance changes</td>
+<td>kinks, crushed cable, poor termination</td>
+<td>replace the damaged section or re-terminate</td>
+</tr>
+<tr>
+<td>Propagation delay and delay skew</td>
+<td>time and difference between pairs</td>
+<td>mixed cable types</td>
+<td>replace with one cable type</td>
+</tr>
+<tr>
+<td>DC resistance unbalance</td>
+<td>direct-current (DC) resistance difference in a pair, important for PoE</td>
+<td>poor termination; extended to more categories in TIA-568.2-E</td>
+<td>re-terminate, re-test</td>
+</tr>
+<tr>
+<td>PS ANEXT (Category 6A)</td>
+<td>power-sum (PS) alien near-end crosstalk (ANEXT) from adjacent cables</td>
+<td>tight bundles; tested on a sample</td>
+<td>loosen the bundle and re-test</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s26-10-3"><span class="n">26.10.3</span>Copper test procedure</h3>
+<ol>
+<li><strong>Check the tester.</strong> Calibration within 12 months; accuracy level suitable for Category 6A (Level IIIe or higher, the ANSI/TIA-1152-A accuracy level for Category 6A); firmware and test limit database current.</li>
+<li><strong>Select the limit.</strong> TIA Category 6A permanent link (or the revision named in the specification).</li>
+<li><strong>Set the reference.</strong> Run the tester's set-reference with the adapters supplied.</li>
+<li><strong>Test each link.</strong> Save each result under the TIA-606 identifier.</li>
+<li><strong>Handle marginal results.</strong> A result marked with an asterisk (inside the tester accuracy of the limit) is treated as specified; most specifications reject marginal passes on new installations.</li>
+<li><strong>Test alien crosstalk on a sample.</strong> Where the specification requires it, test PS ANEXT on the worst-case bundle.</li>
+<li><strong>Record.</strong> Export the native tester file and a PDF summary.</li>
+</ol>
+<p><strong>Acceptance:</strong> Every permanent link passes all parameters at the limit for its category; no marginal pass unless the specification allows it.</p>
+<h2 id="s26-11"><span class="n">26.11</span>Labelling and records (ANSI/TIA-606-C)</h2>
+<h3 id="s26-11-1"><span class="n">26.11.1</span>Identifiers</h3>
+<p>ANSI/TIA-606-C sets identifiers for spaces, cabinets, panels, ports and cables, and scales the requirements by four administration classes. A common form in data centres is floor and space (FS), then the cabinet by grid location, then the panel by rack unit and the port.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Format (example)</th>
+<th>Example on MSC-1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Space</td>
+<td>floor + space letter</td>
+<td>1A (building B2, floor 1, room A = ER2)</td>
+</tr>
+<tr>
+<td>Cabinet</td>
+<td>space + grid position</td>
+<td>1A.AD02</td>
+</tr>
+<tr>
+<td>Panel</td>
+<td>cabinet + rack unit</td>
+<td>1A.AD02-40</td>
+</tr>
+<tr>
+<td>Port</td>
+<td>panel + port number</td>
+<td>1A.AD02-40:02</td>
+</tr>
+<tr>
+<td>Link</td>
+<td>port at end 1 / port at end 2</td>
+<td>1A.AD02-40:01/1B.AK07-38:01</td>
+</tr>
+<tr>
+<td>Campus prefix</td>
+<td>building prefix where links leave the building</td>
+<td>B2-1A.AD02-40:01</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> The format is fixed in the project labelling standard before cables are pulled. The same identifier appears on the label, in the test record and in the data-centre infrastructure management (DCIM) or cable management database. Confirm the format against the edition of TIA-606 named in the contract (the C revision; a D revision is referred to by some sources).</p>
+<h3 id="s26-11-2"><span class="n">26.11.2</span>Label rules</h3>
+<ol>
+<li><strong>Both ends.</strong> Every cable is labelled at both ends within <mark>300 mm</mark> of the termination.</li>
+<li><strong>Panels and ports.</strong> Every panel and port labelled with its identifier.</li>
+<li><strong>Durable labels.</strong> Machine-printed, self-laminating labels; no handwriting.</li>
+<li><strong>Polarity and method.</strong> Panels state the polarity method and fibre type.</li>
+<li><strong>Records match labels.</strong> Test records use the same identifiers; the CxA checks a sample of labels against the records during the walkdown.</li>
+</ol>
+<h2 id="s26-12"><span class="n">26.12</span>Common fibre faults: symptoms, causes and fixes</h2>
+<p>Diagnose a link that fails its loss limit in a fixed order: inspect the end faces first, then compare the two wavelengths, then read the OTDR trace from both ends. Figure <a class="figref" href="#F26-8">F26-8</a> shows this order as a decision tree with the values of the 1.20 km OS2 worked example of 26.9.6.</p>
+<figure class="sheet" id="F26-8"><a href="../data/cx-handbook/figures/F26-8.svg" title="Open drawing F26-8 at full size"><img src="../data/cx-handbook/figures/F26-8.svg" alt="F26-8: Fibre fault diagnosis: end face, wavelength pair, OTDR from both ends" width="1000" height="1086" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F26-8</span> — <b>Fibre fault diagnosis: end face, wavelength pair, OTDR from both ends</b>. Work down the left column; the first condition that holds names the fault and the fix. Each check uses a record already in the test file (end-face image, OLTS result at two wavelengths, bidirectional OTDR trace).</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Fault</th>
+<th>Symptom on OLTS</th>
+<th>Symptom on OTDR</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dirty connector</td>
+<td>high loss that changes each time it is mated</td>
+<td>high reflectance and loss at the connector</td>
+<td>dust, oil, previous mating with a dirty cord</td>
+<td>inspect, clean, re-inspect</td>
+</tr>
+<tr>
+<td>Damaged end face</td>
+<td>high loss that cleaning does not remove</td>
+<td>high loss and reflectance</td>
+<td>scratch, pit, chipped ferrule</td>
+<td>replace cord or re-terminate</td>
+</tr>
+<tr>
+<td>Macrobend</td>
+<td>loss higher at 1550 nm than at 1310 nm (or 1300 vs 850 nm)</td>
+<td>non-reflective step larger at the longer wavelength</td>
+<td>tight tray routing, cable tie, door hinge</td>
+<td>re-route to the minimum bend radius</td>
+</tr>
+<tr>
+<td>Wrong fibre type</td>
+<td>very high loss; multimode light in single-mode or the reverse</td>
+<td>large step at the junction</td>
+<td>OM4 cord in an OS2 link, or the reverse</td>
+<td>replace with the right type</td>
+</tr>
+<tr>
+<td>Polarity reversed</td>
+<td>link loss normal but no link at the switch; tester shows crossed pairs</td>
+<td>not shown</td>
+<td>wrong cord or cassette type</td>
+<td>replace cord or cassette per the method</td>
+</tr>
+<tr>
+<td>Broken fibre</td>
+<td>no light received</td>
+<td>end reflection at a short distance</td>
+<td>crush, pull damage</td>
+<td>locate with OTDR and splice or replace</td>
+</tr>
+<tr>
+<td>High splice loss</td>
+<td>loss above the budget</td>
+<td>step above 0.3 dB in both directions</td>
+<td>poor cleave, contamination in the splicer</td>
+<td>re-splice</td>
+</tr>
+<tr>
+<td>Gainer</td>
+<td>not visible</td>
+<td>step up from one end</td>
+<td>mode field diameter mismatch</td>
+<td>bidirectional average</td>
+</tr>
+<tr>
+<td>APC mated to UPC</td>
+<td>very high loss and damage</td>
+<td>high loss</td>
+<td>mixed polish types</td>
+<td>replace both connectors' cords, inspect for damage</td>
+</tr>
+<tr>
+<td>Air gap at MPO</td>
+<td>high loss on some fibres of an MPO</td>
+<td>reflective events</td>
+<td>debris on the ferrule, pin damage</td>
+<td>inspect whole ferrule with large field of view, clean</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s26-13"><span class="n">26.13</span>Network commissioning</h2>
+<h3 id="s26-13-1"><span class="n">26.13.1</span>Switch configuration verification</h3>
+<p><strong>Purpose:</strong> Prove that each switch holds the approved configuration, and that the configuration is backed up.</p>
+<p><strong>Owner:</strong> Network contractor; CxA and owner OT security witness a sample.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Firmware.</strong> Record the firmware version; it matches the approved version list.</li>
+<li><strong>Hostname and management address.</strong> As in the IP plan; management only in VLAN 199.</li>
+<li><strong>VLANs and ports.</strong> Each port in the VLAN of the IP plan; unused ports shut down and placed in an unused VLAN.</li>
+<li><strong>Port security.</strong> Limit learned media access control (MAC) addresses per access port (for example 1 or 2) and set the violation action as specified.</li>
+<li><strong>Ring protocol.</strong> RSTP priority or MRP role (MRM or MRC), ring ports, profile; recorded per switch.</li>
+<li><strong>PTP.</strong> PTP mode (boundary or transparent clock) and profile on every switch in the EPMS path.</li>
+<li><strong>Management protocols.</strong> Secure Shell (SSH) only (Telnet and Hypertext Transfer Protocol (HTTP) disabled), SNMP version 3 (SNMPv3) with authentication and privacy, syslog to the security information and event management (SIEM) server, NTP to the OT time server.</li>
+<li><strong>Accounts.</strong> Named accounts or central authentication; default accounts disabled.</li>
+<li><strong>Backup.</strong> Export the running configuration to the network backup server; record file name and checksum.</li>
+<li><strong>Compare.</strong> Compare the exported configuration with the approved template line by line; differences are approved or corrected.</li>
+</ol>
+<p><strong>Acceptance:</strong> Configuration equal to the approved template; backup saved; SNMP, syslog and NTP checks received at the servers.</p>
+<h3 id="s26-13-2"><span class="n">26.13.2</span>Ring failover test</h3>
+<p><strong>Purpose:</strong> Measure the traffic loss when a ring link or switch fails and when it is restored, and compare with the acceptance value.</p>
+<p><strong>Trigger:</strong> Ring complete, switch configuration verified, end devices or test endpoints connected.</p>
+<p><strong>Owner:</strong> Network contractor; CxA witnesses 100 %.</p>
+<p><strong>Inputs:</strong> A traffic generator or two laptops sending a constant frame stream (for example one frame every 1 ms with sequence numbers), and a packet capture at the receiver. <mark>A continuous ping at 1 s intervals is too coarse</mark> for MRP and PRP.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Choose the paths.</strong> Select end points so that the test traffic crosses the link that will be broken.</li>
+<li><strong>Start the traffic.</strong> One frame every 1 ms; record the start.</li>
+<li><strong>Break the link.</strong> Pull one ring fibre (or both fibres of the link) at a recorded time.</li>
+<li><strong>Measure loss.</strong> Count lost frames; recovery time = lost frames × 1 ms.</li>
+<li><strong>Restore the link.</strong> Reconnect and count lost frames again (some protocols lose frames on restore).</li>
+<li><strong>Repeat at each ring position.</strong> Break each ring link in turn, and power off one switch.</li>
+<li><strong>Check the systems.</strong> During each break, PME and the BMS must not raise device communication alarms if the alarm delay is longer than the recovery time (chapter 23.10).</li>
+<li><strong>Record.</strong> Fill the failover test record.</li>
+</ol>
+<p><strong>Acceptance:</strong> Each recovery time at or below the value in the specification. For MRP, the limit is the configured profile worst case; for PRP and HSR, zero lost frames; for RSTP, the project value (for example 1 s).</p>
+<p><strong>Worked example:</strong> Failover test on EPMS ring B2-EPMS-RING1 (12 switches, MRP, 200 ms profile, MRM at B2-ER1-EPMS-SW01). Test stream 1 frame per ms between a laptop on SW04 and a laptop on SW09.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Lost frames on break</th>
+<th>Recovery time</th>
+<th>Lost frames on restore</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Break SW04 to SW05 fibre</td>
+<td>23</td>
+<td>23 ms</td>
+<td>0</td>
+<td>pass (≤ 200 ms)</td>
+</tr>
+<tr>
+<td>Break SW08 to SW09 fibre</td>
+<td>19</td>
+<td>19 ms</td>
+<td>0</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Power off SW06</td>
+<td>31</td>
+<td>31 ms</td>
+<td>0</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Break MRM ring port</td>
+<td>21</td>
+<td>21 ms</td>
+<td>0</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>BMS ring B2-BMS-RING1, RSTP, 8 switches, break SW03 to SW04</td>
+<td>640</td>
+<td>640 ms</td>
+<td>2</td>
+<td>pass (≤ 1 s project value)</td>
+</tr>
+<tr>
+<td>Relay PRP pair, LAN A switch power off</td>
+<td>0</td>
+<td>0 ms</td>
+<td>0</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>The PME device communication alarm delay of 5 minutes (chapter 23.10.3) is far longer than the worst measured recovery of <mark>640 ms</mark>. The alarm log shows no communication alarm during the test.</p>
+<h3 id="s26-13-3"><span class="n">26.13.3</span>Interfaces to other contractors</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Dependency</th>
+<th>From</th>
+<th>To</th>
+<th>Needed before</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fibre and copper test records accepted</td>
+<td>cabling contractor</td>
+<td>network contractor</td>
+<td>switch installation sign-off</td>
+</tr>
+<tr>
+<td>Switch configuration verified</td>
+<td>network contractor</td>
+<td>EPMS and BMS contractors</td>
+<td>device communication tests (chapter 24.5)</td>
+</tr>
+<tr>
+<td>PTP working on the EPMS path</td>
+<td>network contractor and time server supplier</td>
+<td>EPMS contractor</td>
+<td>sequence-of-events (SOE) test (chapter 24.10)</td>
+</tr>
+<tr>
+<td>Firewall rules exported</td>
+<td>network or security contractor</td>
+<td>owner security</td>
+<td>integration tests</td>
+</tr>
+<tr>
+<td>Ring failover test passed</td>
+<td>network contractor</td>
+<td>CxA</td>
+<td>Level 4 (L4) sign-off of EPMS and BMS</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s26-14"><span class="n">26.14</span>Acceptance and handover</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Content</th>
+<th>Signed by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fibre Tier 1 records</td>
+<td>every fibre, both wavelengths, polarity</td>
+<td>cabling contractor; CxA sample</td>
+</tr>
+<tr>
+<td>Fibre Tier 2 records</td>
+<td>OTDR files both directions for single-mode links with splices</td>
+<td>cabling contractor</td>
+</tr>
+<tr>
+<td>End-face images</td>
+<td>panel connectors after final cleaning</td>
+<td>cabling contractor</td>
+</tr>
+<tr>
+<td>Copper certification</td>
+<td>every permanent link</td>
+<td>cabling contractor; CxA sample</td>
+</tr>
+<tr>
+<td>Label audit</td>
+<td>sample check of labels against records</td>
+<td>CxA</td>
+</tr>
+<tr>
+<td>IP plan and VLAN plan</td>
+<td>as configured</td>
+<td>network contractor</td>
+</tr>
+<tr>
+<td>Switch configurations and backups</td>
+<td>per switch, with checksum</td>
+<td>network contractor</td>
+</tr>
+<tr>
+<td>Ring failover record</td>
+<td>each ring, each position</td>
+<td>network contractor; CxA</td>
+</tr>
+<tr>
+<td>Firewall rule export and conduit table</td>
+<td>per firewall</td>
+<td>security contractor; owner security</td>
+</tr>
+<tr>
+<td>As-built drawings</td>
+<td>pathways, panels, rings</td>
+<td>contractors</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Compile.</strong> Contractors submit the records within 5 working days of the last test.</li>
+<li><strong>Review.</strong> The CxA reviews within 5 working days; a sample of tester files is opened and checked against the summary.</li>
+<li><strong>Close issues.</strong> Category A and B issues closed with retest records.</li>
+<li><strong>Sign.</strong> The commissioning manager signs the cabling and network acceptance certificate.</li>
+</ol>
+<h2 id="s26-15"><span class="n">26.15</span>Common errors in cabling and network tests</h2>
+<ol>
+<li><strong>Reference set through an adapter.</strong> Every link appears up to 0.75 dB better. Watch the reference step and the reference check reading.</li>
+<li><strong>Test cords not inspected.</strong> A dirty cord adds loss to every link of the day. Inspect the cords at the start and after every 20 links.</li>
+<li><strong>Wrong limit in the tester.</strong> A generic TIA limit used where the specification sets an engineered budget passes links that will fail the application.</li>
+<li><strong>OTDR from one end only.</strong> Gainers are accepted as low loss; splices with high real loss pass.</li>
+<li><strong>Copper channel tested instead of permanent link.</strong> The result changes when cords are replaced.</li>
+<li><strong>Ring failover tested with ping at 1 s.</strong> The test cannot measure an MRP recovery of 20 ms and reports 0 or 1 lost ping.</li>
+<li><strong>Configuration changed after backup.</strong> The backup is old at handover. Take the final backup after the last change and compare checksums.</li>
+</ol>
+<h2 id="s26-16"><span class="n">26.16</span>Checklist for site use</h2>
+<ol>
+<li><strong>Design.</strong> One ring per system, diverse routes, switches on UPS-backed supplies, DMZ between IT and OT.</li>
+<li><strong>Protocols.</strong> MRP profile or RSTP settings recorded; PRP for relays where GOOSE is used.</li>
+<li><strong>IP plan.</strong> Every device has a static address, VLAN, switch and port recorded.</li>
+<li><strong>Media.</strong> Fibre type and polish (UPC or APC) recorded per link; no mixing of APC and UPC.</li>
+<li><strong>Loss budget.</strong> TIA budget and engineered budget calculated for each link at both wavelengths and entered in the tester.</li>
+<li><strong>Polarity.</strong> One method on site; cords and cassettes match; polarity result on every record.</li>
+<li><strong>Inspection.</strong> Every connector inspected and graded before mating; images saved for panels.</li>
+<li><strong>OLTS.</strong> One-jumper reference; reference check at or below 0.10 dB (multimode) or 0.20 dB (single-mode); EF launch for multimode.</li>
+<li><strong>OTDR.</strong> Launch and tail cords; both directions for single-mode links with splices; gainers averaged; bends found by wavelength comparison.</li>
+<li><strong>Copper.</strong> Permanent link certified at the specified category; no marginal pass unless allowed.</li>
+<li><strong>Labels.</strong> TIA-606 identifiers at both ends; records use the same identifiers.</li>
+<li><strong>Switches.</strong> Configuration equal to the template; unused ports shut; SSH, SNMPv3, syslog, NTP and PTP verified.</li>
+<li><strong>Failover.</strong> Each ring tested at each position with a 1 ms frame stream; results inside the acceptance values.</li>
+<li><strong>Backups.</strong> Final configuration backups with checksums.</li>
+<li><strong>Acceptance.</strong> All records in the package; issues A and B closed; certificate signed.</li>
+</ol>
+<h2 id="s26-17"><span class="n">26.17</span>Sources</h2>
+<ol>
+<li>Fluke Networks, "New Loss Budget Values for Reference Grade Connectors in ANSI/TIA-568.3-E", accessed 1 November 2026. <a href="https://flukenetworks.com/content/new-loss-budget-values-reference-grade-connectors-ansitia-5683-d" rel="noopener">https://flukenetworks.com/content/new-loss-budget-values-reference-grade-connectors-ansitia-5683-d</a></li>
+<li>Fluke Networks, "Fiber Optic Link Loss Budget Calculation - SimpliFiber Pro", knowledge base, accessed 31 October 2026. <a href="https://ru.flukenetworks.com/knowledge-base/simplifiber-pro/loss-budget-calculation-simplifiber-pro" rel="noopener">https://ru.flukenetworks.com/knowledge-base/simplifiber-pro/loss-budget-calculation-simplifiber-pro</a></li>
+<li>The Fiber Optic Association, "TIA 568 Standard for Fiber Optics", accessed 31 October 2026. <a href="https://www.thefoa.org/tech/tia568b3.htm" rel="noopener">https://www.thefoa.org/tech/tia568b3.htm</a></li>
+<li>Hexatronic Data Center, "Understanding Telecommunications Industry Association (TIA) Standards", accessed 31 October 2026. <a href="https://hexatronicdatacenter.com/en/knowledge/understanding-telecommunications-industry-association-tia-standards" rel="noopener">https://hexatronicdatacenter.com/en/knowledge/understanding-telecommunications-industry-association-tia-standards</a></li>
+<li>Corning, "Recommended Fiber Optic Test Guidelines", LAN-1561-AEN, accessed 31 October 2026. <a href="https://www.corning.com/catalog/coc/documents/misc/LAN-1561-AEN.pdf" rel="noopener">https://www.corning.com/catalog/coc/documents/misc/LAN-1561-AEN.pdf</a></li>
+<li>OpenExamPrep, "Optical Loss Budgets and Certification Testing" (BICSI Technician study guide), accessed 31 October 2026. <a href="https://open-exam-prep.com/study-guides/bicsi-technician/chapter-3/optical-loss-budgets-and-testing" rel="noopener">https://open-exam-prep.com/study-guides/bicsi-technician/chapter-3/optical-loss-budgets-and-testing</a></li>
+<li>Fluke Networks, "Encircled Flux - CertiFiber Pro", knowledge base, accessed 31 October 2026. <a href="https://es.flukenetworks.com/knowledge-base/certifiber-pro/encircled-flux-certifiber-pro" rel="noopener">https://es.flukenetworks.com/knowledge-base/certifiber-pro/encircled-flux-certifiber-pro</a></li>
+<li>Fluke Networks, "Easier Fiber End Face Inspections: Key Changes to IEC 61300-3-35", accessed 31 October 2026. <a href="https://www.flukenetworks.com/blog/cabling-chronicles/easier-fiber-end-face-inspection" rel="noopener">https://www.flukenetworks.com/blog/cabling-chronicles/easier-fiber-end-face-inspection</a></li>
+<li>FS.com, "Understanding Fiber Polarity" white paper, accessed 31 October 2026. <a href="https://img-en.fs.com/file/white_paper/understanding-fiber-polarity.pdf" rel="noopener">https://img-en.fs.com/file/white_paper/understanding-fiber-polarity.pdf</a></li>
+<li>Fluke Networks, "Attenuation and event deadzones - DTX Compact OTDR Module", accessed 31 October 2026. <a href="https://pt.flukenetworks.com/content/attenuation-and-event-deadzones-dtx-compact-otdr-module" rel="noopener">https://pt.flukenetworks.com/content/attenuation-and-event-deadzones-dtx-compact-otdr-module</a></li>
+<li>Fluke Networks, "Cable Testing 101: There's No Gain with Gainers", accessed 31 October 2026. <a href="https://flukenetworks.com/blog/cabling-chronicles/cable-testing-101-theres-no-gain-gainers" rel="noopener">https://flukenetworks.com/blog/cabling-chronicles/cable-testing-101-theres-no-gain-gainers</a></li>
+<li>Wikipedia, "Media Redundancy Protocol" (summary of IEC 62439-2 recovery times), accessed 31 October 2026. <a href="https://en.wikipedia.org/wiki/Media_Redundancy_Protocol" rel="noopener">https://en.wikipedia.org/wiki/Media_Redundancy_Protocol</a></li>
+<li>IEC 62439-3:2021, Industrial communication networks, High availability automation networks, Part 3: PRP and HSR, IEC. <a href="https://webstore.iec.ch/en/publication/64423" rel="noopener">https://webstore.iec.ch/en/publication/64423</a></li>
+<li>EXFO, "Understanding and mitigating OTDR gainers" application note, accessed 31 October 2026. <a href="https://trsrentelco.com/sites/default/files/resources-pdfs/Understanding_and_mitigating_OTDR_gainers.pdf" rel="noopener">https://trsrentelco.com/sites/default/files/resources-pdfs/Understanding_and_mitigating_OTDR_gainers.pdf</a></li>
+<li>CommScope, "Gainer or High Splice Loss: The Effects of Mode Field Diameter", accessed 31 October 2026. <a href="https://www.commscope.com/blog/2018/gainer-or-high-splice-loss-the-effects-of-mode-field-diameter/" rel="noopener">https://www.commscope.com/blog/2018/gainer-or-high-splice-loss-the-effects-of-mode-field-diameter/</a></li>
+<li>IEC 61300-3-35:2022, Fibre optic interconnecting devices and passive components, Basic test and measurement procedures, Part 3-35: Examinations and measurements, Visual inspection of fibre optic connectors and fibre-stub transceivers, IEC. <a href="https://webstore.iec.ch/en/publication/64254" rel="noopener">https://webstore.iec.ch/en/publication/64254</a></li>
+<li>OpenExamPrep, "Copper Field Testing" (BICSI RCDD study guide), accessed 31 October 2026. <a href="https://open-exam-prep.com/study-guides/bicsi-rcdd/field-testing/copper-testing" rel="noopener">https://open-exam-prep.com/study-guides/bicsi-rcdd/field-testing/copper-testing</a></li>
+<li>OpenExamPrep, "Telecommunications Pathways, Spaces, and Administration" (TIA-606 identifiers), accessed 31 October 2026. <a href="https://open-exam-prep.com/study-guides/bicsi-inst2-copper/standards-and-code-compliance/pathways-spaces-admin" rel="noopener">https://open-exam-prep.com/study-guides/bicsi-inst2-copper/standards-and-code-compliance/pathways-spaces-admin</a></li>
+<li>Texas Instruments, SPRT769, industrial Ethernet redundancy (RSTP, MRP, PRP, HSR), December 2023. <a href="https://ti.com/document-viewer/lit/html/SPRT769/GUID-00161BEF-9FB6-4E90-9DA1-CA46E73159B7" rel="noopener">https://ti.com/document-viewer/lit/html/SPRT769/GUID-00161BEF-9FB6-4E90-9DA1-CA46E73159B7</a></li>
+<li>IEC 62443-3-3:2013, System security requirements and security levels, IEC. <a href="https://webstore.iec.ch/en/publication/7033" rel="noopener">https://webstore.iec.ch/en/publication/7033</a></li>
+<li>Corning, SMF-28 Ultra optical fibre product information sheet PI 1424, accessed 1 November 2026 (values read from the search summary; the PDF refused automated download). <a href="https://csmedia.corning.com/media/worldwide/coc/documents/Fiber/product-information-sheets/PI-1424-AEN.pdf" rel="noopener">https://csmedia.corning.com/media/worldwide/coc/documents/Fiber/product-information-sheets/PI-1424-AEN.pdf</a></li>
+<li>IEEE P802.3bm, "Table 95-8, 100GBASE-SR4 illustrative link power budget", task force draft, accessed 1 November 2026. <a href="https://www.ieee802.org/3/bm/public/mmfadhoc/meetings/jul24_14/8023-95CMP2.pdf" rel="noopener">https://www.ieee802.org/3/bm/public/mmfadhoc/meetings/jul24_14/8023-95CMP2.pdf</a></li>
+<li>IEEE P802.3ba, "Table 86-9, 40GBASE-SR4 and 40GBASE-SR10 illustrative link power budgets" (anslow_07_0110), accessed 1 November 2026. <a href="https://www.ieee802.org/3/ba/public/jan10/anslow_07_0110.pdf" rel="noopener">https://www.ieee802.org/3/ba/public/jan10/anslow_07_0110.pdf</a></li>
+<li>Cabling Installation &amp; Maintenance, "Practical impacts of bend radius on twisted-pair cable installation", accessed 1 November 2026. <a href="https://cablinginstall.com/design-install/article/16466578/practical-impacts-of-bend-radius-on-twistedpair-cable-installation" rel="noopener">https://cablinginstall.com/design-install/article/16466578/practical-impacts-of-bend-radius-on-twistedpair-cable-installation</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="25-integration-points.html"><span>Previous · 25</span><span class="t">Integration points</span></a><a class="next" href="27-dcim-cmms-security-cybersecurity.html"><span>Next · 27</span><span class="t">DCIM, CMMS, security and access control, and OT cybersecurity</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

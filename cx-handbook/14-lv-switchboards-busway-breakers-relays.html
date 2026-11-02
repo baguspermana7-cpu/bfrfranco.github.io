@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14 Low-voltage switchboards, busway, circuit breakers and protection relays | Cx Field Manual R01</title>
+<meta name="description" content="This chapter covers the site acceptance tests of the low-voltage (LV) distribution of a data-centre campus.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/14-lv-switchboards-busway-breakers-relays.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/14-lv-switchboards-busway-breakers-relays.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/14-lv-switchboards-busway-breakers-relays.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/14-lv-switchboards-busway-breakers-relays.html">
+<meta property="og:title" content="14 Low-voltage switchboards, busway, circuit breakers and protection relays | Cx Field Manual R01">
+<meta property="og:description" content="This chapter covers the site acceptance tests of the low-voltage (LV) distribution of a data-centre campus.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="14 Low-voltage switchboards, busway, circuit breakers and protection relays | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter covers the site acceptance tests of the low-voltage (LV) distribution of a data-centre campus.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"14 Low-voltage switchboards, busway, circuit breakers and protection relays","name":"Low-voltage switchboards, busway, circuit breakers and protection relays","description":"This chapter covers the site acceptance tests of the low-voltage (LV) distribution of a data-centre campus.","url":"https://resistancezero.com/cx-handbook/14-lv-switchboards-busway-breakers-relays.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/14-lv-switchboards-busway-breakers-relays.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":9536,"position":14,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"14 Low-voltage switchboards, busway, circuit breakers and protection relays","item":"https://resistancezero.com/cx-handbook/14-lv-switchboards-busway-breakers-relays.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part C · Electrical commissioning</p>
+    <h1><span class="num">14</span>Low-voltage switchboards, busway, circuit breakers and protection relays</h1>
+    <p class="lede">This chapter covers the site acceptance tests of the low-voltage (LV) distribution of a data-centre campus.</p>
+    <p class="basis">Chapter 14 of 32 · 18 sections · 6 figures · 9,536 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 14</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 14</summary>
+<ol><li><a href="#s14-0"><span class="n">14.0</span>Scope of this chapter</a></li><li><a href="#s14-1"><span class="n">14.1</span>The LV system on MSC-1</a><ol><li><a href="#s14-1-1"><span class="n">14.1.1</span>What the LV system is</a></li><li><a href="#s14-1-2"><span class="n">14.1.2</span>Test points and responsibilities</a></li></ol></li><li><a href="#s14-2"><span class="n">14.2</span>Test programme and sequence</a><ol><li><a href="#s14-2-1"><span class="n">14.2.1</span>Sequence for one block switchboard</a></li><li><a href="#s14-2-2"><span class="n">14.2.2</span>What blocks energisation of an LV switchboard</a></li></ol></li><li><a href="#s14-3"><span class="n">14.3</span>Instruments and calibration</a></li><li><a href="#s14-4"><span class="n">14.4</span>LV switchboard tests</a><ol><li><a href="#s14-4-1"><span class="n">14.4.1</span>IEC 61439 verification: design and routine</a></li><li><a href="#s14-4-2"><span class="n">14.4.2</span>Visual and mechanical checks on site</a></li><li><a href="#s14-4-3"><span class="n">14.4.3</span>Torque verification</a></li><li><a href="#s14-4-4"><span class="n">14.4.4</span>Insulation resistance</a></li><li><a href="#s14-4-5"><span class="n">14.4.5</span>Bolted connection resistance</a></li></ol></li><li><a href="#s14-5"><span class="n">14.5</span>Busway tests</a><ol><li><a href="#s14-5-1"><span class="n">14.5.1</span>What busway is and why it is tested</a></li><li><a href="#s14-5-2"><span class="n">14.5.2</span>OEM joint methods</a></li><li><a href="#s14-5-3"><span class="n">14.5.3</span>Busway test procedure</a></li><li><a href="#s14-5-4"><span class="n">14.5.4</span>Busway record fields</a></li></ol></li><li><a href="#s14-6"><span class="n">14.6</span>Circuit breaker tests: ACB and MCCB</a><ol><li><a href="#s14-6-1"><span class="n">14.6.1</span>Breakers and trip units on MSC-1</a></li><li><a href="#s14-6-2"><span class="n">14.6.2</span>What L, S, I and G mean</a></li><li><a href="#s14-6-3"><span class="n">14.6.3</span>Long-time trip time calculation</a></li><li><a href="#s14-6-4"><span class="n">14.6.4</span>Secondary injection of electronic trip units</a></li><li><a href="#s14-6-5"><span class="n">14.6.5</span>Primary injection of ACBs</a></li><li><a href="#s14-6-6"><span class="n">14.6.6</span>MCCB field tests to NEMA AB 4</a></li><li><a href="#s14-6-7"><span class="n">14.6.7</span>ACB mechanical, electrical and contact resistance tests</a></li></ol></li><li><a href="#s14-7"><span class="n">14.7</span>Residual current device tests</a><ol><li><a href="#s14-7-1"><span class="n">14.7.1</span>What an RCD does</a></li><li><a href="#s14-7-2"><span class="n">14.7.2</span>Tests and acceptance values</a></li></ol></li><li><a href="#s14-8"><span class="n">14.8</span>Interlocks, functional tests and transfer schemes</a><ol><li><a href="#s14-8-1"><span class="n">14.8.1</span>Interlock types</a></li><li><a href="#s14-8-2"><span class="n">14.8.2</span>Main-tie-main and block transfer tests</a></li></ol></li><li><a href="#s14-9"><span class="n">14.9</span>Protection relays: device functions and injection tests</a><ol><li><a href="#s14-9-1"><span class="n">14.9.1</span>ANSI device numbers used in this chapter</a></li><li><a href="#s14-9-2"><span class="n">14.9.2</span>Test method for each function</a></li><li><a href="#s14-9-3"><span class="n">14.9.3</span>IDMT timing example</a></li><li><a href="#s14-9-4"><span class="n">14.9.4</span>Undervoltage and frequency example</a></li><li><a href="#s14-9-5"><span class="n">14.9.5</span>Differential example</a></li></ol></li><li><a href="#s14-10"><span class="n">14.10</span>Selectivity verification against the study</a><ol><li><a href="#s14-10-1"><span class="n">14.10.1</span>What selectivity means</a></li><li><a href="#s14-10-2"><span class="n">14.10.2</span>Verification steps</a></li></ol></li><li><a href="#s14-11"><span class="n">14.11</span>Protection setting files and version control</a><ol><li><a href="#s14-11-1"><span class="n">14.11.1</span>Why setting files need control</a></li><li><a href="#s14-11-2"><span class="n">14.11.2</span>Workflow</a></li><li><a href="#s14-11-3"><span class="n">14.11.3</span>Setting register fields</a></li></ol></li><li><a href="#s14-12"><span class="n">14.12</span>Arc-flash study and labels</a><ol><li><a href="#s14-12-1"><span class="n">14.12.1</span>What the arc-flash study gives</a></li><li><a href="#s14-12-2"><span class="n">14.12.2</span>Study inputs that commissioning must confirm</a></li><li><a href="#s14-12-3"><span class="n">14.12.3</span>Label content</a></li><li><a href="#s14-12-4"><span class="n">14.12.4</span>Site check of labels</a></li></ol></li><li><a href="#s14-13"><span class="n">14.13</span>Thermography under load</a><ol><li><a href="#s14-13-1"><span class="n">14.13.1</span>Method</a></li><li><a href="#s14-13-2"><span class="n">14.13.2</span>Temperature difference bands</a></li></ol></li><li><a href="#s14-14"><span class="n">14.14</span>Records</a><ol><li><a href="#s14-14-1"><span class="n">14.14.1</span>Switchboard Level 3 record (filled example)</a></li><li><a href="#s14-14-2"><span class="n">14.14.2</span>Relay test record (filled example)</a></li></ol></li><li><a href="#s14-15"><span class="n">14.15</span>Common errors, detection before the witness test and KPIs</a></li><li><a href="#s14-16"><span class="n">14.16</span>Checklist for site use</a></li><li><a href="#s14-17"><span class="n">14.17</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="13-mv-switchgear-transformers-cables.html"><span>Previous</span>13 Medium-voltage switchgear, transformers and cables</a><a href="15-generators-fuel-synchronising.html"><span>Next</span>15 Generators, fuel systems and synchronising switchgear</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s14-0"><span class="n">14.0</span>Scope of this chapter</h2>
+<p>This chapter covers the site acceptance tests of the low-voltage (LV) distribution of a data-centre campus. The equipment is the main switchboards fed from the 2.5 MVA block transformers and the busway runs to the uninterruptible power supply (UPS) and to the data halls. It also includes the air circuit breakers (ACB) and moulded-case circuit breakers (MCCB) with their electronic trip units, the residual current devices (RCD), the protection relays and the control of protection settings. It also covers the arc-flash labels that are produced from the protection study.</p>
+<ol>
+<li><strong>The LV system on MSC-1.</strong> The block LV single-line diagram, the test points and the roles.</li>
+<li><strong>Programme and sequence.</strong> The order of LV tests and what blocks energisation.</li>
+<li><strong>Instruments.</strong> The instruments, their accuracy and calibration.</li>
+<li><strong>Switchboards.</strong> IEC 61439 verification, visual checks, torque, insulation resistance and the dielectric test.</li>
+<li><strong>Busway.</strong> Joint torque, joint resistance, insulation resistance and the busway test record.</li>
+<li><strong>Circuit breakers.</strong> ACB and MCCB tests, long-time, short-time, instantaneous and ground protection (LSIG) trip units, secondary and primary injection and the NEMA AB 4 field tests.</li>
+<li><strong>RCDs.</strong> Test currents, trip times and records.</li>
+<li><strong>Interlocks and functional tests.</strong> ACB mechanisms, electrical and key interlocks, transfer schemes.</li>
+<li><strong>Protection relays.</strong> ANSI/IEEE C37.2 device functions 27 (undervoltage), 50 (instantaneous overcurrent), 51 (time overcurrent), 50N and 51N (earth-fault overcurrent), 59 (overvoltage), 81 (frequency) and 87 (differential), and the injection tests for each.</li>
+<li><strong>Selectivity.</strong> Verification of the installed settings against the coordination study.</li>
+<li><strong>Setting files.</strong> Version control from the study to the as-left file.</li>
+<li><strong>Arc flash.</strong> IEEE 1584-2018 study inputs, NFPA 70E labels and their site check.</li>
+<li><strong>Thermography.</strong> Infrared survey under load.</li>
+<li><strong>Records, errors and KPIs.</strong></li>
+</ol>
+<p>Documents and standards used: ANSI/NETA ATS-2025 and NEMA AB 4 (guidelines for inspection and preventive maintenance of MCCBs, field test tables as quoted through NETA Acceptance Testing Specifications (ATS) Tables 100.7 and 100.8). The chapter also uses IEC 61439-1 and IEC 61439-2 (LV switchgear assemblies), IEC 60947-2 (circuit breakers), IEC 60364-6 (verification of LV installations), IEC 60255-151 (overcurrent relay curves) and IEEE C37.2 (device function numbers). It also uses IEEE 1584-2018 (arc-flash hazard calculations), NFPA 70E-2024 (electrical safety in the workplace), Schneider Electric Canalis KR and KT installation guides and the MSC-1 numbers from <code>case_ledger.json</code>. Values that could not be checked against the current edition are marked for confirmation, with the document and the table or clause named in the bracket.</p>
+<h2 id="s14-1"><span class="n">14.1</span>The LV system on MSC-1</h2>
+
+<figure class="sheet" id="F14-1"><a href="../data/cx-handbook/figures/F14-1.svg" title="Open drawing F14-1 at full size"><img src="../data/cx-handbook/figures/F14-1.svg" alt="F14-1: MSC-1 block LV system: 2.5 MVA transformer, 4000 A main ACB, switchboard and outgoing circuits with test points" width="1400" height="968" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F14-1</span> — <b>MSC-1 block LV system: 2.5 MVA transformer, 4000 A main ACB, switchboard and outgoing circuits with test points</b>. Test points TP1 to TP8 show where each test of chapter 14 is connected; the A-side and B-side boards of one block are tested and labelled the same way.</figcaption></figure>
+<h3 id="s14-1-1"><span class="n">14.1.1</span>What the LV system is</h3>
+<p>Each data hall on MSC-1 has 8 blocks of 1.5 MW information technology (IT) load. Each block has a 2.5 MVA, 20/0.415 kV transformer that feeds an LV main switchboard. The switchboard supplies a 2.5 MW UPS through a busway, the mechanical boards for cooling equipment through MCCBs and smaller boards for lighting and small power. A and B blocks supply the two power paths to each rack.</p>
+<p>Figure <a class="figref" href="#F14-1">F14-1</a> shows one block with the test points TP1 to TP8 (TP numbers name test points; the commissioning levels L0 to L6 are defined in section 02.3.2).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>MSC-1 quantity</th>
+<th>Value</th>
+<th>Use in this chapter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Block transformer</td>
+<td>2.5 MVA, 20/0.415 kV, Dyn11</td>
+<td>LV current and fault level</td>
+</tr>
+<tr>
+<td>LV full-load current</td>
+<td>2,500 kVA / (√3 × 0.415 kV) = 3,478 A</td>
+<td>main ACB frame and setting</td>
+</tr>
+<tr>
+<td>Main ACB</td>
+<td>4,000 A frame, Ir set 3,500 A (example)</td>
+<td>long-time setting test</td>
+</tr>
+<tr>
+<td>Prospective fault at LV bus (example, uk 6 %, infinite source)</td>
+<td>3,478 / 0.06 = 58.0 kA</td>
+<td>switchboard and breaker ratings, arc-flash study</td>
+</tr>
+<tr>
+<td>UPS per block</td>
+<td>2.5 MW</td>
+<td>busway and feeder ACB</td>
+</tr>
+<tr>
+<td>Blocks per hall</td>
+<td>8</td>
+<td>number of switchboards to test</td>
+</tr>
+<tr>
+<td>Halls on the campus</td>
+<td>12</td>
+<td>96 block switchboards in total</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> The LV prospective fault current at the block switchboard is estimated from the transformer impedance. With uk = 6 % (example nameplate value; use the actual nameplate) and the source impedance neglected, Isc = full-load current / uk = 3,478 / 0.06 = 57,970 A, <mark>about 58 kA</mark>. Including the 20 kV source (13.2 kA at 20 kV, 457 MVA) reduces it slightly. The source impedance on a 2.5 MVA base is 2.5 / 457 = 0.55 %, so Isc = 3,478 / (0.06 + 0.0055) = 53,100 A. The switchboard must have a rated short-time withstand current (Icw) above <mark>58 kA, the higher of the two values</mark>, and the breakers a rated ultimate breaking capacity (Icu) above the same value. The design may use the lower value only with a stated basis.</p>
+<h3 id="s14-1-2"><span class="n">14.1.2</span>Test points and responsibilities</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point</th>
+<th>Equipment</th>
+<th>Test</th>
+<th>Performed by</th>
+<th>Witnessed by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TP1</td>
+<td>switchboard and cables</td>
+<td>visual, torque marks, insulation resistance</td>
+<td>electrical contractor</td>
+<td>commissioning authority (CxA)</td>
+</tr>
+<tr>
+<td>TP2</td>
+<td>ACBs</td>
+<td>mechanical and electrical operation, contact resistance, interlocks</td>
+<td>switchboard original equipment manufacturer (OEM)</td>
+<td>CxA</td>
+</tr>
+<tr>
+<td>TP3</td>
+<td>ACB and MCCB trip units</td>
+<td>secondary and primary injection of L, S, I and G</td>
+<td>testing contractor</td>
+<td>CxA, protection engineer</td>
+</tr>
+<tr>
+<td>TP4</td>
+<td>all protection devices</td>
+<td>setting file check against the study</td>
+<td>protection engineer, testing contractor</td>
+<td>CxA</td>
+</tr>
+<tr>
+<td>TP5</td>
+<td>busway</td>
+<td>torque, joint resistance, insulation resistance</td>
+<td>busway installer and OEM</td>
+<td>CxA</td>
+</tr>
+<tr>
+<td>TP6</td>
+<td>final circuits</td>
+<td>RCD trip tests</td>
+<td>electrical contractor</td>
+<td>CxA (sample)</td>
+</tr>
+<tr>
+<td>TP7</td>
+<td>switchboard and busway</td>
+<td>thermography under load</td>
+<td>testing contractor</td>
+<td>CxA</td>
+</tr>
+<tr>
+<td>TP8</td>
+<td>every switchboard and panel</td>
+<td>arc-flash label</td>
+<td>protection engineer</td>
+<td>CxA, operations</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s14-2"><span class="n">14.2</span>Test programme and sequence</h2>
+<h3 id="s14-2-1"><span class="n">14.2.1</span>Sequence for one block switchboard</h3>
+<p>Times are working days after the trigger.</p>
+<ol>
+<li><strong>Receipt inspection.</strong> The contractor checks the switchboard nameplate (rated current, Icw, ingress protection (IP) rating, form of separation) against the approved submittal and records damage. Time limit: 1 day after delivery.</li>
+<li><strong>Installation checks.</strong> Level, anchoring, busbar connections between shipping sections torqued and marked, earth bar connected. Time limit: 2 days after setting in position.</li>
+<li><strong>Torque verification.</strong> The CxA samples bolted joints with a calibrated torque wrench (14.4.3). Time limit: 1 day.</li>
+<li><strong>Insulation resistance.</strong> Busbars and outgoing cables at 1,000 V DC. Time limit: 1 day. A failed value blocks energisation.</li>
+<li><strong>ACB and MCCB mechanical and electrical tests.</strong> Time limit: 2 days.</li>
+<li><strong>Trip unit injection.</strong> Secondary injection of every trip unit and primary injection of the main and feeder ACBs. Time limit: 2 days.</li>
+<li><strong>Busway tests.</strong> Joint resistance and insulation resistance (IR) of each busway run after installation. Time limit: 1 day per run.</li>
+<li><strong>Interlock and transfer tests.</strong> Time limit: 1 day.</li>
+<li><strong>Setting file compare and lock.</strong> Time limit: 0.5 day.</li>
+<li><strong>Energisation readiness review.</strong> All records complete and approved. Time limit: 1 day.</li>
+<li><strong>Energise and load.</strong> Under the switching programme; thermography when load reaches the required level.</li>
+<li><strong>Arc-flash labels.</strong> Installed after the as-left settings are confirmed; checked against the study tables.</li>
+</ol>
+<h3 id="s14-2-2"><span class="n">14.2.2</span>What blocks energisation of an LV switchboard</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Effect</th>
+<th>Who clears it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IR below acceptance on any busbar or cable</td>
+<td>blocks energisation of that circuit</td>
+<td>contractor finds the cause, retest</td>
+</tr>
+<tr>
+<td>Torque marks missing on bolted joints</td>
+<td>blocks energisation of that section</td>
+<td>contractor torques and marks, CxA samples again</td>
+</tr>
+<tr>
+<td>Trip unit setting differs from the study</td>
+<td>blocks closing of that breaker</td>
+<td>protection engineer and testing contractor</td>
+</tr>
+<tr>
+<td>Primary injection not done on main ACB</td>
+<td>blocks energisation of the board</td>
+<td>testing contractor</td>
+</tr>
+<tr>
+<td>Interlock fails</td>
+<td>blocks energisation</td>
+<td>OEM repairs</td>
+</tr>
+<tr>
+<td>Busway joint resistance outside the 50 % rule</td>
+<td>blocks energisation of that run</td>
+<td>installer re-makes the joint</td>
+</tr>
+<tr>
+<td>Arc-flash label missing</td>
+<td>blocks handover to operations (energisation may proceed under contractor control)</td>
+<td>protection engineer</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s14-3"><span class="n">14.3</span>Instruments and calibration</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Instrument</th>
+<th>Accuracy (typical; check the data sheet)</th>
+<th>Calibration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Torque</td>
+<td>click-type or digital torque wrench</td>
+<td>±4 % of reading (ISO 6789 type)</td>
+<td>yearly or per 5,000 cycles</td>
+</tr>
+<tr>
+<td>Insulation resistance</td>
+<td>1 kV or 5 kV insulation tester</td>
+<td>±5 % of reading</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Contact and joint resistance</td>
+<td>digital low-resistance ohmmeter (DLRO), 10 A to 200 A DC</td>
+<td>±0.25 % of reading</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Trip unit secondary injection</td>
+<td>OEM test kit or universal test set</td>
+<td>as OEM</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Primary injection</td>
+<td>high-current set, 0 to 10 kA or more, with timer</td>
+<td>±2 % with reference current transformer (CT)</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>RCD</td>
+<td>installation tester to IEC 61557-6</td>
+<td>trip time ±1 ms (typical)</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Relay testing</td>
+<td>three-phase secondary injection set</td>
+<td>±0.05 % of reading</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Thermography</td>
+<td>infrared camera with known emissivity setting</td>
+<td>±2 °C or ±2 %</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Phase rotation</td>
+<td>phase rotation meter</td>
+<td>—</td>
+<td>function check before use</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> The test record holds the instrument serial number and calibration certificate number. A torque wrench without a certificate is not used for torque verification.</p>
+<h2 id="s14-4"><span class="n">14.4</span>LV switchboard tests</h2>
+<h3 id="s14-4-1"><span class="n">14.4.1</span>IEC 61439 verification: design and routine</h3>
+<p>IEC 61439-1 and -2 separate two kinds of verification. Design verification proves the design of the assembly (temperature rise, short-circuit withstand, dielectric properties, clearances) by test, by calculation or by comparison with a tested reference design. It is done once by the original manufacturer. Routine verification is done on every assembly by the assembly manufacturer before delivery. The CxA checks that the design verification documents exist for the rated values on the nameplate and witnesses the routine verification at the factory (Level 1, factory acceptance test).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Routine verification item (IEC 61439-2)</th>
+<th>What is checked</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Degree of protection of enclosures</td>
+<td>IP rating, covers, gaskets</td>
+<td>factory routine report</td>
+</tr>
+<tr>
+<td>Clearances and creepage distances</td>
+<td>measured where below the values for the rated impulse voltage</td>
+<td>factory routine report</td>
+</tr>
+<tr>
+<td>Protection against electric shock and integrity of protective circuits</td>
+<td>protective conductor connections, continuity</td>
+<td>factory routine report</td>
+</tr>
+<tr>
+<td>Incorporation of built-in components</td>
+<td>components as the manufacturer's instructions</td>
+<td>factory routine report</td>
+</tr>
+<tr>
+<td>Internal electrical circuits and connections</td>
+<td>torque of a sample of connections</td>
+<td>factory routine report</td>
+</tr>
+<tr>
+<td>Terminals for external conductors</td>
+<td>number, type, identification</td>
+<td>factory routine report</td>
+</tr>
+<tr>
+<td>Mechanical operation</td>
+<td>operation of locks, interlocks, withdrawable parts</td>
+<td>factory routine report</td>
+</tr>
+<tr>
+<td>Dielectric properties</td>
+<td>power-frequency test for 1 s, or IR test for small assemblies as the standard allows</td>
+<td>factory routine report</td>
+</tr>
+<tr>
+<td>Wiring, operational performance and function</td>
+<td>wiring check, functional test</td>
+<td>factory routine report</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> IEC 61439-2 clause 11, list in RF-14 row 8. The power-frequency test voltage depends on the rated insulation voltage Ui; for 300 V &lt; Ui ≤ 690 V the value is 1,890 V AC (IEC 61439-1:2020 dielectric test values, clause 10.9.2, as declared by an assembly manufacturer, RF-14 row 17).</p>
+<h3 id="s14-4-2"><span class="n">14.4.2</span>Visual and mechanical checks on site</h3>
+<ol>
+<li><strong>Nameplate.</strong> Rated voltage 415 V, rated current 4,000 A, Icw not less than the study fault level for 1 s, IP rating and form of separation (for example Form 4b) match the approved submittal.</li>
+<li><strong>Damage.</strong> No cracked insulators, bent busbars, damaged barriers or missing covers.</li>
+<li><strong>Shipping splits.</strong> Busbar connections between shipping sections made with the OEM hardware and torqued (14.4.3).</li>
+<li><strong>Earth bar.</strong> Continuous along the board and connected to the main earthing terminal with the conductor size on the drawing.</li>
+<li><strong>Neutral-earth link.</strong> One link only, at the location on the earthing drawing (the main switchboard of a TN-S block unless the drawing shows another board). Its position is photographed.</li>
+<li><strong>Cable terminations.</strong> Lugs compressed with the correct die, cables supported, bending radius respected, phase colours correct.</li>
+<li><strong>Labels.</strong> Panel and circuit labels match the single-line diagram and the cable schedule.</li>
+<li><strong>Cleanliness.</strong> No tools, swarf, dust or packing inside. A vacuum cleaner is used; compressed air is not used because it blows debris into the mechanisms.</li>
+</ol>
+<h3 id="s14-4-3"><span class="n">14.4.3</span>Torque verification</h3>
+<p><strong>Purpose:</strong> Prove that bolted busbar and cable connections are tight. A loose connection heats under load, oxidises and fails, in some cases months after energisation.</p>
+<p><strong>Owner:</strong> Electrical contractor torques and marks every joint; the CxA verifies a sample.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Torque and mark.</strong> The contractor torques each joint to the OEM value with a calibrated wrench and draws a torque mark (a line of paint pen across the nut and the busbar).</li>
+<li><strong>Sample.</strong> The CxA selects at least 10 % of the joints in each board, including every shipping split joint.</li>
+<li><strong>Verify.</strong> The CxA sets the wrench to the OEM value and applies it in the tightening direction. The joint passes when the nut does not turn before the wrench clicks.</li>
+<li><strong>Escalate.</strong> If any joint in the sample moves, the CxA verifies 100 % of the joints of that board.</li>
+<li><strong>Record.</strong> Joint identifier, bolt size, OEM torque, wrench serial number, result.</li>
+</ol>
+<p><strong>Acceptance:</strong> No sampled joint turns before the wrench reaches the OEM value. <mark>One failure in the sample turns the sample into a 100 % check</mark> of that board (project rule stated in the commissioning specification).</p>
+<p><strong>Worked example:</strong> Board B2-DH3-MSB-A1 has 186 bolted joints. The CxA samples 20 joints including the 6 shipping split joints. Joint SS-3-L2 (M12 bolt, OEM torque 70 N·m, example value) turns at about 50 N·m. The CxA marks the board for a 100 % check. The contractor re-torques all 186 joints, finds <mark>3 more loose joints</mark> in the same shipping split, and the CxA re-samples 20 joints with no failure. The cause is recorded as "shipping split joints torqued by hand and not marked"; the issue is closed with a corrective action for the remaining boards.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Board</td>
+<td>text</td>
+<td>B2-DH3-MSB-A1</td>
+</tr>
+<tr>
+<td>Joint ID</td>
+<td>text</td>
+<td>SS-3-L2</td>
+</tr>
+<tr>
+<td>Bolt size and grade</td>
+<td>text</td>
+<td>M12, 8.8</td>
+</tr>
+<tr>
+<td>OEM torque</td>
+<td>number N·m</td>
+<td>70 (example)</td>
+</tr>
+<tr>
+<td>Wrench SN and certificate</td>
+<td>text</td>
+<td>TW-0441, cert due 2027-02-10</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>list</td>
+<td>moved at about 50 N·m: fail</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>text</td>
+<td>100 % check of the board</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s14-4-4"><span class="n">14.4.4</span>Insulation resistance</h3>
+<p><strong>Purpose:</strong> Prove that busbars and outgoing cables have no insulation defect before energisation.</p>
+<figure class="sheet" id="F14-6"><a href="../data/cx-handbook/figures/F14-6.svg" title="Open drawing F14-6 at full size"><img src="../data/cx-handbook/figures/F14-6.svg" alt="F14-6: Insulation resistance of a 415 V switchboard: connection and readings" width="1000" height="839" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F14-6</span> — <b>Insulation resistance of a 415 V switchboard: connection and readings</b>. The drawing shows the L1 test. For the next test the line lead moves to L2 and L1 joins the shorting link; the electronic devices stay disconnected until all tests are complete.</figcaption></figure>
+
+<p>Figure <a class="figref" href="#F14-6">F14-6</a> shows the connection for the L1 test of board B2-DH3-MSB-A1, the devices that are disconnected first and the example readings of record 14.14.1.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Isolate.</strong> Disconnect electronic devices that are not rated for the test voltage: surge protective devices (SPD), meters, voltage transformer (VT) fuses, control transformers, trip unit auxiliary supplies, and UPS input or output boards.</li>
+<li><strong>Connect.</strong> Test each phase and neutral to earth, and between phases, with all other conductors earthed.</li>
+<li><strong>Apply.</strong> 1,000 V DC for 1 minute on 415 V equipment.</li>
+<li><strong>Record.</strong> Readings for L1, L2, L3 and N to earth and between phases.</li>
+<li><strong>Discharge and reconnect.</strong> Discharge, then reconnect the devices from step 1 and record their reconnection.</li>
+</ol>
+<p><strong>Acceptance:</strong></p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Test voltage</th>
+<th>Minimum</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NETA ATS Table 100.1, 600 V class</td>
+<td>1,000 V DC</td>
+<td>100 MΩ</td>
+<td>switchboards, busway, cables in the absence of OEM data</td>
+</tr>
+<tr>
+<td>IEC 60364-6, circuits above 500 V</td>
+<td>1,000 V DC</td>
+<td>1 MΩ</td>
+<td>statutory minimum for the installation</td>
+</tr>
+<tr>
+<td>IEC 60364-6, circuits up to 500 V</td>
+<td>500 V DC</td>
+<td>1 MΩ</td>
+<td>statutory minimum for the installation</td>
+</tr>
+<tr>
+<td>OEM data (switchboard or busway)</td>
+<td>as OEM</td>
+<td>as OEM</td>
+<td>governs where given</td>
+</tr>
+</tbody>
+</table></div>
+<p>The project specification adopts the NETA value (100 MΩ) for new equipment. The IEC minimum (1 MΩ) is a safety limit for an installation in service, and new busbars are expected to read far higher (practice). For this reason <mark>a new switchboard that reads below 100 MΩ is investigated</mark> even though it passes IEC 60364-6.</p>
+<h3 id="s14-4-5"><span class="n">14.4.5</span>Bolted connection resistance</h3>
+<p>Where the specification asks, the resistance across bolted busbar joints is measured with a DLRO at 10 A or more. NETA ATS practice: compare with similar joints and investigate values that deviate by more than 50 % of the lowest value (RF-14 row 4). This test complements the torque check because a joint can be tight on a dirty or oxidised contact surface.</p>
+<h2 id="s14-5"><span class="n">14.5</span>Busway tests</h2>
+
+<figure class="sheet" id="F14-3"><a href="../data/cx-handbook/figures/F14-3.svg" title="Open drawing F14-3 at full size"><img src="../data/cx-handbook/figures/F14-3.svg" alt="F14-3: Busway run from switchboard B2-DH3-MSB-A1 to UPS-A1: joints, tap-off units and the test points" width="1400" height="656" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F14-3</span> — <b>Busway run from switchboard B2-DH3-MSB-A1 to UPS-A1: joints, tap-off units and the test points</b>. The busway is tested in sections of up to six lengths during installation and then as a complete run before the end boxes are connected.</figcaption></figure>
+<h3 id="s14-5-1"><span class="n">14.5.1</span>What busway is and why it is tested</h3>
+<p>Busway (busbar trunking) carries large currents in a prefabricated metal housing. On MSC-1 a 2,500 A busway runs from the block switchboard to the UPS, and plug-in busway with tap-off units feeds rack power distribution in some designs. Each straight length is factory tested, but the joints between lengths are made on site. In service <mark>most busway failures start at a site-made joint</mark> that was not tightened to the OEM value or was assembled with debris between the bars.</p>
+<p>Figure <a class="figref" href="#F14-3">F14-3</a> shows a busway run with its joints and test points.</p>
+<h3 id="s14-5-2"><span class="n">14.5.2</span>OEM joint methods</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Busway family (examples)</th>
+<th>Joint method</th>
+<th>Torque or check</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Schneider Canalis KR (cast resin)</td>
+<td>junction block with connecting bolt</td>
+<td>54 N·m for 17 mm bolt, 84 N·m for 19 mm bolt</td>
+<td>Canalis KR installation guide (RF-14 row 5)</td>
+</tr>
+<tr>
+<td>Schneider Canalis KT</td>
+<td>joint block with torque-limiting nut (break-off head)</td>
+<td>the nut head shears at the set torque; check the head is broken off</td>
+<td>method from the current version of the Canalis KT installation manual QGH3492101</td>
+</tr>
+<tr>
+<td>Eaton Pow-R-Way III and Siemens Sentron (examples)</td>
+<td>single-bolt joint with break-off or indicator</td>
+<td>OEM value and indicator</td>
+<td>OEM installation instructions for the busway supplied</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s14-5-3"><span class="n">14.5.3</span>Busway test procedure</h3>
+<p><strong>Trigger:</strong> A subsection of up to 6 lengths is installed (Canalis KR guide), and again when the complete run is installed before the end boxes are connected.</p>
+<p><strong>Owner:</strong> Busway installer; OEM representative attends the first run; CxA witnesses.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Check the lengths before assembly.</strong> Inspect the conductor ends for damage, contamination or moisture. The Canalis KR guide requires the insulation resistance of each element to be checked when lengths have been stored for a long time or the packing is damaged.</li>
+<li><strong>Assemble and torque.</strong> Make each joint with the OEM hardware and torque to the OEM value or until the break-off head shears. Mark each joint.</li>
+<li><strong>IR of the subsection.</strong> With a megohmmeter, test each phase and neutral to earth (the housing, if earthed) and between phases. For rated voltage above 500 V use 1,000 V DC; the OEM minimum is 1 MΩ (IEC 60364-6 value quoted by the Canalis KR guide).</li>
+<li><strong>PE continuity.</strong> Check the continuity of the housing or the protective earth (PE) bar from end to end with a low-resistance ohmmeter.</li>
+<li><strong>Joint resistance.</strong> Measure each phase across each joint with a DLRO at 100 A (or the OEM current) and compare joints.</li>
+<li><strong>Complete run.</strong> Repeat steps 3 to 5 for the complete run.</li>
+<li><strong>Tap-off units.</strong> Check rating, fuse or breaker type, phase and the mechanical interlock that prevents opening the cover while the unit is engaged.</li>
+<li><strong>Record.</strong> Fill the busway record.</li>
+</ol>
+<p><strong>Acceptance:</strong></p>
+<ol>
+<li><strong>Insulation resistance.</strong> At least 1 MΩ to the OEM guide; the project adopts 100 MΩ at 1,000 V DC from NETA Table 100.1 for new busway (ATS-2025 refers to the manufacturer's data or Table 100.1, RF-14 row 7).</li>
+<li><strong>Joint resistance.</strong> No joint deviates from similar joints by more than 50 % of the lowest value, and no joint exceeds the OEM maximum where given.</li>
+<li><strong>Torque.</strong> Every joint marked; break-off heads sheared where used.</li>
+</ol>
+<p><strong>Worked example:</strong> The 2,500 A busway from B2-DH3-MSB-A1 to UPS-A1 has 12 lengths and 11 joints. DLRO readings at 100 A on L1 are 14 to 17 µΩ for ten joints and 31 µΩ for J7. The lowest is 14 µΩ; the 50 % limit is 14 + 7 = 21 µΩ. <mark>J7 at 31 µΩ fails</mark>. The installer opens J7 and finds <mark>a piece of the protective film</mark> still on one bar. After cleaning and re-torquing, J7 reads 15 µΩ. The complete run IR at 1,000 V DC reads 2,250 to 2,400 MΩ phase to earth, which passes. The as-found value, the cause and the as-left value are recorded for J7.</p>
+<h3 id="s14-5-4"><span class="n">14.5.4</span>Busway record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Run ID</td>
+<td>text</td>
+<td>B2-DH3-BW-A1</td>
+</tr>
+<tr>
+<td>Rating and type</td>
+<td>text</td>
+<td>2,500 A aluminium, 415 V</td>
+</tr>
+<tr>
+<td>Number of lengths and joints</td>
+<td>number</td>
+<td>12 / 11</td>
+</tr>
+<tr>
+<td>Joint torque method</td>
+<td>text</td>
+<td>OEM torque value, marked</td>
+</tr>
+<tr>
+<td>Joint resistance per joint and phase</td>
+<td>table µΩ</td>
+<td>J1 15, J3 14 ... J7 31 (as found), 15 (as left)</td>
+</tr>
+<tr>
+<td>IR per phase to earth and between phases</td>
+<td>number MΩ</td>
+<td>2,400 / 2,250 / 2,300; N-PE 1,850</td>
+</tr>
+<tr>
+<td>PE continuity end to end</td>
+<td>number Ω</td>
+<td>0.012</td>
+</tr>
+<tr>
+<td>Instrument SN and certificates</td>
+<td>text</td>
+<td>DLRO SN 33410, IR tester SN 1023472</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>list</td>
+<td>pass after rework of J7</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Joint covers fitted before torque check.</strong> The CxA cannot see the marks. Covers are fitted only after the joint is signed.</li>
+<li><strong>Film or packing left on bars.</strong> It raises the joint resistance. The DLRO test finds it.</li>
+<li><strong>Busway tested with SPD or meters connected in a tap-off.</strong> IR reads low. Tap-off units are disconnected for the IR test.</li>
+<li><strong>Horizontal and vertical orientation mixed.</strong> Some busway is rated differently when mounted on edge or flat. The installation drawing and the OEM orientation rules are checked at Level 3.</li>
+</ol>
+<h2 id="s14-6"><span class="n">14.6</span>Circuit breaker tests: ACB and MCCB</h2>
+
+<figure class="sheet" id="F14-2"><a href="../data/cx-handbook/figures/F14-2.svg" title="Open drawing F14-2 at full size"><img src="../data/cx-handbook/figures/F14-2.svg" alt="F14-2: Time-current curves of the main ACB QA1 and feeder ACB QF1 with the LSIG bands and the test points (example settings)" width="1400" height="856" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F14-2</span> — <b>Time-current curves of the main ACB QA1 and feeder ACB QF1 with the LSIG bands and the test points (example settings)</b>. A test point inside the band passes; the gap between the QF1 upper band and the QA1 lower band is the selectivity margin checked against the study.</figcaption></figure>
+<h3 id="s14-6-1"><span class="n">14.6.1</span>Breakers and trip units on MSC-1</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Breaker</th>
+<th>Use</th>
+<th>Frame and setting (example)</th>
+<th>Trip unit</th>
+<th>Tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QA1 main ACB</td>
+<td>transformer incomer</td>
+<td>4,000 A frame, Ir 3,500 A</td>
+<td>electronic LSIG with zone-selective interlocking (ZSI)</td>
+<td>mechanical, contact resistance, secondary and primary injection, interlocks</td>
+</tr>
+<tr>
+<td>QF1 feeder ACB</td>
+<td>UPS input via busway</td>
+<td>2,500 A frame, Ir 2,000 A</td>
+<td>electronic LSIG with ZSI</td>
+<td>as QA1</td>
+</tr>
+<tr>
+<td>QF2 MCCB</td>
+<td>mechanical board</td>
+<td>630 A, Ir 500 A</td>
+<td>electronic long-time, short-time, instantaneous (LSI)</td>
+<td>secondary injection, primary injection on a sample</td>
+</tr>
+<tr>
+<td>QF3 MCCB</td>
+<td>lighting and small power board</td>
+<td>250 A, thermal-magnetic</td>
+<td>fixed instantaneous, adjustable thermal</td>
+<td>NEMA AB 4 inverse-time and instantaneous tests on a sample</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s14-6-2"><span class="n">14.6.2</span>What L, S, I and G mean</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Name</th>
+<th>Function</th>
+<th>Typical setting range (electronic trip unit)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L</td>
+<td>long time</td>
+<td>overload protection with an inverse time characteristic</td>
+<td>Ir 0.4 to 1.0 × In; tr at 6 × Ir 0.5 to 24 s</td>
+</tr>
+<tr>
+<td>S</td>
+<td>short time</td>
+<td>delayed short-circuit protection that allows downstream breakers to clear first</td>
+<td>Isd 1.5 to 10 × Ir; tsd 0.1 to 0.4 s, with or without I²t ramp</td>
+</tr>
+<tr>
+<td>I</td>
+<td>instantaneous</td>
+<td>undelayed short-circuit protection</td>
+<td>Ii 2 to 15 × In, or off on some ACBs</td>
+</tr>
+<tr>
+<td>G</td>
+<td>ground (earth) fault</td>
+<td>protection against earth faults below the short-circuit level</td>
+<td>Ig 0.2 to 1.0 × In (limited to 1,200 A maximum on some trip units); tg 0.1 to 0.4 s</td>
+</tr>
+</tbody>
+</table></div>
+<p>(Ranges are typical of ACB electronic trip units; the trip unit manual for the model gives the ranges.)</p>
+<p>IEC 60947-2 defines the conventional non-tripping current as 1.05 × Ir and the conventional tripping current as 1.30 × Ir within the conventional time (1 h for smaller ratings; Eaton catalogue, RF-14 row 18). Many electronic trip units start the long-time element between 1.05 and 1.20 × Ir; the trip unit manual for the model states the start point.</p>
+<h3 id="s14-6-3"><span class="n">14.6.3</span>Long-time trip time calculation</h3>
+<p>Electronic long-time elements commonly follow an I²t characteristic: t = tr × (6 × Ir / I)², where tr is the set time at 6 × Ir.</p>
+<p><strong>Worked example:</strong> QF1, Ir = 2,000 A, tr = 8 s at 6 × Ir. At 3 × Ir = 6,000 A the nominal time is 8 × (6 / 3)² = 8 × 4 = <mark>32 s</mark>. The trip unit manual gives the tolerance band for the long-time time (for example -20 % to +0 % or ±20 %, depending on maker; the trip unit manual states the band). With a band of 25 to 40 s (example from <a class="figref" href="#F14-2">F14-2</a>), the measured 30.8 s passes.</p>
+<p>Figure <a class="figref" href="#F14-2">F14-2</a> shows the time-current curves of QA1 and QF1 with the tolerance bands and the test points.</p>
+<h3 id="s14-6-4"><span class="n">14.6.4</span>Secondary injection of electronic trip units</h3>
+<p><strong>Purpose:</strong> Prove that the trip unit electronics, its settings and the trip actuator operate as set.</p>
+<p><strong>Owner:</strong> Testing contractor or OEM service; witnessed by the CxA.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Record as-found settings.</strong> Read the settings from the trip unit display or software and save the as-found file.</li>
+<li><strong>Compare with the study.</strong> Compare every setting with the approved setting file revision. Differences are recorded and corrected before testing.</li>
+<li><strong>Connect the test kit.</strong> Connect the OEM test kit to the trip unit test port. Select a test mode that trips the breaker (to prove the actuator) for at least one test of each element.</li>
+<li><strong>Test L.</strong> Inject at 3 × Ir (or the test point in the setting file) and record the trip time.</li>
+<li><strong>Test S.</strong> Inject at 1.2 to 1.5 × Isd and record the time against the tsd band.</li>
+<li><strong>Test I.</strong> Inject above Ii and record the trip (time below the I band).</li>
+<li><strong>Test G.</strong> Inject at 1.2 × Ig and record the time against the tg band.</li>
+<li><strong>Test ZSI.</strong> With the ZSI wiring connected, inject a short-time fault in the downstream breaker and check that it sends the restraint signal; the upstream breaker then uses its set tsd. Without the restraint signal the upstream breaker must trip with no intentional delay.</li>
+<li><strong>Save the as-left file.</strong> Read the as-left settings and compare with the approved file; zero differences.</li>
+</ol>
+<p><strong>Acceptance:</strong> Within the trip unit manual tolerance bands. Secondary injection proves the trip unit electronics; <mark>the current sensors and their connections need primary injection</mark>.</p>
+<h3 id="s14-6-5"><span class="n">14.6.5</span>Primary injection of ACBs</h3>
+<p><strong>Purpose:</strong> Prove the complete protection chain: current sensors, sensor wiring, rating plug, trip unit and actuator.</p>
+<p>Instrument used: High-current primary injection set able to supply the test current through the breaker poles. For a 4,000 A ACB with Ir = 3,500 A, a long-time test at 3 × Ir needs 10,500 A, which is beyond most portable sets. L is then tested at a lower multiple that the set can reach (for example 1.5 × Ir = 5,250 A). S, I and G are tested at the currents in the setting file where the set can reach them. The protection engineer confirms the test points before the test.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Isolate.</strong> Breaker withdrawn to the test position or removed to a test bench; primary leads connected to the line and load terminals of one pole.</li>
+<li><strong>Ratio check.</strong> Inject a current (for example 1,000 A) and compare with the current shown on the trip unit display.</li>
+<li><strong>Each pole.</strong> Repeat for each pole and for the neutral pole where a neutral sensor exists.</li>
+<li><strong>Element tests.</strong> Inject at the agreed test points and time the trip.</li>
+<li><strong>Ground fault.</strong> Inject through one pole only (residual current) and check the G element. For a 4-pole breaker or an external neutral sensor, inject through a phase and back through the neutral to prove that the neutral sensor cancels the residual.</li>
+<li><strong>Restore.</strong> Reinstall the breaker, rack in, check the rating plug and the as-left settings.</li>
+</ol>
+<p><strong>Acceptance:</strong> Displayed current within the trip unit metering accuracy (example value ±2 %; the accuracy for the model is in the trip unit OEM data sheet) and trip times within the manual tolerance bands.</p>
+<p><strong>Worked example:</strong> QF1 ground-fault element Ig = 1,200 A, tg = 0.2 s. Primary injection through L1 only at 1.2 × Ig = 1,440 A gives a trip in 0.21 s, inside the 0.2 s band of the trip unit curve. A second injection of 1,440 A through L1 and back through the neutral conductor of the 4-pole breaker gives no trip. This proves that the neutral sensor is connected with the correct polarity. <mark>A reversed neutral sensor would add the neutral current to the residual</mark> and trip the breaker on normal unbalanced load.</p>
+<h3 id="s14-6-6"><span class="n">14.6.6</span>MCCB field tests to NEMA AB 4</h3>
+<p>NEMA AB 4 describes field tests for MCCBs: an inverse-time overcurrent test at 300 % of rated current and an instantaneous trip test. The test is a modified version of the UL 489 overload and magnetic trip calibration (RF-14 row 3).</p>
+<p>Inverse-time test at 300 % of rating (maximum trip times):</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Rated current (A)</th>
+<th>Maximum trip time at 300 %, ≤ 250 V (s)</th>
+<th>Maximum trip time at 300 %, 251 to 600 V (s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 to 30</td>
+<td>50</td>
+<td>70</td>
+</tr>
+<tr>
+<td>31 to 50</td>
+<td>80</td>
+<td>100</td>
+</tr>
+<tr>
+<td>51 to 100</td>
+<td>140</td>
+<td>160</td>
+</tr>
+<tr>
+<td>101 to 150</td>
+<td>200</td>
+<td>250</td>
+</tr>
+<tr>
+<td>151 to 225</td>
+<td>230</td>
+<td>275</td>
+</tr>
+<tr>
+<td>226 to 400</td>
+<td>300</td>
+<td>350</td>
+</tr>
+<tr>
+<td>401 to 600</td>
+<td>—</td>
+<td>450</td>
+</tr>
+<tr>
+<td>601 to 800</td>
+<td>—</td>
+<td>500</td>
+</tr>
+<tr>
+<td>801 to 1000</td>
+<td>—</td>
+<td>600</td>
+</tr>
+<tr>
+<td>1001 to 1200</td>
+<td>—</td>
+<td>700</td>
+</tr>
+<tr>
+<td>1201 to 1600</td>
+<td>—</td>
+<td>775</td>
+</tr>
+<tr>
+<td>1601 to 2000</td>
+<td>—</td>
+<td>800</td>
+</tr>
+<tr>
+<td>2001 to 2500</td>
+<td>—</td>
+<td>850</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> NEMA AB 4 Table 5-3 and ANSI/NETA ATS Table 100.7 as reproduced in RF-14 row 1 (confirm against NEMA AB 4 and ANSI/NETA ATS-2025 Table 100.7 in the contract edition).</p>
+<p>Instantaneous trip tolerances for field testing:</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Breaker type</th>
+<th>Tolerance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Electronic trip unit</td>
+<td>+30 % / -30 % of setting</td>
+</tr>
+<tr>
+<td>Adjustable instantaneous (thermal-magnetic)</td>
+<td>+40 % / -30 % of setting</td>
+</tr>
+<tr>
+<td>Non-adjustable</td>
+<td>+25 % / -25 % of the manufacturer's published trip band</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> NEMA AB 4 Table 4 and ANSI/NETA ATS Table 100.8, RF-14 row 2.</p>
+<p><strong>Worked example:</strong> QF3 is a 250 A thermal-magnetic MCCB on a 415 V system. The <mark>300 % test current is 750 A</mark>. The table row 226 to 400 A in the 251 to 600 V column gives a <mark>maximum of 350 s</mark>. The breaker trips in 122 s from a cold start at 25 °C, which passes. The instantaneous element is adjustable and set at 10 × In = 2,500 A. The field tolerance is -30 % to +40 %, so it must <mark>trip between 1,750 A and 3,500 A</mark>. The pulse test trips at 2,640 A, which passes. The breaker is allowed to cool to ambient before the next test (practice: at least the time the OEM states; 15 to 30 minutes for this size).</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Testing hot.</strong> A breaker tested again before it cools trips fast and appears to pass. The record holds the cooling time.</li>
+<li><strong>Wrong voltage column.</strong> A 415 V breaker judged against the ≤ 250 V column fails wrongly. The record states the system voltage.</li>
+<li><strong>Instantaneous test on an instantaneous-only MCCB.</strong> The AB 4 instantaneous test can damage instantaneous-only (motor circuit protector) breakers (RF-14 row 3). The OEM procedure is used for those.</li>
+</ol>
+<h3 id="s14-6-7"><span class="n">14.6.7</span>ACB mechanical, electrical and contact resistance tests</h3>
+<ol>
+<li><strong>Operations counter.</strong> Record the counter before testing.</li>
+<li><strong>Spring charging.</strong> Charge manually, then with the motor at rated control voltage; record motor charging time (for example 3 to 5 s; OEM value).</li>
+<li><strong>Close and open.</strong> Close and open by push buttons, then by the closing coil and the shunt trip coil at rated voltage.</li>
+<li><strong>Minimum voltage.</strong> Operate the closing coil at 85 % and the shunt trip at 70 % of rated control voltage, or the percentages in the OEM manual (confirm against the shunt release limits in IEC 60947-1:2020 8.2.1, operating conditions, and the OEM manual).</li>
+<li><strong>Undervoltage release.</strong> Where fitted, check that the breaker trips when the release voltage falls to between 70 % and 35 % of rated voltage. Check that it can close only above 85 % of rated voltage (IEC 60947-2 limits as stated in the ABB Tmax XT catalogue, RF-14 row 19).</li>
+<li><strong>Anti-pumping.</strong> Hold close and give trip; the breaker trips and does not reclose.</li>
+<li><strong>Racking.</strong> Rack between connected, test and disconnected positions; position indication and racking interlock (no racking while closed) operate.</li>
+<li><strong>Contact resistance.</strong> DLRO at 100 A or more across each closed pole. Compare with the OEM maximum and apply the 50 % rule between poles.</li>
+<li><strong>Auxiliary contacts and indications.</strong> Open, closed, tripped, spring charged and racked-in signals arrive at the electrical power monitoring system (EPMS) and the building management system (BMS) as listed in the points list.</li>
+</ol>
+<p><strong>Worked example:</strong> QA1 contact resistance at 200 A: L1 18 µΩ, L2 19 µΩ, L3 20 µΩ, N 21 µΩ. Lowest 18 µΩ; <mark>limit 18 × 1.5 = 27 µΩ</mark>. All poles pass and are below the OEM maximum of 30 µΩ (example OEM value).</p>
+<h2 id="s14-7"><span class="n">14.7</span>Residual current device tests</h2>
+<h3 id="s14-7-1"><span class="n">14.7.1</span>What an RCD does</h3>
+<p>An RCD measures the difference between the currents in the line and neutral conductors. When the difference (the residual current, which flows to earth through a fault or a person) exceeds the rated residual operating current IΔn, it trips. A <mark>30 mA RCD</mark> gives additional protection against electric shock; a 300 mA RCD is used for fire protection on some circuits. On data-centre campuses RCDs are used on socket outlets, outdoor circuits, lighting in wet areas and some mechanical equipment. They are not used on IT rack supplies (project design decision).</p>
+<h3 id="s14-7-2"><span class="n">14.7.2</span>Tests and acceptance values</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Test current</th>
+<th>Acceptance, general non-delay RCD</th>
+<th>Acceptance, S-type (time-delayed)</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Half rated current</td>
+<td>0.5 × IΔn</td>
+<td>no trip</td>
+<td>no trip</td>
+<td>optional in BS 7671 since A2:2022 (RF-14 row 9)</td>
+</tr>
+<tr>
+<td>Rated current</td>
+<td>1 × IΔn</td>
+<td>trip within 300 ms</td>
+<td>trip between 130 and 500 ms</td>
+<td>required</td>
+</tr>
+<tr>
+<td>Five times rated current (30 mA devices)</td>
+<td>5 × IΔn (150 mA)</td>
+<td>trip within 40 ms</td>
+<td>—</td>
+<td>commonly required for additional protection</td>
+</tr>
+<tr>
+<td>Test button</td>
+<td>—</td>
+<td>trips</td>
+<td>trips</td>
+<td>functional check</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> IEC 60364-6 and BS 7671 guidance as summarised in RF-14 row 9. The installation tester is set to the RCD type (AC, A, F or B) or as the national rules state.</p>
+<p><strong>Worked example:</strong> Socket circuit DB-B2-L1-04 with a 30 mA type A RCD. At 0.5 × IΔn (15 mA) no trip; at 1 × IΔn <mark>23 ms against 300 ms</mark>; at 5 × IΔn 12 ms; test button trips. All pass. The record holds the circuit, the RCD type, the rated current and the times at 0° and 180° where the instrument records both.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Board and circuit</td>
+<td>text</td>
+<td>DB-B2-L1-04</td>
+</tr>
+<tr>
+<td>RCD type and IΔn</td>
+<td>text</td>
+<td>type A, 30 mA</td>
+</tr>
+<tr>
+<td>Trip time at 1 × IΔn</td>
+<td>number ms</td>
+<td>23</td>
+</tr>
+<tr>
+<td>Trip time at 5 × IΔn</td>
+<td>number ms</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Half-current no-trip</td>
+<td>list</td>
+<td>no trip</td>
+</tr>
+<tr>
+<td>Test button</td>
+<td>list</td>
+<td>trips</td>
+</tr>
+<tr>
+<td>Instrument and certificate</td>
+<td>text</td>
+<td>installation tester SN 55102, cert due 2027-01-20</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s14-8"><span class="n">14.8</span>Interlocks, functional tests and transfer schemes</h2>
+<h3 id="s14-8-1"><span class="n">14.8.1</span>Interlock types</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Interlock</th>
+<th>Purpose</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mechanical (breaker racking, door)</td>
+<td>prevent access to live parts and racking under load</td>
+<td>try the forbidden action; it must be blocked</td>
+</tr>
+<tr>
+<td>Key interlock (trapped key)</td>
+<td>enforce an order of operations between separate devices, for example main ACB open before a bypass is closed</td>
+<td>follow the key sequence chart; check each key is trapped in the stated states</td>
+</tr>
+<tr>
+<td>Electrical (auxiliary contacts in close circuits)</td>
+<td>prevent two sources being paralleled</td>
+<td>try to close the second breaker; the close circuit must be open</td>
+</tr>
+<tr>
+<td>Software (programmable logic controller (PLC) transfer scheme)</td>
+<td>automatic transfer between sources</td>
+<td>functional test of every transition in the sequence description</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s14-8-2"><span class="n">14.8.2</span>Main-tie-main and block transfer tests</h3>
+<p>Some LV designs have two block switchboards (A and B) with a normally open tie, or a reserve block that can feed either path. The test plan lists every transition in the sequence of operation and tests it with the breakers in the test position first, then live.</p>
+<ol>
+<li><strong>Loss of source A.</strong> Simulate the opening of the upstream 20 kV feeder of block A with the breakers in the test position. The transfer logic opens QA1 and closes the tie after the set delay (for example 3 s) if source B is healthy.</li>
+<li><strong>Return of source A.</strong> Restore; the logic returns to normal after the set delay (for example 5 min) by an open transition or a closed transition, as the design states.</li>
+<li><strong>Both sources lost.</strong> No tie closing; generator logic of chapter 15 takes over.</li>
+<li><strong>Tie closing blocked by fault.</strong> Simulate a trip of QA1 by the S element (a fault on the board); the logic must not close the tie onto the faulted board (lockout).</li>
+<li><strong>Manual mode.</strong> In manual, the logic does nothing; the interlocks still prevent paralleling.</li>
+</ol>
+<p><strong>Acceptance:</strong> Every transition matches the sequence description, with the times inside the stated tolerance (for example ±10 %), and every blocked action stays blocked.</p>
+<p><strong>Worked example:</strong> Test 1 at B2-DH3: QA1 opens 0.1 s after the undervoltage input times out at 3.0 s. The tie QT1 closes 0.4 s later, a total of <mark>3.5 s against a specified 3.5 ±0.35 s</mark>. The UPS-A1 carries the load on battery for 3.5 s, which is inside its runtime of 5 minutes (MSC-1 value).</p>
+<h2 id="s14-9"><span class="n">14.9</span>Protection relays: device functions and injection tests</h2>
+
+<figure class="sheet" id="F14-5"><a href="../data/cx-handbook/figures/F14-5.svg" title="Open drawing F14-5 at full size"><img src="../data/cx-handbook/figures/F14-5.svg" alt="F14-5: Secondary injection of an IEC standard inverse (51) element: curve, test points and tolerance" width="1400" height="791" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F14-5</span> — <b>Secondary injection of an IEC standard inverse (51) element: curve, test points and tolerance</b>. Each test point is injected three times; the average is compared with the curve value and the tolerance from the relay manual.</figcaption></figure>
+<h3 id="s14-9-1"><span class="n">14.9.1</span>ANSI device numbers used in this chapter</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Device number (IEEE C37.2)</th>
+<th>Function</th>
+<th>Quantity measured</th>
+<th>Typical LV or MV use on a data-centre campus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>27</td>
+<td>undervoltage</td>
+<td>voltage below setting for a set time</td>
+<td>source failure detection, transfer schemes</td>
+</tr>
+<tr>
+<td>50</td>
+<td>instantaneous overcurrent</td>
+<td>phase current above setting, no intentional delay</td>
+<td>feeder and incomer short-circuit protection</td>
+</tr>
+<tr>
+<td>51</td>
+<td>AC time overcurrent</td>
+<td>phase current, inverse or definite time</td>
+<td>overload and back-up short-circuit protection</td>
+</tr>
+<tr>
+<td>50N / 51N</td>
+<td>earth overcurrent</td>
+<td>residual or neutral current</td>
+<td>earth-fault protection</td>
+</tr>
+<tr>
+<td>59</td>
+<td>overvoltage</td>
+<td>voltage above setting</td>
+<td>generator and utility interface</td>
+</tr>
+<tr>
+<td>81 (81U, 81O)</td>
+<td>frequency</td>
+<td>frequency below or above setting</td>
+<td>generator and utility interface, load shedding</td>
+</tr>
+<tr>
+<td>87 (87T, 87B)</td>
+<td>differential</td>
+<td>difference between currents entering and leaving a zone</td>
+<td>transformers, busbars</td>
+</tr>
+<tr>
+<td>86</td>
+<td>lockout relay</td>
+<td>—</td>
+<td>after differential and breaker-failure trips</td>
+</tr>
+<tr>
+<td>25</td>
+<td>synchronism check</td>
+<td>voltage, angle and frequency difference</td>
+<td>closed-transition transfers, generator paralleling</td>
+</tr>
+<tr>
+<td>67</td>
+<td>directional overcurrent</td>
+<td>current with direction</td>
+<td>parallel sources</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s14-9-2"><span class="n">14.9.2</span>Test method for each function</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Pick-up test</th>
+<th>Timing test</th>
+<th>Other checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>50</td>
+<td>ramp current from 90 % of setting, record start</td>
+<td>inject 1.2 × setting, record operate time</td>
+<td>drop-off ratio</td>
+</tr>
+<tr>
+<td>51</td>
+<td>ramp current, record start (pick-up 1.0 to 1.1 × Is, by relay design)</td>
+<td>inject at 2, 5 and 10 × Is, compare with curve formula</td>
+<td>curve type and time multiplier setting (TMS) match the file</td>
+</tr>
+<tr>
+<td>50N / 51N</td>
+<td>single-phase injection, residual current</td>
+<td>as 50 and 51</td>
+<td>stabilising resistor or core balance CT (CBCT) ratio if used</td>
+</tr>
+<tr>
+<td>27</td>
+<td>reduce voltage from rated in steps of 0.5 %</td>
+<td>step from rated to 0.9 × setting, record time</td>
+<td>all phases and the phase logic (any phase or all phases)</td>
+</tr>
+<tr>
+<td>59</td>
+<td>raise voltage in steps</td>
+<td>step to 1.1 × setting, record time</td>
+<td>reset ratio</td>
+</tr>
+<tr>
+<td>81U / 81O</td>
+<td>ramp frequency at a set rate (for example 0.1 Hz/s)</td>
+<td>step change past setting, record time</td>
+<td>undervoltage block (for example below 50 % Un)</td>
+</tr>
+<tr>
+<td>87</td>
+<td>inject one side to find minimum pick-up</td>
+<td>inject at 2 × and 5 × pick-up</td>
+<td>bias slope at two points, second-harmonic restraint, CT vector and ratio compensation</td>
+</tr>
+<tr>
+<td>25</td>
+<td>vary angle and voltage difference</td>
+<td>—</td>
+<td>closing permitted only inside the window</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s14-9-3"><span class="n">14.9.3</span>IDMT timing example</h3>
+<p>Figure <a class="figref" href="#F14-5">F14-5</a> shows the IEC standard inverse curve used for a 51 element with Is = 1.0 × In and TMS = 0.10, and the three test points.</p>
+<p><strong>Worked example:</strong> The relay manual tolerance is ±5 % or ±30 ms, whichever is greater (example value from the relay manual for the model). Measured 1.012 s at 2 × Is against 1.003 s calculated is +0.9 %, a pass. A measured 1.07 s at 2 × Is would be <mark>+6.7 %, a fail</mark>. Before rejecting the relay, the CxA checks the two common causes. The first is a test set curve set to the IEEE moderately inverse curve in place of the IEC standard inverse curve. The second is a relay set with TMS 0.107 because the file used a different rounding. In both cases the error is in the configuration and the test is repeated after correction.</p>
+<h3 id="s14-9-4"><span class="n">14.9.4</span>Undervoltage and frequency example</h3>
+<p><strong>Worked example:</strong> Incomer relay 27 element: 80 % of 415 V = 332 V phase to phase, time 2.0 s, any phase. Ramp test: pick-up at 331.4 V (error -0.2 %). Timing: step from 415 V to 299 V (0.9 × setting): operate 2.02 s (+1 %). The 81U element: 47.5 Hz, 0.5 s, blocked below 50 % voltage. Ramp from 50.0 Hz at -0.1 Hz/s: pick-up at 47.49 Hz. Step from 50.0 to 47.3 Hz: operate 0.51 s. Block test: at 40 % voltage and 47.3 Hz, <mark>no operation</mark>. All pass.</p>
+<h3 id="s14-9-5"><span class="n">14.9.5</span>Differential example</h3>
+<p><strong>Worked example:</strong> Block transformer 87T, 2.5 MVA, Dyn11, HV CT 100/1 A, LV CT 4000/1 A (example). Rated currents: HV 72.2 A (0.722 A secondary), LV 3,478 A (0.870 A secondary). The relay compensates ratio and the 30° shift of Dyn11 internally. Test: inject 0.722 A on HV phase A and the matching LV current with the 30° phase shift and 180° reversal. The <mark>differential current reads 0.01 × In</mark> (near zero) and the bias current 1.0 × In, so the relay is stable on through-load. Then inject HV only at increasing current: operate at 0.21 × In against a setting of 0.20 × In (+5 %, at the limit; investigate if the relay manual tolerance is lower). Second-harmonic restraint: inject 1.0 × In fundamental with 20 % second harmonic; no trip with the restraint set at 15 %.</p>
+<h2 id="s14-10"><span class="n">14.10</span>Selectivity verification against the study</h2>
+<h3 id="s14-10-1"><span class="n">14.10.1</span>What selectivity means</h3>
+<p>Selectivity (discrimination) means that for a fault anywhere in the system, only the protective device immediately upstream of the fault trips. On a data-centre LV board, selectivity keeps a fault in one mechanical board from tripping the main ACB that feeds the UPS. The protection study (short-circuit and coordination study) sets the settings that give selectivity. The commissioning tests prove that the installed devices carry those settings and that the test results fall inside the curves of the study.</p>
+<h3 id="s14-10-2"><span class="n">14.10.2</span>Verification steps</h3>
+<ol>
+<li><strong>Settings table.</strong> Obtain the settings table of the approved study revision (one row per device).</li>
+<li><strong>Compare.</strong> Compare each device's as-found setting with the table; record any difference.</li>
+<li><strong>Time margin.</strong> For each upstream and downstream pair, check that the study curves show the required margin. Electronic trip units need a time step between short-time bands (for example 0.1 s to 0.2 s) and no overlap of tolerance bands.</li>
+<li><strong>Test points.</strong> Inject at the fault currents named in the study for each pair (for example 12 kA for QF1 and QA1) and record the times of both devices.</li>
+<li><strong>ZSI.</strong> Where zone-selective interlocking is used, test the restraint signal between each downstream and upstream device.</li>
+<li><strong>Energy-based selectivity.</strong> Where the study claims selectivity from the OEM selectivity tables (current-limiting MCCBs downstream of ACBs), check that the installed device types and ratings match the table entries.</li>
+<li><strong>Report.</strong> List each pair, the study margin, the tested times and the result.</li>
+</ol>
+<p><strong>Worked example:</strong> At 12 kA, QF1 (tsd 0.1 s band) tripped in 0.09 s and QA1 (tsd 0.3 s band) did not trip during a 0.5 s injection with ZSI restraint present. The margin between the QF1 upper band edge (about 0.14 s) and the QA1 lower band edge (about 0.25 s) is about 0.11 s, which <mark>meets the study requirement of 0.1 s</mark> (example values). Figure <a class="figref" href="#F14-2">F14-2</a> shows the two bands.</p>
+<h2 id="s14-11"><span class="n">14.11</span>Protection setting files and version control</h2>
+
+<figure class="sheet" id="F14-4"><a href="../data/cx-handbook/figures/F14-4.svg" title="Open drawing F14-4 at full size"><img src="../data/cx-handbook/figures/F14-4.svg" alt="F14-4: Protection setting verification workflow: from the approved study to the as-left setting file" width="1400" height="698" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F14-4</span> — <b>Protection setting verification workflow: from the approved study to the as-left setting file</b>. The workflow keeps one approved setting per device and proves that the device in the switchboard holds that setting at handover.</figcaption></figure>
+<h3 id="s14-11-1"><span class="n">14.11.1</span>Why setting files need control</h3>
+<p>A protection setting is a design value. It comes from the study and must be the same in the study, in the device and in the as-built records. A large campus has hundreds of trip units and relays. The usual errors are an old file loaded into a device, a setting changed during testing and not restored, and a study revision that was never transferred to the devices. Figure <a class="figref" href="#F14-4">F14-4</a> shows the workflow that prevents these errors.</p>
+<h3 id="s14-11-2"><span class="n">14.11.2</span>Workflow</h3>
+<p><strong>Trigger:</strong> Study revision approved by the engineer of record.</p>
+<p><strong>Owner:</strong> Protection engineer (files and register); testing contractor (loading, testing, as-left); CxA (witness and compare).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Approve the study.</strong> The short-circuit, coordination and arc-flash study revision is approved and issued with a settings table.</li>
+<li><strong>Produce setting files.</strong> One file per device, named with the device tag and study revision, with a checksum or OEM file identifier entered in the setting register.</li>
+<li><strong>Load.</strong> The testing contractor reads and saves the as-found file, then loads the approved file. Time limit: same day as testing.</li>
+<li><strong>Test.</strong> Secondary and primary injection at the test points from the study.</li>
+<li><strong>Compare as-left.</strong> Read the as-left file from the device and compare it with the approved file using the OEM software comparison or a checksum. <mark>Zero differences is the only accepted result</mark>.</li>
+<li><strong>Lock.</strong> Change the device password from default, seal covers where the design uses seals, update the register. Time limit: 1 day after test.</li>
+<li><strong>Change control.</strong> Any later change starts at step 1 with a new study revision; the register keeps the history.</li>
+</ol>
+<h3 id="s14-11-3"><span class="n">14.11.3</span>Setting register fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Device tag</td>
+<td>text</td>
+<td>B2-DH3-MSB-A1-QA1</td>
+</tr>
+<tr>
+<td>Device type and firmware</td>
+<td>text</td>
+<td>ACB electronic trip unit, firmware as read</td>
+</tr>
+<tr>
+<td>Study reference and revision</td>
+<td>text</td>
+<td>MSC1-B2-PS-STU-001 rev C</td>
+</tr>
+<tr>
+<td>Setting file name</td>
+<td>text</td>
+<td>B2-DH3-QA1_revC</td>
+</tr>
+<tr>
+<td>Checksum or OEM file ID</td>
+<td>text</td>
+<td>4F2A91C0 (first 8 characters)</td>
+</tr>
+<tr>
+<td>As-found differences</td>
+<td>number</td>
+<td>2 (Isd and tsd differed)</td>
+</tr>
+<tr>
+<td>As-left differences</td>
+<td>number</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Password changed</td>
+<td>list</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Seal number</td>
+<td>text</td>
+<td>S-0412</td>
+</tr>
+<tr>
+<td>Date and signatures</td>
+<td>text</td>
+<td>2026-12-03, testing contractor, CxA</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s14-12"><span class="n">14.12</span>Arc-flash study and labels</h2>
+<h3 id="s14-12-1"><span class="n">14.12.1</span>What the arc-flash study gives</h3>
+<p>An arc flash is the release of energy from an electric arc between conductors or to earth. The study calculates, for each piece of equipment, the incident energy at the working distance (in cal/cm²) and the arc-flash boundary (the distance at which the incident energy falls to 1.2 cal/cm², the onset of a second-degree burn). IEEE 1584-2018 gives the calculation model; NFPA 70E-2024 gives the label and work-practice requirements.</p>
+<h3 id="s14-12-2"><span class="n">14.12.2</span>Study inputs that commissioning must confirm</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Input (IEEE 1584-2018)</th>
+<th>Where it comes from</th>
+<th>Commissioning check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>System voltage</td>
+<td>single-line diagram</td>
+<td>nameplate</td>
+</tr>
+<tr>
+<td>Bolted fault current at the equipment</td>
+<td>short-circuit study</td>
+<td>transformer nameplate impedance, cable lengths as built</td>
+</tr>
+<tr>
+<td>Arcing current and the reduced arcing current</td>
+<td>calculated by the model</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Protective device clearing time at both arcing currents</td>
+<td>upstream device settings</td>
+<td>as-left setting file matches the study revision</td>
+</tr>
+<tr>
+<td>Working distance</td>
+<td>equipment type (for example LV switchgear 610 mm, panelboards and motor control centres (MCCs) 457 mm, MV switchgear 914 mm; IEEE 1584-2018 typical working distances, RF-33 row 6.3)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Electrode configuration (VCB, VCBB, HCB, VOA, HOA)</td>
+<td>equipment construction</td>
+<td>site inspection of busbar arrangement</td>
+</tr>
+<tr>
+<td>Enclosure size and conductor gap</td>
+<td>equipment data</td>
+<td>OEM drawings</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> RF-14 row 11.</p>
+<p><mark>A change in any of these inputs</mark> after the study (a longer cable, a different transformer impedance, a changed setting) changes the incident energy. <mark>The label is printed only after the as-left settings are confirmed</mark> against the study revision used for the labels.</p>
+<h3 id="s14-12-3"><span class="n">14.12.3</span>Label content</h3>
+<p>NFPA 70E-2024 130.5(H) requires the label to show the nominal system voltage and the arc-flash boundary. The label must also show at least one of: the available incident energy with its working distance, the arc-flash personal protective equipment (PPE) category, the minimum arc rating of clothing, or a site-specific PPE level (RF-14 row 10).</p>
+<p><strong>Worked example:</strong> Label for B2-DH3-MSB-A1 (example values taken from the study for illustration):</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Label field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Equipment</td>
+<td>B2-DH3-MSB-A1, LV main switchboard</td>
+</tr>
+<tr>
+<td>Nominal system voltage</td>
+<td>415 V</td>
+</tr>
+<tr>
+<td>Arc-flash boundary</td>
+<td>2,100 mm</td>
+</tr>
+<tr>
+<td>Incident energy at working distance</td>
+<td>7.8 cal/cm² at 610 mm</td>
+</tr>
+<tr>
+<td>Minimum arc rating of clothing</td>
+<td>8 cal/cm²</td>
+</tr>
+<tr>
+<td>Limited and restricted approach boundaries</td>
+<td>limited 3.0 m (exposed movable conductor), 1.0 m (fixed part); restricted 0.3 m (NFPA 70E-2024 Table 130.4(E)(a), 151 V to 750 V row, RF-14 row 20)</td>
+</tr>
+<tr>
+<td>Study reference and date</td>
+<td>MSC1-B2-PS-STU-001 rev C, 2026-11-20</td>
+</tr>
+<tr>
+<td>Upstream device setting basis</td>
+<td>QA1 Isd 14,000 A, tsd 0.3 s; transformer HV fuse or relay as study</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s14-12-4"><span class="n">14.12.4</span>Site check of labels</h3>
+<ol>
+<li><strong>Count.</strong> Every switchboard section, panelboard, motor control centre (MCC) and busway tap-off listed in the study has a label.</li>
+<li><strong>Match.</strong> The <mark>label values match the study table</mark> for that equipment and revision.</li>
+<li><strong>Position.</strong> The label is visible at the place where work is done (front door, rear cover).</li>
+<li><strong>Durability.</strong> The label material suits the environment.</li>
+<li><strong>Register.</strong> Labels are listed in the as-built record with the study revision.</li>
+</ol>
+<h2 id="s14-13"><span class="n">14.13</span>Thermography under load</h2>
+<h3 id="s14-13-1"><span class="n">14.13.1</span>Method</h3>
+<ol>
+<li><strong>Load.</strong> Survey when the circuits carry their normal load. Where normal loading cannot be reached, survey at <mark>no less than 40 % of normal circuit loading</mark> and record the load (NFPA 70B-2023 7.4.5 and 7.4.6, the edition the source quotes, RF-14 row 21; the NFPA 70B-2026 clause numbers were not read). During commissioning this may require load banks (chapter 28).</li>
+<li><strong>Access.</strong> Survey through infrared windows where installed, or with covers removed under an energised work permit with the PPE from the arc-flash label.</li>
+<li><strong>Camera.</strong> Set emissivity for the surface (bare copper is low and gives false low readings; painted or taped surfaces are higher), reflected temperature and distance.</li>
+<li><strong>Compare.</strong> Compare each component with similar components under similar load (phase to phase), and with ambient.</li>
+<li><strong>Record.</strong> Thermal and visible image, load current, ambient, the hottest spot and the reference spot.</li>
+</ol>
+<h3 id="s14-13-2"><span class="n">14.13.2</span>Temperature difference bands</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Difference between similar components under similar load</th>
+<th>Difference above ambient air</th>
+<th>Indication</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 °C to 3 °C</td>
+<td>1 °C to 10 °C</td>
+<td>possible deficiency</td>
+<td>investigate at next opportunity</td>
+</tr>
+<tr>
+<td>4 °C to 15 °C</td>
+<td>11 °C to 20 °C</td>
+<td>probable deficiency</td>
+<td>repair as time permits</td>
+</tr>
+<tr>
+<td>—</td>
+<td>21 °C to 40 °C</td>
+<td>deficiency</td>
+<td>monitor until repaired</td>
+</tr>
+<tr>
+<td>above 15 °C</td>
+<td>above 40 °C</td>
+<td>major discrepancy</td>
+<td>repair immediately</td>
+</tr>
+</tbody>
+</table></div>
+<p>(Bands as commonly quoted from ANSI/NETA ATS Table 100.18; confirm against ANSI/NETA ATS-2025 Table 100.18 or the contract edition.)</p>
+<p><strong>Worked example:</strong> Busway end box at UPS-A1, load 1,460 A (58 % of 2,500 A). Phase L2 connection 63 °C, L1 44 °C, L3 45 °C, ambient 27 °C. Difference between similar components = 63 - 44 = <mark>19 °C, above 15 °C: major discrepancy</mark>. The circuit is transferred to the B path under a switching programme. The end box connection is found under-torqued and is re-made. The re-survey under similar load shows 45 °C on all phases.</p>
+<h2 id="s14-14"><span class="n">14.14</span>Records</h2>
+<h3 id="s14-14-1"><span class="n">14.14.1</span>Switchboard Level 3 record (filled example)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Record</td>
+<td>ELE-L3-LVSB-B2-DH3-A1</td>
+</tr>
+<tr>
+<td>Nameplate</td>
+<td>415 V, 4,000 A, Icw 65 kA 1 s, IP31, Form 4b (example)</td>
+</tr>
+<tr>
+<td>Torque</td>
+<td>20 joints sampled, 1 failure, 100 % re-torque, re-sample 20 joints pass</td>
+</tr>
+<tr>
+<td>IR at 1,000 V DC 1 min</td>
+<td>L1-E 3.1 GΩ, L2-E 2.9 GΩ, L3-E 3.0 GΩ, N-E 2.2 GΩ, between phases &gt; 2 GΩ</td>
+</tr>
+<tr>
+<td>N-E link</td>
+<td>one link at the main earthing terminal (MET) section, photographed</td>
+</tr>
+<tr>
+<td>QA1 tests</td>
+<td>contact resistance 18/19/20/21 µΩ; secondary injection L, S, G pass; primary injection pass</td>
+</tr>
+<tr>
+<td>QF1 tests</td>
+<td>as QA1; ZSI restraint pass</td>
+</tr>
+<tr>
+<td>MCCB sample</td>
+<td>QF3 300 % 122 s (max 350 s), instantaneous 2,640 A (band 1,750 to 3,500 A)</td>
+</tr>
+<tr>
+<td>Settings</td>
+<td>as-left = rev C, 0 differences</td>
+</tr>
+<tr>
+<td>Interlocks and transfer</td>
+<td>5 transitions pass</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s14-14-2"><span class="n">14.14.2</span>Relay test record (filled example)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Relay</td>
+<td>B2-DH3-TX-A1-87T, firmware as read</td>
+</tr>
+<tr>
+<td>Setting file</td>
+<td>B2-DH3-TX-A1-87T_revC</td>
+</tr>
+<tr>
+<td>87T pick-up</td>
+<td>0.21 × In (setting 0.20)</td>
+</tr>
+<tr>
+<td>Bias slope 1 at 1.0 × In bias</td>
+<td>operate 0.30 × In (setting slope 25 %, expected 0.25 + allowance)</td>
+</tr>
+<tr>
+<td>Second-harmonic restraint</td>
+<td>stable at 20 % with 15 % setting</td>
+</tr>
+<tr>
+<td>51 timing at 2, 5, 10 × Is</td>
+<td>1.012 / 0.431 / 0.301 s</td>
+</tr>
+<tr>
+<td>27 and 81U</td>
+<td>pass as 14.9.4</td>
+</tr>
+<tr>
+<td>Trip test to HV and LV breakers</td>
+<td>46 ms and 52 ms injection to contact separation</td>
+</tr>
+<tr>
+<td>As-left compare</td>
+<td>0 differences</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s14-15"><span class="n">14.15</span>Common errors, detection before the witness test and KPIs</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Detection before witness</th>
+<th>Prevention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Joints torqued but not marked</td>
+<td>CxA sample finds unmarked joints</td>
+<td>torque and mark in one step; covers fitted after sign-off</td>
+</tr>
+<tr>
+<td>SPD or meter left connected for IR</td>
+<td>low IR reading on one phase</td>
+<td>disconnection list in the method statement</td>
+</tr>
+<tr>
+<td>Trip unit tested with default settings</td>
+<td>as-found file shows factory defaults</td>
+<td>settings loaded and compared before testing</td>
+</tr>
+<tr>
+<td>Neutral sensor polarity reversed</td>
+<td>primary injection through phase and neutral</td>
+<td>primary injection of every 4-pole ACB with G element</td>
+</tr>
+<tr>
+<td>ZSI wiring missing or reversed</td>
+<td>ZSI test with downstream injection</td>
+<td>ZSI test in the inspection and test plan</td>
+</tr>
+<tr>
+<td>Wrong NEMA AB 4 voltage column</td>
+<td>CxA review of the test sheet</td>
+<td>sheet states system voltage</td>
+</tr>
+<tr>
+<td>Labels printed from an earlier study revision</td>
+<td>label check against study revision</td>
+<td>labels printed after as-left compare</td>
+</tr>
+<tr>
+<td>Thermography at low load</td>
+<td>record shows load below 40 %</td>
+<td>survey scheduled with load banks</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target (example project value)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Torque sample failure rate</td>
+<td>failed joints / sampled joints</td>
+<td>0 % at second sample</td>
+</tr>
+<tr>
+<td>Setting files with zero as-left differences</td>
+<td>devices with 0 differences / devices tested</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>LV first-pass yield</td>
+<td>tests passed first time / tests</td>
+<td>≥ 90 % (MSC-1 target)</td>
+</tr>
+<tr>
+<td>Thermography major discrepancies at handover</td>
+<td>count</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Labels installed and matching study</td>
+<td>labelled items / study items</td>
+<td>100 %</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s14-16"><span class="n">14.16</span>Checklist for site use</h2>
+<ol>
+<li><strong>Nameplate.</strong> Check rated current, Icw, IP and form of separation against the approved submittal.</li>
+<li><strong>Fault level.</strong> Confirm the switchboard and breaker ratings exceed the study fault level (58 kA example for 2.5 MVA at 6 %).</li>
+<li><strong>Torque.</strong> Sample at least 10 % of joints and every shipping split; escalate to 100 % on any failure.</li>
+<li><strong>Marks.</strong> Confirm every joint is marked before covers are fitted.</li>
+<li><strong>Cleanliness.</strong> Vacuum the board; no compressed air.</li>
+<li><strong>N-E link.</strong> Confirm one neutral-earth link at the location on the earthing drawing.</li>
+<li><strong>IR.</strong> Test at 1,000 V DC with SPDs, meters and electronics disconnected; 100 MΩ project value.</li>
+<li><strong>Busway joints.</strong> Torque or break-off heads, DLRO comparison with the 50 % rule.</li>
+<li><strong>Busway IR.</strong> Test each subsection of up to 6 lengths and the complete run.</li>
+<li><strong>ACB mechanism.</strong> Charging, closing, tripping, minimum voltage, anti-pumping and racking interlocks.</li>
+<li><strong>Contact resistance.</strong> Apply the 50 % rule to every ACB.</li>
+<li><strong>As-found settings.</strong> Save before any change.</li>
+<li><strong>Settings compare.</strong> Approved revision loaded before testing.</li>
+<li><strong>Secondary injection.</strong> L, S, I and G of every electronic trip unit.</li>
+<li><strong>Primary injection.</strong> Every main and feeder ACB, including the neutral sensor test.</li>
+<li><strong>ZSI.</strong> Restraint test for every upstream and downstream pair.</li>
+<li><strong>MCCB sample.</strong> NEMA AB 4 tests at 300 % with the correct voltage column and cooling time.</li>
+<li><strong>RCDs.</strong> Trip at 1 × IΔn within 300 ms (S type 130 to 500 ms), 5 × IΔn within 40 ms for 30 mA.</li>
+<li><strong>Relays.</strong> Pick-up and timing of every enabled element against the file.</li>
+<li><strong>Differential.</strong> Stability on through-load and operation on in-zone injection.</li>
+<li><strong>Transfer scheme.</strong> Every transition and every blocked action.</li>
+<li><strong>Selectivity.</strong> Test each pair at the study fault current and record margins.</li>
+<li><strong>As-left compare.</strong> Zero differences for every device.</li>
+<li><strong>Lock.</strong> Passwords changed and seals fitted.</li>
+<li><strong>Arc-flash labels.</strong> Installed after the as-left compare and checked against the study revision.</li>
+<li><strong>Thermography.</strong> At 40 % load or more; act on the NETA bands.</li>
+<li><strong>Records.</strong> Every record holds instrument serial and certificate numbers.</li>
+</ol>
+<h2 id="s14-17"><span class="n">14.17</span>Sources</h2>
+<ol>
+<li>ANSI/NETA ATS-2025, Standard for Acceptance Testing Specifications for Electrical Power Equipment and Systems, NETA, 2025. <a href="https://www.netaworld.org/standards/ansi-neta-ats" rel="noopener">https://www.netaworld.org/standards/ansi-neta-ats</a></li>
+<li>Test Guy wiki, Trip tolerances for field testing of circuit breakers (NEMA AB 4 Table 5-3, NETA Tables 100.7 and 100.8), accessed 31 October 2026. <a href="https://wiki.testguy.net/t/trip-tolerances-for-field-testing-of-circuit-breakers/61" rel="noopener">https://wiki.testguy.net/t/trip-tolerances-for-field-testing-of-circuit-breakers/61</a></li>
+<li>Eaton, MCCB primary versus secondary injection testing, MZ027042EN. <a href="https://eaton.com/content/dam/eaton/services/eess/eess-documents/eaton-eess-mccb-primary-vs-secondary-injection-testing-mz027042en.pdf" rel="noopener">https://eaton.com/content/dam/eaton/services/eess/eess-documents/eaton-eess-mccb-primary-vs-secondary-injection-testing-mz027042en.pdf</a></li>
+<li>Eaton, MCCB contact resistance white paper WP012023EN. <a href="https://www.eaton.com/content/dam/eaton/products/electrical-circuit-protection/molded-case-circuit-breakers/power-defense-molded-case-circuit-breakers/eaton-mccb-contact-resistance-white-paper-wp012023en.pdf" rel="noopener">https://www.eaton.com/content/dam/eaton/products/electrical-circuit-protection/molded-case-circuit-breakers/power-defense-molded-case-circuit-breakers/eaton-mccb-contact-resistance-white-paper-wp012023en.pdf</a></li>
+<li>Schneider Electric, Canalis KR installation guide: establishing and testing the electrical connection. <a href="https://productinfo.se.com/canaliskr/nve58348-canalis-kr-installation-guide/" rel="noopener">https://productinfo.se.com/canaliskr/nve58348-canalis-kr-installation-guide/</a></li>
+<li>Schneider Electric, Canalis KT busbar trunking system installation manual QGH3492101, version 04, January 2026. <a href="https://www.se.com/in/en/download/document/QGH3492101/" rel="noopener">https://www.se.com/in/en/download/document/QGH3492101/</a></li>
+<li>GT Engineering, EN IEC 61439-2 clause 11 routine verification. <a href="https://www.gt-engineering.it/en/technical-standards/en-iec-standards/en-61439-22119556196/11-routine-verification245504341/" rel="noopener">https://www.gt-engineering.it/en/technical-standards/en-iec-standards/en-61439-22119556196/11-routine-verification245504341/</a></li>
+<li>Certio, RCD testing explained: test currents and trip times. <a href="https://certio.uk/guides/rcd-testing-explained" rel="noopener">https://certio.uk/guides/rcd-testing-explained</a></li>
+<li>eCalPro, IEC 60364 guide (RCD testing clause 6.4.3.9). <a href="https://ecalpro.com/standards/iec-60364/scope-and-structure" rel="noopener">https://ecalpro.com/standards/iec-60364/scope-and-structure</a></li>
+<li>NFPA 70E-2024, Standard for Electrical Safety in the Workplace, label requirements 130.5(H), as summarised by PowerSafe Engineering. <a href="https://www.powersafe-engr.com/post/arc-flash-label-requirements" rel="noopener">https://www.powersafe-engr.com/post/arc-flash-label-requirements</a></li>
+<li>PrintPro, Voltage warning labels: NFPA 70E and OSHA requirements. <a href="https://printproaz.com/blogs/news/voltage-warning-labels-nfpa-70e-osha-requirements" rel="noopener">https://printproaz.com/blogs/news/voltage-warning-labels-nfpa-70e-osha-requirements</a></li>
+<li>IEEE 1584-2018, Guide for Performing Arc-Flash Hazard Calculations, IEEE. <a href="https://standards.ieee.org/standard/1584-2018.html" rel="noopener">https://standards.ieee.org/standard/1584-2018.html</a></li>
+<li>Turn2Engineering, Arc-flash calculator inputs to IEEE 1584-2018. <a href="https://turn2engineering.com/calculators/arc-flash-calculator" rel="noopener">https://turn2engineering.com/calculators/arc-flash-calculator</a></li>
+<li>NETA World, ANSI/NETA standards update, Fall 2025 (ATS-2025 busway revision 7.4.D.2). <a href="https://digitaleditions.sheridan.com/article/ANSINETA+Standards+Update/5022368/850737/article.html" rel="noopener">https://digitaleditions.sheridan.com/article/ANSINETA+Standards+Update/5022368/850737/article.html</a></li>
+<li>IEC 60947-2, Low-voltage switchgear and controlgear, Part 2: Circuit-breakers, IEC (edition in contract). <a href="https://webstore.iec.ch" rel="noopener">https://webstore.iec.ch</a></li>
+<li>IEC 60255-151, Measuring relays and protection equipment, Part 151: Functional requirements for over/under current protection, IEC. <a href="https://webstore.iec.ch" rel="noopener">https://webstore.iec.ch</a></li>
+<li>IEEE C37.2, Standard for Electrical Power System Device Function Numbers, Acronyms and Contact Designations, IEEE. <a href="https://standards.ieee.org" rel="noopener">https://standards.ieee.org</a></li>
+<li>MSC-1 case ledger, <code>case_ledger.json</code>, handbook project file, October 2026.</li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="13-mv-switchgear-transformers-cables.html"><span>Previous · 13</span><span class="t">Medium-voltage switchgear, transformers and cables</span></a><a class="next" href="15-generators-fuel-synchronising.html"><span>Next · 15</span><span class="t">Generators, fuel systems and synchronising switchgear</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>20 Fire detection, suppression and life-safety interfaces | Cx Field Manual R01</title>
+<meta name="description" content="This chapter covers the fire protection and life-safety systems of a data-centre building and the way they act on the other building systems.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/20-fire-life-safety-cause-effect.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/20-fire-life-safety-cause-effect.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/20-fire-life-safety-cause-effect.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/20-fire-life-safety-cause-effect.html">
+<meta property="og:title" content="20 Fire detection, suppression and life-safety interfaces | Cx Field Manual R01">
+<meta property="og:description" content="This chapter covers the fire protection and life-safety systems of a data-centre building and the way they act on the other building systems.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="20 Fire detection, suppression and life-safety interfaces | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter covers the fire protection and life-safety systems of a data-centre building and the way they act on the other building systems.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"20 Fire detection, suppression and life-safety interfaces: the cause-and-effect matrix","name":"Fire detection, suppression and life-safety interfaces: the cause-and-effect matrix","description":"This chapter covers the fire protection and life-safety systems of a data-centre building and the way they act on the other building systems.","url":"https://resistancezero.com/cx-handbook/20-fire-life-safety-cause-effect.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/20-fire-life-safety-cause-effect.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":12999,"position":20,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"20 Fire detection, suppression and life-safety interfaces","item":"https://resistancezero.com/cx-handbook/20-fire-life-safety-cause-effect.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part D · Mechanical and fire commissioning</p>
+    <h1><span class="num">20</span>Fire detection, suppression and life-safety interfaces: the cause-and-effect matrix</h1>
+    <p class="lede">This chapter covers the fire protection and life-safety systems of a data-centre building and the way they act on the other building systems.</p>
+    <p class="basis">Chapter 20 of 32 · 18 sections · 8 figures · 12,999 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 20</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 20</summary>
+<ol><li><a href="#s20-0"><span class="n">20.0</span>Scope of this chapter</a></li><li><a href="#s20-1"><span class="n">20.1</span>Fire protection systems on a data-centre campus</a><ol><li><a href="#s20-1-1"><span class="n">20.1.1</span>What each system does</a></li><li><a href="#s20-1-2"><span class="n">20.1.2</span>MSC-1 fire water numbers</a></li><li><a href="#s20-1-3"><span class="n">20.1.3</span>Who does what</a></li></ol></li><li><a href="#s20-2"><span class="n">20.2</span>Fire alarm system architecture</a><ol><li><a href="#s20-2-1"><span class="n">20.2.1</span>Components</a></li><li><a href="#s20-2-2"><span class="n">20.2.2</span>Circuit classes and survivability</a></li><li><a href="#s20-2-3"><span class="n">20.2.3</span>Secondary power (batteries)</a></li><li><a href="#s20-2-4"><span class="n">20.2.4</span>Panel programming record</a></li></ol></li><li><a href="#s20-3"><span class="n">20.3</span>Initiating device tests (NFPA 72)</a><ol><li><a href="#s20-3-1"><span class="n">20.3.1</span>Acceptance test rule</a></li><li><a href="#s20-3-2"><span class="n">20.3.2</span>Test methods by device</a></li><li><a href="#s20-3-3"><span class="n">20.3.3</span>Device test procedure</a></li><li><a href="#s20-3-4"><span class="n">20.3.4</span>Smoke detector sensitivity</a></li></ol></li><li><a href="#s20-4"><span class="n">20.4</span>Aspirating smoke detection (VESDA)</a><ol><li><a href="#s20-4-1"><span class="n">20.4.1</span>How aspirating detection works</a></li><li><a href="#s20-4-2"><span class="n">20.4.2</span>Code requirements for data centres</a></li><li><a href="#s20-4-3"><span class="n">20.4.3</span>ASD commissioning procedure</a></li><li><a href="#s20-4-4"><span class="n">20.4.4</span>ASD test record fields</a></li></ol></li><li><a href="#s20-5"><span class="n">20.5</span>Notification: sounders, strobes and voice evacuation</a><ol><li><a href="#s20-5-1"><span class="n">20.5.1</span>Audibility</a></li><li><a href="#s20-5-2"><span class="n">20.5.2</span>Visual notification</a></li><li><a href="#s20-5-3"><span class="n">20.5.3</span>Voice evacuation intelligibility</a></li></ol></li><li><a href="#s20-6"><span class="n">20.6</span>Clean agent gas suppression (NFPA 2001)</a><ol><li><a href="#s20-6-1"><span class="n">20.6.1</span>System description</a></li><li><a href="#s20-6-2"><span class="n">20.6.2</span>Design concentration and agent quantity</a></li><li><a href="#s20-6-3"><span class="n">20.6.3</span>Room integrity test (door fan test)</a></li><li><a href="#s20-6-4"><span class="n">20.6.4</span>Room integrity test record fields</a></li><li><a href="#s20-6-5"><span class="n">20.6.5</span>Clean agent system checks before arming</a></li><li><a href="#s20-6-6"><span class="n">20.6.6</span>Release sequence test (with actuators removed)</a></li></ol></li><li><a href="#s20-7"><span class="n">20.7</span>Pre-action sprinkler systems</a><ol><li><a href="#s20-7-1"><span class="n">20.7.1</span>Types of pre-action system</a></li><li><a href="#s20-7-2"><span class="n">20.7.2</span>Pre-action valve set</a></li><li><a href="#s20-7-3"><span class="n">20.7.3</span>Pipe pressure test</a></li><li><a href="#s20-7-4"><span class="n">20.7.4</span>Trip test and water delivery time</a></li><li><a href="#s20-7-5"><span class="n">20.7.5</span>NFPA 25 routine tests that begin at handover</a></li></ol></li><li><a href="#s20-8"><span class="n">20.8</span>Fire pumps and fire water supply</a><ol><li><a href="#s20-8-1"><span class="n">20.8.1</span>Fire pump acceptance test (NFPA 20)</a></li></ol></li><li><a href="#s20-9"><span class="n">20.9</span>The cause-and-effect matrix</a><ol><li><a href="#s20-9-1"><span class="n">20.9.1</span>What the matrix is and why it exists</a></li><li><a href="#s20-9-2"><span class="n">20.9.2</span>How the matrix is built</a></li><li><a href="#s20-9-3"><span class="n">20.9.3</span>Output codes for the MSC-1 building matrix</a></li><li><a href="#s20-9-4"><span class="n">20.9.4</span>The 34-row matrix for building B2 (example)</a></li><li><a href="#s20-9-5"><span class="n">20.9.5</span>Rules that the matrix follows on MSC-1</a></li><li><a href="#s20-9-6"><span class="n">20.9.6</span>Testing the matrix row by row</a></li><li><a href="#s20-9-7"><span class="n">20.9.7</span>C&amp;E row test record</a></li></ol></li><li><a href="#s20-10"><span class="n">20.10</span>Interfaces to other systems</a><ol><li><a href="#s20-10-1"><span class="n">20.10.1</span>Interface list</a></li><li><a href="#s20-10-2"><span class="n">20.10.2</span>Interface timing diagram</a></li><li><a href="#s20-10-3"><span class="n">20.10.3</span>Interface test responsibilities</a></li></ol></li><li><a href="#s20-11"><span class="n">20.11</span>Integrated fire tests (Level 4 and Level 5)</a><ol><li><a href="#s20-11-1"><span class="n">20.11.1</span>Level 4 system tests</a></li><li><a href="#s20-11-2"><span class="n">20.11.2</span>Level 5 scenarios</a></li></ol></li><li><a href="#s20-12"><span class="n">20.12</span>Indonesian acceptance: Damkar functional test and the SLF</a><ol><li><a href="#s20-12-1"><span class="n">20.12.1</span>Regulatory framework</a></li><li><a href="#s20-12-2"><span class="n">20.12.2</span>Typical Damkar acceptance sequence</a></li><li><a href="#s20-12-3"><span class="n">20.12.3</span>Preparing for the Damkar witness test</a></li></ol></li><li><a href="#s20-13"><span class="n">20.13</span>Records that close the fire scope</a></li><li><a href="#s20-14"><span class="n">20.14</span>Common errors and how to find them before the witness test</a></li><li><a href="#s20-15"><span class="n">20.15</span>Key performance indicators for the fire scope</a></li><li><a href="#s20-16"><span class="n">20.16</span>Checklist for site use</a></li><li><a href="#s20-17"><span class="n">20.17</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="19-air-side-liquid-cooling-tab.html"><span>Previous</span>19 Air side and liquid cooling</a><a href="21-bms-architecture-points.html"><span>Next</span>21 BMS architecture, protocols and the points list</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s20-0"><span class="n">20.0</span>Scope of this chapter</h2>
+<p>This chapter covers the fire protection and life-safety systems of a data-centre building and the way they act on the other building systems. The central document is the cause-and-effect (C&amp;E) matrix. For each fire alarm input, it states which outputs the fire alarm system and the interfaced systems must produce, in what order and within what time. The chapter gives the tests for each system with the instrument, set-up, applied value, duration, acceptance value and source, and the filled records.</p>
+<ol>
+<li><strong>Systems and codes.</strong> The fire protection systems of a data centre and the codes that apply on a campus in Jakarta. The codes are NFPA 72, NFPA 75, NFPA 76, NFPA 2001, NFPA 13, NFPA 20, NFPA 25, FM Global data sheets, Permen PU 26/PRT/M/2008 and the Indonesian national standard (Standar Nasional Indonesia, SNI) fire codes.</li>
+<li><strong>Fire alarm system.</strong> Architecture, panels, loops, devices and power supplies.</li>
+<li><strong>Initiating device tests.</strong> Smoke, heat, flame, duct, manual call point, waterflow and supervisory devices, using the NFPA 72 test methods.</li>
+<li><strong>Aspirating smoke detection.</strong> Very early smoke detection apparatus (VESDA) design, transport time, hole sensitivity, alarm levels and tests.</li>
+<li><strong>Notification.</strong> Sounders, strobes, voice evacuation, audibility and intelligibility.</li>
+<li><strong>Clean agent suppression.</strong> Design concentration, agent quantity, discharge time, room integrity (door fan) test, hold time, and the release sequence.</li>
+<li><strong>Pre-action sprinklers.</strong> Types, piping and instrumentation, trip test, water delivery time, air supervision.</li>
+<li><strong>Fire pumps and fire water.</strong> NFPA 20 acceptance test and the MSC-1 fire water numbers.</li>
+<li><strong>The cause-and-effect matrix.</strong> How it is built, a 34-row matrix for one building, and how every row is tested.</li>
+<li><strong>Interfaces.</strong> Building management system (BMS), electrical power monitoring system (EPMS), heating, ventilation and air conditioning (HVAC), dampers, doors and access control, lifts, battery systems, fuel system and emergency power off (EPO), with the timing diagram.</li>
+<li><strong>Integrated fire tests.</strong> Level 4 and Level 5 scenarios.</li>
+<li><strong>Indonesian acceptance.</strong> The Dinas Pemadam Kebakaran (Damkar) functional test and the Sertifikat Laik Fungsi (SLF).</li>
+<li><strong>Records, errors and the site checklist.</strong> The records that close the fire scope, the common errors, the key performance indicators (KPI) and the checklist for site use.</li>
+</ol>
+<p>Documents and standards used: NFPA 72 (National Fire Alarm and Signaling Code), NFPA 75 (protection of information technology equipment), NFPA 76 (fire protection of telecommunications facilities), NFPA 2001 (clean agent fire extinguishing systems), NFPA 13 (installation of sprinkler systems), NFPA 20 (stationary fire pumps), NFPA 25 (inspection, testing and maintenance of water-based systems), and NFPA 855 (energy storage). The other fire documents are FM Global Property Loss Prevention Data Sheet 5-32 (data centres and related facilities), UL 864 (control units for fire signalling systems), UL 268 and EN 54-20 (smoke detectors and aspirating detectors). The Indonesian documents are Permen PU No. 26/PRT/M/2008 (Persyaratan Teknis Sistem Proteksi Kebakaran pada Bangunan Gedung dan Lingkungan), SNI 03-3985-2000 (fire detection and alarm systems), SNI 03-3989-2000 (automatic sprinkler systems), SNI 03-1745-2000 (standpipe and hose systems) and Pd-T-11-2005-C (building fire safety inspection guide). The chapter also uses the Xtralis VESDA design and commissioning documents.</p>
+<h2 id="s20-1"><span class="n">20.1</span>Fire protection systems on a data-centre campus</h2>
+<h3 id="s20-1-1"><span class="n">20.1.1</span>What each system does</h3>
+<p>A data centre has a high value of equipment in a small space, high electrical loads that can start a fire, and an operation that must keep running. The fire strategy has three parts. Very early detection lets the operators find a smouldering component before it becomes a fire. Suppression must not damage the information technology (IT) equipment more than the fire would. Life safety protects the people in the building.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>System</th>
+<th>Purpose</th>
+<th>Typical location on MSC-1</th>
+<th>Main code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Addressable fire alarm system (FAS)</td>
+<td>detection, alarm, control of interfaces</td>
+<td>whole building</td>
+<td>NFPA 72, SNI 03-3985-2000</td>
+</tr>
+<tr>
+<td>Aspirating smoke detection (ASD, for example VESDA)</td>
+<td>very early warning of smoke</td>
+<td>data halls, electrical rooms, uninterruptible power supply (UPS) and battery rooms</td>
+<td>NFPA 76, NFPA 72, EN 54-20</td>
+</tr>
+<tr>
+<td>Pre-action sprinklers</td>
+<td>water suppression with protection against accidental discharge</td>
+<td>data halls</td>
+<td>NFPA 13, NFPA 25, FM DS 5-32</td>
+</tr>
+<tr>
+<td>Clean agent gas suppression</td>
+<td>suppression without water</td>
+<td>medium-voltage (MV) and low-voltage (LV) electrical rooms, some UPS rooms</td>
+<td>NFPA 2001</td>
+</tr>
+<tr>
+<td>Wet sprinklers</td>
+<td>water suppression</td>
+<td>offices, corridors, loading docks, generator halls (or water mist)</td>
+<td>NFPA 13</td>
+</tr>
+<tr>
+<td>Voice evacuation (emergency voice alarm communication)</td>
+<td>instructions to occupants</td>
+<td>whole building</td>
+<td>NFPA 72 Chapter 24</td>
+</tr>
+<tr>
+<td>Fire pumps and fire water tanks</td>
+<td>water supply for sprinklers and hydrants</td>
+<td>central fire pump house</td>
+<td>NFPA 20, SNI 03-1745-2000</td>
+</tr>
+<tr>
+<td>Hydrants and hose reels</td>
+<td>manual fire attack by the fire brigade and trained staff</td>
+<td>site and building</td>
+<td>SNI 03-1745-2000, Permen PU 26/2008</td>
+</tr>
+<tr>
+<td>Smoke control (stair pressurisation, smoke exhaust)</td>
+<td>keep escape routes clear of smoke</td>
+<td>stairs, lobbies, corridors</td>
+<td>Permen PU 26/2008, NFPA 92</td>
+</tr>
+<tr>
+<td>Off-gas detection for lithium-ion batteries</td>
+<td>detect electrolyte vent gas before thermal runaway</td>
+<td>lithium-ion battery rooms</td>
+<td>NFPA 855, UL 9540A results</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-1-2"><span class="n">20.1.2</span>MSC-1 fire water numbers</h3>
+<p>In the MSC-1 worked example, the fire water storage is 360 m³, the design fire flow is 90 L/s and the design duration is 60 minutes. The raw water tank holds 175 m³.</p>
+<p><strong>Worked example:</strong> Fire water volume check. The design fire flow for 60 minutes is 90 L/s × 3,600 s = 324,000 L = 324 m³. The storage of 360 m³ leaves 36 m³, which is <mark>11 % above the design demand</mark>. The commissioning manager asks the fire protection engineer to confirm whether the 324 m³ includes the hose stream allowance. If the hose allowance is separate, the commissioning manager checks the stored volume again against the sum.</p>
+<h3 id="s20-1-3"><span class="n">20.1.3</span>Who does what</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Responsibility in fire commissioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fire protection engineer of record (EoR)</td>
+<td>design, C&amp;E matrix, calculations, acceptance criteria</td>
+</tr>
+<tr>
+<td>Fire alarm contractor</td>
+<td>installation, programming, device tests, panel network</td>
+</tr>
+<tr>
+<td>Suppression contractor (gas and sprinklers)</td>
+<td>installation, pressure tests, door fan tests, trip tests</td>
+</tr>
+<tr>
+<td>BMS, access control and lift contractors</td>
+<td>interface inputs and outputs, response to fire signals</td>
+</tr>
+<tr>
+<td>Commissioning authority (CxA)</td>
+<td>witness of tests, integrated test scripts, issue log</td>
+</tr>
+<tr>
+<td>Commissioning manager</td>
+<td>programme, C&amp;E matrix testing plan, coordination of all interfaced contractors, the integrated test</td>
+</tr>
+<tr>
+<td>Owner's insurer (for example FM Global)</td>
+<td>design review and witness where the insurance requires it</td>
+</tr>
+<tr>
+<td>Authority having jurisdiction (AHJ), here the Dinas Pemadam Kebakaran</td>
+<td>functional test witness and recommendation</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s20-2"><span class="n">20.2</span>Fire alarm system architecture</h2>
+
+<figure class="sheet" id="F20-1"><a href="../data/cx-handbook/figures/F20-1.svg" title="Open drawing F20-1 at full size"><img src="../data/cx-handbook/figures/F20-1.svg" alt="F20-1: Fire alarm system of building B2: networked panels, loops, release panels and hardwired interfaces" width="1400" height="942" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F20-1</span> — <b>Fire alarm system of building B2: networked panels, loops, release panels and hardwired interfaces</b>. Life-safety actions leave the FACP through output modules wired to the controlled equipment; the BMS gateway only displays events.</figcaption></figure>
+<h3 id="s20-2-1"><span class="n">20.2.1</span>Components</h3>
+<p>Figure <a class="figref" href="#F20-1">F20-1</a> shows the fire alarm system of one MSC-1 building.</p>
+<ol>
+<li><strong>Fire alarm control panels (FACP).</strong> One panel per building zone or floor, networked to a main panel at the fire control room. The panels are listed to UL 864 (or EN 54-2 for European panels) and run the C&amp;E logic.</li>
+<li><strong>Signalling line circuits (SLC).</strong> Addressable loops that connect detectors, call points and modules. Each loop is wired Class A (a ring with both ends at the panel) or Class X (Class A with short-circuit isolators) so that one open circuit does not stop the loop.</li>
+<li><strong>Initiating devices.</strong> Smoke detectors, heat detectors, flame detectors, manual call points, duct detectors, waterflow and supervisory switches.</li>
+<li><strong>Interface modules.</strong> Input modules (monitor a contact from another system) and output modules (relays that act on another system). An output module for an emergency control function sits within 1 m (3 ft) of the component it controls (NFPA 72 21.2.4 in the editions before 2025). NFPA 72-2025 21.2.4.1 permits up to 6 m (20 ft) where the conductors run in metal raceway or metal-armoured cable, and sets no distance limit for a Class D (fail-safe) circuit. The project applies the edition adopted by the AHJ.</li>
+<li><strong>Notification appliance circuits (NAC).</strong> Sounders, strobes and loudspeakers, supplied from the panel or from NAC power extenders.</li>
+<li><strong>Graphics workstation.</strong> A computer with the building floor plans showing each device, used by the fire control room operator.</li>
+<li><strong>High-level interface to the BMS.</strong> A read-only gateway (for example BACnet or Modbus) that sends fire events to the BMS for display. <mark>Life-safety actions never depend on this gateway</mark>; they use hardwired or listed interfaces.</li>
+</ol>
+<h3 id="s20-2-2"><span class="n">20.2.2</span>Circuit classes and survivability</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Requirement</th>
+<th>Commissioning check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SLC class</td>
+<td>Class A or Class X per the design</td>
+<td>open one loop conductor; all devices still report; fault shown at the panel</td>
+</tr>
+<tr>
+<td>Short-circuit isolators</td>
+<td>one per group of devices as designed (for example every 20 devices or per zone)</td>
+<td>short the loop between two isolators; only the devices between those isolators are lost</td>
+</tr>
+<tr>
+<td>Pathway survivability</td>
+<td>fire-rated cable or protected routes for circuits that must survive a fire (voice evacuation, panel network)</td>
+<td>check cable type and route against the design and the survivability level</td>
+</tr>
+<tr>
+<td>Earth fault detection</td>
+<td>the panel detects an earth fault on any circuit</td>
+<td>apply an earth to one conductor; trouble signal shown within 200 s (NFPA 72-2025 10.15.1; the source quotes NFPA 72-2010 10.17.1.2)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-2-3"><span class="n">20.2.3</span>Secondary power (batteries)</h3>
+<p><strong>Purpose:</strong> Prove that the panel batteries carry the system for the required standby time and then the alarm load.</p>
+<p><strong>Acceptance:</strong> NFPA 72 requires secondary power for 24 hours of standby followed by 5 minutes of alarm. An emergency voice/alarm communication system needs 15 minutes of operation at full load after the 24 hours (NFPA 72-2025 10.6.7.2.1 to 10.6.7.2.4; the source quotes NFPA 72-2002 4.4.1.5.3.1). Since NFPA 72-2010, the battery calculation must include a <mark>20 % safety margin</mark> on the calculated ampere-hours. Where the local standard states a longer duration, the longer duration governs (confirm the standby duration against the secondary power clause of SNI 03-3985-2000).</p>
+<p><strong>Worked example:</strong> Battery calculation for panel B2-FACP-03. The measured standby current of the panel and its loops is 2.80 A. The measured alarm current with all NACs active is 9.60 A. The battery capacity needed is (2.80 A × 24 h + 9.60 A × 5/60 h) × 1.20 = (67.2 + 0.8) × 1.20 = <mark>81.6 Ah</mark>. The installed batteries are 2 × 12 V 100 Ah in series, which passes. During the test, the commissioning manager also measures the currents. The design sheet shows a calculated standby current of 2.10 A against a measured 2.80 A, so devices were added after the design. The calculation is updated with the measured value.</p>
+<h3 id="s20-2-4"><span class="n">20.2.4</span>Panel programming record</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Panel tag and address</td>
+<td>text</td>
+<td>B2-FACP-03, network node 3</td>
+</tr>
+<tr>
+<td>Firmware and configuration file version</td>
+<td>text</td>
+<td>firmware 5.2.1; config B2-FACP-03_v14 (example)</td>
+</tr>
+<tr>
+<td>Loops and device count</td>
+<td>numbers</td>
+<td>4 loops, 612 devices</td>
+</tr>
+<tr>
+<td>C&amp;E logic version</td>
+<td>text</td>
+<td>C&amp;E matrix B2-FIRE-CE rev 6</td>
+</tr>
+<tr>
+<td>Time and date synchronised</td>
+<td>yes or no</td>
+<td>yes, network time protocol (NTP) via the fire network gateway</td>
+</tr>
+<tr>
+<td>Alarm verification enabled on smoke detectors</td>
+<td>yes or no, delay</td>
+<td>yes, 30 s, offices only (not in data halls)</td>
+</tr>
+<tr>
+<td>Positive alarm sequence</td>
+<td>yes or no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Checksum or version code of the configuration</td>
+<td>text</td>
+<td>0x6F2A (example)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The configuration file version is checked on the day of every witness test. A configuration file changed after the test without a retest is a common cause of later failures.</p>
+<h2 id="s20-3"><span class="n">20.3</span>Initiating device tests (NFPA 72)</h2>
+<h3 id="s20-3-1"><span class="n">20.3.1</span>Acceptance test rule</h3>
+<p>At acceptance, every initiating device, every notification appliance and every interface is tested. The result is recorded in the NFPA 72 record of completion and the device test sheets (NFPA 72-2025 14.4.3.2 sets the test methods in Table 14.4.3.2). <mark>A sample test is not accepted at acceptance</mark>.</p>
+<h3 id="s20-3-2"><span class="n">20.3.2</span>Test methods by device</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Device</th>
+<th>Test method (NFPA 72 practice)</th>
+<th>Instrument</th>
+<th>Acceptance</th>
+<th>Record fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Point smoke detector</td>
+<td>apply listed test aerosol or smoke from a test kit at the detector</td>
+<td>smoke test pole and canister listed by the detector manufacturer</td>
+<td>panel shows alarm at the correct address and text; LED on the detector lights</td>
+<td>address, location, time to alarm, pass or fail</td>
+</tr>
+<tr>
+<td>Smoke detector sensitivity</td>
+<td>read the sensitivity from the panel (listed sensitivity reporting) or test with a calibrated sensitivity tester</td>
+<td>panel report or calibrated tester</td>
+<td>within the listed sensitivity range on the detector label</td>
+<td>address, measured value, range</td>
+</tr>
+<tr>
+<td>Heat detector, restorable</td>
+<td>apply heat from a listed heat source</td>
+<td>heat gun or cordless heat tester</td>
+<td>alarm at the rated temperature or rate of rise</td>
+<td>address, time to alarm</td>
+</tr>
+<tr>
+<td>Heat detector, non-restorable (fixed temperature link)</td>
+<td>mechanical or electrical test of the circuit; do not heat the element</td>
+<td>multimeter</td>
+<td>circuit monitored and alarm on test</td>
+<td>address, method</td>
+</tr>
+<tr>
+<td>Flame detector</td>
+<td>test lamp listed for the detector</td>
+<td>manufacturer's test lamp</td>
+<td>alarm within the manufacturer's time at the stated distance</td>
+<td>address, distance, time</td>
+</tr>
+<tr>
+<td>Duct smoke detector</td>
+<td>test aerosol into the sampling tube; check airflow through the housing</td>
+<td>manometer for the pressure difference across the sampling tubes</td>
+<td>alarm; pressure difference within the manufacturer's range</td>
+<td>address, pressure difference, air velocity in duct</td>
+</tr>
+<tr>
+<td>Manual call point</td>
+<td>operate with the test key or break the element</td>
+<td>test key</td>
+<td>alarm at correct address</td>
+<td>address</td>
+</tr>
+<tr>
+<td>Waterflow switch</td>
+<td>open the inspector's test valve</td>
+<td>stopwatch</td>
+<td>alarm within 90 s of flow (NFPA 72-2025 17.15.2; NFPA 13-2025 section 7.7 covers waterflow alarm devices)</td>
+<td>address, delay setting, time</td>
+</tr>
+<tr>
+<td>Valve supervisory (tamper) switch</td>
+<td>turn the valve</td>
+<td>—</td>
+<td>supervisory signal within two revolutions of the handwheel or one-fifth of the travel (NFPA 72-2025 17.19.1.2; NFPA 25 13.3.3.1)</td>
+<td>address, turns</td>
+</tr>
+<tr>
+<td>Low air pressure switch (pre-action)</td>
+<td>bleed the air</td>
+<td>test gauge</td>
+<td>supervisory at the set pressure</td>
+<td>address, set and measured pressure</td>
+</tr>
+<tr>
+<td>Input module (monitored contact)</td>
+<td>operate the monitored contact</td>
+<td>—</td>
+<td>correct event type at the panel</td>
+<td>address, source device</td>
+</tr>
+<tr>
+<td>Output module (control relay)</td>
+<td>operate the C&amp;E input that drives it</td>
+<td>multimeter at the controlled equipment</td>
+<td>equipment responds as in the C&amp;E matrix</td>
+<td>address, controlled equipment, response time</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-3-3"><span class="n">20.3.3</span>Device test procedure</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Notify.</strong> The fire alarm contractor notifies the fire control room and the monitoring station that the system is under test. The contractor isolates outputs that must not operate (for example the clean agent release and the pre-action solenoid) with the panel's disablement function. <mark>Every disablement is written on the disablement log</mark>.</li>
+<li><strong>Test each device.</strong> Two technicians work as a pair: one at the device, one at the panel or on a radio. Each device is tested by the method in 20.3.2.</li>
+<li><strong>Read at the panel.</strong> The panel technician records the address, the text and the time.</li>
+<li><strong>Reset.</strong> The device technician resets the device, and the panel technician confirms on the device test sheet that the panel returns to normal.</li>
+<li><strong>Restore.</strong> At the end of the session, every disablement is restored and the disablement log is closed with a signature.</li>
+</ol>
+<p><strong>Acceptance:</strong> Each device alarms at the correct address with the correct location text. No device is missing from the panel's device list. Every disablement is restored at the end of the session.</p>
+<p><strong>Worked example:</strong> Device test rate and programme. Building B2 has 4,850 addressable devices. A test pair tests about 40 point detectors per hour in a 4 m high hall, including access with a test pole. Above a raised floor or in ceiling voids with access panels, the rate is about 12 per hour. With 3,900 open-area devices and 950 void devices: 3,900 / 40 + 950 / 12 = 97.5 + 79.2 = 176.7 pair-hours. With three pairs working 7 productive hours per day, the test takes 176.7 / (3 × 7) = <mark>8.4 working days</mark>, plus 2 days for retests.</p>
+<h3 id="s20-3-4"><span class="n">20.3.4</span>Smoke detector sensitivity</h3>
+<p>NFPA 72 requires the sensitivity of smoke detectors to be checked within 1 year after installation and every alternate year after that. After two tests within the listed range, the interval may be extended to a maximum of 5 years where records are kept. The requirement is in the inspection and testing clauses of NFPA 72 Chapter 14; the clause number changes between editions. Addressable detectors with listed sensitivity reporting meet this through the panel report.</p>
+<ol>
+<li><strong>Acceptance baseline.</strong> At acceptance, print the panel sensitivity report for every detector. This is the baseline.</li>
+<li><strong>Out of range.</strong> A detector outside its listed range is cleaned or replaced and its new reading recorded.</li>
+<li><strong>Construction dust.</strong> Detectors installed during construction collect dust and drift towards alarm. Detectors with dust covers keep them on until the area is clean, and <mark>the sensitivity report is printed after the covers are removed</mark>.</li>
+</ol>
+<h2 id="s20-4"><span class="n">20.4</span>Aspirating smoke detection (VESDA)</h2>
+
+<figure class="sheet" id="F20-5"><a href="../data/cx-handbook/figures/F20-5.svg" title="Open drawing F20-5 at full size"><img src="../data/cx-handbook/figures/F20-5.svg" alt="F20-5: VESDA detector B2-DH3-ASD-02: four sampling pipes, predicted and measured transport time" width="1400" height="854" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F20-5</span> — <b>VESDA detector B2-DH3-ASD-02: four sampling pipes, predicted and measured transport time</b>. Smoke is introduced at the end hole of each pipe and timed until the detector reading rises; the measured value is compared with the ASPIRE prediction and the code limit.</figcaption></figure>
+<h3 id="s20-4-1"><span class="n">20.4.1</span>How aspirating detection works</h3>
+<p>An aspirating smoke detector (ASD) draws air through a network of pipes with small sampling holes. A fan in the detector pulls the air to a laser or light-emitting diode (LED) chamber that measures smoke in % obscuration per metre (or per foot). The detector samples many holes at once. Smoke from one hole is diluted by clean air from the other holes, and the sensitivity at one hole is lower than the detector sensitivity.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+<th>What to record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Detector sensitivity</td>
+<td>smoke level at the detector that triggers an alarm level (for example Fire 1)</td>
+<td>the threshold of each alarm level in the ASD test record</td>
+</tr>
+<tr>
+<td>Hole sensitivity</td>
+<td>smoke level at one hole that triggers the alarm when the other holes draw clean air; approximately detector sensitivity × number of holes (calculated by the design software, for example Xtralis ASPIRE)</td>
+<td>the ASPIRE value for each pipe, compared with the code limit</td>
+</tr>
+<tr>
+<td>Transport time</td>
+<td>time for smoke entering the furthest hole to reach the detector</td>
+<td>predicted and measured time for each pipe</td>
+</tr>
+<tr>
+<td>Alarm levels</td>
+<td>VESDA uses Alert, Action, Fire 1 and Fire 2</td>
+<td>the C&amp;E outputs seen at each level</td>
+</tr>
+<tr>
+<td>Flow</td>
+<td>air flow through the detector; the detector monitors high and low flow faults</td>
+<td>normalised flow per pipe and the fault thresholds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-4-2"><span class="n">20.4.2</span>Code requirements for data centres</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Very early warning fire detection (VEWFD): maximum transport time</td>
+<td><mark>60 s</mark></td>
+<td>NFPA 76 (Syscom summary; confirm against the VEWFD clause of NFPA 76-2024)</td>
+</tr>
+<tr>
+<td>Early warning fire detection (EWFD): maximum transport time</td>
+<td>90 s</td>
+<td>NFPA 76 (Syscom summary; confirm against the EWFD clause of NFPA 76-2024)</td>
+</tr>
+<tr>
+<td>VEWFD hole sensitivity</td>
+<td>≤ 1.0 % obscuration per foot (about 3.3 % per metre)</td>
+<td>NFPA 76, quoted in the Xtralis VESDA-E FAQ (question 10)</td>
+</tr>
+<tr>
+<td>EWFD hole sensitivity</td>
+<td>≤ 1.5 % per foot</td>
+<td>NFPA 76, quoted in the Xtralis VESDA-E FAQ (question 10)</td>
+</tr>
+<tr>
+<td>General ASD maximum transport time</td>
+<td>120 s</td>
+<td>UL 268 6th edition, quoted by Xtralis; UL 268 7th edition sets a limit per listed product (90 s for VESDA-E)</td>
+</tr>
+<tr>
+<td>EN 54-20 sensitivity classes</td>
+<td>Class A (very high), B (enhanced), C (normal)</td>
+<td>EN 54-20</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-4-3"><span class="n">20.4.3</span>ASD commissioning procedure</h3>
+<p><strong>Inputs:</strong> the ASPIRE (or equal) design report with predicted transport time, hole sensitivity and flow per pipe; the installed pipe drawings; the alarm level settings.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Pipe inspection.</strong> Check the pipe routes, hole positions, hole sizes, end caps, labels at each hole ("aspirating smoke detector sampling point, do not obstruct") and the support spacing against the design.</li>
+<li><strong>Pipe tightness.</strong> Cap all holes on a pipe with tape and run the detector; the flow falls to near zero. A flow that stays high shows a leak or an open joint. Remove the tape after the test.</li>
+<li><strong>Flow normalisation.</strong> With the pipes complete and clean, run the detector's flow normalisation. Record the normalised flow per pipe. Acceptance: within ±20 % of the ASPIRE predicted flow (example project tolerance; the project value comes from the detector manufacturer's commissioning guide).</li>
+<li><strong>Flow fault test.</strong> Block the end hole or a group of holes until the low flow fault appears. Break a pipe joint until the high flow fault appears. Record the flow at fault.</li>
+<li><strong>Transport time test.</strong> At the furthest hole of each pipe, introduce smoke (a smoke pen or cotton wick) and start the timer. Stop when the detector's smoke level rises. Acceptance: measured time ≤ the code limit (60 s for VEWFD) and close to the ASPIRE prediction.</li>
+<li><strong>Alarm level test.</strong> Introduce smoke at a hole until each alarm level (Alert, Action, Fire 1, Fire 2) operates; check each level at the panel with the correct text and the C&amp;E outputs.</li>
+<li><strong>Settings record.</strong> Record the alarm thresholds, delays, flow fault thresholds and the referencing (if used).</li>
+</ol>
+<p><strong>Worked example:</strong> Hole sensitivity and transport time for VESDA detector B2-DH3-ASD-02 (Figure <a class="figref" href="#F20-5">F20-5</a>) with 4 pipes and 20 holes per pipe (80 holes in total). The detector Fire 1 threshold is 0.0125 % per foot. The approximate hole sensitivity is 0.0125 × 80 = <mark>1.0 % per foot</mark>, equal to the VEWFD limit; the ASPIRE report gives 0.98 % per foot, which passes. The ASPIRE predicted transport time for pipe 3 is 52 s; the measured time is 49 s at the end hole, within 60 s. Pipe 4 measures 71 s against a prediction of 55 s; the technician finds an end cap with a hole drilled larger than the design. After the cap is replaced, the time is 54 s.</p>
+<h3 id="s20-4-4"><span class="n">20.4.4</span>ASD test record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Detector tag, model</td>
+<td>text</td>
+<td>B2-DH3-ASD-02, VESDA-E VEU (example)</td>
+</tr>
+<tr>
+<td>Pipe number</td>
+<td>number</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Holes per pipe, hole diameter</td>
+<td>numbers</td>
+<td>20, 3.0 mm (end cap 4.0 mm)</td>
+</tr>
+<tr>
+<td>Predicted flow / normalised flow</td>
+<td>numbers (L/min)</td>
+<td>46 / 44</td>
+</tr>
+<tr>
+<td>Predicted / measured transport time</td>
+<td>numbers (s)</td>
+<td>52 / 49</td>
+</tr>
+<tr>
+<td>Alert / Action / Fire 1 / Fire 2 thresholds</td>
+<td>numbers (% obs/ft)</td>
+<td>0.004 / 0.008 / 0.0125 / 0.02 (example)</td>
+</tr>
+<tr>
+<td>Low and high flow fault thresholds</td>
+<td>numbers (%)</td>
+<td>−20 % / +20 % (example)</td>
+</tr>
+<tr>
+<td>C&amp;E outputs observed at Fire 1 and Fire 2</td>
+<td>text</td>
+<td>per C&amp;E rows 3 and 4</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>names</td>
+<td>fire alarm contractor, CxA</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s20-5"><span class="n">20.5</span>Notification: sounders, strobes and voice evacuation</h2>
+<h3 id="s20-5-1"><span class="n">20.5.1</span>Audibility</h3>
+<ol>
+<li><strong>Ambient level.</strong> Measure the average ambient sound level in each area with the building in normal operation (data halls at full fan speed reach about 75 to 85 dBA).</li>
+<li><strong>Alarm level.</strong> With all notification appliances on, measure the alarm level at 1.5 m above the floor at the worst positions. Use a sound level meter IEC 61672 Class 1 (or Class 2 where the project accepts it) with A-weighting and the fast or slow response stated in the procedure.</li>
+<li><strong>Acceptance (public mode).</strong> The alarm level is at least 15 dB above the average ambient sound level, or 5 dB above the maximum sound level that lasts at least 60 s, whichever is greater. It is measured 1.5 m above the floor with A-weighting (NFPA 72-2025 18.4.4.1). The total sound level stays at or below 110 dBA at the minimum hearing distance (NFPA 72-2025 18.4.1.2). Private mode is used, for example, in plant rooms where only staff are present. It needs at least 10 dB above the average ambient level, or 5 dB above the maximum level lasting at least 60 s, whichever is greater (NFPA 72-2025 18.4.5.1).</li>
+</ol>
+<p><strong>Worked example:</strong> Data hall B2-DH3 with all computer room air handler (CRAH) units and fan walls running has an average ambient level of 78 dBA. The required alarm level is 78 + 15 = <mark>93 dBA</mark>. The measured levels at 20 grid points range from 91 to 98 dBA; three points near the hot-aisle containment doors read 91 to 92 dBA. The fire alarm contractor adds two sounders inside the containment and the retest gives 94 to 99 dBA. Where 15 dB above ambient would exceed 110 dBA, visual notification appliances carry the signal in that area.</p>
+<h3 id="s20-5-2"><span class="n">20.5.2</span>Visual notification</h3>
+<ol>
+<li><strong>Coverage.</strong> Strobes cover the areas where the ambient noise is high or where hearing-impaired occupants may be, with the candela ratings and spacing in the design (NFPA 72 Chapter 18 tables).</li>
+<li><strong>Synchronisation.</strong> Strobes in the same field of view flash in synchrony. Check visually and with a video at 60 frames per second.</li>
+<li><strong>Hall layout.</strong> In data halls the rack rows block the view, so each aisle needs its own strobes.</li>
+</ol>
+<h3 id="s20-5-3"><span class="n">20.5.3</span>Voice evacuation intelligibility</h3>
+<p><strong>Inputs:</strong> a speech transmission index (STI) meter that uses the STI for public address (STIPA) method (IEC 60268-16), with the STIPA test signal played through the voice evacuation system.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Divide into acoustically distinguishable spaces (ADS).</strong> Each room or area with its own acoustic conditions is one ADS.</li>
+<li><strong>Measure.</strong> In each ADS, measure STIPA at a grid of points at 1.5 m height, with the normal ambient noise present. Use, for example, one point per 40 m² up to the limit in the procedure.</li>
+<li><strong>Acceptance.</strong> The average STI in each ADS and the proportion of points above the minimum meet the project value. NFPA 72 Annex D (2010 and later editions) recommends that 90 % of the measurement points in an ADS meet the required score. With the STIPA method, the usual targets are <mark>STI ≥ 0.50 average</mark> and STI ≥ 0.45 at each point. Annex D is advisory, so the project specification states whether these targets are pass or fail criteria.</li>
+</ol>
+<h2 id="s20-6"><span class="n">20.6</span>Clean agent gas suppression (NFPA 2001)</h2>
+<h3 id="s20-6-1"><span class="n">20.6.1</span>System description</h3>
+<p>A clean agent system stores an extinguishing gas in cylinders and discharges it through pipes and nozzles to fill the protected room to a design concentration. The agent extinguishes the fire and leaves no residue on the equipment. Two families are used:</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Example agents</th>
+<th>How they act</th>
+<th>Discharge time (NFPA 2001)</th>
+<th>Room effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Halocarbon</td>
+<td>FK-5-1-12 (for example 3M Novec 1230, now from other producers), HFC-227ea (FM-200)</td>
+<td>absorb heat and interrupt the combustion</td>
+<td>≤ 10 s to 95 % of the minimum design concentration</td>
+<td>small pressure change; needs pressure relief vent</td>
+</tr>
+<tr>
+<td>Inert gas</td>
+<td>IG-541, IG-55, IG-100 (nitrogen)</td>
+<td>lower the oxygen concentration</td>
+<td>≤ 60 s for class B, ≤ 120 s for class A and C to 95 % of the minimum design concentration (NFPA 2001; the 120 s value for class A and C has applied since the 2012 edition)</td>
+<td>large positive pressure; needs a pressure relief vent sized for the flow</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-6-2"><span class="n">20.6.2</span>Design concentration and agent quantity</h3>
+<ol>
+<li><strong>Minimum extinguishing concentration (MEC).</strong> Found by the cup-burner test (class B) or the room fire test (class A).</li>
+<li><strong>Minimum design concentration.</strong> MEC × safety factor: 1.2 for class A surface fires, 1.3 for class B (NFPA 2001; the 1.2 class A factor is in the note to Table A.7.2.2.3(b) quoted in the public input report for NFPA 2001-2025; confirm the class B and class C factors in the minimum design concentration clause, 7.2.2.3, of NFPA 2001-2025).</li>
+<li><strong>Safety limit.</strong> The design concentration in an occupied room stays at or below the no observed adverse effect level (NOAEL) or within the time limits of NFPA 2001. The NOAEL is 10 % for FK-5-1-12 and 9 % for HFC-227ea (agent manufacturer data sheets).</li>
+<li><strong>Agent quantity for halocarbons.</strong> W = (V / S) × C / (100 − C). W is the agent mass in kg and V the protected volume in m³. S is the specific vapour volume in m³/kg at the room temperature (S = k1 + k2 × T), and C is the design concentration in % by volume.</li>
+</ol>
+<p><strong>Worked example:</strong> MV switchroom B2-ER-03, 20.0 m × 8.0 m × 4.0 m = 640 m³ net volume, design temperature 20 °C, agent FK-5-1-12 at a design concentration of 4.5 %. For FK-5-1-12, k1 = 0.0664 and k2 = 0.000274 (NFPA 2001 and manufacturer data; the agent manufacturer's design manual gives the values for the agent). S = 0.0664 + 0.000274 × 20 = 0.07188 m³/kg. W = (640 / 0.07188) × 4.5 / 95.5 = 8,904 × 0.04712 = <mark>419.5 kg</mark>. The design calculation sheet shows 420 kg in 4 cylinders of 105 kg; the commissioning manager checks the weight of each cylinder against its fill certificate (20.6.5).</p>
+<h3 id="s20-6-3"><span class="n">20.6.3</span>Room integrity test (door fan test)</h3>
+<p><strong>Purpose:</strong> Prove that the room is tight enough to hold the agent concentration at the protected height for the hold time. NFPA 2001 requires the concentration at the highest level of protected equipment to stay at or above 85 % of the adjusted minimum design concentration for at least 10 minutes. A longer time applies where the project specification or the AHJ sets one. NFPA 2001 Annex C gives the door fan method that predicts this hold time.</p>
+<p><strong>Inputs:</strong> a door fan test kit (for example Retrotec) with a calibrated fan in an adjustable door panel. The kit includes a digital manometer with ±1 % accuracy or ±0.15 Pa and the NFPA 2001 Annex C calculation software. The kit is calibrated within the kit manufacturer's interval.</p>
+<ol>
+<li><strong>Room ready.</strong> All walls, ceilings, floors, penetrations and doors are complete; HVAC dampers that close on agent release are closed; HVAC units that stop on release are stopped.</li>
+<li><strong>Door fan.</strong> The fan panel is fitted in a door opening to an adjoining space with a large volume.</li>
+<li><strong>Measure the room data.</strong> Room volume, protected height (top of the highest equipment), room height, agent and design concentration, and the static pressure difference across the boundary before the test.</li>
+</ol>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Pressurise and depressurise.</strong> The fan pressurises and depressurises the room at several pressure differences (for example 10 to 60 Pa) and records the flow at each.</li>
+<li><strong>Leakage area.</strong> The software calculates the equivalent leakage area (ELA) and splits it into upper and lower leakage (with a measured or assumed split).</li>
+<li><strong>Predicted hold time.</strong> The software predicts the time for the agent-air interface to descend to the protected height (for a halocarbon) or for the concentration to fall to the minimum.</li>
+<li><strong>Leak search.</strong> If the predicted time is below 10 minutes, the testers find the leaks with a smoke pencil while the room is depressurised. The contractor seals them, and the test is repeated.</li>
+</ol>
+<p><strong>Acceptance:</strong> <mark>Predicted hold time ≥ 10 minutes</mark> at the protected height (or the project value).</p>
+<p><strong>Worked example:</strong> Room B2-ER-03 (640 m³, room height 4.0 m, protected height 2.4 m, FK-5-1-12 at 4.5 %). The first test gives an ELA of 0.071 m² and a predicted hold time of 7.2 minutes, which fails. The leak search finds an unsealed cable tray penetration through the wall above the ceiling line and gaps around two fire damper frames. After sealing, the ELA is 0.038 m² and the predicted hold time is <mark>13.6 minutes</mark>, which passes.</p>
+<h3 id="s20-6-4"><span class="n">20.6.4</span>Room integrity test record fields</h3>
+<p>Figure <a class="figref" href="#F20-6">F20-6</a> shows the door fan set-up for room B2-ER-03 and the two results of the worked example. The predicted hold time is 7.2 minutes before sealing and 13.6 minutes after sealing, against the 10-minute limit.</p>
+<figure class="sheet" id="F20-6"><a href="../data/cx-handbook/figures/F20-6.svg" title="Open drawing F20-6 at full size"><img src="../data/cx-handbook/figures/F20-6.svg" alt="F20-6: Door fan test of MV room B2-ER-03: leakage area and hold time" width="1000" height="1102" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F20-6</span> — <b>Door fan test of MV room B2-ER-03: leakage area and hold time</b>. The door fan pressurises and depressurises the room at 10 to 60 Pa; the NFPA 2001 Annex C software turns the leakage area into a predicted hold time at the protected height.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Room</td>
+<td>text</td>
+<td>B2-ER-03 MV switchroom</td>
+</tr>
+<tr>
+<td>Net volume, room height, protected height</td>
+<td>numbers</td>
+<td>640 m³, 4.0 m, 2.4 m</td>
+</tr>
+<tr>
+<td>Agent, design concentration, minimum concentration at hold</td>
+<td>text, numbers</td>
+<td>FK-5-1-12, 4.5 %, 85 % of minimum design</td>
+</tr>
+<tr>
+<td>Door fan kit and calibration date</td>
+<td>text</td>
+<td>kit SN RT-2209, calibrated 2026-06-20</td>
+</tr>
+<tr>
+<td>Static pressure before test</td>
+<td>number (Pa)</td>
+<td>0.8</td>
+</tr>
+<tr>
+<td>ELA, first test</td>
+<td>number (m²)</td>
+<td>0.071</td>
+</tr>
+<tr>
+<td>Predicted hold time, first test</td>
+<td>number (min)</td>
+<td>7.2</td>
+</tr>
+<tr>
+<td>Leaks found and sealed</td>
+<td>list</td>
+<td>cable tray penetration grid C4; damper frames FD-03-02 and FD-03-05</td>
+</tr>
+<tr>
+<td>ELA and hold time, retest</td>
+<td>numbers</td>
+<td>0.038 m², 13.6 min</td>
+</tr>
+<tr>
+<td>Pressure relief vent check</td>
+<td>text</td>
+<td>vent opens at design pressure; free area as designed</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>names</td>
+<td>suppression contractor, CxA, insurer witness</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-6-5"><span class="n">20.6.5</span>Clean agent system checks before arming</h3>
+<ol>
+<li><strong>Pipe pressure test.</strong> Closed sections of pipe are tested per NFPA 2001 (pneumatic test at the pressure stated in the standard; confirm the pressure and the hold time in the closed-section pipe test clause of NFPA 2001-2025 chapter 10; a 2023 public input asking for a hydrostatic test in that clause was rejected) and open-ended pipe is blown through with nitrogen or air to prove no obstruction.</li>
+<li><strong>Cylinder weights and pressures.</strong> Each cylinder's weight and pressure (corrected for temperature with the manufacturer's chart) is recorded against the fill certificate. For halocarbon agents, accept an agent loss ≤ 5 % or a pressure loss (temperature corrected) ≤ 10 % (NFPA 2001 11.3.1, unchanged in the 2025 edition cycle). For inert gas agents, accept a pressure loss (temperature corrected) ≤ 5 % (NFPA 2001-2025 11.3.4).</li>
+<li><strong>Nozzles.</strong> Nozzle type, orifice code and position match the hydraulic calculation.</li>
+<li><strong>Release devices.</strong> Solenoid or actuator on the pilot cylinder; tested with the actuator removed from the valve (or with a test device), never by discharging the cylinder.</li>
+<li><strong>Abort switch.</strong> Where provided, the abort switch is of the "dead-man" type (it holds only while pressed) and the C&amp;E defines what it does.</li>
+<li><strong>Manual release.</strong> Manual release stations at the exit doors, with covers.</li>
+<li><strong>Lock-out valve.</strong> A lock-out valve or a disconnect on the release circuit lets maintenance staff work in the room safely; its closed position gives a supervisory signal.</li>
+<li><strong>Warning signs.</strong> Signs at every entrance with the agent name and the instruction not to enter after discharge.</li>
+<li><strong>Pressure relief vent.</strong> Fitted, free area as designed, opens at the design pressure (manufacturer test or certificate).</li>
+</ol>
+<h3 id="s20-6-6"><span class="n">20.6.6</span>Release sequence test (with actuators removed)</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Safe the system.</strong> The suppression contractor removes the actuators from the cylinder valves and connects each actuator to a test load or keeps it in a visible position. The contractor then confirms with the CxA that no cylinder can discharge.</li>
+<li><strong>First detector.</strong> Operate one detector in the room. Acceptance: first-stage alarm in the room and at the panel; outputs per the C&amp;E row.</li>
+<li><strong>Second detector.</strong> Operate a second detector in the other detection zone (coincidence or "double knock"). Acceptance: pre-discharge alarm (distinct tone and visual), HVAC shutdown, dampers closed, doors released, countdown starts.</li>
+<li><strong>Countdown.</strong> The countdown time is measured with a stopwatch from the second detector to the release output. Acceptance: within ±1 s of the set value (example 30 s).</li>
+<li><strong>Release output.</strong> The actuator operates at the end of the countdown. The discharge pressure switch input is simulated to show "agent released" at the panel and the BMS.</li>
+<li><strong>Abort test.</strong> Repeat with the abort switch held during the countdown; the countdown stops (or resets per the C&amp;E) and <mark>the release does not occur while the switch is held</mark>.</li>
+<li><strong>Manual release.</strong> Operate the manual release station; the release follows the C&amp;E (for example a short delay or none).</li>
+<li><strong>Lock-out.</strong> Close the lock-out valve or the release disconnect; the panel shows supervisory and the release output does not reach the actuator.</li>
+<li><strong>Reinstate.</strong> Reconnect the actuators with the CxA present and record the time the system is armed.</li>
+</ol>
+<h2 id="s20-7"><span class="n">20.7</span>Pre-action sprinkler systems</h2>
+
+<figure class="sheet" id="F20-3"><a href="../data/cx-handbook/figures/F20-3.svg" title="Open drawing F20-3 at full size"><img src="../data/cx-handbook/figures/F20-3.svg" alt="F20-3: Double-interlock pre-action valve set B2-DH3-PA-01 and its supervision" width="1400" height="940" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F20-3</span> — <b>Double-interlock pre-action valve set B2-DH3-PA-01 and its supervision</b>. The solenoid release opens the pre-action valve only together with low pipe pressure; detection alone or air loss alone gives an alarm or supervisory signal and no water.</figcaption></figure>
+<h3 id="s20-7-1"><span class="n">20.7.1</span>Types of pre-action system</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Valve opens when</th>
+<th>Water enters the pipe when</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Non-interlock</td>
+<td>detection or sprinkler operation</td>
+<td>either event</td>
+<td>rare in data halls</td>
+</tr>
+<tr>
+<td>Single interlock</td>
+<td>detection operates</td>
+<td>detection; water then waits at closed sprinklers</td>
+<td>data halls where early filling is accepted</td>
+</tr>
+<tr>
+<td>Double interlock</td>
+<td>detection and loss of pipe air pressure (a sprinkler has opened)</td>
+<td>both events</td>
+<td>data halls where accidental water in the pipes must be avoided</td>
+</tr>
+</tbody>
+</table></div>
+<p>FM Global Data Sheet 5-32 and the owner's insurance requirements decide the type on most hyperscale projects; the decision is recorded in the basis of design (BOD).</p>
+<h3 id="s20-7-2"><span class="n">20.7.2</span>Pre-action valve set</h3>
+<p>Figure <a class="figref" href="#F20-3">F20-3</a> shows the pre-action valve set and its instruments.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Function</th>
+<th>Commissioning check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Main control valve (outside screw and yoke (OS&amp;Y) gate or butterfly) with tamper switch</td>
+<td>isolates the system</td>
+<td>supervisory signal on closing</td>
+</tr>
+<tr>
+<td>Pre-action (deluge) valve with solenoid release</td>
+<td>holds back the water until released</td>
+<td>trip test</td>
+</tr>
+<tr>
+<td>Priming water and check valve</td>
+<td>keeps the clapper sealed</td>
+<td>level per manufacturer</td>
+</tr>
+<tr>
+<td>Air or nitrogen supply with air maintenance device</td>
+<td>keeps the pipe pressurised</td>
+<td>supervisory pressure set points</td>
+</tr>
+<tr>
+<td>Low air pressure switch</td>
+<td>detects an opened sprinkler or a leak</td>
+<td>supervisory at the low set point; part of the double interlock</td>
+</tr>
+<tr>
+<td>Alarm pressure switch and waterflow switch</td>
+<td>detect water flowing</td>
+<td>alarm within the set delay</td>
+</tr>
+<tr>
+<td>Inspector's test connection at the far end</td>
+<td>simulates one sprinkler</td>
+<td>water delivery time test</td>
+</tr>
+<tr>
+<td>Main drain and pressure gauges</td>
+<td>drain and readings</td>
+<td>main drain test</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-7-3"><span class="n">20.7.3</span>Pipe pressure test</h3>
+<ol>
+<li><strong>Hydrostatic test.</strong> NFPA 13-2025 29.2.1.1 requires a hydrostatic test of new systems at 13.8 bar (200 psi), held without loss for 2 hours. Where the working pressure exceeds 10.3 bar (150 psi), the test pressure is 3.4 bar (50 psi) above the working pressure (29.2.1.3). A drop in gauge pressure or a visible leak is a loss (29.2.1.2). The gauge is at the lowest point of the section under test (29.2.1.6).</li>
+<li><strong>Air test for pre-action and dry systems.</strong> The sprinkler contractor also runs an air test at 2.7 bar (40 psi) for 24 hours. A loss above 0.1 bar (1.5 psi) in the 24 hours is corrected and the test repeated. This is the NFPA 13 air leakage test, as quoted in local acceptance forms such as the Mercer Island 2022 NFPA 13 acceptance form.</li>
+<li><strong>Drying.</strong> After the hydrostatic test, the pipe is drained and dried so that water left in the pipe does not cause corrosion or freeze. On hyperscale projects nitrogen often replaces compressed air as the supervisory gas, to limit corrosion.</li>
+</ol>
+<h3 id="s20-7-4"><span class="n">20.7.4</span>Trip test and water delivery time</h3>
+<p><strong>Purpose:</strong> Prove that the valve opens on the designed signals and that water reaches the furthest sprinkler within the required time.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Notify.</strong> Notify the fire control room and the BMS operators; protect the equipment near the inspector's test outlet; place a drain hose to a safe point.</li>
+<li><strong>Double interlock: detection only.</strong> Operate the detection (two detectors or the ASD Fire 2 per the C&amp;E). The solenoid opens, but in a double-interlock system the valve stays shut while the pipe air pressure holds. Acceptance: <mark>no water in the pipe</mark>; panel shows "pre-action release, waiting for air loss".</li>
+<li><strong>Double interlock: air loss only.</strong> Reset, then open the inspector's test valve without detection. Acceptance: low air supervisory alarm; valve stays shut.</li>
+<li><strong>Both events.</strong> Operate the detection and open the inspector's test valve. Start the stopwatch at the opening of the test valve.</li>
+<li><strong>Water delivery.</strong> Stop the stopwatch when a steady stream of water flows at the inspector's test connection. Acceptance: within the time required by NFPA 13 for the hazard (for a double-interlock system, NFPA 13 applies the dry-pipe water delivery rules; 60 s for light hazard and 50 s for ordinary hazard in NFPA 13-2025 Table 8.2.4.3.2, applied to double-interlock systems by 8.3.2.3.1.4; the design calculation may set a shorter time).</li>
+<li><strong>Alarms.</strong> Record the time of the waterflow alarm and of the alarm at the BMS.</li>
+<li><strong>Reset and drain.</strong> Close the valve, drain, reset the clapper, restore air pressure and record the time to restore normal air pressure. The air supply must restore normal pressure within <mark>30 minutes</mark> (NFPA 13-2025 8.2.7.3; 8.3.2.5 applies the dry pipe air rules to pre-action systems).</li>
+</ol>
+<p><strong>Worked example:</strong> Pre-action system B2-DH3-PA-01, double interlock, ordinary hazard group 1, 1,680 L pipe volume, normal air pressure 2.4 bar. Detection operated at 10:02:00; the inspector's test valve was opened at 10:02:30. The low air alarm came at 10:02:41 and the clapper opened at 10:02:44. Steady water flowed at the inspector's test connection at 10:03:16, <mark>46 s</mark> after the test valve opened, within the 50 s value for ordinary hazard. The waterflow alarm reached the panel at 10:03:05 and the BMS at 10:03:06.</p>
+<h3 id="s20-7-5"><span class="n">20.7.5</span>NFPA 25 routine tests that begin at handover</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Interval (NFPA 25-2023 values, the edition read for this table; confirm each against NFPA 25-2026 Table 13.1.1.2)</th>
+<th>First due on MSC-1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Valve supervisory switches</td>
+<td>semi-annual</td>
+<td>6 months after handover</td>
+</tr>
+<tr>
+<td>Waterflow alarm devices</td>
+<td>quarterly (vane type semi-annual)</td>
+<td>3 months</td>
+</tr>
+<tr>
+<td>Pre-action valve partial trip with the main valve partly open</td>
+<td>annual</td>
+<td>12 months</td>
+</tr>
+<tr>
+<td>Pre-action full flow trip test</td>
+<td>every 3 years</td>
+<td>36 months, the acceptance trip test sets the baseline</td>
+</tr>
+<tr>
+<td>Main drain test</td>
+<td>annual (quarterly where the supply is a single riser)</td>
+<td>12 months</td>
+</tr>
+<tr>
+<td>Air compressor or nitrogen generator</td>
+<td>per manufacturer, inspection quarterly</td>
+<td>3 months</td>
+</tr>
+</tbody>
+</table></div>
+<p>The acceptance trip test record (20.7.4) is the first baseline that the operations team compares against.</p>
+<h2 id="s20-8"><span class="n">20.8</span>Fire pumps and fire water supply</h2>
+<h3 id="s20-8-1"><span class="n">20.8.1</span>Fire pump acceptance test (NFPA 20)</h3>
+<p><strong>Purpose:</strong> Prove that the fire pump delivers its rated flow and pressure and that its controller starts it on demand.</p>
+<p><strong>Inputs:</strong></p>
+<ul>
+<li>A calibrated flow meter, or a pitot tube with playpipes and hoses.</li>
+<li>Calibrated suction and discharge pressure gauges with an accuracy within 1 % of full scale.</li>
+<li>A tachometer, and a voltmeter and an ammeter for electric pumps.</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Churn (no flow).</strong> Start the pump with the test valve closed. Record suction pressure, discharge pressure, speed and motor current.</li>
+<li><strong>100 % flow.</strong> Open the test valve to rated flow. Record the same values.</li>
+<li><strong>150 % flow.</strong> Open to 150 % of rated flow. Record the same values.</li>
+<li><strong>Automatic start.</strong> Drop the system pressure with the drain; the pump starts at the pressure set point of the controller.</li>
+<li><strong>Alternate power.</strong> For an electric pump with an alternate supply (generator), transfer the controller to the alternate supply while the pump runs at peak load.</li>
+<li><strong>Alarms.</strong> The fire pump contractor simulates the pump running, power failure, phase reversal and controller trouble signals. The CxA records each signal at the fire alarm panel in the fire pump acceptance record.</li>
+</ol>
+<p><strong>Acceptance:</strong> The pump meets its certified curve within the tolerance accepted by the AHJ. At 150 % of rated flow <mark>the net pressure is at least 65 %</mark> of rated net pressure. Churn pressure does not exceed 140 % of rated net pressure; a higher churn pressure is accepted only where the components are rated for it. These are the NFPA 20 criteria for centrifugal fire pumps, as summarised by the American Society of Plumbing Engineers (ASPE).</p>
+<p><strong>Worked example:</strong> Fire pump B2-FP-01 rated 90 L/s at 8.0 bar net. At 150 % flow (135 L/s) the measured net pressure is 5.9 bar, which is <mark>74 % of rated</mark>, above the 65 % minimum. Churn net pressure is 10.4 bar, which is 130 % of rated and below 140 %. The test passes, and the measured curve is plotted against the certified curve in the record.</p>
+<h2 id="s20-9"><span class="n">20.9</span>The cause-and-effect matrix</h2>
+
+<figure class="sheet" id="F20-2"><a href="../data/cx-handbook/figures/F20-2.svg" title="Open drawing F20-2 at full size"><img src="../data/cx-handbook/figures/F20-2.svg" alt="F20-2: Cause-and-effect matrix of building B2 (example, rev 6): 34 causes against 14 effects" width="1400" height="1025" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F20-2</span> — <b>Cause-and-effect matrix of building B2 (example, rev 6): 34 causes against 14 effects</b>. Rows 4, 6, 12 and 20 carry the largest operational consequence; no row trips UPS, PDU or rack power, and no single device releases suppression.</figcaption></figure>
+<h3 id="s20-9-1"><span class="n">20.9.1</span>What the matrix is and why it exists</h3>
+<p>The cause-and-effect matrix is a table with the fire alarm inputs as rows (the causes) and the outputs as columns (the effects). A mark at a crossing means that the input must produce that output. The matrix is the specification for the panel programming, for the interface wiring of every other system, and for the integrated fire test. On a data centre, the matrix decides whether a single smoke detector stops the cooling of a data hall. The owner's operations team reviews every row that acts on cooling or IT power (20.9.2, step 5).</p>
+<h3 id="s20-9-2"><span class="n">20.9.2</span>How the matrix is built</h3>
+<ol>
+<li><strong>Fire strategy.</strong> The fire protection EoR writes the fire strategy: zones, detection types, suppression per room, evacuation strategy, smoke control.</li>
+<li><strong>Input list.</strong> Every input type per zone is listed: each alarm level of each detection system, each manual station, each waterflow and supervisory signal, each fault.</li>
+<li><strong>Output list.</strong> Every output is listed with the owning system and the interface type (hardwired relay, listed interface, or a high-level read-only signal).</li>
+<li><strong>Logic and timing.</strong> For each input, the outputs are marked, with delays, coincidence (two-detector) logic and any condition (for example "only if the room is in automatic mode").</li>
+<li><strong>Owner and operations review.</strong> The owner's operations team reviews the effects on the IT load. For example, it decides whether a single VESDA Action in a data hall stops CRAH units (MSC-1: no). It also decides whether Fire 2 starts the pre-action release (MSC-1: yes, in coincidence with a second device).</li>
+<li><strong>AHJ and insurer review.</strong> The local Damkar and the insurer review the life-safety actions.</li>
+<li><strong>Issue for construction.</strong> The matrix is issued with a revision number. Every later change is a revision with the reason, and the panel configuration version is linked to the matrix revision.</li>
+</ol>
+<h3 id="s20-9-3"><span class="n">20.9.3</span>Output codes for the MSC-1 building matrix</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Output</th>
+<th>Owning system</th>
+<th>Interface</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>O1</td>
+<td>Sounders and strobes in the fire zone</td>
+<td>FAS</td>
+<td>NAC</td>
+</tr>
+<tr>
+<td>O2</td>
+<td>Voice evacuation, phased: alert message to the floor, evacuation message to the fire zone</td>
+<td>FAS voice system</td>
+<td>panel network</td>
+</tr>
+<tr>
+<td>O3</td>
+<td>Signal to the fire control room and the monitoring station (and Damkar where connected)</td>
+<td>FAS</td>
+<td>panel network, dialler</td>
+</tr>
+<tr>
+<td>O4</td>
+<td>Stop air handling units (AHU), CRAH units or fan walls serving the zone</td>
+<td>BMS and unit controllers</td>
+<td>hardwired relay from FAS output module</td>
+</tr>
+<tr>
+<td>O5</td>
+<td>Close fire and smoke dampers serving the zone</td>
+<td>FAS or damper control panel</td>
+<td>hardwired</td>
+</tr>
+<tr>
+<td>O6</td>
+<td>Release access-controlled doors on the escape route of the zone</td>
+<td>access control</td>
+<td>hardwired relay, fail-safe locks</td>
+</tr>
+<tr>
+<td>O7</td>
+<td>Clean agent pre-discharge alarm and countdown (30 s)</td>
+<td>agent release panel</td>
+<td>panel logic</td>
+</tr>
+<tr>
+<td>O8</td>
+<td>Clean agent release</td>
+<td>agent release panel</td>
+<td>actuator circuit</td>
+</tr>
+<tr>
+<td>O9</td>
+<td>Pre-action solenoid release</td>
+<td>FAS or release panel</td>
+<td>release circuit</td>
+</tr>
+<tr>
+<td>O10</td>
+<td>Lifts return to the designated floor and stop</td>
+<td>lift controller</td>
+<td>hardwired</td>
+</tr>
+<tr>
+<td>O11</td>
+<td>Stair pressurisation fans start</td>
+<td>FAS or smoke control panel</td>
+<td>hardwired</td>
+</tr>
+<tr>
+<td>O12</td>
+<td>Open lithium-ion battery rack contactors in the room</td>
+<td>battery BMS</td>
+<td>hardwired</td>
+</tr>
+<tr>
+<td>O13</td>
+<td>Stop fuel transfer pumps to the affected generator room</td>
+<td>fuel control panel</td>
+<td>hardwired</td>
+</tr>
+<tr>
+<td>O14</td>
+<td>Alarm or supervisory event to BMS and EPMS (display only)</td>
+<td>gateway</td>
+<td>high-level read-only</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-9-4"><span class="n">20.9.4</span>The 34-row matrix for building B2 (example)</h3>
+<p>Figure <a class="figref" href="#F20-7">F20-7</a> groups the 34 rows by event class and shows which effects each class may produce. The rows are 2 pre-alarm, 16 single-device alarm, 4 coincidence, 2 release, 8 supervisory and 2 trouble rows. Row 31 (fire pump running) is counted as supervisory; the AHJ may require it as an alarm.</p>
+<figure class="sheet" id="F20-7"><a href="../data/cx-handbook/figures/F20-7.svg" title="Open drawing F20-7 at full size"><img src="../data/cx-handbook/figures/F20-7.svg" alt="F20-7: Event classes of the B2 matrix and the effects each class may produce" width="1000" height="869" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F20-7</span> — <b>Event classes of the B2 matrix and the effects each class may produce</b>. The class of each row limits its effects: only coincidence and release rows act on suppression, and the owner signs the 4 coincidence rows by name.</figcaption></figure>
+
+<p>Rows are causes; the outputs column lists the effects by code; the logic column gives delays and conditions. Figure <a class="figref" href="#F20-2">F20-2</a> shows the same matrix as a grid. The project's issued matrix governs.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>No.</th>
+<th>Cause (input, zone)</th>
+<th>Event class</th>
+<th>Effects</th>
+<th>Logic and timing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>VESDA Alert, data hall B2-DH3</td>
+<td>pre-alarm</td>
+<td>O14, local display at the fire control room</td>
+<td>no evacuation; operator investigates within 5 min</td>
+</tr>
+<tr>
+<td>2</td>
+<td>VESDA Action, B2-DH3</td>
+<td>pre-alarm</td>
+<td>O3, O14</td>
+<td>operator investigates; no plant stop</td>
+</tr>
+<tr>
+<td>3</td>
+<td>VESDA Fire 1, B2-DH3</td>
+<td>alarm</td>
+<td>O1, O2 (alert), O3, O14</td>
+<td>first alarm stage; detection zone 1 of the coincidence</td>
+</tr>
+<tr>
+<td>4</td>
+<td>VESDA Fire 2, B2-DH3</td>
+<td>alarm</td>
+<td>O1, O2 (evacuate DH3), O3, O6, O9, O10, O11, O14</td>
+<td>O9 releases the solenoid; water enters only on air loss (double interlock)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Point smoke detector, single, B2-DH3</td>
+<td>alarm</td>
+<td>O1, O2 (alert), O3, O14</td>
+<td>one detector: alarm only</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Two point smoke detectors, B2-DH3 (coincidence)</td>
+<td>alarm</td>
+<td>O1, O2 (evacuate DH3), O3, O6, O9, O10, O11, O14</td>
+<td>same effects as row 4</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Manual call point, B2-DH3</td>
+<td>alarm</td>
+<td>O1, O2 (evacuate DH3), O3, O6, O10, O11, O14</td>
+<td>no suppression release from a call point</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Pre-action waterflow switch, B2-DH3-PA-01</td>
+<td>alarm</td>
+<td>O1, O2 (evacuate DH3), O3, O4 (DH3 zone units, after owner decision), O14</td>
+<td>30 s retard on the waterflow switch (example)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Pre-action low air pressure, B2-DH3-PA-01</td>
+<td>supervisory</td>
+<td>O3, O14</td>
+<td>no evacuation</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Pre-action main valve closed (tamper), B2-DH3-PA-01</td>
+<td>supervisory</td>
+<td>O3, O14</td>
+<td>no evacuation</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Point smoke detector, single, MV room B2-ER-03</td>
+<td>alarm</td>
+<td>O1, O3, O14</td>
+<td>first stage of the agent coincidence</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Two detectors in different zones, B2-ER-03</td>
+<td>alarm</td>
+<td>O1, O2 (evacuate ER-03), O3, O4, O5, O6, O7, O14</td>
+<td>O7 starts the 30 s countdown; O4 and O5 complete before the end of the countdown</td>
+</tr>
+<tr>
+<td>13</td>
+<td>End of countdown, B2-ER-03</td>
+<td>release</td>
+<td>O8, O14</td>
+<td>release only if the abort switch is not held and the lock-out is open</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Manual release station, B2-ER-03</td>
+<td>release</td>
+<td>O1, O2, O3, O4, O5, O6, O7 (10 s), O8, O14</td>
+<td>short countdown of 10 s (example)</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Abort switch held, B2-ER-03</td>
+<td>supervisory</td>
+<td>O14, countdown held</td>
+<td>release blocked while held; countdown restarts on release of the switch (example logic)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Agent discharge pressure switch, B2-ER-03</td>
+<td>alarm</td>
+<td>O1, O2, O3, O14, "agent discharged, do not enter" lamps</td>
+<td>confirms the discharge</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Lock-out valve closed or release disconnected, B2-ER-03</td>
+<td>supervisory</td>
+<td>O3, O14</td>
+<td>release blocked</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Off-gas detector, lithium-ion battery room B2-BR-03</td>
+<td>alarm</td>
+<td>O1, O3, O12, O14, room extract fan to high speed (BMS)</td>
+<td>early warning of cell venting</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Smoke detector, B2-BR-03</td>
+<td>alarm</td>
+<td>O1, O2 (evacuate BR-03), O3, O6, O12, O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Two detectors, B2-BR-03</td>
+<td>alarm</td>
+<td>O4, O5, O7, then O8</td>
+<td>clean agent room per rows 12 and 13</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Rate-of-rise heat detector, generator hall B2-GH</td>
+<td>alarm</td>
+<td>O1, O2 (evacuate GH), O3, O6, O13, O14</td>
+<td>generators keep running unless the operator stops them</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Flame detector, generator hall B2-GH</td>
+<td>alarm</td>
+<td>O1, O2, O3, O6, O13, O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>23</td>
+<td>Sprinkler waterflow, generator hall B2-GH</td>
+<td>alarm</td>
+<td>O1, O2, O3, O13, O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>24</td>
+<td>Heat detector, fuel pump room B2-FPR</td>
+<td>alarm</td>
+<td>O1, O2, O3, O13, O14</td>
+<td>stops transfer to all day tanks in the building</td>
+</tr>
+<tr>
+<td>25</td>
+<td>Smoke detector, MV and LV switchroom without gas, B2-ER-01</td>
+<td>alarm</td>
+<td>O1, O2, O3, O6, O14</td>
+<td>no electrical trip from detection</td>
+</tr>
+<tr>
+<td>26</td>
+<td>Duct smoke detector, office AHU B2-AHU-OF1</td>
+<td>alarm</td>
+<td>O1 (office zone), O3, O4 (AHU-OF1), O5 (office dampers), O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>27</td>
+<td>Smoke detector, office corridor</td>
+<td>alarm</td>
+<td>O1, O2 (evacuate floor), O3, O6, O10, O11, O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>28</td>
+<td>Manual call point, office or corridor</td>
+<td>alarm</td>
+<td>O1, O2, O3, O6, O10, O11, O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>29</td>
+<td>Stair pressurisation fan failure</td>
+<td>supervisory</td>
+<td>O3, O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>30</td>
+<td>Sprinkler main control valve closed (tamper), any zone</td>
+<td>supervisory</td>
+<td>O3, O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>31</td>
+<td>Fire pump running</td>
+<td>supervisory or alarm per AHJ</td>
+<td>O3, O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>32</td>
+<td>Fire pump controller trouble or phase reversal</td>
+<td>trouble</td>
+<td>O3, O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>33</td>
+<td>Fire water tank low level</td>
+<td>supervisory</td>
+<td>O3, O14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>34</td>
+<td>FACP mains failure, battery fault, earth fault or loop open circuit</td>
+<td>trouble</td>
+<td>O3, O14</td>
+<td>trouble buzzer at the panel</td>
+</tr>
+</tbody>
+</table></div>
+<p>Rows 4, 6, 12 and 20 are the rows with <mark>the largest operational consequence</mark>: they evacuate a room, release doors and either release a suppression system or prepare it. The owner's operations team signs these rows by name in the review record.</p>
+<h3 id="s20-9-5"><span class="n">20.9.5</span>Rules that the matrix follows on MSC-1</h3>
+<ol>
+<li><strong>No single device releases suppression.</strong> Gas and pre-action releases need <mark>two independent detections</mark> (coincidence) or a manual release.</li>
+<li><strong>No automatic electrical trip of IT power.</strong> The matrix <mark>does not trip the UPS, the power distribution units (PDUs) or the rack power</mark> on detection. Where an emergency power off (EPO) is required for an IT room, it is a manual station at the exit, with a cover and a label. NFPA 70 Article 645 is optional. A design may use Article 645 to gain its wiring allowances under raised floors. Such a design must provide the 645.10 disconnecting means for the IT equipment and the room HVAC, with remote disconnect controls at the principal exit doors. Article 645.10(B) permits a different arrangement for a critical operations data system under the conditions listed there. A design that follows NFPA 70 Chapters 1 to 4 only, without Article 645, needs no EPO under NFPA 70. The EoR records the chosen route in the BOD and the AHJ accepts it.</li>
+<li><strong>Cooling stays on in data halls for pre-alarms.</strong> VESDA Alert and Action do not stop cooling. Whether Fire 2 stops CRAH units in a pre-action hall is an owner decision with the EoR and the insurer, recorded in the BOD.</li>
+<li><strong>Gas rooms stop their HVAC before release.</strong> HVAC that would dilute the agent stops and its dampers close before the end of the countdown.</li>
+<li><strong>Doors fail safe.</strong> Access-controlled doors on escape routes release on fire alarm and on loss of power to the lock.</li>
+<li><strong>Generators keep running.</strong> A fire alarm elsewhere in the building <mark>does not stop the generators</mark>. A fire in a generator hall stops the fuel transfer to that hall (rows 21 to 24). The operator decides whether to stop the engines.</li>
+<li><strong>BMS and EPMS display only.</strong> The high-level interface is read-only. <mark>No life-safety action depends on it</mark>.</li>
+</ol>
+<h3 id="s20-9-6"><span class="n">20.9.6</span>Testing the matrix row by row</h3>
+<p><strong>Purpose:</strong> Prove that every cause produces every marked effect, and no unmarked effect, within the stated time.</p>
+<p><strong>Owner:</strong> Commissioning manager, with the fire alarm contractor at the panel and one representative of each interfaced system at the controlled equipment.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Prepare the row sheets.</strong> For each row of the matrix, one test sheet lists the cause, every effect, the expected time, the position where each effect is observed and the observer's name. Time limit: issued 5 working days before the test.</li>
+<li><strong>Brief the observers.</strong> Each observer stands at an effect (for example the CRAH controller, the damper, the door, the lift, the battery BMS screen) with a radio and a synchronised watch.</li>
+<li><strong>Make safe.</strong> The suppression contractor removes the actuators (20.6.6). The sprinkler contractor closes the pre-action main valve or puts a test load on the release circuit. Lifts are empty, and the operations team agrees the effect on live systems.</li>
+<li><strong>Operate the cause.</strong> The fire alarm technician operates the input (real device where possible, simulation only where a real test is unsafe).</li>
+<li><strong>Observe each effect.</strong> Each observer reports "effect seen" with the time. The panel log gives the time of the cause.</li>
+<li><strong>Check the unmarked effects.</strong> Observers at outputs that are not marked for this row report that nothing happened (for example the CRAH units in an adjoining hall keep running).</li>
+<li><strong>Reset.</strong> Reset the panel and every effect; record that each system returned to normal (for example CRAH restart time after the stop is released).</li>
+<li><strong>Record.</strong> The row sheet is signed by the commissioning manager and the fire alarm contractor. A failed effect is raised in the issue log with the row number.</li>
+</ol>
+<p><strong>Acceptance:</strong> All marked effects occur within the time in the matrix. For example, dampers close within 30 s of the coincidence alarm, doors release within 2 s, and lifts reach the designated floor within the lift controller's travel time. <mark>No unmarked effect</mark> occurs, and all systems return to normal after reset.</p>
+<p><strong>Worked example:</strong> Test of row 12 in room B2-ER-03. The second detector was operated at 14:20:00 (panel log). Observers reported: pre-discharge alarm 14:20:01, AHU-ER-03 stopped 14:20:03, damper FD-03-02 closed 14:20:19, damper FD-03-05 closed 14:20:22, doors released 14:20:01, countdown start 14:20:01 and release output (test lamp) at 14:20:31. The countdown was 30 s and the last damper closed <mark>9 s before the release</mark>. The BMS showed the agent alarm at 14:20:04. The CRAH units in the adjoining room B2-ER-04 kept running, as the matrix requires.</p>
+<h3 id="s20-9-7"><span class="n">20.9.7</span>C&amp;E row test record</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Matrix and revision</td>
+<td>text</td>
+<td>B2-FIRE-CE rev 6</td>
+</tr>
+<tr>
+<td>Row number and cause</td>
+<td>text</td>
+<td>row 12, two detectors in different zones, B2-ER-03</td>
+</tr>
+<tr>
+<td>Panel configuration version</td>
+<td>text</td>
+<td>B2-FACP-03_v14</td>
+</tr>
+<tr>
+<td>Cause time (panel log)</td>
+<td>time</td>
+<td>14:20:00</td>
+</tr>
+<tr>
+<td>Effect, observer, time seen</td>
+<td>table</td>
+<td>O4 AHU-ER-03, BMS technician, 14:20:03</td>
+</tr>
+<tr>
+<td>Unmarked effects checked</td>
+<td>list</td>
+<td>ER-04 CRAH running; DH3 doors locked; lifts normal</td>
+</tr>
+<tr>
+<td>Return to normal times</td>
+<td>list</td>
+<td>AHU-ER-03 restart 14:31:10 after reset</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass or fail</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Issue log reference if failed</td>
+<td>text</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>names</td>
+<td>commissioning manager, fire alarm contractor, CxA</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s20-10"><span class="n">20.10</span>Interfaces to other systems</h2>
+
+<figure class="sheet" id="F20-4"><a href="../data/cx-handbook/figures/F20-4.svg" title="Open drawing F20-4 at full size"><img src="../data/cx-handbook/figures/F20-4.svg" alt="F20-4: Clean agent release in MV room B2-ER-03: interface timing from first detector to start of hold" width="1400" height="792" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F20-4</span> — <b>Clean agent release in MV room B2-ER-03: interface timing from first detector to start of hold</b>. Times come from C&amp;E rows 11, 12, 13 and 16 and the row test of 20.9.6; the hold continues beyond the right edge of the chart.</figcaption></figure>
+<h3 id="s20-10-1"><span class="n">20.10.1</span>Interface list</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>Direction</th>
+<th>Signal type</th>
+<th>Test</th>
+<th>Common fault</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FAS to BMS (high level)</td>
+<td>FAS → BMS</td>
+<td>BACnet or Modbus gateway, read-only</td>
+<td>every alarm type and zone appears with correct text</td>
+<td>gateway maps only some point types; alarm text truncated</td>
+</tr>
+<tr>
+<td>FAS to CRAH, AHU and fan walls</td>
+<td>FAS → unit controllers</td>
+<td>volt-free contact, fail-safe or fail-run as designed</td>
+<td>unit stops on the C&amp;E row; restarts on reset</td>
+<td>contact wired to the BMS controller, so a BMS fault stops the action</td>
+</tr>
+<tr>
+<td>FAS to dampers</td>
+<td>FAS → damper actuators</td>
+<td>hardwired, power removal closes</td>
+<td>each damper closes within its time; end switch reports</td>
+<td>actuator spring-return direction wrong</td>
+</tr>
+<tr>
+<td>FAS to access control</td>
+<td>FAS → door controllers and lock power</td>
+<td>hardwired relay, fail-safe</td>
+<td>each door on the escape route releases</td>
+<td>release done in software only, which fails on a network fault</td>
+</tr>
+<tr>
+<td>FAS to lifts</td>
+<td>FAS → lift controller</td>
+<td>hardwired</td>
+<td>lift returns to the designated floor (alternate floor when the main floor detector is in alarm)</td>
+<td>alternate floor input not wired</td>
+</tr>
+<tr>
+<td>FAS to stair pressurisation</td>
+<td>FAS → smoke control panel</td>
+<td>hardwired</td>
+<td>fans start; pressure difference across stair doors in range</td>
+<td>fan direction wrong</td>
+</tr>
+<tr>
+<td>FAS to battery BMS</td>
+<td>FAS → battery system</td>
+<td>hardwired</td>
+<td>contactors open on the C&amp;E row</td>
+<td>lithium-ion vendor requires a specific signal level</td>
+</tr>
+<tr>
+<td>FAS to fuel control panel</td>
+<td>FAS → fuel pumps</td>
+<td>hardwired</td>
+<td>transfer pumps stop</td>
+<td>pumps stop for the whole campus instead of one building</td>
+</tr>
+<tr>
+<td>FAS to EPMS</td>
+<td>FAS → EPMS</td>
+<td>read-only via BMS or direct</td>
+<td>fire events time-stamped beside electrical events</td>
+<td>time not synchronised</td>
+</tr>
+<tr>
+<td>Suppression panel to FAS</td>
+<td>release panel ↔ FAS</td>
+<td>panel network or monitored contacts</td>
+<td>release, abort, lock-out and discharge states at the FAS</td>
+<td>discharge pressure switch not monitored</td>
+</tr>
+<tr>
+<td>Fire pump controller to FAS</td>
+<td>pump → FAS</td>
+<td>monitored contacts</td>
+<td>running, power failure, phase reversal, trouble</td>
+<td>phase reversal signal not wired</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-10-2"><span class="n">20.10.2</span>Interface timing diagram</h3>
+<p>Figure <a class="figref" href="#F20-4">F20-4</a> shows the timing of a clean agent release in room B2-ER-03, from the first detector to the end of the hold time. It also shows the actions of the interfaced systems. The timing values come from the C&amp;E matrix rows 11, 12, 13 and 16.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Time (s) from first detector</th>
+<th>Event</th>
+<th>System</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>first detector alarm; sounders in the room; BMS display</td>
+<td>FAS</td>
+</tr>
+<tr>
+<td>40</td>
+<td>second detector (different zone)</td>
+<td>FAS</td>
+</tr>
+<tr>
+<td>41</td>
+<td>pre-discharge alarm; countdown starts; doors released</td>
+<td>release panel, access control</td>
+</tr>
+<tr>
+<td>43</td>
+<td>AHU-ER-03 stops</td>
+<td>BMS and unit controller</td>
+</tr>
+<tr>
+<td>62</td>
+<td>last damper closed</td>
+<td>dampers</td>
+</tr>
+<tr>
+<td>71</td>
+<td>release output; agent discharge starts</td>
+<td>release panel</td>
+</tr>
+<tr>
+<td>81</td>
+<td>discharge complete (≤ 10 s for a halocarbon)</td>
+<td>suppression</td>
+</tr>
+<tr>
+<td>81 to 681</td>
+<td>hold time of 10 min at the protected height</td>
+<td>room integrity</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-10-3"><span class="n">20.10.3</span>Interface test responsibilities</h3>
+<ol>
+<li><strong>Fire alarm contractor.</strong> Provides the output module and tests the relay operation at the module terminals.</li>
+<li><strong>Interfaced contractor.</strong> Wires from the module to the equipment and proves the equipment response.</li>
+<li><strong>CxA.</strong> Witnesses the end-to-end response, from the cause to the equipment.</li>
+<li><strong>Commissioning manager.</strong> Schedules the row tests so that all observers are present, and tracks the open interface items in the issue log.</li>
+</ol>
+<h2 id="s20-11"><span class="n">20.11</span>Integrated fire tests (Level 4 and Level 5)</h2>
+<h3 id="s20-11-1"><span class="n">20.11.1</span>Level 4 system tests</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Content</th>
+<th>Exit record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FAS acceptance test</td>
+<td>100 % devices, NACs, power supplies, network, graphics</td>
+<td>NFPA 72 record of completion and device test sheets</td>
+</tr>
+<tr>
+<td>ASD commissioning</td>
+<td>20.4.3 for every detector</td>
+<td>ASD test sheets</td>
+</tr>
+<tr>
+<td>Clean agent acceptance</td>
+<td>room integrity, pipe tests, cylinder checks, release sequence with actuators removed</td>
+<td>NFPA 2001 acceptance documents</td>
+</tr>
+<tr>
+<td>Pre-action acceptance</td>
+<td>pressure tests, trip tests, water delivery times</td>
+<td>NFPA 13 contractor's material and test certificate</td>
+</tr>
+<tr>
+<td>Fire pump acceptance</td>
+<td>NFPA 20 test</td>
+<td>fire pump acceptance test record</td>
+</tr>
+<tr>
+<td>Voice evacuation</td>
+<td>audibility, STI, zoning, messages</td>
+<td>audibility and STI survey</td>
+</tr>
+<tr>
+<td>C&amp;E row tests</td>
+<td>20.9.6 for every row</td>
+<td>signed row sheets</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s20-11-2"><span class="n">20.11.2</span>Level 5 scenarios</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Test</th>
+<th>Acceptance (MSC-1 example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fire in a data hall during full IT load</td>
+<td>VESDA Fire 2 simulated in DH3 with load banks running</td>
+<td>evacuation and pre-action release prepared; no IT power trip; cooling per the BOD decision; operations team follows the emergency operating procedure (EOP)</td>
+</tr>
+<tr>
+<td>Gas release preparation in an MV room with generators running</td>
+<td>coincidence in ER-03 during a utility failure test</td>
+<td>HVAC and dampers act before the end of the countdown; the generator plant is unaffected</td>
+</tr>
+<tr>
+<td>Fire alarm during a utility failure</td>
+<td>FAS mains failure (on batteries) while the building runs on generators</td>
+<td>panels stay operational; trouble signal received; no false alarm</td>
+</tr>
+<tr>
+<td>Fire in a generator hall</td>
+<td>heat detector in GH</td>
+<td>fuel transfer to that hall stops; other halls keep fuel transfer; engines run until the operator acts</td>
+</tr>
+<tr>
+<td>Lithium-ion off-gas</td>
+<td>simulated off-gas alarm in BR-03</td>
+<td>contactors open; UPS reports battery lost; extract fan to high speed; no IT power loss while the utility supplies the UPS</td>
+</tr>
+<tr>
+<td>Fire alarm network fault</td>
+<td>open the panel network ring</td>
+<td>panels operate in degraded mode; C&amp;E actions local to each panel still work</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Scenario "fire in a data hall during full IT load" in B2-DH3. The commissioning manager writes the expected sequence from rows 3 and 4. At Fire 1, the sounders operate and the alert message plays. At Fire 2, the evacuation message plays, doors release, the pre-action solenoid releases and the lifts home. The scenario runs with the 12 MW hall load on load banks. The measured times are: Fire 2 at 0 s, voice evacuation at 3 s, doors released at 1 s, pre-action solenoid open at 2 s, lifts at the ground floor at 48 s. The UPS output stays at <mark>1,562 kW per block</mark> throughout, which proves that the matrix does not trip IT power. The operations team uses EOP-FIRE-DH-01 and records the time to send a responder to the hall (2 minutes 40 s).</p>
+<h2 id="s20-12"><span class="n">20.12</span>Indonesian acceptance: Damkar functional test and the SLF</h2>
+<h3 id="s20-12-1"><span class="n">20.12.1</span>Regulatory framework</h3>
+<ol>
+<li><strong>Technical requirements.</strong> Permen PU No. 26/PRT/M/2008 sets the technical requirements for fire protection systems in buildings and their surroundings (detection and alarm, sprinklers, hydrants, fire extinguishers, passive protection, means of escape and fire management).</li>
+<li><strong>SNI codes.</strong> SNI 03-3985-2000 (detection and alarm), SNI 03-3989-2000 (sprinklers), SNI 03-1745-2000 (standpipes and hose systems) and others referenced by the Permen.</li>
+<li><strong>Building function certificate.</strong> The SLF (Sertifikat Laik Fungsi) confirms that the building is fit for use; fire protection and evacuation are part of the safety assessment. Government Regulation PP 16/2021 requires the owner to obtain the SLF before the building is used, and the application is made through the Sistem Informasi Manajemen Bangunan Gedung (SIMBG). PP 28/2025 on risk-based business licensing (in force from 5 June 2025) treats the building approvals as a basic requirement for the business licence. PP 16/2021 Article 274(2) requires the owner to obtain the SLF before the building is used. Article 297(2)(b) requires the SLF of a building other than a house to be renewed every 5 years.</li>
+<li><strong>Local regulation.</strong> In Jakarta, the provincial fire department (Dinas Penanggulangan Kebakaran dan Penyelamatan, Gulkarmat) applies the provincial fire regulation. This is Perda DKI Jakarta No. 8 of 2008 on fire prevention and response (confirm that Perda DKI Jakarta 8/2008 is still current on jdih.jakarta.go.id). Other regencies (for example Bekasi or Karawang, where many campuses sit) have their own Damkar procedures.</li>
+<li><strong>Inspection guide.</strong> Pd-T-11-2005-C is the national guide for building fire safety inspection.</li>
+</ol>
+<h3 id="s20-12-2"><span class="n">20.12.2</span>Typical Damkar acceptance sequence</h3>
+<p>The steps below are the usual practice on projects. The names of the forms and the order vary by city and regency, so confirm them with the local Dinas at the start of the project.</p>
+<ol>
+<li><strong>Design consultation.</strong> The fire protection design is presented to the Dinas, which reviews it against Permen PU 26/2008 and the local regulation. Time: 10 to 20 working days.</li>
+<li><strong>Installation inspection.</strong> Dinas inspectors visit during construction to check the installation against the reviewed design.</li>
+<li><strong>Functional test (uji fungsi).</strong> The Dinas witnesses the functional test of the fire alarm, sprinklers, hydrants, fire pumps, smoke control and the lifts in fire mode. The fire pump and hydrant flow test and the alarm test are always included.</li>
+<li><strong>Recommendation.</strong> The Dinas issues its recommendation or certificate for fire safety, which is an input to the SLF.</li>
+<li><strong>Periodic inspection.</strong> After occupation, the Dinas inspects periodically and the owner keeps the maintenance records.</li>
+</ol>
+<h3 id="s20-12-3"><span class="n">20.12.3</span>Preparing for the Damkar witness test</h3>
+<ol>
+<li><strong>Bilingual documents.</strong> Test procedures and results prepared in Bahasa Indonesia (or bilingual), with the SNI and Permen references next to the NFPA references.</li>
+<li><strong>Pre-test.</strong> Every test that the Dinas will witness is run and passed beforehand, with the records ready.</li>
+<li><strong>Hydrant test.</strong> The hydrant contractor measures outlet pressure and flow with a pitot gauge at the hydraulically most remote outlet and compares them with the reviewed design. The water supply to the yard hydrants is at least 38 L/s at 3.5 bar for at least 30 minutes (Permen PU 26/PRT/M/2008 annex 2.3.5.4; Pergub DKI Jakarta 92/2014 Article 72). A hydraulically designed standpipe gives at least 6.9 bar residual at the most remote 65 mm hose outlet. It gives 4.5 bar at the most remote 40 mm outlet (Pergub DKI Jakarta 92/2014 Article 79). The standpipe design follows SNI 03-1745-2000 (Permen PU 26/PRT/M/2008 annex 5.2.1).</li>
+<li><strong>Fire pump test.</strong> NFPA 20 test points (churn, 100 %, 150 %) recorded and the controller start tested.</li>
+<li><strong>Alarm and evacuation.</strong> A full alarm with the voice evacuation messages in Bahasa Indonesia and English.</li>
+<li><strong>Lifts.</strong> Fire brigade lift operation and lift homing demonstrated.</li>
+<li><strong>Fire management.</strong> The building's fire safety management team, the Manajemen Keselamatan Kebakaran Gedung (MKKG), and its organisation chart. The MKKG requirement is set in Permen PU 20/PRT/M/2009 (Pedoman Teknis Manajemen Proteksi Kebakaran di Perkotaan), which builds on Permen PU 26/2008. Annex chapter IV, part 1, item 1.1(3) requires fire protection management in every public building with at least 500 occupants, at least 5,000 m² of floor area or more than 8 storeys. Item 1.1(5) applies the same 500-occupant and 5,000 m² limits to industrial buildings.</li>
+</ol>
+<p><strong>Worked example:</strong> Hydrant flow at the most remote outlet of building B2. The hydrant contractor connects a 65 mm hose with a smooth-bore nozzle of 28.6 mm and reads a pitot pressure of 3.5 bar. The flow is Q = 0.0666 × d² × √P, with d in mm, P in kPa and Q in L/min. This is the metric form of the pitot flow formula in NFPA 291; the nozzle coefficient comes from the nozzle manufacturer's data. Q = 0.0666 × 28.6² × √350 = 0.0666 × 817.96 × 18.71 = <mark>1,019 L/min (17.0 L/s)</mark>. The commissioning manager compares this value with the design flow per outlet in the reviewed hydrant calculation before the Dinas witness test.</p>
+<h2 id="s20-13"><span class="n">20.13</span>Records that close the fire scope</h2>
+<p>The fire scope closes when the 11 records in the next table are complete and signed. Figure <a class="figref" href="#F20-8">F20-8</a> shows the order in which they close, from the contractor test records to the SLF application, and who signs each record.</p>
+<figure class="sheet" id="F20-8"><a href="../data/cx-handbook/figures/F20-8.svg" title="Open drawing F20-8 at full size"><img src="../data/cx-handbook/figures/F20-8.svg" alt="F20-8: Records that close the fire scope: who signs each record" width="1000" height="726" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F20-8</span> — <b>Records that close the fire scope: who signs each record</b>. Signatories from the 20.13 table. The flow above the matrix is the order in which the records close: contractor records, CxA witness, pre-test, Damkar functional test, Dinas recommendation, SLF application.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Content</th>
+<th>Prepared by</th>
+<th>Signed by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFPA 72 record of completion</td>
+<td>system description, devices, power supplies, test results, certification</td>
+<td>fire alarm contractor</td>
+<td>contractor, CxA, owner</td>
+</tr>
+<tr>
+<td>Device test sheets</td>
+<td>every device with address, test method, result</td>
+<td>fire alarm contractor</td>
+<td>contractor, CxA</td>
+</tr>
+<tr>
+<td>Panel configuration archive</td>
+<td>configuration file, version code, C&amp;E revision</td>
+<td>fire alarm contractor</td>
+<td>contractor, CxA</td>
+</tr>
+<tr>
+<td>ASD test sheets</td>
+<td>per detector and pipe</td>
+<td>fire alarm or ASD contractor</td>
+<td>contractor, CxA</td>
+</tr>
+<tr>
+<td>Clean agent acceptance file</td>
+<td>calculations, door fan reports, pipe tests, cylinder records, release tests</td>
+<td>suppression contractor</td>
+<td>contractor, CxA, insurer</td>
+</tr>
+<tr>
+<td>Sprinkler test certificates</td>
+<td>hydrostatic and air tests, trip tests, water delivery times</td>
+<td>sprinkler contractor</td>
+<td>contractor, CxA</td>
+</tr>
+<tr>
+<td>Fire pump acceptance record</td>
+<td>NFPA 20 test points and curve</td>
+<td>fire pump contractor</td>
+<td>contractor, CxA, Damkar</td>
+</tr>
+<tr>
+<td>Audibility and STI survey</td>
+<td>measured levels and STI per area</td>
+<td>voice evacuation contractor</td>
+<td>contractor, CxA</td>
+</tr>
+<tr>
+<td>C&amp;E row test sheets</td>
+<td>one per row</td>
+<td>commissioning manager</td>
+<td>commissioning manager, fire alarm contractor, CxA</td>
+</tr>
+<tr>
+<td>Damkar recommendation</td>
+<td>functional test witness result</td>
+<td>Dinas</td>
+<td>Dinas</td>
+</tr>
+<tr>
+<td>Disablement log</td>
+<td>every isolation during the tests and its restoration</td>
+<td>fire alarm contractor</td>
+<td>contractor, fire control room</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s20-14"><span class="n">20.14</span>Common errors and how to find them before the witness test</h2>
+<ol>
+<li><strong>Matrix revision and panel configuration out of step.</strong> The panel runs an older C&amp;E revision. Check the configuration version against the matrix revision on the day of every test.</li>
+<li><strong>Output module wired to the wrong unit.</strong> The CRAH that stops is in the adjoining hall. Every row test has observers at the unmarked outputs and the marked ones.</li>
+<li><strong>Life-safety action through the BMS.</strong> The fire signal goes to the BMS, and the BMS stops the AHU. A BMS controller fault then blocks a life-safety action. Life-safety actions are <mark>hardwired from the FAS output module</mark>.</li>
+<li><strong>Detector dust covers left on.</strong> Detectors with covers do not alarm during the test, or the covers are removed after the test and the sensitivity drifts. Record cover removal and print the sensitivity report afterwards.</li>
+<li><strong>ASD end cap drilled wrong.</strong> Transport time is long on one pipe. Compare each pipe with the ASPIRE prediction, and inspect the end cap hole.</li>
+<li><strong>Door fan test before the room is finished.</strong> Ceiling tiles, cable penetrations or door seals are still open, and the test fails, or it passes and later work opens new leaks. Do the test after all trades leave and record a seal-control procedure for later penetrations.</li>
+<li><strong>Actuators not removed for the release test.</strong> A test discharges the agent. The CxA signs the "actuators removed" line before any release test.</li>
+<li><strong>Waterflow retard set too long.</strong> A retard of 90 s on top of the pipe fill time delays the alarm. Measure the time from flow to alarm.</li>
+<li><strong>Lithium-ion off-gas detection not in the matrix.</strong> The detector is installed by the battery vendor and alarms only on its own screen. Add it as an input row with the contactor trip.</li>
+<li><strong>Bahasa Indonesia messages not recorded.</strong> The voice messages exist only in English. Record and test both languages before the Damkar test.</li>
+<li><strong>Disablements not restored.</strong> A release or a sounder circuit stays disabled after a test day. Close the disablement log at the end of each day and check the panel's disabled list.</li>
+</ol>
+<h2 id="s20-15"><span class="n">20.15</span>Key performance indicators for the fire scope</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target (example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Device test coverage</td>
+<td>devices tested and passed / devices installed</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>C&amp;E row pass rate at first test</td>
+<td>rows passed first time / rows tested</td>
+<td>≥ 90 %</td>
+</tr>
+<tr>
+<td>ASD transport time margin</td>
+<td>smallest margin to 60 s across all pipes</td>
+<td>≥ 5 s</td>
+</tr>
+<tr>
+<td>Room integrity hold time</td>
+<td>lowest predicted hold time across gas rooms</td>
+<td>≥ 10 min</td>
+</tr>
+<tr>
+<td>Pre-action water delivery time</td>
+<td>worst measured against the NFPA 13 value</td>
+<td>inside the value for every system</td>
+</tr>
+<tr>
+<td>Open disablements at end of day</td>
+<td>number</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Damkar witness first-time pass</td>
+<td>items passed / items witnessed</td>
+<td>100 %</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s20-16"><span class="n">20.16</span>Checklist for site use</h2>
+<ol>
+<li><strong>Fire strategy and matrix.</strong> The fire strategy, the C&amp;E matrix revision and the panel configuration version are recorded together.</li>
+<li><strong>Owner sign-off.</strong> The owner's operations team has signed the rows that act on IT cooling and on suppression.</li>
+<li><strong>Devices.</strong> Every initiating device and notification appliance is tested and recorded; the sensitivity report is printed after dust covers are removed.</li>
+<li><strong>Circuits.</strong> Class A or Class X loops proven with an open circuit and a short between isolators; earth fault detection proven.</li>
+<li><strong>Batteries.</strong> Panel standby and alarm currents measured; battery calculation updated with measured values and the safety margin.</li>
+<li><strong>ASD.</strong> Flow normalised, flow faults proven, transport time at the end hole of every pipe within 60 s (VEWFD), alarm levels tested.</li>
+<li><strong>Audibility and STI.</strong> Measured with the hall at full fan speed; at least 15 dB above ambient; STI meets the project value.</li>
+<li><strong>Clean agent.</strong> Agent quantity checked, cylinders weighed, pipes tested, room integrity hold time at least 10 minutes, release sequence with actuators removed, abort and lock-out proven.</li>
+<li><strong>Pre-action.</strong> Hydrostatic and air tests passed; double-interlock logic proven in both single-event cases; water delivery time inside the NFPA 13 value.</li>
+<li><strong>Fire pumps.</strong> NFPA 20 test points recorded; automatic start and alternate power proven.</li>
+<li><strong>Matrix rows.</strong> Every row tested with observers at marked and unmarked outputs; every failed row in the issue log.</li>
+<li><strong>Interfaces.</strong> Hardwired actions proven to CRAH, AHU, dampers, doors, lifts, stair pressurisation, battery BMS and fuel pumps; the BMS and EPMS display every event.</li>
+<li><strong>Integrated tests.</strong> The L5 fire scenarios run with the IT load on load banks; no IT power trip from any fire row.</li>
+<li><strong>Damkar.</strong> Bilingual documents, pre-tests passed, hydrant and fire pump results ready, messages in Bahasa Indonesia.</li>
+<li><strong>Disablements.</strong> Disablement log closed and the panel's disabled list empty at the end of each test day.</li>
+</ol>
+<h2 id="s20-17"><span class="n">20.17</span>Sources</h2>
+<ol>
+<li>NFPA 72, National Fire Alarm and Signaling Code. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-72-standard-development/72" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-72-standard-development/72</a></li>
+<li>NFPA 75, Standard for the Fire Protection of Information Technology Equipment. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-75-standard-development/75" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-75-standard-development/75</a></li>
+<li>NFPA 76, Standard for the Fire Protection of Telecommunications Facilities. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-76-standard-development/76" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-76-standard-development/76</a></li>
+<li>NFPA 2001, Standard on Clean Agent Fire Extinguishing Systems. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-2001-standard-development/2001" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-2001-standard-development/2001</a></li>
+<li>NFPA 13, Standard for the Installation of Sprinkler Systems. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-13-standard-development/13" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-13-standard-development/13</a></li>
+<li>NFPA 20, Standard for the Installation of Stationary Pumps for Fire Protection. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-20-standard-development/20" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-20-standard-development/20</a></li>
+<li>NFPA 25, Standard for the Inspection, Testing, and Maintenance of Water-Based Fire Protection Systems. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-25-standard-development/25" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-25-standard-development/25</a></li>
+<li>NFPA 855, Standard for the Installation of Stationary Energy Storage Systems. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-855-standard-development/855" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-855-standard-development/855</a></li>
+<li>FM Global, Property Loss Prevention Data Sheet 5-32, Data Centers and Related Facilities. <a href="https://www.fmglobal.com/research-and-resources/fm-global-data-sheets" rel="noopener">https://www.fmglobal.com/research-and-resources/fm-global-data-sheets</a></li>
+<li>Hetrick et al., hold-time model comparison for NFPA 2001 Annex C, Fire Safety Journal (WPI Combustion Lab copy). <a href="https://combustionlab.wpi.edu/Publications/Hetrick_FSJ.pdf" rel="noopener">https://combustionlab.wpi.edu/Publications/Hetrick_FSJ.pdf</a></li>
+<li>Fire Protection Australia, Testing Enclosures: Overview of a Door Fan Test. <a href="https://fire-protection.com.au/wp-content/uploads/2022/02/Testing-Enclosures-Overview-of-a-Door-Tan-Test.pdf" rel="noopener">https://fire-protection.com.au/wp-content/uploads/2022/02/Testing-Enclosures-Overview-of-a-Door-Tan-Test.pdf</a></li>
+<li>Xtralis, VESDA frequently asked questions on NFPA 76 and aspirating detection. <a href="https://www.xtralis.com/file/12026" rel="noopener">https://www.xtralis.com/file/12026</a></li>
+<li>Xtralis, UL 268 7th edition and aspirating smoke detection transport time. <a href="https://xtralis.com/file/12041" rel="noopener">https://xtralis.com/file/12041</a></li>
+<li>Syscom, Cumplimiento de NFPA 76 en centros de datos y telecomunicaciones. <a href="https://syscom.mx/blog/proteccion-critica-que-tan-cerca-estas-de-cumplir-con-la-nfpa-76-en-tus-sites-y-centros-de-datos" rel="noopener">https://syscom.mx/blog/proteccion-critica-que-tan-cerca-estas-de-cumplir-con-la-nfpa-76-en-tus-sites-y-centros-de-datos</a></li>
+<li>Security Sales and Integration, When and How to Test Smoke Detector Sensitivity. <a href="https://www.securitysales.com/news/when-how-test-smoke-detector-sensitivity/135776/" rel="noopener">https://www.securitysales.com/news/when-how-test-smoke-detector-sensitivity/135776/</a></li>
+<li>Peraturan Menteri Pekerjaan Umum No. 26/PRT/M/2008, Persyaratan Teknis Sistem Proteksi Kebakaran pada Bangunan Gedung dan Lingkungan. BPK JDIH. <a href="https://peraturan.bpk.go.id/Details/104475/permen-pupr-no-26-prtm2008" rel="noopener">https://peraturan.bpk.go.id/Details/104475/permen-pupr-no-26-prtm2008</a></li>
+<li>SNI 03-3985-2000, Tata cara perencanaan, pemasangan dan pengujian sistem deteksi dan alarm kebakaran. Badan Standardisasi Nasional. <a href="https://www.bsn.go.id" rel="noopener">https://www.bsn.go.id</a></li>
+<li>SNI 03-3989-2000, Tata cara perencanaan dan pemasangan sistem sprinkler otomatik. Badan Standardisasi Nasional. <a href="https://www.bsn.go.id" rel="noopener">https://www.bsn.go.id</a></li>
+<li>UL 864, Standard for Control Units and Accessories for Fire Alarm Systems. UL Standards and Engagement. <a href="https://www.shopulstandards.com" rel="noopener">https://www.shopulstandards.com</a></li>
+<li>IEC 60268-16, Sound system equipment, Part 16: Objective rating of speech intelligibility by speech transmission index. IEC, current edition. <a href="https://webstore.iec.ch" rel="noopener">https://webstore.iec.ch</a></li>
+<li>Detik Properti, Standar kebakaran yang sering diabaikan gedung di Indonesia (SLF and fire protection context). <a href="https://www.detik.com/properti/tips-dan-panduan/d-8252504/awas-bahaya-ini-standar-kebakaran-yang-sering-diabaikan-gedung-di-indonesia" rel="noopener">https://www.detik.com/properti/tips-dan-panduan/d-8252504/awas-bahaya-ini-standar-kebakaran-yang-sering-diabaikan-gedung-di-indonesia</a></li>
+<li>Security Sales and Integration, Fireside Chat: Inside the 2025 Edition of NFPA 72, Part 4 (interface device distance, 21.2.4.1). <a href="https://www.securitysales.com/insights/fireside-chat-inside-2025-edition-nfpa-72-part-4/612076/" rel="noopener">https://www.securitysales.com/insights/fireside-chat-inside-2025-edition-nfpa-72-part-4/612076/</a></li>
+<li>Security Sales and Integration, Finding Faults in Fire Systems (NFPA 72-2010 10.17.1.2, 200 s). <a href="https://www.securitysales.com/news/finding-faults-in-fire-systems/32205/" rel="noopener">https://www.securitysales.com/news/finding-faults-in-fire-systems/32205/</a></li>
+<li>Security Sales and Integration, Understanding Secondary Power Supplies (NFPA 72-2002 4.4.1.5.3.1). <a href="https://www.securitysales.com/integration/understanding-secondary-power-supplies/" rel="noopener">https://www.securitysales.com/integration/understanding-secondary-power-supplies/</a></li>
+<li>Security Sales and Integration, Fire Side Chat: Battery Life's Key Role in Life Safety (20 % margin, NFPA 72-2010). <a href="https://www.securitysales.com/news/fire-side-chat-battery-life-s-key-role-in-life-safety/31351/" rel="noopener">https://www.securitysales.com/news/fire-side-chat-battery-life-s-key-role-in-life-safety/31351/</a></li>
+<li>Electrical Contractor, Integrated systems calculation: fire alarm battery math. <a href="https://www.ecmag.com/magazine/articles/article-detail/integrated-systems-calculation-crunching-fire-alarm-math-you-should-know" rel="noopener">https://www.ecmag.com/magazine/articles/article-detail/integrated-systems-calculation-crunching-fire-alarm-math-you-should-know</a></li>
+<li>Electrical Contractor, Codes and standards article on audibility (NFPA 72-2007 7.4.2.1 and 7.4.3.1). <a href="https://www.ecmag.com/magazine/articles/article-detail/codes-standards-sounds-crisis" rel="noopener">https://www.ecmag.com/magazine/articles/article-detail/codes-standards-sounds-crisis</a></li>
+<li>MeyerFire, Is a sprinkler waterflow alarm silenceable (90 s, NFPA 13-2019 7.7). <a href="https://www.meyerfire.com/daily/is-sprinkler-waterflow-alarm-silenceable" rel="noopener">https://www.meyerfire.com/daily/is-sprinkler-waterflow-alarm-silenceable</a></li>
+<li>Open Exam Prep, Supervisory switch and pressure alarm testing (two revolutions or one-fifth of travel). <a href="https://open-exam-prep.com/study-guides/nicet-itwbs/periodic-testing-procedures/supervisory-switch-testing" rel="noopener">https://open-exam-prep.com/study-guides/nicet-itwbs/periodic-testing-procedures/supervisory-switch-testing</a></li>
+<li>Pye-Barker Fire and Safety, Smoke detector sensitivity testing requirements. <a href="https://pyebarkerfs.com/smoke-detector-sensitivity-testing-requirements/" rel="noopener">https://pyebarkerfs.com/smoke-detector-sensitivity-testing-requirements/</a></li>
+<li>National Training Center, Intelligibility (STIPA 0.45 and 0.50). <a href="https://nationaltrainingcenter.com/intelligibility/" rel="noopener">https://nationaltrainingcenter.com/intelligibility/</a></li>
+<li>Open Exam Prep, Special hazard suppression systems (NFPA 2001 discharge time and hold time). <a href="https://open-exam-prep.com/study-guides/nfpa-cfpe/smoke-control-and-special-suppression/special-hazard-suppression-systems" rel="noopener">https://open-exam-prep.com/study-guides/nfpa-cfpe/smoke-control-and-special-suppression/special-hazard-suppression-systems</a></li>
+<li>QRFS, What is hydrostatic testing of a building's fire protection system (NFPA 13-2022 29.2.1). <a href="https://blog.qrfs.com/84-what-is-hydrostatic-testing-of-a-buildings-fire-protection-system/" rel="noopener">https://blog.qrfs.com/84-what-is-hydrostatic-testing-of-a-buildings-fire-protection-system/</a></li>
+<li>QRFS, Installation of air compressors and air maintenance devices (NFPA 13-2019 8.2.6.3.2). <a href="https://blog.qrfs.com/168-guide-to-dry-sprinkler-systems-part-4-installation-of-air-compressors-and-air-maintenance-devices/" rel="noopener">https://blog.qrfs.com/168-guide-to-dry-sprinkler-systems-part-4-installation-of-air-compressors-and-air-maintenance-devices/</a></li>
+<li>City of Mercer Island, NFPA 13 sprinkler system acceptance test form, 2022. <a href="https://www.mercerisland.gov/sites/default/files/fileattachments/community_planning_amp_development/page/24371/nfpa_13_sprinkler_acceptance_form_2022.pdf" rel="noopener">https://www.mercerisland.gov/sites/default/files/fileattachments/community_planning_amp_development/page/24371/nfpa_13_sprinkler_acceptance_form_2022.pdf</a></li>
+<li>ASPE, Engineering considerations for stationary fire pump installations. <a href="https://aspe.org/pipeline/engineering-considerations-for-stationary-fire-pump-installations/" rel="noopener">https://aspe.org/pipeline/engineering-considerations-for-stationary-fire-pump-installations/</a></li>
+<li>Consulting-Specifying Engineer, EPO or No: a consideration of NEC Articles 645.10 and 685. <a href="https://www.csemag.com/epo-or-no-a-consideration-of-nec-articles-645-10-and-685/" rel="noopener">https://www.csemag.com/epo-or-no-a-consideration-of-nec-articles-645-10-and-685/</a></li>
+<li>EC&amp;M, Protecting information technology equipment and the NEC. <a href="https://www.ecmweb.com/code-basics/protecting-information-technology-equipment-and-nec" rel="noopener">https://www.ecmweb.com/code-basics/protecting-information-technology-equipment-and-nec</a></li>
+<li>SIP Law Firm, Menjaga fungsi dan keselamatan melalui Sertifikat Laik Fungsi (PP 16/2021 Article 274(2), SIMBG). <a href="https://siplawfirm.id/resources/menjaga-fungsi-dan-keselamatan-melalui-sertifikat-laik-fungsi" rel="noopener">https://siplawfirm.id/resources/menjaga-fungsi-dan-keselamatan-melalui-sertifikat-laik-fungsi</a></li>
+<li>Hukumonline, PP 28/2025 on risk-based business licensing. <a href="https://www.hukumonline.com/berita/a/pp-28-2025-pertegas-kepastian-perizinan-usaha-berbasis-risiko-lewat-oss-rba-lt6978c0c499b1d/?page=all" rel="noopener">https://www.hukumonline.com/berita/a/pp-28-2025-pertegas-kepastian-perizinan-usaha-berbasis-risiko-lewat-oss-rba-lt6978c0c499b1d/?page=all</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="19-air-side-liquid-cooling-tab.html"><span>Previous · 19</span><span class="t">Air side and liquid cooling</span></a><a class="next" href="21-bms-architecture-points.html"><span>Next · 21</span><span class="t">BMS architecture, protocols and the points list</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

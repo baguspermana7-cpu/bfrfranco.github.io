@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12 Handover administration | Cx Field Manual R01</title>
+<meta name="description" content="This chapter describes how a data-centre building, hall or plant is handed over from the contractor to the owner and its operations team, and how the…">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/12-handover-administration.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/12-handover-administration.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/12-handover-administration.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/12-handover-administration.html">
+<meta property="og:title" content="12 Handover administration | Cx Field Manual R01">
+<meta property="og:description" content="This chapter describes how a data-centre building, hall or plant is handed over from the contractor to the owner and its operations team, and how the…">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="12 Handover administration | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter describes how a data-centre building, hall or plant is handed over from the contractor to the owner and its operations team, and how the…">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"12 Handover administration: completion, O&M manuals, as-built records, training, spares, warranties and DLP","name":"Handover administration: completion, O&M manuals, as-built records, training, spares, warranties and DLP","description":"This chapter describes how a data-centre building, hall or plant is handed over from the contractor to the owner and its operations team, and how the…","url":"https://resistancezero.com/cx-handbook/12-handover-administration.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/12-handover-administration.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":10109,"position":12,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"12 Handover administration","item":"https://resistancezero.com/cx-handbook/12-handover-administration.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part B · Project administration</p>
+    <h1><span class="num">12</span>Handover administration: completion, O&amp;M manuals, as-built records, training, spares, warranties and DLP</h1>
+    <p class="lede">This chapter describes how a data-centre building, hall or plant is handed over from the contractor to the owner and its operations team, and how the contract is closed after handover.</p>
+    <p class="basis">Chapter 12 of 32 · 17 sections · 7 figures · 10,109 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 12</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 12</summary>
+<ol><li><a href="#s12-0"><span class="n">12.0</span>Scope of this chapter</a></li><li><a href="#s12-1"><span class="n">12.1</span>Completion terms and what each one means</a><ol><li><a href="#s12-1-1"><span class="n">12.1.1</span>Why the terms matter</a></li><li><a href="#s12-1-2"><span class="n">12.1.2</span>Taking-over under FIDIC 2017 clause 10</a></li><li><a href="#s12-1-3"><span class="n">12.1.3</span>Completion under NEC4</a></li><li><a href="#s12-1-4"><span class="n">12.1.4</span>Ready for service and ready for workload</a></li></ol></li><li><a href="#s12-2"><span class="n">12.2</span>The handover sequence</a><ol><li><a href="#s12-2-1"><span class="n">12.2.1</span>Gates from L4 to the end of the defects period</a></li><li><a href="#s12-2-2"><span class="n">12.2.2</span>The handover readiness review meeting</a></li></ol></li><li><a href="#s12-3"><span class="n">12.3</span>The turnover package</a><ol><li><a href="#s12-3-1"><span class="n">12.3.1</span>What a turnover package is</a></li><li><a href="#s12-3-2"><span class="n">12.3.2</span>Worked example: turnover package for the chiller plant of building B1</a></li><li><a href="#s12-3-3"><span class="n">12.3.3</span>Turnover package review procedure</a></li></ol></li><li><a href="#s12-4"><span class="n">12.4</span>O&amp;M manuals</a><ol><li><a href="#s12-4-1"><span class="n">12.4.1</span>Purpose and structure</a></li><li><a href="#s12-4-2"><span class="n">12.4.2</span>Common rejection reasons for O&amp;M manuals</a></li></ol></li><li><a href="#s12-5"><span class="n">12.5</span>The systems manual</a><ol><li><a href="#s12-5-1"><span class="n">12.5.1</span>What a systems manual is and how it differs from O&amp;M manuals</a></li><li><a href="#s12-5-2"><span class="n">12.5.2</span>Who writes which part</a></li></ol></li><li><a href="#s12-6"><span class="n">12.6</span>As-built drawings and record documents</a><ol><li><a href="#s12-6-1"><span class="n">12.6.1</span>Definitions</a></li><li><a href="#s12-6-2"><span class="n">12.6.2</span>Rules for mark-ups and as-built drawings</a></li><li><a href="#s12-6-3"><span class="n">12.6.3</span>Verification of as-built drawings by sampling</a></li></ol></li><li><a href="#s12-7"><span class="n">12.7</span>Asset data for the CMMS</a><ol><li><a href="#s12-7-1"><span class="n">12.7.1</span>Why the asset data must be ready before handover</a></li><li><a href="#s12-7-2"><span class="n">12.7.2</span>Asset register fields</a></li><li><a href="#s12-7-3"><span class="n">12.7.3</span>COBie worksheets</a></li><li><a href="#s12-7-4"><span class="n">12.7.4</span>Data flow and validation</a></li></ol></li><li><a href="#s12-8"><span class="n">12.8</span>Spare parts and special tools</a><ol><li><a href="#s12-8-1"><span class="n">12.8.1</span>Categories of spares</a></li><li><a href="#s12-8-2"><span class="n">12.8.2</span>Spares and tools register fields</a></li><li><a href="#s12-8-3"><span class="n">12.8.3</span>Special tools</a></li></ol></li><li><a href="#s12-9"><span class="n">12.9</span>Training</a><ol><li><a href="#s12-9-1"><span class="n">12.9.1</span>Training plan</a></li><li><a href="#s12-9-2"><span class="n">12.9.2</span>Training procedure</a></li><li><a href="#s12-9-3"><span class="n">12.9.3</span>Training record fields</a></li></ol></li><li><a href="#s12-10"><span class="n">12.10</span>Warranties</a><ol><li><a href="#s12-10-1"><span class="n">12.10.1</span>Warranty register</a></li><li><a href="#s12-10-2"><span class="n">12.10.2</span>Start date rules</a></li><li><a href="#s12-10-3"><span class="n">12.10.3</span>Setting warranty expiry alerts in the CMMS</a></li><li><a href="#s12-10-4"><span class="n">12.10.4</span>Warranty KPIs</a></li></ol></li><li><a href="#s12-11"><span class="n">12.11</span>The defects liability period</a><ol><li><a href="#s12-11-1"><span class="n">12.11.1</span>What the DLP is</a></li><li><a href="#s12-11-2"><span class="n">12.11.2</span>Defects handling during the DLP</a></li><li><a href="#s12-11-3"><span class="n">12.11.3</span>Defects register fields</a></li><li><a href="#s12-11-4"><span class="n">12.11.4</span>Retention and the Performance Certificate</a></li></ol></li><li><a href="#s12-12"><span class="n">12.12</span>The final account</a></li><li><a href="#s12-13"><span class="n">12.13</span>Soft Landings and operations readiness</a><ol><li><a href="#s12-13-1"><span class="n">12.13.1</span>BSRIA BG 54/2018 Soft Landings Framework</a></li><li><a href="#s12-13-2"><span class="n">12.13.2</span>Operations readiness on a data-centre campus</a></li></ol></li><li><a href="#s12-14"><span class="n">12.14</span>Common errors and KPIs</a><ol><li><a href="#s12-14-1"><span class="n">12.14.1</span>Common errors in handover administration</a></li><li><a href="#s12-14-2"><span class="n">12.14.2</span>Handover KPIs</a></li></ol></li><li><a href="#s12-15"><span class="n">12.15</span>Checklist for site use</a></li><li><a href="#s12-16"><span class="n">12.16</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="11-meetings-reports-schedules.html"><span>Previous</span>11 Meetings, minutes, daily and weekly reports, schedules and look-aheads</a><a href="13-mv-switchgear-transformers-cables.html"><span>Next</span>13 Medium-voltage switchgear, transformers and cables</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s12-0"><span class="n">12.0</span>Scope of this chapter</h2>
+<p>This chapter describes how a data-centre building, hall or plant is handed over from the contractor to the owner and its operations team, and how the contract is closed after handover. It covers the completion terms in the common contract forms, the handover sequence, the turnover package, the operation and maintenance (O&amp;M) manuals and the systems manual. It also covers the as-built and record documents, the asset data for the computerised maintenance management system (CMMS), spare parts and special tools, and training records. The last topics are warranties, the defects liability period (DLP), the final account and the Soft Landings aftercare. Chapter 09 gives the defect categories and closure evidence. Chapter 27 covers the CMMS and data-centre infrastructure management (DCIM) systems. Chapter 28 covers integrated systems testing (IST), which is the last test before ready for service.</p>
+<ol>
+<li><strong>Completion terms.</strong> Mechanical completion, substantial or practical completion, taking-over under FIDIC 2017 clause 10, Completion under NEC4, ready for service (RFS) and ready for workload.</li>
+<li><strong>Handover sequence.</strong> The gates, their records and their time limits, from the last level 4 (L4) commissioning test to the Performance Certificate or the Defects Certificate.</li>
+<li><strong>Turnover package.</strong> The index per system, with a filled example for a chiller plant.</li>
+<li><strong>O&amp;M manuals and the systems manual.</strong> Content per Construction Specifications Institute (CSI) section 01 78 23 practice and ASHRAE Guideline 1.4-2019, the review procedure and the rejection reasons.</li>
+<li><strong>As-built and record documents.</strong> Mark-up rules, revision rules, verification sampling and the CSI section 01 78 39 practice.</li>
+<li><strong>Asset data for the CMMS.</strong> Asset register fields, tagging, the COBie worksheets and the data flow from the contractor to the CMMS.</li>
+<li><strong>Spares, tools, training and warranties.</strong> Registers, fields and start-date rules.</li>
+<li><strong>Defects liability period and contract close.</strong> Defects handling after handover, the Performance Certificate, retention release and the final account.</li>
+<li><strong>Soft Landings and operations readiness.</strong> BSRIA BG 54/2018 phases and the aftercare plan.</li>
+</ol>
+<p>Documents and standards used: FIDIC Conditions of Contract for Construction and for Plant and Design-Build (2017 editions) and NEC4 Engineering and Construction Contract. The chapter also uses CSI MasterFormat sections 01 78 23, 01 78 39 and 01 79 00 as used in owner specifications, ASHRAE Guideline 0-2019 and ASHRAE Guideline 1.4-2019. It also uses BSRIA BG 54/2018 Soft Landings Framework, COBie, BS EN ISO 19650-4:2022 (which replaced BS 1192-4:2014) and Uptime Institute Tier Standard: Operational Sustainability. Further sources are Permenaker 12/2015, the regulation (Permen) 10/2021 of the Kementerian Energi dan Sumber Daya Mineral (ESDM) and the MSC-1 case ledger.</p>
+<h2 id="s12-1"><span class="n">12.1</span>Completion terms and what each one means</h2>
+
+<figure class="sheet" id="F12-6"><a href="../data/cx-handbook/figures/F12-6.svg" title="Open drawing F12-6 at full size"><img src="../data/cx-handbook/figures/F12-6.svg" alt="F12-6: RFS conditions for data hall B1-DH1: status two weeks before RFS (example)" width="1400" height="528" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F12-6</span> — <b>RFS conditions for data hall B1-DH1: status two weeks before RFS (example)</b>. Each row is one RFS condition from 12.1.4 with its record owner; amber rows have a dated action that must close before the RFS certificate is signed.</figcaption></figure>
+<h3 id="s12-1-1"><span class="n">12.1.1</span>Why the terms matter</h3>
+<p>A data-centre building passes through several "complete" states, and each state has a different legal and practical meaning. The contract decides when the risk and care of the works pass to the owner, when the defects period starts, when liquidated damages stop and when part of the retention is released. The operations team decides when it accepts responsibility for running the plant. The customer decides when it puts information technology (IT) load in the hall. Define each term in the contract and in the commissioning plan. Without these definitions the owner can take over a hall that is not ready, or the contractor can claim completion of a hall that the owner cannot use.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Defined by</th>
+<th>Meaning on a data-centre campus</th>
+<th>Typical record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mechanical completion</td>
+<td>Project specification</td>
+<td>Installation complete and commissioning level 2 (L2) checklists signed for a system; ready for energisation or start-up</td>
+<td>Mechanical completion certificate per system</td>
+</tr>
+<tr>
+<td>Substantial or practical completion</td>
+<td>Contract (form-specific term)</td>
+<td>The works can be used for their intended purpose; only minor work and minor defects remain</td>
+<td>Practical completion certificate</td>
+</tr>
+<tr>
+<td>Taking-over</td>
+<td>FIDIC 2017 clause 10</td>
+<td>The Employer takes over the Works or a Section; the Defects Notification Period (DNP) starts</td>
+<td>Taking-Over Certificate (TOC)</td>
+</tr>
+<tr>
+<td>Completion</td>
+<td>NEC4 ECC clause 11.2(2)</td>
+<td>The Contractor has done all the work the Scope requires by the Completion Date and corrected the notified Defects that would stop the Client using the works</td>
+<td>Completion certificate by the Project Manager</td>
+</tr>
+<tr>
+<td>Ready for service (RFS)</td>
+<td>Owner programme</td>
+<td>The hall has passed level 5 (L5) IST, the operations team has accepted it, and it can receive IT equipment</td>
+<td>RFS certificate</td>
+</tr>
+<tr>
+<td>Ready for workload</td>
+<td>Owner and customer</td>
+<td>Customer IT equipment is installed and the hall carries production load</td>
+<td>Customer acceptance</td>
+</tr>
+<tr>
+<td>Defects certificate or Performance Certificate</td>
+<td>NEC4 clause 44.3 or FIDIC clause 11.9</td>
+<td>The defects period has ended and all notified defects are corrected</td>
+<td>Defects Certificate or Performance Certificate</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-1-2"><span class="n">12.1.2</span>Taking-over under FIDIC 2017 clause 10</h3>
+<p>The FIDIC 2017 Conditions of Contract for Construction (Red Book) and for Plant and Design-Build (Yellow Book) set the taking-over process in clause 10. The steps below follow sub-clause 10.1 as quoted in Fenwick Elliott commentary on the 2017 forms. The Particular Conditions of a contract may change the time periods.</p>
+<ol>
+<li><strong>Application.</strong> The Contractor may apply for a Taking-Over Certificate by a Notice to the Engineer. The Notice is given <mark>not more than 14 days before</mark> the Works or Section will, in the Contractor's opinion, be complete and ready for taking over.</li>
+<li><strong>Engineer's response.</strong> Within 28 days of the application, the Engineer issues the TOC stating the completion date, or rejects the application with reasons and the work needed.</li>
+<li><strong>Conditions for issue.</strong> The Works or Section are complete except for minor outstanding work and defects that do not substantially affect their use. The Tests on Completion are passed. The documents required by the contract (as-built records and O&amp;M manuals under the design-build forms) are submitted (confirm the document conditions against FIDIC 2017 sub-clause 10.1 and the Contractor's Documents sub-clauses of the form used: 4.4 in the Red Book, clause 5 in the Yellow Book).</li>
+<li><strong>Sections and parts.</strong> The Employer can take over a Section named in the Contract Data, or a part of the Works. On a campus, the contract defines each building and each data hall as a Section. Hall 1 can then be taken over while hall 2 is still under test.</li>
+<li><strong>Effect.</strong> On taking over, <mark>the care of the Works or Section passes to the Employer</mark>, delay damages for that Section stop, and the DNP for that Section starts.</li>
+</ol>
+<p><strong>Check:</strong> On a campus, <mark>each data hall is a separate Section in the Contract Data</mark>. If the contract names only the whole building, the owner cannot take over hall 1 for a customer without a contract variation. The DNP of hall 1 then cannot start before the whole building is complete.</p>
+<h3 id="s12-1-3"><span class="n">12.1.3</span>Completion under NEC4</h3>
+<p>The NEC4 Engineering and Construction Contract (ECC) defines Completion in clause 11.2(2). Commentary from law firms and from the NEC website states the effect.</p>
+<ol>
+<li><strong>Definition.</strong> Completion is when the Contractor has done all the work that the Scope states is to be done by the Completion Date. The Contractor must also have corrected the notified Defects that would have prevented the Client from using the works or others from doing their work.</li>
+<li><strong>Decision.</strong> The Project Manager decides the date of Completion and certifies Completion <mark>within one week</mark> of Completion (NEC4 ECC clause 30.2, as summarised in Civil Engineering Contractors Association (CECA) NEC Bulletin No. 68, August 2026).</li>
+<li><strong>Defects date and defect correction period.</strong> The defects date is stated in the Contract Data (often 52 weeks after Completion). A Defect notified before Completion has its defect correction period starting at Completion; a Defect notified after Completion has its period starting at the notification (clause 44.2 per commentary).</li>
+<li><strong>Defects Certificate.</strong> The Supervisor issues the Defects Certificate at the later of the defects date and the end of the last defect correction period (NEC4 ECC clause 44.3, as cited in Fenwick Elliott's commentary). The certificate lists the notified defects that are not corrected, or states that none are outstanding.</li>
+<li><strong>Scope wording.</strong> <mark>The Scope must state what is "to be done by the Completion Date"</mark>. For a data-centre hall, the Scope lists the L5 IST, the turnover package, the training and the asset data as Completion requirements.</li>
+</ol>
+<h3 id="s12-1-4"><span class="n">12.1.4</span>Ready for service and ready for workload</h3>
+<p>Figure <a class="figref" href="#F12-6">F12-6</a> shows the RFS conditions of hall B1-DH1 two weeks before RFS.</p>
+<p>Ready for service is not a contract term in FIDIC or NEC4. It is an owner programme milestone. Hyperscale programmes define RFS for each data hall with a written list of conditions.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>RFS condition</th>
+<th>Record</th>
+<th>Owner of the record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All L4 tests passed for systems serving the hall</td>
+<td>Test register extract</td>
+<td>Commissioning manager (CxM)</td>
+</tr>
+<tr>
+<td>L5 IST passed (in the MSC-1 worked example, 5 days per hall)</td>
+<td>IST report signed</td>
+<td>CxM</td>
+</tr>
+<tr>
+<td>No open category A issue; category B issues accepted by operations</td>
+<td>Issues log extract and acceptance list</td>
+<td>CxM and data centre operations (DCOps) lead</td>
+</tr>
+<tr>
+<td>Statutory certificates for the scope: certificate of operation worthiness, Sertifikat Laik Operasi (SLO), for the electrical installation, fire system acceptance, building function certificate where required</td>
+<td>Certificates</td>
+<td>Owner permitting lead</td>
+</tr>
+<tr>
+<td>Turnover package accepted for the systems serving the hall</td>
+<td>Turnover package acceptance sheet</td>
+<td>DCOps lead</td>
+</tr>
+<tr>
+<td>Asset data loaded in the CMMS and maintenance plans active</td>
+<td>CMMS export and plan list</td>
+<td>CMMS administrator</td>
+</tr>
+<tr>
+<td>Operations staff trained and authorised</td>
+<td>Training records and authorisation register</td>
+<td>DCOps lead</td>
+</tr>
+<tr>
+<td>Spares and special tools received</td>
+<td>Spares receipt record</td>
+<td>DCOps lead</td>
+</tr>
+<tr>
+<td>Live access control and permit system transferred to operations</td>
+<td>Transfer record</td>
+<td>DCOps lead</td>
+</tr>
+<tr>
+<td>Monitoring active: alarms of the building management system (BMS), the electrical power monitoring system (EPMS) and DCIM routed to the operations centre</td>
+<td>Alarm routing test record</td>
+<td>Controls and EPMS leads</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> RFS dates for building B1 of the MSC-1 campus. In the MSC-1 worked example, the target for RFS of building 1 is month 14 from the start of construction. The three halls of B1 have 12 MW of IT load each. The CxM plans IST for B1-DH1 in weeks 52 to 53 of the programme (5 days) and the turnover package acceptance in week 53. CMMS loading is planned in weeks 51 to 53 and training in weeks 48 to 52. RFS for DH1 is planned for the end of week 54, which leaves one week between the end of IST and RFS for the issues raised in IST. DH2 and DH3 follow at 3-week intervals (weeks 57 and 60). The contract names each hall as a Section, so the TOC of DH1 can be issued in week 54 and its DNP starts on that date. The contractor keeps the care of DH2 and DH3 until their own TOCs. On most programmes <mark>a 3-week interval between halls</mark> is the minimum because the same IST team, load banks and heat emulators move from hall to hall.</p>
+<h2 id="s12-2"><span class="n">12.2</span>The handover sequence</h2>
+
+<figure class="sheet" id="F12-1"><a href="../data/cx-handbook/figures/F12-1.svg" title="Open drawing F12-1 at full size"><img src="../data/cx-handbook/figures/F12-1.svg" alt="F12-1: Handover sequence for one data hall: gates G1 to G11 from mechanical completion to the final account" width="1400" height="844" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F12-1</span> — <b>Handover sequence for one data hall: gates G1 to G11 from mechanical completion to the final account</b>. Gates G1 to G5 run per system and per hall during commissioning; G6 to G8 happen at the end of IST; G9 to G11 follow taking-over of the Section.</figcaption></figure>
+<h3 id="s12-2-1"><span class="n">12.2.1</span>Gates from L4 to the end of the defects period</h3>
+<p>Each gate of the handover sequence has an entry condition, an owner, a time limit and a record. Figure <a class="figref" href="#F12-1">F12-1</a> shows the sequence.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Entry condition</th>
+<th>Owner</th>
+<th>Time limit</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G1 Mechanical completion per system</td>
+<td>Installation complete, L2 checklists signed</td>
+<td>Contractor, verified by CxM</td>
+<td>before energisation or start-up</td>
+<td>Mechanical completion certificate</td>
+</tr>
+<tr>
+<td>G2 Functional completion per system</td>
+<td>Level 3 (L3) and L4 tests passed</td>
+<td>CxM</td>
+<td>before IST</td>
+<td>Test register</td>
+</tr>
+<tr>
+<td>G3 Turnover package submitted</td>
+<td>Package complete per the index</td>
+<td>Contractor</td>
+<td>30 days before the planned TOC</td>
+<td>Transmittal</td>
+</tr>
+<tr>
+<td>G4 Turnover package reviewed</td>
+<td>Review comments issued</td>
+<td>CxM and operations</td>
+<td>10 working days after submission</td>
+<td>Review comment sheet</td>
+</tr>
+<tr>
+<td>G5 IST passed</td>
+<td>All scenarios passed</td>
+<td>CxM</td>
+<td>IST window</td>
+<td>IST report</td>
+</tr>
+<tr>
+<td>G6 Handover readiness review</td>
+<td>RFS conditions in 12.1.4 met or accepted</td>
+<td>Owner project director</td>
+<td>5 working days before TOC</td>
+<td>Readiness review minutes</td>
+</tr>
+<tr>
+<td>G7 Taking-over or Completion</td>
+<td>Contract conditions met</td>
+<td>Engineer or Project Manager</td>
+<td>28 days after application (FIDIC practice)</td>
+<td>TOC or Completion certificate</td>
+</tr>
+<tr>
+<td>G8 RFS</td>
+<td>Operations acceptance</td>
+<td>DCOps lead</td>
+<td>same day as G7 or later</td>
+<td>RFS certificate</td>
+</tr>
+<tr>
+<td>G9 Defects period</td>
+<td>Defects notified and corrected</td>
+<td>Owner and contractor</td>
+<td>DNP length, often 12 months</td>
+<td>Defects register</td>
+</tr>
+<tr>
+<td>G10 Performance or Defects Certificate</td>
+<td>DNP ended, defects corrected</td>
+<td>Engineer or Supervisor</td>
+<td>28 days after the last DNP ends (FIDIC practice)</td>
+<td>Performance Certificate</td>
+</tr>
+<tr>
+<td>G11 Final account</td>
+<td>Payments agreed</td>
+<td>Quantity surveyors</td>
+<td>contract period after G10</td>
+<td>Final account statement</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-2-2"><span class="n">12.2.2</span>The handover readiness review meeting</h3>
+<p><strong>Purpose:</strong> To confirm that a building, hall or plant is ready for taking-over and RFS, and to list the items that remain open with their owners and dates.</p>
+<p><strong>Trigger:</strong> The contractor's notice of intent to apply for taking-over, at least 15 working days before the planned date.</p>
+<p><strong>Owner:</strong> The owner's project director chairs; the CxM presents the status.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Review the RFS conditions.</strong> The CxM reads each condition in 12.1.4 with its record.</li>
+<li><strong>Review the open issues.</strong> The CxM presents the open issues for the scope by category. <mark>Category A issues block</mark>. Category B issues need operations acceptance with a closure date. Category C issues are attached to the TOC as the list of minor outstanding work.</li>
+<li><strong>Review the turnover package.</strong> The DCOps lead confirms the status of the package review (12.3).</li>
+<li><strong>Review statutory items.</strong> The permitting lead confirms the SLO and the fire system acceptance.</li>
+<li><strong>Decide.</strong> The chair decides: ready, ready with conditions, or not ready.</li>
+<li><strong>Issue the outstanding works list.</strong> The list of minor outstanding work with dates is attached to the TOC application.</li>
+</ol>
+<p><strong>Records:</strong> Readiness review minutes, outstanding works list, operations acceptance list for category B issues.</p>
+<h2 id="s12-3"><span class="n">12.3</span>The turnover package</h2>
+
+<figure class="sheet" id="F12-2"><a href="../data/cx-handbook/figures/F12-2.svg" title="Open drawing F12-2 at full size"><img src="../data/cx-handbook/figures/F12-2.svg" alt="F12-2: Turnover package tree for the chilled-water plant of building B1 (TP-B1-CHW-01)" width="1400" height="684" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F12-2</span> — <b>Turnover package tree for the chilled-water plant of building B1 (TP-B1-CHW-01)</b>. The package is built per system so that operations can find all information for the plant in one place; green sections are accepted, amber sections have gaps.</figcaption></figure>
+<h3 id="s12-3-1"><span class="n">12.3.1</span>What a turnover package is</h3>
+<p>The turnover package is the set of documents and data that the contractor hands to the owner for each system. The operations team uses it to run, maintain, repair and modify the system. It is assembled per system (for example "chilled-water plant, building B1") because the operations team works by system. A package assembled per subcontractor is returned. The index below is the standard structure used on hyperscale programmes (project practice; the contract specification governs). Figure <a class="figref" href="#F12-2">F12-2</a> shows the tree.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Content</th>
+<th>Format</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Index and contacts</td>
+<td>Package index, contractor and original equipment manufacturer (OEM) contacts, emergency contacts</td>
+<td>PDF</td>
+</tr>
+<tr>
+<td>2 System description</td>
+<td>Short system description, design intent, sequence of operation summary</td>
+<td>PDF, from the systems manual</td>
+</tr>
+<tr>
+<td>3 As-built drawings</td>
+<td>Single-line diagrams, schematics, layouts, piping and instrumentation diagrams (P&amp;IDs), control drawings</td>
+<td>PDF and native computer-aided design (CAD) or building information modelling (BIM) files</td>
+</tr>
+<tr>
+<td>4 Equipment data</td>
+<td>Approved submittals, datasheets, nameplate photos</td>
+<td>PDF and photos</td>
+</tr>
+<tr>
+<td>5 O&amp;M manuals</td>
+<td>OEM manuals and the contractor's system O&amp;M manual</td>
+<td>PDF, searchable</td>
+</tr>
+<tr>
+<td>6 Test records</td>
+<td>Factory acceptance test (FAT) records, L2 checklists, L3 and L4 test reports, IST extract, calibration certificates</td>
+<td>PDF from the Cx system</td>
+</tr>
+<tr>
+<td>7 Statutory certificates</td>
+<td>SLO, pressure vessel certificates, fire acceptance, lifting equipment certificates</td>
+<td>PDF</td>
+</tr>
+<tr>
+<td>8 Asset data</td>
+<td>Asset register and COBie or CMMS template file</td>
+<td>XLSX or COBie</td>
+</tr>
+<tr>
+<td>9 Spares and tools</td>
+<td>Spares list, special tools list, receipt records</td>
+<td>XLSX and PDF</td>
+</tr>
+<tr>
+<td>10 Warranties</td>
+<td>Warranty certificates and warranty register</td>
+<td>PDF and XLSX</td>
+</tr>
+<tr>
+<td>11 Training</td>
+<td>Training plan, attendance sheets, assessments, recordings</td>
+<td>PDF and video</td>
+</tr>
+<tr>
+<td>12 Software and configuration</td>
+<td>Controller programs, configuration backups, licence certificates, passwords handed over under control</td>
+<td>Native files, encrypted</td>
+</tr>
+<tr>
+<td>13 Open items</td>
+<td>Open issues, outstanding works, deferred tests</td>
+<td>XLSX</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-3-2"><span class="n">12.3.2</span>Worked example: turnover package for the chiller plant of building B1</h3>
+<p>Figure <a class="figref" href="#F12-2">F12-2</a> shows the 13 sections of this package with their status after the first review.</p>
+<p><strong>Worked example:</strong> Turnover package TP-B1-CHW-01 for the chilled water (CHW) plant of building B1. In the MSC-1 worked example, the campus cold-loop duty for the air halls is 36.5 MW over 4 buildings, which is about 9.1 MW per building. The chilled water runs at 18 °C supply and 24 °C return. For this example the B1 plant has 5 chillers of 2.5 MW (4 duty and 1 standby; example value, the same arrangement as the B2 staging script in 03.9.3). The warm-loop trim chillers of chapter 18 are a separate plant of 8 duty and 1 standby units of 2,500 kW. The B1 plant also has 5 primary pumps, 2 pressurisation units, 2 side-stream filters, 1 chemical dosing set and 3 buffer vessels. It also has 64 motorised valves, 38 flow, pressure and temperature sensors, 2 chiller plant controllers and 1 chiller plant manager panel. The figures are example data.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Items expected</th>
+<th>Items received</th>
+<th>Accepted</th>
+<th>Rejected</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Index and contacts</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>2 System description</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>from systems manual chapter CHW</td>
+</tr>
+<tr>
+<td>3 As-built drawings</td>
+<td>46</td>
+<td>46</td>
+<td>41</td>
+<td>5</td>
+<td>5 P&amp;ID sheets show valve tags not matching the labels</td>
+</tr>
+<tr>
+<td>4 Equipment data</td>
+<td>21 equipment types</td>
+<td>21</td>
+<td>21</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>5 O&amp;M manuals</td>
+<td>12 OEM manuals plus 1 system manual</td>
+<td>13</td>
+<td>11</td>
+<td>2</td>
+<td>chiller manual is the generic model range; pump manual has no parts list</td>
+</tr>
+<tr>
+<td>6 Test records</td>
+<td>1,180 records</td>
+<td>1,174</td>
+<td>1,174</td>
+<td>0</td>
+<td>6 L3 records missing for valves V-B1-CHW-055 to 060</td>
+</tr>
+<tr>
+<td>7 Statutory certificates</td>
+<td>8 (pressure vessels and buffer vessels)</td>
+<td>8</td>
+<td>8</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>8 Asset data</td>
+<td>140 assets</td>
+<td>140 rows</td>
+<td>128</td>
+<td>12</td>
+<td>12 rows missing serial numbers</td>
+</tr>
+<tr>
+<td>9 Spares and tools</td>
+<td>2 lists</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>10 Warranties</td>
+<td>21 certificates</td>
+<td>19</td>
+<td>19</td>
+<td>0</td>
+<td>2 missing (dosing set, pressurisation units)</td>
+</tr>
+<tr>
+<td>11 Training</td>
+<td>3 sessions</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>12 Software and configuration</td>
+<td>3 controller backups</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>plant manager backup missing</td>
+</tr>
+<tr>
+<td>13 Open items</td>
+<td>1 list</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>17 open issues, 0 category A</td>
+</tr>
+</tbody>
+</table></div>
+<p>The package acceptance rate is calculated on the 13 sections. Seven sections are fully accepted. Sections 3, 5, 6, 8, 10 and 12 have gaps: sections 6, 10 and 12 have missing items, and sections 3, 5 and 8 have rejected items. The CxM issues review sheet RS-TP-B1-CHW-01 with 7 actions. The first four actions are to re-issue 5 P&amp;ID sheets, replace the chiller manual with the model-specific manual, add the pump parts list and issue the 6 missing L3 records. The last three are to complete 12 serial numbers, issue 2 warranty certificates and issue the plant manager backup. For the 7 actions <mark>the contractor has 10 working days</mark>. <mark>The package is not accepted until all 13 sections are complete</mark>. The DCOps lead accepts the chiller plant for IST on the condition that the 7 actions close before the TOC.</p>
+<h3 id="s12-3-3"><span class="n">12.3.3</span>Turnover package review procedure</h3>
+<p><strong>Trigger:</strong> Turnover package transmittal from the contractor.</p>
+<p><strong>Owner:</strong> CxM coordinates; the DCOps lead and the discipline reviewers review.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Completeness check.</strong> <mark>Within 2 working days the document controller checks the package</mark> against the index and returns incomplete packages without review.</li>
+<li><strong>Technical review.</strong> Within 10 working days of acceptance for review, the reviewers check content: correct models, correct tags, readable scans, native files present.</li>
+<li><strong>Comment sheet.</strong> The CxM issues one consolidated comment sheet with a status per section: accepted, accepted with comments, rejected.</li>
+<li><strong>Resubmission.</strong> The contractor resubmits rejected sections within 10 working days.</li>
+<li><strong>Final acceptance.</strong> The DCOps lead signs the turnover package acceptance sheet.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Review status code</th>
+<th>Meaning</th>
+<th>Next step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A Accepted</td>
+<td>Content complete and correct</td>
+<td>none</td>
+</tr>
+<tr>
+<td>B Accepted with comments</td>
+<td>Minor corrections, no resubmission review needed</td>
+<td>contractor corrects and issues for record</td>
+</tr>
+<tr>
+<td>C Rejected</td>
+<td>Missing or wrong content</td>
+<td>contractor resubmits for review</td>
+</tr>
+<tr>
+<td>D Not reviewed</td>
+<td>Package incomplete at the completeness check</td>
+<td>contractor completes and resubmits</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s12-4"><span class="n">12.4</span>O&amp;M manuals</h2>
+<h3 id="s12-4-1"><span class="n">12.4.1</span>Purpose and structure</h3>
+<p>The O&amp;M manual gives the operations and maintenance staff the information to operate, maintain, repair and replace the installed equipment. CSI MasterFormat section 01 78 23 Operation and Maintenance Data is the US specification section that sets the requirements. Owner specifications based on it require a title page and a table of contents, volume labels for multi-volume manuals, and servicing and lubrication schedules. They also require valve tag charts keyed to the flow and control diagrams, and review by the architect and the commissioning authority. These requirements are taken from the Yale University and City of San Diego 01 78 23 sections listed in 12.16; the project specification governs.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>O&amp;M manual part</th>
+<th>Content</th>
+<th>Check by the reviewer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Title page and contents</td>
+<td>Project, system, building, revision, contractor, date</td>
+<td>Matches the system and the turnover index</td>
+</tr>
+<tr>
+<td>Contacts</td>
+<td>Contractor, subcontractor, OEM service contacts with phone numbers and response times</td>
+<td>Phone numbers tested on a sample</td>
+</tr>
+<tr>
+<td>System description</td>
+<td>Function, design conditions, capacity, operating modes</td>
+<td>Agrees with the systems manual and the basis of design (BOD)</td>
+</tr>
+<tr>
+<td>Equipment list</td>
+<td>Tag, description, manufacturer, model, serial number, location</td>
+<td>Agrees with the asset register</td>
+</tr>
+<tr>
+<td>Operating procedures</td>
+<td>Start-up, normal operation, shut-down, emergency operation, seasonal changes</td>
+<td>Steps match the installed controls</td>
+</tr>
+<tr>
+<td>Maintenance procedures</td>
+<td>Preventive maintenance tasks with frequency, labour, tools and materials</td>
+<td>Frequencies match the OEM and the warranty conditions</td>
+</tr>
+<tr>
+<td>Servicing and lubrication schedules</td>
+<td>Lubricant types, quantities, intervals</td>
+<td>OEM values</td>
+</tr>
+<tr>
+<td>Fault finding</td>
+<td>Alarm list, causes, actions</td>
+<td>Alarm list matches the BMS points list</td>
+</tr>
+<tr>
+<td>Parts lists</td>
+<td>Part numbers, recommended spares</td>
+<td>Agrees with the spares list</td>
+</tr>
+<tr>
+<td>Drawings</td>
+<td>As-built schematics, wiring, valve tag charts</td>
+<td>Same revision as the as-built set</td>
+</tr>
+<tr>
+<td>Test reports and certificates</td>
+<td>Factory and site test reports, calibration certificates</td>
+<td>Present and signed</td>
+</tr>
+<tr>
+<td>Warranty</td>
+<td>Warranty certificate, conditions, start date</td>
+<td>Agrees with the warranty register</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-4-2"><span class="n">12.4.2</span>Common rejection reasons for O&amp;M manuals</h3>
+<ol>
+<li><strong>Generic manuals.</strong> The OEM manual covers a whole model range with no indication of the installed model and options. The reviewer asks for the model-specific manual or a marked-up range manual.</li>
+<li><strong>Missing installed data.</strong> Serial numbers, set points and installed options are not stated.</li>
+<li><strong>Not searchable.</strong> <mark>Scanned images without text recognition</mark>. The specification requires searchable PDF.</li>
+<li><strong>Wrong language.</strong> On a Jakarta campus, the owner may require English and Indonesian for safety instructions. The language requirement is stated in the O&amp;M data section of the contract specification.</li>
+<li><strong>No maintenance frequency.</strong> Maintenance tasks are listed without frequency or time.</li>
+<li><strong>Mismatch with the as-built drawings.</strong> Tags or wiring numbers differ from the as-built set.</li>
+<li><strong>Missing parts list.</strong> Parts lists are absent or have no part numbers.</li>
+</ol>
+<p><strong>Worked example:</strong> O&amp;M manual review statistics for building B1 at week 50. The contractor submitted 186 O&amp;M manuals (OEM and system manuals). At the first review, 104 were accepted (status A or B) and 82 were rejected (status C). The first-pass acceptance rate is 104 ÷ 186 = 55.9 %. The rejection reasons for the 82 manuals were: generic manuals 31, missing installed data 22, scanned without text recognition 11, no maintenance frequency 9, missing parts list 6, mismatch with as-built drawings 3. The CxM sends the reasons table to the contractor with the rule that <mark>each resubmission must answer the comment sheet line by line</mark>. At the second review, 71 of the 82 resubmitted manuals were accepted. The total accepted is 175 of 186 (94.1 %), and the 11 remaining manuals are on the TOC outstanding list with a 20-working-day due date.</p>
+<h2 id="s12-5"><span class="n">12.5</span>The systems manual</h2>
+<h3 id="s12-5-1"><span class="n">12.5.1</span>What a systems manual is and how it differs from O&amp;M manuals</h3>
+<p>The systems manual is a commissioning document that explains how the systems work together, why they were designed as they are, and how to operate them to meet the owner's project requirements. ASHRAE Guideline 0-2019 includes the systems manual as a commissioning process deliverable. ASHRAE Guideline 1.4-2019 gives the procedures for preparing facility systems manuals (Section 4 covers systems manual content and organisation, and a 2024 addendum expands section 4.1). <mark>The O&amp;M manuals describe equipment; the systems manual describes systems and the facility</mark>.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Systems manual part (common outline)</th>
+<th>Content for a data-centre building</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Executive summary</td>
+<td>Building purpose, capacity (in the MSC-1 worked example, 36 MW IT per building), redundancy concept, contacts</td>
+</tr>
+<tr>
+<td>Facility design and construction</td>
+<td>Owner's project requirements (OPR), BOD, design narratives, main design changes during construction</td>
+</tr>
+<tr>
+<td>Building and systems information</td>
+<td>System descriptions, single-line and flow diagrams, sequences of operation, set points, operating limits</td>
+</tr>
+<tr>
+<td>Facility operations</td>
+<td>Operating procedures by mode: normal, maintenance, failure, emergency; method of procedure (MOP) and emergency operating procedure (EOP) index</td>
+</tr>
+<tr>
+<td>Training</td>
+<td>Training plan, records and materials</td>
+</tr>
+<tr>
+<td>Commissioning project report</td>
+<td>Cx plan, issues log summary, test summary, IST report, lessons learned</td>
+</tr>
+</tbody>
+</table></div>
+<p>Source: outline from the Building Commissioning Association (BCxA) summary of ASHRAE Guideline 1.4 (confirm the part names against Section 4, Systems Manual Content and Organization, of ASHRAE Guideline 1.4-2019 and its Addendum a, 2024).</p>
+<h3 id="s12-5-2"><span class="n">12.5.2</span>Who writes which part</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Writer</th>
+<th>Reviewer</th>
+<th>Due</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OPR and BOD</td>
+<td>Owner and designer</td>
+<td>CxM</td>
+<td>design phase</td>
+</tr>
+<tr>
+<td>System descriptions and sequences</td>
+<td>Designer, controls contractor</td>
+<td>CxM, operations</td>
+<td>before L4</td>
+</tr>
+<tr>
+<td>Operating procedures, MOP and EOP index</td>
+<td>Operations team with contractor input</td>
+<td>CxM</td>
+<td>before IST</td>
+</tr>
+<tr>
+<td>Commissioning project report</td>
+<td>CxM</td>
+<td>Owner</td>
+<td>30 days after TOC</td>
+</tr>
+<tr>
+<td>Assembly of the manual</td>
+<td>CxM</td>
+<td>DCOps lead</td>
+<td>at TOC, final 30 days after</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s12-6"><span class="n">12.6</span>As-built drawings and record documents</h2>
+<h3 id="s12-6-1"><span class="n">12.6.1</span>Definitions</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Document</th>
+<th>Meaning</th>
+<th>Who produces it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Red-line mark-up</td>
+<td>Site set of construction drawings marked by hand or in a PDF tool with every change made during installation</td>
+<td>Installing subcontractor, kept current weekly</td>
+</tr>
+<tr>
+<td>As-built drawings</td>
+<td>Drawings updated from the mark-ups, showing the installation as built</td>
+<td>Contractor (or designer if the contract says so)</td>
+</tr>
+<tr>
+<td>Record drawings</td>
+<td>As-built drawings accepted by the owner as the formal record</td>
+<td>Contractor issues; owner accepts</td>
+</tr>
+<tr>
+<td>Record documents (CSI 01 78 39)</td>
+<td>Record drawings, record specifications, record product data and record samples</td>
+<td>Contractor</td>
+</tr>
+<tr>
+<td>BIM record model</td>
+<td>Model updated to the as-built state with asset data</td>
+<td>Contractor or BIM consultant</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-6-2"><span class="n">12.6.2</span>Rules for mark-ups and as-built drawings</h3>
+<ol>
+<li><strong>Keep the mark-up set current.</strong> The site mark-up set is updated within 5 working days of each change and checked monthly by the contractor's quality team.</li>
+<li><strong>Use colours consistently.</strong> Red for additions, green for deletions, blue for notes (common practice; follow the project CAD standard).</li>
+<li><strong>Record the reason.</strong> <mark>Each change references its request for information (RFI), site instruction or variation number</mark> (chapters 05 and 08).</li>
+<li><strong>Show hidden services.</strong> Buried cables, embedded conduits and services above ceilings or below raised floors are dimensioned from fixed points.</li>
+<li><strong>Update tags and labels.</strong> <mark>Equipment tags on the drawings agree with the labels on site and with the asset register</mark>.</li>
+<li><strong>Revise and issue.</strong> As-built drawings carry a revision letter or number and the status "As built". The title block states the date of the site survey.</li>
+<li><strong>Issue native files.</strong> CAD or BIM native files are issued with the PDF set, with fonts and references bound.</li>
+</ol>
+<h3 id="s12-6-3"><span class="n">12.6.3</span>Verification of as-built drawings by sampling</h3>
+<p>Figure <a class="figref" href="#F12-7">F12-7</a> shows the sampling check of the building B1 single-line diagrams: the sample size, the 35 points checked, the rejection and the second sample.</p>
+<figure class="sheet" id="F12-7"><a href="../data/cx-handbook/figures/F12-7.svg" title="Open drawing F12-7 at full size"><img src="../data/cx-handbook/figures/F12-7.svg" alt="F12-7: As-built verification by sampling: building B1 single-line diagrams" width="1000" height="769" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F12-7</span> — <b>As-built verification by sampling: building B1 single-line diagrams</b>. A single-line diagram is used to write switching programmes, so one wrong tag or cable size rejects the set; the contractor re-checks all sheets before the second sample.</figcaption></figure>
+
+<p>The CxM and the operations team verify a sample of as-built drawings against the installation before acceptance. A common rule is <mark>a sample of 10 % of the sheets per system, with at least 5 sheets</mark> (project practice; the specification may set another rate). Each sampled sheet is checked at 5 points: tags, cable or pipe routes, device positions, terminal or valve numbers, and dimensions of hidden services.</p>
+<p><strong>Worked example:</strong> As-built verification for the 20 kV and low-voltage (LV) single-line diagrams of building B1. The as-built set has 64 electrical schematic sheets. The sample is 10 % of 64 = 6.4, rounded up to 7 sheets. The checker checks 5 points on each sheet, which is 35 points. The result is 33 points correct and 2 wrong. The breaker tag on the tee-off of ring main unit RMU-03 reads T1 on the drawing and T2 on site. A cable size on an LV feeder reads 240 mm² on the drawing and 300 mm² on site. The point accuracy is 33 ÷ 35 = 94.3 %. The acceptance rule in this example is <mark>no wrong point on a single-line diagram</mark>, because the single-line diagram is used to write switching programmes (chapter 10). The set is rejected. The contractor corrects the 2 points and re-checks all 64 sheets against the site labels, and a second sample of 7 different sheets finds 35 of 35 points correct.</p>
+<h2 id="s12-7"><span class="n">12.7</span>Asset data for the CMMS</h2>
+
+<figure class="sheet" id="F12-3"><a href="../data/cx-handbook/figures/F12-3.svg" title="Open drawing F12-3 at full size"><img src="../data/cx-handbook/figures/F12-3.svg" alt="F12-3: Asset data flow from installation to the CMMS, with the validation rules applied at each step" width="1400" height="668" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F12-3</span> — <b>Asset data flow from installation to the CMMS, with the validation rules applied at each step</b>. Data enters at the step where it is first known on site and is checked by rule before it reaches the CMMS; nothing is typed in at handover from memory.</figcaption></figure>
+<h3 id="s12-7-1"><span class="n">12.7.1</span>Why the asset data must be ready before handover</h3>
+<p>The CMMS holds the asset register, the maintenance plans, the work orders and the spares stock. If the asset data is loaded after handover, the operations team runs the plant for weeks without planned maintenance and without a record of the warranty start dates. Hyperscale programmes <mark>collect the asset data during installation and L2</mark>, validate it during L3 and L4, and load it into the CMMS before RFS. Chapter 27 describes the CMMS itself.</p>
+<h3 id="s12-7-2"><span class="n">12.7.2</span>Asset register fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Asset tag</td>
+<td>text, unique</td>
+<td>B1-CHW-CH-03</td>
+<td>Tagging standard</td>
+</tr>
+<tr>
+<td>Description</td>
+<td>text</td>
+<td>Chiller 3, water-cooled, 2.5 MW (example value, 12.3.2)</td>
+<td>Submittal</td>
+</tr>
+<tr>
+<td>Asset class</td>
+<td>pick list</td>
+<td>Chiller</td>
+<td>Owner classification</td>
+</tr>
+<tr>
+<td>Parent system</td>
+<td>text</td>
+<td>B1-CHW (chilled-water plant B1)</td>
+<td>System list</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>building, level, room</td>
+<td>B1, roof level, chiller hall</td>
+<td>Layout drawing</td>
+</tr>
+<tr>
+<td>Manufacturer</td>
+<td>text</td>
+<td>(OEM name)</td>
+<td>Nameplate</td>
+</tr>
+<tr>
+<td>Model number</td>
+<td>text</td>
+<td>(model)</td>
+<td>Nameplate</td>
+</tr>
+<tr>
+<td>Serial number</td>
+<td>text</td>
+<td>(serial)</td>
+<td>Nameplate photo</td>
+</tr>
+<tr>
+<td>Capacity and rating</td>
+<td>number and unit</td>
+<td>2,500 kW</td>
+<td>Datasheet</td>
+</tr>
+<tr>
+<td>Install date</td>
+<td>date</td>
+<td>12 Jun 2026</td>
+<td>L2 checklist</td>
+</tr>
+<tr>
+<td>Start-up date</td>
+<td>date</td>
+<td>2 Sep 2026</td>
+<td>L3 test record</td>
+</tr>
+<tr>
+<td>Warranty start, warranty end</td>
+<td>date</td>
+<td>15 Feb 2027, 14 Feb 2029</td>
+<td>Warranty register</td>
+</tr>
+<tr>
+<td>Maintenance plan reference</td>
+<td>text</td>
+<td>PM-CHILLER-Q, PM-CHILLER-A</td>
+<td>CMMS job plans</td>
+</tr>
+<tr>
+<td>Criticality</td>
+<td>pick list</td>
+<td>1 (loss affects IT load)</td>
+<td>Owner criticality rules</td>
+</tr>
+<tr>
+<td>Spares reference</td>
+<td>text</td>
+<td>SPL-B1-CHW-01</td>
+<td>Spares list</td>
+</tr>
+<tr>
+<td>Document links</td>
+<td>URL list</td>
+<td>O&amp;M manual, datasheet, test reports</td>
+<td>Common data environment (CDE)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-7-3"><span class="n">12.7.3</span>COBie worksheets</h3>
+<p>COBie (Construction Operations Building information exchange) is a spreadsheet format for handing over asset information. The code of practice BS 1192-4:2014 is withdrawn and BS EN ISO 19650-4:2022 is listed as its successor in the catalogue of the British Standards Institution (BSI). The worksheets of the COBie format and their use on a data-centre handover are listed below (confirm the worksheet list against the COBie version named in the exchange information requirements, for example COBie 2.4 of the US National BIM Standard, NBIMS-US V3).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>COBie worksheet</th>
+<th>Content</th>
+<th>Data-centre example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contact</td>
+<td>People and companies</td>
+<td>OEM service contacts</td>
+</tr>
+<tr>
+<td>Facility</td>
+<td>The building</td>
+<td>B1</td>
+</tr>
+<tr>
+<td>Floor</td>
+<td>Levels</td>
+<td>Ground, level 1, roof</td>
+</tr>
+<tr>
+<td>Space</td>
+<td>Rooms</td>
+<td>B1-DH2, MVR-1, chiller hall</td>
+</tr>
+<tr>
+<td>Zone</td>
+<td>Groups of spaces</td>
+<td>Data hall zone 3, fire zone 12</td>
+</tr>
+<tr>
+<td>Type</td>
+<td>Equipment types with common data</td>
+<td>Chiller model, computer room air handler (CRAH) model, uninterruptible power supply (UPS) model</td>
+</tr>
+<tr>
+<td>Component</td>
+<td>Individual assets</td>
+<td>B1-CHW-CH-03 with serial number</td>
+</tr>
+<tr>
+<td>System</td>
+<td>Groups of components</td>
+<td>B1-CHW plant</td>
+</tr>
+<tr>
+<td>Assembly</td>
+<td>Parts of a type</td>
+<td>Not used on most programmes</td>
+</tr>
+<tr>
+<td>Connection</td>
+<td>Logical connections</td>
+<td>Chiller to pump</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>Spare parts by type</td>
+<td>Compressor oil filter</td>
+</tr>
+<tr>
+<td>Resource</td>
+<td>Tools and materials</td>
+<td>Refrigerant recovery unit</td>
+</tr>
+<tr>
+<td>Job</td>
+<td>Maintenance tasks by type</td>
+<td>Quarterly chiller inspection</td>
+</tr>
+<tr>
+<td>Impact</td>
+<td>Environmental data</td>
+<td>Not used on most programmes</td>
+</tr>
+<tr>
+<td>Document</td>
+<td>Document references</td>
+<td>O&amp;M manual link</td>
+</tr>
+<tr>
+<td>Attribute</td>
+<td>Extra properties</td>
+<td>Refrigerant type and charge</td>
+</tr>
+<tr>
+<td>Coordinate</td>
+<td>Locations</td>
+<td>Not used on most programmes</td>
+</tr>
+<tr>
+<td>Issue</td>
+<td>Open issues</td>
+<td>Not used for handover on most programmes</td>
+</tr>
+<tr>
+<td>PickLists</td>
+<td>Allowed values</td>
+<td>Asset classes</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-7-4"><span class="n">12.7.4</span>Data flow and validation</h3>
+<p>Figure <a class="figref" href="#F12-3">F12-3</a> shows the data flow and the validation rules.</p>
+<ol>
+<li><strong>Template issue.</strong> The owner's CMMS team issues the asset data template with field rules and pick lists at the start of construction.</li>
+<li><strong>Collection during installation.</strong> The installing subcontractor fills tag, description, location, manufacturer and model at installation, and the serial number from the nameplate photo at L2.</li>
+<li><strong>Start-up data.</strong> The commissioning team adds start-up dates and test record links at L3.</li>
+<li><strong>Validation.</strong> The CMMS team runs validation rules: unique tags, tags found in the as-built drawings, mandatory fields complete, dates in order (install date before start-up date before warranty end), pick-list values valid.</li>
+<li><strong>Field sample check.</strong> The operations team checks a sample of 5 % of assets per system on site against the nameplates.</li>
+<li><strong>Load to a test environment.</strong> The data is loaded to a CMMS test environment and the maintenance plans are attached.</li>
+<li><strong>Load to production.</strong> After acceptance, the data is loaded to production before RFS.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Validation rule</th>
+<th>Example failure</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tag is unique</td>
+<td>Two rows with B1-CHW-P-03</td>
+<td>Contractor corrects</td>
+</tr>
+<tr>
+<td>Tag exists on the as-built drawing</td>
+<td>Asset tag not on any drawing</td>
+<td>Check drawing or asset</td>
+</tr>
+<tr>
+<td>Mandatory fields complete</td>
+<td>Serial number blank</td>
+<td>Contractor completes from nameplate photo</td>
+</tr>
+<tr>
+<td>Dates in order</td>
+<td>Start-up date before install date</td>
+<td>Contractor corrects</td>
+</tr>
+<tr>
+<td>Pick-list value valid</td>
+<td>Asset class "chiller unit" not in list</td>
+<td>Map to "Chiller"</td>
+</tr>
+<tr>
+<td>Parent system exists</td>
+<td>System B1-CHW-2 not in system list</td>
+<td>Correct the parent</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Asset data validation for the B1 chiller plant. The contractor submits 140 asset rows. The validation script finds 12 rows with a blank serial number and 3 rows with duplicate tags (the three buffer vessels all tagged B1-CHW-BV-01). It also finds 4 rows with a start-up date earlier than the install date. Some rows have more than one failure; the number of rows with at least one failure is 17. The first-pass data quality is (140 − 17) ÷ 140 = 87.9 %. The target in this example is <mark>100 % of rows passing before the load to production</mark>. After correction, a field sample of 5 % (7 assets) finds 1 serial number that differs from the nameplate by one digit. The DCOps lead asks for a full serial number check against the nameplate photos for the 12 chillers, pumps and pressurisation units, which finds no further error.</p>
+<h2 id="s12-8"><span class="n">12.8</span>Spare parts and special tools</h2>
+<h3 id="s12-8-1"><span class="n">12.8.1</span>Categories of spares</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Purpose</th>
+<th>Who decides the list</th>
+<th>Example for a chiller plant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commissioning spares</td>
+<td>Used during start-up and testing, consumed before handover</td>
+<td>Contractor and OEM</td>
+<td>Filters, gaskets, fuses used during L3</td>
+</tr>
+<tr>
+<td>Contract spares (operational spares)</td>
+<td>Supplied under the contract for the first period of operation</td>
+<td>Specification</td>
+<td>Oil filters, belts, contactors, sensors for 2 years</td>
+</tr>
+<tr>
+<td>Strategic or critical spares</td>
+<td>Long-lead items whose failure would remove redundancy for a long time</td>
+<td>Owner, from a criticality review</td>
+<td>Compressor motor, variable-frequency drive (VFD) power module, controller board</td>
+</tr>
+<tr>
+<td>Consumables</td>
+<td>Items used in routine maintenance</td>
+<td>Operations</td>
+<td>Lubricants, cleaning materials</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-8-2"><span class="n">12.8.2</span>Spares and tools register fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spares list number</td>
+<td>text</td>
+<td>SPL-B1-CHW-01</td>
+</tr>
+<tr>
+<td>Item number</td>
+<td>text</td>
+<td>014</td>
+</tr>
+<tr>
+<td>Description</td>
+<td>text</td>
+<td>VFD power module for chiller compressor</td>
+</tr>
+<tr>
+<td>Manufacturer part number</td>
+<td>text</td>
+<td>(OEM part number)</td>
+</tr>
+<tr>
+<td>Used on asset types</td>
+<td>text list</td>
+<td>Chiller model X, 5 units</td>
+</tr>
+<tr>
+<td>Quantity required, delivered</td>
+<td>numbers</td>
+<td>1, 1</td>
+</tr>
+<tr>
+<td>Lead time if ordered new</td>
+<td>weeks</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Storage location</td>
+<td>text</td>
+<td>B1 spares store, rack 4, shelf 2</td>
+</tr>
+<tr>
+<td>Storage condition</td>
+<td>text</td>
+<td>dry, 15 °C to 30 °C, anti-static bag</td>
+</tr>
+<tr>
+<td>Shelf life or expiry</td>
+<td>date</td>
+<td>not applicable</td>
+</tr>
+<tr>
+<td>Received by, date</td>
+<td>name and date</td>
+<td>Operations storekeeper, 18 Jan 2027</td>
+</tr>
+<tr>
+<td>Delivery note</td>
+<td>text</td>
+<td>DN-44817</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-8-3"><span class="n">12.8.3</span>Special tools</h3>
+<p>Special tools are tools that the OEM requires for maintenance and that are not in a normal tool kit. Examples are racking handles for withdrawable breakers, earth switch operating handles, software licences and cables for controller access, chiller service software, torque tools with specific heads, lifting beams for UPS modules. The contract lists them per equipment type. The receipt record names each tool, its serial number where it has one, and its storage location. <mark>Software tools and licences are handed over with the licence certificate and the named licence holder</mark>, because <mark>a licence registered to the contractor's engineer</mark> stops working when that person leaves.</p>
+<p><strong>Worked example:</strong> Spares receipt for the B1 chiller plant. The specification requires 2 years of operational spares and the owner's criticality review adds 3 strategic items. The spares list SPL-B1-CHW-01 has 38 line items with 214 pieces in total. At the receipt check, 35 lines are complete and 2 lines are short (6 of 10 oil filters, 2 of 4 temperature sensors). One strategic item, the VFD power module with a lead time of 16 weeks, has not arrived. The storekeeper signs the receipt for 35 lines and records 3 open lines on the TOC outstanding list. Because the strategic module has a 16-week lead time, the DCOps lead classifies its absence as a category B issue with a closure date. The contractor provides a written confirmation of the shipping date.</p>
+<h2 id="s12-9"><span class="n">12.9</span>Training</h2>
+<h3 id="s12-9-1"><span class="n">12.9.1</span>Training plan</h3>
+<p>Training transfers the knowledge to operate and maintain the systems from the contractor and the OEMs to the operations team. Owner specifications based on CSI section 01 79 00 Demonstration and Training require instruction on emergency shut-down, operation outside normal limits, and routine and preventive maintenance. They also require a factory-authorised instructor and training records such as agendas, schedules, sign-in sheets, handouts and recordings. The Yale University section 01 79 00 (September 2025) states: "Do not submit instruction program until operation and maintenance data have been reviewed and approved by Architect."</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Training plan field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Training module ID</td>
+<td>text</td>
+<td>TRN-B1-CHW-02</td>
+</tr>
+<tr>
+<td>System</td>
+<td>text</td>
+<td>Chilled-water plant B1</td>
+</tr>
+<tr>
+<td>Title</td>
+<td>text</td>
+<td>Chiller operation, alarms and emergency shut-down</td>
+</tr>
+<tr>
+<td>Audience</td>
+<td>pick list</td>
+<td>Shift engineers, maintenance technicians</td>
+</tr>
+<tr>
+<td>Instructor and qualification</td>
+<td>name and text</td>
+<td>OEM service engineer, factory-authorised</td>
+</tr>
+<tr>
+<td>Prerequisites</td>
+<td>text</td>
+<td>O&amp;M manual accepted, equipment operating</td>
+</tr>
+<tr>
+<td>Duration</td>
+<td>hours</td>
+<td>6 hours (3 classroom, 3 on the plant)</td>
+</tr>
+<tr>
+<td>Learning objectives</td>
+<td>list</td>
+<td>start, stop, change duty, respond to 10 alarms, emergency shut-down</td>
+</tr>
+<tr>
+<td>Materials</td>
+<td>list</td>
+<td>Slides, O&amp;M manual extract, checklist</td>
+</tr>
+<tr>
+<td>Assessment</td>
+<td>text</td>
+<td>Practical demonstration with a checklist, pass mark 80 %</td>
+</tr>
+<tr>
+<td>Recording</td>
+<td>yes or no</td>
+<td>yes, video stored in the CDE</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-9-2"><span class="n">12.9.2</span>Training procedure</h3>
+<ol>
+<li><strong>Plan.</strong> <mark>The contractor submits the training plan 60 days before the first session</mark>. The DCOps lead approves the audience and the dates.</li>
+<li><strong>Prepare.</strong> The instructor issues the materials 10 working days before the session. The CxM checks that the materials match the installed equipment.</li>
+<li><strong>Deliver.</strong> The session runs in two parts: classroom and on the plant. Attendees sign the attendance sheet with name, role and time in and out.</li>
+<li><strong>Assess.</strong> Each attendee completes the practical assessment. Results are recorded per person.</li>
+<li><strong>Record.</strong> The contractor issues the training record within 5 working days: attendance, assessment results, materials, recording link.</li>
+<li><strong>Repeat for shifts.</strong> Sessions repeat so that each shift team attends. On a 24/7 data centre with 4 or 5 shift teams, critical modules run 4 or 5 times, or are recorded and followed by a practical session per shift.</li>
+</ol>
+<h3 id="s12-9-3"><span class="n">12.9.3</span>Training record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Session ID</td>
+<td>TRN-B1-CHW-02-S3</td>
+</tr>
+<tr>
+<td>Date and time</td>
+<td>14 Jan 2027, 08:00 to 14:00</td>
+</tr>
+<tr>
+<td>Instructor</td>
+<td>OEM service engineer</td>
+</tr>
+<tr>
+<td>Attendees</td>
+<td>7 names with roles and shift team</td>
+</tr>
+<tr>
+<td>Attendance time</td>
+<td>7 attendees present for at least 90 % of the session</td>
+</tr>
+<tr>
+<td>Assessment results</td>
+<td>6 passed (82 % to 96 %), 1 failed (70 %)</td>
+</tr>
+<tr>
+<td>Follow-up</td>
+<td>Failed attendee booked on session S4</td>
+</tr>
+<tr>
+<td>Recording</td>
+<td>link in CDE folder Training/B1/CHW</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Training hours for building B1. The training plan has 42 modules. They cover medium-voltage (MV) and LV electrical, generators, UPS and batteries, chilled water, coolant distribution units (CDU) and technology cooling. Further modules cover CRAH, fire detection and suppression interfaces, BMS, EPMS and the operational technology (OT) network. The average module is 5 hours, and the operations team of B1 has 5 shift teams of 6 engineers plus a maintenance team of 10. Critical modules (18 of 42) run once per shift team (5 times); the other 24 modules run twice and are recorded. Delivered hours = 18 × 5 × 5 + 24 × 2 × 5 = 450 + 240 = 690 instructor hours. Attendee hours for the critical modules = 18 × 5 hours × 30 shift engineers = 2,700 hours. The training must finish before IST of DH1 so that the shift engineers can operate the plant during IST. This places the start of training <mark>at least 6 weeks before IST</mark> at 115 instructor hours per week.</p>
+<h2 id="s12-10"><span class="n">12.10</span>Warranties</h2>
+
+<figure class="sheet" id="F12-5"><a href="../data/cx-handbook/figures/F12-5.svg" title="Open drawing F12-5 at full size"><img src="../data/cx-handbook/figures/F12-5.svg" alt="F12-5: Warranty dates against the DNP for the UPS systems of B2-DH3: gap check and extension" width="1400" height="592" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F12-5</span> — <b>Warranty dates against the DNP for the UPS systems of B2-DH3: gap check and extension</b>. Time in months from January 2026. The OEM warranty started at delivery and would end 5 days before the DNP; a 3-month delay to taking-over would open a gap of more than 3 months.</figcaption></figure>
+<h3 id="s12-10-1"><span class="n">12.10.1</span>Warranty register</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Warranty ID</td>
+<td>text</td>
+<td>WAR-B1-CHW-CH-03</td>
+</tr>
+<tr>
+<td>Asset tag or system</td>
+<td>text</td>
+<td>B1-CHW-CH-03</td>
+</tr>
+<tr>
+<td>Supplier and OEM</td>
+<td>text</td>
+<td>Mechanical subcontractor; chiller OEM</td>
+</tr>
+<tr>
+<td>Warranty type</td>
+<td>pick list</td>
+<td>equipment, parts and labour, extended, performance, workmanship</td>
+</tr>
+<tr>
+<td>Start trigger</td>
+<td>pick list</td>
+<td>taking-over, start-up, delivery, invoice date</td>
+</tr>
+<tr>
+<td>Start date</td>
+<td>date</td>
+<td>15 Feb 2027</td>
+</tr>
+<tr>
+<td>Duration</td>
+<td>months</td>
+<td>24</td>
+</tr>
+<tr>
+<td>End date</td>
+<td>date</td>
+<td>14 Feb 2029</td>
+</tr>
+<tr>
+<td>Conditions</td>
+<td>text</td>
+<td>OEM-authorised maintenance every quarter, records kept</td>
+</tr>
+<tr>
+<td>Exclusions</td>
+<td>text</td>
+<td>Water treatment damage, refrigerant leaks caused by others</td>
+</tr>
+<tr>
+<td>Claim contact</td>
+<td>text</td>
+<td>OEM service desk, phone and email</td>
+</tr>
+<tr>
+<td>Certificate reference</td>
+<td>text</td>
+<td>WC-77213</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-10-2"><span class="n">12.10.2</span>Start date rules</h3>
+<p>Figure <a class="figref" href="#F12-5">F12-5</a> shows the warranty and DNP dates of the worked example below.</p>
+<p><mark>The start date is a common cause of warranty disputes</mark>. The OEM warranty often starts at delivery or start-up, while the contract makes the contractor responsible for defects from taking-over. If the equipment was delivered 9 months before taking-over and the OEM warranty is 12 months from delivery, only 3 months of OEM warranty remain at handover. The contract and the purchase orders must close this gap.</p>
+<ol>
+<li><strong>Align OEM and contract periods.</strong> The purchase order requires the OEM warranty to start at taking-over of the Section. The other option is a fixed period after delivery that covers the longest expected storage and commissioning time plus the DNP.</li>
+<li><strong>Record both dates.</strong> The warranty register records the OEM start date and the contract defects period start date.</li>
+<li><strong>Keep the conditions.</strong> The operations team keeps the maintenance records that the warranty conditions require, for example quarterly OEM-authorised service.</li>
+<li><strong>Claims during the DNP.</strong> During the DNP, defects are notified to the contractor under the contract; the contractor manages the OEM claim.</li>
+</ol>
+<p><strong>Worked example:</strong> Warranty gap for the UPS systems of building B2. The UPS modules for B2-DH3 were delivered on 10 Mar 2026 with a 24-month OEM warranty from delivery, so the OEM warranty ends on 9 Mar 2028. Taking-over of the DH3 Section is forecast for 15 Mar 2027, and the DNP is 12 months, ending on 14 Mar 2028. The OEM warranty ends 5 days before the end of the DNP. A 3-month delay to taking-over would create a gap of more than 3 months in which the contractor carries the defects risk without OEM cover. The CxM records the dates in the warranty register and raises the risk in the weekly report. The contractor buys a warranty extension of 6 months from the OEM for a fixed price, which moves the OEM end date to 9 Sep 2028. This covers the DNP with a margin of <mark>5 months and 26 days</mark> (14 Mar 2028 to 9 Sep 2028).</p>
+<h3 id="s12-10-3"><span class="n">12.10.3</span>Setting warranty expiry alerts in the CMMS</h3>
+<ol>
+<li><strong>Load both dates.</strong> The CMMS administrator loads the OEM warranty start and end dates and the contract DNP dates for each asset from the warranty register.</li>
+<li><strong>Set the alert.</strong> <mark>The CMMS raises an alert 90 days before each warranty end date</mark> and sends it to the maintenance planner.</li>
+<li><strong>Inspect before expiry.</strong> The maintenance planner schedules an inspection of the asset 60 days before the end date, so that any defect is notified while the warranty is valid.</li>
+<li><strong>Notify defects found.</strong> Defects found in the inspection are notified to the contractor (during the DNP) or to the OEM (after the DNP) before the end date.</li>
+<li><strong>Record the result.</strong> The inspection record and any claim are linked to the asset in the CMMS.</li>
+</ol>
+<h3 id="s12-10-4"><span class="n">12.10.4</span>Warranty KPIs</h3>
+<p>The warranty key performance indicators (KPIs) are below.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Warranty certificates received</td>
+<td>certificates received ÷ assets requiring one</td>
+<td>100 % at TOC</td>
+</tr>
+<tr>
+<td>Warranty start dates recorded</td>
+<td>assets with OEM start and contract start recorded ÷ assets</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>Warranty claims open</td>
+<td>claims not closed within the OEM response time</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Warranty expiry alerts</td>
+<td>CMMS alerts set 90 days before expiry</td>
+<td>100 %</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s12-11"><span class="n">12.11</span>The defects liability period</h2>
+
+<figure class="sheet" id="F12-4"><a href="../data/cx-handbook/figures/F12-4.svg" title="Open drawing F12-4 at full size"><img src="../data/cx-handbook/figures/F12-4.svg" alt="F12-4: Defects notification period of Section B1-DH1 with an item extension for chiller B1-CHW-CH-02" width="1400" height="700" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F12-4</span> — <b>Defects notification period of Section B1-DH1 with an item extension for chiller B1-CHW-CH-02</b>. Time runs in months from the Taking-Over Certificate of the Section; the extension applies to chiller 2 only, the rest of the Section ends at month 12.</figcaption></figure>
+<h3 id="s12-11-1"><span class="n">12.11.1</span>What the DLP is</h3>
+<p>The defects liability period (DLP) is the period after taking-over or Completion during which the contractor must correct defects notified by the owner. FIDIC calls it the Defects Notification Period (DNP), and NEC4 calls it the period up to the defects date. Under FIDIC 2017 the DNP length is set in the Contract Data; where none is stated, it is 365 days. The Employer is entitled to an extension of the DNP for any part that cannot be used for its intended purpose because of a defect (sub-clause 11.3). In any case <mark>the extension cannot exceed two years</mark> after the DNP stated in the Contract Data. The Performance Certificate is issued within 28 days after the latest expiry of the DNPs, or as soon as the Contractor has completed all work and remedied all defects (sub-clause 11.9). These values come from commentary on the 2017 forms; the Particular Conditions may change them.</p>
+<h3 id="s12-11-2"><span class="n">12.11.2</span>Defects handling during the DLP</h3>
+<p><strong>Trigger:</strong> The operations team finds a fault that is the contractor's responsibility: failed equipment, wrong installation, wrong configuration, or work that does not meet the specification.</p>
+<p><strong>Owner:</strong> The owner's handover manager notifies; the contractor corrects.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Record.</strong> The operations engineer raises a defect in the defects register with the asset tag, the symptom, photos, alarm records and the date found.</li>
+<li><strong>Classify.</strong> The handover manager classifies the defect by its effect on operation: critical (redundancy lost or IT load at risk), major (degraded function), minor (no effect on function).</li>
+<li><strong>Notify.</strong> The handover manager notifies the contractor in writing within 2 working days. The notice states the response time.</li>
+<li><strong>Make safe.</strong> For a critical defect, the operations team makes the plant safe and restores redundancy by switching or isolation (chapter 10).</li>
+<li><strong>Access and permit.</strong> The contractor works under the owner's live-site permit and change process, with a method of procedure (MOP).</li>
+<li><strong>Correct and test.</strong> The contractor corrects the defect and <mark>repeats the test that proves the function</mark> (the L3 or L4 test step), witnessed by operations.</li>
+<li><strong>Close.</strong> The handover manager closes the defect with the test record. Defects that are not corrected in the response time are corrected by the owner at the contractor's cost where the contract allows it.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Defect class</th>
+<th>Example</th>
+<th>Response time (typical)</th>
+<th>Correction time (typical)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Critical</td>
+<td>UPS module fails and the block runs on reduced redundancy</td>
+<td>4 hours on site</td>
+<td>24 hours or the OEM part lead time with a temporary measure</td>
+</tr>
+<tr>
+<td>Major</td>
+<td>One CRAH fan fails, redundancy remains</td>
+<td>1 working day</td>
+<td>5 working days</td>
+</tr>
+<tr>
+<td>Minor</td>
+<td>Label missing, paint damage</td>
+<td>5 working days</td>
+<td>20 working days</td>
+</tr>
+</tbody>
+</table></div>
+<p>The response and correction times are project practice and must be written in the contract. Under NEC4 ECC the defect correction period is stated in Contract Data part one. FIDIC 2017 clause 11 requires remedy within a reasonable time, so hour-based response times go in the Particular Conditions or the Employer's Requirements. <mark>A defects period without written response times</mark> leads to disputes about delay in a live data centre.</p>
+<h3 id="s12-11-3"><span class="n">12.11.3</span>Defects register fields</h3>
+<p>Figure <a class="figref" href="#F12-4">F12-4</a> shows the DNP of Section B1-DH1 with the item extension of the worked example below.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Defect ID</td>
+<td>text</td>
+<td>DLP-B1-0147</td>
+</tr>
+<tr>
+<td>Date found, date notified</td>
+<td>date</td>
+<td>3 May 2027, 4 May 2027</td>
+</tr>
+<tr>
+<td>Asset tag</td>
+<td>text</td>
+<td>B1-DH2-CDU-07</td>
+</tr>
+<tr>
+<td>Description</td>
+<td>text</td>
+<td>CDU flow meter reads 12 % low against a clamp-on reference</td>
+</tr>
+<tr>
+<td>Class</td>
+<td>pick list</td>
+<td>Major</td>
+</tr>
+<tr>
+<td>Contract Section</td>
+<td>text</td>
+<td>Section B1-DH2</td>
+</tr>
+<tr>
+<td>Notified to</td>
+<td>company</td>
+<td>Mechanical subcontractor</td>
+</tr>
+<tr>
+<td>Response due, correction due</td>
+<td>date-time</td>
+<td>5 May 2027, 11 May 2027</td>
+</tr>
+<tr>
+<td>Corrected on</td>
+<td>date</td>
+<td>10 May 2027</td>
+</tr>
+<tr>
+<td>Retest record</td>
+<td>text</td>
+<td>L4 step CDU-L4-07-12 repeated, pass</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>pick list</td>
+<td>open, corrected, closed, rejected</td>
+</tr>
+<tr>
+<td>Effect on DNP</td>
+<td>text</td>
+<td>no extension (CDU remained usable)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> DLP statistics for building B1 at month 6 of the DNP. The defects register holds 147 defects: 6 critical, 41 major and 100 minor. Corrected within the correction time: 5 of 6 critical, 36 of 41 major and 81 of 100 minor. The on-time correction rate is (5 + 36 + 81) ÷ 147 = 122 ÷ 147 = 83.0 %. The one late critical defect is a VFD module on chiller B1-CHW-CH-02 with a 16-week lead time. The chiller stayed out of service for 11 weeks with the standby chiller running. Under the FIDIC practice the owner notifies an extension of the DNP for chiller 2 by 11 weeks, because the chiller could not be used for its intended purpose. The extension applies to chiller 2 only. The rest of the Section keeps its original DNP. The DNP for the Section ends at month 12, and the DNP for chiller 2 ends at month 12 plus 11 weeks.</p>
+<h3 id="s12-11-4"><span class="n">12.11.4</span>Retention and the Performance Certificate</h3>
+<ol>
+<li><strong>Retention at taking-over.</strong> FIDIC 2017 sub-clause 14.9 <mark>releases the first half of the retention</mark> when the Taking-Over Certificate for the Works is issued, and the second half after the latest DNP expires. Under NEC4 secondary Option X16 the retention is halved only at Completion of the whole of the works; sectional Completion does not halve it. The rest is paid after the Defects Certificate. The percentages and the treatment of Sections are set in the Contract Data.</li>
+<li><strong>End of the DNP.</strong> The handover manager confirms that all notified defects are corrected and that the retests are signed.</li>
+<li><strong>Performance Certificate or Defects Certificate.</strong> The Engineer issues the Performance Certificate (FIDIC) or the Supervisor issues the Defects Certificate (NEC4).</li>
+<li><strong>Release.</strong> The second half of the retention is released after the certificate, and any retention bond is returned.</li>
+</ol>
+<h2 id="s12-12"><span class="n">12.12</span>The final account</h2>
+<p>The final account is the agreed total of the contract price, including all variations, claims, adjustments and deductions. The CxM is not the owner of the final account, but the commissioning records support it. These records are the variations for added tests, the deductions for incomplete training or missing spares, and the costs of defects corrected by the owner.</p>
+<ol>
+<li><strong>Draft final statement.</strong> Under FIDIC 2017 sub-clause 14.11 the contractor submits the draft Final Statement within 56 days after receiving the Performance Certificate. Under NEC4 ECC clause 53 the Project Manager makes the final assessment of the amount due within four weeks after the Supervisor issues the Defects Certificate.</li>
+<li><strong>Commissioning input.</strong> The CxM provides a list of open commissioning items with their value: outstanding training sessions, missing spares, missing documents, defects corrected by the owner.</li>
+<li><strong>Agreement.</strong> The quantity surveyors agree the final amounts and the Engineer or Project Manager certifies the final payment.</li>
+<li><strong>Close-out.</strong> The contract is closed and the records are archived in the CDE with the retention period of the owner's records policy.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Commissioning item affecting the final account</th>
+<th>Record</th>
+<th>Typical treatment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Additional tests instructed by the owner</td>
+<td>Variation instruction and test record</td>
+<td>Paid as a variation</td>
+</tr>
+<tr>
+<td>Retests caused by contractor failures</td>
+<td>Test register and issue record</td>
+<td>Contractor cost; witness costs may be charged under the contract</td>
+</tr>
+<tr>
+<td>Training sessions not delivered</td>
+<td>Training plan and records</td>
+<td>Deducted or delivered later</td>
+</tr>
+<tr>
+<td>Spares not delivered</td>
+<td>Spares receipt record</td>
+<td>Deducted or delivered later</td>
+</tr>
+<tr>
+<td>Defects corrected by the owner after notice</td>
+<td>Defects register and cost records</td>
+<td>Charged to the contractor where the contract allows it</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s12-13"><span class="n">12.13</span>Soft Landings and operations readiness</h2>
+<h3 id="s12-13-1"><span class="n">12.13.1</span>BSRIA BG 54/2018 Soft Landings Framework</h3>
+<p>Soft Landings is a process that keeps the design and construction team involved before and after handover so that the building performs as intended in use. The BSRIA BG 54/2018 Soft Landings Framework uses six phases in place of the five stages of the 2014 edition. The phases are inception and briefing, design, construction, pre-handover, initial aftercare, and extended aftercare with post-occupancy evaluation (POE). The 2014 edition described extended aftercare over years 1 to 3 (confirm the aftercare period against the extended aftercare phase of BSRIA BG 54/2018).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Soft Landings phase</th>
+<th>Data-centre activity</th>
+<th>Commissioning link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inception and briefing</td>
+<td>Operations team writes its requirements into the OPR</td>
+<td>OPR, Cx plan</td>
+</tr>
+<tr>
+<td>Design</td>
+<td>Operations reviews the design for maintainability</td>
+<td>Cx design review (chapter 11)</td>
+</tr>
+<tr>
+<td>Construction</td>
+<td>Operations staff visit the site and attend FAT</td>
+<td>L1 and L2 witnessing</td>
+</tr>
+<tr>
+<td>Pre-handover</td>
+<td>Training, turnover package review, operations readiness review</td>
+<td>12.2 to 12.9</td>
+</tr>
+<tr>
+<td>Initial aftercare</td>
+<td>Contractor and designer support on site in the first weeks after RFS</td>
+<td>Defects register, resident engineer</td>
+</tr>
+<tr>
+<td>Extended aftercare</td>
+<td>Periodic reviews of energy, power usage effectiveness (PUE), alarms and defects</td>
+<td>Seasonal testing, trend review (chapter 30)</td>
+</tr>
+<tr>
+<td>Post-occupancy evaluation</td>
+<td>Review of performance against the OPR</td>
+<td>Cx project report update</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-13-2"><span class="n">12.13.2</span>Operations readiness on a data-centre campus</h3>
+<p>The Uptime Institute publishes the Tier Standard: Operational Sustainability. It assesses three elements in order of influence: management and operations, building characteristics, and site location. The management and operations element has four categories: staffing and organisation; maintenance; training; and planning, coordination and management (2010 edition, Tables 1.1 to 1.4; the current edition is sold by the Uptime Institute). Hyperscale programmes run an operations readiness plan in parallel with commissioning, ending with an operations acceptance at RFS.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operations readiness item</th>
+<th>Due before RFS</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Staffing plan filled (shift teams, maintenance, management)</td>
+<td>8 weeks</td>
+<td>Organisation chart and hiring status</td>
+</tr>
+<tr>
+<td>Standard operating procedures (SOP), MOP and EOP written</td>
+<td>4 weeks</td>
+<td>Procedure register</td>
+</tr>
+<tr>
+<td>Training complete</td>
+<td>1 week before IST</td>
+<td>Training records</td>
+</tr>
+<tr>
+<td>CMMS loaded with assets and maintenance plans</td>
+<td>2 weeks</td>
+<td>CMMS export</td>
+</tr>
+<tr>
+<td>Spares and tools received</td>
+<td>2 weeks</td>
+<td>Receipt records</td>
+</tr>
+<tr>
+<td>Vendor service contracts in place</td>
+<td>4 weeks</td>
+<td>Contracts</td>
+</tr>
+<tr>
+<td>Permit and access system transferred</td>
+<td>at RFS</td>
+<td>Transfer record</td>
+</tr>
+<tr>
+<td>Incident and escalation process tested</td>
+<td>IST</td>
+<td>IST scenario records</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Operations readiness score for B1-DH1 at 2 weeks before RFS. The readiness plan has 64 items, of which 55 are complete and 6 are in progress with dates before RFS. Three are late: 2 EOPs for generator failure modes and 1 vendor service contract for the CDUs. The readiness score is 55 ÷ 64 = 85.9 %. The DCOps lead's rule is that every item marked critical must be complete at RFS; the 2 EOPs are critical. The CxM schedules the EOP walk-through in the IST window, where the generator failure scenarios are tested, so that <mark>the EOPs are proved during IST</mark> and signed before RFS.</p>
+<h2 id="s12-14"><span class="n">12.14</span>Common errors and KPIs</h2>
+<h3 id="s12-14-1"><span class="n">12.14.1</span>Common errors in handover administration</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Consequence</th>
+<th>Detection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contract names the whole building as one Section</td>
+<td>Owner cannot take over a hall early</td>
+<td>Contract review at the Cx kick-off</td>
+</tr>
+<tr>
+<td>Turnover package assembled by subcontractor</td>
+<td>Operations cannot find system information</td>
+<td>Index per system in the specification</td>
+</tr>
+<tr>
+<td>O&amp;M manuals reviewed after training</td>
+<td>Training uses wrong material</td>
+<td>Review schedule ties training to O&amp;M acceptance</td>
+</tr>
+<tr>
+<td>As-built drawings not verified</td>
+<td>Wrong switching programme written later</td>
+<td>10 % sample check, zero tolerance on single-line diagrams</td>
+</tr>
+<tr>
+<td>Asset data collected at the end</td>
+<td>CMMS not ready at RFS</td>
+<td>Asset data template issued at construction start</td>
+</tr>
+<tr>
+<td>OEM warranty from delivery</td>
+<td>Warranty gap before the DNP ends</td>
+<td>Warranty register with both start dates</td>
+</tr>
+<tr>
+<td>No response times in the DLP</td>
+<td>Long outages in a live data centre</td>
+<td>Response times written in the Scope</td>
+</tr>
+<tr>
+<td>Software licences registered to individuals</td>
+<td>Loss of access after the contractor leaves</td>
+<td>Licence certificate in the owner's name</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s12-14-2"><span class="n">12.14.2</span>Handover KPIs</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Turnover package first-pass acceptance</td>
+<td>sections accepted at first review ÷ sections submitted</td>
+<td>≥ 80 %</td>
+</tr>
+<tr>
+<td>O&amp;M manual first-pass acceptance</td>
+<td>manuals accepted at first review ÷ manuals submitted</td>
+<td>≥ 80 %</td>
+</tr>
+<tr>
+<td>As-built verification accuracy</td>
+<td>correct points ÷ points checked</td>
+<td>100 % on single-line diagrams, ≥ 95 % elsewhere</td>
+</tr>
+<tr>
+<td>Asset data quality at load</td>
+<td>rows passing all rules ÷ rows</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>Training completion</td>
+<td>sessions delivered ÷ sessions planned</td>
+<td>100 % before IST</td>
+</tr>
+<tr>
+<td>DLP on-time correction</td>
+<td>defects corrected in time ÷ defects</td>
+<td>≥ 90 %</td>
+</tr>
+<tr>
+<td>Outstanding works at TOC</td>
+<td>items on the outstanding works list</td>
+<td>trend to 0 by the end of the DNP</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s12-15"><span class="n">12.15</span>Checklist for site use</h2>
+<ol>
+<li><strong>Sections.</strong> The contract names each data hall (or each building and the shared plant) as a Section with its own taking-over and DNP.</li>
+<li><strong>RFS conditions.</strong> The RFS conditions for each hall are written and agreed with operations before IST.</li>
+<li><strong>Handover gates.</strong> Gates G1 to G11 are in the Primavera P6 schedule with their records and time limits.</li>
+<li><strong>Turnover package index.</strong> The package index is per system and has the 13 sections in 12.3.1.</li>
+<li><strong>Package review.</strong> The completeness check takes 2 working days and the technical review 10 working days, with one consolidated comment sheet.</li>
+<li><strong>O&amp;M manuals.</strong> Manuals are model-specific, searchable, with installed data, maintenance frequencies and parts lists.</li>
+<li><strong>Systems manual.</strong> The systems manual has the six parts and the commissioning project report is issued 30 days after TOC.</li>
+<li><strong>As-built drawings.</strong> A 10 % sample with at least 5 sheets per system is checked on site, with zero tolerance on single-line diagrams.</li>
+<li><strong>Asset data.</strong> The asset template is issued at construction start, validated by rule, field-sampled at 5 % and loaded before RFS.</li>
+<li><strong>Spares and tools.</strong> The spares register shows delivered quantities, storage and lead times, and strategic spares are tracked as issues.</li>
+<li><strong>Software licences.</strong> Licences and backups are handed over in the owner's name.</li>
+<li><strong>Training.</strong> Training records show attendance, assessment and recordings for every shift team before IST.</li>
+<li><strong>Warranties.</strong> The register holds the OEM start date and the contract start date for each asset, with CMMS expiry alerts.</li>
+<li><strong>DLP.</strong> The defects register has classes, response times and retest records, and DNP extensions are recorded per item.</li>
+<li><strong>Final account.</strong> The CxM's list of open commissioning items with values is sent to the quantity surveyors.</li>
+<li><strong>Soft Landings.</strong> The aftercare plan names the resident engineer and the seasonal reviews.</li>
+</ol>
+<h2 id="s12-16"><span class="n">12.16</span>Sources</h2>
+<ol>
+<li>FIDIC, Conditions of Contract for Construction (Red Book), second edition, 2017, and Conditions of Contract for Plant and Design-Build (Yellow Book), second edition, 2017. <a href="https://fidic.org/books" rel="noopener">https://fidic.org/books</a></li>
+<li>Kayrouz and Associates, "Taking-over certificate in construction: UAE guide", accessed 31 October 2026. <a href="https://www.kayrouzandassociates.com/insights/taking-over-certificate-construction-uae-guide" rel="noopener">https://www.kayrouzandassociates.com/insights/taking-over-certificate-construction-uae-guide</a></li>
+<li>Fenwick Elliott, "Taking over: the meaning of completion under the 2017 FIDIC contracts", accessed 31 October 2026. <a href="https://www.fenwickelliott.com/?p=31431" rel="noopener">https://www.fenwickelliott.com/?p=31431</a></li>
+<li>World Construction Network, "Remedies for construction defects", accessed 31 October 2026. <a href="https://www.worldconstructionnetwork.com/analysis/remedies-for-construction-defects/" rel="noopener">https://www.worldconstructionnetwork.com/analysis/remedies-for-construction-defects/</a></li>
+<li>FirstBit, "Defects liability period in construction" (DNP length and Performance Certificate timing; the CMCS article 080 on the Performance Certificate is listed in research note RF-12), accessed 31 October 2026. <a href="https://firstbit.ae/blog/guides/defects-liability-period-in-construction/" rel="noopener">https://firstbit.ae/blog/guides/defects-liability-period-in-construction/</a></li>
+<li>NEC, NEC4 Engineering and Construction Contract, June 2017 with amendments. <a href="https://www.neccontract.com/products/contracts/nec4-ecc" rel="noopener">https://www.neccontract.com/products/contracts/nec4-ecc</a></li>
+<li>NEC, "Defining and managing defects in ECC and liability for not correcting them", accessed 31 October 2026. <a href="https://www.neccontract.com/news/defining-and-managing-defects-in-ecc-and-liability-for-not-correcting-them" rel="noopener">https://www.neccontract.com/news/defining-and-managing-defects-in-ecc-and-liability-for-not-correcting-them</a></li>
+<li>Brodies LLP, "Under NEC contract, what is the connection between the defects date and the defect correction period", accessed 31 October 2026. <a href="https://brodies.com/insights/construction-and-engineering/under-nec-contract-what-is-the-connection-between-the-defects-date-dd-and-the-defect-correction-period-dcp/" rel="noopener">https://brodies.com/insights/construction-and-engineering/under-nec-contract-what-is-the-connection-between-the-defects-date-dd-and-the-defect-correction-period-dcp/</a></li>
+<li>Fenwick Elliott, "Contractual liabilities post completion", accessed 31 October 2026. <a href="https://www.fenwickelliott.com/sites/default/files/fenwick_elliott_-_contractual_liabilities_post_completion.pdf" rel="noopener">https://www.fenwickelliott.com/sites/default/files/fenwick_elliott_-_contractual_liabilities_post_completion.pdf</a></li>
+<li>Yale University Facilities, Section 01 78 23 Operation and Maintenance Data, September 2025. <a href="https://facilities.yale.edu/sites/default/files/files/Design%20Standards/Updated%20Design%20Standards/01%20General%20Requirements/01%2078%2023%20-%20Operation%20and%20Maintenance%20Data%20-%20Sept%2025%20-%20FINAL.pdf" rel="noopener">https://facilities.yale.edu/sites/default/files/files/Design%20Standards/Updated%20Design%20Standards/01%20General%20Requirements/01%2078%2023%20-%20Operation%20and%20Maintenance%20Data%20-%20Sept%2025%20-%20FINAL.pdf</a></li>
+<li>City of San Diego, Section 01 78 23 Operation and Maintenance Data. <a href="https://fpcprojects.sandi.net/sites/PSA/pvspecs/PV%20Spec%20Documents/01%2078%2023%20operation%20and%20maintenance%20data.pdf" rel="noopener">https://fpcprojects.sandi.net/sites/PSA/pvspecs/PV%20Spec%20Documents/01%2078%2023%20operation%20and%20maintenance%20data.pdf</a></li>
+<li>Yale University Facilities, Section 01 79 00 Demonstration and Training, September 2025. <a href="https://facilities.yale.edu/sites/default/files/files/01%2079%2000%20-%20Demonstration%20and%20training%20-%20Sept%2025%20-%20FINAL.pdf" rel="noopener">https://facilities.yale.edu/sites/default/files/files/01%2079%2000%20-%20Demonstration%20and%20training%20-%20Sept%2025%20-%20FINAL.pdf</a></li>
+<li>University of Houston, Section 01 79 00 Demonstration and Training. <a href="https://www.uh.edu/facilities-planning-construction/vendor-resources/owners-design-criteria/master-specs/jan-2016/01/017900.pdf" rel="noopener">https://www.uh.edu/facilities-planning-construction/vendor-resources/owners-design-criteria/master-specs/jan-2016/01/017900.pdf</a></li>
+<li>University of Southern California, Close-Out Checklist (project record documents, O&amp;M data, training), 2020. <a href="https://fpm.usc.edu/wp-content/uploads/2021/11/Close-Out-Checklist-Revised-052020_MIM-1.pdf" rel="noopener">https://fpm.usc.edu/wp-content/uploads/2021/11/Close-Out-Checklist-Revised-052020_MIM-1.pdf</a></li>
+<li>ASHRAE Guideline 0-2019, The Commissioning Process, ASHRAE. <a href="https://www.ashrae.org/technical-resources/ashrae-standards-and-guidelines" rel="noopener">https://www.ashrae.org/technical-resources/ashrae-standards-and-guidelines</a></li>
+<li>ASHRAE Guideline 1.4-2019, Procedures for Preparing Facility Systems Manuals, and Addendum a (2024). <a href="https://www.ashrae.org/file%20library/technical%20resources/standards%20and%20guidelines/standards%20errata/guidelines/g1_4_2019_a_20240315.pdf" rel="noopener">https://www.ashrae.org/file%20library/technical%20resources/standards%20and%20guidelines/standards%20errata/guidelines/g1_4_2019_a_20240315.pdf</a></li>
+<li>Building Commissioning Association, "Systems manual and facility guide", accessed 31 October 2026. <a href="https://www.bcxa.org/blog/systems-manual-facility-guide.html" rel="noopener">https://www.bcxa.org/blog/systems-manual-facility-guide.html</a></li>
+<li>BSRIA, BG 54/2018 Soft Landings Framework 2018, catalogue entry. <a href="https://cis.ihs.com/cis/document/324192" rel="noopener">https://cis.ihs.com/cis/document/324192</a></li>
+<li>ACR News, "BSRIA launches Soft Landings Framework", accessed 31 October 2026. <a href="https://www.acr-news.com/bsria-launches-soft-landings-framework" rel="noopener">https://www.acr-news.com/bsria-launches-soft-landings-framework</a></li>
+<li>Usable Buildings Trust and BSRIA, The Soft Landings Framework (2014 edition). <a href="https://www.usablebuildings.co.uk/UsableBuildings/Unprotected/SoftLandingsFramework.pdf" rel="noopener">https://www.usablebuildings.co.uk/UsableBuildings/Unprotected/SoftLandingsFramework.pdf</a></li>
+<li>BSI, BS 1192-4:2014 Collaborative production of information, Fulfilling employer's information exchange requirements using COBie, catalogue status "Withdrawn". <a href="https://knowledge.bsigroup.com/products/collaborative-production-of-information-fulfilling-employer-s-information-exchange-requirements-using-cobie-code-of-practice" rel="noopener">https://knowledge.bsigroup.com/products/collaborative-production-of-information-fulfilling-employer-s-information-exchange-requirements-using-cobie-code-of-practice</a></li>
+<li>ISO, BS EN ISO 19650-4:2022 Organization and digitization of information about buildings and civil engineering works, Part 4: Information exchange. <a href="https://www.iso.org/standard/78246.html" rel="noopener">https://www.iso.org/standard/78246.html</a></li>
+<li>Uptime Institute, Tier Standard: Operational Sustainability. <a href="https://uptimeinstitute.com/tiers" rel="noopener">https://uptimeinstitute.com/tiers</a></li>
+<li>MSC-1 case ledger, <code>../case_ledger.json</code>, Data Centre Commissioning Field Manual R01 working files, October 2026.</li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="11-meetings-reports-schedules.html"><span>Previous · 11</span><span class="t">Meetings, minutes, daily and weekly reports, schedules and look-aheads</span></a><a class="next" href="13-mv-switchgear-transformers-cables.html"><span>Next · 13</span><span class="t">Medium-voltage switchgear, transformers and cables</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

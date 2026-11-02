@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30 Commissioning data | Cx Field Manual R01</title>
+<meta name="description" content="This chapter explains how the commissioning manager collects, checks and uses commissioning data on a data-centre campus.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/30-commissioning-data-kpis.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/30-commissioning-data-kpis.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/30-commissioning-data-kpis.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/30-commissioning-data-kpis.html">
+<meta property="og:title" content="30 Commissioning data | Cx Field Manual R01">
+<meta property="og:description" content="This chapter explains how the commissioning manager collects, checks and uses commissioning data on a data-centre campus.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="30 Commissioning data | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter explains how the commissioning manager collects, checks and uses commissioning data on a data-centre campus.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"30 Commissioning data: trends, KPIs, dashboards and worked datasets","name":"Commissioning data: trends, KPIs, dashboards and worked datasets","description":"This chapter explains how the commissioning manager collects, checks and uses commissioning data on a data-centre campus.","url":"https://resistancezero.com/cx-handbook/30-commissioning-data-kpis.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/30-commissioning-data-kpis.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":11146,"position":30,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"30 Commissioning data","item":"https://resistancezero.com/cx-handbook/30-commissioning-data-kpis.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part F · Integrated testing, issues and data</p>
+    <h1><span class="num">30</span>Commissioning data: trends, KPIs, dashboards and worked datasets</h1>
+    <p class="lede">This chapter explains how the commissioning manager collects, checks and uses commissioning data on a data-centre campus.</p>
+    <p class="basis">Chapter 30 of 32 · 17 sections · 9 figures · 11,146 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 30</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 30</summary>
+<ol><li><a href="#s30-0"><span class="n">30.0</span>Scope of this chapter</a></li><li><a href="#s30-1"><span class="n">30.1</span>Commissioning data sources and owners</a><ol><li><a href="#s30-1-1"><span class="n">30.1.1</span>What commissioning data is</a></li><li><a href="#s30-1-2"><span class="n">30.1.2</span>Sources on a hyperscale campus</a></li><li><a href="#s30-1-3"><span class="n">30.1.3</span>Ownership rules</a></li></ol></li><li><a href="#s30-2"><span class="n">30.2</span>Record structures and data fields</a><ol><li><a href="#s30-2-1"><span class="n">30.2.1</span>Why the fields matter</a></li><li><a href="#s30-2-2"><span class="n">30.2.2</span>Checklist record (L2 and L3)</a></li><li><a href="#s30-2-3"><span class="n">30.2.3</span>Test record (L4 and L5)</a></li><li><a href="#s30-2-4"><span class="n">30.2.4</span>Issue record</a></li><li><a href="#s30-2-5"><span class="n">30.2.5</span>RFI record</a></li></ol></li><li><a href="#s30-3"><span class="n">30.3</span>KPI definitions and formulas</a><ol><li><a href="#s30-3-1"><span class="n">30.3.1</span>Rules for every KPI</a></li><li><a href="#s30-3-2"><span class="n">30.3.2</span>KPI table</a></li><li><a href="#s30-3-3"><span class="n">30.3.3</span>Checklist completion</a></li><li><a href="#s30-3-4"><span class="n">30.3.4</span>Test first-pass yield and retest ratio</a></li><li><a href="#s30-3-5"><span class="n">30.3.5</span>Issue ageing</a></li><li><a href="#s30-3-6"><span class="n">30.3.6</span>RFI cycle time</a></li><li><a href="#s30-3-7"><span class="n">30.3.7</span>Defect density per MW</a></li><li><a href="#s30-3-8"><span class="n">30.3.8</span>Forecast completion</a></li></ol></li><li><a href="#s30-4"><span class="n">30.4</span>Worked dataset 1: checklist progress for building B2</a><ol><li><a href="#s30-4-1"><span class="n">30.4.1</span>The data</a></li><li><a href="#s30-4-2"><span class="n">30.4.2</span>How to read the curve</a></li><li><a href="#s30-4-3"><span class="n">30.4.3</span>What the commissioning manager does with it</a></li></ol></li><li><a href="#s30-5"><span class="n">30.5</span>Worked dataset 2: issue log, ageing and defect density</a><ol><li><a href="#s30-5-1"><span class="n">30.5.1</span>The data</a></li><li><a href="#s30-5-2"><span class="n">30.5.2</span>How to read it</a></li><li><a href="#s30-5-3"><span class="n">30.5.3</span>Ageing at week 12</a></li><li><a href="#s30-5-4"><span class="n">30.5.4</span>Age histogram at week 12</a></li><li><a href="#s30-5-5"><span class="n">30.5.5</span>Actions from the dataset</a></li></ol></li><li><a href="#s30-6"><span class="n">30.6</span>Worked dataset 3: RFI cycle time</a><ol><li><a href="#s30-6-1"><span class="n">30.6.1</span>The data</a></li><li><a href="#s30-6-2"><span class="n">30.6.2</span>How to read it</a></li><li><a href="#s30-6-3"><span class="n">30.6.3</span>Why the median and the 90th percentile are reported</a></li></ol></li><li><a href="#s30-7"><span class="n">30.7</span>Worked dataset 4: test first-pass yield and retest ratio</a><ol><li><a href="#s30-7-1"><span class="n">30.7.1</span>The data</a></li><li><a href="#s30-7-2"><span class="n">30.7.2</span>How to read it</a></li></ol></li><li><a href="#s30-8"><span class="n">30.8</span>Reading trends from BMS and EPMS</a><ol><li><a href="#s30-8-1"><span class="n">30.8.1</span>What a trend is</a></li><li><a href="#s30-8-2"><span class="n">30.8.2</span>Sampling settings for commissioning</a></li><li><a href="#s30-8-3"><span class="n">30.8.3</span>Rules for sampling</a></li><li><a href="#s30-8-4"><span class="n">30.8.4</span>Steps to review a trend</a></li><li><a href="#s30-8-5"><span class="n">30.8.5</span>Common trend reading errors</a></li></ol></li><li><a href="#s30-9"><span class="n">30.9</span>Statistical checks on trend data</a><ol><li><a href="#s30-9-1"><span class="n">30.9.1</span>Why statistical checks are needed</a></li><li><a href="#s30-9-2"><span class="n">30.9.2</span>The checks</a></li><li><a href="#s30-9-3"><span class="n">30.9.3</span>Outliers by interquartile-range fences</a></li><li><a href="#s30-9-4"><span class="n">30.9.4</span>Shewhart individuals chart and the Western Electric rules</a></li><li><a href="#s30-9-5"><span class="n">30.9.5</span>CUSUM for small shifts</a></li><li><a href="#s30-9-6"><span class="n">30.9.6</span>Stuck values and drift</a></li><li><a href="#s30-9-7"><span class="n">30.9.7</span>Steps to run the checks on a test dataset</a></li></ol></li><li><a href="#s30-10"><span class="n">30.10</span>Energy reconciliation between meters</a><ol><li><a href="#s30-10-1"><span class="n">30.10.1</span>Purpose</a></li><li><a href="#s30-10-2"><span class="n">30.10.2</span>Formula</a></li><li><a href="#s30-10-3"><span class="n">30.10.3</span>Expected residual</a></li><li><a href="#s30-10-4"><span class="n">30.10.4</span>Steps</a></li><li><a href="#s30-10-5"><span class="n">30.10.5</span>Worked dataset 7</a></li><li><a href="#s30-10-6"><span class="n">30.10.6</span>Common reconciliation faults</a></li></ol></li><li><a href="#s30-11"><span class="n">30.11</span>PUE during commissioning</a><ol><li><a href="#s30-11-1"><span class="n">30.11.1</span>Definition</a></li><li><a href="#s30-11-2"><span class="n">30.11.2</span>Measurement categories</a></li><li><a href="#s30-11-3"><span class="n">30.11.3</span>What PUE during commissioning can show</a></li><li><a href="#s30-11-4"><span class="n">30.11.4</span>Steps to measure PUE at IST load steps</a></li><li><a href="#s30-11-5"><span class="n">30.11.5</span>Worked dataset 8</a></li><li><a href="#s30-11-6"><span class="n">30.11.6</span>Partial PUE</a></li><li><a href="#s30-11-7"><span class="n">30.11.7</span>Comparing measured values with a model</a></li></ol></li><li><a href="#s30-12"><span class="n">30.12</span>Data-quality checks</a><ol><li><a href="#s30-12-1"><span class="n">30.12.1</span>Data-quality dimensions</a></li><li><a href="#s30-12-2"><span class="n">30.12.2</span>Weekly data-quality checks on the process logs</a></li><li><a href="#s30-12-3"><span class="n">30.12.3</span>Data-quality checks on system data</a></li></ol></li><li><a href="#s30-13"><span class="n">30.13</span>Dashboards for commissioning</a><ol><li><a href="#s30-13-1"><span class="n">30.13.1</span>Purpose</a></li><li><a href="#s30-13-2"><span class="n">30.13.2</span>Content by audience</a></li><li><a href="#s30-13-3"><span class="n">30.13.3</span>Layout rules</a></li><li><a href="#s30-13-4"><span class="n">30.13.4</span>Example dashboard for building B2</a></li><li><a href="#s30-13-5"><span class="n">30.13.5</span>Steps to build and accept the dashboard</a></li></ol></li><li><a href="#s30-14"><span class="n">30.14</span>Common errors in commissioning data</a></li><li><a href="#s30-15"><span class="n">30.15</span>Checklist for site use</a></li><li><a href="#s30-16"><span class="n">30.16</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="29-issue-library.html"><span>Previous</span>29 Issue library</a><a href="32-forms-and-templates.html"><span>Next</span>32 Forms and templates with filled examples</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s30-0"><span class="n">30.0</span>Scope of this chapter</h2>
+<p>This chapter explains how the commissioning manager collects, checks and uses commissioning data on a data-centre campus. It defines the key performance indicators (KPIs) used to track commissioning, gives the formula for each, and works through eight example datasets with numbers, tables and plots. It also covers how to read trends from the building management system (BMS) and the electrical power monitoring system (EPMS), and the statistical checks that find bad sensors and bad meters. The last sections cover energy reconciliation between meters, power usage effectiveness (PUE) measured during commissioning, data-quality checks and dashboard design.</p>
+<ol>
+<li><strong>Data sources and owners.</strong> Where commissioning data comes from, who owns each source and how often it is updated.</li>
+<li><strong>Record structures.</strong> The fields of the checklist, test, issue and request for information (RFI) records that the KPIs are calculated from.</li>
+<li><strong>KPI definitions.</strong> Checklist completion, test first-pass yield (FPY), retest ratio, issue ageing, RFI cycle time, defect density per MW, issue closure rate and forecast completion, each with a formula, a unit, a target and an example.</li>
+<li><strong>Worked datasets.</strong> Eight example datasets for the MSC-1 campus. They cover L3 checklist progress, the issue log, RFI cycle time, L4 test results, sensor drift and stuck values and a control chart. They also cover energy reconciliation and PUE at the load steps of the integrated systems test (IST).</li>
+<li><strong>Reading trends.</strong> Sampling interval, change-of-value logging, time alignment, units and the trend review procedure.</li>
+<li><strong>Statistical checks.</strong> Outliers by interquartile-range fences, Shewhart control charts with the Western Electric rules, drift against a reference, cumulative sum (CUSUM) charts, stuck values, flat lines and rate-of-change limits.</li>
+<li><strong>Energy reconciliation.</strong> Balancing an incoming meter against its downstream meters, with tolerances based on meter accuracy class.</li>
+<li><strong>PUE during commissioning.</strong> What can and cannot be measured during load-bank testing, the formula, the categories, and a worked example.</li>
+<li><strong>Data quality.</strong> Completeness, validity, timeliness, consistency, uniqueness and accuracy checks with rules.</li>
+<li><strong>Dashboards.</strong> Content by audience, layout, refresh and the rules that keep numbers consistent between reports.</li>
+</ol>
+<p>Documents and standards used: ISO/IEC 30134-2:2026 (PUE, edition 2, which replaced the 2016 edition) and The Green Grid PUE white papers; NIST/SEMATECH e-Handbook of Statistical Methods (outliers, control charts, CUSUM); ASHRAE Guideline 14 (measurement of energy, demand and water savings; model calibration limits). The chapter also uses ASHRAE Guideline 0-2019 (the commissioning process); IEC 62053-22 and IEC 61557-12 (meter and power metering device accuracy); ANSI/ASHRAE Standard 135 (BACnet trend log objects). The data-quality sources are ISO/IEC 25012 (data quality model), ISO 8000 (data quality) and the American Society for Quality (ASQ) definition of first-pass yield. Numbers in the worked datasets are example data, labelled as example data, and consistent with the MSC-1 case ledger (source 19).</p>
+<h2 id="s30-1"><span class="n">30.1</span>Commissioning data sources and owners</h2>
+<h3 id="s30-1-1"><span class="n">30.1.1</span>What commissioning data is</h3>
+<p>Commissioning data is every recorded value that shows the state of the commissioning work or the behaviour of the installed systems. It falls into two groups. Process data describes the work: checklists signed, tests passed, issues raised and closed, RFIs answered. System data describes the plant: temperatures, flows, pressures, voltages, currents, energy, alarms and events recorded by the BMS, the EPMS, data loggers and test instruments.</p>
+<p>Process data tells the manager whether the programme will meet its date. System data tells the commissioning authority (CxA) whether the plant meets its design.</p>
+<h3 id="s30-1-2"><span class="n">30.1.2</span>Sources on a hyperscale campus</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Type</th>
+<th>Owner</th>
+<th>Update frequency</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commissioning database (checklists, tests)</td>
+<td>process</td>
+<td>commissioning authority (CxA)</td>
+<td>real time as forms are signed</td>
+<td>checklist completion, FPY, retest ratio</td>
+</tr>
+<tr>
+<td>Issue log</td>
+<td>process</td>
+<td>CxA, with general contractor (GC) responses</td>
+<td>real time</td>
+<td>issue ageing, defect density, closure rate</td>
+</tr>
+<tr>
+<td>RFI log in the common data environment (CDE)</td>
+<td>process</td>
+<td>GC document controller</td>
+<td>real time</td>
+<td>RFI cycle time</td>
+</tr>
+<tr>
+<td>Commissioning schedule</td>
+<td>process</td>
+<td>GC planner, commissioning manager (CxM) review</td>
+<td>weekly</td>
+<td>planned curves, forecast</td>
+</tr>
+<tr>
+<td>BMS trend logs</td>
+<td>system</td>
+<td>BMS contractor</td>
+<td>1 s to 15 min per point</td>
+<td>sequence tests, temperature and flow trends</td>
+</tr>
+<tr>
+<td>EPMS (for example Schneider EcoStruxure Power Monitoring Expert)</td>
+<td>system</td>
+<td>EPMS contractor</td>
+<td>1 s to 15 min; waveforms on event</td>
+<td>energy, power quality, sequence of events</td>
+</tr>
+<tr>
+<td>Portable data loggers</td>
+<td>system</td>
+<td>CxA test engineer</td>
+<td>1 s to 1 min</td>
+<td>IST, heat-run, reference measurements</td>
+</tr>
+<tr>
+<td>Load-bank controllers</td>
+<td>system</td>
+<td>load-bank supplier</td>
+<td>1 s</td>
+<td>IST load steps</td>
+</tr>
+<tr>
+<td>Test instruments (relay test sets, power analysers)</td>
+<td>system</td>
+<td>test contractor</td>
+<td>per test</td>
+<td>test records</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-1-3"><span class="n">30.1.3</span>Ownership rules</h3>
+<ol>
+<li><strong>One owner per source.</strong> Each source has a named owner who answers for completeness and accuracy. The owner is listed in the commissioning plan.</li>
+<li><strong>One master record per item.</strong> A checklist, test or issue exists in one system only. <mark>Spreadsheet copies are reports, never masters</mark>.</li>
+<li><strong>Fixed identifiers.</strong> Every record carries the asset tag from the project tagging standard (for example B2-DH3-UPS-A1). KPIs grouped by building, hall or system depend on correct tags.</li>
+<li><strong>Data date on every report.</strong> Every KPI report states the date and time the data was extracted.</li>
+<li><strong>Time base.</strong> All system data uses one time base. The BMS, EPMS and loggers are synchronised to the site time server using the Network Time Protocol (NTP) or the Precision Time Protocol (PTP). Every export states the time zone (Western Indonesian Time, WIB, UTC+7 in Jakarta).</li>
+</ol>
+<h2 id="s30-2"><span class="n">30.2</span>Record structures and data fields</h2>
+<h3 id="s30-2-1"><span class="n">30.2.1</span>Why the fields matter</h3>
+<p>Each KPI is calculated from the fields of a record. If the checklist record has no "date signed" field, completion over time cannot be plotted. If the issue record has no category field, ageing against the limits cannot be checked. The tables below give the minimum fields, each with a type and an example value from MSC-1. Figure <a class="figref" href="#F30-8">F30-8</a> shows the four record types and the KPIs that are calculated from their fields.</p>
+<figure class="sheet" id="F30-8"><a href="../data/cx-handbook/figures/F30-8.svg" title="Open drawing F30-8 at full size"><img src="../data/cx-handbook/figures/F30-8.svg" alt="F30-8: Four commissioning records and the KPIs calculated from them" width="1000" height="882" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F30-8</span> — <b>Four commissioning records and the KPIs calculated from them</b>. Each KPI is calculated from named fields of one record type. A field missing from the record removes the KPI or makes it wrong.</figcaption></figure>
+
+<h3 id="s30-2-2"><span class="n">30.2.2</span>Checklist record (L2 and L3)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Checklist ID</td>
+<td>text</td>
+<td>ELE-L3-UPS-B2-DH3-A1</td>
+</tr>
+<tr>
+<td>Level</td>
+<td>list (L1 to L5)</td>
+<td>L3</td>
+</tr>
+<tr>
+<td>System</td>
+<td>list</td>
+<td>uninterruptible power supply (UPS)</td>
+</tr>
+<tr>
+<td>Asset tag</td>
+<td>text</td>
+<td>B2-DH3-UPS-A1</td>
+</tr>
+<tr>
+<td>Building, hall</td>
+<td>text</td>
+<td>B2, DH3</td>
+</tr>
+<tr>
+<td>Issued date</td>
+<td>date</td>
+<td>05 Jan</td>
+</tr>
+<tr>
+<td>Contractor signature date</td>
+<td>date</td>
+<td>28 Jan</td>
+</tr>
+<tr>
+<td>CxA verification date</td>
+<td>date</td>
+<td>30 Jan</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>list</td>
+<td>issued, in progress, contractor complete, verified, rejected</td>
+</tr>
+<tr>
+<td>Open issues linked</td>
+<td>count</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Planned completion week</td>
+<td>number</td>
+<td>6</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-2-3"><span class="n">30.2.3</span>Test record (L4 and L5)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Test ID</td>
+<td>text</td>
+<td>ELE-L4-UPS-B2-DH3-A1-T03</td>
+</tr>
+<tr>
+<td>Script and revision</td>
+<td>text</td>
+<td>FPT-UPS-03 rev C</td>
+</tr>
+<tr>
+<td>Attempt number</td>
+<td>integer</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Date and time start, end</td>
+<td>date-time</td>
+<td>12 Feb 09:00, 12 Feb 11:40</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>list</td>
+<td>pass, fail, aborted, passed with comments</td>
+</tr>
+<tr>
+<td>Failure reason code</td>
+<td>list</td>
+<td>equipment, installation, design, procedure, test equipment, operator</td>
+</tr>
+<tr>
+<td>Linked issue</td>
+<td>text</td>
+<td>ISS-B2-0398</td>
+</tr>
+<tr>
+<td>Witnesses</td>
+<td>list</td>
+<td>CxA, owner, original equipment manufacturer (OEM)</td>
+</tr>
+<tr>
+<td>Data file</td>
+<td>link</td>
+<td>logger file B2-DH3-UPS-A1-T03.csv</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-2-4"><span class="n">30.2.4</span>Issue record</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Issue ID</td>
+<td>text</td>
+<td>ISS-B2-0412</td>
+</tr>
+<tr>
+<td>Date raised</td>
+<td>date-time</td>
+<td>02 Feb 10:20</td>
+</tr>
+<tr>
+<td>Raised by</td>
+<td>name, company</td>
+<td>CxA mechanical engineer</td>
+</tr>
+<tr>
+<td>Asset tag</td>
+<td>text</td>
+<td>B2-DH3-CDU-07</td>
+</tr>
+<tr>
+<td>System, level found</td>
+<td>list</td>
+<td>coolant distribution unit (CDU), L3</td>
+</tr>
+<tr>
+<td>Category</td>
+<td>list</td>
+<td>A, B, C (section 09.9.1)</td>
+</tr>
+<tr>
+<td>Description</td>
+<td>text</td>
+<td>flow 18 % below design at 100 % pump speed</td>
+</tr>
+<tr>
+<td>Responsible party</td>
+<td>list</td>
+<td>GC, OEM, designer</td>
+</tr>
+<tr>
+<td>Target date</td>
+<td>date</td>
+<td>from category and the ageing limit</td>
+</tr>
+<tr>
+<td>Date closed</td>
+<td>date-time</td>
+<td>16 Feb 15:00</td>
+</tr>
+<tr>
+<td>Closure evidence</td>
+<td>link</td>
+<td>retest record</td>
+</tr>
+<tr>
+<td>Type</td>
+<td>list</td>
+<td>defect, design, documentation, possible change</td>
+</tr>
+</tbody>
+</table></div>
+<p>The MSC-1 ageing limits are <mark>category A 1 working day, category B 7 working days and category C 30 working days</mark> (case ledger; definitions in section 09.8.2). Category A means the issue affects safety or blocks the next energisation, fill or commissioning level. Category B must be closed before handover or ready for service (RFS) of the system. Category C may remain at handover with an agreed date.</p>
+<h3 id="s30-2-5"><span class="n">30.2.5</span>RFI record</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RFI number</td>
+<td>text</td>
+<td>RFI-B2-ELE-0147</td>
+</tr>
+<tr>
+<td>Priority</td>
+<td>list</td>
+<td>P1, P2, P3</td>
+</tr>
+<tr>
+<td>Date issued</td>
+<td>date</td>
+<td>03 Feb</td>
+</tr>
+<tr>
+<td>Response due</td>
+<td>date</td>
+<td>10 Feb (5 working days for P2)</td>
+</tr>
+<tr>
+<td>Date responded</td>
+<td>date</td>
+<td>12 Feb</td>
+</tr>
+<tr>
+<td>Date accepted</td>
+<td>date</td>
+<td>13 Feb</td>
+</tr>
+<tr>
+<td>Ball in court</td>
+<td>text</td>
+<td>designer</td>
+</tr>
+<tr>
+<td>Cost and schedule impact flags</td>
+<td>yes or no</td>
+<td>no, no</td>
+</tr>
+</tbody>
+</table></div>
+<p>The RFI priorities follow chapter 05: P1 response within 2 working days, P2 within 5 working days, P3 within 10 working days.</p>
+<h2 id="s30-3"><span class="n">30.3</span>KPI definitions and formulas</h2>
+<h3 id="s30-3-1"><span class="n">30.3.1</span>Rules for every KPI</h3>
+<ol>
+<li><strong>Written formula.</strong> Each KPI has a formula with a numerator and a denominator, both defined by field names.</li>
+<li><strong>Unit and direction.</strong> The unit (%, days, count per MW) and whether higher or lower is better.</li>
+<li><strong>Target with its source.</strong> For example the FPY target of 90 % from the MSC-1 case ledger.</li>
+<li><strong>Scope.</strong> Building, hall, system, contractor and level.</li>
+<li><strong>Data date.</strong> The time the data was extracted.</li>
+<li><strong>Same query every week.</strong> The query is saved and reused so that numbers do not change because of a change in method.</li>
+</ol>
+<h3 id="s30-3-2"><span class="n">30.3.2</span>KPI table</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Formula</th>
+<th>Unit</th>
+<th>Target (MSC-1 example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Checklist completion</td>
+<td>verified checklists / issued checklists × 100</td>
+<td>%</td>
+<td>per planned curve; 100 % before next level</td>
+</tr>
+<tr>
+<td>Schedule performance (checklists)</td>
+<td>verified to date / planned to date</td>
+<td>ratio</td>
+<td>≥ 0.95</td>
+</tr>
+<tr>
+<td>Test first-pass yield (FPY)</td>
+<td>tests passed at attempt 1 / tests with attempt 1 completed × 100</td>
+<td>%</td>
+<td><mark>90 % (case ledger)</mark></td>
+</tr>
+<tr>
+<td>Retest ratio</td>
+<td>(total attempts − unique tests) / unique tests</td>
+<td>ratio</td>
+<td>≤ 0.15</td>
+</tr>
+<tr>
+<td>Issue ageing</td>
+<td>report date − date raised, for open issues</td>
+<td>days</td>
+<td>A ≤ 1, B ≤ 7, C ≤ 30</td>
+</tr>
+<tr>
+<td>Issues past limit</td>
+<td>open issues with age above the limit for their category</td>
+<td>count</td>
+<td>0 for A</td>
+</tr>
+<tr>
+<td>Issue closure rate</td>
+<td>issues closed in week / issues raised in week</td>
+<td>ratio</td>
+<td>&gt; 1.0 after the peak</td>
+</tr>
+<tr>
+<td>Defect density</td>
+<td>issues raised / MW of IT capacity in scope</td>
+<td>issues per MW</td>
+<td>trend; compare halls</td>
+</tr>
+<tr>
+<td>RFI cycle time</td>
+<td>date accepted − date issued, working days</td>
+<td>working days</td>
+<td>median ≤ target for priority</td>
+</tr>
+<tr>
+<td>Forecast completion</td>
+<td>today + remaining items / recent rate</td>
+<td>week</td>
+<td>≤ planned finish</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-3-3"><span class="n">30.3.3</span>Checklist completion</h3>
+<p><strong>Purpose:</strong> Shows how much of the L2 or L3 checklist work is verified, against the plan.</p>
+<p>The formula uses "verified" (signed by the contractor and verified by the CxA). <mark>A checklist signed only by the contractor is counted separately</mark>, because many checklists are rejected at verification.</p>
+<p><strong>Worked example:</strong> Building B2 has 2,400 L3 checklists. At week 12, 1,700 are verified, 140 are contractor-complete awaiting verification and 560 are in progress or not started. Completion = 1,700 / 2,400 = 70.8 %. Planned to date = 2,030. Schedule performance = 1,700 / 2,030 = 0.84, below the 0.95 target. Including the 140 awaiting verification would give 1,840 (76.7 %); the report shows this number separately as "awaiting CxA", so the CxA can see its own backlog.</p>
+<h3 id="s30-3-4"><span class="n">30.3.4</span>Test first-pass yield and retest ratio</h3>
+<p><strong>Purpose:</strong> First-pass yield shows the share of tests that pass at their first attempt. It measures readiness: a low FPY means systems arrive at testing before they are ready.</p>
+<p>The ASQ describes first-pass yield as the share of units that come out of a process without rework. For commissioning the unit is a test script run on one asset. <mark>Count a test only once in the denominator, at its first attempt</mark>. A test aborted for reasons outside the system (for example a load bank fault) is recorded with the reason code "test equipment" and excluded from the denominator. The report states how many were excluded.</p>
+<p>The retest ratio counts all repeat attempts, including second and third retests of the same test. It shows the cost of poor readiness in witness time.</p>
+<p><strong>Worked example:</strong> In building B2, 379 L4 tests have a completed first attempt. 331 passed at attempt 1. FPY = 331 / 379 = 87.3 %, below the 90 % target. The 48 failures needed 60 further attempts: 37 passed at attempt 2, 9 passed at attempt 3, and 2 failed attempt 3; one of these 2 also failed attempt 4, and both are still open. Total attempts = 379 + 60 = 439. Retest ratio = (439 − 379) / 379 = 0.16, above the 0.15 limit. At 2.5 hours of witness time per attempt, the 60 retests used 150 hours of CxA witness time.</p>
+<h3 id="s30-3-5"><span class="n">30.3.5</span>Issue ageing</h3>
+<p><strong>Purpose:</strong> Ageing shows how long open issues have been open, against the limit for their category.</p>
+<p>For each open issue, age = report date − date raised, in working days (the ageing limits of section 09.8.2 are in working days). An issue is past its limit when age &gt; limit for its category. Report the count past the limit by category, the oldest issue in each category and an age histogram.</p>
+<p><strong>Worked example:</strong> At week 12, building B2 has 180 open issues: A 3, B 41, C 136. One A issue is 3 working days old (limit 1 working day): ISS-B2-0461, a fire damper that does not close on the fire alarm signal in B2-DH3. In class B, 9 issues are older than 7 working days, the oldest 16 working days. In class C, 22 issues are older than 30 working days, the oldest 58 working days. Issues past the limit = 1 + 9 + 22 = 32, which is 17.8 % of the 180 open.</p>
+<h3 id="s30-3-6"><span class="n">30.3.6</span>RFI cycle time</h3>
+<p><strong>Purpose:</strong> Cycle time shows how long the project waits for answers to technical questions.</p>
+<p>Cycle time = date accepted − date issued, in working days. Use the date accepted (the originator confirms the answer is usable) in place of the date responded, because a response that needs clarification has not ended the wait. <mark>Report the median and the 90th percentile</mark>; the mean is distorted by a few old RFIs.</p>
+<p><strong>Worked example:</strong> In week 8, 22 P2 RFIs were closed. Sorted cycle times (working days): 3, 4, 4, 5, 5, 7, 8, 8, 9, 9, 9, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 25. The median is the mean of the 11th and 12th values = (9 + 9) / 2 = 9 working days. The 90th percentile, taken as the value at position 0.9 × 22 = 19.8 rounded up to the 20th value, is 18 working days. 17 of 22 exceeded the 5-day P2 target. The mean, 10.6 working days, is pulled up by the single 25-day RFI.</p>
+<h3 id="s30-3-7"><span class="n">30.3.7</span>Defect density per MW</h3>
+<p><strong>Purpose:</strong> Defect density compares halls and buildings of different size, and contractors that work on different scopes.</p>
+<p>Defect density = issues raised / MW of IT capacity in scope. On MSC-1 a hall has 12 MW of IT capacity and a building has 36 MW (3 halls).</p>
+<p><strong>Worked example:</strong> Building B2 raised 737 issues in 12 weeks for 36 MW: 737 / 36 = <mark>20.5 issues per MW</mark>. Hall B2-DH3 raised 281 issues for 12 MW (23.4 per MW); hall B2-DH1 raised 214 (17.8 per MW). The CxM looks at the B2-DH3 issues by category and finds 64 BMS point-to-point issues from one controls subcontractor crew, which explains most of the difference.</p>
+<h3 id="s30-3-8"><span class="n">30.3.8</span>Forecast completion</h3>
+<p>Forecast completion week = current week + (remaining items / average rate over the last 4 weeks). <mark>Use 4 weeks</mark>: one week is too noisy, and a full-period average hides the current rate. The forecast is a projection of the recent rate and is reported separately from the plan. State the rate used.</p>
+<h2 id="s30-4"><span class="n">30.4</span>Worked dataset 1: checklist progress for building B2</h2>
+
+<figure class="sheet" id="F30-1"><a href="../data/cx-handbook/figures/F30-1.svg" title="Open drawing F30-1 at full size"><img src="../data/cx-handbook/figures/F30-1.svg" alt="F30-1: Dataset 1: building B2 L3 checklists, planned and actual (example data)" width="1000" height="930" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F30-1</span> — <b>Dataset 1: building B2 L3 checklists, planned and actual (example data)</b>. Cumulative L3 checklists verified by the CxA per week. The dashed forecast continues the last four weeks of actual progress to the total.</figcaption></figure>
+<h3 id="s30-4-1"><span class="n">30.4.1</span>The data</h3>
+<p>Figure <a class="figref" href="#F30-1">F30-1</a> plots the L3 checklist curve for building B2 against the plan. The dataset is example data.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Planned cumulative</th>
+<th>Actual cumulative (verified)</th>
+<th>Actual weekly</th>
+<th>Planned weekly</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>40</td>
+<td>30</td>
+<td>30</td>
+<td>40</td>
+</tr>
+<tr>
+<td>2</td>
+<td>110</td>
+<td>85</td>
+<td>55</td>
+<td>70</td>
+</tr>
+<tr>
+<td>3</td>
+<td>220</td>
+<td>170</td>
+<td>85</td>
+<td>110</td>
+</tr>
+<tr>
+<td>4</td>
+<td>370</td>
+<td>290</td>
+<td>120</td>
+<td>150</td>
+</tr>
+<tr>
+<td>5</td>
+<td>560</td>
+<td>450</td>
+<td>160</td>
+<td>190</td>
+</tr>
+<tr>
+<td>6</td>
+<td>780</td>
+<td>640</td>
+<td>190</td>
+<td>220</td>
+</tr>
+<tr>
+<td>7</td>
+<td>1,020</td>
+<td>850</td>
+<td>210</td>
+<td>240</td>
+</tr>
+<tr>
+<td>8</td>
+<td>1,260</td>
+<td>1,060</td>
+<td>210</td>
+<td>240</td>
+</tr>
+<tr>
+<td>9</td>
+<td>1,490</td>
+<td>1,240</td>
+<td>180</td>
+<td>230</td>
+</tr>
+<tr>
+<td>10</td>
+<td>1,700</td>
+<td>1,410</td>
+<td>170</td>
+<td>210</td>
+</tr>
+<tr>
+<td>11</td>
+<td>1,880</td>
+<td>1,560</td>
+<td>150</td>
+<td>180</td>
+</tr>
+<tr>
+<td>12</td>
+<td>2,030</td>
+<td>1,700</td>
+<td>140</td>
+<td>150</td>
+</tr>
+<tr>
+<td>13 to 16</td>
+<td>2,160, 2,270, 2,350, 2,400</td>
+<td>forecast</td>
+<td></td>
+<td>130, 110, 80, 50</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-4-2"><span class="n">30.4.2</span>How to read the curve</h3>
+<ol>
+<li><strong>Gap in count.</strong> At week 12 the gap is 2,030 − 1,700 = 330 checklists, or 13.8 percentage points of the total.</li>
+<li><strong>Gap in time.</strong> The actual count of 1,700 equals the planned count for week 10: the work is 2 weeks behind the plan.</li>
+<li><strong>Rate trend.</strong> The weekly actual peaked at 210 in weeks 7 and 8 and fell to 140 in week 12. A falling rate while the plan still expects 150 means the gap will not close by itself.</li>
+<li><strong>Forecast.</strong> The last 4 weeks averaged (180 + 170 + 150 + 140) / 4 = 160 per week. Remaining = 700. Weeks needed = 700 / 160 = 4.4. Forecast completion = <mark>week 16.4 against the planned week 16</mark>.</li>
+<li><strong>Rate needed.</strong> To finish at week 16 the team needs 700 / 4 = 175 per week, 9 % above the recent average.</li>
+</ol>
+<h3 id="s30-4-3"><span class="n">30.4.3</span>What the commissioning manager does with it</h3>
+<ol>
+<li><strong>Split by system.</strong> The 700 remaining checklists split as: BMS 290, EPMS 160, mechanical 150, electrical 100. BMS is the largest block and has the lowest weekly rate.</li>
+<li><strong>Split by status.</strong> 140 are contractor-complete awaiting CxA verification. Clearing these takes CxA time only: 2 CxA engineers at 35 per day each clear them in 2 days.</li>
+<li><strong>Find the constraint.</strong> The BMS checklists wait for point-to-point testing, which waits for BMS graphics. The constraint is graphics, a GC issue.</li>
+<li><strong>Present an option.</strong> The CxM proposes a second BMS graphics engineer for 4 weeks at USD 18,000. The expected effect is a BMS rate of 70 per week in place of 45. With the CxA backlog cleared, the forecast returns to week 16.</li>
+<li><strong>Report in the weekly update.</strong> Block 2 shows "L3 1,700 / 2,400, forecast week 16.4, recovery option in decision request DR-B2-012".</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Counting contractor-signed as complete.</strong> The curve looks better than the verified state. Count verified only, and report contractor-complete separately.</li>
+<li><strong>Changing the total.</strong> Adding checklists to the total mid-project (for example 80 new BMS checklists after a design change) makes the percentage fall. Record the total each week and plot the total line.</li>
+<li><strong>Comparing with a plan that was re-baselined.</strong> Keep the original plan line on the chart if the plan is changed, with the date of the change.</li>
+</ol>
+<h2 id="s30-5"><span class="n">30.5</span>Worked dataset 2: issue log, ageing and defect density</h2>
+
+<figure class="sheet" id="F30-2"><a href="../data/cx-handbook/figures/F30-2.svg" title="Open drawing F30-2 at full size"><img src="../data/cx-handbook/figures/F30-2.svg" alt="F30-2: Dataset 2: building B2 issues raised, closed and open (example data)" width="1000" height="873" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F30-2</span> — <b>Dataset 2: building B2 issues raised, closed and open (example data)</b>. Weekly counts from the commissioning issue log. The open count falls only when closures exceed new issues.</figcaption></figure>
+<h3 id="s30-5-1"><span class="n">30.5.1</span>The data</h3>
+<p>Figure <a class="figref" href="#F30-2">F30-2</a> plots issues raised, closed and open per week for building B2. The dataset is example data.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Raised</th>
+<th>Closed</th>
+<th>Open at week end</th>
+<th>Closure rate (closed / raised)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>20</td>
+<td>3</td>
+<td>17</td>
+<td>0.15</td>
+</tr>
+<tr>
+<td>2</td>
+<td>45</td>
+<td>12</td>
+<td>50</td>
+<td>0.27</td>
+</tr>
+<tr>
+<td>3</td>
+<td>60</td>
+<td>25</td>
+<td>85</td>
+<td>0.42</td>
+</tr>
+<tr>
+<td>4</td>
+<td>72</td>
+<td>40</td>
+<td>117</td>
+<td>0.56</td>
+</tr>
+<tr>
+<td>5</td>
+<td>80</td>
+<td>50</td>
+<td>147</td>
+<td>0.63</td>
+</tr>
+<tr>
+<td>6</td>
+<td>85</td>
+<td>58</td>
+<td>174</td>
+<td>0.68</td>
+</tr>
+<tr>
+<td>7</td>
+<td>82</td>
+<td>64</td>
+<td>192</td>
+<td>0.78</td>
+</tr>
+<tr>
+<td>8</td>
+<td>75</td>
+<td>66</td>
+<td>201</td>
+<td>0.88</td>
+</tr>
+<tr>
+<td>9</td>
+<td>66</td>
+<td>64</td>
+<td>203</td>
+<td>0.97</td>
+</tr>
+<tr>
+<td>10</td>
+<td>58</td>
+<td>60</td>
+<td>201</td>
+<td>1.03</td>
+</tr>
+<tr>
+<td>11</td>
+<td>50</td>
+<td>58</td>
+<td>193</td>
+<td>1.16</td>
+</tr>
+<tr>
+<td>12</td>
+<td>44</td>
+<td>57</td>
+<td>180</td>
+<td>1.30</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>737</td>
+<td>557</td>
+<td>180</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-5-2"><span class="n">30.5.2</span>How to read it</h3>
+<ol>
+<li><strong>Peak of open issues.</strong> The open count peaked at <mark>203 in week 9</mark>. From week 10 the closure rate is above 1.0 and the open count falls.</li>
+<li><strong>Burn-down forecast.</strong> The net reduction over the last 3 weeks averages (2 + 8 + 13) / 3 = 7.7 per week, rising. At the week-12 net reduction of 13 per week, 180 open issues need about 14 weeks. This is longer than the 4 weeks of L3 remaining, so issues will be open at the start of L4. Category B and C issues do not block L4 (section 09.8.2). <mark>Every category A issue in a system must be closed before that system's L4 tests</mark> and every B issue before its handover.</li>
+<li><strong>Ageing.</strong> Table 30.5.3 compares the open issues with their limits.</li>
+<li><strong>Defect density.</strong> 737 / 36 MW = 20.5 issues per MW for the building.</li>
+</ol>
+<h3 id="s30-5-3"><span class="n">30.5.3</span>Ageing at week 12</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Open</th>
+<th>Limit</th>
+<th>Past limit</th>
+<th>Oldest (working days)</th>
+<th>Share past limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>3</td>
+<td>1 working day</td>
+<td>1</td>
+<td>3</td>
+<td>33 %</td>
+</tr>
+<tr>
+<td>B</td>
+<td>41</td>
+<td>7 working days</td>
+<td>9</td>
+<td>16</td>
+<td>22 %</td>
+</tr>
+<tr>
+<td>C</td>
+<td>136</td>
+<td>30 working days</td>
+<td>22</td>
+<td>58</td>
+<td>16 %</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>180</td>
+<td></td>
+<td>32</td>
+<td></td>
+<td>17.8 %</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-5-4"><span class="n">30.5.4</span>Age histogram at week 12</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Age band (working days)</th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 to 1</td>
+<td>2</td>
+<td>6</td>
+<td>9</td>
+<td>17</td>
+</tr>
+<tr>
+<td>2 to 7</td>
+<td>1</td>
+<td>26</td>
+<td>31</td>
+<td>58</td>
+</tr>
+<tr>
+<td>8 to 14</td>
+<td>0</td>
+<td>8</td>
+<td>30</td>
+<td>38</td>
+</tr>
+<tr>
+<td>15 to 30</td>
+<td>0</td>
+<td>1</td>
+<td>44</td>
+<td>45</td>
+</tr>
+<tr>
+<td>31 to 60</td>
+<td>0</td>
+<td>0</td>
+<td>22</td>
+<td>22</td>
+</tr>
+<tr>
+<td>Over 60</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>3</td>
+<td>41</td>
+<td>136</td>
+<td>180</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> The B column past 7 days is 8 + 1 = 9 and the C column past 30 days is 22; both match table 30.5.3.</p>
+<h3 id="s30-5-5"><span class="n">30.5.5</span>Actions from the dataset</h3>
+<ol>
+<li><strong>Category A past limit.</strong> ISS-B2-0461 (fire damper) goes to escalation level 3 the same day. <mark>A category A issue past its limit is reported by name in the weekly update</mark>.</li>
+<li><strong>Category B past limit.</strong> The 9 issues are sorted by responsible party: GC 5, BMS contractor 3, designer 1. Each party receives its list with the target dates.</li>
+<li><strong>Category C tail.</strong> The 22 C issues over 30 working days are mostly documentation (14 missing operation and maintenance (O&amp;M) data sheets). The CxM agrees a single closure date with the GC document controller.</li>
+<li><strong>Repeated causes.</strong> Pareto by type: BMS point-to-point 21 %, labels and tagging 14 %, torque records 9 %, documentation 18 %. The two largest causes go to the contractors' quality managers as non-conformance trends.</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Closing an issue without evidence.</strong> The closure field is filled, but no retest record or photograph exists. The data-quality rule in 30.12 rejects a closure without a link.</li>
+<li><strong>Re-opening by creating a new issue.</strong> The old issue closes, a new one opens, and the ageing restarts at zero. Re-open the original issue.</li>
+<li><strong>Downgrading the category to meet the limit.</strong> Track category changes; the report lists every change with the name and the reason.</li>
+</ol>
+<h2 id="s30-6"><span class="n">30.6</span>Worked dataset 3: RFI cycle time</h2>
+
+<figure class="sheet" id="F30-3"><a href="../data/cx-handbook/figures/F30-3.svg" title="Open drawing F30-3 at full size"><img src="../data/cx-handbook/figures/F30-3.svg" alt="F30-3: Dataset 3: P2 RFI cycle time, median and 90th percentile (example data)" width="1000" height="895" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F30-3</span> — <b>Dataset 3: P2 RFI cycle time, median and 90th percentile (example data)</b>. Cycle time is working days from issue to accepted response for RFIs closed in that week. The 90th percentile shows the slow tail that the median hides.</figcaption></figure>
+<h3 id="s30-6-1"><span class="n">30.6.1</span>The data</h3>
+<p>Figure <a class="figref" href="#F30-3">F30-3</a> shows the median and 90th percentile cycle time of P2 RFIs closed in each week. The dataset is example data.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Week</th>
+<th>P2 RFIs closed</th>
+<th>Median (working days)</th>
+<th>90th percentile</th>
+<th>Number over 5 days</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>12</td>
+<td>4</td>
+<td>7</td>
+<td>3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>15</td>
+<td>5</td>
+<td>9</td>
+<td>5</td>
+</tr>
+<tr>
+<td>4</td>
+<td>18</td>
+<td>6</td>
+<td>12</td>
+<td>11</td>
+</tr>
+<tr>
+<td>6</td>
+<td>20</td>
+<td>8</td>
+<td>16</td>
+<td>15</td>
+</tr>
+<tr>
+<td>8</td>
+<td>22</td>
+<td>9</td>
+<td>18</td>
+<td>17</td>
+</tr>
+<tr>
+<td>10</td>
+<td>24</td>
+<td>7</td>
+<td>14</td>
+<td>15</td>
+</tr>
+<tr>
+<td>12</td>
+<td>25</td>
+<td>6</td>
+<td>12</td>
+<td>14</td>
+</tr>
+<tr>
+<td>14</td>
+<td>23</td>
+<td>5</td>
+<td>10</td>
+<td>9</td>
+</tr>
+<tr>
+<td>16</td>
+<td>21</td>
+<td>5</td>
+<td>9</td>
+<td>6</td>
+</tr>
+<tr>
+<td>18</td>
+<td>20</td>
+<td>5</td>
+<td>9</td>
+<td>5</td>
+</tr>
+<tr>
+<td>20</td>
+<td>19</td>
+<td>4</td>
+<td>8</td>
+<td>2</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-6-2"><span class="n">30.6.2</span>How to read it</h3>
+<ol>
+<li><strong>The median against the target.</strong> The median exceeded the <mark>5 working-day P2 target from week 4 to week 13</mark>.</li>
+<li><strong>The tail.</strong> The 90th percentile peaked at 18 working days in week 8: 1 RFI in 10 waited more than 3.5 weeks.</li>
+<li><strong>The cause.</strong> RFIs in weeks 4 to 9 were mostly electrical design questions waiting for the designer, who answered in batches every second week.</li>
+<li><strong>The change.</strong> From week 9 a weekly 1-hour design-review slot was agreed with the designer. Both lines fall from week 9.</li>
+<li><strong>The residual tail.</strong> At week 20 the 90th percentile is still 8 days, above the target. The CxM checks the 2 RFIs over 5 days: both needed a manufacturer's answer. These are reported separately as "waiting on OEM".</li>
+</ol>
+<h3 id="s30-6-3"><span class="n">30.6.3</span>Why the median and the 90th percentile are reported</h3>
+<p>The median shows the typical wait. The 90th percentile shows the slow tail, which is where the schedule risk sits. The NIST/SEMATECH e-Handbook defines percentiles and the quartiles used in 30.9. Use the same method each week, and state whether the project uses the nearest-rank method or interpolation.</p>
+<h2 id="s30-7"><span class="n">30.7</span>Worked dataset 4: test first-pass yield and retest ratio</h2>
+<h3 id="s30-7-1"><span class="n">30.7.1</span>The data</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>System (building B2, L4)</th>
+<th>Tests with attempt 1</th>
+<th>Passed at attempt 1</th>
+<th>FPY</th>
+<th>Total attempts</th>
+<th>Retest ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UPS</td>
+<td>48</td>
+<td>45</td>
+<td>93.8 %</td>
+<td>51</td>
+<td>0.06</td>
+</tr>
+<tr>
+<td>Low voltage (LV) switchboards and breakers</td>
+<td>96</td>
+<td>89</td>
+<td>92.7 %</td>
+<td>104</td>
+<td>0.08</td>
+</tr>
+<tr>
+<td>Generators</td>
+<td>51</td>
+<td>46</td>
+<td>90.2 %</td>
+<td>57</td>
+<td>0.12</td>
+</tr>
+<tr>
+<td>CDU and technology cooling</td>
+<td>64</td>
+<td>52</td>
+<td>81.3 %</td>
+<td>80</td>
+<td>0.25</td>
+</tr>
+<tr>
+<td>Computer room air handler (CRAH)</td>
+<td>39</td>
+<td>36</td>
+<td>92.3 %</td>
+<td>42</td>
+<td>0.08</td>
+</tr>
+<tr>
+<td>BMS sequences</td>
+<td>54</td>
+<td>40</td>
+<td>74.1 %</td>
+<td>74</td>
+<td>0.37</td>
+</tr>
+<tr>
+<td>EPMS</td>
+<td>27</td>
+<td>23</td>
+<td>85.2 %</td>
+<td>31</td>
+<td>0.15</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>379</td>
+<td>331</td>
+<td>87.3 %</td>
+<td>439</td>
+<td>0.16</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-7-2"><span class="n">30.7.2</span>How to read it</h3>
+<ol>
+<li><strong>Overall.</strong> FPY 87.3 % is below the <mark>90 % target</mark>, and the retest ratio of 0.16 is above its 0.15 limit.</li>
+<li><strong>By system.</strong> Two systems are below 85 %: CDU (81.3 %) and BMS sequences (74.1 %). Together they produce 26 of the 48 first-attempt failures.</li>
+<li><strong>By failure reason.</strong> For the 14 BMS failures: 9 were programming errors found during the test, 3 were points not commissioned at L3, 2 were test script errors. The 3 failures from incomplete L3 work should not have reached L4: <mark>they show that the L4 entry check was not applied</mark>.</li>
+<li><strong>Action.</strong> The CxM adds a readiness check before each BMS L4 test. The CxA verifies the point-to-point record for every point in the sequence, and the BMS contractor does a dry run without witnesses the day before.</li>
+<li><strong>Effect.</strong> In the next 3 weeks, BMS FPY rises to 89 % on 38 tests.</li>
+</ol>
+<p><strong>Worked example:</strong> Witness time saved by the readiness check. Before the check, BMS retests used (74 − 54) = 20 extra attempts × 2.5 hours = 50 hours of CxA witness time for 54 tests, or 0.93 hours per test. After the check, 38 tests needed 4 extra attempts × 2.5 hours = 10 hours, or 0.26 hours per test. For the remaining 120 BMS tests in buildings B3 and B4 this saves about (0.93 − 0.26) × 120 = 80 hours of witness time.</p>
+<h2 id="s30-8"><span class="n">30.8</span>Reading trends from BMS and EPMS</h2>
+<h3 id="s30-8-1"><span class="n">30.8.1</span>What a trend is</h3>
+<p>A trend is a time series of one point: a sequence of time-stamped values recorded by the BMS, the EPMS or a data logger. In BACnet (ANSI/ASHRAE Standard 135) a trend is held in a Trend Log object. The object records the value of a referenced property either at a fixed interval (periodic logging) or when the value changes by more than a set amount (change-of-value (COV) logging). The EPMS records interval data (for example 15-minute energy) and event data (alarms, waveforms, sequence of events).</p>
+<h3 id="s30-8-2"><span class="n">30.8.2</span>Sampling settings for commissioning</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Purpose</th>
+<th>Logging type</th>
+<th>Interval or COV</th>
+<th>Duration</th>
+<th>Example points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sequence test (failover, start-stop)</td>
+<td>periodic</td>
+<td>1 s</td>
+<td>test duration plus 10 min before and after</td>
+<td>CDU pump status, valve position, supply temperature</td>
+</tr>
+<tr>
+<td>Control loop tuning</td>
+<td>periodic</td>
+<td>1 to 5 s</td>
+<td>30 min per step test</td>
+<td>valve command, controlled variable, set point</td>
+</tr>
+<tr>
+<td>L4 performance test</td>
+<td>periodic</td>
+<td>1 min</td>
+<td>2 to 8 h</td>
+<td>flows, temperatures, kW</td>
+</tr>
+<tr>
+<td>Heat run and IST</td>
+<td>periodic</td>
+<td>1 s (loggers), 1 min (BMS)</td>
+<td>IST duration</td>
+<td>all IST points in the script</td>
+</tr>
+<tr>
+<td>Long-term stability</td>
+<td>periodic</td>
+<td>15 min</td>
+<td>7 to 14 days</td>
+<td>space temperatures, humidity, sensor drift</td>
+</tr>
+<tr>
+<td>Alarm and event checks</td>
+<td>COV or event</td>
+<td>per event</td>
+<td>test duration</td>
+<td>alarms, breaker status</td>
+</tr>
+<tr>
+<td>Energy and PUE</td>
+<td>interval</td>
+<td>15 min energy, 1 min power</td>
+<td>24 h to 14 days</td>
+<td>meter kWh registers</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-8-3"><span class="n">30.8.3</span>Rules for sampling</h3>
+<ol>
+<li><strong>Sample faster than the event.</strong> To see an event, the sampling interval must be shorter than the event. A pump changeover that takes 4 s is invisible in a 1-minute trend. <mark>Use 1 s or faster for sequence tests</mark>.</li>
+<li><strong>Sample at least twice as fast as the fastest change of interest.</strong> This is the Nyquist sampling rule from signal theory. Use 5 to 10 samples per period of the fastest oscillation you need to see.</li>
+<li><strong>Use COV with care.</strong> COV logging saves storage, but a COV band of 0.5 K hides a 0.3 K oscillation. For tests, use periodic logging.</li>
+<li><strong>Check controller and network limits.</strong> Many 1-second trends on one controller can overload it or the network. Ask the BMS contractor for the controller's trend capacity and stagger the trends.</li>
+<li><strong>Read the trend buffer size.</strong> Trend logs in controllers overwrite the oldest values when the buffer is full. A buffer of 1,000 samples at 1 s holds about 17 minutes. Archive to the server before the test ends.</li>
+<li><strong>Record the time source.</strong> Note whether the BMS, EPMS and loggers are synchronised and the offset measured before the test.</li>
+</ol>
+<h3 id="s30-8-4"><span class="n">30.8.4</span>Steps to review a trend</h3>
+<p><strong>Trigger:</strong> A sequence test, a performance test, an IST scenario or a stability period ends.</p>
+<p><strong>Owner:</strong> CxA test engineer; CxM reviews the summary.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Export with metadata.</strong> Export the trend with point name, tag, units, logging type, interval and time zone within 1 working day of the test.</li>
+<li><strong>Check completeness.</strong> Count samples against the expected number (duration / interval). The acceptance value is set in the trend-data clause of the project commissioning specification; the example value is at least 99 % of samples for test trends.</li>
+<li><strong>Align time.</strong> Put all trends on one time axis. Correct known offsets between systems and record the correction.</li>
+<li><strong>Plot the set point with the value.</strong> A temperature trend without its set point cannot be judged.</li>
+<li><strong>Mark the test events.</strong> Add the time of each test action from the test record (for example "13:02:10 CDU-07 pump A tripped").</li>
+<li><strong>Compare with the acceptance criteria.</strong> For example, supply temperature stays within ±1 K of set point during the pump changeover and recovers within 120 s (values from the project test script).</li>
+<li><strong>Run the statistical checks.</strong> Section 30.9 for outliers, stuck values and drift.</li>
+<li><strong>Record the result.</strong> Attach the plot and the data file to the test record within 2 working days.</li>
+</ol>
+<h3 id="s30-8-5"><span class="n">30.8.5</span>Common trend reading errors</h3>
+<ol>
+<li><strong>Mixing units.</strong> Flow in L/s on the BMS and m³/h on the logger. Convert before plotting and write the unit on the axis.</li>
+<li><strong>Averaged data hides peaks.</strong> A 15-minute average of a 30-second temperature excursion shows a small rise. Use the raw interval for tests.</li>
+<li><strong>Interpolated gaps.</strong> Some software draws a straight line across missing data. <mark>Show missing data as a gap</mark>.</li>
+<li><strong>Local time against UTC.</strong> Some EPMS servers store UTC and display local time; exports may be in either. Check one known event in both systems.</li>
+<li><strong>Scaling errors.</strong> A 4 to 20 mA signal scaled 0 to 100 °C on the controller and 0 to 50 °C on the drawing. Compare a reading with a calibrated instrument at L3.</li>
+</ol>
+<h2 id="s30-9"><span class="n">30.9</span>Statistical checks on trend data</h2>
+
+<figure class="sheet" id="F30-4"><a href="../data/cx-handbook/figures/F30-4.svg" title="Open drawing F30-4 at full size"><img src="../data/cx-handbook/figures/F30-4.svg" alt="F30-4: Dataset 5: CDU-07 temperature sensors against a reference (example data)" width="1000" height="1089" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F30-4</span> — <b>Dataset 5: CDU-07 temperature sensors against a reference (example data)</b>. Top: sensor minus reference. Bottom: raw TT-02 reading and its 24 h standard deviation; a live sensor on a controlled loop never reads exactly constant.</figcaption></figure>
+
+<figure class="sheet" id="F30-5"><a href="../data/cx-handbook/figures/F30-5.svg" title="Open drawing F30-5 at full size"><img src="../data/cx-handbook/figures/F30-5.svg" alt="F30-5: Dataset 6: control chart of chilled-water supply temperature (example data)" width="1000" height="930" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F30-5</span> — <b>Dataset 6: control chart of chilled-water supply temperature (example data)</b>. Sigma is the average moving range of the baseline divided by 1.128 (NIST/SEMATECH e-Handbook). Rule 1 flags one point outside 3 sigma; the run rule flags 8 or more consecutive points on one side of the mean.</figcaption></figure>
+<h3 id="s30-9-1"><span class="n">30.9.1</span>Why statistical checks are needed</h3>
+<p>Commissioning decisions are made on sensor and meter values. A sensor that drifts, sticks or spikes gives values that look plausible to a reader who looks only at the latest value. Simple statistical checks, applied the same way to every point, find these faults before a test result depends on them. Figure <a class="figref" href="#F30-4">F30-4</a> shows drift and a stuck value; Figure <a class="figref" href="#F30-5">F30-5</a> shows a control chart.</p>
+<h3 id="s30-9-2"><span class="n">30.9.2</span>The checks</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>What it finds</th>
+<th>Rule (example values)</th>
+<th>Source of the method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Range</td>
+<td>impossible values</td>
+<td>value outside the sensor range or a physical limit (for example supply temperature below 5 °C or above 70 °C)</td>
+<td>engineering limits</td>
+</tr>
+<tr>
+<td>Rate of change</td>
+<td>spikes, signal faults</td>
+<td>change between samples above a limit (for example 2 K in 1 s for a water temperature)</td>
+<td>engineering limits</td>
+</tr>
+<tr>
+<td>Outlier, interquartile range (IQR)</td>
+<td>single unusual values</td>
+<td>beyond Q1 − 1.5 IQR or Q3 + 1.5 IQR (mild); beyond 3 IQR (extreme)</td>
+<td>NIST/SEMATECH e-Handbook 7.1.6</td>
+</tr>
+<tr>
+<td>Control chart (Shewhart)</td>
+<td>out-of-control points and shifts</td>
+<td>a point beyond 3 sigma; runs on one side of the mean</td>
+<td>NIST/SEMATECH e-Handbook 6.3.2</td>
+</tr>
+<tr>
+<td>CUSUM</td>
+<td>small sustained shifts</td>
+<td>cumulative sum above h (for example 4 to 5 sigma) with allowance k (for example 0.5 sigma)</td>
+<td>NIST/SEMATECH e-Handbook 6.3.2.3</td>
+</tr>
+<tr>
+<td>Stuck value</td>
+<td>frozen sensor or frozen communication</td>
+<td>standard deviation below a limit over a window (for example below 0.01 K over 6 h on a controlled loop)</td>
+<td>engineering practice</td>
+</tr>
+<tr>
+<td>Drift</td>
+<td>slow change of sensor error</td>
+<td>slope of (sensor − reference) above a limit (for example 0.02 K per day)</td>
+<td>comparison with reference</td>
+</tr>
+<tr>
+<td>Pair comparison</td>
+<td>one sensor of a pair wrong</td>
+<td>difference between redundant sensors above a limit (for example 0.5 K)</td>
+<td>engineering practice</td>
+</tr>
+<tr>
+<td>Energy balance</td>
+<td>meter or current transformer (CT) faults</td>
+<td>residual of a meter balance outside tolerance</td>
+<td>section 30.10</td>
+</tr>
+</tbody>
+</table></div>
+<p>The example limits in the table are typical values used on data-centre commissioning programmes. Set the project limits in the commissioning plan from the sensor accuracy and the control tolerance in the specification.</p>
+<h3 id="s30-9-3"><span class="n">30.9.3</span>Outliers by interquartile-range fences</h3>
+<p>The NIST/SEMATECH e-Handbook defines the box-plot fences used to find outliers. With Q1 the lower quartile and Q3 the upper quartile, IQ = Q3 − Q1. The inner fences are Q1 − 1.5 IQ and Q3 + 1.5 IQ; the outer fences are Q1 − 3 IQ and Q3 + 3 IQ. A point beyond an inner fence is a mild outlier; a point beyond an outer fence is an extreme outlier. The handbook places Q1 at the 0.25(N + 1)th ordered value and Q3 at the 0.75(N + 1)th ordered value.</p>
+<p><strong>Worked example:</strong> Output power of UPS B2-DH3-UPS-A1 during a heat run, 19 one-minute values in kW (example data): 1502, 1498, 1505, 1501, 1499, 1503, 1497, 1500, 1504, 1502, 1496, 1501, 1640, 1499, 1503, 1500, 1462, 1502, 1498.</p>
+<ol>
+<li><strong>Sort.</strong> 1462, 1496, 1497, 1498, 1498, 1499, 1499, 1500, 1500, 1501, 1501, 1502, 1502, 1502, 1503, 1503, 1504, 1505, 1640.</li>
+<li><strong>Quartiles.</strong> N = 19. Q1 is the 0.25 × 20 = 5th value = 1,498 kW. Q3 is the 0.75 × 20 = 15th value = 1,503 kW. Median (10th value) = 1,501 kW.</li>
+<li><strong>IQ.</strong> 1,503 − 1,498 = 5 kW.</li>
+<li><strong>Fences.</strong> Inner: 1,490.5 and 1,510.5 kW. Outer: 1,483 and 1,518 kW.</li>
+<li><strong>Result.</strong> 1,640 kW and 1,462 kW are both beyond the outer fences: two extreme outliers.</li>
+<li><strong>Investigation.</strong> The 1,640 kW value occurs in one sample only, and the UPS output current in the same minute is unchanged. The EPMS log shows a communication retry, so the value is a data error and is excluded from the result with a note. The 1,462 kW value matches a load-bank log entry: one 40 kW element tripped and was reset within the minute. It is a real event and stays in the data.</li>
+</ol>
+<p>Treat <mark>an outlier as a value to investigate</mark>, and remove it only when a record shows it is a data error.</p>
+<h3 id="s30-9-4"><span class="n">30.9.4</span>Shewhart individuals chart and the Western Electric rules</h3>
+<p>A control chart plots values in time order with a centre line (the mean of a stable baseline) and control limits at ±3 sigma. For single readings (an individuals chart), sigma is estimated from the average moving range: sigma = average |x(i) − x(i−1)| / 1.128 (the constant d2 for ranges of two values, from the NIST/SEMATECH e-Handbook).</p>
+<p>The NIST/SEMATECH e-Handbook lists the Western Electric Company (WECO) rules for signalling an out-of-control process:</p>
+<ol>
+<li><strong>Rule 1.</strong> Any single point beyond 3 sigma from the centre line.</li>
+<li><strong>Rule 2.</strong> Two out of three successive points beyond 2 sigma on the same side.</li>
+<li><strong>Rule 3.</strong> Four out of five successive points beyond 1 sigma on the same side.</li>
+<li><strong>Rule 4.</strong> Eight successive points on the same side of the centre line.</li>
+</ol>
+<p>The handbook notes that adding the extra rules increases the rate of false alarms; use rule 1 for alarms and the run rules for review.</p>
+<p><strong>Worked example:</strong> Chilled-water supply temperature at header B2-CHW-S1, 60 samples at 15-minute intervals, set point 18.0 °C (worked dataset 6, example data, Figure <a class="figref" href="#F30-5">F30-5</a>).</p>
+<ol>
+<li><strong>Baseline.</strong> Samples 1 to 40, with sample 23 excluded (a known valve stroke test). Mean = 18.005 °C.</li>
+<li><strong>Moving range.</strong> Average moving range of the baseline = 0.085 K. Sigma = 0.085 / 1.128 = 0.075 K.</li>
+<li><strong>Limits.</strong> Upper control limit = 18.005 + 3 × 0.075 = <mark>18.23 °C</mark>. Lower control limit = 18.005 − 0.225 = 17.78 °C.</li>
+<li><strong>Rule 1.</strong> Sample 23 (18.62 °C) is above the upper limit. The BMS log shows a valve stroke test at that time: the cause is known and recorded.</li>
+<li><strong>Rule 4.</strong> Samples 41 to 60 are all above the mean. The rule signals at sample 48 (the eighth point in the run). The mean of samples 41 to 60 is 18.24 °C, a shift of 0.24 K.</li>
+<li><strong>Rule 1 in the shift.</strong> 11 of the 20 shifted samples (42, 44, 45, 47, 49, 51, 52, 55, 57, 58, 60) are above the upper limit.</li>
+<li><strong>Cause.</strong> The BMS change log shows the set point changed from 18.0 to 18.25 °C at sample 40 by an operator account, with no change record. The set point is restored and the event is entered in the issue log as a change-control breach.</li>
+</ol>
+<h3 id="s30-9-5"><span class="n">30.9.5</span>CUSUM for small shifts</h3>
+<p>A Shewhart chart is slow to show a shift smaller than about 1.5 sigma. The CUSUM chart adds up deviations from the target and signals when the sum passes a decision limit. The upper tabular CUSUM is S(i) = max(0, S(i−1) + x(i) − (target + k)); it signals when S(i) &gt; h. The NIST/SEMATECH e-Handbook describes the method; common choices are k = 0.5 sigma and h = 4 or 5 sigma.</p>
+<p><strong>Worked example:</strong> The same chilled-water data, target 18.005 °C, sigma 0.075 K, k = 0.0375 K, h = 5 sigma = 0.375 K.</p>
+<ol>
+<li><strong>Sample 41.</strong> S = 0 + 18.21 − 18.0425 = 0.1675 K.</li>
+<li><strong>Sample 42.</strong> S = 0.1675 + 18.27 − 18.0425 = 0.395 K, above h = 0.375 K. <mark>The CUSUM signals at sample 42</mark>.</li>
+<li><strong>Comparison.</strong> Rule 4 of the Shewhart chart signals at sample 48. CUSUM finds the shift 6 samples (1.5 hours) earlier.</li>
+</ol>
+<h3 id="s30-9-6"><span class="n">30.9.6</span>Stuck values and drift</h3>
+<p>A stuck value is a reading that does not change. On a controlled water loop a live temperature sensor always shows small variation from the control loop and from noise. A reading with zero variation for several hours means the sensor, its transmitter or the communication path has frozen. The BMS can keep showing the last value received.</p>
+<p>Drift is a slow change of the sensor error over days. It is found only by comparison with a reference: a calibrated portable logger placed in the same pocket or immediately next to the sensor, or a redundant sensor of known accuracy.</p>
+<p><strong>Worked example:</strong> CDU B2-DH3-CDU-07 has three supply temperature sensors: TT-01 (control), TT-02 (monitoring) and TT-03 (high-limit). A reference logger with ±0.1 K accuracy (calibration certificate in the test record) is placed in a test pocket for 14 days (worked dataset 5, example data, Figure <a class="figref" href="#F30-4">F30-4</a>).</p>
+<ol>
+<li><strong>TT-03.</strong> Error against the reference stays between −0.08 and 0.00 K. Pass.</li>
+<li><strong>TT-01.</strong> Error starts at +0.05 K and rises from day 4 at 0.05 K per day. Single readings exceed the 0.5 K limit on day 13; the 24-hour mean of day 14 is 0.52 K. The slope, 0.05 K per day, is above the 0.02 K per day limit from day 5 of data. TT-01 is replaced; the new sensor is checked against the reference for 48 hours.</li>
+<li><strong>TT-02.</strong> Reads 45.2 °C with zero variation from hour 216. The stuck-value rule (standard deviation below 0.01 K over 6 hours) flags it at <mark>hour 222</mark>. The cause is a failed Modbus gateway port that kept returning the last value. The BMS contractor adds a communication-health point for each gateway.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Sensor</th>
+<th>Rule</th>
+<th>Result</th>
+<th>Action</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TT-01</td>
+<td>offset ≤ 0.5 K and slope ≤ 0.02 K per day</td>
+<td>fail (day 13, 0.05 K per day)</td>
+<td>replace, recheck 48 h</td>
+<td>ISS-B2-0477</td>
+</tr>
+<tr>
+<td>TT-02</td>
+<td>standard deviation ≥ 0.01 K over 6 h</td>
+<td>fail (hour 222)</td>
+<td>repair gateway, add health point</td>
+<td>ISS-B2-0478</td>
+</tr>
+<tr>
+<td>TT-03</td>
+<td>offset ≤ 0.5 K</td>
+<td>pass</td>
+<td>none</td>
+<td>sensor check sheet</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-9-7"><span class="n">30.9.7</span>Steps to run the checks on a test dataset</h3>
+<ol>
+<li><strong>Range and rate-of-change checks.</strong> Apply to every point. The check takes minutes in a script or spreadsheet. Flag each value that fails and keep it in the data.</li>
+<li><strong>Stuck-value check.</strong> Apply to every analogue point over the whole dataset.</li>
+<li><strong>Outlier check.</strong> Apply to stable periods only (steady load steps). Outliers in a transient period are expected.</li>
+<li><strong>Control chart.</strong> Apply to controlled variables (temperatures, pressures, flows) during stable periods; use the first stable period as baseline.</li>
+<li><strong>Reference comparison.</strong> Apply to sensors used for acceptance decisions, at least one per type per hall.</li>
+<li><strong>Record every flag.</strong> Each flag gets a disposition: data error excluded, real event kept, sensor fault raised as an issue.</li>
+</ol>
+<h2 id="s30-10"><span class="n">30.10</span>Energy reconciliation between meters</h2>
+
+<figure class="sheet" id="F30-6"><a href="../data/cx-handbook/figures/F30-6.svg" title="Open drawing F30-6 at full size"><img src="../data/cx-handbook/figures/F30-6.svg" alt="F30-6: Dataset 7: energy reconciliation, LV main against feeders (example data)" width="1000" height="895" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F30-6</span> — <b>Dataset 7: energy reconciliation, LV main against feeders (example data)</b>. Residual = (incomer kWh minus sum of feeder kWh) / incomer kWh, for each hour. A step in the residual points to a missing or failed meter; a slow change points to a CT or scaling error.</figcaption></figure>
+<h3 id="s30-10-1"><span class="n">30.10.1</span>Purpose</h3>
+<p><strong>Purpose:</strong> Energy reconciliation checks that the energy measured by an incoming meter equals the energy measured by the meters downstream of it, plus the losses between them, within the accuracy of the meters. It finds missing meters, wrong current transformer (CT) ratios, reversed CTs, wrong scaling and meters that stop reporting. The billing and PUE numbers of the operating data centre depend on these meters, so reconciliation is part of EPMS acceptance (chapter 24).</p>
+<h3 id="s30-10-2"><span class="n">30.10.2</span>Formula</h3>
+<p>Residual (%) = (E_incomer − Σ E_feeders) / E_incomer × 100</p>
+<p>E is the energy in kWh over the same interval, read from the meters' kWh registers (or interval data) with aligned time stamps. Use energy over at least one hour. Instantaneous power values are less suitable because meters sample at different moments.</p>
+<h3 id="s30-10-3"><span class="n">30.10.3</span>Expected residual</h3>
+<p>The residual has two parts: the real losses between the meters (cables, busbars, transformers if any), and the measurement errors of the meters and their CTs and voltage transformers.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Typical value</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Incomer meter accuracy</td>
+<td>class 0.2S (±0.2 % of reading in the rated current range)</td>
+<td>class from the meter data sheet; error limits in IEC 62053-22:2020 Table 3</td>
+</tr>
+<tr>
+<td>Feeder meter accuracy</td>
+<td>class 0.5S (±0.5 % of reading)</td>
+<td>IEC 62053-22</td>
+</tr>
+<tr>
+<td>CT accuracy</td>
+<td>class 0.2S or 0.5S for metering CTs</td>
+<td>IEC 61869-2:2012; CT class from the project single-line diagram and the CT data sheet</td>
+</tr>
+<tr>
+<td>LV busbar and cable losses within one switchboard</td>
+<td>about 0.3 to 1.0 % of energy at full load</td>
+<td>depends on length and loading; calculate from the cable schedule</td>
+</tr>
+<tr>
+<td>Total tolerance used on MSC-1 example</td>
+<td>±2.0 % per hour at loads above 20 % of rating</td>
+<td>example value; the project value is in the metering clause of the project commissioning specification</td>
+</tr>
+</tbody>
+</table></div>
+<p>At low load the meter errors are larger in relative terms. Class S meters are specified down to 1 % of rated current, with wider limits at low current. For class 0.2S at power factor 1, the limit is ±0.2 % from 5 % of rated current to maximum current. From 1 % to 5 % of rated current the limit is ±0.4 % (IEC 62053-22:2020 Table 3, values as reproduced in the Elexon Balancing and Settlement Code (BSC) Code of Practice 4). <mark>Do not reconcile at loads below about 10 % of rating</mark>, or widen the tolerance there.</p>
+<h3 id="s30-10-4"><span class="n">30.10.4</span>Steps</h3>
+<p><strong>Trigger:</strong> A switchboard and its feeder meters are energised and communicating, with a load above 20 % (load banks during L4 or IST).</p>
+<p><strong>Owner:</strong> EPMS contractor runs the query; CxA reviews; CxM signs the reconciliation record.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Draw the metering tree.</strong> From the single-line diagram, list the incomer meter and every meter on its outgoing circuits. Mark circuits with no meter.</li>
+<li><strong>Choose the period.</strong> At least 24 hours at a steady load, or each IST load step.</li>
+<li><strong>Extract hourly energy.</strong> Query each meter's kWh for each hour. Check data completeness first (30.12).</li>
+<li><strong>Calculate the residual for each hour.</strong> Use the formula in 30.10.2.</li>
+<li><strong>Compare with the tolerance.</strong> ±2.0 % in the example.</li>
+<li><strong>Investigate steps and trends.</strong> A sudden step points to a meter or circuit dropping out. A constant large residual points to a CT ratio or scaling error or a missing meter. A negative residual (feeders exceed the incomer) points to a feeder meter counting reversed energy, a wrong CT ratio, or a feeder counted twice.</li>
+<li><strong>Record.</strong> Reconciliation record with the metering tree, the hourly table, the plot and the disposition of each failure.</li>
+</ol>
+<h3 id="s30-10-5"><span class="n">30.10.5</span>Worked dataset 7</h3>
+<p>Figure <a class="figref" href="#F30-6">F30-6</a> shows a 24-hour reconciliation of the LV main of block B2-DH3 against the sum of its feeder meters during a heat run (example data).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Hour</th>
+<th>Incomer kWh</th>
+<th>Feeders kWh</th>
+<th>Difference kWh</th>
+<th>Residual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00:00</td>
+<td>1,712</td>
+<td>1,697</td>
+<td>15</td>
+<td>0.88 %</td>
+</tr>
+<tr>
+<td>06:00</td>
+<td>1,718</td>
+<td>1,702</td>
+<td>16</td>
+<td>0.93 %</td>
+</tr>
+<tr>
+<td>12:00</td>
+<td>1,721</td>
+<td>1,708</td>
+<td>13</td>
+<td>0.76 %</td>
+</tr>
+<tr>
+<td>13:00</td>
+<td>1,717</td>
+<td>1,549</td>
+<td>168</td>
+<td>9.78 %</td>
+</tr>
+<tr>
+<td>14:00</td>
+<td>1,712</td>
+<td>1,544</td>
+<td>168</td>
+<td>9.81 %</td>
+</tr>
+<tr>
+<td>15:00</td>
+<td>1,715</td>
+<td>1,547</td>
+<td>168</td>
+<td>9.80 %</td>
+</tr>
+<tr>
+<td>16:00</td>
+<td>1,713</td>
+<td>1,700</td>
+<td>13</td>
+<td>0.76 %</td>
+</tr>
+<tr>
+<td>20:00</td>
+<td>1,716</td>
+<td>1,701</td>
+<td>15</td>
+<td>0.87 %</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Reading the reconciliation.</p>
+<ol>
+<li><strong>Normal hours.</strong> The residual is between 0.76 % and 0.94 % for 21 of 24 hours. This is inside the <mark>2.0 % tolerance</mark> and consistent with busbar and cable losses plus meter error.</li>
+<li><strong>Hours 13 to 15.</strong> The residual jumps to 9.8 %. The difference, about 168 kWh per hour, is 155 kWh more than normal. Feeder meter B2-DH3-MCC-A1 (mechanical control centre) records about 155 kWh per hour in the other hours.</li>
+<li><strong>Cause.</strong> The Power Monitoring Expert (PME) data log shows meter MCC-A1 offline from 13:00 to 15:59 because a network switch port was disabled during a firmware update.</li>
+<li><strong>Disposition.</strong> The switch port is re-enabled; the meter's on-board log back-fills the 3 hours; the reconciliation is re-run and shows 0.76 % for each of those hours. The record shows both runs.</li>
+<li><strong>Daily total.</strong> After back-fill, 24-hour incomer energy is 41,129 kWh and the feeders total 40,774 kWh: residual 0.86 %.</li>
+</ol>
+<h3 id="s30-10-6"><span class="n">30.10.6</span>Common reconciliation faults</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Residual constant around +33 %</td>
+<td>one phase CT reversed on the incomer or a feeder (that phase subtracts)</td>
+<td>phasor check at the meter (chapter 24)</td>
+</tr>
+<tr>
+<td>Residual constant at a round ratio (for example feeders read 50 % or 200 %)</td>
+<td>CT ratio set wrong in the meter (for example 2000/5 set as 1000/5)</td>
+<td>compare meter CT setting with the CT nameplate</td>
+</tr>
+<tr>
+<td>Residual negative</td>
+<td>feeder counted twice, or a feeder meter measures reverse energy</td>
+<td>metering tree; meter import and export registers</td>
+</tr>
+<tr>
+<td>Residual steps up for some hours</td>
+<td>a feeder meter offline</td>
+<td>PME data log, communication status</td>
+</tr>
+<tr>
+<td>Residual grows with load</td>
+<td>an unmetered load (for example lighting board fed from the busbar)</td>
+<td>site walk with the single-line diagram</td>
+</tr>
+<tr>
+<td>Residual large at low load only</td>
+<td>meter accuracy at low current</td>
+<td>reconcile above 20 % load</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s30-11"><span class="n">30.11</span>PUE during commissioning</h2>
+
+<figure class="sheet" id="F30-7"><a href="../data/cx-handbook/figures/F30-7.svg" title="Open drawing F30-7 at full size"><img src="../data/cx-handbook/figures/F30-7.svg" alt="F30-7: Dataset 8: hall B2-DH3 PUE at the IST load steps (example data)" width="1000" height="888" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F30-7</span> — <b>Dataset 8: hall B2-DH3 PUE at the IST load steps (example data)</b>. Each point is a 1 h average at a stable load step during IST. The fixed overhead (lighting, controls, pumps at minimum speed, UPS no-load loss) makes PUE rise at part load.</figcaption></figure>
+<h3 id="s30-11-1"><span class="n">30.11.1</span>Definition</h3>
+<p>Power usage effectiveness is defined in ISO/IEC 30134-2:2026 and by The Green Grid as:</p>
+<p>PUE = total facility energy / IT equipment energy</p>
+<p>Both energies are measured over the same period. PUE is 1.0 for a facility with no overhead; the MSC-1 design PUE is <mark>1.22 at full IT load</mark> (case ledger). ISO/IEC 30134-2 and The Green Grid define annual PUE on 12 months of energy data. ISO/IEC 30134-2:2026 sets the measurement period in clause 6.1.3 and defines interim PUE (iPUE), measured over a shorter stated period, in clause 9.2. Partial PUE (pPUE, clause 9.3) covers a part of the infrastructure and is a different derivative. The 2026 edition changed the 12-month recording rule of the 2016 edition (confirm the recording period against ISO/IEC 30134-2:2026 clause 6.1.3).</p>
+<h3 id="s30-11-2"><span class="n">30.11.2</span>Measurement categories</h3>
+<p>The Green Grid defines measurement categories by where the IT energy is measured.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>IT energy measured at</th>
+<th>Basis</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PUE0</td>
+<td>UPS output</td>
+<td>peak demand (kW)</td>
+<td>demand-based; not for annual reporting</td>
+</tr>
+<tr>
+<td>PUE1</td>
+<td>UPS output</td>
+<td>12-month energy (kWh)</td>
+<td>basic level</td>
+</tr>
+<tr>
+<td>PUE2</td>
+<td>power distribution unit (PDU) output</td>
+<td>12-month energy</td>
+<td>intermediate</td>
+</tr>
+<tr>
+<td>PUE3</td>
+<td>IT equipment input</td>
+<td>12-month energy</td>
+<td>most accurate</td>
+</tr>
+</tbody>
+</table></div>
+<p>Sources describe PDU-output losses differently between PUE2 summaries; check the definition in The Green Grid document before reporting a PUE2 value.</p>
+<h3 id="s30-11-3"><span class="n">30.11.3</span>What PUE during commissioning can show</h3>
+<p>During integrated systems testing the IT load is replaced by load banks and liquid heat emulators. On MSC-1 a hall's IST uses 12 MW of electrical load: <mark>9.6 MW of liquid heat emulators and 2.4 MW of air heaters</mark> (case ledger). The facility power and the load-bank power can be measured at each load step, which gives a PUE at that step.</p>
+<ol>
+<li><strong>What it shows.</strong> The overhead of the mechanical and electrical plant at each load, the fixed overhead (the part that does not change with load) and the trend with load. A plant that does not reach the design value at full load has a problem: pumps at the wrong speed, chillers running that should be off, fans not modulating.</li>
+<li><strong>What it does not show.</strong> The annual PUE, which depends on weather over a year and on the real IT load profile. A test at one temperature does not represent Jakarta's year.</li>
+<li><strong>Report label.</strong> <mark>Report it as "IST interval PUE, hall B2-DH3, dates, ambient conditions"</mark>. The facility PUE is a separate annual value.</li>
+</ol>
+<h3 id="s30-11-4"><span class="n">30.11.4</span>Steps to measure PUE at IST load steps</h3>
+<ol>
+<li><strong>Define the boundary.</strong> Total facility energy for the hall: the hall's share of the incoming supply, including its mechanical plant share. Write the metering points in the IST script.</li>
+<li><strong>Define the IT energy.</strong> Load-bank and heat-emulator input energy, measured at the load-bank feeders (the equivalent of category 2 or 3 depending on the point). State which.</li>
+<li><strong>Hold each step for at least 1 hour after stabilisation.</strong> Stabilisation: supply temperatures within ±0.5 K of set point for 15 minutes (example criterion; take the value from the IST script).</li>
+<li><strong>Read energy over the hour.</strong> Use kWh registers; check completeness.</li>
+<li><strong>Record ambient conditions.</strong> Dry-bulb and wet-bulb temperature for each hour.</li>
+<li><strong>Calculate PUE per step.</strong> Facility kWh / IT kWh.</li>
+<li><strong>Fit the model.</strong> Facility overhead = fixed part + proportional part × IT load. Compare with the design model.</li>
+</ol>
+<h3 id="s30-11-5"><span class="n">30.11.5</span>Worked dataset 8</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>IT load (MW)</th>
+<th>Facility power (MW)</th>
+<th>PUE measured</th>
+<th>Design model PUE</th>
+<th>Ambient dry bulb</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>3.0</td>
+<td>4.10</td>
+<td>1.37</td>
+<td>1.36</td>
+<td>29.5 °C</td>
+</tr>
+<tr>
+<td>2</td>
+<td>6.0</td>
+<td>7.58</td>
+<td>1.26</td>
+<td>1.26</td>
+<td>31.0 °C</td>
+</tr>
+<tr>
+<td>3</td>
+<td>9.0</td>
+<td>11.03</td>
+<td>1.23</td>
+<td>1.23</td>
+<td>32.5 °C</td>
+</tr>
+<tr>
+<td>4</td>
+<td>12.0</td>
+<td>14.53</td>
+<td>1.21</td>
+<td>1.21</td>
+<td>33.0 °C</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Reading Figure <a class="figref" href="#F30-7">F30-7</a>.</p>
+<ol>
+<li><strong>Full load.</strong> At 12 MW, PUE = 14.53 / 12.00 = 1.21. The design value is 1.22. Pass.</li>
+<li><strong>Fixed overhead.</strong> The design model is PUE = 1 + (0.60 + 0.16 × IT) / IT, with IT in MW. The fixed 0.60 MW covers lighting, controls, pumps at minimum speed and UPS no-load losses. At 3 MW the overhead is 0.60 + 0.48 = 1.08 MW, so PUE = 4.08 / 3.00 = 1.36; measured 1.37.</li>
+<li><strong>Proportional overhead.</strong> The slope between steps 3 and 4 is (14.53 − 11.03) / (12.0 − 9.0) = 1.167 MW of facility power per MW of IT, so 0.167 MW of overhead per added MW, close to the model's 0.16.</li>
+<li><strong>Weather.</strong> Ambient rose from 29.5 to 33.0 °C between steps 1 and 4. The design dry bulb is 34.0 °C. The result is close to design conditions; it is still reported with the ambient values.</li>
+<li><strong>Report.</strong> "IST interval PUE for hall B2-DH3 at 12 MW: 1.21 (1 h average, ambient 33.0 °C dry bulb). This is an interval value; the annual PUE is reported separately."</li>
+</ol>
+<h3 id="s30-11-6"><span class="n">30.11.6</span>Partial PUE</h3>
+<p>Partial PUE (pPUE) applies the same ratio to a zone or a subsystem: energy of the zone's infrastructure plus IT, divided by the IT energy in the zone. During commissioning a pPUE for the liquid-cooled part of a hall (CDUs and their pumps against the liquid heat emulators) shows whether the technology cooling system overhead matches design. Use the same boundary rules as for PUE and state them.</p>
+<h3 id="s30-11-7"><span class="n">30.11.7</span>Comparing measured values with a model</h3>
+<p>Measured values are sometimes compared with a design or simulation model, for example facility power against the design model, or a chilled-water plant model against the plant's trends. Two statistics from ASHRAE Guideline 14 measure the fit: the normalised mean bias error (NMBE), which shows systematic bias, and the coefficient of variation of the root mean square error, CV(RMSE), which shows scatter. Published summaries of Guideline 14-2014 give calibration limits of NMBE within ±10 % and CV(RMSE) at most 30 % for hourly data. For monthly data the limits are NMBE within ±5 % and CV(RMSE) at most 15 %. Guideline 14-2014 is superseded by Guideline 14-2023 (confirm the limits against the calibration criteria of ASHRAE Guideline 14-2023). Both statistics must meet their limits; a model can have small scatter and a large bias.</p>
+<p>NMBE = Σ(measured − model) / ((n − p) × mean of measured) × 100</p>
+<p>CV(RMSE) = √(Σ(measured − model)² / (n − p)) / mean of measured × 100</p>
+<p>Here n is the number of values and p the number of model parameters (1 in the worked example below).</p>
+<p><strong>Worked example:</strong> The four IST steps in table 30.11.5, with facility power as the measured value and the design model 0.60 + 1.16 × IT as the model value, n = 4 and p = 1. Model values: 4.08, 7.56, 11.04, 14.52 MW. Differences: +0.02, +0.02, −0.01, +0.01 MW; sum 0.04 MW; sum of squares 0.0010. Mean measured = (4.10 + 7.58 + 11.03 + 14.53) / 4 = 9.31 MW. NMBE = 0.04 / (3 × 9.31) × 100 = 0.14 %. CV(RMSE) = √(0.0010 / 3) / 9.31 × 100 = 0.20 %. Both are far inside the hourly limits; <mark>four points are too few for a statistical claim</mark>, so the result is reported as a check of the design model only.</p>
+<h2 id="s30-12"><span class="n">30.12</span>Data-quality checks</h2>
+<h3 id="s30-12-1"><span class="n">30.12.1</span>Data-quality dimensions</h3>
+<p>ISO/IEC 25012 defines a data quality model with inherent characteristics (for example accuracy, completeness, consistency, credibility and currentness) and system-dependent characteristics (for example availability and recoverability). ISO/IEC 25012:2008 defines 15 characteristics in these two groups, as summarised by the ISO 25000 portal, iso25000.com. The commissioning manager uses six of these, each with a rule that a script or a spreadsheet can check.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Meaning for commissioning data</th>
+<th>Rule (example)</th>
+<th>Applied to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Completeness</td>
+<td>every expected record or sample exists</td>
+<td>samples received / samples expected ≥ 99.5 % for EPMS interval data; every checklist has an asset tag</td>
+<td>trends, meters, logs</td>
+</tr>
+<tr>
+<td>Validity</td>
+<td>each value fits its field type and range</td>
+<td>category in {A, B, C}; date closed ≥ date raised; temperature within sensor range</td>
+<td>all logs</td>
+</tr>
+<tr>
+<td>Timeliness</td>
+<td>data arrives when needed</td>
+<td>issue entered within 24 h of being found; trend exported within 1 working day</td>
+<td>logs, trends</td>
+</tr>
+<tr>
+<td>Consistency</td>
+<td>the same fact has the same value in each system</td>
+<td>asset tag in the issue log exists in the asset register; breaker status in EPMS equals BMS</td>
+<td>cross-system</td>
+</tr>
+<tr>
+<td>Uniqueness</td>
+<td>each item is recorded once</td>
+<td>no two open issues with the same tag and description</td>
+<td>issue log, RFI log</td>
+</tr>
+<tr>
+<td>Accuracy</td>
+<td>the value matches the real quantity</td>
+<td>sensor within tolerance of reference; meters reconcile</td>
+<td>sensors, meters</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-12-2"><span class="n">30.12.2</span>Weekly data-quality checks on the process logs</h3>
+<p><strong>Trigger:</strong> Weekly, the day before the KPI report.</p>
+<p><strong>Owner:</strong> CxA data coordinator; results to the CxM.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Missing mandatory fields.</strong> List records with a blank asset tag, category, responsible party or date. Target 0. Return the list to the record owners with a 2 working-day limit.</li>
+<li><strong>Invalid dates.</strong> Date closed before date raised; dates in the future. Target 0.</li>
+<li><strong>Unknown tags.</strong> Tags not in the asset register. Target 0.</li>
+<li><strong>Duplicates.</strong> Same tag, same system and similar description within 7 days. Review and merge.</li>
+<li><strong>Closed without evidence.</strong> Closed issues without a linked retest record or photograph. Re-open.</li>
+<li><strong>Category changes.</strong> List each category change in the week with the person and reason.</li>
+<li><strong>Status mismatch.</strong> Checklists marked verified with open category A or B issues linked. Review with the CxA.</li>
+<li><strong>Report the counts.</strong> The data-quality counts are part of the weekly KPI pack; <mark>a KPI is not published if its source fails a check that affects it</mark>.</li>
+</ol>
+<h3 id="s30-12-3"><span class="n">30.12.3</span>Data-quality checks on system data</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Rule</th>
+<th>Example failure</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sample count</td>
+<td>received / expected ≥ 99.5 % per device per day</td>
+<td>48 meters behind one switch missing 2 h</td>
+<td>back-fill from on-board memory; repair network</td>
+</tr>
+<tr>
+<td>Time stamp</td>
+<td>offset between systems ≤ 1 s (BMS) or ≤ 1 ms (SOE devices with PTP)</td>
+<td>logger 37 s ahead of BMS</td>
+<td>correct and record the offset</td>
+</tr>
+<tr>
+<td>Units</td>
+<td>unit in export equals unit in points list</td>
+<td>flow in m³/h in BMS, L/s in points list</td>
+<td>correct the export or the list</td>
+</tr>
+<tr>
+<td>Scaling</td>
+<td>reading within tolerance of a reference at L3</td>
+<td>4 to 20 mA scaled to the wrong range</td>
+<td>correct scaling; retest</td>
+</tr>
+<tr>
+<td>Stuck value</td>
+<td>standard deviation above limit (30.9.6)</td>
+<td>gateway returning last value</td>
+<td>repair; add health point</td>
+</tr>
+<tr>
+<td>Duplicate time stamps</td>
+<td>none</td>
+<td>daylight saving setting on a server (not used in Jakarta)</td>
+<td>correct the server time settings</td>
+</tr>
+<tr>
+<td>Energy register monotonic</td>
+<td>kWh register never decreases</td>
+<td>meter reset after firmware update</td>
+<td>record the reset; correct interval data</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Completeness check on the EPMS for building B2 over 72 hours (data from chapter 24): 431 devices × 4 records per hour × 72 hours = 124,128 expected records. 123,624 received first time: 99.59 %. A switch reboot removed 48 devices for 2 hours (384 records); 120 other records were missing at random. After back-fill from device memory: 124,008 records, 99.90 %. The acceptance value of 99.5 % is met before and after back-fill, and no single device has a gap above 1 hour after back-fill.</p>
+<h2 id="s30-13"><span class="n">30.13</span>Dashboards for commissioning</h2>
+<h3 id="s30-13-1"><span class="n">30.13.1</span>Purpose</h3>
+<p><strong>Purpose:</strong> A dashboard shows the KPIs on one screen so that each reader can see the state of the work without asking. It uses the same queries as the weekly update, so the numbers match.</p>
+<h3 id="s30-13-2"><span class="n">30.13.2</span>Content by audience</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Audience</th>
+<th>Question they ask</th>
+<th>KPIs shown</th>
+<th>Refresh</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Programme director</td>
+<td>will each hall be ready on its date</td>
+<td>forecast RFS per hall, gap in working days, A and B issues past limit</td>
+<td>daily</td>
+</tr>
+<tr>
+<td>Campus commissioning manager</td>
+<td>where is the constraint</td>
+<td>checklist curves by system, FPY by system, issue ageing, RFI tail, witness load</td>
+<td>daily</td>
+</tr>
+<tr>
+<td>CxA leads</td>
+<td>what is due this week</td>
+<td>witness schedule, retests due, issues to verify</td>
+<td>live</td>
+</tr>
+<tr>
+<td>GC project manager</td>
+<td>what is blocking acceptance</td>
+<td>issues by responsible party, checklists awaiting verification</td>
+<td>daily</td>
+</tr>
+<tr>
+<td>Data-centre operations (DCOps)</td>
+<td>what will be open at handover</td>
+<td>open issues by system, training, O&amp;M documents</td>
+<td>weekly</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-13-3"><span class="n">30.13.3</span>Layout rules</h3>
+<ol>
+<li><strong>One question per panel.</strong> Each panel answers one question and has a title that states it ("Open issues past their limit, building B2").</li>
+<li><strong>Numbers with their target.</strong> "FPY 87.3 % (target 90 %)". A number without a target cannot be judged.</li>
+<li><strong>Trends over snapshots.</strong> A line over 12 weeks shows direction; a single number does not.</li>
+<li><strong>Plan and actual on the same axis.</strong> For progress curves, plot planned and actual cumulative values together, as Figure <a class="figref" href="#F30-1">F30-1</a>.</li>
+<li><strong>Data date in the header.</strong> "Data extracted 20 Feb 08:00 WIB."</li>
+<li><strong>Defined status colours.</strong> Use written status definitions; never a colour without a rule.</li>
+<li><strong>Drill-down to the record.</strong> Each number links to the list of records behind it.</li>
+<li><strong>No more than 8 panels per screen.</strong> More panels reduce reading speed.</li>
+</ol>
+<h3 id="s30-13-4"><span class="n">30.13.4</span>Example dashboard for building B2</h3>
+<p>Figure <a class="figref" href="#F30-9">F30-9</a> shows the eight panels of the example dashboard at week 12 with the values of the table. Each panel value comes from the datasets of sections 30.4 to 30.7 and 30.9 to 30.12.</p>
+<figure class="sheet" id="F30-9"><a href="../data/cx-handbook/figures/F30-9.svg" title="Open drawing F30-9 at full size"><img src="../data/cx-handbook/figures/F30-9.svg" alt="F30-9: Example dashboard for building B2 at week 12: eight panels" width="1000" height="933" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F30-9</span> — <b>Example dashboard for building B2 at week 12: eight panels</b>. One question per panel, each number shown with its target. A red frame marks a value outside its target; a dark frame marks a count reported for information.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Panel</th>
+<th>Content</th>
+<th>Example value (week 12)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 RFS forecast</td>
+<td>each hall: objective date, forecast, gap</td>
+<td>DH1 on track; DH2 late 2 days; DH3 recovered</td>
+</tr>
+<tr>
+<td>2 L3 checklist curve</td>
+<td>planned against verified, with forecast</td>
+<td>1,700 / 2,400; forecast week 16.4</td>
+</tr>
+<tr>
+<td>3 L4 FPY by system</td>
+<td>bars by system with 90 % line</td>
+<td>total 87.3 %; BMS 74.1 %</td>
+</tr>
+<tr>
+<td>4 Open issues</td>
+<td>raised, closed, open per week</td>
+<td>180 open, peak 203 in week 9</td>
+</tr>
+<tr>
+<td>5 Issues past limit</td>
+<td>count by category</td>
+<td>A 1, B 9, C 22</td>
+</tr>
+<tr>
+<td>6 RFI cycle time</td>
+<td>median and 90th percentile</td>
+<td>median 6, P90 12 working days</td>
+</tr>
+<tr>
+<td>7 Sensor and meter checks</td>
+<td>flags open by type</td>
+<td>2 sensors failed, 1 meter offline</td>
+</tr>
+<tr>
+<td>8 Data quality</td>
+<td>failed rules this week</td>
+<td>14 records missing tags</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s30-13-5"><span class="n">30.13.5</span>Steps to build and accept the dashboard</h3>
+<ol>
+<li><strong>Define the KPI dictionary.</strong> One page per KPI: formula, fields, filters, target, owner. Approved by the CxM before building.</li>
+<li><strong>Write the queries once.</strong> <mark>The dashboard and the weekly update use the same saved queries</mark>.</li>
+<li><strong>Test with a known dataset.</strong> Calculate three KPIs by hand for one week and compare with the dashboard. Accept a difference of 0.</li>
+<li><strong>Freeze weekly values.</strong> Store the weekly values so that later corrections to records do not change history without a note.</li>
+<li><strong>Review monthly.</strong> Remove panels nobody uses; add a panel when a recurring question appears.</li>
+</ol>
+<h2 id="s30-14"><span class="n">30.14</span>Common errors in commissioning data</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Effect</th>
+<th>How to detect it before a decision</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Counting contractor-signed checklists as complete</td>
+<td>progress overstated</td>
+<td>compare verified with signed counts</td>
+<td>report verified only</td>
+</tr>
+<tr>
+<td>Mean cycle time</td>
+<td>tail hidden or exaggerated</td>
+<td>compare mean with median</td>
+<td>report median and 90th percentile</td>
+</tr>
+<tr>
+<td>Retests counted as new tests in FPY</td>
+<td>FPY overstated</td>
+<td>count unique test IDs</td>
+<td>denominator = first attempts</td>
+</tr>
+<tr>
+<td>Re-raising an issue under a new number</td>
+<td>ageing reset</td>
+<td>duplicates check</td>
+<td>re-open the original</td>
+</tr>
+<tr>
+<td>Trend at 15-minute average for a sequence test</td>
+<td>events invisible</td>
+<td>check logging interval before the test</td>
+<td>log at 1 s</td>
+</tr>
+<tr>
+<td>Unaligned clocks</td>
+<td>wrong cause-and-effect order</td>
+<td>compare one known event in each system</td>
+<td>synchronise; record offsets</td>
+</tr>
+<tr>
+<td>Deleting outliers</td>
+<td>real events lost</td>
+<td>outlier disposition list</td>
+<td>delete only with a record of the data error</td>
+</tr>
+<tr>
+<td>Reconciling at low load</td>
+<td>false failures</td>
+<td>check load before reconciling</td>
+<td>reconcile above 20 % load</td>
+</tr>
+<tr>
+<td>IST PUE reported as facility PUE</td>
+<td>wrong claim to management</td>
+<td>report label</td>
+<td>label as IST interval PUE with dates and weather</td>
+</tr>
+<tr>
+<td>Changing KPI formulas without notice</td>
+<td>numbers jump between weeks</td>
+<td>KPI dictionary version</td>
+<td>version the dictionary; note changes in the report</td>
+</tr>
+<tr>
+<td>Totals changing silently</td>
+<td>percentages fall without new work</td>
+<td>plot the total line</td>
+<td>record the total each week</td>
+</tr>
+<tr>
+<td>Dashboard and weekly update use different queries</td>
+<td>two numbers for one KPI</td>
+<td>compare one week by hand</td>
+<td>one saved query for both</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s30-15"><span class="n">30.15</span>Checklist for site use</h2>
+<ol>
+<li><strong>Sources listed.</strong> Every data source has a named owner and an update frequency in the commissioning plan.</li>
+<li><strong>Tags valid.</strong> Every checklist, test, issue and RFI record has a tag from the asset register.</li>
+<li><strong>Time synchronised.</strong> BMS, EPMS and loggers are synchronised; offsets measured and recorded before each test.</li>
+<li><strong>KPI dictionary approved.</strong> Each KPI has a formula, unit, target, scope and owner.</li>
+<li><strong>Same queries every week.</strong> Dashboard and weekly update use the same saved queries.</li>
+<li><strong>Checklist completion counts verified only.</strong> Contractor-complete is reported separately.</li>
+<li><strong>FPY uses first attempts.</strong> Exclusions for test-equipment failures are counted and reported.</li>
+<li><strong>Issue ageing against limits.</strong> A 1 working day, B 7 working days, C 30 working days on MSC-1; every A past its limit is escalated.</li>
+<li><strong>RFI cycle time as median and 90th percentile.</strong> Using date accepted.</li>
+<li><strong>Trend settings agreed before each test.</strong> Interval, duration, points and buffer size in the test script.</li>
+<li><strong>Statistical checks run.</strong> Range, rate of change, stuck value and outliers on every test dataset; control charts on controlled variables.</li>
+<li><strong>Reference comparison done.</strong> Sensors used for acceptance compared with a calibrated reference.</li>
+<li><strong>Meters reconciled.</strong> Each switchboard incomer against its feeders above 20 % load; residual within tolerance.</li>
+<li><strong>PUE labelled.</strong> IST interval PUE reported with dates, load steps and weather.</li>
+<li><strong>Data-quality checks weekly.</strong> Missing fields, invalid dates, unknown tags, duplicates and closures without evidence at zero, or listed with owners.</li>
+<li><strong>Records attached.</strong> Plots and data files attached to each test record.</li>
+</ol>
+<h2 id="s30-16"><span class="n">30.16</span>Sources</h2>
+<ol>
+<li>ISO/IEC 30134-2:2026, Information technology, Data centres, Key performance indicators, Part 2: Power usage effectiveness (PUE), edition 2, January 2026 (replaces the 2016 edition), ISO and IEC, accessed 1 November 2026. <a href="https://www.iso.org/standard/30134-2" rel="noopener">https://www.iso.org/standard/30134-2</a></li>
+<li>Wikipedia, "Power usage effectiveness" (definition, ISO/IEC 30134-2 and EN 50600-4-2 references), accessed 31 October 2026. <a href="https://en.wikipedia.org/wiki/Power_usage_effectiveness" rel="noopener">https://en.wikipedia.org/wiki/Power_usage_effectiveness</a></li>
+<li>The Green Grid, "The Green Grid Data Center Power Efficiency Metrics: PUE and DCiE", white paper. <a href="http://www.thegreengrid.org/sitecore/content/Global/Content/white-papers/The-Green-Grid-Data-Center-Power-Efficiency-Metrics-PUE-and-DCiE.aspx" rel="noopener">http://www.thegreengrid.org/sitecore/content/Global/Content/white-papers/The-Green-Grid-Data-Center-Power-Efficiency-Metrics-PUE-and-DCiE.aspx</a></li>
+<li>Upsite Technologies, "PUE Levels of Measurement: What You Need to Know", accessed 31 October 2026. <a href="https://www.upsite.com/blog/pue-levels-of-measurement-what-you-need-to-know/" rel="noopener">https://www.upsite.com/blog/pue-levels-of-measurement-what-you-need-to-know/</a></li>
+<li>OpenExamPrep, "Efficiency Metrics: PUE, WUE, CUE and Energy Star Benchmarking" (BICSI DCDC study guide, PUE categories), accessed 31 October 2026. <a href="https://open-exam-prep.com/study-guides/bicsi-dcdc/ch04-capacity-finance-risk/sec03-efficiency-metrics-pue-wue-cue" rel="noopener">https://open-exam-prep.com/study-guides/bicsi-dcdc/ch04-capacity-finance-risk/sec03-efficiency-metrics-pue-wue-cue</a></li>
+<li>NIST/SEMATECH e-Handbook of Statistical Methods, 7.1.6 "What are outliers in the data", accessed 31 October 2026. <a href="https://www.itl.nist.gov/div898/handbook/prc/section1/prc16.htm" rel="noopener">https://www.itl.nist.gov/div898/handbook/prc/section1/prc16.htm</a></li>
+<li>NIST/SEMATECH e-Handbook of Statistical Methods, 6.3.2 "What are Variables Control Charts" (WECO rules), accessed 31 October 2026. <a href="https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc32.htm" rel="noopener">https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc32.htm</a></li>
+<li>NIST/SEMATECH e-Handbook of Statistical Methods, 6.3.2.3 "CUSUM Control Charts", accessed 31 October 2026. <a href="https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc323.htm" rel="noopener">https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc323.htm</a></li>
+<li>ASHRAE Guideline 14-2014, Measurement of Energy, Demand, and Water Savings (superseded by Guideline 14-2023), ASHRAE; calibration limits summarised in "Suitability of ASHRAE Guideline 14 metrics for calibration", Oak Ridge National Laboratory, accessed 31 October 2026. <a href="https://impact.ornl.gov/en/publications/suitability-of-ashrae-guideline-14-metrics-for-calibration/" rel="noopener">https://impact.ornl.gov/en/publications/suitability-of-ashrae-guideline-14-metrics-for-calibration/</a></li>
+<li>ASHRAE Guideline 0-2019, The Commissioning Process, ASHRAE. <a href="https://www.ashrae.org/technical-resources/bookstore/commissioning" rel="noopener">https://www.ashrae.org/technical-resources/bookstore/commissioning</a></li>
+<li>ANSI/ASHRAE Standard 135, BACnet: A Data Communication Protocol for Building Automation and Control Networks (Trend Log object), ASHRAE. <a href="https://www.ashrae.org/technical-resources/bookstore/bacnet" rel="noopener">https://www.ashrae.org/technical-resources/bookstore/bacnet</a></li>
+<li>IEC 62053-22, Electricity metering equipment, Particular requirements, Static meters for AC active energy (classes 0.1 S, 0.2 S and 0.5 S), IEC. <a href="https://webstore.iec.ch/en/publication/65467" rel="noopener">https://webstore.iec.ch/en/publication/65467</a></li>
+<li>IEC 61557-12, Power metering and monitoring devices (PMD), IEC. <a href="https://webstore.iec.ch/en/publication/62420" rel="noopener">https://webstore.iec.ch/en/publication/62420</a></li>
+<li>IEC 61869-2, Instrument transformers, Additional requirements for current transformers, IEC. <a href="https://webstore.iec.ch/en/publication/6050" rel="noopener">https://webstore.iec.ch/en/publication/6050</a></li>
+<li>ISO/IEC 25012:2008, Software engineering, Software product Quality Requirements and Evaluation (SQuaRE), Data quality model, ISO and IEC. <a href="https://www.iso.org/standard/35736.html" rel="noopener">https://www.iso.org/standard/35736.html</a></li>
+<li>ISO 8000-8:2015, Data quality, Information and data quality: concepts and measuring, ISO. <a href="https://www.iso.org/standard/60805.html" rel="noopener">https://www.iso.org/standard/60805.html</a></li>
+<li>American Society for Quality, "Quality glossary" (first-pass yield and rolled throughput yield), accessed 31 October 2026. <a href="https://asq.org/quality-resources/quality-glossary" rel="noopener">https://asq.org/quality-resources/quality-glossary</a></li>
+<li>Stephen Few, Information Dashboard Design: Displaying Data for At-a-Glance Monitoring, Analytics Press, second edition 2013 (cited by title).</li>
+<li>MSC-1 case ledger, <code>case_ledger.json</code>, handbook R02 (design PUE 1.22, ageing limits, first-pass yield target, IST loads).</li>
+<li>ISO 25000 portal, "ISO/IEC 25012" (data quality model: 15 characteristics, inherent and system-dependent), accessed 1 November 2026. <a href="https://iso25000.com/index.php/en/iso-25000-standards/iso-25012" rel="noopener">https://iso25000.com/index.php/en/iso-25000-standards/iso-25012</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="29-issue-library.html"><span>Previous · 29</span><span class="t">Issue library</span></a><a class="next" href="32-forms-and-templates.html"><span>Next · 32</span><span class="t">Forms and templates with filled examples</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

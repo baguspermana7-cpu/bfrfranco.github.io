@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>09 Quality control | Cx Field Manual R01</title>
+<meta name="description" content="This chapter explains how a data-centre project records work that does not meet its requirements, decides what to do with it, removes the cause, and proves…">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/09-quality-ncr-car-punch-defects.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/09-quality-ncr-car-punch-defects.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/09-quality-ncr-car-punch-defects.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/09-quality-ncr-car-punch-defects.html">
+<meta property="og:title" content="09 Quality control | Cx Field Manual R01">
+<meta property="og:description" content="This chapter explains how a data-centre project records work that does not meet its requirements, decides what to do with it, removes the cause, and proves…">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="09 Quality control | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter explains how a data-centre project records work that does not meet its requirements, decides what to do with it, removes the cause, and proves…">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"09 Quality control: non-conformance reports, corrective actions, punch lists and defect closure","name":"Quality control: non-conformance reports, corrective actions, punch lists and defect closure","description":"This chapter explains how a data-centre project records work that does not meet its requirements, decides what to do with it, removes the cause, and proves…","url":"https://resistancezero.com/cx-handbook/09-quality-ncr-car-punch-defects.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/09-quality-ncr-car-punch-defects.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":9859,"position":9,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"09 Quality control","item":"https://resistancezero.com/cx-handbook/09-quality-ncr-car-punch-defects.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part B · Project administration</p>
+    <h1><span class="num">09</span>Quality control: non-conformance reports, corrective actions, punch lists and defect closure</h1>
+    <p class="lede">This chapter explains how a data-centre project records work that does not meet its requirements, decides what to do with it, removes the cause, and proves that each defect is closed.</p>
+    <p class="basis">Chapter 09 of 32 · 17 sections · 6 figures · 9,859 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 09</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 09</summary>
+<ol><li><a href="#s09-0"><span class="n">09.0</span>Scope of this chapter</a></li><li><a href="#s09-1"><span class="n">09.1</span>Terms and what each one means on site</a><ol><li><a href="#s09-1-1"><span class="n">09.1.1</span>Definitions</a></li><li><a href="#s09-1-2"><span class="n">09.1.2</span>Correction and corrective action under ISO 9001:2015</a></li></ol></li><li><a href="#s09-2"><span class="n">09.2</span>Which record to raise</a><ol><li><a href="#s09-2-1"><span class="n">09.2.1</span>Decision table</a></li><li><a href="#s09-2-2"><span class="n">09.2.2</span>Rules that apply to every record</a></li></ol></li><li><a href="#s09-3"><span class="n">09.3</span>NCR form fields</a></li><li><a href="#s09-4"><span class="n">09.4</span>NCR categories</a><ol><li><a href="#s09-4-1"><span class="n">09.4.1</span>Severity</a></li><li><a href="#s09-4-2"><span class="n">09.4.2</span>Origin categories</a></li></ol></li><li><a href="#s09-5"><span class="n">09.5</span>NCR workflow with roles and time limits</a><ol><li><a href="#s09-5-1"><span class="n">09.5.1</span>Procedure</a></li><li><a href="#s09-5-2"><span class="n">09.5.2</span>NCR register fields</a></li><li><a href="#s09-5-3"><span class="n">09.5.3</span>Common errors in the NCR process</a></li></ol></li><li><a href="#s09-6"><span class="n">09.6</span>Disposition: use as is, repair, rework, reject</a><ol><li><a href="#s09-6-1"><span class="n">09.6.1</span>Definitions</a></li><li><a href="#s09-6-2"><span class="n">09.6.2</span>Decision tree</a></li><li><a href="#s09-6-3"><span class="n">09.6.3</span>Contract basis for dispositions</a></li><li><a href="#s09-6-4"><span class="n">09.6.4</span>Concession request fields</a></li></ol></li><li><a href="#s09-7"><span class="n">09.7</span>Corrective action: CAR, 5-why, 8D and A3</a><ol><li><a href="#s09-7-1"><span class="n">09.7.1</span>When a CAR is raised</a></li><li><a href="#s09-7-2"><span class="n">09.7.2</span>CAR fields</a></li><li><a href="#s09-7-3"><span class="n">09.7.3</span>The 5-why method</a></li><li><a href="#s09-7-4"><span class="n">09.7.4</span>Cause-and-effect diagram</a></li><li><a href="#s09-7-5"><span class="n">09.7.5</span>The 8D method</a></li><li><a href="#s09-7-6"><span class="n">09.7.6</span>The A3 report</a></li><li><a href="#s09-7-7"><span class="n">09.7.7</span>Verifying effectiveness</a></li></ol></li><li><a href="#s09-8"><span class="n">09.8</span>Punch lists</a><ol><li><a href="#s09-8-1"><span class="n">09.8.1</span>What a punch list is</a></li><li><a href="#s09-8-2"><span class="n">09.8.2</span>Punch categories</a></li><li><a href="#s09-8-3"><span class="n">09.8.3</span>Rules for assigning a category</a></li><li><a href="#s09-8-4"><span class="n">09.8.4</span>Punch list fields</a></li><li><a href="#s09-8-5"><span class="n">09.8.5</span>Punch walk procedure</a></li></ol></li><li><a href="#s09-9"><span class="n">09.9</span>The commissioning issues log and deferred tests</a><ol><li><a href="#s09-9-1"><span class="n">09.9.1</span>Issues log</a></li><li><a href="#s09-9-2"><span class="n">09.9.2</span>How the issues log, NCR and punch list connect</a></li><li><a href="#s09-9-3"><span class="n">09.9.3</span>Deferred and seasonal tests</a></li></ol></li><li><a href="#s09-10"><span class="n">09.10</span>Retest rules and the defect closure package</a><ol><li><a href="#s09-10-1"><span class="n">09.10.1</span>Retest rules</a></li><li><a href="#s09-10-2"><span class="n">09.10.2</span>Defect closure package anatomy</a></li></ol></li><li><a href="#s09-11"><span class="n">09.11</span>Defect ageing KPIs</a><ol><li><a href="#s09-11-1"><span class="n">09.11.1</span>Measures</a></li><li><a href="#s09-11-2"><span class="n">09.11.2</span>Ageing calculation</a></li><li><a href="#s09-11-3"><span class="n">09.11.3</span>Rules for the ageing report</a></li></ol></li><li><a href="#s09-12"><span class="n">09.12</span>Defects during the defects liability period</a><ol><li><a href="#s09-12-1"><span class="n">09.12.1</span>What the DLP is</a></li><li><a href="#s09-12-2"><span class="n">09.12.2</span>Indonesian handover practice</a></li><li><a href="#s09-12-3"><span class="n">09.12.3</span>Procedure for a defect during the DLP</a></li></ol></li><li><a href="#s09-13"><span class="n">09.13</span>Worked examples of NCRs</a><ol><li><a href="#s09-13-1"><span class="n">09.13.1</span>NCR on busway joint torque</a></li><li><a href="#s09-13-2"><span class="n">09.13.2</span>NCR on a CDU filter mesh</a></li><li><a href="#s09-13-3"><span class="n">09.13.3</span>NCR on a Modbus register map version</a></li><li><a href="#s09-13-4"><span class="n">09.13.4</span>NCR on fibre polarity</a></li></ol></li><li><a href="#s09-14"><span class="n">09.14</span>Common errors and how to detect them early</a></li><li><a href="#s09-15"><span class="n">09.15</span>Checklist for site use</a></li><li><a href="#s09-16"><span class="n">09.16</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="08-change-control.html"><span>Previous</span>08 Change control</a><a href="10-permits-isolation-switching-energisation.html"><span>Next</span>10 Permits to work, isolation, switching programmes and energisation administration</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s09-0"><span class="n">09.0</span>Scope of this chapter</h2>
+<p>This chapter explains how a data-centre project records work that does not meet its requirements, decides what to do with it, removes the cause, and proves that each defect is closed. It starts with the basics: what a nonconformity is, why it needs a formal record, and how a non-conformance report (NCR), a corrective action request (CAR), a punch list and a commissioning issues log differ. It also gives the disposition rules, the root-cause methods, the punch categories, the retest rules, the closure evidence, the ageing key performance indicators (KPIs) and the handling of defects during the defects liability period (DLP). Chapter 07 covers the inspections that find most nonconformities. Chapter 08 covers the decision whether a finding is a defect or a change.</p>
+<ol>
+<li><strong>Terms.</strong> Nonconformity, defect, deficiency, observation, punch item, commissioning issue, NCR, CAR, corrective and preventive action (CAPA), concession and deviation, with the ISO 9001:2015 meaning of correction and corrective action.</li>
+<li><strong>Which record to raise.</strong> A decision table for NCR, punch item, issues log entry and observation.</li>
+<li><strong>NCR form, categories and workflow.</strong> Fields, severity and origin categories, roles and time limits, with a workflow figure.</li>
+<li><strong>Disposition.</strong> Use as is, repair, rework, reject (and regrade), who may decide each one, and a decision tree.</li>
+<li><strong>Corrective action.</strong> CAR fields, 5-why analysis, cause-and-effect diagram, the 8D method and the A3 report, and how effectiveness is verified.</li>
+<li><strong>Punch lists.</strong> Categories A, B and C with definitions and ageing limits, the punch walk procedure and the punch list fields.</li>
+<li><strong>Retest rules and closure evidence.</strong> What triggers a retest, how much is retested, and the contents of a defect closure package.</li>
+<li><strong>Ageing KPIs and the DLP.</strong> Defect ageing measures, a plot of open items, and defect handling under FIDIC 2017 clause 11, NEC4 ECC clauses 43 to 46, AIA A201-2017 section 12.2 and Indonesian provisional and final handover practice.</li>
+<li><strong>Worked examples.</strong> NCRs on busway joint torque, on a coolant distribution unit (CDU) filter mesh, on a Modbus register map version and on fibre polarity.</li>
+</ol>
+<p>Documents and standards used: ISO 9001:2015 clauses 8.7 (control of nonconforming outputs) and 10.2 (nonconformity and corrective action); FIDIC Conditions of Contract for Construction, second edition 2017, sub-clauses 7.5, 7.6 and clause 11. The chapter also uses NEC4 Engineering and Construction Contract (ECC) clauses 43 to 46, AIA A201-2017 sections 9.8 and 12.2 and UFGS 01 45 00 Quality Control section 1.8.6. It also uses ASHRAE Guideline 0-2019 and ASHRAE Standard 202-2024 (issues log, deferred testing), ANSI/NETA ATS-2025, ANSI/TIA-568.3-E (which replaced -D in September 2022), the Ford 8D method, Perpres 16/2018 Pasal 57 and the MSC-1 case ledger.</p>
+<h2 id="s09-1"><span class="n">09.1</span>Terms and what each one means on site</h2>
+<h3 id="s09-1-1"><span class="n">09.1.1</span>Definitions</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition used in this manual</th>
+<th>Example on MSC-1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Requirement</td>
+<td>what the contract documents, the approved submittals, the original equipment manufacturer (OEM) manual or the law require</td>
+<td>busway joint bolts tightened to the OEM torque</td>
+</tr>
+<tr>
+<td>Nonconformity</td>
+<td>non-fulfilment of a requirement (ISO 9000:2015 definition)</td>
+<td>9 joints found below the OEM torque</td>
+</tr>
+<tr>
+<td>Defect</td>
+<td>a nonconformity in the work; contracts use "defect" for work not in accordance with the contract</td>
+<td>CDU filter element with 100 µm mesh where 25 µm is specified</td>
+</tr>
+<tr>
+<td>Deficiency</td>
+<td>term used in commissioning and in UFGS 01 45 00 for work that does not comply; same meaning as defect</td>
+<td>missing earth bonding jumper on cable tray</td>
+</tr>
+<tr>
+<td>Observation</td>
+<td>a condition that does not breach a requirement but may lead to one; no NCR</td>
+<td>cable drums stored on soft ground before forecast rain</td>
+</tr>
+<tr>
+<td>Punch item (snag)</td>
+<td>a small defect or incomplete item listed during a punch walk, closed on the punch list</td>
+<td>missing label on a valve</td>
+</tr>
+<tr>
+<td>Commissioning issue</td>
+<td>an entry in the commissioning issues log: any problem found in the commissioning process, including design issues and test failures</td>
+<td>CDU leak alarm not received at the building management system (BMS)</td>
+</tr>
+<tr>
+<td>Correction</td>
+<td>action to eliminate a detected nonconformity (ISO 9000:2015)</td>
+<td>re-torque the 9 joints</td>
+</tr>
+<tr>
+<td>Corrective action</td>
+<td>action to eliminate the cause of a nonconformity and prevent recurrence (ISO 9000:2015)</td>
+<td>add torque marking and a second-person check to the busway method</td>
+</tr>
+<tr>
+<td>Preventive action</td>
+<td>action to eliminate the cause of a potential nonconformity</td>
+<td>apply the torque marking rule to switchboard bus links before their installation starts</td>
+</tr>
+<tr>
+<td>Concession</td>
+<td>permission to use or release work that does not conform to the specified requirements</td>
+<td>accept a valve label in a different font for the remaining 4 weeks before final labels arrive</td>
+</tr>
+<tr>
+<td>Deviation permit</td>
+<td>permission, before the work is done, to depart from the specified requirements for a limited quantity or time</td>
+<td>permission to use an equivalent gland type for 20 cable entries</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s09-1-2"><span class="n">09.1.2</span>Correction and corrective action under ISO 9001:2015</h3>
+<p>ISO 9001:2015 separates two duties.</p>
+<ol>
+<li><strong>Clause 8.7, control of nonconforming outputs.</strong> The organisation identifies and controls outputs that do not conform, to prevent their unintended use or delivery. The clause applies to nonconforming outputs detected before delivery and to nonconforming products and services detected after delivery. The organisation deals with them in one or more of four ways: correction; segregation, containment, return or suspension of provision; informing the customer; and obtaining authorisation for acceptance under concession. Conformity is verified again after correction.</li>
+<li><strong>Clause 8.7.2, records.</strong> The organisation retains documented information that describes the nonconformity, describes the actions taken, describes any concessions obtained, and identifies the authority deciding the action. <mark>On a construction project the NCR form is this documented information.</mark></li>
+<li><strong>Clause 10.2, nonconformity and corrective action.</strong> When a nonconformity occurs, the organisation first reacts to it: it controls and corrects the nonconformity and deals with the consequences. It then evaluates whether action is needed to remove the causes, so that the nonconformity does not recur or occur elsewhere. The evaluation reviews the nonconformity, determines its causes and checks whether similar nonconformities exist. The organisation implements the action needed, reviews its effectiveness, and updates the risks and the quality system if necessary. The CAR is the record of this work.</li>
+</ol>
+<p><mark>A correction removes the defect; a corrective action removes its cause.</mark> Re-torquing 9 busway joints is a correction. Changing the installation method so that no joint can be left untorqued is a corrective action. An NCR is closed by a correction and a verified disposition. <mark>A CAR is closed only when the corrective action has been shown to be effective.</mark></p>
+<h2 id="s09-2"><span class="n">09.2</span>Which record to raise</h2>
+<h3 id="s09-2-1"><span class="n">09.2.1</span>Decision table</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Condition found</th>
+<th>Record</th>
+<th>Who raises it</th>
+<th>Typical closure time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Work does not meet a requirement, and the correction needs a technical decision, a design input, a concession, or affects other work</td>
+<td>NCR</td>
+<td>anyone who finds it; the quality assurance and quality control (QA/QC) manager registers it</td>
+<td>5 to 15 working days</td>
+</tr>
+<tr>
+<td>Work does not meet a requirement, correction is simple and obvious, no design input needed, found during a punch walk</td>
+<td>punch item</td>
+<td>inspector or commissioning manager (CxM) on the punch walk</td>
+<td>category A 1 working day, B 7 working days, C 30 working days (case ledger)</td>
+</tr>
+<tr>
+<td>Work does not meet a requirement and is corrected the same day it is found</td>
+<td>comment on the inspection request (IR) only; no NCR</td>
+<td>inspector</td>
+<td>same day</td>
+</tr>
+<tr>
+<td>A commissioning test fails, a sequence does not work, a design issue is found, or a requirement is unclear</td>
+<td>commissioning issues log entry; plus NCR if it is a nonconformity in the work</td>
+<td>CxM</td>
+<td>per issue priority</td>
+</tr>
+<tr>
+<td>The same nonconformity occurs three or more times, a hold point is bypassed, or an NCR is major</td>
+<td>CAR, linked to the NCRs</td>
+<td>QA/QC manager or Engineer</td>
+<td>20 to 40 working days to verify effectiveness</td>
+</tr>
+<tr>
+<td>A condition that may lead to a nonconformity</td>
+<td>observation in the surveillance report</td>
+<td>inspector</td>
+<td>next inspection</td>
+</tr>
+</tbody>
+</table></div>
+<p>UFGS 01 45 00 uses a similar rule for its deficiency list: "There is no requirement to report a deficiency/rework item that is corrected the same day it is discovered."</p>
+<h3 id="s09-2-2"><span class="n">09.2.2</span>Rules that apply to every record</h3>
+<ol>
+<li><strong>One item, one record.</strong> Each defect has one record. A punch item that grows into an NCR is closed on the punch list with the note "transferred to NCR-xxxx".</li>
+<li><strong>Location and tag.</strong> Every record states the building, the room, the grid and the asset tag.</li>
+<li><strong>Requirement cited.</strong> Every record states the requirement that is not met: document, clause or page.</li>
+<li><strong>Photograph.</strong> Every record has at least one photograph of the defect with the asset tag visible where possible.</li>
+<li><strong>No closure without evidence.</strong> <mark>No record is closed on a statement alone.</mark> Section 09.10 lists the evidence.</li>
+</ol>
+<h2 id="s09-3"><span class="n">09.3</span>NCR form fields</h2>
+<p>The NCR form has four parts: identification and description (raised by the finder), disposition (proposed by the contractor, approved by the Engineer), action and verification (contractor and inspector) and closure (QA/QC manager and Engineer). Figure <a class="figref" href="#F09-6">F09-6</a> shows the four parts filled for NCR-B2-ELE-0044, with the date of each entry checked against the time limits of section 09.5.1.</p>
+<figure class="sheet" id="F09-6"><a href="../data/cx-handbook/figures/F09-6.svg" title="Open drawing F09-6 at full size"><img src="../data/cx-handbook/figures/F09-6.svg" alt="F09-6: The four parts of the NCR form, filled for NCR-B2-ELE-0044" width="1000" height="766" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F09-6</span> — <b>The four parts of the NCR form, filled for NCR-B2-ELE-0044</b>. Each part of the form has one author and one signature; the dates in the filled NCR are checked against the time limits of the procedure in 09.5.1.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NCR number</td>
+<td>text, unique</td>
+<td>NCR-B2-ELE-0044</td>
+</tr>
+<tr>
+<td>Date raised</td>
+<td>date</td>
+<td>8 September 2026</td>
+</tr>
+<tr>
+<td>Raised by (name, role, company)</td>
+<td>text</td>
+<td>Engineer's representative, electrical</td>
+</tr>
+<tr>
+<td>Project, building, room, grid</td>
+<td>text</td>
+<td>MSC-1, B2, data hall 2, grid E4 to E9</td>
+</tr>
+<tr>
+<td>System and asset tags</td>
+<td>list</td>
+<td>B2-DH2-BW-03 joints J01 to J48</td>
+</tr>
+<tr>
+<td>Discipline and package</td>
+<td>code</td>
+<td>ELE, electrical subcontractor ES-02</td>
+</tr>
+<tr>
+<td>Source of detection</td>
+<td>code</td>
+<td>inspection and test plan (ITP) line, IR, punch walk, test, audit, supplier, client</td>
+</tr>
+<tr>
+<td>Reference IR or test record</td>
+<td>text</td>
+<td>IR-B2-ELE-0711</td>
+</tr>
+<tr>
+<td>Requirement not met</td>
+<td>text</td>
+<td>busway OEM installation manual section 5, joint torque value on the joint label; specification 26 25 00 clause 3.2</td>
+</tr>
+<tr>
+<td>Description of nonconformity</td>
+<td>text</td>
+<td>9 of 48 joints measured below the label torque; torque marks absent on 14 joints</td>
+</tr>
+<tr>
+<td>Severity</td>
+<td>code</td>
+<td>major or minor (09.4.1)</td>
+</tr>
+<tr>
+<td>Origin category</td>
+<td>code</td>
+<td>workmanship (09.4.2)</td>
+</tr>
+<tr>
+<td>Containment action taken</td>
+<td>text</td>
+<td>busway run B2-DH2-BW-03 locked out; energisation permit withdrawn</td>
+</tr>
+<tr>
+<td>Proposed disposition</td>
+<td>code</td>
+<td>rework</td>
+</tr>
+<tr>
+<td>Proposed correction method</td>
+<td>text</td>
+<td>re-torque all 48 joints with calibrated wrench, mark each joint, second-person check, insulation resistance test</td>
+</tr>
+<tr>
+<td>Proposed by, date</td>
+<td>text</td>
+<td>ES-02 QC engineer, 9 September 2026</td>
+</tr>
+<tr>
+<td>Disposition approved by, date</td>
+<td>text</td>
+<td>Engineer's representative, 10 September 2026</td>
+</tr>
+<tr>
+<td>Designer input required</td>
+<td>yes or no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Owner or client notification required</td>
+<td>yes or no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Correction completed, date</td>
+<td>date</td>
+<td>11 September 2026</td>
+</tr>
+<tr>
+<td>Verification method and record</td>
+<td>text</td>
+<td>re-inspection IR-B2-ELE-0711-R1; torque record TQ-B2-DH2-BW-03</td>
+</tr>
+<tr>
+<td>Retest required</td>
+<td>list</td>
+<td>insulation resistance of the run; thermographic scan at L3 load</td>
+</tr>
+<tr>
+<td>CAR required, CAR number</td>
+<td>yes or no, text</td>
+<td>yes, CAR-B2-ELE-0014</td>
+</tr>
+<tr>
+<td>Cost borne by</td>
+<td>code</td>
+<td>contractor</td>
+</tr>
+<tr>
+<td>Closed by, date</td>
+<td>text</td>
+<td>GC-A QA/QC manager and Engineer, 16 September 2026</td>
+</tr>
+<tr>
+<td>Attachments</td>
+<td>list</td>
+<td>photographs 1 to 9, torque record, IR test sheet</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s09-4"><span class="n">09.4</span>NCR categories</h2>
+<h3 id="s09-4-1"><span class="n">09.4.1</span>Severity</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Definition</th>
+<th>Examples</th>
+<th>Rules</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Major</td>
+<td>affects safety, the function or the reliability of a system, the warranty, a statutory requirement, or needs a design decision or a concession to accept</td>
+<td>busway joints under-torqued; wrong current transformer (CT) ratio; fibre polarity reversed; leak alarm register mapped wrongly</td>
+<td>Engineer approves the disposition; containment within 1 working day; CAR required</td>
+</tr>
+<tr>
+<td>Minor</td>
+<td>does not affect safety, function, reliability or warranty; correction restores conformity with no design input</td>
+<td>wrong cable tie type; label font; missing gland shroud</td>
+<td>QA/QC manager approves the disposition; CAR when repeated three or more times</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s09-4-2"><span class="n">09.4.2</span>Origin categories</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Origin</th>
+<th>Typical data-centre examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WK</td>
+<td>workmanship</td>
+<td>torque, termination, bending radius, earthing, pipe support spacing</td>
+</tr>
+<tr>
+<td>MT</td>
+<td>material or equipment</td>
+<td>wrong filter mesh delivered, wrong cable type, damaged unit on delivery</td>
+</tr>
+<tr>
+<td>SP</td>
+<td>supplier or factory</td>
+<td>factory test not done, wrong firmware loaded at factory</td>
+</tr>
+<tr>
+<td>DS</td>
+<td>design</td>
+<td>drawing error found during installation; design conflict</td>
+</tr>
+<tr>
+<td>DC</td>
+<td>documentation</td>
+<td>missing certificate, wrong revision used, unsigned checklist</td>
+</tr>
+<tr>
+<td>PR</td>
+<td>process</td>
+<td>hold point bypassed, instrument out of calibration used, test done without permit</td>
+</tr>
+<tr>
+<td>CF</td>
+<td>configuration and software</td>
+<td>wrong register map, wrong set point, wrong network address</td>
+</tr>
+<tr>
+<td>TS</td>
+<td>test failure</td>
+<td>an L2 or L3 test result outside the acceptance value</td>
+</tr>
+</tbody>
+</table></div>
+<p>The origin category is the basis of the trend analysis in 09.11. A design-origin NCR is also checked against the decision tree in chapter 08, because the correction may be a change.</p>
+<h2 id="s09-5"><span class="n">09.5</span>NCR workflow with roles and time limits</h2>
+
+<figure class="sheet" id="F09-1"><a href="../data/cx-handbook/figures/F09-1.svg" title="Open drawing F09-1 at full size"><img src="../data/cx-handbook/figures/F09-1.svg" alt="F09-1: NCR workflow with roles and MSC-1 time limits in working days" width="1400" height="813" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F09-1</span> — <b>NCR workflow with roles and MSC-1 time limits in working days</b>. The finder records the nonconformity, the subcontractor proposes the disposition, and the QA/QC manager or the Engineer approves it; closure needs the 10-item evidence package.</figcaption></figure>
+<h3 id="s09-5-1"><span class="n">09.5.1</span>Procedure</h3>
+<p>Figure <a class="figref" href="#F09-1">F09-1</a> shows the workflow. The time limits are those in the MSC-1 quality plan.</p>
+<p><strong>Purpose:</strong> Record a nonconformity, contain it, decide its disposition, correct it, verify the correction and close the record.</p>
+<p><strong>Trigger:</strong> An inspection, test, punch walk, audit or report finds work that does not meet a requirement and cannot be corrected the same day.</p>
+<p><strong>Owner:</strong> General contractor (GC) QA/QC manager for the register; the Engineer for major dispositions.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Raise the NCR.</strong> The finder fills the identification and description part and sends it to the QA/QC manager the <mark>same working day</mark>.</li>
+<li><strong>Register and notify.</strong> The QA/QC manager registers the NCR, gives it a number and notifies the subcontractor, the Engineer and, for any system in the commissioning plan, the CxM, within 1 working day.</li>
+<li><strong>Contain.</strong> The subcontractor contains the nonconformity within 1 working day. Containment means one or more of: tag the item "nonconforming, do not use", segregate it, lock it out, withdraw the permit to energise or fill, or stop the work front. The containment is recorded on the NCR.</li>
+<li><strong>Propose disposition.</strong> The subcontractor proposes the disposition, the correction method, the retest and the cause within 3 working days.</li>
+<li><strong>Review and approve.</strong> The QA/QC manager (minor) or the Engineer (major) reviews the proposal within 3 working days and approves it, rejects it or returns it for more information. <mark>A disposition of "use as is" or "repair" on a major NCR needs the designer's written agreement</mark>.</li>
+<li><strong>Correct.</strong> The subcontractor corrects the item as approved within the time stated on the NCR (MSC-1 default: <mark>10 working days</mark> for major, 5 working days for minor).</li>
+<li><strong>Verify.</strong> The subcontractor raises a re-inspection IR. The inspector verifies the correction and witnesses any retest.</li>
+<li><strong>Raise CAR if required.</strong> For a major NCR, a repeated minor NCR (three or more of the same type in 4 weeks) or a process NCR, the QA/QC manager raises a CAR (09.7).</li>
+<li><strong>Close.</strong> The QA/QC manager and the Engineer close the NCR when the closure evidence in 09.10 is filed. The CxM confirms closure for any system in the commissioning plan.</li>
+</ol>
+<p><strong>Acceptance:</strong> The NCR shows containment, approved disposition, correction, verification by IR, retest results where required, CAR reference where required, and closure signatures.</p>
+<p><strong>Records:</strong> NCR register, NCR form, photographs, re-inspection IR, test records, CAR.</p>
+<h3 id="s09-5-2"><span class="n">09.5.2</span>NCR register fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NCR number</td>
+<td>text</td>
+<td>NCR-B2-MEC-0027</td>
+</tr>
+<tr>
+<td>Date raised</td>
+<td>date</td>
+<td>19 August 2026</td>
+</tr>
+<tr>
+<td>Severity and origin</td>
+<td>code</td>
+<td>major, MT</td>
+</tr>
+<tr>
+<td>System and tag</td>
+<td>text</td>
+<td>B2-DH3-CDU-07</td>
+</tr>
+<tr>
+<td>Short description</td>
+<td>text</td>
+<td>filter element 100 µm installed; 25 µm specified</td>
+</tr>
+<tr>
+<td>Disposition</td>
+<td>code</td>
+<td>rework</td>
+</tr>
+<tr>
+<td>Due date</td>
+<td>date</td>
+<td>2 September 2026</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>code</td>
+<td>open, contained, disposition approved, corrected, verified, closed</td>
+</tr>
+<tr>
+<td>Days open</td>
+<td>number</td>
+<td>9</td>
+</tr>
+<tr>
+<td>CAR</td>
+<td>text</td>
+<td>CAR-B2-MEC-0009</td>
+</tr>
+<tr>
+<td>Cost borne by</td>
+<td>code</td>
+<td>supplier through contractor</td>
+</tr>
+<tr>
+<td>Closed date</td>
+<td>date</td>
+<td>open</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s09-5-3"><span class="n">09.5.3</span>Common errors in the NCR process</h3>
+<ol>
+<li><strong>No containment.</strong> The NCR is raised but the item stays in service and the next trade covers it. Record containment within 1 working day and check it on the daily walk.</li>
+<li><strong>Disposition proposed by the finder.</strong> The inspector writes "re-torque" on the NCR and the subcontractor treats it as approved. <mark>The subcontractor proposes, the authority approves</mark>; the inspector records only the finding.</li>
+<li><strong>Closure on a signature only.</strong> The NCR is closed with "done" and a signature. Closure needs the evidence in 09.10.</li>
+<li><strong>NCR for a design change.</strong> A design-origin NCR is corrected by the contractor and later claimed. Apply the chapter 08 decision tree before approving the disposition.</li>
+</ol>
+<h2 id="s09-6"><span class="n">09.6</span>Disposition: use as is, repair, rework, reject</h2>
+
+<figure class="sheet" id="F09-2"><a href="../data/cx-handbook/figures/F09-2.svg" title="Open drawing F09-2 at full size"><img src="../data/cx-handbook/figures/F09-2.svg" alt="F09-2: Disposition decision tree: rework, use as is, repair or reject" width="1400" height="851" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F09-2</span> — <b>Disposition decision tree: rework, use as is, repair or reject</b>. Use as is and repair leave the work different from the contract documents, so both need a concession and an as-built note.</figcaption></figure>
+<h3 id="s09-6-1"><span class="n">09.6.1</span>Definitions</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Disposition</th>
+<th>Meaning</th>
+<th>Result</th>
+<th>Who may approve on MSC-1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use as is</td>
+<td>accept the item without correction because it still meets the intended function</td>
+<td>the item stays nonconforming to the document; a concession is recorded and the as-built record shows the departure</td>
+<td>Engineer with designer's written agreement; owner informed for major NCRs</td>
+</tr>
+<tr>
+<td>Repair</td>
+<td>correct the item by a method that makes it fit for use but not fully to the original requirement</td>
+<td>the item is fit for use; a concession records the remaining departure</td>
+<td>Engineer with designer's written agreement</td>
+</tr>
+<tr>
+<td>Rework</td>
+<td>correct the item so that it fully meets the original requirement</td>
+<td>the item conforms; no concession needed</td>
+<td>QA/QC manager (minor) or Engineer (major)</td>
+</tr>
+<tr>
+<td>Reject</td>
+<td>remove and replace the item, or return it to the supplier</td>
+<td>a new conforming item is installed and inspected</td>
+<td>QA/QC manager (minor) or Engineer (major)</td>
+</tr>
+<tr>
+<td>Regrade</td>
+<td>use the item for another, less demanding purpose where it conforms</td>
+<td>the item is moved and recorded at its new location</td>
+<td>Engineer</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>Use as is and repair always need a concession and the designer's written agreement</mark>, because the work will remain different from the contract documents.</p>
+<h3 id="s09-6-2"><span class="n">09.6.2</span>Decision tree</h3>
+<p>Figure <a class="figref" href="#F09-2">F09-2</a> shows the decision tree.</p>
+<ol>
+<li><strong>Safety first.</strong> If the nonconformity affects safety of people or equipment and cannot be fully corrected in place, the disposition is reject.</li>
+<li><strong>Rework when conformity is possible.</strong> If the item can be brought fully to the requirement by an approved method in place (re-torque, re-terminate, re-label, reconfigure), the disposition is rework.</li>
+<li><strong>Check the function as it is.</strong> If it cannot be made to conform, ask the designer whether it still meets the function, the reliability and the warranty conditions as it is. If yes, the disposition may be use as is with a concession.</li>
+<li><strong>Check a repair method.</strong> If it does not meet the function as it is, ask whether a repair method approved by the designer and the OEM makes it fit for use. If yes, the disposition is repair with a concession.</li>
+<li><strong>Otherwise reject.</strong> If none of the above applies, the disposition is reject.</li>
+<li><strong>Owner acceptance.</strong> For use as is or repair on a major NCR, the owner's construction manager (CM) is informed in writing. Under NEC4 clause 45 a defect is accepted only through a proposal to change the Scope that the Project Manager accepts; the Prices may then be reduced. Under FIDIC and AIA the acceptance is recorded as described in 09.6.3.</li>
+</ol>
+<h3 id="s09-6-3"><span class="n">09.6.3</span>Contract basis for dispositions</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Rejection and remedial work</th>
+<th>Acceptance of a defect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FIDIC 2017</td>
+<td>7.5: the Engineer rejects defective plant, materials, design or workmanship. 7.6: the Engineer instructs replacement or remedial work; if the Contractor fails, others do it at the Contractor's cost</td>
+<td>no sub-clause lets the Engineer accept defective work as it is; if the Contractor fails to remedy a defect, sub-clause 11.4 lets the Employer obtain a reasonable reduction in the Contract Price by agreement or determination (confirm the 2017 wording against FIDIC 2017 sub-clause 11.4(b))</td>
+</tr>
+<tr>
+<td>NEC4 ECC</td>
+<td>clause 44: the Contractor corrects a notified defect before the end of the defect correction period; clause 46: if not corrected, the Contractor pays the cost of having it corrected by others</td>
+<td>clause 45: the Contractor or the Project Manager may propose to change the Scope so that the defect does not have to be corrected; if accepted, the Prices, the Completion Date and Key Dates may be reduced</td>
+</tr>
+<tr>
+<td>AIA A201-2017</td>
+<td>section 12.2.1: before Substantial Completion the Contractor promptly corrects rejected work at its expense, including additional testing and inspection; section 12.2.3: nonconforming work is removed from the site</td>
+<td>section 12.3: the Owner may accept nonconforming work without requiring correction, with an appropriate and equitable reduction in the Contract Sum</td>
+</tr>
+<tr>
+<td>ISO 9001:2015</td>
+<td>8.7.1: correction, segregation, containment, return or suspension</td>
+<td>8.7.1 d): acceptance under concession; 8.7.2 c): concession recorded</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s09-6-4"><span class="n">09.6.4</span>Concession request fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Concession number</td>
+<td>text</td>
+<td>CON-B2-0008</td>
+</tr>
+<tr>
+<td>Linked NCR</td>
+<td>text</td>
+<td>NCR-B2-MEC-0031</td>
+</tr>
+<tr>
+<td>Requirement departed from</td>
+<td>text</td>
+<td>specification 23 21 13 clause 2.6, pipe support spacing 2.4 m maximum</td>
+</tr>
+<tr>
+<td>Actual condition</td>
+<td>text</td>
+<td>2.7 m spacing at 3 supports above the hall 3 technology cooling system (TCS) header, because of a cable tray crossing</td>
+</tr>
+<tr>
+<td>Technical justification</td>
+<td>text</td>
+<td>designer's stress check for DN 200 steel full of water shows deflection 1.8 mm, within the designer's limit</td>
+</tr>
+<tr>
+<td>Limit of quantity or time</td>
+<td>text</td>
+<td>3 supports, grid F2 to F4, permanent</td>
+</tr>
+<tr>
+<td>Designer agreement</td>
+<td>name, date</td>
+<td>engineer of record (EOR), mechanical, 2 October 2026</td>
+</tr>
+<tr>
+<td>Owner informed</td>
+<td>name, date</td>
+<td>CM, 3 October 2026</td>
+</tr>
+<tr>
+<td>As-built note</td>
+<td>text</td>
+<td>note added on B2-M-TCS-310 rev E</td>
+</tr>
+<tr>
+<td>Price adjustment</td>
+<td>money</td>
+<td>none</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s09-7"><span class="n">09.7</span>Corrective action: CAR, 5-why, 8D and A3</h2>
+<h3 id="s09-7-1"><span class="n">09.7.1</span>When a CAR is raised</h3>
+<ol>
+<li><strong>Major NCR.</strong> Every major NCR has a CAR, unless the QA/QC manager records why the cause is already controlled by an open CAR.</li>
+<li><strong>Repeat.</strong> <mark>Three or more NCRs or punch items with the same origin and description within 4 weeks.</mark></li>
+<li><strong>Process failure.</strong> Any NCR with origin PR (hold point bypassed, expired calibration used, test without permit).</li>
+<li><strong>Audit finding.</strong> A nonconformity found in a quality audit of the contractor's system.</li>
+<li><strong>Supplier.</strong> A nonconformity that originates at a supplier or factory; the CAR goes to the supplier through the contractor.</li>
+</ol>
+<h3 id="s09-7-2"><span class="n">09.7.2</span>CAR fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CAR number</td>
+<td>text</td>
+<td>CAR-B2-ELE-0014</td>
+</tr>
+<tr>
+<td>Linked NCRs</td>
+<td>list</td>
+<td>NCR-B2-ELE-0044, -0046, -0049</td>
+</tr>
+<tr>
+<td>Issued to</td>
+<td>text</td>
+<td>electrical subcontractor ES-02</td>
+</tr>
+<tr>
+<td>Problem statement</td>
+<td>text</td>
+<td>busway joints left below OEM torque in halls 1 and 2; 21 joints in 3 runs</td>
+</tr>
+<tr>
+<td>Containment</td>
+<td>text</td>
+<td>all busway runs in B2 locked out pending torque audit</td>
+</tr>
+<tr>
+<td>Root cause (method and result)</td>
+<td>text</td>
+<td>5-why, see 09.7.3</td>
+</tr>
+<tr>
+<td>Corrective action</td>
+<td>text</td>
+<td>method statement revised; torque marking; second-person check; daily wrench check</td>
+</tr>
+<tr>
+<td>Preventive action (other places)</td>
+<td>text</td>
+<td>same rule applied to switchboard bus links and generator terminal boxes</td>
+</tr>
+<tr>
+<td>Owner of action, due date</td>
+<td>text</td>
+<td>ES-02 construction manager, 30 September 2026</td>
+</tr>
+<tr>
+<td>Effectiveness check</td>
+<td>text</td>
+<td>torque audit on next 3 busway runs: 0 joints below torque</td>
+</tr>
+<tr>
+<td>Effectiveness result</td>
+<td>text</td>
+<td>0 of 144 joints below torque, 26 October 2026</td>
+</tr>
+<tr>
+<td>Closed by, date</td>
+<td>text</td>
+<td>GC-A QA/QC manager, 27 October 2026</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s09-7-3"><span class="n">09.7.3</span>The 5-why method</h3>
+<p>The 5-why method asks "why" in a sequence, each answer becoming the next question, until the answer is a cause that the project can control. The number five is a guide. Stop when the cause is one that a corrective action can remove. Write each answer as a fact that can be checked.</p>
+<p><strong>Worked example:</strong> For CAR-B2-ELE-0014 (busway joints under torque), the QA/QC manager records:</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Question</th>
+<th>Answer (checked fact)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Why were the joints below torque</td>
+<td>the installers tightened the joints with an impact driver and did not complete the final torque with the torque wrench</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Why did they not complete the final torque</td>
+<td>one torque wrench was available for two crews; the second crew moved on to the next section and planned to return</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Why did nobody detect the joints that were left</td>
+<td>the joints had no torque mark, so a tightened joint and an untightened joint looked the same</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Why was there no torque mark</td>
+<td>the method statement MS-ELE-BW-002 rev 0 did not require torque marking</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Why did the method statement not require it</td>
+<td>the OEM manual recommends marking but the method statement template did not have a torque-mark step</td>
+</tr>
+</tbody>
+</table></div>
+<p>The corrective actions are one calibrated torque wrench per crew and torque marking with a paint pen after the final torque. They also include a second-person check of the marks before the IR and the method statement template revised for all bolted electrical joints. The result is verified by a torque audit of the next three runs.</p>
+<h3 id="s09-7-4"><span class="n">09.7.4</span>Cause-and-effect diagram</h3>
+<p>When several causes may act together, draw a cause-and-effect (Ishikawa) diagram with six branches: people, method, material, machine (tools and instruments), measurement and environment. Write the possible causes on the branches, then test each one with a fact (a record, a measurement, a witness statement). <mark>Only causes supported by facts go into the CAR.</mark></p>
+<h3 id="s09-7-5"><span class="n">09.7.5</span>The 8D method</h3>
+<p>The eight disciplines (8D) method was first described in a Ford Motor Company manual in 1987. It is used for major or repeated problems, especially those that involve a supplier. The steps are below; D0 was added later as a planning step.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Name</th>
+<th>What is done on a data-centre project</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D0</td>
+<td>plan</td>
+<td>decide that 8D is needed; set emergency response (lock out, stop shipments)</td>
+<td>CAR header</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>form the team</td>
+<td>name the people with product and process knowledge: QA/QC manager, subcontractor engineer, OEM start-up engineer, CxM</td>
+<td>team list</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>describe the problem</td>
+<td>state what, where, when, how many, with data; use "is" and "is not" comparison</td>
+<td>problem statement</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>interim containment</td>
+<td>protect the work: quarantine stock, inspect installed units, add a temporary check</td>
+<td>containment record</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>root cause and escape point</td>
+<td>find the root cause of the occurrence and the escape point, <mark>the earliest control that should have detected it</mark></td>
+<td>5-why, cause-and-effect diagram, test results</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>choose permanent corrective actions</td>
+<td>select actions and show that they remove the cause</td>
+<td>action list with evidence</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>implement and validate</td>
+<td>implement and confirm by data that the problem no longer occurs</td>
+<td>validation data</td>
+</tr>
+<tr>
+<td>D7</td>
+<td>prevent recurrence</td>
+<td>update procedures, templates, factory tests, training</td>
+<td>revised documents</td>
+</tr>
+<tr>
+<td>D8</td>
+<td>close and recognise</td>
+<td>close the 8D, record lessons, recognise the team</td>
+<td>closed 8D report</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s09-7-6"><span class="n">09.7.6</span>The A3 report</h3>
+<p>An A3 report puts the problem on one sheet of A3 paper in a fixed order: background, current condition with data, goal, root cause analysis, countermeasures, implementation plan with owners and dates, and follow-up check. On MSC-1 the A3 format is used for problems that cross several contractors, because one sheet can be reviewed in a 30-minute meeting. An example is repeated BMS integration failures that involve the OEM, the integrator and the network contractor.</p>
+<h3 id="s09-7-7"><span class="n">09.7.7</span>Verifying effectiveness</h3>
+<ol>
+<li><strong>Define the check before closing.</strong> Write the effectiveness check on the CAR when the action is approved: what is measured, on how many items, by when.</li>
+<li><strong>Measure on new work.</strong> <mark>The check uses work done after the corrective action</mark>. The corrected items do not count in the sample.</li>
+<li><strong>Use a sample large enough to see the problem.</strong> If the problem rate was 9 in 48 (19 %), a sample of 10 joints still has a 12 % chance of showing 0 failures when nothing has changed. A sample of 144 joints with 0 failures gives a clear result, because that chance falls below 0.000 000 1 %.</li>
+<li><strong>Close or reopen.</strong> If the check passes, close the CAR. If it fails, reopen the root-cause step.</li>
+</ol>
+<h2 id="s09-8"><span class="n">09.8</span>Punch lists</h2>
+
+<figure class="sheet" id="F09-3"><a href="../data/cx-handbook/figures/F09-3.svg" title="Open drawing F09-3 at full size"><img src="../data/cx-handbook/figures/F09-3.svg" alt="F09-3: Punch category matrix: effect of the item against the stage by which it must be closed" width="1400" height="455" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F09-3</span> — <b>Punch category matrix: effect of the item against the stage by which it must be closed</b>. The category is set by the most serious effect of the item; safety decides first, then test validity, then operation and record, then appearance.</figcaption></figure>
+<h3 id="s09-8-1"><span class="n">09.8.1</span>What a punch list is</h3>
+<p>A punch list (snag list) is the list of small defects and incomplete items found when the work is close to complete. AIA A201-2017 section 9.8.2 requires the Contractor, when it considers the work substantially complete, to "prepare and submit to the Architect a comprehensive list of items to be completed or corrected prior to final payment", and states that failure to include an item does not alter the Contractor's responsibility. On a data-centre project, punch walks happen at several stages: before each energisation, before each commissioning level, before ready for service (RFS) and before handover.</p>
+<h3 id="s09-8-2"><span class="n">09.8.2</span>Punch categories</h3>
+<p>The MSC-1 programme uses three categories. The case ledger sets the ageing limits.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Definition</th>
+<th>Examples</th>
+<th>Must be closed before</th>
+<th>Ageing limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>affects safety, prevents energisation, filling or the next commissioning test, or would make a test result invalid</td>
+<td>missing earth bond on a switchboard; open cable entry into a medium-voltage (MV) panel; CDU leak sensor not connected; protective cover missing on a live busbar</td>
+<td>the next energisation, fill or commissioning level</td>
+<td><mark>1 working day</mark></td>
+</tr>
+<tr>
+<td>B</td>
+<td>does not prevent the next test, but must be closed before handover or RFS because it affects operation, maintenance, warranty or the record</td>
+<td>missing valve labels; BMS graphic with wrong units; incomplete operation and maintenance (O&amp;M) manual section; damaged paint on a CDU frame</td>
+<td>handover of the system or RFS of the hall</td>
+<td>7 working days</td>
+</tr>
+<tr>
+<td>C</td>
+<td>minor or cosmetic item that may remain at handover with an agreed date, without affecting operation or safety</td>
+<td>scratched floor tile; label font different from the standard; door closer adjustment in a corridor</td>
+<td>final completion or the end of the agreed period</td>
+<td>30 working days</td>
+</tr>
+</tbody>
+</table></div>
+<p>Figure <a class="figref" href="#F09-3">F09-3</a> shows the category matrix: the effect of the item (safety, test validity, operation, record, appearance) against the stage at which it must be closed.</p>
+<h3 id="s09-8-3"><span class="n">09.8.3</span>Rules for assigning a category</h3>
+<ol>
+<li><strong>Safety decides first.</strong> <mark>Any item that can injure a person or damage equipment at the next step is category A</mark>, whatever its size.</li>
+<li><strong>Test validity next.</strong> An item that would make the next test result unreliable (a sensor not calibrated, a valve in the wrong position, a flow meter not installed) is category A for that test.</li>
+<li><strong>Operation and record.</strong> Items needed for the operator to run and maintain the system (labels, graphics, manuals, spares) are category B.</li>
+<li><strong>Appearance last.</strong> Items that affect only appearance are category C.</li>
+<li><strong>Disagreement.</strong> If the contractor and the inspector disagree, the CxM decides for systems in the commissioning plan; the Engineer decides for other work.</li>
+</ol>
+<h3 id="s09-8-4"><span class="n">09.8.4</span>Punch list fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Item number</td>
+<td>text</td>
+<td>PL-B2-DH3-0587</td>
+</tr>
+<tr>
+<td>Date raised</td>
+<td>date</td>
+<td>6 October 2026</td>
+</tr>
+<tr>
+<td>Raised by</td>
+<td>text</td>
+<td>CxM, building B2</td>
+</tr>
+<tr>
+<td>Punch walk reference</td>
+<td>text</td>
+<td>PW-B2-DH3-L4-02 (pre-L4 walk, hall 3)</td>
+</tr>
+<tr>
+<td>Location and grid</td>
+<td>text</td>
+<td>B2 data hall 3, grid G6</td>
+</tr>
+<tr>
+<td>System and asset tag</td>
+<td>text</td>
+<td>B2-DH3-CDU-11</td>
+</tr>
+<tr>
+<td>Description</td>
+<td>text</td>
+<td>leak detection cable under CDU not connected to the CDU controller terminal LD1</td>
+</tr>
+<tr>
+<td>Requirement</td>
+<td>text</td>
+<td>CDU OEM installation manual section 7.3; drawing B2-M-CDU-410 rev C</td>
+</tr>
+<tr>
+<td>Category</td>
+<td>code</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Responsible contractor</td>
+<td>text</td>
+<td>mechanical subcontractor MS-01</td>
+</tr>
+<tr>
+<td>Due date</td>
+<td>date</td>
+<td>7 October 2026</td>
+</tr>
+<tr>
+<td>Photograph before</td>
+<td>file</td>
+<td>PL-0587-1.jpg</td>
+</tr>
+<tr>
+<td>Action taken</td>
+<td>text</td>
+<td>cable connected; leak simulated with water on the sensing cable; alarm at CDU and at BMS</td>
+</tr>
+<tr>
+<td>Photograph after</td>
+<td>file</td>
+<td>PL-0587-2.jpg</td>
+</tr>
+<tr>
+<td>Verified by, date</td>
+<td>text</td>
+<td>CxM, 7 October 2026</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>code</td>
+<td>open, ready for verification, closed, transferred to NCR</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s09-8-5"><span class="n">09.8.5</span>Punch walk procedure</h3>
+<p><strong>Purpose:</strong> Find and record every remaining defect in a defined area before a stated milestone.</p>
+<p><strong>Trigger:</strong> The contractor declares the area or system ready for the milestone (energisation, next commissioning level, RFS, handover).</p>
+<p><strong>Owner:</strong> CxM for commissioning milestones; Engineer for handover.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Contractor self-punch.</strong> The contractor walks the area first and closes its own items. It issues its own list with the closed items. Allow 3 working days.</li>
+<li><strong>Plan the walk.</strong> The CxM fixes the date, the area boundaries, the systems and the attendees: CxM, Engineer's inspector, contractor QC, subcontractor supervisors, owner's operations representative.</li>
+<li><strong>Walk by system and by room.</strong> Walk with the drawings and the checklists. Open panels where safe and permitted. Record each item with its tag, photograph and category on a tablet linked to the punch database.</li>
+<li><strong>Agree categories on the spot.</strong> The CxM and the contractor QC agree the category for each item before leaving the room and record it on the punch list.</li>
+<li><strong>Issue the list.</strong> The CxM issues the list within 1 working day with due dates set from the category limits.</li>
+<li><strong>Close items.</strong> The contractor closes each item and marks it "ready for verification" with a photograph after correction.</li>
+<li><strong>Verify.</strong> The inspector who raised the item, or a named delegate, verifies on site and closes it. Category A items are verified before the milestone.</li>
+<li><strong>Milestone decision.</strong> The milestone proceeds when all category A items for the systems in scope are closed. Open category B and C items are listed in the milestone record with their due dates.</li>
+</ol>
+<p><strong>Acceptance:</strong> <mark>Zero open category A items for the milestone</mark>; all B and C items have a responsible contractor and a due date.</p>
+<p><strong>Records:</strong> Punch list export, photographs, milestone record.</p>
+<h2 id="s09-9"><span class="n">09.9</span>The commissioning issues log and deferred tests</h2>
+<h3 id="s09-9-1"><span class="n">09.9.1</span>Issues log</h3>
+<p>ASHRAE Standard 202 requires an issues log that lists each continuing issue with the person or organisation responsible for its resolution. The log is kept until every issue is resolved or accepted by the owner. ASHRAE Guideline 0-2019 gives the recommended practice beyond the Standard 202 minimum. The final commissioning report includes the issues and resolution log.</p>
+<p><mark>Issues and punch items use one urgency scheme: category A, B or C</mark>. The definitions and ageing limits are those of section 09.8.2 (A 1 working day, B 7 working days, C 30 working days in the MSC-1 worked example). The codes P1, P2 and P3 are kept for two other quantities: the request for information (RFI) response priority (section 05.5.3) and the alarm priority of the BMS and the electrical power monitoring system (EPMS) (section 21.11). An issues log, a punch list, an integrated systems testing (IST) issue log or a form never uses P1 to P3 for issue urgency. Issue numbers follow the register pattern of section 05.3.2: ISS-building-sequence (ISS-B2-1412), with IST issues in the IST series of the hall (IST-DH3-014).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Issue number</td>
+<td>text</td>
+<td>ISS-B2-1412</td>
+</tr>
+<tr>
+<td>Date found</td>
+<td>date</td>
+<td>14 September 2026</td>
+</tr>
+<tr>
+<td>Found during</td>
+<td>text</td>
+<td>L3 load bank test, block B2-DH3-BLK-04</td>
+</tr>
+<tr>
+<td>System</td>
+<td>text</td>
+<td>EPMS, block main meter</td>
+</tr>
+<tr>
+<td>Description</td>
+<td>text</td>
+<td>meter reads 75 % of true current; CT ratio setting 3,000/5 A, CT nameplate 4,000/5 A</td>
+</tr>
+<tr>
+<td>Category</td>
+<td>code</td>
+<td>A, B or C, with the definitions and ageing limits of the punch categories in section 09.8.2</td>
+</tr>
+<tr>
+<td>Type</td>
+<td>code</td>
+<td>design, installation, configuration, test procedure, owner's project requirements (OPR)</td>
+</tr>
+<tr>
+<td>Linked record</td>
+<td>text</td>
+<td>RFI-B2-ELE-0388, design change notice DCN-E-0105, variation order VO-B2-023 (chapter 08)</td>
+</tr>
+<tr>
+<td>Responsible party</td>
+<td>text</td>
+<td>EPMS integrator and switchboard manufacturer</td>
+</tr>
+<tr>
+<td>Resolution</td>
+<td>text</td>
+<td>meters reconfigured; CTs replaced on blocks 07 and 08</td>
+</tr>
+<tr>
+<td>Retest record</td>
+<td>text</td>
+<td>CX-L3-B2-DH3-EPMS-04 rerun 21 September 2026</td>
+</tr>
+<tr>
+<td>Status and date closed</td>
+<td>code, date</td>
+<td>closed, 22 September 2026</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s09-9-2"><span class="n">09.9.2</span>How the issues log, NCR and punch list connect</h3>
+<ol>
+<li><strong>Issue first.</strong> Every commissioning problem goes in the issues log, even if it is also an NCR or a punch item, so the commissioning record is complete.</li>
+<li><strong>NCR for nonconforming work.</strong> If the issue is a nonconformity in the work, the QA/QC manager raises an NCR and the issue log entry references it.</li>
+<li><strong>Punch for simple items.</strong> If the issue is a simple item found on a punch walk, it is a punch item and the issue log may hold one summary entry per walk.</li>
+<li><strong>Change for design or OPR issues.</strong> If the issue needs a design change or an OPR change, it goes through the chapter 08 decision tree.</li>
+</ol>
+<h3 id="s09-9-3"><span class="n">09.9.3</span>Deferred and seasonal tests</h3>
+<p>A deferred test is a test that cannot be performed, or cannot be performed conclusively, during the construction-phase acceptance period, for example because the information technology (IT) load is not yet installed. A seasonal test is a functional test performed near design weather conditions, for example dry cooler performance at the design dry-bulb temperature of 34 °C in the MSC-1 case. Each deferred test is recorded in the issues log with: the test, the reason for deferral, the condition that allows the test, the planned date or season, and the person responsible. On MSC-1 the dry cooler full-capacity test is deferred to the hottest month after RFS, and the issue stays open as category C until the test record is signed.</p>
+<h2 id="s09-10"><span class="n">09.10</span>Retest rules and the defect closure package</h2>
+
+<figure class="sheet" id="F09-4"><a href="../data/cx-handbook/figures/F09-4.svg" title="Open drawing F09-4 at full size"><img src="../data/cx-handbook/figures/F09-4.svg" alt="F09-4: Defect closure package for a major NCR: the ten items a reader can audit without asking" width="1400" height="749" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F09-4</span> — <b>Defect closure package for a major NCR: the ten items a reader can audit without asking</b>. The QA/QC manager reads the package against the ten items and writes &quot;complete&quot; or the missing item number on the NCR before signing closure.</figcaption></figure>
+<h3 id="s09-10-1"><span class="n">09.10.1</span>Retest rules</h3>
+<p>When a defect is corrected, the inspection or test that found it is repeated. The correction may also disturb other work, so the retest scope can be wider than the item. The table gives the MSC-1 rules.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Correction</th>
+<th>Minimum retest</th>
+<th>Wider retest when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Re-torque of a bolted electrical joint</td>
+<td>torque check of the joint; insulation resistance of the circuit if it was opened</td>
+<td>joints opened in a run: insulation resistance of the whole run; thermographic scan at load</td>
+</tr>
+<tr>
+<td>Re-termination of an MV cable</td>
+<td>full test set on that cable (insulation resistance, very low frequency (VLF) withstand, partial discharge (PD) test where specified)</td>
+<td>the termination kit type has failed twice: witness the next kit of each jointer</td>
+</tr>
+<tr>
+<td>Replacement of a CT or a meter</td>
+<td>meter accuracy check against a reference; CT ratio and polarity check</td>
+<td>the CT shorting block was rewired: secondary injection of the protection relays on the same CTs</td>
+</tr>
+<tr>
+<td>Firmware or configuration change in a controller</td>
+<td>point-to-point check of the points affected; the sequence steps affected</td>
+<td>the change affects a common library or map: retest all controllers of that type</td>
+</tr>
+<tr>
+<td>Replacement of a pipe section or joint</td>
+<td>pressure test of the section</td>
+<td>flushing of the section and the downstream equipment strainers</td>
+</tr>
+<tr>
+<td>Change of a filter or strainer element</td>
+<td>differential pressure reading at design flow</td>
+<td>flushing water quality test if debris was found</td>
+</tr>
+<tr>
+<td>Fibre re-termination or cassette change</td>
+<td>end-face inspection and loss test on the affected fibres; polarity check</td>
+<td>trunk replaced: all tests on all fibres of the trunk</td>
+</tr>
+<tr>
+<td>Correction during L4 or L5</td>
+<td>the failed test step and every earlier step whose result could change</td>
+<td>the CxM decides; the decision is recorded on the test script</td>
+</tr>
+</tbody>
+</table></div>
+<p>Rules that apply to every retest:</p>
+<ol>
+<li><strong>Same procedure.</strong> The retest uses the same procedure, instruments of the same class, and the same acceptance value as the original test, unless an approved change revised them.</li>
+<li><strong>Same witnesses.</strong> The parties who witnessed the original test are notified of the retest with the same notice period.</li>
+<li><strong>Record both results.</strong> <mark>The failed result stays in the record.</mark> The retest result is added with a reference to the NCR or punch item.</li>
+<li><strong>Retest cost.</strong> Under AIA A201-2017 section 13.4.3 and section 12.2.1, the cost of repeated tests and of correcting rejected work is the Contractor's; FIDIC 2017 and NEC4 have similar provisions (chapter 07).</li>
+</ol>
+<h3 id="s09-10-2"><span class="n">09.10.2</span>Defect closure package anatomy</h3>
+<p>Every major NCR is closed with a package that a reader can audit without asking anyone. Figure <a class="figref" href="#F09-4">F09-4</a> shows the contents.</p>
+<ol>
+<li><strong>NCR form.</strong> All four parts complete with signatures.</li>
+<li><strong>Photographs before and after.</strong> With the asset tag visible and the date.</li>
+<li><strong>Disposition approval.</strong> The signed approval, plus the designer's written agreement and the concession for use as is or repair.</li>
+<li><strong>Correction method.</strong> The method statement or the work instruction used, with its revision.</li>
+<li><strong>Re-inspection IR.</strong> The released IR for the corrected work.</li>
+<li><strong>Test records.</strong> The retest sheets with instrument serial numbers and calibration certificate references.</li>
+<li><strong>Drawing and document updates.</strong> Red-line mark-ups or revised drawings if the correction changed anything shown on a drawing.</li>
+<li><strong>CAR reference.</strong> The CAR number, or the reason why none is required.</li>
+<li><strong>Commissioning confirmation.</strong> The CxM's signature for systems in the commissioning plan, with the issues log entry closed.</li>
+<li><strong>Cost record.</strong> Who bears the cost; back-charge reference if the owner corrected the defect.</li>
+</ol>
+<p><strong>Check:</strong> Before signing closure, the QA/QC manager reads the package against this list of 10 items and writes "complete" or the missing item number on the NCR.</p>
+<h2 id="s09-11"><span class="n">09.11</span>Defect ageing KPIs</h2>
+
+<figure class="sheet" id="F09-5"><a href="../data/cx-handbook/figures/F09-5.svg" title="Open drawing F09-5 at full size"><img src="../data/cx-handbook/figures/F09-5.svg" alt="F09-5: Open punch items by category, data hall 3, weeks 30 to 41 of 2026" width="1400" height="714" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F09-5</span> — <b>Open punch items by category, data hall 3, weeks 30 to 41 of 2026</b>. A flat or rising open count close to a milestone is escalated; in week 41 the category B trend is flat because of BMS graphics items.</figcaption></figure>
+<h3 id="s09-11-1"><span class="n">09.11.1</span>Measures</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Formula</th>
+<th>MSC-1 target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Open items by category</td>
+<td>count of open punch items per category on the report date</td>
+<td>category A open more than 1 working day: 0</td>
+</tr>
+<tr>
+<td>Age of open items</td>
+<td>report date minus date raised, in working days</td>
+<td>B not more than 7, C not more than 30 (case ledger)</td>
+</tr>
+<tr>
+<td>Items past their ageing limit</td>
+<td>count of open items with age above the category limit</td>
+<td>0 for A; not more than 5 % of open B and C</td>
+</tr>
+<tr>
+<td>NCR closure time</td>
+<td>median working days from raised to closed, major and minor</td>
+<td>major not more than 15; minor not more than 8</td>
+</tr>
+<tr>
+<td>Repeat rate</td>
+<td>NCRs with the same origin and description in 4 weeks / NCRs raised</td>
+<td>not more than 10 %</td>
+</tr>
+<tr>
+<td>First-pass yield</td>
+<td>IRs released at first inspection / IRs inspected</td>
+<td>at least 90 % (case ledger; chapter 07)</td>
+</tr>
+<tr>
+<td>CAR effectiveness</td>
+<td>CARs closed with effectiveness check passed / CARs closed</td>
+<td>100 %</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s09-11-2"><span class="n">09.11.2</span>Ageing calculation</h3>
+<p><strong>Worked example:</strong> In the MSC-1 worked example, the CxM runs the punch report for data hall 3 on Friday 9 October 2026 (week 41). The punch database holds 412 items for hall 3: 286 closed and 126 open. Of the open items, 2 are category A, 49 are category B and 75 are category C. One category A item was raised on Wednesday 7 October (age 2 working days), above the 1-day limit. It is reported in red with the name of the responsible supervisor. Of the 49 category B items, 6 are older than 7 working days, which is 6 / 49 = <mark>12.2 %</mark> above the limit and above the 5 % target. Of the 75 category C items, 2 are older than 30 working days (2.7 %). The CxM's report lists the 6 category B items by contractor: 4 are BMS graphics items for the integrator and 2 are labels for the mechanical subcontractor. The weekly Cx coordination meeting assigns the integrator an extra engineer for 3 days. Figure <a class="figref" href="#F09-5">F09-5</a> plots the open items by category for weeks 30 to 41.</p>
+<h3 id="s09-11-3"><span class="n">09.11.3</span>Rules for the ageing report</h3>
+<ol>
+<li><strong>Count working days.</strong> Count age in working days, excluding the public holidays in the project calendar.</li>
+<li><strong>Do not reset age on reassignment.</strong> An item that moves from one contractor to another keeps its <mark>original date raised</mark>.</li>
+<li><strong>Report the oldest items by name.</strong> The report lists the 10 oldest open items in each category with the responsible person.</li>
+<li><strong>Show the trend.</strong> Plot the open count by category each week; a flat or rising trend close to a milestone is escalated.</li>
+</ol>
+<h2 id="s09-12"><span class="n">09.12</span>Defects during the defects liability period</h2>
+<h3 id="s09-12-1"><span class="n">09.12.1</span>What the DLP is</h3>
+<p>After taking over (practical completion, substantial completion, or provisional handover), the contractor remains responsible for remedying defects that appear during a period stated in the contract. The name differs by contract. FIDIC 2017 uses the Defects Notification Period (DNP). NEC4 uses the period up to the defects date, with a defect correction period for each defect. AIA A201-2017 uses the one-year correction period, and Indonesian contracts use the maintenance period, masa pemeliharaan.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Period</th>
+<th>Remedy rule</th>
+<th>Final certificate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FIDIC 2017</td>
+<td>Defects Notification Period stated in the Contract Data, 365 days where none is stated, from the date in the Taking-Over Certificate</td>
+<td>clause 11: the Contractor remedies notified defects within a reasonable time; if it fails, the Employer may have the work done at the Contractor's cost</td>
+<td>Performance Certificate within 28 days after the latest DNP expires (sub-clause 11.9)</td>
+</tr>
+<tr>
+<td>NEC4 ECC</td>
+<td>until the defects date in the Contract Data</td>
+<td>clauses 43 to 46, listed below the table</td>
+<td>Defects Certificate at the later of the defects date and the end of the last defect correction period (clause 44.3)</td>
+</tr>
+<tr>
+<td>AIA A201-2017</td>
+<td>one year after Substantial Completion (section 12.2.2.1), extended for work first performed after Substantial Completion (12.2.2.2), not extended by corrective work (12.2.2.3)</td>
+<td>the Contractor corrects promptly after notice from the Owner; if the Owner fails to give notice and an opportunity to correct, it waives the right to require correction</td>
+<td>final payment under section 9.10</td>
+</tr>
+<tr>
+<td>Indonesian government contract</td>
+<td>maintenance period in the contract (sample contracts use 180 calendar days from provisional hand over (PHO))</td>
+<td>the provider maintains and remedies; 5 % retention or a maintenance bond is held</td>
+<td>final hand over (FHO), serah terima akhir, then release of retention</td>
+</tr>
+</tbody>
+</table></div>
+<p>The NEC4 ECC defect clauses work as follows.</p>
+<ol>
+<li><strong>Clause 43.2, notification.</strong> The Supervisor and the Contractor each notify a defect as soon as they become aware of it.</li>
+<li><strong>Clause 44.2, correction period.</strong> The Contractor corrects a notified defect before the end of its defect correction period. The period starts at Completion for a defect notified before Completion, and at notification for a defect notified after Completion.</li>
+<li><strong>Clause 44.4, parts taken over.</strong> For a part of the works taken over by the Client, the period starts when the Client gives access.</li>
+<li><strong>Clause 46, uncorrected defects.</strong> A defect that is not corrected is corrected by others, and the Contractor pays the cost.</li>
+</ol>
+<h3 id="s09-12-2"><span class="n">09.12.2</span>Indonesian handover practice</h3>
+<p>Perpres 16/2018 Pasal 57 sets the handover steps. After the work is 100 % complete, the provider asks the commitment-making official, Pejabat Pembuat Komitmen (PPK), in writing for handover. The PPK inspects the work, and the PPK and the provider sign the handover record, Berita Acara Serah Terima. In public works practice this is the first handover, serah terima pertama or provisional hand over (PHO). The PPK then pays <mark>95 % of the contract price and holds 5 % as retention</mark> (or accepts a maintenance bond) for the maintenance period. At the end of the maintenance period, if the work meets the contract, the parties sign the final handover record (FHO) and the PPK releases the retention or the bond. Private data-centre contracts in Jakarta use the same PHO and FHO terms with FIDIC-style defect clauses.</p>
+<h3 id="s09-12-3"><span class="n">09.12.3</span>Procedure for a defect during the DLP</h3>
+<p><strong>Purpose:</strong> Notify, correct and close a defect found after taking over, in a live data centre, without risk to the IT load.</p>
+<p><strong>Trigger:</strong> The owner's operations team or a maintenance contractor finds a defect after taking over.</p>
+<p><strong>Owner:</strong> CM for notification; contractor for correction; owner's operations manager for access.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Record and notify.</strong> The operations team records the defect in the computerised maintenance management system (CMMS). The CM notifies the contractor in writing under the contract clause, the same working day for urgent defects and within 5 working days for others.</li>
+<li><strong>Classify urgency.</strong> Urgent: affects redundancy, safety or the IT load (for example a CDU pump failure that leaves a zone at N). Normal: all others.</li>
+<li><strong>Plan the access.</strong> The operations team issues a method of procedure (MOP) and a permit to work for the correction, with the change management approval of the live site. Contractor attendance for urgent defects: within the response time in the contract (MSC-1 example: 4 hours).</li>
+<li><strong>Correct and retest.</strong> The contractor corrects the defect under the MOP and retests as in 09.10.1.</li>
+<li><strong>Close and update records.</strong> The operations team closes the CMMS work order; the CM closes the DLP defect record; the as-built and O&amp;M records are updated if anything changed.</li>
+<li><strong>Extend where the contract allows.</strong> FIDIC 2017 sub-clause 11.3 extends the DNP for an item that cannot be used for its intended purpose because of a defect. The extension cannot exceed two years after the DNP stated in the Contract Data. Record the new end date for that item in the DLP defect register.</li>
+</ol>
+<p><strong>Records:</strong> CMMS work order, notice letter, MOP, permit, retest record, DLP defect register.</p>
+<h2 id="s09-13"><span class="n">09.13</span>Worked examples of NCRs</h2>
+<h3 id="s09-13-1"><span class="n">09.13.1</span>NCR on busway joint torque</h3>
+<p><strong>Worked example:</strong> In the MSC-1 worked example, the pre-energisation inspection of overhead busway run B2-DH2-BW-03 in data hall 2 takes place on 8 September 2026. The Engineer's inspector checks joints with a calibrated torque wrench set to the value on the OEM joint label (68 N·m is an example value; the governing value is on the joint label and in section 5 of the busway OEM installation manual). Nine of 48 joints turn before the wrench clicks, which shows they were below the label torque. Fourteen joints have no torque mark. The inspector raises NCR-B2-ELE-0044 (major, workmanship) the same day. Containment: the run is locked out and the energisation permit for the run is withdrawn. Disposition: rework, approved by the Engineer on 10 September. Correction: all 48 joints are released, inspected for damage and re-torqued with two calibrated wrenches; each joint receives a paint mark; a second person checks the marks. Retest: insulation resistance phase to phase and phase to earth at 1,000 V DC reads above 2,000 MΩ for every phase. The project minimum for low-voltage (LV) equipment is 100 MΩ (chapter 14). The thermographic scan at the level 3 (L3) load bank test of 1.5 MW on 15 September shows a maximum temperature difference of <mark>0.8 K between similar joints</mark>. This is below the 1 °C to 3 °C band that ANSI/NETA Acceptance Testing Specifications (ATS) Table 100.18 marks as a possible deficiency for similar components under similar load (bands in section 14.13.2; confirm against ANSI/NETA ATS-2025 Table 100.18). CAR-B2-ELE-0014 records the 5-why in 09.7.3. The NCR closes on 16 September with the 10-item package; the CAR closes on 27 October after the audit of 144 joints in 3 further runs finds 0 below torque.</p>
+<h3 id="s09-13-2"><span class="n">09.13.2</span>NCR on a CDU filter mesh</h3>
+<p><strong>Worked example:</strong> The technology cooling system specification for hall 3 requires a 25 µm filter element (the MSC-1 TCS filter rating in section 19.11.1) in each CDU secondary circuit. The reason is that the cold-plate manufacturer limits particle size in the rack loops. These are example values; the governing values are in the CDU OEM installation manual and the cold-plate manufacturer's coolant specification. On 19 August 2026 the mechanical inspector opens the filter housing of B2-DH3-CDU-07 during the pre-fill punch walk and reads "100 µm" on the element. The supplier's packing list shows that all 16 CDUs for hall 3 were shipped with 100 µm elements. The inspector raises NCR-B2-MEC-0027 (major, material) and the CxM records issue ISS-B2-1367. Containment: no CDU secondary circuit in hall 3 is filled; the elements in stock are quarantined. The contractor first proposes "use as is" for the flushing period. The designer does not agree, because flushing debris would pass into the rack manifolds. Disposition: reject, with 16 replacement 25 µm elements supplied by the CDU OEM within 9 working days. A temporary 100 µm element is allowed only in the flushing bypass loop, which does not connect to the racks. Retest: the differential pressure across each new element at design flow is recorded at L3 and compared with the OEM clean-element value. The cause is at the supplier (wrong part number in the factory bill of materials), so the contractor issues an 8D request to the CDU OEM. The 8D records three steps. D3 is the inspection of the units for halls 4 to 6 at the factory. D4 traces the root cause to a bill-of-materials revision not released to production. D7 adds the filter element part number to the factory final inspection checklist.</p>
+<h3 id="s09-13-3"><span class="n">09.13.3</span>NCR on a Modbus register map version</h3>
+<p><strong>Worked example:</strong> The interface control document for the CDU to BMS interface states that CDU firmware 4.12.x uses register map CDU1-MB-MAP v3.2 (chapter 25). During the L3 point-to-point test on B2-DH3-CDU-03 on 2 September 2026, the CxM wets the leak sensor; the CDU display shows the leak alarm, but the BMS shows no alarm. The BMS reads holding register 40211 as the leak status; in map v3.2 the leak status is at register 40213, because v3.2 inserted two registers for a second pressure sensor. The BMS integrator had configured the CDUs from map v3.1. The CxM raises NCR-B2-BMS-0019 (major, configuration) and issue ISS-B2-1388 as category A, because a leak alarm that does not reach the BMS makes <mark>the hall unsafe to fill</mark>. Containment: the TCS fill of hall 3 is held. Disposition: rework; the integrator loads the v3.2 template for all 16 CDUs. Retest: because the map is common to all CDUs of the type, <mark>every mapped point on all 16 CDUs is retested</mark>. The leak alarm is tested on every CDU and the time from wetting to BMS alarm is recorded (all below 10 s, the limit in the interface control document). CAR-B2-BMS-0006 root cause: the integrator's template library held map versions without a link to the firmware version. Corrective action: each template carries the firmware range in its name and the L2 checklist adds "read CDU firmware version and confirm template version".</p>
+<h3 id="s09-13-4"><span class="n">09.13.4</span>NCR on fibre polarity</h3>
+<p><strong>Worked example:</strong> The approved cabling submittal for building B2 states ANSI/TIA-568.3-D polarity method B for multi-fibre push-on (MPO) trunks, with method-B cassettes at both ends and A-to-B duplex patch cords. On 23 September 2026, at ITP-ICT-FO-001 line 4.3 (chapter 07), the polarity test runs on the link from the main distribution area (MDA), B2-MDA-01, to the intermediate distribution area (IDA) of hall 2, B2-DH2-IDA-02. The test shows that the transmit fibre at position 1 of the A-end arrives at position 1 of the B-end, where the receive position should be. The trunk label reads "Type A". Two of the 24 trunks between the MDA and hall 2 are Type A; the other 22 are Type B. The inspector raises NCR-B2-ICT-0011 (major, material and workmanship). Containment: the two trunks are tagged and excluded from the network turn-up plan. The installer proposes a repair: use A-to-A patch cords at one end of the two links. The CxM and the owner's network team do not agree. Operators would need to know that two links use different cords, and a later cord change would reverse the link. The disposition is <mark>reject; replace the two trunks with Type B trunks of the same length</mark>. Retest: end-face inspection, loss at 1310 nm and 1550 nm and polarity on all 144 fibres of each new trunk. Results: loss 0.96 dB to 1.31 dB against a budget of 3.35 dB; polarity correct on every fibre. CAR: the installer's receiving inspection now records the trunk type against the cabling schedule before a trunk leaves the store.</p>
+<h2 id="s09-14"><span class="n">09.14</span>Common errors and how to detect them early</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>How to detect it early</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Defect corrected without a record</td>
+<td>compare work fronts with the NCR and punch registers on the daily walk</td>
+<td>raise the record retrospectively with the evidence</td>
+</tr>
+<tr>
+<td>NCR closed without retest</td>
+<td>closure package check list item 6</td>
+<td>reopen; retest</td>
+</tr>
+<tr>
+<td>Use as is without designer agreement</td>
+<td>disposition approval field empty for designer</td>
+<td>stop; obtain agreement or change the disposition</td>
+</tr>
+<tr>
+<td>Punch category set low to meet the milestone</td>
+<td>CxM reviews every category A decision before the milestone</td>
+<td>re-categorise; hold the milestone</td>
+</tr>
+<tr>
+<td>CAR closed on the action without effectiveness check</td>
+<td>CAR effectiveness result field empty</td>
+<td>reopen; check new work</td>
+</tr>
+<tr>
+<td>Age reset when item reassigned</td>
+<td>database audit of date-raised changes</td>
+<td>restore original date</td>
+</tr>
+<tr>
+<td>DLP defect corrected without MOP</td>
+<td>operations permit register</td>
+<td>stop work; issue MOP</td>
+</tr>
+<tr>
+<td>Same defect found in other halls</td>
+<td>repeat-rate KPI rising</td>
+<td>raise CAR; inspect all locations</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s09-15"><span class="n">09.15</span>Checklist for site use</h2>
+<ol>
+<li><strong>Right record.</strong> The finding is recorded as an NCR, punch item, issue or observation using the table in 09.2.1.</li>
+<li><strong>Requirement cited.</strong> The record names the document and clause that is not met.</li>
+<li><strong>Contained.</strong> A major NCR is contained within 1 working day and the containment is recorded.</li>
+<li><strong>Disposition approved.</strong> The disposition is approved by the authority in 09.6.1; use as is and repair have the designer's agreement and a concession.</li>
+<li><strong>Defect or change checked.</strong> Design-origin items are checked against the chapter 08 decision tree.</li>
+<li><strong>Correction verified.</strong> A re-inspection IR is released for the correction.</li>
+<li><strong>Retest done.</strong> The retest scope follows 09.10.1 and both results are kept.</li>
+<li><strong>CAR raised.</strong> Major, repeated and process NCRs have a CAR with a defined effectiveness check.</li>
+<li><strong>Punch categories agreed.</strong> Every punch item has an agreed category and a due date from the ageing limits.</li>
+<li><strong>Category A cleared.</strong> Zero category A items are open before any energisation, fill or commissioning level.</li>
+<li><strong>Ageing reported.</strong> Open items, ages and items past limit are reported weekly by category and contractor.</li>
+<li><strong>Closure package complete.</strong> The 10-item package is complete before an NCR is closed.</li>
+<li><strong>Issues log updated.</strong> Every commissioning problem is in the issues log with its linked records.</li>
+<li><strong>DLP register kept.</strong> Defects after taking over are notified under the contract clause and closed with CMMS and retest records.</li>
+</ol>
+<h2 id="s09-16"><span class="n">09.16</span>Sources</h2>
+<ol>
+<li>International Organization for Standardization, ISO 9001:2015 Quality management systems, Requirements, clauses 8.7 and 10.2. <a href="https://www.iso.org/standard/62085.html" rel="noopener">https://www.iso.org/standard/62085.html</a></li>
+<li>International Organization for Standardization, ISO 9000:2015 Quality management systems, Fundamentals and vocabulary (definitions of nonconformity, correction, corrective action, concession). <a href="https://www.iso.org/standard/45481.html" rel="noopener">https://www.iso.org/standard/45481.html</a></li>
+<li>The Core Solution, "ISO 9001:2015 Clause 8.7.1 explained", accessed 31 October 2026. <a href="https://www.thecoresolution.com/clause-8-7-1-iso-9001-2015-explained" rel="noopener">https://www.thecoresolution.com/clause-8-7-1-iso-9001-2015-explained</a></li>
+<li>The Core Solution, "ISO 9001:2015 Clause 10.2 explained", accessed 31 October 2026. <a href="https://www.thecoresolution.com/clause-10-2-iso-90012015-explained" rel="noopener">https://www.thecoresolution.com/clause-10-2-iso-90012015-explained</a></li>
+<li>ISMS.online, "ISO 9001 Clause 8.7 Control of nonconforming outputs", accessed 31 October 2026. <a href="https://isms.online/iso-9001/clause-8-7-control-of-nonconforming-outputs" rel="noopener">https://isms.online/iso-9001/clause-8-7-control-of-nonconforming-outputs</a></li>
+<li>Wikipedia, "Eight disciplines problem solving", accessed 31 October 2026. <a href="https://en.wikipedia.org/wiki/Eight_disciplines_problem_solving" rel="noopener">https://en.wikipedia.org/wiki/Eight_disciplines_problem_solving</a></li>
+<li>FIDIC, Conditions of Contract for Construction (Red Book), second edition 2017, sub-clauses 7.5, 7.6 and clause 11. <a href="https://fidic.org/books/construction-contract-2nd-ed-2017-red-book" rel="noopener">https://fidic.org/books/construction-contract-2nd-ed-2017-red-book</a></li>
+<li>RICS isurv, "Content of the pre-2017 FIDIC forms", accessed 31 October 2026. <a href="https://www.isurv.com/info/359/fidic/2669/content_of_the_pre-2017_fidic_forms/4" rel="noopener">https://www.isurv.com/info/359/fidic/2669/content_of_the_pre-2017_fidic_forms/4</a></li>
+<li>NEC, "Defining and managing defects in ECC and liability for not correcting them", accessed 31 October 2026. <a href="https://www.neccontract.com/news/defining-and-managing-defects-in-ecc-and-liability-for-not-correcting-them" rel="noopener">https://www.neccontract.com/news/defining-and-managing-defects-in-ecc-and-liability-for-not-correcting-them</a></li>
+<li>Brodies, "Under NEC Contract, what is the connection between the defects date and the defect correction period", accessed 31 October 2026. <a href="https://brodies.com/insights/construction-and-engineering/under-nec-contract-what-is-the-connection-between-the-defects-date-dd-and-the-defect-correction-period-dcp/" rel="noopener">https://brodies.com/insights/construction-and-engineering/under-nec-contract-what-is-the-connection-between-the-defects-date-dd-and-the-defect-correction-period-dcp/</a></li>
+<li>American Institute of Architects, A201-2017 General Conditions of the Contract for Construction, sample copy, sections 9.8, 12.2, 12.3 and 13.4, accessed 31 October 2026. <a href="https://www.maine.edu/general-services/wp-content/uploads/sites/34/2019/12/A201-2017-SAMPLE-100219-Accessible.pdf" rel="noopener">https://www.maine.edu/general-services/wp-content/uploads/sites/34/2019/12/A201-2017-SAMPLE-100219-Accessible.pdf</a></li>
+<li>Whole Building Design Guide, UFGS 01 45 00 Quality Control, August 2023, section 1.8.6 Deficiency/Rework Items List, accessed 31 October 2026. <a href="https://www.wbdg.org/FFC/DOD/UFGS/01%2045%2000.pdf" rel="noopener">https://www.wbdg.org/FFC/DOD/UFGS/01%2045%2000.pdf</a></li>
+<li>Consulting-Specifying Engineer, "ASHRAE Standard 202 on commissioning released" (issues log), accessed 31 October 2026. <a href="https://www.csemag.com/ashrae-standard-202-on-commissioning-released" rel="noopener">https://www.csemag.com/ashrae-standard-202-on-commissioning-released</a></li>
+<li>Engineered Systems, August 2018, commissioning classifications (deferred and seasonal testing), accessed 31 October 2026. <a href="https://digital.bnpmedia.com/article/Commissioning/3154465/516226/article.html" rel="noopener">https://digital.bnpmedia.com/article/Commissioning/3154465/516226/article.html</a></li>
+<li>ASHRAE, titles, purposes and scopes (Guideline 0-2019, Standard 202-2024), accessed 31 October 2026. <a href="https://www.ashrae.org/technical-resources/standards-and-guidelines/titles-purposes-and-scopes" rel="noopener">https://www.ashrae.org/technical-resources/standards-and-guidelines/titles-purposes-and-scopes</a></li>
+<li>ANSI blog, "ANSI/NETA ATS-2025: Electrical Power Testing", accessed 31 October 2026. <a href="https://blog.ansi.org/ansi/ansi-neta-ats-2025-electrical-power-testing/" rel="noopener">https://blog.ansi.org/ansi/ansi-neta-ats-2025-electrical-power-testing/</a></li>
+<li>Leviton, "Understanding Duplex Polarity" application note, accessed 31 October 2026. <a href="https://www.leviton.com/content/dam/leviton/network-solutions/product_documents/application_note/Leviton_AppNote_UnderstandingDuplexPolarity.pdf" rel="noopener">https://www.leviton.com/content/dam/leviton/network-solutions/product_documents/application_note/Leviton_AppNote_UnderstandingDuplexPolarity.pdf</a></li>
+<li>Peraturan Presiden Nomor 16 Tahun 2018, Pasal 57, accessed 31 October 2026. <a href="https://api-law.crpg.info/peraturan/perpres/16/2018/pasal/57" rel="noopener">https://api-law.crpg.info/peraturan/perpres/16/2018/pasal/57</a></li>
+<li>Balai Besar Wilayah Sungai Serayu Opak, Kementerian PUPR, SOP Serah Terima Pertama Pekerjaan Konstruksi (PHO), accessed 31 October 2026. <a href="https://sda.pu.go.id/balai/bbwsserayuopak/storage/pdf/sop/CmSla-8.%20SOP%20Serah%20Terima%20Pertama%20Pekerjaan%20Konstruksi%20(PHO)_BBWS%20SO.pdf" rel="noopener">https://sda.pu.go.id/balai/bbwsserayuopak/storage/pdf/sop/CmSla-8.%20SOP%20Serah%20Terima%20Pertama%20Pekerjaan%20Konstruksi%20(PHO)_BBWS%20SO.pdf</a></li>
+<li>Direktorat Jenderal Perbendaharaan, Kementerian Keuangan, "Retensi bukan pemeliharaan", accessed 31 October 2026. <a href="https://djpb.kemenkeu.go.id/portal/id/berita/lainnya/opini/4219-retensi-bukan-pemeliharaan.html" rel="noopener">https://djpb.kemenkeu.go.id/portal/id/berita/lainnya/opini/4219-retensi-bukan-pemeliharaan.html</a></li>
+<li>MSC-1 case ledger, <code>../case_ledger.json</code>, Data Centre Commissioning Field Manual R01 working files, October 2026.</li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="08-change-control.html"><span>Previous · 08</span><span class="t">Change control</span></a><a class="next" href="10-permits-isolation-switching-energisation.html"><span>Next · 10</span><span class="t">Permits to work, isolation, switching programmes and energisation administration</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

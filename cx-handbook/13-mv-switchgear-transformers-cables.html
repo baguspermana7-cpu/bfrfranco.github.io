@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13 Medium-voltage switchgear, transformers and cables | Cx Field Manual R01</title>
+<meta name="description" content="This chapter covers the site acceptance tests of the medium-voltage (MV) system of a data-centre campus.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/13-mv-switchgear-transformers-cables.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/13-mv-switchgear-transformers-cables.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/13-mv-switchgear-transformers-cables.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/13-mv-switchgear-transformers-cables.html">
+<meta property="og:title" content="13 Medium-voltage switchgear, transformers and cables | Cx Field Manual R01">
+<meta property="og:description" content="This chapter covers the site acceptance tests of the medium-voltage (MV) system of a data-centre campus.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="13 Medium-voltage switchgear, transformers and cables | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter covers the site acceptance tests of the medium-voltage (MV) system of a data-centre campus.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"13 Medium-voltage switchgear, transformers and cables: tests and acceptance values","name":"Medium-voltage switchgear, transformers and cables: tests and acceptance values","description":"This chapter covers the site acceptance tests of the medium-voltage (MV) system of a data-centre campus.","url":"https://resistancezero.com/cx-handbook/13-mv-switchgear-transformers-cables.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/13-mv-switchgear-transformers-cables.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":14355,"position":13,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"13 Medium-voltage switchgear, transformers and cables","item":"https://resistancezero.com/cx-handbook/13-mv-switchgear-transformers-cables.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part C · Electrical commissioning</p>
+    <h1><span class="num">13</span>Medium-voltage switchgear, transformers and cables: tests and acceptance values</h1>
+    <p class="lede">This chapter covers the site acceptance tests of the medium-voltage (MV) system of a data-centre campus.</p>
+    <p class="basis">Chapter 13 of 32 · 17 sections · 8 figures · 14,355 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 13</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 13</summary>
+<ol><li><a href="#s13-0"><span class="n">13.0</span>Scope of this chapter</a></li><li><a href="#s13-1"><span class="n">13.1</span>The MV system on MSC-1 and the test boundary</a><ol><li><a href="#s13-1-1"><span class="n">13.1.1</span>What the MV system is and why it is tested on site</a></li><li><a href="#s13-1-2"><span class="n">13.1.2</span>Test points and responsibilities</a></li><li><a href="#s13-1-3"><span class="n">13.1.3</span>Commissioning levels for MV equipment</a></li></ol></li><li><a href="#s13-2"><span class="n">13.2</span>Test programme, roles, sequence and hold points</a><ol><li><a href="#s13-2-1"><span class="n">13.2.1</span>Roles</a></li><li><a href="#s13-2-2"><span class="n">13.2.2</span>Sequence for one 20 kV switchboard section</a></li><li><a href="#s13-2-3"><span class="n">13.2.3</span>What blocks energisation</a></li></ol></li><li><a href="#s13-3"><span class="n">13.3</span>Instruments, calibration and safety for MV testing</a><ol><li><a href="#s13-3-1"><span class="n">13.3.1</span>Instruments and accuracy</a></li><li><a href="#s13-3-2"><span class="n">13.3.2</span>Safety rules for high-voltage testing</a></li><li><a href="#s13-3-3"><span class="n">13.3.3</span>Test record fields common to all MV tests</a></li></ol></li><li><a href="#s13-4"><span class="n">13.4</span>Insulation resistance, polarisation index and dielectric absorption ratio</a><ol><li><a href="#s13-4-1"><span class="n">13.4.1</span>What the test measures</a></li><li><a href="#s13-4-2"><span class="n">13.4.2</span>Test voltages and minimum values</a></li><li><a href="#s13-4-3"><span class="n">13.4.3</span>Temperature correction</a></li><li><a href="#s13-4-4"><span class="n">13.4.4</span>Polarisation index and dielectric absorption ratio</a></li><li><a href="#s13-4-5"><span class="n">13.4.5</span>Procedure for IR and PI on a 20 kV breaker panel</a></li></ol></li><li><a href="#s13-5"><span class="n">13.5</span>MV switchgear tests</a><ol><li><a href="#s13-5-1"><span class="n">13.5.1</span>What is tested and why</a></li><li><a href="#s13-5-2"><span class="n">13.5.2</span>Contact resistance</a></li><li><a href="#s13-5-3"><span class="n">13.5.3</span>Timing and travel</a></li><li><a href="#s13-5-4"><span class="n">13.5.4</span>Vacuum interrupter integrity</a></li><li><a href="#s13-5-5"><span class="n">13.5.5</span>SF6 gas checks in gas-insulated ring main units and switchgear</a></li><li><a href="#s13-5-6"><span class="n">13.5.6</span>Mechanical operation and interlocks</a></li><li><a href="#s13-5-7"><span class="n">13.5.7</span>Power-frequency withstand test of the switchgear</a></li></ol></li><li><a href="#s13-6"><span class="n">13.6</span>Instrument transformer tests</a><ol><li><a href="#s13-6-1"><span class="n">13.6.1</span>What current and voltage transformers do</a></li><li><a href="#s13-6-2"><span class="n">13.6.2</span>CT tests</a></li><li><a href="#s13-6-3"><span class="n">13.6.3</span>VT tests</a></li><li><a href="#s13-6-4"><span class="n">13.6.4</span>CT and VT record</a></li></ol></li><li><a href="#s13-7"><span class="n">13.7</span>Power transformer tests</a><ol><li><a href="#s13-7-1"><span class="n">13.7.1</span>Transformers on MSC-1</a></li><li><a href="#s13-7-2"><span class="n">13.7.2</span>Turns ratio test (TTR)</a></li><li><a href="#s13-7-3"><span class="n">13.7.3</span>Winding resistance</a></li><li><a href="#s13-7-4"><span class="n">13.7.4</span>Excitation current</a></li><li><a href="#s13-7-5"><span class="n">13.7.5</span>Insulation power factor (dissipation factor) and capacitance</a></li><li><a href="#s13-7-6"><span class="n">13.7.6</span>Sweep frequency response analysis (SFRA)</a></li><li><a href="#s13-7-7"><span class="n">13.7.7</span>Oil tests for liquid-filled transformers</a></li><li><a href="#s13-7-8"><span class="n">13.7.8</span>Dry-type (cast-resin) transformer checks</a></li><li><a href="#s13-7-9"><span class="n">13.7.9</span>Transformer protection and auxiliaries</a></li></ol></li><li><a href="#s13-8"><span class="n">13.8</span>MV cable tests: sheath, VLF withstand and tan δ</a><ol><li><a href="#s13-8-1"><span class="n">13.8.1</span>Why DC is no longer used on XLPE cables</a></li><li><a href="#s13-8-2"><span class="n">13.8.2</span>Outer sheath test</a></li><li><a href="#s13-8-3"><span class="n">13.8.3</span>VLF withstand test voltages</a></li><li><a href="#s13-8-4"><span class="n">13.8.4</span>Test set capacity</a></li><li><a href="#s13-8-5"><span class="n">13.8.5</span>Tan δ (dissipation factor) test</a></li><li><a href="#s13-8-6"><span class="n">13.8.6</span>Procedure for the VLF test of one 20 kV cable</a></li></ol></li><li><a href="#s13-9"><span class="n">13.9</span>Partial discharge testing</a><ol><li><a href="#s13-9-1"><span class="n">13.9.1</span>What partial discharge is</a></li><li><a href="#s13-9-2"><span class="n">13.9.2</span>Offline and online PD</a></li><li><a href="#s13-9-3"><span class="n">13.9.3</span>Calibration and background noise</a></li><li><a href="#s13-9-4"><span class="n">13.9.4</span>Acceptance for new MV cable systems</a></li><li><a href="#s13-9-5"><span class="n">13.9.5</span>Online PD screening of switchgear after energisation</a></li></ol></li><li><a href="#s13-10"><span class="n">13.10</span>Protection relays: secondary injection, primary injection and trip tests</a><ol><li><a href="#s13-10-1"><span class="n">13.10.1</span>Protection functions on the 20 kV system</a></li><li><a href="#s13-10-2"><span class="n">13.10.2</span>Secondary injection</a></li><li><a href="#s13-10-3"><span class="n">13.10.3</span>Primary injection</a></li><li><a href="#s13-10-4"><span class="n">13.10.4</span>Trip tests</a></li><li><a href="#s13-10-5"><span class="n">13.10.5</span>Protection record fields</a></li></ol></li><li><a href="#s13-11"><span class="n">13.11</span>Earthing, phasing and pre-energisation checks</a><ol><li><a href="#s13-11-1"><span class="n">13.11.1</span>Earthing of MV equipment</a></li><li><a href="#s13-11-2"><span class="n">13.11.2</span>Phasing</a></li><li><a href="#s13-11-3"><span class="n">13.11.3</span>Pre-energisation checklist for one 20 kV section</a></li></ol></li><li><a href="#s13-12"><span class="n">13.12</span>Energisation and post-energisation checks</a></li><li><a href="#s13-13"><span class="n">13.13</span>Test records and data fields</a><ol><li><a href="#s13-13-1"><span class="n">13.13.1</span>Switchgear record (filled example)</a></li><li><a href="#s13-13-2"><span class="n">13.13.2</span>Transformer record (filled example)</a></li><li><a href="#s13-13-3"><span class="n">13.13.3</span>Cable record (filled example)</a></li></ol></li><li><a href="#s13-14"><span class="n">13.14</span>Common errors, detection before the witness test and KPIs</a></li><li><a href="#s13-15"><span class="n">13.15</span>Checklist for site use</a></li><li><a href="#s13-16"><span class="n">13.16</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="12-handover-administration.html"><span>Previous</span>12 Handover administration</a><a href="14-lv-switchboards-busway-breakers-relays.html"><span>Next</span>14 Low-voltage switchboards, busway, circuit breakers and protection relays</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s13-0"><span class="n">13.0</span>Scope of this chapter</h2>
+<p>This chapter covers the site acceptance tests of the medium-voltage (MV) system of a data-centre campus. The equipment is the 20 kV switchgear, the 150/20 kV and 20/0.415 kV transformers, the 20 kV cables, the instrument transformers and the protection relays. For every test the chapter gives the instrument, the connection, the applied value, the duration, and the acceptance value with its source. It also gives the fields of the test record and the errors found most often before a witness test.</p>
+<ol>
+<li><strong>The MV system and the test boundary.</strong> The MSC-1 20 kV single-line diagram, the test points and who tests what.</li>
+<li><strong>Test programme and hold points.</strong> The order of tests, the roles, the time limits and what blocks energisation.</li>
+<li><strong>Instruments and safety.</strong> Calibration, accuracy, earthing of test objects and the permit to test.</li>
+<li><strong>Insulation resistance.</strong> Test voltages, minimum values from the ANSI/NETA Acceptance Testing Specifications (ATS), temperature correction, polarisation index (PI) and dielectric absorption ratio (DAR).</li>
+<li><strong>Switchgear tests.</strong> Contact resistance, timing, vacuum interrupter integrity, sulphur hexafluoride (SF6) gas checks, interlocks and the power-frequency withstand test.</li>
+<li><strong>Instrument transformers.</strong> Current transformer (CT) and voltage transformer (VT) ratio, polarity, excitation, burden and insulation.</li>
+<li><strong>Power transformers.</strong> Turns ratio (TTR), winding resistance, excitation current, power factor, sweep frequency response analysis (SFRA), oil tests and dry-type checks.</li>
+<li><strong>MV cables.</strong> Sheath test, very low frequency (VLF) withstand, tan δ (dissipation factor) and the decision rules.</li>
+<li><strong>Partial discharge.</strong> Offline measurement to IEC 60270, online measurement and calibration.</li>
+<li><strong>Protection.</strong> Relay secondary injection, primary injection, trip tests and setting control.</li>
+<li><strong>Pre-energisation checks.</strong> Earthing, phasing, interlocks and the energisation record.</li>
+<li><strong>Records and errors.</strong> Data fields of every record, filled examples and common errors.</li>
+</ol>
+<p>Documents and standards used: ANSI/NETA ATS-2025 (Standard for Acceptance Testing Specifications for Electrical Power Equipment and Systems), IEEE 400-2023 and IEEE 400.2-2024 (field testing of shielded power cable systems, VLF), IEEE 400.3 (partial discharge testing of cable systems in the field) and IEC 60270:2025 (partial discharge measurements). The chapter also uses IEC 62271-1 and IEC 62271-200:2021 (MV switchgear), IEC 62271-100 (circuit breakers), IEC 60076-1 and IEC 60076-18 (power transformers and frequency response), IEEE C57.152-2025 (diagnostic field testing of liquid-filled transformers) and IEEE C57.106 (acceptance and maintenance of insulating mineral oil). It also uses IEC 60422 Ed. 5.0 (2024) (mineral oil supervision), IEC 61869-2 and -3 (CTs and VTs), IEC 60255-151 (overcurrent relay curves), IEEE 43 (insulation resistance of rotating machines, used here only for PI guidance), IEC 60502-2 (MV extruded cables) and the MSC-1 case numbers in <code>case_ledger.json</code>. Where a value could not be checked against the current edition, the text marks it for confirmation and names the document and the table or clause that holds the value.</p>
+<h2 id="s13-1"><span class="n">13.1</span>The MV system on MSC-1 and the test boundary</h2>
+
+<figure class="sheet" id="F13-1"><a href="../data/cx-handbook/figures/F13-1.svg" title="Open drawing F13-1 at full size"><img src="../data/cx-handbook/figures/F13-1.svg" alt="F13-1: MSC-1 20 kV single-line diagram for one transformer section with the test points of chapter 13" width="1400" height="1128" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F13-1</span> — <b>MSC-1 20 kV single-line diagram for one transformer section with the test points of chapter 13</b>. Each numbered test point T1 to T9 is the place where the test of the same number in table 13.1.2 is connected.</figcaption></figure>
+<h3 id="s13-1-1"><span class="n">13.1.1</span>What the MV system is and why it is tested on site</h3>
+<p>The MV system takes power from the 150 kV utility connection and distributes it at 20 kV to the buildings. In each building, block transformers reduce it to 415 V for the uninterruptible power supply (UPS) and mechanical loads. On a data-centre campus a few MV circuits carry many megawatts of information technology (IT) load, so a failed cable joint or a wrong relay setting can trip a whole building. Factory tests prove the design and the manufacture of each item. Site tests prove that the items survived transport and installation, that they are connected correctly and that the protection operates as the study requires.</p>
+<p>Figure <a class="figref" href="#F13-1">F13-1</a> shows one transformer section of the MSC-1 20 kV system with the test points used in this chapter.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>MSC-1 quantity</th>
+<th>Value</th>
+<th>Use in this chapter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Main transformers</td>
+<td>4 × 80 MVA, 150/20 kV, impedance uk 16.5 %</td>
+<td>turns ratio (TTR), winding resistance, oil tests, SFRA</td>
+</tr>
+<tr>
+<td>Current per transformer at 20 kV, normal</td>
+<td>1,334.6 A</td>
+<td>CT ratio choice, primary injection current</td>
+</tr>
+<tr>
+<td>Current per transformer, one path lost</td>
+<td>2,193.9 A</td>
+<td>incomer rating check, thermal test load</td>
+</tr>
+<tr>
+<td>20 kV section fault level, tie open</td>
+<td>13.2 kA</td>
+<td>relay settings, partial discharge (PD) and withstand safety distances</td>
+</tr>
+<tr>
+<td>20 kV fault level, tie closed</td>
+<td>25.0 kA</td>
+<td>switchgear rating check</td>
+</tr>
+<tr>
+<td>Switchgear short-circuit class</td>
+<td>31.5 kA</td>
+<td>nameplate check at receipt</td>
+</tr>
+<tr>
+<td>Building feeders</td>
+<td>2 per building, 1,334.6 A each</td>
+<td>feeder breaker and cable tests</td>
+</tr>
+<tr>
+<td>Block transformers</td>
+<td>2.5 MVA, 20/0.415 kV, low-voltage (LV) current 3,478 A</td>
+<td>TTR, winding resistance, dry-type checks</td>
+</tr>
+<tr>
+<td>150 kV fault level</td>
+<td>31.5 kA</td>
+<td>150 kV side tests, power quality chapter 17</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-1-2"><span class="n">13.1.2</span>Test points and responsibilities</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point</th>
+<th>Equipment</th>
+<th>Tests</th>
+<th>Performed by</th>
+<th>Witnessed by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>80 MVA transformer TX-A</td>
+<td>insulation resistance (IR), PI, TTR, winding resistance, excitation current, power factor, SFRA, oil</td>
+<td>transformer original equipment manufacturer (OEM) or testing contractor</td>
+<td>commissioning authority (CxA), owner's electrical engineer</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>20 kV breakers Q01 to Q13</td>
+<td>contact resistance, timing, vacuum integrity, mechanical operation, interlocks</td>
+<td>switchgear OEM</td>
+<td>CxA</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>CTs and VTs</td>
+<td>ratio, polarity, excitation, burden, insulation</td>
+<td>testing contractor</td>
+<td>CxA</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>Protection relays</td>
+<td>secondary injection of every enabled element</td>
+<td>protection testing contractor</td>
+<td>CxA, protection engineer</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>CT to relay chain</td>
+<td>primary injection</td>
+<td>testing contractor</td>
+<td>CxA</td>
+</tr>
+<tr>
+<td>T6</td>
+<td>Trip circuits</td>
+<td>trip from relay to breaker, lockout relay 86</td>
+<td>testing contractor</td>
+<td>CxA</td>
+</tr>
+<tr>
+<td>T7</td>
+<td>20 kV cables</td>
+<td>outer sheath test</td>
+<td>cable installer</td>
+<td>CxA</td>
+</tr>
+<tr>
+<td>T8</td>
+<td>20 kV cables</td>
+<td>VLF withstand with tan δ, or monitored withstand</td>
+<td>testing contractor</td>
+<td>CxA, cable supplier</td>
+</tr>
+<tr>
+<td>T9</td>
+<td>Open tie or feeder end</td>
+<td>phasing and phase rotation</td>
+<td>testing contractor</td>
+<td>CxA, operations</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-1-3"><span class="n">13.1.3</span>Commissioning levels for MV equipment</h3>
+<p>This chapter uses the level definitions of section 02.3.2 (L0 to L6). The MV tests in this chapter sit at Level 1 (factory acceptance test) and Level 2 (site installation and pre-energisation tests), with energisation and start-up at Level 3 and functional checks at Level 4.</p>
+<ol>
+<li><strong>Level 0, design and submittal review.</strong> The CxA checks the approved data sheets, the routine test certificates format and the inspection and test plan (ITP) before manufacture. The output is the approved ITP with hold and witness points.</li>
+<li><strong>Level 1, factory acceptance test.</strong> The CxA witnesses routine tests at the factory: power-frequency withstand, partial discharge on transformers, ratio and losses. The output is the signed factory acceptance test (FAT) report.</li>
+<li><strong>Level 2, installation and pre-energisation tests.</strong> Every test in sections 13.4 to 13.11 is done after installation and before energisation. The output is one signed Level 2 test record per device, for example ELE-L2-MVSG-Q11.</li>
+<li><strong>Level 3, energisation and start-up.</strong> The equipment is energised under a switching programme, phasing is confirmed, and metering and alarms are checked live. The output is the energisation record and the Level 3 start-up checklist.</li>
+<li><strong>Level 4 and Level 5, functional and integrated tests.</strong> The MV system takes part in the functional transfer tests at Level 4 and in the loss-of-utility and transfer scenarios of the integrated systems test at Level 5 (chapter 28).</li>
+</ol>
+<h2 id="s13-2"><span class="n">13.2</span>Test programme, roles, sequence and hold points</h2>
+<h3 id="s13-2-1"><span class="n">13.2.1</span>Roles</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Responsibility in MV testing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commissioning manager (CxM)</td>
+<td>owns the programme, sets the sequence, chairs the energisation readiness review, signs the Level 2 summary</td>
+</tr>
+<tr>
+<td>Commissioning authority (CxA)</td>
+<td>witnesses tests, checks results against acceptance values, raises issues</td>
+</tr>
+<tr>
+<td>Testing contractor (NETA certified technicians or equal)</td>
+<td>performs the tests, owns the instruments and calibration certificates, writes the reports</td>
+</tr>
+<tr>
+<td>Equipment OEM</td>
+<td>performs OEM-specific tests (breaker timing, transformer SFRA baseline), confirms warranty conditions</td>
+</tr>
+<tr>
+<td>Protection engineer</td>
+<td>issues the protection study and setting files, approves deviations</td>
+</tr>
+<tr>
+<td>Authorised person (high voltage)</td>
+<td>issues permits to work and permits to test, applies and removes earths</td>
+</tr>
+<tr>
+<td>Owner's operations representative</td>
+<td>receives the energised equipment and the records</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-2-2"><span class="n">13.2.2</span>Sequence for one 20 kV switchboard section</h3>
+<p>The sequence below is for one bus section with its incomer transformer and feeders. Times are working days after the trigger.</p>
+<ol>
+<li><strong>Installation inspection.</strong> The installer completes the Level 2 installation checklist: anchoring, busbar joints torqued and marked, earthing connected, cable terminations made to the OEM instruction. Time limit: 2 days after mechanical completion.</li>
+<li><strong>Insulation resistance of busbars and breakers.</strong> The testing contractor tests each phase to earth and between phases at 5,000 V DC for 1 minute. Time limit: 1 day. A failed value blocks the withstand test.</li>
+<li><strong>Contact resistance and timing.</strong> The OEM tests each breaker. Time limit: 2 days for a section of 10 panels.</li>
+<li><strong>Instrument transformer tests.</strong> Ratio, polarity, excitation and burden for each CT and VT. Time limit: 2 days.</li>
+<li><strong>Power-frequency withstand of the switchgear.</strong> Applied only after steps 2 to 4 pass, with VTs and surge arresters disconnected. Time limit: 1 day.</li>
+<li><strong>Relay secondary injection.</strong> Each enabled protection element against the approved setting file. Time limit: 0.5 day per relay.</li>
+<li><strong>Primary injection.</strong> CT to relay chain for every protection CT. Time limit: 2 days per section.</li>
+<li><strong>Trip tests.</strong> Each relay trips its breaker through the real trip circuit. Time limit: 1 day.</li>
+<li><strong>Cable tests.</strong> Sheath test, VLF withstand with tan δ on each feeder cable after terminations are complete. Time limit: 1 day per 3 cables.</li>
+<li><strong>Transformer tests.</strong> Section 13.7 tests on the incomer transformer, oil results received from the laboratory. Time limit: 5 days including laboratory time.</li>
+<li><strong>Pre-energisation review.</strong> The CxM reviews all records with the CxA and the authorised person. Time limit: 1 day. The <mark>energisation readiness certificate is signed only when every Level 2 record is complete and every open issue is category C or lower</mark>.</li>
+<li><strong>Energisation and phasing.</strong> Under the switching programme of chapter 10. Phasing at the open tie (T9) before the tie is ever closed.</li>
+</ol>
+<h3 id="s13-2-3"><span class="n">13.2.3</span>What blocks energisation</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Effect</th>
+<th>Who clears it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Any IR value below the acceptance value</td>
+<td>blocks withstand and energisation</td>
+<td>testing contractor retests after cause found; CxA accepts</td>
+</tr>
+<tr>
+<td>Withstand test breakdown or flashover</td>
+<td>blocks energisation of that circuit</td>
+<td>OEM repairs, full retest of that circuit</td>
+</tr>
+<tr>
+<td>VLF tan δ in "action required" or tip-up above limit on a new cable</td>
+<td>blocks energisation of that cable</td>
+<td>installer locates and repairs, retest</td>
+</tr>
+<tr>
+<td>Relay setting file revision different from the approved study</td>
+<td>blocks energisation of that circuit</td>
+<td>protection engineer issues corrected file</td>
+</tr>
+<tr>
+<td>Trip test not done on any breaker</td>
+<td>blocks energisation of that breaker</td>
+<td>testing contractor</td>
+</tr>
+<tr>
+<td>Oil breakdown voltage (BDV) or moisture outside limits</td>
+<td>blocks energisation of the transformer</td>
+<td>transformer OEM processes oil, resamples</td>
+</tr>
+<tr>
+<td>Missing calibration certificate for an instrument used</td>
+<td>result not accepted</td>
+<td>testing contractor repeats with calibrated instrument</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s13-3"><span class="n">13.3</span>Instruments, calibration and safety for MV testing</h2>
+<h3 id="s13-3-1"><span class="n">13.3.1</span>Instruments and accuracy</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Instrument</th>
+<th>Typical range</th>
+<th>Accuracy or class (check the data sheet)</th>
+<th>Calibration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Insulation resistance</td>
+<td>insulation tester 5 kV or 10 kV</td>
+<td>up to 10 TΩ</td>
+<td>±5 % of reading in the main range</td>
+<td>yearly, certificate traceable to national standards</td>
+</tr>
+<tr>
+<td>Contact resistance</td>
+<td>micro-ohmmeter (DLRO)</td>
+<td>100 A to 600 A DC</td>
+<td>±0.25 % of reading ± a few digits (typical)</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Breaker timing</td>
+<td>timing analyser</td>
+<td>0.1 ms resolution</td>
+<td>±0.1 ms timing (typical)</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>CT and VT</td>
+<td>CT analyser</td>
+<td>voltage method to several kV knee point</td>
+<td>ratio ±0.05 % to ±0.1 % (typical)</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>TTR</td>
+<td>three-phase turns ratio tester</td>
+<td>ratio to 10,000</td>
+<td>±0.1 % (typical)</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Winding resistance</td>
+<td>winding resistance meter</td>
+<td>1 µΩ to 2 kΩ, 10 A to 50 A</td>
+<td>±0.1 % to ±0.2 % (typical)</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Power factor</td>
+<td>insulation power factor test set</td>
+<td>10 kV, 50 Hz or variable frequency</td>
+<td>±0.5 % of reading for capacitance (typical)</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>SFRA</td>
+<td>frequency response analyser</td>
+<td>20 Hz to 2 MHz</td>
+<td>±1 dB to -100 dB (typical)</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>VLF and tan δ</td>
+<td>VLF sine 0.1 Hz test set with tan δ module</td>
+<td>0 to 45 kV or 60 kV rms</td>
+<td>tan δ resolution 1 × 10⁻⁴</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Partial discharge</td>
+<td>PD detector to IEC 60270 with calibrator</td>
+<td>1 pC to 10 nC</td>
+<td>calibrator certificate yearly</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Relay testing</td>
+<td>three-phase secondary injection set</td>
+<td>0 to 32 A per phase, 0 to 300 V</td>
+<td>±0.05 % of reading (typical)</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Primary injection</td>
+<td>high-current injection set</td>
+<td>0 to 2,000 A or more</td>
+<td>±1 % to ±2 % with reference CT</td>
+<td>yearly</td>
+</tr>
+<tr>
+<td>Phasing</td>
+<td>phasing sticks or voltage detector</td>
+<td>20 kV system</td>
+<td>to IEC 61243</td>
+<td>before each use, self test</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> The calibration certificate date is within 12 months on the test day, the serial number on the certificate matches the instrument and the certificate number is entered in the test record. A result from an instrument without a valid certificate is repeated.</p>
+<h3 id="s13-3-2"><span class="n">13.3.2</span>Safety rules for high-voltage testing</h3>
+<p>Figure <a class="figref" href="#F13-8">F13-8</a> shows the permit-to-test arrangement for the IR test of cable B2-MV-C-011. It shows the barriers at both ends, the earths removed for the test, the discharge time and the record of each step.</p>
+<figure class="sheet" id="F13-8"><a href="../data/cx-handbook/figures/F13-8.svg" title="Open drawing F13-8 at full size"><img src="../data/cx-handbook/figures/F13-8.svg" alt="F13-8: Permit to test for a 20 kV cable: test area, barriers, earths and discharge" width="1000" height="723" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F13-8</span> — <b>Permit to test for a 20 kV cable: test area, barriers, earths and discharge</b>. The permit to test names the test object, the two barrier zones and each earth that may be removed; the earths go back on after the discharge time and are counted against the earth log.</figcaption></figure>
+
+<ol>
+<li><strong>Permit to test.</strong> The authorised person issues a permit to test for each high-voltage (HV) test (IR at 5 kV, withstand, VLF, PD). The permit names the test object, the limits of the test area and the earths that may be removed for the test.</li>
+<li><strong>Barrier and signs.</strong> The test area is fenced with barrier tape or barriers and signed "Danger: high-voltage testing". The far end of a cable has its own barrier and a person with a radio, or is locked in a room.</li>
+<li><strong>Earths.</strong> Earths are removed <mark>only for the duration of the test</mark>, by the authorised person, and replaced after the discharge time.</li>
+<li><strong>Discharge.</strong> After any DC test the object is discharged through the instrument and then earthed for at least four times the test duration, or as the instrument manual states. For example, <mark>a 420 m cross-linked polyethylene (XLPE) cable charged to 5 kV DC holds a lethal charge</mark> until it is earthed.</li>
+<li><strong>VT and surge arrester removal.</strong> VTs, surge arresters and electronic devices on the busbar are disconnected before a withstand test. Their disconnection is listed in the test sheet and checked by the CxA before voltage is applied.</li>
+<li><strong>Weather and humidity.</strong> Outdoor terminations are tested dry. If relative humidity in the room is above the instrument or OEM limit (for example 80 %), the test is postponed or surfaces are cleaned and dried.</li>
+</ol>
+<h3 id="s13-3-3"><span class="n">13.3.3</span>Test record fields common to all MV tests</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Record number</td>
+<td>text</td>
+<td>ELE-L2-MVSG-Q11-IR</td>
+</tr>
+<tr>
+<td>Device tag</td>
+<td>text</td>
+<td>MSC1-SS1-20KV-A-Q11</td>
+</tr>
+<tr>
+<td>Test standard and edition</td>
+<td>text</td>
+<td>ANSI/NETA ATS-2025 7.6.3</td>
+</tr>
+<tr>
+<td>Date and time</td>
+<td>date-time</td>
+<td>2026-11-12 09:40</td>
+</tr>
+<tr>
+<td>Ambient temperature, relative humidity</td>
+<td>number °C, %</td>
+<td>29 °C, 64 %</td>
+</tr>
+<tr>
+<td>Equipment temperature</td>
+<td>number °C</td>
+<td>31 °C</td>
+</tr>
+<tr>
+<td>Instrument, serial number, calibration certificate and due date</td>
+<td>text</td>
+<td>5 kV IR tester, SN 1023471, cert C-25-0812, due 2027-03-14</td>
+</tr>
+<tr>
+<td>Applied value and duration</td>
+<td>number and unit</td>
+<td>5,000 V DC, 60 s</td>
+</tr>
+<tr>
+<td>Result per phase</td>
+<td>number and unit</td>
+<td>L1-E 28.2 GΩ, L2-E 27.9 GΩ, L3-E 28.6 GΩ</td>
+</tr>
+<tr>
+<td>Acceptance value and source</td>
+<td>text</td>
+<td>≥ 10,000 MΩ, ANSI/NETA ATS-2021 Table 100.1, 25 kV class (confirm against ANSI/NETA ATS-2025 Table 100.1)</td>
+</tr>
+<tr>
+<td>Pass or fail</td>
+<td>list</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Tested by, witnessed by, signatures</td>
+<td>text</td>
+<td>testing contractor technician, CxA</td>
+</tr>
+<tr>
+<td>Remarks and issue number</td>
+<td>text</td>
+<td>none</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s13-4"><span class="n">13.4</span>Insulation resistance, polarisation index and dielectric absorption ratio</h2>
+
+<figure class="sheet" id="F13-3"><a href="../data/cx-handbook/figures/F13-3.svg" title="Open drawing F13-3 at full size"><img src="../data/cx-handbook/figures/F13-3.svg" alt="F13-3: Insulation resistance against time at 5000 V DC: polarisation index of two transformer windings (example)" width="1400" height="746" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F13-3</span> — <b>Insulation resistance against time at 5000 V DC: polarisation index of two transformer windings (example)</b>. The absorption current falls with time in dry insulation, so the resistance keeps rising; in wet or contaminated insulation the leakage current dominates and the curve is flat.</figcaption></figure>
+<h3 id="s13-4-1"><span class="n">13.4.1</span>What the test measures</h3>
+<p>The insulation resistance (IR) test applies a DC voltage between a conductor and earth (or between conductors) and measures the current. The current has three parts: the capacitive charging current, which falls to zero in seconds; the absorption current, which falls slowly over minutes as the insulation polarises; and the leakage current, which stays constant. Clean, dry insulation shows a resistance that keeps rising for 10 minutes because the absorption current keeps falling. Wet or contaminated insulation shows a flat curve because the leakage current dominates.</p>
+<p>Figure <a class="figref" href="#F13-3">F13-3</a> shows the IR against time for a dry and a wet transformer winding.</p>
+<h3 id="s13-4-2"><span class="n">13.4.2</span>Test voltages and minimum values</h3>
+<p>The tables below give the representative values used in the absence of manufacturer data. The manufacturer's published value governs when it exists.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Equipment voltage rating</th>
+<th>DC test voltage</th>
+<th>Minimum IR (switchgear, cables, general apparatus)</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1,000 V class</td>
+<td>1,000 V</td>
+<td>100 MΩ</td>
+<td>NETA ATS Table 100.1 (600 V row; confirm the 1,000 V row against ANSI/NETA ATS-2025 Table 100.1)</td>
+</tr>
+<tr>
+<td>5 kV class</td>
+<td>2,500 V</td>
+<td>1,500 MΩ</td>
+<td>ANSI/NETA ATS-2021 Table 100.1</td>
+</tr>
+<tr>
+<td>15 kV class</td>
+<td>2,500 V</td>
+<td>5,000 MΩ</td>
+<td>NETA ATS Table 100.1</td>
+</tr>
+<tr>
+<td>25 kV class (20 kV system)</td>
+<td>5,000 V</td>
+<td>10,000 MΩ</td>
+<td>ANSI/NETA ATS-2021 Table 100.1 (confirm against ANSI/NETA ATS-2025 Table 100.1)</td>
+</tr>
+<tr>
+<td>34.5 kV class</td>
+<td>5,000 V</td>
+<td>100,000 MΩ</td>
+<td>ANSI/NETA ATS-2021 Table 100.1 (confirm against ANSI/NETA ATS-2025 Table 100.1)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Transformer winding voltage</th>
+<th>DC test voltage</th>
+<th>Minimum, liquid-filled</th>
+<th>Minimum, dry-type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 to 600 V</td>
+<td>1,000 V</td>
+<td>100 MΩ</td>
+<td>500 MΩ</td>
+<td>NETA ATS Table 100.5 (ATS-2017 values reproduced in RF-13 row 27)</td>
+</tr>
+<tr>
+<td>601 to 5,000 V</td>
+<td>2,500 V</td>
+<td>1,000 MΩ</td>
+<td>5,000 MΩ</td>
+<td>NETA ATS Table 100.5</td>
+</tr>
+<tr>
+<td>Above 5,000 V</td>
+<td>5,000 V</td>
+<td>5,000 MΩ</td>
+<td>25,000 MΩ</td>
+<td>NETA ATS Table 100.5</td>
+</tr>
+</tbody>
+</table></div>
+<p>ANSI/NETA ATS-2021 Table 100.1 gives 10,000 MΩ at 5,000 V DC for the 25 kV class and 100,000 MΩ at 5,000 V DC for the 34.5 kV class. An older undated copy of the table gave 20,000 MΩ at 5,000 V DC for the 25 kV class and 15,000 V DC for the 34.5 kV class. Earlier revisions of this manual used those values. The project specification and the ATS edition in the contract govern.</p>
+<p><strong>Source:</strong> ANSI/NETA ATS-2021 Table 100.1 (RF-13 rows 34 to 36) and ANSI/NETA ATS Table 100.5 as quoted in RF-13 rows 4 and 27. MSC-1 uses <mark>10,000 MΩ at 5,000 V DC</mark> for 20 kV switchgear and cable, the value agreed across the chapters of this manual. ATS-2025 added Table 100.6 for MV cable acceptance values; for cables use Table 100.6 of the edition in the contract.</p>
+<h3 id="s13-4-3"><span class="n">13.4.3</span>Temperature correction</h3>
+<p>Insulation resistance falls as temperature rises. NETA ATS Table 100.14 gives correction factors to a 20 °C base. A field approximation used for many insulation systems is that the resistance halves for each 10 °C rise. Record the winding or equipment temperature, apply the factor from the table in the contract edition and compare the corrected value with the minimum.</p>
+<p><strong>Worked example:</strong> The HV winding of transformer TX-A reads 6,200 MΩ at 1 minute at 5,000 V DC with the winding at 30 °C. Using the halving approximation, the factor from 30 °C to 20 °C is 2.0, so the corrected value is 6,200 × 2.0 = 12,400 MΩ. The minimum for a liquid-filled winding above 5,000 V is 5,000 MΩ, so the winding passes with a corrected value <mark>2.5 times the minimum</mark>. The record states the factor used and its source (Table 100.14 in the contract edition; the 2.0 here is the halving approximation and must be confirmed against the table).</p>
+<h3 id="s13-4-4"><span class="n">13.4.4</span>Polarisation index and dielectric absorption ratio</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Definition</th>
+<th>Use</th>
+<th>Practice guide value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Polarisation index (PI)</td>
+<td>R at 10 min / R at 1 min</td>
+<td>transformers, large cables, machines</td>
+<td>below 1.0 investigate; IEEE 43 asks 2.0 or more for class B and higher machine insulation; transformers compared with factory value</td>
+</tr>
+<tr>
+<td>Dielectric absorption ratio (DAR)</td>
+<td>R at 60 s / R at 30 s</td>
+<td>quick check where 10 min is not practical</td>
+<td>1.25 or more is commonly used as acceptable (practice, not a standard limit)</td>
+</tr>
+</tbody>
+</table></div>
+<p>A PI is not meaningful when the 1-minute value is high (above about 5,000 MΩ on small equipment), because the instrument current is then close to its resolution. In that case the 1-minute value alone is used. <mark>A transformer PI is compared with the factory PI and with the other windings</mark> of the same unit. Oil-paper insulation in a new transformer shows a PI between 1.3 and 3, depending on temperature and oil condition.</p>
+<h3 id="s13-4-5"><span class="n">13.4.5</span>Procedure for IR and PI on a 20 kV breaker panel</h3>
+<p><strong>Purpose:</strong> Prove that the busbar, breaker and connections of one panel have no insulation defect before the withstand test.</p>
+<p><strong>Owner:</strong> Testing contractor; witnessed by the CxA.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Isolate and earth.</strong> The authorised person isolates the bus section, proves dead with a tested detector and applies portable earths. The permit to test lists the earths to be removed.</li>
+<li><strong>Disconnect sensitive items.</strong> Disconnect VT primaries (or rack out the VT truck), surge arresters, capacitive voltage indicators that the OEM lists as not suitable and cable terminations. Record each disconnection.</li>
+<li><strong>Clean.</strong> Wipe insulators and bushings with a clean, lint-free cloth and the OEM-approved solvent.</li>
+<li><strong>Connect.</strong> Connect the line lead to the phase under test, the earth lead to the panel earth bar and short and earth the other two phases. Use the guard terminal on the bushing surface if surface leakage is suspected.</li>
+<li><strong>Apply.</strong> Apply 5,000 V DC (25 kV class equipment) and record the value at 30 s, 1 min and, for transformers or cables, 10 min.</li>
+<li><strong>Repeat.</strong> Repeat for each phase to earth and, with the breaker open, across the open contacts of each pole.</li>
+<li><strong>Discharge.</strong> Let the instrument discharge the object, then apply the earth for at least four times the test duration.</li>
+<li><strong>Compare.</strong> Compare the corrected 1-minute values with Table 100.1 and the three phases with each other. A phase more than about 50 % below the other two is investigated even when it passes the minimum (practice).</li>
+<li><strong>Record.</strong> Fill the record of 13.3.3 and sign.</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Surface leakage.</strong> Humid air and dust on bushings give a low value. The guard terminal on a bare copper wrap around the bushing removes surface current from the reading.</li>
+<li><strong>VT left connected.</strong> A connected VT primary reads as a low IR and can be damaged by the test voltage. The disconnection list prevents it.</li>
+<li><strong>Too short a discharge.</strong> The next person touches a charged busbar. The earth is applied before any lead is moved.</li>
+<li><strong>No temperature recorded.</strong> The value cannot be corrected and compared with factory data. The temperature field is mandatory in the form.</li>
+</ol>
+<h2 id="s13-5"><span class="n">13.5</span>MV switchgear tests</h2>
+<h3 id="s13-5-1"><span class="n">13.5.1</span>What is tested and why</h3>
+<p>A 20 kV vacuum circuit breaker interrupts fault currents up to its rated short-circuit breaking current (31.5 kA on MSC-1) in a few tens of milliseconds. The contact resistance test proves that the contacts are clean and correctly adjusted. The timing test proves that the mechanism operates within the OEM time limits. The vacuum integrity test proves that the interrupters have not lost vacuum. The interlock tests prove that unsafe operation is prevented, and the withstand test proves that the complete assembly withstands its test voltage after installation.</p>
+<h3 id="s13-5-2"><span class="n">13.5.2</span>Contact resistance</h3>
+<p>Instrument used: Micro-ohmmeter (digital low-resistance ohmmeter, DLRO) with a DC test current of at least 100 A. A current below 100 A does not break through thin oxide films and gives a pessimistic value.</p>
+<p>Connection: Current leads on the outer terminals of the pole (busbar spout and cable spout of the truck or of the fixed breaker), potential leads inside the current leads, on the same conductors. The breaker is closed and racked to the service or test position the OEM specifies.</p>
+<p><strong>Acceptance:</strong> The value is not above the manufacturer's published maximum. As a fallback, <mark>if the manufacturer's value is not available, investigate any pole that deviates from the adjacent poles or similar breakers by more than 50 % of the lowest value</mark> (NETA ATS, RF-13 row 5).</p>
+<p><strong>Worked example:</strong> Breaker Q11 (1,600 A vacuum breaker) reads 28 µΩ on L1, 31 µΩ on L2 and 45 µΩ on L3 at 200 A DC. The lowest value is 28 µΩ; 50 % of 28 is 14, so the investigation limit is 28 + 14 = 42 µΩ. L3 at 45 µΩ exceeds 42 µΩ and is investigated, although all three are below the OEM maximum of 50 µΩ (example OEM value). The OEM checks the L3 plug-in contacts, finds one finger with low pressure, replaces the contact cluster and the retest reads 30 µΩ. The record shows the as-found, the action and the as-left value.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Breaker tag and serial</td>
+<td>text</td>
+<td>Q11, SN 26-04411</td>
+</tr>
+<tr>
+<td>Position during test</td>
+<td>list</td>
+<td>service position, closed</td>
+</tr>
+<tr>
+<td>Test current</td>
+<td>number A</td>
+<td>200</td>
+</tr>
+<tr>
+<td>L1, L2, L3 resistance</td>
+<td>number µΩ</td>
+<td>28, 31, 45 (as found); 28, 31, 30 (as left)</td>
+</tr>
+<tr>
+<td>OEM maximum</td>
+<td>number µΩ</td>
+<td>50 (example)</td>
+</tr>
+<tr>
+<td>50 % rule limit</td>
+<td>number µΩ</td>
+<td>42</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>list</td>
+<td>as found: investigate; as left: pass</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-5-3"><span class="n">13.5.3</span>Timing and travel</h3>
+<p>Instrument used: Breaker timing analyser with main contact channels, coil current channels and, where the OEM provides a mounting, a travel transducer.</p>
+<p>Connection: One main contact channel across each pole (with one side earthed as the instrument allows, or using a dual-ground method for safety), coil current clamp on the close and trip coil circuits, trigger from the analyser to the close and trip command.</p>
+<p>Tests performed: Close time, open (trip) time, pole spread (difference between the first and last pole), close-open (CO) time and, if the breaker has an auto-reclose duty, open-close-open sequence. Tests are done at rated control voltage and, as the OEM manual allows, at minimum control voltage. Typical minimum values are 85 % for close coils and 70 % for trip coils (confirm the percentages against IEC 62271-1:2017+A1:2021 6.9.2, shunt closing release, and 6.9.3, shunt opening release, and the OEM manual).</p>
+<p><strong>Acceptance:</strong> The OEM routine test values with their tolerance. Typical vacuum breaker values are opening times of 30 to 60 ms and closing times of 40 to 80 ms; the routine test report gives the exact values for each serial number. For pole spread, the OEM limit applies; values of about 2 to 3 ms for opening and 3 to 5 ms for closing are common on 50 Hz equipment (OEM routine test report; confirm against IEC 62271-100:2021+AMD1:2024 6.101, simultaneity of poles, and 8.101, mechanical operating tests, and the OEM manual; clause numbers read in the 2021 base text).</p>
+<p><strong>Worked example:</strong> Q11 trip at 110 V DC: L1 38.2 ms, L2 38.9 ms, L3 39.6 ms. Pole spread = 39.6 - 38.2 = <mark>1.4 ms</mark>. The OEM routine report gives 40 ms ±5 ms opening and 2 ms maximum spread. The breaker passes. At 77 V DC (70 % of 110 V) the trip time is 44.1 ms, still inside the OEM limit for minimum voltage.</p>
+<h3 id="s13-5-4"><span class="n">13.5.4</span>Vacuum interrupter integrity</h3>
+<p>A vacuum interrupter that has lost vacuum looks normal and has normal contact resistance, but it cannot interrupt current. The site test is an AC (or DC where the OEM permits) withstand across the open contacts at the OEM value, for 1 minute unless the OEM states another duration. <mark>Any breakdown across the open gap means the interrupter is replaced</mark>. Some OEMs supply a dedicated vacuum checker that applies a high voltage with a magnetic field (magnetron method) and reads the internal pressure. The record names the OEM procedure number, the applied voltage and the result for each pole.</p>
+<h3 id="s13-5-5"><span class="n">13.5.5</span>SF6 gas checks in gas-insulated ring main units and switchgear</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Instrument</th>
+<th>Acceptance</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gas pressure or density</td>
+<td>built-in density monitor; calibrated gauge if access is given</td>
+<td>in the green zone or above the OEM minimum filling density at 20 °C</td>
+<td>OEM manual</td>
+</tr>
+<tr>
+<td>Density monitor alarm and lockout contacts</td>
+<td>adjustable gas source (only on units designed for it) or OEM test</td>
+<td>alarm and lockout at the OEM values</td>
+<td>OEM manual</td>
+</tr>
+<tr>
+<td>Leak test</td>
+<td>handheld SF6 leak detector or infrared camera</td>
+<td>no detectable leak at flanges and fittings</td>
+<td>IEC 62271-1 permissible leakage rate; OEM</td>
+</tr>
+<tr>
+<td>Gas quality (moisture, purity, decomposition)</td>
+<td>gas analyser, only where the OEM allows sampling</td>
+<td>OEM values (for example moisture limits by dew point)</td>
+<td>IEC 60480:2019 Table 1, SF6 contaminants (confirm the values against IEC 60480:2019 Table 1) and the OEM manual</td>
+</tr>
+</tbody>
+</table></div>
+<p>Sealed-for-life ring main units have no gas port; their site check is the indicator reading and the alarm contact wiring. <mark>Opening a sealed SF6 compartment on site voids most OEM warranties</mark>.</p>
+<h3 id="s13-5-6"><span class="n">13.5.6</span>Mechanical operation and interlocks</h3>
+<ol>
+<li><strong>Manual operation.</strong> Charge the spring by hand, close and open the breaker mechanically. Record the operations counter before and after.</li>
+<li><strong>Electrical operation.</strong> Close and open from the local control and from the remote control system (electrical power monitoring system (EPMS) or supervisory control and data acquisition (SCADA)) with rated control voltage.</li>
+<li><strong>Anti-pumping.</strong> Hold a close command and give a trip command; the breaker must trip and not reclose until the close command is released.</li>
+<li><strong>Racking interlock.</strong> Try to rack the breaker in or out while closed; the mechanism must prevent it.</li>
+<li><strong>Earth switch interlock.</strong> Try to close the earth switch with the breaker in the service position, and try to rack the breaker in with the earth switch closed; both must be prevented.</li>
+<li><strong>Door interlocks.</strong> Try to open the cable compartment door with the earth switch open; the door must stay locked.</li>
+<li><strong>Key interlocks.</strong> Check every key interlock against the interlock diagram: a key is released only in the state shown and only one key exists for each lock. <mark>Spare keys are listed and held by the authorised person</mark>.</li>
+<li><strong>Bus coupler and incomer logic.</strong> On MSC-1 the tie and the two incomers form a two-out-of-three interlock. Both incomers and the tie cannot be closed together unless the switchboard is rated for the paralleled fault level (25.0 kA against 31.5 kA rating). The protection study must also allow it. Test every combination with the breakers in the test position.</li>
+</ol>
+<h3 id="s13-5-7"><span class="n">13.5.7</span>Power-frequency withstand test of the switchgear</h3>
+<p><strong>Purpose:</strong> Prove that the installed busbar and connections have no insulation defect that the IR test did not show.</p>
+<p>Applied value: On site the test is commonly applied at 80 % of the rated short-duration power-frequency withstand voltage of the switchgear, for 1 minute (RF-13 row 18; confirm against IEC 62271-200:2021 8.104, tests after erection on site, and the OEM installation manual). For 24 kV equipment with a rated withstand of 50 kV (IEC 62271-1 list for Ur 24 kV), 80 % is <mark>40 kV rms for 1 minute</mark>.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Rated voltage Ur</th>
+<th>Rated short-duration power-frequency withstand (common value)</th>
+<th>Site test at 80 % (practice)</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12 kV</td>
+<td>28 kV</td>
+<td>22.4 kV</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>24 kV</td>
+<td>50 kV</td>
+<td>40 kV</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>36 kV</td>
+<td>70 kV</td>
+<td>56 kV</td>
+<td>1 min</td>
+</tr>
+</tbody>
+</table></div>
+<p>The withstand values in this table are the common values of the rated insulation level table of IEC 62271-1 (confirm the values against IEC 62271-1:2017+A1:2021 Table 1, rated insulation levels for range I, series I, and the OEM manual for the contract; table number read in the 2017 base text).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Prerequisites.</strong> IR test passed on all phases, VTs and surge arresters disconnected, cable terminations disconnected or the cables included in the plan, all CT secondaries shorted and earthed.</li>
+<li><strong>Connection.</strong> Test transformer or resonant test set to one phase; the other two phases and the enclosure earthed. Breakers closed so the whole section busbar is tested; a second test with breakers open tests across the open gaps if the OEM requires it.</li>
+<li><strong>Ramp.</strong> Raise the voltage at the rate given in the procedure (for example 2 kV per second) to 40 kV.</li>
+<li><strong>Hold.</strong> Hold for 60 s and record the leakage current at the start and end.</li>
+<li><strong>Lower.</strong> Reduce the voltage to zero at the same rate before switching off.</li>
+<li><strong>Repeat.</strong> Repeat for each phase.</li>
+<li><strong>IR after.</strong> Repeat the IR test after the withstand test.</li>
+</ol>
+<p><strong>Acceptance:</strong> <mark>No breakdown, no flashover</mark>, no audible discharge, and the IR after the test is not significantly lower than before.</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>VT left on the bus.</strong> A VT energised at 40 kV at 50 Hz saturates and can be destroyed. The disconnection list in 13.4.5 is checked again before this test.</li>
+<li><strong>CT secondaries open.</strong> An open CT secondary near the test conductor can flash over. Every CT secondary is shorted at the test block.</li>
+<li><strong>Wrong value.</strong> Using the <mark>factory value (50 kV) on site</mark> overstresses insulation that has already passed its factory test. The test sheet states the rated value, the percentage and the applied value.</li>
+</ol>
+<h2 id="s13-6"><span class="n">13.6</span>Instrument transformer tests</h2>
+
+<figure class="sheet" id="F13-5"><a href="../data/cx-handbook/figures/F13-5.svg" title="Open drawing F13-5 at full size"><img src="../data/cx-handbook/figures/F13-5.svg" alt="F13-5: Current transformer test connections: ratio and polarity, excitation (knee point) and secondary burden" width="1400" height="1109" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F13-5</span> — <b>Current transformer test connections: ratio and polarity, excitation (knee point) and secondary burden</b>. Three set-ups use one CT analyser: (a) ratio and polarity by voltage method, (b) excitation curve, (c) burden measured by injecting rated secondary current into the connected loop.</figcaption></figure>
+<h3 id="s13-6-1"><span class="n">13.6.1</span>What current and voltage transformers do</h3>
+<p>A current transformer (CT) reduces the primary current (for example 1,500 A) to a standard secondary current (1 A or 5 A) for relays and meters. A voltage transformer (VT) reduces the primary voltage (20 kV) to a standard secondary voltage (for example 110 V phase to phase). Protection CTs are designed to stay accurate at many times rated current (class 5P20 means a composite error of 5 % or less at 20 times rated current). Metering CTs are designed to be accurate at normal current (class 0.5 or 0.2S) and to saturate early to protect the meter. A wrong ratio, a reversed polarity or a CT that saturates too early makes a relay trip on load or fail to trip on a fault.</p>
+<p>Figure <a class="figref" href="#F13-5">F13-5</a> shows the three test connections used with a CT analyser.</p>
+<h3 id="s13-6-2"><span class="n">13.6.2</span>CT tests</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method</th>
+<th>Applied value</th>
+<th>Acceptance</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ratio</td>
+<td>voltage method with CT analyser, or current method with primary injection</td>
+<td>analyser applies voltage to secondary and reads primary; or 10 % to 100 % of rated primary current</td>
+<td>ratio error within the class limit at the test current (5P: ±1 % at rated current; 0.5: ±0.5 % at 100 % rated current)</td>
+<td>IEC 61869-2:2012 accuracy class tables as quoted by CTL Systems (RF-13 row 28; IEC 61869-2:2012 Table 201 for measuring classes 0.1 to 1 and Table 205 for protective classes P and PR)</td>
+</tr>
+<tr>
+<td>Polarity</td>
+<td>analyser phase reading, or DC kick (flick) test</td>
+<td>—</td>
+<td>S1 in phase with P1 (subtractive)</td>
+<td>IEC 61869-2 marking</td>
+</tr>
+<tr>
+<td>Excitation (saturation) curve</td>
+<td>voltage applied to S1-S2 with primary open, increased to saturation</td>
+<td>0 to above the knee point</td>
+<td>knee point above the value in the protection study; curve matches the OEM curve</td>
+<td>IEC 61869-2 definition of knee point</td>
+</tr>
+<tr>
+<td>Winding resistance</td>
+<td>DC resistance of S1-S2</td>
+<td>analyser DC test</td>
+<td>within OEM value after correction to 75 °C or reference temperature</td>
+<td>OEM routine report</td>
+</tr>
+<tr>
+<td>Burden</td>
+<td>inject rated secondary current into the connected circuit and measure voltage</td>
+<td>1 A or 5 A</td>
+<td>measured VA below rated VA of the CT</td>
+<td>IEC 61869-2 rated burden</td>
+</tr>
+<tr>
+<td>Insulation</td>
+<td>secondary to earth with secondaries shorted</td>
+<td>500 V or 1,000 V DC, 1 min</td>
+<td>1 MΩ or more is a common minimum; the project specification may ask more</td>
+<td>practice (confirm against ANSI/NETA ATS-2025 7.10.1)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Knee point definition: The knee point voltage is the secondary voltage at which a 10 % increase in voltage causes a 50 % increase in exciting current (IEC 61869-2, RF-13 row 20).</p>
+<p><strong>Worked example:</strong> Feeder CT on Q11, 1500/1 A, 5P20, 15 VA, secondary winding resistance Rct = 4.5 Ω. The relay burden plus the wiring loop measures 6.8 VA at 1 A, which is 6.8 Ω. The voltage the CT must produce at the accuracy limit (20 × 1 A) is 20 × (4.5 + 6.8) = 226 V. This is an estimate of the required secondary electromotive force (EMF). For a class 5P CT the accuracy limit is defined by the composite error at the accuracy limit factor and the rated burden. The check against the measured excitation curve is: at 226 V the exciting current must remain below 5 % of 20 A = 1 A. The measured curve in <a class="figref" href="#F13-5">F13-5</a> reaches 215 V at 0.30 A and the curve has flattened, so the CT is near saturation at the required voltage. The CxM refers the result to the protection engineer. The engineer confirms that the maximum fault current through Q11 is 13.2 kA, which is 8.8 times rated current and below the accuracy limit factor of 20. The required voltage at that current is 8.8 × 11.3 Ω = 99 V, <mark>well below the 182 V knee point</mark>. The protection study states the required knee point as 150 V, above this 99 V estimate, and the record quotes the study value. The record shows the calculation and the engineer's acceptance.</p>
+<h3 id="s13-6-3"><span class="n">13.6.3</span>VT tests</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method</th>
+<th>Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ratio</td>
+<td>VT analyser or apply a known primary voltage (for example 1 kV) and read secondary</td>
+<td>within class: 0.5 class ±0.5 % at 80 % to 120 % rated voltage (confirm against IEC 61869-3:2011 Table 301)</td>
+</tr>
+<tr>
+<td>Polarity</td>
+<td>analyser phase reading</td>
+<td>a terminal marking polarity correct</td>
+</tr>
+<tr>
+<td>Insulation</td>
+<td>primary to earth at 1,000 V DC for 1 min (practice); secondary to earth at 500 V DC</td>
+<td>OEM minimum; practice 1,000 MΩ or more for primary</td>
+</tr>
+<tr>
+<td>Secondary fuse or miniature circuit breaker (MCB)</td>
+<td>check rating and type</td>
+<td>as drawing</td>
+</tr>
+<tr>
+<td>Earthing of secondary</td>
+<td>one earth point per VT secondary circuit</td>
+<td>single earth, at the switchgear</td>
+</tr>
+<tr>
+<td>Burden</td>
+<td>measure VA at rated voltage</td>
+<td>below rated VA</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-6-4"><span class="n">13.6.4</span>CT and VT record</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CT tag</td>
+<td>text</td>
+<td>Q11-CT-L1-PROT</td>
+</tr>
+<tr>
+<td>Ratio rated / measured</td>
+<td>text</td>
+<td>1500/1 / 1497.0/1</td>
+</tr>
+<tr>
+<td>Ratio error</td>
+<td>number %</td>
+<td>-0.20</td>
+</tr>
+<tr>
+<td>Phase displacement</td>
+<td>number minutes</td>
+<td>+12</td>
+</tr>
+<tr>
+<td>Polarity</td>
+<td>list</td>
+<td>correct</td>
+</tr>
+<tr>
+<td>Knee point voltage measured / required</td>
+<td>number V</td>
+<td>182 / 150</td>
+</tr>
+<tr>
+<td>Rct at 20 °C / at 75 °C</td>
+<td>number Ω</td>
+<td>4.52 / 5.49</td>
+</tr>
+<tr>
+<td>Measured burden at rated current</td>
+<td>number VA</td>
+<td>6.8</td>
+</tr>
+<tr>
+<td>IR secondary to earth</td>
+<td>number MΩ</td>
+<td>&gt; 500 at 500 V DC</td>
+</tr>
+<tr>
+<td>Secondary earth point</td>
+<td>text</td>
+<td>terminal X1-12, switchgear Q11</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Ratio tap set wrong.</strong> Multi-ratio CTs (for example 1500/1000/1 A) are wired on the wrong tap. The ratio test of the installed wiring at the test block shows it.</li>
+<li><strong>Two earth points.</strong> A CT secondary earthed in the switchgear and again in the relay panel lets circulating current flow in the protection circuit. Lift each earth in turn and measure.</li>
+<li><strong>CT left open-circuit.</strong> An open CT secondary in service develops dangerous voltage. Shorting links at the test block are closed and photographed before the record is signed.</li>
+<li><strong>Polarity mark on the wrong side.</strong> CTs installed with P1 facing the load reverse directional and differential protection. The primary injection test of 13.10 proves polarity in the installed position.</li>
+</ol>
+<h2 id="s13-7"><span class="n">13.7</span>Power transformer tests</h2>
+<h3 id="s13-7-1"><span class="n">13.7.1</span>Transformers on MSC-1</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Transformer</th>
+<th>Rating</th>
+<th>Type</th>
+<th>Site tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Main TX-A to TX-D</td>
+<td>80 MVA, 150/20 kV, uk 16.5 %, on-load tap changer</td>
+<td>oil-immersed, conservator, Buchholz relay</td>
+<td>full set: 13.7.2 to 13.7.9</td>
+</tr>
+<tr>
+<td>Block transformers</td>
+<td>2.5 MVA, 20/0.415 kV, Dyn11, off-circuit taps ±2 × 2.5 %</td>
+<td>cast-resin dry-type or oil-immersed (project choice)</td>
+<td>IR, TTR, winding resistance, dry-type checks or oil BDV, temperature devices</td>
+</tr>
+<tr>
+<td>Auxiliary transformers</td>
+<td>as project</td>
+<td>as project</td>
+<td>IR, TTR, winding resistance</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-7-2"><span class="n">13.7.2</span>Turns ratio test (TTR)</h3>
+<p><strong>Purpose:</strong> Prove that each winding has the correct number of turns on every tap and that the vector group is correct.</p>
+<p>Instrument used: Three-phase turns ratio tester that applies a low AC voltage (8 V to 250 V, by tester model) and reads ratio and phase deviation.</p>
+<p><strong>Acceptance:</strong> <mark>Measured ratio within ±0.5 % of the calculated (nameplate) ratio</mark> on every tap (NETA ATS, RF-13 row 6). IEC 60076-1 Table 1 gives the factory tolerance as the lower of ±0.5 % of the declared ratio and ±1/10 of the measured impedance in percent (confirm against the voltage ratio item of IEC 60076-1:2011 clause 10, Table 1, Tolerances). The three phases should agree closely with each other.</p>
+<p><strong>Worked example:</strong> Block transformer B2-DH3-TX-A1, 2.5 MVA, 20/0.415 kV, Dyn11. The tester measures the ratio of one HV phase winding (delta, 20 kV across it) to the corresponding LV phase winding (star, 415/√3 = 239.6 V). Nominal ratio = 20,000 / 239.6 = 83.47.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Tap</th>
+<th>HV voltage</th>
+<th>Calculated ratio</th>
+<th>Measured L1 / L2 / L3</th>
+<th>Worst deviation</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 (+5 %)</td>
+<td>21,000 V</td>
+<td>87.65</td>
+<td>87.70 / 87.66 / 87.69</td>
+<td>+0.06 %</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>2 (+2.5 %)</td>
+<td>20,500 V</td>
+<td>85.56</td>
+<td>85.60 / 85.58 / 85.61</td>
+<td>+0.06 %</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>3 (nominal)</td>
+<td>20,000 V</td>
+<td>83.47</td>
+<td>83.52 / 83.49 / 83.51</td>
+<td>+0.06 %</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>4 (-2.5 %)</td>
+<td>19,500 V</td>
+<td>81.39</td>
+<td>81.42 / 81.40 / 81.43</td>
+<td>+0.05 %</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>5 (-5 %)</td>
+<td>19,000 V</td>
+<td>79.30</td>
+<td>79.34 / 79.31 / 79.35</td>
+<td>+0.06 %</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>The phase deviation reads near 0 minutes for each phase pair, confirming the Dyn11 connection selected on the tester. After the test, the tap is returned to the position in the voltage study (tap 3 on MSC-1 unless the study says otherwise) and the tap position is recorded and photographed.</p>
+<h3 id="s13-7-3"><span class="n">13.7.3</span>Winding resistance</h3>
+<p><strong>Purpose:</strong> Find loose connections, broken strands and tap changer contact problems.</p>
+<p>Instrument used: Winding resistance meter with a DC current of 1 % to 10 % of rated winding current (OEM guidance) up to the meter limit, and automatic discharge.</p>
+<p>Method: Measure each phase on each tap after the reading stabilises (large transformers take several minutes to saturate the core). On an on-load tap changer, measure on every tap in both directions and record the transition (the dynamic resistance trace if the meter has it).</p>
+<p><strong>Acceptance:</strong> For a liquid-filled transformer, the manufacturer is consulted when a temperature-corrected value differs by more than <mark>2 % from the factory value or from the adjacent phases</mark> (ANSI/NETA ATS 7.2.2 wording as quoted from an earlier edition, RF-13 row 29; confirm against ATS-2025). The 1 % comparison is the NETA item for large dry-type transformers. The phase comparison takes the winding connection into account.</p>
+<p>The temperature correction for copper windings is R at 75 °C = R measured × (235 + 75) / (235 + t). For aluminium use 225 in place of 235.</p>
+<p><strong>Worked example:</strong> TX-A HV winding phase A measured 0.4120 Ω at a top-oil temperature of 28 °C with the oil and winding at equilibrium. R75 = 0.4120 × 310 / 263 = 0.4856 Ω. The factory test report gives 0.4848 Ω at 75 °C. Difference = (0.4856 - 0.4848) / 0.4848 = <mark>+0.17 %, inside 2 %</mark>. Phase B 0.4851 Ω, phase C 0.4860 Ω after correction; maximum phase difference 0.19 %.</p>
+<h3 id="s13-7-4"><span class="n">13.7.4</span>Excitation current</h3>
+<p>The excitation current test applies a single-phase AC voltage (commonly 10 kV or less) to each HV phase with the LV open and measures the current. On a three-phase core-type transformer the two outer phases draw similar currents and the centre phase draws less, because its magnetic path is shorter. <mark>A pattern different from two similar high values and one lower value points to a winding or core defect, or residual magnetism after a DC test</mark>. For this reason the excitation test is done before the winding resistance test, or the core is demagnetised before it.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example (TX-A, 10 kV applied, tap 9 nominal)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase A (H1-H0)</td>
+<td>32.4 mA</td>
+</tr>
+<tr>
+<td>Phase B (H2-H0)</td>
+<td>21.8 mA</td>
+</tr>
+<tr>
+<td>Phase C (H3-H0)</td>
+<td>32.1 mA</td>
+</tr>
+<tr>
+<td>Pattern</td>
+<td>two high, centre low: normal</td>
+</tr>
+<tr>
+<td>Factory value</td>
+<td>32.0 / 21.5 / 31.9 mA</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-7-5"><span class="n">13.7.5</span>Insulation power factor (dissipation factor) and capacitance</h3>
+<p><strong>Purpose:</strong> Measure the dielectric losses of the main insulation (HV to LV, HV to earth, LV to earth) and of the bushings, and set a baseline for maintenance.</p>
+<figure class="sheet" id="F13-6"><a href="../data/cx-handbook/figures/F13-6.svg" title="Open drawing F13-6 at full size"><img src="../data/cx-handbook/figures/F13-6.svg" alt="F13-6: Insulation power factor of TX-A: six connections for CH, CHL and CL" width="1000" height="871" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F13-6</span> — <b>Insulation power factor of TX-A: six connections for CH, CHL and CL</b>. The LV lead of the test set goes to the winding that is not energised. Earthed, it adds that path to the reading (GST); on the guard terminal it removes it; on the measuring input it measures only the inter-winding insulation (UST).</figcaption></figure>
+
+<p>Instrument used: Insulation power factor test set, 10 kV, with ungrounded specimen test (UST) and grounded specimen test (GST) modes.</p>
+<p>Method: Short each winding on itself. Test CH (HV to earth), CL (LV to earth) and CHL (HV to LV) in the combinations of the test set manual. Test each bushing C1 (through the test tap) in UST mode.</p>
+<p>Figure <a class="figref" href="#F13-6">F13-6</a> shows the six connections for a two-winding transformer, the insulation that each connection measures and example results for TX-A. The capacitances are example values; the power factors are those of record 13.13.2. The test 1 reading (CH + CHL) equals the sum of tests 2 and 3 within about 1 %; a larger difference points to a wrong lead or guard connection (RF-13 row 26).</p>
+<p><strong>Acceptance:</strong> Liquid-filled transformer insulation power factor corrected to 20 °C is compared with the manufacturer's value; new oil-paper insulation commonly reads 0.5 % or less (practice; confirm against ATS-2025 Table 100.3 and IEEE C57.152-2025). Bushing C1 capacitance within ±10 % of nameplate and power factor within the bushing OEM limit (confirm against the bushing OEM data and IEEE C57.19.01). The values are the baseline for later tests.</p>
+<h3 id="s13-7-6"><span class="n">13.7.6</span>Sweep frequency response analysis (SFRA)</h3>
+<p><strong>Purpose:</strong> Detect winding movement, core displacement and clamping faults caused by transport. The SFRA trace is the reference record of the winding and core geometry. A site trace is compared with the factory trace taken after the factory tests.</p>
+<p>Instrument used: Frequency response analyser, 20 Hz to 2 MHz (IEC 60076-18, RF-13 row 9).</p>
+<p>Method: Bushings disconnected from external busbars and cables, tap at the extreme and the nominal position (as the factory test), connections as listed in IEC 60076-18 (end-to-end open circuit, end-to-end short circuit, capacitive inter-winding and inductive inter-winding). The same lead routing and the same earthing of braids as at the factory.</p>
+<p><strong>Acceptance:</strong> Visual and numerical comparison with the factory trace. There is no single pass/fail number in IEC 60076-18; differences in the mid-frequency range (roughly 2 kHz to 1 MHz depending on design) are referred to the OEM. The record holds the trace files with their names, the tap and the lead configuration.</p>
+<p><strong>Worked example:</strong> TX-A arrives on site with an impact recorder showing a 3.2 g longitudinal shock during unloading, above the 3 g limit in the transport specification (example). The CxM makes <mark>SFRA a hold point</mark>. The end-to-end open-circuit traces on all three HV phases overlay the factory traces within 0.5 dB up to 500 kHz. Above 1 MHz the traces differ by up to 3 dB because of the site lead length. The OEM accepts this difference as a lead effect. The OEM issues a written statement that no winding movement is indicated, and the hold point is released.</p>
+<h3 id="s13-7-7"><span class="n">13.7.7</span>Oil tests for liquid-filled transformers</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method</th>
+<th>Acceptance, new oil in new equipment before energising</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dielectric breakdown voltage (BDV)</td>
+<td>ASTM D1816, 1 mm or 2 mm gap</td>
+<td>equipment &gt; 69 kV and &lt; 230 kV: ≥ 30 kV (1 mm) or ≥ 52 kV (2 mm); ≤ 69 kV: ≥ 25 kV (1 mm) or ≥ 45 kV (2 mm)</td>
+<td>IEEE C57.106 Table 2 (2006 values quoted in RF-13 row 10; confirm against the new-oil table of IEEE C57.106-2015)</td>
+</tr>
+<tr>
+<td>BDV (IEC method)</td>
+<td>IEC 60156, 2.5 mm gap</td>
+<td>Um ≥ 72.5 kV: &gt; 60 kV; Um &lt; 72.5 kV: &gt; 55 kV</td>
+<td>IEC 60422:2024 Table 3 values as given in the Snowy Hydro guide SHL-ELE-520 (RF-13 row 30)</td>
+</tr>
+<tr>
+<td>Water content</td>
+<td>IEC 60814 or ASTM D1533 Karl Fischer</td>
+<td>Um above 145 kV (TX-A): below 5 mg/kg; Um below 72.5 kV (20 kV class): 10 mg/kg or less, at 20 °C</td>
+<td>IEC 60422 values as given in SHL-ELE-520 Table 1 (RF-13 row 30; confirm against IEC 60422:2024 Table 3, recommended limits for mineral insulating oils after filling in new electrical equipment)</td>
+</tr>
+<tr>
+<td>Dissipation factor at 90 °C</td>
+<td>IEC 60247 or ASTM D924</td>
+<td>0.010 maximum for Um above 145 kV; 0.015 up to 145 kV</td>
+<td>IEC 60422 values as given in SHL-ELE-520 (RF-13 row 30)</td>
+</tr>
+<tr>
+<td>Interfacial tension, acidity, colour</td>
+<td>ASTM D971, D974, D1500</td>
+<td>IEEE C57.106 new-oil values (confirm against the IEEE C57.106-2015 table for new oil in new equipment)</td>
+<td>IEEE C57.106</td>
+</tr>
+<tr>
+<td>Dissolved gas analysis (DGA)</td>
+<td>IEC 60567 sampling, IEC 61181 or ASTM D3612</td>
+<td>baseline; gases low and consistent with new oil; any acetylene is investigated</td>
+<td>IEEE C57.104-2019; IEC 60599</td>
+</tr>
+<tr>
+<td>Furan and polychlorinated biphenyl (PCB)</td>
+<td>where the specification asks</td>
+<td>PCB not detected; baseline furans</td>
+<td>project specification</td>
+</tr>
+</tbody>
+</table></div>
+<p>The sampling plan below is practice for a new 80 MVA transformer. Take the first sample after oil filling and processing and before energisation (baseline DGA, BDV and moisture). Take DGA samples after 24 hours of energisation, after 1 week and after 1 month (example schedule; the transformer OEM commissioning instructions set the schedule for the unit, and IEEE C57.104-2019 gives the DGA interpretation). <mark>A rising hydrogen or any acetylene in the first month is referred to the OEM before load is increased</mark>.</p>
+<p><strong>Worked example:</strong> TX-A oil sample after processing, oil temperature 35 °C: BDV by IEC 60156 72 kV (2.5 mm gap), water 4 mg/kg, DGA hydrogen 4 µL/L, methane 1 µL/L, acetylene not detected. All values meet the new-oil limits in the purchase specification, so the oil hold point is released.</p>
+<h3 id="s13-7-8"><span class="n">13.7.8</span>Dry-type (cast-resin) transformer checks</h3>
+<ol>
+<li><strong>Visual and cleanliness.</strong> No cracks in the resin, no dust or moisture on windings, no loose spacers.</li>
+<li><strong>Torque.</strong> HV and LV connections and tap links torqued to the OEM value and marked.</li>
+<li><strong>Tap links.</strong> All three phases on the same tap; <mark>the tap matches the voltage study</mark>.</li>
+<li><strong>Temperature monitoring.</strong> The PT100 resistance temperature sensors in each LV winding read ambient within 2 °C before energisation. The alarm (for example 130 °C) and trip (for example 150 °C) set points of the controller match the OEM data for the insulation class. The fan start set point is tested with a simulated input.</li>
+<li><strong>IR.</strong> HV to LV and earth at 5,000 V DC, LV to HV and earth at 1,000 V DC; dry-type minimum values from Table 100.5 (25,000 MΩ for the HV winding, 500 MΩ for the LV winding; confirm against ANSI/NETA ATS-2025 Table 100.5).</li>
+<li><strong>Clearances.</strong> Distance from the windings to the enclosure and to cables meets the OEM drawing.</li>
+<li><strong>Factory PD.</strong> The factory routine PD test result is on file (IEC 60076-11:2018 14.2.7 sets the routine partial discharge measurement for dry-type transformers; commonly 10 pC at 1.3 Ur, confirm against IEC 60076-11:2018 14.2.7).</li>
+</ol>
+<h3 id="s13-7-9"><span class="n">13.7.9</span>Transformer protection and auxiliaries</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Device</th>
+<th>Test</th>
+<th>Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Buchholz relay</td>
+<td>inject air through the test valve; operate trip float by test button or OEM method</td>
+<td>alarm on gas, trip on float, wired to the relay and the EPMS</td>
+</tr>
+<tr>
+<td>Pressure relief device</td>
+<td>operate the micro-switch</td>
+<td>trip signal received</td>
+</tr>
+<tr>
+<td>Oil and winding temperature indicators</td>
+<td>inject or heat the probe, compare with a calibrated thermometer</td>
+<td>reading within ±2 °C (practice; OEM value); alarm and trip contacts operate at the set values</td>
+</tr>
+<tr>
+<td>Oil level indicator</td>
+<td>operate low-level contact</td>
+<td>alarm received</td>
+</tr>
+<tr>
+<td>On-load tap changer</td>
+<td>operate through the full range locally and remotely; check end-stop limits and the voltage regulating relay</td>
+<td>every tap reached, limits stop at the end taps, position indication matches</td>
+</tr>
+<tr>
+<td>Cooling fans and pumps</td>
+<td>start manually and by temperature contact</td>
+<td>rotation correct, current within nameplate</td>
+</tr>
+<tr>
+<td>Neutral earthing resistor</td>
+<td>resistance at ambient</td>
+<td>within the nameplate tolerance</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s13-8"><span class="n">13.8</span>MV cable tests: sheath, VLF withstand and tan δ</h2>
+
+<figure class="sheet" id="F13-2"><a href="../data/cx-handbook/figures/F13-2.svg" title="Open drawing F13-2 at full size"><img src="../data/cx-handbook/figures/F13-2.svg" alt="F13-2: VLF tan delta of three phases of one 20 kV cable (example): mean tan delta against applied voltage" width="1400" height="776" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F13-2</span> — <b>VLF tan delta of three phases of one 20 kV cable (example): mean tan delta against applied voltage</b>. Phases L1 and L2 stay flat near 0.5 x 10⁻³; phase L3 rises with voltage, which is the pattern of a defect in a joint or a termination.</figcaption></figure>
+<h3 id="s13-8-1"><span class="n">13.8.1</span>Why DC is no longer used on XLPE cables</h3>
+<p>Cross-linked polyethylene (XLPE) cable insulation stores space charge when a high DC voltage is applied. When the cable is later energised with AC, the stored charge adds to the AC stress and can start breakdown. IEEE 400.2 and the cable industry moved acceptance testing of extruded cables to AC at very low frequency (VLF, 0.01 to 0.1 Hz). A small VLF test set can charge the cable and stresses the insulation in the same way as the service voltage (RF-13 row 17).</p>
+<h3 id="s13-8-2"><span class="n">13.8.2</span>Outer sheath test</h3>
+<p><strong>Purpose:</strong> Prove that the outer polyethylene or polyvinyl chloride (PVC) sheath has no damage that would let water reach the metallic screen.</p>
+<p>Method: Disconnect the screen from earth at both ends. Apply DC between the screen and earth. The soil, or the conductive coating on the sheath, is the other electrode.</p>
+<p>Applied value: Common practice is <mark>5 kV DC for 1 minute</mark> (IEC 60229 gives 4 kV per mm of sheath thickness with a maximum of 10 kV; confirm against IEC 60229:2007 clause 5, electrical test after installation, and the cable specification).</p>
+<p><strong>Acceptance:</strong> No breakdown. Many specifications also set an IR value per kilometre (for example 1 MΩ·km at 1,000 V DC; the project specification states the value).</p>
+<h3 id="s13-8-3"><span class="n">13.8.3</span>VLF withstand test voltages</h3>
+<p>The table gives the IEEE 400.2 sinusoidal VLF test voltages (phase to ground, kV rms) as reproduced from the guide by class (RF-13 row 14). IEEE 400.2-2024 now gives rms values only and lists ratings such as 11, 22 and 33 kV (RF-13 row 13). Confirm the row for the contract cable against IEEE 400.2-2024 Table 3.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Cable rating (phase to phase)</th>
+<th>Installation test</th>
+<th>Acceptance test</th>
+<th>Maintenance test</th>
+<th>Duration (acceptance)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>15 kV</td>
+<td>19 kV</td>
+<td>21 kV</td>
+<td>16 kV</td>
+<td>30 min (15 to 60 min range)</td>
+</tr>
+<tr>
+<td>20 kV</td>
+<td>24 kV</td>
+<td>26 kV</td>
+<td>20 kV</td>
+<td>30 min</td>
+</tr>
+<tr>
+<td>25 kV</td>
+<td>29 kV</td>
+<td>32 kV</td>
+<td>24 kV</td>
+<td>30 min</td>
+</tr>
+<tr>
+<td>35 kV</td>
+<td>39 kV</td>
+<td>44 kV</td>
+<td>33 kV</td>
+<td>30 min</td>
+</tr>
+<tr>
+<td>22 kV (2024 rating list)</td>
+<td>26 kV</td>
+<td>28 kV</td>
+<td>22 kV</td>
+<td>30 min</td>
+</tr>
+</tbody>
+</table></div>
+<p>For a 12/20 (24) kV cable on MSC-1 (U0 = 12 kV), the <mark>acceptance level from the 20 kV row is 26 kV rms at 0.1 Hz for 30 minutes</mark>. This is about 2.2 U0. Some European specifications use 3 U0 (36 kV rms) for 60 minutes, following HD 620 practice (confirm against the after-installation test clause of CENELEC HD 620 S2 Part 1 and the project specification). The project specification states which applies; the test record states the source of the value.</p>
+<h3 id="s13-8-4"><span class="n">13.8.4</span>Test set capacity</h3>
+<p>A VLF test set is rated for a maximum load capacitance at each frequency. The load capacitance of the cable is the capacitance per km multiplied by the length in km.</p>
+<p><strong>Worked example:</strong> Feeder cable B2-MV-C-011, two cables in parallel per phase, 630 mm² XLPE 12/20 kV, capacitance about 0.39 µF/km per core (typical catalogue value; use the cable data sheet), length 420 m. Load per phase = 2 × 0.39 × 0.42 = 0.33 µF. A 45 kV VLF sine test set rated for 1.0 µF at 0.1 Hz at full voltage (example rating) can test this load at 0.1 Hz. A 2.4 km campus ring cable of the same type (1.87 µF for two in parallel) exceeds 1.0 µF, so the test set steps down to 0.05 Hz where its rating covers 2 µF. IEEE 400.2 and the later Cable Diagnostic Focused Initiative (CDFI) work show no significant change in test effect between 0.1 and 0.01 Hz when the guide voltages and times are used (RF-13 row 17).</p>
+<h3 id="s13-8-5"><span class="n">13.8.5</span>Tan δ (dissipation factor) test</h3>
+<p>What the test measures: The ratio of the resistive (loss) current to the capacitive current in the cable insulation at a given voltage. Good XLPE has low and voltage-independent losses. Water trees, contamination and defective accessories raise the losses and make them rise with voltage.</p>
+<p>Method: Apply VLF sine voltage in steps of 0.5 U0, 1.0 U0 and 1.5 U0 (6, 12 and 18 kV for U0 = 12 kV). At each step record 6 to 10 tan δ readings. Calculate:</p>
+<ol>
+<li><strong>Mean tan δ (TD) at U0.</strong> The average of the readings at 1.0 U0.</li>
+<li><strong>Stability.</strong> The standard deviation of the readings at U0.</li>
+<li><strong>Tip-up.</strong> The mean at 1.5 U0 minus the mean at 0.5 U0.</li>
+</ol>
+<p><strong>Acceptance:</strong> IEEE 400.2 gives tables with three categories: no action required, further study advised, action required. The table for service-aged polyethylene (PE) based insulations, XLPE and tree-retardant cross-linked polyethylene (TRXLPE), as widely reproduced from the 2013 edition is below (values × 10⁻³). IEEE 400.2-2024 Annex G Table G.1 gives separate figures for newly installed PE cables, intended for trending; it has no action-required level (RF-13 row 15).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Stability at U0 (std. dev.)</th>
+<th>Tip-up (1.5 U0 - 0.5 U0)</th>
+<th>Mean TD at U0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No action required</td>
+<td>&lt; 0.1</td>
+<td>&lt; 5</td>
+<td>&lt; 4</td>
+</tr>
+<tr>
+<td>Further study advised</td>
+<td>0.1 to 0.5</td>
+<td>5 to 80</td>
+<td>4 to 50</td>
+</tr>
+<tr>
+<td>Action required</td>
+<td>&gt; 0.5</td>
+<td>&gt; 80</td>
+<td>&gt; 50</td>
+</tr>
+</tbody>
+</table></div>
+<p>(Values from the widely reproduced IEEE 400.2-2013 table for PE-based insulation; confirm against IEEE 400.2-2024 Table 4 and Table G.1 before using them as contract limits.)</p>
+<p>For new cables on a data-centre campus the CxM applies a stricter rule and asks for <mark>each phase to be in "no action required"</mark> and for the three phases of one circuit to agree closely. A new cable in "further study" is <mark>investigated before energisation</mark>, because its defect is almost always in a joint or termination made on site.</p>
+<p>Figure <a class="figref" href="#F13-2">F13-2</a> shows tan δ against voltage for a cable where one phase has a defective joint.</p>
+<p><strong>Worked example:</strong> Cable B2-MV-C-011 phases L1, L2, L3 (example results):</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Mean TD at 0.5 U0</th>
+<th>Mean TD at U0</th>
+<th>Mean TD at 1.5 U0</th>
+<th>Stability at U0</th>
+<th>Tip-up</th>
+<th>Category</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1</td>
+<td>0.45</td>
+<td>0.50</td>
+<td>0.55</td>
+<td>0.01</td>
+<td>0.10</td>
+<td>no action required</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>0.52</td>
+<td>0.56</td>
+<td>0.60</td>
+<td>0.02</td>
+<td>0.08</td>
+<td>no action required</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>0.80</td>
+<td>2.90</td>
+<td>7.00</td>
+<td>0.35</td>
+<td>6.20</td>
+<td>further study (stability and tip-up)</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>L3 is not accepted</mark>. A VLF partial discharge test (13.9) locates a PD source at 286 m from the near end, which is the position of joint J2 on the cable route drawing. The jointer remakes J2; the retest of L3 gives mean TD 0.54, stability 0.02 and tip-up 0.09. The withstand test at 26 kV for 30 minutes then passes on all three phases.</p>
+<h3 id="s13-8-6"><span class="n">13.8.6</span>Procedure for the VLF test of one 20 kV cable</h3>
+<p><strong>Trigger:</strong> Terminations complete at both ends, sheath test passed, cable route drawing with joint positions issued.</p>
+<p><strong>Owner:</strong> Testing contractor; witnessed by the CxA and the cable supplier representative.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Isolate both ends.</strong> Disconnect the cable from the switchgear and the transformer, or rack out the breaker and open the earth switch as the switchgear design allows. Apply barriers at both ends with a person or a locked door at the far end.</li>
+<li><strong>IR before.</strong> Test each core at 5,000 V DC for 1 minute; record the values (cable IR per ATS-2025 Table 100.6 of the contract edition).</li>
+<li><strong>Connect.</strong> HV lead to the core under test, the other two cores and all screens earthed. The far end open with clearance to earth meeting the test voltage.</li>
+<li><strong>Tan δ.</strong> Run steps at 0.5, 1.0 and 1.5 U0 and compute mean, stability and tip-up. Stop and investigate if any phase is in "action required".</li>
+<li><strong>Withstand.</strong> Raise to 26 kV rms (20 kV row, IEEE 400.2) and hold 30 minutes, monitoring tan δ if the set allows (monitored withstand).</li>
+<li><strong>Ramp down.</strong> Reduce the voltage slowly to zero at the end of the test (IEEE 400.2-2024 requires a controlled reduction, RF-13 row 12) and let the set discharge the cable.</li>
+<li><strong>Earth.</strong> Apply the earth for the time in the procedure.</li>
+<li><strong>IR after.</strong> Repeat the IR test.</li>
+<li><strong>Reconnect.</strong> Reconnect under the permit, torque the terminations to the OEM value and mark them.</li>
+<li><strong>Record.</strong> Fill the cable test record (13.13.3).</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Surge arresters left connected.</strong> Arresters conduct at the VLF test voltage and the set trips. They are disconnected and the disconnection recorded.</li>
+<li><strong>Screens not earthed at the test end.</strong> The screen floats and the measurement is wrong. Screens earthed at both ends for the withstand test unless the cross-bonding design says otherwise.</li>
+<li><strong>Termination surfaces wet or dirty.</strong> Surface leakage raises tan δ on all phases equally. Clean and dry; repeat.</li>
+<li><strong>Wrong row of the table.</strong> Using the 35 kV row on a 20 kV cable overstresses it. The record states cable rating, U0 and the row used.</li>
+</ol>
+<h2 id="s13-9"><span class="n">13.9</span>Partial discharge testing</h2>
+<h3 id="s13-9-1"><span class="n">13.9.1</span>What partial discharge is</h3>
+<p>A partial discharge (PD) is a small electrical discharge that bridges only part of the insulation between conductors. Examples are a discharge inside a void in a cable joint, along the surface of a contaminated termination or at a sharp edge in switchgear. Each discharge damages a small amount of the insulation. PD in a new installation points to a workmanship or manufacturing defect and is the usual early sign of a failure in MV cable accessories.</p>
+<p>IEC 60270:2025 defines PD measurement in terms of apparent charge in picocoulombs (pC), measured with a calibrated system (RF-13 row 21). IEEE 400.3 covers PD testing of cable systems in the field.</p>
+<h3 id="s13-9-2"><span class="n">13.9.2</span>Offline and online PD</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>When used</th>
+<th>Sensors</th>
+<th>Output</th>
+<th>Strengths and limits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Offline PD with VLF or resonant source</td>
+<td>acceptance of new cables and after repair</td>
+<td>coupling capacitor and PD detector to IEC 60270; time-domain reflectometry for location</td>
+<td>PD inception voltage (PDIV), PD extinction voltage (PDEV), magnitude in pC at U0, 1.5 U0, 1.7 U0 (project choice), location along the cable</td>
+<td>calibrated in pC, locates defects; needs an outage</td>
+</tr>
+<tr>
+<td>Online PD on energised switchgear and cables</td>
+<td>Level 3 after energisation and as a baseline for maintenance</td>
+<td>transient earth voltage (TEV) sensors, high-frequency CTs (HFCT) on screen earths, ultrasonic (airborne acoustic) sensors, ultra-high frequency (UHF) sensors</td>
+<td>relative level in dBmV or mV, pulse count, phase-resolved pattern</td>
+<td>no outage; not in pC; detects active PD at service voltage</td>
+</tr>
+<tr>
+<td>Factory PD</td>
+<td>routine test of transformers, cast-resin units, switchgear, cable lengths</td>
+<td>IEC 60270 measuring circuit</td>
+<td>pC at specified voltage</td>
+<td>the reference baseline for site results</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-9-3"><span class="n">13.9.3</span>Calibration and background noise</h3>
+<ol>
+<li><strong>Calibrate at the terminals.</strong> Before each offline test, a calibrator injects a known charge (for example 100 pC) at the cable termination with the full test circuit connected. The detector reading is scaled to the injected charge. The calibrator has a valid certificate.</li>
+<li><strong>Record the background noise.</strong> With the test circuit connected and the source energised at a low voltage, record the noise level. IEC 60270 practice is to keep the <mark>background noise below 50 %</mark> of the PD level that must be detected (confirm against IEC 60270:2025 clause 10, external disturbances and interference, and its Figure 7, minimum realistic specified PD magnitude versus noise level).</li>
+<li><strong>Velocity and length.</strong> For location, the propagation velocity of the cable is set from a time-domain reflectometer (TDR) measurement of the known length.</li>
+<li><strong>Remove the calibrator.</strong> The calibrator is <mark>disconnected before the test voltage</mark> is applied.</li>
+</ol>
+<h3 id="s13-9-4"><span class="n">13.9.4</span>Acceptance for new MV cable systems</h3>
+<p>There is no single site acceptance level in pC agreed for all cable systems. Common project wording is "no PD detected above the background noise up to 1.5 U0, at a calibrated sensitivity of 20 pC or better at the termination" (example project value; the project specification and the accessory supplier state the value). The factory routine test of the cable length to IEC 60502-2 requires no detectable discharge at 1.73 U0 at a sensitivity of 10 pC or better (IEC 60502-2 routine test as quoted by a cable maker, RF-13 row 31; confirm against IEC 60502-2:2014+AMD1:2024 16.3, partial discharge test; clause number read in the 2014 base text). A located PD source in a new joint or termination is repaired.</p>
+<h3 id="s13-9-5"><span class="n">13.9.5</span>Online PD screening of switchgear after energisation</h3>
+<p><strong>Worked example:</strong> One week after energisation, the CxM orders an online PD survey of the 20 kV board with a handheld TEV and ultrasonic instrument. The background TEV on the room metalwork is 8 dBmV. Panels Q01 to Q12 read 7 to 10 dBmV. Panel Q13 reads 26 dBmV TEV and the ultrasonic probe at the cable box gasket reads 14 dBµV with a crackling sound. The survey sheet classifies the reading as "investigate" using the instrument maker's guidance (thresholds vary by instrument; the instrument maker's guidance gives the bands). Q13 is switched out under a switching programme; the cable compartment shows a termination with a stress-control tube cut short. The termination is remade, the VLF test is repeated and the online reading falls to 9 dBmV.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Panel</td>
+<td>Q13</td>
+</tr>
+<tr>
+<td>Background TEV</td>
+<td>8 dBmV</td>
+</tr>
+<tr>
+<td>TEV reading</td>
+<td>26 dBmV</td>
+</tr>
+<tr>
+<td>Ultrasonic reading</td>
+<td>14 dBµV, crackle</td>
+</tr>
+<tr>
+<td>Pulses per cycle</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Load at time of test</td>
+<td>610 A</td>
+</tr>
+<tr>
+<td>Classification</td>
+<td>investigate (instrument guidance)</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>switch out, inspect termination</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s13-10"><span class="n">13.10</span>Protection relays: secondary injection, primary injection and trip tests</h2>
+
+<figure class="sheet" id="F13-4"><a href="../data/cx-handbook/figures/F13-4.svg" title="Open drawing F13-4 at full size"><img src="../data/cx-handbook/figures/F13-4.svg" alt="F13-4: Primary injection of feeder Q11: test set, CT 1500/1 A, relay and the trip circuit" width="1400" height="860" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F13-4</span> — <b>Primary injection of feeder Q11: test set, CT 1500/1 A, relay and the trip circuit</b>. The primary injection loop proves the whole measuring chain from the busbar to the relay input, including the CT ratio, polarity, wiring and relay configuration.</figcaption></figure>
+<h3 id="s13-10-1"><span class="n">13.10.1</span>Protection functions on the 20 kV system</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>ANSI device number</th>
+<th>Function</th>
+<th>Typical use on MSC-1 20 kV</th>
+<th>Test to record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>50 / 51</td>
+<td>instantaneous and time overcurrent, phase</td>
+<td>incomers, feeders, bus coupler</td>
+<td>pick-up, drop-off, time at 2, 5 and 10 × setting</td>
+</tr>
+<tr>
+<td>50N / 51N</td>
+<td>instantaneous and time overcurrent, earth</td>
+<td>incomers, feeders (resistance-earthed 20 kV system)</td>
+<td>pick-up, time; residual path by primary injection</td>
+</tr>
+<tr>
+<td>67 / 67N</td>
+<td>directional overcurrent</td>
+<td>parallel incomers when the tie is closed</td>
+<td>forward and reverse zones at the characteristic angle</td>
+</tr>
+<tr>
+<td>87T</td>
+<td>transformer differential</td>
+<td>80 MVA transformers</td>
+<td>pick-up, bias slope at two points, second-harmonic restraint</td>
+</tr>
+<tr>
+<td>87B</td>
+<td>busbar differential</td>
+<td>20 kV bus sections (project choice)</td>
+<td>pick-up, bias slope, through-current stability</td>
+</tr>
+<tr>
+<td>27 / 59</td>
+<td>under and overvoltage</td>
+<td>incomers, transfer schemes</td>
+<td>pick-up and time</td>
+</tr>
+<tr>
+<td>81</td>
+<td>under and over frequency</td>
+<td>incomers, generator interface</td>
+<td>pick-up and time</td>
+</tr>
+<tr>
+<td>50BF</td>
+<td>breaker failure</td>
+<td>all breakers with 87 or 50/51 tripping</td>
+<td>logic and time against the logic diagram</td>
+</tr>
+<tr>
+<td>86</td>
+<td>lockout relay</td>
+<td>after 87 and 50BF trips</td>
+<td>trips all breakers in the trip matrix, blocks closing</td>
+</tr>
+<tr>
+<td>63 / 26 / 49</td>
+<td>Buchholz, oil temperature, winding temperature</td>
+<td>transformer protection inputs</td>
+<td>contact operates at set value, mapped to relay and EPMS</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-10-2"><span class="n">13.10.2</span>Secondary injection</h3>
+<p><strong>Purpose:</strong> Prove that each enabled protection element picks up and operates at the set value and time.</p>
+<p>Instrument used: Three-phase secondary injection test set with timing, binary inputs for trip contacts and the relay test software. Accuracy ±0.05 % to ±0.1 % of reading is typical (data sheet).</p>
+<p>Connection: Through the relay test block, with the CT secondary shorted on the CT side of the test block and the trip outputs isolated or connected to the test set binary inputs.</p>
+<p>Tests per element:</p>
+<ol>
+<li><strong>Pick-up.</strong> Ramp the current slowly from 90 % of the setting until the element starts. Record the start value.</li>
+<li><strong>Drop-off.</strong> Reduce the current until the element resets. Record the reset ratio.</li>
+<li><strong>Timing.</strong> Inject at 2, 5 and 10 times the setting for inverse definite minimum time (IDMT) elements and at 1.2 times the setting for definite-time elements. Record the operate time.</li>
+<li><strong>Directional elements.</strong> Check the forward and reverse zones at the characteristic angle.</li>
+<li><strong>Differential.</strong> Check the pick-up of each phase, the bias slope at two points and the second-harmonic restraint.</li>
+<li><strong>Logic.</strong> Check blocking, interlocking, breaker failure and output mapping against the logic diagram.</li>
+</ol>
+<p><strong>Acceptance:</strong> Within the relay manufacturer's stated accuracy for the element, for example pick-up ±3 % to ±5 % and timing ±5 % or ±30 ms (limits from the relay manufacturer's technical manual for the model; IEC 60255-151 defines the accuracy classes that the manual declares). The setting file read from the relay after testing matches the approved file revision.</p>
+<p><strong>Worked example:</strong> Feeder Q11 earth-fault element 51N: setting IsN = 0.22 × In = 330 A primary (0.22 A secondary), IEC standard inverse curve, time multiplier setting (TMS) = 0.10. The IEC 60255-151 standard inverse formula is t = TMS × 0.14 / ((I/Is)^0.02 - 1).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Multiple of IsN</th>
+<th>Injected secondary</th>
+<th>Calculated time</th>
+<th>Measured time</th>
+<th>Error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>0.440 A</td>
+<td>0.1 × 0.14 / (2^0.02 - 1) = 0.1 × 0.14 / 0.01396 = 1.003 s</td>
+<td>1.012 s</td>
+<td>+0.9 %</td>
+</tr>
+<tr>
+<td>5</td>
+<td>1.100 A</td>
+<td>0.1 × 0.14 / 0.03271 = 0.428 s</td>
+<td>0.431 s</td>
+<td>+0.7 %</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2.200 A</td>
+<td>0.1 × 0.14 / 0.04713 = 0.297 s</td>
+<td>0.301 s</td>
+<td>+1.3 %</td>
+</tr>
+</tbody>
+</table></div>
+<p>All three points are <mark>inside ±5 %</mark>, so the element passes.</p>
+<h3 id="s13-10-3"><span class="n">13.10.3</span>Primary injection</h3>
+<p><strong>Purpose:</strong> Prove the complete chain from the primary conductor to the relay. The chain covers CT ratio, CT polarity, CT wiring, test block, relay input configuration and the CT ratio setting inside the relay. <mark>Secondary injection alone cannot find a wrong CT ratio setting</mark> or a crossed phase in the wiring.</p>
+<p>Figure <a class="figref" href="#F13-4">F13-4</a> shows the primary injection set-up for feeder Q11.</p>
+<p>Instrument used: Primary injection set rated for the required current (0 to 2,000 A for MSC-1 feeders), with a reference CT or clamp meter of class 1 or better on the loop, and a timer input from the relay trip contact.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Isolate.</strong> Breaker in the test position or a bolted loop on the busbar side as the switchgear design allows; the cable disconnected and earthed beyond the CT.</li>
+<li><strong>Phase ratio.</strong> Inject 300 A through L1 and return through L2 (or through a shorting bar at the cable end). Read primary and secondary on the relay display. Expected: 300 A primary, 0.200 A secondary for 1500/1 A.</li>
+<li><strong>Each phase.</strong> Repeat for each phase pair so each CT carries current in each direction.</li>
+<li><strong>Earth path.</strong> Inject through one phase only, returning through earth or a separate conductor that bypasses the other CTs. The relay must show residual current equal to the injected current.</li>
+<li><strong>Pick-up and timing.</strong> For at least one element per relay, ramp the primary current to the pick-up value and time the trip at 2 times the setting, as <a class="figref" href="#F13-4">F13-4</a> shows.</li>
+<li><strong>Directional and differential.</strong> For 67 and 87 elements, inject through the protected zone and check that the relay sees through-current (no operation) and reverse current where applicable. For 87T, inject on the HV side with a short circuit on the LV side and confirm the differential current reads near zero.</li>
+<li><strong>Restore.</strong> Remove the test leads, reconnect the cable under the permit, check the test block links closed.</li>
+</ol>
+<p><strong>Acceptance:</strong> Relay reads the injected current within the CT class plus the relay metering accuracy (for example ±3 %); polarity correct; residual and differential currents as expected.</p>
+<p><strong>Worked example:</strong> During primary injection of Q11 the relay shows 360 A for 300 A injected. The ratio 360 / 300 = 1.2 and 1500 / 1250 = 1.2, so the <mark>relay CT primary setting is 1,250 A</mark> in place of 1,500 A. The setting file shows the correct 1,500 A, but the commissioning technician had loaded an earlier file revision. The correct revision is loaded, the as-left comparison shows zero differences and the injection is repeated with 300 A displayed. With this error the relay reads 1,334.6 A × 1.2 = 1,601 A when the feeder carries its normal 1,334.6 A. Every overcurrent element operates at 83 % of its intended primary current, and the feeder can trip on normal load.</p>
+<h3 id="s13-10-4"><span class="n">13.10.4</span>Trip tests</h3>
+<ol>
+<li><strong>Trip each breaker from its relay.</strong> Operate each protection output by injection and check that the real breaker trips through the real trip circuit with rated control voltage. Record the time from injection to main contact separation.</li>
+<li><strong>Lockout relay.</strong> Check that the 86 lockout operates, trips all breakers listed in the trip matrix and blocks closing until reset.</li>
+<li><strong>Intertrips.</strong> Check intertrips between the 20 kV incomer and the 150 kV breaker (transformer differential, Buchholz), and between the transformer and the LV main for block transformers.</li>
+<li><strong>Trip circuit supervision.</strong> Open the trip circuit and check that the supervision alarm appears at the relay and in the EPMS within the set delay.</li>
+<li><strong>DC supply.</strong> Remove one DC supply of a dual-supplied relay panel; check that protection remains in service and the alarm is raised.</li>
+</ol>
+<h3 id="s13-10-5"><span class="n">13.10.5</span>Protection record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Relay tag and model</td>
+<td>text</td>
+<td>Q11-F, multifunction feeder relay</td>
+</tr>
+<tr>
+<td>Firmware version</td>
+<td>text</td>
+<td>as read from relay</td>
+</tr>
+<tr>
+<td>Setting file name and revision</td>
+<td>text</td>
+<td>MSC1-SS1-Q11_revC</td>
+</tr>
+<tr>
+<td>Study reference</td>
+<td>text</td>
+<td>MSC1-SS1-PS-STU-001 rev C</td>
+</tr>
+<tr>
+<td>Element, setting, test points</td>
+<td>table</td>
+<td>51N, 0.22 In, SI, TMS 0.10; 2, 5 and 10 × IsN</td>
+</tr>
+<tr>
+<td>Measured pick-up, drop-off, times</td>
+<td>numbers</td>
+<td>as table 13.10.2</td>
+</tr>
+<tr>
+<td>Primary injection result</td>
+<td>text</td>
+<td>ratio, polarity, residual pass</td>
+</tr>
+<tr>
+<td>Trip test time</td>
+<td>number ms</td>
+<td>58 ms injection to contact separation</td>
+</tr>
+<tr>
+<td>As-left file comparison</td>
+<td>list</td>
+<td>0 differences</td>
+</tr>
+<tr>
+<td>Tested by, witnessed by</td>
+<td>text</td>
+<td>protection technician, CxA</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s13-11"><span class="n">13.11</span>Earthing, phasing and pre-energisation checks</h2>
+<h3 id="s13-11-1"><span class="n">13.11.1</span>Earthing of MV equipment</h3>
+<ol>
+<li><strong>Switchgear earth bar.</strong> Continuous along the line-up, connected to the main earthing terminal at both ends with the conductor size on the drawing. Bolted joints torqued and marked.</li>
+<li><strong>Transformer tank and neutral.</strong> Tank earthed at two points; the 20 kV neutral of the 80 MVA transformer connected through the neutral earthing resistor as the earthing study requires.</li>
+<li><strong>Cable screens.</strong> Earthed at both ends (solid bonding) unless the design uses single-point bonding or cross-bonding with sheath voltage limiters. The screen earth connection passes through the core balance CT in the correct direction (screen earth wire brought back through the CT). Screen current then does not cancel the earth-fault reading.</li>
+<li><strong>Continuity.</strong> Measure from each equipment earth terminal to the main earth bar with a low-resistance ohmmeter. Chapter 17 gives the method and values.</li>
+</ol>
+<h3 id="s13-11-2"><span class="n">13.11.2</span>Phasing</h3>
+<p><strong>Purpose:</strong> Prove that L1, L2 and L3 on both sides of a tie or a parallel point are the same phases before the tie is closed.</p>
+<p>Method: Energise both sides from their own sources with the tie open. Measure the voltage between L1 on one side and L1 on the other side with phasing sticks rated for 20 kV. Then measure L2-L2, L3-L3 and the cross pairs L1-L2, L2-L3 and L3-L1.</p>
+<p><strong>Acceptance:</strong> <mark>Like phases read near zero</mark> (a few hundred volts at most from measurement and angle differences); cross pairs read about the line voltage (20 kV). Phase rotation on both sides is the same (L1-L2-L3 clockwise), checked on the VT secondaries with a phase rotation meter.</p>
+<p><strong>Worked example:</strong> Tie between sections A and B, each fed from its own 80 MVA transformer on the same 150 kV bus. Readings: L1A-L1B 0.2 kV, L2A-L2B 0.3 kV, L3A-L3B 0.2 kV, L1A-L2B 20.1 kV, L2A-L3B 20.0 kV, L3A-L1B 20.1 kV. Like phases match. <mark>The tie is only closed after the CxM, the authorised person and operations sign the phasing record</mark>.</p>
+<h3 id="s13-11-3"><span class="n">13.11.3</span>Pre-energisation checklist for one 20 kV section</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>No.</th>
+<th>Item</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>All Level 2 test records signed for switchgear, CTs, VTs, relays, cables, transformer</td>
+<td>record list</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Setting files as-left match the approved study revision</td>
+<td>setting register</td>
+</tr>
+<tr>
+<td>3</td>
+<td>All temporary earths removed and counted against the earth log</td>
+<td>earth log</td>
+</tr>
+<tr>
+<td>4</td>
+<td>All test links and CT shorting links in service position</td>
+<td>test block photo</td>
+</tr>
+<tr>
+<td>5</td>
+<td>VTs and surge arresters reconnected after withstand tests</td>
+<td>disconnection list closed</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Breaker spring charged, control voltage present, trip circuit supervision healthy</td>
+<td>panel check</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Interlocks and key system tested</td>
+<td>interlock record</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Switching programme approved and briefed</td>
+<td>switching programme</td>
+</tr>
+<tr>
+<td>9</td>
+<td>EPMS and SCADA indications live for the section</td>
+<td>point-to-point record</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Rooms clean, doors closed, fire detection in service</td>
+<td>room handover</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s13-12"><span class="n">13.12</span>Energisation and post-energisation checks</h2>
+<p>Figure <a class="figref" href="#F13-7">F13-7</a> shows the checks of this section on a time line from energisation (day 0) to the last DGA sample at 1 month.</p>
+<figure class="sheet" id="F13-7"><a href="../data/cx-handbook/figures/F13-7.svg" title="Open drawing F13-7 at full size"><img src="../data/cx-handbook/figures/F13-7.svg" alt="F13-7: Energisation and post-energisation checks of one 20 kV section" width="1000" height="823" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F13-7</span> — <b>Energisation and post-energisation checks of one 20 kV section</b>. Each bar or mark is a hold point or a record in the energisation programme; the next step starts only when the record before it is signed.</figcaption></figure>
+
+<ol>
+<li><strong>Energise under the switching programme.</strong> The authorised person energises step by step; the CxM witnesses. Each step is timed and signed on the programme.</li>
+<li><strong>Soak.</strong> The transformer is held energised at no load for the soak time in the OEM manual or the specification (for example 24 hours) before load is applied, with Buchholz and temperatures monitored.</li>
+<li><strong>Voltages and rotation.</strong> Check secondary voltages and phase rotation at each VT and at the relays; compare primary values shown in the relays and the EPMS with each other (difference under 1 %).</li>
+<li><strong>Load checks.</strong> When load is first applied, read the currents and angles in each relay and check that directional and differential elements see the expected values (for 87T, differential current near zero, bias current equal to load).</li>
+<li><strong>Online PD survey.</strong> Within the first two weeks of energisation (13.9.5).</li>
+<li><strong>Thermography.</strong> Infrared survey of terminations and busbar joints when the load is at least 40 % of normal circuit loading where possible (section 14.13 gives the method and limits).</li>
+<li><strong>DGA follow-up.</strong> Samples per the plan in 13.7.7.</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Energising with an earth switch closed.</strong> The breaker closes onto an earth fault. The pre-energisation checklist item 3 and the interlock test prevent it.</li>
+<li><strong>No soak period.</strong> A transformer defect that would show on Buchholz gas at no load appears under load. The soak time is a hold point on the programme.</li>
+<li><strong>Relay readings not compared.</strong> A crossed CT that passed separate tests shows only under load. The load check of step 4 is a record field.</li>
+</ol>
+<h2 id="s13-13"><span class="n">13.13</span>Test records and data fields</h2>
+<h3 id="s13-13-1"><span class="n">13.13.1</span>Switchgear record (filled example)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Record</td>
+<td>ELE-L2-MVSG-Q11</td>
+</tr>
+<tr>
+<td>Device</td>
+<td>MSC1-SS1-20KV-A-Q11, vacuum breaker 1,600 A, 31.5 kA, SN 26-04411</td>
+</tr>
+<tr>
+<td>IR at 5,000 V DC, 1 min, closed, phase to earth</td>
+<td>L1 28.2 GΩ, L2 27.9 GΩ, L3 28.6 GΩ</td>
+</tr>
+<tr>
+<td>IR across open contacts</td>
+<td>L1 32.0 GΩ, L2 31.4 GΩ, L3 33.1 GΩ</td>
+</tr>
+<tr>
+<td>Contact resistance at 200 A</td>
+<td>28 / 31 / 30 µΩ (as left)</td>
+</tr>
+<tr>
+<td>Timing at 110 V DC trip</td>
+<td>38.2 / 38.9 / 39.6 ms, spread 1.4 ms</td>
+</tr>
+<tr>
+<td>Timing at 110 V DC close</td>
+<td>52.1 / 52.6 / 53.0 ms, spread 0.9 ms</td>
+</tr>
+<tr>
+<td>Vacuum integrity</td>
+<td>OEM procedure VI-02, 40 kV AC 1 min across open contacts, no breakdown (example OEM value)</td>
+</tr>
+<tr>
+<td>Power-frequency withstand (section)</td>
+<td>40 kV rms 1 min, each phase, no breakdown</td>
+</tr>
+<tr>
+<td>Interlocks</td>
+<td>8 checks per 13.5.6, all pass</td>
+</tr>
+<tr>
+<td>Counter</td>
+<td>112 before, 131 after</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Tested by / witnessed by</td>
+<td>OEM service engineer / CxA</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-13-2"><span class="n">13.13.2</span>Transformer record (filled example)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Record</td>
+<td>ELE-L2-TX-A</td>
+</tr>
+<tr>
+<td>Device</td>
+<td>TX-A 80 MVA 150/20 kV, SN 2026-118</td>
+</tr>
+<tr>
+<td>IR 5,000 V DC, HV to LV and earth, 1 min / 10 min</td>
+<td>6,200 MΩ / 15,500 MΩ at 30 °C, PI 2.5</td>
+</tr>
+<tr>
+<td>IR corrected to 20 °C</td>
+<td>12,400 MΩ (factor 2.0; confirm against the 30 °C row of ANSI/NETA ATS-2025 Table 100.14)</td>
+</tr>
+<tr>
+<td>TTR, all 17 taps</td>
+<td>worst deviation +0.12 %</td>
+</tr>
+<tr>
+<td>Winding resistance HV, corrected to 75 °C</td>
+<td>0.4856 / 0.4851 / 0.4860 Ω, factory 0.4848 / 0.4846 / 0.4853 Ω</td>
+</tr>
+<tr>
+<td>Excitation current at 10 kV</td>
+<td>32.4 / 21.8 / 32.1 mA</td>
+</tr>
+<tr>
+<td>Insulation power factor at 20 °C</td>
+<td>CH 0.31 %, CL 0.28 %, CHL 0.25 %</td>
+</tr>
+<tr>
+<td>SFRA</td>
+<td>overlay with factory traces, OEM statement attached</td>
+</tr>
+<tr>
+<td>Oil</td>
+<td>BDV 72 kV (2.5 mm), water 4 mg/kg, DGA baseline attached</td>
+</tr>
+<tr>
+<td>Buchholz, pressure relief device (PRD), temperature devices</td>
+<td>tested, contacts mapped to relay and EPMS</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass, energisation hold point released</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s13-13-3"><span class="n">13.13.3</span>Cable record (filled example)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Record</td>
+<td>ELE-L2-MVC-011 rev B</td>
+</tr>
+<tr>
+<td>Cable</td>
+<td>B2-MV-C-011, 2 × (3 × 1C 630 mm²) XLPE 12/20 (24) kV, 420 m, joints J1 to J3</td>
+</tr>
+<tr>
+<td>Sheath test</td>
+<td>5 kV DC 1 min, all screens, no breakdown</td>
+</tr>
+<tr>
+<td>IR before / after, 5,000 V DC 1 min</td>
+<td>L1 48 / 47 GΩ, L2 51 / 50 GΩ, L3 46 / 46 GΩ</td>
+</tr>
+<tr>
+<td>Tan δ (as left)</td>
+<td>all phases "no action required"; L3 after J2 rework TD 0.54, stability 0.02, tip-up 0.09 (× 10⁻³)</td>
+</tr>
+<tr>
+<td>PD (offline)</td>
+<td>before repair: PD at 286 m (J2); after repair: no PD above 15 pC background up to 1.5 U0</td>
+</tr>
+<tr>
+<td>VLF withstand</td>
+<td>26 kV rms, 0.1 Hz sine, 30 min each phase, no breakdown</td>
+</tr>
+<tr>
+<td>Test set</td>
+<td>VLF sine 45 kV, SN 77812, cert due 2027-05-02</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s13-14"><span class="n">13.14</span>Common errors, detection before the witness test and KPIs</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>How it is found before the witness test</th>
+<th>Prevention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Test value taken from the wrong standard edition</td>
+<td>CxA review of the test procedure against the contract edition list</td>
+<td>the ITP names the edition of each standard</td>
+</tr>
+<tr>
+<td>Instrument out of calibration</td>
+<td>certificate check at the pre-test meeting</td>
+<td>instrument register with due dates</td>
+</tr>
+<tr>
+<td>Temperature not recorded</td>
+<td>form field mandatory</td>
+<td>electronic form rejects an empty field</td>
+</tr>
+<tr>
+<td>VT or arrester connected during withstand</td>
+<td>disconnection list signed before test</td>
+<td>photo of disconnected link in the record</td>
+</tr>
+<tr>
+<td>CT polarity wrong</td>
+<td>primary injection and load check</td>
+<td>primary injection is a hold point</td>
+</tr>
+<tr>
+<td>Old setting file loaded</td>
+<td>as-left comparison</td>
+<td>setting register with file checksum</td>
+</tr>
+<tr>
+<td>Cable tested at the wrong level</td>
+<td>record states cable rating, U0, table row</td>
+<td>test voltage approved in the method statement</td>
+</tr>
+<tr>
+<td>Phasing done with uncalibrated sticks</td>
+<td>self-test before use</td>
+<td>phasing record includes the self-test</td>
+</tr>
+<tr>
+<td>Transformer tap left at the test position</td>
+<td>photo of tap position</td>
+<td>tap position is a pre-energisation item</td>
+</tr>
+<tr>
+<td>Earth left on after test</td>
+<td>earth log count</td>
+<td>numbered earths, log signed off</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target (example project value)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>First-pass yield of MV Level 2 tests</td>
+<td>tests passed at first attempt / tests performed</td>
+<td>≥ 90 % (MSC-1 target)</td>
+</tr>
+<tr>
+<td>Records complete at energisation readiness review</td>
+<td>complete records / required records</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>Open issues of category A at energisation</td>
+<td>count</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Time from test to signed record</td>
+<td>working days</td>
+<td>≤ 2</td>
+</tr>
+<tr>
+<td>Repeat tests caused by instrument or procedure errors</td>
+<td>count per month</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s13-15"><span class="n">13.15</span>Checklist for site use</h2>
+<ol>
+<li><strong>Edition list.</strong> Confirm the contract editions of ANSI/NETA ATS, IEEE 400.2, IEC 62271-200 and IEC 60076 before approving any method statement.</li>
+<li><strong>Calibration.</strong> Check every instrument certificate on the day of test and enter its number in the record.</li>
+<li><strong>Permit to test.</strong> Confirm the permit names the test object, the limits and the earths that may be removed.</li>
+<li><strong>Disconnection list.</strong> Check VTs, surge arresters and electronics are disconnected before every withstand test.</li>
+<li><strong>IR first.</strong> Do the insulation resistance test before any withstand test and repeat it after.</li>
+<li><strong>Temperature.</strong> Record the equipment temperature and correct IR and winding resistance.</li>
+<li><strong>Contact resistance.</strong> Apply the 50 % rule to every breaker even when the OEM maximum is met.</li>
+<li><strong>Timing.</strong> Compare close, open and pole spread with the routine test report of the same serial number.</li>
+<li><strong>Interlocks.</strong> Test every mechanical, key and electrical interlock against the interlock diagram.</li>
+<li><strong>Withstand value.</strong> Write the rated value, the percentage and the applied value on the test sheet.</li>
+<li><strong>CT checks.</strong> Ratio, polarity, knee point, burden and single earth point for every protection CT.</li>
+<li><strong>TTR.</strong> All taps within ±0.5 %; tap returned to the study position and photographed.</li>
+<li><strong>Winding resistance.</strong> Corrected to 75 °C and within 2 % of the factory value and of the adjacent phases (liquid-filled).</li>
+<li><strong>SFRA.</strong> Compare with the factory trace when the impact recorder or the specification requires it.</li>
+<li><strong>Oil.</strong> BDV, moisture and DGA baseline received from the laboratory before energisation.</li>
+<li><strong>Cable sheath.</strong> Sheath test passed before the VLF test.</li>
+<li><strong>VLF level.</strong> State the cable rating, U0 and the IEEE 400.2 row on the test sheet.</li>
+<li><strong>Tan δ.</strong> Every phase of a new cable in "no action required" and the three phases in agreement.</li>
+<li><strong>PD.</strong> Calibrate at the terminals and record background noise before any PD test.</li>
+<li><strong>Secondary injection.</strong> Every enabled element, against the approved setting file.</li>
+<li><strong>Primary injection.</strong> Every protection CT chain, including the residual path.</li>
+<li><strong>Trip tests.</strong> Every breaker tripped by its relay through the real circuit.</li>
+<li><strong>Setting register.</strong> As-left file compared with the approved revision, zero differences.</li>
+<li><strong>Phasing.</strong> Like phases near zero and cross phases at line voltage before any tie is closed.</li>
+<li><strong>Earth log.</strong> All temporary earths counted back before energisation.</li>
+<li><strong>Energisation readiness.</strong> Certificate signed by the CxM, CxA and authorised person.</li>
+<li><strong>Post-energisation.</strong> Relay readings compared under load, online PD survey and DGA follow-up planned.</li>
+</ol>
+<h2 id="s13-16"><span class="n">13.16</span>Sources</h2>
+<ol>
+<li>ANSI/NETA ATS-2025, Standard for Acceptance Testing Specifications for Electrical Power Equipment and Systems, InterNational Electrical Testing Association, 2025. <a href="https://www.netaworld.org/standards/ansi-neta-ats" rel="noopener">https://www.netaworld.org/standards/ansi-neta-ats</a></li>
+<li>ANSI blog, ANSI/NETA ATS-2025 electrical power testing, 2025. <a href="https://blog.ansi.org/ansi/ansi-neta-ats-2025-electrical-power-testing/" rel="noopener">https://blog.ansi.org/ansi/ansi-neta-ats-2025-electrical-power-testing/</a></li>
+<li>Test Guy forum, NETA Table 100.1 test voltages (quoting ATS), accessed 31 October 2026. <a href="https://forum.testguy.net/archive/index.php/t-2600.html" rel="noopener">https://forum.testguy.net/archive/index.php/t-2600.html</a></li>
+<li>Test Guy forum, NETA Table 100.5 transformer insulation resistance values, accessed 31 October 2026. <a href="https://forum.testguy.net/archive/index.php/t-6994.html" rel="noopener">https://forum.testguy.net/archive/index.php/t-6994.html</a></li>
+<li>Eaton, Molded case circuit breakers contact resistance white paper WP012023EN (quotes the NETA 50 % rule). <a href="https://www.eaton.com/content/dam/eaton/products/electrical-circuit-protection/molded-case-circuit-breakers/power-defense-molded-case-circuit-breakers/eaton-mccb-contact-resistance-white-paper-wp012023en.pdf" rel="noopener">https://www.eaton.com/content/dam/eaton/products/electrical-circuit-protection/molded-case-circuit-breakers/power-defense-molded-case-circuit-breakers/eaton-mccb-contact-resistance-white-paper-wp012023en.pdf</a></li>
+<li>IEEE 400.2-2024, Guide for Field Testing of Shielded Power Cable Systems Using Very Low Frequency (VLF), IEEE, 2024. <a href="https://standards.ieee.org/ieee/400.2/11049/" rel="noopener">https://standards.ieee.org/ieee/400.2/11049/</a></li>
+<li>Diatech, Review of changes in IEEE 400.2 for VLF cable testing, 2025. <a href="https://www.diatech.in/review-of-changes-in-ieee-400-2-for-vlf-cable-testing/" rel="noopener">https://www.diatech.in/review-of-changes-in-ieee-400-2-for-vlf-cable-testing/</a></li>
+<li>EE Electronics, VLF cable testing: test voltages, tan delta and when to use it, 2026. <a href="https://ee-electronics.com/latest-articles/vlf-cable-testing/" rel="noopener">https://ee-electronics.com/latest-articles/vlf-cable-testing/</a></li>
+<li>P. Liu, VLF tangent delta figures of merit in IEEE 400.2-2024, LinkedIn article. <a href="https://www.linkedin.com/pulse/vlf-tangent-delta-td-figures-merit-mentioned-ieee-4002-pengwei-liu-ye3tf" rel="noopener">https://www.linkedin.com/pulse/vlf-tangent-delta-td-figures-merit-mentioned-ieee-4002-pengwei-liu-ye3tf</a></li>
+<li>Wikipedia, VLF cable testing (summary of IEEE 400.2, IEC 60502 and CDFI results). <a href="https://en.wikipedia.org/wiki/VLF_cable_testing" rel="noopener">https://en.wikipedia.org/wiki/VLF_cable_testing</a></li>
+<li>Megavar, VLF testing guide: withstand levels, tan delta and sheath test, 2026. <a href="https://megavar.com.au/technical-insights/vlf-cable-testing-guide/" rel="noopener">https://megavar.com.au/technical-insights/vlf-cable-testing-guide/</a></li>
+<li>IEC 60270:2025, High-voltage test techniques: partial discharge measurements, IEC. <a href="https://webstore.iec.ch/en/publication/65087" rel="noopener">https://webstore.iec.ch/en/publication/65087</a></li>
+<li>IEC 62271-200:2021, AC metal-enclosed switchgear and controlgear for rated voltages above 1 kV and up to and including 52 kV, IEC. <a href="https://webstore.iec.ch/en/publication/63466" rel="noopener">https://webstore.iec.ch/en/publication/63466</a></li>
+<li>IEEE C57.152-2025, Guide for Diagnostic Field Testing of Liquid-Filled Power Transformers, Regulators and Reactors, IEEE. <a href="https://standards.ieee.org/ieee/C57.152/7662/" rel="noopener">https://standards.ieee.org/ieee/C57.152/7662/</a></li>
+<li>SDMyers, Dielectric breakdown voltage testing part 6 (IEEE C57.106 limits). <a href="https://www.sdmyers.com/knowledge-vault/dielectric-breakdown-voltage-testing-part-6/" rel="noopener">https://www.sdmyers.com/knowledge-vault/dielectric-breakdown-voltage-testing-part-6/</a></li>
+<li>IEC 60422 Ed. 5.0 (2024), Mineral insulating oils in electrical equipment: supervision and maintenance guidance, preview. <a href="https://vde-verlag.de/iec-normen/preview-pdf/info_iec60422{ed5.0}b.pdf" rel="noopener">https://vde-verlag.de/iec-normen/preview-pdf/info_iec60422{ed5.0}b.pdf</a></li>
+<li>Megger, Transformer frequency response analysis (SFRA). <a href="https://www.megger.com/en/type/power-transformer-testing-and-monitoring/transformer-frequency-response" rel="noopener">https://www.megger.com/en/type/power-transformer-testing-and-monitoring/transformer-frequency-response</a></li>
+<li>Open Exam Prep, Transformer turns ratio and acceptance (NETA ±0.5 %). <a href="https://open-exam-prep.com/study-guides/neta-ett-level-ii/transformer-testing/transformer-turns-ratio-ttr" rel="noopener">https://open-exam-prep.com/study-guides/neta-ett-level-ii/transformer-testing/transformer-turns-ratio-ttr</a></li>
+<li>Alliance Engineering, Knee-point voltage of class PX CTs (IEC 61869-2 definition). <a href="https://www.allianceengineeringco.com/blog/knee-point-voltage-calculation-class-px-cts" rel="noopener">https://www.allianceengineeringco.com/blog/knee-point-voltage-calculation-class-px-cts</a></li>
+<li>Insulation Testing, Switchgear insulation testing field guide. <a href="https://insulationtesting.com/switchgear-insulation-testing/" rel="noopener">https://insulationtesting.com/switchgear-insulation-testing/</a></li>
+<li>Naiji Electric, Metal-clad switchgear testing to IEC 62271-200 (site test at 80 %). <a href="https://naijielectric.com/blog/metal-clad-switchgear-testing-standards-procedures/" rel="noopener">https://naijielectric.com/blog/metal-clad-switchgear-testing-standards-procedures/</a></li>
+<li>MSC-1 case ledger, <code>case_ledger.json</code>, handbook project file, October 2026.</li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="12-handover-administration.html"><span>Previous · 12</span><span class="t">Handover administration</span></a><a class="next" href="14-lv-switchboards-busway-breakers-relays.html"><span>Next · 14</span><span class="t">Low-voltage switchboards, busway, circuit breakers and protection relays</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

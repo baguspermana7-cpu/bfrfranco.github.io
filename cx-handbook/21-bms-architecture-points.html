@@ -1,0 +1,2580 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>21 BMS architecture, protocols and the points list | Cx Field Manual R01</title>
+<meta name="description" content="This chapter describes how a building management system (BMS) on a hyperscale data-centre campus is built, which communication protocols it uses, and how the…">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/21-bms-architecture-points.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/21-bms-architecture-points.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/21-bms-architecture-points.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/21-bms-architecture-points.html">
+<meta property="og:title" content="21 BMS architecture, protocols and the points list | Cx Field Manual R01">
+<meta property="og:description" content="This chapter describes how a building management system (BMS) on a hyperscale data-centre campus is built, which communication protocols it uses, and how the…">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="21 BMS architecture, protocols and the points list | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter describes how a building management system (BMS) on a hyperscale data-centre campus is built, which communication protocols it uses, and how the…">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"21 BMS architecture, protocols and the points list","name":"BMS architecture, protocols and the points list","description":"This chapter describes how a building management system (BMS) on a hyperscale data-centre campus is built, which communication protocols it uses, and how the…","url":"https://resistancezero.com/cx-handbook/21-bms-architecture-points.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/21-bms-architecture-points.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":11982,"position":21,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"21 BMS architecture, protocols and the points list","item":"https://resistancezero.com/cx-handbook/21-bms-architecture-points.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part E · Controls, monitoring, integration and networks</p>
+    <h1><span class="num">21</span>BMS architecture, protocols and the points list</h1>
+    <p class="lede">This chapter describes how a building management system (BMS) on a hyperscale data-centre campus is built, which communication protocols it uses, and how the points list is written and checked.</p>
+    <p class="basis">Chapter 21 of 32 · 18 sections · 10 figures · 11,982 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 21</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 21</summary>
+<ol><li><a href="#s21-0"><span class="n">21.0</span>Scope of this chapter</a></li><li><a href="#s21-1"><span class="n">21.1</span>Layers of a data-centre BMS and the MSC-1 device counts</a><ol><li><a href="#s21-1-1"><span class="n">21.1.1</span>The four layers</a></li><li><a href="#s21-1-2"><span class="n">21.1.2</span>What a data-centre BMS controls and what it only monitors</a></li><li><a href="#s21-1-3"><span class="n">21.1.3</span>Device counts for one MSC-1 hall</a></li></ol></li><li><a href="#s21-2"><span class="n">21.2</span>Protocols used in a data-centre BMS</a><ol><li><a href="#s21-2-1"><span class="n">21.2.1</span>Protocol selection table</a></li><li><a href="#s21-2-2"><span class="n">21.2.2</span>BACnet/IP</a></li><li><a href="#s21-2-3"><span class="n">21.2.3</span>BACnet MS/TP</a></li><li><a href="#s21-2-4"><span class="n">21.2.4</span>BACnet Secure Connect</a></li><li><a href="#s21-2-5"><span class="n">21.2.5</span>Modbus TCP and Modbus RTU</a></li><li><a href="#s21-2-6"><span class="n">21.2.6</span>OPC UA and SNMP</a></li></ol></li><li><a href="#s21-3"><span class="n">21.3</span>BACnet objects, properties, services and device profiles</a><ol><li><a href="#s21-3-1"><span class="n">21.3.1</span>Object types used in a data-centre BMS</a></li><li><a href="#s21-3-2"><span class="n">21.3.2</span>Properties that cause most commissioning findings</a></li><li><a href="#s21-3-3"><span class="n">21.3.3</span>The command priority array</a></li><li><a href="#s21-3-4"><span class="n">21.3.4</span>Services used in daily work</a></li><li><a href="#s21-3-5"><span class="n">21.3.5</span>Device profiles, PICS and BTL listing</a></li></ol></li><li><a href="#s21-4"><span class="n">21.4</span>BACnet addressing: device instances, network numbers and broadcast management</a><ol><li><a href="#s21-4-1"><span class="n">21.4.1</span>Device instance numbering</a></li><li><a href="#s21-4-2"><span class="n">21.4.2</span>Network numbers</a></li><li><a href="#s21-4-3"><span class="n">21.4.3</span>IP addressing for BACnet/IP</a></li><li><a href="#s21-4-4"><span class="n">21.4.4</span>BBMD and foreign device registration rules</a></li></ol></li><li><a href="#s21-5"><span class="n">21.5</span>BACnet MS/TP physical design values</a><ol><li><a href="#s21-5-1"><span class="n">21.5.1</span>Values for each MS/TP trunk</a></li><li><a href="#s21-5-2"><span class="n">21.5.2</span>Number of devices on a trunk</a></li><li><a href="#s21-5-3"><span class="n">21.5.3</span>Worked example: trunk timing for rack-row sensors</a></li><li><a href="#s21-5-4"><span class="n">21.5.4</span>MS/TP wiring rules for the installation inspection</a></li></ol></li><li><a href="#s21-6"><span class="n">21.6</span>BACnet/SC design and certificate management</a><ol><li><a href="#s21-6-1"><span class="n">21.6.1</span>Where BACnet/SC is used on the campus</a></li><li><a href="#s21-6-2"><span class="n">21.6.2</span>Certificate fields recorded for each BACnet/SC node</a></li></ol></li><li><a href="#s21-7"><span class="n">21.7</span>Modbus register maps</a><ol><li><a href="#s21-7-1"><span class="n">21.7.1</span>The four Modbus data tables</a></li><li><a href="#s21-7-2"><span class="n">21.7.2</span>Register addressing: one-based numbers and zero-based addresses</a></li><li><a href="#s21-7-3"><span class="n">21.7.3</span>Block size limits</a></li><li><a href="#s21-7-4"><span class="n">21.7.4</span>Scaling and data types</a></li><li><a href="#s21-7-5"><span class="n">21.7.5</span>32-bit word order</a></li><li><a href="#s21-7-6"><span class="n">21.7.6</span>Modbus serial settings and timing</a></li><li><a href="#s21-7-7"><span class="n">21.7.7</span>Worked example: Modbus RTU polling cycle for leak panels</a></li></ol></li><li><a href="#s21-8"><span class="n">21.8</span>OPC UA and SNMP integration details</a><ol><li><a href="#s21-8-1"><span class="n">21.8.1</span>OPC UA connection record</a></li><li><a href="#s21-8-2"><span class="n">21.8.2</span>SNMP polling and notifications</a></li></ol></li><li><a href="#s21-9"><span class="n">21.9</span>Point types, naming convention and semantic tagging</a><ol><li><a href="#s21-9-1"><span class="n">21.9.1</span>Point types</a></li><li><a href="#s21-9-2"><span class="n">21.9.2</span>Naming convention</a></li><li><a href="#s21-9-3"><span class="n">21.9.3</span>Point dictionary extract</a></li><li><a href="#s21-9-4"><span class="n">21.9.4</span>Semantic tagging: Project Haystack, Brick and ASHRAE 223P</a></li></ol></li><li><a href="#s21-10"><span class="n">21.10</span>The points list: fields, review and two filled extracts</a><ol><li><a href="#s21-10-1"><span class="n">21.10.1</span>Purpose of the points list</a></li><li><a href="#s21-10-2"><span class="n">21.10.2</span>Points list fields</a></li><li><a href="#s21-10-3"><span class="n">21.10.3</span>Review steps for each points list issue</a></li><li><a href="#s21-10-4"><span class="n">21.10.4</span>Worked example: CRAH points list extract, 40 points</a></li><li><a href="#s21-10-5"><span class="n">21.10.5</span>Worked example: CDU points list extract, 30 points</a></li></ol></li><li><a href="#s21-11"><span class="n">21.11</span>Alarm priorities, classes and routing</a><ol><li><a href="#s21-11-1"><span class="n">21.11.1</span>Alarm classes used on the campus</a></li><li><a href="#s21-11-2"><span class="n">21.11.2</span>Alarm fields recorded for each alarm point</a></li><li><a href="#s21-11-3"><span class="n">21.11.3</span>Rules for alarm design</a></li></ol></li><li><a href="#s21-12"><span class="n">21.12</span>Trend intervals and storage sizing</a><ol><li><a href="#s21-12-1"><span class="n">21.12.1</span>Trend interval rules</a></li><li><a href="#s21-12-2"><span class="n">21.12.2</span>Worked example: trend storage for one hall</a></li></ol></li><li><a href="#s21-13"><span class="n">21.13</span>Redundancy of controllers, servers and networks</a><ol><li><a href="#s21-13-1"><span class="n">21.13.1</span>Redundancy options</a></li><li><a href="#s21-13-2"><span class="n">21.13.2</span>Split of redundant equipment across controllers</a></li></ol></li><li><a href="#s21-14"><span class="n">21.14</span>Graphics standards</a><ol><li><a href="#s21-14-1"><span class="n">21.14.1</span>Rules for BMS graphics</a></li><li><a href="#s21-14-2"><span class="n">21.14.2</span>Graphics review record fields</a></li></ol></li><li><a href="#s21-15"><span class="n">21.15</span>Control panel design and power to controls</a><ol><li><a href="#s21-15-1"><span class="n">21.15.1</span>Control panel requirements checked at design review and L2 inspection</a></li><li><a href="#s21-15-2"><span class="n">21.15.2</span>Power to controls</a></li></ol></li><li><a href="#s21-16"><span class="n">21.16</span>Checklist for site use</a></li><li><a href="#s21-17"><span class="n">21.17</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="20-fire-life-safety-cause-effect.html"><span>Previous</span>20 Fire detection, suppression and life-safety interfaces</a><a href="22-bms-commissioning-procedure.html"><span>Next</span>22 BMS commissioning procedure</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s21-0"><span class="n">21.0</span>Scope of this chapter</h2>
+<p>This chapter describes how a building management system (BMS) on a hyperscale data-centre campus is built, which communication protocols it uses, and how the points list is written and checked. Chapter 22 uses this chapter as its reference when it describes the commissioning procedure.</p>
+<ol>
+<li><strong>System layers.</strong> The chapter defines the four layers of a BMS (field devices, controllers, supervisory devices, servers and clients) and gives the device counts for one hall of the MSC-1 worked example.</li>
+<li><strong>Protocols.</strong> It covers BACnet/IP, BACnet master-slave/token-passing (MS/TP), BACnet Secure Connect (BACnet/SC), Modbus TCP, Modbus RTU, OPC Unified Architecture (OPC UA) and the Simple Network Management Protocol (SNMP), with the values a commissioning manager checks for each.</li>
+<li><strong>BACnet objects and addressing.</strong> It lists the object types and properties used in a data-centre BMS, the command priority array, device instance numbering, network numbers and broadcast management.</li>
+<li><strong>Modbus register maps.</strong> It explains the four Modbus data tables, register addressing, scaling, 32-bit word order and serial timing, with a polling-time calculation.</li>
+<li><strong>Naming, tagging and the points list.</strong> It gives a naming convention, the Project Haystack, Brick and ASHRAE 223P tagging approaches, and the field list of a points list. It gives two filled extracts: one computer room air handler (CRAH) with 40 points and one coolant distribution unit (CDU) with 30 points.</li>
+<li><strong>Alarms, trends, redundancy, graphics and panels.</strong> It defines alarm priorities and classes, trend intervals and storage, controller, server and network redundancy, graphics rules, control panel design and power to controls.</li>
+<li><strong>Documents and standards used.</strong> ANSI/ASHRAE Standard 135-2024 (BACnet), ASHRAE Guideline 13-2024 (Specifying Building Automation Systems), ASHRAE Guideline 36-2024 (sequences of operation), the Modbus Application Protocol Specification V1.1b3 and the Modbus over Serial Line Specification and Implementation Guide V1.02. The chapter also uses the BACnet Testing Laboratories (BTL) listing, Project Haystack, Brick and the ASHRAE 223P public review draft.</li>
+</ol>
+<h2 id="s21-1"><span class="n">21.1</span>Layers of a data-centre BMS and the MSC-1 device counts</h2>
+
+<figure class="sheet" id="F21-1"><a href="../data/cx-handbook/figures/F21-1.svg" title="Open drawing F21-1 at full size"><img src="../data/cx-handbook/figures/F21-1.svg" alt="F21-1: BMS architecture of one MSC-1 building in four layers" width="1400" height="979" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F21-1</span> — <b>BMS architecture of one MSC-1 building in four layers</b>. Servers and clients at the top, supervisory devices on the building OT network, unit controllers on hall switches A and B, field devices hardwired or on RS-485 trunks.</figcaption></figure>
+<h3 id="s21-1-1"><span class="n">21.1.1</span>The four layers</h3>
+<p>A BMS is built in four layers. Each layer has its own hardware, its own network and its own failure behaviour. The commissioning manager uses the layer model to decide which test proves which function.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Typical devices</th>
+<th>Network</th>
+<th>What the layer must do when the layer above fails</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Field</td>
+<td>Temperature, pressure, flow and leak sensors; valve and damper actuators; variable frequency drive (VFD) inputs</td>
+<td>Hardwired 4–20 mA, 0–10 V, resistance, dry contact; some on RS-485</td>
+<td>Keep reporting a value; actuators go to their fail position on loss of signal</td>
+</tr>
+<tr>
+<td>2 Controller</td>
+<td>Direct digital controllers (DDC), programmable logic controllers (PLC), unit controllers inside CRAH and CDU</td>
+<td>BACnet MS/TP, BACnet/IP, Modbus RTU or TCP</td>
+<td>Run the local sequence on the last valid setpoint</td>
+</tr>
+<tr>
+<td>3 Supervisory</td>
+<td>Automation servers, network controllers, routers, gateways, BACnet broadcast management devices (BBMD)</td>
+<td>BACnet/IP on the operational technology (OT) network</td>
+<td>Keep controller-to-controller data, schedules and local alarm buffers</td>
+</tr>
+<tr>
+<td>4 Server and client</td>
+<td>BMS servers, historian, operator workstations, web clients</td>
+<td>Enterprise or OT server network</td>
+<td>Restore from backup; no control function depends on this layer</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>The rule that a lower layer keeps running</mark> when an upper layer is lost is the most important architecture requirement for a data centre. Chapter 22 tests it with loss-of-communication and server failover tests (sections 22.14 and 22.16).</p>
+<h3 id="s21-1-2"><span class="n">21.1.2</span>What a data-centre BMS controls and what it only monitors</h3>
+<p>On a hyperscale campus the BMS has three groups of points.</p>
+<ol>
+<li><strong>Points it controls.</strong> The BMS commands mechanical plant: CRAH fans and valves, CDU setpoints where the design gives the BMS that authority, dry cooler fans, pumps, trim chillers, ventilation for electrical rooms, battery rooms and generator rooms. Each command has a range limit and a rate limit written in the sequence of operation.</li>
+<li><strong>Points it monitors through integration.</strong> The BMS reads data from equipment that has its own controller. Examples are uninterruptible power supply (UPS) alarms, generator status, fuel tank levels, leak detection panels, very early smoke detection apparatus (VESDA) fault and alarm states, and fire alarm summary signals. It does not command these systems unless the interface control document (chapter 25) states the command.</li>
+<li><strong>Points it passes to other systems.</strong> The BMS sends mechanical data to the data centre infrastructure management (DCIM) system and to the computerised maintenance management system (CMMS). These are read-only exports.</li>
+</ol>
+<p>The electrical power monitoring system (EPMS) is a separate system with its own network (chapters 23 and 24). The BMS receives a small number of EPMS signals, for example "source stable" after a utility transfer, through a defined interface.</p>
+<h3 id="s21-1-3"><span class="n">21.1.3</span>Device counts for one MSC-1 hall</h3>
+<p>In the MSC-1 worked example each hall carries 12 MW of information technology (IT) load: 9.6 MW of liquid-cooled load through the technology cooling system (TCS) and 2.4 MW of air-cooled load. Each hall has 16 CDUs of 1 MW each, arranged in 4 zones of 4 CDUs, and 100 racks. The worked example assumes 13 CRAH units per hall for the air-cooled load (168.5 m³/s per hall, about 13 m³/s per unit).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Equipment per hall</th>
+<th>Quantity</th>
+<th>Controller type</th>
+<th>Protocol to BMS</th>
+<th>Points per unit (approx.)</th>
+<th>Points per hall</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CDU</td>
+<td>16</td>
+<td>original equipment manufacturer (OEM) unit controller</td>
+<td>BACnet/IP or Modbus TCP</td>
+<td>30</td>
+<td>480</td>
+</tr>
+<tr>
+<td>CRAH</td>
+<td>13</td>
+<td>OEM unit controller</td>
+<td>BACnet/IP</td>
+<td>40</td>
+<td>520</td>
+</tr>
+<tr>
+<td>Rack-row temperature and humidity sensors</td>
+<td>50</td>
+<td>Sensor network on MS/TP</td>
+<td>BACnet MS/TP</td>
+<td>4</td>
+<td>200</td>
+</tr>
+<tr>
+<td>Leak detection zones</td>
+<td>32</td>
+<td>Leak panel</td>
+<td>Modbus RTU through gateway</td>
+<td>3</td>
+<td>96</td>
+</tr>
+<tr>
+<td>Hall pressure, room sensors, door contacts</td>
+<td>1 set</td>
+<td>DDC</td>
+<td>BACnet/IP</td>
+<td>60</td>
+<td>60</td>
+</tr>
+<tr>
+<td>Branch valves and flow meters on the TCS</td>
+<td>16</td>
+<td>DDC</td>
+<td>BACnet/IP</td>
+<td>8</td>
+<td>128</td>
+</tr>
+<tr>
+<td>Total per hall</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>about 1,480</td>
+</tr>
+</tbody>
+</table></div>
+<p>A building with 3 halls and its plant (dry coolers, pumps, trim chillers, generators' auxiliaries, electrical-room ventilation) carries about 6,000 to 8,000 BMS points. The campus with 4 buildings carries about 25,000 to 30,000 points. These counts are estimates for the worked example. The approved points list of the project is the governing count.</p>
+<h2 id="s21-2"><span class="n">21.2</span>Protocols used in a data-centre BMS</h2>
+<h3 id="s21-2-1"><span class="n">21.2.1</span>Protocol selection table</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Protocol</th>
+<th>Physical layer</th>
+<th>Where it is used on the campus</th>
+<th>Addressing</th>
+<th>Values to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BACnet/IP</td>
+<td>Ethernet, User Datagram Protocol (UDP)</td>
+<td>Controller to supervisory and server; CRAH and CDU unit controllers</td>
+<td>Device instance, IP address, UDP port 47808</td>
+<td>One BBMD per subnet; network number unique</td>
+</tr>
+<tr>
+<td>BACnet MS/TP</td>
+<td>RS-485 twisted pair</td>
+<td>Room sensors, small fan controllers, legacy devices</td>
+<td>Medium access control (MAC) address 0–127 for masters</td>
+<td>Baud rate, Max_Master, termination, unit loads</td>
+</tr>
+<tr>
+<td>BACnet/SC</td>
+<td>Ethernet, Transport Layer Security (TLS) over WebSocket</td>
+<td>Links that cross a firewall or a building boundary</td>
+<td>Virtual MAC, device universally unique identifier (UUID), hub uniform resource identifier (URI)</td>
+<td>Certificates, primary and failover hub</td>
+</tr>
+<tr>
+<td>Modbus TCP</td>
+<td>Ethernet, TCP port 502</td>
+<td>UPS, generator controllers, CDU, meters, fuel system</td>
+<td>IP address and unit identifier</td>
+<td>Register map version, word order, polling rate</td>
+</tr>
+<tr>
+<td>Modbus RTU</td>
+<td>RS-485</td>
+<td>Leak panels, small meters, VFDs, fuel pumps</td>
+<td>Slave address 1–247</td>
+<td>Baud rate, parity, termination</td>
+</tr>
+<tr>
+<td>OPC UA</td>
+<td>Ethernet, TCP port 4840</td>
+<td>PLC-based plant (trim chillers, water treatment)</td>
+<td>Endpoint URL, node ID</td>
+<td>Security policy, certificate trust</td>
+</tr>
+<tr>
+<td>SNMP</td>
+<td>Ethernet, UDP 161 and 162</td>
+<td>UPS network cards, rack power distribution units (PDU), switches</td>
+<td>IP address, object identifier (OID)</td>
+<td>SNMP version 3, notification receiver address</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> UDP 47808 is from Siemens Desigo engineering help. MS/TP addresses are from the Chipkin BACnet discovery reference, and Modbus TCP port 502 is from the Chipkin Modbus TCP reference. OPC UA port 4840 is from the Internet Assigned Numbers Authority (IANA) port registry. SNMP ports are from the WinCC OA driver documentation (see research note RF-21).</p>
+<h3 id="s21-2-2"><span class="n">21.2.2</span>BACnet/IP</h3>
+<p>BACnet/IP carries BACnet messages in UDP packets on port 47808 (hexadecimal BAC0). BACnet uses broadcasts for device discovery (Who-Is and I-Am) and for some alarm messages. IP routers do not forward broadcasts. A BBMD on each IP subnet receives local broadcasts and forwards them to the BBMDs listed in its broadcast distribution table (BDT). Section 21.4.4 gives the BBMD rules.</p>
+<h3 id="s21-2-3"><span class="n">21.2.3</span>BACnet MS/TP</h3>
+<p>BACnet master-slave/token-passing (MS/TP) runs on an RS-485 pair. Masters pass a token. A device may send only while it holds the token. The trunk speed is set by the slowest device and by cable length. Section 21.5 gives the physical design values.</p>
+<h3 id="s21-2-4"><span class="n">21.2.4</span>BACnet Secure Connect</h3>
+<p>BACnet/SC is a secure data link layer defined in Annex AB of ANSI/ASHRAE 135. It was added by Addendum 135-2016bj and has been part of the standard since the 2020 edition. Each node opens an outbound WebSocket connection, protected by TLS version 1.3, to a hub. Both ends authenticate each other with X.509 certificates. A node holds a primary hub address and, optionally, a failover hub address. The standard does not fix a port number. Port 443 is the common choice because enterprise firewalls already allow it.</p>
+<p>On a data-centre campus BACnet/SC is used where BACnet traffic must cross a security boundary, for example from a building OT network to a campus operations centre. Inside a hall the usual design is BACnet/IP on a segmented OT network, because many OEM unit controllers do not yet support BACnet/SC. The commissioning manager checks the controller data sheets and the BTL listing for BACnet/SC support before the design is frozen.</p>
+<h3 id="s21-2-5"><span class="n">21.2.5</span>Modbus TCP and Modbus RTU</h3>
+<p>Modbus is a request and response protocol. A client (master) reads or writes a server (slave). The server never sends data unless it is asked. The BMS sees a change only at the next poll. Modbus has no standard object model, no units, no alarm service and no time stamp. All meaning comes from the OEM register map. Section 21.7 describes the register map in detail.</p>
+<h3 id="s21-2-6"><span class="n">21.2.6</span>OPC UA and SNMP</h3>
+<p>OPC UA is used where a plant PLC (for example a water treatment skid or a trim chiller plant controller) exposes its data as an information model. The BMS connects to an endpoint such as <code>opc.tcp://10.20.4.15:4840</code>. The security policy (for example Basic256Sha256 with Sign and Encrypt) and the certificate exchange are part of the interface control document.</p>
+<p>SNMP is the native monitoring protocol of UPS network management cards, rack PDUs and network switches. The BMS or DCIM polls on UDP 161 and receives SNMP notifications on UDP 162. On a hyperscale programme the usual practice is to allow only SNMP version 3 with authentication and encryption. SNMP version 1 and version 2c send the community string in clear text.</p>
+<h2 id="s21-3"><span class="n">21.3</span>BACnet objects, properties, services and device profiles</h2>
+<h3 id="s21-3-1"><span class="n">21.3.1</span>Object types used in a data-centre BMS</h3>
+<p>ANSI/ASHRAE 135-2020 defines 62 standard object types (the count the source quotes; the adopted edition is ANSI/ASHRAE 135-2024). A data-centre BMS uses about 15 of them in daily work.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Object type</th>
+<th>Abbreviation</th>
+<th>Typical data-centre use</th>
+<th>Properties checked at commissioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Analog Input</td>
+<td>AI</td>
+<td>CDU supply temperature, CRAH return air temperature, differential pressure</td>
+<td>Present_Value, Units, Status_Flags, Reliability, COV_Increment</td>
+</tr>
+<tr>
+<td>Analog Output</td>
+<td>AO</td>
+<td>Valve position command, fan speed command</td>
+<td>Present_Value, Priority_Array, Relinquish_Default, Units</td>
+</tr>
+<tr>
+<td>Analog Value</td>
+<td>AV</td>
+<td>Setpoints, calculated values (for example hall average inlet temperature)</td>
+<td>Present_Value, Out_Of_Service, Units</td>
+</tr>
+<tr>
+<td>Binary Input</td>
+<td>BI</td>
+<td>Pump run status, filter switch, leak contact</td>
+<td>Present_Value, Polarity, Active_Text, Inactive_Text</td>
+</tr>
+<tr>
+<td>Binary Output</td>
+<td>BO</td>
+<td>Pump start command, damper open command</td>
+<td>Priority_Array, Minimum_On_Time, Minimum_Off_Time, Relinquish_Default</td>
+</tr>
+<tr>
+<td>Binary Value</td>
+<td>BV</td>
+<td>Enable flags, mode flags, alarm reset</td>
+<td>Present_Value, Active_Text</td>
+</tr>
+<tr>
+<td>Multi-state Input</td>
+<td>MSI</td>
+<td>CDU operating state reported by the unit controller</td>
+<td>State_Text, Number_Of_States</td>
+</tr>
+<tr>
+<td>Multi-state Value</td>
+<td>MSV</td>
+<td>Operating mode (Auto, Manual, Maintenance, Off)</td>
+<td>State_Text, Priority_Array</td>
+</tr>
+<tr>
+<td>Trend Log</td>
+<td>TL</td>
+<td>Logging of a point at a fixed interval or on change of value</td>
+<td>Log_Interval, Buffer_Size, Stop_When_Full, Enable</td>
+</tr>
+<tr>
+<td>Trend Log Multiple</td>
+<td>TLM</td>
+<td>Logging of several points with one time stamp</td>
+<td>Log_DeviceObjectProperty list</td>
+</tr>
+<tr>
+<td>Notification Class</td>
+<td>NC</td>
+<td>Routing of alarms to recipients by priority</td>
+<td>Priority, Ack_Required, Recipient_List</td>
+</tr>
+<tr>
+<td>Event Enrollment</td>
+<td>EE</td>
+<td>Alarm on a property that has no intrinsic reporting</td>
+<td>Event_Type, Event_Parameters</td>
+</tr>
+<tr>
+<td>Schedule</td>
+<td>SCH</td>
+<td>Time-based mode changes (rare in a data hall; used for offices and generator room ventilation tests)</td>
+<td>Weekly_Schedule, Exception_Schedule</td>
+</tr>
+<tr>
+<td>Calendar</td>
+<td>CAL</td>
+<td>Holidays for the schedules</td>
+<td>Date_List</td>
+</tr>
+<tr>
+<td>Device</td>
+<td>DEV</td>
+<td>One per controller</td>
+<td>Object_Identifier, Max_Master, Max_Info_Frames, Firmware_Revision, Application_Software_Version</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> object type count from the BACnet Wikipedia entry quoting ANSI/ASHRAE 135-2020; property names from ANSI/ASHRAE 135 as reproduced in the OPC Foundation BACnet companion specification (OPC 30030).</p>
+<h3 id="s21-3-2"><span class="n">21.3.2</span>Properties that cause most commissioning findings</h3>
+<ol>
+<li><strong>Units.</strong> The Units property must match the points list. A CDU flow point that reports <mark>litres per minute</mark> while the points list says litres per second gives a value 60 times too large on the graphic. The point-to-point test in chapter 22 compares the unit text on the graphic with the reference instrument.</li>
+<li><strong>Status_Flags and Reliability.</strong> Status_Flags has four flags: IN_ALARM, FAULT, OVERRIDDEN and OUT_OF_SERVICE. Reliability gives the reason for a fault, for example OPEN_LOOP or OVER_RANGE. A graphic must show a value with a fault flag differently from a good value.</li>
+<li><strong>Out_Of_Service.</strong> When Out_Of_Service is TRUE, the Present_Value can be written by hand and does not follow the physical input. A point left out of service after commissioning reports a false value with no alarm. The pre-handover check in section 22.19 lists every object with Out_Of_Service TRUE.</li>
+<li><strong>COV_Increment.</strong> The change-of-value (COV) increment decides when a subscribed client receives a new value. A COV increment of 1.0 °C on a CDU supply temperature hides a 0.8 K drift. On a data-centre point the usual increment is 0.1 K for temperature and 1 % of span for pressure and flow (example values; the project specification sets the increments).</li>
+<li><strong>Polarity.</strong> Polarity on a binary input inverts the reading. A normally closed leak contact needs the polarity that makes "leak" read ACTIVE.</li>
+</ol>
+<h3 id="s21-3-3"><span class="n">21.3.3</span>The command priority array</h3>
+<p>Commandable properties, such as the Present_Value of an Analog Output or a Binary Output, have a priority array with 16 slots. Slot 1 has the highest priority. The device uses the value in the highest-priority slot that is not NULL. When every slot is NULL the device uses the <mark>Relinquish_Default</mark> value. Figure <a class="figref" href="#F21-7">F21-7</a> shows the priority array of the CRAH 11 fan speed command (AO:1) in three states. The example values are an operator override of 80 % at priority 8, a sequence value of 62 % at priority 16 and a Relinquish_Default of 100 %.</p>
+<figure class="sheet" id="F21-7"><a href="../data/cx-handbook/figures/F21-7.svg" title="Open drawing F21-7 at full size"><img src="../data/cx-handbook/figures/F21-7.svg" alt="F21-7: BACnet priority array of the CRAH 11 fan speed command" width="1000" height="752" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F21-7</span> — <b>BACnet priority array of the CRAH 11 fan speed command</b>. Present_Value takes the value of the highest-priority slot that is not NULL; when every slot is NULL it takes Relinquish_Default.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Name in ANSI/ASHRAE 135</th>
+<th>Typical data-centre use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Manual Life Safety</td>
+<td>Fire brigade override panel (if the design uses BACnet for it)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Automatic Life Safety</td>
+<td>Smoke control commands from the fire alarm interface</td>
+</tr>
+<tr>
+<td>3, 4</td>
+<td>Not assigned</td>
+<td>Project use, for example emergency power-off (EPO) related ventilation stop</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Critical Equipment Control</td>
+<td>Equipment protection, for example pump minimum flow protection</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Minimum On/Off</td>
+<td>Minimum run and stop times on binary outputs</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Not assigned</td>
+<td>Project use</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Manual Operator</td>
+<td>Operator override from the workstation</td>
+</tr>
+<tr>
+<td>9–16</td>
+<td>Not assigned</td>
+<td>Sequences of operation, for example at 10 to 16; 16 is the default when a write has no priority</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> OPC Foundation OPC 30030 clause 3.2.1 and Chipkin "What is a BACnet priority array" (RF-21 entry 18).</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Override left at priority 8.</strong> An operator override at priority 8 stays in place after the operator logs off. The sequence at priority 16 cannot move the output. The BMS must show every point with an active priority 8 value on an override summary page.</li>
+<li><strong>Sequence writes at the wrong priority.</strong> If two programmes write the same output at the same priority, the output takes the value of whichever programme wrote last. The controls submittal must state the priority used by each programme.</li>
+<li><strong>Relinquish_Default left unchecked.</strong> The Relinquish_Default of a CRAH fan speed output decides what the fan does after a controller restart before the sequence runs. A value of 0 % stops the airflow. The points list must state the Relinquish_Default for every output.</li>
+</ol>
+<h3 id="s21-3-4"><span class="n">21.3.4</span>Services used in daily work</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Service</th>
+<th>What it does</th>
+<th>Where the commissioning manager sees it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Who-Is / I-Am</td>
+<td>Device discovery</td>
+<td>Network checkout; a missing I-Am means the device is not on the network</td>
+</tr>
+<tr>
+<td>Who-Has / I-Have</td>
+<td>Find an object by name</td>
+<td>Duplicate name checks</td>
+</tr>
+<tr>
+<td>ReadProperty, ReadPropertyMultiple</td>
+<td>Read values</td>
+<td>Graphics and trends; ReadPropertyMultiple reduces traffic</td>
+</tr>
+<tr>
+<td>WriteProperty</td>
+<td>Write values and priorities</td>
+<td>Setpoint changes, overrides</td>
+</tr>
+<tr>
+<td>SubscribeCOV</td>
+<td>Ask a device to send changes</td>
+<td>Fast graphics updates; check subscription limits in the protocol implementation conformance statement (PICS)</td>
+</tr>
+<tr>
+<td>ConfirmedEventNotification / UnconfirmedEventNotification</td>
+<td>Alarm delivery</td>
+<td>Alarm testing in section 22.11</td>
+</tr>
+<tr>
+<td>AcknowledgeAlarm</td>
+<td>Operator acknowledgement</td>
+<td>Alarm testing</td>
+</tr>
+<tr>
+<td>TimeSynchronization / UTCTimeSynchronization</td>
+<td>Set controller clocks</td>
+<td>Time synchronisation in section 22.17</td>
+</tr>
+<tr>
+<td>ReinitializeDevice</td>
+<td>Warm or cold restart</td>
+<td>Controller restart tests; must be password-protected</td>
+</tr>
+<tr>
+<td>DeviceCommunicationControl</td>
+<td>Stop and start a device's communication</td>
+<td>Must be password-protected</td>
+</tr>
+<tr>
+<td>AtomicReadFile / AtomicWriteFile</td>
+<td>Backup and restore</td>
+<td>Backup restore test</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s21-3-5"><span class="n">21.3.5</span>Device profiles, PICS and BTL listing</h3>
+<p>ANSI/ASHRAE 135 Annex L defines device profiles. Each profile is a set of BACnet interoperability building blocks (BIBB) from Annex K. A manufacturer declares the profile and the BIBBs it supports in a protocol implementation conformance statement (PICS).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Name</th>
+<th>What the profile includes</th>
+<th>Typical data-centre device</th>
+<th>What to check in the PICS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B-BC</td>
+<td>BACnet Building Controller</td>
+<td>Data sharing, alarm management, scheduling, trending, backup and restore</td>
+<td>Automation server, network controller</td>
+<td>COV support and the maximum number of subscriptions</td>
+</tr>
+<tr>
+<td>B-AAC</td>
+<td>BACnet Advanced Application Controller</td>
+<td>Data sharing, alarms, schedules; no trending or backup requirement</td>
+<td>Programmable plant controller</td>
+<td>trending and backup, if the design needs them</td>
+</tr>
+<tr>
+<td>B-ASC</td>
+<td>BACnet Application Specific Controller</td>
+<td>Serves values, accepts writes, responds to discovery</td>
+<td>CRAH or CDU unit controller, room sensor</td>
+<td>writable properties and the object name length</td>
+</tr>
+<tr>
+<td>B-OWS</td>
+<td>BACnet Operator Workstation</td>
+<td>Operator display and command</td>
+<td>BMS workstation software</td>
+<td>alarm acknowledgement and command BIBBs</td>
+</tr>
+<tr>
+<td>B-AWS</td>
+<td>BACnet Advanced Operator Workstation</td>
+<td>Configuration in addition to operation</td>
+<td>Engineering workstation</td>
+<td>configuration and backup BIBBs</td>
+</tr>
+</tbody>
+</table></div>
+<p>A B-BC device is <mark>not required to support COV subscriptions</mark>. The commissioning manager reads the PICS of every device type and does not assume COV support from the profile name.</p>
+<p>The BACnet Testing Laboratories (BTL) programme of BACnet International tests products against the BTL test package. Certified products carry the BTL Mark and appear in the online BTL Listing. The test organisations are ISO 17025 accredited. On a hyperscale programme the usual practice is to require a BTL listing for every controller and gateway, and to record the listed firmware revision. A controller delivered with a different firmware revision from the listed one is a submittal deviation.</p>
+<h2 id="s21-4"><span class="n">21.4</span>BACnet addressing: device instances, network numbers and broadcast management</h2>
+
+<figure class="sheet" id="F21-2"><a href="../data/cx-handbook/figures/F21-2.svg" title="Open drawing F21-2 at full size"><img src="../data/cx-handbook/figures/F21-2.svg" alt="F21-2: BACnet internetwork of Building 2 with one BBMD per subnet and MS/TP trunks under the automation servers" width="1400" height="779" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F21-2</span> — <b>BACnet internetwork of Building 2 with one BBMD per subnet and MS/TP trunks under the automation servers</b>. Each IP subnet that needs broadcasts has exactly one BBMD; all BBMDs hold the same broadcast distribution table; a commissioning laptop registers as a foreign device.</figcaption></figure>
+<h3 id="s21-4-1"><span class="n">21.4.1</span>Device instance numbering</h3>
+<p>Every BACnet device has a device instance number between <mark>0 and 4,194,302</mark>. The number must be unique across the whole internetwork. On a campus with four buildings this means one numbering scheme for the campus, set before any controller is configured.</p>
+<p><strong>Worked example:</strong> The MSC-1 scheme uses six digits: building (1 digit), hall (1 digit, 0 for building plant), system code (1 digit) and unit number (3 digits).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Digit position</th>
+<th>Meaning</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Building</td>
+<td>1 to 4</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Hall</td>
+<td>0 = building plant, 1 to 3 = data halls, 9 = campus central plant</td>
+</tr>
+<tr>
+<td>3</td>
+<td>System code</td>
+<td>1 = supervisory, 2 = CRAH, 3 = CDU, 4 = TCS valves, 5 = sensors, 6 = leak and gateways, 7 = electrical-room ventilation, 8 = dry coolers and pumps</td>
+</tr>
+<tr>
+<td>4–6</td>
+<td>Unit number</td>
+<td>001 to 999</td>
+</tr>
+</tbody>
+</table></div>
+<p>The CDU number 7 in Building 2, hall 3 is device instance <mark>233007</mark>. The CRAH number 11 in the same hall is 232011. The highest number in the scheme is 498999, far below the limit of 4,194,302.</p>
+<p><strong>Check:</strong> Before the first controller is loaded, the controls contractor sends the device instance register (one row per device) to the commissioning manager. The commissioning manager sorts the register by instance number and confirms there is no duplicate. After installation, a BACnet discovery (Who-Is with no range) is compared with the register.</p>
+<h3 id="s21-4-2"><span class="n">21.4.2</span>Network numbers</h3>
+<p>Each BACnet network (each IP subnet that carries BACnet, each MS/TP trunk, each BACnet/SC hub network) has a network number. Routers use the network number to forward messages. Configuration tools accept network numbers from 1 to 65534 (Distech ECLYPSE REST API, NetworkNumber minimum 1 and maximum 65534). The value 65535 (X'FFFF') is the global broadcast destination network number (ANSI/ASHRAE 135 clause 6, network layer). The BACnet committee addendum 135-2016bx states the rule: ("A global broadcast, indicated by a DNET of X'FFFF', is sent to all networks through all routers").</p>
+<p><strong>Worked example:</strong> The MSC-1 scheme sets network number = building × 1000 + hall × 100 + trunk number. Building 2 BACnet/IP network is 2000. MS/TP trunk 2 under the automation server of hall 3 is network 2302.</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Same network number on two trunks.</strong> Two MS/TP trunks on different routers with the same network number make routers send messages to the wrong trunk. Devices appear and disappear in discovery.</li>
+<li><strong>Factory default network number 1.</strong> Many routers ship with network number 1. A second router left at the default creates a duplicate. The network checkout in section 22.5 reads the network number from every router.</li>
+</ol>
+<h3 id="s21-4-3"><span class="n">21.4.3</span>IP addressing for BACnet/IP</h3>
+<p>The OT network design (chapter 26) allocates one subnet per building and per function. A typical allocation is one /24 subnet for the BMS supervisory devices of each building and one /24 for each hall's unit controllers. The BMS IP address register has these fields: device tag, device instance, IP address, subnet mask, gateway, virtual local area network (VLAN) number, switch and port, and BBMD role (yes or no).</p>
+<h3 id="s21-4-4"><span class="n">21.4.4</span>BBMD and foreign device registration rules</h3>
+<ol>
+<li><strong>One BBMD per subnet.</strong> Each IP subnet that carries BACnet/IP and needs broadcasts from other subnets has exactly <mark>one BBMD</mark>. Two BBMDs on one subnet forward each broadcast twice and can create broadcast loops.</li>
+<li><strong>Identical broadcast distribution tables.</strong> Every BBMD in the internetwork holds the same BDT, listing every peer BBMD's IP address and mask. A BBMD missing from one table makes discovery work in one direction only.</li>
+<li><strong>Foreign devices for tools.</strong> A commissioning laptop or a remote server on another subnet registers as a foreign device with a BBMD. The registration has a time-to-live and must be renewed. The BBMD's foreign device table has a size limit (for example 16 entries on some products; check the product manual).</li>
+<li><strong>No BBMD where broadcasts are not needed.</strong> If the design uses only directed (unicast) communication from the server to devices, a BBMD is not required for that subnet. The network design states which subnets have BBMDs.</li>
+<li><strong>Broadcast traffic limit.</strong> A hall with 29 unit controllers that all answer a global Who-Is produces 29 I-Am messages at once. The design limits global Who-Is to network-specific ranges in the server configuration.</li>
+</ol>
+<h2 id="s21-5"><span class="n">21.5</span>BACnet MS/TP physical design values</h2>
+
+<figure class="sheet" id="F21-3"><a href="../data/cx-handbook/figures/F21-3.svg" title="Open drawing F21-3 at full size"><img src="../data/cx-handbook/figures/F21-3.svg" alt="F21-3: BACnet MS/TP trunk 2302: daisy chain, terminations at the two ends, bias at one point, shield earthed once" width="1400" height="978" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F21-3</span> — <b>BACnet MS/TP trunk 2302: daisy chain, terminations at the two ends, bias at one point, shield earthed once</b>. The router end provides bias; the two end devices carry the 120 Ω terminations; the shield is joined at every device and earthed only at the router panel.</figcaption></figure>
+<h3 id="s21-5-1"><span class="n">21.5.1</span>Values for each MS/TP trunk</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Medium</td>
+<td>RS-485 shielded twisted pair, characteristic impedance about 120 Ω</td>
+<td>Product manuals; Chipkin RS-485 guidance</td>
+</tr>
+<tr>
+<td>Baud rates in use</td>
+<td>9,600, 19,200, 38,400, 76,800, 115,200 bit/s; the same rate on every device</td>
+<td>Chipkin troubleshooting guide</td>
+</tr>
+<tr>
+<td>Recommended rate for a new trunk</td>
+<td>38,400 or 76,800 bit/s</td>
+<td>Chipkin cable-length article; Johnson Controls asks for at least 38,400 bit/s on the MS/TP master</td>
+</tr>
+<tr>
+<td>Maximum length</td>
+<td>1,200 m at rates up to 76,800 bit/s; about 760 m (2,500 ft) at 115,200 bit/s</td>
+<td>Chipkin cable-length article</td>
+</tr>
+<tr>
+<td>Unit loads per segment</td>
+<td>32 unit loads; repeater for more; half-load transceivers count 0.5</td>
+<td>Setra and Siemens product documentation</td>
+</tr>
+<tr>
+<td>Master MAC addresses</td>
+<td>0 to 127</td>
+<td>Chipkin discovery reference</td>
+</tr>
+<tr>
+<td>Slave MAC addresses</td>
+<td>128 to 254</td>
+<td>Chipkin discovery reference</td>
+</tr>
+<tr>
+<td>Max_Master default</td>
+<td>127; set to <mark>the highest master MAC</mark> on the trunk</td>
+<td>OPC 30030 clause 8.4.2</td>
+</tr>
+<tr>
+<td>Max_Info_Frames default</td>
+<td>1</td>
+<td>OPC 30030 clause 8.4.2</td>
+</tr>
+<tr>
+<td>Termination</td>
+<td>120 Ω at the two end devices only</td>
+<td>Chipkin troubleshooting guide</td>
+</tr>
+<tr>
+<td>Shield</td>
+<td>Continuous through each device, earthed at one point only</td>
+<td>Chipkin troubleshooting guide</td>
+</tr>
+<tr>
+<td>Topology</td>
+<td>Daisy chain; no T connections or star wiring</td>
+<td>Chipkin T-connection article</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s21-5-2"><span class="n">21.5.2</span>Number of devices on a trunk</h3>
+<p>The protocol allows up to 128 master addresses, but the practical number is lower. Controller resources and polling traffic set the limit. A Schneider Electric knowledge article states that the device limit is set by the resource limit of the supervising controller. On a data-centre project the usual design rule is <mark>no more than 32 to 50 devices per trunk</mark> (project design value; no standard publishes a device limit for a trunk). Each zone has a separate trunk, so that a trunk fault affects only one zone.</p>
+<h3 id="s21-5-3"><span class="n">21.5.3</span>Worked example: trunk timing for rack-row sensors</h3>
+<p><strong>Worked example:</strong> Hall 3 of Building 2 has 50 rack-row temperature and humidity sensors. The design splits them into 4 trunks, one per zone, with 12 or 13 sensors each. The trunk runs at 38,400 bit/s.</p>
+<ol>
+<li><strong>Time per byte.</strong> MS/TP sends 10 bits per byte (1 start, 8 data, 1 stop). At 38,400 bit/s one byte takes 0.26 ms.</li>
+<li><strong>Read of one sensor.</strong> A ReadPropertyMultiple request for 4 values is about 40 bytes and the response about 70 bytes, plus token and reply overhead of about 30 bytes. One read is about 140 bytes, or 36 ms.</li>
+<li><strong>One scan of the trunk.</strong> 13 sensors × 36 ms = 0.47 s. Add the token passing between 13 masters (about 13 × 8 bytes × 0.26 ms = 27 ms) and the poll-for-master time for unused addresses.</li>
+<li><strong>Effect of Max_Master.</strong> With Max_Master left at 127, the token holder polls for masters at the unused addresses 14 to 127, one at a time after each token rotation. Each unanswered poll waits for a time-out of about 20 ms. Setting Max_Master to <mark>13</mark>, the highest master MAC on the trunk (21.5.1), on every device removes this delay.</li>
+<li><strong>Result.</strong> With Max_Master set correctly, a full scan takes under 1 s, which supports a 5 s graphic refresh and a 1 min trend with margin.</li>
+</ol>
+<p>The timing values are calculated estimates for the worked example. The controls contractor confirms them by measuring the token rotation time with a protocol analyser during the network checkout (section 22.5).</p>
+<h3 id="s21-5-4"><span class="n">21.5.4</span>MS/TP wiring rules for the installation inspection</h3>
+<ol>
+<li><strong>Polarity marked and followed.</strong> The + (B) and − (A) conductors are labelled differently by different manufacturers. The controls shop drawing gives the terminal names for each device type. A reversed pair stops communication with that device.</li>
+<li><strong>Termination at the two ends only.</strong> End-of-line resistors are fitted or switched on at the first and last device. A termination switched on at a middle device loads the line.</li>
+<li><strong>Bias at one point.</strong> Line bias (pull-up and pull-down resistors) is provided at one point, for example at the router or automation server. Several biased devices on one trunk reduce the signal margin.</li>
+<li><strong>Shield continuity.</strong> The shield is joined through each device and earthed at one end only. A shield earthed at both ends carries earth current between the two panels.</li>
+<li><strong>Separation from power cables.</strong> MS/TP cables run in a separate containment from power cables or keep the separation distance in the project specification. A trunk run beside a VFD output cable picks up noise and shows high cyclic redundancy check (CRC) error counts.</li>
+</ol>
+<h2 id="s21-6"><span class="n">21.6</span>BACnet/SC design and certificate management</h2>
+<h3 id="s21-6-1"><span class="n">21.6.1</span>Where BACnet/SC is used on the campus</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Link</th>
+<th>Protocol</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hall unit controllers to building automation server</td>
+<td>BACnet/IP on a hall OT VLAN</td>
+<td>OEM controllers support BACnet/IP; traffic stays inside the building OT network</td>
+</tr>
+<tr>
+<td>Building automation servers to building BMS server</td>
+<td>BACnet/IP or BACnet/SC</td>
+<td>BACnet/SC where the server sits in a different security zone</td>
+</tr>
+<tr>
+<td>Building BMS servers to campus operations centre</td>
+<td>BACnet/SC or the vendor's secure server-to-server protocol</td>
+<td>Crosses a firewall between security zones</td>
+</tr>
+<tr>
+<td>Remote vendor support</td>
+<td>No BACnet; vendor access through the campus remote-access system (chapter 27)</td>
+<td>Remote BACnet access is not permitted</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s21-6-2"><span class="n">21.6.2</span>Certificate fields recorded for each BACnet/SC node</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node tag</td>
+<td>Text</td>
+<td>B2-BMS-AS-01</td>
+</tr>
+<tr>
+<td>Device UUID</td>
+<td>16-octet identifier</td>
+<td>6f1c2b7e-9a41-4f0e-8c3d-2b5a7c9e1d04</td>
+</tr>
+<tr>
+<td>Primary hub URI</td>
+<td>wss URI</td>
+<td>wss://b2-bms-hub-a.ot.msc1.local:443</td>
+</tr>
+<tr>
+<td>Failover hub URI</td>
+<td>wss URI</td>
+<td>wss://b2-bms-hub-b.ot.msc1.local:443</td>
+</tr>
+<tr>
+<td>Operational certificate expiry</td>
+<td>Date</td>
+<td>2028-10-31</td>
+</tr>
+<tr>
+<td>Issuing certificate authority</td>
+<td>Text</td>
+<td>MSC1 OT Issuing CA 01</td>
+</tr>
+<tr>
+<td>Certificate renewal owner</td>
+<td>Role</td>
+<td>BMS system administrator</td>
+</tr>
+</tbody>
+</table></div>
+<p>The commissioning test for BACnet/SC includes the failover from the primary hub to the failover hub (section 22.18). It also checks that a node with an expired or revoked certificate is refused.</p>
+<h2 id="s21-7"><span class="n">21.7</span>Modbus register maps</h2>
+
+<figure class="sheet" id="F21-4"><a href="../data/cx-handbook/figures/F21-4.svg" title="Open drawing F21-4 at full size"><img src="../data/cx-handbook/figures/F21-4.svg" alt="F21-4: Modbus 32-bit word order: the value 24.2 L/s read in four orders" width="1000" height="537" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F21-4</span> — <b>Modbus 32-bit word order: the value 24.2 L/s read in four orders</b>. The same two registers give four different numbers depending on the word and byte order set in the client; only ABCD matches the CDU display.</figcaption></figure>
+<h3 id="s21-7-1"><span class="n">21.7.1</span>The four Modbus data tables</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Size</th>
+<th>Access</th>
+<th>Function codes</th>
+<th>Typical data-centre content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Discrete inputs</td>
+<td>1 bit</td>
+<td>Read only</td>
+<td>02</td>
+<td>Alarm bits, contact states</td>
+</tr>
+<tr>
+<td>Coils</td>
+<td>1 bit</td>
+<td>Read and write</td>
+<td>01 read, 05 write single, 15 write multiple</td>
+<td>Remote start, alarm reset</td>
+</tr>
+<tr>
+<td>Input registers</td>
+<td>16 bits</td>
+<td>Read only</td>
+<td>04</td>
+<td>Measurements: voltage, current, temperature, flow</td>
+</tr>
+<tr>
+<td>Holding registers</td>
+<td>16 bits</td>
+<td>Read and write</td>
+<td>03 read, 06 write single, 16 write multiple</td>
+<td>Setpoints and also, on many devices, measurements</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> Modbus Application Protocol Specification V1.1b3, clause 4.3 and clause 6 (RF-21 entries 21 to 25).</p>
+<p>Many OEMs place all measurements in holding registers and read them with function code 03. The register map states which function code to use. Reading with the wrong function code returns exception code 01 (illegal function) or 02 (illegal data address).</p>
+<h3 id="s21-7-2"><span class="n">21.7.2</span>Register addressing: one-based numbers and zero-based addresses</h3>
+<p>The Modbus protocol data unit (PDU) uses zero-based addresses. <mark>Register number 1 is sent as address 0.</mark> OEM documents use three conventions.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Convention in the OEM document</th>
+<th>Example in the map</th>
+<th>Address sent on the wire</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zero-based PDU address</td>
+<td>0x0064 (decimal 100)</td>
+<td>100</td>
+</tr>
+<tr>
+<td>One-based register number</td>
+<td>101</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Five-digit or six-digit "4x" reference</td>
+<td>40101 or 400101</td>
+<td>100</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>A one-register offset</mark> is the most common Modbus integration error. The symptom is a value that is plausible but belongs to the neighbouring register, for example the CDU return temperature shown in the supply temperature field. The point-to-point test detects it only if the two values differ by more than the test tolerance at the time of the test. The commissioning manager asks for an offset check on a register that has a distinctive value, such as a serial number or a firmware version register.</p>
+<h3 id="s21-7-3"><span class="n">21.7.3</span>Block size limits</h3>
+<p>Function codes 03 and 04 read <mark>1 to 125 registers</mark> per request. Function code 16 writes <mark>1 to 123 registers</mark> per request. The serial RTU frame is at most 256 bytes. Polling configuration in the BMS gateway must group registers into blocks inside these limits and must not span gaps that the device does not implement. A block that includes an unimplemented register returns exception code 02 for the whole block, and every point in that block goes to fault.</p>
+<h3 id="s21-7-4"><span class="n">21.7.4</span>Scaling and data types</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Data type in the map</th>
+<th>Registers</th>
+<th>Example</th>
+<th>How the BMS converts it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UINT16 with scale factor</td>
+<td>1</td>
+<td>CDU supply temperature, raw 452, scale 0.1</td>
+<td>452 × 0.1 = 45.2 °C</td>
+</tr>
+<tr>
+<td>INT16 with scale factor</td>
+<td>1</td>
+<td>Differential pressure, raw −15, scale 0.1</td>
+<td>−1.5 kPa</td>
+</tr>
+<tr>
+<td>UINT32</td>
+<td>2</td>
+<td>Energy counter in kWh</td>
+<td>High word × 65,536 + low word</td>
+</tr>
+<tr>
+<td>FLOAT32 (IEEE 754)</td>
+<td>2</td>
+<td>Flow 24.2 L/s</td>
+<td>Combine two registers in the stated word order</td>
+</tr>
+<tr>
+<td>Bit field in UINT16</td>
+<td>1</td>
+<td>Alarm word, bit 3 = pump 1 fault</td>
+<td>Mask with 0x0008</td>
+</tr>
+<tr>
+<td>Scale factor register</td>
+<td>1</td>
+<td>Some meters give a separate register holding the power of ten</td>
+<td>Read once and apply to the values</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s21-7-5"><span class="n">21.7.5</span>32-bit word order</h3>
+<p>Modbus sends the two bytes of each register with the most significant byte first (big-endian). The specification does not define the order of two registers that form one 32-bit value. Devices use four orderings. The letters A, B, C and D are the bytes of the value, A being the most significant.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Order name</th>
+<th>Register 1</th>
+<th>Register 2</th>
+<th>Typical label in the gateway</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ABCD</td>
+<td>A B</td>
+<td>C D</td>
+<td>Big-endian, no swap</td>
+</tr>
+<tr>
+<td>CDAB</td>
+<td>C D</td>
+<td>A B</td>
+<td>Word swap</td>
+</tr>
+<tr>
+<td>BADC</td>
+<td>B A</td>
+<td>D C</td>
+<td>Byte swap</td>
+</tr>
+<tr>
+<td>DCBA</td>
+<td>D C</td>
+<td>B A</td>
+<td>Byte and word swap</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> The CDU in B2-DH3-CDU-07 reports TCS flow as FLOAT32 at holding registers 40201 and 40202. The flow is 24.2 L/s per 1 MW CDU at 45/55 °C (MSC-1 ledger, section 21.10.5), which is 0x41C1999A in IEEE 754. Read in ABCD order the BMS shows <mark>24.2 L/s</mark>. Read in CDAB order the BMS shows about −1.6 × 10^-23, which the graphic shows as 0.00 L/s. Read in BADC order it shows −12.1 L/s. The CDAB result is the dangerous case: a reading of 0.00 L/s looks like a stopped pump and raises no data-quality alarm. The commissioning manager tests every FLOAT32 point against a value read on the device's local display.</p>
+<h3 id="s21-7-6"><span class="n">21.7.6</span>Modbus serial settings and timing</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value in the Modbus serial line guide</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Slave addresses</td>
+<td>1 to 247; 0 is broadcast; 248 to 255 reserved</td>
+<td>Unique address on each trunk</td>
+</tr>
+<tr>
+<td>Default baud rate</td>
+<td>19,200 bit/s (9,600 also required)</td>
+<td>Same rate on every device</td>
+</tr>
+<tr>
+<td>Default parity</td>
+<td>Even; no parity requires 2 stop bits</td>
+<td>Same framing on every device</td>
+</tr>
+<tr>
+<td>Character frame in RTU</td>
+<td>11 bits: 1 start, 8 data, 1 parity, 1 stop</td>
+<td>Gateway set to 8E1 or 8N2</td>
+</tr>
+<tr>
+<td>Frame gap t3.5</td>
+<td>3.5 character times; fixed 1.750 ms above 19,200 bit/s</td>
+<td>Gateway inter-frame delay</td>
+</tr>
+<tr>
+<td>Inter-character time-out t1.5</td>
+<td>1.5 character times; fixed 750 µs above 19,200 bit/s</td>
+<td>Converters that add delay break frames</td>
+</tr>
+<tr>
+<td>Devices per segment without repeater</td>
+<td>32</td>
+<td>Count from the shop drawing</td>
+</tr>
+<tr>
+<td>Trunk length</td>
+<td>1,000 m at 9,600 bit/s with AWG26 or larger</td>
+<td>Length on the cable schedule</td>
+</tr>
+<tr>
+<td>Derivation (stub) length</td>
+<td>Not more than 20 m</td>
+<td>Inspection</td>
+</tr>
+<tr>
+<td>Termination</td>
+<td>150 Ω (0.5 W), or 120 Ω with 1 nF capacitor in series, at each end</td>
+<td>Inspection and resistance test</td>
+</tr>
+<tr>
+<td>Line polarisation</td>
+<td>Pull-up and pull-down 450 to 650 Ω at one point only</td>
+<td>Inspection</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> Modbus over Serial Line Specification and Implementation Guide V1.02, clauses 2.2, 2.5.1, 3.2, 3.4 (RF-21 entries 27 to 31).</p>
+<h3 id="s21-7-7"><span class="n">21.7.7</span>Worked example: Modbus RTU polling cycle for leak panels</h3>
+<p><strong>Worked example:</strong> Building 2 hall 3 has 8 leak detection panels on one Modbus RTU trunk at 19,200 bit/s, 8E1. Each panel has 12 holding registers (zone states and panel status) read in one block with function code 03.</p>
+<ol>
+<li><strong>Character time.</strong> 11 bits ÷ 19,200 bit/s = 0.573 ms per character.</li>
+<li><strong>Request.</strong> Address, function, start address, quantity and CRC: 8 bytes = 4.6 ms.</li>
+<li><strong>Response.</strong> Address, function, byte count, 24 data bytes and CRC: 29 bytes = 16.6 ms.</li>
+<li><strong>Gaps and device turnaround.</strong> Add two t3.5 gaps of 2.0 ms each and a device response delay of 20 ms. The 20 ms is an example value from a typical panel data sheet; the OEM manual of the installed panel governs.</li>
+<li><strong>One poll.</strong> 4.6 + 16.6 + 4.0 + 20 = about 45 ms.</li>
+<li><strong>One cycle of 8 panels.</strong> 8 × 45 ms = 0.36 s. With a gateway poll delay of 100 ms between requests the cycle is about 1.2 s.</li>
+<li><strong>Time-out effect.</strong> If one panel is switched off and the gateway time-out is 1,000 ms and the gateway makes 3 attempts, that panel adds 3 × 1,000 ms = 3 s to every cycle. The cycle becomes 4.2 s for all other panels. The design sets the time-out to <mark>300 ms with 1 retry</mark> and lets the gateway mark the failed device offline and skip it.</li>
+</ol>
+<p>The leak alarm reaches the BMS within one polling cycle plus the BMS scan. Chapter 25, section 25.8, adds the full latency budget.</p>
+<h2 id="s21-8"><span class="n">21.8</span>OPC UA and SNMP integration details</h2>
+<h3 id="s21-8-1"><span class="n">21.8.1</span>OPC UA connection record</h3>
+<p>The OPC UA client in the BMS connects to a server endpoint on the plant PLC. The connection record is part of the interface control document for that system (chapter 25).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Endpoint URL</td>
+<td>Text</td>
+<td>opc.tcp://10.24.8.21:4840</td>
+</tr>
+<tr>
+<td>Security mode</td>
+<td>Choice</td>
+<td>SignAndEncrypt</td>
+</tr>
+<tr>
+<td>Security policy</td>
+<td>Choice</td>
+<td>Basic256Sha256</td>
+</tr>
+<tr>
+<td>Server certificate thumbprint</td>
+<td>Hexadecimal text</td>
+<td>3F:9A:...:C1 (40 hexadecimal characters)</td>
+</tr>
+<tr>
+<td>Client certificate subject</td>
+<td>Text</td>
+<td>CN=B2-BMS-SRV-01</td>
+</tr>
+<tr>
+<td>User authentication</td>
+<td>Choice</td>
+<td>User name and password from the OT identity store</td>
+</tr>
+<tr>
+<td>Sampling interval</td>
+<td>Milliseconds</td>
+<td>1,000</td>
+</tr>
+<tr>
+<td>Publishing interval</td>
+<td>Milliseconds</td>
+<td>2,000</td>
+</tr>
+<tr>
+<td>Namespace and node identifiers</td>
+<td>Text list</td>
+<td>ns=3; s=TrimChiller.CH01.CHWS_Temp</td>
+</tr>
+</tbody>
+</table></div>
+<ol>
+<li><strong>Check the security mode.</strong> A connection with security mode <mark>None</mark> sends data and passwords in clear text. The commissioning record shows SignAndEncrypt for every OPC UA session on the campus.</li>
+<li><strong>Check the certificate trust lists.</strong> The PLC trusts the BMS client certificate and the BMS trusts the PLC server certificate. A rejected certificate moves to the rejected folder of the server and the connection fails without data.</li>
+<li><strong>Check sampling and publishing intervals.</strong> A publishing interval longer than the alarm delay in the sequence makes the alarm late. For a trim chiller supply temperature the interval is 2 s or less in the worked example.</li>
+</ol>
+<h3 id="s21-8-2"><span class="n">21.8.2</span>SNMP polling and notifications</h3>
+<ol>
+<li><strong>SNMP version.</strong> <mark>Only SNMP version 3</mark> with authentication (Secure Hash Algorithm, SHA) and privacy (Advanced Encryption Standard, AES) is accepted on the MSC-1 OT network. The user name, authentication protocol and privacy protocol are recorded for each device.</li>
+<li><strong>Management information base.</strong> The UPS network card and the rack PDU each publish a management information base (MIB). The BMS or DCIM loads the OEM MIB of the delivered firmware. The MIB file name and version are recorded in the interface control document.</li>
+<li><strong>Notification receivers.</strong> Each device sends SNMP notifications to two receivers, for example the BMS server and the DCIM collector. Each of these notifications is a single unacknowledged UDP message. The design also polls the alarm summary OID every 30 s, so that a lost notification is detected at the next poll.</li>
+<li><strong>Polling load.</strong> A rack PDU with 50 OIDs polled every 30 s by two clients adds little load. A poll interval of 1 s on 1,200 PDUs (MSC-1 campus) can overload the PDU management cards. The DCIM design states the interval.</li>
+</ol>
+<h2 id="s21-9"><span class="n">21.9</span>Point types, naming convention and semantic tagging</h2>
+<h3 id="s21-9-1"><span class="n">21.9.1</span>Point types</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point type</th>
+<th>Signal</th>
+<th>Object</th>
+<th>Example</th>
+<th>Checked at point-to-point test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hardware analog input</td>
+<td>4–20 mA, 0–10 V, PT1000, negative temperature coefficient (NTC) thermistor 10k</td>
+<td>AI</td>
+<td>CDU TCS supply temperature</td>
+<td>Value against reference instrument</td>
+</tr>
+<tr>
+<td>Hardware analog output</td>
+<td>0–10 V, 4–20 mA</td>
+<td>AO</td>
+<td>CRAH chilled-water valve command</td>
+<td>Actuator position at 0, 25, 50, 75, 100 %</td>
+</tr>
+<tr>
+<td>Hardware binary input</td>
+<td>Dry contact, volt-free</td>
+<td>BI</td>
+<td>Pump run status from VFD relay</td>
+<td>Contact operated at the device</td>
+</tr>
+<tr>
+<td>Hardware binary output</td>
+<td>Relay contact</td>
+<td>BO</td>
+<td>Exhaust fan start</td>
+<td>Device starts and status returns</td>
+</tr>
+<tr>
+<td>Network point</td>
+<td>BACnet, Modbus, OPC UA, SNMP</td>
+<td>AI, BI, MSI, AV</td>
+<td>CDU flow from unit controller</td>
+<td>Value against device local display</td>
+</tr>
+<tr>
+<td>Software point</td>
+<td>Calculated or set in a controller</td>
+<td>AV, BV, MSV</td>
+<td>Hall average inlet temperature</td>
+<td>Calculation checked with test inputs</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s21-9-2"><span class="n">21.9.2</span>Naming convention</h3>
+<p>The point name is the address a person reads. It must identify site, building, area, equipment and point without a drawing. The MSC-1 convention has five fields separated by underscores. Figure <a class="figref" href="#F21-8">F21-8</a> shows the five fields of the CDU 07 TCS supply temperature name and the BACnet record that carries it. The name has 26 characters; the shortest Object_Name limit in the MSC-1 example is 32 characters.</p>
+<figure class="sheet" id="F21-8"><a href="../data/cx-handbook/figures/F21-8.svg" title="Open drawing F21-8 at full size"><img src="../data/cx-handbook/figures/F21-8.svg" alt="F21-8: Point name anatomy and the BACnet record of one point" width="1000" height="688" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F21-8</span> — <b>Point name anatomy and the BACnet record of one point</b>. Five fields separated by underscores give the site, building, area, equipment and point; the same name is the BACnet Object_Name and the key of the points list row.</figcaption></figure>
+
+<p><code>&lt;Site&gt;_&lt;Building&gt;_&lt;Area&gt;_&lt;Equipment&gt;_&lt;Point&gt;</code></p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Rule</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Site</td>
+<td>Fixed campus code</td>
+<td>MSC1</td>
+</tr>
+<tr>
+<td>Building</td>
+<td>B plus number</td>
+<td>B2</td>
+</tr>
+<tr>
+<td>Area</td>
+<td>Hall DH1 to DH3, plant room PR, electrical room ER, roof RF</td>
+<td>DH3</td>
+</tr>
+<tr>
+<td>Equipment</td>
+<td>Equipment type code plus two-digit number</td>
+<td>CDU07</td>
+</tr>
+<tr>
+<td>Point</td>
+<td>Point code from the project point dictionary</td>
+<td>TCS_SupT</td>
+</tr>
+</tbody>
+</table></div>
+<p>The full name of the CDU 07 TCS supply temperature is <mark>MSC1_B2_DH3_CDU07_TCS_SupT</mark>. The BACnet Object_Name holds the full name. The graphic label shows the short point description, for example "TCS supply temperature".</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Names built from controller numbers.</strong> A name such as "AS03_AI_12" tells the operator nothing and changes when a controller is replaced. The naming convention uses equipment tags from the equipment schedule.</li>
+<li><strong>Different codes for the same quantity.</strong> "SAT", "SupAirT" and "SA_Temp" on three CRAH types stop a fleet-wide trend query. The point dictionary is issued before the OEM unit controllers are configured, and OEM point names are mapped to it in the gateway or server.</li>
+<li><strong>Names longer than the field.</strong> Some controllers limit Object_Name length (for example 32 or 64 characters; check the PICS). The naming convention is tested against the shortest limit on the project.</li>
+</ol>
+<h3 id="s21-9-3"><span class="n">21.9.3</span>Point dictionary extract</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point code</th>
+<th>Meaning</th>
+<th>Units</th>
+<th>Object type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCS_SupT</td>
+<td>Technology cooling system supply temperature</td>
+<td>°C</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>TCS_RetT</td>
+<td>Technology cooling system return temperature</td>
+<td>°C</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>TCS_Flow</td>
+<td>TCS flow rate</td>
+<td>L/s</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>TCS_DP</td>
+<td>TCS differential pressure</td>
+<td>kPa</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>FWS_SupT</td>
+<td>Facility water system supply temperature</td>
+<td>°C</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>SAT</td>
+<td>Supply air temperature</td>
+<td>°C</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>RAT</td>
+<td>Return air temperature</td>
+<td>°C</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>Fan_Spd</td>
+<td>Fan speed feedback</td>
+<td>%</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>Fan_SpdCmd</td>
+<td>Fan speed command</td>
+<td>%</td>
+<td>AO</td>
+</tr>
+<tr>
+<td>Pmp1_Sts</td>
+<td>Pump 1 run status</td>
+<td>Off/On</td>
+<td>BI</td>
+</tr>
+<tr>
+<td>Leak_Alm</td>
+<td>Leak detected</td>
+<td>Normal/Alarm</td>
+<td>BI</td>
+</tr>
+<tr>
+<td>Mode</td>
+<td>Operating mode</td>
+<td>Auto/Manual/Maintenance/Off</td>
+<td>MSV</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s21-9-4"><span class="n">21.9.4</span>Semantic tagging: Project Haystack, Brick and ASHRAE 223P</h3>
+<p>A point name is text. Software that analyses thousands of points needs a machine-readable description: what the point measures, on which equipment, in which part of which system.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Publisher and status</th>
+<th>How it describes a point</th>
+<th>Use on a data-centre project</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project Haystack</td>
+<td>Project Haystack open-source community; version 4</td>
+<td>Tags on each entity: marker tags such as <code>point</code>, <code>sensor</code>, <code>temp</code>, <code>discharge</code>, and reference tags such as <code>equipRef</code></td>
+<td>Common in BMS servers and analytics tools; easy to apply to a points list</td>
+</tr>
+<tr>
+<td>Brick</td>
+<td>Brick consortium, open source</td>
+<td>Classes and relationships in a Resource Description Framework (RDF) graph, for example a water temperature sensor class linked to the CDU by <code>isPointOf</code> (class name in the example below)</td>
+<td>Used where the owner runs an analytics platform that reads RDF models</td>
+</tr>
+<tr>
+<td>ASHRAE 223P</td>
+<td>ASHRAE, developed through the BACnet Semantic Interoperability Working Group; second public review draft April 2026; not published as a standard at the access date</td>
+<td>Detailed model of connections, connection points and the medium (water, air, electricity) between equipment, using RDF, the Shapes Constraint Language (SHACL) and the SPARQL query language</td>
+<td>Specify only as "Haystack or Brick now, 223P when published"; confirm status before the contract</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Example:</strong> The Haystack record for MSC1_B2_DH3_CDU07_TCS_SupT has the tags <code>point</code>, <code>sensor</code>, <code>water</code>, <code>temp</code>, <code>leaving</code>, <code>his</code> (trended), <code>unit: "°C"</code>, <code>equipRef: @B2-DH3-CDU-07</code> and <code>siteRef: @MSC1</code>. The Brick model of the same point is an instance of <code>Leaving_Water_Temperature_Sensor</code> linked to the CDU by <code>isPointOf</code>.</p>
+<p><strong>Check:</strong> The commissioning manager asks the controls contractor for a tag export of 20 random points per hall and compares each tag set with the points list. A missing <code>equipRef</code> makes the point invisible to equipment-level dashboards.</p>
+<h2 id="s21-10"><span class="n">21.10</span>The points list: fields, review and two filled extracts</h2>
+
+<figure class="sheet" id="F21-5"><a href="../data/cx-handbook/figures/F21-5.svg" title="Open drawing F21-5 at full size"><img src="../data/cx-handbook/figures/F21-5.svg" alt="F21-5: Anatomy of a points list row: where each field comes from and which test uses it" width="1400" height="549" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F21-5</span> — <b>Anatomy of a points list row: where each field comes from and which test uses it</b>. Each field of one row has an owner and a downstream use: programming, graphics, alarms, trends, interface control documents and P2P sheets.</figcaption></figure>
+<h3 id="s21-10-1"><span class="n">21.10.1</span>Purpose of the points list</h3>
+<p><strong>Purpose:</strong> The points list is the single register of every BMS point. It is the input for controller programming, graphics, alarms, trends, the point-to-point test sheets and the interface control documents.</p>
+<p><strong>Owner:</strong> The controls contractor writes it. The engineer of record reviews it. The commissioning manager reviews it for testability. The operations team reviews alarm and trend columns.</p>
+<p><strong>Trigger:</strong> The first issue is due <mark>with the controls submittal</mark>, before controller programming starts. ASHRAE Guideline 13-2024 places the points list in the submittal content (confirm the clause number in the submittal requirements of ASHRAE Guideline 13-2024).</p>
+<h3 id="s21-10-2"><span class="n">21.10.2</span>Points list fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+<th>Who fills it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Point name</td>
+<td>Text, naming convention</td>
+<td>MSC1_B2_DH3_CDU07_TCS_SupT</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Description</td>
+<td>Text</td>
+<td>CDU 07 TCS supply temperature</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Equipment tag</td>
+<td>Text from equipment schedule</td>
+<td>B2-DH3-CDU-07</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Point type</td>
+<td>Choice: HW AI, HW AO, HW BI, HW BO, NET, SW</td>
+<td>NET</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>BACnet object</td>
+<td>Type and instance</td>
+<td>AI:301</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Device instance</td>
+<td>Integer</td>
+<td>233007</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Source protocol and address</td>
+<td>Text</td>
+<td>Modbus TCP, unit 1, HR 40101 FLOAT32 ABCD</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Units or state texts</td>
+<td>Text</td>
+<td>°C</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Range</td>
+<td>Numbers</td>
+<td>20 to 70</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Sensor type and accuracy</td>
+<td>Text</td>
+<td>PT1000 class A, ±0.15 K + 0.002·t (OEM)</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Alarm limits</td>
+<td>Numbers</td>
+<td>High 47.0, high-high 49.0, low 40.0</td>
+<td>Engineer of record</td>
+</tr>
+<tr>
+<td>Alarm class and delay</td>
+<td>Choice and seconds</td>
+<td>P2, 30 s</td>
+<td>Engineer of record and operations</td>
+</tr>
+<tr>
+<td>Trend interval and method</td>
+<td>Choice</td>
+<td>1 min interval and COV 0.1 K</td>
+<td>Operations</td>
+</tr>
+<tr>
+<td>Commandable priority</td>
+<td>Integer</td>
+<td>Not applicable (input)</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Relinquish_Default</td>
+<td>Value</td>
+<td>Not applicable</td>
+<td>Engineer of record</td>
+</tr>
+<tr>
+<td>Graphic page</td>
+<td>Text</td>
+<td>B2_DH3_CDU07</td>
+<td>Controls contractor</td>
+</tr>
+<tr>
+<td>Interface reference</td>
+<td>interface control document (ICD) number</td>
+<td>ICD-25-031</td>
+<td>Commissioning manager</td>
+</tr>
+<tr>
+<td>Test reference</td>
+<td>point-to-point (P2P) sheet number</td>
+<td>P2P-B2-DH3-CDU07</td>
+<td>Commissioning manager</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s21-10-3"><span class="n">21.10.3</span>Review steps for each points list issue</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Count check.</strong> Compare the number of points per equipment type with the OEM point list and the specification. A CRAH type with 28 points in the list and 40 in the OEM map needs an explanation for each missing point.</li>
+<li><strong>Naming check.</strong> Run the names through a script that checks the five-field format and the point dictionary codes. Return the list with every failed name.</li>
+<li><strong>Units and range check.</strong> Confirm every analog point has units and a range that covers the design values. A TCS supply sensor with a range of 0 to 50 °C cannot show the 55 °C return case.</li>
+<li><strong>Alarm check.</strong> Confirm every alarm has a limit, a class, a delay and a reset rule. Compare limits with the basis of design (BOD).</li>
+<li><strong>Trend check.</strong> Confirm every point used in a functional test or a key performance indicator (KPI) is trended at the interval the test needs.</li>
+<li><strong>Interface check.</strong> Confirm every network point has an interface control document reference and a register or object address.</li>
+<li><strong>Return within the review period.</strong> Return comments within the review time in the contract, for example 10 working days. The controls contractor resubmits within 5 working days of comments (project contract governs).</li>
+</ol>
+<h3 id="s21-10-4"><span class="n">21.10.4</span>Worked example: CRAH points list extract, 40 points</h3>
+<p>Figure <a class="figref" href="#F21-10">F21-10</a> shows the review counts of the two extracts in 21.10.4 and 21.10.5 by object type, alarm class and trend method. The reviewer compares these counts with the OEM point map at step 1 of 21.10.3.</p>
+<figure class="sheet" id="F21-10"><a href="../data/cx-handbook/figures/F21-10.svg" title="Open drawing F21-10 at full size"><img src="../data/cx-handbook/figures/F21-10.svg" alt="F21-10: Points list review counts: CRAH 11 (40 points) and CDU 07 (30 points)" width="1000" height="922" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F21-10</span> — <b>Points list review counts: CRAH 11 (40 points) and CDU 07 (30 points)</b>. These are the counts the reviewer compares with the OEM point map at step 1 of 21.10.3. Every alarmed point needs a class, a limit and a delay; every point used in a functional test needs a trend.</figcaption></figure>
+
+<p><strong>Worked example:</strong> CRAH 11 in Building 2, hall 3 (equipment tag B2-DH3-CRAH-11) has an OEM unit controller connected by BACnet/IP, device instance 232011. The unit has two electronically commutated (EC) fans, a chilled-water coil fed at 18/24 °C, a two-way modulating valve and a filter. The prefix MSC1_B2_DH3_CRAH11_ is omitted from the point names in the table.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Point</th>
+<th>Object</th>
+<th>Units or states</th>
+<th>Alarm (class, limit, delay)</th>
+<th>Trend</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>SAT</td>
+<td>AI:1</td>
+<td>°C</td>
+<td>P2 high 27.0, 60 s</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>2</td>
+<td>RAT</td>
+<td>AI:2</td>
+<td>°C</td>
+<td>P3 high 40.0, 300 s</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>3</td>
+<td>SAT_Sp</td>
+<td>AV:1</td>
+<td>°C</td>
+<td>none</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Inlet_T_Avg (from rack-row sensors)</td>
+<td>AV:2</td>
+<td>°C</td>
+<td>P2 high 27.0, 120 s</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>5</td>
+<td>SA_RH</td>
+<td>AI:3</td>
+<td>% RH</td>
+<td>P3 high 70, 600 s</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>6</td>
+<td>RA_RH</td>
+<td>AI:4</td>
+<td>% RH</td>
+<td>none</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Dewpoint</td>
+<td>AV:3</td>
+<td>°C</td>
+<td>P3 high 17.0, 600 s</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Fan1_Sts</td>
+<td>BI:1</td>
+<td>Off/On</td>
+<td>P2 fail, 30 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Fan2_Sts</td>
+<td>BI:2</td>
+<td>Off/On</td>
+<td>P2 fail, 30 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Fan1_Spd</td>
+<td>AI:5</td>
+<td>%</td>
+<td>none</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Fan2_Spd</td>
+<td>AI:6</td>
+<td>%</td>
+<td>none</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Fan_SpdCmd</td>
+<td>AO:1</td>
+<td>%</td>
+<td>none</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Fan1_Pwr</td>
+<td>AI:7</td>
+<td>kW</td>
+<td>none</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Fan2_Pwr</td>
+<td>AI:8</td>
+<td>kW</td>
+<td>none</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Fan1_Flt</td>
+<td>BI:3</td>
+<td>Normal/Fault</td>
+<td>P2, 5 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Fan2_Flt</td>
+<td>BI:4</td>
+<td>Normal/Fault</td>
+<td>P2, 5 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Airflow</td>
+<td>AI:9</td>
+<td>m³/s</td>
+<td>P3 low 10.0, 120 s</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Fan_DP</td>
+<td>AI:10</td>
+<td>Pa</td>
+<td>none</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Flt_DP</td>
+<td>AI:11</td>
+<td>Pa</td>
+<td>P4 high 250, 3,600 s</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td>20</td>
+<td>CHW_Vlv_Cmd</td>
+<td>AO:2</td>
+<td>%</td>
+<td>none</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>21</td>
+<td>CHW_Vlv_Pos</td>
+<td>AI:12</td>
+<td>%</td>
+<td>P3 deviation 10 % for 300 s</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>22</td>
+<td>CHW_SupT</td>
+<td>AI:13</td>
+<td>°C</td>
+<td>P3 high 20.0, 300 s</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>23</td>
+<td>CHW_RetT</td>
+<td>AI:14</td>
+<td>°C</td>
+<td>none</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>24</td>
+<td>CHW_Flow</td>
+<td>AI:15</td>
+<td>L/s</td>
+<td>none</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>25</td>
+<td>Coil_Duty</td>
+<td>AV:4</td>
+<td>kW</td>
+<td>none</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>26</td>
+<td>Cond_Leak</td>
+<td>BI:5</td>
+<td>Normal/Alarm</td>
+<td>P1, 0 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>27</td>
+<td>Unit_Enable</td>
+<td>BV:1</td>
+<td>Disable/Enable</td>
+<td>none</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>28</td>
+<td>Mode</td>
+<td>MSV:1</td>
+<td>Auto/Manual/Maintenance/Off</td>
+<td>P4 not Auto, 900 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>29</td>
+<td>Local_Remote</td>
+<td>BI:6</td>
+<td>Remote/Local</td>
+<td>P3 Local, 60 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>30</td>
+<td>Common_Alm</td>
+<td>BI:7</td>
+<td>Normal/Alarm</td>
+<td>P2, 0 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>31</td>
+<td>Comms_Sts</td>
+<td>BV:2 (server)</td>
+<td>Online/Offline</td>
+<td>P2 offline, 60 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>32</td>
+<td>Power_Fail</td>
+<td>BI:8</td>
+<td>Normal/Alarm</td>
+<td>P2, 0 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>33</td>
+<td>Supply_A_Sts</td>
+<td>BI:9</td>
+<td>Off/On</td>
+<td>P3 off, 10 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>34</td>
+<td>Supply_B_Sts</td>
+<td>BI:10</td>
+<td>Off/On</td>
+<td>P3 off, 10 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>35</td>
+<td>Fire_Shutdown</td>
+<td>BI:11</td>
+<td>Normal/Active</td>
+<td>P1, 0 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>36</td>
+<td>Run_Hours_F1</td>
+<td>AI:16</td>
+<td>h</td>
+<td>none</td>
+<td>1 day</td>
+</tr>
+<tr>
+<td>37</td>
+<td>Run_Hours_F2</td>
+<td>AI:17</td>
+<td>h</td>
+<td>none</td>
+<td>1 day</td>
+</tr>
+<tr>
+<td>38</td>
+<td>Lead_Lag_Rank</td>
+<td>AV:5</td>
+<td>rank number</td>
+<td>none</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>39</td>
+<td>Ctrl_FW_Ver</td>
+<td>CharacterString value</td>
+<td>text</td>
+<td>none</td>
+<td>on change</td>
+</tr>
+<tr>
+<td>40</td>
+<td>Alarm_Reset</td>
+<td>BV:3</td>
+<td>Normal/Reset</td>
+<td>none</td>
+<td>COV</td>
+</tr>
+</tbody>
+</table></div>
+<p>Notes on the extract:</p>
+<ol>
+<li><strong>Inlet temperature control.</strong> Points 4 and 1 show that the CRAH controls on the average rack inlet temperature with a supply air limit. The sequence of operation states which one is the controlled variable.</li>
+<li><strong>Fire shutdown is hardwired.</strong> Point 35 is a hardwired input from the fire alarm interface relay. The BMS reports the state. The relay in the unit's control circuit stops the fans; no network command is involved (chapter 20 and chapter 25).</li>
+<li><strong>Alarm limit 27.0 °C.</strong> The supply and inlet limits in the example use 27 °C. This value is the upper end of the recommended inlet range of 18 to 27 °C for classes A1 to A4. The source is the ASHRAE Thermal Guidelines for Data Processing Environments, 5th edition, 2021, reference card. The project BOD sets the actual limit.</li>
+</ol>
+<h3 id="s21-10-5"><span class="n">21.10.5</span>Worked example: CDU points list extract, 30 points</h3>
+<p><strong>Worked example:</strong> CDU 07 in Building 2, hall 3 (B2-DH3-CDU-07, device instance 233007) is a 1 MW liquid-to-liquid unit. The TCS side runs at 45 °C supply and 55 °C return. The facility water system (FWS) side runs at 35/45 °C. The required TCS flow at 1 MW and 10 K is 1 MW × 24.17 L/s per MW = <mark>24.2 L/s</mark> (MSC-1 ledger value 24.1651 L/s per MW). The unit controller exposes Modbus TCP; the building automation server maps it to BACnet objects. The prefix MSC1_B2_DH3_CDU07_ is omitted.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Point</th>
+<th>Source register (Modbus) and object</th>
+<th>Units or states</th>
+<th>Alarm (class, limit, delay)</th>
+<th>Trend</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>TCS_SupT</td>
+<td>IR 30001 INT16 ×0.1 → AI:301</td>
+<td>°C</td>
+<td>P2 high 47.0, 30 s; P1 high-high 49.0, 10 s</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>2</td>
+<td>TCS_RetT</td>
+<td>IR 30002 INT16 ×0.1 → AI:302</td>
+<td>°C</td>
+<td>P3 high 58.0, 60 s</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>3</td>
+<td>TCS_SupT_Sp</td>
+<td>HR 40010 INT16 ×0.1 → AV:301</td>
+<td>°C</td>
+<td>none</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>4</td>
+<td>TCS_Flow</td>
+<td>HR 40201–40202 FLOAT32 ABCD → AI:303</td>
+<td>L/s</td>
+<td>P2 low 20.0, 15 s</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>5</td>
+<td>TCS_DP</td>
+<td>IR 30004 INT16 ×0.1 → AI:304</td>
+<td>kPa</td>
+<td>P2 low 80.0, 15 s</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>6</td>
+<td>TCS_SupP</td>
+<td>IR 30005 INT16 ×0.1 → AI:305</td>
+<td>kPa(g)</td>
+<td>P2 low 197, 10 s</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>7</td>
+<td>TCS_RetP</td>
+<td>IR 30006 INT16 ×0.1 → AI:306</td>
+<td>kPa(g)</td>
+<td>none</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Pmp1_Sts</td>
+<td>DI 10001 → BI:301</td>
+<td>Off/On</td>
+<td>P3 fail, 10 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Pmp2_Sts</td>
+<td>DI 10002 → BI:302</td>
+<td>Off/On</td>
+<td>P3 fail, 10 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Pmp1_Spd</td>
+<td>IR 30010 UINT16 ×0.1 → AI:307</td>
+<td>%</td>
+<td>none</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Pmp2_Spd</td>
+<td>IR 30011 UINT16 ×0.1 → AI:308</td>
+<td>%</td>
+<td>none</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Pmp1_Flt</td>
+<td>DI 10003 → BI:303</td>
+<td>Normal/Fault</td>
+<td>P2, 0 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Pmp2_Flt</td>
+<td>DI 10004 → BI:304</td>
+<td>Normal/Fault</td>
+<td>P2, 0 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Duty_Pump</td>
+<td>IR 30012 → MSI:301</td>
+<td>Pump 1/Pump 2</td>
+<td>none</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>15</td>
+<td>FWS_SupT</td>
+<td>IR 30020 INT16 ×0.1 → AI:309</td>
+<td>°C</td>
+<td>P3 high 37.0, 60 s</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>16</td>
+<td>FWS_RetT</td>
+<td>IR 30021 INT16 ×0.1 → AI:310</td>
+<td>°C</td>
+<td>none</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>17</td>
+<td>FWS_Vlv_Pos</td>
+<td>IR 30022 UINT16 ×0.1 → AI:311</td>
+<td>%</td>
+<td>P3 at 100 % for 300 s</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>18</td>
+<td>FWS_Flow</td>
+<td>HR 40203–40204 FLOAT32 ABCD → AI:312</td>
+<td>L/s</td>
+<td>none</td>
+<td>10 s</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Duty_kW</td>
+<td>HR 40205–40206 FLOAT32 ABCD → AI:313</td>
+<td>kW</td>
+<td>none</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Reservoir_Lvl</td>
+<td>IR 30030 UINT16 ×0.1 → AI:314</td>
+<td>%</td>
+<td>P2 low 30, 30 s; P1 low-low 15, 5 s</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Leak_Tray</td>
+<td>DI 10010 → BI:305</td>
+<td>Normal/Alarm</td>
+<td>P1, 0 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Filter_DP</td>
+<td>IR 30031 INT16 ×0.1 → AI:315</td>
+<td>kPa</td>
+<td>P4 high 50, 3,600 s</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td>23</td>
+<td>Conductivity</td>
+<td>IR 30032 UINT16 → AI:316</td>
+<td>µS/cm</td>
+<td>P3 high (project fluid specification), 600 s</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td>24</td>
+<td>Fluid_pH</td>
+<td>IR 30033 UINT16 ×0.01 → AI:317</td>
+<td>pH</td>
+<td>P3 outside band, 600 s</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td>25</td>
+<td>Unit_State</td>
+<td>IR 30040 → MSI:302</td>
+<td>Off / Start / Run / Alarm / Maintenance</td>
+<td>P2 Alarm, 0 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>26</td>
+<td>Common_Alm</td>
+<td>DI 10011 → BI:306</td>
+<td>Normal/Alarm</td>
+<td>P2, 0 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>27</td>
+<td>Remote_Enable</td>
+<td>Coil 00001 → BO:301</td>
+<td>Disable/Enable</td>
+<td>none</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>28</td>
+<td>Supply_A_Sts</td>
+<td>DI 10012 → BI:307</td>
+<td>Off/On</td>
+<td>P3 off, 10 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>29</td>
+<td>Supply_B_Sts</td>
+<td>DI 10013 → BI:308</td>
+<td>Off/On</td>
+<td>P3 off, 10 s</td>
+<td>COV</td>
+</tr>
+<tr>
+<td>30</td>
+<td>Comms_Heartbeat</td>
+<td>HR 40300 UINT16 counter → AV:302</td>
+<td>count</td>
+<td>P2 not changing for 30 s</td>
+<td>none</td>
+</tr>
+</tbody>
+</table></div>
+<p>Notes on the extract:</p>
+<ol>
+<li><strong>Heartbeat point.</strong> Point 30 is a counter that the CDU controller increments every second. The BMS raises an alarm when the value <mark>stops changing for 30 s</mark>. This detects a frozen gateway that keeps sending the last good values with good status. Chapter 25, section 25.9, describes this failure.</li>
+<li><strong>Minimum pressure 197 kPa(g).</strong> Point 6 uses the minimum TCS supply pressure of the MSC-1 worked example from chapter 16. The project hydraulic design sets the actual value.</li>
+<li><strong>Setpoint authority.</strong> Point 3 is writable only if the interface control document gives the BMS authority to change the CDU supply setpoint. If not, the point is mapped read-only and the BACnet object is an AI.</li>
+<li><strong>Ten-second trends.</strong> The TCS points are trended at 10 s because the integrated systems test (chapter 28) judges CDU transfer events that last less than one minute.</li>
+</ol>
+<h2 id="s21-11"><span class="n">21.11</span>Alarm priorities, classes and routing</h2>
+
+<figure class="sheet" id="F21-6"><a href="../data/cx-handbook/figures/F21-6.svg" title="Open drawing F21-6 at full size"><img src="../data/cx-handbook/figures/F21-6.svg" alt="F21-6: Alarm flow from a CDU leak tray sensor to the operator, with the independent P1 path" width="1400" height="772" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F21-6</span> — <b>Alarm flow from a CDU leak tray sensor to the operator, with the independent P1 path</b>. The alarm passes through the unit controller, the automation server and the BMS server to the workstation and the operations centre; a summary relay drives a beacon without the servers.</figcaption></figure>
+<h3 id="s21-11-1"><span class="n">21.11.1</span>Alarm classes used on the campus</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Meaning</th>
+<th>Example</th>
+<th>Operator response time</th>
+<th>BACnet event priority (example mapping)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1 Critical</td>
+<td>Immediate risk to IT load or life safety</td>
+<td>CDU leak tray alarm; TCS supply high-high; fire shutdown active</td>
+<td>Acknowledge within 1 min; on site within 5 min</td>
+<td>10</td>
+</tr>
+<tr>
+<td>P2 Major</td>
+<td>Loss of redundancy or a failed device</td>
+<td>Pump fault on a CDU with standby running; CRAH fan fail</td>
+<td>Acknowledge within 5 min; action within 30 min</td>
+<td>50</td>
+</tr>
+<tr>
+<td>P3 Minor</td>
+<td>Condition outside normal band without loss of redundancy</td>
+<td>Valve deviation; filter high; humidity high</td>
+<td>Acknowledge within 30 min; work order same shift</td>
+<td>100</td>
+</tr>
+<tr>
+<td>P4 Advisory</td>
+<td>Maintenance information</td>
+<td>Filter differential pressure trend; run hours</td>
+<td>Next working day</td>
+<td>200</td>
+</tr>
+</tbody>
+</table></div>
+<p>BACnet event priorities run from 0 (highest) to 255 (lowest). They are set per transition (to-offnormal, to-fault, to-normal) in the Priority property of the Notification Class object (ANSI/ASHRAE 135-2024 clause 12.21; OPC 30030 clause 7.27.2.2 reproduces the rule: "Priorities shall range from 0 - 255 inclusive. A lower number indicates a higher priority"). The mapping in the table is the MSC-1 worked example. The project alarm philosophy document sets the classes and response times.</p>
+<h3 id="s21-11-2"><span class="n">21.11.2</span>Alarm fields recorded for each alarm point</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Point name</td>
+<td>Text</td>
+<td>MSC1_B2_DH3_CDU07_TCS_SupT</td>
+</tr>
+<tr>
+<td>Alarm type</td>
+<td>Choice</td>
+<td>High limit</td>
+</tr>
+<tr>
+<td>Limit</td>
+<td>Number with units</td>
+<td>47.0 °C</td>
+</tr>
+<tr>
+<td>Deadband</td>
+<td>Number</td>
+<td>0.5 K</td>
+</tr>
+<tr>
+<td>Time delay</td>
+<td>Seconds</td>
+<td>30</td>
+</tr>
+<tr>
+<td>Class</td>
+<td>Choice</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>Notification class</td>
+<td>Integer</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Acknowledgement required</td>
+<td>Choice for each transition</td>
+<td>To-offnormal yes; to-normal no</td>
+</tr>
+<tr>
+<td>Recipient list</td>
+<td>Text</td>
+<td>BMS server B2; campus operations centre</td>
+</tr>
+<tr>
+<td>Operator message</td>
+<td>Text</td>
+<td>"CDU 07 TCS supply above 47 °C. Check FWS supply and CDU valve. See SOP-COOL-12."</td>
+</tr>
+<tr>
+<td>Shelving allowed</td>
+<td>Choice</td>
+<td>Yes, maximum 8 h, supervisor role</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s21-11-3"><span class="n">21.11.3</span>Rules for alarm design</h3>
+<ol>
+<li><strong>Every alarm has an action.</strong> If no operator action exists for an alarm, the point becomes an event log entry or an advisory. An alarm list with many alarms that need <mark>no action</mark> makes operators miss the alarms that do.</li>
+<li><strong>Delays prevent chatter.</strong> A high limit without a delay and deadband on a noisy signal produces repeated alarm and return-to-normal messages. The example uses a 0.5 K deadband and a 30 s delay.</li>
+<li><strong>Suppression of consequential alarms.</strong> When a CDU is in Maintenance mode, its low-flow and pump alarms are suppressed and a single "CDU in maintenance" P4 event is shown. When the CDU power supply A is off, the comms alarm of devices powered only from supply A is suppressed for a set time (project alarm philosophy governs).</li>
+<li><strong>Alarm flood limit.</strong> The operations team sets a limit for the alarm rate an operator can handle. ANSI/ISA-18.2 defines an alarm flood as 10 or more annunciated alarms in any 10-minute period per operator (as quoted by Digital Refining, "Alarm floods and plant incidents"). The MSC-1 example target is fewer than 10 alarms in 10 minutes per operator during an upset (confirm the flood rate against the alarm performance metrics table in clause 16, monitoring and assessment, of ANSI/ISA-18.2-2016). The performance metrics table of the 2009 edition sets a target of less than 1 % of the time in a flood condition (Process Online, "Improving alarm management with ISA-18.2: Part 2"). The integrated systems test records the alarm count during a utility loss and compares it with the target.</li>
+<li><strong>Independent alarm path for P1.</strong> P1 alarms are also sent through <mark>a path that does not depend on the BMS server</mark>. Examples are a hardwired summary relay to a beacon in the operations room, or a second server. Chapter 22, section 22.16, tests it.</li>
+</ol>
+<h2 id="s21-12"><span class="n">21.12</span>Trend intervals and storage sizing</h2>
+<h3 id="s21-12-1"><span class="n">21.12.1</span>Trend interval rules</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point group</th>
+<th>Interval</th>
+<th>Method</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CDU TCS temperatures, flows, pressures</td>
+<td>10 s</td>
+<td>Interval</td>
+<td>Events during CDU transfers last under 60 s</td>
+</tr>
+<tr>
+<td>CRAH air temperatures, fan speed, valve position</td>
+<td>1 min</td>
+<td>Interval</td>
+<td>Air-side time constants are minutes</td>
+</tr>
+<tr>
+<td>Plant temperatures, flows, pump speeds</td>
+<td>1 min</td>
+<td>Interval</td>
+<td>Staging events</td>
+</tr>
+<tr>
+<td>Binary status and alarms</td>
+<td>On change</td>
+<td>COV</td>
+<td>Every change has a time stamp</td>
+</tr>
+<tr>
+<td>Energy and run hours</td>
+<td>15 min or 1 h</td>
+<td>Interval</td>
+<td>Reporting</td>
+</tr>
+<tr>
+<td>Water quality</td>
+<td>15 min</td>
+<td>Interval</td>
+<td>Slow change</td>
+</tr>
+</tbody>
+</table></div>
+<p>A university building automation system (BAS) guideline gives a default interval of 15 minutes and a "_COV" suffix for change-of-value trends. A data-centre BMS needs much shorter intervals for cooling points because the thermal time constants of liquid-cooled racks are short.</p>
+<h3 id="s21-12-2"><span class="n">21.12.2</span>Worked example: trend storage for one hall</h3>
+<p><strong>Worked example:</strong> Hall 3 of Building 2 has 1,480 points (section 21.1.3).</p>
+<ol>
+<li><strong>Points at 10 s.</strong> 16 CDUs × 12 analog points = 192 points. Samples per day: 192 × 8,640 = 1,658,880.</li>
+<li><strong>Points at 1 min.</strong> About 600 points. Samples per day: 600 × 1,440 = 864,000.</li>
+<li><strong>COV points.</strong> About 500 binary points with an average of 20 changes per day: 10,000 samples per day.</li>
+<li><strong>Total samples per day.</strong> About 2.53 million.</li>
+<li><strong>Storage.</strong> Assume 24 bytes per stored sample in the historian database (time stamp, value, status, index; example value, the sizing guide of the historian vendor governs). The hall then needs <mark>61 MB per day, 22 GB per year</mark>.</li>
+<li><strong>Retention.</strong> The MSC-1 example keeps 13 months online so that a full year can be compared with the same month of the previous year. This is about 24 GB per hall, 290 GB for 12 halls, before compression.</li>
+<li><strong>Controller buffer.</strong> Each controller Trend Log holds samples locally while the server is unreachable. A CDU trend buffer of 2,000 samples at 10 s holds <mark>5.5 hours</mark>. The server must collect the buffer before it fills, and the server outage test in chapter 22 confirms that no samples are lost for an outage of 1 hour.</li>
+</ol>
+<h2 id="s21-13"><span class="n">21.13</span>Redundancy of controllers, servers and networks</h2>
+<h3 id="s21-13-1"><span class="n">21.13.1</span>Redundancy options</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Common design on a hyperscale campus</th>
+<th>What happens on failure</th>
+<th>Test in chapter 22</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit controller (CRAH, CDU)</td>
+<td>One controller per unit; redundancy is at unit level (N+1 or N+2 units)</td>
+<td>The unit stops or holds its last state; other units carry the load</td>
+<td>Sequence test with one unit failed</td>
+</tr>
+<tr>
+<td>Plant controller (pumps, dry coolers, trim chillers)</td>
+<td>Redundant PLC pair with hot standby, or split plant across two controllers so that each controls half the equipment</td>
+<td>The standby takes over within the switchover time, or the remaining half carries the duty</td>
+<td>Controller failover test</td>
+</tr>
+<tr>
+<td>Automation server</td>
+<td>One per hall or per zone; equipment of one redundant group split across two servers</td>
+<td>Controllers continue; supervisory data from that server is lost</td>
+<td>Loss-of-supervision test</td>
+</tr>
+<tr>
+<td>BMS server</td>
+<td>Virtual machines on a high-availability cluster, or vendor redundant server pair, or third-party failover software</td>
+<td>Clients reconnect to the surviving server; history continues from controller buffers</td>
+<td>Server failover test</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>Two switches per hall, controllers dual-homed or split across switches; ring topology with a fast recovery protocol</td>
+<td>Traffic reroutes; ring recovery time sets the communication gap</td>
+<td>Network path failure test</td>
+</tr>
+<tr>
+<td>Control power</td>
+<td>Two supplies (A and B) to plant controllers; UPS-backed supply to all BMS panels</td>
+<td>Controller stays powered on loss of one supply</td>
+<td>Control power test</td>
+</tr>
+</tbody>
+</table></div>
+<p>Siemens documentation for Desigo CC states that an installation has one server station. High availability for the server is made with virtualisation or third-party failover software in many projects. Schneider documentation for EcoStruxure Building Operation states that building control continues when the link between controller and server is lost. The commissioning manager reads the vendor architecture document of the delivered product and tests the redundancy that the design states.</p>
+<h3 id="s21-13-2"><span class="n">21.13.2</span>Split of redundant equipment across controllers</h3>
+<p>Figure <a class="figref" href="#F21-9">F21-9</a> shows how the 16 CDUs of Building 2, hall 3 are split between the two hall switches: odd-numbered units on switch A and even-numbered units on switch B.</p>
+<figure class="sheet" id="F21-9"><a href="../data/cx-handbook/figures/F21-9.svg" title="Open drawing F21-9 at full size"><img src="../data/cx-handbook/figures/F21-9.svg" alt="F21-9: Split of the hall 3 CDUs across the two hall switches" width="1000" height="537" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F21-9</span> — <b>Split of the hall 3 CDUs across the two hall switches</b>. Units that back each other up in one zone connect to different switches, so the loss of one switch leaves every zone with two supervised CDUs.</figcaption></figure>
+
+<ol>
+<li><strong>Rule.</strong> Equipment that backs up other equipment <mark>does not share a controller</mark>, a power supply or a network switch with it. CDU 01 and CDU 02 of zone 1 connect to different hall switches.</li>
+<li><strong>Worked check.</strong> In Building 2, hall 3, the 4 CDUs of each zone connect alternately to switch A and switch B. Loss of switch A removes supervision of 8 CDUs but every zone keeps 2 supervised units. The CDUs keep running on local control during the loss.</li>
+<li><strong>Failure of shared software.</strong> A fault in shared software can affect every controller at once. The Amazon Web Services (AWS) Tokyo event of 23 August 2019 started in a control-system failover mode. A software bug made the control system and the connected PLCs unresponsive, and redundant cooling units in parts of one availability zone failed. The design defines the safe state that every unit controller takes when supervision is lost, for example full cooling with the last valid setpoint. Chapter 22 tests that each unit type reaches that state.</li>
+</ol>
+<h2 id="s21-14"><span class="n">21.14</span>Graphics standards</h2>
+<h3 id="s21-14-1"><span class="n">21.14.1</span>Rules for BMS graphics</h3>
+<ol>
+<li><strong>One page per equipment.</strong> Each CRAH, CDU, pump set and dry cooler has a page. Each page shows all points in the points list for that equipment.</li>
+<li><strong>Hall overview.</strong> Each hall has one overview with the CDU and CRAH states, the zone inlet temperatures and the active alarms. The overview fits on one screen without scrolling.</li>
+<li><strong>Status colours.</strong> The graphics standard defines one colour set for all pages. A common set is grey for off, green for running in normal state, amber for warning or manual mode and red for alarm. Magenta or a hatched pattern shows a communication fault or stale data (owner graphics standard governs).</li>
+<li><strong>Point quality shown.</strong> A value with a fault flag, an out-of-service flag or an override at priority 8 shows a marker beside the value. An operator must see that a value is not live.</li>
+<li><strong>Units on every value.</strong> Every analog value shows its units.</li>
+<li><strong>Setpoints and commands visible.</strong> Each control loop shows the setpoint, the measured value and the output on one page.</li>
+<li><strong>Navigation in two clicks.</strong> From the campus page to any equipment page takes no more than two levels of navigation in the MSC-1 standard.</li>
+<li><strong>Graphics match the drawings.</strong> Equipment shown on a page matches the flow diagram: valve positions, pump numbers, sensor locations. A graphic that shows a sensor on the return pipe when it is installed on the supply pipe misleads the operator.</li>
+</ol>
+<h3 id="s21-14-2"><span class="n">21.14.2</span>Graphics review record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Page name</td>
+<td>Text</td>
+<td>B2_DH3_CDU07</td>
+</tr>
+<tr>
+<td>Points shown / points in list</td>
+<td>Count</td>
+<td>30 / 30</td>
+</tr>
+<tr>
+<td>Units shown on all analog values</td>
+<td>Yes or no</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Quality markers tested</td>
+<td>Yes or no</td>
+<td>Yes (fault, override, out of service)</td>
+</tr>
+<tr>
+<td>Matches flow diagram revision</td>
+<td>Text</td>
+<td>M-B2-DH3-601 rev C</td>
+</tr>
+<tr>
+<td>Navigation checked</td>
+<td>Yes or no</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Reviewer and date</td>
+<td>Text and date</td>
+<td>Commissioning engineer, 2027-03-14</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s21-15"><span class="n">21.15</span>Control panel design and power to controls</h2>
+<h3 id="s21-15-1"><span class="n">21.15.1</span>Control panel requirements checked at design review and L2 inspection</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Requirement used in the MSC-1 example</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Enclosure</td>
+<td>Steel, IP54 minimum in plant rooms, IP31 in clean electrical rooms (project specification governs)</td>
+<td>Nameplate and data sheet</td>
+</tr>
+<tr>
+<td>Separation</td>
+<td>Mains voltage and extra-low voltage in separate sections with a barrier</td>
+<td>Visual inspection</td>
+</tr>
+<tr>
+<td>Terminals</td>
+<td>Numbered terminals matching the wiring diagram; one conductor per terminal side unless the terminal is rated for two</td>
+<td>Visual inspection</td>
+</tr>
+<tr>
+<td>Spare capacity</td>
+<td>20 % spare I/O of each type, 25 % spare DIN rail space (project specification governs)</td>
+<td>Count against the I/O schedule</td>
+</tr>
+<tr>
+<td>Labelling</td>
+<td>Panel tag, supply source and circuit, drawing number</td>
+<td>Visual inspection</td>
+</tr>
+<tr>
+<td>Ventilation and heat</td>
+<td>Panel internal temperature below the controller rating at the maximum room temperature</td>
+<td>Heat calculation in the submittal</td>
+</tr>
+<tr>
+<td>Earthing</td>
+<td>Protective earth bar; separate clean earth for shields if the specification requires it</td>
+<td>Continuity test</td>
+</tr>
+<tr>
+<td>Documentation pocket</td>
+<td>As-built wiring diagram inside the door</td>
+<td>Visual inspection</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s21-15-2"><span class="n">21.15.2</span>Power to controls</h3>
+<ol>
+<li><strong>UPS-backed control power.</strong> All BMS panels for cooling equipment are fed from a UPS-backed supply. A controller that restarts on every utility transfer loses its state and delays cooling restart.</li>
+<li><strong>Dual supply to plant controllers.</strong> Controllers for redundant plant receive supply A and supply B through a diode or relay module, or each controller of a redundant pair is fed from a different source.</li>
+<li><strong>Power supply sizing.</strong> The 24 V power supply in each panel is sized for the controllers, I/O modules and field devices it powers. The margin is at least 25 % (project specification governs). The submittal includes the load calculation.</li>
+<li><strong>Field device power.</strong> Actuators and transmitters powered from the panel are counted in the load. A 24 VAC transformer feeding 12 valve actuators that each draw 10 VA at stroke needs at least 120 VA plus margin.</li>
+<li><strong>Supply monitoring.</strong> Each panel reports supply-healthy status to the BMS. Point 32 in the CRAH extract is an example.</li>
+<li><strong>Ride-through test.</strong> Chapter 22, section 22.15, removes control power and records restart time and the state of every output after restart.</li>
+</ol>
+<p><strong>Worked example:</strong> The automation server panel B2-DH3-BMS-AS-01 has 1 automation server (12 W), 4 I/O modules (3 W each), 1 network switch (15 W) and 2 MS/TP routers (4 W each). The total load is 12 + 12 + 15 + 8 = 47 W at 24 VDC, or 1.96 A. With a 25 % margin the supply must deliver at least 2.45 A; the panel uses a <mark>5 A supply</mark>. The supply is fed from the UPS-backed mechanical distribution board B2-DB-MECH-UPS-A, circuit 14.</p>
+<h2 id="s21-16"><span class="n">21.16</span>Checklist for site use</h2>
+<ol>
+<li><strong>Device instance register received.</strong> The register covers every controller and gateway, has no duplicate instance and follows the campus scheme.</li>
+<li><strong>Network number register received.</strong> Every IP network, MS/TP trunk and BACnet/SC network has a unique number between 1 and 65534.</li>
+<li><strong>BBMD plan approved.</strong> One BBMD per subnet that needs broadcasts; all broadcast distribution tables identical.</li>
+<li><strong>BTL listing checked.</strong> Each controller and gateway model is listed, and the delivered firmware matches the listed revision or the deviation is approved.</li>
+<li><strong>PICS read for each device type.</strong> COV support, maximum subscriptions, object name length and application protocol data unit (APDU) size are recorded.</li>
+<li><strong>MS/TP trunk design checked.</strong> Baud rate, device count, length, termination, bias point and Max_Master value recorded per trunk.</li>
+<li><strong>Modbus maps received and frozen.</strong> Each map has a version, the firmware it applies to, the addressing convention, data types and word order.</li>
+<li><strong>Polling budget calculated.</strong> Each Modbus trunk and gateway has a polling cycle time below the alarm delay it supports.</li>
+<li><strong>OPC UA and SNMP security recorded.</strong> SignAndEncrypt for OPC UA; SNMP version 3 only.</li>
+<li><strong>Naming convention issued.</strong> The point dictionary is issued to all OEMs before unit controllers are configured.</li>
+<li><strong>Points list reviewed.</strong> Count, naming, units, ranges, alarms, trends and interface references checked and comments returned within the review period.</li>
+<li><strong>Alarm philosophy approved.</strong> Classes, response times, delays, suppression rules and flood target defined.</li>
+<li><strong>Trend plan and storage sized.</strong> Intervals per point group and historian storage for the retention period agreed.</li>
+<li><strong>Redundancy split checked.</strong> Redundant equipment does not share a controller, switch or power supply.</li>
+<li><strong>Safe state on loss of supervision defined.</strong> Each unit type has a written safe state for loss of BMS communication.</li>
+<li><strong>Graphics standard approved.</strong> Colours, quality markers, navigation and page list agreed before graphics production.</li>
+<li><strong>Panel design reviewed.</strong> Spare capacity, separation, labelling and heat calculation checked.</li>
+<li><strong>Control power design checked.</strong> UPS-backed supply, dual supply where required, and power supply load calculation reviewed.</li>
+<li><strong>Heartbeat points included.</strong> Each gateway and each network-integrated unit controller has a heartbeat or a stale-data check.</li>
+<li><strong>Semantic tagging sample checked.</strong> Tag export for 20 points per hall compared with the points list.</li>
+</ol>
+<h2 id="s21-17"><span class="n">21.17</span>Sources</h2>
+<ol>
+<li>ANSI/ASHRAE Standard 135-2024, BACnet — A Data Communication Protocol for Building Automation and Control Networks. ASHRAE, 2024. <a href="https://www.ashrae.org/technical-resources/bookstore/bacnet" rel="noopener">https://www.ashrae.org/technical-resources/bookstore/bacnet</a></li>
+<li>ASHRAE Guideline 13-2024, Specifying Building Automation Systems. ASHRAE, 2024. <a href="https://webstore.ansi.org/standards/ashrae/ashraeguideline132024" rel="noopener">https://webstore.ansi.org/standards/ashrae/ashraeguideline132024</a></li>
+<li>ASHRAE Guideline 36-2024, High-Performance Sequences of Operation for HVAC Systems. ASHRAE, 2024. <a href="https://webstore.ansi.org/standards/ashrae/ashraeguideline362024" rel="noopener">https://webstore.ansi.org/standards/ashrae/ashraeguideline362024</a></li>
+<li>MODBUS Application Protocol Specification V1.1b3. Modbus Organization, 2012. <a href="https://www.modbus.org/file/secure/modbusprotocolspecification.pdf" rel="noopener">https://www.modbus.org/file/secure/modbusprotocolspecification.pdf</a></li>
+<li>MODBUS over Serial Line Specification and Implementation Guide V1.02. Modbus-IDA, 2006. <a href="https://cars.uchicago.edu/software/epics/Modbus_over_serial_line_V1_02.pdf" rel="noopener">https://cars.uchicago.edu/software/epics/Modbus_over_serial_line_V1_02.pdf</a></li>
+<li>Modbus TCP MBAP header and message format reference. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/articles/modbus-tcp-mbap-header-and-message-format-reference/" rel="noopener">https://docs.chipkin.com/articles/modbus-tcp-mbap-header-and-message-format-reference/</a></li>
+<li>BACnet Discovery and Network Architecture Reference. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/articles/bacnet-discovery-network-architecture-reference/" rel="noopener">https://docs.chipkin.com/articles/bacnet-discovery-network-architecture-reference/</a></li>
+<li>What BACnet Secure Connect Is. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/protocols/bacnet/secure-connect/" rel="noopener">https://docs.chipkin.com/protocols/bacnet/secure-connect/</a></li>
+<li>Protecting Building Automation Systems with BACnet Secure Connect. ASHRAE eSociety, 2019. <a href="https://www.ashrae.org/news/esociety/protecting-building-automation-systems-with-bacnet-secure-connect" rel="noopener">https://www.ashrae.org/news/esociety/protecting-building-automation-systems-with-bacnet-secure-connect</a></li>
+<li>Troubleshooting Guide for BACnet MS/TP Networks. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/articles/troubleshooting-guide-for-bacnet-mstp-networks" rel="noopener">https://docs.chipkin.com/articles/troubleshooting-guide-for-bacnet-mstp-networks</a></li>
+<li>Understanding RS485: Cable Lengths and Baud Rates for BACnet MSTP. Chipkin Automation Systems, accessed 2026. <a href="https://store.chipkin.com/articles/understanding-rs485-cable-lengths-and-baud-rates-for-bacnet-mstp" rel="noopener">https://store.chipkin.com/articles/understanding-rs485-cable-lengths-and-baud-rates-for-bacnet-mstp</a></li>
+<li>OPC 30030 BACnet companion specification, clauses 3.2.1 and 8.4.2. OPC Foundation, version 2.00. <a href="https://reference.opcfoundation.org/BACnet/v200/docs/8.4.2" rel="noopener">https://reference.opcfoundation.org/BACnet/v200/docs/8.4.2</a></li>
+<li>BACnet — What is a BACnet priority array. Chipkin Automation Systems, accessed 2026. <a href="https://store.chipkin.com/articles/bacnet-what-is-a-bacnet-priority-array" rel="noopener">https://store.chipkin.com/articles/bacnet-what-is-a-bacnet-priority-array</a></li>
+<li>BACnet device profiles and B-BC profile pages. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/protocols/bacnet/profiles/" rel="noopener">https://docs.chipkin.com/protocols/bacnet/profiles/</a></li>
+<li>BTL Certification. BACnet International, accessed 2026. <a href="https://bacnetinternational.org/btl-certification/" rel="noopener">https://bacnetinternational.org/btl-certification/</a></li>
+<li>BACnet (encyclopedia entry, object type counts). Wikipedia, accessed 2026. <a href="https://en.wikipedia.org/wiki/BACnet" rel="noopener">https://en.wikipedia.org/wiki/BACnet</a></li>
+<li>Project Haystack, Introduction. Project Haystack, accessed 2026. <a href="https://project-haystack.org/doc/docHaystack/Intro" rel="noopener">https://project-haystack.org/doc/docHaystack/Intro</a></li>
+<li>Brick Schema, Introduction. Brick consortium, accessed 2026. <a href="https://brickschema.org/" rel="noopener">https://brickschema.org/</a></li>
+<li>Building Digitization and Semantic Interoperability (ASHRAE 223P status). NIST, accessed 2026. <a href="https://www.nist.gov/programs-projects/building-digitization-and-semantic-interoperability" rel="noopener">https://www.nist.gov/programs-projects/building-digitization-and-semantic-interoperability</a></li>
+<li>ASHRAE Standard 223P. U.S. Department of Energy, 2022. <a href="https://www.energy.gov/cmei/buildings/ashrae-standard-223p" rel="noopener">https://www.energy.gov/cmei/buildings/ashrae-standard-223p</a></li>
+<li>Service Name and Transport Protocol Port Number Registry (OPC UA 4840). IANA, accessed 2026. <a href="https://www.iana.org/assignments/service-names-port-numbers?search=484" rel="noopener">https://www.iana.org/assignments/service-names-port-numbers?search=484</a></li>
+<li>WinCC OA driver overview, network ports. Siemens ETM, accessed 2026. <a href="https://www.winccoa.com/documentation/WinCCOA/latest/en_US/driver/topics/driver_overview_network.html" rel="noopener">https://www.winccoa.com/documentation/WinCCOA/latest/en_US/driver/topics/driver_overview_network.html</a></li>
+<li>Building Automation System (BAS) Guidelines. Boise State University, 2023. <a href="https://www.boisestate.edu/operations/wp-content/uploads/sites/319/2023/08/Building-Automation-System-BAS-Guidelines.pdf" rel="noopener">https://www.boisestate.edu/operations/wp-content/uploads/sites/319/2023/08/Building-Automation-System-BAS-Guidelines.pdf</a></li>
+<li>Summary of the Amazon EC2 and Amazon EBS Service Event in the Tokyo (AP-NORTHEAST-1) Region. Amazon Web Services, 2019. <a href="https://aws.amazon.com/message/56489/" rel="noopener">https://aws.amazon.com/message/56489/</a></li>
+<li>Desigo CC System Overview, engineering help. Siemens, accessed 2026. <a href="https://mybuilding.siemens.com/d036861342594/help/engineeringhelp/en-US/12748007307.html" rel="noopener">https://mybuilding.siemens.com/d036861342594/help/engineeringhelp/en-US/12748007307.html</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="20-fire-life-safety-cause-effect.html"><span>Previous · 20</span><span class="t">Fire detection, suppression and life-safety interfaces</span></a><a class="next" href="22-bms-commissioning-procedure.html"><span>Next · 22</span><span class="t">BMS commissioning procedure</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>17 Earthing, lightning protection and power quality | Cx Field Manual R01</title>
+<meta name="description" content="This chapter covers three related subjects that a commissioning manager must prove before a data-centre building is handed over.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/17-earthing-lightning-power-quality.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/17-earthing-lightning-power-quality.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/17-earthing-lightning-power-quality.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/17-earthing-lightning-power-quality.html">
+<meta property="og:title" content="17 Earthing, lightning protection and power quality | Cx Field Manual R01">
+<meta property="og:description" content="This chapter covers three related subjects that a commissioning manager must prove before a data-centre building is handed over.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="17 Earthing, lightning protection and power quality | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter covers three related subjects that a commissioning manager must prove before a data-centre building is handed over.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"17 Earthing, lightning protection and power quality","name":"Earthing, lightning protection and power quality","description":"This chapter covers three related subjects that a commissioning manager must prove before a data-centre building is handed over.","url":"https://resistancezero.com/cx-handbook/17-earthing-lightning-power-quality.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/17-earthing-lightning-power-quality.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":10012,"position":17,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"17 Earthing, lightning protection and power quality","item":"https://resistancezero.com/cx-handbook/17-earthing-lightning-power-quality.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part C · Electrical commissioning</p>
+    <h1><span class="num">17</span>Earthing, lightning protection and power quality</h1>
+    <p class="lede">This chapter covers three related subjects that a commissioning manager must prove before a data-centre building is handed over.</p>
+    <p class="basis">Chapter 17 of 32 · 18 sections · 6 figures · 10,012 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 17</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 17</summary>
+<ol><li><a href="#s17-0"><span class="n">17.0</span>Scope of this chapter</a></li><li><a href="#s17-1"><span class="n">17.1</span>Earthing systems on a data-centre campus</a><ol><li><a href="#s17-1-1"><span class="n">17.1.1</span>What earthing does</a></li><li><a href="#s17-1-2"><span class="n">17.1.2</span>Parts of the MSC-1 earthing system</a></li><li><a href="#s17-1-3"><span class="n">17.1.3</span>TN-S distribution and the single N-PE link</a></li></ol></li><li><a href="#s17-2"><span class="n">17.2</span>Soil resistivity measurement</a><ol><li><a href="#s17-2-1"><span class="n">17.2.1</span>Purpose</a></li><li><a href="#s17-2-2"><span class="n">17.2.2</span>Wenner four-pin method</a></li></ol></li><li><a href="#s17-3"><span class="n">17.3</span>Earth electrode resistance: the fall-of-potential method</a><ol><li><a href="#s17-3-1"><span class="n">17.3.1</span>Principle</a></li><li><a href="#s17-3-2"><span class="n">17.3.2</span>Distances</a></li><li><a href="#s17-3-3"><span class="n">17.3.3</span>Procedure</a></li><li><a href="#s17-3-4"><span class="n">17.3.4</span>Acceptance values</a></li><li><a href="#s17-3-5"><span class="n">17.3.5</span>Worked example</a></li><li><a href="#s17-3-6"><span class="n">17.3.6</span>Earth resistance record fields</a></li></ol></li><li><a href="#s17-4"><span class="n">17.4</span>Other earth resistance methods</a><ol><li><a href="#s17-4-1"><span class="n">17.4.1</span>Slope method</a></li><li><a href="#s17-4-2"><span class="n">17.4.2</span>Clamp-on method</a></li><li><a href="#s17-4-3"><span class="n">17.4.3</span>High-current injection</a></li></ol></li><li><a href="#s17-5"><span class="n">17.5</span>Touch and step voltage, bonding and continuity</a><ol><li><a href="#s17-5-1"><span class="n">17.5.1</span>Touch and step voltage measurement</a></li><li><a href="#s17-5-2"><span class="n">17.5.2</span>Continuity of protective and bonding conductors</a></li><li><a href="#s17-5-3"><span class="n">17.5.3</span>Earth fault loop impedance</a></li></ol></li><li><a href="#s17-6"><span class="n">17.6</span>Lightning protection to IEC 62305</a><ol><li><a href="#s17-6-1"><span class="n">17.6.1</span>What the LPS protects against</a></li><li><a href="#s17-6-2"><span class="n">17.6.2</span>Risk assessment and protection level</a></li><li><a href="#s17-6-3"><span class="n">17.6.3</span>External LPS inspection and tests</a></li><li><a href="#s17-6-4"><span class="n">17.6.4</span>Inspection intervals</a></li></ol></li><li><a href="#s17-7"><span class="n">17.7</span>Surge protective devices</a><ol><li><a href="#s17-7-1"><span class="n">17.7.1</span>What an SPD does</a></li><li><a href="#s17-7-2"><span class="n">17.7.2</span>SPD types to IEC 61643-11</a></li><li><a href="#s17-7-3"><span class="n">17.7.3</span>Installation checks and tests</a></li></ol></li><li><a href="#s17-8"><span class="n">17.8</span>Power quality: what it is and the standards</a><ol><li><a href="#s17-8-1"><span class="n">17.8.1</span>Why power quality is measured on a data centre</a></li><li><a href="#s17-8-2"><span class="n">17.8.2</span>Standards and what each covers</a></li></ol></li><li><a href="#s17-9"><span class="n">17.9</span>PQ instruments and set-up</a><ol><li><a href="#s17-9-1"><span class="n">17.9.1</span>IEC 61000-4-30 Class A</a></li><li><a href="#s17-9-2"><span class="n">17.9.2</span>Set-up parameters</a></li><li><a href="#s17-9-3"><span class="n">17.9.3</span>Connection procedure</a></li></ol></li><li><a href="#s17-10"><span class="n">17.10</span>Harmonics and IEEE 519-2022</a><ol><li><a href="#s17-10-1"><span class="n">17.10.1</span>Terms</a></li><li><a href="#s17-10-2"><span class="n">17.10.2</span>Voltage distortion limits (IEEE 519 Table 1)</a></li><li><a href="#s17-10-3"><span class="n">17.10.3</span>Current distortion limits (IEEE 519 Table 2, 120 V to 69 kV)</a></li><li><a href="#s17-10-4"><span class="n">17.10.4</span>Assessment statistics</a></li><li><a href="#s17-10-5"><span class="n">17.10.5</span>Worked examples of the ISC/IL ratio</a></li><li><a href="#s17-10-6"><span class="n">17.10.6</span>Reading a harmonic spectrum</a></li><li><a href="#s17-10-7"><span class="n">17.10.7</span>Harmonic filter and power factor correction checks</a></li></ol></li><li><a href="#s17-11"><span class="n">17.11</span>Voltage dips, swells, interruptions and the ITIC curve</a><ol><li><a href="#s17-11-1"><span class="n">17.11.1</span>Definitions</a></li><li><a href="#s17-11-2"><span class="n">17.11.2</span>ITIC curve</a></li><li><a href="#s17-11-3"><span class="n">17.11.3</span>Worked example of event review</a></li><li><a href="#s17-11-4"><span class="n">17.11.4</span>Dip table</a></li></ol></li><li><a href="#s17-12"><span class="n">17.12</span>Flicker, unbalance and frequency</a><ol><li><a href="#s17-12-1"><span class="n">17.12.1</span>Flicker</a></li><li><a href="#s17-12-2"><span class="n">17.12.2</span>Voltage unbalance</a></li><li><a href="#s17-12-3"><span class="n">17.12.3</span>Frequency</a></li></ol></li><li><a href="#s17-13"><span class="n">17.13</span>PQ survey procedure and data review</a><ol><li><a href="#s17-13-1"><span class="n">17.13.1</span>Survey procedure</a></li><li><a href="#s17-13-2"><span class="n">17.13.2</span>PQ report content and record fields</a></li><li><a href="#s17-13-3"><span class="n">17.13.3</span>Cross-check with the permanent meters</a></li></ol></li><li><a href="#s17-14"><span class="n">17.14</span>Records</a><ol><li><a href="#s17-14-1"><span class="n">17.14.1</span>Earthing and LPS record (filled example)</a></li><li><a href="#s17-14-2"><span class="n">17.14.2</span>PQ record (filled example)</a></li></ol></li><li><a href="#s17-15"><span class="n">17.15</span>Common errors, detection before the witness test and KPIs</a></li><li><a href="#s17-16"><span class="n">17.16</span>Checklist for site use</a></li><li><a href="#s17-17"><span class="n">17.17</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="16-ups-batteries-transfer-rack-power.html"><span>Previous</span>16 UPS, batteries, transfer switches and rack power distribution</a><a href="18-chw-plant-heat-rejection-flushing.html"><span>Next</span>18 Chilled-water and heat-rejection plant</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s17-0"><span class="n">17.0</span>Scope of this chapter</h2>
+<p>This chapter covers three related subjects that a commissioning manager must prove before a data-centre building is handed over. They are the earthing and bonding system, the lightning protection system (LPS) with its surge protective devices (SPD), and the power quality (PQ) of the supply and of the installation. For each subject the chapter gives what the system is and why it exists, the tests, the instruments, the applied values and the acceptance values with their sources. It also gives the record fields, filled examples and the common errors.</p>
+<ol>
+<li><strong>Earthing systems.</strong> The earthing arrangement of a campus: substation grid, building ring earth, main earthing terminal (MET), TN-S distribution and data-hall bonding.</li>
+<li><strong>Soil resistivity.</strong> The Wenner method and its use in the design check.</li>
+<li><strong>Earth electrode resistance.</strong> The fall-of-potential method of IEEE 81 with the 61.8 % rule, the slope method, the clamp-on method and their limits.</li>
+<li><strong>Bonding and continuity.</strong> Low-resistance measurements of protective and bonding conductors.</li>
+<li><strong>Touch and step voltage.</strong> When and how they are measured.</li>
+<li><strong>Lightning protection.</strong> IEC 62305 risk assessment, lightning protection levels (LPL) and LPS classes, rolling sphere and mesh methods, inspection and tests.</li>
+<li><strong>Surge protection.</strong> IEC 61643-11 SPD types, installation checks and records.</li>
+<li><strong>Power quality.</strong> IEEE 519 harmonic limits, IEC 61000-4-30 Class A instruments, IEC 61000-4-7 harmonics, IEC 61000-4-15 flicker, voltage dips and swells, the Information Technology Industry Council (ITIC) curve, the PQ survey procedure and the review of PQ data.</li>
+</ol>
+<p>Documents and standards used: IEEE 81-2025 (supersedes 81-2012; measuring earth resistivity, ground impedance and earth surface potentials), IEEE 80 (safety in AC substation grounding), IEEE 142 (grounding of industrial and commercial power systems), IEC 60364-5-54, IEC 60364-6 and PUIL 2020 (SNI 0225). The chapter also uses IEC 62305-1 to -4 (with IEC 62305-3:2024), IEC 61643-11:2025 and IEC 61643-12, IEEE 519-2022, IEC 61000-4-30:2025, IEC 61000-4-7 and IEC 61000-4-15. It also uses IEC 62586-2, EN 50160, the ITIC (CBEMA) curve note, SEMI F47 and the MSC-1 numbers in <code>case_ledger.json</code>. Values not checked against the current edition are marked for confirmation, with the document and the table or clause named in the bracket.</p>
+<h2 id="s17-1"><span class="n">17.1</span>Earthing systems on a data-centre campus</h2>
+
+<figure class="sheet" id="F17-1"><a href="../data/cx-handbook/figures/F17-1.svg" title="Open drawing F17-1 at full size"><img src="../data/cx-handbook/figures/F17-1.svg" alt="F17-1: Earthing and bonding scheme of one MSC-1 building: grid, ring earth, MET, TN-S and hall bonding" width="1400" height="912" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F17-1</span> — <b>Earthing and bonding scheme of one MSC-1 building: grid, ring earth, MET, TN-S and hall bonding</b>. All earth electrodes on the site are bonded into one system; the neutral of each LV system is connected to earth at one point only, so no neutral current flows in the protective conductors.</figcaption></figure>
+<h3 id="s17-1-1"><span class="n">17.1.1</span>What earthing does</h3>
+<p>Earthing has three functions on a data-centre campus. First, it carries fault current back to the source so that protective devices operate quickly (protective earthing). Second, it limits the voltages that people can touch during a fault (touch and step voltage). Third, it provides a common reference and a low-impedance path for lightning and surge currents (functional and lightning earthing). On MSC-1 <mark>one connected system serves all three functions</mark>; separate, unbonded earth electrodes on the same site create dangerous voltage differences during a fault or a lightning strike.</p>
+<p>Figure <a class="figref" href="#F17-1">F17-1</a> shows the earthing and bonding scheme of one MSC-1 building.</p>
+<h3 id="s17-1-2"><span class="n">17.1.2</span>Parts of the MSC-1 earthing system</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Description (MSC-1 example)</th>
+<th>Design basis</th>
+<th>Commissioning test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Substation earth grid</td>
+<td>buried copper mesh under the 150/20 kV substation, 60 × 40 m, with rods</td>
+<td>IEEE 80 touch and step voltage study</td>
+<td>fall-of-potential (17.3), touch and step (17.5)</td>
+</tr>
+<tr>
+<td>20 kV neutral earthing</td>
+<td>80 MVA transformer neutral through a neutral earthing resistor (NER) (example 1,000 A, 10 s)</td>
+<td>earthing study, relay settings</td>
+<td>NER resistance, connection continuity</td>
+</tr>
+<tr>
+<td>Building ring earth</td>
+<td>bare copper conductor around each building, about 0.8 m deep, with rods at corners, bonded to the foundation steel</td>
+<td>IEC 62305-3 type B arrangement, IEC 60364-5-54</td>
+<td>fall-of-potential of the combined system, continuity</td>
+</tr>
+<tr>
+<td>Main earthing terminal (MET)</td>
+<td>copper bar in each electrical room with removable test links</td>
+<td>IEC 60364-5-54</td>
+<td>continuity, test link resistance</td>
+</tr>
+<tr>
+<td>Block transformer star point</td>
+<td>each 2.5 MVA Dyn11 transformer LV star point connected to the MET through one N-PE link</td>
+<td>TN-S system, one N-PE link per source</td>
+<td>visual, test of neutral current in the protective earth conductor (PE)</td>
+</tr>
+<tr>
+<td>Protective conductors</td>
+<td>PE in every circuit, PE bars in every board</td>
+<td>IEC 60364-5-54 sizing</td>
+<td>continuity, earth fault loop impedance</td>
+</tr>
+<tr>
+<td>Data-hall supplementary bonding</td>
+<td>bonding of rack frames, cable trays, raised floor or overhead structure, pipework</td>
+<td>ANSI/TIA-607 or project telecom bonding standard</td>
+<td>continuity</td>
+</tr>
+<tr>
+<td>Lightning protection</td>
+<td>air terminals, roof mesh, down conductors, test joints</td>
+<td>IEC 62305-3</td>
+<td>continuity, earth resistance at test joints</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s17-1-3"><span class="n">17.1.3</span>TN-S distribution and the single N-PE link</h3>
+<p>In a TN-S system the neutral (N) and protective earth (PE) conductors are separate from the source to every load. The neutral is connected to earth <mark>at one point only</mark>, at the source (the transformer star point or the MET). If the neutral is connected to PE at a second point, part of the neutral current returns through the PE conductors, cable screens and building steel. This current causes magnetic fields, corrosion, noise on data cables and wrong readings on earth-fault protection.</p>
+<p><strong>Check:</strong> With the block under normal load, clamp the PE conductor of each outgoing feeder and the main bonding conductor. <mark>Current in the PE conductors above a few amperes points to a second N-PE connection</mark> downstream. The usual causes are a neutral bar link left in a sub-board, or an equipment neutral terminal bonded to its frame. Another cause is an uninterruptible power supply (UPS) output configured as a separately derived source without a matching design.</p>
+<p><strong>Worked example:</strong> Block B2-DH3-A1 at 1,200 A load. Clamp readings: main N-PE link 4.1 A, PE of feeder QF2 (mechanical board) 18.6 A, PE of other feeders below 0.5 A. The mechanical board neutral bar is found linked to its PE bar by a factory link that should have been removed. After removal, the QF2 PE current reads 0.3 A and the main link 22.5 A (the unbalanced current of the block returning to the star point as designed).</p>
+<h2 id="s17-2"><span class="n">17.2</span>Soil resistivity measurement</h2>
+<h3 id="s17-2-1"><span class="n">17.2.1</span>Purpose</h3>
+<p>Soil resistivity is measured before design, to size the earth grid, and during commissioning when a measured earth resistance differs from the design value. The result explains whether the difference comes from the soil or from the installation.</p>
+<h3 id="s17-2-2"><span class="n">17.2.2</span>Wenner four-pin method</h3>
+<p>Instrument used: Four-pole earth tester with a frequency different from 50 Hz (to reject power-frequency interference), four probes and reels of test lead.</p>
+<p>Set-up: Four probes in a straight line with equal spacing a; the outer two inject current, the inner two measure voltage. The probe depth is small compared with a (practice: depth below a / 20).</p>
+<p>Calculation: <mark>ρ = 2π a R</mark>, where R is the reading in ohms and a in metres. The reading for spacing a represents the soil down to a depth of about a.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Choose traverses.</strong> At least two traverses at right angles across the site, away from buried metal (pipes, cables, fences).</li>
+<li><strong>Spacings.</strong> Take readings at a = 1, 2, 4, 8, 16 and 32 m (or as the design needs).</li>
+<li><strong>Record.</strong> Spacing, reading, calculated ρ, soil condition (dry, wet), date and weather.</li>
+<li><strong>Plot.</strong> Plot ρ against a. A flat curve means uniform soil; a rising or falling curve means layered soil.</li>
+</ol>
+<p><strong>Worked example:</strong> Traverse 1 at the MSC-1 substation site, after two dry days:</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Spacing a (m)</th>
+<th>Reading R (Ω)</th>
+<th>ρ = 2π a R (Ω·m)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>9.6</td>
+<td>60.3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>4.4</td>
+<td>55.3</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2.0</td>
+<td>50.3</td>
+</tr>
+<tr>
+<td>8</td>
+<td>0.86</td>
+<td>43.2</td>
+</tr>
+<tr>
+<td>16</td>
+<td>0.37</td>
+<td>37.2</td>
+</tr>
+<tr>
+<td>32</td>
+<td>0.17</td>
+<td>34.2</td>
+</tr>
+</tbody>
+</table></div>
+<p>The resistivity falls from about 60 Ω·m near the surface to about 34 Ω·m at depth, which is typical of a dry upper layer over wetter clay. The design used a two-layer model with 60 and 35 Ω·m, so the soil matches the design.</p>
+<h2 id="s17-3"><span class="n">17.3</span>Earth electrode resistance: the fall-of-potential method</h2>
+
+<figure class="sheet" id="F17-2"><a href="../data/cx-handbook/figures/F17-2.svg" title="Open drawing F17-2 at full size"><img src="../data/cx-handbook/figures/F17-2.svg" alt="F17-2: Fall-of-potential test of the substation earth grid: electrode positions and the resistance curve (example)" width="1400" height="903" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F17-2</span> — <b>Fall-of-potential test of the substation earth grid: electrode positions and the resistance curve (example)</b>. The resistance rises from the grid, flattens in the zone where neither electrode influences the reading, and rises again near C; the true value is read on the flat part at about 61.8 % of the distance to C.</figcaption></figure>
+<h3 id="s17-3-1"><span class="n">17.3.1</span>Principle</h3>
+<p>The fall-of-potential method injects a test current between the electrode under test (E) and a remote current electrode (C). A potential probe (P) placed between them measures the voltage between E and P. The ratio of voltage to current is the resistance. Near E the reading is low because P is inside the voltage gradient of E; near C the reading is high because P is inside the gradient of C. Between them, where neither electrode influences the reading, the curve is flat. IEEE 81-2012 Annex C (the edition the source quotes; the IEEE 81-2025 annex was not read) shows that for a hemispherical electrode in uniform soil the true resistance is read with <mark>P at 61.8 % of the distance from E to C</mark> (RF-17 row 1).</p>
+<p>Figure <a class="figref" href="#F17-2">F17-2</a> shows the set-up and the resistance curve for the MSC-1 substation grid.</p>
+<h3 id="s17-3-2"><span class="n">17.3.2</span>Distances</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Electrode under test</th>
+<th>Largest dimension D</th>
+<th>Distance E to C (practice)</th>
+<th>P at 61.8 %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single rod 3 m</td>
+<td>3 m</td>
+<td>at least 30 m (10 × rod length)</td>
+<td>18.5 m</td>
+</tr>
+<tr>
+<td>Building ring earth 120 × 60 m</td>
+<td>diagonal 134 m</td>
+<td>5 to 10 × diagonal: 670 to 1,340 m (impractical on most sites; see slope method)</td>
+<td>414 to 828 m</td>
+</tr>
+<tr>
+<td>Substation grid 60 × 40 m</td>
+<td>diagonal 72 m</td>
+<td>5.5 × diagonal = 400 m (MSC-1 example)</td>
+<td>247 m</td>
+</tr>
+</tbody>
+</table></div>
+<p>The distance from E to C is measured from the electrical centre of the electrode under test, which for a grid is near its geometric centre. Distances of 5 to 10 times the largest dimension are common practice for large grids; IEEE 81 discusses the required distances in detail (confirm against IEEE 81-2025; clause 8 is the number in the superseded 2012 edition). Some instrument guides use 2 to 3 times the largest dimension. At shorter distances the plateau check of 17.3.3 step 5 or the slope method decides whether the reading is valid.</p>
+<h3 id="s17-3-3"><span class="n">17.3.3</span>Procedure</h3>
+<p><strong>Trigger:</strong> Earth grid or ring earth complete and backfilled; before energisation of the substation or the building.</p>
+<p><strong>Owner:</strong> Electrical contractor or testing contractor; witnessed by the commissioning authority (CxA).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Isolate the electrode where possible.</strong> For a single rod or a test point, open the test link so that the reading is of that electrode alone. For a substation grid that is bonded to the utility earth through cable screens, record the bonds. The measurement then includes them. This is the value that matters for the touch-voltage study, and the record states it.</li>
+<li><strong>Lay out the line.</strong> Run the current lead to C at the planned distance in a straight line away from buried metal. Run the potential lead to P on the same line, with the two leads kept apart (several metres) to reduce mutual coupling.</li>
+<li><strong>Drive probes.</strong> Drive C and P to good contact; wet them if the soil is dry.</li>
+<li><strong>Measure at 61.8 %.</strong> Record the reading with P at 61.8 % of E to C.</li>
+<li><strong>Check the plateau.</strong> Move P to about 52 % and 72 % and record. If the three readings agree <mark>within about ±5 %</mark>, the plateau exists (practice, RF-17 row 2).</li>
+<li><strong>Full curve where needed.</strong> If they do not agree, take readings from 10 % to 90 % and plot the curve; increase the E to C distance or use the slope method.</li>
+<li><strong>Second direction.</strong> Repeat on a second line at an angle of at least 90° to the first. The two results should agree within the measurement uncertainty.</li>
+<li><strong>Restore.</strong> Close all test links, torque and mark them.</li>
+<li><strong>Record.</strong> Fill the earth resistance record (17.3.6).</li>
+</ol>
+<h3 id="s17-3-4"><span class="n">17.3.4</span>Acceptance values</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Electrode</th>
+<th>Acceptance value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Substation grid</td>
+<td>value from the IEEE 80 design study that gives safe touch and step voltages at the design fault current</td>
+<td>project earthing study</td>
+</tr>
+<tr>
+<td>Combined building earthing system on a data-centre campus</td>
+<td>≤ 1 Ω is a common project requirement</td>
+<td>project specification (example)</td>
+</tr>
+<tr>
+<td>LPS earth termination (type A arrangement)</td>
+<td>≤ 10 Ω at low frequency is the IEC 62305-3 guidance value for the overall earth termination (ABB Furse technical reference to IEC/BS EN 62305-3, RF-17 row 29)</td>
+<td>IEC 62305-3 clause 5.4 (earth termination system)</td>
+</tr>
+<tr>
+<td>Building earth electrode for a TT or TN system</td>
+<td>value from PUIL 2020 and the protective device calculation</td>
+<td>PUIL 2020 (SNI 0225:2020) and the project earthing calculation</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>The acceptance value is the one stated in the project specification</mark>. A value from a general standard is used only where the specification refers to it.</p>
+<h3 id="s17-3-5"><span class="n">17.3.5</span>Worked example</h3>
+<p><strong>Worked example:</strong> MSC-1 substation grid, 60 × 40 m, C at 400 m, test current about 30 mA at 128 Hz.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>P position</th>
+<th>Distance from E</th>
+<th>Reading</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10 %</td>
+<td>40 m</td>
+<td>0.20 Ω</td>
+</tr>
+<tr>
+<td>30 %</td>
+<td>120 m</td>
+<td>0.35 Ω</td>
+</tr>
+<tr>
+<td>52 %</td>
+<td>208 m</td>
+<td>0.40 Ω</td>
+</tr>
+<tr>
+<td>61.8 %</td>
+<td>247 m</td>
+<td>0.42 Ω</td>
+</tr>
+<tr>
+<td>72 %</td>
+<td>288 m</td>
+<td>0.44 Ω</td>
+</tr>
+<tr>
+<td>90 %</td>
+<td>360 m</td>
+<td>0.70 Ω</td>
+</tr>
+</tbody>
+</table></div>
+<p>The 52 %, 61.8 % and 72 % readings are 0.40, 0.42 and 0.44 Ω, within ±4.8 % of 0.42 Ω, so the plateau exists. Second line at 90°: 0.41 Ω at 61.8 %. The design study requires ≤ 0.5 Ω for the grid to keep the touch voltage below the IEEE 80 tolerable value at the design earth-fault current (example). <mark>The grid is accepted at 0.42 Ω</mark>.</p>
+<h3 id="s17-3-6"><span class="n">17.3.6</span>Earth resistance record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Electrode ID</td>
+<td>text</td>
+<td>MSC1-SS1-GRID</td>
+</tr>
+<tr>
+<td>Electrode description and size</td>
+<td>text</td>
+<td>copper mesh 60 × 40 m, 24 rods 3 m</td>
+</tr>
+<tr>
+<td>Method</td>
+<td>list</td>
+<td>fall-of-potential, 61.8 %</td>
+</tr>
+<tr>
+<td>E to C distance, direction</td>
+<td>number m, text</td>
+<td>400 m, bearing 090°</td>
+</tr>
+<tr>
+<td>Readings at 52 %, 61.8 %, 72 %</td>
+<td>numbers Ω</td>
+<td>0.40, 0.42, 0.44</td>
+</tr>
+<tr>
+<td>Second direction reading</td>
+<td>number Ω</td>
+<td>0.41</td>
+</tr>
+<tr>
+<td>Test frequency and current</td>
+<td>text</td>
+<td>128 Hz, 30 mA</td>
+</tr>
+<tr>
+<td>Soil condition and weather</td>
+<td>text</td>
+<td>dry, no rain for 2 days</td>
+</tr>
+<tr>
+<td>Bonds connected during test</td>
+<td>text</td>
+<td>150 kV cable screens bonded</td>
+</tr>
+<tr>
+<td>Instrument, SN, certificate</td>
+<td>text</td>
+<td>earth tester SN 44211, cert due 2027-04-01</td>
+</tr>
+<tr>
+<td>Acceptance value and source</td>
+<td>text</td>
+<td>≤ 0.5 Ω, earthing study MSC1-SS1-ES-001 rev B</td>
+</tr>
+<tr>
+<td>Result, signatures</td>
+<td>text</td>
+<td>pass; contractor, CxA</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s17-4"><span class="n">17.4</span>Other earth resistance methods</h2>
+<h3 id="s17-4-1"><span class="n">17.4.1</span>Slope method</h3>
+<p>For large electrodes, C sometimes cannot be placed far enough away. In that case the slope method uses readings at 20 %, 40 % and 60 % of the E to C distance to estimate where the true value lies. The slope coefficient is μ = (R60 - R40) / (R40 - R20). The Megger table "Values of DP / DC for various values of μ" is in the Megger guide "Getting Down to Earth" and is reproduced in the Megger DET2/3 user manual. For each μ it gives the ratio Pt / C, which is the potential probe position that gives the true resistance. Examples from that table: μ = 0.40 gives 0.643, μ = 0.80 gives 0.580 and μ = 1.20 gives 0.494 (RF-17 row 30). If μ is above the last value in the table, C is moved further away. The method assumes uniform soil and a hemispherical electrode approximation.</p>
+<h3 id="s17-4-2"><span class="n">17.4.2</span>Clamp-on method</h3>
+<p>A clamp-on earth tester induces a voltage in a closed earth loop and measures the current. It reads the resistance of the loop, which equals the resistance of the clamped electrode only when the rest of the loop (many parallel electrodes) has a much lower resistance.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Clamp-on result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single electrode with no parallel path</td>
+<td>no loop, no valid reading</td>
+</tr>
+<tr>
+<td>One electrode in a large multi-earthed system (for example a lighting pole earth bonded to the PE network)</td>
+<td>close to the electrode resistance</td>
+</tr>
+<tr>
+<td>Ring earth or grid with internal loops</td>
+<td>reads the loop of conductors, near zero; not the earth resistance</td>
+</tr>
+<tr>
+<td>Two electrodes only, bonded to each other</td>
+<td>reads the sum of both</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>The clamp-on method cannot measure a substation grid or a building ring earth</mark>. It is useful for routine checks of individual rods in a multi-earthed system and for loop continuity.</p>
+<h3 id="s17-4-3"><span class="n">17.4.3</span>High-current injection</h3>
+<p>For a large substation grid connected to remote earth through cable screens and overhead earth wires, IEEE 81 describes current injection methods using a remote circuit (for example a de-energised line) with test currents of tens of amperes. The resistance is calculated from the earth potential rise and the current that flows into the soil (the split factor). This is a specialist test; the earthing designer specifies it when the touch-voltage design depends on it.</p>
+<h2 id="s17-5"><span class="n">17.5</span>Touch and step voltage, bonding and continuity</h2>
+<h3 id="s17-5-1"><span class="n">17.5.1</span>Touch and step voltage measurement</h3>
+<p>Where the earthing study shows touch or step voltages close to the tolerable limits of IEEE 80, a measurement is made. A current is injected into the grid against a remote electrode. The voltage between a hand position (structure) and a foot position (a weighted plate on the ground 1 m away) is measured and scaled to the design fault current. The acceptance value is the tolerable touch or step voltage from the study, which depends on the fault clearing time and the surface layer (for example crushed rock).</p>
+<h3 id="s17-5-2"><span class="n">17.5.2</span>Continuity of protective and bonding conductors</h3>
+<p>Instrument used: Low-resistance ohmmeter with at least 200 mA test current (IEC 61557-4 instruments), or a digital low-resistance ohmmeter (DLRO) at 10 A for main bonds.</p>
+<p>Method: Measure between the MET and each bonded item (PE bar of each board, structural steel, pipework entry, cable tray, raised floor grid, rack frame). Null the leads first.</p>
+<p><strong>Acceptance:</strong></p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Bond</th>
+<th>Acceptance (example project values)</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MET to PE bar of each board</td>
+<td>≤ 0.1 Ω (practice; the continuity must also give an earth fault loop impedance that meets the protective device disconnection time)</td>
+<td>project specification; IEC 60364-6</td>
+</tr>
+<tr>
+<td>Data-hall supplementary bonds (rack, tray, floor)</td>
+<td>≤ 0.1 Ω between any bonded item and the hall bonding bar (value from the project telecom bonding specification named in the contract)</td>
+<td>project specification</td>
+</tr>
+<tr>
+<td>LPS down conductor joints and natural components</td>
+<td>overall ≤ 0.2 Ω is commonly quoted for continuity (confirm against the steel-reinforcement continuity requirement of IEC 62305-3:2024 and its Annex D; the 2024 edition has no Annex E)</td>
+<td>IEC 62305-3</td>
+</tr>
+<tr>
+<td>Pipe bonding at building entry</td>
+<td>≤ 0.1 Ω (example)</td>
+<td>project specification</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Data hall B2-DH3 bonding test, 100 racks sampled at 20 racks, cable trays at 10 points, raised floor at 6 points, coolant distribution unit (CDU) frames 4. Highest reading 0.064 Ω at rack R-17 (bond via a 6 mm² conductor to the overhead bonding conductor). One tray section read <mark>2.3 Ω because a tray splice was painted</mark> under the bonding jumper. The jumper was refitted on bare metal with a serrated washer and read 0.012 Ω.</p>
+<h3 id="s17-5-3"><span class="n">17.5.3</span>Earth fault loop impedance</h3>
+<p>For each final circuit and sub-main, the earth fault loop impedance (Zs) is measured with an installation tester. It is compared with the maximum Zs that gives disconnection within the required time for the protective device (project value: the designer calculates the maximum Zs from the protective device data for the disconnection times of IEC 60364-4-41 and PUIL 2020). On large sub-mains the designer calculates the value from the cable data, and the PE continuity measurement confirms it. Loop testers lose accuracy below about 0.05 Ω.</p>
+<h2 id="s17-6"><span class="n">17.6</span>Lightning protection to IEC 62305</h2>
+<h3 id="s17-6-1"><span class="n">17.6.1</span>What the LPS protects against</h3>
+<p>A lightning strike to a building can damage the structure (fire, mechanical damage), injure people by touch and step voltages, and damage electrical and electronic systems through the lightning current and the induced surges. IEC 62305 deals with these in four parts: general principles (Part 1), risk management (Part 2), physical damage and life hazard (Part 3, the external LPS) and electrical and electronic systems (Part 4, the surge protection measures).</p>
+<h3 id="s17-6-2"><span class="n">17.6.2</span>Risk assessment and protection level</h3>
+<p>IEC 62305-2 calculates the risk of loss for the building from the lightning flash density of the site, the building dimensions, its contents and the services entering it. The result selects the lightning protection level (LPL) and the protection measures. Jakarta has a high flash density, so data-centre buildings there commonly require <mark>LPL I or II</mark> (project risk assessment governs). The commissioning manager (CxM) checks the risk assessment in five steps:</p>
+<ol>
+<li><strong>Flash density.</strong> The ground flash density used matches a published or measured value for the site.</li>
+<li><strong>Building data.</strong> Dimensions, height of roof equipment and construction match the as-built building.</li>
+<li><strong>Services.</strong> Every incoming power and telecom line is listed with its length and type.</li>
+<li><strong>Loss types.</strong> Loss of human life (R1) and loss of service to the public or of economic value are assessed as the owner requires.</li>
+<li><strong>Measures.</strong> The selected LPS class and SPD measures appear on the drawings and in the installation.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>LPS class</th>
+<th>Rolling sphere radius</th>
+<th>Mesh size</th>
+<th>Minimum lightning current the air terminals intercept</th>
+<th>Interception probability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I</td>
+<td>20 m</td>
+<td>5 × 5 m</td>
+<td>3 kA</td>
+<td>99 %</td>
+</tr>
+<tr>
+<td>II</td>
+<td>30 m</td>
+<td>10 × 10 m</td>
+<td>5 kA</td>
+<td>97 %</td>
+</tr>
+<tr>
+<td>III</td>
+<td>45 m</td>
+<td>15 × 15 m</td>
+<td>10 kA</td>
+<td>91 %</td>
+</tr>
+<tr>
+<td>IV</td>
+<td>60 m</td>
+<td>20 × 20 m</td>
+<td>16 kA</td>
+<td>84 %</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> IEC 62305-1 and -3 values as summarised in RF-17 row 4. The maximum current parameters used for component sizing (commonly quoted as 200 kA for LPL I, 150 kA for LPL II, 100 kA for LPL III and IV) are to be confirmed against IEC 62305-1 Table 3.</p>
+<h3 id="s17-6-3"><span class="n">17.6.3</span>External LPS inspection and tests</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Check</th>
+<th>Test</th>
+<th>Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Air terminals and roof mesh</td>
+<td>positions match the rolling sphere or mesh design; all roof equipment (dry coolers, chillers, antennas) inside the protected zone or bonded</td>
+<td>visual against drawing; photographs</td>
+<td>as design</td>
+</tr>
+<tr>
+<td>Down conductors</td>
+<td>number and spacing as design (10 m for class I and II, 15 m for III, 20 m for IV: IEC/BS EN 62305-3 down-conductor spacing table as reproduced in the ABB Furse technical reference, RF-17 row 33)</td>
+<td>visual, measure spacing</td>
+<td>as design</td>
+</tr>
+<tr>
+<td>Test joints</td>
+<td>one per down conductor, accessible, labelled</td>
+<td>continuity across joint; earth resistance with the joint open</td>
+<td>continuity ≤ 0.2 Ω overall (confirm against IEC 62305-3:2024 5.3.6, test joints, and Annex D); earth resistance as design</td>
+</tr>
+<tr>
+<td>Natural components (steel frame, rebar)</td>
+<td>continuity of the structure used as a down conductor</td>
+<td>DLRO between roof and foundation earth</td>
+<td>as design (overall ≤ 0.2 Ω commonly quoted; confirm against the steel-reinforcement continuity requirement of IEC 62305-3:2024 and its Annex D)</td>
+</tr>
+<tr>
+<td>Separation distance</td>
+<td>distance between LPS conductors and internal metal or cables</td>
+<td>measure at the points listed in the design</td>
+<td>≥ calculated separation distance s</td>
+</tr>
+<tr>
+<td>Equipotential bonding at entry</td>
+<td>services bonded at the entry point, directly or through SPDs</td>
+<td>visual and continuity</td>
+<td>as design</td>
+</tr>
+<tr>
+<td>Earth termination</td>
+<td>type B ring earth or type A rods</td>
+<td>fall-of-potential or test-joint measurement</td>
+<td>as design</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Building B2 roof, 120 × 60 m, LPS class I. The mesh design is 5 × 5 m. The inspection finds that two dry-cooler fan housings, 2.8 m above the roof, are outside the protected zone of the mesh. When checked with a 20 m rolling sphere, the sphere touches their top edges without touching an air terminal. As the correction, <mark>air terminals of 1.5 m are added</mark> on the cooler frames and bonded to the mesh. The re-check shows the sphere rests on the new terminals. Continuity from each new air terminal to the nearest test joint reads 0.03 to 0.05 Ω.</p>
+<h3 id="s17-6-4"><span class="n">17.6.4</span>Inspection intervals</h3>
+<p>IEC 62305-3 Annex E gives maximum intervals between inspections by LPS class. For class I and II the table gives a visual inspection every year and a complete inspection every 2 years; for class III and IV it gives 2 and 4 years (IEC 62305-3 Table E.2 as reproduced on DEHN test form 2110, RF-17). The same table gives a complete inspection every year for critical situations, and its footnote includes structures with sensitive internal systems, which covers a data centre. Check that the 2024 edition keeps this table. The commissioning record is the first complete inspection and sets the baseline values for later inspections.</p>
+<h2 id="s17-7"><span class="n">17.7</span>Surge protective devices</h2>
+<h3 id="s17-7-1"><span class="n">17.7.1</span>What an SPD does</h3>
+<p>A surge protective device (SPD) limits transient overvoltages and diverts surge current to earth. Surges come from lightning strikes to the building or to the incoming lines, from induction by nearby strikes and from switching operations. In a data centre, the information technology (IT) equipment, the UPS rectifiers, the controls and the network equipment are sensitive to surges. SPDs are coordinated in stages from the service entrance to the equipment.</p>
+<h3 id="s17-7-2"><span class="n">17.7.2</span>SPD types to IEC 61643-11</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Type (IEC)</th>
+<th>Test waveform</th>
+<th>Main parameter</th>
+<th>Typical location on MSC-1</th>
+<th>Example rating (project value)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type 1</td>
+<td>10/350 µs impulse current</td>
+<td>Iimp (impulse current per pole)</td>
+<td>main LV switchboard of each block, where the building has an external LPS</td>
+<td>Iimp 25 kA per pole for LPL I, 12.5 kA per pole for LPL III and IV (Schneider Electrical Installation Guide on IEC 62305-2, RF-17); the IEC 62305-4 calculation governs</td>
+</tr>
+<tr>
+<td>Type 2</td>
+<td>8/20 µs current</td>
+<td>In (nominal discharge current), Imax</td>
+<td>sub-boards, UPS input and output boards, mechanical boards</td>
+<td>In 20 kA</td>
+</tr>
+<tr>
+<td>Type 3</td>
+<td>combination wave</td>
+<td>Uoc</td>
+<td>close to sensitive equipment</td>
+<td>as equipment</td>
+</tr>
+<tr>
+<td>Combined Type 1+2</td>
+<td>both</td>
+<td>Iimp and In</td>
+<td>main board where space is limited</td>
+<td>as above</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> IEC 61643-11:2025 and the type definitions in RF-17 row 6.</p>
+<figure class="sheet" id="F17-6"><a href="../data/cx-handbook/figures/F17-6.svg" title="Open drawing F17-6 at full size"><img src="../data/cx-handbook/figures/F17-6.svg" alt="F17-6: Surge protection stages in one MSC-1 block: SPD type, rating and wiring limits" width="1000" height="804" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F17-6</span> — <b>Surge protection stages in one MSC-1 block: SPD type, rating and wiring limits</b>. Each stage limits the surge that reaches the next; the lead length and the earth conductor size at each SPD decide whether the stated Up is achieved at the terminals.</figcaption></figure>
+
+<p>Figure <a class="figref" href="#F17-6">F17-6</a> shows the three SPD stages of one MSC-1 block with the ratings and the wiring limits of 17.7.3.</p>
+<p>Selection parameters:</p>
+<ol>
+<li><strong>Maximum continuous operating voltage Uc.</strong> At least 1.1 × U0 for a TN system: for U0 = 240 V, Uc ≥ 264 V; 275 V or 320 V devices are common. This minimum Uc of 1.1 U / √3 (1.1 × U0) applies between line and neutral and between line and PE in a TN system. It is from IEC 60364-5-53 Table 534.2 as reproduced in the Schneider Electric Electrical Installation Guide, Figure J23 (RF-17 row 31).</li>
+<li><strong>Voltage protection level Up.</strong> Below the rated impulse withstand voltage of the protected equipment, with margin for the connecting leads. For a 230/400 V system the required rated impulse voltages are 6 kV (category IV, origin), 4 kV (category III, distribution), 2.5 kV (category II, equipment) and 1.5 kV (category I, sensitive). The values are from IEC 60364-4-44 Table 443.2 as reproduced in the Schneider Electric Electrical Installation Guide, Figure J24 (RF-17 row 32).</li>
+<li><strong>Short-circuit current rating.</strong> Equal to or above the prospective fault current at the point of installation (58 kA at the MSC-1 block board), with the backup fuse or breaker the original equipment manufacturer (OEM) specifies.</li>
+<li><strong>Coordination.</strong> Type 1 and Type 2 devices coordinated by the OEM's stated cable length or by a combined device.</li>
+</ol>
+<h3 id="s17-7-3"><span class="n">17.7.3</span>Installation checks and tests</h3>
+<ol>
+<li><strong>Lead length.</strong> The total length of the connecting conductors (phase to SPD plus SPD to earth bar) kept as short as possible: preferably 0.5 m or less and never more than 1 m (Hager technical guide on IEC 60364-5-53, RF-17). <mark>Long leads add inductive voltage to Up</mark>.</li>
+<li><strong>Conductor size.</strong> Earth conductor of a Type 1 SPD at least 16 mm² copper; conductors of other SPDs at least 4 mm² copper, or the larger OEM value (Hager technical guide on IEC 60364-5-53, RF-17).</li>
+<li><strong>Backup protection.</strong> Fuse or breaker rating and type as the OEM table for the prospective fault current.</li>
+<li><strong>Status indication.</strong> Each module shows "healthy" on its window indicator.</li>
+<li><strong>Remote alarm.</strong> The auxiliary contact is wired to the electrical power monitoring system (EPMS) or the building management system (BMS); operate the contact (by removing a module or the OEM test method) and confirm the alarm arrives with the correct tag.</li>
+<li><strong>Insulation resistance.</strong> SPDs are <mark>disconnected (modules removed) before the insulation resistance (IR) test</mark> of the board and refitted after it. Their removal and refit are recorded.</li>
+<li><strong>Varistor check.</strong> Where the specification requires, an SPD tester measures the varistor voltage at 1 mA DC and compares with the OEM range (practice).</li>
+<li><strong>Record.</strong> Type, Uc, Up, In, Iimp, backup device, lead length, alarm test result.</li>
+</ol>
+<p><strong>Worked example:</strong> B2-DH3-MSB-A1 Type 1+2 SPD, 4-pole TN-S, Uc 320 V, Iimp 25 kA per pole (example), Up 1.5 kV. Measured lead length: phase leads 0.35 m, earth lead 0.42 m, total 0.77 m. This exceeds the 0.5 m recommendation. The contractor moves the SPD earth connection from the main PE bar to a local bar 0.1 m from the device; total 0.45 m. The remote alarm test shows "B2-DH3-MSB-A1-SPD fault" in the EPMS 3 s after the module is removed.</p>
+<h2 id="s17-8"><span class="n">17.8</span>Power quality: what it is and the standards</h2>
+<h3 id="s17-8-1"><span class="n">17.8.1</span>Why power quality is measured on a data centre</h3>
+<p>Power quality (PQ) describes how close the voltage is to an ideal sine wave at the nominal value and frequency, and how much the load distorts it. A data centre is affected by PQ in two directions. The supply affects the data centre. Voltage dips from faults on the 150 kV network cause transfers to UPS battery and generator starts. If the ride-through is not sufficient, mechanical equipment that has no UPS stops. The data centre affects the supply. Rectifiers, power supplies and drives draw non-sinusoidal current that produces harmonic voltages at the point of common coupling (PCC), and the utility sets limits for them. During commissioning, a PQ survey proves the baseline at handover, confirms that harmonic limits are met under load, and records how the installation responds to real voltage events.</p>
+<h3 id="s17-8-2"><span class="n">17.8.2</span>Standards and what each covers</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Subject</th>
+<th>Use in commissioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IEEE 519-2022</td>
+<td>harmonic voltage and current limits at the PCC</td>
+<td>acceptance of harmonic emissions</td>
+</tr>
+<tr>
+<td>IEC 61000-4-30:2025</td>
+<td>measurement methods for PQ parameters; Class A, S and B instruments</td>
+<td>instrument class and set-up</td>
+</tr>
+<tr>
+<td>IEC 62586-2</td>
+<td>conformity tests for PQ instruments</td>
+<td>proof that an instrument is Class A</td>
+</tr>
+<tr>
+<td>IEC 61000-4-7</td>
+<td>measurement of harmonics and interharmonics</td>
+<td>harmonic grouping, window</td>
+</tr>
+<tr>
+<td>IEC 61000-4-15</td>
+<td>flickermeter</td>
+<td>Pst and Plt measurement</td>
+</tr>
+<tr>
+<td>EN 50160</td>
+<td>voltage characteristics of public supply networks</td>
+<td>reference values for supply voltage</td>
+</tr>
+<tr>
+<td>ITIC (CBEMA) curve</td>
+<td>voltage tolerance envelope of IT equipment</td>
+<td>assessment of dips and swells</td>
+</tr>
+<tr>
+<td>SEMI F47</td>
+<td>voltage sag immunity of semiconductor equipment</td>
+<td>reference envelope for drives and controls</td>
+</tr>
+<tr>
+<td>Utility grid code (PLN)</td>
+<td>connection requirements at 150 kV</td>
+<td>PCC limits stated in the connection agreement</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s17-9"><span class="n">17.9</span>PQ instruments and set-up</h2>
+<h3 id="s17-9-1"><span class="n">17.9.1</span>IEC 61000-4-30 Class A</h3>
+<p>A Class A instrument measures with methods and accuracy that give the same result on different Class A instruments connected to the same signal. For voltage, <mark>Class A requires a voltage measurement uncertainty of 0.1 % of the declared input voltage Udin over 10 % to 150 % of Udin</mark> (RF-17 row 11). It uses fixed aggregation intervals:</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Interval</th>
+<th>Length</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic interval</td>
+<td>10 cycles at 50 Hz (12 at 60 Hz), about 200 ms</td>
+<td>all parameters</td>
+</tr>
+<tr>
+<td>150/180-cycle</td>
+<td>15 basic intervals, about 3 s</td>
+<td>very short-time values</td>
+</tr>
+<tr>
+<td>10 minutes</td>
+<td>aggregation of the basic intervals, synchronised to the clock</td>
+<td>statistics, compliance</td>
+</tr>
+<tr>
+<td>2 hours</td>
+<td>12 × 10-minute values</td>
+<td>long-term flicker Plt</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> RF-17 row 10. Edition 4.0 (2025) is current; check the contract edition.</p>
+<p>On MSC-1, permanent Class A meters on the 20 kV incomers and selected LV mains (chapter 23) record PQ continuously. For the commissioning survey a portable Class A analyser is used at points without a permanent meter, and to cross-check the permanent meters.</p>
+<h3 id="s17-9-2"><span class="n">17.9.2</span>Set-up parameters</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Setting (MSC-1 example)</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nominal voltage Udin</td>
+<td>20 kV (via voltage transformer (VT) 20,000/110 V) or 415 V phase to phase</td>
+<td>basis of percentages and thresholds</td>
+</tr>
+<tr>
+<td>Nominal frequency</td>
+<td>50 Hz</td>
+<td>aggregation and harmonic analysis</td>
+</tr>
+<tr>
+<td>Wiring</td>
+<td>3-phase 4-wire for LV; 3-phase 3-wire with 3 VTs for 20 kV</td>
+<td>match the system</td>
+</tr>
+<tr>
+<td>Current sensors</td>
+<td>flexible current probes rated above the maximum current, or current transformer (CT) secondary clamps</td>
+<td>maximum demand load current (IL) of 1,335 A at 20 kV and 3,478 A at 415 V</td>
+</tr>
+<tr>
+<td>Dip threshold</td>
+<td>90 % of Udin</td>
+<td>conventional LV setting with the IEC 61000-4-30 method (Schneider PM8000 EN 50160 note, RF-17)</td>
+</tr>
+<tr>
+<td>Swell threshold</td>
+<td>110 % of Udin</td>
+<td>IEC 61000-4-30 method as applied in an EN 50160 report (Circutor, RF-17)</td>
+</tr>
+<tr>
+<td>Interruption threshold</td>
+<td>10 % of Udin (EN 50160 reports use 5 %)</td>
+<td>instrument setting (confirm against IEC 61000-4-30:2025 5.6, supply voltage interruptions, and EN 50160:2022+A1:2025)</td>
+</tr>
+<tr>
+<td>Hysteresis</td>
+<td>2 % of Udin</td>
+<td>IEC 61000-4-30 practice (Schneider and Circutor notes, RF-17)</td>
+</tr>
+<tr>
+<td>Harmonics</td>
+<td>to the 50th order, IEC 61000-4-7 grouping</td>
+<td>IEEE 519 assessment</td>
+</tr>
+<tr>
+<td>Recording interval</td>
+<td>10 minutes for statistics; 3 s values kept</td>
+<td>IEEE 519 and EN 50160 statistics</td>
+</tr>
+<tr>
+<td>Waveform capture</td>
+<td>on dip, swell, interruption and transient triggers</td>
+<td>event analysis</td>
+</tr>
+<tr>
+<td>Time synchronisation</td>
+<td>GPS or network time, to the EPMS clock</td>
+<td>compare events between instruments</td>
+</tr>
+<tr>
+<td>Duration</td>
+<td>at least 7 days of normal operation</td>
+<td>weekly statistics</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s17-9-3"><span class="n">17.9.3</span>Connection procedure</h3>
+<ol>
+<li><strong>Permit.</strong> Connection of voltage leads to live LV terminals or to VT secondaries is done under an energised-work permit with the arc-flash personal protective equipment (PPE) on the label.</li>
+<li><strong>Voltage first.</strong> Connect the voltage leads through fused leads to the VT secondary terminals or the LV board terminals: L1, L2, L3, N and earth.</li>
+<li><strong>Current probes.</strong> Fit the flexible current probes around each phase and the neutral with the arrow pointing toward the load.</li>
+<li><strong>Check the phasor display.</strong> Voltages in sequence L1-L2-L3 at 120° spacing; each current near its voltage at a power factor that fits the load (for example 0.95 to 1.0 for a UPS input with active front end). A current shown at <mark>180° from its voltage means a reversed probe</mark>.</li>
+<li><strong>Check the power.</strong> Active power positive (import) and close to the reading of the permanent meter at the same point.</li>
+<li><strong>Start.</strong> Start the recording, note the start time, lock the instrument and the enclosure.</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Probe direction reversed.</strong> Power reads negative and harmonic phase angles are wrong. The phasor check at step 4 finds it.</li>
+<li><strong>Wrong Udin.</strong> Using 400 V on a 415 V system shifts every percentage by 3.75 % and creates false swells. The set-up sheet states Udin.</li>
+<li><strong>Unsynchronised clock.</strong> Events cannot be matched with the EPMS and the protection relays. The instrument clock is synchronised before the start.</li>
+<li><strong>Too short a survey.</strong> Two days of data cannot give weekly statistics. The survey runs for <mark>at least 7 days</mark>.</li>
+</ol>
+<h2 id="s17-10"><span class="n">17.10</span>Harmonics and IEEE 519-2022</h2>
+
+<figure class="sheet" id="F17-3"><a href="../data/cx-handbook/figures/F17-3.svg" title="Open drawing F17-3 at full size"><img src="../data/cx-handbook/figures/F17-3.svg" alt="F17-3: Current harmonic spectrum at the 20 kV incomer TX-A (internal check point) against IEEE 519-2022 limits" width="1400" height="746" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F17-3</span> — <b>Current harmonic spectrum at the 20 kV incomer TX-A (internal check point) against IEEE 519-2022 limits</b>. Bars are the 95th percentile of the 10-minute values over 7 days, in percent of IL; the dashed line is the IEEE 519 limit for each harmonic range.</figcaption></figure>
+<h3 id="s17-10-1"><span class="n">17.10.1</span>Terms</h3>
+<ol>
+<li><strong>Harmonic.</strong> A sinusoidal component at an integer multiple of the fundamental frequency (h = 5 is 250 Hz on a 50 Hz system).</li>
+<li><strong>Total harmonic distortion of voltage (THDv).</strong> The root-sum-square of the harmonic voltages divided by the fundamental voltage.</li>
+<li><strong>Total demand distortion (TDD).</strong> The root-sum-square of the harmonic currents divided by the maximum demand load current IL (not by the present fundamental current). <mark>TDD stays meaningful at light load</mark>, when the total harmonic distortion (THD) of current is large but the harmonic amperes are small.</li>
+<li><strong>IL.</strong> The maximum demand load current at the PCC: the average of the 12 monthly maximum demand currents, or for a new site the design maximum demand.</li>
+<li><strong>ISC.</strong> The maximum short-circuit current (ISC) at the PCC. ISC divided by IL is the short-circuit ratio (ISC/IL).</li>
+<li><strong>PCC.</strong> The point of common coupling: the point on the utility system nearest to the customer where another customer is or could be supplied. For MSC-1 the PCC is the 150 kV connection.</li>
+</ol>
+<h3 id="s17-10-2"><span class="n">17.10.2</span>Voltage distortion limits (IEEE 519 Table 1)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Bus voltage at the PCC</th>
+<th>Individual harmonic</th>
+<th>THDv</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V ≤ 1.0 kV</td>
+<td>5.0 %</td>
+<td>8.0 %</td>
+</tr>
+<tr>
+<td>1 kV &lt; V ≤ 69 kV</td>
+<td>3.0 %</td>
+<td>5.0 %</td>
+</tr>
+<tr>
+<td>69 kV &lt; V ≤ 161 kV</td>
+<td>1.5 %</td>
+<td>2.5 %</td>
+</tr>
+<tr>
+<td>V &gt; 161 kV</td>
+<td>1.0 %</td>
+<td>1.5 %</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> IEEE 519-2014 Table 1, unchanged in 2022 (RF-17 row 7).</p>
+<h3 id="s17-10-3"><span class="n">17.10.3</span>Current distortion limits (IEEE 519 Table 2, 120 V to 69 kV)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>ISC/IL</th>
+<th>2 ≤ h &lt; 11</th>
+<th>11 ≤ h &lt; 17</th>
+<th>17 ≤ h &lt; 23</th>
+<th>23 ≤ h &lt; 35</th>
+<th>35 ≤ h ≤ 50</th>
+<th>TDD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lt; 20</td>
+<td>4.0 %</td>
+<td>2.0 %</td>
+<td>1.5 %</td>
+<td>0.6 %</td>
+<td>0.3 %</td>
+<td>5.0 %</td>
+</tr>
+<tr>
+<td>20 to &lt; 50</td>
+<td>7.0 %</td>
+<td>3.5 %</td>
+<td>2.5 %</td>
+<td>1.0 %</td>
+<td>0.5 %</td>
+<td>8.0 %</td>
+</tr>
+<tr>
+<td>50 to &lt; 100</td>
+<td>10.0 %</td>
+<td>4.5 %</td>
+<td>4.0 %</td>
+<td>1.5 %</td>
+<td>0.7 %</td>
+<td>12.0 %</td>
+</tr>
+<tr>
+<td>100 to &lt; 1000</td>
+<td>12.0 %</td>
+<td>5.5 %</td>
+<td>5.0 %</td>
+<td>2.0 %</td>
+<td>1.0 %</td>
+<td>15.0 %</td>
+</tr>
+<tr>
+<td>≥ 1000</td>
+<td>15.0 %</td>
+<td>7.0 %</td>
+<td>6.0 %</td>
+<td>2.5 %</td>
+<td>1.4 %</td>
+<td>20.0 %</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> IEEE 519 Table 2 as reproduced in RF-17 row 8 (all rows agree with IEEE 519-2022 Table 2 as reproduced by Comsys, RF-17 row 34). In IEEE 519-2022 the limits apply to every harmonic order. Note a of Table 2 limits even harmonics of order h ≤ 6 to 50 % of the table values (IEEE 519-2022 Table 2 as reproduced by Comsys, RF-17 row 34). Table 3 covers 69 kV to 161 kV with lower values (commonly quoted as half of Table 2; confirm against IEEE 519-2022 Table 3), which applies at the MSC-1 150 kV PCC.</p>
+<h3 id="s17-10-4"><span class="n">17.10.4</span>Assessment statistics</h3>
+<p>IEEE 519 assesses the measured values statistically. For voltage, the weekly 95th percentile of the 10-minute values is below the Table 1 limits, and the daily 99th percentile of the very short (3 s) values is below 1.5 times the limits. For current, the weekly 95th percentile of the 10-minute values is below the table limits. The weekly 99th percentile of the 10-minute values is below 1.5 times the limits, and the daily 99th percentile of the 3 s values is below 2.0 times the limits (IEEE 519-2014 rules as summarised by Fuhr, RF-17; confirm against IEEE 519-2022 clause 5).</p>
+<h3 id="s17-10-5"><span class="n">17.10.5</span>Worked examples of the ISC/IL ratio</h3>
+<p><strong>Worked example:</strong> MSC-1 PCC at 150 kV. ISC = 31.5 kA (case ledger). IL = campus design demand current at 150 kV = 711.8 A. ISC/IL = 31,500 / 711.8 = 44.3, in the "20 to &lt; 50" range. At 150 kV, Table 3 applies; with the commonly quoted Table 3 values the TDD limit is 4.0 % (confirm against IEEE 519-2022 Table 3, row 20 to &lt; 50). The voltage limits at 150 kV are <mark>1.5 % individual and 2.5 % THDv</mark>.</p>
+<p><strong>Worked example:</strong> Internal check point at one 20 kV transformer incomer (not the PCC, used as an internal design target on MSC-1). ISC = 13.2 kA with the tie open; IL = 1,334.6 A per transformer. ISC/IL = 13,200 / 1,334.6 = 9.9, in the "&lt; 20" row: <mark>TDD limit 5.0 %</mark>, h5 and h7 4.0 %, h11 and h13 2.0 %. Figure <a class="figref" href="#F17-3">F17-3</a> shows a measured spectrum at this point. A TDD of 4.6 % of 1,335 A is 61 A of harmonic current.</p>
+<p><strong>Worked example:</strong> Block LV bus at 415 V used as a design target for UPS input current. ISC = 58 kA (chapter 14 example) and IL = 3,478 A. ISC/IL = 16.7, row "&lt; 20": TDD 5.0 %. A 2.5 MW UPS with an active front-end rectifier draws current THD below 3 % at full load (OEM data sheet value for the model), so the target is met at the block.</p>
+<h3 id="s17-10-6"><span class="n">17.10.6</span>Reading a harmonic spectrum</h3>
+<p><strong>Worked example:</strong> The 7-day survey at TX-A incomer (<a class="figref" href="#F17-3">F17-3</a>) gives these 95th-percentile values in % of IL: h3 0.9, h5 3.1, h7 2.4, h9 0.4, h11 2.3, h13 1.4, h17 0.7, h19 0.6, h23 0.3, h25 0.3. TDD 95th percentile = 4.6 %.</p>
+<ol>
+<li><strong>Compare each range.</strong> h5 and h7 (2 to &lt; 11 range, limit 4.0 %) pass. <mark>h11 at 2.3 % exceeds the 2.0 % limit</mark> of the 11 to &lt; 17 range. h13 at 1.4 % passes. Higher orders pass.</li>
+<li><strong>Compare TDD.</strong> 4.6 % against 5.0 %: pass. The root-sum-square of the individual 95th percentiles is about 5.0 %. This is higher than the measured TDD 95th percentile because <mark>the individual harmonics do not reach their 95th-percentile values at the same time</mark>. The standard compares the measured TDD statistic.</li>
+<li><strong>Identify the source.</strong> h11 and h13 are the lowest characteristic harmonics of 12-pulse rectifiers, and six-pulse converters also produce them (orders 6k ± 1). The CxM asks which loads were running: the chillers' variable speed drives and the UPS rectifiers. The 3 s values show h11 rising when the trim chillers run.</li>
+<li><strong>Report.</strong> Because this point is an internal target, the exceedance is reported to the designer with ISC/IL, the load during the survey and the 3 s values. At the 150 kV PCC the designer checks the h11 value referred to the 150 kV current against Table 3 before any filter is proposed. The value referred to 150 kV is 2.3 % × 1,334.6 A × (20 / 150) per transformer.</li>
+</ol>
+<h3 id="s17-10-7"><span class="n">17.10.7</span>Harmonic filter and power factor correction checks</h3>
+<p>Where the design includes active harmonic filters or capacitor banks:</p>
+<ol>
+<li><strong>Active filter.</strong> Commission per OEM: CT positions and polarity (the filter measures load current upstream of its connection), compensation mode, harmonic orders selected. Prove by measuring TDD at the filter's point with the filter off and on at the same load: for example 9.8 % off and 3.2 % on.</li>
+<li><strong>Capacitor bank.</strong> Check detuning reactor rating (for example 7 % detuning, resonance about 189 Hz on 50 Hz), step switching, discharge resistors and temperature protection. <mark>A capacitor bank without detuning can form a parallel resonance</mark> with the transformer near the 5th or 7th harmonic and amplify distortion. A PQ survey with the bank switched in and then out shows whether this happens.</li>
+</ol>
+<h2 id="s17-11"><span class="n">17.11</span>Voltage dips, swells, interruptions and the ITIC curve</h2>
+
+<figure class="sheet" id="F17-4"><a href="../data/cx-handbook/figures/F17-4.svg" title="Open drawing F17-4 at full size"><img src="../data/cx-handbook/figures/F17-4.svg" alt="F17-4: Voltage events from the PQ survey placed on the ITIC curve (example events at a 415 V UPS input board)" width="1400" height="766" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F17-4</span> — <b>Voltage events from the PQ survey placed on the ITIC curve (example events at a 415 V UPS input board)</b>. Points inside the envelope should not affect IT equipment built to the curve; points below the lower edge are sags that can stop a power supply without UPS or flywheel ride-through.</figcaption></figure>
+
+<figure class="sheet" id="F17-5"><a href="../data/cx-handbook/figures/F17-5.svg" title="Open drawing F17-5 at full size"><img src="../data/cx-handbook/figures/F17-5.svg" alt="F17-5: RMS voltage of event E3 recorded at half-cycle resolution: depth, duration and recovery of a voltage dip" width="1400" height="761" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F17-5</span> — <b>RMS voltage of event E3 recorded at half-cycle resolution: depth, duration and recovery of a voltage dip</b>. A dip starts when the RMS of one half-cycle-refreshed one-cycle window falls below the threshold on any phase and ends when all phases are above the threshold plus the hysteresis.</figcaption></figure>
+<h3 id="s17-11-1"><span class="n">17.11.1</span>Definitions</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Definition (IEC 61000-4-30 practice; confirm against IEC 61000-4-30:2025 5.5 and 5.6)</th>
+<th>Parameters recorded</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dip (sag)</td>
+<td>root mean square (RMS) voltage on any phase falls below the dip threshold (90 % of Udin)</td>
+<td>residual voltage, duration, phases, time</td>
+</tr>
+<tr>
+<td>Swell</td>
+<td>RMS voltage on any phase rises above the swell threshold (110 % of Udin)</td>
+<td>maximum voltage, duration</td>
+</tr>
+<tr>
+<td>Interruption</td>
+<td>RMS voltage on all phases falls below the interruption threshold (10 % of Udin as set in 17.9.2; 5 % in EN 50160 reports)</td>
+<td>duration</td>
+</tr>
+<tr>
+<td>Rapid voltage change</td>
+<td>quick change between two steady-state levels without crossing the dip or swell thresholds</td>
+<td>ΔU, ΔUmax</td>
+</tr>
+</tbody>
+</table></div>
+<p>The dip starts when the RMS value (one-cycle window refreshed every half cycle) on one phase falls below the threshold and ends when the RMS on all phases rises above the threshold plus the hysteresis. Figure <a class="figref" href="#F17-5">F17-5</a> shows the RMS trace of one dip.</p>
+<h3 id="s17-11-2"><span class="n">17.11.2</span>ITIC curve</h3>
+<p>The ITIC curve (Information Technology Industry Council, successor of the CBEMA curve) describes the AC input voltage envelope that IT equipment tolerates. It was drawn for 120 V, 60 Hz equipment and is widely used as a reference at other voltages (RF-17 row 13).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Edge</th>
+<th>Duration</th>
+<th>Voltage (% of nominal)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lower</td>
+<td>up to 20 ms</td>
+<td>0 % (complete loss tolerated)</td>
+</tr>
+<tr>
+<td>Lower</td>
+<td>20 ms to 0.5 s</td>
+<td>70 %</td>
+</tr>
+<tr>
+<td>Lower</td>
+<td>0.5 s to 10 s</td>
+<td>80 %</td>
+</tr>
+<tr>
+<td>Lower</td>
+<td>steady state, beyond 10 s</td>
+<td>90 %</td>
+</tr>
+<tr>
+<td>Upper</td>
+<td>up to 1 ms</td>
+<td>200 %</td>
+</tr>
+<tr>
+<td>Upper</td>
+<td>1 ms to 3 ms</td>
+<td>140 %</td>
+</tr>
+<tr>
+<td>Upper</td>
+<td>3 ms to 0.5 s</td>
+<td>120 %</td>
+</tr>
+<tr>
+<td>Upper</td>
+<td>steady state, beyond 0.5 s</td>
+<td>110 %</td>
+</tr>
+</tbody>
+</table></div>
+<p>SEMI F47 asks equipment to ride through 50 % for 200 ms, 70 % for 0.5 s and 80 % for 1 s (RF-17 row 14). Many drives and control power supplies on a data-centre campus are specified to SEMI F47 or a similar envelope; the PQ review compares events with both curves.</p>
+<p>Figure <a class="figref" href="#F17-4">F17-4</a> places the events of a 14-day survey on the ITIC curve. Each event is reviewed in four steps:</p>
+<ol>
+<li><strong>Place.</strong> Plot the residual voltage and duration on the ITIC and SEMI F47 envelopes.</li>
+<li><strong>Correlate.</strong> Match the event time with the EPMS, relay and BMS event logs to find the cause and the equipment that reacted.</li>
+<li><strong>Compare.</strong> Compare the reaction of each load group with its specified ride-through.</li>
+<li><strong>Raise.</strong> Raise an issue for every load that tripped inside its specified ride-through envelope.</li>
+</ol>
+<h3 id="s17-11-3"><span class="n">17.11.3</span>Worked example of event review</h3>
+<p><strong>Worked example:</strong> A 14-day survey at the UPS-A1 input board records five events:</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Date and time</th>
+<th>Residual or peak</th>
+<th>Duration</th>
+<th>Inside ITIC</th>
+<th>Effect on the installation</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>2026-11-14 08:12</td>
+<td>88 %</td>
+<td>40 ms</td>
+<td>yes</td>
+<td>none</td>
+<td>start of a chiller compressor on the same block</td>
+</tr>
+<tr>
+<td>E2</td>
+<td>2026-11-15 13:40</td>
+<td>106 %</td>
+<td>50 ms</td>
+<td>yes</td>
+<td>none</td>
+<td>capacitor step switching</td>
+</tr>
+<tr>
+<td>E3</td>
+<td>2026-11-18 14:02</td>
+<td>62 %</td>
+<td>120 ms</td>
+<td>no</td>
+<td>UPS-A1 on battery for 120 ms; two computer room air handler (CRAH) fans tripped and restarted after 30 s</td>
+<td>single-phase fault on the 150 kV network</td>
+</tr>
+<tr>
+<td>E4</td>
+<td>2026-11-20 10:05</td>
+<td>85 %</td>
+<td>2 s</td>
+<td>yes</td>
+<td>none</td>
+<td>energising of a block transformer (inrush)</td>
+</tr>
+<tr>
+<td>E5</td>
+<td>2026-11-22 09:00</td>
+<td>0 %</td>
+<td>4 s</td>
+<td>no (planned)</td>
+<td>UPS on battery, generator start, planned</td>
+<td>generator transfer test</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> For E3 the CxM compares the dip with the ride-through of every load group. The UPS rode through on battery as designed. The computer room air handler (CRAH) fans, which are not on UPS, tripped on their drive undervoltage protection. The specification asks mechanical drives to ride through 70 % for 0.5 s; <mark>the drives tripped at 62 % for 120 ms</mark>, which is below the specified ride-through. The issue is raised with the mechanical contractor to enable the drives' kinetic buffering or automatic restart function. The restart time is verified in the integrated systems test (chapter 28).</p>
+<h3 id="s17-11-4"><span class="n">17.11.4</span>Dip table</h3>
+<p>Dips are also summarised in a table of residual voltage against duration, as used in EN 50160 and IEC 61000-2-8 reporting. The survey report includes the count of dips in each cell, so later surveys and utility statistics can be compared.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Residual voltage u</th>
+<th>10 ms to 200 ms</th>
+<th>200 ms to 500 ms</th>
+<th>500 ms to 1 s</th>
+<th>1 s to 5 s</th>
+<th>5 s to 60 s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>80 % ≤ u &lt; 90 %</td>
+<td>1 (E1)</td>
+<td>0</td>
+<td>0</td>
+<td>1 (E4)</td>
+<td>0</td>
+</tr>
+<tr>
+<td>70 % ≤ u &lt; 80 %</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>40 % ≤ u &lt; 70 %</td>
+<td>1 (E3)</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>5 % ≤ u &lt; 40 %</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>u &lt; 5 % (interruption)</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1 (E5, planned)</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s17-12"><span class="n">17.12</span>Flicker, unbalance and frequency</h2>
+<h3 id="s17-12-1"><span class="n">17.12.1</span>Flicker</h3>
+<p>Flicker is the visual impression of unsteadiness of light caused by voltage fluctuations. The IEC 61000-4-15 flickermeter gives the short-term severity Pst over 10 minutes and the long-term severity Plt over 2 hours. Plt is the cube root of the mean of the cubes of 12 Pst values: Plt = ((ΣPst³)/12)^(1/3). Pst = 1 is the level at which half of observers notice the flicker.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Reference value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Plt at the supply</td>
+<td>≤ 1 for 95 % of the week</td>
+<td>EN 50160 as applied in a compliance report (Circutor, RF-17)</td>
+</tr>
+<tr>
+<td>Planning levels at MV</td>
+<td>Pst 0.9, Plt 0.7</td>
+<td>IEC/TR 61000-3-7:2008 indicative planning levels as tabulated by CIGRE C4.108 (RF-17)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Twelve Pst values over 2 hours: eleven at 0.35 and one at 0.90 during a chiller start sequence. Plt = ((11 × 0.35³ + 0.90³) / 12)^(1/3) = ((11 × 0.0429 + 0.729) / 12)^(1/3) = ((0.472 + 0.729) / 12)^(1/3) = (0.1001)^(1/3) = 0.46. This is <mark>below 1, so the flicker is acceptable</mark>.</p>
+<h3 id="s17-12-2"><span class="n">17.12.2</span>Voltage unbalance</h3>
+<p>Voltage unbalance is the ratio of the negative-sequence voltage to the positive-sequence voltage. EN 50160 gives 2 % for 95 % of 10-minute values in a week as the reference for most networks (EN 50160 as applied in a compliance report, RF-17). Unbalance raises the losses and the temperature of motors and can increase current ripple in rectifiers. On MSC-1 the LV loads are three-phase and balanced; single-phase lighting and small power boards are distributed across phases.</p>
+<h3 id="s17-12-3"><span class="n">17.12.3</span>Frequency</h3>
+<p>The supply frequency is set by the grid. EN 50160 gives 50 Hz ±1 % for 99.5 % of a year on interconnected systems (EN 50160:2007 as described by NI, RF-17, the edition the source quotes; confirm against the power frequency clause of EN 50160:2022+A1:2025, which was not read); the utility grid code governs at the 150 kV PCC. During generator operation (chapter 15) the frequency is set by the generator governors and the PQ instrument records the transient response at load steps.</p>
+<h2 id="s17-13"><span class="n">17.13</span>PQ survey procedure and data review</h2>
+<h3 id="s17-13-1"><span class="n">17.13.1</span>Survey procedure</h3>
+<p><strong>Trigger:</strong> Building at representative load (load banks or IT load), all mechanical plant in automatic, permanent meters commissioned.</p>
+<p><strong>Owner:</strong> PQ specialist from the testing contractor; CxM approves the plan; the electrical designer reviews the results.</p>
+<p><strong>Inputs:</strong> Single-line diagram, ISC and IL at each point, utility connection agreement limits, specification limits, list of large loads and their schedules.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Plan.</strong> Select points: the 150 kV PCC (through the utility metering VTs or the permanent Class A meter), each 20 kV incomer, two or more block LV boards, and the UPS input and output of one block. State the duration (at least 7 days) and the load conditions. Time limit: plan approved 5 working days before the start.</li>
+<li><strong>Instrument check.</strong> Class A certificate (IEC 62586-2 conformity), calibration certificate, firmware, clock synchronised.</li>
+<li><strong>Connect.</strong> Follow 17.9.3.</li>
+<li><strong>Baseline day.</strong> Record one day with the normal load pattern.</li>
+<li><strong>Load steps.</strong> During the survey, run planned operations: transformer energising, chiller staging, UPS transfer to bypass and back, generator transfer test. Log the time of each operation in the survey log.</li>
+<li><strong>Download daily.</strong> Download data each day and check for gaps or wrong settings.</li>
+<li><strong>Disconnect.</strong> After 7 days, stop the recording and disconnect under the permit.</li>
+<li><strong>Analyse.</strong> Calculate the statistics, the event list and the compliance tables. Time limit: draft report 5 working days after the end.</li>
+<li><strong>Review.</strong> The CxM, the designer and the CxA review the report; exceedances become issues with owners.</li>
+<li><strong>Archive.</strong> The raw data files, the set-up file and the report are stored in the common data environment with the record number.</li>
+</ol>
+<h3 id="s17-13-2"><span class="n">17.13.2</span>PQ report content and record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Content</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Survey identification</td>
+<td>record number, points, dates</td>
+<td>ELE-L4-PQ-B2-001, 2026-11-12 to 2026-11-26</td>
+</tr>
+<tr>
+<td>Instrument</td>
+<td>model, SN, Class A conformity, calibration</td>
+<td>Class A analyser SN 90233, cert due 2027-06-30</td>
+</tr>
+<tr>
+<td>Set-up</td>
+<td>Udin, wiring, CT and VT ratios, thresholds</td>
+<td>415 V, 3P4W, probes 6,000 A, dip 90 %, swell 110 %</td>
+</tr>
+<tr>
+<td>Load during survey</td>
+<td>min, mean, max demand</td>
+<td>0.9 / 1.7 / 2.1 MW per block</td>
+</tr>
+<tr>
+<td>Voltage magnitude</td>
+<td>95th percentile of 10-min values per phase</td>
+<td>101.2 % / 101.0 % / 101.3 % of Udin</td>
+</tr>
+<tr>
+<td>Frequency</td>
+<td>min, max</td>
+<td>49.91 to 50.08 Hz</td>
+</tr>
+<tr>
+<td>THDv</td>
+<td>95th percentile</td>
+<td>1.8 %</td>
+</tr>
+<tr>
+<td>TDD and individual harmonics</td>
+<td>95th percentile per order</td>
+<td>as 17.10.6</td>
+</tr>
+<tr>
+<td>Flicker</td>
+<td>Pst 95th percentile, Plt maximum</td>
+<td>0.41, 0.46</td>
+</tr>
+<tr>
+<td>Unbalance</td>
+<td>95th percentile</td>
+<td>0.4 %</td>
+</tr>
+<tr>
+<td>Events</td>
+<td>list, ITIC plot, dip table</td>
+<td>5 events, 1 outside ITIC unplanned</td>
+</tr>
+<tr>
+<td>Compliance summary</td>
+<td>each parameter against its limit</td>
+<td>h11 exceeds internal target</td>
+</tr>
+<tr>
+<td>Issues raised</td>
+<td>issue numbers</td>
+<td>ISS-B2-0613 (h11), ISS-B2-0219 (CRAH ride-through)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s17-13-3"><span class="n">17.13.3</span>Cross-check with the permanent meters</h3>
+<p>On MSC-1 the CxM compares 10-minute voltage, THDv and TDD values for the same intervals. Differences larger than the combined instrument uncertainties (for example more than 0.2 % on voltage or more than 0.5 percentage points on THDv) <mark>point to a set-up error</mark>: wrong VT ratio, wrong Udin, or a CT polarity error on the permanent meter. This cross-check is part of the EPMS acceptance (chapter 24).</p>
+<p><strong>Worked example:</strong> At TX-A incomer the portable analyser gives a 10-minute voltage of 20.31 kV; the permanent meter gives 20.14 kV for the same interval: a difference of 0.84 %. The permanent meter VT ratio is set to 20,000/110 V while the installed VT nameplate reads 20,000/√3 / 110/√3 V with the meter configured for a line-to-neutral connection. After correcting the meter wiring mode, the <mark>difference falls to 0.05 %</mark>.</p>
+<h2 id="s17-14"><span class="n">17.14</span>Records</h2>
+<h3 id="s17-14-1"><span class="n">17.14.1</span>Earthing and LPS record (filled example)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Record</td>
+<td>ELE-L3-EARTH-B2</td>
+</tr>
+<tr>
+<td>Soil resistivity</td>
+<td>two traverses, 34 to 60 Ω·m, two-layer model matches design</td>
+</tr>
+<tr>
+<td>Substation grid resistance</td>
+<td>0.42 Ω (61.8 %), plateau ±4.8 %, second line 0.41 Ω; design ≤ 0.5 Ω</td>
+</tr>
+<tr>
+<td>Building B2 combined system</td>
+<td>0.38 Ω by fall-of-potential with C at 900 m; project ≤ 1 Ω</td>
+</tr>
+<tr>
+<td>MET continuity to 24 boards</td>
+<td>0.004 to 0.031 Ω</td>
+</tr>
+<tr>
+<td>Data-hall bonding (sample 40 points)</td>
+<td>highest 0.064 Ω; one tray splice repaired</td>
+</tr>
+<tr>
+<td>N-PE link check</td>
+<td>one link per block; one extra link removed in mechanical board</td>
+</tr>
+<tr>
+<td>LPS class I</td>
+<td>mesh 5 × 5 m, 36 down conductors (360 m perimeter at 10 m spacing), test joints 0.02 to 0.06 Ω, two air terminals added</td>
+</tr>
+<tr>
+<td>SPDs</td>
+<td>16 boards, status healthy, alarms received, one lead length corrected</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass after corrections</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s17-14-2"><span class="n">17.14.2</span>PQ record (filled example)</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Record</td>
+<td>ELE-L4-PQ-B2-001</td>
+</tr>
+<tr>
+<td>Points</td>
+<td>TX-A incomer 20 kV, B2-DH3-MSB-A1, UPS-A1 input</td>
+</tr>
+<tr>
+<td>Duration</td>
+<td>14 days</td>
+</tr>
+<tr>
+<td>THDv 95th percentile</td>
+<td>20 kV 1.2 %, 415 V 1.8 %</td>
+</tr>
+<tr>
+<td>TDD 95th percentile</td>
+<td>20 kV 4.6 %, 415 V 3.9 %</td>
+</tr>
+<tr>
+<td>Individual harmonic exceedance</td>
+<td>h11 2.3 % against 2.0 % at 20 kV (internal target)</td>
+</tr>
+<tr>
+<td>Events outside ITIC</td>
+<td>E3 62 % 120 ms (150 kV network fault)</td>
+</tr>
+<tr>
+<td>Flicker Plt maximum</td>
+<td>0.46</td>
+</tr>
+<tr>
+<td>Unbalance 95th percentile</td>
+<td>0.4 %</td>
+</tr>
+<tr>
+<td>Issues</td>
+<td>ISS-B2-0613, ISS-B2-0219</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s17-15"><span class="n">17.15</span>Common errors, detection before the witness test and KPIs</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Detection</th>
+<th>Prevention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Earth test with C too close</td>
+<td>no plateau at 52, 61.8 and 72 %</td>
+<td>distance table in the method statement</td>
+</tr>
+<tr>
+<td>Test leads run side by side</td>
+<td>readings change when leads are moved</td>
+<td>leads separated by several metres</td>
+</tr>
+<tr>
+<td>Clamp-on used for a grid</td>
+<td>reading near zero</td>
+<td>method statement forbids clamp-on for grids</td>
+</tr>
+<tr>
+<td>Test link left open after test</td>
+<td>MET inspection</td>
+<td>links listed and signed closed</td>
+</tr>
+<tr>
+<td>Second N-PE link</td>
+<td>PE current clamp survey</td>
+<td>survey under load before handover</td>
+</tr>
+<tr>
+<td>Bonding jumper on painted surface</td>
+<td>continuity reading above 0.1 Ω</td>
+<td>serrated washers, paint removed</td>
+</tr>
+<tr>
+<td>Roof equipment outside the protected zone</td>
+<td>rolling sphere check against as-built roof</td>
+<td>roof check after all equipment is set</td>
+</tr>
+<tr>
+<td>SPD lead length too long</td>
+<td>measurement of leads</td>
+<td>SPD position shown on the board drawing</td>
+</tr>
+<tr>
+<td>PQ probe reversed</td>
+<td>negative power on phasor check</td>
+<td>phasor check before start</td>
+</tr>
+<tr>
+<td>Survey shorter than a week</td>
+<td>data review</td>
+<td>plan states 7 days minimum</td>
+</tr>
+<tr>
+<td>Wrong ISC/IL basis</td>
+<td>designer review</td>
+<td>ISC and IL stated in the survey plan</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target (example project value)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Earth resistance results meeting design at first test</td>
+<td>count passed / count tested</td>
+<td>≥ 90 %</td>
+</tr>
+<tr>
+<td>Bonding points above limit at handover</td>
+<td>count</td>
+<td>0</td>
+</tr>
+<tr>
+<td>SPD alarms tested and received</td>
+<td>tested / installed</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>PQ survey points complete with 7 days of valid data</td>
+<td>complete / planned</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>Unplanned events outside ITIC with an issue raised</td>
+<td>issues / events</td>
+<td>100 %</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s17-16"><span class="n">17.16</span>Checklist for site use</h2>
+<ol>
+<li><strong>Soil data.</strong> Confirm soil resistivity data exist for the design and repeat the Wenner test where results differ.</li>
+<li><strong>Electrode isolation.</strong> Open test links only under a permit and list them.</li>
+<li><strong>C distance.</strong> Place C at 5 to 10 times the largest dimension of the electrode where possible.</li>
+<li><strong>61.8 % reading.</strong> Read at 61.8 % and confirm the plateau at 52 % and 72 %.</li>
+<li><strong>Second direction.</strong> Repeat on a second line at 90°.</li>
+<li><strong>Acceptance value.</strong> Use the value from the earthing study or the project specification.</li>
+<li><strong>Clamp-on limits.</strong> Do not use the clamp-on method for grids or ring earths.</li>
+<li><strong>Links closed.</strong> Close, torque and mark every test link after the test.</li>
+<li><strong>N-PE link.</strong> Confirm one N-PE link per source and survey PE currents under load.</li>
+<li><strong>Bonding.</strong> Measure continuity of MET, board PE bars, steel, pipework, trays, racks and floors.</li>
+<li><strong>Touch and step.</strong> Measure where the study shows margins close to the limits.</li>
+<li><strong>LPS class.</strong> Confirm the class from the IEC 62305-2 risk assessment.</li>
+<li><strong>Rolling sphere.</strong> Check the as-built roof, including all roof equipment, with the class radius.</li>
+<li><strong>Down conductors.</strong> Count, spacing and test joints as design.</li>
+<li><strong>LPS continuity.</strong> Measure across test joints and natural components.</li>
+<li><strong>Separation distance.</strong> Measure at the points named in the design.</li>
+<li><strong>SPD selection.</strong> Check Uc, Up, Iimp or In, and short-circuit rating against the board.</li>
+<li><strong>SPD leads.</strong> Keep total lead length at about 0.5 m or less.</li>
+<li><strong>SPD alarms.</strong> Prove every remote alarm in the EPMS or BMS.</li>
+<li><strong>PQ instrument.</strong> Confirm Class A conformity and calibration.</li>
+<li><strong>PQ set-up.</strong> Udin, wiring, ratios, thresholds and clock checked on the set-up sheet.</li>
+<li><strong>Phasor check.</strong> Confirm voltage sequence and current direction before recording.</li>
+<li><strong>Duration.</strong> Record at least 7 days with representative load.</li>
+<li><strong>Operations log.</strong> Log every planned switching and load step with its time.</li>
+<li><strong>IEEE 519 basis.</strong> State the PCC, ISC, IL and the table row used.</li>
+<li><strong>Events.</strong> Place every event on the ITIC curve and in the dip table.</li>
+<li><strong>Cross-check.</strong> Compare portable and permanent meter values for the same intervals.</li>
+<li><strong>Issues.</strong> Raise an issue for every exceedance and every unplanned event outside ITIC.</li>
+</ol>
+<h2 id="s17-17"><span class="n">17.17</span>Sources</h2>
+<ol>
+<li>IEEE 81-2025, Guide for Measuring Earth Resistivity, Ground Impedance, and Earth Surface Potentials of a Grounding System, IEEE, 2025 (supersedes IEEE 81-2012). <a href="https://standards.ieee.org/standard/81.html" rel="noopener">https://standards.ieee.org/standard/81.html</a></li>
+<li>Metrel, Earth resistance measurement and the 62 % rule (IEEE 81-2012 Annex C, the edition the source quotes). <a href="https://www.metrel.si/en/solutions/power-distribution/earth-resistance-measurement-and-62-rule/" rel="noopener">https://www.metrel.si/en/solutions/power-distribution/earth-resistance-measurement-and-62-rule/</a></li>
+<li>Open Exam Prep, Ground electrode fall-of-potential and clamp-on (NETA ETT study guide). <a href="https://open-exam-prep.com/study-guides/neta-ett-level-ii/grounding-batteries-devices/ground-electrode-fop-and-clamp-on" rel="noopener">https://open-exam-prep.com/study-guides/neta-ett-level-ii/grounding-batteries-devices/ground-electrode-fop-and-clamp-on</a></li>
+<li>IEC 62305-3:2024, Protection against lightning, Part 3: Physical damage to structures and life hazard, IEC. <a href="https://webstore.iec.ch/en/publication/33680" rel="noopener">https://webstore.iec.ch/en/publication/33680</a></li>
+<li>eCalPro, IEC 62305 lightning protection guide (LPS classes, rolling sphere, mesh, minimum currents). <a href="https://ecalpro.com/standards/iec-62305/lightning-protection-guide" rel="noopener">https://ecalpro.com/standards/iec-62305/lightning-protection-guide</a></li>
+<li>ABB, IEC/BS EN 62305 parts 1 to 4 overview. <a href="https://library.e.abb.com/public/ee4d371685e544e09e8d9712fbd716c9/IEC%20BS%20EN%2062305%201%20-%204.pdf" rel="noopener">https://library.e.abb.com/public/ee4d371685e544e09e8d9712fbd716c9/IEC%20BS%20EN%2062305%201%20-%204.pdf</a></li>
+<li>IEC 61643-11:2025, Low-voltage surge protective devices, Part 11, IEC. <a href="https://webstore.iec.ch/en/publication/65314" rel="noopener">https://webstore.iec.ch/en/publication/65314</a></li>
+<li>Instrumentation Blog, SPD selection to IEC 61643: Type 1, 2 and 3. <a href="https://www.instrumentationblog.in/spd-selection-iec-61643/" rel="noopener">https://www.instrumentationblog.in/spd-selection-iec-61643/</a></li>
+<li>IEEE 519-2022, Standard for Harmonic Control in Electric Power Systems, as summarised by MB Drive Services (changes between 2014 and 2022). <a href="https://mb-drive-services.com/what-has-changed-in-ieee-519-between-2014-and-2022-editions/" rel="noopener">https://mb-drive-services.com/what-has-changed-in-ieee-519-between-2014-and-2022-editions/</a></li>
+<li>Mirus International, WP003 A practical and effective way of applying IEEE Std 519 harmonic limits. <a href="https://ww.mirusinternational.com/downloads/MIRUS-WP003-A-Practical-and-Effective-Way-of-Applying-IEEEStd519-Harmonic-Limits.pdf" rel="noopener">https://ww.mirusinternational.com/downloads/MIRUS-WP003-A-Practical-and-Effective-Way-of-Applying-IEEEStd519-Harmonic-Limits.pdf</a></li>
+<li>IEC 61000-4-30:2025, Power quality measurement methods, IEC. <a href="https://webstore.iec.ch/en/publication/71611" rel="noopener">https://webstore.iec.ch/en/publication/71611</a></li>
+<li>Fluke, What does the IEC 61000-4-30 Class A standard mean to me. <a href="https://www.fluke.com/en-gb/learn/blog/power-quality/what-does-the-iec-61000-4-30-class-a-standard-mean-to-me" rel="noopener">https://www.fluke.com/en-gb/learn/blog/power-quality/what-does-the-iec-61000-4-30-class-a-standard-mean-to-me</a></li>
+<li>National Instruments, Aggregation intervals (IEC 61000-4-30 and IEC 61000-4-15). <a href="https://www.ni.com/docs/en-US/bundle/labview-electrical-power-toolkit/page/aggregation-intervals.html" rel="noopener">https://www.ni.com/docs/en-US/bundle/labview-electrical-power-toolkit/page/aggregation-intervals.html</a></li>
+<li>Schneider Electric, ION reference: power quality aggregator module. <a href="https://product-help.schneider-electric.com/ION-Reference/content/ion" rel="noopener">https://product-help.schneider-electric.com/ION-Reference/content/ion</a> reference/power-quality-aggregator-module.htm</li>
+<li>ITIC, ITI (CBEMA) curve application note, October 2000 (updated). <a href="https://www.itic.org/resources/Oct2000Curve-UPDATED.doc" rel="noopener">https://www.itic.org/resources/Oct2000Curve-UPDATED.doc</a></li>
+<li>SagSwell, ITIC (CBEMA) curve corner points and SEMI F47. <a href="https://sagswell.com/guides/itic-cbema-curve" rel="noopener">https://sagswell.com/guides/itic-cbema-curve</a></li>
+<li>Hufocw course slides ECEg-6312, IEEE 519 current limits. <a href="https://www.hufocw.org/Download/file/32110" rel="noopener">https://www.hufocw.org/Download/file/32110</a></li>
+<li>MSC-1 case ledger, <code>case_ledger.json</code>, handbook project file, October 2026.</li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="16-ups-batteries-transfer-rack-power.html"><span>Previous · 16</span><span class="t">UPS, batteries, transfer switches and rack power distribution</span></a><a class="next" href="18-chw-plant-heat-rejection-flushing.html"><span>Next · 18</span><span class="t">Chilled-water and heat-rejection plant</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

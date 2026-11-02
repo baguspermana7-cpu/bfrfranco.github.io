@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 Permits to work, isolation, switching programmes and energisation administration | Cx Field Manual R01</title>
+<meta name="description" content="This chapter describes how work is authorised and how equipment is isolated and proved dead on a hyperscale data-centre campus.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/10-permits-isolation-switching-energisation.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/10-permits-isolation-switching-energisation.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/10-permits-isolation-switching-energisation.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/10-permits-isolation-switching-energisation.html">
+<meta property="og:title" content="10 Permits to work, isolation, switching programmes and energisation administration | Cx Field Manual R01">
+<meta property="og:description" content="This chapter describes how work is authorised and how equipment is isolated and proved dead on a hyperscale data-centre campus.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="10 Permits to work, isolation, switching programmes and energisation administration | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter describes how work is authorised and how equipment is isolated and proved dead on a hyperscale data-centre campus.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"10 Permits to work, isolation, switching programmes and energisation administration","name":"Permits to work, isolation, switching programmes and energisation administration","description":"This chapter describes how work is authorised and how equipment is isolated and proved dead on a hyperscale data-centre campus.","url":"https://resistancezero.com/cx-handbook/10-permits-isolation-switching-energisation.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/10-permits-isolation-switching-energisation.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":13887,"position":10,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"10 Permits to work, isolation, switching programmes and energisation administration","item":"https://resistancezero.com/cx-handbook/10-permits-isolation-switching-energisation.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part B · Project administration</p>
+    <h1><span class="num">10</span>Permits to work, isolation, switching programmes and energisation administration</h1>
+    <p class="lede">This chapter describes how work is authorised and how equipment is isolated and proved dead on a hyperscale data-centre campus.</p>
+    <p class="basis">Chapter 10 of 32 · 11 sections · 10 figures · 13,887 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 10</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 10</summary>
+<ol><li><a href="#s10-0"><span class="n">10.0</span>Scope of this chapter</a></li><li><a href="#s10-1"><span class="n">10.1</span>The permit-to-work system: purpose, roles and permit types</a><ol><li><a href="#s10-1-1"><span class="n">10.1.1</span>What a permit to work is and why it exists</a></li><li><a href="#s10-1-2"><span class="n">10.1.2</span>Roles in the permit system</a></li><li><a href="#s10-1-3"><span class="n">10.1.3</span>Permit types used on a data-centre campus</a></li><li><a href="#s10-1-4"><span class="n">10.1.4</span>Fields of the permit form</a></li><li><a href="#s10-1-5"><span class="n">10.1.5</span>Permit life cycle with time limits</a></li><li><a href="#s10-1-6"><span class="n">10.1.6</span>Shift handover and long-duration work</a></li><li><a href="#s10-1-7"><span class="n">10.1.7</span>Permit register fields and KPIs</a></li></ol></li><li><a href="#s10-2"><span class="n">10.2</span>Energy isolation and lockout/tagout</a><ol><li><a href="#s10-2-1"><span class="n">10.2.1</span>What isolation is</a></li><li><a href="#s10-2-2"><span class="n">10.2.2</span>The six steps of OSHA 29 CFR 1910.147</a></li><li><a href="#s10-2-3"><span class="n">10.2.3</span>Electrical requirements of OSHA 29 CFR 1910.333</a></li><li><a href="#s10-2-4"><span class="n">10.2.4</span>The electrically safe work condition in NFPA 70E-2024</a></li><li><a href="#s10-2-5"><span class="n">10.2.5</span>The isolation certificate</a></li><li><a href="#s10-2-6"><span class="n">10.2.6</span>Locks, tags, key safes and group lockout</a></li><li><a href="#s10-2-7"><span class="n">10.2.7</span>The lock and tag register</a></li><li><a href="#s10-2-8"><span class="n">10.2.8</span>Removal of a lock when its owner is absent</a></li></ol></li><li><a href="#s10-3"><span class="n">10.3</span>Test before touch and proving dead</a><ol><li><a href="#s10-3-1"><span class="n">10.3.1</span>Why a test is needed after isolation</a></li><li><a href="#s10-3-2"><span class="n">10.3.2</span>The live-dead-live method</a></li><li><a href="#s10-3-3"><span class="n">10.3.3</span>Instruments for test before touch</a></li><li><a href="#s10-3-4"><span class="n">10.3.4</span>MV proving dead and earthing at 20 kV</a></li><li><a href="#s10-3-5"><span class="n">10.3.5</span>Common errors in proving dead</a></li></ol></li><li><a href="#s10-4"><span class="n">10.4</span>Switching programmes</a><ol><li><a href="#s10-4-1"><span class="n">10.4.1</span>What a switching programme is</a></li><li><a href="#s10-4-2"><span class="n">10.4.2</span>Roles in switching</a></li><li><a href="#s10-4-3"><span class="n">10.4.3</span>Format of a switching programme</a></li><li><a href="#s10-4-4"><span class="n">10.4.4</span>Approval timeline and day-of-switching procedure</a></li><li><a href="#s10-4-5"><span class="n">10.4.5</span>Worked example: 20 kV ring energisation of one MSC-1 building</a></li><li><a href="#s10-4-6"><span class="n">10.4.6</span>Switching programme for a UPS maintenance bypass isolation</a></li></ol></li><li><a href="#s10-5"><span class="n">10.5</span>Energisation administration</a><ol><li><a href="#s10-5-1"><span class="n">10.5.1</span>What energisation administration controls</a></li><li><a href="#s10-5-2"><span class="n">10.5.2</span>The energisation readiness board</a></li><li><a href="#s10-5-3"><span class="n">10.5.3</span>Gate criteria for energisation of 20 kV and LV equipment</a></li><li><a href="#s10-5-4"><span class="n">10.5.4</span>The energisation certificate</a></li><li><a href="#s10-5-5"><span class="n">10.5.5</span>The energised-zone declaration and the live boundary</a></li></ol></li><li><a href="#s10-6"><span class="n">10.6</span>Simultaneous operations in a partly live building</a><ol><li><a href="#s10-6-1"><span class="n">10.6.1</span>What SIMOPS means on a data-centre campus</a></li><li><a href="#s10-6-2"><span class="n">10.6.2</span>SIMOPS controls</a></li><li><a href="#s10-6-3"><span class="n">10.6.3</span>SIMOPS RACI</a></li></ol></li><li><a href="#s10-7"><span class="n">10.7</span>Indonesian legal requirements</a><ol><li><a href="#s10-7-1"><span class="n">10.7.1</span>UU No. 1 Tahun 1970 on work safety</a></li><li><a href="#s10-7-2"><span class="n">10.7.2</span>Permenaker No. 12 Tahun 2015 on K3 Listrik</a></li><li><a href="#s10-7-3"><span class="n">10.7.3</span>Duties of the Ahli K3 Listrik</a></li><li><a href="#s10-7-4"><span class="n">10.7.4</span>SLO and NIDI under the ESDM regulations</a></li><li><a href="#s10-7-5"><span class="n">10.7.5</span>PUIL 2020 and IEC 60364-6 initial verification</a></li></ol></li><li><a href="#s10-8"><span class="n">10.8</span>Common errors, interfaces and KPIs</a><ol><li><a href="#s10-8-1"><span class="n">10.8.1</span>Common errors across permits, isolation and energisation</a></li><li><a href="#s10-8-2"><span class="n">10.8.2</span>Interfaces</a></li><li><a href="#s10-8-3"><span class="n">10.8.3</span>KPIs for the energisation phase</a></li></ol></li><li><a href="#s10-9"><span class="n">10.9</span>Checklist for site use</a></li><li><a href="#s10-10"><span class="n">10.10</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="09-quality-ncr-car-punch-defects.html"><span>Previous</span>09 Quality control</a><a href="11-meetings-reports-schedules.html"><span>Next</span>11 Meetings, minutes, daily and weekly reports, schedules and look-aheads</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s10-0"><span class="n">10.0</span>Scope of this chapter</h2>
+<p>This chapter describes how work is authorised and how equipment is isolated and proved dead on a hyperscale data-centre campus. It also describes how high-voltage (HV) and low-voltage (LV) switching is written and carried out, and how a system is declared ready to energise. It applies to construction, commissioning and the first operation of a building while other parts are still under construction. Chapter 13 gives the medium-voltage (MV) test values that feed the energisation gate. Chapter 16 gives the uninterruptible power supply (UPS) tests. Chapter 28 covers integrated systems testing (IST) under live conditions.</p>
+<ol>
+<li><strong>Permit-to-work system.</strong> What a permit to work (PTW) is, who issues and receives it, the permit types and the permit fields. It also covers the life cycle with time limits, suspension, shift handover and the permit register with its key performance indicators (KPIs).</li>
+<li><strong>Isolation and lockout/tagout.</strong> The six steps of OSHA 29 CFR 1910.147, the electrical requirements of OSHA 29 CFR 1910.333 and the process for an electrically safe work condition in NFPA 70E-2024 Article 120. It also covers isolation certificates, lock types, group lockout and the lock and tag register.</li>
+<li><strong>Test before touch.</strong> The live-dead-live method, the instruments, their category ratings and the proving unit, MV voltage detection and portable earthing.</li>
+<li><strong>Switching programmes.</strong> The format (step, location, device, action, expected indication, actual indication, signature), the roles, the approval timeline, read-back, deviation rules and a full programme for a 20 kV ring.</li>
+<li><strong>Energisation administration.</strong> The energisation readiness board (ERB), the gate criteria, the energisation certificate, the energised-zone declaration and the notice to all trades.</li>
+<li><strong>Simultaneous operations.</strong> Work in a building where some areas are live and some are still under construction (SIMOPS).</li>
+<li><strong>Indonesian requirements.</strong> Undang-Undang (UU) No. 1 Tahun 1970 on work safety, Permenaker No. 12 Tahun 2015 on electrical occupational safety and health (K3 Listrik) and the duties of the Ahli K3 Listrik. It also covers the Sertifikat Laik Operasi (SLO) and the Nomor Identitas Instalasi (NIDI) under the ministerial regulations (Permen) of the Kementerian Energi dan Sumber Daya Mineral (ESDM). The list ends with the Persyaratan Umum Instalasi Listrik (PUIL) 2020 (SNI 0225:2020).</li>
+<li><strong>Worked examples.</strong> A 20 kV ring energisation of one MSC-1 building, a UPS maintenance bypass isolation, an initial verification insulation test, a permit register analysis and a SIMOPS conflict check.</li>
+</ol>
+<p>Documents and standards used: OSHA 29 CFR 1910.147 and 1910.333, NFPA 70E-2024, HSE HSG85 (third edition, 2013), HSE GS38, IEC 60364-6, IEC 61243-1 and IEC 61243-3, IEC 61010-1, IEC 61230 and IEC 62271-200. The chapter also uses UU 1/1970, Permenaker 12/2015 and Permenaker 33/2015, Permen ESDM 10/2021 and 12/2021, PUIL 2020, ASHRAE Guideline 0-2019 and the MSC-1 case ledger.</p>
+<h2 id="s10-1"><span class="n">10.1</span>The permit-to-work system: purpose, roles and permit types</h2>
+
+<figure class="sheet" id="F10-1"><a href="../data/cx-handbook/figures/F10-1.svg" title="Open drawing F10-1 at full size"><img src="../data/cx-handbook/figures/F10-1.svg" alt="F10-1: Permit-to-work life cycle on a data-centre campus: request to cancellation" width="1400" height="736" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F10-1</span> — <b>Permit-to-work life cycle on a data-centre campus: request to cancellation</b>. Steps 1 to 5 happen before work starts; steps 6 to 10 happen on the work day. The permit receiver holds the permit at the work face, the issuer keeps the office copy.</figcaption></figure>
+<h3 id="s10-1-1"><span class="n">10.1.1</span>What a permit to work is and why it exists</h3>
+<p>A permit to work is a written authority to carry out a defined task, at a defined place, in a defined time window, under defined precautions. It is part of a safe system of work. It records that a competent person has identified the hazards, that the isolations and controls are in place, and that the person doing the work has read and accepted them. On a data-centre campus the permit system has four purposes.</p>
+<ol>
+<li><strong>Control of hazardous work.</strong> Electrical work, hot work, confined-space entry, work at height, lifting and excavation can kill or can damage live plant. The permit stops the work until the controls are in place.</li>
+<li><strong>Control of interaction between trades.</strong> On a campus with 1,000 or more workers per building, the permit office sees all planned work in an area. It can refuse two permits that conflict, for example hot work above a cable tray that is being pulled.</li>
+<li><strong>Protection of live and commissioned plant.</strong> After a switchboard is energised or a chilled-water loop is filled, any work near it needs the permission of the person who controls it. The permit is that permission.</li>
+<li><strong>Record.</strong> The permit and the permit register show who worked where, under which isolations, and when the plant was returned to service. Incident investigation and the handover file both use the permit register.</li>
+</ol>
+<h3 id="s10-1-2"><span class="n">10.1.2</span>Roles in the permit system</h3>
+<p>The role names differ between projects. The table uses the names that most hyperscale programmes use and gives the common alternatives. The project PTW procedure names the persons and their authorisation level.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Common alternative names</th>
+<th>Duties</th>
+<th>Typical holder on a campus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Permit issuer</td>
+<td>Authorising person, issuing authority</td>
+<td>Reviews the method statement and risk assessment, defines precautions, signs the permit, closes it</td>
+<td>General contractor (GC) PTW coordinator; after energisation, the authorised person for the live system</td>
+</tr>
+<tr>
+<td>Isolating authority</td>
+<td>Authorised person (electrical), senior authorised person (SAP) for HV</td>
+<td>Makes and records the isolations, applies safety locks, issues the isolation certificate</td>
+<td>Electrical contractor authorised person; for 20 kV, the SAP</td>
+</tr>
+<tr>
+<td>Area authority</td>
+<td>Area controller, zone owner</td>
+<td>Controls the area, confirms no conflicting work, signs the area acceptance</td>
+<td>Building package manager or the zone engineer</td>
+</tr>
+<tr>
+<td>Permit receiver</td>
+<td>Performing authority, competent person in charge</td>
+<td>Accepts the permit, briefs the work party, keeps the permit at the work face, returns it</td>
+<td>Subcontractor supervisor</td>
+</tr>
+<tr>
+<td>Work party member</td>
+<td>Authorised worker</td>
+<td>Signs the permit briefing, applies a personal lock</td>
+<td>Electricians, fitters</td>
+</tr>
+<tr>
+<td>Ahli K3 Listrik</td>
+<td>Electrical safety expert (Indonesia)</td>
+<td>Supervises electrical safety, inspects and tests installations under Permenaker 12/2015</td>
+<td>Owner or contractor appointed Ahli K3 Listrik</td>
+</tr>
+<tr>
+<td>Commissioning manager</td>
+<td>CxM, commissioning authority</td>
+<td>Requests commissioning permits, confirms test scope and test limits, attends the ERB</td>
+<td>Owner or CxA</td>
+</tr>
+<tr>
+<td>Fire watch and standby person</td>
+<td>Attendant</td>
+<td>Watches hot work or confined-space entry, raises the alarm</td>
+<td>Trained worker named on the permit</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> One person may hold two roles (for example permit issuer and isolating authority) only when the project procedure allows it. The permit issuer and the permit receiver are <mark>never the same person</mark> on the same permit.</p>
+<h3 id="s10-1-3"><span class="n">10.1.3</span>Permit types used on a data-centre campus</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Permit type</th>
+<th>Trigger</th>
+<th>Main precautions</th>
+<th>Maximum validity (typical)</th>
+<th>Linked documents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>General work permit</td>
+<td>Work in a controlled area that is not covered by another type</td>
+<td>Area check, access route, barriers, personal protective equipment (PPE)</td>
+<td>One shift</td>
+<td>Method statement, risk assessment</td>
+</tr>
+<tr>
+<td>Hot work permit</td>
+<td>Welding, cutting, grinding, brazing, open flame</td>
+<td>Remove combustibles within the stated radius, fire extinguisher, fire watch during and after the work, smoke detector isolation request</td>
+<td>One shift</td>
+<td>Fire system impairment request</td>
+</tr>
+<tr>
+<td>Electrical isolation permit (permit to work on de-energised equipment)</td>
+<td>Work on or near conductors that are made dead</td>
+<td>Isolation certificate, locks, proving dead, earthing for MV</td>
+<td>One shift, renewed daily</td>
+<td>Isolation certificate, switching programme</td>
+</tr>
+<tr>
+<td>Energised electrical work permit</td>
+<td>Work on or near exposed live parts where de-energising is not feasible</td>
+<td>Justification, shock and arc-flash risk assessment, PPE category, approach boundaries, signatures of the responsible manager</td>
+<td>Single task</td>
+<td>NFPA 70E energised electrical work permit</td>
+</tr>
+<tr>
+<td>Sanction for test</td>
+<td>Testing that needs the removal of an isolation or earth for a short time (for example a very low frequency (VLF) test on an MV cable)</td>
+<td>Test area barriers, test voltage, test equipment, safe discharge</td>
+<td>Duration of the test</td>
+<td>Test procedure, isolation certificate</td>
+</tr>
+<tr>
+<td>Confined space entry permit</td>
+<td>Entry into a tank, pit, vault, cable trench or plenum classified as a confined space</td>
+<td>Atmosphere test, ventilation, standby person, rescue plan</td>
+<td>One shift</td>
+<td>Gas test record, rescue plan</td>
+</tr>
+<tr>
+<td>Work at height permit</td>
+<td>Work above the project height limit (scissor lift, scaffold, roof edge, cable tray at height)</td>
+<td>Fall protection, equipment inspection, exclusion zone below</td>
+<td>One shift</td>
+<td>Lift inspection, harness inspection</td>
+</tr>
+<tr>
+<td>Lifting permit</td>
+<td>Lifts with a crane, or any critical lift (transformer, generator, chiller module)</td>
+<td>Lift plan, load chart, exclusion zone, appointed person</td>
+<td>One lift or one shift</td>
+<td>Lift plan</td>
+</tr>
+<tr>
+<td>Excavation and ground disturbance permit</td>
+<td>Digging near buried 20 kV cables or earthing grid</td>
+<td>Cable locate, hand dig near services</td>
+<td>Duration of the dig</td>
+<td>Utility drawings, cable avoidance survey</td>
+</tr>
+<tr>
+<td>Mechanical isolation permit</td>
+<td>Work on pressurised chilled-water, fuel or refrigerant systems</td>
+<td>Valve locks, vents and drains, pressure proving</td>
+<td>One shift</td>
+<td>Mechanical isolation certificate</td>
+</tr>
+</tbody>
+</table></div>
+<p>Figure <a class="figref" href="#F10-7">F10-7</a> shows how the PTW coordinator selects the permit types for one task, with the main precaution and validity of each type.</p>
+<figure class="sheet" id="F10-7"><a href="../data/cx-handbook/figures/F10-7.svg" title="Open drawing F10-7 at full size"><img src="../data/cx-handbook/figures/F10-7.svg" alt="F10-7: Permit type selection: one question per hazard, top to bottom" width="1000" height="1198" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F10-7</span> — <b>Permit type selection: one question per hazard, top to bottom</b>. The PTW coordinator asks all nine questions for every request; each &quot;yes&quot; adds a permit and its linked document, and a task with no &quot;yes&quot; takes a general work permit.</figcaption></figure>
+
+<p>The working values below are common hyperscale practice. Each one depends on the project procedure and the local law.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Typical value</th>
+<th>Source and status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fire watch after hot work ends</td>
+<td>at least 1 hour; the project fire strategy may add monitoring time</td>
+<td>NFPA 51B-2019 raised the fire watch from 30 minutes to 1 hour, as stated in the 2019 edition summaries (confirm the fire watch clause of NFPA 51B-2024 in the NFPA free-access reader)</td>
+</tr>
+<tr>
+<td>Clearance of combustibles from hot work</td>
+<td>11 m (35 ft) radius or protected by covers</td>
+<td>NFPA 51B, as applied in university hot work permits (confirm the 35 ft rule in the hot work chapter of NFPA 51B-2024)</td>
+</tr>
+<tr>
+<td>Work at height in Indonesia</td>
+<td>any work where a difference in level can cause a fall; the regulation sets no minimum height, and projects often use 1.8 m as the permit trigger</td>
+<td>Permenaker No. 9 Tahun 2016 Pasal 1 angka 2 (definition); the 1.8 m in that regulation is the maximum length of a personal fall-arrest lanyard</td>
+</tr>
+<tr>
+<td>Confined space oxygen range</td>
+<td>19.5 % to 23.5 % by volume</td>
+<td>OSHA 29 CFR 1910.146(b), definition of hazardous atmosphere</td>
+</tr>
+<tr>
+<td>Confined space flammable gas</td>
+<td>below 10 % of the lower flammable limit (LFL)</td>
+<td>OSHA 29 CFR 1910.146(b), definition of hazardous atmosphere</td>
+</tr>
+<tr>
+<td>Gas test validity before entry</td>
+<td>test immediately before entry, continuous monitoring during entry</td>
+<td>project procedure</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-1-4"><span class="n">10.1.4</span>Fields of the permit form</h3>
+<p>Every permit type uses the same header and close-out fields. The type-specific fields are added in a second section.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Permit number</td>
+<td>text, unique, pre-printed or system-generated</td>
+<td>PTW-B1-E-0457</td>
+</tr>
+<tr>
+<td>Permit type</td>
+<td>pick list</td>
+<td>Electrical isolation</td>
+</tr>
+<tr>
+<td>Building, level, room</td>
+<td>pick list</td>
+<td>B1, L1, MV switch room MVR-1</td>
+</tr>
+<tr>
+<td>Equipment tags</td>
+<td>text list</td>
+<td>B1-MVS-01 panels P03 to P05</td>
+</tr>
+<tr>
+<td>Task description</td>
+<td>text</td>
+<td>Terminate 20 kV cable B1-F2-C1 at panel P04</td>
+</tr>
+<tr>
+<td>Method statement and risk assessment references</td>
+<td>document numbers</td>
+<td>MS-ELE-031 rev C, RA-ELE-031 rev C</td>
+</tr>
+<tr>
+<td>Hazards identified</td>
+<td>check list</td>
+<td>stored energy, adjacent live panel P06, induced voltage</td>
+</tr>
+<tr>
+<td>Isolation certificate number</td>
+<td>text</td>
+<td>IC-B1-HV-0112</td>
+</tr>
+<tr>
+<td>Precautions</td>
+<td>check list and text</td>
+<td>earth switch P04 closed and locked, barrier at P06</td>
+</tr>
+<tr>
+<td>PPE</td>
+<td>check list</td>
+<td>arc-rated clothing 8 cal/cm², insulating gloves class 2</td>
+</tr>
+<tr>
+<td>Valid from, valid to</td>
+<td>date and time</td>
+<td>31 Oct 2026 07:30 to 31 Oct 2026 17:30</td>
+</tr>
+<tr>
+<td>Permit issuer name, signature, time</td>
+<td>signature</td>
+<td>A. Pratama, 07:20</td>
+</tr>
+<tr>
+<td>Area authority name, signature</td>
+<td>signature</td>
+<td>R. Hidayat, 07:22</td>
+</tr>
+<tr>
+<td>Permit receiver name, signature, time</td>
+<td>signature</td>
+<td>D. Saputra, 07:25</td>
+</tr>
+<tr>
+<td>Work party briefing signatures</td>
+<td>list of signatures</td>
+<td>6 names</td>
+</tr>
+<tr>
+<td>Suspension record</td>
+<td>table of time, reason, signatures</td>
+<td>12:00 to 13:00 lunch, permit held by issuer</td>
+</tr>
+<tr>
+<td>Hand-back declaration</td>
+<td>check box and signature</td>
+<td>work complete, tools removed, guards replaced</td>
+</tr>
+<tr>
+<td>Cancellation</td>
+<td>signature and time</td>
+<td>16:50, A. Pratama</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-1-5"><span class="n">10.1.5</span>Permit life cycle with time limits</h3>
+<p>Figure <a class="figref" href="#F10-1">F10-1</a> shows the life cycle as a workflow with the owner, time limit and record of each step.</p>
+<p><strong>Trigger:</strong> A task in the three-week look-ahead (chapter 11) needs a permit.</p>
+<p><strong>Owner:</strong> The permit receiver raises the request. The permit issuer owns the decision.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Submit the permit request.</strong> The subcontractor supervisor submits the request with the method statement and risk assessment <mark>at least 2 working days before the work</mark>. For HV switching or work in an energised building the lead time is 5 working days because the switching programme has to be written and checked.</li>
+<li><strong>Check for conflicts.</strong> The PTW coordinator compares the request with all open and planned permits in the same room and the rooms above and below. The coordinator records the result in the permit register within 1 working day.</li>
+<li><strong>Prepare isolations.</strong> The isolating authority writes or selects the isolation certificate and, for HV, the switching programme. The programme is checked by a second authorised person.</li>
+<li><strong>Carry out the isolation.</strong> On the day, the isolating authority isolates, locks, proves dead and, for MV, earths the equipment. The isolating authority signs the isolation certificate.</li>
+<li><strong>Issue the permit.</strong> The permit issuer and the permit receiver walk the work area together and check each precaution on the permit. The issuer signs, then the receiver signs. The walk-down takes 15 to 30 minutes for an electrical permit.</li>
+<li><strong>Brief the work party.</strong> The permit receiver reads the permit to the work party. Each worker signs the briefing section and applies a personal lock to the group lock box.</li>
+<li><strong>Keep the permit at the work face.</strong> The permit copy stays at the work location in a clear holder. The issuer copy stays in the permit office.</li>
+<li><strong>Suspend when needed.</strong> Work stops for breaks, for a fire alarm or for a change of conditions. The receiver returns the permit or marks it suspended. Work restarts only after the issuer re-checks the area.</li>
+<li><strong>Hand back at the end of the shift.</strong> The receiver signs that the work is complete or that the area is safe to leave. Each worker removes the personal lock.</li>
+<li><strong>Cancel the permit.</strong> The issuer inspects the area and cancels the permit. Only after cancellation can the isolating authority <mark>remove the isolation</mark>.</li>
+</ol>
+<p><strong>Acceptance:</strong> The permit register shows each permit with issue time, hand-back time and cancellation time. <mark>No permit stays open past its validity</mark>. A permit that is not handed back by the end of its validity is treated as an incident.</p>
+<p><strong>Records:</strong> Signed permit, isolation certificate, gas test record (if any), permit register entry.</p>
+<h3 id="s10-1-6"><span class="n">10.1.6</span>Shift handover and long-duration work</h3>
+<p>A permit is valid for one shift. Work that runs for several days, for example a 20 kV cable termination campaign, uses one of two methods. In the first method, a new permit is issued each day under the same isolation certificate, and the isolation stays in place. In the second method, the permit is extended at shift change. The off-going receiver and the on-coming receiver both sign the handover section, and the issuer re-checks the precautions. OSHA 29 CFR 1910.147(f)(4) requires specific procedures at shift or personnel changes so that lockout protection continues without a gap.</p>
+<ol>
+<li><strong>Locks at shift change.</strong> The on-coming workers apply their personal locks to the group lock box before the off-going workers remove theirs. <mark>At no moment is the group lock box without a personal lock</mark> while work continues.</li>
+<li><strong>Isolation continuity.</strong> The isolation certificate stays open. The isolating authority confirms at handover that the safety locks and earths are still in place.</li>
+<li><strong>Night shift limits.</strong> Many projects forbid new HV isolations between 20:00 and 06:00 except in an emergency. The switching programme states the planned time window.</li>
+</ol>
+<h3 id="s10-1-7"><span class="n">10.1.7</span>Permit register fields and KPIs</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Register field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Permit number</td>
+<td>text</td>
+<td>PTW-B1-E-0457</td>
+</tr>
+<tr>
+<td>Type</td>
+<td>pick list</td>
+<td>Electrical isolation</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>text</td>
+<td>B1 L1 MVR-1</td>
+</tr>
+<tr>
+<td>Requested date</td>
+<td>date</td>
+<td>27 Oct 2026</td>
+</tr>
+<tr>
+<td>Issued date and time</td>
+<td>date-time</td>
+<td>31 Oct 2026 07:20</td>
+</tr>
+<tr>
+<td>Planned end</td>
+<td>date-time</td>
+<td>31 Oct 2026 17:30</td>
+</tr>
+<tr>
+<td>Handed back</td>
+<td>date-time</td>
+<td>31 Oct 2026 16:40</td>
+</tr>
+<tr>
+<td>Cancelled</td>
+<td>date-time</td>
+<td>31 Oct 2026 16:50</td>
+</tr>
+<tr>
+<td>Linked isolation certificate</td>
+<td>text</td>
+<td>IC-B1-HV-0112</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>pick list</td>
+<td>issued, suspended, handed back, cancelled, overdue</td>
+</tr>
+<tr>
+<td>Audit result</td>
+<td>pick list</td>
+<td>compliant, minor finding, major finding</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target (typical)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Overdue permits</td>
+<td>permits open after their validity end, per week</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Permit audit compliance</td>
+<td>audited permits with no major finding ÷ audited permits</td>
+<td>≥ 95 %</td>
+</tr>
+<tr>
+<td>Request lead time</td>
+<td>working days between request and planned start</td>
+<td>≥ 2 days (≥ 5 for HV)</td>
+</tr>
+<tr>
+<td>Permit conflicts found</td>
+<td>conflicts found by the coordinator before issue</td>
+<td>recorded, trend only</td>
+</tr>
+<tr>
+<td>Isolation errors</td>
+<td>isolations found incomplete at walk-down</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Permit register analysis for building B1 in week 43. The register lists 412 permits issued in the week: 188 general, 96 hot work, 74 electrical isolation, 3 energised electrical work, 21 confined space, 25 work at height and 5 lifting. The safety team audited 60 permits at the work face. Three audits found a major finding: two hot-work permits with no fire extinguisher at the work face, and one electrical permit with the permit copy missing from the work face. Audit compliance = (60 − 3) ÷ 60 = 95.0 %, which meets the 95 % target with no margin. Two permits were found open at 19:30 after a 17:30 validity end, so the overdue count is 2 and the target of 0 is missed. The PTW coordinator records both as incidents, and the weekly report (chapter 11) lists the actions: <mark>a 17:00 permit-office call to every receiver with an open permit</mark>, and a fire extinguisher check added to the hot-work walk-down.</p>
+<h2 id="s10-2"><span class="n">10.2</span>Energy isolation and lockout/tagout</h2>
+<h3 id="s10-2-1"><span class="n">10.2.1</span>What isolation is</h3>
+<p>Isolation is the separation of equipment from every source of energy, secured so that the energy cannot return while people work. Electrical isolation opens a device that gives a visible or verified gap, then locks it. Lockout/tagout (LOTO) is the US term for applying locks and tags to energy-isolating devices. In UK and IEC practice the same steps are called "isolate, secure, prove dead and earth". The data-centre campus uses both terms because the contractors come from both traditions.</p>
+<p>Isolation on a data-centre campus covers more than electricity. A UPS module stores energy in DC capacitors and batteries. A chilled-water pipe stores pressure. A generator can start on a remote signal. A coolant distribution unit (CDU) pump can be started by the building management system (BMS). Every energy source is listed on the isolation certificate.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Energy source</th>
+<th>Example in a data hall</th>
+<th>Isolation method</th>
+<th>Proof of isolation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AC electrical, LV</td>
+<td>415 V UPS output switchboard</td>
+<td>Open and lock the circuit breaker or switch-disconnector, rack out where withdrawable</td>
+<td>Test for absence of voltage at the point of work</td>
+</tr>
+<tr>
+<td>AC electrical, MV</td>
+<td>20 kV ring main unit (RMU) panel</td>
+<td>Open the circuit breaker, open the disconnector, close the earth switch, lock all three</td>
+<td>MV voltage detection, then earth switch closed</td>
+</tr>
+<tr>
+<td>DC electrical</td>
+<td>UPS battery string 480 V to 600 V DC</td>
+<td>Open and lock the battery breaker or remove fuses</td>
+<td>Test for absence of DC voltage across the bus</td>
+</tr>
+<tr>
+<td>Stored electrical</td>
+<td>UPS DC link capacitors</td>
+<td>Wait the discharge time on the original equipment manufacturer (OEM) label, then test</td>
+<td>Test for absence of voltage on the DC link</td>
+</tr>
+<tr>
+<td>Control and remote start</td>
+<td>Generator auto-start, BMS start of pumps</td>
+<td>Controller to "off" or "local", remove the start fuse, lock the selector</td>
+<td>Attempt a start from the panel: no response</td>
+</tr>
+<tr>
+<td>Hydraulic and pressure</td>
+<td>Chilled-water pipe 10 bar</td>
+<td>Close and lock two valves, open vent and drain</td>
+<td>Pressure gauge reads 0 bar</td>
+</tr>
+<tr>
+<td>Mechanical</td>
+<td>Fan rotating under air pressure</td>
+<td>Lock the fan isolator, fit a mechanical block</td>
+<td>Fan stopped and blocked</td>
+</tr>
+<tr>
+<td>Thermal</td>
+<td>Hot water at 45 °C on the facility water system</td>
+<td>Isolate and cool</td>
+<td>Thermometer reading</td>
+</tr>
+<tr>
+<td>Chemical</td>
+<td>Glycol, water treatment dosing</td>
+<td>Isolate dosing pump and valves</td>
+<td>Visual and lock</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-2-2"><span class="n">10.2.2</span>The six steps of OSHA 29 CFR 1910.147</h3>
+<p>OSHA 29 CFR 1910.147(d) sets the order in which energy control is applied.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>OSHA step</th>
+<th>Title in 1910.147(d)</th>
+<th>Action on a data-centre campus</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(d)(1)</td>
+<td>Preparation for shutdown</td>
+<td>Read the isolation procedure for the equipment, identify every energy source from the single-line diagram and the OEM manual</td>
+<td>Isolation certificate, energy source list</td>
+</tr>
+<tr>
+<td>(d)(2)</td>
+<td>Machine or equipment shutdown</td>
+<td>Transfer the load (for example UPS to maintenance bypass), then stop the equipment by its normal stop</td>
+<td>Switching programme steps</td>
+</tr>
+<tr>
+<td>(d)(3)</td>
+<td>Machine or equipment isolation</td>
+<td>Open the energy-isolating devices: breakers, switch-disconnectors, valves</td>
+<td>Switching programme steps</td>
+</tr>
+<tr>
+<td>(d)(4)</td>
+<td>Lockout or tagout device application</td>
+<td>Apply a safety lock and a tag on each isolation point</td>
+<td>Lock and tag register</td>
+</tr>
+<tr>
+<td>(d)(5)</td>
+<td>Stored energy</td>
+<td>Discharge capacitors, wait the OEM discharge time, apply MV earths, vent pressure</td>
+<td>Isolation certificate</td>
+</tr>
+<tr>
+<td>(d)(6)</td>
+<td>Verification of isolation</td>
+<td>Test for absence of voltage, try to start the equipment, read the pressure gauge</td>
+<td>Proving-dead record</td>
+</tr>
+</tbody>
+</table></div>
+<p>OSHA 29 CFR 1910.147(c)(4) requires a written energy control procedure for each piece of equipment. The procedure lists the shut-down, isolation, blocking and securing steps, the placement, removal and transfer of locks and tags, and the test that verifies isolation. In addition <mark>OSHA 29 CFR 1910.147(c)(6) requires a periodic inspection of each procedure at least annually</mark>, by an authorised employee other than the one using it. On a construction campus the commissioning team turns the energy control procedures into equipment-specific isolation procedures (one per equipment type) before the first energisation.</p>
+<h3 id="s10-2-3"><span class="n">10.2.3</span>Electrical requirements of OSHA 29 CFR 1910.333</h3>
+<p>OSHA 29 CFR 1910.333(b)(2) adds electrical rules that must be followed in the order presented.</p>
+<ol>
+<li><strong>Written procedures.</strong> The employer keeps a written copy of the lockout and tagging procedures and makes it available for inspection.</li>
+<li><strong>Disconnect from all sources.</strong> The circuits and equipment are disconnected from all electrical energy sources. Push buttons, selector switches and interlocks are not the only means of de-energising. On a UPS this means that <mark>the UPS "off" button is never the isolation</mark>. The input, bypass, battery and output breakers are the isolation.</li>
+<li><strong>Lock and tag on each disconnecting means.</strong> A lock and a tag go on each device used to de-energise the circuit.</li>
+<li><strong>Release stored energy.</strong> Capacitors are discharged and high-capacitance elements are short-circuited and grounded.</li>
+<li><strong>Verify de-energised condition.</strong> A qualified person operates the equipment controls to check that the equipment cannot be restarted. A qualified person then uses test equipment to test the circuit elements and electrical parts, including checks for induced voltage and backfeed. <mark>For circuits over 600 V nominal, the test equipment is checked for proper operation immediately before and immediately after the test</mark>.</li>
+<li><strong>Re-energise in order.</strong> Before re-energising, a qualified person tests and visually inspects the equipment, and exposed employees are warned to stay clear. Each lock and tag is removed by the person who applied it or under that person's direct supervision. A visual check confirms that all employees are clear.</li>
+</ol>
+<h3 id="s10-2-4"><span class="n">10.2.4</span>The electrically safe work condition in NFPA 70E-2024</h3>
+<p>NFPA 70E defines an electrically safe work condition (ESWC) as a state of a conductor or circuit part. In that state the conductor or circuit part has been disconnected from energised parts, locked and tagged, tested to verify the absence of voltage and, where necessary, temporarily grounded. The 2024 edition puts the process in section 120.6 (it was 120.5 in the 2021 edition) and adds a step to the previous list. The list gives the eight steps of NFPA 70E-2024 120.6 in short form, checked against the 2024 text, which requires the steps in the order presented where feasible.</p>
+<ol>
+<li><strong>Determine all sources.</strong> Determine all possible sources of electrical supply to the equipment. Check the up-to-date drawings, diagrams and identification tags. On a data-centre block this includes the normal supply, the generator supply, the UPS output, the static bypass, the battery and any back-feed from a parallel UPS.</li>
+<li><strong>Interrupt the load and open the disconnects.</strong> After the load current is interrupted, open the disconnecting device for each source.</li>
+<li><strong>Verify the open position.</strong> Where possible, visually verify that all blades of the disconnecting devices are fully open or that drawout circuit breakers are withdrawn to the fully disconnected position.</li>
+<li><strong>Release stored electrical energy.</strong> Discharge capacitors and stored energy in the circuit.</li>
+<li><strong>Release or block stored non-electrical energy.</strong> Release or block stored mechanical energy, such as closing springs of circuit breakers, to the extent that it could re-energise the circuit.</li>
+<li><strong>Apply lockout devices.</strong> Apply lockout devices in accordance with the documented and established lockout procedure.</li>
+<li><strong>Test for absence of voltage.</strong> Use an adequately rated portable test instrument to test each phase conductor or circuit part at each point of work, phase to phase and phase to ground. Before and after each test, verify that the test instrument operates on any known voltage source. A permanently mounted absence of voltage tester (AVT) may be used where it is listed and installed for that purpose. This is NFPA 70E-2024 120.6(7) Exception No. 1, as described in the magazine of the International Association of Electrical Inspectors (IAEI). The tester is permanently mounted, installed to the manufacturer's instructions and tests at the point of work.</li>
+<li><strong>Ground where needed.</strong> Where induced voltages or stored energy are possible, ground the phase conductors or circuit parts before touching them. Where the conductors could contact other exposed energised conductors, apply grounding devices rated for the available fault current.</li>
+</ol>
+<p><strong>Check:</strong> Steps 1 to 8 are done <mark>in the order listed</mark>. A permit that records step 7 before step 6 has been filled in after the event and is rejected at audit.</p>
+<h3 id="s10-2-5"><span class="n">10.2.5</span>The isolation certificate</h3>
+<p>The isolation certificate is the record of steps 1 to 8. It is separate from the permit because one isolation can support several permits. The isolating authority signs it, and on many projects this is a different person from the permit issuer. The example certificate records voltage tests to the protective earth conductor (PE).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Isolation certificate number</td>
+<td>text</td>
+<td>IC-B2-LV-0388</td>
+</tr>
+<tr>
+<td>Equipment to be made safe</td>
+<td>tag and description</td>
+<td>B2-DH3-UPS-A1, UPS system A1, 2.5 MW, two 1,250 kW modules</td>
+</tr>
+<tr>
+<td>Energy sources</td>
+<td>table: source, device, tag</td>
+<td>upstream module input breaker MIB, rectifier input QF1, static bypass input QF2, battery QF3, inverter output QF4, back-feed from the live load bus through the module output breaker (MOB)</td>
+</tr>
+<tr>
+<td>Isolation points</td>
+<td>table: device, position, lock number</td>
+<td>MOB open, lock L-0417, 09:26; QF4 open, L-0412, 09:29; QF1 L-0413 and QF2 L-0414 open, 09:30; QF3 L-0415 and MIB L-0416 open, 09:31</td>
+</tr>
+<tr>
+<td>Stored energy release</td>
+<td>text and time</td>
+<td>DC link discharge 5 minutes per OEM label; waited 10 minutes, 09:31 to 09:41</td>
+</tr>
+<tr>
+<td>Proving dead record</td>
+<td>table: point, phases tested, instrument serial, result</td>
+<td>output terminals L1-L2, L2-L3, L3-L1, L1-N, L2-N, L3-N, L1-PE, L2-PE, L3-PE: 0 V, 09:44 to 09:49; DC busbar positive to negative and each pole to PE: 0 V, 09:50</td>
+</tr>
+<tr>
+<td>Instrument proved on known source before and after</td>
+<td>check boxes and time</td>
+<td>09:42 and 09:51</td>
+</tr>
+<tr>
+<td>Earths applied (MV)</td>
+<td>table: location, earth number</td>
+<td>not applicable</td>
+</tr>
+<tr>
+<td>Safety key safe number</td>
+<td>text</td>
+<td>KS-B2-07</td>
+</tr>
+<tr>
+<td>Isolating authority signature</td>
+<td>signature and time</td>
+<td>M. Sihombing, 09:55</td>
+</tr>
+<tr>
+<td>Permits issued under this isolation</td>
+<td>list</td>
+<td>PTW-B2-E-0901, PTW-B2-E-0902</td>
+</tr>
+<tr>
+<td>Isolation removal</td>
+<td>signature, time, condition</td>
+<td>after permits cancelled</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-2-6"><span class="n">10.2.6</span>Locks, tags, key safes and group lockout</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Description</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Safety lock (isolating authority lock)</td>
+<td>Red padlock with a unique key, one key only, number engraved</td>
+<td>Applied only by the isolating authority, key kept in the key safe</td>
+</tr>
+<tr>
+<td>Personal lock</td>
+<td>Padlock issued to one worker, name and photo on the tag</td>
+<td>Applied to the group lock box, removed only by its owner</td>
+</tr>
+<tr>
+<td>Group lock box</td>
+<td>Steel box holding the keys of the safety locks</td>
+<td>Personal locks of every worker on the box while work continues</td>
+</tr>
+<tr>
+<td>Key safe</td>
+<td>Lockable cabinet in the permit office or switch room</td>
+<td>Holds the keys of safety locks between shifts</td>
+</tr>
+<tr>
+<td>Danger tag</td>
+<td>Tag with "Danger, do not operate" and the isolation certificate number</td>
+<td>Attached to each locked device</td>
+</tr>
+<tr>
+<td>Caution tag</td>
+<td>Tag for information (for example "out of service")</td>
+<td>Never used as an isolation</td>
+</tr>
+<tr>
+<td>Lockout hasp</td>
+<td>Hasp that takes several padlocks</td>
+<td>Used where several groups lock one device</td>
+</tr>
+<tr>
+<td>Breaker lockout device</td>
+<td>Device that holds a moulded-case breaker toggle in the off position</td>
+<td>Fitted to moulded-case (MCCB) and miniature (MCB) circuit breakers that have no padlock provision</td>
+</tr>
+<tr>
+<td>Racking lock</td>
+<td>Padlock through the racking shutter of a withdrawable breaker</td>
+<td>Holds the breaker in the disconnected position</td>
+</tr>
+</tbody>
+</table></div>
+<p>OSHA 29 CFR 1910.147(c)(5)(ii) requires lockout and tagout devices to be durable, standardised by colour, shape or size, substantial enough to resist removal without excessive force, and identifiable to the person who applied them. In addition <mark>tag attachments need a minimum unlocking strength of no less than 50 pounds</mark> (about 22 kg).</p>
+<figure class="sheet" id="F10-8"><a href="../data/cx-handbook/figures/F10-8.svg" title="Open drawing F10-8 at full size"><img src="../data/cx-handbook/figures/F10-8.svg" alt="F10-8: Group lockout for isolation certificate IC-B2-LV-0388 (UPS B2-DH3-UPS-A1)" width="1000" height="923" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F10-8</span> — <b>Group lockout for isolation certificate IC-B2-LV-0388 (UPS B2-DH3-UPS-A1)</b>. The isolation cannot be removed while any personal lock is on the group lock box; the safety-lock keys stay in the box or in the key safe, never with a worker.</figcaption></figure>
+
+<p>Figure <a class="figref" href="#F10-8">F10-8</a> shows the group lockout for isolation certificate IC-B2-LV-0388: six safety locks, their keys in one group lock box, and the personal locks of two work parties (example values).</p>
+<p>Group lockout under OSHA 29 CFR 1910.147(f)(3) gives each worker the same protection as a personal lock. One authorised employee has primary responsibility for the group. Each worker attaches a personal lock to the group lock box when starting work and removes it when stopping. On the campus, the isolating authority holds primary responsibility, and the group lock box is kept at the work face or at the switch room door.</p>
+<h3 id="s10-2-7"><span class="n">10.2.7</span>The lock and tag register</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Register field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lock number</td>
+<td>text</td>
+<td>L-0412</td>
+</tr>
+<tr>
+<td>Lock type</td>
+<td>pick list</td>
+<td>safety lock (red)</td>
+</tr>
+<tr>
+<td>Device locked</td>
+<td>tag</td>
+<td>B2-DH3-UPS-A1-QF4</td>
+</tr>
+<tr>
+<td>Position locked</td>
+<td>pick list</td>
+<td>open</td>
+</tr>
+<tr>
+<td>Isolation certificate</td>
+<td>text</td>
+<td>IC-B2-LV-0388</td>
+</tr>
+<tr>
+<td>Applied by, date and time</td>
+<td>name and time</td>
+<td>M. Sihombing, 31 Oct 2026 09:29</td>
+</tr>
+<tr>
+<td>Key location</td>
+<td>text</td>
+<td>key safe KS-B2-07</td>
+</tr>
+<tr>
+<td>Removed by, date and time</td>
+<td>name and time</td>
+<td>M. Sihombing, 31 Oct 2026 16:20</td>
+</tr>
+<tr>
+<td>Remarks</td>
+<td>text</td>
+<td>none</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-2-8"><span class="n">10.2.8</span>Removal of a lock when its owner is absent</h3>
+<p>A personal lock left on a group box after the worker has left the site blocks the cancellation of the permit. OSHA 29 CFR 1910.147(e)(3) allows removal by another person only under a documented procedure that includes three actions.</p>
+<ol>
+<li><strong>Verify absence.</strong> The supervisor verifies that the worker who applied the lock is not at the facility. On a campus this means a check of the gate access records and a phone call.</li>
+<li><strong>Try to contact the worker.</strong> The supervisor makes reasonable efforts to tell the worker that the lock is being removed.</li>
+<li><strong>Inform before return.</strong> The worker is told about the removal before resuming work at the facility.</li>
+</ol>
+<p>On hyperscale programmes the usual practice adds a fourth action. The permit issuer and the safety manager witness the removal, the lock is cut with bolt cutters, and the removal is recorded on a lock removal form with the reason. The event is reported in the weekly safety report.</p>
+<h2 id="s10-3"><span class="n">10.3</span>Test before touch and proving dead</h2>
+
+<figure class="sheet" id="F10-2"><a href="../data/cx-handbook/figures/F10-2.svg" title="Open drawing F10-2 at full size"><img src="../data/cx-handbook/figures/F10-2.svg" alt="F10-2: Isolation sequence of a 20 kV cable feeder panel shown with EN 60617 switch states" width="1400" height="924" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F10-2</span> — <b>Isolation sequence of a 20 kV cable feeder panel shown with EN 60617 switch states</b>. Each column is one state of the same panel B1-MVS-01-P04. The earth switch is closed only after the voltage detection system shows no voltage on all three phases.</figcaption></figure>
+<h3 id="s10-3-1"><span class="n">10.3.1</span>Why a test is needed after isolation</h3>
+<p>An open breaker does not prove that the conductors are dead. The conductor can still be live for one of these reasons: a wrong drawing, a mislabelled panel, a second source, induced voltage from a parallel cable or a failed breaker pole. A second source is a generator, a parallel UPS or a back-feed through a control transformer. The test for absence of voltage at the point of work is the only check that the conductor that will be touched is dead.</p>
+<h3 id="s10-3-2"><span class="n">10.3.2</span>The live-dead-live method</h3>
+<p>The live-dead-live method (in UK practice "prove, test, prove") checks the instrument before and after the test so that a failed instrument cannot report a false "dead".</p>
+<ol>
+<li><strong>Check the instrument.</strong> Inspect the voltage detector, leads and probes for damage. Check the category rating and the calibration or functional check label.</li>
+<li><strong>Prove on a known live source.</strong> Test the detector on a known voltage source, either a proving unit or a known live circuit of similar voltage. The detector must indicate the voltage.</li>
+<li><strong>Test the circuit at the point of work.</strong> Test every combination: on a three-phase four-wire circuit, L1-L2, L2-L3, L3-L1, L1-N, L2-N, L3-N, L1-PE, L2-PE, L3-PE and N-PE. This is 10 tests.</li>
+<li><strong>Prove again on the known source.</strong> Test the detector again on the same known source. If it does not indicate, the dead test is invalid. Replace the detector and repeat from step 2.</li>
+<li><strong>Record.</strong> Write the instrument serial number, the results and the times on the isolation certificate.</li>
+</ol>
+<p><mark>Ten tests are needed on a three-phase four-wire circuit</mark>. A single-phase circuit needs three (L-N, L-PE, N-PE). A DC circuit needs three (positive to negative, positive to earth, negative to earth).</p>
+<h3 id="s10-3-3"><span class="n">10.3.3</span>Instruments for test before touch</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Instrument</th>
+<th>Standard</th>
+<th>Rating needed on a data-centre campus</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Two-pole voltage detector (LV)</td>
+<td>IEC 61243-3</td>
+<td>Measurement category (CAT) IV 600 V or CAT III 1,000 V to IEC 61010-1, matched to the system</td>
+<td>Proving dead on 415 V and DC up to the detector rating</td>
+</tr>
+<tr>
+<td>Proving unit</td>
+<td>OEM specification</td>
+<td>Output matched to the detector range</td>
+<td>Known source for live-dead-live</td>
+</tr>
+<tr>
+<td>Multimeter</td>
+<td>IEC 61010-1</td>
+<td>CAT IV 600 V where used at the origin of the installation</td>
+<td>Measurement, not preferred for proving dead (selector errors)</td>
+</tr>
+<tr>
+<td>MV voltage detector (contact type)</td>
+<td>IEC 61243-1</td>
+<td>Voltage range covering 20 kV, with integrated self-test</td>
+<td>Proving dead on 20 kV conductors where no voltage detection system is fitted</td>
+</tr>
+<tr>
+<td>Voltage detection system on switchgear</td>
+<td>IEC 61243-5 (VDS), fitted to IEC 62271-200 panels</td>
+<td>Indicator lamps per phase at the panel front</td>
+<td>Proving dead on 20 kV panels with integrated detection</td>
+</tr>
+<tr>
+<td>Phase comparator</td>
+<td>OEM specification</td>
+<td>Rated for 20 kV</td>
+<td>Phasing check before closing a ring</td>
+</tr>
+<tr>
+<td>Portable earthing and short-circuiting equipment</td>
+<td>IEC 61230</td>
+<td>Rated for the fault level and duration (for MSC-1 20 kV, at least 25 kA for 1 s, class 31.5 kA)</td>
+<td>Earthing at the point of work where no earth switch exists</td>
+</tr>
+<tr>
+<td>Permanently mounted absence of voltage tester (AVT)</td>
+<td>UL 1436 (listing)</td>
+<td>Installed per OEM</td>
+<td>Testing for absence of voltage without opening the enclosure, NFPA 70E 120.6 exception</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> GS38 (fourth edition) from the UK Health and Safety Executive gives guidance on the leads and probes of test instruments. The probes have finger guards and fused leads. The exposed probe tip is <mark>not more than 4 mm</mark>, and 2 mm or less, or a spring-loaded retractable shrouded probe, is recommended where practicable (GS38 text as quoted by the test-lead maker Kewtech). A multimeter left on the current range shorts the circuit when used as a voltage detector. For this reason most campus procedures forbid multimeters for proving dead and allow only two-pole voltage detectors.</p>
+<h3 id="s10-3-4"><span class="n">10.3.4</span>MV proving dead and earthing at 20 kV</h3>
+<p>Figure <a class="figref" href="#F10-2">F10-2</a> shows the four states of a 20 kV cable feeder panel with the EN 60617 switch symbols.</p>
+<p>On a 20 kV ring main unit or a metal-enclosed switchboard built to IEC 62271-200, the panels have an integrated earth switch and a voltage detection system. The proving-dead sequence for a cable feeder panel follows the order below.</p>
+<ol>
+<li><strong>Open the circuit breaker.</strong> Confirm the mechanical position indicator shows "open" (O).</li>
+<li><strong>Open the disconnector or rack the breaker out.</strong> Confirm the position indicator shows "open" or "disconnected".</li>
+<li><strong>Check the voltage detection system.</strong> Use the self-test of the VDS indicator, then confirm all three phases show no voltage.</li>
+<li><strong>Close the earth switch.</strong> The earth switch has a short-circuit making capacity. If the cable is still live, the earth switch makes on the fault and the upstream protection trips. This is why <mark>the VDS check comes first</mark>.</li>
+<li><strong>Lock the breaker, disconnector and earth switch.</strong> Apply safety locks and danger tags to each.</li>
+<li><strong>Prove dead at the point of work.</strong> At the cable termination in the panel cable compartment, use the MV voltage detector (after proving it on its self-test or a known live panel) before the cable is touched.</li>
+<li><strong>Apply additional earths where needed.</strong> Where the work is at a remote point, for example a cable joint in a trench, portable earths are applied at the point of work after a proving test.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>State on the panel</th>
+<th>Breaker</th>
+<th>Disconnector</th>
+<th>Earth switch</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>In service</td>
+<td>closed</td>
+<td>closed</td>
+<td>open</td>
+<td>Cable feeder energised and loaded</td>
+</tr>
+<tr>
+<td>Open</td>
+<td>open</td>
+<td>closed</td>
+<td>open</td>
+<td>Cable feeder de-energised from this end, can be re-closed</td>
+</tr>
+<tr>
+<td>Isolated</td>
+<td>open</td>
+<td>open</td>
+<td>open</td>
+<td>Gap established, not yet safe to touch</td>
+</tr>
+<tr>
+<td>Earthed (safe for work)</td>
+<td>open</td>
+<td>open</td>
+<td>closed and locked</td>
+<td>Cable earthed at this end</td>
+</tr>
+<tr>
+<td>Test position</td>
+<td>open, racked to test</td>
+<td>disconnected</td>
+<td>as needed</td>
+<td>Breaker tested off-line</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Proving-dead record for 20 kV cable feeder B1-MVS-01-P04. In the MSC-1 worked example, the building is supplied by two 20 kV feeders of 1,334.6 A each. The isolating authority opens the breaker at 08:05 and the disconnector at 08:06. The voltage detection system self-test passes at 08:07 and all three phase lamps are off. The earth switch is closed at 08:09. Locks L-0101 (breaker), L-0102 (disconnector) and L-0103 (earth switch) are applied at 08:11. At the termination, the MV voltage detector is self-tested at 08:20, used on L1, L2 and L3 at 08:21 with no indication, and self-tested again at 08:22. The isolation certificate IC-B1-HV-0112 records three tests on three phases with the detector serial number and two self-test times. The permit PTW-B1-E-0457 is issued at 08:30. Total time from the first switching step to the permit issue is 25 minutes, which matches the <mark>30-minute allowance in the switching programme</mark>.</p>
+<h3 id="s10-3-5"><span class="n">10.3.5</span>Common errors in proving dead</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>How it shows</th>
+<th>How to detect it before the witness test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Detector not proved after the test</td>
+<td>Isolation certificate has one proving time only</td>
+<td>Certificate form with two mandatory time fields; audit rejects one-time entries</td>
+</tr>
+<tr>
+<td>Not all combinations tested</td>
+<td>Certificate lists L-N only</td>
+<td>Pre-printed 10-test grid on the certificate</td>
+</tr>
+<tr>
+<td>Test made only at the isolation point</td>
+<td>Work on a panel 40 m from the tested breaker</td>
+<td>Certificate field "point of work" must name the terminals touched</td>
+</tr>
+<tr>
+<td>Second source missed</td>
+<td>Generator or parallel UPS back-feeds the panel</td>
+<td>Energy source list taken from the single-line diagram, checked by a second authorised person</td>
+</tr>
+<tr>
+<td>Wrong panel</td>
+<td>Panel labels not yet permanent</td>
+<td>Label check against the as-built single-line diagram on the walk-down</td>
+</tr>
+<tr>
+<td>Induced voltage on a long cable</td>
+<td>Detector shows a low voltage on an isolated cable</td>
+<td>Earth at the point of work, then test</td>
+</tr>
+<tr>
+<td>DC link not discharged</td>
+<td>Voltage on capacitors after the UPS is isolated</td>
+<td>Wait the OEM time and test the DC bus</td>
+</tr>
+<tr>
+<td>Instrument category too low</td>
+<td>CAT II meter used at a main switchboard</td>
+<td>Instrument register lists category; tool check at the permit walk-down</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s10-4"><span class="n">10.4</span>Switching programmes</h2>
+
+<figure class="sheet" id="F10-3"><a href="../data/cx-handbook/figures/F10-3.svg" title="Open drawing F10-3 at full size"><img src="../data/cx-handbook/figures/F10-3.svg" alt="F10-3: Switching programme SP-B1-HV-007: first energisation of 20 kV ring R1 in building B1" width="1400" height="850" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F10-3</span> — <b>Switching programme SP-B1-HV-007: first energisation of 20 kV ring R1 in building B1</b>. Leg A is energised from P03 at step 11 and leg B from P07 at step 17; the normal open point at RMU-02 S2 stays open and is phase-checked before any later ring closure.</figcaption></figure>
+
+<figure class="sheet" id="F10-5"><a href="../data/cx-handbook/figures/F10-5.svg" title="Open drawing F10-5 at full size"><img src="../data/cx-handbook/figures/F10-5.svg" alt="F10-5: UPS system B2-DH3-UPS-A1 on maintenance bypass: breaker states after step 16 of the isolation" width="1400" height="846" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F10-5</span> — <b>UPS system B2-DH3-UPS-A1 on maintenance bypass: breaker states after step 16 of the isolation</b>. The load bus stays live through the maintenance bypass breaker; the UPS between MIB and MOB is dead and proved dead at its input, bypass, output and DC bus.</figcaption></figure>
+<h3 id="s10-4-1"><span class="n">10.4.1</span>What a switching programme is</h3>
+<p>A switching programme (also called a switching schedule or switching sequence) is a written list of switching operations in the exact order in which they are carried out, with the expected result of each step. It is prepared before the day, checked by a second competent person, approved by the person in control of the network, and carried out step by step with each step signed. A switching programme is required for every operation on the 20 kV system. It is also required for LV operations that change the source of a critical load, for example a UPS transfer to maintenance bypass, or a transfer between the A and B supplies of a block.</p>
+<p>Utility networks use the same discipline. In the UK, the Energy Networks Association (ENA) distribution safety rules and the National Grid safety rules use written switching programmes. Their safety documents are named Permit for Work, Sanction for Test and Limitation of Access. These names are UK practice; for the Jakarta campus, the names and formats come from the safety procedure of the state electricity company, PLN, for the 150 kV and 20 kV interface. On a data-centre campus the owner adopts the same structure for its private 20 kV network.</p>
+<h3 id="s10-4-2"><span class="n">10.4.2</span>Roles in switching</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Duty</th>
+<th>Authorisation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Control person (switching authority)</td>
+<td>Holds control of the network, approves the programme, gives permission to start each block of steps, keeps the network status board</td>
+<td>Written appointment by the owner for the 20 kV network</td>
+</tr>
+<tr>
+<td>Senior authorised person (SAP)</td>
+<td>Writes and carries out HV switching, issues HV safety documents</td>
+<td>Written authorisation for 20 kV, specific to the switchgear type</td>
+</tr>
+<tr>
+<td>Authorised person (AP)</td>
+<td>Carries out LV switching and isolation, issues LV safety documents</td>
+<td>Written authorisation for LV</td>
+</tr>
+<tr>
+<td>Checker</td>
+<td>Second SAP or AP who checks the written programme against the single-line diagram</td>
+<td>Same level as the writer</td>
+</tr>
+<tr>
+<td>Competent person (assistant)</td>
+<td>Reads the steps aloud, records the times, watches the operator</td>
+<td>Trained and briefed</td>
+</tr>
+<tr>
+<td>Commissioning manager</td>
+<td>Confirms the commissioning scope and the test limits, witnesses energisation</td>
+<td>Not a switching role unless authorised</td>
+</tr>
+<tr>
+<td>OEM or switchgear specialist</td>
+<td>Present for the first operation of new equipment</td>
+<td>Named in the programme</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-4-3"><span class="n">10.4.3</span>Format of a switching programme</h3>
+<p>The programme has a header, a list of preconditions, the steps and a sign-off.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Header field</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Programme number and revision</td>
+<td>SP-B1-HV-007 rev 1</td>
+</tr>
+<tr>
+<td>Purpose</td>
+<td>First energisation of 20 kV ring R1 of building B1 from B1-MVS-01</td>
+</tr>
+<tr>
+<td>Network diagram reference</td>
+<td>B1-E-SLD-001 rev F (as-built mark-up dated 28 Oct 2026)</td>
+</tr>
+<tr>
+<td>Date and time window</td>
+<td>2 Nov 2026, 09:00 to 13:00</td>
+</tr>
+<tr>
+<td>Written by, checked by, approved by</td>
+<td>SAP R. Nugroho; SAP A. Wibowo; control person H. Santoso</td>
+</tr>
+<tr>
+<td>Safety documents affected</td>
+<td>PTW-B1-E-0457 cancelled 1 Nov 2026 16:50; IC-B1-HV-0112 removed</td>
+</tr>
+<tr>
+<td>Persons present</td>
+<td>SAP, assistant, CxM, switchgear OEM start-up engineer, Ahli K3 Listrik</td>
+</tr>
+<tr>
+<td>Communication</td>
+<td>Radio channel 3, mobile phone backup, read-back of every step</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Column of the step table</th>
+<th>What it holds</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Step</td>
+<td>Sequential number, never re-numbered after approval</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>Time the step is done, written by the assistant</td>
+<td>09:47</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>Room and panel</td>
+<td>B1 L1 RMU room 2, RMU-02</td>
+</tr>
+<tr>
+<td>Device</td>
+<td>Tag and device type</td>
+<td>RMU-02 ring switch S1</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>One operation in plain words</td>
+<td>Close</td>
+</tr>
+<tr>
+<td>Expected indication</td>
+<td>What the operator must see after the action</td>
+<td>Position indicator "I", VDS lamps on three phases</td>
+</tr>
+<tr>
+<td>Actual indication</td>
+<td>What the operator saw</td>
+<td>as expected</td>
+</tr>
+<tr>
+<td>Done by, checked by</td>
+<td>Initials</td>
+<td>RN, AW</td>
+</tr>
+</tbody>
+</table></div>
+<ol>
+<li><strong>One action per step.</strong> "Open breaker P03 and close earth switch P03" is two steps.</li>
+<li><strong>Use the device tag from the as-built drawing.</strong> The tag on the drawing, the label on the panel and the tag in the step must be the same.</li>
+<li><strong>State the expected indication.</strong> Each step says what the operator must see: mechanical position, lamp, meter reading, relay display or status in the electrical power monitoring system (EPMS).</li>
+<li><strong>Include check steps.</strong> Steps such as "Check VDS on RMU-03 side A shows voltage on three phases" are numbered steps with an expected indication.</li>
+<li><strong>Include hold points.</strong> A hold point is a numbered step where the control person must give permission before the next step (for example before closing the ring).</li>
+<li><strong>Include the return-to-normal steps or a separate programme.</strong> If the programme leaves the network in an abnormal state, the programme says so.</li>
+</ol>
+<h3 id="s10-4-4"><span class="n">10.4.4</span>Approval timeline and day-of-switching procedure</h3>
+<p>Figure <a class="figref" href="#F10-10">F10-10</a> shows the approval steps on a scale of working days before the switching day, and the day-of steps with the role at each step.</p>
+<figure class="sheet" id="F10-10"><a href="../data/cx-handbook/figures/F10-10.svg" title="Open drawing F10-10 at full size"><img src="../data/cx-handbook/figures/F10-10.svg" alt="F10-10: Switching programme approval timeline and the day-of-switching sequence" width="1000" height="942" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F10-10</span> — <b>Switching programme approval timeline and the day-of-switching sequence</b>. WD is working days before the switching day. Each bar starts at the latest day for the activity and runs to the next deadline. The lower row is the day-of procedure; a deviation at step 4 leads to step 5.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Activity</th>
+<th>Owner</th>
+<th>Time limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Programme request with purpose and window</td>
+<td>CxM or package manager</td>
+<td>10 working days before the switching day</td>
+</tr>
+<tr>
+<td>Draft programme</td>
+<td>SAP</td>
+<td>7 working days before</td>
+</tr>
+<tr>
+<td>Check against the single-line diagram and site walk-down</td>
+<td>Checker SAP</td>
+<td>5 working days before</td>
+</tr>
+<tr>
+<td>Approval and issue to all persons present</td>
+<td>Control person</td>
+<td>3 working days before</td>
+</tr>
+<tr>
+<td>Notice to all trades in the building</td>
+<td>PTW coordinator</td>
+<td>2 working days before (48 hours)</td>
+</tr>
+<tr>
+<td>Rehearsal walk-down with no operation</td>
+<td>SAP and assistant</td>
+<td>1 working day before</td>
+</tr>
+<tr>
+<td>Pre-switching briefing</td>
+<td>SAP</td>
+<td>30 minutes before the first step</td>
+</tr>
+<tr>
+<td>Post-switching report and network status update</td>
+<td>SAP and control person</td>
+<td>same day</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Brief the team.</strong> The SAP reads the purpose, the preconditions, the hold points and the stop rule. Each person signs the briefing sheet.</li>
+<li><strong>Confirm preconditions.</strong> The SAP confirms that all permits in the affected area are cancelled, all earths listed for removal are removed, and the doors and barriers are in place.</li>
+<li><strong>Request permission.</strong> The SAP asks the control person for permission to start. The control person records the start time on the network status board.</li>
+<li><strong>Read, repeat, act, confirm.</strong> The assistant reads the step aloud. The SAP repeats the device tag and action, places a hand on the device, then operates it. The SAP reads the indication aloud and the assistant writes the time and the actual indication.</li>
+<li><strong>Stop on any deviation.</strong> If the actual indication differs from the expected indication, the SAP stops, makes the equipment safe in its current state and calls the control person. <mark>No step is improvised</mark>. A new or changed step needs a written revision approved by the control person.</li>
+<li><strong>Report completion.</strong> The SAP reports the final network state to the control person. The control person updates the network status board, and the SAP checks the EPMS one-line mimic against the board.</li>
+</ol>
+<h3 id="s10-4-5"><span class="n">10.4.5</span>Worked example: 20 kV ring energisation of one MSC-1 building</h3>
+<p>Figure <a class="figref" href="#F10-3">F10-3</a> shows the ring, the normal open point and the blocks of steps with their hold points.</p>
+<p><strong>Worked example:</strong> First energisation of ring R1 in building B1. In the MSC-1 worked example each building has an information technology (IT) load of 36 MW, a facility load of 43.92 MW and an apparent power of 46.23 MVA. Two 20 kV feeders of 1,334.6 A each supply the building switchboard B1-MVS-01. Ring R1 leaves panel P03, loops through four ring main units RMU-01 to RMU-04, and returns to panel P07. Each ring main unit has two ring switches (S1 towards P03, S2 towards P07) and one transformer tee-off breaker (T1) feeding one 2.5 MVA block transformer. The normal open point is ring switch S2 of RMU-02. All four transformer tee-offs stay open during this programme. The block transformers are energised under a separate programme after the ring is proved. The switchgear fault rating is the 31.5 kA class and the calculated fault level on the building bus with the tie closed is 25.0 kA.</p>
+<p>Four preconditions apply before step 1. The L2 tests on all ring cables are signed (insulation resistance, VLF withstand, partial discharge and sheath test, chapter 13), and relay settings on P03 and P07 are injection-tested and signed. The as-built single-line diagram is marked up, and the ERB has approved the energisation (10.5).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Location</th>
+<th>Device</th>
+<th>Action</th>
+<th>Expected indication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>B1 MVR-1</td>
+<td>P03 earth switch</td>
+<td>Remove safety lock L-0201</td>
+<td>Lock removed, entry in lock register</td>
+</tr>
+<tr>
+<td>2</td>
+<td>B1 MVR-1</td>
+<td>P03 earth switch</td>
+<td>Open</td>
+<td>Indicator "O", earth switch open</td>
+</tr>
+<tr>
+<td>3</td>
+<td>B1 MVR-1</td>
+<td>P07 earth switch</td>
+<td>Remove lock L-0202 and open</td>
+<td>Indicator "O"</td>
+</tr>
+<tr>
+<td>4</td>
+<td>RMU-01 to RMU-04</td>
+<td>all ring earth switches (8)</td>
+<td>Check open and unlocked</td>
+<td>Eight indicators "O"</td>
+</tr>
+<tr>
+<td>5</td>
+<td>RMU-01 to RMU-04</td>
+<td>all T1 tee-off breakers (4)</td>
+<td>Check open and locked</td>
+<td>Four indicators "O", locks L-0211 to L-0214 in place</td>
+</tr>
+<tr>
+<td>6</td>
+<td>RMU-01</td>
+<td>S1 and S2</td>
+<td>Check closed</td>
+<td>Indicators "I"</td>
+</tr>
+<tr>
+<td>7</td>
+<td>RMU-02</td>
+<td>S1 closed, S2 open (normal open point)</td>
+<td>Check</td>
+<td>S1 "I", S2 "O", padlock on S2</td>
+</tr>
+<tr>
+<td>8</td>
+<td>RMU-03, RMU-04</td>
+<td>S1 and S2</td>
+<td>Check closed</td>
+<td>Indicators "I"</td>
+</tr>
+<tr>
+<td>9</td>
+<td>B1 MVR-1</td>
+<td>P03 relay</td>
+<td>Check healthy, no trip flags, settings group 1</td>
+<td>Relay display "healthy"</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Hold point</td>
+<td>control person</td>
+<td>Give permission to energise leg A</td>
+<td>Permission time recorded</td>
+</tr>
+<tr>
+<td>11</td>
+<td>B1 MVR-1</td>
+<td>P03 circuit breaker</td>
+<td>Close</td>
+<td>Indicator "I", ammeter 0 A to 2 A (cable charging)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>B1 MVR-1</td>
+<td>P03 VDS</td>
+<td>Check</td>
+<td>Three phase lamps on</td>
+</tr>
+<tr>
+<td>13</td>
+<td>RMU-01</td>
+<td>VDS S1 side and S2 side</td>
+<td>Check</td>
+<td>Three lamps on both sides</td>
+</tr>
+<tr>
+<td>14</td>
+<td>RMU-02</td>
+<td>VDS S1 side</td>
+<td>Check</td>
+<td>Three lamps on</td>
+</tr>
+<tr>
+<td>15</td>
+<td>RMU-02</td>
+<td>VDS S2 side</td>
+<td>Check</td>
+<td>Three lamps off (normal open point holds)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Hold point</td>
+<td>control person</td>
+<td>Give permission to energise leg B</td>
+<td>Permission recorded</td>
+</tr>
+<tr>
+<td>17</td>
+<td>B1 MVR-1</td>
+<td>P07 circuit breaker</td>
+<td>Close</td>
+<td>Indicator "I"</td>
+</tr>
+<tr>
+<td>18</td>
+<td>RMU-04, RMU-03</td>
+<td>VDS both sides</td>
+<td>Check</td>
+<td>Three lamps on</td>
+</tr>
+<tr>
+<td>19</td>
+<td>RMU-02</td>
+<td>VDS S2 side</td>
+<td>Check</td>
+<td>Three lamps on (now live from leg B)</td>
+</tr>
+<tr>
+<td>20</td>
+<td>RMU-02</td>
+<td>S2 phase comparator test across the open point</td>
+<td>Test L1, L2, L3</td>
+<td>In phase on all three (indication per OEM, near 0 V difference)</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Hold point</td>
+<td>control person</td>
+<td>Decide to close the ring or leave the normal open point</td>
+<td>Decision recorded: normal open point stays open</td>
+</tr>
+<tr>
+<td>22</td>
+<td>B1 MVR-1</td>
+<td>P03 and P07 relays</td>
+<td>Read currents and check alarms</td>
+<td>No alarms; cable charging current only</td>
+</tr>
+<tr>
+<td>23</td>
+<td>EPMS</td>
+<td>B1 one-line mimic</td>
+<td>Check P03, P07, RMU states</td>
+<td>EPMS matches the network status board</td>
+</tr>
+<tr>
+<td>24</td>
+<td>Control room</td>
+<td>network status board</td>
+<td>Update</td>
+<td>R1 live, normal open point RMU-02 S2, tee-offs open and locked</td>
+</tr>
+</tbody>
+</table></div>
+<p>The programme has 24 steps and 3 hold points. With read-back, each step takes 2 to 4 minutes, so the programme takes about 75 minutes plus the hold points. The 4-hour window allows for one stop and recovery. <mark>Step 20 is the phasing check that proves the two legs are in phase</mark> before the normal open point is ever closed in a later programme. The charging current at step 11 can be estimated from the cable capacitance. The ring has about 1.2 km of 20 kV cross-linked polyethylene (XLPE) cable. At an assumed 0.3 µF/km per phase, the capacitance is 0.36 µF per phase; take the real value from the cable datasheet. The charging current per phase is I = 2π × 50 × 0.36 µF × 11,547 V = 1.3 A. The ammeter reading at step 11 is expected to be near 1 A, and <mark>a reading of tens of amperes</mark> means a fault or a closed tee-off.</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Programme written from the design drawing.</strong> The panel order on site differs from the design drawing after a change. The checker walks the route <mark>with the as-built mark-up</mark>.</li>
+<li><strong>Missing check steps.</strong> A programme with only "close" and "open" steps has no proof of the state between steps. Every operation is followed by an indication check.</li>
+<li><strong>Earths left on.</strong> A portable earth left on a cable joint makes the breaker close onto a fault. Step 4 and the earth register prevent it.</li>
+<li><strong>Two programmes in the same window.</strong> Two SAPs switch in the same ring. The control person issues <mark>one programme per network section</mark> at a time.</li>
+</ol>
+<h3 id="s10-4-6"><span class="n">10.4.6</span>Switching programme for a UPS maintenance bypass isolation</h3>
+<p>Figure <a class="figref" href="#F10-5">F10-5</a> shows the breaker states of the UPS and the maintenance bypass cabinet at the end of this programme.</p>
+<p><strong>Worked example:</strong> Isolation of UPS system B2-DH3-UPS-A1 for a capacitor replacement. In the MSC-1 worked example each UPS system is rated 2.5 MW. In normal operation it runs at 62.5 % load on its block, and at 71.4 % if one system in the block is lost. The UPS has an external maintenance bypass cabinet with three breakers. They are the module input breaker (MIB, upstream of the UPS rectifier and static bypass inputs), the maintenance bypass breaker (MBB) and the module output breaker (MOB). A key interlock allows MBB to close only when the UPS is on static bypass, and MOB to open only when MBB is closed. The internal breakers are QF1 rectifier input, QF2 static bypass input, QF3 battery and QF4 inverter output.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Device</th>
+<th>Action</th>
+<th>Expected indication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>UPS display</td>
+<td>Check mode</td>
+<td>"Normal, on inverter", no alarms, load 1.56 MW</td>
+</tr>
+<tr>
+<td>2</td>
+<td>BMS and EPMS</td>
+<td>Inform control room, suppress planned alarms per the alarm plan</td>
+<td>Alarm suppression logged</td>
+</tr>
+<tr>
+<td>3</td>
+<td>UPS display</td>
+<td>Transfer to static bypass</td>
+<td>"On bypass", load continues</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Key interlock</td>
+<td>Release key K1 from the UPS panel</td>
+<td>Key K1 free</td>
+</tr>
+<tr>
+<td>5</td>
+<td>MBB</td>
+<td>Insert key K1 and close</td>
+<td>MBB "I", load shared through MBB and static bypass</td>
+</tr>
+<tr>
+<td>6</td>
+<td>MOB</td>
+<td>Open and lock L-0417</td>
+<td>MOB "O", UPS output disconnected from load; load on MBB</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Load bus meter</td>
+<td>Check voltage and current</td>
+<td>415 V ± 2 %, load current unchanged</td>
+</tr>
+<tr>
+<td>8</td>
+<td>UPS display</td>
+<td>Switch inverter off</td>
+<td>Inverter off</td>
+</tr>
+<tr>
+<td>9</td>
+<td>QF4</td>
+<td>Open and lock L-0412</td>
+<td>"O"</td>
+</tr>
+<tr>
+<td>10</td>
+<td>QF1</td>
+<td>Open and lock L-0413</td>
+<td>"O"</td>
+</tr>
+<tr>
+<td>11</td>
+<td>QF2</td>
+<td>Open and lock L-0414</td>
+<td>"O"</td>
+</tr>
+<tr>
+<td>12</td>
+<td>QF3 battery</td>
+<td>Open and lock L-0415</td>
+<td>"O"</td>
+</tr>
+<tr>
+<td>13</td>
+<td>MIB</td>
+<td>Open and lock L-0416</td>
+<td>"O"</td>
+</tr>
+<tr>
+<td>14</td>
+<td>DC link</td>
+<td>Wait the OEM discharge time</td>
+<td>5 minutes on the OEM label; wait 10 minutes (09:31 to 09:41 in the certificate of 10.2.5)</td>
+</tr>
+<tr>
+<td>15</td>
+<td>UPS terminals</td>
+<td>Prove dead at the input, bypass, output and DC bus</td>
+<td>detector proved 09:42; 0 V on all combinations; detector re-proved 09:51</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Isolation certificate</td>
+<td>Sign IC-B2-LV-0388</td>
+<td>Signed by the authorised person</td>
+</tr>
+</tbody>
+</table></div>
+<p>The load runs on the maintenance bypass with no UPS protection for the duration of the work. The risk assessment states three things. It states how long the load runs this way (in this example, 6 hours) and which upstream source supports the load (the block's normal supply, with the generator able to start). It also states the condition under which the work stops (a utility event). For this work <mark>the switching programme for the return to the UPS is approved at the same time as the isolation programme</mark> and kept in the switch room.</p>
+<h2 id="s10-5"><span class="n">10.5</span>Energisation administration</h2>
+
+<figure class="sheet" id="F10-4"><a href="../data/cx-handbook/figures/F10-4.svg" title="Open drawing F10-4 at full size"><img src="../data/cx-handbook/figures/F10-4.svg" alt="F10-4: Energisation readiness gate: 16 criteria reviewed by the ERB for ring R1 (example status)" width="1400" height="668" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F10-4</span> — <b>Energisation readiness gate: 16 criteria reviewed by the ERB for ring R1 (example status)</b>. Each row is one criterion of 10.5.3; the right-hand column shows the status on 30 Oct 2026. A single open criterion without a risk acceptance blocks energisation.</figcaption></figure>
+<h3 id="s10-5-1"><span class="n">10.5.1</span>What energisation administration controls</h3>
+<p>Energisation is the first time a system is connected to a live source. After energisation, the system is live for every trade in the area. Before it, the system is a construction item. Energisation administration is the set of documents and meetings that decide when this change happens, and that tell every person on site where the live boundary now sits.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Document</th>
+<th>Purpose</th>
+<th>Owner</th>
+<th>Signed by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energisation request</td>
+<td>Asks the ERB to approve energisation of a defined scope</td>
+<td>Electrical contractor</td>
+<td>Contractor package manager</td>
+</tr>
+<tr>
+<td>Pre-energisation checklist</td>
+<td>Lists the gate criteria and their records</td>
+<td>CxM</td>
+<td>Contractor, CxM, owner representative</td>
+</tr>
+<tr>
+<td>Switching programme</td>
+<td>Lists the operations</td>
+<td>SAP</td>
+<td>Writer, checker, control person</td>
+</tr>
+<tr>
+<td>Energisation certificate</td>
+<td>Records that the scope was energised and is now live</td>
+<td>SAP</td>
+<td>SAP, CxM, owner representative, Ahli K3 Listrik</td>
+</tr>
+<tr>
+<td>Energised-zone declaration</td>
+<td>Declares the room or area as live, with access rules</td>
+<td>PTW coordinator</td>
+<td>Permit issuer and area authority</td>
+</tr>
+<tr>
+<td>Notice to all trades</td>
+<td>Informs all workers of the new live area</td>
+<td>PTW coordinator</td>
+<td>Issued 48 hours before</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-5-2"><span class="n">10.5.2</span>The energisation readiness board</h3>
+<p>The energisation readiness board (ERB) is a meeting that decides whether a defined scope can be energised. It meets weekly during the energisation phase, and also on request 3 working days before each energisation.</p>
+<p><strong>Purpose:</strong> To approve or refuse the energisation of a defined scope against written gate criteria.</p>
+<p><strong>Owner:</strong> The owner's electrical lead chairs; the CxM presents the gate status.</p>
+<p><strong>Inputs:</strong> Energisation request, pre-energisation checklist with records, open issues list for the scope, switching programme draft.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Present the scope.</strong> The contractor presents the scope with the single-line diagram, the equipment list and the planned date.</li>
+<li><strong>Review each gate criterion.</strong> The CxM reads each criterion and the record that proves it. A criterion without a signed record is "open".</li>
+<li><strong>Review open issues.</strong> Any <mark>open category A issue</mark> (section 09.8.2) on the scope blocks energisation. Category B issues are accepted only with a written risk acceptance.</li>
+<li><strong>Decide.</strong> The board approves, approves with conditions, or refuses. The decision and the conditions are minuted.</li>
+<li><strong>Issue the decision.</strong> The CxM issues the ERB decision record to the SAP, the PTW coordinator and the area authority within 1 working day.</li>
+</ol>
+<p><strong>Acceptance:</strong> All criteria in 10.5.3 are closed with a record, or have a written risk acceptance signed by the owner.</p>
+<p><strong>Records:</strong> ERB decision record, signed pre-energisation checklist.</p>
+<h3 id="s10-5-3"><span class="n">10.5.3</span>Gate criteria for energisation of 20 kV and LV equipment</h3>
+<p>Figure <a class="figref" href="#F10-4">F10-4</a> shows the 16 criteria as a gate status board for ring R1. The source column cites the NETA Acceptance Testing Specifications (ATS).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>No.</th>
+<th>Criterion</th>
+<th>Record</th>
+<th>Source of acceptance value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Equipment installed and inspected (L1 and L2 checklists signed)</td>
+<td>L2 checklist ELE-L2-MVS-01</td>
+<td>Project specification, ASHRAE Guideline 0-2019 process</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Insulation resistance, VLF withstand and partial discharge tests on cables signed</td>
+<td>Cable test reports</td>
+<td>IEEE 400.2, IEC 60270 (chapter 13)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Switchgear tests signed: contact resistance, timing, interlock, VDS</td>
+<td>Switchgear test sheet</td>
+<td>ANSI/NETA ATS, OEM (chapter 13)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Protection relay settings applied and secondary-injection tested</td>
+<td>Relay test report against the approved settings file</td>
+<td>Protection study</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Current transformer (CT) and voltage transformer (VT) ratio, polarity and burden tests signed</td>
+<td>CT/VT test sheets</td>
+<td>IEC 61869 series, NETA ATS</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Earthing system tested and bonded</td>
+<td>Earth resistance and continuity report</td>
+<td>Project specification, IEEE 81 (chapter 17)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Arc-flash labels fitted with the study values</td>
+<td>Label photo log</td>
+<td>Arc-flash study, NFPA 70E</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Room complete: doors, locks, lighting, fire detection active, no construction storage</td>
+<td>Room inspection record</td>
+<td>Project procedure</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Signage: danger signs, single-line diagram on the wall, emergency procedure</td>
+<td>Photo log</td>
+<td>Project procedure</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Operating tools and PPE in the room: racking tool, earth switch handle, voltage detector, insulating mat</td>
+<td>Tool inventory</td>
+<td>Project procedure</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Authorised persons appointed and trained on this switchgear</td>
+<td>Authorisation register</td>
+<td>Project procedure, Permenaker 12/2015</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Switching programme approved</td>
+<td>SP number and signatures</td>
+<td>10.4</td>
+</tr>
+<tr>
+<td>13</td>
+<td>All permits in the scope cancelled or transferred</td>
+<td>Permit register extract</td>
+<td>10.1</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Notice to all trades issued 48 hours before</td>
+<td>Notice and distribution list</td>
+<td>Project procedure</td>
+</tr>
+<tr>
+<td>15</td>
+<td>EPMS shows the devices of the scope (or a temporary meter is fitted)</td>
+<td>EPMS point check</td>
+<td>Chapter 24</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Indonesian statutory steps for the scope complete or scheduled (inspection by the Ahli K3 Listrik; inspection by the Lembaga Inspeksi Teknik (LIT) for the SLO where the scope is a new installation)</td>
+<td>Inspection record</td>
+<td>Permenaker 12/2015, Permen ESDM 10/2021</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>A scope with an open criterion is not energised</mark> unless the owner signs a risk acceptance that names the criterion, the reason and the compensating control.</p>
+<h3 id="s10-5-4"><span class="n">10.5.4</span>The energisation certificate</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Certificate number</td>
+<td>text</td>
+<td>EC-B1-HV-003</td>
+</tr>
+<tr>
+<td>Scope</td>
+<td>text and tag list</td>
+<td>Ring R1: B1-MVS-01 P03 and P07, RMU-01 to RMU-04 ring switches; tee-offs excluded</td>
+</tr>
+<tr>
+<td>Switching programme</td>
+<td>text</td>
+<td>SP-B1-HV-007 rev 1</td>
+</tr>
+<tr>
+<td>ERB decision</td>
+<td>text</td>
+<td>ERB-B1-021, approved 30 Oct 2026</td>
+</tr>
+<tr>
+<td>Date and time energised</td>
+<td>date-time</td>
+<td>2 Nov 2026 09:47</td>
+</tr>
+<tr>
+<td>Network state after energisation</td>
+<td>text</td>
+<td>Ring live, normal open point RMU-02 S2, tee-offs open and locked</td>
+</tr>
+<tr>
+<td>Live boundary</td>
+<td>text and drawing</td>
+<td>B1 MVR-1 and RMU rooms 1 and 2 declared live</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>four signatures</td>
+<td>SAP, CxM, owner representative, Ahli K3 Listrik</td>
+</tr>
+<tr>
+<td>Distribution</td>
+<td>list</td>
+<td>PTW office, control room, all package managers</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-5-5"><span class="n">10.5.5</span>The energised-zone declaration and the live boundary</h3>
+<p>After energisation, the room is an energised zone. The PTW coordinator changes the room status in the permit system and fits "Danger, live equipment" signs at every door. The coordinator changes the door access so that only authorised persons can enter. The live boundary drawing (a building plan with live rooms hatched red) is updated and posted at each building entrance and in the permit office.</p>
+<ol>
+<li><strong>Door control.</strong> Doors to live rooms are locked. Access cards are enabled for authorised persons only.</li>
+<li><strong>Permit change.</strong> Any work in a live room now needs a permit issued by the authorised person for the live system.</li>
+<li><strong>Tool and material control.</strong> No construction material is stored in a live room.</li>
+<li><strong>Escort.</strong> Non-authorised workers enter only under escort and only with a permit.</li>
+</ol>
+<p><strong>Worked example:</strong> Live boundary count for building B1 on 2 Nov 2026. Before the ring energisation, B1 had 2 live rooms (the incoming MV room and the generator control room). After certificate EC-B1-HV-003, it has 4 live rooms (MVR-1, RMU room 1, RMU room 2, and the MV cable trench access covered by a Limitation of Access). The PTW coordinator changes 4 room records, fits 9 door signs, disables 312 construction access cards on those doors and issues 1 notice to 26 subcontractors. The next week, the block transformers T1 to T4 are energised under EC-B1-HV-004, and the live room count rises to 8.</p>
+<h2 id="s10-6"><span class="n">10.6</span>Simultaneous operations in a partly live building</h2>
+
+<figure class="sheet" id="F10-6"><a href="../data/cx-handbook/figures/F10-6.svg" title="Open drawing F10-6 at full size"><img src="../data/cx-handbook/figures/F10-6.svg" alt="F10-6: SIMOPS day plan for building B2 on 4 Nov 2026: permits rescheduled around the DH2 load bank test" width="1400" height="592" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F10-6</span> — <b>SIMOPS day plan for building B2 on 4 Nov 2026: permits rescheduled around the DH2 load bank test</b>. Bars show the time window of each activity in hours of the day; the three moved permits now sit outside the test window or after the riser fire-wrap.</figcaption></figure>
+<h3 id="s10-6-1"><span class="n">10.6.1</span>What SIMOPS means on a data-centre campus</h3>
+<p>Simultaneous operations (SIMOPS) means construction work, commissioning and live operation in the same building at the same time. On a hyperscale campus, hall 1 may be in IST while hall 2 is in L3 commissioning and hall 3 is still under fit-out. The power and cooling systems are shared: the same 20 kV switchboard feeds a live hall and a hall under construction. The SIMOPS plan controls the risk that construction work affects the live hall, and that a commissioning test affects either of them.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Zone status</th>
+<th>Meaning</th>
+<th>Who may work</th>
+<th>Permit issuer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Construction</td>
+<td>No permanent energy present</td>
+<td>Any trained worker</td>
+<td>GC PTW office</td>
+</tr>
+<tr>
+<td>Commissioning</td>
+<td>Systems energised for testing, temporary</td>
+<td>Authorised workers and Cx team</td>
+<td>GC with the CxM test permit</td>
+</tr>
+<tr>
+<td>Live (operational)</td>
+<td>Systems energised and serving IT load</td>
+<td>Operations staff and escorted contractors</td>
+<td>Owner's operations team</td>
+</tr>
+<tr>
+<td>Restricted live</td>
+<td>Live and holding customer IT equipment</td>
+<td>Operations staff only, escorted contractors with approval</td>
+<td>Owner's operations team with change approval</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-6-2"><span class="n">10.6.2</span>SIMOPS controls</h3>
+<p>Figure <a class="figref" href="#F10-6">F10-6</a> shows a SIMOPS day plan with the permits moved around a load bank test.</p>
+<ol>
+<li><strong>Zone map.</strong> A drawing per building shows each room's zone status. The PTW office updates it after each energisation certificate and posts it daily.</li>
+<li><strong>Physical separation.</strong> Construction routes and live zones are separated by locked doors or hoarding. Shared risers carry signs on each level.</li>
+<li><strong>Permit conflict check.</strong> Each permit in a construction zone is checked against the live zones on the floor above and below and in shared risers. Hot work below a live cable tray, core drilling near a live busway, and water work above a live switch room are refused or need extra controls.</li>
+<li><strong>Change control for live systems.</strong> Any switching in a system that feeds a live zone goes through the owner's change process, with a method of procedure (MOP) and a back-out plan.</li>
+<li><strong>Test isolation boundaries.</strong> A commissioning test in hall 2, for example a load bank test at 12 MW, is limited by isolations. A fault in the test then cannot trip the supply to hall 1. The isolation boundary is written in the test script.</li>
+<li><strong>Alarm management.</strong> The BMS and EPMS alarms of systems under test are routed to the Cx team, and alarms of live systems to the operations team. Shared alarms are agreed in the alarm plan.</li>
+<li><strong>Daily SIMOPS meeting.</strong> The PTW coordinator, the operations shift lead, the CxM and the package managers meet at 07:00 to review the day's permits and tests (chapter 11).</li>
+</ol>
+<h3 id="s10-6-3"><span class="n">10.6.3</span>SIMOPS RACI</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Activity</th>
+<th>GC</th>
+<th>CxM</th>
+<th>Owner operations</th>
+<th>Ahli K3 Listrik</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Maintain the zone map</td>
+<td>R</td>
+<td>C</td>
+<td>A</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Permit conflict check</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Switching in a system feeding a live zone</td>
+<td>C</td>
+<td>C</td>
+<td>A and R</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Commissioning test boundary</td>
+<td>C</td>
+<td>R</td>
+<td>A</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Live-zone access control</td>
+<td>I</td>
+<td>I</td>
+<td>A and R</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Electrical safety inspection</td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+<td>A and R</td>
+</tr>
+</tbody>
+</table></div>
+<p>R = responsible, A = accountable, C = consulted, I = informed.</p>
+<p><strong>Worked example:</strong> SIMOPS conflict check for building B2 on 4 Nov 2026. Hall DH1 is live (restricted live), hall DH2 is in L4 commissioning with a 12 MW load bank test planned from 10:00 to 16:00, and hall DH3 is in fit-out. The permit office has 47 permit requests for the day. The coordinator checks each against three rules. The rules are: no hot work within 11 m of a live cable route, no water or wet trades above a live electrical room, and no work in the DH2 test boundary during the test. The check finds 3 conflicts. Hot work permit PTW-B2-H-0611 in the level 2 riser is 6 m below the live DH1 busway, so it is moved to 17:00 after the riser is fire-wrapped. Wet-trade permit PTW-B2-G-0614 is above the DH2 UPS room during the load bank test, so it is moved to the next day. General permit PTW-B2-G-0620 for cable tray work in DH2 is inside the test boundary and is refused for the test window. The result is 44 permits issued and 3 rescheduled, and the decision is minuted in the daily SIMOPS meeting.</p>
+<h2 id="s10-7"><span class="n">10.7</span>Indonesian legal requirements</h2>
+<h3 id="s10-7-1"><span class="n">10.7.1</span>UU No. 1 Tahun 1970 on work safety</h3>
+<p>Undang-Undang No. 1 Tahun 1970 tentang Keselamatan Kerja is the base law for occupational safety in Indonesia. Pasal 2(2) applies it to workplaces where electricity is generated, transformed, collected, stored, distributed or used. Pasal 9(1) requires the pengurus (the person who leads the workplace) to explain the hazards, the safeguards and the personal protective equipment to every new worker. Pasal 11(1) requires the pengurus to report every accident in the workplace. Pasal 12(e) gives workers the right to object to work where the required safety conditions and protective equipment are in doubt. The ministerial regulations below are made under this law.</p>
+<h3 id="s10-7-2"><span class="n">10.7.2</span>Permenaker No. 12 Tahun 2015 on K3 Listrik</h3>
+<p>Permenaker No. 12 Tahun 2015 tentang Keselamatan dan Kesehatan Kerja Listrik di Tempat Kerja applies the work safety law to electricity. It was amended by Permenaker No. 33 Tahun 2015, which changed Article 10 on inspection and testing.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Article</th>
+<th>Requirement (summary)</th>
+<th>Effect on a data-centre campus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pasal 2</td>
+<td>The employer and the pengurus must carry out K3 Listrik at the workplace</td>
+<td>The owner and the GC each have a K3 Listrik programme</td>
+</tr>
+<tr>
+<td>Pasal 4</td>
+<td>K3 Listrik covers planning, installation, use, change and maintenance, and inspection and testing; it applies above 50 V AC or 120 V DC</td>
+<td>Covers 20 kV, 415 V, UPS DC systems and the 800 V DC rack systems of the MSC-1 example</td>
+</tr>
+<tr>
+<td>Pasal 5</td>
+<td>The work must follow electrical standards: SNI, international standards or other standards accepted by the K3 Listrik inspector</td>
+<td>PUIL 2020 and IEC standards are the base for design and test</td>
+</tr>
+<tr>
+<td>Pasal 7</td>
+<td>A company with generation above 200 kVA must have an Ahli K3 bidang Listrik</td>
+<td>Each MSC-1 building has 17 generators of 3.6 MVA, so <mark>an Ahli K3 Listrik is mandatory</mark></td>
+</tr>
+<tr>
+<td>Pasal 9</td>
+<td>Inspection is the assessment and measurement of installations for compliance; testing adds calculation and test</td>
+<td>Defines the L2 and L3 electrical tests as statutory inspection and testing</td>
+</tr>
+<tr>
+<td>Pasal 10 (as amended by Permenaker 33/2015)</td>
+<td>Inspection and testing by the Pengawas Ketenagakerjaan Spesialis K3 Listrik, the company's Ahli K3 Listrik or the Ahli K3 Listrik of a PJK3 (licensed K3 service company); before handover to the owner or user, after change or repair, and periodically; the labour inspector uses the results for guidance or legal action</td>
+<td>The Ahli K3 Listrik inspects before handover of each building</td>
+</tr>
+<tr>
+<td>Pasal 11</td>
+<td>Periodic inspection <mark>at least once a year</mark>; periodic testing <mark>at least once every five years</mark></td>
+<td>The operations team plans the annual inspection from the handover date (chapter 12)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Text source: the regulation text on pasal.id. Pasal 10 is quoted from the amended text in Permenaker 33/2015, which also deletes paragraphs (4) and (5) of the original Pasal 10.</p>
+<h3 id="s10-7-3"><span class="n">10.7.3</span>Duties of the Ahli K3 Listrik</h3>
+<p>The Ahli K3 Listrik is a technical expert appointed by the Minister of Manpower, with a competence in electrical safety. On a data-centre campus the Ahli K3 Listrik is employed by the owner, the GC or a PJK3. The practical duties on a campus follow from Permenaker 12/2015 Pasal 7 and Pasal 10 and from the scope written in the appointment decree of the person.</p>
+<ol>
+<li><strong>Supervise compliance.</strong> Check that electrical planning, installation, use, change and maintenance follow the standards and the regulation.</li>
+<li><strong>Inspect and test.</strong> Inspect and test, or witness the inspection and testing, before handover, after a change or repair, and periodically, and sign the report.</li>
+<li><strong>Review the safe system of work.</strong> Review the PTW procedure, the isolation procedures and the switching programmes for electrical work.</li>
+<li><strong>Sign energisation records.</strong> Sign the energisation certificate for new installations on the campus (project practice).</li>
+<li><strong>Report.</strong> Report the inspection and testing results to the employer. Under Pasal 10(3) as amended, the labour inspector (Pengawas Ketenagakerjaan) uses these results for guidance or legal action.</li>
+<li><strong>Investigate electrical accidents.</strong> Take part in the investigation of electrical incidents and near misses.</li>
+</ol>
+<h3 id="s10-7-4"><span class="n">10.7.4</span>SLO and NIDI under the ESDM regulations</h3>
+<p>The Ministry of Energy and Mineral Resources (ESDM) regulates electricity safety (keselamatan ketenagalistrikan, K2). Two documents matter for energisation.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Document</th>
+<th>What it is</th>
+<th>Requirement</th>
+<th>Status of the research</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NIDI (Nomor Identitas Instalasi Tenaga Listrik)</td>
+<td>Identity number for an electrical installation, issued through the SIUJANG GATRIK online system</td>
+<td>Prerequisite for the SLO application; applied to HV and MV utilisation installations since 18 August 2021 and LV from 17 January 2022</td>
+<td>ESDM news releases</td>
+</tr>
+<tr>
+<td>SLO (Sertifikat Laik Operasi)</td>
+<td>Certificate that the installation is fit to operate, issued after inspection and testing by an accredited inspection body</td>
+<td>Permen ESDM 10/2021 Pasal 18(1): the installation is <mark>operated after it holds an SLO</mark>; Permen ESDM 12/2021 Pasal 31(1): SLO mandatory for HV and MV utilisation installations</td>
+<td>Pasal 31(1) read in the official text on the ESDM legal database (JDIH); Pasal 18(1) from the pasal.id text</td>
+</tr>
+<tr>
+<td>SLO validity</td>
+<td>Period after which the SLO must be extended</td>
+<td>10 years for HV and MV utilisation installations, 15 years for LV, 5 years for generation; each can be extended</td>
+<td>Permen ESDM 12/2021 Pasal 39, read in the official JDIH text</td>
+</tr>
+<tr>
+<td>SLO lapse</td>
+<td>Conditions that end the SLO before expiry</td>
+<td>Change of capacity, change of installation, reconditioning or relocation</td>
+<td>ESDM FAQ summary</td>
+</tr>
+</tbody>
+</table></div>
+<p>The MSC-1 buildings take supply at 20 kV from the campus 150/20 kV substation. Each building is a medium-voltage utilisation installation and <mark>needs a NIDI and an SLO</mark>.</p>
+<ol>
+<li><strong>Apply for the NIDI.</strong> The owner, or the installer on its behalf, registers the installation in SIUJANG GATRIK once the design and capacity are fixed.</li>
+<li><strong>Book the inspection.</strong> The owner books an accredited inspection body (Lembaga Inspeksi Teknik) for the SLO inspection after the L2 tests are complete.</li>
+<li><strong>Inspection and test.</strong> The inspection body inspects the installation and witnesses the tests. The records from chapters 13, 14 and 17 are the evidence.</li>
+<li><strong>SLO issue.</strong> The SLO is issued. The ERB checks the SLO before the installation goes into operation with IT load.</li>
+<li><strong>Change after SLO.</strong> An added transformer or a new hall changes the capacity. The owner checks whether a new SLO is needed before the change is energised.</li>
+</ol>
+<p><strong>Check:</strong> Construction-phase energisation for commissioning happens before the SLO on many projects, under the contractor's K3 Listrik controls and with the agreement of the utility and the inspection body. The legal position for each energisation is confirmed by the owner's legal and permitting team; this manual does not give a legal opinion.</p>
+<h3 id="s10-7-5"><span class="n">10.7.5</span>PUIL 2020 and IEC 60364-6 initial verification</h3>
+<p>PUIL 2020 (Persyaratan Umum Instalasi Listrik, SNI 0225:2020) is the Indonesian general requirement for electrical installations. It is based on the IEC 60364 series. Part 6 of IEC 60364 gives the initial verification of a low-voltage installation: inspection first, then testing. The usual test order is listed below. IEC 60364-6:2016 clause 6.4.3 holds the tests, and clause 6.4.3.3 holds the insulation resistance test with Table 6.1 (clause 6.4.3.3 and Table 6.1 carry the same numbers in SNI 0225-6:2020, PUIL 2020 part 6; the IEC 60364-6:2016 contents confirm 6.4.3, testing, and Table 6.1; confirm the other sub-clause numbers against IEC 60364-6:2016 clause 6.4.3). Figure <a class="figref" href="#F10-9">F10-9</a> shows the test order and the filled insulation resistance record of the worked example below.</p>
+<figure class="sheet" id="F10-9"><a href="../data/cx-handbook/figures/F10-9.svg" title="Open drawing F10-9 at full size"><img src="../data/cx-handbook/figures/F10-9.svg" alt="F10-9: Initial verification of a 415 V circuit: test order and insulation resistance record" width="1000" height="838" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F10-9</span> — <b>Initial verification of a 415 V circuit: test order and insulation resistance record</b>. The circuit passes because the lowest of the five readings is above 1 MΩ; a reading between 1 MΩ and 100 MΩ on new cable passes but is raised as an observation.</figcaption></figure>
+
+<ol>
+<li><strong>Continuity of protective conductors.</strong> Measure the resistance of each protective conductor and bonding conductor with a low-resistance ohmmeter at a test current of at least 0.2 A.</li>
+<li><strong>Insulation resistance.</strong> Measure between live conductors and between live conductors and earth with the test voltage and minimum value in the table.</li>
+<li><strong>Protection by SELV, PELV or electrical separation.</strong> The two terms are safety extra-low voltage (SELV) and protective extra-low voltage (PELV). Check the separation of the circuits.</li>
+<li><strong>Automatic disconnection of supply.</strong> Measure the earth fault loop impedance and compare it with the maximum for the protective device; measure the earth electrode resistance in TT systems.</li>
+<li><strong>Additional protection.</strong> Test residual current devices (RCD) for trip time at the rated residual current.</li>
+<li><strong>Polarity and phase sequence.</strong> Check that switches are in the line conductor and that the phase rotation is L1-L2-L3.</li>
+<li><strong>Functional tests.</strong> Operate switchgear, interlocks and controls.</li>
+<li><strong>Voltage drop.</strong> Check where the design asks for it.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Nominal circuit voltage</th>
+<th>Test voltage (DC)</th>
+<th>Minimum insulation resistance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SELV and PELV</td>
+<td>250 V</td>
+<td>0.5 MΩ</td>
+</tr>
+<tr>
+<td>Up to and including 500 V (including 230/400 V and 240/415 V)</td>
+<td>500 V</td>
+<td>1 MΩ</td>
+</tr>
+<tr>
+<td>Above 500 V</td>
+<td>1,000 V</td>
+<td>1 MΩ</td>
+</tr>
+</tbody>
+</table></div>
+<p>Source: values given in vendor guides derived from IEC 60364-6:2016 Table 6.1 (confirm the values against IEC 60364-6:2016 Table 6.1, minimum values of insulation resistance, and PUIL 2020 part 6). IEC 60364-6 6.4.3.3 requires surge protective devices (SPD) and other equipment that could affect the test or be damaged to be disconnected first. Disconnection may not be reasonably practicable, for example at a fixed socket-outlet with an integrated SPD. IEC 60364-6 6.4.3.3 then allows the test voltage for that circuit to be reduced to 250 V DC, and the reading must still be at least 1 MΩ (clause text quoted in English and in the SNI 0225-6:2020 translation on the Schneider Electric standards forum). UK practice described by NICEIC is the same.</p>
+<p><strong>Worked example:</strong> Insulation resistance test of the remote power panel (RPP) feed B2-DH3-RPP-A1-07, a 415 V four-wire circuit of 95 mm² copper, 64 m long. The electrician disconnects the surge protective device and the RPP meter supply and links L1, L2, L3 and N at the far end for the live-to-earth test. The electrician sets the insulation tester (calibrated, certificate valid to March 2027) to 500 V DC for 60 seconds. Results: live conductors to PE 2,400 MΩ, L1-L2 1,850 MΩ, L2-L3 1,920 MΩ, L3-L1 1,770 MΩ, L1-N 2,050 MΩ. The lowest value is 1,770 MΩ, which is far above <mark>the 1 MΩ minimum for a circuit up to 500 V</mark>. The result passes. A new cable of this length normally reads above 100 MΩ. A value between 1 MΩ and 100 MΩ passes the standard but is raised as an observation for investigation (moisture or damage). The project specification may set a higher minimum. The record is the L2 test sheet ELE-L2-RPP-07 with the instrument serial number, the test voltage and the five values.</p>
+<h2 id="s10-8"><span class="n">10.8</span>Common errors, interfaces and KPIs</h2>
+<h3 id="s10-8-1"><span class="n">10.8.1</span>Common errors across permits, isolation and energisation</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Consequence</th>
+<th>Detection before the witness test or the energisation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Permit issued without a walk-down</td>
+<td>Precautions not in place</td>
+<td>Permit form requires walk-down time and both signatures</td>
+</tr>
+<tr>
+<td>Isolation certificate shared by two contractors with no group box</td>
+<td>One contractor removes the isolation while the other works</td>
+<td>Group lock box mandatory for more than one party</td>
+</tr>
+<tr>
+<td>Switching programme based on design drawings</td>
+<td>Wrong panel operated</td>
+<td>Checker walk-down with as-built mark-up 5 days before</td>
+</tr>
+<tr>
+<td>Energisation notice not issued</td>
+<td>Worker opens a live panel cover believing it is dead</td>
+<td>ERB criterion 14</td>
+</tr>
+<tr>
+<td>Temporary supplies not recorded</td>
+<td>Back-feed into a panel declared dead</td>
+<td>Temporary supply register reviewed at each isolation</td>
+</tr>
+<tr>
+<td>UPS "off" used as isolation</td>
+<td>DC link and bypass still live</td>
+<td>Isolation procedure lists breakers only</td>
+</tr>
+<tr>
+<td>Lock removed by another worker</td>
+<td>Unplanned re-energisation</td>
+<td>Lock removal form and audit</td>
+</tr>
+<tr>
+<td>SLO assumed to cover a later extension</td>
+<td>Operation without a valid SLO</td>
+<td>Permitting tracker at each ERB</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-8-2"><span class="n">10.8.2</span>Interfaces</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>This step</th>
+<th>Depends on</th>
+<th>Chapter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energisation gate</td>
+<td>Cable, switchgear and relay test records</td>
+<td>13, 14</td>
+</tr>
+<tr>
+<td>UPS isolation</td>
+<td>UPS OEM procedure, key interlock scheme</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Earthing before work</td>
+<td>Earthing system tested</td>
+<td>17</td>
+</tr>
+<tr>
+<td>EPMS status check after switching</td>
+<td>EPMS points commissioned</td>
+<td>24</td>
+</tr>
+<tr>
+<td>Alarm suppression during switching</td>
+<td>BMS and EPMS alarm plan</td>
+<td>22, 24</td>
+</tr>
+<tr>
+<td>SIMOPS meeting</td>
+<td>Daily huddle and look-ahead</td>
+<td>11</td>
+</tr>
+<tr>
+<td>Handover of permits to operations</td>
+<td>Operations readiness</td>
+<td>12</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s10-8-3"><span class="n">10.8.3</span>KPIs for the energisation phase</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Switching programme deviations</td>
+<td>Steps where the actual indication differed from the expected, per programme</td>
+<td>0; each deviation investigated</td>
+</tr>
+<tr>
+<td>ERB first-pass approval rate</td>
+<td>Scopes approved at the first ERB ÷ scopes presented</td>
+<td>≥ 80 %</td>
+</tr>
+<tr>
+<td>Energisation on planned date</td>
+<td>Energisations done on the planned date ÷ planned energisations</td>
+<td>≥ 90 %</td>
+</tr>
+<tr>
+<td>Electrical incidents</td>
+<td>Electric shocks, arc flashes and unplanned energisations</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Isolation audit compliance</td>
+<td>Audited isolations with no finding ÷ audited isolations</td>
+<td>100 %</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> ERB first-pass rate for building B1 over 6 weeks. The contractor presented 15 energisation scopes. Eleven were approved at the first ERB. Four were refused: two because relay test reports were not signed, one because the arc-flash labels were missing, and one because the notice to trades was late. First-pass rate = 11 ÷ 15 = 73 %, below the 80 % target. The CxM adds a pre-ERB check 5 working days before each board, where the contractor sends the pre-energisation checklist with records. In the next 6 weeks, 14 of 16 scopes pass first time, a rate of 87.5 %.</p>
+<h2 id="s10-9"><span class="n">10.9</span>Checklist for site use</h2>
+<ol>
+<li><strong>Permit procedure.</strong> The project PTW procedure names the roles, the permit types, the validity and the lead times, and the Ahli K3 Listrik has reviewed it.</li>
+<li><strong>Permit register.</strong> The register shows status, validity and the linked isolation certificate for every permit, and the overdue count is reviewed <mark>daily at 17:00</mark>.</li>
+<li><strong>Energy source list.</strong> Each isolation certificate lists all sources from the as-built single-line diagram, including generator, parallel UPS, battery and temporary supplies.</li>
+<li><strong>Lock control.</strong> Safety locks, personal locks, the group lock box and the key safe are in use, and the lock register matches the locks in the field.</li>
+<li><strong>Live-dead-live.</strong> The isolation certificate has two proving times and the full grid of test combinations.</li>
+<li><strong>Instruments.</strong> Voltage detectors meet IEC 61243-3 or IEC 61243-1 and are rated CAT IV 600 V or the right MV range; the proving unit is available.</li>
+<li><strong>MV earthing.</strong> The earth switch is closed and locked after the VDS check; portable earths are rated for the fault level.</li>
+<li><strong>Switching programme.</strong> The programme is written from the as-built drawing, checked by a second SAP with a walk-down, approved by the control person and issued 3 working days before.</li>
+<li><strong>Read-back.</strong> Every step is read, repeated, done and confirmed, and any deviation stops the programme.</li>
+<li><strong>ERB.</strong> All 16 gate criteria have a signed record or a written risk acceptance.</li>
+<li><strong>Energisation certificate.</strong> The certificate records the scope, the network state and the live boundary, with four signatures.</li>
+<li><strong>Live boundary.</strong> Signs, door access and the zone map are updated the same day.</li>
+<li><strong>SIMOPS.</strong> The daily SIMOPS meeting reviews all permits against live zones and test boundaries.</li>
+<li><strong>Indonesian requirements.</strong> The Ahli K3 Listrik is appointed, the NIDI is registered, and the SLO inspection is booked before operation with IT load.</li>
+<li><strong>Initial verification.</strong> LV circuits have continuity, insulation resistance, loop impedance, RCD, polarity and phase sequence records before energisation.</li>
+</ol>
+<h2 id="s10-10"><span class="n">10.10</span>Sources</h2>
+<ol>
+<li>US Occupational Safety and Health Administration, 29 CFR 1910.147 The control of hazardous energy (lockout/tagout), accessed 31 October 2026. <a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147" rel="noopener">https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147</a></li>
+<li>US Occupational Safety and Health Administration, 29 CFR 1910.333 Selection and use of work practices, accessed 31 October 2026. <a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.333" rel="noopener">https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.333</a></li>
+<li>National Fire Protection Association, NFPA 70E Standard for Electrical Safety in the Workplace, 2024 edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-70e-standard-development/70e" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-70e-standard-development/70e</a></li>
+<li>MSC Industrial Supply, "Keeping up with changing electrical safety standards: 2024 NFPA 70E", accessed 31 October 2026. <a href="https://www.mscdirect.com/knowledge-center/articles/keeping-changing-electrical-safety-standards-2024-nfpa-70e" rel="noopener">https://www.mscdirect.com/knowledge-center/articles/keeping-changing-electrical-safety-standards-2024-nfpa-70e</a></li>
+<li>Utah Division of Professional Licensing, NFPA 70E-2024 course objectives listing Article 120 and 120.6, accessed 31 October 2026. <a href="https://secure.utah.gov/ce-public/files/objectives/13679.pdf" rel="noopener">https://secure.utah.gov/ce-public/files/objectives/13679.pdf</a></li>
+<li>UK Health and Safety Executive, HSG85 Electricity at work: Safe working practices, third edition, 2013. <a href="https://www.hse.gov.uk/pubns/books/hsg85.htm" rel="noopener">https://www.hse.gov.uk/pubns/books/hsg85.htm</a></li>
+<li>UK Health and Safety Executive, GS38 Electrical test equipment for use on low voltage electrical systems, current edition. <a href="https://www.hse.gov.uk/pubns/gs38.htm" rel="noopener">https://www.hse.gov.uk/pubns/gs38.htm</a></li>
+<li>NICEIC, "Safe isolation procedure in 10 easy steps", accessed 31 October 2026. <a href="https://niceic.com/views/safe-isolation-procedure-in-10-easy-steps/" rel="noopener">https://niceic.com/views/safe-isolation-procedure-in-10-easy-steps/</a></li>
+<li>IEC 60364-6:2016, Low-voltage electrical installations, Part 6: Verification, IEC. <a href="https://webstore.iec.ch/en/publication/25494" rel="noopener">https://webstore.iec.ch/en/publication/25494</a></li>
+<li>RS Components, "Insulation resistance testing" (table derived from IEC 60364-6), accessed 31 October 2026. <a href="https://uk.rs-online.com/web/content/discovery/ideas-and-advice/insulation-resistance-testing" rel="noopener">https://uk.rs-online.com/web/content/discovery/ideas-and-advice/insulation-resistance-testing</a></li>
+<li>IEC 61243-3, Live working, Voltage detectors, Part 3: Two-pole low-voltage type, IEC. <a href="https://webstore.iec.ch/en/publication/62345" rel="noopener">https://webstore.iec.ch/en/publication/62345</a></li>
+<li>IEC 62271-200, High-voltage switchgear and controlgear, Part 200: AC metal-enclosed switchgear and controlgear for rated voltages above 1 kV and up to and including 52 kV, IEC. <a href="https://webstore.iec.ch/en/publication/62782" rel="noopener">https://webstore.iec.ch/en/publication/62782</a></li>
+<li>Republik Indonesia, Undang-Undang No. 1 Tahun 1970 tentang Keselamatan Kerja. <a href="https://peraturan.bpk.go.id/Details/47057/uu-no-1-tahun-1970" rel="noopener">https://peraturan.bpk.go.id/Details/47057/uu-no-1-tahun-1970</a></li>
+<li>Kementerian Ketenagakerjaan, Permenaker No. 12 Tahun 2015 tentang Keselamatan dan Kesehatan Kerja Listrik di Tempat Kerja, text summary on pasal.id, accessed 31 October 2026. <a href="https://pasal.id/peraturan/permen/permenaker-no-12-tahun-2015" rel="noopener">https://pasal.id/peraturan/permen/permenaker-no-12-tahun-2015</a></li>
+<li>Kementerian Ketenagakerjaan, Permenaker No. 33 Tahun 2015 (amendment of Permenaker 12/2015). <a href="https://peraturan.bpk.go.id/Details/146032/permenaker-no-33-tahun-2015" rel="noopener">https://peraturan.bpk.go.id/Details/146032/permenaker-no-33-tahun-2015</a></li>
+<li>Kementerian ESDM, Permen ESDM No. 10 Tahun 2021 tentang Keselamatan Ketenagalistrikan, text on pasal.id, accessed 31 October 2026. <a href="https://pasal.id/en/peraturan/permen/permen-esdm-no-10-tahun-2021" rel="noopener">https://pasal.id/en/peraturan/permen/permen-esdm-no-10-tahun-2021</a></li>
+<li>Kementerian ESDM, Permen ESDM No. 12 Tahun 2021. <a href="https://jdih.esdm.go.id/storage/document/Permen%20ESDM%20No.%2012%20Tahun%202021.pdf" rel="noopener">https://jdih.esdm.go.id/storage/document/Permen%20ESDM%20No.%2012%20Tahun%202021.pdf</a></li>
+<li>Kementerian ESDM, "Begini cara ajukan NIDI demi pastikan keselamatan ketenagalistrikan", accessed 31 October 2026. <a href="https://www.esdm.go.id/id/media-center/arsip-berita/begini-cara-ajukan-nidi-demi-pastikan-keselamatan-ketenagalistrikan" rel="noopener">https://www.esdm.go.id/id/media-center/arsip-berita/begini-cara-ajukan-nidi-demi-pastikan-keselamatan-ketenagalistrikan</a></li>
+<li>Direktorat Jenderal Ketenagalistrikan, FAQ SLO (7 August 2024). <a href="https://gatrik.esdm.go.id/assets/uploads/download_index/files/81afd-faq-slo-07082024.pdf" rel="noopener">https://gatrik.esdm.go.id/assets/uploads/download_index/files/81afd-faq-slo-07082024.pdf</a></li>
+<li>Badan Standardisasi Nasional, SNI 0225:2020 Persyaratan Umum Instalasi Listrik 2020 (PUIL 2020). <a href="https://bsn.go.id" rel="noopener">https://bsn.go.id</a></li>
+<li>ASHRAE Guideline 0-2019, The Commissioning Process, ASHRAE. <a href="https://www.ashrae.org/technical-resources/ashrae-standards-and-guidelines" rel="noopener">https://www.ashrae.org/technical-resources/ashrae-standards-and-guidelines</a></li>
+<li>MSC-1 case ledger, <code>../case_ledger.json</code>, Data Centre Commissioning Field Manual R01 working files, October 2026.</li>
+<li>US Occupational Safety and Health Administration, 29 CFR 1910.146 Permit-required confined spaces, accessed 1 November 2026. <a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.146" rel="noopener">https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.146</a></li>
+<li>National Fire Protection Association, NFPA 51B Standard for Fire Prevention During Welding, Cutting, and Other Hot Work, 2024 edition (current), and the 2019 edition summary of changes, accessed 1 November 2026. <a href="https://www.fire-police-ems.com/NFPA51B-2019.shtml" rel="noopener">https://www.fire-police-ems.com/NFPA51B-2019.shtml</a></li>
+<li>University of Michigan Environment, Health and Safety, Hot Work Permit (NFPA 51B based), 2025, accessed 1 November 2026. <a href="https://ehs.umich.edu/wp-content/uploads/2025-U-M-Internal-Hot-Work-Permit.docx.pdf" rel="noopener">https://ehs.umich.edu/wp-content/uploads/2025-U-M-Internal-Hot-Work-Permit.docx.pdf</a></li>
+<li>Kementerian Ketenagakerjaan, Permenaker No. 9 Tahun 2016 tentang K3 dalam Pekerjaan pada Ketinggian, text on pasal.id, accessed 1 November 2026. <a href="https://pasal.id/peraturan/permen/permenaker-no-9-tahun-2016" rel="noopener">https://pasal.id/peraturan/permen/permenaker-no-9-tahun-2016</a></li>
+<li>Kementerian Ketenagakerjaan, Permenaker No. 33 Tahun 2015, text on pasal.id, accessed 1 November 2026. <a href="https://pasal.id/peraturan/permen/permenaker-no-33-tahun-2015" rel="noopener">https://pasal.id/peraturan/permen/permenaker-no-33-tahun-2015</a></li>
+<li>Electrical Contracting News (Kewtech), "Is your equipment HSE GS38 compliant", accessed 1 November 2026. <a href="https://electricalcontractingnews.com/news/is-your-equipment-hse-gs38-compliant/" rel="noopener">https://electricalcontractingnews.com/news/is-your-equipment-hse-gs38-compliant/</a></li>
+<li>Republik Indonesia, UU No. 1 Tahun 1970, text on pasal.id, accessed 1 November 2026. <a href="https://pasal.id/peraturan/uu/uu-no-1-tahun-1970" rel="noopener">https://pasal.id/peraturan/uu/uu-no-1-tahun-1970</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="09-quality-ncr-car-punch-defects.html"><span>Previous · 09</span><span class="t">Quality control</span></a><a class="next" href="11-meetings-reports-schedules.html"><span>Next · 11</span><span class="t">Meetings, minutes, daily and weekly reports, schedules and look-aheads</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

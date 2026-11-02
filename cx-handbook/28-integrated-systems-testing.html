@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>28 Integrated systems testing (L5) | Cx Field Manual R01</title>
+<meta name="description" content="This chapter covers integrated systems testing (IST), the fifth and last level (L5) of data-centre commissioning.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/28-integrated-systems-testing.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/28-integrated-systems-testing.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/28-integrated-systems-testing.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/28-integrated-systems-testing.html">
+<meta property="og:title" content="28 Integrated systems testing (L5) | Cx Field Manual R01">
+<meta property="og:description" content="This chapter covers integrated systems testing (IST), the fifth and last level (L5) of data-centre commissioning.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="28 Integrated systems testing (L5) | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter covers integrated systems testing (IST), the fifth and last level (L5) of data-centre commissioning.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"28 Integrated systems testing (L5): scenarios, scripts, instrumentation and results","name":"Integrated systems testing (L5): scenarios, scripts, instrumentation and results","description":"This chapter covers integrated systems testing (IST), the fifth and last level (L5) of data-centre commissioning.","url":"https://resistancezero.com/cx-handbook/28-integrated-systems-testing.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/28-integrated-systems-testing.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":11862,"position":28,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"28 Integrated systems testing (L5)","item":"https://resistancezero.com/cx-handbook/28-integrated-systems-testing.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part F · Integrated testing, issues and data</p>
+    <h1><span class="num">28</span>Integrated systems testing (L5): scenarios, scripts, instrumentation and results</h1>
+    <p class="lede">This chapter covers integrated systems testing (IST), the fifth and last level (L5) of data-centre commissioning.</p>
+    <p class="basis">Chapter 28 of 32 · 19 sections · 7 figures · 11,862 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 28</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 28</summary>
+<ol><li><a href="#s28-0"><span class="n">28.0</span>Scope of this chapter</a></li><li><a href="#s28-1"><span class="n">28.1</span>What IST is and why it exists</a><ol><li><a href="#s28-1-1"><span class="n">28.1.1</span>Definition</a></li><li><a href="#s28-1-2"><span class="n">28.1.2</span>How IST differs from L4</a></li><li><a href="#s28-1-3"><span class="n">28.1.3</span>Electrical IST and heat-load test</a></li><li><a href="#s28-1-4"><span class="n">28.1.4</span>Why a hall does not go live without IST</a></li></ol></li><li><a href="#s28-2"><span class="n">28.2</span>Prerequisites and the IST entry gate</a><ol><li><a href="#s28-2-1"><span class="n">28.2.1</span>Prerequisite list</a></li><li><a href="#s28-2-2"><span class="n">28.2.2</span>Entry gate review procedure</a></li><li><a href="#s28-2-3"><span class="n">28.2.3</span>Gate certificate fields</a></li></ol></li><li><a href="#s28-3"><span class="n">28.3</span>IST script structure</a><ol><li><a href="#s28-3-1"><span class="n">28.3.1</span>What a script is</a></li><li><a href="#s28-3-2"><span class="n">28.3.2</span>Script header fields</a></li><li><a href="#s28-3-3"><span class="n">28.3.3</span>Step format</a></li><li><a href="#s28-3-4"><span class="n">28.3.4</span>Hold points</a></li><li><a href="#s28-3-5"><span class="n">28.3.5</span>Approval of scripts</a></li></ol></li><li><a href="#s28-4"><span class="n">28.4</span>Roles on test day</a><ol><li><a href="#s28-4-1"><span class="n">28.4.1</span>Roles and authority</a></li><li><a href="#s28-4-2"><span class="n">28.4.2</span>Communication rules</a></li><li><a href="#s28-4-3"><span class="n">28.4.3</span>Staffing for one hall IST day</a></li></ol></li><li><a href="#s28-5"><span class="n">28.5</span>Instrumentation and data loggers</a><ol><li><a href="#s28-5-1"><span class="n">28.5.1</span>What must be measured</a></li><li><a href="#s28-5-2"><span class="n">28.5.2</span>Thermocouple selection</a></li><li><a href="#s28-5-3"><span class="n">28.5.3</span>Time synchronisation</a></li><li><a href="#s28-5-4"><span class="n">28.5.4</span>Logging intervals and trigger settings</a></li><li><a href="#s28-5-5"><span class="n">28.5.5</span>Instrument register fields</a></li></ol></li><li><a href="#s28-6"><span class="n">28.6</span>Load banks and heat emulators</a><ol><li><a href="#s28-6-1"><span class="n">28.6.1</span>Why IST needs simulated load</a></li><li><a href="#s28-6-2"><span class="n">28.6.2</span>Types of load bank used in IST</a></li><li><a href="#s28-6-3"><span class="n">28.6.3</span>Air flow of rack simulators</a></li><li><a href="#s28-6-4"><span class="n">28.6.4</span>Load plan for one MSC-1 hall</a></li><li><a href="#s28-6-5"><span class="n">28.6.5</span>Load bank installation and stabilisation</a></li></ol></li><li><a href="#s28-7"><span class="n">28.7</span>Acceptance criteria</a><ol><li><a href="#s28-7-1"><span class="n">28.7.1</span>How acceptance values are chosen</a></li><li><a href="#s28-7-2"><span class="n">28.7.2</span>Pass, fail and conditional pass</a></li></ol></li><li><a href="#s28-8"><span class="n">28.8</span>Abort criteria and the stop procedure</a><ol><li><a href="#s28-8-1"><span class="n">28.8.1</span>Abort criteria</a></li><li><a href="#s28-8-2"><span class="n">28.8.2</span>Stop procedure</a></li></ol></li><li><a href="#s28-9"><span class="n">28.9</span>Scenario library</a><ol><li><a href="#s28-9-1"><span class="n">28.9.1</span>How the library is built</a></li><li><a href="#s28-9-2"><span class="n">28.9.2</span>Electrical scenarios</a></li><li><a href="#s28-9-3"><span class="n">28.9.3</span>Mechanical and liquid cooling scenarios</a></li><li><a href="#s28-9-4"><span class="n">28.9.4</span>Controls, network and fire scenarios</a></li></ol></li><li><a href="#s28-10"><span class="n">28.10</span>IST programme for one hall</a><ol><li><a href="#s28-10-1"><span class="n">28.10.1</span>Five-day plan</a></li><li><a href="#s28-10-2"><span class="n">28.10.2</span>Day 2 timeline</a></li></ol></li><li><a href="#s28-11"><span class="n">28.11</span>Script 1: utility loss at full load and return to utility (S01 and S02)</a><ol><li><a href="#s28-11-1"><span class="n">28.11.1</span>Filled record of S01 and S02</a></li><li><a href="#s28-11-2"><span class="n">28.11.2</span>Common errors in S01</a></li></ol></li><li><a href="#s28-12"><span class="n">28.12</span>Script 2: CDU failover in zone 2 (S16)</a><ol><li><a href="#s28-12-1"><span class="n">28.12.1</span>Filled record of S16</a></li></ol></li><li><a href="#s28-13"><span class="n">28.13</span>Script 3: fire alarm with pre-action release in hall DH3 (S28)</a><ol><li><a href="#s28-13-1"><span class="n">28.13.1</span>Filled record of S28</a></li></ol></li><li><a href="#s28-14"><span class="n">28.14</span>Results analysis</a><ol><li><a href="#s28-14-1"><span class="n">28.14.1</span>Plots that every scenario report contains</a></li><li><a href="#s28-14-2"><span class="n">28.14.2</span>Calculations</a></li><li><a href="#s28-14-3"><span class="n">28.14.3</span>Result analysis steps</a></li></ol></li><li><a href="#s28-15"><span class="n">28.15</span>Reporting</a><ol><li><a href="#s28-15-1"><span class="n">28.15.1</span>IST report contents</a></li><li><a href="#s28-15-2"><span class="n">28.15.2</span>Report timing</a></li><li><a href="#s28-15-3"><span class="n">28.15.3</span>Issue log fields for IST</a></li></ol></li><li><a href="#s28-16"><span class="n">28.16</span>Common errors in IST</a></li><li><a href="#s28-17"><span class="n">28.17</span>Checklist for site use</a></li><li><a href="#s28-18"><span class="n">28.18</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="27-dcim-cmms-security-cybersecurity.html"><span>Previous</span>27 DCIM, CMMS, security and access control, and OT cybersecurity</a><a href="29-issue-library.html"><span>Next</span>29 Issue library</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s28-0"><span class="n">28.0</span>Scope of this chapter</h2>
+<p>This chapter covers integrated systems testing (IST), the fifth and last level (L5) of data-centre commissioning. In IST the electrical, mechanical, liquid cooling, controls, monitoring and fire systems of one data hall run together under simulated full IT load. The commissioning team applies planned failures to prove that the hall keeps the IT load powered and cooled. The chapter gives a commissioning manager what he needs to plan, run, stop, analyse and report an IST.</p>
+<ol>
+<li><strong>Definition and purpose.</strong> What IST is, how it differs from the L4 functional performance tests and why a hall does not go live without it.</li>
+<li><strong>Entry gate.</strong> The prerequisites from L1 to L4, the readiness review and the records that must be signed before the first IST day.</li>
+<li><strong>Script structure.</strong> The fields of an IST script, the step format and the hold points.</li>
+<li><strong>Roles on test day.</strong> The test director, the system leads, the observers, the safety officer and their authority to stop a test.</li>
+<li><strong>Instrumentation.</strong> Power quality analysers, thermocouple loggers, flow and pressure instruments, sequence of events (SOE) recorders, time synchronisation and logging intervals.</li>
+<li><strong>Load banks and heat emulators.</strong> Dry resistive load banks, rack-mounted load simulators, liquid heat emulators for the technology cooling system (TCS), placement, stabilisation and kW per rack.</li>
+<li><strong>Acceptance and abort criteria.</strong> The pass values for each measured quantity, with their source, and the limits at which the test stops.</li>
+<li><strong>Scenario library.</strong> A table of 30 IST scenarios with trigger, expected response, measured quantities, pass criteria and abort criteria, and a dependency map.</li>
+<li><strong>Test-day plan.</strong> The five-day IST programme for one hall in the MSC-1 worked example.</li>
+<li><strong>Three full scripts.</strong> Utility loss at full load with return to utility, coolant distribution unit (CDU) failover, and fire alarm with pre-action release in a data hall, each with filled record tables.</li>
+<li><strong>Results analysis and reporting.</strong> Trend plots, ride-through calculations, the IST report and the issue log.</li>
+<li><strong>Common errors and a site checklist.</strong></li>
+</ol>
+<p>Documents and standards used: ANSI/ASHRAE/IES Standard 202-2024 (the commissioning process), ASHRAE Guideline 0-2019 (the commissioning process guideline), Uptime Institute Tier Standard: Topology and Tier Standard: Operational Sustainability, ASHRAE Technical Committee (TC) 9.9 Thermal Guidelines for Data Processing Environments (5th edition, 2021). The test standards are IEC 61000-4-30 (power quality measurement methods), IEC 62040-3:2021 (uninterruptible power supply (UPS) performance), ISO 8528-5 (generating set transient performance), NFPA 110 (emergency and standby power systems) and IEC 60584-1 (thermocouple tolerances). The chapter also uses the Information Technology Industry Council (ITIC) curve application note (the successor of the Computer and Business Equipment Manufacturers Association (CBEMA) curve), Schneider Electric White Paper 148 (Data Center Projects: Commissioning), and published load-bank practice from Aggreko and Avtron. Where a value comes from a secondary source, the text names that source and the exact document or table to check it against.</p>
+<h2 id="s28-1"><span class="n">28.1</span>What IST is and why it exists</h2>
+<h3 id="s28-1-1"><span class="n">28.1.1</span>Definition</h3>
+<p>Integrated systems testing is a set of planned tests in which all systems that serve a data hall operate together at design load. The test team applies normal events (start-up, transfer, return to utility) and abnormal events (component failure, loss of a source, fire alarm) to that hall. The test proves that the systems interact as the design intends. A training guide for the BICSI data-centre design credential, Data Center Design Consultant (DCDC), describes L5 IST as the stage that "evaluates the entire facility operating under 100% simulated design electrical and thermal load" (research note RF-28, row 5).</p>
+<p>The level ladder L1 to L5 is industry practice. Its numbering and names come from the project commissioning plan, and they differ between owners. Hyperscale programmes use the following ladder.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Name</th>
+<th>What it proves</th>
+<th>Typical record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1</td>
+<td>Factory acceptance test (FAT)</td>
+<td>the equipment meets its specification at the factory</td>
+<td>FAT report signed by vendor and witness</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Delivery and installation inspection</td>
+<td>the equipment arrived undamaged and is installed per drawings</td>
+<td>receiving record, L2 installation checklist</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Pre-functional checks and start-up</td>
+<td>each device is wired, set and starts under the vendor</td>
+<td>L3 checklist, start-up report</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Functional performance test (FPT)</td>
+<td>each system performs its sequences on its own</td>
+<td>L4 FPT script, signed</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>Integrated systems test (IST)</td>
+<td>all systems together keep the IT load powered and cooled through events</td>
+<td>L5 IST script, IST report</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-1-2"><span class="n">28.1.2</span>How IST differs from L4</h3>
+<p>An L4 functional test checks one system against its own sequence. For example, the L4 test of the UPS proves that the UPS transfers to battery when its input fails. IST checks what happens to every other system at the same time. When the utility fails, the UPS goes to battery and the generators start and synchronise. The mechanical switchboards lose power for up to 15 s (the MSC-1 limit for closing the generator bus to the mechanical boards; S01 measured 12.4 s). The chilled-water pumps stop and restart, the chillers wait for their anti-recycle timers and the CDUs ride through on their own UPS supply. The building management system (BMS) and the electrical power monitoring system (EPMS) record all of it. A fault in the interaction between two systems that each passed L4 is the type of fault IST finds.</p>
+<ol>
+<li><strong>Interaction faults.</strong> A pump variable frequency drive (VFD) fed from a non-UPS board restarts 45 s after generator power returns, while the chiller anti-recycle timer adds 4 minutes. A published IST example shows this case (RF-28, row 7).</li>
+<li><strong>Load faults.</strong> A breaker setting that passed L4 at 30 % load trips at 100 % load during a transfer, because the inrush of restarting pumps adds to the steady load.</li>
+<li><strong>Thermal faults.</strong> Rack inlet temperature rises above the ASHRAE recommended limit during the cooling restart, because the thermal storage was sized for a shorter gap.</li>
+<li><strong>Controls faults.</strong> The BMS raises 2,000 alarms in 10 s and the operator cannot find the alarm that matters.</li>
+<li><strong>Procedure faults.</strong> The emergency operating procedure (EOP) tells the operator to open a valve that the design removed.</li>
+</ol>
+<h3 id="s28-1-3"><span class="n">28.1.3</span>Electrical IST and heat-load test</h3>
+<p>Some projects split IST into two parts: a heat-load test of the mechanical systems and an electrical integrated test (RF-28, row 19). Halls with liquid cooling at 120 kW per rack run both together, because the electrical events stop and restart the cooling and the cooling plant load changes the electrical load. The MSC-1 worked example runs one combined IST per hall.</p>
+<h3 id="s28-1-4"><span class="n">28.1.4</span>Why a hall does not go live without IST</h3>
+<p><strong>Purpose:</strong> IST is the last point at which a failure costs only test time. After IT equipment arrives, the same failure stops customer workloads.</p>
+<ol>
+<li><strong>Risk transfer.</strong> The owner accepts the hall for operation only when the IST report shows every scenario passed or has an accepted deviation.</li>
+<li><strong>Tier certification.</strong> Where the owner seeks Uptime Institute Tier certification of the constructed facility, the demonstrations of concurrent maintainability (Tier III) or fault tolerance (Tier IV) are run during or after IST. The Tier Certification of Constructed Facility (TCCF) agreement between the owner and Uptime Institute lists the demonstrations. No public list was found for this manual.</li>
+<li><strong>Operator training.</strong> The facility operations team runs the emergency operating procedures (EOPs) and methods of procedure (MOPs) during IST, on live plant, before any IT load is at risk.</li>
+<li><strong>Baseline data.</strong> The IST trend data becomes the reference for the first year of operation: pump power at design flow, UPS losses, rack inlet temperature spread.</li>
+</ol>
+<h2 id="s28-2"><span class="n">28.2</span>Prerequisites and the IST entry gate</h2>
+<h3 id="s28-2-1"><span class="n">28.2.1</span>Prerequisite list</h3>
+<p>IST starts only when the levels below it are closed for every system that serves the hall. The commissioning manager runs an entry gate review 10 working days before the first IST day and a final check 1 working day before.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>No.</th>
+<th>Prerequisite</th>
+<th>Record that proves it</th>
+<th>Owner</th>
+<th>Blocks IST if missing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>L4 FPT signed for every system serving the hall</td>
+<td>L4 FPT register, 100 % signed</td>
+<td>commissioning authority (CxA)</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>2</td>
+<td>No open category A issue; category B issues reviewed</td>
+<td>issue log extract, signed</td>
+<td>CxA</td>
+<td>yes (A); test director decides (B)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Protection settings applied and tested</td>
+<td>relay settings record and secondary injection reports (chapter 14)</td>
+<td>electrical contractor</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Generator load bank tests passed</td>
+<td>generator L4 test reports (chapter 15)</td>
+<td>generator vendor</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>5</td>
+<td>UPS and battery discharge tests passed</td>
+<td>UPS L4 report, battery capacity test record (chapter 16)</td>
+<td>UPS vendor</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Mechanical testing, adjusting and balancing (TAB) and CDU tests passed</td>
+<td>TAB report, CDU L4 report (chapters 18 and 19)</td>
+<td>mechanical contractor</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>7</td>
+<td>BMS and EPMS point-to-point and alarm tests passed</td>
+<td>BMS L4 report, EPMS L4 report (chapters 22 and 24)</td>
+<td>controls contractor</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Fire alarm and suppression acceptance with the authority</td>
+<td>fire acceptance certificate (chapter 20)</td>
+<td>fire contractor</td>
+<td>yes for fire scenarios</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Network ring failover test passed</td>
+<td>operational technology (OT) network test record (chapter 26)</td>
+<td>network contractor</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Load banks and heat emulators delivered, installed, tested at 25 %</td>
+<td>load bank installation record</td>
+<td>load bank vendor</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>11</td>
+<td>IST instrumentation installed, calibrated, time-synchronised</td>
+<td>instrument register with certificates, time check record</td>
+<td>CxA</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>12</td>
+<td>IST scripts approved by designer, owner and contractors</td>
+<td>script approval sheet</td>
+<td>commissioning manager</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>13</td>
+<td>EOPs and MOPs issued for the scenarios</td>
+<td>EOP and method of procedure (MOP) register</td>
+<td>owner operations</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Permit to work and switching programme for each day</td>
+<td>approved permits (chapter 10)</td>
+<td>electrical authorised person</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Emergency response plan, first aid, fire watch</td>
+<td>safety plan, signed by safety officer</td>
+<td>contractor safety officer</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Utility notified of planned utility breaker operations</td>
+<td>utility notification letter</td>
+<td>owner</td>
+<td>yes for utility scenarios</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-2-2"><span class="n">28.2.2</span>Entry gate review procedure</h3>
+<p>The entry gate review and the script approval of section 28.3.5 run on the same calendar. Figure <a class="figref" href="#F28-7">F28-7</a> shows both in working days before the first IST day, from the script draft at T−30 to the final check at T−1.</p>
+<figure class="sheet" id="F28-7"><a href="../data/cx-handbook/figures/F28-7.svg" title="Open drawing F28-7 at full size"><img src="../data/cx-handbook/figures/F28-7.svg" alt="F28-7: Road to IST day 1: script approval and entry gate in working days" width="1000" height="757" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F28-7</span> — <b>Road to IST day 1: script approval and entry gate in working days</b>. Two procedures share one calendar: the script approval of section 28.3.5 and the entry gate review of section 28.2.2. Both must be closed before the first IST day.</figcaption></figure>
+
+<p><strong>Trigger:</strong> the last L4 test of the hall is signed, or 10 working days before the planned IST start, whichever is earlier.</p>
+<p><strong>Owner:</strong> the commissioning manager.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Issue the gate pack.</strong> The CxA issues the prerequisite list with the status of each row 12 working days before IST. Each row shows the record number and the date signed.</li>
+<li><strong>Hold the review meeting.</strong> The commissioning manager chairs a 2-hour meeting 10 working days before IST with the test director, each system lead, the data-centre operations (DCOps) lead and the safety officer. Each lead confirms the rows of his system.</li>
+<li><strong>Classify the gaps.</strong> Each missing row is classed as "blocks IST", "blocks one scenario" or "accepted with a workaround". A missing L4 record always blocks the scenarios that use that system.</li>
+<li><strong>Agree the recovery dates.</strong> The responsible contractor gives a date for each gap. The CxA records the dates in the gate pack.</li>
+<li><strong>Run the final check.</strong> One working day before IST, the CxA checks every gap again. If a "blocks IST" row is still open, the commissioning manager postpones IST and informs the owner in writing the same day.</li>
+<li><strong>Sign the gate certificate.</strong> The commissioning manager, the CxA and the owner representative sign the IST entry certificate IST-GATE-B2-DH3.</li>
+</ol>
+<p><strong>Acceptance:</strong> all 16 rows closed, or open rows accepted in writing with the scenarios they affect removed from the day plan.</p>
+<p><strong>Records:</strong> gate pack, meeting minutes, entry certificate.</p>
+<h3 id="s28-2-3"><span class="n">28.2.3</span>Gate certificate fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Certificate number</td>
+<td>text</td>
+<td>IST-GATE-B2-DH3</td>
+</tr>
+<tr>
+<td>Hall</td>
+<td>text</td>
+<td>Building B2, data hall DH3</td>
+</tr>
+<tr>
+<td>Planned IST start</td>
+<td>date</td>
+<td>2026-11-16</td>
+</tr>
+<tr>
+<td>Prerequisites closed</td>
+<td>number of 16</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Open rows and decision</td>
+<td>text</td>
+<td>row 13: EOP-ELE-07 in draft; scenario S07 moved to day 4</td>
+</tr>
+<tr>
+<td>Load at gate</td>
+<td>MW</td>
+<td>3.0 (25 % load bank check)</td>
+</tr>
+<tr>
+<td>Instruments registered</td>
+<td>number</td>
+<td>412 channels</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>names, dates</td>
+<td>commissioning manager, CxA, owner representative</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Signing on a promise.</strong> The gate is signed because the contractor says the last L4 report "will be issued tomorrow". Accept only signed records.</li>
+<li><strong>Missing upstream systems.</strong> The prerequisite list covers the hall only and omits the central plant, the medium-voltage (MV) ring and the generator plant that serve it.</li>
+<li><strong>Unchecked load bank controls.</strong> The load bank control cables are installed but the 25 % check was never run, and on day 1 two banks do not respond.</li>
+</ol>
+<h2 id="s28-3"><span class="n">28.3</span>IST script structure</h2>
+<h3 id="s28-3-1"><span class="n">28.3.1</span>What a script is</h3>
+<p>An IST script is the controlled document that tells each person on the test what to do, when, and what result to record. One script covers one scenario. The script is approved before the test and becomes the test record when it is filled and signed.</p>
+<h3 id="s28-3-2"><span class="n">28.3.2</span>Script header fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Script number</td>
+<td>text</td>
+<td>IST-B2-DH3-S01</td>
+</tr>
+<tr>
+<td>Revision</td>
+<td>text</td>
+<td>Rev C, approved 2026-11-09</td>
+</tr>
+<tr>
+<td>Scenario title</td>
+<td>text</td>
+<td>Utility loss at 100 % load and return to utility</td>
+</tr>
+<tr>
+<td>Systems involved</td>
+<td>list</td>
+<td>medium voltage (MV), low voltage (LV), generators, UPS, chilled-water (CHW) plant, CDU, computer room air handler (CRAH), BMS, EPMS</td>
+</tr>
+<tr>
+<td>Initial conditions</td>
+<td>list</td>
+<td>utility on both MV feeders, 12.0 MW IT load, CHW 18 °C supply</td>
+</tr>
+<tr>
+<td>Load required</td>
+<td>MW</td>
+<td>12.0 IT (9.6 liquid, 2.4 air)</td>
+</tr>
+<tr>
+<td>Expected duration</td>
+<td>minutes</td>
+<td>90</td>
+</tr>
+<tr>
+<td>Prerequisite scenarios</td>
+<td>list</td>
+<td>S00 baseline at 100 % for 4 h</td>
+</tr>
+<tr>
+<td>Risk assessment (RA) number</td>
+<td>text</td>
+<td>RA-IST-S01</td>
+</tr>
+<tr>
+<td>EOP and MOP used</td>
+<td>list</td>
+<td>EOP-ELE-01, MOP-ELE-RT-01</td>
+</tr>
+<tr>
+<td>Permit to work (PTW) number</td>
+<td>text</td>
+<td>PTW-B2-2026-1184</td>
+</tr>
+<tr>
+<td>Approvals</td>
+<td>names</td>
+<td>designer, owner, contractor leads, CxA</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-3-3"><span class="n">28.3.3</span>Step format</h3>
+<p>Each step has one action, one role and one expected result. A step that needs a decision is a hold point.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Content</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Step</td>
+<td>number</td>
+<td>7</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>planned clock time or offset</td>
+<td>T0 + 0 s</td>
+</tr>
+<tr>
+<td>Role</td>
+<td>one role</td>
+<td>electrical lead</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>one action with the device tag</td>
+<td>open 20 kV incomer B2-MV-IN-1 and B2-MV-IN-2 by relay test trip</td>
+</tr>
+<tr>
+<td>Expected result</td>
+<td>value or state</td>
+<td>UPS on battery with no output gap; generators start</td>
+</tr>
+<tr>
+<td>Measured result</td>
+<td>value</td>
+<td>filled during the test</td>
+</tr>
+<tr>
+<td>Pass or fail</td>
+<td>P or F</td>
+<td>filled during the test</td>
+</tr>
+<tr>
+<td>Initials</td>
+<td>text</td>
+<td>filled during the test</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-3-4"><span class="n">28.3.4</span>Hold points</h3>
+<p>A hold point is a step at which the test stops until the test director gives the next instruction. Each script has hold points at these places.</p>
+<ol>
+<li><strong>Before the first event.</strong> The test director checks that all loggers are recording, that the load is at the set value for the stabilisation period and that every observer is in position.</li>
+<li><strong>After each event.</strong> The system leads report the state of their systems. The test director checks that no abort criterion is reached.</li>
+<li><strong>Before the return to normal.</strong> The test director confirms that the recovery conditions (for example the utility stability timer) are met.</li>
+<li><strong>At the end.</strong> The test director confirms the hall is back at the initial conditions before the next scenario starts.</li>
+</ol>
+<h3 id="s28-3-5"><span class="n">28.3.5</span>Approval of scripts</h3>
+<ol>
+<li><strong>Draft.</strong> The CxA drafts the script from the design sequences, the cause-and-effect matrix and the vendor procedures 30 working days before IST.</li>
+<li><strong>Review.</strong> The designer, each contractor and owner operations review the draft in 10 working days and return comments on the comment sheet.</li>
+<li><strong>Revise.</strong> The CxA answers each comment and issues Rev B within 5 working days.</li>
+<li><strong>Dry run.</strong> The test director and the system leads walk through each script in the hall and at the panels, without operating anything, 5 working days before IST. Each wrong tag or missing step is corrected.</li>
+<li><strong>Approve.</strong> The approval sheet is signed and Rev C is issued 3 working days before IST. No change is made after this without a script change note signed by the test director.</li>
+</ol>
+<h2 id="s28-4"><span class="n">28.4</span>Roles on test day</h2>
+
+<figure class="sheet" id="F28-4"><a href="../data/cx-handbook/figures/F28-4.svg" title="Open drawing F28-4 at full size"><img src="../data/cx-handbook/figures/F28-4.svg" alt="F28-4: Test-day organisation for an IST: one test director gives every instruction that changes the plant" width="1400" height="852" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F28-4</span> — <b>Test-day organisation for an IST: one test director gives every instruction that changes the plant</b>. Solid lines are the instruction path. Observers and owner operations watch and record; they do not operate during the test.</figcaption></figure>
+<h3 id="s28-4-1"><span class="n">28.4.1</span>Roles and authority</h3>
+<p>Figure <a class="figref" href="#F28-4">F28-4</a> shows the test-day organisation. One person, the test director, gives every instruction that changes the plant. Every other person reports to him through the system leads.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Who on MSC-1</th>
+<th>Duties</th>
+<th>Authority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Test director</td>
+<td>commissioning manager or senior CxA</td>
+<td>runs the script, calls each step and hold point, decides pass, fail, repeat or abort</td>
+<td>stops or starts any step</td>
+</tr>
+<tr>
+<td>Script reader and recorder</td>
+<td>CxA engineer</td>
+<td>reads each step aloud, records times and results on the master script</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Electrical lead</td>
+<td>electrical contractor commissioning engineer</td>
+<td>operates MV and LV switching, reports electrical state</td>
+<td>stops on electrical safety grounds</td>
+</tr>
+<tr>
+<td>Mechanical lead</td>
+<td>mechanical contractor commissioning engineer</td>
+<td>reports plant state, operates mechanical isolations</td>
+<td>stops on mechanical safety grounds</td>
+</tr>
+<tr>
+<td>Controls lead</td>
+<td>BMS and EPMS contractor engineer</td>
+<td>reports alarms and trends, takes screen captures</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Load bank lead</td>
+<td>load bank vendor engineer</td>
+<td>sets and holds the load, reports load bank alarms</td>
+<td>trips load banks on vendor safety grounds</td>
+</tr>
+<tr>
+<td>Vendor engineers</td>
+<td>UPS, generator, chiller, CDU vendors</td>
+<td>watch their equipment, read event logs</td>
+<td>stops if equipment damage is imminent</td>
+</tr>
+<tr>
+<td>Owner operations</td>
+<td>facility shift lead and operators</td>
+<td>run the EOPs and MOPs, watch the BMS and EPMS consoles</td>
+<td>none during test; takes over after</td>
+</tr>
+<tr>
+<td>Safety officer</td>
+<td>contractor health and safety manager</td>
+<td>watches access, permits, fire watch</td>
+<td>stops any step for a safety reason</td>
+</tr>
+<tr>
+<td>Observers</td>
+<td>owner, designer, insurer, certifier</td>
+<td>watch and note; do not operate</td>
+<td>none</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>Any person on the test may call "stop" for safety</mark>, and every person stops at once. Only the test director restarts the test.</p>
+<h3 id="s28-4-2"><span class="n">28.4.2</span>Communication rules</h3>
+<ol>
+<li><strong>One radio channel for instructions.</strong> The test director uses channel 1. System leads answer on channel 1. Side discussions use channel 2.</li>
+<li><strong>Repeat-back.</strong> The person who receives an operating instruction repeats it with the device tag before acting. Example: "Open B2-MV-IN-1, electrical lead, understood."</li>
+<li><strong>Standard words.</strong> "Hold" means wait in the present state. "Stop" means stop all actions and go to a safe state. "Abort" means end the scenario and run the recovery steps.</li>
+<li><strong>Clock.</strong> All persons use the time shown on the IST master clock display, which reads the same Global Positioning System (GPS) time as the loggers.</li>
+<li><strong>Positions.</strong> Each lead stands at his system's panel or at the location in the script. The test director stays at the IST control desk with the BMS, EPMS and logger screens.</li>
+</ol>
+<h3 id="s28-4-3"><span class="n">28.4.3</span>Staffing for one hall IST day</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Number</th>
+<th>Shift</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Test director</td>
+<td>1</td>
+<td>day (07:00 to 19:00)</td>
+</tr>
+<tr>
+<td>Script reader and recorder</td>
+<td>1</td>
+<td>day</td>
+</tr>
+<tr>
+<td>Electrical lead and switching team</td>
+<td>1 + 3</td>
+<td>day</td>
+</tr>
+<tr>
+<td>Mechanical lead and technicians</td>
+<td>1 + 3</td>
+<td>day</td>
+</tr>
+<tr>
+<td>Controls lead</td>
+<td>2 (BMS, EPMS)</td>
+<td>day</td>
+</tr>
+<tr>
+<td>Load bank lead and technicians</td>
+<td>1 + 2</td>
+<td>day and night watch</td>
+</tr>
+<tr>
+<td>Vendor engineers</td>
+<td>4 (UPS, generator, chiller, CDU)</td>
+<td>day</td>
+</tr>
+<tr>
+<td>Owner operations</td>
+<td>3</td>
+<td>day and night</td>
+</tr>
+<tr>
+<td>Safety officer and fire watch</td>
+<td>1 + 2</td>
+<td>day and night</td>
+</tr>
+<tr>
+<td>Total on day shift</td>
+<td>25</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s28-5"><span class="n">28.5</span>Instrumentation and data loggers</h2>
+<h3 id="s28-5-1"><span class="n">28.5.1</span>What must be measured</h3>
+<p>IST produces the record that a scenario passed. The building management system (BMS) and the electrical power monitoring system (EPMS) record many values, but their sensors and their logging intervals are set for operation. IST adds independent instruments with known accuracy and a short logging interval, so that a transient of 20 ms or a temperature rise of 1 K per minute is visible.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Instrument</th>
+<th>Accuracy or class</th>
+<th>Logging interval</th>
+<th>Location in MSC-1 hall</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Voltage, current, power, frequency, sags, transients</td>
+<td>power quality (PQ) analyser, IEC 61000-4-30 Class A</td>
+<td>voltage ±0.1 % of declared input; frequency ±0.01 Hz</td>
+<td>waveform capture on trigger; 10-cycle (200 ms at 50 Hz) values; 1 s trends</td>
+<td>UPS output A and B per block, generator bus, MV incomers</td>
+</tr>
+<tr>
+<td>Breaker and transfer events</td>
+<td>SOE recorder or relay event logs with GPS time</td>
+<td>1 ms time stamp</td>
+<td>event</td>
+<td>MV and LV breakers, UPS, static switches</td>
+</tr>
+<tr>
+<td>Rack inlet air temperature</td>
+<td>type T thermocouples on a multichannel logger</td>
+<td>±0.5 °C (IEC 60584-1 class 1) plus logger error</td>
+<td>10 s</td>
+<td>3 heights on 1 rack in every 4 (front door)</td>
+</tr>
+<tr>
+<td>Supply and return air of CRAH and fan wall</td>
+<td>type T thermocouples or resistance temperature detector (RTD) probes</td>
+<td>±0.5 °C</td>
+<td>10 s</td>
+<td>each air handler</td>
+</tr>
+<tr>
+<td>TCS supply and return temperature</td>
+<td>clamp-on or immersion RTD, class A, 3- or 4-wire</td>
+<td>±(0.15 + 0.002</td>
+<td>t</td>
+<td>) °C, so ±0.24 °C at 45 °C (IEC 60751:2008 class A; the 2022 edition changed the class rules, so read the class on the sensor certificate)</td>
+</tr>
+<tr>
+<td>TCS and facility water system (FWS) flow</td>
+<td>ultrasonic clamp-on flow meter or calibrated in-line meter</td>
+<td>±1 to 2 % of reading (manufacturer data)</td>
+<td>5 s</td>
+<td>CDU secondary, FWS header</td>
+</tr>
+<tr>
+<td>Differential pressure</td>
+<td>calibrated pressure transmitter</td>
+<td>±0.25 % of span</td>
+<td>5 s</td>
+<td>CDU secondary, CHW risers</td>
+</tr>
+<tr>
+<td>Room temperature and humidity</td>
+<td>combined logger</td>
+<td>±0.3 °C, ±2 % relative humidity (RH) (manufacturer data)</td>
+<td>60 s</td>
+<td>hall at 4 points, hot aisle at 4 points</td>
+</tr>
+<tr>
+<td>Load bank load</td>
+<td>load bank controller log</td>
+<td>per vendor (for example ±1 % of kW)</td>
+<td>1 s</td>
+<td>each load bank group</td>
+</tr>
+<tr>
+<td>Generator and UPS data</td>
+<td>equipment controller logs</td>
+<td>per vendor</td>
+<td>event and 1 s</td>
+<td>each unit</td>
+</tr>
+</tbody>
+</table></div>
+<p>The IEC 61000-4-30 Class A uncertainty values come from the Fluke summary of the standard and the Schneider technical note on ION meters (RF-28, row 13). The thermocouple tolerances come from IEC 60584-1 as published by thermocouple suppliers (RF-28, row 15).</p>
+<h3 id="s28-5-2"><span class="n">28.5.2</span>Thermocouple selection</h3>
+<ol>
+<li><strong>Type T for air and water.</strong> Type T (copper-constantan) class 1 has a tolerance of <mark>±0.5 °C from −40 to 125 °C</mark>, which covers all data-hall air and water temperatures.</li>
+<li><strong>Type K only for hot surfaces.</strong> Type K class 1 has ±1.5 °C up to 375 °C. Do not use it for rack inlet measurement, because 1.5 °C is a large part of the margin between 27 °C and the allowable limit.</li>
+<li><strong>System accuracy.</strong> The logger adds its own error and the cold junction compensation error. Calibrate each logger channel with its thermocouple at two points (for example 20 °C and 50 °C) in a dry-block calibrator before IST and accept a channel when the system error is within ±0.5 °C.</li>
+<li><strong>Mounting.</strong> Fix the junction in free air 50 mm in front of the rack door with a non-metallic clip. A junction taped to a metal door reads the door temperature.</li>
+<li><strong>Labels.</strong> Label each thermocouple with the channel and the rack, for example "L03-CH14 / R-DH3-B07 / mid".</li>
+</ol>
+<h3 id="s28-5-3"><span class="n">28.5.3</span>Time synchronisation</h3>
+<p>Every instrument and every system log must use the same time so that the order of events can be read. The test director checks the time of each device before the first scenario of each day.</p>
+<ol>
+<li><strong>Reference.</strong> A GPS clock in the IST control desk is the reference. The EPMS time server and the relay time sources use the same GPS time (chapter 24).</li>
+<li><strong>Check method.</strong> The controls lead triggers a test event (for example a contact into an SOE input) at a whole GPS second and reads the time stamp in every system that records it.</li>
+<li><strong>Acceptance.</strong> SOE devices and relays within 1 ms; PQ analysers within 10 ms; BMS controllers and loggers within 1 s; load bank controllers within 1 s.</li>
+<li><strong>Record.</strong> The time check record lists each device, its time source, its offset and the person who checked it.</li>
+</ol>
+<h3 id="s28-5-4"><span class="n">28.5.4</span>Logging intervals and trigger settings</h3>
+<ol>
+<li><strong>PQ analyser triggers.</strong> Set the voltage sag trigger at 90 % of nominal, the swell trigger at 110 %, and capture at least 10 cycles before and 50 cycles after each trigger.</li>
+<li><strong>Continuous PQ trend.</strong> Record 1 s root-mean-square (RMS) voltage, current, kW and frequency for the whole day.</li>
+<li><strong>Temperature loggers.</strong> Use 10 s for rack inlet and air handler temperatures. A 60 s interval misses the peak of a short cooling interruption.</li>
+<li><strong>Liquid loop loggers.</strong> Use 5 s for CDU supply temperature, flow and differential pressure.</li>
+<li><strong>BMS trend.</strong> Set BMS trends for the hall to change-of-value or 10 s during IST and return them to the operating setting after IST.</li>
+<li><strong>Storage.</strong> Each logger stores at least 7 days of data at these intervals. The controls lead downloads all data at the end of each day and copies it to two locations.</li>
+</ol>
+<h3 id="s28-5-5"><span class="n">28.5.5</span>Instrument register fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Channel ID</td>
+<td>text</td>
+<td>L03-CH14</td>
+</tr>
+<tr>
+<td>Instrument</td>
+<td>text</td>
+<td>32-channel thermocouple logger, serial 2219-0457</td>
+</tr>
+<tr>
+<td>Sensor</td>
+<td>text</td>
+<td>type T class 1, 2 m lead</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>text</td>
+<td>rack R-DH3-B07, front, mid height (1.0 m)</td>
+</tr>
+<tr>
+<td>Measured quantity</td>
+<td>text</td>
+<td>rack inlet air temperature</td>
+</tr>
+<tr>
+<td>Range and unit</td>
+<td>text</td>
+<td>0 to 60 °C</td>
+</tr>
+<tr>
+<td>Calibration certificate</td>
+<td>text</td>
+<td>CAL-2026-1043, valid to 2027-08-31</td>
+</tr>
+<tr>
+<td>Two-point check result</td>
+<td>°C</td>
+<td>+0.2 at 20 °C, +0.3 at 50 °C</td>
+</tr>
+<tr>
+<td>Logging interval</td>
+<td>s</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Time offset at daily check</td>
+<td>s</td>
+<td>0.4</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> channel count for one MSC-1 hall. The hall has 100 racks at 120 kW. One rack in four carries three thermocouples (bottom 0.3 m, middle 1.0 m, top 1.8 m): 25 racks × 3 = 75 channels. The air side has 13 air handlers (the MSC-1 CRAH count of chapter 21) with supply and return: 26 channels. The liquid side has 16 CDUs with secondary supply and return temperature, flow and differential pressure: 64 channels. Room and hot-aisle loggers add 8. Electrical PQ analysers sit on 8 blocks × 2 UPS outputs = 16 points, plus 4 on the generator bus and MV incomers: 20 analysers. The total is about 173 temperature and liquid channels plus 20 PQ analysers. At 10 s for 173 channels over a 12-hour day the loggers store 173 × 4,320 = 747,360 readings per day.</p>
+<h2 id="s28-6"><span class="n">28.6</span>Load banks and heat emulators</h2>
+
+<figure class="sheet" id="F28-5"><a href="../data/cx-handbook/figures/F28-5.svg" title="Open drawing F28-5 at full size"><img src="../data/cx-handbook/figures/F28-5.svg" alt="F28-5: Heat-load test layout for one rack position and one zone of hall B2-DH3" width="1400" height="734" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F28-5</span> — <b>Heat-load test layout for one rack position and one zone of hall B2-DH3</b>. Power comes from both busways through the rack PDUs; liquid heat goes to the CDU through the rack manifold; air heat goes to the hot aisle and back to the fan walls.</figcaption></figure>
+<h3 id="s28-6-1"><span class="n">28.6.1</span>Why IST needs simulated load</h3>
+<p>The hall has no IT equipment during IST. Load banks take electrical power and turn it into heat. They give the electrical systems their design current and the cooling systems their design heat. An IST at 10 % load does not test the design limits. Breakers do not reach their pickup, UPS modules do not reach their thermal limits, and the cooling plant does not reach its design flow.</p>
+<h3 id="s28-6-2"><span class="n">28.6.2</span>Types of load bank used in IST</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>What it simulates</th>
+<th>Typical size</th>
+<th>Connection</th>
+<th>Heat goes to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Floor-standing resistive load bank</td>
+<td>electrical load only, or air heat</td>
+<td>100 to 500 kW</td>
+<td>busway tap-off box or power distribution unit (PDU) output</td>
+<td>hall air or outside (ducted)</td>
+</tr>
+<tr>
+<td>Rack-mounted load simulator ("server simulator")</td>
+<td>rack power and rack air flow</td>
+<td>3 to 50 kW per unit</td>
+<td>rack PDU sockets</td>
+<td>rack exhaust air into the hot aisle</td>
+</tr>
+<tr>
+<td>Liquid heat emulator (liquid-cooled load bank)</td>
+<td>heat into the TCS loop</td>
+<td>100 to 500 kW</td>
+<td>rack PDU or busway for power; TCS manifold for water</td>
+<td>TCS water</td>
+</tr>
+<tr>
+<td>Resistive-reactive load bank</td>
+<td>kW and kvar, power factor below 1</td>
+<td>500 to 2,500 kVA</td>
+<td>generator bus or LV board</td>
+<td>outside air</td>
+</tr>
+<tr>
+<td>DC load bank</td>
+<td>battery discharge load</td>
+<td>per battery string</td>
+<td>battery DC bus</td>
+<td>air</td>
+</tr>
+</tbody>
+</table></div>
+<p>A published IST in Jakarta used 12 digital load banks of 200 kW on two overhead busways to load a 1,450 kW hall to 1,500 kW. One laptop controlled all banks together and logged kW, voltage and frequency (RF-28, row 8). The same case notes that earlier practice in Asia used many small 3 kW heaters, which made load control and data logging inaccurate (RF-28, row 9).</p>
+<h3 id="s28-6-3"><span class="n">28.6.3</span>Air flow of rack simulators</h3>
+<p>A rack-mounted simulator should move air at the rate of the servers it replaces, because the cooling system responds to air flow and heat. A published guide gives <mark>120 to 160 cubic feet per minute (CFM) per kW</mark> (about 57 to 76 L/s per kW) for server simulators (RF-28, row 6). The project value comes from the load-bank original equipment manufacturer (OEM) data sheet and the IT equipment design value. In the MSC-1 worked example, the air-cooled part of each rack is 20 % of 120 kW = 24 kW. At a mid value of 65 L/s per kW, each rack simulator for the air portion moves about 24 × 65 = 1,560 L/s. The hall air design flow of 168.5 m³/s for 2.4 MW gives 70 L/s per kW, which agrees.</p>
+<h3 id="s28-6-4"><span class="n">28.6.4</span>Load plan for one MSC-1 hall</h3>
+<p>In the MSC-1 worked example, each hall has 100 racks at 120 kW (12.0 MW IT). The ledger capture ratio is 0.8: 9.6 MW goes into the TCS liquid loop and 2.4 MW goes into the air.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Load source</th>
+<th>Power</th>
+<th>Simulates</th>
+<th>Connection</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Liquid heat emulators</td>
+<td>9.6 MW</td>
+<td>direct-to-chip heat into TCS at 45 °C supply, 55 °C return</td>
+<td>rack power whips; TCS quick connects</td>
+<td>100 units of 100 kW set at 96 kW, one per rack (example fleet; the load-bank vendor equipment list sets the unit rating)</td>
+</tr>
+<tr>
+<td>Air heaters (rack simulators)</td>
+<td>2.4 MW</td>
+<td>rack air heat</td>
+<td>rack PDU sockets</td>
+<td>100 racks × 24 kW</td>
+</tr>
+<tr>
+<td>Dry load bank set</td>
+<td>6.0 MW</td>
+<td>extra electrical load on the generator and LV boards when the hall load must exceed 12 MW, or load on blocks without heat</td>
+<td>busway tap-off or LV test feeder</td>
+<td>12 × 500 kW</td>
+</tr>
+<tr>
+<td>Reactive load</td>
+<td>1.0 Mvar</td>
+<td>power factor below 1 for generator tests</td>
+<td>generator bus</td>
+<td>1 resistive-reactive bank</td>
+</tr>
+</tbody>
+</table></div>
+<p>The electrical IT load is 12.0 MW. <mark>The 2.4 MW air heaters and the 9.6 MW liquid emulators carry the whole 12.0 MW</mark> so that the hall heat equals its electrical load. The <mark>6.0 MW dry set</mark> serves block overload scenarios and generator tests where the heat is not wanted in the hall.</p>
+<p><strong>Worked example:</strong> current in one UPS block. The hall has 8 blocks of 1.5 MW. In the block failure scenario one block carries its own load and that of a failed partner. The block load is 3.0 MW at 415 V and power factor 0.95, so I = 3,000 kW / (√3 × 0.415 kV × 0.95) = 3,000 / 0.6829 = <mark>4,393 A per block</mark> (case ledger value ist_block_a). Before the scenario, the load bank lead confirms that the busway tap-off boxes and the load bank cables for that block are rated for this current. The electrical lead confirms that the block breaker long-time pickup sits above 4,393 A with the margin given in the protection study.</p>
+<h3 id="s28-6-5"><span class="n">28.6.5</span>Load bank installation and stabilisation</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Install.</strong> The load bank vendor installs each unit per the load bank layout drawing (Figure <a class="figref" href="#F28-5">F28-5</a>), with cables sized for 125 % of the unit current and connections torqued to the vendor value.</li>
+<li><strong>Test at 25 %.</strong> The vendor energises each unit at 25 % and checks phase rotation, current balance within 10 % and fan operation. Record per unit.</li>
+<li><strong>Step to 50 %, 75 %, 100 %.</strong> The load bank lead raises the load in steps of 25 % with a hold of 30 minutes at each step. The electrical lead checks breaker and cable temperatures by thermal imaging at each step.</li>
+<li><strong>Stabilise.</strong> The load is held at 100 % until the hall is in thermal steady state. <mark>Steady state is reached when every rack inlet temperature changes by less than 0.5 K in 30 minutes</mark> and every CDU supply temperature changes by less than 0.3 K in 30 minutes. On MSC-1 this took 2 to 4 hours (the S00 baseline).</li>
+<li><strong>Hold during scenarios.</strong> The load bank lead holds the set load. Load banks with automatic restart after a supply interruption must be set to restart with a delay. The load then returns the way IT servers return (for example all units within 1 to 5 s after power returns). Load banks without UPS supply on their own fans must be reviewed: if their fans stop during an interruption, they can overheat when the heater returns.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Load bank ID</td>
+<td>text</td>
+<td>LB-DH3-L17</td>
+</tr>
+<tr>
+<td>Type and rating</td>
+<td>text</td>
+<td>liquid heat emulator, 100 kW, 415 V, set at 96 kW</td>
+</tr>
+<tr>
+<td>Connected to</td>
+<td>text</td>
+<td>rack R-DH3-C04 whips A and B; CDU-DH3-07 manifold port 4</td>
+</tr>
+<tr>
+<td>Test at 25 %</td>
+<td>A per phase</td>
+<td>34 / 35 / 34</td>
+</tr>
+<tr>
+<td>Test at 100 %</td>
+<td>A per phase</td>
+<td>133 / 134 / 133</td>
+</tr>
+<tr>
+<td>Water flow at 100 %</td>
+<td>L/min</td>
+<td>140</td>
+</tr>
+<tr>
+<td>Water ΔT at 100 %</td>
+<td>K</td>
+<td>9.9</td>
+</tr>
+<tr>
+<td>Alarms during test</td>
+<td>text</td>
+<td>none</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Heat in the wrong place.</strong> Dry load banks placed in the hall add air heat that the liquid system was meant to remove; the air side then fails a test that the design would pass.</li>
+<li><strong>Load banks on one path.</strong> All load banks are connected to the A whips only; a B-side failure then proves nothing about rack dual-cord transfer.</li>
+<li><strong>No restart delay.</strong> All load banks return at once after an interruption, giving a load step that real IT equipment with staggered power supplies does not give.</li>
+<li><strong>Unlogged load.</strong> Analogue heaters with no log leave the report without a measured load; the test then cannot show it ran at 100 %.</li>
+</ol>
+<h2 id="s28-7"><span class="n">28.7</span>Acceptance criteria</h2>
+<h3 id="s28-7-1"><span class="n">28.7.1</span>How acceptance values are chosen</h3>
+<p>The acceptance value for every measured quantity comes from one of three places. In order of priority, they are the owner's project requirements (OPR) and the specification, the published standard named by the specification, and the OEM data for the equipment. The script states the source next to each value. Where the specification gives no value, the CxA proposes one from a standard and the designer approves it before the script is approved.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Acceptance value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IT load continuity</td>
+<td><mark>no loss of power to any rack PDU</mark> (both cords) during any single-failure scenario</td>
+<td>OPR; Uptime Tier III or IV objective</td>
+</tr>
+<tr>
+<td>UPS output voltage transient on mode change</td>
+<td>within the IEC 62040-3 dynamic class declared by the vendor (class 1 for double conversion, VFI-SS-111)</td>
+<td>IEC 62040-3:2021, vendor data sheet (read the class 1 limits from the dynamic output performance curves of IEC 62040-3:2021)</td>
+</tr>
+<tr>
+<td>Voltage at the IT equipment input</td>
+<td>inside the ITIC curve: 0 V up to 20 ms, 70 % up to 0.5 s, 80 % up to 10 s, 90 % beyond 10 s</td>
+<td>ITIC (CBEMA) curve application note; specification</td>
+</tr>
+<tr>
+<td>Generator start to ready to accept load</td>
+<td>within 10 s for the emergency loads where NFPA 110 Type 10 applies; project value for the standby plant (for example 15 s to bus, 30 s to full load)</td>
+<td>NFPA 110; specification</td>
+</tr>
+<tr>
+<td>Generator transient on load step</td>
+<td>frequency dip ≤ 7 %, recovery ≤ 3 s; voltage dip ≤ 15 %, recovery ≤ 4 s (class G3, diesel)</td>
+<td>ISO 8528-5:2022 Table 4, as reproduced in Kohler white paper TP-143 and Avtron "Testing diesel gen-sets to ISO 8528"</td>
+</tr>
+<tr>
+<td>UPS battery autonomy during the event</td>
+<td>battery state of charge stays above the value that leaves the design autonomy margin; on MSC-1 the design is 5 min at full block load</td>
+<td>specification</td>
+</tr>
+<tr>
+<td>Rack inlet air temperature</td>
+<td>within the ASHRAE recommended range <mark>18 to 27 °C</mark> at steady state; during a transient, within the allowable class of the IT equipment (A1: 15 to 32 °C)</td>
+<td>ASHRAE TC 9.9, 5th edition (2021)</td>
+</tr>
+<tr>
+<td>Rate of change of inlet temperature</td>
+<td>≤ 20 °C in any hour and ≤ 5 °C in any 15 minutes; ≤ 5 °C per hour where tape is present</td>
+<td>ASHRAE Thermal Guidelines 4th edition (2015), footnote f of the class table (ASHRAE reference card) (confirm that the 5th edition, 2021, keeps footnote f unchanged)</td>
+</tr>
+<tr>
+<td>TCS supply temperature</td>
+<td>at the set point ±1 K at steady state; peak during a transient below the design limit of the IT cold plates (MSC-1: 45 °C set point, abort at 50 °C)</td>
+<td>OPR, IT vendor liquid cooling specification</td>
+</tr>
+<tr>
+<td>TCS flow per rack</td>
+<td>≥ design flow (MSC-1: 139.2 L/min per rack) within 10 s of a CDU failover</td>
+<td>specification</td>
+</tr>
+<tr>
+<td>Chilled water and FWS supply temperature</td>
+<td>return to set point ±0.5 K within the time stated in the sequence (for example 15 min after chiller restart)</td>
+<td>specification, sequence of operation</td>
+</tr>
+<tr>
+<td>Alarms</td>
+<td>every expected alarm received at the BMS or EPMS with correct text and priority within 10 s; no unexpected priority 1 alarm</td>
+<td>specification, alarm matrix</td>
+</tr>
+<tr>
+<td>Event time stamps</td>
+<td>SOE events of one scenario in the correct order with resolution 1 ms</td>
+<td>specification (chapter 24)</td>
+</tr>
+<tr>
+<td>Recovery</td>
+<td>all systems return to the initial state, with all auto modes restored, without manual action except where the EOP requires it</td>
+<td>specification</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-7-2"><span class="n">28.7.2</span>Pass, fail and conditional pass</h3>
+<ol>
+<li><strong>Pass.</strong> Every acceptance value in the script is met and recorded.</li>
+<li><strong>Fail.</strong> Any acceptance value is not met. The test director records the failure, raises an issue in the issue log with priority, and decides whether the scenario is repeated after the fix.</li>
+<li><strong>Conditional pass.</strong> A minor value is missed and the designer and owner accept it in writing with a corrective action and date. Example: one alarm text is wrong on the BMS screen.</li>
+<li><strong>Void.</strong> The test did not run as written (for example the load was 80 % when the event was triggered). <mark>A void test has no result</mark> and is repeated.</li>
+</ol>
+<h2 id="s28-8"><span class="n">28.8</span>Abort criteria and the stop procedure</h2>
+
+<figure class="sheet" id="F28-6"><a href="../data/cx-handbook/figures/F28-6.svg" title="Open drawing F28-6 at full size"><img src="../data/cx-handbook/figures/F28-6.svg" alt="F28-6: Abort decision flow: from the stop call to the decision to repeat the scenario" width="1400" height="796" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F28-6</span> — <b>Abort decision flow: from the stop call to the decision to repeat the scenario</b>. Any person calls the stop; the test director takes every later decision. The repeat waits for a known cause and a signed debrief record.</figcaption></figure>
+<h3 id="s28-8-1"><span class="n">28.8.1</span>Abort criteria</h3>
+<p>An abort criterion is a measured value or a condition at which the test director ends the scenario and returns the hall to a safe state, before damage or injury. <mark>Abort criteria are set below the damage limit</mark> of the equipment and above the expected response, so that a normal test does not reach them.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Abort value on MSC-1</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rack inlet air temperature</td>
+<td>any rack inlet &gt; 35 °C for 60 s, or &gt; 32 °C average over 5 racks</td>
+<td>IT equipment allowable limit A2 is 35 °C; load banks are not damaged but the cooling has failed</td>
+</tr>
+<tr>
+<td>TCS supply temperature</td>
+<td>&gt; 50 °C at any CDU secondary outlet for 30 s</td>
+<td>5 K above the 45 °C design supply; cold-plate design margin</td>
+</tr>
+<tr>
+<td>TCS flow</td>
+<td>&lt; 50 % of design at any CDU for 60 s</td>
+<td>load emulators reach their high-temperature cut-out</td>
+</tr>
+<tr>
+<td>UPS battery</td>
+<td>state of charge &lt; 30 % or remaining time &lt; 2 min on any block</td>
+<td>the battery must keep reserve for a real event</td>
+</tr>
+<tr>
+<td>Generator</td>
+<td>any unit alarm "shutdown" or overload &gt; 110 % for 60 s</td>
+<td>protect the generator and the remaining units</td>
+</tr>
+<tr>
+<td>Load bank</td>
+<td>over-temperature alarm on more than 2 units, or any unit on fire alarm</td>
+<td>equipment safety</td>
+</tr>
+<tr>
+<td>Electrical</td>
+<td>any unplanned trip of an MV breaker or of a main LV breaker</td>
+<td>the scenario no longer matches the script</td>
+</tr>
+<tr>
+<td>Fire</td>
+<td>any real fire, smoke from equipment, or fire alarm outside the test zone</td>
+<td>life safety</td>
+</tr>
+<tr>
+<td>Leak</td>
+<td>water detected outside the test drip trays</td>
+<td>equipment and electrical safety</td>
+</tr>
+<tr>
+<td>People</td>
+<td>any injury, any person in a restricted zone, any permit breach</td>
+<td>life safety</td>
+</tr>
+<tr>
+<td>Communication</td>
+<td>loss of radio channel 1 for more than 2 minutes</td>
+<td>the test director cannot control the test</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-8-2"><span class="n">28.8.2</span>Stop procedure</h3>
+<p>Figure <a class="figref" href="#F28-6">F28-6</a> shows the decision flow.</p>
+<ol>
+<li><strong>Call the stop.</strong> The person who sees the condition calls "stop, stop, stop" on channel 1 with the reason.</li>
+<li><strong>Freeze actions.</strong> Every person stops operating. Nobody opens or closes any device unless the test director orders it.</li>
+<li><strong>Reduce load.</strong> The test director orders the load bank lead to reduce load to the agreed safe level (on MSC-1: 25 % within 2 minutes, or zero for fire, leak or injury).</li>
+<li><strong>Restore sources.</strong> The electrical lead restores the normal sources by the recovery steps written in the script. The mechanical lead restores normal plant.</li>
+<li><strong>Record.</strong> The script reader records the time of the stop, the reason, the last step completed and the measured values.</li>
+<li><strong>Debrief.</strong> The test director holds a debrief within 30 minutes. The scenario is repeated only after the cause is known and the debrief record is signed.</li>
+</ol>
+<p><strong>Records:</strong> stop record (time, caller, condition, values), debrief record, issue log entry.</p>
+<h2 id="s28-9"><span class="n">28.9</span>Scenario library</h2>
+
+<figure class="sheet" id="F28-2"><a href="../data/cx-handbook/figures/F28-2.svg" title="Open drawing F28-2 at full size"><img src="../data/cx-handbook/figures/F28-2.svg" alt="F28-2: Scenario dependency map: which IST scenarios need which earlier scenario to pass" width="1400" height="1044" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F28-2</span> — <b>Scenario dependency map: which IST scenarios need which earlier scenario to pass</b>. Read from left to right: a scenario starts only when every scenario to its left on the same line has passed or has an accepted deviation.</figcaption></figure>
+<h3 id="s28-9-1"><span class="n">28.9.1</span>How the library is built</h3>
+<p>The scenario library lists every event that the hall must survive. The CxA builds it from four inputs. The first two are the design failure modes in the basis of design (BOD) and the redundancy claims in the OPR (for example "2N electrical, N+1 cooling"). The other two are the cause-and-effect matrix of the fire system and the operating modes in the sequences of operation (maintenance mode, return to normal). Each scenario has one trigger and one set of pass and abort criteria. Figure <a class="figref" href="#F28-2">F28-2</a> shows which scenarios depend on which, so that a failed scenario stops only the scenarios that need it.</p>
+<p>The values in the table are the MSC-1 worked-example values. A project replaces them with its own OPR and specification values.</p>
+<h3 id="s28-9-2"><span class="n">28.9.2</span>Electrical scenarios</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Scenario and trigger</th>
+<th>Expected response</th>
+<th>Measured quantities</th>
+<th>Pass criteria</th>
+<th>Abort criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S00</td>
+<td>Baseline: 100 % load for 4 h, no event</td>
+<td>all systems stable in auto</td>
+<td>all channels</td>
+<td>inlet 18 to 27 °C; TCS 45 ±1 °C; no alarm</td>
+<td>any abort value in 28.8.1</td>
+</tr>
+<tr>
+<td>S01</td>
+<td>Utility loss on both 20 kV incomers (relay test trip) at 100 % load</td>
+<td>UPS to battery with no output gap; generators start, synchronise and close; mechanical loads restart; chillers restart</td>
+<td>UPS output V and I; generator start and close times; bus V and Hz; pump and chiller restart times; inlet and TCS temperatures</td>
+<td>no rack loses power; generator bus ready ≤ 15 s; UPS returns to mains mode on generator; inlet ≤ 27 °C</td>
+<td>battery &lt; 30 %; inlet &gt; 35 °C for 60 s; TCS &gt; 50 °C</td>
+</tr>
+<tr>
+<td>S02</td>
+<td>Return to utility after S01 (utility restored, 30 min stability timer)</td>
+<td>closed-transition retransfer; generators unload and cool down</td>
+<td>retransfer time; parallel time; V and Hz at bus</td>
+<td>no interruption to any load; parallel time within utility limit (for example ≤ 100 ms)</td>
+<td>any unplanned trip</td>
+</tr>
+<tr>
+<td>S03</td>
+<td>One generator fails to start during S01 (start signal blocked on G-07)</td>
+<td>remaining units carry the load; load shed of non-critical loads if programmed</td>
+<td>units on bus; bus kW; frequency; load shed signals</td>
+<td>N units carry building load; bus frequency within ±2 % at steady state</td>
+<td>any unit overload &gt; 110 % for 60 s</td>
+</tr>
+<tr>
+<td>S04</td>
+<td>Generator trips while on load (emergency stop of G-03 at 80 % plant load)</td>
+<td>remaining units pick up its share; frequency dip and recovery</td>
+<td>frequency dip and recovery time; kW per unit</td>
+<td>frequency dip ≤ 7 %, recovery ≤ 3 s (ISO 8528-5:2022 Table 4, class G3)</td>
+<td>second unit trip</td>
+</tr>
+<tr>
+<td>S05</td>
+<td>UPS module failure (one module of block A3 forced off by vendor test command)</td>
+<td>remaining modules carry block load; no transfer to bypass</td>
+<td>output V transient; module kW; alarms</td>
+<td>output inside IEC 62040-3 class 1 curve; no bypass</td>
+<td>UPS on bypass; output loss</td>
+</tr>
+<tr>
+<td>S06</td>
+<td>UPS block failure (block A3 output breaker opened)</td>
+<td>rack PDUs on B side carry full rack load; block B3 rises to its contingency load</td>
+<td>rack PDU B currents; B3 kW; inlet temperatures</td>
+<td>no rack loss; B3 below its rating; currents per 28.6.4</td>
+<td>B3 &gt; 100 % rating</td>
+</tr>
+<tr>
+<td>S07</td>
+<td>UPS transfer to static bypass and back (vendor command)</td>
+<td>static switch transfer with no output gap</td>
+<td>output V transient; transfer time</td>
+<td>inside ITIC curve; transfer recorded in SOE</td>
+<td>output loss</td>
+</tr>
+<tr>
+<td>S08</td>
+<td>UPS maintenance bypass (MOP: close maintenance bypass, open UPS input and output)</td>
+<td>block on raw mains, then return to UPS</td>
+<td>sequence of breaker states; V at output</td>
+<td>no interruption; interlocks prevent wrong order</td>
+<td>wrong interlock operation</td>
+</tr>
+<tr>
+<td>S09</td>
+<td>Battery autonomy at full block load on one block (input open, no generator)</td>
+<td>block runs on battery; operator alarm; input restored at 3 min</td>
+<td>battery V, I, time; state of charge</td>
+<td>autonomy trend matches ≥ 5 min design</td>
+<td>state of charge &lt; 30 %</td>
+</tr>
+<tr>
+<td>S10</td>
+<td>Loss of one LV main board (block transformer T-A5 upstream breaker opened)</td>
+<td>block on UPS battery then on alternate source per design</td>
+<td>breaker states; UPS mode; times</td>
+<td>no rack loss; design source change time met</td>
+<td>battery &lt; 30 %</td>
+</tr>
+<tr>
+<td>S11</td>
+<td>MV ring cable fault simulated (open ring section breaker under load)</td>
+<td>ring reconfigures; no load loss</td>
+<td>breaker times; bus V</td>
+<td>no interruption downstream of UPS; mechanical loads per design</td>
+<td>unplanned trips</td>
+</tr>
+<tr>
+<td>S12</td>
+<td>Emergency power off (EPO) of hall DH3, test mode with load banks only</td>
+<td>EPO opens the hall circuits shown in the cause-and-effect (C&amp;E) matrix; alarms</td>
+<td>EPO circuit breaker states; time to open</td>
+<td>all listed breakers open ≤ 1 s; no breaker outside the list opens</td>
+<td>any breaker outside the list opens</td>
+</tr>
+<tr>
+<td>S13</td>
+<td>Maintenance mode A: A-side of hall isolated by MOP, then utility loss</td>
+<td>B side carries the full hall; generators start for B side</td>
+<td>B-side currents; temperatures</td>
+<td>no rack loss; B side within rating</td>
+<td>B side &gt; 100 %</td>
+</tr>
+<tr>
+<td>S14</td>
+<td>Maintenance mode B: mirror of S13</td>
+<td>as S13 for A side</td>
+<td>as S13</td>
+<td>as S13</td>
+<td>as S13</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-9-3"><span class="n">28.9.3</span>Mechanical and liquid cooling scenarios</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Scenario and trigger</th>
+<th>Expected response</th>
+<th>Measured quantities</th>
+<th>Pass criteria</th>
+<th>Abort criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S15</td>
+<td>CHW pump trip (duty pump P-CHW-02 tripped at its starter)</td>
+<td>standby pump starts; flow restored</td>
+<td>header flow; differential pressure (DP); pump start time</td>
+<td>flow ≥ 95 % of design within 30 s</td>
+<td>inlet &gt; 32 °C average</td>
+</tr>
+<tr>
+<td>S16</td>
+<td>CDU failover (CDU-DH3-07 power removed on both feeds)</td>
+<td>other CDUs in zone 2 raise flow; supply temperature held</td>
+<td>TCS flow per CDU; supply temperature; DP</td>
+<td>rack flow ≥ 139.2 L/min within 10 s; TCS peak ≤ 47 °C</td>
+<td>TCS &gt; 50 °C for 30 s; flow &lt; 50 % for 60 s</td>
+</tr>
+<tr>
+<td>S17</td>
+<td>Chiller fail (trim chiller CH-02 tripped at its panel)</td>
+<td>next chiller starts; buffer tank supplies during start</td>
+<td>chiller start time; CHW supply temperature</td>
+<td>CHW supply back to 18 ±0.5 °C within 15 min</td>
+<td>CHW &gt; 24 °C</td>
+</tr>
+<tr>
+<td>S18</td>
+<td>Dry cooler fan group failure (fan group DC-04 power off)</td>
+<td>remaining dry coolers raise fan speed; FWS held</td>
+<td>FWS supply temperature; fan speeds</td>
+<td>FWS supply ≤ 35 °C + 1 K at design ambient</td>
+<td>FWS &gt; 41 °C</td>
+</tr>
+<tr>
+<td>S19</td>
+<td>CRAH or fan wall unit failure (FW-DH3-03 off)</td>
+<td>other fan walls raise speed; pressure held</td>
+<td>hall differential pressure; inlet temperatures</td>
+<td>inlet ≤ 27 °C; DP within ±20 % of set point</td>
+<td>inlet &gt; 32 °C average</td>
+</tr>
+<tr>
+<td>S20</td>
+<td>Total cooling interruption ride-through at utility loss (part of S01)</td>
+<td>thermal storage and UPS-fed pumps keep cooling</td>
+<td>inlet and TCS temperatures; tank outlet temperature</td>
+<td>inlet ≤ 27 °C; TCS ≤ 47 °C</td>
+<td>as S01</td>
+</tr>
+<tr>
+<td>S21</td>
+<td>Leak detection under rack row C (wet rope sensor wetted with 50 mL water in a tray)</td>
+<td>leak alarm with location; CDU isolation if programmed</td>
+<td>alarm time; location text; valve state</td>
+<td>alarm ≤ 10 s with correct zone; isolation per C&amp;E</td>
+<td>water outside tray</td>
+</tr>
+<tr>
+<td>S22</td>
+<td>TCS low-pressure event (CDU make-up isolated and loop drained 2 L at a test point)</td>
+<td>low-pressure alarm; make-up or pump protection</td>
+<td>loop pressure; alarm time</td>
+<td>alarm at set value; pumps protected</td>
+<td>pump cavitation noise or pressure &lt; 0.5 bar</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-9-4"><span class="n">28.9.4</span>Controls, network and fire scenarios</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Scenario and trigger</th>
+<th>Expected response</th>
+<th>Measured quantities</th>
+<th>Pass criteria</th>
+<th>Abort criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S23</td>
+<td>BMS server failure (primary BMS server powered off)</td>
+<td>standby server takes over; controllers keep running</td>
+<td>takeover time; trend gaps; alarm delivery</td>
+<td>takeover ≤ 60 s; no controller stops; trend gap ≤ takeover time</td>
+<td>any plant stops</td>
+</tr>
+<tr>
+<td>S24</td>
+<td>EPMS server failure (Power Monitoring Expert (PME) primary server stopped)</td>
+<td>standby or meters buffer data; no loss of SOE</td>
+<td>gap in data; SOE completeness</td>
+<td>no SOE event lost after recovery</td>
+<td>—</td>
+</tr>
+<tr>
+<td>S25</td>
+<td>Network ring break (fibre pulled between two BMS ring switches)</td>
+<td>ring heals; no controller offline</td>
+<td>recovery time; packet loss</td>
+<td>recovery inside the protocol value (chapter 26)</td>
+<td>controllers offline &gt; 60 s</td>
+</tr>
+<tr>
+<td>S26</td>
+<td>Controller failure (CDU zone controller power off)</td>
+<td>CDUs continue at last command or local control</td>
+<td>CDU states; flows</td>
+<td>no loss of cooling</td>
+<td>flow &lt; 50 %</td>
+</tr>
+<tr>
+<td>S27</td>
+<td>Fire alarm in hall DH3, one detector (smoke aerosol)</td>
+<td>pre-alarm or alarm per C&E; notification</td>
+<td>panel times; BMS alarm</td>
+<td>actions match C&amp;E within 10 s</td>
+<td>real smoke</td>
+</tr>
+<tr>
+<td>S28</td>
+<td>Fire alarm with pre-action release in DH3 (two detectors, double interlock)</td>
+<td>pre-action valve trips; pipe fills; C&amp;E actions</td>
+<td>trip time; water at test point; C&amp;E outputs</td>
+<td>all C&amp;E actions; water at test point within project value</td>
+<td>water outside the pipe network</td>
+</tr>
+<tr>
+<td>S29</td>
+<td>Loss of BMS and EPMS together during utility loss (both servers off, then S01)</td>
+<td>plant runs on local controllers; operator uses local panels</td>
+<td>plant states; EOP times</td>
+<td>no loss of load or cooling; EOP actions done in stated times</td>
+<td>as S01</td>
+</tr>
+<tr>
+<td>S30</td>
+<td>Black start: all utility and all generator start signals blocked for 60 s, then released</td>
+<td>UPS carries load on battery; generators start late and close</td>
+<td>battery state of charge; times</td>
+<td>no rack loss; battery above 30 %</td>
+<td>battery &lt; 30 %</td>
+</tr>
+</tbody>
+</table></div>
+<p>The library has 31 rows (S00 to S30). <mark>Every scenario has a stated abort value before the script is approved</mark>.</p>
+<h2 id="s28-10"><span class="n">28.10</span>IST programme for one hall</h2>
+
+<figure class="sheet" id="F28-1"><a href="../data/cx-handbook/figures/F28-1.svg" title="Open drawing F28-1 at full size"><img src="../data/cx-handbook/figures/F28-1.svg" alt="F28-1: IST day 2 for hall B2-DH3: utility loss, return to utility and generator scenarios" width="1400" height="774" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F28-1</span> — <b>IST day 2 for hall B2-DH3: utility loss, return to utility and generator scenarios</b>. Each bar is one activity; each mark is one event. A recovery period to thermal steady state separates two scenarios that use the same source.</figcaption></figure>
+<h3 id="s28-10-1"><span class="n">28.10.1</span>Five-day plan</h3>
+<p>In the MSC-1 worked example each hall has <mark>5 IST days</mark>, and the campus has 12 halls, so the campus needs <mark>60 IST windows</mark>. Figure <a class="figref" href="#F28-1">F28-1</a> shows the day plan for day 2.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Day</th>
+<th>Main activity</th>
+<th>Scenarios</th>
+<th>Load</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Day 1</td>
+<td>load step-up 25 to 100 %, stabilisation, baseline</td>
+<td>S00, S21, S22</td>
+<td>3.0 to 12.0 MW</td>
+</tr>
+<tr>
+<td>Day 2</td>
+<td>utility loss, return to utility, generator scenarios</td>
+<td>S01, S02, S20, S03, S04</td>
+<td>12.0 MW</td>
+</tr>
+<tr>
+<td>Day 3</td>
+<td>UPS scenarios, maintenance modes</td>
+<td>S05 to S10, S13, S14</td>
+<td>12.0 MW</td>
+</tr>
+<tr>
+<td>Day 4</td>
+<td>cooling scenarios and controls failures</td>
+<td>S15 to S19, S23 to S26, S29</td>
+<td>12.0 MW</td>
+</tr>
+<tr>
+<td>Day 5</td>
+<td>fire, EPO, MV ring, black start, repeats</td>
+<td>S11, S12, S27, S28, S30, repeats</td>
+<td>12.0 MW then 0</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-10-2"><span class="n">28.10.2</span>Day 2 timeline</h3>
+<ol>
+<li><strong>07:00 to 07:30.</strong> The safety officer gives the safety briefing and the electrical authorised person signs the team onto the permit. The test director runs the radio check and the controls lead records the time check of all instruments.</li>
+<li><strong>07:30 to 08:00.</strong> The load bank lead confirms that the load has been at 12.0 MW since the night before. The test director confirms that every lead is at his position for S01.</li>
+<li><strong>08:00 to 09:30.</strong> The test director runs S01 utility loss and S20 cooling ride-through on script IST-B2-DH3-S01. Hold point 1 is at 08:45 and T0, the trip of both incomers, is at 09:00, so the script steps at T0 + 30 min to T0 + 90 min fall in the next window.</li>
+<li><strong>09:30 to 10:30.</strong> The electrical lead runs the 30-minute utility stability timer from 09:30 and the S02 closed-transition retransfer at 10:00 (T0 + 60 min). Hold point 3 is at 10:30.</li>
+<li><strong>10:30 to 11:30.</strong> The mechanical lead reports thermal recovery to steady state. The controls lead downloads the data.</li>
+<li><strong>11:30 to 12:30.</strong> The test director runs S03 generator fail to start.</li>
+<li><strong>13:30 to 15:00.</strong> The test director runs S04 generator trip on load.</li>
+<li><strong>15:00 to 16:00.</strong> The system leads report recovery, and the CxA checks the baseline values against S00.</li>
+<li><strong>16:00 to 17:00.</strong> The test director holds the debrief. The CxA updates the issue log and issues the plan for day 3.</li>
+</ol>
+<p><strong>Check:</strong> <mark>two scenarios that use the same source are never run back to back</mark> without a recovery period. The recovery period ends when the steady-state test of 28.6.5 step 4 is met again.</p>
+<h2 id="s28-11"><span class="n">28.11</span>Script 1: utility loss at full load and return to utility (S01 and S02)</h2>
+<p><strong>Purpose:</strong> prove that the hall keeps all 100 racks powered and cooled when both 20 kV utility incomers of building B2 open at full load, and that it returns to utility without interruption.</p>
+<p><strong>Inputs:</strong> approved script IST-B2-DH3-S01 Rev C; switching programme SP-B2-IST-02; EOP-ELE-01; utility notification; S00 baseline passed.</p>
+<p>The initial conditions before step 1 are the following.</p>
+<ol>
+<li><strong>Electrical state.</strong> Both 20 kV incomers closed; generators in auto, off; all UPS blocks in double-conversion mode with batteries at 100 % state of charge.</li>
+<li><strong>Load.</strong> 12.0 MW IT load (9.6 MW liquid emulators, 2.4 MW air heaters), steady state for at least 4 hours.</li>
+<li><strong>Cooling.</strong> CHW supply 18 °C, FWS supply 35 °C, TCS supply 45 °C, all in auto.</li>
+<li><strong>Instruments.</strong> PQ analysers recording on all 16 UPS outputs and the generator bus; loggers at 10 s and 5 s; time check passed.</li>
+</ol>
+<p><strong>Steps:</strong></p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Time</th>
+<th>Role</th>
+<th>Action</th>
+<th>Expected result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>T0 − 15 min</td>
+<td>test director</td>
+<td>hold point 1: confirm load, loggers, positions</td>
+<td>all leads report ready</td>
+</tr>
+<tr>
+<td>2</td>
+<td>T0 − 5 min</td>
+<td>controls lead</td>
+<td>mark start of event on BMS and EPMS event logs</td>
+<td>marker logged</td>
+</tr>
+<tr>
+<td>3</td>
+<td>T0</td>
+<td>electrical lead</td>
+<td>open both incomers B2-MV-IN-1 and IN-2 by relay test trip</td>
+<td>incomers open; SOE events</td>
+</tr>
+<tr>
+<td>4</td>
+<td>T0 to T0 + 1 s</td>
+<td>electrical lead</td>
+<td>read UPS mode</td>
+<td>all 8 blocks on battery; no output gap</td>
+</tr>
+<tr>
+<td>5</td>
+<td>T0 + 15 s</td>
+<td>electrical lead</td>
+<td>read generator bus</td>
+<td><mark>generators synchronised, bus closed</mark></td>
+</tr>
+<tr>
+<td>6</td>
+<td>T0 + 30 s</td>
+<td>mechanical lead</td>
+<td>read pump and CDU states</td>
+<td>UPS-fed pumps ran through; others restarted</td>
+</tr>
+<tr>
+<td>7</td>
+<td>T0 + 5 min</td>
+<td>mechanical lead</td>
+<td>read chiller states</td>
+<td>trim chillers restarted after anti-recycle delay</td>
+</tr>
+<tr>
+<td>8</td>
+<td>T0 + 15 min</td>
+<td>test director</td>
+<td>hold point 2: read temperatures and battery state</td>
+<td>all inside pass values</td>
+</tr>
+<tr>
+<td>9</td>
+<td>T0 + 30 min</td>
+<td>test director</td>
+<td>instruct utility restore; start 30 min stability timer</td>
+<td>utility healthy at incomers</td>
+</tr>
+<tr>
+<td>10</td>
+<td>T0 + 60 min</td>
+<td>electrical lead</td>
+<td>closed-transition retransfer by the generator controls</td>
+<td><mark>parallel ≤ 100 ms</mark>; no interruption</td>
+</tr>
+<tr>
+<td>11</td>
+<td>T0 + 65 min</td>
+<td>electrical lead</td>
+<td>generators unload and run cool-down</td>
+<td>generators stop after cool-down (for example 5 min)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>T0 + 90 min</td>
+<td>test director</td>
+<td>hold point 3: all systems at initial conditions</td>
+<td>all auto modes restored</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Acceptance:</strong> the values in section 28.7.1 for continuity, UPS transient, generator time, temperatures, alarms and recovery.</p>
+<h3 id="s28-11-1"><span class="n">28.11.1</span>Filled record of S01 and S02</h3>
+<p><strong>Worked example:</strong> the filled S01 and S02 record of hall DH3 in the MSC-1 worked example (example values).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Measured quantity</th>
+<th>Acceptance</th>
+<th>Measured</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rack PDUs that lost power</td>
+<td>0</td>
+<td>0 of 200</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>UPS output voltage deviation at T0 (worst block A6)</td>
+<td>inside class 1 curve</td>
+<td>−2.1 % for 8 ms</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Generator first unit ready</td>
+<td>≤ 10 s</td>
+<td>7.8 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Generator bus closed to mechanical boards</td>
+<td>≤ 15 s</td>
+<td>12.4 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Building generator bus load after pickup</td>
+<td>per design 14.6 MW (12.0 MW × power usage effectiveness (PUE) 1.22)</td>
+<td>14.4 MW</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Bus frequency dip at mechanical pickup</td>
+<td>≤ 7 %</td>
+<td>4.6 % (47.7 Hz), recovered in 2.1 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>UPS battery state of charge lowest</td>
+<td>≥ 30 %</td>
+<td>98 % (battery for 12.4 s)</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Trim chiller restart</td>
+<td>≤ 5 min</td>
+<td>3 min 40 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Highest rack inlet temperature</td>
+<td>≤ 27 °C</td>
+<td>25.9 °C at T0 + 4 min</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Highest TCS supply temperature</td>
+<td>≤ 47 °C</td>
+<td>46.2 °C at T0 + 3 min</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Retransfer parallel time</td>
+<td>≤ 100 ms</td>
+<td>84 ms</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Unexpected priority 1 alarms</td>
+<td>0</td>
+<td>1 (CH-02 "low oil pressure" during restart)</td>
+<td>conditional pass, issue IST-DH3-014</td>
+</tr>
+</tbody>
+</table></div>
+<p>The battery time is the gap between T0 and the generator bus closing to the UPS input: 12.4 s. At full block load of 1.5 MW, 12.4 s uses 1.5 × 12.4 / 3,600 = 0.0052 MWh = 5.2 kWh. Against the battery screen value of 301 kWh this is about 2 % of the battery energy, which agrees with the 98 % lowest state of charge reported by the UPS. The UPS operation manual states how the UPS computes state of charge; check it before using the value as evidence.</p>
+<h3 id="s28-11-2"><span class="n">28.11.2</span>Common errors in S01</h3>
+<ol>
+<li><strong>Generator load test skipped.</strong> The utility loss is run before the generator plant passed its own block-load test; the generator then trips and the scenario is void.</li>
+<li><strong>Utility not informed.</strong> The 20 kV feeders are opened without notice and the utility protection logs a fault.</li>
+<li><strong>Retransfer by hand.</strong> The return to utility is made by operators with open transition, giving a second interruption to non-UPS loads.</li>
+<li><strong>Load banks without restart delay.</strong> All load banks drop on their own undervoltage and return together, so the generator sees a step that the design never planned.</li>
+</ol>
+<h2 id="s28-12"><span class="n">28.12</span>Script 2: CDU failover in zone 2 (S16)</h2>
+<p><strong>Purpose:</strong> prove that when one CDU of the four in zone 2 is lost, the remaining three keep every rack at or above design flow and the TCS supply temperature below the pass value.</p>
+<p><strong>Inputs:</strong> script IST-B2-DH3-S16 Rev C; CDU sequence of operation; CDU vendor present.</p>
+<p>In the MSC-1 worked example, zone 2 has 25 racks and 2.4 MW of liquid load, served by 4 CDUs of 1.0 MW. Each rack needs 139.2 L/min, so the zone needs 25 × 139.2 = 3,480 L/min (58.0 L/s). With 4 CDUs each one delivers <mark>14.5 L/s at 0.6 MW</mark>. After the loss of one CDU, each of the remaining three must deliver <mark>19.3 L/s at 0.8 MW</mark>, which is inside the 1.0 MW rating.</p>
+<p><strong>Steps:</strong></p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Time</th>
+<th>Role</th>
+<th>Action</th>
+<th>Expected result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>T0 − 10 min</td>
+<td>test director</td>
+<td>hold point 1: zone 2 at 2.4 MW, steady state</td>
+<td>TCS 45 ±1 °C; 4 CDUs at about 14.5 L/s each</td>
+</tr>
+<tr>
+<td>2</td>
+<td>T0</td>
+<td>electrical lead</td>
+<td>open both supply breakers of CDU-DH3-07</td>
+<td>CDU-07 pumps stop; check valve closes</td>
+</tr>
+<tr>
+<td>3</td>
+<td>T0 to T0 + 10 s</td>
+<td>mechanical lead</td>
+<td>read CDU-05, 06, 08 flow</td>
+<td>each rises to about 19.3 L/s</td>
+</tr>
+<tr>
+<td>4</td>
+<td>T0 + 60 s</td>
+<td>controls lead</td>
+<td>read BMS alarms</td>
+<td>"CDU-07 power fail" priority 2; no rack low-flow alarm</td>
+</tr>
+<tr>
+<td>5</td>
+<td>T0 + 15 min</td>
+<td>test director</td>
+<td>hold point 2: read supply temperature and rack flows</td>
+<td>inside pass values</td>
+</tr>
+<tr>
+<td>6</td>
+<td>T0 + 20 min</td>
+<td>electrical lead</td>
+<td>close CDU-07 breakers</td>
+<td>CDU-07 restarts and rejoins in auto</td>
+</tr>
+<tr>
+<td>7</td>
+<td>T0 + 35 min</td>
+<td>test director</td>
+<td>hold point 3: zone back to 4 CDUs</td>
+<td>flows balanced within ±10 %</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-12-1"><span class="n">28.12.1</span>Filled record of S16</h3>
+<p><strong>Worked example:</strong> S16 record for zone 2 of hall DH3 (example values).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Measured quantity</th>
+<th>Acceptance</th>
+<th>Measured</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time for remaining CDUs to reach new flow</td>
+<td>≤ 10 s</td>
+<td>6.5 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Lowest rack flow after 10 s</td>
+<td>≥ 139.2 L/min</td>
+<td>141.0 L/min (rack R-DH3-C11)</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Zone total flow after failover</td>
+<td>≥ 58.0 L/s</td>
+<td>58.6 L/s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Peak TCS supply temperature</td>
+<td>≤ 47 °C</td>
+<td>46.4 °C at T0 + 50 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Secondary DP at the farthest rack</td>
+<td>≥ design minimum (for example 0.8 bar)</td>
+<td>0.86 bar</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>CDU-05, 06, 08 heat load</td>
+<td>≤ 1.0 MW each</td>
+<td>0.79, 0.81, 0.80 MW</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Alarms</td>
+<td>"CDU-07 power fail" only</td>
+<td>as expected</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>CDU-07 return to auto</td>
+<td>without manual reset</td>
+<td>needed manual reset at the human-machine interface (HMI)</td>
+<td>fail, issue IST-DH3-022</td>
+</tr>
+</tbody>
+</table></div>
+<p>The heat in each CDU is Q = ρ × c × V × ΔT. For CDU-06: 0.990 kg/L × 4.18 kJ/(kg·K) × 19.5 L/s × 10.0 K = 807 kW, which agrees with the <mark>0.81 MW recorded</mark>. A value far from the calculation points to a flow meter or temperature sensor error, and the CxA checks the instrument before accepting the result.</p>
+<h2 id="s28-13"><span class="n">28.13</span>Script 3: fire alarm with pre-action release in hall DH3 (S28)</h2>
+<p><strong>Purpose:</strong> prove that a confirmed fire alarm in DH3 operates the pre-action system and every output in the C&amp;E matrix, and that the power and cooling of the hall respond as the C&amp;E matrix states.</p>
+<p><strong>Inputs:</strong> script IST-B2-DH3-S28 Rev C; C&amp;E matrix CE-B2-DH3 Rev 4 (chapter 20); fire contractor and the authority having jurisdiction (AHJ) witness where required; drainage plan for the water.</p>
+<p><strong>Steps:</strong></p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Time</th>
+<th>Role</th>
+<th>Action</th>
+<th>Expected result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>T0 − 15 min</td>
+<td>safety officer</td>
+<td>confirm fire brigade notified of test; fire watch posted</td>
+<td>notification logged</td>
+</tr>
+<tr>
+<td>2</td>
+<td>T0 − 10 min</td>
+<td>fire lead</td>
+<td>confirm pre-action panel normal; air pressure in pipe network</td>
+<td>panel normal</td>
+</tr>
+<tr>
+<td>3</td>
+<td>T0</td>
+<td>fire lead</td>
+<td>apply test aerosol to detector DH3-SD-104</td>
+<td>first alarm (pre-alarm) at panel</td>
+</tr>
+<tr>
+<td>4</td>
+<td>T0 + 60 s</td>
+<td>fire lead</td>
+<td>apply test aerosol to detector DH3-SD-117</td>
+<td>second alarm; release of pre-action valve</td>
+</tr>
+<tr>
+<td>5</td>
+<td>T0 + 60 s to + 70 s</td>
+<td>controls lead</td>
+<td>read C&amp;E outputs at BMS</td>
+<td>outputs per matrix</td>
+</tr>
+<tr>
+<td>6</td>
+<td>T0 + 2 min</td>
+<td>fire lead</td>
+<td>read water arrival at the inspector test point</td>
+<td>water flowing</td>
+</tr>
+<tr>
+<td>7</td>
+<td>T0 + 5 min</td>
+<td>test director</td>
+<td>hold point 2: confirm power and cooling state of the hall per C&amp;E</td>
+<td>load banks remain on unless the matrix shows a trip</td>
+</tr>
+<tr>
+<td>8</td>
+<td>T0 + 10 min</td>
+<td>fire lead</td>
+<td>close valve, drain, reset panel</td>
+<td>panel normal; pipe network drained</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-13-1"><span class="n">28.13.1</span>Filled record of S28</h3>
+<p><strong>Worked example:</strong> S28 record (example values).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Measured quantity</th>
+<th>Acceptance</th>
+<th>Measured</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time first detector to alarm at panel</td>
+<td>≤ 10 s</td>
+<td>6 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Time second detector to valve release</td>
+<td>≤ 10 s</td>
+<td>4 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Water at inspector test point after release</td>
+<td>project value from the fire design (for example ≤ 60 s; the fire design states the limit for the hazard under NFPA 13)</td>
+<td>48 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>C&amp;E outputs operated</td>
+<td>14 of 14</td>
+<td>14 of 14</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Outputs operated that are not in the C&amp;E</td>
+<td>0</td>
+<td>1 (fan wall FW-DH3-02 stopped)</td>
+<td>fail, issue IST-DH3-031</td>
+</tr>
+<tr>
+<td>BMS alarm text and priority</td>
+<td>per alarm matrix</td>
+<td>correct</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Hall IT load kept</td>
+<td>12.0 MW (no EPO in C&amp;E)</td>
+<td>12.0 MW</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Highest rack inlet during event</td>
+<td>≤ 27 °C</td>
+<td>27.6 °C (row B, after FW-02 stopped)</td>
+<td>fail, same issue</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s28-14"><span class="n">28.14</span>Results analysis</h2>
+
+<figure class="sheet" id="F28-3"><a href="../data/cx-handbook/figures/F28-3.svg" title="Open drawing F28-3 at full size"><img src="../data/cx-handbook/figures/F28-3.svg" alt="F28-3: Power and temperature trends during S01 utility loss in hall B2-DH3 (example data)" width="1400" height="944" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F28-3</span> — <b>Power and temperature trends during S01 utility loss in hall B2-DH3 (example data)</b>. Upper plot in seconds from T0 shows the power transfer; lower plot in minutes shows the thermal response while the trim chillers restart.</figcaption></figure>
+<h3 id="s28-14-1"><span class="n">28.14.1</span>Plots that every scenario report contains</h3>
+<ol>
+<li><strong>Power trend.</strong> UPS output kW per block and generator bus kW over the scenario window (Figure <a class="figref" href="#F28-3">F28-3</a>).</li>
+<li><strong>Voltage and frequency trend.</strong> Bus voltage and frequency at 200 ms values, with the event markers.</li>
+<li><strong>Temperature trend.</strong> Highest, mean and lowest rack inlet temperature and TCS supply temperature.</li>
+<li><strong>Event sequence.</strong> SOE events in time order with offsets from T0.</li>
+<li><strong>Alarm list.</strong> All alarms from BMS and EPMS between T0 − 1 min and T0 + 30 min.</li>
+</ol>
+<h3 id="s28-14-2"><span class="n">28.14.2</span>Calculations</h3>
+<ol>
+<li><strong>Rate of rise of inlet temperature.</strong> Take the steepest 10-minute slope of the highest rack inlet. In S01 the inlet rose from 24.2 to 25.9 °C in 4 minutes: 0.43 K per minute, which is 25.5 K per hour for the 4-minute interval. The CxA checks two limits. The change in any hour was 1.7 K, against the <mark>20 °C per hour</mark> limit. The change in any 15 minutes was also 1.7 K, against the 5 °C limit. Both pass against footnote f of ASHRAE Thermal Guidelines 4th edition, 2015 (confirm that the 5th edition, 2021, keeps the footnote unchanged).</li>
+<li><strong>Thermal ride-through margin.</strong> Margin = (pass limit − peak) / (pass limit − initial). For TCS in S01: (47.0 − 46.2) / (47.0 − 45.0) = 0.4, so <mark>40 % of the allowed rise remains</mark>.</li>
+<li><strong>Generator load check.</strong> Bus kW divided by the number of units on the bus and by unit rating: 14.4 MW / (6 × 2.88 MW) = 83 % per unit for the six units serving the hall (example).</li>
+<li><strong>Heat balance.</strong> Electrical IT load against heat removed by the CDUs and air handlers. The difference must be <mark>within 5 % at steady state</mark>; a larger difference points to a wrong meter or to heat going to the room.</li>
+</ol>
+<p><strong>Worked example:</strong> heat balance in S00. Load bank log: 12.02 MW. EPMS UPS outputs: 12.10 MW. CDU heat sum: 9.58 MW. Air side heat from air flow and ΔT: 168.5 m³/s × 1.16 kg/m³ × 1.006 kJ/(kg·K) × 12.4 K = 2.44 MW. Total heat removed 12.02 MW, equal to the load bank value within 0.1 %, so the instruments are consistent.</p>
+<h3 id="s28-14-3"><span class="n">28.14.3</span>Result analysis steps</h3>
+<ol>
+<li><strong>Download.</strong> The controls lead downloads all logger, PQ and system data within 2 hours of the scenario.</li>
+<li><strong>Align.</strong> The CxA <mark>aligns all data to the GPS time</mark> and marks T0.</li>
+<li><strong>Compare.</strong> The CxA compares each measured value with its acceptance value and fills the result column.</li>
+<li><strong>Explain.</strong> Every fail and every unexpected value has a cause statement, even when the scenario passed.</li>
+<li><strong>Review.</strong> The designer and the system leads review the results within 2 working days.</li>
+</ol>
+<h2 id="s28-15"><span class="n">28.15</span>Reporting</h2>
+<h3 id="s28-15-1"><span class="n">28.15.1</span>IST report contents</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Summary</td>
+<td>hall, dates, scenarios run, passed, failed, conditional, void</td>
+</tr>
+<tr>
+<td>2 Entry gate</td>
+<td>gate certificate and open rows</td>
+</tr>
+<tr>
+<td>3 Instruments</td>
+<td>instrument register, calibration certificates, time check records</td>
+</tr>
+<tr>
+<td>4 Load</td>
+<td>load bank layout and load logs</td>
+</tr>
+<tr>
+<td>5 Scenario results</td>
+<td>one section per scenario: script, filled record, plots, issues</td>
+</tr>
+<tr>
+<td>6 Issue log</td>
+<td>all IST issues with priority, owner and status</td>
+</tr>
+<tr>
+<td>7 Deviations</td>
+<td>accepted deviations with signatures</td>
+</tr>
+<tr>
+<td>8 Lessons</td>
+<td>changes to EOPs, MOPs, sequences and settings</td>
+</tr>
+<tr>
+<td>9 Sign-off</td>
+<td>test director, CxA, owner, designer</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s28-15-2"><span class="n">28.15.2</span>Report timing</h3>
+<ol>
+<li><strong>Daily report.</strong> The CxA issues it <mark>by 09:00 the next morning</mark> with the scenarios run, the results and the issues raised.</li>
+<li><strong>Draft IST report.</strong> The CxA issues it <mark>within 10 working days</mark> of the last IST day.</li>
+<li><strong>Final IST report.</strong> The CxA issues it within 5 working days after the comments, with all category A issues closed and retests recorded.</li>
+</ol>
+<h3 id="s28-15-3"><span class="n">28.15.3</span>Issue log fields for IST</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Issue number</td>
+<td>text</td>
+<td>IST-DH3-031</td>
+</tr>
+<tr>
+<td>Scenario</td>
+<td>text</td>
+<td>S28</td>
+</tr>
+<tr>
+<td>Description</td>
+<td>text</td>
+<td>fan wall FW-DH3-02 stopped on fire alarm; not in C&amp;E matrix</td>
+</tr>
+<tr>
+<td>Category</td>
+<td>A, B, C (section 09.9.1)</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>role</td>
+<td>BMS contractor</td>
+</tr>
+<tr>
+<td>Cause</td>
+<td>text</td>
+<td>wrong fire relay input mapped to FW-02 run enable</td>
+</tr>
+<tr>
+<td>Corrective action</td>
+<td>text</td>
+<td>correct mapping; retest S28</td>
+</tr>
+<tr>
+<td>Due date</td>
+<td>date</td>
+<td>2026-11-24</td>
+</tr>
+<tr>
+<td>Retest record</td>
+<td>text</td>
+<td>IST-B2-DH3-S28 Rev C retest 1</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>text</td>
+<td>open</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>A failed scenario is closed only by a retest record</mark>, and the retest uses the same script and the same acceptance values.</p>
+<h2 id="s28-16"><span class="n">28.16</span>Common errors in IST</h2>
+<ol>
+<li><strong>Testing at part load.</strong> The IST is run at 50 % load to save load bank rental. Breaker settings and cooling limits are then unproven at design load.</li>
+<li><strong>Too short a stabilisation.</strong> The first scenario starts 30 minutes after the load reaches 100 %. The thermal mass is not at steady state and the temperature rise looks smaller than it is.</li>
+<li><strong>Instruments without time sync.</strong> The PQ analyser clock is 3 s off the SOE clock, and the sequence of events cannot be read.</li>
+<li><strong>Scripts written from the specification only.</strong> The scripts miss the vendor settings, such as anti-recycle timers, that decide the result.</li>
+<li><strong>No abort values.</strong> The team argues during the event about whether to stop.</li>
+<li><strong>Too many people operating.</strong> Two persons operate the same panel at the same time without the test director's call.</li>
+<li><strong>Missing recovery period.</strong> Scenario S04 starts while the batteries are still recharging after S01, so the battery margin in S04 is wrong.</li>
+<li><strong>No baseline.</strong> Without S00 the report cannot show what changed during an event.</li>
+<li><strong>Data lost.</strong> Logger memory fills on day 3 because the interval was set to 1 s for all channels.</li>
+<li><strong>Owner operations kept out.</strong> Operators watch from outside; the EOPs are never tried on live plant.</li>
+</ol>
+<h2 id="s28-17"><span class="n">28.17</span>Checklist for site use</h2>
+<ol>
+<li><strong>Gate certificate.</strong> The IST entry certificate is signed with all 16 prerequisite rows closed or accepted.</li>
+<li><strong>Scripts approved.</strong> Every scenario script is at the approved revision, with abort values.</li>
+<li><strong>Dry run done.</strong> The test director and leads walked every script at the panels.</li>
+<li><strong>Permits.</strong> The permit to work and switching programme for the day are approved.</li>
+<li><strong>Utility notice.</strong> The utility has written notice of the planned incomer operations.</li>
+<li><strong>Load banks.</strong> All load banks passed the 25 % check and run at the set load with logs.</li>
+<li><strong>Steady state.</strong> Inlet change &lt; 0.5 K and TCS change &lt; 0.3 K in 30 minutes before the first event.</li>
+<li><strong>Instruments.</strong> All channels recording; calibration certificates in the register; time check passed.</li>
+<li><strong>Radios.</strong> Channel 1 and channel 2 checked; repeat-back rule briefed.</li>
+<li><strong>Safety.</strong> Safety briefing held; fire watch posted; first aid in place.</li>
+<li><strong>Roles.</strong> Every role in the roles table is filled by a named person.</li>
+<li><strong>Recovery.</strong> The recovery steps for each scenario are in the script.</li>
+<li><strong>Download.</strong> Data downloaded and copied to two locations after each scenario.</li>
+<li><strong>Daily report.</strong> Issued by 09:00 the next day.</li>
+<li><strong>Issues.</strong> Every fail is in the issue log with a retest plan.</li>
+<li><strong>Final report.</strong> Issued with all category A issues closed by retest records.</li>
+</ol>
+<h2 id="s28-18"><span class="n">28.18</span>Sources</h2>
+<ol>
+<li>ANSI/ASHRAE/IES Standard 202-2024, The Commissioning Process Requirements for New Buildings and New Systems. ASHRAE, 2024. <a href="https://webstore.ansi.org/standards/ashrae/ansiashraeies2022024" rel="noopener">https://webstore.ansi.org/standards/ashrae/ansiashraeies2022024</a></li>
+<li>ASHRAE Guideline 0-2019, The Commissioning Process. ASHRAE, 2019. <a href="https://www.ashrae.org/technical-resources/bookstore/commissioning" rel="noopener">https://www.ashrae.org/technical-resources/bookstore/commissioning</a></li>
+<li>ASHRAE, Principles of Building Commissioning: ASHRAE Guideline 0 and Standard 202 (course page). <a href="https://www.ashrae.org/professional-development/all-instructor-led-training/catalog-of-instructor-led-training/principles-of-building-commissioning-ashrae-guideline-0-and-standard-202" rel="noopener">https://www.ashrae.org/professional-development/all-instructor-led-training/catalog-of-instructor-led-training/principles-of-building-commissioning-ashrae-guideline-0-and-standard-202</a></li>
+<li>ASHRAE TC 9.9, Thermal Guidelines for Data Processing Environments, 5th edition, reference card. ASHRAE, 2021. <a href="https://www.ashrae.org/file%20library/technical%20resources/bookstore/supplemental%20files/therm-gdlns-5th-r-e-refcard.pdf" rel="noopener">https://www.ashrae.org/file%20library/technical%20resources/bookstore/supplemental%20files/therm-gdlns-5th-r-e-refcard.pdf</a></li>
+<li>Uptime Institute, Tier Standard: Topology and Tier Standard: Operational Sustainability. Uptime Institute. <a href="https://uptimeinstitute.com/tiers" rel="noopener">https://uptimeinstitute.com/tiers</a></li>
+<li>BICSI DCDC study guide, 16.3 Level 5 Integrated Systems Testing, Black Start, and Operational Turnover. Open Exam Prep, accessed 2026. <a href="https://open-exam-prep.com/study-guides/bicsi-dcdc/ch16-commissioning-ist/sec03-level5-ist-turnover" rel="noopener">https://open-exam-prep.com/study-guides/bicsi-dcdc/ch16-commissioning-ist/sec03-level5-ist-turnover</a></li>
+<li>Aggreko, IST case study for a new data centre in Indonesia. Aggreko, 2021. <a href="https://bynder.aggreko.com/m/2b6cc6c1db1b8623/original/AGK_3605_CS_DC_IST-for-New-data-Centre-Indonesia_2021.pdf" rel="noopener">https://bynder.aggreko.com/m/2b6cc6c1db1b8623/original/AGK_3605_CS_DC_IST-for-New-data-Centre-Indonesia_2021.pdf</a></li>
+<li>Aggreko, Load bank and commissioning for data centres (white paper). Aggreko, 2020. <a href="https://bynder.aggreko.com/m/34acbfd3f0f96433/original/AGK5006-1_loadbank-and-commissioning-for-data-centres_whitepaper_global_Apr2020-pdf.pdf" rel="noopener">https://bynder.aggreko.com/m/34acbfd3f0f96433/original/AGK5006-1_loadbank-and-commissioning-for-data-centres_whitepaper_global_Apr2020-pdf.pdf</a></li>
+<li>Schneider Electric, White Paper 148, Data Center Projects: Commissioning, Rev 1. Schneider Electric. <a href="https://download.schneider-electric.com/doc/SPD_DBOY-6NJNK6_EN/DBOY-6NJNK6_R1_EN.pdf" rel="noopener">https://download.schneider-electric.com/doc/SPD_DBOY-6NJNK6_EN/DBOY-6NJNK6_R1_EN.pdf</a></li>
+<li>NFPA, An Overview of NFPA 110. NFPA, 2023. <a href="https://www.nfpa.org/news-blogs-and-articles/blogs/2023/01/23/an-overview-of-nfpa-110" rel="noopener">https://www.nfpa.org/news-blogs-and-articles/blogs/2023/01/23/an-overview-of-nfpa-110</a></li>
+<li>Kohler Power Systems, Understanding NFPA 110 (white paper). Kohler. <a href="https://resources.kohler.com/power/kohler/industrial/pdf/NFPA110_Whitepaper.pdf" rel="noopener">https://resources.kohler.com/power/kohler/industrial/pdf/NFPA110_Whitepaper.pdf</a></li>
+<li>Avtron Power Solutions, Testing Diesel Gen-sets to ISO 8528. Avtron. <a href="https://avtronpower.com/resources/articles/testing-diesel-gen-sets-to-iso8528/" rel="noopener">https://avtronpower.com/resources/articles/testing-diesel-gen-sets-to-iso8528/</a></li>
+<li>Cummins, ISO 8528-5 performance class summary. Cummins. <a href="https://mart.cummins.com/imagelibrary/data/assetfiles/0058623.pdf" rel="noopener">https://mart.cummins.com/imagelibrary/data/assetfiles/0058623.pdf</a></li>
+<li>Fluke, What does the IEC 61000-4-30 Class A standard mean to me. Fluke. <a href="https://www.fluke.com/en-gb/learn/blog/power-quality/what-does-the-iec-61000-4-30-class-a-standard-mean-to-me" rel="noopener">https://www.fluke.com/en-gb/learn/blog/power-quality/what-does-the-iec-61000-4-30-class-a-standard-mean-to-me</a></li>
+<li>Schneider Electric, Technical Note 7EN72-0185-12, IEC 61000-4-30 compliance and ION meters, 2018. <a href="https://econtent.adhq.com/dam/Original/79/Schneider_Electric_S7650A0C0B6A0A0A_User_Manual.pdf" rel="noopener">https://econtent.adhq.com/dam/Original/79/Schneider_Electric_S7650A0C0B6A0A0A_User_Manual.pdf</a></li>
+<li>Schneider Electric, White Paper 1, The Different Types of UPS Systems (IEC 62040-3 classification). <a href="https://download.schneider-electric.com/doc/SPD_SADE-5TNM3Y_EN/WP1_V10_EN.pdf" rel="noopener">https://download.schneider-electric.com/doc/SPD_SADE-5TNM3Y_EN/WP1_V10_EN.pdf</a></li>
+<li>DatacenterDynamics, Exploring static UPS systems. <a href="https://www.datacenterdynamics.com/en/analysis/exploring-static-ups-systems/" rel="noopener">https://www.datacenterdynamics.com/en/analysis/exploring-static-ups-systems/</a></li>
+<li>Power Monitors Inc., CBEMA and ITIC curves (white paper). <a href="https://powermonitors.com/whitepapers/cbema-and-itic-curves/" rel="noopener">https://powermonitors.com/whitepapers/cbema-and-itic-curves/</a></li>
+<li>TC Direct, Thermocouple accuracies (IEC 60584-1 tolerances). <a href="https://www.tcdirect.co.uk/thermocouple-sensors/thermocouple-accuracies.aspx" rel="noopener">https://www.tcdirect.co.uk/thermocouple-sensors/thermocouple-accuracies.aspx</a></li>
+<li>WIKA, Data sheet IN 00.23, Application of thermocouples. <a href="https://www.wika.com/media/Technical-information/English/ds_in0023_en_co.pdf" rel="noopener">https://www.wika.com/media/Technical-information/English/ds_in0023_en_co.pdf</a></li>
+<li>Dataknox, Eight stages of data center commissioning. <a href="https://www.dataknox.io/blog/eight-stages-of-data-center-commissioning-breakdown" rel="noopener">https://www.dataknox.io/blog/eight-stages-of-data-center-commissioning-breakdown</a></li>
+<li>Archdesk, Data center commissioning levels. <a href="https://archdesk.com/blog/data-center-commissioning-levels" rel="noopener">https://archdesk.com/blog/data-center-commissioning-levels</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="27-dcim-cmms-security-cybersecurity.html"><span>Previous · 27</span><span class="t">DCIM, CMMS, security and access control, and OT cybersecurity</span></a><a class="next" href="29-issue-library.html"><span>Next · 29</span><span class="t">Issue library</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

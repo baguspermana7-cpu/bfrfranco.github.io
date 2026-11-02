@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02 The commissioning process | Cx Field Manual R01</title>
+<meta name="description" content="This chapter explains the commissioning process on a hyperscale data-centre campus from the first design review to the end of the first year of operation.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/02-commissioning-process-levels-roles.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/02-commissioning-process-levels-roles.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/02-commissioning-process-levels-roles.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/02-commissioning-process-levels-roles.html">
+<meta property="og:title" content="02 The commissioning process | Cx Field Manual R01">
+<meta property="og:description" content="This chapter explains the commissioning process on a hyperscale data-centre campus from the first design review to the end of the first year of operation.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="02 The commissioning process | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter explains the commissioning process on a hyperscale data-centre campus from the first design review to the end of the first year of operation.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"02 The commissioning process: phases, levels L0 to L5, roles and responsibilities","name":"The commissioning process: phases, levels L0 to L5, roles and responsibilities","description":"This chapter explains the commissioning process on a hyperscale data-centre campus from the first design review to the end of the first year of operation.","url":"https://resistancezero.com/cx-handbook/02-commissioning-process-levels-roles.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/02-commissioning-process-levels-roles.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":10139,"position":2,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"02 The commissioning process","item":"https://resistancezero.com/cx-handbook/02-commissioning-process-levels-roles.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part A · Commissioning foundations</p>
+    <h1><span class="num">02</span>The commissioning process: phases, levels L0 to L5, roles and responsibilities</h1>
+    <p class="lede">This chapter explains the commissioning process on a hyperscale data-centre campus from the first design review to the end of the first year of operation.</p>
+    <p class="basis">Chapter 02 of 32 · 17 sections · 8 figures · 10,139 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 02</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 02</summary>
+<ol><li><a href="#s02-0"><span class="n">02.0</span>Scope of this chapter</a></li><li><a href="#s02-1"><span class="n">02.1</span>What commissioning is and why a data centre needs it</a><ol><li><a href="#s02-1-1"><span class="n">02.1.1</span>Definition</a></li><li><a href="#s02-1-2"><span class="n">02.1.2</span>Why the data-centre process is deeper</a></li></ol></li><li><a href="#s02-2"><span class="n">02.2</span>Project phases and their commissioning activities</a><ol><li><a href="#s02-2-1"><span class="n">02.2.1</span>The phases of ASHRAE Guideline 0-2019</a></li><li><a href="#s02-2-2"><span class="n">02.2.2</span>Pre-design phase in detail</a></li><li><a href="#s02-2-3"><span class="n">02.2.3</span>Design phase in detail</a></li><li><a href="#s02-2-4"><span class="n">02.2.4</span>Construction phase in detail</a></li><li><a href="#s02-2-5"><span class="n">02.2.5</span>Acceptance phase in detail</a></li><li><a href="#s02-2-6"><span class="n">02.2.6</span>Occupancy and operations phase in detail</a></li></ol></li><li><a href="#s02-3"><span class="n">02.3</span>Commissioning levels L0 to L6: who defines what</a><ol><li><a href="#s02-3-1"><span class="n">02.3.1</span>Sources of level definitions</a></li><li><a href="#s02-3-2"><span class="n">02.3.2</span>Level definitions used in this manual</a></li><li><a href="#s02-3-3"><span class="n">02.3.3</span>Level entry and exit criteria</a></li></ol></li><li><a href="#s02-4"><span class="n">02.4</span>Each level in detail</a><ol><li><a href="#s02-4-1"><span class="n">02.4.1</span>Level 0: design and planning review</a></li><li><a href="#s02-4-2"><span class="n">02.4.2</span>Level 1: factory acceptance test</a></li><li><a href="#s02-4-3"><span class="n">02.4.3</span>Level 2: delivery and installation inspection</a></li><li><a href="#s02-4-4"><span class="n">02.4.4</span>Level 3: start-up and pre-functional checks</a></li><li><a href="#s02-4-5"><span class="n">02.4.5</span>Level 4: functional performance test</a></li><li><a href="#s02-4-6"><span class="n">02.4.6</span>Level 5: integrated systems test</a></li><li><a href="#s02-4-7"><span class="n">02.4.7</span>Level 6: turnover and occupancy</a></li><li><a href="#s02-4-8"><span class="n">02.4.8</span>Typical durations per level and system</a></li></ol></li><li><a href="#s02-5"><span class="n">02.5</span>Gates between levels</a><ol><li><a href="#s02-5-1"><span class="n">02.5.1</span>What a gate is</a></li><li><a href="#s02-5-2"><span class="n">02.5.2</span>Gate review procedure</a></li><li><a href="#s02-5-3"><span class="n">02.5.3</span>Gate record fields</a></li><li><a href="#s02-5-4"><span class="n">02.5.4</span>Issue categories that affect gates</a></li></ol></li><li><a href="#s02-6"><span class="n">02.6</span>Colour tag practice</a><ol><li><a href="#s02-6-1"><span class="n">02.6.1</span>What the tags are</a></li><li><a href="#s02-6-2"><span class="n">02.6.2</span>Rules for tags</a></li></ol></li><li><a href="#s02-7"><span class="n">02.7</span>Level ladders by system</a><ol><li><a href="#s02-7-1"><span class="n">02.7.1</span>UPS ladder</a></li><li><a href="#s02-7-2"><span class="n">02.7.2</span>Chiller ladder</a></li><li><a href="#s02-7-3"><span class="n">02.7.3</span>CRAH ladder</a></li><li><a href="#s02-7-4"><span class="n">02.7.4</span>BMS ladder</a></li><li><a href="#s02-7-5"><span class="n">02.7.5</span>EPMS ladder</a></li><li><a href="#s02-7-6"><span class="n">02.7.6</span>Fire systems ladder</a></li></ol></li><li><a href="#s02-8"><span class="n">02.8</span>Roles and responsibilities</a><ol><li><a href="#s02-8-1"><span class="n">02.8.1</span>Role descriptions</a></li><li><a href="#s02-8-2"><span class="n">02.8.2</span>Rules on independence and authority</a></li></ol></li><li><a href="#s02-9"><span class="n">02.9</span>RACI per level</a></li><li><a href="#s02-10"><span class="n">02.10</span>RACI per document</a></li><li><a href="#s02-11"><span class="n">02.11</span>Delivery models: lease, build, OFCI and CFCI</a><ol><li><a href="#s02-11-1"><span class="n">02.11.1</span>Lease and build</a></li><li><a href="#s02-11-2"><span class="n">02.11.2</span>OFCI and CFCI</a></li></ol></li><li><a href="#s02-12"><span class="n">02.12</span>Campus sequencing and energisation</a><ol><li><a href="#s02-12-1"><span class="n">02.12.1</span>The MSC-1 campus</a></li><li><a href="#s02-12-2"><span class="n">02.12.2</span>Dependencies between levels and energisation</a></li><li><a href="#s02-12-3"><span class="n">02.12.3</span>Campus sequencing table</a></li></ol></li><li><a href="#s02-13"><span class="n">02.13</span>Process KPIs</a></li><li><a href="#s02-14"><span class="n">02.14</span>Common errors in the commissioning process</a></li><li><a href="#s02-15"><span class="n">02.15</span>Checklist for site use</a></li><li><a href="#s02-16"><span class="n">02.16</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="01-reference-library.html"><span>Previous</span>01 Commissioning reference library</a><a href="03-commissioning-documents.html"><span>Next</span>03 Commissioning documents</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s02-0"><span class="n">02.0</span>Scope of this chapter</h2>
+<p>This chapter explains the commissioning process on a hyperscale data-centre campus from the first design review to the end of the first year of operation. It defines the project phases and the commissioning levels Level 0 (L0) to Level 5 (L5), with Level 6 (L6) where a project uses it. It also defines the gates between levels, the tag colours, the roles and the responsibility matrices. It ends with the differences between a leased and a self-built facility and with the sequencing of a multi-building campus.</p>
+<ol>
+<li><strong>Purpose of commissioning.</strong> What commissioning is, what it verifies and why a data centre needs a deeper process than an office building.</li>
+<li><strong>Project phases.</strong> The four phases of ASHRAE Guideline 0-2019 and the acceptance phase used in older and data-centre models, with the activities and deliverables of each.</li>
+<li><strong>Commissioning levels.</strong> Definitions of L0 to L6, who publishes each definition, entry and exit criteria, durations, performers, witnesses and records.</li>
+<li><strong>Gates and tags.</strong> The gate review between levels and the colour tag practice.</li>
+<li><strong>Level ladders by system.</strong> Worked ladders for the uninterruptible power supply (UPS), chiller, computer room air handler (CRAH), building management system (BMS), electrical power monitoring system (EPMS) and fire systems.</li>
+<li><strong>Roles.</strong> Owner commissioning manager (CxM), commissioning authority or provider (CxA), engineer of record (EoR), general contractor (GC), mechanical, electrical and plumbing (MEP) subcontractors, original equipment manufacturers (OEM). The roles also include the controls integrator, testing, adjusting and balancing (TAB) contractor, electrical testing company and data-centre operations (DCOps). The chapter also covers environment, health and safety (EHS), quality assurance and quality control (QA/QC), and the authorities: PLN (the state electricity company), the accredited technical inspection body (LIT) and the fire authority.</li>
+<li><strong>Responsibility matrices.</strong> Responsible, accountable, consulted, informed (RACI) matrices per level and per document.</li>
+<li><strong>Delivery models and campus sequencing.</strong> Lease versus build, owner-furnished and contractor-furnished equipment, and the sequencing of four buildings with shared plant and energisation.</li>
+</ol>
+<p>Documents and sources used: ASHRAE Guideline 0-2019 and Standard 202-2024 (through the 2020 ASHRAE course), the International Facility Management Association (IFMA) Facility Management Journal (FMJ) article on the Level 0 to 6 data-centre framework (NEBB, August 2026). The chapter also uses the Uptime Institute Journal article on mission-critical commissioning and the CxPlanner description of tag colours. It also uses the Archdesk level gate tables, chapter 04 and chapter 22 of this manual, research notes RF-02 and RN-04, and the MSC-1 case ledger.</p>
+<h2 id="s02-1"><span class="n">02.1</span>What commissioning is and why a data centre needs it</h2>
+<h3 id="s02-1-1"><span class="n">02.1.1</span>Definition</h3>
+<p>ASHRAE Guideline 0 describes commissioning as a quality-focused process for achieving, validating and documenting that a facility and its systems meet the owner's project requirements (OPR). The ASHRAE course on Guideline 0 and Standard 202 names three elements of the process: communication, documentation and verification (source 1). All three begin in pre-design and continue to occupancy.</p>
+<p>On a data-centre campus, commissioning verifies four things.</p>
+<ol>
+<li><strong>Installation.</strong> Each item is the approved item, undamaged, installed as drawn and connected correctly.</li>
+<li><strong>Function.</strong> Each item and each system performs its functions, including alarms, interlocks and failure responses.</li>
+<li><strong>Performance.</strong> Each system delivers its capacity and efficiency at design load and at design ambient conditions.</li>
+<li><strong>Integration and resilience.</strong> All systems together carry the critical load through every normal operation, maintenance operation and single failure that the design claims to tolerate.</li>
+</ol>
+<h3 id="s02-1-2"><span class="n">02.1.2</span>Why the data-centre process is deeper</h3>
+<p>The IFMA article written by NEBB contrasts a traditional four-phase commissioning model (design, construction, acceptance, warranty and occupancy) with a data-centre model of Levels 0 to 6. It states that the data-centre model "adds explicit readiness gates, QA/QC artifacts, and multi-party witnessing". The data-centre model progresses from factory to site, from components to systems and finally to fully integrated facility testing under normal and failure scenarios (source 2). Uptime Institute states that the rigour of data-centre commissioning has little relationship to the Tier level and that representative testing should not be accepted for mission-critical systems (source 3).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Office building commissioning</th>
+<th>Hyperscale data-centre commissioning</th>
+<th>What the CxM does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Structure</td>
+<td>Phases</td>
+<td>Phases and levels L0 to L5 or L6 with gates</td>
+<td>Write the levels and gates into the Cx plan (section 02.3)</td>
+</tr>
+<tr>
+<td>Sampling</td>
+<td>5 % to 10 % sampling recommended by ASHRAE for verification</td>
+<td><mark>100 % of critical power and cooling components at L3 to L5</mark>; sampling only for non-critical L2 items</td>
+<td>State 100 % testing of critical items in the Cx plan</td>
+</tr>
+<tr>
+<td>Load</td>
+<td>Building load at handover</td>
+<td>Load banks or heater skids at 100 % design IT load, for example 12 MW per hall in the MSC-1 worked example</td>
+<td>Book load banks or heater skids for the full design IT load</td>
+</tr>
+<tr>
+<td>Failure tests</td>
+<td>Few</td>
+<td>Every single failure that the topology claims to tolerate, tested at load</td>
+<td>List every claimed single failure as an L5 scenario</td>
+</tr>
+<tr>
+<td>Witnesses</td>
+<td>Commissioning provider</td>
+<td>Owner CxM, CxA, EoR, OEM, operations team, and certification body where used</td>
+<td>Name each witness party in the Cx plan</td>
+</tr>
+<tr>
+<td>Records</td>
+<td>Checklists and test forms</td>
+<td>Signed scripts with measured values, trend files, power quality files and photos per step</td>
+<td>Accept only scripts with measured values and the attached files</td>
+</tr>
+<tr>
+<td>Duration</td>
+<td>Weeks</td>
+<td>Months per building; <mark>5 integrated systems test (IST) days per hall in the MSC-1 worked example</mark></td>
+<td>Programme months per building and 5 IST days per hall</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s02-2"><span class="n">02.2</span>Project phases and their commissioning activities</h2>
+
+<figure class="sheet" id="F02-1"><a href="../data/cx-handbook/figures/F02-1.svg" title="Open drawing F02-1 at full size"><img src="../data/cx-handbook/figures/F02-1.svg" alt="F02-1: Project phases and the commissioning deliverables of each phase" width="1400" height="606" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F02-1</span> — <b>Project phases and the commissioning deliverables of each phase</b>. Each box is a phase with the levels it contains; the table lists the deliverables that close the phase.</figcaption></figure>
+<h3 id="s02-2-1"><span class="n">02.2.1</span>The phases of ASHRAE Guideline 0-2019</h3>
+<p>Guideline 0-2019 is organised by the phases of the building acquisition process: pre-design, design, construction, and occupancy and operations (source 1). The older four-phase model described by NEBB uses design, construction, acceptance, and warranty and occupancy (source 2). This manual uses five phases so that the acceptance work of a data centre (L4 and L5) is visible on its own. Figure <a class="figref" href="#F02-1">F02-1</a> shows the phases with their main deliverables.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Commissioning objective (Guideline 0-2019)</th>
+<th>Main activities</th>
+<th>Deliverables at exit</th>
+<th>Levels</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pre-design</td>
+<td>Start the process: OPR, scope, budget, team</td>
+<td>Hire the CxA; set Cx scope and budget; draft Cx plan; write OPR; put Cx duties in design contracts; set issues log and systems manual format</td>
+<td>Accepted OPR; Cx plan draft; Cx scope and budget; design checklists</td>
+<td>L0 starts</td>
+</tr>
+<tr>
+<td>Design</td>
+<td>Verify design decisions and prepare for construction</td>
+<td>Verify the basis of design (BOD); OPR-based design reviews; write Cx specification; draft construction checklists and test procedures; define training requirements; update OPR and Cx plan</td>
+<td>Design review logs closed; Cx specification in tender; draft checklists and scripts; training requirements</td>
+<td>L0</td>
+</tr>
+<tr>
+<td>Construction</td>
+<td>Verify that construction meets the OPR and prepare for handover</td>
+<td>Submittal verification; factory acceptance test (FAT); delivery inspection; installation checklists; start-up; finalise scripts; implement training; prepare systems manual</td>
+<td>Signed L1, L2 and L3 records; issues log with no open item that blocks L4</td>
+<td>L1, L2, L3</td>
+</tr>
+<tr>
+<td>Acceptance</td>
+<td>Prove function, performance and resilience</td>
+<td>Functional performance tests per system; integrated systems test per hall and per building; certification demonstrations</td>
+<td>Signed L4 and L5 records; Cx report per hall; owner acceptance</td>
+<td>L4, L5</td>
+</tr>
+<tr>
+<td>Occupancy and operations</td>
+<td>Close out and confirm operation</td>
+<td>Seasonal and deferred tests; training verification; lessons-learned workshop; final Cx process report; warranty review about one year after occupancy</td>
+<td>Final Cx report; lessons-learned log; systems manual accepted</td>
+<td>L6 where used</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s02-2-2"><span class="n">02.2.2</span>Pre-design phase in detail</h3>
+<p><strong>Purpose:</strong> Set the requirements, the scope and the team before design starts.</p>
+<p><strong>Owner:</strong> Owner project director, with the owner CxM.</p>
+<p><strong>Trigger:</strong> Approval of the project or the campus phase.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Appoint the CxM and the CxA.</strong> The owner appoints its commissioning manager and, where used, a third-party CxA. ASHRAE recommends a commissioning provider with actual and perceived independence (source 1). <mark>Allow 20 working days for the CxA tender</mark>.</li>
+<li><strong>Set the Cx scope.</strong> List the systems to be commissioned: medium-voltage (MV) and low-voltage (LV) power, generators, UPS, batteries, mechanical plant, air and liquid cooling, fire, BMS, EPMS, operational technology (OT) network, security, data-centre infrastructure management (DCIM) interfaces and the building enclosure.</li>
+<li><strong>Set the budget.</strong> Include CxA fees, load banks, heater skids, fuel for generator tests, temporary chillers if any, instruments and the operations team's time.</li>
+<li><strong>Write the OPR.</strong> The owner and the Cx team write the OPR with verifiable benchmarks (chapter 03). Allow 15 working days for the first draft and 5 working days for owner review.</li>
+<li><strong>Write the Cx plan draft.</strong> The CxM writes the first Cx plan: scope, team, schedule for design activities, outline of later phases (chapter 03).</li>
+<li><strong>Put Cx duties in design contracts.</strong> The design services contracts state the EoR's Cx duties: BOD, response time to design review comments, sequence of operations, attendance at L4 and L5.</li>
+<li><strong>Set the issues log and systems manual formats.</strong> The issues log fields and the systems manual structure are fixed now so that they are used from the first design review.</li>
+<li><strong>Collect lessons learned.</strong> Review the lessons-learned log of the previous building or campus.</li>
+</ol>
+<p><strong>Records:</strong> Accepted OPR revision 0; Cx plan revision 0; CxA appointment letter; design contract Cx clauses.</p>
+<h3 id="s02-2-3"><span class="n">02.2.3</span>Design phase in detail</h3>
+<p><strong>Purpose:</strong> Verify that the design can deliver the OPR, and put commissioning into the construction documents.</p>
+<p><strong>Owner:</strong> CxM, with the EoR.</p>
+<p><strong>Trigger:</strong> Issue of the concept design (or the 30 % design package).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Review the BOD.</strong> Check that the BOD records the codes, the redundancy, the load assumptions, the climate data (in the MSC-1 worked example, 34.0 °C dry bulb and 27.5 °C wet bulb), the control sequences and the equipment basis.</li>
+<li><strong>Review the design at 30 %, 60 %, 90 % and issued for construction.</strong> Each review checks the design against the OPR. <mark>Return comments within 10 working days (chapter 06</mark> gives the comment log).</li>
+<li><strong>Write the Cx specification.</strong> The CxM writes or reviews section 01 91 13 and the discipline Cx sections (23 08 00, 26 08 00, 28 08 00). These sections put the contractor's duties, the witness notice period and the retest cost into the tender.</li>
+<li><strong>Draft the checklists and scripts.</strong> L2 and L3 checklist templates and L4 script outlines are drafted from the design. They are finalised in construction from the approved submittals.</li>
+<li><strong>Define training.</strong> The training requirements are written into the specifications: audience, outcome, duration and verification.</li>
+<li><strong>Update the OPR and the Cx plan.</strong> Changes in the owner's needs are recorded in the OPR with a revision.</li>
+<li><strong>Track deviations.</strong> Every design item that does not meet the OPR is an issue in the issues log.</li>
+</ol>
+<p><strong>Records:</strong> Design review comment logs; Cx specification sections; checklist and script templates; updated OPR and Cx plan.</p>
+<h3 id="s02-2-4"><span class="n">02.2.4</span>Construction phase in detail</h3>
+<p><strong>Purpose:</strong> Verify that the equipment and the installation meet the contract documents and the OPR, and bring every system to the point where it can be tested at function level.</p>
+<figure class="sheet" id="F02-8"><a href="../data/cx-handbook/figures/F02-8.svg" title="Open drawing F02-8 at full size"><img src="../data/cx-handbook/figures/F02-8.svg" alt="F02-8: Commissioning activities of the design and construction phases in order" width="1000" height="749" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F02-8</span> — <b>Commissioning activities of the design and construction phases in order</b>. The upper row is the design phase (CxM with the EoR); the lower row is the construction phase from contract award (GC for the work, CxM for the verification).</figcaption></figure>
+
+<p><strong>Owner:</strong> GC for the work; CxM for the verification.</p>
+<p><strong>Trigger:</strong> Contract award.</p>
+<p>Figure <a class="figref" href="#F02-8">F02-8</a> shows the design and construction activities in order, with the person who does each step and the record it produces.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Verify submittals.</strong> The Cx team reviews the submittals of commissioned systems against the OPR and the specification and records issues (chapter 06).</li>
+<li><strong>Witness factory tests (L1).</strong> The OEM runs the approved FAT procedure; the CxM or CxA witnesses (section 02.4.2).</li>
+<li><strong>Inspect deliveries (L2A).</strong> The GC and the CxA inspect each delivery for damage and completeness.</li>
+<li><strong>Inspect the installation (L2B).</strong> The contractor completes installation checklists; the CxA verifies.</li>
+<li><strong>Start up the equipment (L3).</strong> The OEM starts each item; the contractor completes pre-functional checklists; the CxA witnesses.</li>
+<li><strong>Finalise scripts.</strong> L4 and L5 scripts are finalised from the approved submittals and the final sequence of operations. Uptime Institute states that the EoR should give the CxA a finalised sequence of operations so that the CxA can write the L4 and L5 scripts (source 3).</li>
+<li><strong>Prepare the systems manual and training.</strong> The contractor and the designers assemble the systems manual; the training plan is implemented.</li>
+</ol>
+<p><strong>Records:</strong> Signed L1, L2 and L3 records; submittal review records; issues log.</p>
+<h3 id="s02-2-5"><span class="n">02.2.5</span>Acceptance phase in detail</h3>
+<p><strong>Purpose:</strong> Prove function, performance and resilience at design load before the owner accepts the hall.</p>
+<p><strong>Owner:</strong> CxM.</p>
+<p><strong>Trigger:</strong> L3 complete for the systems in the test scope with no open issue that blocks L4.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Run L4 functional performance tests.</strong> Each system is tested against its script at defined loads.</li>
+<li><strong>Run L5 integrated systems tests.</strong> All systems in the hall are tested together under normal and failure scenarios (chapter 28).</li>
+<li><strong>Hold certification demonstrations.</strong> Where the owner seeks Uptime Tier Certification of Constructed Facility, the demonstrations take place after construction of critical systems. Uptime states the visit is 3 to 5 days, a little more than one month after critical systems construction ends (source 4).</li>
+<li><strong>Issue the Cx report per hall.</strong> The Cx report lists the results, open issues and deferred tests.</li>
+<li><strong>Obtain owner acceptance.</strong> The owner accepts the hall for IT installation, with or without a list of agreed open items.</li>
+</ol>
+<p><strong>Records:</strong> Signed L4 scripts; L5 IST records; Cx report; owner acceptance certificate.</p>
+<h3 id="s02-2-6"><span class="n">02.2.6</span>Occupancy and operations phase in detail</h3>
+<p><strong>Purpose:</strong> Complete deferred and seasonal tests, confirm operation and close out the process.</p>
+<p><strong>Owner:</strong> CxM until the final report; then DCOps.</p>
+<p><strong>Trigger:</strong> Owner acceptance of the hall.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Run deferred tests.</strong> Tests that could not be done before handover (for example tests at full IT load once the tenant IT is installed) are run and recorded.</li>
+<li><strong>Run seasonal tests.</strong> ASHRAE lists seasonal and deferred testing in this phase (source 1). In Jakarta <mark>there is no cold season</mark>. The seasonal test runs in the high wet-bulb and dry-bulb period, the hottest months of the dry season. Take the months from the Indonesian meteorology agency (BMKG) Jakarta station data used for the BOD design conditions.</li>
+<li><strong>Verify training.</strong> The operations team demonstrates the procedures that it was trained on.</li>
+<li><strong>Hold a lessons-learned workshop.</strong> The Cx team records the lessons in the lessons-learned log for the next building.</li>
+<li><strong>Issue the final Cx process report.</strong> The CxM issues the report; the owner accepts it.</li>
+<li><strong>Review before warranty expiry.</strong> The ASHRAE course states that ongoing commissioning extends about a year into occupancy, at the expiry of major equipment warranties (source 1).</li>
+</ol>
+<p><strong>Records:</strong> Deferred and seasonal test records; training verification records; lessons-learned log; final Cx process report.</p>
+<h2 id="s02-3"><span class="n">02.3</span>Commissioning levels L0 to L6: who defines what</h2>
+<h3 id="s02-3-1"><span class="n">02.3.1</span>Sources of level definitions</h3>
+<p><mark>There is no single published standard for commissioning levels</mark>. ASHRAE Guideline 0 is organised by phase and does not number levels. Uptime Institute states that organisations define levels differently, that some activities fit a different level on a given project, and that a complete programme includes all five levels (source 3). The table lists the definitions found in this research.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Publisher</th>
+<th>Levels</th>
+<th>Definition used</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uptime Institute Journal</td>
+<td>1 to 5</td>
+<td>L1 factory, L2 site acceptance and installation checks, L3 start-up and component checks, L4 functional and load bank tests, L5 integrated systems test</td>
+<td>States that numbering varies by organisation</td>
+</tr>
+<tr>
+<td>IFMA FMJ article by NEBB (2026)</td>
+<td>0 to 6</td>
+<td>L0 design, planning and construction review; L1 procurement and factory witness testing; L2A site acceptance and L2B installation and pre-energisation; L3 start-up; L4 functional performance test (FPT); L5 integrated system test (IST); L6 turnover and occupancy</td>
+<td>Splits L2 into 2A and 2B</td>
+</tr>
+<tr>
+<td>CxPlanner</td>
+<td>1 to 5 with tag colours</td>
+<td>L1 red, L2 yellow, L3 green, L4 blue, L5 white</td>
+<td>Notes that some teams use L0 or levels up to L7</td>
+</tr>
+<tr>
+<td>Archdesk</td>
+<td>1 to 5</td>
+<td>Gate table with entry, tests, exit and witnesses per level</td>
+<td>States that level boundaries vary by specification</td>
+</tr>
+<tr>
+<td>Schneider Electric White Paper 148</td>
+<td>not numbered</td>
+<td>Component start-up followed by integrated commissioning; "as built" script report and component error log</td>
+<td>Describes the documents of integrated commissioning</td>
+</tr>
+<tr>
+<td>This manual</td>
+<td>0 to 5, with 6 where the project uses it</td>
+<td>As table 02.3.2</td>
+<td>Follows the project Cx plan when it differs</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> At the start of every project, the CxM writes the level definitions into the Cx plan and asks every contractor to confirm them in writing. <mark>A "Level 3" in one contractor's schedule can mean another contractor's Level 4</mark>.</p>
+<h3 id="s02-3-2"><span class="n">02.3.2</span>Level definitions used in this manual</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Name</th>
+<th>What is verified</th>
+<th>Typical location</th>
+<th>Ends with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Design and planning review</td>
+<td>OPR, BOD, design, Cx specification, scripts in draft</td>
+<td>Office</td>
+<td>Design review logs closed for the issued-for-construction package</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>Factory acceptance test (FAT)</td>
+<td>Each item of major equipment against its specification at the factory</td>
+<td>OEM factory</td>
+<td>Signed FAT report and shipping release</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Delivery and installation inspection (L2A delivery, L2B installation)</td>
+<td>Condition on arrival; installation quality; pre-energisation tests (torque, insulation resistance, pressure test, flushing)</td>
+<td>Site, de-energised</td>
+<td>Signed L2 checklist; red tag removed</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Start-up and pre-functional checks</td>
+<td>First energisation, OEM start-up, settings, point-to-point checks, calibration, TAB</td>
+<td>Site, energised item by item</td>
+<td>Signed L3 checklist; equipment ready for functional test</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Functional performance test (FPT)</td>
+<td>Each system's functions, sequences, alarms, failure responses and capacity at defined load</td>
+<td>Site, system level, with load banks</td>
+<td>Signed L4 script with measured values</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>Integrated systems test (IST)</td>
+<td>All systems together through normal, maintenance and failure scenarios at design load</td>
+<td>Site, hall or building</td>
+<td>Signed IST record and Cx report</td>
+</tr>
+<tr>
+<td>L6</td>
+<td>Turnover and occupancy (where used)</td>
+<td>Closeout, training, systems manual, deferred and seasonal tests, final report</td>
+<td>Site in operation</td>
+<td>Final Cx report accepted</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s02-3-3"><span class="n">02.3.3</span>Level entry and exit criteria</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Entry criteria</th>
+<th>Exit criteria</th>
+<th>Blocks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>OPR draft issued; design package issued for review</td>
+<td>All comments answered; OPR issues closed or accepted by owner</td>
+<td>Release of the package for tender or construction</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>FAT procedure approved by the CxA at least 10 working days before the test; calibrated instruments listed; witness dates confirmed</td>
+<td>Every FAT step passed or a deviation accepted in writing; shipping release signed</td>
+<td>Shipment of the equipment</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Equipment delivered; installation complete for the item; method statement approved; L1 issues closed or carried with owner acceptance</td>
+<td>Checklist complete and signed; pre-energisation tests passed; issues that block energisation closed</td>
+<td>First energisation of the item</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>L2 signed; energisation permit issued (chapter 10); OEM start-up engineer on site; settings file approved</td>
+<td>Start-up report signed by OEM; pre-functional checklist signed; points verified; no open issue that blocks L4</td>
+<td>L4 test of the system</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>L3 signed for every item in the system; L4 script at approved revision (no draft scripts); load banks connected; zero open critical issues on the system</td>
+<td>Every step passed; measured values recorded; retests closed; issues log updated</td>
+<td>L5 for the hall</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>L4 passed for every system in the hall with issues closed; IST script approved by owner and CxA; event logging enabled on UPS, switchgear, generators and BMS; fire detection active</td>
+<td>Every scenario passed; zero open critical issues; all other issues have a closure date</td>
+<td>Owner acceptance of the hall</td>
+</tr>
+<tr>
+<td>L6</td>
+<td>Owner acceptance of the hall</td>
+<td>Deferred and seasonal tests done; training verified; final report accepted</td>
+<td>Release of retention and end of the CxA contract</td>
+</tr>
+</tbody>
+</table></div>
+<p>The L4 entry rule "no draft scripts" and the L5 rule "event logging enabled on UPS, switchgear, generators and BMS" are taken from the Archdesk gate tables (source 6). The L5 prerequisite that <mark>all Level 4 testing has passed with issues closed</mark> is stated in the NEBB article (source 2).</p>
+<h2 id="s02-4"><span class="n">02.4</span>Each level in detail</h2>
+<h3 id="s02-4-1"><span class="n">02.4.1</span>Level 0: design and planning review</h3>
+<p><strong>Purpose:</strong> Find design faults before they are built, and prepare the commissioning documents.</p>
+<p><strong>Owner:</strong> CxM; reviewers from the CxA and the operations team.</p>
+<p><strong>Trigger:</strong> Issue of each design package.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Register the package.</strong> Log the package in the design review register with the date received. Start the 10 working day review clock.</li>
+<li><strong>Review against the OPR.</strong> Check each OPR requirement against the drawings, the specification and the BOD. Record each gap as a comment with the OPR clause.</li>
+<li><strong>Review for testability.</strong> Check that each system can be tested: test points, load bank connection points, isolation valves for testing, BMS points for every alarm in the script, metering for capacity tests.</li>
+<li><strong>Review for maintainability.</strong> Check that each item can be maintained without dropping the critical load, as the Tier objective requires.</li>
+<li><strong>Issue comments.</strong> Return the comment log within 10 working days.</li>
+<li><strong>Close comments.</strong> The EoR answers within 10 working days; the CxM closes or escalates each comment.</li>
+</ol>
+<p><strong>Records:</strong> Design review comment log with status per comment; OPR traceability matrix.</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>No load bank connection points.</strong> The design shows no load bank cabinets or connection points for the generator and UPS tests. A late finding costs weeks of temporary cabling.</li>
+<li><strong>Missing test isolation valves.</strong> A chiller cannot be isolated for a capacity test without draining a header.</li>
+</ol>
+<h3 id="s02-4-2"><span class="n">02.4.2</span>Level 1: factory acceptance test</h3>
+<p><strong>Purpose:</strong> Prove that each item of major equipment meets its specification before it leaves the factory.</p>
+<p><strong>Owner:</strong> OEM performs; CxM or CxA witnesses.</p>
+<p><strong>Trigger:</strong> Equipment ready for test at the factory; FAT procedure approved.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Approve the FAT procedure.</strong> The OEM submits the procedure at least 20 working days before the test. Uptime states that OEMs should provide the written test procedure for approval before L1 (source 3). The CxA returns comments within 5 working days.</li>
+<li><strong>Confirm the witnesses.</strong> Confirm witness names, travel and the test date at least 10 working days before. Archdesk recommends confirming owner witness dates at least 30 days ahead (source 6).</li>
+<li><strong>Check the instruments.</strong> At the start of the test, check the calibration certificate of each instrument against its serial number.</li>
+<li><strong>Witness the steps.</strong> Witness every step marked as a witness point. Witness every failure simulation; <mark>do not accept a report of a failure test that was not seen</mark>.</li>
+<li><strong>Record deviations.</strong> Record each failed step in the FAT punch list with a category.</li>
+<li><strong>Sign the report and the shipping release.</strong> <mark>The shipping release is signed only when all steps have passed</mark> or the deviations are accepted in writing by the owner.</li>
+</ol>
+<p><strong>Records:</strong> FAT procedure approved; FAT report signed; FAT punch list; shipping release; L1 tag.</p>
+<h3 id="s02-4-3"><span class="n">02.4.3</span>Level 2: delivery and installation inspection</h3>
+<p><strong>Purpose:</strong> Prove that the equipment arrived undamaged and was installed correctly before it is energised or filled.</p>
+<p><strong>Owner:</strong> Installing contractor performs; GC QA/QC verifies; CxA witnesses by sample or in full as the Cx plan states.</p>
+<p><strong>Trigger:</strong> Delivery (L2A); installation complete (L2B).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Inspect the delivery (L2A).</strong> Check the shipping indicators (shock and tilt indicators), packaging, nameplate data against the approved submittal, accessories and documents. Record within 1 working day of delivery.</li>
+<li><strong>Record the asset.</strong> Enter the asset tag, make, model and serial number in the asset register. Uptime states that asset data should be logged into the maintenance system on receipt (source 3).</li>
+<li><strong>Inspect the installation (L2B).</strong> Check location, levelling, fixings, clearances, labels, cable terminations, torque marks, earthing, pipe supports, valves and insulation against the drawings and the OEM manual.</li>
+<li><strong>Run the pre-energisation tests.</strong> Torque checks, insulation resistance, continuity, pressure tests and flushing as the checklist states. The NEBB article lists <mark>100 percent torque checks, megger and continuity, pressure testing, flush and fill</mark> in L2B (source 2).</li>
+<li><strong>Sign the checklist.</strong> The installing contractor signs; the GC QA/QC signs; the CxA signs the items it witnessed.</li>
+</ol>
+<p><strong>Records:</strong> L2A delivery checklist; L2B installation checklist; test sheets; photos; L2 tag.</p>
+<h3 id="s02-4-4"><span class="n">02.4.4</span>Level 3: start-up and pre-functional checks</h3>
+<p><strong>Purpose:</strong> Energise or start each item, set it up and prove that each component works on its own.</p>
+<p><strong>Owner:</strong> OEM performs start-up; contractor performs pre-functional checks; CxA witnesses.</p>
+<p><strong>Trigger:</strong> L2 signed; energisation permit issued.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Issue the energisation permit.</strong> The permit to work and energisation procedure of chapter 10 apply.</li>
+<li><strong>Energise or start.</strong> The OEM start-up engineer starts the item using the OEM start-up procedure.</li>
+<li><strong>Apply settings.</strong> Load the approved settings file (protection settings, control setpoints, network addresses) and record the file version.</li>
+<li><strong>Check points.</strong> Verify every BMS and EPMS point of the item point to point (chapters 22 and 24).</li>
+<li><strong>Calibrate sensors and stroke actuators.</strong> Record the as-found and as-left values.</li>
+<li><strong>Run TAB.</strong> The TAB contractor balances air and water systems. NEBB lists TAB at 100 percent water side and air side in L3 (source 2).</li>
+<li><strong>Sign the start-up report and the pre-functional checklist.</strong> The OEM start-up engineer signs the start-up report. The contractor and the CxA sign the pre-functional checklist.</li>
+</ol>
+<p><strong>Records:</strong> OEM start-up report; settings file record; point-to-point sheets; calibration records; TAB report; L3 tag.</p>
+<h3 id="s02-4-5"><span class="n">02.4.5</span>Level 4: functional performance test</h3>
+<p><strong>Purpose:</strong> Prove each system's functions, sequences, alarms, failure responses and capacity at defined loads.</p>
+<figure class="sheet" id="F02-6"><a href="../data/cx-handbook/figures/F02-6.svg" title="Open drawing F02-6 at full size"><img src="../data/cx-handbook/figures/F02-6.svg" alt="F02-6: Level 4 test day: run order and the decision after a failed step" width="1000" height="939" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F02-6</span> — <b>Level 4 test day: run order and the decision after a failed step</b>. The left column is the normal run order. The right column is the path after a failed step; the issue category decides whether the script continues.</figcaption></figure>
+
+<p><strong>Owner:</strong> CxA or CxM writes and directs the script; contractor and OEM operate the equipment; owner operations witness.</p>
+<p><strong>Trigger:</strong> L3 signed for every item in the system; script approved.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Hold the pre-test meeting.</strong> Confirm the script revision, the permits, the load banks, the instruments, the roles and the stop criteria. Allow 30 minutes on the test day.</li>
+<li><strong>Run the script steps in order.</strong> Record the measured value, the time and the result for each step.</li>
+<li><strong>Stop on a failure.</strong> On a failed step, stop, record the failure and raise the issue with its category (section 02.5.4). A category A failure ends the test. A category B failure lets the script continue only when the CxM and the EoR record that the later steps are not affected. Figure <a class="figref" href="#F02-6">F02-6</a> shows the run order and the action for each category.</li>
+<li><strong>Run load tests for the stated duration.</strong> Uptime recommends <mark>at least 8 hours continuous runtime</mark> for all load bank tests (source 3).</li>
+<li><strong>Sign the script.</strong> Contractor, OEM, CxA and owner witness sign the script on the day.</li>
+</ol>
+<p><strong>Records:</strong> Signed L4 script with measured values; trend files; power analyser files; issues raised; L4 tag.</p>
+<h3 id="s02-4-6"><span class="n">02.4.6</span>Level 5: integrated systems test</h3>
+<p><strong>Purpose:</strong> Prove that all systems of a hall or building work together through normal, maintenance and failure scenarios at design load.</p>
+<p><strong>Owner:</strong> CxM directs; CxA records; contractor, OEMs and operations operate.</p>
+<p><strong>Trigger:</strong> L4 passed for every system in the hall with issues closed.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Confirm readiness.</strong> Hold the IST readiness review 5 working days before the start (chapter 28 lists the readiness checklist).</li>
+<li><strong>Confirm the load.</strong> In the MSC-1 worked example a hall needs 12 MW of load: 9.6 MW of liquid heater skids and 2.4 MW of air heaters.</li>
+<li><strong>Run the scenarios.</strong> Run each scenario in the approved order with observers at the stated positions. Uptime recommends that <mark>fire detection and suppression stay active during L5</mark> and that equipment is isolated at the upstream breaker (source 3).</li>
+<li><strong>Record the results.</strong> Record the expected response, the actual response, the time stamps and the result for each scenario.</li>
+<li><strong>Restore and recover.</strong> Return the hall to normal between scenarios and confirm recovery to the stated conditions before the next scenario.</li>
+<li><strong>Sign the IST record.</strong> The CxM, the CxA, the GC and the DCOps lead sign the record at the end of the last IST day.</li>
+</ol>
+<p><strong>Records:</strong> IST record; event logs from UPS, switchgear, generators, BMS and EPMS; trend files; issues; L5 tag.</p>
+<h3 id="s02-4-7"><span class="n">02.4.7</span>Level 6: turnover and occupancy</h3>
+<p><strong>Purpose:</strong> Close out the commissioning of the hall and confirm operation in its first year.</p>
+<p><strong>Owner:</strong> CxM; DCOps receives.</p>
+<p><strong>Trigger:</strong> Owner acceptance.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Compile closeout records.</strong> Collect the L1 to L5 records into the commissioning record set.</li>
+<li><strong>Close or transfer issues.</strong> Close the issues log or transfer open items to the defects list with owners and dates.</li>
+<li><strong>Deliver training and the systems manual.</strong> The CxA verifies the training records and the systems manual content against the training plan and the systems manual outline.</li>
+<li><strong>Run deferred and seasonal tests.</strong> Record each test on its script with the measured values.</li>
+<li><strong>Hold the lessons-learned workshop and issue the final report.</strong> The CxM issues the final Cx report; the owner accepts it.</li>
+</ol>
+<p><strong>Records:</strong> Commissioning record set; final Cx report; lessons-learned log.</p>
+<h3 id="s02-4-8"><span class="n">02.4.8</span>Typical durations per level and system</h3>
+<p>The durations below are planning values for one MSC-1 hall (12 MW, 8 blocks of 2.5 MVA, 16 coolant distribution units (CDU)). They are examples for planning; the project programme governs.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>System</th>
+<th>L1 (per unit type)</th>
+<th>L2</th>
+<th>L3</th>
+<th>L4</th>
+<th>L5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MV switchgear, block transformers</td>
+<td>3 to 5 days</td>
+<td>10 days</td>
+<td>5 days</td>
+<td>3 days</td>
+<td>part of 5 IST days</td>
+</tr>
+<tr>
+<td>LV switchboards and busway</td>
+<td>2 to 3 days</td>
+<td>10 days</td>
+<td>5 days</td>
+<td>3 days</td>
+<td>part of 5 IST days</td>
+</tr>
+<tr>
+<td>Generators (17 per building)</td>
+<td>1 day per unit</td>
+<td>2 days per unit</td>
+<td>1 day per unit</td>
+<td>8 h load bank per unit plus 2 days parallel tests</td>
+<td>part of IST</td>
+</tr>
+<tr>
+<td>UPS (8 blocks per hall)</td>
+<td>2 days per type</td>
+<td>2 days per block</td>
+<td>1 day per block</td>
+<td>2 days per block</td>
+<td>part of IST</td>
+</tr>
+<tr>
+<td>Chillers and dry coolers</td>
+<td>2 days per type</td>
+<td>5 days</td>
+<td>3 days</td>
+<td>3 days</td>
+<td>part of IST</td>
+</tr>
+<tr>
+<td>CRAH and fan walls</td>
+<td>1 day per type</td>
+<td>5 days</td>
+<td>5 days</td>
+<td>3 days</td>
+<td>part of IST</td>
+</tr>
+<tr>
+<td>CDUs (16 per hall)</td>
+<td>1 day per type</td>
+<td>5 days</td>
+<td>5 days</td>
+<td>4 days</td>
+<td>part of IST</td>
+</tr>
+<tr>
+<td>BMS</td>
+<td>3 to 5 days per software package</td>
+<td>5 to 10 days</td>
+<td>10 to 15 days</td>
+<td>10 to 15 days</td>
+<td>part of IST</td>
+</tr>
+<tr>
+<td>EPMS</td>
+<td>2 to 3 days</td>
+<td>5 days</td>
+<td>10 days</td>
+<td>5 days</td>
+<td>part of IST</td>
+</tr>
+<tr>
+<td>Fire detection and suppression</td>
+<td>1 day per panel type</td>
+<td>10 days</td>
+<td>5 days</td>
+<td>5 days</td>
+<td>part of IST</td>
+</tr>
+</tbody>
+</table></div>
+<p>The BMS durations match table 22.1.2 of this manual.</p>
+<h2 id="s02-5"><span class="n">02.5</span>Gates between levels</h2>
+
+<figure class="sheet" id="F02-2"><a href="../data/cx-handbook/figures/F02-2.svg" title="Open drawing F02-2 at full size"><img src="../data/cx-handbook/figures/F02-2.svg" alt="F02-2: Level ladder L0 to L5 with the gate that closes each level" width="1400" height="780" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F02-2</span> — <b>Level ladder L0 to L5 with the gate that closes each level</b>. Read from bottom to top. The record named at each gate must be signed and filed in the CDE before the next level starts.</figcaption></figure>
+<h3 id="s02-5-1"><span class="n">02.5.1</span>What a gate is</h3>
+<p>A gate is a formal review at the end of a level that decides whether the next level may start. Figure <a class="figref" href="#F02-2">F02-2</a> shows the ladder with its gates. The gate is held for each item (L1 to L3) or for each system (L4) or for each hall (L5).</p>
+<h3 id="s02-5-2"><span class="n">02.5.2</span>Gate review procedure</h3>
+<p><strong>Purpose:</strong> Stop the next level from starting on equipment or systems that are not ready.</p>
+<p><strong>Owner:</strong> CxM chairs; CxA presents; GC, OEM and owner operations attend.</p>
+<p><strong>Trigger:</strong> The contractor requests the next level in writing.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Receive the request.</strong> The contractor submits the gate request with the list of records. The CxM logs it with the date.</li>
+<li><strong>Check the records.</strong> The CxA checks that every record named in the exit criteria is signed and filed in the common data environment (CDE). Allow 2 working days for an item gate and 3 working days for a system gate.</li>
+<li><strong>Check the issues log.</strong> List the open issues against the item or system. <mark>Any open critical issue blocks the gate</mark>.</li>
+<li><strong>Decide.</strong> The gate result is one of three: passed; passed with conditions (named issues with closure dates that do not affect the next level); or failed.</li>
+<li><strong>Record the decision.</strong> Record the decision, the conditions and the signatures in the gate record.</li>
+<li><strong>Change the tag.</strong> Where tags are used, the tag is changed only after the gate record is signed (section 02.6).</li>
+</ol>
+<p><strong>Records:</strong> Gate request; gate record with decision and conditions; updated tag log.</p>
+<h3 id="s02-5-3"><span class="n">02.5.3</span>Gate record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gate ID</td>
+<td>text</td>
+<td>GATE-L4-B2-DH3-UPS-A1</td>
+</tr>
+<tr>
+<td>Level completed</td>
+<td>choice L0 to L6</td>
+<td>L3</td>
+</tr>
+<tr>
+<td>Item or system</td>
+<td>asset tag or system code</td>
+<td>B2-DH3-UPS-A1</td>
+</tr>
+<tr>
+<td>Records checked</td>
+<td>list of record IDs</td>
+<td>ELE-L2-UPS-B2-DH3-A1-01 rev 0; ELE-L3-UPS-B2-DH3-A1-01 rev 0; OEM start-up report SU-4471</td>
+</tr>
+<tr>
+<td>Open issues</td>
+<td>list of issue IDs with category</td>
+<td>ISS-B2-1182 (C, label missing)</td>
+</tr>
+<tr>
+<td>Decision</td>
+<td>choice: passed, passed with conditions, failed</td>
+<td>passed with conditions</td>
+</tr>
+<tr>
+<td>Conditions</td>
+<td>text with closure dates</td>
+<td>ISS-B2-1182 closed by 2027-03-12</td>
+</tr>
+<tr>
+<td>Signed by</td>
+<td>names and roles</td>
+<td>CxM, CxA lead, GC Cx coordinator, DCOps lead</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>date</td>
+<td>2027-03-05</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s02-5-4"><span class="n">02.5.4</span>Issue categories that affect gates</h3>
+<p>The MSC-1 case ledger uses three issue categories with ageing limits (A 1 working day, B 7 working days, C 30 working days). Issues and punch items use this one scheme; section 09.8.2 gives the full definitions and section 09.9.1 states the rule. The table shows how each category affects a gate.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Meaning</th>
+<th>Ageing limit (MSC-1)</th>
+<th>Effect on the gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A (critical)</td>
+<td>Affects safety, the critical load, or the validity of the next test</td>
+<td>1 working day</td>
+<td>Blocks the gate</td>
+</tr>
+<tr>
+<td>B (major)</td>
+<td>Affects function or performance; the next test can run but the result may be affected</td>
+<td>7 working days</td>
+<td>Blocks the gate unless the CxM and EoR record that the next level is not affected</td>
+</tr>
+<tr>
+<td>C (minor)</td>
+<td>Does not affect function or the next test (labels, paint, documentation format)</td>
+<td>30 working days</td>
+<td>Does not block; listed as a condition</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s02-6"><span class="n">02.6</span>Colour tag practice</h2>
+
+<figure class="sheet" id="F02-4"><a href="../data/cx-handbook/figures/F02-4.svg" title="Open drawing F02-4 at full size"><img src="../data/cx-handbook/figures/F02-4.svg" alt="F02-4: Colour tag flow: red, yellow, green, blue and white tags and the gate that changes each" width="1400" height="674" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F02-4</span> — <b>Colour tag flow: red, yellow, green, blue and white tags and the gate that changes each</b>. Common scheme described by CxPlanner (L1 red to L5 white). The project Cx plan states the scheme; commissioning tags must look different from LOTO tags.</figcaption></figure>
+<h3 id="s02-6-1"><span class="n">02.6.1</span>What the tags are</h3>
+<p>Many data-centre projects hang a coloured tag on each item of equipment to show the last level it has passed. CxPlanner describes the common scheme (source 5). It is: Level 1 red tag (factory testing), Level 2 yellow tag (pre-installation), Level 3 green tag (pre-commissioning), Level 4 blue tag (functional performance testing) and Level 5 white tag (integrated systems testing). The colours are project practice. Some projects use the colours with different meanings, for example red for "not energised, do not operate". The Cx plan states the scheme. Figure <a class="figref" href="#F02-4">F02-4</a> shows the tag flow.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Hung when</th>
+<th>Meaning on site</th>
+<th>Who hangs it</th>
+<th>Who may remove it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Red</td>
+<td>L1 passed and the item is delivered</td>
+<td>Item passed FAT; not inspected on site; do not energise</td>
+<td>GC QA/QC on delivery</td>
+<td>CxA after L2 gate</td>
+</tr>
+<tr>
+<td>Yellow</td>
+<td>L2 passed</td>
+<td>Installed and inspected; pre-energisation tests passed; may be energised under permit</td>
+<td>CxA</td>
+<td>CxA after L3 gate</td>
+</tr>
+<tr>
+<td>Green</td>
+<td>L3 passed</td>
+<td>Started up and checked as a component; ready for functional test</td>
+<td>CxA</td>
+<td>CxA after L4 gate</td>
+</tr>
+<tr>
+<td>Blue</td>
+<td>L4 passed</td>
+<td>System passed functional test; ready for IST</td>
+<td>CxA</td>
+<td>CxM after L5 gate</td>
+</tr>
+<tr>
+<td>White</td>
+<td>L5 passed</td>
+<td>Passed IST; ready for owner acceptance</td>
+<td>CxM</td>
+<td>DCOps at handover</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s02-6-2"><span class="n">02.6.2</span>Rules for tags</h3>
+<ol>
+<li><strong>The tag follows the gate record.</strong> A tag is changed only after the gate record is signed. <mark>A tag without a gate record is a defect</mark>.</li>
+<li><strong>One tag per item.</strong> The new tag replaces the old one. Keep the removed tag in the item file or photograph it.</li>
+<li><strong>The tag carries data.</strong> Each tag shows the asset tag, the level, the gate ID, the date and the signature.</li>
+<li><strong>A tag is not a lock.</strong> <mark>A colour tag does not replace the lockout and tagout</mark> (LOTO) tags and locks of the permit system (chapter 10). The two must look different.</li>
+<li><strong>A failed retest moves the tag back.</strong> If a later test fails and the item is changed (for example a replaced controller board), <mark>the tag goes back to the level that must be repeated</mark>.</li>
+<li><strong>The tag log matches the CDE.</strong> A weekly walk-down compares a sample of 20 tags with the gate records.</li>
+</ol>
+<p><strong>Worked example:</strong> Tag check in hall B2-DH3. During the weekly walk-down on 18 March 2027 the CxA checks 20 tags in hall B2-DH3. Eighteen match the gate records. Two do not. CRAH B2-DH3-CRAH-14 has a blue tag but the gate record GATE-L4-B2-DH3-CRAH-14 is not signed, because the fan wall alarm test failed on 15 March. CDU B2-DH3-CDU-07 has a green tag but its controller board was replaced on 16 March after L4. The CxA moves <mark>CRAH-14 back to green and CDU-07 back to yellow</mark> (L3 must be repeated for the new board: settings, point-to-point checks of 30 points, and the start-up record). The CxA records both corrections in the tag log and raises issue ISS-B2-1240 (category B) for the tag process. The tag accuracy for the week is 18 of 20, <mark>90 %</mark>, below the 100 % target.</p>
+<h2 id="s02-7"><span class="n">02.7</span>Level ladders by system</h2>
+<p>The values are MSC-1 worked examples. The project scripts and OEM documents govern.</p>
+<h3 id="s02-7-1"><span class="n">02.7.1</span>UPS ladder</h3>
+<p><strong>Worked example:</strong> UPS ladder for block B2-DH3-A1 (2.5 MW UPS system, 5 min battery runtime at full load from the MSC-1 ledger).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Activity</th>
+<th>Performed by</th>
+<th>Witnessed by</th>
+<th>Duration</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Review UPS submittal, battery sizing (about 301 kWh screening value from the ledger for 2.5 MW for 5 min with margins), single-line, bypass arrangement, EPMS points</td>
+<td>EoR, CxM</td>
+<td>CxA</td>
+<td>10 working days</td>
+<td>Design review log DR-B2-UPS</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>FAT of UPS modules: insulation, functional checks, efficiency at 25, 50, 75 and 100 % load, transfer to bypass and back, step load 0 to 100 %, alarms</td>
+<td>OEM</td>
+<td>CxA, owner electrical lead</td>
+<td>2 days</td>
+<td>FAT report UPS-L1-FAT-B2-01</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Delivery check; installation, cable terminations, torque, insulation resistance (IR) of cables at 1,000 V DC, battery rack installation, earthing</td>
+<td>Electrical contractor</td>
+<td>CxA (witnesses a 10 % sample of the torque marks, which the contractor checks at 100 %; reviews all IR results)</td>
+<td>2 days</td>
+<td>ELE-L2-UPS-B2-DH3-A1-01</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>OEM start-up; battery string voltage and internal ohmic values; settings; alarm and EPMS point-to-point checks; L3 checklist (chapter 03)</td>
+<td>OEM, electrical contractor, EPMS contractor</td>
+<td>CxA</td>
+<td>1 day</td>
+<td>ELE-L3-UPS-B2-DH3-A1-01; OEM start-up report</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Load bank test at 100 % for 8 h; step loads; loss of input; return of input; transfer to static bypass and back; maintenance bypass; battery discharge to end voltage at full load; harmonics and efficiency</td>
+<td>OEM, electrical contractor, load bank supplier</td>
+<td>CxM, CxA, owner operations</td>
+<td>2 days</td>
+<td>UPS-L4-B2-DH3-A1-01</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>Loss of utility; generator start and transfer; UPS carries load on battery; return to utility</td>
+<td>CxM</td>
+<td>Owner, CxA, operations</td>
+<td>part of 5 IST days</td>
+<td>IST-B2-DH3 day 2</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s02-7-2"><span class="n">02.7.2</span>Chiller ladder</h3>
+<p><strong>Worked example:</strong> Chiller ladder for the building B2 air-hall chilled-water plant. The cold loop runs at 18 °C supply and 24 °C return with 5 chillers of 2.5 MW, 4 duty and 1 standby (example value). Chapter 18 sizes the warm-loop trim chiller plant.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Activity</th>
+<th>Performed by</th>
+<th>Witnessed by</th>
+<th>Duration</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Review chiller selection at 34.0 °C dry bulb design; staging sequence; flow limits; BMS points</td>
+<td>EoR, CxM</td>
+<td>CxA</td>
+<td>10 working days</td>
+<td>DR-B2-CHW</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>Factory performance test to AHRI 550/590 conditions: capacity, power, efficiency at 100, 75, 50 and 25 % load; safeties</td>
+<td>OEM</td>
+<td>CxA, owner mechanical lead</td>
+<td>2 days</td>
+<td>MEC-L1-FAT-CH-B2-01</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Delivery check; installation; vibration isolators; piping connections; pressure test of field piping; flushing per BSRIA BG 29; power cable IR</td>
+<td>Mechanical and electrical contractors</td>
+<td>CxA</td>
+<td>5 days</td>
+<td>MEC-L2-CH-B2-01 to -05</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>OEM start-up; refrigerant charge check; safeties; flow switch; sensor calibration; BMS point-to-point</td>
+<td>OEM, controls contractor</td>
+<td>CxA</td>
+<td>3 days</td>
+<td>MEC-L3-CH-B2-01 to -05</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Staging sequence test (20-step script in chapter 03); capacity test with heater load; restart after power loss; alarm tests</td>
+<td>Controls contractor, OEM, mechanical contractor</td>
+<td>CxM, CxA, operations</td>
+<td>3 days</td>
+<td>MEC-L4-CHW-B2-STG-01</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>Chiller trip during IST; restart after utility loss and generator transfer; recovery of chilled water supply temperature</td>
+<td>CxM</td>
+<td>Owner, CxA</td>
+<td>part of IST</td>
+<td>IST-B2 day 3</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s02-7-3"><span class="n">02.7.3</span>CRAH ladder</h3>
+<p><strong>Worked example:</strong> CRAH ladder for hall B2-DH3 (air load 2.4 MW per hall from the MSC-1 ledger).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Activity</th>
+<th>Performed by</th>
+<th>Witnessed by</th>
+<th>Duration</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Review airflow (168.5 m³/s per hall in the ledger), redundancy, fan control sequence, humidity limits from the ASHRAE Technical Committee (TC) 9.9 class</td>
+<td>EoR, CxM</td>
+<td>CxA</td>
+<td>10 working days</td>
+<td>DR-B2-AIR</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>FAT of first unit of each type: fan curve, coil capacity check, controller functions, alarms</td>
+<td>OEM</td>
+<td>CxA</td>
+<td>1 day</td>
+<td>MEC-L1-FAT-CRAH-B2-01</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Installation; coil and condensate connections; filters; power IR; pressure test of chilled-water connections</td>
+<td>Mechanical and electrical contractors</td>
+<td>CxA by sample</td>
+<td>5 days per hall</td>
+<td>MEC-L2-CRAH-B2-DH3-nn</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Start-up; fan rotation; controller settings; point-to-point; airflow measurement by TAB contractor</td>
+<td>OEM, controls contractor, TAB contractor</td>
+<td>CxA</td>
+<td>5 days per hall</td>
+<td>MEC-L3-CRAH-B2-DH3-nn; TAB report</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Supply air temperature control; fan speed control on pressure; unit failure and standby response; alarms; loss of BMS communication</td>
+<td>Controls contractor</td>
+<td>CxM, CxA</td>
+<td>3 days</td>
+<td>MEC-L4-CRAH-B2-DH3-01</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>Loss of one CRAH at full air load; loss of chilled water; recovery after utility loss</td>
+<td>CxM</td>
+<td>Owner, CxA</td>
+<td>part of IST</td>
+<td>IST-B2-DH3 day 3</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s02-7-4"><span class="n">02.7.4</span>BMS ladder</h3>
+<p><strong>Worked example:</strong> BMS ladder for hall B2-DH3 (1,480 points from chapter 22).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Activity</th>
+<th>Performed by</th>
+<th>Witnessed by</th>
+<th>Duration</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Points list, sequence of operation and network design review</td>
+<td>EoR, controls contractor</td>
+<td>CxM</td>
+<td>10 working days per cycle</td>
+<td>Design review log</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>FAT of panels and software with simulated inputs and outputs</td>
+<td>Controls contractor</td>
+<td>CxM, operations</td>
+<td>3 to 5 days</td>
+<td>BMS-L1-FAT-B2-DH3</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Panel and field device installation inspection; cable tests</td>
+<td>Controls and electrical contractors</td>
+<td>Cx engineer by sample</td>
+<td>5 to 10 days</td>
+<td>BMS-L2-nn</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Network checkout; point-to-point checks; calibration; actuator stroke</td>
+<td>Controls contractor</td>
+<td>Cx engineer (100 % of critical points)</td>
+<td>10 to 15 days</td>
+<td>BMS-L3-nn</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Loop tuning; sequences; alarms; trends; graphics; failover; restart</td>
+<td>Controls contractor with mechanical contractor</td>
+<td>CxM, operations</td>
+<td>10 to 15 days</td>
+<td>BMS-L4-nn</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>BMS behaviour in IST scenarios</td>
+<td>CxM</td>
+<td>Owner, operations</td>
+<td>part of IST</td>
+<td>IST record</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s02-7-5"><span class="n">02.7.5</span>EPMS ladder</h3>
+<p>Figure <a class="figref" href="#F02-7">F02-7</a> compares the L1 to L4 durations of the six ladders in this section. The BMS ladder needs the longest site time, up to 40 working days for L2 to L4 in one hall.</p>
+<figure class="sheet" id="F02-7"><a href="../data/cx-handbook/figures/F02-7.svg" title="Open drawing F02-7 at full size"><img src="../data/cx-handbook/figures/F02-7.svg" alt="F02-7: Six level ladders compared: durations from L1 to L4" width="1000" height="856" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F02-7</span> — <b>Six level ladders compared: durations from L1 to L4</b>. Durations are the MSC-1 planning values of tables 02.7.1 to 02.7.6. The bar is the sum of the upper L2, L3 and L4 values in working days.</figcaption></figure>
+
+<p><strong>Worked example:</strong> EPMS ladder for building B2 (431 devices in the chapter 23 worked example).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Activity</th>
+<th>Performed by</th>
+<th>Witnessed by</th>
+<th>Duration</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Meter schedule, riser, time synchronisation and integration list review</td>
+<td>EoR, EPMS contractor</td>
+<td>CxM</td>
+<td>10 working days</td>
+<td>DR-B2-EPMS</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>Server and software FAT with simulated devices; report and alarm templates</td>
+<td>EPMS contractor</td>
+<td>CxM</td>
+<td>2 to 3 days</td>
+<td>EPMS-L1-FAT-B2</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Meter wiring, current transformer (CT) polarity, shorting blocks, network cabling</td>
+<td>Switchboard OEM, EPMS contractor</td>
+<td>Cx engineer by sample</td>
+<td>5 days</td>
+<td>EPMS-L2-nn</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Device configuration; communication; point-to-point checks against the switchboard displays; time synchronisation</td>
+<td>EPMS contractor</td>
+<td>Cx engineer</td>
+<td>10 days</td>
+<td>EPMS-L3-nn</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Alarms; sequence-of-events time stamps across devices; reports; power quality capture; BMS and DCIM interfaces</td>
+<td>EPMS contractor</td>
+<td>CxM, operations</td>
+<td>5 days</td>
+<td>EPMS-L4-nn</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>Event records of every IST scenario; time alignment of events from UPS, switchgear and generators</td>
+<td>CxM</td>
+<td>Owner</td>
+<td>part of IST</td>
+<td>IST record and EPMS event export</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s02-7-6"><span class="n">02.7.6</span>Fire systems ladder</h3>
+<p><strong>Worked example:</strong> Fire detection and clean agent ladder for hall B2-DH3 electrical rooms.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Activity</th>
+<th>Performed by</th>
+<th>Witnessed by</th>
+<th>Duration</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Cause-and-effect matrix review; detection layout; agent quantity; interface list (emergency power off (EPO), dampers, CRAH stop, BMS)</td>
+<td>Fire engineer, EoR</td>
+<td>CxM</td>
+<td>10 working days</td>
+<td>DR-B2-FIRE</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>Panel FAT where specified; agent cylinder certificates</td>
+<td>Fire contractor</td>
+<td>CxA</td>
+<td>1 day per panel type</td>
+<td>FIRE-L1-B2</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Device installation; pipe pressure test; nozzle check; room sealing</td>
+<td>Fire contractor</td>
+<td>CxA</td>
+<td>10 days</td>
+<td>FIRE-L2-nn</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Device-by-device test from the real initiating device; panel programming check; enclosure integrity (door fan) test</td>
+<td>Fire contractor</td>
+<td>CxA</td>
+<td>5 days</td>
+<td>FIRE-L3-nn; door fan report</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Cause-and-effect test of every interface from real devices: fans stop, dampers close, releases sequence, EPO status to BMS</td>
+<td>Fire contractor, controls and electrical contractors</td>
+<td>CxM, operations</td>
+<td>5 days</td>
+<td>FIRE-L4-CE-B2-DH3</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>Fire alarm scenario during IST with all systems live; local fire authority inspection as a separate hold point</td>
+<td>CxM</td>
+<td>Owner, fire authority</td>
+<td>part of IST</td>
+<td>IST record; authority acceptance letter</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s02-8"><span class="n">02.8</span>Roles and responsibilities</h2>
+<h3 id="s02-8-1"><span class="n">02.8.1</span>Role descriptions</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Employed by</th>
+<th>Main duties in commissioning</th>
+<th>Signs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Owner commissioning manager (CxM)</td>
+<td>Owner</td>
+<td>Owns the Cx plan, scripts approval, gate decisions, issues log, Cx reports; directs L4 and L5</td>
+<td>Gate records, L4 and L5 scripts, Cx reports</td>
+</tr>
+<tr>
+<td>Commissioning authority or provider (CxA)</td>
+<td>Owner (third party) or owner in-house</td>
+<td>Writes or reviews scripts, witnesses all levels, records issues, prepares Cx reports</td>
+<td>Witness signatures, issue records</td>
+</tr>
+<tr>
+<td>Engineer of record (EoR)</td>
+<td>Owner (designer)</td>
+<td>BOD, sequences of operation, answers requests for information (RFI), confirms design intent, attends L4 and L5</td>
+<td>RFI answers, design deviations</td>
+</tr>
+<tr>
+<td>Construction manager (CM)</td>
+<td>Owner</td>
+<td>The owner's representative on site: administers the construction contract, issues site instructions, decides contract matters within its delegated authority, receives notices</td>
+<td>Site instructions, owner letters, acceptance of changes within its authority</td>
+</tr>
+<tr>
+<td>General contractor (GC) or engineering, procurement and construction (EPC) contractor</td>
+<td>Owner</td>
+<td>Delivers the works, manages subcontractors, Cx coordination, schedules tests, provides labour and permits</td>
+<td>Contractor signatures on L2 to L5 records</td>
+</tr>
+<tr>
+<td>MEP subcontractor</td>
+<td>GC</td>
+<td>Install and test their systems, complete L2 and L3 checklists</td>
+<td>L2 and L3 checklists</td>
+</tr>
+<tr>
+<td>OEM start-up engineer</td>
+<td>OEM, for the owner under owner-furnished, contractor-installed (OFCI) supply or for the GC under contractor-furnished, contractor-installed (CFCI) supply</td>
+<td>FAT, start-up, settings, support at L4 and L5</td>
+<td>FAT report, start-up report</td>
+</tr>
+<tr>
+<td>Controls integrator</td>
+<td>GC or owner</td>
+<td>BMS and EPMS programming, point-to-point checks, sequences, graphics</td>
+<td>BMS and EPMS L3 and L4 records</td>
+</tr>
+<tr>
+<td>TAB contractor</td>
+<td>GC</td>
+<td>Air and water balancing, TAB report</td>
+<td>TAB report</td>
+</tr>
+<tr>
+<td>Electrical testing company (NETA)</td>
+<td>GC</td>
+<td>Electrical acceptance tests to NETA Acceptance Testing Specifications (ATS)</td>
+<td>Test reports</td>
+</tr>
+<tr>
+<td>Data-centre operations (DCOps)</td>
+<td>Owner</td>
+<td>Reviews scripts for operability, witnesses L4 and L5, receives training, accepts handover</td>
+<td>Witness signatures, acceptance</td>
+</tr>
+<tr>
+<td>EHS lead</td>
+<td>Owner and GC</td>
+<td>Permit to work, LOTO, energisation safety, load bank safety</td>
+<td>Permits</td>
+</tr>
+<tr>
+<td>QA/QC (led by the GC QA/QC manager)</td>
+<td>GC</td>
+<td>Inspection and test plans, inspection requests, non-conformance reports (NCR) (chapters 07 and 09)</td>
+<td>Inspection records</td>
+</tr>
+<tr>
+<td>PLN</td>
+<td>State utility</td>
+<td>Utility connection, protection coordination at the connection, energisation of the intake</td>
+<td>Connection and energisation records</td>
+</tr>
+<tr>
+<td>LIT</td>
+<td>Accredited technical inspection body</td>
+<td>Inspection and testing for the certificate of operational fitness (SLO)</td>
+<td>SLO, inspection report</td>
+</tr>
+<tr>
+<td>Authority having jurisdiction (AHJ)</td>
+<td>Local government (fire authority, building authority)</td>
+<td>Fire installation acceptance, building permits, occupancy</td>
+<td>Acceptance letter</td>
+</tr>
+<tr>
+<td>Landlord</td>
+<td>Building owner in a leased facility</td>
+<td>Commissions the landlord scope and gives the tenant witness access (section 02.11.1)</td>
+<td>Landlord commissioning records</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> Every chapter and form uses these role names: CxM, CxA, GC, MEP subcontractor, OEM start-up engineer, EoR, CM, DCOps (DCOps lead for the named person), landlord, PLN, AHJ, EHS lead and QA/QC (QA/QC manager for the named person). Always <mark>write CxA for the commissioning authority</mark>; the ASHRAE term "commissioning provider" appears only where ASHRAE is quoted. Write CM for the owner's representative. Some contract forms name a separate contract administrator: the Engineer in FIDIC 2017, the Project Manager in NEC4 and the Architect in AIA A201. In that case the text uses that contract term and names the contract (chapter 08).</p>
+<h3 id="s02-8-2"><span class="n">02.8.2</span>Rules on independence and authority</h3>
+<ol>
+<li><strong>The contractor operates the equipment.</strong> The ASHRAE course states that checklist and test activities that activate a device are done by the contractor under observation of the commissioning provider (source 1). <mark>The CxA does not operate breakers or valves</mark> during a witnessed test.</li>
+<li><strong>The EoR confirms design intent.</strong> Uptime states that the EoR is legally responsible for the design and is the party who confirms that design intent was met (source 3).</li>
+<li><strong>The CxA reports to the owner.</strong> The CxA contract is with the owner. On a design-build contract where the GC employs the CxA, the owner keeps its own witness points and its own copy of the issues log.</li>
+<li><strong>The owner accepts.</strong> The owner holds the acceptance authority for deviations from the OPR.</li>
+<li><strong>The OEM stays through L5.</strong> Uptime recommends that tender documents require on-site OEM technician support through L4 and L5 (source 3).</li>
+</ol>
+<h2 id="s02-9"><span class="n">02.9</span>RACI per level</h2>
+<p>Figure <a class="figref" href="#F02-3">F02-3</a> shows the matrix. R means responsible (does the work), A accountable (one party who answers for the result), C consulted, I informed.</p>
+<figure class="sheet" id="F02-3"><a href="../data/cx-handbook/figures/F02-3.svg" title="Open drawing F02-3 at full size"><img src="../data/cx-handbook/figures/F02-3.svg" alt="F02-3: RACI matrix per level: CxM, CxA, EoR, GC, OEM and operations" width="1400" height="600" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F02-3</span> — <b>RACI matrix per level: CxM, CxA, EoR, GC, OEM and operations</b>. Responsibility for each level activity. The project Cx plan issues the final matrix; a row with two A entries is corrected before issue.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Activity</th>
+<th>CxM</th>
+<th>CxA</th>
+<th>EoR</th>
+<th>GC</th>
+<th>OEM</th>
+<th>DCOps</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0 design review</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+<td>C</td>
+</tr>
+<tr>
+<td>L1 FAT procedure</td>
+<td>A</td>
+<td>R (approve)</td>
+<td>C</td>
+<td>C</td>
+<td>R (write)</td>
+<td>I</td>
+</tr>
+<tr>
+<td>L1 FAT witness</td>
+<td>A</td>
+<td>R</td>
+<td>I</td>
+<td>C</td>
+<td>R (perform)</td>
+<td>C</td>
+</tr>
+<tr>
+<td>L2 delivery and installation checklist</td>
+<td>I</td>
+<td>C (verify)</td>
+<td>I</td>
+<td>A</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>L3 start-up and pre-functional</td>
+<td>I</td>
+<td>R (witness)</td>
+<td>I</td>
+<td>A</td>
+<td>R (perform)</td>
+<td>I</td>
+</tr>
+<tr>
+<td>L4 script writing</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+</tr>
+<tr>
+<td>L4 execution</td>
+<td>A</td>
+<td>R (direct and record)</td>
+<td>C</td>
+<td>R (operate)</td>
+<td>R</td>
+<td>C (witness)</td>
+</tr>
+<tr>
+<td>L5 script writing</td>
+<td>A</td>
+<td>R</td>
+<td>R (scenarios from design)</td>
+<td>C</td>
+<td>C</td>
+<td>R (operability)</td>
+</tr>
+<tr>
+<td>L5 execution</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>R</td>
+<td>R</td>
+<td>R (operate in scenarios)</td>
+</tr>
+<tr>
+<td>Gate decision</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Issues log</td>
+<td>A</td>
+<td>R</td>
+<td>R (design issues)</td>
+<td>R (construction issues)</td>
+<td>R (equipment issues)</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Handover acceptance</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+<td>R</td>
+<td>I</td>
+<td>A</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s02-10"><span class="n">02.10</span>RACI per document</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Document</th>
+<th>CxM</th>
+<th>CxA</th>
+<th>EoR</th>
+<th>GC</th>
+<th>OEM</th>
+<th>DCOps</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OPR</td>
+<td>A, R</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+<td>C</td>
+</tr>
+<tr>
+<td>BOD</td>
+<td>C</td>
+<td>C</td>
+<td>A, R</td>
+<td>I</td>
+<td>I</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Cx plan</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Cx specification (01 91 13 and discipline sections)</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+<td>I</td>
+</tr>
+<tr>
+<td>FAT procedure</td>
+<td>C</td>
+<td>A (approve)</td>
+<td>C</td>
+<td>I</td>
+<td>R</td>
+<td>I</td>
+</tr>
+<tr>
+<td>L2 checklist template</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>L3 checklist template</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>R (start-up content)</td>
+<td>I</td>
+</tr>
+<tr>
+<td>L4 script</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+</tr>
+<tr>
+<td>L5 IST script</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+<td>R</td>
+</tr>
+<tr>
+<td>Issues log</td>
+<td>A</td>
+<td>R</td>
+<td>R</td>
+<td>R</td>
+<td>R</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Cx progress report</td>
+<td>A</td>
+<td>R</td>
+<td>I</td>
+<td>I</td>
+<td>I</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Final Cx report</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Systems manual</td>
+<td>A</td>
+<td>C (verify)</td>
+<td>R (design content)</td>
+<td>R (assembly)</td>
+<td>R (equipment content)</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Training plan</td>
+<td>A</td>
+<td>C (verify)</td>
+<td>C</td>
+<td>R</td>
+<td>R</td>
+<td>C</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> <mark>Each row has exactly one A</mark>. A row with two A entries is a defect in the matrix. Correct it before the Cx plan is issued.</p>
+<h2 id="s02-11"><span class="n">02.11</span>Delivery models: lease, build, OFCI and CFCI</h2>
+<h3 id="s02-11-1"><span class="n">02.11.1</span>Lease and build</h3>
+<p>On a self-built campus the owner commissions every system from the utility intake to the rack. In a leased facility a landlord builds the shell and some or all of the infrastructure, and the tenant commissions what it installs. The usual split on hyperscale programmes is shown below.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Self-build</th>
+<th>Lease (powered shell)</th>
+<th>Lease (turnkey)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Utility intake and MV</td>
+<td>Owner commissions</td>
+<td>Landlord commissions; tenant witnesses</td>
+<td>Landlord commissions; tenant witnesses</td>
+</tr>
+<tr>
+<td>Generators, central plant</td>
+<td>Owner</td>
+<td>Landlord or tenant per lease</td>
+<td>Landlord</td>
+</tr>
+<tr>
+<td>UPS and critical distribution</td>
+<td>Owner</td>
+<td>Tenant</td>
+<td>Landlord; tenant L4 and L5 at the demarcation</td>
+</tr>
+<tr>
+<td>White-space cooling, containment</td>
+<td>Owner</td>
+<td>Tenant</td>
+<td>Landlord; tenant L4</td>
+</tr>
+<tr>
+<td>IST</td>
+<td>Owner, full building</td>
+<td>Tenant for its hall, with landlord plant in a booked window</td>
+<td>Landlord IST; tenant IST at the demarcation</td>
+</tr>
+<tr>
+<td>SLO</td>
+<td>Owner for the whole installation</td>
+<td>Each installation needs its own SLO; <mark>check whether the landlord SLO covers the tenant installation</mark></td>
+<td>Landlord, with tenant installation checked per lease</td>
+</tr>
+<tr>
+<td>Records</td>
+<td>Owner keeps all</td>
+<td>Tenant needs the landlord's Cx reports for shared systems</td>
+<td>Landlord delivers the Cx record set</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>No access to shared plant tests.</strong> The tenant cannot pull the landlord's utility feeder or fail a shared generator outside a landlord window. <mark>Write the IST windows into the lease</mark>.</li>
+<li><strong>No landlord records.</strong> The tenant's IST relies on landlord systems it has never seen tested. Ask for the landlord L4 and L5 records before the tenant IST.</li>
+</ol>
+<h3 id="s02-11-2"><span class="n">02.11.2</span>OFCI and CFCI</h3>
+<ol>
+<li><strong>Owner-furnished, contractor-installed (OFCI).</strong> The owner buys long-lead equipment (MV and LV switchgear, transformers, generators, UPS, chillers, sometimes busway and CDUs) under framework agreements. The contractor installs it. FAT and shipping damage sit with the owner's supply contract; installation defects sit with the contractor.</li>
+<li><strong>Contractor-furnished, contractor-installed (CFCI).</strong> The contractor buys and installs. All defects sit with the contractor.</li>
+<li><strong>Effect on commissioning.</strong> For OFCI equipment the owner's procurement team must attend the FAT and the delivery inspection. The interface between the OEM's start-up and the contractor's installation must be written in the Cx plan. A common dispute is who pays for a failed start-up that an installation fault caused. The Cx plan states who pays before the first start-up.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>OFCI owner role</th>
+<th>OFCI contractor role</th>
+<th>CFCI contractor role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FAT</td>
+<td>Arranges and witnesses</td>
+<td>Informed</td>
+<td>Arranges; owner witnesses</td>
+</tr>
+<tr>
+<td>Delivery inspection</td>
+<td>Accepts delivery from OEM</td>
+<td>Receives and stores</td>
+<td>Receives and inspects</td>
+</tr>
+<tr>
+<td>Installation</td>
+<td>Informed</td>
+<td>Installs to OEM manual</td>
+<td>Installs</td>
+</tr>
+<tr>
+<td>Start-up</td>
+<td>OEM performs under owner contract</td>
+<td>Supports, provides access and power</td>
+<td>OEM performs under contractor order</td>
+</tr>
+<tr>
+<td>Warranty</td>
+<td>From OEM to owner</td>
+<td>Installation warranty</td>
+<td>Full warranty</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s02-12"><span class="n">02.12</span>Campus sequencing and energisation</h2>
+
+<figure class="sheet" id="F02-5"><a href="../data/cx-handbook/figures/F02-5.svg" title="Open drawing F02-5 at full size"><img src="../data/cx-handbook/figures/F02-5.svg" alt="F02-5: MSC-1 campus sequencing: four buildings, levels by month and IST windows" width="1400" height="690" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F02-5</span> — <b>MSC-1 campus sequencing: four buildings, levels by month and IST windows</b>. Planning view of the MSC-1 worked example; B3 and B4 dates are planning values from the programme.</figcaption></figure>
+<h3 id="s02-12-1"><span class="n">02.12.1</span>The MSC-1 campus</h3>
+<p>In the MSC-1 worked example the campus has 4 buildings, each with 3 halls of 12 MW IT load (144 MW in total). Building B1 has a target ready-for-service (RFS) date 14 months after the start of construction and building B2 22 months. Each hall needs 5 IST days, giving 60 IST days for the campus. Figure <a class="figref" href="#F02-5">F02-5</a> shows the sequence.</p>
+<h3 id="s02-12-2"><span class="n">02.12.2</span>Dependencies between levels and energisation</h3>
+<ol>
+<li><strong>L3 of MV needs the utility.</strong> The first MV energisation needs the PLN connection and the recommendation of fitness for energisation (RLB) for the intake. L3 of any downstream electrical item cannot start before its upstream board is energised.</li>
+<li><strong>L4 of cooling needs power and load.</strong> Chiller and CDU L4 tests need permanent power and heat load (heater skids or load banks).</li>
+<li><strong>L5 needs all L4.</strong> The hall IST needs every system of the hall at L4 passed.</li>
+<li><strong>A live hall next to a construction hall.</strong> Once hall 1 is in operation, work on hall 2 runs under the live-site rules of chapter 10. Tests that affect shared systems (central plant, MV ring, generator bus) need an operations approval and a risk assessment.</li>
+<li><strong>Shared plant gets one full IST.</strong> <mark>The first hall served by a shared plant tests the plant fully</mark>. Later halls test the plant in a delta IST for the added capacity and interfaces.</li>
+</ol>
+<h3 id="s02-12-3"><span class="n">02.12.3</span>Campus sequencing table</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Month from start</th>
+<th>B1</th>
+<th>B2</th>
+<th>B3</th>
+<th>B4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 to 6</td>
+<td>Structure; L0 complete; L1 FATs</td>
+<td>Design</td>
+<td>Design</td>
+<td>Design</td>
+</tr>
+<tr>
+<td>6 to 10</td>
+<td>MV energised; L2 and L3</td>
+<td>Structure; L1 FATs</td>
+<td>Design</td>
+<td>Design</td>
+</tr>
+<tr>
+<td>10 to 13</td>
+<td>L4 halls 1 to 3</td>
+<td>L2 starts</td>
+<td>Structure</td>
+<td>Design</td>
+</tr>
+<tr>
+<td>13 to 14</td>
+<td>L5: 15 IST days; RFS month 14</td>
+<td>L2 and L3</td>
+<td>Structure; L1 FATs</td>
+<td>Structure</td>
+</tr>
+<tr>
+<td>14 to 21</td>
+<td>Operation; L6</td>
+<td>MV energised under live-site rules; L4</td>
+<td>L2 and L3</td>
+<td>L1 FATs</td>
+</tr>
+<tr>
+<td>21 to 22</td>
+<td>Operation</td>
+<td>L5: 15 IST days; RFS month 22</td>
+<td>L4</td>
+<td>L2</td>
+</tr>
+<tr>
+<td>22 to 30</td>
+<td>Operation</td>
+<td>Operation; L6</td>
+<td>L5 and RFS (planning value from the programme)</td>
+<td>L3 and L4</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> IST window conflict on the campus MV ring. B2 hall 1 IST is planned for month 21 and includes a scenario that opens the MV ring section that also feeds B1. B1 is live with tenant IT load. The CxM moves the scenario to a combined window with B1 operations. The CxM writes a method statement that keeps B1 on its second intake for the duration of the scenario (about 40 min) and obtains the operations approval 10 working days before. The B2 IST grows from 5 to 6 days because the scenario must run at 02:00 local time. <mark>The campus total becomes 61 IST days</mark>.</p>
+<h2 id="s02-13"><span class="n">02.13</span>Process KPIs</h2>
+<p>The table defines the key performance indicators (KPI) that the CxM reports for the process each week.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target (MSC-1)</th>
+<th>Source of data</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>First-pass yield</td>
+<td>L4 steps passed at first attempt divided by steps run</td>
+<td><mark>≥ 90 % (ledger value)</mark></td>
+<td>L4 scripts</td>
+</tr>
+<tr>
+<td>Issue ageing</td>
+<td>Open issues older than their category limit</td>
+<td>0 for A; ≤ 5 % for B and C</td>
+<td>Issues log</td>
+</tr>
+<tr>
+<td>Gate turnaround</td>
+<td>Working days from gate request to decision</td>
+<td>≤ 2 for items; ≤ 3 for systems</td>
+<td>Gate records</td>
+</tr>
+<tr>
+<td>Script readiness</td>
+<td>L4 scripts approved 10 working days before the test</td>
+<td>100 %</td>
+<td>Script register</td>
+</tr>
+<tr>
+<td>Tag accuracy</td>
+<td>Tags matching gate records in the weekly sample</td>
+<td>100 %</td>
+<td>Tag log</td>
+</tr>
+<tr>
+<td>FAT witness coverage</td>
+<td>First unit of each type witnessed in full</td>
+<td>100 %</td>
+<td>FAT register</td>
+</tr>
+<tr>
+<td>IST days per hall</td>
+<td>Days used against plan</td>
+<td>5</td>
+<td>IST records</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s02-14"><span class="n">02.14</span>Common errors in the commissioning process</h2>
+<ol>
+<li><strong>Levels not defined in the Cx plan.</strong> Contractors schedule against their own level names. Detect it by asking each contractor to describe L3 in writing at the kick-off.</li>
+<li><strong>Tags without gate records.</strong> Detect it by the weekly tag sample.</li>
+<li><strong>L4 on draft scripts.</strong> Detect it by checking the script revision on the test day against the script register.</li>
+<li><strong>Witness by report.</strong> A FAT report accepted without a witness for the failure tests. Detect it by checking the witness signature on each failure step.</li>
+<li><strong>Sampling on critical items.</strong> Detect it by reading the Cx plan sampling rules against the OPR.</li>
+<li><strong>IST before L4 issues closed.</strong> Detect it at the IST readiness review.</li>
+<li><strong>No OEM at L5.</strong> The OEM support ended at start-up. Detect it by checking the purchase order for L4 and L5 support days.</li>
+<li><strong>Lease without test windows.</strong> Detect it by reading the lease for IST access clauses.</li>
+<li><strong>Shared plant tested in every hall.</strong> Repeat full tests of shared plant risk the live halls. Detect it in the campus sequencing review.</li>
+<li><strong>RACI with two accountable parties.</strong> Detect it by counting A entries per row.</li>
+</ol>
+<h2 id="s02-15"><span class="n">02.15</span>Checklist for site use</h2>
+<ol>
+<li><strong>Phases planned.</strong> The Cx plan lists the activities and deliverables of each phase.</li>
+<li><strong>Levels defined.</strong> The Cx plan defines L0 to L5 (and L6 if used) and every contractor has confirmed them in writing.</li>
+<li><strong>Entry and exit criteria written.</strong> Every level has entry and exit criteria and a list of records.</li>
+<li><strong>Gate procedure in use.</strong> Gate requests, checks, decisions and records follow section 02.5.</li>
+<li><strong>Issue categories set.</strong> Categories and ageing limits are in the Cx plan.</li>
+<li><strong>Tag scheme stated.</strong> The colours, their meaning and the rules are in the Cx plan and posted on site.</li>
+<li><strong>Ladders prepared.</strong> Each system has a level ladder with performers, witnesses, durations and records.</li>
+<li><strong>Roles appointed.</strong> Every role in table 02.8.1 has a named person.</li>
+<li><strong>RACI issued.</strong> The RACI per level and per document is issued with one A per row.</li>
+<li><strong>OEM support ordered.</strong> OEM support days for L4 and L5 are in the purchase orders.</li>
+<li><strong>Delivery model clear.</strong> OFCI and CFCI items and the lease split are listed.</li>
+<li><strong>Campus sequence agreed.</strong> IST windows, shared plant tests and live-site rules are in the programme.</li>
+<li><strong>Authorities booked.</strong> PLN, LIT and fire authority hold points are in the programme.</li>
+<li><strong>KPIs reported.</strong> The process KPIs are in the weekly Cx report.</li>
+</ol>
+<h2 id="s02-16"><span class="n">02.16</span>Sources</h2>
+<ol>
+<li>ASHRAE, "Principles of Building Commissioning: ASHRAE Guideline 0 and Standard 202", course slides, 2020, accessed 31 October 2026. <a href="https://www.utah.gov/pmn/files/1040363.pdf" rel="noopener">https://www.utah.gov/pmn/files/1040363.pdf</a></li>
+<li>IFMA Facility Management Journal, "Beyond Traditional" (NEBB article on the Level 0 to 6 data-centre commissioning framework), August 2026, accessed 31 October 2026. <a href="https://fmj.ifma.org/beyond-traditional-nebb" rel="noopener">https://fmj.ifma.org/beyond-traditional-nebb</a></li>
+<li>Uptime Institute Journal, "Improve Project Success Through Mission Critical Commissioning", accessed 14 October 2026. <a href="https://journal.uptimeinstitute.com/improve-project-success-through-mission-critical-commissioning" rel="noopener">https://journal.uptimeinstitute.com/improve-project-success-through-mission-critical-commissioning</a></li>
+<li>Uptime Institute Journal, "Tier Certification preparation", accessed 25 October 2026. <a href="https://journal.uptimeinstitute.com/tiercertificationpreparation/" rel="noopener">https://journal.uptimeinstitute.com/tiercertificationpreparation/</a></li>
+<li>CxPlanner, "Data Center Commissioning: The 5 Levels of Testing", accessed 31 October 2026. <a href="https://cxplanner.com/commissioning-101/data-centers-level-testing" rel="noopener">https://cxplanner.com/commissioning-101/data-centers-level-testing</a></li>
+<li>Archdesk, "Master Data Center Commissioning: L1-L5", accessed 14 October 2026. <a href="https://archdesk.com/blog/data-center-commissioning-levels" rel="noopener">https://archdesk.com/blog/data-center-commissioning-levels</a></li>
+<li>Schneider Electric, White Paper 148, Data Center Projects: Commissioning, Rev 1, accessed 31 October 2026. <a href="https://download.schneider-electric.com/doc/SPD_DBOY-6NJNK6_EN/DBOY-6NJNK6_R1_EN.pdf" rel="noopener">https://download.schneider-electric.com/doc/SPD_DBOY-6NJNK6_EN/DBOY-6NJNK6_R1_EN.pdf</a></li>
+<li>Uptime Institute, Tier Standard: Topology, accessed 31 October 2026. <a href="https://uptimeinstitute.com/resources/asset/tier-standard-topology" rel="noopener">https://uptimeinstitute.com/resources/asset/tier-standard-topology</a></li>
+<li>Uptime Institute, Tier Certification of Constructed Facility, accessed 14 October 2026. <a href="https://uptimeinstitute.com/tier-certification/construction" rel="noopener">https://uptimeinstitute.com/tier-certification/construction</a></li>
+<li>ANSI/ASHRAE/IES Standard 202-2024, catalogue entry, accessed 31 October 2026. <a href="https://webstore.ansi.org/standards/ashrae/ansiashraeies2022024" rel="noopener">https://webstore.ansi.org/standards/ashrae/ansiashraeies2022024</a></li>
+<li>Ministry of Energy and Mineral Resources, SLO and LIT presentation (Permen ESDM 12/2021), accessed 14 October 2026. <a href="https://gatrik.esdm.go.id/assets/uploads/download_index/files/edd7c-20210323_webinar-perizinan-ujptl-dan-slo_final.pdf" rel="noopener">https://gatrik.esdm.go.id/assets/uploads/download_index/files/edd7c-20210323_webinar-perizinan-ujptl-dan-slo_final.pdf</a></li>
+<li>Permen PU 26/PRT/M/2008, fire protection requirements, accessed 14 October 2026. <a href="https://peraturan.bpk.go.id/Download/95203/PermenPU26-2008.pdf" rel="noopener">https://peraturan.bpk.go.id/Download/95203/PermenPU26-2008.pdf</a></li>
+<li>NEBB, Procedural Standard for Testing, Adjusting and Balancing, 2019, 9th edition, accessed 31 October 2026. <a href="https://www.nebb.org" rel="noopener">https://www.nebb.org</a></li>
+<li>Data Centre Commissioning Field Manual R01, chapter 22 (BMS commissioning durations) and chapter 04 (document control), October 2026.</li>
+<li>Data Centre Commissioning Field Manual R01, chapter 23 (EPMS device count for building B2), October 2026.</li>
+<li>MSC-1 case ledger, <code>../case_ledger.json</code>, Data Centre Commissioning Field Manual R01 working files, October 2026.</li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="01-reference-library.html"><span>Previous · 01</span><span class="t">Commissioning reference library</span></a><a class="next" href="03-commissioning-documents.html"><span>Next · 03</span><span class="t">Commissioning documents</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

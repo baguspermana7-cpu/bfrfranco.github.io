@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04 Document control, the common data environment and transmittals | Cx Field Manual R01</title>
+<meta name="description" content="This chapter explains how project documents are named, versioned, reviewed, issued, stored and replaced on a hyperscale data-centre campus.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/04-document-control-cde.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/04-document-control-cde.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/04-document-control-cde.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/04-document-control-cde.html">
+<meta property="og:title" content="04 Document control, the common data environment and transmittals | Cx Field Manual R01">
+<meta property="og:description" content="This chapter explains how project documents are named, versioned, reviewed, issued, stored and replaced on a hyperscale data-centre campus.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="04 Document control, the common data environment and transmittals | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter explains how project documents are named, versioned, reviewed, issued, stored and replaced on a hyperscale data-centre campus.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"04 Document control, the common data environment and transmittals","name":"Document control, the common data environment and transmittals","description":"This chapter explains how project documents are named, versioned, reviewed, issued, stored and replaced on a hyperscale data-centre campus.","url":"https://resistancezero.com/cx-handbook/04-document-control-cde.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/04-document-control-cde.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":11067,"position":4,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"04 Document control, the common data environment and transmittals","item":"https://resistancezero.com/cx-handbook/04-document-control-cde.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part B · Project administration</p>
+    <h1><span class="num">04</span>Document control, the common data environment and transmittals</h1>
+    <p class="lede">This chapter explains how project documents are named, versioned, reviewed, issued, stored and replaced on a hyperscale data-centre campus.</p>
+    <p class="basis">Chapter 04 of 32 · 17 sections · 7 figures · 11,067 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 04</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 04</summary>
+<ol><li><a href="#s04-0"><span class="n">04.0</span>Scope of this chapter</a></li><li><a href="#s04-1"><span class="n">04.1</span>Purpose of document control on a data-centre campus</a><ol><li><a href="#s04-1-1"><span class="n">04.1.1</span>What document control does</a></li><li><a href="#s04-1-2"><span class="n">04.1.2</span>Document classes on a data-centre project</a></li><li><a href="#s04-1-3"><span class="n">04.1.3</span>Roles and responsibilities</a></li></ol></li><li><a href="#s04-2"><span class="n">04.2</span>ISO 19650 concepts and the common data environment</a><ol><li><a href="#s04-2-1"><span class="n">04.2.1</span>Information containers and the CDE</a></li><li><a href="#s04-2-2"><span class="n">04.2.2</span>The four container states</a></li><li><a href="#s04-2-3"><span class="n">04.2.3</span>Information requirements that drive the CDE</a></li></ol></li><li><a href="#s04-3"><span class="n">04.3</span>Suitability codes, published codes and revision codes</a><ol><li><a href="#s04-3-1"><span class="n">04.3.1</span>Suitability (status) codes</a></li><li><a href="#s04-3-2"><span class="n">04.3.2</span>Revision codes</a></li><li><a href="#s04-3-3"><span class="n">04.3.3</span>Legacy BS 1192:2007 codes</a></li></ol></li><li><a href="#s04-4"><span class="n">04.4</span>Naming information containers</a><ol><li><a href="#s04-4-1"><span class="n">04.4.1</span>The seven fields</a></li><li><a href="#s04-4-2"><span class="n">04.4.2</span>Type codes and role codes</a></li><li><a href="#s04-4-3"><span class="n">04.4.3</span>Volume and level codes for a campus</a></li><li><a href="#s04-4-4"><span class="n">04.4.4</span>Naming equipment tags and documents together</a></li><li><a href="#s04-4-5"><span class="n">04.4.5</span>Steps to check a name before upload</a></li></ol></li><li><a href="#s04-5"><span class="n">04.5</span>Document register, drawing register and metadata</a><ol><li><a href="#s04-5-1"><span class="n">04.5.1</span>Document register fields</a></li><li><a href="#s04-5-2"><span class="n">04.5.2</span>Drawing register fields</a></li><li><a href="#s04-5-3"><span class="n">04.5.3</span>Example register extract</a></li></ol></li><li><a href="#s04-6"><span class="n">04.6</span>Review status codes and what each code allows</a><ol><li><a href="#s04-6-1"><span class="n">04.6.1</span>The A, B, C, D scheme</a></li><li><a href="#s04-6-2"><span class="n">04.6.2</span>Rules the CxM applies to review codes</a></li><li><a href="#s04-6-3"><span class="n">04.6.3</span>Comment response sheet fields</a></li></ol></li><li><a href="#s04-7"><span class="n">04.7</span>Transmittals</a><ol><li><a href="#s04-7-1"><span class="n">04.7.1</span>What a transmittal is</a></li><li><a href="#s04-7-2"><span class="n">04.7.2</span>Transmittal fields</a></li><li><a href="#s04-7-3"><span class="n">04.7.3</span>Transmittal workflow and time limits</a></li><li><a href="#s04-7-4"><span class="n">04.7.4</span>Distribution matrix</a></li></ol></li><li><a href="#s04-8"><span class="n">04.8</span>Review cycle time limits and turnaround KPIs</a><ol><li><a href="#s04-8-1"><span class="n">04.8.1</span>Time limits set by contracts and specifications</a></li><li><a href="#s04-8-2"><span class="n">04.8.2</span>Turnaround KPIs</a></li><li><a href="#s04-8-3"><span class="n">04.8.3</span>Calculating turnaround and the due date</a></li><li><a href="#s04-8-4"><span class="n">04.8.4</span>Escalation for overdue reviews</a></li></ol></li><li><a href="#s04-9"><span class="n">04.9</span>Superseded document control on site</a><ol><li><a href="#s04-9-1"><span class="n">04.9.1</span>Why site copies need their own control</a></li><li><a href="#s04-9-2"><span class="n">04.9.2</span>Site copy control procedure</a></li><li><a href="#s04-9-3"><span class="n">04.9.3</span>Site document audit sheet fields</a></li></ol></li><li><a href="#s04-10"><span class="n">04.10</span>Redlines and as-built control</a><ol><li><a href="#s04-10-1"><span class="n">04.10.1</span>Redline rules</a></li><li><a href="#s04-10-2"><span class="n">04.10.2</span>As-built process</a></li><li><a href="#s04-10-3"><span class="n">04.10.3</span>As-built verification sheet fields</a></li></ol></li><li><a href="#s04-11"><span class="n">04.11</span>CDE tools and what each is used for</a><ol><li><a href="#s04-11-1"><span class="n">04.11.1</span>Tools on a commissioning programme</a></li><li><a href="#s04-11-2"><span class="n">04.11.2</span>Integration rules between tools</a></li><li><a href="#s04-11-3"><span class="n">04.11.3</span>Choosing the CDE configuration at project start</a></li></ol></li><li><a href="#s04-12"><span class="n">04.12</span>Commissioning documents in the CDE</a><ol><li><a href="#s04-12-1"><span class="n">04.12.1</span>The Cx document set</a></li><li><a href="#s04-12-2"><span class="n">04.12.2</span>Rules for test scripts and checklists</a></li><li><a href="#s04-12-3"><span class="n">04.12.3</span>Document hierarchy for conflicts</a></li></ol></li><li><a href="#s04-13"><span class="n">04.13</span>Access, security, retention and handover</a><ol><li><a href="#s04-13-1"><span class="n">04.13.1</span>Access rules</a></li><li><a href="#s04-13-2"><span class="n">04.13.2</span>Retention and archive</a></li><li><a href="#s04-13-3"><span class="n">04.13.3</span>Handover of the record set</a></li></ol></li><li><a href="#s04-14"><span class="n">04.14</span>Audits, common errors and how to detect them</a><ol><li><a href="#s04-14-1"><span class="n">04.14.1</span>Weekly document control audit</a></li><li><a href="#s04-14-2"><span class="n">04.14.2</span>Common errors table</a></li></ol></li><li><a href="#s04-15"><span class="n">04.15</span>Checklist for site use</a></li><li><a href="#s04-16"><span class="n">04.16</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="03-commissioning-documents.html"><span>Previous</span>03 Commissioning documents</a><a href="05-rfi-and-technical-queries.html"><span>Next</span>05 Requests for information (RFI) and technical queries</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s04-0"><span class="n">04.0</span>Scope of this chapter</h2>
+<p>This chapter explains how project documents are named, versioned, reviewed, issued, stored and replaced on a hyperscale data-centre campus. It also explains how the commissioning manager (CxM) uses the document control system so that every inspection and test is done against the current approved document. Chapter 05 covers requests for information (RFI), chapter 06 covers submittals and method statements, and chapter 07 covers inspection and test plans.</p>
+<ol>
+<li><strong>Purpose and roles.</strong> What document control does, the document classes on a data-centre project, and who is responsible for each step (document controller, information manager, design manager, CxM).</li>
+<li><strong>ISO 19650 concepts.</strong> Information containers, the common data environment (CDE), the appointing party and appointed parties, and the four container states: work in progress (WIP), shared, published and archived.</li>
+<li><strong>Status and revision codes.</strong> Suitability codes S0 to S7, the published codes A and B, the as-built record status (CR) for as-constructed records, the revision codes P01, P01.01 and C01, and the legacy BS 1192:2007 codes.</li>
+<li><strong>Naming.</strong> The seven-field container identifier (project, originator, volume or system, level or location, type, role, number) with the code lists and examples from the MSC-1 campus.</li>
+<li><strong>Registers and metadata.</strong> Document register and drawing register fields, with a filled example.</li>
+<li><strong>Review status codes.</strong> The A, B, C and D review codes used on many contracts in Asia and the Middle East, and what each code allows the contractor to do.</li>
+<li><strong>Transmittals.</strong> Transmittal fields, the transmittal workflow, acknowledgement, and the difference between a transmittal and project mail.</li>
+<li><strong>Review cycle time limits and key performance indicators (KPI).</strong> The time limits in FIDIC 2017, the United States unified facilities guide specification (UFGS) 01 33 00 and NEC, and how to calculate turnaround and overdue figures.</li>
+<li><strong>Site control.</strong> Superseded document control on site, redline mark-ups, as-built drawings and the record set handed to the operator.</li>
+<li><strong>CDE tools.</strong> What Oracle Aconex, Procore, Autodesk Construction Cloud (ACC), CxAlloy and Bluebeam Studio are used for on a commissioning programme.</li>
+<li><strong>Commissioning records.</strong> How the commissioning document set (owner's project requirements, basis of design, Cx plan, checklists, test scripts, issues log) is held in the CDE.</li>
+</ol>
+<p>Documents and standards used: ISO 19650-1:2018 and ISO 19650-2:2018 and the UK National Annex guidance for ISO 19650-2 (building information modelling (BIM) Toolkit National Annex Guidance and the UK National Annex code lists as implemented in Autodesk Construction Cloud). The chapter also uses BS 1192:2007 (withdrawn), FIDIC Conditions of Contract for Construction 2017, UFGS 01 33 00 Submittal Procedures and NEC contracts guidance on the period for reply. It also uses Oracle Aconex help, Procore support documentation, Autodesk Construction Cloud help, CxAlloy and Bluebeam product documentation, and the MSC-1 case ledger.</p>
+<h2 id="s04-1"><span class="n">04.1</span>Purpose of document control on a data-centre campus</h2>
+<h3 id="s04-1-1"><span class="n">04.1.1</span>What document control does</h3>
+<p>Document control is the set of rules and records that decides which version of each document is valid for which use and who may change it. It also records who has received each version and where the old versions are kept. On a data-centre campus the volume is large. The MSC-1 worked example has 4 buildings, 3 data halls per building and 12 data halls in total. Each hall has 16 coolant distribution units (CDU), 8 block transformers and their uninterruptible power supply (UPS) systems. A single building carries several thousand drawings, several hundred submittals and several thousand commissioning checklists.</p>
+<p>Document control has six jobs.</p>
+<ol>
+<li><strong>Identify each document.</strong> Every document has <mark>one unique identifier that does not change across revisions</mark>. The identifier is built from fixed fields (section 04.4).</li>
+<li><strong>Control the revision.</strong> Every issue of a document carries a revision code and a status code. The pair tells the reader whether the content is preliminary or contractual and what it may be used for.</li>
+<li><strong>Control distribution.</strong> Every issue to another organisation is sent on a transmittal and recorded. The register shows who received which revision and when.</li>
+<li><strong>Control review.</strong> Documents that need review (design drawings, submittals, method statements, test scripts) pass through a workflow with a named reviewer, a due date and a review code.</li>
+<li><strong>Remove superseded information.</strong> When a new revision is published, the old one is marked superseded in the CDE and removed or stamped on site.</li>
+<li><strong>Keep the record.</strong> Every revision, transmittal, comment and review code is kept in the archive for the life of the asset and for any dispute.</li>
+</ol>
+<p><strong>Check:</strong> A tester who picks up a test script on site must be able to answer three questions from the document itself and the register. The questions are: which revision is current, is it approved for use (status A1 or C01 or higher on most projects), and has it been superseded. If the tester cannot answer all three in <mark>under two minutes</mark>, the document control system is failing at the point of use.</p>
+<h3 id="s04-1-2"><span class="n">04.1.2</span>Document classes on a data-centre project</h3>
+<p>The table lists the document classes that the CxM uses and the usual originator of each class.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Document class</th>
+<th>Examples on MSC-1</th>
+<th>Usual originator</th>
+<th>Needs formal review</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Owner requirements</td>
+<td>owner's project requirements (OPR), design standards, operations requirements</td>
+<td>owner</td>
+<td>owner sign-off</td>
+</tr>
+<tr>
+<td>Design</td>
+<td>basis of design (BOD), drawings, specifications, calculations, schedules</td>
+<td>design consultants</td>
+<td>yes, at each design stage</td>
+</tr>
+<tr>
+<td>Contractor design and shop drawings</td>
+<td>medium-voltage (MV) switchgear general arrangement, UPS wiring diagrams, CDU piping isometrics</td>
+<td>contractors and suppliers</td>
+<td>yes, as submittals (chapter 06)</td>
+</tr>
+<tr>
+<td>Product information</td>
+<td>datasheets, certificates, type test reports</td>
+<td>manufacturers</td>
+<td>yes, as submittals</td>
+</tr>
+<tr>
+<td>Method statements and risk assessments</td>
+<td>method statement and risk assessment (MSRA) for energising 20 kV switchgear, MSRA for flushing the technical cooling system (TCS)</td>
+<td>contractors</td>
+<td>yes (chapter 06)</td>
+</tr>
+<tr>
+<td>Quality records</td>
+<td>inspection and test plans (ITP), inspection requests, non-conformance reports (NCR)</td>
+<td>contractors and inspectors</td>
+<td>yes (chapters 07 and 09)</td>
+</tr>
+<tr>
+<td>Commissioning documents</td>
+<td>Cx plan, Level 1 to Level 5 checklists, test scripts, issues log, Cx reports</td>
+<td>CxM and commissioning authority (CxA)</td>
+<td>yes, by the CxA and the owner</td>
+</tr>
+<tr>
+<td>Correspondence</td>
+<td>letters, notices, minutes, RFIs, site instructions</td>
+<td>all parties</td>
+<td>depends on type</td>
+</tr>
+<tr>
+<td>Handover records</td>
+<td>as-built drawings, operation and maintenance (O&amp;M) manuals, asset data</td>
+<td>contractors</td>
+<td>yes, before practical completion</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s04-1-3"><span class="n">04.1.3</span>Roles and responsibilities</h3>
+<p>The role names differ between programmes. The functions in the table are always present.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Main tasks in document control</th>
+<th>Typical time limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Information manager (appointing party)</td>
+<td>writes the information standard, the naming code lists and the CDE rules; audits compliance</td>
+<td>code lists issued before the first appointment</td>
+</tr>
+<tr>
+<td>Document controller (each organisation)</td>
+<td>checks names and metadata, issues transmittals, keeps the register, removes superseded copies</td>
+<td>registers a received transmittal within 1 working day</td>
+</tr>
+<tr>
+<td>Design manager or lead designer</td>
+<td>assigns reviewers, checks design status before publishing, signs off design stages</td>
+<td>per contract review period</td>
+</tr>
+<tr>
+<td>Task team lead (each discipline)</td>
+<td>approves WIP for sharing (S1 to S4), answers review comments</td>
+<td>as set in the task information delivery plan</td>
+</tr>
+<tr>
+<td>CxM</td>
+<td>checks that commissioning uses approved documents; owns the Cx document set; reviews submittals and scripts for testability</td>
+<td>per contract review period</td>
+</tr>
+<tr>
+<td>CxA</td>
+<td>reviews design, submittals and scripts for the owner; witnesses tests</td>
+<td>per Cx plan</td>
+</tr>
+<tr>
+<td>Site engineer or supervisor</td>
+<td>keeps the site drawing set current, records redlines</td>
+<td>removes a superseded drawing within 1 working day of the transmittal</td>
+</tr>
+</tbody>
+</table></div>
+<p>The following matrix shows who is responsible (R), accountable (A), consulted (C) and informed (I) for each step of the document cycle.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Originator</th>
+<th>Document controller</th>
+<th>Reviewer</th>
+<th>CxM</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Name and metadata check</td>
+<td>R</td>
+<td>A</td>
+<td>I</td>
+<td>I</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Share for coordination (S1)</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Submit for review (S3 or S4)</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Review code (A, B, C, D)</td>
+<td>I</td>
+<td>I</td>
+<td>R</td>
+<td>C</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Publish for construction (A1 or C01)</td>
+<td>C</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Supersede on site</td>
+<td>I</td>
+<td>R</td>
+<td>I</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Archive</td>
+<td>I</td>
+<td>R</td>
+<td>I</td>
+<td>I</td>
+<td>A</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s04-2"><span class="n">04.2</span>ISO 19650 concepts and the common data environment</h2>
+
+<figure class="sheet" id="F04-1"><a href="../data/cx-handbook/figures/F04-1.svg" title="Open drawing F04-1 at full size"><img src="../data/cx-handbook/figures/F04-1.svg" alt="F04-1: CDE container states and the approval gates between them" width="1400" height="717" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F04-1</span> — <b>CDE container states and the approval gates between them</b>. A container moves right only through an approval gate; a rejected shared container returns to WIP; a published revision moves to the archive when the next revision is published.</figcaption></figure>
+<h3 id="s04-2-1"><span class="n">04.2.1</span>Information containers and the CDE</h3>
+<p>ISO 19650-1:2018 calls any named, persistent set of information an information container. A drawing file, a model, a specification, a spreadsheet register and a test script are all information containers. The common data environment (CDE) is the agreed source of information for the project, used to collect, manage and share information containers through a managed process. A CDE can be one software product or several products joined by rules, and the rules are part of the CDE. <mark>A shared network drive without states, codes and approvals does not meet the definition</mark>.</p>
+<p>ISO 19650-2:2018 defines the parties. The appointing party is the client (on a data-centre campus, the owner). The lead appointed party is the organisation that receives an appointment directly from the appointing party, for example the design consultant or the general contractor. Appointed parties are their subcontractors and suppliers, grouped in task teams.</p>
+<h3 id="s04-2-2"><span class="n">04.2.2</span>The four container states</h3>
+<p>Every information container sits in one of four states. Figure <a class="figref" href="#F04-1">F04-1</a> shows the states and the approval gates between them.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>State</th>
+<th>Who can see it</th>
+<th>What it is used for</th>
+<th>Gate to the next state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Work in progress (WIP)</td>
+<td>the authoring task team only</td>
+<td>drafting and checking inside the team</td>
+<td>task team lead checks and approves for sharing</td>
+</tr>
+<tr>
+<td>Shared</td>
+<td>the other task teams and the lead appointed party</td>
+<td>coordination, information, review and comment, authorisation</td>
+<td>lead appointed party authorises; appointing party accepts</td>
+</tr>
+<tr>
+<td>Published</td>
+<td>all parties with access, including site</td>
+<td>construction, procurement, testing, handover</td>
+<td>superseded by a new revision, or project end</td>
+</tr>
+<tr>
+<td>Archived</td>
+<td>read-only for all; no new use</td>
+<td>record of every transaction, revision and change</td>
+<td>none; kept for the retention period</td>
+</tr>
+</tbody>
+</table></div>
+<p>The rules for moving between states are fixed in the project information standard. On most hyperscale programmes the usual practice is as follows.</p>
+<ol>
+<li><strong>WIP to shared.</strong> The author completes a self-check, and the task team lead reviews the container against the naming rules and the content checklist. The container then moves to shared with a suitability code S1 to S4. <mark>The revision drops the WIP version suffix</mark> (P01.03 becomes P01).</li>
+<li><strong>Shared to published.</strong> The lead appointed party authorises the container and the appointing party accepts it. The container receives a published code (A1 to An, or B1 to Bn for partial sign-off) and, for contractual issues, a C revision.</li>
+<li><strong>Published to archived.</strong> When a new revision is published, the previous one moves to the archive automatically. The archived revision stays readable and is marked superseded.</li>
+<li><strong>Rejection.</strong> A container that fails review returns from shared to WIP. It keeps its P revision, and the author increments the version suffix while correcting it.</li>
+</ol>
+<p><strong>Check:</strong> Open three published drawings for the MV switchroom of building 2 in the CDE. Confirm that each one shows a published status code, a C revision and a reviewer approval record with a date. <mark>A published drawing with a P revision and an A status is a configuration error</mark> in the CDE and must be raised with the information manager.</p>
+<h3 id="s04-2-3"><span class="n">04.2.3</span>Information requirements that drive the CDE</h3>
+<p>ISO 19650 links the CDE to a chain of requirement documents. The CxM needs to know them because commissioning deliverables are listed in them.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Document</th>
+<th>Abbreviation</th>
+<th>Content the CxM checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Organisational information requirements</td>
+<td>OIR</td>
+<td>owner's strategic needs, for example energy reporting and asset data for the computerised maintenance management system (CMMS)</td>
+</tr>
+<tr>
+<td>Asset information requirements</td>
+<td>AIR</td>
+<td>asset data fields for each equipment type (tag, serial number, warranty, maintenance interval)</td>
+</tr>
+<tr>
+<td>Project information requirements</td>
+<td>PIR</td>
+<td>information needed to answer the owner's project decisions</td>
+</tr>
+<tr>
+<td>Exchange information requirements</td>
+<td>EIR</td>
+<td>what each appointed party must deliver, in which format, at which milestone; includes Cx records</td>
+</tr>
+<tr>
+<td>BIM execution plan</td>
+<td>BEP</td>
+<td>the appointed party's response: naming, software, CDE use, responsibility matrix</td>
+</tr>
+<tr>
+<td>Master information delivery plan</td>
+<td>MIDP</td>
+<td>the list of every container to be delivered, with dates and responsible task team</td>
+</tr>
+<tr>
+<td>Task information delivery plan</td>
+<td>TIDP</td>
+<td>the same list for one task team</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong> The EIR does not list commissioning records, so the Level 3 to Level 5 checklists and test reports are delivered as loose PDF files outside the CDE. Correct this at appointment stage by <mark>adding a commissioning deliverables table to the EIR</mark>. The table names each record type, its format (native and PDF), its naming type code and the milestone at which it is due.</p>
+<h2 id="s04-3"><span class="n">04.3</span>Suitability codes, published codes and revision codes</h2>
+<h3 id="s04-3-1"><span class="n">04.3.1</span>Suitability (status) codes</h3>
+<p>The status code says what the information in a container may be used for. It does not say whether the content is correct. The codes below follow the UK National Annex to ISO 19650-2 as implemented in the Autodesk Construction Cloud naming standard. Older guidance documents show different text for S4 and S5, so the project information protocol must state the code list in force.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>State</th>
+<th>Meaning</th>
+<th>Revision type</th>
+<th>What the receiver may do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S0</td>
+<td>WIP</td>
+<td>initial status, work in progress</td>
+<td>preliminary with version (P01.01)</td>
+<td>nothing; not visible outside the task team</td>
+</tr>
+<tr>
+<td>S1</td>
+<td>Shared</td>
+<td>suitable for coordination</td>
+<td>preliminary (P01)</td>
+<td>use for clash checks and coordination only</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>Shared</td>
+<td>suitable for information</td>
+<td>preliminary</td>
+<td>read for information; no construction, no procurement</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>Shared</td>
+<td>suitable for review and comment</td>
+<td>preliminary</td>
+<td>review and return comments by the due date</td>
+</tr>
+<tr>
+<td>S4</td>
+<td>Shared</td>
+<td>suitable for stage approval</td>
+<td>preliminary</td>
+<td>review for approval of the design stage</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>—</td>
+<td>withdrawn in the current UK National Annex</td>
+<td>not used</td>
+<td>do not use; older documents may show "suitable for review and acceptance"</td>
+</tr>
+<tr>
+<td>S6</td>
+<td>Shared</td>
+<td>suitable for project information model (PIM) authorisation</td>
+<td>preliminary</td>
+<td>authorise the PIM at the information model milestone</td>
+</tr>
+<tr>
+<td>S7</td>
+<td>Shared</td>
+<td>suitable for asset information model (AIM) authorisation</td>
+<td>preliminary</td>
+<td>authorise the AIM before handover</td>
+</tr>
+<tr>
+<td>A1, A2 … An</td>
+<td>Published</td>
+<td>authorised and accepted at milestone n</td>
+<td>contractual (C01)</td>
+<td>use for construction, procurement and testing</td>
+</tr>
+<tr>
+<td>B1, B2 … Bn</td>
+<td>Published</td>
+<td>partial sign-off with comments at milestone n</td>
+<td>preliminary</td>
+<td>use the parts without comments; the parts with comments are on hold</td>
+</tr>
+<tr>
+<td>CR</td>
+<td>Published</td>
+<td>as-constructed record document</td>
+<td>contractual</td>
+<td>use as the record for operation and maintenance</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>A drawing with code S2 must never be used to build or to test</mark>. On a commissioning programme the most common error is a test engineer printing an S2 "for information" single-line diagram to write a test script. The script is then based on a design that has not been accepted.</p>
+<h3 id="s04-3-2"><span class="n">04.3.2</span>Revision codes</h3>
+<p>The National Annex guidance uses two integers with a letter prefix:</p>
+<ol>
+<li><strong>P revisions.</strong> P01, P02 and onward are preliminary (non-contractual) revisions used while a container is shared. A WIP container carries a version suffix after a full stop: P01.01, P01.02, P01.03.</li>
+<li><strong>C revisions.</strong> C01, C02 and onward are contractual revisions used when a container is published with an A code or as a CR record.</li>
+<li><strong>Version suffix dropped on sharing.</strong> When a WIP container is shared, the version suffix is dropped. After five WIP versions the sequence is P01.01, P01.02, P01.03, P01.04, P01.05 and then P01.</li>
+<li><strong>No reuse.</strong> <mark>A revision code is never reused for different content</mark>. If a published C02 is found to be wrong, the correction is C03.</li>
+<li><strong>Separate from status.</strong> The revision code and the status code are separate metadata fields. Most CDE platforms keep them as attributes and show them in the title block; they are not part of the file name in the seven-field identifier.</li>
+</ol>
+<p><strong>Worked example:</strong> In the MSC-1 worked example, the 20 kV switchgear single-line diagram for building 2 has the following history in the register.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Date (example)</th>
+<th>Revision</th>
+<th>Status</th>
+<th>Event</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>03 Feb</td>
+<td>P01.01</td>
+<td>S0</td>
+<td>electrical designer starts the drawing</td>
+</tr>
+<tr>
+<td>10 Feb</td>
+<td>P01.04</td>
+<td>S0</td>
+<td>internal check complete after 4 versions</td>
+</tr>
+<tr>
+<td>11 Feb</td>
+<td>P01</td>
+<td>S1</td>
+<td>shared for coordination with the mechanical and structural task teams</td>
+</tr>
+<tr>
+<td>24 Feb</td>
+<td>P02</td>
+<td>S3</td>
+<td>shared for owner review and comment after the coordination clash on the cable trench</td>
+</tr>
+<tr>
+<td>10 Mar</td>
+<td>P03</td>
+<td>S4</td>
+<td>issued for stage approval after 17 owner comments were closed</td>
+</tr>
+<tr>
+<td>20 Mar</td>
+<td>C01</td>
+<td>A3</td>
+<td>authorised and accepted for construction at milestone 3</td>
+</tr>
+<tr>
+<td>15 Jun</td>
+<td>C02</td>
+<td>A3</td>
+<td>protection relay type changed by RFI-B2-ELE-0142; republished</td>
+</tr>
+<tr>
+<td>30 Nov</td>
+<td>C03</td>
+<td>CR</td>
+<td>as-constructed record after the redlines from site were incorporated</td>
+</tr>
+</tbody>
+</table></div>
+<p>The site team holds C02 from 15 June. The C01 prints are removed from the switchroom drawing rack <mark>within 1 working day of the C02 transmittal</mark> (section 04.9).</p>
+<h3 id="s04-3-3"><span class="n">04.3.3</span>Legacy BS 1192:2007 codes</h3>
+<p>Many suppliers, older templates and some Asian and Middle Eastern projects still use the codes of BS 1192:2007, which was withdrawn when ISO 19650 was published. The main differences are listed below. The exact text of each legacy code must be taken from the project's own information protocol, because projects modified the list.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>BS 1192:2007 practice</th>
+<th>ISO 19650 UK National Annex practice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Field 3 name</td>
+<td>volume or system</td>
+<td>volume or system (same)</td>
+</tr>
+<tr>
+<td>Field 6 name</td>
+<td>role</td>
+<td>role (same position, called discipline in some guidance)</td>
+</tr>
+<tr>
+<td>Preliminary codes for tender, contractor design and costing</td>
+<td>D1 suitable for costing, D2 for tender, D3 for contractor design, D4 for manufacture or procurement</td>
+<td>removed; use S codes and the appointment milestones</td>
+</tr>
+<tr>
+<td>As-built</td>
+<td>AB codes were common</td>
+<td>CR as-constructed record</td>
+</tr>
+<tr>
+<td>Revision format</td>
+<td>P1, P2 and C1, C2 were common</td>
+<td>P01, P02 and C01, C02 with two integers</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong> A supplier's drawing arrives with revision "C" and status "AB". The document controller maps it to the project scheme (for example C01 and CR) in the metadata. The document controller <mark>records the supplier's own revision in a separate "originator revision" field</mark> and leaves the supplier's title block unchanged.</p>
+<h2 id="s04-4"><span class="n">04.4</span>Naming information containers</h2>
+
+<figure class="sheet" id="F04-2"><a href="../data/cx-handbook/figures/F04-2.svg" title="Open drawing F04-2 at full size"><img src="../data/cx-handbook/figures/F04-2.svg" alt="F04-2: Anatomy of an information container identifier on the MSC-1 campus" width="1400" height="674" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F04-2</span> — <b>Anatomy of an information container identifier on the MSC-1 campus</b>. Fields 1 to 6 come from the project code lists; field 7 is a sequential number reserved in the MIDP.</figcaption></figure>
+<h3 id="s04-4-1"><span class="n">04.4.1</span>The seven fields</h3>
+<p>The container identifier is built from seven fields separated by hyphens. Each field is applied in the order shown. Figure <a class="figref" href="#F04-2">F04-2</a> shows the anatomy of one MSC-1 identifier.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Order</th>
+<th>Field</th>
+<th>Length</th>
+<th>Definition</th>
+<th>MSC-1 example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Project</td>
+<td>2–6 characters</td>
+<td>unique project code assigned by the appointing party</td>
+<td>MSC1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Originator</td>
+<td>2–6 characters (3–6 recommended)</td>
+<td>organisation that produced the information</td>
+<td>EDC (electrical designer, example)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Volume or system</td>
+<td>2 characters</td>
+<td>spatial or system subdivision of the project</td>
+<td>B2 (building 2)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Level or location</td>
+<td>2 characters</td>
+<td>level or location the information refers to</td>
+<td>00 (ground floor)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Type</td>
+<td>2 characters</td>
+<td>form of the information</td>
+<td>DR (drawing rendition)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Role</td>
+<td>1–2 characters</td>
+<td>discipline of the author</td>
+<td>E (electrical engineer)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Number</td>
+<td>4–6 digits</td>
+<td>sequential number within the series</td>
+<td>2101</td>
+</tr>
+</tbody>
+</table></div>
+<p>The full identifier is <mark>MSC1-EDC-B2-00-DR-E-2101</mark>. The revision (C02) and the status (A3) are held as metadata and printed in the title block.</p>
+<p>Two codes have fixed meanings in fields 3 and 4: ZZ means all volumes or multiple locations, and XX means no volume or no applicable location. A campus-wide specification that applies to every building is MSC1-EDC-ZZ-XX-SP-E-0001.</p>
+<h3 id="s04-4-2"><span class="n">04.4.2</span>Type codes and role codes</h3>
+<p>The project code list is issued by the information manager. The National Annex guidance gives the recommended type codes, and the project may add codes. The codes most used on a data-centre commissioning programme are listed below.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Type code</th>
+<th>Meaning</th>
+<th>Data-centre example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DR</td>
+<td>drawing rendition</td>
+<td>MV single-line diagram, CDU piping layout</td>
+</tr>
+<tr>
+<td>M3</td>
+<td>3D model</td>
+<td>federated mechanical model of data hall 1</td>
+</tr>
+<tr>
+<td>SP</td>
+<td>specification</td>
+<td>building management system (BMS) specification, Power Monitoring Expert (PME) specification</td>
+</tr>
+<tr>
+<td>SH</td>
+<td>schedule</td>
+<td>equipment schedule, cable schedule, BMS points schedule</td>
+</tr>
+<tr>
+<td>CA</td>
+<td>calculations</td>
+<td>short-circuit study, cable sizing, pump head calculation</td>
+</tr>
+<tr>
+<td>RP</td>
+<td>report</td>
+<td>factory acceptance test (FAT) report, Cx report, protection study report</td>
+</tr>
+<tr>
+<td>MS</td>
+<td>method statement</td>
+<td>MSRA for energising 20 kV switchgear</td>
+</tr>
+<tr>
+<td>RI</td>
+<td>request for information</td>
+<td>RFI-B2-ELE-0142</td>
+</tr>
+<tr>
+<td>MI</td>
+<td>minutes or action notes</td>
+<td>weekly Cx coordination meeting minutes</td>
+</tr>
+<tr>
+<td>SN</td>
+<td>snagging list</td>
+<td>punch list for data hall 2</td>
+</tr>
+<tr>
+<td>HS</td>
+<td>health and safety</td>
+<td>lock-out tag-out (LOTO) plan</td>
+</tr>
+<tr>
+<td>CO</td>
+<td>correspondence</td>
+<td>letters and notices</td>
+</tr>
+<tr>
+<td>PR</td>
+<td>programme</td>
+<td>integrated Cx programme</td>
+</tr>
+<tr>
+<td>SU</td>
+<td>survey</td>
+<td>thermographic survey</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Role code</th>
+<th>Discipline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>architect</td>
+</tr>
+<tr>
+<td>C</td>
+<td>civil engineer</td>
+</tr>
+<tr>
+<td>E</td>
+<td>electrical engineer</td>
+</tr>
+<tr>
+<td>F</td>
+<td>facilities manager</td>
+</tr>
+<tr>
+<td>K</td>
+<td>client (appointing party)</td>
+</tr>
+<tr>
+<td>M</td>
+<td>mechanical engineer</td>
+</tr>
+<tr>
+<td>P</td>
+<td>public health engineer</td>
+</tr>
+<tr>
+<td>S</td>
+<td>structural engineer</td>
+</tr>
+<tr>
+<td>W</td>
+<td>contractor (lead appointed party or appointed party)</td>
+</tr>
+<tr>
+<td>X</td>
+<td>subcontractor</td>
+</tr>
+<tr>
+<td>Y</td>
+<td>specialist designer</td>
+</tr>
+<tr>
+<td>Z</td>
+<td>general (non-disciplinary)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The National Annex list has no separate code for commissioning or for controls. Most data-centre programmes add project codes, for example "CX" for commissioning, "BM" for building management system (BMS) and "PM" for the electrical power monitoring system (EPMS). A two-character role code is allowed because field 6 is 1–2 characters long. The CxM asks the information manager to add these codes before the first Cx document is issued, so that Cx records do not appear under "Z".</p>
+<h3 id="s04-4-3"><span class="n">04.4.3</span>Volume and level codes for a campus</h3>
+<p>A campus needs a clear volume code list before any document is issued. The MSC-1 worked example uses this list.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field 3 code</th>
+<th>Meaning</th>
+<th>Field 4 code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ZZ</td>
+<td>whole campus</td>
+<td>ZZ</td>
+<td>multiple levels</td>
+</tr>
+<tr>
+<td>SS</td>
+<td>150/20 kV substation</td>
+<td>XX</td>
+<td>no location</td>
+</tr>
+<tr>
+<td>B1 to B4</td>
+<td>buildings 1 to 4</td>
+<td>00</td>
+<td>ground floor (MV rooms, generator yard access)</td>
+</tr>
+<tr>
+<td>CP</td>
+<td>central plant yard (dry coolers, trim chillers)</td>
+<td>01</td>
+<td>level 1 (data halls DH1 to DH3)</td>
+</tr>
+<tr>
+<td>GY</td>
+<td>generator yard</td>
+<td>RF</td>
+<td>roof</td>
+</tr>
+<tr>
+<td>FT</td>
+<td>fuel farm</td>
+<td>B1</td>
+<td>basement (cable trench and pipe basement)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The level codes are 2 characters. "RF" for roof is a project code. The basement code "B1" is the National Annex example code for basement level. "B1" is also building 1 in field 3, and the position in the identifier removes the conflict. The document controller must not shorten the identifier.</p>
+<h3 id="s04-4-4"><span class="n">04.4.4</span>Naming equipment tags and documents together</h3>
+<p>The container identifier names the document. The equipment tag names the asset. Commissioning records link the two. The tag format is set in the asset information requirements. In the MSC-1 worked example the tag format is building, hall, system, equipment and number, for example B2-DH3-UPS-A1 (building 2, data hall 3, UPS system A, unit 1). The document identifier for the Level 3 pre-functional checklist of that UPS is MSC1-CXA-B2-01-RP-CX-3051, with the tag B2-DH3-UPS-A1 in the metadata field "Asset tag".</p>
+<p><strong>Worked example:</strong> The CxM needs to know how many identifiers to reserve for Level 3 checklists in building 2. Building 2 has 3 halls, each with 8 block UPS systems, 16 CDUs and 8 block transformers (MSC-1 ledger). The count of Level 3 checklists is 3 × (8 UPS + 16 CDU + 8 transformers) = 3 × 32 = 96 checklists for these three equipment types. The CxM <mark>reserves the number range 3001 to 3200</mark> under type RP and role CX for Level 3 checklists in volume B2. This range leaves 104 numbers for the other systems in the building (switchboards, BMS controllers, fire systems). If the total exceeds 200, the range 3201 to 3400 is reserved before the range runs out.</p>
+<h3 id="s04-4-5"><span class="n">04.4.5</span>Steps to check a name before upload</h3>
+<p><strong>Purpose:</strong> Stop wrong names entering the CDE, where they break search, transmittals and the MIDP.</p>
+<p><strong>Owner:</strong> Document controller of the originating organisation.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Split the identifier into fields.</strong> Count seven fields separated by six hyphens. A missing field or an extra hyphen fails the check.</li>
+<li><strong>Check each field against the code list.</strong> Compare fields 1 to 6 with the current project code list (MSC1-KIM-ZZ-XX-SH-K-0002 in the worked example). An unknown code fails the check.</li>
+<li><strong>Check the number against the MIDP.</strong> The number must exist in the MIDP or the TIDP for that originator and type. A number not in the plan is raised with the task team lead within 1 working day.</li>
+<li><strong>Check the title block.</strong> The identifier, revision, status and title in the title block must match the metadata entered in the CDE character for character.</li>
+<li><strong>Check the file name.</strong> The file name equals the identifier, with no revision or status added (for example MSC1-EDC-B2-00-DR-E-2101.pdf). Platforms that store revision as metadata reject duplicate names with different revision suffixes.</li>
+<li><strong>Upload to WIP or to the shared area as the workflow requires.</strong> Record the upload in the register with the date.</li>
+</ol>
+<p><strong>Acceptance:</strong> All six checks pass. Most CDE platforms (for example the ACC naming standards function) can enforce fields 1 to 6 automatically and place non-compliant files in a holding area.</p>
+<p><strong>Records:</strong> CDE upload log; naming exceptions log with the reason and the person who approved each exception.</p>
+<h2 id="s04-5"><span class="n">04.5</span>Document register, drawing register and metadata</h2>
+
+<figure class="sheet" id="F04-4"><a href="../data/cx-handbook/figures/F04-4.svg" title="Open drawing F04-4 at full size"><img src="../data/cx-handbook/figures/F04-4.svg" alt="F04-4: Document register extract for building 2 with review codes" width="1400" height="616" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F04-4</span> — <b>Document register extract for building 2 with review codes</b>. The register shows one current revision per identifier; a code C row is a hold on every checklist that refers to it.</figcaption></figure>
+<h3 id="s04-5-1"><span class="n">04.5.1</span>Document register fields</h3>
+<p>The document register lists every container and its current state. Each CDE platform has its own field names. The fields below are the minimum the CxM needs to trace a commissioning document.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identifier</td>
+<td>text, 7 fields</td>
+<td>MSC1-EDC-B2-00-DR-E-2101</td>
+<td>unique; never changes across revisions</td>
+</tr>
+<tr>
+<td>Title</td>
+<td>text</td>
+<td>Building 2 20 kV switchgear single-line diagram</td>
+<td>plain description; system and location named</td>
+</tr>
+<tr>
+<td>Revision</td>
+<td>code</td>
+<td>C02</td>
+<td>P or C with two integers</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>code</td>
+<td>A3</td>
+<td>from the project status list</td>
+</tr>
+<tr>
+<td>Originator revision</td>
+<td>text</td>
+<td>Rev D</td>
+<td>supplier's own revision, if different</td>
+</tr>
+<tr>
+<td>Discipline</td>
+<td>code</td>
+<td>E</td>
+<td>same as field 6</td>
+</tr>
+<tr>
+<td>Document type</td>
+<td>code</td>
+<td>DR</td>
+<td>same as field 5</td>
+</tr>
+<tr>
+<td>Asset tags</td>
+<td>list</td>
+<td>B2-MVS-01, B2-MVS-02</td>
+<td>equipment tags shown or described</td>
+</tr>
+<tr>
+<td>Specification section</td>
+<td>text</td>
+<td>26 13 00</td>
+<td>link to the specification</td>
+</tr>
+<tr>
+<td>Date of issue</td>
+<td>date</td>
+<td>15 Jun 2026</td>
+<td>date the revision was published</td>
+</tr>
+<tr>
+<td>Author and checker</td>
+<td>names</td>
+<td>A. Rahman / B. Sari</td>
+<td>initials as on the title block</td>
+</tr>
+<tr>
+<td>Approver</td>
+<td>name and role</td>
+<td>owner electrical lead</td>
+<td>the person who set the A code</td>
+</tr>
+<tr>
+<td>Review code</td>
+<td>code</td>
+<td>A, B, C or D</td>
+<td>for reviewed documents (section 04.6)</td>
+</tr>
+<tr>
+<td>Transmittal number</td>
+<td>text</td>
+<td>MSC1-EDC-TR-0418</td>
+<td>the transmittal that issued this revision</td>
+</tr>
+<tr>
+<td>Superseded by</td>
+<td>identifier and revision</td>
+<td>C03</td>
+<td>blank while current</td>
+</tr>
+<tr>
+<td>Related RFIs or changes</td>
+<td>list</td>
+<td>RFI-B2-ELE-0142, variation order (VO) 08-021</td>
+<td>links to chapters 05 and 08</td>
+</tr>
+<tr>
+<td>File format</td>
+<td>list</td>
+<td>PDF, DWG, RVT</td>
+<td>native and PDF</td>
+</tr>
+<tr>
+<td>Security class</td>
+<td>code</td>
+<td>internal, restricted</td>
+<td>restricted for security layouts and network drawings</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s04-5-2"><span class="n">04.5.2</span>Drawing register fields</h3>
+<p>The drawing register is a filtered view of the document register for drawing types (DR, M2, M3). It adds the fields needed on site.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sheet size and scale</td>
+<td>text</td>
+<td>A1, 1:50</td>
+</tr>
+<tr>
+<td>Hold clouds</td>
+<td>yes or no with reference</td>
+<td>yes, cloud 2 "relay type on hold pending RFI-B2-ELE-0142"</td>
+</tr>
+<tr>
+<td>Site copies issued</td>
+<td>number and location</td>
+<td>2 copies, MV room B2-00-MV1 rack and site office</td>
+</tr>
+<tr>
+<td>Site copies withdrawn</td>
+<td>date and initials</td>
+<td>16 Jun 2026, DC-02</td>
+</tr>
+<tr>
+<td>Redline set</td>
+<td>reference</td>
+<td>RL-B2-E-2101-01 (section 04.10)</td>
+</tr>
+<tr>
+<td>As-built status</td>
+<td>code</td>
+<td>not started, in progress, CR issued</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s04-5-3"><span class="n">04.5.3</span>Example register extract</h3>
+<p>Figure <a class="figref" href="#F04-4">F04-4</a> shows this extract with the current and superseded rows marked.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Identifier</th>
+<th>Title</th>
+<th>Rev</th>
+<th>Status</th>
+<th>Issued</th>
+<th>Review code</th>
+<th>Superseded by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MSC1-EDC-B2-00-DR-E-2101</td>
+<td>B2 20 kV switchgear single-line diagram</td>
+<td>C02</td>
+<td>A3</td>
+<td>15 Jun</td>
+<td>A</td>
+<td>—</td>
+</tr>
+<tr>
+<td>MSC1-EDC-B2-00-DR-E-2102</td>
+<td>B2 20 kV protection schedule</td>
+<td>C01</td>
+<td>A3</td>
+<td>20 Mar</td>
+<td>B</td>
+<td>—</td>
+</tr>
+<tr>
+<td>MSC1-MSW-B2-00-DR-X-0007</td>
+<td>MV switchgear panel general arrangement, suite B2-MVS-01</td>
+<td>C03</td>
+<td>A3</td>
+<td>02 Jul</td>
+<td>B</td>
+<td>—</td>
+</tr>
+<tr>
+<td>MSC1-UPS-B2-01-DR-X-0031</td>
+<td>UPS B2-DH3-UPS-A1 control wiring</td>
+<td>P02</td>
+<td>S3</td>
+<td>05 Jul</td>
+<td>C</td>
+<td>—</td>
+</tr>
+<tr>
+<td>MSC1-BMC-B2-01-SH-BM-0004</td>
+<td>B2 BMS points schedule, CDU group</td>
+<td>C01</td>
+<td>A3</td>
+<td>28 Jun</td>
+<td>A</td>
+<td>—</td>
+</tr>
+<tr>
+<td>MSC1-CXA-B2-01-RP-CX-3051</td>
+<td>L3 checklist B2-DH3-UPS-A1</td>
+<td>C01</td>
+<td>A4</td>
+<td>12 Aug</td>
+<td>A</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> The row for MSC1-UPS-B2-01-DR-X-0031 has status S3 and review code C. That drawing is still under review. <mark>No Level 2 wiring inspection of UPS B2-DH3-UPS-A1 may be signed against it</mark>, and the CxM records the dependency in the Cx programme.</p>
+<h2 id="s04-6"><span class="n">04.6</span>Review status codes and what each code allows</h2>
+<h3 id="s04-6-1"><span class="n">04.6.1</span>The A, B, C, D scheme</h3>
+<p>Many contracts in Asia and the Middle East use a four-letter review code for contractor documents (shop drawings, submittals, method statements). The wording is set by each contract's specification. The table gives the usual meaning and the action each code allows.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Usual wording</th>
+<th>Work allowed</th>
+<th>Resubmission</th>
+<th>Typical next step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>approved; no comments</td>
+<td>proceed with fabrication, procurement, installation and testing</td>
+<td>none needed</td>
+<td>issue for construction</td>
+</tr>
+<tr>
+<td>B</td>
+<td>approved with comments; approved as noted</td>
+<td>proceed, incorporating every comment</td>
+<td>resubmit only if the contract asks for a record copy with the comments incorporated, within 10 working days or the contract period</td>
+<td>contractor confirms each comment in writing</td>
+</tr>
+<tr>
+<td>C</td>
+<td>revise and resubmit</td>
+<td>no fabrication or installation of the affected items; preparatory work at the contractor's risk only</td>
+<td>required, within 10 working days or the contract period</td>
+<td>contractor answers every comment on a comment response sheet</td>
+</tr>
+<tr>
+<td>D</td>
+<td>rejected</td>
+<td>none</td>
+<td>new submission needed</td>
+<td>contractor resubmits a compliant proposal or a new product</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>Under code B the contractor proceeds and incorporates the comments; under code C fabrication of the affected items stops</mark> until the resubmission is returned with code A or B.</p>
+<p>Some specifications add more codes. UFGS 01 33 00 (the United States unified facilities guide specification) uses five codes: A approved as submitted, AN approved as noted, RR disapproved as submitted and resubmit, NR not reviewed, and RA receipt acknowledged (for informational submittals). The mapping to the four-letter scheme is: A to A, AN to B, RR to C or D, NR and RA have no equivalent and must be listed separately in the register.</p>
+<h3 id="s04-6-2"><span class="n">04.6.2</span>Rules the CxM applies to review codes</h3>
+<ol>
+<li><strong>One code per document.</strong> A package with several drawings may have a different code for each drawing. The transmittal lists the code per drawing.</li>
+<li><strong>Comments are numbered.</strong> Every comment has a number, a location (sheet, grid, cloud) and a required action. A comment that only says "check" is not accepted.</li>
+<li><strong>Code B comments are tracked to closure.</strong> The register keeps a comment count and a closed count. A code B drawing with open comments may be built, but the Level 2 inspection checks the comments.</li>
+<li><strong>Code C stops dependent work in the Cx programme.</strong> The CxM marks every checklist and test that depends on a code C document as blocked, with the document identifier as the reason.</li>
+<li><strong>No verbal codes.</strong> <mark>A review code given in a meeting is recorded in minutes but is not valid until the stamped document is returned through the CDE</mark>.</li>
+<li><strong>Approval does not transfer design responsibility.</strong> Under most contracts a review code does not relieve the contractor of responsibility for errors in its documents. The exact wording is in the contract (for example, FIDIC 2017 Yellow Book Sub-Clause 5.2; the governing wording is in the Particular Conditions of the signed contract).</li>
+</ol>
+<h3 id="s04-6-3"><span class="n">04.6.3</span>Comment response sheet fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Comment number</td>
+<td>integer</td>
+<td>07</td>
+</tr>
+<tr>
+<td>Document and revision</td>
+<td>identifier</td>
+<td>MSC1-UPS-B2-01-DR-X-0031 P02</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>text</td>
+<td>sheet 4, terminal block X12</td>
+</tr>
+<tr>
+<td>Reviewer comment</td>
+<td>text</td>
+<td>Battery breaker auxiliary contact is not wired to the BMS interface terminal X12:5.</td>
+</tr>
+<tr>
+<td>Reviewer and role</td>
+<td>name</td>
+<td>CxM electrical</td>
+</tr>
+<tr>
+<td>Contractor response</td>
+<td>text</td>
+<td>Added wire 2041 from QF-BAT aux 13-14 to X12:5.</td>
+</tr>
+<tr>
+<td>Revised in revision</td>
+<td>code</td>
+<td>P03</td>
+</tr>
+<tr>
+<td>Reviewer verdict</td>
+<td>closed or open</td>
+<td>closed</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s04-7"><span class="n">04.7</span>Transmittals</h2>
+
+<figure class="sheet" id="F04-3"><a href="../data/cx-handbook/figures/F04-3.svg" title="Open drawing F04-3 at full size"><img src="../data/cx-handbook/figures/F04-3.svg" alt="F04-3: Transmittal workflow from approval to site withdrawal of the superseded print" width="1400" height="844" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F04-3</span> — <b>Transmittal workflow from approval to site withdrawal of the superseded print</b>. The transmittal closes only when every recipient has acknowledged and the site has withdrawn the superseded prints.</figcaption></figure>
+<h3 id="s04-7-1"><span class="n">04.7.1</span>What a transmittal is</h3>
+<p>A transmittal is the formal record that a defined set of documents, each at a defined revision and status, was sent from one organisation to another for a stated purpose on a stated date. In Oracle Aconex, a transmittal updates the recipients' document registers as part of the audit trail. Project mail is used for correspondence, and a document attached to mail is not registered. On every platform the rule is the same: <mark>a document issued for use must travel on a transmittal</mark>. An email attachment is an uncontrolled copy.</p>
+<h3 id="s04-7-2"><span class="n">04.7.2</span>Transmittal fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Transmittal number</td>
+<td>text</td>
+<td>MSC1-EDC-TR-0418</td>
+</tr>
+<tr>
+<td>Date sent</td>
+<td>date and time</td>
+<td>15 Jun 2026 14:20</td>
+</tr>
+<tr>
+<td>From (organisation and person)</td>
+<td>text</td>
+<td>electrical designer, document controller DC-01</td>
+</tr>
+<tr>
+<td>To (organisations and persons)</td>
+<td>list</td>
+<td>general contractor document control; MV switchgear subcontractor; CxM</td>
+</tr>
+<tr>
+<td>Copy to</td>
+<td>list</td>
+<td>owner electrical lead; CxA</td>
+</tr>
+<tr>
+<td>Purpose of issue</td>
+<td>code</td>
+<td>for construction, for review, for information, for coordination, for tender, for record</td>
+</tr>
+<tr>
+<td>Documents</td>
+<td>table</td>
+<td>identifier, title, revision, status, format, number of copies</td>
+</tr>
+<tr>
+<td>Reason for issue</td>
+<td>text</td>
+<td>revision C02 after RFI-B2-ELE-0142 changed relay type</td>
+</tr>
+<tr>
+<td>Response required</td>
+<td>yes or no</td>
+<td>yes, acknowledgement</td>
+</tr>
+<tr>
+<td>Response due</td>
+<td>date</td>
+<td>17 Jun 2026 (2 working days)</td>
+</tr>
+<tr>
+<td>Superseded documents</td>
+<td>list</td>
+<td>MSC1-EDC-B2-00-DR-E-2101 C01</td>
+</tr>
+<tr>
+<td>Instruction to recipient</td>
+<td>text</td>
+<td>Withdraw C01 prints from MV room B2-00-MV1.</td>
+</tr>
+<tr>
+<td>Acknowledgement</td>
+<td>name and date</td>
+<td>received by DC-GC-03, 15 Jun 2026 16:05</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s04-7-3"><span class="n">04.7.3</span>Transmittal workflow and time limits</h3>
+<p>Figure <a class="figref" href="#F04-3">F04-3</a> shows the transmittal workflow as a swimlane between the originator, the document controller, the receiving organisation and the site.</p>
+<p><strong>Trigger:</strong> A document reaches a state or status that must be communicated (shared for review, published for construction, returned with a review code, issued as a record).</p>
+<p><strong>Owner:</strong> Document controller of the sending organisation.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Prepare the issue list.</strong> The originator lists the identifiers, revisions and purpose. Time limit: same working day as the approval.</li>
+<li><strong>Check names and metadata.</strong> The document controller checks each container (section 04.4.5) and the status and revision against the approval record. Time limit: 1 working day.</li>
+<li><strong>Raise the transmittal.</strong> The document controller creates the transmittal in the CDE, attaches the containers, enters the purpose, the response due date and the superseded list.</li>
+<li><strong>Send and log.</strong> The CDE sends the transmittal and updates the register. The register shows the new revision as current.</li>
+<li><strong>Acknowledge.</strong> The receiving document controller acknowledges receipt. Time limit: 1 working day for construction issues, 2 working days for other purposes.</li>
+<li><strong>Distribute internally.</strong> The receiving document controller sends the documents to the named users and to site. Time limit: 1 working day.</li>
+<li><strong>Withdraw superseded copies on site.</strong> The site engineer removes or stamps the old prints (section 04.9). Time limit: 1 working day for construction issues.</li>
+<li><strong>Close.</strong> The sending document controller closes the transmittal when every acknowledgement is in. Unacknowledged transmittals older than 3 working days are reported in the weekly document control report.</li>
+</ol>
+<p><strong>Acceptance:</strong> Every recipient has acknowledged; the register shows the new revision as current; the site withdrawal record is signed.</p>
+<p><strong>Records:</strong> transmittal record with acknowledgements; site withdrawal record (section 04.9.2).</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Purpose of issue left blank.</strong> The receiver cannot tell whether an S3 drawing is for review or for construction. The CDE template must make the purpose a required field.</li>
+<li><strong>Superseded list missing.</strong> The site keeps both revisions. <mark>Make the superseded list a required field for every construction issue</mark>.</li>
+<li><strong>Transmittal sent to a person who has left the project.</strong> Acknowledgement never arrives. The document controller updates the distribution matrix weekly from the project directory.</li>
+<li><strong>Large packages.</strong> A transmittal with 300 drawings is not reviewed properly. Some platforms limit the number of documents per transmittal; split large issues by system and building.</li>
+</ol>
+<h3 id="s04-7-4"><span class="n">04.7.4</span>Distribution matrix</h3>
+<p>The distribution matrix says which roles receive which document types. The table is an extract from the MSC-1 worked example.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Document type</th>
+<th>General contractor</th>
+<th>MV subcontractor</th>
+<th>BMS integrator</th>
+<th>CxM</th>
+<th>CxA</th>
+<th>Owner operations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MV single-line diagrams (DR, E)</td>
+<td>construction</td>
+<td>construction</td>
+<td>information</td>
+<td>construction</td>
+<td>review</td>
+<td>information</td>
+</tr>
+<tr>
+<td>BMS points schedules (SH, BM)</td>
+<td>construction</td>
+<td>—</td>
+<td>construction</td>
+<td>construction</td>
+<td>review</td>
+<td>information</td>
+</tr>
+<tr>
+<td>Cx test scripts (RP, CX)</td>
+<td>information</td>
+<td>for use</td>
+<td>for use</td>
+<td>owner</td>
+<td>review</td>
+<td>information</td>
+</tr>
+<tr>
+<td>Method statements (MS)</td>
+<td>review</td>
+<td>for use (own)</td>
+<td>for use (own)</td>
+<td>review</td>
+<td>information</td>
+<td>—</td>
+</tr>
+<tr>
+<td>As-built records (CR)</td>
+<td>record</td>
+<td>record</td>
+<td>record</td>
+<td>record</td>
+<td>information</td>
+<td>record</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Revision C02 of MSC1-EDC-B2-00-DR-E-2101 is published on 15 June at 14:20. The distribution matrix sends it to the general contractor, the MV subcontractor, the CxM (construction), the CxA (review) and the BMS integrator and owner operations (information): 6 organisations. Acknowledgements arrive from 5 organisations on 15 and 16 June. The BMS integrator acknowledges on Friday 19 June. Counting 15 June as day 0, 16, 17, 18 and 19 June are working days 1 to 4. The acknowledgement took 4 working days against the 1 working day limit for construction issues and passed the 3 working day reporting threshold. The transmittal appears on the weekly overdue list. The document controller records the reason given by the integrator (the person named in the matrix was on leave). The matrix is updated to include a second contact.</p>
+<h2 id="s04-8"><span class="n">04.8</span>Review cycle time limits and turnaround KPIs</h2>
+
+<figure class="sheet" id="F04-5"><a href="../data/cx-handbook/figures/F04-5.svg" title="Open drawing F04-5 at full size"><img src="../data/cx-handbook/figures/F04-5.svg" alt="F04-5: Review cycle of the UPS control wiring drawing against the FAT need date" width="1400" height="516" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F04-5</span> — <b>Review cycle of the UPS control wiring drawing against the FAT need date</b>. Working days counted from the first submission on Monday 6 July 2026; the FAT on 7 September needs the approved drawing by 27 July (working day 15).</figcaption></figure>
+<h3 id="s04-8-1"><span class="n">04.8.1</span>Time limits set by contracts and specifications</h3>
+<p>The review period is set by the contract. The CxM must read the contract clause and the specification section before agreeing a review schedule. The table lists published values from common forms.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Document type</th>
+<th>Review period</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FIDIC Conditions of Contract for Plant and Design-Build (Yellow Book) 2017, Sub-Clause 5.2.2</td>
+<td>contractor's documents submitted for review</td>
+<td>not more than 21 days unless the Employer's Requirements state otherwise</td>
+<td>days are calendar days under FIDIC; some amended contracts change 21 to 30 days (the period and, for a Red Book contract, the sub-clause number are read from the signed contract)</td>
+</tr>
+<tr>
+<td>UFGS 01 33 00 (US federal guide specification)</td>
+<td>submittals for quality assurance and quality control (QA/QC) manager approval</td>
+<td>at least 15 working days</td>
+<td>value in brackets, to be edited by the specifier</td>
+</tr>
+<tr>
+<td>UFGS 01 33 00</td>
+<td>submittals approved by the Contracting Officer</td>
+<td>at least 20 working days; 30 working days suggested for projects of 180 or more calendar days</td>
+<td>resubmittal review period equals the original</td>
+</tr>
+<tr>
+<td>NEC (ECC)</td>
+<td>any communication needing a reply</td>
+<td>the "period for reply" stated in Contract Data Part 1 (for example 1 or 2 weeks)</td>
+<td>clause 13.3; a specific period in the contract overrides it</td>
+</tr>
+<tr>
+<td>Typical Asia and Middle East owner specification</td>
+<td>shop drawings and material submittals</td>
+<td>10 to 14 days</td>
+<td>contract governs; check whether days are working or calendar</td>
+</tr>
+</tbody>
+</table></div>
+<p><mark>Before the first submission, the CxM confirms whether the contract counts working days or calendar days</mark> and records the answer in the Cx plan. A 14-calendar-day period over a public holiday week in Jakarta (for example the Idul Fitri collective leave) can contain only 6 or 7 working days.</p>
+<h3 id="s04-8-2"><span class="n">04.8.2</span>Turnaround KPIs</h3>
+<p>The document control report shows the following measures each week. Each measure has a definition that can be calculated from the register.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target on the MSC-1 worked example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Average review turnaround</td>
+<td>mean of (date returned − date received) for documents returned in the week, in working days</td>
+<td>≤ 10 working days</td>
+</tr>
+<tr>
+<td>Percentage returned on time</td>
+<td>documents returned by the due date ÷ documents due in the week × 100</td>
+<td>≥ 90 %</td>
+</tr>
+<tr>
+<td>Overdue reviews</td>
+<td>documents past the due date and not returned</td>
+<td>0 older than 5 working days past due</td>
+</tr>
+<tr>
+<td>First-time approval rate</td>
+<td>documents returned code A or B at first submission ÷ documents returned × 100</td>
+<td>≥ 70 %</td>
+</tr>
+<tr>
+<td>Resubmission count</td>
+<td>mean number of submissions per approved document</td>
+<td>≤ 1.5</td>
+</tr>
+<tr>
+<td>Unacknowledged transmittals</td>
+<td>transmittals without full acknowledgement after 3 working days</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Superseded copies on site</td>
+<td>prints of superseded revisions found in the weekly site audit</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Naming exceptions</td>
+<td>uploads placed in the holding area for naming errors in the week</td>
+<td>trend down; reason recorded</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s04-8-3"><span class="n">04.8.3</span>Calculating turnaround and the due date</h3>
+<p>Figure <a class="figref" href="#F04-5">F04-5</a> shows the review cycle of this worked example on a working-day axis.</p>
+<p><strong>Worked example:</strong> The UPS subcontractor submits MSC1-UPS-B2-01-DR-X-0031 P02 on Monday 6 July 2026 at 16:00. The contract states a review period of 10 working days counted from the next working day after receipt, and the project calendar has no holiday in July. Day 1 is Tuesday 7 July, so the due date is Monday 20 July (working days: 7, 8, 9, 10, 13, 14, 15, 16, 17 and 20 July). The reviewer returns the drawing on Thursday 16 July with code C, which is 8 working days. The subcontractor resubmits P03 on Thursday 23 July. The second review is due on Thursday 6 August and is returned on Tuesday 4 August with code B (8 working days). The total elapsed time from first submission to approval is 6 July to 4 August, which is 21 working days. The UPS factory needs the approved control wiring drawing 6 weeks before the factory acceptance test (FAT). If the FAT is planned for 7 September, <mark>the latest approval date is 27 July</mark>. The approval on 4 August is 6 working days late. The CxM raises an early warning to move the FAT, or to accept a FAT with the wiring drawing at code B and the comments listed in the FAT procedure.</p>
+<h3 id="s04-8-4"><span class="n">04.8.4</span>Escalation for overdue reviews</h3>
+<ol>
+<li><strong>Due date minus 2 working days.</strong> The CDE sends a reminder to the reviewer. The document controller lists the item in the daily look-ahead.</li>
+<li><strong>Due date.</strong> The design manager calls the reviewer and records a committed return date.</li>
+<li><strong>Due date plus 3 working days.</strong> The item is listed in the weekly project meeting with the committed date and the impact on the programme.</li>
+<li><strong>Due date plus 5 working days.</strong> The project manager writes to the reviewing organisation. The contractor may give a notice under the contract (for example a delay notice), as described in chapter 08.</li>
+<li><strong>Deemed approval clauses.</strong> Some contracts state that a document not reviewed within the period is deemed to have received no objection. The CxM checks the contract for such a clause. <mark>A deemed approval of a test script or a points list can bring an untested sequence to the integrated systems test (IST) stage</mark>.</li>
+</ol>
+<h2 id="s04-9"><span class="n">04.9</span>Superseded document control on site</h2>
+<h3 id="s04-9-1"><span class="n">04.9.1</span>Why site copies need their own control</h3>
+<p>The CDE controls the electronic copies. Printed drawings in a switchroom, a tablet with downloaded files, and a test folder carried by a testing contractor are outside the CDE once they are printed or downloaded. Most errors in testing against old documents come from these copies.</p>
+<h3 id="s04-9-2"><span class="n">04.9.2</span>Site copy control procedure</h3>
+<p><strong>Purpose:</strong> Confirm that every printed or downloaded document used on site is the current revision.</p>
+<p><strong>Owner:</strong> General contractor's site document controller, with the CxM for commissioning documents.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Issue site copies from the CDE only.</strong> Each print carries a stamp "CONTROLLED COPY No. n" with the date printed and the revision. <mark>Uncontrolled prints carry "UNCONTROLLED, FOR INFORMATION ONLY"</mark>.</li>
+<li><strong>Record each copy.</strong> The site copy register lists the copy number, the location (for example the drawing rack in MV room B2-00-MV1) and the holder.</li>
+<li><strong>Withdraw on supersession.</strong> Within 1 working day of a construction transmittal that supersedes a revision, the site document controller collects every controlled copy of the old revision. The controller stamps each copy "SUPERSEDED" with the date and either destroys it or files it in the superseded cabinet. The new revision is placed in the same location.</li>
+<li><strong>Use QR codes where available.</strong> A quick response (QR) code on each print links to the CDE record. Scanning the code on site shows whether the printed revision is still current.</li>
+<li><strong>Check tablets.</strong> Tablets used for checklists must open documents from the CDE in online mode or synchronise before each shift. Offline copies older than the last synchronisation are not used for sign-off.</li>
+<li><strong>Audit weekly.</strong> The site document controller and a CxM representative audit 20 printed documents chosen at random across the active rooms. Any superseded copy found is recorded as a document control non-conformance.</li>
+</ol>
+<p><strong>Acceptance:</strong> Zero superseded copies in the weekly audit; site copy register matches the drawing register.</p>
+<p><strong>Records:</strong> site copy register; superseded withdrawal record; weekly site document audit sheet.</p>
+<h3 id="s04-9-3"><span class="n">04.9.3</span>Site document audit sheet fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Audit date and auditor</td>
+<td>date, name</td>
+<td>14 Aug 2026, DC-GC-03 and CxM electrical</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>text</td>
+<td>B2-00-MV1 drawing rack</td>
+</tr>
+<tr>
+<td>Identifier found</td>
+<td>identifier</td>
+<td>MSC1-EDC-B2-00-DR-E-2101</td>
+</tr>
+<tr>
+<td>Revision on the print</td>
+<td>code</td>
+<td>C01</td>
+</tr>
+<tr>
+<td>Current revision in CDE</td>
+<td>code</td>
+<td>C02</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>current or superseded</td>
+<td>superseded</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>text</td>
+<td>print withdrawn and stamped; C02 placed; NCR DC-0012 raised</td>
+</tr>
+<tr>
+<td>Signature</td>
+<td>initials</td>
+<td>DC-GC-03</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong> Test engineers bring their own printed test scripts from the office. The CxM requires every script used in a witnessed test to carry the controlled-copy stamp, and the witness checks the revision against the CDE before the test starts (chapter 07).</p>
+<h2 id="s04-10"><span class="n">04.10</span>Redlines and as-built control</h2>
+<h3 id="s04-10-1"><span class="n">04.10.1</span>Redline rules</h3>
+<p>A redline is a mark-up on a controlled site copy that records a difference between the installed work and the drawing. Redlines are the input to the as-built drawings.</p>
+<ol>
+<li><strong>Use one master redline set per drawing.</strong> The site keeps one master redline copy per drawing, identified as RL-identifier-sequence (for example RL-B2-E-2101-01). Redlines on other copies are transferred to the master within 1 working day.</li>
+<li><strong>Use fixed colours.</strong> Red for additions, green for deletions, blue for notes that are not part of the drawing. The colour convention is printed in the legend of the master copy.</li>
+<li><strong>Reference the authority.</strong> Each redline carries the authority for the change: RFI number, site instruction, NCR or variation number. <mark>A redline with no authority is a deviation and is raised as an NCR</mark> (chapter 09).</li>
+<li><strong>Date and initial each redline.</strong> The person recording the change and the date are written next to the cloud.</li>
+<li><strong>Record measured values.</strong> Cable routes, valve positions, sensor locations and spare ways are recorded with measured dimensions or panel positions.</li>
+<li><strong>Electronic redlines.</strong> Where markups are made in a shared PDF session (for example a Bluebeam Studio Session), the session record keeps the author and time of each markup. Each markup can be edited only by its author. The master redline set is exported from the session at each milestone.</li>
+</ol>
+<h3 id="s04-10-2"><span class="n">04.10.2</span>As-built process</h3>
+<p><strong>Trigger:</strong> A system reaches Level 3 sign-off, or the contract milestone for as-built drawings.</p>
+<p><strong>Owner:</strong> The contractor who produced the drawing, with the design consultant where the contract requires the designer to update its own drawings.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Freeze the redline set.</strong> The master redline set for the system is scanned and uploaded to the CDE with status S2 and type DR, linked to the drawing.</li>
+<li><strong>Incorporate.</strong> The author updates the native file and issues it at status S3 for review with all clouds and the authority references.</li>
+<li><strong>Verify on site.</strong> The reviewer, with the CxM for commissioned systems, checks a sample on site. For the MSC-1 worked example the sample is all MV and low-voltage (LV) switchgear schedules, all BMS points schedules, and 10 % of cable routes.</li>
+<li><strong>Publish as CR.</strong> The approved as-built drawing is published with status CR and a C revision.</li>
+<li><strong>Close the redline set.</strong> The master redline copy is archived and the site copy register is closed for that drawing.</li>
+</ol>
+<p><strong>Acceptance:</strong> Every redline cloud is shown on the CR drawing or closed with a reason; the CR drawing matches the site sample.</p>
+<p><strong>Records:</strong> redline master set; as-built verification sheet; CR transmittal.</p>
+<p><strong>Worked example:</strong> The BMS points schedule for the CDU group in building 2 hall 3 (MSC1-BMC-B2-01-SH-BM-0004 C01) lists 16 CDUs with 42 points each, which is 672 points. During Level 3 testing, 3 points were added on each CDU (secondary loop leak detection status, filter differential pressure and pump 2 run hours), as instructed by RFI-B2-BMS-0087. The master redline shows 3 × 16 = 48 added points with the authority "RFI-B2-BMS-0087". The as-built schedule C02 lists 720 points. During verification the CxM compares the as-built schedule with the BMS database export: <mark>720 points in both, with 0 differences</mark> in names and addresses. The schedule is published as CR at revision C03.</p>
+<h3 id="s04-10-3"><span class="n">04.10.3</span>As-built verification sheet fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Drawing identifier and revision</td>
+<td>identifier</td>
+<td>MSC1-BMC-B2-01-SH-BM-0004 C02</td>
+</tr>
+<tr>
+<td>Redline set</td>
+<td>reference</td>
+<td>RL-B2-BM-0004-01</td>
+</tr>
+<tr>
+<td>Redline clouds counted</td>
+<td>integer</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Clouds incorporated</td>
+<td>integer</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Site sample</td>
+<td>text</td>
+<td>all 720 points compared with BMS export</td>
+</tr>
+<tr>
+<td>Differences found</td>
+<td>integer</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Verified by</td>
+<td>name, role, date</td>
+<td>CxM controls, 02 Nov 2026</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>accept or reject</td>
+<td>accept</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s04-11"><span class="n">04.11</span>CDE tools and what each is used for</h2>
+<h3 id="s04-11-1"><span class="n">04.11.1</span>Tools on a commissioning programme</h3>
+<p>A hyperscale programme can use more than one platform. Figure <a class="figref" href="#F04-6">F04-6</a> shows, for an example configuration, the tool in which each document class is drafted, the tool that holds the record and when a copy goes to the main CDE. The owner or the general contractor chooses the main CDE, and specialist tools are used for commissioning and for drawing mark-up. The table describes the functions that each vendor's documentation describes. The project information standard decides which tool holds the record for each document class.</p>
+<figure class="sheet" id="F04-6"><a href="../data/cx-handbook/figures/F04-6.svg" title="Open drawing F04-6 at full size"><img src="../data/cx-handbook/figures/F04-6.svg" alt="F04-6: Which tool holds the record for each document class" width="1000" height="606" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F04-6</span> — <b>Which tool holds the record for each document class</b>. One tool holds the record for each document class; the other tools show a copy and a link. The Cx plan names the record tool for every class.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Functions used on a Cx programme</th>
+<th>Record it holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Oracle Aconex</td>
+<td>document register, transmittals that update the recipients' registers, project mail, registration of incoming mail from outside the platform, review workflows, reports on document status, workflow progress and overdue actions</td>
+<td>contractual document register, transmittals, formal correspondence</td>
+</tr>
+<tr>
+<td>Procore</td>
+<td>RFIs, submittals with workflow templates, ball-in-court tracking, drawings with linked RFIs, required on-site dates and lead times</td>
+<td>RFI log, submittal log, drawing set for the contractor</td>
+</tr>
+<tr>
+<td>Autodesk Construction Cloud (ACC)</td>
+<td>Docs with naming standards that validate file names and attributes, status codes and revision codes, reviews, RFIs and submittals, model coordination</td>
+<td>design models and drawings, design review records</td>
+</tr>
+<tr>
+<td>CxAlloy</td>
+<td>commissioning checklists and tests (offline use in the field, synchronised later), issues with photos, asset tracking, reports</td>
+<td>Level 1 to Level 5 checklists, test records, Cx issues log</td>
+</tr>
+<tr>
+<td>Bluebeam Studio (Sessions and Projects)</td>
+<td>shared PDF review where many attendees mark up the same file at the same time; each markup editable by its author; session record exported as a report</td>
+<td>review comments and redline sessions; final record exported to the main CDE</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> For each document class, <mark>the Cx plan names one tool as the record</mark>. A test script can be drafted and commented in Bluebeam. The approved version and its review code are held in the main CDE, and the executed test record is held in CxAlloy with a link to the script identifier and revision.</p>
+<h3 id="s04-11-2"><span class="n">04.11.2</span>Integration rules between tools</h3>
+<ol>
+<li><strong>One identifier everywhere.</strong> The seven-field identifier and the asset tag are the same in every tool. CxAlloy equipment records carry the asset tag; checklists carry the document identifier in a reference field.</li>
+<li><strong>One record per document class.</strong> The register of the main CDE is the record for revision and status. Other tools show a copy and a link.</li>
+<li><strong>Export at milestones.</strong> Commissioning records are exported from CxAlloy as PDF and native data at each Cx level milestone and uploaded to the main CDE under type RP and role CX.</li>
+<li><strong>Access by role.</strong> Each tool assigns permissions to project roles. Named individuals receive a role. When a person leaves, the role is reassigned and the history stays intact.</li>
+<li><strong>Time zone and calendar.</strong> All tools use the project time zone (UTC+7 for Jakarta) and the same working-day calendar, so that due dates match across tools.</li>
+</ol>
+<h3 id="s04-11-3"><span class="n">04.11.3</span>Choosing the CDE configuration at project start</h3>
+<p><strong>Purpose:</strong> Set up the CDE so that commissioning documents can be named, reviewed and found from the first day.</p>
+<p><strong>Owner:</strong> Information manager, with the CxM as a consulted party.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Agree the folder or container structure.</strong> Use the volume code (building) and the discipline as the first two levels. Do not create folders per person or per company for published information.</li>
+<li><strong>Load the code lists.</strong> Fields 1 to 6 with the project additions (CX, BM, PM roles; RF level code).</li>
+<li><strong>Configure states and status codes.</strong> WIP, shared, published and archived areas with the S, A, B and CR codes. Restrict A codes to the approver roles.</li>
+<li><strong>Configure workflows.</strong> At minimum: design review, submittal review, method statement review, test script review, as-built review. Each workflow has a named role, a review period in working days and an escalation step.</li>
+<li><strong>Configure the transmittal template.</strong> Purpose of issue, response due date and superseded list as required fields.</li>
+<li><strong>Load the distribution matrix.</strong> By role.</li>
+<li><strong>Test the configuration.</strong> Upload 10 dummy containers through every workflow and confirm the register, the status, the revision and the notifications. The CxM signs the test record before the first live upload.</li>
+</ol>
+<p><strong>Records:</strong> CDE configuration record, test upload record signed by the information manager and the CxM.</p>
+<h2 id="s04-12"><span class="n">04.12</span>Commissioning documents in the CDE</h2>
+<h3 id="s04-12-1"><span class="n">04.12.1</span>The Cx document set</h3>
+<p>The CxM owns a set of documents that must be held in the CDE with the same control as design documents.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Document</th>
+<th>Type code</th>
+<th>Role code</th>
+<th>Originator</th>
+<th>Status needed before use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Owner's project requirements (OPR)</td>
+<td>SP</td>
+<td>K</td>
+<td>owner</td>
+<td>A code, published</td>
+</tr>
+<tr>
+<td>Basis of design (BOD)</td>
+<td>RP</td>
+<td>E, M, BM</td>
+<td>designers</td>
+<td>A code, published</td>
+</tr>
+<tr>
+<td>Cx plan</td>
+<td>RP</td>
+<td>CX</td>
+<td>CxA or CxM</td>
+<td>A code, published</td>
+</tr>
+<tr>
+<td>Cx specification</td>
+<td>SP</td>
+<td>CX</td>
+<td>CxA</td>
+<td>A code, published</td>
+</tr>
+<tr>
+<td>Level 1 factory and Level 2 delivery checklists</td>
+<td>RP</td>
+<td>CX</td>
+<td>CxM, contractor</td>
+<td>template at A code</td>
+</tr>
+<tr>
+<td>Level 2 installation checklists</td>
+<td>RP</td>
+<td>CX</td>
+<td>contractor</td>
+<td>template at A code</td>
+</tr>
+<tr>
+<td>Level 3 start-up and functional checklists</td>
+<td>RP</td>
+<td>CX</td>
+<td>contractor, CxM</td>
+<td>template at A code</td>
+</tr>
+<tr>
+<td>Level 4 functional performance test scripts</td>
+<td>RP</td>
+<td>CX</td>
+<td>CxM</td>
+<td>A code; one script per system or equipment group</td>
+</tr>
+<tr>
+<td>Level 5 integrated systems test (IST) scripts</td>
+<td>RP</td>
+<td>CX</td>
+<td>CxM</td>
+<td>A code; owner and CxA accepted</td>
+</tr>
+<tr>
+<td>Cx issues log</td>
+<td>SH</td>
+<td>CX</td>
+<td>CxM</td>
+<td>live register; weekly export at S2</td>
+</tr>
+<tr>
+<td>Cx meeting minutes</td>
+<td>MI</td>
+<td>CX</td>
+<td>CxM</td>
+<td>S2</td>
+</tr>
+<tr>
+<td>Cx reports (per level, final)</td>
+<td>RP</td>
+<td>CX</td>
+<td>CxM, CxA</td>
+<td>A code</td>
+</tr>
+<tr>
+<td>Systems manual and training records</td>
+<td>RP</td>
+<td>CX</td>
+<td>contractor, CxM</td>
+<td>A code before handover</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s04-12-2"><span class="n">04.12.2</span>Rules for test scripts and checklists</h3>
+<ol>
+<li><strong>Templates are published documents.</strong> Each checklist template has an identifier and a revision. An executed checklist records the template identifier and revision it was based on.</li>
+<li><strong>Executed records are new containers.</strong> Each executed checklist for one asset is its own container with its own number, linked to the asset tag. <mark>The template is never overwritten with test data</mark>.</li>
+<li><strong>Script changes during a test are redlines.</strong> If a step in a Level 4 script is changed during the test, the witness writes the change on the controlled copy, both parties sign it, and the script is revised afterwards. The executed record keeps the redlined copy.</li>
+<li><strong>Test data is kept in native form.</strong> Trend logs, power analyser files, thermographic images and BMS exports are attached to the executed record in their native format and as PDF.</li>
+<li><strong>Retest records are separate.</strong> A retest after a failed test is a new executed record with a reference to the failed one and to the Cx issue that was closed.</li>
+</ol>
+<p><strong>Worked example:</strong> The Level 4 test script for the CDUs of building 2 hall 3 is MSC1-CXA-B2-01-RP-CX-4012, revision C02, status A4. On 21 September the CxM executes the script on CDU B2-DH3-CDU-07. During step 18 (pump changeover on loss of pump 1), the script states a changeover time of ≤ 5 s, while the approved sequence of operations states ≤ 10 s. The witness and the contractor apply the sequence of operations value (the higher-order document). They record the redline on the controlled copy with both signatures and the authority "sequence of operations MSC1-BMC-B2-01-SP-BM-0002 C02, clause 4.3.2". <mark>The measured changeover time of 6.8 s is recorded as a pass</mark>. The CxM revises the script to C03 within 5 working days, and the remaining 15 CDUs are tested on C03.</p>
+<h3 id="s04-12-3"><span class="n">04.12.3</span>Document hierarchy for conflicts</h3>
+<p>When two documents disagree, the contract states the order of precedence. Where the contract is silent for commissioning documents, the usual practice on hyperscale programmes is the order below, and the conflict is raised as an RFI (chapter 05).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Document</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>contract and its conditions</td>
+</tr>
+<tr>
+<td>2</td>
+<td>owner's project requirements</td>
+</tr>
+<tr>
+<td>3</td>
+<td>specifications</td>
+</tr>
+<tr>
+<td>4</td>
+<td>approved design drawings and sequences of operation</td>
+</tr>
+<tr>
+<td>5</td>
+<td>approved shop drawings and submittals</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Cx plan and Cx specification</td>
+</tr>
+<tr>
+<td>7</td>
+<td>approved test scripts and checklists</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s04-13"><span class="n">04.13</span>Access, security, retention and handover</h2>
+<h3 id="s04-13-1"><span class="n">04.13.1</span>Access rules</h3>
+<p>Data-centre drawings include security layouts, network diagrams and power capacity information. The usual practice is to classify these as restricted.</p>
+<ol>
+<li><strong>Classify at upload.</strong> The security class is a required metadata field (public, internal, restricted).</li>
+<li><strong>Restrict by role.</strong> Restricted containers are visible only to named roles. The operational technology (OT) network drawings (chapter 26) and the physical security layouts are restricted.</li>
+<li><strong>Watermark prints.</strong> Restricted prints carry the user name and the print date.</li>
+<li><strong>Review access quarterly.</strong> The information manager exports the user list and the role list and removes users who have left the project. The record is kept.</li>
+<li><strong>No personal storage.</strong> Documents are not stored in personal cloud folders or messaging groups. <mark>Photos of drawings sent through messaging applications are uncontrolled copies</mark>.</li>
+</ol>
+<h3 id="s04-13-2"><span class="n">04.13.2</span>Retention and archive</h3>
+<p>The archive holds every revision, transmittal, review comment and acknowledgement. The retention period is set by the contract and by law. The CxM confirms that executed Cx records, test data and calibration certificates of test instruments are included in the archive scope. Warranty claims and incident investigations after handover need these records.</p>
+<h3 id="s04-13-3"><span class="n">04.13.3</span>Handover of the record set</h3>
+<p><strong>Trigger:</strong> Practical completion of a building, or the contract milestone for the asset information model. Figure <a class="figref" href="#F04-7">F04-7</a> shows the five steps and the completeness count of the building 2 worked example below.</p>
+<figure class="sheet" id="F04-7"><a href="../data/cx-handbook/figures/F04-7.svg" title="Open drawing F04-7 at full size"><img src="../data/cx-handbook/figures/F04-7.svg" alt="F04-7: Handover completeness of the building 2 record set" width="1000" height="793" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F04-7</span> — <b>Handover completeness of the building 2 record set</b>. MSC-1 worked example of 04.13.3. The owner does not authorise the asset information model (AIM) until every open container is closed or accepted as a listed exception.</figcaption></figure>
+
+<p><strong>Owner:</strong> Information manager, with the CxM for commissioning records.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Check completeness against the MIDP.</strong> Every container in the MIDP with a handover milestone has status CR or A code.</li>
+<li><strong>Check asset data.</strong> Each asset tag has the fields required by the AIR (manufacturer, model, serial number, installation date, warranty start, maintenance interval).</li>
+<li><strong>Check Cx records.</strong> Each commissioned asset has its executed Level 1 to Level 4 records and its system has a Level 5 record.</li>
+<li><strong>Authorise the AIM.</strong> The AIM containers are shared at S7 and authorised by the owner.</li>
+<li><strong>Transfer.</strong> The record set is transferred to the owner's operations CDE or CMMS on a transmittal with purpose "for record".</li>
+</ol>
+<p><strong>Acceptance:</strong> zero missing containers against the MIDP handover list; zero asset tags with missing required fields; owner acknowledgement of the record transmittal.</p>
+<p><strong>Worked example:</strong> In the MSC-1 worked example, building 2 has 1,940 containers in the MIDP with a handover milestone. At the completeness check, 1,902 are at CR or A code, 31 are at P revisions under review and 7 are missing. <mark>The completeness is 1,902 ÷ 1,940 × 100 = 98.0 %</mark>. The 38 open items are listed by originator with a due date. The owner does not authorise the AIM until the figure is 100 % or the owner accepts a listed exception for each open item.</p>
+<h2 id="s04-14"><span class="n">04.14</span>Audits, common errors and how to detect them</h2>
+<h3 id="s04-14-1"><span class="n">04.14.1</span>Weekly document control audit</h3>
+<p><strong>Purpose:</strong> Find document control failures before a witness test uses a wrong document.</p>
+<p><strong>Owner:</strong> CxM, with the general contractor's document controller.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Sample the register.</strong> Pick 20 published documents used by tests planned for the next 2 weeks.</li>
+<li><strong>Check status and revision.</strong> Each must be at an A code with a C revision, or at the status the Cx plan allows.</li>
+<li><strong>Check transmittals.</strong> Each must have a construction transmittal with full acknowledgement.</li>
+<li><strong>Check site copies.</strong> Visit the locations listed in the site copy register and compare the printed revision.</li>
+<li><strong>Check test scripts.</strong> The scripts for the next 2 weeks must be at the approved revision, with the documents they refer to at the revision stated in the script header.</li>
+<li><strong>Record findings.</strong> Each finding is logged with an owner and a due date of no more than 2 working days.</li>
+</ol>
+<p><strong>Acceptance:</strong> <mark>zero findings on documents used in the next week's witness tests</mark>.</p>
+<h3 id="s04-14-2"><span class="n">04.14.2</span>Common errors table</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>How to detect it before the witness test</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Test script refers to C01 of a drawing that is now C02</td>
+<td>compare the reference list in the script header with the register</td>
+<td>revise the script reference; recheck the affected steps</td>
+</tr>
+<tr>
+<td>Drawing at S2 used for installation</td>
+<td>Level 2 checklist records the drawing status; CxM checks a sample</td>
+<td>stop the work; raise an NCR; reinstall against the A-coded drawing if different</td>
+</tr>
+<tr>
+<td>Supplier drawing with its own number only</td>
+<td>register search by asset tag returns no drawing</td>
+<td>document controller assigns the project identifier and records the supplier number in "originator reference"</td>
+</tr>
+<tr>
+<td>Two documents with the same identifier</td>
+<td>CDE duplicate check; naming holding area</td>
+<td>renumber the later document; inform all recipients by transmittal</td>
+</tr>
+<tr>
+<td>Points schedule in a spreadsheet emailed between parties</td>
+<td>BMS integrator's database version differs from the register revision</td>
+<td>publish the schedule in the CDE; freeze the emailed copies as uncontrolled</td>
+</tr>
+<tr>
+<td>Comment on code B drawing never closed</td>
+<td>comment count open greater than zero at Level 2</td>
+<td>Level 2 checklist includes "all review comments closed" as an item</td>
+</tr>
+<tr>
+<td>Redline without authority</td>
+<td>redline cloud with no RFI, site instruction (SI) or NCR reference</td>
+<td>raise an NCR; obtain approval or remove the change</td>
+</tr>
+<tr>
+<td>Executed checklist not linked to a template revision</td>
+<td>CxAlloy record without template reference</td>
+<td>add the reference; if the template changed, check the steps against the revision used</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s04-15"><span class="n">04.15</span>Checklist for site use</h2>
+<ol>
+<li><strong>Code lists issued.</strong> The project code lists for all seven fields, including the CX, BM and PM role codes, are published before the first Cx document.</li>
+<li><strong>CDE configuration tested.</strong> Ten dummy containers have passed through every workflow, and the CxM has signed the test record.</li>
+<li><strong>Contract review periods recorded.</strong> The Cx plan states the review period for each document type and whether the contract counts working or calendar days.</li>
+<li><strong>EIR includes Cx records.</strong> The exchange information requirements list every Cx record type, format, type code and milestone.</li>
+<li><strong>Names checked before upload.</strong> Every upload passes the six-step name check, and exceptions are logged.</li>
+<li><strong>Status before use.</strong> Only A-coded documents with C revisions are used for installation and testing, unless the Cx plan states another rule for a named document type.</li>
+<li><strong>Review codes understood.</strong> All parties have the written meaning of codes A, B, C and D, and code C items are blocked in the Cx programme.</li>
+<li><strong>Comments tracked.</strong> Every code B and code C comment is recorded on a comment response sheet with a closure status.</li>
+<li><strong>Transmittals complete.</strong> Each construction transmittal has a purpose, a superseded list and acknowledgements within the time limits.</li>
+<li><strong>Distribution matrix current.</strong> The matrix is updated weekly from the project directory.</li>
+<li><strong>Site copies controlled.</strong> Prints carry controlled-copy stamps, the site copy register is current, and superseded prints are withdrawn within 1 working day.</li>
+<li><strong>Weekly site audit done.</strong> Twenty documents are audited each week with zero superseded copies found at the witness locations.</li>
+<li><strong>Redlines kept on master sets.</strong> Each redline has a colour, a date, initials and an authority reference.</li>
+<li><strong>As-built verified.</strong> Each CR drawing for a commissioned system has an as-built verification sheet.</li>
+<li><strong>Cx records in the CDE.</strong> Templates, executed records, test data and retest records are held as separate containers linked to asset tags.</li>
+<li><strong>Turnaround KPIs reported.</strong> The weekly report shows average turnaround, on-time percentage, overdue reviews and unacknowledged transmittals.</li>
+<li><strong>Access reviewed.</strong> Restricted containers are limited by role and the user list is reviewed each quarter.</li>
+<li><strong>Handover completeness measured.</strong> The MIDP handover list shows 100 % or an owner-accepted exception for each open item.</li>
+</ol>
+<h2 id="s04-16"><span class="n">04.16</span>Sources</h2>
+<ol>
+<li>ISO 19650-1:2018, Organization and digitization of information about buildings and civil engineering works, including building information modelling (BIM), Information management using building information modelling, Part 1: Concepts and principles, ISO, 2018. <a href="https://www.iso.org/standard/68078.html" rel="noopener">https://www.iso.org/standard/68078.html</a></li>
+<li>ISO 19650-2:2018, Part 2: Delivery phase of the assets, ISO, 2018. <a href="https://www.iso.org/standard/68080.html" rel="noopener">https://www.iso.org/standard/68080.html</a></li>
+<li>Centre for Digital Built Britain, BIM Toolkit National Annex Guidance (information container identification, field codification, status and revision codes), accessed 31 October 2026. <a href="https://www.cdbb.cam.ac.uk/files/national_annex_guidance.pdf" rel="noopener">https://www.cdbb.cam.ac.uk/files/national_annex_guidance.pdf</a></li>
+<li>Autodesk, "Status Codes", Autodesk Construction Cloud Docs help (file naming standards), accessed 31 October 2026. <a href="https://help.autodesk.com/cloudhelp/ENU/Docs-Files/files/files-naming-standard/Status_Codes.html" rel="noopener">https://help.autodesk.com/cloudhelp/ENU/Docs-Files/files/files-naming-standard/Status_Codes.html</a></li>
+<li>Autodesk, "Revision Codes", Autodesk Construction Cloud Docs help, accessed 31 October 2026. <a href="https://help.autodesk.com/view/DOCS/ENU/?guid=Revision_Codes" rel="noopener">https://help.autodesk.com/view/DOCS/ENU/?guid=Revision_Codes</a></li>
+<li>Autodesk, "Create Naming Standards", Autodesk Construction Cloud Docs help, accessed 31 October 2026. <a href="https://help.autodesk.com/cloudhelp/ENU/Docs-Files/files/files-naming-standard/Set_Up_Naming_Standard.html" rel="noopener">https://help.autodesk.com/cloudhelp/ENU/Docs-Files/files/files-naming-standard/Set_Up_Naming_Standard.html</a></li>
+<li>Designing Buildings Wiki, "Common data environment CDE" (status areas WIP, shared, published, archive), accessed 31 October 2026. <a href="https://www.designingbuildings.co.uk/wiki/Common_data_environment_CDE" rel="noopener">https://www.designingbuildings.co.uk/wiki/Common_data_environment_CDE</a></li>
+<li>BIM+ (CIOB), "Status codes: why the complexity", on the change from BS 1192 codes to ISO 19650 codes, accessed 31 October 2026. <a href="https://bimplus.co.uk/status-codes-why-complexity" rel="noopener">https://bimplus.co.uk/status-codes-why-complexity</a></li>
+<li>Oracle Aconex Support Central, "What is the difference between a document, a transmittal, and a mail", accessed 31 October 2026. <a href="https://help.aconex.com/mail/what-is-the-difference-between-a-document,-a-transmittal,-and-a-/" rel="noopener">https://help.aconex.com/mail/what-is-the-difference-between-a-document,-a-transmittal,-and-a-/</a></li>
+<li>Oracle Aconex Support Central, "Transmit documents" and "Register incoming mail received from outside Aconex", accessed 31 October 2026. <a href="https://help.aconex.com/documents/transmit-your-document/" rel="noopener">https://help.aconex.com/documents/transmit-your-document/</a> and <a href="https://help.aconex.com/mail/register-incoming-mail-received-from-outside-aconex/" rel="noopener">https://help.aconex.com/mail/register-incoming-mail-received-from-outside-aconex/</a></li>
+<li>Procore, "Create a Submittal", Procore support documentation, accessed 31 October 2026. <a href="https://v2.support.procore.com/product-manuals/submittals-project/tutorials/create-a-submittal" rel="noopener">https://v2.support.procore.com/product-manuals/submittals-project/tutorials/create-a-submittal</a></li>
+<li>Bluebeam, "Five things you may not know about Studio Sessions" and "Studio Sessions vs. Studio Projects Guide", accessed 31 October 2026. <a href="https://support.bluebeam.com/studio/how-to/tips-and-tricks/five-things-you-may-not-know-about-sessions.html" rel="noopener">https://support.bluebeam.com/studio/how-to/tips-and-tricks/five-things-you-may-not-know-about-sessions.html</a> and <a href="https://support.bluebeam.com/articles/studio-and-bluebeam-cloud-comparison-guide" rel="noopener">https://support.bluebeam.com/articles/studio-and-bluebeam-cloud-comparison-guide</a></li>
+<li>CxAlloy, "Commissioning project management", product documentation, accessed 31 October 2026. <a href="https://www.cxalloy.com/commissioning-project-management/" rel="noopener">https://www.cxalloy.com/commissioning-project-management/</a></li>
+<li>USACE, NAVFAC and AFCEC, UFGS 01 33 00 Submittal Procedures (review action codes, review periods, resubmittal numbering), Whole Building Design Guide, accessed 31 October 2026. <a href="https://www.wbdg.org/FFC/DOD/UFGS/UFGS%2001%2033%2000.pdf" rel="noopener">https://www.wbdg.org/FFC/DOD/UFGS/UFGS%2001%2033%2000.pdf</a></li>
+<li>FIDIC, Conditions of Contract for Plant and Design-Build (Yellow Book), Second Edition 2017, Sub-Clause 5.2.2 review period, as quoted in published contract amendments ("in Sub-Clause 5.2.2 first paragraph, '21 days' is deleted and replaced with '30 days'"), accessed 31 October 2026. <a href="https://www.lawinsider.com/clause/contractors-documents" rel="noopener">https://www.lawinsider.com/clause/contractors-documents</a></li>
+<li>NEC, "Period for reply" FAQ, neccontract.com, accessed 31 October 2026. <a href="https://www.neccontract.com/support/faqs/period-for-reply" rel="noopener">https://www.neccontract.com/support/faqs/period-for-reply</a></li>
+<li>BS 1192:2007+A2:2016, Collaborative production of architectural, engineering and construction information, Code of practice, BSI (withdrawn and replaced by BS EN ISO 19650). <a href="https://knowledge.bsigroup.com/products/collaborative-production-of-architectural-engineering-and-construction-information-code-of-practice" rel="noopener">https://knowledge.bsigroup.com/products/collaborative-production-of-architectural-engineering-and-construction-information-code-of-practice</a></li>
+<li>MSC-1 case ledger, <code>../case_ledger.json</code>, Data Centre Commissioning Field Manual R01 working files, October 2026.</li>
+<li>London Borough of Camden, contractor documentation requirements listing the BS 1192:2007 codes D1 for costing, D2 for tender, D3 for contractor design, D4 for manufacture or procurement, accessed 1 November 2026. <a href="https://camdocs.camden.gov.uk/CMWebDrawer/Record/5189673/file/document" rel="noopener">https://camdocs.camden.gov.uk/CMWebDrawer/Record/5189673/file/document</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="03-commissioning-documents.html"><span>Previous · 03</span><span class="t">Commissioning documents</span></a><a class="next" href="05-rfi-and-technical-queries.html"><span>Next · 05</span><span class="t">Requests for information (RFI) and technical queries</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

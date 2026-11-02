@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>16 UPS, batteries, transfer switches and rack power distribution | Cx Field Manual R01</title>
+<meta name="description" content="This chapter covers the part of the electrical system that keeps the information technology (IT) load supplied without a break.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/16-ups-batteries-transfer-rack-power.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/16-ups-batteries-transfer-rack-power.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/16-ups-batteries-transfer-rack-power.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/16-ups-batteries-transfer-rack-power.html">
+<meta property="og:title" content="16 UPS, batteries, transfer switches and rack power distribution | Cx Field Manual R01">
+<meta property="og:description" content="This chapter covers the part of the electrical system that keeps the information technology (IT) load supplied without a break.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="16 UPS, batteries, transfer switches and rack power distribution | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter covers the part of the electrical system that keeps the information technology (IT) load supplied without a break.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"16 UPS, batteries, transfer switches and rack power distribution","name":"UPS, batteries, transfer switches and rack power distribution","description":"This chapter covers the part of the electrical system that keeps the information technology (IT) load supplied without a break.","url":"https://resistancezero.com/cx-handbook/16-ups-batteries-transfer-rack-power.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/16-ups-batteries-transfer-rack-power.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":10062,"position":16,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"16 UPS, batteries, transfer switches and rack power distribution","item":"https://resistancezero.com/cx-handbook/16-ups-batteries-transfer-rack-power.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part C · Electrical commissioning</p>
+    <h1><span class="num">16</span>UPS, batteries, transfer switches and rack power distribution</h1>
+    <p class="lede">This chapter covers the part of the electrical system that keeps the information technology (IT) load supplied without a break.</p>
+    <p class="basis">Chapter 16 of 32 · 17 sections · 7 figures · 10,062 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 16</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 16</summary>
+<ol><li><a href="#s16-0"><span class="n">16.0</span>Scope of this chapter</a></li><li><a href="#s16-1"><span class="n">16.1</span>The power chain from block transformer to rack</a><ol><li><a href="#s16-1-1"><span class="n">16.1.1</span>Why the chain exists</a></li><li><a href="#s16-1-2"><span class="n">16.1.2</span>The MSC-1 block design</a></li><li><a href="#s16-1-3"><span class="n">16.1.3</span>Components in the chain</a></li></ol></li><li><a href="#s16-2"><span class="n">16.2</span>UPS types and the IEC 62040-3 classification</a><ol><li><a href="#s16-2-1"><span class="n">16.2.1</span>Input dependency</a></li><li><a href="#s16-2-2"><span class="n">16.2.2</span>Output waveform and dynamic class</a></li><li><a href="#s16-2-3"><span class="n">16.2.3</span>What the site tests prove against the classification</a></li></ol></li><li><a href="#s16-3"><span class="n">16.3</span>UPS factory acceptance test</a><ol><li><a href="#s16-3-1"><span class="n">16.3.1</span>FAT content</a></li><li><a href="#s16-3-2"><span class="n">16.3.2</span>What the site repeats and why</a></li></ol></li><li><a href="#s16-4"><span class="n">16.4</span>UPS installation checks (Level 2)</a></li><li><a href="#s16-5"><span class="n">16.5</span>UPS start-up (Level 3)</a></li><li><a href="#s16-6"><span class="n">16.6</span>UPS functional tests (Level 4)</a><ol><li><a href="#s16-6-1"><span class="n">16.6.1</span>Test set-up</a></li><li><a href="#s16-6-2"><span class="n">16.6.2</span>Steady-state output</a></li><li><a href="#s16-6-3"><span class="n">16.6.3</span>Step load test</a></li><li><a href="#s16-6-4"><span class="n">16.6.4</span>Input failure and return (mode transfer)</a></li><li><a href="#s16-6-5"><span class="n">16.6.5</span>Transfer to static bypass and back</a></li><li><a href="#s16-6-6"><span class="n">16.6.6</span>Maintenance bypass</a></li><li><a href="#s16-6-7"><span class="n">16.6.7</span>Eco mode and parallel redundancy</a></li><li><a href="#s16-6-8"><span class="n">16.6.8</span>Generator compatibility test</a></li><li><a href="#s16-6-9"><span class="n">16.6.9</span>Efficiency test</a></li><li><a href="#s16-6-10"><span class="n">16.6.10</span>Full-load battery autonomy test</a></li></ol></li><li><a href="#s16-7"><span class="n">16.7</span>Batteries</a><ol><li><a href="#s16-7-1"><span class="n">16.7.1</span>Battery technologies in data centres</a></li><li><a href="#s16-7-2"><span class="n">16.7.2</span>Battery installation checks (Level 2)</a></li><li><a href="#s16-7-3"><span class="n">16.7.3</span>Lead-acid capacity test (IEEE 450 and IEEE 1188 method)</a></li><li><a href="#s16-7-4"><span class="n">16.7.4</span>Ohmic measurements and float checks</a></li><li><a href="#s16-7-5"><span class="n">16.7.5</span>Test intervals for lead-acid batteries</a></li><li><a href="#s16-7-6"><span class="n">16.7.6</span>Lithium-ion battery commissioning</a></li><li><a href="#s16-7-7"><span class="n">16.7.7</span>Battery discharge curve</a></li></ol></li><li><a href="#s16-8"><span class="n">16.8</span>Transfer switches: STS, ATS and rack transfer switches</a><ol><li><a href="#s16-8-1"><span class="n">16.8.1</span>Types and timing</a></li><li><a href="#s16-8-2"><span class="n">16.8.2</span>ATS time delays</a></li><li><a href="#s16-8-3"><span class="n">16.8.3</span>STS transfer timing test</a></li><li><a href="#s16-8-4"><span class="n">16.8.4</span>ATS functional test</a></li></ol></li><li><a href="#s16-9"><span class="n">16.9</span>Rack power distribution: RPP, busway, tap-off units and rack PDUs</a><ol><li><a href="#s16-9-1"><span class="n">16.9.1</span>Distribution options</a></li><li><a href="#s16-9-2"><span class="n">16.9.2</span>Busway installation and tests</a></li><li><a href="#s16-9-3"><span class="n">16.9.3</span>Rack PDU checks</a></li><li><a href="#s16-9-4"><span class="n">16.9.4</span>Metering accuracy classes</a></li><li><a href="#s16-9-5"><span class="n">16.9.5</span>Metering accuracy test</a></li></ol></li><li><a href="#s16-10"><span class="n">16.10</span>Monitoring: UPS, battery, STS and PDU points to EPMS</a><ol><li><a href="#s16-10-1"><span class="n">16.10.1</span>Minimum alarm list</a></li><li><a href="#s16-10-2"><span class="n">16.10.2</span>Point-to-point test</a></li></ol></li><li><a href="#s16-11"><span class="n">16.11</span>Integrated tests for the UPS and rack power chain (Level 5)</a></li><li><a href="#s16-12"><span class="n">16.12</span>Filled test records</a><ol><li><a href="#s16-12-1"><span class="n">16.12.1</span>UPS L4 test summary</a></li><li><a href="#s16-12-2"><span class="n">16.12.2</span>Battery capacity test record</a></li><li><a href="#s16-12-3"><span class="n">16.12.3</span>Transfer switch timing record</a></li></ol></li><li><a href="#s16-13"><span class="n">16.13</span>Common errors and how to find them before the witness test</a></li><li><a href="#s16-14"><span class="n">16.14</span>Key performance indicators for the UPS and rack power scope</a></li><li><a href="#s16-15"><span class="n">16.15</span>Checklist for site use</a></li><li><a href="#s16-16"><span class="n">16.16</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="15-generators-fuel-synchronising.html"><span>Previous</span>15 Generators, fuel systems and synchronising switchgear</a><a href="17-earthing-lightning-power-quality.html"><span>Next</span>17 Earthing, lightning protection and power quality</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s16-0"><span class="n">16.0</span>Scope of this chapter</h2>
+<p>This chapter covers the part of the electrical system that keeps the information technology (IT) load supplied without a break. The equipment is the static uninterruptible power supply (UPS) modules, their batteries, the static and automatic transfer switches, and the distribution from the UPS output to the rack power distribution units (PDUs). The chapter gives the tests from factory to integrated systems test. For each test it gives the instrument, set-up, applied value, duration, acceptance value and source, and the filled record.</p>
+<ol>
+<li><strong>The power chain.</strong> From the block transformer to the rack, with the MSC-1 block numbers.</li>
+<li><strong>UPS types and IEC 62040-3 classification.</strong> voltage and frequency independent (VFI), voltage independent (VI) and voltage and frequency dependent (VFD); the output waveform letters; the dynamic performance classes 1 to 3.</li>
+<li><strong>UPS factory acceptance test.</strong> What the witness sees at the factory and what the site repeats.</li>
+<li><strong>UPS installation and start-up.</strong> Level 2 and Level 3 checks.</li>
+<li><strong>UPS functional tests.</strong> Steady-state, efficiency, step load, mode transfers, bypass, maintenance bypass, ECO mode, parallel redundancy, input harmonics, generator compatibility and full-load battery autonomy.</li>
+<li><strong>Batteries.</strong> Vented and valve-regulated lead-acid (VRLA), nickel-cadmium and lithium-ion; IEEE 450, IEEE 1188, IEEE 1106, UL 1973 and UL 9540A; the capacity test; ohmic measurements; battery management system (BMS) checks for lithium-ion.</li>
+<li><strong>Transfer switches.</strong> Static transfer switches (STS), automatic transfer switches (ATS) and rack transfer switches, with their timing tests.</li>
+<li><strong>Rack power distribution.</strong> Remote power panels (RPP), busway and tap-off units, rack PDUs and the metering accuracy classes.</li>
+<li><strong>Monitoring.</strong> Alarms and points to the electrical power monitoring system (EPMS).</li>
+<li><strong>Records, errors, KPIs and the site checklist.</strong></li>
+</ol>
+<p>Documents and standards used: IEC 62040-1 (UPS safety), IEC 62040-3:2021 (UPS performance and test methods), IEEE 450 (vented lead-acid maintenance and testing), IEEE 1188 (VRLA), IEEE 1106 (nickel-cadmium), IEEE 485 (lead-acid sizing) and IEEE 1635 (battery ventilation and thermal management). The chapter also uses UL 1973 (stationary batteries), UL 9540 and UL 9540A (energy storage systems and thermal runaway fire test method), NFPA 855 (stationary energy storage installation), IEEE 446 (emergency and standby power, the Orange Book) and the Information Technology Industry Council (ITI) curve, formerly the Computer and Business Equipment Manufacturers Association (CBEMA) curve. It also uses ANSI C12.20 and IEC 62053-21 and -22 (meter accuracy classes), IEC 61439-6 (busbar trunking), ANSI/NETA Acceptance Testing Specifications (ATS), PUIL 2020 and the UPS, battery and power distribution unit (PDU) manufacturers' commissioning documents.</p>
+<h2 id="s16-1"><span class="n">16.1</span>The power chain from block transformer to rack</h2>
+
+<figure class="sheet" id="F16-4"><a href="../data/cx-handbook/figures/F16-4.svg" title="Open drawing F16-4 at full size"><img src="../data/cx-handbook/figures/F16-4.svg" alt="F16-4: Rack power chain of one MSC-1 rack: two blocks, two UPS, two busways, two rack PDUs" width="1400" height="1110" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F16-4</span> — <b>Rack power chain of one MSC-1 rack: two blocks, two UPS, two busways, two rack PDUs</b>. Each rack takes its A feed from one block and its B feed from another; each feed carries half the rack in normal operation and the whole rack when the other block is lost.</figcaption></figure>
+<h3 id="s16-1-1"><span class="n">16.1.1</span>Why the chain exists</h3>
+<p>The utility and the generators cannot supply power without a break. A utility fault clears in 100 ms or more, and a generator plant needs about 7 to 25 seconds to be on the bus (chapter 15). IT power supplies ride through about 20 ms of zero voltage at full load (the ITI curve value; confirm against the ITI curve note). The UPS bridges that gap by converting stored DC energy to AC with no break, and it filters the voltage disturbances of the supply.</p>
+<h3 id="s16-1-2"><span class="n">16.1.2</span>The MSC-1 block design</h3>
+<p>In the MSC-1 worked example, each hall of 12 MW IT is supplied by 8 power blocks. Each block has a 2.5 MVA transformer (20/0.415 kV, 3,478 A on the low-voltage side) and a 2.5 MW UPS with 5 minutes of battery autonomy. The design is block-redundant: 7 blocks carry the full hall load and the eighth is the redundant block.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>MSC-1 value</th>
+<th>Derivation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hall IT load</td>
+<td>12 MW</td>
+<td>ledger</td>
+</tr>
+<tr>
+<td>Blocks per hall</td>
+<td>8</td>
+<td>ledger</td>
+</tr>
+<tr>
+<td>IT load per block, normal</td>
+<td>1.5 MW</td>
+<td>12 / 8</td>
+</tr>
+<tr>
+<td>UPS output load per block, normal</td>
+<td>1.5625 MW = <mark>62.5 %</mark> of 2.5 MW</td>
+<td>1.5 / 0.96 power supply unit (PSU) efficiency</td>
+</tr>
+<tr>
+<td>UPS load with one block lost</td>
+<td>1.786 MW = 71.4 %</td>
+<td>12 / 7 / 0.96</td>
+</tr>
+<tr>
+<td>Strict 2N comparison</td>
+<td>125 %</td>
+<td>half the blocks carrying the hall: 12 / 4 / 0.96 / 2.5</td>
+</tr>
+<tr>
+<td>Battery energy screen per block</td>
+<td>301.4 kWh</td>
+<td>2.5 MW × 5/60 h = 208.3 kWh, divided by 0.96 × 0.80 × 0.90</td>
+</tr>
+<tr>
+<td>Rack power (type R)</td>
+<td>120 kW</td>
+<td>ledger</td>
+</tr>
+<tr>
+<td>Rack current at 415 V</td>
+<td>170.4 A</td>
+<td>120,000 / (√3 × 415 × 0.98)</td>
+</tr>
+<tr>
+<td>Rack power (type S)</td>
+<td>142 kW, 201.6 A</td>
+<td>ledger</td>
+</tr>
+</tbody>
+</table></div>
+<p>The battery screen of 301.4 kWh reproduces with an inverter efficiency of 0.96, an end-of-life capacity factor of 0.80 (the IEEE 450 and IEEE 1188 replacement point) and a design margin factor of 0.90. These factors are the screening basis; the battery vendor's sizing to IEEE 485 (lead-acid) or the vendor method (lithium-ion) governs.</p>
+<p>Figure <a class="figref" href="#F16-4">F16-4</a> shows the rack power chain from the block transformer to the rack PDU.</p>
+<h3 id="s16-1-3"><span class="n">16.1.3</span>Components in the chain</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Function</th>
+<th>Main commissioning tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Block transformer and LV switchboard</td>
+<td>20/0.415 kV supply</td>
+<td>chapter 13 and 14</td>
+</tr>
+<tr>
+<td>UPS input and bypass breakers</td>
+<td>feed the rectifier and the static bypass</td>
+<td>chapter 14 breaker tests</td>
+</tr>
+<tr>
+<td>UPS modules</td>
+<td>double conversion with battery support</td>
+<td>16.3 to 16.6</td>
+</tr>
+<tr>
+<td>Battery strings and battery breakers</td>
+<td>stored energy</td>
+<td>16.7</td>
+</tr>
+<tr>
+<td>UPS output switchboard</td>
+<td>distributes the UPS output</td>
+<td>chapter 14</td>
+</tr>
+<tr>
+<td>Maintenance bypass</td>
+<td>isolates the UPS for work</td>
+<td>16.6.6</td>
+</tr>
+<tr>
+<td>STS (where used)</td>
+<td>selects between two UPS sources for single-corded loads</td>
+<td>16.8</td>
+</tr>
+<tr>
+<td>Busway and tap-off units, or RPPs</td>
+<td>distribution in the hall</td>
+<td>16.9</td>
+</tr>
+<tr>
+<td>Rack PDUs or power shelves</td>
+<td>supply the IT power supplies</td>
+<td>16.9</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s16-2"><span class="n">16.2</span>UPS types and the IEC 62040-3 classification</h2>
+<h3 id="s16-2-1"><span class="n">16.2.1</span>Input dependency</h3>
+<p>IEC 62040-3 classifies a UPS by how its output depends on the input. The classification has three parts written as AAA-BB-CC.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Name</th>
+<th>How it works</th>
+<th>Output depends on input</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VFD</td>
+<td>voltage and frequency dependent (offline or standby)</td>
+<td>load fed from mains; inverter starts on mains failure</td>
+<td>voltage and frequency</td>
+</tr>
+<tr>
+<td>VI</td>
+<td>voltage independent (line-interactive)</td>
+<td>inverter or regulator corrects voltage; frequency follows mains</td>
+<td>frequency</td>
+</tr>
+<tr>
+<td>VFI</td>
+<td>voltage and frequency independent (double conversion)</td>
+<td>rectifier and inverter in series; output generated by the inverter</td>
+<td>neither</td>
+</tr>
+</tbody>
+</table></div>
+<p>Data-centre UPS modules are <mark>VFI in their normal mode</mark>. Several models also have an eco mode in which the load runs on the static bypass with the inverter on standby. In that mode the UPS behaves as VFD or VI and its classification is different.</p>
+<h3 id="s16-2-2"><span class="n">16.2.2</span>Output waveform and dynamic class</h3>
+<ol>
+<li><strong>Output waveform (BB).</strong> The first letter is for normal mode, the second for stored energy mode. S means sinusoidal (total harmonic distortion (THD) within the IEC 62040-3 limit with linear and reference non-linear load), X means sinusoidal with linear load only, Y means non-sinusoidal.</li>
+<li><strong>Dynamic output performance (CC).</strong> Three digits: the first for a change of operating mode (for example normal to battery), the second for a step of linear load in normal or battery mode, the third for a step of reference non-linear load.</li>
+<li><strong>Classes.</strong> Each digit is 1, 2 or 3. Class 1 is the tightest output tolerance curve and is required for sensitive critical loads. Class 3 permits an interruption of up to 10 ms with the voltage regulated to +10 %, −20 % within 100 ms (Schneider white paper summary of IEC 62040-3). The class 1 and class 2 curves are in the standard (class 2 permits an interruption of up to 1 ms with ±20 % regulation within 10 ms, Schneider white paper WP1, edition not stated; confirm against IEC 62040-3:2021 5.3.4 and Figure 3, dynamic output performance class 2).</li>
+</ol>
+<p><strong>Example:</strong> A specification asking for VFI-SS-111 means a double-conversion UPS with sinusoidal output in normal and battery mode, and class 1 dynamic performance for mode change, linear load step and non-linear load step.</p>
+<h3 id="s16-2-3"><span class="n">16.2.3</span>What the site tests prove against the classification</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Classification element</th>
+<th>Site test that checks it</th>
+<th>Section</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VFI</td>
+<td>input voltage and frequency varied (or generator transient) while the output stays inside tolerance</td>
+<td>16.6.8</td>
+</tr>
+<tr>
+<td>SS</td>
+<td>output voltage THD with linear and non-linear load in normal and battery mode</td>
+<td>16.6.2</td>
+</tr>
+<tr>
+<td>First digit 1</td>
+<td>input failure and return: output stays inside class 1 curve</td>
+<td>16.6.4</td>
+</tr>
+<tr>
+<td>Second digit 1</td>
+<td>linear load step 0 → 100 → 0 %</td>
+<td>16.6.3</td>
+</tr>
+<tr>
+<td>Third digit 1</td>
+<td>non-linear load step (accepted from the type test where the specification allows, because site non-linear load banks are rare)</td>
+<td>16.6.3</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s16-3"><span class="n">16.3</span>UPS factory acceptance test</h2>
+<h3 id="s16-3-1"><span class="n">16.3.1</span>FAT content</h3>
+<ol>
+<li><strong>Visual and documents.</strong> Nameplate, serial numbers, firmware version, wiring against drawings, torque marks, labels.</li>
+<li><strong>Insulation and dielectric test.</strong> As in the manufacturer routine test (IEC 62040-1).</li>
+<li><strong>Steady-state output.</strong> Output voltage and frequency at 0 %, 50 % and 100 % load.</li>
+<li><strong>Efficiency.</strong> At 25 %, 50 %, 75 % and 100 % load in double-conversion mode and, where offered, in eco mode, measured to IEC 62040-3 (Annex on efficiency measurement; confirm the annex letter in the 2021 edition).</li>
+<li><strong>Step load.</strong> 0 → 100 → 0 % linear load with the waveform recorder.</li>
+<li><strong>Mode transfers.</strong> Normal → battery → normal, normal → bypass → normal, inverter fault → bypass.</li>
+<li><strong>Heat run.</strong> Full load for at least 4 hours (8 hours on some hyperscale specifications) with thermal imaging of the power connections at the end.</li>
+<li><strong>Parallel system test.</strong> Where modules are paralleled, load sharing and the loss of one module.</li>
+<li><strong>Communications.</strong> Modbus TCP and Simple Network Management Protocol (SNMP) points against the point list.</li>
+</ol>
+<h3 id="s16-3-2"><span class="n">16.3.2</span>What the site repeats and why</h3>
+<p>The FAT runs on the factory's load bank and the factory's supply. The site tests <mark>repeat the tests that depend on the site</mark>: the real input supply (utility and generator), the real battery and its cables, the real output distribution, the protection settings and the communications. The commissioning manager accepts the factory acceptance test (FAT) values for type-tested characteristics (for example the non-linear load step) where the specification allows. The commissioning manager lists them in the test plan as "accepted from FAT".</p>
+<p><strong>Worked example:</strong> FAT witness planning for one building. Building B2 has 3 halls × 8 blocks = 24 UPS systems of 2.5 MW. The factory has two test bays and needs 2 days per system with an 8-hour heat run. The FAT programme is 24 × 2 / 2 = 24 working days. The commissioning authority (CxA) witnesses the first system in full and <mark>one system in every six</mark>, which gives 4 witnessed FATs and 20 reviewed reports.</p>
+<h2 id="s16-4"><span class="n">16.4</span>UPS installation checks (Level 2)</h2>
+<ol>
+<li><strong>Room conditions.</strong> The room is clean, dry and at its design temperature before the UPS is energised. Dust from construction in power electronics causes failures, so the room has its final ceiling and floor finishes.</li>
+<li><strong>Positioning and clearances.</strong> Front and rear clearances per the manufacturer's installation manual and PUIL 2020 working space requirements.</li>
+<li><strong>Cable terminations.</strong> Input, bypass, output and battery cables are terminated with the specified lugs and torqued to the manufacturer's values; torque marks are applied.</li>
+<li><strong>Battery cable polarity.</strong> The positive and negative DC cables are checked for polarity with a voltmeter before the battery breaker is closed.</li>
+<li><strong>Earthing.</strong> UPS frame and the neutral arrangement (the neutral earthing point on the output for a transformerless UPS) match the earthing design (chapter 17).</li>
+<li><strong>Insulation resistance.</strong> Cables are tested at 1,000 V DC before connection to the UPS (power electronics are disconnected or the manufacturer's method is used).</li>
+<li><strong>Ventilation and cooling.</strong> The UPS room cooling is running; air temperature at the UPS air inlet is within the manufacturer's range (for example 20 to 30 °C).</li>
+<li><strong>Labelling.</strong> Breaker labels, single-line diagram on the wall, arc-flash labels from the study (chapter 14).</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field in ELE-L2-UPS checklist</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UPS tag</td>
+<td>text</td>
+<td>B2-DH3-UPS-A1</td>
+</tr>
+<tr>
+<td>Model, rating, firmware</td>
+<td>text</td>
+<td>2,500 kW / 0.415 kV, firmware 4.12.3 (example)</td>
+</tr>
+<tr>
+<td>Input cable insulation resistance (IR) (phase-earth, phase-phase)</td>
+<td>number (MΩ)</td>
+<td>&gt; 2,000 MΩ at 1,000 V</td>
+</tr>
+<tr>
+<td>Battery cable polarity</td>
+<td>pass or fail</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Torque record reference</td>
+<td>text</td>
+<td>TQ-B2-DH3-UPS-A1-01</td>
+</tr>
+<tr>
+<td>Room temperature at energisation</td>
+<td>number (°C)</td>
+<td>24.5</td>
+</tr>
+<tr>
+<td>Open items</td>
+<td>list</td>
+<td>1 (rear clearance obstructed by cable tray support)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s16-5"><span class="n">16.5</span>UPS start-up (Level 3)</h2>
+<p><strong>Owner:</strong> UPS original equipment manufacturer (OEM) start-up engineer, with the CxA present.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Pre-energisation check.</strong> The engineer checks the internal connections, the DC capacitors' discharge state and the control wiring. Time limit: half a day per system.</li>
+<li><strong>Energise the rectifier.</strong> The input breaker closes; the DC bus charges; the rectifier starts. DC bus voltage is recorded.</li>
+<li><strong>Battery connection.</strong> The battery breaker closes with <mark>the DC bus voltage within the manufacturer's window</mark> of the battery voltage, to avoid inrush.</li>
+<li><strong>Inverter start.</strong> The inverter starts and synchronises to the bypass. The output voltage, frequency and phase rotation are recorded.</li>
+<li><strong>Settings.</strong> The engineer enters the settings: output voltage, bypass synchronisation window, slew rate, battery parameters (number of cells or modules, float and boost voltages, temperature compensation, end-of-discharge voltage), parallel configuration, eco mode enabled or disabled.</li>
+<li><strong>Alarm and event log.</strong> The log is cleared and the time is synchronised with the site time server.</li>
+<li><strong>Settings record.</strong> The settings are exported to a file and printed as the UPS settings record.</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>UPS settings record field</th>
+<th>Example value (B2-DH3-UPS-A1)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Output voltage</td>
+<td>415 V</td>
+</tr>
+<tr>
+<td>Bypass synchronisation window</td>
+<td>±2 % (49.0 to 51.0 Hz)</td>
+</tr>
+<tr>
+<td>Slew rate</td>
+<td>1 Hz/s</td>
+</tr>
+<tr>
+<td>Battery type and configuration</td>
+<td>lithium-ion, lithium iron phosphate (LFP), 4 cabinets in parallel, 1 string per cabinet (example)</td>
+</tr>
+<tr>
+<td>End-of-discharge voltage</td>
+<td>per battery vendor</td>
+</tr>
+<tr>
+<td>Eco mode</td>
+<td>disabled (owner decision)</td>
+</tr>
+<tr>
+<td>Parallel mode</td>
+<td>single module (block design)</td>
+</tr>
+<tr>
+<td>Battery temperature compensation</td>
+<td>not applicable to lithium-ion; −3 mV/°C per cell for VRLA example</td>
+</tr>
+<tr>
+<td>Firmware version</td>
+<td>4.12.3</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s16-6"><span class="n">16.6</span>UPS functional tests (Level 4)</h2>
+
+<figure class="sheet" id="F16-1"><a href="../data/cx-handbook/figures/F16-1.svg" title="Open drawing F16-1 at full size"><img src="../data/cx-handbook/figures/F16-1.svg" alt="F16-1: Double-conversion UPS B2-DH3-UPS-A1 with static bypass and external maintenance bypass" width="1400" height="1050" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F16-1</span> — <b>Double-conversion UPS B2-DH3-UPS-A1 with static bypass and external maintenance bypass</b>. Normal path: Q1, rectifier, DC link, inverter, Q4. Static bypass path: Q2 and the thyristor switch. Maintenance bypass Q3 is interlocked so that it closes only when the UPS is on static bypass.</figcaption></figure>
+
+<figure class="sheet" id="F16-5"><a href="../data/cx-handbook/figures/F16-5.svg" title="Open drawing F16-5 at full size"><img src="../data/cx-handbook/figures/F16-5.svg" alt="F16-5: UPS step load test of B2-DH3-UPS-A1 in normal mode: 0 to 100 % and 100 to 0 % linear load" width="1400" height="776" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F16-5</span> — <b>UPS step load test of B2-DH3-UPS-A1 in normal mode: 0 to 100 % and 100 to 0 % linear load</b>. Example curves drawn through the recorded peak and recovery values; the dashed lines show the ±5 % data-sheet limit and the ±1 % recovery band.</figcaption></figure>
+<h3 id="s16-6-1"><span class="n">16.6.1</span>Test set-up</h3>
+<p>Figure <a class="figref" href="#F16-6">F16-6</a> shows the test set-up: the load bank, the two analysers, the DC shunt and the common time source. Figure <a class="figref" href="#F16-1">F16-1</a> shows the UPS with its rectifier, inverter, battery, static bypass and external maintenance bypass, and the breaker positions in each operating mode.</p>
+<figure class="sheet" id="F16-6"><a href="../data/cx-handbook/figures/F16-6.svg" title="Open drawing F16-6 at full size"><img src="../data/cx-handbook/figures/F16-6.svg" alt="F16-6: UPS Level 4 test set-up: load bank, two analysers and a common time source" width="1000" height="909" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F16-6</span> — <b>UPS Level 4 test set-up: load bank, two analysers and a common time source</b>. The two analysers read input and output at the same instant, which the efficiency test needs; the DC shunt and the battery terminal voltage give the battery current and power on the same time base.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Load bank</td>
+<td>resistive, 2.5 MW in steps of 5 % or less, contactor switching for step tests; resistive-reactive where the specification asks for a power factor test</td>
+</tr>
+<tr>
+<td>Power quality analyser at input</td>
+<td>IEC 61000-4-30 Class A, power accuracy ±0.1 % of reading or better for efficiency, calibrated within 12 months</td>
+</tr>
+<tr>
+<td>Power quality analyser at output</td>
+<td>as above, plus waveform capture at ≥ 10 kHz for transients</td>
+</tr>
+<tr>
+<td>DC measurement</td>
+<td>DC clamp meter or shunt with ±0.5 % accuracy; DC voltage on the battery terminals</td>
+</tr>
+<tr>
+<td>Thermal camera</td>
+<td>±2 °C</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>all recorders synchronised to the same time source within 10 ms</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s16-6-2"><span class="n">16.6.2</span>Steady-state output</h3>
+<ol>
+<li><strong>Run at three loads.</strong> 0 %, 50 % and 100 % load, each for 15 minutes.</li>
+<li><strong>Read.</strong> Output voltage per phase, voltage unbalance, frequency, voltage THD.</li>
+<li><strong>Acceptance.</strong> Output voltage within <mark>±1 % of 415 V</mark> (410.9 to 419.2 V); frequency 50.0 Hz ±0.1 % when free-running; voltage THD ≤ 2 % with linear load (example project values from the specification and the manufacturer's data sheet).</li>
+</ol>
+<h3 id="s16-6-3"><span class="n">16.6.3</span>Step load test</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>0 → 100 % step.</strong> With the UPS in normal mode at 0 % load, switch 100 % load in one step. Record the output root mean square (RMS) voltage every half cycle and the waveform.</li>
+<li><strong>100 → 0 % step.</strong> Remove 100 % in one step.</li>
+<li><strong>Repeat in battery mode.</strong> With the input breaker open (UPS on battery), repeat 0 → 100 % and 100 → 0 %; keep the battery mode time short.</li>
+<li><strong>Read.</strong> Maximum deviation of the output RMS voltage and the time to return within ±1 %.</li>
+</ol>
+<p><strong>Acceptance:</strong> Output voltage inside the class 1 dynamic tolerance curve of IEC 62040-3 for a linear load step. Manufacturers' data sheets commonly state a deviation within ±5 % and recovery within about 20 to 50 ms for a 100 % linear step (the data-sheet values are the project values; the curve is IEC 62040-3:2021 Figure 2, dynamic output performance class 1, in 5.3.4).</p>
+<p><strong>Worked example:</strong> Step test record for B2-DH3-UPS-A1 in normal mode (Figure <a class="figref" href="#F16-5">F16-5</a> plots both steps). The 0 → 100 % step gave a minimum RMS output of 398.0 V (−4.1 %) and the output returned within ±1 % (above 410.9 V) after 24 ms. The 100 → 0 % step gave a maximum of 430.6 V (+3.8 %) and recovery after 20 ms. The data sheet states ±5 % and 50 ms, so <mark>both steps pass</mark>.</p>
+<h3 id="s16-6-4"><span class="n">16.6.4</span>Input failure and return (mode transfer)</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Input failure.</strong> At 100 % load, open the UPS input breaker (and the bypass breaker for a separate bypass input, to simulate a full supply loss).</li>
+<li><strong>Record.</strong> Output voltage waveform during the transfer to battery; DC current and battery voltage.</li>
+<li><strong>Battery mode.</strong> Run for 2 minutes on battery.</li>
+<li><strong>Input return.</strong> Close the input breaker. The rectifier walks in (ramps its input current) over the set walk-in time, for example 10 to 20 s.</li>
+<li><strong>Repeat on the generator.</strong> In L5, the same test is done with the generator as the returning source (16.6.8).</li>
+</ol>
+<p><strong>Acceptance:</strong> No disturbance to the output outside the class 1 curve on transfer to battery and back. The rectifier walk-in follows the set time, and the battery charge current after return is limited to the set value.</p>
+<h3 id="s16-6-5"><span class="n">16.6.5</span>Transfer to static bypass and back</h3>
+<ol>
+<li><strong>Manual transfer to bypass.</strong> From the UPS front panel, transfer to bypass at 100 % load. The output transfers with no break when the inverter and bypass are synchronised.</li>
+<li><strong>Transfer on inverter fault.</strong> Simulate an inverter fault (manufacturer test function). The load transfers to bypass. Acceptance: transfer within the manufacturer's time (for example less than 4 ms for an unsynchronised fault transfer, or with no break when synchronised).</li>
+<li><strong>Transfer on overload.</strong> Apply 110 % and 125 % load where the load bank allows; the inverter carries the overload for the time in the data sheet (for example 10 minutes at 110 %, 60 s at 125 %), then transfers to bypass.</li>
+<li><strong>Bypass not available.</strong> Open the bypass input, then apply an overload: the inverter shuts down at its limit and the alarm is raised. This test is done only with the manufacturer's agreement and is recorded as a "bypass unavailable" behaviour check.</li>
+<li><strong>Return to inverter.</strong> The UPS returns to inverter automatically after the overload clears (where set).</li>
+</ol>
+<h3 id="s16-6-6"><span class="n">16.6.6</span>Maintenance bypass</h3>
+<p>The maintenance bypass switches (or breakers) let the operator isolate the UPS for work while the load stays on the raw supply. An interlock (for example a key interlock or an electrical interlock) prevents the maintenance bypass from closing while the UPS output is out of synchronism with the bypass source.</p>
+<ol>
+<li><strong>Transfer to maintenance bypass.</strong> Follow the operating procedure: UPS to static bypass, close maintenance bypass, open UPS output breaker. The load sees no break.</li>
+<li><strong>Interlock test.</strong> Try to close the maintenance bypass with the UPS on inverter and not synchronised (manufacturer test mode); <mark>the interlock prevents it</mark>.</li>
+<li><strong>Return.</strong> Reverse the sequence; the load sees no break.</li>
+<li><strong>Procedure check.</strong> The written method of procedure (MOP) matches the labels on the switchgear and the sequence that worked.</li>
+</ol>
+<p><strong>Acceptance:</strong> No interruption measured at the output switchboard during the sequence (no RMS value below 90 % for more than one half cycle); interlock prevents the unsafe operation; MOP signed as validated.</p>
+<h3 id="s16-6-7"><span class="n">16.6.7</span>Eco mode and parallel redundancy</h3>
+<ol>
+<li><strong>Eco mode (if enabled).</strong> With the UPS in eco mode (load on bypass), simulate a bypass supply failure; the inverter takes the load. Measure the output disturbance. Eco mode transfers commonly fall into a dynamic class 2 or 3. The manufacturer's IEC 62040-3:2021 classification declaration for eco mode states the class for the offered UPS. Many owners disable eco mode; <mark>the decision is recorded in the owner's project requirements (OPR)</mark>.</li>
+<li><strong>Parallel systems.</strong> Where modules are paralleled in one system, check load sharing (each module within ±5 % of the average at 50 % and 100 % load, example project value) and the loss of one module (the others carry the load with no output disturbance outside the class 1 curve).</li>
+<li><strong>Block redundancy on MSC-1.</strong> The MSC-1 design uses one UPS per block with no paralleling. The redundancy is tested at L5 by failing a whole block and checking that the racks stay on their second feed and the remaining blocks carry 71.4 % (16.1.2).</li>
+</ol>
+<h3 id="s16-6-8"><span class="n">16.6.8</span>Generator compatibility test</h3>
+<p><strong>Purpose:</strong> Prove that the UPS and the generator plant work together. The rectifier walks in without upsetting the generator, the bypass stays synchronised within the window, and the input current harmonics do not distort the generator voltage.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Run on generator.</strong> In the L5 utility failure test, record at the UPS input: voltage, frequency, current, current THD and the rectifier walk-in ramp.</li>
+<li><strong>Synchronisation.</strong> Record the time from generator bus live until the UPS reports "bypass synchronised".</li>
+<li><strong>Harmonics.</strong> At 100 % load on generator, measure input current THD and the voltage THD at the generator bus.</li>
+</ol>
+<p><strong>Acceptance:</strong> <mark>Input current THD at full load ≤ 5 %</mark> for an active-front-end (IGBT) rectifier (example project value; IEEE 519 is the usual reference for the limit at the point of common coupling). The generator bus voltage THD is ≤ 5 %. The UPS synchronises to the generator within 60 s of bus live (example project value). The generator does not trip during walk-in.</p>
+<h3 id="s16-6-9"><span class="n">16.6.9</span>Efficiency test</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Set load.</strong> 25 %, 50 %, 75 % and 100 % of rated output in double-conversion mode with the battery fully charged (charging power distorts the result).</li>
+<li><strong>Stabilise.</strong> Run 15 minutes at each step.</li>
+<li><strong>Measure.</strong> Read input and output active power on the two analysers at the same time for 5 minutes and average.</li>
+<li><strong>Calculate.</strong> Efficiency = output kW / input kW.</li>
+</ol>
+<p><strong>Acceptance:</strong> Efficiency at each load not lower than the guaranteed value minus the measurement tolerance agreed in the contract.</p>
+<p><strong>Worked example:</strong> At 62.5 % load (the MSC-1 normal block load), the input analyser reads 1,601.9 kW and the output analyser reads 1,562.5 kW. Efficiency = 1,562.5 / 1,601.9 = <mark>97.54 %</mark>. With two analysers each at ±0.1 % of reading, the efficiency uncertainty is about ±0.14 percentage points (root sum of squares), so the result lies between 97.40 % and 97.68 %. The guarantee is 97.0 % at 50 % to 75 % load, so the test passes.</p>
+<h3 id="s16-6-10"><span class="n">16.6.10</span>Full-load battery autonomy test</h3>
+<ol>
+<li><strong>Charge.</strong> The battery is fully charged (at least 24 hours on float for VRLA, or 100 % state of charge reported by the lithium-ion BMS).</li>
+<li><strong>Load.</strong> 100 % of rated output (2.5 MW), or the design load stated in the specification.</li>
+<li><strong>Discharge.</strong> Open the input and bypass breakers. Record time, DC voltage, DC current and battery temperature every 30 s.</li>
+<li><strong>End.</strong> Stop at the end-of-discharge alarm or at the design autonomy plus a margin agreed with the battery vendor.</li>
+<li><strong>Recharge.</strong> Record the recharge current and the time to full charge.</li>
+</ol>
+<p><strong>Acceptance:</strong> Autonomy ≥ the design value at the design load (5 minutes on MSC-1), corrected to the reference temperature where the battery temperature differs from 25 °C.</p>
+<p><strong>Worked example:</strong> B2-DH3-UPS-A1 on a new lithium-ion battery ran 7 minutes 40 s at 2.5 MW to the end-of-discharge alarm, at a battery temperature of 26 °C. The design is 5 minutes at end of life with the 0.80 capacity factor. A new battery should give at least 5 / 0.80 = 6.25 minutes, so the measured <mark>7.67 minutes</mark> passes and shows a margin over the end-of-life basis.</p>
+<h2 id="s16-7"><span class="n">16.7</span>Batteries</h2>
+
+<figure class="sheet" id="F16-2"><a href="../data/cx-handbook/figures/F16-2.svg" title="Open drawing F16-2 at full size"><img src="../data/cx-handbook/figures/F16-2.svg" alt="F16-2: VRLA capacity test of string B2-DH3-BAT-B1-S2: average cell voltage and the weak monobloc" width="1400" height="766" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F16-2</span> — <b>VRLA capacity test of string B2-DH3-BAT-B1-S2: average cell voltage and the weak monobloc</b>. Curves are an example drawn through the recorded end points; the steep fall of monobloc 23 three minutes before the string end is the signature of a weak unit.</figcaption></figure>
+<h3 id="s16-7-1"><span class="n">16.7.1</span>Battery technologies in data centres</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Technology</th>
+<th>Cell nominal voltage</th>
+<th>Typical life</th>
+<th>Main standards</th>
+<th>Commissioning focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vented lead-acid (VLA, flooded)</td>
+<td>2.0 V</td>
+<td>15 to 20 years</td>
+<td>IEEE 450, IEEE 484 (installation), IEEE 485 (sizing)</td>
+<td>electrolyte level and specific gravity, ventilation for hydrogen, capacity test</td>
+</tr>
+<tr>
+<td>Valve-regulated lead-acid (VRLA)</td>
+<td>2.0 V (12 V monoblocs of 6 cells)</td>
+<td>5 to 10 years design life, less at high temperature</td>
+<td>IEEE 1188, IEEE 1187 (installation)</td>
+<td>float voltage, ohmic values, temperature, capacity test</td>
+</tr>
+<tr>
+<td>Nickel-cadmium (NiCd)</td>
+<td>1.2 V</td>
+<td>20 years</td>
+<td>IEEE 1106, IEEE 1115 (sizing)</td>
+<td>electrolyte, capacity test (end voltage about 1.0 to 1.14 V per cell)</td>
+</tr>
+<tr>
+<td>Lithium-ion, lithium iron phosphate (LFP)</td>
+<td>3.2 V</td>
+<td>10 to 15 years</td>
+<td>UL 1973, UL 9540, UL 9540A, NFPA 855, IEEE 1635 (ventilation)</td>
+<td>BMS functions, protection, communication, capacity, fire protection interface</td>
+</tr>
+<tr>
+<td>Lithium-ion, nickel manganese cobalt (NMC)</td>
+<td>3.6 to 3.7 V</td>
+<td>10 to 15 years</td>
+<td>as above</td>
+<td>as above, with stricter thermal runaway controls</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s16-7-2"><span class="n">16.7.2</span>Battery installation checks (Level 2)</h3>
+<ol>
+<li><strong>Rack and cabinet.</strong> Racks are anchored as designed, seismic restraints fitted, and the rack is earthed.</li>
+<li><strong>Cell or module numbering.</strong> Each cell or module carries a number in the order of the series string, starting at the positive end. The numbering matches the record sheet.</li>
+<li><strong>Inter-cell connections.</strong> Connections are torqued to the battery manufacturer's value. The connection resistance of each inter-cell connector is measured with a micro-ohmmeter.</li>
+<li><strong>Polarity.</strong> The string voltage and polarity are checked before connection to the UPS.</li>
+<li><strong>Ventilation.</strong> For lead-acid batteries, the room ventilation rate is calculated for hydrogen evolution (IEEE 1635 and IEC 62485-2 give the method) and the extract fan runs. For lithium-ion, the ventilation and exhaust follow the UL 9540A test results and NFPA 855.</li>
+<li><strong>Spill containment and eyewash.</strong> For vented lead-acid and NiCd: spill containment and an eyewash station.</li>
+<li><strong>Fire protection.</strong> The detection and suppression in the battery room match the design (chapter 20); for lithium-ion, the off-gas detection is installed where the design requires it.</li>
+</ol>
+<p><strong>Acceptance:</strong> Inter-cell connection resistance: each connection resistance within 10 % of the average of all connections of the same type, or within the manufacturer's maximum (IEEE 450 and IEEE 1188 practice; the manufacturer's installation instructions give the maximum). A connection above the limit is cleaned, re-torqued and measured again.</p>
+<p><strong>Worked example:</strong> String B2-DH3-BAT-A1-S1 has 239 inter-cell connectors. The average connection resistance is 42 µΩ. Connector 117-118 reads 51 µΩ, which is 21 % above the average. The technician cleans and re-torques it; the new reading is <mark>43 µΩ</mark>, within 10 % of the average, and both readings are written on the record sheet.</p>
+<h3 id="s16-7-3"><span class="n">16.7.3</span>Lead-acid capacity test (IEEE 450 and IEEE 1188 method)</h3>
+<p><strong>Purpose:</strong> Measure the capacity of the battery as a percentage of its rated capacity. The result proves that the battery meets the design autonomy and gives the baseline for later tests.</p>
+<p><strong>Trigger:</strong> Acceptance test at installation (where the specification requires it), the first performance test within 2 years, then periodic tests, with shorter intervals when capacity falls (16.7.5).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Instrument</th>
+<th>Accuracy</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Battery load unit (constant current or constant power)</td>
+<td>±1 % of setting</td>
+<td>discharges the battery at the rated rate</td>
+</tr>
+<tr>
+<td>Cell voltage monitoring (multi-channel logger or the battery monitoring system)</td>
+<td>±0.1 % of reading, ±1 mV</td>
+<td>records each cell or monobloc voltage</td>
+</tr>
+<tr>
+<td>DC clamp or shunt</td>
+<td>±0.5 %</td>
+<td>records the discharge current</td>
+</tr>
+<tr>
+<td>Temperature probes</td>
+<td>±0.5 °C</td>
+<td>records the electrolyte or cell case temperature (pilot cells)</td>
+</tr>
+<tr>
+<td>Timer</td>
+<td>1 s</td>
+<td>records the time to the end voltage</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Charge and rest.</strong> Equalise or fully charge the battery per the manufacturer, then leave it on float for at least 72 hours (lead-acid practice) before the test.</li>
+<li><strong>Record initial values.</strong> Float voltage of each cell, temperature of pilot cells (at least 10 % of cells), ambient temperature.</li>
+<li><strong>Choose the rate.</strong> Use a rate that matches the duty (for a UPS, the 5- to 15-minute rate at the manufacturer's end voltage). IEEE 450 prefers a test duration similar to the duty. For tests shorter than 1 hour, the rate-adjusted method applies the temperature correction to the discharge rate before the test. For tests of 1 hour or longer, the time-adjusted method corrects the measured time.</li>
+<li><strong>Disconnect from the load.</strong> Isolate the battery from the UPS (or run the UPS on a load bank only), connect the load unit.</li>
+<li><strong>Discharge.</strong> Start the discharge and the timer at the same moment. Hold the current or power constant within ±1 %.</li>
+<li><strong>Record during the test.</strong> All cell voltages at least every 10 % of the expected test time and at the end; record any cell that falls quickly.</li>
+<li><strong>End the test.</strong> Stop when the string voltage reaches the end voltage multiplied by the number of cells (for example 1.67 V per cell × 240 cells = 400.8 V for a short-rate UPS test; the end voltage depends on the rate and the manufacturer's table).</li>
+<li><strong>Calculate.</strong> Capacity = (actual time to end voltage / rated time) × 100 % for the rate-adjusted method. For the time-adjusted method, IEEE 450 divides by the temperature correction factor for the electrolyte temperature (confirm the formula and the factor table against the capacity-test clause of the IEEE 450 edition in the contract). Some vendor notes write the factor as a multiplier, so check how the table defines the factor before using it.</li>
+<li><strong>Recharge.</strong> Recharge immediately and record the recharge time.</li>
+</ol>
+<p><strong>Acceptance:</strong> At acceptance, capacity ≥ 100 % of rated (or the manufacturer's guaranteed value; some manufacturers ship at 90 % and reach 100 % after a few cycles). In service, <mark>replace the battery when capacity falls to 80 %</mark> of rated (IEEE 450 and IEEE 1188 replacement criterion).</p>
+<p><strong>Worked example:</strong> VRLA string B2-DH3-BAT-B1-S2 has 240 cells (40 monoblocs of 12 V). The manufacturer's table gives 15 minutes at 1,180 W per cell to 1.67 V per cell at 25 °C. The average cell temperature on the test day is 25 °C, so no rate adjustment is needed. The load unit is set to 240 × 1,180 = 283.2 kW constant power. The string reaches 400.8 V at 14 minutes 6 s. Capacity = 14.1 / 15.0 × 100 = <mark>94 %</mark>. The acceptance criterion is 100 % at installation, so the result fails. The cell records show monobloc 23 falling below 1.67 V per cell at 11 minutes while the others were at 1.78 V. Monobloc 23 is replaced, the string is recharged, and the test is repeated; the second test gives 15 minutes 24 s, which is 103 %.</p>
+<h3 id="s16-7-4"><span class="n">16.7.4</span>Ohmic measurements and float checks</h3>
+<ol>
+<li><strong>Ohmic baseline.</strong> At installation, after the first full charge, measure the internal ohmic value (impedance, conductance or resistance; use the same method and the same instrument model for all later readings) of every cell or monobloc. This is the baseline.</li>
+<li><strong>Float voltage.</strong> Record each cell or monobloc float voltage. Acceptance: within the manufacturer's float band (for example 2.25 V per cell ±0.05 V for a VRLA cell at 25 °C, example manufacturer value).</li>
+<li><strong>Float current.</strong> For VRLA, record the string float current; a rising float current with rising temperature is a warning of thermal runaway.</li>
+<li><strong>Temperature.</strong> Record the negative terminal temperature of each monobloc. Acceptance: within 3 °C of the average of the string (practice value; the battery manufacturer's instructions give the limit).</li>
+<li><strong>Investigation trigger.</strong> An ohmic value change of 20 % or more against the baseline is a common trigger for investigation and a capacity test (Fluke guidance referencing IEEE practice; confirm against IEEE 1188 Annex and the manufacturer's limit).</li>
+</ol>
+<h3 id="s16-7-5"><span class="n">16.7.5</span>Test intervals for lead-acid batteries</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Vented lead-acid (VLA), IEEE 450</th>
+<th>VRLA (IEEE 1188)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Acceptance capacity test</td>
+<td>at installation where the specification requires it</td>
+<td>at installation where the specification requires it</td>
+</tr>
+<tr>
+<td>First performance test</td>
+<td>within the first 2 years of service</td>
+<td>within the first 2 years of service</td>
+</tr>
+<tr>
+<td>Periodic performance test</td>
+<td>at intervals not greater than 25 % of the expected service life (and not more than 5 years)</td>
+<td>at intervals not greater than 25 % of the expected service life or 2 years, whichever is less</td>
+</tr>
+<tr>
+<td>Annual performance test</td>
+<td>when capacity is below 90 % or has dropped more than 10 % since the last test, or at 85 % of service life</td>
+<td>when capacity has dropped more than 10 % or at 85 % of service life</td>
+</tr>
+<tr>
+<td>Ohmic and float checks</td>
+<td>quarterly</td>
+<td>quarterly</td>
+</tr>
+</tbody>
+</table></div>
+<p>The intervals follow the IEEE schedule as summarised by Fluke; confirm against the current editions of IEEE 450 and IEEE 1188.</p>
+<h3 id="s16-7-6"><span class="n">16.7.6</span>Lithium-ion battery commissioning</h3>
+<p>A lithium-ion UPS battery is a system of cells in modules and modules in racks or cabinets. Each module has a module BMS, and a rack or system BMS controls a DC contactor or breaker. The BMS protects the cells against overcharge, overdischarge, overcurrent and overtemperature by opening the contactor. If the BMS fails, the cell protection fails, so the commissioning <mark>tests the BMS functions one by one</mark>.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Documents.</strong> Collect the UL 1973 listing for the battery, the UL 9540A test report for the cell, module and unit, and the vendor's installation manual. The fire protection design (chapter 20) uses the UL 9540A results.</li>
+<li><strong>Module installation.</strong> Check the serial numbers of every module against the packing list and record the state of charge at delivery (lithium-ion is shipped at a partial state of charge for transport rules, for example 30 % or less).</li>
+<li><strong>Communication.</strong> Connect the BMS to the UPS and to the EPMS. Each module reports cell voltages and temperatures. Acceptance: all cells report, values within the vendor's band (for LFP, cell voltages within about 20 mV of each other at rest; the vendor's BMS manual gives the band).</li>
+<li><strong>Contactor test.</strong> Open and close each rack contactor from the BMS and from the emergency stop. Acceptance: contactor opens within the vendor's time, the UPS reports the rack lost and the remaining racks carry the load.</li>
+<li><strong>Protection simulation.</strong> With the vendor's tool, simulate cell overvoltage, cell undervoltage, cell overtemperature, module communication loss and an insulation fault. Each simulation produces the alarm or trip in the vendor's protection table.</li>
+<li><strong>Balancing.</strong> Charge to 100 % and let the BMS balance the cells. Record the cell voltage spread after balancing.</li>
+<li><strong>Capacity test.</strong> Discharge at the UPS design power to the vendor's end-of-discharge condition; record time, energy delivered (kWh) and the lowest cell voltage. Acceptance: energy and time ≥ the vendor's guaranteed values.</li>
+<li><strong>Fire interface.</strong> Off-gas detection (where installed) and the fire alarm interface: a simulated off-gas alarm trips the battery contactors and sends the alarm per the cause-and-effect matrix (chapter 20).</li>
+</ol>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Lithium-ion BMS protection test</th>
+<th>Simulated value (example LFP)</th>
+<th>Expected response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cell overvoltage warning</td>
+<td>3.55 V</td>
+<td>warning to UPS and EPMS</td>
+</tr>
+<tr>
+<td>Cell overvoltage trip</td>
+<td>3.65 V</td>
+<td>charge stopped, contactor opens if not cleared</td>
+</tr>
+<tr>
+<td>Cell undervoltage trip</td>
+<td>2.50 V</td>
+<td>discharge stopped, contactor opens</td>
+</tr>
+<tr>
+<td>Cell overtemperature warning</td>
+<td>50 °C</td>
+<td>warning</td>
+</tr>
+<tr>
+<td>Cell overtemperature trip</td>
+<td>60 °C</td>
+<td>contactor opens</td>
+</tr>
+<tr>
+<td>Module communication loss</td>
+<td>disconnect one module cable</td>
+<td>rack alarm; rack contactor opens after the vendor's delay</td>
+</tr>
+<tr>
+<td>Insulation fault (DC earth fault)</td>
+<td>insert test resistor</td>
+<td>alarm</td>
+</tr>
+</tbody>
+</table></div>
+<p>These values are examples; the vendor's protection table governs.</p>
+<p><strong>Worked example:</strong> Energy check for one MSC-1 block. The vendor guarantees 330 kWh usable at beginning of life for B2-DH3-BAT-A1 (4 cabinets). The discharge at 2.5 MW UPS output for 7 minutes 40 s delivered 2,500 / 0.96 × 7.667 / 60 = <mark>332.8 kWh</mark> DC. The DC shunt measured 333.5 kWh. The measured value is above the guarantee, and it is above the 301.4 kWh screen of 16.1.2.</p>
+<h3 id="s16-7-7"><span class="n">16.7.7</span>Battery discharge curve</h3>
+<p>Figure <a class="figref" href="#F16-2">F16-2</a> shows the discharge curves of the VRLA string of 16.7.3: the first test with the weak monobloc and the repeat test after replacement. Read the curve shape and the end time. A string voltage that falls steeply at the end means one or more cells reached their end early.</p>
+<h2 id="s16-8"><span class="n">16.8</span>Transfer switches: STS, ATS and rack transfer switches</h2>
+
+<figure class="sheet" id="F16-3"><a href="../data/cx-handbook/figures/F16-3.svg" title="Open drawing F16-3 at full size"><img src="../data/cx-handbook/figures/F16-3.svg" alt="F16-3: STS B2-DH3-STS-03 transfer on preferred source failure, against the ITI curve" width="1400" height="746" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F16-3</span> — <b>STS B2-DH3-STS-03 transfer on preferred source failure, against the ITI curve</b>. Half-cycle RMS of the STS output and the preferred source in per cent of 415 V; the dashed line is the ITI lower boundary that the IT power supplies ride through.</figcaption></figure>
+<h3 id="s16-8-1"><span class="n">16.8.1</span>Types and timing</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Device</th>
+<th>Where used</th>
+<th>How it transfers</th>
+<th>Typical transfer time (manufacturer's data sheet governs)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Static transfer switch (STS), silicon-controlled rectifier (SCR) based</td>
+<td>between two UPS sources for single-corded loads or for a PDU transformer</td>
+<td>thyristors on the preferred source turn off, thyristors on the alternate source turn on (break-before-make)</td>
+<td>about 4 ms or less (under a quarter cycle)</td>
+</tr>
+<tr>
+<td>Automatic transfer switch (ATS), mechanical, open transition</td>
+<td>mechanical loads, house loads between utility and generator</td>
+<td>mechanism opens one source and closes the other</td>
+<td>100 ms to several seconds, plus set time delays</td>
+</tr>
+<tr>
+<td>ATS, closed transition</td>
+<td>as above, where a break on return is not wanted</td>
+<td>both sources closed for a short overlap when in sync</td>
+<td>overlap ≤ 100 ms typical</td>
+</tr>
+<tr>
+<td>ATS with delayed transition</td>
+<td>motor loads</td>
+<td>opens, waits for residual voltage to decay, then closes</td>
+<td>set delay, for example 1 to 5 s</td>
+</tr>
+<tr>
+<td>Rack transfer switch (rack ATS)</td>
+<td>single-corded IT equipment in a dual-fed rack</td>
+<td>relay or hybrid switching</td>
+<td>about 8 to 16 ms</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s16-8-2"><span class="n">16.8.2</span>ATS time delays</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Timer (common name)</th>
+<th>Purpose</th>
+<th>Example setting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engine start delay</td>
+<td>ignore short utility dips</td>
+<td>1 to 3 s</td>
+</tr>
+<tr>
+<td>Transfer to emergency delay</td>
+<td>wait after the generator is ready</td>
+<td>0 to 5 s</td>
+</tr>
+<tr>
+<td>Retransfer to normal delay</td>
+<td>wait for a stable utility</td>
+<td>30 min (owner decision; 5 min is common for testing)</td>
+</tr>
+<tr>
+<td>Engine cool-down</td>
+<td>run unloaded before stop</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>Neutral position delay (delayed transition)</td>
+<td>let motor residual voltage decay</td>
+<td>1 to 3 s</td>
+</tr>
+<tr>
+<td>In-phase monitor</td>
+<td>transfer only when the two sources are within a set angle</td>
+<td>±10° (example)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s16-8-3"><span class="n">16.8.3</span>STS transfer timing test</h3>
+<p><strong>Purpose:</strong> Prove that the STS transfers the load to the alternate source within the specified time with the output inside the ITI curve, for every transfer cause.</p>
+<p>The instrument is a power quality analyser or oscilloscope recorder with ≥ 10 kHz sampling on the preferred source, alternate source and STS output voltages; current probe on the output.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Load.</strong> Connect a load bank at 100 % of the STS rating (or the design load).</li>
+<li><strong>Preferred source failure.</strong> Open the preferred source upstream breaker. Record the output waveform.</li>
+<li><strong>Preferred source undervoltage.</strong> Reduce the preferred source to the transfer threshold where a test source allows (or use the manufacturer's simulation).</li>
+<li><strong>Manual transfer.</strong> Transfer from the panel with both sources healthy and in phase; the output shows no break.</li>
+<li><strong>Out-of-phase sources.</strong> With the sources out of phase beyond the set limit, a manual transfer is blocked; an automatic transfer on source failure follows the out-of-phase logic (break-before-make with a delay).</li>
+<li><strong>Retransfer.</strong> Restore the preferred source; the STS returns after the retransfer delay.</li>
+<li><strong>Downstream transformer.</strong> If the STS supplies a transformer, record the inrush on the transfer, because an out-of-phase transfer into a transformer gives a large inrush that can trip the upstream breaker.</li>
+</ol>
+<p><strong>Acceptance:</strong> Transfer time from source failure to the output inside tolerance ≤ the specified value (for example 4 ms). Output voltage inside the ITI curve: <mark>no zero voltage longer than 20 ms</mark>, no voltage below 70 % for longer than 0.5 s (ITI curve; confirm against the ITI note); no upstream trip on transfer.</p>
+<p><strong>Worked example:</strong> STS B2-DH3-STS-03 rated 400 A (Figure <a class="figref" href="#F16-3">F16-3</a> plots the record). The preferred source failed at 13:42:10.116 and the output voltage fell below 90 % at 13:42:10.117. The alternate thyristors fired at 13:42:10.119 and the output was back above 90 % at 13:42:10.120. The transfer time from source failure to the output back inside tolerance was <mark>4 ms</mark>, inside the 4 ms specification. The output was below 90 % for 3 ms, far inside the 20 ms ITI zero-voltage limit. The upstream breaker on the alternate source did not trip, so the result passes.</p>
+<h3 id="s16-8-4"><span class="n">16.8.4</span>ATS functional test</h3>
+<ol>
+<li><strong>Normal source failure.</strong> Open the normal source upstream breaker; the engine start signal is issued after the start delay; the ATS transfers after the generator is ready and the transfer delay.</li>
+<li><strong>Times.</strong> Record each timer with a stopwatch or the recorder against the setting. Acceptance: within ±10 % of the setting or ±1 s, whichever is larger (example project tolerance).</li>
+<li><strong>Return.</strong> Restore the normal source; the ATS retransfers after the retransfer delay; the engine cools down and stops.</li>
+<li><strong>In-phase or closed transition.</strong> Record the phase angle at transfer (in-phase monitor) or the overlap time (closed transition).</li>
+<li><strong>Bypass-isolation.</strong> Where the ATS has a bypass-isolation switch, bypass the ATS and withdraw it; the load stays supplied.</li>
+<li><strong>Signals.</strong> Position, source available and alarm signals reach the BMS and the EPMS.</li>
+</ol>
+<h2 id="s16-9"><span class="n">16.9</span>Rack power distribution: RPP, busway, tap-off units and rack PDUs</h2>
+<h3 id="s16-9-1"><span class="n">16.9.1</span>Distribution options</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Commissioning tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Remote power panel (RPP)</td>
+<td>panelboard in the hall with branch circuit breakers and branch circuit monitoring</td>
+<td>breaker tests, branch monitoring accuracy, labels</td>
+</tr>
+<tr>
+<td>Busway with tap-off units</td>
+<td>overhead busbar trunking with plug-in tap-off units at each rack</td>
+<td>joint torque, insulation resistance, phasing, tap-off breaker, thermal scan under load</td>
+</tr>
+<tr>
+<td>PDU with transformer</td>
+<td>floor-standing unit with a transformer and panelboards</td>
+<td>transformer tests, inrush, breaker tests, metering</td>
+</tr>
+<tr>
+<td>Rack PDU</td>
+<td>strip or unit in the rack with outlets, metering and network card</td>
+<td>input current reading, outlet switching, network and alarms</td>
+</tr>
+<tr>
+<td>Power shelf (high-density racks)</td>
+<td>rack-mounted rectifier shelf for a DC busbar in the rack (48 V or 800 V DC on next-generation racks)</td>
+<td>rectifier redundancy, DC output, busbar connection, vendor procedure</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s16-9-2"><span class="n">16.9.2</span>Busway installation and tests</h3>
+<ol>
+<li><strong>Joint torque.</strong> Every busway joint is torqued to the manufacturer's value and marked. Some designs use a break-off bolt head that shows the torque was reached.</li>
+<li><strong>Insulation resistance.</strong> At 1,000 V DC for 1 minute, phase to phase and phase to earth, with tap-off units removed or open. Acceptance: ≥ 100 MΩ per run (example project value; a value per run length in the busway manufacturer's instructions governs where given).</li>
+<li><strong>Phasing.</strong> Check the phase order at each tap-off position so that three-phase rack loads see the same rotation and the single-phase loads are spread as designed.</li>
+<li><strong>Tap-off unit.</strong> Check the breaker rating and setting against the rack schedule (for example 250 A for a type R rack at 170.4 A), the interlock that prevents inserting or removing the unit under load (manufacturer design), and the metering module.</li>
+<li><strong>Thermal scan.</strong> At the L4 or L5 heat-load test, scan every joint and tap-off with the busway at its design load. Acceptance: <mark>temperature rise compared with similar joints below 10 K</mark>; a joint more than 10 K above its neighbours is investigated (ANSI/NETA ATS thermographic survey practice uses temperature differences between similar components to rank action; confirm the bands against ANSI/NETA ATS-2025 Table 100.18).</li>
+</ol>
+<p><strong>Worked example:</strong> Busway B2-DH3-BW-A04 carries 12 racks at 170.4 A each, but in normal operation the A feed in a dual-fed rack carries half: 12 × 85.2 = 1,022 A. When the block that feeds the B side of these racks is lost, the A feed carries the full rack. The current is then 12 × 170.4 = <mark>2,045 A</mark>, within a 2,500 A busway rating. The thermal scan runs at the one-block-lost case of the L5 test, and the commissioning manager records the busway current at the time of the scan.</p>
+<h3 id="s16-9-3"><span class="n">16.9.3</span>Rack PDU checks</h3>
+<ol>
+<li><strong>Inventory.</strong> Model, serial number, firmware and media access control (MAC) address recorded for every rack PDU (on a 100-rack hall with two PDUs per rack, that is 200 records).</li>
+<li><strong>Input reading.</strong> With a load (rack load bank or the IT equipment), compare the PDU input current reading with a calibrated clamp meter. Acceptance: within the PDU's stated accuracy (many rack PDUs state ±1 % billing-grade accuracy to IEC 62053-21 Class 1; the PDU data sheet states the class).</li>
+<li><strong>Outlet switching (switched PDUs).</strong> Switch each outlet off and on from the management interface; record the result.</li>
+<li><strong>Alarm thresholds.</strong> Configure the warning and critical current thresholds (for example 80 % and 90 % of the input breaker rating) and test one threshold with a load.</li>
+<li><strong>Network and protocol.</strong> SNMP (preferably SNMPv3), Modbus TCP or Redfish as specified; the data centre infrastructure management (DCIM) system or the EPMS reads the points.</li>
+<li><strong>Time.</strong> Network Time Protocol (NTP) configured; the PDU time matches the site time server within 1 s.</li>
+</ol>
+<h3 id="s16-9-4"><span class="n">16.9.4</span>Metering accuracy classes</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Class</th>
+<th>Error limit at rated conditions</th>
+<th>Typical use in the power chain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ANSI C12.20</td>
+<td>0.1</td>
+<td>±0.1 %</td>
+<td>utility and revenue meters (North American practice)</td>
+</tr>
+<tr>
+<td>ANSI C12.20</td>
+<td>0.2</td>
+<td>±0.2 %</td>
+<td>revenue and main meters</td>
+</tr>
+<tr>
+<td>ANSI C12.20</td>
+<td>0.5</td>
+<td>±0.5 %</td>
+<td>sub-meters</td>
+</tr>
+<tr>
+<td>IEC 62053-22</td>
+<td>0.2S, 0.5S</td>
+<td>±0.2 %, ±0.5 % (with current transformer (CT) operated meters, the "S" means accuracy is also specified at low current)</td>
+<td>main switchboard and UPS output meters</td>
+</tr>
+<tr>
+<td>IEC 62053-21</td>
+<td>1, 2 (0.5 in the 2020 edition)</td>
+<td>±1 %, ±2 %</td>
+<td>RPP branch monitoring, rack PDU input metering</td>
+</tr>
+</tbody>
+</table></div>
+<p>Confirm the classes and error limits against the current editions of ANSI C12.20 and IEC 62053-21 and -22.</p>
+<h3 id="s16-9-5"><span class="n">16.9.5</span>Metering accuracy test</h3>
+<p><strong>Purpose:</strong> Prove that the energy and power readings used for power usage effectiveness (PUE), capacity and billing are within their class.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Reference meter.</strong> Use a portable reference meter or power analyser at least three times more accurate than the meter under test (for a class 0.5S meter, <mark>a reference of ±0.1 % or better</mark>).</li>
+<li><strong>Connect.</strong> Connect the reference in the same circuit: voltage on the same busbar, current by calibrated current clamps or a test CT on the same conductor.</li>
+<li><strong>Test points.</strong> Read at about 10 %, 50 % and 100 % of the circuit's expected load, at the real power factor.</li>
+<li><strong>Error.</strong> Error = (meter reading − reference reading) / reference reading × 100 %.</li>
+<li><strong>CT ratio check.</strong> If the error is the same at every load point, the likely cause is a wrong CT ratio or a wrong multiplier in the meter set-up.</li>
+</ol>
+<p><strong>Acceptance:</strong> Error within the class limit plus the reference uncertainty.</p>
+<p><strong>Worked example:</strong> UPS output meter of B2-DH3-UPS-A1 (class 0.5S) reads 1,571.0 kW; the reference analyser reads 1,562.5 kW. Error = (1,571.0 − 1,562.5) / 1,562.5 = +0.54 %. The class limit is 0.5 % and the reference uncertainty 0.1 %, so the result is accepted up to 0.6 %. The reading of <mark>+0.54 % is accepted</mark>, but the same +0.5 % offset appears at the 10 % and 100 % load points. The technician compares the meter set-up with the CT test certificate: the CT has a measured ratio error of −0.45 % that the meter set-up does not correct. After the certificate ratio is entered in the meter's CT correction field, the meter reads +0.08 % at all three load points. The record shows both results.</p>
+<h2 id="s16-10"><span class="n">16.10</span>Monitoring: UPS, battery, STS and PDU points to EPMS</h2>
+<h3 id="s16-10-1"><span class="n">16.10.1</span>Minimum alarm list</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point</th>
+<th>Source</th>
+<th>Priority</th>
+<th>Action expected from operations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UPS on battery</td>
+<td>UPS</td>
+<td>1</td>
+<td>check input supply and generator status</td>
+</tr>
+<tr>
+<td>UPS on static bypass</td>
+<td>UPS</td>
+<td>1</td>
+<td>investigate cause; load is unprotected</td>
+</tr>
+<tr>
+<td>UPS on maintenance bypass</td>
+<td>output switchboard auxiliary contact</td>
+<td>1</td>
+<td>confirm planned work</td>
+</tr>
+<tr>
+<td>Battery low (end of discharge approaching)</td>
+<td>UPS or BMS</td>
+<td>1</td>
+<td>prepare for load loss</td>
+</tr>
+<tr>
+<td>Inverter fault</td>
+<td>UPS</td>
+<td>1</td>
+<td>call service</td>
+</tr>
+<tr>
+<td>Overload</td>
+<td>UPS</td>
+<td>2</td>
+<td>review load</td>
+</tr>
+<tr>
+<td>Battery temperature high</td>
+<td>battery monitoring or BMS</td>
+<td>2</td>
+<td>check room cooling</td>
+</tr>
+<tr>
+<td>Lithium-ion rack contactor open</td>
+<td>BMS</td>
+<td>1</td>
+<td>autonomy reduced; call vendor</td>
+</tr>
+<tr>
+<td>STS on alternate source</td>
+<td>STS</td>
+<td>2</td>
+<td>check preferred source</td>
+</tr>
+<tr>
+<td>STS sources out of synchronism</td>
+<td>STS</td>
+<td>2</td>
+<td>check UPS bypass sources</td>
+</tr>
+<tr>
+<td>Rack PDU input above 80 %</td>
+<td>rack PDU</td>
+<td>3</td>
+<td>capacity review</td>
+</tr>
+<tr>
+<td>Rack PDU input above 90 %</td>
+<td>rack PDU</td>
+<td>2</td>
+<td>rebalance load</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s16-10-2"><span class="n">16.10.2</span>Point-to-point test</h3>
+<ol>
+<li><strong>Force each alarm.</strong> The manufacturer's engineer forces each alarm at the UPS, STS, BMS or PDU (test function or real condition).</li>
+<li><strong>Check at the EPMS.</strong> The alarm appears at the EPMS with the correct text, priority and time stamp within 1 s of the device event log time.</li>
+<li><strong>Analogue values.</strong> kW, kVA, voltage, current, battery voltage, battery current, state of charge and autonomy remaining are compared with the device display.</li>
+<li><strong>Loss of communication.</strong> Disconnect the network card; the EPMS raises a communication alarm within its timeout.</li>
+<li><strong>Record.</strong> The point-to-point sheet (chapter 25 format) with each point, value, pass or fail and signatures.</li>
+</ol>
+<h2 id="s16-11"><span class="n">16.11</span>Integrated tests for the UPS and rack power chain (Level 5)</h2>
+<p>The table lists the Level 5 scenarios for the UPS chain. Figure <a class="figref" href="#F16-7">F16-7</a> shows the readings of the loss-of-block test in the worked example below.</p>
+<figure class="sheet" id="F16-7"><a href="../data/cx-handbook/figures/F16-7.svg" title="Open drawing F16-7 at full size"><img src="../data/cx-handbook/figures/F16-7.svg" alt="F16-7: Loss-of-block test in hall B2-DH3: UPS output of the eight blocks" width="1000" height="757" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F16-7</span> — <b>Loss-of-block test in hall B2-DH3: UPS output of the eight blocks</b>. Each box is one 2.5 MW UPS block. The hall load moves from eight blocks to seven; the sum stays the same because the racks move to their surviving feed.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Action</th>
+<th>Measurements</th>
+<th>Acceptance (MSC-1 example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Utility failure with hall at full load</td>
+<td>open both utility incomers</td>
+<td>UPS on battery time, generator bus live time, UPS return to normal, rack inlet power at a sample of racks</td>
+<td>no rack loses power; UPS returns to normal mode within the battery autonomy</td>
+</tr>
+<tr>
+<td>Loss of one block</td>
+<td>open the block transformer MV breaker</td>
+<td>remaining 7 blocks' load, busway currents, rack PDUs on the surviving feed</td>
+<td>each remaining UPS ≤ 71.4 % plus the measured margin; no rack power loss</td>
+</tr>
+<tr>
+<td>UPS to static bypass on generator</td>
+<td>transfer one UPS to bypass while on generator</td>
+<td>bypass synchronisation, output disturbance</td>
+<td>no break; output inside ITI curve</td>
+</tr>
+<tr>
+<td>Battery discharge to generator start failure</td>
+<td>block generator start, let the UPS discharge to its end-of-discharge alarm (on load banks only)</td>
+<td>autonomy, alarms</td>
+<td>autonomy ≥ 5 min; alarms received in order</td>
+</tr>
+<tr>
+<td>STS transfer under load</td>
+<td>open the preferred source of an STS</td>
+<td>output transfer time</td>
+<td>≤ 4 ms; downstream loads stay on</td>
+</tr>
+<tr>
+<td>Maintenance bypass procedure</td>
+<td>operations staff follow the MOP</td>
+<td>output disturbance, interlocks</td>
+<td>no break; MOP validated</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Loss-of-block test in hall B2-DH3. Before the test, the 8 UPS outputs read between 1,540 and 1,580 kW (average 1,562 kW, 62.5 %). The commissioning manager opens the MV breaker of block 5 at 10:12:00. The 7 remaining UPS outputs rise to between 1,760 and 1,810 kW. The highest is <mark>72.4 %</mark> of 2,500 kW, 1 percentage point above the 71.4 % design figure because the blocks do not share the load equally. Block 4 carried the highest load before the test (1,580 kW), and 1,580 × 8 / 7 = 1,806 kW. No rack PDU reports a power loss, and the B-feed rack PDUs on block 5 report zero current while their A-feed partners report the full rack current.</p>
+<h2 id="s16-12"><span class="n">16.12</span>Filled test records</h2>
+<h3 id="s16-12-1"><span class="n">16.12.1</span>UPS L4 test summary</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Document number</td>
+<td>ELE-L4-UPS-A1 rev 0</td>
+</tr>
+<tr>
+<td>Asset</td>
+<td>B2-DH3-UPS-A1, 2,500 kW, 415 V, VFI-SS-111 (manufacturer declaration)</td>
+</tr>
+<tr>
+<td>Load bank and analysers</td>
+<td>LB-LV-2500, power quality (PQ) analyser SN 4471 and SN 4472, calibrated 2026-09-15</td>
+</tr>
+<tr>
+<td>Steady-state output</td>
+<td>414.2 to 416.0 V, THD 1.1 %: pass</td>
+</tr>
+<tr>
+<td>Step load normal mode</td>
+<td>−4.1 % / 24 ms; +3.8 % / 20 ms: pass</td>
+</tr>
+<tr>
+<td>Step load battery mode</td>
+<td>−4.4 % / 26 ms; +3.9 % / 21 ms: pass</td>
+</tr>
+<tr>
+<td>Input failure and return</td>
+<td>no output disturbance outside class 1 curve; walk-in 15 s: pass</td>
+</tr>
+<tr>
+<td>Static bypass transfers</td>
+<td>manual: no break; inverter fault: 2.8 ms: pass</td>
+</tr>
+<tr>
+<td>Maintenance bypass</td>
+<td>no break; interlock proven; MOP-B2-UPS-01 validated: pass</td>
+</tr>
+<tr>
+<td>Efficiency at 62.5 %</td>
+<td>97.54 % ±0.14: pass (guarantee 97.0 %)</td>
+</tr>
+<tr>
+<td>Autonomy at 2.5 MW</td>
+<td>7 min 40 s at 26 °C: pass (design 5 min at end of life)</td>
+</tr>
+<tr>
+<td>Input current THD at 100 %</td>
+<td>3.2 %: pass</td>
+</tr>
+<tr>
+<td>Open items</td>
+<td>1 (event log time 3 s behind site NTP; NTP server address corrected, recheck)</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>electrical contractor, UPS manufacturer, CxA, owner representative</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s16-12-2"><span class="n">16.12.2</span>Battery capacity test record</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>String</td>
+<td>B2-DH3-BAT-B1-S2, 240 VRLA cells (40 × 12 V monoblocs)</td>
+</tr>
+<tr>
+<td>Manufacturer rating used</td>
+<td>1,180 W per cell for 15 min to 1.67 V per cell at 25 °C</td>
+</tr>
+<tr>
+<td>Test load</td>
+<td>283.2 kW constant power</td>
+</tr>
+<tr>
+<td>Average cell temperature at start</td>
+<td>25.0 °C</td>
+</tr>
+<tr>
+<td>Float period before test</td>
+<td>96 h</td>
+</tr>
+<tr>
+<td>End voltage (string)</td>
+<td>400.8 V</td>
+</tr>
+<tr>
+<td>Time to end voltage, first test</td>
+<td>14 min 6 s (94 %): fail</td>
+</tr>
+<tr>
+<td>Weak unit</td>
+<td>monobloc 23, below 1.67 V per cell at 11 min</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>monobloc 23 replaced, non-conformance report (NCR) NCR-B2-ELE-0412</td>
+</tr>
+<tr>
+<td>Time to end voltage, repeat</td>
+<td>15 min 24 s (103 %): pass</td>
+</tr>
+<tr>
+<td>Recharge time to float current stable</td>
+<td>9 h 20 min</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>battery vendor, electrical contractor, CxA</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s16-12-3"><span class="n">16.12.3</span>Transfer switch timing record</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Device</th>
+<th>Test</th>
+<th>Setting</th>
+<th>Measured</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B2-DH3-STS-03</td>
+<td>preferred source failure</td>
+<td>≤ 4 ms</td>
+<td>4 ms</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-DH3-STS-03</td>
+<td>manual transfer, sources in phase</td>
+<td>no break</td>
+<td>no break</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-DH3-STS-03</td>
+<td>manual transfer, sources 25° apart</td>
+<td>blocked</td>
+<td>blocked</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-MECH-ATS-02</td>
+<td>engine start delay</td>
+<td>2 s</td>
+<td>2.1 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-MECH-ATS-02</td>
+<td>transfer to emergency delay</td>
+<td>3 s</td>
+<td>3.0 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-MECH-ATS-02</td>
+<td>retransfer delay (test setting)</td>
+<td>5 min</td>
+<td>5 min 02 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-MECH-ATS-02</td>
+<td>neutral position delay</td>
+<td>2 s</td>
+<td>2.2 s</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s16-13"><span class="n">16.13</span>Common errors and how to find them before the witness test</h2>
+<ol>
+<li><strong>Battery not rested before the capacity test.</strong> The test runs a few hours after the charge, and the result is high or erratic. Record the float time on the test sheet; <mark>require 72 hours for lead-acid</mark>.</li>
+<li><strong>Temperature ignored.</strong> The battery room is at 20 °C and the result is low; or at 30 °C and the result is high. Record pilot cell temperatures and apply the IEEE 450 correction.</li>
+<li><strong>Load bank not constant power.</strong> A resistive load bank draws less power as the DC voltage falls, so the battery lasts longer than at the UPS constant-power duty. Use a constant-power or constant-current load unit, or test through the UPS inverter with an AC load bank.</li>
+<li><strong>One analyser for efficiency.</strong> Input and output are read at different times with one instrument, and a load drift gives a wrong efficiency. Use two synchronised analysers.</li>
+<li><strong>Eco mode left enabled by default.</strong> The firmware default enables eco mode, and the owner's requirement says disabled. Compare the settings record against the OPR before the L4 test.</li>
+<li><strong>Maintenance bypass MOP not validated.</strong> Operations staff later find that the labels or the key sequence differ from the MOP. Validate the MOP with the operations team during L4.</li>
+<li><strong>Busway thermal scan at low load.</strong> The scan at 30 % load shows no hot joint; a loose joint at 100 % would. Scan at the highest load the test programme reaches (on MSC-1, the one-block-lost L5 case).</li>
+<li><strong>Rack PDU firmware mixed.</strong> Different firmware versions give different SNMP objects and the DCIM shows gaps. Record and align firmware before the integration test.</li>
+<li><strong>Lithium-ion BMS protection not simulated.</strong> The vendor commissions the battery with the BMS healthy and never proves the trips. Ask for the protection simulation in the vendor's procedure.</li>
+<li><strong>Meter CT correction not applied.</strong> Meters read consistently high or low. Compare at three load points; <mark>a constant offset points to the CT set-up</mark>.</li>
+</ol>
+<h2 id="s16-14"><span class="n">16.14</span>Key performance indicators for the UPS and rack power scope</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target (example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>First-pass yield of UPS L4 tests</td>
+<td>tests passed at first witness / tests witnessed</td>
+<td>≥ 90 %</td>
+</tr>
+<tr>
+<td>Battery acceptance capacity</td>
+<td>lowest string capacity at acceptance</td>
+<td>≥ 100 %</td>
+</tr>
+<tr>
+<td>UPS efficiency at normal block load</td>
+<td>measured at 62.5 % load</td>
+<td>≥ guarantee (97.0 % example)</td>
+</tr>
+<tr>
+<td>STS transfer time</td>
+<td>worst measured</td>
+<td>≤ 4 ms</td>
+</tr>
+<tr>
+<td>Meter error</td>
+<td>worst error at main and UPS meters</td>
+<td>within class</td>
+</tr>
+<tr>
+<td>Rack PDU commissioning coverage</td>
+<td>PDUs with verified readings and alarms / total PDUs</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>Open category A issues at L5 start</td>
+<td>number</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s16-15"><span class="n">16.15</span>Checklist for site use</h2>
+<ol>
+<li><strong>Block design numbers.</strong> The UPS rating, battery autonomy, normal load (62.5 %) and one-block-lost load (71.4 %) are in the test plan.</li>
+<li><strong>Classification.</strong> The manufacturer's IEC 62040-3 declaration (for example VFI-SS-111) is on file and matches the specification.</li>
+<li><strong>FAT.</strong> FAT reports received for all UPS systems, witnessed at the agreed rate, with step load, transfers, efficiency and heat run.</li>
+<li><strong>L2.</strong> Terminations torqued and marked, IR of cables recorded, battery polarity checked, room clean and cooled before energisation.</li>
+<li><strong>L3.</strong> Start-up report and UPS settings record issued; eco mode setting matches the OPR.</li>
+<li><strong>Steady state and step load.</strong> Results inside the specification and the class 1 curve in normal and battery mode.</li>
+<li><strong>Transfers.</strong> Battery, static bypass and maintenance bypass transfers proven with no break; interlock proven; MOP validated.</li>
+<li><strong>Efficiency.</strong> Measured with two synchronised analysers at the four load points.</li>
+<li><strong>Generator compatibility.</strong> Walk-in, synchronisation and harmonics proven on the generator.</li>
+<li><strong>Battery capacity.</strong> Capacity test or full-load autonomy test passed with temperature recorded.</li>
+<li><strong>Ohmic baseline.</strong> Ohmic values and float voltages recorded for every cell or monobloc.</li>
+<li><strong>Lithium-ion BMS.</strong> Contactor, protection simulations, balancing and communication proven.</li>
+<li><strong>STS and ATS.</strong> Transfer times and timers recorded against the settings.</li>
+<li><strong>Busway and RPP.</strong> Joint torque, IR, phasing, tap-off settings and thermal scan at high load.</li>
+<li><strong>Rack PDUs.</strong> Inventory, reading accuracy, thresholds, network and time checked for every PDU.</li>
+<li><strong>Meters.</strong> Accuracy tests at three load points for main, UPS output and sample branch meters.</li>
+<li><strong>EPMS points.</strong> Point-to-point sheets complete for UPS, battery, STS, ATS and PDU.</li>
+<li><strong>IST.</strong> The scenarios in 16.11 pass and their results are in the integrated systems test (IST) report.</li>
+</ol>
+<h2 id="s16-16"><span class="n">16.16</span>Sources</h2>
+<ol>
+<li>IEC 62040-3:2021, Uninterruptible power systems (UPS), Part 3: Method of specifying the performance and test requirements. IEC, 2021. <a href="https://webstore.iec.ch/en/publication/64386" rel="noopener">https://webstore.iec.ch/en/publication/64386</a></li>
+<li>IECEE, IEC 62040-3:2011 status page (replaced by IEC 62040-3:2021). <a href="https://www.iecee.org/certification/iec-standards/iec-62040-32011" rel="noopener">https://www.iecee.org/certification/iec-standards/iec-62040-32011</a></li>
+<li>Schneider Electric, White Paper WP1, UPS classification (IEC 62040-3 classification summary). <a href="https://download.schneider-electric.com/doc/SPD_SADE-5TNM3Y_EN/WP1_V10_EN.pdf" rel="noopener">https://download.schneider-electric.com/doc/SPD_SADE-5TNM3Y_EN/WP1_V10_EN.pdf</a></li>
+<li>IEC 62040-1, Uninterruptible power systems, Part 1: Safety requirements. IEC, current edition. <a href="https://webstore.iec.ch" rel="noopener">https://webstore.iec.ch</a></li>
+<li>IEEE 450, Recommended Practice for Maintenance, Testing, and Replacement of Vented Lead-Acid Batteries for Stationary Applications. IEEE, current edition. <a href="https://standards.ieee.org/ieee/450/" rel="noopener">https://standards.ieee.org/ieee/450/</a></li>
+<li>IEEE 1188, Recommended Practice for Maintenance, Testing, and Replacement of Valve-Regulated Lead-Acid (VRLA) Batteries for Stationary Applications. IEEE, current edition. <a href="https://standards.ieee.org/ieee/1188/" rel="noopener">https://standards.ieee.org/ieee/1188/</a></li>
+<li>IEEE 1106, Recommended Practice for Installation, Maintenance, Testing, and Replacement of Vented Nickel-Cadmium Batteries for Stationary Applications. IEEE, current edition. <a href="https://standards.ieee.org/ieee/1106/" rel="noopener">https://standards.ieee.org/ieee/1106/</a></li>
+<li>IEEE 485, Recommended Practice for Sizing Lead-Acid Batteries for Stationary Applications. IEEE, current edition. <a href="https://standards.ieee.org/ieee/485/" rel="noopener">https://standards.ieee.org/ieee/485/</a></li>
+<li>IEEE 1635 / ASHRAE 21, Guide for the Ventilation and Thermal Management of Batteries for Stationary Applications. IEEE, current edition. <a href="https://standards.ieee.org/ieee/1635/" rel="noopener">https://standards.ieee.org/ieee/1635/</a></li>
+<li>UL 1973, Standard for Batteries for Use in Stationary and Motive Auxiliary Power Applications. UL Standards and Engagement, current edition. <a href="https://www.shopulstandards.com" rel="noopener">https://www.shopulstandards.com</a></li>
+<li>UL 9540A, Test Method for Evaluating Thermal Runaway Fire Propagation in Battery Energy Storage Systems. UL Standards and Engagement, current edition. <a href="https://www.shopulstandards.com" rel="noopener">https://www.shopulstandards.com</a></li>
+<li>NFPA 855, Standard for the Installation of Stationary Energy Storage Systems. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-855-standard-development/855" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-855-standard-development/855</a></li>
+<li>Fluke, Recommended battery tests and testing schedule for battery back-up systems. <a href="https://www.fluke.com/en/learn/blog/energy-efficiency/recommended-battery-tests" rel="noopener">https://www.fluke.com/en/learn/blog/energy-efficiency/recommended-battery-tests</a></li>
+<li>Open Exam Prep, Battery load test, IEEE 450 and VRLA (NETA ETT Level II study guide). <a href="https://open-exam-prep.com/study-guides/neta-ett-level-ii/grounding-batteries-devices/battery-load-test-ieee-450-vrla" rel="noopener">https://open-exam-prep.com/study-guides/neta-ett-level-ii/grounding-batteries-devices/battery-load-test-ieee-450-vrla</a></li>
+<li>Information Technology Industry Council, ITI (CBEMA) Curve Application Note. <a href="https://www.itic.org" rel="noopener">https://www.itic.org</a></li>
+<li>IEEE 446, Recommended Practice for Emergency and Standby Power Systems for Industrial and Commercial Applications (Orange Book). IEEE. <a href="https://standards.ieee.org/ieee/446/" rel="noopener">https://standards.ieee.org/ieee/446/</a></li>
+<li>ANSI C12.20, American National Standard for Electricity Meters, 0.1, 0.2 and 0.5 Accuracy Classes. NEMA, current edition. <a href="https://www.nema.org" rel="noopener">https://www.nema.org</a></li>
+<li>IEC 62053-21 and IEC 62053-22, Electricity metering equipment, Particular requirements, static meters for AC active energy. IEC, 2020 editions. <a href="https://webstore.iec.ch" rel="noopener">https://webstore.iec.ch</a></li>
+<li>IEC 61439-6, Low-voltage switchgear and controlgear assemblies, Part 6: Busbar trunking systems. IEC, current edition. <a href="https://webstore.iec.ch" rel="noopener">https://webstore.iec.ch</a></li>
+<li>ANSI/NETA ATS, Standard for Acceptance Testing Specifications for Electrical Power Equipment and Systems. NETA, current edition. <a href="https://www.netaworld.org/standards/ansi-neta-ats" rel="noopener">https://www.netaworld.org/standards/ansi-neta-ats</a></li>
+<li>IEEE 519-2022, Standard for Harmonic Control in Electric Power Systems. IEEE, 2022. <a href="https://standards.ieee.org/ieee/519/10677/" rel="noopener">https://standards.ieee.org/ieee/519/10677/</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="15-generators-fuel-synchronising.html"><span>Previous · 15</span><span class="t">Generators, fuel systems and synchronising switchgear</span></a><a class="next" href="17-earthing-lightning-power-quality.html"><span>Next · 17</span><span class="t">Earthing, lightning protection and power quality</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

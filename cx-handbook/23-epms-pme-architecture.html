@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>23 EPMS and Schneider EcoStruxure Power Monitoring Expert (PME) | Cx Field Manual R01</title>
+<meta name="description" content="This chapter describes what an electrical power monitoring system (EPMS) is on a hyperscale data-centre campus and how Schneider Electric EcoStruxure Power…">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/23-epms-pme-architecture.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/23-epms-pme-architecture.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/23-epms-pme-architecture.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/23-epms-pme-architecture.html">
+<meta property="og:title" content="23 EPMS and Schneider EcoStruxure Power Monitoring Expert (PME) | Cx Field Manual R01">
+<meta property="og:description" content="This chapter describes what an electrical power monitoring system (EPMS) is on a hyperscale data-centre campus and how Schneider Electric EcoStruxure Power…">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="23 EPMS and Schneider EcoStruxure Power Monitoring Expert (PME) | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter describes what an electrical power monitoring system (EPMS) is on a hyperscale data-centre campus and how Schneider Electric EcoStruxure Power…">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"23 EPMS and Schneider EcoStruxure Power Monitoring Expert (PME): architecture and devices","name":"EPMS and Schneider EcoStruxure Power Monitoring Expert (PME): architecture and devices","description":"This chapter describes what an electrical power monitoring system (EPMS) is on a hyperscale data-centre campus and how Schneider Electric EcoStruxure Power…","url":"https://resistancezero.com/cx-handbook/23-epms-pme-architecture.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/23-epms-pme-architecture.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":10313,"position":23,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"23 EPMS and Schneider EcoStruxure Power Monitoring Expert (PME)","item":"https://resistancezero.com/cx-handbook/23-epms-pme-architecture.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part E · Controls, monitoring, integration and networks</p>
+    <h1><span class="num">23</span>EPMS and Schneider EcoStruxure Power Monitoring Expert (PME): architecture and devices</h1>
+    <p class="lede">This chapter describes what an electrical power monitoring system (EPMS) is on a hyperscale data-centre campus and how Schneider Electric EcoStruxure Power Monitoring Expert (PME) is built.</p>
+    <p class="basis">Chapter 23 of 32 · 19 sections · 8 figures · 10,313 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 23</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 23</summary>
+<ol><li><a href="#s23-0"><span class="n">23.0</span>Scope of this chapter</a></li><li><a href="#s23-1"><span class="n">23.1</span>EPMS purpose and the boundary with BMS and DCIM</a><ol><li><a href="#s23-1-1"><span class="n">23.1.1</span>What the EPMS does</a></li><li><a href="#s23-1-2"><span class="n">23.1.2</span>Ownership of data between EPMS, BMS and DCIM</a></li><li><a href="#s23-1-3"><span class="n">23.1.3</span>Why the EPMS uses its own network and server</a></li></ol></li><li><a href="#s23-2"><span class="n">23.2</span>EcoStruxure Power architecture in three layers</a><ol><li><a href="#s23-2-1"><span class="n">23.2.1</span>Connected products layer</a></li><li><a href="#s23-2-2"><span class="n">23.2.2</span>Edge control layer</a></li><li><a href="#s23-2-3"><span class="n">23.2.3</span>Apps, analytics and services layer</a></li><li><a href="#s23-2-4"><span class="n">23.2.4</span>Steps to set out the architecture at design review</a></li></ol></li><li><a href="#s23-3"><span class="n">23.3</span>PME server software: clients, services and databases</a><ol><li><a href="#s23-3-1"><span class="n">23.3.1</span>Clients</a></li><li><a href="#s23-3-2"><span class="n">23.3.2</span>Windows services</a></li><li><a href="#s23-3-3"><span class="n">23.3.3</span>The four databases</a></li><li><a href="#s23-3-4"><span class="n">23.3.4</span>Software modules</a></li></ol></li><li><a href="#s23-4"><span class="n">23.4</span>Field devices and what each one provides</a><ol><li><a href="#s23-4-1"><span class="n">23.4.1</span>Device families</a></li><li><a href="#s23-4-2"><span class="n">23.4.2</span>Choosing the device for each point</a></li><li><a href="#s23-4-3"><span class="n">23.4.3</span>Data available from a MicroLogic X trip unit</a></li></ol></li><li><a href="#s23-5"><span class="n">23.5</span>Instrument transformers and meter wiring</a><ol><li><a href="#s23-5-1"><span class="n">23.5.1</span>Current transformers</a></li><li><a href="#s23-5-2"><span class="n">23.5.2</span>Voltage inputs</a></li><li><a href="#s23-5-3"><span class="n">23.5.3</span>Wiring modes</a></li><li><a href="#s23-5-4"><span class="n">23.5.4</span>Shorting test block</a></li></ol></li><li><a href="#s23-6"><span class="n">23.6</span>Gateways and protocols</a><ol><li><a href="#s23-6-1"><span class="n">23.6.1</span>Protocols in an EPMS</a></li><li><a href="#s23-6-2"><span class="n">23.6.2</span>Link150 gateway</a></li><li><a href="#s23-6-3"><span class="n">23.6.3</span>Com&#x27;X data logger</a></li><li><a href="#s23-6-4"><span class="n">23.6.4</span>Serial line loading and poll cycle</a></li></ol></li><li><a href="#s23-7"><span class="n">23.7</span>Time synchronisation and SOE resolution</a><ol><li><a href="#s23-7-1"><span class="n">23.7.1</span>Why time matters</a></li><li><a href="#s23-7-2"><span class="n">23.7.2</span>Time sources</a></li><li><a href="#s23-7-3"><span class="n">23.7.3</span>Rules for configuring time</a></li><li><a href="#s23-7-4"><span class="n">23.7.4</span>SOE resolution and what limits it</a></li></ol></li><li><a href="#s23-8"><span class="n">23.8</span>Power quality: waveform capture and event classification</a><ol><li><a href="#s23-8-1"><span class="n">23.8.1</span>IEC 61000-4-30 Class A</a></li><li><a href="#s23-8-2"><span class="n">23.8.2</span>The ITIC (CBEMA) curve</a></li><li><a href="#s23-8-3"><span class="n">23.8.3</span>SEMI F47</a></li><li><a href="#s23-8-4"><span class="n">23.8.4</span>Waveform capture settings</a></li></ol></li><li><a href="#s23-9"><span class="n">23.9</span>Data model: names, logging, energy, demand and hierarchies</a><ol><li><a href="#s23-9-1"><span class="n">23.9.1</span>Device naming</a></li><li><a href="#s23-9-2"><span class="n">23.9.2</span>Logging intervals</a></li><li><a href="#s23-9-3"><span class="n">23.9.3</span>Energy registers and demand</a></li><li><a href="#s23-9-4"><span class="n">23.9.4</span>Hierarchies and virtual meters</a></li></ol></li><li><a href="#s23-10"><span class="n">23.10</span>Alarm design</a><ol><li><a href="#s23-10-1"><span class="n">23.10.1</span>Alarm sources</a></li><li><a href="#s23-10-2"><span class="n">23.10.2</span>Priority scheme</a></li><li><a href="#s23-10-3"><span class="n">23.10.3</span>Rules for setting alarms</a></li><li><a href="#s23-10-4"><span class="n">23.10.4</span>Alarm list fields</a></li></ol></li><li><a href="#s23-11"><span class="n">23.11</span>Reports</a><ol><li><a href="#s23-11-1"><span class="n">23.11.1</span>Steps to verify a report before the witness test</a></li></ol></li><li><a href="#s23-12"><span class="n">23.12</span>Licensing and server sizing</a><ol><li><a href="#s23-12-1"><span class="n">23.12.1</span>Licence types</a></li><li><a href="#s23-12-2"><span class="n">23.12.2</span>Licence sizing steps</a></li></ol></li><li><a href="#s23-13"><span class="n">23.13</span>Redundancy, backups and cybersecurity</a><ol><li><a href="#s23-13-1"><span class="n">23.13.1</span>Redundancy</a></li><li><a href="#s23-13-2"><span class="n">23.13.2</span>Backups</a></li><li><a href="#s23-13-3"><span class="n">23.13.3</span>Cybersecurity controls</a></li></ol></li><li><a href="#s23-14"><span class="n">23.14</span>Interfaces to BMS and DCIM</a></li><li><a href="#s23-15"><span class="n">23.15</span>Worked example: EPMS device count and gateway list for one MSC-1 building</a></li><li><a href="#s23-16"><span class="n">23.16</span>Points list and device configuration record fields</a><ol><li><a href="#s23-16-1"><span class="n">23.16.1</span>Points list</a></li><li><a href="#s23-16-2"><span class="n">23.16.2</span>Device configuration record</a></li></ol></li><li><a href="#s23-17"><span class="n">23.17</span>Checklist for site use</a></li><li><a href="#s23-18"><span class="n">23.18</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="22-bms-commissioning-procedure.html"><span>Previous</span>22 BMS commissioning procedure</a><a href="24-epms-pme-commissioning.html"><span>Next</span>24 EPMS and PME commissioning procedure</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s23-0"><span class="n">23.0</span>Scope of this chapter</h2>
+<p>This chapter describes what an electrical power monitoring system (EPMS) is on a hyperscale data-centre campus and how Schneider Electric EcoStruxure Power Monitoring Expert (PME) is built. It also lists the field devices, gateways, protocols and time sources that feed PME. Chapter 24 gives the commissioning procedure that tests every part described here. Chapter 26 covers the operational technology (OT) network and the fibre and copper cabling that the EPMS uses.</p>
+<ol>
+<li><strong>System purpose and boundaries.</strong> The difference between the EPMS, the building management system (BMS) and data-centre infrastructure management (DCIM), and which system owns which data.</li>
+<li><strong>EcoStruxure Power architecture.</strong> The three layers that Schneider uses (connected products, edge control, apps, analytics and services) applied to one building of the MSC-1 campus.</li>
+<li><strong>PME server software.</strong> Engineering Client, Web Client, the Windows services, the four SQL Server databases, the Virtual Processor and the licensed software modules. The names follow the PME 2023 and PME 2024 online help.</li>
+<li><strong>Field devices.</strong> PowerLogic ION9000, PM8000 and PM5000 meters, MasterPact MTZ breakers with MicroLogic X trip units, and ComPacT and PowerPacT moulded-case breakers. The chapter also covers Easergy P3 protection relays, Galaxy uninterruptible power supply (UPS) network management cards, generator controllers and automatic transfer switches (ATS).</li>
+<li><strong>Instrument transformers and meter wiring.</strong> Current transformer (CT) and voltage transformer (VT) selection, wiring modes and the shorting test block.</li>
+<li><strong>Gateways and protocols.</strong> The Link150 and Com'X gateways. The protocols are Modbus Transmission Control Protocol (TCP) and Modbus remote terminal unit (RTU), ION protocol, IEC 61850, BACnet/IP, Open Platform Communications (OPC) Data Access (DA) and OPC Unified Architecture (UA), Simple Network Management Protocol (SNMP) and syslog.</li>
+<li><strong>Time synchronisation.</strong> Global Positioning System (GPS) clocks, Precision Time Protocol (PTP, IEEE 1588), IRIG-B, Network Time Protocol (NTP) and the sequence-of-events (SOE) resolution each one supports.</li>
+<li><strong>Power quality.</strong> Waveform capture, IEC 61000-4-30 Class A measurement, the Information Technology Industry Council (ITIC) curve (formerly the Computer and Business Equipment Manufacturers Association (CBEMA) curve) and SEMI F47.</li>
+<li><strong>Data model, alarms, reports, licensing, redundancy and cybersecurity.</strong> How data is logged, named, grouped, alarmed, reported, licensed, backed up and protected.</li>
+<li><strong>Worked examples.</strong> EPMS device count and gateway list for one MSC-1 building, CT sizing for a block low-voltage (LV) main, licence sizing and network load.</li>
+</ol>
+<p>Schneider Electric documents used: PME 2023 and PME 2024 online help, PowerLogic ION9000, PM8000 and PM5000 datasheets and user guides, MasterPact MTZ Modbus Communication Guide, Link150 datasheet and Easergy P3 product data. Standards and other documents used: IEC 61000-4-30 (Edition 4.0, 2025), IEC 62053-22, IEC 61869-2, IEEE 1588-2019, IEC 61850-9-3, IEEE C37.238, the ITI (CBEMA) curve application note, ANSI/ASHRAE 135 (BACnet), IEC 62443-3-3, and the MSC-1 case ledger.</p>
+<h2 id="s23-1"><span class="n">23.1</span>EPMS purpose and the boundary with BMS and DCIM</h2>
+<h3 id="s23-1-1"><span class="n">23.1.1</span>What the EPMS does</h3>
+<p>An EPMS measures, records and reports the electrical state of the power system from the utility intake to the rack power distribution. On a data-centre campus it has six jobs.</p>
+<ol>
+<li><strong>Measure electrical quantities.</strong> Voltage, current, active and reactive power, energy, frequency, power factor, harmonics and unbalance at every metered point on the single-line diagram. The measurement is used for billing, capacity planning and power usage effectiveness (PUE).</li>
+<li><strong>Record events with a common time.</strong> Breaker trips, protection operations, transfer switch operations, UPS mode changes and voltage disturbances are time-stamped by the device and collected into one event log. The common time base lets the operator rebuild the order of events after an incident.</li>
+<li><strong>Capture power quality (PQ) disturbances.</strong> Sags, swells, transients and interruptions are recorded as waveforms and classified against a tolerance curve.</li>
+<li><strong>Alarm the operator.</strong> PME raises alarms on overload, breaker trip, loss of supply, communication failure and power quality events in the PME Alarms application. It passes them to the BMS or a notification service.</li>
+<li><strong>Report.</strong> Energy, PUE, capacity, breaker settings and power quality reports are produced on a schedule and on demand.</li>
+<li><strong>Feed other systems.</strong> The BMS receives a small set of read-only points (for example a "source stable" permissive after a generator transfer). DCIM receives power data for rack and power-chain capacity.</li>
+</ol>
+<h3 id="s23-1-2"><span class="n">23.1.2</span>Ownership of data between EPMS, BMS and DCIM</h3>
+<p>The table is the boundary agreed on most hyperscale programmes. The interface control document (ICD) for each project records the final version (chapter 25).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Data or function</th>
+<th>EPMS (PME)</th>
+<th>BMS</th>
+<th>DCIM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Electrical measurements at switchboards</td>
+<td>owner, source of record</td>
+<td>read-only copy of selected points</td>
+<td>read-only copy for capacity</td>
+</tr>
+<tr>
+<td>Breaker status and trip cause</td>
+<td>owner</td>
+<td>read-only status for alarms</td>
+<td>read-only for power chain model</td>
+</tr>
+<tr>
+<td>Power quality waveforms and events</td>
+<td>owner</td>
+<td>not received</td>
+<td>summary only</td>
+</tr>
+<tr>
+<td>Mechanical plant control (pumps, computer room air handlers (CRAH), coolant distribution units (CDU))</td>
+<td>not involved</td>
+<td>owner</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>Rack power distribution unit (PDU) and branch circuit data</td>
+<td>where metered by EPMS devices</td>
+<td>not involved</td>
+<td>owner of the rack model</td>
+</tr>
+<tr>
+<td>Energy and PUE reports</td>
+<td>owner of electrical energy data</td>
+<td>supplies mechanical sub-meters if any</td>
+<td>dashboard user</td>
+</tr>
+<tr>
+<td>Control commands to breakers</td>
+<td>only when the specification allows, under a separate permit</td>
+<td>never</td>
+<td>never</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> On a correct design, no BMS or DCIM point can write to a breaker, a relay or a meter setting. Ask the integrator to show the write permissions in the gateway mapping file and in the PME user roles before the integration test.</p>
+<h3 id="s23-1-3"><span class="n">23.1.3</span>Why the EPMS uses its own network and server</h3>
+<p>The EPMS sits on its own network segment for three reasons. First, the protection relays and trip units on the EPMS network take part in the electrical protection system, and their configuration must be changed only by authorised electrical staff. Second, time synchronisation by Precision Time Protocol (PTP) needs switches that support PTP and a controlled network load. Third, the cybersecurity zone model of IEC 62443-3-3 separates systems with different consequences of failure into separate zones joined by conduits with defined flows. Chapter 26 gives the network design.</p>
+<h2 id="s23-2"><span class="n">23.2</span>EcoStruxure Power architecture in three layers</h2>
+<p>Schneider Electric describes EcoStruxure Power in three layers. Figure <a class="figref" href="#F23-1">F23-1</a> applies them to one MSC-1 building.</p>
+<figure class="sheet" id="F23-1"><a href="../data/cx-handbook/figures/F23-1.svg" title="Open drawing F23-1 at full size"><img src="../data/cx-handbook/figures/F23-1.svg" alt="F23-1: EPMS architecture for one MSC-1 building in the three EcoStruxure Power layers" width="1400" height="1020" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F23-1</span> — <b>EPMS architecture for one MSC-1 building in the three EcoStruxure Power layers</b>. Connected products measure and protect; the edge-control layer carries the data and runs PME; the apps layer is where reports, alarms and analytics are used.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Schneider name</th>
+<th>Items on the MSC-1 building</th>
+<th>Typical owner during construction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Connected products</td>
+<td>ION9000 and PM8000 meters, PM5000 meters, MasterPact MTZ with MicroLogic X, ComPacT NSX, Easergy P3 relays, Galaxy UPS network management cards, generator controllers, ATS controllers</td>
+<td>switchboard manufacturer and EPMS contractor</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Edge control</td>
+<td>PME server, SQL Server, EPMS switches, Link150 and Com'X gateways, time server, firewall</td>
+<td>EPMS contractor and network contractor</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Apps, analytics and services</td>
+<td>PME Web Applications (Dashboards, Diagrams, Trends, Alarms, Reports), software modules, report subscriptions, exports to BMS and DCIM</td>
+<td>EPMS contractor, then the owner operations team</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-2-1"><span class="n">23.2.1</span>Connected products layer</h3>
+<p>Every device in this layer measures or protects and has a communication port. The device keeps its own logs (energy, events, waveforms) in memory. <mark>Onboard logging is what allows data to be recovered after a network outage</mark>, so the specification must require it for every meter that feeds billing or PUE.</p>
+<h3 id="s23-2-2"><span class="n">23.2.2</span>Edge control layer</h3>
+<p>The edge control layer is the PME server and the network that carries device data to it. On a hyperscale campus the usual practice is one PME server per building or per campus phase, with a separate reporting or historian server in the OT demilitarised zone (DMZ). The server is a virtual machine on a resilient host or a physical server with redundant power supplies and disks.</p>
+<h3 id="s23-2-3"><span class="n">23.2.3</span>Apps, analytics and services layer</h3>
+<p>This layer is where users work: the Web Client in a browser, scheduled reports, notifications and exports. In the MSC-1 worked example, the operations team uses Dashboards for PUE, the Alarms application for events, and Reports for monthly energy and capacity.</p>
+<h3 id="s23-2-4"><span class="n">23.2.4</span>Steps to set out the architecture at design review</h3>
+<p><strong>Purpose:</strong> Confirm at the design stage that the EPMS architecture can be commissioned and operated.</p>
+<p><strong>Owner:</strong> Commissioning manager (CxM), with the electrical engineer of record (EoR) and the EPMS contractor.</p>
+<p><strong>Trigger:</strong> Issue of the EPMS design submittal (for example the 60 % design stage).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Obtain the submittal set.</strong> Request the EPMS riser diagram, meter schedule, points list, network diagram, Internet Protocol (IP) address plan, time synchronisation diagram and server specification. Allow the EPMS contractor 10 working days to issue them after the request.</li>
+<li><strong>Check every metered point.</strong> Compare the meter schedule against the single-line diagrams. Every incomer, bus section, generator, UPS input and output, block transformer and outgoing feeder above the agreed rating (for example <mark>250 A</mark>) must have a device.</li>
+<li><strong>Check the device class.</strong> Utility intakes and generator buses need Class A power quality meters (ION9000 class). Block LV mains need revenue-grade meters (PM8000 class, Class 0.2S). Feeders need Class 0.5S or better (PM5000 class).</li>
+<li><strong>Check the network path.</strong> Every Ethernet device must connect to an access switch in the same electrical room. Every serial device must connect through a gateway with no more than the number of devices agreed for the poll cycle (see 23.6.4).</li>
+<li><strong>Check time synchronisation.</strong> Every device that feeds SOE must have one stated time source (PTP or IRIG-B), and the time server must have a GPS antenna position and lightning protection.</li>
+<li><strong>Check the integration list.</strong> The BMS and DCIM points must be listed with protocol, direction, update rate and owner (Figure <a class="figref" href="#F23-6">F23-6</a>).</li>
+<li><strong>Record comments.</strong> Return comments within 10 working days in the design review log with a reference to the drawing and the clause of the specification.</li>
+</ol>
+<p><strong>Records:</strong> Design review comment log, signed comment responses, revised riser diagram.</p>
+<h2 id="s23-3"><span class="n">23.3</span>PME server software: clients, services and databases</h2>
+
+<figure class="sheet" id="F23-2"><a href="../data/cx-handbook/figures/F23-2.svg" title="Open drawing F23-2 at full size"><img src="../data/cx-handbook/figures/F23-2.svg" alt="F23-2: PME server software: clients, Windows services and the four SQL Server databases" width="1400" height="898" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F23-2</span> — <b>PME server software: clients, Windows services and the four SQL Server databases</b>. Service names follow the PME 2024 help page on Windows services; the device data path runs from ION Site Service through the Log Inserter into ION_Data.</figcaption></figure>
+<h3 id="s23-3-1"><span class="n">23.3.1</span>Clients</h3>
+<p>PME has two kinds of client. The names below are those used in the PME help and the Schneider licensing frequently asked questions (FAQ).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Client</th>
+<th>What it is</th>
+<th>Tools it contains</th>
+<th>Licence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engineering Client</td>
+<td>Windows application for configuration and administration; one is installed on the PME server by default</td>
+<td>Management Console (sites, devices, gateways, communications), Vista (user diagrams), Designer (ION device and Virtual Processor logic)</td>
+<td>the Base licence includes one Engineering Client</td>
+</tr>
+<tr>
+<td>Web Client</td>
+<td>browser access with no installation</td>
+<td>Dashboards, Diagrams, Trends, Alarms, Reports (the Web Applications)</td>
+<td>the Base licence includes two Web Clients; more are licensed separately</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> Schneider Electric FAQ on PME components and licences (see 23.18, items 4 and 5).</p>
+<h3 id="s23-3-2"><span class="n">23.3.2</span>Windows services</h3>
+<p>All PME applications without a user interface run as Windows services. Figure <a class="figref" href="#F23-2">F23-2</a> shows how they connect. The table lists the services checked at commissioning; the full list is in the PME 2024 help page "PME Windows services".</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Function</th>
+<th>What to check at commissioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ION Site Service</td>
+<td>handles packet communication to devices and gateways</td>
+<td>running; site status online for every gateway</td>
+</tr>
+<tr>
+<td>ION Network Router Service</td>
+<td>routes ION requests between components</td>
+<td>running; no routing errors in the system log</td>
+</tr>
+<tr>
+<td>ION Log Inserter Service</td>
+<td>stores historical data from devices and the Virtual Processor in ION_Data</td>
+<td>running; log upload counters rising</td>
+</tr>
+<tr>
+<td>ION Log Subsystem Router Service</td>
+<td>transfers device data to storage and processing</td>
+<td>running (delayed start)</td>
+</tr>
+<tr>
+<td>ION Real Time Data Service</td>
+<td>provides live values to Vista, Diagrams and Trends</td>
+<td>running; live values update in Diagrams</td>
+</tr>
+<tr>
+<td>ION Query Service</td>
+<td>provides history from ION_Data to clients</td>
+<td>running; Trends show history</td>
+</tr>
+<tr>
+<td>ION Virtual Processor Service (NVIP.DEFAULT)</td>
+<td>aggregation, control and mathematical analysis (virtual meters, PUE)</td>
+<td>running; virtual meter values match the hand calculation</td>
+</tr>
+<tr>
+<td>ION Virtual Processor Service (NVIP.PQADVISOR)</td>
+<td>data for Power Quality Performance diagrams</td>
+<td>running only when that module is licensed</td>
+</tr>
+<tr>
+<td>ION Report Subscription Service</td>
+<td>runs scheduled reports</td>
+<td>test subscription received by email</td>
+</tr>
+<tr>
+<td>ION Event Watcher Service</td>
+<td>monitors system events against Event Watcher rules</td>
+<td>test rule fires</td>
+</tr>
+<tr>
+<td>ION OPC DA Server and ION OPC UA Server</td>
+<td>serve real-time OPC data</td>
+<td>start on client request when the Data Exchange Module licence is active</td>
+</tr>
+<tr>
+<td>ION PQDIF Exporter Service, ION Comtrade Processor</td>
+<td>export power quality data in the Power Quality Data Interchange Format (PQDIF), import waveforms in the Common Format for Transient Data Exchange (COMTRADE)</td>
+<td>test export opens in a viewer</td>
+</tr>
+<tr>
+<td>ION Software Modbus Gateway Service</td>
+<td>makes software data available on Modbus TCP</td>
+<td>used, for example, by the circuit breaker aging function</td>
+</tr>
+<tr>
+<td>ION Software ASCO Gateway Service</td>
+<td>converts data from ASCO transfer switches</td>
+<td>only on projects with ASCO ATS</td>
+</tr>
+<tr>
+<td>ION Syslog Server Service</td>
+<td>sends configured PME messages to a syslog server</td>
+<td>message received at the security information and event management (SIEM) server</td>
+</tr>
+<tr>
+<td>SQL Server (ION)</td>
+<td>database engine for ION_Data, ION_Network, ION_SystemLog and ApplicationModules</td>
+<td>running; database sizes recorded</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Services left on Local System after a change.</strong> When PME is installed with Windows Integrated Authentication, the Windows account used for the database also runs the services. <mark>A password expiry on that account stops all services</mark> at the next restart. Check the account policy before handover.</li>
+<li><strong>OPC server not starting.</strong> The OPC servers start only on a client request and only with the <mark>Data Exchange Module licence</mark>. A DCIM integrator who reports "no OPC server" has either not activated the licence or has a firewall blocking the client connection.</li>
+<li><strong>Virtual Processor logic changed without a record.</strong> Virtual meters and PUE calculations live in the Virtual Processor. Any change after the report verification test invalidates that test. Keep the Designer framework file under document control.</li>
+</ol>
+<h3 id="s23-3-3"><span class="n">23.3.3</span>The four databases</h3>
+<p>PME stores device communication settings, system configuration and logged history in four SQL Server databases.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Database</th>
+<th>Contents</th>
+<th>Growth</th>
+<th>Backup practice (example; the database maintenance page of the PME help for the installed version gives the project practice)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ION_Data</td>
+<td>logged history, events, waveforms, alarms</td>
+<td>the largest; grows with the number of devices and logging rate</td>
+<td>weekly full, daily differential</td>
+</tr>
+<tr>
+<td>ION_Network</td>
+<td>sites, devices, gateways, communication settings; one per system</td>
+<td>small</td>
+<td>daily</td>
+</tr>
+<tr>
+<td>ION_SystemLog</td>
+<td>system events with timestamps, visible in Management Console</td>
+<td>small to medium</td>
+<td>weekly</td>
+</tr>
+<tr>
+<td>ApplicationModules</td>
+<td>Web Applications configuration, hierarchies, dashboards, report definitions</td>
+<td>small</td>
+<td>daily</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> ION_Data growth for one MSC-1 building. Assume 431 devices (23.15). Each device logs 20 energy and demand values every 15 minutes, which is 96 records per day per value. One stored value takes about 40 bytes including index overhead (an assumption used for sizing only; measure the real figure after one week of operation). Daily growth = 431 × 20 × 96 × 40 bytes = 33.1 MB per day, or about 12.1 GB per year for interval data. Waveforms add more. This example has 26 ION9000 and PM8000 meters (2 ION9000 and 24 PM8000). If each records 5 waveform captures per day at 100 kB each, waveforms add 13 MB per day, or 4.7 GB per year. <mark>Size the ION_Data volume for at least 5 years of growth plus 50 % free space</mark>: (12.1 + 4.7) × 5 × 1.5 = 126 GB. The project then rounds up to the SQL Server edition limit and the disk size.</p>
+<p><strong>Check:</strong> SQL Server Express has a database size limit (maximum relational database size 10 GB, vendor document "Editions and supported features of SQL Server 2022"). A building of the size above needs <mark>SQL Server Standard</mark>. Confirm the edition on the server build sheet before factory acceptance test (FAT).</p>
+<h3 id="s23-3-4"><span class="n">23.3.4</span>Software modules</h3>
+<p>Software modules combine features into a set of deliverables for one application. The PME 2023 help lists the modules below; each needs its own licence unless stated otherwise in the current licence guide.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Application (Schneider wording, shortened)</th>
+<th>Use on a data-centre campus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backup Power Module</td>
+<td>generator and UPS performance monitoring and reporting, including battery health</td>
+<td>generator test reports, UPS battery reports</td>
+</tr>
+<tr>
+<td>Breaker Performance Module</td>
+<td>circuit breaker aging and breaker settings monitoring</td>
+<td>MicroLogic X wear and settings reports</td>
+</tr>
+<tr>
+<td>Capacity Management Module</td>
+<td>generator and UPS capacity monitoring and reporting, transformer and UPS loss monitoring</td>
+<td>redundancy loading checks for N+1 and 2N blocks</td>
+</tr>
+<tr>
+<td>Energy Analysis Dashboard Module</td>
+<td>gadgets for consumption patterns and comparison</td>
+<td>operations dashboards</td>
+</tr>
+<tr>
+<td>Energy Analysis Reports Module</td>
+<td>energy consumption monitoring and modelling</td>
+<td>monthly energy report</td>
+</tr>
+<tr>
+<td>Energy Billing Module</td>
+<td>energy-based billing, branch circuit consumption</td>
+<td>tenant billing in colocation halls</td>
+</tr>
+<tr>
+<td>Event Notification Module</td>
+<td>notifications by email, short message service (SMS) or SNMP</td>
+<td>out-of-hours alarm notification</td>
+</tr>
+<tr>
+<td>Insulation Monitoring Module</td>
+<td>monitoring of isolated power systems</td>
+<td>rarely used on data-centre campuses</td>
+</tr>
+<tr>
+<td>Power Quality Performance Module</td>
+<td>analysis of power quality events and their impact</td>
+<td>PQ event classification and reports</td>
+</tr>
+</tbody>
+</table></div>
+<p>PME 2023 also added a Device Replacement Manager, a Device Replacement report and an IEC 61000-2-4 report, and neutral protection settings in the circuit breaker setting report.</p>
+<h2 id="s23-4"><span class="n">23.4</span>Field devices and what each one provides</h2>
+<h3 id="s23-4-1"><span class="n">23.4.1</span>Device families</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Device</th>
+<th>Class and main functions (from Schneider datasheets)</th>
+<th>Protocols</th>
+<th>Typical location on MSC-1</th>
+<th>What to check and record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PowerLogic ION9000</td>
+<td>active energy Class 0.1S (IEC 62053-22); IEC 61000-4-30 Class A; transients to 20 µs; waveform capture</td>
+<td>ION, Modbus TCP and RTU, IEC 61850, Distributed Network Protocol 3 (DNP3); time sync by PTP, IRIG-B, NTP, Simple Network Time Protocol (SNTP)</td>
+<td>20 kV utility intakes, generator 20 kV bus</td>
+<td>PTP lock and the Class A setting, on the device configuration record</td>
+</tr>
+<tr>
+<td>PowerLogic PM8000</td>
+<td>active energy Class 0.2S; waveform capture in COMTRADE; power quality to IEC 61000-4-30 (Class S or A per model)</td>
+<td>ION, Modbus RTU and TCP, IEC 61850, DNP3; NTP and IRIG-B (1 ms system accuracy)</td>
+<td>block LV main incomers</td>
+<td>IRIG-B source, CT ratio and wiring mode, on the device configuration record</td>
+</tr>
+<tr>
+<td>PowerLogic PM5000 (PM5560)</td>
+<td>active energy Class 0.2S (PM5560); PM5110, PM5330, PM5340 Class 0.5S; harmonics to 63rd</td>
+<td>Modbus TCP, BACnet/IP (PM5560), Modbus RTU</td>
+<td>LV feeders, mechanical motor control centres (MCC)</td>
+<td>protocol option against the order code; CT ratio</td>
+</tr>
+<tr>
+<td>MasterPact MTZ with MicroLogic X</td>
+<td>air circuit breaker trip unit with metering, trip history, wear indicators, settings</td>
+<td>Modbus via the IFM interface module (serial), or the IFE or EIFE interface module (Ethernet)</td>
+<td>LV main, UPS input and output breakers</td>
+<td>interface module type (IFM, IFE or EIFE) and Modbus unit ID</td>
+</tr>
+<tr>
+<td>ComPacT NSX / PowerPacT with MicroLogic</td>
+<td>moulded-case breaker trip unit with metering</td>
+<td>Modbus through IFM or IFE</td>
+<td>outgoing feeders and busway tap-offs</td>
+<td>interface module type and Modbus address</td>
+</tr>
+<tr>
+<td>Easergy P3</td>
+<td>protection relay with event recorder</td>
+<td>IEC 61850 Ed.1 and Ed.2 with generic object-oriented substation event (GOOSE) messages, Modbus TCP, DNP3 TCP, IEC 60870-5-101; Parallel Redundancy Protocol (PRP) and Rapid Spanning Tree Protocol (RSTP)</td>
+<td>20 kV switchgear</td>
+<td>IEC 61850 edition and redundancy protocol against the network design</td>
+</tr>
+<tr>
+<td>Galaxy UPS network management card</td>
+<td>UPS status, mode, battery, alarms</td>
+<td>Modbus TCP, SNMP</td>
+<td>each UPS</td>
+<td>Modbus unit ID and SNMP credentials changed from default</td>
+</tr>
+<tr>
+<td>Generator controller</td>
+<td>engine and alternator data, alarms</td>
+<td>Modbus RTU on RS-485 (some models Modbus TCP)</td>
+<td>each generator</td>
+<td>serial address, baud rate and parity against the gateway list</td>
+</tr>
+<tr>
+<td>ATS controller</td>
+<td>transfer status, source availability</td>
+<td>Modbus RTU or TCP; ASCO through the ION Software ASCO Gateway Service</td>
+<td>house and mechanical loads</td>
+<td>protocol against the order code; ASCO gateway service running where used</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Source:</strong> ION9000, PM8000 and PM5000 datasheets and FAQs; MTZ Modbus Communication Guide; Easergy P3 product listings (23.18, items 6 to 11). Confirm the protocol options against the order code of each device, because options differ by model.</p>
+<h3 id="s23-4-2"><span class="n">23.4.2</span>Choosing the device for each point</h3>
+<ol>
+<li><strong>Utility intake and generator bus.</strong> Use a Class A power quality meter with PTP. The intake meter is the reference for PUE (total facility energy), for utility disputes and for PQ events that come from the grid. In the MSC-1 example the two 20 kV intakes each carry up to <mark>1,334.6 A</mark> per feeder (case ledger value).</li>
+<li><strong>Block LV main.</strong> Use a revenue-grade meter (Class 0.2S) on dedicated CTs plus the MicroLogic X trip unit data. The trip unit gives trip cause and wear; the meter gives billing-grade energy.</li>
+<li><strong>UPS output.</strong> The UPS output energy is the IT energy for PUE in many designs. Use a Class 0.5S or better meter on the UPS output switchboard incomer, or sum the PDU output meters in the Virtual Processor. The PUE method statement defines which method applies (see 23.11).</li>
+<li><strong>Feeders and mechanical loads.</strong> Use PM5000-class meters. Mechanical loads (chillers, dry coolers, pumps, CRAH) are metered so that PUE can be split into its parts.</li>
+<li><strong>Generators and ATS.</strong> Read the controller over Modbus for status and alarms. Fit a separate meter only where the specification asks for revenue-grade generator energy.</li>
+</ol>
+<h3 id="s23-4-3"><span class="n">23.4.3</span>Data available from a MicroLogic X trip unit</h3>
+<p>The trip unit is a protection device first and a meter second. The commissioning team uses its data for three tests in chapter 24: breaker status, trip indication and settings verification.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Data group</th>
+<th>Examples</th>
+<th>Used in test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Status</td>
+<td>open, closed, tripped, racked in, racked out, spring charged</td>
+<td>point-to-point status test</td>
+</tr>
+<tr>
+<td>Trip history</td>
+<td>trip cause (long-time, short-time, instantaneous, ground fault), trip current, time stamp</td>
+<td>trip indication test</td>
+</tr>
+<tr>
+<td>Settings</td>
+<td>Ir, tr, Isd, tsd, Ii, Ig, tg, energy reduction maintenance setting (ERMS) status</td>
+<td>breaker settings report against the coordination study</td>
+</tr>
+<tr>
+<td>Measurements</td>
+<td>currents, voltages, power, energy</td>
+<td>value cross-check against the meter</td>
+</tr>
+<tr>
+<td>Wear</td>
+<td>contact wear, operation counter</td>
+<td>Breaker Performance Module</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s23-5"><span class="n">23.5</span>Instrument transformers and meter wiring</h2>
+
+<figure class="sheet" id="F23-3"><a href="../data/cx-handbook/figures/F23-3.svg" title="Open drawing F23-3 at full size"><img src="../data/cx-handbook/figures/F23-3.svg" alt="F23-3: Meter wiring for a 4-wire wye LV main: three CTs, direct voltage inputs, fused and shorting test block" width="1400" height="958" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F23-3</span> — <b>Meter wiring for a 4-wire wye LV main: three CTs, direct voltage inputs, fused and shorting test block</b>. Primary P1 faces the source; secondary S1 enters the meter I+ terminal; the test block lets a reference meter be inserted and the CT be shorted before any lead is lifted.</figcaption></figure>
+<h3 id="s23-5-1"><span class="n">23.5.1</span>Current transformers</h3>
+<p>The meter can be no more accurate than its CT. On revenue-grade points <mark>the CT accuracy class must match the meter class</mark>.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Rule</th>
+<th>Source of the value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary rating</td>
+<td>the next standard rating at or above the maximum continuous current</td>
+<td>design practice</td>
+</tr>
+<tr>
+<td>Secondary</td>
+<td>5 A for long leads in LV switchboards; 1 A for medium-voltage (MV) panels and long runs (lower lead burden)</td>
+<td>design practice</td>
+</tr>
+<tr>
+<td>Accuracy class for Class 0.2S meters</td>
+<td>CT class 0.2S</td>
+<td>IEC 61869-2:2012 Table 202 (special accuracy classes 0.2S and 0.5S)</td>
+</tr>
+<tr>
+<td>Accuracy class for Class 0.5S meters</td>
+<td>CT class 0.5S or 0.5</td>
+<td>IEC 61869-2</td>
+</tr>
+<tr>
+<td>Burden</td>
+<td>sum of meter input burden, lead burden and test block burden below the CT rated burden</td>
+<td>CT nameplate and lead resistance calculation</td>
+</tr>
+<tr>
+<td>Polarity</td>
+<td>P1 towards the source, S1 to the meter I+ terminal</td>
+<td>CT nameplate marking</td>
+</tr>
+<tr>
+<td>Earthing</td>
+<td>S2 commoned and earthed at one point only</td>
+<td>standard practice</td>
+</tr>
+<tr>
+<td>Open circuit</td>
+<td>the secondary must never be open under load; the test block shorts the CT first</td>
+<td>electrical safety</td>
+</tr>
+</tbody>
+</table></div>
+<p>The special classes have tighter limits at low current than the standard classes. A university laboratory summary of PN-EN 61869-2 (the Polish adoption of IEC 61869-2) gives the class 0.2S ratio error limits. They are ±0.75 % at 1 %, ±0.35 % at 5 % and ±0.2 % at 20 % and 100 % of rated current. The phase displacement limits are 30, 15 and 10 minutes. Its 120 % column differs from vendor tables that also give ±0.2 %, so confirm the 120 % value against IEC 61869-2:2012 Table 202 before quoting it in a specification.</p>
+<p><strong>Worked example:</strong> CT for the MSC-1 block LV main. The block transformer is <mark>2.5 MVA at 415 V</mark>. Full-load current I = 2,500,000 / (√3 × 415) = 3,478 A (case ledger value). The next standard primary rating is 4,000 A, so the CT is 4000/5 A. At full load the secondary current is 3,478 / 4,000 × 5 = 4.35 A. At 10 % load (348 A) the secondary current is 0.43 A. This is above 50 mA, the lower end of the PM8000 measured current range (Schneider FAQ FA244498). Burden check: 2 × 6 m of 4 mm² copper at 75 °C gives about 2 × 6 × 0.0055 Ω = 0.066 Ω. At 5 A that is 5² × 0.066 = 1.65 VA. The PM8000 current input burden is 0.024 VA at 10 A (Schneider FAQ FA244498), and the test block adds about 0.1 VA. Total about 1.8 VA, so a <mark>CT rated 5 VA, class 0.2S</mark> has margin.</p>
+<h3 id="s23-5-2"><span class="n">23.5.2</span>Voltage inputs</h3>
+<p>At 415 V the meter voltage inputs connect directly to the busbars through fuses (Figure <a class="figref" href="#F23-3">F23-3</a>). At 20 kV the meter uses VTs, for example 20,000/√3 : 110/√3 V, star-connected, with secondary fuses or miniature circuit breakers (MCB).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>LV direct (415 V)</th>
+<th>MV via VT (20 kV)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connection</td>
+<td>V1, V2, V3 through 2 A fuses (or the rating in the meter manual), VN direct</td>
+<td>VT secondaries V1, V2, V3, VN through fuses or MCB</td>
+</tr>
+<tr>
+<td>Meter setting</td>
+<td>potential transformer (PT), the meter's term for a VT, primary 415, PT secondary 415 (ratio 1:1) or "direct"</td>
+<td>PT primary 20,000, PT secondary 110</td>
+</tr>
+<tr>
+<td>Wiring mode</td>
+<td>4W-Wye</td>
+<td>4W-Wye for a star VT; 3W-Delta with 2 VTs in open delta</td>
+</tr>
+<tr>
+<td>Check</td>
+<td>phase sequence clockwise L1-L2-L3</td>
+<td>VT ratio and polarity checked by secondary injection</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-5-3"><span class="n">23.5.3</span>Wiring modes</h3>
+<p>The meter must be set to the wiring mode that matches the physical wiring. A wrong setting gives wrong power values even when every wire is correct.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Mode (PM8000 term may differ by model)</th>
+<th>Physical connection</th>
+<th>Where used</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4W-Wye</td>
+<td>3 CTs, 3 phase voltages and neutral</td>
+<td>LV 4-wire systems; MV with star VTs</td>
+<td>3 CTs and 4 voltage wires present; mode recorded on the device configuration record</td>
+</tr>
+<tr>
+<td>3W-Delta</td>
+<td>2 or 3 CTs, 3 phase voltages, no neutral</td>
+<td>MV with open-delta VTs; 3-wire LV loads</td>
+<td>no neutral wire; mode recorded on the device configuration record</td>
+</tr>
+<tr>
+<td>Single-phase</td>
+<td>1 CT, 1 voltage</td>
+<td>single-phase sub-circuits</td>
+<td>CT and voltage on the same phase</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-5-4"><span class="n">23.5.4</span>Shorting test block</h3>
+<p>Every revenue-grade and PQ meter needs a test block. It lets the team insert a reference meter, inject current or replace the meter without de-energising the switchboard.</p>
+<ol>
+<li><strong>Locate the block.</strong> The block sits between the CT secondaries and the meter, inside the low-voltage compartment of the switchboard, with a label naming the meter tag.</li>
+<li><strong>Short before lifting.</strong> The test procedure closes the shorting links before any CT lead or the meter is disconnected.</li>
+<li><strong>Separate voltage links.</strong> Voltage links are fused or have isolating links so that the voltage inputs can be isolated without touching the busbars.</li>
+<li><strong>Record the block type.</strong> The device configuration record lists the block type and the link positions for service and for test.</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>CT installed with P1 towards the load.</strong> The power on that phase reads negative. Detected by the phasor check in chapter 24.4.</li>
+<li><strong>CTs and voltages from different phases.</strong> I1 is wired with V2. The phase angle reads near 120° away from the expected angle. Detected by the phasor check.</li>
+<li><strong>Double earthing of S2.</strong> Earthing at the CT and again at the meter creates a circulating current path. Detected by an insulation check with the earth link open.</li>
+<li><strong>CT ratio entered as the wrong value.</strong> A 4000/5 CT entered as 3000/5 makes every current and power value <mark>25 % low</mark>. Detected by the value verification against a reference clamp (chapter 24.6).</li>
+</ol>
+<h2 id="s23-6"><span class="n">23.6</span>Gateways and protocols</h2>
+<h3 id="s23-6-1"><span class="n">23.6.1</span>Protocols in an EPMS</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Protocol</th>
+<th>Transport</th>
+<th>Used for</th>
+<th>Notes for commissioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ION</td>
+<td>Ethernet (ION over TCP) or serial</td>
+<td>ION9000, PM8000 native protocol to PME</td>
+<td>richest data (logs, waveforms, events); secure ION available from PME 2023</td>
+</tr>
+<tr>
+<td>Modbus TCP</td>
+<td>Ethernet, TCP port 502</td>
+<td>most meters, trip units (IFE, EIFE), UPS cards</td>
+<td>register map from the device guide; unit ID per device</td>
+</tr>
+<tr>
+<td>Modbus RTU</td>
+<td>RS-485 serial</td>
+<td>generator controllers, older meters, IFM</td>
+<td>baud rate, parity, address; 2-wire with termination and bias</td>
+</tr>
+<tr>
+<td>IEC 61850</td>
+<td>Ethernet (manufacturing message specification (MMS), generic object-oriented substation event (GOOSE))</td>
+<td>protection relays</td>
+<td>substation configuration language (SCL) files; GOOSE is used between relays, PME reads MMS where supported</td>
+</tr>
+<tr>
+<td>BACnet/IP</td>
+<td>Ethernet, User Datagram Protocol (UDP) port 47808</td>
+<td>some meters (PM5560); export to BMS through a gateway</td>
+<td>ANSI/ASHRAE 135 object types and instance numbers</td>
+</tr>
+<tr>
+<td>OPC DA, OPC UA</td>
+<td>Ethernet</td>
+<td>export from PME to DCIM or a historian</td>
+<td>needs the Data Exchange Module licence</td>
+</tr>
+<tr>
+<td>SNMP</td>
+<td>Ethernet, UDP 161/162</td>
+<td>UPS cards, switches, Event Notification Module SNMP notifications</td>
+<td>community strings or SNMPv3 credentials</td>
+</tr>
+<tr>
+<td>Syslog</td>
+<td>Ethernet, UDP or TCP 514</td>
+<td>PME and network devices to a SIEM</td>
+<td>ION Syslog Server Service in PME</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-6-2"><span class="n">23.6.2</span>Link150 gateway</h3>
+<p>The Link150 is a Modbus TCP to Modbus RTU gateway. Its datasheet lists Hypertext Transfer Protocol (HTTP), Modbus TCP/IP, File Transfer Protocol (FTP) and SNMP. It can restrict which Modbus TCP masters may reach the serial devices and whether each master has read-only or full access.</p>
+<ol>
+<li><strong>Serial side settings.</strong> Set baud rate, parity and stop bits to match every device on the RS-485 line (for example 19,200 baud, even parity, 1 stop bit). All devices on one line must use the same settings.</li>
+<li><strong>Addresses.</strong> Give each serial device a unique Modbus address on that line (<mark>1 to 247</mark>). Record them on the device configuration record.</li>
+<li><strong>Access control.</strong> Enable the IP filtering so that only the PME server address (and, if agreed, the BMS gateway address) can reach the serial devices. Set the BMS address to read-only.</li>
+<li><strong>Timeout.</strong> Set the serial response timeout to suit the slowest device (for example 1 s for generator controllers). A short timeout produces intermittent communication alarms.</li>
+<li><strong>Management.</strong> Change the default administrator password and record the firmware version.</li>
+</ol>
+<h3 id="s23-6-3"><span class="n">23.6.3</span>Com'X data logger</h3>
+<p>The Com'X 210 and 510 are energy servers and data loggers. They collect data from meters and gateways, keep logs and present web pages and trend plots. On a data-centre campus they are used where a small number of meters are far from the EPMS network, or as a temporary data source during construction. When the Com'X logs data that PME later uses, the time base of the Com'X must be synchronised to the same NTP server as PME.</p>
+<h3 id="s23-6-4"><span class="n">23.6.4</span>Serial line loading and poll cycle</h3>
+<p><strong>Worked example:</strong> Poll cycle for the 17 generator controllers of one MSC-1 building. Each controller is polled for 60 registers in 3 Modbus requests. At 19,200 baud, one Modbus RTU character is 11 bits (start, 8 data, parity, stop), so one character takes 11 / 19,200 = 0.57 ms. A request of 8 characters and a response of 45 characters (20 registers × 2 bytes + 5 bytes overhead) take 53 × 0.57 = 30.4 ms. Add a device turnaround of about 50 ms (assumed example value; the controller manual gives the project value) and the 3.5-character silent interval (2 ms). The total is about 82 ms per request. Three requests per controller take 0.25 s. Seventeen controllers on one line take 17 × 0.25 = 4.2 s per cycle. The specification asks for a <mark>real-time update of 2 s or faster for generator status</mark>. The 17 controllers are split over <mark>3 Link150 gateways</mark> (6, 6 and 5 controllers), which gives cycles of 1.5 s, 1.5 s and 1.25 s.</p>
+<h2 id="s23-7"><span class="n">23.7</span>Time synchronisation and SOE resolution</h2>
+
+<figure class="sheet" id="F23-4"><a href="../data/cx-handbook/figures/F23-4.svg" title="Open drawing F23-4 at full size"><img src="../data/cx-handbook/figures/F23-4.svg" alt="F23-4: Time synchronisation architecture: GPS clock, PTP to Class A meters and relays, IRIG-B to legacy devices, NTP to servers" width="1400" height="1002" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F23-4</span> — <b>Time synchronisation architecture: GPS clock, PTP to Class A meters and relays, IRIG-B to legacy devices, NTP to servers</b>. The time server is the single reference; each device receives exactly one external source, and the PME server synchronises to the same clock so its event log and the device logs agree.</figcaption></figure>
+<h3 id="s23-7-1"><span class="n">23.7.1</span>Why time matters</h3>
+<p>PME uses time stamps for three things. The PME help names two of them. The first is event clustering, where the same event seen by several devices is counted only once. The second is associating process impact alarms with power quality events. The commissioning team adds a third: the sequence of events after a fault. The order of a relay trip, a breaker opening and a UPS transfer must be clear to the nearest millisecond.</p>
+<h3 id="s23-7-2"><span class="n">23.7.2</span>Time sources</h3>
+<p>Figure <a class="figref" href="#F23-4">F23-4</a> shows the architecture. A GPS receiver feeds a time server, which outputs PTP, IRIG-B and NTP.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>What it is</th>
+<th>Typical accuracy at the device</th>
+<th>Devices that use it on MSC-1</th>
+<th>What to record at commissioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPS</td>
+<td>satellite time received by an antenna on the roof</td>
+<td>the reference, better than 1 µs at the receiver</td>
+<td>time server only</td>
+<td>antenna position, lightning protection and the loss-of-GPS-lock alarm</td>
+</tr>
+<tr>
+<td>PTP (IEEE 1588-2019; power profile IEC 61850-9-3 or IEEE C37.238)</td>
+<td>time messages over Ethernet with hardware time stamping in PTP-aware switches</td>
+<td>below 1 µs to tens of µs, depending on switches; the IEC/IEEE 61850-9-3 profile aims at better than 1 µs after 15 transparent-clock switches</td>
+<td>ION9000, Easergy P3, MTZ where supported</td>
+<td>PTP lock state and offset, in the SOE test record</td>
+</tr>
+<tr>
+<td>IRIG-B</td>
+<td>a serial time code at 100 pulses per second; B00x is direct-current (DC) level shift (unmodulated), B12x is a 1 kHz amplitude-modulated carrier</td>
+<td>about 1 ms at the PM8000 (datasheet value)</td>
+<td>PM8000, older relays</td>
+<td>the same IRIG-B format (B00x or B12x) set at the time server and the device</td>
+</tr>
+<tr>
+<td>NTP</td>
+<td>time over Ethernet with software time stamps</td>
+<td>about 1 ms on a quiet local subnet to a few ms with router hops (NTP FAQ, ntp.org); measure the offset on site</td>
+<td>PME server, gateways, switches, firewalls</td>
+<td>the measured offset at each device</td>
+</tr>
+<tr>
+<td>SNTP</td>
+<td>simplified NTP</td>
+<td>about 1 s for the PM8000 (datasheet value)</td>
+<td>non-SOE meters</td>
+<td>device listed as "not SOE grade" in the SOE test record</td>
+</tr>
+<tr>
+<td>PME time sync</td>
+<td>PME sends time to devices</td>
+<td>Modbus devices hourly by default; ION devices when enabled</td>
+<td>PM5000 class meters</td>
+<td>device listed as "not SOE grade"; sync enabled only where no PTP or IRIG-B source exists</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-7-3"><span class="n">23.7.3</span>Rules for configuring time</h3>
+<ol>
+<li><strong>One source per device.</strong> A device with two external sources can step its clock between them. Schneider guidance for the ION9000 is to use only one external synchronisation source at a time.</li>
+<li><strong>Enable PME sync only where no better source exists.</strong> For ION devices, enable PME time sync in ION Setup (Clock, Timezone tab, CL1 Time Sync Source set to ETHERNET - ION). Then enable it in Management Console. For an Ethernet device, set Time Synch Ethernet Enabled to Yes. For a serial device, set Time Synch ION Enabled to Yes on the gateway site. Do not enable it on a device that already has PTP or IRIG-B.</li>
+<li><strong>Use UTC in devices.</strong> Set devices to Coordinated Universal Time (UTC) with the time zone offset for Jakarta (<mark>UTC+7</mark>, no daylight saving) applied in the display and in PME. Mixed settings produce a 7 h offset between the device front panel and PME.</li>
+<li><strong>Plan the holdover.</strong> The time server has a holdover oscillator for loss of GPS. Record its holdover specification from the time server datasheet (for example 1 µs drift per hour) and set an alarm for loss of GPS lock.</li>
+<li><strong>Know the drift without sync.</strong> The ION9000 internal clock drifts about <mark>2 ppm, which is 5 seconds per 30 days</mark> (Schneider community answer). A meter left without sync for a month cannot be used for SOE.</li>
+</ol>
+<h3 id="s23-7-4"><span class="n">23.7.4</span>SOE resolution and what limits it</h3>
+<p>SOE resolution is set by three things: the time source accuracy, the binary input scan rate and debounce filter of the device, and the protocol time-stamp resolution. A relay with a 1 ms scan and a 2 ms debounce, synchronised by PTP, stamps an input change with about 1 ms resolution. A meter synchronised by PME software every hour can be several hundred milliseconds off. <mark>Only devices on PTP or IRIG-B are used in SOE reports</mark>; the SOE test record (chapter 24.10) lists the others as "not SOE grade".</p>
+<h2 id="s23-8"><span class="n">23.8</span>Power quality: waveform capture and event classification</h2>
+
+<figure class="sheet" id="F23-5"><a href="../data/cx-handbook/figures/F23-5.svg" title="Open drawing F23-5 at full size"><img src="../data/cx-handbook/figures/F23-5.svg" alt="F23-5: ITIC (CBEMA) voltage tolerance envelope with three recorded MSC-1 example events" width="1000" height="931" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F23-5</span> — <b>ITIC (CBEMA) voltage tolerance envelope with three recorded MSC-1 example events</b>. Events above the upper line can damage equipment; events below the lower line may cause equipment to stop without damage. Event E2 falls below the lower line.</figcaption></figure>
+<h3 id="s23-8-1"><span class="n">23.8.1</span>IEC 61000-4-30 Class A</h3>
+<p>IEC 61000-4-30 defines how a power quality instrument measures and aggregates. The current edition is Edition 4.0 (2025). A Class A instrument gives the same result as another Class A instrument on the same signal. Specify Class A at utility intakes, where a dispute with the utility is possible.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Element of Class A</th>
+<th>Requirement (summary; confirm the values against IEC 61000-4-30:2025 clauses 4 and 5)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic measurement interval</td>
+<td>10 cycles at 50 Hz (12 cycles at 60 Hz), about 200 ms</td>
+</tr>
+<tr>
+<td>Aggregation</td>
+<td>150/180 cycles (about 3 s), 10 min, 2 h; the 10 min intervals align to the clock</td>
+</tr>
+<tr>
+<td>Time clock</td>
+<td>clause 4.6 sets the maximum permissible error of the time clock (±20 ms for 50 Hz and ±16.7 ms for 60 Hz in clause 4.6 of IEC 61000-4-30 Ed. 3.0, 2015, as tabulated by Schneider Electric; clause 4.6, maximum permissible error of the time clock, keeps its number and title in IEC 61000-4-30:2025; confirm the value against IEC 61000-4-30:2025 clause 4.6)</td>
+</tr>
+<tr>
+<td>Flagging</td>
+<td>intervals affected by a dip, swell or interruption are flagged so that they are not used in statistics</td>
+</tr>
+<tr>
+<td>Parameters</td>
+<td>frequency, voltage magnitude, flicker, dips and swells, interruptions, unbalance, harmonics, interharmonics, rapid voltage changes</td>
+</tr>
+</tbody>
+</table></div>
+<p>On ION9000 meters with PTP, Schneider states that Class A readings across meters are time-aligned with an alignment accuracy of ±1 cycle.</p>
+<h3 id="s23-8-2"><span class="n">23.8.2</span>The ITIC (CBEMA) curve</h3>
+<p>The Information Technology Industry Council (ITI) curve describes the voltage tolerance of information technology equipment. Its application note states that it applies to 120 V nominal 60 Hz equipment. On a 230/400 V 50 Hz campus, use it as a reference for classifying events. The acceptance basis remains the server power supply data and the owner project requirements (OPR). Figure <a class="figref" href="#F23-5">F23-5</a> plots the envelope.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Region (ITI application note)</th>
+<th>Boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Steady-state tolerance</td>
+<td>±10 % of nominal for an indefinite period</td>
+</tr>
+<tr>
+<td>Line voltage swell</td>
+<td>up to 120 % for up to 0.5 s</td>
+</tr>
+<tr>
+<td>Voltage sags</td>
+<td>to 80 % for up to 10 s; to 70 % for up to 0.5 s</td>
+</tr>
+<tr>
+<td>Dropout</td>
+<td>complete interruption for up to 20 ms</td>
+</tr>
+<tr>
+<td>Prohibited region</td>
+<td>above the upper envelope: damage may result</td>
+</tr>
+<tr>
+<td>No-damage region</td>
+<td>below the lower envelope: equipment may stop but should not be damaged</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-8-3"><span class="n">23.8.3</span>SEMI F47</h3>
+<p>SEMI F47 is a sag-immunity standard for semiconductor equipment. The current edition is SEMI F47-0706 (reapproved 0812). Its Table 1 requires ride-through of sags to 50 % of nominal for 200 ms (10 cycles at 50 Hz) and to 70 % for 0.5 s (25 cycles). It also requires ride-through of sags to 80 % for 1.0 s (50 cycles). The Advanced Energy SEMI F47-0706 compliance note reproduces this table. Some data-centre specifications ask that mechanical plant controllers and variable-speed drives ride through the SEMI F47 curve. Cooling then does not stop during a grid sag that the UPS rides through.</p>
+<h3 id="s23-8-4"><span class="n">23.8.4</span>Waveform capture settings</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Typical value on MSC-1</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sag trigger</td>
+<td>90 % of nominal (10 % dip threshold)</td>
+<td>IEC 61000-4-30 dip threshold practice</td>
+</tr>
+<tr>
+<td>Swell trigger</td>
+<td>110 % of nominal</td>
+<td>same</td>
+</tr>
+<tr>
+<td>Transient trigger (ION9000)</td>
+<td>Threshold register 150, which the ION9000 reads as a 50 % deviation from nominal voltage (ION9000 help, "Transient alarms": percentage of nominal plus 100)</td>
+<td>detect switching transients</td>
+</tr>
+<tr>
+<td>Pre-trigger cycles</td>
+<td>4 cycles</td>
+<td>see the waveform before the event</td>
+</tr>
+<tr>
+<td>Post-trigger cycles</td>
+<td>20 to 50 cycles</td>
+<td>see recovery and transfer</td>
+</tr>
+<tr>
+<td>Samples per cycle</td>
+<td>256 or 512 for PQ meters (model dependent)</td>
+<td>resolution for analysis</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>onboard memory and upload to ION_Data</td>
+<td>recovery after network loss</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Trigger set on the wrong nominal.</strong> A meter set to <mark>400 V nominal</mark> on a 415 V system triggers swells at 440 V; the intended trigger is 456.5 V. Check the nominal value in the device configuration record.</li>
+<li><strong>Disturbance triggers on every motor start.</strong> A 95 % sag threshold on a mechanical board records hundreds of events a day. Use <mark>90 %</mark> and record the decision.</li>
+<li><strong>Waveforms not uploaded.</strong> Waveforms stay in the meter when the log upload is not configured in Management Console. Check that a test waveform appears in PME within 15 minutes.</li>
+</ol>
+<h2 id="s23-9"><span class="n">23.9</span>Data model: names, logging, energy, demand and hierarchies</h2>
+<h3 id="s23-9-1"><span class="n">23.9.1</span>Device naming</h3>
+<p>PME names a device as Group.DeviceName. A consistent name lets reports, hierarchies and the BMS mapping be built by rule. On hyperscale programmes the usual practice is to reuse the asset tag from the single-line diagram.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Rule</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Group</td>
+<td>building and electrical room</td>
+<td>B2_ER2</td>
+</tr>
+<tr>
+<td>Device name</td>
+<td>asset tag of the switchboard and the function</td>
+<td>LVMSB_A1_MAIN</td>
+</tr>
+<tr>
+<td>Full PME name</td>
+<td>Group.DeviceName</td>
+<td>B2_ER2.LVMSB_A1_MAIN</td>
+</tr>
+<tr>
+<td>Asset tag on the label</td>
+<td>the same as the drawing</td>
+<td>B2-DH3-LVMSB-A1-Q1</td>
+</tr>
+<tr>
+<td>IP address</td>
+<td>from the IP plan (chapter 26.3)</td>
+<td>10.21.10.41</td>
+</tr>
+<tr>
+<td>Modbus unit ID</td>
+<td>255 for IFE and EIFE, 1 for most Ethernet meters, the serial address behind a gateway</td>
+<td>255</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-9-2"><span class="n">23.9.2</span>Logging intervals</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Interval</th>
+<th>Where stored</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energy (kWh, kvarh, kVAh delivered and received)</td>
+<td>15 min</td>
+<td>device log and ION_Data</td>
+<td>energy reports, billing, PUE</td>
+</tr>
+<tr>
+<td>Demand (kW, kVA)</td>
+<td>15 min block, or sliding window as specified</td>
+<td>device and ION_Data</td>
+<td>peak demand, capacity</td>
+</tr>
+<tr>
+<td>Trend values (V, I, kW, power factor (PF), total harmonic distortion (THD))</td>
+<td>1 to 5 min for selected points</td>
+<td>ION_Data</td>
+<td>Trends, capacity</td>
+</tr>
+<tr>
+<td>Min and max</td>
+<td>per interval</td>
+<td>device</td>
+<td>investigation</td>
+</tr>
+<tr>
+<td>Events and alarms</td>
+<td>on change</td>
+<td>device and ION_Data</td>
+<td>SOE, Alarms</td>
+</tr>
+<tr>
+<td>Waveforms</td>
+<td>on trigger</td>
+<td>device and ION_Data</td>
+<td>PQ analysis</td>
+</tr>
+<tr>
+<td>Class A PQ data</td>
+<td>10 min aggregation</td>
+<td>ION9000 and ION_Data</td>
+<td>PQ compliance reports</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-9-3"><span class="n">23.9.3</span>Energy registers and demand</h3>
+<ol>
+<li><strong>Use received and delivered energy separately.</strong> A generator or a battery energy storage system can export; the meter must count both directions so that the net value is correct.</li>
+<li><strong>Align demand intervals to the clock.</strong> A 15-minute block demand starts at 00, 15, 30 and 45 minutes. Meters with unsynchronised clocks produce demand peaks that do not line up across the building.</li>
+<li><strong>Record register roll-over.</strong> Every energy register rolls over at a maximum value. PME 2023 has a Device Replacement Manager to handle replacement and parameter overflow without a spike or dip in reports. Record the roll-over value of each device type in the device configuration record.</li>
+</ol>
+<h3 id="s23-9-4"><span class="n">23.9.4</span>Hierarchies and virtual meters</h3>
+<p>A hierarchy groups devices into the structure used by reports: campus, building, hall, block, load type. A virtual meter is a calculated meter, for example the sum of all mechanical feeders of a hall. Virtual meters are built in the Virtual Processor or in the hierarchy configuration.</p>
+<p><strong>Worked example:</strong> Virtual meters for PUE of one MSC-1 building. The building facility energy is measured at the two 20 kV intakes (ION9000 B2-INC-1 and B2-INC-2). The IT energy is measured at the 24 UPS output meters. PUE over a period = (E_INC1 + E_INC2) / Σ E_UPSout. At design load the building facility power is 43.92 MW and the IT power is 36.0 MW (case ledger). Over 24 h at that load: facility energy 43.92 × 24 = 1,054.1 MWh; IT energy 36.0 × 24 = 864.0 MWh. PUE = 1,054.1 / 864.0 = <mark>1.22</mark>, which matches the design PUE of 1.22. The virtual meter "B2_PUE" is configured as the ratio of two summed virtual meters and logged every 15 minutes. <mark>The report divides total energies</mark> and never averages the 15-minute PUE values, because an average of ratios differs from the ratio of the totals.</p>
+<h2 id="s23-10"><span class="n">23.10</span>Alarm design</h2>
+<h3 id="s23-10-1"><span class="n">23.10.1</span>Alarm sources</h3>
+<p>PME raises alarms from three sources. Device alarms are set in the device and reported as events. PME software alarms are set in PME on real-time values. System alarms cover communication loss and stopped services. The Alarms Web Application shows them together. Figure <a class="figref" href="#F23-8">F23-8</a> shows the path of an alarm from its source through the PME rules (delay, hysteresis, event clustering) to the five priority classes. It also shows the response time and the notification route of each class.</p>
+<figure class="sheet" id="F23-8"><a href="../data/cx-handbook/figures/F23-8.svg" title="Open drawing F23-8 at full size"><img src="../data/cx-handbook/figures/F23-8.svg" alt="F23-8: EPMS alarm path in PME: three sources, four rules, five priority classes" width="1000" height="926" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F23-8</span> — <b>EPMS alarm path in PME: three sources, four rules, five priority classes</b>. Every alarm passes the same PME rules before it reaches an operator; the priority sets the response time and the notification route (example OPR values from 23.10.2).</figcaption></figure>
+
+<h3 id="s23-10-2"><span class="n">23.10.2</span>Priority scheme</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Meaning</th>
+<th>Example on MSC-1</th>
+<th>Response time (example OPR value)</th>
+<th>Notification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Critical</td>
+<td>loss of a power path or protection operation</td>
+<td>MV feeder trip, LV main trip, UPS on battery</td>
+<td>immediate</td>
+<td>Alarms, BMS, SMS by Event Notification Module</td>
+</tr>
+<tr>
+<td>2 High</td>
+<td>redundancy reduced</td>
+<td>generator not available, UPS bypass, transformer above 90 % load</td>
+<td>15 min</td>
+<td>Alarms, BMS, email</td>
+</tr>
+<tr>
+<td>3 Medium</td>
+<td>equipment needs attention</td>
+<td>THD above 8 %, breaker wear above 80 %</td>
+<td>4 h</td>
+<td>Alarms, email</td>
+</tr>
+<tr>
+<td>4 Low</td>
+<td>information</td>
+<td>PQ event inside the ITIC envelope</td>
+<td>next working day</td>
+<td>Alarms only</td>
+</tr>
+<tr>
+<td>System</td>
+<td>EPMS health</td>
+<td>device communication lost above 5 min, service stopped</td>
+<td>1 h</td>
+<td>Alarms, email to the EPMS administrator</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-10-3"><span class="n">23.10.3</span>Rules for setting alarms</h3>
+<ol>
+<li><strong>Each alarm has an action.</strong> The alarm list states the operator action. An alarm with no action is removed or set to Low.</li>
+<li><strong>Set a delay for communication alarms.</strong> A <mark>5-minute delay</mark> on device communication loss avoids alarms during short network events. The network failover test (chapter 26.13) shows whether the delay is long enough.</li>
+<li><strong>Use hysteresis.</strong> An overload alarm at <mark>90 % clears at 85 %</mark>. Without hysteresis, a load at 90 % gives repeated alarms.</li>
+<li><strong>Do not duplicate.</strong> A breaker trip seen by the trip unit, the relay and the meter must produce one critical alarm. The PQ module groups these events by event clustering when the clocks are synchronised.</li>
+<li><strong>Limit the alarm rate.</strong> Set a target, for example no more than 10 alarms in 10 minutes per operator during normal operation. Test the target during the alarm flood test of chapter 24.9.</li>
+</ol>
+<h3 id="s23-10-4"><span class="n">23.10.4</span>Alarm list fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alarm ID</td>
+<td>text</td>
+<td>B2-EPMS-ALM-0142</td>
+</tr>
+<tr>
+<td>Device</td>
+<td>PME name</td>
+<td>B2_ER2.LVMSB_A1_MAIN</td>
+</tr>
+<tr>
+<td>Condition</td>
+<td>text</td>
+<td>breaker tripped (MicroLogic X trip cause)</td>
+</tr>
+<tr>
+<td>Priority</td>
+<td>1 to 4 or System</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Delay</td>
+<td>seconds</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Hysteresis</td>
+<td>% or value</td>
+<td>not applicable</td>
+</tr>
+<tr>
+<td>Notification</td>
+<td>list</td>
+<td>Alarms, BMS point B2.EPMS.LVMSB_A1.TRIP, SMS group B2-ELEC</td>
+</tr>
+<tr>
+<td>Operator action</td>
+<td>text</td>
+<td>check the trip cause, follow EOP-ELEC-04</td>
+</tr>
+<tr>
+<td>Tested</td>
+<td>date and record reference</td>
+<td>2026-11-18, ATR-B2-0142</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s23-11"><span class="n">23.11</span>Reports</h2>
+<p>PME Reports produces reports on demand and by subscription. The report templates available depend on the licensed modules.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Report</th>
+<th>Module or source</th>
+<th>Used for</th>
+<th>Commissioning check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energy usage and energy by hierarchy</td>
+<td>Energy Analysis Reports Module</td>
+<td>monthly energy, tenant billing</td>
+<td>totals match the sum of device registers for the same interval</td>
+</tr>
+<tr>
+<td>PUE (custom or dashboard)</td>
+<td>Virtual Processor and Dashboards</td>
+<td>PUE reporting</td>
+<td>ratio of totals, hand calculation from 23.9.4</td>
+</tr>
+<tr>
+<td>Capacity: generator, UPS, equipment, branch circuit</td>
+<td>Capacity Management Module</td>
+<td>redundancy loading</td>
+<td>loading per block against the 2N or N+1 design</td>
+</tr>
+<tr>
+<td>Power losses</td>
+<td>Capacity Management Module</td>
+<td>transformer and UPS losses</td>
+<td>losses equal input minus output</td>
+</tr>
+<tr>
+<td>Circuit breaker settings</td>
+<td>Breaker Performance Module</td>
+<td>settings against the coordination study</td>
+<td>each setting equals the study value</td>
+</tr>
+<tr>
+<td>Circuit breaker aging</td>
+<td>Breaker Performance Module</td>
+<td>maintenance planning</td>
+<td>wear values present for every MTZ</td>
+</tr>
+<tr>
+<td>Generator and UPS battery</td>
+<td>Backup Power Module</td>
+<td>monthly generator test, battery health</td>
+<td>test run appears with start time and load</td>
+</tr>
+<tr>
+<td>PQ reports, IEC 61000-2-4 report</td>
+<td>Power Quality Performance Module, PME 2023</td>
+<td>compliance and incident analysis</td>
+<td>events classified, waveforms attached</td>
+</tr>
+<tr>
+<td>Device Replacement report</td>
+<td>PME 2023</td>
+<td>history of replaced devices</td>
+<td>entry created during the replacement test</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> For every report, the commissioning team prepares the expected value by hand from device registers before running the report. A report that matches its own data source proves nothing; <mark>the comparison must be against an independent calculation</mark>.</p>
+<h3 id="s23-11-1"><span class="n">23.11.1</span>Steps to verify a report before the witness test</h3>
+<ol>
+<li><strong>Freeze the configuration.</strong> Record the PME version, the hierarchy revision and the Virtual Processor framework revision on the report check sheet.</li>
+<li><strong>Choose the test interval.</strong> Use a closed interval with stable data, for example one full day 00:00 to 24:00 UTC+7.</li>
+<li><strong>Read the device registers.</strong> Read the energy register of each device at the start and the end of the interval from the device log (ION Setup or the Modbus register). PME values are the item under test and are read only in step 5.</li>
+<li><strong>Calculate the expected value.</strong> Subtract start from end for each device and sum by hierarchy node in a spreadsheet kept with the record.</li>
+<li><strong>Run the report.</strong> Run the PME report for the same interval and the same nodes and save the output as PDF.</li>
+<li><strong>Compare.</strong> The difference between report and hand calculation must be within <mark>0.1 % or one register count</mark>, whichever is larger (example acceptance; the specification governs).</li>
+<li><strong>Investigate any difference.</strong> The EPMS contractor finds the cause and writes it on the report check sheet. Typical causes are a missing device in the hierarchy, a device with an unsynchronised clock, or a register roll-over.</li>
+<li><strong>Sign the sheet.</strong> The EPMS contractor and the commissioning authority (CxA) sign the report check sheet with the PDF attached.</li>
+</ol>
+<h2 id="s23-12"><span class="n">23.12</span>Licensing and server sizing</h2>
+<h3 id="s23-12-1"><span class="n">23.12.1</span>Licence types</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Licence</th>
+<th>What it enables</th>
+<th>Sizing rule on MSC-1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base licence</td>
+<td>the system; one Engineering Client and two Web Clients</td>
+<td>one per PME system</td>
+</tr>
+<tr>
+<td>Device licences</td>
+<td>the number of connected devices; sold in bundles (5, 25, 50, 100, 200 or unlimited per the Schneider FAQ; the Schneider PME licensing guide for the ordered version sets the current model)</td>
+<td>one per device, including serial devices behind gateways</td>
+</tr>
+<tr>
+<td>Additional Engineering Clients and Web Clients</td>
+<td>more concurrent users</td>
+<td>number of operators and engineers at the same time</td>
+</tr>
+<tr>
+<td>Software modules</td>
+<td>each module in 23.3.4</td>
+<td>per the specification</td>
+</tr>
+<tr>
+<td>Data Exchange Module</td>
+<td>OPC DA and OPC UA servers, aggregation and statistics export, Virtual ION Processor (VIP) Modbus slave, COMTRADE export with the extract, transform and load (ETL) tool</td>
+<td>when DCIM or a historian reads PME by OPC</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-12-2"><span class="n">23.12.2</span>Licence sizing steps</h3>
+<ol>
+<li><strong>Count devices from the meter schedule.</strong> Count every device with its own communication address, including trip units and UPS cards.</li>
+<li><strong>Add growth.</strong> Add the devices of future phases connected to the same server, from the campus phasing plan (project value).</li>
+<li><strong>Add 5 % spare.</strong> Spare licences cover devices added after design changes.</li>
+<li><strong>List modules.</strong> List each software module named in the specification and confirm that the order includes it.</li>
+<li><strong>Record the licence key.</strong> The licence certificate and activation record go into the handover package with the server build sheet.</li>
+</ol>
+<p><strong>Worked example:</strong> Licence count for one MSC-1 building. Devices from 23.15: 431. Spare 5 %: 22. Total 453 device licences. With an unlimited device licence the count is used only for server sizing. With bundles, 453 needs, for example, two bundles of 200, one of 50 and one of 5 (455 licences). Users: 4 operators in the control room and 3 engineers need 7 Web Clients and 2 Engineering Clients. The order adds 5 Web Clients and 1 Engineering Client to the Base licence.</p>
+<h2 id="s23-13"><span class="n">23.13</span>Redundancy, backups and cybersecurity</h2>
+<h3 id="s23-13-1"><span class="n">23.13.1</span>Redundancy</h3>
+<ol>
+<li><strong>Device level.</strong> Meters keep onboard logs; when the server or network is down, data is recovered when communication returns. The data completeness test (chapter 24.13) proves this.</li>
+<li><strong>Network level.</strong> Rings with RSTP or Media Redundancy Protocol (MRP), or PRP for protection relays, as in chapter 26.2.</li>
+<li><strong>Server level.</strong> A virtual machine on a host cluster with failover, or a standby server restored from backup within a defined time. The OPR states the recovery time objective (RTO), for example <mark>4 h</mark>. It also states the recovery point objective (RPO), for example 24 h for configuration and 0 h for interval data held in device memory.</li>
+</ol>
+<h3 id="s23-13-2"><span class="n">23.13.2</span>Backups</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Frequency (example)</th>
+<th>Location</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ION_Network and ApplicationModules</td>
+<td>daily</td>
+<td>off the PME server, on the OT backup server in the DMZ</td>
+<td>restore to a test server</td>
+</tr>
+<tr>
+<td>ION_Data</td>
+<td>weekly full, daily differential</td>
+<td>same</td>
+<td>restore and compare record counts</td>
+</tr>
+<tr>
+<td>ION_SystemLog</td>
+<td>weekly</td>
+<td>same</td>
+<td>restore</td>
+</tr>
+<tr>
+<td>PME configuration files, Designer frameworks, Vista diagrams</td>
+<td>after every change</td>
+<td>document control</td>
+<td>file comparison</td>
+</tr>
+<tr>
+<td>Device configuration files (ION Setup templates, relay settings, trip unit settings)</td>
+<td>after commissioning and after every change</td>
+<td>document control</td>
+<td>compare against device</td>
+</tr>
+<tr>
+<td>Network switch configurations</td>
+<td>after every change</td>
+<td>network backup server</td>
+<td>compare</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-13-3"><span class="n">23.13.3</span>Cybersecurity controls</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Requirement (from IEC 62443-3-3 practice and PME features)</th>
+<th>Evidence at commissioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zones and conduits</td>
+<td>EPMS in its own zone; only listed flows through the firewall</td>
+<td>firewall rule export and conduit table</td>
+</tr>
+<tr>
+<td>Accounts</td>
+<td>named accounts; no shared administrator; PME strong password policy (PME 2023)</td>
+<td>user list with roles</td>
+</tr>
+<tr>
+<td>Default passwords</td>
+<td>changed on every device, gateway and switch</td>
+<td>device configuration records</td>
+</tr>
+<tr>
+<td>Encrypted protocols</td>
+<td>secure ION, secure EtherGate and secure Modbus with Transport Layer Security (TLS) where devices support them (PME 2023)</td>
+<td>device list showing the protocol used</td>
+</tr>
+<tr>
+<td>Unused services</td>
+<td>disabled on devices (FTP, HTTP, Telnet) unless needed</td>
+<td>port scan report</td>
+</tr>
+<tr>
+<td>Logging</td>
+<td>syslog to the SIEM through the ION Syslog Server Service</td>
+<td>received test messages</td>
+</tr>
+<tr>
+<td>Patching</td>
+<td>Windows and SQL Server patches tested on a test server before production</td>
+<td>patch record</td>
+</tr>
+<tr>
+<td>Remote access</td>
+<td>through a jump host in the DMZ with multi-factor authentication</td>
+<td>access procedure</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s23-14"><span class="n">23.14</span>Interfaces to BMS and DCIM</h2>
+<p>Figure <a class="figref" href="#F23-6">F23-6</a> shows the data flow. Each interface is defined in the ICD (chapter 25) with the fields in the table.</p>
+<figure class="sheet" id="F23-6"><a href="../data/cx-handbook/figures/F23-6.svg" title="Open drawing F23-6 at full size"><img src="../data/cx-handbook/figures/F23-6.svg" alt="F23-6: Data flow from EPMS devices to PME, the BMS and DCIM, with update rates and direction" width="1400" height="877" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F23-6</span> — <b>Data flow from EPMS devices to PME, the BMS and DCIM, with update rates and direction</b>. Each interface has one direction, one protocol, one owner and one points list; the source-stable permissive to the BMS is a hardwired or network point agreed in the interface control document.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>ICD field</th>
+<th>Content</th>
+<th>Example for PME to BMS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Interface ID</td>
+<td>unique number</td>
+<td>ICD-B2-EPMS-BMS-01</td>
+</tr>
+<tr>
+<td>Source system and owner</td>
+<td>system and contractor</td>
+<td>PME, EPMS contractor</td>
+</tr>
+<tr>
+<td>Destination system and owner</td>
+<td>system and contractor</td>
+<td>BMS, BMS contractor</td>
+</tr>
+<tr>
+<td>Protocol and port</td>
+<td>protocol, port, version</td>
+<td>Modbus TCP, port 502, through gateway GW-B2-01</td>
+</tr>
+<tr>
+<td>Direction</td>
+<td>read-only or read-write</td>
+<td>read-only from BMS</td>
+</tr>
+<tr>
+<td>Points list reference</td>
+<td>document number and revision</td>
+<td>B2-EPMS-PL-003 rev C</td>
+</tr>
+<tr>
+<td>Update rate</td>
+<td>seconds</td>
+<td>5 s</td>
+</tr>
+<tr>
+<td>Failure behaviour</td>
+<td>what the destination does when data stops</td>
+<td>BMS shows "EPMS comms lost" after 30 s and holds the last value flagged as stale</td>
+</tr>
+<tr>
+<td>Test reference</td>
+<td>test script</td>
+<td>IT-B2-EPMS-BMS-01</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Write the points list.</strong> The EPMS contractor lists every point with PME name, register or object, scaling, units and update rate. Allow 10 working days.</li>
+<li><strong>Agree the mapping.</strong> The BMS contractor confirms each point in the BMS database. Disagreements go to the interface log within 5 working days.</li>
+<li><strong>Test point by point.</strong> During the integration test, each point is forced or changed at the source and seen at the destination with the same value and units (chapter 24.15).</li>
+<li><strong>Test failure.</strong> The network link is pulled and the stale-data behaviour is recorded.</li>
+</ol>
+<h2 id="s23-15"><span class="n">23.15</span>Worked example: EPMS device count and gateway list for one MSC-1 building</h2>
+<p>Figure <a class="figref" href="#F23-7">F23-7</a> summarises the count. The MSC-1 ledger gives one building with 3 halls of 8 blocks each (24 blocks of 2.5 MVA), two 20 kV feeders and 17 generators. The design assumptions below are stated for the example; the project meter schedule governs.</p>
+<figure class="sheet" id="F23-7"><a href="../data/cx-handbook/figures/F23-7.svg" title="Open drawing F23-7 at full size"><img src="../data/cx-handbook/figures/F23-7.svg" alt="F23-7: MSC-1 worked example: EPMS device count for one building by switchboard type and protocol" width="1400" height="489" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F23-7</span> — <b>MSC-1 worked example: EPMS device count for one building by switchboard type and protocol</b>. Counts are a worked example built from the MSC-1 ledger and stated design assumptions; the project meter schedule and single-line diagrams govern.</figcaption></figure>
+
+<p><strong>Worked example:</strong> Device count for building B2.</p>
+<ol>
+<li><strong>20 kV intake and bus.</strong> 2 ION9000 meters (one per intake) and 3 Easergy P3 relays (2 incomers and 1 bus section): 5 devices.</li>
+<li><strong>20 kV feeders to blocks.</strong> 24 Easergy P3 relays, one per block transformer feeder: 24 devices.</li>
+<li><strong>Generator 20 kV bus.</strong> 17 Easergy P3 generator relays and 17 generator controllers (serial): 34 devices.</li>
+<li><strong>Block LV mains.</strong> 24 MasterPact MTZ with MicroLogic X through EIFE and 24 PM8000 meters: 48 devices.</li>
+<li><strong>Block LV feeders.</strong> 8 PM5560 meters per block for UPS input, UPS output, mechanical and house feeders: 8 × 24 = 192 devices.</li>
+<li><strong>UPS.</strong> One Galaxy UPS network management card per block: 24 devices.</li>
+<li><strong>Mechanical and house.</strong> 96 PM5000 meters on mechanical motor control centres (MCC) and 8 ATS controllers: 104 devices.</li>
+<li><strong>Total.</strong> 5 + 24 + 34 + 48 + 192 + 24 + 104 = <mark>431 devices</mark>.</li>
+</ol>
+<p><strong>Gateway list.</strong> Only the 17 generator controllers are serial in this example. From 23.6.4 they need 3 Link150 gateways. Each gateway gets an IP address in the EPMS virtual local area network (VLAN) and a site entry in Management Console.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Gateway</th>
+<th>Location</th>
+<th>Serial devices</th>
+<th>Addresses</th>
+<th>Baud, parity</th>
+<th>PME site name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B2-GEN-LK150-01</td>
+<td>generator hall, panel GCP-1</td>
+<td>GEN-01 to GEN-06</td>
+<td>1 to 6</td>
+<td>19,200, even</td>
+<td>B2_GEN_LK1</td>
+</tr>
+<tr>
+<td>B2-GEN-LK150-02</td>
+<td>generator hall, panel GCP-2</td>
+<td>GEN-07 to GEN-12</td>
+<td>1 to 6</td>
+<td>19,200, even</td>
+<td>B2_GEN_LK2</td>
+</tr>
+<tr>
+<td>B2-GEN-LK150-03</td>
+<td>generator hall, panel GCP-3</td>
+<td>GEN-13 to GEN-17</td>
+<td>1 to 5</td>
+<td>19,200, even</td>
+<td>B2_GEN_LK3</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Network load.</strong> Assume each Ethernet device is polled for 100 registers every 2 s by PME and the BMS gateway reads 20 registers every 5 s. One Modbus TCP request and response of 100 registers is about 300 bytes including TCP and Ethernet overhead. PME traffic: 414 Ethernet devices × 300 bytes / 2 s = 62 kB/s, which is 0.5 Mbit/s. Waveform uploads add short bursts. <mark>The EPMS network load is below 1 % of a 1 Gbit/s uplink</mark>, so the network design is set by availability and time synchronisation; bandwidth is a minor factor.</p>
+<p><strong>Network ports.</strong> 414 Ethernet devices plus 3 gateways in 12 electrical rooms (assumed) give about 35 device ports per room. With 24-port access switches, each room needs 2 switches, giving 24 access switches per building on the EPMS network, plus 2 core switches.</p>
+<h2 id="s23-16"><span class="n">23.16</span>Points list and device configuration record fields</h2>
+<p>The points list and the device configuration record are the two documents the commissioning team tests against in chapter 24.</p>
+<h3 id="s23-16-1"><span class="n">23.16.1</span>Points list</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Point ID</td>
+<td>text</td>
+<td>B2.ER2.LVMSB_A1.KW_TOT</td>
+</tr>
+<tr>
+<td>PME device</td>
+<td>Group.DeviceName</td>
+<td>B2_ER2.LVMSB_A1_MAIN</td>
+</tr>
+<tr>
+<td>Quantity</td>
+<td>text</td>
+<td>active power, total</td>
+</tr>
+<tr>
+<td>Unit</td>
+<td>text</td>
+<td>kW</td>
+</tr>
+<tr>
+<td>Source register or ION handle</td>
+<td>number</td>
+<td>Modbus 3060 (example; from the device register map)</td>
+</tr>
+<tr>
+<td>Data type and scaling</td>
+<td>text</td>
+<td>float32, scale 1</td>
+</tr>
+<tr>
+<td>Update rate</td>
+<td>seconds</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Logged</td>
+<td>yes or no and interval</td>
+<td>yes, 15 min</td>
+</tr>
+<tr>
+<td>Alarm</td>
+<td>alarm ID or none</td>
+<td>B2-EPMS-ALM-0150</td>
+</tr>
+<tr>
+<td>Exported to</td>
+<td>BMS, DCIM, none</td>
+<td>DCIM</td>
+</tr>
+<tr>
+<td>Test status</td>
+<td>not tested, pass, fail</td>
+<td>not tested</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-16-2"><span class="n">23.16.2</span>Device configuration record</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Asset tag</td>
+<td>text</td>
+<td>B2-DH3-LVMSB-A1-Q1-PM</td>
+</tr>
+<tr>
+<td>Model and order code</td>
+<td>text</td>
+<td>PM8000 (order code from nameplate)</td>
+</tr>
+<tr>
+<td>Serial number</td>
+<td>text</td>
+<td>from nameplate</td>
+</tr>
+<tr>
+<td>Firmware</td>
+<td>text</td>
+<td>version read in ION Setup</td>
+</tr>
+<tr>
+<td>CT primary / secondary</td>
+<td>A</td>
+<td>4000 / 5</td>
+</tr>
+<tr>
+<td>PT primary / secondary</td>
+<td>V</td>
+<td>415 / 415</td>
+</tr>
+<tr>
+<td>Wiring mode</td>
+<td>text</td>
+<td>4W-Wye</td>
+</tr>
+<tr>
+<td>Nominal voltage, current, frequency</td>
+<td>V, A, Hz</td>
+<td>415, 4000, 50</td>
+</tr>
+<tr>
+<td>IP address, mask, gateway</td>
+<td>text</td>
+<td>10.21.10.41 / 24 / 10.21.10.1</td>
+</tr>
+<tr>
+<td>Protocol and unit ID</td>
+<td>text</td>
+<td>ION and Modbus TCP, unit ID 1</td>
+</tr>
+<tr>
+<td>Time source</td>
+<td>text</td>
+<td>IRIG-B</td>
+</tr>
+<tr>
+<td>Demand interval</td>
+<td>min</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Logging template</td>
+<td>text</td>
+<td>B2_LV_MAIN_v3</td>
+</tr>
+<tr>
+<td>Waveform triggers</td>
+<td>text</td>
+<td>sag 90 %, swell 110 %, 4 pre / 30 post cycles</td>
+</tr>
+<tr>
+<td>Password changed</td>
+<td>yes or no</td>
+<td>yes, held in the owner password vault</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s23-17"><span class="n">23.17</span>Checklist for site use</h2>
+<ol>
+<li><strong>Single-line coverage.</strong> Every incomer, bus section, generator, UPS, block transformer and feeder above the agreed rating has a device on the meter schedule.</li>
+<li><strong>Device class.</strong> Intakes and generator bus Class A PQ meters; block mains Class 0.2S; feeders Class 0.5S or better.</li>
+<li><strong>CT class and ratio.</strong> CT class matches the meter class; ratio entered in the meter equals the nameplate.</li>
+<li><strong>Test blocks.</strong> Every revenue-grade and PQ meter has a shorting test block with a label.</li>
+<li><strong>Wiring mode and nominal values.</strong> Recorded on the device configuration record for every device.</li>
+<li><strong>Network path.</strong> Every Ethernet device on an access switch in its room; every serial device behind a Link150 with the poll cycle calculated.</li>
+<li><strong>Time source.</strong> One source per device; SOE devices on PTP or IRIG-B; UTC in devices with UTC+7 display.</li>
+<li><strong>PME services.</strong> All required services running; service account policy checked.</li>
+<li><strong>Databases.</strong> SQL Server edition sized for 5 years of ION_Data; backup jobs scheduled off the server.</li>
+<li><strong>Licences.</strong> Device licences cover all devices plus spare; modules and Data Exchange Module on the order.</li>
+<li><strong>Alarms.</strong> Alarm list with priority, delay, action and notification for every alarm.</li>
+<li><strong>Reports.</strong> Expected values prepared by hand for every report before testing.</li>
+<li><strong>Integration.</strong> ICD written for PME to BMS and PME to DCIM with direction, rate and failure behaviour.</li>
+<li><strong>Cybersecurity.</strong> Default passwords changed, secure protocols used where supported, syslog to SIEM, firewall rules exported.</li>
+<li><strong>Records.</strong> Device configuration records, points list, gateway list and licence certificate filed in the commissioning record set.</li>
+</ol>
+<h2 id="s23-18"><span class="n">23.18</span>Sources</h2>
+<ol>
+<li>Schneider Electric, "Software Modules", EcoStruxure Power Monitoring Expert 2023 online help, accessed 31 October 2026. <a href="https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2023/content/4_configuring/modules/modules_intro_configuring.htm" rel="noopener">https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2023/content/4_configuring/modules/modules_intro_configuring.htm</a></li>
+<li>Schneider Electric, "PME Windows services", EcoStruxure Power Monitoring Expert 2024 online help, accessed 31 October 2026. <a href="https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2024/content/8_reference/planning/ref_pmewindowsservices.htm" rel="noopener">https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2024/content/8_reference/planning/ref_pmewindowsservices.htm</a></li>
+<li>Schneider Electric, "What's new in Power Monitoring Expert 2023", PME 2023 online help, accessed 31 October 2026. <a href="https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2023/content/1_overview/whatsnew.htm" rel="noopener">https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2023/content/1_overview/whatsnew.htm</a></li>
+<li>Schneider Electric, "Power Monitoring Expert Components", FAQ FA295024, accessed 31 October 2026. <a href="https://www.se.com/ca/en/faqs/FA295024/" rel="noopener">https://www.se.com/ca/en/faqs/FA295024/</a></li>
+<li>Schneider Electric, PME licensing FAQs FA363331 and FA406013, accessed 31 October 2026. <a href="https://www.se.com/au/en/faqs/FA363331/" rel="noopener">https://www.se.com/au/en/faqs/FA363331/</a> and <a href="https://www.se.com/ca/en/faqs/FA406013" rel="noopener">https://www.se.com/ca/en/faqs/FA406013</a></li>
+<li>Schneider Electric, "Enabling time synchronization", PME 2023 online help, accessed 31 October 2026. <a href="https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2023/content/4_configuring/modules/pq_performance/configure_the_monitoring_devices/enable_time_synchronization.htm" rel="noopener">https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2023/content/4_configuring/modules/pq_performance/configure_the_monitoring_devices/enable_time_synchronization.htm</a></li>
+<li>Schneider Electric, "PME Databases", PME online help, accessed 31 October 2026. <a href="https://product-help.schneider-electric.com/EcoStruxure-Power-Monitoring-Expert/content/8_reference/planning/ref_pmedatabases.htm" rel="noopener">https://product-help.schneider-electric.com/EcoStruxure-Power-Monitoring-Expert/content/8_reference/planning/ref_pmedatabases.htm</a></li>
+<li>Schneider Electric, PowerLogic ION9000 datasheet, accessed 31 October 2026. <a href="https://docs.rs-online.com/fe93/A700000014386176.pdf" rel="noopener">https://docs.rs-online.com/fe93/A700000014386176.pdf</a></li>
+<li>Schneider Electric, PowerLogic PM8000 series brochure, accessed 31 October 2026. <a href="https://iportal2.schneider-electric.com/Contents/docs/SQD-POWERLOGIC%20PM%208000%20SERIES.PDF" rel="noopener">https://iportal2.schneider-electric.com/Contents/docs/SQD-POWERLOGIC%20PM%208000%20SERIES.PDF</a></li>
+<li>Schneider Electric, PowerLogic PM5000 series technical datasheet FAQ FA234024, accessed 31 October 2026. <a href="https://www.se.com/dk/da/faqs/FA234024" rel="noopener">https://www.se.com/dk/da/faqs/FA234024</a></li>
+<li>Schneider Electric, MasterPact MTZ Modbus Communication Guide, accessed 31 October 2026. <a href="https://www.productinfo.schneider-electric.com/mtzmodbuscommguide/" rel="noopener">https://www.productinfo.schneider-electric.com/mtzmodbuscommguide/</a></li>
+<li>Schneider Electric, Link150 Ethernet gateway datasheet, accessed 31 October 2026. <a href="https://www1.lk.dk/flipbooks/EM4300_Technical_Datasheet/content/Link150_Datasheet.pdf" rel="noopener">https://www1.lk.dk/flipbooks/EM4300_Technical_Datasheet/content/Link150_Datasheet.pdf</a></li>
+<li>Schneider Electric Community, "1PPS time synchronization signal for ION9000" and "ION9000 measurement accuracy and time synchronization", accessed 31 October 2026. <a href="https://community.se.com/t5/Metering-Power-Quality/1PPS-time-synchronization-signal-for-ION9000/td-p/409568" rel="noopener">https://community.se.com/t5/Metering-Power-Quality/1PPS-time-synchronization-signal-for-ION9000/td-p/409568</a></li>
+<li>Information Technology Industry Council, ITI (CBEMA) Curve Application Note (reproduced), accessed 31 October 2026. <a href="https://powerquality.blog/2022/02/04/iti-cbema-curve-application-note/" rel="noopener">https://powerquality.blog/2022/02/04/iti-cbema-curve-application-note/</a></li>
+<li>IEC 61000-4-30:2025 Edition 4.0, Electromagnetic compatibility, Testing and measurement techniques, Power quality measurement methods, preview, accessed 31 October 2026. <a href="https://www.vde-verlag.de/iec-normen/preview-pdf/info_iec61000-4-30{ed4.0}b.pdf" rel="noopener">https://www.vde-verlag.de/iec-normen/preview-pdf/info_iec61000-4-30{ed4.0}b.pdf</a></li>
+<li>IEEE 1588-2019, Standard for a Precision Clock Synchronization Protocol for Networked Measurement and Control Systems, IEEE, 2020. <a href="https://standards.ieee.org/ieee/1588/6825/" rel="noopener">https://standards.ieee.org/ieee/1588/6825/</a></li>
+<li>IEC 62443-3-3:2013, Industrial communication networks, Network and system security, System security requirements and security levels, IEC. <a href="https://webstore.iec.ch/en/publication/7033" rel="noopener">https://webstore.iec.ch/en/publication/7033</a></li>
+<li>MSC-1 case ledger, <code>../case_ledger.json</code>, Data Centre Commissioning Field Manual R01 working files, October 2026.</li>
+<li>Schneider Electric, PowerLogic PM8000 technical specifications, FAQ FA244498, accessed 1 November 2026. <a href="https://www.se.com/us/en/faqs/FA244498" rel="noopener">https://www.se.com/us/en/faqs/FA244498</a></li>
+<li>Schneider Electric, "Transient alarms", PowerLogic ION9000 online help, accessed 1 November 2026. <a href="https://product-help.schneider-electric.com/PowerLogic-ION9000/en-us/content/08-alarms/transient-alarms.htm" rel="noopener">https://product-help.schneider-electric.com/PowerLogic-ION9000/en-us/content/08-alarms/transient-alarms.htm</a></li>
+<li>Advanced Energy, "SEMI F47-0706 compliance: voltage sag immunity", application note, accessed 1 November 2026. <a href="https://www.advancedenergy.com/getmedia/346f4ecd-3a42-4219-9a93-0a1ae94b64e5/en-lv-semi-F47-0706-compliance-voltage-sag-immunity.pdf" rel="noopener">https://www.advancedenergy.com/getmedia/346f4ecd-3a42-4219-9a93-0a1ae94b64e5/en-lv-semi-F47-0706-compliance-voltage-sag-immunity.pdf</a></li>
+<li>NTP Project, "NTP FAQ: How does it work, accuracy", accessed 1 November 2026. <a href="https://www.ntp.org/ntpfaq/NTP-s-algo/" rel="noopener">https://www.ntp.org/ntpfaq/NTP-s-algo/</a></li>
+<li>Wikipedia, "IEC/IEEE 61850-9-3" (power utility profile of IEEE 1588), accessed 1 November 2026. <a href="https://en.wikipedia.org/wiki/IEC/IEEE_61850-9-3" rel="noopener">https://en.wikipedia.org/wiki/IEC/IEEE_61850-9-3</a></li>
+<li>Lodz University of Technology, laboratory instruction cw2 on current transformers (PN-EN 61869-2 accuracy tables), accessed 1 November 2026. <a href="https://imsi.p.lodz.pl/sites/i25/files/2023-12/cw2_%20v0318.pdf" rel="noopener">https://imsi.p.lodz.pl/sites/i25/files/2023-12/cw2_%20v0318.pdf</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="22-bms-commissioning-procedure.html"><span>Previous · 22</span><span class="t">BMS commissioning procedure</span></a><a class="next" href="24-epms-pme-commissioning.html"><span>Next · 24</span><span class="t">EPMS and PME commissioning procedure</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24 EPMS and PME commissioning procedure | Cx Field Manual R01</title>
+<meta name="description" content="This chapter is the step-by-step commissioning procedure for an electrical power monitoring system (EPMS) built on Schneider Electric EcoStruxure Power…">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/24-epms-pme-commissioning.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/24-epms-pme-commissioning.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/24-epms-pme-commissioning.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/24-epms-pme-commissioning.html">
+<meta property="og:title" content="24 EPMS and PME commissioning procedure | Cx Field Manual R01">
+<meta property="og:description" content="This chapter is the step-by-step commissioning procedure for an electrical power monitoring system (EPMS) built on Schneider Electric EcoStruxure Power…">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="24 EPMS and PME commissioning procedure | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter is the step-by-step commissioning procedure for an electrical power monitoring system (EPMS) built on Schneider Electric EcoStruxure Power…">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"24 EPMS and PME commissioning procedure: devices, data, alarms, sequence of events and reports","name":"EPMS and PME commissioning procedure: devices, data, alarms, sequence of events and reports","description":"This chapter is the step-by-step commissioning procedure for an electrical power monitoring system (EPMS) built on Schneider Electric EcoStruxure Power…","url":"https://resistancezero.com/cx-handbook/24-epms-pme-commissioning.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/24-epms-pme-commissioning.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":9260,"position":24,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"24 EPMS and PME commissioning procedure","item":"https://resistancezero.com/cx-handbook/24-epms-pme-commissioning.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part E · Controls, monitoring, integration and networks</p>
+    <h1><span class="num">24</span>EPMS and PME commissioning procedure: devices, data, alarms, sequence of events and reports</h1>
+    <p class="lede">This chapter is the step-by-step commissioning procedure for an electrical power monitoring system (EPMS) built on Schneider Electric EcoStruxure Power Monitoring Expert (PME).</p>
+    <p class="basis">Chapter 24 of 32 · 20 sections · 6 figures · 9,260 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 24</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 24</summary>
+<ol><li><a href="#s24-0"><span class="n">24.0</span>Scope of this chapter</a></li><li><a href="#s24-1"><span class="n">24.1</span>Commissioning workflow and levels</a><ol><li><a href="#s24-1-1"><span class="n">24.1.1</span>Rules for moving between steps</a></li></ol></li><li><a href="#s24-2"><span class="n">24.2</span>Prerequisites, documents and instruments</a><ol><li><a href="#s24-2-1"><span class="n">24.2.1</span>Documents needed before testing</a></li><li><a href="#s24-2-2"><span class="n">24.2.2</span>Test instruments</a></li><li><a href="#s24-2-3"><span class="n">24.2.3</span>Safety conditions</a></li></ol></li><li><a href="#s24-3"><span class="n">24.3</span>Device configuration verification</a><ol><li><a href="#s24-3-1"><span class="n">24.3.1</span>Device configuration record (filled example)</a></li></ol></li><li><a href="#s24-4"><span class="n">24.4</span>Wiring diagnostics: phase rotation, CT polarity and phasors</a><ol><li><a href="#s24-4-1"><span class="n">24.4.1</span>How each wiring fault appears</a></li><li><a href="#s24-4-2"><span class="n">24.4.2</span>Phasor record (filled example)</a></li></ol></li><li><a href="#s24-5"><span class="n">24.5</span>Communications verification</a><ol><li><a href="#s24-5-1"><span class="n">24.5.1</span>Register spot check against the device display</a></li></ol></li><li><a href="#s24-6"><span class="n">24.6</span>Value verification against a calibrated reference</a><ol><li><a href="#s24-6-1"><span class="n">24.6.1</span>Acceptance tolerance</a></li><li><a href="#s24-6-2"><span class="n">24.6.2</span>Procedure</a></li><li><a href="#s24-6-3"><span class="n">24.6.3</span>Meter verification sheet (filled example)</a></li></ol></li><li><a href="#s24-7"><span class="n">24.7</span>Energy register checks</a></li><li><a href="#s24-8"><span class="n">24.8</span>Breaker status, trip indication and control tests</a></li><li><a href="#s24-9"><span class="n">24.9</span>Alarm tests</a><ol><li><a href="#s24-9-1"><span class="n">24.9.1</span>Alarm flood test</a></li></ol></li><li><a href="#s24-10"><span class="n">24.10</span>SOE timestamp accuracy test</a><ol><li><a href="#s24-10-1"><span class="n">24.10.1</span>SOE test record (filled example)</a></li></ol></li><li><a href="#s24-11"><span class="n">24.11</span>Power quality settings and waveform trigger tests</a></li><li><a href="#s24-12"><span class="n">24.12</span>Report verification and the PUE calculation check</a><ol><li><a href="#s24-12-1"><span class="n">24.12.1</span>Report verification</a></li><li><a href="#s24-12-2"><span class="n">24.12.2</span>PUE calculation check</a></li></ol></li><li><a href="#s24-13"><span class="n">24.13</span>Data completeness over 72 hours</a></li><li><a href="#s24-14"><span class="n">24.14</span>Cybersecurity, accounts, backups and restore</a></li><li><a href="#s24-15"><span class="n">24.15</span>Integration tests with the BMS and DCIM, and the EPMS role in IST</a><ol><li><a href="#s24-15-1"><span class="n">24.15.1</span>Point-to-point integration test</a></li><li><a href="#s24-15-2"><span class="n">24.15.2</span>Source-stable permissive to the BMS</a></li><li><a href="#s24-15-3"><span class="n">24.15.3</span>EPMS role during the integrated systems test</a></li></ol></li><li><a href="#s24-16"><span class="n">24.16</span>Acceptance package and handover</a></li><li><a href="#s24-17"><span class="n">24.17</span>Common errors across the EPMS commissioning</a></li><li><a href="#s24-18"><span class="n">24.18</span>Checklist for site use</a></li><li><a href="#s24-19"><span class="n">24.19</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="23-epms-pme-architecture.html"><span>Previous</span>23 EPMS and Schneider EcoStruxure Power Monitoring Expert (PME)</a><a href="25-integration-points.html"><span>Next</span>25 Integration points</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s24-0"><span class="n">24.0</span>Scope of this chapter</h2>
+<p>This chapter is the step-by-step commissioning procedure for an electrical power monitoring system (EPMS) built on Schneider Electric EcoStruxure Power Monitoring Expert (PME). Chapter 23 describes the architecture and the devices. Chapter 26 covers the operational technology (OT) network and cabling tests that must be complete before the communication tests in this chapter.</p>
+<ol>
+<li><strong>Workflow and levels.</strong> The commissioning levels Level 1 (L1) to Level 5 (L5) for the EPMS, the order of the 14 steps, the owner, witness, duration and exit record of each step.</li>
+<li><strong>Prerequisites and instruments.</strong> The documents and the calibrated test instruments needed, with accuracy and calibration requirements.</li>
+<li><strong>Device tests.</strong> Configuration verification, wiring diagnostics of the current transformer (CT) and voltage inputs with phasor diagrams, communication verification, value verification against a calibrated reference and energy register checks.</li>
+<li><strong>Status and alarm tests.</strong> Breaker status and trip indication, alarm tests and the alarm flood test.</li>
+<li><strong>Time tests.</strong> The sequence-of-events (SOE) timestamp accuracy test and the waveform trigger test.</li>
+<li><strong>System tests.</strong> Power quality (PQ) settings, report verification, the power usage effectiveness (PUE) calculation check and the 72-hour data completeness run.</li>
+<li><strong>Security and recovery.</strong> Accounts, passwords, backups and a restore test.</li>
+<li><strong>Integration and acceptance.</strong> Tests with the building management system (BMS) and data-centre infrastructure management (DCIM), the role of the EPMS in the integrated systems test (IST), and the acceptance package.</li>
+<li><strong>Filled records.</strong> A meter verification sheet and an SOE test record with example values from the MSC-1 campus.</li>
+</ol>
+<p>Process documents used: ASHRAE Guideline 0-2019 (commissioning process) and ANSI/NETA ATS-2025 (acceptance testing of electrical equipment, section on metering and instrument transformers; the project specification names the edition that applies). Standards and other documents used: IEC 62053-22 (static meters, Class 0.2S and 0.5S), IEC 61869-2 (current transformers), IEC 61000-4-30 Edition 4.0 (power quality measurement), IEEE 1588-2019, IEC 62443-3-3, PME 2023 and PME 2024 online help, and the MSC-1 case ledger.</p>
+<h2 id="s24-1"><span class="n">24.1</span>Commissioning workflow and levels</h2>
+<p>Figure <a class="figref" href="#F24-1">F24-1</a> shows the 14 steps. The table gives the level, the trigger, the owner and the exit record for each step. Durations are typical for one MSC-1 building with 431 devices (chapter 23.15).</p>
+<figure class="sheet" id="F24-1"><a href="../data/cx-handbook/figures/F24-1.svg" title="Open drawing F24-1 at full size"><img src="../data/cx-handbook/figures/F24-1.svg" alt="F24-1: EPMS commissioning workflow from factory test to acceptance, with the record that closes each step" width="1400" height="774" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F24-1</span> — <b>EPMS commissioning workflow from factory test to acceptance, with the record that closes each step</b>. Each box names the step and the signed record that closes it; the next step starts only when that record is accepted by the CxA.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Level</th>
+<th>Trigger</th>
+<th>Owner</th>
+<th>Exit record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Factory acceptance test (FAT) of PME server</td>
+<td>L1</td>
+<td>server built with licences and base configuration</td>
+<td>EPMS contractor</td>
+<td>FAT report signed by the commissioning authority (CxA)</td>
+</tr>
+<tr>
+<td>2 Device delivery</td>
+<td>L2 (L2A)</td>
+<td>switchboards and meters delivered</td>
+<td>switchboard manufacturer</td>
+<td>receiving record with serial numbers and firmware</td>
+</tr>
+<tr>
+<td>3 Install and wire</td>
+<td>L2</td>
+<td>switchboard installed</td>
+<td>electrical contractor</td>
+<td>L2 checklist per switchboard</td>
+</tr>
+<tr>
+<td>4 Configuration check</td>
+<td>L3</td>
+<td>device powered</td>
+<td>EPMS contractor</td>
+<td>device configuration record</td>
+</tr>
+<tr>
+<td>5 Wiring diagnostics</td>
+<td>L3</td>
+<td>load on the circuit (or primary injection)</td>
+<td>EPMS contractor</td>
+<td>phasor record</td>
+</tr>
+<tr>
+<td>6 Communications</td>
+<td>L3</td>
+<td>network L3 tests complete (chapter 26)</td>
+<td>EPMS contractor</td>
+<td>communication record</td>
+</tr>
+<tr>
+<td>7 Value verification</td>
+<td>L3</td>
+<td>load of at least 10 % of CT rating</td>
+<td>EPMS contractor, CxA witness</td>
+<td>meter verification sheet</td>
+</tr>
+<tr>
+<td>8 Breaker status and trip</td>
+<td>L3</td>
+<td>breaker test with the switchboard manufacturer</td>
+<td>electrical contractor and EPMS contractor</td>
+<td>point-to-point sheet</td>
+</tr>
+<tr>
+<td>9 Alarm tests</td>
+<td>L4</td>
+<td>all devices online</td>
+<td>EPMS contractor</td>
+<td>alarm test record</td>
+</tr>
+<tr>
+<td>10 SOE timestamp test</td>
+<td>L4</td>
+<td>time server and Precision Time Protocol (PTP) or IRIG-B working</td>
+<td>EPMS contractor, relay engineer</td>
+<td>SOE test record</td>
+</tr>
+<tr>
+<td>11 PQ, waveforms, reports</td>
+<td>L4</td>
+<td>steps 4 to 10 signed</td>
+<td>EPMS contractor</td>
+<td>report check sheet</td>
+</tr>
+<tr>
+<td>12 72 h data run</td>
+<td>L4</td>
+<td>steps 9 to 11 signed, configuration frozen</td>
+<td>EPMS contractor</td>
+<td>data completeness record</td>
+</tr>
+<tr>
+<td>13 Security, backup, restore</td>
+<td>L4</td>
+<td>configuration frozen</td>
+<td>EPMS contractor, owner IT security</td>
+<td>restore record</td>
+</tr>
+<tr>
+<td>14 Acceptance</td>
+<td>L5 inputs</td>
+<td>all records accepted</td>
+<td>commissioning manager</td>
+<td>EPMS acceptance certificate</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s24-1-1"><span class="n">24.1.1</span>Rules for moving between steps</h3>
+<ol>
+<li><strong>One record closes one step.</strong> A step is complete only when its record is signed by the EPMS contractor and accepted by the CxA. The CxA reviews each record within <mark>3 working days</mark>.</li>
+<li><strong>Sampling by the CxA.</strong> For steps 4 to 7 the CxA witnesses a sample of <mark>10 to 20 % of devices</mark> on each switchboard. The sample always includes every intake, generator and block main meter. A failure in the sample raises the sample to 100 % for that switchboard.</li>
+<li><strong>Configuration freeze.</strong> Before step 12 the EPMS contractor freezes the PME configuration and records the revision. <mark>Any later change resets the 72 h run</mark>.</li>
+<li><strong>Issues.</strong> Every failure is entered in the issues log with a category (A, B, C as in section 09.9.1) and a retest reference. <mark>Category A issues block the next step</mark> on that device.</li>
+<li><strong>Interfaces.</strong> Steps 6 and 10 depend on the network contractor (switches, PTP) and the time server supplier. Steps 8 and 14 depend on the switchboard manufacturer and the BMS contractor. Hold the dates in the integrated schedule.</li>
+</ol>
+<h2 id="s24-2"><span class="n">24.2</span>Prerequisites, documents and instruments</h2>
+<h3 id="s24-2-1"><span class="n">24.2.1</span>Documents needed before testing</h3>
+<ol>
+<li><strong>Approved meter schedule.</strong> Device tag, model, CT ratio and voltage transformer (VT) ratio, wiring mode, location and network address for every device.</li>
+<li><strong>Points list.</strong> The fields of chapter 23.16.1, with the expected range for each point.</li>
+<li><strong>Alarm list.</strong> The fields of chapter 23.10.4.</li>
+<li><strong>Single-line diagrams and switchboard drawings.</strong> The as-built revision, with CT locations and test blocks.</li>
+<li><strong>Network drawings and IP plan.</strong> The network drawings and the Internet Protocol (IP) address plan from chapter 26, with switch port allocation.</li>
+<li><strong>Protection settings and coordination study.</strong> For the breaker settings report check.</li>
+<li><strong>PUE method statement.</strong> Which meters are total facility energy and which are IT energy.</li>
+<li><strong>Test scripts.</strong> One script per test type in this chapter, approved by the CxA <mark>10 working days</mark> before the first test.</li>
+</ol>
+<h3 id="s24-2-2"><span class="n">24.2.2</span>Test instruments</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Instrument</th>
+<th>Use</th>
+<th>Accuracy or class requirement</th>
+<th>Calibration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reference power analyser (three-phase, with current clamps or direct current inputs)</td>
+<td>value verification</td>
+<td>measurement uncertainty at least 3 times better than the meter under test; for a Class 0.2S meter, 0.05 % or better on power with direct inputs</td>
+<td>within 12 months, traceable certificate</td>
+</tr>
+<tr>
+<td>Current clamps for the analyser</td>
+<td>CT secondary current</td>
+<td>0.1 % class or better at 1 to 5 A</td>
+<td>calibrated with the analyser as a set</td>
+</tr>
+<tr>
+<td>Secondary injection test set with Global Positioning System (GPS) time reference</td>
+<td>SOE test, waveform trigger test, CT secondary injection</td>
+<td>binary output time accuracy better than 100 µs (check the certificate); voltage and current amplitude 0.05 %</td>
+<td>within 12 months</td>
+</tr>
+<tr>
+<td>Phase rotation meter</td>
+<td>phase sequence</td>
+<td>not applicable (indicator)</td>
+<td>function check before use</td>
+</tr>
+<tr>
+<td>Multimeter (measurement category (CAT) III 600 V or better)</td>
+<td>continuity, voltages</td>
+<td>basic accuracy 0.1 % on direct current (DC)</td>
+<td>within 12 months</td>
+</tr>
+<tr>
+<td>Laptop with ION Setup, relay software and a Modbus scanner</td>
+<td>configuration and register reads</td>
+<td>not applicable</td>
+<td>software versions recorded</td>
+</tr>
+<tr>
+<td>Network tester or laptop with ping and packet capture</td>
+<td>communication tests</td>
+<td>not applicable</td>
+<td>not applicable</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> The reference analyser must be more accurate than the meter it checks. A ratio of at least 3 to 1 between the meter error limit and the reference uncertainty is the usual practice. For a PM8000 (Class 0.2S) the reference uncertainty on active power must be <mark>0.07 % or better</mark>. This means direct current inputs through the test block, because most clamp sets add 0.2 % or more.</p>
+<h3 id="s24-2-3"><span class="n">24.2.3</span>Safety conditions</h3>
+<ol>
+<li><strong>Permit to work.</strong> Tests inside the low-voltage (LV) compartment of a live switchboard need a permit to work and an energised work assessment. The site electrical safety rules apply (chapter 10).</li>
+<li><strong>Personal protective equipment.</strong> Arc-rated clothing to the category on the switchboard arc-flash label.</li>
+<li><strong>CT secondary.</strong> The shorting links of the test block are closed before any CT lead is lifted. <mark>An open CT secondary under load produces a dangerous voltage</mark>.</li>
+<li><strong>Two people.</strong> Work in the LV compartment of a live switchboard is done by two competent persons.</li>
+</ol>
+<h2 id="s24-3"><span class="n">24.3</span>Device configuration verification</h2>
+<p><strong>Purpose:</strong> Prove that each device holds the settings in the approved meter schedule.</p>
+<p><strong>Trigger:</strong> Device powered and reachable with ION Setup or its configuration software.</p>
+<p><strong>Owner:</strong> EPMS contractor technician; CxA witnesses the sample.</p>
+<p><strong>Inputs:</strong> Meter schedule, device configuration record template (chapter 23.16.2), laptop with ION Setup.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Read the nameplate.</strong> Record model, order code, serial number and the CT nameplate ratio and class. Take a photograph of the meter and of one CT nameplate.</li>
+<li><strong>Connect and read.</strong> Connect with ION Setup (ION devices) or the device configuration software. Record the firmware version.</li>
+<li><strong>Check the CT settings.</strong> CT primary and secondary in the meter equal the CT nameplate. For the MSC-1 block main this is <mark>4000 / 5</mark>.</li>
+<li><strong>Check the PT settings.</strong> The potential transformer (PT) primary and secondary in the meter equal the VT ratio, or 415 / 415 for direct connection.</li>
+<li><strong>Check the wiring mode.</strong> 4W-Wye for the MSC-1 LV systems and for the 20 kV intakes with star VTs.</li>
+<li><strong>Check nominal values.</strong> Nominal voltage 415 V (line to line) or 20,000 V, nominal frequency 50 Hz, nominal current equal to the CT primary.</li>
+<li><strong>Check demand and logging.</strong> Demand interval 15 min block; logging template name and revision as on the schedule.</li>
+<li><strong>Check waveform and PQ settings.</strong> Sag threshold 90 %, swell 110 %, pre and post cycles as in chapter 23.8.4.</li>
+<li><strong>Check communication settings.</strong> IP address, mask, gateway, protocol, unit ID, serial address and baud rate.</li>
+<li><strong>Check the time source.</strong> One source as on the time synchronisation diagram.</li>
+<li><strong>Save the configuration file.</strong> Save the device configuration (ION Setup template or export) to the project document system under the asset tag.</li>
+<li><strong>Record and sign.</strong> Fill the device configuration record. Any difference is corrected and re-read before signing.</li>
+</ol>
+<p><strong>Acceptance:</strong> Every field equals the approved meter schedule. No tolerance applies to settings.</p>
+<p><strong>Records:</strong> Device configuration record with configuration file and photographs.</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Template applied with the wrong CT ratio.</strong> A template copied from another switchboard carries its CT ratio. Detect by comparing the CT setting against the nameplate photograph for every device, including those outside the CxA sample.</li>
+<li><strong>Nominal voltage left at the factory default.</strong> Many meters ship with a nominal value that does not match 415 V. PQ triggers then work on the wrong base.</li>
+<li><strong>Time source set to two sources.</strong> PME sync left enabled on a meter that also has IRIG-B. Detect by reading the clock source register or the ION Setup clock screen.</li>
+</ol>
+<h3 id="s24-3-1"><span class="n">24.3.1</span>Device configuration record (filled example)</h3>
+<p><strong>Example:</strong></p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Asset tag</td>
+<td>B2-DH3-LVMSB-A1-Q1-PM</td>
+</tr>
+<tr>
+<td>PME name</td>
+<td>B2_ER2.LVMSB_A1_MAIN</td>
+</tr>
+<tr>
+<td>Model</td>
+<td>PowerLogic PM8000</td>
+</tr>
+<tr>
+<td>Firmware</td>
+<td>read: as installed; recorded on the record</td>
+</tr>
+<tr>
+<td>CT primary / secondary / class</td>
+<td>4000 / 5 A / 0.2S, 5 VA</td>
+</tr>
+<tr>
+<td>PT primary / secondary</td>
+<td>415 / 415 V (direct)</td>
+</tr>
+<tr>
+<td>Wiring mode</td>
+<td>4W-Wye</td>
+</tr>
+<tr>
+<td>Nominal V / I / f</td>
+<td>415 V / 4,000 A / 50 Hz</td>
+</tr>
+<tr>
+<td>Demand</td>
+<td>15 min block</td>
+</tr>
+<tr>
+<td>Logging template</td>
+<td>B2_LV_MAIN_v3</td>
+</tr>
+<tr>
+<td>Sag / swell trigger</td>
+<td>90 % / 110 %</td>
+</tr>
+<tr>
+<td>IP / mask / gateway</td>
+<td>10.21.10.41 / 255.255.255.0 / 10.21.10.1</td>
+</tr>
+<tr>
+<td>Protocol / unit ID</td>
+<td>ION and Modbus Transmission Control Protocol (TCP) / 1</td>
+</tr>
+<tr>
+<td>Time source</td>
+<td>IRIG-B (B004), PME sync disabled</td>
+</tr>
+<tr>
+<td>Default password changed</td>
+<td>yes, stored in the owner password vault entry B2-EPMS-041</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Signed</td>
+<td>EPMS technician, CxA (sample witnessed)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s24-4"><span class="n">24.4</span>Wiring diagnostics: phase rotation, CT polarity and phasors</h2>
+<p><strong>Purpose:</strong> Prove that each CT is on the right phase with the right polarity, and that the voltage inputs are in the right order.</p>
+<figure class="sheet" id="F24-2"><a href="../data/cx-handbook/figures/F24-2.svg" title="Open drawing F24-2 at full size"><img src="../data/cx-handbook/figures/F24-2.svg" alt="F24-2: Phasor diagrams at the PM8000 on a block LV main: correct wiring and CT2 reversed" width="1400" height="872" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F24-2</span> — <b>Phasor diagrams at the PM8000 on a block LV main: correct wiring and CT2 reversed</b>. Voltage phasors are drawn 120° apart in the order V1, V2, V3 (anticlockwise rotation); each current phasor should sit just behind its own voltage. A current that points away from its voltage reveals a reversed CT.</figcaption></figure>
+
+<p><strong>Trigger:</strong> Device configured (24.3) and load on the circuit of at least 10 % of the CT rating, or primary current injection where no load is available.</p>
+<p><strong>Owner:</strong> EPMS contractor technician; CxA witnesses every intake, generator and block main.</p>
+<p><strong>Inputs:</strong> Phasor screen of the meter (front panel or ION Setup), phase rotation meter, the expected power factor of the load.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Check voltage phase sequence.</strong> Read the phase rotation at the meter terminals with a phase rotation meter, and read the meter's own phase rotation value. Both must show L1-L2-L3 (positive sequence).</li>
+<li><strong>Read voltage magnitudes.</strong> V1N, V2N, V3N within 2 % of each other and close to 239.6 V on a 415 V system.</li>
+<li><strong>Read voltage angles.</strong> V1 at 0°, V2 at -120°, V3 at +120° (or 240°), within ±2°.</li>
+<li><strong>Read current magnitudes.</strong> I1, I2, I3 compared with a clamp reading on the CT secondary at the test block. Each within 2 % of the clamp reading.</li>
+<li><strong>Read current angles.</strong> Each current lags its own voltage by the load angle. For a power factor of 0.95 lagging, the angle is <mark>18.2°</mark> (arccos 0.95).</li>
+<li><strong>Read phase powers.</strong> P1, P2, P3 all positive (for a load) and within the load unbalance expected.</li>
+<li><strong>Compare with the diagram.</strong> Draw or print the phasor diagram (Figure <a class="figref" href="#F24-2">F24-2</a>) and attach it to the phasor record.</li>
+<li><strong>Correct any fault.</strong> With the CT shorted at the test block, swap S1 and S2 for a reversed CT, or re-terminate a CT on the wrong phase. Repeat steps 4 to 7.</li>
+<li><strong>Record.</strong> Fill the phasor record with all magnitudes and angles.</li>
+</ol>
+<p><strong>Acceptance:</strong> Positive phase sequence. Each current within ±30° of its own voltage for a load with power factor above 0.87 (the window is set from the expected load power factor). All phase powers positive for a load. Clamp and meter currents within 2 %.</p>
+<p><strong>Records:</strong> Phasor record with the diagram.</p>
+<h3 id="s24-4-1"><span class="n">24.4.1</span>How each wiring fault appears</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Fault</th>
+<th>Current angle seen</th>
+<th>Phase power</th>
+<th>Total power</th>
+<th>Neutral current calculated</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Correct</td>
+<td>each I lags its V by about 18°</td>
+<td>all positive</td>
+<td>correct</td>
+<td>small</td>
+<td>record on the phasor record</td>
+</tr>
+<tr>
+<td>One CT reversed (P1 and P2 swapped, or S1 and S2 swapped)</td>
+<td>that I shifted by 180°</td>
+<td>that phase negative</td>
+<td>one third of correct (balanced load)</td>
+<td>about twice the phase current</td>
+<td>short the CT at the test block, swap S1 and S2</td>
+</tr>
+<tr>
+<td>Two CTs swapped (I1 on L2, I2 on L1)</td>
+<td>I1 near V2 angle, I2 near V1 angle</td>
+<td>two phases with wrong values, power factor (PF) near 0.5 or negative</td>
+<td>wrong</td>
+<td>high</td>
+<td>short the CTs, re-terminate each CT on its own phase</td>
+</tr>
+<tr>
+<td>Voltage V1 and V2 swapped</td>
+<td>negative sequence shown</td>
+<td>wrong on two phases</td>
+<td>wrong</td>
+<td>not affected</td>
+<td>open the fused voltage links under permit, swap the leads</td>
+</tr>
+<tr>
+<td>CT from another circuit</td>
+<td>angle and magnitude unrelated to the load</td>
+<td>wrong</td>
+<td>wrong</td>
+<td>high</td>
+<td>trace the CT secondary to its circuit, re-terminate</td>
+</tr>
+<tr>
+<td>CT shorting link left closed</td>
+<td>current near zero</td>
+<td>near zero</td>
+<td>near zero</td>
+<td>near zero</td>
+<td>open the shorting link, re-read</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Reversed CT on phase 2 of B2-DH3-LVMSB-A1. The load bank draws 3,000 A per phase at 415 V with power factor 0.95. This 2,048.7 kW test load is a different quantity from the 1.5 MW block IT load of the MSC-1 worked example. It is set to test the meter at 86 % of 3,478 A, the rated LV current of the 2.5 MVA block transformer. Phase voltage = 415 / √3 = 239.6 V. Correct phase power = 239.6 × 3,000 × 0.95 = 682.9 kW; correct total = 3 × 682.9 = <mark>2,048.7 kW</mark>. With CT2 reversed, I2 is turned by 180°, so P2 = -682.9 kW. The total = 682.9 - 682.9 + 682.9 = 682.9 kW, one third of the correct value. The calculated neutral current is the vector sum of I1, I2 and I3. With I2 reversed the sum equals twice I2 in the reversed direction, about 6,000 A. The clamp reading on the reference shows 2,048 kW. The technician closes the shorting links of TB1 and swaps S1 and S2 of CT2 at the block. The technician then opens the links and reads P2 = +683.1 kW and the total 2,047.7 kW (682.7 + 683.1 + 681.9, from the phasor record below).</p>
+<h3 id="s24-4-2"><span class="n">24.4.2</span>Phasor record (filled example)</h3>
+<p><strong>Example:</strong></p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Phase 1</th>
+<th>Phase 2 (as found)</th>
+<th>Phase 2 (after fix)</th>
+<th>Phase 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V (L-N), V</td>
+<td>239.8</td>
+<td>239.4</td>
+<td>239.4</td>
+<td>239.7</td>
+</tr>
+<tr>
+<td>V angle</td>
+<td>0.0°</td>
+<td>-120.1°</td>
+<td>-120.1°</td>
+<td>119.9°</td>
+</tr>
+<tr>
+<td>I (meter), A</td>
+<td>2,998</td>
+<td>3,004</td>
+<td>3,003</td>
+<td>2,995</td>
+</tr>
+<tr>
+<td>I (clamp at TB1, scaled), A</td>
+<td>3,001</td>
+<td>3,006</td>
+<td>3,006</td>
+<td>2,999</td>
+</tr>
+<tr>
+<td>I angle</td>
+<td>-18.3°</td>
+<td>+41.5°</td>
+<td>-138.5°</td>
+<td>101.7°</td>
+</tr>
+<tr>
+<td>P, kW</td>
+<td>682.7</td>
+<td>-683.5</td>
+<td>683.1</td>
+<td>681.9</td>
+</tr>
+<tr>
+<td>PF</td>
+<td>0.95</td>
+<td>-0.95</td>
+<td>0.95</td>
+<td>0.95</td>
+</tr>
+<tr>
+<td>Phase sequence</td>
+<td>L1-L2-L3</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Result</td>
+<td></td>
+<td>fail as found</td>
+<td>pass after fix</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>The phase 3 current angle of 101.7° is correct: V3 is at 119.9° and the current lags by 18.2°. The phase 2 angles follow from V2 at -120.1°: after the fix the current lags by 18.4° (-138.5°); as found it was turned by 180° (+41.5°), which is +161.6° from V2.</p>
+<h2 id="s24-5"><span class="n">24.5</span>Communications verification</h2>
+<p><strong>Purpose:</strong> Prove that PME communicates with every device through the planned path with stable response times.</p>
+<p><strong>Trigger:</strong> Network tests of chapter 26 complete for the switches serving the devices; devices configured.</p>
+<p><strong>Owner:</strong> EPMS contractor; network contractor available for faults.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Ping each Ethernet device.</strong> From the PME server, 100 pings to each device. Acceptance: <mark>0 % loss, round-trip time (RTT) below 10 ms</mark> on the local network.</li>
+<li><strong>Add sites and devices in Management Console.</strong> Each Ethernet device as an Ethernet device; each serial device under its Link150 gateway site with its serial address.</li>
+<li><strong>Check device status.</strong> Every device shows connected. Record the time to connect.</li>
+<li><strong>Check gateway settings.</strong> For each Link150: baud rate, parity, stop bits, timeout and IP filter as on the gateway list (chapter 23.15).</li>
+<li><strong>Read a register from each serial device.</strong> Use a Modbus scanner through the gateway to read one known register (for example the serial number). This isolates gateway faults from PME faults.</li>
+<li><strong>Measure the poll cycle.</strong> For each serial line, record the update period of a real-time value in Diagrams. Acceptance: at or below the value calculated in design (1.5 s for the MSC-1 generator lines).</li>
+<li><strong>Check the system log.</strong> ION_SystemLog shows no repeated communication errors over 1 h for the devices tested.</li>
+<li><strong>Record.</strong> Fill the communication record.</li>
+</ol>
+<p><strong>Acceptance:</strong> All devices connected; no communication error repeated more than once in 1 h; poll cycle within the design value.</p>
+<p><strong>Records:</strong> Communication record per switchboard.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Device</td>
+<td>PME name</td>
+<td>B2_GEN.GEN_07</td>
+</tr>
+<tr>
+<td>Path</td>
+<td>text</td>
+<td>10.21.10.202 (B2-GEN-LK150-02), serial address 1</td>
+</tr>
+<tr>
+<td>Ping loss / RTT</td>
+<td>%, ms</td>
+<td>0 % / 0.8 ms to the gateway</td>
+</tr>
+<tr>
+<td>Status in Management Console</td>
+<td>connected / disconnected</td>
+<td>connected</td>
+</tr>
+<tr>
+<td>Register read test</td>
+<td>value</td>
+<td>serial number read correctly</td>
+</tr>
+<tr>
+<td>Poll cycle</td>
+<td>s</td>
+<td>1.4</td>
+</tr>
+<tr>
+<td>Errors in 1 h</td>
+<td>count</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass / fail</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>RS-485 termination missing or doubled.</strong> Intermittent errors on the last devices of a line. Fit one 120 Ω terminator at each end of the line only, and check the bias setting of the gateway.</li>
+<li><strong>Duplicate serial addresses.</strong> Two devices with address 1 on one line produce corrupted replies. Read each device address at its front panel.</li>
+<li><strong>Unit ID wrong for IFE or EIFE.</strong> The MasterPact IFE and EIFE Ethernet interface modules answer on <mark>unit ID 255</mark>. A device added with unit ID 1 does not respond.</li>
+<li><strong>Firewall between PME and devices.</strong> A firewall in the path blocks ION (TCP port 7700) or Modbus (TCP 502). Confirm the ports in the conduit table (chapter 27, section 27.10.4) for the installed PME version.</li>
+</ol>
+<h3 id="s24-5-1"><span class="n">24.5.1</span>Register spot check against the device display</h3>
+<p>A device can be connected in PME and still deliver wrong values if the register map, data type or scaling is wrong. The fault is most frequent on third-party devices: generator controllers, automatic transfer switch (ATS) controllers and uninterruptible power supply (UPS) cards. PME uses a device driver whose register map must match the firmware of the device.</p>
+<ol>
+<li><strong>Choose three registers per device type.</strong> One analogue value (for example generator kW), one status (for example generator running), one counter (for example engine hours).</li>
+<li><strong>Read the device display.</strong> Read each value on the controller front panel and record it with the time.</li>
+<li><strong>Read PME.</strong> Read the same values in Diagrams within 10 s.</li>
+<li><strong>Compare.</strong> Analogue values within the display resolution; status identical; counter identical.</li>
+<li><strong>Check scaling and units.</strong> A value that differs by a factor of 10, 100 or 1,000 indicates a scaling or unit error in the driver. A value that is random indicates a word-order (byte swap) error in a 32-bit register.</li>
+<li><strong>Record the driver version.</strong> Record the PME device type and driver version on the communication record, because a firmware upgrade of the controller can change the register map.</li>
+</ol>
+<p><strong>Example:</strong> Generator controller GEN-07 displays 2,412 kW; PME shows 241.2 kW. The driver applies a scale of 0.1 that the controller firmware does not use. The EPMS contractor corrects the driver scaling, re-reads 2,412 kW and records the change on the communication record.</p>
+<h2 id="s24-6"><span class="n">24.6</span>Value verification against a calibrated reference</h2>
+<p><strong>Purpose:</strong> Prove that each meter reads voltage, current, power and power factor within the acceptance tolerance against a calibrated reference.</p>
+<figure class="sheet" id="F24-3"><a href="../data/cx-handbook/figures/F24-3.svg" title="Open drawing F24-3 at full size"><img src="../data/cx-handbook/figures/F24-3.svg" alt="F24-3: Meter versus calibrated reference: active-power error at five load points for two meters" width="1000" height="950" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F24-3</span> — <b>Meter versus calibrated reference: active-power error at five load points for two meters</b>. Error = (meter reading - reference reading) / reference reading x 100 %. Each point is the mean of three readings taken within 10 s on a steady load.</figcaption></figure>
+
+<p><strong>Trigger:</strong> Wiring diagnostics passed; load of at least 10 % of the CT rating.</p>
+<p><strong>Owner:</strong> EPMS contractor test engineer; CxA witnesses every intake, generator and block main meter and a sample of feeders.</p>
+<p><strong>Inputs:</strong> Reference power analyser with calibration certificate, meter configuration record, the tolerance table.</p>
+<h3 id="s24-6-1"><span class="n">24.6.1</span>Acceptance tolerance</h3>
+<p>The acceptance tolerance combines the meter class, the CT class and the reference uncertainty. The specification states the values; the table gives example values used on hyperscale programmes. The meter-class limits come from IEC 62053-22. For a Class 0.2S meter at unity power factor, the limit is ±0.2 % from 0.05 In to Imax and ±0.4 % from 0.01 In to 0.05 In. Elexon Code of Practice 4 reproduces the BS EN 62053-22 table; the same limits sit in IEC 62053-22:2020 Table 3, "Acceptable percentage error limits". In is the rated current of the meter (5 A) and Imax its maximum current.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Meter</th>
+<th>CT class</th>
+<th>Where the reference is connected</th>
+<th>Example tolerance on kW</th>
+<th>On V</th>
+<th>On I</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ION9000 (0.1S)</td>
+<td>0.2S</td>
+<td>in series through the test block (same CTs)</td>
+<td>±0.3 %</td>
+<td>±0.2 %</td>
+<td>±0.3 %</td>
+</tr>
+<tr>
+<td>PM8000 (0.2S)</td>
+<td>0.2S</td>
+<td>same CTs, through the test block</td>
+<td>±0.5 %</td>
+<td>±0.3 %</td>
+<td>±0.5 %</td>
+</tr>
+<tr>
+<td>PM5000 (0.5S)</td>
+<td>0.5S or 0.5</td>
+<td>same CTs, through the test block</td>
+<td>±1.0 %</td>
+<td>±0.5 %</td>
+<td>±1.0 %</td>
+</tr>
+<tr>
+<td>MicroLogic X metering</td>
+<td>breaker sensors</td>
+<td>compared with the meter on the same circuit</td>
+<td>±2.0 %</td>
+<td>±0.5 %</td>
+<td>±1.5 %</td>
+</tr>
+</tbody>
+</table></div>
+<p>The MicroLogic X row is an example comparison limit. The MicroLogic X user guide (DOCA0102) classes the MasterPact MTZ power and energy metering as Class 1 to IEC 61557-12. The limits are ±1 % for active power at power factor 1 from 10 % of Ib and ±1.5 % from 5 % of Ib. The ±2.0 % limit adds the error of the PM8000 and its CT, against which the trip unit is compared.</p>
+<p>When the reference is connected in series with the meter on the same CTs, the CT error is common to both and drops out of the comparison. The test then proves the meter and its settings. To prove the CT as well, the reference must use its own primary current sensor, which is only practical at low current. Accept the CT on its factory test certificate and its nameplate class.</p>
+<h3 id="s24-6-2"><span class="n">24.6.2</span>Procedure</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Record the reference details.</strong> Model, serial number, calibration date and certificate number.</li>
+<li><strong>Connect the reference.</strong> Open the test block current links in the order given on the block label, so that the reference current inputs are in series with the meter. Connect the reference voltage inputs to the block voltage links.</li>
+<li><strong>Check the connection.</strong> The reference shows the same phase sequence and similar values to the meter.</li>
+<li><strong>Set the reference ratio.</strong> Enter the CT ratio 4000/5 in the reference so that it reads primary values.</li>
+<li><strong>Take readings.</strong> At a steady load, read the meter and the reference <mark>within 10 s of each other, three times</mark>. Use the mean.</li>
+<li><strong>Repeat at load points.</strong> Where the load can be set (load banks during L4 or IST), repeat at 10, 25, 50, 75 and 100 % of the block load. Where the load cannot be set, take one point at the available load and repeat later at a higher load.</li>
+<li><strong>Calculate the error.</strong> Error % = (meter - reference) / reference × 100.</li>
+<li><strong>Restore.</strong> Remove the reference, close the links in the correct order and check that the meter reads the same current as before.</li>
+<li><strong>Record.</strong> Fill the meter verification sheet.</li>
+</ol>
+<p><strong>Acceptance:</strong> Every error inside the tolerance of 24.6.1 at every load point.</p>
+<h3 id="s24-6-3"><span class="n">24.6.3</span>Meter verification sheet (filled example)</h3>
+<p>Figure <a class="figref" href="#F24-3">F24-3</a> plots the results.</p>
+<p><strong>Worked example:</strong> Meter verification for B2-DH3-LVMSB-A1 meter M-A1 (PM8000) during the L4 load bank test. Reference: three-phase analyser, 0.05 % class, certificate dated 2026-03-14. The load bank sets five points of the 2,048.7 kW test load used in 24.4 (3,000 A per phase on the LV main). The MSC-1 block IT load is 1.5 MW.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Load point</th>
+<th>Reference kW</th>
+<th>Meter kW</th>
+<th>Error %</th>
+<th>Reference V (L-N avg)</th>
+<th>Meter V</th>
+<th>Reference A (avg)</th>
+<th>Meter A</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10 %</td>
+<td>204.9</td>
+<td>205.6</td>
+<td>+0.32</td>
+<td>239.7</td>
+<td>239.8</td>
+<td>300.1</td>
+<td>300.9</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>25 %</td>
+<td>512.2</td>
+<td>513.1</td>
+<td>+0.18</td>
+<td>239.6</td>
+<td>239.6</td>
+<td>750.2</td>
+<td>751.4</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>50 %</td>
+<td>1,024.4</td>
+<td>1,025.3</td>
+<td>+0.09</td>
+<td>239.5</td>
+<td>239.5</td>
+<td>1,500.3</td>
+<td>1,501.6</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>75 %</td>
+<td>1,536.5</td>
+<td>1,537.4</td>
+<td>+0.06</td>
+<td>239.4</td>
+<td>239.4</td>
+<td>2,250.6</td>
+<td>2,252.0</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>100 %</td>
+<td>2,048.7</td>
+<td>2,051.0</td>
+<td>+0.11</td>
+<td>239.2</td>
+<td>239.3</td>
+<td>3,000.8</td>
+<td>3,003.1</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>All five points are inside ±0.5 % on kW. The worst error is +0.32 % at 10 % load, which is expected: meter error grows at low current. The +0.32 % is the analyser value from the unrounded means; the rounded values in the table give +0.34 %.</p>
+<p>The feeder meter M-F07 (PM5000 on a class 0.5 CT, 300/5 A) on the same board read +1.8 % at 10 % load and +0.9 % at 25 % load. The tolerance is ±1.0 %, so <mark>the 10 % point fails</mark>. The team found the CT burden: the leads were 2.5 mm² over 18 m, giving 2 × 18 × 0.0088 Ω × 5² = 7.9 VA, above the CT rating of 7.5 VA. Re-routing the leads to 4 mm² (2 × 18 × 0.0055 Ω × 5² = 5.0 VA) and retesting gave +0.6 % at 10 % load. The issue was logged as category B, closed after retest.</p>
+<h2 id="s24-7"><span class="n">24.7</span>Energy register checks</h2>
+<p><strong>Purpose:</strong> Prove that energy registers count in the right direction and at the right rate, and that PME logs match the device registers.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Read the start values.</strong> Read kWh delivered, kWh received, kvarh and kVAh on the meter and in PME at the same minute.</li>
+<li><strong>Run a known load.</strong> Hold a steady load for at least 1 h (load bank during L4, or normal load).</li>
+<li><strong>Read the end values.</strong> Read the same registers at the end.</li>
+<li><strong>Calculate the expected energy.</strong> Expected kWh = average reference kW × hours.</li>
+<li><strong>Compare.</strong> Meter kWh increment against the expected value; PME logged kWh against the meter increment.</li>
+<li><strong>Check direction.</strong> For an import load, kWh delivered rises and kWh received stays constant. For a generator test with export, received rises.</li>
+<li><strong>Check the 15-minute log.</strong> The four 15-minute intervals of each hour add up to the hourly increment.</li>
+</ol>
+<p><strong>Acceptance:</strong> Meter increment within the kW tolerance of 24.6.1 plus one register count; PME logged energy equal to the meter increment within one count; direction correct.</p>
+<p><strong>Worked example:</strong> Energy check on M-A1 over 2 h at 1,024.4 kW (reference average). Expected 2,048.8 kWh. Meter register at start 18,422.6 kWh, at end 20,473.2 kWh: increment 2,050.6 kWh, error +0.09 %. PME log for the 8 intervals: 256.3, 256.4, 256.2, 256.4, 256.3, 256.3, 256.4, 256.3 = 2,050.6 kWh. <mark>PME equals the meter increment</mark>, and the meter is inside ±0.5 % of the reference.</p>
+<h2 id="s24-8"><span class="n">24.8</span>Breaker status, trip indication and control tests</h2>
+<p><strong>Purpose:</strong> Prove that every breaker status, trip indication and trip cause reaches PME (and the BMS where mapped) with the right value and the right time.</p>
+<p><strong>Trigger:</strong> Breaker installed and tested by the switchboard manufacturer; trip unit communicating.</p>
+<p><strong>Owner:</strong> Electrical contractor operates the breaker under permit; EPMS contractor records PME; switchboard manufacturer tests the trip unit.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Status open and closed.</strong> Operate the breaker open and closed. PME and the BMS (if mapped) show the change within the update time of the points list (for example 2 s in PME, 5 s in the BMS).</li>
+<li><strong>Racked positions.</strong> Rack out to test and disconnected positions. PME shows racked in, test and racked out as listed.</li>
+<li><strong>Spring charged.</strong> Discharge and recharge the closing spring where the indication is mapped.</li>
+<li><strong>Trip indication.</strong> Trip the breaker with the trip unit test function or by secondary injection through the manufacturer's test kit. PME shows "tripped" and the trip cause (long time, short time, instantaneous, ground fault).</li>
+<li><strong>Trip cause match.</strong> Each injected protection function appears as its own cause in PME.</li>
+<li><strong>Settings read-back.</strong> Read Ir, tr, Isd, tsd, Ii, Ig, tg and the energy reduction maintenance setting (ERMS) status from PME and compare with the coordination study.</li>
+<li><strong>Remote control.</strong> Only where the specification allows remote control: test open and close commands from PME under a separate permit and with the switchboard in a safe state.</li>
+<li><strong>Record.</strong> Fill the point-to-point sheet.</li>
+</ol>
+<p><strong>Acceptance:</strong> Every status and trip cause correct; <mark>settings equal to the coordination study with zero deviation</mark>; update times within the points list values.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Breaker tag</td>
+<td>text</td>
+<td>B2-DH3-LVMSB-A1-Q1</td>
+</tr>
+<tr>
+<td>Test</td>
+<td>text</td>
+<td>trip by short-time injection</td>
+</tr>
+<tr>
+<td>Expected PME state</td>
+<td>text</td>
+<td>tripped, cause short time</td>
+</tr>
+<tr>
+<td>Observed PME state and time</td>
+<td>text, s</td>
+<td>tripped, short time, 1.2 s</td>
+</tr>
+<tr>
+<td>Observed BMS point</td>
+<td>text, s</td>
+<td>B2.EPMS.LVMSB_A1.TRIP = 1, 4.1 s</td>
+</tr>
+<tr>
+<td>Settings Isd / tsd in study</td>
+<td>value</td>
+<td>6 × Ir / 0.2 s</td>
+</tr>
+<tr>
+<td>Settings read in PME</td>
+<td>value</td>
+<td>6 × Ir / 0.2 s</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass / fail</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s24-9"><span class="n">24.9</span>Alarm tests</h2>
+<p><strong>Purpose:</strong> Prove that every alarm in the alarm list fires at its set value, with its priority, delay and notification, and that it clears correctly.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Choose the stimulus.</strong> For each alarm, use the real condition where safe, for example a breaker trip or a pulled cable for loss of communication. Otherwise use a simulated value: secondary injection into the meter or a test value in the Virtual Processor.</li>
+<li><strong>Apply the stimulus.</strong> The EPMS contractor applies the stimulus and records the time on the alarm test record.</li>
+<li><strong>Observe PME.</strong> The alarm appears in the Alarms application with the right priority and text after the set delay.</li>
+<li><strong>Observe notifications.</strong> The Event Notification Module sends email, a short message service (SMS) message or a Simple Network Management Protocol (SNMP) notification to the listed group; the BMS shows the mapped point.</li>
+<li><strong>Acknowledge.</strong> Acknowledge in PME and record who and when.</li>
+<li><strong>Remove the stimulus.</strong> The alarm clears at the hysteresis value.</li>
+<li><strong>Record.</strong> Fill the alarm test record.</li>
+</ol>
+<p><strong>Acceptance:</strong> Alarm active within the set delay plus 10 s; <mark>notification received within 60 s</mark>; clear at the hysteresis value; text and priority as in the alarm list.</p>
+<h3 id="s24-9-1"><span class="n">24.9.1</span>Alarm flood test</h3>
+<p>The alarm flood test checks what the operator sees during a large event. On an MSC-1 building, a utility loss followed by a generator start produces events from more than 100 devices within 30 s.</p>
+<ol>
+<li><strong>Prepare.</strong> Record the alarm count rule from the owner project requirements (OPR), for example "the first-out critical alarms visible on one screen without scrolling".</li>
+<li><strong>Create the event.</strong> Use the L4 utility failure test or the IST scenario (chapter 28).</li>
+<li><strong>Count.</strong> Export the Alarms list for the 10 minutes after the event. Count alarms by priority.</li>
+<li><strong>Check grouping.</strong> PQ events from several meters are grouped into one event by event clustering when clocks are synchronised.</li>
+<li><strong>Check the BMS.</strong> The BMS shows the mapped critical points without delay above its update time.</li>
+<li><strong>Record.</strong> The flood record lists counts by priority and any alarm without an action.</li>
+</ol>
+<p><strong>Worked example:</strong> Alarm flood after a simulated utility loss on building B2. In 10 minutes PME recorded 412 events. They included 24 priority 1 alarms (one per block main transfer) and 34 priority 2 alarms (17 generators starting and 17 generator breakers closing). The rest were 120 priority 4 alarms (PQ sags seen by meters) and 234 events logged without alarm. After event clustering the 120 PQ alarms became <mark>one PQ event with 120 device records</mark>. The operator screen showed the 24 critical alarms on one page, which meets the OPR rule.</p>
+<h2 id="s24-10"><span class="n">24.10</span>SOE timestamp accuracy test</h2>
+<p><strong>Purpose:</strong> Prove that devices used for sequence-of-events analysis time-stamp the same physical event within the specified tolerance.</p>
+<figure class="sheet" id="F24-4"><a href="../data/cx-handbook/figures/F24-4.svg" title="Open drawing F24-4 at full size"><img src="../data/cx-handbook/figures/F24-4.svg" alt="F24-4: SOE timing chart: one injected trip seen by five devices and the PME event log" width="1400" height="697" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F24-4</span> — <b>SOE timing chart: one injected trip seen by five devices and the PME event log</b>. Each bar is the time stamp recorded by one device for the same input change, after subtracting the known input debounce setting; the spread between PTP and IRIG-B devices must stay inside ±1 ms.</figcaption></figure>
+
+<figure class="sheet" id="F24-5"><a href="../data/cx-handbook/figures/F24-5.svg" title="Open drawing F24-5 at full size"><img src="../data/cx-handbook/figures/F24-5.svg" alt="F24-5: SOE test set-up: GPS-synchronised secondary test set driving the same contact into five devices" width="1400" height="902" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F24-5</span> — <b>SOE test set-up: GPS-synchronised secondary test set driving the same contact into five devices</b>. The test set and the EPMS time server share the same GPS time, so the test-set event time is the reference for every device time stamp.</figcaption></figure>
+
+<p><strong>Trigger:</strong> Time server locked to GPS; PTP and IRIG-B distribution tested; devices configured with one time source each.</p>
+<p><strong>Owner:</strong> EPMS contractor with the protection relay engineer; CxA witnesses 100 %.</p>
+<p><strong>Inputs:</strong> GPS-synchronised secondary injection test set (Figure <a class="figref" href="#F24-5">F24-5</a>), test terminal block, debounce settings of each device binary input.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Check the time server.</strong> GPS locked, number of satellites, PTP grandmaster status; record the values.</li>
+<li><strong>Check device clocks.</strong> Read the clock and the time source status of each device; all show the expected source and a locked or synchronised flag.</li>
+<li><strong>Wire the stimulus.</strong> One test-set binary output (a dry contact) wired in parallel to one binary input on each device under test through a test terminal block. Use twisted pair below 10 m to each device.</li>
+<li><strong>Record debounce.</strong> Read and record the debounce or filter time of each binary input (for example 2 ms on the relay input, 1 ms on the meter input).</li>
+<li><strong>Inject.</strong> Program the test set to close the contact at a whole GPS second. Repeat 10 times at 30 s intervals; record both closing and opening transitions.</li>
+<li><strong>Read the device logs.</strong> Read the event time of each transition from each device log (relay software, ION Setup) and from the PME event log.</li>
+<li><strong>Correct for debounce.</strong> Corrected time = recorded time - debounce setting.</li>
+<li><strong>Calculate.</strong> For each repeat, the offset of each device from the test-set time; then the mean and the maximum absolute offset over the 10 repeats.</li>
+<li><strong>Record.</strong> Fill the SOE test record; mark devices that are not on PTP or IRIG-B as "not SOE grade".</li>
+</ol>
+<p><strong>Acceptance:</strong> For SOE-grade devices, every corrected offset within <mark>±1 ms</mark> of the test-set time (example project value; the EPMS specification sets the tolerance). PME event log entries present for every transition within 5 s.</p>
+<p>Figure <a class="figref" href="#F24-4">F24-4</a> shows the result of one repeat.</p>
+<h3 id="s24-10-1"><span class="n">24.10.1</span>SOE test record (filled example)</h3>
+<p><strong>Worked example:</strong> SOE test on building B2, 20 kV intake and block A1 devices. Time server: GPS locked, 11 satellites, PTP grandmaster class 6. Test set: GPS synchronised, binary output accuracy 50 µs per certificate.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Device</th>
+<th>Time source</th>
+<th>Debounce (ms)</th>
+<th>Mean corrected offset (ms)</th>
+<th>Maximum absolute offset (ms)</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B2-INC1 ION9000</td>
+<td>PTP</td>
+<td>1</td>
+<td>+0.2</td>
+<td>0.4</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-INC1 Easergy P3</td>
+<td>PTP</td>
+<td>2</td>
+<td>-0.3</td>
+<td>0.6</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-DH3-LVMSB-A1-Q1 MicroLogic X (input/output (IO) module input)</td>
+<td>PTP</td>
+<td>1</td>
+<td>+0.4</td>
+<td>0.7</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-DH3-LVMSB-A1 PM8000</td>
+<td>IRIG-B</td>
+<td>1</td>
+<td>+0.8</td>
+<td>0.9</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-DH3-LVMSB-A1-F07 PM5000</td>
+<td>PME sync</td>
+<td>1</td>
+<td>+412</td>
+<td>438</td>
+<td>not SOE grade</td>
+</tr>
+<tr>
+<td>PME event log</td>
+<td>Network Time Protocol (NTP)</td>
+<td>not applicable</td>
+<td>all 20 transitions present within 1.5 s</td>
+<td></td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>The PM8000 offset of +0.8 ms is inside the tolerance but close to it. The team recorded the IRIG-B cable length (64 m) and the IRIG-B format (B004) on the record so that a later drift can be traced.</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Separate test-set outputs for each device.</strong> The output skew of the test set is added to the result. <mark>Use one contact split to all devices</mark>.</li>
+<li><strong>Debounce not subtracted.</strong> A <mark>10 ms filter</mark> on a relay input makes the relay look 10 ms late.</li>
+<li><strong>Time zone or daylight setting wrong.</strong> A device shows +7 h or -7 h. Set Coordinated Universal Time (UTC) in devices and the offset in the display.</li>
+<li><strong>PTP not passing a switch.</strong> A switch without PTP support in the path adds variable delay. The device reports synchronised but offsets of 1 to 5 ms appear. Check the PTP mode of every switch on the path (chapter 26.13).</li>
+</ol>
+<h2 id="s24-11"><span class="n">24.11</span>Power quality settings and waveform trigger tests</h2>
+<p><strong>Purpose:</strong> Prove that power quality meters capture disturbances at the set thresholds, store the waveform and deliver it to PME with the right classification.</p>
+<p><strong>Trigger:</strong> SOE test passed for the meters involved (the waveform time stamp depends on the clock).</p>
+<p><strong>Owner:</strong> EPMS contractor; CxA witnesses intake and block main meters.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Confirm settings.</strong> Read the sag, swell and transient thresholds, nominal voltage, pre-trigger and post-trigger cycles from the meter; compare with the device configuration record.</li>
+<li><strong>Isolate the voltage inputs.</strong> With the permit in place, open the voltage links of the test block so that the meter voltage inputs are fed only by the test set.</li>
+<li><strong>Inject a sag.</strong> From the test set, apply nominal voltage (239.6 V phase to neutral) for 2 s. Then apply a sag to 80 % (191.7 V) for 100 ms on phase 1, then nominal.</li>
+<li><strong>Inject a deeper sag.</strong> Repeat with 50 % for 150 ms on all three phases.</li>
+<li><strong>Inject a swell.</strong> Apply 115 % (275.5 V) for 200 ms.</li>
+<li><strong>Inject an interruption.</strong> Apply 0 V for 20 ms (one cycle at 50 Hz).</li>
+<li><strong>Check the meter.</strong> Each injection appears in the meter event log with magnitude and duration within the meter specification (for example magnitude ±0.2 % of nominal, duration ±1 cycle).</li>
+<li><strong>Check PME.</strong> Each waveform appears in PME within 15 minutes, with the correct number of pre and post cycles, and the Power Quality Performance Module classifies it against the tolerance curve.</li>
+<li><strong>Restore.</strong> Close the voltage links, check that the meter reads the bus voltages.</li>
+<li><strong>Record.</strong> Fill the waveform test record.</li>
+</ol>
+<p><strong>Acceptance:</strong> Four injected events captured, with magnitudes and durations within the meter specification and waveforms in PME. Classification correct: the 80 %/100 ms sag and the 115 %/200 ms swell inside the Information Technology Industry Council (ITIC) envelope. The 50 %/150 ms sag below the lower line, and the 20 ms interruption on the boundary.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Meter</td>
+<td>PME name</td>
+<td>B2_INC1.ION9000</td>
+</tr>
+<tr>
+<td>Injection</td>
+<td>text</td>
+<td>sag 50 %, 150 ms, three phases</td>
+</tr>
+<tr>
+<td>Meter recorded magnitude</td>
+<td>%</td>
+<td>50.1 %</td>
+</tr>
+<tr>
+<td>Meter recorded duration</td>
+<td>ms</td>
+<td>150</td>
+</tr>
+<tr>
+<td>Waveform in PME</td>
+<td>yes/no, time</td>
+<td>yes, 7 min after injection</td>
+</tr>
+<tr>
+<td>Pre / post cycles seen</td>
+<td>count</td>
+<td>4 / 30</td>
+</tr>
+<tr>
+<td>Classification</td>
+<td>text</td>
+<td>below ITIC lower curve</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass / fail</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Voltage links left open after the test.</strong> The meter reads zero voltage and every power value is zero. The restore step reads the bus voltage before the permit is closed.</li>
+<li><strong>Nominal voltage wrong.</strong> The sag threshold is calculated on the wrong base and the 80 % injection is recorded as 77 %.</li>
+<li><strong>Waveform log full.</strong> The meter overwrites or stops recording. Set the log mode and the upload rate in Management Console.</li>
+</ol>
+<h2 id="s24-12"><span class="n">24.12</span>Report verification and the PUE calculation check</h2>
+<h3 id="s24-12-1"><span class="n">24.12.1</span>Report verification</h3>
+<p>Use the eight steps of chapter 23.11.1 for every report template in the specification.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Report</td>
+<td>text</td>
+<td>Energy usage by hierarchy, building B2</td>
+</tr>
+<tr>
+<td>Interval</td>
+<td>date and time</td>
+<td>2026-11-20 00:00 to 2026-11-21 00:00 UTC+7</td>
+</tr>
+<tr>
+<td>Hierarchy revision</td>
+<td>text</td>
+<td>B2_HIER rev 4</td>
+</tr>
+<tr>
+<td>Expected value (hand calculation)</td>
+<td>number and unit</td>
+<td>864.2 MWh IT energy</td>
+</tr>
+<tr>
+<td>Report value</td>
+<td>number and unit</td>
+<td>864.2 MWh</td>
+</tr>
+<tr>
+<td>Difference</td>
+<td>%</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass / fail</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Attached</td>
+<td>file</td>
+<td>report PDF and spreadsheet</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s24-12-2"><span class="n">24.12.2</span>PUE calculation check</h3>
+<p><strong>Purpose:</strong> Prove that the PUE shown in PME equals the ratio of total facility energy to IT energy defined in the PUE method statement.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Read the method statement.</strong> List the meters for total facility energy and for IT energy, and any meters subtracted (for example office loads excluded by the owner rule).</li>
+<li><strong>Check the hierarchy.</strong> Every meter in the method statement is in the right node of the hierarchy, once.</li>
+<li><strong>Read registers.</strong> For a closed 24 h interval, read the energy increment of each meter from the device logs.</li>
+<li><strong>Calculate.</strong> PUE = Σ facility energy / Σ IT energy, using energies, never averaged 15-minute PUE values.</li>
+<li><strong>Compare.</strong> The PME PUE for the same interval equals the hand value <mark>within 0.005</mark> (three decimal places of PUE).</li>
+<li><strong>Check partial PUE.</strong> Where the dashboard shows mechanical and electrical loss components, check that the components add up to the total.</li>
+</ol>
+<p><strong>Worked example:</strong> PUE check for building B2 on 2026-11-20 during the L4 heat-load test at design load. Intake ION9000 B2-INC1: 527.2 MWh; B2-INC2: 526.8 MWh; total facility 1,054.0 MWh. Twenty-four UPS output meters: sum 863.9 MWh. PUE = 1,054.0 / 863.9 = 1.2200. The PME dashboard shows 1.220 for the day. The average of the 96 fifteen-minute PUE values is 1.2213, which differs from the ratio of totals by 0.0013; <mark>the report uses the ratio of totals</mark>, so the dashboard value is accepted. The design PUE in the case ledger is 1.22.</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>A meter counted twice.</strong> A UPS output meter also included under a hall node gives an IT energy that is too high and a PUE that is too low.</li>
+<li><strong>A meter missing.</strong> A mechanical motor control centre (MCC) meter left out of the facility node has no effect when the intakes are used for facility energy. It does distort the partial PUE.</li>
+<li><strong>Generator energy during a test.</strong> During a generator test the intake meters see less energy; the method statement must say whether generator output is added to facility energy.</li>
+</ol>
+<h2 id="s24-13"><span class="n">24.13</span>Data completeness over 72 hours</h2>
+<p><strong>Purpose:</strong> Prove that PME collects every logged record from every device over a continuous period of normal operation, and that gaps are recovered from device memory.</p>
+<figure class="sheet" id="F24-6"><a href="../data/cx-handbook/figures/F24-6.svg" title="Open drawing F24-6 at full size"><img src="../data/cx-handbook/figures/F24-6.svg" alt="F24-6: 72 h data completeness run: 15-minute energy records received per hour for one building" width="1000" height="870" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F24-6</span> — <b>72 h data completeness run: 15-minute energy records received per hour for one building</b>. Counts per hour as first received (before back-fill), from a SQL query on ION_Data grouped by hour; the dip shows 48 devices behind one switch missing for two hours.</figcaption></figure>
+
+<p><strong>Trigger:</strong> Steps 4 to 11 signed; configuration frozen and its revision recorded.</p>
+<p><strong>Owner:</strong> EPMS contractor runs the test; CxA reviews the data.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Record the start.</strong> Start time, configuration revision, number of devices and expected records per interval.</li>
+<li><strong>Run normal operation for 72 h.</strong> No configuration change. Network maintenance is planned outside the window. A disturbance that is part of normal operation (a switch reboot, a short power event) stays in the record.</li>
+<li><strong>Query the database.</strong> At the end, count records per device per hour in ION_Data with a SQL query or a PME export.</li>
+<li><strong>Find gaps.</strong> List every device-interval with no record.</li>
+<li><strong>Back-fill.</strong> Trigger log upload from devices with onboard logs; repeat the count.</li>
+<li><strong>Calculate.</strong> Completeness = records received / records expected × 100.</li>
+<li><strong>Record.</strong> Fill the data completeness record with the per-hour plot (Figure <a class="figref" href="#F24-6">F24-6</a>) and the list of remaining gaps by device.</li>
+</ol>
+<p><strong>Acceptance:</strong> (example values; the specification governs) <mark>Completeness ≥ 99.5 % after back-fill</mark>; no device with a gap longer than 1 h after back-fill; every gap explained.</p>
+<p><strong>Worked example:</strong> Building B2 with 431 devices logging energy every 15 minutes. Expected records = 431 × 4 × 72 = <mark>124,128</mark>. First count: 123,624 (99.59 %). The gap list showed 48 devices behind access switch B2-ER2-SW03 missing 8 intervals each (384 records). The switch had rebooted after a firmware fault at hour 31. The list also showed 120 single missing intervals spread over 3 hours. After back-fill from device memory, the 384 records were recovered: 124,008 records, 99.90 %. The 120 single misses came from PM5000 meters without onboard logging of that quantity. They were listed in the record and accepted under the 1 h rule, because each was a single 15-minute interval. The switch fault was logged as a network issue (category B) for the network contractor.</p>
+<h2 id="s24-14"><span class="n">24.14</span>Cybersecurity, accounts, backups and restore</h2>
+<p><strong>Purpose:</strong> Prove that the EPMS meets the cybersecurity requirements and can be restored from backup.</p>
+<p><strong>Owner:</strong> EPMS contractor; owner IT and OT security representative witnesses.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Account review.</strong> Export the PME user list. Every account is named, has a role, and no shared administrator account exists. Default accounts are disabled or renamed as the specification states.</li>
+<li><strong>Password policy.</strong> Create a test user with a weak password; PME 2023 and later refuse it under the strong password policy.</li>
+<li><strong>Device passwords.</strong> For a sample of 10 % of devices and all gateways and switches, try the factory default password; it must fail.</li>
+<li><strong>Protocols.</strong> Confirm the devices that use secure ION or secure Modbus with Transport Layer Security (TLS) where supported, as listed in the specification.</li>
+<li><strong>Port scan.</strong> Scan the EPMS virtual local area network (VLAN) from the PME server and from the demilitarised zone (DMZ). Only the ports in the conduit table are open.</li>
+<li><strong>Syslog.</strong> Generate a PME login failure; the security information and event management (SIEM) server receives the syslog message within 60 s.</li>
+<li><strong>Backup.</strong> Run the backup jobs for the four databases and the configuration files; record file names, sizes and locations.</li>
+<li><strong>Restore test.</strong> Restore the backups to a test server (a virtual machine in the DMZ test area). Start PME on the test server isolated from the devices. Check that the device list, hierarchies, reports and a sample of historical data match the production server.</li>
+<li><strong>Timing.</strong> Record the restore time against the recovery time objective (RTO) in the OPR (for example <mark>4 h</mark>).</li>
+<li><strong>Record.</strong> Fill the restore record.</li>
+</ol>
+<p><strong>Acceptance:</strong> No default passwords; only listed ports open; syslog received; restore complete with matching data within the recovery time objective.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backup set</td>
+<td>text</td>
+<td>B2-PME full, 2026-11-24 02:00</td>
+</tr>
+<tr>
+<td>ION_Data size</td>
+<td>GB</td>
+<td>4.6</td>
+</tr>
+<tr>
+<td>ION_Network / ApplicationModules / ION_SystemLog</td>
+<td>MB</td>
+<td>38 / 112 / 410</td>
+</tr>
+<tr>
+<td>Restore start / end</td>
+<td>time</td>
+<td>09:10 / 10:42</td>
+</tr>
+<tr>
+<td>Restore duration</td>
+<td>h</td>
+<td>1.5</td>
+</tr>
+<tr>
+<td>Devices in restored ION_Network</td>
+<td>count</td>
+<td>431</td>
+</tr>
+<tr>
+<td>Sample trend comparison</td>
+<td>text</td>
+<td>10 points, 7 days, identical</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>pass / fail</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s24-15"><span class="n">24.15</span>Integration tests with the BMS and DCIM, and the EPMS role in IST</h2>
+<h3 id="s24-15-1"><span class="n">24.15.1</span>Point-to-point integration test</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Select points.</strong> All critical and high-priority points and a 20 % sample of the rest from the integration points list.</li>
+<li><strong>Change the value at the source.</strong> The electrical contractor operates the breaker under permit, or the EPMS contractor changes the load or injects at the meter.</li>
+<li><strong>Read at the destination.</strong> The BMS or DCIM contractor reads the value and its time and writes both on the integration test record.</li>
+<li><strong>Compare.</strong> Same value within the scaling tolerance (for example ±0.1 % for analogue values) and same units; update within the rate in the interface control document (ICD).</li>
+<li><strong>Test stale data.</strong> Disconnect the gateway or block the Open Platform Communications (OPC) connection; the destination shows the stale or communication-lost state within the time in the ICD.</li>
+<li><strong>Test write protection.</strong> From the BMS or DCIM, try to write to a mapped point. <mark>The write is refused</mark>.</li>
+<li><strong>Record.</strong> Fill the integration test record and reference the ICD (chapter 25).</li>
+</ol>
+<p><strong>Acceptance:</strong> Every tested point correct; stale-data behaviour as written; writes refused.</p>
+<h3 id="s24-15-2"><span class="n">24.15.2</span>Source-stable permissive to the BMS</h3>
+<p>On the MSC-1 design the EPMS provides a "source stable" permissive (point SRC_STABLE) to the BMS after a utility loss and generator transfer. The BMS uses it to restart chilled-water pumps, dry coolers and other mechanical groups in steps.</p>
+<ol>
+<li><strong>TRUE conditions.</strong> The EPMS sets SRC_STABLE TRUE when all of these hold. The source breaker is closed. Voltage and frequency stay inside the band for the hold time (example values: 30 s and 49.5 to 50.5 Hz; the generator and chiller original equipment manufacturer (OEM) limits set the project band). The transfer sequence is complete. No load shed or generator overload is active, and the signal quality is valid.</li>
+<li><strong>FALSE conditions.</strong> Any condition lost, a stale value or loss of the EPMS link gives FALSE at the BMS.</li>
+<li><strong>Test.</strong> The test checks that the point changes to TRUE only after these conditions are met and that the BMS restarts groups in the stated order and intervals. Chapter 25, section 25.7.2 gives the filled test record INT-L4-IF018-B2.</li>
+</ol>
+<h3 id="s24-15-3"><span class="n">24.15.3</span>EPMS role during the integrated systems test</h3>
+<p>During IST (chapter 28) the EPMS is the record of the electrical sequence. Before IST:</p>
+<ol>
+<li><strong>Freeze the configuration.</strong> The EPMS contractor records the configuration revision on the IST scenario record. No changes are made during the IST window.</li>
+<li><strong>Check time sync.</strong> The PME operator reads the time server and the SOE-grade device clocks on the morning of each IST day and records the GPS lock state on the IST scenario record.</li>
+<li><strong>Prepare exports.</strong> The EPMS contractor prepares the event log export and the waveform export templates for each scenario.</li>
+<li><strong>Assign a PME operator.</strong> One person records events and exports after each scenario within 1 h.</li>
+</ol>
+<p>The EPMS event log and waveforms are attached to each IST scenario record as evidence of the transfer times and of the voltage at the critical loads.</p>
+<h2 id="s24-16"><span class="n">24.16</span>Acceptance package and handover</h2>
+<p>The EPMS acceptance certificate is signed when every item below is in the commissioning record set.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Count for building B2 (example)</th>
+<th>Signed by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PME FAT report</td>
+<td>1</td>
+<td>EPMS contractor, CxA</td>
+</tr>
+<tr>
+<td>Device configuration records</td>
+<td>431</td>
+<td>EPMS contractor; CxA sample</td>
+</tr>
+<tr>
+<td>Phasor records</td>
+<td>67 (2 intakes, 17 generators, 24 block mains, 24 UPS) plus feeders</td>
+<td>EPMS contractor; CxA</td>
+</tr>
+<tr>
+<td>Communication records</td>
+<td>1 per switchboard</td>
+<td>EPMS contractor</td>
+</tr>
+<tr>
+<td>Meter verification sheets</td>
+<td>67 plus feeder sample</td>
+<td>EPMS contractor; CxA</td>
+</tr>
+<tr>
+<td>Point-to-point sheets for breakers</td>
+<td>1 per switchboard</td>
+<td>electrical contractor; EPMS contractor</td>
+</tr>
+<tr>
+<td>Alarm test records and flood record</td>
+<td>1 per alarm list section</td>
+<td>EPMS contractor; CxA</td>
+</tr>
+<tr>
+<td>SOE test record</td>
+<td>1 per building</td>
+<td>EPMS contractor; CxA</td>
+</tr>
+<tr>
+<td>Waveform test records</td>
+<td>1 per PQ meter</td>
+<td>EPMS contractor</td>
+</tr>
+<tr>
+<td>Report check sheets and PUE check</td>
+<td>1 per report template</td>
+<td>EPMS contractor; CxA</td>
+</tr>
+<tr>
+<td>Data completeness record</td>
+<td>1</td>
+<td>EPMS contractor; CxA</td>
+</tr>
+<tr>
+<td>Restore record and security checklist</td>
+<td>1</td>
+<td>EPMS contractor; owner security</td>
+</tr>
+<tr>
+<td>Integration test records</td>
+<td>1 per ICD</td>
+<td>EPMS and BMS or DCIM contractors</td>
+</tr>
+<tr>
+<td>As-built documents</td>
+<td>meter schedule, points list, network drawings, licence certificate</td>
+<td>EPMS contractor</td>
+</tr>
+<tr>
+<td>Training record</td>
+<td>operators and engineers</td>
+<td>EPMS contractor, owner</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Assemble.</strong> The EPMS contractor compiles the package within 5 working days after the last test.</li>
+<li><strong>Review.</strong> The CxA reviews within 5 working days and returns comments.</li>
+<li><strong>Close issues.</strong> All category A and B issues closed; category C issues listed with dates.</li>
+<li><strong>Sign.</strong> The commissioning manager signs the EPMS acceptance certificate; the data-centre operations (DCOps) lead countersigns.</li>
+</ol>
+<h2 id="s24-17"><span class="n">24.17</span>Common errors across the EPMS commissioning</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Symptom</th>
+<th>How to detect before the witness test</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CT ratio wrong in the meter</td>
+<td>values off by a fixed ratio</td>
+<td>compare CT setting with the nameplate photograph for every device</td>
+<td>correct the setting, re-verify</td>
+</tr>
+<tr>
+<td>CT reversed</td>
+<td>one phase power negative</td>
+<td>phasor screen during 24.4</td>
+<td>swap S1 and S2 with the CT shorted</td>
+</tr>
+<tr>
+<td>CT on the wrong phase</td>
+<td>angles 120° off</td>
+<td>phasor screen</td>
+<td>re-terminate</td>
+</tr>
+<tr>
+<td>Wrong wiring mode</td>
+<td>wrong power, odd power factor</td>
+<td>configuration record check</td>
+<td>correct mode</td>
+</tr>
+<tr>
+<td>Duplicate Modbus address</td>
+<td>intermittent bad values</td>
+<td>read address at each front panel</td>
+<td>readdress</td>
+</tr>
+<tr>
+<td>Missing RS-485 terminator</td>
+<td>errors at the end of the line</td>
+<td>communication error count</td>
+<td>fit terminator at line ends</td>
+</tr>
+<tr>
+<td>Two time sources</td>
+<td>clock jumps in the event log</td>
+<td>read the clock source on each device</td>
+<td>disable PME sync on PTP or IRIG-B devices</td>
+</tr>
+<tr>
+<td>Device in local time</td>
+<td>7 h offset</td>
+<td>compare device clock with the time server</td>
+<td>set UTC in the device</td>
+</tr>
+<tr>
+<td>Template copied between boards</td>
+<td>settings of another board</td>
+<td>compare each record with the meter schedule</td>
+<td>apply the correct template</td>
+</tr>
+<tr>
+<td>Hierarchy error</td>
+<td>report totals wrong</td>
+<td>hand calculation before the report test</td>
+<td>correct hierarchy, re-run</td>
+</tr>
+<tr>
+<td>Virtual Processor changed after testing</td>
+<td>report values change</td>
+<td>framework revision on the report check sheet</td>
+<td>re-test reports</td>
+</tr>
+<tr>
+<td>Default passwords</td>
+<td>security finding</td>
+<td>sample password check</td>
+<td>change and record in the vault</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s24-18"><span class="n">24.18</span>Checklist for site use</h2>
+<ol>
+<li><strong>Scripts approved.</strong> All EPMS test scripts approved by the CxA <mark>10 working days</mark> before the first test.</li>
+<li><strong>Instruments calibrated.</strong> Reference analyser and test set certificates within 12 months, copies attached to the records.</li>
+<li><strong>Permits.</strong> Permit to work and energised work assessment in place for each switchboard test.</li>
+<li><strong>Configuration.</strong> Device configuration record filled and checked against the nameplate for every device.</li>
+<li><strong>Phasors.</strong> Phase sequence positive; currents within ±30° of their voltages; all phase powers positive for loads.</li>
+<li><strong>Communications.</strong> All devices connected; poll cycle within design; no repeated errors in 1 h.</li>
+<li><strong>Values.</strong> Meter verification sheet inside tolerance at every load point.</li>
+<li><strong>Energy.</strong> Register increment within tolerance; PME log equal to the meter increment.</li>
+<li><strong>Breakers.</strong> Status, racked position, trip cause and settings correct for every breaker.</li>
+<li><strong>Alarms.</strong> Every alarm fired, notified and cleared; flood test inside the OPR rule.</li>
+<li><strong>SOE.</strong> All SOE-grade devices within ±1 ms; others marked "not SOE grade".</li>
+<li><strong>Waveforms.</strong> Four injected events captured and classified per PQ meter.</li>
+<li><strong>Reports and PUE.</strong> Every report equal to the hand calculation; PUE from the ratio of totals.</li>
+<li><strong>72 h run.</strong> Completeness at or above 99.5 % after back-fill; no gap above 1 h.</li>
+<li><strong>Security and restore.</strong> No default passwords; only listed ports open; restore within the RTO.</li>
+<li><strong>Integration.</strong> BMS and DCIM points correct; stale data shown; writes refused.</li>
+<li><strong>Acceptance.</strong> Package complete; issues A and B closed; certificate signed.</li>
+</ol>
+<h2 id="s24-19"><span class="n">24.19</span>Sources</h2>
+<ol>
+<li>ASHRAE Guideline 0-2019, The Commissioning Process, ASHRAE, 2019. <a href="https://www.ashrae.org/technical-resources/standards-and-guidelines" rel="noopener">https://www.ashrae.org/technical-resources/standards-and-guidelines</a></li>
+<li>ANSI/NETA ATS-2025, Standard for Acceptance Testing Specifications for Electrical Power Equipment and Systems, InterNational Electrical Testing Association, 2025 (the project specification names the edition that applies). <a href="https://www.netaworld.org/standards/ansi-neta-ats" rel="noopener">https://www.netaworld.org/standards/ansi-neta-ats</a></li>
+<li>IEC 62053-22:2020, Electricity metering equipment, Particular requirements, Static meters for AC active energy (classes 0.1 S, 0.2 S and 0.5 S), IEC. <a href="https://webstore.iec.ch/en/publication/62001" rel="noopener">https://webstore.iec.ch/en/publication/62001</a></li>
+<li>IEC 61869-2:2012, Instrument transformers, Additional requirements for current transformers, IEC. <a href="https://webstore.iec.ch/en/publication/6050" rel="noopener">https://webstore.iec.ch/en/publication/6050</a></li>
+<li>IEC 61000-4-30:2025 Edition 4.0, Power quality measurement methods, preview, accessed 31 October 2026. <a href="https://www.vde-verlag.de/iec-normen/preview-pdf/info_iec61000-4-30{ed4.0}b.pdf" rel="noopener">https://www.vde-verlag.de/iec-normen/preview-pdf/info_iec61000-4-30{ed4.0}b.pdf</a></li>
+<li>Schneider Electric, "Enabling time synchronization", PME 2023 online help, accessed 31 October 2026. <a href="https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2023/content/4_configuring/modules/pq_performance/configure_the_monitoring_devices/enable_time_synchronization.htm" rel="noopener">https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2023/content/4_configuring/modules/pq_performance/configure_the_monitoring_devices/enable_time_synchronization.htm</a></li>
+<li>Schneider Electric, "PME Windows services", PME 2024 online help, accessed 31 October 2026. <a href="https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2024/content/8_reference/planning/ref_pmewindowsservices.htm" rel="noopener">https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2024/content/8_reference/planning/ref_pmewindowsservices.htm</a></li>
+<li>Schneider Electric, "What's new in Power Monitoring Expert 2023", accessed 31 October 2026. <a href="https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2023/content/1_overview/whatsnew.htm" rel="noopener">https://product-help.schneider-electric.com/EcoStruxure/Power-Monitoring-Expert-2023/content/1_overview/whatsnew.htm</a></li>
+<li>Schneider Electric, "PME Databases", PME online help, accessed 31 October 2026. <a href="https://product-help.schneider-electric.com/EcoStruxure-Power-Monitoring-Expert/content/8_reference/planning/ref_pmedatabases.htm" rel="noopener">https://product-help.schneider-electric.com/EcoStruxure-Power-Monitoring-Expert/content/8_reference/planning/ref_pmedatabases.htm</a></li>
+<li>Schneider Electric, PowerLogic PM8000 series brochure, accessed 31 October 2026. <a href="https://iportal2.schneider-electric.com/Contents/docs/SQD-POWERLOGIC%20PM%208000%20SERIES.PDF" rel="noopener">https://iportal2.schneider-electric.com/Contents/docs/SQD-POWERLOGIC%20PM%208000%20SERIES.PDF</a></li>
+<li>Schneider Electric, PowerLogic ION9000 datasheet, accessed 31 October 2026. <a href="https://docs.rs-online.com/fe93/A700000014386176.pdf" rel="noopener">https://docs.rs-online.com/fe93/A700000014386176.pdf</a></li>
+<li>Schneider Electric Community, "PM5560 starting current and accuracy", accessed 31 October 2026. <a href="https://community.se.com/t5/Metering-Power-Quality/PM5560-Starting-Current-and-Accuracy-of-PM5560/m-p/443395" rel="noopener">https://community.se.com/t5/Metering-Power-Quality/PM5560-Starting-Current-and-Accuracy-of-PM5560/m-p/443395</a></li>
+<li>Schneider Electric Community, "1PPS time synchronization signal for ION9000", accessed 31 October 2026. <a href="https://community.se.com/t5/Metering-Power-Quality/1PPS-time-synchronization-signal-for-ION9000/td-p/409568" rel="noopener">https://community.se.com/t5/Metering-Power-Quality/1PPS-time-synchronization-signal-for-ION9000/td-p/409568</a></li>
+<li>Schneider Electric, MasterPact MTZ Modbus Communication Guide, accessed 31 October 2026. <a href="https://www.productinfo.schneider-electric.com/mtzmodbuscommguide/" rel="noopener">https://www.productinfo.schneider-electric.com/mtzmodbuscommguide/</a></li>
+<li>Information Technology Industry Council, ITI (CBEMA) Curve Application Note (reproduced), accessed 31 October 2026. <a href="https://powerquality.blog/2022/02/04/iti-cbema-curve-application-note/" rel="noopener">https://powerquality.blog/2022/02/04/iti-cbema-curve-application-note/</a></li>
+<li>IEEE 1588-2019, Precision Clock Synchronization Protocol, IEEE. <a href="https://standards.ieee.org/ieee/1588/6825/" rel="noopener">https://standards.ieee.org/ieee/1588/6825/</a></li>
+<li>IEC 62443-3-3:2013, System security requirements and security levels, IEC. <a href="https://webstore.iec.ch/en/publication/7033" rel="noopener">https://webstore.iec.ch/en/publication/7033</a></li>
+<li>MSC-1 case ledger, <code>../case_ledger.json</code>, Data Centre Commissioning Field Manual R01 working files, October 2026.</li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="23-epms-pme-architecture.html"><span>Previous · 23</span><span class="t">EPMS and Schneider EcoStruxure Power Monitoring Expert (PME)</span></a><a class="next" href="25-integration-points.html"><span>Next · 25</span><span class="t">Integration points</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>25 Integration points | Cx Field Manual R01</title>
+<meta name="description" content="This chapter describes how the interfaces between systems on a hyperscale data-centre campus are listed, specified, handed over and tested.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/25-integration-points.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/25-integration-points.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/25-integration-points.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/25-integration-points.html">
+<meta property="og:title" content="25 Integration points | Cx Field Manual R01">
+<meta property="og:description" content="This chapter describes how the interfaces between systems on a hyperscale data-centre campus are listed, specified, handed over and tested.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="25 Integration points | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter describes how the interfaces between systems on a hyperscale data-centre campus are listed, specified, handed over and tested.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"25 Integration points: master interface list, interface control documents and integration testing","name":"Integration points: master interface list, interface control documents and integration testing","description":"This chapter describes how the interfaces between systems on a hyperscale data-centre campus are listed, specified, handed over and tested.","url":"https://resistancezero.com/cx-handbook/25-integration-points.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/25-integration-points.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":9497,"position":25,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"25 Integration points","item":"https://resistancezero.com/cx-handbook/25-integration-points.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part E · Controls, monitoring, integration and networks</p>
+    <h1><span class="num">25</span>Integration points: master interface list, interface control documents and integration testing</h1>
+    <p class="lede">This chapter describes how the interfaces between systems on a hyperscale data-centre campus are listed, specified, handed over and tested.</p>
+    <p class="basis">Chapter 25 of 32 · 14 sections · 10 figures · 9,497 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 25</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 25</summary>
+<ol><li><a href="#s25-0"><span class="n">25.0</span>Scope of this chapter</a></li><li><a href="#s25-1"><span class="n">25.1</span>Interface types and ownership boundaries</a><ol><li><a href="#s25-1-1"><span class="n">25.1.1</span>Three types of interface</a></li><li><a href="#s25-1-2"><span class="n">25.1.2</span>The ownership boundary</a></li></ol></li><li><a href="#s25-2"><span class="n">25.2</span>The master interface list</a><ol><li><a href="#s25-2-1"><span class="n">25.2.1</span>Purpose and owner</a></li><li><a href="#s25-2-2"><span class="n">25.2.2</span>MIL fields</a></li><li><a href="#s25-2-3"><span class="n">25.2.3</span>Master interface list for the MSC-1 campus, part 1: systems, protocols and data</a></li><li><a href="#s25-2-4"><span class="n">25.2.4</span>Master interface list, part 2: owners, ICD references and tests</a></li><li><a href="#s25-2-5"><span class="n">25.2.5</span>Using the MIL</a></li></ol></li><li><a href="#s25-3"><span class="n">25.3</span>Interface control document contents</a><ol><li><a href="#s25-3-1"><span class="n">25.3.1</span>Sections of an ICD</a></li><li><a href="#s25-3-2"><span class="n">25.3.2</span>Worked example: ICD-25-021 extract, CDU to BMS</a></li><li><a href="#s25-3-3"><span class="n">25.3.3</span>ICD review steps</a></li></ol></li><li><a href="#s25-4"><span class="n">25.4</span>Modbus and BACnet map handover</a><ol><li><a href="#s25-4-1"><span class="n">25.4.1</span>What the OEM hands over</a></li><li><a href="#s25-4-2"><span class="n">25.4.2</span>Map handover record fields</a></li><li><a href="#s25-4-3"><span class="n">25.4.3</span>Freezing a map</a></li></ol></li><li><a href="#s25-5"><span class="n">25.5</span>Integration responsibility matrix</a><ol><li><a href="#s25-5-1"><span class="n">25.5.1</span>Matrix by step</a></li><li><a href="#s25-5-2"><span class="n">25.5.2</span>Roles named in the matrix</a></li></ol></li><li><a href="#s25-6"><span class="n">25.6</span>Integration test levels</a><ol><li><a href="#s25-6-1"><span class="n">25.6.1</span>Definitions</a></li><li><a href="#s25-6-2"><span class="n">25.6.2</span>Coverage rules</a></li></ol></li><li><a href="#s25-7"><span class="n">25.7</span>Integration test procedure and record</a><ol><li><a href="#s25-7-1"><span class="n">25.7.1</span>Test steps</a></li><li><a href="#s25-7-2"><span class="n">25.7.2</span>Worked example: filled integration test record, IF-018 EPMS to BMS source stable</a></li></ol></li><li><a href="#s25-8"><span class="n">25.8</span>Data latency budget</a><ol><li><a href="#s25-8-1"><span class="n">25.8.1</span>Method</a></li><li><a href="#s25-8-2"><span class="n">25.8.2</span>Worked example: CDU leak tray alarm to the campus operations centre</a></li><li><a href="#s25-8-3"><span class="n">25.8.3</span>Worked example: effect of a failed device on a shared Modbus port</a></li><li><a href="#s25-8-4"><span class="n">25.8.4</span>Latency limits used in the MSC-1 example</a></li></ol></li><li><a href="#s25-9"><span class="n">25.9</span>Common integration failures and how to detect them before the witness test</a><ol><li><a href="#s25-9-1"><span class="n">25.9.1</span>Failure cases from published sources</a></li><li><a href="#s25-9-2"><span class="n">25.9.2</span>Checks by system family before the witness test</a></li></ol></li><li><a href="#s25-10"><span class="n">25.10</span>Hardwired interface testing</a><ol><li><a href="#s25-10-1"><span class="n">25.10.1</span>Hardwired interface test steps</a></li><li><a href="#s25-10-2"><span class="n">25.10.2</span>Hardwired interface record fields</a></li></ol></li><li><a href="#s25-11"><span class="n">25.11</span>Change control for interfaces, maps and firmware</a><ol><li><a href="#s25-11-1"><span class="n">25.11.1</span>Rules</a></li><li><a href="#s25-11-2"><span class="n">25.11.2</span>Change request record fields</a></li></ol></li><li><a href="#s25-12"><span class="n">25.12</span>Checklist for site use</a></li><li><a href="#s25-13"><span class="n">25.13</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="24-epms-pme-commissioning.html"><span>Previous</span>24 EPMS and PME commissioning procedure</a><a href="26-ot-network-fibre-copper.html"><span>Next</span>26 OT network, fibre optic and copper cabling</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s25-0"><span class="n">25.0</span>Scope of this chapter</h2>
+<p>This chapter describes how the interfaces between systems on a hyperscale data-centre campus are listed, specified, handed over and tested. An interface is any place where one system sends a signal, a value or a command to another system that a different contractor or original equipment manufacturer (OEM) supplies. An example is a coolant distribution unit that sends data to the building management system (BMS) or the electrical power monitoring system (EPMS).</p>
+<ol>
+<li><strong>Interface types.</strong> The chapter defines hardwired, protocol and application interfaces and the ownership boundary of each.</li>
+<li><strong>Master interface list.</strong> It gives the field definitions and a master interface list with 66 rows for the MSC-1 campus. The electrical rows cover the uninterruptible power supply (UPS), generator controllers, automatic transfer switches (ATS) and static transfer switches (STS), medium-voltage (MV) and low-voltage (LV) protection and trip units, power distribution units (PDU) and remote power panels (RPP). The mechanical rows cover coolant distribution units (CDU), computer room air handlers (CRAH), chillers, pumps and variable frequency drives (VFD), dry coolers and leak detection. The fire and security rows cover fire alarm, very early smoke detection apparatus (VESDA), clean agent, emergency power-off (EPO), access control and closed-circuit television (CCTV). The software rows cover data centre infrastructure management (DCIM) and the computerised maintenance management system (CMMS). The site rows cover the supervisory control and data acquisition (SCADA) interface of PLN (Perusahaan Listrik Negara, the Indonesian state electricity company), battery energy storage system (BESS), fuel system, water treatment, lighting, lifts, weather station and time servers.</li>
+<li><strong>Interface control documents.</strong> It gives the content of an interface control document (ICD) with a filled example, and the rules for handing over Modbus and BACnet maps.</li>
+<li><strong>Responsibility matrix.</strong> It gives the integration responsibility matrix by role and by step.</li>
+<li><strong>Integration testing.</strong> It defines three test levels (data, function, scenario), gives the test steps and a filled test record, and a data latency budget with a worked example.</li>
+<li><strong>Common integration failures.</strong> It lists the failures seen on data-centre projects: word order, scaling, polling rates, duplicate identifiers, stale data and firmware changes. For each one it gives the check that detects it before the witness test.</li>
+<li><strong>Documents and standards used.</strong> ANSI/ASHRAE 135-2024 (BACnet), the Modbus Application Protocol Specification V1.1b3 and the Modbus over Serial Line Specification V1.02. Also the Internet Assigned Numbers Authority (IANA) port registry, the Amazon Web Services (AWS) Tokyo event summary of 2019 and the Uptime Institute Annual Outage Analysis 2024. The chapter also uses chapters 20, 21, 22, 23, 24, 26 and 28 of this manual.</li>
+</ol>
+<h2 id="s25-1"><span class="n">25.1</span>Interface types and ownership boundaries</h2>
+<h3 id="s25-1-1"><span class="n">25.1.1</span>Three types of interface</h3>
+<p>Every interface is one of three types, set by what crosses the boundary. Figure <a class="figref" href="#F25-9">F25-9</a> shows how to classify an interface, where the boundary sits for each type and what the interface test must prove.</p>
+<figure class="sheet" id="F25-9"><a href="../data/cx-handbook/figures/F25-9.svg" title="Open drawing F25-9 at full size"><img src="../data/cx-handbook/figures/F25-9.svg" alt="F25-9: Classify each interface by what crosses the boundary: hardwired, protocol, application" width="1000" height="888" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F25-9</span> — <b>Classify each interface by what crosses the boundary: hardwired, protocol, application</b>. The type decides where the boundary sits and what the interface test must prove; the master interface list records the type for every row.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>What crosses the boundary</th>
+<th>Example on the campus</th>
+<th>What the test proves</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hardwired</td>
+<td>A voltage, current or contact state on a cable</td>
+<td>Fire alarm relay to CRAH fan stop circuit; EPO station to UPS trip input</td>
+<td>The contact operates the receiving circuit; the wire is on the correct terminal</td>
+</tr>
+<tr>
+<td>Protocol</td>
+<td>Values and commands in a communication protocol</td>
+<td>CDU to BMS on Modbus Transmission Control Protocol (TCP); CRAH to BMS on BACnet/IP; UPS to DCIM on Simple Network Management Protocol (SNMP)</td>
+<td>Each mapped value arrives with the correct scaling, units, quality and timing</td>
+</tr>
+<tr>
+<td>Application</td>
+<td>Records exchanged between software applications by an application programming interface (API), file transfer or database link</td>
+<td>BMS alarms to CMMS work orders; DCIM asset records to CMMS</td>
+<td>Each record type is created, updated and closed in the receiving application</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-1-2"><span class="n">25.1.2</span>The ownership boundary</h3>
+<p>Each interface has two sides. Each side has one owner. The boundary is a physical point (a terminal, a switch port) or a logical point (a register map, an API endpoint). The ICD states the boundary.</p>
+<ol>
+<li><strong>Hardwired boundary.</strong> The boundary is <mark>the terminal in the receiving panel</mark>. The sending contractor provides the contact and the cable to the terminal, unless the ICD says otherwise. The receiving contractor provides the terminal and the logic behind it.</li>
+<li><strong>Protocol boundary.</strong> The boundary is the network port of the device that serves the data (the Modbus server, the BACnet device). The OEM of that device provides the map and the configuration of its communication card. The client contractor (the BMS or EPMS integrator) provides the polling configuration, the mapping into its database and the graphics.</li>
+<li><strong>Network boundary.</strong> The network contractor provides the switch port, the virtual local area network (VLAN), the Internet Protocol (IP) address allocation and the firewall rules (chapter 26). The ICD lists the network details.</li>
+<li><strong>Application boundary.</strong> The boundary is the API endpoint. The owner of the receiving application publishes the API specification. The sending application owner builds the client.</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>No owner for the gateway.</strong> A Modbus-to-BACnet gateway between a CDU and the BMS is supplied by the CDU OEM and configured by the BMS contractor. When it fails, each party says the gateway belongs to the other. The ICD names <mark>one owner for the gateway hardware</mark> and one for its configuration.</li>
+<li><strong>Relay contacts with no rating stated.</strong> A fire alarm relay rated 1 A at 30 V direct current (DC) wired into a 230 V alternating current (AC) fan contactor circuit fails. The ICD states voltage, current and contact type on both sides.</li>
+</ol>
+<h2 id="s25-2"><span class="n">25.2</span>The master interface list</h2>
+
+<figure class="sheet" id="F25-1"><a href="../data/cx-handbook/figures/F25-1.svg" title="Open drawing F25-1 at full size"><img src="../data/cx-handbook/figures/F25-1.svg" alt="F25-1: Integration map of the MSC-1 campus: which system sends data to which" width="1400" height="1079" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F25-1</span> — <b>Integration map of the MSC-1 campus: which system sends data to which</b>. Solid lines are protocol interfaces, dashed lines are hardwired or read-only interfaces. Each line on this map is one or more rows in the master interface list with its own ICD.</figcaption></figure>
+<h3 id="s25-2-1"><span class="n">25.2.1</span>Purpose and owner</h3>
+<p><strong>Purpose:</strong> The master interface list (MIL) is the register of every interface on the campus. It assigns each interface an identifier, an ICD, an owner on each side, a test level and a test method. It is the input for the integration test plan and for the integrated systems test (IST) scripts in chapter 28.</p>
+<p><strong>Owner:</strong> The commissioning manager owns the MIL. The engineers of record for electrical, mechanical, fire and controls review it. Each contractor confirms its rows.</p>
+<p><strong>Trigger:</strong> First issue at the end of design development. It is updated at every submittal approval that adds or changes an interface, and frozen before the start of Level 4 (L4) testing.</p>
+<h3 id="s25-2-2"><span class="n">25.2.2</span>MIL fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Interface ID</td>
+<td>Text, IF-nnn</td>
+<td>IF-021</td>
+</tr>
+<tr>
+<td>System A (sender of the main data)</td>
+<td>Text</td>
+<td>CDU (16 per hall)</td>
+</tr>
+<tr>
+<td>System B (receiver)</td>
+<td>Text</td>
+<td>BMS</td>
+</tr>
+<tr>
+<td>Protocol and physical medium</td>
+<td>Text</td>
+<td>Modbus TCP over operational technology (OT) Ethernet (copper to hall switch)</td>
+</tr>
+<tr>
+<td>Direction</td>
+<td>Choice: A→B, B→A, A↔B</td>
+<td>A↔B (status read, enable written)</td>
+</tr>
+<tr>
+<td>Data items</td>
+<td>Integer per instance</td>
+<td>30 per CDU</td>
+</tr>
+<tr>
+<td>Owner, side A</td>
+<td>Role</td>
+<td>CDU OEM</td>
+</tr>
+<tr>
+<td>Owner, side B</td>
+<td>Role</td>
+<td>BMS controls contractor</td>
+</tr>
+<tr>
+<td>ICD reference</td>
+<td>Text</td>
+<td>ICD-25-021 rev B</td>
+</tr>
+<tr>
+<td>Test level</td>
+<td>Choice: L3 data, L4 function, L5 scenario</td>
+<td>L3, L4, L5</td>
+</tr>
+<tr>
+<td>Test method</td>
+<td>Text</td>
+<td>point-to-point (P2P) test of all 30 points against CDU display; pump failover; IST CDU loss</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>Choice</td>
+<td>ICD approved / map frozen / L3 passed / L4 passed / L5 passed</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-2-3"><span class="n">25.2.3</span>Master interface list for the MSC-1 campus, part 1: systems, protocols and data</h3>
+<p>The data item counts are per instance of system A unless the row says otherwise. They are the MSC-1 worked-example estimates; the approved ICD gives the actual count.</p>
+<figure class="sheet" id="F25-10"><a href="../data/cx-handbook/figures/F25-10.svg" title="Open drawing F25-10 at full size"><img src="../data/cx-handbook/figures/F25-10.svg" alt="F25-10: Master interface list: the fields and one filled row traced to its ICD" width="1000" height="727" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F25-10</span> — <b>Master interface list: the fields and one filled row traced to its ICD</b>. The left column is the MIL field (25.2.2); the middle column is the IF-021 value; the right column is the ICD-25-021 section that holds the detail behind it.</figcaption></figure>
+
+<p>Figure <a class="figref" href="#F25-10">F25-10</a> shows the twelve MIL fields filled for row IF-021 and the ICD-25-021 section that holds the detail behind each field.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>System A</th>
+<th>System B</th>
+<th>Protocol and medium</th>
+<th>Direction</th>
+<th>Data items</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IF-001</td>
+<td>UPS system (each 2.5 MW block)</td>
+<td>EPMS</td>
+<td>Modbus TCP, OT Ethernet</td>
+<td>A→B</td>
+<td>120</td>
+</tr>
+<tr>
+<td>IF-002</td>
+<td>UPS system</td>
+<td>BMS</td>
+<td>Hardwired dry contacts</td>
+<td>A→B</td>
+<td>4 (on battery, on bypass, common alarm, summary fault)</td>
+</tr>
+<tr>
+<td>IF-003</td>
+<td>UPS network card</td>
+<td>DCIM</td>
+<td>SNMP version 3, OT Ethernet</td>
+<td>A→B</td>
+<td>80</td>
+</tr>
+<tr>
+<td>IF-004</td>
+<td>Generator controller (17 per building)</td>
+<td>EPMS</td>
+<td>Modbus TCP, OT Ethernet</td>
+<td>A→B</td>
+<td>150</td>
+</tr>
+<tr>
+<td>IF-005</td>
+<td>Generator controller</td>
+<td>BMS</td>
+<td>Hardwired contacts</td>
+<td>A→B</td>
+<td>4 (running, fail to start, common alarm, in auto)</td>
+</tr>
+<tr>
+<td>IF-006</td>
+<td>Generator paralleling switchgear programmable logic controller (PLC)</td>
+<td>EPMS</td>
+<td>Modbus TCP, OT Ethernet</td>
+<td>A→B</td>
+<td>200</td>
+</tr>
+<tr>
+<td>IF-007</td>
+<td>Generator controller</td>
+<td>Generator room ventilation (BMS)</td>
+<td>Hardwired contact</td>
+<td>A→B</td>
+<td>1 (run signal starts ventilation)</td>
+</tr>
+<tr>
+<td>IF-008</td>
+<td>Fuel system PLC</td>
+<td>BMS</td>
+<td>Modbus TCP, OT Ethernet</td>
+<td>A↔B</td>
+<td>60</td>
+</tr>
+<tr>
+<td>IF-009</td>
+<td>Fuel system day tank level</td>
+<td>Generator controller</td>
+<td>Hardwired 4–20 mA and contacts</td>
+<td>A→B</td>
+<td>3 (level, low, high)</td>
+</tr>
+<tr>
+<td>IF-010</td>
+<td>Fuel system PLC</td>
+<td>EPMS</td>
+<td>Modbus TCP</td>
+<td>A→B</td>
+<td>20</td>
+</tr>
+<tr>
+<td>IF-011</td>
+<td>ATS (each)</td>
+<td>EPMS</td>
+<td>Modbus TCP via gateway, RS-485 to gateway</td>
+<td>A→B</td>
+<td>30</td>
+</tr>
+<tr>
+<td>IF-012</td>
+<td>STS (each)</td>
+<td>EPMS</td>
+<td>Modbus TCP</td>
+<td>A→B</td>
+<td>40</td>
+</tr>
+<tr>
+<td>IF-013</td>
+<td>MV protection relays (20 kV)</td>
+<td>EPMS</td>
+<td>IEC 61850 manufacturing message specification (MMS) or Modbus TCP (as relay model)</td>
+<td>A→B</td>
+<td>50 per relay</td>
+</tr>
+<tr>
+<td>IF-014</td>
+<td>MV protection relays</td>
+<td>Substation automation and interlocks</td>
+<td>IEC 61850 generic object-oriented substation event (GOOSE) or hardwired</td>
+<td>A↔B</td>
+<td>10 per relay</td>
+</tr>
+<tr>
+<td>IF-015</td>
+<td>LV breaker trip units</td>
+<td>EPMS</td>
+<td>Modbus remote terminal unit (RTU) protocol to gateway, Modbus TCP to EPMS</td>
+<td>A→B</td>
+<td>40 per breaker</td>
+</tr>
+<tr>
+<td>IF-016</td>
+<td>Floor PDUs and RPPs</td>
+<td>EPMS</td>
+<td>Modbus TCP</td>
+<td>A→B</td>
+<td>80</td>
+</tr>
+<tr>
+<td>IF-017</td>
+<td>Rack PDUs (1,200 racks on campus)</td>
+<td>DCIM</td>
+<td>SNMP version 3</td>
+<td>A→B</td>
+<td>50 per PDU</td>
+</tr>
+<tr>
+<td>IF-018</td>
+<td>EPMS</td>
+<td>BMS</td>
+<td>BACnet/IP and one hardwired backup contact</td>
+<td>A→B</td>
+<td>6 (source stable per bus, utility available)</td>
+</tr>
+<tr>
+<td>IF-019</td>
+<td>EPMS</td>
+<td>DCIM</td>
+<td>Vendor web service or Open Platform Communications Unified Architecture (OPC UA) (Data Exchange Module OPC UA server licence as listed in the release notes and licence schedule of the delivered Power Monitoring Expert (PME) version)</td>
+<td>A→B</td>
+<td>2,000 per building</td>
+</tr>
+<tr>
+<td>IF-020</td>
+<td>BESS controller (2 × 10 MWh)</td>
+<td>EPMS</td>
+<td>Modbus TCP</td>
+<td>A→B</td>
+<td>100</td>
+</tr>
+<tr>
+<td>IF-021</td>
+<td>CDU (16 per hall)</td>
+<td>BMS</td>
+<td>Modbus TCP, OT Ethernet</td>
+<td>A↔B</td>
+<td>30</td>
+</tr>
+<tr>
+<td>IF-022</td>
+<td>BESS container systems (heating, ventilation and air conditioning (HVAC), fire, gas detection)</td>
+<td>BMS</td>
+<td>Modbus TCP</td>
+<td>A→B</td>
+<td>30</td>
+</tr>
+<tr>
+<td>IF-023</td>
+<td>PLN SCADA</td>
+<td>150 kV substation remote terminal unit (RTU)</td>
+<td>IEC 60870-5-104 or Distributed Network Protocol 3 (DNP3) as the PLN connection agreement states</td>
+<td>A↔B</td>
+<td>40 (example; the point list annex of the PLN connection agreement sets the count)</td>
+</tr>
+<tr>
+<td>IF-024</td>
+<td>150 kV substation RTU</td>
+<td>EPMS</td>
+<td>Modbus TCP or IEC 60870-5-104</td>
+<td>A→B</td>
+<td>50</td>
+</tr>
+<tr>
+<td>IF-025</td>
+<td>CDU zone controller</td>
+<td>CDUs of the zone</td>
+<td>BACnet/IP</td>
+<td>A↔B</td>
+<td>10 per CDU (lead, lag, enable, duty)</td>
+</tr>
+<tr>
+<td>IF-026</td>
+<td>Leak detection (CDU tray)</td>
+<td>CDU controller</td>
+<td>Hardwired contact</td>
+<td>A→B</td>
+<td>1</td>
+</tr>
+<tr>
+<td>IF-027</td>
+<td>CRAH (13 per hall)</td>
+<td>BMS</td>
+<td>BACnet/IP</td>
+<td>A↔B</td>
+<td>40</td>
+</tr>
+<tr>
+<td>IF-028</td>
+<td>Rack-row sensors (50 per hall)</td>
+<td>BMS</td>
+<td>BACnet master-slave/token-passing (MS/TP)</td>
+<td>A→B</td>
+<td>4</td>
+</tr>
+<tr>
+<td>IF-029</td>
+<td>BMS (hall inlet temperatures)</td>
+<td>CRAH</td>
+<td>BACnet/IP</td>
+<td>A→B</td>
+<td>2 per CRAH (average inlet, maximum inlet)</td>
+</tr>
+<tr>
+<td>IF-030</td>
+<td>Trim chillers</td>
+<td>Chiller plant PLC</td>
+<td>BACnet/IP or Modbus TCP (as OEM)</td>
+<td>A↔B</td>
+<td>80 per chiller</td>
+</tr>
+<tr>
+<td>IF-031</td>
+<td>Chiller plant PLC</td>
+<td>BMS</td>
+<td>OPC UA, OT Ethernet</td>
+<td>A↔B</td>
+<td>300</td>
+</tr>
+<tr>
+<td>IF-032</td>
+<td>Facility water system (FWS) pumps and VFDs</td>
+<td>Plant PLC</td>
+<td>Hardwired start and speed; Modbus RTU for diagnostics</td>
+<td>A↔B</td>
+<td>20 per pump</td>
+</tr>
+<tr>
+<td>IF-033</td>
+<td>Dry coolers (160 fans on campus)</td>
+<td>BMS</td>
+<td>BACnet/IP</td>
+<td>A↔B</td>
+<td>25 per dry cooler</td>
+</tr>
+<tr>
+<td>IF-034</td>
+<td>Water treatment skid</td>
+<td>BMS</td>
+<td>Modbus TCP</td>
+<td>A→B</td>
+<td>40</td>
+</tr>
+<tr>
+<td>IF-035</td>
+<td>Make-up water tanks and meters</td>
+<td>BMS</td>
+<td>Hardwired 4–20 mA and pulse</td>
+<td>A→B</td>
+<td>10</td>
+</tr>
+<tr>
+<td>IF-036</td>
+<td>Leak detection panels</td>
+<td>BMS</td>
+<td>Modbus RTU via gateway</td>
+<td>A→B</td>
+<td>3 per zone</td>
+</tr>
+<tr>
+<td>IF-037</td>
+<td>Leak detection panel</td>
+<td>Branch isolation valve controller</td>
+<td>Hardwired contact</td>
+<td>A→B</td>
+<td>1 per zone</td>
+</tr>
+<tr>
+<td>IF-038</td>
+<td>Electrical room ventilation</td>
+<td>BMS</td>
+<td>BACnet MS/TP</td>
+<td>A↔B</td>
+<td>12 per room</td>
+</tr>
+<tr>
+<td>IF-039</td>
+<td>Battery room ventilation and hydrogen detection</td>
+<td>BMS</td>
+<td>Hardwired contacts and 4–20 mA</td>
+<td>A→B</td>
+<td>6 per room</td>
+</tr>
+<tr>
+<td>IF-040</td>
+<td>Weather station</td>
+<td>BMS</td>
+<td>Modbus RTU</td>
+<td>A→B</td>
+<td>8</td>
+</tr>
+<tr>
+<td>IF-041</td>
+<td>Fire alarm control panel (FACP)</td>
+<td>BMS</td>
+<td>BACnet/IP high-level interface (read only)</td>
+<td>A→B</td>
+<td>200 per building</td>
+</tr>
+<tr>
+<td>IF-042</td>
+<td>FACP</td>
+<td>CRAH fan stop circuits</td>
+<td>Hardwired relay per CRAH</td>
+<td>A→B</td>
+<td>1 per CRAH</td>
+</tr>
+<tr>
+<td>IF-043</td>
+<td>FACP</td>
+<td>Smoke and fire dampers</td>
+<td>Hardwired</td>
+<td>A→B</td>
+<td>2 per damper</td>
+</tr>
+<tr>
+<td>IF-044</td>
+<td>VESDA detectors</td>
+<td>FACP</td>
+<td>Hardwired relays or VESDA network to FACP interface</td>
+<td>A→B</td>
+<td>4 per detector (alert, action, fire 1, fault)</td>
+</tr>
+<tr>
+<td>IF-045</td>
+<td>VESDA network</td>
+<td>BMS</td>
+<td>High-level interface (Modbus or BACnet gateway)</td>
+<td>A→B</td>
+<td>4 per detector</td>
+</tr>
+<tr>
+<td>IF-046</td>
+<td>Clean agent release panel</td>
+<td>FACP</td>
+<td>Hardwired</td>
+<td>A↔B</td>
+<td>6 per zone</td>
+</tr>
+<tr>
+<td>IF-047</td>
+<td>Clean agent release panel</td>
+<td>HVAC shutdown and damper closure</td>
+<td>Hardwired</td>
+<td>A→B</td>
+<td>2 per zone</td>
+</tr>
+<tr>
+<td>IF-048</td>
+<td>FACP</td>
+<td>Access control (door release on alarm)</td>
+<td>Hardwired</td>
+<td>A→B</td>
+<td>1 per door group</td>
+</tr>
+<tr>
+<td>IF-049</td>
+<td>EPO stations</td>
+<td>UPS and switchgear trip circuits</td>
+<td>Hardwired, supervised</td>
+<td>A→B</td>
+<td>2 per EPO zone</td>
+</tr>
+<tr>
+<td>IF-050</td>
+<td>EPO stations</td>
+<td>BMS and EPMS (status)</td>
+<td>Hardwired contacts</td>
+<td>A→B</td>
+<td>2 per EPO zone</td>
+</tr>
+<tr>
+<td>IF-051</td>
+<td>FACP</td>
+<td>Lifts (fire homing)</td>
+<td>Hardwired</td>
+<td>A→B</td>
+<td>3 per lift group</td>
+</tr>
+<tr>
+<td>IF-052</td>
+<td>Sprinkler and pre-action valve monitoring</td>
+<td>FACP</td>
+<td>Hardwired supervised inputs</td>
+<td>A→B</td>
+<td>4 per valve</td>
+</tr>
+<tr>
+<td>IF-053</td>
+<td>Fire pump controller</td>
+<td>FACP and BMS</td>
+<td>Hardwired contacts</td>
+<td>A→B</td>
+<td>6</td>
+</tr>
+<tr>
+<td>IF-054</td>
+<td>Access control system</td>
+<td>BMS</td>
+<td>BACnet/IP or vendor API</td>
+<td>A→B</td>
+<td>2 per door (status, forced)</td>
+</tr>
+<tr>
+<td>IF-055</td>
+<td>Access control system</td>
+<td>CCTV video management system</td>
+<td>Vendor API</td>
+<td>A↔B</td>
+<td>Event-based (door forced opens camera view)</td>
+</tr>
+<tr>
+<td>IF-056</td>
+<td>BMS</td>
+<td>DCIM</td>
+<td>BACnet/IP or representational state transfer (REST) API (as DCIM product)</td>
+<td>A→B</td>
+<td>1,500 per hall</td>
+</tr>
+<tr>
+<td>IF-057</td>
+<td>BMS</td>
+<td>CMMS</td>
+<td>REST API or scheduled file transfer</td>
+<td>A→B</td>
+<td>Alarms, run hours, 200 assets per hall</td>
+</tr>
+<tr>
+<td>IF-058</td>
+<td>EPMS</td>
+<td>CMMS</td>
+<td>Scheduled file transfer</td>
+<td>A→B</td>
+<td>Breaker operation counts, alarms</td>
+</tr>
+<tr>
+<td>IF-059</td>
+<td>DCIM</td>
+<td>CMMS</td>
+<td>REST API</td>
+<td>A↔B</td>
+<td>Asset records, work orders</td>
+</tr>
+<tr>
+<td>IF-060</td>
+<td>Lighting control system</td>
+<td>BMS</td>
+<td>BACnet/IP</td>
+<td>A↔B</td>
+<td>50 per building</td>
+</tr>
+<tr>
+<td>IF-061</td>
+<td>Lifts</td>
+<td>BMS</td>
+<td>BACnet/IP or Modbus TCP via lift gateway</td>
+<td>A→B</td>
+<td>6 per lift</td>
+</tr>
+<tr>
+<td>IF-062</td>
+<td>Campus time servers</td>
+<td>BMS servers and automation servers</td>
+<td>Network Time Protocol (NTP)</td>
+<td>A→B</td>
+<td>Time</td>
+</tr>
+<tr>
+<td>IF-063</td>
+<td>Campus time servers</td>
+<td>EPMS servers, meters and relays</td>
+<td>NTP; Precision Time Protocol (PTP) where the design requires it</td>
+<td>A→B</td>
+<td>Time</td>
+</tr>
+<tr>
+<td>IF-064</td>
+<td>Building BMS servers</td>
+<td>Campus operations centre BMS</td>
+<td>BACnet Secure Connect (BACnet/SC) or vendor server-to-server protocol</td>
+<td>A↔B</td>
+<td>Alarms and summary points</td>
+</tr>
+<tr>
+<td>IF-065</td>
+<td>Rack baseboard management controllers (Redfish)</td>
+<td>DCIM</td>
+<td>Redfish API (read only)</td>
+<td>A→B</td>
+<td>Inlet temperature, power per server</td>
+</tr>
+<tr>
+<td>IF-066</td>
+<td>Temporary heater skids for commissioning</td>
+<td>BMS (temporary)</td>
+<td>Modbus TCP</td>
+<td>A↔B</td>
+<td>20 per skid</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-2-4"><span class="n">25.2.4</span>Master interface list, part 2: owners, ICD references and tests</h3>
+<p>Part 2 names the owner on each side of the boundary defined in 25.1.2. Figure <a class="figref" href="#F25-7">F25-7</a> shows the boundary and the two owners for one protocol row (IF-021), one hardwired row (IF-042) and one application row (IF-057).</p>
+<figure class="sheet" id="F25-7"><a href="../data/cx-handbook/figures/F25-7.svg" title="Open drawing F25-7 at full size"><img src="../data/cx-handbook/figures/F25-7.svg" alt="F25-7: Ownership boundary of three MIL rows: protocol, hardwired, application" width="1000" height="852" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F25-7</span> — <b>Ownership boundary of three MIL rows: protocol, hardwired, application</b>. Each side of a boundary has one owner; the master interface list records both owners, the ICD and the test levels for every row.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Owner side A</th>
+<th>Owner side B</th>
+<th>ICD reference</th>
+<th>Test level</th>
+<th>Test method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IF-001</td>
+<td>UPS OEM</td>
+<td>EPMS integrator</td>
+<td>ICD-25-001</td>
+<td>L3, L4, L5</td>
+<td>All mapped points against UPS display; transfer to battery and bypass; IST utility loss</td>
+</tr>
+<tr>
+<td>IF-002</td>
+<td>UPS OEM</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-002</td>
+<td>L3, L5</td>
+<td>Operate each contact at the UPS; IST</td>
+</tr>
+<tr>
+<td>IF-003</td>
+<td>UPS OEM</td>
+<td>DCIM vendor</td>
+<td>ICD-25-003</td>
+<td>L3, L4</td>
+<td>Poll against UPS display; force alarm, check SNMP notification and poll</td>
+</tr>
+<tr>
+<td>IF-004</td>
+<td>Generator OEM</td>
+<td>EPMS integrator</td>
+<td>ICD-25-004</td>
+<td>L3, L4</td>
+<td>Points against controller display; start and load test</td>
+</tr>
+<tr>
+<td>IF-005</td>
+<td>Generator OEM</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-005</td>
+<td>L3, L4</td>
+<td>Start generator; check status and alarm at BMS</td>
+</tr>
+<tr>
+<td>IF-006</td>
+<td>Switchgear OEM</td>
+<td>EPMS integrator</td>
+<td>ICD-25-006</td>
+<td>L3, L4, L5</td>
+<td>Points; synchronise and load; IST</td>
+</tr>
+<tr>
+<td>IF-007</td>
+<td>Generator OEM</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-007</td>
+<td>L4</td>
+<td>Start generator; ventilation starts within the sequence time</td>
+</tr>
+<tr>
+<td>IF-008</td>
+<td>Fuel system contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-008</td>
+<td>L3, L4</td>
+<td>Points; transfer pump start on low day tank level</td>
+</tr>
+<tr>
+<td>IF-009</td>
+<td>Fuel system contractor</td>
+<td>Generator OEM</td>
+<td>ICD-25-009</td>
+<td>L3, L4</td>
+<td>Level signal calibrated; low level alarm at controller</td>
+</tr>
+<tr>
+<td>IF-010</td>
+<td>Fuel system contractor</td>
+<td>EPMS integrator</td>
+<td>ICD-25-010</td>
+<td>L3</td>
+<td>Points against PLC display</td>
+</tr>
+<tr>
+<td>IF-011</td>
+<td>ATS OEM</td>
+<td>EPMS integrator</td>
+<td>ICD-25-011</td>
+<td>L3, L4</td>
+<td>Points; transfer and retransfer recorded</td>
+</tr>
+<tr>
+<td>IF-012</td>
+<td>STS OEM</td>
+<td>EPMS integrator</td>
+<td>ICD-25-012</td>
+<td>L3, L4</td>
+<td>Points; transfer events with time stamps</td>
+</tr>
+<tr>
+<td>IF-013</td>
+<td>MV switchgear OEM</td>
+<td>EPMS integrator</td>
+<td>ICD-25-013</td>
+<td>L3, L4</td>
+<td>Points from relay; trip events and sequence-of-events time stamps</td>
+</tr>
+<tr>
+<td>IF-014</td>
+<td>MV switchgear OEM</td>
+<td>Protection engineer</td>
+<td>ICD-25-014</td>
+<td>L4</td>
+<td>GOOSE or wired interlock test (chapter 13)</td>
+</tr>
+<tr>
+<td>IF-015</td>
+<td>LV switchgear OEM</td>
+<td>EPMS integrator</td>
+<td>ICD-25-015</td>
+<td>L3, L4</td>
+<td>Points from trip unit; breaker operation recorded</td>
+</tr>
+<tr>
+<td>IF-016</td>
+<td>PDU OEM</td>
+<td>EPMS integrator</td>
+<td>ICD-25-016</td>
+<td>L3</td>
+<td>Points against PDU display with load bank current</td>
+</tr>
+<tr>
+<td>IF-017</td>
+<td>Rack PDU OEM</td>
+<td>DCIM vendor</td>
+<td>ICD-25-017</td>
+<td>L3</td>
+<td>Sample of 10 % of PDUs against clamp meter</td>
+</tr>
+<tr>
+<td>IF-018</td>
+<td>EPMS integrator</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-018</td>
+<td>L4, L5</td>
+<td>Utility loss: source stable signal and staggered restart timing</td>
+</tr>
+<tr>
+<td>IF-019</td>
+<td>EPMS integrator</td>
+<td>DCIM vendor</td>
+<td>ICD-25-019</td>
+<td>L3</td>
+<td>Sample of points; time stamps</td>
+</tr>
+<tr>
+<td>IF-020</td>
+<td>BESS OEM</td>
+<td>EPMS integrator</td>
+<td>ICD-25-020</td>
+<td>L3, L4</td>
+<td>Points; charge and discharge test</td>
+</tr>
+<tr>
+<td>IF-021</td>
+<td>CDU OEM</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-021</td>
+<td>L3, L4, L5</td>
+<td>All points against CDU display; pump failover; IST CDU loss</td>
+</tr>
+<tr>
+<td>IF-022</td>
+<td>BESS OEM</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-022</td>
+<td>L3</td>
+<td>Points; forced alarms</td>
+</tr>
+<tr>
+<td>IF-023</td>
+<td>PLN</td>
+<td>Electrical contractor (substation)</td>
+<td>ICD-25-023</td>
+<td>L3, L4</td>
+<td>Point list test with PLN dispatch, as the PLN connection agreement</td>
+</tr>
+<tr>
+<td>IF-024</td>
+<td>Substation contractor</td>
+<td>EPMS integrator</td>
+<td>ICD-25-024</td>
+<td>L3</td>
+<td>Points against RTU</td>
+</tr>
+<tr>
+<td>IF-025</td>
+<td>CDU OEM</td>
+<td>CDU OEM (zone controller)</td>
+<td>ICD-25-025</td>
+<td>L4</td>
+<td>Lead-lag rotation; CDU trip in zone</td>
+</tr>
+<tr>
+<td>IF-026</td>
+<td>Leak detection contractor</td>
+<td>CDU OEM</td>
+<td>ICD-25-026</td>
+<td>L3, L4</td>
+<td>Wet the sensor; CDU response</td>
+</tr>
+<tr>
+<td>IF-027</td>
+<td>CRAH OEM</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-027</td>
+<td>L3, L4, L5</td>
+<td>Points; fan failure; IST air side</td>
+</tr>
+<tr>
+<td>IF-028</td>
+<td>BMS controls contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-028</td>
+<td>L3</td>
+<td>Calibration against reference probe</td>
+</tr>
+<tr>
+<td>IF-029</td>
+<td>BMS controls contractor</td>
+<td>CRAH OEM</td>
+<td>ICD-25-029</td>
+<td>L4</td>
+<td>Loss of sensor network: CRAH fallback</td>
+</tr>
+<tr>
+<td>IF-030</td>
+<td>Chiller OEM</td>
+<td>Plant controls contractor</td>
+<td>ICD-25-030</td>
+<td>L3, L4</td>
+<td>Points; staging</td>
+</tr>
+<tr>
+<td>IF-031</td>
+<td>Plant controls contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-031</td>
+<td>L3, L4</td>
+<td>Points; setpoint write within limits; loss of link</td>
+</tr>
+<tr>
+<td>IF-032</td>
+<td>Mechanical contractor (VFD supplier)</td>
+<td>Plant controls contractor</td>
+<td>ICD-25-032</td>
+<td>L3, L4</td>
+<td>Start, speed, fault; duty changeover</td>
+</tr>
+<tr>
+<td>IF-033</td>
+<td>Dry cooler OEM</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-033</td>
+<td>L3, L4</td>
+<td>Points; fan staging</td>
+</tr>
+<tr>
+<td>IF-034</td>
+<td>Water treatment contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-034</td>
+<td>L3</td>
+<td>Points against skid display</td>
+</tr>
+<tr>
+<td>IF-035</td>
+<td>Mechanical contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-035</td>
+<td>L3</td>
+<td>Level and meter calibration</td>
+</tr>
+<tr>
+<td>IF-036</td>
+<td>Leak detection contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-036</td>
+<td>L3, L4</td>
+<td>Wet each zone; alarm at BMS within the latency limit</td>
+</tr>
+<tr>
+<td>IF-037</td>
+<td>Leak detection contractor</td>
+<td>Mechanical contractor</td>
+<td>ICD-25-037</td>
+<td>L4</td>
+<td>Wet zone; valve closes</td>
+</tr>
+<tr>
+<td>IF-038</td>
+<td>Mechanical contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-038</td>
+<td>L3, L4</td>
+<td>Points; ventilation sequence</td>
+</tr>
+<tr>
+<td>IF-039</td>
+<td>Electrical contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-039</td>
+<td>L3, L4</td>
+<td>Gas detector test gas; ventilation boost</td>
+</tr>
+<tr>
+<td>IF-040</td>
+<td>BMS controls contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-040</td>
+<td>L3</td>
+<td>Compare with reference readings</td>
+</tr>
+<tr>
+<td>IF-041</td>
+<td>Fire contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-041</td>
+<td>L3</td>
+<td>Device states shown at BMS for sample of devices</td>
+</tr>
+<tr>
+<td>IF-042</td>
+<td>Fire contractor</td>
+<td>CRAH OEM / electrical contractor</td>
+<td>ICD-25-042</td>
+<td>L4, L5</td>
+<td>Cause-and-effect test (chapter 20)</td>
+</tr>
+<tr>
+<td>IF-043</td>
+<td>Fire contractor</td>
+<td>Mechanical contractor</td>
+<td>ICD-25-043</td>
+<td>L4</td>
+<td>Damper closes and reports</td>
+</tr>
+<tr>
+<td>IF-044</td>
+<td>Fire contractor</td>
+<td>Fire contractor</td>
+<td>ICD-25-044</td>
+<td>L4</td>
+<td>Smoke test at detector</td>
+</tr>
+<tr>
+<td>IF-045</td>
+<td>Fire contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-045</td>
+<td>L3</td>
+<td>States at BMS</td>
+</tr>
+<tr>
+<td>IF-046</td>
+<td>Fire contractor (clean agent)</td>
+<td>Fire contractor (FACP)</td>
+<td>ICD-25-046</td>
+<td>L4</td>
+<td>Release sequence simulated without discharge</td>
+</tr>
+<tr>
+<td>IF-047</td>
+<td>Fire contractor</td>
+<td>Mechanical contractor</td>
+<td>ICD-25-047</td>
+<td>L4</td>
+<td>HVAC stop and damper closure</td>
+</tr>
+<tr>
+<td>IF-048</td>
+<td>Fire contractor</td>
+<td>Security contractor</td>
+<td>ICD-25-048</td>
+<td>L4</td>
+<td>Doors release on fire alarm</td>
+</tr>
+<tr>
+<td>IF-049</td>
+<td>Electrical contractor</td>
+<td>UPS OEM and switchgear OEM</td>
+<td>ICD-25-049</td>
+<td>L4</td>
+<td>EPO test by simulation at agreed points (chapter 20)</td>
+</tr>
+<tr>
+<td>IF-050</td>
+<td>Electrical contractor</td>
+<td>BMS and EPMS integrators</td>
+<td>ICD-25-050</td>
+<td>L3</td>
+<td>Operate EPO status contact</td>
+</tr>
+<tr>
+<td>IF-051</td>
+<td>Fire contractor</td>
+<td>Lift contractor</td>
+<td>ICD-25-051</td>
+<td>L4</td>
+<td>Lift homing test</td>
+</tr>
+<tr>
+<td>IF-052</td>
+<td>Fire contractor</td>
+<td>Fire contractor</td>
+<td>ICD-25-052</td>
+<td>L4</td>
+<td>Valve tamper and flow switch tests</td>
+</tr>
+<tr>
+<td>IF-053</td>
+<td>Fire pump contractor</td>
+<td>Fire contractor and BMS controls contractor</td>
+<td>ICD-25-053</td>
+<td>L3, L4</td>
+<td>Pump run and fault signals</td>
+</tr>
+<tr>
+<td>IF-054</td>
+<td>Security contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-054</td>
+<td>L3</td>
+<td>Door states at BMS</td>
+</tr>
+<tr>
+<td>IF-055</td>
+<td>Security contractor</td>
+<td>Security contractor (CCTV)</td>
+<td>ICD-25-055</td>
+<td>L4</td>
+<td>Door forced: camera view opens</td>
+</tr>
+<tr>
+<td>IF-056</td>
+<td>BMS controls contractor</td>
+<td>DCIM vendor</td>
+<td>ICD-25-056</td>
+<td>L3, L4</td>
+<td>Sample of points; time stamps; loss of link</td>
+</tr>
+<tr>
+<td>IF-057</td>
+<td>BMS controls contractor</td>
+<td>Owner CMMS team</td>
+<td>ICD-25-057</td>
+<td>L4</td>
+<td>Alarm creates work order</td>
+</tr>
+<tr>
+<td>IF-058</td>
+<td>EPMS integrator</td>
+<td>Owner CMMS team</td>
+<td>ICD-25-058</td>
+<td>L4</td>
+<td>File received and imported</td>
+</tr>
+<tr>
+<td>IF-059</td>
+<td>DCIM vendor</td>
+<td>Owner CMMS team</td>
+<td>ICD-25-059</td>
+<td>L4</td>
+<td>Asset record created and updated</td>
+</tr>
+<tr>
+<td>IF-060</td>
+<td>Electrical contractor (lighting)</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-060</td>
+<td>L3</td>
+<td>Status and command per zone</td>
+</tr>
+<tr>
+<td>IF-061</td>
+<td>Lift contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-061</td>
+<td>L3</td>
+<td>Status per lift</td>
+</tr>
+<tr>
+<td>IF-062</td>
+<td>Network contractor</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-062</td>
+<td>L3, L4</td>
+<td>Clock offsets; time server loss</td>
+</tr>
+<tr>
+<td>IF-063</td>
+<td>Network contractor</td>
+<td>EPMS integrator</td>
+<td>ICD-25-063</td>
+<td>L3, L4</td>
+<td>Clock offsets; sequence-of-events comparison</td>
+</tr>
+<tr>
+<td>IF-064</td>
+<td>BMS controls contractor</td>
+<td>Owner operations technology team</td>
+<td>ICD-25-064</td>
+<td>L3, L4</td>
+<td>Alarms at operations centre; hub failover</td>
+</tr>
+<tr>
+<td>IF-065</td>
+<td>IT hardware supplier</td>
+<td>DCIM vendor</td>
+<td>ICD-25-065</td>
+<td>L3</td>
+<td>Inlet temperature compared with rack-row sensor</td>
+</tr>
+<tr>
+<td>IF-066</td>
+<td>Load bank supplier</td>
+<td>BMS controls contractor</td>
+<td>ICD-25-066</td>
+<td>L3</td>
+<td>Heater skid power and temperatures on BMS before IST</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-2-5"><span class="n">25.2.5</span>Using the MIL</h3>
+<ol>
+<li><strong>Count the interfaces per contractor.</strong> Sort the MIL by owner. Each contractor receives its rows and confirms them in writing within 10 working days of the issue.</li>
+<li><strong>Link each row to an ICD.</strong> A row with no approved ICD by the start of L3 is <mark>an open issue</mark>.</li>
+<li><strong>Link each row to a test.</strong> Each row appears in the integration test plan with a test script number for each test level.</li>
+<li><strong>Track the status.</strong> The status column is updated weekly. The weekly commissioning report shows the count of rows by status.</li>
+<li><strong>Freeze before L4.</strong> After the freeze, a change to a row needs a change request with an impact statement on tests already passed (section 25.11).</li>
+</ol>
+<p><strong>Worked example:</strong> On 2027-03-01 the MSC-1 MIL status for Building 2 is: 66 rows; 61 ICDs approved; <mark>5 ICDs open</mark> (IF-019, IF-023, IF-057, IF-059, IF-065); 48 maps frozen; 22 rows passed L3. The open ICD for IF-023 is waiting for the PLN connection agreement data list. The commissioning manager records it as an issue with the electrical contractor's interface manager as owner and a required date of 2027-03-31.</p>
+<h2 id="s25-3"><span class="n">25.3</span>Interface control document contents</h2>
+
+<figure class="sheet" id="F25-3"><a href="../data/cx-handbook/figures/F25-3.svg" title="Open drawing F25-3 at full size"><img src="../data/cx-handbook/figures/F25-3.svg" alt="F25-3: Anatomy of an interface control document: thirteen sections and their writers" width="1400" height="626" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F25-3</span> — <b>Anatomy of an interface control document: thirteen sections and their writers</b>. Each section answers one question that the other side would otherwise ask by RFI; the approval date of the ICD is recorded in the master interface list.</figcaption></figure>
+<h3 id="s25-3-1"><span class="n">25.3.1</span>Sections of an ICD</h3>
+<p>An ICD defines one interface completely, so that each side can <mark>build and test its part</mark> without asking the other side. No data-centre standard defines the ICD format. The structure below follows hyperscale programme and systems-engineering practice.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Content</th>
+<th>Who writes it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 Identification</td>
+<td>ICD number, revision, MIL row, systems, owners, approval signatures</td>
+<td>Commissioning manager</td>
+</tr>
+<tr>
+<td>2 Purpose and functions</td>
+<td>What the interface is for, in full sentences; the functions that depend on it</td>
+<td>Engineer of record</td>
+</tr>
+<tr>
+<td>3 Physical layer</td>
+<td>Cable type, connector or terminal, terminal numbers both ends, contact rating, voltage, shield and earth</td>
+<td>Both owners</td>
+</tr>
+<tr>
+<td>4 Network layer</td>
+<td>IP addresses, subnet, VLAN, switch and port, ports and protocols allowed through firewalls</td>
+<td>Network contractor</td>
+</tr>
+<tr>
+<td>5 Protocol settings</td>
+<td>Protocol, version, unit identifier or device instance, baud rate and framing, time-outs, retries, polling interval</td>
+<td>Both owners</td>
+</tr>
+<tr>
+<td>6 Data list</td>
+<td>One row per data item: name, address, data type, scaling, units, range, direction, update rate, quality handling</td>
+<td>Side A owner</td>
+</tr>
+<tr>
+<td>7 Commands and authority</td>
+<td>Which commands side B may send, at what priority, within which limits, with what interlocks</td>
+<td>Engineer of record</td>
+</tr>
+<tr>
+<td>8 Failure behaviour</td>
+<td>What each side does on loss of communication, on stale data, on invalid values; heartbeat definition</td>
+<td>Engineer of record</td>
+</tr>
+<tr>
+<td>9 Timing</td>
+<td>Maximum latency for each data group; time synchronisation source</td>
+<td>Commissioning manager</td>
+</tr>
+<tr>
+<td>10 Security</td>
+<td>Accounts, certificates, SNMP version 3 users, OPC UA security policy</td>
+<td>OT security lead</td>
+</tr>
+<tr>
+<td>11 Versions</td>
+<td>Firmware of each device, map version, software versions on both sides</td>
+<td>Both owners</td>
+</tr>
+<tr>
+<td>12 Tests</td>
+<td>Test level, method and acceptance for each function; reference to the test scripts</td>
+<td>Commissioning manager</td>
+</tr>
+<tr>
+<td>13 Change history</td>
+<td>Revision table with reason for each change</td>
+<td>Commissioning manager</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-3-2"><span class="n">25.3.2</span>Worked example: ICD-25-021 extract, CDU to BMS</h3>
+<p><strong>Worked example:</strong> ICD-25-021 revision B, CDU type 1 (16 per hall, 192 on the campus) to BMS.</p>
+<p><strong>Purpose:</strong> The BMS monitors each CDU, raises alarms, trends the technology cooling system (TCS) values for the IST, and enables or disables each CDU. The BMS does not control the CDU pumps or valves. The CDU controls its own TCS supply temperature and flow.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>ICD item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Physical layer</td>
+<td>CDU controller Ethernet port ETH1, Cat 6A patch to hall OT switch A (odd CDU numbers) or B (even numbers)</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>VLAN 2310 (B2 DH3 unit controllers), subnet 10.22.3.0/24, CDU 07 at 10.22.3.47; TCP port 502 allowed only from the automation server 10.22.0.13</td>
+</tr>
+<tr>
+<td>Protocol</td>
+<td>Modbus TCP, unit identifier 1</td>
+</tr>
+<tr>
+<td>Map version</td>
+<td>CDU1-MB-MAP version 3.2 for controller firmware 4.12.x</td>
+</tr>
+<tr>
+<td>Addressing convention in the map</td>
+<td>One-based register numbers with 3xxxx and 4xxxx prefixes; remove the prefix and subtract 1 for the zero-based address sent in the Modbus message</td>
+</tr>
+<tr>
+<td>32-bit values</td>
+<td>FLOAT32 IEEE 754, <mark>word order ABCD</mark> (high word first)</td>
+</tr>
+<tr>
+<td>Polling</td>
+<td>Block 1: input registers 30001–30040 every 2 s; block 2: holding registers 40201–40206 every 2 s; block 3: discrete inputs 10001–10013 every 1 s; block 4: holding register 40300 (heartbeat) every 1 s</td>
+</tr>
+<tr>
+<td>Time-out and retries</td>
+<td>500 ms time-out, 1 retry; device marked offline after 3 failed polls</td>
+</tr>
+<tr>
+<td>Commands</td>
+<td>Coil 00001 Remote_Enable only. Written by the BMS at priority 10 from the hall sequence. No setpoint writes in revision B.</td>
+</tr>
+<tr>
+<td>Heartbeat</td>
+<td>Holding register 40300 increments every 1 s. BMS stale alarm if <mark>unchanged for 30 s</mark>.</td>
+</tr>
+<tr>
+<td>Failure behaviour, CDU side</td>
+<td>On loss of Modbus communication for 60 s the CDU keeps running on its local setpoint and keeps its last enable state</td>
+</tr>
+<tr>
+<td>Failure behaviour, BMS side</td>
+<td>All CDU points marked stale; priority 2 (P2) alarm "CDU 07 communication lost" after 60 s</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>Leak tray alarm from CDU sensor to operations centre display within 10 s (section 25.8)</td>
+</tr>
+<tr>
+<td>Tests</td>
+<td>L3: P2P of all 30 points (chapter 22 P2P sheet); L4: pump failover and CDU trip in zone; L5: IST CDU loss at full load</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-3-3"><span class="n">25.3.3</span>ICD review steps</h3>
+<ol>
+<li><strong>Check completeness.</strong> Each of the 13 sections is filled. A section marked "to be confirmed" has a named owner and a date.</li>
+<li><strong>Check against the points list.</strong> Every data item in the ICD appears in the BMS points list with the same address, data type and scaling (chapter 21, section 21.10).</li>
+<li><strong>Check commands and authority.</strong> Every command written by side B is in section 7 with limits. A command that is not in the ICD is <mark>not configured</mark>.</li>
+<li><strong>Check failure behaviour.</strong> Both sides state what they do on loss of communication. The behaviour matches the sequence of operation.</li>
+<li><strong>Check versions.</strong> The firmware version in the ICD matches the firmware delivered to site. The map version matches the firmware.</li>
+<li><strong>Approve within 10 working days.</strong> Both owners and the engineer of record sign. The commissioning manager records the approval date in the MIL.</li>
+</ol>
+<h2 id="s25-4"><span class="n">25.4</span>Modbus and BACnet map handover</h2>
+<h3 id="s25-4-1"><span class="n">25.4.1</span>What the OEM hands over</h3>
+<ol>
+<li><strong>The map as a data file.</strong> The map is handed over as a spreadsheet or comma-separated file, in addition to the PDF manual, so that the integrator imports it without retyping. <mark>Retyping 120 UPS registers</mark> from a PDF produces errors.</li>
+<li><strong>The firmware it applies to.</strong> The map states the firmware versions it is valid for. A map <mark>without a firmware version</mark> is not accepted.</li>
+<li><strong>The addressing convention.</strong> The map states whether addresses are zero-based addresses as sent in the Modbus message, one-based register numbers or prefixed references (chapter 21, section 21.7.2).</li>
+<li><strong>Data types, scaling and word order.</strong> Each 32-bit value states its word order. Each scaled value states the scale factor or the scale register.</li>
+<li><strong>Unimplemented registers.</strong> The map lists the address gaps, so that polling blocks can be built around them.</li>
+<li><strong>For BACnet devices.</strong> The OEM hands over the protocol implementation conformance statement (PICS) and the object list with object types, instances, names, units and commandable properties. Where the OEM supports it, the OEM also hands over the engineering data exchange (EDE) file.</li>
+</ol>
+<h3 id="s25-4-2"><span class="n">25.4.2</span>Map handover record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Device type</td>
+<td>Text</td>
+<td>CDU type 1</td>
+</tr>
+<tr>
+<td>Map document number and version</td>
+<td>Text</td>
+<td>CDU1-MB-MAP v3.2</td>
+</tr>
+<tr>
+<td>Firmware versions covered</td>
+<td>Text</td>
+<td>4.12.0 to 4.12.9</td>
+</tr>
+<tr>
+<td>File format received</td>
+<td>Choice</td>
+<td>XLSX and PDF</td>
+</tr>
+<tr>
+<td>Addressing convention</td>
+<td>Choice</td>
+<td>One-based with prefix</td>
+</tr>
+<tr>
+<td>Word order for 32-bit values</td>
+<td>Choice</td>
+<td>ABCD</td>
+</tr>
+<tr>
+<td>Number of registers</td>
+<td>Integer</td>
+<td>64</td>
+</tr>
+<tr>
+<td>Registers mapped to the BMS</td>
+<td>Integer</td>
+<td>30</td>
+</tr>
+<tr>
+<td>Date received / date frozen</td>
+<td>Dates</td>
+<td>2027-01-12 / 2027-02-02</td>
+</tr>
+<tr>
+<td>Received by</td>
+<td>Role</td>
+<td>BMS controls contractor integration engineer</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-4-3"><span class="n">25.4.3</span>Freezing a map</h3>
+<p>A map is frozen when the firmware of the device type is frozen for site delivery and the integrator has imported the map. After the freeze, a firmware change on that device type is a change request (section 25.11). The commissioning manager records the freeze date in the MIL. The P2P tests of chapter 22 are <mark>valid only for the frozen map version</mark>.</p>
+<h2 id="s25-5"><span class="n">25.5</span>Integration responsibility matrix</h2>
+
+<figure class="sheet" id="F25-2"><a href="../data/cx-handbook/figures/F25-2.svg" title="Open drawing F25-2 at full size"><img src="../data/cx-handbook/figures/F25-2.svg" alt="F25-2: Integration responsibility matrix: who does each step of an interface" width="1400" height="549" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F25-2</span> — <b>Integration responsibility matrix: who does each step of an interface</b>. The commissioning manager owns the master interface list and the test acceptance; each side of an interface has one owner for the device and one for the client configuration.</figcaption></figure>
+<h3 id="s25-5-1"><span class="n">25.5.1</span>Matrix by step</h3>
+<p>R = responsible (does the work), A = accountable (approves), C = consulted, I = informed.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>OEM of side A</th>
+<th>Integrator of side B</th>
+<th>Network contractor</th>
+<th>Engineer of record</th>
+<th>Commissioning manager</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MIL row created</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+<td>C</td>
+<td>R, A</td>
+</tr>
+<tr>
+<td>ICD written</td>
+<td>R (data list, physical)</td>
+<td>R (polling, mapping)</td>
+<td>R (network section)</td>
+<td>A (functions, authority)</td>
+<td>R (identification, tests)</td>
+</tr>
+<tr>
+<td>Map handed over</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+<td>A (freeze date)</td>
+</tr>
+<tr>
+<td>Network port and VLAN</td>
+<td>I</td>
+<td>C</td>
+<td>R</td>
+<td>I</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Device communication configured</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Client polling and mapping</td>
+<td>C</td>
+<td>R</td>
+<td>I</td>
+<td>I</td>
+<td>I</td>
+</tr>
+<tr>
+<td>L3 data test</td>
+<td>C (attends)</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+<td>A (witness)</td>
+</tr>
+<tr>
+<td>L4 function test</td>
+<td>R (device behaviour)</td>
+<td>R (BMS or EPMS behaviour)</td>
+<td>C</td>
+<td>C</td>
+<td>A</td>
+</tr>
+<tr>
+<td>L5 scenario test</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+<td>R, A</td>
+</tr>
+<tr>
+<td>Change after freeze</td>
+<td>R (change request)</td>
+<td>C (impact)</td>
+<td>C</td>
+<td>A</td>
+<td>A (retest scope)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-5-2"><span class="n">25.5.2</span>Roles named in the matrix</h3>
+<ol>
+<li><strong>Interface manager of each contractor.</strong> Each contractor names one person as interface manager. That person signs the MIL rows and ICDs for the contractor.</li>
+<li><strong>Integration engineer of the BMS and EPMS contractors.</strong> This person builds the polling configuration, imports maps, and runs the L3 data tests.</li>
+<li><strong>OEM service engineer.</strong> The OEM sends a service engineer to the L3 test of the first unit of each type. The engineer also attends every L4 function test that needs a change of state in the OEM equipment.</li>
+<li><strong>Commissioning manager.</strong> The commissioning manager owns the MIL, approves ICDs for testability, witnesses tests and closes MIL rows.</li>
+</ol>
+<h2 id="s25-6"><span class="n">25.6</span>Integration test levels</h2>
+
+<figure class="sheet" id="F25-4"><a href="../data/cx-handbook/figures/F25-4.svg" title="Open drawing F25-4 at full size"><img src="../data/cx-handbook/figures/F25-4.svg" alt="F25-4: Integration test levels mapped to commissioning levels L3, L4 and L5" width="1400" height="550" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F25-4</span> — <b>Integration test levels mapped to commissioning levels L3, L4 and L5</b>. Each level answers a different question; a pass at the data level does not show that a function or a scenario works.</figcaption></figure>
+<h3 id="s25-6-1"><span class="n">25.6.1</span>Definitions</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Name</th>
+<th>What the test proves</th>
+<th>Commissioning level</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data level</td>
+<td>Data test</td>
+<td>Each value arrives correctly: right address, scaling, units, quality, time stamp</td>
+<td>L3</td>
+<td>CDU 07 TCS supply 45.2 °C at BMS equals 45.2 °C on CDU display</td>
+</tr>
+<tr>
+<td>Function level</td>
+<td>Function test</td>
+<td>Each function that uses the interface works: alarm, command, interlock, failure behaviour</td>
+<td>L4</td>
+<td>Leak tray alarm reaches operations centre in under 10 s; loss of link keeps CDU running</td>
+</tr>
+<tr>
+<td>Scenario level</td>
+<td>Scenario test</td>
+<td>All interfaces together give the right result in an event</td>
+<td>L5</td>
+<td>Utility loss: UPS, generators, EPMS source stable, BMS staggered restart, CDU flow kept</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-6-2"><span class="n">25.6.2</span>Coverage rules</h3>
+<ol>
+<li><strong>Data level coverage.</strong> Every mapped point of the first unit of each device type is tested. For repeated units, every point of each unit is tested in the P2P of chapter 22. For high-count devices such as rack PDUs, a sample of <mark>10 %</mark> is tested at L3 (the project specification sets the sample size). The rest are checked by a script that compares values with the expected range.</li>
+<li><strong>Function level coverage.</strong> Every function in section 7 and section 8 of each ICD is tested once per device type. Alarms that have life-safety or load impact are tested once per unit (for example every CDU leak alarm).</li>
+<li><strong>Scenario level coverage.</strong> Every interface with a test level L5 in the MIL appears in at least one IST scenario (chapter 28).</li>
+</ol>
+<h2 id="s25-7"><span class="n">25.7</span>Integration test procedure and record</h2>
+<h3 id="s25-7-1"><span class="n">25.7.1</span>Test steps</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Confirm prerequisites.</strong> Confirm that the ICD is approved, the map is frozen, the network checkout is passed (chapter 22, section 22.5) and both devices run the firmware in the ICD. Record the firmware versions read from the devices on the test day.</li>
+<li><strong>Confirm the state of the equipment.</strong> Confirm the equipment can be operated for the test under the permit to work. Record the permit number.</li>
+<li><strong>Run the data test.</strong> For each data item, the integration engineer compares the value at the source (device display or reference instrument) with the value at the receiver. Record both values on the integration test record.</li>
+<li><strong>Run the quality tests.</strong> Make each data item invalid at the source where possible (sensor disconnected, device in fault). Confirm that the receiver shows the fault quality and does not show a good value.</li>
+<li><strong>Run the command tests.</strong> For each permitted command, send it from side B. Confirm that side A acts and reports. Send a command <mark>outside its limits</mark> and confirm it is refused.</li>
+<li><strong>Run the failure tests.</strong> Disconnect the link. Record on the integration test record the time until side B marks the data stale (limit: the stale time in ICD section 8) and what side A does. Restore the link and record recovery.</li>
+<li><strong>Measure latency.</strong> For each data group with a latency limit, create a change at the source and record the time stamp at each stage (section 25.8).</li>
+<li><strong>Record and sign.</strong> Fill the test record. Enter each failed item in the issues log with the interface ID.</li>
+</ol>
+<h3 id="s25-7-2"><span class="n">25.7.2</span>Worked example: filled integration test record, IF-018 EPMS to BMS source stable</h3>
+<p><strong>Worked example:</strong> Test record INT-L4-IF018-B2, Building 2, 20 kV bus section A. The EPMS sets "source stable" (SRC_STABLE) TRUE when five conditions hold (definition in chapter 24, section 24.15.2). The source breaker is closed and voltage and frequency stay inside the band for the hold time. The transfer sequence is complete, no load-shed or generator overload is active and the signal quality is valid. Loss of the signal or stale quality gives FALSE. The worked example uses a hold time of <mark>30 s</mark> (an example value, as in chapter 24, section 24.15.2). It uses a frequency band of 49.5 to 50.5 Hz (an example value; the generator and chiller OEM limits set the project band). The BMS uses the signal to start the staggered restart of FWS pumps and dry coolers. The interface has a BACnet/IP Binary Value (BV) and a hardwired backup contact from an EPMS output relay.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Expected</th>
+<th>Measured</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Read firmware and software versions</td>
+<td>As ICD-25-018 rev A</td>
+<td>PME server version and BMS server version as ICD</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Generator test on bus A (load bank), bus voltage and frequency stable</td>
+<td>Source stable TRUE 30 s after stability</td>
+<td>BV TRUE at 30.4 s; contact closed at 30.3 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Frequency held at 49.2 Hz by the generator test set</td>
+<td>Source stable FALSE</td>
+<td>FALSE within 0.6 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Frequency restored to 50.0 Hz</td>
+<td>TRUE after 30 s stable</td>
+<td>TRUE at 30.5 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Disconnect the EPMS network link to BMS</td>
+<td>BMS uses the hardwired contact; P2 "EPMS link lost"</td>
+<td>Hardwired used; alarm at 30 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Disagreement test: force BV TRUE in EPMS test mode while contact open</td>
+<td>BMS treats source as not stable (both signals required)</td>
+<td>Restart held; P3 "source stable disagreement"</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Measure BMS restart sequence after TRUE</td>
+<td>One unit released every 30 s: pump 3 at 0 s, pump 4 at 30 s, then dry cooler groups</td>
+<td>0 s, 30 s, then 30 s steps</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Restore and sign</td>
+<td></td>
+<td></td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s25-8"><span class="n">25.8</span>Data latency budget</h2>
+
+<figure class="sheet" id="F25-5"><a href="../data/cx-handbook/figures/F25-5.svg" title="Open drawing F25-5 at full size"><img src="../data/cx-handbook/figures/F25-5.svg" alt="F25-5: Latency budget: CDU leak tray alarm from the sensor to the campus operations centre" width="1400" height="721" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F25-5</span> — <b>Latency budget: CDU leak tray alarm from the sensor to the campus operations centre</b>. Cumulative worst-case time after each stage; the measured value is lower because the worst case of each polled stage does not occur at the same moment.</figcaption></figure>
+
+<figure class="sheet" id="F25-6"><a href="../data/cx-handbook/figures/F25-6.svg" title="Open drawing F25-6 at full size"><img src="../data/cx-handbook/figures/F25-6.svg" alt="F25-6: Shared Modbus RTU port: polling cycle time when one of eight leak panels is switched off" width="1400" height="721" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F25-6</span> — <b>Shared Modbus RTU port: polling cycle time when one of eight leak panels is switched off</b>. One failed device slows the alarm latency of every other device on the same port unless the time-out, retry and offline rules in the ICD limit it.</figcaption></figure>
+<h3 id="s25-8-1"><span class="n">25.8.1</span>Method</h3>
+<p>The latency of an interface is the time from a change at the source to the moment the change is shown to the person or system that must act. The budget adds the worst-case time of each stage. For a polled stage, the worst case is one full polling cycle plus the transfer time. For an event-driven stage (BACnet change of value (COV), SNMP notification, BACnet event notification), the worst case is the processing time plus any retry.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Type</th>
+<th>How to find the worst-case time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sensor and input filter</td>
+<td>Physical</td>
+<td>Sensor response time and controller input filter from data sheets</td>
+</tr>
+<tr>
+<td>Device controller scan</td>
+<td>Cyclic</td>
+<td>Controller scan time</td>
+</tr>
+<tr>
+<td>Modbus poll by gateway or server</td>
+<td>Polled</td>
+<td>Polling interval + response time + any time-out of other devices on the same port</td>
+</tr>
+<tr>
+<td>Protocol conversion in gateway</td>
+<td>Cyclic</td>
+<td>Gateway internal update cycle</td>
+</tr>
+<tr>
+<td>BACnet COV or poll to server</td>
+<td>Event or polled</td>
+<td>COV processing time, or poll interval</td>
+</tr>
+<tr>
+<td>Alarm delay in the alarm definition</td>
+<td>Configured</td>
+<td>Delay in the points list</td>
+</tr>
+<tr>
+<td>Server alarm processing</td>
+<td>Cyclic</td>
+<td>Vendor data</td>
+</tr>
+<tr>
+<td>Transfer to operations centre</td>
+<td>Event</td>
+<td>Server-to-server forwarding time</td>
+</tr>
+<tr>
+<td>Display refresh</td>
+<td>Cyclic</td>
+<td>Client refresh interval</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-8-2"><span class="n">25.8.2</span>Worked example: CDU leak tray alarm to the campus operations centre</h3>
+<p><strong>Worked example:</strong> The requirement in the MSC-1 example is that a CDU leak tray alarm is displayed at the campus operations centre within <mark>10 s</mark>. The stage values are example design values. Before the L4 test, replace each one with the value from the data sheet of the delivered CDU controller, automation server and BMS server, and recalculate the total.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Worst case (s)</th>
+<th>Basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Leak sensor and CDU input debounce</td>
+<td>1.0</td>
+<td>CDU controller input filter 1 s</td>
+</tr>
+<tr>
+<td>CDU controller scan</td>
+<td>0.1</td>
+<td>100 ms scan</td>
+</tr>
+<tr>
+<td>Modbus TCP poll of discrete inputs by the automation server</td>
+<td>1.0 + 0.05</td>
+<td>Poll every 1 s; response 50 ms</td>
+</tr>
+<tr>
+<td>Automation server alarm evaluation</td>
+<td>0.5</td>
+<td>Server cycle 500 ms</td>
+</tr>
+<tr>
+<td>Alarm delay in points list</td>
+<td>0</td>
+<td>P1 alarms have no delay</td>
+</tr>
+<tr>
+<td>Event notification to building BMS server</td>
+<td>0.5</td>
+<td>Confirmed notification, one transfer</td>
+</tr>
+<tr>
+<td>Building server to campus operations centre (BACnet/SC)</td>
+<td>1.0</td>
+<td>Forwarding cycle</td>
+</tr>
+<tr>
+<td>Operations centre client refresh</td>
+<td>1.0</td>
+<td>Alarm list refresh 1 s</td>
+</tr>
+<tr>
+<td>Total</td>
+<td><mark>5.15</mark></td>
+<td>Margin 4.85 s against 10 s</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Check:</strong> At L4 the test wets the leak sensor at a recorded time and reads the alarm time at the operations centre client. The measured value in the MSC-1 test record was <mark>3.8 s</mark>. The measured value is below the budget because the worst case of each polled stage did not occur at the same time.</p>
+<h3 id="s25-8-3"><span class="n">25.8.3</span>Worked example: effect of a failed device on a shared Modbus port</h3>
+<p><strong>Worked example:</strong> Eight leak detection panels share one Modbus RTU trunk (chapter 21, section 21.7.7). Normal cycle time is 1.2 s. Panel 4 is switched off and the gateway time-out is 1,000 ms with 3 retries. Each cycle then adds 4 × 1.0 s = 4.0 s for panel 4 (first try and 3 retries), so the cycle becomes <mark>5.2 s</mark> for all 7 working panels. The leak alarm latency for those panels then exceeds a 5 s requirement. With a 300 ms time-out, 1 retry and an offline skip after 3 failed cycles, the cycle is 1.2 + 0.6 = 1.8 s for 3 cycles. It then returns to about 1.1 s. The ICD for IF-036 states the time-out, retry and offline rules. The L4 test switches one panel off and measures the latency of another.</p>
+<h3 id="s25-8-4"><span class="n">25.8.4</span>Latency limits used in the MSC-1 example</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Data group</th>
+<th>Limit at the person or system that acts</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Leak alarms, TCS high-high temperature, fire summary</td>
+<td>10 s at operations centre</td>
+<td>Operator action before the thermal limit</td>
+</tr>
+<tr>
+<td>CDU and CRAH status and alarms</td>
+<td>30 s at the building BMS</td>
+<td>Loss-of-redundancy response</td>
+</tr>
+<tr>
+<td>EPMS source stable to BMS</td>
+<td>2 s at the BMS controller</td>
+<td>Staggered restart timing</td>
+</tr>
+<tr>
+<td>UPS on battery to DCIM</td>
+<td>10 s (SNMP notification) and 30 s (poll as backup)</td>
+<td>Capacity planning response</td>
+</tr>
+<tr>
+<td>Trend values for IST</td>
+<td>Time stamp accuracy within 1 s</td>
+<td>Event reconstruction</td>
+</tr>
+<tr>
+<td>CMMS work orders from alarms</td>
+<td>15 minutes</td>
+<td>Maintenance planning</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s25-9"><span class="n">25.9</span>Common integration failures and how to detect them before the witness test</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Symptom</th>
+<th>Detection before witness</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>32-bit word order wrong</td>
+<td>FLOAT32 value implausibly large or small, or near zero</td>
+<td>Compare one FLOAT32 value per device type with the device display at L3</td>
+<td>Set the word order in the client to the map</td>
+</tr>
+<tr>
+<td>Scaling wrong</td>
+<td>Value 10 or 100 times too large or too small</td>
+<td>Compare with display at two different values</td>
+<td>Correct scale factor; check scale register</td>
+</tr>
+<tr>
+<td>Register offset by one</td>
+<td>Value belongs to the neighbouring register</td>
+<td>Read a distinctive register (serial number, firmware)</td>
+<td>Correct addressing convention</td>
+</tr>
+<tr>
+<td>Signed and unsigned confused</td>
+<td>Negative values shown as about 65,000</td>
+<td>Test a value below zero where possible (for example a differential pressure reversed by valve position)</td>
+<td>Set INT16 in the client</td>
+</tr>
+<tr>
+<td>Polling too fast</td>
+<td>Device communication card overloaded; time-outs; values freeze</td>
+<td>Read the device's communication diagnostics during a 24-hour soak</td>
+<td>Increase interval; reduce clients</td>
+</tr>
+<tr>
+<td>Polling too slow</td>
+<td>Alarm late</td>
+<td>Latency test at L4</td>
+<td>Shorten interval for alarm blocks</td>
+</tr>
+<tr>
+<td>Duplicate identifiers</td>
+<td>Devices appear and disappear; values from wrong device</td>
+<td>Compare discovery with register; check duplicate Modbus unit IDs behind one gateway</td>
+<td>Re-address</td>
+</tr>
+<tr>
+<td>Stale data shown as good</td>
+<td>Gateway frozen; values stop changing with good status</td>
+<td>Heartbeat point and stale-data alarm tested at L4</td>
+<td>Add heartbeat; configure stale timer</td>
+</tr>
+<tr>
+<td>Firmware changed after test</td>
+<td>Map moved; points wrong after a service visit</td>
+<td>Read firmware versions before every test; compare with ICD</td>
+<td>Change control; retest</td>
+</tr>
+<tr>
+<td>Time stamps wrong</td>
+<td>Events out of order across systems</td>
+<td>Cross-system event time stamp comparison</td>
+<td>Fix time source and time zone</td>
+</tr>
+<tr>
+<td>Two masters on one Modbus RTU trunk</td>
+<td>Collisions; cyclic redundancy check (CRC) errors</td>
+<td>Inspect drawings; protocol analyser capture</td>
+<td>One master per trunk</td>
+</tr>
+<tr>
+<td>BACnet device instance reused after replacement</td>
+<td>Old and new device conflict</td>
+<td>Device instance register update procedure</td>
+<td>Assign from register</td>
+</tr>
+<tr>
+<td>Units text mismatch</td>
+<td>Graphic shows L/min while value is L/s</td>
+<td>Data test compares units</td>
+<td>Correct units property</td>
+</tr>
+<tr>
+<td>Command accepted outside limits</td>
+<td>Setpoint outside safe range written</td>
+<td>Command limit test at L4</td>
+<td>Limits in both client and device</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s25-9-1"><span class="n">25.9.1</span>Failure cases from published sources</h3>
+<ol>
+<li><strong>AWS Tokyo, 23 August 2019.</strong> AWS reported that its data-centre control system contained third-party code to communicate with fans, chillers and temperature sensors, directly or through PLCs. During a failover of the control system, a bug caused excessive interactions between the control system and devices. Both the control system and the PLCs became unresponsive. Redundant cooling failed in parts of one availability zone and servers shut down on overheating. AWS disabled the failover mode that triggered the bug. In the failover test, watch the device side (PLCs and equipment) and check that each device has a defined behaviour on loss of its supervisor.</li>
+<li><strong>Uptime Institute Annual Outage Analysis 2024.</strong> The report states that configuration and change management issues were <mark>62 %</mark> of the most common causes of major IT system and software outages. Interface maps, firmware versions and polling configurations are configuration items, and section 25.11 places them under change control.</li>
+</ol>
+<h3 id="s25-9-2"><span class="n">25.9.2</span>Checks by system family before the witness test</h3>
+<p>The integration engineer and the commissioning engineer make these checks in the week before each witness test. Each check uses only the device, its local display, the ICD and the receiving system.</p>
+<p>Checks for UPS and battery systems (IF-001 to IF-003):</p>
+<ol>
+<li><strong>Operating mode texts.</strong> Compare every state of the UPS operating mode register (normal, on battery, on bypass, maintenance bypass, fault) with the state texts in the EPMS and DCIM. A mode code with no text in the receiver shows a number to the operator.</li>
+<li><strong>Battery values at discharge.</strong> Check battery voltage, current and remaining time during the UPS battery discharge test, because the values do not change at float charge. The remaining time at the receiver agrees with the UPS display within one display step.</li>
+<li><strong>SNMP and Modbus agree.</strong> The DCIM value from SNMP and the EPMS value from Modbus for the same quantity, for example output kW, agree within 1 % at the same moment.</li>
+</ol>
+<p>Checks for generators, paralleling switchgear and fuel (IF-004 to IF-010):</p>
+<ol start="4">
+<li><strong>Engine values during the load test.</strong> Oil pressure, coolant temperature and kW are compared with the controller display at 25, 50, 75 and 100 % load during the generator load test (chapter 15).</li>
+<li><strong>Start failure signal.</strong> The fail-to-start alarm is generated by the controller's own crank logic, for example by isolating the fuel solenoid for the test under the OEM's procedure. A jumper at the BMS terminal <mark>does not test the interface</mark>.</li>
+<li><strong>Day tank level span.</strong> The day tank level is compared at two levels, low and high, with a dip reading or sight glass.</li>
+</ol>
+<p>Checks for transfer switches, relays and breakers (IF-011 to IF-016):</p>
+<ol start="7">
+<li><strong>Event time stamps.</strong> Transfer and trip events carry the device time stamp. The EPMS shows the device time. The time difference between two devices that see the same event is within the sequence-of-events accuracy in chapter 24.</li>
+<li><strong>Breaker position states.</strong> Open, closed, tripped and racked-out positions are each shown correctly. <mark>Many maps omit racked-out</mark>.</li>
+<li><strong>Gateway serial ports.</strong> For RS-485 trip units behind a gateway, the unit identifiers in the EPMS match the trip unit addresses. Two breakers with the same address on one port give one breaker's values on both graphics.</li>
+</ol>
+<p>Checks for rack PDUs and IT telemetry (IF-017, IF-065):</p>
+<ol start="10">
+<li><strong>Sample size.</strong> Ten per cent of rack PDUs are compared with a clamp meter at a known load. The remaining 90 % are checked by a script that flags any PDU with a value outside the expected band or with no change for 24 hours.</li>
+<li><strong>Polling load.</strong> The DCIM poll interval and the number of clients per PDU are read from the DCIM configuration and compared with the PDU vendor's limit.</li>
+</ol>
+<p>Checks for EPMS to BMS and DCIM (IF-018, IF-019):</p>
+<ol start="12">
+<li><strong>Fail-safe value.</strong> Loss of the EPMS link makes the source stable value <mark>FALSE</mark> at the BMS. The test disconnects the link (section 25.7.2, step 5).</li>
+<li><strong>Point counts.</strong> The number of points received by DCIM equals the number in ICD-25-019 for each building.</li>
+</ol>
+<p>Checks for CDU, CRAH and plant (IF-021, IF-025 to IF-035):</p>
+<ol start="14">
+<li><strong>Commands only from the ICD.</strong> The BMS writes only the commands listed in the ICD. The integration engineer exports the list of writable points from the BMS and compares it with ICD section 7.</li>
+<li><strong>Heartbeat per unit.</strong> The heartbeat stale alarm is tested on every CDU, because a frozen gateway affects one unit at a time.</li>
+<li><strong>Network inlet temperatures to CRAH.</strong> When the CRAH uses inlet temperatures written by the BMS, the CRAH fallback on loss of those values is tested on each CRAH type (chapter 22, section 22.14).</li>
+<li><strong>OPC UA session security.</strong> The OPC UA session of the chiller plant PLC shows SignAndEncrypt in the BMS connection diagnostics.</li>
+</ol>
+<p>Checks for leak detection (IF-026, IF-036, IF-037):</p>
+<ol start="18">
+<li><strong>Zone map.</strong> Each leak zone number in the BMS matches the zone on the leak panel and the location drawing. The test wets the cable in the field at the location named on the drawing.</li>
+<li><strong>Cable break.</strong> A cable break fault is shown as a fault, which is a different state from a leak.</li>
+</ol>
+<p>Checks for fire, VESDA, clean agent and EPO (IF-041 to IF-053):</p>
+<ol start="20">
+<li><strong>Read-only interface.</strong> The BMS high-level interface to the FACP is read only. The test attempts a write from the BMS and confirms that <mark>the FACP refuses it</mark>.</li>
+<li><strong>Cause-and-effect matrix rows.</strong> Each hardwired fire interface row is tested from the real fire alarm device in test mode, as the cause-and-effect matrix in chapter 20 states.</li>
+<li><strong>EPO tests by simulation.</strong> EPO trip interfaces to UPS and switchgear are tested at the agreed simulation points with the trip circuits isolated from the protected equipment, as chapter 20 states.</li>
+</ol>
+<p>Checks for security, lighting, lifts, weather and time (IF-054 to IF-064):</p>
+<ol start="23">
+<li><strong>Door state texts.</strong> Door open, closed, forced and held-open states are shown at the BMS with the door names used by security.</li>
+<li><strong>Weather station values.</strong> Outdoor temperature and humidity at the BMS are compared with a reference instrument at the station. The values are used by dry cooler sequences, so an error changes plant staging.</li>
+<li><strong>Time sources.</strong> Each server shows the campus time servers as its NTP sources, and the offset is within the limits of chapter 22, section 22.17.</li>
+</ol>
+<p>Checks for application interfaces (IF-057 to IF-059):</p>
+<ol start="26">
+<li><strong>Record creation.</strong> A P2 alarm at the BMS creates one work order in the CMMS with the asset tag, the alarm text and the time. The test also confirms that a repeated alarm does not create duplicate work orders.</li>
+<li><strong>Asset identifiers.</strong> The asset tags in BMS, DCIM and CMMS for the same equipment are <mark>identical</mark>, for example B2-DH3-CDU-07 in all three systems.</li>
+</ol>
+<h2 id="s25-10"><span class="n">25.10</span>Hardwired interface testing</h2>
+<p>A hardwired interface carries a contact state or an analogue signal on a cable between two contractors' panels. Figure <a class="figref" href="#F25-8">F25-8</a> shows the test of IF-042, the fire alarm contact that stops the fans of CRAH 11, with the value recorded at each of the six steps below.</p>
+<figure class="sheet" id="F25-8"><a href="../data/cx-handbook/figures/F25-8.svg" title="Open drawing F25-8 at full size"><img src="../data/cx-handbook/figures/F25-8.svg" alt="F25-8: Hardwired interface test of IF-042: FACP contact to the CRAH 11 fan stop" width="1000" height="799" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F25-8</span> — <b>Hardwired interface test of IF-042: FACP contact to the CRAH 11 fan stop</b>. Two testers: one operates the fire alarm device at the source, the other records the action and its time at the receiving panel (example values from record 25.10.2).</figcaption></figure>
+
+<h3 id="s25-10-1"><span class="n">25.10.1</span>Hardwired interface test steps</h3>
+<ol>
+<li><strong>Confirm the contact rating.</strong> Read the contact rating of the sending relay and the input rating of the receiving terminal from the ICD and data sheets. Confirm the circuit voltage is within both ratings.</li>
+<li><strong>Confirm normally open or normally closed.</strong> Confirm the contact type in the ICD matches the installed contact. Safety interfaces such as fire shutdown use a contact that fails to the safe state on wire break, where the design requires it.</li>
+<li><strong>Operate at the source.</strong> Operate the sending device in its real mode (for example a fire alarm in test mode activates its output relay). <mark>Do not jumper the receiving terminal.</mark></li>
+<li><strong>Observe at the receiving equipment.</strong> A second tester at the receiving equipment records the action (fan stops, damper closes) and the time.</li>
+<li><strong>Test wire break where supervised.</strong> For supervised circuits, open the circuit and confirm the fault indication at the sending panel.</li>
+<li><strong>Confirm reset behaviour.</strong> Reset the source. Confirm the receiving equipment does not restart until the reset rule in the cause-and-effect matrix allows it (chapter 20).</li>
+</ol>
+<h3 id="s25-10-2"><span class="n">25.10.2</span>Hardwired interface record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Interface ID and instance</td>
+<td>Text</td>
+<td>IF-042, B2-DH3-CRAH-11</td>
+</tr>
+<tr>
+<td>Source device and terminal</td>
+<td>Text</td>
+<td>FACP B2 loop 3 output module OM-3-17, terminals 1-2</td>
+</tr>
+<tr>
+<td>Receiving device and terminal</td>
+<td>Text</td>
+<td>CRAH 11 control panel X2:21-22</td>
+</tr>
+<tr>
+<td>Contact type and rating</td>
+<td>Text</td>
+<td>Normally closed, 2 A at 30 V DC</td>
+</tr>
+<tr>
+<td>Circuit voltage measured</td>
+<td>Number</td>
+<td>24.1 V DC</td>
+</tr>
+<tr>
+<td>Action time at receiver</td>
+<td>Seconds</td>
+<td>Fans stopped 2.4 s after alarm</td>
+</tr>
+<tr>
+<td>Reset behaviour</td>
+<td>Text</td>
+<td>Fans restart only after FACP reset and BMS enable</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>Choice</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s25-11"><span class="n">25.11</span>Change control for interfaces, maps and firmware</h2>
+<h3 id="s25-11-1"><span class="n">25.11.1</span>Rules</h3>
+<ol>
+<li><strong>Firmware is a configuration item.</strong> The firmware of each device type in the MIL is recorded in the ICD. A firmware change on site needs <mark>a change request</mark> approved by the commissioning manager before installation.</li>
+<li><strong>Impact statement.</strong> The change request states which registers, objects or functions change, and which tests must be repeated. The OEM provides the release notes.</li>
+<li><strong>Retest scope.</strong> After a change the data test is repeated for every point of the changed device type on one unit, and for the changed points on every unit. Function tests that use changed points are repeated.</li>
+<li><strong>Service visits.</strong> OEM service engineers report the firmware version before and after every visit. The commissioning team reads the version after each visit and compares it with the ICD.</li>
+<li><strong>Map revision.</strong> A new map revision increments the ICD revision. The ICD revision table records the reason.</li>
+<li><strong>Freeze dates.</strong> Firmware and maps are frozen before L4. After L4 starts, changes are made <mark>only to correct a defect</mark>, with the retest scope agreed.</li>
+</ol>
+<h3 id="s25-11-2"><span class="n">25.11.2</span>Change request record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Change request number</td>
+<td>Text</td>
+<td>CR-INT-0031</td>
+</tr>
+<tr>
+<td>Interface IDs affected</td>
+<td>Text</td>
+<td>IF-021, IF-025</td>
+</tr>
+<tr>
+<td>Device type and units</td>
+<td>Text</td>
+<td>CDU type 1, all 48 units in Building 2</td>
+</tr>
+<tr>
+<td>Firmware from / to</td>
+<td>Text</td>
+<td>4.12.0 / 4.12.3</td>
+</tr>
+<tr>
+<td>Reason</td>
+<td>Text</td>
+<td>Correction of pump changeover timing defect ISS-B2-0866</td>
+</tr>
+<tr>
+<td>Registers changed</td>
+<td>Text</td>
+<td>None; new register 40301 (pump changeover count) added</td>
+</tr>
+<tr>
+<td>Retest scope</td>
+<td>Text</td>
+<td>Data test of all 30 points on CDU 07; heartbeat on all units; pump failover test on CDUs 07 and 13</td>
+</tr>
+<tr>
+<td>Approved by and date</td>
+<td>Text</td>
+<td>Commissioning manager, 2027-05-03</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s25-12"><span class="n">25.12</span>Checklist for site use</h2>
+<ol>
+<li><strong>MIL issued and confirmed.</strong> Every contractor has confirmed its rows in writing.</li>
+<li><strong>One owner for each side.</strong> Every row names one owner on side A and one on side B, including gateways.</li>
+<li><strong>ICD approved for every row before L3.</strong> All 13 ICD sections filled; open items have an owner and a date.</li>
+<li><strong>Maps received as data files.</strong> Each map states firmware versions, addressing convention, data types, scaling and word order.</li>
+<li><strong>Maps frozen and recorded.</strong> Freeze date in the MIL; P2P tests valid only for the frozen version.</li>
+<li><strong>Network details in each ICD.</strong> IP address, VLAN, switch port and permitted ports recorded.</li>
+<li><strong>Commands and limits defined.</strong> Every command written across an interface is listed with limits and priority.</li>
+<li><strong>Failure behaviour defined on both sides.</strong> Loss of communication, stale data and invalid values.</li>
+<li><strong>Heartbeat on every gateway and unit controller.</strong> Stale-data alarm tested.</li>
+<li><strong>Polling budget calculated.</strong> Time-outs, retries and offline rules set so that one failed device does not delay others beyond the latency limit.</li>
+<li><strong>Latency budgets written.</strong> For each data group with a limit; measured at L4.</li>
+<li><strong>Data tests complete.</strong> First unit of each type fully tested; other units by P2P or by sample as the plan states.</li>
+<li><strong>Function tests complete.</strong> Alarms, commands, interlocks, failure behaviour for each ICD.</li>
+<li><strong>Hardwired interfaces tested from the real source.</strong> No jumpers at the receiving terminal.</li>
+<li><strong>Time stamps compared across systems.</strong> BMS, EPMS and DCIM within 1 s for one shared event.</li>
+<li><strong>Firmware read before each test.</strong> Versions match the ICD.</li>
+<li><strong>Change requests for every firmware change.</strong> Retest scope agreed and completed.</li>
+<li><strong>Every L5 interface in an IST scenario.</strong> Cross-checked with the IST script list of chapter 28.</li>
+<li><strong>MIL status reported weekly.</strong> Count of rows by status in the weekly commissioning report.</li>
+<li><strong>MIL closed at handover.</strong> Every row at L5 passed or with an accepted deviation; final MIL in the handover records.</li>
+</ol>
+<h2 id="s25-13"><span class="n">25.13</span>Sources</h2>
+<ol>
+<li>ANSI/ASHRAE Standard 135-2024, BACnet. ASHRAE, 2024. <a href="https://www.ashrae.org/technical-resources/bookstore/bacnet" rel="noopener">https://www.ashrae.org/technical-resources/bookstore/bacnet</a></li>
+<li>MODBUS Application Protocol Specification V1.1b3. Modbus Organization, 2012. <a href="https://www.modbus.org/file/secure/modbusprotocolspecification.pdf" rel="noopener">https://www.modbus.org/file/secure/modbusprotocolspecification.pdf</a></li>
+<li>MODBUS over Serial Line Specification and Implementation Guide V1.02. Modbus-IDA, 2006. <a href="https://cars.uchicago.edu/software/epics/Modbus_over_serial_line_V1_02.pdf" rel="noopener">https://cars.uchicago.edu/software/epics/Modbus_over_serial_line_V1_02.pdf</a></li>
+<li>Modbus TCP MBAP header and message format reference. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/articles/modbus-tcp-mbap-header-and-message-format-reference/" rel="noopener">https://docs.chipkin.com/articles/modbus-tcp-mbap-header-and-message-format-reference/</a></li>
+<li>Modbus RTU: How to Encode Real and 32-bit Data Messages. Chipkin Automation Systems, accessed 2026. <a href="https://store.chipkin.com/articles/modbus-rtu-how-to-encode-real-32-bit-data-messages" rel="noopener">https://store.chipkin.com/articles/modbus-rtu-how-to-encode-real-32-bit-data-messages</a></li>
+<li>Modbus Floating Point Register Mapping: Byte Order Guide. Industrial Monitor Direct, accessed 2026. <a href="https://industrialmonitordirect.com/blogs/knowledgebase/modbus-floating-point-register-mapping-byte-order-guide" rel="noopener">https://industrialmonitordirect.com/blogs/knowledgebase/modbus-floating-point-register-mapping-byte-order-guide</a></li>
+<li>BACnet Discovery and Network Architecture Reference. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/articles/bacnet-discovery-network-architecture-reference/" rel="noopener">https://docs.chipkin.com/articles/bacnet-discovery-network-architecture-reference/</a></li>
+<li>What BACnet Secure Connect Is. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/protocols/bacnet/secure-connect/" rel="noopener">https://docs.chipkin.com/protocols/bacnet/secure-connect/</a></li>
+<li>Service Name and Transport Protocol Port Number Registry. IANA, accessed 2026. <a href="https://www.iana.org/assignments/service-names-port-numbers?search=484" rel="noopener">https://www.iana.org/assignments/service-names-port-numbers?search=484</a></li>
+<li>WinCC OA driver overview, network ports (SNMP 161 and 162). Siemens ETM, accessed 2026. <a href="https://www.winccoa.com/documentation/WinCCOA/latest/en_US/driver/topics/driver_overview_network.html" rel="noopener">https://www.winccoa.com/documentation/WinCCOA/latest/en_US/driver/topics/driver_overview_network.html</a></li>
+<li>Summary of the Amazon EC2 and Amazon EBS Service Event in the Tokyo (AP-NORTHEAST-1) Region. Amazon Web Services, 2019. <a href="https://aws.amazon.com/message/56489/" rel="noopener">https://aws.amazon.com/message/56489/</a></li>
+<li>Annual Outage Analysis 2024. Uptime Institute, 2024. <a href="https://uptimeinstitute.com/resources/research-and-reports/annual-outage-analysis-2024" rel="noopener">https://uptimeinstitute.com/resources/research-and-reports/annual-outage-analysis-2024</a></li>
+<li>Project Haystack, Introduction. Project Haystack, accessed 2026. <a href="https://project-haystack.org/doc/docHaystack/Intro" rel="noopener">https://project-haystack.org/doc/docHaystack/Intro</a></li>
+<li>Brick Schema, Introduction. Brick consortium, accessed 2026. <a href="https://brickschema.org/" rel="noopener">https://brickschema.org/</a></li>
+<li>Building Digitization and Semantic Interoperability (ASHRAE 223P). NIST, accessed 2026. <a href="https://www.nist.gov/programs-projects/building-digitization-and-semantic-interoperability" rel="noopener">https://www.nist.gov/programs-projects/building-digitization-and-semantic-interoperability</a></li>
+<li>ASHRAE Guideline 13-2024, Specifying Building Automation Systems. ASHRAE, 2024. <a href="https://webstore.ansi.org/standards/ashrae/ashraeguideline132024" rel="noopener">https://webstore.ansi.org/standards/ashrae/ashraeguideline132024</a></li>
+<li>Troubleshooting Guide for BACnet MS/TP Networks. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/articles/troubleshooting-guide-for-bacnet-mstp-networks" rel="noopener">https://docs.chipkin.com/articles/troubleshooting-guide-for-bacnet-mstp-networks</a></li>
+<li>IEC 62443 series, Security for industrial automation and control systems. IEC, current parts. <a href="https://webstore.iec.ch/en/publication/7029" rel="noopener">https://webstore.iec.ch/en/publication/7029</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="24-epms-pme-commissioning.html"><span>Previous · 24</span><span class="t">EPMS and PME commissioning procedure</span></a><a class="next" href="26-ot-network-fibre-copper.html"><span>Next · 26</span><span class="t">OT network, fibre optic and copper cabling</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

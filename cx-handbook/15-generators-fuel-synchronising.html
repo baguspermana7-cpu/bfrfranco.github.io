@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>15 Generators, fuel systems and synchronising switchgear | Cx Field Manual R01</title>
+<meta name="description" content="This chapter covers the standby diesel generator plant of a data-centre building.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/15-generators-fuel-synchronising.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/15-generators-fuel-synchronising.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/15-generators-fuel-synchronising.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/15-generators-fuel-synchronising.html">
+<meta property="og:title" content="15 Generators, fuel systems and synchronising switchgear | Cx Field Manual R01">
+<meta property="og:description" content="This chapter covers the standby diesel generator plant of a data-centre building.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="15 Generators, fuel systems and synchronising switchgear | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter covers the standby diesel generator plant of a data-centre building.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"15 Generators, fuel systems and synchronising switchgear","name":"Generators, fuel systems and synchronising switchgear","description":"This chapter covers the standby diesel generator plant of a data-centre building.","url":"https://resistancezero.com/cx-handbook/15-generators-fuel-synchronising.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/15-generators-fuel-synchronising.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":13411,"position":15,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"15 Generators, fuel systems and synchronising switchgear","item":"https://resistancezero.com/cx-handbook/15-generators-fuel-synchronising.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part C · Electrical commissioning</p>
+    <h1><span class="num">15</span>Generators, fuel systems and synchronising switchgear</h1>
+    <p class="lede">This chapter covers the standby diesel generator plant of a data-centre building.</p>
+    <p class="basis">Chapter 15 of 32 · 20 sections · 8 figures · 13,411 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 15</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 15</summary>
+<ol><li><a href="#s15-0"><span class="n">15.0</span>Scope of this chapter</a></li><li><a href="#s15-1"><span class="n">15.1</span>What a standby generator plant does on a data-centre campus</a><ol><li><a href="#s15-1-1"><span class="n">15.1.1</span>Purpose of the plant</a></li><li><a href="#s15-1-2"><span class="n">15.1.2</span>The MSC-1 generator plant</a></li><li><a href="#s15-1-3"><span class="n">15.1.3</span>Plant arrangement</a></li></ol></li><li><a href="#s15-2"><span class="n">15.2</span>Ratings, NFPA 110 classification and ISO 8528-5 performance classes</a><ol><li><a href="#s15-2-1"><span class="n">15.2.1</span>ISO 8528-1 power ratings</a></li><li><a href="#s15-2-2"><span class="n">15.2.2</span>NFPA 110 Level, Type and Class</a></li><li><a href="#s15-2-3"><span class="n">15.2.3</span>ISO 8528-5 transient performance classes</a></li><li><a href="#s15-2-4"><span class="n">15.2.4</span>Load acceptance steps and brake mean effective pressure</a></li></ol></li><li><a href="#s15-3"><span class="n">15.3</span>Commissioning levels for the generator plant</a><ol><li><a href="#s15-3-1"><span class="n">15.3.1</span>Levels, owners and exit records</a></li><li><a href="#s15-3-2"><span class="n">15.3.2</span>What blocks the next level</a></li><li><a href="#s15-3-3"><span class="n">15.3.3</span>Factory acceptance test content</a></li></ol></li><li><a href="#s15-4"><span class="n">15.4</span>Installation checks (Level 2)</a><ol><li><a href="#s15-4-1"><span class="n">15.4.1</span>Mechanical and exhaust installation</a></li><li><a href="#s15-4-2"><span class="n">15.4.2</span>Electrical installation and alternator tests</a></li><li><a href="#s15-4-3"><span class="n">15.4.3</span>L2 checklist record fields</a></li></ol></li><li><a href="#s15-5"><span class="n">15.5</span>Fuel system: storage, transfer, day tanks, flushing and fuel quality</a><ol><li><a href="#s15-5-1"><span class="n">15.5.1</span>System description</a></li><li><a href="#s15-5-2"><span class="n">15.5.2</span>Day-tank control levels</a></li><li><a href="#s15-5-3"><span class="n">15.5.3</span>Pressure test of fuel piping</a></li><li><a href="#s15-5-4"><span class="n">15.5.4</span>Flushing the fuel system</a></li><li><a href="#s15-5-5"><span class="n">15.5.5</span>Fuel quality tests on delivery and before acceptance</a></li><li><a href="#s15-5-6"><span class="n">15.5.6</span>Transfer system functional test</a></li></ol></li><li><a href="#s15-6"><span class="n">15.6</span>Start-up and controller set-up (Level 3)</a><ol><li><a href="#s15-6-1"><span class="n">15.6.1</span>First start sequence</a></li><li><a href="#s15-6-2"><span class="n">15.6.2</span>Protective shutdown tests</a></li><li><a href="#s15-6-3"><span class="n">15.6.3</span>Governor and AVR set-up</a></li><li><a href="#s15-6-4"><span class="n">15.6.4</span>Controller settings record fields</a></li></ol></li><li><a href="#s15-7"><span class="n">15.7</span>Load bank test</a><ol><li><a href="#s15-7-1"><span class="n">15.7.1</span>Purpose and set-up</a></li><li><a href="#s15-7-2"><span class="n">15.7.2</span>Load steps and durations</a></li><li><a href="#s15-7-3"><span class="n">15.7.3</span>Readings taken at each interval</a></li><li><a href="#s15-7-4"><span class="n">15.7.4</span>Acceptance criteria</a></li><li><a href="#s15-7-5"><span class="n">15.7.5</span>Common errors in load bank tests</a></li></ol></li><li><a href="#s15-8"><span class="n">15.8</span>Transient performance test (ISO 8528-5)</a><ol><li><a href="#s15-8-1"><span class="n">15.8.1</span>Purpose</a></li><li><a href="#s15-8-2"><span class="n">15.8.2</span>Instrument and set-up</a></li><li><a href="#s15-8-3"><span class="n">15.8.3</span>Steps</a></li><li><a href="#s15-8-4"><span class="n">15.8.4</span>Acceptance and filled record</a></li><li><a href="#s15-8-5"><span class="n">15.8.5</span>What the UPS and the drives need from the generator</a></li></ol></li><li><a href="#s15-9"><span class="n">15.9</span>Start-time, crank-cycle and block-load tests</a><ol><li><a href="#s15-9-1"><span class="n">15.9.1</span>Start-time test (NFPA 110 Type 10)</a></li><li><a href="#s15-9-2"><span class="n">15.9.2</span>Crank-cycle test</a></li><li><a href="#s15-9-3"><span class="n">15.9.3</span>Block-load test</a></li></ol></li><li><a href="#s15-10"><span class="n">15.10</span>Synchronising, load sharing and transfer</a><ol><li><a href="#s15-10-1"><span class="n">15.10.1</span>How synchronising works</a></li><li><a href="#s15-10-2"><span class="n">15.10.2</span>Synchronising window</a></li><li><a href="#s15-10-3"><span class="n">15.10.3</span>Dead-bus closing and first-up arbitration</a></li><li><a href="#s15-10-4"><span class="n">15.10.4</span>Synchronising test procedure</a></li><li><a href="#s15-10-5"><span class="n">15.10.5</span>Load sharing test</a></li><li><a href="#s15-10-6"><span class="n">15.10.6</span>Transfer back to utility (closed transition)</a></li></ol></li><li><a href="#s15-11"><span class="n">15.11</span>Generator and paralleling protection</a><ol><li><a href="#s15-11-1"><span class="n">15.11.1</span>Protection functions</a></li><li><a href="#s15-11-2"><span class="n">15.11.2</span>Secondary injection and trip test</a></li></ol></li><li><a href="#s15-12"><span class="n">15.12</span>Emissions and noise</a><ol><li><a href="#s15-12-1"><span class="n">15.12.1</span>Emissions measurement</a></li><li><a href="#s15-12-2"><span class="n">15.12.2</span>Noise measurement</a></li></ol></li><li><a href="#s15-13"><span class="n">15.13</span>Generator controller communications to EPMS and BMS</a><ol><li><a href="#s15-13-1"><span class="n">15.13.1</span>Why the controller points matter</a></li><li><a href="#s15-13-2"><span class="n">15.13.2</span>Controller families and their Modbus documents</a></li><li><a href="#s15-13-3"><span class="n">15.13.3</span>Example generator point list</a></li><li><a href="#s15-13-4"><span class="n">15.13.4</span>Point-to-point test</a></li></ol></li><li><a href="#s15-14"><span class="n">15.14</span>NFPA 110 acceptance test and the integrated test</a><ol><li><a href="#s15-14-1"><span class="n">15.14.1</span>Acceptance sequence</a></li><li><a href="#s15-14-2"><span class="n">15.14.2</span>Integrated test (Level 5) for the generator plant</a></li></ol></li><li><a href="#s15-15"><span class="n">15.15</span>Filled test records</a><ol><li><a href="#s15-15-1"><span class="n">15.15.1</span>Generator L4 test summary sheet</a></li><li><a href="#s15-15-2"><span class="n">15.15.2</span>Synchronising test record</a></li></ol></li><li><a href="#s15-16"><span class="n">15.16</span>Common errors and how to find them before the witness test</a></li><li><a href="#s15-17"><span class="n">15.17</span>Key performance indicators for the generator scope</a></li><li><a href="#s15-18"><span class="n">15.18</span>Checklist for site use</a></li><li><a href="#s15-19"><span class="n">15.19</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="14-lv-switchboards-busway-breakers-relays.html"><span>Previous</span>14 Low-voltage switchboards, busway, circuit breakers and protection relays</a><a href="16-ups-batteries-transfer-rack-power.html"><span>Next</span>16 UPS, batteries, transfer switches and rack power distribution</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s15-0"><span class="n">15.0</span>Scope of this chapter</h2>
+<p>This chapter covers the standby diesel generator plant of a data-centre building. The plant is the generator sets, the fuel storage and transfer system, the medium-voltage synchronising (paralleling) switchgear, and the controls that start, synchronise, share load and transfer the building to and from the utility. The chapter gives the tests from installation (Level 2) to integrated systems testing (Level 5). For each test it gives the instrument, the applied value, the duration, the acceptance value and its source, and the record that closes the test.</p>
+<ol>
+<li><strong>Plant description.</strong> What a standby generator plant is, why a data centre needs one, and the MSC-1 plant of 17 sets per building on a 20 kV generator bus.</li>
+<li><strong>Ratings and classes.</strong> ISO 8528-1 power ratings, NFPA 110 Level, Type and Class, and the ISO 8528-5 transient performance classes G1 to G4.</li>
+<li><strong>Commissioning levels.</strong> The factory test, delivery, installation, start-up, functional and integrated tests, with roles and exit records.</li>
+<li><strong>Installation checks.</strong> Mechanical, exhaust, ventilation, electrical, earthing and alternator insulation tests.</li>
+<li><strong>Fuel system.</strong> Bulk tanks, transfer pumps, day tanks, piping pressure test, flushing, polishing, fuel quality tests and day-tank control.</li>
+<li><strong>Start-up and controller set-up.</strong> Protective shutdowns, governor and automatic voltage regulator (AVR) settings, and the settings record.</li>
+<li><strong>Load bank test.</strong> Steps from 0 % to 100 % (110 % where the rating allows), durations, readings and the filled record.</li>
+<li><strong>Transient performance test.</strong> ISO 8528-5 load acceptance and load rejection, with the frequency and voltage dip and recovery measured against the performance class.</li>
+<li><strong>Start-time, crank and block-load tests.</strong> The NFPA 110 Type 10 start time, the crank-cycle test and the block-load test.</li>
+<li><strong>Synchronising and load sharing.</strong> Synchronising limits, dead-bus closing, first-up arbitration, active and reactive load sharing, and the closed-transition return to the utility.</li>
+<li><strong>Protection.</strong> Generator and paralleling protection functions and the secondary injection and trip tests.</li>
+<li><strong>Emissions and noise.</strong> The site measurements and the Indonesian limits that apply.</li>
+<li><strong>Communications.</strong> The generator controller Modbus map to the electrical power monitoring system (EPMS) and building management system (BMS), and the point-to-point test.</li>
+<li><strong>Acceptance.</strong> The NFPA 110 acceptance sequence, the two-hour load test, the filled records, common errors, key performance indicators (KPIs) and the site checklist.</li>
+</ol>
+<p>Documents and standards used: ISO 8528-1, -5 and -6 (generating sets: ratings, performance and test methods; -5 in the 2022 edition), NFPA 110 (emergency and standby power systems), NFPA 37 (stationary combustion engines), NFPA 30 (flammable and combustible liquids) and ASTM D975 (diesel fuel). The chapter also uses ISO 4406 (fluid cleanliness code), IEEE 1547 synchronisation table (used as a reference window), IEEE C37.2 device function numbers, ANSI/NETA Acceptance Testing Specifications (ATS), PUIL 2020 (SNI 0225) and Permenaker 12/2015 (K3 Listrik). It also uses the commissioning guides of Caterpillar, Cummins and MTU (Rolls-Royce Power Systems) and the controller manuals of Deep Sea Electronics (DSE), ComAp, Woodward (easYgen) and Cummins (PowerCommand).</p>
+<h2 id="s15-1"><span class="n">15.1</span>What a standby generator plant does on a data-centre campus</h2>
+
+<figure class="sheet" id="F15-1"><a href="../data/cx-handbook/figures/F15-1.svg" title="Open drawing F15-1 at full size"><img src="../data/cx-handbook/figures/F15-1.svg" alt="F15-1: Generator plant of one MSC-1 building: 17 sets on a split 20 kV generator bus" width="1400" height="1060" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F15-1</span> — <b>Generator plant of one MSC-1 building: 17 sets on a split 20 kV generator bus</b>. Three sets of each bus section are drawn; the others repeat the same chain. Each set has its own 52G with device 25 sync check and generator protection.</figcaption></figure>
+<h3 id="s15-1-1"><span class="n">15.1.1</span>Purpose of the plant</h3>
+<p>A data-centre building takes its normal supply from the utility grid through medium-voltage (MV) switchgear and transformers (chapter 13). When the utility supply fails, the uninterruptible power supply (UPS) batteries carry the information technology (IT) load for a few minutes (chapter 16). The generator plant starts during those minutes, takes over the whole building load, and runs until the utility returns. The mechanical plant (chillers, pumps, computer room air handlers and coolant distribution units) has no battery support on most designs. It stops for the seconds between the utility failure and the generator bus becoming live, and restarts on generator power.</p>
+<p>The generator plant has three jobs:</p>
+<ol>
+<li><strong>Start and close fast.</strong> The sets start, reach rated speed and voltage and close onto a common bus within a time the UPS batteries and the cooling thermal inertia can cover. NFPA 110 calls a system that restores power within 10 seconds a Type 10 system.</li>
+<li><strong>Carry the full building load.</strong> The sets accept the restarting mechanical loads and the UPS rectifier walk-in in steps without the frequency or voltage leaving the band that the UPS rectifiers and motor drives accept.</li>
+<li><strong>Run for the design duration.</strong> The fuel system stores fuel for the design run time (the NFPA 110 Class, in hours) and delivers it to every engine for that time without a single failure stopping more than one set.</li>
+</ol>
+<h3 id="s15-1-2"><span class="n">15.1.2</span>The MSC-1 generator plant</h3>
+<p>In the MSC-1 worked example, each building has an IT load of 36 MW and a facility load of 43.92 MW at a design power usage effectiveness (PUE) of 1.22. The generator plant for one building is:</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>MSC-1 value</th>
+<th>Derivation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generator sets per building</td>
+<td>17</td>
+<td>43.92 MW / 2.88 MW = 15.25, rounded up to 16 (N), plus 1 redundant (N+1)</td>
+</tr>
+<tr>
+<td>Set rating</td>
+<td>3.6 MVA, 2.88 MW at 0.8 power factor</td>
+<td>data-centre continuous rating as defined in the original equipment manufacturer (OEM) rating definition sheet for the set model</td>
+</tr>
+<tr>
+<td>Generator voltage</td>
+<td>20 kV, 50 Hz</td>
+<td>direct MV alternator on the 20 kV generator bus</td>
+</tr>
+<tr>
+<td>Rated current per set</td>
+<td>103.9 A</td>
+<td>3,600,000 / (√3 × 20,000)</td>
+</tr>
+<tr>
+<td>Fuel consumption at full load</td>
+<td>720 L/h per set</td>
+<td>about 0.25 L/kWh</td>
+</tr>
+<tr>
+<td>Design run time</td>
+<td>24 h</td>
+<td>owner's project requirements (OPR)</td>
+</tr>
+<tr>
+<td>Bulk fuel per building</td>
+<td>293.76 m³</td>
+<td>17 × 720 L/h × 24 h</td>
+</tr>
+<tr>
+<td>Total installed capacity</td>
+<td>48.96 MW</td>
+<td>17 × 2.88 MW</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Fuel storage against NFPA 110 5.5.3. The ledger figure of 293.76 m³ is the consumption of all 17 sets at full load for 24 hours. NFPA 110 requires the stored fuel to be 133 % of the fuel needed for the Class. If the authority having jurisdiction (AHJ) or the owner applies that rule to a Class 24 system, the storage becomes 293.76 × 1.33 = <mark>390.7 m³ per building</mark>. With 16 sets running at the building facility load of 43.92 MW, the real consumption is 43.92 / 2.88 × 720 = 10,980 L/h, so 293.76 m³ lasts 26.8 hours. The commissioning manager records which basis the design used in the basis of design (BOD) and asks the engineer of record (EoR) to confirm it before the fuel quantity is accepted.</p>
+<h3 id="s15-1-3"><span class="n">15.1.3</span>Plant arrangement</h3>
+<p>Figure <a class="figref" href="#F15-1">F15-1</a> shows the single-line diagram of the generator plant. Each set has its own generator circuit breaker (52G) in the synchronising switchgear. The 17 breakers connect to a 20 kV generator bus split into two sections by a bus-coupler. Feeder breakers from the generator bus supply the building MV switchboards through generator-to-utility transfer breakers. The plant control system decides which sets start, closes them onto the bus, adds load in steps and returns the building to the utility. It is a programmable logic controller (PLC) master control or the master function of the generator controllers.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Device number (IEEE C37.2)</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generator circuit breaker</td>
+<td>52G</td>
+<td>connects one set to the generator bus</td>
+</tr>
+<tr>
+<td>Synchronising check relay</td>
+<td>25</td>
+<td>permits closing only when voltage, frequency and phase angle match</td>
+</tr>
+<tr>
+<td>Generator protection relay</td>
+<td>ANSI/IEEE C37.2 functions 87G (generator differential), 32 (reverse power), 40 (loss of excitation), 46 (negative-sequence current), 51V (voltage-restrained overcurrent), 59 (overvoltage), 27 (undervoltage), 81 (frequency)</td>
+<td>protects the alternator and the engine against faults and abnormal operation</td>
+</tr>
+<tr>
+<td>Bus-coupler</td>
+<td>52BC</td>
+<td>splits or joins the two generator bus sections</td>
+</tr>
+<tr>
+<td>Generator feeder breaker</td>
+<td>52F</td>
+<td>supplies one building MV switchboard from the generator bus</td>
+</tr>
+<tr>
+<td>Utility-generator transfer pair</td>
+<td>52U and 52GT</td>
+<td>open-transition or closed-transition transfer between utility and generator</td>
+</tr>
+<tr>
+<td>Neutral earthing resistor</td>
+<td>NER</td>
+<td>limits the earth-fault current on the 20 kV generator system</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s15-2"><span class="n">15.2</span>Ratings, NFPA 110 classification and ISO 8528-5 performance classes</h2>
+<h3 id="s15-2-1"><span class="n">15.2.1</span>ISO 8528-1 power ratings</h3>
+<p>A generator set has a different rating for each type of duty. The commissioning manager checks that the rating on the nameplate and on the factory test report is the rating the specification asked for. The load bank test duration and the overload step depend on this rating.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Rating</th>
+<th>Meaning (ISO 8528-1)</th>
+<th>Overload allowed</th>
+<th>Typical data-centre use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Continuous operating power (COP)</td>
+<td>constant load for unlimited hours</td>
+<td>none</td>
+<td>design rating on some hyperscale specifications</td>
+</tr>
+<tr>
+<td>Prime rated power (PRP)</td>
+<td>variable load for unlimited hours, average not above 70 % of PRP over 24 h</td>
+<td>10 % for 1 h in 12 h</td>
+<td>older data-centre specifications</td>
+</tr>
+<tr>
+<td>Limited-time running power (LTP)</td>
+<td>constant load up to 500 h per year</td>
+<td>none</td>
+<td>rare</td>
+</tr>
+<tr>
+<td>Emergency standby power (ESP)</td>
+<td>variable load during a utility outage, up to 200 h per year, average 70 %</td>
+<td>none</td>
+<td>small sites; not accepted by most data-centre owners</td>
+</tr>
+<tr>
+<td>Data-centre continuous (DCC) or data-centre power (DCP)</td>
+<td>manufacturer rating for unlimited hours at variable or constant load in data-centre duty</td>
+<td>per OEM</td>
+<td>common on hyperscale projects (Caterpillar, Cummins and MTU each publish one)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The DCC and DCP ratings are manufacturer ratings, and their exact definitions differ between manufacturers. ISO 8528-1 defines only COP, PRP, LTP and ESP. The DCC or DCP definition for the offered set is taken from the OEM rating definition sheet of that set. The Uptime Institute Tier Standard: Topology requires engine generators to be rated for unlimited run hours at the design load for Tier III and Tier IV.</p>
+<h3 id="s15-2-2"><span class="n">15.2.2</span>NFPA 110 Level, Type and Class</h3>
+<p>NFPA 110 classifies an emergency power supply system (EPSS) by three properties. The specification and the AHJ decide which apply.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Meaning</th>
+<th>Values</th>
+<th>MSC-1 value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Level</td>
+<td>consequence of failure</td>
+<td>Level 1: failure could cause loss of life or serious injury; Level 2: less critical</td>
+<td>Level 2 for the data-hall load; Level 1 for life-safety loads where the local AHJ applies NFPA 110 (NFPA 110 4.4 Level definitions as quoted by Cummins, RF-15 row 23; the AHJ decides which loads are Level 1)</td>
+</tr>
+<tr>
+<td>Type</td>
+<td>maximum time for power to return to the load terminals</td>
+<td>Type 10 = 10 s; Type 60 = 60 s; Type 120 = 120 s; Type M = manual</td>
+<td>Type 10 for the generator bus (project requirement)</td>
+</tr>
+<tr>
+<td>Class</td>
+<td>minimum run time at rated load without refuelling, in hours</td>
+<td>Class 0.083, 0.25, 2, 6, 48, X (X = other, set by the code or the user)</td>
+<td>Class X = 24 h</td>
+</tr>
+</tbody>
+</table></div>
+<p>A Level 1 generator inside a building stands in a room with a 2-hour fire resistance rating that contains only the EPSS equipment (NFPA 110 7.2.1.1).</p>
+<h3 id="s15-2-3"><span class="n">15.2.3</span>ISO 8528-5 transient performance classes</h3>
+<p>ISO 8528-5 defines how a set behaves when load is suddenly added or removed. Class G1 is for loads that tolerate large variation (lighting, simple resistive loads). Class G2 is for public supply-like quality. Class G3 is for loads with high demands on frequency and voltage, which includes data-centre UPS rectifiers and variable-speed drives. Class G4 is a class whose values are agreed between the manufacturer and the customer (AMC).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Parameter (ISO 8528-5:2022 Table 4)</th>
+<th>G1</th>
+<th>G2</th>
+<th>G3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frequency droop</td>
+<td>≤ 8 %</td>
+<td>≤ 5 %</td>
+<td>≤ 3 %</td>
+</tr>
+<tr>
+<td>Steady-state frequency band</td>
+<td>≤ ±2.5 %</td>
+<td>≤ ±1.5 %</td>
+<td>≤ ±0.5 %</td>
+</tr>
+<tr>
+<td>Transient frequency deviation, 100 % load removed</td>
+<td>≤ +18 %</td>
+<td>≤ +12 %</td>
+<td>≤ +10 %</td>
+</tr>
+<tr>
+<td>Transient frequency deviation, load added</td>
+<td>≤ −15 %</td>
+<td>≤ −10 %</td>
+<td>≤ −7 %</td>
+</tr>
+<tr>
+<td>Frequency recovery time</td>
+<td>≤ 10 s</td>
+<td>≤ 5 s</td>
+<td>≤ 3 s</td>
+</tr>
+<tr>
+<td>Related frequency tolerance band</td>
+<td>3.5 %</td>
+<td>2 %</td>
+<td>2 %</td>
+</tr>
+<tr>
+<td>Steady-state voltage deviation</td>
+<td>≤ ±5 %</td>
+<td>≤ ±2.5 %</td>
+<td>≤ ±1 %</td>
+</tr>
+<tr>
+<td>Transient voltage deviation, 100 % load removed</td>
+<td>≤ +35 %</td>
+<td>≤ +25 %</td>
+<td>≤ +20 %</td>
+</tr>
+<tr>
+<td>Transient voltage deviation, load added</td>
+<td>≤ −25 %</td>
+<td>≤ −20 %</td>
+<td>≤ −15 %</td>
+</tr>
+<tr>
+<td>Voltage recovery time</td>
+<td>≤ 10 s</td>
+<td>≤ 6 s</td>
+<td>≤ 4 s</td>
+</tr>
+</tbody>
+</table></div>
+<p>These values are taken from a manufacturer's reproduction of ISO 8528-5:2022 Table 4 (Kohler) and agree with a second summary (Avtron). One Cummins bulletin lists a different G3 voltage rise, so confirm every value against the current edition of ISO 8528-5 before it goes into a test script. For a 50 Hz, 20 kV set in class G3, the values become:</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Limit in class G3</th>
+<th>Value at 50 Hz and 20 kV</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lowest frequency on load acceptance</td>
+<td>−7 %</td>
+<td><mark>46.5 Hz</mark></td>
+</tr>
+<tr>
+<td>Highest frequency on 100 % load rejection</td>
+<td>+10 %</td>
+<td>55.0 Hz</td>
+</tr>
+<tr>
+<td>Frequency recovery band</td>
+<td>±2 % (tolerance band)</td>
+<td>49.0 to 51.0 Hz</td>
+</tr>
+<tr>
+<td>Frequency recovery time</td>
+<td>3 s</td>
+<td>from the load step to entry into the band</td>
+</tr>
+<tr>
+<td>Lowest voltage on load acceptance</td>
+<td>−15 %</td>
+<td><mark>17.0 kV</mark></td>
+</tr>
+<tr>
+<td>Highest voltage on 100 % load rejection</td>
+<td>+20 %</td>
+<td>24.0 kV</td>
+</tr>
+<tr>
+<td>Voltage recovery time</td>
+<td>4 s</td>
+<td>from the load step to entry into the voltage band</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s15-2-4"><span class="n">15.2.4</span>Load acceptance steps and brake mean effective pressure</h3>
+<p>A modern turbocharged engine cannot accept 100 % load in one step and stay inside class G3. ISO 8528-5:2022 Figure 6 gives reference values for the largest sudden power increase as a function of the brake mean effective pressure (bmep) at declared power. The higher the bmep, the smaller the first step. A large data-centre engine with a bmep of about 25 bar needs three or four load stages to reach 100 % (read the stage sizes from Figure 6 and from the OEM transient data sheet; confirm against the current edition of ISO 8528-5).</p>
+<p>The bmep is calculated from the declared power:</p>
+<p>bmep (bar) = (P × nr × 1,000) / (Vd × n)</p>
+<p>In this formula P is the declared power in kW and nr is the number of crank revolutions per working cycle (2 for a four-stroke engine). Vd is the swept volume in litres and n is the speed in revolutions per second.</p>
+<p><strong>Worked example:</strong> A 2.88 MW electrical set with an alternator efficiency of 96.5 % needs an engine output of 2,985 kW. With a swept volume of 95.4 L and a speed of 1,500 rpm (25 rev/s), bmep = (2,985 × 2 × 1,000) / (95.4 × 25) = <mark>25.0 bar</mark>. At this bmep, the commissioning manager expects the OEM to declare three or four acceptance stages. The test script in 15.8 uses the four stages declared on the example OEM transient data sheet: 0 to 30 %, 30 to 55 %, 55 to 80 % and 80 to 100 %.</p>
+<h2 id="s15-3"><span class="n">15.3</span>Commissioning levels for the generator plant</h2>
+<h3 id="s15-3-1"><span class="n">15.3.1</span>Levels, owners and exit records</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Activity</th>
+<th>Lead role</th>
+<th>Witness</th>
+<th>Exit record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1</td>
+<td>Factory acceptance test (FAT) of each set and of the synchronising switchgear</td>
+<td>OEM test engineer</td>
+<td>commissioning authority (CxA), EoR</td>
+<td>signed FAT report with load bank and transient results per set</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Delivery inspection and installation checks</td>
+<td>mechanical and electrical contractor</td>
+<td>CxA</td>
+<td>signed L2 checklist ELE-L2-GEN-nn per set, fuel L2 checklist MEC-L2-FUEL</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Start-up and pre-functional checks by the OEM</td>
+<td>OEM start-up engineer</td>
+<td>CxA, contractor</td>
+<td>OEM start-up report, settings record, L3 checklist ELE-L3-GEN-nn</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Functional tests: load bank, transient, start time, synchronising, load sharing, transfer, protection</td>
+<td>electrical contractor with OEM</td>
+<td>CxA, owner, AHJ where required</td>
+<td>signed L4 test scripts ELE-L4-GEN-01 to -08</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>Integrated systems test (IST): utility failure and return with the building on load</td>
+<td>commissioning manager</td>
+<td>owner, operations team</td>
+<td>IST script results, issue log entries closed</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s15-3-2"><span class="n">15.3.2</span>What blocks the next level</h3>
+<ol>
+<li><strong>L1 to L2.</strong> A set does not ship until its FAT report shows the full load run and the transient results inside the specified class. A set that failed the FAT is retested at the factory.</li>
+<li><strong>L2 to L3.</strong> The OEM does not start an engine until the fuel system is flushed and its fuel sample passes (15.5). The coolant and lubricating oil must also be filled to the OEM specification, the exhaust complete, the room ventilation working and the alternator insulation resistance passed.</li>
+<li><strong>L3 to L4.</strong> The load bank test does not start until the OEM start-up report is signed, all protective shutdowns are proven and the controller settings record is issued.</li>
+<li><strong>L4 to L5.</strong> The integrated test does not start until every set has passed its load bank, transient and protection tests. The synchronising and load sharing tests must also pass with all sets, and the generator controller points must be proven at the EPMS and BMS.</li>
+</ol>
+<h3 id="s15-3-3"><span class="n">15.3.3</span>Factory acceptance test content</h3>
+<ol>
+<li><strong>Run at rated load.</strong> The set runs at 100 % of its rating at 0.8 power factor for the duration in the specification (4 hours in this example). Readings are taken every 15 minutes.</li>
+<li><strong>Overload.</strong> Where the rating allows an overload (prime rating), the set runs at 110 % for 1 hour.</li>
+<li><strong>Transient performance.</strong> Load acceptance in the declared stages and 100 % load rejection, recorded with a high-speed recorder against ISO 8528-5 class G3.</li>
+<li><strong>Protective shutdowns.</strong> Low oil pressure, high coolant temperature, overspeed, overcrank and emergency stop are proven by simulation or by real trip.</li>
+<li><strong>Alternator tests.</strong> Insulation resistance, winding resistance, voltage waveform and harmonic content, phase rotation.</li>
+<li><strong>Switchgear FAT.</strong> Synchronising logic with simulated generator signals, protection relay injection, interlocks and the control panel input and output (I/O) list.</li>
+</ol>
+<p><strong>Worked example:</strong> FAT witness plan for 17 sets. With two FAT test cells at the factory and 1.5 days per set (4-hour run, transient test, shutdowns, paperwork), the 17 sets need 17 × 1.5 / 2 = 12.75 working days. The CxA witnesses three sets in full (the first, one from the middle of the run and the last) and reviews the other 14 reports, which gives <mark>3 witnessed FATs and 14 reviewed reports</mark> for building B2.</p>
+<h2 id="s15-4"><span class="n">15.4</span>Installation checks (Level 2)</h2>
+<h3 id="s15-4-1"><span class="n">15.4.1</span>Mechanical and exhaust installation</h3>
+<ol>
+<li><strong>Foundation and isolators.</strong> The set stands level within the OEM tolerance (for example 1 mm per metre) on its anti-vibration mounts. The mounts are released from their transport locks.</li>
+<li><strong>Exhaust system.</strong> The exhaust has a flexible connection at the engine, supports independent of the engine, insulation where people can touch it, a rain cap or a drain, and a back-pressure test point. The design back-pressure is below the OEM limit (for example 6.7 kPa; the OEM installation manual gives the limit).</li>
+<li><strong>Room ventilation.</strong> Air inlet and outlet louvres and the radiator duct are complete, and the motorised louvres open on engine start. The design air temperature rise across the room is within the OEM limit.</li>
+<li><strong>Cooling system.</strong> Radiator or remote cooler filled with the OEM-approved coolant mixture. Coolant concentration checked with a refractometer.</li>
+<li><strong>Lubricating oil.</strong> Filled to the dipstick full mark with the OEM grade. A sample is taken for the baseline oil analysis.</li>
+<li><strong>Starting system.</strong> Batteries or air starters installed, charger working, battery voltage recorded, cranking cables sized and tight.</li>
+<li><strong>Fire protection.</strong> The room fire detection and any sprinkler or water-mist system cover the set as designed (chapter 20).</li>
+</ol>
+<h3 id="s15-4-2"><span class="n">15.4.2</span>Electrical installation and alternator tests</h3>
+<p>Figure <a class="figref" href="#F15-6">F15-6</a> shows the stator insulation test connection and the insulation resistance (IR) curve of set B2-GEN-07.</p>
+<figure class="sheet" id="F15-6"><a href="../data/cx-handbook/figures/F15-6.svg" title="Open drawing F15-6 at full size"><img src="../data/cx-handbook/figures/F15-6.svg" alt="F15-6: Alternator stator insulation test of B2-GEN-07: connection and IR curve" width="1000" height="985" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F15-6</span> — <b>Alternator stator insulation test of B2-GEN-07: connection and IR curve</b>. The 1-minute value is corrected to 40 °C before it is compared with the minimum; the PI needs no correction because both readings are at the same temperature.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Instrument and accuracy</th>
+<th>Applied value</th>
+<th>Duration</th>
+<th>Acceptance value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alternator stator insulation resistance (IR)</td>
+<td>insulation tester, ±5 % accuracy, calibrated within 12 months</td>
+<td>5 kV DC for a 20 kV winding (each phase to earth, other phases earthed)</td>
+<td>1 min and 10 min</td>
+<td>IR at 1 min corrected to 40 °C ≥ 100 MΩ (form-wound stator built after 1970); polarisation index (PI) ≥ 2.0</td>
+<td>IEEE 43-2013 minimum values (100 MΩ at 40 °C, PI 2.0), RF-15 row 24</td>
+</tr>
+<tr>
+<td>Rotor and exciter insulation resistance</td>
+<td>insulation tester</td>
+<td>500 V DC</td>
+<td>1 min</td>
+<td>≥ 1 MΩ or OEM value</td>
+<td>OEM manual</td>
+</tr>
+<tr>
+<td>Winding resistance</td>
+<td>micro-ohmmeter, ±0.2 %</td>
+<td>10 A DC</td>
+<td>until stable</td>
+<td>phases within 2 % of each other and of the factory value</td>
+<td>ANSI/NETA ATS</td>
+</tr>
+<tr>
+<td>Space heater</td>
+<td>multimeter, clamp meter</td>
+<td>supply voltage</td>
+<td>—</td>
+<td>current within ±10 % of nameplate</td>
+<td>OEM manual</td>
+</tr>
+<tr>
+<td>Earthing of frame and neutral earthing resistor</td>
+<td>low-resistance ohmmeter</td>
+<td>10 A</td>
+<td>—</td>
+<td>bond resistance ≤ 0.1 Ω; NER resistance within ±10 % of nameplate</td>
+<td>project specification</td>
+</tr>
+<tr>
+<td>MV cable from alternator to 52G</td>
+<td>per chapter 13 (VLF withstand, IR)</td>
+<td>per chapter 13</td>
+<td>per chapter 13</td>
+<td>per chapter 13</td>
+<td>IEEE 400.2</td>
+</tr>
+<tr>
+<td>Phase rotation</td>
+<td>phase rotation meter</td>
+<td>at first run</td>
+<td>—</td>
+<td>same rotation as the generator bus and utility</td>
+<td>project specification</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Alternator IR record for set B2-GEN-07. The IR at 1 minute was 3,850 MΩ and at 10 minutes 9,240 MΩ at a winding temperature of 28 °C. PI = 9,240 / 3,850 = <mark>2.40</mark>, above the minimum of 2.0. The IEEE 43 temperature correction to 40 °C halves the IR for every 10 °C rise. The 1-minute value at 40 °C is about 3,850 × 0.5^1.2 = 1,676 MΩ, far above the 100 MΩ minimum. The result is a pass and the record goes into ELE-L2-GEN-07.</p>
+<h3 id="s15-4-3"><span class="n">15.4.3</span>L2 checklist record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Asset tag</td>
+<td>text</td>
+<td>B2-GEN-07</td>
+</tr>
+<tr>
+<td>Serial numbers (engine, alternator, controller)</td>
+<td>text</td>
+<td>engine SN 4ZX01234, alternator SN A1-77881, controller SN 2203-0417</td>
+</tr>
+<tr>
+<td>Rating on nameplate</td>
+<td>text</td>
+<td>3,600 kVA, 2,880 kW, 0.8 pf, 20 kV, 50 Hz, DCC</td>
+</tr>
+<tr>
+<td>Foundation level reading</td>
+<td>number (mm/m)</td>
+<td>0.6</td>
+</tr>
+<tr>
+<td>Exhaust back-pressure (design)</td>
+<td>number (kPa)</td>
+<td>5.1</td>
+</tr>
+<tr>
+<td>Coolant concentration</td>
+<td>number (%)</td>
+<td>50</td>
+</tr>
+<tr>
+<td>Starting battery voltage</td>
+<td>number (V)</td>
+<td>25.6</td>
+</tr>
+<tr>
+<td>IR 1 min / 10 min, PI</td>
+<td>numbers</td>
+<td>3,850 MΩ / 9,240 MΩ / 2.40</td>
+</tr>
+<tr>
+<td>Open items</td>
+<td>list</td>
+<td>2 (louvre actuator label missing; exhaust insulation gap at flange)</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>name, role, date</td>
+<td>contractor QA, CxA</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s15-5"><span class="n">15.5</span>Fuel system: storage, transfer, day tanks, flushing and fuel quality</h2>
+
+<figure class="sheet" id="F15-2"><a href="../data/cx-handbook/figures/F15-2.svg" title="Open drawing F15-2 at full size"><img src="../data/cx-handbook/figures/F15-2.svg" alt="F15-2: Fuel system of one generator: bulk tank, duplex transfer, filter and day tank with level control" width="1400" height="926" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F15-2</span> — <b>Fuel system of one generator: bulk tank, duplex transfer, filter and day tank with level control</b>. The transfer pumps start at 60 % and stop at 90 %; high-high at 95 % closes the inlet solenoid valve; leak sensors in the bund stop the pump to that tank.</figcaption></figure>
+<h3 id="s15-5-1"><span class="n">15.5.1</span>System description</h3>
+<p>Figure <a class="figref" href="#F15-2">F15-2</a> shows the fuel system piping and instrumentation diagram (P&amp;ID) for one building. Diesel is delivered by road tanker to a fill point with a spill containment box. It is stored in bulk tanks (double-wall steel tanks above ground, or underground tanks with interstitial monitoring). Duplex transfer pumps move the fuel from the bulk tanks to a day tank at each generator. A filter and water separator on the transfer line, and the engine's own filters, keep the fuel clean. A polishing skid circulates the bulk tank contents through filters and a water coalescer.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+<th>Commissioning check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fill point and spill box</td>
+<td>tanker connection, overfill protection</td>
+<td>overfill alarm at 90 % and shut-off valve at 95 % of tank volume (project specification values)</td>
+</tr>
+<tr>
+<td>Bulk tank</td>
+<td>stores the Class duration of fuel</td>
+<td>tank calibration chart, level gauge, leak detection in the interstitial space</td>
+</tr>
+<tr>
+<td>Transfer pumps (duty and standby)</td>
+<td>fill the day tanks</td>
+<td>flow, pressure, changeover on failure, run on generator power</td>
+</tr>
+<tr>
+<td>Day tank</td>
+<td>supplies one engine for a limited time</td>
+<td>level switches, overflow return, high-level shut-off, leak detection in the bund</td>
+</tr>
+<tr>
+<td>Polishing skid</td>
+<td>removes water and particles</td>
+<td>filter differential pressure, water-in-fuel sensor, flow</td>
+</tr>
+<tr>
+<td>Leak detection</td>
+<td>finds leaks in pipe sleeves, bunds and sumps</td>
+<td>each sensor alarms at the fire alarm panel or BMS</td>
+</tr>
+<tr>
+<td>Fuel level monitoring</td>
+<td>shows litres and hours of run time</td>
+<td>calibrated against the tank chart; transmitted to the BMS</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s15-5-2"><span class="n">15.5.2</span>Day-tank control levels</h3>
+<p>Each day tank has level switches or a level transmitter with set points. The values below are an example for a 1,500 L day tank, which gives 2.1 hours at 720 L/h.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Percentage of tank</th>
+<th>Volume</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High-high</td>
+<td>95 %</td>
+<td>1,425 L</td>
+<td>alarm; close the inlet solenoid valve; stop transfer pumps to this tank</td>
+</tr>
+<tr>
+<td>High</td>
+<td>90 %</td>
+<td>1,350 L</td>
+<td>stop filling</td>
+</tr>
+<tr>
+<td>Low (pump start)</td>
+<td>60 %</td>
+<td>900 L</td>
+<td>start filling</td>
+</tr>
+<tr>
+<td>Low alarm</td>
+<td>40 %</td>
+<td>600 L</td>
+<td>alarm "day tank low" to BMS</td>
+</tr>
+<tr>
+<td>Low-low</td>
+<td>15 %</td>
+<td>225 L</td>
+<td>alarm "day tank critical"; engine has about 19 minutes at full load (225 / 720 × 60 = 18.75)</td>
+</tr>
+<tr>
+<td>Leak in bund</td>
+<td>sensor</td>
+<td>—</td>
+<td>alarm; stop transfer pump to this tank</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s15-5-3"><span class="n">15.5.3</span>Pressure test of fuel piping</h3>
+<p><strong>Purpose:</strong> Prove that the fuel piping does not leak before it is filled with diesel.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Isolate the section.</strong> The pipefitter isolates the section from tanks, pumps and engines with blank flanges or closed valves rated for the test pressure.</li>
+<li><strong>Fill and vent.</strong> For a hydrostatic test, the section is filled with a test liquid compatible with diesel (the diesel itself in a closed system, or water followed by a drying procedure agreed with the OEM). For a pneumatic test, use dry air or nitrogen with the safety exclusion zone set.</li>
+<li><strong>Apply the test pressure.</strong> NFPA 30-2024 27.7.1.1 requires 150 % of the maximum anticipated pressure for a hydrostatic test, or 110 % for a pneumatic test, held while every joint is inspected. Clause 27.7.1.2 sets a minimum of 34.5 kPa (5 psig) at the highest point and a hold time of at least 10 minutes. The project specification may set a longer hold.</li>
+<li><strong>Read and inspect.</strong> A calibrated pressure gauge (accuracy class 0.6 or better, range about 1.5 to 2 times the test pressure) shows no pressure drop that cannot be explained by temperature. Every joint is inspected; for a pneumatic test, joints are checked with leak detection fluid.</li>
+<li><strong>Record.</strong> The record shows the section, the test medium, the pressure, the start and end readings, the temperature and the signatures.</li>
+</ol>
+<p><strong>Acceptance:</strong> <mark>No visible leak and no unexplained pressure drop</mark> during the hold period.</p>
+<p><strong>Worked example:</strong> Transfer pump discharge header B2-FO-HDR-01. The pump dead-head pressure is 6.0 bar, so the maximum anticipated pressure is 6.0 bar and the hydrostatic test pressure is 1.5 × 6.0 = <mark>9.0 bar</mark>. The gauge has a range of 0 to 16 bar, class 0.6 (±0.1 bar). The section held 9.0 bar to 8.98 bar over 30 minutes while the pipe temperature fell 0.4 °C. The reading change of 0.02 bar is below the gauge accuracy, so the test passes.</p>
+<h3 id="s15-5-4"><span class="n">15.5.4</span>Flushing the fuel system</h3>
+<p>New fuel piping contains welding slag, mill scale, cutting oil and dust. If this debris reaches the engine, it blocks the filters within hours or damages the high-pressure injection pump.</p>
+<ol>
+<li><strong>Prepare the flush loop.</strong> The contractor connects a temporary flushing rig (pump, filter of 10 µm or finer, and bypass hoses) so that the flushing fluid bypasses the day tanks, the engine and the polishing skid. The engine fuel connections are capped.</li>
+<li><strong>Set the flow.</strong> The rig circulates at a velocity that gives turbulent flow, commonly at least 1.5 times the design velocity. The project flushing specification states the velocity for the project.</li>
+<li><strong>Circulate and change filters.</strong> Filters are changed when the differential pressure reaches the manufacturer's limit. Each change is recorded.</li>
+<li><strong>Sample.</strong> After at least 4 hours of circulation with no filter change, the contractor takes a sample at the end of the loop in a clean bottle.</li>
+<li><strong>Test the sample.</strong> A particle counter or a laboratory reports the cleanliness to ISO 4406.</li>
+<li><strong>Reinstate.</strong> When the sample passes, the contractor removes the temporary connections, fits the permanent filters and records the final configuration.</li>
+</ol>
+<p><strong>Acceptance:</strong> Cleanliness at or better than the engine OEM target. Caterpillar publishes ISO 18/16/13 as the cleanliness of fuel delivered to engines with high-pressure common-rail systems. The OEM fuel recommendations for the engine model give the target that applies.</p>
+<h3 id="s15-5-5"><span class="n">15.5.5</span>Fuel quality tests on delivery and before acceptance</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Test method</th>
+<th>Acceptance value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Water and sediment</td>
+<td>ASTM D2709</td>
+<td>≤ 0.05 % by volume</td>
+<td>ASTM D975 Table 1, water and sediment row (No. 1-D and No. 2-D grades; ALS Global summary, RF-15 row 28)</td>
+</tr>
+<tr>
+<td>Particle cleanliness</td>
+<td>ISO 4406 particle counter</td>
+<td>≤ 18/16/13 at the engine</td>
+<td>OEM fuel recommendation</td>
+</tr>
+<tr>
+<td>Water content</td>
+<td>ASTM D6304 (Karl Fischer)</td>
+<td>≤ 200 mg/kg (common project value)</td>
+<td>project specification</td>
+</tr>
+<tr>
+<td>Microbial contamination</td>
+<td>ASTM D6469 guidance, field test kit</td>
+<td>negative or below the kit's low threshold</td>
+<td>project specification</td>
+</tr>
+<tr>
+<td>Cetane number</td>
+<td>ASTM D613 or calculated index ASTM D976</td>
+<td>≥ the national fuel specification value</td>
+<td>Indonesian fuel specification (Dirjen Migas)</td>
+</tr>
+<tr>
+<td>Sulphur</td>
+<td>ASTM D5453</td>
+<td>per the national specification for the grade</td>
+<td>Indonesian fuel specification</td>
+</tr>
+<tr>
+<td>Biodiesel (FAME) content</td>
+<td>EN 14078</td>
+<td>as declared by the supplier</td>
+<td>national blend mandate</td>
+</tr>
+</tbody>
+</table></div>
+<p>Indonesian automotive diesel contains fatty acid methyl ester (FAME) under the national biodiesel mandate (B35 from 2023 and B40 from 2025; confirm the current blend against the Ministry of Energy and Mineral Resources (ESDM) ministerial decree in force). FAME absorbs water and supports microbial growth. Fuel stored for a 24-hour reserve may sit for years, so it needs a polishing routine and quarterly sampling. The commissioning manager asks the engine OEM to confirm in writing that the blend is accepted for the warranty.</p>
+<h3 id="s15-5-6"><span class="n">15.5.6</span>Transfer system functional test</h3>
+<p><strong>Purpose:</strong> Prove that every day tank is refilled automatically under normal and failure conditions.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Normal fill.</strong> The technician draws the day tank of B2-GEN-07 down to 60 % by running the engine or draining to a bulk tank. The duty transfer pump starts at 60 % and stops at 90 %. The fill time is recorded.</li>
+<li><strong>Pump failure.</strong> The technician trips the duty pump. The standby pump starts within the set delay (example 10 s) and an alarm reaches the BMS.</li>
+<li><strong>High-high level.</strong> The technician lifts the high-high float. The inlet solenoid valve closes and the alarm appears at the BMS within 5 s.</li>
+<li><strong>Leak detection.</strong> The technician wets each leak sensor in the day-tank bund and the pipe sleeves. Each sensor alarms with the correct tag.</li>
+<li><strong>Generator power.</strong> With the utility supply switched off and the building on generators (L5), the transfer pumps run from the generator-backed supply.</li>
+</ol>
+<p><strong>Records:</strong> Fuel transfer test record MEC-L4-FUEL-01 with levels, times, alarms received and signatures.</p>
+<p><strong>Worked example:</strong> Fill time check. The duty pump delivers 3,000 L/h. Filling from 60 % (900 L) to 90 % (1,350 L) takes 450 L. With the engine at full load the net rate is 3,000 − 720 = 2,280 L/h, so the fill takes <mark>11.8 minutes</mark>. A measured fill time of 21 minutes means the pump delivers only about 2,000 L/h. The technician checks the suction strainer and the pump relief valve before the test is repeated.</p>
+<h2 id="s15-6"><span class="n">15.6</span>Start-up and controller set-up (Level 3)</h2>
+<h3 id="s15-6-1"><span class="n">15.6.1</span>First start sequence</h3>
+<p><strong>Owner:</strong> OEM start-up engineer, with the electrical contractor and the CxA present.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Pre-start inspection.</strong> The OEM start-up engineer checks oil, coolant and fuel levels, belt tension, air filter restriction indicator, exhaust connections and that no tools are left in the enclosure. Time limit: 1 hour per set.</li>
+<li><strong>Prime and crank.</strong> The fuel system is primed. The engine is cranked with the fuel shut off (where the OEM allows) to build oil pressure before the first firing.</li>
+<li><strong>First start at no load.</strong> The engine starts in manual mode and runs at idle, then at rated speed. The engineer records oil pressure, coolant temperature, speed and battery charging current every 2 minutes for the first 15 minutes.</li>
+<li><strong>Leak and vibration walk-down.</strong> The contractor walks the set for fuel, oil, coolant and exhaust leaks. Vibration is measured on the engine and alternator bearings.</li>
+<li><strong>Alternator excitation.</strong> The AVR builds voltage. The engineer records the no-load voltage on each phase, the phase rotation and the frequency.</li>
+<li><strong>Protective shutdown tests.</strong> Each shutdown is proven (15.6.2).</li>
+<li><strong>Settings record.</strong> The engineer issues the controller settings record (15.6.4).</li>
+</ol>
+<h3 id="s15-6-2"><span class="n">15.6.2</span>Protective shutdown tests</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Shutdown or alarm</th>
+<th>Test method</th>
+<th>Acceptance value (example; OEM value governs)</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Overspeed</td>
+<td>raise speed set point in test mode, or simulate the speed signal</td>
+<td>shutdown at 115 % of rated speed (1,725 rpm at 1,500 rpm rated)</td>
+<td>trip speed and time</td>
+</tr>
+<tr>
+<td>Low lubricating oil pressure</td>
+<td>drain the sensor line to atmosphere through a test valve, or simulate the sensor</td>
+<td>pre-alarm then shutdown at the OEM pressure</td>
+<td>pressure at trip</td>
+</tr>
+<tr>
+<td>High coolant temperature</td>
+<td>simulate the sensor with a calibrated resistance or current source</td>
+<td>pre-alarm then shutdown at the OEM temperature</td>
+<td>temperature at trip</td>
+</tr>
+<tr>
+<td>Low coolant level</td>
+<td>lower the float or disconnect the probe</td>
+<td>alarm or shutdown per OEM</td>
+<td>yes or no</td>
+</tr>
+<tr>
+<td>Overcrank (fail to start)</td>
+<td>block the fuel supply in test mode</td>
+<td>shutdown after the set crank cycles</td>
+<td>number of cycles and time</td>
+</tr>
+<tr>
+<td>Emergency stop (local and remote)</td>
+<td>press each button</td>
+<td>engine stops, 52G opens, alarm at BMS and EPMS</td>
+<td>stop time</td>
+</tr>
+<tr>
+<td>Fuel leak in base tank or enclosure</td>
+<td>wet the sensor</td>
+<td>alarm; shutdown where specified</td>
+<td>yes or no</td>
+</tr>
+<tr>
+<td>Fire alarm interface</td>
+<td>signal from the fire alarm control panel</td>
+<td>action as in the cause-and-effect matrix (chapter 20)</td>
+<td>yes or no</td>
+</tr>
+</tbody>
+</table></div>
+<p>NFPA 110 requires the Level 1 controller to show visual and audible alarms for low oil pressure, high coolant temperature, overspeed, overcrank and other conditions listed in its safety indications and shutdowns table (Table 5.6.5.4 in NFPA 110-2022, the edition quoted in the public input report for the 2025 edition; confirm the table number in NFPA 110-2025).</p>
+<h3 id="s15-6-3"><span class="n">15.6.3</span>Governor and AVR set-up</h3>
+<p>The governor holds the engine speed (and so the frequency). The AVR holds the alternator output voltage. Both have proportional, integral and derivative (PID) gains that the OEM start-up engineer tunes during start-up so that the transient test in 15.8 passes.</p>
+<ol>
+<li><strong>Speed set point.</strong> 1,500 rpm for 50 Hz on a four-pole alternator. In isochronous mode the frequency returns to exactly 50.0 Hz after a load change.</li>
+<li><strong>Droop setting.</strong> For paralleled sets that share load through the controllers' load-sharing lines, the governors run isochronous with load sharing. Where droop is used as a back-up mode, set the droop at 3 % or less. ISO 8528-5 class G3 limits frequency droop to ≤ 3 % (table in 15.2.3; the OEM setting guide gives the governor setting).</li>
+<li><strong>Voltage set point.</strong> 20.0 kV. Voltage droop for reactive sharing, where used, at about 4 % at full reactive load (OEM value).</li>
+<li><strong>Volts-per-hertz (V/Hz) roll-off.</strong> The AVR reduces the voltage when the frequency falls below a knee point (for example 48 Hz) so that the engine recovers speed faster after a large step. This setting changes the voltage dip in the transient test and must appear in the settings record.</li>
+<li><strong>Gains.</strong> The engineer starts from the OEM default gains, steps 25 % load on and off, and adjusts until the recovery is fast with no more than one overshoot.</li>
+</ol>
+<h3 id="s15-6-4"><span class="n">15.6.4</span>Controller settings record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Controller model and firmware</td>
+<td>text</td>
+<td>Woodward easYgen-3500XT, firmware 1.24 (example)</td>
+</tr>
+<tr>
+<td>Rated speed, frequency, voltage</td>
+<td>numbers</td>
+<td>1,500 rpm, 50 Hz, 20.0 kV</td>
+</tr>
+<tr>
+<td>Governor mode and gains</td>
+<td>text, numbers</td>
+<td>isochronous load sharing; P 8.0, I 2.5, D 0.2</td>
+</tr>
+<tr>
+<td>AVR gains and V/Hz knee</td>
+<td>numbers</td>
+<td>P 4.0, I 1.2; knee 48.0 Hz, slope 1.0 per unit</td>
+</tr>
+<tr>
+<td>Synchronising window</td>
+<td>numbers</td>
+<td>ΔV ≤ 3 %, Δf ≤ 0.1 Hz, Δφ ≤ 10°, breaker closing time 80 ms</td>
+</tr>
+<tr>
+<td>Load sharing mode</td>
+<td>text</td>
+<td>digital bus (CAN) between controllers</td>
+</tr>
+<tr>
+<td>Protection settings</td>
+<td>table reference</td>
+<td>relay setting sheet B2-GEN-07-PS rev 2</td>
+</tr>
+<tr>
+<td>Modbus address and baud rate or IP address</td>
+<td>text</td>
+<td>10.21.10.57, unit ID 1</td>
+</tr>
+<tr>
+<td>Signature</td>
+<td>name, date</td>
+<td>OEM start-up engineer, CxA</td>
+</tr>
+</tbody>
+</table></div>
+<p>The settings record is controlled like a drawing. Any change after the L4 tests needs <mark>a new revision and a retest</mark> of the affected function.</p>
+<h2 id="s15-7"><span class="n">15.7</span>Load bank test</h2>
+<h3 id="s15-7-1"><span class="n">15.7.1</span>Purpose and set-up</h3>
+<p><strong>Purpose:</strong> Prove that each set carries its rated load for the specified time with stable frequency, voltage, temperatures and pressures. Prove also that the cooling system and room ventilation hold the engine within limits at full load.</p>
+<p><strong>Inputs:</strong> signed L3 start-up report, settings record, fuel day tank full, load bank connected, test script ELE-L4-GEN-01.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Instrument</th>
+<th>Accuracy or class</th>
+<th>Connection</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Power quality analyser (for example Fluke 1760, Hioki PQ3198 or equal)</td>
+<td>IEC 61000-4-30 Class A, calibrated within 12 months</td>
+<td>on the generator VTs and CTs or on the load bank metering</td>
+<td>kW, kvar, pf, V, A, Hz, harmonics, recorded every 1 s</td>
+</tr>
+<tr>
+<td>Load bank metering</td>
+<td>±1 %</td>
+<td>at the load bank</td>
+<td>applied load cross-check</td>
+</tr>
+<tr>
+<td>Infrared camera</td>
+<td>±2 °C</td>
+<td>handheld</td>
+<td>terminations, breaker, alternator terminal box</td>
+</tr>
+<tr>
+<td>Sound level meter</td>
+<td>IEC 61672 Class 1</td>
+<td>1 m and 7 m from the enclosure</td>
+<td>noise check (15.12)</td>
+</tr>
+<tr>
+<td>Exhaust gas analyser (where emissions are measured)</td>
+<td>per manufacturer</td>
+<td>exhaust test port</td>
+<td>NOx, carbon monoxide (CO), O2, smoke (15.12)</td>
+</tr>
+<tr>
+<td>Controller readings</td>
+<td>controller accuracy</td>
+<td>screen or Modbus</td>
+<td>oil pressure, coolant temperature, exhaust temperature</td>
+</tr>
+</tbody>
+</table></div>
+<p>On MSC-1 a 20 kV resistive and reactive load bank of 3.0 MW and 2.25 Mvar is connected to a spare feeder breaker of the generator bus, or to a load bank connection cabinet. When only low-voltage load banks are available, a temporary 20/0.415 kV transformer of at least 3.6 MVA is used. Its losses are subtracted from the generator output.</p>
+<h3 id="s15-7-2"><span class="n">15.7.2</span>Load steps and durations</h3>
+<p>The table gives a common data-centre load bank sequence, and Figure <a class="figref" href="#F15-7">F15-7</a> plots it with the coolant trend of the 100 % step. The specification governs; some hyperscale specifications ask for 4 hours at 100 % and 1 hour at 110 % only where the rating allows overload.</p>
+<figure class="sheet" id="F15-7"><a href="../data/cx-handbook/figures/F15-7.svg" title="Open drawing F15-7 at full size"><img src="../data/cx-handbook/figures/F15-7.svg" alt="F15-7: Load bank sequence of one 2,880 kW set and the coolant trend at 100 %" width="1000" height="1057" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F15-7</span> — <b>Load bank sequence of one 2,880 kW set and the coolant trend at 100 %</b>. Top: applied load against time. Bottom: coolant temperature and room temperature rise read every 15 to 60 minutes during step 5 (record of 15.7.4).</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Load (% of kW rating)</th>
+<th>kW on MSC-1 set</th>
+<th>Power factor</th>
+<th>Duration</th>
+<th>Readings</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0 % (warm-up)</td>
+<td>0</td>
+<td>—</td>
+<td>10 min</td>
+<td>every 5 min</td>
+</tr>
+<tr>
+<td>2</td>
+<td>25 %</td>
+<td>720</td>
+<td>1.0</td>
+<td>30 min</td>
+<td>every 15 min</td>
+</tr>
+<tr>
+<td>3</td>
+<td>50 %</td>
+<td>1,440</td>
+<td>0.8</td>
+<td>30 min</td>
+<td>every 15 min</td>
+</tr>
+<tr>
+<td>4</td>
+<td>75 %</td>
+<td>2,160</td>
+<td>0.8</td>
+<td>30 min</td>
+<td>every 15 min</td>
+</tr>
+<tr>
+<td>5</td>
+<td>100 %</td>
+<td>2,880</td>
+<td>0.8</td>
+<td><mark>4 h</mark> (2 h minimum per NFPA 110 acceptance)</td>
+<td>every 15 min</td>
+</tr>
+<tr>
+<td>6</td>
+<td>110 % (prime rating only)</td>
+<td>3,168</td>
+<td>0.8</td>
+<td>1 h</td>
+<td>every 15 min</td>
+</tr>
+<tr>
+<td>7</td>
+<td>cool-down at 0 %</td>
+<td>0</td>
+<td>—</td>
+<td>5 to 10 min</td>
+<td>at end</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s15-7-3"><span class="n">15.7.3</span>Readings taken at each interval</h3>
+<ol>
+<li><strong>Electrical.</strong> Voltage on each phase, current on each phase, kW, kvar, power factor and frequency.</li>
+<li><strong>Engine.</strong> Oil pressure, coolant temperature at engine outlet, exhaust temperature per cylinder bank, charge air temperature and pressure, fuel pressure.</li>
+<li><strong>Room.</strong> Air temperature at the radiator inlet and at the room outlet louvre; this proves the room ventilation design.</li>
+<li><strong>Alternator.</strong> Winding temperature from the resistance temperature detectors (RTDs), bearing temperature.</li>
+<li><strong>Fuel.</strong> Day tank level and transfer pump status.</li>
+<li><strong>Observations.</strong> Leaks, abnormal noise, vibration, smoke colour.</li>
+</ol>
+<h3 id="s15-7-4"><span class="n">15.7.4</span>Acceptance criteria</h3>
+<ol>
+<li><strong>Frequency.</strong> Steady-state frequency within ±0.5 % of 50 Hz (49.75 to 50.25 Hz) at every load (ISO 8528-5 class G3 steady-state band).</li>
+<li><strong>Voltage.</strong> Steady-state voltage within ±1 % of 20.0 kV (19.8 to 20.2 kV) (ISO 8528-5:2022 class G3 steady-state voltage deviation, Kohler white paper, RF-15 row 7).</li>
+<li><strong>Temperatures.</strong> Coolant, oil and alternator winding temperatures stable (change less than 1 °C over the last 30 minutes) and below the OEM alarm values.</li>
+<li><strong>Room temperature rise.</strong> Within the design value (for example 10 K between room inlet and radiator inlet).</li>
+<li><strong>No leaks, no alarms.</strong> No fuel, oil or coolant leaks; no controller alarms.</li>
+<li><strong>Voltage unbalance.</strong> ≤ 1 % between phases (confirm against the voltage unbalance row of ISO 8528-5:2022 Table 4).</li>
+</ol>
+<p><strong>Worked example:</strong> Filled load bank record for B2-GEN-07, step 5 (100 %).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Time</th>
+<th>kW</th>
+<th>kvar</th>
+<th>pf</th>
+<th>V L-L (kV)</th>
+<th>Hz</th>
+<th>Coolant (°C)</th>
+<th>Oil (kPa)</th>
+<th>Exhaust (°C)</th>
+<th>Room in/out (°C)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10:00</td>
+<td>2,884</td>
+<td>2,158</td>
+<td>0.80</td>
+<td>20.04</td>
+<td>50.01</td>
+<td>82</td>
+<td>465</td>
+<td>498</td>
+<td>31.5 / 39.8</td>
+</tr>
+<tr>
+<td>10:15</td>
+<td>2,881</td>
+<td>2,161</td>
+<td>0.80</td>
+<td>20.02</td>
+<td>50.00</td>
+<td>86</td>
+<td>462</td>
+<td>506</td>
+<td>31.8 / 40.4</td>
+</tr>
+<tr>
+<td>11:00</td>
+<td>2,879</td>
+<td>2,160</td>
+<td>0.80</td>
+<td>20.03</td>
+<td>50.00</td>
+<td>88</td>
+<td>460</td>
+<td>512</td>
+<td>32.4 / 41.6</td>
+</tr>
+<tr>
+<td>12:00</td>
+<td>2,882</td>
+<td>2,159</td>
+<td>0.80</td>
+<td>20.02</td>
+<td>49.99</td>
+<td>88</td>
+<td>460</td>
+<td>513</td>
+<td>33.1 / 42.3</td>
+</tr>
+<tr>
+<td>13:00</td>
+<td>2,880</td>
+<td>2,160</td>
+<td>0.80</td>
+<td>20.03</td>
+<td>50.00</td>
+<td>88</td>
+<td>459</td>
+<td>513</td>
+<td>33.6 / 42.9</td>
+</tr>
+<tr>
+<td>14:00</td>
+<td>2,881</td>
+<td>2,160</td>
+<td>0.80</td>
+<td>20.02</td>
+<td>50.00</td>
+<td>88</td>
+<td>459</td>
+<td>514</td>
+<td>33.9 / 43.2</td>
+</tr>
+</tbody>
+</table></div>
+<p>The frequency stayed between 49.99 and 50.01 Hz, inside ±0.25 Hz. The voltage stayed between 20.02 and 20.04 kV, inside ±0.2 kV. The coolant temperature was stable at 88 °C for the last 3 hours, below the example alarm value of 98 °C. The room temperature rise was 43.2 − 33.9 = <mark>9.3 K</mark>, inside the 10 K design value. The outdoor temperature rose during the afternoon. The commissioning manager records the outdoor temperature beside the room readings and asks the EoR whether the 10 K rise still holds at the 34 °C design dry bulb.</p>
+<h3 id="s15-7-5"><span class="n">15.7.5</span>Common errors in load bank tests</h3>
+<ol>
+<li><strong>Unity power factor only.</strong> A resistive-only load bank does not load the alternator to its rated kVA. The alternator heating and the AVR response at 0.8 pf are not proven. Use a resistive-reactive load bank or state the gap in the report.</li>
+<li><strong>Load bank on the wrong side of the meter.</strong> Readings taken at the load bank include the cable and transformer losses. The analyser connects on the generator side.</li>
+<li><strong>Enclosure doors left open.</strong> The test runs with the enclosure doors open, so the ventilation result is better than in service. The doors stay closed during step 5.</li>
+<li><strong>Short 100 % duration.</strong> Temperatures have not stabilised. Stabilisation is <mark>a change of less than 1 °C in 30 minutes</mark>.</li>
+<li><strong>Fuel day tank isolated.</strong> The day tank is bypassed with a temporary drum, so the transfer system is not proven under real consumption.</li>
+</ol>
+<h2 id="s15-8"><span class="n">15.8</span>Transient performance test (ISO 8528-5)</h2>
+
+<figure class="sheet" id="F15-3"><a href="../data/cx-handbook/figures/F15-3.svg" title="Open drawing F15-3 at full size"><img src="../data/cx-handbook/figures/F15-3.svg" alt="F15-3: Load acceptance stage 1 of B2-GEN-07: frequency and voltage dip against ISO 8528-5 class G3" width="1400" height="954" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F15-3</span> — <b>Load acceptance stage 1 of B2-GEN-07: frequency and voltage dip against ISO 8528-5 class G3</b>. Example record drawn from the test values in 15.8.4; the dashed lines are the class G3 limits taken from the Kohler reproduction of ISO 8528-5:2022 Table 4.</figcaption></figure>
+<h3 id="s15-8-1"><span class="n">15.8.1</span>Purpose</h3>
+<p><strong>Purpose:</strong> Prove that the set meets the ISO 8528-5 performance class in the specification (G3 on MSC-1) when load is added in the declared stages and when 100 % load is rejected.</p>
+<h3 id="s15-8-2"><span class="n">15.8.2</span>Instrument and set-up</h3>
+<ol>
+<li><strong>Recorder.</strong> A power quality analyser or a transient recorder that records the root mean square (RMS) voltage and frequency at least every half cycle (10 ms at 50 Hz) and the waveform at 10 kHz or more. Calibration within 12 months.</li>
+<li><strong>Connection.</strong> On the generator voltage transformer (VT) secondaries (phase-to-phase voltage) and on one current transformer (CT) for the current. A speed signal from the magnetic pickup gives the engine speed.</li>
+<li><strong>Load.</strong> The load bank is set to switch the declared stages in one step each, with contactor closing time below 50 ms.</li>
+<li><strong>Initial state.</strong> The set runs at no load (for the first stage) at rated speed and voltage, warmed up to normal coolant temperature.</li>
+</ol>
+<h3 id="s15-8-3"><span class="n">15.8.3</span>Steps</h3>
+<ol>
+<li><strong>Stage 1.</strong> Apply 0 to 30 % (864 kW) in one step. Record for 15 s.</li>
+<li><strong>Stage 2.</strong> After stabilisation, apply 30 to 55 % (from 864 to 1,584 kW).</li>
+<li><strong>Stage 3.</strong> Apply 55 to 80 % (from 1,584 to 2,304 kW).</li>
+<li><strong>Stage 4.</strong> Apply 80 to 100 % (from 2,304 to 2,880 kW).</li>
+<li><strong>Rejection.</strong> At 100 % and stable, remove 100 % in one step. Record for 15 s.</li>
+<li><strong>Repeat.</strong> Repeat the full sequence once to show the result repeats.</li>
+<li><strong>Read the results.</strong> For each step, read the minimum or maximum frequency, the minimum or maximum voltage, and the time from the step until the frequency and the voltage enter their recovery bands and stay there.</li>
+</ol>
+<h3 id="s15-8-4"><span class="n">15.8.4</span>Acceptance and filled record</h3>
+<p><strong>Acceptance:</strong> Each step meets the class G3 values in 15.2.3 (ISO 8528-5:2022 Table 4 as reproduced by Kohler, RF-15 rows 4 to 9). The frequency limits are dip ≤ 7 %, rise ≤ 10 % and recovery ≤ 3 s. The voltage limits are dip ≤ 15 %, rise ≤ 20 % and recovery ≤ 4 s. The project specification may set tighter values and governs.</p>
+<p><strong>Worked example:</strong> Transient test record for B2-GEN-07 (Figure <a class="figref" href="#F15-3">F15-3</a> plots stage 1).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>kW change</th>
+<th>Minimum or maximum frequency</th>
+<th>Deviation</th>
+<th>Recovery time</th>
+<th>Minimum or maximum voltage</th>
+<th>Deviation</th>
+<th>Recovery time</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stage 1</td>
+<td>0 → 864</td>
+<td>47.10 Hz</td>
+<td>−5.8 %</td>
+<td>2.1 s</td>
+<td>17.92 kV</td>
+<td>−10.4 %</td>
+<td>1.6 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Stage 2</td>
+<td>864 → 1,584</td>
+<td>47.65 Hz</td>
+<td>−4.7 %</td>
+<td>1.8 s</td>
+<td>18.30 kV</td>
+<td>−8.5 %</td>
+<td>1.3 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Stage 3</td>
+<td>1,584 → 2,304</td>
+<td>47.55 Hz</td>
+<td>−4.9 %</td>
+<td>1.9 s</td>
+<td>18.24 kV</td>
+<td>−8.8 %</td>
+<td>1.4 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Stage 4</td>
+<td>2,304 → 2,880</td>
+<td>48.20 Hz</td>
+<td>−3.6 %</td>
+<td>1.4 s</td>
+<td>18.70 kV</td>
+<td>−6.5 %</td>
+<td>1.0 s</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Rejection</td>
+<td>2,880 → 0</td>
+<td>54.60 Hz</td>
+<td>+9.2 %</td>
+<td>2.6 s</td>
+<td>23.20 kV</td>
+<td>+16.0 %</td>
+<td>2.2 s</td>
+<td>pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>The rejection result is close to the G3 limit (+9.2 % against +10 %). The commissioning manager records the margin of 0.8 percentage points. The commissioning manager asks the OEM whether the governor gains can be improved before the synchronised plant test, because a 100 % rejection of a single set happens in service when its breaker trips.</p>
+<h3 id="s15-8-5"><span class="n">15.8.5</span>What the UPS and the drives need from the generator</h3>
+<p>The ISO class is a generic class. The UPS rectifier and the chiller drives have their own input tolerances, and the generator must stay inside both.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Load</th>
+<th>Typical input tolerance (load OEM data sheet governs)</th>
+<th>Effect if exceeded</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Double-conversion UPS rectifier</td>
+<td>rectifier input accepts a wide frequency range; the bypass synchronisation window is set narrower (±2 % or ±3 %); slew rate limit about 1 Hz/s</td>
+<td>UPS stays on battery or loses bypass synchronism</td>
+</tr>
+<tr>
+<td>Chiller variable-speed drive</td>
+<td>voltage −15 % to +10 %; frequency ±5 %</td>
+<td>drive trips on undervoltage and restarts after a delay, adding minutes of cooling loss</td>
+</tr>
+<tr>
+<td>Pump and fan drives</td>
+<td>voltage −15 % to +10 %</td>
+<td>trip and restart</td>
+</tr>
+<tr>
+<td>Lighting and controls</td>
+<td>wide</td>
+<td>no effect</td>
+</tr>
+</tbody>
+</table></div>
+<p>The UPS frequency window and slew rate are set in the UPS settings record (chapter 16). If the UPS synchronisation window is too narrow, the UPS stays unsynchronised with the generator after a load step, and a transfer to bypass during that time would be a break transfer. The commissioning manager checks the two settings records side by side.</p>
+<h2 id="s15-9"><span class="n">15.9</span>Start-time, crank-cycle and block-load tests</h2>
+
+<figure class="sheet" id="F15-5"><a href="../data/cx-handbook/figures/F15-5.svg" title="Open drawing F15-5 at full size"><img src="../data/cx-handbook/figures/F15-5.svg" alt="F15-5: Start-time test of building B2: utility loss to all sets on the generator bus" width="1400" height="790" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F15-5</span> — <b>Start-time test of building B2: utility loss to all sets on the generator bus</b>. Times from the analyser record with breaker auxiliary contacts sampled at 1 ms; the project limits are example values from the OPR.</figcaption></figure>
+<h3 id="s15-9-1"><span class="n">15.9.1</span>Start-time test (NFPA 110 Type 10)</h3>
+<p><strong>Purpose:</strong> Prove that the plant restores power to the generator bus within the Type time after a utility failure.</p>
+<p><strong>Inputs:</strong> The power quality analyser records the utility incoming voltage, the generator bus voltage and the breaker status contacts with a 1 ms time resolution. The sets are at their normal standby condition: jacket water heaters on, coolant at the heater temperature, no prior run in the last 4 hours (cold start condition of NFPA 110).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Simulate the failure.</strong> Open the utility incoming breaker, or remove the utility voltage sensing to the plant controller. In a new unoccupied building NFPA 110 uses the opening of the normal supply breakers.</li>
+<li><strong>Record the sequence.</strong> Record the time of utility loss, start signal, crank, engine firing, rated speed, rated voltage, first breaker closed onto the dead bus, and each further set synchronised.</li>
+<li><strong>Compare.</strong> Compare the time to bus live (first set closed) and the time to all required sets on the bus with the specification.</li>
+</ol>
+<p><strong>Acceptance:</strong> For a Type 10 system, <mark>the load terminals have power within 10 s</mark> of the failure. On MSC-1 the project requirement is generator bus live within 10 s and all 16 required sets on the bus within 30 s (example project values stated in the OPR).</p>
+<p><strong>Worked example:</strong> Start-time record of building B2.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Time from utility loss</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Utility voltage below 80 %</td>
+<td>0.00 s</td>
+</tr>
+<tr>
+<td>Start signal after 1.0 s confirmation delay</td>
+<td>1.00 s</td>
+</tr>
+<tr>
+<td>First engine firing</td>
+<td>2.40 s</td>
+</tr>
+<tr>
+<td>First set at rated speed and voltage</td>
+<td>6.80 s</td>
+</tr>
+<tr>
+<td>First 52G closed on dead bus (B2-GEN-03)</td>
+<td>7.15 s</td>
+</tr>
+<tr>
+<td>8th set synchronised</td>
+<td>14.6 s</td>
+</tr>
+<tr>
+<td>16th set synchronised</td>
+<td>22.4 s</td>
+</tr>
+<tr>
+<td>17th set synchronised</td>
+<td>24.9 s</td>
+</tr>
+</tbody>
+</table></div>
+<p>Figure <a class="figref" href="#F15-5">F15-5</a> shows the same record as a timeline. The bus was live at <mark>7.15 s</mark>, inside 10 s, and the 16th set was on the bus at 22.4 s, inside the 30 s project value.</p>
+<h3 id="s15-9-2"><span class="n">15.9.2</span>Crank-cycle test</h3>
+<p><strong>Purpose:</strong> Prove that the starting system makes the specified number of crank attempts and then signals overcrank.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Block fuel.</strong> In test mode, the OEM start-up engineer disables the fuel supply so that the engine cannot fire.</li>
+<li><strong>Initiate start.</strong> The controller cranks through its programmed cycle. NFPA 110 sets cycle cranking as a crank period of about 15 s followed by a rest of about 15 s. The cranking limiter time-out is 75 s for three cycles (NFPA 110-2022 5.6.4.2.1 and Table 5.6.4.2, the text quoted in the public input report for the 2025 edition; confirm that NFPA 110-2025 keeps 5.6.4.2.1 unchanged). Some battery sizing documents assume six cycles, so the project specification states the number.</li>
+<li><strong>Read the battery.</strong> A recorder on the starting battery shows the voltage during cranking. The voltage stays above the OEM minimum (for example about 18 V during the crank for a 24 V system).</li>
+<li><strong>Overcrank alarm.</strong> At the end of the cycle the controller shows "overcrank" and sends the alarm to the BMS.</li>
+<li><strong>Restore and start.</strong> Fuel is restored and the engine starts on the same battery.</li>
+</ol>
+<p><strong>Acceptance:</strong> Programmed crank and rest periods within ±1 s, overcrank alarm received, engine starts on the same battery after the test.</p>
+<h3 id="s15-9-3"><span class="n">15.9.3</span>Block-load test</h3>
+<p><strong>Purpose:</strong> Prove that the plant accepts the real building load as it is applied in service. On a data centre the real load is applied by the restart of the mechanical plant and the UPS rectifier walk-in.</p>
+<ol>
+<li><strong>Define the block.</strong> The EoR gives the largest load step in the load-add sequence. On MSC-1 the hall step is 7.2 MW per hall (from the ledger), applied across the paralleled sets on the bus.</li>
+<li><strong>Share the step.</strong> With 17 sets on the bus, each set sees 7.2 / 17 = 0.42 MW, which is 14.7 % of its rating. With only the 16 required sets, each sees 0.45 MW (15.6 %).</li>
+<li><strong>Apply with load banks.</strong> The block is simulated with load banks switched in one step on the bus before the building load is used.</li>
+<li><strong>Measure.</strong> Record bus frequency and voltage as in 15.8.</li>
+</ol>
+<p><strong>Acceptance:</strong> Bus frequency and voltage stay inside the G3 limits for the step, and no set trips on reverse power or overload during the transient.</p>
+<h2 id="s15-10"><span class="n">15.10</span>Synchronising, load sharing and transfer</h2>
+
+<figure class="sheet" id="F15-4"><a href="../data/cx-handbook/figures/F15-4.svg" title="Open drawing F15-4 at full size"><img src="../data/cx-handbook/figures/F15-4.svg" alt="F15-4: Plant control states: from standby through dead-bus close and synchronising to closed-transition return" width="1400" height="764" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F15-4</span> — <b>Plant control states: from standby through dead-bus close and synchronising to closed-transition return</b>. States are read left to right on the top row and right to left on the bottom row; each transition is a test step in the L4 script.</figcaption></figure>
+<h3 id="s15-10-1"><span class="n">15.10.1</span>How synchronising works</h3>
+<p>A set can be connected to a live bus only when its voltage, frequency and phase angle match the bus. If the breaker closes with a large phase angle error, a large current flows between the set and the bus. The shaft then receives a torque shock that can damage the coupling or the alternator.</p>
+<ol>
+<li><strong>Voltage match.</strong> The AVR adjusts the set voltage to the bus voltage.</li>
+<li><strong>Frequency match.</strong> The governor runs the set slightly faster than the bus (positive slip, for example +0.05 Hz) so that the set picks up a little load when it closes and does not trip on reverse power.</li>
+<li><strong>Phase match.</strong> As the slip moves the phase angle through zero, the synchroniser sends the close command early by the breaker closing time so that the contacts touch at zero degrees.</li>
+<li><strong>Check.</strong> An independent sync-check relay (device 25) permits the close only inside the window.</li>
+</ol>
+<h3 id="s15-10-2"><span class="n">15.10.2</span>Synchronising window</h3>
+<p>The IEEE 1547 synchronisation table for distributed generation gives a reference window by unit size. A 3.6 MVA set falls in the 1,500 to 10,000 kVA band.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Aggregate rating</th>
+<th>Frequency difference</th>
+<th>Voltage difference</th>
+<th>Phase angle difference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 to 500 kVA</td>
+<td>0.3 Hz</td>
+<td>10 %</td>
+<td>20°</td>
+</tr>
+<tr>
+<td>500 to 1,500 kVA</td>
+<td>0.2 Hz</td>
+<td>5 %</td>
+<td>15°</td>
+</tr>
+<tr>
+<td>1,500 to 10,000 kVA</td>
+<td><mark>0.1 Hz</mark></td>
+<td>3 %</td>
+<td>10°</td>
+</tr>
+</tbody>
+</table></div>
+<p>The table is in IEEE 1547-2003 (and carried into later editions; confirm against IEEE 1547-2018). It is written for connection to a utility system, but generator OEMs and switchgear designers commonly use the same values for the paralleling switchgear. The project protection setting sheet governs.</p>
+<h3 id="s15-10-3"><span class="n">15.10.3</span>Dead-bus closing and first-up arbitration</h3>
+<p>When the utility fails, the generator bus is dead. The first set to reach rated voltage and frequency closes onto the dead bus without synchronising. <mark>Only one set may close on the dead bus</mark>; a second set closing at the same moment would connect two unsynchronised sets.</p>
+<ol>
+<li><strong>Arbitration.</strong> The controllers share a "dead-bus closing" permission over the load-sharing communication line or a hardwired permissive. The first set to request receives the permission and the others wait.</li>
+<li><strong>Failure case.</strong> If the communication line fails, the logic must still allow only one dead-bus closure (for example a hardwired first-up relay). This is tested by opening the communication line before a start.</li>
+<li><strong>Dead-bus check.</strong> The controller confirms that the bus voltage is below the dead-bus threshold (for example 10 % of rated) before closing.</li>
+</ol>
+<p>Some plants use "random access paralleling" or excitation-off paralleling: all sets close their breakers at standstill or at low speed with the excitation off, then excite together. This brings the bus live faster, and the commissioning manager asks for the OEM description and tests it as a separate mode.</p>
+<h3 id="s15-10-4"><span class="n">15.10.4</span>Synchronising test procedure</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Test the check relay.</strong> Inject secondary voltages into the device 25 relay from a three-phase test set (for example Omicron CMC or Megger SMRT). Vary the angle, slip and voltage, and record the boundary of the close permission. Acceptance: boundary within ±1° and ±0.01 Hz of the setting.</li>
+<li><strong>Check the closing time.</strong> Measure the breaker closing time with a breaker timer; it must equal the value set in the synchroniser (example 80 ms ±10 ms).</li>
+<li><strong>Synchroscope test with the breaker racked to test.</strong> Run the set, let the synchroniser bring it into sync, and record the angle at the close command against the bus. Acceptance: close command at the advance angle that corresponds to the closing time and slip.</li>
+<li><strong>Live close.</strong> Close the breaker on the live bus with the recorder on the current. Acceptance: <mark>inrush current at close below 10 % of rated current</mark> (example project value), no reverse power trip.</li>
+<li><strong>Repeat for every set.</strong> Each of the 17 sets closes three times; the recorded phase angle at contact touch is within ±10°.</li>
+</ol>
+<p><strong>Worked example:</strong> Advance angle. With a slip of +0.05 Hz, the phase angle moves 0.05 × 360 = 18° per second. With a breaker closing time of 80 ms, the angle moves 18 × 0.080 = <mark>1.44°</mark> during the closing time. The synchroniser sends the close command at −1.44° so that the contacts touch at 0°. If the closing time were wrongly set to 40 ms, contact would occur at +0.72°, still inside the window. The error matters at higher slip, so the test also runs at 0.1 Hz slip (2.88° at 80 ms).</p>
+<h3 id="s15-10-5"><span class="n">15.10.5</span>Load sharing test</h3>
+<p><strong>Purpose:</strong> Prove that the sets share the active power (kW) and the reactive power (kvar) in proportion to their ratings.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>All sets on the bus.</strong> All 17 sets on the bus with the load bank at 50 % and then 90 % of the plant rating.</li>
+<li><strong>Read each set.</strong> Record kW and kvar of each set from the analyser or the controller.</li>
+<li><strong>Calculate the error.</strong> Error = (set kW − average kW) / set rating × 100 %.</li>
+<li><strong>Step changes.</strong> Add and remove 25 % of plant load and check that sharing returns within 10 s.</li>
+<li><strong>Remove one set.</strong> Trip one set; the others pick up its load without overload, and the sharing returns.</li>
+</ol>
+<p><strong>Acceptance:</strong> Active power sharing within ±5 % of the set rating between 80 % and 100 % load and ±10 % between 20 % and 80 %; reactive sharing within ±10 % (ISO 8528-5:2022 Table 4 sharing values for G2 and G3, Kohler white paper, RF-15 row 10; the project value applies where tighter).</p>
+<p><strong>Worked example:</strong> At a plant load of 30.0 MW with 17 sets, the average is 1,765 kW per set. Set B2-GEN-11 reads 1,890 kW, an error of (1,890 − 1,765) / 2,880 = +4.3 %. The load is 61 % of rating, where the limit is ±10 %, so the set passes. Set B2-GEN-04 reads 1,560 kvar against an average of 1,324 kvar, an error of (1,560 − 1,324) / 2,160 = <mark>+10.9 %</mark> of the rated kvar, which fails the ±10 % reactive limit. The OEM start-up engineer checks the AVR reactive droop or the reactive sharing line of B2-GEN-04 before the test is repeated.</p>
+<h3 id="s15-10-6"><span class="n">15.10.6</span>Transfer back to utility (closed transition)</h3>
+<p>When the utility returns, the building is transferred back. In an open transition, the generator feeder opens and the utility breaker closes, with a short break that the UPS carries. In a closed transition, the generator bus is synchronised with the utility, both breakers are closed for a short overlap, and then the generator breaker opens.</p>
+<ol>
+<li><strong>Utility stable timer.</strong> The controller waits for the utility to be stable for the set time (example 5 minutes) before starting the return.</li>
+<li><strong>Synchronise to utility.</strong> The plant adjusts frequency and phase so the generator bus matches the utility.</li>
+<li><strong>Close and overlap.</strong> The utility breaker closes; the plant ramps its load down (soft transfer) or opens immediately (fast closed transition). The utility interconnection agreement limits the overlap for a fast closed transition, for example to 100 ms or less. The PLN (state electricity company) connection agreement and the switchgear OEM manual state the limit for the project.</li>
+<li><strong>Failure to separate.</strong> If the generator breaker does not open within the overlap limit, a separate timer trips it or the utility breaker (device 62 or a dedicated overlap timer). This is tested.</li>
+<li><strong>Cool-down.</strong> The sets run unloaded for the cool-down time (example 5 minutes) and stop.</li>
+</ol>
+<p><strong>Acceptance:</strong> The overlap time measured with a breaker timer or the recorder is ≤ the agreed value. <mark>The overlap timer trips</mark> the correct breaker when the generator breaker is blocked. The UPS stays on normal mode throughout.</p>
+<p>Figure <a class="figref" href="#F15-4">F15-4</a> shows the plant states from standby to return to utility.</p>
+<h2 id="s15-11"><span class="n">15.11</span>Generator and paralleling protection</h2>
+<h3 id="s15-11-1"><span class="n">15.11.1</span>Protection functions</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Device</th>
+<th>Function</th>
+<th>Example setting (from the protection setting study; project values govern)</th>
+<th>Test method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>87G</td>
+<td>generator differential</td>
+<td>10 % of rated current, slope 20 %</td>
+<td>secondary injection on both CT sets, in-zone and out-of-zone</td>
+</tr>
+<tr>
+<td>32</td>
+<td>reverse power</td>
+<td>5 % of rated kW (144 kW), 5 s</td>
+<td>inject reverse power; live test by reducing fuel set point</td>
+</tr>
+<tr>
+<td>40</td>
+<td>loss of excitation</td>
+<td>per the alternator capability curve</td>
+<td>inject offset mho characteristic</td>
+</tr>
+<tr>
+<td>46</td>
+<td>negative-sequence current</td>
+<td>I2 continuous 8 %, I2²t = 20</td>
+<td>inject unbalanced current</td>
+</tr>
+<tr>
+<td>51V</td>
+<td>voltage-restrained overcurrent</td>
+<td>pickup 1.5 × rated current at rated voltage</td>
+<td>inject current and voltage</td>
+</tr>
+<tr>
+<td>59 / 27</td>
+<td>over- and undervoltage</td>
+<td>110 % for 2 s; 85 % for 3 s</td>
+<td>inject voltage</td>
+</tr>
+<tr>
+<td>81O / 81U</td>
+<td>over- and underfrequency</td>
+<td>52.5 Hz for 1 s; 47.5 Hz for 5 s</td>
+<td>inject frequency</td>
+</tr>
+<tr>
+<td>51N or 59N</td>
+<td>earth fault on a resistance-earthed system</td>
+<td>per NER rating and study</td>
+<td>inject current or residual voltage</td>
+</tr>
+<tr>
+<td>25</td>
+<td>sync check</td>
+<td>0.1 Hz, 3 %, 10°</td>
+<td>as in 15.10.4</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s15-11-2"><span class="n">15.11.2</span>Secondary injection and trip test</h3>
+<ol>
+<li><strong>Relay injection.</strong> The protection testing contractor injects each function with a calibrated three-phase test set and records the pickup and the operating time against the setting sheet. Acceptance per ANSI/NETA ATS: pickup within the manufacturer's tolerance, timing within the manufacturer's tolerance of the curve.</li>
+<li><strong>CT and VT checks.</strong> Ratio, polarity and burden for every CT and VT (chapter 14).</li>
+<li><strong>Trip test.</strong> Each function's output trips the 52G (and shuts down the engine where specified) with the breaker in the service position on a dead bus, or in test position with the trip coil proven.</li>
+<li><strong>Live reverse power test.</strong> With the set on the bus, the OEM reduces the fuel set point until the set motors; the 32 function trips the 52G at the set value and time.</li>
+<li><strong>Settings file.</strong> The relay settings are downloaded and compared with the setting sheet line by line; the file is stored in the settings register.</li>
+</ol>
+<p><strong>Worked example:</strong> Reverse power setting check. The setting is 5 % of 2,880 kW = 144 kW for 5 s. The test set injects 180 kW reverse (6.25 %) and the relay trips at 5.04 s; it injects 120 kW reverse (4.2 %) for 30 s and the relay does not trip. The pickup lies between 120 and 180 kW; a fine search gives <mark>143 kW</mark>, within ±3 % of the setting, so the test passes.</p>
+<h2 id="s15-12"><span class="n">15.12</span>Emissions and noise</h2>
+<h3 id="s15-12-1"><span class="n">15.12.1</span>Emissions measurement</h3>
+<ol>
+<li><strong>Applicable limits.</strong> Indonesian emission limits for stationary internal combustion engines are set by the Minister of Environment and Forestry (confirm the current regulation and the limits for the engine size against Permen LHK No. 11 of 2021 on emission standards for internal combustion engines). The environmental permit of the campus (AMDAL, the environmental impact assessment, or UKL-UPL, the environmental management and monitoring plan) may set additional monitoring.</li>
+<li><strong>What is measured.</strong> Nitrogen oxides (NOx), carbon monoxide (CO), particulate matter or opacity, sulphur dioxide (SO2) where required, and oxygen (O2) for the reference correction.</li>
+<li><strong>Who measures.</strong> An accredited laboratory (accredited by the National Accreditation Committee (KAN) to ISO/IEC 17025) with a portable flue gas analyser, at 75 % or 100 % load during the load bank test.</li>
+<li><strong>Correction.</strong> Results are corrected to the reference oxygen content stated in the regulation (for example 13 % or 15 % O2 for engines; confirm against Permen LHK No. 11 of 2021).</li>
+<li><strong>Record.</strong> Laboratory report with analyser calibration certificate, load during the test, O2 and the corrected concentrations.</li>
+</ol>
+<p><strong>Worked example:</strong> Oxygen correction. The analyser reads NOx = 1,450 mg/Nm³ at a measured O2 of 11.2 %. The corrected value at a reference of 15 % O2 is 1,450 × (21 − 15) / (21 − 11.2) = 1,450 × 6 / 9.8 = <mark>888 mg/Nm³</mark>. This corrected value is compared with the limit in the permit.</p>
+<h3 id="s15-12-2"><span class="n">15.12.2</span>Noise measurement</h3>
+<ol>
+<li><strong>Limits.</strong> The environmental noise limits in Indonesia are set by Kepmen LH No. 48 of 1996 (for example 55 dBA for housing and 70 dBA for industrial areas at the receiver; confirm the zone and the current regulation against Kepmen LH No. 48 of 1996). The project specification adds a limit at 1 m or 7 m from the generator enclosure (for example 85 dBA at 1 m).</li>
+<li><strong>Instrument.</strong> Sound level meter IEC 61672 Class 1, calibrated with an acoustic calibrator before and after the measurement.</li>
+<li><strong>Positions.</strong> Measure at 1 m from each face of the enclosure at 1.5 m height. Measure also at the site boundary nearest to the housing and at the receiver points named in the environmental permit.</li>
+<li><strong>Conditions.</strong> With all 17 sets at load for the boundary measurement; background measured with all sets stopped. Wind speed below 5 m/s.</li>
+<li><strong>Correction.</strong> If the level with the sets running is less than 10 dB above the background, the background is subtracted logarithmically.</li>
+</ol>
+<p><strong>Worked example:</strong> Background correction at the east boundary. With all sets running the meter reads 68.0 dBA; with all sets stopped it reads 62.0 dBA. The difference is 6 dB, so the background correction applies: L = 10 × log10(10^6.80 − 10^6.20) = 10 × log10(6,309,573 − 1,584,893) = <mark>66.7 dBA</mark>. This is below the 70 dBA industrial limit.</p>
+<h2 id="s15-13"><span class="n">15.13</span>Generator controller communications to EPMS and BMS</h2>
+<h3 id="s15-13-1"><span class="n">15.13.1</span>Why the controller points matter</h3>
+<p>The generator controller holds the readings that the operators need during an outage: running status, kW, fuel level, alarms. The EPMS (chapter 23) uses the electrical values for the sequence of events and power reports. The BMS (chapter 21) uses the fuel and room values. Both read the controller through Modbus TCP or Modbus RTU through a gateway.</p>
+<h3 id="s15-13-2"><span class="n">15.13.2</span>Controller families and their Modbus documents</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Controller</th>
+<th>Manufacturer document for the register map</th>
+<th>Notes for commissioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DSE 8610 MKII, DSE 8660</td>
+<td>DSE GenComm protocol document (register pages, for example the page of basic instrumentation)</td>
+<td>registers are grouped in pages of 256; many values are 32-bit and need two registers</td>
+</tr>
+<tr>
+<td>ComAp InteliGen, InteliSys</td>
+<td>ComAp communication guide and the archive-specific Modbus list exported from the controller configuration tool</td>
+<td>the register map depends on the configuration file loaded; export the list from the commissioned archive</td>
+</tr>
+<tr>
+<td>Woodward easYgen-3000XT</td>
+<td>easYgen-3000XT interface manual (Modbus data protocols)</td>
+<td>data protocols are selectable; the protocol number must match the map used by the EPMS</td>
+</tr>
+<tr>
+<td>Cummins PowerCommand PCC3.3</td>
+<td>PowerCommand Modbus register map in the controller manual</td>
+<td>some values are scaled (for example 0.1 °C); check the scale factor column</td>
+</tr>
+</tbody>
+</table></div>
+<p>Register numbers differ between firmware versions and configurations, so the commissioning manager never uses a register list from another project. The map used for the point-to-point test is the map exported from the commissioned controller archive.</p>
+<h3 id="s15-13-3"><span class="n">15.13.3</span>Example generator point list</h3>
+<p>The table shows a minimum point list for one set. Register addresses here are placeholders ("from map"); the real address comes from the manufacturer document for the installed firmware.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point</th>
+<th>Unit</th>
+<th>Type</th>
+<th>Scaling</th>
+<th>Register</th>
+<th>Used by</th>
+<th>Alarm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engine running</td>
+<td>—</td>
+<td>binary</td>
+<td>—</td>
+<td>from map</td>
+<td>EPMS, BMS</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Generator breaker 52G closed</td>
+<td>—</td>
+<td>binary</td>
+<td>—</td>
+<td>from switchgear relay</td>
+<td>EPMS</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Common shutdown</td>
+<td>—</td>
+<td>binary</td>
+<td>—</td>
+<td>from map</td>
+<td>EPMS, BMS</td>
+<td>priority 1</td>
+</tr>
+<tr>
+<td>Common warning</td>
+<td>—</td>
+<td>binary</td>
+<td>—</td>
+<td>from map</td>
+<td>BMS</td>
+<td>priority 2</td>
+</tr>
+<tr>
+<td>Generator kW total</td>
+<td>kW</td>
+<td>32-bit integer</td>
+<td>1</td>
+<td>from map</td>
+<td>EPMS</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Generator kvar total</td>
+<td>kvar</td>
+<td>32-bit integer</td>
+<td>1</td>
+<td>from map</td>
+<td>EPMS</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Voltage L1-L2, L2-L3, L3-L1</td>
+<td>V</td>
+<td>16-bit or 32-bit</td>
+<td>1 or 0.1</td>
+<td>from map</td>
+<td>EPMS</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Frequency</td>
+<td>Hz</td>
+<td>16-bit</td>
+<td>0.01 or 0.1</td>
+<td>from map</td>
+<td>EPMS</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Oil pressure</td>
+<td>kPa</td>
+<td>16-bit</td>
+<td>1</td>
+<td>from map</td>
+<td>BMS</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Coolant temperature</td>
+<td>°C</td>
+<td>16-bit</td>
+<td>1 or 0.1</td>
+<td>from map</td>
+<td>BMS</td>
+<td>high alarm</td>
+</tr>
+<tr>
+<td>Starting battery voltage</td>
+<td>V</td>
+<td>16-bit</td>
+<td>0.1</td>
+<td>from map</td>
+<td>BMS</td>
+<td>low alarm</td>
+</tr>
+<tr>
+<td>Engine run hours</td>
+<td>h</td>
+<td>32-bit</td>
+<td>1</td>
+<td>from map</td>
+<td>BMS, computerised maintenance management system (CMMS)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Day tank level</td>
+<td>% or L</td>
+<td>analogue (BMS input)</td>
+<td>per transmitter</td>
+<td>BMS I/O</td>
+<td>BMS</td>
+<td>low, low-low, high-high</td>
+</tr>
+<tr>
+<td>Bulk tank level</td>
+<td>L</td>
+<td>analogue (BMS input)</td>
+<td>tank chart</td>
+<td>BMS I/O</td>
+<td>BMS</td>
+<td>low</td>
+</tr>
+<tr>
+<td>Controller mode (auto, manual, off)</td>
+<td>—</td>
+<td>enumeration</td>
+<td>—</td>
+<td>from map</td>
+<td>BMS</td>
+<td>"not in auto" alarm</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s15-13-4"><span class="n">15.13.4</span>Point-to-point test</h3>
+<ol>
+<li><strong>Prepare.</strong> The integrator loads the point list with the exported register map into the EPMS and BMS. Time limit: 2 working days before the test.</li>
+<li><strong>Simulate or force each point.</strong> The OEM start-up engineer forces each binary point at the controller (for example a warning simulated by a test input) and applies a real condition for the analogue points (running the set at load for kW, V and Hz).</li>
+<li><strong>Compare.</strong> The tester records the controller value and the EPMS or BMS value. Acceptance: analogue values agree within the controller's display resolution plus 0.5 % of span; binary points arrive with the correct state and text.</li>
+<li><strong>Alarm priority and time stamp.</strong> The alarm arrives at the correct priority; the time stamp at the EPMS is within 1 s of the controller event (or within the EPMS time-synchronisation tolerance set in chapter 23).</li>
+<li><strong>Loss of communication.</strong> Disconnect the controller network cable; the EPMS and BMS show "communication loss" for the set within the configured timeout (example 30 s).</li>
+</ol>
+<p><strong>Records:</strong> Point-to-point sheet INT-L4-GEN-nn with each point, the forced value, the received value, pass or fail and signatures (chapter 25 gives the integration test format).</p>
+<p><strong>Worked example:</strong> Scaling error found in the test. The controller shows a coolant temperature of 86 °C; the BMS shows 8.6 °C. The register holds 860 with a scale factor of 0.1, and the BMS integrator applied 0.01. The fix is in the BMS point configuration, and the point is retested with the set at load. The error is recorded in the issue log. The same template was used for all 17 sets, so <mark>all 17 sets are retested for that point</mark>.</p>
+<h2 id="s15-14"><span class="n">15.14</span>NFPA 110 acceptance test and the integrated test</h2>
+<h3 id="s15-14-1"><span class="n">15.14.1</span>Acceptance sequence</h3>
+<p>NFPA 110 7.13 sets the installation acceptance tests. The sequence below follows NFPA 110 as summarised in public sources (confirm each step and duration against NFPA 110-2025 7.13). Figure <a class="figref" href="#F15-8">F15-8</a> shows the sequence with the MSC-1 record that closes each step.</p>
+<figure class="sheet" id="F15-8"><a href="../data/cx-handbook/figures/F15-8.svg" title="Open drawing F15-8 at full size"><img src="../data/cx-handbook/figures/F15-8.svg" alt="F15-8: NFPA 110 installation acceptance sequence for the MSC-1 generator plant" width="1000" height="927" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F15-8</span> — <b>NFPA 110 installation acceptance sequence for the MSC-1 generator plant</b>. Each box is one step of the acceptance test with the clause and the MSC-1 record that closes it; the AHJ witnesses the steps that the local rules require.</figcaption></figure>
+
+<ol>
+<li><strong>Notify the AHJ.</strong> The AHJ is notified before the test so that the test can be witnessed (NFPA 110 7.13.3).</li>
+<li><strong>Cold-start test with simulated or real failure.</strong> In a new unoccupied building the normal supply is interrupted by opening the normal supply breakers; in an occupied building a simulated failure is used (7.13.4.1). The time from failure to power at the load is recorded.</li>
+<li><strong>Load pick-up.</strong> The emergency loads are picked up and the voltage, frequency and current are recorded.</li>
+<li><strong>Return to normal.</strong> The normal supply is restored and the transfer back is timed.</li>
+<li><strong>Cool-down.</strong> The set cools for at least 5 minutes before the load test.</li>
+<li><strong>Two-hour load test.</strong> Each set in a multi-set system is tested separately for 2 hours at load (7.13.4.3). One public summary gives the steps as 30 minutes at 30 %, 30 minutes at 50 % and 1 hour at 100 % of rated kW (NFPA 110 7.13.4.3 as summarised by DatacenterDynamics, RF-15 row 13). The MSC-1 project test in 15.7 runs 4 hours at 100 % and covers this test.</li>
+<li><strong>Crank-cycle test.</strong> As in 15.9.2.</li>
+<li><strong>Records.</strong> Test results are recorded and kept on site.</li>
+</ol>
+<h3 id="s15-14-2"><span class="n">15.14.2</span>Integrated test (Level 5) for the generator plant</h3>
+<p>The integrated systems test (IST, chapter 28) proves the plant together with the MV switchgear, the UPS and the mechanical plant. The generator-related scenarios are:</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>What is done</th>
+<th>What is measured</th>
+<th>Acceptance (MSC-1 example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Utility failure, full load</td>
+<td>open both utility incomers with the hall on load banks and real cooling</td>
+<td>bus live time, all sets on bus, UPS on battery time, mechanical restart time</td>
+<td>bus live ≤ 10 s; UPS returns to normal mode within the battery autonomy; no rack inlet above the limit</td>
+</tr>
+<tr>
+<td>One set fails to start</td>
+<td>disable one set before the failure</td>
+<td>the plant runs on the remaining 16</td>
+<td>load carried; alarm received</td>
+</tr>
+<tr>
+<td>One set trips at full load</td>
+<td>trip one set's 52G during the run</td>
+<td>bus frequency and voltage; remaining sets' load</td>
+<td>bus stays inside G3 limits; no cascade trip</td>
+</tr>
+<tr>
+<td>Bus-coupler open</td>
+<td>test with the bus split into two sections</td>
+<td>each section carries its own load</td>
+<td>as designed</td>
+</tr>
+<tr>
+<td>Fuel transfer on generator power</td>
+<td>run for at least 4 hours on generators</td>
+<td>day tank levels, pump operation</td>
+<td>day tanks refill; bulk level falls at the expected rate</td>
+</tr>
+<tr>
+<td>Return to utility, closed transition</td>
+<td>restore utility</td>
+<td>overlap time, UPS state</td>
+<td>overlap ≤ agreed value; UPS stays in normal mode</td>
+</tr>
+<tr>
+<td>Utility returns during generator start</td>
+<td>restore utility at 5 s</td>
+<td>control logic</td>
+<td>logic completes or aborts as designed with no break to the UPS output</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example:</strong> Fuel use during a 4-hour IST run. The building carries 43.92 MW on 17 sets for 4 hours. The fuel use is 43.92 / 2.88 × 720 × 4 = <mark>43,920 L</mark>. The bulk tank gauge falls from 285,400 L to 241,900 L, a measured use of 43,500 L, 1.0 % less than expected. The difference is within the gauge accuracy, and it confirms the tank chart and the fuel consumption data before the plant is handed over.</p>
+<h2 id="s15-15"><span class="n">15.15</span>Filled test records</h2>
+<h3 id="s15-15-1"><span class="n">15.15.1</span>Generator L4 test summary sheet</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Document number</td>
+<td>ELE-L4-GEN-07 rev 0</td>
+</tr>
+<tr>
+<td>Asset</td>
+<td>B2-GEN-07, 3,600 kVA, 20 kV, DCC rating</td>
+</tr>
+<tr>
+<td>Test date and weather</td>
+<td>12 March 2027, 31 °C dry bulb, 78 % relative humidity (RH)</td>
+</tr>
+<tr>
+<td>Load bank</td>
+<td>MV load bank LB-20-3000, 3.0 MW / 2.25 Mvar, calibration certificate 2026-11-04</td>
+</tr>
+<tr>
+<td>Analyser</td>
+<td>power quality (PQ) analyser SN 1760-4471, IEC 61000-4-30 Class A, calibrated 2026-09-15</td>
+</tr>
+<tr>
+<td>Load bank result</td>
+<td>4 h at 100 %: pass (frequency 49.99–50.01 Hz, voltage 20.02–20.04 kV)</td>
+</tr>
+<tr>
+<td>Transient result</td>
+<td>class G3: pass, rejection margin 0.8 percentage points</td>
+</tr>
+<tr>
+<td>Start time (plant test)</td>
+<td>bus live 7.15 s: pass</td>
+</tr>
+<tr>
+<td>Protection</td>
+<td>relay settings verified against B2-GEN-07-PS rev 2: pass</td>
+</tr>
+<tr>
+<td>Emissions</td>
+<td>NOx 888 mg/Nm³ at 15 % O2: pass against permit value</td>
+</tr>
+<tr>
+<td>Open items</td>
+<td>1 (AVR reactive sharing check on GEN-04 linked to this test)</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>electrical contractor, OEM start-up engineer, CxA, owner representative</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s15-15-2"><span class="n">15.15.2</span>Synchronising test record</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Set</th>
+<th>Closing time (ms)</th>
+<th>Slip at close (Hz)</th>
+<th>Angle at contact (°)</th>
+<th>Inrush at close (% of rated)</th>
+<th>Reverse power trip</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B2-GEN-01</td>
+<td>78</td>
+<td>+0.05</td>
+<td>+0.8</td>
+<td>3.1</td>
+<td>no</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-GEN-02</td>
+<td>82</td>
+<td>+0.06</td>
+<td>−1.1</td>
+<td>3.8</td>
+<td>no</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-GEN-03</td>
+<td>79</td>
+<td>+0.04</td>
+<td>+0.4</td>
+<td>2.6</td>
+<td>no</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-GEN-04</td>
+<td>81</td>
+<td>+0.05</td>
+<td>+1.6</td>
+<td>4.2</td>
+<td>no</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>B2-GEN-05</td>
+<td>112</td>
+<td>+0.05</td>
+<td>+0.6</td>
+<td>3.4</td>
+<td>no</td>
+<td>investigate</td>
+</tr>
+</tbody>
+</table></div>
+<p>Set B2-GEN-05 closed 32 ms slower than the 80 ms setting. At a slip of +0.05 Hz the angle moves 18° per second, so the contact touched at 18 × 0.032 = +0.6°. The angle is inside the 10° window, but the slow closing time points to a breaker mechanism defect. At the 0.1 Hz slip test the same delay would give +1.2°. The commissioning manager raises a non-conformance report (NCR), the breaker supplier services the mechanism, and the test is repeated.</p>
+<h2 id="s15-16"><span class="n">15.16</span>Common errors and how to find them before the witness test</h2>
+<ol>
+<li><strong>Settings record not issued.</strong> The OEM tunes the governor during the load bank test and leaves without a settings record. Ask for the record at the end of L3 and compare the controller file on the day of the witness test.</li>
+<li><strong>Transient test at 50 % first step.</strong> The first load stage is larger than the OEM declared stage, and the set fails G3. Read the OEM transient data sheet before writing the script.</li>
+<li><strong>Recorder too slow.</strong> A meter averaging over 1 s does not show the real frequency dip. Use a recorder with half-cycle RMS values.</li>
+<li><strong>Phase rotation checked only on the generator.</strong> The rotation must match across the generator bus, the utility side of the transfer breakers and the downstream switchboards. Check it with the phase rotation meter on both sides of each transfer breaker.</li>
+<li><strong>Dead-bus arbitration tested only with communication healthy.</strong> Open the load-sharing communication line and run a start; only one set may close on the dead bus.</li>
+<li><strong>Overlap timer not tested.</strong> The closed-transition overlap is measured, but the protection that trips when the overlap is exceeded is never proven. Block the generator breaker opening and confirm the timer trips the defined breaker.</li>
+<li><strong>Day-tank level switches in the wrong order.</strong> The high and low floats are swapped during installation, so the pump runs until the high-high switch stops it. Lift each float by hand and watch the pump and the alarm.</li>
+<li><strong>Fuel not sampled after flushing.</strong> The flushing report shows filter changes but no ISO 4406 result. <mark>No engine starts without the sample result</mark>.</li>
+<li><strong>Modbus map from another firmware.</strong> Values arrive scaled wrongly or in the wrong register. Export the map from the commissioned controller.</li>
+<li><strong>Emission test at low load.</strong> The laboratory measures at idle because the load bank is not connected. Book the laboratory for the load bank day.</li>
+</ol>
+<h2 id="s15-17"><span class="n">15.17</span>Key performance indicators for the generator scope</h2>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Definition</th>
+<th>Target (example)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>First-pass yield of L4 generator tests</td>
+<td>tests passed at first witness / tests witnessed</td>
+<td>≥ 90 % (ledger target)</td>
+</tr>
+<tr>
+<td>Start reliability during commissioning</td>
+<td>successful starts / start attempts</td>
+<td>100 % in the final 20 starts</td>
+</tr>
+<tr>
+<td>Bus-live time</td>
+<td>time from utility loss to first breaker closed</td>
+<td>≤ 10 s</td>
+</tr>
+<tr>
+<td>Transient margin</td>
+<td>smallest margin to the G3 limit across all steps</td>
+<td>≥ 1 percentage point</td>
+</tr>
+<tr>
+<td>Sync close angle</td>
+<td>largest angle at contact across all sets</td>
+<td>≤ 5°</td>
+</tr>
+<tr>
+<td>Load sharing error</td>
+<td>largest kW sharing error</td>
+<td>≤ ±5 %</td>
+</tr>
+<tr>
+<td>Open NCRs at L5 start</td>
+<td>number</td>
+<td>0 major, ≤ 5 minor (severity per section 09.4.1)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s15-18"><span class="n">15.18</span>Checklist for site use</h2>
+<ol>
+<li><strong>Rating basis.</strong> The nameplate rating, the FAT report rating and the specification rating (DCC, COP or PRP) are the same, and the fuel quantity basis (with or without 133 %) is recorded in the BOD.</li>
+<li><strong>FAT reports.</strong> All 17 FAT reports are received and three are witnessed; transient results are inside class G3.</li>
+<li><strong>L2 checks.</strong> Alternator IR and PI pass; exhaust, ventilation, cooling and starting systems are complete.</li>
+<li><strong>Fuel piping.</strong> Pressure test records exist for every section at the test pressure for at least 10 minutes.</li>
+<li><strong>Fuel flushing.</strong> The flushing record and the ISO 4406 sample result meet the OEM target before any engine start.</li>
+<li><strong>Fuel quality.</strong> Delivery samples meet ASTM D975 water and sediment and the national specification; the OEM accepts the biodiesel blend in writing.</li>
+<li><strong>Day-tank control.</strong> Each level set point is proven by lifting the float or simulating the transmitter, with the correct alarm at the BMS.</li>
+<li><strong>Start-up.</strong> OEM start-up report signed; all protective shutdowns proven; settings record issued.</li>
+<li><strong>Load bank.</strong> Each set completes the load bank sequence with stable temperatures and steady-state values inside class G3.</li>
+<li><strong>Transient test.</strong> Each set passes load acceptance in the declared stages and 100 % load rejection, recorded at half-cycle resolution.</li>
+<li><strong>Start time.</strong> Bus live within 10 s and all required sets on the bus within the project time.</li>
+<li><strong>Crank cycle.</strong> The crank and rest periods and the overcrank alarm are proven.</li>
+<li><strong>Synchronising.</strong> The device 25 window, breaker closing time and close angle are recorded for every set.</li>
+<li><strong>Load sharing.</strong> kW and kvar sharing are within the limits at two plant loads and after one set trips.</li>
+<li><strong>Closed transition.</strong> The overlap time and the overlap protection are proven.</li>
+<li><strong>Protection.</strong> Every relay is injected, every trip output is proven, and the settings file matches the setting sheet.</li>
+<li><strong>Emissions and noise.</strong> The laboratory report and the noise survey are filed with the environmental permit references.</li>
+<li><strong>Communications.</strong> The point-to-point sheet is complete for all sets with the exported register map.</li>
+<li><strong>IST.</strong> The generator scenarios in 15.14.2 pass and their results are in the IST report.</li>
+</ol>
+<h2 id="s15-19"><span class="n">15.19</span>Sources</h2>
+<ol>
+<li>ISO 8528-5:2022, Reciprocating internal combustion engine driven alternating current generating sets, Part 5: Generating sets. ISO, 2022. <a href="https://www.iso.org/standard/78071.html" rel="noopener">https://www.iso.org/standard/78071.html</a></li>
+<li>ISO 8528-1:2018, Part 1: Application, ratings and performance. ISO, 2018. <a href="https://www.iso.org/standard/69866.html" rel="noopener">https://www.iso.org/standard/69866.html</a></li>
+<li>ISO 8528-6:2005, Part 6: Test methods. ISO, 2005. <a href="https://www.iso.org/standard/37543.html" rel="noopener">https://www.iso.org/standard/37543.html</a></li>
+<li>Kohler Power Systems, Power Systems Topics 143: ISO 8528-5 and Generator Transient Performance, 2024. <a href="https://techcomm.kohler.com/techcomm/pdf/ISO%208528-5%20and%20Generator%20Transient%20Performance_WP.pdf" rel="noopener">https://techcomm.kohler.com/techcomm/pdf/ISO%208528-5%20and%20Generator%20Transient%20Performance_WP.pdf</a></li>
+<li>Avtron Power Solutions, Testing Diesel Gen-sets to ISO 8528. <a href="https://avtronpower.com/resources/articles/testing-diesel-gen-sets-to-iso8528/" rel="noopener">https://avtronpower.com/resources/articles/testing-diesel-gen-sets-to-iso8528/</a></li>
+<li>Cummins, Transient performance technical paper (ISO 8528-5 classes). <a href="https://mart.cummins.com/imagelibrary/data/assetfiles/0058629.pdf" rel="noopener">https://mart.cummins.com/imagelibrary/data/assetfiles/0058629.pdf</a></li>
+<li>Caterpillar, Transient Performance Specifications for Diesel Generator Sets (white paper). <a href="https://www.cat.com/en_US/by-industry/electric-power/Articles/White-papers/transient-performance-specifications-for-diesel-generator-sets.html" rel="noopener">https://www.cat.com/en_US/by-industry/electric-power/Articles/White-papers/transient-performance-specifications-for-diesel-generator-sets.html</a></li>
+<li>NFPA 110, Standard for Emergency and Standby Power Systems. National Fire Protection Association, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-110-standard-development/110" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-110-standard-development/110</a></li>
+<li>Data Center Dynamics, Understanding NFPA 110 Chapter 7. <a href="https://www.datacenterdynamics.com/en/opinions/understanding-nfpa-110-chapter-7/" rel="noopener">https://www.datacenterdynamics.com/en/opinions/understanding-nfpa-110-chapter-7/</a></li>
+<li>Consulting-Specifying Engineer, Critical Power: NFPA 110 Standard for Emergency and Standby Power Systems. <a href="https://www.csemag.com/critical-power-nfpa-110-standard-for-emergency-and-standby-power-systems/" rel="noopener">https://www.csemag.com/critical-power-nfpa-110-standard-for-emergency-and-standby-power-systems/</a></li>
+<li>NFPA 37, Standard for the Installation and Use of Stationary Combustion Engines and Gas Turbines. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-37-standard-development/37" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-37-standard-development/37</a></li>
+<li>NFPA 30, Flammable and Combustible Liquids Code. NFPA, current edition. <a href="https://www.nfpa.org/codes-and-standards/nfpa-30-standard-development/30" rel="noopener">https://www.nfpa.org/codes-and-standards/nfpa-30-standard-development/30</a></li>
+<li>ASTM D975, Standard Specification for Diesel Fuel. ASTM International, current edition. <a href="https://www.astm.org/d0975.html" rel="noopener">https://www.astm.org/d0975.html</a></li>
+<li>ISO 4406:2021, Hydraulic fluid power, Method for coding the level of contamination by solid particles. ISO, 2021. <a href="https://www.iso.org/standard/79423.html" rel="noopener">https://www.iso.org/standard/79423.html</a></li>
+<li>Schneider Electric, ADVC3 Operations Manual, Standards and Guidelines (IEEE 1547 synchronisation table). <a href="https://www.productinfo.schneider-electric.com/advc-operationsmanual/" rel="noopener">https://www.productinfo.schneider-electric.com/advc-operationsmanual/</a></li>
+<li>IEEE 1547-2018, Standard for Interconnection and Interoperability of Distributed Energy Resources. IEEE, 2018. <a href="https://standards.ieee.org/ieee/1547/5915/" rel="noopener">https://standards.ieee.org/ieee/1547/5915/</a></li>
+<li>IEEE 43-2013, Recommended Practice for Testing Insulation Resistance of Electric Machinery. IEEE, 2013. <a href="https://standards.ieee.org/ieee/43/5390/" rel="noopener">https://standards.ieee.org/ieee/43/5390/</a></li>
+<li>ANSI/NETA ATS, Standard for Acceptance Testing Specifications for Electrical Power Equipment and Systems. InterNational Electrical Testing Association, current edition. <a href="https://www.netaworld.org/standards/ansi-neta-ats" rel="noopener">https://www.netaworld.org/standards/ansi-neta-ats</a></li>
+<li>Deep Sea Electronics, GenComm protocol and DSE8610 MKII operator manual. <a href="https://www.deepseaelectronics.com" rel="noopener">https://www.deepseaelectronics.com</a></li>
+<li>Woodward, easYgen-3000XT series manuals. <a href="https://www.woodward.com" rel="noopener">https://www.woodward.com</a></li>
+<li>ComAp, InteliGen and InteliSys communication guides. <a href="https://www.comap-control.com" rel="noopener">https://www.comap-control.com</a></li>
+<li>Cummins, PowerCommand control manuals. <a href="https://www.cummins.com" rel="noopener">https://www.cummins.com</a></li>
+<li>Uptime Institute, Tier Standard: Topology. <a href="https://uptimeinstitute.com/tiers" rel="noopener">https://uptimeinstitute.com/tiers</a></li>
+<li>Kementerian Ketenagakerjaan, Permenaker No. 12 Tahun 2015 tentang Keselamatan dan Kesehatan Kerja Listrik di Tempat Kerja. <a href="https://jdih.kemnaker.go.id" rel="noopener">https://jdih.kemnaker.go.id</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="14-lv-switchboards-busway-breakers-relays.html"><span>Previous · 14</span><span class="t">Low-voltage switchboards, busway, circuit breakers and protection relays</span></a><a class="next" href="16-ups-batteries-transfer-rack-power.html"><span>Next · 16</span><span class="t">UPS, batteries, transfer switches and rack power distribution</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (localStorage.getItem('rz_cookie_consent') === 'declined') {
+    window['ga-disable-G-GED7FX8RTV'] = true;
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-GED7FX8RTV');
+  (function(){
+    var loaded=false;
+    function loadGtag(){
+      if(loaded)return;loaded=true;
+      if(window['ga-disable-G-GED7FX8RTV'])return;
+      var s=document.createElement('script');
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-GED7FX8RTV';
+      s.async=true;document.head.appendChild(s);
+    }
+    ['scroll','click','keydown','touchstart'].forEach(function(e){
+      document.addEventListener(e,loadGtag,{once:true,passive:true});
+    });
+  })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>22 BMS commissioning procedure | Cx Field Manual R01</title>
+<meta name="description" content="This chapter gives the commissioning procedure for the building management system (BMS) of a hyperscale data-centre campus.">
+<meta name="author" content="Bagus Dwi Permana">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://resistancezero.com/cx-handbook/22-bms-commissioning-procedure.html">
+<link rel="alternate" hreflang="en" href="https://resistancezero.com/cx-handbook/22-bms-commissioning-procedure.html">
+<link rel="alternate" hreflang="x-default" href="https://resistancezero.com/cx-handbook/22-bms-commissioning-procedure.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://resistancezero.com/cx-handbook/22-bms-commissioning-procedure.html">
+<meta property="og:title" content="22 BMS commissioning procedure | Cx Field Manual R01">
+<meta property="og:description" content="This chapter gives the commissioning procedure for the building management system (BMS) of a hyperscale data-centre campus.">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="22 BMS commissioning procedure | Cx Field Manual R01">
+<meta name="twitter:description" content="This chapter gives the commissioning procedure for the building management system (BMS) of a hyperscale data-centre campus.">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"22 BMS commissioning procedure: from factory test to sequence acceptance","name":"BMS commissioning procedure: from factory test to sequence acceptance","description":"This chapter gives the commissioning procedure for the building management system (BMS) of a hyperscale data-centre campus.","url":"https://resistancezero.com/cx-handbook/22-bms-commissioning-procedure.html","mainEntityOfPage":"https://resistancezero.com/cx-handbook/22-bms-commissioning-procedure.html","inLanguage":"en","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"publisher":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"datePublished":"2026-11-03","dateModified":"2026-11-03","wordCount":9913,"position":22,"isPartOf":{"@type":"Book","name":"Data Centre Commissioning Field Manual","bookEdition":"R01","url":"https://resistancezero.com/cx-handbook/","author":{"@type":"Person","name":"Bagus Dwi Permana","url":"https://resistancezero.com/"},"inLanguage":"en"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Data Centre Commissioning Field Manual","item":"https://resistancezero.com/cx-handbook/"},{"@type":"ListItem","position":3,"name":"22 BMS commissioning procedure","item":"https://resistancezero.com/cx-handbook/22-bms-commissioning-procedure.html"}]}]</script>
+<link rel="icon" type="image/png" href="../assets/Favicon.png">
+<link rel="apple-touch-icon" href="../assets/Favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <script src="../js/rz-version.js?v=20261102-2f6bda5b" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20261031-9fc566e6" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
+    <link rel="stylesheet" href="../css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="../css/rz-tool.css?v=20261101-52ec8657">
+    <link rel="stylesheet" href="../css/rz-cx-handbook.css?v=20261103-acc60fec">
+</head>
+<body class="hub tool cxhb">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="../index.html" class="nav-brand">
+      <img src="../assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="../glossary.html" class="nav-link">Glossary</a>
+      <a href="../datahallAI.html" class="nav-link">DC AI/HPC</a>
+      <a href="../dc-conventional.html" class="nav-link">DC Conventional</a>
+      <div class="nav-dropdown">
+        <a href="../cx-calculator.html" class="nav-link" aria-haspopup="true">Calculators</a>
+        <div class="dropdown-menu">
+          <a href="../capex-calculator.html" class="dropdown-item">CAPEX</a>
+          <a href="../opex-calculator.html" class="dropdown-item">OPEX</a>
+          <a href="../pue-calculator.html" class="dropdown-item">PUE</a>
+          <a href="../tia-942-checklist.html" class="dropdown-item">TIA-942</a>
+          <a href="../cx-calculator.html" class="dropdown-item">Cx</a>
+          <a href="../rfs-readiness-workbench.html" class="dropdown-item">RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Cx field manual</a>
+      <a href="../index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="theme-toggle-text" id="themeToggle" type="button" aria-label="Toggle dark or light mode">Theme</button>
+  </div>
+</nav>
+<main class="main-content" id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow"><b>Cx field manual R01</b> · Part E · Controls, monitoring, integration and networks</p>
+    <h1><span class="num">22</span>BMS commissioning procedure: from factory test to sequence acceptance</h1>
+    <p class="lede">This chapter gives the commissioning procedure for the building management system (BMS) of a hyperscale data-centre campus.</p>
+    <p class="basis">Chapter 22 of 32 · 22 sections · 6 figures · 9,913 words · October 2026</p>
+    <p class="crumb"><a href="../cx-calculator.html">Cx calculator</a> / <a href="index.html">Field manual</a> / Chapter 22</p>
+  </div>
+</header>
+<div class="wrap cxhb-layout">
+<nav class="cxhb-toc" aria-label="Chapter contents">
+<details><summary>Contents of chapter 22</summary>
+<ol><li><a href="#s22-0"><span class="n">22.0</span>Scope of this chapter</a></li><li><a href="#s22-1"><span class="n">22.1</span>BMS commissioning workflow, levels and time limits</a><ol><li><a href="#s22-1-1"><span class="n">22.1.1</span>Levels used for BMS work</a></li><li><a href="#s22-1-2"><span class="n">22.1.2</span>Durations and dependencies for one MSC-1 hall</a></li></ol></li><li><a href="#s22-2"><span class="n">22.2</span>Controls submittal review</a><ol><li><a href="#s22-2-1"><span class="n">22.2.1</span>Contents of the controls submittal</a></li><li><a href="#s22-2-2"><span class="n">22.2.2</span>Review steps</a></li></ol></li><li><a href="#s22-3"><span class="n">22.3</span>Factory acceptance test of panels and software</a><ol><li><a href="#s22-3-1"><span class="n">22.3.1</span>FAT scope</a></li><li><a href="#s22-3-2"><span class="n">22.3.2</span>Worked example: FAT sample for automation server panel B2-DH3-BMS-AS-01</a></li></ol></li><li><a href="#s22-4"><span class="n">22.4</span>L2 panel and field installation inspection</a><ol><li><a href="#s22-4-1"><span class="n">22.4.1</span>Panel inspection checklist</a></li><li><a href="#s22-4-2"><span class="n">22.4.2</span>Field device inspection checklist</a></li><li><a href="#s22-4-3"><span class="n">22.4.3</span>Cable tests for controls wiring</a></li></ol></li><li><a href="#s22-5"><span class="n">22.5</span>Network checkout for BACnet and Modbus</a><ol><li><a href="#s22-5-1"><span class="n">22.5.1</span>BACnet network checkout steps</a></li><li><a href="#s22-5-2"><span class="n">22.5.2</span>Modbus network checkout steps</a></li><li><a href="#s22-5-3"><span class="n">22.5.3</span>Network checkout record fields</a></li></ol></li><li><a href="#s22-6"><span class="n">22.6</span>Point-to-point test</a><ol><li><a href="#s22-6-1"><span class="n">22.6.1</span>Definition and method</a></li><li><a href="#s22-6-2"><span class="n">22.6.2</span>P2P procedure</a></li><li><a href="#s22-6-3"><span class="n">22.6.3</span>Worked example: filled P2P sheet for CDU 07</a></li></ol></li><li><a href="#s22-7"><span class="n">22.7</span>Sensor calibration and accuracy checks</a><ol><li><a href="#s22-7-1"><span class="n">22.7.1</span>Reference instruments</a></li><li><a href="#s22-7-2"><span class="n">22.7.2</span>Tolerances used in the MSC-1 example</a></li><li><a href="#s22-7-3"><span class="n">22.7.3</span>Calibration steps for a water temperature sensor</a></li><li><a href="#s22-7-4"><span class="n">22.7.4</span>Calibration record fields</a></li></ol></li><li><a href="#s22-8"><span class="n">22.8</span>Actuator stroke tests for valves and dampers</a><ol><li><a href="#s22-8-1"><span class="n">22.8.1</span>Steps</a></li><li><a href="#s22-8-2"><span class="n">22.8.2</span>Worked example: CRAH 11 chilled-water valve stroke record</a></li></ol></li><li><a href="#s22-9"><span class="n">22.9</span>Loop tuning (PID)</a><ol><li><a href="#s22-9-1"><span class="n">22.9.1</span>Tuning conditions and method</a></li><li><a href="#s22-9-2"><span class="n">22.9.2</span>Acceptance values for the example loop</a></li><li><a href="#s22-9-3"><span class="n">22.9.3</span>Worked example: CDU 07 supply temperature loop response</a></li></ol></li><li><a href="#s22-10"><span class="n">22.10</span>Sequence-of-operation testing</a><ol><li><a href="#s22-10-1"><span class="n">22.10.1</span>Writing a sequence test script</a></li><li><a href="#s22-10-2"><span class="n">22.10.2</span>Test types</a></li><li><a href="#s22-10-3"><span class="n">22.10.3</span>Worked example: filled sequence test extract for CDU pump failover and zone staging</a></li></ol></li><li><a href="#s22-11"><span class="n">22.11</span>Alarm testing</a><ol><li><a href="#s22-11-1"><span class="n">22.11.1</span>Steps</a></li><li><a href="#s22-11-2"><span class="n">22.11.2</span>Alarm test record fields</a></li></ol></li><li><a href="#s22-12"><span class="n">22.12</span>Trend verification</a><ol><li><a href="#s22-12-1"><span class="n">22.12.1</span>Steps</a></li></ol></li><li><a href="#s22-13"><span class="n">22.13</span>Graphics verification</a></li><li><a href="#s22-14"><span class="n">22.14</span>Loss-of-communication tests</a><ol><li><a href="#s22-14-1"><span class="n">22.14.1</span>Test cases</a></li><li><a href="#s22-14-2"><span class="n">22.14.2</span>Steps for each case</a></li></ol></li><li><a href="#s22-15"><span class="n">22.15</span>Controller power failure and restart</a><ol><li><a href="#s22-15-1"><span class="n">22.15.1</span>Steps</a></li><li><a href="#s22-15-2"><span class="n">22.15.2</span>Worked example: restart record for plant controller B2-PR-BMS-PLC-02</a></li></ol></li><li><a href="#s22-16"><span class="n">22.16</span>Server failover and loss of the BMS server</a><ol><li><a href="#s22-16-1"><span class="n">22.16.1</span>Test cases</a></li><li><a href="#s22-16-2"><span class="n">22.16.2</span>Acceptance used in the MSC-1 example</a></li></ol></li><li><a href="#s22-17"><span class="n">22.17</span>Time synchronisation</a><ol><li><a href="#s22-17-1"><span class="n">22.17.1</span>Requirements and test</a></li></ol></li><li><a href="#s22-18"><span class="n">22.18</span>User accounts, roles and security tests</a><ol><li><a href="#s22-18-1"><span class="n">22.18.1</span>Account and role tests</a></li><li><a href="#s22-18-2"><span class="n">22.18.2</span>Security checks (IEC 62443 based, chapter 27 for the full OT security programme)</a></li></ol></li><li><a href="#s22-19"><span class="n">22.19</span>Acceptance criteria and sign-off</a><ol><li><a href="#s22-19-1"><span class="n">22.19.1</span>Acceptance criteria for the BMS of one hall</a></li><li><a href="#s22-19-2"><span class="n">22.19.2</span>Sign-off record fields</a></li></ol></li><li><a href="#s22-20"><span class="n">22.20</span>Checklist for site use</a></li><li><a href="#s22-21"><span class="n">22.21</span>Sources</a></li></ol>
+</details>
+<div class="side-pager"><a href="21-bms-architecture-points.html"><span>Previous</span>21 BMS architecture, protocols and the points list</a><a href="23-epms-pme-architecture.html"><span>Next</span>23 EPMS and Schneider EcoStruxure Power Monitoring Expert (PME)</a><a href="index.html"><span>Manual</span>All chapters</a></div>
+</nav>
+<article class="cxhb-body">
+<h2 id="s22-0"><span class="n">22.0</span>Scope of this chapter</h2>
+<p>This chapter gives the commissioning procedure for the building management system (BMS) of a hyperscale data-centre campus. The procedure runs from the review of the controls submittal to the signed acceptance of the sequences of operation. Chapter 21 gives the architecture, protocols and points list that this procedure tests.</p>
+<ol>
+<li><strong>Workflow and gates.</strong> The chapter maps BMS work to commissioning levels L1 to L5, with owners, durations in working days and the record that closes each step.</li>
+<li><strong>Submittal review and factory test.</strong> It covers the controls submittal review and the factory acceptance test (FAT) of panels and software.</li>
+<li><strong>Installation and network checkout.</strong> It covers the L2 panel and field inspection, the input and output (I/O) checkout and the network checkout for BACnet and Modbus.</li>
+<li><strong>Point-to-point test and calibration.</strong> It gives the point-to-point (P2P) method with a filled test sheet, the sensor calibration method with reference instruments and tolerances, and the actuator stroke test.</li>
+<li><strong>Loops and sequences.</strong> It covers proportional-integral-derivative (PID) loop tuning with a worked response, and the step-by-step testing of sequences of operation: staging, failover and alarm responses, with a filled sequence test extract.</li>
+<li><strong>System functions.</strong> It covers alarm testing, trend verification, graphics verification, loss-of-communication tests, controller power failure and restart, server failover, time synchronisation, user accounts and security.</li>
+<li><strong>Acceptance.</strong> It gives the acceptance criteria and the sign-off record.</li>
+<li><strong>Documents and standards used.</strong> ASHRAE Guideline 0-2019 and ANSI/ASHRAE/IES Standard 202-2024 (the commissioning process for new buildings and new systems), ASHRAE Guideline 1.1 (heating, ventilation, air conditioning and refrigeration (HVAC&amp;R) technical requirements for commissioning) and ASHRAE Guideline 13-2024. The chapter also uses ASHRAE Guideline 36-2024, ANSI/ASHRAE 135-2024 (BACnet), the Modbus specifications, IEC 62443 (operational technology (OT) security) and public owner specifications for BMS checkout (University of Missouri, Boise State University).</li>
+</ol>
+<h2 id="s22-1"><span class="n">22.1</span>BMS commissioning workflow, levels and time limits</h2>
+
+<figure class="sheet" id="F22-1"><a href="../data/cx-handbook/figures/F22-1.svg" title="Open drawing F22-1 at full size"><img src="../data/cx-handbook/figures/F22-1.svg" alt="F22-1: BMS commissioning workflow for one MSC-1 hall: steps, durations and the record that closes each step" width="1400" height="766" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F22-1</span> — <b>BMS commissioning workflow for one MSC-1 hall: steps, durations and the record that closes each step</b>. Each step starts only when the record of the previous step is signed; a step started early is entered in the schedule as a risk with a named owner.</figcaption></figure>
+<h3 id="s22-1-1"><span class="n">22.1.1</span>Levels used for BMS work</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>BMS activity</th>
+<th>Performed by</th>
+<th>Witnessed by</th>
+<th>Exit record</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Controls design review, points list and sequence review</td>
+<td>Engineer of record, controls contractor</td>
+<td>Commissioning manager</td>
+<td>Design review comment log closed</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>FAT of panels and software, simulated I/O</td>
+<td>Controls contractor, original equipment manufacturer (OEM)</td>
+<td>Commissioning manager, owner operations</td>
+<td>Signed FAT report BMS-L1-FAT-nn</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Panel and field device installation inspection, cable tests</td>
+<td>Controls contractor, electrical contractor</td>
+<td>Commissioning engineer (sample witness)</td>
+<td>Signed L2 checklist BMS-L2-nn</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Network checkout, I/O checkout, P2P, calibration, actuator stroke</td>
+<td>Controls contractor</td>
+<td>Commissioning engineer (100 % of critical points, sample of others)</td>
+<td>Signed P2P sheets and calibration records BMS-L3-nn</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>Loop tuning, sequence tests, alarms, trends, graphics, failover, restart</td>
+<td>Controls contractor with mechanical contractor and OEMs</td>
+<td>Commissioning manager, owner operations</td>
+<td>Signed functional test scripts BMS-L4-nn</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>BMS behaviour in integrated systems tests</td>
+<td>Commissioning manager</td>
+<td>Owner, operations</td>
+<td>integrated systems test (IST) record (chapter 28)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s22-1-2"><span class="n">22.1.2</span>Durations and dependencies for one MSC-1 hall</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Duration (working days)</th>
+<th>Starts when</th>
+<th>Blocks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Controls submittal review</td>
+<td>10 per review cycle</td>
+<td>Submittal received complete</td>
+<td>Panel manufacture and programming</td>
+</tr>
+<tr>
+<td>FAT</td>
+<td>3 to 5 per hall software package</td>
+<td>FAT procedure approved 10 days before</td>
+<td>Panel shipment</td>
+</tr>
+<tr>
+<td>L2 inspection</td>
+<td>5 to 10</td>
+<td>Panels installed, field wiring terminated</td>
+<td>L3 P2P</td>
+</tr>
+<tr>
+<td>Network checkout</td>
+<td>2 to 3</td>
+<td>L2 closed for network cabling; OT switches configured (chapter 26)</td>
+<td>P2P of network points</td>
+</tr>
+<tr>
+<td>P2P and calibration</td>
+<td>10 to 15 for 1,480 points</td>
+<td>Equipment powered; OEM start-up done for unit controllers</td>
+<td>L4 sequence tests</td>
+</tr>
+<tr>
+<td>Loop tuning</td>
+<td>3 to 5</td>
+<td>Water flowing at design conditions; load available (heater skids or IT load)</td>
+<td>Sequence acceptance</td>
+</tr>
+<tr>
+<td>Sequence and system tests</td>
+<td>10 to 15</td>
+<td>P2P closed with no open Category A issue</td>
+<td>L5 IST</td>
+</tr>
+</tbody>
+</table></div>
+<p>The commissioning manager records the start and finish of each step in the commissioning schedule. A step that starts before its predecessor has closed is <mark>recorded as a risk</mark> with a named owner.</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>P2P before power.</strong> P2P cannot be done on a coolant distribution unit (CDU) that has no permanent power and no fluid. The test then covers only the controller side of the point. Plan P2P after OEM start-up of each unit.</li>
+<li><strong>Loop tuning without load.</strong> A computer room air handler (CRAH) loop tuned with no heat load runs at minimum fan speed, and the tuning does not hold at design load. Loop tuning in a data hall needs heater skids or load banks (in the MSC-1 example, 9.6 MW of liquid heater skids and 2.4 MW of air heaters per hall).</li>
+<li><strong>Network points tested before the gateway map is frozen.</strong> A Modbus map revision after P2P invalidates every P2P record for that device type. <mark>Freeze the map version first</mark> (chapter 25).</li>
+</ol>
+<h2 id="s22-2"><span class="n">22.2</span>Controls submittal review</h2>
+<h3 id="s22-2-1"><span class="n">22.2.1</span>Contents of the controls submittal</h3>
+<p><strong>Purpose:</strong> The review confirms that the controls design can be installed, programmed and tested as the specification requires.</p>
+<p><strong>Owner:</strong> The engineer of record reviews for compliance. The commissioning manager reviews for testability and for the commissioning requirements in the specification.</p>
+<p><strong>Inputs:</strong> Controls specification, owner's project requirements (OPR), basis of design (BOD), sequence of operation, mechanical flow diagrams, OEM unit controller documentation.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Submittal part</th>
+<th>What the commissioning manager checks</th>
+<th>Typical finding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>System architecture drawing</td>
+<td>Layers, network numbers, BACnet broadcast management device (BBMD) locations, redundancy split</td>
+<td>Two redundant CDUs on one switch</td>
+</tr>
+<tr>
+<td>Device instance and IP register</td>
+<td>Unique numbers in the campus scheme</td>
+<td>Factory default instance 1 on gateways</td>
+</tr>
+<tr>
+<td>Bill of materials with BACnet Testing Laboratories (BTL) listings</td>
+<td>Each controller and gateway listed; firmware revision</td>
+<td>Gateway firmware newer than listed revision</td>
+</tr>
+<tr>
+<td>Protocol implementation conformance statement (PICS) for each device type</td>
+<td>Change-of-value (COV) support, maximum subscriptions, object name length</td>
+<td>Unit controller without COV; graphics will poll</td>
+</tr>
+<tr>
+<td>Points list</td>
+<td>Fields as chapter 21, section 21.10.2</td>
+<td>Missing alarm delays and Relinquish_Default</td>
+</tr>
+<tr>
+<td>Sequence of operation as programmed</td>
+<td>Matches the design sequence; every mode and failure case covered</td>
+<td>No sequence for loss of supervision</td>
+</tr>
+<tr>
+<td>Panel drawings and power calculation</td>
+<td>Separation, spare capacity, uninterruptible power supply (UPS) backed supply</td>
+<td>24 V supply without margin</td>
+</tr>
+<tr>
+<td>Wiring diagrams and terminal schedules</td>
+<td>Terminal numbers match the panel; shield earthing shown</td>
+<td>BACnet master-slave/token-passing (MS/TP) shield earthed at every panel</td>
+</tr>
+<tr>
+<td>Field device data sheets</td>
+<td>Sensor accuracy, range, output signal</td>
+<td>Sensor range does not cover 55 °C technology cooling system (TCS) return</td>
+</tr>
+<tr>
+<td>Graphics samples</td>
+<td>Graphics standard followed</td>
+<td>No marker for overridden values</td>
+</tr>
+<tr>
+<td>Commissioning plan of the contractor</td>
+<td>P2P method, calibration instruments, test forms</td>
+<td>No reference instrument list</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s22-2-2"><span class="n">22.2.2</span>Review steps</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Completeness check within 2 working days.</strong> Check that every part in the table above is present. <mark>Return an incomplete submittal</mark> at once with a list of the missing parts. The review clock starts when the submittal is complete.</li>
+<li><strong>Architecture review.</strong> Compare the architecture drawing with the redundancy design. Confirm that each redundant pair of equipment is split across controllers, switches and power supplies.</li>
+<li><strong>Listing and PICS review.</strong> Look up each controller model in the BTL Listing. Record the listed firmware revision and compare it with the delivered revision stated in the bill of materials.</li>
+<li><strong>Points list review.</strong> Use the review steps of chapter 21, section 21.10.3.</li>
+<li><strong>Sequence review.</strong> Walk through the programmed sequence with the design sequence open beside it. Mark each design statement as covered, changed or missing.</li>
+<li><strong>Testability review.</strong> For each sequence statement, write how it will be tested: which input is forced, which output is observed, what value is the pass limit. A statement that cannot be tested is <mark>returned for rewording</mark>.</li>
+<li><strong>Comment return within 10 working days.</strong> Return the comments with a status: approved, approved with comments, revise and resubmit. The contract sets the review period and the status codes.</li>
+</ol>
+<p><strong>Records:</strong> Submittal review comment sheet with comment number, document reference, comment, response, status and closure date.</p>
+<h2 id="s22-3"><span class="n">22.3</span>Factory acceptance test of panels and software</h2>
+<h3 id="s22-3-1"><span class="n">22.3.1</span>FAT scope</h3>
+<p><strong>Purpose:</strong> The FAT proves at the factory or in the contractor's workshop that the panels are built to the drawings and that the software runs the sequences on simulated inputs. Defects found at the FAT <mark>cost hours to correct</mark>. The same defects found on site cost days.</p>
+<p><strong>Trigger:</strong> Panels built and software loaded; FAT procedure approved at least 10 working days before the test.</p>
+<p><strong>Owner:</strong> Controls contractor performs; commissioning manager and owner operations witness.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>FAT part</th>
+<th>Method</th>
+<th>Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Panel construction</td>
+<td>Inspection against panel drawings</td>
+<td>No deviation, or deviation recorded and approved</td>
+</tr>
+<tr>
+<td>Panel wiring</td>
+<td>Continuity of 10 % of terminals chosen by the witness; insulation resistance of mains wiring at 500 V DC</td>
+<td>Continuity as drawing; insulation resistance at least 1 MΩ (project specification governs)</td>
+</tr>
+<tr>
+<td>Power supply</td>
+<td>Load test with all controllers running</td>
+<td>Output voltage within the supply's rated tolerance</td>
+</tr>
+<tr>
+<td>I/O simulation</td>
+<td>Signal injected at the terminals: 4 and 20 mA, 0 and 10 V, resistance for temperature, contact closure</td>
+<td>Value shown in software within 0.5 % of span</td>
+</tr>
+<tr>
+<td>Software load</td>
+<td>Version of each programme recorded</td>
+<td>Matches the approved submittal</td>
+</tr>
+<tr>
+<td>Sequence on simulated I/O</td>
+<td>Each sequence mode stepped by the simulator</td>
+<td>Outputs follow the sequence</td>
+</tr>
+<tr>
+<td>Alarms</td>
+<td>Each alarm forced once</td>
+<td>Alarm reaches the server with the correct class and text</td>
+</tr>
+<tr>
+<td>Graphics</td>
+<td>Each page opened</td>
+<td>Points shown match the points list</td>
+</tr>
+<tr>
+<td>Restart</td>
+<td>Controller power removed and restored</td>
+<td>Outputs go to the defined state; programme resumes</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s22-3-2"><span class="n">22.3.2</span>Worked example: FAT sample for automation server panel B2-DH3-BMS-AS-01</h3>
+<p><strong>Worked example:</strong> The panel has 4 I/O modules with 64 points. The witness chooses 7 points (10 % rounded up) for continuity and injection.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point</th>
+<th>Signal injected</th>
+<th>Expected value</th>
+<th>Value shown</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DH3_Hall_DP (AI, 4–20 mA, 0–50 Pa)</td>
+<td>12.000 mA</td>
+<td>25.0 Pa</td>
+<td>25.0 Pa</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>DH3_ER1_T (AI, PT1000)</td>
+<td>1,077.9 Ω (20.0 °C)</td>
+<td>20.0 °C</td>
+<td>20.1 °C</td>
+<td>Pass (within 0.25 K)</td>
+</tr>
+<tr>
+<td>DH3_ExFan1_Sts (BI)</td>
+<td>Contact closed</td>
+<td>On</td>
+<td>On</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>DH3_ExFan1_Cmd (BO)</td>
+<td>Command On</td>
+<td>Relay contact closed</td>
+<td>Closed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>DH3_Damper1_Cmd (AO, 0–10 V)</td>
+<td>Command 50 %</td>
+<td>5.00 V</td>
+<td>5.02 V</td>
+<td>Pass (within 0.5 % of span)</td>
+</tr>
+<tr>
+<td>DH3_Leak_Zone1 (BI)</td>
+<td>Contact open (leak)</td>
+<td>Alarm</td>
+<td>Normal</td>
+<td>Fail: <mark>polarity wrong</mark></td>
+</tr>
+<tr>
+<td>DH3_Door1_Sts (BI)</td>
+<td>Contact closed</td>
+<td>Closed</td>
+<td>Closed</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>The leak zone polarity is corrected in the software at the FAT and re-tested. The FAT report records the defect, the correction and the retest result. The PT1000 resistance of 1,077.9 Ω at 20 °C follows from the IEC 60751 relation:</p>
+<p>R = 1,000 × (1 + 3.9083 × 10⁻³ × t − 5.775 × 10⁻⁷ × t²)</p>
+<p><strong>Records:</strong> FAT report BMS-L1-FAT-B2-DH3 with the procedure, attendance, results table, defect list with closure, software version list and the witness signatures.</p>
+<h2 id="s22-4"><span class="n">22.4</span>L2 panel and field installation inspection</h2>
+<h3 id="s22-4-1"><span class="n">22.4.1</span>Panel inspection checklist</h3>
+<ol>
+<li><strong>Panel location and access.</strong> The panel is installed at the location on the drawing with the clearance in front stated in the specification. Doors open fully.</li>
+<li><strong>Power source.</strong> The panel supply comes from the UPS-backed circuit on the drawing. The circuit label in the distribution board and in the panel agree.</li>
+<li><strong>Earthing.</strong> The protective earth conductor is connected and tested for continuity.</li>
+<li><strong>Terminal tightness and ferrules.</strong> Conductors have ferrules where specified. A pull test of 10 % of terminals finds no loose conductor.</li>
+<li><strong>Labels.</strong> Panel tag, terminal numbers, cable numbers and device tags match the drawings.</li>
+<li><strong>Segregation.</strong> Mains and extra-low voltage cables are separated inside the panel.</li>
+<li><strong>Spare capacity.</strong> Spare I/O and DIN rail space are present as in the approved submittal.</li>
+<li><strong>Documents in panel.</strong> The current wiring diagram is in the door pocket.</li>
+</ol>
+<h3 id="s22-4-2"><span class="n">22.4.2</span>Field device inspection checklist</h3>
+<ol>
+<li><strong>Sensor location.</strong> Each sensor is installed where the flow diagram shows it. A TCS supply temperature sensor is in the supply pipe downstream of the CDU outlet, with the immersion length in the data sheet.</li>
+<li><strong>Thermowell and insertion.</strong> Immersion sensors sit in thermowells with heat transfer paste where the OEM requires it.</li>
+<li><strong>Pressure tapping.</strong> Differential pressure transmitters have isolation valves and an equalising valve for zero checks.</li>
+<li><strong>Flow meter straight lengths.</strong> Flow meters have the upstream and downstream straight pipe lengths stated by the OEM. For example, the Endress+Hauser Promag 10 and Promag H 200 electromagnetic meters need 5 × DN upstream and 2 × DN downstream (operating instructions, installation conditions). DN is the nominal diameter. Other meter types need longer runs; the operating instructions of the installed meter govern.</li>
+<li><strong>Actuator mounting.</strong> Actuators are mounted with the linkage at the stated position; manual override is accessible.</li>
+<li><strong>Cable identification.</strong> Each field cable has a cable number at both ends.</li>
+<li><strong>MS/TP and Modbus wiring.</strong> Daisy-chain topology, termination at both ends only, shield continuity and single-point earth (chapter 21, sections 21.5.4 and 21.7.6).</li>
+</ol>
+<h3 id="s22-4-3"><span class="n">22.4.3</span>Cable tests for controls wiring</h3>
+<p>The controls contractor tests every field cable and every RS-485 trunk before the network checkout in section 22.5. Figure <a class="figref" href="#F22-6">F22-6</a> shows the termination check on MS/TP trunk 2302 and the reading expected for each number of fitted terminations.</p>
+<figure class="sheet" id="F22-6"><a href="../data/cx-handbook/figures/F22-6.svg" title="Open drawing F22-6 at full size"><img src="../data/cx-handbook/figures/F22-6.svg" alt="F22-6: RS-485 termination check on MS/TP trunk 2302" width="1000" height="694" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F22-6</span> — <b>RS-485 termination check on MS/TP trunk 2302</b>. Two 120 Ω terminations in parallel read about 60 Ω; one gives 120 Ω and three give 40 Ω, so the ohmmeter reading shows how many terminations are fitted.</figcaption></figure>
+
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Cable type</th>
+<th>Test</th>
+<th>Instrument</th>
+<th>Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Analog and binary field wiring</td>
+<td>Continuity and polarity</td>
+<td>Multimeter</td>
+<td>Correct terminal at both ends</td>
+</tr>
+<tr>
+<td>Mains supply to panel</td>
+<td>Insulation resistance at 500 V DC</td>
+<td>Insulation resistance tester</td>
+<td>Project specification value, for example at least 1 MΩ</td>
+</tr>
+<tr>
+<td>RS-485 trunk</td>
+<td>Loop resistance of each conductor; resistance across the pair with terminations fitted</td>
+<td>Multimeter</td>
+<td>About 60 Ω across the pair with two 120 Ω terminations fitted</td>
+</tr>
+<tr>
+<td>RS-485 trunk</td>
+<td>Shield continuity end to end; shield-to-earth only at one point</td>
+<td>Multimeter</td>
+<td>Continuous; one earth point</td>
+</tr>
+<tr>
+<td>Ethernet to controllers</td>
+<td>Permanent link test</td>
+<td>Cable certifier (chapter 26)</td>
+<td>Pass to the specified category</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Example:</strong> The MS/TP trunk 2302 in Building 2 hall 3 has two 120 Ω end terminations. With all devices disconnected from power, the resistance between the + and − conductors at the router end reads <mark>61 Ω</mark>. This confirms two terminations in parallel and no third termination; a third termination would give about 40 Ω.</p>
+<h2 id="s22-5"><span class="n">22.5</span>Network checkout for BACnet and Modbus</h2>
+<h3 id="s22-5-1"><span class="n">22.5.1</span>BACnet network checkout steps</h3>
+<p><strong>Purpose:</strong> The network checkout proves that every device is reachable, uniquely addressed and communicating without errors before point tests start.</p>
+<p><strong>Owner:</strong> Controls contractor performs; commissioning engineer witnesses.</p>
+<p><strong>Inputs:</strong> Device instance register, network number register, IP register, BBMD plan, OT network handover from the network contractor (chapter 26).</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Discovery scan.</strong> Run a Who-Is from the BMS server and from a commissioning laptop registered as a foreign device. Export the list of I-Am responses with device instance, network number and medium access control (MAC) or IP address.</li>
+<li><strong>Compare with the register.</strong> Compare the scan list with the device instance register. Every registered device answers; no unregistered device answers; no instance appears twice.</li>
+<li><strong>Read the Device object.</strong> Read Firmware_Revision, Application_Software_Version, Max_Master, Max_Info_Frames, APDU_Timeout and Number_Of_APDU_Retries from each device. Compare with the approved values.</li>
+<li><strong>Check the BBMD tables.</strong> Read the broadcast distribution table of each BBMD. Confirm that the tables are identical and that each subnet has one BBMD.</li>
+<li><strong>Measure MS/TP traffic.</strong> Connect a protocol analyser to each MS/TP trunk for at least one minute. Record the token rotation time and the count of poll-for-master frames. Confirm I-Am from every device on the trunk.</li>
+<li><strong>Read error counters.</strong> Read the cyclic redundancy check (CRC) and framing error counters of each MS/TP device where the device exposes them. A device with rising counters during the capture is checked for wiring, termination and noise.</li>
+<li><strong>Check router network numbers.</strong> Read the network number on each router port. Compare with the network number register.</li>
+</ol>
+<p><strong>Acceptance:</strong> All devices in the register answer. No device instance, MAC address or network number is duplicated, and the firmware and software versions are as approved. The MS/TP token rotation time is below the value in the design (MSC-1 example: below 1 s on sensor trunks). Error counters do not increase during a 10 minute observation.</p>
+<h3 id="s22-5-2"><span class="n">22.5.2</span>Modbus network checkout steps</h3>
+<ol>
+<li><strong>Address scan.</strong> Poll each configured slave address with a read of a known register (for example a device identification or firmware register). Record response time and any exception code.</li>
+<li><strong>Offset check.</strong> Read a register with a distinctive value, such as a serial number, and compare with the device nameplate. A mismatch shows <mark>a one-register offset</mark>.</li>
+<li><strong>Word order check.</strong> Read one FLOAT32 value and compare with the device local display (chapter 21, section 21.7.5).</li>
+<li><strong>Time-out and retry settings.</strong> Read the gateway settings for response time-out, retries and delay between polls. Compare with the polling budget in the design.</li>
+<li><strong>Device removal test.</strong> Disconnect one device from the trunk. Record the time until the gateway marks it offline and the effect on the polling cycle of the other devices. Reconnect and record the recovery time.</li>
+</ol>
+<h3 id="s22-5-3"><span class="n">22.5.3</span>Network checkout record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Device tag</td>
+<td>Text</td>
+<td>B2-DH3-CDU-07</td>
+</tr>
+<tr>
+<td>Device instance</td>
+<td>Integer</td>
+<td>233007</td>
+</tr>
+<tr>
+<td>Network number</td>
+<td>Integer</td>
+<td>2003</td>
+</tr>
+<tr>
+<td>IP or MAC address</td>
+<td>Text</td>
+<td>10.22.3.47</td>
+</tr>
+<tr>
+<td>Firmware revision read</td>
+<td>Text</td>
+<td>4.12.0</td>
+</tr>
+<tr>
+<td>Firmware revision approved</td>
+<td>Text</td>
+<td>4.12.0</td>
+</tr>
+<tr>
+<td>Max_Master / Max_Info_Frames (MS/TP only)</td>
+<td>Integers</td>
+<td>not applicable</td>
+</tr>
+<tr>
+<td>Response time (Modbus)</td>
+<td>Milliseconds</td>
+<td>38</td>
+</tr>
+<tr>
+<td>Error counters start / end</td>
+<td>Integers</td>
+<td>0 / 0</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>Choice</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Tester and witness</td>
+<td>Names and dates</td>
+<td>Controls technician; commissioning engineer, 2027-04-02</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s22-6"><span class="n">22.6</span>Point-to-point test</h2>
+
+<figure class="sheet" id="F22-2"><a href="../data/cx-handbook/figures/F22-2.svg" title="Open drawing F22-2 at full size"><img src="../data/cx-handbook/figures/F22-2.svg" alt="F22-2: Point-to-point test of one analog input: every stage from the pipe to the graphic, alarm and trend" width="1400" height="798" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F22-2</span> — <b>Point-to-point test of one analog input: every stage from the pipe to the graphic, alarm and trend</b>. The stimulus is applied at the field end; the observation is made at the graphic, in the alarm list and in the trend. Reading the controller alone does not prove the path.</figcaption></figure>
+<h3 id="s22-6-1"><span class="n">22.6.1</span>Definition and method</h3>
+<p>A point-to-point test proves the whole path of a point. The path starts at the physical quantity at the field device and passes through the signal on the cable, the controller input or output and the BACnet object. It ends at the value and state shown on the graphic, in the alarm list and in the trend. A test that <mark>only reads the value in the controller</mark> does not prove the graphic, the alarm or the trend. The owner specifications reviewed for this chapter require a checkout of every point. They also require the readout to be verified at the BMS workstation (University of Missouri building automatic controls design criteria; contract clause samples).</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point type</th>
+<th>Stimulus at the field end</th>
+<th>Observation at the BMS</th>
+<th>Pass condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Analog input (sensor)</td>
+<td>Reference instrument beside the sensor, or sensor in a calibrator</td>
+<td>Graphic value, trend sample</td>
+<td>Difference within the tolerance in section 22.7</td>
+</tr>
+<tr>
+<td>Analog input (transmitter with 4–20 mA)</td>
+<td>Loop calibrator in place of the transmitter at 4, 12 and 20 mA, then transmitter reconnected and compared with reference</td>
+<td>Graphic value at each current</td>
+<td>Within 0.5 % of span at each current; then within sensor tolerance</td>
+</tr>
+<tr>
+<td>Analog output</td>
+<td>Command at 0, 25, 50, 75 and 100 % from the graphic</td>
+<td>Actuator position at the device; feedback value</td>
+<td>Position within 5 % of command; feedback agrees</td>
+</tr>
+<tr>
+<td>Binary input</td>
+<td>Operate the device: start the pump, open the door, wet the leak cable</td>
+<td>Graphic state, alarm list, trend</td>
+<td>Correct state text within the polling time; alarm with correct class</td>
+</tr>
+<tr>
+<td>Binary output</td>
+<td>Command from the graphic</td>
+<td>Equipment starts or stops; status input changes</td>
+<td>Equipment responds; status returns within the proving time</td>
+</tr>
+<tr>
+<td>Network point</td>
+<td>Read the value on the device local display</td>
+<td>Graphic value</td>
+<td>Same value within the display resolution</td>
+</tr>
+<tr>
+<td>Alarm on any point</td>
+<td>Drive the value past the limit</td>
+<td>Alarm list, alarm text, class, recipient</td>
+<td>Alarm appears after the stated delay with correct text</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s22-6-2"><span class="n">22.6.2</span>P2P procedure</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Prepare the sheet.</strong> Print or open the P2P sheet generated from the points list for one piece of equipment. Each row is one point.</li>
+<li><strong>Confirm the equipment state.</strong> Confirm that the equipment is in a state that allows the test, under a permit to work where the test runs equipment (chapter 10). Record the permit number.</li>
+<li><strong>Set up the reference instrument.</strong> Record the instrument identification, its calibration certificate number and expiry date.</li>
+<li><strong>Test each point.</strong> Apply the stimulus in the table above. Record the reference value, the BMS value and the difference.</li>
+<li><strong>Check the alarm.</strong> For each point with an alarm, drive the value past the limit or simulate it at the controller input, and record the alarm time, class and text.</li>
+<li><strong>Check the trend.</strong> After the test, open the trend for the points tested and confirm the stimulus is visible in the trend with the correct time stamps.</li>
+<li><strong>Restore.</strong> Remove any forced value. Confirm that no point is left out of service or overridden. Record the override summary page as empty for this equipment.</li>
+<li><strong>Sign the sheet.</strong> The technician and the witness sign. Any failed point is entered in the issues log with an issue number.</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Testing at one value only.</strong> A sensor tested only at room temperature does not show a span error. Test transmitters at three points of span.</li>
+<li><strong>Forced values left in place.</strong> A point forced to a value for testing and not released reports a false value for months. <mark>Step 7 is mandatory.</mark></li>
+<li><strong>Reading the controller instead of the graphic.</strong> The graphic can show a different object from the one tested. Read the graphic.</li>
+<li><strong>Accepting the OEM display as the reference for its own sensor.</strong> The OEM display reads the same sensor as the BMS. It proves the communication path only. Sensor accuracy needs an independent reference instrument (section 22.7).</li>
+</ol>
+<h3 id="s22-6-3"><span class="n">22.6.3</span>Worked example: filled P2P sheet for CDU 07</h3>
+<p><strong>Worked example:</strong> P2P sheet P2P-B2-DH3-CDU07, 12 of 30 points shown. The CDU runs on heater skid load at 0.8 MW. Reference instruments: dry-block temperature calibrator and reference probe TC-REF-04 (certificate CAL-2027-118, expiry 2027-11-30); clamp-on ultrasonic flow meter FL-REF-02 (certificate CAL-2027-090, expiry 2027-09-15); digital pressure calibrator PR-REF-03 (certificate CAL-2027-101, expiry 2027-10-20). Permit to work PTW-B2-0457.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point</th>
+<th>Reference value</th>
+<th>BMS graphic value</th>
+<th>Difference and tolerance</th>
+<th>Alarm and trend check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCS_SupT</td>
+<td>45.12 °C (reference probe in test well)</td>
+<td>45.2 °C</td>
+<td>0.08 K within ±0.3 K</td>
+<td>High alarm simulated at 47.1 °C: P2 after 31 s; trend shows step</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>TCS_RetT</td>
+<td>53.05 °C</td>
+<td>53.4 °C</td>
+<td><mark>0.35 K outside ±0.3 K</mark></td>
+<td>not tested before correction</td>
+<td>Fail: issue ISS-B2-0812, sensor offset</td>
+</tr>
+<tr>
+<td>TCS_Flow</td>
+<td>19.6 L/s (clamp-on)</td>
+<td>19.4 L/s</td>
+<td>1.0 % within ±3 %</td>
+<td>Low alarm at 20.0 L/s active as expected at 19.4: P2 after 16 s</td>
+<td>Pass; alarm limit to be reviewed with the designer for part load</td>
+</tr>
+<tr>
+<td>TCS_DP</td>
+<td>112.4 kPa (calibrator at test ports)</td>
+<td>112 kPa</td>
+<td>0.4 kPa within ±2 % of 250 kPa span</td>
+<td>trend checked</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>TCS_SupP</td>
+<td>268 kPa(g)</td>
+<td>267 kPa(g)</td>
+<td>1 kPa within ±2 % of 600 kPa span</td>
+<td>low alarm simulated at 196: P2 after 11 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Pmp1_Sts</td>
+<td>Pump 1 running (local display)</td>
+<td>On</td>
+<td>not applicable</td>
+<td>stop pump 1: status Off in 4 s; fault alarm P3 after 10 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Pmp2_Sts</td>
+<td>Pump 2 started by duty change</td>
+<td>On</td>
+<td>not applicable</td>
+<td>trend shows changeover</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Pmp1_Spd</td>
+<td>72.0 % (local display)</td>
+<td>72.0 %</td>
+<td>0</td>
+<td>trend checked</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>FWS_SupT</td>
+<td>35.40 °C</td>
+<td>35.4 °C</td>
+<td>0 K within ±0.3 K</td>
+<td>trend checked</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Leak_Tray</td>
+<td>Water applied to tray sensor</td>
+<td>Alarm</td>
+<td>not applicable</td>
+<td>P1 alarm in 3 s with text "CDU 07 leak tray"</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Reservoir_Lvl</td>
+<td>64 % (sight glass)</td>
+<td>63.8 %</td>
+<td>0.2 % within ±5 %</td>
+<td>low alarm simulated: P2</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Comms_Heartbeat</td>
+<td>Counter increments every 1 s</td>
+<td>Increments</td>
+<td>not applicable</td>
+<td>Gateway stopped: alarm after 30 s</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>The TCS_RetT failure is entered in the issues log as ISS-B2-0812, Category B. The controls contractor enters a lead-wire compensation of 1.3 Ω (22.7.3), and the point is retested on 2027-04-14 with a difference of +0.02 K. The sheet is re-signed with the retest row.</p>
+<h2 id="s22-7"><span class="n">22.7</span>Sensor calibration and accuracy checks</h2>
+<h3 id="s22-7-1"><span class="n">22.7.1</span>Reference instruments</h3>
+<p>The reference instrument must be more accurate than the sensor under test. ANSI/NCSL Z540.3-2006 sets a test uncertainty ratio (TUR) of <mark>at least 4 to 1</mark> between the tolerance of the sensor under test and the expanded uncertainty of the calibration process. Where 4 to 1 cannot be met, the standard accepts a documented risk analysis that shows a false-accept probability of 2 % or less. The project quality plan states the ratio used on the project. Each reference instrument has a calibration certificate traceable to national standards, issued within the calibration interval of the project quality plan, for example 12 months.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Reference instrument</th>
+<th>Typical reference accuracy (check the instrument certificate)</th>
+<th>Set-up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Water temperature</td>
+<td>Reference platinum resistance probe with readout, or dry-block calibrator</td>
+<td>±0.05 K to ±0.1 K</td>
+<td>Probe in a test well beside the sensor, or sensor removed into the dry block</td>
+</tr>
+<tr>
+<td>Air temperature</td>
+<td>Reference probe with radiation shield</td>
+<td>±0.1 K to ±0.2 K</td>
+<td>Probe within 100 mm of the sensor, 5 minutes to stabilise</td>
+</tr>
+<tr>
+<td>Relative humidity</td>
+<td>Reference hygrometer or chilled-mirror instrument</td>
+<td>±1 % to ±1.5 % RH</td>
+<td>Beside the sensor, 10 minutes to stabilise</td>
+</tr>
+<tr>
+<td>Pressure and differential pressure</td>
+<td>Digital pressure calibrator</td>
+<td>±0.025 % to ±0.05 % of full scale</td>
+<td>Connected at the transmitter test ports with isolation valves</td>
+</tr>
+<tr>
+<td>Liquid flow</td>
+<td>Clamp-on ultrasonic flow meter</td>
+<td>±1 % to ±2 % of reading with straight pipe</td>
+<td>Mounted on a straight length as the instrument manual states</td>
+</tr>
+<tr>
+<td>Current and voltage signals</td>
+<td>Loop calibrator</td>
+<td>±0.01 % to ±0.02 % of reading</td>
+<td>In series with the loop, or in place of the transmitter</td>
+</tr>
+<tr>
+<td>Air flow</td>
+<td>Flow hood, or pitot traverse with micromanometer</td>
+<td>±3 % to ±5 % of reading</td>
+<td>As the testing and balancing method</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s22-7-2"><span class="n">22.7.2</span>Tolerances used in the MSC-1 example</h3>
+<p>The project specification sets the tolerance for each point type; the table gives the MSC-1 worked example values.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Point</th>
+<th>Sensor accuracy (data sheet)</th>
+<th>Field tolerance at P2P</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCS and facility water system (FWS) water temperature</td>
+<td>PT1000 class A</td>
+<td><mark>±0.3 K</mark></td>
+<td>CDU loop controls to 45 °C; error above 0.3 K shifts capacity</td>
+</tr>
+<tr>
+<td>Air temperature at CRAH and rack row</td>
+<td>±0.2 K</td>
+<td>±0.5 K</td>
+<td>Air stratification near the sensor</td>
+</tr>
+<tr>
+<td>Relative humidity</td>
+<td>±2 % RH</td>
+<td>±5 % RH</td>
+<td>Sensor drift and location effect</td>
+</tr>
+<tr>
+<td>Water differential pressure</td>
+<td>±0.25 % of span</td>
+<td>±2 % of span</td>
+<td>Pump control stability</td>
+</tr>
+<tr>
+<td>Water flow (electromagnetic meter)</td>
+<td>±0.5 % of reading</td>
+<td>±3 % of reading (against clamp-on reference)</td>
+<td>Uncertainty of the reference instrument</td>
+</tr>
+<tr>
+<td>Air differential pressure (hall to corridor)</td>
+<td>±1 % of span</td>
+<td>±2 Pa</td>
+<td>Low pressures</td>
+</tr>
+<tr>
+<td>Valve position feedback</td>
+<td>±2 %</td>
+<td>±5 % of stroke</td>
+<td>Linkage play</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s22-7-3"><span class="n">22.7.3</span>Calibration steps for a water temperature sensor</h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Record the instrument.</strong> Record the reference probe identification, certificate number and expiry date on the calibration sheet.</li>
+<li><strong>Insert the reference.</strong> Place the reference probe in the test well next to the BMS sensor, at the same immersion depth. If no test well exists, remove the BMS sensor and place it with the reference probe in a dry-block calibrator.</li>
+<li><strong>Stabilise.</strong> Wait until the reference reading changes by less than 0.02 K in 2 minutes.</li>
+<li><strong>Read both.</strong> Record three readings 1 minute apart of the reference and the BMS graphic. Use the average.</li>
+<li><strong>Calculate the difference.</strong> Difference = BMS average − reference average.</li>
+<li><strong>Judge.</strong> If the difference is inside the tolerance, record Pass. If it is outside, check the sensor wiring resistance and the controller input configuration (sensor type, offset). Apply an offset only if the specification allows it and the offset is less than the sensor accuracy class allows; otherwise replace the sensor.</li>
+<li><strong>Second point for dry-block method.</strong> When the dry block is used, repeat at a second temperature that spans the operating range, for example 35 °C and 55 °C for the TCS.</li>
+</ol>
+<p><strong>Worked example:</strong> CDU 07 TCS_RetT before correction. Reference readings: 53.04, 53.05, 53.06 °C, average 53.05 °C. BMS readings: 53.4, 53.4, 53.4 °C. Difference: +0.35 K. Tolerance: ±0.3 K. Result: Fail. The controller input was configured for PT1000 with a lead-wire compensation of 0 Ω on a two-wire input with 25 m of cable. Each 1 Ω of lead resistance adds about 0.26 K on a PT1000 (from 3.85 Ω per K). The measured loop resistance of the cable is 1.3 Ω, which gives <mark>about 0.34 K</mark>. The contractor enters a lead-wire compensation of 1.3 Ω. The retest gives a difference of 0.02 K. The issue ISS-B2-0812 is closed with the compensation value recorded on the calibration sheet.</p>
+<h3 id="s22-7-4"><span class="n">22.7.4</span>Calibration record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Point name</td>
+<td>Text</td>
+<td>MSC1_B2_DH3_CDU07_TCS_RetT</td>
+</tr>
+<tr>
+<td>Sensor type and serial</td>
+<td>Text</td>
+<td>PT1000 class A, SN 23-11874</td>
+</tr>
+<tr>
+<td>Reference instrument and certificate</td>
+<td>Text</td>
+<td>TC-REF-04, CAL-2027-118</td>
+</tr>
+<tr>
+<td>Certificate expiry</td>
+<td>Date</td>
+<td>2027-11-30</td>
+</tr>
+<tr>
+<td>Method</td>
+<td>Choice</td>
+<td>Test well / dry block / loop calibrator</td>
+</tr>
+<tr>
+<td>Reference readings</td>
+<td>Three numbers</td>
+<td>53.04, 53.05, 53.06</td>
+</tr>
+<tr>
+<td>BMS readings</td>
+<td>Three numbers</td>
+<td>53.4, 53.4, 53.4</td>
+</tr>
+<tr>
+<td>Difference</td>
+<td>Number</td>
+<td>+0.35 K</td>
+</tr>
+<tr>
+<td>Tolerance</td>
+<td>Number</td>
+<td>±0.3 K</td>
+</tr>
+<tr>
+<td>Correction applied</td>
+<td>Text</td>
+<td>Lead compensation 1.3 Ω</td>
+</tr>
+<tr>
+<td>Result after correction</td>
+<td>Choice and number</td>
+<td>Pass, +0.02 K</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>Names and dates</td>
+<td>Technician; commissioning engineer</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s22-8"><span class="n">22.8</span>Actuator stroke tests for valves and dampers</h2>
+<h3 id="s22-8-1"><span class="n">22.8.1</span>Steps</h3>
+<ol>
+<li><strong>Check the fail position first.</strong> Remove the control signal (or power for spring-return actuators). Record <mark>the position the actuator goes to</mark> and the time. Compare with the fail position in the points list. A CRAH chilled-water valve that the design sets to fail open must open on loss of signal.</li>
+<li><strong>Command 0 %.</strong> Confirm the valve is fully closed or the damper fully shut at the device. Record feedback.</li>
+<li><strong>Command 25, 50, 75 and 100 %.</strong> At each step wait for the actuator to stop. Record the position indicator at the device and the feedback value.</li>
+<li><strong>Stroke time.</strong> Command 0 to 100 % and record the time to full travel. Compare with the actuator data sheet, for example 90 s for a typical modulating valve actuator.</li>
+<li><strong>Reverse direction.</strong> Command 100 to 0 % and record the positions on the way down. A difference between up and down positions <mark>larger than 5 %</mark> shows linkage play or hysteresis.</li>
+<li><strong>Manual override.</strong> Confirm the manual override works and that the BMS shows the override state if the actuator reports it.</li>
+</ol>
+<h3 id="s22-8-2"><span class="n">22.8.2</span>Worked example: CRAH 11 chilled-water valve stroke record</h3>
+<p><strong>Worked example:</strong> Valve B2-DH3-CRAH-11-CV-01, actuator with 0–10 V control and 2–10 V feedback, fail position open by spring return.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Position at device (indicator)</th>
+<th>Feedback value</th>
+<th>Difference</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Signal removed</td>
+<td>100 % (opened in 22 s)</td>
+<td>100 %</td>
+<td>0</td>
+<td>Pass: fail open as points list</td>
+</tr>
+<tr>
+<td>0 %</td>
+<td>0 %</td>
+<td>1 %</td>
+<td>1 %</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>25 %</td>
+<td>24 %</td>
+<td>25 %</td>
+<td>1 %</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>50 %</td>
+<td>50 %</td>
+<td>51 %</td>
+<td>1 %</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>75 %</td>
+<td>76 %</td>
+<td>75 %</td>
+<td>1 %</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>100 %</td>
+<td>100 %</td>
+<td>99 %</td>
+<td>1 %</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Stroke time 0 to 100 %</td>
+<td>88 s</td>
+<td>not applicable</td>
+<td>data sheet 90 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Down 75 % / 50 % / 25 %</td>
+<td>77 / 52 / 26 %</td>
+<td>76 / 52 / 26 %</td>
+<td>Hysteresis 2 %</td>
+<td>Pass (limit 5 %)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s22-9"><span class="n">22.9</span>Loop tuning (PID)</h2>
+
+<figure class="sheet" id="F22-3"><a href="../data/cx-handbook/figures/F22-3.svg" title="Open drawing F22-3 at full size"><img src="../data/cx-handbook/figures/F22-3.svg" alt="F22-3: CDU 07 supply temperature loop: response to a 1 K setpoint step before and after tuning" width="1400" height="795" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F22-3</span> — <b>CDU 07 supply temperature loop: response to a 1 K setpoint step before and after tuning</b>. Trend at 5 s intervals. The first parameter set overshoots by 0.62 K and oscillates; the final set overshoots by 0.16 K and stays inside ±0.1 K after 189 s.</figcaption></figure>
+<h3 id="s22-9-1"><span class="n">22.9.1</span>Tuning conditions and method</h3>
+<p><strong>Purpose:</strong> Loop tuning sets the proportional gain, integral time and, where used, derivative time of each control loop. The tuned loop brings the controlled variable to the setpoint within the settling time, with limited overshoot and without sustained oscillation, at design load and at part load.</p>
+<p><strong>Trigger:</strong> P2P closed for the loop's points; actuator stroke passed; process running at a stable load. For a CDU TCS supply temperature loop the load is from heater skids; for a CRAH loop the hall air heaters or IT load.</p>
+<p><strong>Owner:</strong> Controls contractor tunes; commissioning manager witnesses the acceptance test.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Record the starting parameters.</strong> Record gain, integral time, derivative time, output limits, deadband and sample time from the controller.</li>
+<li><strong>Trend set-up.</strong> Trend the controlled variable, the setpoint and the output at an interval of 1/10 of the expected response time or shorter (for the CDU loop, 5 s or shorter).</li>
+<li><strong>Steady state.</strong> Hold the load constant for 15 minutes. Record the steady-state band of the controlled variable.</li>
+<li><strong>Setpoint step test.</strong> Step the setpoint by an amount the process can tolerate (for the TCS supply, 45.0 to 46.0 °C, which stays below the 47.0 °C alarm). Record the response for at least 15 minutes.</li>
+<li><strong>Load step test.</strong> Change the load by 25 % of rated (for one CDU, 0.25 MW of heater skid). Record the response.</li>
+<li><strong>Read the response.</strong> From the trend, read rise time to 90 % of the step, peak overshoot, time to stay inside the settling band, and the number of oscillations.</li>
+<li><strong>Adjust and repeat.</strong> If the response fails the acceptance values, adjust the parameters and repeat steps 4 to 6. Record each parameter set and each result.</li>
+<li><strong>Repeat at part load.</strong> Repeat steps 4 and 6 at 30 % load. Valve loops <mark>can become unstable at low load</mark> because the valve works in its most sensitive range.</li>
+<li><strong>Record final parameters.</strong> Record the final parameters in the controller and in the as-built documentation, and back up the controller.</li>
+</ol>
+<h3 id="s22-9-2"><span class="n">22.9.2</span>Acceptance values for the example loop</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>MSC-1 acceptance value for the CDU TCS supply temperature loop (project specification governs)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Steady-state band at constant load</td>
+<td>±0.2 K</td>
+</tr>
+<tr>
+<td>Overshoot after a 1 K setpoint step</td>
+<td><mark>≤ 0.3 K</mark></td>
+</tr>
+<tr>
+<td>Settling time into ±0.1 K after the step</td>
+<td>≤ 300 s</td>
+</tr>
+<tr>
+<td>Oscillations after the step</td>
+<td>No more than 2 visible cycles; amplitude decreasing</td>
+</tr>
+<tr>
+<td>Output</td>
+<td>No continuous valve hunting larger than ±2 % at steady state</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s22-9-3"><span class="n">22.9.3</span>Worked example: CDU 07 supply temperature loop response</h3>
+<p><strong>Worked example:</strong> The loop controls the TCS supply temperature by moving the FWS valve of CDU 07. The trend interval is 5 s. A setpoint step from 45.0 to 46.0 °C is made at t = 60 s.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>First parameter set (gain 4.0 %/K, integral time 40 s)</th>
+<th>Final parameter set (gain 2.0 %/K, integral time 90 s)</th>
+<th>Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rise time to 90 % of the step</td>
+<td>54 s</td>
+<td>86 s</td>
+<td>not specified</td>
+</tr>
+<tr>
+<td>Peak overshoot</td>
+<td>0.62 K at 106 s after the step</td>
+<td><mark>0.16 K</mark> at 145 s after the step</td>
+<td>≤ 0.3 K</td>
+</tr>
+<tr>
+<td>Time to remain within ±0.1 K</td>
+<td>453 s</td>
+<td><mark>189 s</mark></td>
+<td>≤ 300 s</td>
+</tr>
+<tr>
+<td>Oscillation period</td>
+<td>212 s, more than 3 cycles</td>
+<td>Not visible after the first peak</td>
+<td>≤ 2 cycles</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>Fail</td>
+<td>Pass</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Figure <a class="figref" href="#F22-3">F22-3</a> shows both responses. The first set gives a fast rise but an overshoot of 0.62 K and slow settling. Reducing the gain by half and increasing the integral time to 90 s gives an overshoot of 0.16 K and settling in 189 s. The final parameters are written in the as-built controller parameter list for CDU type 1. They are applied to all 16 CDUs of the hall after a spot check on two more units (CDU 02 and CDU 13).</p>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Tuning one unit and copying the parameters without a check.</strong> Units of the same type on different branches of the TCS see different hydraulics. Spot-check at least two more units.</li>
+<li><strong>Tuning at no load.</strong> Parameters tuned at no load oscillate at design load.</li>
+<li><strong>Derivative action on a noisy signal.</strong> Derivative action amplifies noise. Most temperature and flow loops in a data centre use proportional-integral (PI) control only.</li>
+</ol>
+<h2 id="s22-10"><span class="n">22.10</span>Sequence-of-operation testing</h2>
+
+<figure class="sheet" id="F22-4"><a href="../data/cx-handbook/figures/F22-4.svg" title="Open drawing F22-4 at full size"><img src="../data/cx-handbook/figures/F22-4.svg" alt="F22-4: CDU 07 pump failover during the sequence test: TCS flow and supply temperature" width="1400" height="721" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F22-4</span> — <b>CDU 07 pump failover during the sequence test: TCS flow and supply temperature</b>. Flow from the trend at 5 s plus the 1 s samples of the CDU controller during the event; the supply temperature stays below the 46.5 °C limit.</figcaption></figure>
+<h3 id="s22-10-1"><span class="n">22.10.1</span>Writing a sequence test script</h3>
+<p>A sequence test script turns each statement in the sequence of operation into a test step.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Content</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Step number</td>
+<td>Integer</td>
+<td>7</td>
+</tr>
+<tr>
+<td>Precondition</td>
+<td>State of the system before the step</td>
+<td>CDU 07 running, pump 1 duty, load 0.8 MW</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>What the tester does</td>
+<td>Open pump 1 isolator at the local isolator to stop pump 1</td>
+</tr>
+<tr>
+<td>Expected result</td>
+<td>What the sequence must do, with the limit</td>
+<td>Pump 2 starts within 10 s; TCS flow returns above 18.0 L/s within 15 s; P2 alarm "pump 1 fault"</td>
+</tr>
+<tr>
+<td>Measured result</td>
+<td>Values from the trend and alarm log</td>
+<td>Pump 2 on at 6 s; flow 22.8 L/s at 11 s; alarm at 2 s</td>
+</tr>
+<tr>
+<td>Pass or fail</td>
+<td>Choice</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s22-10-2"><span class="n">22.10.2</span>Test types</h3>
+<ol>
+<li><strong>Normal operation.</strong> Start-up, operation at design load and at part load, and normal stop. Confirm each mode transition in the sequence.</li>
+<li><strong>Staging.</strong> Add and remove units as load changes: dry cooler fans, pumps, CRAH units. Confirm staging points, time delays and the order of units.</li>
+<li><strong>Lead and lag rotation.</strong> Confirm that the rotation of duty units happens at the set time or run-hour difference and that a rotation does not interrupt flow.</li>
+<li><strong>Failover.</strong> Fail a duty unit and confirm that the standby starts within the stated time and that the process variable stays inside its limit.</li>
+<li><strong>Sensor failure.</strong> Disconnect a sensor used by a sequence. Confirm that the sequence uses the defined fallback, for example a redundant sensor or a fixed output, and raises an alarm.</li>
+<li><strong>Alarm responses.</strong> Drive each process alarm and confirm the sequence action, if any, and the alarm message.</li>
+<li><strong>Loss of supervision.</strong> Covered in section 22.14.</li>
+<li><strong>Restart after power loss.</strong> Covered in section 22.15.</li>
+</ol>
+<h3 id="s22-10-3"><span class="n">22.10.3</span>Worked example: filled sequence test extract for CDU pump failover and zone staging</h3>
+<p><strong>Worked example:</strong> Test script BMS-L4-B2-DH3-CDU-SEQ-01, CDU 07 and zone 2 (CDUs 05 to 08). Load: heater skids at 0.8 MW on CDU 07 and 0.53 MW on each of CDUs 05, 06 and 08, so the zone carries 2.4 MW, the design zone liquid load. Trends at 5 s. Witnessed by the commissioning manager and the data-centre operations (DCOps) lead.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Expected result and limit</th>
+<th>Measured result</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Confirm baseline for 15 min</td>
+<td>TCS supply 45.0 ± 0.2 °C; flow 19 to 21 L/s at 0.8 MW</td>
+<td>44.9 to 45.1 °C; 19.6 L/s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Stop pump 1 at local isolator</td>
+<td>Pump 2 starts within 10 s; P2 "pump 1 fault"</td>
+<td>Pump 2 on at 6 s; alarm at 2 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Observe flow recovery</td>
+<td>Flow above 18.0 L/s within 15 s; TCS supply below 46.5 °C</td>
+<td>Minimum flow 9.8 L/s at 4 s; <mark>19.1 L/s at 12 s</mark>; supply peak 45.6 °C</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Restore pump 1 isolator</td>
+<td>Pump 1 available; pump 2 stays duty; alarm returns to normal</td>
+<td>As expected</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Stop pump 2 with pump 1 available</td>
+<td>Pump 1 starts within 10 s</td>
+<td>Pump 1 on at 7 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Trip CDU 07 by its common fault input (simulated at controller)</td>
+<td>Zone 2 remaining CDUs increase duty; zone supply stays below 46.5 °C; P2 "CDU 07 fault"</td>
+<td>CDUs 05, 06, 08 at <mark>0.80 MW each</mark>; zone supply peak 45.9 °C at 75 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Reset CDU 07</td>
+<td>CDU 07 restarts only after operator reset; no automatic restart</td>
+<td>Restarted after reset at 14:32</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Disconnect CDU 07 TCS_SupT sensor</td>
+<td>Sensor fault alarm; CDU uses its second supply sensor</td>
+<td>Fault alarm P2 at 3 s; control moved to TCS_SupT_2</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Reconnect sensor</td>
+<td>Alarm returns to normal; control returns to primary sensor after 60 s</td>
+<td>As expected</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Raise FWS supply to 37.5 °C by FWS setpoint change</td>
+<td>P3 "FWS supply high" after 60 s; CDU valve to 100 %</td>
+<td>Alarm at 61 s; valve 100 %</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Restore FWS setpoint</td>
+<td>Return to normal</td>
+<td>As expected</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Restore all points; check override summary</td>
+<td>No point overridden or out of service</td>
+<td>Override summary empty</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>The test records show that the loss of one CDU in a zone of four is carried by the other three at 0.80 MW each. The value is the zone liquid load of 2.4 MW divided by 3. In the MSC-1 design the zone liquid load at full information technology (IT) load is 2.4 MW across 4 CDUs of 1 MW. Each of the three remaining CDUs runs 0.2 MW below its rating.</p>
+<h2 id="s22-11"><span class="n">22.11</span>Alarm testing</h2>
+<h3 id="s22-11-1"><span class="n">22.11.1</span>Steps</h3>
+<ol>
+<li><strong>Test every alarm once.</strong> Each alarm in the points list is generated once, either by the physical condition or by simulation at the controller input. <mark>Simulation in the server software</mark> does not prove the controller alarm logic.</li>
+<li><strong>Check the delay.</strong> Record the time from the condition to the alarm on the workstation. Compare with the delay in the points list plus the polling time.</li>
+<li><strong>Check class, text and recipients.</strong> Confirm the class, the message text and that every recipient in the recipient list receives the alarm, including the campus operations centre.</li>
+<li><strong>Check acknowledgement.</strong> Acknowledge the alarm from the workstation. Confirm that the acknowledgement is recorded with the user name and time.</li>
+<li><strong>Check return to normal.</strong> Remove the condition. Confirm the return-to-normal message and that alarms requiring reset stay latched until reset.</li>
+<li><strong>Check suppression.</strong> Put the equipment into Maintenance mode. Confirm that its consequential alarms are suppressed as the alarm philosophy states.</li>
+<li><strong>Check the independent P1 path.</strong> For each P1 alarm, confirm that the independent path (beacon, summary relay, second server) also operates.</li>
+<li><strong>Alarm flood test.</strong> During the integrated systems test, count the alarms in the first 10 minutes after a utility loss and compare with the target of the alarm philosophy.</li>
+</ol>
+<h3 id="s22-11-2"><span class="n">22.11.2</span>Alarm test record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alarm point</td>
+<td>Text</td>
+<td>MSC1_B2_DH3_CDU07_Leak_Tray</td>
+</tr>
+<tr>
+<td>Method</td>
+<td>Choice</td>
+<td>Physical / simulated at controller</td>
+</tr>
+<tr>
+<td>Condition time</td>
+<td>Time</td>
+<td>10:41:05</td>
+</tr>
+<tr>
+<td>Alarm time at workstation</td>
+<td>Time</td>
+<td>10:41:08</td>
+</tr>
+<tr>
+<td>Delay measured / limit</td>
+<td>Seconds</td>
+<td>3 / 5</td>
+</tr>
+<tr>
+<td>Class shown</td>
+<td>Choice</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>Text shown</td>
+<td>Text</td>
+<td>CDU 07 leak tray</td>
+</tr>
+<tr>
+<td>Recipients confirmed</td>
+<td>List</td>
+<td>B2 workstation, campus operations centre, beacon</td>
+</tr>
+<tr>
+<td>Acknowledged by and time</td>
+<td>Text</td>
+<td>Operator user ops.b2.02, 10:41:40</td>
+</tr>
+<tr>
+<td>Return to normal time</td>
+<td>Time</td>
+<td>10:44:12</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>Choice</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s22-12"><span class="n">22.12</span>Trend verification</h2>
+<h3 id="s22-12-1"><span class="n">22.12.1</span>Steps</h3>
+<ol>
+<li><strong>Configuration check.</strong> Export the trend configuration. Compare each trended point's interval and method with the trend plan of chapter 21, section 21.12.</li>
+<li><strong>Gap check.</strong> After 7 days of operation, query every trend for gaps longer than two intervals. List the points with gaps.</li>
+<li><strong>Time stamp check.</strong> Compare the time stamp of a known event (for example the pump changeover in the sequence test) in the controller trend, the server historian and the alarm log. They must agree within the time synchronisation tolerance (section 22.17).</li>
+<li><strong>Buffer test.</strong> Disconnect the server from a controller for 1 hour, then reconnect. Confirm that the server collects the controller buffer and that the trend has no gap.</li>
+<li><strong>Storage check.</strong> Compare the historian database growth over 7 days with the storage sizing in chapter 21. Confirm that the retention setting matches the trend plan.</li>
+<li><strong>Export check.</strong> Export one day of trend data to a comma-separated file. Confirm that operations can open it and that the columns have point names and units.</li>
+</ol>
+<p><strong>Acceptance:</strong> Every trend runs at the interval in the trend plan. No gap is longer than two intervals, except during recorded outages. Event time stamps agree <mark>within 1 s</mark> across controller, server and alarm log. The buffer is collected without loss after a 1 hour disconnection.</p>
+<h2 id="s22-13"><span class="n">22.13</span>Graphics verification</h2>
+<ol>
+<li><strong>Page list.</strong> Confirm that a page exists for every item in the page list of the graphics standard.</li>
+<li><strong>Point count per page.</strong> Count the points shown on each equipment page and compare with the points list.</li>
+<li><strong>Live value check.</strong> During P2P, confirm that each value changes on the graphic when the field value changes. A static picture with fixed text passes a visual check and <mark>fails this check</mark>.</li>
+<li><strong>Quality markers.</strong> Force a point into fault, override and out of service. Confirm that the graphic shows each marker.</li>
+<li><strong>Command from graphic.</strong> Command an output from the graphic with an operator account. Confirm the command is written at priority 8 and that the override marker appears. Release the command and confirm the marker goes.</li>
+<li><strong>Match with drawings.</strong> Compare each system graphic with the current flow diagram revision. Record the drawing revision on the graphics review record (chapter 21, section 21.14.2).</li>
+<li><strong>Navigation.</strong> Confirm the navigation path from the campus page to each equipment page.</li>
+<li><strong>Performance.</strong> Measure the time to open the hall overview page from a client. The MSC-1 example sets 3 s or less (project specification governs).</li>
+</ol>
+<h2 id="s22-14"><span class="n">22.14</span>Loss-of-communication tests</h2>
+<h3 id="s22-14-1"><span class="n">22.14.1</span>Test cases</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>How the loss is made</th>
+<th>Expected behaviour</th>
+<th>Limit used in the MSC-1 example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit controller loses link to automation server</td>
+<td>Disconnect the controller network cable at the switch</td>
+<td>Unit continues on last valid setpoint; server shows the unit offline with P2 alarm</td>
+<td>Offline alarm within 60 s; unit keeps cooling</td>
+</tr>
+<tr>
+<td>Automation server loses link to BMS server</td>
+<td>Disconnect server uplink</td>
+<td>Controllers continue; automation server buffers alarms and trends</td>
+<td>Alarms delivered after reconnect; no trend gap</td>
+</tr>
+<tr>
+<td>Gateway frozen (sends last values)</td>
+<td>Stop the gateway application while its network port stays up</td>
+<td>Heartbeat stops; BMS marks points stale and raises alarm</td>
+<td>Stale alarm within 30 s</td>
+</tr>
+<tr>
+<td>MS/TP trunk open circuit</td>
+<td>Disconnect trunk at the middle device</td>
+<td>Devices beyond the break offline; others continue</td>
+<td>Alarm within 60 s; others unaffected</td>
+</tr>
+<tr>
+<td>Network switch failure</td>
+<td>Power off switch A of the hall</td>
+<td>Devices on switch B continue; devices on A offline but running locally</td>
+<td>Supervision of each zone kept on at least two CDUs</td>
+</tr>
+<tr>
+<td>Supervision loss to a CRAH that controls on network inlet temperatures</td>
+<td>Disconnect CRAH from the sensor network</td>
+<td>CRAH moves to its fallback: control on return air or fixed fan speed</td>
+<td>Fallback within 120 s; supply air below 27 °C</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s22-14-2"><span class="n">22.14.2</span>Steps for each case</h3>
+<ol>
+<li><strong>Record the baseline.</strong> Record the state of the affected units and the process values for 10 minutes.</li>
+<li><strong>Make the loss.</strong> Make the loss as described in the table. Record the exact time.</li>
+<li><strong>Observe at the equipment.</strong> A second tester at the equipment records what the unit does: running, setpoint, outputs.</li>
+<li><strong>Observe at the BMS.</strong> Record the time of the offline or stale alarm.</li>
+<li><strong>Hold.</strong> Hold the loss for the time in the script, at least 15 minutes for unit controller cases.</li>
+<li><strong>Restore.</strong> Restore the link. Record the time until data returns, whether alarms and trends buffered during the loss appear, and whether any output changed on reconnection.</li>
+<li><strong>Check for unwanted actions.</strong> A reconnection <mark>must not write old commands</mark> to the unit. Compare the output before the loss, during the loss and after reconnection.</li>
+</ol>
+<p><strong>Common errors:</strong></p>
+<ol>
+<li><strong>Testing only the alarm.</strong> The offline alarm proves the BMS noticed. The safe state of the unit <mark>must be checked at the unit</mark>.</li>
+<li><strong>Network loss made by disabling the device in software.</strong> Disabling a device in the server does not reproduce a network loss. Disconnect the cable or shut the switch port.</li>
+</ol>
+<h2 id="s22-15"><span class="n">22.15</span>Controller power failure and restart</h2>
+<h3 id="s22-15-1"><span class="n">22.15.1</span>Steps</h3>
+<ol>
+<li><strong>Record the state before.</strong> Record outputs, setpoints, mode and time of the controller.</li>
+<li><strong>Remove control power.</strong> Open the controller supply circuit at the panel. Record the time.</li>
+<li><strong>Observe outputs during the loss.</strong> Confirm that outputs go to their hardware fail positions (spring-return actuators to their fail position, relay outputs de-energised) and that this is the safe state in the design.</li>
+<li><strong>Restore power after 5 minutes.</strong> Record the time the controller takes to boot and the time its programmes start.</li>
+<li><strong>Observe restart behaviour.</strong> Confirm that outputs follow the Relinquish_Default values until the programme runs, then follow the sequence. Confirm that setpoints and parameters are the same as before the loss.</li>
+<li><strong>Check restart delays.</strong> For controllers that start motors, confirm the staggered restart delays in the sequence, so that pumps and fans do not all start at the same time.</li>
+<li><strong>Check the clock.</strong> Confirm that the controller time is correct after restart (section 22.17).</li>
+<li><strong>Check stored data.</strong> Confirm that the trend buffer and the alarm buffer from before the loss are kept or that their loss is recorded.</li>
+</ol>
+<h3 id="s22-15-2"><span class="n">22.15.2</span>Worked example: restart record for plant controller B2-PR-BMS-PLC-02</h3>
+<p><strong>Worked example:</strong> The controller runs dry cooler fans 1 to 20 and FWS pumps 3 and 4 in Building 2. Supply A only is removed, then supply A and B.</p>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Time</th>
+<th>Observation</th>
+<th>Limit</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Supply A off</td>
+<td>09:00:00</td>
+<td>Controller stays on via supply B; P3 "supply A lost"</td>
+<td>No interruption</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Supply A and B off</td>
+<td>09:05:00</td>
+<td>Fans and pumps run on variable frequency drive (VFD) local fallback speed 80 %</td>
+<td>Equipment keeps running at fallback speed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Supplies restored</td>
+<td>09:10:00</td>
+<td>Controller boot complete 09:11:12 (72 s)</td>
+<td>≤ 120 s</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Programme running</td>
+<td>09:11:20</td>
+<td>Setpoints unchanged; parameters unchanged</td>
+<td>Same as before</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Restart of stopped fans</td>
+<td>09:11:20 to 09:12:40</td>
+<td>Fans 15 to 20 that the sequence had staged off stayed off; staging restarted from current FWS temperature</td>
+<td>No simultaneous start</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>09:11:30</td>
+<td>Controller time within 0.2 s of the time server</td>
+<td>≤ 1 s</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s22-16"><span class="n">22.16</span>Server failover and loss of the BMS server</h2>
+
+<figure class="sheet" id="F22-5"><a href="../data/cx-handbook/figures/F22-5.svg" title="Open drawing F22-5 at full size"><img src="../data/cx-handbook/figures/F22-5.svg" alt="F22-5: BMS server failover test: states of the servers and of the controllers" width="1400" height="782" loading="lazy" decoding="async"></a><figcaption><span class="fig-no">FIG. F22-5</span> — <b>BMS server failover test: states of the servers and of the controllers</b>. Controllers stay in their running state in every server state; the test watches the controllers and the equipment during each transition as well as the servers.</figcaption></figure>
+<h3 id="s22-16-1"><span class="n">22.16.1</span>Test cases</h3>
+<ol>
+<li><strong>Primary server shutdown.</strong> Shut down the primary BMS server (or its virtual machine) in the normal way. Record the time until clients reconnect to the standby or to the restarted server, and whether alarms raised during the switchover reach the workstation.</li>
+<li><strong>Primary server hard failure.</strong> Remove the network connection or power of the primary server host. Record the same times.</li>
+<li><strong>Failback.</strong> Return the primary server. Record whether the system returns to the primary and whether any data is duplicated or lost.</li>
+<li><strong>Both servers lost.</strong> Shut down both servers. Confirm that controllers continue and that P1 alarms still reach the operations room by the independent path.</li>
+<li><strong>Historian continuity.</strong> After each case, check the historian for gaps.</li>
+<li><strong>Licence and certificate check.</strong> Confirm that the standby server holds valid licences and the same certificates, so that it can run without the primary.</li>
+</ol>
+<h3 id="s22-16-2"><span class="n">22.16.2</span>Acceptance used in the MSC-1 example</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Acceptance value (project specification governs)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Client reconnection after primary failure</td>
+<td><mark>≤ 60 s</mark></td>
+</tr>
+<tr>
+<td>Alarms lost during switchover</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Trend data lost after switchover</td>
+<td>0 samples, using controller buffers</td>
+</tr>
+<tr>
+<td>Control outputs changed by switchover</td>
+<td>None</td>
+</tr>
+<tr>
+<td>Independent P1 path with both servers lost</td>
+<td>Operates</td>
+</tr>
+</tbody>
+</table></div>
+<p>The Amazon Web Services (AWS) Tokyo event of 23 August 2019 began while the data-centre control system was failing over from a failed host. AWS reported that a bug in the third-party control software made the control system and the connected programmable logic controllers (PLC) unresponsive during that process, and that AWS disabled the failover mode afterwards. A failover test watches the controllers and the equipment during the server switchover, and the servers.</p>
+<h2 id="s22-17"><span class="n">22.17</span>Time synchronisation</h2>
+<h3 id="s22-17-1"><span class="n">22.17.1</span>Requirements and test</h3>
+<p>All BMS controllers, servers and workstations take their time from the campus time servers (Network Time Protocol (NTP) or Precision Time Protocol (PTP) infrastructure in chapter 26). BACnet controllers that cannot use NTP receive time from the automation server by the TimeSynchronization or UTCTimeSynchronization service.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Read the time source configuration.</strong> Record the NTP servers configured on each server and automation server. Record the BACnet time synchronisation recipients and interval.</li>
+<li><strong>Compare clocks.</strong> Read the clock of 10 % of controllers and every server at one moment, using a reference clock from the time server. Record the offsets.</li>
+<li><strong>Event test.</strong> Create one event that appears in three systems. For example, a CDU pump stop appears in the BMS, in the electrical power monitoring system (EPMS) as a load change on the power distribution unit (PDU), and in the data centre infrastructure management (DCIM) system. Compare the three time stamps.</li>
+<li><strong>Time server loss.</strong> Disconnect the primary time server. Confirm that devices move to the secondary time server and that a P3 alarm is raised.</li>
+<li><strong>Time zone and daylight saving.</strong> Confirm the time zone (<mark>Western Indonesian Time, UTC+7</mark>, seven hours ahead of Coordinated Universal Time (UTC), with no daylight saving) on every server. Confirm that trends store UTC or a declared time zone.</li>
+</ol>
+<p><strong>Acceptance:</strong> Server offsets within 100 ms; controller offsets within 1 s; event time stamps across BMS, EPMS and DCIM within 1 s (MSC-1 example values; project specification governs).</p>
+<h2 id="s22-18"><span class="n">22.18</span>User accounts, roles and security tests</h2>
+<h3 id="s22-18-1"><span class="n">22.18.1</span>Account and role tests</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Permitted</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Viewer</td>
+<td>View graphics, alarms, trends</td>
+<td>Try to command an output: refused</td>
+</tr>
+<tr>
+<td>Operator</td>
+<td>Acknowledge alarms, command outputs at priority 8, change setpoints within limits</td>
+<td>Command accepted; setpoint outside limit refused</td>
+</tr>
+<tr>
+<td>Supervisor</td>
+<td>Shelve alarms, change alarm limits</td>
+<td>Shelving limited to 8 h</td>
+</tr>
+<tr>
+<td>Engineer</td>
+<td>Change programmes and parameters</td>
+<td>Change recorded in audit log with user and time</td>
+</tr>
+<tr>
+<td>Administrator</td>
+<td>Manage users</td>
+<td>Separate account from engineering accounts</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s22-18-2"><span class="n">22.18.2</span>Security checks (IEC 62443 based, chapter 27 for the full OT security programme)</h3>
+<ol>
+<li><strong>Default passwords removed.</strong> Every controller, gateway, switch and server has its default password changed. The test tries <mark>the default password</mark> on a sample of 10 devices of each type.</li>
+<li><strong>Named accounts only.</strong> No shared accounts are used for operation. Each user has a named account from the OT identity store.</li>
+<li><strong>Password-protected device services.</strong> The ReinitializeDevice and DeviceCommunicationControl services require a password on each BACnet device that supports it.</li>
+<li><strong>Unused services disabled.</strong> Web servers, File Transfer Protocol (FTP) and Telnet on controllers are disabled unless the design requires them.</li>
+<li><strong>Audit log.</strong> Changes of setpoints, overrides and programmes are logged with user, time, old value and new value. The test changes one setpoint and reads the log entry.</li>
+<li><strong>BACnet/SC certificates.</strong> A node with an expired or revoked certificate is refused by the hub. The test uses a test certificate that has been revoked.</li>
+<li><strong>Remote access.</strong> No direct remote access to the BMS network exists. Vendor access passes through the campus remote-access system with approval and recording (chapter 27).</li>
+<li><strong>Backup and restore.</strong> A full backup of servers and controllers is made, and one controller programme and one server database are restored to a test machine to prove the backup.</li>
+</ol>
+<h2 id="s22-19"><span class="n">22.19</span>Acceptance criteria and sign-off</h2>
+<h3 id="s22-19-1"><span class="n">22.19.1</span>Acceptance criteria for the BMS of one hall</h3>
+<ol>
+<li><strong>P2P complete.</strong> All points in the approved points list have a signed P2P record; failed points are retested and passed.</li>
+<li><strong>Calibration complete.</strong> All analog points have calibration records inside the tolerance of section 22.7.2.</li>
+<li><strong>Loops tuned.</strong> All loops meet the acceptance values at design and part load.</li>
+<li><strong>Sequences passed.</strong> All sequence test scripts are signed with no failed step.</li>
+<li><strong>Alarms tested.</strong> Every alarm tested once with the record of section 22.11.2.</li>
+<li><strong>Trends verified.</strong> Seven days of trends without unexplained gaps.</li>
+<li><strong>Failover and restart passed.</strong> Loss-of-communication, power failure, server failover and time synchronisation tests passed.</li>
+<li><strong>Security tests passed.</strong> Account, role and security checks passed.</li>
+<li><strong>No open Category A issue.</strong> Category B issues have a dated close-out plan accepted by the commissioning manager (MSC-1 defect ageing limits: A 1 working day, B 7 working days, C 30 working days).</li>
+<li><strong>Clean handover state.</strong> The override summary is <mark>empty</mark> and <mark>no object is out of service</mark>. The commissioning manager exports the override summary and the out-of-service list and attaches both to the sign-off.</li>
+<li><strong>As-built records.</strong> The as-built points list, controller parameter list, programme versions and backups are delivered.</li>
+</ol>
+<h3 id="s22-19-2"><span class="n">22.19.2</span>Sign-off record fields</h3>
+<div class="tbl" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Record number</td>
+<td>Text</td>
+<td>BMS-L4-SIGNOFF-B2-DH3</td>
+</tr>
+<tr>
+<td>Scope</td>
+<td>Text</td>
+<td>BMS of Building 2 hall 3: 1,480 points, 29 unit controllers, 3 automation servers</td>
+</tr>
+<tr>
+<td>P2P records</td>
+<td>Count</td>
+<td>1,480 of 1,480</td>
+</tr>
+<tr>
+<td>Sequence scripts</td>
+<td>Count</td>
+<td>18 of 18 signed</td>
+</tr>
+<tr>
+<td>Open issues</td>
+<td>Counts by category</td>
+<td>A 0, B 2 (ISS-B2-0840, ISS-B2-0844), C 9</td>
+</tr>
+<tr>
+<td>Override summary and out-of-service list</td>
+<td>Attachment</td>
+<td>Both empty, exported 2027-05-21 10:00</td>
+</tr>
+<tr>
+<td>Software versions</td>
+<td>Attachment</td>
+<td>Version list rev 4</td>
+</tr>
+<tr>
+<td>Backups</td>
+<td>Text</td>
+<td>Full backup 2027-05-21, restored to test server 2027-05-22</td>
+</tr>
+<tr>
+<td>Signatures</td>
+<td>Names and dates</td>
+<td>Controls contractor project manager; mechanical contractor; commissioning manager; DCOps lead</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s22-20"><span class="n">22.20</span>Checklist for site use</h2>
+<ol>
+<li><strong>Submittal complete before review.</strong> Architecture, registers, BTL listings, PICS, points list, sequences, panel drawings, data sheets, graphics samples and contractor commissioning plan are present.</li>
+<li><strong>Testability reviewed.</strong> Each sequence statement has a test method and a pass limit.</li>
+<li><strong>FAT procedure approved 10 days before the FAT.</strong> The procedure covers wiring, I/O simulation, sequences, alarms, graphics and restart.</li>
+<li><strong>L2 panel and field checks signed.</strong> Panel power, earthing, labels, segregation; sensor locations and actuator mounting.</li>
+<li><strong>RS-485 trunks measured.</strong> About 60 Ω across each pair with two terminations; shield earthed at one point.</li>
+<li><strong>Network checkout signed.</strong> Discovery matches the register; no duplicates; versions as approved; MS/TP rotation time and error counters recorded.</li>
+<li><strong>Modbus offset and word order checked.</strong> One distinctive register and one FLOAT32 value per device type.</li>
+<li><strong>Reference instruments in calibration.</strong> Certificates within date for every instrument used.</li>
+<li><strong>P2P sheets signed.</strong> Each point tested end to end, including alarm and trend, with forced values removed.</li>
+<li><strong>Calibration records complete.</strong> Three readings, difference, tolerance and correction recorded.</li>
+<li><strong>Actuators stroked.</strong> Fail position, positions at five commands, stroke time and hysteresis recorded.</li>
+<li><strong>Loops tuned at design and part load.</strong> Response values recorded against the acceptance table.</li>
+<li><strong>Sequence scripts signed.</strong> Normal, staging, rotation, failover, sensor failure and alarm steps.</li>
+<li><strong>Every alarm tested once.</strong> Delay, class, text, recipients, acknowledgement and return to normal recorded.</li>
+<li><strong>Trends checked after 7 days.</strong> Intervals, gaps, time stamps, buffer recovery and storage growth.</li>
+<li><strong>Graphics verified.</strong> Live values, quality markers, commands and drawing revision.</li>
+<li><strong>Loss-of-communication cases tested at the equipment.</strong> Safe state observed at the unit for each case.</li>
+<li><strong>Power failure and restart tested.</strong> Fail positions, boot time, parameters kept and staggered restart.</li>
+<li><strong>Server failover tested.</strong> Reconnection time, no lost alarms, no output changes, independent P1 path with both servers lost.</li>
+<li><strong>Time synchronisation tested.</strong> Offsets and cross-system event time stamps within limits.</li>
+<li><strong>Security tested.</strong> Default passwords, named accounts, device service passwords, audit log, certificates, backup restore.</li>
+<li><strong>Override summary empty at sign-off.</strong> Export attached to the sign-off record.</li>
+</ol>
+<h2 id="s22-21"><span class="n">22.21</span>Sources</h2>
+<ol>
+<li>ASHRAE Guideline 0-2019, The Commissioning Process. ASHRAE, 2019. <a href="https://www.ashrae.org/technical-resources/bookstore/commissioning" rel="noopener">https://www.ashrae.org/technical-resources/bookstore/commissioning</a></li>
+<li>ANSI/ASHRAE/IES Standard 202-2024, The Commissioning Process Requirements for New Buildings and New Systems. ASHRAE, 2024. <a href="https://www.ashrae.org/technical-resources/bookstore/commissioning" rel="noopener">https://www.ashrae.org/technical-resources/bookstore/commissioning</a></li>
+<li>ASHRAE Guideline 13-2024, Specifying Building Automation Systems. ASHRAE, 2024. <a href="https://webstore.ansi.org/standards/ashrae/ashraeguideline132024" rel="noopener">https://webstore.ansi.org/standards/ashrae/ashraeguideline132024</a></li>
+<li>ASHRAE Guideline 36-2024, High-Performance Sequences of Operation for HVAC Systems. ASHRAE, 2024. <a href="https://webstore.ansi.org/standards/ashrae/ashraeguideline362024" rel="noopener">https://webstore.ansi.org/standards/ashrae/ashraeguideline362024</a></li>
+<li>ANSI/ASHRAE Standard 135-2024, BACnet. ASHRAE, 2024. <a href="https://www.ashrae.org/technical-resources/bookstore/bacnet" rel="noopener">https://www.ashrae.org/technical-resources/bookstore/bacnet</a></li>
+<li>Building Automatic Controls design criteria (point-by-point checkout). University of Missouri Facilities, 2025. <a href="https://facilities.missouri.edu/wp-content/uploads/2025/10/PDC_building_automatic_controls_rev1_0.docx" rel="noopener">https://facilities.missouri.edu/wp-content/uploads/2025/10/PDC_building_automatic_controls_rev1_0.docx</a></li>
+<li>Building Automation System (BAS) Guidelines (start-up, calibration, stroke). Boise State University, 2023. <a href="https://www.boisestate.edu/operations/wp-content/uploads/sites/319/2023/08/Building-Automation-System-BAS-Guidelines.pdf" rel="noopener">https://www.boisestate.edu/operations/wp-content/uploads/sites/319/2023/08/Building-Automation-System-BAS-Guidelines.pdf</a></li>
+<li>Point-to-Point Verification clause samples. Law Insider, accessed 2026. <a href="https://lawinsider.com/clause/point-to-point-verification" rel="noopener">https://lawinsider.com/clause/point-to-point-verification</a></li>
+<li>Commissioning control inputs and outputs (FacilitiesNet article). FacilitiesNet, accessed 2026. <a href="https://facilitiesnet.com/buildingautomation/article.aspx?id=12380" rel="noopener">https://facilitiesnet.com/buildingautomation/article.aspx?id=12380</a></li>
+<li>Troubleshooting Guide for BACnet MS/TP Networks. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/articles/troubleshooting-guide-for-bacnet-mstp-networks" rel="noopener">https://docs.chipkin.com/articles/troubleshooting-guide-for-bacnet-mstp-networks</a></li>
+<li>Troubleshoot MS/TP network: 6 reasons for troubled communication. Cimetrics, accessed 2026. <a href="https://www.cimetrics.com/blogs/news/troubleshoot-ms-tp-network-6-reasons-for-troubled-communication" rel="noopener">https://www.cimetrics.com/blogs/news/troubleshoot-ms-tp-network-6-reasons-for-troubled-communication</a></li>
+<li>BACnet — What is a BACnet priority array. Chipkin Automation Systems, accessed 2026. <a href="https://store.chipkin.com/articles/bacnet-what-is-a-bacnet-priority-array" rel="noopener">https://store.chipkin.com/articles/bacnet-what-is-a-bacnet-priority-array</a></li>
+<li>OPC 30030 BACnet companion specification, clause 8.4.2. OPC Foundation, version 2.00. <a href="https://reference.opcfoundation.org/BACnet/v200/docs/8.4.2" rel="noopener">https://reference.opcfoundation.org/BACnet/v200/docs/8.4.2</a></li>
+<li>What BACnet Secure Connect Is. Chipkin Automation Systems, accessed 2026. <a href="https://docs.chipkin.com/protocols/bacnet/secure-connect/" rel="noopener">https://docs.chipkin.com/protocols/bacnet/secure-connect/</a></li>
+<li>Summary of the Amazon EC2 and Amazon EBS Service Event in the Tokyo (AP-NORTHEAST-1) Region. Amazon Web Services, 2019. <a href="https://aws.amazon.com/message/56489/" rel="noopener">https://aws.amazon.com/message/56489/</a></li>
+<li>Desigo CC System Overview, engineering help. Siemens, accessed 2026. <a href="https://mybuilding.siemens.com/d036861342594/help/engineeringhelp/en-US/12748007307.html" rel="noopener">https://mybuilding.siemens.com/d036861342594/help/engineeringhelp/en-US/12748007307.html</a></li>
+<li>BMS Redundancy TVDA knowledge article (EcoStruxure Building Operation). Schneider Electric Community, accessed 2026. <a href="https://community.se.com/t5/Building-Automation-Knowledge/BMS-Redundancy-TVDA/ta-p/7145" rel="noopener">https://community.se.com/t5/Building-Automation-Knowledge/BMS-Redundancy-TVDA/ta-p/7145</a></li>
+<li>BTL Certification. BACnet International, accessed 2026. <a href="https://bacnetinternational.org/btl-certification/" rel="noopener">https://bacnetinternational.org/btl-certification/</a></li>
+<li>Annual Outage Analysis 2024. Uptime Institute, 2024. <a href="https://uptimeinstitute.com/resources/research-and-reports/annual-outage-analysis-2024" rel="noopener">https://uptimeinstitute.com/resources/research-and-reports/annual-outage-analysis-2024</a></li>
+<li>IEC 62443 series, Security for industrial automation and control systems. IEC, current parts. <a href="https://webstore.iec.ch/en/publication/7029" rel="noopener">https://webstore.iec.ch/en/publication/7029</a></li>
+</ol>
+<nav class="cxhb-pager" aria-label="Chapters"><a class="prev" href="21-bms-architecture-points.html"><span>Previous · 21</span><span class="t">BMS architecture, protocols and the points list</span></a><a class="next" href="23-epms-pme-architecture.html"><span>Next · 23</span><span class="t">EPMS and Schneider EcoStruxure Power Monitoring Expert (PME)</span></a></nav>
+<p class="notice">Educational field reference compiled from public standards, guides, manufacturer documents and published incident reports; sources close each chapter. The project specification, the Engineer of Record and the OEM documents govern; check the current edition of every standard before use. Worked examples use an example campus (MSC-1: 4 buildings, 12 halls of 12 MW), not project data. Independent research; not affiliated with any current or former employer. <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a>.</p>
+</article>
+</div>
+</main>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="../index.html">Home</a></li><li><a href="../articles.html">Technical journal</a></li><li><a href="../dc-incidents.html">Incident library</a></li><li><a href="../glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="../index.html#contact">Contact</a></li><li><a href="../manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.getElementById('themeToggle');
+  if(b)b.addEventListener('click',function(){
+    var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('theme',t);}catch(e){}
+  });
+  var d=document.querySelector('.cxhb-toc details');
+  if(d&&window.matchMedia&&window.matchMedia('(min-width: 961px)').matches)d.open=true;
+})();
+</script>
+</body>
+</html>
