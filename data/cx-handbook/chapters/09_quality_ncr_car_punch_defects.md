@@ -271,7 +271,7 @@ The corrective actions are one calibrated torque wrench per crew and torque mark
 
 ### 09.7.4 Cause-and-effect diagram
 
-When several causes may act together, draw a cause-and-effect (Ishikawa) diagram with six branches: people, method, material, machine (tools and instruments), measurement and environment. Write the possible causes on the branches, then test each one with a fact (a record, a measurement, an interview). ==Only causes supported by facts go into the CAR.==
+When several causes may act together, draw a cause-and-effect (Ishikawa) diagram with six branches: people, method, material, machine (tools and instruments), measurement and environment. Write the possible causes on the branches, then test each one with a fact (a record, a measurement, a witness statement). ==Only causes supported by facts go into the CAR.==
 
 ### 09.7.5 The 8D method
 

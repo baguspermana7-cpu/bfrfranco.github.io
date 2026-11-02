@@ -2,17 +2,17 @@
 
 ## 33.0 Scope of this chapter
 
-This chapter collects in one place the terms, the acceptance values, the formulas and the worked examples that chapters 01 to 31 explain in full. Every value in it is copied from a chapter section. The section number is given beside the value so that the reader can go back to the full procedure, the instrument set-up and the source. Where the source check of 1 November 2026 found a different value in a public source, the row gives the verified value. The row also names the chapter that still states the older value (IEEE 1584-2018 working distances in 33.8).
+This chapter collects in one place the terms, the acceptance values, the formulas and the worked examples that chapters 01 to 30 and 32 explain in full. Every value in it is copied from a chapter section. The section number is given beside the value so that the reader can go back to the full procedure, the instrument set-up and the source. Where the source check of 1 November 2026 found a different value in a public source, the row gives the verified value. The row also names the chapter that still states the older value (IEEE 1584-2018 working distances in 33.8).
 
 1. **Glossary.** 487 terms and acronyms used in the manual, each with the full term, a plain definition and the section where the term is used or explained (sections 33.2 to 33.6).
 2. **Quick-reference acceptance values.** Tables of acceptance values grouped by system: MV tests, LV tests, generators, UPS and batteries, earthing and power quality, chilled-water plant and flushing, air and liquid cooling, fire, BMS, EPMS and PME, fibre and copper, IST, and administrative time limits (sections 33.7 to 33.19).
 3. **Unit conversions.** The conversions a commissioning engineer uses on site between SI, US customary and the units printed on instruments (section 33.20).
 4. **Formulas.** The formulas used in the manual for current, short-circuit current, insulation indices, tan δ, protection timing, earthing, power quality, fluid and air heat, loss budget, PUE and commissioning KPIs, each with one worked line taken from the chapters (section 33.21).
-5. **Index of worked examples.** All 285 worked examples of chapters 01 to 31 and 34, listed by equipment tag and section (section 33.22).
+5. **Index of worked examples.** All 270 worked examples of chapters 01 to 30, listed by equipment tag and section (section 33.22).
 6. **Quick-reference sheets.** Figures F33-1 to F33-4 print the most used values on four sheets for the site office wall: electrical values, mechanical values, controls and network values, and administrative time limits.
 7. **Term maps and decision sheets.** Figures F33-5 to F33-18 place the glossary terms on a single-line diagram, a piping and instrumentation diagram (P&ID) fragment, a controls block diagram, the level flow and the fire signal path. They also give decision trees for the document to raise and for two-meaning abbreviations, plot the ITI envelope, the fibre loss budget and the IR minimums, and map the record IDs of the worked examples.
 
-Documents and standards used: the finished chapters 01 to 31 of this manual. Through them, the chapter uses ANSI/NETA ATS-2025, IEEE 400.2-2024, IEEE 43, IEEE 81-2025 (supersedes 81-2012), IEEE 450, IEEE 1188, IEEE 519-2022, ISO 8528-5:2022, NFPA 110, IEC 62040-3:2021, IEC 62305-3:2024, IEC 61000-4-30, BSRIA BG 29/2021, ASHRAE TC 9.9 thermal guidelines (5th edition), ASME B31.9, NFPA 72, NFPA 2001, NFPA 13, NFPA 20, NFPA 76, ANSI/TIA-568.3-E (loss values quoted from -D), IEC 61300-3-35:2022, IEC 62439-2:2021, FIDIC 2017, NEC4 ECC and AIA A201-2017. The research note `research/RF-33.md` lists the chapter section behind each value.
+Documents and standards used: the finished chapters 01 to 30 and 32 of this manual. Through them, the chapter uses ANSI/NETA ATS-2025, IEEE 400.2-2024, IEEE 43, IEEE 81-2025 (supersedes 81-2012), IEEE 450, IEEE 1188, IEEE 519-2022, ISO 8528-5:2022, NFPA 110, IEC 62040-3:2021, IEC 62305-3:2024, IEC 61000-4-30, BSRIA BG 29/2021, ASHRAE TC 9.9 thermal guidelines (5th edition), ASME B31.9, NFPA 72, NFPA 2001, NFPA 13, NFPA 20, NFPA 76, ANSI/TIA-568.3-E (loss values quoted from -D), IEC 61300-3-35:2022, IEC 62439-2:2021, FIDIC 2017, NEC4 ECC and AIA A201-2017. The research note `research/RF-33.md` lists the chapter section behind each value.
 
 ## 33.1 How to use this chapter
 
@@ -90,7 +90,6 @@ Figure F33-5 shows where the electrical test terms of this glossary are measured
 | BACnet | Building Automation and Control networks | ANSI/ASHRAE 135 data communication protocol for building automation, carried over IP, MS/TP or Secure Connect. | 21.2 |
 | BACnet/SC | BACnet Secure Connect | BACnet data link that runs over TLS-secured WebSocket connections through a hub, with a certificate for each device. | 21.6 |
 | BAS | building automation system | Another name for the BMS used in some standards and contracts. | 21.12.1 |
-| BATNA | best alternative to a negotiated agreement | The course of action a party takes if a negotiation fails. | 31.16 |
 | BBMD | BACnet broadcast management device | Device that forwards BACnet broadcasts between IP subnets using a broadcast distribution table. | 21.4 |
 | BCxA | Building Commissioning Association | Professional association for commissioning providers that publishes guidance and certifications. | 01.3 |
 | BDT | broadcast distribution table | List of BBMD addresses that receive forwarded BACnet broadcasts. | 21.2.2 |
@@ -529,7 +528,6 @@ Figure F33-10 lists the five abbreviations with two meanings in this manual (IR,
 |---|---|---|---|
 | SAP | senior authorised person | Person with the highest switching authority who approves switching programmes. | 10.1 |
 | SAT | site acceptance test | Test of equipment or software on site after installation. | 06.1 |
-| SBAR | situation, background, assessment, recommendation | Structured format for an escalation message. | 31.6 |
 | SCADA | supervisory control and data acquisition | Utility control system, for example the PLN SCADA at the 150 kV substation. | 25.0 |
 | SCL | substation configuration language | IEC 61850 file format for relay configuration. | 23.6 |
 | Secondary injection | secondary injection test | Test that injects current and voltage into a relay or trip unit to check pick-up and timing. | 13.10.2 |
@@ -1297,7 +1295,7 @@ First-pass yield = tests passed at attempt 1 / tests with attempt 1 completed. R
 
 ## 33.22 Index of worked examples by tag and chapter
 
-The index lists every "Worked example" block of chapters 01 to 31 and of chapter 34 in section order. The tag column gives the equipment or record tags named in the example. The building prefix (B1 to B4) and the hall code (DH1 to DH3) show where in the MSC-1 example campus the record belongs. Rows marked "MSC-1 campus values" use campus-level MSC-1 numbers without a device tag.
+The index lists every "Worked example" block of chapters 01 to 30 in section order. The tag column gives the equipment or record tags named in the example. The building prefix (B1 to B4) and the hall code (DH1 to DH3) show where in the MSC-1 example campus the record belongs. Rows marked "MSC-1 campus values" use campus-level MSC-1 numbers without a device tag.
 
 ### 33.22.1 Chapters 01 to 06: references, process, documents, RFIs and submittals
 
@@ -1583,7 +1581,7 @@ This part of the index lists 38 worked examples. Figure F33-18 maps the record I
 | MSC-1 campus values | 28.13.1 | Filled record of S28 |
 | MSC-1 campus values | 28.14.2 | Calculations |
 
-### 33.22.6 Chapters 29 to 31: issue library, data and KPIs, working with the manager
+### 33.22.6 Chapters 29 and 30: issue library, data and KPIs
 
 This part of the index lists 32 worked examples.
 
@@ -1610,28 +1608,6 @@ This part of the index lists 32 worked examples.
 | B2-DH3 | 30.11.5 | Worked dataset 8 |
 | MSC-1 campus values | 30.11.7 | Comparing measured values with a model |
 | MSC-1 campus values | 30.12.3 | Data-quality checks on system data |
-| B2-DH3 | 31.2.3 | Steps to find out what your manager is measured on |
-| B2-DH3 | 31.3.4 | The objective confirmation email |
-| B2-DH3, B2-DH2 | 31.4.3 | Schedule-compression methods available in commissioning |
-| B2-007 | 31.5.4 | How to present the table in a meeting |
-| B2-034, B2-031 | 31.7.4 | When the manager changes a decision |
-| B2-DH3, B2-031 | 31.10.3 | Rules for status words |
-| B2-DH3-CDU-07 | 31.11.5 | Rules for escalation |
-| B2-07, B2-DH3 | 31.12.4 | The written refusal |
-| B2-031 | 31.13.3 | Steps when an instruction changes scope |
-| MSC-1 campus values | 31.14.6 | DCOps |
-| B2-0455, B2-0457 | 31.15.3 | Practical rules for meetings with mixed teams |
-
-### 33.22.7 Chapter 34: interview exercises
-
-This part of the index lists the 4 worked examples of chapter 34. They are rehearsed exchanges with the MSC-1 hall B2-DH3 as the case; the tags are the hall and the records named in the exchange.
-
-| Tag | Section | Subject of the section |
-|---|---|---|
-| B2-DH3, CDU flushing | 34.1.11 | The directive programme director on the 14 March RFS date |
-| B2-DH3, IST day 1 | 34.3.13 | IST go or no-go after a failed cooling redundancy test |
-| B2-DH3, handover review | 34.4.9 | The operations director rejects a hall at handover |
-| B2-DH3, open defects | 34.6.7 | The customer asks for RFS with open defects |
 
 ## 33.23 Checklist for site use
 
@@ -1652,7 +1628,7 @@ This part of the index lists the 4 worked examples of chapter 34. They are rehea
 
 ## 33.24 Sources
 
-1. Chapters 01 to 31 of this field manual (field_r01), sections as listed in each table row and in research/RF-33.md, October 2026.
+1. Chapters 01 to 30 and 32 of this field manual (field_r01), sections as listed in each table row and in research/RF-33.md, October 2026.
 2. ANSI/NETA ATS-2025, Standard for Acceptance Testing Specifications for Electrical Power Equipment and Systems, NETA, 2025. https://blog.ansi.org/ansi/ansi-neta-ats-2025-electrical-power-testing/
 3. IEEE 400.2, Guide for Field Testing of Shielded Power Cable Systems Using Very Low Frequency (VLF), IEEE, 2024. https://standards.ieee.org/ieee/400.2/
 4. IEEE 81-2025, Guide for Measuring Earth Resistivity, Ground Impedance, and Earth Surface Potentials of a Grounding System, IEEE, 2025 (supersedes IEEE 81-2012). https://standards.ieee.org/standard/81.html

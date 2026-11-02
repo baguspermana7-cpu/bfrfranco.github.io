@@ -667,7 +667,7 @@ When two documents disagree, the contract states the order of precedence. Where 
 
 Data-centre drawings include security layouts, network diagrams and power capacity information. The usual practice is to classify these as restricted.
 
-1. **Classify at upload.** The security class is a required metadata field (internal, restricted, confidential).
+1. **Classify at upload.** The security class is a required metadata field (public, internal, restricted).
 2. **Restrict by role.** Restricted containers are visible only to named roles. The operational technology (OT) network drawings (chapter 26) and the physical security layouts are restricted.
 3. **Watermark prints.** Restricted prints carry the user name and the print date.
 4. **Review access quarterly.** The information manager exports the user list and the role list and removes users who have left the project. The record is kept.

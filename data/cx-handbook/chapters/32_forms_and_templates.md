@@ -83,7 +83,7 @@ The table lists the 30 forms with the section that defines each one and the regi
 | 26 | IST scenario sheet | 03.10.2, 28.3 | IST register | IST test director |
 | 27 | Issue log | 03.11.1, 09.9.1, 28.15.3 | issues log | CxA |
 | 28 | Turnover checklist | 12.3 | turnover register | CxM |
-| 29 | Decision log | 31.7.2 | decision log | CxM |
+| 29 | Decision log | 32.4.2 | decision log | CxM |
 | 30 | Training record | 12.9.3 | training register | data-centre operations (DCOps) lead |
 
 ## 32.2 Document and query forms
@@ -678,7 +678,7 @@ The ITP has a header block and a line table. The field table covers both.
 
 ### 32.4.2 Decision log form
 
-**Purpose:** The decision log records each decision made by a manager on the programme with its owner, the options considered, the reason, the cost, the contract effect and the actions. It links each decision to the confirming email sent the same working day. It is defined in sections 31.7.1 procedure and 31.7.2 decision log fields. It gives the CxM a dated record of who decided what, which protects the test programme when a verbal decision is later disputed.
+**Purpose:** The decision log records each decision made by a manager on the programme with its owner, the options considered, the reason, the cost, the contract effect and the actions. It links each decision to the confirming email sent the same working day. It gives the CxM a dated record of who decided what, which protects the test programme when a verbal decision is later disputed.
 
 | Field | Type | Required | Example value | Filled by |
 |---|---|---|---|---|
@@ -697,7 +697,7 @@ The ITP has a header block and a line table. The field table covers both.
 | Status | open, closed, superseded | Y | open | CxM |
 | Superseded by | text | Y if superseded | blank | CxM |
 
-**Worked example:** Decision DL-B2-044 on a deferred L4 retest for the CDU pump changeover in hall B2-DH3 (an example built on the fields of section 31.7.2).
+**Worked example:** Decision DL-B2-044 on a deferred L4 retest for the CDU pump changeover in hall B2-DH3 (an example built on the fields above).
 
 | Field | Entry |
 |---|---|
@@ -719,7 +719,7 @@ The ITP has a header block and a line table. The field table covers both.
 
 1. **Decision written as a discussion.** "Discussed IST start" is not a decision. The decision field is one sentence that someone can act on.
 2. **No confirming email.** A verbal decision recorded only in the log is disputed later. ==The confirming email is sent the same working day== and its link is entered.
-3. **Disagreement not recorded.** When the CxM recommended a different option, the entry says so: "CxM recommended option A; programme director decided option B" (section 31.7).
+3. **Disagreement not recorded.** When the CxM recommended a different option, the entry says so: "CxM recommended option A; programme director decided option B".
 4. **Superseded decisions left open.** A later decision that replaces DL-B2-031 is entered with its own number, and DL-B2-031 is marked superseded with the new number.
 
 ## 32.5 Safety and energisation forms

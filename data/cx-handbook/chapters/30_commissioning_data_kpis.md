@@ -287,7 +287,7 @@ Figure F30-2 plots issues raised, closed and open per week for building B2. The 
 
 ### 30.5.5 Actions from the dataset
 
-1. **Category A past limit.** ISS-B2-0461 (fire damper) goes to escalation level 3 the same day (chapter 31.11). ==A category A issue past its limit is reported by name in the weekly update==.
+1. **Category A past limit.** ISS-B2-0461 (fire damper) goes to escalation level 3 the same day. ==A category A issue past its limit is reported by name in the weekly update==.
 2. **Category B past limit.** The 9 issues are sorted by responsible party: GC 5, BMS contractor 3, designer 1. Each party receives its list with the target dates.
 3. **Category C tail.** The 22 C issues over 30 working days are mostly documentation (14 missing operation and maintenance (O&M) data sheets). The CxM agrees a single closure date with the GC document controller.
 4. **Repeated causes.** Pareto by type: BMS point-to-point 21 %, labels and tagging 14 %, torque records 9 %, documentation 18 %. The two largest causes go to the contractors' quality managers as non-conformance trends.
@@ -723,7 +723,7 @@ ISO/IEC 25012 defines a data quality model with inherent characteristics (for ex
 3. **Trends over snapshots.** A line over 12 weeks shows direction; a single number does not.
 4. **Plan and actual on the same axis.** For progress curves, plot planned and actual cumulative values together, as Figure F30-1.
 5. **Data date in the header.** "Data extracted 20 Feb 08:00 WIB."
-6. **Defined status colours.** Use the status definitions from chapter 31.10.3; never a colour without a rule.
+6. **Defined status colours.** Use written status definitions; never a colour without a rule.
 7. **Drill-down to the record.** Each number links to the list of records behind it.
 8. **No more than 8 panels per screen.** More panels reduce reading speed.
 

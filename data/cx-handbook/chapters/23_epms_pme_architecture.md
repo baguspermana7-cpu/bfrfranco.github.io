@@ -147,7 +147,7 @@ PME stores device communication settings, system configuration and logged histor
 
 **Worked example:** ION_Data growth for one MSC-1 building. Assume 431 devices (23.15). Each device logs 20 energy and demand values every 15 minutes, which is 96 records per day per value. One stored value takes about 40 bytes including index overhead (an assumption used for sizing only; measure the real figure after one week of operation). Daily growth = 431 × 20 × 96 × 40 bytes = 33.1 MB per day, or about 12.1 GB per year for interval data. Waveforms add more. This example has 26 ION9000 and PM8000 meters (2 ION9000 and 24 PM8000). If each records 5 waveform captures per day at 100 kB each, waveforms add 13 MB per day, or 4.7 GB per year. ==Size the ION_Data volume for at least 5 years of growth plus 50 % free space==: (12.1 + 4.7) × 5 × 1.5 = 126 GB. The project then rounds up to the SQL Server edition limit and the disk size.
 
-**Check:** SQL Server Express has a database size limit (maximum relational database size 10 GB, Microsoft "Editions and supported features of SQL Server 2022"). A building of the size above needs ==SQL Server Standard==. Confirm the edition on the server build sheet before factory acceptance test (FAT).
+**Check:** SQL Server Express has a database size limit (maximum relational database size 10 GB, vendor document "Editions and supported features of SQL Server 2022"). A building of the size above needs ==SQL Server Standard==. Confirm the edition on the server build sheet before factory acceptance test (FAT).
 
 ### 23.3.4 Software modules
 
