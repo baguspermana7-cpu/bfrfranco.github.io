@@ -103,7 +103,8 @@ CATEGORY_MAP = {
 def categorize(fname):
     directory = Path(fname).parts[0]
     nested = {"manual": "Technical Manuals", "prd": "Product Requirements",
-              "network": "Network Guides", "id": "Bahasa Indonesia", "dc-market": "Reports"}
+              "network": "Network Guides", "id": "Bahasa Indonesia", "dc-market": "Reports",
+              "cx-handbook": "Commissioning Field Manual"}
     if directory in nested:
         return nested[directory]
     if fname in CATEGORY_MAP:
@@ -145,7 +146,7 @@ def build_content(root, inventory=None):
     ]
 
     CATEGORY_ORDER = [
-        "About", "Calculators", "Product Requirements", "Technical Manuals", "Technical Articles", "Comparisons",
+        "About", "Calculators", "Product Requirements", "Technical Manuals", "Commissioning Field Manual", "Technical Articles", "Comparisons",
         "Tools", "Simulations", "Insight Series", "Reports", "Network Guides", "Bahasa Indonesia",
         "Pillar Pages", "Hubs", "Legal", "Other",
     ]
@@ -155,6 +156,7 @@ def build_content(root, inventory=None):
         "Calculators": "Decision support tools — free, no signup required",
         "Technical Manuals": "Per-calculator methodology — inputs, formulas, constants, worked examples, references",
         "Product Requirements": "Deterministic cockpit scope, telemetry provenance, functional requirements, and acceptance evidence",
+        "Commissioning Field Manual": "Data centre commissioning field manual R01 — process, administration, electrical, mechanical, controls, IST, issues, glossary",
         "Technical Articles": "Deep-dive engineering articles (Operations Journal series)",
         "Comparisons": "Side-by-side infrastructure technology analysis",
         "Tools": "Interactive monitors, checklists, and labs",

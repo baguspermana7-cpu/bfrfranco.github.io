@@ -81,6 +81,10 @@ def get_priority_changefreq_subdir(subdir, fname):
         if fname == "index.html":
             return 0.8, "weekly"
         return 0.7, "monthly"
+    if subdir == "cx-handbook":
+        if fname == "index.html":
+            return 0.8, "monthly"
+        return 0.7, "monthly"
     if subdir == "prd":
         if fname == "index.html":
             return 0.8, "weekly"

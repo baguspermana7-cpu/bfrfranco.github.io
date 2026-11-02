@@ -9,7 +9,7 @@ from urllib.parse import quote, unquote, urljoin, urlsplit
 
 
 SITE_URL = "https://resistancezero.com"
-PUBLIC_DIRS = frozenset({"id", "manual", "prd", "network", "dc-market"})
+PUBLIC_DIRS = frozenset({"id", "manual", "prd", "network", "dc-market", "cx-handbook"})
 
 # A class or id naming a tier-gated region, matched after camelCase is split to hyphens.
 GATED_MARKER_RE = re.compile(r"(^|[\s_-])(pro|premium|gated|locked|root-gate)([\s_-]|$)")
