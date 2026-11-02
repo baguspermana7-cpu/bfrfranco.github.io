@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.24.38 — 2026-11-02 — "Last four calculators"
+
+Owner: *"audit total dan perbaiki semuanya"*, then *"continue"* — plan `cryptic-rolling-sonnet`, phase 3. All 13 calculators are now on the tool shell.
+
+### Changed
+- **cx, fire checklist, RFS readiness and critical spares move to the tool page shell**, refit by hand because each is its own app. Each page now has the hub nav and footer and a plain header (eyebrow, title, one lede, a mono basis line, crumbs). KPI tile strips are replaced by fact-list rows. Tabs and actions share one tool bar. The only fixed element is the nav. Behaviour is unchanged: every JS-bound id is kept, and presets, inputs, Free/Full and Save still work.
+- RFS: the 18-button mode bar becomes a tab row plus four actions. Spares: the aurora, banner and share rail are gone; the 32 module panes are a tab row on desktop and the existing `<select>` on phones. cx: the 9-button bar becomes a Free/Full segment plus four actions (Share, Reset, Save, Export PDF); the Gantt stays as a figure.
+- **Copy without filler on all 13 calculators** (owner: *"sempurnakan jangan ada kata2 filler"*). The footer slogan is gone. The long disclaimers are now short notices that keep every point: education and planning only, not a basis for decisions, independent research, runs in the browser, Privacy and Terms. Puffery adjectives and intensifiers are cut, and gate T22 keeps them out. Domain names stay: Kraljic "Leverage", the VITAL/ESSENTIAL tiers, critical spares, and the opex "Comprehensive" maintenance tier.
+- Fire checklist: the red eyebrow, the mono slogan footer and the boxed source tags are replaced by register text.
+
+### Fixed
+- **Spares painted readiness values red** (65.0 %, 72.5 %). The value now keeps the text colour, and the row's note cell carries the band as a word ("within band", "watch", "out of band"). Only that word takes the colour.
+
+### Gates
+- `tools/test-tool-register.mjs` T14 now also fails a red value inside a fact list. It was red on the old spares page (`#sum_readiness`, `#sum_hub_read`, 4 of 4 views) and is green after the fix.
+- T22 fails filler words in a calculator's copy (scripts and styles excluded). Red on the previous release: 47 hits across 12 pages. Green now: 0.
+- `ship-gate.sh` runs the register gate on all 13 calculators (was 9).
+
+### Agent harness
+- **WI-HARNESS-002**: the public standard's §3/§4/§8 and its P1–P10 ledger shipped in v3.24.36. This entry closes the work item's last criterion (A15), which is checked by `tools/harness-public-sync.py` in the harness repo against this site's `origin/main`.
+
 ## v3.24.37 — 2026-11-02 — "The shared controls, on the register"
 
 Owner: *"continue"* — WI-WEB-ALLPAGES-001. The whole-site render scan for blue and navy found the controls every page shares still in the old palette, after the pages around them had moved to graphite and one amber.
