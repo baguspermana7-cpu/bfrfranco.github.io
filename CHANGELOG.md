@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v3.24.39 — 2026-11-03 — "One blue less"
+
+Owner: *"continue"*, *"Continue all"*, then *"setelah itu commit and push"*. The hub slogan removal was agreed with the LTC session after the owner's *"sempurnakan jangan ada kata2 filler"*.
+
+### Changed
+- **Hub footer slogan removed.** `datacenter-solutions.html` keeps "Data-center engineering tools and telemetry models." and drops "Mission-critical infrastructure, documented." The 9 calculators lost the same sentence in v3.24.38, so the phrase is gone from every live page. `index1.html` is an owner mockup and is not swept.
+- **Decorative light blue (`#93c5fd`) moved to the accent on 13 pages and in `styles.css` (53 lines).** On articles 1, 2, 4, 9, 13, 14, 15, 17, 18 and 23 this affects article navigation links, headings, quotes, formula text, key-insight labels, the TOC and the cookie link. These lines now use `var(--rz-art-accent)`, which is amber in dark (#E8B563) and dark amber in light (#92400e). Unscoped rules that showed pale blue on white in light theme are now readable too. `compare-n1-vs-2n` (table head, privacy link), `compare-ashrae-vs-uptime` (cookie link), `tools.html` (disclaimer link) and the calculator disclaimer link in `styles.css` take #E8B563 in dark.
+- Categorical hues stay: the article-14 perspective tabs, article-13 vendor formulas, article-17 scenario and comparison states, the article-27 lever categories, the compare-ashrae A/B sides, the pln province tags and the maturity ramp.
+- **Skip links on 404, privacy and the 5 `pln-java-grid-*` regional pages are on the register.** They were navy in light and bright blue in dark; now they are graphite in light and amber in dark, with a 4px corner, matching `styles.css`. This is the new `skip` family in `tools/sweep-site-register.py`: 14 old values before, 0 after. The LTC session will add its 13 hub-tool pages to the same family.
+
+### Measured
+- A computed-style scan of 176 pages in both themes, run before and after this release, counts visible elements whose own text renders #93c5fd: 94 before, 28 after. The 28 left are the categorical hues above, `ltc-system-modelling-lab` and `pln-java-grid` (LTC-owned).
+
 ## v3.24.38 — 2026-11-02 — "Last four calculators"
 
 Owner: *"audit total dan perbaiki semuanya"*, then *"continue"* — plan `cryptic-rolling-sonnet`, phase 3. All 13 calculators are now on the tool shell.
