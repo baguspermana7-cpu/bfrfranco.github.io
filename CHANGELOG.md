@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v3.24.42 — 2026-11-03 — "Hub explorers"
+
+Owner: *"lakukan update dan enhancement utk semua tools di dc hub"*. Release R1 of the hub-tools plan: the six static hub pages.
+
+### Changed
+- **cdu-hub, compare-air-vs-liquid-cooling, compare-raised-floor-vs-slab, pln-sumatra-grid, network-visualization-hub and ai-engineering-maintenance move to the tool register**: hub nav and footer, a plain header (eyebrow, title, one lede, a mono basis line, crumbs), link lists and comparisons as tables, no hero cards, gradients, badges, scroll-top or share widgets. A new `explorer` kind in `tools/refit-tool-shell.py` does the transform (`--check` is a no-op after `--apply`); page rules live in `css/rz-explorer.css`.
+- PLN Sumatra grid: the stat tiles are a fact list ("What the dataset holds"), the map keys are drawn as SVG on the register (substation, plant, data centre keep separate marks), and the page now shows its source and dataset version (RUPTL 2025-2034 / PLN AR 2024, version 2026-06-26, read from the data file at load). The Leaflet zoom control is readable again.
+- compare-raised-floor-vs-slab no longer loads the TCO calculator's `script.min.js`.
+- The CAPEX report styles and the account pill use graphite instead of the navy-grey #111827.
+
+### Gates
+- `tools/test-tool-register.mjs` covers the six pages (19 in all). Red before: 223 failures across the six. T11 skips auth.js's own sign-in modal only while the page is locked; on a calculator that opens the modal the check still fails (4 of 4 views).
+- The skip-link family in `tools/sweep-site-register.py` now includes these pages.
+
 ## v3.24.41 — 2026-11-03 — "Shared blue, gone"
 
 Owner: *"Continue all"* and *"setelah itu commit and push"*. The faint mobile menu button was reported by the LTC session, from the new cx-handbook pages.
