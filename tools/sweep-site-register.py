@@ -558,7 +558,10 @@ FAMILIES["mlink"] = {
 # Same register as styles.css: graphite chip with white text in light, amber chip in dark, 4px corner.
 # Only pages this session owns; the hub tools and calculators carry the same block and are the LTC session's.
 FAMILIES["skip"] = {
-    "globs": ["404.html", "privacy.html", "pln-java-grid-*.html"],
+    "globs": ["404.html", "privacy.html", "pln-java-grid-*.html",
+              # hub-tools refit R1: the explorer refit drops the page <style> that carried the navy block
+              "cdu-hub.html", "compare-air-vs-liquid-cooling.html", "compare-raised-floor-vs-slab.html",
+              "pln-sumatra-grid.html", "network-visualization-hub.html", "ai-engineering-maintenance.html"],
     "pairs": [
         (".skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;",
          ".skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;"),

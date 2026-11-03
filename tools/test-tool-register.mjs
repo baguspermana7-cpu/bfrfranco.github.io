@@ -26,7 +26,8 @@
  *       4.5:1, or 3:1 at >= 24 px / >= 18.66 px bold; disabled fields skipped. Proven red: 46 T9 failures on the round-3 tree (light muted token, slate inline text, white-on-amber).
  *  Structural checks (the render, not the source) — added with the shell refit:
  *   T10 no stat-tile strip: >= 3 sibling boxes each holding a >= 1.1rem mono number outside [data-rz-fact-list]
- *   T11 no position:fixed element except the nav, .rz-toast*, .rz-sheet*
+ *   T11 no position:fixed element except the nav, .rz-toast*, .rz-sheet*, and the auth.js sign-in modal that the access gate opens
+ *       on a LOCKED page (body.locked; ai-engineering-maintenance). Proven narrow: the open modal on an unlocked calculator fails.
  *   T12 the page head (header / hero) carries no <img>, no background-image, no radius > 4 px, no badge / pill
  *   T13 the bar (.tool-bar, else the innermost container between head and first field holding >= 3 buttons/selects) has <= 6 controls (aria-pressed chips = 1 group); no FREE MODE / FULL ACCESS / PRO ACTIVE text pill anywhere
  *   T14 no second hue (red included) on labels, eyebrows, headings, crumbs; red only inside a .tool-results note cell,
@@ -199,6 +200,10 @@ function scan2() {
   for (const e of all) {
     if (getComputedStyle(e).position !== 'fixed') continue;
     if (e.closest('.hub-nav, nav, [class*="rz-toast"], [class*="rz-sheet"], .skip-link')) continue;
+    // Page kind "locked": on a page whose access gate holds (body.locked), auth.js enforceTierFeatureAccess() opens the
+    // shared sign-in modal itself; a modal is fixed by nature while open. Exempt ONLY that overlay, ONLY while locked:
+    // the same overlay on an unlocked page (any calculator) still fails here. Glass on it is still T3's business.
+    if (document.body.classList.contains('locked') && e.closest('#rzModalOverlay')) continue;
     o.fixed.push(nm(e));
   }
 
