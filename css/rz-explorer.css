@@ -1,0 +1,156 @@
+/* ============================================================
+   rz-explorer.css — the explorer pages of the DC hub on the TOOL register (release R1, tools/refit_shell/explorer.py):
+   hubs, comparisons, the Sumatra grid map and the AI-maintenance concept brief. Loaded after css/rz-hub.css and
+   css/rz-tool.css; uses their tokens only. Sections, tables, callouts and the jump bar are rz-tool.css's ck-* classes
+   (the fire-checklist vocabulary); this file adds prose, the map, link tables and the brief's cards and figures.
+   Rules kept by construction: graphite + one amber, 1 px solid hairlines, radius <= 4 px, no shadow, no gradient,
+   nothing fixed, no transforms.
+   ============================================================ */
+
+/* --- sections: a muted clause in a heading, prose blocks, link cells --- */
+body.tool .tool-head + .ck-body { padding-top: var(--rz-space-8); }   /* no jump bar between head and first section */
+body.tool .ck-sec > h2 .muted { color: var(--rzt-muted); font-weight: 400; }
+body.tool .ck-sec > p.lead { margin-bottom: var(--rz-space-4); }
+body.tool .ex-prose { max-width: 74ch; margin: 0 0 var(--rz-space-6); }
+body.tool .ex-prose h3 { margin: 0 0 var(--rz-space-2); font: 600 16px/1.35 var(--rzt-sans); color: var(--rzt-text); }
+body.tool .ex-prose p { margin: 0 0 var(--rz-space-3); font-size: 15px; line-height: 1.65; color: var(--rzt-text-2); }
+body.tool .ex-prose p strong, body.tool .ex-prose p b { color: var(--rzt-text); font-weight: 600; }
+body.tool .ck-tbl td a { color: var(--rzt-text); font-weight: 500; text-decoration: underline; text-decoration-color: var(--rzt-accent); text-underline-offset: 3px; }
+body.tool .ck-tbl td a:hover { text-decoration-color: var(--rzt-text); }
+body.tool .ck-tbl td:first-child { min-width: 9rem; }
+body.tool .ck-tbl td { font-size: 14px; line-height: 1.5; }
+body.tool .ck-tbl td + td { color: var(--rzt-text-2); }
+body.tool .ck-tbl .num { font-family: var(--rzt-mono); text-align: right; white-space: nowrap; }
+body.tool .ck-callout { max-width: 74ch; }
+body.tool .tool-ref .against span { display: inline; }
+
+/* --- the Sumatra grid: map, key, fact list, atlas --- */
+body.tool .ex-map { padding: 0; margin: 0; }
+body.tool #sgMap { height: 520px; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); background: var(--rzt-inset); }
+body.tool .ex-legend { display: flex; flex-wrap: wrap; gap: var(--rz-space-2) var(--rz-space-5); margin: var(--rz-space-3) 0 0; font: 400 12px var(--rzt-mono); color: var(--rzt-text-2); }
+body.tool .ex-legend span { display: inline-flex; align-items: center; gap: 8px; }
+body.tool .ex-legend .k-line { display: inline-block; width: 22px; height: 0; border-top: 2px solid #5E6673; }
+body.tool .ex-legend .k-275 { border-top-width: 4px; border-top-color: #2B2F36; }
+body.tool .ex-legend .k-isl { border-top-color: #4A5160; border-top-style: dashed; }
+body.tool .ex-legend .k-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #5E6673; }
+body.tool .ex-legend .k-plant { background: #D49A2A; }
+body.tool .ex-legend .k-dc { background: #1a1d23; outline: 1px solid var(--rzt-line-strong); }
+[data-theme="dark"] body.tool .ex-legend .k-275 { border-top-color: #A0AEC0; }
+[data-theme="dark"] body.tool .ex-legend .k-dc { background: #E8EDF5; }
+body.tool .ex-facts { max-width: 760px; margin-bottom: var(--rz-space-5); border-top: 1px solid var(--rzt-line); }
+body.tool .sg-tags { margin-left: 6px; font: 400 12px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool .sg-notes { font-size: 13px; color: var(--rzt-muted); min-width: 16rem; }
+body.tool .leaflet-container { font-family: var(--rzt-sans); }
+body.tool .leaflet-popup-content { font: 400 13px/1.45 var(--rzt-sans); color: #111827; }
+body.tool .leaflet-popup-content b { color: #111827; }
+body.tool .leaflet-popup-content .sg-pop-note { color: #4B5563; font-size: 12px; }
+body.tool .leaflet-popup-content-wrapper, body.tool .leaflet-popup-tip { border-radius: var(--rz-radius); box-shadow: none; border: 1px solid rgba(17,24,39,.22); }
+@media (max-width: 600px) { body.tool #sgMap { height: 380px; } }
+
+/* --- the AI-maintenance brief (body[data-rz-page="aiem"]) --- */
+/* locked: the sign-in notice in flow under the head; the brief is not drawn */
+body.tool .root-gate { display: none; }
+body.tool.locked .root-gate { display: block; padding: var(--rz-space-8) 0 var(--rz-space-10); }
+body.tool.locked .ex-locked { display: none; }
+body.tool .root-card h2 { margin: 0 0 var(--rz-space-2); font: 600 18px/1.3 var(--rzt-sans); color: var(--rzt-text); }
+body.tool .root-card p { margin: 0; }
+body.tool .root-actions { margin-top: var(--rz-space-4); }
+body.tool .root-actions .tool-btn { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; font: 500 14px var(--rzt-sans); color: var(--rzt-text-2); background: transparent; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); cursor: pointer; text-decoration: none; }
+body.tool .root-actions .tool-btn:hover { border-color: var(--rzt-line-strong); color: var(--rzt-text); }
+body.tool .root-actions .tool-btn.is-primary { font-weight: 600; color: var(--rz-text-inverse); background: var(--rzt-accent); border-color: var(--rzt-accent); }
+body.tool .root-actions .tool-btn.is-primary:hover { background: var(--rz-accent-signal-dim); border-color: var(--rz-accent-signal-dim); }
+body.tool .ck-jump .chip.active { border-color: var(--rzt-accent); color: var(--rzt-text); }
+
+body.tool .ex-sec h3 { margin: var(--rz-space-6) 0 var(--rz-space-2); font: 600 16px/1.35 var(--rzt-sans); color: var(--rzt-text); }
+body.tool .ex-sec > p, body.tool .ex-sec > ul { max-width: 74ch; font-size: 15px; line-height: 1.65; color: var(--rzt-text-2); }
+body.tool .ex-sec > ul { padding-left: 1.2rem; }
+body.tool .ex-sec > ul li { margin-bottom: 6px; }
+body.tool .ex-sec b, body.tool .ex-sec strong { color: var(--rzt-text); font-weight: 600; }
+body.tool .ex-sec code { font: 400 12px var(--rzt-mono); color: var(--rzt-text-2); background: var(--rzt-inset); padding: 1px 4px; border-radius: 2px; overflow-wrap: anywhere; }
+body.tool .ex-sec details { margin-top: var(--rz-space-5); max-width: 74ch; font-size: 14px; line-height: 1.6; color: var(--rzt-text-2); }
+body.tool .ex-sec details > summary { cursor: pointer; color: var(--rzt-text); }
+
+/* cards: a panel and one hairline */
+body.tool .modules-grid, body.tool .modes-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rz-space-4); }
+body.tool .phase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--rz-space-4); }
+@media (max-width: 760px) { body.tool .modules-grid, body.tool .modes-grid { grid-template-columns: minmax(0, 1fr); } }
+body.tool .module-card, body.tool .mode-card, body.tool .phase { display: flex; flex-direction: column; gap: var(--rz-space-3); min-width: 0; padding: var(--rz-space-4); background: var(--rzt-panel); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); }
+body.tool .mc-head { display: flex; align-items: baseline; gap: var(--rz-space-3); }
+body.tool .mc-num, body.tool .ph-tag, body.tool .mode-tag { font: 500 11px var(--rzt-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--rzt-muted); }
+body.tool .mc-name, body.tool .mode-title, body.tool .ph-title { font: 600 16px/1.3 var(--rzt-sans); color: var(--rzt-text); }
+body.tool .mc-role { font: 400 12px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool .mc-body, body.tool .mode-sub { font-size: 14px; line-height: 1.6; color: var(--rzt-text-2); }
+body.tool .mc-meta { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: 6px var(--rz-space-3); margin: 0; padding-top: var(--rz-space-3); border-top: 1px solid var(--rzt-line-soft); font-size: 13px; }
+body.tool .mc-meta dt { font: 500 11px var(--rzt-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--rzt-muted); }
+body.tool .mc-meta dd { margin: 0; color: var(--rzt-text-2); }
+body.tool .mc-svg, body.tool .mode-svg { padding: var(--rz-space-2); background: var(--rzt-inset); border: 1px solid var(--rzt-line-soft); border-radius: var(--rz-radius); overflow-x: auto; }
+body.tool .mc-svg svg, body.tool .mode-svg svg { display: block; width: 100%; height: auto; }
+body.tool .qa { padding: var(--rz-space-3); background: var(--rzt-inset); border-radius: var(--rz-radius); font: 400 12px/1.6 var(--rzt-mono); color: var(--rzt-text-2); }
+body.tool .qa .q { color: var(--rzt-text); }
+body.tool .qa .a { margin-top: 6px; }
+body.tool .pros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--rz-space-3); font-size: 13px; line-height: 1.5; color: var(--rzt-text-2); }
+body.tool .pros > div { padding-top: var(--rz-space-2); border-top: 1px solid var(--rzt-line); }
+body.tool .pros b { display: block; margin-bottom: 4px; font: 500 11px var(--rzt-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--rzt-muted); }
+@media (max-width: 600px) { body.tool .pros { grid-template-columns: minmax(0, 1fr); } }
+body.tool .phase ul { margin: 0; padding-left: 1.1rem; font-size: 13px; line-height: 1.55; color: var(--rzt-text-2); }
+body.tool .ph-complex { margin-top: auto; padding-top: var(--rz-space-2); border-top: 1px solid var(--rzt-line-soft); font: 400 12px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool .ph-complex b { color: var(--rzt-text); font-weight: 500; }
+
+/* gaps: one disclosure row each */
+body.tool .gap { border-top: 1px solid var(--rzt-line); }
+body.tool .gap:last-of-type { border-bottom: 1px solid var(--rzt-line); }
+body.tool .gap > summary { display: list-item; padding: 12px 2px; cursor: pointer; font: 600 15px/1.4 var(--rzt-sans); color: var(--rzt-text); }
+body.tool .gap > summary .gap-num { margin-right: 10px; font: 500 12px var(--rzt-mono); color: var(--rzt-muted); }
+body.tool .gap-body { padding: 0 0 var(--rz-space-3); }
+body.tool .gap-body .row { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: var(--rz-space-3); margin: 0; padding: 8px 0; border-top: 1px solid var(--rzt-line-soft); font-size: 14px; }
+body.tool .gap-body dt { font: 500 11px var(--rzt-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--rzt-muted); padding-top: 2px; }
+body.tool .gap-body dd { margin: 0; line-height: 1.6; color: var(--rzt-text-2); }
+@media (max-width: 600px) { body.tool .gap-body .row { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+
+/* open questions: rows */
+body.tool .questions { border-top: 1px solid var(--rzt-line); max-width: 80ch; }
+body.tool .question { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: var(--rz-space-3); padding: 10px 0; border-bottom: 1px solid var(--rzt-line-soft); }
+body.tool .q-num { font: 500 12px var(--rzt-mono); color: var(--rzt-muted); padding-top: 2px; }
+body.tool .q-body { font-size: 14px; line-height: 1.6; color: var(--rzt-text-2); }
+
+/* tables in the brief */
+body.tool .data-table .hl { color: var(--rzt-text); font-weight: 600; }
+body.tool .data-table .best, body.tool .data-table .weak { color: var(--rzt-text); font-weight: 600; }
+
+/* figures: the paper's block diagrams, re-pointed. Knowledge path amber; data path and output graphite;
+   the safety net in fault red only inside the figure that declares that meaning */
+body.tool .big-diagram { margin: 0 0 var(--rz-space-2); padding: var(--rz-space-3); background: var(--rzt-inset); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+body.tool .big-diagram svg { display: block; width: 100%; min-width: 720px; height: auto; }
+body.tool .legend { display: flex; flex-wrap: wrap; gap: var(--rz-space-2) var(--rz-space-5); margin: 0 0 var(--rz-space-4); font: 400 12px var(--rzt-mono); color: var(--rzt-text-2); }
+body.tool .legend span { display: inline-flex; align-items: center; gap: 8px; }
+body.tool .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--rzt-text-2); }
+body.tool .legend i.k-amber { background: var(--rzt-accent); }
+body.tool .legend i.k-dash { background: var(--rzt-muted); }
+body.tool .legend i.k-line { background: var(--rzt-line-strong); }
+body.tool .legend i.k-red { background: var(--rzt-fault); }
+body.tool .d-bg { fill: var(--rzt-inset); }
+body.tool .d-block { fill: var(--rzt-panel); stroke: var(--rzt-line-strong); stroke-width: 1; }
+body.tool .d-block-cyan { fill: transparent; stroke: var(--rzt-text-2); stroke-width: 1.1; }
+body.tool .d-block-amber { fill: var(--rz-accent-signal-bg); stroke: var(--rzt-accent); stroke-width: 1.2; }
+body.tool .d-block-green { fill: transparent; stroke: var(--rzt-muted); stroke-width: 1; stroke-dasharray: 4 3; }
+body.tool .d-block-red { fill: transparent; stroke: var(--rzt-fault); stroke-width: 1; }
+body.tool .d-line { fill: none; stroke: var(--rzt-line-strong); stroke-width: .8; }
+body.tool .d-line-cyan { fill: none; stroke: var(--rzt-text-2); stroke-width: 1; }
+body.tool .d-line-amber { fill: none; stroke: var(--rzt-accent); stroke-width: 1; }
+body.tool .d-line-green { fill: none; stroke: var(--rzt-muted); stroke-width: .9; }
+body.tool .d-line-feedback { fill: none; stroke: var(--rzt-muted); stroke-width: .9; stroke-dasharray: 4 3; }
+body.tool .d-line-dim { fill: none; stroke: var(--rzt-line-strong); stroke-width: .6; stroke-dasharray: 3 3; }
+body.tool .d-text { font: 600 11px var(--rzt-sans); fill: var(--rzt-text); }
+body.tool .d-text-sm { font: 400 9px var(--rzt-mono); fill: var(--rzt-muted); }
+body.tool .d-text-cyan { font: 400 9.5px var(--rzt-mono); fill: var(--rzt-text-2); }
+body.tool .d-text-amber { font: 400 9.5px var(--rzt-mono); fill: var(--rzt-accent-text); }
+body.tool .d-text-green { font: 400 9.5px var(--rzt-mono); fill: var(--rzt-muted); }
+body.tool .d-text-section { font: 600 10px var(--rzt-mono); letter-spacing: .08em; fill: var(--rzt-muted); text-transform: uppercase; }
+
+/* the auth modal must not advertise the demo account on a Full/Educator page (kept from the page's own style) */
+body.tool[data-rz-page="aiem"] .rz-demo-hint { display: none !important; }
+
+@media print {
+  body.tool .hub-nav, body.tool .tool-bar, body.tool .hub-foot, body.tool .tool-head .crumb, body.tool .root-gate { display: none; }
+  body.tool.locked .ex-locked { display: block; }
+}
