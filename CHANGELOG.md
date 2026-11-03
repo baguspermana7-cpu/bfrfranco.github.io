@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v3.24.41 — 2026-11-03 — "Shared blue, gone"
+
+Owner: *"Continue all"* and *"setelah itu commit and push"*. The faint mobile menu button was reported by the LTC session, from the new cx-handbook pages.
+
+### Changed
+- **Nav avatar** (`styles.css`, `styles-index.css`): the 2px blue ring, blue shadow and 1.1× hover scale are replaced by a 1px neutral hairline. On hover the hairline turns amber.
+- **Article table of contents** (`styles.css`): flat panel and 1px hairline cards, muted numbers, amber only on hover. This replaces the blue rail, blue numbers, the blue calculator wash and the slide-and-shadow hover. The "Interactive" badge is amber. Article-1, 11 and 18 lose the page-local blue overrides that beat the shared rule.
+- **Info chips** (`--rz-chip-info`): instrument cyan (#0e7490, and neon #00DDFF in dark) is now identity ink (#3a3f47 / #c4c9d1). The token feeds the info badges, callouts and rail tags on about 50 articles. Status colours (good, warn, alert) are unchanged.
+- **Links in the reading column** (`css/rz-article-dark.css`): plain links outside paragraphs and lists, such as references, table cells and notes, take the amber accent instead of each page's own blue. TOC cards read as text. Reference numbers and list markers are muted ink, inline citations are amber, and dotted term underlines are muted.
+- **Dark reference block** (`styles.css`): seven `#60a5fa` values become muted numbers, amber links and text-coloured headings.
+- **Light footer**: graphite #1a1d23 instead of the navy-to-blue gradient. The copyright line moves from white at 40 % opacity (3.77:1, flagged by the accessibility gate) to #969eaa (6.2:1). Footer column headings had no colour of their own and showed the global heading ink at 50 % opacity, nearly invisible on the dark footer. They now read #969eaa.
+
+### Fixed
+- **Mobile menu button almost invisible in light theme.** `js/rz-mobile-nav.js` injects the button with an inline style of white bars (#f1f5f9) on a white-tinted chip. That inline style beat every stylesheet rule, so pages without `styles.css` (the hub, tools, cx-handbook) showed an empty white square at 390 px. The inline style now carries layout only, and colour comes from theme-aware rules: ink bars on white in light, light bars on graphite in dark, 4px corner. The light rules for the button and the open drawer matched only `[data-theme="light"]`; they now match any theme that is not dark. Screenshots at 390 px show datacenter-solutions in light (empty before, ink bars after) and in dark, tools in light, and article-5 in dark.
+
+### Measured
+- Computed-style scan, 176 pages × both themes, counting visible elements whose text, border, fill or gradient sits in the saturated blue band. From v3.24.39 to this release:
+  - total: 3,413 → 2,072
+  - nav avatar: 136 → 0
+  - TOC numbers: 291 → 41
+  - plain links: 447 → 146
+  - reference numbers: 133 → 0
+  - citations: 86 → 0
+  - term underlines: 128 → 0
+  - footer gradient: 52 → 0
+- The rest is mostly map markers, data tags and categorical hues, plus pages the LTC session owns.
+
 ## v3.24.40 — 2026-11-03 — "Field manual"
 
 Owner: *"warna biru ini dan beberapa component itu terlihat ai design slop"* and *"handbook by sesi lain sudah selesai … jadikan ke web page itu"*.

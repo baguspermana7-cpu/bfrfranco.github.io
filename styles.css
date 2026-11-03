@@ -276,16 +276,16 @@ a {
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--light-blue);
-    box-shadow: 0 2px 8px rgba(45, 90, 135, 0.3);
-    transition: all 0.3s ease;
+    /* site register: was a 2px blue ring with a blue shadow that grew on hover */
+    border: 1px solid rgba(40, 44, 52, 0.24);
+    transition: border-color 0.2s ease;
 }
 
 .nav-avatar:hover {
-    transform: scale(1.1);
-    border-color: var(--medium-blue);
-    box-shadow: 0 4px 15px rgba(45, 90, 135, 0.4);
+    border-color: #92400e;
 }
+[data-theme="dark"] .nav-avatar { border-color: rgba(160, 168, 180, 0.28); }
+[data-theme="dark"] .nav-avatar:hover { border-color: #E8B563; }
 
 .nav-logo-text {
     color: var(--heading-color); /* W1: solid text, no gradient fill (ANTI_VIBECODE §A27) */
@@ -2569,7 +2569,8 @@ section {
    Footer
    ========================================== */
 .footer {
-    background: var(--primary-gradient);
+    /* site register: graphite, as in dark; was the navy-to-blue --primary-gradient */
+    background: #1a1d23;
     color: var(--white);
     padding: 3rem 0;
 }
@@ -2624,7 +2625,8 @@ section {
 
 .footer-copyright {
     font-size: 0.75rem;
-    opacity: 0.4;
+    /* white at 40 % read 3.77:1 on the graphite footer; #969eaa reads 6.3:1 */
+    color: #969eaa;
     margin-top: 1rem;
 }
 
@@ -2633,7 +2635,8 @@ section {
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    opacity: 0.5;
+    /* had no colour of its own: it took the global h4 ink at 50 % opacity, dark on the dark footer */
+    color: #969eaa;
     margin-bottom: 1rem;
 }
 
@@ -4529,11 +4532,12 @@ section {
 [data-theme="dark"] .article-body [class*="-desc"] {
     color: #94a3b8;
 }
-/* TOC section — global base styles */
+/* TOC section — global base styles (site register: flat panel, 1px hairlines, amber only on hover;
+   was a blue rail, blue numerals, a blue calculator wash and a slide-and-shadow hover) */
 .toc-section {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    background: #f8f9fa;
     padding: 3rem 2rem;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid rgba(40,44,52,0.14);
 }
 .toc-container {
     max-width: 900px;
@@ -4542,7 +4546,7 @@ section {
 .toc-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--primary-blue);
+    color: #1a1d23;
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
@@ -4557,57 +4561,50 @@ section {
     background: #fff;
     padding: 0.75rem 1rem;
     border-radius: var(--rz-radius);
-    border-left: 2px solid var(--accent-blue);
-    transition: all 0.2s ease;
+    border: 1px solid rgba(40,44,52,0.18);
+    transition: border-color 0.2s ease;
     text-decoration: none;
     color: var(--text-primary);
 }
 .toc-item:hover {
-    transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #92400e;
 }
 .toc-item-number {
     font-size: 0.75rem;
-    color: var(--accent-blue);
+    color: #5c6470;
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
     margin-bottom: 0.25rem;
 }
 .toc-item-title {
     font-weight: 600;
     font-size: 0.88rem;
 }
-.toc-item.toc-calculator {
-    background: linear-gradient(135deg, #eff6ff 0%, rgba(6, 182, 212, 0.10) 100%);
-    border-left-color: #3b82f6;
-    border-left-width: 2px;
-}
 .toc-item.toc-calculator .toc-item-number { display: flex; align-items: center; gap: 6px; }
 .toc-item.toc-calculator .toc-calc-badge {
-    font-size: 0.6rem; background: #3b82f6; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
+    font-size: 0.6rem; background: transparent; color: #92400e; border: 1px solid rgba(146,64,14,0.45); padding: 0 5px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px;
 }
 @media (max-width: 768px) {
     .toc-grid { grid-template-columns: 1fr; }
 }
 /* TOC section — dark mode */
 [data-theme="dark"] .toc-section {
-    background: linear-gradient(135deg, #191b1f 0%, #282b31 100%);
-    border-color: rgba(255,255,255,0.1);
+    background: #121316;
+    border-color: rgba(160,168,180,0.14);
 }
 [data-theme="dark"] .toc-section .toc-item {
-    background: rgba(40,43,49,0.8);
+    background: #16181d;
     color: #e2e8f0;
-    border-color: rgba(255,255,255,0.08);
+    border-color: rgba(160,168,180,0.18);
 }
 [data-theme="dark"] .toc-section .toc-item:hover {
-    background: rgba(96,165,250,0.1);
-    border-color: rgba(96,165,250,0.3);
+    background: #1c1e23;
+    border-color: rgba(232,181,99,0.6);
 }
-[data-theme="dark"] .toc-section .toc-item-number { color: #60a5fa; }
+[data-theme="dark"] .toc-section .toc-item-number { color: #969eaa; }
 [data-theme="dark"] .toc-section .toc-item-title { color: #e2e8f0; }
-[data-theme="dark"] .toc-section .toc-title { color: #60a5fa; }
-[data-theme="dark"] .toc-item.toc-calculator {
-    background: linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.08) 100%);
-}
+[data-theme="dark"] .toc-section .toc-title { color: #f6f7f9; }
+[data-theme="dark"] .toc-item.toc-calculator .toc-calc-badge { color: #E8B563; border-color: rgba(232,181,99,0.5); }
 /* Data tables */
 [data-theme="dark"] .article-body .data-table-wrapper {
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -4723,21 +4720,21 @@ section {
     border-color: rgba(255,255,255,0.06);
 }
 [data-theme="dark"] .reference-number {
-    color: #60a5fa;
+    color: #969eaa;
 }
 [data-theme="dark"] .reference-source {
     color: #94a3b8;
 }
 [data-theme="dark"] .reference-item a {
-    color: #60a5fa;
+    color: #E8B563;
 }
 /* Pattern 2: .references (articles 9, 10, 11, 12, 14, 16, 17) */
 [data-theme="dark"] .references {
     background: #191b1f;
-    border-color: rgba(96,165,250,0.3);
+    border-color: rgba(160,168,180,0.18);
 }
 [data-theme="dark"] .references h3 {
-    color: #60a5fa;
+    color: #f6f7f9;
 }
 [data-theme="dark"] .references ol,
 [data-theme="dark"] .references ul {
@@ -4748,7 +4745,7 @@ section {
     color: #cbd5e1;
 }
 [data-theme="dark"] .references a {
-    color: #60a5fa;
+    color: #E8B563;
 }
 [data-theme="dark"] .ref-source {
     color: #94a3b8;
@@ -4759,14 +4756,14 @@ section {
     border-color: rgba(255,255,255,0.06);
 }
 [data-theme="dark"] .ref-list li::before {
-    color: #60a5fa;
+    color: #969eaa;
 }
 [data-theme="dark"] .ref-list a {
-    color: #60a5fa;
+    color: #E8B563;
 }
 /* Cite inline links */
 [data-theme="dark"] .article-body a.cite {
-    color: #60a5fa;
+    color: #E8B563;
 }
 
 /* ── Global article-content dark mode ── */
@@ -7314,16 +7311,18 @@ section {
         margin-left: auto;
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 8px;
+        border-radius: 4px;
         cursor: pointer;
         color: var(--heading-color, #f1f5f9);
         z-index: 1001;
         transition: background 0.2s, border-color 0.2s;
     }
-    [data-theme="light"] .rz-nav-burger {
-        background: rgba(25,27,31,0.04);
-        border-color: rgba(15, 23, 42, 0.10);
-        color: #0f172a;
+    /* light = no data-theme="dark" (the site never sets "light"); the old [data-theme="light"]
+       rule never matched, so light pages drew white bars on a white bar — the faint burger */
+    :root:not([data-theme="dark"]) .rz-nav-burger {
+        background: #ffffff;
+        border-color: rgba(40, 44, 52, 0.24);
+        color: #1a1d23;
     }
     .rz-nav-burger:hover {
         background: rgba(232, 181, 99, 0.12);
@@ -7909,7 +7908,7 @@ p a[href$="terms.html"], p a[href$="privacy.html"] {
    ==========================================================================*/
 :root {
   /* the site's own semantic set, replacing the framework defaults */
-  --rz-chip-info:   #0e7490;   /* instrument cyan, light-readable */
+  --rz-chip-info:   #3a3f47;   /* identity ink; was instrument cyan, withdrawn with the register (one amber accent) */
   --rz-chip-good:   #2f855a;   /* oscilloscope green, light-readable */
   --rz-chip-warn:   #a16207;   /* signal amber, light-readable */
   --rz-chip-alert:  #b42318;   /* fault red, light-readable */
@@ -7918,7 +7917,7 @@ p a[href$="terms.html"], p a[href$="privacy.html"] {
   --rz-chip-mono:   'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 [data-theme="dark"] {
-  --rz-chip-info:   #00DDFF;
+  --rz-chip-info:   #c4c9d1;   /* identity ink in dark; was neon #00DDFF */
   --rz-chip-good:   #6fbf8e;   /* W1: muted status green — the oscilloscope neon was withdrawn by the owner 2026-10-15 */
   --rz-chip-warn:   #FFAA00;
   --rz-chip-alert:  #FF6B6B;
@@ -8123,7 +8122,8 @@ html .c-rank {
   box-shadow: none !important;
 }
 /* white-on-fill text is unreadable once the fill is gone: give the mark its own semantic colour */
-html .toc-calc-badge   { color: var(--rz-chip-info) !important; }
+html .toc-calc-badge   { color: #92400e !important; }
+[data-theme="dark"] .toc-calc-badge { color: #E8B563 !important; }
 html .series-badge-icon,
 html .service-rank,
 html .c-rank           { color: var(--rz-chip-quiet) !important; }

@@ -105,7 +105,11 @@
             'align-items:center;justify-content:center;gap:5px;' +
             'width:44px !important;min-width:44px;height:44px !important;min-height:44px;' +
             'padding:0;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);' +
-            'border-radius:8px;color:#f1f5f9;cursor:pointer;}' +
+            'border-radius:4px;color:#f1f5f9;cursor:pointer;}' +
+            /* light = no data-theme="dark": ink bars on a white chip. Without this, pages that do not
+               load styles.css (hub/tool/handbook sheets) drew #f1f5f9 bars on white, nearly invisible. */
+            ':root:not([data-theme="dark"]) .rz-nav-burger{background:#ffffff;' +
+            'border-color:rgba(40,44,52,0.24);color:#1a1d23;}' +
             '.rz-nav-burger>span{display:block !important;width:20px !important;height:2px !important;' +
             'background:currentColor !important;border-radius:2px;flex-shrink:0;}';
         /* every menu shape this site ships, not just the two most common */
@@ -151,9 +155,9 @@
             'display:block !important;padding:0.85rem 0.25rem;color:#f1f5f9;text-decoration:none;' +
             'border-bottom:1px solid rgba(255,255,255,0.10);font-size:1rem;}' +
             /* W1 2026-10-31: per-theme graphite — the drawer was navy #0f172a in BOTH themes */
-            '[data-theme="light"] ' + MENU.split(',').join(',[data-theme="light"] ') +
+            ':root:not([data-theme="dark"]) ' + MENU.split(',').join(',:root:not([data-theme="dark"]) ') +
             '{background:#ffffff !important;border-top-color:rgba(18,19,22,0.10);}' +
-            '[data-theme="light"] ' + MENU.split(',').map(function(s){return s + ' a';}).join(',[data-theme="light"] ') +
+            ':root:not([data-theme="dark"]) ' + MENU.split(',').map(function(s){return s + ' a';}).join(',:root:not([data-theme="dark"]) ') +
             '{color:#1a1c20;border-bottom-color:rgba(18,19,22,0.10);}' +
             'body.rz-nav-open{overflow:hidden;}';
         document.head.appendChild(style);
@@ -204,11 +208,10 @@
                 'align-items:center !important;justify-content:center !important;' +
                 'flex-direction:column !important;gap:5px !important;' +
                 'padding:0 !important;margin-left:auto !important;' +
-                'background:rgba(255,255,255,0.06);' +
-                'border:1px solid rgba(255,255,255,0.18);' +
-                'border-radius:8px;' +
-                'cursor:pointer;color:#f1f5f9;' +
-                'z-index:1001;position:relative;';
+                /* colour, fill and border come from the injected BURGER rules, which know the
+                   theme; inline #f1f5f9 here beat them and left white bars on white in light */
+                'border-width:1px;border-style:solid;border-radius:4px;' +
+                'cursor:pointer;z-index:1001;position:relative;';
             for (var i = 0; i < burger.children.length; i++) {
                 burger.children[i].style.cssText =
                     'display:block !important;' +

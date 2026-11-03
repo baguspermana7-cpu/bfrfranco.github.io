@@ -370,6 +370,33 @@ html[data-rz-register="editorial"] .article-body p a:hover,
 html[data-rz-register="editorial"] .article-body li a:hover{
   text-decoration-color:var(--rz-art-accent);
 }
+/* every other plain link in the reading column (references, table cells, cite numbers, notes) was
+   left on each page's own blue (#2563eb light, #60a5fa dark); it takes the same amber. A link that
+   carries a class is a component (TOC card, button, chip) and is styled where it is defined. */
+html[data-rz-register="editorial"] .article-body a:not([class]){
+  color:var(--rz-art-accent);
+  border-bottom-color:color-mix(in srgb,var(--rz-art-accent) 45%,transparent);
+}
+/* TOC cards are navigation blocks, not inline links: titles read as text */
+html[data-rz-register="editorial"] .article-body a.toc-item,
+html[data-rz-register="editorial"] .toc-section a.toc-item{
+  color:var(--rz-art-strong);
+}
+/* reference numbers, list markers, inline citations and dotted term underlines: every article
+   carried its own blue (#2563eb / #1d4ed8 / #60a5fa / --accent-blue). Numbers read as muted ink,
+   citations as the accent, term underlines as a muted dashed line. */
+html[data-rz-register="editorial"] .reference-number,
+html[data-rz-register="editorial"] .ref-list li::before,
+html[data-rz-register="editorial"] .references ol li::marker{
+  color:var(--rz-art-muted) !important;
+}
+html[data-rz-register="editorial"] .article-body a.cite,
+html[data-rz-register="editorial"] .article-body a.cite:hover{
+  color:var(--rz-art-accent) !important;
+}
+html[data-rz-register="editorial"] .article-body :is(.tooltip,.tip){
+  border-bottom-color:var(--rz-art-muted) !important;
+}
 
 /* --- pull-quote: replace the 2px accent side-stripe with an even hairline border
    + a hanging Fraunces quotation glyph (editorial, and clears the side-stripe ban). --- */
