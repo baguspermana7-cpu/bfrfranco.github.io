@@ -92,6 +92,19 @@ def first_sentence(text):
     return m.group(1) if m else text
 
 
+# The manual shares the Cx calculator's social card: same subject, one card to keep fresh.
+OG_IMAGE = 'https://resistancezero.com/assets/og/cx-calculator.webp'
+# Descriptions are written, not clipped: a cut-off sentence fails the meta description gate.
+DESC = json.loads((ROOT / 'data' / 'cx-handbook' / 'descriptions.json').read_text(encoding='utf-8'))
+
+
+def described(key):
+    text = DESC.get(key)
+    if not text or len(text) > 160 or text.endswith('…'):
+        raise SystemExit(f'descriptions.json: "{key}" missing, longer than 160 chars, or clipped')
+    return text
+
+
 def clip(text, n=158):
     if len(text) <= n:
         return text
@@ -325,7 +338,12 @@ def head(title, desc, canonical, jsonld, tokens):
 <meta property="og:description" content="{esc(desc)}">
 <meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="{OG_IMAGE}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Data centre commissioning field manual">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{OG_IMAGE}">
 <meta name="twitter:title" content="{esc(title)}">
 <meta name="twitter:description" content="{esc(desc)}">
 <script type="application/ld+json">{ld}</script>
@@ -438,7 +456,7 @@ def chapter_page(ch, prev, nxt, tokens, total):
     index_url = f'{SITE}/cx-handbook/'
     short = ch['title'].split(':')[0]
     title = f'{ch["id"]} {short} | Cx Field Manual {EDITION}'
-    desc = clip(ch['scope'])
+    desc = described(ch['id'])
     ld = [{'@context': 'https://schema.org', '@type': 'TechArticle', 'headline': clip(f'{ch["id"]} {ch["title"]}', 110),
            'name': ch['title'], 'description': desc, 'url': url, 'mainEntityOfPage': url, 'inLanguage': 'en',
            'author': AUTHOR_LD, 'publisher': AUTHOR_LD, 'datePublished': PUBLISHED, 'dateModified': PUBLISHED,
@@ -494,8 +512,7 @@ def index_page(spec, chapters, figs, tokens):
     url = f'{SITE}/cx-handbook/'
     words = sum(c['words'] for c in chapters)
     title = f'{BOOK} {EDITION} | Resistance Zero'
-    desc = clip(f'{len(chapters)} chapters and {len(figs)} drawing sheets on data centre commissioning: process and levels, '
-                'project administration, electrical, mechanical, fire, BMS, EPMS, integrated systems testing, issues and data.')
+    desc = described('index')
     ld = [{'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': f'{BOOK} {EDITION}', 'url': url,
            'description': desc, 'inLanguage': 'en', 'datePublished': PUBLISHED,
            'isPartOf': {'@type': 'WebSite', 'name': 'Resistance Zero', 'url': SITE + '/'},
