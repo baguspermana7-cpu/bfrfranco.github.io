@@ -17303,55 +17303,63 @@ Key drivers: AI/ML workloads requiring high-density infrastructure, cloud migrat
 
 > Compare traditional air cooling with direct liquid cooling (DLC) for data centers. Efficiency, cost, density support, and future readiness.
 
-# Air Cooling vs Liquid Cooling
+Cooling · **Compare** · C.08
 
 
-The defining infrastructure decision for next-generation data centers. As power densities surge past 30 kW per rack, the physics of heat removal dictate the cooling architecture.
+# Air cooling vs liquid cooling CRAH/CRAC against direct-to-chip and immersion
 
 
- Air Cooling -- Traditional CRAH/CRAC
- Liquid Cooling -- DLC/Immersion
+Above about 30 kW per rack, heat removal sets the cooling architecture. Air and liquid compared on density, PUE, cost, operations and water.
+
+
+basis published vendor and operator ranges · ASHRAE TC 9.9 · OCP · no engine runs on this page
+
+
+DC Solutions → Air vs liquid cooling
 
 
 
 
 
-## Side-by-Side Comparison
+
+## 01 Side by side
+
+
+Typical ranges from published vendor and operator figures; a design still needs site numbers.
 
 
 
  |
- Category | Air Cooling | Liquid Cooling | Edge |
+ Category | Air cooling | Liquid cooling | Edge |
 
 
 
 
- | Max Density | 15-20 kW/rack (with containment) | 100+ kW/rack (immersion: 200+ kW) | L |
+ | Max Density | 15-20 kW/rack (with containment) | 100+ kW/rack (immersion: 200+ kW) | Liquid |
 
- | PUE Impact | 1.3-1.6 typical | 1.02-1.15 achievable | L |
+ | PUE Impact | 1.3-1.6 typical | 1.02-1.15 achievable | Liquid |
 
- | CAPEX | $2-4M per MW cooling (lower initial) | $3-6M per MW cooling (higher initial) | A |
+ | CAPEX | $2-4M per MW cooling (lower initial) | $3-6M per MW cooling (higher initial) | Air |
 
- | OPEX | Higher -- fan power, overcooling | Lower -- 30-50% energy reduction | L |
+ | OPEX | Higher -- fan power, overcooling | Lower -- 30-50% energy reduction | Liquid |
 
- | Retrofit | Standard -- no special infrastructure | Moderate to complex (piping, CDUs, floor loading) | A |
+ | Retrofit | Standard -- no special infrastructure | Moderate to complex (piping, CDUs, floor loading) | Air |
 
- | Noise | 70-85 dBA at rack level | 40-55 dBA (fans reduced or eliminated) | L |
+ | Noise | 70-85 dBA at rack level | 40-55 dBA (fans reduced or eliminated) | Liquid |
 
- | AI/HPC Ready | No -- cannot cool 40kW+ GPU racks | Yes -- designed for 40-200+ kW racks | L |
-
-
+ | AI/HPC Ready | No -- cannot cool 40kW+ GPU racks | Yes -- designed for 40-200+ kW racks | Liquid |
 
 
 
 
 
 
-## Detailed Analysis
 
 
+## 02 Analysis
 
- Heat Transfer Physics
+
+### Heat Transfer Physics
 
 
 **Air cooling** relies on convective heat transfer from server heatsinks to room air, then from room air to chilled water coils in CRAH/CRAC units. Air's thermal conductivity is 0.026 W/mK and its volumetric heat capacity is 1.2 kJ/m3K. Moving enough air to cool a 15 kW rack requires approximately 2,500-3,500 CFM, generating significant fan noise and energy consumption.
@@ -17360,13 +17368,11 @@ The defining infrastructure decision for next-generation data centers. As power 
 **Liquid cooling** uses water or engineered fluids with thermal conductivity of 0.6 W/mK (water) and volumetric heat capacity of 4,184 kJ/m3K -- approximately 3,500x more effective at absorbing heat per unit volume. This means a small-diameter pipe carrying liquid can remove more heat than a large air duct. Direct-to-chip cold plates place liquid within millimeters of the heat source, minimizing thermal resistance.
 
 
-The physics are unambiguous: above 20 kW per rack, air cooling requires exponentially increasing fan power and airflow volume, while liquid cooling scales linearly with modest increases in flow rate.
+Above 20 kW per rack, air cooling requires exponentially increasing fan power and airflow volume, while liquid cooling scales linearly with modest increases in flow rate.
 
 
 
-
-
- Liquid Cooling Technologies
+### Liquid Cooling Technologies
 
 
 **Rear-Door Heat Exchangers (RDHx)**: The simplest liquid cooling retrofit. Chilled water circulates through a coil mounted on the rear door of a standard rack. Supports up to 30-40 kW per rack. No changes to servers required. Works alongside existing CRAH units. Cost: $3,000-$8,000 per rack.
@@ -17379,9 +17385,7 @@ The physics are unambiguous: above 20 kW per rack, air cooling requires exponent
 
 
 
-
-
- Financial Analysis
+### Financial Analysis
 
 
 **Air cooling CAPEX** is well-understood: CRAH units ($50-100K each), raised floor ($50-80/sqft), hot/cold aisle containment ($15-30K per row), and chiller plant ($1-2M per MW). Total cooling CAPEX for a 1 MW IT load: $2-4M. This is the baseline that liquid cooling must justify a premium over.
@@ -17394,9 +17398,7 @@ The physics are unambiguous: above 20 kW per rack, air cooling requires exponent
 
 
 
-
-
- AI/HPC Readiness
+### AI/HPC Readiness
 
 
 The AI infrastructure buildout is the single largest driver of liquid cooling adoption. An NVIDIA DGX H100 system draws 10.2 kW. A rack of 4 DGX H100 systems plus networking draws 45-50 kW. The next-generation GB200 NVL72 rack exceeds 120 kW. Air cooling cannot physically remove this heat load from a standard 42U rack.
@@ -17409,9 +17411,7 @@ The AI infrastructure buildout is the single largest driver of liquid cooling ad
 
 
 
-
-
- Operational Considerations
+### Operational Considerations
 
 
 **Air cooling operations** are well-understood by the global data center workforce. Maintenance procedures, troubleshooting, and monitoring are standard skill sets. However, air-cooled systems require more physical space, making cable management and hot-swap procedures easier due to standard rack access.
@@ -17420,13 +17420,11 @@ The AI infrastructure buildout is the single largest driver of liquid cooling ad
 **Liquid cooling operations** require new skills: fluid handling, leak detection response, CDU maintenance, water quality management, and plumbing work that data center technicians may not traditionally perform. Leak risk is the primary operational concern -- mitigated through leak detection systems, non-conductive coolants, containment trays, and drip-proof quick-disconnect fittings. Staff training and updated SOPs are essential before deployment.
 
 
-**Noise reduction** is an underappreciated benefit of liquid cooling. Eliminating or reducing server fans drops ambient noise from 75-85 dBA to 40-55 dBA, improving the working environment for operations staff and reducing hearing protection requirements for extended data hall presence.
+**Noise** falls with liquid cooling. Eliminating or reducing server fans drops ambient noise from 75-85 dBA to 40-55 dBA, improving the working environment for operations staff and reducing hearing protection requirements for extended data hall presence.
 
 
 
-
-
- Water Usage and Sustainability
+### Water Usage and Sustainability
 
 
 **Air cooling** in many climates relies on evaporative cooling towers, consuming significant water. A 10 MW facility with cooling towers can consume 15-30 million gallons annually. In water-stressed regions, this is increasingly unacceptable to regulators and communities.
@@ -17439,49 +17437,28 @@ The AI infrastructure buildout is the single largest driver of liquid cooling ad
 
 
 
-
-## Which Is Right for You?
-
+## 03 Which one fits
 
 
-### Match cooling technology to your workload and timeline
+Match the cooling to the rack density and the remaining life of the building.
 
 
 
-
-#### Stay with Air Cooling When...
+ |
+ Stay with air when | Move to liquid when |
 
 
 
 
-- Rack densities remain below 15 kW
+ | Rack densities remain below 15 kW | Planning AI/HPC infrastructure (40+ kW racks) |
 
-- Traditional enterprise workloads (no AI/HPC)
+ | Traditional enterprise workloads (no AI/HPC) | New construction or major expansion |
 
-- Existing facility with no liquid infrastructure
+ | Existing facility with no liquid infrastructure | Targeting PUE below 1.2 |
 
-- Budget constraints prevent retrofit investment
+ | Budget constraints prevent retrofit investment | Water conservation is a priority |
 
-- Short remaining facility lifecycle (<5 years)
-
-
-
-
-
-#### Invest in Liquid Cooling When...
-
-
-
-
-- Planning AI/HPC infrastructure (40+ kW racks)
-
-- New construction or major expansion
-
-- Targeting PUE below 1.2
-
-- Water conservation is a priority
-
-- Future-proofing for next-gen GPU platforms
+ | Short remaining facility lifecycle (<5 years) | Future-proofing for next-gen GPU platforms |
 
 
 
@@ -17490,26 +17467,32 @@ The AI infrastructure buildout is the single largest driver of liquid cooling ad
 
 
 
-
-## Frequently Asked Questions
+## 04 Questions
 
 
 ### At what power density does liquid cooling become necessary?
 
+
 Traditional air cooling supports up to 15-20 kW per rack with optimized containment. Between 20-40 kW, hybrid approaches work. Above 40 kW, direct liquid cooling becomes the practical necessity. Modern AI GPU racks (NVIDIA DGX) operate at 40-120+ kW, making liquid cooling mandatory for AI training clusters.
+
 
 
 ### Can I retrofit an existing air-cooled data center with liquid cooling?
 
-Yes, but complexity varies. Rear-door heat exchangers are the simplest retrofit. Direct-to-chip solutions require in-rack plumbing and CDU installation. Full immersion cooling effectively requires a data hall redesign. Floor loading capacity must also be evaluated, as liquid-cooled systems are significantly heavier.
+
+Yes, but complexity varies. Rear-door heat exchangers are the simplest retrofit. Direct-to-chip solutions require in-rack plumbing and CDU installation. Full immersion cooling effectively requires a data hall redesign. Floor loading capacity must also be evaluated, as liquid-cooled systems are heavier.
+
 
 
 ### What is the PUE difference between air and liquid cooling?
 
-Air-cooled data centers typically achieve PUE of 1.3-1.6, with best-in-class reaching 1.2. Direct liquid cooling can achieve PUE of 1.02-1.15 because liquid transfers heat 3,500x more efficiently than air. The PUE improvement alone can justify the CAPEX premium within 3-5 years for high-density deployments.
+
+Air-cooled data centers typically achieve PUE of 1.3-1.6, and the best reach 1.2. Direct liquid cooling can achieve PUE of 1.02-1.15 because liquid transfers heat 3,500x more efficiently than air. The PUE improvement alone can justify the CAPEX premium within 3-5 years for high-density deployments.
+
 
 
 ### Is liquid cooling reliable enough for production data centers?
+
 
 Yes. Liquid cooling has been used in HPC for over two decades. Modern CDU systems include redundant pumps, leak detection, and automatic isolation valves. Major OEMs (Dell, HPE, Lenovo, Supermicro) offer factory-integrated liquid cooling with standard warranties. Leak risk is managed through non-conductive coolants and drip-proof fittings.
 
@@ -17517,23 +17500,42 @@ Yes. Liquid cooling has been used in HPC for over two decades. Modern CDU system
 
 
 
-## Related Resources
+
+## 05 Related tools
 
 
 
-#### ASHRAE Thermal Control Lab
-
-Interactive thermal envelope simulator for cooling design optimization.
-
-
-#### PUE Calculator
-
-Calculate and benchmark your Power Usage Effectiveness.
+ |
+ Tool | What it does |
 
 
-#### CAPEX Calculator
 
-Estimate build costs including cooling infrastructure options.
+
+ | ASHRAE Thermal Control Lab | Interactive thermal envelope simulator for cooling design optimization. |
+
+ | PUE Calculator | Calculate and benchmark your Power Usage Effectiveness. |
+
+ | CAPEX Calculator | Estimate build costs including cooling infrastructure options. |
+
+
+
+
+
+
+
+
+
+
+06 / Reference
+
+
+### Read further
+
+
+Technical manual and methodologyCDU toolkitRaised floor vs slab
+
+
+Independent personal research from public sources; it does not represent any current or former employer. Terms and disclaimer.
 
 
 ======================================================================
@@ -18861,76 +18863,67 @@ Calculate your data center's carbon emissions and offset requirements.
 
 > Compare raised floor and slab-on-grade designs for data centers. Airflow management, cable routing, cost, and modern trends.
 
-**
- Skip to main content
+Building · **Compare** · C.09
+
+
+# Raised floor vs slab-on-grade plenum against overhead services
+
+
+The floor decides airflow, cable routing, structural capacity and construction cost for the life of the building.
+
+
+basis published cost and load ranges · Uptime Institute · NEC power/data separation · no engine runs on this page
+
+
+DC Solutions → Raised floor vs slab
 
 
 
 
 
 
-
-# Raised Floor vs Slab-on-Grade
-
-
-The flooring decision impacts airflow, cabling, structural capacity, and construction cost for the entire life of a data center. Compare the legacy standard against the modern hyperscale approach.
-
-
- **  Raised Floor
- **  Slab-on-Grade
-
-
-
-
-
-
-## Quick Comparison
+## 01 Quick comparison
 
 
 
  |
- Category | Raised Floor | Slab-on-Grade |
+ Category | Raised floor | Slab-on-grade | Edge |
 
 
 
 
- | Airflow Management** | Underfloor plenum with perforated tiles; struggles above 10 kW/rack without containment | Overhead or row-based cooling; scales to 50+ kW/rack with rear-door HEX or DLC |
+ | Airflow Management | Underfloor plenum with perforated tiles; struggles above 10 kW/rack without containment | Overhead or row-based cooling; scales to 50+ kW/rack with rear-door HEX or DLC | Slab |
 
- | **Cable Routing** | Underfloor — convenient but congests plenum and blocks airflow at scale | Overhead trays — cleaner separation of power, data, and cooling pathways |
+ | Cable Routing | Underfloor — convenient but congests plenum and blocks airflow at scale | Overhead trays — cleaner separation of power, data, and cooling pathways | Slab |
 
- | **Cost per sq ft** | $35–65/sqft for floor system (panels, pedestals, stringers, seismic bracing) | $15–25/sqft for overhead infrastructure (cable trays, containment, supports) |
+ | Cost per sq ft | $35–65/sqft for floor system (panels, pedestals, stringers, seismic bracing) | $15–25/sqft for overhead infrastructure (cable trays, containment, supports) | Slab |
 
- | **Structural Load** | Limited by pedestal capacity; typical 2,500 lb/sqft concentrated load | Concrete slab supports 5,000+ lb/sqft; ideal for 30–50 kW AI/GPU racks |
+ | Structural Load | Limited by pedestal capacity; typical 2,500 lb/sqft concentrated load | Concrete slab supports 5,000+ lb/sqft; ideal for 30–50 kW AI/GPU racks | Slab |
 
- | **Flexibility** | Tiles are relocatable; layout changes are fast; cable moves are easy | Cable trays are fixed; layout changes require overhead re-routing |
+ | Flexibility | Tiles are relocatable; layout changes are fast; cable moves are easy | Cable trays are fixed; layout changes require overhead re-routing | Raised floor |
 
- | **Cooling Efficiency** | Underfloor leakage 20–40% through cable cutouts, misaligned tiles, and unsealed penetrations | Contained overhead or in-row delivery with less than 5% bypass air |
+ | Cooling Efficiency | Underfloor leakage 20–40% through cable cutouts, misaligned tiles, and unsealed penetrations | Contained overhead or in-row delivery with less than 5% bypass air | Slab |
 
- | **Modern Trend** | Legacy enterprise, colo, financial — still common in retrofits | Hyperscale standard (Google, Meta, AWS, Microsoft) since ~2015 |
-
-
-
-
-
-
-
-### Verdict: Slab-on-Grade for New Builds
-
-
-Slab-on-grade with overhead services is the modern standard for new data center construction. It offers lower cost, higher load capacity for dense AI/HPC racks, better cooling efficiency, and faster construction. Raised floor remains viable for enterprise retrofits, colocation facilities with diverse tenant requirements, and environments under 10 kW/rack average density.
+ | Modern Trend | Legacy enterprise, colo, financial — still common in retrofits | Hyperscale standard (Google, Meta, AWS, Microsoft) since ~2015 | Slab |
 
 
 
 
 
-
-## 01Airflow and Cooling Architecture
-
-
- **How floor design determines cooling delivery and efficiency **
+**Slab-on-Grade for New Builds.** Slab-on-grade with overhead services is the modern standard for new data center construction. It offers lower cost, higher load capacity for dense AI/HPC racks, better cooling efficiency, and faster construction. Raised floor remains viable for enterprise retrofits, colocation facilities with diverse tenant requirements, and environments under 10 kW/rack average density.
 
 
- Raised floor** creates an underfloor plenum (typically 18–36 inches) that acts as a cold air distribution chamber. CRAC/CRAH units push conditioned air into the plenum, which rises through perforated tiles at rack fronts. This works well at 3–8 kW/rack densities but breaks down at higher loads: cable bundles block airflow paths, tile placement becomes a complex fluid dynamics problem, and air bypass through cutouts and gaps wastes 20–40% of cooling capacity.
+
+
+
+## 02 Airflow and Cooling Architecture
+
+
+How floor design determines cooling delivery and efficiency.
+
+
+
+**Raised floor** creates an underfloor plenum (typically 18–36 inches) that acts as a cold air distribution chamber. CRAC/CRAH units push conditioned air into the plenum, which rises through perforated tiles at rack fronts. This works well at 3–8 kW/rack densities but breaks down at higher loads: cable bundles block airflow paths, tile placement becomes a complex fluid dynamics problem, and air bypass through cutouts and gaps wastes 20–40% of cooling capacity.
 
 
 **Slab-on-grade** eliminates the plenum entirely. Cooling is delivered via overhead ducting, in-row cooling units (IRCU), or rear-door heat exchangers mounted directly on racks. Hot/cold aisle containment is implemented with physical barriers (curtains, panels, or hard walls). This approach scales linearly — adding a 50 kW rack simply requires adding a matching in-row cooler, without redesigning the entire plenum airflow pattern.
@@ -18940,11 +18933,11 @@ Slab-on-grade with overhead services is the modern standard for new data center 
 
 
 
+## 03 Cable Management Strategy
 
-## 02Cable Management Strategy
 
+Underfloor vs overhead cabling and power distribution.
 
- **Underfloor vs overhead cabling and power distribution **
 
 
 Raised floor data centers route power, fiber, and copper cabling through the underfloor plenum. In early deployments, this is clean and organized. Over 5–10 years of growth, the plenum fills with abandoned cables ("cable spaghetti"), blocking up to 50% of the plenum cross-section. Studies by the Uptime Institute found that heavily cabled plenums reduce effective cooling delivery by 25–35%.
@@ -18957,45 +18950,45 @@ Slab-on-grade uses overhead cable trays at 2–3 tiers: top tier for power (busw
 
 
 
+## 04 Structural Load and Density Support
 
-## 03Structural Load and Density Support
 
+Why AI/GPU rack density favours the slab.
 
- Why AI/GPU rack density is driving the slab revolution **
 
 
 A fully loaded AI training rack with 8x NVIDIA H100 GPUs weighs 2,500–3,500 lbs. Standard raised floor panels (PSA/BIFMA rated) support 2,000–2,500 lbs concentrated load. Heavy-duty panels exist but cost 2–3x more and require reinforced pedestals and stringers, driving the floor system cost above $60/sqft.
 
 
-Concrete slab-on-grade (typically 6–8 inch reinforced slab with vapor barrier) supports 5,000+ lbs/sqft with no special treatment. For the AI/HPC revolution driving rack densities from 10 kW to 50–100 kW, slab-on-grade is structurally mandatory. Raised floor simply cannot handle the weight of liquid-cooled, GPU-dense cabinets without extensive (and expensive) reinforcement.
+Concrete slab-on-grade (typically 6–8 inch reinforced slab with vapor barrier) supports 5,000+ lbs/sqft with no special treatment. With rack densities rising from 10 kW to 50–100 kW, slab-on-grade is structurally mandatory. Raised floor cannot carry the weight of liquid-cooled, GPU-dense cabinets without extensive (and expensive) reinforcement.
 
 
 
 
 
 
+## 05 Construction Timeline and Cost
 
-## 04Construction Timeline and Cost
 
+Speed to deployment and total construction budget impact.
 
- Speed to deployment and total construction budget impact **
 
 
 Raised floor installation adds 4–8 weeks to the construction schedule. The process involves: slab leveling, pedestal layout and bonding, stringer installation, seismic bracing (in applicable zones), panel placement and grounding, and perforated tile placement with damper calibration. Each step requires specialized labor and quality inspection.
 
 
-Slab-on-grade construction skips all of these steps. Overhead cable trays are installed in parallel with other ceiling services (lighting, fire detection, VESDA sampling pipes). Total time savings: 3–6 weeks per data hall. For hyperscalers building 50–100 MW campuses, this acceleration translates to months of earlier revenue from IT deployment.
+Slab-on-grade skips these steps. Overhead cable trays are installed in parallel with other ceiling services (lighting, fire detection, VESDA sampling pipes). Total time savings: 3–6 weeks per data hall. For hyperscalers building 50–100 MW campuses, this acceleration translates to months of earlier revenue from IT deployment.
 
 
 
 
 
 
+## 06 Liquid Cooling Compatibility
 
-## 05Liquid Cooling Compatibility
 
+Direct liquid cooling and the end of air-only paradigms.
 
- Direct liquid cooling and the end of air-only paradigms **
 
 
 Direct liquid cooling (DLC) and immersion cooling require water/coolant piping to each rack. Running pressurized liquid lines through a raised floor plenum introduces leak risk directly above electrical infrastructure. A coolant leak in the plenum can propagate to multiple racks before detection, potentially shorting PDUs and cable connections below the floor.
@@ -19008,83 +19001,84 @@ Slab-on-grade facilities route coolant manifolds overhead or at slab level with 
 
 
 
-
-
-## Decision Helper
-
+## 07 Which one fits
 
 
 
- Choose Raised Floor if:** You are retrofitting an existing facility, tenant requirements vary widely (colocation), average rack density is under 10 kW, frequent layout changes are expected, or the facility is an enterprise campus with established raised-floor maintenance expertise.**
-
- Choose Slab-on-Grade if:** You are building new construction, rack densities will exceed 10 kW average, AI/GPU workloads are planned, liquid cooling is in the roadmap, construction speed matters, or you are building at hyperscale (10+ MW).
+ |
+ Choose raised floor if | Choose slab-on-grade if |
 
 
 
 
-
-
-
-
-## Frequently Asked Questions
-
-
-
- Why are hyperscale data centers moving away from raised floors? **
-
- Hyperscalers like Google, Meta, and Microsoft have largely abandoned raised floors in favor of slab-on-grade with overhead services. Reasons include: higher structural load capacity for dense AI/GPU racks (30-50 kW+), elimination of underfloor cable congestion that blocks airflow, faster construction timelines, lower cost per square foot, and better compatibility with rear-door heat exchangers and direct liquid cooling.
-
-
-
-
- What is the cost difference between raised floor and slab construction? **
-
- Raised floor adds $25-65 per square foot to construction cost depending on panel type, pedestal height, and load rating. A standard 18-inch raised floor with 2,500 lb/sqft concentrated load rating costs approximately $35-45/sqft installed. Slab-on-grade with overhead cable trays and containment costs $15-25/sqft for the equivalent infrastructure, representing 30-50% savings.
-
-
-
-
- Can you retrofit a raised floor data center to slab-on-grade? **
-
- Technically possible but rarely cost-effective for operating facilities. Retrofitting requires relocating all underfloor cabling and piping to overhead paths, installing new cable trays, modifying the cooling system from underfloor delivery to overhead or row-based units, and potentially reinforcing the structural slab. Most operators choose slab-on-grade for new builds while maintaining raised floors in existing facilities until end of life.
+ | You are retrofitting an existing facility, tenant requirements vary widely (colocation), average rack density is under 10 kW, frequent layout changes are expected, or the facility is an enterprise campus with established raised-floor maintenance expertise. | You are building new construction, rack densities will exceed 10 kW average, AI/GPU workloads are planned, liquid cooling is in the roadmap, construction speed matters, or you are building at hyperscale (10+ MW). |
 
 
 
 
 
 
-## Related Resources
+
+
+## 08 Questions
+
+
+### Why are hyperscale data centers moving away from raised floors?
+
+
+Hyperscalers like Google, Meta, and Microsoft have largely abandoned raised floors in favor of slab-on-grade with overhead services. Reasons include: higher structural load capacity for dense AI/GPU racks (30-50 kW+), elimination of underfloor cable congestion that blocks airflow, faster construction timelines, lower cost per square foot, and better compatibility with rear-door heat exchangers and direct liquid cooling.
 
 
 
+### What is the cost difference between raised floor and slab construction?
 
-#### ASHRAE Thermal Control
 
-
-ASHRAE TC 9.9 thermal guidelines for data center cooling design, envelope classes, and allowable ranges.
-
+Raised floor adds $25-65 per square foot to construction cost depending on panel type, pedestal height, and load rating. A standard 18-inch raised floor with 2,500 lb/sqft concentrated load rating costs approximately $35-45/sqft installed. Slab-on-grade with overhead cable trays and containment costs $15-25/sqft for the equivalent infrastructure, representing 30-50% savings.
 
 
 
-#### CAPEX Calculator
+### Can you retrofit a raised floor data center to slab-on-grade?
 
 
-Calculate total data center construction costs including flooring, cooling, and structural systems.
-
-
-
-
-#### DC Solutions Hub
-
-
-Explore all data center infrastructure solutions, calculators, and comparison tools.
-
+Technically possible but rarely cost-effective for operating facilities. Retrofitting requires relocating all underfloor cabling and piping to overhead paths, installing new cable trays, modifying the cooling system from underfloor delivery to overhead or row-based units, and potentially reinforcing the structural slab. Most operators choose slab-on-grade for new builds while maintaining raised floors in existing facilities until end of life.
 
 
 
 
 
- Technical Manual & Methodology ↗
+
+## 09 Related tools
+
+
+
+ |
+ Tool | What it does |
+
+
+
+
+ | ASHRAE Thermal Control | ASHRAE TC 9.9 thermal guidelines for data center cooling design, envelope classes, and allowable ranges. |
+
+ | CAPEX Calculator | Calculate total data center construction costs including flooring, cooling, and structural systems. |
+
+ | DC Solutions Hub | Explore all data center infrastructure solutions, calculators, and comparison tools. |
+
+
+
+
+
+
+
+
+
+
+10 / Reference
+
+
+### Read further
+
+
+Technical manual and methodologyAir vs liquid coolingCAPEX calculator
 
 
 ======================================================================
@@ -61347,105 +61341,97 @@ No neutral $/kW CDU price is publicly sourceable — so this is a **relative** t
 
 > A four-part CDU toolkit for AI/HPC data centers — selection guide, maintenance checklist, an interactive Mini-BMS cockpit, and a deep all-aspects comparison.
 
-≈
- 01 · Select
-
-## CDU Selection & Deployment Guide
+Liquid cooling · **CDU toolkit** · C.07
 
 
-Compare in-row, in-rack, sidecar, L2L vs L2A and 2-phase CDUs with verified vendor specs and manual links, the flow/ΔT sizing math, installation requirements, a documentation hub, and an FAQ.
-
- 9-col deep tables sizing math verified links
- Open the guide
+# Coolant distribution unit toolkit select, operate, visualise, size, compare
 
 
-
- ✓
- 02 · Operate
-
-## Install, Inspection & Maintenance Checklist
+Selection, deployment, operation, comparison and sizing of liquid-cooling CDUs for AI/HPC halls, as five linked pages.
 
 
-Operational parameter bands, water-quality acceptance criteria (ASHRAE W-classes, OCP limits), the numeric commissioning procedure, a symptom→cause→action table, PM cadences, and a printable service-record form.
-
- water quality commissioning printable form
- Open the checklist
+basis ASHRAE TC 9.9 · OCP · DMTF Redfish · published vendor datasheets · independent reference, not procurement or engineering advice
 
 
-
- **
- 03 · Visualise
-
-## CDU Mini-BMS
-
-
-An interactive cockpit per CDU type: datahall installation layout, a full ISA P&ID schematic, and live simulated parameters with sparkline trends — inject a fault (leak, pump-fail, clog…) and watch the controls respond.
-
- animated P&ID live params fault scenarios
- Open the cockpit
-
-
-
- ∑
- 05 · Calculate
-
-## Sizing & Thermohydraulic Calculator
-
-
-Size a CDU from first principles — secondary flow, pipe velocity, pressure drop (Darcy-Weisbach), heat-exchanger approach (ε-NTU), NPSH margin, dew-point reset and pump N+1 power — computed live by a validated engine with basis chips and band checks.
-
- validated engine ε-NTU + Darcy basis chips
- Open the calculator
-
-
-
- **
- 04 · Compare
-
-## Deep Comparison — All Aspects
-
-
-Source-tagged comparison across worldwide common field issues, control systems & BMS/DCIM integration, after-sales & warranty per vendor, and TCO & maintenance burden by type — plus a 10-vendor capability matrix.
-
- field issues control + TCO vendor matrix
- Open the comparison
-
-
-
-
- Maintenance intelligence — connect the toolkit to the FMECA knowledge base & spares engine
-
-
-
- **
- 06 · Diagnose
-
-## AI Engineering Maintenance & FMECA
-
-
-The FMECA + Knowledge-Graph + ML-advisor concept for data-center asset failure analysis. The CDU liquid-cooling fault modes in this toolkit — **F11.1** coolant-chemistry drift, **F11.2** CDU-pump failure, **F11.3** manifold/hose leak, **F11.4** fluid degradation, **F11.5** filter clogging — are the very faults the Mini-BMS injects and the checklist tracks, mapped to mechanisms, effects, corrective actions and RPN risk.
-
- FMECA-KG F11.1–F11.5 RPN risk
- Open the knowledge base
-
-
-
- **
- 07 · Stock
-
-## Critical Spares Readiness
-
-
-Quantify stocking levels, supplier risk and obsolescence exposure for CDU critical spares — FMECA criticality scoring, newsvendor optimal stock, multi-site hub positioning and last-time-buy economics. Pairs directly with the checklist's §07 spare-parts & consumables register.
-
- FMECA criticality newsvendor last-time-buy
- Open the spares engine
+DC Solutions → CDU toolkit
 
 
 
 
 
- **What is a CDU?** A Coolant Distribution Unit hydraulically decouples the facility water loop from the chip-side technology cooling loop and regulates flow, temperature and pressure to direct-to-chip cold plates. This toolkit is an independent, educational reference built from published vendor datasheets and standards (ASHRAE TC 9.9, OCP, DMTF Redfish) — every figure is source-tagged, and links are validated. Not procurement, safety, or engineering advice.
+
+## 01 The toolkit
+
+
+Five linked resources, in the order a CDU project uses them.
+
+
+
+ |
+ No. | Step | Tool | What it covers |
+
+
+
+
+ | 01 | Select | CDU Selection & Deployment Guide | Compare in-row, in-rack, sidecar, L2L vs L2A and 2-phase CDUs with verified vendor specs and manual links, the flow/ΔT sizing math, installation requirements, a documentation hub, and an FAQ. |
+
+ | 02 | Operate | Install, Inspection & Maintenance Checklist | Operational parameter bands, water-quality acceptance criteria (ASHRAE W-classes, OCP limits), the numeric commissioning procedure, a symptom→cause→action table, PM cadences, and a printable service-record form. |
+
+ | 03 | Visualise | CDU Mini-BMS | An interactive cockpit per CDU type: datahall installation layout, a full ISA P&ID schematic, and live simulated parameters with sparkline trends — inject a fault (leak, pump-fail, clog…) and watch the controls respond. |
+
+ | 04 | Compare | Deep Comparison — All Aspects | Source-tagged comparison across worldwide common field issues, control systems & BMS/DCIM integration, after-sales & warranty per vendor, and TCO & maintenance burden by type — plus a 10-vendor capability matrix. |
+
+ | 05 | Calculate | Sizing & Thermohydraulic Calculator | Size a CDU from first principles — secondary flow, pipe velocity, pressure drop (Darcy-Weisbach), heat-exchanger approach (ε-NTU), NPSH margin, dew-point reset and pump N+1 power — computed live by a validated engine with basis chips and band checks. |
+
+
+
+
+
+
+
+
+## 02 Maintenance links
+
+
+Two tools outside the toolkit that share its fault modes (F11.1 to F11.5) and its spares register.
+
+
+
+ |
+ No. | Step | Tool | What it covers |
+
+
+
+
+ | 06 | Diagnose | AI Engineering Maintenance & FMECA | The FMECA + Knowledge-Graph + ML-advisor concept for data-center asset failure analysis. The CDU liquid-cooling fault modes in this toolkit — **F11.1** coolant-chemistry drift, **F11.2** CDU-pump failure, **F11.3** manifold/hose leak, **F11.4** fluid degradation, **F11.5** filter clogging — are the very faults the Mini-BMS injects and the checklist tracks, mapped to mechanisms, effects, corrective actions and RPN risk. |
+
+ | 07 | Stock | Critical Spares Readiness | Quantify stocking levels, supplier risk and obsolescence exposure for CDU critical spares — FMECA criticality scoring, newsvendor optimal stock, multi-site hub positioning and last-time-buy economics. Pairs directly with the checklist's §07 spare-parts & consumables register. |
+
+
+
+
+
+
+
+
+## 03 What a CDU does
+
+
+A Coolant Distribution Unit hydraulically decouples the facility water loop from the chip-side technology cooling loop and regulates flow, temperature and pressure to direct-to-chip cold plates.
+
+
+
+
+
+
+
+04 / Reference
+
+
+### Read further
+
+
+Technical manual and methodologyCDU selection guideAir vs liquid cooling
 
 
 ======================================================================
@@ -172178,159 +172164,111 @@ Pick up to 4 protocols and watch them run on the same wall clock. The chip strip
 
 > 25 animated, parameter-driven labs for industrial and IT protocols: Modbus, BACnet, OPC-UA, TLS, OAuth, gRPC and MCP.
 
-# Network Visualization Hub
+Knowledge labs · **Network** · L.03
 
 
-25 animated, parameter-driven labs for industrial & IT communication protocols — from Modbus RTU on RS-485 to MCP tool-calls between AI agents. Oscilloscope-grade industrial register; not consumer techno music video.
+# Network visualization hub 25 protocol labs in five lanes
 
 
- **FREE** public-tier
- **5 lanes** · 25 topics
- **CompTIA** Net+ N10-009 + Sec+ SY0-701 aligned
- **Canvas 2D + Web Audio** · zero framework
+Animated, parameter-driven labs for industrial and IT communication protocols, from Modbus RTU on RS-485 to MCP tool calls between AI agents.
 
 
+Canvas 2D + Web Audio · CompTIA Network+ N10-009 and Security+ SY0-701 aligned · all 25 labs live · free
 
 
+DC Solutions → Knowledge labs → Network hub
 
 
 
 
-## Industrial OT Lane B · 9 topics
 
 
-Field protocols that move bytes between PLCs, RTUs, BMS controllers, chillers, and sensors. The protocols that run your building when nobody's looking.
+## 01 Foundations lane A · 5 topics
 
 
+The conceptual scaffolding every networking engineer needs.
 
 
- Modbus RTU LIVE
- Serial master/slave over RS-485 · square-sweep 1200→1600 Hz · square chips on thin wire · 1979
 
+ |
+ Protocol | What the animation shows |
 
 
- Modbus TCP LIVE
- MBAP-header byte exchange over Ethernet · sine 1.3 kHz · rect chips · MBAP overhead visibly larger
 
 
+ | OSI / TCP-IP models | Byte chip ascends 7-layer stack vertically |
 
- BACnet MS/TP LIVE
- Token-passing on RS-485 · sine-sweep · hex chips · amber token chip passes between nodes before any data frame
+ | IPv4 vs IPv6 | Side-by-side · v6 chip visibly 4× wider |
 
+ | Subnetting / CIDR | Subnet boundary line on wire = CIDR prefix |
 
+ | TCP handshake | SYN / SYN-ACK / ACK as 3 distinct chip shapes |
 
- BACnet/IP LIVE
- BACnet over UDP/IP · triangle waveform · hex chips · BVLC tunnel scan-line at packet head
+ | DHCP / DNS | 4-stage DORA · monotonic ascending pitch |
 
 
 
- OPC-UA LIVE
- Subscription model · sine-sweep · layered chips · always-on encryption shroud · broker-diamond client
 
 
 
- DNP3 LIVE
- Telemetry SCADA · sine-sweep 600→900 Hz · UNSOLICITED responses (outstation pushes spontaneously)
 
 
+## 02 Industrial OT lane B · 9 topics
 
- PROFINET LIVE
- Real-time industrial Ethernet · sync line above wire shows cyclic deterministic timing
 
+Field protocols that move bytes between PLCs, RTUs, BMS controllers, chillers, and sensors.
 
 
- EtherNet/IP LIVE
- CIP over Ethernet · sawtooth · envelope chips with rotating marker-stripe head (ENIP/CPF/CIP-Conn/CIP-Svc)
 
+ |
+ Protocol | What the animation shows |
 
 
- EtherCAT LIVE
- Distributed clocks · telegram passes through every slave on-the-fly · ultra-fast 1 ms cycles
 
 
+ | Modbus RTU | Serial master/slave over RS-485 · square-sweep 1200→1600 Hz · square chips on thin wire · 1979 |
 
+ | Modbus TCP | MBAP-header byte exchange over Ethernet · sine 1.3 kHz · rect chips · MBAP overhead visibly larger |
 
+ | BACnet MS/TP | Token-passing on RS-485 · sine-sweep · hex chips · amber token chip passes between nodes before any data frame |
 
+ | BACnet/IP | BACnet over UDP/IP · triangle waveform · hex chips · BVLC tunnel scan-line at packet head |
 
+ | OPC-UA | Subscription model · sine-sweep · layered chips · always-on encryption shroud · broker-diamond client |
 
+ | DNP3 | Telemetry SCADA · sine-sweep 600→900 Hz · UNSOLICITED responses (outstation pushes spontaneously) |
 
-## Foundations Lane A · 5 topics
+ | PROFINET | Real-time industrial Ethernet · sync line above wire shows cyclic deterministic timing |
 
+ | EtherNet/IP | CIP over Ethernet · sawtooth · envelope chips with rotating marker-stripe head (ENIP/CPF/CIP-Conn/CIP-Svc) |
 
-The conceptual scaffolding every networking engineer needs but most CompTIA courses gloss past.
+ | EtherCAT | Distributed clocks · telegram passes through every slave on-the-fly · ultra-fast 1 ms cycles |
 
 
 
- OSI / TCP-IP models LIVE
- Byte chip ascends 7-layer stack vertically
 
 
- IPv4 vs IPv6 LIVE
- Side-by-side · v6 chip visibly 4× wider
 
 
- Subnetting / CIDR LIVE
- Subnet boundary line on wire = CIDR prefix
 
-
- TCP handshake LIVE
- SYN / SYN-ACK / ACK as 3 distinct chip shapes
-
-
- DHCP / DNS LIVE
- 4-stage DORA · monotonic ascending pitch
-
-
-
-
-
-
-
-## DC Management Lane C · 3 topics
+## 03 DC Management lane C · 3 topics
 
 
 Operator-side monitoring, telemetry, and management plane protocols.
 
 
 
- SNMP LIVE
- Polling cadence visible as amber-dot metronome
-
-
- IPMI / Redfish LIVE
- OOB sideband-dashed wire · independent of data plane
-
-
- syslog LIVE
- Long-rect line chips · one-way append-only stream
+ |
+ Protocol | What the animation shows |
 
 
 
 
+ | SNMP | Polling cadence visible as amber-dot metronome |
 
+ | IPMI / Redfish | OOB sideband-dashed wire · independent of data plane |
 
-
-## Security Lane D · 4 topics
-
-
-Cryptographic ceremonies and secure transport. The handshakes that wrap modern traffic.
-
-
-
- TLS handshake LIVE
- Scan-line shroud builds progressively across handshake
-
-
- OAuth 2.0 / JWT LIVE
- 4-actor dance · amber→cyan flow-stage tint on token issue
-
-
- mTLS LIVE
- Bilateral — both nodes cert-badged · handshake echoes both ways
-
-
- WireGuard LIVE
- Minimalist · pre-keyed mesh · always-on encryption
+ | syslog | Long-rect line chips · one-way append-only stream |
 
 
 
@@ -172338,43 +172276,91 @@ Cryptographic ceremonies and secure transport. The handshakes that wrap modern t
 
 
 
-## APIs + Agents Lane E · 4 topics
+
+## 04 Security lane D · 4 topics
+
+
+Cryptographic ceremonies and secure transport.
+
+
+
+ |
+ Protocol | What the animation shows |
+
+
+
+
+ | TLS handshake | Scan-line shroud builds progressively across handshake |
+
+ | OAuth 2.0 / JWT | 4-actor dance · amber→cyan flow-stage tint on token issue |
+
+ | mTLS | Bilateral — both nodes cert-badged · handshake echoes both ways |
+
+ | WireGuard | Minimalist · pre-keyed mesh · always-on encryption |
+
+
+
+
+
+
+
+
+## 05 APIs + Agents lane E · 4 topics
 
 
 HTTP-family protocols and the new AI-agent transports.
 
 
 
- REST API LIVE
- Envelope chip · header/body distinct · server-processing gap
-
-
- GraphQL LIVE
- One outbound long-rect query · multiple inbound chips (3-shape cap)
-
-
- gRPC LIVE
- HTTP/2 4-lane multiplex · simultaneous stream chips
-
-
- MCP tool-call LIVE
- 3-actor RPC · mesh-tunnel · industrial register held
+ |
+ Protocol | What the animation shows |
 
 
 
 
+ | REST API | Envelope chip · header/body distinct · server-processing gap |
 
+ | GraphQL | One outbound long-rect query · multiple inbound chips (3-shape cap) |
 
-### Compare mode LIVE
+ | gRPC | HTTP/2 4-lane multiplex · simultaneous stream chips |
 
-
-4-panel side-by-side comparison with normalised instrument chip strip (throughput, latency, overhead, status). All 4 Lane B protocols available. **Open compare →**
+ | MCP tool-call | 3-actor RPC · mesh-tunnel · industrial register held |
 
 
 
 
 
- Technical Manual & Methodology ↗
+
+
+
+## 06 Compare mode
+
+
+
+ |
+ Tool | What it does |
+
+
+
+
+ | Compare mode | Four panels side by side with a normalised strip per protocol (throughput, latency, overhead, status). All four lane B protocols are available. |
+
+
+
+
+
+
+
+
+
+
+07 / Reference
+
+
+### Read further
+
+
+Technical manual and methodologyAll tools
 
 
 ======================================================================
@@ -176674,22 +176660,75 @@ Footnote: The Java-Bali submarine interconnect lands at Banyuwangi (Ketapang sub
 
 > The PLN Sumatra 275/150 kV interconnected grid for AI/HPC siting: the north-south backbone, key substations, plants, and the Batam-Bintan grid.
 
-** 275 kV backbone
- ** 150 kV
- ** Batam island (separate)
- ** Substation
- ** Plant
- ** Data center
+Grid monitors · **Sumatra** · G.02
 
 
- **Batam is islanded.** The Batam-Bintan-Rempang-Galang (Barelang) 150 kV grid is *not* synchronously tied to the mainland Sumatra interconnection — it is its own system run by b'right PLN Batam, with **Medco Power's Panaran gas plants** and PLTU Tanjung Kasam as base-load, and the Nongsa Digital Park subsea-cable DC hub as a fast-growing, Singapore-adjacent AI/edge load.
+# PLN Sumatra interconnected grid and the Batam island system
 
 
-## Substation & plant atlas
+The Sumatra 275/150 kV system, a north-south backbone from Aceh through Medan, Pekanbaru and Palembang to Lampung, plus the separate Batam-Bintan (Barelang) island grid run by PLN Batam, where Medco Power operates the Panaran gas plants.
+
+
+source RUPTL 2025-2034 / PLN AR 2024 / public sources · dataset version 2026-06-26 · coordinates approximate; not an operational topology
+
+
+DC Solutions → Java-Bali grid → Sumatra grid
+
+
+
+
+
+
+## 01 Grid map
+
+
+Click the map to enable scroll zoom; click a mark for its rating, operator and confidence.
+
+
+
+
+ 275 kV backbone 150 kV Batam island (separate grid) **Substation **Plant **Data center
+
+ **FIG. 1** Source: RUPTL 2025-2034 / PLN AR 2024 / public sources. Coordinates approximate; not an operational topology. Dataset version 2026-06-26 .
+
+
+
+
+
+## 02 What the dataset holds
+
+
+
+**Batam is islanded.** The Batam-Bintan-Rempang-Galang (Barelang) 150 kV grid is *not* synchronously tied to the mainland Sumatra interconnection — it is its own system run by b'right PLN Batam, with **Medco Power's Panaran gas plants** and PLTU Tanjung Kasam as base-load, and the Nongsa Digital Park subsea-cable DC hub, a Singapore-adjacent AI/edge load.
+
+
+
+
+
+## 03 Substation and plant atlas
+
+
+Sorted by province. Capacity is MW for plants and MVA for substations.
 
 
  |
  Node | Type | kV | Capacity | Region | Notes |
+
+
+
+
+
+
+
+
+
+04 / Reference
+
+
+### Read further
+
+
+Technical manual and methodologyJava-Bali grid monitorThe dataset (JavaScript, with sources)
 
 
 ======================================================================

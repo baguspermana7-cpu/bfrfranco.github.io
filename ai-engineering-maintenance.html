@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-rz-register="tool">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
     <link rel="canonical" href="https://resistancezero.com/ai-engineering-maintenance.html">
     <link rel="alternate" hreflang="en" href="https://resistancezero.com/ai-engineering-maintenance.html">
     <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/ai-engineering-maintenance.html">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#0b0c0e">
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
 
@@ -38,7 +38,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -69,464 +69,104 @@
     <script src="js/rz-version.js?v=20261103-89b417e5" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
-
-    <style>
-        /* site register: graphite + one amber. "--cyan" kept as a NAME so every rule and the diagram legend
-           still resolve, but it is a neutral now: it was instrument cyan on links, headings, pills, the
-           primary button and one diagram path; that path stays distinct from the amber path by tone. */
-        :root {
-            --bg: #0e0f12;
-            --bg-solid: #0e0f12;
-            --panel: #16181D;
-            --panel-inner: rgba(22,24,29,0.6);
-            --panel-hover: #1d2026;
-            --text: #CFD3DA;
-            --text-strong: #F6F7F9;
-            --text-body: #CFD3DA;
-            --muted: #969eaa;
-            --line: rgba(160,168,180,0.24);
-            --line-soft: rgba(160,168,180,0.14);
-
-            --cyan: #CFD3DA;
-            --cyan-dim: rgba(160,168,180,0.45);
-            --amber: #E8B563;
-            --amber-dim: rgba(232,181,99,0.5);
-            --green: #6aa588;
-            --green-dim: rgba(106,165,136,0.5);
-            --red: #FF3030;
-            --red-dim: rgba(255,48,48,0.5);
-
-            --shadow: rgba(0,0,0,0.35);
-            --shadow-deep: rgba(0,0,0,0.45);
-            --kv-bg: rgba(14,15,18,0.6);
-            --grad-top: transparent;
-            --grad-bot: transparent;
-            --pill-bg: transparent;
-            --pill-border: rgba(160,168,180,0.32);
-            --pill-color: #CFD3DA;
-            --pill-amber-bg: rgba(232,181,99,0.10);
-            --pill-amber-border: rgba(232,181,99,0.40);
-            --pill-amber-color: #E8B563;
-            --pill-green-bg: rgba(106,165,136,0.14);
-            --pill-green-border: rgba(106,165,136,0.40);
-            --pill-green-color: #86efac;
-            --pill-red-bg: rgba(255,48,48,0.14);
-            --pill-red-border: rgba(255,48,48,0.40);
-            --pill-red-color: #fca5a5;
-            --svg-bg: #121316;
-        }
-        [data-theme="light"] {
-            --bg: #f8f9fa; --bg-solid: #f8f9fa;
-            --panel: #ffffff;
-            --panel-inner: #f1f3f5;
-            --panel-hover: #e9ecef;
-            --text: #343a40; --text-strong: #1a1d23; --text-body: #343a40; --muted: #5c6470;
-            --line: rgba(40,44,52,0.18); --line-soft: rgba(40,44,52,0.10);
-            --cyan: #343a40; --cyan-dim: rgba(40,44,52,0.4);
-            --amber: #92400e; --amber-dim: rgba(146,64,14,0.5);
-            --green: #047857; --green-dim: rgba(4,120,87,0.5);
-            --red: #b91c1c; --red-dim: rgba(185,28,28,0.5);
-            --shadow: rgba(40,44,52,0.10); --shadow-deep: rgba(40,44,52,0.16);
-            --kv-bg: #f1f3f5;
-            --grad-top: transparent; --grad-bot: transparent;
-            --pill-bg: transparent; --pill-border: rgba(40,44,52,0.28); --pill-color: #343a40;
-            --pill-amber-bg: rgba(146,64,14,0.08); --pill-amber-border: rgba(146,64,14,0.4); --pill-amber-color: #92400e;
-            --pill-green-bg: rgba(4,120,87,0.10); --pill-green-border: rgba(4,120,87,0.4); --pill-green-color: #14532d;
-            --pill-red-bg: rgba(185,28,28,0.10); --pill-red-border: rgba(185,28,28,0.4); --pill-red-color: #7f1d1d;
-            --svg-bg: #f1f3f5;
-        }
-        .hero .cite a, footer .citation-block a { text-decoration: underline; text-underline-offset: 2px; }
-        .root-actions button { background: var(--amber) !important; color: #0E0F12 !important; }
-        [data-theme="light"] .root-actions button { color: #ffffff !important; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { overflow-x: hidden; max-width: 100vw; }
-        body {
-            font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-            min-height: 100vh;
-            background: radial-gradient(ellipse at top right, var(--grad-top), transparent 45%),
-                        radial-gradient(ellipse at bottom left, var(--grad-bot), transparent 52%),
-                        var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-        }
-        img, picture, video, svg { max-width: 100%; height: auto; display: block; }
-
-        /* Navbar (canonical pattern from LTC pages) */
-        .navbar { position: sticky; top: 0; z-index: 1000; background: rgba(11,19,36,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 1rem; }
-        [data-theme="light"] .navbar { background: rgba(255,255,255,0.92); }
-        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; height: 56px; gap: 0.5rem; }
-        .nav-logo { display: flex; align-items: center; text-decoration: none; margin-right: 1rem; flex-shrink: 0; }
-        .nav-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
-        .nav-menu { display: flex; list-style: none; gap: 0.15rem; align-items: center; flex: 1; }
-        .nav-link { padding: 0.45rem 0.65rem; color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 500; border-radius: 8px; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
-        .nav-link:hover { color: var(--text); background: rgba(148,163,184,0.1); }
-        .nav-dropdown { position: relative; }
-        .dropdown-arrow { width: 10px; height: 10px; transition: transform 0.2s; }
-        .nav-dropdown:hover .dropdown-arrow { transform: rotate(180deg); }
-        .dropdown-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--bg-solid); border: 1px solid var(--line); min-width: 180px; border-radius: 10px; box-shadow: 0 10px 40px var(--shadow-deep); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s, visibility 0.2s; z-index: 1001; padding: 8px 0; }
-        .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; pointer-events: auto; }
-        .dropdown-menu li { list-style: none; padding: 0; }
-        .dropdown-menu a { display: block; padding: 0.45rem 1rem; color: var(--text-body); text-decoration: none; font-size: 0.8rem; transition: background 0.15s; }
-        .dropdown-menu a:hover { background: rgba(148,163,184,0.1); }
-        .theme-toggle { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: rgba(148,163,184,0.1); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-        .theme-toggle:hover { background: rgba(148,163,184,0.2); transform: scale(1.05); }
-        .theme-toggle svg { width: 20px; height: 20px; }
-        .theme-toggle .sun-icon { color: var(--amber); display: none; }
-        .theme-toggle .moon-icon { color: var(--muted); display: block; }
-        [data-theme="light"] .theme-toggle .sun-icon { display: block; }
-        [data-theme="light"] .theme-toggle .moon-icon { display: none; }
-        [data-theme="light"] .theme-toggle { background: rgba(100,116,139,0.08); border-color: rgba(100,116,139,0.2); }
-        .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; background: none; border: none; padding: 8px; border-radius: 8px; }
-        .hamburger:hover { background: rgba(148,163,184,0.1); }
-        .bar { width: 22px; height: 2.5px; background: var(--muted); border-radius: 3px; transition: all 0.3s; }
-        @media (max-width: 900px) {
-            .nav-menu { display: none; position: absolute; top: 56px; left: 0; right: 0; background: var(--bg-solid); border-bottom: 1px solid var(--line); flex-direction: column; padding: 0.5rem; gap: 0; box-shadow: 0 8px 20px var(--shadow); }
-            .nav-menu.active { display: flex; }
-            .hamburger { display: flex; }
-            .dropdown-menu { position: static; transform: none; box-shadow: none; border: none; padding-left: 1rem; }
-        }
-
-        /* Layout */
-        .wrap { max-width: 1180px; margin: 0 auto; padding: 1.2rem 1rem 2rem; }
-        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 0.7rem; margin-bottom: 1rem; flex-wrap: wrap; }
-        .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; border-radius: 10px; border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: background 0.2s; }
-        .back:hover { background: rgba(148,163,184,0.1); }
-        .pill { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.32rem 0.7rem; border-radius: 4px; border: 1px solid var(--pill-border); background: var(--pill-bg); color: var(--pill-color); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
-        .pill-amber { border-color: var(--pill-amber-border); background: var(--pill-amber-bg); color: var(--pill-amber-color); }
-        .pill-green { border-color: var(--pill-green-border); background: var(--pill-green-bg); color: var(--pill-green-color); }
-        .pill-red { border-color: var(--pill-red-border); background: var(--pill-red-bg); color: var(--pill-red-color); }
-
-        /* Hero */
-        .hero { border: 1px solid var(--line); border-radius: 4px; background: var(--panel); box-shadow: 0 12px 28px var(--shadow); padding: 1.4rem 1.3rem; margin-bottom: 1.1rem; }
-        .hero h1 { font-size: clamp(1.4rem, 3vw, 2rem); margin: 0.5rem 0 0.5rem; line-height: 1.25; color: var(--text-strong); letter-spacing: -0.01em; }
-        .hero .subtitle { color: var(--text-body); line-height: 1.6; font-size: 0.96rem; max-width: 880px; margin-bottom: 0.8rem; }
-        .hero .cite { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); padding: 0.55rem 0.7rem; background: var(--kv-bg); border-left: 2px solid var(--cyan); border-radius: 4px; max-width: 880px; }
-        .hero .cite a { color: var(--cyan); text-decoration: none; }
-        .hero .cite a:hover { text-decoration: underline; }
-
-        /* Concept summary tiles */
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.65rem; margin-top: 1rem; }
-        .sum-tile { border: 1px solid var(--line); border-radius: 4px; background: var(--panel-inner); padding: 0.7rem 0.85rem; }
-        .sum-tile .num { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--cyan); letter-spacing: 0.1em; font-weight: 700; }
-        .sum-tile .ttl { font-size: 0.92rem; font-weight: 700; color: var(--text-strong); margin: 0.2rem 0 0.3rem; }
-        .sum-tile .dsc { font-size: 0.78rem; color: var(--text-body); line-height: 1.5; }
-        .sum-tile.amber .num { color: var(--amber); }
-        .sum-tile.green .num { color: var(--green); }
-        .sum-tile.red .num { color: var(--red); }
-
-        /* v1.40.0 — Pro-only page: hide demo-credential hint in the global auth modal.
-           Demo accounts cannot pass page-access:{demo:false}; advertising the credential
-           creates a UX trap (modal says "use demo", page then refuses). Page-scoped only. */
-        .rz-demo-hint { display: none !important; }
-
-        /* Section nav */
-        .section-nav { position: sticky; top: 56px; z-index: 100; display: flex; gap: 0.35rem; padding: 0.55rem 0.55rem; background: rgba(11,19,36,0.92); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 1rem; overflow-x: auto; scrollbar-width: none; }
-        .section-nav::-webkit-scrollbar { display: none; }
-        [data-theme="light"] .section-nav { background: rgba(255,255,255,0.94); }
-        .nav-pill { flex-shrink: 0; padding: 0.36rem 0.7rem; border-radius: 8px; font-size: 0.72rem; font-weight: 600; color: var(--muted); text-decoration: none; border: 1px solid transparent; transition: all 0.2s; white-space: nowrap; }
-        .nav-pill:hover { color: var(--text); background: rgba(148,163,184,0.1); }
-        .nav-pill.active { color: var(--pill-color); background: var(--pill-bg); border-color: var(--pill-border); }
-
-        /* Section */
-        .section { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: 0 10px 24px var(--shadow); padding: 1.2rem 1.2rem; margin-bottom: 1rem; }
-        .section h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-strong); }
-        .section h2 i { color: var(--cyan); font-size: 0.95rem; }
-        .section .intro { color: var(--text-body); font-size: 0.88rem; line-height: 1.7; margin-bottom: 0.9rem; }
-
-        /* Module 2x2 grid */
-        .modules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
-        @media (max-width: 760px) { .modules-grid { grid-template-columns: 1fr; } }
-        .module-card { border: 1px solid var(--line); border-radius: 4px; background: var(--panel-inner); padding: 0.95rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .module-card .mc-head { display: flex; align-items: center; gap: 0.5rem; }
-        .module-card .mc-num { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--amber); background: var(--pill-amber-bg); border: 1px solid var(--pill-amber-border); border-radius: 6px; padding: 0.15rem 0.45rem; font-weight: 700; }
-        .module-card .mc-name { font-size: 1rem; font-weight: 700; color: var(--text-strong); }
-        .module-card .mc-role { font-size: 0.82rem; color: var(--cyan); font-family: 'JetBrains Mono', monospace; margin-top: -0.1rem; }
-        .module-card .mc-body { font-size: 0.82rem; color: var(--text-body); line-height: 1.55; }
-        .module-card .mc-meta { display: grid; grid-template-columns: 80px 1fr; gap: 0.35rem 0.6rem; font-size: 0.76rem; padding-top: 0.5rem; border-top: 1px dashed var(--line-soft); }
-        .module-card .mc-meta dt { color: var(--muted); font-family: 'JetBrains Mono', monospace; }
-        .module-card .mc-meta dd { color: var(--text-body); }
-        .module-card .mc-svg { background: var(--svg-bg); border: 1px solid var(--line-soft); border-radius: 8px; padding: 0.4rem; margin-top: 0.45rem; }
-        .module-card .mc-svg svg { width: 100%; height: auto; }
-
-        /* Mode comparison cards */
-        .modes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
-        @media (max-width: 760px) { .modes-grid { grid-template-columns: 1fr; } }
-        .mode-card { border: 1px solid var(--line); border-radius: 4px; background: var(--panel-inner); padding: 0.95rem; display: flex; flex-direction: column; gap: 0.6rem; }
-        .mode-card.cyan { border-color: var(--cyan-dim); }
-        .mode-card.amber { border-color: var(--amber-dim); }
-        .mode-card .mode-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; display: inline-block; padding: 0.2rem 0.55rem; border-radius: 4px; }
-        .mode-card.cyan .mode-tag { color: var(--cyan); background: var(--pill-bg); border: 1px solid var(--pill-border); }
-        .mode-card.amber .mode-tag { color: var(--amber); background: var(--pill-amber-bg); border: 1px solid var(--pill-amber-border); }
-        .mode-card .mode-title { font-size: 1.05rem; font-weight: 700; color: var(--text-strong); }
-        .mode-card .mode-sub { font-size: 0.82rem; color: var(--text-body); line-height: 1.55; }
-        .mode-card .mode-svg { background: var(--svg-bg); border: 1px solid var(--line-soft); border-radius: 8px; padding: 0.5rem; }
-        .mode-card .mode-svg svg { width: 100%; height: auto; }
-        .mode-card .qa { background: var(--kv-bg); border-radius: 4px; padding: 0.55rem 0.7rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 1.6; }
-        .mode-card .qa .q { color: var(--cyan); }
-        .mode-card.amber .qa .q { color: var(--amber); }
-        .mode-card .qa .a { color: var(--text-body); margin-top: 0.3rem; }
-        .mode-card .pros { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; font-size: 0.76rem; }
-        .mode-card .pros .strong, .mode-card .pros .weak { padding: 0.45rem 0.55rem; border-radius: 6px; line-height: 1.5; }
-        .mode-card .pros .strong { background: rgba(106,165,136,0.08); border-left: 2px solid var(--green); color: var(--text-body); }
-        .mode-card .pros .weak { background: rgba(255,48,48,0.08); border-left: 2px solid var(--red); color: var(--text-body); }
-        .mode-card .pros b { color: var(--text-strong); font-weight: 700; display: block; margin-bottom: 0.2rem; font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; }
-
-        /* Case study numbers */
-        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.55rem; margin-bottom: 0.85rem; }
-        .kpi { border: 1px solid var(--line); border-radius: 4px; background: var(--panel-inner); padding: 0.65rem 0.8rem; }
-        .kpi .kl { font-family: 'JetBrains Mono', monospace; font-size: 0.66rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-        .kpi .kv { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text-strong); margin-top: 0.2rem; }
-        .kpi .ks { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
-        .kpi.cyan .kv { color: var(--cyan); }
-        .kpi.amber .kv { color: var(--amber); }
-        .kpi.green .kv { color: var(--green); }
-        .kpi.red .kv { color: var(--red); }
-
-        /* Data table */
-        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; border: 1px solid var(--line); }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .data-table th { background: var(--pill-bg); color: var(--pill-color); text-align: left; padding: 0.55rem 0.75rem; font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--line); }
-        .data-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--line-soft); color: var(--text-body); }
-        .data-table tr:hover td { background: rgba(148,163,184,0.06); }
-        .data-table tr:last-child td { border-bottom: none; }
-        .data-table .num { font-family: 'JetBrains Mono', monospace; text-align: right; }
-        .data-table .hl { color: var(--text-strong); font-weight: 700; }
-        .data-table .weak { color: var(--red); font-weight: 700; }
-        .data-table .best { color: var(--green); font-weight: 700; }
-
-        /* Gap accordions */
-        .gap { margin-bottom: 0.55rem; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--panel-inner); }
-        .gap > summary { display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 0.85rem; cursor: pointer; user-select: none; font-size: 0.9rem; font-weight: 600; color: var(--text-strong); list-style: none; }
-        .gap > summary::-webkit-details-marker { display: none; }
-        .gap > summary:hover { background: var(--panel-hover); }
-        .gap > summary .gap-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: var(--pill-amber-bg); color: var(--pill-amber-color); font-size: 0.78rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; border: 1px solid var(--pill-amber-border); flex-shrink: 0; }
-        .gap > summary .gap-chev { margin-left: auto; font-size: 0.75rem; color: var(--muted); transition: transform 0.25s; }
-        .gap[open] > summary .gap-chev { transform: rotate(180deg); }
-        .gap-body { padding: 0.2rem 0.95rem 0.9rem; border-top: 1px dashed var(--line-soft); }
-        .gap-body .row { display: grid; grid-template-columns: 100px 1fr; gap: 0.6rem 0.8rem; font-size: 0.84rem; padding: 0.55rem 0; border-bottom: 1px dashed var(--line-soft); }
-        .gap-body .row:last-child { border-bottom: none; }
-        .gap-body .row dt { font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 0.1rem; }
-        .gap-body .row dd { color: var(--text-body); line-height: 1.6; }
-        .gap-body .row.gap-tag dd { color: var(--red); }
-        .gap-body .row.gap-why dd { color: var(--text-strong); }
-        .gap-body .row.gap-enh dd { color: var(--green); }
-        .gap-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; background: var(--kv-bg); border: 1px solid var(--line-soft); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--cyan); }
-
-        /* Roadmap phases */
-        .phase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.7rem; }
-        .phase { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-inner); padding: 0.85rem 0.9rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .phase .ph-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--amber); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
-        .phase .ph-title { font-size: 0.95rem; font-weight: 700; color: var(--text-strong); line-height: 1.3; }
-        .phase ul { list-style: none; font-size: 0.78rem; color: var(--text-body); line-height: 1.55; }
-        .phase ul li { padding-left: 1rem; position: relative; margin-bottom: 0.18rem; }
-        .phase ul li:before { content: ''; position: absolute; left: 0.2rem; top: 0.5rem; width: 4px; height: 4px; border-radius: 50%; background: var(--cyan); }
-        .phase .ph-complex { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); padding-top: 0.35rem; border-top: 1px dashed var(--line-soft); margin-top: auto; }
-        .phase .ph-complex b { color: var(--amber); }
-
-        /* Open questions */
-        .questions { display: grid; gap: 0.55rem; }
-        .question { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-inner); padding: 0.65rem 0.85rem; display: flex; gap: 0.7rem; align-items: flex-start; }
-        .question .q-num { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--cyan); font-weight: 700; min-width: 1.4rem; padding-top: 0.05rem; }
-        .question .q-body { font-size: 0.86rem; color: var(--text-body); line-height: 1.55; }
-        .question .q-body b { color: var(--text-strong); }
-
-        /* Big diagram */
-        .big-diagram { background: var(--svg-bg); border: 1px solid var(--line); border-radius: 12px; padding: 0.85rem 0.85rem 0.55rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .big-diagram svg { width: 100%; height: auto; min-width: 720px; display: block; }
-        @media (max-width: 760px) { .big-diagram svg { min-width: 720px; } }
-        .legend { display: flex; flex-wrap: wrap; gap: 0.55rem; padding: 0.55rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); }
-        .legend span { display: inline-flex; align-items: center; gap: 0.32rem; padding: 0.18rem 0.55rem; border-radius: 5px; border: 1px solid var(--line); background: var(--kv-bg); }
-        .legend i { width: 9px; height: 9px; display: inline-block; border-radius: 2px; }
-
-        /* Footer */
-        footer { margin-top: 1.5rem; padding: 1rem 0.6rem 0.6rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.78rem; line-height: 1.65; text-align: center; }
-        footer .citation-block { background: var(--kv-bg); border: 1px solid var(--line); border-radius: 10px; padding: 0.7rem 0.85rem; margin-bottom: 0.8rem; max-width: 880px; margin-left: auto; margin-right: auto; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: var(--text-body); }
-        footer .citation-block a { color: var(--cyan); text-decoration: none; }
-        footer .citation-block a:hover { text-decoration: underline; }
-        footer .footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding: 0.5rem 0; text-align: left; max-width: 880px; margin: 0 auto 1rem; }
-        footer .footer-grid h4 { font-size: 0.78rem; color: var(--text-strong); margin-bottom: 0.35rem; }
-        footer .footer-grid a { display: block; color: var(--muted); text-decoration: none; font-size: 0.76rem; padding: 0.15rem 0; }
-        footer .footer-grid a:hover { color: var(--cyan); }
-        footer .ver { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); margin-top: 0.55rem; }
-
-        /* Locked gate */
-        .root-gate { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.74); padding: 1rem; backdrop-filter: blur(6px); }
-        body.locked .root-gate { display: flex; }
-        body.locked .wrap { filter: blur(4px); pointer-events: none; user-select: none; }
-        .root-card { max-width: 430px; width: 100%; background: #0e0f12; border: 1px solid rgba(160,168,180,0.32); border-radius: 4px; padding: 1.2rem 1.1rem; text-align: center; box-shadow: 0 18px 36px var(--shadow-deep); }
-        [data-theme="light"] .root-card { background: #fff; border-color: rgba(8,145,178,0.4); }
-        [data-theme="light"] .root-gate { background: rgba(241,245,249,0.8); }
-        .root-card h2 { font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text-strong); }
-        .root-card p { font-size: 0.86rem; color: var(--text-body); line-height: 1.6; }
-        .root-actions { margin-top: 0.85rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-        .root-actions button, .root-actions a { border-radius: 9px; padding: 0.5rem 0.85rem; font-size: 0.8rem; font-weight: 700; border: 1px solid var(--line); text-decoration: none; cursor: pointer; color: var(--text); font-family: inherit; }
-        .root-actions button { background: var(--cyan); color: #0f172a; border: none; }
-
-        /* Skip link */
-        .skip-link { position: absolute; top: -50px; left: 0; background: #1e3a5f; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: 600; font-size: 0.9rem; z-index: 10000; border-radius: 0 0 8px 0; transition: top 0.2s ease; }
-        .skip-link:focus { top: 0; }
-        [data-theme="light"] .skip-link { background: #1a1d23; color: #fff; }
-
-        /* SVG diagram styles — thin instrument lines, no glow */
-        .d-bg { fill: var(--svg-bg); }
-        .d-block { fill: rgba(14,15,18,0.65); stroke: var(--line); stroke-width: 1; }
-        .d-block-cyan { fill: transparent; stroke: var(--cyan); stroke-width: 1.2; }
-        .d-block-amber { fill: rgba(255,170,0,0.07); stroke: var(--amber); stroke-width: 1.2; }
-        .d-block-green { fill: rgba(106,165,136,0.07); stroke: var(--green); stroke-width: 1.0; }
-        .d-block-red { fill: rgba(255,48,48,0.07); stroke: var(--red); stroke-width: 1.0; }
-        [data-theme="light"] .d-block { fill: rgba(255,255,255,0.85); stroke: rgba(100,116,139,0.36); }
-        .d-line { fill: none; stroke: var(--line); stroke-width: 0.8; }
-        .d-line-cyan { fill: none; stroke: var(--cyan); stroke-width: 1.0; }
-        .d-line-amber { fill: none; stroke: var(--amber); stroke-width: 1.0; }
-        .d-line-green { fill: none; stroke: var(--green); stroke-width: 0.9; }
-        .d-line-feedback { fill: none; stroke: var(--green); stroke-width: 0.9; stroke-dasharray: 4 3; }
-        .d-line-dim { fill: none; stroke: var(--line); stroke-width: 0.6; stroke-dasharray: 3 3; }
-        .d-text { font-family: "IBM Plex Sans", sans-serif; font-size: 11px; font-weight: 600; fill: var(--text-strong); }
-        .d-text-sm { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: var(--muted); }
-        .d-text-cyan { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; fill: var(--cyan); }
-        .d-text-amber { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; fill: var(--amber); }
-        .d-text-green { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; fill: var(--green); }
-        .d-text-section { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; fill: var(--muted); text-transform: uppercase; }
-
-        /* Cookie banner */
-
-        /* v1.8.0 — mobile responsive patch */
-        @media (max-width: 768px) {
-            html, body { overflow-x: hidden; max-width: 100vw; }
-            img { max-width: 100%; height: auto; display: block; }
-            .nav-menu, .nav-links { display: none; }
-            .navbar { padding: 0.5rem 0.75rem; }
-            .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
-            button, a.btn, [role="button"] { min-height: 44px; }
-            .section { padding: 1rem 0.85rem; }
-            .hero { padding: 1.05rem 0.9rem; }
-            h1 { font-size: 1.4rem !important; }
-            .modules-grid, .modes-grid, .phase-grid { grid-template-columns: 1fr !important; gap: 0.65rem; }
-            .summary-grid { grid-template-columns: 1fr 1fr; gap: 0.45rem; }
-            .gap-body .row { grid-template-columns: 1fr; gap: 0.2rem; }
-            .gap-body .row dt { padding-top: 0; }
-            .table-wrap { overflow-x: auto; }
-            .data-table { font-size: 0.78rem; }
-            .data-table th, .data-table td { padding: 0.4rem 0.55rem; }
-            .big-diagram { padding: 0.5rem; }
-            .big-diagram svg { min-width: 720px; }
-            .mode-card .pros { grid-template-columns: 1fr; }
-            footer .footer-grid { grid-template-columns: 1fr; }
-            .root-card { max-width: 92vw; padding: 1.25rem 1rem; margin: 0 1rem; }
-        }
-        @media (max-width: 480px) {
-            .summary-grid { grid-template-columns: 1fr; }
-            .topbar { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-        }
-        @media print {
-            body { background: #fff !important; color: #000 !important; }
-            body.locked .wrap { filter: none !important; pointer-events: auto !important; user-select: auto !important; }
-            .section, .hero { box-shadow: none !important; border-color: #ccc !important; background: #fff !important; break-inside: avoid; }
-            .gap { break-inside: avoid; }
-            * { color: #000 !important; }
-        }
-    </style>
-<style>
-/* Mobile form controls: 16px, or iOS Safari zooms the viewport on focus and does not zoom back.
-   This page does not load styles.min.css, so it carries the rule itself. */
-@media (max-width: 768px) {
-  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
-  select, textarea { font-size: 16px !important; }
-}
-</style>
+    <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261103-bbb51a4a">
+    <link rel="stylesheet" href="css/rz-explorer.css?v=20261103-d2dd2a91">
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
-<body class="locked">
-    <a class="skip-link" href="#main-content">Skip to main content</a>
+<body class="hub tool locked" data-rz-page="aiem">
+    <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <nav class="navbar"><div class="nav-container">
-        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
-        <ul class="nav-menu" id="navMenu">
-            <li><a href="index.html" class="nav-link">Home</a></li>
-            <li class="nav-dropdown"><a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
-                <ul class="dropdown-menu" role="menu">
-                    <li role="menuitem"><a href="datacenter-solutions.html" style="font-weight:600;">DC Solutions Hub</a></li>
-                    <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
-                    <li role="menuitem"><a href="datahallAI.html" title="Root & Educator access only">🔒 DC AI/HPC</a></li>
-                    <li role="menuitem"><a href="dc-conventional.html" title="Root & Educator access only">🔒 DC Conventional</a></li>
-                    <li role="menuitem"><a href="spares-readiness-calculator.html">Spares Readiness</a></li>
-                </ul>
-            </li>
-            <li class="nav-dropdown">
-                <a href="articles.html" class="nav-link">Insights <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
-                <ul class="dropdown-menu">
-                    <li><a href="articles.html" style="font-weight:600;">Engineering Journal</a></li>
-                    <li><a href="geopolitics.html">Global Analysis</a></li>
-                    <li><a href="future-forward.html">Future Forward</a></li>
-                </ul>
-            </li>
-            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-        </ul>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
-            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        </button>
-        <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-    </div></nav>
-
-    <div class="wrap">
-        <div class="topbar">
-            <a class="back" href="datacenter-solutions.html"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to DC Solutions</a>
-            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-                <span class="pill"><i class="fas fa-crown" aria-hidden="true"></i> Full access Module</span>
-                <span class="pill-amber pill"><i class="fas fa-file-alt" aria-hidden="true"></i> Concept Brief</span>
-            </div>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="nav-icon theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i class="fas fa-sun"></i></button>
+  </div>
+</nav>
 
-        <!-- ════════════════════════════════════════ HERO ════════════════════════════════════════ -->
-        <section class="hero" id="main-content">
-            <!-- v1.40.0 — Honest framing banner (per 2026-05-24 production review) -->
-            <div style="margin-bottom:1.2rem;padding:0.9rem 1.1rem;border:1px solid rgba(255,170,0,0.45);border-radius:8px;background:rgba(255,170,0,0.08);font-size:0.86rem;line-height:1.5;">
-                <strong style="color:var(--amber);"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> This is a concept-and-design document, not a production product.</strong>
-                It documents the technical basis (FMECA + KG + ML + NLP architecture, 12 engineering gaps, 5-phase roadmap, and a 826-row worldwide FMECA seed dataset). The production industrial-advisor build (Maintenance Intelligence Workbench &mdash; 11 screens, multi-tenant RBAC, real CMMS / BMS / edge integrations) is a separate, multi-year initiative tracked in <a href="docs/plans/2026-05-25-ai-maintenance-product-roadmap.md" style="color:var(--amber);">docs/plans/2026-05-25-ai-maintenance-product-roadmap.md</a>. AI is <strong>advisory-only by default</strong>; physical control remains in SIS / protection relays / BMS engineered sequences (IEC 61508).
-            </div>
-            <span class="pill"><i class="fas fa-microchip" aria-hidden="true"></i> Prescriptive Maintenance · FMECA + KG + ML + NLP</span>
-            <h1>AI Engineering Maintenance — Intelligent Advisor System Concept</h1>
-            <p class="subtitle">
-                A concept-and-design brief for a prescriptive maintenance advisor that fuses <b>FMECA documentation</b>
-                (IEC 60812), a <b>Neo4j knowledge graph</b>, a <b>Random Forest + PCA</b> diagnostic classifier, and a
-                <b>rule-based NLP layer</b> (Aho-Corasick) into a single closed-loop advisor for engineered assets.
-                Two operator interaction modes: ask in natural language (<b>By API</b>), or upload sensor data and let
-                the engine diagnose (<b>By Engine</b>). This page synthesizes the paper, surfaces 12 engineering gaps,
-                and proposes concrete enhancements with a phased build roadmap.
-            </p>
-            <p class="cite">
-                Source paper: <b>Lin, H. &amp; Ompusunggu, A. P. (2026)</b>. <i>Intelligent Advisor System for
-                Prescriptive Maintenance of Engineered Assets Using FMECA, Knowledge Graph and Machine Learning.</i>
-                Artificial Intelligence for Engineering (Wiley / IET). DOI:
-                <a href="https://doi.org/10.1049/aie2.70019" target="_blank" rel="noopener">10.1049/aie2.70019</a>.
-                Case-study dataset (Cranfield): <a href="https://doi.org/10.17862/cranfield.rd.5097649" target="_blank" rel="noopener">10.17862/cranfield.rd.5097649</a>.
-            </p>
+<main id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow">Labs · <b>Concept brief</b> · L.04</p>
+    <h1>AI engineering maintenance <span class="muted">an intelligent advisor system, as a concept</span></h1>
+    <p class="lede">A design brief for a maintenance advisor built on FMECA, a knowledge graph and machine learning: the paper it starts from, twelve engineering gaps with a proposed fix each, a phased roadmap and a worldwide FMECA seed dataset.</p>
+    <p class="basis">source Lin, H. &amp; Ompusunggu, A. P. (2026), Artificial Intelligence for Engineering, DOI <a href="https://doi.org/10.1049/aie2.70019" target="_blank" rel="noopener">10.1049/aie2.70019</a> · dataset Cranfield <a href="https://doi.org/10.17862/cranfield.rd.5097649" target="_blank" rel="noopener">10.17862/cranfield.rd.5097649</a> · Full access or Educator</p>
+    <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="datacenter-solutions.html#knowledge-labs">Labs</a> → AI engineering maintenance</p>
+  </div>
+</header>
+<div class="wrap">
+  <div class="root-gate">
+        <div class="root-card ck-callout">
+            <h2>Full access or Educator access required</h2>
+            <p>This concept brief is for Full access and Educator accounts. Sign in to continue, or return to the DC Solutions hub.</p>
+            <div class="root-actions">
+                <button class="tool-btn is-primary" id="rootLoginBtn" type="button">Sign In</button>
+                <a class="tool-btn" href="datacenter-solutions.html">Back to DC Solutions</a>
+            
+      </div>
+    </div>
+  </div>
+</div>
+<div class="ex-locked">
+<div class="wrap">
+  <nav class="tool-bar ck-jump" aria-label="On this page">
+    <span class="lbl">Jump to</span>
+    <a class="chip nav-pill" href="#sec-arch">Architecture</a><a class="chip nav-pill" href="#sec-modules">4 Modules</a><a class="chip nav-pill" href="#sec-modes">2 Modes</a><a class="chip nav-pill" href="#sec-case">Case Study</a><a class="chip nav-pill" href="#sec-gaps">Gaps &amp; Enhancements</a><a class="chip nav-pill" href="#sec-enhanced">Enhanced Engine</a><a class="chip nav-pill" href="#sec-roadmap">Roadmap</a><a class="chip nav-pill" href="#sec-questions">Open Questions</a><a class="chip nav-pill" href="#sec-knowledge-base">Knowledge Base</a>
+  </nav>
+</div>
+<div class="wrap ck-body">
 
-            <div class="summary-grid">
-                <div class="sum-tile"><div class="num">MODULE 1</div><div class="ttl">FMECA Documentation</div><div class="dsc">IEC 60812 tabular failure analysis. Components, Faults, Failures, Actions, Mechanisms, Effects, Steps, SOD&middot;RPN.</div></div>
-                <div class="sum-tile amber"><div class="num">MODULE 2</div><div class="ttl">FMECA Knowledge Graph</div><div class="dsc">Neo4j graph: 10 node types &middot; 12 relationship types. Cypher-queryable single source of truth for asset reasoning.</div></div>
-                <div class="sum-tile green"><div class="num">MODULE 3</div><div class="ttl">Maintenance Analytics (ML)</div><div class="dsc">Random Forest + PCA over 26 statistical features from position-error + motor-current signals. Bayesian-tuned.</div></div>
-                <div class="sum-tile"><div class="num">MODULE 4</div><div class="ttl">NLP Layer</div><div class="dsc">Rule + dictionary based: Aho-Corasick word segmentation, NER to FMECA entity classes, Cypher template selection.</div></div>
-            </div>
-        </section>
-
-        <!-- ════════════════════════════════════════ SECTION NAV ════════════════════════════════════════ -->
-        <nav class="section-nav" id="sectionNav">
-            <a class="nav-pill active" href="#sec-arch">Architecture</a>
-            <a class="nav-pill" href="#sec-modules">4 Modules</a>
-            <a class="nav-pill" href="#sec-modes">2 Modes</a>
-            <a class="nav-pill" href="#sec-case">Case Study</a>
-            <a class="nav-pill" href="#sec-gaps">Gaps &amp; Enhancements</a>
-            <a class="nav-pill" href="#sec-enhanced">Enhanced Engine</a>
-            <a class="nav-pill" href="#sec-roadmap">Roadmap</a>
-            <a class="nav-pill" href="#sec-questions">Open Questions</a>
-            <a class="nav-pill" href="#sec-knowledge-base">Knowledge Base</a>
-        </nav>
-
-        <!-- ════════════════════════════════════════ SECTION 1 — BLOCK DIAGRAM ════════════════════════════════════════ -->
-        <section class="section" id="sec-arch" data-nav-id="sec-arch">
-            <h2><i class="fas fa-sitemap" aria-hidden="true"></i> Architecture &mdash; The Paper's Baseline System</h2>
-            <p class="intro">
+<section class="ck-sec" id="sec-concept">
+  <h2><span class="n">01</span> Concept</h2>
+  <p class="lead">A prescriptive maintenance advisor that joins FMECA documentation (IEC 60812), a Neo4j knowledge graph, a Random Forest + PCA classifier and a rule-based NLP layer (Aho-Corasick). Two ways in: ask in natural language (by API), or upload sensor data and let the engine diagnose (by engine).</p>
+  <p class="ck-callout"><b>This is a concept-and-design document, not a production product.</b> It documents the technical basis (FMECA + KG + ML + NLP architecture, 12 engineering gaps, 5-phase roadmap, and a 826-row worldwide FMECA seed dataset). The production industrial-advisor build (Maintenance Intelligence Workbench &mdash; 11 screens, multi-tenant RBAC, real CMMS / BMS / edge integrations) is a separate, multi-year initiative tracked in <a href="docs/plans/2026-05-25-ai-maintenance-product-roadmap.md">docs/plans/2026-05-25-ai-maintenance-product-roadmap.md</a>. AI is <strong>advisory-only by default</strong>; physical control remains in SIS / protection relays / BMS engineered sequences (IEC 61508).</p>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Module</th><th scope="col">Name</th><th scope="col">What it does</th></tr></thead>
+    <tbody>
+      <tr><td>Module 1</td><td>FMECA Documentation</td><td>IEC 60812 tabular failure analysis. Components, Faults, Failures, Actions, Mechanisms, Effects, Steps, SOD&middot;RPN.</td></tr>
+      <tr><td>Module 2</td><td>FMECA Knowledge Graph</td><td>Neo4j graph: 10 node types &middot; 12 relationship types. Cypher-queryable single source of truth for asset reasoning.</td></tr>
+      <tr><td>Module 3</td><td>Maintenance Analytics (ML)</td><td>Random Forest + PCA over 26 statistical features from position-error + motor-current signals. Bayesian-tuned.</td></tr>
+      <tr><td>Module 4</td><td>NLP Layer</td><td>Rule + dictionary based: Aho-Corasick word segmentation, NER to FMECA entity classes, Cypher template selection.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+<section class="ck-sec ex-sec" id="sec-arch" data-nav-id="sec-arch">
+            <h2><span class="n">02</span> Architecture &mdash; The Paper's Baseline System</h2>
+            <p class="lead">
                 The advisor system has four cooperating modules. <b>FMECA</b> is the source-of-truth documentation; the
                 <b>Knowledge Graph</b> turns the tabular FMECA into a queryable Neo4j instance; the <b>Maintenance
                 Analytics</b> module diagnoses faults from raw sensor data; and the <b>NLP layer</b> translates
@@ -534,7 +174,7 @@
                 which keeps the answer surface deterministic.
             </p>
 
-            <div class="big-diagram" role="img" tabindex="0" aria-label="Block diagram of the paper's baseline architecture">
+            <div class="big-diagram ex-figure" role="img" tabindex="0" aria-label="Block diagram of the paper's baseline architecture">
                 <svg viewBox="0 0 1100 540" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
                     <defs>
                         <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -547,7 +187,7 @@
                             <path d="M0,0 L10,5 L0,10 Z" fill="#FFAA00"/>
                         </marker>
                         <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                            <path d="M0,0 L10,5 L0,10 Z" fill="#6aa588"/>
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#7D8794"/>
                         </marker>
                     </defs>
 
@@ -674,17 +314,15 @@
                 </svg>
             </div>
             <div class="legend">
-                <span><i style="background:var(--amber);"></i> Knowledge / FMECA path</span>
-                <span><i style="background:var(--cyan);"></i> Data / NLP path</span>
-                <span><i style="background:var(--green);"></i> Reply / Advisor output</span>
-                <span><i style="background:var(--line);"></i> External integration (abstract in paper)</span>
+                <span><i class="k-amber"></i> Knowledge / FMECA path</span>
+                <span><i class="k-grey"></i> Data / NLP path</span>
+                <span><i class="k-dash"></i> Reply / Advisor output</span>
+                <span><i class="k-line"></i> External integration (abstract in paper)</span>
             </div>
         </section>
-
-        <!-- ════════════════════════════════════════ SECTION 2 — 4 MODULES ════════════════════════════════════════ -->
-        <section class="section" id="sec-modules" data-nav-id="sec-modules">
-            <h2><i class="fas fa-cubes" aria-hidden="true"></i> The Four Modules</h2>
-            <p class="intro">
+        <section class="ck-sec ex-sec" id="sec-modules" data-nav-id="sec-modules">
+            <h2><span class="n">03</span> The Four Modules</h2>
+            <p class="lead">
                 Each module has a distinct role, a clear input contract, a clear output contract, and a specific
                 tech-stack pick. The cards below name each one, with a sub-flowchart showing its internal pipeline.
             </p>
@@ -733,7 +371,7 @@
                     </div>
                     <div class="mc-body">
                         Converts the tabular FMECA into a graph: <b>10 node types</b> linked by <b>12 relationship
-                        types</b> &mdash; <code style="font-family:monospace;color:var(--amber);">HAS_COMPONENTS, HAS_FAULTS, LEADS_TO, HAS_MECHANISM, HAS_RPN, HAS_STEPS,
+                        types</b> &mdash; <code>HAS_COMPONENTS, HAS_FAULTS, LEADS_TO, HAS_MECHANISM, HAS_RPN, HAS_STEPS,
                         HAS_ACTIONS_OF_FAILURES</code> and similar. Queryable via Cypher templates from both modes.
                     </div>
                     <dl class="mc-meta">
@@ -838,11 +476,9 @@
                 </div>
             </div>
         </section>
-
-        <!-- ════════════════════════════════════════ SECTION 3 — TWO MODES ════════════════════════════════════════ -->
-        <section class="section" id="sec-modes" data-nav-id="sec-modes">
-            <h2><i class="fas fa-arrows-left-right" aria-hidden="true"></i> Two Interaction Modes</h2>
-            <p class="intro">
+        <section class="ck-sec ex-sec" id="sec-modes" data-nav-id="sec-modes">
+            <h2><span class="n">04</span> Two Interaction Modes</h2>
+            <p class="lead">
                 The user reaches the advisor through one of two entry points. <b>Mode A</b> is for the engineer who
                 knows what to ask; <b>Mode B</b> is for the technician with raw data but no diagnosis. Both modes
                 terminate at the same Cypher-template tail, so the answer surface is consistent &mdash; the upstream
@@ -898,7 +534,7 @@
                     </div>
                     <div class="mode-title">Sensor-Upload Diagnostic Path</div>
                     <div class="mode-sub">
-                        Operator uploads raw measurement data (paper's CLI: <code style="color:var(--amber);background:var(--kv-bg);padding:0 4px;border-radius:3px;">predict ./dataset/output_3</code>).
+                        Operator uploads raw measurement data (paper's CLI: <code>predict ./dataset/output_3</code>).
                         PCA + RF classify the fault. Predicted label feeds the same Cypher tail as Mode A &mdash;
                         same answer surface, different arrival path.
                     </div>
@@ -919,7 +555,7 @@
                         </svg>
                     </div>
                     <div class="qa">
-                        <div class="q">Upload: <code style="background:var(--kv-bg);padding:0 4px;border-radius:3px;">predict ./dataset/output_3</code> (label = Backlashneg40)</div>
+                        <div class="q">Upload: <code>predict ./dataset/output_3</code> (label = Backlashneg40)</div>
                         <div class="a">
                             A: "All 10 motion cycles classified as <b>Backlash</b>. Linked components: <b>bearings,
                             nuts, balls, screws</b>. Failure descriptions and effects attached. Corrective actions:
@@ -934,29 +570,27 @@
                 </div>
             </div>
         </section>
-
-        <!-- ════════════════════════════════════════ SECTION 4 — CASE STUDY ════════════════════════════════════════ -->
-        <section class="section" id="sec-case" data-nav-id="sec-case">
-            <h2><i class="fas fa-flask" aria-hidden="true"></i> Case-Study Numbers &mdash; What the Paper Actually Reports</h2>
-            <p class="intro">
+        <section class="ck-sec ex-sec" id="sec-case" data-nav-id="sec-case">
+            <h2><span class="n">05</span> Case-Study Numbers &mdash; What the Paper Reports</h2>
+            <p class="lead">
                 Asset under test: a single linear actuator (Cranfield dataset). Four fault states &times; three loads
                 &times; 50 motion cycles = <b>600 events</b>. Results below are quoted verbatim from the paper &mdash;
                 no fabricated numbers, no averaged-up restatements.
             </p>
 
-            <div class="kpi-row">
-                <div class="kpi cyan"><div class="kl">Faults</div><div class="kv">4</div><div class="ks">Normal, Backlash, Spalling, Lack-of-lubrication</div></div>
-                <div class="kpi cyan"><div class="kl">Loads</div><div class="kv">3</div><div class="ks">20 kg, 40 kg, -40 kg</div></div>
-                <div class="kpi cyan"><div class="kl">Total events</div><div class="kv">600</div><div class="ks">12 conditions &times; 50 cycles</div></div>
-                <div class="kpi cyan"><div class="kl">Sample rate</div><div class="kv">25 Hz</div><div class="ks">16-second motion cycles</div></div>
-                <div class="kpi amber"><div class="kl">Macro F1</div><div class="kv">84.84%</div><div class="ks">overall, after Bayesian opt</div></div>
-                <div class="kpi amber"><div class="kl">Precision / Recall</div><div class="kv">85.00 / 84.76</div><div class="ks">%</div></div>
-                <div class="kpi amber"><div class="kl">RF trees</div><div class="kv">51</div><div class="ks">optimum</div></div>
-                <div class="kpi amber"><div class="kl">PCA components</div><div class="kv">7</div><div class="ks">optimum</div></div>
+            <div class="ex-facts" data-rz-fact-list>
+                <div class="ex-fact"><div class="f-label">Faults</div><div class="f-value">4</div><div class="f-note">Normal, Backlash, Spalling, Lack-of-lubrication</div></div>
+                <div class="ex-fact"><div class="f-label">Loads</div><div class="f-value">3</div><div class="f-note">20 kg, 40 kg, -40 kg</div></div>
+                <div class="ex-fact"><div class="f-label">Total events</div><div class="f-value">600</div><div class="f-note">12 conditions &times; 50 cycles</div></div>
+                <div class="ex-fact"><div class="f-label">Sample rate</div><div class="f-value">25 Hz</div><div class="f-note">16-second motion cycles</div></div>
+                <div class="ex-fact"><div class="f-label">Macro F1</div><div class="f-value">84.84%</div><div class="f-note">overall, after Bayesian opt</div></div>
+                <div class="ex-fact"><div class="f-label">Precision / Recall</div><div class="f-value">85.00 / 84.76</div><div class="f-note">%</div></div>
+                <div class="ex-fact"><div class="f-label">RF trees</div><div class="f-value">51</div><div class="f-note">optimum</div></div>
+                <div class="ex-fact"><div class="f-label">PCA components</div><div class="f-value">7</div><div class="f-note">optimum</div></div>
             </div>
 
-            <div class="table-wrap">
-                <table class="data-table">
+            <div class="ck-tbl-wrap">
+                <table class="ck-tbl data-table">
                     <thead><tr><th>Fault class</th><th>Per-fault F1</th><th>Notes</th></tr></thead>
                     <tbody>
                         <tr><td class="hl">Lack-of-lubrication</td><td class="num best">97.12%</td><td>Best performance &mdash; all events correctly classified across the 3 loads</td></tr>
@@ -966,23 +600,21 @@
                     </tbody>
                 </table>
             </div>
-            <p style="font-size:0.78rem;color:var(--muted);margin-top:0.6rem;">
-                <i class="fas fa-info-circle" aria-hidden="true"></i> The 77.98% Spalling F1 is the canonical opportunity for enhancement
+            <p>
+                The 77.98% Spalling F1 is the canonical opportunity for enhancement
                 (see Gap #10 below). Spalling is also the most economically valuable diagnosis &mdash; catching it
                 early prevents secondary damage to nuts, balls, and screws.
             </p>
         </section>
-
-        <!-- ════════════════════════════════════════ SECTION 5 — GAPS & ENHANCEMENTS ════════════════════════════════════════ -->
-        <section class="section" id="sec-gaps" data-nav-id="sec-gaps">
-            <h2><i class="fas fa-magnifying-glass" aria-hidden="true"></i> Gaps &amp; Proposed Enhancements</h2>
-            <p class="intro">
+        <section class="ck-sec ex-sec" id="sec-gaps" data-nav-id="sec-gaps">
+            <h2><span class="n">06</span> Gaps &amp; Proposed Enhancements</h2>
+            <p class="lead">
                 Twelve concrete gaps surfaced from a critical read of the paper. Each is paired with a proposed
                 enhancement that names the algorithm or library, not just the wishful direction. Open any gap below.
             </p>
 
             <details class="gap">
-                <summary><span class="gap-num">01</span> Single-asset case study &mdash; no fleet generalization <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">01</span> Single-asset case study &mdash; no fleet generalization</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>The paper validates on <b>one linear actuator</b>. No discussion of how the KG, ML, or NLP behave across asset families (pumps, chillers, switchgear, gensets) or across multiple sites.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Engineering operations rarely have one asset. A fleet has thousands. Transfer learning, cross-asset reasoning, and federated training are required for operational value.</dd></dl>
@@ -991,7 +623,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">02</span> Static FMECA &mdash; no operational feedback loop <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">02</span> Static FMECA &mdash; no operational feedback loop</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>The KG is frozen at design time. Field failures, novel fault patterns, and lessons learned from completed work orders never propagate back into the FMECA or the KG.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>The most valuable knowledge in an engineering operation is what the technicians learn doing the job. A static FMECA wastes it. The advisor stays as smart as the day it was commissioned.</dd></dl>
@@ -1000,7 +632,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">03</span> No CMMS integration &mdash; prescription stops at advice <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">03</span> No CMMS integration &mdash; prescription stops at advice</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>Paper mentions CMMS work orders abstractly. Advisor output is a text answer &mdash; not an action in the maintenance system. No bi-directional sync.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>True "prescriptive" maintenance requires the prescription to land in a planner's queue, with parts reserved, technicians assigned, and an estimated MTTR. Otherwise it's just decision support.</dd></dl>
@@ -1009,7 +641,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">04</span> PCA opacity &mdash; loss of feature interpretability <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">04</span> PCA opacity &mdash; loss of feature interpretability</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>PCA collapses the 26 engineering-meaningful features (RMS, skewness, crest factor, overshoot...) into 7 abstract components. A technician cannot tell <i>which signal feature</i> drove a classification.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Maintenance staff need explainable diagnoses. "The RF says backlash" is not actionable; "the RF says backlash because overshoot OVy is 3&sigma; above baseline" is.</dd></dl>
@@ -1018,7 +650,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">05</span> No anomaly detection &mdash; novel faults are force-fit <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">05</span> No anomaly detection &mdash; novel faults are force-fit</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>RF only chooses among the 4 known classes. Any unseen fault mode (e.g. a sudden seal failure) gets force-classified into the nearest known label, silently and confidently wrong.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>"Unknown unknowns" are the most expensive failures. A diagnostic system that lies confidently in their presence destroys operator trust.</dd></dl>
@@ -1027,7 +659,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">06</span> No Remaining Useful Life &mdash; diagnostic, not prognostic <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">06</span> No Remaining Useful Life &mdash; diagnostic, not prognostic</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>The system diagnoses <i>what</i> is failing, not <i>when</i>. RUL prediction is absent. "True" prescriptive maintenance must be time-aware so the planner can schedule before fault, not after.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Without RUL, the advisor can only react. With RUL, the advisor can schedule the work order to land 2 weeks before predicted failure, with parts in the cage and a technician booked.</dd></dl>
@@ -1036,16 +668,16 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">07</span> No vendor / spare-parts / cost integration <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">07</span> No vendor / spare-parts / cost integration</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>Prescription stops at "do action X" + "follow steps Y". No link to part availability, vendor catalog, lead-time, or cost. The planner has to do all of that lookup separately.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>If the prescribed action requires a bearing the warehouse doesn't carry with a 12-week lead time, the advisor's recommendation is operationally useless.</dd></dl>
-                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Link the FMECA-KG to the existing <a href="spares-readiness-calculator.html" style="color:var(--cyan);">Spares Readiness Calculator</a> spare-parts catalog. KG nodes get <code>HAS_SPARE_PART</code> edges into <code>SPARES_CATALOG</code> entries with availability, lead-time, cost, and supplier. Advisor output becomes: <i>"replace bearing X &mdash; in stock at Bekasi warehouse, $420, 0-day lead time"</i>.</dd></dl>
+                    <dl class="row gap-enh"><dt>Enhancement</dt><dd>Link the FMECA-KG to the existing <a href="spares-readiness-calculator.html">Spares Readiness Calculator</a> spare-parts catalog. KG nodes get <code>HAS_SPARE_PART</code> edges into <code>SPARES_CATALOG</code> entries with availability, lead-time, cost, and supplier. Advisor output becomes: <i>"replace bearing X &mdash; in stock at Bekasi warehouse, $420, 0-day lead time"</i>.</dd></dl>
                 </div>
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">08</span> No edge / offline mode &mdash; cloud-only assumption <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">08</span> No edge / offline mode &mdash; cloud-only assumption</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>Architecture assumes cloud Neo4j + cloud ML inference. Industrial sites often have intermittent connectivity, data-sovereignty constraints (data must not leave the plant), and latency requirements that exclude a cloud round-trip.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Petrochemical, defence, and primary-industry sites won't deploy a cloud-only advisor. Many DC operations sites have the same constraint.</dd></dl>
@@ -1054,7 +686,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">09</span> Rule-based NLP fragility &mdash; can't handle unseen vocabulary <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">09</span> Rule-based NLP fragility &mdash; can't handle unseen vocabulary</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>Aho-Corasick is a literal-string matcher. If a technician types "lube starvation" instead of "lack of lubrication", or "pitting" instead of "spalling", the NLP fails silently.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Field vocabulary varies by region, language, vendor, and seniority. A diagnostic system that needs the operator to use exact dictionary terms won't survive contact with reality.</dd></dl>
@@ -1063,7 +695,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">10</span> Spalling early-stage misclassification (F1 = 77.98%) <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">10</span> Spalling early-stage misclassification (F1 = 77.98%)</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>The paper's documented weakest class. Early-stage spalling has signal characteristics overlapping normal and backlash; the 26 time-domain stats miss the fault-mechanism-specific harmonic content.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>Spalling is the most expensive failure mode to miss &mdash; it cascades. Early detection saves the raceway, the balls, the seal, and possibly the entire bearing.</dd></dl>
@@ -1072,7 +704,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">11</span> No multi-fault concurrency &mdash; single-label assumption <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">11</span> No multi-fault concurrency &mdash; single-label assumption</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>RF emits exactly one class per cycle. Real degraded assets often have <i>multiple concurrent</i> failure modes &mdash; e.g. spalling combined with lack-of-lubrication &mdash; that the current model collapses to whichever has the higher vote share.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>If a bearing is both spalling AND lubrication-starved, prescribing only "re-grease" while ignoring spalling will accelerate the spalling. Single-label diagnosis can prescribe a partially correct, partially harmful action.</dd></dl>
@@ -1081,7 +713,7 @@
             </details>
 
             <details class="gap">
-                <summary><span class="gap-num">12</span> No uncertainty quantification &mdash; raw vote share, not calibrated <span class="gap-chev"><i class="fas fa-chevron-down" aria-hidden="true"></i></span></summary>
+                <summary><span class="gap-num">12</span> No uncertainty quantification &mdash; raw vote share, not calibrated</summary>
                 <div class="gap-body">
                     <dl class="row gap-tag"><dt>Gap</dt><dd>RF outputs vote share, which is correlated with confidence but not calibrated. There is no statistical guarantee on the prediction; no prediction interval.</dd></dl>
                     <dl class="row gap-why"><dt>Why it matters</dt><dd>A reliability engineer needs to know <i>how confident</i> the advisor is before authorising an unplanned shutdown. "85% probable backlash" is not the same as "95% confident the true class is in {backlash, lack-of-lubrication}".</dd></dl>
@@ -1089,17 +721,15 @@
                 </div>
             </details>
         </section>
-
-        <!-- ════════════════════════════════════════ SECTION 6 — ENHANCED ARCHITECTURE ════════════════════════════════════════ -->
-        <section class="section" id="sec-enhanced" data-nav-id="sec-enhanced">
-            <h2><i class="fas fa-diagram-project" aria-hidden="true"></i> Proposed Enhanced Engine Architecture</h2>
-            <p class="intro">
+        <section class="ck-sec ex-sec" id="sec-enhanced" data-nav-id="sec-enhanced">
+            <h2><span class="n">07</span> Proposed Enhanced Engine Architecture</h2>
+            <p class="lead">
                 The diagram below incorporates the 12 enhancements into a single architecture. Green dashed lines are
                 the <b>feedback / experience-capture</b> loops. Red blocks are <b>safety nets</b> (anomaly detection,
                 uncertainty quantification). Amber blocks are <b>knowledge surfaces</b>. Cyan blocks are <b>inference</b>.
             </p>
 
-            <div class="big-diagram" role="img" tabindex="0" aria-label="Enhanced architecture diagram">
+            <div data-rz-series-meaning="safety net in fault red" class="big-diagram ex-figure" role="img" tabindex="0" aria-label="Enhanced architecture diagram">
                 <svg viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
                     <!-- Section bands -->
                     <text class="d-text-section" x="20" y="30">A. Ingest</text>
@@ -1145,7 +775,7 @@
                     <!-- B. Inference Stack -->
                     <rect class="d-block-red" x="265" y="60" width="335" height="60" rx="5"/>
                     <text class="d-text" x="277" y="80">Anomaly Pre-filter</text>
-                    <text class="d-text" x="277" y="98" style="fill:var(--red);">Gap#05 &middot; Isolation Forest / OC-SVM</text>
+                    <text class="d-text" x="277" y="98">Gap#05 &middot; Isolation Forest / OC-SVM</text>
                     <text class="d-text-sm" x="277" y="112">High anomaly + low RF conf -&gt; human-in-the-loop route</text>
 
                     <rect class="d-block-cyan" x="265" y="135" width="335" height="60" rx="5"/>
@@ -1160,7 +790,7 @@
 
                     <rect class="d-block-red" x="265" y="285" width="335" height="60" rx="5"/>
                     <text class="d-text" x="277" y="305">Conformal Prediction</text>
-                    <text class="d-text" x="277" y="322" style="fill:var(--red);">Gap#12 temperature scaling + Mondrian</text>
+                    <text class="d-text" x="277" y="322">Gap#12 temperature scaling + Mondrian</text>
                     <text class="d-text-sm" x="277" y="336">Prediction set at 95% marginal coverage</text>
 
                     <rect class="d-block-cyan" x="265" y="360" width="335" height="60" rx="5"/>
@@ -1198,7 +828,7 @@
 
                     <rect class="d-block" x="635" y="325" width="265" height="80" rx="5"/>
                     <text class="d-text" x="647" y="348">Spares Catalog Link</text>
-                    <text class="d-text" x="647" y="365" style="fill:var(--cyan);">Gap#07 HAS_SPARE_PART edges</text>
+                    <text class="d-text" x="647" y="365">Gap#07 HAS_SPARE_PART edges</text>
                     <text class="d-text-sm" x="647" y="380">Availability &middot; lead-time &middot; cost</text>
                     <text class="d-text-sm" x="647" y="395">Reuses Spares Readiness Calc</text>
 
@@ -1230,7 +860,7 @@
 
                     <rect class="d-block-red" x="940" y="280" width="245" height="70" rx="5"/>
                     <text class="d-text" x="952" y="300">Human-in-the-Loop Queue</text>
-                    <text class="d-text" x="952" y="317" style="fill:var(--red);">For anomalies + low-confidence</text>
+                    <text class="d-text" x="952" y="317">For anomalies + low-confidence</text>
                     <text class="d-text-sm" x="952" y="332">Reliability engineer triages</text>
 
                     <rect class="d-block-green" x="940" y="370" width="245" height="70" rx="5"/>
@@ -1273,24 +903,22 @@
 
                     <!-- Feedback loops -->
                     <path class="d-line-feedback" d="M1062,230 V550 Q1062,580 600,580 Q400,580 230,540" marker-end="url(#arr-green)"/>
-                    <text class="d-text-sm" x="650" y="595" style="fill:var(--green);">CMMS-close -&gt; experience-capture (Gap #02 / #03)</text>
+                    <text class="d-text-sm" x="650" y="595">CMMS-close -&gt; experience-capture (Gap #02 / #03)</text>
 
                     <!-- FMECA inheritance arrow -->
                     <path class="d-line-amber" d="M767,420 V215" marker-end="url(#arr-amber)"/>
                 </svg>
             </div>
             <div class="legend">
-                <span><i style="background:var(--cyan);"></i> Inference stack</span>
-                <span><i style="background:var(--amber);"></i> Knowledge surface</span>
-                <span><i style="background:var(--green);"></i> Output / feedback (dashed = closed-loop)</span>
-                <span><i style="background:var(--red);"></i> Safety net (anomaly / uncertainty)</span>
+                <span><i class="k-grey"></i> Inference stack</span>
+                <span><i class="k-amber"></i> Knowledge surface</span>
+                <span><i class="k-dash"></i> Output / feedback (dashed = closed-loop)</span>
+                <span><i class="k-red"></i> Safety net (anomaly / uncertainty)</span>
             </div>
         </section>
-
-        <!-- ════════════════════════════════════════ SECTION 7 — ROADMAP ════════════════════════════════════════ -->
-        <section class="section" id="sec-roadmap" data-nav-id="sec-roadmap">
-            <h2><i class="fas fa-route" aria-hidden="true"></i> Phased Build Roadmap</h2>
-            <p class="intro">
+        <section class="ck-sec ex-sec" id="sec-roadmap" data-nav-id="sec-roadmap">
+            <h2><span class="n">08</span> Phased Build Roadmap</h2>
+            <p class="lead">
                 Five phases. Phase 1 reproduces the paper's baseline; Phases 2-5 add the 12 enhancements in dependency
                 order. Phase complexity is rated by effort, not difficulty &mdash; the actual hard part is the
                 cross-functional sign-off, not the code.
@@ -1364,11 +992,9 @@
                 </div>
             </div>
         </section>
-
-        <!-- ════════════════════════════════════════ SECTION 8 — OPEN QUESTIONS ════════════════════════════════════════ -->
-        <section class="section" id="sec-questions" data-nav-id="sec-questions">
-            <h2><i class="fas fa-circle-question" aria-hidden="true"></i> Open Questions for the Owner</h2>
-            <p class="intro">
+        <section class="ck-sec ex-sec" id="sec-questions" data-nav-id="sec-questions">
+            <h2><span class="n">09</span> Open Questions for the Owner</h2>
+            <p class="lead">
                 Eight questions to answer before we can scope an MVP. Each one shifts the architecture materially.
             </p>
 
@@ -1383,11 +1009,9 @@
                 <div class="question"><div class="q-num">Q8</div><div class="q-body"><b>Regulatory / safety case scope?</b> Is the advisor advisory-only (no closed-loop control) or does it actuate anything (auto-shutdown, auto-throttle)? If actuating, Gap #12 conformal prediction + Gap #05 anomaly net become safety-critical, not optional. IEC 61508 / 62443 may apply.</div></div>
             </div>
         </section>
-
-        <!-- ════════════════════════════════════════ SECTION 9 — KNOWLEDGE BASE SEED (2026-05-23) ════════════════════════════════════════ -->
-        <section class="section" id="sec-knowledge-base" data-nav-id="sec-knowledge-base">
-            <h2><i class="fas fa-database" aria-hidden="true"></i> Knowledge Base &mdash; Worldwide FMECA Seed Dataset (2026-05-23)</h2>
-            <p class="intro">
+        <section class="ck-sec ex-sec" id="sec-knowledge-base" data-nav-id="sec-knowledge-base">
+            <h2><span class="n">10</span> Knowledge Base &mdash; Worldwide FMECA Seed Dataset (2026-05-23)</h2>
+            <p class="lead">
                 The Lin &amp; Ompusunggu architecture is unopinionated about <i>which</i> failure modes it
                 ingests. The graph is only as useful as its seed data. To take the concept beyond a
                 rotating-machinery prototype, we commissioned a parallel research run for worldwide
@@ -1396,22 +1020,22 @@
                 plus eight CSV seed files ready for Neo4j ingestion.
             </p>
 
-            <div class="metric-grid" style="margin-top:1rem;">
-                <div class="metric"><div class="m-val">20</div><div class="m-lbl">Asset families covered (electrical &middot; cooling &middot; controls &middot; fire/life-safety &middot; mechanical/civil)</div></div>
-                <div class="metric"><div class="m-val">109</div><div class="m-lbl">Fault modes documented (avg ~5 per family)</div></div>
-                <div class="metric"><div class="m-val">826</div><div class="m-lbl">KG-ready data rows across 8 CSV seed files (834 lines incl. headers)</div></div>
-                <div class="metric"><div class="m-val">46</div><div class="m-lbl">Primary citations (CIGRE, IEEE 493, ASHRAE TC 9.9, NFPA, NETA, OREDA 7e, NPRD-2016, FMD-2016)</div></div>
+            <div class="ex-facts" data-rz-fact-list>
+                <div class="ex-fact"><div class="f-value">20</div><div class="f-note">Asset families covered (electrical &middot; cooling &middot; controls &middot; fire/life-safety &middot; mechanical/civil)</div></div>
+                <div class="ex-fact"><div class="f-value">109</div><div class="f-note">Fault modes documented (avg ~5 per family)</div></div>
+                <div class="ex-fact"><div class="f-value">826</div><div class="f-note">KG-ready data rows across 8 CSV seed files (834 lines incl. headers)</div></div>
+                <div class="ex-fact"><div class="f-value">46</div><div class="f-note">Primary citations (CIGRE, IEEE 493, ASHRAE TC 9.9, NFPA, NETA, OREDA 7e, NPRD-2016, FMD-2016)</div></div>
             </div>
 
-            <h3 style="margin-top:1.6rem;">Headline findings</h3>
-            <ul style="margin-top:0.4rem;">
+            <h3>Headline findings</h3>
+            <ul>
                 <li><b>54% of major DC outages are power-related</b> (Uptime Institute 2024 / 2025); 13% cooling; 12% network; ~40% involve human error somewhere in the chain. The graph weights human-error mechanism nodes (<code>M-HUM-001/002/003</code>) accordingly.</li>
                 <li><b>Liquid cooling has &lt;10 s ride-through</b> if the coolant pump fails, vs minutes for air. Severity scoring on pump-failure fault <code>F11.2</code> is one tier hotter than the equivalent CRAH failure &mdash; a structural change to the FMECA, not a tweak.</li>
                 <li><b>VRLA Arrhenius</b>: battery life halves for every <b>8.3 &deg;C</b> above 25 &deg;C ambient. A parameterised mechanism node, not a static FMECA cell &mdash; the engine evaluates it against actual battery-room temperature in real time.</li>
                 <li><b>Highest RPN in the dataset = 200</b>: diesel microbial contamination (<code>F19.1</code>). Slow to detect, devastating when it hits backup power. Top preventive-action target for any site running extended-runtime fuel storage.</li>
             </ul>
 
-            <h3 style="margin-top:1.6rem;">Confidence tiers</h3>
+            <h3>Confidence tiers</h3>
             <p>Every fault row carries a <code>confidence_tier</code> column (<code>high</code> / <code>medium</code> / <code>thin</code>). <strong>Default stance is advisory-only.</strong> Confidence tiers gate the engine's <em>recommendation routing</em>, not autonomous action. Engine treatment:</p>
             <ul>
                 <li><b>High</b> &mdash; standards-body / peer-reviewed / canonical databook sources (IEEE, IEC, ISO, ASHRAE, CIGRE, NETA, NFPA, OREDA, NPRD-2016, IEEE 493). Eligible for draft work-order generation; <strong>human approval required</strong> before any operational action. AI is advisory only; physical control remains in SIS / protection relays / BMS engineered sequences.</li>
@@ -1419,24 +1043,24 @@
                 <li><b>Thin</b> &mdash; single vendor / manufacturer / OEM / unattributed (liquid cooling DLC + immersion, busway, magnetic-bearing chillers, flywheel UPS). Surfaced in UI; no auto draft work-order; vendor outreach required. Outreach plan in <code>docs/handoff/2026-05-23-fmeca-vendor-outreach.md</code>.</li>
             </ul>
 
-            <h3 style="margin-top:1.6rem;">CSV seed inventory</h3>
-            <table class="kb-table" style="width:100%;border-collapse:collapse;margin-top:0.4rem;font-size:0.86rem;">
-                <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.12);"><th style="text-align:left;padding:0.4rem 0.6rem;">File</th><th style="text-align:right;padding:0.4rem 0.6rem;">Rows</th><th style="text-align:left;padding:0.4rem 0.6rem;">Maps to KG node / edge</th></tr></thead>
+            <h3>CSV seed inventory</h3>
+            <div class="ck-tbl-wrap"><table class="ck-tbl kb-table">
+                <thead><tr><th>File</th><th>Rows</th><th>Maps to KG node / edge</th></tr></thead>
                 <tbody>
-                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">components.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">144</td><td style="padding:0.3rem 0.6rem;">Component nodes</td></tr>
-                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">faults.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">109</td><td style="padding:0.3rem 0.6rem;">Fault nodes (1 per row)</td></tr>
-                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">failures.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">109</td><td style="padding:0.3rem 0.6rem;">Failure-state edges</td></tr>
-                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">actions.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">138</td><td style="padding:0.3rem 0.6rem;">Corrective + preventive action nodes</td></tr>
-                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">mechanisms.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">99</td><td style="padding:0.3rem 0.6rem;">Physical degradation mechanism nodes</td></tr>
-                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">effects.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">42</td><td style="padding:0.3rem 0.6rem;">Effect-of-failure rows (local / system / business)</td></tr>
-                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">steps.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">76</td><td style="padding:0.3rem 0.6rem;">Procedure-step nodes (tool &middot; skill &middot; duration &middot; safety)</td></tr>
-                    <tr><td style="padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;">sod_rpn.csv</td><td style="text-align:right;padding:0.3rem 0.6rem;">109</td><td style="padding:0.3rem 0.6rem;">Severity / Occurrence / Detectability + RPN values</td></tr>
+                    <tr><td>components.csv</td><td>144</td><td>Component nodes</td></tr>
+                    <tr><td>faults.csv</td><td>109</td><td>Fault nodes (1 per row)</td></tr>
+                    <tr><td>failures.csv</td><td>109</td><td>Failure-state edges</td></tr>
+                    <tr><td>actions.csv</td><td>138</td><td>Corrective + preventive action nodes</td></tr>
+                    <tr><td>mechanisms.csv</td><td>99</td><td>Physical degradation mechanism nodes</td></tr>
+                    <tr><td>effects.csv</td><td>42</td><td>Effect-of-failure rows (local / system / business)</td></tr>
+                    <tr><td>steps.csv</td><td>76</td><td>Procedure-step nodes (tool &middot; skill &middot; duration &middot; safety)</td></tr>
+                    <tr><td>sod_rpn.csv</td><td>109</td><td>Severity / Occurrence / Detectability + RPN values</td></tr>
                 </tbody>
-            </table>
+            </table></div>
 
-            <details style="margin-top:1.4rem;">
+            <details>
                 <summary><b>Gap #13 &mdash; Liquid-cooling fault-mode telemetry below industry benchmark</b> (new, surfaced by this dataset)</summary>
-                <div style="padding:0.6rem 0 0.4rem 0;">
+                <div>
                     Liquid-cooling and immersion-cooling primary sources thin out to ASHRAE TC 9.9 + OCP + one ASME paper.
                     Magnetic-bearing chillers and flywheel UPS depend largely on vendor-stated MTBF rather than independently audited data.
                     Mitigation: a vendor-outreach handoff doc has been scheduled (Vertiv, CoolIT, Asetek, Boyd for liquid;
@@ -1445,80 +1069,54 @@
                 </div>
             </details>
 
-            <p class="intro" style="margin-top:1.4rem;">
-                <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> Full report:
+            <p class="lead">
+                Full report:
                 <a href="docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md">docs/research/2026-05-23-fmeca-kg-worldwide-asset-failure-data.md</a>
                 &middot; CSV seed files in <a href="docs/research/csv/">docs/research/csv/</a>
                 &middot; Standard: <a href="standarization/KNOWLEDGE_BASE_STANDARD.md">KNOWLEDGE_BASE_STANDARD.md</a>
             </p>
         </section>
+</div>
 
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:4px;padding:0.45rem 0.85rem;color:#5c6470;border-color:rgba(40,44,52,0.28)}.rz-manual-link a:hover{color:#92400e;border-color:rgba(146,64,14,0.5)}[data-theme="dark"] .rz-manual-link a{color:#969eaa;border-color:rgba(160,168,180,0.35)}[data-theme="dark"] .rz-manual-link a:hover{color:#E8B563;border-color:rgba(232,181,99,0.5)}</style><a href="manual/ai-engineering-maintenance.html">Technical Manual &amp; Methodology &#8599;</a></div>
-        <footer>
-            <div class="citation-block">
-                <b>Citation.</b> Lin, H. &amp; Ompusunggu, A. P. (2026). Intelligent Advisor System for Prescriptive
-                Maintenance of Engineered Assets Using FMECA, Knowledge Graph and Machine Learning.
-                <i>Artificial Intelligence for Engineering</i>. Wiley / IET.
-                DOI: <a href="https://doi.org/10.1049/aie2.70019" target="_blank" rel="noopener">10.1049/aie2.70019</a>.<br>
-                <b>Dataset.</b> Cranfield University Linear Actuator Degradation:
-                <a href="https://doi.org/10.17862/cranfield.rd.5097649" target="_blank" rel="noopener">10.17862/cranfield.rd.5097649</a>.
-            </div>
-            <div class="footer-grid">
-                <div>
-                    <h4>Related</h4>
-                    <a href="datacenter-solutions.html">DC Solutions Hub</a>
-                    <a href="spares-readiness-calculator.html">Spares Readiness Calculator</a>
-                    <a href="datahallAI.html">AI Data Hall Dashboard</a>
-                    <a href="chiller-plant.html">Chiller Plant SCADA</a>
-                </div>
-                <div>
-                    <h4>Legal</h4>
-                    <a href="privacy.html">Privacy</a>
-                    <a href="terms.html">Terms</a>
-                    <a href="index.html#contact">Contact</a>
-                </div>
-                <div>
-                    <h4>Site</h4>
-                    <a href="index.html">Home</a>
-                    <a href="articles.html">Engineering Journal</a>
-                    <a href="changelog.html">Changelog</a>
-                </div>
-            </div>
-            <div class="ver" id="versionStamp">&middot; ResistanceZero &middot; v?.?.? &middot;</div>
-            <p style="margin-top:0.4rem;font-size:0.72rem;">
-                This is a concept-and-design document. No fabricated numbers. Reported metrics quoted verbatim from the
-                source paper. Architecture proposals are advisory.
-            </p>
-        </footer>
+<section class="tool-ref" aria-labelledby="ref-h">
+  <div class="wrap">
+    <p class="eyebrow" id="ref-h">11 / Reference</p>
+    <h3>Written against</h3>
+    <p class="against"><span>IEC 60812</span><span>Neo4j / Cypher</span><span>scikit-learn RF + PCA</span><span>Aho-Corasick NLP</span></p>
+    <h3>Read further</h3>
+    <p class="links"><a href="manual/ai-engineering-maintenance.html">Technical manual and methodology</a><a href="spares-readiness-calculator.html">Spares readiness calculator</a><a href="cdu-hub.html">CDU toolkit</a><a href="datahallAI.html">AI data hall cockpit</a><a href="chiller-plant.html">Chiller plant cockpit</a></p>
+    <p class="notice">A concept-and-design document. Metrics are quoted from the source paper; architecture proposals are advisory. Dataset: Cranfield University linear actuator degradation.</p>
+  </div>
+</section>
+</div>
+</main>
+
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
     </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
 
-    <!-- Locked / page-access gate -->
-    <div class="root-gate">
-        <div class="root-card">
-            <h2><i class="fas fa-lock" aria-hidden="true" style="color:var(--cyan);margin-right:0.3rem;"></i> Full access or Educator access required</h2>
-            <p>This concept brief is for Full access and Educator accounts. Sign in to continue, or return to the DC Solutions hub.</p>
-            <div class="root-actions">
-                <button id="rootLoginBtn">Sign In</button>
-                <a href="datacenter-solutions.html">Back to DC Solutions</a>
-            </div>
-        </div>
-    </div>
-
-    
-
-    <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
-    <script src="auth.js?v=20261031-f01cb5a3" defer></script>
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  function paint(){var d=document.documentElement.getAttribute('data-theme')==='dark';var i=t&&t.querySelector('i');if(i)i.className=d?'fas fa-sun':'fas fa-moon';var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'#0b0c0e':'#F5F7FA');}
+  if(t){t.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';var n=d?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(e){}paint();});paint();}
+  var s=document.getElementById('navSearchBtn');if(s)s.addEventListener('click',function(){if(window.__rzPalette&&window.__rzPalette.open)window.__rzPalette.open();});
+})();
+</script>
+<script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
+<script src="auth.js?v=20261031-f01cb5a3" defer></script>
     <script>
-    /* Theme toggle */
-    (function(){var t=document.getElementById('themeToggle'),p=window.matchMedia('(prefers-color-scheme: dark)');function g(){var s=localStorage.getItem('theme');return s||'dark';}function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',theme==='dark'?'#0b1324':'#f1f5f9');}a(g());if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});p.addEventListener('change',function(e){if(!localStorage.getItem('theme'))a(e.matches?'dark':'light');});})();
-    /* Hamburger nav */
-    (function(){var b=document.getElementById('hamburgerBtn'),m=document.getElementById('navMenu');if(b&&m)b.addEventListener('click',function(){m.classList.toggle('active');b.setAttribute('aria-expanded',m.classList.contains('active'));});})();
     /* Page-access tier gate */
     (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('ai-engineering-maintenance');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var t=s&&s.tier,r=s&&s.role;var passes=!!s&&(t==='pro'||t==='root'||r==='root'||r==='pro'||r==='educator');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
     /* Section nav scroll-spy */
     (function(){var secs=document.querySelectorAll('[data-nav-id]'),pills=document.querySelectorAll('.nav-pill');if(!secs.length)return;var obs=new IntersectionObserver(function(entries){entries.forEach(function(en){if(en.isIntersecting){var id=en.target.getAttribute('data-nav-id');pills.forEach(function(p){p.classList.toggle('active',p.getAttribute('href')==='#'+id);});}});},{rootMargin:'-120px 0px -60% 0px',threshold:0});secs.forEach(function(s){obs.observe(s);});pills.forEach(function(p){p.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector('[data-nav-id="'+this.getAttribute('href').slice(1)+'"]');if(t){var y=t.getBoundingClientRect().top+window.pageYOffset-110;window.scrollTo({top:y,behavior:'smooth'});}});});})();
-    /* Version stamp */
-    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
     </script>
 </body>
 </html>

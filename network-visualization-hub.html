@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark" data-rz-register="tool">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Network Visualization Hub · ResistanceZero</title>
 <meta name="description" content="25 animated, parameter-driven labs for industrial and IT protocols: Modbus, BACnet, OPC-UA, TLS, OAuth, gRPC and MCP.">
 <meta name="ai-content-declaration" content="human-authored">
-<meta name="theme-color" content="#0F172A">
+<meta name="theme-color" content="#0b0c0e">
 <link rel="canonical" href="https://resistancezero.com/network-visualization-hub.html">
 <!-- Open Graph / social (v1.50.x SEO fix — required tags were missing) -->
 <meta property="og:type" content="website">
@@ -23,251 +23,184 @@
 <meta name="twitter:image" content="https://resistancezero.com/assets/og/network-visualization-hub.webp">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Network Visualization Hub","url":"https://resistancezero.com/network-visualization-hub.html","description":"25 animated, parameter-driven labs for industrial and IT communication protocols.","isPartOf":{"@type":"WebSite","name":"ResistanceZero","url":"https://resistancezero.com/"}}</script>
 <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
-<link rel="stylesheet" href="styles.min.css?v=20261103-9d57ed99">
-<style>
-  :root { --cyan:#00DDFF; --amber:#FFAA00; --green:#6aa588; --red:#FF3030; --wire:#94a3b8; --canvas-bg:#121316; }
-  /* a11y (v1.51.10): neon instrument tokens are dark-canvas colors — derive readable
-     light-theme equivalents; --wire brightened for the dark page text */
-  :root:not([data-theme="dark"]) { --cyan:#056177; --amber:#92400e; --green:#047857; --red:#b91c1c; --wire:#475569; }
-  /* v3.3.x — 4.5rem is 72px and the mobile navbar measures 77px: the H1 still sat 5px under it
-     after the a8d65a9e sweep raised this from 3rem. Clear the bar with margin this time. */
-  .nh-hero { padding:5.5rem 1.5rem 1rem; max-width:1100px; margin:0 auto; }
-  .nh-hero h1 { font-family:"IBM Plex Sans",system-ui,sans-serif; font-size:clamp(1.8rem,3.5vw,2.4rem); margin:0 0 0.6rem; letter-spacing:-0.01em; }
-  .nh-hero p.lede { font-size:1.05rem; max-width:760px; }
-  .nh-meta { display:flex; gap:1.5rem; flex-wrap:wrap; margin-top:1rem; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.78rem; color:var(--wire); }
-  .nh-meta b { color:var(--cyan); font-weight:600; }
-  .nh-section { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
-  .nh-lane { margin-top:2rem; border-top:0.8px solid rgba(0,221,255,0.18); padding-top:1rem; }
-  .nh-lane h2 { font-family:"IBM Plex Sans",system-ui,sans-serif; font-size:1.1rem; margin:0 0 0.4rem; display:flex; align-items:baseline; gap:0.6rem; }
-  .nh-lane h2 .lane-tag { font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.7rem; color:var(--cyan); letter-spacing:0.06em; text-transform:uppercase; padding:0.15rem 0.5rem; border:0.8px solid var(--cyan); border-radius:2px; }
-  .nh-lane .lane-desc { color:var(--wire); margin:0.3rem 0 0.8rem; font-size:0.92rem; }
-  .nh-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:0.7rem; }
-  .nh-card { display:block; padding:0.9rem 1rem; border:1px solid var(--wire); border-radius:4px; text-decoration:none; color:inherit; transition:border-color 120ms ease; }
-  .nh-card:hover, .nh-card:focus-visible { border-color:var(--cyan); outline:2px solid var(--amber); outline-offset:2px; }
-  .nh-card .nh-card-title { display:flex; align-items:center; gap:0.5rem; font-family:"IBM Plex Sans",system-ui,sans-serif; font-size:0.98rem; font-weight:600; margin-bottom:0.2rem; }
-  .nh-card .nh-card-desc { font-size:0.82rem; color:var(--wire); line-height:1.4; }
-  .nh-card .nh-status { font-family:'JetBrains Mono',ui-monospace,monospace; font-size:0.65rem; letter-spacing:0.06em; padding:0.1rem 0.4rem; border-radius:2px; text-transform:uppercase; }
-  .nh-status.live { color:var(--green); border:0.8px solid var(--green); }
-  .nh-status.phase1 { color:var(--cyan); border:0.8px solid var(--cyan); }
-  .nh-status.coming { color:var(--wire); border:0.8px solid var(--wire); }
-  .nh-card.disabled { pointer-events:none; opacity:0.55; }
-  .nh-compare-cta { margin-top:2rem; padding:1.2rem 1.5rem; border:0.8px solid var(--cyan); border-radius:4px; background:rgba(0,221,255,0.04); text-align:center; }
-  .nh-compare-cta h3 { margin:0 0 0.5rem; font-family:"IBM Plex Sans",system-ui,sans-serif; font-size:1.05rem; color:var(--cyan); }
-  .nh-compare-cta p { margin:0; color:var(--wire); font-size:0.88rem; }
-
-  /* v1.8.0 — mobile responsive patch (per RESPONSIVE_STANDARD.md) */
-  @media (max-width: 768px) {
-    html, body { overflow-x: hidden; max-width: 100vw; }
-    img, picture, video, svg { max-width: 100%; height: auto; display: block; }
-    .nav-menu, .nav-links { display: none !important; }
-    .footer-grid { grid-template-columns: 1fr !important; gap: 1.25rem !important; padding: 1rem !important; }
-    button, a.btn, [role="button"] { min-height: 44px; }
-  }
-</style>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261103-bbb51a4a">
+    <link rel="stylesheet" href="css/rz-explorer.css?v=20261103-d2dd2a91">
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="hub tool" data-rz-page="network-hub">
+    <a href="#main-content" class="skip-link">Skip to content</a>
 
-<header class="navbar">
-  <div class="nav-container">
-    <a href="index.html" class="logo" aria-label="ResistanceZero home">ResistanceZero</a>
-    <nav class="nav-right" aria-label="primary">
-      <a href="datacenter-solutions.html#knowledge-labs">Knowledge Labs</a>
-      <a href="tools.html">Tools</a>
-    </nav>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="nav-icon theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i class="fas fa-sun"></i></button>
+  </div>
+</nav>
+
+<main id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow">Knowledge labs · <b>Network</b> · L.03</p>
+    <h1>Network visualization hub <span class="muted">25 protocol labs in five lanes</span></h1>
+    <p class="lede">Animated, parameter-driven labs for industrial and IT communication protocols, from Modbus RTU on RS-485 to MCP tool calls between AI agents.</p>
+    <p class="basis">Canvas 2D + Web Audio · CompTIA Network+ N10-009 and Security+ SY0-701 aligned · all 25 labs live · free</p>
+    <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="datacenter-solutions.html#knowledge-labs">Knowledge labs</a> → Network hub</p>
   </div>
 </header>
+<div class="wrap ck-body">
+<section class="ck-sec" id="lane-a">
+  <h2><span class="n">01</span> Foundations <span class="muted">lane A · 5 topics</span></h2>
+  <p class="lead">The conceptual scaffolding every networking engineer needs.</p>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Protocol</th><th scope="col">What the animation shows</th></tr></thead>
+    <tbody>
+      <tr><td><a href="network/foundations/osi-tcp-ip-models.html">OSI / TCP-IP models</a></td><td>Byte chip ascends 7-layer stack vertically</td></tr>
+      <tr><td><a href="network/foundations/ipv4-vs-ipv6.html">IPv4 vs IPv6</a></td><td>Side-by-side · v6 chip visibly 4× wider</td></tr>
+      <tr><td><a href="network/foundations/subnetting-cidr.html">Subnetting / CIDR</a></td><td>Subnet boundary line on wire = CIDR prefix</td></tr>
+      <tr><td><a href="network/foundations/tcp-handshake.html">TCP handshake</a></td><td>SYN / SYN-ACK / ACK as 3 distinct chip shapes</td></tr>
+      <tr><td><a href="network/foundations/dhcp-dns.html">DHCP / DNS</a></td><td>4-stage DORA · monotonic ascending pitch</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-<main>
+<section class="ck-sec" id="lane-b">
+  <h2><span class="n">02</span> Industrial OT <span class="muted">lane B · 9 topics</span></h2>
+  <p class="lead">Field protocols that move bytes between PLCs, RTUs, BMS controllers, chillers, and sensors.</p>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Protocol</th><th scope="col">What the animation shows</th></tr></thead>
+    <tbody>
+      <tr><td><a href="network/industrial-ot/modbus-rtu.html">Modbus RTU</a></td><td>Serial master/slave over RS-485 · square-sweep 1200→1600 Hz · square chips on thin wire · 1979</td></tr>
+      <tr><td><a href="network/industrial-ot/modbus-tcp.html">Modbus TCP</a></td><td>MBAP-header byte exchange over Ethernet · sine 1.3 kHz · rect chips · MBAP overhead visibly larger</td></tr>
+      <tr><td><a href="network/industrial-ot/bacnet-mstp.html">BACnet MS/TP</a></td><td>Token-passing on RS-485 · sine-sweep · hex chips · amber token chip passes between nodes before any data frame</td></tr>
+      <tr><td><a href="network/industrial-ot/bacnet-ip.html">BACnet/IP</a></td><td>BACnet over UDP/IP · triangle waveform · hex chips · BVLC tunnel scan-line at packet head</td></tr>
+      <tr><td><a href="network/industrial-ot/opc-ua.html">OPC-UA</a></td><td>Subscription model · sine-sweep · layered chips · always-on encryption shroud · broker-diamond client</td></tr>
+      <tr><td><a href="network/industrial-ot/dnp3.html">DNP3</a></td><td>Telemetry SCADA · sine-sweep 600→900 Hz · UNSOLICITED responses (outstation pushes spontaneously)</td></tr>
+      <tr><td><a href="network/industrial-ot/profinet.html">PROFINET</a></td><td>Real-time industrial Ethernet · sync line above wire shows cyclic deterministic timing</td></tr>
+      <tr><td><a href="network/industrial-ot/ethernet-ip.html">EtherNet/IP</a></td><td>CIP over Ethernet · sawtooth · envelope chips with rotating marker-stripe head (ENIP/CPF/CIP-Conn/CIP-Svc)</td></tr>
+      <tr><td><a href="network/industrial-ot/ethercat.html">EtherCAT</a></td><td>Distributed clocks · telegram passes through every slave on-the-fly · ultra-fast 1 ms cycles</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-  <section class="nh-hero">
-    <h1>Network Visualization Hub</h1>
-    <p class="lede">25 animated, parameter-driven labs for industrial &amp; IT communication protocols &mdash; from Modbus RTU on RS-485 to MCP tool-calls between AI agents. Oscilloscope-grade industrial register; not consumer techno music video.</p>
-    <div class="nh-meta">
-      <span><b>FREE</b> public-tier</span>
-      <span><b>5 lanes</b> · 25 topics</span>
-      <span><b>CompTIA</b> Net+ N10-009 + Sec+ SY0-701 aligned</span>
-      <span><b>Canvas 2D + Web Audio</b> · zero framework</span>
-    </div>
-  </section>
+<section class="ck-sec" id="lane-c">
+  <h2><span class="n">03</span> DC Management <span class="muted">lane C · 3 topics</span></h2>
+  <p class="lead">Operator-side monitoring, telemetry, and management plane protocols.</p>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Protocol</th><th scope="col">What the animation shows</th></tr></thead>
+    <tbody>
+      <tr><td><a href="network/dc-management/snmp.html">SNMP</a></td><td>Polling cadence visible as amber-dot metronome</td></tr>
+      <tr><td><a href="network/dc-management/ipmi-redfish.html">IPMI / Redfish</a></td><td>OOB sideband-dashed wire · independent of data plane</td></tr>
+      <tr><td><a href="network/dc-management/syslog.html">syslog</a></td><td>Long-rect line chips · one-way append-only stream</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-  <section class="nh-section">
+<section class="ck-sec" id="lane-d">
+  <h2><span class="n">04</span> Security <span class="muted">lane D · 4 topics</span></h2>
+  <p class="lead">Cryptographic ceremonies and secure transport.</p>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Protocol</th><th scope="col">What the animation shows</th></tr></thead>
+    <tbody>
+      <tr><td><a href="network/security/tls-handshake.html">TLS handshake</a></td><td>Scan-line shroud builds progressively across handshake</td></tr>
+      <tr><td><a href="network/security/oauth-jwt.html">OAuth 2.0 / JWT</a></td><td>4-actor dance · amber→cyan flow-stage tint on token issue</td></tr>
+      <tr><td><a href="network/security/mtls.html">mTLS</a></td><td>Bilateral — both nodes cert-badged · handshake echoes both ways</td></tr>
+      <tr><td><a href="network/security/wireguard.html">WireGuard</a></td><td>Minimalist · pre-keyed mesh · always-on encryption</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-    <!-- Lane B — Industrial OT (Phase 0/1 live) -->
-    <div class="nh-lane">
-      <h2>Industrial OT <span class="lane-tag">Lane B · 9 topics</span></h2>
-      <p class="lane-desc">Field protocols that move bytes between PLCs, RTUs, BMS controllers, chillers, and sensors. The protocols that run your building when nobody's looking.</p>
-      <div class="nh-grid">
+<section class="ck-sec" id="lane-e">
+  <h2><span class="n">05</span> APIs + Agents <span class="muted">lane E · 4 topics</span></h2>
+  <p class="lead">HTTP-family protocols and the new AI-agent transports.</p>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Protocol</th><th scope="col">What the animation shows</th></tr></thead>
+    <tbody>
+      <tr><td><a href="network/apis-agents/rest-api.html">REST API</a></td><td>Envelope chip · header/body distinct · server-processing gap</td></tr>
+      <tr><td><a href="network/apis-agents/graphql.html">GraphQL</a></td><td>One outbound long-rect query · multiple inbound chips (3-shape cap)</td></tr>
+      <tr><td><a href="network/apis-agents/grpc.html">gRPC</a></td><td>HTTP/2 4-lane multiplex · simultaneous stream chips</td></tr>
+      <tr><td><a href="network/apis-agents/mcp-tool-call.html">MCP tool-call</a></td><td>3-actor RPC · mesh-tunnel · industrial register held</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-        <a class="nh-card" href="network/industrial-ot/modbus-rtu.html">
-          <div class="nh-card-title">Modbus RTU <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Serial master/slave over RS-485 · square-sweep 1200→1600 Hz · square chips on thin wire · 1979</div>
-        </a>
+<section class="ck-sec" id="compare">
+  <h2><span class="n">06</span> Compare mode</h2>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Tool</th><th scope="col">What it does</th></tr></thead>
+    <tbody>
+      <tr><td><a href="network-compare.html">Compare mode</a></td><td>Four panels side by side with a normalised strip per protocol (throughput, latency, overhead, status). All four lane B protocols are available.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+</div>
 
-        <a class="nh-card" href="network/industrial-ot/modbus-tcp.html">
-          <div class="nh-card-title">Modbus TCP <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">MBAP-header byte exchange over Ethernet · sine 1.3 kHz · rect chips · MBAP overhead visibly larger</div>
-        </a>
-
-        <a class="nh-card" href="network/industrial-ot/bacnet-mstp.html">
-          <div class="nh-card-title">BACnet MS/TP <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Token-passing on RS-485 · sine-sweep · hex chips · amber token chip passes between nodes before any data frame</div>
-        </a>
-
-        <a class="nh-card" href="network/industrial-ot/bacnet-ip.html">
-          <div class="nh-card-title">BACnet/IP <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">BACnet over UDP/IP · triangle waveform · hex chips · BVLC tunnel scan-line at packet head</div>
-        </a>
-
-        <a class="nh-card" href="network/industrial-ot/opc-ua.html">
-          <div class="nh-card-title">OPC-UA <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Subscription model · sine-sweep · layered chips · always-on encryption shroud · broker-diamond client</div>
-        </a>
-
-        <a class="nh-card" href="network/industrial-ot/dnp3.html">
-          <div class="nh-card-title">DNP3 <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Telemetry SCADA · sine-sweep 600→900 Hz · UNSOLICITED responses (outstation pushes spontaneously)</div>
-        </a>
-
-        <a class="nh-card" href="network/industrial-ot/profinet.html">
-          <div class="nh-card-title">PROFINET <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Real-time industrial Ethernet · sync line above wire shows cyclic deterministic timing</div>
-        </a>
-
-        <a class="nh-card" href="network/industrial-ot/ethernet-ip.html">
-          <div class="nh-card-title">EtherNet/IP <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">CIP over Ethernet · sawtooth · envelope chips with rotating marker-stripe head (ENIP/CPF/CIP-Conn/CIP-Svc)</div>
-        </a>
-
-        <a class="nh-card" href="network/industrial-ot/ethercat.html">
-          <div class="nh-card-title">EtherCAT <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Distributed clocks · telegram passes through every slave on-the-fly · ultra-fast 1 ms cycles</div>
-        </a>
-
-      </div>
-    </div>
-
-    <!-- Lane A — Foundations -->
-    <div class="nh-lane">
-      <h2>Foundations <span class="lane-tag">Lane A · 5 topics</span></h2>
-      <p class="lane-desc">The conceptual scaffolding every networking engineer needs but most CompTIA courses gloss past.</p>
-      <div class="nh-grid">
-        <a class="nh-card" href="network/foundations/osi-tcp-ip-models.html">
-          <div class="nh-card-title">OSI / TCP-IP models <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Byte chip ascends 7-layer stack vertically</div>
-        </a>
-        <a class="nh-card" href="network/foundations/ipv4-vs-ipv6.html">
-          <div class="nh-card-title">IPv4 vs IPv6 <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Side-by-side · v6 chip visibly 4× wider</div>
-        </a>
-        <a class="nh-card" href="network/foundations/subnetting-cidr.html">
-          <div class="nh-card-title">Subnetting / CIDR <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Subnet boundary line on wire = CIDR prefix</div>
-        </a>
-        <a class="nh-card" href="network/foundations/tcp-handshake.html">
-          <div class="nh-card-title">TCP handshake <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">SYN / SYN-ACK / ACK as 3 distinct chip shapes</div>
-        </a>
-        <a class="nh-card" href="network/foundations/dhcp-dns.html">
-          <div class="nh-card-title">DHCP / DNS <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">4-stage DORA · monotonic ascending pitch</div>
-        </a>
-      </div>
-    </div>
-
-    <!-- Lane C — DC Management -->
-    <div class="nh-lane">
-      <h2>DC Management <span class="lane-tag">Lane C · 3 topics</span></h2>
-      <p class="lane-desc">Operator-side monitoring, telemetry, and management plane protocols.</p>
-      <div class="nh-grid">
-        <a class="nh-card" href="network/dc-management/snmp.html">
-          <div class="nh-card-title">SNMP <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Polling cadence visible as amber-dot metronome</div>
-        </a>
-        <a class="nh-card" href="network/dc-management/ipmi-redfish.html">
-          <div class="nh-card-title">IPMI / Redfish <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">OOB sideband-dashed wire · independent of data plane</div>
-        </a>
-        <a class="nh-card" href="network/dc-management/syslog.html">
-          <div class="nh-card-title">syslog <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Long-rect line chips · one-way append-only stream</div>
-        </a>
-      </div>
-    </div>
-
-    <!-- Lane D — Security -->
-    <div class="nh-lane">
-      <h2>Security <span class="lane-tag">Lane D · 4 topics</span></h2>
-      <p class="lane-desc">Cryptographic ceremonies and secure transport. The handshakes that wrap modern traffic.</p>
-      <div class="nh-grid">
-        <a class="nh-card" href="network/security/tls-handshake.html">
-          <div class="nh-card-title">TLS handshake <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Scan-line shroud builds progressively across handshake</div>
-        </a>
-        <a class="nh-card" href="network/security/oauth-jwt.html">
-          <div class="nh-card-title">OAuth 2.0 / JWT <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">4-actor dance · amber→cyan flow-stage tint on token issue</div>
-        </a>
-        <a class="nh-card" href="network/security/mtls.html">
-          <div class="nh-card-title">mTLS <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Bilateral — both nodes cert-badged · handshake echoes both ways</div>
-        </a>
-        <a class="nh-card" href="network/security/wireguard.html">
-          <div class="nh-card-title">WireGuard <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Minimalist · pre-keyed mesh · always-on encryption</div>
-        </a>
-      </div>
-    </div>
-
-    <!-- Lane E — APIs + Agents -->
-    <div class="nh-lane">
-      <h2>APIs + Agents <span class="lane-tag">Lane E · 4 topics</span></h2>
-      <p class="lane-desc">HTTP-family protocols and the new AI-agent transports.</p>
-      <div class="nh-grid">
-        <a class="nh-card" href="network/apis-agents/rest-api.html">
-          <div class="nh-card-title">REST API <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">Envelope chip · header/body distinct · server-processing gap</div>
-        </a>
-        <a class="nh-card" href="network/apis-agents/graphql.html">
-          <div class="nh-card-title">GraphQL <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">One outbound long-rect query · multiple inbound chips (3-shape cap)</div>
-        </a>
-        <a class="nh-card" href="network/apis-agents/grpc.html">
-          <div class="nh-card-title">gRPC <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">HTTP/2 4-lane multiplex · simultaneous stream chips</div>
-        </a>
-        <a class="nh-card" href="network/apis-agents/mcp-tool-call.html">
-          <div class="nh-card-title">MCP tool-call <span class="nh-status live">LIVE</span></div>
-          <div class="nh-card-desc">3-actor RPC · mesh-tunnel · industrial register held</div>
-        </a>
-      </div>
-    </div>
-
-    <a class="nh-compare-cta" href="network-compare.html" style="text-decoration:none;color:inherit;display:block;">
-      <h3>Compare mode <span class="nh-status live" style="margin-left:0.5rem;">LIVE</span></h3>
-      <p>4-panel side-by-side comparison with normalised instrument chip strip (throughput, latency, overhead, status). All 4 Lane B protocols available. <strong style="color:var(--cyan);">Open compare →</strong></p>
-    </a>
-
-  </section>
-
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:4px;padding:0.45rem 0.85rem;color:#5c6470;border-color:rgba(40,44,52,0.28)}.rz-manual-link a:hover{color:#92400e;border-color:rgba(146,64,14,0.5)}[data-theme="dark"] .rz-manual-link a{color:#969eaa;border-color:rgba(160,168,180,0.35)}[data-theme="dark"] .rz-manual-link a:hover{color:#E8B563;border-color:rgba(232,181,99,0.5)}</style><a href="manual/network-visualization-hub.html">Technical Manual &amp; Methodology &#8599;</a></div>
-  <footer style="max-width:1100px;margin:2rem auto;padding:1.5rem;border-top:0.8px solid var(--wire);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.72rem;color:var(--wire);text-align:center;">
-    <span id="versionStamp">· ResistanceZero · v?.?.? ·</span><br>
-    <span style="margin-top:0.4rem;display:inline-block;">Plan: <a href="docs/plans/2026-05-24-network-visualization-hub-v2.md" style="color:var(--cyan);">v2.3</a> &middot; Standard: <a href="standarization/KNOWLEDGE_LABS_STANDARD.md" style="color:var(--cyan);">KNOWLEDGE_LABS_STANDARD.md</a></span>
-  </footer>
-
+<section class="tool-ref" aria-labelledby="ref-h">
+  <div class="wrap">
+    <p class="eyebrow" id="ref-h">07 / Reference</p>
+    <h3>Read further</h3>
+    <p class="links"><a href="manual/network-visualization-hub.html">Technical manual and methodology</a><a href="tools.html">All tools</a></p>
+  </div>
+</section>
 </main>
 
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  function paint(){var d=document.documentElement.getAttribute('data-theme')==='dark';var i=t&&t.querySelector('i');if(i)i.className=d?'fas fa-sun':'fas fa-moon';var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'#0b0c0e':'#F5F7FA');}
+  if(t){t.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';var n=d?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(e){}paint();});paint();}
+  var s=document.getElementById('navSearchBtn');if(s)s.addEventListener('click',function(){if(window.__rzPalette&&window.__rzPalette.open)window.__rzPalette.open();});
+})();
+</script>
 <script src="js/rz-version.js?v=20261103-89b417e5"></script>
 <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
 <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
-<script>
-(function () {
-  var el = document.getElementById('versionStamp');
-  if (!el) return;
-  var v = window.RZ_VERSION || '1.x.x';
-  el.textContent = '· ResistanceZero · v' + v + ' · ' + (window.RZ_VERSION_DATE || '') + ' ·';
-})();
-</script>
-
 </body>
 </html>
