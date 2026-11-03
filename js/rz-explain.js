@@ -57,34 +57,34 @@
   function injectCss() {
     if (document.getElementById('rz-explain-css')) return;
     var css = [
+      /* Site register (owner 2026-11-03: the blue links, pill chips, 12 px radius and drop shadow read as AI slop):
+         graphite panel, hairline, radius 4, one amber accent, terms underlined in the text colour, no pills. */
+      '#' + PANEL_ID + '{--rzx-bg:#121316;--rzx-t1:#E8EDF5;--rzx-t2:#A0AEC0;--rzx-t3:#7D8794;--rzx-line:rgba(255,255,255,.14);--rzx-line2:rgba(255,255,255,.08);--rzx-inset:#08090b;--rzx-acc:#E8B563;}',
+      '[data-theme="light"] #' + PANEL_ID + '{--rzx-bg:#FFFFFF;--rzx-t1:#111827;--rzx-t2:#374151;--rzx-t3:#656B78;--rzx-line:rgba(17,24,39,.20);--rzx-line2:rgba(17,24,39,.10);--rzx-inset:#EEF2F7;--rzx-acc:#7A4800;}',
       '.rzx-trigger{cursor:help;border-bottom:1px dotted currentColor;text-decoration:none;}',
-      '.rzx-trigger:focus-visible{outline:2px solid #0ea5e9;outline-offset:2px;border-radius:3px;}',
+      '.rzx-trigger:focus-visible{outline:2px solid #E8B563;outline-offset:2px;}',
+      '[data-theme="light"] .rzx-trigger:focus-visible{outline-color:#B07600;}',
       '#' + PANEL_ID + '{position:fixed;z-index:100002;max-width:380px;min-width:240px;display:none;',
-      'background:var(--fs-bg2,var(--bg-secondary,#1e293b));color:var(--fs-t1,var(--text-primary,#f1f5f9));',
-      'border:1px solid var(--fs-bd,var(--bg-tertiary,#334155));border-radius:12px;padding:14px 16px;',
-      'box-shadow:0 12px 32px rgba(0,0,0,.35);font-size:.82rem;line-height:1.55;',
-      "font-family:'IBM Plex Sans','Inter',system-ui,sans-serif;}",
-      '[data-theme="light"] #' + PANEL_ID + '{background:#ffffff;color:#0f172a;border-color:#e2e8f0;box-shadow:0 12px 32px rgba(15,23,42,.18);}',
-      '#' + PANEL_ID + ' .rzx-title{font-weight:700;font-size:.88rem;margin:0 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}',
-      '#' + PANEL_ID + ' .rzx-back{cursor:pointer;border:1px solid var(--fs-bd,#334155);background:transparent;color:inherit;border-radius:6px;font-size:.66rem;padding:1px 8px;font-family:inherit;}',
-      '#' + PANEL_ID + ' .rzx-body{margin:0;color:var(--fs-t2,var(--text-primary,#cbd5e1));}',
-      '[data-theme="light"] #' + PANEL_ID + ' .rzx-body{color:#334155;}',
-      '#' + PANEL_ID + ' .rzx-term{color:#38bdf8;border-bottom:1px dotted #38bdf8;cursor:help;}',
-      '[data-theme="light"] #' + PANEL_ID + ' .rzx-term{color:#0369a1;border-bottom-color:#0369a1;}',
-      '#' + PANEL_ID + ' .rzx-formula{margin:8px 0 0;padding:6px 10px;border-radius:8px;background:var(--fs-bg3,rgba(15,23,42,.6));',
+      'background:var(--rzx-bg);color:var(--rzx-t1);border:1px solid var(--rzx-line);border-radius:4px;padding:14px 16px;',
+      "font-size:.82rem;line-height:1.55;font-family:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;}",
+      '#' + PANEL_ID + ' .rzx-title{font-weight:600;font-size:.88rem;margin:0 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}',
+      '#' + PANEL_ID + ' .rzx-back{cursor:pointer;border:1px solid var(--rzx-line);background:transparent;color:var(--rzx-t2);border-radius:4px;font-size:.7rem;padding:1px 8px;font-family:inherit;}',
+      '#' + PANEL_ID + ' .rzx-body{margin:0;color:var(--rzx-t2);}',
+      '#' + PANEL_ID + ' .rzx-term{color:var(--rzx-t1);border-bottom:1px solid var(--rzx-line);cursor:help;}',
+      '#' + PANEL_ID + ' .rzx-term:hover,#' + PANEL_ID + ' .rzx-term:focus-visible{border-bottom-color:var(--rzx-acc);outline:none;}',
+      '#' + PANEL_ID + ' .rzx-formula{margin:8px 0 0;padding:6px 10px;border-radius:4px;background:var(--rzx-inset);border:1px solid var(--rzx-line2);',
       "font-family:'JetBrains Mono',monospace;font-size:.74rem;overflow-x:auto;white-space:pre-wrap;}",
-      '[data-theme="light"] #' + PANEL_ID + ' .rzx-formula{background:#f1f5f9;}',
-      '#' + PANEL_ID + ' table.rzx-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.72rem;}',
-      '#' + PANEL_ID + ' table.rzx-table td{padding:3px 6px;border-bottom:1px dashed var(--fs-bd2,rgba(51,65,85,.4));}',
-      '#' + PANEL_ID + ' .rzx-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;align-items:center;}',
-      '#' + PANEL_ID + ' .rzx-chip{font-size:.6rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;',
-      'padding:2px 8px;border-radius:99px;border:1px solid var(--fs-bd,#334155);color:var(--fs-t3,#94a3b8);}',
-      '#' + PANEL_ID + ' .rzx-rel{font-size:.66rem;cursor:help;padding:2px 8px;border-radius:99px;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3);}',
-      '[data-theme="light"] #' + PANEL_ID + ' .rzx-rel{color:#0369a1;background:rgba(3,105,161,.08);border-color:rgba(3,105,161,.3);}',
-      '#' + PANEL_ID + ' a.rzx-gloss{font-size:.66rem;color:#38bdf8;}',
-      '[data-theme="light"] #' + PANEL_ID + ' a.rzx-gloss{color:#0369a1;}',
+      '#' + PANEL_ID + ' table.rzx-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.74rem;}',
+      '#' + PANEL_ID + ' table.rzx-table td{padding:4px 8px 4px 0;border-top:1px solid var(--rzx-line2);text-align:left;vertical-align:top;color:var(--rzx-t2);}',
+      '#' + PANEL_ID + ' table.rzx-table td:first-child{color:var(--rzx-t1);}',
+      '#' + PANEL_ID + ' table.rzx-table td.num{font-family:\'JetBrains Mono\',monospace;white-space:nowrap;}',
+      '#' + PANEL_ID + ' .rzx-meta{margin-top:10px;padding-top:8px;border-top:1px solid var(--rzx-line2);font-size:.72rem;color:var(--rzx-t3);display:grid;gap:3px;}',
+      '#' + PANEL_ID + ' .rzx-meta b{font-weight:500;color:var(--rzx-t2);}',
+      '#' + PANEL_ID + ' .rzx-rel{cursor:help;color:var(--rzx-t1);border-bottom:1px solid var(--rzx-line);}',
+      '#' + PANEL_ID + ' .rzx-rel:hover,#' + PANEL_ID + ' .rzx-rel:focus-visible{border-bottom-color:var(--rzx-acc);outline:none;}',
+      '#' + PANEL_ID + ' a.rzx-gloss{color:var(--rzx-t1);text-decoration:underline;text-decoration-color:var(--rzx-acc);text-underline-offset:2px;}',
       '@media (max-width:600px){#' + PANEL_ID + '{left:0!important;right:0!important;bottom:0!important;top:auto!important;',
-      'max-width:none;border-radius:16px 16px 0 0;max-height:60vh;overflow-y:auto;}}',
+      'max-width:none;border-radius:0;border-width:1px 0 0;max-height:60vh;overflow-y:auto;}}',
       '@media (prefers-reduced-motion:no-preference){#' + PANEL_ID + '{transition:opacity .14s ease;}}'
     ].join('');
     var st = document.createElement('style');
@@ -176,19 +176,21 @@
     if (e.table && e.table.length) {
       html += '<table class="rzx-table">';
       for (var i = 0; i < Math.min(e.table.length, 6); i++) {
-        html += '<tr><td>' + esc(e.table[i][0]) + '</td><td style="text-align:right;font-family:\'JetBrains Mono\',monospace;">' + esc(e.table[i][1]) + '</td></tr>';
+        var c1 = String(e.table[i][1] == null ? '' : e.table[i][1]);
+        html += '<tr><td>' + esc(e.table[i][0]) + '</td><td' + (/^[~≈<>≤≥±]?\s*[-−]?\d/.test(c1) ? ' class="num"' : '') + '>' + esc(c1) + '</td></tr>';
       }
       html += '</table>';
     }
     var meta = '';
-    if (e.u) meta += '<span class="rzx-chip">' + esc(e.u) + '</span>';
-    if (e.s) meta += '<span class="rzx-chip" title="Source">' + esc(e.s) + '</span>';
-    var rel = e.rel || [];
+    if (e.u) meta += '<div><b>Unit</b> ' + esc(e.u) + '</div>';
+    if (e.s) meta += '<div><b>Source</b> ' + esc(e.s) + '</div>';
+    var rel = e.rel || [], relHtml = [];
     for (var r = 0; r < Math.min(rel.length, 4); r++) {
       var re2 = db()[rel[r]];
-      if (re2) meta += '<span class="rzx-rel" data-explain="' + esc(rel[r]) + '" tabindex="0">' + esc(re2.t ? String(re2.t).replace(/\s*\(.*\)$/, '') : rel[r]) + '</span>';
+      if (re2) relHtml.push('<span class="rzx-rel" data-explain="' + esc(rel[r]) + '" tabindex="0">' + esc(re2.t ? String(re2.t).replace(/\s*\(.*\)$/, '') : rel[r]) + '</span>');
     }
-    if (e.link) meta += '<a class="rzx-gloss" href="' + esc(e.link) + '">Glossary →</a>';
+    if (relHtml.length) meta += '<div><b>See also</b> ' + relHtml.join(', ') + '</div>';
+    if (e.link) meta += '<div><a class="rzx-gloss" href="' + esc(e.link) + '">Glossary entry</a></div>';
     if (meta) html += '<div class="rzx-meta">' + meta + '</div>';
     p.innerHTML = html;
     return true;

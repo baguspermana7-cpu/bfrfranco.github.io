@@ -224,7 +224,7 @@
       <div class="in-group cx-scenario-bar">
         <h2>Scenario</h2>
         <div class="cx-scenario-row">
-          <select id="cxScenarioSelect" class="cx-scenario-sel" aria-label="Scenario preset">
+          <select id="cxScenarioSelect" class="cx-scenario-sel" aria-label="Scenario preset" onchange="if(this.value)cxLoadScenario()">
       <option value="">— Custom Configuration —</option>
       <option value="enterprise_2mw">Enterprise DC — 2MW Tier III</option>
       <option value="colo_10mw">Colocation — 10MW Tier III+</option>
@@ -235,7 +235,6 @@
       <option value="fast_track">Fast-Track Repurposed — 10MW Warehouse</option>
       <option value="recommission">Recommissioning — 3MW Existing</option>
     </select>
-          <button type="button" class="tool-btn" onclick="cxLoadScenario()">Load</button>
         </div>
       </div>
       <div class="in-group">
@@ -424,9 +423,6 @@
         <option value="INR">INR &#8377;</option>
       </select>
         </div>
-      </div>
-      <div class="cx-actions">
-        <button type="button" class="tool-btn cx-btn-primary" onclick="cxCalculate(true)">Calculate</button>
       </div>
     </aside>
 
@@ -5621,9 +5617,11 @@ cxRestoreInputs();
 document.querySelectorAll('.cx-input-field, .cx-input-range').forEach(function(el){
   el.addEventListener('change',function(){
     cxSaveInputs();
-    if(cxLastResults)cxCalculate();
+    cxCalculate();
   });
 });
+// Results are live: the page computes once on load and again on every input change (no Calculate button).
+if(!cxLastResults)cxCalculate();
 
 // --- AUTO-SAVE TIMER (30 seconds) ---
 setInterval(function(){
