@@ -149,7 +149,7 @@
       // instrument-cyan (#00DDFF, informational/secondary data), JetBrains Mono data-field label,
       // 4px radius. NO glassmorphism blur, NO generic-blue — both are on the anti-pattern list.
       st.textContent =
-        '#rzAccountPill{position:fixed;left:16px;bottom:16px;z-index:1200;background:#111827;' +
+        '#rzAccountPill{position:fixed;left:16px;bottom:16px;z-index:1200;background:#1a1d23;' +
         'color:#00DDFF;border:1px solid rgba(0,221,255,0.34);border-radius:4px;padding:8px 12px;' +
         "font-family:'JetBrains Mono','SF Mono','Cascadia Code','Consolas',monospace;font-size:10.5px;" +
         'font-weight:500;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;' +
