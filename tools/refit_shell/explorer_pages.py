@@ -213,8 +213,9 @@ SG_INIT = '''<script>
 def sg_main(src):
     note = re.search(r'<div class="sg-note">(.*?)</div>', src).group(1)
     note = copy(note, [(" as a fast-growing, Singapore-adjacent AI/edge load", ", a Singapore-adjacent AI/edge load")])
-    legend = ('<p class="ex-legend"><span><i class="k-line k-275"></i>275 kV backbone</span><span><i class="k-line k-150"></i>150 kV</span>'
-              '<span><i class="k-line k-isl"></i>Batam island (separate grid)</span><span><i class="k-dot k-sub"></i>Substation</span>'
+    key = '<svg class="k-line %s" width="22" height="6" viewBox="0 0 22 6" aria-hidden="true"><line x1="0" y1="3" x2="22" y2="3"/></svg>'
+    legend = ('<p class="ex-legend"><span>%s275 kV backbone</span><span>%s150 kV</span>' % (key % 'k-275', key % 'k-150') +
+              '<span>%sBatam island (separate grid)</span><span><i class="k-dot k-sub"></i>Substation</span>' % (key % 'k-isl') +
               '<span><i class="k-dot k-plant"></i>Plant</span><span><i class="k-dot k-dc"></i>Data center</span></p>')
     # the dataset header (js/pln-sumatra-grid-data.js): sources and version, quoted; the version is re-read from the data at load
     src_line = ('Source: RUPTL 2025-2034 / PLN AR 2024 / public sources. Coordinates approximate; not an operational topology. '

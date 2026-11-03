@@ -17,7 +17,8 @@ body.tool .ex-prose p { margin: 0 0 var(--rz-space-3); font-size: 15px; line-hei
 body.tool .ex-prose p strong, body.tool .ex-prose p b { color: var(--rzt-text); font-weight: 600; }
 body.tool .ck-tbl td a { color: var(--rzt-text); font-weight: 500; text-decoration: underline; text-decoration-color: var(--rzt-accent); text-underline-offset: 3px; }
 body.tool .ck-tbl td a:hover { text-decoration-color: var(--rzt-text); }
-body.tool .ck-tbl td:first-child { min-width: 9rem; }
+body.tool .ck-tbl td:first-child { width: 14rem; }
+@media (max-width: 600px) { body.tool .ck-tbl td:first-child { width: auto; min-width: 6.5rem; } body.tool .ck-tbl td, body.tool .ck-tbl th { padding: 8px 10px; font-size: 13px; } }
 body.tool .ck-tbl td { font-size: 14px; line-height: 1.5; }
 body.tool .ck-tbl td + td { color: var(--rzt-text-2); }
 body.tool .ck-tbl .num { font-family: var(--rzt-mono); text-align: right; white-space: nowrap; }
@@ -29,13 +30,14 @@ body.tool .ex-map { padding: 0; margin: 0; }
 body.tool #sgMap { height: 520px; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); background: var(--rzt-inset); }
 body.tool .ex-legend { display: flex; flex-wrap: wrap; gap: var(--rz-space-2) var(--rz-space-5); margin: var(--rz-space-3) 0 0; font: 400 12px var(--rzt-mono); color: var(--rzt-text-2); }
 body.tool .ex-legend span { display: inline-flex; align-items: center; gap: 8px; }
-body.tool .ex-legend .k-line { display: inline-block; width: 22px; height: 0; border-top: 2px solid #5E6673; }
-body.tool .ex-legend .k-275 { border-top-width: 4px; border-top-color: #2B2F36; }
-body.tool .ex-legend .k-isl { border-top-color: #4A5160; border-top-style: dashed; }
+body.tool .ex-legend svg { display: block; flex: none; }   /* line keys drawn as the map draws them (a dashed CSS border is banned chrome, T15) */
+body.tool .ex-legend .k-line line { stroke: #5E6673; stroke-width: 2; }
+body.tool .ex-legend .k-275 line { stroke: #2B2F36; stroke-width: 4; }
+body.tool .ex-legend .k-isl line { stroke: #4A5160; stroke-dasharray: 5 4; }
 body.tool .ex-legend .k-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #5E6673; }
 body.tool .ex-legend .k-plant { background: #D49A2A; }
 body.tool .ex-legend .k-dc { background: #1a1d23; outline: 1px solid var(--rzt-line-strong); }
-[data-theme="dark"] body.tool .ex-legend .k-275 { border-top-color: #A0AEC0; }
+[data-theme="dark"] body.tool .ex-legend .k-275 line { stroke: #A0AEC0; }
 [data-theme="dark"] body.tool .ex-legend .k-dc { background: #E8EDF5; }
 body.tool .ex-facts { max-width: 760px; margin-bottom: var(--rz-space-5); border-top: 1px solid var(--rzt-line); }
 body.tool .sg-tags { margin-left: 6px; font: 400 12px var(--rzt-mono); color: var(--rzt-muted); }
@@ -147,6 +149,10 @@ body.tool .d-text-amber { font: 400 9.5px var(--rzt-mono); fill: var(--rzt-accen
 body.tool .d-text-green { font: 400 9.5px var(--rzt-mono); fill: var(--rzt-muted); }
 body.tool .d-text-section { font: 600 10px var(--rzt-mono); letter-spacing: .08em; fill: var(--rzt-muted); text-transform: uppercase; }
 
+/* the shared sign-in modal (auth.js) opens by itself on a locked page: on the register it dims without glass,
+   and its error line keeps AA contrast in light (#f87171 on white measured 2.77) */
+body.tool .rz-modal-overlay { -webkit-backdrop-filter: none; backdrop-filter: none; }
+[data-theme="light"] body.tool .rz-error { color: var(--rzt-fault); }
 /* the auth modal must not advertise the demo account on a Full/Educator page (kept from the page's own style) */
 body.tool[data-rz-page="aiem"] .rz-demo-hint { display: none !important; }
 
