@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v3.24.40 — 2026-11-03 — "Field manual"
+
+Owner: *"warna biru ini dan beberapa component itu terlihat ai design slop"* and *"handbook by sesi lain sudah selesai … jadikan ke web page itu"*.
+
+### Added
+- **Data centre commissioning field manual, R01, as 33 web pages** under `cx-handbook/`: an index and 32 chapters (parts A–G, 384,159 words, 267 drawings). Each chapter has its own contents list, previous/next links and its drawings inline at the section they illustrate, as framed sheets with a stable `#F02-1` style anchor and a full-size link. Two chapters of the source (31 and 34) are interview preparation and are not published; employer references in the rest were removed.
+- `tools/build-cx-handbook.py --apply/--check` builds the pages from `data/cx-handbook/`; the freshness gate now covers it (10 generated artefacts).
+- The Cx calculator's reference section links the manual: index, process and levels (02), integrated systems testing (28), issue library (29), glossary (33).
+
+### Changed
+- **Explain popover on the site register** (`js/rz-explain.js`, 101 pages): graphite panel, 1 px hairline, radius 4, no drop shadow. Linked terms are underlined in the text colour and take the amber accent on hover instead of sky blue. Unit, source and related terms are plain rows ("See also …") instead of pill chips. Table text is left-aligned; only numbers use the mono face. The focus ring is amber. On phones the bottom sheet has square corners.
+- Cx calculator: choosing a scenario applies it at once (the Load button is gone); results compute on load and on every change (the Calculate button is gone); drop-downs use the sans face, numbers stay mono; the number field has no spinner arrows.
+
+### Gates
+- `tools/test-cx-handbook.py`: page count = chapters + index; every figure placed exactly once (267/267); every prose figure reference resolves (279/279); zero employer or interview terms. Red on a copy with F02-1 removed (266/267, 277/279) and on the unedited sources (4 hits).
+
 ## v3.24.39 — 2026-11-03 — "One blue less"
 
 Owner: *"continue"*, *"Continue all"*, then *"setelah itu commit and push"*. The hub slogan removal was agreed with the LTC session after the owner's *"sempurnakan jangan ada kata2 filler"*.
