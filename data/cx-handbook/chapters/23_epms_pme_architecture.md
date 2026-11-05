@@ -665,7 +665,7 @@ The points list and the device configuration record are the two documents the co
 15. IEC 61000-4-30:2025 Edition 4.0, Electromagnetic compatibility, Testing and measurement techniques, Power quality measurement methods, preview, accessed 31 October 2026. https://www.vde-verlag.de/iec-normen/preview-pdf/info_iec61000-4-30{ed4.0}b.pdf
 16. IEEE 1588-2019, Standard for a Precision Clock Synchronization Protocol for Networked Measurement and Control Systems, IEEE, 2020. https://standards.ieee.org/ieee/1588/6825/
 17. IEC 62443-3-3:2013, Industrial communication networks, Network and system security, System security requirements and security levels, IEC. https://webstore.iec.ch/en/publication/7033
-18. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+18. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).
 19. Schneider Electric, PowerLogic PM8000 technical specifications, FAQ FA244498, accessed 1 November 2026. https://www.se.com/us/en/faqs/FA244498
 20. Schneider Electric, "Transient alarms", PowerLogic ION9000 online help, accessed 1 November 2026. https://product-help.schneider-electric.com/PowerLogic-ION9000/en-us/content/08-alarms/transient-alarms.htm
 21. Advanced Energy, "SEMI F47-0706 compliance: voltage sag immunity", application note, accessed 1 November 2026. https://www.advancedenergy.com/getmedia/346f4ecd-3a42-4219-9a93-0a1ae94b64e5/en-lv-semi-F47-0706-compliance-voltage-sag-immunity.pdf

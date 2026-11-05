@@ -687,4 +687,4 @@ The EPMS acceptance certificate is signed when every item below is in the commis
 15. Information Technology Industry Council, ITI (CBEMA) Curve Application Note (reproduced), accessed 31 October 2026. https://powerquality.blog/2022/02/04/iti-cbema-curve-application-note/
 16. IEEE 1588-2019, Precision Clock Synchronization Protocol, IEEE. https://standards.ieee.org/ieee/1588/6825/
 17. IEC 62443-3-3:2013, System security requirements and security levels, IEC. https://webstore.iec.ch/en/publication/7033
-18. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+18. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

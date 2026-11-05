@@ -752,4 +752,4 @@ Figure F07-7 shows the week 27 IR counts for the building B2 electrical discipli
 15. ASHRAE, Titles, purposes and scopes of standards and guidelines (Guideline 0-2019, Standard 202), accessed 31 October 2026. https://www.ashrae.org/technical-resources/standards-and-guidelines/titles-purposes-and-scopes
 16. ASME B31.9 Building Services Piping. https://www.asme.org/codes-standards/find-codes-standards/b31-9-building-services-piping
 17. BSRIA BG 29 Pre-commission cleaning of pipework systems. https://www.bsria.com/uk/product/
-18. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+18. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

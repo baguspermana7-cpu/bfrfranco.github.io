@@ -661,5 +661,5 @@ The numbers in the daily and weekly reports come from registers. Each register h
 16. Oracle, Primavera P6 Enterprise Project Portfolio Management documentation (float and scheduling), accessed 31 October 2026. https://docs.oracle.com/en/industries/construction-engineering/primavera-p6-project/
 17. Lean Construction Institute, Last Planner System resources, accessed 31 October 2026. https://leanconstruction.org/lean-topics/last-planner-system/
 18. ISO 10816-3, Mechanical vibration, evaluation of machine vibration by measurements on non-rotating parts, Part 3, ISO (superseded by ISO 20816-3:2022; the specification names the edition to use). https://www.iso.org/standard/78311.html
-19. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+19. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).
 20. Defense Contract Management Agency, DCMA-EA PAM 200.1 Earned Value Management System (EVMS) Program Analysis Pamphlet, October 2012. https://www.dcma.mil/Portals/31/Documents/Policy/DCMA-PAM-200-1.pdf

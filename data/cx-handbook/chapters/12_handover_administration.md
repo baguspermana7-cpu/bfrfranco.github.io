@@ -655,4 +655,4 @@ The Uptime Institute publishes the Tier Standard: Operational Sustainability. It
 21. BSI, BS 1192-4:2014 Collaborative production of information, Fulfilling employer's information exchange requirements using COBie, catalogue status "Withdrawn". https://knowledge.bsigroup.com/products/collaborative-production-of-information-fulfilling-employer-s-information-exchange-requirements-using-cobie-code-of-practice
 22. ISO, BS EN ISO 19650-4:2022 Organization and digitization of information about buildings and civil engineering works, Part 4: Information exchange. https://www.iso.org/standard/78246.html
 23. Uptime Institute, Tier Standard: Operational Sustainability. https://uptimeinstitute.com/tiers
-24. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+24. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

@@ -723,4 +723,4 @@ Figure F03-4 shows which document needs which. ==A document cannot be approved b
 13. ANSI/NETA ATS-2025 summary, ANSI Blog, accessed 31 October 2026. https://blog.ansi.org/ansi/ansi-neta-ats-2025-electrical-power-testing/
 14. ISO 19650-2:2018, Organization and digitization of information about buildings, Part 2: Delivery phase, ISO. https://www.iso.org/standard/68080.html
 15. Data Centre Commissioning Field Manual R01, chapter 04 (document control, sections 04.12.2 and 04.12.3), October 2026.
-16. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+16. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

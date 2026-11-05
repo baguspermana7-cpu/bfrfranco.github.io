@@ -640,4 +640,4 @@ The table gives the key performance indicators (KPI) for change control and the 
 16. International Organization for Standardization, ISO 9001:2015, clause 8.5.6 control of changes. https://www.iso.org/standard/62085.html
 17. IEC 61869-2:2012 Instrument transformers, Part 2: Additional requirements for current transformers. https://webstore.iec.ch/en/publication/6050
 18. ASHRAE, Standard 202 and Guideline 0 titles, purposes and scopes, accessed 31 October 2026. https://www.ashrae.org/technical-resources/standards-and-guidelines/titles-purposes-and-scopes
-19. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+19. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

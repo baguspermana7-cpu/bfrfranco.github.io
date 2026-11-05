@@ -19,7 +19,7 @@ This chapter covers the site acceptance tests of the low-voltage (LV) distributi
 13. **Thermography.** Infrared survey under load.
 14. **Records, errors and KPIs.**
 
-Documents and standards used: ANSI/NETA ATS-2025 and NEMA AB 4 (guidelines for inspection and preventive maintenance of MCCBs, field test tables as quoted through NETA Acceptance Testing Specifications (ATS) Tables 100.7 and 100.8). The chapter also uses IEC 61439-1 and IEC 61439-2 (LV switchgear assemblies), IEC 60947-2 (circuit breakers), IEC 60364-6 (verification of LV installations), IEC 60255-151 (overcurrent relay curves) and IEEE C37.2 (device function numbers). It also uses IEEE 1584-2018 (arc-flash hazard calculations), NFPA 70E-2024 (electrical safety in the workplace), Schneider Electric Canalis KR and KT installation guides and the MSC-1 numbers from `case_ledger.json`. Values that could not be checked against the current edition are marked for confirmation, with the document and the table or clause named in the bracket.
+Documents and standards used: ANSI/NETA ATS-2025 and NEMA AB 4 (guidelines for inspection and preventive maintenance of MCCBs, field test tables as quoted through NETA Acceptance Testing Specifications (ATS) Tables 100.7 and 100.8). The chapter also uses IEC 61439-1 and IEC 61439-2 (LV switchgear assemblies), IEC 60947-2 (circuit breakers), IEC 60364-6 (verification of LV installations), IEC 60255-151 (overcurrent relay curves) and IEEE C37.2 (device function numbers). It also uses IEEE 1584-2018 (arc-flash hazard calculations), NFPA 70E-2024 (electrical safety in the workplace), Schneider Electric Canalis KR and KT installation guides and the MSC-1 example-campus numbers. Values that could not be checked against the current edition are marked for confirmation, with the document and the table or clause named in the bracket.
 
 ## 14.1 The LV system on MSC-1
 
@@ -703,4 +703,4 @@ NFPA 70E-2024 130.5(H) requires the label to show the nominal system voltage and
 15. IEC 60947-2, Low-voltage switchgear and controlgear, Part 2: Circuit-breakers, IEC (edition in contract). https://webstore.iec.ch
 16. IEC 60255-151, Measuring relays and protection equipment, Part 151: Functional requirements for over/under current protection, IEC. https://webstore.iec.ch
 17. IEEE C37.2, Standard for Electrical Power System Device Function Numbers, Acronyms and Contact Designations, IEEE. https://standards.ieee.org
-18. MSC-1 case ledger, `case_ledger.json`, handbook project file, October 2026.
+18. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

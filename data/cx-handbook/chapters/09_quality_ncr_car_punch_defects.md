@@ -583,4 +583,4 @@ Perpres 16/2018 Pasal 57 sets the handover steps. After the work is 100 % comple
 18. Peraturan Presiden Nomor 16 Tahun 2018, Pasal 57, accessed 31 October 2026. https://api-law.crpg.info/peraturan/perpres/16/2018/pasal/57
 19. Balai Besar Wilayah Sungai Serayu Opak, Kementerian PUPR, SOP Serah Terima Pertama Pekerjaan Konstruksi (PHO), accessed 31 October 2026. https://sda.pu.go.id/balai/bbwsserayuopak/storage/pdf/sop/CmSla-8.%20SOP%20Serah%20Terima%20Pertama%20Pekerjaan%20Konstruksi%20(PHO)_BBWS%20SO.pdf
 20. Direktorat Jenderal Perbendaharaan, Kementerian Keuangan, "Retensi bukan pemeliharaan", accessed 31 October 2026. https://djpb.kemenkeu.go.id/portal/id/berita/lainnya/opini/4219-retensi-bukan-pemeliharaan.html
-21. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+21. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

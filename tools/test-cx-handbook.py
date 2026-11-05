@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(sys.argv[sys.argv.index('--root') + 1]) if '--root' in sys.argv else Path(__file__).resolve().parent.parent
 PAGES = ROOT / 'cx-handbook'
 SRC = ROOT / 'data' / 'cx-handbook'
-SENSITIVE = re.compile(r'\b(microsoft|msft|interview\w*|candi|ranjith|whatsapp|confidential)\b', re.I)
+SENSITIVE = re.compile(r'\b(microsoft|msft|interview\w*|candi|ranjith|whatsapp|confidential)\b|case_ledger|working files|research/R[FN]-\d+|field_r01', re.I)
 FIGREF = re.compile(r'\bF\d{2}-\d+\b')
 
 

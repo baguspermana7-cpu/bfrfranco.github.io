@@ -13,7 +13,7 @@ This chapter covers three related subjects that a commissioning manager must pro
 7. **Surge protection.** IEC 61643-11 SPD types, installation checks and records.
 8. **Power quality.** IEEE 519 harmonic limits, IEC 61000-4-30 Class A instruments, IEC 61000-4-7 harmonics, IEC 61000-4-15 flicker, voltage dips and swells, the Information Technology Industry Council (ITIC) curve, the PQ survey procedure and the review of PQ data.
 
-Documents and standards used: IEEE 81-2025 (supersedes 81-2012; measuring earth resistivity, ground impedance and earth surface potentials), IEEE 80 (safety in AC substation grounding), IEEE 142 (grounding of industrial and commercial power systems), IEC 60364-5-54, IEC 60364-6 and PUIL 2020 (SNI 0225). The chapter also uses IEC 62305-1 to -4 (with IEC 62305-3:2024), IEC 61643-11:2025 and IEC 61643-12, IEEE 519-2022, IEC 61000-4-30:2025, IEC 61000-4-7 and IEC 61000-4-15. It also uses IEC 62586-2, EN 50160, the ITIC (CBEMA) curve note, SEMI F47 and the MSC-1 numbers in `case_ledger.json`. Values not checked against the current edition are marked for confirmation, with the document and the table or clause named in the bracket.
+Documents and standards used: IEEE 81-2025 (supersedes 81-2012; measuring earth resistivity, ground impedance and earth surface potentials), IEEE 80 (safety in AC substation grounding), IEEE 142 (grounding of industrial and commercial power systems), IEC 60364-5-54, IEC 60364-6 and PUIL 2020 (SNI 0225). The chapter also uses IEC 62305-1 to -4 (with IEC 62305-3:2024), IEC 61643-11:2025 and IEC 61643-12, IEEE 519-2022, IEC 61000-4-30:2025, IEC 61000-4-7 and IEC 61000-4-15. It also uses IEC 62586-2, EN 50160, the ITIC (CBEMA) curve note, SEMI F47 and the MSC-1 example-campus numbers. Values not checked against the current edition are marked for confirmation, with the document and the table or clause named in the bracket.
 
 ## 17.1 Earthing systems on a data-centre campus
 
@@ -659,4 +659,4 @@ On MSC-1 the CxM compares 10-minute voltage, THDv and TDD values for the same in
 15. ITIC, ITI (CBEMA) curve application note, October 2000 (updated). https://www.itic.org/resources/Oct2000Curve-UPDATED.doc
 16. SagSwell, ITIC (CBEMA) curve corner points and SEMI F47. https://sagswell.com/guides/itic-cbema-curve
 17. Hufocw course slides ECEg-6312, IEEE 519 current limits. https://www.hufocw.org/Download/file/32110
-18. MSC-1 case ledger, `case_ledger.json`, handbook project file, October 2026.
+18. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

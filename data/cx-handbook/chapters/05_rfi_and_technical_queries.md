@@ -760,4 +760,4 @@ Of the 15 items, 1 led to a change order, which is 6.7 %, close to the 8.8 % cha
 14. ANSI/TIA-568.3-D, Optical Fiber Cabling and Components Standard, Telecommunications Industry Association, October 2016; replaced by ANSI/TIA-568.3-E, approved 29 September 2022 (FOTC summary, accessed 1 November 2026). https://www.tiafotc.org/tia-standards-update/tia-568-3-e/
 15. NFPA 13, Standard for the Installation of Sprinkler Systems, National Fire Protection Association (edition adopted by the project). https://www.nfpa.org/codes-and-standards/nfpa-13-standard-development/13
 16. NEC4 Engineering and Construction Contract, Thomas Telford / NEC, 2017 (clauses 13.3, 15 and 61.3; January 2023 amendments; Z clauses of the signed contract govern). https://www.neccontract.com/products/contracts/nec4-ecc
-17. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+17. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

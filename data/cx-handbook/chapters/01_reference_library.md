@@ -715,7 +715,7 @@ A new CxM on a Jakarta hyperscale campus has limited time before the first desig
 32. Open Library, Arregoces and Portolani, Data Center Fundamentals. https://openlibrary.org/works/OL6216191W
 33. Open Library, Barroso and Hölzle, The Datacenter as a Computer. https://openlibrary.org/works/OL9959158W
 34. Open Library, Doughton and Hooper, Inspection, Testing and Commissioning of Electrical Installations. https://openlibrary.org/works/OL21036234W
-35. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+35. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).
 36. NFPA, Current Edition fields on the standard development pages for NFPA 13, 25, 70B, 70E, 72, 75, 76, 110 and 2001, accessed 1 November 2026. https://www.nfpa.org/codes-and-standards/nfpa-72-standard-development/72
 37. IEEE Standards Association, status pages for IEEE 400-2012 (superseded by 400-2023), IEEE 400.3-2022, IEEE 1188-2025, IEEE 450-2020 and IEEE 485-2020, accessed 1 November 2026. https://standards.ieee.org/ieee/1188/11656/ and https://standards.ieee.org/standard/400-2012.html
 38. ASHRAE, Commissioning bookstore page (Standard 230-2022, Guideline 1.3-2018, Guideline 1.5-2017), accessed 1 November 2026. https://www.ashrae.org/technical-resources/bookstore/commissioning

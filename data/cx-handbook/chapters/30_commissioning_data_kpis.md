@@ -806,5 +806,5 @@ Figure F30-9 shows the eight panels of the example dashboard at week 12 with the
 16. ISO 8000-8:2015, Data quality, Information and data quality: concepts and measuring, ISO. https://www.iso.org/standard/60805.html
 17. American Society for Quality, "Quality glossary" (first-pass yield and rolled throughput yield), accessed 31 October 2026. https://asq.org/quality-resources/quality-glossary
 18. Stephen Few, Information Dashboard Design: Displaying Data for At-a-Glance Monitoring, Analytics Press, second edition 2013 (cited by title).
-19. MSC-1 case ledger, `case_ledger.json`, handbook R02 (design PUE 1.22, ageing limits, first-pass yield target, IST loads).
+19. MSC-1 example campus (design PUE 1.22, ageing limits, first-pass yield target, IST loads).
 20. ISO 25000 portal, "ISO/IEC 25012" (data quality model: 15 characteristics, inherent and system-dependent), accessed 1 November 2026. https://iso25000.com/index.php/en/iso-25000-standards/iso-25012

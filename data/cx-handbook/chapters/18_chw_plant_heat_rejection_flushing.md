@@ -17,7 +17,7 @@ This chapter covers the central cooling plant of a data-centre building. The pla
 11. **Functional and failure tests.** Plant control sequences at Level 4 (L4), and the plant inputs to the Level 5 (L5) integrated systems test in chapter 28.
 12. **Records and key performance indicators.** Record fields, filled examples, common errors and the site checklist.
 
-Documents and standards used are listed here. Chillers: AHRI Standard 550/590 (I-P) and AHRI Standard 551/591 (SI), and ANSI/ASHRAE Standard 30 (method of testing liquid chillers). Piping: ASME B31.9 (building services piping) and ASME B31.3 (process piping). Water: BSRIA BG 29/2021 (pre-commission cleaning of pipework systems), BSRIA BG 50 (water treatment for closed heating and cooling systems), BS 8552 (sampling and monitoring of water from building services closed systems) and ANSI/ASHRAE Standard 188 (legionellosis risk management). Balancing and equipment tests: CIBSE Commissioning Code W and its 2025 successor "Water distribution systems", ISO 9906:2012 (rotodynamic pump acceptance tests) and CTI ATC-105:2022 (cooling tower acceptance test). Energy and process: ANSI/ASHRAE Standard 90.4 (energy standard for data centres) and ASHRAE Guideline 0-2019 (the commissioning process). Start-up: the chiller manufacturers' start-up documents (Trane, Carrier, Johnson Controls York, Daikin). The worked examples use the MSC-1 numbers in `case_ledger.json`.
+Documents and standards used are listed here. Chillers: AHRI Standard 550/590 (I-P) and AHRI Standard 551/591 (SI), and ANSI/ASHRAE Standard 30 (method of testing liquid chillers). Piping: ASME B31.9 (building services piping) and ASME B31.3 (process piping). Water: BSRIA BG 29/2021 (pre-commission cleaning of pipework systems), BSRIA BG 50 (water treatment for closed heating and cooling systems), BS 8552 (sampling and monitoring of water from building services closed systems) and ANSI/ASHRAE Standard 188 (legionellosis risk management). Balancing and equipment tests: CIBSE Commissioning Code W and its 2025 successor "Water distribution systems", ISO 9906:2012 (rotodynamic pump acceptance tests) and CTI ATC-105:2022 (cooling tower acceptance test). Energy and process: ANSI/ASHRAE Standard 90.4 (energy standard for data centres) and ASHRAE Guideline 0-2019 (the commissioning process). Start-up: the chiller manufacturers' start-up documents (Trane, Carrier, Johnson Controls York, Daikin). The worked examples use the MSC-1 example-campus numbers.
 
 ## 18.1 Plant arrangement and the numbers used in this chapter
 
@@ -29,7 +29,7 @@ The FWS runs warm: in the MSC-1 worked example it supplies 35 °C and returns 45
 
 ### 18.1.2 MSC-1 plant numbers
 
-In the MSC-1 worked example the campus has 4 buildings, each with 3 data halls of 12 MW information technology (IT) load. The following values come from `case_ledger.json` or are derived from it in this chapter.
+In the MSC-1 worked example the campus has 4 buildings, each with 3 data halls of 12 MW information technology (IT) load. The following values are the MSC-1 example-campus values or are derived from them in this chapter.
 
 | Quantity | Value | Basis |
 |---|---|---|

@@ -651,4 +651,4 @@ The table defines the key performance indicators (KPI) for submittals.
 16. Centre for Digital Built Britain, BIM Toolkit National Annex Guidance (type codes MS, CA, SP), accessed 31 October 2026. https://www.cdbb.cam.ac.uk/files/national_annex_guidance.pdf
 17. IEC 62271-200:2021, High-voltage switchgear and controlgear, Part 200: AC metal-enclosed switchgear and controlgear for rated voltages above 1 kV and up to and including 52 kV, IEC. https://webstore.iec.ch/ (search IEC 62271-200)
 18. IEC 62040-3:2021, Uninterruptible power systems (UPS), Part 3: Method of specifying the performance and test requirements, IEC. https://webstore.iec.ch/ (search IEC 62040-3)
-19. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+19. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

@@ -712,4 +712,4 @@ The table defines the key performance indicators (KPI) that the CxM reports for 
 13. NEBB, Procedural Standard for Testing, Adjusting and Balancing, 2019, 9th edition, accessed 31 October 2026. https://www.nebb.org
 14. Data Centre Commissioning Field Manual R01, chapter 22 (BMS commissioning durations) and chapter 04 (document control), October 2026.
 15. Data Centre Commissioning Field Manual R01, chapter 23 (EPMS device count for building B2), October 2026.
-16. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+16. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).

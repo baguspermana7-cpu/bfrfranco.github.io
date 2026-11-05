@@ -781,7 +781,7 @@ Source: values given in vendor guides derived from IEC 60364-6:2016 Table 6.1 (c
 19. Direktorat Jenderal Ketenagalistrikan, FAQ SLO (7 August 2024). https://gatrik.esdm.go.id/assets/uploads/download_index/files/81afd-faq-slo-07082024.pdf
 20. Badan Standardisasi Nasional, SNI 0225:2020 Persyaratan Umum Instalasi Listrik 2020 (PUIL 2020). https://bsn.go.id
 21. ASHRAE Guideline 0-2019, The Commissioning Process, ASHRAE. https://www.ashrae.org/technical-resources/ashrae-standards-and-guidelines
-22. MSC-1 case ledger, `../case_ledger.json`, Data Centre Commissioning Field Manual R01 working files, October 2026.
+22. MSC-1 example campus: the worked-example data set described on the manual index (illustrative values, not project data).
 23. US Occupational Safety and Health Administration, 29 CFR 1910.146 Permit-required confined spaces, accessed 1 November 2026. https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.146
 24. National Fire Protection Association, NFPA 51B Standard for Fire Prevention During Welding, Cutting, and Other Hot Work, 2024 edition (current), and the 2019 edition summary of changes, accessed 1 November 2026. https://www.fire-police-ems.com/NFPA51B-2019.shtml
 25. University of Michigan Environment, Health and Safety, Hot Work Permit (NFPA 51B based), 2025, accessed 1 November 2026. https://ehs.umich.edu/wp-content/uploads/2025-U-M-Internal-Hot-Work-Permit.docx.pdf
