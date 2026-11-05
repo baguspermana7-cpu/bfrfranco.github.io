@@ -50,7 +50,7 @@
     --bg-dark: #121316;
     --bg-card: #191b1f;
     --bg-card-hover: #272a2f;
-    --bg-sidebar: linear-gradient(180deg, #1e3a5f 0%, #191b1f 100%);
+    --bg-sidebar: #191b1f;
     --bg-menu-btn: rgba(255, 255, 255, 0.12);
     --accent-cyan: #06b6d4;
     --accent-green: #10b981;
@@ -682,7 +682,7 @@ body[data-conv-authority="unavailable"] .stats-panel .stat-value {
     --bg-dark: #f0f4f8;
     --bg-card: #ffffff;
     --bg-card-hover: #f8fafc;
-    --bg-sidebar: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+    --bg-sidebar: #ffffff;
     --bg-menu-btn: rgba(0, 0, 0, 0.05);
     --text-primary: #1e293b;
     --text-secondary: #475569;
@@ -710,7 +710,7 @@ body[data-conv-authority="unavailable"] .stats-panel .stat-value {
 
 /* Navigation Section */
 [data-theme="light"] .nav-section { background: var(--bg-sidebar); box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
-[data-theme="light"] .nav-section::before { background: linear-gradient(to right, transparent, rgba(0,0,0,0.03), transparent); }
+[data-theme="light"] .nav-section::before { background: none; }
 [data-theme="light"] .nav-section h2 { color: var(--text-primary); }
 
 /* Nav Menu Items */
@@ -799,8 +799,8 @@ body[data-conv-authority="unavailable"] .stats-panel .stat-value {
         .rz-restricted-card { max-width: 420px; padding: 32px; background: #191b1f; border: 1px solid rgba(100, 116, 139,0.3); border-radius: 4px; text-align: center; color: #f1f5f9; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         .rz-restricted-card h2 { margin: 0 0 8px; font-size: 1.25rem; }
         .rz-restricted-card p { margin: 0 0 20px; color: #94a3b8; font-size: 0.9rem; line-height: 1.5; }
-        .rz-restricted-card button { padding: 10px 22px; border: none; border-radius: 10px; background: linear-gradient(135deg,#64748b,#64748b); color: #fff; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
-        .rz-restricted-card button:hover { background: linear-gradient(135deg,#64748b,#64748b); }
+        .rz-restricted-card button { padding: 10px 22px; border: none; border-radius: 10px; background: #64748b; color: #fff; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        .rz-restricted-card button:hover { background: #4b5563; }
 
         /* v1.8.0 — mobile sim/lab responsive patch */
         @media (max-width: 768px) {
@@ -950,7 +950,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
     <script src="js/conv-alarm-workspace.js?v=20260920-a6e2efa0" defer></script>
     <script src="js/rz-bms-shell.js?v=20260920-1c0de861" defer></script>
 <style id="rz-skiplink-v1">
-.skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
+.skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
 [data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
 </style>
@@ -2740,9 +2740,9 @@ function openFaqDialog(){
   var ex=d.getElementById('rzFaqDialogConv'); if(ex){ ex.style.display='flex'; return; }
   var dlg=d.createElement('div'); dlg.id='rzFaqDialogConv'; dlg.setAttribute('role','dialog');
   dlg.setAttribute('aria-modal','true'); dlg.setAttribute('aria-labelledby','rzFaqTitleConv');
-  dlg.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.78);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  dlg.style.cssText='position:fixed;inset:0;background:rgba(11,12,14,.82);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
   var box=d.createElement('div');
-  box.style.cssText='background:#121316;border:1px solid #2a2d33;border-radius:10px;max-width:760px;width:100%;max-height:88vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:"IBM Plex Sans",sans-serif;';
+  box.style.cssText='background:#121316;border:1px solid #2a2d33;border-radius:4px;max-width:760px;width:100%;max-height:88vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:"IBM Plex Sans",sans-serif;';
   box.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 18px;border-bottom:1px solid #2a2d33;"><h3 id="rzFaqTitleConv" style="margin:0;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#67e8f9;">Conventional DC &mdash; Frequently Asked Questions</h3><button id="rzFaqCloseConv" type="button" aria-label="Close FAQ" style="background:none;border:1px solid #8f6161;color:#e7bcbc;width:28px;height:28px;border-radius:5px;cursor:pointer;">&times;</button></div><div id="rzFaqListConv" style="overflow-y:auto;padding:14px 18px 18px;flex:1;"></div>';
   dlg.appendChild(box);
   var list=box.querySelector('#rzFaqListConv');
@@ -2802,9 +2802,9 @@ function showBasisDrawer(id){
   var ex=d.getElementById('kpiBasisDrawer');if(ex)ex.remove();
   var ov=d.createElement('div');
   ov.id='kpiBasisDrawer';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','kbdTitle');
-  ov.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.82);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(11,12,14,.85);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;';
   var box=d.createElement('div');
-  box.style.cssText='background:#121316;border:1px solid #2a2d33;border-radius:10px;max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:"IBM Plex Sans",sans-serif;';
+  box.style.cssText='background:#121316;border:1px solid #2a2d33;border-radius:4px;max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:"IBM Plex Sans",sans-serif;';
   var hdr='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid #2a2d33;">'+
     '<h3 id="kbdTitle" style="margin:0;font-size:14px;color:#67e8f9;letter-spacing:.05em;text-transform:uppercase;">'+b.title+'</h3>'+
     '<span style="font-size:10px;background:rgba(56,189,248,.12);color:#67e8f9;padding:3px 8px;border-radius:4px;border:1px solid rgba(56,189,248,.3);letter-spacing:.06em;">'+b.mode+'</span>'+
