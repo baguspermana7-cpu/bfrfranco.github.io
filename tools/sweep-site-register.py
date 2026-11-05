@@ -24,10 +24,8 @@ ROOT = Path(__file__).resolve().parent.parent
 
 # design artefacts keep their before/after evidence; the owner decides their fate
 EXCLUDE = {"manual/rz-cockpit-mockup.html", "prd/rz-cockpit-mockup.html",
-           "article-9-paper.html",  # paper/print document (PAPER_DOCUMENTS in audit-vibecode)
-           # owned by the parallel LTC session (lab manuals, pillar-fire-safety rewrite)
-           "manual/ltc-system-modelling-lab.html", "manual/standards-ltc-lab.html",
-           "manual/pillar-fire-safety.html"}
+           "article-9-paper.html"}  # paper/print document (PAPER_DOCUMENTS in audit-vibecode)
+# The three LTC manuals left this set in v3.24.44: their owner takes the manual family's values.
 
 # graphite + amber, the values css/rz-article-dark.css uses
 DARK_BG, DARK_SURFACE, DARK_SURFACE_2 = "#0e0f12", "#16181d", "#121316"
