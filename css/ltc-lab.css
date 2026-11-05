@@ -459,51 +459,51 @@ body.ltc-revamp .ltc-schematic svg {
     }
 }
 
-/* ── KPI strip ────────────────────────────────────────────── */
+/* ── KPI readout ──────────────────────────────────────────
+   One framed instrument row, cells split by hairlines (owner 2026-10-15: tile strips with tinted
+   "good" boxes read as slop). A good value keeps the text colour; state is not painted on the cell. */
 body.ltc-revamp .ltc-kpi-strip {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
-}
-
-body.ltc-revamp .ltc-kpi-card {
-    background: var(--ltc-card-bg);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1px;
     border: 1px solid var(--ltc-hairline);
     border-radius: 4px;
-    padding: 10px 10px 8px;
-    text-align: center;
-    box-shadow: var(--ltc-shadow-sm);
+    background: var(--ltc-hairline);
+    overflow: hidden;
 }
-body.ltc-revamp .ltc-kpi-card.ltc-kpi-good {
-    background: var(--ltc-kpi-good-bg);
-    border-color: rgba(18,161,80,.22);
-}
+
+body.ltc-revamp .ltc-kpi-card,
+body.ltc-revamp .ltc-kpi-card.ltc-kpi-good,
 [data-theme="dark"] body.ltc-revamp .ltc-kpi-card.ltc-kpi-good {
-    border-color: rgba(52,211,153,.2);
+    background: var(--ltc-card-bg);
+    border: 0;
+    border-radius: 0;
+    padding: 10px 12px 8px;
+    text-align: left;
+    box-shadow: none;
 }
 
 body.ltc-revamp .ltc-kpi-label {
-    font-size: 0.60rem;
+    font-size: 0.66rem;
     color: var(--ltc-muted);
     letter-spacing: 0.04em;
     text-transform: uppercase;
     margin-bottom: 4px;
 }
 
-body.ltc-revamp .ltc-kpi-value {
-    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--ltc-text);
-    line-height: 1;
-    word-break: break-all;
-}
+body.ltc-revamp .ltc-kpi-value,
 body.ltc-revamp .ltc-kpi-value.ltc-kpi-green {
-    color: var(--ltc-green);
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--ltc-text);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
 }
 
 body.ltc-revamp .ltc-kpi-unit {
-    font-size: 0.58rem;
+    font-size: 0.66rem;
     color: var(--ltc-muted);
     margin-top: 2px;
 }
