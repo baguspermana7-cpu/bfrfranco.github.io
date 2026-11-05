@@ -842,7 +842,7 @@
      their head. On screen the same document reads as a stack of sheets. */
   var CSS = '*{box-sizing:border-box}html{background:#e9edf3}body{margin:0;color:#1f2933;font:400 13.5px/1.5 "IBM Plex Sans",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
     'main{max-width:900px;margin:20px auto 64px;padding:0 12px}main>section,main>nav{background:#fff;box-shadow:0 1px 3px rgba(17,24,39,.18);margin:0 0 16px;padding:40px 44px;scroll-margin-top:60px}' +
-    '.bar{position:sticky;top:0;z-index:2;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 16px;background:#111827;color:#e5e7eb;font:500 12px "JetBrains Mono",monospace}.bar span{flex:1}' +
+    '.bar{position:sticky;top:0;z-index:2;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 16px;background:#1a1d23;color:#e5e7eb;font:500 12px "JetBrains Mono",monospace}.bar span{flex:1}' +
     'button{font:500 12px "JetBrains Mono",monospace;padding:8px 12px;min-height:36px;border:1px solid #9aa3ad;border-radius:3px;background:#fff;color:#111;cursor:pointer}.bar button{background:#1f2937;color:#f9fafb;border-color:#4b5563}.bar button.pri{background:#b45309;border-color:#b45309}' +
     '.cover{min-height:640px}.eyebrow{font:500 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#b45309;margin:0 0 14px}.cover .rule{width:72px;height:3px;background:#b45309;margin:0 0 16px}' +
     'h1{font-size:32px;line-height:1.15;margin:0 0 8px;font-weight:600;letter-spacing:-.01em}.cover .sub{font-size:14px;color:#4b5563;margin:0 0 24px}.meta{color:#4b5563;font-size:12.5px;margin:0 0 16px}' +

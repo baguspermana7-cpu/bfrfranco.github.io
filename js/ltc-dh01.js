@@ -328,7 +328,7 @@
     var g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
     function P(x, y) { return rot ? [PADL + y * scale, PADT + x * scale] : [PADL + x * scale, PADT + y * scale]; }
     function R(x, y, w, hh) { var a = P(x, y); return rot ? [a[0], a[1], hh * scale, w * scale] : [a[0], a[1], w * scale, hh * scale]; }
-    var ink = tok(cv, '--t1', '#E8EDF5'), mute = tok(cv, '--t3', '#8190a6'), t2 = tok(cv, '--t2', '#b8c2d3'), bg1 = tok(cv, '--bg1', '#0a0e1a'), bg2 = tok(cv, '--bg2', '#111827'),
+    var ink = tok(cv, '--t1', '#E8EDF5'), mute = tok(cv, '--t3', '#8190a6'), t2 = tok(cv, '--t2', '#b8c2d3'), bg1 = tok(cv, '--bg1', '#0b0c0e'), bg2 = tok(cv, '--bg2', '#121316'),
         bg3 = tok(cv, '--bg3', '#1c2333'), cy = tok(cv, '--c', '#00DDFF'), red = tok(cv, '--r', '#FF5050'), amber = tok(cv, '--o', '#FFB020'), line = tok(cv, '--bd2', 'rgba(255,255,255,.2)');
     var mono = "500 10.5px 'JetBrains Mono', monospace", small = scale < 20;
     var hits = [];

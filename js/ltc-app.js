@@ -44,7 +44,7 @@
     document.documentElement.setAttribute('data-theme', t);
     try { localStorage.setItem('theme', t); } catch (e) { /* private mode */ }
     var m = $('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e1a' : '#f5f7fa');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0b0c0e' : '#f5f7fa');
     var b = $('#themeToggle');
     if (b) b.setAttribute('aria-label', t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
   }
