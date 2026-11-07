@@ -215,10 +215,18 @@
             { key: 'charts',    label: 'CHARTS',               icon: 'fa-chart-line' },
             { key: 'report',    label: 'REPORT',               icon: 'fa-file-lines' }
         ];
+        var TAB_STEPS = { results: 'steps 1–5', charts: 'step 6', report: 'step 7' };
+        tabsBar.setAttribute('role', 'tablist');
+        tabsBar.setAttribute('aria-label', 'Dashboard');
         tabDefs.forEach(function (t, i) {
             var btn = el('button', { className: 'ltc-tab-btn' + (i === 0 ? ' ltc-tab-active' : '') });
-            btn.innerHTML = '<i class="fas ' + t.icon + '" aria-hidden="true"></i> ' + t.label;
+            btn.innerHTML = '<i class="fas ' + t.icon + '" aria-hidden="true"></i> ' + t.label +
+                (TAB_STEPS[t.key] ? ' <span class="ltc-tab-step">' + TAB_STEPS[t.key] + '</span>' : '');
+            btn.type = 'button';
             btn.dataset.tab = t.key;
+            btn.id = 'ltcTabBtn-' + t.key;
+            btn.setAttribute('role', 'tab');
+            btn.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
             tabsBar.appendChild(btn);
         });
         centerCol.appendChild(tabsBar);
@@ -232,6 +240,10 @@
 
         [panelDetailed, panelFlow, panelCharts, panelReport].forEach(function (p) {
             p.style.display = 'none';
+        });
+        [['results', panelResults], ['detailed', panelDetailed], ['flow', panelFlow], ['charts', panelCharts], ['report', panelReport]].forEach(function (x) {
+            x[1].setAttribute('role', 'tabpanel');
+            x[1].setAttribute('aria-labelledby', 'ltcTabBtn-' + x[0]);
         });
 
         // Results grid placeholder
@@ -877,6 +889,7 @@
                 // Deactivate all
                 tabsBar.querySelectorAll('.ltc-tab-btn').forEach(function (b) {
                     b.classList.remove('ltc-tab-active');
+                    b.setAttribute('aria-selected', 'false');
                 });
                 Object.values(panelMap).forEach(function (pid) {
                     var p = document.getElementById(pid);
@@ -885,6 +898,7 @@
 
                 // Activate selected (with entrance animation)
                 btn.classList.add('ltc-tab-active');
+                btn.setAttribute('aria-selected', 'true');
                 var activePanel = document.getElementById(panelMap[btn.dataset.tab]);
                 if (activePanel) {
                     activePanel.style.display = '';

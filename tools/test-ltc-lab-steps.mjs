@@ -40,6 +40,8 @@
  *    label says a fault mode moves the screening risk index, not the heat balance
  * S18 (1440) In plant mode a setting carries the 'screening only' mark exactly when changing it moves none of the
  *    plant's outputs (each setting perturbed and restored in the page)
+ * S19 The dashboard tab follows the step (1-5 Results, 6 Charts, 7 Report); the tab buttons are ARIA tabs with
+ *    aria-selected in sync, and the step-scoped tabs name their steps
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -357,6 +359,19 @@ try {
     ok((await cap()) !== c0, `${w} S7 Recompute did not update the result (${c0})`);
     ok(!rs.due, `${w} S7 Recompute left the due mark`);
     await p.evaluate(() => document.getElementById('ltcAutoRun').click());
+    // S19 the dashboard tab follows the step: 1-5 Results, 6 Charts, 7 Report; tabs are ARIA tabs and name their steps
+    const tabState = () => p.evaluate(() => [...document.querySelectorAll('.ltc-tabs-bar .ltc-tab-btn')].map((b) => ({ k: b.dataset.tab,
+      on: b.classList.contains('ltc-tab-active'), role: b.getAttribute('role'), sel: b.getAttribute('aria-selected'), txt: b.textContent.replace(/\s+/g, ' ').trim() })));
+    for (const [step, want] of [['capture', 'results'], ['check', 'charts'], ['loop', 'results'], ['review', 'report'], ['load', 'results']]) {
+      await p.evaluate(() => document.querySelector('.ltc-tab-btn[data-tab="flow"]').click());
+      await p.evaluate((s) => document.getElementById('ltcStep-' + s).click(), step);
+      await new Promise((r) => setTimeout(r, 400));
+      const ts = await tabState(), on = ts.filter((t) => t.on).map((t) => t.k);
+      ok(on.length === 1 && on[0] === want, `${w} S19 step ${step} leaves tab ${on.join(',')} open, expected ${want}`);
+      ok(ts.every((t) => t.role === 'tab' && t.sel === String(t.on)), `${w} S19 tabs not ARIA tabs in sync: ${JSON.stringify(ts.map((t) => [t.k, t.role, t.sel, t.on]))}`);
+    }
+    const tl = Object.fromEntries((await tabState()).map((t) => [t.k, t.txt]));
+    ok(/1\s*[–-]\s*5/.test(tl.results) && /\b6\b/.test(tl.charts) && /\b7\b/.test(tl.report), `${w} S19 tab labels do not name their steps: ${JSON.stringify(tl)}`);
     const sw = await p.evaluate(() => document.documentElement.scrollWidth);
     ok(sw <= w, `${w} S5 scrollWidth ${sw}`);
     ok(!errs.length, `${w} S5 page error: ${errs[0]}`);
@@ -364,4 +379,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, 0 errors');

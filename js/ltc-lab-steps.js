@@ -30,9 +30,9 @@
       result: function (t) { return 'PUE ' + t('outPue') + ' · COP ' + t('outCop'); } },
     { key: 'cost', name: 'Cost · carbon', nodes: [],
       result: function (t) { return t('outNetOpex') + ' · ' + t('outCarbon'); } },
-    { key: 'check', name: 'Check', nodes: [], tab: /chart/i,
+    { key: 'check', name: 'Check', nodes: [], tab: 'charts',
       result: function (t) { return t('quickConstraintState') || 'targets and limits'; } },
-    { key: 'review', name: 'Review', nodes: [], tab: /report/i,
+    { key: 'review', name: 'Review', nodes: [], tab: 'report',
       result: function () { var s = document.getElementById('scenarioSelect'); var o = s && s.options[s.selectedIndex];
         return o && o.value ? 'scenario ' + o.textContent.trim() : 'not saved yet'; } }
   ];
@@ -65,12 +65,11 @@
     guide.parentNode.replaceChild(nav, guide);
   }
 
-  function openTab(re) {
-    var tabs = document.querySelectorAll('[role="tab"], .ltc-tab, [data-tab]');
-    for (var i = 0; i < tabs.length; i++) {
-      if (re.test(tabs[i].textContent)) { tabs[i].click(); return tabs[i]; }
-    }
-    return null;
+  /* 3.27.0 — by key, inside the dashboard's own tab bar (text matching could hit another widget's [data-tab]) */
+  function openTab(key) {
+    var t = document.querySelector('.ltc-tabs-bar .ltc-tab-btn[data-tab="' + key + '"]');
+    if (t && !t.classList.contains('ltc-tab-active')) t.click();
+    return t;
   }
 
   function select(i, fromUser) {
@@ -86,7 +85,10 @@
     foldRail();
     if (fromUser) {
       try { history.replaceState(null, '', '#step=' + (active + 1)); } catch (e) {}
+      /* steps 1-5 read the Results tab: switch to it quietly (the strip above stays in view); 6 and 7 own a tab and
+       * scroll to it */
       if (s.tab) { var t = openTab(s.tab); if (t && t.scrollIntoView) t.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' }); }
+      else openTab('results');
     }
   }
 
