@@ -299,6 +299,7 @@
         var dsCard = el('div', { className: 'ltc-rail-card' });
         var dsHeader = el('div', { className: 'ltc-rail-header' });
         dsHeader.appendChild(el('span', { className: 'ltc-rail-title', textContent: 'DESIGN STATUS' }));
+        dsHeader.appendChild(el('span', { className: 'ltc-rail-sum', id: 'ltcDesignSum', textContent: '' }));
         dsCard.appendChild(dsHeader);
         var dsBody = el('div', { className: 'ltc-design-status' });
         dsBody.innerHTML = [
@@ -1237,6 +1238,7 @@
         var w = function (k) { return isFinite(CAL[k]) ? Math.round(CAL[k] * 100) : '?'; };
 
         setText2('ltcRadialPct', f0(score));
+        setText2('ltcDesignSum', f0(score) + ' / 100');
         var gradeEl = document.getElementById('ltcDesignGrade');
         if (gradeEl) gradeEl.textContent = gradeWord(score).toLowerCase();
         setText2('ltcDesignBasis', 'Total = ASHRAE ' + w('totalScoreWeightAshrae') + ' % · Uptime ' +

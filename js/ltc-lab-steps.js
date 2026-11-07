@@ -83,10 +83,37 @@
     document.body.setAttribute('data-ltc-step', s.key);
     paintNodes();
     drawStrip();
+    foldRail();
     if (fromUser) {
       try { history.replaceState(null, '', '#step=' + (active + 1)); } catch (e) {}
       if (s.tab) { var t = openTab(s.tab); if (t && t.scrollIntoView) t.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' }); }
     }
+  }
+
+  /* Right rail scoped to the step: a card that belongs to the active step is open; the others fold to their header
+   * (title + the header's own summary) with a link to the step that owns them. Nothing is removed or recomputed. */
+  var RAIL = { 'STANDARDS SCREEN': ['check'], 'DESIGN STATUS': ['check'], 'MODEL VALIDATION': ['check'],
+    'SENSITIVITY ANALYSIS': ['load', 'capture', 'loop', 'rejection', 'cost', 'check'], 'SCENARIO INFO': ['review'] };
+  function idx(key) { for (var i = 0; i < STEPS.length; i++) if (STEPS[i].key === key) return i; return -1; }
+  function foldRail() {
+    var key = STEPS[active].key;
+    document.querySelectorAll('.ltc-rail-card').forEach(function (c) {
+      var t = c.querySelector('.ltc-rail-title'); var own = t && RAIL[t.textContent.trim().toUpperCase()];
+      if (!own) return;
+      var fold = own.indexOf(key) < 0;
+      c.classList.toggle('is-folded', fold);
+      var go = c.querySelector('.ltc-rail-go');
+      if (!go) {
+        go = document.createElement('button'); go.type = 'button'; go.className = 'ltc-rail-go';
+        go.addEventListener('click', function () { var j = idx(go.getAttribute('data-step')); if (j >= 0) { select(j, true); if (items[j]) items[j].focus(); } });
+        c.querySelector('.ltc-rail-header').appendChild(go);
+      }
+      var j = idx(own[own.length - 1]);
+      go.setAttribute('data-step', STEPS[j].key);
+      go.textContent = STEPS[j].name + ' \u203a';
+      go.setAttribute('aria-label', 'Open ' + t.textContent.trim().toLowerCase() + ' in step ' + (j + 1) + ', ' + STEPS[j].name);
+      go.hidden = !fold;
+    });
   }
 
   /* the plant diagram is redrawn on every model run, so the outline is re-applied after each redraw */

@@ -13,6 +13,8 @@
  * S7 Run semantics: auto-run is on by default and the Recompute button is hidden; switching auto-run off reaches the
  *    engine toggle and shows Recompute; an edit then leaves the result unchanged and marks Recompute due; clicking it
  *    updates the result and clears the mark
+ * S8 The right rail follows the step: at Load the Standards/Design/Validation cards are folded with a link to Check and
+ *    Sensitivity is open; at Check they are open; the fold link selects its step
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -73,6 +75,23 @@ try {
     await new Promise((r) => setTimeout(r, 1500));
     const after = await p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
     ok(after !== before, `${w} S2 Capture result did not change after IT load 60 (${before})`);
+    const rail = () => p.evaluate(() => Object.fromEntries([...document.querySelectorAll('.ltc-rail-card')].map((c) => {
+      const t = c.querySelector('.ltc-rail-title'); const g = c.querySelector('.ltc-rail-go');
+      return [t ? t.textContent.trim() : '?', (c.classList.contains('is-folded') ? 'folded' : 'open') + (g && !g.hidden ? ':' + g.textContent.trim() : '')]; })));
+    await p.evaluate(() => document.getElementById('ltcStep-load').click());
+    let rl = await rail();
+    for (const k of ['STANDARDS SCREEN', 'DESIGN STATUS', 'MODEL VALIDATION'])
+      ok(/^folded:Check/.test(rl[k] || ''), `${w} S8 at Load ${k} should be folded with a Check link: ${rl[k]}`);
+    ok(rl['SENSITIVITY ANALYSIS'] === 'open', `${w} S8 at Load sensitivity should be open: ${rl['SENSITIVITY ANALYSIS']}`);
+    const went = await p.evaluate(() => { const g = document.querySelector('.ltc-rail-card.is-folded .ltc-rail-go[data-step="check"]'); if (!g) return false; g.click(); return true; });
+    ok(went, `${w} S8 no fold link to Check on a folded card`);
+    rl = await rail();
+    const cur = await p.evaluate(() => document.querySelector('.ltc-step[aria-current="step"]')?.id);
+    ok(cur === 'ltcStep-check', `${w} S8 fold link did not select Check (${cur})`);
+    for (const k of ['STANDARDS SCREEN', 'DESIGN STATUS', 'MODEL VALIDATION'])
+      ok(rl[k] === 'open', `${w} S8 at Check ${k} should be open: ${rl[k]}`);
+    ok(/^folded:Review/.test(rl['SCENARIO INFO'] || ''), `${w} S8 at Check scenario info should fold to Review: ${rl['SCENARIO INFO']}`);
+    await p.evaluate(() => document.getElementById('ltcStep-load').click());
     const cap = () => p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
     const run = () => p.evaluate(() => { const b = document.getElementById('ltcRunBtn'), a = document.getElementById('ltcAutoRun'), e = document.getElementById('autoRunToggle');
       return { hidden: b.hidden, text: b.textContent.trim(), due: b.classList.contains('is-due'), auto: !!a && a.checked, eng: !!e && e.checked }; });
@@ -100,4 +119,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, 0 errors');
