@@ -147,8 +147,15 @@
 
         // Run section
         var runSection = el('div', { className: 'ltc-run-section' });
-        var runBtn = el('button', { className: 'ltc-run-btn', id: 'ltcRunBtn', textContent: '▶ Run Model' });
+        /* 3.27.0 — the engine already re-runs on every edit (autoRunToggle, debounced). A "Run Model" button
+         * beside live sliders said the opposite, so: the auto-run switch is shown here, and the button exists
+         * only when auto-run is off, as "Recompute", marked when inputs changed since the last run. */
+        var auto = el('label', { className: 'ltc-auto' });
+        auto.innerHTML = '<input type="checkbox" id="ltcAutoRun" checked> Auto-run <span>results update as you edit</span>';
+        var runBtn = el('button', { className: 'ltc-run-btn', id: 'ltcRunBtn', textContent: 'Recompute', type: 'button' });
+        runBtn.hidden = true;
         var lastRun = el('div', { className: 'ltc-last-run', id: 'ltcLastRun', textContent: 'Last run: —' });
+        runSection.appendChild(auto);
         runSection.appendChild(runBtn);
         runSection.appendChild(lastRun);
         /* v3.17.0 — the physical numbers come from the shared plant engine; the old lab model stays one
@@ -979,6 +986,39 @@
     if (pdfReportBtn) pdfReportBtn.addEventListener('click', exportPdfReport);
 
     // ════════════════════════════════════════════════════════
+    // bindAutoRun — mirror the engine's #autoRunToggle; the Recompute button shows only when it is off
+    function bindAutoRun(runBtn) {
+        var mine = document.getElementById('ltcAutoRun');
+        var eng = document.getElementById('autoRunToggle');
+        if (!mine) return;
+        function paint() {
+            var on = eng ? eng.checked : mine.checked;
+            mine.checked = on;
+            runBtn.hidden = on;
+            if (on) runBtn.classList.remove('is-due');
+            document.body.classList.toggle('ltc-autorun-off', !on);
+        }
+        mine.addEventListener('change', function () {
+            if (eng && eng.checked !== mine.checked) {
+                eng.checked = mine.checked;
+                eng.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            paint();
+        });
+        if (eng) eng.addEventListener('change', paint);
+        // auto-run off + an input edited → the shown results no longer match the inputs
+        document.addEventListener('input', function (e) {
+            var t = e.target;
+            if (!runBtn.hidden && t && t.id !== 'ltcAutoRun' && t.id !== 'ltcLegacyEngine' &&
+                t.closest && t.closest('.ltc-left-rail, .panel, .ltc-other-params')) {
+                runBtn.classList.add('is-due');
+                var lr = document.getElementById('ltcLastRun');
+                if (lr) lr.setAttribute('data-due', 'inputs changed since this run');
+            }
+        }, true);
+        paint();
+    }
+
     // bindRunBtn — wire ltcRunBtn to existing runCalc
     // ════════════════════════════════════════════════════════
     function bindRunBtn() {
@@ -998,6 +1038,8 @@
                     ('0' + now.getSeconds()).slice(-2);
             }
         });
+
+        bindAutoRun(ltcRunBtn);
 
         // Reset btn
         var resetBtn = document.getElementById('ltcResetBtn');
@@ -1056,6 +1098,8 @@
             var now = new Date();
             lr.innerHTML = 'Last run: ' + now.getHours() + ':' + ('0' + now.getMinutes()).slice(-2) + ':' +
                 ('0' + now.getSeconds()).slice(-2) + ' <span class="ltc-run-ok">✓ Completed</span>';
+            lr.removeAttribute('data-due');
+            var rb = document.getElementById('ltcRunBtn'); if (rb) rb.classList.remove('is-due');
         }
     }
 

@@ -1686,3 +1686,16 @@ body.ltc-revamp .ltc-sub-bar-row {
 body.ltc-revamp .ltc-sub-bar-lbl { font-size: 12px; color: var(--ltc-text); }
 body.ltc-revamp .ltc-sub-bar-val { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--ltc-text); text-align: right; }
 body.ltc-revamp .ltc-sub-bar-basis { grid-column: 1 / -1; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; color: var(--ltc-muted); }
+
+/* ── Run section (3.27.0): auto-run switch; Recompute only when auto-run is off, amber only when due ── */
+body.ltc-revamp .ltc-auto { display: flex; align-items: baseline; gap: 6px; font-size: 12px; color: var(--ltc-text); cursor: pointer; }
+body.ltc-revamp .ltc-auto input { accent-color: var(--ltc-accent); margin: 0; transform: translateY(1px); }
+body.ltc-revamp .ltc-auto span { color: var(--ltc-muted); font-size: 11px; }
+body.ltc-revamp .ltc-run-btn[hidden] { display: none; }
+body.ltc-revamp .ltc-run-btn { background: transparent; color: var(--ltc-text); border: 1px solid var(--ltc-hairline); transition: background-color 0.15s, color 0.15s, border-color 0.15s; }
+body.ltc-revamp .ltc-run-btn:hover { opacity: 1; border-color: var(--ltc-accent); }
+body.ltc-revamp .ltc-run-btn.is-due { background: var(--ltc-accent); color: var(--ltc-on-accent); border-color: var(--ltc-accent); }
+body.ltc-revamp .ltc-last-run { text-align: left; }
+body.ltc-revamp .ltc-last-run[data-due]::after { content: ' · ' attr(data-due); color: var(--ltc-accent); }
+@media (prefers-reduced-motion: reduce) { body.ltc-revamp .ltc-run-btn:active { transform: none; } }
+body.ltc-revamp .ltc-last-run[data-due] .ltc-run-ok { display: none; }

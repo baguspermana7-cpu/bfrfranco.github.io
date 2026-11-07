@@ -10,6 +10,9 @@
  * S5 0 page errors, scrollWidth <= viewport at 1440 and 390
  * S6 DESIGN STATUS states its basis: no radial donut or bar track; the total equals the weighted sum of the five
  *    standard scores; each design screen row recomputes (within 0.6 of the shown integer) from the numbers its basis line shows
+ * S7 Run semantics: auto-run is on by default and the Recompute button is hidden; switching auto-run off reaches the
+ *    engine toggle and shows Recompute; an edit then leaves the result unchanged and marks Recompute due; clicking it
+ *    updates the result and clears the mark
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -70,6 +73,26 @@ try {
     await new Promise((r) => setTimeout(r, 1500));
     const after = await p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
     ok(after !== before, `${w} S2 Capture result did not change after IT load 60 (${before})`);
+    const cap = () => p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
+    const run = () => p.evaluate(() => { const b = document.getElementById('ltcRunBtn'), a = document.getElementById('ltcAutoRun'), e = document.getElementById('autoRunToggle');
+      return { hidden: b.hidden, text: b.textContent.trim(), due: b.classList.contains('is-due'), auto: !!a && a.checked, eng: !!e && e.checked }; });
+    const setIt = (v) => p.evaluate((v) => { const e = document.getElementById('inItLoad'); e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+    let rs = await run();
+    if (!(await p.$('#ltcAutoRun'))) { fails.push(`${w} S7 no auto-run switch (#ltcAutoRun) in the run section`); await p.close(); continue; }
+    ok(rs.auto && rs.eng && rs.hidden, `${w} S7 default: auto ${rs.auto}, engine ${rs.eng}, button hidden ${rs.hidden}`);
+    await p.evaluate(() => document.getElementById('ltcAutoRun').click());
+    rs = await run();
+    ok(!rs.auto && !rs.eng && !rs.hidden && rs.text === 'Recompute' && !rs.due, `${w} S7 auto off: ${JSON.stringify(rs)}`);
+    const c0 = await cap();
+    await setIt('40'); await new Promise((r) => setTimeout(r, 1200));
+    rs = await run();
+    ok((await cap()) === c0, `${w} S7 auto off but the result moved on edit`);
+    ok(rs.due, `${w} S7 edit with auto off did not mark Recompute due`);
+    await p.evaluate(() => document.getElementById('ltcRunBtn').click()); await new Promise((r) => setTimeout(r, 1200));
+    rs = await run();
+    ok((await cap()) !== c0, `${w} S7 Recompute did not update the result (${c0})`);
+    ok(!rs.due, `${w} S7 Recompute left the due mark`);
+    await p.evaluate(() => document.getElementById('ltcAutoRun').click());
     const sw = await p.evaluate(() => document.documentElement.scrollWidth);
     ok(sw <= w, `${w} S5 scrollWidth ${sw}`);
     ok(!errs.length, `${w} S5 page error: ${errs[0]}`);
@@ -77,4 +100,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, 0 errors');
