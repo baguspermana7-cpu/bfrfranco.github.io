@@ -3195,6 +3195,19 @@
 
             function extractSankeyFlows(model) {
                 if (!model) return null;
+                if (model.plant) {
+                    /* 3.27.0 — plant mode: every node is a plant figure and the flows add up to the facility power.
+                     * The legacy split invented aux = 3 % of IT, took the TCS pumps out of the liquid loop although the
+                     * plant books them apart, and read the fans as aux − 3 % IT (0 kW). */
+                    var P = model.plant, bdp = model.breakdown;
+                    var pFanAir = Math.max((P.air.fanKw || 0) + (P.elec.roomFanKw || 0), 0);
+                    var pFanLiq = Math.max(P.liquid.coolerFanKw || 0, 0);
+                    var pLiquid = Math.max(bdp.liquidCooling - pFanLiq, 0), pAir = Math.max(bdp.airCooling - pFanAir, 0);
+                    var pPump = Math.max(bdp.pump, 0), pFan = pFanAir + pFanLiq, pAux = Math.max(bdp.aux, 0), pLoss = Math.max(bdp.elecLoss, 0);
+                    var pIt = Math.max(model.itKw, 0), pThermal = pLiquid + pPump + pAir + pFan;
+                    return { it: pIt, thermal: pThermal, elecLoss: pLoss, facilityAux: pAux, liquidCore: pLiquid, pump: pPump, air: pAir,
+                        fan: pFan, total: pIt + pThermal + pLoss + pAux };
+                }
                 var it = Math.max(model.itKw, 0);
                 var elecLoss = Math.max(model.breakdown.elecLoss, 0);
                 var auxBase = Math.max(model.itKw * 0.03, 0);
@@ -3729,10 +3742,10 @@
                 } else if (nodeId === 'thermal') {
                     focus = flows.thermal;
                     var thermalParts = [
-                        { label: 'Liquid Loop', value: flows.liquidCore, color: '#0d9488', note: 'Liquid cooling power excluding pump drive.' },
-                        { label: 'Pump Drive', value: flows.pump, color: '#115e59', note: 'Hydraulic pumping electrical demand.' },
-                        { label: 'Air Path', value: flows.air, color: '#0284c7', note: 'Residual heat air-cooling burden.' },
-                        { label: 'Fan Power', value: flows.fan, color: '#16a34a', note: 'CRAH/CRAC and airflow power share.' }
+                        { label: 'Liquid Loop', value: flows.liquidCore, color: '#0d9488', note: model.plant ? 'FWS pumps and trim chillers (dry-cooler fans are under Fan Power).' : 'Liquid cooling power excluding pump drive.' },
+                        { label: 'Pump Drive', value: flows.pump, color: '#115e59', note: model.plant ? 'TCS (rack-side) loop pumps.' : 'Hydraulic pumping electrical demand.' },
+                        { label: 'Air Path', value: flows.air, color: '#0284c7', note: model.plant ? 'Chillers, CHW and CW pumps, cooling-tower fans.' : 'Residual heat air-cooling burden.' },
+                        { label: 'Fan Power', value: flows.fan, color: '#16a34a', note: model.plant ? 'CRAH fans, electrical-room fans, dry-cooler fans.' : 'CRAH/CRAC and airflow power share.' }
                     ];
                     spec.title = 'Thermal Management | Branch Breakdown';
                     spec.subtitle = 'Thermal domain decomposition into liquid, pump, air, and fan branches.';

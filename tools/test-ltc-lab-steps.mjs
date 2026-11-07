@@ -51,6 +51,7 @@
  *    moves a fitted metric, with apply off the form is untouched
  * S24 Pareto apply best: the baseline row is the design before the apply, the figures shown reproduce from the form,
  *    the form carries no float noise
+ * S25 (plant) The energy Sankey adds up to the plant's facility power; aux, pump and fan nodes are plant figures
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -289,12 +290,17 @@ try {
     }
     const before = await p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
     await p.evaluate(() => { const e = document.getElementById('inItLoad'); e.value = '60'; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
-    await new Promise((r) => setTimeout(r, 1500));
-    const after = await p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
+    // the strip refreshes on a short timer after each render; under CPU load allow up to 6 s before calling it stale
+    let after = before;
+    for (let i = 0; i < 24 && after === before; i++) { await new Promise((r) => setTimeout(r, 250));
+      after = await p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent); }
     if (after === before) {
       const dx = await p.evaluate(() => ({ it: document.getElementById('inItLoad').value, model: window.__ltcLastModel && window.__ltcLastModel.itKw,
         auto: document.getElementById('autoRunToggle') && document.getElementById('autoRunToggle').checked, ltcAuto: document.getElementById('ltcAutoRun') && document.getElementById('ltcAutoRun').checked,
         last: document.getElementById('ltcLastRun') && document.getElementById('ltcLastRun').textContent, legacy: !!window.__ltcLegacy, outLiquid: document.getElementById('outLiquidLoad') && document.getElementById('outLiquidLoad').textContent, fm: document.getElementById('inFailureMode') && document.getElementById('inFailureMode').value }));
+      await new Promise((r) => setTimeout(r, 3000));
+      dx.later = await p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
+      dx.active = await p.evaluate(() => (document.querySelector('.ltc-step[aria-current]') || {}).id);
       fails.push(`${w} S2 Capture result did not change after IT load 60 (${before}) · state ${JSON.stringify(dx)}`);
     }
     const rail = () => p.evaluate(() => Object.fromEntries([...document.querySelectorAll('.ltc-rail-card')].map((c) => {
@@ -341,8 +347,9 @@ try {
     let cr = await cmp();
     ok(cr.length >= 6, `${w} S10 compare rows after save: ${cr.length}`);
     ok(cr.every((r) => r.word === 'same'), `${w} S10 right after save not all same: ${cr.filter((r) => r.word !== 'same').map((r) => r.k + ' ' + r.a + '→' + r.b).join(', ')}`);
-    await setIt0('52'); await new Promise((r) => setTimeout(r, 1500));
-    cr = await cmp();
+    await setIt0('52');
+    for (let i = 0; i < 24; i++) { await new Promise((r) => setTimeout(r, 250)); cr = await cmp();
+      const it = cr.find((r) => r.k === 'itKw'); if (it && Math.abs(it.b - 52000) < 1 && Math.abs(it.live - 52000) < 1) break; }
     ok(cr.some((r) => r.word !== 'same'), `${w} S10 nothing changed after IT load 52`);
     // [direction, display decimals, extensive]; IT load 52 differs from the save, so extensive totals must read "scale"
     const spec = { pue: [-1, 3, 0], systemCop: [1, 2, 0], wue: [-1, 2, 0], itKw: [0, 0, 1], totalFacilityKw: [0, 0, 1],
@@ -492,6 +499,21 @@ try {
       await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
       await runCal(false);
       await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
+      // S25 (plant) the energy Sankey adds up to the plant's facility power and each node is a plant figure
+      const s25 = await p.evaluate(() => { const m = window.__ltcLastModel, sum = document.getElementById('sankeySummary');
+        if (!m.plant || !sum) return null;
+        const kw = (lbl) => { const t = [...document.querySelectorAll('#energySankeySvg text')].map((x) => x.textContent); const i = t.indexOf(lbl);
+          return i >= 0 && t[i + 1] ? +t[i + 1].split('kW')[0].replace(/[^\d.]/g, '') : NaN; };
+        const tot = +(sum.textContent.match(/Total facility power: ([\d,]+)/) || [0, 'NaN'])[1].replace(/,/g, '');
+        const P = m.plant, fans = (P.air.fanKw || 0) + (P.elec.roomFanKw || 0) + (P.liquid.coolerFanKw || 0);
+        return { tot, fac: m.totalFacilityKw, aux: kw('Facility Aux'), plantAux: m.breakdown.aux, pump: kw('Pump Drive'), plantPump: m.breakdown.pump,
+          fan: kw('Fan Power'), plantFan: fans }; });
+      if (s25) {
+        ok(Math.abs(s25.tot - s25.fac) <= 1, `${w} S25 Sankey total ${s25.tot} kW != plant facility ${Math.round(s25.fac)} kW`);
+        ok(Math.abs(s25.aux - s25.plantAux) <= 1, `${w} S25 Sankey Facility Aux ${s25.aux} kW != plant aux ${Math.round(s25.plantAux)} kW`);
+        ok(Math.abs(s25.pump - s25.plantPump) <= 1, `${w} S25 Sankey Pump Drive ${s25.pump} kW != plant TCS pumps ${Math.round(s25.plantPump)} kW`);
+        ok(Math.abs(s25.fan - s25.plantFan) <= 1, `${w} S25 Sankey Fan Power ${s25.fan} kW != plant fans ${Math.round(s25.plantFan)} kW`);
+      }
       // S24 Pareto "apply best": the baseline row is the design before the apply, the figures shown are reproduced from
       // the form, and the form shows plain numbers (no float noise such as 1.2300000000000002)
       if (await p.$('#runPareto')) {
@@ -533,4 +555,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, 0 errors');
