@@ -158,8 +158,66 @@
     }
   };
   var strip;
+  /* Review: the current design against the last saved scenario. "Before" is RECOMPUTED from that scenario's saved
+   * inputs on the engine the page runs now (LTCLabPlant over the screening model), not read from the numbers stored
+   * with it: a scenario saved before v3.17.0 or on the legacy toggle stored the screening model's PUE. */
+  /* [key, label, decimals, direction (-1 lower is better, 1 higher, 0 none), unit, extensive]. An extensive total
+   * scales with the IT load, so when the IT load differs it is reported as "scale", not better or worse. */
+  var CMP = [
+    ['pue', 'PUE (annual)', 3, -1, '', 0], ['systemCop', 'Cooling COP', 2, 1, '', 0], ['wue', 'WUE', 2, -1, 'L/kWh', 0],
+    ['itKw', 'IT load', 0, 0, 'kW', 1], ['totalFacilityKw', 'Facility power', 0, 0, 'kW', 1],
+    ['annualGwh', 'Annual energy', 2, -1, 'GWh', 1], ['netOpex', 'Net operating cost', 0, -1, '$/yr', 1],
+    ['netCarbonTons', 'Net carbon', 0, -1, 't CO₂e/yr', 1]
+  ];
+  function cmpWord(c, a, b, scaled) {
+    var d = b - a;
+    if (Math.abs(d) < 0.5 * Math.pow(10, -c[2]) || Math.abs(d) <= Math.abs(a) * 1e-6) return 'same';
+    if (c[3] === 0) return 'changed';
+    if (c[5] && scaled) return 'scale';
+    return d * c[3] > 0 ? 'better' : 'worse';
+  }
+  function lastSaved() {
+    try { var a = JSON.parse(localStorage.getItem('ltc_lab_scenarios_v1') || '[]'); return Array.isArray(a) && a.length ? a[a.length - 1] : null; } catch (e) { return null; }
+  }
+  function drawCompare(m) {
+    var snap = lastSaved(), LP = window.LTCLabPlant, LM = window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc;
+    strip.hidden = false;
+    strip.innerHTML = '';
+    var h = document.createElement('div');
+    h.className = 'ltc-arith-head';
+    strip.appendChild(h);
+    if (!snap || !snap.input || !LP || !LM || m.engine !== 'ltc-plant') {
+      h.textContent = (active + 1) + ' · Review — before → after';
+      var p = document.createElement('p'); p.className = 'ltc-rev-empty';
+      p.textContent = snap ? 'The comparison runs on the plant model; switch the legacy screening model off.' : 'No saved scenario yet. Save one below; the next edits are then compared against it here.';
+      strip.appendChild(p);
+      return;
+    }
+    var before;
+    try { before = LP.compute(snap.input, LM.compute(snap.input)); } catch (e) { strip.hidden = true; return; }
+    var scaled = Math.abs(before.itKw - m.itKw) > Math.abs(m.itKw) * 1e-6;
+    h.textContent = (active + 1) + ' · Review — "' + (snap.name || 'scenario') + '" v' + (snap.version || '?') + ' → current design (before recomputed from its saved inputs)' +
+      (scaled ? '. IT load differs, so totals show scale, not better or worse.' : '');
+    CMP.forEach(function (c) {
+      var a = before[c[0]], b = m[c[0]];
+      if (!isFinite(a) || !isFinite(b)) return;
+      var word = cmpWord(c, a, b, scaled), same = word === 'same', d = b - a;
+      var line = document.createElement('div');
+      line.className = 'ltc-arith-row ltc-rev-row is-' + word;
+      line.innerHTML = '<span class="ltc-arith-l"></span><span class="ltc-arith-f"></span><span class="ltc-arith-v"></span><span class="ltc-arith-s"></span>';
+      var u = c[4] ? ' ' + c[4] : '';
+      line.children[0].textContent = c[1];
+      line.children[1].textContent = n0(a, c[2]) + ' → ' + n0(b, c[2]) + u;
+      line.children[2].textContent = same ? '' : (d > 0 ? '+' : '−') + n0(Math.abs(d), c[2]) + u;
+      line.children[3].textContent = word;
+      line.setAttribute('data-before', a); line.setAttribute('data-after', b); line.setAttribute('data-key', c[0]);
+      strip.appendChild(line);
+    });
+  }
+
   function drawStrip() {
     if (!strip) return;
+    if (STEPS[active].key === 'review' && window.__ltcLastModel) { drawCompare(window.__ltcLastModel); return; }
     var m = window.__ltcLastModel, r = m && m.plant, f = LINES[STEPS[active].key];
     if (!r || !f) { strip.hidden = true; return; }
     var rows = [];
@@ -209,7 +267,7 @@
 
   function watch() {
     var ids = ['outDesignDensity', 'outLiquidLoad', 'outAirLoad', 'outFlow', 'outPump', 'outPue', 'outCop', 'outNetOpex', 'outCarbon',
-      'quickConstraintState'];
+      'quickConstraintState', 'scenarioSelect'];
     var mo = new MutationObserver(function () { clearTimeout(watch.t); watch.t = setTimeout(refresh, 60); });
     ids.forEach(function (id) {
       var e = document.getElementById(id);

@@ -15,6 +15,9 @@
  *    updates the result and clears the mark
  * S9 Sensitivity perturbs the model the page shows: every listed ΔPUE is reproduced by recomputing the plant
  *    (LTCLabPlant) with that input one step up, and no listed input is one the plant ignores
+ * S10 Review compares against the last saved scenario: empty state before any save; right after a save every row
+ *    reads "same" (the before, recomputed from the saved inputs, reproduces the shown design); after an edit each
+ *    row's after equals the live model and its better/worse word follows the sign
  * S8 The right rail follows the step: at Load the Standards/Design/Validation cards are folded with a link to Check and
  *    Sensitivity is open; at Check they are open; the fold link selects its step
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
@@ -111,6 +114,31 @@ try {
       ok(d !== null, `${w} S9 sensitivity row "${n}" is not a known input`);
       if (d !== null) ok(Math.abs(d) >= 5e-6 && Math.abs(shown - d) <= 5e-5, `${w} S9 "${n}" shows ${shown}, plant recompute ${d.toFixed(5)}`);
     }
+    const setIt0 = (v) => p.evaluate((v) => { const e = document.getElementById('inItLoad'); e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+    await p.evaluate(() => document.getElementById('ltcStep-review').click()); await new Promise((r) => setTimeout(r, 300));
+    ok(await p.evaluate(() => !!document.querySelector('.ltc-arith .ltc-rev-empty')), `${w} S10 no empty state before any saved scenario`);
+    await p.evaluate(() => { document.getElementById('scenarioName').value = 'gate-' + innerWidth; document.getElementById('saveScenarioBtn').click(); });
+    await new Promise((r) => setTimeout(r, 900));
+    const cmp = () => p.evaluate(() => { const m = window.__ltcLastModel; return [...document.querySelectorAll('.ltc-arith .ltc-rev-row')].map((r) => ({
+      k: r.dataset.key, a: +r.dataset.before, b: +r.dataset.after, live: m[r.dataset.key], word: r.querySelector('.ltc-arith-s').textContent })); });
+    let cr = await cmp();
+    ok(cr.length >= 6, `${w} S10 compare rows after save: ${cr.length}`);
+    ok(cr.every((r) => r.word === 'same'), `${w} S10 right after save not all same: ${cr.filter((r) => r.word !== 'same').map((r) => r.k + ' ' + r.a + '→' + r.b).join(', ')}`);
+    await setIt0('52'); await new Promise((r) => setTimeout(r, 1500));
+    cr = await cmp();
+    ok(cr.some((r) => r.word !== 'same'), `${w} S10 nothing changed after IT load 52`);
+    // [direction, display decimals, extensive]; IT load 52 differs from the save, so extensive totals must read "scale"
+    const spec = { pue: [-1, 3, 0], systemCop: [1, 2, 0], wue: [-1, 2, 0], itKw: [0, 0, 1], totalFacilityKw: [0, 0, 1],
+      annualGwh: [-1, 2, 1], netOpex: [-1, 0, 1], netCarbonTons: [-1, 0, 1] };
+    const itRow = cr.find((r) => r.k === 'itKw'); const scaled = !!itRow && itRow.a !== itRow.b;
+    ok(scaled, `${w} S10 IT load row missing or unchanged after the IT load edit`);
+    for (const r of cr) {
+      ok(Math.abs(r.b - r.live) <= Math.abs(r.live) * 1e-9 + 1e-9, `${w} S10 ${r.k} after ${r.b} != live ${r.live}`);
+      const [dir, dp, ext] = spec[r.k] || [0, 0, 0]; const d = r.b - r.a;
+      const want = Math.abs(d) < 0.5 * 10 ** -dp || Math.abs(d) <= Math.abs(r.a) * 1e-6 ? 'same' : dir === 0 ? 'changed' : ext && scaled ? 'scale' : d * dir > 0 ? 'better' : 'worse';
+      ok(r.word === want, `${w} S10 ${r.k} ${r.a}→${r.b} reads "${r.word}", expected "${want}"`);
+    }
+    await p.evaluate(() => document.getElementById('ltcStep-load').click());
     const cap = () => p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
     const run = () => p.evaluate(() => { const b = document.getElementById('ltcRunBtn'), a = document.getElementById('ltcAutoRun'), e = document.getElementById('autoRunToggle');
       return { hidden: b.hidden, text: b.textContent.trim(), due: b.classList.contains('is-due'), auto: !!a && a.checked, eng: !!e && e.checked }; });
@@ -138,4 +166,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, 0 errors');
