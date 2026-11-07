@@ -53,6 +53,7 @@
  *    the form carries no float noise
  * S25 (plant) The energy Sankey adds up to the plant's facility power; aux, pump and fan nodes are plant figures
  * S26 Charts tab chrome: no text with a hue cast except the amber accent and a fault-red state pill; no dashed borders
+ * S27 Accordion titles are the block heading only (no tooltip text glued on)
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -532,6 +533,10 @@ try {
         return { cast: [...new Set(cast)].slice(0, 6), dashed: [...new Set(dashed)].slice(0, 6) }; });
       ok(s26.cast.length === 0, `${w} S26 Charts-tab text with a hue cast: ${s26.cast.join(' | ')}`);
       ok(s26.dashed.length === 0, `${w} S26 Charts-tab dashed/dotted borders: ${s26.dashed.join(', ')}`);
+      // S27 accordion titles are the block's heading, not the heading plus its tooltip text ("Chart?Facility … notes.Ref:")
+      const s27 = await p.evaluate(() => [...document.querySelectorAll('.ltc-acc-title')].map((e) => e.textContent.trim())
+        .filter((t) => t.length > 70 || /\?|[a-z)]\.[A-Z]|Ref:|Impact:/.test(t)).map((t) => t.slice(0, 60)));
+      ok(s27.length === 0, `${w} S27 accordion titles carry tooltip text: ${s27.slice(0, 4).join(' | ')}`);
       // S24 Pareto "apply best": the baseline row is the design before the apply, the figures shown are reproduced from
       // the form, and the form shows plain numbers (no float noise such as 1.2300000000000002)
       if (await p.$('#runPareto')) {
@@ -573,4 +578,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, 0 errors');

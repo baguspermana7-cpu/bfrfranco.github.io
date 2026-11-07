@@ -605,12 +605,16 @@
             });
             blocks.forEach(function (block, idx) {
                 var heading = block.querySelector('h4, h3');
-                var title = heading ? heading.textContent.replace(/\s+/g, ' ').trim() : 'Details';
+                /* the heading carries its tooltip ("?" + title, description, Ref, Impact) inside it: read a copy without it */
+                var hc = heading ? heading.cloneNode(true) : null;
+                if (hc) Array.prototype.forEach.call(hc.querySelectorAll('.tooltip-trigger, .tooltip-content, .rzx-pop'), function (x) { x.remove(); });
+                var title = hc ? hc.textContent.replace(/\s+/g, ' ').trim() : 'Details';
                 var open = idx === 0;
                 var wrap = el('section', { className: 'ltc-acc' + (open ? ' open' : '') });
                 var btn = el('button', { type: 'button', className: 'ltc-acc-head' });
                 btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-                btn.innerHTML = '<span class="ltc-acc-title">' + title + '</span><span class="ltc-acc-chev" aria-hidden="true">▾</span>';
+                btn.innerHTML = '<span class="ltc-acc-title"></span><span class="ltc-acc-chev" aria-hidden="true">▾</span>';
+                btn.firstChild.textContent = title;
                 var body = el('div', { className: 'ltc-acc-body' });
                 if (!open) body.style.display = 'none';
                 host.insertBefore(wrap, block);
