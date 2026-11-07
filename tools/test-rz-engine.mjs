@@ -1620,6 +1620,55 @@ if (M.opex && M.opex.totalAnnual) {
     ok('sparesPricing sourced', !!D.sources['sparesPricing']);
 }
 
+/* ── v3.25.0 tariff model — MRC/NRC defaults by business model (worked examples + provenance) ── */
+{
+    const T = D.tariffs, MT = M.tariffs;
+    ok('tariffs present', !!T && !!T.businessModels && !!T.gaas && !!T.marketIndex && !!MT);
+    ok('tariffs sourced (4 sidecar entries)', ['tariffs', 'tariffs.businessModels', 'tariffs.gaas', 'tariffs.addons'].every(k => D.sources[k] && D.sources[k].source && D.sources[k].asOf));
+    ok('business models (6) keys stable', Object.keys(T.businessModels).join(',') === 'retail_colo,wholesale_colo,hyperscale_lease,gpu_colo,gaas,enterprise_self');
+    for (const [k, b] of Object.entries(T.businessModels)) {
+        ok(`model ${k}: fields complete`, typeof b.label === 'string' && (b.pricing === 'perKw' || b.pricing === 'perGpuHour') && b.nrcPerKw >= 0 && b.contractYears >= 1 && b.takeOrPayPct > 0 && b.takeOrPayPct <= 1 && b.escalation >= 0 && typeof b.note === 'string' && b.note.length > 20);
+    }
+    /* market index — CBRE 2026 figures as fetched */
+    ok('index singapore 403 (CBRE 2026 avg, band 330–475)', T.marketIndex.singapore.perKwMonth === 403 && T.marketIndex.singapore.band[0] === 330 && T.marketIndex.singapore.band[1] === 475);
+    ok('index n-virginia 173 (CBRE NA H2 2025)', T.marketIndex['n-virginia'].perKwMonth === 173);
+    ok('every index row has band + evidence', Object.values(T.marketIndex).every(r => r.perKwMonth > 0 && Array.isArray(r.band) && r.band[0] <= r.perKwMonth && r.perKwMonth <= r.band[1] && /^(broker|secondary)$/.test(r.evidence)));
+    ok('index keys that exist in DATA.markets point at real markets', Object.keys(T.marketIndex).every(k => D.markets[k] || k === 'johor' || k === 'bangkok'));
+    ok('countryMarket targets resolve to an index or a market', Object.values(T.countryMarket).every(k => T.marketIndex[k] || (D.markets[k] && typeof D.markets[k].coloPrice === 'number')));
+    /* block-size curve — CBRE NA H1 2026 */
+    ok('blockSizeBands monotonic decreasing (wholesale discount)', T.blockSizeBands.every((b, i, a) => i === 0 || b.perKwMonth < a[i - 1].perKwMonth));
+    ok('blockFactor(300 kW) = 1 (index basis band)', MT.blockFactor(300).factor === 1);
+    ok('blockFactor(5 MW) = 175.00/204.69', Math.abs(MT.blockFactor(5000).factor - 175 / 204.69) < 1e-9);
+    ok('blockFactor(100 MW) = 165.31/204.69 ≈ 0.808', Math.abs(MT.blockFactor(100000).factor - 165.31 / 204.69) < 1e-9 && MT.blockFactor(100000).band === '10 MW+');
+    /* resolver — per-kW models */
+    const w = MT.resolve({ model: 'wholesale_colo', itLoadKw: 5000, countryId: 'ID' });
+    ok('wholesale ID 5 MW: jakarta via countryMarket, 2025 coloPrice fallback flagged', w.index.marketKey === 'jakarta' && w.index.perKwMonth === D.markets.jakarta.coloPrice && /2025/.test(w.index.basis));
+    ok('wholesale ID 5 MW: mrc = 160 × 3–10 MW factor', Math.abs(w.mrcPerKwMonth - Math.round(160 * (175 / 204.69) * 100) / 100) < 1e-9 && w.nrcPerKw === 0 && w.contractYears === 10 && w.takeOrPayPct === 0.7);
+    const h = MT.resolve({ model: 'hyperscale_lease', itLoadKw: 100000, marketKey: 'singapore' });
+    ok('hyperscale SG 100 MW: 403 × 0.808 = 325.47', h.mrcPerKwMonth === 325.47 && h.blockBand === '10 MW+' && h.contractYears === 15);
+    const r = MT.resolve({ model: 'retail_colo', itLoadKw: 300, marketKey: 'singapore' });
+    ok('retail SG: index as published, NRC 260 $/kW, billed in full', r.mrcPerKwMonth === 403 && r.nrcPerKw === 260 && r.takeOrPayPct === 1 && r.blockFactor === 1);
+    const g = MT.resolve({ model: 'gpu_colo', itLoadKw: 20000, marketKey: 'johor' });
+    ok('gpu_colo Johor 20 MW: 130 × 0.808 × 1.25', Math.abs(g.mrcPerKwMonth - Math.round(130 * (165.31 / 204.69) * 1.25 * 100) / 100) < 1e-9 && g.index.evidence === 'secondary');
+    ok('unknown model → wholesale_colo; unknown country → global fallback 196', MT.resolve({ model: 'nope', itLoadKw: 2000, countryId: 'XX' }).model === 'wholesale_colo' && MT.resolve({ model: 'wholesale_colo', itLoadKw: 2000, countryId: 'XX' }).index.perKwMonth === 196);
+    ok('index override honoured', MT.resolve({ model: 'retail_colo', itLoadKw: 300, indexPerKwMonth: 250 }).mrcPerKwMonth === 250);
+    ok('resolve basis strings name the source', w.basis.length >= 2 && /coloPrice/.test(w.basis[0]) && /CBRE/.test(w.basis[1]));
+    /* GaaS — worked example: H100 reserved mid $3.44 × 70 % × 730 h ÷ (10.2/8 × 1.08 kW) */
+    ok('kwPerGpu(h100) = 10.2/8 × 1.08 = 1.377', Math.abs(MT.kwPerGpu('h100') - 1.377) < 1e-9);
+    ok('gpuHourPrice(h100, reserved) = 3.44 mid of 3.19–3.69', MT.gpuHourPrice('h100', 'reserved').perGpuHour === 3.44);
+    ok('gaasPerKwMonth(h100, 3.44, 0.70) = 1276.57', Math.abs(MT.gaasPerKwMonth('h100', 3.44, 0.70) - 3.44 * 0.7 * 730 / 1.377) < 1e-9);
+    const ga = MT.resolve({ model: 'gaas', itLoadKw: 40000, sku: 'h100' });
+    ok('gaas h100 40 MW: fleet floor(40000/1.377)=29048 GPUs, 3631 nodes', ga.gaas.gpus === 29048 && ga.gaas.nodes === 3631 && ga.mrcPerKwMonth === 1276.57);
+    ok('gaas hardware capex = gpus × $32.5k mid, band 25–40k', ga.gaas.hardwareCapexUsd === 29048 * 32500 && ga.gaas.hardwareCapexBand[0] === 29048 * 25000 && ga.gaas.hardwareCapexBand[1] === 29048 * 40000);
+    ok('gaas basis names price, utilisation, node kW and the hardware capex exclusion', ga.basis.length === 2 && /3\.44\/GPU-hr/.test(ga.basis[0]) && /70 %/.test(ga.basis[0]) && /NOT in the facility CAPEX/.test(ga.basis[1]));
+    ok('gaas pricing mode + user price honoured', MT.resolve({ model: 'gaas', itLoadKw: 1000, sku: 'b200', pricingMode: 'onDemand' }).gaas.perGpuHour === (7.69 + 8.60) / 2 && MT.resolve({ model: 'gaas', itLoadKw: 1000, sku: 'b200', pricePerGpuHour: 5 }).gaas.perGpuHour === 5);
+    ok('gaas skus (5) carry node kW from NVIDIA + three price bands + capex band', Object.keys(T.gaas.skus).length === 5 && Object.values(T.gaas.skus).every(s => s.nodeKwMax > 0 && s.gpusPerNode > 0 && ['onDemand', 'reserved', 'marketplace', 'gpuCapexUsd'].every(k => s[k] && s[k].lo <= s[k].hi && typeof s[k].ref === 'string')));
+    ok('DGX node power as published: H100/H200 10.2, B200 14.3, B300 14.0, GB300 NVL72 142', T.gaas.skus.h100.nodeKwMax === 10.2 && T.gaas.skus.h200.nodeKwMax === 10.2 && T.gaas.skus.b200.nodeKwMax === 14.3 && T.gaas.skus.b300.nodeKwMax === 14.0 && T.gaas.skus.gb300_nvl72.nodeKwMax === 142);
+    ok('gaas utilisation default inside its band', T.gaas.utilizationDefault >= T.gaas.utilizationBand[0] && T.gaas.utilizationDefault <= T.gaas.utilizationBand[1]);
+    ok('GaaS equivalent far above wholesale colo (the fleet capex is the difference)', ga.mrcPerKwMonth > 5 * w.mrcPerKwMonth && ga.gaas.hardwareCapexUsd > 5e8);
+    ok('addons: TeleGeography 100 GigE medians + remote hands', T.addons.ipTransit100GePerMbpsMonth.singapore === 0.26 && T.addons.ipTransit100GePerMbpsMonth.floor === 0.03 && T.addons.remoteHandsPerHour.usd === 157.11);
+}
+
 /* ── report ── */
 console.log(`\nRZ-ENGINE TEST — ${pass} passed, ${fail} failed`);
 if (fail) {

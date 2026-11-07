@@ -67,9 +67,20 @@ export interface ReqAvailability {
     slaTargetPct: number | null;
 }
 
+export type RevenueModelId = 'retail_colo' | 'wholesale_colo' | 'hyperscale_lease' | 'gpu_colo' | 'gaas' | 'enterprise_self';
+export type GaasSkuId = 'h100' | 'h200' | 'b200' | 'b300' | 'gb300_nvl72';
+export type GaasPricingMode = 'reserved' | 'onDemand' | 'marketplace';
+
 export interface ReqBusiness {
     budgetUsd: number | null;
     priorities: PriorityKey[];
+    /** v3.25.0 — how the facility earns: drives the MRC/NRC defaults
+     *  (engine DATA.tariffs / models.tariffs.resolve) and the sim revenue basis. */
+    revenueModel: RevenueModelId;
+    /** GPU-as-a-Service only: fleet SKU, list-price mode, utilisation (0-1). */
+    gaasSku: GaasSkuId;
+    gaasPricingMode: GaasPricingMode;
+    gaasUtilization: number;
     /** Owner mandate (2026-07-19): margin flows into cost/financial — the
      *  registry param req.designMarginPct writes BOTH here and capex.contingency. */
     designMarginPct: number;
@@ -116,7 +127,8 @@ const DEFAULTS: Omit<RequirementsState, 'actions'> = {
         itLoadMwByYear: { y1: 0, y2: 0, y3: 0, y4: 0, y5: 0, y10: 0 }, // 0 = "derive from Y0" until user edits
     },
     availability: { slaTargetPct: null },
-    business: { budgetUsd: null, priorities: ['reliability', 'performance', 'cost', 'sustainability', 'speed'], designMarginPct: 10 },
+    business: { budgetUsd: null, priorities: ['reliability', 'performance', 'cost', 'sustainability', 'speed'], designMarginPct: 10,
+                revenueModel: 'wholesale_colo', gaasSku: 'h100', gaasPricingMode: 'reserved', gaasUtilization: 0.70 },
     lastSavedAt: null,
 };
 

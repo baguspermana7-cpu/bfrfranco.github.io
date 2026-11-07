@@ -12,22 +12,26 @@ import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import type { CandidateSite, SiteScoreResult, AxisKey } from '@/types/site-intel';
 import { AXIS_LABELS, AXIS_EXPLAIN, axisBand } from '@/types/site-intel';
 import { AxisExplainPanel } from './AxisExplainPanel';
+import type { SiteScreening } from '@/lib/site-screening';
 import { ScoreValue } from '@/components/ui/ScoreValue';
 import { Play, FileDown, ChevronRight } from 'lucide-react';
 
 /** Poor/Fair axis chip → opens the explain panel (owner mandate: no naked bad chips). */
 export interface AxisExplainSel { siteId: string; axis: AxisKey }
 
-export function SiteComparisonTable({ sites, results, selectedId, analysesById, axisExplain, onExplainAxis, onEdit }: {
+export function SiteComparisonTable({ sites, results, selectedId, analysesById, axisExplain, onExplainAxis, onEdit, screenings }: {
     sites: CandidateSite[]; results: SiteScoreResult[]; selectedId: string | null;
     analysesById?: Map<string, SiteAnalyses>;
     axisExplain?: AxisExplainSel | null;
     onExplainAxis?: (sel: AxisExplainSel | null) => void;
     onEdit?: () => void;
+    /** v3.25.0 — gate results; a screened-out column never carries the ★. */
+    screenings?: Map<string, SiteScreening>;
 }) {
     const axes = Object.keys(AXIS_LABELS) as AxisKey[];
     const bySite = (id: string) => results.find((r) => r.siteId === id);
     const sel = results.find((r) => r.siteId === selectedId);
+    const passes = (id: string) => screenings?.get(id)?.passed !== false;
     const best = (vals: number[], v: number) => vals.length > 1 && v === Math.max(...vals);
     return (
         <div id="sec-compare" className="scroll-mt-24 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
@@ -45,7 +49,7 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                             <td className="py-1.5 pr-2 font-semibold text-slate-800 dark:text-slate-200">Total Score (engine)</td>
                             {sites.map((s) => {
                                 const r = bySite(s.id);
-                                const vals = results.map((x) => x.engine.score);
+                                const vals = results.filter((x) => passes(x.siteId)).map((x) => x.engine.score);
                                 /* Score cells render through ScoreValue (semantic color);
                                  * best-of-row keeps a ★ marker (color is now the score scale).
                                  * INLINE trace (not traceId): the registry site.* nodes read
@@ -58,10 +62,23 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                                         formulaTemplate: 'Weight-renormalized sum of the 10 engine site factors (each 0–1 × its weight) → 0–100.',
                                         deps: [...r.engine.breakdown].sort((a, b) => b.contribution - a.contribution).slice(0, 4).map((f) => ({ label: f.key, value: Math.round(f.value * 100), unit: '/100', provenance: 'engine' as const })),
                                     }} /> : '—'}
-                                    {r && best(vals, r.engine.score) && <span className="ml-0.5 text-[9px] text-rz-signal" aria-label="best of row">★</span>}
+                                    {r && passes(s.id) && best(vals, r.engine.score) && <span className="ml-0.5 text-[9px] text-rz-signal" aria-label="best of row">★</span>}
                                 </td>;
                             })}
                         </tr>
+                        {screenings && (
+                            <tr className="border-b border-slate-100 dark:border-slate-800/60">
+                                <td className="py-1.5 pr-2 text-slate-500" title="Hard gates (Criteria panel). A screened-out candidate keeps its score for reference but is excluded from the ranking.">Screening</td>
+                                {sites.map((s) => {
+                                    const sc = screenings.get(s.id);
+                                    return <td key={s.id} className="px-2 py-1.5 text-right">
+                                        {!sc ? '—' : sc.passed
+                                            ? <span className="text-[9px] font-semibold text-rz-mint">PASS</span>
+                                            : <span className="text-[9px] font-semibold text-rz-alert" title={sc.failed.map((f) => `${f.label}: ${f.observed}`).join('\n')}>SCREENED OUT</span>}
+                                    </td>;
+                                })}
+                            </tr>
+                        )}
                         {axes.map((k) => (
                             <tr key={k} className="border-b border-slate-100 dark:border-slate-800/60">
                                 <td className="py-1.5 pr-2 text-slate-500 cursor-help" title={AXIS_EXPLAIN[k]}>{AXIS_LABELS[k]} <span className="text-[9px] text-slate-400">ⓘ</span>{k === 'naturalRisks' && <span className="ml-1 text-[9px]">(risk: lower better)</span>}</td>

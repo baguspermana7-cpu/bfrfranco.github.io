@@ -6868,6 +6868,43 @@
              * (1 = best). power/grid dominate DC site selection. v2.5.0: +climate
              * (free-cooling hours) factor per CBRE/JLL site-selection frameworks. */
             weights: { power: 0.17, grid: 0.14, seismic: 0.10, talent: 0.11, tax: 0.09, carbon: 0.09, flood: 0.07, latency: 0.07, water: 0.08, climate: 0.08 },
+            /* v3.25.0 — selection-criteria profiles. Each is a full 10-factor weight
+             * vector (sum = 1.0) for one use case; `balanced` IS the default `weights`
+             * above (byte-equal) so every existing score is unchanged. Rationale per
+             * profile is the site-selection logic a client expects to see stated:
+             *  ai_training  — power price/availability and grid dominate (GPU campus
+             *                 runs 24/7 at full load); carbon + water matter for
+             *                 liquid-cooled heat rejection; latency barely matters.
+             *  colocation   — latency / market proximity and grid reliability lead
+             *                 (SLA-bound tenants); talent for 24/7 ops.
+             *  enterprise_dr — hazard separation first: seismic + flood dominate,
+             *                 then grid; cost second; latency to the primary site
+             *                 matters only inside the replication window.
+             *  hyperscale   — power + grid + carbon (PPAs) + climate (free cooling),
+             *                 tax for 15-yr economics; latency moderate. */
+            weightProfiles: {
+                balanced:      { label: 'Balanced (default)',      weights: { power: 0.17, grid: 0.14, seismic: 0.10, talent: 0.11, tax: 0.09, carbon: 0.09, flood: 0.07, latency: 0.07, water: 0.08, climate: 0.08 } },
+                ai_training:   { label: 'AI training campus',      weights: { power: 0.22, grid: 0.16, seismic: 0.08, talent: 0.08, tax: 0.07, carbon: 0.11, flood: 0.06, latency: 0.03, water: 0.10, climate: 0.09 } },
+                colocation:    { label: 'Colocation / cloud edge', weights: { power: 0.12, grid: 0.16, seismic: 0.08, talent: 0.12, tax: 0.08, carbon: 0.06, flood: 0.07, latency: 0.18, water: 0.06, climate: 0.07 } },
+                enterprise_dr: { label: 'Enterprise DR site',      weights: { power: 0.10, grid: 0.15, seismic: 0.20, talent: 0.07, tax: 0.08, carbon: 0.04, flood: 0.16, latency: 0.08, water: 0.06, climate: 0.06 } },
+                hyperscale:    { label: 'Hyperscale campus',       weights: { power: 0.20, grid: 0.15, seismic: 0.08, talent: 0.07, tax: 0.10, carbon: 0.12, flood: 0.07, latency: 0.06, water: 0.07, climate: 0.08 } }
+            },
+            /* v3.25.0 — hard screening gates (must-have criteria). A site that FAILS a
+             * gate is screened out of the ranking regardless of its weighted score.
+             * Thresholds are screening conventions, stated so a client can challenge
+             * them: capacity must cover the IT load; flood 'extreme' and PGA > 60 %g
+             * (ASCE-7 SDC E/F, near-fault) are walk-away hazards for a Tier III+ shell —
+             * SDC D (Tokyo, Jakarta, California) is designed for, not excluded;
+             * permitting beyond 24 months breaks a typical COD; water stress 4-5
+             * (WRI Aqueduct 'high'/'extremely high') is a no-go only when the cooling
+             * design consumes water (evaporative / adiabatic). */
+            gates: [
+                { id: 'capacity', label: 'Utility capacity ≥ IT load',            attr: 'availableCapacityMw', op: '>=', ref: 'itLoadMw' },
+                { id: 'flood',    label: 'Flood risk not extreme',                attr: 'floodRisk',           op: '!=', value: 'extreme' },
+                { id: 'seismic',  label: 'PGA (2 %/50 yr) ≤ 60 %g (below SDC E / near-fault)', attr: 'pgaPct2in50yr', op: '<=', value: 60 },
+                { id: 'permit',   label: 'Permitting ≤ 24 months',                attr: 'permitMonths',        op: '<=', value: 24 },
+                { id: 'water',    label: 'Water stress ≤ 3 when cooling uses water', attr: 'waterStress0to5',  op: '<=', value: 3, onlyIf: 'waterCooling' }
+            ],
             /* v2.5.0 site research pass — ASHRAE 169-2021 climate zone → annual
              * economizer (free-cooling) hours; USGS PGA %g → IBC/ASCE-7 SDC score;
              * WRI Aqueduct 0-5 water-stress → 0-1; IEEE-1366 SAIDI reference. */
@@ -6882,6 +6919,124 @@
                 { min: 40, grade: 'D', label: 'Marginal' },
                 { min: 0,  grade: 'E', label: 'Challenged' }
             ]
+        },
+        /* ══ v3.25.0 — DATA.tariffs: MRC / NRC tariff defaults by DC BUSINESS MODEL.
+         * The per-market $/kW·mo index is DATA.tariffs.marketIndex (CBRE Global Data
+         * Center Trends 2026, 250–500 kW asking rate) with DATA.markets[*].coloPrice
+         * (2025 basis) as the fallback. A business model is a MULTIPLIER on that
+         * index (the CBRE block-size curve) plus its own NRC, term, take-or-pay,
+         * escalation and add-ons. GPU-as-a-Service is priced per GPU-hour and
+         * converted to an IT-kW equivalent through the node's rated power. Every
+         * number carries its source in DATA.sources['tariffs.*']; nothing here is a
+         * recommendation. ══ */
+        tariffs: {
+            /* $/kW·mo, 250–500 kW requirement, CBRE Global Data Center Trends 2026
+             * (avg where CBRE prints one, else the band midpoint; band kept).
+             * johor / bangkok come from secondary trackers (coloprice, Knight Frank) and
+             * are flagged evidence 'secondary'. Markets absent here resolve through
+             * DATA.markets[key].coloPrice (2025 basis). */
+            marketIndex: {
+                'singapore':      { perKwMonth: 403,   band: [330, 475], evidence: 'broker', note: 'CBRE 2026 avg' },
+                'tokyo':          { perKwMonth: 280,   band: [280, 280], evidence: 'broker', note: 'CBRE 2026' },
+                'hong-kong':      { perKwMonth: 295,   band: [295, 295], evidence: 'broker', note: 'CBRE 2026' },
+                'sydney':         { perKwMonth: 188,   band: [188, 188], evidence: 'broker', note: 'CBRE 2026' },
+                'chicago':        { perKwMonth: 215,   band: [200, 230], evidence: 'broker', note: 'CBRE 2026 band midpoint' },
+                'frankfurt':      { perKwMonth: 250,   band: [235, 265], evidence: 'broker', note: 'CBRE 2026 band midpoint' },
+                'n-virginia':     { perKwMonth: 173,   band: [160, 185], evidence: 'broker', note: 'CBRE NA H2 2025 avg' },
+                'silicon-valley': { perKwMonth: 237.5, band: [200, 275], evidence: 'broker', note: 'CBRE 2026 band midpoint' },
+                'dallas':         { perKwMonth: 172.5, band: [160, 185], evidence: 'broker', note: 'CBRE 2026 band midpoint' },
+                'phoenix':        { perKwMonth: 195,   band: [175, 215], evidence: 'broker', note: 'CBRE 2026 band midpoint' },
+                'sao-paulo':      { perKwMonth: 160,   band: [130, 190], evidence: 'broker', note: 'CBRE 2026 band midpoint' },
+                'queretaro':      { perKwMonth: 260,   band: [250, 270], evidence: 'broker', note: 'CBRE 2026 band midpoint' },
+                'santiago':       { perKwMonth: 200,   band: [190, 210], evidence: 'broker', note: 'CBRE 2026 band midpoint' },
+                'johor':          { perKwMonth: 130,   band: [110, 150], evidence: 'secondary', note: 'coloprice index + Knight Frank 2026; DC Byte: Singapore space-only ≈ 3× Johor/Batam' },
+                'bangkok':        { perKwMonth: 142.5, band: [120, 165], evidence: 'secondary', note: 'coloprice index 2026' }
+            },
+            /* Country → default market key when the CAPEX city market is 'none'. */
+            countryMarket: { ID: 'jakarta', SG: 'singapore', MY: 'kuala-lumpur', TH: 'bangkok', JP: 'tokyo', AU: 'sydney', IN: 'mumbai', KR: 'seoul', US: 'n-virginia', CA: 'toronto', GB: 'london', DE: 'frankfurt', NL: 'amsterdam', FR: 'paris', IE: 'dublin', AE: 'dubai', ZA: 'johannesburg', KE: 'nairobi', BR: 'sao-paulo', CL: 'santiago', MX: 'queretaro' },
+            /* When neither a market nor a country index exists. */
+            fallbackIndex: { perKwMonth: 196, label: 'CBRE North America average asking rate, H2 2025', evidence: 'broker' },
+            /* Wholesale discount curve — CBRE North America H1 2026 average asking
+             * rate by block size. factor = band ÷ the 250–500 kW band (the index basis).
+             * Cross-check: Digital Realty Q2 2026 new leases, all regions at DLR share —
+             * 0–1 MW ≈ $280/kW vs >1 MW ≈ $157/kW (signed base rent, 0.56×), so the
+             * curve below is the ASKING-rate view and realised wholesale rent can sit
+             * lower. */
+            blockSizeBands: [
+                { maxKw: 500,      perKwMonth: 204.69, label: '250–500 kW' },
+                { maxKw: 3000,     perKwMonth: 183.75, label: '500 kW – 3 MW' },
+                { maxKw: 10000,    perKwMonth: 175.00, label: '3 – 10 MW' },
+                { maxKw: Infinity, perKwMonth: 165.31, label: '10 MW+' }
+            ],
+            /* Business models. indexFactor multiplies the market index (or, when
+             * blockSized, the block-size factor for the project's IT load); gpuPremium
+             * = JLL/CBRE "AI-capable capacity commands a 20–30 % premium" (1.25 mid). */
+            businessModels: {
+                retail_colo:      { label: 'Retail colocation (cabinets / cages, < 1 MW)', pricing: 'perKw', indexFactor: 1.0, blockSized: false,
+                                    nrcPerKw: 260, contractYears: 3, takeOrPayPct: 1.0, escalation: 0.03, crossConnectNrc: 1000, crossConnectMrc: 200,
+                                    note: 'index as published (250–500 kW asking); NRC = $500 setup on a 1.92 kW cabinet (2026 list) ≈ $260/kW; cabinets bill the contracted kW in full' },
+                wholesale_colo:   { label: 'Wholesale colocation (1–10 MW suites)', pricing: 'perKw', indexFactor: 1.0, blockSized: true,
+                                    nrcPerKw: 0, contractYears: 10, takeOrPayPct: 0.70, escalation: 0.03, crossConnectNrc: 1000, crossConnectMrc: 200,
+                                    note: 'turnkey lease: fit-out amortised into MRC (NRC 0 unless the tenant funds TI — the Financial page can override from the CAPEX engine)' },
+                hyperscale_lease: { label: 'Hyperscale / build-to-suit lease (10 MW+)', pricing: 'perKw', indexFactor: 1.0, blockSized: true,
+                                    nrcPerKw: 0, contractYears: 15, takeOrPayPct: 0.70, escalation: 0.03, crossConnectNrc: 0, crossConnectMrc: 0,
+                                    note: '10 MW+ block of the CBRE curve; long term; cross-connects negotiated into the lease' },
+                gpu_colo:         { label: 'High-density / GPU colocation (liquid-ready)', pricing: 'perKw', indexFactor: 1.25, blockSized: true,
+                                    nrcPerKw: 260, contractYears: 5, takeOrPayPct: 0.70, escalation: 0.03, crossConnectNrc: 1000, crossConnectMrc: 200,
+                                    liquidSurchargePerRackMonth: [500, 4000],
+                                    note: 'AI premium 20–30 % (1.25 mid, JLL/CBRE 2026); liquid-cooling surcharge $500–4,000/rack·mo quoted by providers (secondary) — not applied by default' },
+                gaas:             { label: 'GPU-as-a-Service (own fleet, $/GPU-hour)', pricing: 'perGpuHour', indexFactor: 0, blockSized: false,
+                                    nrcPerKw: 0, contractYears: 3, takeOrPayPct: 1.0, escalation: 0.0, crossConnectNrc: 0, crossConnectMrc: 0,
+                                    note: 'revenue = GPU-hours sold × price; the GPU fleet is IT-hardware CAPEX on top of the facility; reserved contracts bill the reserved GPUs in full; $/GPU-hr erodes with each generation — escalation 0 by default, adjust explicitly' },
+                enterprise_self:  { label: 'Enterprise owner-occupied (internal chargeback)', pricing: 'perKw', indexFactor: 1.0, blockSized: true,
+                                    nrcPerKw: 0, contractYears: 15, takeOrPayPct: 1.0, escalation: 0.03, crossConnectNrc: 0, crossConnectMrc: 0,
+                                    note: 'no external customer: the chargeback is the avoided wholesale rent for the same block, billed in full' }
+            },
+            gaas: {
+                hoursPerMonth: 730,            /* 8760 h ÷ 12 */
+                utilizationDefault: 0.70,      /* debt-financed cluster breakeven ≈ 70 % (2026 neocloud analyses); reserved contracts set a floor */
+                utilizationBand: [0.55, 0.75],
+                /* node kW → IT kW: fabric + OOB + storage share of rack IT, from the DC AI
+                 * basis (28.16 + 1.06 + 10.0 MW over 499.84 MW rack IT = +7.8 %). */
+                itOverheadFactor: 1.08,
+                gpuLifeYearsDefault: 5,        /* 4 yr conservative … 6 yr CoreWeave */
+                /* $/GPU-hr, public list prices read 2026-11 (CoreWeave, Lambda, Nebius)
+                 * + market medians (Sep 2026 trackers). nodeKw = NVIDIA max system power. */
+                skus: {
+                    h100:  { label: 'H100 SXM (HGX / DGX H100, 8 GPU)', gpusPerNode: 8, nodeKwMax: 10.2,
+                             onDemand: { lo: 4.50, hi: 6.16, ref: 'Nebius 4.50 · Lambda 4.59 · CoreWeave 6.16' },
+                             reserved: { lo: 3.19, hi: 3.69, ref: 'CoreWeave reserved 3.19–3.69' },
+                             marketplace: { lo: 2.40, hi: 2.40, ref: 'Vast.ai 2.40 (marketplace floor)' },
+                             gpuCapexUsd: { lo: 25000, hi: 40000, ref: 'per GPU in 8-GPU volumes (secondary 2026 guides)' } },
+                    h200:  { label: 'H200 SXM (HGX / DGX H200, 8 GPU)', gpusPerNode: 8, nodeKwMax: 10.2,
+                             onDemand: { lo: 5.40, hi: 6.31, ref: 'Nebius 5.40 · CoreWeave 6.31' },
+                             reserved: { lo: 3.99, hi: 4.99, ref: 'CoreWeave reserved 3.99–4.99; market median 4.44 (Sep 2026)' },
+                             marketplace: { lo: 4.44, hi: 4.98, ref: 'median 4.44 · AWS capacity block ≈ 4.98' },
+                             gpuCapexUsd: { lo: 28000, hi: 40000, ref: 'per GPU (secondary 2026 guides)' } },
+                    b200:  { label: 'B200 (HGX / DGX B200, 8 GPU)', gpusPerNode: 8, nodeKwMax: 14.3,
+                             onDemand: { lo: 7.69, hi: 8.60, ref: 'Lambda 7.69 · Nebius 8.50 · CoreWeave 8.60' },
+                             reserved: { lo: 6.79, hi: 7.99, ref: 'CoreWeave reserved 6.79–7.99 (Lambda reserved 8.87–9.86)' },
+                             marketplace: { lo: 6.85, hi: 6.85, ref: 'market median 6.85 (Sep 2026)' },
+                             gpuCapexUsd: { lo: 30000, hi: 40000, ref: 'per GPU in 8-GPU volumes; street quotes 45–50k under constraint (secondary)' } },
+                    b300:  { label: 'B300 (HGX / DGX B300, 8 GPU)', gpusPerNode: 8, nodeKwMax: 14.0,
+                             onDemand: { lo: 9.50, hi: 9.50, ref: 'Nebius 9.50' },
+                             reserved: { lo: 9.50, hi: 9.50, ref: 'no public reserved price — on-demand used' },
+                             marketplace: { lo: 9.50, hi: 9.50, ref: 'no tracker median yet' },
+                             gpuCapexUsd: { lo: 35000, hi: 50000, ref: 'per GPU (secondary 2026 guides, Blackwell Ultra)' } },
+                    gb300_nvl72: { label: 'GB300 NVL72 (72 GPU rack, liquid)', gpusPerNode: 72, nodeKwMax: 142,
+                             onDemand: { lo: 10.50, hi: 10.50, ref: 'CoreWeave GB300 NVL72 instance $42.00/hr for 4 GPUs = 10.50/GPU-hr' },
+                             reserved: { lo: 10.50, hi: 10.50, ref: 'no public reserved price — on-demand used' },
+                             marketplace: { lo: 10.50, hi: 10.50, ref: 'no tracker median yet' },
+                             gpuCapexUsd: { lo: 40000, hi: 55000, ref: 'per GPU incl. rack-scale share (secondary; cooling kit excluded)' } }
+                }
+            },
+            addons: {
+                crossConnect: { nrcUsd: [500, 1500], mrcUsd: [100, 300], ref: 'US colo list ranges; GSA EIS $44.46–688.22/mo; Iron Mountain GSA $122.96/mo' },
+                remoteHandsPerHour: { usd: 157.11, band: [150, 250], ref: 'Iron Mountain GSA schedule $157.11/hr; market quotes $150–250' },
+                /* $/Mbps·mo, 100 GigE weighted medians, TeleGeography Q2 2026 */
+                ipTransit100GePerMbpsMonth: { floor: 0.03, europe: 0.08, singapore: 0.26, 'hong-kong': 0.25, tokyo: 0.28, taipei: 0.42, mumbai: 0.97 },
+                powerOverageFactor: [1.5, 2.0]
+            }
         },
         /* ══ v2.4.0 — DATA.commissioning: Operational Readiness Index (Layer 7).
          * Weighted commissioning-level completion → readiness %. Levels follow the
@@ -9109,6 +9264,10 @@
         /* ── A1: provenance sidecar. Keyed by DATA path → { source, asOf, unit?, method? }.
          * The provenance test asserts every economically-material leaf is registered here. */
         sources: {
+            'tariffs': { source: 'v3.25.0 MRC/NRC tariff model by DC business model — market index CBRE Global Data Center Trends 2026 (250–500 kW asking, avg or band midpoint; NoVA from CBRE NA H2 2025 $173 avg); block-size curve CBRE North America H1 2026 ($204.69 / 183.75 / 175.00 / 165.31 per kW·mo for 250–500 kW, 500 kW–3 MW, 3–10 MW, 10 MW+); cross-check Digital Realty Q2 2026 new-lease base rent 0–1 MW ≈ $280/kW vs >1 MW ≈ $157/kW (all regions, DLR share); AI premium 20–30 % (JLL/CBRE 2026); Johor $110–150 + Bangkok $120–165 from coloprice/Knight Frank (secondary); fallback = CBRE NA average $196 (H2 2025)', asOf: '2026-11', unit: '$/kW·mo', method: 'SCREENING index × block-size factor × model factor' },
+            'tariffs.businessModels': { source: 'retail NRC: public 2026 cabinet list price $500 setup on a 1.92 kW cabinet ($608/mo) ≈ $260/kW; retail cross-connect NRC $500–1,500 + MRC $100–300 (US list ranges); wholesale/hyperscale turnkey leases carry fit-out in the rent (NRC 0 — practice); take-or-pay 70 % and 3 % escalation = standard colo screening terms (practice; UK bands escalate 3–5 %); terms 3 / 10 / 15 / 5 yr = typical retail / wholesale / build-to-suit / GPU-colo tenors (practice)', asOf: '2026-11', method: 'SCREENING; every field is user-overridable in the Financial module' },
+            'tariffs.gaas': { source: '$/GPU-hr list prices read 2026-11: CoreWeave (H100 6.16 on-demand, reserved 3.19–3.69; H200 6.31, reserved 3.99–4.99; B200 8.60, reserved 6.79–7.99; GB300 NVL72 instance $42.00/hr for 4 GPUs), Lambda (H100 4.59, B200 7.69, reserved B200 8.87–9.86), Nebius (H100 4.50, H200 5.40, B200 8.50, B300 9.50); market medians Sep 2026 (B200 ≈ 6.85, H200 ≈ 4.44), Vast.ai H100 2.40, AWS H200 capacity block ≈ 4.98. Node power: NVIDIA DGX H100/H200 10.2 kW max, DGX B200 ~14.3 kW max, DGX B300 ~14 kW, GB300 NVL72 142 kW ref-arch. Utilisation 70 % = debt-financed cluster breakeven in 2026 neocloud analyses (band 55–75 %); GPU life 4–6 yr (CoreWeave 6); IT overhead 1.08 = DC AI basis (fabric + OOB + storage ÷ rack IT); GPU purchase prices $25–40k (H100/H200/B200 per GPU in 8-GPU volumes), B300 35–50k, GB300 40–55k incl. rack share — secondary 2026 price guides, get vendor quotes', asOf: '2026-11', unit: '$/GPU-hr, kW', method: 'SCREENING: price × utilisation × 730 h ÷ IT kW per GPU' },
+            'tariffs.addons': { source: 'Cross-connect: US colo list $500–1,500 NRC + $100–300/mo; GSA EIS $44.46–688.22/mo; Iron Mountain GSA $122.96/mo. Remote hands: Iron Mountain GSA schedule $157.11/hr, market $150–250/hr. IP transit: TeleGeography IP Transit Pricing 2026 — 100 GigE weighted medians Q2 2026 (floor $0.03, Europe $0.08, Singapore $0.26, Hong Kong $0.25, Tokyo $0.28, Taipei $0.42, Mumbai $0.97 per Mbps·mo). Power overage 1.5–2× (UK colo price bands 2026)', asOf: '2026-11', method: 'SCREENING add-on price points' },
             'capexDetail': { source: 'Turner & Townsend DCCI 2025 + Cushman & Wakefield DC Cost Guide 2025 (city $/W anchor table) + JLL 2026 escalation; category factors calibrated to the anchor (locMult = perW/4.65) — lineage: capex-calculator inline model, lifted v2.3.0', asOf: '2025', method: 'budgetary estimate-grade; NOT detailed engineering' },
             'capexDetail.costFactors.electrical': { source: 'calculator lineage 1200 $/kW (DCMOC A7 2025 used 1550 for a different model shape — NOT merged; engine detailed model is the shared source from v2.3.0)', asOf: '2025', unit: '$/kW IT' },
             'deepSeaCooling': { source: 'Design basis: 150 MW AI DC deep-sea cooling reference architecture (owner, 2026) — chiller-less primary + hybrid trim backup; seawater properties: TEOS-10/IOC tables at S=35, 5 °C; intake-temp bands: NOAA World Ocean Atlas typical tropical/subtropical profiles; SWAC cost scaling: Makai Ocean Engineering SWAC studies + Hawaii/InterContinental SWAC projects (public figures), HDPE marine pipeline install multipliers 2.5-4x onshore', asOf: '2026', method: 'poster mode reproduces the reference (cp 4.0, rho 1000): 172.5 MW / (4.0*5) = 8.625 m3/s = 31,050 m3/h, 4+1 pumps 2.9 m3/s @ 60 m ≈ 2.0 MW each; accurate mode uses rho 1025 / cp 3985' },
@@ -12465,9 +12624,11 @@
                  *  supplied factors count; weights are renormalized over present
                  *  factors so a partial set still scores fairly. Returns score 0-100,
                  *  grade, per-factor breakdown, and the list of missing factors. */
-                score: function (factors) {
+                score: function (factors, weights) {
                     factors = factors || {};
-                    var W = DATA.site.weights;
+                    /* v3.25.0: optional weight vector (a DATA.site.weightProfiles entry
+                     * or a user-edited copy). Omitted → DATA.site.weights, unchanged. */
+                    var W = (weights && typeof weights === 'object') ? weights : DATA.site.weights;
                     var breakdown = [];
                     var present = 0, weighted = 0, missing = [];
                     for (var k in W) {
@@ -12486,6 +12647,87 @@
             },
 
             /* ── v2.4.0: commissioning readiness model — Layer 7 ── */
+            /* ── v3.25.0: tariff model — MRC/NRC defaults by business model ── */
+            tariffs: {
+                /** $/kW·mo index for a market key (2026 CBRE index → 2025 coloPrice fallback → global fallback). */
+                marketIndex: function (marketKey) {
+                    var T = DATA.tariffs, m = marketKey && T.marketIndex[marketKey];
+                    if (m) return { perKwMonth: m.perKwMonth, band: m.band, evidence: m.evidence, basis: 'tariffs.marketIndex.' + marketKey + ' (' + m.note + ')', marketKey: marketKey };
+                    var mk = marketKey && DATA.markets && DATA.markets[marketKey];
+                    if (mk && typeof mk.coloPrice === 'number') return { perKwMonth: mk.coloPrice, band: null, evidence: 'broker-2025', basis: 'markets.' + marketKey + '.coloPrice (2025 basis)', marketKey: marketKey };
+                    return { perKwMonth: T.fallbackIndex.perKwMonth, band: null, evidence: T.fallbackIndex.evidence, basis: T.fallbackIndex.label, marketKey: null };
+                },
+                /** Market key for a country when no city market is selected. */
+                marketForCountry: function (countryId) {
+                    var k = DATA.tariffs.countryMarket[String(countryId || '').toUpperCase()];
+                    return k || null;
+                },
+                /** Block-size factor (CBRE curve ÷ its first band) for an IT load in kW. */
+                blockFactor: function (itLoadKw) {
+                    var b = DATA.tariffs.blockSizeBands, base = b[0].perKwMonth, kw = Math.max(0, +itLoadKw || 0);
+                    for (var i = 0; i < b.length; i++) if (kw <= b[i].maxKw) return { factor: b[i].perKwMonth / base, band: b[i].label, perKwMonth: b[i].perKwMonth };
+                    return { factor: b[b.length - 1].perKwMonth / base, band: b[b.length - 1].label, perKwMonth: b[b.length - 1].perKwMonth };
+                },
+                /** IT kW per GPU for a sku, including the fabric/OOB/storage overhead. */
+                kwPerGpu: function (skuId) {
+                    var s = DATA.tariffs.gaas.skus[skuId];
+                    if (!s) return null;
+                    return (s.nodeKwMax / s.gpusPerNode) * DATA.tariffs.gaas.itOverheadFactor;
+                },
+                /** Default $/GPU-hr for a sku and pricing mode ('reserved' | 'onDemand' | 'marketplace'): band midpoint. */
+                gpuHourPrice: function (skuId, mode) {
+                    var s = DATA.tariffs.gaas.skus[skuId];
+                    if (!s) return null;
+                    var b = s[mode] || s.reserved;
+                    return { perGpuHour: (b.lo + b.hi) / 2, band: [b.lo, b.hi], ref: b.ref, mode: s[mode] ? mode : 'reserved' };
+                },
+                /** $/GPU-hr × utilisation × hours → $/kW·mo of IT load. */
+                gaasPerKwMonth: function (skuId, pricePerGpuHour, utilization) {
+                    var kw = RZEngine.models.tariffs.kwPerGpu(skuId);
+                    if (!kw) return null;
+                    var u = Math.max(0, Math.min(1, +utilization));
+                    return (+pricePerGpuHour) * u * DATA.tariffs.gaas.hoursPerMonth / kw;
+                },
+                /** GPU fleet that an IT load supports: count, nodes, hardware CAPEX (band midpoint). */
+                gaasFleet: function (skuId, itLoadKw) {
+                    var s = DATA.tariffs.gaas.skus[skuId], kw = RZEngine.models.tariffs.kwPerGpu(skuId);
+                    if (!s || !kw) return null;
+                    var gpus = Math.floor(Math.max(0, +itLoadKw || 0) / kw);
+                    var capexPerGpu = (s.gpuCapexUsd.lo + s.gpuCapexUsd.hi) / 2;
+                    return { gpus: gpus, nodes: Math.floor(gpus / s.gpusPerNode), kwPerGpu: kw, capexPerGpu: capexPerGpu, capexUsd: gpus * capexPerGpu, capexBand: [gpus * s.gpuCapexUsd.lo, gpus * s.gpuCapexUsd.hi], lifeYears: DATA.tariffs.gaas.gpuLifeYearsDefault };
+                },
+                /** The tariff a DCMOC project opens with.
+                 *  o = { model, itLoadKw, marketKey?, countryId?, indexPerKwMonth?, sku?, pricePerGpuHour?, utilization?, pricingMode? } */
+                resolve: function (o) {
+                    o = o || {};
+                    var T = DATA.tariffs, id = T.businessModels[o.model] ? o.model : 'wholesale_colo', bm = T.businessModels[id];
+                    var itKw = Math.max(1, +o.itLoadKw || 1000), basis = [];
+                    var mkey = o.marketKey && o.marketKey !== 'none' ? o.marketKey : RZEngine.models.tariffs.marketForCountry(o.countryId);
+                    var idx = typeof o.indexPerKwMonth === 'number' ? { perKwMonth: o.indexPerKwMonth, basis: 'index override', evidence: 'user', marketKey: mkey, band: null } : RZEngine.models.tariffs.marketIndex(mkey);
+                    var out = { model: id, label: bm.label, pricing: bm.pricing, index: idx, blockFactor: 1, blockBand: null, indexFactor: bm.indexFactor,
+                                mrcPerKwMonth: 0, nrcPerKw: bm.nrcPerKw, contractYears: bm.contractYears, takeOrPayPct: bm.takeOrPayPct, escalation: bm.escalation,
+                                crossConnectNrc: bm.crossConnectNrc, crossConnectMrc: bm.crossConnectMrc, gaas: null, basis: basis, note: bm.note };
+                    if (bm.pricing === 'perGpuHour') {
+                        var sku = T.gaas.skus[o.sku] ? o.sku : 'h100', mode = o.pricingMode || 'reserved';
+                        var p = typeof o.pricePerGpuHour === 'number' ? { perGpuHour: o.pricePerGpuHour, band: null, ref: 'user price', mode: 'user' } : RZEngine.models.tariffs.gpuHourPrice(sku, mode);
+                        var u = typeof o.utilization === 'number' ? o.utilization : T.gaas.utilizationDefault;
+                        var fleet = RZEngine.models.tariffs.gaasFleet(sku, itKw);
+                        out.mrcPerKwMonth = RZEngine.models.tariffs.gaasPerKwMonth(sku, p.perGpuHour, u);
+                        out.gaas = { sku: sku, label: T.gaas.skus[sku].label, perGpuHour: p.perGpuHour, priceBand: p.band, priceRef: p.ref, mode: p.mode, utilization: u, kwPerGpu: fleet.kwPerGpu, gpus: fleet.gpus, nodes: fleet.nodes, gpuHoursPerYear: fleet.gpus * u * 8760, hardwareCapexUsd: fleet.capexUsd, hardwareCapexBand: fleet.capexBand, capexPerGpu: fleet.capexPerGpu, lifeYears: fleet.lifeYears };
+                        basis.push('GaaS ' + T.gaas.skus[sku].label + ': $' + p.perGpuHour.toFixed(2) + '/GPU-hr (' + p.mode + ': ' + p.ref + ') × ' + Math.round(u * 100) + ' % utilisation × ' + T.gaas.hoursPerMonth + ' h ÷ ' + fleet.kwPerGpu.toFixed(3) + ' kW/GPU (node ' + T.gaas.skus[sku].nodeKwMax + ' kW ÷ ' + T.gaas.skus[sku].gpusPerNode + ' × ' + T.gaas.itOverheadFactor + ' overhead)');
+                        basis.push('fleet ' + fleet.gpus + ' GPUs / ' + fleet.nodes + ' nodes; hardware CAPEX ≈ $' + Math.round(fleet.capexUsd).toLocaleString() + ' (band $' + Math.round(fleet.capexBand[0]).toLocaleString() + '–' + Math.round(fleet.capexBand[1]).toLocaleString() + ', secondary price guides) — NOT in the facility CAPEX');
+                    } else {
+                        var bf = bm.blockSized ? RZEngine.models.tariffs.blockFactor(itKw) : { factor: 1, band: null };
+                        out.blockFactor = bf.factor; out.blockBand = bf.band;
+                        out.mrcPerKwMonth = idx.perKwMonth * bf.factor * bm.indexFactor;
+                        basis.push('index $' + idx.perKwMonth + '/kW·mo — ' + idx.basis);
+                        if (bm.blockSized) basis.push('block-size factor ' + bf.factor.toFixed(3) + ' (' + bf.band + ', CBRE NA H1 2026 asking-rate curve)');
+                        if (bm.indexFactor !== 1) basis.push('model factor ' + bm.indexFactor + ' (' + bm.note + ')');
+                    }
+                    out.mrcPerKwMonth = Math.round(out.mrcPerKwMonth * 100) / 100;
+                    return out;
+                }
+            },
             commissioning: {
                 /** Readiness status for a 0-100 index. */
                 status: function (index) {
@@ -15315,7 +15557,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-09-06-cdu"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-11-06-tariffs"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

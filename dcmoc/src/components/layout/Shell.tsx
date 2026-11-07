@@ -6,6 +6,7 @@ import { PageDescription } from '@/components/layout/PageDescription';
 import { useSimulationStore } from '@/store/simulation';
 import { useRequirementsStore } from '@/store/requirements';
 import { useScenarioStore, SavedScenario } from '@/store/scenario';
+import { buildScenarioSummary } from '@/lib/scenarioSummary';
 import { useCapexStore } from '@/store/capex';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import type { LucideIcon } from 'lucide-react';
@@ -57,9 +58,10 @@ import {
     Stethoscope,
 } from 'lucide-react';
 import clsx from 'clsx';
-import { getPUE } from '@/constants/pue';
 import { useAuthStore } from '@/store/auth';
 import { useProjectsStore, takeSnapshot, restoreSnapshot } from '@/store/projects';
+import { seedPresentationPresets } from '@/lib/presentationPresets';
+import { syncTariffRevenue } from '@/lib/tariffs';
 import { fetchShared } from '@/lib/cloudProjects';
 import { LoginScreen } from '@/components/ui/LoginScreen';
 import { Explain } from '@/components/ui/Explain';
@@ -103,6 +105,20 @@ export function Shell({ children }: ShellProps) {
         });
         return unsub;
     }, []);
+
+    /* v3.25.0 — presentation presets: seed the 5 client-ready projects ONCE per
+     * browser (idempotent, additive, never on a ?share= view). The live
+     * configuration is backed up and restored inside the seeder. */
+    useEffect(() => {
+        if (!hydrated) return;
+        try {
+            if (new URLSearchParams(window.location.search).get('share')) return;
+            seedPresentationPresets();
+            syncTariffRevenue();   // v3.25.0: the live project's revenue basis = its business model's tariff, from first paint
+        } catch (err) {
+            if (process.env.NODE_ENV !== 'production') console.warn('[presets] seed skipped:', err);
+        }
+    }, [hydrated]);
 
     /* Keluar dari mode lihat-saja: restore backup → readOnly off → strip query. */
     const exitShareView = React.useCallback(() => {
@@ -341,15 +357,16 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
         { num: 3, label: 'Architecture', icon: Boxes, childIds: ['architecture', 'fire'] },
         { num: 4, label: 'Capacity Planning', icon: Layers, childIds: ['capacity', 'fuel-gen', 'cdu'] },
         { num: 5, label: 'CAPEX Engine', icon: Building, childIds: ['capex'] },
-        { num: 6, label: 'Construction', icon: HardHat, childIds: ['construction', 'phased-finance'] },
+        { num: 6, label: 'Construction', icon: HardHat, childIds: ['construction'] },
         { num: 7, label: 'Commissioning', icon: CheckCircle2, childIds: ['commissioning'] },
         /* Maintenance BEFORE Staffing (owner): the maintenance regime determines headcount */
         { num: 8, label: 'Operations', icon: Wrench, childIds: ['ops', 'sim', 'maint', 'staff'] },
         { num: 9, label: 'Asset Intelligence', icon: Activity, childIds: ['asset-health', 'asset-lifecycle', 'cbm', 'spares'] },
         { num: 10, label: 'Reliability', icon: ShieldCheck, childIds: ['risk', 'reliability'] },
         { num: 11, label: 'Sustainability', icon: Leaf, childIds: ['carbon', 'energy-audit', 'renewable-economics'] },
-        { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'invest', 'portfolio', 'benchmark', 'strategic'] },
-        { num: 13, label: 'AI Decision Engine', icon: BrainCircuit, childIds: [] },
+        { num: 12, label: 'Financial', icon: TrendingUp, childIds: ['finance', 'phased-finance', 'invest', 'portfolio', 'benchmark', 'strategic'] },
+        /* v3.25.0: engine 13 was an empty group — it is the Results / decision page (deterministic rules + recommendations) */
+        { num: 13, label: 'AI Decision Engine', icon: BrainCircuit, childIds: ['report'] },   // v3.25.0: the Results Engine page IS engine 13 (was an empty group, then wrongly the Executive Overview)
     ];
     // Engine badge/icon color — SEMANTIC by LIFECYCLE PHASE (design.md §5: color
     // MEANS something). The 13 engines are a lifecycle sequence → 4 brand-hue
@@ -394,19 +411,12 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
     // Save current state as scenario
     const handleSaveScenario = () => {
         if (!scenarioName.trim()) return;
-        const totalStaff = inputs.headcount_ShiftLead + inputs.headcount_Engineer +
-            inputs.headcount_Technician + inputs.headcount_Admin + inputs.headcount_Janitor;
         scenarioStore.saveScenario({
             name: scenarioName.trim(),
             countryId: selectedCountry?.id || 'ID',
             simInputs: { ...inputs },
             capexInputs: { ...capexStore.inputs },
-            summary: {
-                monthlyOpex: 0,
-                annualCapex: capexStore.results?.total || 0,
-                totalStaff,
-                pue: getPUE(inputs.coolingType),
-            },
+            summary: buildScenarioSummary(),   // v3.25.0: engine OPEX/staff/PUE/IRR — was monthlyOpex 0
         });
         setScenarioName('');
     };

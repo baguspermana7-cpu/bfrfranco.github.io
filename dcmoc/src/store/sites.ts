@@ -15,11 +15,16 @@ const STORAGE_KEY = 'dcmoc_candidate_sites';
 const MAX_SITES = 5;
 const LABELS = ['A', 'B', 'C', 'D', 'E'];
 
+/* v3.25.0 — selection criteria (profile + enabled gates) persist with the sites. */
+export interface SiteCriteria { profileId: string; gatesEnabled: Record<string, boolean>; adoptedSiteId?: string | null }
+const DEFAULT_CRITERIA: SiteCriteria = { profileId: 'balanced', gatesEnabled: {}, adoptedSiteId: null };
+
 interface SitesPayloadV1 {
     version: 1;
     sites: CandidateSite[];
     selectedSiteId: string | null;
     lastRunAt: number | null;
+    criteria?: SiteCriteria;     // optional: payloads written before v3.25.0 have none
 }
 
 function loadFromStorage(): SitesPayloadV1 | null {
@@ -33,10 +38,10 @@ function loadFromStorage(): SitesPayloadV1 | null {
     } catch { return null; }
 }
 
-function saveToStorage(s: { sites: CandidateSite[]; selectedSiteId: string | null; lastRunAt: number | null }): void {
+function saveToStorage(s: { sites: CandidateSite[]; selectedSiteId: string | null; lastRunAt: number | null; criteria: SiteCriteria }): void {
     if (typeof window === 'undefined') return;
     try {
-        const payload: SitesPayloadV1 = { version: 1, sites: s.sites, selectedSiteId: s.selectedSiteId, lastRunAt: s.lastRunAt };
+        const payload: SitesPayloadV1 = { version: 1, sites: s.sites, selectedSiteId: s.selectedSiteId, lastRunAt: s.lastRunAt, criteria: s.criteria };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch { /* quota — non-fatal */ }
 }
@@ -46,6 +51,11 @@ export interface SitesStore {
     selectedSiteId: string | null;
     comparisonIds: string[];
     lastRunAt: number | null;
+    criteria: SiteCriteria;
+    setCriteriaProfile: (profileId: string) => void;
+    toggleGate: (gateId: string) => void;
+    /** Decision step: records the adopted candidate (the caller syncs country + requirements). */
+    adoptSite: (id: string | null) => void;
     addSite: (countryId: string, name?: string) => void;
     removeSite: (id: string) => void;
     updateSite: (id: string, patch: Partial<Omit<CandidateSite, 'id' | 'attributes'>>) => void;
@@ -93,7 +103,7 @@ function relabel(sites: CandidateSite[]): CandidateSite[] {
 
 export const useSitesStore = create<SitesStore>((set, get) => {
     const persisted = loadFromStorage();
-    let seed = persisted?.sites ?? seedDefaultSites('ID');
+    const seed = persisted?.sites ?? seedDefaultSites('ID');
     /* DA1 stale-load rebase: a persisted pristine site follows the CURRENT project
      * country (fixes legacy localStorage frozen on the 'ID' seed). Deferred one
      * tick so the simulation store finishes initializing first. */
@@ -110,14 +120,23 @@ export const useSitesStore = create<SitesStore>((set, get) => {
         selectedSiteId: persisted?.selectedSiteId ?? seed[0]?.id ?? null,
         comparisonIds: seed.map((s) => s.id),
         lastRunAt: persisted?.lastRunAt ?? null,
+        criteria: persisted?.criteria && typeof persisted.criteria.profileId === 'string'
+            ? { profileId: persisted.criteria.profileId, gatesEnabled: persisted.criteria.gatesEnabled ?? {}, adoptedSiteId: persisted.criteria.adoptedSiteId ?? null }
+            : DEFAULT_CRITERIA,
     };
     const commit = (next: Partial<SitesStore>) => {
         set(next);
         const s = get();
-        saveToStorage({ sites: s.sites, selectedSiteId: s.selectedSiteId, lastRunAt: s.lastRunAt });
+        saveToStorage({ sites: s.sites, selectedSiteId: s.selectedSiteId, lastRunAt: s.lastRunAt, criteria: s.criteria });
     };
     return {
         ...initial,
+        setCriteriaProfile: (profileId) => commit({ criteria: { ...get().criteria, profileId } }),
+        adoptSite: (id) => commit({ criteria: { ...get().criteria, adoptedSiteId: id }, selectedSiteId: id ?? get().selectedSiteId, lastRunAt: Date.now() }),
+        toggleGate: (gateId) => {
+            const c = get().criteria;
+            commit({ criteria: { ...c, gatesEnabled: { ...c.gatesEnabled, [gateId]: c.gatesEnabled[gateId] === false } } });
+        },
         addSite: (countryId, name) => {
             const s = get();
             if (s.sites.length >= MAX_SITES) return;
@@ -139,6 +158,7 @@ export const useSitesStore = create<SitesStore>((set, get) => {
             const sites = relabel(s.sites.filter((x) => x.id !== id));
             commit({
                 sites,
+                criteria: s.criteria.adoptedSiteId === id ? { ...s.criteria, adoptedSiteId: null } : s.criteria,
                 comparisonIds: s.comparisonIds.filter((x) => x !== id),
                 selectedSiteId: s.selectedSiteId === id ? sites[0]?.id ?? null : s.selectedSiteId,
             });

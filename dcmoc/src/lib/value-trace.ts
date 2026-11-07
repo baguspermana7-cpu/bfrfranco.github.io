@@ -7,6 +7,7 @@
  * ──────────────────────────────────────────────────────────────────────── */
 
 import { useSimulationStore } from '@/store/simulation';
+import { USE_CASE_TO_ENGINE, monthsToCod } from '@/lib/requirementsMappings';
 import { ccOverall } from '@/components/modules/reliability/availabilityChain';
 import { useCapexStore } from '@/store/capex';
 import { useRequirementsStore } from '@/store/requirements';
@@ -1536,7 +1537,7 @@ function resultsDims(): { capexScore: number; susScore: number; finScore: number
         // Requirements: engine intake completeness
         let reqScore = 50;
         try {
-            const v = M.requirements?.validate?.({ itLoadKw: i.itLoad, targetTier: i.tierLevel, region: country?.id, useCase: 'ai', coolingType: i.coolingType, rackKw: req().workload.avgRackDensityKw, budgetUsd: req().business.budgetUsd ?? undefined });
+            const v = M.requirements?.validate?.({ itLoadKw: i.itLoad, targetTier: i.tierLevel, region: country?.id, useCase: USE_CASE_TO_ENGINE[req().overview.useCase] ?? 'ai', coolingType: i.coolingType, rackKw: req().workload.avgRackDensityKw, budgetUsd: req().business.budgetUsd ?? undefined, deadlineMonths: monthsToCod(req().overview.targetCod) });   // v3.25.0: same intake as ResultsEnginePage
             reqScore = Math.round(v?.completeness?.pct ?? 50);
         } catch { /* */ }
         // Site: engine site score (best candidate)
@@ -1686,10 +1687,11 @@ function dashFinancial(): FinancialResult | null {
         const taxRate = sim().selectedCountry?.economy?.taxRate ?? 0.22;
         const annualOpex = dashOpexAnnual() ?? Math.round(capexTotal * 0.06);
         const rev = i.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH; // live SSOT (optimizer tunable)
-        const key = [capexTotal, i.itLoad, taxRate, annualOpex, rev, (i.occupancyRamp ?? []).join(',')].join('|');
+        const hw = i.itHardwareCapexUsd ?? 0; // v3.25.0: GaaS GPU fleet on top of the facility
+        const key = [capexTotal, hw, i.itLoad, taxRate, annualOpex, rev, (i.occupancyRamp ?? []).join(',')].join('|');
         if (_finCache?.key === key) return _finCache.fin;
         const fin = calculateFinancials({
-            totalCapex: capexTotal, annualOpex, revenuePerKwMonth: rev,
+            totalCapex: capexTotal + hw, annualOpex, revenuePerKwMonth: rev,
             itLoadKw: i.itLoad, discountRate: 0.10, projectLifeYears: 15, escalationRate: 0.03,
             opexEscalation: 0.03, occupancyRamp: i.occupancyRamp?.length ? i.occupancyRamp : defaultOccupancyRamp(15),
             taxRate, depreciationYears: 15,
@@ -2176,7 +2178,7 @@ function pfModel(): { irr: number; npv: number; payback: number; capex: number; 
             const f = calculateFinancials({
                 totalCapex: phaseCapex,
                 annualOpex: phase.itLoadKw * 50 * 12 + adders * (phase.itLoadKw / capPlan.totalItLoadKw),
-                revenuePerKwMonth: 150, itLoadKw: phase.itLoadKw, discountRate: adjustedDiscount,
+                revenuePerKwMonth: i.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH, itLoadKw: phase.itLoadKw, discountRate: adjustedDiscount, // SSOT (was a 150 literal — drifted from the page once the tariff model moved the basis)
                 projectLifeYears: 20, escalationRate: 0.03, opexEscalation: country.economy.inflationRate,
                 occupancyRamp: phaseOccRamp.concat(Array(16).fill(0.95)), taxRate: effectiveTaxRate,
                 depreciationYears: 20,

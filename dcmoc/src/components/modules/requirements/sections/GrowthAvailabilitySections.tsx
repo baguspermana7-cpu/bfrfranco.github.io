@@ -9,9 +9,11 @@ import { useRequirementsStore } from '@/store/requirements';
 import { writeSharedTier } from '@/lib/requirementsMappings';
 import { CreatableCombobox, type ComboValue } from '@/components/ui/CreatableCombobox';
 import { setParam } from '@/state/registry';
-import { SectionCard, Field, Segmented, NumInput } from '../ui';
+import { SectionCard, Field, Segmented, NumInput, Select } from '../ui';
+import { tariffFromStores, syncTariffRevenue, REVENUE_MODEL_OPTIONS, GAAS_SKU_OPTIONS, GAAS_MODE_OPTIONS } from '@/lib/tariffs';
+import { fmt, fmtMoney } from '@/lib/format';
 import { ChevronUp, ChevronDown } from 'lucide-react';
-import type { GrowthType, PriorityKey } from '@/store/requirements';
+import type { GrowthType, PriorityKey, RevenueModelId, GaasSkuId, GaasPricingMode } from '@/store/requirements';
 import type { ReqDerived } from '../useRequirementsDerived';
 
 const PRIORITY_LABELS: Record<PriorityKey, string> = {
@@ -116,8 +118,48 @@ export function BusinessPrioritySection({ derived }: { derived: ReqDerived }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [capexTotal]);
     const marginValue: ComboValue<number> = { value: b.designMarginPct, isCustom: !MARGIN_PRESETS.some((p) => p.value === b.designMarginPct) };
+    /* v3.25.0 — revenue model → MRC/NRC defaults (engine DATA.tariffs). The resolved
+     * tariff is written to the sim revenue basis so every DCF opens on it. */
+    const itLoad = useSimulationStore((s) => s.inputs.itLoad);
+    const countryId = useSimulationStore((s) => s.selectedCountry?.id);
+    const cityMarket = useCapexStore((s) => s.inputs.cityMarket);
+    const tariff = React.useMemo(() => syncTariffRevenue() ?? tariffFromStores(),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [b.revenueModel, b.gaasSku, b.gaasPricingMode, b.gaasUtilization, itLoad, countryId, cityMarket]);
     return (
-        <SectionCard num="1.5" title="Business, Margin & Priority" caption="Budget + design margin (flows into CAPEX contingency & financials) + project priorities" id="sec-business">
+        <SectionCard num="1.5" title="Business, Margin & Priority" caption="Revenue model (sets the MRC/NRC defaults) + budget + design margin (flows into CAPEX contingency & financials) + project priorities" id="sec-business">
+            <div className="grid gap-3 md:grid-cols-3 mb-3" data-testid="req-revenue-model">
+                <Field label="Revenue model" hint="How the facility earns. Sets MRC $/kW·mo (market index 2026 × block-size × model), NRC, take-or-pay and the typical term — all overridable in Financial.">
+                    <Select<RevenueModelId> value={b.revenueModel ?? 'wholesale_colo'} options={REVENUE_MODEL_OPTIONS}
+                        onChange={(v) => req.actions.setBusiness({ revenueModel: v })} />
+                </Field>
+                {b.revenueModel === 'gaas' ? (
+                    <>
+                        <Field label="GPU fleet (SKU · pricing)" hint="Public list prices 2026-11 (CoreWeave / Lambda / Nebius); node kW from NVIDIA DGX max system power.">
+                            <div className="grid grid-cols-2 gap-2">
+                                <Select<GaasSkuId> value={b.gaasSku ?? 'h100'} options={GAAS_SKU_OPTIONS} onChange={(v) => req.actions.setBusiness({ gaasSku: v })} />
+                                <Select<GaasPricingMode> value={b.gaasPricingMode ?? 'reserved'} options={GAAS_MODE_OPTIONS} onChange={(v) => req.actions.setBusiness({ gaasPricingMode: v })} />
+                            </div>
+                        </Field>
+                        <Field label="GPU utilisation" hint="Share of GPU-hours sold. 70 % = 2026 breakeven for a debt-financed cluster; reserved contracts set the floor.">
+                            <NumInput value={Math.round((b.gaasUtilization ?? 0.7) * 100)} min={10} max={100} unit="%"
+                                onChange={(v) => req.actions.setBusiness({ gaasUtilization: Math.max(0.1, Math.min(1, (v ?? 70) / 100)) })} />
+                        </Field>
+                    </>
+                ) : (
+                    <Field label="Resolved tariff" hint="Engine models.tariffs.resolve — the Financial module opens on these values (AUTO) and lets you override each one.">
+                        <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-2 py-1.5 text-xs text-slate-900 dark:text-white tabular-nums" data-testid="req-tariff-summary">
+                            {tariff ? <>MRC <b>${fmt(tariff.mrcPerKwMonth, 2)}</b>/kW·mo · NRC ${tariff.nrcPerKw}/kW · take-or-pay {Math.round(tariff.takeOrPayPct * 100)} % · term {tariff.contractYears} yr</> : 'engine loading…'}
+                        </div>
+                    </Field>
+                )}
+                {tariff && (
+                    <div className="md:col-span-3 text-[11px] leading-relaxed text-slate-600 dark:text-slate-400" data-testid="req-tariff-basis">
+                        {tariff.basis.map((s, i) => <div key={i}>{s}</div>)}
+                        {tariff.gaas && <div className="text-slate-900 dark:text-white">MRC equivalent <b>${fmt(tariff.mrcPerKwMonth, 0)}</b>/kW·mo · fleet {tariff.gaas.gpus.toLocaleString()} GPUs · hardware CAPEX {fmtMoney(tariff.gaas.hardwareCapexUsd)} — carried in every DCF on top of the facility CAPEX</div>}
+                    </div>
+                )}
+            </div>
             <div className="grid gap-3 md:grid-cols-3">
                 <Field label="Budget (USD)" explainKey="budget-usd" hint={b.budgetUsd != null && capexTotal != null && b.budgetUsd === Math.round(capexTotal * 1.2 / 1e5) * 1e5 ? 'predefined ≈ CAPEX P80 (editable)' : undefined}><NumInput value={b.budgetUsd} min={0} unit="USD" placeholder="Total budget"
                     onChange={(v) => req.actions.setBusiness({ budgetUsd: v })} /></Field>

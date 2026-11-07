@@ -13,6 +13,7 @@ import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Responsi
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useRequirementsStore } from '@/store/requirements';
+import { USE_CASE_TO_ENGINE, monthsToCod } from '@/lib/requirementsMappings';
 import { useConstructionTracking } from '@/store/constructionTracking';
 import { useSitesStore } from '@/store/sites';
 import { plannedSchedule, evm } from '@/state/adapters/construction-adapter';
@@ -55,7 +56,9 @@ export function ResultsEnginePage() {
         /* dimension composites — each formula documented in `basis` */
         const dims: Dim[] = [];
         // Requirements: engine intake completeness (intake object captured for the explain panel)
-        const intake = { itLoadKw: inputs.itLoad, targetTier: inputs.tierLevel, region: country?.id, useCase: 'ai', coolingType: inputs.coolingType, rackKw: req.workload.avgRackDensityKw, budgetUsd: req.business.budgetUsd ?? undefined };
+        /* v3.25.0: intake reads the brief — useCase was hardcoded 'ai' and deadlineMonths was never sent, so
+         * completeness could not exceed 5/6 (83 %) whatever the user filled in. */
+        const intake = { itLoadKw: inputs.itLoad, targetTier: inputs.tierLevel, region: country?.id, useCase: USE_CASE_TO_ENGINE[req.overview.useCase] ?? 'ai', coolingType: inputs.coolingType, rackKw: req.workload.avgRackDensityKw, budgetUsd: req.business.budgetUsd ?? undefined, deadlineMonths: monthsToCod(req.overview.targetCod) };
         let reqScore = 50; let reqMissing: string[] = [];
         try {
             const v = m?.requirements?.validate?.(intake);

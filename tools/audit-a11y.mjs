@@ -97,6 +97,15 @@ for (const f of PAGES) {
         const tick = () => { if (finite().length === 0) quiet++; else quiet = 0; if (quiet >= 2 || Date.now() - t0 > 6000) res(); else setTimeout(tick, 200); };
         tick();
       })).catch(() => {});
+      // 2026-11-07 (third instance): the hub's hero mounts after the poll returned quiet, and axe then sampled the
+      // LAST staggered .keys li (ambient, delay 200 ms + 3 x 70 ms) mid-fade at #cdcfd4 / #d5d6d9 on white. Waiting
+      // cannot win a race against work that starts later, so the sample is taken at REST: every finite animation
+      // and transition is jumped to its end state (fill: forwards keeps it there), twice, 250 ms apart, so a
+      // tick that starts a new one in between is caught too. Infinite ones (flows, dwell bars) are left alone.
+      for (let pass = 0; pass < 2; pass++) {
+        await pg.evaluate(() => { document.getAnimations().forEach(a => { try { const e = a.effect && a.effect.getTiming ? a.effect.getTiming() : null; if (e && e.iterations !== Infinity) a.finish(); } catch (err) {} }); });
+        await new Promise(r => setTimeout(r, 250));
+      }
       await pg.evaluate(AXE_SRC);
       const res = await pg.evaluate(async () => await axe.run(document, {
         resultTypes: ['violations'],

@@ -83,6 +83,34 @@ Deterministic NOW, AI-pluggable LATER via one interface `DecisionProvider`:
 - Honesty: `DECISION_DISCLAIMER` on every result (engineering guidance, not
   investment/professional advice).
 
+## 7b. Presentation presets + site selection process (v3.25.0)
+
+- **Presets are projects, not templates.** `dcmoc/src/lib/presentationPresets.ts` holds five complete
+  briefs (JKT-AI-40, SG-COLO-20, SBY-DR-5, CYB-HPC-15, BTM-HYPER-100). They are materialised through the
+  stores' own setters, snapshotted with `takeSnapshot()`, and saved as `demo_*` ProjectBundles + `demo_sc_*`
+  scenarios (four starred). Seeding runs once per browser (`dcmoc_demo_seed`), is additive, backs up and
+  restores the live configuration, and is skipped when fewer than 5 of the 10 project slots are free.
+  *Reset presets* re-materialises them from the current engine — never edit a preset bundle by hand.
+- **A preset must be internally consistent**: use-case profile → density → cooling → tier floor →
+  redundancy (Results rule 5), budget ≥ engine CAPEX (rule 1), completeness 100 % (`DATA.requirements.required`
+  all present). `tools/test-dcmoc-presets.mjs` proves it on a fresh profile; run it after any engine or store change.
+- **Selection is a process, every number engine-owned.** Weights = `DATA.site.weightProfiles` (balanced is
+  byte-equal to `DATA.site.weights`); gates = `DATA.site.gates` (thresholds stated as screening conventions).
+  `models.site.score(factors, weights?)`. A screened-out candidate keeps its score but never ranks. Adopt writes
+  Requirements 1.1 (siteStatus, cityRegion) and the project country — the only path from Site to the brief.
+- **Scenario summaries come from one helper** (`lib/scenarioSummary.ts`) — the Dashboard's own engine calls.
+  A save path that writes literals into `summary` is a defect.
+
+## 7c. Tariff model — MRC/NRC by business model (v3.25.0)
+
+Owner: *"improve pre determine MRC dan NRC tariff … dengan beberapa type business DC misal GaaS … deep research dulu … harus accurate."*
+
+- **One resolver**: `models.tariffs.resolve({ model, itLoadKw, marketKey | countryId, sku, pricingMode, utilization })` in `rz-engine.js`; DCMOC calls it through `src/lib/tariffs.ts` (`resolveTariff`, `tariffFromStores`, `syncTariffRevenue`). Requirements 1.5, the Financial AUTO fields, the presets and the Results/Scenario screening all read this one result. No page carries a tariff literal.
+- **Per-kW models** (retail, wholesale, hyperscale, GPU colo, owner-occupied): `MRC = index × blockFactor × indexFactor`. Index order: `DATA.tariffs.marketIndex[key]` (CBRE Global DC Trends 2026, 250–500 kW asking) → `DATA.markets[key].coloPrice` (2025 basis, flagged `broker-2025`) → `fallbackIndex` (CBRE NA average $196). `blockFactor` = CBRE NA H1 2026 block-size curve ÷ its 250–500 kW band (1.00 / 0.898 / 0.855 / 0.808). `indexFactor` 1.25 only on GPU colo (JLL/CBRE AI premium 20–30 %). NRC: retail $260/kW (a $500 setup on a 1.92 kW cabinet), turnkey leases 0 (fit-out sits in the rent — the Financial page can override from the CAPEX engine).
+- **GPU-as-a-Service**: `$/GPU-hr × utilisation × 730 h ÷ (nodeKwMax ÷ gpusPerNode × 1.08)` → the sim revenue basis in $/kW·mo; the fleet (`floor(itLoadKw ÷ kW/GPU)` GPUs, nodes, hardware CAPEX band, life) is written to `sim.itHardwareCapexUsd` and added to `totalCapex` in the Financial DCF, the dashboard financial node (`value-trace.ts`) and `finScreening`. Prices are list prices with their provider named (`DATA.sources['tariffs.gaas']`); $/GPU-hr erodes per generation, so escalation defaults to 0 and is an explicit input.
+- **Rules**: (1) every tariff number lives in `DATA.tariffs` with a `DATA.sources['tariffs*']` entry (source, asOf, method); (2) a market with no 2026 figure resolves through the flagged 2025 index, never through an invented number — Jakarta is that case today; (3) the resolver's `basis[]` strings are rendered wherever the value is shown (Requirements 1.5, Financial *Business model* block); (4) the Financial per-field override stays the user's escape hatch — AUTO never overwrites an overridden field; (5) gates: `tools/test-rz-engine.mjs` (worked examples incl. the H100 $1,276.57/kW·mo case), `tools/test-dcmoc-presets.mjs` L6 (JKT-AI-40 opens as GaaS with the fleet line; switching the model in Financial moves the sim basis; BTM-HYPER-100 = index × 10 MW+ factor).
+- **Research record**: `~/.local/state/rzharness/projects/PRJ-RZ-WEB/work-items/WI-DCMOC-PRESENT-001/TARIFF_RESEARCH.md` — every figure with its URL and evidence class (broker report / company filing / list price / secondary tracker / practice).
+
 ## 8. Per-engine + dashboard PDF
 Reuse `dcmoc/src/modules/reporting/PdfUtils.ts` (~34 primitives) + the
 store→generator(props)+html2canvas pattern. Every one of the 13 engines AND the

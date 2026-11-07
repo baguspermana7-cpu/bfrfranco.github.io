@@ -23,6 +23,7 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { useScenarioStore } from '@/store/scenario';
+import { buildScenarioSummary } from '@/lib/scenarioSummary';
 import { getPUE } from '@/constants/pue';
 import { Boxes, FileDown, Save, ChevronRight } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
@@ -142,7 +143,7 @@ export function ArchitecturePage() {
             name: `Arch · ${(i.itLoadKw / 1000).toFixed(0)}MW ${i.coolingType} ${i.redundancy}`,
             countryId: country?.id ?? 'ID',
             simInputs, capexInputs: useCapexStore.getState().inputs,
-            summary: { monthlyOpex: 0, annualCapex: useCapexStore.getState().results?.total ?? 0, totalStaff: 0, pue: f.pue },
+            summary: buildScenarioSummary(),   // v3.25.0: engine OPEX/staff/PUE — was 0/0
         });
         showToast('Scenario saved');
     };

@@ -14,6 +14,8 @@
 
 import { explainThresholdMetric, type DecisionLever, type ThresholdLeverSpec } from '@/lib/decision-explain';
 import { rzModels, rzData } from '@/lib/rz-engine';
+import { useSimulationStore } from '@/store/simulation';
+import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import { fmtMoney } from '@/lib/format';
 import { AXIS_LABELS, type AxisKey, type SiteScoreResult } from '@/types/site-intel';
 
@@ -74,9 +76,14 @@ export interface FinScreen {
 export function finScreening(itLoadKw: number, pue: number, countryId: string, capexTotal: number): FinScreen | null {
     const m = rzModels();
     if (!m?.roi?.npv) return null;
-    const rate = rzData()?.decision?.revenuePerKwMonth ?? 280;
+    /* v3.25.0: the sim revenue basis is the SSOT (tariff model → sim.revenuePerKwMonth);
+     * the old `decision.revenuePerKwMonth ?? 280` read a key the engine never had, so
+     * every Results/Scenario IRR silently used $280. GaaS adds its GPU fleet to capex. */
+    const simIn = useSimulationStore.getState().inputs;
+    const rate = simIn.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH;
+    const hardwareCapex = simIn.itHardwareCapexUsd ?? 0;
     const build = (revMult: number, capexMult: number): { capex: number; revenue: number; opexAnnual: number; flows: number[] } => {
-        const capex = capexTotal * capexMult;
+        const capex = (capexTotal + hardwareCapex) * capexMult;
         const revenue = rate * itLoadKw * 12 * revMult;
         const opexAnnual: number = m?.opex?.totalAnnual
             ? m.opex.totalAnnual(itLoadKw / 1000, pue, countryId, 12, { capex, basisPreset: 'dcContract' }).total
@@ -84,8 +91,8 @@ export function finScreening(itLoadKw: number, pue: number, countryId: string, c
         return { capex, revenue, opexAnnual, flows: Array.from({ length: 15 }, () => revenue - opexAnnual) };
     };
     const base = build(1, 1);
-    const npv: number = m.roi.npv(base.flows, 0.1) - capexTotal;
-    const irr: number | null = m.roi.irr ? m.roi.irr([-capexTotal, ...base.flows]) : null;
+    const npv: number = m.roi.npv(base.flows, 0.1) - base.capex;
+    const irr: number | null = m.roi.irr ? m.roi.irr([-base.capex, ...base.flows]) : null;
     return {
         revenue: base.revenue,
         opexAnnual: base.opexAnnual,

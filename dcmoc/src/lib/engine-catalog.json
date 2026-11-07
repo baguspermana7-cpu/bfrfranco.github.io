@@ -2,9 +2,9 @@
  "generator": "tools/build-engine-catalog.mjs",
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
- "modelCount": 53,
- "functionCount": 235,
- "sourceCount": 163,
+ "modelCount": 54,
+ "functionCount": 243,
+ "sourceCount": 167,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -1235,6 +1235,7 @@
     "dcmoc/src/components/modules/StrategicPlanningDashboard.tsx",
     "dcmoc/src/components/modules/financial/FinancialPage.tsx",
     "dcmoc/src/components/modules/operations/OpexBreakdown.tsx",
+    "dcmoc/src/lib/scenarioSummary.ts",
     "dcmoc/src/lib/screening.ts",
     "dcmoc/src/lib/value-bindings.ts",
     "dcmoc/src/lib/value-trace.ts",
@@ -1689,12 +1690,14 @@
     {
      "name": "score",
      "params": [
-      "factors"
+      "factors",
+      "weights"
      ]
     }
    ],
    "consumers": [
     "dcmoc/src/components/modules/NewEngineDashboards.tsx",
+    "dcmoc/src/components/modules/site-intel/SelectionProcessPanel.tsx",
     "dcmoc/src/components/modules/site-intel/SiteComparisonRail.tsx",
     "dcmoc/src/components/modules/site-intel/SiteIntelligencePage.tsx",
     "dcmoc/src/components/modules/site-intel/SiteMapRadar.tsx",
@@ -1791,6 +1794,68 @@
    "consumers": [
     "dcmoc/src/lib/value-trace.ts",
     "dcmoc/src/modules/reporting/boq/BoqDossier.ts"
+   ]
+  },
+  {
+   "name": "tariffs",
+   "functions": [
+    {
+     "name": "blockFactor",
+     "params": [
+      "itLoadKw"
+     ]
+    },
+    {
+     "name": "gaasFleet",
+     "params": [
+      "skuId",
+      "itLoadKw"
+     ]
+    },
+    {
+     "name": "gaasPerKwMonth",
+     "params": [
+      "skuId",
+      "pricePerGpuHour",
+      "utilization"
+     ]
+    },
+    {
+     "name": "gpuHourPrice",
+     "params": [
+      "skuId",
+      "mode"
+     ]
+    },
+    {
+     "name": "kwPerGpu",
+     "params": [
+      "skuId"
+     ]
+    },
+    {
+     "name": "marketForCountry",
+     "params": [
+      "countryId"
+     ]
+    },
+    {
+     "name": "marketIndex",
+     "params": [
+      "marketKey"
+     ]
+    },
+    {
+     "name": "resolve",
+     "params": [
+      "o"
+     ]
+    }
+   ],
+   "consumers": [
+    "dcmoc/src/components/modules/requirements/sections/GrowthAvailabilitySections.tsx",
+    "dcmoc/src/lib/tariffs.ts",
+    "dcmoc/src/store/requirements.ts"
    ]
   },
   {
@@ -2968,6 +3033,30 @@
    "source": "PROXY/SCREENING per-country landed-cost + export-control. Import-duty bands (equipment): FTA 0 / low ~3% / med ~7.5% / high ~17% (IN ~15, BR ~16) / punitive ~30% (China↔US), applied to the imported-EQUIPMENT fraction per category (BOM split: ups ~70/gen ~75/network ~80/cooling ~55/electrical ~40%, labor-heavy ~0) — WTO/national tariff schedules, screening. Export-control tiers = US BIS Fed-Register PROXY; AI Diffusion Rule RESCINDED 2025 so caps are NOT in force — advisory only, NOT statutory/legal advice. Customs lead +2-12 wk by jurisdiction. Per-country band assignment in CountryProfile.supplyChain.",
    "asOf": "2026",
    "method": "PROXY/SCREENING — duty on equipment fraction only; export-control advisory, policy fluid"
+  },
+  {
+   "key": "tariffs",
+   "source": "v3.25.0 MRC/NRC tariff model by DC business model — market index CBRE Global Data Center Trends 2026 (250–500 kW asking, avg or band midpoint; NoVA from CBRE NA H2 2025 $173 avg); block-size curve CBRE North America H1 2026 ($204.69 / 183.75 / 175.00 / 165.31 per kW·mo for 250–500 kW, 500 kW–3 MW, 3–10 MW, 10 MW+); cross-check Digital Realty Q2 2026 new-lease base rent 0–1 MW ≈ $280/kW vs >1 MW ≈ $157/kW (all regions, DLR share); AI premium 20–30 % (JLL/CBRE 2026); Johor $110–150 + Bangkok $120–165 from coloprice/Knight Frank (secondary); fallback = CBRE NA average $196 (H2 2025)",
+   "asOf": "2026-11",
+   "method": "SCREENING index × block-size factor × model factor"
+  },
+  {
+   "key": "tariffs.addons",
+   "source": "Cross-connect: US colo list $500–1,500 NRC + $100–300/mo; GSA EIS $44.46–688.22/mo; Iron Mountain GSA $122.96/mo. Remote hands: Iron Mountain GSA schedule $157.11/hr, market $150–250/hr. IP transit: TeleGeography IP Transit Pricing 2026 — 100 GigE weighted medians Q2 2026 (floor $0.03, Europe $0.08, Singapore $0.26, Hong Kong $0.25, Tokyo $0.28, Taipei $0.42, Mumbai $0.97 per Mbps·mo). Power overage 1.5–2× (UK colo price bands 2026)",
+   "asOf": "2026-11",
+   "method": "SCREENING add-on price points"
+  },
+  {
+   "key": "tariffs.businessModels",
+   "source": "retail NRC: public 2026 cabinet list price $500 setup on a 1.92 kW cabinet ($608/mo) ≈ $260/kW; retail cross-connect NRC $500–1,500 + MRC $100–300 (US list ranges); wholesale/hyperscale turnkey leases carry fit-out in the rent (NRC 0 — practice); take-or-pay 70 % and 3 % escalation = standard colo screening terms (practice; UK bands escalate 3–5 %); terms 3 / 10 / 15 / 5 yr = typical retail / wholesale / build-to-suit / GPU-colo tenors (practice)",
+   "asOf": "2026-11",
+   "method": "SCREENING; every field is user-overridable in the Financial module"
+  },
+  {
+   "key": "tariffs.gaas",
+   "source": "$/GPU-hr list prices read 2026-11: CoreWeave (H100 6.16 on-demand, reserved 3.19–3.69; H200 6.31, reserved 3.99–4.99; B200 8.60, reserved 6.79–7.99; GB300 NVL72 instance $42.00/hr for 4 GPUs), Lambda (H100 4.59, B200 7.69, reserved B200 8.87–9.86), Nebius (H100 4.50, H200 5.40, B200 8.50, B300 9.50); market medians Sep 2026 (B200 ≈ 6.85, H200 ≈ 4.44), Vast.ai H100 2.40, AWS H200 capacity block ≈ 4.98. Node power: NVIDIA DGX H100/H200 10.2 kW max, DGX B200 ~14.3 kW max, DGX B300 ~14 kW, GB300 NVL72 142 kW ref-arch. Utilisation 70 % = debt-financed cluster breakeven in 2026 neocloud analyses (band 55–75 %); GPU life 4–6 yr (CoreWeave 6); IT overhead 1.08 = DC AI basis (fabric + OOB + storage ÷ rack IT); GPU purchase prices $25–40k (H100/H200/B200 per GPU in 8-GPU volumes), B300 35–50k, GB300 40–55k incl. rack share — secondary 2026 price guides, get vendor quotes",
+   "asOf": "2026-11",
+   "method": "SCREENING: price × utilisation × 730 h ÷ IT kW per GPU"
   },
   {
    "key": "tax",

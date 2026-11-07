@@ -12,7 +12,10 @@ import { useSimulationStore } from '@/store/simulation';
 import { useSitesStore } from '@/store/sites';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
+import { useRequirementsStore } from '@/store/requirements';
 import { scoreAllSites, buildAnalysisCtx, analyzeSite, type SiteAnalyses } from '@/lib/site-adapter';
+import { screenAllSites, profileWeights } from '@/lib/site-screening';
+import { SelectionStepper, CriteriaPanel, ScreeningPanel, DecisionPanel, PROCESS_STEPS } from './SelectionProcessPanel';
 import { COUNTRIES } from '@/constants/countries';
 import { SiteMapPanel, SiteRadarPanel } from './SiteMapRadar';
 import { SiteCards, SiteDetailPanels, IntegratedAnalysesPanels } from './SiteCardsPanels';
@@ -22,25 +25,50 @@ import { ScoreValue } from '@/components/ui/ScoreValue';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { MapPin, Loader2 } from 'lucide-react';
 
-const STRIP = [
-    { id: 'sec-overview', label: '1 Overview' },
-    { id: 'sec-map', label: '2 Location Analysis' },
-    { id: 'sec-panels', label: '3-8 Detail Panels' },
-    { id: 'sec-compare', label: '9 Site Score & Compare' },
-];
+/* v3.25.0: the strip IS the selection process (criteria → candidates → screening → scoring → decision). */
+const STRIP = PROCESS_STEPS.map((s) => ({ id: s.id, label: s.label }));
 
 export function SiteIntelligencePage() {
     const inputs = useSimulationStore((s) => s.inputs);
     const itLoadMw = inputs.itLoad / 1000;
     const capexTotal = useCapexStore((s) => s.results?.total ?? null);
     const eff = useEffectiveInputs();
-    const { sites, selectedSiteId, selectSite } = useSitesStore();
+    const { sites, selectedSiteId, selectSite, criteria, setCriteriaProfile, toggleGate, adoptSite } = useSitesStore();
     const [drawer, setDrawer] = React.useState(false);
-    const [activeSec, setActiveSec] = React.useState(STRIP[0].id);
+    const [toast, setToast] = React.useState<string | null>(null);
+    const [activeSec, setActiveSec] = React.useState<string>(STRIP[0].id);
     /* Poor/Fair axis chip → explain panel (reason + solved levers) in the compare card */
     const [axisExplain, setAxisExplain] = React.useState<AxisExplainSel | null>(null);
 
-    const results = React.useMemo(() => scoreAllSites(sites), [sites]);
+    /* v3.25.0 — profile weights (engine DATA.site.weightProfiles) + hard gates.
+     * Ranking = passing candidates by score, then screened-out ones; rank 1 is
+     * always a candidate that passed every enabled gate. */
+    const weights = React.useMemo(() => profileWeights(criteria.profileId), [criteria.profileId]);
+    const screenings = React.useMemo(() => screenAllSites(sites, {
+        itLoadMw, waterCooling: inputs.coolingType !== 'air', enabled: criteria.gatesEnabled,
+    }), [sites, itLoadMw, inputs.coolingType, criteria.gatesEnabled]);
+    const results = React.useMemo(() => {
+        const scored = scoreAllSites(sites, weights);
+        const pass = scored.filter((r) => screenings.get(r.siteId)?.passed !== false);
+        const fail = scored.filter((r) => screenings.get(r.siteId)?.passed === false);
+        const ranked = [...pass, ...fail];
+        ranked.forEach((r, i) => { r.rank = i + 1; });
+        return ranked;
+    }, [sites, weights, screenings]);
+    const adoptCandidate = React.useCallback((site: { id: string; countryId: string; city: string; name: string; label: string }) => {
+        useSimulationStore.getState().actions.selectCountry(site.countryId);
+        useRequirementsStore.getState().actions.setOverview({ siteStatus: 'shortlisted', cityRegion: site.city || site.name });
+        adoptSite(site.id);
+        setToast(`Site ${site.label} adopted — Requirements 1.1 site status = shortlisted, city = ${site.city || site.name}, project country = ${COUNTRIES[site.countryId]?.name ?? site.countryId}.`);
+        window.setTimeout(() => setToast(null), 4000);
+    }, [adoptSite]);
+    const stepDone: Record<string, boolean> = {
+        'sec-criteria': true,
+        'sec-map': sites.length >= 2,
+        'sec-screening': sites.every((s) => (screenings.get(s.id)?.unknown.length ?? 0) === 0),
+        'sec-compare': sites.length >= 2 && results.some((r) => screenings.get(r.siteId)?.passed !== false),
+        'sec-decision': !!criteria.adoptedSiteId && sites.some((s) => s.id === criteria.adoptedSiteId),
+    };
 
     /* PHASE V — the 5 sibling analyses computed PER SITE (shared project ctx) */
     const analysesById = React.useMemo(() => {
@@ -58,7 +86,7 @@ export function SiteIntelligencePage() {
         } catch { /* engines guarded individually too */ }
         return map;
     }, [sites, inputs.itLoad, inputs.tierLevel, inputs.coolingType, capexTotal, eff]);
-    const best = results[0] ?? null;
+    const best = results.find((r) => screenings.get(r.siteId)?.passed !== false) ?? null;
     const bestSite = best ? sites.find((s) => s.id === best.siteId) : null;
     const selected = sites.find((s) => s.id === selectedSiteId) ?? sites[0] ?? null;
     const selectedResult = selected ? results.find((r) => r.siteId === selected.id) ?? null : null;
@@ -97,20 +125,17 @@ export function SiteIntelligencePage() {
                 </div>
             </div>
 
-            <div className="flex gap-1 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-1">
-                {STRIP.map((t) => (
-                    <button key={t.id} onClick={() => document.getElementById(t.id)?.scrollIntoView({ behavior: 'smooth' })}
-                        className={`whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[11px] font-medium ${activeSec === t.id ? 'bg-rz-signal text-black' : 'text-slate-600 dark:text-slate-300 hover:bg-rz-signal/10'}`}>
-                        {t.label}
-                    </button>
-                ))}
-            </div>
+            <SelectionStepper done={stepDone} active={activeSec} onJump={(id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })} />
+            {toast && <div role="status" className="rounded border border-rz-mint/40 bg-rz-mint/10 px-3 py-2 text-[11px] text-rz-mint">{toast}</div>}
 
             <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
                 <div className="min-w-0 space-y-4">
                     {/* KPI row — best-site card + 5 score cards through the shared
                       * ScoreValue primitive (Workstream M: semantic score color +
                       * Explain tooltip replaces the native title attr). */}
+                    <CriteriaPanel profileId={criteria.profileId} onProfile={setCriteriaProfile}
+                        gatesEnabled={criteria.gatesEnabled} onToggleGate={toggleGate} screenings={screenings} />
+
                     <div id="sec-overview" className="grid scroll-mt-24 grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {(() => {
                             /* "Overall Best" is comparative — with a single site there is no
@@ -159,8 +184,13 @@ export function SiteIntelligencePage() {
                         <SiteDetailPanels site={selected} />
                     </div>
 
+                    <ScreeningPanel sites={sites} screenings={screenings} />
+
                     <SiteComparisonTable sites={sites} results={results} selectedId={selected?.id ?? null} analysesById={analysesById}
-                        axisExplain={axisExplain} onExplainAxis={setAxisExplain} onEdit={() => setDrawer(true)} />
+                        axisExplain={axisExplain} onExplainAxis={setAxisExplain} onEdit={() => setDrawer(true)} screenings={screenings} />
+
+                    <DecisionPanel sites={sites} ranked={results} screenings={screenings} adoptedSiteId={criteria.adoptedSiteId ?? null}
+                        onAdopt={adoptCandidate} onSelect={selectSite} />
 
                     <p className="text-[10px] text-slate-400">
                         Country marked “EXAMPLE” sites carry illustrative attributes — edit via Edit Criteria. Country: {selected ? COUNTRIES[selected.countryId]?.name : '—'}.

@@ -41,6 +41,9 @@ export interface SimulationState {
         /** Optimizer tunable (Workstream D): colo revenue price $/kW-mo — a commercial
          *  fine-tune the Auto-optimizer may move inside its band; default 150. */
         revenuePerKwMonth?: number;
+        /** v3.25.0 — IT-hardware CAPEX on top of the facility (the GPU fleet of a
+         *  GPU-as-a-Service model; 0 for colocation). Added to every DCF capex. */
+        itHardwareCapexUsd?: number;
         headcount_ShiftLead: number;
         headcount_Engineer: number;
         headcount_Technician: number;
@@ -206,7 +209,8 @@ export const useSimulationStore = create<SimulationState>()(persist((set) => ({
                  * ($50-500/kW·mo spans retail→AI-premium; JLL 2026 wholesale
                  * $140-230) so a typo in the Financial field can't poison
                  * every DCF surface. */
-                if (validated.revenuePerKwMonth !== undefined) validated.revenuePerKwMonth = Math.max(50, Math.min(500, validated.revenuePerKwMonth));
+                if (validated.revenuePerKwMonth !== undefined) validated.revenuePerKwMonth = Math.max(50, Math.min(5000, validated.revenuePerKwMonth)); // 5000: a GPU-as-a-Service kW equivalent runs ~$1,000-2,000
+                if (validated.itHardwareCapexUsd !== undefined) validated.itHardwareCapexUsd = Math.max(0, Math.min(5e10, validated.itHardwareCapexUsd || 0));
                 /* Workstream G — discrete strategy buttons are PRESETS of the %
                  * mix: clicking one also writes the matching pure mix (unless a
                  * caller passed an explicit mix in the same update). */

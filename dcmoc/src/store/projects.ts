@@ -97,6 +97,9 @@ export function restoreSnapshot(s: ProjectBundle['snapshot']): void {
     try {
         // 1) sim (canonical shared inputs)
         if (s.simInputs) useSimulationStore.getState().actions.setInputs(s.simInputs);
+        // 1b) project country (v3.25.0 — was never restored: a SG project opened as ID until capex reconciled)
+        const cid = s.capexInputs?.location;
+        if (typeof cid === 'string' && cid) useSimulationStore.getState().actions.selectCountry(cid);
         // 2) capex (auto-recalcs on setInputs)
         if (s.capexInputs) useCapexStore.getState().setInputs(s.capexInputs);
         // 3) requirements
@@ -109,7 +112,7 @@ export function restoreSnapshot(s: ProjectBundle['snapshot']): void {
             if (s.requirements.business) a.setBusiness(s.requirements.business);
         }
         // 4) sites / architecture / trackings — direct set (schemas versioned per store)
-        if (s.sites?.sites?.length) useSitesStore.setState({ sites: s.sites.sites, selectedSiteId: s.sites.selectedSiteId ?? s.sites.sites[0]?.id ?? null, comparisonIds: s.sites.sites.map((x: { id: string }) => x.id) });
+        if (s.sites?.sites?.length) useSitesStore.setState({ sites: s.sites.sites, selectedSiteId: s.sites.selectedSiteId ?? s.sites.sites[0]?.id ?? null, comparisonIds: s.sites.sites.map((x: { id: string }) => x.id), ...(s.sites.criteria ? { criteria: s.sites.criteria } : {}) });
         if (s.architecture) useArchitectureStore.getState().actions.set(s.architecture);
         if (s.constructionTracking) useConstructionTracking.getState().actions.set(s.constructionTracking);
         if (s.cxTracking) useCxTracking.getState().actions.set(s.cxTracking);

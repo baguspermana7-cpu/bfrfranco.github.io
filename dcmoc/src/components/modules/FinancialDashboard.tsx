@@ -5,6 +5,7 @@ import { useRequirementsStore } from '@/store/requirements';
 import { MAINT_PER_KW_YR } from '@/lib/screening';
 import { rzData } from '@/lib/rz-engine';
 import { resolveMarketKey } from '@/lib/market-key';
+import { resolveTariff, REVENUE_MODEL_OPTIONS, GAAS_SKU_OPTIONS, GAAS_MODE_OPTIONS, type ResolvedTariff } from '@/lib/tariffs';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
 import { useEffectiveInputs } from '@/store/useEffectiveInputs';
@@ -147,6 +148,9 @@ const FinancialDashboard = () => {
     /* #333 dedup — Lease Term DERIVED reaktif dari Contract Duration
      * (Requirements 1.1, satu sumber). Bukan input lagi di halaman ini. */
     const reqOverview = useRequirementsStore((s) => s.overview);
+    const business = useRequirementsStore((s) => s.business);
+    const reqActions = useRequirementsStore((s) => s.actions);
+    const simInputsHw = useSimulationStore((s) => s.inputs.itHardwareCapexUsd);
     const contractYearsDerived = typeof reqOverview.contractDurationYr === 'number'
         ? reqOverview.contractDurationYr
         : (reqOverview.contractDurationCustom ?? 10);
@@ -196,17 +200,20 @@ const FinancialDashboard = () => {
         const itLoad = inputs.itLoad ?? 1000;
         const cid = (selectedCountry?.id ?? '').toUpperCase();
         const marketKey = resolveMarketKey(cityMarket);
-        const marketColo: number | undefined = marketKey !== 'none' ? D?.markets?.[marketKey]?.coloPrice : undefined;
-        const marketName: string | undefined = marketKey !== 'none' ? D?.markets?.[marketKey]?.name : undefined;
 
-        // Revenue $/kW·mo — real market colo when a market is selected, else the
-        // JLL/CBRE band default × tier multiplier (never the old 120+rate×500).
+        // Revenue $/kW·mo — v3.25.0: the engine tariff model (market index 2026 ×
+        // CBRE block-size curve × business-model factor; GaaS = $/GPU-hr × utilisation
+        // ÷ IT kW per GPU). Falls back to the JLL/CBRE band only while the engine loads.
+        const tariff: ResolvedTariff | null = resolveTariff({
+            model: business.revenueModel ?? 'wholesale_colo', itLoadKw: itLoad, marketKey, countryId: cid || null,
+            sku: business.gaasSku, pricingMode: business.gaasPricingMode, utilization: business.gaasUtilization,
+        });
         const tierRevMult = tier === 4 ? 1.15 : tier === 3 ? 1.0 : 0.85;
-        const bandBase = defaultRevenueInputs.mrcPerKwMonth; // JLL/CBRE $185 mid-band
-        const revValue = marketColo != null ? marketColo : Math.round(bandBase * tierRevMult);
-        const revSource = marketColo != null
-            ? `DATA.markets ${marketName} colo rate $${marketColo}/kW·mo (JLL/CBRE 2026)`
-            : `JLL/CBRE 2026 wholesale band $${bandBase}/kW·mo × Tier-${tier} multiplier ${tierRevMult}`;
+        const bandBase = defaultRevenueInputs.mrcPerKwMonth; // JLL/CBRE $185 mid-band (engine-less fallback)
+        const revValue = tariff ? Math.round(tariff.mrcPerKwMonth) : Math.round(bandBase * tierRevMult);
+        const revSource = tariff
+            ? `${tariff.label}: ${tariff.basis.join(' · ')}`
+            : `JLL/CBRE 2026 wholesale band $${bandBase}/kW·mo × Tier-${tier} multiplier ${tierRevMult} (engine not loaded)`;
 
         // Discount / WACC — Damodaran regional WACC + country risk (engine).
         const countryWacc = D?.discountDefaults?.[cid];
@@ -215,12 +222,14 @@ const FinancialDashboard = () => {
             ? `DATA.discountDefaults ${cid} WACC (Damodaran regional + country risk 2026)`
             : `DATA.discountDefaults global WACC (Damodaran 2026)`;
 
-        // NRC per kW — fit-out share of the design CAPEX per kW (real capex).
+        // NRC per kW — the business model's setup charge (retail: $500 setup on a
+        // 1.92 kW cabinet ≈ $260/kW; wholesale/hyperscale/GaaS: fit-out sits in the
+        // MRC, NRC 0). Engine-less fallback: 2 % of the design CAPEX per kW.
         const capexPerKw = capexResults ? Math.round(capexResults.total / Math.max(1, itLoad)) : 0;
-        const nrcValue = capexPerKw > 0 ? Math.max(100, Math.round(capexPerKw * 0.02)) : (tier === 4 ? 350 : tier === 3 ? 250 : 150);
-        const nrcSource = capexPerKw > 0
-            ? `2% of design CAPEX/kW ($${capexPerKw.toLocaleString()}/kW from CAPEX Engine)`
-            : `Tier-${tier} screening fit-out fee`;
+        const nrcValue = tariff ? tariff.nrcPerKw : (capexPerKw > 0 ? Math.max(100, Math.round(capexPerKw * 0.02)) : (tier === 4 ? 350 : tier === 3 ? 250 : 150));
+        const nrcSource = tariff
+            ? `${tariff.label} — ${tariff.note}`
+            : (capexPerKw > 0 ? `2% of design CAPEX/kW ($${capexPerKw.toLocaleString()}/kW from CAPEX Engine)` : `Tier-${tier} screening fit-out fee`);
 
         return {
             revenuePerKwMonth: { value: revValue, source: revSource },
@@ -237,9 +246,22 @@ const FinancialDashboard = () => {
             mrcEscalation: { value: eco ? Math.round(eco.inflationRate * 100) : 3, source: 'Country inflation (economy.inflationRate)' },
             mrcCrossConnectMonthly: { value: 5000, source: 'X-connect port maintenance (screening)' },
             contractYears: { value: contractYearsDerived, source: 'Contract Duration (Requirements 1.1)' },
-            takeOrPayPct: { value: 70, source: 'Standard colo minimum commit (screening)' },
+            takeOrPayPct: { value: tariff ? Math.round(tariff.takeOrPayPct * 100) : 70, source: tariff ? `${tariff.label} (engine DATA.tariffs.businessModels)` : 'Standard colo minimum commit (screening)' },
+            _tariff: { value: 0, source: '' },
         } as const;
-    }, [selectedCountry?.id, inputs.tierLevel, inputs.itLoad, capexResults?.total, cityMarket, contractYearsDerived]);
+    }, [selectedCountry?.id, inputs.tierLevel, inputs.itLoad, capexResults?.total, cityMarket, contractYearsDerived, business.revenueModel, business.gaasSku, business.gaasPricingMode, business.gaasUtilization]);
+
+    /* The resolved tariff itself (for the business-model block + the GaaS fleet line). */
+    const tariff = useMemo(() => resolveTariff({
+        model: business.revenueModel ?? 'wholesale_colo', itLoadKw: inputs.itLoad ?? 1000, marketKey: resolveMarketKey(cityMarket),
+        countryId: selectedCountry?.id ?? null, sku: business.gaasSku, pricingMode: business.gaasPricingMode, utilization: business.gaasUtilization,
+    }), [business.revenueModel, business.gaasSku, business.gaasPricingMode, business.gaasUtilization, inputs.itLoad, cityMarket, selectedCountry?.id]);
+    /* GaaS: the GPU fleet is IT-hardware CAPEX on top of the facility — written to
+     * the sim SSOT so Executive / Results / scenario DCFs carry it too. */
+    const hardwareCapex = tariff?.gaas ? Math.round(tariff.gaas.hardwareCapexUsd) : 0;
+    useEffect(() => {
+        if ((simInputsHw ?? 0) !== hardwareCapex) simActions.setInputs({ itHardwareCapexUsd: hardwareCapex });
+    }, [hardwareCapex]); // eslint-disable-line react-hooks/exhaustive-deps
 
     /* Sync AUTO values into the effective input state for every non-overridden
      * field. Overridden fields keep the user's manual value. Downstream calc +
@@ -313,7 +335,7 @@ const FinancialDashboard = () => {
         if (!capexResults) return null;
         const occupancyRamp = defaultOccupancyRamp(finInputs.projectLifeYears);
         return calculateFinancials({
-            totalCapex: capexResults.total,
+            totalCapex: capexResults.total + hardwareCapex,   // v3.25.0: + GPU fleet when GaaS
             annualOpex,
             revenuePerKwMonth: finInputs.revenuePerKwMonth,
             itLoadKw: inputs.itLoad,
@@ -325,7 +347,7 @@ const FinancialDashboard = () => {
             taxRate: finInputs.taxRate,
             depreciationYears: finInputs.depreciationYears,
         });
-    }, [capexResults, annualOpex, inputs.itLoad, finInputs]);
+    }, [capexResults, annualOpex, inputs.itLoad, finInputs, hardwareCapex]);
 
     /* ─── Diagnostics Tier-1: NPV / ROI explain (owner mandate: no naked red numbers)
      * Recompute closure re-runs the SAME chain the KPIs use (capexResults.total →
@@ -338,7 +360,7 @@ const FinancialDashboard = () => {
         const occupancyRamp = defaultOccupancyRamp(finInputs.projectLifeYears);
         const recompute = (mods: { revMult?: number; capexMult?: number }): FinancialResult =>
             calculateFinancials({
-                totalCapex: capexResults.total * (mods.capexMult ?? 1),
+                totalCapex: (capexResults.total + hardwareCapex) * (mods.capexMult ?? 1),
                 annualOpex,
                 revenuePerKwMonth: finInputs.revenuePerKwMonth * (mods.revMult ?? 1),
                 itLoadKw: inputs.itLoad,
@@ -416,7 +438,7 @@ const FinancialDashboard = () => {
             : null;
 
         return { npv: npvExplain, roi: roiExplain };
-    }, [capexResults, annualOpex, inputs.itLoad, finInputs]);
+    }, [capexResults, annualOpex, inputs.itLoad, finInputs, hardwareCapex]);
 
     // Revenue model
     const revResult: RevenueResult | null = useMemo(() => {
@@ -610,6 +632,49 @@ const FinancialDashboard = () => {
                         {/* ── Divider ─────────────────────── */}
                         <div className="relative py-2">
                             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-cyan-200 dark:border-cyan-800/30" /></div>
+                        </div>
+
+                        {/* ── Business model (v3.25.0) — drives the MRC/NRC defaults ── */}
+                        <div className="text-[10px] uppercase text-slate-600 dark:text-slate-400 font-semibold tracking-wider border-b border-slate-200 dark:border-slate-800 pb-1">
+                            Business model
+                        </div>
+                        <div className="space-y-2" data-testid="fin-business-model">
+                            <select className="w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100"
+                                value={business.revenueModel ?? 'wholesale_colo'} aria-label="Revenue model"
+                                onChange={(e) => reqActions.setBusiness({ revenueModel: e.target.value as typeof business.revenueModel })}>
+                                {REVENUE_MODEL_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                            </select>
+                            {business.revenueModel === 'gaas' && (
+                                <div className="grid grid-cols-3 gap-2">
+                                    <select className="rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100 col-span-2"
+                                        value={business.gaasSku} aria-label="GPU SKU" onChange={(e) => reqActions.setBusiness({ gaasSku: e.target.value as typeof business.gaasSku })}>
+                                        {GAAS_SKU_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                                    </select>
+                                    <select className="rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs text-slate-900 dark:text-slate-100"
+                                        value={business.gaasPricingMode} aria-label="GPU pricing mode" onChange={(e) => reqActions.setBusiness({ gaasPricingMode: e.target.value as typeof business.gaasPricingMode })}>
+                                        {GAAS_MODE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                                    </select>
+                                    <label className="col-span-3 flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 uppercase">
+                                        Utilisation
+                                        <input type="number" min={10} max={100} step={1} aria-label="GPU utilisation %"
+                                            className="w-20 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs text-slate-900 dark:text-slate-100 tabular-nums"
+                                            value={Math.round((business.gaasUtilization ?? 0.7) * 100)}
+                                            onChange={(e) => reqActions.setBusiness({ gaasUtilization: Math.max(0.1, Math.min(1, Number(e.target.value) / 100)) })} />
+                                        <span className="normal-case">% of GPU-hours sold</span>
+                                    </label>
+                                </div>
+                            )}
+                            {tariff && (
+                                <div className="text-[10px] leading-relaxed text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded p-2" data-testid="fin-tariff-basis">
+                                    <div><span className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">${fmt(tariff.mrcPerKwMonth, 2)}/kW·mo</span> · NRC ${tariff.nrcPerKw}/kW · take-or-pay {Math.round(tariff.takeOrPayPct * 100)} % · typical term {tariff.contractYears} yr</div>
+                                    {tariff.basis.map((b, i) => <div key={i}>{b}</div>)}
+                                    {tariff.gaas && (
+                                        <div className="mt-1 text-slate-800 dark:text-slate-200" data-testid="fin-gaas-fleet">
+                                            Fleet {tariff.gaas.gpus.toLocaleString()} × {tariff.gaas.label} · {Math.round(tariff.gaas.gpuHoursPerYear).toLocaleString()} GPU-h/yr · hardware CAPEX {fmtMoney(tariff.gaas.hardwareCapexUsd)} ({tariff.gaas.lifeYears} yr life) — added to the DCF on top of the facility CAPEX
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {/* ── Revenue / NRC Section ────────── */}

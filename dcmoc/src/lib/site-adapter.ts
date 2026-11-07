@@ -92,12 +92,13 @@ export function attributesToOverrides(site: CandidateSite): Partial<Record<Facto
 }
 
 /** Score one site through the ENGINE (authoritative). Null when engine absent. */
-export function scoreSite(site: CandidateSite): SiteScoreResult | null {
+export function scoreSite(site: CandidateSite, weights?: Partial<Record<FactorKey, number>>): SiteScoreResult | null {
     const m = rzModels()?.site;
     if (!m?.deriveFactors || !m?.score) return null;
     const overrides = attributesToOverrides(site);
     const factors = m.deriveFactors(site.countryId, overrides);
-    const engine = m.score(factors);
+    /* v3.25.0: optional criteria-profile weights (DATA.site.weightProfiles); omitted → engine default (unchanged scores). */
+    const engine = weights ? m.score(factors, weights) : m.score(factors);
     const b: Partial<Record<FactorKey, number>> = {};
     (engine.breakdown as { key: FactorKey; value: number }[]).forEach((r) => { b[r.key] = r.value; });
     const g = (k: FactorKey) => b[k] ?? 0.6;
@@ -159,8 +160,8 @@ export function scoreSite(site: CandidateSite): SiteScoreResult | null {
     };
 }
 
-export function scoreAllSites(sites: CandidateSite[]): SiteScoreResult[] {
-    const results = sites.map(scoreSite).filter((r): r is SiteScoreResult => r != null);
+export function scoreAllSites(sites: CandidateSite[], weights?: Partial<Record<FactorKey, number>>): SiteScoreResult[] {
+    const results = sites.map((s) => scoreSite(s, weights)).filter((r): r is SiteScoreResult => r != null);
     results.sort((x, y) => y.engine.score - x.engine.score);
     results.forEach((r, i) => { r.rank = i + 1; });
     return results;
