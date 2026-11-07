@@ -47,6 +47,8 @@
  * S21 (1440) Optimize To Target writes back only changes that matter (each changed input, reverted alone, moves an
  *    objective metric) and its impact line does not call a worse PUE better
  * S22 No cell of a result table (Target Guidance scenario table) breaks across lines or overflows its cell at 1440 or 390
+ * S23 Calibration Fit: shown figures are reproduced from the form (apply on or off); with apply on every written input
+ *    moves a fitted metric, with apply off the form is untouched
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -457,6 +459,37 @@ try {
       const formK = await p.evaluate(() => { const m = window.__ltcLastModel; return [m.pue, m.systemCop, m.netOpex]; });
       ok(formK.every((v, i) => Math.abs(v - optK[i]) <= Math.abs(optK[i]) * 1e-9 + 1e-9), `${w} S21 optimised [${optK}] not reproduced from the form [${formK}]`);
       await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
+      // S23 Calibration Fit: with "apply" on, the figures shown are reproduced from the form and every input it changed
+      // moves a fitted metric; with "apply" off, the form is untouched and the figures shown still follow the form
+      const runCal = async (apply) => {
+        const before = await p.evaluate((apply) => { const set = (id, v) => { const e = document.getElementById(id); e.value = v; };
+          set('calTargetPue', '1.24'); set('calTargetCop', '4.2'); document.getElementById('calLockApply').checked = apply;
+          const m = window.__ltcLastModel; window.__s23prev = m; return Object.assign({}, m.input); }, apply);
+        await p.evaluate(() => document.getElementById('runCalibration').click());
+        for (let i = 0; i < 60 && await p.evaluate(() => window.__ltcLastModel === window.__s23prev); i++) await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 800));
+        const rowLbl = await p.evaluate(() => (document.getElementById('optRowLabel') || {}).textContent);
+        ok(rowLbl === 'Calibrated', `${w} S23 scenario row after calibration reads "${rowLbl}", expected "Calibrated"`);
+        const shown = await p.evaluate((before) => { const m = window.__ltcLastModel, LP = window.LTCLabPlant, after = m.input;
+          const K = ['pue', 'systemCop', 'netOpex', 'netCarbonTons', 'pumpPowerKw'];
+          const T = ['liquidCapture', 'controlQuality', 'predictiveGain', 'coefHeatTransfer', 'coefCduLoss', 'coefPipeLoss', 'coefFutureTech',
+            'airCop', 'pumpEff', 'hydraulicMargin', 'economizerHours', 'fanPower'];
+          const changed = T.filter((k) => Math.abs((+after[k]) - (+before[k])) > 1e-9);
+          const idle = changed.filter((k) => { const alt = LP.computeLike(m, Object.assign({}, after, { [k]: before[k] }));
+            return K.every((q) => Math.abs(alt[q] - m[q]) <= Math.abs(m[q]) * 1e-9 + 1e-9); });
+          return { k: [m.pue, m.systemCop, m.netOpex], changed, idle }; }, before);
+        await p.evaluate(() => { const e = document.getElementById('inPumpHead'); e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
+        await new Promise((r) => setTimeout(r, 1500));
+        const form = await p.evaluate(() => { const m = window.__ltcLastModel; return [m.pue, m.systemCop, m.netOpex]; });
+        const same = form.every((v, i) => Math.abs(v - shown.k[i]) <= Math.abs(shown.k[i]) * 1e-9 + 1e-9);
+        ok(same, `${w} S23 calibration (apply ${apply ? 'on' : 'off'}) shows [${shown.k}] but the form computes [${form}]`);
+        if (apply) ok(shown.idle.length === 0, `${w} S23 calibration wrote inputs with no effect on any fitted metric: ${shown.idle.join(', ')}`);
+        else ok(shown.changed.length === 0, `${w} S23 calibration with apply off shows results on inputs not in the form: ${shown.changed.join(', ')}`);
+      };
+      await runCal(true);
+      await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
+      await runCal(false);
+      await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
     }
     const sw = await p.evaluate(() => document.documentElement.scrollWidth);
     ok(sw <= w, `${w} S5 scrollWidth ${sw}`);
@@ -465,4 +498,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, 0 errors');

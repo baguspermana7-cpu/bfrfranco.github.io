@@ -576,6 +576,7 @@
 
             var baselineModel = null;
             var optimizedModel = null;
+            var optimizedSource = 'Optimized'; /* row label: what produced optimizedModel */
             var calibrationState = null;
             var calibrationDirty = false;
             var latestPareto = [];
@@ -2996,6 +2997,7 @@
                     return;
                 }
 
+                setText('optRowLabel', optimizedSource);
                 setText('optPue', fmtNum(opt.pue, 3));
                 setText('optCop', fmtNum(opt.systemCop, 2));
                 setText('optNetOpex', fmtUsd(opt.netOpex));
@@ -8515,6 +8517,7 @@
                 selectedParetoIdx = idx;
                 applyInputObjectToForm(m.input);
                 optimizedModel = m;
+                optimizedSource = 'Pareto point';
                 baselineModel = computeModel(gatherInputs());
                 applyModelToUI(m);
                 renderScenarioTable(baselineModel, m);
@@ -10497,6 +10500,7 @@
                 if (cduLossEl) cduLossEl.value = fmtNum(bestInput.coefCduLoss, 2);
 
                 optimizedModel = best;
+                optimizedSource = 'Optimized';
                 applyModelToUI(optimizedModel);
                 renderScenarioTable(baselineModel, optimizedModel);
                 renderTargetActions(baselineModel, optimizedModel);
@@ -10546,6 +10550,27 @@
                     }
                 }
 
+                /* 3.27.0 — same write-back rule as Optimize To Target: the random search moves every tunable, so keep only
+                 * changes that lower the fit error, round to the precision the form shows and recompute, so the
+                 * calibrated figures are reproduced from the form. With "apply" off the form is untouched and the
+                 * results keep showing the form's model; the calibrated state appears only in the comparison. */
+                var CAL_DEC = { liquidCapture: 0, controlQuality: 0, predictiveGain: 0, coefHeatTransfer: 1, coefCduLoss: 2,
+                    coefPipeLoss: 2, coefFutureTech: 0, airCop: 1, pumpEff: 0, hydraulicMargin: 0, economizerHours: 0, fanPower: 1 };
+                Object.keys(CAL_DEC).forEach(function(k) {
+                    if (bestInput[k] === input[k]) return;
+                    var trial = Object.assign({}, bestInput);
+                    trial[k] = input[k];
+                    var tm = computeModel(trial), te = calibrationError(tm, targets);
+                    if (te.error <= bestEval.error + 1e-12) { bestInput = trial; best = tm; bestEval = te; }
+                });
+                bestInput = Object.assign({}, bestInput);
+                Object.keys(CAL_DEC).forEach(function(k) {
+                    if (bestInput[k] === input[k]) return;
+                    var f = Math.pow(10, CAL_DEC[k]); bestInput[k] = Math.round(bestInput[k] * f) / f;
+                });
+                best = computeModel(bestInput);
+                bestEval = calibrationError(best, targets);
+
                 var applyChecked = document.getElementById('calLockApply').checked;
                 if (applyChecked) {
                     document.getElementById('inLiquidCapture').value = fmtNum(bestInput.liquidCapture, 0);
@@ -10564,6 +10589,7 @@
 
                 baselineModel = base;
                 optimizedModel = best;
+                optimizedSource = 'Calibrated';
                 calibrationState = {
                     metricCount: targets.metricCount,
                     baseError: baseEval.error,
@@ -10581,7 +10607,7 @@
                 };
                 calibrationDirty = false;
 
-                applyModelToUI(optimizedModel);
+                applyModelToUI(applyChecked ? optimizedModel : base);
                 renderScenarioTable(baselineModel, optimizedModel);
                 renderTargetActions(baselineModel, optimizedModel);
             }

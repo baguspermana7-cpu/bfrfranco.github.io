@@ -270,12 +270,15 @@
   function watch() {
     var ids = ['outDesignDensity', 'outLiquidLoad', 'outAirLoad', 'outFlow', 'outPump', 'outPue', 'outCop', 'outNetOpex', 'outCarbon',
       'quickConstraintState', 'scenarioSelect'];
-    var mo = new MutationObserver(function () { clearTimeout(watch.t); watch.t = setTimeout(refresh, 60); });
+    /* throttle, not debounce: number count-up animations mutate these nodes every frame, and a debounce re-armed
+     * on each mutation could hold the refresh off for seconds (review rows still showing the previous model) */
+    var soon = function (ms) { if (watch.t) return; watch.t = setTimeout(function () { watch.t = 0; refresh(); }, ms); };
+    var mo = new MutationObserver(function () { soon(60); });
     ids.forEach(function (id) {
       var e = document.getElementById(id);
       if (e) mo.observe(e, { childList: true, characterData: true, subtree: true });
     });
-    document.addEventListener('ltc:rendered', function () { clearTimeout(watch.t); watch.t = setTimeout(refresh, 30); });
+    document.addEventListener('ltc:rendered', function () { soon(30); });
     var ov = document.querySelector('.ltc-overview-card');
     if (ov) new MutationObserver(function () { clearTimeout(watch.p); watch.p = setTimeout(paintNodes, 30); })
       .observe(ov, { childList: true, subtree: true });
