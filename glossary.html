@@ -220,6 +220,15 @@
         }
         .glossary-search::placeholder { color: rgba(255,255,255,0.5); }
         .glossary-search:focus { border-color: rgba(255,255,255,0.5); }
+        /* 3.27.0 — light theme: the hero was dark in both themes, and the transparent navbar's dark links sat on it
+         * (contrast 2.27). While the hero was a gradient axe could not measure it; flat, it fails. Light theme gets a
+         * light hero with dark text. */
+        html:not([data-theme="dark"]) .glossary-hero { background: #F6F6F7; color: #1a1d23; border-bottom: 1px solid rgba(0,0,0,0.10); }
+        html:not([data-theme="dark"]) .glossary-hero h1 { color: #1a1d23; }
+        html:not([data-theme="dark"]) .glossary-hero p { color: #45484d; }
+        html:not([data-theme="dark"]) .glossary-search { background: #fff; color: #1a1d23; border-color: rgba(0,0,0,0.18); }
+        html:not([data-theme="dark"]) .glossary-search::placeholder { color: #6b7079; }
+        html:not([data-theme="dark"]) .glossary-search:focus { border-color: #B07600; }
 
         /* Term Counter */
         .term-counter {
@@ -453,7 +462,7 @@
 [data-theme="dark"] [style*="color: #64748b"], [data-theme="dark"] [style*="color:#64748b"] { color:#9aa8bb !important; }
 [data-theme="dark"] .term-counter strong { color:var(--gl-accent); }
 </style>
-    <script src="js/rz-version.js?v=20261107-33281ebe" defer></script>
+    <script src="js/rz-version.js?v=20261107-1ce42af6" defer></script>
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
     <script>

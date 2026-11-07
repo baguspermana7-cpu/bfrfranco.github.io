@@ -289,6 +289,19 @@ gate "data hall plan — equipment, counts and flow are on the drawing" node too
 
 
 
+# 3.27.0 — glossary register + LTC lab laws. The LTC browser gates read a served tree: start one on 8166 for them
+# and stop it by its own PID (never by pattern).
+gate "glossary — cards on the register, every term filed under its own letter" python3 tools/test-glossary.py
+ltc_srv_pid=""
+if python3 -m http.server 8166 --bind 127.0.0.1 >/dev/null 2>&1 & then ltc_srv_pid=$!; sleep 1; fi
+gate "LTC lab golden — 12 scenarios x 28 rendered outputs identical to the fixture" \
+  env RZ_BASE=http://127.0.0.1:8166 timeout 600 node tools/test-ltc-lab-golden.mjs
+gate "LTC lab step thread — S1-S28: every shown figure follows the plant model, chrome on the register" \
+  env RZ_BASE=http://127.0.0.1:8166 timeout 900 node tools/test-ltc-lab-steps.mjs
+gate "slop render scan — computed tells per page (report only until a baseline is recorded)" \
+  env RZ_BASE=http://127.0.0.1:8166 timeout 900 node tools/audit-slop-render.mjs
+[ -n "$ltc_srv_pid" ] && kill "$ltc_srv_pid" 2>/dev/null
+
 # Engine-files byte-identical guard (locked since v1.32.x accuracy review)
 echo
 runs=$((runs+1))

@@ -11,6 +11,30 @@ release sections rather than semver.
 
 ---
 
+## v3.27.0 — 2026-11-08 — "LTC lab: every figure from the plant, one step at a time"
+
+### Added
+- **ltc-system-modelling-lab.html — a seven-step thread** (Load, Capture, Loop, Rejection, Cost · carbon, Check, Review) in the left rail. Each step shows its own result line, outlines its equipment on the system overview, and opens an arithmetic strip that substitutes the engine's own numbers into each equation (`holds` when the substitution reproduces the engine value). Review compares the current design with the last saved scenario, recomputed from its saved inputs (better / worse / same, `scale` when the IT load differs). The right rail and the dashboard tab follow the step (1–5 Results, 6 Charts, 7 Report; ARIA tabs). Auto-run switch in view; Recompute only when it is off. Design status is a fact list that states its basis.
+- **Settings the plant does not read are marked `screening only`** (17 inputs: they move the legacy risk index, not the heat balance).
+- Gates: `tools/test-ltc-lab-steps.mjs` (laws S1–S28 at 1440 and 390 px, each proven red on the old tree or a mutation), `tools/test-ltc-lab-golden.mjs` (12 scenarios × 28 rendered outputs against a fixture), `tools/audit-slop-render.mjs` (computed slop tells per page: rails, pills, radii, blur, gradients; report only until a baseline is recorded), `tools/test-glossary.py` (G1–G4). All four wired into `tools/ship-gate.sh`; the LTC browser gates start their own server on 8166 and stop it by PID.
+
+### Fixed — LTC lab accuracy (figures that mixed the plant and the legacy model)
+- Primary sliders show the values the model runs on, also after a programmatic set; IT range 0.5–200 MW, capture 0–99 %.
+- Pump figures name their loop (TCS rack-side, FWS facility, both); the Results card, fx traces, Equation Inspector, PDF equation lines, tornado, impact matrix, fix suggestions and the operating-scenario readout all read or perturb the plant (`LTCLabPlant.traceOf / equationLines / stepInput / computeLike`).
+- **Optimize To Target** and **Calibration Fit** write back only changes that lower their objective, at the precision the form shows, then recompute — the shown figures are reproduced from the form (calibration had rewritten 12 inputs, 10 with no effect). With "apply" off the form is untouched and the results keep the form's model. The scenario row names its source (Optimized, Calibrated, Pareto point).
+- **Pareto "Apply Best Feasible Point"** compared the point with itself (baseline read after the apply); candidates no longer write float noise (1.3900000000000001) into the form.
+- **Energy Sankey** adds up to the plant's facility power (it invented aux = 3 % of IT, dropped the TCS pumps and showed fans as 0 kW: 131,039 kW for a 129,750 kW plant).
+- The step strip refreshes on an `ltc:rendered` event, throttled, so it no longer shows the previous model after an edit.
+
+### Changed — off the slop register
+- LTC lab chrome: one accent, no tiles, neutral `--text-secondary` (was slate), status pills neutral / amber / red-as-state, 56 slate and navy panel fills removed, solid hairlines instead of dashed boxes; chart series amber and grey (red only for a high-risk point); result tables keep each figure on one line and scroll inside their frame on a phone; accordion titles no longer include their heading's tooltip text.
+- Glossary (EN + ID): cards are panels with a 1 px hairline, links hairline chips, no hover slide, blur or aurora; six article-28 terms filed under their own letter. Light theme gets a light hero: the dark one put the navbar links at contrast 2.27, which axe could not measure while the hero was a gradient.
+- cdu-calculator, infographic-dc-sustainability, asean-dc-report-2026, achievements: rails, pills, round radii, blur and gradients removed (render scan before → after: 8/13/1, 12/4/1, 4/17/1/1, 1/32 → 0); CDU KPI chips state the band verdict as text. `test-cdu-calc` stays 42/42.
+- Manual family callouts: one panel with one hairline.
+
+### Notes
+- WI-HARNESS-002's last criterion (A15) closed in v3.24.36; this release carries the LTC work item WI-LTC-LAB-001 under the same harness (per-criterion checkpoint, owner-request ledger R001–R088).
+
 ## v3.26.0 — 2026-11-07 — "Cx Analysis: the handbook's programme as an app"
 
 ### Added
