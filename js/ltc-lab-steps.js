@@ -275,6 +275,7 @@
       var e = document.getElementById(id);
       if (e) mo.observe(e, { childList: true, characterData: true, subtree: true });
     });
+    document.addEventListener('ltc:rendered', function () { clearTimeout(watch.t); watch.t = setTimeout(refresh, 30); });
     var ov = document.querySelector('.ltc-overview-card');
     if (ov) new MutationObserver(function () { clearTimeout(watch.p); watch.p = setTimeout(paintNodes, 30); })
       .observe(ov, { childList: true, subtree: true });

@@ -1141,6 +1141,9 @@
         document.querySelectorAll('.ltc-scr').forEach(function (x) { x.hidden = !model.plant; });
         var fp = document.getElementById('flowPump'), fpl = fp && fp.parentElement.firstElementChild;
         if (fpl) fpl.textContent = model.plant ? 'TCS pumps' : 'Pump + Hydraulics';
+        /* the step strip reads these figures; a render event is its refresh signal (a DOM observer on nodes captured
+         * once could miss a render, leaving "85,000 kW liquid" beside a 60 MW model) */
+        try { document.dispatchEvent(new CustomEvent('ltc:rendered', { detail: { model: model } })); } catch (e) {}
         polishNumbers();
         // Live run stamp — auto-run recomputes constantly; show it.
         var lr = document.getElementById('ltcLastRun');

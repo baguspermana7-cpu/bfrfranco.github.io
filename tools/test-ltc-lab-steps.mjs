@@ -46,6 +46,7 @@
  *    unfilled words, scenario metrics are rows of one panel
  * S21 (1440) Optimize To Target writes back only changes that matter (each changed input, reverted alone, moves an
  *    objective metric) and its impact line does not call a worse PUE better
+ * S22 No cell of a result table (Target Guidance scenario table) breaks across lines or overflows its cell at 1440 or 390
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -286,7 +287,12 @@ try {
     await p.evaluate(() => { const e = document.getElementById('inItLoad'); e.value = '60'; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
     await new Promise((r) => setTimeout(r, 1500));
     const after = await p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
-    ok(after !== before, `${w} S2 Capture result did not change after IT load 60 (${before})`);
+    if (after === before) {
+      const dx = await p.evaluate(() => ({ it: document.getElementById('inItLoad').value, model: window.__ltcLastModel && window.__ltcLastModel.itKw,
+        auto: document.getElementById('autoRunToggle') && document.getElementById('autoRunToggle').checked, ltcAuto: document.getElementById('ltcAutoRun') && document.getElementById('ltcAutoRun').checked,
+        last: document.getElementById('ltcLastRun') && document.getElementById('ltcLastRun').textContent, legacy: !!window.__ltcLegacy, outLiquid: document.getElementById('outLiquidLoad') && document.getElementById('outLiquidLoad').textContent, fm: document.getElementById('inFailureMode') && document.getElementById('inFailureMode').value }));
+      fails.push(`${w} S2 Capture result did not change after IT load 60 (${before}) · state ${JSON.stringify(dx)}`);
+    }
     const rail = () => p.evaluate(() => Object.fromEntries([...document.querySelectorAll('.ltc-rail-card')].map((c) => {
       const t = c.querySelector('.ltc-rail-title'); const g = c.querySelector('.ltc-rail-go');
       return [t ? t.textContent.trim() : '?', (c.classList.contains('is-folded') ? 'folded' : 'open') + (g && !g.hidden ? ':' + g.textContent.trim() : '')]; })));
@@ -411,7 +417,7 @@ try {
     await p.evaluate(() => document.querySelector('.ltc-tab-btn[data-tab="results"]').click());
     // S21 (1440) Optimize To Target writes back only changes that matter: every input it changed, reverted alone,
     // moves at least one objective metric; the action list names only changed inputs; impact words follow the signs
-    if (w === 1440 && await p.$('#optimizeTarget')) {
+    if (await p.$('#optimizeTarget')) {
       const before = await p.evaluate(() => Object.assign({}, window.__ltcLastModel.input));
       await p.evaluate(() => document.getElementById('optimizeTarget').click());
       await new Promise((r) => setTimeout(r, 2500));
@@ -434,14 +440,22 @@ try {
         controlQuality: /control quality/i, predictiveGain: /predictive/i, coefHeatTransfer: /heat.transfer/i, coefCduLoss: /cdu loss/i,
         coefPipeLoss: /pipe loss/i, coefFutureTech: /future/i };
       const unnamed = s21.changed.filter((k) => !LBL[k].test(s21.acts));
-      ok(unnamed.length === 0, `S21 optimizer changed ${unnamed.join(', ')} but the action list does not say so`);
-      ok(s21.idle.length === 0, `S21 optimizer changed inputs with no effect on any objective metric: ${s21.idle.join(', ')}`);
-      ok(!s21.lie, `S21 impact line calls a worse or unchanged PUE "better": ${s21.acts}`);
+      ok(unnamed.length === 0, `${w} S21 optimizer changed ${unnamed.join(', ')} but the action list does not say so`);
+      ok(s21.idle.length === 0, `${w} S21 optimizer changed inputs with no effect on any objective metric: ${s21.idle.join(', ')}`);
+      ok(!s21.lie, `${w} S21 impact line calls a worse or unchanged PUE "better": ${s21.acts}`);
+      // S22 a figure in a result table never breaks across lines (390: "$89,2 / 79,14 / 3")
+      const broken = await p.evaluate(() => { document.querySelector('.ltc-tab-btn[data-tab="charts"]').click();
+        const acc = document.getElementById('targetActions').closest('.ltc-acc'); if (acc && !acc.classList.contains('open')) acc.querySelector('.ltc-acc-head').click();
+        return [...document.querySelectorAll('.target-block td, .target-block th')].filter((c) => {
+          const t = c.textContent.trim(); if (!t || c.offsetHeight === 0) return false;
+          const r = document.createRange(); r.selectNodeContents(c); const lines = new Set([...r.getClientRects()].map((x) => Math.round(x.top))).size;
+          return lines > 1 || c.scrollWidth > c.clientWidth + 1; }).map((c) => c.textContent.trim()).slice(0, 6); });
+      ok(broken.length === 0, `${w} S22 result-table cells broken across lines or overflowing their cell: ${broken.join(' | ')}`);
       const optK = await p.evaluate(() => { const m = window.__ltcLastModel; return [m.pue, m.systemCop, m.netOpex]; });
       await p.evaluate(() => { const e = document.getElementById('inPumpHead'); e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
       await new Promise((r) => setTimeout(r, 1500));
       const formK = await p.evaluate(() => { const m = window.__ltcLastModel; return [m.pue, m.systemCop, m.netOpex]; });
-      ok(formK.every((v, i) => Math.abs(v - optK[i]) <= Math.abs(optK[i]) * 1e-9 + 1e-9), `S21 optimised [${optK}] not reproduced from the form [${formK}]`);
+      ok(formK.every((v, i) => Math.abs(v - optK[i]) <= Math.abs(optK[i]) * 1e-9 + 1e-9), `${w} S21 optimised [${optK}] not reproduced from the form [${formK}]`);
       await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
     }
     const sw = await p.evaluate(() => document.documentElement.scrollWidth);
@@ -451,4 +465,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, 0 errors');
