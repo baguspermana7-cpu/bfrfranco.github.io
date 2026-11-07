@@ -20,6 +20,9 @@
  *    row's after equals the live model and its better/worse word follows the sign
  * S8 The right rail follows the step: at Load the Standards/Design/Validation cards are folded with a link to Check and
  *    Sensitivity is open; at Check they are open; the fold link selects its step
+ * S11 The six primary sliders show the values the model runs on: equal to their inputs after load (the plant pull sets
+ *    them silently) and after a programmatic set; their ranges hold the plant default (IT 100 MW) and the plant clamp
+ *    (capture 99 %)
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -41,6 +44,26 @@ try {
     await p.evaluate(() => { localStorage.clear(); localStorage.setItem('rz_premium_session', JSON.stringify({ email: 'educator@resistancezero.com', tier: 'pro', role: 'educator', expires: new Date(Date.now() + 864e5).toISOString() })); localStorage.setItem('rz_cookie_consent', 'declined'); localStorage.setItem('theme', 'dark'); });
     await p.goto(`${BASE}/ltc-system-modelling-lab.html#step=3`, { waitUntil: 'networkidle2', timeout: 90000 });
     await new Promise((r) => setTimeout(r, 3000));
+    // S11 the primary sliders show the values the model runs on, also after a programmatic set (plant pull, scenario)
+    const sl = () => p.evaluate(() => ['inItLoad', 'inLiquidCapture', 'inSupplyTemp', 'inReturnTemp', 'inPumpHead', 'inPumpEff'].map((id) => {
+      const o = document.getElementById(id), n = document.getElementById('ltcNum_' + id), r = document.getElementById('ltcRange_' + id);
+      return { id, model: o && +o.value, num: n && +n.value, range: r && +r.value, max: r && +r.max }; }));
+    for (const s of await sl()) ok(s.num === s.model && s.range === s.model, `${w} S11 ${s.id} slider ${s.num}/${s.range}, model input ${s.model}`);
+    const lim = Object.fromEntries((await sl()).map((s) => [s.id, s.max]));
+    ok(lim.inItLoad >= 100, `${w} S11 IT load slider max ${lim.inItLoad} < plant default 100 MW`);
+    ok(lim.inLiquidCapture <= 99, `${w} S11 capture slider max ${lim.inLiquidCapture} > plant clamp 99 %`);
+    await p.evaluate(() => { const a = document.getElementById('inPumpHead'), b = document.getElementById('inSupplyTemp');
+      a.value = '33'; b.value = '31.5'; b.dispatchEvent(new Event('input', { bubbles: true })); });
+    await new Promise((r) => setTimeout(r, 1200));
+    for (const s of (await sl()).filter((s) => /PumpHead|SupplyTemp/.test(s.id))) ok(s.num === s.model && s.range === s.model, `${w} S11 after a silent set ${s.id} slider ${s.num}, model ${s.model}`);
+    await p.evaluate(() => { const a = document.getElementById('inCoolingArchitecture'); a.dataset.was = a.value;
+      a.value = [...a.options].map((o) => o.value).find((v) => v !== a.value); document.getElementById('inPumpEff').dispatchEvent(new Event('input', { bubbles: true })); });
+    await new Promise((r) => setTimeout(r, 1200));
+    const ac = await p.evaluate(() => { const a = document.getElementById('inCoolingArchitecture'), on = document.querySelector('.ltc-arch-card.ltc-arch-active');
+      const r = { want: a.value, shown: on && on.dataset.arch, known: !!document.querySelector(`.ltc-arch-card[data-arch="${a.value}"]`) };
+      a.value = a.dataset.was; a.dispatchEvent(new Event('change', { bubbles: true })); return r; });
+    if (ac.known) ok(ac.shown === ac.want, `${w} S11 architecture card shows ${ac.shown}, model ${ac.want}`);
+    await new Promise((r) => setTimeout(r, 1200));
     const s1 = await p.evaluate(() => ({ n: document.querySelectorAll('.ltc-step').length, cur: [...document.querySelectorAll('.ltc-step[aria-current]')].map((e) => e.id),
       res: [...document.querySelectorAll('.ltc-step-res')].map((e) => e.textContent.trim()),
       lit: [...document.querySelectorAll('rect.ltc-step-node')].map((r) => r.getAttribute('data-rzd-node')).sort().join(',') }));
@@ -166,4 +189,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, 0 errors');

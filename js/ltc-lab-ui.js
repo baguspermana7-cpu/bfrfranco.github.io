@@ -12,8 +12,8 @@
 
     // ── Slider config ────────────────────────────────────────
     var SLIDERS = [
-        { id: 'inItLoad',        label: 'IT Load',            min: 0.5, max: 80,  step: 0.5, unit: 'MW' },
-        { id: 'inLiquidCapture', label: 'Liquid Capture',     min: 0,   max: 100, step: 1,   unit: '%', preset: true },
+        { id: 'inItLoad',        label: 'IT Load',            min: 0.5, max: 200, step: 0.5, unit: 'MW' },
+        { id: 'inLiquidCapture', label: 'Liquid Capture',     min: 0,   max: 99,  step: 1,   unit: '%', preset: true },
         { id: 'inSupplyTemp',    label: 'Supply Temperature', min: 16,  max: 42,  step: 0.1, unit: '°C', preset: true },
         { id: 'inReturnTemp',    label: 'Return Temperature', min: 16,  max: 60,  step: 0.1, unit: '°C', preset: true },
         { id: 'inPumpHead',      label: 'Pump Head',          min: 5,   max: 90,  step: 0.5, unit: 'm' },
@@ -770,19 +770,24 @@
                 }
             });
 
-            // Keep numbox in sync if original input is changed externally
+            /* 3.27.0 — the slider follows the model input whatever set it. LTCLabPlant.pull() writes the plant's
+             * values without an event per field and a scenario load sets them directly, so a change listener alone
+             * left five of six sliders on the HTML defaults (IT 12 MW shown, 100 MW computed). Every render resyncs. */
             if (origInput) {
-                origInput.addEventListener('change', function () {
+                var follow = function () {
                     var v = parseFloat(origInput.value);
-                    if (!isNaN(v)) {
-                        numbox.value = v;
-                        range.value = v;
-                        updateRangeFill(v);
-                    }
-                });
+                    if (isNaN(v) || document.activeElement === numbox) return;
+                    if (+numbox.value !== v) numbox.value = v;
+                    if (+range.value !== v) { range.value = v; updateRangeFill(v); }
+                };
+                origInput.addEventListener('change', follow);
+                origInput.addEventListener('input', follow);
+                sliderSync.push(follow);
             }
         });
     }
+    var sliderSync = [];
+    function syncSliders() { sliderSync.forEach(function (f) { f(); }); }
 
     // ════════════════════════════════════════════════════════
     // bindArchPresets
@@ -819,11 +824,13 @@
 
         // Keep arch cards in sync if select changes externally
         if (archSelect) {
-            archSelect.addEventListener('change', function () {
+            var followArch = function () {
                 host.querySelectorAll('.ltc-arch-card').forEach(function (c) {
                     c.classList.toggle('ltc-arch-active', c.dataset.arch === archSelect.value);
                 });
-            });
+            };
+            archSelect.addEventListener('change', followArch);
+            sliderSync.push(followArch);
         }
     }
 
@@ -1092,6 +1099,7 @@
         renderReportCompare(model);
         renderScenarioInfo(model);
         renderResultsTab(model);
+        syncSliders();
         polishNumbers();
         // Live run stamp — auto-run recomputes constantly; show it.
         var lr = document.getElementById('ltcLastRun');
