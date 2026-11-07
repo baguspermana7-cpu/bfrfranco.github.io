@@ -31,6 +31,8 @@
  *    water's with a note when another coolant is selected, and a capture above the architecture cap is noted
  * S14 Every fx trace on the Results card in plant mode names the plant as its source, carries no Indonesian UI
  *    text, and its listed inputs reproduce the traced value by independent arithmetic
+ * S15 Every Equation Inspector line has the form 'name = formula = numeric expression = result' and the expression
+ *    evaluates to the stated result (the same lines go into the PDF)
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -150,6 +152,17 @@ try {
         ok(t.deps.length && Math.abs(v - t.head) <= Math.abs(t.head) * 0.003 + 0.051, `${w} S14 ${k} = ${t.head}, but its inputs [${t.deps.join(', ')}] give ${v}`); }
     }
     ok(traced >= 8, `${w} S14 only ${traced} traces checked (keys: ${keys.join(',')})`);
+    // S15 the Equation Inspector (and the PDF equation list) does its own arithmetic: every line "... = expr = result"
+    const eq = await p.evaluate(() => [...document.querySelectorAll('#equationList .equation-line')].map((e) => e.textContent.replace(/^Eq \d+:\s*/, '').trim()));
+    ok(eq.length >= 8, `${w} S15 ${eq.length} equation lines`);
+    for (const line of eq) {
+      const seg = line.split(' = ');
+      const expr = (seg[seg.length - 2] || '').replace(/,/g, '').replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+      const res = parseFloat((seg[seg.length - 1] || '').replace(/[$,]/g, ''));
+      let v = NaN;
+      if (seg.length >= 3 && /^[\d.\s+\-*/()]*$/.test(expr)) { try { v = Function(`return (${expr})`)(); } catch {} }
+      ok(isFinite(v) && Math.abs(v - res) <= Math.abs(res) * 0.002 + 0.06, `${w} S15 "${line.slice(0, 90)}" evaluates to ${v}, states ${res}`);
+    }
     const s1 = await p.evaluate(() => ({ n: document.querySelectorAll('.ltc-step').length, cur: [...document.querySelectorAll('.ltc-step[aria-current]')].map((e) => e.id),
       res: [...document.querySelectorAll('.ltc-step-res')].map((e) => e.textContent.trim()),
       lit: [...document.querySelectorAll('rect.ltc-step-node')].map((r) => r.getAttribute('data-rzd-node')).sort().join(',') }));
@@ -275,4 +288,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, 0 errors');

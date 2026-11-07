@@ -120,6 +120,33 @@
     return t ? { formula: t[0], deps: t[1] } : null;
   }
 
+  /* 3.27.0 — the Equation Inspector and the PDF equation list in plant mode: each line is
+   * "name = formula = numeric expression = result unit", the expression built from the plant's own quantities, so the
+   * reader (and the gate) can do the arithmetic. The old list mixed the screening model's terms into plant numbers
+   * ("PUE = 129,750 / 100,000 = 1.189"; "Facility × 8760 = 885 GWh"). */
+  function equationLines(m) {
+    var r = m && m.plant;
+    if (!r) return null;
+    var I = r.input, L = r.liquid, A = r.annual, d = r.design, C = P.CONST, G = 9.81, cool = (m.internals || {}).totalCoolingKw;
+    var f = function (v, dec) { return Number(v).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }); };
+    return [
+      'Q_liquid = IT × capture = ' + f(d.it, 1) + ' × ' + f(I.capturePct / 100, 4) + ' = ' + f(d.liquidIt, 1) + ' kW',
+      'flow_TCS = Q / (cp × ΔT) / ρ × 60000 = ' + f(d.liquidIt, 1) + ' / (' + f(C.CP_W, 3) + ' × ' + f(L.tcsDeltaK, 2) + ') / ' + f(C.RHO_W, 0) + ' × 60000 = ' + f(L.tcsLps * 60, 1) + ' LPM',
+      'P_TCS = ρ × g × H × V / η = ' + f(C.RHO_W, 0) + ' × ' + G + ' × ' + f(I.tcsHeadM, 2) + ' × ' + f(L.tcsLps / 1000, 5) + ' / ' + f(I.tcsPumpEff, 3) + ' / 1000 = ' + f(L.tcsPumpKw, 2) + ' kW',
+      'P_FWS = ρ × g × H × V / η = ' + f(C.RHO_W, 0) + ' × ' + G + ' × ' + f(I.fwsHeadM, 2) + ' × ' + f(L.fwsLps / 1000, 5) + ' / ' + f(I.fwsPumpEff, 3) + ' / 1000 = ' + f(L.fwsPumpKw, 2) + ' kW',
+      'P_pumps = P_TCS + P_FWS = ' + f(L.tcsPumpKw, 2) + ' + ' + f(L.fwsPumpKw, 2) + ' = ' + f(L.tcsPumpKw + L.fwsPumpKw, 2) + ' kW',
+      'COP_system = IT / cooling power = ' + f(d.it, 1) + ' / ' + f(cool, 2) + ' = ' + f(d.it / cool, 3),
+      'PUE_design = facility / IT, design day = ' + f(d.facility, 2) + ' / ' + f(d.it, 1) + ' = ' + f(d.facility / d.it, 4),
+      'PUE_annual = facility energy / IT energy = ' + f(A.m0MWh, 1) + ' / ' + f(A.m3MWh, 1) + ' = ' + f(A.m0MWh / A.m3MWh, 4),
+      'Annual energy = Σ facility × h over the climate bins / 1000 = ' + f(A.m0MWh, 1) + ' / 1000 = ' + f(A.m0MWh / 1000, 3) + ' GWh',
+      'WUE = site water / IT energy = ' + f(A.waterM3, 1) + ' / ' + f(A.m3MWh, 1) + ' = ' + f(A.waterM3 / A.m3MWh, 4) + ' L/kWh',
+      'NetOPEX = energy + water − reuse credit = ' + f(A.energyCost, 0) + ' + ' + f(A.waterCost, 0) + ' − ' + f(m.heatReuseCredit, 0) + ' = ' + f(m.netOpex, 0) + ' $/yr',
+      A.co2t >= m.avoidedCarbonTons
+        ? 'NetCarbon = grid CO₂ − avoided by heat reuse = ' + f(A.co2t, 1) + ' − ' + f(m.avoidedCarbonTons, 1) + ' = ' + f(m.netCarbonTons, 1) + ' tCO2e/yr'
+        : 'NetCarbon = grid CO₂ − avoided, floored at zero = ' + f(0, 1) + ' = ' + f(0, 1) + ' tCO2e/yr'
+    ];
+  }
+
   /* write the lab's inputs into the shared plant (keeps site / advanced keys the lab does not own) */
   /* The lab's first runs happen before it has read the shared plant; writing then would overwrite
    * a plant chosen elsewhere with the lab's own defaults. So nothing is written until pull() ran. */
@@ -238,7 +265,7 @@
     window.addEventListener('storage', function (e) { if (e.key === P.KEY) pull(); });
   }
 
-  root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE, CAPTURE_CAP: CAPTURE_CAP, traceOf: traceOf,
+  root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE, CAPTURE_CAP: CAPTURE_CAP, traceOf: traceOf, equationLines: equationLines,
     /* after the first read of the plant the lab's inputs win; tests state it explicitly */
     ready: function (climateShown) { pulled = true; if (climateShown) pulledClimate = climateShown; } };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCLabPlant;

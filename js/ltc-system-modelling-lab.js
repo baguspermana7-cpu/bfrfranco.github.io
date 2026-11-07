@@ -3032,6 +3032,13 @@
             function renderEquationInspector(model) {
                 var el = document.getElementById('equationList');
                 if (!el || !model) return;
+                var plantLines = window.LTCLabPlant && window.LTCLabPlant.equationLines ? window.LTCLabPlant.equationLines(model) : null;
+                if (plantLines) {
+                    el.innerHTML = plantLines.map(function(line, idx) {
+                        return '<div class="equation-line"><strong>Eq ' + (idx + 1) + ':</strong> ' + escapeHtml(line) + '</div>';
+                    }).join('');
+                    return;
+                }
 
                 var cp = (COOLANTS[model.input.coolantKey] || COOLANTS.water).cp;
                 var rho = (COOLANTS[model.input.coolantKey] || COOLANTS.water).rho;
@@ -6303,6 +6310,8 @@
 
             function pdfEquationLines(model) {
                 if (!model || !model.input) return [];
+                var plantLines = window.LTCLabPlant && window.LTCLabPlant.equationLines ? window.LTCLabPlant.equationLines(model) : null;
+                if (plantLines) return plantLines;
                 var cp = (COOLANTS[model.input.coolantKey] || COOLANTS.water).cp;
                 var rho = (COOLANTS[model.input.coolantKey] || COOLANTS.water).rho;
                 return [
