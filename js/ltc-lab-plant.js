@@ -203,7 +203,7 @@
     window.addEventListener('storage', function (e) { if (e.key === P.KEY) pull(); });
   }
 
-  root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE,
+  root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE, CAPTURE_CAP: CAPTURE_CAP,
     /* after the first read of the plant the lab's inputs win; tests state it explicitly */
     ready: function (climateShown) { pulled = true; if (climateShown) pulledClimate = climateShown; } };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCLabPlant;

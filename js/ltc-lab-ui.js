@@ -731,6 +731,14 @@
 
             row.appendChild(header);
             row.appendChild(range);
+            /* the plant caps capture per architecture (hybrid 75 %, direct 98 %): above the cap the slider
+             * would move while the model stood still, so the cap is stated where the value is set */
+            var capNote = null;
+            if (cfg.id === 'inLiquidCapture') {
+                capNote = el('p', { className: 'ltc-slider-note', id: 'ltcCapNote' });
+                capNote.hidden = true;
+                row.appendChild(capNote);
+            }
             host.appendChild(row);
 
             // Update range fill visual via CSS custom property
@@ -779,6 +787,14 @@
                     if (isNaN(v) || document.activeElement === numbox) return;
                     if (+numbox.value !== v) numbox.value = v;
                     if (+range.value !== v) { range.value = v; updateRangeFill(v); }
+                    if (capNote) {
+                        var arch = document.getElementById('inCoolingArchitecture'), caps = window.LTCLabPlant && window.LTCLabPlant.CAPTURE_CAP;
+                        var key = arch ? arch.value : '', cap = caps ? (caps[key] != null ? caps[key] : 98) : null;
+                        var over = cap != null && !window.__ltcLegacy && v > cap;
+                        capNote.hidden = !over;
+                        if (over) capNote.textContent = 'Model uses ' + cap + ' %: the ' +
+                            (arch.options[arch.selectedIndex] ? arch.options[arch.selectedIndex].textContent.trim() : key) + ' architecture caps capture there.';
+                    }
                 };
                 origInput.addEventListener('change', follow);
                 origInput.addEventListener('input', follow);
@@ -1810,18 +1826,23 @@
 
         // Coolant thermophysical properties — from the shared engine DATA.coolants
         // (crawled/sourced: cp, rho, viscosity, thermal conductivity).
-        var cool = (window.RZEngine && window.RZEngine.data && window.RZEngine.data.coolants &&
-                    window.RZEngine.data.coolants[inp.coolantKey]) || {};
-        var coolLabel = ({ water: 'Water', pg20: '20% PG', pg30: '30% PG', pg40: '40% PG',
-                           dielectric_1p: 'Dielectric 1P', dielectric_2p: 'Dielectric 2P' })[inp.coolantKey] || (inp.coolantKey || '—');
+        /* 3.27.0 — in plant mode every row is the plant's: the plant computes the TCS on water and clamps the
+         * return to supply + 3 K, so the card shows those, and the coolant select is named for what it drives */
+        var pl = model.plant, coolants = (window.RZEngine && window.RZEngine.data && window.RZEngine.data.coolants) || {};
+        var cool = coolants[pl ? 'water' : inp.coolantKey] || {};
+        var coolNames = { water: 'Water', pg20: '20% PG', pg30: '30% PG', pg40: '40% PG',
+                          dielectric_1p: 'Dielectric 1P', dielectric_2p: 'Dielectric 2P' };
+        var coolLabel = pl ? 'Water' : coolNames[inp.coolantKey] || (inp.coolantKey || '—');
         var c1rows = [
-            { lbl: 'Supply Temperature',  val: fmt(inp.supplyTemp, 1) + ' °C', key: 'supplyTemp' },
-            { lbl: 'Return Temperature',  val: fmt(inp.returnTemp, 1) + ' °C', key: 'returnTemp' },
+            { lbl: 'Supply Temperature',  val: fmt(pl ? pl.input.tcsSupplyC : inp.supplyTemp, 1) + ' °C', key: 'supplyTemp' },
+            { lbl: 'Return Temperature',  val: fmt(pl ? pl.input.tcsReturnC : inp.returnTemp, 1) + ' °C', key: 'returnTemp' },
             { lbl: 'ΔT',                  val: fmt(model.deltaT, 1) + ' K', key: 'deltaT' },
             { lbl: 'Coolant',             val: coolLabel },
             { lbl: 'Cp',                  val: cool.cp != null ? fmt(cool.cp, 3) + ' kJ/kg·K' : '—' },
             { lbl: 'Density',             val: cool.rho != null ? fmt(cool.rho, 0) + ' kg/m³' : '—' }
         ];
+        if (pl && inp.coolantKey && inp.coolantKey !== 'water')
+            c1rows.push({ lbl: 'Coolant select', val: (coolNames[inp.coolantKey] || inp.coolantKey) + ' · screening' });
         if (cool.viscosityMpas != null) c1rows.push({ lbl: 'Viscosity', val: fmt(cool.viscosityMpas, 3) + ' mPa·s' });
         if (cool.thermalCondWmk != null) c1rows.push({ lbl: 'Thermal Cond.', val: fmt(cool.thermalCondWmk, 3) + ' W/m·K' });
         c1rows.push({ lbl: 'Volumetric Flow',   val: fmt(model.flowLpm, 0) + ' LPM', key: 'flowLpm' });
@@ -1838,9 +1859,9 @@
             model.tcsPumpKw != null ? { lbl: 'TCS pumps', val: fmt(model.tcsPumpKw, 1) + ' kW' } : null,
             model.fwsPumpKw != null ? { lbl: 'FWS pumps', val: fmt(model.fwsPumpKw, 1) + ' kW' } : null,
             { lbl: model.tcsPumpKw != null ? 'Both loops' : 'Pump Power', val: fmt(model.pumpPowerKw, 1) + ' kW', key: 'pumpPowerKw' },
-            { lbl: 'Pipe Loss Factor',    val: fmt(inp.coefPipeLoss, 3) + 'x' },
-            { lbl: 'Hydraulic Margin',    val: fmt(inp.hydraulicMargin, 0) + '%' },
-            { lbl: 'Liquid COP',          val: fmt(intern.liquidCop || model.liquidCop, 2) }
+            pl ? null : { lbl: 'Pipe Loss Factor',    val: fmt(inp.coefPipeLoss, 3) + 'x' },
+            pl ? null : { lbl: 'Hydraulic Margin',    val: fmt(inp.hydraulicMargin, 0) + '%' },
+            { lbl: 'Liquid COP',          val: fmt(pl ? model.liquidCop : intern.liquidCop || model.liquidCop, 2) }
         ].filter(Boolean));
 
         // Card 3: Performance
@@ -1850,12 +1871,13 @@
             { lbl: 'WUE',                 val: fmt(model.wue, 3) + ' L/kWh', key: 'wue' },
             { lbl: 'Total Facility',      val: fmt(model.totalFacilityKw, 0) + ' kW', key: 'totalFacilityKw' },
             { lbl: 'Annual Energy',       val: fmt(model.annualGwh, 2) + ' GWh/yr', key: 'annualGwh' },
-            { lbl: 'Economizer %',        val: fmt((intern.economizerFraction || 0) * 100, 1) + '%' }
+            pl ? { lbl: 'Hours, no trim cooling', val: fmt((pl.totals.hours - pl.totals.trimHours) / Math.max(1, pl.totals.hours) * 100, 1) + '%' }
+               : { lbl: 'Economizer %',        val: fmt((intern.economizerFraction || 0) * 100, 1) + '%' }
         ]);
 
         // Card 4: Power Breakdown donut
         var bd = model.breakdown || {};
-        var c4 = donutCard(bd);
+        var c4 = donutCard(bd, !!pl);
 
         grid.innerHTML = c1 + c2 + c3 + c4;
 
@@ -1879,12 +1901,12 @@
             '</div>';
     }
 
-    function donutCard(bd) {
+    function donutCard(bd, plantMode) {
         var slices = [
             { lbl: 'IT',           kw: bd.it || 0 },
             { lbl: 'Liquid Cool', kw: bd.liquidCooling || 0 },
             { lbl: 'Air Cool',    kw: bd.airCooling || 0 },
-            { lbl: 'Pump',        kw: bd.pump || 0 },
+            { lbl: plantMode ? 'TCS pumps' : 'Pump', kw: bd.pump || 0 },
             { lbl: 'Elec Loss',   kw: bd.elecLoss || 0 },
             { lbl: 'Aux/Fan',     kw: bd.aux || 0 }
         ].filter(function (s) { return s.kw > 0; });

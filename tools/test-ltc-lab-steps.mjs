@@ -26,6 +26,9 @@
  * S12 Pump power names one plant quantity per label: Results has a TCS pump row equal to rho g H Q / eta from the shown
  *    head, flow and efficiency; the KPI says it sums TCS + FWS and equals that sum; the energy-balance pump row is the
  *    TCS pumps; the energy-balance rows add up to the Total Facility row
+ * S13 In plant mode the Results card shows the plant: Liquid COP is the plant's, the free-cooling row is the plant's
+ *    hours without trim, inputs the plant ignores (pipe loss, hydraulic margin) are not listed, the coolant properties are
+ *    water's with a note when another coolant is selected, and a capture above the architecture cap is noted
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -90,6 +93,42 @@ try {
     ok(ebp && /TCS/.test(ebp[0]) && Math.abs(ebp[1] - pw.tcs) <= 0.06, `${w} S12 energy-balance pump row ${JSON.stringify(ebp)} vs TCS ${pw.tcs}`);
     const ebSum = pw.eb.reduce((a, e) => a + e[1], 0);
     ok(Math.abs(ebSum - pw.foot) <= pw.foot * 0.001, `${w} S12 energy-balance rows sum ${ebSum.toFixed(1)} != Total Facility ${pw.foot}`);
+    // S13 in plant mode the Results card shows what the plant computed, not the screening model's internals
+    const rr = () => p.evaluate(() => {
+      const m = window.__ltcLastModel || {}, r = m.plant, num = (t) => parseFloat(String(t).replace(/,/g, ''));
+      const rows = Object.fromEntries([...document.querySelectorAll('#ltcTabResults .ltc-res-row')].map((x) =>
+        [x.querySelector('.ltc-res-lbl').textContent.trim(), x.querySelector('.ltc-res-val').textContent.trim()]));
+      const L = r && r.liquid, T = r && r.totals;
+      return { rows, num: Object.fromEntries(Object.entries(rows).map(([k, v]) => [k, num(v)])),
+        cop: L && (L.coolerKw + L.trimKw) / Math.max(1, L.coolerFanKw + L.trimKwe + L.fwsPumpKw),
+        free: T && (T.hours - T.trimHours) / T.hours * 100, plant: !!r };
+    });
+    let q = await rr();
+    if (q.plant) {
+      ok(Math.abs(q.num['Liquid COP'] - q.cop) <= 0.006, `${w} S13 Liquid COP ${q.num['Liquid COP']} != plant ${q.cop && q.cop.toFixed(3)}`);
+      ok(!('Economizer %' in q.rows), `${w} S13 "Economizer %" (screening-model internal) shown in plant mode: ${q.rows['Economizer %']}`);
+      const fk = Object.keys(q.rows).find((k) => /no trim/i.test(k));
+      ok(fk && Math.abs(q.num[fk] - q.free) <= 0.06, `${w} S13 free-cooling row ${fk}=${fk && q.num[fk]} vs plant ${q.free && q.free.toFixed(2)}`);
+      for (const k of ['Pipe Loss Factor', 'Hydraulic Margin']) ok(!(k in q.rows), `${w} S13 "${k}" shown but the plant does not use it`);
+      await p.evaluate(() => { const c = document.getElementById('inCoolant'); c.dataset.was = c.value; c.value = 'pg30'; c.dispatchEvent(new Event('change', { bubbles: true })); });
+      await new Promise((r) => setTimeout(r, 1500));
+      q = await rr();
+      ok(q.num['Cp'] === 4.186 && q.num['Density'] === 997, `${w} S13 PG30 selected: card Cp ${q.rows['Cp']}, density ${q.rows['Density']}; the plant computes water (4.186, 997)`);
+      ok(Object.entries(q.rows).some(([k, v]) => /coolant/i.test(k) && /screening/i.test(v)), `${w} S13 PG30 selected but no row says the selection drives the screening model only`);
+      await p.evaluate(() => { const c = document.getElementById('inCoolant'); c.value = c.dataset.was; c.dispatchEvent(new Event('change', { bubbles: true }));
+        const a = document.getElementById('inCoolingArchitecture'); a.value = 'hybrid'; a.dispatchEvent(new Event('change', { bubbles: true })); });
+      await new Promise((r) => setTimeout(r, 800));
+      await p.evaluate(() => { const e = document.getElementById('inLiquidCapture'); e.value = '85'; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
+      await new Promise((r) => setTimeout(r, 1500));
+      const capNote = await p.evaluate(() => { const n = document.getElementById('ltcCapNote'); return n && !n.hidden ? n.textContent : ''; });
+      const eff = (await rr()).num['Effective Capture'];
+      ok(/75/.test(capNote) && eff === 75, `${w} S13 hybrid at 85 %: model runs ${eff} %, slider note "${capNote}"`);
+      await p.evaluate(() => { const a = document.getElementById('inCoolingArchitecture'); a.value = 'direct_liquid'; a.dispatchEvent(new Event('change', { bubbles: true })); });
+      await new Promise((r) => setTimeout(r, 800));
+      await p.evaluate(() => { const e = document.getElementById('inLiquidCapture'); e.value = '85'; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
+      await new Promise((r) => setTimeout(r, 1500));
+      ok(await p.evaluate(() => { const n = document.getElementById('ltcCapNote'); return !n || n.hidden; }), `${w} S13 capture note still shown under the cap`);
+    }
     const s1 = await p.evaluate(() => ({ n: document.querySelectorAll('.ltc-step').length, cur: [...document.querySelectorAll('.ltc-step[aria-current]')].map((e) => e.id),
       res: [...document.querySelectorAll('.ltc-step-res')].map((e) => e.textContent.trim()),
       lit: [...document.querySelectorAll('rect.ltc-step-node')].map((r) => r.getAttribute('data-rzd-node')).sort().join(',') }));
@@ -215,4 +254,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, 0 errors');
