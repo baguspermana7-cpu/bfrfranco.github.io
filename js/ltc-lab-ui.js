@@ -1766,7 +1766,14 @@
         for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('active', btns[i].getAttribute('data-scen') === cur);
         var eng = window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc;
         var norm = null;
-        if (eng && cur !== 'normal') { var ni = Object.assign({}, model.input); ni.failureMode = 'normal'; norm = eng.compute(ni); }
+        var LP = window.LTCLabPlant;
+        if (eng && cur !== 'normal') { var ni = Object.assign({}, model.input); ni.failureMode = 'normal'; norm = LP ? LP.computeLike(model, ni) : eng.compute(ni); }
+        /* 3.27.0 — the plant is a steady-state heat balance and has no fault mode: in plant mode a fault mode moves
+         * the screening risk index only, and the card says so (it claimed a whole-model recompute) */
+        var lblNote = document.querySelector('.ltc-scenario-card .ltc-overview-label .ltc-muted');
+        if (lblNote) lblNote.textContent = model.plant
+            ? '— the plant computes steady state; a fault mode here moves the screening risk index, not the heat balance'
+            : '— screening model recomputed under the fault mode';
         function d(v, dec) { return norm == null ? '' : ' <span class="ltc-scenario-delta ' + (v > 0 ? 'up' : (v < 0 ? 'down' : '')) + '">' + (v >= 0 ? '+' : '') + v.toFixed(dec) + '</span>'; }
         host.innerHTML =
             '<div class="ltc-scenario-metric"><span>PUE</span><b>' + fmt(model.pue, 3) + '</b>' + (norm ? d(model.pue - norm.pue, 3) : '') + '</div>' +

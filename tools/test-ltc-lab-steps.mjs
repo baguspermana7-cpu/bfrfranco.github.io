@@ -36,6 +36,8 @@
  * S16 The Charts-tab tornado and the Logic Impact Matrix perturb the shown model (the plant) one step from the shown
  *    base: every tornado row and the IT-load matrix row equal a plant recompute (the old range clamp turned +0.2 MW
  *    at 100 MW into 80 MW)
+ * S17 The operating-scenario readout's deltas are the same model recomputed in normal mode, and in plant mode its
+ *    label says a fault mode moves the screening risk index, not the heat balance
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -190,6 +192,21 @@ try {
     const n16 = (x) => parseFloat(String(x).replace(/[,+]/g, ''));
     ok(s16.it && Math.abs(n16(s16.it[4]) - s16.wantOpex) <= Math.abs(s16.wantOpex) * 0.01 + 1, `${w} S16 impact matrix IT +step net OPEX ${s16.it && s16.it[4]}, plant ${Math.round(s16.wantOpex)}`);
     ok(s16.it && Math.abs(n16(s16.it[2]) - s16.wantPue) <= 0.0006, `${w} S16 impact matrix IT +step PUE ${s16.it && s16.it[2]}, plant ${s16.wantPue.toFixed(4)}`);
+    // S17 the operating-scenario readout compares like with like and says what a fault mode moves in plant mode
+    await p.evaluate(() => document.querySelector('#ltcScenarioBtns .ltc-scenario-btn[data-scen="pump_degraded"]').click());
+    await new Promise((r) => setTimeout(r, 1500));
+    const s17 = await p.evaluate(() => {
+      const m = window.__ltcLastModel, ni = Object.assign({}, m.input, { failureMode: 'normal' });
+      const norm = window.LTCLabPlant.compute(ni, window.RZEngine.models.ltc.compute(ni));
+      const rows = [...document.querySelectorAll('#ltcScenarioReadout .ltc-scenario-metric')].map((e) => [e.querySelector('span').textContent,
+        parseFloat((e.querySelector('.ltc-scenario-delta')?.textContent || 'NaN').replace(/,/g, ''))]);
+      const lbl = document.querySelector('.ltc-scenario-card .ltc-overview-label').textContent;
+      return { rows, lbl, want: { PUE: m.pue - norm.pue, 'System COP': m.systemCop - norm.systemCop, 'Risk Index': m.riskIndex - norm.riskIndex, 'Loop pumps': m.pumpPowerKw - norm.pumpPowerKw } };
+    });
+    for (const [k, d] of s17.rows) ok(Math.abs(d - s17.want[k]) <= 0.051, `${w} S17 scenario delta ${k} ${d}, same-model recompute ${s17.want[k]}`);
+    ok(/risk index/i.test(s17.lbl) && !/recomputes the whole model/i.test(s17.lbl), `${w} S17 scenario label "${s17.lbl.slice(0, 90)}" does not say a fault mode moves only the risk index`);
+    await p.evaluate(() => document.querySelector('#ltcScenarioBtns .ltc-scenario-btn[data-scen="normal"]').click());
+    await new Promise((r) => setTimeout(r, 1200));
     const s1 = await p.evaluate(() => ({ n: document.querySelectorAll('.ltc-step').length, cur: [...document.querySelectorAll('.ltc-step[aria-current]')].map((e) => e.id),
       res: [...document.querySelectorAll('.ltc-step-res')].map((e) => e.textContent.trim()),
       lit: [...document.querySelectorAll('rect.ltc-step-node')].map((r) => r.getAttribute('data-rzd-node')).sort().join(',') }));
@@ -315,4 +332,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, 0 errors');
