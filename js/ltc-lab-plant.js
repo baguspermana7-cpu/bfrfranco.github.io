@@ -21,6 +21,11 @@
 
   var CLIMATE = { tropical: 'tropical', temperate: 'temperate', dry: 'arid', continental: 'temperate' };
   var CAPTURE_CAP = { direct_liquid: 98, hybrid: 75, air_inrow_dahu: 0 };
+  /* settings the plant does not read (proved per setting by test-ltc-lab-steps S18): they feed the screening model,
+   * its risk index and the legacy comparison, not the heat balance */
+  var SCREENING_ONLY = ['inRackCount', 'inRackType', 'inHighDensityShare', 'inModelYear', 'inCoolant', 'inHydraulicMargin',
+    'inMonitoring', 'inFireType', 'inCoefHeatTransfer', 'inCoefPipeLoss', 'inAirCop', 'inEconomizerHours', 'inFanPower',
+    'inControlQuality', 'inPredictiveGain', 'inCoefCduLoss', 'inCoefFutureTech'];
 
   /* lab input → plant input; only what the lab actually owns */
   function toPlant(li) {
@@ -280,7 +285,7 @@
     window.addEventListener('storage', function (e) { if (e.key === P.KEY) pull(); });
   }
 
-  root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE, CAPTURE_CAP: CAPTURE_CAP, traceOf: traceOf, equationLines: equationLines, stepInput: stepInput, computeLike: computeLike,
+  root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE, CAPTURE_CAP: CAPTURE_CAP, SCREENING_ONLY: SCREENING_ONLY, traceOf: traceOf, equationLines: equationLines, stepInput: stepInput, computeLike: computeLike,
     /* after the first read of the plant the lab's inputs win; tests state it explicitly */
     ready: function (climateShown) { pulled = true; if (climateShown) pulledClimate = climateShown; } };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCLabPlant;

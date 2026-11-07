@@ -482,7 +482,7 @@
             return { wrap: wrap, grid: g };
         }
         var secs = {
-            design: mkSec('design', '1', 'Design inputs', 'Your decisions — set these first.'),
+            design: mkSec('design', '1', 'Design inputs', 'Your decisions — set these first. A setting marked “screening only” is not read by the plant: it moves the risk index and the legacy comparison, not the heat balance.'),
             auto:   mkSec('auto',   '2', 'Auto-filled', 'Filled from the country & architecture presets (sourced engine data). Override anytime — ↺ restores the preset value.'),
             tune:   mkSec('tune',   '3', 'Optimization & calibration', 'Targets and model-tuning knobs — adjust these when optimizing the design.')
         };
@@ -503,6 +503,13 @@
                                    tier === 'design' ? 'DESIGN' : 'TUNE';
                 chip.id = 'chip_' + field.id;
                 label.appendChild(chip);
+                var scrList = window.LTCLabPlant && window.LTCLabPlant.SCREENING_ONLY;
+                if (scrList && scrList.indexOf(field.id) >= 0) {
+                    var scr = el('span', { className: 'ltc-scr', textContent: 'screening only' });
+                    scr.title = 'The plant does not read this setting: it feeds the screening model (risk index, legacy comparison), not the heat balance.';
+                    scr.hidden = true;
+                    label.appendChild(scr);
+                }
                 if (tier === 'auto') {
                     var rb = el('button', { type: 'button', className: 'ltc-auto-reset', title: 'Reset to preset value', textContent: '↺' });
                     rb.id = 'reset_' + field.id;
@@ -1117,6 +1124,7 @@
         renderResultsTab(model);
         syncSliders();
         /* the Flow tab's loss bars read breakdown.pump, which in plant mode is the TCS pumps (FWS sit in liquid cooling) */
+        document.querySelectorAll('.ltc-scr').forEach(function (x) { x.hidden = !model.plant; });
         var fp = document.getElementById('flowPump'), fpl = fp && fp.parentElement.firstElementChild;
         if (fpl) fpl.textContent = model.plant ? 'TCS pumps' : 'Pump + Hydraulics';
         polishNumbers();

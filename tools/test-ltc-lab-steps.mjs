@@ -38,6 +38,8 @@
  *    at 100 MW into 80 MW)
  * S17 The operating-scenario readout's deltas are the same model recomputed in normal mode, and in plant mode its
  *    label says a fault mode moves the screening risk index, not the heat balance
+ * S18 (1440) In plant mode a setting carries the 'screening only' mark exactly when changing it moves none of the
+ *    plant's outputs (each setting perturbed and restored in the page)
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -210,6 +212,33 @@ try {
     ok(/risk index/i.test(s17.lbl) && !/recomputes the whole model/i.test(s17.lbl), `${w} S17 scenario label "${s17.lbl.slice(0, 90)}" does not say a fault mode moves only the risk index`);
     await p.evaluate(() => document.querySelector('#ltcScenarioBtns .ltc-scenario-btn[data-scen="normal"]').click());
     await new Promise((r) => setTimeout(r, 1200));
+    // S18 (1440) in plant mode a setting is marked "screening only" exactly when changing it moves none of the plant's outputs
+    if (w === 1440) {
+      const s18 = await p.evaluate(async () => {
+        const sleep = (t) => new Promise((r) => setTimeout(r, t));
+        const snap = () => { const m = window.__ltcLastModel; return [m.pue, m.systemCop, m.wue, m.totalFacilityKw, m.netOpex, m.netCarbonTons, m.flowLpm,
+          m.pumpPowerKw, m.cduCount, m.pueDesign, m.plant.it.racks]; };
+        const skip = /^(inCoolingArchitecture|inCountryProfile|inTargetPue|inTargetCop|inFailureMode)$/;
+        const fields = [...document.querySelectorAll('#ltcOtherParamsBody .ltc-tier-sec input, #ltcOtherParamsBody .ltc-tier-sec select')]
+          .filter((f) => f.id && !skip.test(f.id) && !/checkbox|file|button/.test(f.type));
+        const out = [];
+        for (const f of fields) {
+          const marked = !!(f.closest('.input-group') && f.closest('.input-group').querySelector('.ltc-scr:not([hidden])'));
+          const v0 = f.value, base = snap();
+          if (f.tagName === 'SELECT') { const o = [...f.options].find((o) => o.value !== f.value); if (!o) continue; f.value = o.value; }
+          else { const v = +f.value || 0, mx = f.max !== '' ? +f.max : Infinity; let nv = v ? v * 1.1 : 1; if (nv > mx) nv = v * 0.9; f.value = String(+nv.toFixed(4)); }
+          f.dispatchEvent(new Event('input', { bubbles: true })); f.dispatchEvent(new Event('change', { bubbles: true }));
+          await sleep(450);
+          const moved = snap().some((v, i) => Math.abs(v - base[i]) > Math.abs(base[i]) * 1e-9 + 1e-12);
+          f.value = v0; f.dispatchEvent(new Event('input', { bubbles: true })); f.dispatchEvent(new Event('change', { bubbles: true }));
+          await sleep(450);
+          out.push({ id: f.id, marked, moved });
+        }
+        return out;
+      });
+      ok(s18.length >= 25, `S18 only ${s18.length} settings probed`);
+      for (const r of s18) ok(r.marked !== r.moved, `${w} S18 ${r.id}: ${r.moved ? 'moves the plant' : 'moves nothing in the plant'} but is ${r.marked ? '' : 'not '}marked screening only`);
+    }
     const s1 = await p.evaluate(() => ({ n: document.querySelectorAll('.ltc-step').length, cur: [...document.querySelectorAll('.ltc-step[aria-current]')].map((e) => e.id),
       res: [...document.querySelectorAll('.ltc-step-res')].map((e) => e.textContent.trim()),
       lit: [...document.querySelectorAll('rect.ltc-step-node')].map((r) => r.getAttribute('data-rzd-node')).sort().join(',') }));
@@ -335,4 +364,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, 0 errors');
