@@ -82,6 +82,7 @@
     });
     document.body.setAttribute('data-ltc-step', s.key);
     paintNodes();
+    drawStrip();
     if (fromUser) {
       try { history.replaceState(null, '', '#step=' + (active + 1)); } catch (e) {}
       if (s.tab) { var t = openTab(s.tab); if (t && t.scrollIntoView) t.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' }); }
@@ -96,8 +97,73 @@
     });
   }
 
+
+  /* Arithmetic strip: the active step's equations, from the engine's own trace table (plant.trace, formulas written
+   * in js/ltc-plant.js). Where an identity can be recomputed from the engine's own numbers, the values are substituted
+   * and the line is marked "holds" only if the recomputation lands within 1e-6 (relative) of the engine value — the identities are exact in floating point; otherwise the
+   * engine formula and value are shown as they are. Nothing here feeds back into the model. */
+  var CP = 4.186, RHO = 997, G = 9.81;
+  function n0(x, d) { return Number(x).toLocaleString('en-US', { maximumFractionDigits: d === undefined ? 0 : d }); }
+  function within(a, b) { return isFinite(a) && isFinite(b) && Math.abs(a - b) <= Math.max(1e-9, Math.abs(b) * 1e-6); }
+  var LINES = {
+    capture: function (r) {
+      var it = r.it.kw, cap = r.input.capturePct;
+      return [['liquidIt', n0(it) + ' kW × ' + n0(cap, 1) + ' %', it * cap / 100, r.liquid.itKw, 'kW'],
+              ['airIt', n0(it) + ' kW × (1 − ' + n0(cap, 1) + ' %)', it * (1 - cap / 100), r.air.itKw, 'kW']];
+    },
+    loop: function (r) {
+      var q = r.liquid, dt = q.tcsDeltaK;
+      var lpsCalc = q.itKw / (CP * dt) / RHO * 1000;
+      var pumpCalc = RHO * G * r.input.tcsHeadM * (q.tcsLps / 1000) / 1000 / r.input.tcsPumpEff;
+      return [['tcsLps', n0(q.itKw) + ' kW ÷ (' + CP + ' × ' + n0(dt, 1) + ' K) ÷ ' + RHO + ' × 1000', lpsCalc, q.tcsLps, 'L/s'],
+              ['tcsPumpKw', RHO + ' × ' + G + ' × ' + n0(r.input.tcsHeadM, 1) + ' m × ' + n0(q.tcsLps / 1000, 3) + ' m³/s ÷ ' + n0(r.input.tcsPumpEff, 2), pumpCalc, q.tcsPumpKw, 'kW'],
+              ['cduPerHall', null, null, q.cduPerHall, '']];
+    },
+    rejection: function (r) {
+      return [['coolerLeaving', null, null, r.liquid.coolerLeavingC, '°C'], ['chillerCop', null, null, r.air.chillerCop, ''],
+              ['pue', n0(r.totals.facilityKw) + ' kW ÷ ' + n0(r.it.kw) + ' kW', r.totals.facilityKw / r.it.kw, r.totals.pue, ''],
+              ['pueAnnual', null, null, r.totals.pueAnnual, '']];
+    },
+    cost: function (r) {
+      var A = r.annual;
+      return [[null, n0(A.m0MWh) + ' MWh × 1000 × $' + n0(r.input.elecPrice, 3) + '/kWh', A.m0MWh * 1000 * r.input.elecPrice, A.energyCost, 'USD/yr', 'Energy cost'],
+              [null, n0(A.waterM3) + ' m³ × $' + n0(r.input.waterTariff, 2) + '/m³', A.waterM3 * r.input.waterTariff, A.waterCost, 'USD/yr', 'Water cost']];
+    }
+  };
+  var strip;
+  function drawStrip() {
+    if (!strip) return;
+    var m = window.__ltcLastModel, r = m && m.plant, f = LINES[STEPS[active].key];
+    if (!r || !f) { strip.hidden = true; return; }
+    var rows = [];
+    try { rows = f(r); } catch (e) { strip.hidden = true; return; }
+    var tr = r.trace || {};
+    strip.hidden = false;
+    strip.innerHTML = '';
+    var h = document.createElement('div');
+    h.className = 'ltc-arith-head';
+    h.textContent = (active + 1) + ' · ' + STEPS[active].name + ' — how the numbers are made';
+    strip.appendChild(h);
+    rows.forEach(function (row) {
+      var t = row[0] ? tr[row[0]] : null, label = t ? t.label : row[5], formula = t ? t.formula : '';
+      var engine = row[3], unit = row[4], sub = row[1], calc = row[2];
+      var line = document.createElement('div');
+      line.className = 'ltc-arith-row';
+      var holds = sub && within(calc, engine);
+      var val = n0(engine, Math.abs(engine) < 10 ? 3 : Math.abs(engine) < 1000 ? 1 : 0) + (unit ? ' ' + unit : '');
+      line.innerHTML = '<span class="ltc-arith-l"></span><span class="ltc-arith-f"></span><span class="ltc-arith-v"></span><span class="ltc-arith-s"></span>';
+      line.children[0].textContent = label || '';
+      line.children[1].textContent = holds ? (formula ? formula + ' → ' : '') + sub + ' = ' + val : (formula || '') + (sub && !holds ? '' : '');
+      line.children[2].textContent = holds ? '' : val;
+      line.children[3].textContent = holds ? 'holds' : sub ? 'engine value' : 'engine';
+      if (holds) line.classList.add('is-holds');
+      strip.appendChild(line);
+    });
+  }
+
   function refresh() {
     paintNodes();
+    drawStrip();
     STEPS.forEach(function (s, i) {
       var b = items[i]; if (!b) return;
       var res = b.querySelector('.ltc-step-res');
@@ -141,6 +207,8 @@
     var guide = document.querySelector('.ltc-flow-guide');
     if (!guide) return false;
     build(guide);
+    var kpi = document.getElementById('ltcKpiStrip');
+    if (kpi && kpi.parentNode) { strip = document.createElement('div'); strip.className = 'ltc-arith'; strip.setAttribute('aria-live', 'polite'); kpi.parentNode.insertBefore(strip, kpi.nextSibling); }
     var m = /step=(\d)/.exec(location.hash);
     select(m ? +m[1] - 1 : 0, false);
     refresh();

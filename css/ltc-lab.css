@@ -1656,3 +1656,14 @@ html[data-theme="light"] .ltc-step[aria-current="step"] .ltc-step-n,
 html[data-theme="light"] .ltc-step[aria-current="step"] .ltc-step-name { color: #92400e; border-color: #92400e; }
 rect[data-rzd-node].ltc-step-node { stroke: var(--o, #E8B563) !important; stroke-width: 2px !important; }
 @media (prefers-reduced-motion: reduce) { .ltc-step, .ltc-step.is-changed .ltc-step-res::before { transition: none; } }
+/* arithmetic strip under the KPI row — the active step's equations, values substituted where they recompute */
+.ltc-arith { margin: 10px 0 0; border: 1px solid var(--ltc-hairline, rgba(255,255,255,.12)); border-radius: 4px; padding: 8px 12px; }
+.ltc-arith[hidden] { display: none; }
+.ltc-arith-head { font: 600 .72rem/1.4 var(--ltc-mono, 'JetBrains Mono', monospace); letter-spacing: .02em; opacity: .75; margin-bottom: 4px; }
+.ltc-arith-row { display: grid; grid-template-columns: minmax(150px, 210px) 1fr auto auto; gap: 4px 12px; align-items: baseline;
+  padding: 5px 0; border-top: 1px solid var(--ltc-hairline, rgba(255,255,255,.08)); font-size: .78rem; }
+.ltc-arith-l { opacity: .8; }
+.ltc-arith-f, .ltc-arith-v { font-family: var(--ltc-mono, 'JetBrains Mono', monospace); font-size: .74rem; overflow-wrap: anywhere; }
+.ltc-arith-s { font: 500 .66rem/1 var(--ltc-mono, 'JetBrains Mono', monospace); opacity: .6; text-transform: lowercase; }
+.ltc-arith-row.is-holds .ltc-arith-s { color: #6aa588; opacity: 1; }
+@media (max-width: 640px) { .ltc-arith-row { grid-template-columns: 1fr auto; } .ltc-arith-f { grid-column: 1 / -1; } }
