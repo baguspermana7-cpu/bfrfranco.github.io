@@ -1390,6 +1390,8 @@
         controlIndex:'/100', riskIndex:'/100', cduCount:'units' };
     function traceValueOf(key, m) {
         if (!m) return null;
+        if (m.plant && key === 'supplyTemp') return m.plant.input.tcsSupplyC;
+        if (m.plant && key === 'returnTemp') return m.plant.input.tcsReturnC;
         if (m[key] !== undefined) return m[key];
         if (m.input && m.input[key] !== undefined) return m.input[key];
         if (m.internals && m.internals[key] !== undefined) return m.internals[key];
@@ -1403,7 +1405,9 @@
         return v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: dec }) + (u ? ' ' + u : '');
     }
     function traceProvenance(key, m) {
+        if (m && m.plant && (key === 'supplyTemp' || key === 'returnTemp')) return { cls: 'input', label: 'INPUT · as the plant uses it' };
         if (m && m.input && m.input[key] !== undefined) return { cls: 'input', label: 'INPUT' };
+        if (m && m.plant) return { cls: 'engine', label: 'PLANT · LTCPlant.compute' };
         if (LTC_TRACE[key] && LTC_TRACE[key].deps.length) return { cls: 'engine', label: 'ENGINE · models.ltc.compute' };
         return { cls: 'derived', label: 'MODEL' };
     }
@@ -1414,6 +1418,15 @@
         var meta = (typeof window.__ltcTermMeta === 'function') ? window.__ltcTermMeta(key) : null;
         var spec = LTC_TRACE[key] || { deps: [] };
         var prov = traceProvenance(key, m);
+        /* 3.27.0 — plant mode: the plant's formula and the plant quantities it uses; the screening model's
+         * dependency tree (capture from heat-transfer coefficient, WUE from economiser hours …) is not how
+         * these numbers were made */
+        var pt = m.plant && window.LTCLabPlant && window.LTCLabPlant.traceOf ? window.LTCLabPlant.traceOf(key, m) : null;
+        var depFmt = function (v, u) {
+            if (typeof v !== 'number' || !isFinite(v)) return '—';
+            var a = Math.abs(v), dec = a >= 1000 ? 0 : a >= 100 ? 1 : a >= 10 ? 2 : 3;
+            return v.toLocaleString('en-US', { maximumFractionDigits: dec }) + (u ? ' ' + u : '');
+        };
         var pop = document.getElementById('ltcTracePop');
         if (!pop) {
             pop = el('div', { id: 'ltcTracePop', className: 'ltc-trace-pop' });
@@ -1428,11 +1441,16 @@
                 return '<button type="button" class="ltc-trace-crumb" data-ckey="' + c + '" data-cidx="' + i + '">' +
                     ((window.__ltcTermMeta && window.__ltcTermMeta(c).title) || c) + '</button>';
             }).join(' › ') + ' › <b>' + (meta ? meta.title : key) + '</b></div>' : '';
-        var pills = spec.deps.map(function (d) {
+        var pills = pt ? pt.deps.map(function (d) {
+            return d.k ? '<button type="button" class="ltc-trace-pill" data-tkey="' + d.k + '" title="' + d.label + ' (click to trace)">' +
+                    '<b>' + depFmt(d.v, d.unit) + '</b><span>' + d.label + '</span></button>'
+                : '<span class="ltc-trace-pill is-leaf"><b>' + depFmt(d.v, d.unit) + '</b><span>' + d.label + '</span></span>';
+        }).join('') : spec.deps.map(function (d) {
             var dm = window.__ltcTermMeta ? window.__ltcTermMeta(d) : null;
-            return '<button type="button" class="ltc-trace-pill" data-tkey="' + d + '" title="' + (dm ? dm.title : d) + ' — klik untuk trace">' +
+            return '<button type="button" class="ltc-trace-pill" data-tkey="' + d + '" title="' + (dm ? dm.title : d) + ' (click to trace)">' +
                 '<b>' + traceFmt(d, traceValueOf(d, m)) + '</b><span>' + (dm ? dm.title : d) + '</span></button>';
         }).join('');
+        var formula = pt ? (pt.formula === 'input' ? '' : pt.formula) : (meta && meta.formula) || '';
         pop.innerHTML =
             '<div class="ltc-trace-head">' +
             '<div><div class="ltc-trace-val">' + traceFmt(key, traceValueOf(key, m)) + '</div>' +
@@ -1441,8 +1459,8 @@
             '<button type="button" class="ltc-trace-x" aria-label="Close">×</button></div>' +
             crumbHtml +
             (meta ? '<p class="ltc-trace-desc">' + meta.desc + '</p>' : '') +
-            (meta && meta.formula ? '<div class="ltc-trace-formula">' + meta.formula + '</div>' : '') +
-            (pills ? '<div class="ltc-trace-deps-lbl">DIHITUNG DARI — klik untuk telusuri:</div><div class="ltc-trace-deps">' + pills + '</div>' : '') +
+            (formula ? '<div class="ltc-trace-formula">' + formula + '</div>' : '') +
+            (pills ? '<div class="ltc-trace-deps-lbl">COMPUTED FROM' + (pt && !pt.deps.some(function (d) { return d.k; }) ? '' : ' · click a value to trace it') + '</div><div class="ltc-trace-deps">' + pills + '</div>' : '') +
             (meta && meta.impact ? '<p class="ltc-trace-impact">' + meta.impact + '</p>' : '') +
             '<div class="ltc-trace-actions">' +
             '<button type="button" class="ltc-trace-open-detail">Open in DETAILED tab</button>' +
@@ -1465,11 +1483,12 @@
         });
         pop.querySelector('.ltc-trace-copy').addEventListener('click', function () {
             var txt = (meta ? meta.title : key) + ' = ' + traceFmt(key, traceValueOf(key, m)) + '\n' +
-                (meta ? meta.formula + '\n' : '') +
-                spec.deps.map(function (d) {
+                (formula ? formula + '\n' : '') +
+                (pt ? pt.deps.map(function (d) { return '  • ' + d.label + ' = ' + depFmt(d.v, d.unit); })
+                    : spec.deps.map(function (d) {
                     var dm = window.__ltcTermMeta ? window.__ltcTermMeta(d) : null;
                     return '  • ' + (dm ? dm.title : d) + ' = ' + traceFmt(d, traceValueOf(d, m));
-                }).join('\n') + '\nSource: LTC lab · models.ltc.compute (shared RZ engine)';
+                })).join('\n') + '\nSource: LTC lab · ' + (pt ? 'LTCPlant.compute (shared plant engine)' : 'models.ltc.compute (shared RZ engine)');
             try { navigator.clipboard.writeText(txt); } catch (e) {}
         });
     }

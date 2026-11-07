@@ -85,6 +85,41 @@
     return out;
   }
 
+  /* 3.27.0 — the fx trace of a plant-mode figure: the plant's formula and the plant quantities it is computed from,
+   * in the order the formula uses them, so the listed values reproduce the figure. k = a further traceable key. */
+  function traceOf(key, m) {
+    var r = m && m.plant;
+    if (!r) return null;
+    var I = r.input, L = r.liquid, A = r.annual, d = r.design, bd = m.breakdown || {}, cool = (m.internals || {}).totalCoolingKw;
+    var cap = Math.min(CAPTURE_CAP[m.input && m.input.architectureMode] != null ? CAPTURE_CAP[m.input.architectureMode] : 98, 99);
+    var dep = function (label, v, unit, k) { return { label: label, v: v, unit: unit || '', k: k }; };
+    var T = {
+      itKw: ['IT load × 1000', [dep('IT load', I.itMw, 'MW', 'itLoadMw')]],
+      liquidKw: [r.trace.liquidIt.formula, [dep('IT load', d.it, 'kW', 'itKw'), dep('Capture', I.capturePct, '%', 'effectiveCapture')]],
+      airKw: [r.trace.airIt.formula, [dep('IT load', d.it, 'kW', 'itKw'), dep('Capture', I.capturePct, '%', 'effectiveCapture')]],
+      effectiveCapture: ['min(capture input, architecture cap)', [dep('Capture input', m.input && m.input.liquidCapture, '%'), dep('Architecture cap', cap, '%')]],
+      deltaT: ['TCS return − supply (return held at supply + 3 K or more)', [dep('TCS supply', I.tcsSupplyC, '°C', 'supplyTemp'), dep('TCS return', I.tcsReturnC, '°C', 'returnTemp')]],
+      flowLpm: [r.trace.tcsLps.formula + ', × 60 for L/min', [dep('Heat into cold plates', d.liquidIt, 'kW', 'liquidKw'), dep('cp water', P.CONST.CP_W, 'kJ/kg·K'),
+        dep('TCS ΔT', L.tcsDeltaK, 'K', 'deltaT'), dep('ρ water', P.CONST.RHO_W, 'kg/m³')]],
+      pumpPowerKw: ['TCS pumps + FWS pumps; each ρ·g·H·V̇ / η', [dep('TCS pumps', L.tcsPumpKw, 'kW'), dep('FWS pumps', L.fwsPumpKw, 'kW')]],
+      cduCount: [r.trace.cduPerHall.formula + ', × halls', [dep('CDUs per hall', L.cduPerHall, ''), dep('Halls', I.halls, '')]],
+      totalFacilityKw: ['IT + liquid cooling + air cooling + TCS pumps + electrical losses + aux, design day', [dep('IT', bd.it, 'kW', 'itKw'),
+        dep('Liquid cooling', bd.liquidCooling, 'kW'), dep('Air cooling', bd.airCooling, 'kW'), dep('TCS pumps', bd.pump, 'kW'),
+        dep('Electrical losses', bd.elecLoss, 'kW'), dep('Aux', bd.aux, 'kW')]],
+      pue: ['annual facility energy ÷ annual IT energy (ISO/IEC 30134-2, category 3), over the climate bins at mean utilisation',
+        [dep('Facility energy', A.m0MWh, 'MWh/yr'), dep('IT energy', A.m3MWh, 'MWh/yr')]],
+      wue: ['annual site water ÷ annual IT energy', [dep('Water', A.waterM3, 'm³/yr'), dep('IT energy', A.m3MWh, 'MWh/yr')]],
+      annualGwh: ['facility energy at the utility meter, Σ facility·h over the climate bins', [dep('Facility energy', A.m0MWh, 'MWh/yr')]],
+      systemCop: ['IT ÷ cooling power (pumps, fans, chillers, trim, dry coolers, room fans), design day', [dep('IT', d.it, 'kW', 'itKw'), dep('Cooling power', cool, 'kW')]],
+      annualOpex: ['energy cost + water cost', [dep('Energy cost', A.energyCost, '$/yr'), dep('Water cost', A.waterCost, '$/yr')]],
+      netOpex: ['annual OPEX − heat reuse credit', [dep('Annual OPEX', m.annualOpex, '$/yr', 'annualOpex'), dep('Heat reuse credit', m.heatReuseCredit, '$/yr')]],
+      netCarbonTons: ['max(0, grid CO₂ − avoided by heat reuse)', [dep('Grid CO₂', A.co2t, 't/yr'), dep('Avoided', m.avoidedCarbonTons, 't/yr')]],
+      supplyTemp: ['input', []], returnTemp: ['input', []]
+    };
+    var t = T[key];
+    return t ? { formula: t[0], deps: t[1] } : null;
+  }
+
   /* write the lab's inputs into the shared plant (keeps site / advanced keys the lab does not own) */
   /* The lab's first runs happen before it has read the shared plant; writing then would overwrite
    * a plant chosen elsewhere with the lab's own defaults. So nothing is written until pull() ran. */
@@ -203,7 +238,7 @@
     window.addEventListener('storage', function (e) { if (e.key === P.KEY) pull(); });
   }
 
-  root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE, CAPTURE_CAP: CAPTURE_CAP,
+  root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE, CAPTURE_CAP: CAPTURE_CAP, traceOf: traceOf,
     /* after the first read of the plant the lab's inputs win; tests state it explicitly */
     ready: function (climateShown) { pulled = true; if (climateShown) pulledClimate = climateShown; } };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCLabPlant;

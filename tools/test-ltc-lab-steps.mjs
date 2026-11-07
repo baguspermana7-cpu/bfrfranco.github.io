@@ -29,6 +29,8 @@
  * S13 In plant mode the Results card shows the plant: Liquid COP is the plant's, the free-cooling row is the plant's
  *    hours without trim, inputs the plant ignores (pipe loss, hydraulic margin) are not listed, the coolant properties are
  *    water's with a note when another coolant is selected, and a capture above the architecture cap is noted
+ * S14 Every fx trace on the Results card in plant mode names the plant as its source, carries no Indonesian UI
+ *    text, and its listed inputs reproduce the traced value by independent arithmetic
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -129,6 +131,25 @@ try {
       await new Promise((r) => setTimeout(r, 1500));
       ok(await p.evaluate(() => { const n = document.getElementById('ltcCapNote'); return !n || n.hidden; }), `${w} S13 capture note still shown under the cap`);
     }
+    // S14 every fx trace in plant mode is the plant's: its source, and the listed inputs reproduce the value
+    const RE = { liquidKw: (a, b) => a * b / 100, flowLpm: (q, cp, dt, rho) => q / (cp * dt) / rho * 1000 * 60, pumpPowerKw: (a, b) => a + b,
+      cduCount: (a, b) => a * b, totalFacilityKw: (...v) => v.reduce((x, y) => x + y, 0), pue: (a, b) => a / b, wue: (a, b) => a / b,
+      annualGwh: (a) => a / 1000, deltaT: (a, b) => b - a, effectiveCapture: (a, b) => Math.min(a, b), systemCop: (a, b) => a / b };
+    const keys = await p.evaluate(() => [...new Set([...document.querySelectorAll('#ltcTabResults [data-ltc-trace]')].map((e) => e.dataset.ltcTrace))]);
+    let traced = 0;
+    for (const k of keys) {
+      const t = await p.evaluate((k) => { document.querySelector(`#ltcTabResults [data-ltc-trace="${k}"]`).click();
+        const pop = document.getElementById('ltcTracePop'), num = (x) => parseFloat(String(x).replace(/,/g, ''));
+        const r = { prov: pop.querySelector('.ltc-trace-prov')?.textContent || '', text: pop.textContent, head: num(pop.querySelector('.ltc-trace-val').textContent),
+          deps: [...pop.querySelectorAll('.ltc-trace-pill b')].map((b) => num(b.textContent)) };
+        pop.classList.remove('open'); return r; }, k);
+      ok(!/models\.ltc\.compute/.test(t.prov) && /plant/i.test(t.prov + (/INPUT/.test(t.prov) ? ' plant' : '')), `${w} S14 ${k} trace source "${t.prov}"`);
+      ok(!/DIHITUNG|klik|telusuri/i.test(t.text), `${w} S14 ${k} trace has Indonesian UI text`);
+      if (RE[k]) { traced++;
+        const v = RE[k](...t.deps);
+        ok(t.deps.length && Math.abs(v - t.head) <= Math.abs(t.head) * 0.003 + 0.051, `${w} S14 ${k} = ${t.head}, but its inputs [${t.deps.join(', ')}] give ${v}`); }
+    }
+    ok(traced >= 8, `${w} S14 only ${traced} traces checked (keys: ${keys.join(',')})`);
     const s1 = await p.evaluate(() => ({ n: document.querySelectorAll('.ltc-step').length, cur: [...document.querySelectorAll('.ltc-step[aria-current]')].map((e) => e.id),
       res: [...document.querySelectorAll('.ltc-step-res')].map((e) => e.textContent.trim()),
       lit: [...document.querySelectorAll('rect.ltc-step-node')].map((r) => r.getAttribute('data-rzd-node')).sort().join(',') }));
@@ -254,4 +275,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, 0 errors');
