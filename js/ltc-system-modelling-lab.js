@@ -8492,7 +8492,7 @@
                     } else {
                         tbody.innerHTML = latestPareto.map(function(m, idx) {
                             return '<tr class="clickable" data-pareto-idx="' + idx + '">' +
-                                '<td>P' + (idx + 1) + (m._feasible ? ' | feasible' : ' | soft') + '</td>' +
+                                '<td>P' + (idx + 1) + (m._feasible ? ' · feasible' : ' · soft') + '</td>' +
                                 '<td>' + fmtNum(m.pue, 3) + '</td>' +
                                 '<td>' + fmtNum(m.systemCop, 2) + '</td>' +
                                 '<td>' + fmtUsd(m.netOpex) + '</td>' +
@@ -8515,10 +8515,11 @@
                 var m = latestPareto[idx];
                 if (!m) return;
                 selectedParetoIdx = idx;
+                /* the baseline is the design before the point is applied (it was read after, so the delta was ~0) */
+                baselineModel = computeModel(gatherInputs());
                 applyInputObjectToForm(m.input);
                 optimizedModel = m;
                 optimizedSource = 'Pareto point';
-                baselineModel = computeModel(gatherInputs());
                 applyModelToUI(m);
                 renderScenarioTable(baselineModel, m);
                 renderTargetActions(baselineModel, m);
@@ -10360,7 +10361,12 @@
 
             function randomInRange(min, max, step, randomFn) {
                 var raw = min + (randomUnit(randomFn) * (max - min));
-                if (step > 0) raw = Math.round(raw / step) * step;
+                if (step > 0) {
+                    /* k * 0.01 is not exact in binary (1.3900000000000001); cut to the step's decimals so a candidate
+                     * written to the form reads back as the same number */
+                    var dec = Math.max(0, Math.ceil(-Math.log10(step) - 1e-9));
+                    raw = +(Math.round(raw / step) * step).toFixed(dec);
+                }
                 return clamp(raw, min, max);
             }
 

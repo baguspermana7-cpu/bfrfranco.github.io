@@ -49,6 +49,8 @@
  * S22 No cell of a result table (Target Guidance scenario table) breaks across lines or overflows its cell at 1440 or 390
  * S23 Calibration Fit: shown figures are reproduced from the form (apply on or off); with apply on every written input
  *    moves a fitted metric, with apply off the form is untouched
+ * S24 Pareto apply best: the baseline row is the design before the apply, the figures shown reproduce from the form,
+ *    the form carries no float noise
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -490,6 +492,39 @@ try {
       await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
       await runCal(false);
       await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
+      // S24 Pareto "apply best": the baseline row is the design before the apply, the figures shown are reproduced from
+      // the form, and the form shows plain numbers (no float noise such as 1.2300000000000002)
+      if (await p.$('#runPareto')) {
+        const pre = await p.evaluate(() => { const m = window.__ltcLastModel; window.__s24prev = m; return m.pue; });
+        await p.evaluate(() => { const e = document.getElementById('paretoSamples'); if (e) e.value = '200'; document.getElementById('runPareto').click(); });
+        for (let i = 0; i < 60 && await p.evaluate(() => !document.querySelector('#paretoRows tr[data-pareto-idx]')); i++) await new Promise((r) => setTimeout(r, 500));
+        await p.evaluate(() => document.getElementById('applyParetoBest').click());
+        await new Promise((r) => setTimeout(r, 1200));
+        const s24 = await p.evaluate(() => { const m = window.__ltcLastModel;
+          const noisy = [...document.querySelectorAll('.calc-input-panel input[type=number], .ltc-left-rail input[type=number]')]
+            .filter((e) => /\.\d*0000\d|\.\d*9999\d|\d\.\d{5,}/.test(e.value)).map((e) => e.id + '=' + e.value);
+          return { k: [m.pue, m.systemCop, m.netOpex], base: +document.getElementById('basePue').textContent, noisy: noisy.slice(0, 5) }; });
+        ok(Math.abs(s24.base - pre) < 0.0006, `${w} S24 Pareto baseline row PUE ${s24.base} is not the design before the apply (${pre.toFixed(3)})`);
+        ok(s24.noisy.length === 0, `${w} S24 Pareto wrote float noise into the form: ${s24.noisy.join(', ')}`);
+        // S22 (all result tables) + S20 (selected row): no cell of any scenario table on the Charts tab breaks or overflows;
+        // the selected Pareto row is marked without a second hue
+        const s22b = await p.evaluate(() => { document.querySelector('.ltc-tab-btn[data-tab="charts"]').click();
+          document.querySelectorAll('.ltc-acc').forEach((a) => { if (!a.classList.contains('open') && a.querySelector('.scenario-table')) a.querySelector('.ltc-acc-head').click(); });
+          const broken = [...document.querySelectorAll('.scenario-table td, .scenario-table th')].filter((c) => {
+            const t = c.textContent.trim(); if (!t || c.offsetHeight === 0 || t.length > 40) return false;
+            const r = document.createRange(); r.selectNodeContents(c); const lines = new Set([...r.getClientRects()].map((x) => Math.round(x.top))).size;
+            return lines > 1 || c.scrollWidth > c.clientWidth + 1; }).map((c) => c.textContent.trim()).slice(0, 6);
+          const sel = document.querySelector('#paretoRows tr.selected'); let green = null;
+          if (sel) { const cs = getComputedStyle(sel); for (const v of [cs.backgroundColor, cs.outlineColor]) { const m = v.match(/[\d.]+/g); if (m && (+m[3] !== 0) && +m[1] > +m[0] + 30 && +m[1] > +m[2]) green = v; } }
+          return { broken, green }; });
+        ok(s22b.broken.length === 0, `${w} S22 Charts-tab table cells broken across lines or overflowing: ${s22b.broken.join(' | ')}`);
+        ok(!s22b.green, `${w} S20 selected Pareto row marked in a second hue: ${s22b.green}`);
+        await p.evaluate(() => { const e = document.getElementById('inPumpHead'); e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
+        await new Promise((r) => setTimeout(r, 1500));
+        const form = await p.evaluate(() => { const m = window.__ltcLastModel; return [m.pue, m.systemCop, m.netOpex]; });
+        ok(form.every((v, i) => Math.abs(v - s24.k[i]) <= Math.abs(s24.k[i]) * 1e-9 + 1e-9), `${w} S24 Pareto point shows [${s24.k}] but the form computes [${form}]`);
+        await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
+      }
     }
     const sw = await p.evaluate(() => document.documentElement.scrollWidth);
     ok(sw <= w, `${w} S5 scrollWidth ${sw}`);
@@ -498,4 +533,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, 0 errors');
