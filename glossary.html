@@ -137,7 +137,7 @@
             --gl-pill-bg: rgba(146, 64, 14, 0.08);
             --gl-pill-color: #92400e;
             --gl-pill-hover: rgba(146, 64, 14, 0.16);
-            --gl-alpha-bg: rgba(255, 255, 255, 0.95);
+            --gl-alpha-bg: #ffffff;
             --gl-alpha-border: #e2e8f0;
             --gl-alpha-active: #92400e;
             --gl-search-bg: rgba(255, 255, 255, 0.12);
@@ -153,7 +153,7 @@
             --gl-pill-bg: rgba(232, 181, 99, 0.12);
             --gl-pill-color: #E8B563;
             --gl-pill-hover: rgba(232, 181, 99, 0.22);
-            --gl-alpha-bg: rgba(18, 19, 22, 0.95);
+            --gl-alpha-bg: #121316;
             --gl-alpha-border: #2a2d34;
             --gl-alpha-active: #E8B563;
             --gl-letter-color: #E8B563;
@@ -162,7 +162,7 @@
 
         /* Hero */
         .glossary-hero {
-            background: linear-gradient(135deg, var(--gl-bg-hero-start) 0%, var(--gl-bg-hero-mid) 50%, var(--gl-bg-hero-end) 100%);
+            background: var(--gl-bg-hero-end);
             padding: 8rem 2rem 3rem;
             color: #fff;
             text-align: center;
@@ -173,10 +173,9 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background:
-                radial-gradient(circle at 20% 80%, rgba(232, 181, 99, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(232, 181, 99, 0.05) 0%, transparent 50%);
+            background: none;
             z-index: 0;
+            display: none;
         }
         .glossary-hero > * { position: relative; z-index: 1; }
         .glossary-hero h1{font-family:'IBM Plex Sans',system-ui,sans-serif;font-weight:600;
@@ -211,13 +210,12 @@
             width: 100%;
             padding: 14px 16px 14px 48px;
             border: 1px solid var(--gl-search-border);
-            border-radius: 12px;
+            border-radius: 4px;
             background: var(--gl-search-bg);
             color: #fff;
             font-size: 1rem;
             font-family: inherit;
             outline: none;
-            backdrop-filter: blur(8px);
             transition: border-color 0.2s;
         }
         .glossary-search::placeholder { color: rgba(255,255,255,0.5); }
@@ -244,23 +242,22 @@
             justify-content: center;
             flex-wrap: wrap;
             gap: 4px;
-            backdrop-filter: blur(12px);
         }
         .alpha-btn {
             width: 34px;
             height: 34px;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             background: transparent;
             color: var(--text-secondary);
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: color 0.15s, background-color 0.15s;
             font-family: inherit;
         }
         .alpha-btn:hover { background: var(--gl-pill-bg); color: var(--gl-alpha-active); }
-        .alpha-btn.active { background: var(--gl-alpha-active); color: #fff; }
+        .alpha-btn.active { background: transparent; color: var(--gl-alpha-active); box-shadow: inset 0 -2px 0 var(--gl-alpha-active); }
         .alpha-btn.disabled { opacity: 0.3; cursor: default; }
 
         /* Glossary Content */
@@ -273,11 +270,11 @@
         /* Letter Section */
         .letter-section { margin-bottom: 2.5rem; }
         .letter-heading {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--gl-letter-color);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
             padding-bottom: 0.5rem;
-            border-bottom: 3px solid var(--gl-term-border);
+            border-bottom: 1px solid var(--gl-alpha-border);
             margin-bottom: 1.25rem;
             scroll-margin-top: 120px;
         }
@@ -286,15 +283,13 @@
         .term {
             padding: 1rem 1.25rem;
             margin-bottom: 0.75rem;
-            border-left: 3px solid var(--gl-term-border);
-            border-radius: 0 8px 8px 0;
+            border-left: 1px solid var(--gl-alpha-border);
+            border-radius: 4px;
             background: var(--card-bg, #fff);
-            transition: box-shadow 0.2s, transform 0.15s;
+            transition: border-color 0.15s;
+            border: 1px solid var(--gl-alpha-border);
         }
-        .term:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            transform: translateX(4px);
-        }
+        .term:hover { border-color: var(--gl-accent); }
         .term.hidden { display: none; }
         .term-name {
             font-size: 1.05rem;
@@ -321,15 +316,16 @@
         .term-links a {
             display: inline-block;
             padding: 3px 10px;
-            border-radius: 20px;
-            background: var(--gl-pill-bg);
-            color: var(--gl-pill-color);
+            border-radius: 2px;
+            background: transparent;
+            color: var(--text-secondary);
             font-size: 0.78rem;
             font-weight: 500;
             text-decoration: none;
-            transition: background 0.15s;
+            transition: color 0.15s, border-color 0.15s;
+            border: 1px solid var(--gl-alpha-border);
         }
-        .term-links a:hover { background: var(--gl-pill-hover); }
+        .term-links a:hover { color: var(--gl-accent); border-color: var(--gl-accent); }
 
         .no-results {
             text-align: center;
@@ -411,9 +407,8 @@
         justify-content: center !important;
         gap: 8px !important;
         padding: 8px 12px !important;
-        background: rgba(25,27,32,0.92) !important;
+        background: #121316 !important;
         border-top: 1px solid rgba(255,255,255,0.08);
-        backdrop-filter: blur(10px);
         z-index: 100;
     }
     .share-btn { width: 40px !important; height: 40px !important; }
@@ -577,17 +572,11 @@
         <!-- ═══ A ═══ -->
         <section class="letter-section" id="section-A">
             <h2 class="letter-heading">A</h2>
-            <div class="term" id="term-entropy"><h3 class="term-name">Shannon Entropy <span class="term-full">(H)</span></h3><p class="term-def">The information-theoretic floor for lossless compression: the minimum average bits per symbol needed to encode a source. Structured data has entropy far below its raw size, which is why compression works &mdash; but you can never go below it.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a></div></div>
 
-            <div class="term" id="term-kolmogorov-complexity"><h3 class="term-name">Kolmogorov Complexity <span class="term-full">(K(x))</span></h3><p class="term-def">The length of the shortest program that outputs a given string &mdash; its true compressed size. Most long strings are incompressible, so arbitrary data cannot shrink to a tiny size unless it is itself the output of a short program.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a></div></div>
 
-            <div class="term" id="term-knowledge-distillation"><h3 class="term-name">Knowledge Distillation <span class="term-full">(Model / Dataset Distillation)</span></h3><p class="term-def">Training a small 'student' to mimic a large 'teacher', inheriting most capability at a fraction of the parameters. Dataset distillation synthesizes a tiny artificial dataset that trains a model almost as well as the full one.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a></div></div>
 
-            <div class="term" id="term-hyperdimensional-computing"><h3 class="term-name">Hyperdimensional Computing <span class="term-full">(HDC / VSA)</span></h3><p class="term-def">Representing knowledge as very-high-dimensional random vectors and superposing many items into one vector via binding and bundling, recovered approximately &mdash; the principled version of compressing a knowledge base into a single vector.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a></div></div>
 
-            <div class="term" id="term-memristor"><h3 class="term-name">Memristor <span class="term-full">(Analog In-Memory Computing)</span></h3><p class="term-def">A resistive memory device whose crossbar arrays perform vector-matrix multiplication in a single physical step via Ohm's and Kirchhoff's laws, eliminating the von Neumann data-movement bottleneck for large energy-efficiency gains.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a></div></div>
 
-            <div class="term" id="term-rag"><h3 class="term-name">Retrieval-Augmented Generation <span class="term-full">(RAG)</span></h3><p class="term-def">Grounding a language model's answers in retrieved documents: embed a corpus into a vector store, fetch the most relevant chunks for a query, and inject them into the prompt. The highest-ROI way to make a local model accurate on your own data.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a><a href="article-29.html#agents">Article 29</a></div></div>
 
             <div class="term" id="term-approach-temperature"><h3 class="term-name">Approach Temperature <span class="term-full">(ATD)</span></h3><p class="term-def">The closest temperature difference a CDU heat exchanger achieves between the secondary (chip-side) supply and the facility (primary) supply — the residual pinch. Lower approach = a more effective exchanger. Typical L2L CDUs run 3–5 °C (OCP Project Deschutes targets 3 °C). From heat-exchanger effectiveness: approach = (1 − &epsilon;) &times; (hot-in − cold-in).</p><div class="term-links"><a href="cdu-selection-guide.html">CDU Selection Guide</a><a href="cdu-checklist.html">CDU Checklist</a></div></div>
 
@@ -985,6 +974,7 @@
             <div class="term" id="term-hbm"><h3 class="term-name">HBM <span class="term-full">(High Bandwidth Memory)</span></h3><p class="term-def">Stacked DRAM packaged next to the GPU die, giving far higher bandwidth than ordinary GPU memory. An H200 has 141 GB at 4.8 TB/s, and a GB200 NVL72 rack holds 13.4 TB of HBM3E; because decode is bandwidth-bound, HBM bandwidth sets tokens per second [S9][S10].</p><div class="term-links"><a href="article-29.html#hardware">Article 29</a></div></div>
             <div class="term" id="term-hard-gate"><h3 class="term-name">Hard Gate</h3><p class="term-def">A check whose failure blocks progress and cannot be overridden by the agent or its orchestrator. In the article&rsquo;s factory example the hard gates are lint, test, build, nonempty and secrets, and overrides are refused while one fails [S60].</p><div class="term-links"><a href="article-30.html#failure">Article 30</a></div></div>
             <div class="term" id="term-human-in-the-loop"><h3 class="term-name">Human in the Loop <span class="term-full">(HITL)</span></h3><p class="term-def">A design in which a person must approve an action before it takes effect. CISA and partner agencies advise limiting active control of OT infrastructure by AI without a human in the loop, citing safety concerns and latency limitations [S33].</p><div class="term-links"><a href="article-30.html#bms">Article 30</a></div></div>
+            <div class="term" id="term-hyperdimensional-computing"><h3 class="term-name">Hyperdimensional Computing <span class="term-full">(HDC / VSA)</span></h3><p class="term-def">Representing knowledge as very-high-dimensional random vectors and superposing many items into one vector via binding and bundling, recovered approximately &mdash; the principled version of compressing a knowledge base into a single vector.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a></div></div>
         </section>
 
         <!-- ═══ I ═══ -->
@@ -1050,6 +1040,8 @@
 
             <div class="term" id="term-kwh"><h3 class="term-name">kWh <span class="term-full">(Kilowatt-Hour)</span></h3><p class="term-def">A unit of energy equal to one kilowatt of power sustained for one hour. Data center energy consumption is billed in kWh. A 10 MW facility operating at full load consumes 240,000 kWh per day (87.6 million kWh per year). Electricity cost is the largest single OPEX item.</p></div>
 
+            <div class="term" id="term-knowledge-distillation"><h3 class="term-name">Knowledge Distillation <span class="term-full">(Model / Dataset Distillation)</span></h3><p class="term-def">Training a small 'student' to mimic a large 'teacher', inheriting most capability at a fraction of the parameters. Dataset distillation synthesizes a tiny artificial dataset that trains a model almost as well as the full one.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a></div></div>
+            <div class="term" id="term-kolmogorov-complexity"><h3 class="term-name">Kolmogorov Complexity <span class="term-full">(K(x))</span></h3><p class="term-def">The length of the shortest program that outputs a given string &mdash; its true compressed size. Most long strings are incompressible, so arbitrary data cannot shrink to a tiny size unless it is itself the output of a short program.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a></div></div>
             <div class="term" id="term-kraljic-matrix"><h3 class="term-name">Kraljic Matrix</h3><p class="term-def">A 2×2 procurement strategy framework (Peter Kraljic, HBR 1983) that positions items on supply risk (x-axis) versus profit/spend impact (y-axis): Strategic (high-high) → partnership, dual-source; Bottleneck (high risk, low spend) → secure supply, safety stock; Leverage (low risk, high spend) → competitive tender; Non-Critical (low-low) → catalog purchasing. For data center M&amp;E spares, most long-lead equipment (switchgear, transformers, chillers) falls in Strategic or Bottleneck, justifying proactive safety stock and supplier partnership investment.</p><div class="term-links"><a href="spares-readiness-calculator.html">Critical Spares Engine</a></div></div>
 
             <div class="term" id="term-kv-cache"><h3 class="term-name">KV Cache <span class="term-full">(Key&ndash;Value Cache)</span></h3><p class="term-def">The stored key and value vectors of every earlier token, kept so each new token does not recompute them. Bytes = 2 &times; layers &times; KV heads &times; head dim &times; bytes per value &times; tokens &times; batch; Llama 3 70B needs 320 KiB per token in BF16, or 40 GiB for one 128K-token sequence (derived from [S2]).</p><div class="term-links"><a href="article-29.html#kv-cache">Article 29</a></div></div>
@@ -1103,6 +1095,7 @@
             <h2 class="letter-heading">M</h2>
             <div class="term" id="term-manifold"><h3 class="term-name">Manifold <span class="term-full">(Rack Manifold)</span></h3><p class="term-def">The rack-level distribution header that splits CDU secondary flow to each cold plate and recombines the return. The flow path is chip cold-plate &rarr; rack manifold &rarr; CDU &rarr; facility water; the manifold sets per-rack flow balance and houses the quick-disconnect couplers.</p><div class="term-links"><a href="cdu-selection-guide.html">CDU Selection Guide</a></div></div>
 
+            <div class="term" id="term-memristor"><h3 class="term-name">Memristor <span class="term-full">(Analog In-Memory Computing)</span></h3><p class="term-def">A resistive memory device whose crossbar arrays perform vector-matrix multiplication in a single physical step via Ohm's and Kirchhoff's laws, eliminating the von Neumann data-movement bottleneck for large energy-efficiency gains.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a></div></div>
             <div class="term" id="term-metric-vari-metric"><h3 class="term-name">METRIC / VARI-METRIC</h3><p class="term-def">Multi-echelon inventory optimization models for recoverable spare parts. METRIC (Multi-Echelon Technique for Recoverable Item Control, Sherbrooke 1968) minimises expected backorders across a supply network (sites → depot) for a given spares budget, using Poisson demand and Palm's theorem. VARI-METRIC (Slay 1984) adds variance correction, improving accuracy from ~11% to within 1% of the true optimum. Applied to data center fleet management, METRIC/VARI-METRIC determines the optimal split of spare units between regional hubs and central depot to maximise fleet readiness within budget. Superseded in large-scale applications by full MEIO (Multi-Echelon Inventory Optimisation) solvers.</p><div class="term-links"><a href="spares-readiness-calculator.html">Critical Spares Engine</a></div></div>
 
             <div class="term" id="term-mdb"><h3 class="term-name">MDB <span class="term-full">(Main Distribution Board)</span></h3><p class="term-def">The primary electrical panel that receives power from the utility transformer and distributes it to sub-distribution boards, UPS systems, and mechanical loads. The MDB contains the main circuit breaker, bus bars, and metering equipment for the facility.</p></div>
@@ -1281,6 +1274,7 @@
         <!-- ═══ R ═══ -->
         <section class="letter-section" id="section-R">
             <h2 class="letter-heading">R</h2>
+            <div class="term" id="term-rag"><h3 class="term-name">Retrieval-Augmented Generation <span class="term-full">(RAG)</span></h3><p class="term-def">Grounding a language model's answers in retrieved documents: embed a corpus into a vector store, fetch the most relevant chunks for a query, and inject them into the prompt. The highest-ROI way to make a local model accurate on your own data.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a><a href="article-29.html#agents">Article 29</a></div></div>
             <div class="term" id="term-room-integrity"><h3 class="term-name">Room Integrity <span class="term-full">(Door-Fan Test)</span></h3><p class="term-def">The measured air-tightness of a clean-agent protected room, expressed as an equivalent leakage area. NFPA 2001 requires the agent concentration to be retained for a minimum hold time (typically &ge;10 min); a door-fan (blower-door) test verifies the enclosure is tight enough &mdash; otherwise the agent leaks away before the fire is fully extinguished and re-ignites.</p><div class="term-links"><a href="pillar-fire-safety.html">Fire Safety</a><a href="ltc-nfpa-fire-risk.html">NFPA Fire Risk</a></div></div>
             <div class="term" id="term-redfish-coolingunit"><h3 class="term-name">Redfish CoolingUnit</h3><p class="term-def">The DMTF Redfish CoolingUnit schema (DSP2064 v1.1.0, controls landed Dec 2024) — the open telemetry and control API for CDUs: CoolingLoop, CoolantConnector, Pump, LeakDetection, Filters and Reservoirs, plus settable flow / supply-temperature / &Delta;P setpoints. OCP mandates Redfish for 2024+ liquid-cooling deployments.</p><div class="term-links"><a href="cdu-comparison.html">CDU Comparison</a></div></div>
 
@@ -1351,6 +1345,7 @@
 
             <div class="term" id="term-static-ups"><h3 class="term-name">Static UPS</h3><p class="term-def">A solid-state UPS with no moving parts, using power electronics (rectifier, inverter, battery) to provide uninterrupted power. Static UPS is the most common type in data centers, available from 10 kVA to 1,600+ kVA per module with efficiency ratings up to 97% in double-conversion mode.</p></div>
 
+            <div class="term" id="term-entropy"><h3 class="term-name">Shannon Entropy <span class="term-full">(H)</span></h3><p class="term-def">The information-theoretic floor for lossless compression: the minimum average bits per symbol needed to encode a source. Structured data has entropy far below its raw size, which is why compression works &mdash; but you can never go below it.</p><div class="term-links"><a href="article-28.html">The Compression Horizon</a></div></div>
             <div class="term" id="term-structured-cabling"><h3 class="term-name">Structured Cabling</h3><p class="term-def">A standardized approach to data center cabling using organized pathways, patch panels, and labeling systems. TIA-942 defines structured cabling zones: entrance room, main distribution area (MDA), horizontal distribution area (HDA), equipment distribution area (EDA), and zone distribution area (ZDA).</p><div class="term-links"><a href="ltc-ansi-tia-topology-readiness.html">TIA Topology Readiness</a></div></div>
 
             <div class="term" id="term-surge-protection"><h3 class="term-name">Surge Protection <span class="term-full">(SPD)</span></h3><p class="term-def">Devices that protect electrical equipment from voltage spikes caused by lightning, utility switching, or generator transitions. Surge Protective Devices (SPDs) are installed at each level of the power distribution chain (Type 1 at service entrance, Type 2 at sub-panels, Type 3 at equipment).</p></div>

@@ -172,14 +172,14 @@
             --gl-term-border: #92400e;
             --gl-pill-bg: rgba(146, 64, 14, 0.08);
             --gl-pill-color: #92400e;
-            --gl-alpha-bg: rgba(255, 255, 255, 0.95);
+            --gl-alpha-bg: #ffffff;
             --gl-alpha-border: #e2e8f0;
             --gl-alpha-active: #92400e;
             --gl-search-bg: rgba(255, 255, 255, 0.12);
             --gl-search-border: rgba(255, 255, 255, 0.25);
             --gl-letter-color: #92400e;
             --gl-footer-bg: #0e0f12;
-            --gl-glass-bg: rgba(255,255,255,0.85);
+            --gl-glass-bg: #ffffff;
             --gl-glass-border: rgba(0,0,0,0.08);
         }
         [data-theme="dark"] {
@@ -195,13 +195,13 @@
             --gl-card-border: #2a2d34;
             --gl-pill-bg: rgba(232, 181, 99, 0.12);
             --gl-pill-color: #E8B563;
-            --gl-alpha-bg: rgba(18, 19, 22, 0.95);
+            --gl-alpha-bg: #121316;
             --gl-alpha-border: #2a2d34;
             --gl-alpha-active: #E8B563;
             --gl-letter-color: #E8B563;
             --gl-term-border: #E8B563;
             --gl-footer-bg: #0a0b0d;
-            --gl-glass-bg: rgba(18,19,22,0.9);
+            --gl-glass-bg: #121316;
             --gl-glass-border: rgba(255,255,255,0.08);
         }
 
@@ -219,7 +219,6 @@
         .navbar {
             position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             background: var(--gl-glass-bg);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--gl-glass-border);
         }
         .nav-container {
@@ -255,13 +254,14 @@
 
         /* ═══ Hero ═══ */
         .glossary-hero {
-            background: linear-gradient(135deg, var(--gl-bg-hero-start) 0%, var(--gl-bg-hero-mid) 50%, var(--gl-bg-hero-end) 100%);
+            background: var(--gl-bg-hero-end);
             padding: 8rem 2rem 3rem; color: #fff; text-align: center;
             position: relative; overflow: hidden;
         }
         .glossary-hero::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: none;
+            display: none;
         }
         .glossary-hero > * { position: relative; z-index: 1; }
         .glossary-hero h1 {
@@ -278,9 +278,9 @@
         }
         .glossary-search {
             width: 100%; padding: 14px 16px 14px 48px;
-            border: 1px solid var(--gl-search-border); border-radius: 12px;
+            border: 1px solid var(--gl-search-border); border-radius: 4px;
             background: var(--gl-search-bg); color: #fff; font-size: 1rem;
-            font-family: inherit; outline: none; backdrop-filter: blur(8px);
+            font-family: inherit; outline: none;
         }
         .glossary-search::placeholder { color: rgba(255,255,255,0.5); }
         .glossary-search:focus { border-color: rgba(255,255,255,0.5); }
@@ -294,32 +294,32 @@
             position: sticky; top: 60px; z-index: 90;
             background: var(--gl-alpha-bg); border-bottom: 1px solid var(--gl-alpha-border);
             padding: 10px 1rem; display: flex; justify-content: center; flex-wrap: wrap; gap: 4px;
-            backdrop-filter: blur(12px);
         }
         .alpha-btn {
-            width: 34px; height: 34px; border: none; border-radius: 8px;
+            width: 34px; height: 34px; border: none; border-radius: 4px;
             background: transparent; color: var(--gl-text); font-weight: 600;
-            font-size: 0.85rem; cursor: pointer; transition: all 0.15s; font-family: inherit;
+            font-size: 0.85rem; cursor: pointer; transition: color 0.15s, background-color 0.15s; font-family: inherit;
         }
         .alpha-btn:hover { background: var(--gl-pill-bg); color: var(--gl-alpha-active); }
-        .alpha-btn.active { background: var(--gl-alpha-active); color: #fff; }
+        .alpha-btn.active { background: transparent; color: var(--gl-alpha-active); box-shadow: inset 0 -2px 0 var(--gl-alpha-active); }
         .alpha-btn.disabled { opacity: 0.3; cursor: default; }
 
         /* ═══ Glossary Content ═══ */
         .glossary-content { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
         .letter-section { margin-bottom: 2.5rem; }
         .letter-heading {
-            font-size: 2rem; font-weight: 800; color: var(--gl-letter-color);
-            padding-bottom: 0.5rem; border-bottom: 3px solid var(--gl-term-border);
+            font-size: 1.25rem; font-weight: 600; color: var(--text-primary);
+            padding-bottom: 0.5rem; border-bottom: 1px solid var(--gl-alpha-border);
             margin-bottom: 1.25rem; scroll-margin-top: 120px;
         }
         .term {
             padding: 1rem 1.25rem; margin-bottom: 0.75rem;
-            border-left: 3px solid var(--gl-term-border);
-            border-radius: 0 8px 8px 0; background: var(--gl-card-bg);
-            transition: box-shadow 0.2s, transform 0.15s;
+            border-left: 1px solid var(--gl-alpha-border);
+            border-radius: 4px; background: var(--gl-card-bg);
+            transition: border-color 0.15s;
+            border: 1px solid var(--gl-alpha-border);
         }
-        .term:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateX(4px); }
+        .term:hover { border-color: var(--gl-accent); }
         .term.hidden { display: none; }
         .term-name { font-size: 1.05rem; font-weight: 700; color: var(--gl-text-heading); margin: 0 0 0.15rem; }
         .term-en { font-weight: 400; color: var(--gl-text-muted); font-size: 0.85rem; font-style: italic; }
