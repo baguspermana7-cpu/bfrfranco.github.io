@@ -25,7 +25,7 @@
     { key: 'capture', name: 'Capture', nodes: ['racks', 'cdu'],
       result: function (t) { return t('outLiquidLoad') + ' liquid · ' + t('outAirLoad') + ' air'; } },
     { key: 'loop', name: 'Loop', nodes: ['cdu', 'cool'],
-      result: function (t) { return t('outFlow') + ' · ' + t('outPump') + ' pumps'; } },
+      result: function (t) { return t('outFlow') + ' · ' + t('outPump') + ' loop pumps'; } },
     { key: 'rejection', name: 'Rejection', nodes: ['cool', 'crah', 'chiller', 'tower', 'elec'],
       result: function (t) { return 'PUE ' + t('outPue') + ' · COP ' + t('outCop'); } },
     { key: 'cost', name: 'Cost · carbon', nodes: [],

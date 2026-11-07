@@ -66,7 +66,7 @@
     Object.assign(out, {
       itKw: d.it, liquidKw: d.liquidIt, airKw: d.airIt, effectiveCapture: r.input.capturePct,
       deltaT: L.tcsDeltaK, flowLpm: L.tcsLps * 60, massFlowKgS: L.tcsLps * P.CONST.RHO_W / 1000,
-      pumpPowerKw: L.tcsPumpKw + L.fwsPumpKw, cduCount: L.cduTotal,
+      pumpPowerKw: L.tcsPumpKw + L.fwsPumpKw, tcsPumpKw: L.tcsPumpKw, fwsPumpKw: L.fwsPumpKw, cduCount: L.cduTotal,
       pue: r.totals.pueAnnual, pueDesign: r.totals.pue, systemCop: d.it / coolingKw, wue: A.wue,
       annualGwh: A.m0MWh / 1000, annualEnergyCost: A.energyCost, annualWaterCost: A.waterCost,
       annualOpex: A.energyCost + A.waterCost, heatReuseCredit: reuseKwh * r.input.elecPrice * 0.62,

@@ -200,7 +200,7 @@
             kpiCard('kpiItLoad',  'IT Load',        '—', 'MW', ''),
             kpiCard('kpiLiquid',  'Liquid Cooling',  '—', 'MW', ''),
             kpiCard('kpiFlow',    'Total Flow',      '—', 'LPM', ''),
-            kpiCard('kpiPump',    'Pump Power',      '—', 'kW', ''),
+            kpiCard('kpiPump',    'Loop pumps',      '—', 'kW · TCS + FWS', ''),
             kpiCard('kpiPue',     'PUE',             '—', '',   'ltc-kpi-good', 'ltc-kpi-green'),
             kpiCard('kpiCop',     'System COP',      '—', '',   'ltc-kpi-good', 'ltc-kpi-green')
         ].join('');
@@ -1731,7 +1731,7 @@
             '<div class="ltc-scenario-metric"><span>PUE</span><b>' + fmt(model.pue, 3) + '</b>' + (norm ? d(model.pue - norm.pue, 3) : '') + '</div>' +
             '<div class="ltc-scenario-metric"><span>System COP</span><b>' + fmt(model.systemCop, 2) + '</b>' + (norm ? d(model.systemCop - norm.systemCop, 2) : '') + '</div>' +
             '<div class="ltc-scenario-metric"><span>Risk Index</span><b>' + fmt(model.riskIndex, 1) + '</b>' + (norm ? d(model.riskIndex - norm.riskIndex, 1) : '') + '</div>' +
-            '<div class="ltc-scenario-metric"><span>Pump Power</span><b>' + fmt(model.pumpPowerKw, 1) + ' kW</b>' + (norm ? d(model.pumpPowerKw - norm.pumpPowerKw, 1) : '') + '</div>';
+            '<div class="ltc-scenario-metric"><span>Loop pumps</span><b>' + fmt(model.pumpPowerKw, 1) + ' kW</b>' + (norm ? d(model.pumpPowerKw - norm.pumpPowerKw, 1) : '') + '</div>';
     }
 
     // REPORT scenario-compare — snapshots are pure engine KPIs; deltas are computed.
@@ -1743,7 +1743,7 @@
         { k: 'pue',    lbl: 'PUE',              dec: 3, lowerBetter: true },
         { k: 'cop',    lbl: 'System COP',       dec: 2, lowerBetter: false },
         { k: 'flow',   lbl: 'Total Flow (LPM)', dec: 0, neutral: true },
-        { k: 'pump',   lbl: 'Pump Power (kW)',  dec: 1, lowerBetter: true },
+        { k: 'pump',   lbl: 'Loop pumps (kW)',  dec: 1, lowerBetter: true },
         { k: 'risk',   lbl: 'Risk Index',       dec: 1, lowerBetter: true },
         { k: 'opex',   lbl: 'Net OPEX ($/yr)',  dec: 0, lowerBetter: true, usd: true },
         { k: 'carbon', lbl: 'Carbon (tCO2e/yr)', dec: 0, lowerBetter: true }
@@ -1832,12 +1832,16 @@
         // Card 2: Pump & Hydraulic
         var c2 = resCard('PUMP & HYDRAULIC', [
             { lbl: 'Pump Head',           val: fmt(inp.pumpHead, 1) + ' m' },
-            { lbl: 'Pump Power',          val: fmt(model.pumpPowerKw, 2) + ' kW', key: 'pumpPowerKw' },
             { lbl: 'Pump Efficiency',     val: fmt(inp.pumpEff, 1) + '%' },
+            /* 3.27.0 — head and efficiency are the TCS pump's; the sum of both loops sat between them as
+             * "Pump Power", so rho g H Q / eta from this card gave half the shown figure */
+            model.tcsPumpKw != null ? { lbl: 'TCS pumps', val: fmt(model.tcsPumpKw, 1) + ' kW' } : null,
+            model.fwsPumpKw != null ? { lbl: 'FWS pumps', val: fmt(model.fwsPumpKw, 1) + ' kW' } : null,
+            { lbl: model.tcsPumpKw != null ? 'Both loops' : 'Pump Power', val: fmt(model.pumpPowerKw, 1) + ' kW', key: 'pumpPowerKw' },
             { lbl: 'Pipe Loss Factor',    val: fmt(inp.coefPipeLoss, 3) + 'x' },
             { lbl: 'Hydraulic Margin',    val: fmt(inp.hydraulicMargin, 0) + '%' },
             { lbl: 'Liquid COP',          val: fmt(intern.liquidCop || model.liquidCop, 2) }
-        ]);
+        ].filter(Boolean));
 
         // Card 3: Performance
         var c3 = resCard('PERFORMANCE', [
@@ -1991,7 +1995,7 @@
             { lbl: 'IT Load',           kw: bd.it || model.itKw || 0,    note: '100% productive' },
             { lbl: 'Liquid Cooling',    kw: bd.liquidCooling || 0,        note: fmt((model.effectiveCapture||0), 1) + '% captured' },
             { lbl: 'Air Cooling',       kw: bd.airCooling || 0,           note: 'residual path' },
-            { lbl: 'Pump Power',        kw: bd.pump || model.pumpPowerKw || 0, note: 'hydraulic losses incl.' },
+            { lbl: model.plant ? 'TCS pumps' : 'Pump Power', kw: bd.pump || model.pumpPowerKw || 0, note: model.plant ? 'CDU loop; FWS pumps are in Liquid Cooling' : 'hydraulic losses incl.' },
             { lbl: 'Elec Losses',       kw: bd.elecLoss || 0,             note: 'UPS + distribution' },
             { lbl: 'Aux / Fan',         kw: bd.aux || 0,                   note: 'lighting, HVAC misc' }
         ];

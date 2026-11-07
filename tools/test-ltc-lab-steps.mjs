@@ -23,6 +23,9 @@
  * S11 The six primary sliders show the values the model runs on: equal to their inputs after load (the plant pull sets
  *    them silently) and after a programmatic set; their ranges hold the plant default (IT 100 MW) and the plant clamp
  *    (capture 99 %)
+ * S12 Pump power names one plant quantity per label: Results has a TCS pump row equal to rho g H Q / eta from the shown
+ *    head, flow and efficiency; the KPI says it sums TCS + FWS and equals that sum; the energy-balance pump row is the
+ *    TCS pumps; the energy-balance rows add up to the Total Facility row
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -64,6 +67,29 @@ try {
       a.value = a.dataset.was; a.dispatchEvent(new Event('change', { bubbles: true })); return r; });
     if (ac.known) ok(ac.shown === ac.want, `${w} S11 architecture card shows ${ac.shown}, model ${ac.want}`);
     await new Promise((r) => setTimeout(r, 1200));
+    // S12 pump power: each label names one plant quantity and the TCS row reproduces rho g H Q / eta from what is shown
+    const pw = await p.evaluate(() => {
+      const m = window.__ltcLastModel || {}, r = m.plant, num = (t) => parseFloat(String(t).replace(/,/g, ''));
+      const rows = Object.fromEntries([...document.querySelectorAll('#ltcTabResults .ltc-res-row')].map((x) =>
+        [x.querySelector('.ltc-res-lbl').textContent.trim(), num(x.querySelector('.ltc-res-val').textContent)]));
+      const kpi = document.getElementById('kpiPump'), kl = kpi && kpi.parentElement.querySelector('.ltc-kpi-label').textContent.trim();
+      const eb = [...document.querySelectorAll('.ltc-etable tbody tr')].map((t) => [t.cells[0].textContent.trim(), num(t.cells[1].textContent)]);
+      const foot = num(document.querySelector('.ltc-etable tfoot td:nth-child(2)')?.textContent);
+      return { rows, kl, kv: kpi && num(kpi.textContent), eb, foot, tcs: r && r.liquid.tcsPumpKw, fws: r && r.liquid.fwsPumpKw };
+    });
+    const tcsRow = pw.rows['TCS pumps'];
+    ok(tcsRow != null, `${w} S12 no "TCS pumps" row in Results (rows: ${Object.keys(pw.rows).filter((k) => /pump/i.test(k)).join(', ')})`);
+    if (tcsRow != null) {
+      const calc = 997 * 9.81 * pw.rows['Pump Head'] * (pw.rows['Volumetric Flow'] / 60000) / (pw.rows['Pump Efficiency'] / 100) / 1000;
+      ok(Math.abs(calc - tcsRow) <= tcsRow * 0.002 + 0.05, `${w} S12 TCS pump ${tcsRow} kW, rho g H Q / eta from the shown row = ${calc.toFixed(1)}`);
+      ok(Math.abs(tcsRow - pw.tcs) <= 0.051, `${w} S12 TCS row ${tcsRow} != plant ${pw.tcs}`);
+    }
+    ok(/TCS\s*\+\s*FWS|both loops|loop pumps/i.test(pw.kl || ''), `${w} S12 KPI "${pw.kl}" does not say it sums two loops`);
+    ok(Math.abs(pw.kv - (pw.tcs + pw.fws)) <= 0.06, `${w} S12 KPI ${pw.kv} != TCS + FWS ${pw.tcs + pw.fws}`);
+    const ebp = pw.eb.find((e) => /pump/i.test(e[0]));
+    ok(ebp && /TCS/.test(ebp[0]) && Math.abs(ebp[1] - pw.tcs) <= 0.06, `${w} S12 energy-balance pump row ${JSON.stringify(ebp)} vs TCS ${pw.tcs}`);
+    const ebSum = pw.eb.reduce((a, e) => a + e[1], 0);
+    ok(Math.abs(ebSum - pw.foot) <= pw.foot * 0.001, `${w} S12 energy-balance rows sum ${ebSum.toFixed(1)} != Total Facility ${pw.foot}`);
     const s1 = await p.evaluate(() => ({ n: document.querySelectorAll('.ltc-step').length, cur: [...document.querySelectorAll('.ltc-step[aria-current]')].map((e) => e.id),
       res: [...document.querySelectorAll('.ltc-step-res')].map((e) => e.textContent.trim()),
       lit: [...document.querySelectorAll('rect.ltc-step-node')].map((r) => r.getAttribute('data-rzd-node')).sort().join(',') }));
@@ -189,4 +215,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, 0 errors');
