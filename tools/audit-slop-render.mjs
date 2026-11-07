@@ -47,7 +47,7 @@ function scan() {
     const bl = parseFloat(c.borderLeftWidth), br = parseFloat(c.borderRightWidth), bt = parseFloat(c.borderTopWidth), bb = parseFloat(c.borderBottomWidth);
     const side = bl >= 2 && bt <= 1 && bb <= 1 && br <= 1 ? c.borderLeftColor : br >= 2 && bt <= 1 && bb <= 1 && bl <= 1 ? c.borderRightColor : null;
     if (side && sat(side) > 0.25 && r.height >= 40 && c.borderLeftStyle !== 'none') out.rail.push(name(e));
-    const rad = parseFloat(c.borderTopLeftRadius) || 0;
+    const rr = c.borderTopLeftRadius; const rad = /%/.test(rr) ? (parseFloat(rr) || 0) * Math.min(r.width, r.height) / 100 : (parseFloat(rr) || 0);
     const filled = !/rgba\(0, 0, 0, 0\)|transparent/.test(c.backgroundColor) || bt >= 1;
     if (rad >= 12 && r.height < 44 && filled && e.tagName !== 'INPUT' && !/toggle|switch|avatar|dot|knob|thumb/i.test(e.className)) out.pill.push(name(e));
     if (rad > 8 && r.width >= 200 && !/rgba\(0, 0, 0, 0\)|transparent/.test(c.backgroundColor)) out.round.push(name(e));
