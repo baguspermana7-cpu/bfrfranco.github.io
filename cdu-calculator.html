@@ -86,23 +86,20 @@
         .cc-validation b { font-weight:700; }
         [data-theme="dark"] .cc-validation { color:#fca5a5; background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.5); }
         .tip { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; margin-left:auto; background:rgba(232,181,99,.12); border:1px solid rgba(232,181,99,.35); border-radius:50%; font-size:10px; color:var(--cdu-primary); cursor:help; position:relative; }
-        .tip .tipbox { display:none; position:absolute; bottom:130%; right:0; width:248px; background:#0e0f12; color:#e2e8f0; border:1px solid #334155; border-radius:8px; padding:.6rem .7rem; font-size:.74rem; font-weight:400; line-height:1.5; z-index:30; box-shadow:0 8px 24px rgba(0,0,0,.4); text-align:left; }
+        .tip .tipbox { display:none; position:absolute; bottom:130%; right:0; width:248px; background:#0e0f12; color:#e2e8f0; border:1px solid #334155; border-radius:4px; padding:.6rem .7rem; font-size:.74rem; font-weight:400; line-height:1.5; z-index:30; box-shadow:0 8px 24px rgba(0,0,0,.4); text-align:left; }
         .tip:hover .tipbox { display:block; }
         .tip .tipbox b { color:var(--cdu-primary); }
         /* results */
         .cc-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.8rem; }
-        .kpi { background:var(--cdu-card); border:1px solid var(--cdu-border); border-left:2px solid var(--cdu-primary); border-radius:4px; padding:.85rem .95rem; }
-        .kpi.ok { border-left-color:#0891b2; }
-        .kpi.warn { border-left-color:#d97706; }
-        .kpi.alarm { border-left-color:#dc2626; }
+        .kpi { background:var(--cdu-card); border:1px solid var(--cdu-border); border-radius:4px; padding:.85rem .95rem; }
         .kpi-label { font-size:.68rem; font-family:'JetBrains Mono',monospace; letter-spacing:.06em; text-transform:uppercase; color:var(--cdu-muted); display:flex; align-items:center; gap:.4rem; }
         .kpi-val { font-size:1.32rem; font-weight:700; font-family:'JetBrains Mono',monospace; margin:.2rem 0 .1rem; font-variant-numeric:tabular-nums slashed-zero; }
         .kpi-sub { font-size:.72rem; color:var(--cdu-muted); line-height:1.4; }
-        .chip { font-family:'JetBrains Mono',monospace; font-size:.56rem; font-weight:700; letter-spacing:.06em; padding:1px 5px; border-radius:4px; text-transform:uppercase; }
-        .chip.derived { background:rgba(6,182,212,.14); color:#155e75; }
+        .chip { font-family:'JetBrains Mono',monospace; font-size:.68rem; font-weight:500; letter-spacing:0; padding:0; margin-left:.35rem; border-radius:0; background:none !important; text-transform:none; }
+        .chip.derived { color:var(--cdu-muted); }
         .chip.warn { background:rgba(217,119,6,.16); color:#92400e; }
         .chip.alarm { background:rgba(220,38,38,.16); color:#b91c1c; }
-        [data-theme="dark"] .chip.derived { color:#67e8f9; }
+        [data-theme="dark"] .chip.derived { color:var(--cdu-muted); }
         .cc-note { grid-column:1 / -1; border:1px dashed var(--cdu-border); border-radius:4px; background:var(--cdu-inset); padding:.9rem 1.1rem; font-size:.8rem; color:var(--cdu-muted); line-height:1.6; }
         .cc-note b { color:var(--cdu-text); }
         .cc-note a { color:var(--cdu-primary); text-decoration:underline; text-underline-offset:2px; }
@@ -118,12 +115,12 @@
         /* pro section + gate */
         .cc-pro { grid-column:1 / -1; position:relative; margin-top:.4rem; }
         .cc-pro.locked > .cc-pro-inner { filter:blur(6px); user-select:none; pointer-events:none; }
-        .cc-pro-overlay { display:none; position:absolute; inset:0; z-index:10; flex-direction:column; align-items:center; justify-content:center; gap:.6rem; background:rgba(25,27,32,.78); border-radius:12px; cursor:pointer; }
+        .cc-pro-overlay { display:none; position:absolute; inset:0; z-index:10; flex-direction:column; align-items:center; justify-content:center; gap:.6rem; background:rgba(25,27,32,.78); border-radius:4px; cursor:pointer; }
         .cc-pro.locked .cc-pro-overlay { display:flex; }
         .cc-pro-overlay i { font-size:1.8rem; color:var(--rz-accent-ui); }
         .cc-pro-overlay .t { font-weight:700; color:#fff; }
         .cc-pro-overlay .d { font-size:.8rem; color:#cbd5e1; max-width:300px; text-align:center; }
-        .cc-pro-overlay .b { padding:8px 18px; background:#64748b; border:none; border-radius:8px; color:#fff; font-weight:600; font-size:.8rem; cursor:pointer; }
+        .cc-pro-overlay .b { padding:8px 18px; background:#64748b; border:none; border-radius:4px; color:#fff; font-weight:600; font-size:.8rem; cursor:pointer; }
         .cc-pro-inner { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:.9rem; }
         .cc-pro-panel { background:var(--cdu-card); border:1px solid var(--cdu-border); border-top:2px solid var(--rz-accent-ui); border-radius:4px; padding:1rem 1.1rem; }
         .cc-pro-panel h3 { font-size:.8rem; font-family:'JetBrains Mono',monospace; letter-spacing:.05em; text-transform:uppercase; color:var(--rz-accent-ui); margin:0 0 .7rem; }
@@ -437,7 +434,8 @@
         function kpiCard(label, value, unit, sub, state){
             var cls = state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'ok');
             var chip = state==='alarm' ? 'alarm' : (state==='warn' ? 'warn' : 'derived');
-            return '<div class="kpi '+cls+'"><div class="kpi-label">'+label+' <span class="chip '+chip+'">Derived</span></div>'+
+            var word = state==='alarm' ? 'out of band' : (state==='warn' ? 'watch' : 'derived');
+            return '<div class="kpi '+cls+'"><div class="kpi-label">'+label+' <span class="chip '+chip+'">'+word+'</span></div>'+
                    '<div class="kpi-val">'+value+'<span style="font-size:.8rem;color:var(--cdu-muted);font-weight:500;"> '+unit+'</span></div>'+
                    '<div class="kpi-sub">'+sub+'</div></div>';
         }
@@ -719,7 +717,7 @@
         function ccReportSections(){
             var pro=lastPro, rows='';
             document.querySelectorAll('#ccKpis .kpi').forEach(function(k){
-                rows+='<tr><td>'+k.querySelector('.kpi-label').textContent.replace('Derived','').trim()+'</td><td>'+k.querySelector('.kpi-val').textContent.trim()+'</td><td>'+(k.getAttribute('data-basis')||'derived')+'</td></tr>';
+                rows+='<tr><td>'+k.querySelector('.kpi-label').firstChild.textContent.trim()+'</td><td>'+k.querySelector('.kpi-val').textContent.trim()+'</td><td>'+(k.getAttribute('data-basis')||'derived')+'</td></tr>';
             });
             var out=[{ id:'sizing', label:'Sizing results (derived)',
                 html:'<table><tr><th>Metric</th><th>Value</th><th>Basis</th></tr>'+rows+'</table>' }];
