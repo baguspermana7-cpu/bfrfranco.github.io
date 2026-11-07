@@ -1764,3 +1764,25 @@ body.ltc-revamp .scenario-table { table-layout: auto; width: max-content; min-wi
 /* a picked Pareto point is marked like a pressed chip: amber hairline, no green fill */
 body.ltc-revamp .scenario-table tbody tr.clickable:hover { background: var(--ltc-tile-bg); }
 body.ltc-revamp .scenario-table tbody tr.clickable.selected { background: transparent; outline: 1px solid var(--ltc-accent); outline-offset: -1px; }
+
+/* 3.27.0 — S26: the lab's legacy chrome (Charts tab and shared controls) on the neutral register. The page's
+ * --text-secondary was slate (#A0AEC0 / #334155) and status pills, help buttons and notes carried green, blue and
+ * navy fills. "ok" is not an alarm, so it reads in the text colour; warn is amber; err stays red as a state word. */
+body.ltc-revamp { --text-secondary: var(--ltc-muted); }
+body.ltc-revamp .status-pill { background: transparent; border-color: var(--ltc-hairline); color: var(--ltc-text); }
+body.ltc-revamp .status-pill.ok { color: var(--ltc-text); border-color: var(--ltc-hairline); }
+body.ltc-revamp .status-pill.warn { color: var(--ltc-accent); border-color: var(--ltc-accent); }
+body.ltc-revamp .status-pill.err { color: #e5484d; border-color: rgba(229, 72, 77, 0.55); }
+:root:not([data-theme="dark"]) body.ltc-revamp .status-pill.err { color: #b42318; }
+body.ltc-revamp .mode-help-btn { background: transparent; border: 1px solid var(--ltc-hairline); color: var(--ltc-muted); border-radius: 4px; }
+body.ltc-revamp .mode-help-btn:hover,
+body.ltc-revamp .mode-help-btn:focus-visible { background: transparent; border-color: var(--ltc-accent); color: var(--ltc-accent); }
+body.ltc-revamp .tooltip-trigger,
+body.ltc-revamp .mode-state,
+body.ltc-revamp .block-detail-head p,
+body.ltc-revamp .sankey-drill-head p,
+body.ltc-revamp .mode-help-head p,
+body.ltc-revamp .mode-help-table th,
+body.ltc-revamp .sankey-drill-table th { color: var(--ltc-muted); }
+body.ltc-revamp .note-box,
+body.ltc-revamp .hist-placeholder { border: 1px solid var(--ltc-hairline); border-radius: 4px; background: transparent; }

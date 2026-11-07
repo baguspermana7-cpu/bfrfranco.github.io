@@ -52,6 +52,7 @@
  * S24 Pareto apply best: the baseline row is the design before the apply, the figures shown reproduce from the form,
  *    the form carries no float noise
  * S25 (plant) The energy Sankey adds up to the plant's facility power; aux, pump and fan nodes are plant figures
+ * S26 Charts tab chrome: no text with a hue cast except the amber accent and a fault-red state pill; no dashed borders
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -514,6 +515,23 @@ try {
         ok(Math.abs(s25.pump - s25.plantPump) <= 1, `${w} S25 Sankey Pump Drive ${s25.pump} kW != plant TCS pumps ${Math.round(s25.plantPump)} kW`);
         ok(Math.abs(s25.fan - s25.plantFan) <= 1, `${w} S25 Sankey Fan Power ${s25.fan} kW != plant fans ${Math.round(s25.plantFan)} kW`);
       }
+      // S26 Charts tab chrome: no text with a hue cast (slate, blue, green) except the amber accent and a fault-red state
+      // pill, and no dashed or dotted borders
+      const s26 = await p.evaluate(() => { document.querySelector('.ltc-tab-btn[data-tab="charts"]').click();
+        document.querySelectorAll('.ltc-acc').forEach((a) => { if (!a.classList.contains('open') && a.offsetParent) a.querySelector('.ltc-acc-head').click(); });
+        const panel = document.getElementById('ltcTabCharts'); if (!panel) return { cast: ['no #ltcTabCharts'], dashed: [] };
+        const hue = (c) => { const m = c.match(/[\d.]+/g); if (!m) return null; const [r, g, bb, a] = m.map(Number); if (a === 0) return null;
+          const mx = Math.max(r, g, bb), mn = Math.min(r, g, bb); if (mx - mn <= 25) return null; let h;
+          if (mx === r) h = 60 * (((g - bb) / (mx - mn)) % 6); else if (mx === g) h = 60 * ((bb - r) / (mx - mn) + 2); else h = 60 * ((r - g) / (mx - mn) + 4); return (h + 360) % 360; };
+        const vis = [...panel.querySelectorAll('*')].filter((e) => e.offsetParent && !e.closest('svg'));
+        const cast = vis.filter((e) => { if (!e.textContent.trim() || [...e.childNodes].every((n) => n.nodeType !== 3 || !n.textContent.trim())) return false;
+          const h = hue(getComputedStyle(e).color); if (h === null || (h >= 25 && h <= 50)) return false;
+          return !(e.matches('.status-pill.err') && (h < 15 || h > 345)); }).map((e) => e.tagName.toLowerCase() + '.' + [...e.classList].join('.') + ' ' + getComputedStyle(e).color);
+        const dashed = vis.filter((e) => { const cs = getComputedStyle(e); return ['Top', 'Right', 'Bottom', 'Left'].some((k) => /dashed|dotted/.test(cs['border' + k + 'Style']) && parseFloat(cs['border' + k + 'Width']) > 0); })
+          .map((e) => e.id || e.className);
+        return { cast: [...new Set(cast)].slice(0, 6), dashed: [...new Set(dashed)].slice(0, 6) }; });
+      ok(s26.cast.length === 0, `${w} S26 Charts-tab text with a hue cast: ${s26.cast.join(' | ')}`);
+      ok(s26.dashed.length === 0, `${w} S26 Charts-tab dashed/dotted borders: ${s26.dashed.join(', ')}`);
       // S24 Pareto "apply best": the baseline row is the design before the apply, the figures shown are reproduced from
       // the form, and the form shows plain numbers (no float noise such as 1.2300000000000002)
       if (await p.$('#runPareto')) {
@@ -555,4 +573,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, 0 errors');
