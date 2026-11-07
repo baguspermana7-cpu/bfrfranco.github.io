@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v3.24.44 — 2026-11-07 — "Hub tools on graphite (R2)"
+
+Owner: *"continue, polish more, sempurnakan"*. Release R2a of the hub-tools plan.
+
+### Changed
+- **LTC standards workbench (hub + five modules)**: the inline token block moves from navy (#0a0e1a, #111827) to the hub graphite (#0b0c0e, #121316, #1b1d22); the OK-state green is the site's status green #6aa588 instead of neon #00E07A; links take the text colour with an amber hover underline instead of cyan. Navy fallbacks in `js/ltc-app.js`, `js/ltc-dh01.js` and `js/ltc-report.js` follow.
+- **LTC modelling lab**: the navy primary gradient, the radial aurora, 19 two-stop panel gradients, 9 backdrop blurs and 3 hover lifts are gone. Panels take the card colour, data bars keep their hue as a flat fill, the navbar is solid, and four leftover navy surfaces are graphite. The two gradients left are the red-to-green scale (data) and the loading shimmer. `css/ltc-lab.css` follows; the KPI strip is one framed readout row with hairline dividers and mono values, with no tinted "good" cells.
+- **The three LTC manuals** (modelling lab, standards lab, fire pillar) take the manual family's values: neon #00FF88 becomes the status green. They leave the EXCLUDE set of `tools/sweep-site-register.py`.
+- **Fire system P&ID**: the page no longer loads the Tailwind CDN script at runtime; the 35 utility classes it used are a local `<style id="fs-utilities">` block, with 4 px radii. Navy symbol fills (#0c1424, #020a16, #04121c) are graphite.
+- **DC market tracker**: the Monte Carlo projection uses a seeded generator (mulberry32, seed 20260101), so the same inputs give the same P10/P50/P90 on every load.
+- **Data hall AI**: 20 HMI header gradients and 16 backdrop blurs are gone; panels are flat graphite (light: white). Three gradients remain: the heat scale, a hard-stop line and the hatch pattern.
+- **Cockpits**: the dc-conventional sidebar loses its navy gradient, dialog backdrops lose blur and the navy tint, and the skip link on all seven cockpits is graphite instead of navy. The ict CCTV cyan glow and the fuel hero gradient are removed. Engine version pins are unchanged. At phone width the dc-conventional subsystem row keeps each item at its label width and scrolls, instead of letting 5 of 7 labels run into each other.
+- **Cx field manual**: 40 source-list entries that pointed at private working files (`../case_ledger.json`, "working files", `research/RF-33.md`) now name the MSC-1 example campus described on the manual index.
+
+### Gates
+- `tools/test-cx-handbook.py` C4 also bans those private paths: red on the previous chapter 18 (2 hits), green now.
+- audit-vibecode §A27–34: neon-green 17 → 14 files site-wide; no LTC, calculator or manual file is flagged for navy or neon.
+
 ## v3.24.42 — 2026-11-03 — "Hub explorers"
 
 Owner: *"lakukan update dan enhancement utk semua tools di dc hub"*. Release R1 of the hub-tools plan: the six static hub pages.
