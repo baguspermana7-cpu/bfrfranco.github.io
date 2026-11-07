@@ -7234,6 +7234,16 @@
                     gen: {diesel:1.00,gas:1.10,dualfuel:1.25,hvo:1.08},
                     density: {standard:{kw:6,cool:1.0,pow:1.0},medium:{kw:12,cool:1.15,pow:1.05},high:{kw:25,cool:1.35,pow:1.15},ai_hpc:{kw:75,cool:1.60,pow:1.30}},
                     baseKw: {electrical:72,mechanical_air:35,mechanical_dlc:50,fire:12,security:6,it:11,controls:14,building:5},
+                    /* ── programPlan (v3.26.0) — the editable schedule layer over programRich. crewPerLevel = the
+                     * Cx engineers per crew-day each level's labour term carries (hoisted from levelCosts, values
+                     * unchanged); man-hours = crew-days × crew × hoursPerCrewDay; crew needed on site = crew-days ÷
+                     * (calendar months × workDaysPerMonth) ÷ shift productivity; a 2×12 h shift pattern raises
+                     * productivity and the labour rate (overtime premium). Screening constants. ── */
+                    plan: {
+                        crewPerLevel: { l0: 2.5, l1: 2, l2: 3, l3: 4, l4: 5, l5: 8, l6: 3 },
+                        hoursPerCrewDay: 8, workDaysPerMonth: 22, siteCrewCapDefault: 20,
+                        shifts: { '1x8': { label: '1 × 8 h', productivity: 1.0, rateMult: 1.0 }, '2x12': { label: '2 × 12 h', productivity: 1.4, rateMult: 1.25 } }
+                    },
                     /* Fixed display proportions (grand-total split — realistic cost weights). */
                     levelProportions: {l0:0.03,l1:0.04,l2:0.10,l3:0.22,l4:0.20,l5:0.32,l6:0.09},
                     levelLabels: {l0:'L0 Design & Cx Prep',l1:'L1 Factory Witness',l2:'L2 Standalone Functional',l3:'L3 System Functional',l4:'L4 Subsystem Integration',l5:'L5 Integrated Systems Test',l6:'L6 Closeout & Turnover'},
@@ -9369,6 +9379,7 @@
             'reliability':            { source: 'IEEE 493 (Gold Book) typical component MTBF/MTTR + Uptime Institute Tier Standard availability targets', asOf: '2026', unit: 'hours (MTBF/MTTR) + availability fraction', method: 'screening-grade RAM inputs; NOT a certified reliability/FMEA study' },
             'site':                   { source: 'DC site-selection factor weighting (power + grid + seismic + talent + tax + carbon + flood + latency + water) — engine heuristic informed by 451/CBRE/Uptime site-selection criteria', asOf: '2026', unit: 'weights (fraction, sum=1) + grade bands', method: 'transparent weighted-factor screen; factor inputs are caller-supplied 0-1 goodness scores' },
             'commissioning':          { source: 'Standard DC commissioning sequence (ASHRAE Guideline 0 / BCxA + Uptime Cx) — L1–L5 levels + IST/SAT/FAT + punchlist; weights are an engine readiness heuristic', asOf: '2026', unit: 'weights (fraction, sum=1) + readiness %', method: 'weighted completion index; NOT a Cx authority sign-off' },
+            'commissioning.cx.rich.plan': { source: 'Cx program plan layer (v3.26.0): crew per level = the staffing each level\'s labour term carried in the cx-calculator model (hoisted, unchanged); 8 h crew-day; 22 working days/month (construction convention); 2×12 h shift = 1.4× productivity at a 1.25× labour rate (construction overtime/extended-shift productivity literature, screening); 20-person site cap as a default planning ceiling', asOf: '2026', unit: 'people · h · days/month · multipliers', method: 'SCREENING — project resource plans supersede' },
             'commissioning.istScenarios': { source: 'Workstream G — Level-5 Integrated Systems Test scenario library: scripted failure scenarios (black-building/pull-the-plug, generator step-load + fuel endurance, UPS transfer + autonomy, dual A/B source transfer, bus-tie + interlock, cooling failover + ramp-up, mechanical N+2→N degradation hotspot map, fire/EPO cause-and-effect, BMS/network failover). Purpose + preconditions + scripted method + acceptance + what-to-observe + systems + duration + governing standard. Uptime Tier Certification of Constructed Facility IST practice + NFPA 110/72/75 + ISO 8528 + IEC 62040-3 + ASHRAE TC9.9', asOf: '2026', unit: 'scenario procedures (qualitative) + duration hrs + appliesFrom redundancy gate', method: 'IST planning template — the project IST script is authored by the CxA' },
             'asset':                  { source: 'ASHRAE Equipment Life Expectancy + manufacturer service-life data (design lives); health-index weighting is an engine asset-management heuristic; lifecycle replacement intervals + $/kW lifted from DCMOC CapexEngine (UPS/gen/CRAC/PDU/BMS/fire)', asOf: '2026', unit: 'years + weights (sum=1) + health % + $/kW replacement', method: 'screening health + lifecycle model; NOT a condition survey' },
             'construction':           { source: 'Canonical DC build phase sequence (design→permit→procurement→civil→MEP→commissioning) + typical fast-track overlap factors — engine scheduling heuristic', asOf: '2026', unit: 'months (durations) + overlap fractions', method: 'CPM-style forward pass with per-phase overlap; screening schedule, NOT a resource-loaded programme' },
@@ -12885,17 +12896,17 @@
                 levelCosts: function (inp, dur, eq) {
                     var C = RZEngine.models.commissioning;
                     eq = eq || C.equipScale(inp); dur = dur || C.levelDurations(inp, eq);
-                    var r = C._rate(inp.region);
-                    var l0 = (dur.l0 * r.cxDay * 2.5 + inp.itLoad * 2) * r.mult;
-                    var l1 = dur.l1 * r.cxDay * 2 + dur.l1 * r.perDiem;
-                    var l2 = dur.l2 * r.cxDay * 3 + dur.l2 * 350 + inp.itLoad * 0.5;
-                    var l3 = dur.l3 * r.cxDay * 4 + (eq.generators * 12 + 8) * 350 + dur.l3 * 500 + (eq.generators * 2 + eq.chillers * 2) * r.oemDay;
+                    var r = C._rate(inp.region), CP = DATA.commissioning.cx.rich.plan.crewPerLevel;
+                    var l0 = (dur.l0 * r.cxDay * CP.l0 + inp.itLoad * 2) * r.mult;
+                    var l1 = dur.l1 * r.cxDay * CP.l1 + dur.l1 * r.perDiem;
+                    var l2 = dur.l2 * r.cxDay * CP.l2 + dur.l2 * 350 + inp.itLoad * 0.5;
+                    var l3 = dur.l3 * r.cxDay * CP.l3 + (eq.generators * 12 + 8) * 350 + dur.l3 * 500 + (eq.generators * 2 + eq.chillers * 2) * r.oemDay;
                     var lbHrs = 24; if (inp.redundancy === '2N' || inp.redundancy === '2N+1') lbHrs *= 2;
-                    var l4 = dur.l4 * r.cxDay * 5 + lbHrs * 350 + dur.l4 * 200 * 4 + dur.l4 * 600;
+                    var l4 = dur.l4 * r.cxDay * CP.l4 + lbHrs * 350 + dur.l4 * 200 * 4 + dur.l4 * 600;
                     var mw = inp.itLoad / 1000;
                     var lbDays = (inp.redundancy === '2N' || inp.redundancy === '2N+1') ? 5 : (inp.redundancy === 'N+1' ? 2 : 1);
-                    var l5 = dur.l5 * r.cxDay * 8 + mw * 8000 * lbDays + 20 * inp.itLoad * 0.3 * r.diesel + dur.l5 * r.witnessDay;
-                    var l6 = (dur.l6 * r.cxDay * 3 + Math.ceil(inp.itLoad / 2000) * r.cxDay * 2 + inp.itLoad * 3 + inp.itLoad * 1.5) * r.mult;
+                    var l5 = dur.l5 * r.cxDay * CP.l5 + mw * 8000 * lbDays + 20 * inp.itLoad * 0.3 * r.diesel + dur.l5 * r.witnessDay;
+                    var l6 = (dur.l6 * r.cxDay * CP.l6 + Math.ceil(inp.itLoad / 2000) * r.cxDay * 2 + inp.itLoad * 3 + inp.itLoad * 1.5) * r.mult;
                     return { l0: l0, l1: l1, l2: l2, l3: l3, l4: l4, l5: l5, l6: l6 };
                 },
 
@@ -12973,7 +12984,196 @@
                         input: inp
                     };
                 },
-                /** Cx program WBS (Workstream E2): expands the rich program into a
+                /** Cx PROGRAM PLAN (v3.26.0) — the editable schedule/cost/man-hour layer the DCMOC Cx
+                 *  super-app and cx-calculator share. Baseline = programRich (per-level labour crew-days,
+                 *  cost, calendar window). overrides[levelId] = { start?, months?, crew?, shift? } in calendar
+                 *  months / people / '1x8'|'2x12'. Rules (DATA.commissioning.cx.rich.plan):
+                 *   - a moved or stretched level carries its successors by the same delta (serial program);
+                 *   - man-hours = crew-days × crew × hoursPerCrewDay;
+                 *   - crew needed on site = crew-days ÷ (months × workDaysPerMonth) ÷ shift productivity;
+                 *   - cost moves ONLY through the engine's own calendar-day terms: the L5 witness term
+                 *     (dur.l5 × witnessDay) scales with the L5 window, the labour term (dur × cxDay × crew)
+                 *     scales with crew and the shift rate multiplier — each scaled by the same factor
+                 *     programRich applied to that level (level.cost ÷ its levelCosts term);
+                 *   - monthly series = uniform spread over each level's window (stated basis).
+                 *  Returns {levels, finishMonth, baselineFinish, total, baselineTotal, manHours,
+                 *  baselineManHours, monthly{cost,baselineCost,manHours,crew}, cumulative, peak, baselinePeak,
+                 *  months, basis}. */
+                programPlan: function (input, overrides) {
+                    overrides = overrides || {};
+                    var C = RZEngine.models.commissioning, P = DATA.commissioning.cx.rich.plan;
+                    var rich = C.programRich(input), inp = rich.input, rate = C._rate(inp.region), rm = rate.mult;
+                    var dur = C.levelDurations(inp, rich.equip), lc = C.levelCosts(inp, dur, rich.equip);
+                    var order = ['L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6'];
+                    var schedBy = {}, costBy = {};
+                    for (var i = 0; i < rich.schedule.length; i++) schedBy[rich.schedule[i].level] = rich.schedule[i];
+                    for (var j = 0; j < rich.levels.length; j++) costBy[rich.levels[j].id] = rich.levels[j];
+                    var levels = [], carry = 0, total = 0, baseTotal = 0, mh = 0, baseMh = 0;
+                    for (var k = 0; k < order.length; k++) {
+                        var id = order[k], lk = id.toLowerCase(), sc = schedBy[id], lv = costBy[id], ov = overrides[id] || {};
+                        var baseCrew = P.crewPerLevel[lk], days = lv.days;
+                        var crew = ov.crew != null && ov.crew > 0 ? +ov.crew : baseCrew;
+                        var shiftKey = ov.shift && P.shifts[ov.shift] ? ov.shift : '1x8', shift = P.shifts[shiftKey];
+                        var start = ov.start != null ? Math.max(0, +ov.start) : +(sc.start + carry).toFixed(2);
+                        var months = ov.months != null && ov.months > 0 ? +ov.months : sc.months;
+                        var end = +(start + months).toFixed(2);
+                        carry = +(end - sc.end).toFixed(2);
+                        // scale factor programRich applied to this level's levelCosts term (regional mult on L1-L5)
+                        var lcAdj = (id === 'L0' || id === 'L6') ? lc[lk] : lc[lk] * rm;
+                        var kf = lcAdj > 0 ? lv.cost / lcAdj : 0;
+                        var regional = (id === 'L0' || id === 'L6') ? rm : 1; // L0/L6 carry r.mult inside levelCosts
+                        var labourTerm = days * rate.cxDay * baseCrew * regional * ((id === 'L0' || id === 'L6') ? 1 : rm);
+                        var dCrew = labourTerm * (crew / baseCrew - 1) * kf;
+                        var dShift = labourTerm * (crew / baseCrew) * (shift.rateMult - 1) * kf;
+                        var dWitness = id === 'L5' ? (months - sc.months) * P.workDaysPerMonth * rate.witnessDay * rm * kf : 0;
+                        var cost = Math.round(lv.cost + dCrew + dShift + dWitness);
+                        var manHours = Math.round(days * crew * P.hoursPerCrewDay), baseManHours = Math.round(days * baseCrew * P.hoursPerCrewDay);
+                        var crewNeeded = months > 0 ? +(days / (months * P.workDaysPerMonth) / shift.productivity).toFixed(1) : 0;
+                        total += cost; baseTotal += lv.cost; mh += manHours; baseMh += baseManHours;
+                        levels.push({
+                            id: id, label: lv.label, start: start, end: end, months: +months.toFixed(2), laborDays: days,
+                            crew: crew, shift: shiftKey, crewNeeded: crewNeeded, manHours: manHours, cost: cost,
+                            costDelta: cost - lv.cost, edited: !!(ov.start != null || ov.months != null || ov.crew != null || ov.shift),
+                            baseline: { start: sc.start, end: sc.end, months: sc.months, cost: lv.cost, crew: baseCrew, manHours: baseManHours, crewNeeded: +(days / (sc.months * P.workDaysPerMonth)).toFixed(1) }
+                        });
+                    }
+                    var finish = 0, baseFinish = 0;
+                    for (var f = 0; f < levels.length; f++) { finish = Math.max(finish, levels[f].end); baseFinish = Math.max(baseFinish, levels[f].baseline.end); }
+                    var nMonths = Math.max(1, Math.ceil(Math.max(finish, baseFinish)));
+                    var monthly = { cost: [], baselineCost: [], manHours: [], crew: [] }, cumulative = [], cum = 0;
+                    function overlap(s, e, m) { return Math.max(0, Math.min(e, m + 1) - Math.max(s, m)); }
+                    for (var m = 0; m < nMonths; m++) {
+                        var c = 0, bc = 0, h = 0, cr = 0;
+                        for (var q = 0; q < levels.length; q++) {
+                            var L = levels[q], w = L.end - L.start, bw = L.baseline.end - L.baseline.start;
+                            if (w > 0) { var o = overlap(L.start, L.end, m); c += L.cost / w * o; h += L.manHours / w * o; cr += L.crewNeeded * o; }
+                            if (bw > 0) bc += L.baseline.cost / bw * overlap(L.baseline.start, L.baseline.end, m);
+                        }
+                        monthly.cost.push(Math.round(c)); monthly.baselineCost.push(Math.round(bc)); monthly.manHours.push(Math.round(h)); monthly.crew.push(+cr.toFixed(1));
+                        cum += c; cumulative.push(Math.round(cum));
+                    }
+                    var peak = { month: 0, cost: 0 }, basePeak = { month: 0, cost: 0 };
+                    for (var pm = 0; pm < nMonths; pm++) {
+                        if (monthly.cost[pm] > peak.cost) peak = { month: pm, cost: monthly.cost[pm] };
+                        if (monthly.baselineCost[pm] > basePeak.cost) basePeak = { month: pm, cost: monthly.baselineCost[pm] };
+                    }
+                    return {
+                        levels: levels, finishMonth: +finish.toFixed(1), baselineFinish: +baseFinish.toFixed(1),
+                        total: Math.round(total), baselineTotal: Math.round(baseTotal), totalDelta: Math.round(total - baseTotal),
+                        manHours: mh, baselineManHours: baseMh, monthly: monthly, cumulative: cumulative, months: nMonths,
+                        peak: peak, baselinePeak: basePeak, siteCrewCapDefault: P.siteCrewCapDefault,
+                        region: rich.region, grand: rich.grand, input: inp,
+                        basis: 'programRich baseline · man-hours = crew-days × crew × ' + P.hoursPerCrewDay + ' h · crew on site = crew-days ÷ (months × ' + P.workDaysPerMonth + ') ÷ shift productivity · cost moves through the L5 witness-day term and the labour term only · uniform spread per level window'
+                    };
+                },
+                calendarPlan: function (spec) {
+                    spec = spec || {};
+                    var DAY = 86400000, notes = [];
+                    function parse(s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || '')); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : NaN; }
+                    function iso(t) { return new Date(t).toISOString().slice(0, 10); }
+                    function dow(t) { return new Date(t).getUTCDay(); }
+                    function isWork(t) { var d = dow(t); return d >= 1 && d <= 5; }
+                    function nextWork(t) { t += DAY; while (!isWork(t)) t += DAY; return t; }
+                    function onOrNextWork(t) { while (!isWork(t)) t += DAY; return t; }
+                    function lastWork(t, n) { for (var i = 1; i < n; i++) t = nextWork(t); return t; }
+                    function ym(t) { var d = new Date(t); return d.getUTCFullYear() * 12 + d.getUTCMonth(); }
+                    function label(k) { var m = k % 12; return Math.floor(k / 12) + '-' + (m < 10 ? '0' : '') + (m + 1); }
+                    function pretty(t) { var d = new Date(t); return d.getUTCDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getUTCMonth()]; }
+                    function firstFullWeek(k) { var t = Date.UTC(Math.floor(k / 12), k % 12, 1); while (dow(t) !== 1) t += DAY; return t; }
+                    function slotOnOrAfter(t) { var k = ym(t), mon = firstFullWeek(k); if (mon < t) { k++; mon = firstFullWeek(k); } return { mon: mon, lostK: ym(t) !== k ? ym(t) : null }; }
+                    function largest(total, weights) {
+                        var sum = 0, i; for (i = 0; i < weights.length; i++) sum += weights[i];
+                        if (!sum) { var z = []; for (i = 0; i < weights.length; i++) z.push(0); return z; }
+                        var out = [], rem = [], used = 0;
+                        for (i = 0; i < weights.length; i++) { var raw = total * weights[i] / sum, fl = Math.floor(raw); out.push(fl); rem.push({ i: i, r: raw - fl }); used += fl; }
+                        rem.sort(function (a, b) { return b.r - a.r || a.i - b.i; });
+                        for (var j = 0; used < total && j < rem.length; j++, used++) out[rem[j].i]++;
+                        return out;
+                    }
+                    var slot = spec.slotRule === 'first-full-week', anchor = parse(spec.anchor), levelsIn = spec.levels || [];
+                    function schedule(overrides, useBase) {
+                        var out = [], prevEnd = null;
+                        function pick(L, k) { var b = L['baseline' + k.charAt(0).toUpperCase() + k.slice(1)]; return useBase && b != null ? b : L[k]; }
+                        for (var i = 0; i < levelsIn.length; i++) {
+                            var L = levelsIn[i], ov = overrides && overrides[L.id], explain = '', moved = false;
+                            var earliest = prevEnd === null ? (isNaN(anchor) ? NaN : onOrNextWork(anchor)) : nextWork(prevEnd);
+                            var want = ov && ov.start != null ? parse(ov.start) : (L.start ? parse(L.start) : NaN), start;
+                            if (!isNaN(want)) {
+                                start = onOrNextWork(want);
+                                if (start !== want) explain = pretty(want) + ' is not a work day; starts ' + pretty(start) + '. ';
+                                if (!isNaN(earliest) && start < earliest) {
+                                    var clamped = slot && L.witness ? slotOnOrAfter(earliest).mon : earliest;
+                                    explain += 'Requested ' + pretty(want) + ' is before predecessor acceptance (' + pretty(prevEnd) + '); ' + (slot && L.witness ? 'next witness slot ' : 'starts ') + pretty(clamped) + '. ';
+                                    start = clamped;
+                                }
+                                if (ov && ov.start != null) moved = true;
+                            } else if (slot && L.witness && !isNaN(earliest)) {
+                                var s = slotOnOrAfter(earliest); start = s.mon;
+                                if (s.lostK !== null) explain = 'Witness slot: predecessor acceptance ' + pretty(prevEnd) + ' is past the first full week of ' + label(s.lostK) + '; next slot ' + pretty(s.mon) + ' (first full Mon–Fri week of ' + label(ym(s.mon)) + '). ';
+                                else explain = 'Witness slot: first full Mon–Fri week on/after predecessor acceptance (' + pretty(s.mon) + '). ';
+                            } else start = earliest;
+                            if (isNaN(start)) { notes.push(L.id + ': no start could be resolved (anchor or start date missing)'); start = Date.UTC(1970, 0, 5); }
+                            var days = Math.max(1, Math.round(pick(L, 'workDays') || 1)), end = lastWork(start, days);
+                            out.push({ id: L.id, label: L.label || L.id, startT: start, endT: end, start: iso(start), end: iso(end), workDays: days, cost: +pick(L, 'cost') || 0, manHours: +pick(L, 'manHours') || 0, witness: !!L.witness, explain: explain.trim(), moved: moved });
+                            prevEnd = end;
+                        }
+                        var release = prevEnd === null ? NaN : nextWork(prevEnd);
+                        return { levels: out, releaseT: release };
+                    }
+                    var baseS = schedule(null, true), scenS = schedule(spec.overrides || {}, false);
+                    for (var q = 0; q < scenS.levels.length; q++) { var b = baseS.levels[q], s2 = scenS.levels[q]; if (b && (b.startT !== s2.startT || b.endT !== s2.endT)) s2.moved = true; }
+                    // month axis
+                    var k0 = isNaN(anchor) ? ym(baseS.levels.length ? baseS.levels[0].startT : Date.UTC(1970, 0, 1)) : ym(anchor), k1 = k0;
+                    function stretch(t) { if (!isNaN(t)) { k1 = Math.max(k1, ym(t)); k0 = Math.min(k0, ym(t)); } }
+                    stretch(baseS.releaseT); stretch(scenS.releaseT);
+                    for (var a = 0; a < baseS.levels.length; a++) { stretch(baseS.levels[a].startT); stretch(baseS.levels[a].endT); stretch(scenS.levels[a].startT); stretch(scenS.levels[a].endT); }
+                    // lines (dates resolved against the scenario / baseline releases) — need the axis to span them too
+                    function resolveDate(v, fallback) { if (v === 'release') return scenS.releaseT; if (v === 'baselineRelease') return baseS.releaseT; var t = parse(v); return isNaN(t) ? fallback : t; }
+                    var linesIn = spec.lines || [], lineDefs = [];
+                    for (var li = 0; li < linesIn.length; li++) {
+                        var ln = linesIn[li];
+                        if (ln.kind === 'standby') { var f = resolveDate(ln.from, baseS.releaseT), to = resolveDate(ln.to, scenS.releaseT); if (!isNaN(f) && !isNaN(to)) { stretch(f); stretch(to - DAY); } lineDefs.push({ id: ln.id, label: ln.label || ln.id, kind: 'standby', perWorkDay: +ln.perWorkDay || 0, fromT: f, toT: to, from: ln.from, to: ln.to }); }
+                        else if (ln.kind === 'lump') { var on = resolveDate(ln.on, scenS.releaseT); if (!isNaN(on)) stretch(on); lineDefs.push({ id: ln.id, label: ln.label || ln.id, kind: 'lump', amount: +ln.amount || 0, onT: on, on: ln.on }); }
+                        else notes.push('line ' + (ln.id || li) + ': unknown kind "' + ln.kind + '" ignored');
+                    }
+                    var nM = k1 - k0 + 1, months = []; for (var mm = 0; mm < nM; mm++) months.push(label(k0 + mm));
+                    function zeros() { var z = []; for (var i = 0; i < nM; i++) z.push(0); return z; }
+                    function bucket(levels, key) {
+                        var series = zeros();
+                        for (var i = 0; i < levels.length; i++) {
+                            var L = levels[i], w = zeros(), t = L.startT;
+                            for (var d = 0; d < L.workDays; d++) { w[ym(t) - k0]++; t = nextWork(t); }
+                            var alloc = largest(L[key], w); L[key + 'ByMonth'] = alloc;
+                            for (var j = 0; j < nM; j++) series[j] += alloc[j];
+                        }
+                        return series;
+                    }
+                    var monthly = { baselineCost: bucket(baseS.levels, 'cost'), baselineManHours: bucket(baseS.levels, 'manHours'), cost: bucket(scenS.levels, 'cost'), manHours: bucket(scenS.levels, 'manHours'), extension: zeros() };
+                    var lines = [], extTotal = 0;
+                    for (var x = 0; x < lineDefs.length; x++) {
+                        var D = lineDefs[x], by = zeros(), amount = 0, days = 0;
+                        if (D.kind === 'standby' && !isNaN(D.fromT) && !isNaN(D.toT)) { var cnt = zeros(); for (var tt = onOrNextWork(D.fromT); tt < D.toT; tt = nextWork(tt)) { cnt[ym(tt) - k0]++; days++; } amount = Math.round(days * D.perWorkDay); by = largest(amount, cnt); }
+                        else if (D.kind === 'lump' && !isNaN(D.onT)) { amount = Math.round(D.amount); by[ym(D.onT) - k0] += amount; }
+                        for (var y = 0; y < nM; y++) monthly.extension[y] += by[y];
+                        extTotal += amount; lines.push({ id: D.id, label: D.label, kind: D.kind, perWorkDay: D.perWorkDay, days: days, amount: amount, byMonth: by, from: D.from, to: D.to, on: D.on });
+                    }
+                    monthly.delta = []; monthly.costWithExtension = []; monthly.deltaWithExtension = [];
+                    for (var z = 0; z < nM; z++) { monthly.delta.push(monthly.cost[z] - monthly.baselineCost[z]); monthly.costWithExtension.push(monthly.cost[z] + monthly.extension[z]); monthly.deltaWithExtension.push(monthly.cost[z] + monthly.extension[z] - monthly.baselineCost[z]); }
+                    var total = 0, baseTotal = 0, mh = 0, baseMh = 0;
+                    for (var c = 0; c < scenS.levels.length; c++) { total += scenS.levels[c].cost; mh += scenS.levels[c].manHours; baseTotal += baseS.levels[c].cost; baseMh += baseS.levels[c].manHours; }
+                    var eac = null, dd = parse(spec.dataDate);
+                    if (!isNaN(dd)) { var actual = 0; for (var e = 0; e < scenS.levels.length; e++) if (scenS.levels[e].endT <= dd) actual += scenS.levels[e].cost; eac = { dataDate: iso(dd), actual: actual, etc: total + extTotal - actual, eac: total + extTotal }; }
+                    function strip(L) { var o = {}; for (var k in L) if (L.hasOwnProperty(k) && k !== 'startT' && k !== 'endT') o[k] = L[k]; return o; }
+                    var relDelta = (!isNaN(scenS.releaseT) && !isNaN(baseS.releaseT)) ? Math.round((scenS.releaseT - baseS.releaseT) / DAY) : 0;
+                    return {
+                        months: months, levels: scenS.levels.map(strip), baseline: { levels: baseS.levels.map(strip), release: isNaN(baseS.releaseT) ? null : iso(baseS.releaseT) },
+                        release: isNaN(scenS.releaseT) ? null : iso(scenS.releaseT), baselineRelease: isNaN(baseS.releaseT) ? null : iso(baseS.releaseT), releaseDeltaDays: relDelta,
+                        monthly: monthly, lines: lines, total: total, baselineTotal: baseTotal, totalDelta: total - baseTotal, extensionTotal: extTotal, totalWithExtension: total + extTotal,
+                        manHours: mh, baselineManHours: baseMh, eac: eac, notes: notes, slotRule: slot ? 'first-full-week' : null,
+                        basis: 'Serial FS on work days (Mon–Fri, no holiday calendar) · witness slot = Monday of the first full Mon–Fri week of a calendar month, on/after predecessor acceptance · cost and man-hours fall in the months of each level\'s work days, pro rata by work day, integers by largest remainder · standby per work day from the baseline release up to the new release, lump sums in the month they fall · EAC = actual to the data date + ETC · lines are non-labour, man-hours never move'
+                    };
+                },
+                                /** Cx program WBS (Workstream E2): expands the rich program into a
                  *  2-tier tree — L0..L6 level (CALENDAR window from programSchedule
                  *  weights, labor-days effort attached) → 3-5 sub-activities each
                  *  (DATA.commissioning.cx.rich.subActivities), serial-with-overlap

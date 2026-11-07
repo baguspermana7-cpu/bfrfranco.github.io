@@ -1667,6 +1667,86 @@ if (M.opex && M.opex.totalAnnual) {
     ok('gaas utilisation default inside its band', T.gaas.utilizationDefault >= T.gaas.utilizationBand[0] && T.gaas.utilizationDefault <= T.gaas.utilizationBand[1]);
     ok('GaaS equivalent far above wholesale colo (the fleet capex is the difference)', ga.mrcPerKwMonth > 5 * w.mrcPerKwMonth && ga.gaas.hardwareCapexUsd > 5e8);
     ok('addons: TeleGeography 100 GigE medians + remote hands', T.addons.ipTransit100GePerMbpsMonth.singapore === 0.26 && T.addons.ipTransit100GePerMbpsMonth.floor === 0.03 && T.addons.remoteHandsPerHour.usd === 157.11);
+
+}
+
+{
+    /* ── commissioning programPlan — the editable schedule layer (v3.26.0, WI-CX-SUPERAPP-001 L1).
+     * Laws: (a) parity with programRich when nothing is overridden; (b) a moved level carries its
+     * successors and leaves cost untouched; (c) a stretched L5 costs the witness-day term only; (d) the
+     * monthly series sum to the totals; (e) crew needed = crew-days ÷ (months × 22); (f) crew and shift
+     * overrides move cost by the labour term only; (g) the new DATA block carries provenance; and the
+     * crew-per-level hoist leaves the pinned enterprise_2mw figure unchanged. Proven RED on the
+     * pre-3.26.0 engine (programPlan missing). ── */
+    const C = E.models.commissioning;
+    const nr = (a, b, t = 1) => Math.abs(a - b) <= t;
+    const inp = { itLoadKw: 40000, coolingType: 'liquid', powerRedundancy: '2N', countryId: 'ID', rackDensity: 'ai_hpc' };
+
+    ok('programPlan exists', typeof C.programPlan === 'function');
+    if (typeof C.programPlan === 'function') {
+    const rich = C.programRich(inp), base = C.programPlan(inp);
+    // (a) parity with programRich when nothing is overridden
+    ok('7 levels', base.levels.length === 7);
+    rich.levels.forEach((l, i) => {
+        const p = base.levels[i], s = rich.schedule[i];
+        ok(`${l.id} cost parity`, p.cost === l.cost && p.costDelta === 0);
+        ok(`${l.id} window parity`, p.start === s.start && nr(p.end, s.end, 0.011) && p.months === s.months);
+        ok(`${l.id} laborDays parity`, p.laborDays === l.days);
+    });
+    ok('baseline finish = calendarMonths', nr(base.finishMonth, rich.calendarMonths, 0.11) && base.finishMonth === base.baselineFinish);
+    ok('baseline total = Σ level cost', base.total === rich.levels.reduce((a, l) => a + l.cost, 0) && base.totalDelta === 0);
+    // (d) monthly sums close
+    ok('Σ monthly.cost = total', nr(base.monthly.cost.reduce((a, b) => a + b, 0), base.total, 7));
+    ok('Σ monthly.baselineCost = baselineTotal', nr(base.monthly.baselineCost.reduce((a, b) => a + b, 0), base.baselineTotal, 7));
+    const CP = D.commissioning.cx.rich.plan.crewPerLevel;
+    const mhExp = rich.levels.reduce((a, l) => a + Math.round(l.days * CP[l.id.toLowerCase()] * 8), 0);
+    ok('man-hours = Σ crew-days × crew × 8', base.manHours === mhExp && base.baselineManHours === mhExp);
+    ok('Σ monthly.manHours = manHours', nr(base.monthly.manHours.reduce((a, b) => a + b, 0), base.manHours, 7));
+    ok('cumulative ends at total', nr(base.cumulative[base.cumulative.length - 1], base.total, 7));
+    // (e) crew needed
+    const L3 = base.levels[3];
+    ok('crew needed = crew-days ÷ (months × 22)', nr(L3.crewNeeded, L3.laborDays / (L3.months * 22), 0.06));
+    // (b) shift L3 +1.0 → successors +1.0, finish +1.0, cost unchanged
+    const sh = C.programPlan(inp, { L3: { start: rich.schedule[3].start + 1 } });
+    ok('L3 start moved', nr(sh.levels[3].start, rich.schedule[3].start + 1, 0.011));
+    ['L4', 'L5', 'L6'].forEach((id, i) => ok(`${id} carried +1.0`, nr(sh.levels[4 + i].start, rich.schedule[4 + i].start + 1, 0.011)));
+    ok('L0–L2 untouched', sh.levels.slice(0, 3).every((p, i) => p.start === rich.schedule[i].start));
+    ok('finish +1.0', nr(sh.finishMonth, base.finishMonth + 1, 0.11));
+    ok('shift alone: cost unchanged', sh.total === base.total && sh.totalDelta === 0);
+    ok('shift alone: man-hours unchanged', sh.manHours === base.manHours);
+    ok('shift moves the monthly curve', sh.monthly.cost.filter((v, i) => v !== base.monthly.cost[i]).length >= 6);
+    ok('baselineCost series stays the baseline', base.monthly.baselineCost.every((v, i) => v === sh.monthly.baselineCost[i]) && sh.monthly.baselineCost.slice(base.months).every((v) => v === 0));
+    // (c) stretch L5 +0.6 → cost delta = witness-day term only
+    const st = C.programPlan(inp, { L5: { months: rich.schedule[5].months + 0.6 } });
+    const mi = C.mapInput(inp), rate = C._rate(mi.region), eq = C.equipScale(mi), dur = C.levelDurations(mi, eq), lc = C.levelCosts(mi, dur, eq);
+    const kf5 = rich.levels[5].cost / (lc.l5 * rate.mult);
+    const expDelta = Math.round(0.6 * 22 * rate.witnessDay * rate.mult * kf5);
+    ok(`L5 stretch delta = witness-day term (${st.levels[5].costDelta} vs ${expDelta})`, nr(st.levels[5].costDelta, expDelta, 2));
+    ok('L5 stretch: other levels unchanged in cost', st.levels.filter((p) => p.id !== 'L5').every((p) => p.costDelta === 0));
+    ok('L5 stretch: L6 carried +0.6', nr(st.levels[6].start, rich.schedule[6].start + 0.6, 0.011));
+    const st3 = C.programPlan(inp, { L3: { months: rich.schedule[3].months + 1 } });
+    ok('L3 stretch +1 mo: crew needed falls', st3.levels[3].crewNeeded < base.levels[3].crewNeeded && st3.levels[3].costDelta === 0);
+    ok('L5 stretch: man-hours unchanged', st.manHours === base.manHours);
+    // (f) crew + shift overrides
+    const cr = C.programPlan(inp, { L3: { crew: 8 } });
+    ok('L3 crew 8 doubles man-hours for L3', cr.levels[3].manHours === base.levels[3].manHours * 2);
+    const labour3 = dur.l3 * rate.cxDay * CP.l3 * rate.mult, kf3 = rich.levels[3].cost / (lc.l3 * rate.mult);
+    ok('L3 crew 8 cost delta = labour term × (8/4 − 1)', nr(cr.levels[3].costDelta, Math.round(labour3 * kf3), 2));
+    const s2 = C.programPlan(inp, { L5: { shift: '2x12' } });
+    ok('2x12: crew needed ÷ 1.4', nr(s2.levels[5].crewNeeded, base.levels[5].crewNeeded / 1.4, 0.11));
+    const labour5 = dur.l5 * rate.cxDay * CP.l5 * rate.mult;
+    ok('2x12: labour cost × 1.25', nr(s2.levels[5].costDelta, Math.round(labour5 * 0.25 * kf5), 2));
+    ok('2x12: man-hours unchanged (same crew-days × crew)', s2.manHours === base.manHours);
+    // guards
+    ok('negative/zero override ignored', C.programPlan(inp, { L3: { months: 0, crew: -1 } }).levels[3].months === rich.schedule[3].months);
+    ok('unknown shift falls back to 1x8', C.programPlan(inp, { L3: { shift: 'x' } }).levels[3].shift === '1x8');
+    // (g) provenance
+    ok('DATA.sources carries commissioning.cx.rich.plan', !!(D.sources && D.sources['commissioning.cx.rich.plan']));
+    ok('plan constants present', D.commissioning.cx.rich.plan.hoursPerCrewDay === 8 && D.commissioning.cx.rich.plan.workDaysPerMonth === 22);
+    // levelCosts parity after hoisting (the exact figure test-rz-engine.mjs pins)
+    const e2 = C.programRich('enterprise_2mw');
+    ok('enterprise_2mw L2 cost unchanged after hoist (205418)', e2.levels[2].cost === 205418);
+    }
 }
 
 /* ── report ── */

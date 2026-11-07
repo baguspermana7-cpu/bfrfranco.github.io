@@ -3,8 +3,8 @@
  "note": "AUTO-GENERATED from rz-engine.js — do not hand-edit. Consumers are grep-derived from real usage.",
  "dataVersion": "2.5.1",
  "modelCount": 54,
- "functionCount": 243,
- "sourceCount": 167,
+ "functionCount": 245,
+ "sourceCount": 168,
  "namespaces": [
   {
    "name": "aiFactory",
@@ -478,6 +478,12 @@
      "params": []
     },
     {
+     "name": "calendarPlan",
+     "params": [
+      "spec"
+     ]
+    },
+    {
      "name": "equipScale",
      "params": [
       "inp"
@@ -515,6 +521,13 @@
      "name": "programCost",
      "params": [
       "input"
+     ]
+    },
+    {
+     "name": "programPlan",
+     "params": [
+      "input",
+      "overrides"
      ]
     },
     {
@@ -2382,6 +2395,12 @@
    "source": "Commissioning program cost/schedule methodology promoted from cx-calculator.html. RICH engine (cx.rich): equipment quantities scaled from IT load + rack density → per-level (L0-L6) staffed durations at 30 regional day-rate cards ($/day cxDay/fieldDay/oemDay/witnessDay + per-diem + diesel $/L + cost mult), gm-normalized (^0.45) base blend vs level-sum, Monte-Carlo (N=10000) band + 7-param sensitivity tornado. Base rates + multipliers calibrated to DC Cx budgetary practice (ASHRAE Guideline 0 / BCxA / NETA ECS scope, Uptime IST scenario counts). Compact cx.* kept for back-compat.",
    "asOf": "2026",
    "method": "budgetary estimate-grade Cx program model; NOT a detailed Cx plan"
+  },
+  {
+   "key": "commissioning.cx.rich.plan",
+   "source": "Cx program plan layer (v3.26.0): crew per level = the staffing each level's labour term carried in the cx-calculator model (hoisted, unchanged); 8 h crew-day; 22 working days/month (construction convention); 2×12 h shift = 1.4× productivity at a 1.25× labour rate (construction overtime/extended-shift productivity literature, screening); 20-person site cap as a default planning ceiling",
+   "asOf": "2026",
+   "method": "SCREENING — project resource plans supersede"
   },
   {
    "key": "commissioning.istScenarios",

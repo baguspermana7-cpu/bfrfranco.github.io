@@ -31,13 +31,13 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
-    <script src="js/rz-version.js?v=20261107-bf224579" defer></script>
+    <script src="js/rz-version.js?v=20261107-33281ebe" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-toast.js?v=20261031-8ff9bd7c" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
-    <script src="js/cdu-model.js?v=20260920-13afdfe3" defer></script>
+    <script src="js/cdu-model.js?v=20261107-3aee8d6a" defer></script>
     <script src="js/cdu-engine.js?v=20260920-f5abd3c1" defer></script>
-    <script src="rz-engine.min.js?v=20261105-3a64ef3a" defer></script>
+    <script src="rz-engine.min.js?v=20261107-df30269e" defer></script>
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"WebApplication","name":"CDU Sizing & Thermohydraulic Calculator","applicationCategory":"EngineeringApplication","operatingSystem":"Web","url":"https://resistancezero.com/cdu-calculator.html","description":"Size secondary flow, pressure drop, pipe velocity, heat-exchanger approach (epsilon-NTU), NPSH margin, dew-point reset and pump power for a Coolant Distribution Unit.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
     </script>
@@ -320,7 +320,7 @@
             <div class="cc-validation" id="ccValidation" role="alert" aria-live="polite" hidden></div>
             <div class="cc-kpis" id="ccKpis"></div>
             <div class="cc-note" style="margin-top:1rem;">
-                <b>How to read this.</b> Every figure is <span class="chip derived">Derived</span> by the validated CDU engine (<code>js/cdu-engine.js</code>, 40/40 tests) from your inputs and the bands in <a href="cdu-checklist.html">the checklist</a>. A cyan rail = within band, amber = watch, red = out of band. Flow uses Q&nbsp;=&nbsp;ṁ·cp·ΔT; pressure drop uses Darcy-Weisbach with Haaland friction; approach uses &epsilon;-NTU; dew point uses the Magnus formula; NPSH per the Hydraulic Institute. PG-25 properties are handbook-class (ILLUSTRATIVE) — confirm against your fluid's datasheet. <b>Full access analysis</b> (TCO/NPV, Monte-Carlo, sensitivity and a PDF tech-spec) is coming next. Not procurement or safety advice.
+                <b>How to read this.</b> Every figure is <span class="chip derived">Derived</span> by the validated CDU engine (<code>js/cdu-engine.js</code>, 42/42 tests) from your inputs and the bands in <a href="cdu-checklist.html">the checklist</a>. A cyan rail = within band, amber = watch, red = out of band. Flow uses Q&nbsp;=&nbsp;ṁ·cp·ΔT; pressure drop uses Darcy-Weisbach with Haaland friction; approach uses &epsilon;-NTU; dew point uses the Magnus formula; NPSH per the Hydraulic Institute. PG-25 properties are handbook-class (ILLUSTRATIVE) — confirm against your fluid's datasheet. <b>Full access analysis</b> (TCO/NPV, Monte-Carlo, sensitivity and a PDF tech-spec) is coming next. Not procurement or safety advice.
             </div>
             <figure class="rz-chart" data-rz-chart>
                 <div class="rz-chart-canvas"><canvas></canvas></div>
@@ -487,8 +487,10 @@
             var approachState = E.bandState(approach, M.bands.atdK);
             // NPSH
             var vp = E.vaporPressureBar(supply);
-            var fricHead = leg.dpTotalBar * M.phys.barToPa / (fp.rho * M.phys.gravityMs2);
-            var npshA = E.npshAvailableM(M.phys.atmPressureBar, vp, 2.0, fricHead, fp.rho);
+            // closed, pressurised secondary loop: suction = atmosphere + fill pressurisation + static head, less the strainer only
+            // (the loop's distribution dP is pump head, not a suction loss — v3.26.0; basis in M.pump, ILLUSTRATIVE)
+            var strainerHead = M.pump.suctionStrainerDpBar * M.phys.barToPa / (fp.rho * M.phys.gravityMs2);
+            var npshA = E.npshAvailableM(M.phys.atmPressureBar + M.pump.suctionPressurisationBarG, vp, M.pump.suctionStaticHeadM, strainerHead, fp.rho);
             var margin = E.cavitationMarginPct(npshA, M.pump.npshRequiredMDefault);
             var marginState = E.bandState(margin, M.bands.npshMarginPct);
             // dew point
@@ -506,7 +508,7 @@
             html += kpiCard('Pipe velocity', leg.velocityMs.toFixed(2), 'm/s', dn+' · band 1.5–3.0 m/s · Re '+(leg.reynolds/1000).toFixed(0)+'k', leg.velState);
             html += kpiCard('Pressure drop', leg.dpTotalBar.toFixed(2), 'bar', len+'m + ΣK '+K+' · Haaland f '+leg.frictionFactor.toFixed(4), E.bandState(leg.dpTotalBar, M.bands.dpBar));
             html += kpiCard('HX approach', approach.toFixed(1), '°C', 'ε '+eps.toFixed(2)+' (NTU '+ntu+') · band 3–5 °C', approachState);
-            html += kpiCard('NPSH margin', margin.toFixed(0), '%', 'avail '+npshA.toFixed(1)+'m vs req '+M.pump.npshRequiredMDefault+'m · ≥10–20%', marginState);
+            html += kpiCard('NPSH margin', margin.toFixed(0), '%', 'avail '+npshA.toFixed(1)+'m vs req '+M.pump.npshRequiredMDefault+'m · loop '+M.pump.suctionPressurisationBarG.toFixed(1)+' bar g, strainer '+M.pump.suctionStrainerDpBar+' bar · ≥10–20%', marginState);
             html += kpiCard('Dew-point margin', dewMargin.toFixed(1), 'K', 'supply '+supply+'°C vs dew '+dew.toFixed(1)+'°C · ≥2–3 K', dewState);
             html += kpiCard('Pump electrical', elec.toFixed(2), 'kW', 'shaft '+shaft.toFixed(2)+' kW · hyd '+hyd.toFixed(2)+' kW', 'ok');
             html += kpiCard('Pumps (N+1)', npumps, 'units', Math.max(npumps-1,1)+' duty + 1 standby · '+perPump+' LPM each', 'ok');
@@ -519,7 +521,7 @@
                 { label:'Pipe velocity', value:leg.velocityMs.toFixed(2), unit:'m/s', note:dn+' · Re '+(leg.reynolds/1000).toFixed(0)+'k' },
                 { label:'Pressure drop', value:leg.dpTotalBar.toFixed(2), unit:'bar', note:'Haaland f '+leg.frictionFactor.toFixed(4) },
                 { label:'HX approach', value:approach.toFixed(1), unit:'degC', note:'eps '+eps.toFixed(2)+' (NTU '+ntu+')' },
-                { label:'NPSH margin', value:margin.toFixed(0), unit:'%', note:'avail '+npshA.toFixed(1)+'m vs req '+M.pump.npshRequiredMDefault+'m' },
+                { label:'NPSH margin', value:margin.toFixed(0), unit:'%', note:'avail '+npshA.toFixed(1)+'m vs req '+M.pump.npshRequiredMDefault+'m (closed loop '+M.pump.suctionPressurisationBarG.toFixed(1)+' bar g, strainer '+M.pump.suctionStrainerDpBar+' bar)' },
                 { label:'Dew-point margin', value:dewMargin.toFixed(1), unit:'K', note:'supply '+supply+'C vs dew '+dew.toFixed(1)+'C' },
                 { label:'Pump electrical', value:elec.toFixed(2), unit:'kW', note:'shaft '+shaft.toFixed(2)+' kW · hyd '+hyd.toFixed(2)+' kW' },
                 { label:'Pumps (N+1)', value:String(npumps), unit:'units', note:Math.max(npumps-1,1)+' duty + 1 standby' }

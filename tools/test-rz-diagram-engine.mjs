@@ -25,7 +25,7 @@
  *
  *   Run:  node tools/test-rz-diagram-engine.mjs   (from rz-work/)
  * ==========================================================================*/
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import vm from 'node:vm';
@@ -874,7 +874,13 @@ const D = sandbox.RZDiagram;
 
   for (const page of adopters) {
     const html = readFileSync(join(root, page), 'utf8');
-    const missing = uniq.filter((v) => !new RegExp(`${v}\\s*:`).test(html));
+    // a page defines a property in its own markup OR in a local stylesheet it links (2026-11-07:
+    // cx-calculator.html maps the palette in css/rz-cx-analysis.css and read as "never defines")
+    const sheets = [...html.matchAll(/<link[^>]+rel="stylesheet"[^>]+href="([^"?#]+)/g)].map((m) => m[1])
+      .filter((h) => !/^(https?:)?\/\//.test(h)).map((h) => join(root, h)).filter((f) => existsSync(f))
+      .map((f) => readFileSync(f, 'utf8'));
+    const corpus = [html, ...sheets].join('\n');
+    const missing = uniq.filter((v) => !new RegExp(`${v}\\s*:`).test(corpus));
     ok(`T3:${page}`, missing.length === 0,
       `${page} loads the diagram engine but never defines ${missing.join(', ')} — ` +
       `an undefined property renders as an invalid value in one theme only`);

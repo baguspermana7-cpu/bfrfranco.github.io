@@ -168,7 +168,12 @@
     pumpEff: 0.70,               // source: typical seal-less CDU pump BEP ; ILLUSTRATIVE
     motorEff: 0.92,              // source: IE3-class motor ; ILLUSTRATIVE
     perPumpLpmDefault: 600,      // source: typical CDU duty pump ; ILLUSTRATIVE
-    npshRequiredMDefault: 6      // source: typical CDU pump NPSHr ; ILLUSTRATIVE
+    npshRequiredMDefault: 6,     // source: typical CDU pump NPSHr ; ILLUSTRATIVE
+    /* Suction basis for NPSHa. A CDU pump draws from its own return header / reservoir inside a CLOSED,
+     * pressurised secondary loop, so the loop's distribution dP is pump head, not a suction loss. */
+    suctionPressurisationBarG: 1.0, // source: typical secondary-loop fill pressure at the expansion vessel (1–2 bar g) ; ILLUSTRATIVE
+    suctionStaticHeadM: 2.0,        // source: return header / reservoir level above the pump suction ; ILLUSTRATIVE
+    suctionStrainerDpBar: 0.15      // source: Y-strainer at design flow, dirty allowance ; ILLUSTRATIVE
   };
 
   /* TCO / ROI defaults — ALL illustrative/target. source: roi-calculator.html

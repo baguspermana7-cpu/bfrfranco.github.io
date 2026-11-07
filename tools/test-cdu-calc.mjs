@@ -86,6 +86,21 @@ approx(E.cavitationMarginPct(npshA, 6), 84.5, 4, 'Ex5 cavitation margin vs NPSHr
 const npshA2 = E.npshAvailableM(1.013, 0.0562, 0.5, 1.5, 1018.65);  // ~8.57 m
 ok(E.cavitationMarginPct(npshA2, 8) < M.bands.npshMarginPct.min, 'Ex5 edge: static 0.5m vs NPSHr 8 -> margin <10% (FAIL band)');
 
+/* ---- Ex5b: the PAGE's suction basis — a closed, pressurised secondary loop ------
+ * cdu-calculator.html once subtracted the WHOLE secondary-loop dP from NPSHa as if the pump drew from an open
+ * tank through the loop (DN50 default: 7.3 m of 11.7 m, margin -24 %). A CDU pump draws from its own
+ * pressurised return/reservoir: suction pressure = atmosphere + fill pressurisation + static head, less only
+ * the suction strainer. The basis lives in the model (ILLUSTRATIVE) and the page must use it. */
+const fpB = E.fluidProps('pg25', 32, 25);
+let npshB = NaN;
+try { npshB = E.npshAvailableM(M.phys.atmPressureBar + M.pump.suctionPressurisationBarG, E.vaporPressureBar(32), M.pump.suctionStaticHeadM,
+  M.pump.suctionStrainerDpBar * M.phys.barToPa / (fpB.rho * M.phys.gravityMs2), fpB.rho); } catch (e) { npshB = NaN; }   // a model without the basis is a FAIL, not a crash
+ok(Number.isFinite(npshB) && E.cavitationMarginPct(npshB, M.pump.npshRequiredMDefault) >= M.bands.npshMarginPct.max,
+  'Ex5b model suction basis (pressurised loop + strainer) clears NPSHr with margin >= the band top');
+const pageSrc = readFileSync(path.join(__dirname, '..', 'cdu-calculator.html'), 'utf8');
+ok(!/npshAvailableM\([^)]*fricHead/.test(pageSrc) && /npshAvailableM\([^)]*suctionPressurisationBarG/.test(pageSrc),
+  'Ex5b page: NPSHa uses the model suction basis, not the whole-loop friction head');
+
 /* ---- Ex6: HX effectiveness (epsilon-NTU) + approach ---------------------- */
 approx(E.epsilonNTU(2.0, 0.9), 0.6889, 0.005, 'Ex6 epsilonNTU(NTU2,Cr0.9,counter) = 0.689');
 approx(E.approachTempC(45, 35, 0.6889), 3.11, 0.1, 'Ex6 approach(45,35,eps0.689) = 3.1 C (in band)');
