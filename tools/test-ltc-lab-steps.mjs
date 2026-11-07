@@ -42,6 +42,8 @@
  *    plant's outputs (each setting perturbed and restored in the page)
  * S19 The dashboard tab follows the step (1-5 Results, 6 Charts, 7 Report); the tab buttons are ARIA tabs with
  *    aria-selected in sync, and the step-scoped tabs name their steps
+ * S20 No second hue or tile in the lab's chrome: section labels neutral or amber with no bullet glyph, tier chips are
+ *    unfilled words, scenario metrics are rows of one panel
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -372,6 +374,36 @@ try {
     }
     const tl = Object.fromEntries((await tabState()).map((t) => [t.k, t.txt]));
     ok(/1\s*[–-]\s*5/.test(tl.results) && /\b6\b/.test(tl.charts) && /\b7\b/.test(tl.report), `${w} S19 tab labels do not name their steps: ${JSON.stringify(tl)}`);
+    // S20 no second hue or tile in the lab's chrome: section labels neutral or amber with no bullet glyph, tier chips
+    // unfilled words, scenario metrics rows of one panel (not boxed tiles)
+    await p.evaluate(() => { const b = document.getElementById('ltcOtherParamsBtn'); if (b && !b.classList.contains('open')) b.click();
+      document.querySelector('.ltc-tab-btn[data-tab="flow"]').click(); });
+    await new Promise((r) => setTimeout(r, 400));
+    const s20 = await p.evaluate(() => {
+      const hsl = (c) => { const m = c.match(/[\d.]+/g); if (!m) return null; const [r, g, b] = m.slice(0, 3).map((v) => v / 255), a = m[3] == null ? 1 : +m[3];
+        const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let h = 0;
+        if (d) h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+        return { h: (h * 60 + 360) % 360, s: mx ? d / mx : 0, a }; };
+      const out = [];
+      for (const e of document.querySelectorAll('.ltc-overview-label, .ltc-section-label, .ltc-res-card-title, .ltc-rail-title, .ltc-tier-title')) {
+        if (!e.offsetParent && getComputedStyle(e).position !== 'fixed') continue;
+        const c = hsl(getComputedStyle(e).color);
+        if (c && c.s > 0.2 && !(c.h >= 25 && c.h <= 50)) out.push(`label "${e.textContent.trim().slice(0, 30)}" hue ${Math.round(c.h)} sat ${c.s.toFixed(2)}`);
+        if (/^\s*●/.test(e.textContent)) out.push(`label "${e.textContent.trim().slice(0, 30)}" starts with a bullet glyph`);
+      }
+      for (const e of document.querySelectorAll('.ltc-tier-chip')) {
+        const c = hsl(getComputedStyle(e).backgroundColor);
+        if (c && c.a > 0.02) { out.push(`tier chip "${e.textContent.trim()}" filled ${getComputedStyle(e).backgroundColor}`); break; }
+      }
+      for (const e of document.querySelectorAll('.ltc-scenario-metric')) {
+        const cs = getComputedStyle(e), bg = hsl(cs.backgroundColor);
+        const sides = ['Top', 'Right', 'Bottom', 'Left'].filter((k) => parseFloat(cs['border' + k + 'Width']) > 0).length;
+        if ((bg && bg.a > 0.02) || sides >= 3) { out.push(`scenario metric is a boxed tile (bg ${cs.backgroundColor}, ${sides} bordered sides)`); break; }
+      }
+      return out;
+    });
+    for (const f of s20) fails.push(`${w} S20 ${f}`);
+    await p.evaluate(() => document.querySelector('.ltc-tab-btn[data-tab="results"]').click());
     const sw = await p.evaluate(() => document.documentElement.scrollWidth);
     ok(sw <= w, `${w} S5 scrollWidth ${sw}`);
     ok(!errs.length, `${w} S5 page error: ${errs[0]}`);
@@ -379,4 +411,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, 0 errors');

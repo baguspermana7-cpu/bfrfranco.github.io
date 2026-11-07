@@ -188,7 +188,7 @@
 
         // System overview card
         var overviewCard = el('div', { className: 'ltc-overview-card' });
-        overviewCard.appendChild(el('div', { className: 'ltc-overview-label', textContent: '● SYSTEM OVERVIEW' }));
+        overviewCard.appendChild(el('div', { className: 'ltc-overview-label', textContent: 'SYSTEM OVERVIEW' }));
         var schematic = el('div', { className: 'ltc-schematic', id: 'ltcSchematic' });
         schematic.innerHTML = buildSystemOverviewSVG();
         overviewCard.appendChild(schematic);
@@ -253,7 +253,7 @@
         panelDetailed.appendChild(el('div', { id: 'ltcDetailedHost' }));
         // Living FLOW: scenario replay — drives the engine's real failureMode recompute.
         var scen = el('div', { className: 'ltc-overview-card ltc-scenario-card' });
-        scen.innerHTML = '<div class="ltc-overview-label">● OPERATING SCENARIO <span class="ltc-muted">— engine recomputes the whole model under fault stress</span></div>' +
+        scen.innerHTML = '<div class="ltc-overview-label">OPERATING SCENARIO <span class="ltc-muted">— engine recomputes the whole model under fault stress</span></div>' +
             '<div class="ltc-scenario-btns" id="ltcScenarioBtns">' +
             [['normal','Normal'],['pump_degraded','Pump Degraded'],['sensor_degraded','Sensor Degraded'],
              ['heatwave','Heatwave'],['grid_stress','Grid Stress'],['redundancy_degraded','Redundancy Degraded']]
@@ -274,13 +274,13 @@
 
         // Sensitivity TORNADO (two-directional, engine-computed) — comprehensiveness add
         var tornadoCard = el('div', { className: 'ltc-overview-card ltc-tornado-card' });
-        tornadoCard.innerHTML = '<div class="ltc-overview-label">● SENSITIVITY TORNADO <span class="ltc-muted">— change in annual PUE for one step down and up, recomputed on the model shown; inputs with no effect are left out</span></div>' +
+        tornadoCard.innerHTML = '<div class="ltc-overview-label">SENSITIVITY TORNADO <span class="ltc-muted">— change in annual PUE for one step down and up, recomputed on the model shown; inputs with no effect are left out</span></div>' +
             '<div id="ltcTornado" class="ltc-tornado"></div>';
         panelCharts.appendChild(tornadoCard);
         panelCharts.appendChild(el('div', { id: 'ltcChartsHost' }));
         // REPORT: A/B scenario compare — pin a design, compare current vs it (engine values).
         var cmp = el('div', { className: 'ltc-overview-card ltc-compare-card' });
-        cmp.innerHTML = '<div class="ltc-overview-label">● SCENARIO COMPARE <span class="ltc-muted">— pin a design (A), tune inputs, compare vs current (B)</span></div>' +
+        cmp.innerHTML = '<div class="ltc-overview-label">SCENARIO COMPARE <span class="ltc-muted">— pin a design (A), tune inputs, compare vs current (B)</span></div>' +
             '<div class="ltc-compare-actions">' +
             '<button type="button" class="ltc-nav-btn ltc-nav-btn-primary" id="ltcPinA"><i class="fas fa-thumbtack" aria-hidden="true"></i> Pin current as A</button>' +
             '<button type="button" class="ltc-nav-btn ltc-nav-btn-outline" id="ltcClearA">Clear</button>' +

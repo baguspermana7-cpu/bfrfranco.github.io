@@ -7,24 +7,24 @@
 /* ── Light theme tokens ───────────────────────────────────── */
 :root:not([data-theme="dark"]) body.ltc-revamp {
     --ltc-on-accent:    #FFFFFF;
-    --ltc-page-bg:      #F5F7FA;
+    --ltc-page-bg:      #F6F6F7;
     --ltc-card-bg:      #FFFFFF;
-    --ltc-tile-bg:      #EEF1F6;
-    --ltc-topbar-bg:    #F5F7FA;
+    --ltc-tile-bg:      #F0F1F3;
+    --ltc-topbar-bg:    #F6F6F7;
     --ltc-hairline:     rgba(17,24,39,.12);
     --ltc-text:         #1a1d23;
-    --ltc-muted:        #5B6472;
+    --ltc-muted:        #5f6368;
     --ltc-accent:       #8A5A00;
     --ltc-link:         #0077AA;
     --ltc-green:        #007A44;
     --ltc-pipe-supply:  #0077AA;
     --ltc-pipe-return:  #CC1F1F;
-    --ltc-radial-track: #E9EDF3;
+    --ltc-radial-track: #EBECEE;
     --ltc-shadow:       none;
     --ltc-shadow-sm:    none;
     --ltc-badge-bg:     rgba(138,90,0,.08);
     --ltc-badge-text:   #8A5A00;
-    --ltc-sens-bar-bg:  #E9EDF3;
+    --ltc-sens-bar-bg:  #EBECEE;
     --ltc-kpi-good-bg:  rgba(0,122,68,.06);
 }
 
@@ -36,8 +36,8 @@
     --ltc-tile-bg:      #191b1f;
     --ltc-topbar-bg:    #0b0c0e;
     --ltc-hairline:     rgba(255,255,255,.10);
-    --ltc-text:         #E8EDF5;
-    --ltc-muted:        #8190a6;
+    --ltc-text:         #ECEDEF;
+    --ltc-muted:        #9a9ea6;
     --ltc-accent:       #FFAA00;
     --ltc-link:         #00DDFF;
     --ltc-green:        #6aa588;
@@ -426,7 +426,7 @@ body.ltc-revamp .ltc-overview-label {
     font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 0.62rem;
     letter-spacing: 0.08em;
-    color: var(--ltc-green);
+    color: var(--ltc-muted);
     font-weight: 600;
     margin-bottom: 10px;
 }
@@ -1296,14 +1296,17 @@ body.ltc-revamp .ltc-scenario-btn {
 }
 body.ltc-revamp .ltc-scenario-btn:hover { border-color: var(--ltc-accent); }
 body.ltc-revamp .ltc-scenario-btn.active { background: var(--ltc-accent); color: var(--ltc-on-accent); border-color: var(--ltc-accent); }
-body.ltc-revamp .ltc-scenario-readout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
-body.ltc-revamp .ltc-scenario-metric { background: var(--ltc-tile-bg); border: 1px solid var(--ltc-hairline); border-radius: 4px; padding: 9px 11px; display: flex; flex-direction: column; gap: 3px; }
+/* 3.27.0 — one framed panel of readings, divided by hairlines (was four boxed stat tiles) */
+body.ltc-revamp .ltc-scenario-readout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 12px; border: 1px solid var(--ltc-hairline); border-radius: 4px; }
+body.ltc-revamp .ltc-scenario-metric { background: none; border: 0; box-shadow: -1px 0 0 var(--ltc-hairline); padding: 9px 12px; display: flex; flex-direction: column; gap: 3px; }
+body.ltc-revamp .ltc-scenario-metric:first-child { box-shadow: none; }
 body.ltc-revamp .ltc-scenario-metric span { font-size: 11px; color: var(--ltc-muted); }
 body.ltc-revamp .ltc-scenario-metric b { font-size: 17px; color: var(--ltc-text); font-variant-numeric: tabular-nums; }
 body.ltc-revamp .ltc-scenario-delta { font-size: 11px; font-weight: 700; }
 body.ltc-revamp .ltc-scenario-delta.up { color: var(--ltc-pipe-return); }
 body.ltc-revamp .ltc-scenario-delta.down { color: var(--ltc-green); }
-@media (max-width: 640px) { body.ltc-revamp .ltc-scenario-readout { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { body.ltc-revamp .ltc-scenario-readout { grid-template-columns: repeat(2, 1fr); }
+    body.ltc-revamp .ltc-scenario-metric:nth-child(n+3) { border-top: 1px solid var(--ltc-hairline); } body.ltc-revamp .ltc-scenario-metric:nth-child(3) { box-shadow: none; } }
 
 /* ── Power-breakdown donut: center total + per-slice % ──────────────────── */
 body.ltc-revamp .ltc-donut-ring { position: relative; flex-shrink: 0; }
@@ -1432,12 +1435,12 @@ body.ltc-revamp .ltc-tier-chip {
     display: inline-block; font-size: 8.5px; font-weight: 700; letter-spacing: .06em;
     padding: 1px 6px; border-radius: 4px; margin-left: 6px; vertical-align: 1px; white-space: nowrap;
 }
-body.ltc-revamp .ltc-chip-design { background: var(--ltc-badge-bg); color: var(--ltc-accent); }
-body.ltc-revamp .ltc-chip-auto { background: var(--ltc-kpi-good-bg); color: var(--ltc-green); }
-body.ltc-revamp .ltc-chip-tune { background: rgba(245,158,11,.14); color: #d97706; }
-[data-theme="dark"] body.ltc-revamp .ltc-chip-tune { color: #fbbf24; }
-body.ltc-revamp .ltc-tier-chip.ltc-chip-overridden { background: rgba(245,158,11,.18); color: #d97706; outline: 1px solid rgba(245,158,11,.5); }
-[data-theme="dark"] body.ltc-revamp .ltc-tier-chip.ltc-chip-overridden { color: #fbbf24; }
+/* 3.27.0 — tier marks are words, not filled chips: design in the accent, the rest muted; overridden = accent */
+body.ltc-revamp .ltc-tier-chip { padding: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; }
+body.ltc-revamp .ltc-chip-design { background: none; color: var(--ltc-accent); }
+body.ltc-revamp .ltc-chip-auto { background: none; color: var(--ltc-muted); }
+body.ltc-revamp .ltc-chip-tune { background: none; color: var(--ltc-muted); }
+body.ltc-revamp .ltc-tier-chip.ltc-chip-overridden { background: none; color: var(--ltc-accent); outline: none; text-decoration: underline; text-underline-offset: 2px; }
 body.ltc-revamp .ltc-auto-reset {
     background: none; border: 1px solid var(--ltc-hairline); border-radius: 4px;
     font-size: 10px; padding: 0 5px; margin-left: 5px; cursor: pointer; color: var(--ltc-muted);
