@@ -54,6 +54,7 @@
  * S25 (plant) The energy Sankey adds up to the plant's facility power; aux, pump and fan nodes are plant figures
  * S26 Charts tab chrome: no text with a hue cast except the amber accent and a fault-red state pill; no dashed borders
  * S27 Accordion titles are the block heading only (no tooltip text glued on)
+ * S28 Charts-tab series are amber and greys (red only for a high-risk state)
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -530,13 +531,27 @@ try {
           return !(e.matches('.status-pill.err') && (h < 15 || h > 345)); }).map((e) => e.tagName.toLowerCase() + '.' + [...e.classList].join('.') + ' ' + getComputedStyle(e).color);
         const dashed = vis.filter((e) => { const cs = getComputedStyle(e); return ['Top', 'Right', 'Bottom', 'Left'].some((k) => /dashed|dotted/.test(cs['border' + k + 'Style']) && parseFloat(cs['border' + k + 'Width']) > 0); })
           .map((e) => e.id || e.className);
-        return { cast: [...new Set(cast)].slice(0, 6), dashed: [...new Set(dashed)].slice(0, 6) }; });
+        const navy = vis.filter((e) => { const h = hue(getComputedStyle(e).backgroundColor); return h !== null && h > 180 && h < 260; })
+          .map((e) => (e.id || e.className) + ' ' + getComputedStyle(e).backgroundColor);
+        return { cast: [...new Set(cast)].slice(0, 6), dashed: [...new Set(dashed)].slice(0, 6), navy: [...new Set(navy)].slice(0, 6) }; });
+      ok(s26.navy.length === 0, `${w} S26 Charts-tab panels with a navy/blue fill: ${s26.navy.join(' | ')}`);
       ok(s26.cast.length === 0, `${w} S26 Charts-tab text with a hue cast: ${s26.cast.join(' | ')}`);
       ok(s26.dashed.length === 0, `${w} S26 Charts-tab dashed/dotted borders: ${s26.dashed.join(', ')}`);
       // S27 accordion titles are the block's heading, not the heading plus its tooltip text ("Chart?Facility … notes.Ref:")
       const s27 = await p.evaluate(() => [...document.querySelectorAll('.ltc-acc-title')].map((e) => e.textContent.trim())
-        .filter((t) => t.length > 70 || /\?|[a-z)]\.[A-Z]|Ref:|Impact:/.test(t)).map((t) => t.slice(0, 60)));
+        .filter((t) => t.length > 70 || /\?|[a-z)]\.[A-Z]|Ref:|Impact:|[a-z)]Guide$/.test(t)).map((t) => t.slice(0, 60)));
       ok(s27.length === 0, `${w} S27 accordion titles carry tooltip text: ${s27.slice(0, 4).join(' | ')}`);
+      // S28 chart series on the register: no SVG fill/stroke or histogram bar on the Charts tab in a hue other than amber
+      // or grey, except red for a high-risk state
+      const s28 = await p.evaluate(() => { const panel = document.getElementById('ltcTabCharts'); const out = new Set();
+        const hue = (c) => { const m = (c || '').match(/[\d.]+/g); if (!m || m.length < 3) return null; const [r, g, bb, a] = m.map(Number); if (a === 0) return null;
+          const mx = Math.max(r, g, bb), mn = Math.min(r, g, bb); if (mx - mn <= 25) return null; let h;
+          if (mx === r) h = 60 * (((g - bb) / (mx - mn)) % 6); else if (mx === g) h = 60 * ((bb - r) / (mx - mn) + 2); else h = 60 * ((r - g) / (mx - mn) + 4); return (h + 360) % 360; };
+        panel.querySelectorAll('svg *, .hist-bar').forEach((e) => { if (!e.getBoundingClientRect().width) return; const cs = getComputedStyle(e);
+          for (const v of [cs.fill, cs.stroke, e.classList.contains('hist-bar') ? cs.backgroundColor : '']) { const h = hue(v);
+            if (h === null || (h >= 25 && h <= 50) || h < 12 || h > 350) continue; out.add(((e.closest('svg') || {}).id || 'hist') + ' ' + v); } });
+        return [...out].slice(0, 6); });
+      ok(s28.length === 0, `${w} S28 Charts-tab series in a second hue: ${s28.join(' | ')}`);
       // S24 Pareto "apply best": the baseline row is the design before the apply, the figures shown are reproduced from
       // the form, and the form shows plain numbers (no float noise such as 1.2300000000000002)
       if (await p.$('#runPareto')) {
@@ -578,4 +593,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, 0 errors');

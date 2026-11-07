@@ -607,7 +607,7 @@
                 var heading = block.querySelector('h4, h3');
                 /* the heading carries its tooltip ("?" + title, description, Ref, Impact) inside it: read a copy without it */
                 var hc = heading ? heading.cloneNode(true) : null;
-                if (hc) Array.prototype.forEach.call(hc.querySelectorAll('.tooltip-trigger, .tooltip-content, .rzx-pop'), function (x) { x.remove(); });
+                if (hc) Array.prototype.forEach.call(hc.querySelectorAll('.tooltip-trigger, .tooltip-content, .rzx-pop, button'), function (x) { x.remove(); });
                 var title = hc ? hc.textContent.replace(/\s+/g, ' ').trim() : 'Details';
                 var open = idx === 0;
                 var wrap = el('section', { className: 'ltc-acc' + (open ? ' open' : '') });

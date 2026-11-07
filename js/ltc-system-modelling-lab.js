@@ -3424,44 +3424,44 @@
                 function buildSensitivityCandidates() {
                     if (nodeId === 'source') {
                         return [
-                            sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#2563eb', 'Primary scale driver for total facility power.', 1.5),
+                            sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#8a8f98', 'Primary scale driver for total facility power.', 1.5),
                             sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#14b8a6', 'Shifts burden between liquid and air branches.', 1.2),
                             sensitivityCandidate('upsEff', 'UPS Efficiency (%)', '#f59e0b', 'Electrical conversion loss sensitivity.', 1.15),
-                            sensitivityCandidate('distLoss', 'Distribution Loss (%)', '#d97706', 'Distribution chain loss overhead.', 1.1),
+                            sensitivityCandidate('distLoss', 'Distribution Loss (%)', '#b3b7bd', 'Distribution chain loss overhead.', 1.1),
                             sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control quality impact on cooling efficiency realization.', 0.95),
-                            sensitivityCandidate('airCop', 'Air Path COP', '#0284c7', 'Residual air branch efficiency response.', 0.9),
-                            sensitivityCandidate('fanPower', 'Fan Power Budget (%IT)', '#16a34a', 'Configured airflow demand envelope.', 0.9)
+                            sensitivityCandidate('airCop', 'Air Path COP', '#8a8f98', 'Residual air branch efficiency response.', 0.9),
+                            sensitivityCandidate('fanPower', 'Fan Power Budget (%IT)', '#b3b7bd', 'Configured airflow demand envelope.', 0.9)
                         ];
                     }
                     if (nodeId === 'compute') {
                         return [
-                            sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#2563eb', 'Direct compute load scaling.', 1.7),
-                            sensitivityCandidate('highDensityShare', 'High-Density Share (%)', '#1d4ed8', 'Density concentration on compute envelope.', 1.2),
-                            sensitivityCandidate('rackDensityTarget', 'Target Rack Density', '#2563eb', 'Design density target that affects effective compute profile.', 1.0),
+                            sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#8a8f98', 'Direct compute load scaling.', 1.7),
+                            sensitivityCandidate('highDensityShare', 'High-Density Share (%)', '#6b7079', 'Density concentration on compute envelope.', 1.2),
+                            sensitivityCandidate('rackDensityTarget', 'Target Rack Density', '#8a8f98', 'Design density target that affects effective compute profile.', 1.0),
                             sensitivityCandidate('modelYear', 'Model Horizon Year', '#0ea5e9', 'Future projection factor on compute envelope.', 0.9)
                         ];
                     }
                     if (nodeId === 'thermal') {
                         return [
-                            sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#0d9488', 'Primary thermal split between liquid and air.', 1.4),
-                            sensitivityCandidate('airCop', 'Air Path COP', '#0284c7', 'Residual air-cooling efficiency burden.', 1.2),
-                            sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#115e59', 'Hydraulic conversion efficiency.', 1.05),
-                            sensitivityCandidate('fanPower', 'Fan Power Budget (%IT)', '#16a34a', 'Airflow fan branch demand.', 1.0),
+                            sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#c98a00', 'Primary thermal split between liquid and air.', 1.4),
+                            sensitivityCandidate('airCop', 'Air Path COP', '#8a8f98', 'Residual air-cooling efficiency burden.', 1.2),
+                            sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#9a6a00', 'Hydraulic conversion efficiency.', 1.05),
+                            sensitivityCandidate('fanPower', 'Fan Power Budget (%IT)', '#b3b7bd', 'Airflow fan branch demand.', 1.0),
                             sensitivityCandidate('economizerHours', 'Economizer Availability (%)', '#0ea5e9', 'Free-cooling effect on thermal branch.', 0.95),
                             sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control-led thermal optimization response.', 0.9)
                         ];
                     }
                     if (nodeId === 'elec') {
                         return [
-                            sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#2563eb', 'Higher IT load increases conversion losses.', 1.3),
+                            sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#8a8f98', 'Higher IT load increases conversion losses.', 1.3),
                             sensitivityCandidate('upsEff', 'UPS Efficiency (%)', '#f59e0b', 'Dominant loss driver in UPS chain.', 1.6),
-                            sensitivityCandidate('distLoss', 'Distribution Loss (%)', '#d97706', 'PDU and busway loss sensitivity.', 1.35),
+                            sensitivityCandidate('distLoss', 'Distribution Loss (%)', '#b3b7bd', 'PDU and busway loss sensitivity.', 1.35),
                             sensitivityCandidate('modelYear', 'Model Horizon Year', '#0ea5e9', 'Future operation factor influence.', 0.8)
                         ];
                     }
                     if (nodeId === 'aux') {
                         return [
-                            sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#64748b', 'Aux baseline scales with facility size.', 1.2),
+                            sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#5c6169', 'Aux baseline scales with facility size.', 1.2),
                             sensitivityCandidate('monitoring', 'Monitoring Coverage (%)', '#475569', 'Monitoring quality affects auxiliary overhead.', 1.1),
                             sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control maturity impact on support burden.', 0.95),
                             sensitivityCandidate('coefFutureTech', 'Future Tech Multiplier (%)', '#0ea5e9', 'Future efficiency drift on support load.', 0.8)
@@ -3469,45 +3469,45 @@
                     }
                     if (nodeId === 'liq') {
                         return [
-                            sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#0d9488', 'Captured heat fraction feeding liquid loop.', 1.5),
+                            sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#c98a00', 'Captured heat fraction feeding liquid loop.', 1.5),
                             sensitivityCandidate('coefCduLoss', 'CDU Loss Coefficient (%)', '#14b8a6', 'CDU parasitic term contribution.', 1.25),
                             sensitivityCandidate('coefHeatTransfer', 'Heat Transfer Effectiveness (%)', '#06b6d4', 'Heat-transfer efficiency in liquid domain.', 1.05),
                             sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control effect on liquid COP realization.', 0.95),
-                            sensitivityCandidate('supplyTemp', 'Liquid Supply Temp (C)', '#0284c7', 'Supply setpoint shift affecting liquid COP.', 0.9),
+                            sensitivityCandidate('supplyTemp', 'Liquid Supply Temp (C)', '#8a8f98', 'Supply setpoint shift affecting liquid COP.', 0.9),
                             sensitivityCandidate('returnTemp', 'Liquid Return Temp (C)', '#0369a1', 'Return setpoint shift affecting deltaT and flow.', 0.9)
                         ];
                     }
                     if (nodeId === 'pump') {
                         return [
-                            sensitivityCandidate('pumpHead', 'Pump Head (m)', '#0f766e', 'Direct hydraulic work requirement.', 1.5),
-                            sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#115e59', 'Efficiency loss amplification on pump kW.', 1.45),
+                            sensitivityCandidate('pumpHead', 'Pump Head (m)', '#c98a00', 'Direct hydraulic work requirement.', 1.5),
+                            sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#9a6a00', 'Efficiency loss amplification on pump kW.', 1.45),
                             sensitivityCandidate('hydraulicMargin', 'Hydraulic Margin (%)', '#134e4a', 'Design safety margin overhead.', 1.2),
-                            sensitivityCandidate('coefPipeLoss', 'Pipe Loss Multiplier', '#0d9488', 'Pressure-drop multiplier impact.', 1.15),
+                            sensitivityCandidate('coefPipeLoss', 'Pipe Loss Multiplier', '#c98a00', 'Pressure-drop multiplier impact.', 1.15),
                             sensitivityCandidate('highDensityShare', 'High-Density Share (%)', '#14b8a6', 'Density-driven hydraulic stress influence.', 0.95)
                         ];
                     }
                     if (nodeId === 'air') {
                         return [
-                            sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#0284c7', 'Residual uncaptured heat moved to air path.', 1.45),
+                            sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#8a8f98', 'Residual uncaptured heat moved to air path.', 1.45),
                             sensitivityCandidate('airCop', 'Air Path COP', '#0ea5e9', 'Air-side COP impact on electrical demand.', 1.35),
-                            sensitivityCandidate('economizerHours', 'Economizer Availability (%)', '#1d4ed8', 'Outdoor-air/economizer relief factor.', 1.1),
+                            sensitivityCandidate('economizerHours', 'Economizer Availability (%)', '#6b7079', 'Outdoor-air/economizer relief factor.', 1.1),
                             sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control-induced air branch efficiency shift.', 0.95),
                             sensitivityCandidate('supplyTemp', 'Liquid Supply Temp (C)', '#0369a1', 'Setpoint coupling to residual thermal burden.', 0.8)
                         ];
                     }
                     if (nodeId === 'fan') {
                         return [
-                            sensitivityCandidate('fanPower', 'Fan Power Budget (%IT)', '#16a34a', 'Configured facility airflow baseline.', 1.6),
+                            sensitivityCandidate('fanPower', 'Fan Power Budget (%IT)', '#b3b7bd', 'Configured facility airflow baseline.', 1.6),
                             sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#22c55e', 'Residual-air demand from capture efficiency.', 1.25),
                             sensitivityCandidate('controlQuality', 'Control Quality (%)', '#15803d', 'Control modulation on fan dispatch.', 1.05),
-                            sensitivityCandidate('airCop', 'Air Path COP', '#0284c7', 'Air-path efficiency coupling to fan duty.', 0.9),
+                            sensitivityCandidate('airCop', 'Air Path COP', '#8a8f98', 'Air-path efficiency coupling to fan duty.', 0.9),
                             sensitivityCandidate('monitoring', 'Monitoring Coverage (%)', '#65a30d', 'Observability impact on fan optimization.', 0.8)
                         ];
                     }
                     return [
-                        sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#2563eb', 'Primary load scaling term.', 1.1),
+                        sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#8a8f98', 'Primary load scaling term.', 1.1),
                         sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control quality effect.', 1.0),
-                        sensitivityCandidate('airCop', 'Air Path COP', '#0284c7', 'Cooling efficiency influence.', 0.9)
+                        sensitivityCandidate('airCop', 'Air Path COP', '#8a8f98', 'Cooling efficiency influence.', 0.9)
                     ];
                 }
 
@@ -3664,19 +3664,19 @@
                 if (nodeId === 'source') {
                     focus = flows.total;
                     var sourceParts = [
-                        { label: 'IT Compute', value: flows.it, color: '#2563eb', note: 'Direct productive compute load.' },
-                        { label: 'Thermal Management', value: flows.thermal, color: '#0891b2', note: 'Cooling + hydraulic + fan envelope.' },
-                        { label: 'Electrical Loss', value: flows.elecLoss, color: '#d97706', note: 'UPS and distribution conversion losses.' },
-                        { label: 'Facility Aux', value: flows.facilityAux, color: '#64748b', note: 'Lighting/control/safety base auxiliary.' }
+                        { label: 'IT Compute', value: flows.it, color: '#8a8f98', note: 'Direct productive compute load.' },
+                        { label: 'Thermal Management', value: flows.thermal, color: '#c98a00', note: 'Cooling + hydraulic + fan envelope.' },
+                        { label: 'Electrical Loss', value: flows.elecLoss, color: '#b3b7bd', note: 'UPS and distribution conversion losses.' },
+                        { label: 'Facility Aux', value: flows.facilityAux, color: '#5c6169', note: 'Lighting/control/safety base auxiliary.' }
                     ];
                     spec.title = 'Total Facility Input | Detailed Distribution';
                     spec.subtitle = 'Top-level plant power split across primary functional domains.';
                     spec.nodes = [
-                        { id: 'f_total', label: 'Total Facility Input', col: 0, color: '#1d4ed8' },
-                        { id: 'f_it', label: 'IT Compute', col: 1, color: '#2563eb' },
-                        { id: 'f_thermal', label: 'Thermal Mgmt', col: 1, color: '#0891b2' },
-                        { id: 'f_elec', label: 'Electrical Loss', col: 1, color: '#d97706' },
-                        { id: 'f_aux', label: 'Facility Aux', col: 1, color: '#64748b' }
+                        { id: 'f_total', label: 'Total Facility Input', col: 0, color: '#6b7079' },
+                        { id: 'f_it', label: 'IT Compute', col: 1, color: '#8a8f98' },
+                        { id: 'f_thermal', label: 'Thermal Mgmt', col: 1, color: '#c98a00' },
+                        { id: 'f_elec', label: 'Electrical Loss', col: 1, color: '#b3b7bd' },
+                        { id: 'f_aux', label: 'Facility Aux', col: 1, color: '#5c6169' }
                     ];
                     spec.links = sourceParts.map(function(p, idx) {
                         return { from: 'f_total', to: ['f_it', 'f_thermal', 'f_elec', 'f_aux'][idx], value: p.value, color: p.color, label: p.label + ' ' + fmtNum(p.value, 0) + ' kW' };
@@ -3697,8 +3697,8 @@
                     var highDensityIt = model.itKw * clamp((input.highDensityShare || 0) / 100, 0, 1);
                     var standardIt = Math.max(model.itKw - highDensityIt, 0);
                     var computeParts = scaleDetailParts([
-                        { label: 'High-Density Racks', value: highDensityIt, color: '#1d4ed8', note: 'AI/HPC high-density rack segment.' },
-                        { label: 'Standard Density Racks', value: standardIt, color: '#3b82f6', note: 'Conventional density rack segment.' }
+                        { label: 'High-Density Racks', value: highDensityIt, color: '#6b7079', note: 'AI/HPC high-density rack segment.' },
+                        { label: 'Standard Density Racks', value: standardIt, color: '#b3b7bd', note: 'Conventional density rack segment.' }
                     ], focus);
                     var hdToLiquid = computeParts[0].value * captureRatio;
                     var hdToAir = computeParts[0].value - hdToLiquid;
@@ -3707,25 +3707,25 @@
                     spec.title = 'IT Compute | Rack + Heat Routing Detail';
                     spec.subtitle = 'Compute load split by rack density and routed to liquid vs air path.';
                     spec.nodes = [
-                        { id: 'c_it', label: 'IT Compute', col: 0, color: '#2563eb' },
-                        { id: 'c_hd', label: 'High-Density Racks', col: 1, color: '#1d4ed8' },
-                        { id: 'c_std', label: 'Standard Racks', col: 1, color: '#3b82f6' },
-                        { id: 'c_liq', label: 'Heat to Liquid Path', col: 2, color: '#0d9488' },
-                        { id: 'c_air', label: 'Heat to Air Path', col: 2, color: '#0284c7' }
+                        { id: 'c_it', label: 'IT Compute', col: 0, color: '#8a8f98' },
+                        { id: 'c_hd', label: 'High-Density Racks', col: 1, color: '#6b7079' },
+                        { id: 'c_std', label: 'Standard Racks', col: 1, color: '#b3b7bd' },
+                        { id: 'c_liq', label: 'Heat to Liquid Path', col: 2, color: '#c98a00' },
+                        { id: 'c_air', label: 'Heat to Air Path', col: 2, color: '#8a8f98' }
                     ];
                     spec.links = [
-                        { from: 'c_it', to: 'c_hd', value: computeParts[0].value, color: '#1d4ed8', label: 'High-density IT' },
-                        { from: 'c_it', to: 'c_std', value: computeParts[1].value, color: '#3b82f6', label: 'Standard IT' },
-                        { from: 'c_hd', to: 'c_liq', value: hdToLiquid, color: '#0d9488', label: 'HD -> liquid path' },
-                        { from: 'c_hd', to: 'c_air', value: hdToAir, color: '#0284c7', label: 'HD -> air path' },
-                        { from: 'c_std', to: 'c_liq', value: stdToLiquid, color: '#0d9488', label: 'STD -> liquid path' },
-                        { from: 'c_std', to: 'c_air', value: stdToAir, color: '#0284c7', label: 'STD -> air path' }
+                        { from: 'c_it', to: 'c_hd', value: computeParts[0].value, color: '#6b7079', label: 'High-density IT' },
+                        { from: 'c_it', to: 'c_std', value: computeParts[1].value, color: '#b3b7bd', label: 'Standard IT' },
+                        { from: 'c_hd', to: 'c_liq', value: hdToLiquid, color: '#c98a00', label: 'HD -> liquid path' },
+                        { from: 'c_hd', to: 'c_air', value: hdToAir, color: '#8a8f98', label: 'HD -> air path' },
+                        { from: 'c_std', to: 'c_liq', value: stdToLiquid, color: '#c98a00', label: 'STD -> liquid path' },
+                        { from: 'c_std', to: 'c_air', value: stdToAir, color: '#8a8f98', label: 'STD -> air path' }
                     ];
                     spec.rows = rowsFromParts([
                         computeParts[0],
                         computeParts[1],
-                        { label: 'Routed to Liquid Path', value: model.liquidKw, color: '#0d9488', note: 'Effective capture-routed IT heat load.' },
-                        { label: 'Routed to Air Path', value: model.airKw, color: '#0284c7', note: 'Residual IT heat for air path.' }
+                        { label: 'Routed to Liquid Path', value: model.liquidKw, color: '#c98a00', note: 'Effective capture-routed IT heat load.' },
+                        { label: 'Routed to Air Path', value: model.airKw, color: '#8a8f98', note: 'Residual IT heat for air path.' }
                     ], focus);
                     spec.formulas = [
                         'highDensityIT = IT * highDensityShare',
@@ -3742,19 +3742,19 @@
                 } else if (nodeId === 'thermal') {
                     focus = flows.thermal;
                     var thermalParts = [
-                        { label: 'Liquid Loop', value: flows.liquidCore, color: '#0d9488', note: model.plant ? 'FWS pumps and trim chillers (dry-cooler fans are under Fan Power).' : 'Liquid cooling power excluding pump drive.' },
-                        { label: 'Pump Drive', value: flows.pump, color: '#115e59', note: model.plant ? 'TCS (rack-side) loop pumps.' : 'Hydraulic pumping electrical demand.' },
-                        { label: 'Air Path', value: flows.air, color: '#0284c7', note: model.plant ? 'Chillers, CHW and CW pumps, cooling-tower fans.' : 'Residual heat air-cooling burden.' },
-                        { label: 'Fan Power', value: flows.fan, color: '#16a34a', note: model.plant ? 'CRAH fans, electrical-room fans, dry-cooler fans.' : 'CRAH/CRAC and airflow power share.' }
+                        { label: 'Liquid Loop', value: flows.liquidCore, color: '#c98a00', note: model.plant ? 'FWS pumps and trim chillers (dry-cooler fans are under Fan Power).' : 'Liquid cooling power excluding pump drive.' },
+                        { label: 'Pump Drive', value: flows.pump, color: '#9a6a00', note: model.plant ? 'TCS (rack-side) loop pumps.' : 'Hydraulic pumping electrical demand.' },
+                        { label: 'Air Path', value: flows.air, color: '#8a8f98', note: model.plant ? 'Chillers, CHW and CW pumps, cooling-tower fans.' : 'Residual heat air-cooling burden.' },
+                        { label: 'Fan Power', value: flows.fan, color: '#b3b7bd', note: model.plant ? 'CRAH fans, electrical-room fans, dry-cooler fans.' : 'CRAH/CRAC and airflow power share.' }
                     ];
                     spec.title = 'Thermal Management | Branch Breakdown';
                     spec.subtitle = 'Thermal domain decomposition into liquid, pump, air, and fan branches.';
                     spec.nodes = [
-                        { id: 't_total', label: 'Thermal Management', col: 0, color: '#0891b2' },
-                        { id: 't_liq', label: 'Liquid Loop', col: 1, color: '#0d9488' },
-                        { id: 't_pump', label: 'Pump Drive', col: 1, color: '#115e59' },
-                        { id: 't_air', label: 'Air Path', col: 1, color: '#0284c7' },
-                        { id: 't_fan', label: 'Fan Power', col: 1, color: '#16a34a' }
+                        { id: 't_total', label: 'Thermal Management', col: 0, color: '#c98a00' },
+                        { id: 't_liq', label: 'Liquid Loop', col: 1, color: '#c98a00' },
+                        { id: 't_pump', label: 'Pump Drive', col: 1, color: '#9a6a00' },
+                        { id: 't_air', label: 'Air Path', col: 1, color: '#8a8f98' },
+                        { id: 't_fan', label: 'Fan Power', col: 1, color: '#b3b7bd' }
                     ];
                     spec.links = thermalParts.map(function(p, idx) {
                         return { from: 't_total', to: ['t_liq', 't_pump', 't_air', 't_fan'][idx], value: p.value, color: p.color, label: p.label };
@@ -3776,18 +3776,18 @@
                     var distLoss = Math.max(upsInput * ((input.distLoss || 0) / 100), 0);
                     var elecParts = scaleDetailParts([
                         { label: 'UPS Conversion Loss', value: upsLoss, color: '#f59e0b', note: 'Rectifier/inverter conversion overhead.' },
-                        { label: 'Distribution Loss', value: distLoss, color: '#d97706', note: 'PDU/busway/distribution line losses.' }
+                        { label: 'Distribution Loss', value: distLoss, color: '#b3b7bd', note: 'PDU/busway/distribution line losses.' }
                     ], focus);
                     spec.title = 'Electrical Loss | Conversion Detail';
                     spec.subtitle = 'Power chain losses from UPS conversion and downstream distribution.';
                     spec.nodes = [
-                        { id: 'e_total', label: 'Electrical Loss', col: 0, color: '#d97706' },
+                        { id: 'e_total', label: 'Electrical Loss', col: 0, color: '#b3b7bd' },
                         { id: 'e_ups', label: 'UPS Loss', col: 1, color: '#f59e0b' },
-                        { id: 'e_dist', label: 'Distribution Loss', col: 1, color: '#d97706' }
+                        { id: 'e_dist', label: 'Distribution Loss', col: 1, color: '#b3b7bd' }
                     ];
                     spec.links = [
                         { from: 'e_total', to: 'e_ups', value: elecParts[0].value, color: '#f59e0b', label: 'UPS conversion loss' },
-                        { from: 'e_total', to: 'e_dist', value: elecParts[1].value, color: '#d97706', label: 'Distribution loss' }
+                        { from: 'e_total', to: 'e_dist', value: elecParts[1].value, color: '#b3b7bd', label: 'Distribution loss' }
                     ];
                     spec.rows = rowsFromParts(elecParts, focus);
                     spec.formulas = [
@@ -3805,20 +3805,20 @@
                     focus = flows.facilityAux;
                     var monitorRatio = clamp((input.monitoring || 80) / 100, 0.1, 1);
                     var auxParts = scaleDetailParts([
-                        { label: 'BMS + Controls', value: 0.34 + (monitorRatio * 0.16), color: '#64748b', note: 'Building management systems and control backbone.' },
+                        { label: 'BMS + Controls', value: 0.34 + (monitorRatio * 0.16), color: '#5c6169', note: 'Building management systems and control backbone.' },
                         { label: 'Lighting + Safety', value: 0.28 - (monitorRatio * 0.08), color: '#94a3b8', note: 'Lighting, safety, and static support loads.' },
                         { label: 'Misc Facility Support', value: 0.38 - (monitorRatio * 0.08), color: '#475569', note: 'Security, services, and miscellaneous auxiliaries.' }
                     ], focus);
                     spec.title = 'Facility Aux | Support Load Breakdown';
                     spec.subtitle = 'Base non-process facility support consumption allocation.';
                     spec.nodes = [
-                        { id: 'a_total', label: 'Facility Aux', col: 0, color: '#64748b' },
-                        { id: 'a_bms', label: 'BMS + Controls', col: 1, color: '#64748b' },
+                        { id: 'a_total', label: 'Facility Aux', col: 0, color: '#5c6169' },
+                        { id: 'a_bms', label: 'BMS + Controls', col: 1, color: '#5c6169' },
                         { id: 'a_light', label: 'Lighting + Safety', col: 1, color: '#94a3b8' },
                         { id: 'a_misc', label: 'Misc Support', col: 1, color: '#475569' }
                     ];
                     spec.links = [
-                        { from: 'a_total', to: 'a_bms', value: auxParts[0].value, color: '#64748b', label: 'BMS + control backbone' },
+                        { from: 'a_total', to: 'a_bms', value: auxParts[0].value, color: '#5c6169', label: 'BMS + control backbone' },
                         { from: 'a_total', to: 'a_light', value: auxParts[1].value, color: '#94a3b8', label: 'Lighting and safety loads' },
                         { from: 'a_total', to: 'a_misc', value: auxParts[2].value, color: '#475569', label: 'Misc facility services' }
                     ];
@@ -3838,21 +3838,21 @@
                     var liquidCop = Math.max(internals.liquidCop || 1, 1);
                     var cduLossKw = Math.max(model.liquidKw * ((input.coefCduLoss || 0) / 100), 0);
                     var liquidParts = scaleDetailParts([
-                        { label: 'Captured IT Heat Conversion', value: model.liquidKw / liquidCop, color: '#0d9488', note: 'Liquid-captured IT load converted by liquid COP.' },
+                        { label: 'Captured IT Heat Conversion', value: model.liquidKw / liquidCop, color: '#c98a00', note: 'Liquid-captured IT load converted by liquid COP.' },
                         { label: 'CDU Parasitic Recovery', value: cduLossKw / liquidCop, color: '#14b8a6', note: 'CDU loss burden propagated into liquid power demand.' }
                     ], focus);
                     spec.title = 'Liquid Loop | Detailed Solver Decomposition';
                     spec.subtitle = 'Contribution of captured IT heat and CDU parasitic burden to liquid-loop energy.';
                     spec.nodes = [
-                        { id: 'l_capture', label: 'Captured Heat Duty', col: 0, color: '#0d9488' },
+                        { id: 'l_capture', label: 'Captured Heat Duty', col: 0, color: '#c98a00' },
                         { id: 'l_cdu', label: 'CDU Loss Duty', col: 0, color: '#14b8a6' },
-                        { id: 'l_solver', label: 'Liquid Thermal Solver', col: 1, color: '#0891b2' },
-                        { id: 'l_out', label: 'Liquid Loop', col: 2, color: '#0d9488' }
+                        { id: 'l_solver', label: 'Liquid Thermal Solver', col: 1, color: '#c98a00' },
+                        { id: 'l_out', label: 'Liquid Loop', col: 2, color: '#c98a00' }
                     ];
                     spec.links = [
-                        { from: 'l_capture', to: 'l_solver', value: liquidParts[0].value, color: '#0d9488', label: 'Captured duty / liquid COP' },
+                        { from: 'l_capture', to: 'l_solver', value: liquidParts[0].value, color: '#c98a00', label: 'Captured duty / liquid COP' },
                         { from: 'l_cdu', to: 'l_solver', value: liquidParts[1].value, color: '#14b8a6', label: 'CDU duty / liquid COP' },
-                        { from: 'l_solver', to: 'l_out', value: focus, color: '#0d9488', label: 'Liquid loop net power' }
+                        { from: 'l_solver', to: 'l_out', value: focus, color: '#c98a00', label: 'Liquid loop net power' }
                     ];
                     spec.rows = rowsFromParts(liquidParts, focus);
                     spec.formulas = [
@@ -3874,22 +3874,22 @@
                        teal the liquid loop draws in, so the chart says "same family, different
                        member" instead of "unrelated thing that happens to be purple". */
                     var pumpFactors = scaleDetailParts([
-                        { label: 'Static Head Requirement', value: Math.max(input.pumpHead || 1, 1), color: '#0f766e', note: 'Nominal vertical/lift and base hydraulic head.' },
-                        { label: 'Pipe Friction Multiplier', value: Math.max((input.coefPipeLoss || 1) - 0.85, 0.15), color: '#115e59', note: 'Pipe complexity and pressure-drop multiplier.' },
+                        { label: 'Static Head Requirement', value: Math.max(input.pumpHead || 1, 1), color: '#c98a00', note: 'Nominal vertical/lift and base hydraulic head.' },
+                        { label: 'Pipe Friction Multiplier', value: Math.max((input.coefPipeLoss || 1) - 0.85, 0.15), color: '#9a6a00', note: 'Pipe complexity and pressure-drop multiplier.' },
                         { label: 'Hydraulic Margin', value: Math.max((input.hydraulicMargin || 0) / 100, 0.05), color: '#134e4a', note: 'Design safety margin for uncertain operating envelope.' },
-                        { label: 'Redundancy Overhead', value: Math.max(redundancyFactor - 1, 0.05), color: '#0d9488', note: 'N+1 / 2N redundancy circulation overhead.' },
+                        { label: 'Redundancy Overhead', value: Math.max(redundancyFactor - 1, 0.05), color: '#c98a00', note: 'N+1 / 2N redundancy circulation overhead.' },
                         { label: 'Density Stress Effect', value: Math.max((internals.densityStress || 1) - 1, 0.05), color: '#14b8a6', note: 'Rack density impact on effective pumping requirement.' }
                     ], focus);
                     spec.title = 'Pump Drive | Hydraulic Driver Detail';
                     spec.subtitle = 'Pump branch decomposition by hydraulic design and reliability drivers.';
                     spec.nodes = [
-                        { id: 'p_h1', label: 'Static Head', col: 0, color: '#0f766e' },
-                        { id: 'p_h2', label: 'Pipe Friction', col: 0, color: '#115e59' },
+                        { id: 'p_h1', label: 'Static Head', col: 0, color: '#c98a00' },
+                        { id: 'p_h2', label: 'Pipe Friction', col: 0, color: '#9a6a00' },
                         { id: 'p_h3', label: 'Hydraulic Margin', col: 0, color: '#134e4a' },
-                        { id: 'p_h4', label: 'Redundancy', col: 0, color: '#0d9488' },
+                        { id: 'p_h4', label: 'Redundancy', col: 0, color: '#c98a00' },
                         { id: 'p_h5', label: 'Density Stress', col: 0, color: '#14b8a6' },
-                        { id: 'p_solver', label: 'Hydraulic Solver', col: 1, color: '#0f766e' },
-                        { id: 'p_out', label: 'Pump Drive', col: 2, color: '#115e59' }
+                        { id: 'p_solver', label: 'Hydraulic Solver', col: 1, color: '#c98a00' },
+                        { id: 'p_out', label: 'Pump Drive', col: 2, color: '#9a6a00' }
                     ];
                     spec.links = [
                         { from: 'p_h1', to: 'p_solver', value: pumpFactors[0].value, color: pumpFactors[0].color, label: pumpFactors[0].label },
@@ -3897,7 +3897,7 @@
                         { from: 'p_h3', to: 'p_solver', value: pumpFactors[2].value, color: pumpFactors[2].color, label: pumpFactors[2].label },
                         { from: 'p_h4', to: 'p_solver', value: pumpFactors[3].value, color: pumpFactors[3].color, label: pumpFactors[3].label },
                         { from: 'p_h5', to: 'p_solver', value: pumpFactors[4].value, color: pumpFactors[4].color, label: pumpFactors[4].label },
-                        { from: 'p_solver', to: 'p_out', value: focus, color: '#115e59', label: 'Pump drive net power' }
+                        { from: 'p_solver', to: 'p_out', value: focus, color: '#9a6a00', label: 'Pump drive net power' }
                     ];
                     spec.rows = rowsFromParts(pumpFactors, focus);
                     spec.formulas = [
@@ -3917,24 +3917,24 @@
                     var controlPenalty = Math.max(1 - clamp(model.controlIndex / 100, 0, 1), 0.08);
                     var residualRatio = clamp(model.airKw / Math.max(model.itKw, 1), 0.02, 1);
                     var airParts = scaleDetailParts([
-                        { label: 'Residual Heat Duty', value: residualRatio * 1.4, color: '#0284c7', note: 'Uncaptured IT heat routed to air path.' },
+                        { label: 'Residual Heat Duty', value: residualRatio * 1.4, color: '#8a8f98', note: 'Uncaptured IT heat routed to air path.' },
                         { label: 'Climate + Wet-Bulb Effect', value: climatePenalty, color: '#0ea5e9', note: 'Ambient climate impact on air-path efficiency.' },
                         { label: 'Control/Economizer Penalty', value: econPenalty + controlPenalty, color: '#0369a1', note: 'Operational and control limitations reducing air-path COP.' }
                     ], focus);
                     spec.title = 'Air Path | Contribution Breakdown';
                     spec.subtitle = 'Residual thermal duty and operating-condition contributions to air-path power.';
                     spec.nodes = [
-                        { id: 'ar_h1', label: 'Residual Heat Duty', col: 0, color: '#0284c7' },
+                        { id: 'ar_h1', label: 'Residual Heat Duty', col: 0, color: '#8a8f98' },
                         { id: 'ar_h2', label: 'Climate Effect', col: 0, color: '#0ea5e9' },
                         { id: 'ar_h3', label: 'Control + Economizer', col: 0, color: '#0369a1' },
-                        { id: 'ar_solver', label: 'Air Thermal Solver', col: 1, color: '#0284c7' },
-                        { id: 'ar_out', label: 'Air Path', col: 2, color: '#0284c7' }
+                        { id: 'ar_solver', label: 'Air Thermal Solver', col: 1, color: '#8a8f98' },
+                        { id: 'ar_out', label: 'Air Path', col: 2, color: '#8a8f98' }
                     ];
                     spec.links = [
                         { from: 'ar_h1', to: 'ar_solver', value: airParts[0].value, color: airParts[0].color, label: airParts[0].label },
                         { from: 'ar_h2', to: 'ar_solver', value: airParts[1].value, color: airParts[1].color, label: airParts[1].label },
                         { from: 'ar_h3', to: 'ar_solver', value: airParts[2].value, color: airParts[2].color, label: airParts[2].label },
-                        { from: 'ar_solver', to: 'ar_out', value: focus, color: '#0284c7', label: 'Air path net power' }
+                        { from: 'ar_solver', to: 'ar_out', value: focus, color: '#8a8f98', label: 'Air path net power' }
                     ];
                     spec.rows = rowsFromParts(airParts, focus);
                     spec.formulas = [
@@ -3953,24 +3953,24 @@
                     var captureFactor = clamp(1 - (model.effectiveCapture / 100) * 0.55, 0.3, 1);
                     var controlFactor = clamp(1 - (controlBonus * 0.18), 0.6, 1.15);
                     var fanParts = scaleDetailParts([
-                        { label: 'Base Airflow Budget', value: Math.max(input.fanPower || 1, 0.2), color: '#16a34a', note: 'Configured airflow budget relative to IT load.' },
+                        { label: 'Base Airflow Budget', value: Math.max(input.fanPower || 1, 0.2), color: '#b3b7bd', note: 'Configured airflow budget relative to IT load.' },
                         { label: 'Residual-Air Requirement', value: Math.max(captureFactor, 0.15), color: '#22c55e', note: 'Effective liquid-capture reduction effect on airflow demand.' },
                         { label: 'Control Modulation', value: Math.max(controlFactor, 0.15), color: '#15803d', note: 'Control quality modulation impact on fan dispatch.' }
                     ], focus);
                     spec.title = 'Fan Power | Airflow Driver Breakdown';
                     spec.subtitle = 'Fan branch decomposition across budget, capture condition, and control modulation.';
                     spec.nodes = [
-                        { id: 'fn_h1', label: 'Airflow Budget', col: 0, color: '#16a34a' },
+                        { id: 'fn_h1', label: 'Airflow Budget', col: 0, color: '#b3b7bd' },
                         { id: 'fn_h2', label: 'Residual-Air Need', col: 0, color: '#22c55e' },
                         { id: 'fn_h3', label: 'Control Modulation', col: 0, color: '#15803d' },
-                        { id: 'fn_solver', label: 'Airflow Solver', col: 1, color: '#16a34a' },
-                        { id: 'fn_out', label: 'Fan Power', col: 2, color: '#16a34a' }
+                        { id: 'fn_solver', label: 'Airflow Solver', col: 1, color: '#b3b7bd' },
+                        { id: 'fn_out', label: 'Fan Power', col: 2, color: '#b3b7bd' }
                     ];
                     spec.links = [
                         { from: 'fn_h1', to: 'fn_solver', value: fanParts[0].value, color: fanParts[0].color, label: fanParts[0].label },
                         { from: 'fn_h2', to: 'fn_solver', value: fanParts[1].value, color: fanParts[1].color, label: fanParts[1].label },
                         { from: 'fn_h3', to: 'fn_solver', value: fanParts[2].value, color: fanParts[2].color, label: fanParts[2].label },
-                        { from: 'fn_solver', to: 'fn_out', value: focus, color: '#16a34a', label: 'Fan power net demand' }
+                        { from: 'fn_solver', to: 'fn_out', value: focus, color: '#b3b7bd', label: 'Fan power net demand' }
                     ];
                     spec.rows = rowsFromParts(fanParts, focus);
                     spec.formulas = [
@@ -4025,7 +4025,7 @@
                         id: n.id,
                         label: n.label,
                         col: c,
-                        color: n.color || '#64748b',
+                        color: n.color || '#5c6169',
                         value: 0,
                         inValue: 0,
                         outValue: 0,
@@ -4134,7 +4134,7 @@
                 var splitSvg = [];
                 for (var si = 1; si < colCount; si++) {
                     var sx = (colXs[si - 1] + colXs[si]) / 2;
-                    splitSvg.push('<line x1="' + fmtNum(sx, 2) + '" y1="34" x2="' + fmtNum(sx, 2) + '" y2="' + (h - 24) + '" stroke="rgba(148,163,184,0.18)" stroke-dasharray="2 4"></line>');
+                    splitSvg.push('<line x1="' + fmtNum(sx, 2) + '" y1="34" x2="' + fmtNum(sx, 2) + '" y2="' + (h - 24) + '" stroke="rgba(128,128,128,0.18)" stroke-dasharray="2 4"></line>');
                 }
                 return {
                     w: w,
@@ -7872,9 +7872,10 @@
             }
 
             function riskColor(risk) {
-                if (risk <= 25) return '#047857';
-                if (risk <= 40) return '#b45309';
-                return '#b91c1c';
+                /* risk is a state: grey (low), amber (medium), red (high) — no green, no second accent */
+                if (risk <= 25) return '#8a8f98';
+                if (risk <= 40) return '#c98a00';
+                return '#d1453b';
             }
 
             function syncParetoRowSelection() {
@@ -7906,12 +7907,13 @@
                 var pw = w - pad.l - pad.r;
                 var ph = h - pad.t - pad.b;
                 var isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
-                var chartText = isDarkTheme ? '#f8fafc' : '#1f2937';
-                var chartTextSoft = isDarkTheme ? '#e2e8f0' : '#334155';
-                var chartTextFaint = isDarkTheme ? '#cbd5e1' : '#64748b';
-                var gridStroke = isDarkTheme ? 'rgba(148,163,184,0.28)' : 'rgba(148,163,184,0.2)';
-                var legendFill = isDarkTheme ? 'rgba(2,6,23,0.92)' : 'rgba(255,255,255,0.92)';
-                var legendStroke = isDarkTheme ? 'rgba(203,213,225,0.55)' : 'rgba(148,163,184,0.42)';
+                var chartText = isDarkTheme ? '#ECEDEF' : '#1a1d23';
+                var chartTextSoft = isDarkTheme ? '#c9cbcf' : '#3a3d42';
+                var chartTextFaint = isDarkTheme ? '#9a9ea6' : '#5f6368';
+                var accentStroke = isDarkTheme ? '#FFAA00' : '#B07600';
+                var gridStroke = isDarkTheme ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)';
+                var legendFill = isDarkTheme ? 'rgba(18,19,22,0.92)' : 'rgba(255,255,255,0.92)';
+                var legendStroke = isDarkTheme ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.16)';
 
                 var pueVals = latestPareto.map(function(m) { return m.pue; });
                 var opexVals = latestPareto.map(function(m) { return m.netOpex; });
@@ -7983,10 +7985,10 @@
                     var x = sx(m.pue);
                     var y = sy(m.netOpex);
                     var r = 4 + (((m.netCarbonTons - minCarbon) / (maxCarbon - minCarbon)) * 3.5);
-                    var stroke = m._feasible ? '#065f46' : '#9a3412';
+                    var stroke = m._feasible ? '#5c6169' : '#9a6a00';
                     var strokeDash = m._feasible ? '' : ' stroke-dasharray="3 2"';
                     var selected = idx === selectedParetoIdx;
-                    var outer = selected ? '<circle cx="' + fmtNum(x, 2) + '" cy="' + fmtNum(y, 2) + '" r="' + fmtNum(r + 4, 2) + '" fill="none" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="2 2"></circle>' : '';
+                    var outer = selected ? '<circle cx="' + fmtNum(x, 2) + '" cy="' + fmtNum(y, 2) + '" r="' + fmtNum(r + 4, 2) + '" fill="none" stroke="' + accentStroke + '" stroke-width="1.6" stroke-dasharray="2 2"></circle>' : '';
                     var title = 'P' + (idx + 1) + ' | PUE ' + fmtNum(m.pue, 3) + ' | COP ' + fmtNum(m.systemCop, 2) + ' | OPEX ' + fmtUsd(m.netOpex) + ' | Carbon ' + fmtNum(m.netCarbonTons, 0) + ' | Risk ' + fmtNum(m.riskIndex, 1);
                     var labelAnchor = (idx % 2 === 0) ? 'start' : 'end';
                     var labelX = x + ((idx % 2 === 0) ? (r + 2) : -(r + 3));
@@ -8005,8 +8007,8 @@
                     var gxSel = sx(sm.pue);
                     var gySel = sy(sm.netOpex);
                     selectedGuides = '' +
-                        '<line x1="' + fmtNum(gxSel, 2) + '" y1="' + pad.t + '" x2="' + fmtNum(gxSel, 2) + '" y2="' + (pad.t + ph) + '" stroke="rgba(37,99,235,0.42)" stroke-width="1" stroke-dasharray="2 3"></line>' +
-                        '<line x1="' + pad.l + '" y1="' + fmtNum(gySel, 2) + '" x2="' + (pad.l + pw) + '" y2="' + fmtNum(gySel, 2) + '" stroke="rgba(37,99,235,0.42)" stroke-width="1" stroke-dasharray="2 3"></line>';
+                        '<line x1="' + fmtNum(gxSel, 2) + '" y1="' + pad.t + '" x2="' + fmtNum(gxSel, 2) + '" y2="' + (pad.t + ph) + '" stroke="' + accentStroke + '" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="2 3"></line>' +
+                        '<line x1="' + pad.l + '" y1="' + fmtNum(gySel, 2) + '" x2="' + (pad.l + pw) + '" y2="' + fmtNum(gySel, 2) + '" stroke="' + accentStroke + '" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="2 3"></line>';
                 }
                 var legendX = w - 232;
                 var legendY = 10;
@@ -8014,19 +8016,18 @@
                 var yMid = pad.t + (ph / 2);
 
                 svg.innerHTML = [
-                    '<defs><linearGradient id="paretoBg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="rgba(59,130,246,0.06)"/><stop offset="100%" stop-color="rgba(16,185,129,0.04)"/></linearGradient></defs>',
-                    '<rect x="' + pad.l + '" y="' + pad.t + '" width="' + pw + '" height="' + ph + '" fill="url(#paretoBg)" stroke="rgba(148,163,184,0.34)" rx="8" />',
+                    '<rect x="' + pad.l + '" y="' + pad.t + '" width="' + pw + '" height="' + ph + '" fill="none" stroke="' + gridStroke + '" rx="4" />',
                     grid.join(''),
-                    frontierPath ? '<path d="' + frontierPath + '" fill="none" stroke="rgba(30,64,175,0.5)" stroke-width="1.6" stroke-dasharray="4 3"></path>' : '',
+                    frontierPath ? '<path d="' + frontierPath + '" fill="none" stroke="' + chartTextFaint + '" stroke-width="1.6" stroke-dasharray="4 3"></path>' : '',
                     selectedGuides,
                     points,
                     '<text x="' + fmtNum(xMid, 2) + '" y="' + (h - 8) + '" fill="' + chartText + '" font-size="11" font-weight="700" text-anchor="middle">X-Axis: PUE (lower is better)</text>',
                     '<text x="26" y="' + fmtNum(yMid, 2) + '" fill="' + chartTextSoft + '" font-size="11" font-weight="700" text-anchor="middle" transform="rotate(-90 26 ' + fmtNum(yMid, 2) + ')">Y-Axis: Net OPEX (lower is better)</text>',
                     '<rect x="' + legendX + '" y="' + legendY + '" width="214" height="48" rx="8" fill="' + legendFill + '" stroke="' + legendStroke + '"></rect>',
                     '<text x="' + (legendX + 10) + '" y="' + (legendY + 16) + '" fill="' + chartText + '" font-size="10" font-weight="700">Legend</text>',
-                    '<circle cx="' + (legendX + 12) + '" cy="' + (legendY + 30) + '" r="4.5" fill="#047857"></circle><text x="' + (legendX + 22) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk low</text>',
-                    '<circle cx="' + (legendX + 80) + '" cy="' + (legendY + 30) + '" r="4.5" fill="#b45309"></circle><text x="' + (legendX + 90) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk medium</text>',
-                    '<circle cx="' + (legendX + 158) + '" cy="' + (legendY + 30) + '" r="4.5" fill="#b91c1c"></circle><text x="' + (legendX + 168) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk high</text>',
+                    '<circle cx="' + (legendX + 12) + '" cy="' + (legendY + 30) + '" r="4.5" fill="' + riskColor(0) + '"></circle><text x="' + (legendX + 22) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk low</text>',
+                    '<circle cx="' + (legendX + 80) + '" cy="' + (legendY + 30) + '" r="4.5" fill="' + riskColor(30) + '"></circle><text x="' + (legendX + 90) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk medium</text>',
+                    '<circle cx="' + (legendX + 158) + '" cy="' + (legendY + 30) + '" r="4.5" fill="' + riskColor(99) + '"></circle><text x="' + (legendX + 168) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk high</text>',
                     '<text x="' + (legendX + 10) + '" y="' + (legendY + 44) + '" fill="' + chartTextFaint + '" font-size="9">Soft-constraint: dashed stroke | circle size = carbon</text>'
                 ].join('');
 
@@ -8083,22 +8084,22 @@
                         var subX = 500;
                         var subW = 250;
                         var partA = [
-                            { key: 'it', color: '#2563eb', label: 'IT' },
-                            { key: 'thermal', color: '#0891b2', label: 'Thermal' },
-                            { key: 'elecLoss', color: '#d97706', label: 'Elec Loss' },
-                            { key: 'facilityAux', color: '#64748b', label: 'Aux' }
+                            { key: 'it', color: '#8a8f98', label: 'IT' },
+                            { key: 'thermal', color: '#c98a00', label: 'Thermal' },
+                            { key: 'elecLoss', color: '#b3b7bd', label: 'Elec Loss' },
+                            { key: 'facilityAux', color: '#5c6169', label: 'Aux' }
                         ];
                         var partB = [
-                            { key: 'liquidCore', color: '#0d9488', label: 'Liquid' },
-                            { key: 'pump', color: '#115e59', label: 'Pump' },
-                            { key: 'air', color: '#0284c7', label: 'Air' },
-                            { key: 'fan', color: '#16a34a', label: 'Fan' }
+                            { key: 'liquidCore', color: '#c98a00', label: 'Liquid' },
+                            { key: 'pump', color: '#9a6a00', label: 'Pump' },
+                            { key: 'air', color: '#8a8f98', label: 'Air' },
+                            { key: 'fan', color: '#b3b7bd', label: 'Fan' }
                         ];
                         var html = [];
                         html.push('<text x="26" y="' + (y + 5) + '" fill="currentColor" font-size="11">' + escapeHtml(label) + '</text>');
                         html.push('<text x="26" y="' + (y + 20) + '" fill="currentColor" opacity="0.72" font-size="10">' + fmtNum(flows.total / 1000, 2) + ' MW total</text>');
-                        html.push('<rect x="' + barX + '" y="' + (y - 10) + '" width="' + barW + '" height="16" rx="5" fill="rgba(148,163,184,0.12)" stroke="rgba(148,163,184,0.32)"/>');
-                        html.push('<rect x="' + subX + '" y="' + (y - 10) + '" width="' + subW + '" height="16" rx="5" fill="rgba(148,163,184,0.12)" stroke="rgba(148,163,184,0.32)"/>');
+                        html.push('<rect x="' + barX + '" y="' + (y - 10) + '" width="' + barW + '" height="16" rx="5" fill="rgba(128,128,128,0.12)" stroke="rgba(128,128,128,0.32)"/>');
+                        html.push('<rect x="' + subX + '" y="' + (y - 10) + '" width="' + subW + '" height="16" rx="5" fill="rgba(128,128,128,0.12)" stroke="rgba(128,128,128,0.32)"/>');
                         var x = barX;
                         partA.forEach(function(p) {
                             var sw = Math.max(2, (flows[p.key] / maxTotal) * barW);
@@ -8120,9 +8121,9 @@
                     svg.innerHTML = [
                         '<rect x="0" y="0" width="860" height="360" fill="transparent"/>',
                         '<text x="24" y="30" fill="currentColor" opacity="0.86" font-size="12">COMPARE DELTA VIEW (Baseline vs Optimized)</text>',
-                        laneSvg('Baseline', 96, b, '#1d4ed8'),
-                        laneSvg('Optimized', 206, o, '#0f766e'),
-                        '<line x1="24" y1="150" x2="836" y2="150" stroke="rgba(148,163,184,0.28)" stroke-dasharray="3 3"/>',
+                        laneSvg('Baseline', 96, b, '#6b7079'),
+                        laneSvg('Optimized', 206, o, '#c98a00'),
+                        '<line x1="24" y1="150" x2="836" y2="150" stroke="rgba(128,128,128,0.28)" stroke-dasharray="3 3"/>',
                         '<text x="24" y="326" fill="currentColor" opacity="0.78" font-size="10">Delta non-IT overhead: ' + signed(nonItDelta, 0, ' kW') + ' | Delta PUE ' + signed(optModel.pue - baseModel.pue, 3, '') + ' | Delta COP ' + signed(optModel.systemCop - baseModel.systemCop, 2, '') + '</text>'
                     ].join('');
 
@@ -8154,19 +8155,19 @@
                 var midX = 332;
                 var rightX = 610;
                 var topY = 62;
-                var source = { id: 'source', label: 'Total Facility Input', value: total, x: srcX, y: topY, h: 232, color: '#1d4ed8' };
+                var source = { id: 'source', label: 'Total Facility Input', value: total, x: srcX, y: topY, h: 232, color: '#6b7079' };
                 var midNodes = [
-                    { id: 'compute', label: 'IT Compute', value: flows.it, x: midX, y: 84, h: 42, color: '#2563eb' },
-                    { id: 'thermal', label: 'Thermal Management', value: flows.thermal, x: midX, y: 156, h: 44, color: '#0891b2' },
-                    { id: 'elec', label: 'Electrical Loss', value: flows.elecLoss, x: midX, y: 232, h: 30, color: '#d97706' },
-                    { id: 'aux', label: 'Facility Aux', value: flows.facilityAux, x: midX, y: 278, h: 24, color: '#64748b' }
+                    { id: 'compute', label: 'IT Compute', value: flows.it, x: midX, y: 84, h: 42, color: '#8a8f98' },
+                    { id: 'thermal', label: 'Thermal Management', value: flows.thermal, x: midX, y: 156, h: 44, color: '#c98a00' },
+                    { id: 'elec', label: 'Electrical Loss', value: flows.elecLoss, x: midX, y: 232, h: 30, color: '#b3b7bd' },
+                    { id: 'aux', label: 'Facility Aux', value: flows.facilityAux, x: midX, y: 278, h: 24, color: '#5c6169' }
                 ];
                 var thermalNode = midNodes[1];
                 var rightNodes = [
-                    { id: 'liq', label: 'Liquid Loop', value: flows.liquidCore, x: rightX, y: 150, h: 30, color: '#0d9488' },
-                    { id: 'pump', label: 'Pump Drive', value: flows.pump, x: rightX, y: 198, h: 20, color: '#115e59' },
-                    { id: 'air', label: 'Air Path', value: flows.air, x: rightX, y: 234, h: 20, color: '#0284c7' },
-                    { id: 'fan', label: 'Fan Power', value: flows.fan, x: rightX, y: 270, h: 20, color: '#16a34a' }
+                    { id: 'liq', label: 'Liquid Loop', value: flows.liquidCore, x: rightX, y: 150, h: 30, color: '#c98a00' },
+                    { id: 'pump', label: 'Pump Drive', value: flows.pump, x: rightX, y: 198, h: 20, color: '#9a6a00' },
+                    { id: 'air', label: 'Air Path', value: flows.air, x: rightX, y: 234, h: 20, color: '#8a8f98' },
+                    { id: 'fan', label: 'Fan Power', value: flows.fan, x: rightX, y: 270, h: 20, color: '#b3b7bd' }
                 ];
 
                 var links = [];
@@ -8205,7 +8206,7 @@
 
                 function nodeSvg(n) {
                     return '<g class="sankey-node" data-sankey-node="' + escapeAttr(n.id) + '" tabindex="0" role="button" aria-label="Open detailed Sankey for ' + escapeAttr(n.label) + '">' +
-                        '<rect x="' + n.x + '" y="' + fmtNum(n.y, 2) + '" width="' + nodeW + '" height="' + fmtNum(n.h, 2) + '" rx="5" fill="' + n.color + '" fill-opacity="0.9" stroke="rgba(15,23,42,0.35)" />' +
+                        '<rect x="' + n.x + '" y="' + fmtNum(n.y, 2) + '" width="' + nodeW + '" height="' + fmtNum(n.h, 2) + '" rx="5" fill="' + n.color + '" fill-opacity="0.9" stroke="rgba(0,0,0,0.35)" />' +
                         '<text x="' + (n.x + nodeW + 8) + '" y="' + fmtNum(n.y + 12, 2) + '" fill="currentColor" font-size="11">' + escapeHtml(n.label) + '</text>' +
                         '<text x="' + (n.x + nodeW + 8) + '" y="' + fmtNum(n.y + 24, 2) + '" fill="currentColor" opacity="0.78" font-size="10">' + fmtNum(n.value, 0) + ' kW | ' + sankeyPct(n.value, total) + '</text>' +
                     '</g>';
@@ -8225,7 +8226,7 @@
                     nodeSvg(source),
                     midNodes.map(nodeSvg).join(''),
                     rightNodes.map(nodeSvg).join(''),
-                    '<rect x="606" y="86" width="230" height="218" fill="none" stroke="rgba(148,163,184,0.16)" stroke-dasharray="2 3" rx="8"/>',
+                    '<rect x="606" y="86" width="230" height="218" fill="none" stroke="rgba(128,128,128,0.16)" stroke-dasharray="2 3" rx="8"/>',
                     '<text x="52" y="346" fill="currentColor" opacity="0.74" font-size="10">Flow width is proportional to power contribution. Labels are fixed-position to keep small branches readable.</text>'
                 ].join('');
                 bindSankeyNodeDrill(svg);
@@ -10378,7 +10379,10 @@
                     /* k * 0.01 is not exact in binary (1.3900000000000001); cut to the step's decimals so a candidate
                      * written to the form reads back as the same number */
                     var dec = Math.max(0, Math.ceil(-Math.log10(step) - 1e-9));
-                    raw = +(Math.round(raw / step) * step).toFixed(dec);
+                    /* bounds such as base − 22 × 1.18 are not on the grid: snap them inward to the grid first */
+                    var lo = Math.ceil(min / step - 1e-9) * step, hi = Math.floor(max / step + 1e-9) * step;
+                    if (lo > hi) { lo = min; hi = max; }
+                    return +clamp(Math.round(raw / step) * step, lo, hi).toFixed(dec);
                 }
                 return clamp(raw, min, max);
             }
