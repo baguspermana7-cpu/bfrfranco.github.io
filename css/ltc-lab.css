@@ -1629,3 +1629,30 @@ body.ltc-revamp .page-background { display: none; }
 .ltc-engine-pick { display: flex; gap: 6px; align-items: flex-start; margin-top: 10px; font-size: 12px; color: var(--text-secondary, #A0AEC0); line-height: 1.4; cursor: pointer; }
 .ltc-engine-pick span { color: var(--text-muted, #8190a6); }
 .ltc-engine-pick input { margin-top: 2px; accent-color: #FFAA00; }
+
+/* ── Step thread (js/ltc-lab-steps.js, 2026-11-07) — replaces the static 1-2-3 hint ── */
+.ltc-steps { margin: 0 0 14px; }
+.ltc-steps ol { list-style: none; margin: 0; padding: 0; border: 1px solid var(--ltc-hairline, rgba(255,255,255,.12)); border-radius: 4px; }
+.ltc-steps li + li { border-top: 1px solid var(--ltc-hairline, rgba(255,255,255,.12)); }
+.ltc-step { display: grid; grid-template-columns: 22px 1fr; grid-template-rows: auto auto; column-gap: 8px; width: 100%;
+  min-height: 44px; padding: 7px 10px; background: transparent; border: 0; color: inherit; text-align: left; cursor: pointer;
+  font: inherit; transition: background-color .15s ease-out; }
+.ltc-step:hover { background: rgba(255,255,255,.03); }
+.ltc-step:focus-visible { outline: 2px solid var(--o, #E8B563); outline-offset: -2px; }
+.ltc-step-n { grid-row: 1 / span 2; align-self: center; width: 20px; height: 20px; border: 1px solid currentColor; border-radius: 50%;
+  display: grid; place-items: center; font: 600 .68rem/1 var(--ltc-mono, 'JetBrains Mono', monospace); opacity: .55; }
+.ltc-step-name { font-size: .82rem; font-weight: 600; }
+.ltc-step-res { font: 500 .72rem/1.35 var(--ltc-mono, 'JetBrains Mono', monospace); opacity: .7; position: relative; }
+.ltc-step[aria-current="step"] { background: rgba(232,181,99,.06); }
+.ltc-step[aria-current="step"] .ltc-step-n { color: var(--o, #E8B563); opacity: 1; border-color: var(--o, #E8B563); }
+.ltc-step[aria-current="step"] .ltc-step-name { color: var(--o, #E8B563); }
+.ltc-step.is-done .ltc-step-n { opacity: .85; }
+.ltc-step.is-stale .ltc-step-n { border-style: dashed; }
+.ltc-step.is-changed .ltc-step-res::before { content: attr(data-was); display: block; text-decoration: line-through; opacity: .5;
+  transition: opacity .6s ease-out; }
+html[data-theme="light"] .ltc-step:hover { background: rgba(0,0,0,.03); }
+html[data-theme="light"] .ltc-step[aria-current="step"] { background: rgba(146,64,14,.06); }
+html[data-theme="light"] .ltc-step[aria-current="step"] .ltc-step-n,
+html[data-theme="light"] .ltc-step[aria-current="step"] .ltc-step-name { color: #92400e; border-color: #92400e; }
+rect[data-rzd-node].ltc-step-node { stroke: var(--o, #E8B563) !important; stroke-width: 2px !important; }
+@media (prefers-reduced-motion: reduce) { .ltc-step, .ltc-step.is-changed .ltc-step-res::before { transition: none; } }

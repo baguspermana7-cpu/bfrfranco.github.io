@@ -65,7 +65,7 @@
         });
         // Affordance hint on the schematic
         var ovLbl = document.querySelector('.ltc-overview-label');
-        if (ovLbl) ovLbl.innerHTML += ' <span class="ltc-muted" style="letter-spacing:0;text-transform:none;font-weight:500">— klik equipment / angka ƒx untuk trace perhitungan</span>';
+        if (ovLbl) ovLbl.innerHTML += ' <span class="ltc-muted" style="letter-spacing:0;text-transform:none;font-weight:500">— click equipment or an ƒx value to trace the calculation</span>';
         patchApplyModelToUI();
         // Initial paint: the engine's first applyModelToUI runs BEFORE this scaffold
         // exists (both scripts are `defer`; the engine's DOMContentLoaded handler is
