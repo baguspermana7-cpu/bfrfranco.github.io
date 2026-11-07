@@ -2951,23 +2951,23 @@
                     items.push('Model tracks 100% parameter mapping from input profile to outputs, scores, and risk logic.');
                     if (base.failureMode && base.failureMode !== 'normal') items.push('Active degraded mode: ' + base.failureMode + ' (' + base.failureNote + ').');
                 } else {
-                    var dCapture = opt.input.liquidCapture - base.input.liquidCapture;
-                    var dSupply = opt.input.supplyTemp - base.input.supplyTemp;
-                    var dAirCop = opt.input.airCop - base.input.airCop;
-                    var dPumpEff = opt.input.pumpEff - base.input.pumpEff;
-                    var dControl = opt.input.controlQuality - base.input.controlQuality;
-                    var dFuture = opt.input.coefFutureTech - base.input.coefFutureTech;
-                    var dPue = base.pue - opt.pue;
-                    var dCop = opt.systemCop - base.systemCop;
-                    var dRisk = base.riskIndex - opt.riskIndex;
-
-                    if (Math.abs(dCapture) > 0.4) items.push('Liquid capture tuned to ' + fmtNum(opt.input.liquidCapture, 0) + '% (' + signed(dCapture, 0, ' pts') + ').');
-                    if (Math.abs(dSupply) > 0.2) items.push('Supply setpoint moved to ' + fmtNum(opt.input.supplyTemp, 1) + 'C (' + signed(dSupply, 1, 'C') + ').');
-                    if (Math.abs(dAirCop) > 0.05) items.push('Air-path COP updated to ' + fmtNum(opt.input.airCop, 2) + ' (' + signed(dAirCop, 2, '') + ').');
-                    if (Math.abs(dPumpEff) > 0.5) items.push('Pump efficiency adjusted to ' + fmtNum(opt.input.pumpEff, 0) + '% (' + signed(dPumpEff, 0, ' pts') + ').');
-                    if (Math.abs(dControl) > 0.5) items.push('Control quality shifted to ' + fmtNum(opt.input.controlQuality, 0) + '% (' + signed(dControl, 0, ' pts') + ').');
-                    if (Math.abs(dFuture) > 0.5) items.push('Future-tech multiplier set to ' + fmtNum(opt.input.coefFutureTech, 0) + '% (' + signed(dFuture, 0, ' pts') + ').');
-                    items.push('Projected impact: PUE ' + signed(dPue, 3, '') + ' better, COP ' + signed(dCop, 2, '') + ', net OPEX ' + signed(base.netOpex - opt.netOpex, 0, ' USD/yr') + ', risk index ' + signed(dRisk, 1, '') + ' better.');
+                    /* 3.27.0 — every input the optimiser changed, by name, so the projected deltas can be traced to
+                     * the changes (heat reuse and rack density moved net OPEX by tens of millions unannounced) */
+                    var OPT_LABELS = [['liquidCapture', 'Liquid capture', '%', 0], ['supplyTemp', 'Supply setpoint', ' °C', 1],
+                        ['rackDensityTarget', 'Target rack density', ' kW/rack', 0], ['highDensityShare', 'High-density rack share', '%', 0],
+                        ['pumpEff', 'Pump efficiency', '%', 0], ['heatReuse', 'Heat reuse rate', '%', 0], ['airCop', 'Air-path COP', '', 2],
+                        ['economizerHours', 'Economizer hours', '%', 0], ['hydraulicMargin', 'Hydraulic margin', '%', 0],
+                        ['controlQuality', 'Control quality', '%', 0], ['predictiveGain', 'Predictive gain', '%', 0],
+                        ['coefHeatTransfer', 'Heat-transfer coefficient', '%', 1], ['coefCduLoss', 'CDU loss coefficient', '%', 2],
+                        ['coefPipeLoss', 'Pipe loss multiplier', '', 2], ['coefFutureTech', 'Future-tech multiplier', '%', 0]];
+                    OPT_LABELS.forEach(function (l) {
+                        var a = base.input[l[0]], b = opt.input[l[0]];
+                        if (a == null || b == null || Math.abs(b - a) < Math.pow(10, -l[3]) / 2) return;
+                        items.push(l[1] + ' ' + fmtNum(a, l[3]) + l[2] + ' → ' + fmtNum(b, l[3]) + l[2] + ' (' + signed(b - a, l[3], '') + ').');
+                    });
+                    items.push('Projected: PUE ' + fmtNum(base.pue, 3) + ' → ' + fmtNum(opt.pue, 3) + ' (' + signed(opt.pue - base.pue, 3, '') + '), COP ' +
+                        fmtNum(base.systemCop, 2) + ' → ' + fmtNum(opt.systemCop, 2) + ', net OPEX ' + signed(opt.netOpex - base.netOpex, 0, ' USD/yr') +
+                        ', risk index ' + fmtNum(base.riskIndex, 1) + ' → ' + fmtNum(opt.riskIndex, 1) + '.');
                     if (opt.failureMode && opt.failureMode !== 'normal') items.push('Optimization computed under degraded mode: ' + opt.failureMode + ' (' + opt.failureNote + ').');
                 }
 
@@ -10456,6 +10456,28 @@
                     }
                 });
 
+                /* 3.27.0 — write back only what matters, at the precision the form shows. The random search moves every
+                 * tunable at once, so inputs with no weight in the objective (air COP, economiser hours, coefficients
+                 * in plant mode) came back with random values and were listed as actions; the form also rounded the
+                 * values after the model was computed (and never wrote coefCduLoss), so the optimised figures could not
+                 * be reproduced from the form. Prune each change that does not lower the score, round, recompute. */
+                var FORM_DEC = { liquidCapture: 0, rackDensityTarget: 0, highDensityShare: 0, supplyTemp: 1, returnTemp: 1, airCop: 1,
+                    pumpEff: 0, economizerHours: 0, heatReuse: 0, hydraulicMargin: 0, controlQuality: 0, predictiveGain: 0,
+                    coefHeatTransfer: 1, coefCduLoss: 2, coefPipeLoss: 2, coefFutureTech: 0 };
+                var roundForm = function (o) { var r = Object.assign({}, o); Object.keys(FORM_DEC).forEach(function (k) {
+                    var f = Math.pow(10, FORM_DEC[k]); r[k] = Math.round(r[k] * f) / f; }); return r; };
+                tunables.forEach(function(cfg) {
+                    if (bestInput[cfg.key] === input[cfg.key]) return;
+                    var trial = Object.assign({}, bestInput);
+                    trial[cfg.key] = input[cfg.key];
+                    if (cfg.key === 'supplyTemp') trial.returnTemp = input.returnTemp;
+                    var tm = computeModel(trial), ts = optimizeObjective(tm, input, constraints);
+                    if (ts <= bestScore + 1e-9) { bestInput = trial; best = tm; bestScore = ts; }
+                });
+                bestInput = roundForm(bestInput);
+                best = computeModel(bestInput);
+                bestScore = optimizeObjective(best, input, constraints);
+
                 document.getElementById('inLiquidCapture').value = fmtNum(bestInput.liquidCapture, 0);
                 document.getElementById('inRackDensityTarget').value = fmtNum(bestInput.rackDensityTarget, 0);
                 document.getElementById('inHighDensityShare').value = fmtNum(bestInput.highDensityShare, 0);
@@ -10471,6 +10493,8 @@
                 document.getElementById('inCoefHeatTransfer').value = fmtNum(bestInput.coefHeatTransfer, 1);
                 document.getElementById('inCoefPipeLoss').value = fmtNum(bestInput.coefPipeLoss, 2);
                 document.getElementById('inCoefFutureTech').value = fmtNum(bestInput.coefFutureTech, 0);
+                var cduLossEl = document.getElementById('inCoefCduLoss');
+                if (cduLossEl) cduLossEl.value = fmtNum(bestInput.coefCduLoss, 2);
 
                 optimizedModel = best;
                 applyModelToUI(optimizedModel);
