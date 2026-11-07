@@ -295,19 +295,12 @@
         dsCard.appendChild(dsHeader);
         var dsBody = el('div', { className: 'ltc-design-status' });
         dsBody.innerHTML = [
-            '<div class="ltc-design-top">',
-            '<div class="ltc-radial-wrap">',
-            '<svg class="ltc-radial-svg" viewBox="0 0 120 120" id="ltcRadialSvg">',
-            '<circle class="ltc-radial-track" cx="60" cy="60" r="48" fill="none" stroke-width="10"/>',
-            '<circle class="ltc-radial-bar" cx="60" cy="60" r="48" fill="none" stroke-width="10" stroke-linecap="round" transform="rotate(-90 60 60)" id="ltcRadialBar"/>',
-            '<text class="ltc-radial-pct" x="60" y="68" text-anchor="middle" id="ltcRadialPct">—</text>',
-            '</svg>',
+            '<div class="ltc-design-head">',
+            '<span class="ltc-design-scorelbl">Weighted standards screen</span>',
+            '<span class="ltc-design-total"><b id="ltcRadialPct">—</b> / 100 · <span id="ltcDesignGrade">—</span></span>',
             '</div>',
-            '<div class="ltc-design-meta">',
-            '<div class="ltc-design-scorelbl">Weighted screen · 0–100</div>',
-            '<div class="ltc-design-grade" id="ltcDesignGrade">—</div>',
-            '</div>',
-            '</div>',
+            '<p class="ltc-design-basis" id="ltcDesignBasis">—</p>',
+            '<div class="ltc-design-sublbl">Design screens · each 0–100, not part of the total</div>',
             '<div class="ltc-sub-bars" id="ltcSubBars"></div>'
         ].join('');
         dsCard.appendChild(dsBody);
@@ -1193,49 +1186,40 @@
     // ════════════════════════════════════════════════════════
     function renderDesignStatus(model) {
         var score = model.scores.total || 0;
-        var r = 48;
-        var circumference = 2 * Math.PI * r; // 301.6
-        var filled = (score / 100) * circumference;
+        var ltc = window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc;
+        var CAL = (window.RZEngine && window.RZEngine.data && window.RZEngine.data.ltcCalibration) || {};
+        var ds = CAL.designSubScores || {};
+        var f0 = function (v) { return isFinite(v) ? Number(v).toFixed(0) : '—'; };
+        var w = function (k) { return isFinite(CAL[k]) ? Math.round(CAL[k] * 100) : '?'; };
 
-        var bar = document.getElementById('ltcRadialBar');
-        if (bar) {
-            bar.style.strokeDasharray = filled.toFixed(1) + ' ' + (circumference - filled).toFixed(1);
-            bar.style.stroke = 'var(--ltc-accent)'; // reference ring is blue
-        }
-        setText2('ltcRadialPct', score.toFixed(0) + '%');
-
+        setText2('ltcRadialPct', f0(score));
         var gradeEl = document.getElementById('ltcDesignGrade');
-        if (gradeEl) gradeEl.textContent = gradeWord(score); // word grade, not letter
+        if (gradeEl) gradeEl.textContent = gradeWord(score).toLowerCase();
+        setText2('ltcDesignBasis', 'Total = ASHRAE ' + w('totalScoreWeightAshrae') + ' % · Uptime ' +
+            w('totalScoreWeightUptime') + ' % · NFPA ' + w('totalScoreWeightNfpa') + ' % · ANSI ' +
+            w('totalScoreWeightAnsi') + ' % · ISO ' + w('totalScoreWeightIso') + ' % of the five standard checks.');
 
-        // Sub-bars: Efficiency, Resilience, Sustainability, Operability
         var subBars = document.getElementById('ltcSubBars');
-        if (!subBars) return;
-
-        var ss = (window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc)
-            ? window.RZEngine.models.ltc.designSubScores(model)
-            : {
-                efficiency:     model.scores.iso || 0,
-                resilience:     model.scores.uptime || 0,
-                sustainability: model.scores.iso || 0,
-                operability:    model.confidence || 0
-              };
-
+        if (!subBars || !ltc) return;
+        var ss = ltc.designSubScores(model);
         var rows = [
-            { lbl: 'Efficiency',     val: ss.efficiency },
-            { lbl: 'Resilience',     val: ss.resilience },
-            { lbl: 'Sustainability', val: ss.sustainability },
-            { lbl: 'Operability',    val: ss.operability }
+            { lbl: 'Efficiency', val: ss.efficiency,
+              basis: 'PUE ' + (isFinite(model.pue) ? model.pue.toFixed(3) : '—') + ' on ' + ds.effPueBest + ' = 100 … ' + ds.effPueWorst + ' = 0' },
+            { lbl: 'Resilience', val: ss.resilience,
+              basis: 'risk index ' + (isFinite(model.riskIndex) ? model.riskIndex.toFixed(1) : '—') + ' on ' + CAL.riskMin + ' = 100 … ' + CAL.riskMax + ' = 0' },
+            { lbl: 'Sustainability', val: ss.sustainability,
+              basis: (model.avoidedCarbonTons > 0 && model.annualGwh > 0)
+                  ? f0(model.avoidedCarbonTons) + ' tCO₂e avoided ÷ (' + model.annualGwh.toFixed(1) + ' GWh × ' + ds.sustainRef + ' t/GWh)'
+                  : 'no avoided carbon: floor ' + ds.sustainFloor },
+            { lbl: 'Operability', val: ss.operability,
+              basis: 'model confidence ' + f0(model.confidence) + ' ÷ ' + ds.operMaxConf }
         ];
-
+        subBars.setAttribute('data-rz-fact-list', '');
         subBars.innerHTML = rows.map(function (r) {
             return '<div class="ltc-sub-bar-row">' +
-                '<div class="ltc-sub-bar-head">' +
                 '<span class="ltc-sub-bar-lbl">' + r.lbl + '</span>' +
-                '<span class="ltc-sub-bar-val">' + r.val.toFixed(0) + '%</span>' +
-                '</div>' +
-                '<div class="ltc-sub-bar-track">' +
-                '<div class="ltc-sub-bar-fill" style="width:' + r.val.toFixed(0) + '%"></div>' +
-                '</div>' +
+                '<span class="ltc-sub-bar-val">' + f0(r.val) + '</span>' +
+                '<span class="ltc-sub-bar-basis">' + r.basis + '</span>' +
                 '</div>';
         }).join('');
     }

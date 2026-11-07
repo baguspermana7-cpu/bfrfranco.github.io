@@ -8,6 +8,8 @@
  *    a line that substitutes but does not hold is a failure (the strip would be showing a wrong equation)
  * S4 the step's equipment is outlined on the plant diagram (Loop → cdu + cool)
  * S5 0 page errors, scrollWidth <= viewport at 1440 and 390
+ * S6 DESIGN STATUS states its basis: no radial donut or bar track; the total equals the weighted sum of the five
+ *    standard scores; each design screen row recomputes (within 0.6 of the shown integer) from the numbers its basis line shows
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -43,6 +45,26 @@ try {
       rows.filter((r) => r.startsWith('engine value')).forEach((r) => fails.push(`${w} S3 ${k}: substituted line does not recompute: ${r}`));
       ok(rows.some((r) => r.startsWith('holds')), `${w} S3 ${k}: no line holds`);
     }
+    const ds = await p.evaluate(() => {
+      const m = window.__ltcLastModel, C = window.RZEngine.data.ltcCalibration, sc = m.scores;
+      const sum = sc.ashrae * C.totalScoreWeightAshrae + sc.ansi * C.totalScoreWeightAnsi + sc.iso * C.totalScoreWeightIso
+        + sc.nfpa * C.totalScoreWeightNfpa + sc.uptime * C.totalScoreWeightUptime;
+      return { donut: !!document.querySelector('#ltcRadialSvg, .ltc-sub-bar-track'), total: document.getElementById('ltcRadialPct').textContent,
+        sum, rows: [...document.querySelectorAll('#ltcSubBars .ltc-sub-bar-row')].map((r) => [r.querySelector('.ltc-sub-bar-lbl').textContent,
+          +r.querySelector('.ltc-sub-bar-val').textContent, r.querySelector('.ltc-sub-bar-basis')?.textContent || '']) };
+    });
+    ok(!ds.donut, `${w} S6 radial donut / bar track still rendered`);
+    ok(String(Math.round(ds.sum)) === ds.total, `${w} S6 total ${ds.total} != weighted sum ${ds.sum}`);
+    const num = (t) => (t.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
+    const clamp = (v) => Math.min(100, Math.max(0, v));
+    const re = { Efficiency: ([pue, best, , worst]) => clamp((worst - pue) / (worst - best) * 100),
+      Resilience: ([ri, lo, , hi]) => clamp((hi - ri) / (hi - lo) * 100),
+      Operability: ([conf, max]) => clamp(conf / max * 100) };
+    ok(ds.rows.length === 4, `${w} S6 expected 4 design screens, got ${ds.rows.length}`);
+    for (const [lbl, val, basis] of ds.rows) {
+      if (!basis) { fails.push(`${w} S6 ${lbl}: no basis line`); continue; }
+      if (re[lbl]) ok(Math.abs(re[lbl](num(basis)) - val) <= 0.6, `${w} S6 ${lbl} ${val} does not recompute from "${basis}"`);
+    }
     const before = await p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
     await p.evaluate(() => { const e = document.getElementById('inItLoad'); e.value = '60'; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
     await new Promise((r) => setTimeout(r, 1500));
@@ -55,4 +77,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, 0 errors');
