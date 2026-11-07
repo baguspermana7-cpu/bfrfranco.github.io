@@ -85,6 +85,21 @@
     return out;
   }
 
+  /* 3.27.0 — one step of a sensitivity perturbation, and the model it gives. The range clamp applies only to a base
+   * inside the range: the engine's IT-load range ends at 80 MW, so "+0.2 MW" from the plant's 100 MW became 80 MW and
+   * the impact matrix reported IT +0.2 MW as -$18 M. The model is the one the page shows: the plant unless the legacy
+   * model was picked (a plant base against a legacy perturbation put the model gap, +0.038 PUE, on every bar). */
+  function stepInput(input, cfg, dir) {
+    var i = Object.assign({}, input), b = +i[cfg.key] || 0, v = b + dir * cfg.step;
+    var inside = cfg.min == null || cfg.max == null || (b >= cfg.min && b <= cfg.max);
+    i[cfg.key] = inside ? Math.min(cfg.max, Math.max(cfg.min, v)) : v;
+    return i;
+  }
+  function computeLike(model, input) {
+    var eng = root.RZEngine && root.RZEngine.models && root.RZEngine.models.ltc, legacy = eng ? eng.compute(input) : null;
+    return model && model.plant ? compute(input, legacy) : legacy;
+  }
+
   /* 3.27.0 — the fx trace of a plant-mode figure: the plant's formula and the plant quantities it is computed from,
    * in the order the formula uses them, so the listed values reproduce the figure. k = a further traceable key. */
   function traceOf(key, m) {
@@ -265,7 +280,7 @@
     window.addEventListener('storage', function (e) { if (e.key === P.KEY) pull(); });
   }
 
-  root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE, CAPTURE_CAP: CAPTURE_CAP, traceOf: traceOf, equationLines: equationLines,
+  root.LTCLabPlant = { toPlant: toPlant, compute: compute, sync: sync, overview: overview, pull: pull, CLIMATE: CLIMATE, CAPTURE_CAP: CAPTURE_CAP, traceOf: traceOf, equationLines: equationLines, stepInput: stepInput, computeLike: computeLike,
     /* after the first read of the plant the lab's inputs win; tests state it explicitly */
     ready: function (climateShown) { pulled = true; if (climateShown) pulledClimate = climateShown; } };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.LTCLabPlant;

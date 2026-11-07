@@ -33,6 +33,9 @@
  *    text, and its listed inputs reproduce the traced value by independent arithmetic
  * S15 Every Equation Inspector line has the form 'name = formula = numeric expression = result' and the expression
  *    evaluates to the stated result (the same lines go into the PDF)
+ * S16 The Charts-tab tornado and the Logic Impact Matrix perturb the shown model (the plant) one step from the shown
+ *    base: every tornado row and the IT-load matrix row equal a plant recompute (the old range clamp turned +0.2 MW
+ *    at 100 MW into 80 MW)
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -163,6 +166,30 @@ try {
       if (seg.length >= 3 && /^[\d.\s+\-*/()]*$/.test(expr)) { try { v = Function(`return (${expr})`)(); } catch {} }
       ok(isFinite(v) && Math.abs(v - res) <= Math.abs(res) * 0.002 + 0.06, `${w} S15 "${line.slice(0, 90)}" evaluates to ${v}, states ${res}`);
     }
+    // S16 the tornado and the Logic Impact Matrix perturb the model the page shows (the plant), one step from the shown base
+    const s16 = await p.evaluate(() => {
+      const m = window.__ltcLastModel, eng = window.RZEngine.models.ltc, IP = window.RZEngine.data.ltcCalibration.impactParams;
+      const plant = (inp) => window.LTCLabPlant.compute(inp, eng.compute(inp));
+      const at = (cfg, dir) => { const i = Object.assign({}, m.input); i[cfg.key] = (i[cfg.key] || 0) + dir * cfg.step; return plant(i); };
+      const tor = [...document.querySelectorAll('#ltcTornado .ltc-tor-row')].map((r) => {
+        const lbl = r.querySelector('.ltc-tor-lbl').textContent.trim(), cfg = IP.find((c) => c.label === lbl);
+        const v = r.querySelector('.ltc-tor-val').textContent.replace(/−/g, '-'), g = (re) => parseFloat((v.match(re) || [])[1]);
+        if (!cfg) return { lbl, miss: true };
+        return { lbl, shown: [g(/-step\s*([+-]?[\d.]+)/), g(/\+step\s*([+-]?[\d.]+)/)], want: [at(cfg, -1).pue - m.pue, at(cfg, 1).pue - m.pue] };
+      });
+      const imp = [...document.querySelectorAll('#impactRows tr')].map((tr) => [...tr.cells].map((c) => c.textContent.trim()));
+      const it = imp.find((r) => /^IT Load/.test(r[0]));
+      const cfgIt = IP.find((c) => c.key === 'itLoadMw'), altIt = at(cfgIt, 1);
+      return { tor, it, wantOpex: altIt.netOpex - m.netOpex, wantPue: altIt.pue - m.pue };
+    });
+    ok(s16.tor.length >= 3, `${w} S16 tornado rows ${s16.tor.length}`);
+    for (const t of s16.tor) {
+      if (t.miss) { fails.push(`${w} S16 tornado row "${t.lbl}" is not an engine impact parameter`); continue; }
+      ok(Math.abs(t.shown[0] - t.want[0]) <= 0.00006 && Math.abs(t.shown[1] - t.want[1]) <= 0.00006, `${w} S16 tornado ${t.lbl} shows ${t.shown.join(' / ')}, plant -step / +step ${t.want.map((v) => v.toFixed(4)).join(' / ')}`);
+    }
+    const n16 = (x) => parseFloat(String(x).replace(/[,+]/g, ''));
+    ok(s16.it && Math.abs(n16(s16.it[4]) - s16.wantOpex) <= Math.abs(s16.wantOpex) * 0.01 + 1, `${w} S16 impact matrix IT +step net OPEX ${s16.it && s16.it[4]}, plant ${Math.round(s16.wantOpex)}`);
+    ok(s16.it && Math.abs(n16(s16.it[2]) - s16.wantPue) <= 0.0006, `${w} S16 impact matrix IT +step PUE ${s16.it && s16.it[2]}, plant ${s16.wantPue.toFixed(4)}`);
     const s1 = await p.evaluate(() => ({ n: document.querySelectorAll('.ltc-step').length, cur: [...document.querySelectorAll('.ltc-step[aria-current]')].map((e) => e.id),
       res: [...document.querySelectorAll('.ltc-step-res')].map((e) => e.textContent.trim()),
       lit: [...document.querySelectorAll('rect.ltc-step-node')].map((r) => r.getAttribute('data-rzd-node')).sort().join(',') }));
@@ -288,4 +315,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, 0 errors');

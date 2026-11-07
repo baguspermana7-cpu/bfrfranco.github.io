@@ -7710,7 +7710,9 @@
 
             function mutateInputForParam(input, cfg) {
                 var candidate = Object.assign({}, input);
-                candidate[cfg.key] = clamp(candidate[cfg.key] + cfg.step, cfg.min, cfg.max);
+                /* 3.27.0 — clamp only a base inside the range: IT 100 MW + 0.2 was clamped to the 80 MW end */
+                var inside = input[cfg.key] >= cfg.min && input[cfg.key] <= cfg.max;
+                candidate[cfg.key] = inside ? clamp(candidate[cfg.key] + cfg.step, cfg.min, cfg.max) : candidate[cfg.key] + cfg.step;
                 if (cfg.key === 'modelYear') candidate[cfg.key] = Math.round(candidate[cfg.key]);
                 if (cfg.key === 'supplyTemp') {
                     var baseDeltaT = Math.max(input.returnTemp - input.supplyTemp, 6);

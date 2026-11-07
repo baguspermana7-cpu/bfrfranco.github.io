@@ -262,7 +262,7 @@
 
         // Sensitivity TORNADO (two-directional, engine-computed) — comprehensiveness add
         var tornadoCard = el('div', { className: 'ltc-overview-card ltc-tornado-card' });
-        tornadoCard.innerHTML = '<div class="ltc-overview-label">● SENSITIVITY TORNADO <span class="ltc-muted">— ΔPUE for ±1 step per input (engine-computed)</span></div>' +
+        tornadoCard.innerHTML = '<div class="ltc-overview-label">● SENSITIVITY TORNADO <span class="ltc-muted">— change in annual PUE for one step down and up, recomputed on the model shown; inputs with no effect are left out</span></div>' +
             '<div id="ltcTornado" class="ltc-tornado"></div>';
         panelCharts.appendChild(tornadoCard);
         panelCharts.appendChild(el('div', { id: 'ltcChartsHost' }));
@@ -1528,13 +1528,17 @@
         var base = metricOf(model);
         var target = base > row.hi ? row.hi : row.lo;      // pull toward the violated edge
         var out = [];
+        var LP = window.LTCLabPlant;
         d.ltcCalibration.impactParams.forEach(function (cfg) {
             [1, -1].forEach(function (dir) {
-                var inp = Object.assign({}, model.input);
-                var nv = (inp[cfg.key] || 0) + dir * cfg.step;
-                if (nv < cfg.min || nv > cfg.max) return;
-                inp[cfg.key] = nv;
-                var alt = metricOf(ml.compute(inp));
+                var inp = LP ? LP.stepInput(model.input, cfg, dir) : Object.assign({}, model.input);
+                if (!LP) {
+                    var nv = (inp[cfg.key] || 0) + dir * cfg.step;
+                    if (nv < cfg.min || nv > cfg.max) return;
+                    inp[cfg.key] = nv;
+                }
+                if (inp[cfg.key] === model.input[cfg.key]) return;          // at the end of the range: no step
+                var alt = metricOf(LP ? LP.computeLike(model, inp) : ml.compute(inp));
                 var gain = Math.abs(base - target) - Math.abs(alt - target);
                 if (gain > 1e-9) out.push({ key: cfg.key, label: cfg.label, dir: dir, gain: gain });
             });
@@ -1715,16 +1719,18 @@
         }
         var base = model.pue;
         function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
+        var LP = window.LTCLabPlant;
         var rows = data.ltcCalibration.impactParams.map(function (cfg) {
-            var lo = Object.assign({}, model.input); lo[cfg.key] = clamp((lo[cfg.key] || 0) - cfg.step, cfg.min, cfg.max);
-            var hi = Object.assign({}, model.input); hi[cfg.key] = clamp((hi[cfg.key] || 0) + cfg.step, cfg.min, cfg.max);
-            var dLow = eng.compute(lo).pue - base;
-            var dHigh = eng.compute(hi).pue - base;
+            var lo = LP ? LP.stepInput(model.input, cfg, -1) : Object.assign({}, model.input, { [cfg.key]: clamp((model.input[cfg.key] || 0) - cfg.step, cfg.min, cfg.max) });
+            var hi = LP ? LP.stepInput(model.input, cfg, 1) : Object.assign({}, model.input, { [cfg.key]: clamp((model.input[cfg.key] || 0) + cfg.step, cfg.min, cfg.max) });
+            var dLow = (LP ? LP.computeLike(model, lo) : eng.compute(lo)).pue - base;
+            var dHigh = (LP ? LP.computeLike(model, hi) : eng.compute(hi)).pue - base;
             return { label: cfg.label, dLow: dLow, dHigh: dHigh, range: Math.abs(dHigh - dLow) };
         }).filter(function (r) { return r.range > 1e-9; })
           .sort(function (a, b) { return b.range - a.range; })
           .slice(0, 8);
         var maxAbs = rows.reduce(function (m, r) { return Math.max(m, Math.abs(r.dLow), Math.abs(r.dHigh)); }, 1e-6);
+        function sgn(v) { var t = Math.abs(v) < 5e-5 ? 0 : v; return (t > 0 ? '+' : t < 0 ? '−' : '') + Math.abs(t).toFixed(4); }
         host.innerHTML = rows.map(function (r) {
             var lo = Math.min(r.dLow, r.dHigh), hi = Math.max(r.dLow, r.dHigh);
             var leftPct = (lo + maxAbs) / (2 * maxAbs) * 100;
@@ -1735,7 +1741,7 @@
                     '<span class="ltc-tor-zero"></span>' +
                     '<span class="ltc-tor-bar" style="left:' + leftPct.toFixed(1) + '%;width:' + Math.max(widthPct, 0.6).toFixed(1) + '%"></span>' +
                 '</span>' +
-                '<span class="ltc-tor-val">' + (hi >= 0 ? '+' : '') + hi.toFixed(3) + ' / ' + (lo >= 0 ? '+' : '') + lo.toFixed(3) + '</span>' +
+                '<span class="ltc-tor-val">−step ' + sgn(r.dLow) + ' · +step ' + sgn(r.dHigh) + '</span>' +
                 '</div>';
         }).join('') || '<div class="ltc-muted" style="padding:10px">No sensitivity range at current inputs.</div>';
     }
