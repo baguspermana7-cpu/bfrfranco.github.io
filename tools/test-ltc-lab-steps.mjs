@@ -87,7 +87,9 @@ try {
       const kpi = document.getElementById('kpiPump'), kl = kpi && kpi.parentElement.querySelector('.ltc-kpi-label').textContent.trim();
       const eb = [...document.querySelectorAll('.ltc-etable tbody tr')].map((t) => [t.cells[0].textContent.trim(), num(t.cells[1].textContent)]);
       const foot = num(document.querySelector('.ltc-etable tfoot td:nth-child(2)')?.textContent);
-      return { rows, kl, kv: kpi && num(kpi.textContent), eb, foot, tcs: r && r.liquid.tcsPumpKw, fws: r && r.liquid.fwsPumpKw };
+      const fp = document.getElementById('flowPump');
+      return { rows, kl, kv: kpi && num(kpi.textContent), eb, foot, tcs: r && r.liquid.tcsPumpKw, fws: r && r.liquid.fwsPumpKw,
+        flow: fp && [fp.parentElement.firstElementChild.textContent.trim(), num(fp.textContent)] };
     });
     const tcsRow = pw.rows['TCS pumps'];
     ok(tcsRow != null, `${w} S12 no "TCS pumps" row in Results (rows: ${Object.keys(pw.rows).filter((k) => /pump/i.test(k)).join(', ')})`);
@@ -100,6 +102,7 @@ try {
     ok(Math.abs(pw.kv - (pw.tcs + pw.fws)) <= 0.06, `${w} S12 KPI ${pw.kv} != TCS + FWS ${pw.tcs + pw.fws}`);
     const ebp = pw.eb.find((e) => /pump/i.test(e[0]));
     ok(ebp && /TCS/.test(ebp[0]) && Math.abs(ebp[1] - pw.tcs) <= 0.06, `${w} S12 energy-balance pump row ${JSON.stringify(ebp)} vs TCS ${pw.tcs}`);
+    ok(pw.flow && /TCS/.test(pw.flow[0]) && Math.abs(pw.flow[1] - pw.tcs) <= 0.6, `${w} S12 Flow-tab loss bar ${JSON.stringify(pw.flow)} vs TCS pumps ${pw.tcs}`);
     const ebSum = pw.eb.reduce((a, e) => a + e[1], 0);
     ok(Math.abs(ebSum - pw.foot) <= pw.foot * 0.001, `${w} S12 energy-balance rows sum ${ebSum.toFixed(1)} != Total Facility ${pw.foot}`);
     // S13 in plant mode the Results card shows what the plant computed, not the screening model's internals

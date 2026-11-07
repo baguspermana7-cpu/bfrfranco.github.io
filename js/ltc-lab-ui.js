@@ -1116,6 +1116,9 @@
         renderScenarioInfo(model);
         renderResultsTab(model);
         syncSliders();
+        /* the Flow tab's loss bars read breakdown.pump, which in plant mode is the TCS pumps (FWS sit in liquid cooling) */
+        var fp = document.getElementById('flowPump'), fpl = fp && fp.parentElement.firstElementChild;
+        if (fpl) fpl.textContent = model.plant ? 'TCS pumps' : 'Pump + Hydraulics';
         polishNumbers();
         // Live run stamp — auto-run recomputes constantly; show it.
         var lr = document.getElementById('ltcLastRun');
