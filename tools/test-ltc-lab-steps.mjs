@@ -13,6 +13,8 @@
  * S7 Run semantics: auto-run is on by default and the Recompute button is hidden; switching auto-run off reaches the
  *    engine toggle and shows Recompute; an edit then leaves the result unchanged and marks Recompute due; clicking it
  *    updates the result and clears the mark
+ * S9 Sensitivity perturbs the model the page shows: every listed ΔPUE is reproduced by recomputing the plant
+ *    (LTCLabPlant) with that input one step up, and no listed input is one the plant ignores
  * S8 The right rail follows the step: at Load the Standards/Design/Validation cards are folded with a link to Check and
  *    Sensitivity is open; at Check they are open; the fold link selects its step
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
@@ -92,6 +94,23 @@ try {
       ok(rl[k] === 'open', `${w} S8 at Check ${k} should be open: ${rl[k]}`);
     ok(/^folded:Review/.test(rl['SCENARIO INFO'] || ''), `${w} S8 at Check scenario info should fold to Review: ${rl['SCENARIO INFO']}`);
     await p.evaluate(() => document.getElementById('ltcStep-load').click());
+    const sens = await p.evaluate(() => {
+      const m = window.__ltcLastModel, LP = window.LTCLabPlant, LM = RZEngine.models.ltc;
+      const P = RZEngine.data.ltcCalibration.impactParams.concat([{ key: 'upsEff', label: 'UPS efficiency', step: 0.5, min: 90, max: 99.5 },
+        { key: 'pumpHead', label: 'Pump head', step: 2, min: 5, max: 90 }, { key: 'distLoss', label: 'Distribution loss', step: 0.5, min: 0.5, max: 8 }]);
+      return [...document.querySelectorAll('#ltcSensBars .ltc-sens-row')].map((r) => {
+        const name = r.querySelector('.ltc-sens-name').firstChild.textContent.trim(); const shown = +r.querySelector('.ltc-sens-delta').textContent;
+        const c = P.find((q) => q.label === name); if (!c) return [name, shown, null];
+        const x = Object.assign({}, m.input); x[c.key] = Math.min(c.max, Math.max(c.min, +x[c.key] + c.step));
+        if (c.key === 'supplyTemp') x.returnTemp = x.supplyTemp + Math.max(m.input.returnTemp - m.input.supplyTemp, 6);
+        return [name, shown, LP.compute(x, LM.compute(x)).pue - m.pue];
+      });
+    });
+    ok(sens.length >= 3, `${w} S9 sensitivity lists ${sens.length} rows`);
+    for (const [n, shown, d] of sens) {
+      ok(d !== null, `${w} S9 sensitivity row "${n}" is not a known input`);
+      if (d !== null) ok(Math.abs(d) >= 5e-6 && Math.abs(shown - d) <= 5e-5, `${w} S9 "${n}" shows ${shown}, plant recompute ${d.toFixed(5)}`);
+    }
     const cap = () => p.evaluate(() => document.querySelector('#ltcStep-capture .ltc-step-res').textContent);
     const run = () => p.evaluate(() => { const b = document.getElementById('ltcRunBtn'), a = document.getElementById('ltcAutoRun'), e = document.getElementById('autoRunToggle');
       return { hidden: b.hidden, text: b.textContent.trim(), due: b.classList.contains('is-due'), auto: !!a && a.checked, eng: !!e && e.checked }; });
@@ -119,4 +138,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, 0 errors');

@@ -331,7 +331,7 @@
         var sensHeader = el('div', { className: 'ltc-rail-header' });
         sensHeader.appendChild(el('span', { className: 'ltc-rail-title', textContent: 'SENSITIVITY ANALYSIS' }));
         sensCard.appendChild(sensHeader);
-        sensCard.appendChild(el('div', { className: 'ltc-sens-label', textContent: 'Top 5: Impact on PUE' }));
+        sensCard.appendChild(el('div', { className: 'ltc-sens-label', textContent: 'Top 5 · change in annual PUE for one step up' }));
         sensCard.appendChild(el('div', { className: 'ltc-sens-bars', id: 'ltcSensBars' }));
         rightRail.appendChild(sensCard);
 
@@ -1576,16 +1576,41 @@
     // ════════════════════════════════════════════════════════
     // renderSensitivity — top-5 by |ΔPUE|, sourced from engine
     // ════════════════════════════════════════════════════════
+    // plant inputs the lab owns that impactParams does not list; bounds from the lab's SENSITIVITY_BOUNDS
+    var SENS_EXTRA = [
+        { key: 'upsEff',   label: 'UPS efficiency',    step: 0.5, min: 90,  max: 99.5, unit: '%' },
+        { key: 'pumpHead', label: 'Pump head',         step: 2,   min: 5,   max: 90,   unit: 'm' },
+        { key: 'distLoss', label: 'Distribution loss', step: 0.5, min: 0.5, max: 8,    unit: '%' }
+    ];
     function renderSensitivity(model) {
         var host = document.getElementById('ltcSensBars');
         if (!host) return;
 
         var entries = [];
 
-        // Primary: engine sensitivity (single source of truth)
-        if (window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc && model.input) {
-            var rows = window.RZEngine.models.ltc.sensitivity(model.input);
-            entries = rows.map(function (r) { return { name: r.label, delta: r.dpue }; });
+        // Primary (3.27.0): perturb the SAME model the page shows. Since v3.17.0 the displayed PUE is the shared
+        // plant engine's (js/ltc-lab-plant.js); models.ltc.sensitivity perturbs the legacy screening model, whose
+        // heuristic inputs (future tech, predictive gain, coefficients…) do not reach the plant at all. Each row is
+        // the plant's annual PUE after one step up of that input, minus the shown PUE.
+        var inert = [];
+        var LP = window.LTCLabPlant, LM = window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc;
+        if (LP && LM && model.input && model.engine === 'ltc-plant') {
+            var params = (window.RZEngine.data.ltcCalibration.impactParams || []).concat(SENS_EXTRA);
+            var base = model.pue;
+            params.forEach(function (c) {
+                var x = Object.assign({}, model.input);
+                if (!isFinite(+x[c.key])) return;
+                x[c.key] = Math.min(c.max, Math.max(c.min, +x[c.key] + c.step));
+                if (c.key === 'supplyTemp') x.returnTemp = x.supplyTemp + Math.max(model.input.returnTemp - model.input.supplyTemp, 6);
+                var d;
+                try { d = LP.compute(x, LM.compute(x)).pue - base; } catch (e) { return; }
+                if (!isFinite(d)) return;
+                if (Math.abs(d) < 5e-6) { inert.push(c.label); return; }
+                entries.push({ name: c.label, step: '+' + c.step + (c.unit ? ' ' + c.unit.replace(/^C$/, '°C') : ''), delta: d });
+            });
+        } else if (LM && model.input) {
+            var rows = LM.sensitivity(model.input);
+            entries = rows.map(function (r) { return { name: r.label, step: '+' + r.step + (r.unit ? ' ' + r.unit : ''), delta: r.dpue }; });
         }
 
         // Fallback: read the impact matrix table already rendered on the page
@@ -1616,18 +1641,19 @@
 
         host.innerHTML = top5.map(function (e) {
             var pct = (Math.abs(e.delta) / maxAbs) * 100;
-            var isPos = e.delta > 0;
+            var lowers = e.delta < 0;
             return '<div class="ltc-sens-row">' +
                 '<div class="ltc-sens-head">' +
-                '<span class="ltc-sens-name">' + e.name + '</span>' +
-                '<span class="ltc-sens-delta ' + (isPos ? 'ltc-pos' : '') + '">' +
-                (isPos ? '+' : '') + e.delta.toFixed(3) + '</span>' +
+                '<span class="ltc-sens-name">' + e.name + (e.step ? ' <span class="ltc-sens-step">' + e.step + '</span>' : '') + '</span>' +
+                '<span class="ltc-sens-delta ' + (lowers ? 'ltc-lowers' : 'ltc-raises') + '">' +
+                (lowers ? '' : '+') + e.delta.toFixed(4) + '</span>' +
                 '</div>' +
                 '<div class="ltc-sens-track">' +
-                '<div class="ltc-sens-fill ' + (isPos ? 'ltc-pos' : '') + '" style="width:' + pct.toFixed(0) + '%"></div>' +
+                '<div class="ltc-sens-fill" style="width:' + pct.toFixed(0) + '%"></div>' +
                 '</div>' +
                 '</div>';
-        }).join('');
+        }).join('') + (inert.length ? '<p class="ltc-sens-inert">No effect on the plant PUE: ' + inert.join(', ') +
+            ' (screening-model inputs).</p>' : '');
     }
 
     // ════════════════════════════════════════════════════════
