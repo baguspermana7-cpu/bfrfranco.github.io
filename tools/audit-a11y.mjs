@@ -84,6 +84,19 @@ for (const f of PAGES) {
       await pg.goto(`http://localhost:${PORT}/${f}`, { waitUntil: 'networkidle2', timeout: 60000 });
       await pg.evaluate(t => document.documentElement.setAttribute('data-theme', t), theme);
       await new Promise(r => setTimeout(r, 700)); // settle theme transitions
+      // settle one-shot entrance animations too: axe blends opacity into the sampled colour, and a staggered
+      // fade-in (e.g. the hub's .keys li, 200 ms + i x 70 ms + 400 ms) outlives the 700 ms above — a mid-fade
+      // sample read #6B7280 as #A6AAB2 (2.3:1) on 2026-11-07. Finite animations only; capped at 4 s.
+      // Poll rather than snapshot: rows inserted after load (engine-fed lists) and re-renders on the theme
+      // switch start NEW finite animations after a one-shot wait returned; 2026-11-07 the hub's four
+      // .keys li sampled #767d8a/#9398a2/#e0e2e4/#cdcfd2 mid-fade with the snapshot wait. Quiet = two
+      // consecutive 200 ms polls with no finite animation running; capped at 6 s.
+      await pg.evaluate(() => new Promise(res => {
+        const t0 = Date.now(); let quiet = 0;
+        const finite = () => document.getAnimations().filter(a => { const e = a.effect && a.effect.getTiming ? a.effect.getTiming() : null; return e && e.iterations !== Infinity && a.playState !== 'finished'; });
+        const tick = () => { if (finite().length === 0) quiet++; else quiet = 0; if (quiet >= 2 || Date.now() - t0 > 6000) res(); else setTimeout(tick, 200); };
+        tick();
+      })).catch(() => {});
       await pg.evaluate(AXE_SRC);
       const res = await pg.evaluate(async () => await axe.run(document, {
         resultTypes: ['violations'],

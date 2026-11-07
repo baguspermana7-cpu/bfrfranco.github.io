@@ -23,24 +23,24 @@
 <meta name="twitter:image" content="https://resistancezero.com/assets/og/all-in-one-dashboard.webp">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"All-In-One Dashboard · Self-Hosted (Glance)","url":"https://resistancezero.com/all-in-one-dashboard.html","description":"Self-hosted minimalist dashboard for engineers — RSS feeds, weather, stocks, calendars, and global news in one unified view.","isPartOf":{"@type":"WebSite","name":"ResistanceZero","url":"https://resistancezero.com/"}}</script>
 <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
-<link rel="stylesheet" href="styles.min.css?v=20261103-9d57ed99">
-<script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+<link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
+<script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
 <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
 <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 
 <style>
 :root {
-  --aio-cyan: #06b6d4;
+  --aio-cyan: var(--rz-accent-ui);
   --aio-amber: #f59e0b;
   --aio-mint: #7DDDB4;
   --aio-line: #475569;
   --aio-bg-card: rgba(255,255,255,0.02);
-  --aio-bg-tile: rgba(15,23,42,0.5);
+  --aio-bg-tile: rgba(25,27,32,0.5);
 }
 [data-theme="light"] {
   --aio-bg-card: #ffffff;
   --aio-bg-tile: #f8fafc;
-  --aio-cyan: #0e7490;
+  --aio-cyan: var(--rz-accent-ui);
 }
 
 .aio-hero {
@@ -57,7 +57,7 @@
   text-transform: uppercase;
   color: var(--aio-cyan);
   border: 0.8px solid var(--aio-cyan);
-  background: rgba(6,182,212,0.06);
+  background: rgba(232,181,99,0.06);
   padding: 0.25rem 0.7rem;
   border-radius: 4px;
   margin-bottom: 1rem;
@@ -95,7 +95,7 @@
   font-size: 1.4rem;
   margin: 2.5rem 0 0.5rem;
   display: flex; align-items: baseline; gap: 0.6rem;
-  border-bottom: 0.8px solid rgba(6,182,212,0.18);
+  border-bottom: 0.8px solid rgba(232,181,99,0.18);
   padding-bottom: 0.5rem;
 }
 .aio-section h2 .h2tag {
@@ -108,7 +108,7 @@
 .aio-section p { line-height: 1.65; margin: 0.8rem 0; }
 .aio-section ul { line-height: 1.7; padding-left: 1.4rem; }
 .aio-section ul li { margin: 0.35rem 0; }
-.aio-section code { font-family: 'JetBrains Mono', ui-monospace, monospace; background: rgba(6,182,212,0.08); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+.aio-section code { font-family: 'JetBrains Mono', ui-monospace, monospace; background: rgba(232,181,99,0.08); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
 
 .aio-grid {
   display: grid;
@@ -148,11 +148,11 @@
 }
 .aio-quickstart h3 { margin: 0 0 0.6rem; font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 1.05rem; color: var(--aio-cyan); }
 .aio-quickstart pre {
-  background: rgba(15,23,42,0.85);
+  background: rgba(25,27,32,0.85);
   color: #cffafe;
   padding: 1rem 1.2rem;
   border-radius: 6px;
-  border: 0.8px solid rgba(6,182,212,0.25);
+  border: 0.8px solid rgba(232,181,99,0.25);
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 0.85rem;
   line-height: 1.55;
@@ -168,14 +168,14 @@
   font-weight: 600;
   color: var(--aio-cyan);
   border: 0.8px solid var(--aio-cyan);
-  background: rgba(6,182,212,0.06);
+  background: rgba(232,181,99,0.06);
   padding: 0.5rem 1rem;
   border-radius: 6px;
   text-decoration: none;
   margin-right: 0.5rem;
   transition: background 150ms ease;
 }
-.aio-cta:hover { background: rgba(6,182,212,0.12); }
+.aio-cta:hover { background: rgba(232,181,99,0.12); }
 
 .aio-demo {
   background: rgba(245,158,11,0.06);
@@ -208,7 +208,7 @@
 
 /* a11y color-contrast overrides (color-only, per-theme) */
 [data-theme="light"] .aio-hero .badge,
-[data-theme="light"] .aio-cta { color: #155e75; }
+[data-theme="light"] .aio-cta { color: var(--rz-accent-ui); }
 [data-theme="light"] .aio-section code { color: #475569; }
 [data-theme="light"] .aio-demo b { color: #92400e; }
 [data-theme="dark"] .aio-hero p.lede,
@@ -218,6 +218,13 @@
 [data-theme="dark"] .aio-section code,
 [data-theme="dark"] .aio-meta,
 [data-theme="dark"] .aio-foot { color: #94a3b8; }
+
+/* sweep-cyan-register: the page accent, per theme */
+:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
+[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+/* sweep-cyan-register: page tokens re-resolve inside dark panels */
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--aio-cyan:var(--rz-accent-ui)}
 </style>
 </head>
 <body>

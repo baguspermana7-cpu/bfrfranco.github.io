@@ -108,22 +108,22 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="styles.min.css?v=20261103-9d57ed99">
+    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
 
     <style>
         :root { --cmp-primary: #ef4444; --cmp-primary-light: rgba(239,68,68,0.1); --cmp-a: #ef4444; --cmp-b: #06b6d4; }
         [data-theme="dark"] { --cmp-bg: #0e0f12; --cmp-card: #16181d; --cmp-border: #2a2d34; --cmp-text: #f1f5f9; --cmp-muted: #94a3b8; }
-        :root:not([data-theme="dark"]) { --cmp-bg: #f8fafc; --cmp-card: #ffffff; --cmp-border: #e2e8f0; --cmp-text: #0f172a; --cmp-muted: #64748b; }
+        :root:not([data-theme="dark"]) { --cmp-bg: #f8fafc; --cmp-card: #ffffff; --cmp-border: #e2e8f0; --cmp-text: #191B20; --cmp-muted: #64748b; }
 
-        .compare-hero { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 40%, #ef4444 100%); padding: 8rem 2rem 4rem; color: #fff; text-align: center; position: relative; overflow: hidden; }
-        .compare-hero::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background: radial-gradient(circle at 30% 70%, rgba(239,68,68,0.4) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(6,182,212,0.25) 0%, transparent 50%); z-index:0; }
+        .compare-hero { background: transparent; border-bottom: 1px solid rgba(128,128,128,0.18); padding: 8rem 2rem 4rem; color: inherit; text-align: center; position: relative; overflow: hidden; }
+        .compare-hero::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background: none; z-index:0; }
         .compare-hero > * { position:relative; z-index:1; }
         .compare-hero h1{font-family:'IBM Plex Sans',system-ui,sans-serif;font-weight:600; font-size: clamp(2rem, 4.5vw, 3rem); margin-bottom: 1rem; }
-        .compare-hero p { font-size: 1.15rem; color: rgba(255,255,255,0.85); max-width: 700px; margin: 0 auto 1.5rem; }
+        .compare-hero p { font-size: 1.15rem; color: inherit; opacity: 0.85; max-width: 700px; margin: 0 auto 1.5rem; }
         .hero-badges { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
         .hero-badge { padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 600; font-size: 0.9rem; }
         .hero-badge.a { background: rgba(239,68,68,0.3); border: 1px solid rgba(239,68,68,0.5); color: #fca5a5; }
-        .hero-badge.b { background: rgba(6,182,212,0.3); border: 1px solid rgba(6,182,212,0.5); color: #67e8f9; }
+        .hero-badge.b { background: rgba(6,182,212,0.3); border: 1px solid rgba(6,182,212,0.5); color: #67e8f9; } :root:not([data-theme="dark"]) .compare-hero .hero-badge { color: #1a1d23 !important; }
 
         .compare-section { padding: 4rem 2rem; max-width: 960px; margin: 0 auto; }
         .compare-section h2 { font-size: 1.75rem; color: var(--cmp-text); margin-bottom: 1.5rem; text-align: center; }
@@ -292,7 +292,7 @@
 [data-theme="dark"] .formula-card h4.dcie { color:#94a3b8 !important; }
 [data-theme="dark"] .compare-table thead th:nth-child(2), [data-theme="dark"] .compare-table thead th:nth-child(3) { filter:none; }
 </style>
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 </head>
@@ -480,6 +480,12 @@
             <div class="footer-connect"><h4 class="footer-heading">CONNECT</h4><ul class="footer-links"><li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li><li><a href="articles.html">Technical Journal</a></li><li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li><li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener noreferrer">GitHub</a></li></ul></div>
         </div></div>
     </footer>
+    <script>
+        // Dark mode (the toggle in the nav had no handler on this page)
+        (function(){ var toggle=document.getElementById('themeToggle'); var theme='light'; try{ theme=localStorage.getItem('theme')||'light'; }catch(e){}
+        document.documentElement.setAttribute('data-theme',theme);
+        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); try{ localStorage.setItem('theme',n); }catch(e){} }); })();
+    </script>
 
     
 

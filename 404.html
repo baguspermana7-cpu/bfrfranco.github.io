@@ -33,7 +33,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.min.css?v=20261103-9d57ed99">
+    <link rel="stylesheet" href="/styles.min.css?v=20261105-a05dc709">
     <style>
         /* v3.20.2 — the 404 on the design system: flat surface, solid type, 4px controls, 1px
            hairlines, no aurora, no gradient text, no grain, no glow, no hover lift. Every URL on
@@ -63,16 +63,16 @@
             text-decoration: none; cursor: pointer;
             transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
         }
-        .btn-return { background: #7DDDB4; color: #0B1F17; border: 1px solid #7DDDB4; }
+        .btn-return { background: var(--rz-accent-ui); color: #0B1F17; border: 1px solid var(--rz-accent-ui); }
         .btn-return:hover { background: #A8ECCF; border-color: #A8ECCF; }
         .btn-search { background: transparent; color: #e2e8f0; border: 1px solid #334155; }
-        .btn-search:hover { border-color: #7DDDB4; color: #f1f5f9; }
+        .btn-search:hover { border-color: var(--rz-accent-ui); color: #f1f5f9; }
         .btn-search kbd {
             font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.75rem;
             padding: 1px 6px; border: 1px solid #334155; border-radius: 4px; color: #94a3b8;
         }
         .btn-return svg, .btn-search svg { width: 18px; height: 18px; }
-        .btn-return:focus-visible, .btn-search:focus-visible, .popular-links a:focus-visible { outline: 2px solid #7DDDB4; outline-offset: 2px; }
+        .btn-return:focus-visible, .btn-search:focus-visible, .popular-links a:focus-visible { outline: 2px solid var(--rz-accent-ui); outline-offset: 2px; }
         .popular-links { margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid #2a2d34; width: 100%; }
         .popular-links h2 {
             font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.75rem; font-weight: 600;
@@ -89,8 +89,13 @@
             margin-top: 2.5rem; font-family: "JetBrains Mono", ui-monospace, monospace;
             font-size: 0.75rem; color: #64748b; letter-spacing: 0.1em; text-transform: uppercase;
         }
-    </style>
-    <script src="/js/rz-version.js?v=20261107-a097e41e" defer></script>
+    
+/* sweep-cta-accent: the page accent, per theme */
+:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
+[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+</style>
+    <script src="/js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="/js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="/js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
     <script src="/js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>

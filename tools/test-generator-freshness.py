@@ -63,6 +63,12 @@ BUILDERS = [
     ("data/journal.json + journal grids", ["python3", "tools/build-journal.py", "--check"]),
     ("journal register sweep (article CSS)", ["python3", "tools/sweep-journal-register.py", "--check"]),
     ("site register sweep (manual/, network/, prd/ tokens)", ["python3", "tools/sweep-site-register.py", "--check"]),
+    ("navy register sweep (navy cast -> graphite, AC3)", ["python3", "tools/sweep-navy-register.py", "--check"]),
+    ("PLN register sweep (one accent on the grid pages)", ["python3", "tools/sweep-pln-register.py", "--check"]),
+    ("cyan register sweep (no second accent on reading/tool pages)", ["python3", "tools/sweep-cyan-register.py", "--check"]),
+    ("hero CTA sweep (journal CTA flat amber, no glow)", ["python3", "tools/sweep-hero-cta.py", "--check"]),
+    ("wash register sweep (no coloured gradient bands)", ["python3", "tools/sweep-wash-register.py", "--check"]),
+    ("CTA accent sweep (button/CTA chrome on the one accent)", ["python3", "tools/sweep-cta-accent.py", "--check"]),
     ("cx-handbook/ (Cx field manual pages)", ["python3", "tools/build-cx-handbook.py", "--check"]),
 ]
 

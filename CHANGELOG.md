@@ -11,6 +11,44 @@ release sections rather than semver.
 
 ---
 
+## v3.24.45 — 2026-11-07 — "Accent, everywhere it was blue"
+
+Owner: *"continue, masih banyak task yang belum kamu lakukan dengan sempurna"*. The audit-scope rule came from the LTC session: *"exempt only what actually has findings, with the finding named."*
+
+### Changed
+- **Journal hub meta and legal notice** (`css/rz-article-dark.css`, folded in from the LTC session): `.jhero p` no longer out-specifies `.jmeta`, so the "Insights · 36 articles · …" line renders at its .78rem mono size (was 18.9 px sans), and `.jnotice` drops to .8rem/1.55 muted with 12px 14px padding (was 16.6 px) on articles, insights, future-forward and geopolitics.
+- **article-30 cover**: a 1600×900 hero (`assets/article-30-hero.webp`, a frame from the owner's video) as the cover figure; the journal cards and `data/journal.json` pick it up (image was null), and the OG card is rebuilt from it.
+- **a11y**: article-26's privacy line and disclaimer in light mode read 2.5:1 after the hue sweep; now #646a73 (5.4:1). The a11y gate waits for finite entrance animations before axe samples colour — the hub's staggered `.keys li` fade-in had been sampled mid-fade (#6B7280 read as #A6AAB2, then #CDCFD4), a flake that depended on load.
+- **Rebased onto v3.24.44** (LTC hub tools): where both releases touched a line, the flat graphite (no gradient, no backdrop blur) and the 4 px radius won; 275 token-only conflicts resolved by the normaliser.
+- **Articles**: UI blue in 24 articles is now the editorial accent (`var(--rz-art-accent)`, #E8B563 in dark and #92400e in light). This covers buttons, toolbars, widget borders, tab states, links and the TOC. Chart series, map markers, ramps and named `--*-blue` data series keep their colours; they are categories, not chrome.
+- **Shared links** (`styles.css`): dark links in the article body, article nav, author bio, references, back link, contact block and calculator disclaimer move from #60a5fa/#818cf8/#a5b4fc to amber. Light disclaimer links move from #2563eb/#1d4ed8 to #92400e/#78350f. The cookie banner's accept button is graphite in light and amber in dark, at 4 px radius. The dark footer border loses its navy cast (#1f2b47 to #2a2e36).
+- **Table of contents in articles** (`css/rz-article-dark.css`): muted numbers and a hairline card on every editorial page, with amber on hover.
+- **Second accents removed** (contact sheet): cyan chrome on 22 reading and tool pages, green on the ASEAN report and the PUE infographic, the regional hue of each PLN grid page, red and green Login buttons on article-2/3. One accent per theme. Categorical colour (ratings, scale levels, comparison sides, chart series) is kept, and each kept rule is named in the sweep.
+- **Coloured gradient bands** on heroes, calculator panels and CTAs (green, teal, red, blue; dark in both themes) are flat graphite. A CTA is flat amber. The PLN heroes lose their regional glows.
+- **Journal hero CTA** (articles 14/16/17/18): the 30 px gradient pill with an infinite `pulse-glow` is a flat amber button at 4 px, with no animation. The dc-market-tracker premium button no longer pulses.
+- **Navy cast → graphite** of the same lightness on pages, `styles.css`, the cockpit instrument sheet and the PLN dashboard scripts.
+- **`audit-vibecode` scope (AC2)**: §A27–34 now gate every scanned file. The only exemptions are a named EXEMPT set and a `PENDING` map pinned per file and per rule: design artefacts, the homepage, the paper document, and `rz-calc-editorial.css`, which only `changelog.html` and a plan artefact load. Owning a page is not a reason to exempt it, so clean calculator pages gate. A `PENDING` entry whose finding has gone fails as `stale-exemption`; after rebasing on 3.24.42 it flagged exactly `capex-calculator.html` and `js/rz-scenario.js`, which are now removed. An `aurora-*` rule that only says `display: none` no longer counts as the tell.
+
+### Fixed
+- **Calculator button with no visible label** (article-9, dark). `[data-theme="dark"] .article-body a` (0,2,1) outranked `.hvac-cta-btn` (0,1,0). On-accent text in the 4 affected articles now wins.
+- **Dark instrument panels in the light theme** (`[data-rz-dark-panel]`). These panels stay dark in day mode but took the day accent #92400e, about 2.6:1 on graphite. They keep the night tokens. A page token that aliases the accent on `:root` (`--ig-color: var(--rz-accent-ui)`) is resolved at `:root`, so it is now re-declared on the panel. Without that, the infographic, ASEAN and PLN heroes showed brown numerals on black.
+- **Pale evidence tiles on article-20 (light)**. The journal sweep marked tiles inside a `[data-rz-fact-list]` as dark panels, while the editorial register flattens them onto the page. A fact-list tile is never a dark panel, and the existing marks are removed.
+- **article-14 hero stats**: `rgba(0,0,0,.3)` read as a grey box with pale amber in light; it is now a dark panel.
+- Compare pages: the hero follows the theme, and the theme toggle works (it was a dead button).
+
+### Added
+- `tools/audit-render-register.mjs` (AC3) renders every sitemap page in {light, dark} × {390, 1440} and counts, from computed style, navy-band backgrounds, neon, serif chrome, and **wash**: a band at least 50 % of the viewport wide painted by a gradient with a dark chromatic stop outside the accent. Data encodings are exempt. Out-of-scope pages are listed with a reason.
+- Reproducible sweeps, each with `--check` wired into `test-generator-freshness.py`: `sweep-navy-register.py`, `sweep-pln-register.py`, `sweep-cyan-register.py`, `sweep-hero-cta.py` and `sweep-wash-register.py`.
+- `audit-vibecode` `animated-cta` also matches `jump-to`/`-btn` selectors and `pulse`/`glow` keyframes. The 3.24.42 detector fails the new test and this one passes it. A P&ID flow arrow and hover feedback stay exempt.
+- `audit-responsive-layout` covers sitemap subfolder pages, and a page that fails to load counts as UNMEASURED and fails.
+
+### Measured
+- AC3 render register, 195 pages × 2 themes × 2 widths = 780 renders: navy 2,602 → 0; wash 161 → 0; neon 0; serif 0; errors 0; dead toggles 0.
+- Blue band (computed style, hue 195–250°, 176 pages × both themes): 1,719 → 1,311. Cyan band (180–194°): 3,022 → 1,204. The residue is instrument state colour, charts and data fills, not chrome.
+- Button / CTA chrome (`tools/sweep-cta-accent.py`, 14 pages): every off-accent fill, tint and border on a `btn|button|cta` rule moved onto the one accent (pink article-15, red mode/PDF buttons on 2/6/7, green calculator buttons on 3/12/17, blue mode buttons on 4 and pln-java-grid, mint 404 return button, tinted CTA blocks on FF-2, 8, geopolitics-3, dc-market-tracker); state, legend, share and destructive buttons kept by name. `--check` is wired into generator freshness.
+- Accessibility after the sweeps (axe, 8 pages × both themes): the first gate run found 9 contrast rows the sweeps had created — cdu-calculator active buttons white-on-amber in dark, article-26 engineer note forced to day ink inside its dark panel, article-13 disclaimer links on the night amber inside a day-painted disclaimer and a calculator badge whose fill `styles.css` strips (`background:none !important`) leaving white text on nothing. All four causes fixed at the source; privacy.html, a dark-only page, lost the day token set the sweep had injected (dark-coverage gate).
+- AC5 contact sheet: 124 pages × 4 renders reviewed and sent; 40 pages re-shot after the fixes.
+
 ## v3.24.44 — 2026-11-07 — "Hub tools on graphite (R2)"
 
 Owner: *"continue, polish more, sempurnakan"*. Release R2a of the hub-tools plan.

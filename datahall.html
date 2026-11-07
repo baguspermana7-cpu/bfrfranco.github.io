@@ -76,7 +76,7 @@
             --bg-core: #050607;
             --bg-panel: #15171a;
             --bg-raised: #1c1e23;
-            --border: #25344b;
+            --border: #31353F;
             --border-soft: #23262c;
 
             --txt-main: #e2e8f0;
@@ -555,16 +555,16 @@
     <!-- v1.43.21 — data-quality service (SIM banner + chip). Additive; the rack/
          CRAH grid + all displayed values are unchanged. P1 datahall metadata. -->
     <script src="js/rz-telemetry-quality.js?v=20260920-90aca1fe" defer></script>
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 <style id="rz-skiplink-v1">
-.skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
+.skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
-[data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
+[data-theme="dark"] .skip-link{background:#E8B563;color:#0E0F12}
 </style>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
-    <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=20261031-5a5d53ed">
+    <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=20261105-c3fa9df6">
     <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=20261031-adcaa40e">
     <script src="js/datahall-ai/alarm-query.js?v=20260920-4d06f77a" defer></script>
     <script src="js/conv-alarm-events.js?v=20260920-05aca3f2" defer></script>
@@ -1306,7 +1306,7 @@
          * doc-03 §2 + doc-10 colour semantics. Red = breach ONLY.
          */
         var TIER = [
-            { max: 0.001, name: 'Spare / unoccupied', fill: '#1b2436', cls: 'offline' },
+            { max: 0.001, name: 'Spare / unoccupied', fill: '#24262D', cls: 'offline' },
             { max: 0.70,  name: 'Normal (<70%)',      fill: '#2f5e46', cls: 'normal'  },
             { max: 0.85,  name: '70–85%',             fill: '#7a5a1f', cls: 'warn'    },
             { max: 0.95,  name: '85–95%',             fill: '#9a5026', cls: 'warn'    },
@@ -1712,7 +1712,7 @@
                 : null;
             if (ramp) {
                 var lo = ramp.stops[0][0], hi = ramp.stops[ramp.stops.length - 1][0];
-                lg.innerHTML = '<span class="lg-item"><span class="lg-sw" style="background:#1b2436"></span>Spare</span>'
+                lg.innerHTML = '<span class="lg-item"><span class="lg-sw" style="background:#24262D"></span>Spare</span>'
                     + '<span class="lg-ramp" title="' + ramp.title + '"><span class="lg-end">' + ramp.lo + '</span>'
                     + '<span class="lg-bar" style="background:' + rampCss(ramp.stops) + '">'
                     + ramp.ticks.map(function (tk) { return '<span class="lg-tick" style="left:' + (((tk[0] - lo) / (hi - lo)) * 100).toFixed(1) + '%"><span>' + tk[1] + '</span></span>'; }).join('')
@@ -1720,9 +1720,9 @@
                 return;
             }
             if (mode === 'alarms') {
-                items = [['#1b2436', 'Normal'], ['#7a5a1f', 'Warning'], ['#9a342f', 'Critical']];
+                items = [['#24262D', 'Normal'], ['#7a5a1f', 'Warning'], ['#9a342f', 'Critical']];
             } else {
-                items = [['#1b2436', 'Spare slot'], ['#2f5e46', 'Occupied']];
+                items = [['#24262D', 'Spare slot'], ['#2f5e46', 'Occupied']];
             }
             lg.innerHTML = items.map(function (it) {
                 return '<span class="lg-item"><span class="lg-sw" style="background:' + it[0] + '"></span>' + it[1] + '</span>';
@@ -1736,7 +1736,7 @@
            the ramp is presentation): normal sits on a muted slate → green band (doc-03: "muted
            neutral rack blocks for normal"), amber begins where the warning threshold begins, red
            where the breach threshold begins. Red is still reserved for breach. */
-        var RAMP_POWER = [[0.00, '#1f2a3c'], [0.40, '#2b4a5e'], [0.70, '#3f7a58'], [0.85, '#b0892a'], [0.95, '#c05a2a'], [1.05, '#c0392b']];
+        var RAMP_POWER = [[0.00, '#282B33'], [0.40, '#2b4a5e'], [0.70, '#3f7a58'], [0.85, '#b0892a'], [0.95, '#c05a2a'], [1.05, '#c0392b']];
         var RAMP_TEMP  = [[18, '#2b4a5e'], [22, '#2f5e46'], [25.4, '#3f7a58'], [27, '#b0892a'], [30, '#c0392b']];
         var RAMP_MARGIN = [[0, '#c0392b'], [1, '#c05a2a'], [3, '#b0892a'], [5, '#3f7a58'], [7, '#2b4a5e']];
         function hexLerp(a, b, t) {
@@ -1795,20 +1795,20 @@
             return '<b>' + st.kw.min.toFixed(1) + '</b>–<b>' + st.kw.max.toFixed(1) + '</b><br>avg <b>' + st.kw.avg.toFixed(1) + '</b>';
         }
         function rackFill(rk, zone) {
-            if (currentMode === 'space') return rk.occupied ? '#2f5e46' : '#1b2436';
-            if (currentMode === 'temp')  return rk.occupied ? rampColor(RAMP_TEMP, rackInletFor(rk.idx)) : '#1b2436';
+            if (currentMode === 'space') return rk.occupied ? '#2f5e46' : '#24262D';
+            if (currentMode === 'temp')  return rk.occupied ? rampColor(RAMP_TEMP, rackInletFor(rk.idx)) : '#24262D';
             if (currentMode === 'cooling-margin') {
                 /* Tint by rack-inlet margin to the declared 27C recommended maximum. */
-                if (!rk.occupied) return '#1b2436';
+                if (!rk.occupied) return '#24262D';
                 return rampColor(RAMP_MARGIN, RACK_INLET_RECOMMENDED_MAX_C - rackInletFor(rk.idx));
             }
             if (currentMode === 'alarms') {
-                if (!rk.occupied) return '#1b2436';
+                if (!rk.occupied) return '#24262D';
                 if (rk.util > 0.95) return '#9a342f';
                 if (rk.util > 0.85) return '#7a5a1f';
-                return '#1b2436';
+                return '#24262D';
             }
-            return rk.occupied ? rampColor(RAMP_POWER, rk.util) : '#1b2436'; // power density (default) — continuous ramp
+            return rk.occupied ? rampColor(RAMP_POWER, rk.util) : '#24262D'; // power density (default) — continuous ramp
         }
 
         function renderFloor() {
@@ -2356,7 +2356,7 @@ function showBasisDrawer(id){
   var ex=d.getElementById('kpiBasisDrawer');if(ex)ex.remove();
   var ov=d.createElement('div');
   ov.id='kpiBasisDrawer';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','kbdTitle');
-  ov.style.cssText='position:fixed;inset:0;background:rgba(11,12,14,.92);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(15,16,20,.92);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;';
   var box=d.createElement('div');
   box.style.cssText='background:#121316;border:1px solid #2a2d33;border-radius:10px;max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:"IBM Plex Sans",sans-serif;';
   var hdr='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid #2a2d33;">'+
@@ -2367,7 +2367,7 @@ function showBasisDrawer(id){
   var body='<div style="padding:14px 18px 18px;overflow-y:auto;font-size:12.5px;line-height:1.55;">';
   body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Formula</span><div style="font-family:JetBrains Mono,monospace;background:#16181d;border:1px solid #2a2d33;border-radius:6px;padding:8px 11px;margin-top:4px;color:#fbbf24;font-size:12px;">'+b.formula+'</div></div>';
   body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Inputs</span><table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:12px;">';
-  for(var i=0;i<b.inputs.length;i++){body+='<tr><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);color:#94a3b8;">'+b.inputs[i][0]+'</td><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);font-family:JetBrains Mono,monospace;color:#dbe5f0;text-align:right;">'+b.inputs[i][1]+'</td></tr>';}
+  for(var i=0;i<b.inputs.length;i++){body+='<tr><td style="padding:5px 6px;border-bottom:1px solid rgba(55,59,70,.5);color:#94a3b8;">'+b.inputs[i][0]+'</td><td style="padding:5px 6px;border-bottom:1px solid rgba(55,59,70,.5);font-family:JetBrains Mono,monospace;color:#dbe5f0;text-align:right;">'+b.inputs[i][1]+'</td></tr>';}
   body+='</table></div>';
   var outputStyle=b.outputStyle||'background:#0a7d28;color:#fff;';
   body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Output</span><div style="font-family:JetBrains Mono,monospace;'+outputStyle+'border-radius:6px;padding:8px 11px;margin-top:4px;font-size:13px;font-weight:700;">'+b.output+'</div></div>';

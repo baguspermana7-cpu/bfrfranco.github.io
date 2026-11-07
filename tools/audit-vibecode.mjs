@@ -464,13 +464,15 @@ const RULES = [
        flow indicator whose animation IS the reading, telling the operator the line is
        live. Banning that would delete information from a process diagram to satisfy a
        marketing-copy rule. So: a resting (never :hover) infinite bounce/float on a
-       call-to-action, and nothing else. The §B Pixel-Rise scroll cue stays exempt. */
+       call-to-action, and nothing else. The §B Pixel-Rise scroll cue stays exempt.
+       Widened 2026-11-04 (contact sheet): the journal hero CTA `.jump-to-calc` ran an infinite
+       `pulse-glow` box-shadow — neither its selector nor its keyframe name was in the list. */
     test: (t) => {
       const hits = cssBlocks(t).filter((b) =>
-        /(cta|hero-btn|scroll-down|scroll-cue|bounce-arrow)/i.test(b.sel)
+        /(cta|hero-btn|jump-to|-btn\b|scroll-down|scroll-cue|bounce-arrow)/i.test(b.sel)
         && !/:hover|:focus/.test(b.sel)
         && !/scroll-explore/i.test(b.sel)
-        && /animation:[^;]*(bounce|float)[^;]*infinite/i.test(b.body));
+        && /animation:[^;]*(bounce|float|pulse|glow)[^;]*infinite/i.test(b.body));
       return hits.length ? `${hits.length} bouncing call-to-action: ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
     } },
 
@@ -571,7 +573,9 @@ const RULES = [
        saturation. Graphite (#0b0c0e, s ≈ 0.12) is below the band; #0a0e1a (s ≈ 0.44) is in it. */
     test: (t) => {
       // a class or id named aurora-*, not the word in prose or a chart title (Oklo Aurora is a reactor)
-      const aurora = cssBlocks(t).filter((b) => /[.#][a-z0-9_-]*aurora/i.test(b.sel)).length;
+      // a rule whose only declaration is display:none HIDES aurora markup; it is the fix, not the tell
+      const hidesOnly = (b) => /^\s*display\s*:\s*none\s*(!important)?\s*;?\s*$/i.test(b.body.replace(/\/\*[\s\S]*?\*\//g, ''));
+      const aurora = cssBlocks(t).filter((b) => /[.#][a-z0-9_-]*aurora/i.test(b.sel) && !hidesOnly(b)).length;
       const navy = (t.match(/(?:background(?:-color)?|--[a-z0-9-]*bg[a-z0-9-]*)\s*:\s*(#[0-9a-f]{3,8})\b/gi) || [])
         .map((d) => d.match(/#[0-9a-f]{3,8}/i)[0])
         .filter((hex) => { const c = hexToHsl(hex); return c && c[0] >= 205 && c[0] <= 250 && c[1] >= 0.3 && c[2] <= 0.14; });
@@ -603,7 +607,29 @@ const HUB_STRICT = new Set(['datacenter-solutions.html', 'css/rz-hub.css', 'js/r
    tools/sweep-journal-register.py rewrote 1,405 declarations to get every row to zero. */
 const JOURNAL_STRICT = (rel) => /^(articles1?|insights|geopolitics|future-forward|article-\d+|FF-\d+|geopolitics-\d+)\.html$/.test(rel)
   || rel === 'css/rz-article-dark.css' || rel === 'js/rz-journal-filter.js';
-const isStrict = (rel) => HUB_STRICT.has(rel) || JOURNAL_STRICT(rel);
+/* WI-WEB-ALLPAGES-001 AC2 (W6 flip, 2026-11-03): §A27–34 gate on EVERY scanned file except a named
+   EXEMPT set, each with its written reason. Exempt findings are still printed, as their own block,
+   so nothing disappears; they are not counted as gating or monitored. */
+const EXEMPT = [
+  [/^(rz-(index-(mockup|mockup-day|polish|redesign)|article-mockup|cockpit-mockup|dark-beforeafter|skin-gallery|style-lab)|planb|plan-[a-z0-9-]+)\.html$|^(manual|prd)\/rz-cockpit-mockup\.html$|^tools\/_rz-diagram-demo\.html$/,
+    'design artefact (mockup, plan, gallery or demo): the owner decides whether it stays'],
+  [/^(index\.html|styles-index\.css)$/,
+    'homepage: changes only through an owner-approved mockup'],
+  [/^css\/rz-calc-editorial\.css$/,
+    'stylesheet loaded only by changelog.html (historical record) and plan-dark-mode-standard.html (design artefact); no live page renders its serif'],
+  [/^article-9-paper\.html$/,
+    'paper/print document: the serif is its print typeface (PAPER_DOCUMENTS)'],
+];
+/* Files owned by the parallel LTC session that carry a finding TODAY, each pinned to the rule it
+   breaks (LTC 2026-11-03: "exempt only what actually has findings, with the finding named").
+   Every other rule on these files, and every rule on LTC's clean files, gates. An entry is removed
+   in the release that clears it; a stale entry (no finding left) fails the audit. */
+const PENDING = Object.assign({
+  /* emptied 2026-11-07 (v3.24.45): LTC's v3.24.44 cleared every listed finding (22 entries went stale and failed the audit) */
+}, process.env.RZ_VIBECODE_PENDING ? JSON.parse(process.env.RZ_VIBECODE_PENDING) : {});   /* test seam: the gate's own test injects one entry to prove the mechanism */
+const pendingReason = (rel, rule) => (PENDING[rel] || []).includes(rule) ? `LTC-owned, fix scheduled in 3.24.42 (${rule})` : null;
+const exemptReason = (rel, rule) => { for (const [re, why] of EXEMPT) if (re.test(rel)) return why; return rule ? pendingReason(rel, rule) : null; };
+const isStrict = (rel, rule) => HUB_STRICT.has(rel) || JOURNAL_STRICT(rel) || !exemptReason(rel, rule);
 
 function hexToHsl(hex) {
   let h = hex.slice(1);
@@ -656,7 +682,7 @@ for (const f of files) {
     const m = blocks ? (blocks.length ? `${blocks.length} decorative block(s): ${blocks.map(block => block.sel).join(', ')}` : null) : r.test(t, f);
     if (!m) continue;
     const rel = f.replace(ROOT + "/", "");
-    findings.push({ file: rel, rule: r.id, msg: m, blocks, monitor: Boolean(r.scoped) && !isStrict(rel) });
+    findings.push({ file: rel, rule: r.id, msg: m, blocks, monitor: false, exempt: Boolean(r.scoped) && !isStrict(rel, r.id) ? exemptReason(rel, r.id) : undefined });
   }
 }
 
@@ -668,8 +694,13 @@ for (const file of OWNER_HOLDS) {
   findings.push({ file, rule: 'active-owner-hold', msg: 'UNVERIFIED — active owner hold; coordination and a post-owner rescan are required.', monitor: false });
 }
 
-const gating = findings.filter((f) => !f.monitor);
+const scannedRel = new Set(files.map((f) => f.replace(ROOT + '/', '')));
+for (const [file, rules] of Object.entries(PENDING)) for (const rule of rules) {
+  if (scannedRel.has(file) && !findings.some((f) => f.file === file && f.rule === rule)) findings.push({ file, rule: 'stale-exemption', msg: `PENDING lists ${rule} on ${file} but the finding is gone — remove the entry`, monitor: false });
+}
+const gating = findings.filter((f) => !f.monitor && !f.exempt);
 const monitored = findings.filter((f) => f.monitor);
+const exempted = findings.filter((f) => f.exempt);
 const inventory = {
   files: files.map(file => file.replace(ROOT + '/', '')),
   excludedNames: SKIP,
@@ -677,6 +708,8 @@ const inventory = {
   activeOwnerHolds: OWNER_HOLDS.map(file => ({ file, status: 'UNVERIFIED', reason: 'Active owner hold; read-only scan does not certify the evolving source.' })),
   historicalEvidenceExcluded: ['changelog.html', 'standarization/Audit result/'],
   paperDocuments: [...PAPER_DOCUMENTS],
+  exempt: EXEMPT.map(([re, why]) => ({ pattern: re.source, reason: why })),
+  pending: PENDING,
   functionalRailSelectors: SAFETY_RAIL_SEL.source,
   protectedGeometrySelectors: GEOMETRY_SEL.source,
   decorativeCoverage: 'Static CSS files and HTML style elements; runtime JS CSS and inline style attributes require separate review. Explicit paper documents, print media and functional geometry are protected.',
@@ -684,7 +717,7 @@ const inventory = {
   limitation: 'Static detectors are not proof that all 26 design tells are absent; visual and content judgement remain required.',
 };
 if (JSON_OUTPUT) {
-  console.log(JSON.stringify({ findings, inventory, summary: { gating: gating.length, monitored: monitored.length, filesWithFindings: new Set(findings.map(finding => finding.file)).size } }, null, 2));
+  console.log(JSON.stringify({ findings, inventory, summary: { gating: gating.length, monitored: monitored.length, exempt: exempted.length, filesWithFindings: new Set(findings.map(finding => finding.file)).size } }, null, 2));
   process.exit(STRICT && gating.length ? 1 : 0);
 }
 const group = (list) => {
@@ -705,6 +738,9 @@ if (monitorRows.length) console.log(`  ○ MONITOR — §A27–34 gate on ${[...
 for (const [rule, fs] of monitorRows) {
   console.log(`  ○ ${rule}: ${fs.length} file(s) — ${fs.slice(0, 3).join(', ')}${fs.length > 3 ? ' …' : ''}`);
 }
-console.log(`── ${gating.length} gating + ${monitored.length} monitored finding(s) across ${new Set(findings.map((f) => f.file)).size} file(s). See standarization/ANTI_VIBECODE_STANDARD.md`);
+const exemptByReason = {};
+for (const f of exempted) (exemptByReason[f.exempt] ||= new Set()).add(f.file);
+for (const [why, fs] of Object.entries(exemptByReason)) console.log(`  · EXEMPT (${why}): ${fs.size} file(s) — ${[...fs].slice(0, 4).join(', ')}${fs.size > 4 ? ' …' : ''}`);
+console.log(`── ${gating.length} gating + ${monitored.length} monitored + ${exempted.length} exempt finding(s) across ${new Set(findings.map((f) => f.file)).size} file(s). See standarization/ANTI_VIBECODE_STANDARD.md`);
 if (!gating.length) console.log("── no gating findings in this scope; monitored findings and visual review remain unresolved. Not a ship clearance.");
 process.exit(STRICT && gating.length ? 1 : 0);

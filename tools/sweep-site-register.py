@@ -556,7 +556,9 @@ FAMILIES["mlink"] = {
 # Same register as styles.css: graphite chip with white text in light, amber chip in dark, 4px corner.
 # Only pages this session owns; the hub tools and calculators carry the same block and are the LTC session's.
 FAMILIES["skip"] = {
-    "globs": ["404.html", "privacy.html", "pln-java-grid-*.html",
+    "globs": ["404.html", "privacy.html", "pln-java-grid.html", "pln-java-grid-*.html", "EPMS_Telemetry.html",
+              "chiller-plant.html", "datahall.html", "datahallAI.html", "dc-conventional.html", "dc-market-tracker.html",
+              "fire-system.html", "fuel-system.html", "ict.html", "water-system.html",
               # hub-tools refit R1: the explorer refit drops the page <style> that carried the navy block
               "cdu-hub.html", "compare-air-vs-liquid-cooling.html", "compare-raised-floor-vs-slab.html",
               "pln-sumatra-grid.html", "network-visualization-hub.html", "ai-engineering-maintenance.html"],
@@ -565,6 +567,32 @@ FAMILIES["skip"] = {
          ".skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;"),
         ('[data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}',
          '[data-theme="dark"] .skip-link{background:' + AMBER_DARK + ';color:#0E0F12}'),
+    ],
+}
+
+# ---- "comparehero" family: the compare pages' saturated hero (2026-11-03) ----
+# Each page painted its hero as a three-stop saturated gradient (red, cyan, green, amber, navy) plus
+# drifting radial washes in ::before. Flat graphite with a hairline, the hub register; the A/B side
+# colours in the legend and table stay (categorical).
+FAMILIES["comparehero"] = {
+    "globs": ["compare-*.html"],
+    "pairs": [
+        # saturated three-stop gradient (or the flat graphite of the first cut, which went dark in day mode
+        # and hid the light-theme title) -> the editorial panel, which follows the theme
+        ("re", r"\.compare-hero \{ background: (?:linear-gradient\(135deg, #[0-9a-fA-F]{6} 0%, #[0-9a-fA-F]{6} (?:40|50)%, #[0-9a-fA-F]{6} 100%\)|#16181D); (?:border-bottom: 1px solid rgba\(255,255,255,0\.08\); )?padding: 8rem 2rem 4rem; color: #fff;",
+         ".compare-hero { background: transparent; border-bottom: 1px solid rgba(128,128,128,0.18); padding: 8rem 2rem 4rem; color: inherit;"),
+        # second cut used --rz-art-* tokens, which these pages do not load (no rz-article-dark.css)
+        (".compare-hero { background: var(--rz-art-panel); border-bottom: 1px solid var(--rz-art-line); padding: 8rem 2rem 4rem; color: var(--rz-art-strong);",
+         ".compare-hero { background: transparent; border-bottom: 1px solid rgba(128,128,128,0.18); padding: 8rem 2rem 4rem; color: inherit;"),
+        (".compare-hero p { font-size: 1.15rem; color: var(--rz-art-text);",
+         ".compare-hero p { font-size: 1.15rem; color: inherit; opacity: 0.85;"),
+        # side badges were tuned for a dark band: pastel text on a pastel pill in day mode
+        ("re", r"(\.hero-badge\.b \{[^}\n]*\})(?! :root:not)",
+         r'\1 :root:not([data-theme="dark"]) .compare-hero .hero-badge { color: #1a1d23 !important; }'),
+        ("re", r"(\.compare-hero::before \{ content:''; position:absolute; top:0;left:0;right:0;bottom:0; )background: radial-gradient\([^;]*;",
+         r"\1background: none;"),
+        (".compare-hero p { font-size: 1.15rem; color: rgba(255,255,255,0.85);",
+         ".compare-hero p { font-size: 1.15rem; color: inherit; opacity: 0.85;"),
     ],
 }
 

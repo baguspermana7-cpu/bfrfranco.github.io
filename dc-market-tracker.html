@@ -100,7 +100,7 @@
             --dmt-primary: #0d9488;
             --dmt-accent: #2dd4bf;
             --dmt-primary-rgb: 13, 148, 136;
-            --dmt-gradient: linear-gradient(135deg, #0d9488 0%, #2dd4bf 100%);
+            --dmt-gradient: linear-gradient(rgba(22,24,29,1),rgba(22,24,29,1));
             --dmt-dark: #134e4a;
             --dmt-darker: #0f3d3a;
             --dmt-amber: #f59e0b;
@@ -111,7 +111,7 @@
             --dmt-bg: #ffffff;
             --dmt-bg2: #f8fafc;
             --dmt-bg3: #f1f5f9;
-            --dmt-text: #1e293b;
+            --dmt-text: #272A32;
             --dmt-text2: #475569;
             --dmt-text3: #64748b;
             --dmt-border: #e2e8f0;
@@ -133,13 +133,13 @@
         }
         [data-theme="dark"] {
             --dmt-bg: #0e0f12;
-            --dmt-bg2: #1e293b;
+            --dmt-bg2: #272A32;
             --dmt-bg3: #1c1e23;
             --dmt-text: #f1f5f9;
             --dmt-text2: #cbd5e1;
             --dmt-text3: #94a3b8;
             --dmt-border: #2a2d34;
-            --dmt-glass: rgba(15,23,42,0.85);
+            --dmt-glass: rgba(25,27,32,0.85);
             --dmt-glass-border: rgba(45,212,191,0.15);
             --dmt-shadow-sm: 0 2px 4px rgba(0,0,0,0.2);
             --dmt-shadow-md: 0 4px 12px rgba(0,0,0,0.3);
@@ -257,7 +257,7 @@
 
         /* HERO */
         .dmt-hero {
-            background: linear-gradient(135deg, rgba(15,32,39,0.88) 0%, rgba(19,78,74,0.82) 40%, rgba(13,148,136,0.72) 100%),
+            background: linear-gradient(rgba(22,24,29,0.88),rgba(22,24,29,0.88)),
                         url('assets/market-tracker-hero.webp') center/cover no-repeat;
             padding: 7rem 2rem 3rem; color: white; position: relative; overflow: hidden;
         }
@@ -320,7 +320,7 @@
         .leaflet-popup-close-button:hover { color:#f1f5f9 !important; }
         .leaflet-control-zoom a { background:#16181d !important; color:#e2e8f0 !important; border-color:#334155 !important; }
         .leaflet-control-zoom a:hover { background:#334155 !important; }
-        .leaflet-control-attribution { background:rgba(15,23,42,0.8) !important; color:#64748b !important; font-size:0.6rem !important; }
+        .leaflet-control-attribution { background:rgba(25,27,32,0.8) !important; color:#64748b !important; font-size:0.6rem !important; }
         .leaflet-control-attribution a { color:#64748b !important; }
         .dmt-map-legend {
             display: flex; gap: 1.5rem; align-items: center; margin-top: 1rem;
@@ -494,7 +494,7 @@
         .gated-overlay { position: relative; cursor: pointer; }
         .gated-overlay::after {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15,23,42,0.6); backdrop-filter: blur(6px);
+            background: rgba(25,27,32,0.6); backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px); border-radius: inherit; z-index: 10;
         }
         .gated-overlay::before {
@@ -529,17 +529,16 @@
         }
         .dmt-premium-btn {
             margin-left: auto; padding: 0.6rem 1.4rem; border-radius: 10px;
-            border: 1px solid rgba(8,145,178,0.6);
+            border: 1px solid var(--rz-accent-ui);
             background: #64748b;
             color: white; cursor: pointer; font-weight: 700; font-size: 0.9rem;
             font-family: inherit; transition: all 0.3s;
             box-shadow: 0 2px 12px rgba(100, 116, 139,0.35);
             position: relative; overflow: hidden;
         }
-        @keyframes dmtPremiumGlow { 0%,100% { box-shadow:0 2px 12px rgba(100, 116, 139,0.35); } 50% { box-shadow:0 2px 20px rgba(100, 116, 139,0.55); } }
-        .dmt-premium-btn { animation: dmtPremiumGlow 2.5s ease-in-out infinite; }
+        /* the premium button no longer pulses (resting infinite glow on a CTA, ANTI_VIBECODE §A23) */
         .dmt-premium-btn:hover { box-shadow:0 4px 24px rgba(100, 116, 139,0.5) !important; filter:brightness(1.1); }
-        .dmt-premium-btn.premium-active { animation:none !important; background:linear-gradient(135deg,rgba(100, 116, 139,0.2),rgba(8,145,178,0.15)) !important; color:#67e8f9 !important; border-color:rgba(100, 116, 139,0.5) !important; box-shadow:0 2px 8px rgba(100, 116, 139,0.2) !important; }
+        .dmt-premium-btn.premium-active { animation:none !important; background:linear-gradient(135deg,rgba(100, 116, 139,0.2),rgba(232,181,99,0.15)) !important; color:#67e8f9 !important; border-color:rgba(100, 116, 139,0.5) !important; box-shadow:0 2px 8px rgba(100, 116, 139,0.2) !important; }
         #dmtPremiumBadge {
             display: none; padding: 4px 12px; border-radius: 4px;
             background: rgba(100,116,139,.12);border:1px solid rgba(100,116,139,.42);
@@ -601,7 +600,7 @@
 
         /* PRINT */
         @media print {
-            body { background: white !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body { background: white !important; color: #272A32 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .navbar, .dmt-hero, .dmt-mode-bar, #dmtLoginModal, .nav-back, .dmt-footer,
             .dmt-cookie-banner, .dmt-scroll-top, .dmt-theme-toggle, .dmt-filters,
             .gated-badge, #dmtFreeWatermark { display: none !important; }
@@ -710,13 +709,13 @@
 
         /* Root-only gate overlay */
         body.locked > nav, body.locked > section, body.locked > main, body.locked > .dmt-hero, body.locked > .dmt-markets-section { filter: blur(8px) saturate(0.6); pointer-events: none; user-select: none; }
-        .rz-restricted-overlay { position: fixed; inset: 0; z-index: 90000; display: none; align-items: center; justify-content: center; background: rgba(2,6,23,0.85); backdrop-filter: blur(6px); }
+        .rz-restricted-overlay { position: fixed; inset: 0; z-index: 90000; display: none; align-items: center; justify-content: center; background: rgba(11,12,14,0.85); backdrop-filter: blur(6px); }
         body.locked .rz-restricted-overlay { display: flex; }
         .rz-restricted-card { max-width: 420px; padding: 32px; background: #0e0f12; border: 1px solid rgba(13,148,136,0.35); border-radius: 4px; text-align: center; color: #f1f5f9; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         .rz-restricted-card h2 { margin: 0 0 8px; font-size: 1.25rem; }
         .rz-restricted-card p { margin: 0 0 20px; color: #94a3b8; font-size: 0.9rem; line-height: 1.5; }
-        .rz-restricted-card button { padding: 10px 22px; border: none; border-radius: 10px; background: linear-gradient(135deg,#0d9488,#14b8a6); color: #fff; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
-        .rz-restricted-card button:hover { background: linear-gradient(135deg,#0f766e,#0d9488); }
+        .rz-restricted-card button { padding: 10px 22px; border: none; border-radius: 10px; background: linear-gradient(#92400e,#92400e); color: #fff; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        .rz-restricted-card button:hover { background: linear-gradient(#92400e,#92400e); }
     /* a11y (v1.51.10): dark-side fixes the var swap cannot express */
 [data-theme="dark"] .dmt-privacy-badge { color:#2dd4bf; }
 :root:not([data-theme="dark"]) .dmt-privacy-badge { color:#0f766e; }
@@ -729,8 +728,13 @@
 /* page does not load styles.css — style the injected version stamp locally */
 .rz-version-num { color:#0a6e52 !important; } .rz-version-label { color:#5b6b82 !important; }
 [data-theme="dark"] .rz-version-num { color:#7dd3b0 !important; } [data-theme="dark"] .rz-version-label { color:#9aa8bb !important; }
+
+/* sweep-cta-accent: the page accent, per theme */
+:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
+[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
 </style>
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>    <meta property="og:image:alt" content="Global Data Center Market Tracker | Live Capacity &amp; Growth Dashboard">
 
@@ -745,9 +749,9 @@
 }
 </style>
 <style id="rz-skiplink-v1">
-.skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
+.skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
-[data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
+[data-theme="dark"] .skip-link{background:#E8B563;color:#0E0F12}
 </style>
     <!-- PLAN02 I4 — instrument chrome (header/section-title signature; map viz untouched) -->
     <link rel="stylesheet" href="css/rz-monitor-instrument.css?v=20261031-c0f51d22">
@@ -772,11 +776,11 @@
                 </div>
             </a>
             <div class="nav-links">
-                <a href="pln-java-grid.html" class="nav-link" style="color:#3b82f6;">PLN Java Grid</a>
-                <a href="tco-calculator.html" class="nav-link" style="color:#0369a1;">TCO Calc</a>
-                <a href="pue-calculator.html" class="nav-link" style="color:#06b6d4;">PUE Calc</a>
-                <a href="capex-calculator.html" class="nav-link" style="color:#f59e0b;">CAPEX Calc</a>
-                <a href="opex-calculator.html" class="nav-link" style="color:#10b981;">OPEX Calc</a>
+                <a href="pln-java-grid.html" class="nav-link">PLN Java Grid</a>
+                <a href="tco-calculator.html" class="nav-link">TCO Calc</a>
+                <a href="pue-calculator.html" class="nav-link">PUE Calc</a>
+                <a href="capex-calculator.html" class="nav-link">CAPEX Calc</a>
+                <a href="opex-calculator.html" class="nav-link">OPEX Calc</a>
                 <a href="glossary.html" class="nav-link" style="color: #14b8a6;">Glossary</a>
                 <div class="nav-auth-wrap" id="navAuthWrap">
                     <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()">
@@ -1520,8 +1524,8 @@
                     plugins: {
                         legend: { position: 'top', labels: { color: textColor, font: { family: 'IBM Plex Sans', size: 12 } } },
                         tooltip: {
-                            backgroundColor: isDark ? '#1e293b' : '#ffffff',
-                            titleColor: isDark ? '#f1f5f9' : '#1e293b',
+                            backgroundColor: isDark ? '#272A32' : '#ffffff',
+                            titleColor: isDark ? '#f1f5f9' : '#272A32',
                             bodyColor: isDark ? '#cbd5e1' : '#475569',
                             borderColor: isDark ? '#334155' : '#e2e8f0',
                             borderWidth: 1,
@@ -1615,8 +1619,8 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: isDark ? '#1e293b' : '#ffffff',
-                            titleColor: isDark ? '#f1f5f9' : '#1e293b',
+                            backgroundColor: isDark ? '#272A32' : '#ffffff',
+                            titleColor: isDark ? '#f1f5f9' : '#272A32',
                             bodyColor: isDark ? '#cbd5e1' : '#475569',
                             borderColor: isDark ? '#334155' : '#e2e8f0',
                             borderWidth: 1,
@@ -1691,8 +1695,8 @@
                     plugins: {
                         legend: { position: 'bottom', labels: { color: isDark ? '#cbd5e1' : '#64748b', font: { family: 'IBM Plex Sans', size: 11 }, boxWidth: 12, padding: 12 } },
                         tooltip: {
-                            backgroundColor: isDark ? '#1e293b' : '#ffffff',
-                            titleColor: isDark ? '#f1f5f9' : '#1e293b',
+                            backgroundColor: isDark ? '#272A32' : '#ffffff',
+                            titleColor: isDark ? '#f1f5f9' : '#272A32',
                             bodyColor: isDark ? '#cbd5e1' : '#475569',
                             borderColor: isDark ? '#334155' : '#e2e8f0',
                             borderWidth: 1,
@@ -1751,8 +1755,8 @@
                     plugins: {
                         legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#64748b', font: { family: 'IBM Plex Sans', size: 11 } } },
                         tooltip: {
-                            backgroundColor: isDark ? '#1e293b' : '#ffffff',
-                            titleColor: isDark ? '#f1f5f9' : '#1e293b',
+                            backgroundColor: isDark ? '#272A32' : '#ffffff',
+                            titleColor: isDark ? '#f1f5f9' : '#272A32',
                             bodyColor: isDark ? '#cbd5e1' : '#475569',
                             borderColor: isDark ? '#334155' : '#e2e8f0',
                             borderWidth: 1,
@@ -1993,9 +1997,9 @@
             var p95 = document.getElementById('dmtMcP95').textContent;
 
             var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Global DC Market Tracker Report</title>';
-            html += '<style>body{font-family:"IBM Plex Sans",Helvetica,Arial,sans-serif;color:#1f2937;margin:2cm;font-size:11px;line-height:1.6;}';
-            html += 'h1{color:#1e3a5f;font-size:22px;border-bottom:3px solid #0d9488;padding-bottom:8px;margin-bottom:16px;}';
-            html += 'h2{color:#1e3a5f;font-size:16px;margin-top:24px;margin-bottom:8px;border-left:4px solid #0d9488;padding-left:10px;}';
+            html += '<style>body{font-family:"IBM Plex Sans",Helvetica,Arial,sans-serif;color:#262830;margin:2cm;font-size:11px;line-height:1.6;}';
+            html += 'h1{color:#373B46;font-size:22px;border-bottom:3px solid #0d9488;padding-bottom:8px;margin-bottom:16px;}';
+            html += 'h2{color:#373B46;font-size:16px;margin-top:24px;margin-bottom:8px;border-left:4px solid #0d9488;padding-left:10px;}';
             html += 'table{width:100%;border-collapse:collapse;margin:12px 0;font-size:10px;}';
             html += 'th{background:#f1f5f9;color:#475569;padding:6px 10px;text-align:left;border-bottom:2px solid #e2e8f0;font-size:9px;text-transform:uppercase;letter-spacing:0.5px;}';
             html += 'td{padding:5px 10px;border-bottom:1px solid #e2e8f0;}';

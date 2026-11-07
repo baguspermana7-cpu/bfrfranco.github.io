@@ -101,11 +101,11 @@
             --pjgjm-primary: #ef4444;
             --pjgjm-accent: #f87171;
             --pjgjm-primary-rgb: 239, 68, 68;
-            --pjgjm-gradient: linear-gradient(135deg, #b91c1c 0%, #ef4444 50%, #f87171 100%);
+            --pjgjm-gradient: linear-gradient(rgba(22,24,29,1),rgba(22,24,29,1));
             --pjgjm-bg: #ffffff;
             --pjgjm-bg2: #f8fafc;
             --pjgjm-bg3: #f1f5f9;
-            --pjgjm-text: #1e293b;
+            --pjgjm-text: #272A32;
             --pjgjm-text2: #475569;
             --pjgjm-text3: #94a3b8;
             --pjgjm-border: #e2e8f0;
@@ -127,7 +127,7 @@
             --pjgjm-text2: #cbd5e1;
             --pjgjm-text3: #64748b;
             --pjgjm-border: #2a2d34;
-            --pjgjm-glass: rgba(11,18,32,0.85);
+            --pjgjm-glass: rgba(19,20,24,0.85);
             --pjgjm-glass-border: rgba(248,113,113,0.18);
             --pjgjm-shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
             --pjgjm-shadow-md: 0 4px 12px rgba(0,0,0,0.4);
@@ -155,7 +155,7 @@
         .nav-logo {
             width: 44px; height: 40px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 0.7rem; color: white; letter-spacing: 0.5px;
+            font-weight: 800; font-size: 0.7rem; color: var(--pjgjm-on-primary); letter-spacing: 0.5px;
             background: var(--pjgjm-gradient);
             box-shadow: 0 3px 10px rgba(239,68,68,0.35);
         }
@@ -195,20 +195,19 @@
 
         /* HERO */
         .pjgjm-hero {
-            background: linear-gradient(135deg, rgba(8,14,28,0.92) 0%, rgba(15,23,42,0.86) 50%, rgba(185,28,28,0.55) 100%);
+            background: linear-gradient(rgba(22,24,29,0.92),rgba(22,24,29,0.92));
             padding: 2.5rem 2rem 3rem; color: white; position: relative; overflow: hidden;
         }
         .pjgjm-hero::before {
             content: ''; position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 20% 50%, rgba(248,113,113,0.18) 0%, transparent 60%),
-                        radial-gradient(ellipse at 80% 20%, rgba(239,68,68,0.10) 0%, transparent 50%);
+            background: none;
         }
         .pjgjm-hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
         .pjgjm-hero h1 {
             font-size: 2.4rem; font-weight: 900; line-height: 1.15;
             margin-bottom: 0.6rem; letter-spacing: -0.02em;
         }
-        .pjgjm-hero h1 span { background: var(--pjgjm-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .pjgjm-hero h1 span { color: var(--pjgjm-primary); }
         .pjgjm-hero-sub {
             font-size: 1rem; color: rgba(255,255,255,0.78); max-width: 760px;
             line-height: 1.7; margin-bottom: 1.6rem;
@@ -268,7 +267,7 @@
             transition: all 0.2s;
         }
         .pjgjm-segment button.active {
-            background: var(--pjgjm-gradient); color: white;
+            background: var(--pjgjm-gradient); color: var(--pjgjm-on-primary);
             box-shadow: 0 2px 8px rgba(239,68,68,0.35);
         }
         .pjgjm-segment button:not(.active):hover { color: var(--pjgjm-primary); }
@@ -325,7 +324,7 @@
         /* Confidence legend (3-dot HI/MED/LOW) */
         .pjgjm-conf-legend {
             position: absolute; bottom: 12px; right: 14px;
-            background: rgba(8,15,30,0.78); border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(17,18,21,0.78); border: 1px solid rgba(255,255,255,0.12);
             padding: 5px 9px; border-radius: 50px;
             font-size: 0.62rem; font-family: 'JetBrains Mono', monospace;
             color: #cbd5e1; display: inline-flex; gap: 8px; align-items: center;
@@ -352,12 +351,12 @@
         .leaflet-popup-close-button:hover { color:#f1f5f9 !important; }
         .leaflet-control-zoom a { background:#16181d !important; color:#e2e8f0 !important; border-color:#334155 !important; }
         .leaflet-control-zoom a:hover { background:#334155 !important; }
-        .leaflet-control-attribution { background:rgba(15,23,42,0.8) !important; color:#64748b !important; font-size:0.6rem !important; }
+        .leaflet-control-attribution { background:rgba(25,27,32,0.8) !important; color:#64748b !important; font-size:0.6rem !important; }
         .leaflet-control-attribution a { color:#64748b !important; }
         .leaflet-control-layers { background:#16181d !important; color:#e2e8f0 !important; border:1px solid #334155 !important; }
         .leaflet-control-layers label { color:#e2e8f0 !important; font-size:0.78rem !important; }
         .rzm-plant {
-            background: rgba(8,15,30,0.9); border: 1.5px solid #fbbf24;
+            background: rgba(17,18,21,0.9); border: 1.5px solid #fbbf24;
             border-radius: 50%; color: #fbbf24;
             display: flex; align-items: center; justify-content: center;
             font-size: 9px;
@@ -369,13 +368,13 @@
         .rzm-plant-solar { border-color: #facc15; color: #facc15; }
         /* DC marker style */
         .rzm-dc {
-            background: rgba(8,15,30,0.9); border: 1.5px solid #facc15;
+            background: rgba(17,18,21,0.9); border: 1.5px solid #facc15;
             border-radius: 4px; color: #facc15;
             display: flex; align-items: center; justify-content: center;
             font-size: 10px;
         }
         .rzm-industrial {
-            background: rgba(8,15,30,0.9); border: 1.5px dashed #94a3b8;
+            background: rgba(17,18,21,0.9); border: 1.5px dashed #94a3b8;
             border-radius: 50%; color: #cbd5e1;
             display: flex; align-items: center; justify-content: center;
             font-size: 9px;
@@ -391,7 +390,7 @@
         #pjgjm-sld { width: 100%; height: 100%; display: block; touch-action: none; }
         .pjgjm-sld-hint {
             position: absolute; top: 12px; left: 14px;
-            background: rgba(8,15,30,0.7); border: 1px solid rgba(248,113,113,0.25);
+            background: rgba(17,18,21,0.7); border: 1px solid rgba(248,113,113,0.25);
             padding: 4px 10px; border-radius: 50px;
             font-size: 0.65rem; color: #cbd5e1; font-family: 'JetBrains Mono', monospace;
             pointer-events: none;
@@ -409,28 +408,28 @@
         @keyframes pjgjm-flow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -24; } }
 
         /* SLD nodes */
-        .pjgjm-node-station circle { fill: rgba(15,23,42,0.95); stroke: var(--pjgjm-v500); stroke-width: 1.5; transition: stroke-width 0.15s, fill 0.15s; }
+        .pjgjm-node-station circle { fill: rgba(25,27,32,0.95); stroke: var(--pjgjm-v500); stroke-width: 1.5; transition: stroke-width 0.15s, fill 0.15s; }
         .pjgjm-node-station[data-voltage="150"] circle { stroke: var(--pjgjm-v150); }
-        .pjgjm-node-plant circle { fill: rgba(8,15,30,0.95); stroke: #facc15; stroke-width: 1.6; }
+        .pjgjm-node-plant circle { fill: rgba(17,18,21,0.95); stroke: #facc15; stroke-width: 1.6; }
         .pjgjm-node-plant[data-fuel="coal"] circle { stroke: #f87171; }
         .pjgjm-node-plant[data-fuel="gas"] circle { stroke: #60a5fa; }
         .pjgjm-node-plant[data-fuel="hydro"] circle { stroke: #38bdf8; }
         .pjgjm-node-plant[data-fuel="solar"] circle { stroke: #facc15; }
-        .pjgjm-node-dc rect { fill: rgba(8,15,30,0.95); stroke: var(--pjgjm-v20); stroke-width: 1.6; }
-        .pjgjm-node-industrial circle { fill: rgba(8,15,30,0.85); stroke: #94a3b8; stroke-width: 1.2; stroke-dasharray: 2 2; }
+        .pjgjm-node-dc rect { fill: rgba(17,18,21,0.95); stroke: var(--pjgjm-v20); stroke-width: 1.6; }
+        .pjgjm-node-industrial circle { fill: rgba(17,18,21,0.85); stroke: #94a3b8; stroke-width: 1.2; stroke-dasharray: 2 2; }
         .pjgjm-node-station, .pjgjm-node-plant, .pjgjm-node-dc, .pjgjm-node-industrial { cursor: pointer; }
         .pjgjm-node-station:hover circle, .pjgjm-node-plant:hover circle { stroke-width: 2.6; fill: rgba(239,68,68,0.18); }
         .pjgjm-node-dc:hover rect { stroke-width: 2.6; }
         .pjgjm-node-label {
             font-family: "IBM Plex Sans", sans-serif; font-size: 10px; font-weight: 600;
             fill: #f1f5f9; paint-order: stroke fill;
-            stroke: rgba(8,15,30,0.85); stroke-width: 2.4; stroke-linejoin: round;
+            stroke: rgba(17,18,21,0.85); stroke-width: 2.4; stroke-linejoin: round;
             pointer-events: none;
         }
         .pjgjm-node-cap {
             font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 500;
             fill: #94a3b8; paint-order: stroke fill;
-            stroke: rgba(8,15,30,0.7); stroke-width: 2; stroke-linejoin: round;
+            stroke: rgba(17,18,21,0.7); stroke-width: 2; stroke-linejoin: round;
             pointer-events: none;
         }
         .pjgjm-kv-badge text { font-family: 'JetBrains Mono', monospace; font-size: 7px; fill: #cbd5e1; }
@@ -555,7 +554,7 @@
             display: inline-flex; align-items: center; gap: 8px;
             font-size: 0.83rem; font-weight: 700; color: #fff;
             text-decoration: none; padding: 8px 20px; border-radius: 10px;
-            background: var(--card-gradient, linear-gradient(135deg, #b91c1c, #ef4444));
+            background: var(--card-gradient, linear-gradient(#92400e,#92400e));
             border: none;
             box-shadow: 0 3px 12px var(--card-glow, rgba(239,68,68,0.3));
             transition: all 0.25s;
@@ -728,8 +727,16 @@
     h1 { font-size: 1.4rem !important; }
 }
 
+    
+        /* sweep-pln-register: one accent, per theme */
+        :root:not([data-theme="dark"]) .pjgjm-hero{--pjgjm-primary:#E8B563;--pjgjm-accent:#E8B563}
+        :root:not([data-theme="dark"]){--pjgjm-primary:#92400e;--pjgjm-accent:#92400e;--pjgjm-primary-rgb:146,64,14;--pjgjm-gradient:linear-gradient(#92400e,#92400e);--pjgjm-on-primary:#ffffff}
+        [data-theme="dark"]{--pjgjm-primary:#E8B563;--pjgjm-accent:#E8B563;--pjgjm-primary-rgb:232,181,99;--pjgjm-gradient:linear-gradient(#E8B563,#E8B563);--pjgjm-on-primary:#121316}
+        .nav-logo{background:transparent!important;border:1px solid var(--pjgjm-primary);color:var(--pjgjm-primary)!important;box-shadow:none!important;border-radius:4px!important}
+        .nav-back{background:transparent!important;border:1px solid rgba(128,128,128,.3);border-radius:4px!important}
+        .nav-back:hover{background:rgba(var(--pjgjm-primary-rgb),.1)!important}
     </style>
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="Jawa Timur Provincial Grid Detail | PLN Java-Bali Monitor">
 
@@ -765,12 +772,12 @@
                 </div>
             </a>
             <div class="nav-links">
-                <a href="pln-java-grid.html" class="nav-link" style="color:#3b82f6;"><i class="fas fa-arrow-left"></i> Java Grid Overview</a>
-                <a href="pln-java-grid-jakarta-banten.html" class="nav-link" style="color:#06b6d4;"><i class="fas fa-city"></i> Jakarta + Banten</a>
-                <a href="pln-java-grid-jabar.html" class="nav-link" style="color:#10b981;"><i class="fas fa-mountain"></i> Jawa Barat</a>
-                <a href="pln-java-grid-jateng.html" class="nav-link" style="color:#f59e0b;"><i class="fas fa-water"></i> Jateng + DIY</a>
-                <a href="dc-market-tracker.html" class="nav-link" style="color:#14b8a6;"><i class="fas fa-globe"></i> DC Markets</a>
-                <a href="datacenter-solutions.html" class="nav-link" style="color:#f59e0b;"><i class="fas fa-server"></i> Solutions</a>
+                <a href="pln-java-grid.html" class="nav-link"><i class="fas fa-arrow-left"></i> Java Grid Overview</a>
+                <a href="pln-java-grid-jakarta-banten.html" class="nav-link"><i class="fas fa-city"></i> Jakarta + Banten</a>
+                <a href="pln-java-grid-jabar.html" class="nav-link"><i class="fas fa-mountain"></i> Jawa Barat</a>
+                <a href="pln-java-grid-jateng.html" class="nav-link"><i class="fas fa-water"></i> Jateng + DIY</a>
+                <a href="dc-market-tracker.html" class="nav-link"><i class="fas fa-globe"></i> DC Markets</a>
+                <a href="datacenter-solutions.html" class="nav-link"><i class="fas fa-server"></i> Solutions</a>
                 <a href="pln-java-grid.html" class="nav-back">
                     <i class="fas fa-arrow-left"></i> Back
                 </a>
@@ -984,9 +991,9 @@
                         </a>
                     </div>
                 </div>
-                <div class="ds-strat-card" style="--card-border: rgba(16,185,129,0.45); --card-glow: rgba(16,185,129,0.22); --card-gradient: linear-gradient(135deg, #047857, #10b981);">
+                <div class="ds-strat-card" style="--card-border: rgba(16,185,129,0.45); --card-glow: rgba(16,185,129,0.22); --card-gradient: linear-gradient(rgba(22,24,29,1),rgba(22,24,29,1));">
                     <div class="ds-strat-top">
-                        <div class="ds-strat-icon" style="background: linear-gradient(135deg, #047857, #10b981); color: white;"><i class="fas fa-mountain"></i></div>
+                        <div class="ds-strat-icon" style="background: linear-gradient(rgba(22,24,29,1),rgba(22,24,29,1)); color: white;"><i class="fas fa-mountain"></i></div>
                         <div class="ds-strat-title-wrap">
                             <h3 class="ds-strat-title">Jawa Barat</h3>
                             <div class="ds-strat-subtitle">Cirata, Saguling, Bandung, Cirebon, Indramayu</div>
@@ -999,9 +1006,9 @@
                         </a>
                     </div>
                 </div>
-                <div class="ds-strat-card" style="--card-border: rgba(6,182,212,0.45); --card-glow: rgba(6,182,212,0.22); --card-gradient: linear-gradient(135deg, #0e7490, #06b6d4);">
+                <div class="ds-strat-card" style="--card-border: rgba(6,182,212,0.45); --card-glow: rgba(6,182,212,0.22); --card-gradient: linear-gradient(rgba(22,24,29,1),rgba(22,24,29,1));">
                     <div class="ds-strat-top">
-                        <div class="ds-strat-icon" style="background: linear-gradient(135deg, #0e7490, #06b6d4); color: white;"><i class="fas fa-city"></i></div>
+                        <div class="ds-strat-icon" style="background: linear-gradient(rgba(22,24,29,1),rgba(22,24,29,1)); color: white;"><i class="fas fa-city"></i></div>
                         <div class="ds-strat-title-wrap">
                             <h3 class="ds-strat-title">DKI Jakarta + Banten</h3>
                             <div class="ds-strat-subtitle">Suralaya, Muara Karang, Cawang, Bekasi, Cikarang</div>
@@ -1077,7 +1084,7 @@
     <script src="auth.js?v=20261031-f01cb5a3" defer></script>
     <script src="rz-engine.min.js?v=20261024-90cc5600" defer></script>
     <script src="js/rz-map.js?v=20261011-58cf2a70"></script>
-    <script src="js/pln-tooltip.js?v=20260920-d7be053c" defer></script>
+    <script src="js/pln-tooltip.js?v=20261105-a018bce2" defer></script>
     <script src="js/pln-java-grid-data.js?v=20260920-c83cf566"></script>
     <script src="js/pln-java-grid-data-jatim.js?v=20260920-b36746a6"></script>
 
@@ -1460,7 +1467,7 @@
                 if (len >= 36) {
                     var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
                     var bg = svgEl('g', { 'class': 'pjgjm-kv-badge', transform: 'translate(' + (mx - 8) + ',' + (my - 4.5) + ')' });
-                    bg.appendChild(svgEl('rect', { width: 16, height: 9, rx: 2, fill: 'rgba(8,15,30,0.9)', stroke: 'rgba(255,255,255,0.18)' }));
+                    bg.appendChild(svgEl('rect', { width: 16, height: 9, rx: 2, fill: 'rgba(17,18,21,0.9)', stroke: 'rgba(255,255,255,0.18)' }));
                     var t = svgEl('text', { x: 8, y: 6.5, 'text-anchor': 'middle' });
                     t.textContent = String(e.voltage);
                     bg.appendChild(t);

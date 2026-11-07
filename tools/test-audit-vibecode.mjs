@@ -7,13 +7,13 @@ import test from 'node:test';
 
 const audit = resolve('tools/audit-vibecode.mjs');
 
-function scan(css, { file = 'fixture.css', args = [] } = {}) {
+function scan(css, { file = 'fixture.css', args = [], env = {} } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'rz-vibecode-'));
   try {
     for (const name of ['terms.html', 'privacy.html']) writeFileSync(join(root, name), '');
     mkdirSync(join(root, file, '..'), { recursive: true });
     writeFileSync(join(root, file), css);
-    const result = spawnSync(process.execPath, [audit, '--strict', '--json', ...args], { cwd: root, encoding: 'utf8' });
+    const result = spawnSync(process.execPath, [audit, '--strict', '--json', ...args], { cwd: root, encoding: 'utf8', env: { ...process.env, ...env } });
     return { status: result.status, report: JSON.parse(result.stdout) };
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -55,9 +55,15 @@ test('preserve print, geometry, photos, functional UI and protected aurora', () 
     .diagram-node { border-radius: 12px; }
     .menu-panel { border-radius: 12px; box-shadow: 0 2px 4px #333; }
     .card:focus-visible { box-shadow: 0 0 0 3px blue; }
-    .aurora-mesh { border-radius: 50%; filter: blur(40px); }
   `);
   assert.equal(result.status, 0);
+  /* the aurora was the homepage signature until the owner withdrew it (2026-10-15): it is reported,
+     with its reason, only where the homepage still carries it, and gates everywhere else */
+  const home = scan(`.aurora-mesh { border-radius: 50%; filter: blur(40px); }`, { file: 'styles-index.css' });
+  assert.equal(home.status, 0);
+  assert.ok(home.report.findings.some(finding => finding.rule === 'aurora-navy' && finding.exempt));
+  const elsewhere = scan(`.aurora-mesh { border-radius: 50%; filter: blur(40px); }`, { file: 'tools.html' });
+  assert.equal(elsewhere.status, 1);
 });
 
 test('print exemption cannot leak; braces in strings do not break extraction', () => {
@@ -184,13 +190,30 @@ test('§A27–34 gate on the hub family, one rule per tell', () => {
   }
 });
 
-test('§A27–34 are MONITORED, not gating, outside the hub and journal families', () => {
+test('§A27–34 GATE on every page except the named EXEMPT set, which reports them with a reason (WI-WEB-ALLPAGES-001 AC2)', () => {
   for (const [rule, css] of Object.entries(TELLS)) {
-    const result = scan(css, { file: 'tco-calculator.html' });
-    assert.equal(result.status, 0, rule);
-    const hit = result.report.findings.find(finding => finding.rule === rule);
-    assert.ok(hit && hit.monitor, `${rule} must be monitored on a page outside the strict families`);
+    const gated = scan(css, { file: 'tools.html' });
+    assert.equal(gated.status, 1, `${rule} must gate on a page outside the old strict families`);
+    const owned = scan(css, { file: 'tco-calculator.html' });
+    assert.equal(owned.status, 1, `${rule} must gate on a clean file another session owns (no ownership exemption)`);
+    const exempt = scan(css, { file: 'plan-demo.html' });
+    assert.equal(exempt.status, 0, rule);
+    const hit = exempt.report.findings.find(finding => finding.rule === rule);
+    assert.ok(hit && hit.exempt && !hit.monitor, `${rule} on an EXEMPT page must carry its reason`);
+    assert.equal(exempt.report.summary.monitored, 0);
   }
+});
+
+test('PENDING exempts only the named rule on the named file; any other rule on that file gates', () => {
+  // the live map is empty since 3.24.45, so the mechanism is proven with an injected entry (RZ_VIBECODE_PENDING seam)
+  const env = { RZ_VIBECODE_PENDING: JSON.stringify({ 'css/ltc-app.css': ['aurora-navy'] }) };
+  const pinned = scan(TELLS['aurora-navy'], { file: 'css/ltc-app.css', env });
+  const pinnedHit = pinned.report.findings.find(finding => finding.rule === 'aurora-navy');
+  assert.ok(pinnedHit && /3\.24\.42 \(aurora-navy\)/.test(pinnedHit.exempt), 'pinned rule carries its named reason');
+  const other = scan(TELLS['gradient-text'], { file: 'css/ltc-app.css', env });
+  assert.equal(other.status, 1, 'an un-pinned rule on a PENDING file must gate');
+  const live = scan(TELLS['aurora-navy'], { file: 'css/ltc-app.css' });
+  assert.equal(live.status, 1, 'without an injected entry the same finding gates: the live map must not carry it');
 });
 
 test('§A27–34 GATE on the journal family (v3.23.0: articles hub, series landings, every editorial page)', () => {
@@ -231,4 +254,22 @@ test('neon green is a hue band, not one hex; navy is saturation, not darkness', 
   for (const hex of ['#0b0c0e', '#121316', '#08090b', '#1b1d22']) {
     assert.equal(scan(`body { background: ${hex}; }`, { file: HUB }).status, 0, hex);
   }
+});
+
+test('aurora-navy: a rule that only HIDES aurora markup (display:none) is the fix, not the tell', () => {
+  const hides = scan('/* no aurora */ .aurora-blob { display: none !important; }', { file: 'tools.html' });
+  assert.ok(!hides.report.findings.some(finding => finding.rule === 'aurora-navy'), 'hide-only aurora rule must not fire');
+  const paints = scan('.aurora-blob { display: block; background: radial-gradient(#334155, transparent); }', { file: 'tools.html' });
+  assert.equal(paints.status, 1, 'an aurora rule that paints must still gate');
+});
+
+test('animated-cta catches a resting infinite pulse/glow on a journal or button CTA, not a P&ID flow arrow (2026-11-04)', () => {
+  const glow = scan('.jump-to-calc { padding: 1rem; animation: pulse-glow 2s ease-in-out infinite; }', { file: 'article-99.html' });
+  assert.ok(glow.report.findings.some(f => f.rule === 'animated-cta') && glow.status === 1, 'journal CTA pulse-glow must gate');
+  const btn = scan('.dmt-premium-btn { animation: dmtPremiumGlow 2.5s ease-in-out infinite; }', { file: 'tools.html' });
+  assert.ok(btn.report.findings.some(f => f.rule === 'animated-cta'), 'a glowing -btn must gate');
+  const hover = scan('.jump-to-calc:hover { animation: pulse-glow 2s infinite; }', { file: 'article-99.html' });
+  assert.ok(!hover.report.findings.some(f => f.rule === 'animated-cta'), 'hover feedback is not a resting animation');
+  const flow = scan('.fp-arrow.active { animation: pulse 1s linear infinite; }', { file: 'fuel-system.html' });
+  assert.ok(!flow.report.findings.some(f => f.rule === 'animated-cta'), 'a P&ID flow arrow is information, not a CTA');
 });

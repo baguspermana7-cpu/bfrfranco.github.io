@@ -28,9 +28,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.min.css?v=20261103-9d57ed99">
+    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
     <link rel="stylesheet" href="css/rz-design-studio.css?v=20260920-972eff8b">
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <script type="application/ld+json">
@@ -41,12 +41,12 @@
     </script>
     <style>
         /* ===== RZ Dark System — editorial register (this is a document/reference page) ===== */
-        :root { --ck-bg:#f8fafc; --ck-card:#ffffff; --ck-border:#e2e8f0; --ck-text:#0f172a; --ck-muted:#475569; --ck-inset:#f1f5f9; --ck-accent:#0e7490; --ck-serif:'IBM Plex Sans',system-ui,sans-serif; --ck-sans:'IBM Plex Sans',system-ui,sans-serif; --ck-mono:'IBM Plex Mono',ui-monospace,monospace; }
+        :root { --ck-bg:#f8fafc; --ck-card:#ffffff; --ck-border:#e2e8f0; --ck-text:#191B20; --ck-muted:#475569; --ck-inset:#f1f5f9; --ck-accent:var(--rz-accent-ui); --ck-serif:'IBM Plex Sans',system-ui,sans-serif; --ck-sans:'IBM Plex Sans',system-ui,sans-serif; --ck-mono:'IBM Plex Mono',ui-monospace,monospace; }
         [data-theme="dark"] { --ck-bg:#0E0F12; --ck-card:#16181D; --ck-border:rgba(160,168,180,.16); --ck-text:#F6F7F9; --ck-muted:#9AA3AF; --ck-inset:#1c1f25; --ck-accent:#E8B563; }
 
         body { background:var(--ck-bg); color:var(--ck-text); font-family:var(--ck-sans); }
         .ck-hero { position:relative; padding:7rem 1.5rem 3rem; overflow:hidden; border-bottom:1px solid var(--ck-border); }
-        [data-theme="dark"] .ck-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(620px 300px at 84% -16%,rgba(232,181,99,.10),transparent 64%); pointer-events:none; }
+        [data-theme="dark"] .ck-hero::before { content:''; position:absolute; inset:0; background: none; pointer-events:none; }
         .ck-hero > * { position:relative; }
         .ck-kick { font-family:var(--ck-mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ck-accent); font-weight:600; }
         .ck-hero h1 { font-family:var(--ck-serif); font-weight:600; font-size:clamp(1.9rem,4vw,2.9rem); letter-spacing:-.015em; margin:.5rem 0 .6rem; line-height:1.05; max-width:20ch; }
@@ -191,9 +191,16 @@
 [data-theme="dark"] .cad.q{ color:#67e8f9; } [data-theme="dark"] .cad.a{ color:#f87171; }
 [data-theme="dark"] .crit.y{ color:#f87171; } [data-theme="dark"] .crit.m{ color:#fbbf24; } [data-theme="dark"] .crit.n{ color:#9aa3af; }
 .ck-wrap p a, .lead a { text-decoration:underline; text-underline-offset:2px; }
-[data-theme="dark"] .btn-print{ color:#0b1220; }
+[data-theme="dark"] .btn-print{ color:#131418; }
 [data-theme="dark"] .btn-print.ghost{ color:var(--ck-accent); }
-:root:not([data-theme="dark"]) .btn-print{ background:#155e75; color:#fff; }
+:root:not([data-theme="dark"]) .btn-print{ background:var(--rz-accent-ui); color: var(--rz-on-accent-ui) !important; }
+
+/* sweep-cyan-register: the page accent, per theme */
+:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
+[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+/* sweep-cyan-register: page tokens re-resolve inside dark panels */
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--ck-accent:var(--rz-accent-ui)}
 </style>
 </head>
 <body>

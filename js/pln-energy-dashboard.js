@@ -295,7 +295,7 @@
       var div = document.createElement('div');
       div.className = 'pjg-choropleth-legend';
       div.style.cssText = [
-        'background:rgba(15,23,42,0.88)',
+        'background:rgba(25,27,32,0.88)',
         'border:1px solid rgba(96,165,250,0.25)',
         'border-radius:8px',
         'padding:10px 12px',
@@ -374,7 +374,7 @@
       // Visual: filled when ON, outlined when OFF
       btnRef.style.background = enabled
         ? 'linear-gradient(135deg,#f59e0b,#b45309)'
-        : 'rgba(15,23,42,0.85)';
+        : 'rgba(25,27,32,0.85)';
       btnRef.style.color = enabled ? '#fff' : '#cbd5e1';
       btnRef.style.borderColor = enabled ? '#f59e0b' : 'rgba(96,165,250,0.3)';
     }
@@ -391,7 +391,7 @@
         'padding:6px 12px',
         'border-radius:6px',
         'border:1px solid rgba(96,165,250,0.3)',
-        'background:rgba(15,23,42,0.85)',
+        'background:rgba(25,27,32,0.85)',
         'color:#cbd5e1',
         'font:600 11px/1.1 Inter,system-ui,sans-serif',
         'letter-spacing:0.04em',
@@ -689,7 +689,7 @@
 
       var ttBg = svgEl('rect', {
         x: 0, y: 0, width: 110, height: 16 + series.length * 14,
-        fill: 'rgba(15,23,42,0.88)', rx: '4',
+        fill: 'rgba(25,27,32,0.88)', rx: '4',
         stroke: 'rgba(96,165,250,0.25)', 'stroke-width': '1'
       });
       var ttG = svgEl('g', { 'class': 'pjg-chart-tt' });
@@ -954,7 +954,7 @@
     var ttGroup = svgEl('g', { class: 'pjg-line-tooltip', style: 'pointer-events:none;opacity:0;transition:opacity 0.12s ease;' });
     var ttVLine = svgEl('line', { x1: 0, x2: 0, y1: mTop, y2: mTop + innerH, stroke: 'rgba(255,255,255,0.5)', 'stroke-width': '1', 'stroke-dasharray': '3 2' });
     var ttDot   = svgEl('circle', { cx: 0, cy: 0, r: '4.5', fill: lineColor, stroke: '#fff', 'stroke-width': '1.5' });
-    var ttRect  = svgEl('rect', { x: 0, y: 0, width: '1', height: '1', rx: '4', fill: 'rgba(15,23,42,0.92)', stroke: 'rgba(96,165,250,0.3)', 'stroke-width': '1' });
+    var ttRect  = svgEl('rect', { x: 0, y: 0, width: '1', height: '1', rx: '4', fill: 'rgba(25,27,32,0.92)', stroke: 'rgba(96,165,250,0.3)', 'stroke-width': '1' });
     var ttText1 = svgEl('text', { x: 0, y: 0, fill: '#f1f5f9', 'font-size': '11', 'font-weight': '700', 'font-family': "'Inter',sans-serif" });
     var ttText2 = svgEl('text', { x: 0, y: 0, fill: '#94a3b8', 'font-size': '10', 'font-family': "'Inter',sans-serif" });
     ttGroup.appendChild(ttVLine);
@@ -1141,7 +1141,7 @@
 
     /* Tooltip pill */
     var ttG   = svgEl('g', {});
-    var ttBg  = svgEl('rect', { rx: '4', fill: 'rgba(15,23,42,0.92)', stroke: 'rgba(96,165,250,0.3)', 'stroke-width': '1' });
+    var ttBg  = svgEl('rect', { rx: '4', fill: 'rgba(25,27,32,0.92)', stroke: 'rgba(96,165,250,0.3)', 'stroke-width': '1' });
     var ttXlbl = svgEl('text', { fill: '#94a3b8', 'font-size': '10', 'font-family': "'Inter',sans-serif" });
     var ttSeriesTexts = lines.map(function (line) {
       var t = svgEl('text', { fill: line.color, 'font-size': '10', 'font-family': "'Inter',sans-serif", 'font-weight': '600' });
@@ -1281,7 +1281,7 @@
         span.className = 'pjg-bar-seg-label';
         span.textContent = seg.label + ' ' + segPct + '%';
         span.style.cssText = [
-          'color:' + (_isLight(seg.color) ? '#0f172a' : '#fff'),
+          'color:' + (_isLight(seg.color) ? '#191B20' : '#fff'),
           'font-size:10px',
           'font-weight:700',
           'white-space:nowrap',

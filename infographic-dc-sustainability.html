@@ -110,14 +110,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="styles.min.css?v=20261103-9d57ed99">
+    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
 
     <style>
-        :root { --ig-color: #06b6d4; --ig-light: #22d3ee; --ig-dark: #0e7490; --ig-bg: rgba(6,182,212,0.08); --ig-border: rgba(6,182,212,0.25); }
+        :root { --ig-color: var(--rz-accent-ui); --ig-light: var(--rz-accent-ui); --ig-dark: var(--rz-accent-ui); --ig-bg: rgba(232,181,99,0.08); --ig-border: rgba(232,181,99,0.25); }
 
         /* Hero */
         .ig-hero {
-            background: linear-gradient(135deg, #0c1829 0%, #0e2a3a 40%, #083344 100%);
+            background: linear-gradient(rgba(22,24,29,1),rgba(22,24,29,1));
             padding: 7rem 2rem 4rem;
             position: relative;
             overflow: hidden;
@@ -129,7 +129,7 @@
             right: -20%;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%);
+            background: none;
             border-radius: 50%;
         }
         .ig-hero-content {
@@ -674,7 +674,7 @@
 /* v2026-07-10 — a11y color-contrast fixes (axe critical/serious). COLOR ONLY. */
 /* Light theme: darken too-light foregrounds on white/tinted backgrounds */
 html:not([data-theme="dark"]) .ig-gauge-val,
-html:not([data-theme="dark"]) .ig-calc-label span { color: #0e7490; }
+html:not([data-theme="dark"]) .ig-calc-label span { color: var(--rz-accent-ui); }
 html:not([data-theme="dark"]) .ig-section-sub,
 html:not([data-theme="dark"]) .ig-gauge-sub,
 html:not([data-theme="dark"]) .ig-wue-unit,
@@ -713,10 +713,17 @@ html:not([data-theme="dark"]) #scoreNum[style*="rgb(239, 68, 68)"] { color: #b91
 [data-theme="dark"] [style*="color: #64748b"], [data-theme="dark"] [style*="color:#64748b"] { color: #94a3b8 !important; }
 
     /* a11y (v1.51.10) */
-#copyToast{background:#0e7490 !important}
+#copyToast{background:var(--rz-accent-ui) !important}
 p > a[href$="glossary.html"]{text-decoration:underline !important;text-underline-offset:2px}
+
+/* sweep-cyan-register: the page accent, per theme */
+:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
+[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+/* sweep-cyan-register: page tokens re-resolve inside dark panels */
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--ig-color:var(--rz-accent-ui);--ig-dark:var(--rz-accent-ui);--ig-light:var(--rz-accent-ui)}
 </style>
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 </head>
@@ -787,7 +794,7 @@ p > a[href$="glossary.html"]{text-decoration:underline !important;text-underline
 
     <main id="main-content">
     <!-- Hero -->
-    <section class="ig-hero">
+    <section data-rz-dark-panel class="ig-hero">
         <div class="ig-hero-content">
             <span class="ig-badge">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>

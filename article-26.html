@@ -85,7 +85,7 @@
          the editorial article skin (scoped to data-rz-register=editorial + dark),
          and the read-progress/entrance runtime. Light mode + structure untouched. -->
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261103-05c80e83">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261107-b12aaf92">
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
 <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
 <script src="js/rz-article-editorial.js?v=20261017-a3f81def" defer></script>
@@ -93,7 +93,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
-    <link rel="stylesheet" href="styles.min.css?v=20261103-9d57ed99">
+    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
     <link rel="preload" as="image" href="assets/article-26-hero.webp">
 
     <!-- Structured Data: TechnicalArticle -->
@@ -651,7 +651,7 @@
         .pfas-input-group { display:flex; flex-direction:column; gap:0.3rem; }
         .pfas-label { font-size:0.8rem; font-weight:600; color:#374151; display:flex; align-items:center; gap:0.35rem; }
         [data-theme="dark"] .pfas-label { color:#d1d5db; }
-        .pfas-select, .pfas-num { padding:0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius:6px; font-size:0.84rem; background: #fff; color:#111827; width:100%; box-sizing:border-box; }
+        .pfas-select, .pfas-num { padding:0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius:6px; font-size:0.84rem; background: #fff; color:#191A1F; width:100%; box-sizing:border-box; }
         .pfas-select:focus, .pfas-num:focus { outline:2px solid #b45309; outline-offset:1px; }
         [data-theme="dark"] .pfas-select, [data-theme="dark"] .pfas-num { background: var(--rz-art-panel); border-color: #374151; color:#f3f4f6;}
 
@@ -693,7 +693,7 @@
         [data-theme="dark"] .pfas-pro-panel { background: var(--rz-art-bg); border-color: #374151;}
         .pfas-pro-panel-header { padding:0.875rem 1.25rem; border-bottom: 1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between; }
         [data-theme="dark"] .pfas-pro-panel-header { border-color: #374151; }
-        .pfas-pro-panel-title { font-size:0.95rem; font-weight:700; color:#1e293b; }
+        .pfas-pro-panel-title { font-size:0.95rem; font-weight:700; color:#272A32; }
         [data-theme="dark"] .pfas-pro-panel-title { color:#f1f5f9; }
         .pfas-pro-panel-inner { padding:1.25rem; }
         .pfas-pro-kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin-bottom:1rem; }
@@ -786,9 +786,8 @@
 /* JS-set el.style.color serializes to rgb() in the attribute, not hex */
 [data-theme="dark"] [style*="rgb(146, 64, 14)"] { color:#e8b563 !important; }
 [data-theme="dark"] [style*="color: #64748b"], [data-theme="dark"] [style*="color:#64748b"] { color:#9aa8bb !important; }
-:root:not([data-theme="dark"]) .pfas-engineer-note p { color:#374151 !important; }
-:root:not([data-theme="dark"]) .pfas-engineer-note strong, :root:not([data-theme="dark"]) .engineer-label { color:#92400e !important; }
-.pfas-privacy, .pfas-disclaimer { color:#64748b; }
+/* .pfas-engineer-note is a data-rz-dark-panel: it keeps its night ink in day mode (a11y 2026-11-06) */
+:root:not([data-theme="dark"]) .pfas-privacy, :root:not([data-theme="dark"]) .pfas-disclaimer { color: #646a73; } /* light: 5.4:1 on white (a11y, 3.24.43); dark keeps its own rule above */
 
 /* the shared editorial h3 rule (html[register] .article-body h3) out-specifies the
    box rules after the h4->h3 heading-order fix — re-assert the box heading look */
@@ -801,7 +800,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-insigh
 html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-danger-box h3 { color:#fcd34d !important; }
 html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warning-box h3 { color:#fbbf24 !important; }
 </style>
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 <style id="rz-mobile-v18">
@@ -1749,7 +1748,7 @@ TFA formed over 10 yr
                 <div class="pfas-kpi-sub" id="pfasRegSub">Based on current EPA/EU status</div>
             </div>
             <div class="pfas-kpi-card" id="pfasKpiVapor">
-                <div class="pfas-kpi-label">Est. Annual Vapor Release <span class="pfas-tt">?<span data-rz-dark-panel class="pfas-tt-box"><div class="pfas-tt-title">Where the per-event figure comes from</div><div class="pfas-tt-desc">Each opening releases 0.008&nbsp;kg of fluid per litre of charge. For the default 800&nbsp;L tank that is 6.4&nbsp;kg, or 0.57&nbsp;% of the charge per event.</div><div class="pfas-tt-bench">That constant has a physical scale behind it. A saturated headspace filling a third of an 800&nbsp;L tank holds about 2.0&nbsp;kg of Novec&nbsp;7000 vapour when the tank is opened at 32.5&nbsp;&deg;C, so 0.008 is roughly <strong>three full headspace exchanges</strong> &mdash; about five if the tank is opened cool at 22&nbsp;&deg;C, where the vapour is thinner. Film and drag-out sit inside that total, not on top of it. A multi-hour full-hatch entry turns the headspace over several times, which is the range this figure sits in. The coefficient is still an assumption, not a measurement &mdash; but it is an assumption of the right order.</div></span></span></div>
+                <div class="pfas-kpi-label">Est. Annual Vapor Release <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Where the per-event figure comes from</div><div class="pfas-tt-desc">Each opening releases 0.008&nbsp;kg of fluid per litre of charge. For the default 800&nbsp;L tank that is 6.4&nbsp;kg, or 0.57&nbsp;% of the charge per event.</div><div class="pfas-tt-bench">That constant has a physical scale behind it. A saturated headspace filling a third of an 800&nbsp;L tank holds about 2.0&nbsp;kg of Novec&nbsp;7000 vapour when the tank is opened at 32.5&nbsp;&deg;C, so 0.008 is roughly <strong>three full headspace exchanges</strong> &mdash; about five if the tank is opened cool at 22&nbsp;&deg;C, where the vapour is thinner. Film and drag-out sit inside that total, not on top of it. A multi-hour full-hatch entry turns the headspace over several times, which is the range this figure sits in. The coefficient is still an assumption, not a measurement &mdash; but it is an assumption of the right order.</div></span></span></div>
                 <div class="pfas-kpi-value" id="pfasVaporValue">—</div>
                 <div class="pfas-kpi-sub" id="pfasVaporSub">kg PFAS/year (no recovery)</div>
             </div>
@@ -3003,8 +3002,8 @@ function copyLink() {
         var jLabels      = { 'us-ca':'USA — California','us-other':'USA — Other','eu':'European Union','asean':'ASEAN','other':'Other/Global' };
 
         var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>PFAS Risk Assessment Report</title>' +
-            '<style>@page{margin:15mm}body{font-family:Arial,sans-serif;font-size:12px;color:#1f2937;padding:20px 30px;print-color-adjust:exact;-webkit-print-color-adjust:exact}' +
-            'h1{color:#1e3a5f;font-size:18px;margin:0}h2{color:#1e3a5f;font-size:14px;margin:16px 0 8px;border-bottom: 2px solid #b45309;padding-bottom:4px}h3{color:#374151;font-size:12px;margin:10px 0 6px}' +
+            '<style>@page{margin:15mm}body{font-family:Arial,sans-serif;font-size:12px;color:#262830;padding:20px 30px;print-color-adjust:exact;-webkit-print-color-adjust:exact}' +
+            'h1{color:#373B46;font-size:18px;margin:0}h2{color:#373B46;font-size:14px;margin:16px 0 8px;border-bottom: 2px solid #b45309;padding-bottom:4px}h3{color:#374151;font-size:12px;margin:10px 0 6px}' +
             '.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom: 3px solid #b45309;padding-bottom:12px;margin-bottom:16px}' +
             '.brand{text-align:right;font-size:10px;color:#64748b}.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}' +
             '.kpi{background: #f8fafc;border: 1px solid #e5e7eb;border-radius:6px;padding:10px;border-top: 3px solid #b45309}' +

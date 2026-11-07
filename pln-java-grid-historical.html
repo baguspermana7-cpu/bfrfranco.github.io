@@ -94,7 +94,7 @@
             --pjg-bg: #ffffff;
             --pjg-bg2: #f8fafc;
             --pjg-bg3: #f1f5f9;
-            --pjg-text: #1e293b;
+            --pjg-text: #272A32;
             --pjg-text2: #475569;
             --pjg-text3: #94a3b8;
             --pjg-border: #e2e8f0;
@@ -116,7 +116,7 @@
             --pjg-text2: #cbd5e1;
             --pjg-text3: #64748b;
             --pjg-border: #2a2d34;
-            --pjg-glass: rgba(11,18,32,0.85);
+            --pjg-glass: rgba(19,20,24,0.85);
             --pjg-glass-border: rgba(96,165,250,0.18);
             --pjg-shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
             --pjg-shadow-md: 0 4px 12px rgba(0,0,0,0.4);
@@ -147,7 +147,7 @@
         .nav-logo {
             width: 40px; height: 40px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 0.7rem; color: white; letter-spacing: 0.5px;
+            font-weight: 800; font-size: 0.7rem; color: var(--pjg-on-primary); letter-spacing: 0.5px;
             background: var(--pjg-gradient);
             box-shadow: 0 3px 10px rgba(59,130,246,0.35);
         }
@@ -173,20 +173,19 @@
 
         /* ===== HERO ===== */
         .pjg-hero {
-            background: linear-gradient(135deg, rgba(8,14,28,0.92) 0%, rgba(15,23,42,0.86) 50%, rgba(29,78,216,0.55) 100%);
+            background: #16181D;
             padding: 7rem 2rem 3rem; color: white; position: relative; overflow: hidden;
         }
         .pjg-hero::before {
             content: ''; position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 20% 50%, rgba(96,165,250,0.18) 0%, transparent 60%),
-                        radial-gradient(ellipse at 80% 20%, rgba(34,211,238,0.10) 0%, transparent 50%);
+            background: none;
         }
         .pjg-hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
         .pjg-hero h1 {
             font-size: 2.4rem; font-weight: 900; line-height: 1.15;
             margin-bottom: 0.6rem; letter-spacing: -0.02em;
         }
-        .pjg-hero-accent { background: var(--pjg-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .pjg-hero-accent { color: var(--pjg-primary); }
         .pjg-hero-sub {
             font-size: 1rem; color: rgba(255,255,255,0.78); max-width: 780px;
             line-height: 1.7; margin-bottom: 1.6rem;
@@ -254,7 +253,7 @@
             transition: all 0.15s; font-family: inherit;
         }
         .pjg-pill:hover { color: var(--pjg-primary); border-color: var(--pjg-primary); }
-        .pjg-pill.active { background: var(--pjg-primary); color: white; border-color: var(--pjg-primary); }
+        .pjg-pill.active { background: var(--pjg-primary); color: var(--pjg-on-primary); border-color: var(--pjg-primary); }
 
         /* C, G. Chart wrap */
         .pjg-chart-wrap {
@@ -451,8 +450,16 @@
         .pjg-yoy-up { color: #047857; }
         [data-theme="dark"] .pjg-yoy-up { color: #34d399; }
         .pjg-pill.active { background: #1d4ed8; border-color: #1d4ed8; }
+    
+        /* sweep-pln-register: one accent, per theme */
+        :root:not([data-theme="dark"]) .pjg-hero{--pjg-primary:#E8B563;--pjg-accent:#E8B563}
+        :root:not([data-theme="dark"]){--pjg-primary:#92400e;--pjg-accent:#92400e;--pjg-primary-rgb:146,64,14;--pjg-gradient:linear-gradient(#92400e,#92400e);--pjg-on-primary:#ffffff}
+        [data-theme="dark"]{--pjg-primary:#E8B563;--pjg-accent:#E8B563;--pjg-primary-rgb:232,181,99;--pjg-gradient:linear-gradient(#E8B563,#E8B563);--pjg-on-primary:#121316}
+        .nav-logo{background:transparent!important;border:1px solid var(--pjg-primary);color:var(--pjg-primary)!important;box-shadow:none!important;border-radius:4px!important}
+        .nav-back{background:transparent!important;border:1px solid rgba(128,128,128,.3);border-radius:4px!important}
+        .nav-back:hover{background:rgba(var(--pjg-primary-rgb),.1)!important}
     </style>
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="Historical Energy Dashboard — PLN Java-Bali Grid Monitor">
 
@@ -486,10 +493,10 @@
                 </div>
             </a>
             <div class="nav-links" id="pjgHistNavLinks">
-                <a href="tco-calculator.html" class="nav-link" style="color:#0369a1;"><i class="fas fa-calculator"></i> TCO Calc</a>
-                <a href="pue-calculator.html" class="nav-link" style="color:#06b6d4;"><i class="fas fa-tachometer-alt"></i> PUE Calc</a>
-                <a href="dc-market-tracker.html" class="nav-link" style="color:#14b8a6;"><i class="fas fa-globe"></i> DC Markets</a>
-                <a href="datacenter-solutions.html" class="nav-link" style="color:#f59e0b;"><i class="fas fa-server"></i> Solutions</a>
+                <a href="tco-calculator.html" class="nav-link"><i class="fas fa-calculator"></i> TCO Calc</a>
+                <a href="pue-calculator.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> PUE Calc</a>
+                <a href="dc-market-tracker.html" class="nav-link"><i class="fas fa-globe"></i> DC Markets</a>
+                <a href="datacenter-solutions.html" class="nav-link"><i class="fas fa-server"></i> Solutions</a>
                 <a href="pln-java-grid.html" class="nav-back">
                     <i class="fas fa-arrow-left"></i> Back
                 </a>
@@ -692,7 +699,7 @@
     <script src="rz-engine.min.js?v=20261024-90cc5600" defer></script>
     <script src="js/pln-java-grid-data.js?v=20260920-c83cf566" defer></script>
     <script src="js/pln-energy-data.js?v=20260920-c49ec09c"></script>
-    <script src="js/pln-energy-dashboard.js?v=20260920-2cf8934a"></script>
+    <script src="js/pln-energy-dashboard.js?v=20261105-d75dfc3f"></script>
 
     <!-- PAGE IIFE -->
     <script>

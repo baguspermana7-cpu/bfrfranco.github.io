@@ -51,20 +51,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="styles.min.css?v=20261103-9d57ed99">
+    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
 
     <style>
-        :root { --cdu-primary:#06b6d4; --cdu-accent:#0891b2; --cdu-gold:#f59e0b; }
+        :root { --cdu-primary:var(--rz-accent-ui); --cdu-accent:var(--rz-accent-ui); --cdu-gold:#f59e0b; }
         [data-theme="dark"] { --cdu-bg:#0e0f12; --cdu-card:#16181d; --cdu-border:#2a2d34; --cdu-text:#f1f5f9; --cdu-muted:#94a3b8; --cdu-inset:#121316; }
-        :root:not([data-theme="dark"]) { --cdu-primary:#0e7490; --cdu-bg:#f8fafc; --cdu-card:#ffffff; --cdu-border:#e2e8f0; --cdu-text:#0f172a; --cdu-muted:#475569; --cdu-inset:#f1f5f9; }
+        :root:not([data-theme="dark"]) { --cdu-primary:var(--rz-accent-ui); --cdu-bg:#f8fafc; --cdu-card:#ffffff; --cdu-border:#e2e8f0; --cdu-text:#191B20; --cdu-muted:#475569; --cdu-inset:#f1f5f9; }
 
-        .cdu-hero { background:linear-gradient(135deg,#0c2733 0%,#0e4a5a 42%,#06b6d4 100%); padding:7.5rem 1.5rem 3.5rem; color:#fff; text-align:center; position:relative; overflow:hidden; }
-        .cdu-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 22% 78%,rgba(6,182,212,.4) 0%,transparent 52%),radial-gradient(circle at 78% 22%,rgba(245,158,11,.22) 0%,transparent 52%); z-index:0; }
+        .cdu-hero { background: transparent; border-bottom: 1px solid rgba(128,128,128,0.18); padding:7.5rem 1.5rem 3.5rem; color: inherit; text-align:center; position:relative; overflow:hidden; }
+        .cdu-hero::before { content:''; position:absolute; inset:0; background: none; z-index:0; }
         .cdu-hero > * { position:relative; z-index:1; }
         .cdu-hero h1 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:clamp(1.9rem,4.4vw,3rem); font-weight:600; margin:0 0 .8rem; letter-spacing:-.015em; }
-        .cdu-hero p { font-size:clamp(1rem,1.7vw,1.18rem); max-width:64ch; margin:0 auto; color:rgba(255,255,255,.92); line-height:1.6; }
+        .cdu-hero p { font-size:clamp(1rem,1.7vw,1.18rem); max-width:64ch; margin:0 auto; color: inherit; line-height:1.6; }
         .cdu-badges { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; margin-top:1.4rem; }
-        .cdu-badge { font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.04em; text-transform:uppercase; font-weight:600; padding:.35rem .7rem; border-radius:6px; border:1px solid rgba(255,255,255,.35); background:rgba(255,255,255,.08); color:#fff; }
+        .cdu-badge { font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.04em; text-transform:uppercase; font-weight:600; padding:.35rem .7rem; border-radius:6px; border:1px solid rgba(128,128,128,.35); background:rgba(128,128,128,.08); color: inherit; }
 
         body { font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif; }
         main { background:var(--cdu-bg); color:var(--cdu-text); }
@@ -128,8 +128,8 @@
             background:
               linear-gradient(to right, var(--cdu-card) 30%, rgba(255,255,255,0)) 0 0/36px 100% no-repeat local,
               linear-gradient(to left, var(--cdu-card) 30%, rgba(255,255,255,0)) 100% 0/36px 100% no-repeat local,
-              radial-gradient(farthest-side at 0 50%, rgba(8,145,178,.22), rgba(0,0,0,0)) 0 0/14px 100% no-repeat scroll,
-              radial-gradient(farthest-side at 100% 50%, rgba(8,145,178,.22), rgba(0,0,0,0)) 100% 0/14px 100% no-repeat scroll;
+              radial-gradient(farthest-side at 0 50%, rgba(232,181,99,.22), rgba(0,0,0,0)) 0 0/14px 100% no-repeat scroll,
+              radial-gradient(farthest-side at 100% 50%, rgba(232,181,99,.22), rgba(0,0,0,0)) 100% 0/14px 100% no-repeat scroll;
             background-color:var(--cdu-card); }
         table.cdu-tbl { width:100%; border-collapse:collapse; font-size:.85rem; min-width:1320px; }
         table.cdu-tbl th { background:var(--cdu-inset); text-align:left; padding:.7rem .9rem; font-family:'JetBrains Mono',monospace; font-size:.62rem; letter-spacing:.04em; text-transform:uppercase; color:var(--cdu-muted); border-bottom:2px solid var(--cdu-border); white-space:nowrap; }
@@ -175,9 +175,16 @@
         .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#92400e; }
         [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(16,185,129,.18); color:#34d399; }
         [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
-    </style>
+    
+/* sweep-cyan-register: the page accent, per theme */
+:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
+[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+/* sweep-cyan-register: page tokens re-resolve inside dark panels */
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--cdu-accent:var(--rz-accent-ui);--cdu-primary:var(--rz-accent-ui)}
+</style>
 
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 </head>

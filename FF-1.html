@@ -83,7 +83,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261103-05c80e83">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261107-b12aaf92">
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
 <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
 <script src="js/rz-article-editorial.js?v=20261017-a3f81def" defer></script>
@@ -91,7 +91,7 @@
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="styles.min.css?v=20261103-9d57ed99">
+    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
     <link rel="preload" as="image" href="assets/future-forward-1-cover.webp">
 
     <!-- Structured Data -->
@@ -208,9 +208,9 @@
 
     <style>
         :root {
-            --prep-green: #065f46;   /* v3.6.1 — was #155e75. A token named green holding violet-800 is how the page kept a purple identity while reading as if it had one of the site's own. FF-2 is amber, FF-3 is cyan; this page is the green it always claimed. */
+            --prep-green: #065f46;   /* v3.6.1 — was var(--rz-accent-ui). A token named green holding violet-800 is how the page kept a purple identity while reading as if it had one of the site's own. FF-2 is amber, FF-3 is cyan; this page is the green it always claimed. */
             --prep-emerald: #64748b;
-            --prep-teal: #06b6d4;
+            --prep-teal: var(--rz-accent-ui);
             --prep-amber: #f59e0b;
             --prep-red: #ef4444;
             --spacing-xs: 0.25rem;
@@ -232,8 +232,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 18% 78%, rgba(34, 211, 238, 0.24) 0%, transparent 48%),
-                radial-gradient(circle at 80% 16%, rgba(6, 95, 70, 0.24) 0%, transparent 45%);
+            background: none;
             z-index: 0;
         }
         .article-hero::after {
@@ -259,7 +258,7 @@
             margin-bottom: 1.5rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            border: 1px solid rgba(34,211,238, 0.28);
+            border: 1px solid rgba(232,181,99,0.28);
         }
         .article-title {
             font-size: clamp(2rem, 5vw, 3.5rem);
@@ -673,7 +672,7 @@
             padding-bottom: 0;
         }
         [data-theme="dark"] .article-body h3 {
-            color: #67e8f9;
+            color: var(--rz-accent-ui);
         }
         [data-theme="dark"] .article-body h4 {
             color: #6FBF9A;
@@ -758,7 +757,7 @@
             max-width: 1000px;
             height: auto;
             border-radius: 14px;
-            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.28);
+            box-shadow: 0 14px 40px rgba(25,27,32,0.28);
             border: 1px solid rgba(148, 163, 184, 0.18);
         }
         .feature-cover figcaption {
@@ -782,7 +781,7 @@
             border: 1px solid rgba(6,95,70,0.12);
             border-radius: 4px;
             padding: 1rem 1rem 0.95rem;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+            box-shadow: 0 8px 24px rgba(25,27,32,0.06);
         }
         .hfx-evidence-value {
             font-size: 1.45rem;
@@ -794,7 +793,7 @@
         .hfx-evidence-label {
             font-size: 0.78rem;
             font-weight: 700;
-            color: #0f172a;
+            color: #191B20;
             text-transform: uppercase;
             letter-spacing: 0.04em;
             margin-bottom: 0.2rem;
@@ -814,7 +813,7 @@
             margin: 2rem 0;
             padding: 1.35rem 1.5rem;
             border-radius: 4px;
-            background: linear-gradient(135deg, rgba(6, 95, 70,0.08) 0%, rgba(6,182,212,0.06) 100%);
+            background: linear-gradient(135deg, rgba(6, 95, 70,0.08) 0%, rgba(232,181,99,0.06) 100%);
             border: 1px solid rgba(6, 95, 70,0.12);
             text-align: center;
         }
@@ -837,8 +836,8 @@
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 700;
-            color: #fff;
-            background: #06b6d4;
+            color: var(--rz-on-accent-ui) !important;
+            background: var(--rz-accent-ui);
             box-shadow: 0 10px 24px rgba(15,118,110,0.18);
         }
         .hfx-cta-btn:hover {;}
@@ -864,7 +863,7 @@
             margin: 1.25rem 0 1.5rem;
             overflow: hidden;
             border-radius: 12px;
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            box-shadow: 0 10px 24px rgba(25,27,32,0.06);
         }
         .hfx-country-table th,
         .hfx-country-table td,
@@ -884,7 +883,7 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;}
         .hfx-country-table td:first-child,
-        .hfx-timeline-table td:first-child { font-weight: 700; color: #0f172a; }
+        .hfx-timeline-table td:first-child { font-weight: 700; color: #191B20; }
         .risk-chip {
             display: inline-flex;
             align-items: center;
@@ -908,7 +907,7 @@
             border-radius: 4px;
             background: #fff;
             border: 1px solid rgba(148,163,184,0.14);
-            box-shadow: 0 10px 24px rgba(15,23,42,0.04);
+            box-shadow: 0 10px 24px rgba(25,27,32,0.04);
         }
         .hfx-pulse-card h4 {
             margin: 0 0 0.45rem 0;
@@ -926,7 +925,7 @@
             border-radius: 18px;
             background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
             border: 1px solid rgba(148,163,184,0.16);
-            box-shadow: 0 18px 50px rgba(15,23,42,0.08);
+            box-shadow: 0 18px 50px rgba(25,27,32,0.08);
         }
         .hfx-calculator-title {
             margin: 0 0 0.35rem 0;
@@ -945,7 +944,7 @@
             gap: 1rem;
             flex-wrap: wrap;
             padding: 1rem;
-            background: linear-gradient(135deg, rgba(6, 95, 70,0.08) 0%, rgba(6,182,212,0.06) 100%);
+            background: linear-gradient(135deg, rgba(6, 95, 70,0.08) 0%, rgba(232,181,99,0.06) 100%);
             border-radius: 14px;
             border: 1px solid rgba(6, 95, 70,0.1);
             margin-bottom: 1.2rem;
@@ -974,13 +973,13 @@
             border: 1px solid rgba(148,163,184,0.18);
         }
         .hfx-mode-btn.active {
-            background: #06b6d4;
-            color: #fff;
+            background: var(--rz-accent-ui);
+            color: var(--rz-on-accent-ui) !important;
             box-shadow: 0 8px 20px rgba(15,118,110,0.18);
         }
         .hfx-toolbar-btn {
             background: #0E0F12;
-            color: #0f172a;
+            color: #191B20;
             border: 1px solid rgba(148,163,184,0.18);}
         .hfx-toolbar-btn:hover { color: #CFD3DA; background: #0E0F12;}
         .hfx-privacy-badge {
@@ -1016,7 +1015,7 @@
             border-radius: 10px;
             border: 1px solid rgba(148,163,184,0.22);
             background: #fff;
-            color: #0f172a;
+            color: #191B20;
             font-size: 0.9rem;
             font-family: inherit;
         }
@@ -1039,12 +1038,12 @@
             color: #fff;
             border-radius: 4px;
             padding: 1rem;
-            border: 1px solid rgba(103,232,249,0.14);}
+            border: 1px solid rgba(232,181,99,0.14);}
         .hfx-result-value {
             font-size: 1.6rem;
             font-weight: 800;
             line-height: 1.1;
-            color: #67e8f9;
+            color: var(--rz-accent-ui);
             margin-bottom: 0.25rem;
         }
         .hfx-result-label {
@@ -1060,7 +1059,7 @@
             line-height: 1.45;
         }
         .hfx-narrative {
-            background: linear-gradient(135deg, rgba(6, 95, 70,0.06) 0%, rgba(6,182,212,0.05) 100%);
+            background: linear-gradient(135deg, rgba(6, 95, 70,0.06) 0%, rgba(232,181,99,0.05) 100%);
             border: 1px solid rgba(6, 95, 70,0.12);
             border-radius: 14px;
             padding: 1.1rem 1.2rem;
@@ -1125,7 +1124,7 @@
         .hfx-panel-title {
             margin: 0 0 0.8rem 0;
             font-size: 0.92rem;
-            color: #0f172a;
+            color: #191B20;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -1212,7 +1211,7 @@
         .hfx-scenario-row {
             margin: 1.25rem 0 0.5rem;
             padding: 1rem 1.25rem;
-            background: linear-gradient(135deg, rgba(6, 95, 70,0.04) 0%, rgba(6,182,212,0.03) 100%);
+            background: linear-gradient(135deg, rgba(6, 95, 70,0.04) 0%, rgba(232,181,99,0.03) 100%);
             border: 1px solid rgba(6, 95, 70,0.10);
             border-radius: 12px;
         }
@@ -1223,7 +1222,7 @@
             border-radius: 10px;
             background: #fff;
             font-size: 0.85rem;
-            color: #0f172a;
+            color: #191B20;
             cursor: pointer;
         }
         .hfx-scenario-row select:focus {
@@ -1255,7 +1254,7 @@
             border-color: rgba(245,158,11,0.15);
         }
         [data-theme="dark"] .hfx-disclaimer p { color: #94a3b8 !important; }
-        [data-theme="dark"] .hfx-disclaimer div[style*="color:#1e3a5f"] { color: #6FBF9A !important; }
+        [data-theme="dark"] .hfx-disclaimer div[style*="color:#373B46"] { color: #6FBF9A !important; }
         .hfx-login-overlay {
             display: none;
             position: fixed;
@@ -1273,8 +1272,8 @@
             border-radius: 18px;
             color: #CFD3DA;
             background: #0E0F12;
-            border: 1px solid rgba(103,232,249,0.18);
-            box-shadow: 0 24px 64px rgba(2,6,23,0.55);}
+            border: 1px solid rgba(232,181,99,0.18);
+            box-shadow: 0 24px 64px rgba(11,12,14,0.55);}
         .hfx-login-box h3 {
             margin: 0 0 0.5rem 0;
             color: #f8fafc;
@@ -1300,8 +1299,8 @@
             border-radius: 10px;
             padding: 0.85rem 1rem;
             font-weight: 800;
-            color: #fff;
-            background: #06b6d4;
+            color: var(--rz-on-accent-ui) !important;
+            background: var(--rz-accent-ui);
             cursor: pointer;
         }
         .hfx-login-close {
@@ -1328,8 +1327,8 @@
             color: #94a3b8;
         }
         .hfx-login-demo code {
-            color: #67e8f9;
-            background: rgba(103,232,249,0.08);
+            color: var(--rz-accent-ui);
+            background: rgba(232,181,99,0.08);
             padding: 0.08rem 0.3rem;
             border-radius: 4px;
         }
@@ -1428,12 +1427,19 @@
 :root:not([data-theme="dark"]) .read-more-ff, :root:not([data-theme="dark"]) .article-meta-ff span, :root:not([data-theme="dark"]) .article-tag-ff { color:#64748b !important; }
 [data-theme="dark"] .read-more-ff, [data-theme="dark"] .article-meta-ff span, [data-theme="dark"] .article-tag-ff { color:#6FBF9A !important; }
 [data-theme="dark"] .tgs-disclaimer div div div { color:#94a3b8 !important; }
-[data-theme="dark"] p > a[href$="privacy.html"], [data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
+[data-theme="dark"] p > a[href$="privacy.html"], [data-theme="dark"] #cookieBanner a { color:var(--rz-art-accent) !important; }
 .series-badge-icon { color:#ffffff !important; }
-[data-theme="dark"] .series-badge-icon { background: #155e75 !important; }
+[data-theme="dark"] .series-badge-icon { background: var(--rz-accent-ui) !important; }
+
+/* sweep-cyan-register: the page accent, per theme */
+:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
+[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+/* sweep-cyan-register: page tokens re-resolve inside dark panels */
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--prep-teal:var(--rz-accent-ui)}
 </style>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer integrity="sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt" crossorigin="anonymous"></script>
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 <style id="rz-mobile-v18">
@@ -2041,7 +2047,7 @@
                                 <i class="fas fa-triangle-exclamation"></i>
                             </div>
                             <div>
-                                <div style="font-weight:700;font-size:0.8rem;margin-bottom:0.5rem;color:#1e3a5f;">Disclaimer &amp; Data Sources</div>
+                                <div style="font-weight:700;font-size:0.8rem;margin-bottom:0.5rem;color:#373B46;">Disclaimer &amp; Data Sources</div>
                                 <p style="font-size:0.72rem;line-height:1.65;color:#475569;margin:0 0 0.5rem;">This calculator is provided for <strong>educational and estimation purposes only</strong>. It translates public benchmarks about AI Overviews, click compression, platform concentration, and website resilience into a strategic model. It is not legal, financial, or investment advice.</p>
                                 <p style="font-size:0.72rem;line-height:1.65;color:#475569;margin:0 0 0.5rem;"><strong>Methodology anchors:</strong> Google AI Overviews disclosures, Pew click-behavior research, Similarweb AI referral estimates, Ahrefs CTR studies, Verisign domain statistics, Cloudflare traffic trends, DataReportal behavior reports, and public platform earnings releases.</p>
                                 <p style="font-size:0.72rem;line-height:1.65;color:#475569;margin:0 0 0.5rem;">All calculations are performed entirely in your browser. No input data is transmitted to any server. See our <a href="privacy.html" style="color:#64748b;">Privacy Policy</a> for details.</p>
@@ -2863,8 +2869,8 @@ window.hfxHandleLogin = window.hfxHandleLogin || function(){};
         var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Website Resilience &amp; Moat Assessment</title>';
         html += '<style>';
         html += '@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:15mm}}';
-        html += 'body{font-family:"IBM Plex Sans",-apple-system,sans-serif;max-width:820px;margin:0 auto;padding:20px 30px;color:#1f2937;font-size:13px;line-height:1.6}';
-        html += 'h1{color:#1e3a5f;font-size:22px;margin:0 0 4px}h2{color:#1e3a5f;font-size:15px;margin:16px 0 8px;border-bottom: 2px solid #065f46;padding-bottom:4px}h3{color:#374151;font-size:13px;margin:12px 0 6px}';
+        html += 'body{font-family:"IBM Plex Sans",-apple-system,sans-serif;max-width:820px;margin:0 auto;padding:20px 30px;color:#262830;font-size:13px;line-height:1.6}';
+        html += 'h1{color:#373B46;font-size:22px;margin:0 0 4px}h2{color:#373B46;font-size:15px;margin:16px 0 8px;border-bottom: 2px solid #065f46;padding-bottom:4px}h3{color:#374151;font-size:13px;margin:12px 0 6px}';
         html += '.pdf-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom: 3px solid #065f46;padding-bottom:12px;margin-bottom:16px}';
         html += '.pdf-date{color:#64748b;font-size:11px}.pdf-brand{color:#065f46;font-weight:700;font-size:11px}';
         html += '.pdf-score{display:flex;align-items:center;gap:16px;margin:12px 0;padding:16px;background: #f8fafc;border-radius:8px;border-left: 4px solid ' + band.color + '}';
@@ -2875,7 +2881,7 @@ window.hfxHandleLogin = window.hfxHandleLogin || function(){};
         html += 'table{width:100%;border-collapse:collapse;margin:8px 0;font-size:11px}th,td{padding:6px 8px;text-align:left;border-bottom: 1px solid #e5e7eb}';
         html += 'th{background: #f8fafc;font-weight:600;color:#374151}';
         html += '.pdf-narrative{background: #f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:12px;line-height:1.65;border-left: 3px solid #065f46}';
-        html += '.pdf-narrative p{margin:6px 0}.pdf-narrative strong{color:#1e3a5f}';
+        html += '.pdf-narrative p{margin:6px 0}.pdf-narrative strong{color:#373B46}';
         html += '.pdf-footer{text-align:center;margin-top:20px;padding-top:12px;border-top: 2px solid #065f46;font-size:9px;color:#94a3b8}';
         html += '</style></head><body>';
         html += '<div class="pdf-header"><div><h1>Website Resilience &amp; Moat Assessment</h1><div class="pdf-brand">ResistanceZero Future Forward</div></div><div class="pdf-date">Generated ' + dateStr + '<br>Mode: ' + (state.mode === 'pro' ? 'Full analysis' : 'Free Assessment') + '</div></div>';

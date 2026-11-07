@@ -255,6 +255,13 @@ html[data-rz-register="editorial"]:not([data-theme="dark"]){
   --rz-art-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
   --rz-art-mono:'IBM Plex Mono',ui-monospace,monospace;
 }
+/* A panel the article paints dark in BOTH themes (data-rz-dark-panel, 37 pages) keeps the dark
+   tokens in day mode: the day accent #92400e reads ~2.6:1 on #0E0F12, the night one #E8B563 ~10:1. */
+html[data-rz-register="editorial"]:not([data-theme="dark"]) [data-rz-dark-panel]{
+  --rz-art-accent:#E8B563 !important;
+  --rz-art-bg:#0E0F12; --rz-art-panel:#16181D; --rz-art-text:#CFD3DA; --rz-art-strong:#F6F7F9;
+  --rz-art-muted:#969eaa; --rz-art-line:rgba(255,255,255,.12);
+}
 /* ---- HERO ---- (keep article bg; add soft warm wash + accent rule) */
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-hero{position:relative;overflow:hidden;}
 /* Day hero wash removed: stacking an amber radial over articles that already carry a
@@ -381,6 +388,18 @@ html[data-rz-register="editorial"] .article-body a:not([class]){
 html[data-rz-register="editorial"] .article-body a.toc-item,
 html[data-rz-register="editorial"] .toc-section a.toc-item{
   color:var(--rz-art-strong);
+}
+/* TOC cards: each article kept its own copy of the old card (blue numbers, blue left rail, blue
+   calculator wash). One register rule for all of them: muted numbers, hairline card, amber on hover. */
+html[data-rz-register="editorial"] .toc-section .toc-item-number{
+  color:var(--rz-art-muted) !important;
+}
+html[data-rz-register="editorial"] .toc-section a.toc-item{
+  border:1px solid var(--rz-art-line) !important;
+  background-image:none !important;
+}
+html[data-rz-register="editorial"] .toc-section a.toc-item:hover{
+  border-color:var(--rz-art-accent) !important;
 }
 /* reference numbers, list markers, inline citations and dotted term underlines: every article
    carried its own blue (#2563eb / #1d4ed8 / #60a5fa / --accent-blue). Numbers read as muted ink,
@@ -1485,10 +1504,10 @@ html[data-rz-register="editorial"] body.rz-nav-open .navbar{background:var(--rz-
 html[data-rz-register="editorial"] .jwrap{max-width:1120px;margin:0 auto;padding:0 20px}
 html[data-rz-register="editorial"] .jhero{padding:112px 0 28px;border-bottom:1px solid var(--rz-art-line)}
 html[data-rz-register="editorial"] .jhero h1{font:600 clamp(1.9rem,3.6vw,2.6rem)/1.15 var(--rz-art-sans);letter-spacing:-.02em;color:var(--rz-art-strong);margin:0 0 12px}
-html[data-rz-register="editorial"] .jhero p{font:400 1.05rem/1.6 var(--rz-art-sans);color:var(--rz-art-text);max-width:62ch;margin:0}
+html[data-rz-register="editorial"] .jhero p:not(.jmeta){font:400 1.05rem/1.6 var(--rz-art-sans);color:var(--rz-art-text);max-width:62ch;margin:0}
 html[data-rz-register="editorial"] .jmeta{font:500 .78rem/1.5 var(--rz-art-mono);color:var(--rz-art-muted);letter-spacing:.02em;margin:0 0 10px}
 html[data-rz-register="editorial"] .jmeta b{color:var(--rz-art-accent);font-weight:600}
-html[data-rz-register="editorial"] .jnotice{margin:28px 0 0;padding:16px 18px;border:1px solid var(--rz-art-line);background:var(--rz-art-panel);font:400 .92rem/1.55 var(--rz-art-sans);color:var(--rz-art-text)}
+html[data-rz-register="editorial"] .jnotice{margin:28px 0 0;padding:12px 14px;border:1px solid var(--rz-art-line);background:var(--rz-art-panel);font:400 .8rem/1.55 var(--rz-art-sans);color:var(--rz-art-muted)}
 html[data-rz-register="editorial"] .jnotice b{color:var(--rz-art-strong);font-weight:600}
 html[data-rz-register="editorial"] .jnotice p{margin:0 0 8px}
 html[data-rz-register="editorial"] .jnotice p:last-child{margin:0}

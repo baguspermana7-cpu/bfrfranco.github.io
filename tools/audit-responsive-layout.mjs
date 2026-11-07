@@ -19,13 +19,20 @@
    See standarization/RESPONSIVE_STANDARD.md "Article reading column".
    ============================================================================ */
 import puppeteer from 'puppeteer';
-import { readdirSync } from 'fs';
+import { readdirSync, readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
 const STRICT = process.argv.includes('--strict');
 const ROOT = process.cwd();
 const SKIP = /^(rz-|plan-|planb|google|404|sitemap|robots|llms|article-9-paper)/;
-const pages = readdirSync(ROOT).filter(f => f.endsWith('.html') && !SKIP.test(f)).sort();
+/* WI-WEB-ALLPAGES-001 AC4: root pages PLUS every published page in a subfolder (manual/, network/,
+   cx-handbook/, id/, ...). The root-only walk measured 163 of the site's pages and called it clean. */
+const sitemapSub = existsSync(resolve(ROOT, 'sitemap.xml'))
+  ? [...readFileSync(resolve(ROOT, 'sitemap.xml'), 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)]
+      .map(m => { const p = m[1].trim().replace(/^https?:\/\/[^/]+\/?/, ''); return p.endsWith('/') ? p + 'index.html' : p; })
+      .filter(p => p.includes('/') && p.endsWith('.html') && existsSync(resolve(ROOT, p)) && !SKIP.test(p.split('/').pop()) && !/(^|\/)rz-/.test(p))
+  : [];
+const pages = [...new Set([...readdirSync(ROOT).filter(f => f.endsWith('.html') && !SKIP.test(f)), ...sitemapSub])].sort();
 
 const LAUNCH_ARGS = { args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] };
 let browser = await puppeteer.launch(LAUNCH_ARGS);
@@ -44,7 +51,7 @@ async function newPageSafe() {
 }
 
 async function measure(f) {
-  const r = { f, mobileOverflow: 0, tabletOverflow: 0, wideTableW: 0 };
+  const r = { f, mobileOverflow: 0, tabletOverflow: 0, wideTableW: 0, unmeasured: [] };
   for (const [w, key] of [[360, 'm'], [390, 'm'], [768, 't'], [2400, 'wide']]) {
     const pg = await newPageSafe();
     // A phone, not a narrow desktop window: with isMobile the layout viewport WIDENS to fit
@@ -69,7 +76,7 @@ async function measure(f) {
       if (key === 'm') r.mobileOverflow = Math.max(r.mobileOverflow, m.over);
       if (key === 't') r.tabletOverflow = m.over;
       if (key === 'wide') r.wideTableW = m.maxArtTbl;
-    } catch (e) { /* heavy/auth pages may time out on file://; not a layout failure */ }
+    } catch (e) { r.unmeasured.push(w + 'px: ' + String(e.message || e).slice(0, 60)); } // a page that did not load was NOT measured — never count it clean
     await pg.close();
   }
   return r;
@@ -86,6 +93,7 @@ rows.sort((a, c) => a.f.localeCompare(c.f));
 const mob = rows.filter(r => r.mobileOverflow > 8);
 const tab = rows.filter(r => r.tabletOverflow > 8);
 const wideTbl = rows.filter(r => r.wideTableW > 900);
+const unm = rows.filter(r => r.unmeasured.length);
 
 let failed = false;
 if (mob.length) {
@@ -103,10 +111,15 @@ if (wideTbl.length) {
   console.log('\n✗ ARTICLE TABLE wider than reading column (>900px @2400) — table sprawls past the prose:');
   wideTbl.sort((a, c) => c.wideTableW - a.wideTableW).forEach(r => console.log(`   ${r.f.padEnd(38)} table=${r.wideTableW}px`));
 }
+if (unm.length) {
+  failed = true;
+  console.log('\n✗ UNMEASURED — the page did not load, so it was not checked:');
+  unm.forEach(r => console.log(`   ${r.f.padEnd(38)} ${r.unmeasured.join(' · ')}`));
+}
 if (!failed) {
   console.log(`\nRESPONSIVE-LAYOUT AUDIT — CLEAN. ${pages.length} content pages: no mobile/tablet overflow, article tables within the reading column.`);
 } else {
-  console.log(`\nRESPONSIVE-LAYOUT AUDIT — ${mob.length} mobile-overflow + ${tab.length} tablet-overflow + ${wideTbl.length} wide-article-table, of ${pages.length} pages.`);
+  console.log(`\nRESPONSIVE-LAYOUT AUDIT — ${mob.length} mobile-overflow + ${tab.length} tablet-overflow + ${wideTbl.length} wide-article-table + ${unm.length} unmeasured, of ${pages.length} pages.`);
   console.log('Fix: wrap wide tables/toolbars in an overflow-x:auto scroll container; keep article prose tables inside the centered reading column. See standarization/RESPONSIVE_STANDARD.md.');
 }
 process.exit(STRICT && failed ? 1 : 0);

@@ -110,14 +110,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="styles.min.css?v=20261103-9d57ed99">
+    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
 
     <style>
-        :root { --ig-color: #10b981; --ig-light: #34d399; --ig-dark: #059669; --ig-bg: rgba(16,185,129,0.08); --ig-border: rgba(16,185,129,0.25); }
+        :root { --ig-color: var(--rz-accent-ui); --ig-light: var(--rz-accent-ui); --ig-dark: var(--rz-accent-ui); --ig-bg: rgba(232,181,99,0.08); --ig-border: rgba(232,181,99,0.25); }
 
         /* Hero */
         .ig-hero {
-            background: linear-gradient(135deg, #0c1f1a 0%, #0a2e24 40%, #064e3b 100%);
+            background: linear-gradient(rgba(22,24,29,1),rgba(22,24,29,1));
             padding: 7rem 2rem 4rem;
             position: relative;
             overflow: hidden;
@@ -129,7 +129,7 @@
             right: -20%;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%);
+            background: none;
             border-radius: 50%;
         }
         .ig-hero-content {
@@ -320,7 +320,7 @@
             height: 18px;
             background: var(--ig-color);
             border-radius: 50%;
-            border: 3px solid var(--bg-primary, #0f172a);
+            border: 3px solid var(--bg-primary, #191B20);
             z-index: 2;
             flex-shrink: 0;
         }
@@ -633,25 +633,32 @@
 }
 
     /* a11y (v1.52.4) */
-:root:not([data-theme="dark"]) #pueDisplay, :root:not([data-theme="dark"]) #pueRating { color:#047857 !important; }
+:root:not([data-theme="dark"]) #pueDisplay, :root:not([data-theme="dark"]) #pueRating { color:var(--rz-accent-ui) !important; }
 :root:not([data-theme="dark"]) #pueSavings { color:#475569 !important; }
 :root:not([data-theme="dark"]) [class*="ig-"] strong { color:#475569 !important; }
 :root:not([data-theme="dark"]) .references-section h3 { color:#92400e !important; }
 [data-theme="dark"] p > a[href$="privacy.html"], [data-theme="dark"] #cookieBanner a { color:#93c5fd !important; }
-#copyToast { background:#047857 !important; }
+#copyToast { background:var(--rz-accent-ui) !important; }
 p > a[href$="glossary.html"] { text-decoration:underline !important; text-underline-offset:2px; }
 :root:not([data-theme="dark"]) [id^="ref-"] span, :root:not([data-theme="dark"]) [id^="ref-"] a { color:#92400e !important; }
 :root:not([data-theme="dark"]) p > a[href$="glossary.html"] { color:#92400e !important; }
-:root:not([data-theme="dark"]) .ig-insight-num, :root:not([data-theme="dark"]) .ig-bar-value { color:#047857 !important; }
+:root:not([data-theme="dark"]) .ig-insight-num, :root:not([data-theme="dark"]) .ig-bar-value { color:var(--rz-accent-ui) !important; }
 :root:not([data-theme="dark"]) .ig-insight-text { color:#64748b !important; }
 :root:not([data-theme="dark"]) [style*="color: #94a3b8"], :root:not([data-theme="dark"]) [style*="color:#94a3b8"] { color:#64748b !important; }
 [data-theme="dark"] .ig-slider-labels span, [data-theme="dark"] .ig-section-sub { color:#94a3b8 !important; }
 .fb-btn { background:#1456ad !important; }
-#copyLinkBtn { background:#047857 !important; }
+#copyLinkBtn { background:var(--rz-accent-ui) !important; }
 [data-theme="dark"] [id^="ref-"] div, [data-theme="dark"] [id^="ref-"] span { color:#94a3b8 !important; }
 [data-theme="dark"] [id^="ref-"] a { color:#f87171 !important; }
+
+/* sweep-cyan-register: the page accent, per theme */
+:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
+[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+/* sweep-cyan-register: page tokens re-resolve inside dark panels */
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--ig-color:var(--rz-accent-ui);--ig-dark:var(--rz-accent-ui);--ig-light:var(--rz-accent-ui)}
 </style>
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 </head>
@@ -722,7 +729,7 @@ p > a[href$="glossary.html"] { text-decoration:underline !important; text-underl
 
     <main id="main-content">
     <!-- Hero -->
-    <section class="ig-hero">
+    <section data-rz-dark-panel class="ig-hero">
         <div class="ig-hero-content">
             <span class="ig-badge">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>

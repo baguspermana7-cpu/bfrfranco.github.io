@@ -83,7 +83,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- v1.43.10 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261103-05c80e83">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261107-b12aaf92">
     <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
 <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
 <script src="js/rz-article-editorial.js?v=20261017-a3f81def" defer></script>
@@ -92,7 +92,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
-    <link rel="stylesheet" href="styles.min.css?v=20261103-9d57ed99">
+    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
     <link rel="preload" as="image" href="assets/article-19-cover.webp">
 
     <!-- Structured Data -->
@@ -169,12 +169,12 @@
 
     <style>
         :root {
-            --a19-teal: #0891b2;
-            --a19-cyan: #06b6d4;
+            --a19-teal: var(--rz-accent-ui);
+            --a19-cyan: var(--rz-accent-ui);
             --a19-dark: #134e4a;
             --a19-light: #ecfeff;
-            --a19-accent: #22d3ee;
-            --a19-indigo: #0e7490;
+            --a19-accent: var(--rz-accent-ui);
+            --a19-indigo: var(--rz-accent-ui);
             --spacing-xs: 0.25rem;
             --spacing-sm: 0.5rem;
             --spacing-md: 1rem;
@@ -184,9 +184,9 @@
         }
 
         .article-hero {
-            background: linear-gradient(135deg, #042f2e 0%, #134e4a 30%, #0e7490 60%, #0891b2 100%);
+            background: transparent; border-bottom: 1px solid rgba(128,128,128,0.18);
             padding: 7rem 2rem 3.5rem;
-            color: #fff;
+            color: inherit;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -195,9 +195,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background:
-                radial-gradient(circle at 20% 80%, rgba(8, 145, 178, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.2) 0%, transparent 50%);
+            background: none;
             z-index: 0;
         }
         .article-hero::after {
@@ -213,8 +211,8 @@
 
         .article-category {
             display: inline-block;
-            background: rgba(8, 145, 178, 0.2);
-            color: #67e8f9;
+            background: rgba(232,181,99,0.2);
+            color: var(--rz-accent-ui);
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-size: 0.875rem;
@@ -222,14 +220,14 @@
             margin-bottom: 1.5rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            border: 1px solid rgba(8, 145, 178, 0.3);
+            border: 1px solid rgba(232,181,99,0.3);
         }
         .article-title {
             font-size: clamp(1.6rem, 3.2vw, 2.35rem);
             font-weight: 800;
             margin-bottom: 1.25rem;
             line-height: 1.25;
-            color: #fff;
+            color: inherit;
             letter-spacing: -0.01em;
         }
         .article-title .highlight {
@@ -264,7 +262,7 @@
             transition: color 0.3s ease;
             text-decoration: none;
         }
-        .back-link:hover { color: #fff; }
+        .back-link:hover { color: inherit; }
 
         /* Evidence Block */
         .aif-evidence-block {
@@ -283,7 +281,7 @@
             color: #CFD3DA;
             background: #121316;
             border: 1px solid rgba(255,255,255,0.08);
-            border-top: 2px solid #0891b2;
+            border-top: 2px solid var(--rz-accent-ui);
             border-radius: 4px;
             padding: 1rem 0.75rem;
             text-align: center;
@@ -294,11 +292,11 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(180deg, rgba(8,145,178,0.06) 0%, transparent 60%);
+            background: linear-gradient(180deg, rgba(232,181,99,0.06) 0%, transparent 60%);
             pointer-events: none;
         }
         .aif-evidence-card:hover {
-            border-color: rgba(8,145,178,0.4);
+            border-color: rgba(232,181,99,0.4);
             box-shadow: 0 8px 24px rgba(0,0,0,0.2);}
         .aif-evidence-value {
             font-size: 1.6rem;
@@ -332,11 +330,11 @@
         .article-body p { margin-bottom: 1rem; }
         .article-body h2 {
             font-size: 1.4rem;
-            color: #0e7490;
+            color: var(--rz-accent-ui);
             margin: 2.5rem 0 1rem;
             font-weight: 700;
             line-height: 1.3;
-            border-left: 3px solid #0891b2;
+            border-left: 3px solid var(--rz-accent-ui);
             padding-left: 0.75rem;
         }
         .article-body h3 {
@@ -352,7 +350,7 @@
             margin-bottom: 0.5rem;
         }
         .article-body strong {
-            color: #1e293b;
+            color: #272A32;
         }
 
         /* Decision Matrix Table */
@@ -363,8 +361,8 @@
             font-size: 0.85rem;
         }
         .decision-matrix thead th {
-            background: #0e7490;
-            color: #fff;
+            background: var(--rz-accent-ui);
+            color: var(--rz-on-accent-ui) !important;
             padding: 0.75rem 0.5rem;
             font-weight: 600;
             text-align: center;
@@ -401,7 +399,7 @@
         }
         .verdict-box h4 {
             margin: 0 0 0.5rem;
-            color: #0e7490;
+            color: var(--rz-accent-ui);
             font-size: 0.95rem;
         }
         .verdict-box p {
@@ -419,7 +417,7 @@
             color: #f0fdfa;
         }
         .aif-insight-box h4 {
-            color: #67e8f9;
+            color: var(--rz-accent-ui);
             margin: 0 0 0.75rem;
             font-size: 0.95rem;
         }
@@ -459,17 +457,17 @@
         /* Dark mode overrides */
         [data-theme="dark"] .article-content { background: var(--rz-art-bg);}
         [data-theme="dark"] .article-body { color: #cbd5e1; }
-        [data-theme="dark"] .article-body h2 { color: #22d3ee; border-left-color: #0891b2; }
-        [data-theme="dark"] .article-body h3 { color: #67e8f9; }
+        [data-theme="dark"] .article-body h2 { color: var(--rz-accent-ui); border-left-color: var(--rz-accent-ui); }
+        [data-theme="dark"] .article-body h3 { color: var(--rz-accent-ui); }
         [data-theme="dark"] .article-body strong { color: #f1f5f9; }
         [data-theme="dark"] .decision-matrix tbody td { border-bottom-color: #334155; }
-        [data-theme="dark"] .decision-matrix tbody tr:hover { background: rgba(8,145,178,0.1); }
+        [data-theme="dark"] .decision-matrix tbody tr:hover { background: rgba(232,181,99,0.1); }
         [data-theme="dark"] .data-table-container { border-color: #334155; }
         [data-theme="dark"] .data-table-container th { background: var(--rz-art-panel); color: #e2e8f0; border-bottom-color: #475569;}
-        [data-theme="dark"] .data-table-container td { border-bottom-color: #1e293b; }
+        [data-theme="dark"] .data-table-container td { border-bottom-color: #272A32; }
         [data-theme="dark"] .data-table-container tr:hover { background: var(--rz-art-panel);}
-        [data-theme="dark"] .verdict-box { background: rgba(8,145,178,0.1); border-color: rgba(8,145,178,0.3); }
-        [data-theme="dark"] .verdict-box h4 { color: #22d3ee; }
+        [data-theme="dark"] .verdict-box { background: rgba(232,181,99,0.1); border-color: rgba(232,181,99,0.3); }
+        [data-theme="dark"] .verdict-box h4 { color: var(--rz-accent-ui); }
         [data-theme="dark"] .verdict-box p { color: #cbd5e1; }
 
         /* Responsive */
@@ -642,8 +640,15 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 :root:not([data-theme="dark"]) .dm-mid { color:#92400e !important; }
 :root:not([data-theme="dark"]) .rz-chart-chip, :root:not([data-theme="dark"]) .rz-chart-chip.derived { color:#065f46 !important; }
 :root:not([data-theme="dark"]) .rz-chart-chip.warn { color:#92400e !important; }
+
+/* sweep-cyan-register: the page accent, per theme */
+:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
+[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
+/* sweep-cyan-register: page tokens re-resolve inside dark panels */
+:root:not([data-theme="dark"]) [data-rz-dark-panel]{--a19-accent:var(--rz-accent-ui);--a19-cyan:var(--rz-accent-ui);--a19-indigo:var(--rz-accent-ui);--a19-teal:var(--rz-accent-ui)}
 </style>
-    <script src="js/rz-version.js?v=20261107-a097e41e" defer></script>
+    <script src="js/rz-version.js?v=20261107-e247a1e2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
@@ -773,27 +778,27 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 <!-- Evidence Block -->
 <div class="aif-evidence-block">
     <div data-rz-fact-list class="aif-evidence-grid">
-        <div data-rz-dark-panel class="aif-evidence-card">
+        <div class="aif-evidence-card">
             <div class="aif-evidence-value">20 km</div>
             <div class="aif-evidence-label">Distance Apart</div>
             <div class="aif-evidence-sub">Singapore to Batam</div>
         </div>
-        <div data-rz-dark-panel class="aif-evidence-card">
+        <div class="aif-evidence-card">
             <div class="aif-evidence-value">2-3x</div>
             <div class="aif-evidence-label">Cost Full access</div>
             <div class="aif-evidence-sub">Companies willingly pay</div>
         </div>
-        <div data-rz-dark-panel class="aif-evidence-card">
+        <div class="aif-evidence-card">
             <div class="aif-evidence-value">26+</div>
             <div class="aif-evidence-label">Submarine Cables</div>
             <div class="aif-evidence-sub">Singapore connectivity</div>
         </div>
-        <div data-rz-dark-panel class="aif-evidence-card">
+        <div class="aif-evidence-card">
             <div class="aif-evidence-value">$4.3B</div>
             <div class="aif-evidence-label">SG DC Market</div>
             <div class="aif-evidence-sub">2025 valuation</div>
         </div>
-        <div data-rz-dark-panel class="aif-evidence-card">
+        <div class="aif-evidence-card">
             <div class="aif-evidence-value">&lt;2ms</div>
             <div class="aif-evidence-label">Interconnect Latency</div>
             <div class="aif-evidence-sub">Between both locations</div>

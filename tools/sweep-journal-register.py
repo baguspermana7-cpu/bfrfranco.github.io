@@ -326,7 +326,7 @@ def dark_descendants(text):
     """R14: every element whose class is a dark context gets data-rz-dark-panel (the register then keeps
     its headings light in light mode); the classes of everything inside such an element are collected
     so R12 can lift slate-grey text that sits on the dark surface without a background of its own."""
-    desc, stack, inserts, edits, skip_to = set(), [], [], [], 0
+    desc, stack, inserts, edits, drops, skip_to = set(), [], [], [], [], 0
     for m in TAG_RE.finditer(text):
         if m.start() < skip_to:
             continue
@@ -345,6 +345,17 @@ def dark_descendants(text):
         classes = set(cm.group(1).split()) if cm else set()
         own_dark = bool(classes & DARK_CTX)
         inside = any(s[1] for s in stack)
+        # a fact list is flattened by the editorial register onto the page surface (background none,
+        # text from the --rz-art-* tokens), so a tile in it is NOT a dark panel: marking it made the
+        # article-20 evidence strip pale-on-white in light mode (contact sheet 2026-11-04)
+        in_fact = 'data-rz-fact-list' in attrs or any(s[2] for s in stack)
+        if in_fact:
+            dm = re.search(r'\sdata-rz-dark-panel(?=[\s>/=])', attrs)
+            if dm:
+                drops.append((m.start(3) + dm.start(), m.start(3) + dm.end()))
+            if not selfclose and tag not in VOID:
+                stack.append((tag, False, True))
+            continue
         if inside or own_dark:
             desc.update(classes)
         if own_dark and 'data-rz-dark-panel' not in attrs:
@@ -360,14 +371,16 @@ def dark_descendants(text):
                         a0 = m.start(3)  # where the attributes begin
                         edits.append((a0 + sm.start(1) + cm2.start(1), a0 + sm.start(1) + cm2.end(1)))
         if not selfclose and tag not in VOID:
-            stack.append((tag, own_dark or inside))
-    ops = [(pos, 'ins') for pos in inserts] + [(a, 'grey', b) for a, b in edits]
+            stack.append((tag, own_dark or inside, False))
+    ops = [(pos, 'ins') for pos in inserts] + [(a, 'grey', b) for a, b in edits] + [(a, 'del', b) for a, b in drops]
     for op in sorted(ops, key=lambda o: o[0], reverse=True):
         if op[1] == 'ins':
             text = text[:op[0]] + ' data-rz-dark-panel' + text[op[0]:]
+        elif op[1] == 'del':
+            text = text[:op[0]] + text[op[2]:]
         else:
             text = text[:op[0]] + '#9aa3ad' + text[op[2]:]
-    return text, desc, len(inserts), len(edits)
+    return text, desc, len(inserts) + len(drops), len(edits)
 RULE_RE = re.compile(r'([^{}]+)\{([^{}]*)\}')
 
 
