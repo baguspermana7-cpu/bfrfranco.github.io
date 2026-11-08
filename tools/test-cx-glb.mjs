@@ -14,30 +14,37 @@ import { readGlb, bounds } from './lib/glb-read.mjs';
 const here = dirname(fileURLToPath(import.meta.url)), R = (p) => resolve(here, '..', p);
 let pass = 0, fail = 0;
 const ok = (n, c, d) => { if (c) pass++; else { fail++; console.log('  ✘', n, d === undefined ? '' : `— ${typeof d === 'string' ? d : JSON.stringify(d)}`); } };
-const GLB = R('assets/cx/campus-equipment.glb');
+const GLB = process.env.CX_GLB || R('assets/cx/campus-equipment.glb');   /* CX_GLB=… points the laws at another file (red proof against an old build) */
 const campusSrc = readFileSync(R('js/rz-cx-campus.js'), 'utf8');
 const FAM = {};
 for (const m of campusSrc.matchAll(/family\('([a-z_]+)',\s*(.+?),\s*([\d.]+),\s*([\d.]+),\s*([\d.]+),\s*function/g)) FAM[m[1]] = { w: +m[3], h: +m[4], d: +m[5] };
-const BUDGET = { main_tx: 1600, hv_intake: 1000, chillers: 800, dry_coolers: 700, mv_board: 600 };
+/* Triangle budgets. Low meshes draw on the campus (default 500); `_hi` twins draw only inside the focused building
+ * (K17: detail where the camera is, speed everywhere else). racks_hi is instanced up to 560 times, so it stays small. */
+const BUDGET = { main_tx: 1600, hv_intake: 1000, chillers: 800, dry_coolers: 700, mv_board: 600,
+  racks_hi: 320, cdu_hi: 900, crah_hi: 900, ups_hi: 700, unit_subs_hi: 1200, lv_busway_hi: 700, bms_hi: 500, fire_hi: 500, chillers_hi: 2600, fws_hi: 900,
+  dry_coolers_hi: 1800, generators_hi: 2600, hv_intake_hi: 2200, main_tx_hi: 3200, mv_board_hi: 1600 };
+const SHADE_MIN = 0.40;   /* K16: the campus multiplies COLOR_0 by a mid-grey tint — anything darker reads as black */
 const g = readGlb(GLB);
-const names = g.meshes.map((m) => m.name);
-ok('library has one mesh per campus family, no extras', names.length === Object.keys(FAM).length && Object.keys(FAM).every((k) => names.includes(k)), { names, fam: Object.keys(FAM) });
+const names = g.meshes.map((m) => m.name), fams = Object.keys(FAM);
+ok('library has one low and one _hi mesh per campus family, no extras', names.length === fams.length * 2 && fams.every((k) => names.includes(k) && names.includes(k + '_hi')), { names, fam: fams });
 ok('mesh names are unique', new Set(names).size === names.length);
-ok('file stays under 420 KB (lazy-loaded with the campus)', statSync(GLB).size <= 420 * 1024, statSync(GLB).size);
-let tri = 0;
+ok('file stays under 1.4 MB (lazy-loaded after the page, only when the 3D panel scrolls into view)', statSync(GLB).size <= 1.4 * 1024 * 1024, statSync(GLB).size);
+let tri = 0; const triBy = {};
 for (const m of g.meshes) {
-  const f = FAM[m.name]; if (!f) continue;
-  const b = bounds(m); tri += m.triangles;
+  const base = m.name.replace(/_hi$/, ''), f = FAM[base]; if (!f) continue;
+  const b = bounds(m); tri += m.triangles; triBy[m.name] = m.triangles;
   ok(`${m.name}: a shape, not a box (>= 40 triangles)`, m.triangles >= 40, m.triangles);
-  ok(`${m.name}: within its per-family budget`, m.triangles <= (BUDGET[m.name] || 500), m.triangles);
+  ok(`${m.name}: within its per-family budget (${BUDGET[m.name] || 500})`, m.triangles <= (BUDGET[m.name] || 500), m.triangles);
   ok(`${m.name}: indexed, with normals and COLOR_0`, !!m.index && !!m.normal && !!m.color, { index: !!m.index, normal: !!m.normal, color: !!m.color });
-  ok(`${m.name}: grey factors in [0.2, 1] (raw, not sRGB-converted)`, (() => { let mn = 1, mx = 0; for (let i = 0; i < m.color.length; i += m.colorN) { mn = Math.min(mn, m.color[i]); mx = Math.max(mx, m.color[i]); } return mn >= 0.2 && mx <= 1 && mx >= 0.99; })());
+  ok(`${m.name}: grey factors in [${SHADE_MIN}, 1] (raw, not sRGB-converted)`, (() => { let mn = 1, mx = 0; for (let i = 0; i < m.color.length; i += m.colorN) { mn = Math.min(mn, m.color[i]); mx = Math.max(mx, m.color[i]); } return mn >= SHADE_MIN && mx <= 1 && mx >= 0.99; })(), (() => { let mn = 1; for (let i = 0; i < m.color.length; i += m.colorN) mn = Math.min(mn, m.color[i]); return { min: +mn.toFixed(3) }; })());
   ok(`${m.name}: stands on the floor inside its footprint (${f.w} × ${f.h} × ${f.d})`,
     b.min[1] >= -0.01 && b.max[1] <= f.h * 1.12 + 0.02 && b.min[0] >= -f.w / 2 * 1.15 - 0.02 && b.max[0] <= f.w / 2 * 1.15 + 0.02 && b.min[2] >= -f.d / 2 * 1.15 - 0.02 && b.max[2] <= f.d / 2 * 1.15 + 0.02, b);
   ok(`${m.name}: uses its footprint (>= 70 % of the declared width and height)`, (b.max[0] - b.min[0]) >= f.w * 0.7 && b.max[1] >= f.h * 0.7, b);
   ok(`${m.name}: unit normals`, (() => { for (let i = 0; i < m.normal.length; i += 3) { const l = Math.hypot(m.normal[i], m.normal[i + 1], m.normal[i + 2]); if (Math.abs(l - 1) > 0.02) return false; } return true; })());
 }
-ok('whole library under 7,000 triangles', tri <= 7000, tri);
+ok('whole library under 32,000 triangles', tri <= 32000, tri);
+ok('every _hi twin carries more detail than its low mesh', fams.every((k) => (triBy[k + '_hi'] || 0) > (triBy[k] || 0)), fams.map((k) => [k, triBy[k], triBy[k + '_hi']]));
+console.log('  triangles (low / hi): ' + fams.map((k) => `${k} ${triBy[k]}/${triBy[k + '_hi']}`).join(' · ') + ` · total ${tri}`);
 if (process.argv.includes('--regen')) {
   const dir = mkdtempSync(join(tmpdir(), 'cx-glb-')), out = join(dir, 'lib.glb');
   const r = spawnSync(process.env.BLENDER || resolve(process.env.HOME, 'tools/blender/blender'), ['-b', '--python', R('tools/cx-assets/build-cx-assets.py'), '--', out], { encoding: 'utf8' });

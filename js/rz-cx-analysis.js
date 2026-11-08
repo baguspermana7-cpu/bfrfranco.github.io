@@ -306,21 +306,36 @@
   function step(d) { if (!S.plan) return; var max = Math.ceil(S.plan.finishMonth); S.month = Math.min(max, Math.max(0, S.month + d)); $('cxAnMonth').value = S.month; renderTimeline(S.plan); renderSchematic(S.plan); renderStatus(S.plan); renderInspector(S.plan); syncCampus(); }
   function stopPlay() { if (S.timer) root.clearInterval(S.timer); S.timer = null; var b = $('cxAnPlay'); if (b) { b.setAttribute('aria-pressed', 'false'); b.textContent = 'Play'; } }
 
-  function campusCounts(plan) {
-    try { var C = root.RZEngine && root.RZEngine.models.commissioning, es = C && C.equipScale && C.equipScale(C.mapInput(plan ? plan.input : inputs()));
-      if (!es) return {}; return { chillers: Math.min(12, es.chillers), pumps: Math.min(8, es.pumps), generators: Math.min(8, es.generators), transformers: Math.min(2, Math.max(2, es.transformers)), coolers: Math.min(14, Math.ceil(es.cooling_units / 12)) };
-    } catch (e) { return {}; }
+  /* The 3D plant's site basis (K18): the engine's own mapped input (kW, cooling type, rack density → kW per rack) and its
+   * equipScale counts. RZCxCampus.layout() turns this into what is drawn and what each callout says; nothing is typed. */
+  function campusBasis(plan) {
+    var src = plan ? plan.input : inputs(), out = { itKw: src && src.itLoad, rackKw: null, coolingType: src && (src.coolingType || src.cooling), es: null };
+    try {
+      var E = root.RZEngine, C = E && E.models.commissioning, inp = C && C.mapInput && C.mapInput(src);
+      if (inp) {
+        out.itKw = inp.itLoad; out.coolingType = inp.coolingType;
+        var R = E.data && E.data.commissioning && E.data.commissioning.cx && E.data.commissioning.cx.rich, den = R && R.density && (R.density[inp.rackDensity] || R.density.standard);
+        out.rackKw = den ? den.kw : null; out.es = C.equipScale ? C.equipScale(inp) : null;
+      }
+    } catch (e) { /* layout() falls back to the engine's published rules */ }
+    return out;
   }
+  function campusKey(b) { return [b.itKw, b.rackKw, b.coolingType, b.es && b.es.racks, b.es && b.es.cooling_units, b.es && b.es.chillers].join('|'); }
   function bootCampus() {
     var host = $('cxAnCampus'); if (!host || !root.RZCxCampus) return;
-    var plan = S.plan || recompute();
+    var plan = S.plan || recompute(), b = campusBasis(plan); S.campusKey = campusKey(b);
     root.RZCxCampus.boot(host, {
-      counts: campusCounts(plan), itLoadKw: plan ? plan.input.itLoad : inputs().itLoad,
+      basis: b,
       status: function () { return S.plan ? P.statusAt(S.plan, S.month) : null; },
       onSelect: function (id) { if (sysById(id)) { S.sel = 'sys:' + id; render(); } }
     });
   }
-  function syncCampus() { var host = $('cxAnCampus'); if (host && host.__rzCampus && S.plan) host.__rzCampus.setStatus(P.statusAt(S.plan, S.month)); }
+  function syncCampus() {
+    var host = $('cxAnCampus'); if (!(host && host.__rzCampus && S.plan)) return;
+    var b = campusBasis(S.plan), key = campusKey(b);
+    if (key !== S.campusKey) { S.campusKey = key; host.__rzCampus.setBasis(b); }
+    host.__rzCampus.setStatus(P.statusAt(S.plan, S.month));
+  }
   function init() {
     if (S.ready || !build()) return; S.ready = true;
     var p = store.load(); S.overrides = p.overrides; S.cap = p.siteCrewCap; S.extra = { calendar: p.calendar, lines: p.lines };

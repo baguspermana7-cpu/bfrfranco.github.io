@@ -263,7 +263,10 @@ gate "Cx plan core — level math, gates, tags, totals are pure functions of the
 gate "Cx calendar — work-day shifts, baseline fields, witness slot float, clamped overrides" node tools/test-cx-calendar.mjs
 gate "Cx io — CSV round-trip, cell hygiene, duplicate ids, release rows" node tools/test-cx-io.mjs
 gate "Cx assets — every equipment family is a shaped, bounded, deterministic geometry" node tools/test-cx-assets.mjs
+gate "Cx campus basis — the 3D plant's counts, CDUs, flows and callout text follow the engine's site basis; light palette" node tools/test-cx-campus-basis.mjs
 gate "Cx glb library — Blender export matches a regenerated build byte for byte, footprints, shades" node tools/test-cx-glb.mjs --regen
+gate "Cx records (Tier 3 slice) — PRD v1.0 invariants on the demo record set, overlay on the plan, register import reasons" node tools/test-cx-records.mjs
+gate "DCMOC Cx plan bridge — same plan and status as the site module, store clamps/persists/5 scenarios (needs dcmoc/node_modules)" node tools/test-dcmoc-cx-plan.mjs
 gate "Cx Analysis — plan editor, schematic, 3D campus with the glb library and callouts, Tier 1.5 calendar, both themes" node tools/test-cx-analysis.mjs
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs

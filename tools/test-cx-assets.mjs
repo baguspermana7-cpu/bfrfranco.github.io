@@ -51,7 +51,7 @@ for (const k of Object.keys(FAM)) {
 }
 ok('whole campus at the default form stays under 120k triangles', sceneTris <= 120000, sceneTris);
 // the campus must use the module for every family and fall back to a box without it
-ok('campus wires RZCxAssets.build into family()', /RZCxAssets[\s\S]{0,400}build\(T, systemId, w, h, d\)/.test(campusSrc));
+ok('campus wires RZCxAssets.build into family()', /RZCxAssets[\s\S]{0,1200}build\(T, systemId, w, h, d\)/.test(campusSrc));
 ok('campus falls back to a box when the module is absent', /BoxGeometry\(w, h, d\)/.test(campusSrc) && /vertexColors/.test(campusSrc));
 console.log(`CX ASSETS — ${pass} passed, ${fail} failed · scene ≈ ${sceneTris.toLocaleString('en-US')} triangles`);
 process.exit(fail ? 1 : 0);

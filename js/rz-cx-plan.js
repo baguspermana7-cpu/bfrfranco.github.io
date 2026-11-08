@@ -173,4 +173,4 @@
               fmtUsd: fmtUsd, fmtInt: fmtInt, fmtMo: fmtMo };
   root.RZCxPlan = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
-})(typeof window !== 'undefined' ? window : this);
+})(typeof window !== 'undefined' ? window : typeof globalThis !== 'undefined' ? globalThis : this);   /* CommonJS: `this` is the ORIGINAL exports object, replaced by module.exports = API below — root.RZEngine would be unreachable; globalThis is where Node consumers (dcmoc bridge, gates) put the engine */

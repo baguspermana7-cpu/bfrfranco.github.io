@@ -108,7 +108,12 @@
 .cx-3d-crumb { font: 500 12px var(--rzt-mono); color: var(--rzt-text-2); margin-left: auto; }
 .cx-3d-crumb button { background: none; border: 0; padding: 0; font: inherit; color: var(--rzt-text); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 .cx-3d-crumb b { color: var(--rzt-text); font-weight: 600; }
-.cx-3d-stage { position: relative; height: 520px; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); background: var(--rzt-inset); overflow: hidden; }
+/* The 3D stage is the light engineering canvas of PRD v1.0 §24 in BOTH page themes (owner K16 2026-11-08 "jangan gelap"):
+ * ground #EEF2F6 on canvas #F4F6F8, text #17212F, lines #D9E0E8. The tokens are re-scoped inside the stage so the
+ * projected labels and callouts (chips on the canvas) read as part of the drawing, not of the page chrome. */
+.cx-3d-stage { position: relative; height: 520px; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); background: #F4F6F8; overflow: hidden;
+  --rzt-text: #17212F; --rzt-text-muted: #526174; --rzt-panel: #FFFFFF; --rzt-bg: #FFFFFF; --rzt-line: #D9E0E8; --rzt-line-strong: #526174; --rzt-inset: #EEF2F6; }
+[data-theme="dark"] .cx-3d-stage { background: #EEF2F6; }
 .cx-3d-stage canvas { display: block; width: 100%; height: 100%; outline: none; touch-action: none; }
 .cx-3d-stage canvas:focus-visible { outline: 2px solid var(--rzt-accent); outline-offset: -2px; }
 .cx-3d-nogl { margin: 0; padding: var(--rz-space-4); font: 400 13px/1.5 var(--rzt-sans); color: var(--rzt-text-2); }

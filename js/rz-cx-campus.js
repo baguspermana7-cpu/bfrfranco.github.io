@@ -10,8 +10,58 @@
 (function (root) {
   'use strict';
   var REDUCE = root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var TAG_HEX = { red: 0xef4444, yellow: 0xd49a2a, green: 0x22c55e, blue: 0x3b82f6, white: 0xe4e4e7, none: 0x50545c };
+  var TAG_HEX = { red: 0xef4444, yellow: 0xd49a2a, green: 0x22c55e, blue: 0x3b82f6, white: 0xe4e4e7, none: 0xd9e0e8 };   /* none = PRD v1.0 §38 "neutral plant objects": light grey, never a dark mass (K16) */
   var MED = { hv: 0xef4444, mv: 0xd49a2a, lv: 0x22c55e, supply: 0x22d3ee, ret: 0xd49a2a, chw: 0x22d3ee };
+  /* Instrument palette (PRD v1.0 §24 "light engineering workspace", owner K16 2026-11-08 "jangan gelap"): the 3D canvas
+   * is the light ground in BOTH page themes — schematic/3D ground #EEF2F6 on canvas #F4F6F8, lines #D9E0E8, text
+   * #17212F, secondary #526174. Equipment is neutral mid-grey (none) until its system carries a tag. */
+  var PAL = { canvas: 0xf4f6f8, ground: 0xeef2f6, plateSide: 0xc9d1da, outline: 0x7d8a99, grid: 0xd9e0e8, wall: 0xffffff, roof: 0xf4f6f8, edge: 0x526174,
+    floor: 0xffffff, yard: 0xe6ebf0, fence: 0x8a97a6, road: 0xd4dbe3, detail: 0xb8c2cd, none: 0xd9e0e8 };
+  /* What the drawn hall and yards can hold (metres above): the layout caps the engine's counts here and SAYS so. */
+  var CAP = { rows: 10, perRow: 56, crahPerWall: 12, ups: 16, unit_subs: 6, lv_busway: 6, bms: 3, fire: 2, chillers: 12, fws: 8, dry_coolers: 14, generators: 8, hv_intake: 6, main_tx: 4, mv_board: 1 };
+  /* layout(basis) — DOM-free and pure (tools/test-cx-campus-basis.mjs): the equipment the site basis implies.
+   * basis = { itKw, rackKw, coolingType, es } where es = RZEngine.models.commissioning.equipScale(input) (counts per
+   * engine rule: racks = kW ÷ rack kW, cooling units kW ÷ 200, UPS modules kW ÷ 500, chillers kW ÷ 500, pumps kW ÷ 300,
+   * generators kW ÷ 2000, unit transformers kW ÷ 2500, LV boards kW ÷ 2000 + 1). Dry coolers (1 MW each, N+1) and the
+   * 150/20 kV transformers (2N, 100 MVA class) have no engine rule and are declared here. Every family carries the
+   * count the basis implies (all), the count drawn (count ≤ capacity) and a one-line basis for its callout. */
+  function layout(basis) {
+    basis = basis || {};
+    var kw = +basis.itKw, rackKw = +basis.rackKw, es = basis.es || {}, cool = String(basis.coolingType || 'air');
+    if (!isFinite(kw) || kw <= 0) kw = 2000; if (!isFinite(rackKw) || rackKw <= 0) rackKw = 6;
+    var liquid = cool === 'dlc' || cool === 'immersion', share = cool === 'immersion' ? 0.95 : (liquid ? 0.85 : 0);
+    function n(v, d) { v = +v; return isFinite(v) && v > 0 ? Math.ceil(v) : d; }
+    function per(all) { return all > 0 ? Math.round(kw / all) : 0; }
+    var racksAll = n(es.racks, Math.ceil(kw / rackKw)), hallCap = CAP.rows * CAP.perRow, halls = Math.max(1, Math.ceil(racksAll / hallCap)), racks = Math.min(racksAll, hallCap);
+    var rows = Math.max(1, Math.min(CAP.rows, Math.ceil(racks / 20))), perRow = Math.ceil(racks / rows);
+    var crahAll = n(es.cooling_units, Math.ceil(kw / 200)), crah = Math.min(crahAll, CAP.crahPerWall * 2);
+    var cdu = liquid ? rows * 2 : 0;
+    var upsAll = n(es.ups_modules, Math.ceil(kw / 500)), txAll = n(es.transformers, Math.ceil(kw / 2500)), lvAll = n(es.lvsb, Math.ceil(kw / 2000) + 1);
+    var chAll = n(es.chillers, Math.ceil(kw / 500)), pAll = n(es.pumps, Math.ceil(kw / 300)), genAll = n(es.generators, Math.ceil(kw / 2000));
+    var dcAll = Math.ceil(kw * 1.1 / 1000) + 1, mtxAll = Math.max(2, Math.ceil(kw / 100000) + 1), mtx = Math.min(mtxAll, CAP.main_tx);
+    var fwsLps = liquid ? kw * share / (4.18 * 10) : 0, chwLps = kw * (1 - share) / (4.18 * 6);
+    function fam(count, all, text) { return { count: Math.max(0, Math.round(count)), all: all, basis: text + (all > count ? ' · ' + count + ' of ' + all + ' drawn' : '') }; }
+    return {
+      kw: kw, rackKw: rackKw, coolingType: cool, liquid: liquid, liquidShare: share, halls: halls, rows: rows, perRow: perRow, crahPerWall: Math.ceil(crah / 2), fwsLps: fwsLps, chwLps: chwLps,
+      families: {
+        racks: fam(racks, racksAll, rackKw + ' kW per rack' + (halls > 1 ? ' · hall 1 of ' + halls : '')),
+        cdu: fam(cdu, cdu, liquid ? '2 per row · ' + cool.toUpperCase() + ' ' + Math.round(share * 100) + ' % liquid' : 'none · air-cooled'),
+        crah: fam(crah, crahAll, '≈ ' + per(crahAll) + ' kW each'),
+        ups: fam(Math.min(upsAll, CAP.ups), upsAll, '≈ ' + per(upsAll) + ' kW modules'),
+        unit_subs: fam(Math.min(txAll, CAP.unit_subs), txAll, '≈ ' + per(txAll) + ' kW each'),
+        lv_busway: fam(Math.min(lvAll, CAP.lv_busway), lvAll, 'sections + 1 spare'),
+        bms: fam(CAP.bms, CAP.bms, 'BMS · EPMS · OT'),
+        fire: fam(CAP.fire, CAP.fire, 'panel + agent bank'),
+        chillers: fam(Math.min(chAll, CAP.chillers), chAll, '≈ ' + per(chAll) + ' kW each'),
+        fws: fam(Math.min(pAll, CAP.fws), pAll, '≈ ' + per(pAll) + ' kW duty each'),
+        dry_coolers: fam(Math.min(dcAll, CAP.dry_coolers), dcAll, '1 MW each, N+1'),
+        generators: fam(Math.min(genAll, CAP.generators), genAll, '≈ ' + per(genAll) + ' kW each'),
+        hv_intake: fam(Math.min(mtx + 2, CAP.hv_intake), mtx + 2, mtx + ' tx bays + 2 line bays'),
+        main_tx: fam(mtx, mtxAll, '150/20 kV · 2N'),
+        mv_board: fam(1, 1, '20 kV GIS')
+      }
+    };
+  }
   /* Site basis — ADOPTED, metres, origin at the hall centre. Declared on the page as "Representative · Conceptual". */
   var SITE = {
     hall: { id: 'hall', name: 'Data hall', x: 0, z: 0, w: 62, d: 31, h: 12, systems: ['racks', 'cdu', 'crah', 'ups', 'lv_busway', 'unit_subs', 'bms', 'epms', 'fire', 'ot_network'] },
@@ -47,44 +97,31 @@
     var cam = new T.OrthographicCamera(-1, 1, 1, -1, -500, 1000); cam.zoom = 1;
     var ctl = new T.OrbitControls(cam, cv); ctl.enableDamping = true; ctl.dampingFactor = 0.1; ctl.enablePan = true; ctl.autoRotate = false; ctl.minZoom = 0.5; ctl.maxZoom = 8;
     ctl.maxPolarAngle = Math.PI * 0.47; ctl.minPolarAngle = 0.2;
-    scene.add(new T.HemisphereLight(0xe8edf5, 0x1a1c22, 0.75));
-    var sun = new T.DirectionalLight(0xffffff, 1.1); sun.position.set(-90, 75, 60); scene.add(sun);           /* key from front-left, low: tops bright, front faces mid, right faces shaded (3-tone iso) */
-    var fill = new T.DirectionalLight(0xffffff, 0.35); fill.position.set(120, 40, -20); scene.add(fill);       /* fill from the right: the shaded face still reads, never black */
-    /* Palette = the tool register's own tokens (computed on the host), so the scene follows the theme like the rest of the page. */
-    function isDark() { return (document.documentElement.getAttribute('data-theme') || 'dark') !== 'light'; }
-    function tok(name, fallback) { var v = ''; try { v = getComputedStyle(host).getPropertyValue(name).trim(); } catch (e) { v = ''; } if (!v) return new T.Color(fallback); try { return new T.Color(v); } catch (e2) { return new T.Color(fallback); } }
-    function palette() {
-      var dark = isDark();
-      return { dark: dark, ground: tok('--rzt-inset', dark ? 0x121316 : 0xe9ecf0), grid: tok('--rzt-line', dark ? 0x2a2d34 : 0xcfd4db), gridSoft: tok('--rzt-line-soft', dark ? 0x1d1f25 : 0xdfe3e8),
-        wall: dark ? 0x363a43 : 0xcdd2d9, roof: dark ? 0x474c56 : 0xe3e6eb, edge: dark ? 0x7a808a : 0x2a2d34, floor: dark ? 0x1f2227 : 0xf2f4f6, yard: dark ? 0x1b1d23 : 0xe2e5ea, fence: dark ? 0x4b505a : 0x9aa0aa, road: dark ? 0x1e2026 : 0xd3d7dd, none: dark ? 0x8b919c : 0x9aa0aa };
-    }
-    var pal = palette(), dark = pal.dark;
-    /* the site is a plate: a slab with a darker edge, the way an isometric figure sits on its base; the stage background shows around it */
-    function plateColors() { return { top: pal.ground, side: new T.Color(dark ? 0x08090b : 0xb4b9c1), outline: new T.Color(dark ? 0x07080a : 0x2a2d34) }; }
-    var pc = plateColors(), plateTop = new T.MeshBasicMaterial({ color: pc.top }), plateSide = new T.MeshBasicMaterial({ color: pc.side });   /* unlit: the slab is the biggest surface on screen and software GL pays per pixel for lights */
+    /* High-key 3-tone isometric light (the K15 reference frame): an even hemisphere plus one key from the front-left so a
+     * white wall renders ≈ top 1.0 · left 0.84 · front 0.75 · right 0.64 of its albedo, and a fill from the right so the
+     * shaded face never goes black. Standard material, roughness 0.9: no specular highlights on a drawing. */
+    scene.add(new T.HemisphereLight(0xffffff, 0xe6ebf0, 1.25));                        /* K16: bright sky term so no face reads dark; two lights, not three (software GL is fragment-bound) */
+    var sun = new T.DirectionalLight(0xffffff, 0.45); sun.position.set(-90, 130, 70); scene.add(sun);
+    var pal = PAL;
+    renderer.setClearColor(PAL.canvas, 1);                                                                /* the canvas is the light workspace in both page themes (K16) */
+    /* the site is a plate: a slab with a darker edge, the way an isometric figure sits on its base */
+    var plateTop = new T.MeshBasicMaterial({ color: pal.ground }), plateSide = new T.MeshBasicMaterial({ color: pal.plateSide });   /* unlit: the slab is the biggest surface on screen and software GL pays per pixel for lights */
     var ground = new T.Mesh(new T.BoxGeometry(300, 6, 230), [plateSide, plateSide, plateTop, plateSide, plateSide, plateSide]); ground.position.set(-5, -3.05, 6); scene.add(ground);
-    var outlineMat = new T.MeshBasicMaterial({ color: pc.outline, side: T.BackSide });                      /* inverted hull = the drawn outline of every machine */
-    var grid = new T.GridHelper(200, 20, pal.gridSoft, pal.gridSoft); grid.position.set(-5, 0, 6); grid.material.transparent = true; grid.material.opacity = dark ? 0.35 : 0.4; scene.add(grid);
+    var outlineMat = new T.MeshBasicMaterial({ color: pal.outline, side: T.BackSide });                   /* inverted hull = the drawn outline of every machine */
+    var grid = new T.GridHelper(200, 20, pal.grid, pal.grid); grid.position.set(-5, 0, 6); grid.material.transparent = true; grid.material.opacity = 0.55; scene.add(grid);
 
     /* ---- materials ---- */
     var mat = {
-      wall: new T.MeshStandardMaterial({ color: pal.wall, transparent: true, opacity: 1 }),
-      roof: new T.MeshStandardMaterial({ color: pal.roof, transparent: true, opacity: 1 }),
-      floor: new T.MeshStandardMaterial({ color: pal.floor }),
-      yard: new T.MeshStandardMaterial({ color: pal.yard }),
+      wall: new T.MeshStandardMaterial({ color: pal.wall, roughness: 0.9, metalness: 0, transparent: true, opacity: 1 }),
+      roof: new T.MeshStandardMaterial({ color: pal.roof, roughness: 0.9, metalness: 0, transparent: true, opacity: 1 }),
+      floor: new T.MeshStandardMaterial({ color: pal.floor, roughness: 0.9, metalness: 0 }),
+      yard: new T.MeshStandardMaterial({ color: pal.yard, roughness: 0.9, metalness: 0 }),
       fence: new T.LineBasicMaterial({ color: pal.fence }),
-      road: new T.MeshStandardMaterial({ color: pal.road }),
-      detail: new T.MeshStandardMaterial({ color: dark ? 0x2a2d34 : 0x8a9099, transparent: true, opacity: 1 })   /* louvres, doors, parapets, roof plant */
+      road: new T.MeshStandardMaterial({ color: pal.road, roughness: 0.9, metalness: 0 }),
+      detail: new T.MeshStandardMaterial({ color: pal.detail, roughness: 0.9, metalness: 0, transparent: true, opacity: 1 })   /* louvres, doors, parapets, roof plant */
     };
-    function retheme() {
-      pal = palette(); dark = pal.dark; TAG_HEX.none = pal.none;
-      pc = plateColors(); plateTop.color.copy(pc.top); plateSide.color.copy(pc.side); outlineMat.color.copy(pc.outline); grid.material.color.copy(pal.gridSoft); grid.material.opacity = dark ? 0.35 : 0.4;
-      mat.wall.color.set(pal.wall); mat.roof.color.set(pal.roof); mat.floor.color.set(pal.floor); mat.yard.color.set(pal.yard); mat.fence.color.set(pal.fence); mat.road.color.set(pal.road); mat.detail.color.set(dark ? 0x2a2d34 : 0x8a9099);
-      for (var k in buildings) if (buildings.hasOwnProperty(k)) { var b = buildings[k]; if (b.userData.walls) b.userData.walls.material.color.set(pal.wall); if (b.userData.roof) b.userData.roof.material.color.set(pal.roof); if (b.userData.detail) b.userData.detail.color.set(dark ? 0x2a2d34 : 0x8a9099); if (b.userData.edge) b.userData.edge.material.color.set(pal.edge); }
-      applyStatus();
-    }
-    if ('MutationObserver' in root) new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     var buildings = {}, equipment = [], flows = [], focused = null, paused = false, status = indexStatus(opts.status && opts.status());
+    var L = layout(typeof opts.basis === 'function' ? opts.basis() : opts.basis);
 
     function box(w, h, d, m) { var g = new T.Mesh(new T.BoxGeometry(w, h, d), m); return g; }
     function edges(w, h, d, color) { var e = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(w, h, d)), new T.LineBasicMaterial({ color: color || pal.edge })); return e; }
@@ -92,20 +129,30 @@
      * comes from RZCxAssets — merged, vertex-shaded primitives at the family footprint, y from the floor — and
      * falls back to a plain box when that module is absent, so the campus never fails for a missing asset. */
     var assets = root.RZCxAssets, shaped = 0;
-    function family(systemId, count, w, h, d, place, meta) {
+    /* A family is allocated at its CAPACITY (the most the drawn room holds) and draws L.families[id].count of it, so a
+     * changed IT load, rack density or cooling type re-lays the plant without rebuilding a mesh (setBasis). place(i, L)
+     * returns [x, ry, z, y] for unit i under the current layout. */
+    function family(systemId, cap, w, h, d, place, meta) {
       var geo = assets && assets.build(T, systemId, w, h, d), isShape = !!(geo && geo.attributes.color);
       if (isShape) shaped++; else geo = new T.BoxGeometry(w, h, d).translate(0, h / 2, 0);
-      var im = new T.InstancedMesh(geo, new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, metalness: 0, flatShading: true, vertexColors: isShape }), count); im.instanceMatrix.setUsage(T.DynamicDrawUsage);
-      var hull = new T.InstancedMesh(geo, outlineMat, count);                                            /* same geometry, back faces, 4 % larger: a dark line around each unit */
-      var o = new T.Object3D();
-      for (var i = 0; i < count; i++) {
-        var p = place(i); o.position.set(p[0], p[3] || 0, p[2]); o.rotation.y = p[1] || 0; o.scale.set(1, 1, 1); o.updateMatrix(); im.setMatrixAt(i, o.matrix); im.setColorAt(i, new T.Color(TAG_HEX.none));
-        o.scale.set(1.04, 1.04, 1.04); o.updateMatrix(); hull.setMatrixAt(i, o.matrix);
-      }
+      var im = new T.InstancedMesh(geo, new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, metalness: 0, flatShading: true, vertexColors: isShape }), cap); im.instanceMatrix.setUsage(T.DynamicDrawUsage);
+      var hull = new T.InstancedMesh(geo, outlineMat, cap);                                              /* same geometry, back faces, 4 % larger: a dark line around each unit */
       hull.visible = false; im.add(hull);                                                              /* outlines are sub-pixel at campus scale; focus() shows them for the focused building only */
-      im.userData = { system: systemId, label: meta && meta.label, building: meta && meta.building, shaped: isShape ? 'primitives' : 'box', hull: hull }; equipment.push(im); return im;
+      im.userData = { system: systemId, label: meta && meta.label, building: meta && meta.building, shaped: isShape ? 'primitives' : 'box', hull: hull, place: place, cap: cap, geoLo: geo, geoHi: null, size: [w, h, d] };
+      equipment.push(im); layoutFamily(im); return im;
     }
-    function tint(im) { var r = status.byId[im.userData.system], c = new T.Color(TAG_HEX[(r && r.tag) || 'none']); for (var i = 0; i < im.count; i++) im.setColorAt(i, c); im.instanceColor.needsUpdate = true; }
+    var _o = new T.Object3D();
+    function layoutFamily(im) {
+      var f = L.families[im.userData.system], count = Math.min(im.userData.cap, f ? f.count : im.userData.cap), hull = im.userData.hull;
+      for (var i = 0; i < count; i++) {
+        var p = im.userData.place(i, L); _o.position.set(p[0], p[3] || 0, p[2]); _o.rotation.y = p[1] || 0; _o.scale.set(1, 1, 1); _o.updateMatrix(); im.setMatrixAt(i, _o.matrix); im.setColorAt(i, new T.Color(TAG_HEX.none));
+        _o.scale.set(1.04, 1.04, 1.04); _o.updateMatrix(); hull.setMatrixAt(i, _o.matrix);
+      }
+      im.count = count; hull.count = count; im.userData.drawn = count; im.userData.all = f ? f.all : count; im.userData.basis = f ? f.basis : '';
+      im.visible = count > 0; im.instanceMatrix.needsUpdate = true; hull.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true;
+      im.computeBoundingSphere();
+    }
+    function tint(im) { var r = status.byId[im.userData.system], c = new T.Color(TAG_HEX[(r && r.tag) || 'none']); for (var i = 0; i < im.count; i++) im.setColorAt(i, c); if (im.instanceColor) im.instanceColor.needsUpdate = true; }
 
     function building(spec) {
       var g = new T.Group(); g.position.set(spec.x, 0, spec.z); g.userData = { building: spec.id, name: spec.name };
@@ -132,59 +179,70 @@
       }
       scene.add(g); buildings[spec.id] = g; return g;
     }
-    var counts = opts.counts || {};
-    function cnt(k, d) { return Math.max(1, Math.min(counts[k] || d, 40)); }
-
-    /* ---- the hall: rack rows, CDUs at the row ends, CRAH along the long walls, LV/UPS room east, control room ---- */
-    var hall = building(SITE.hall), hi = hall.userData.inner;
-    var rows = 10, perRow = 22, pitch = 3.1;
-    hi.add(family('racks', rows * perRow, 0.6, 2.2, 1.2, function (i) { var r = Math.floor(i / perRow), c = i % perRow; return [-24 + c * 0.9, 0, -14 + r * pitch + 0.2]; }, { building: 'hall', label: 'rack rows' }));
-    hi.add(family('cdu', rows * 2, 1.2, 2.0, 1.0, function (i) { var r = Math.floor(i / 2), s = i % 2; return [s ? -3.2 + 0.9 * perRow - 24 + 1.6 : -26, 0, -14 + r * pitch + 0.2]; }, { building: 'hall', label: 'CDUs, end of row' }));
-    hi.add(family('crah', 16, 2.4, 2.6, 1.0, function (i) { var side = i < 8 ? -1 : 1, k = i % 8; return [-26 + k * 7.2, 0, side * 14.6]; }, { building: 'hall', label: 'CRAH / fan walls' }));
-    hi.add(family('ups', 8, 1.0, 2.2, 0.9, function (i) { return [22 + (i % 4) * 1.4, 0, -12 + Math.floor(i / 4) * 2.4]; }, { building: 'hall', label: 'UPS' }));
-    hi.add(family('unit_subs', 4, 2.2, 2.4, 1.6, function (i) { return [22 + i * 2.6, 0, -4]; }, { building: 'hall', label: 'unit substations' }));
-    hi.add(family('lv_busway', 4, 1.6, 2.2, 0.8, function (i) { return [22 + i * 2.6, 0, 0.5]; }, { building: 'hall', label: 'LV switchboards' }));
-    hi.add(family('bms', 3, 0.8, 2.0, 0.8, function (i) { return [24 + i * 1.2, 0, 8]; }, { building: 'hall', label: 'BMS / EPMS / OT racks' }));
-    hi.add(family('fire', 2, 1.6, 1.6, 0.8, function (i) { return [24 + i * 2.2, 0, 12]; }, { building: 'hall', label: 'fire panel + agent' }));
+    /* ---- the hall: rack rows (pitch 3.1 m, racks 0.9 m), CDUs at the row ends, CRAH along the long walls, electrical room east ---- */
+    var hall = building(SITE.hall), hi = hall.userData.inner, pitch = 3.1;
+    function rowX0(l) { return -(l.perRow - 1) * 0.9 / 2; }
+    function rowZ(l, r) { return -(l.rows - 1) * pitch / 2 + r * pitch; }
+    hi.add(family('racks', CAP.rows * CAP.perRow, 0.6, 2.2, 1.2, function (i, l) { var r = Math.floor(i / l.perRow), c = i % l.perRow; return [rowX0(l) + c * 0.9, 0, rowZ(l, r)]; }, { building: 'hall', label: 'rack rows' }));
+    hi.add(family('cdu', CAP.rows * 2, 1.2, 2.0, 1.0, function (i, l) { var r = Math.floor(i / 2), s = i % 2; return [s ? rowX0(l) + (l.perRow - 1) * 0.9 + 1.7 : rowX0(l) - 1.7, 0, rowZ(l, r)]; }, { building: 'hall', label: 'CDUs, end of row' }));
+    hi.add(family('crah', CAP.crahPerWall * 2, 2.4, 2.6, 1.0, function (i, l) { var n = Math.max(1, l.crahPerWall), side = i < n ? -1 : 1, k = i % n, sp = Math.min(7.2, 52 / n); return [-26 + sp / 2 + k * sp, 0, side * 14.6]; }, { building: 'hall', label: 'CRAH / fan walls' }));
+    hi.add(family('ups', CAP.ups, 1.0, 2.2, 0.9, function (i) { return [21.5 + (i % 8) * 1.1, 0, -13 + Math.floor(i / 8) * 2.4]; }, { building: 'hall', label: 'UPS' }));
+    hi.add(family('unit_subs', CAP.unit_subs, 2.2, 2.4, 1.6, function (i) { return [22 + (i % 3) * 2.8, 0, -6.5 + Math.floor(i / 3) * 2.4]; }, { building: 'hall', label: 'unit substations' }));
+    hi.add(family('lv_busway', CAP.lv_busway, 1.6, 2.2, 0.8, function (i) { return [22 + (i % 3) * 2.8, 0, 0.5 + Math.floor(i / 3) * 1.6]; }, { building: 'hall', label: 'LV switchboards' }));
+    hi.add(family('bms', CAP.bms, 0.8, 2.0, 0.8, function (i) { return [24 + i * 1.2, 0, 8]; }, { building: 'hall', label: 'BMS / EPMS / OT racks' }));
+    hi.add(family('fire', CAP.fire, 1.6, 1.6, 0.8, function (i) { return [24 + i * 2.2, 0, 12]; }, { building: 'hall', label: 'fire panel + agent' }));
     /* plant: chillers, FWS pumps */
     var plant = building(SITE.plant), pi = plant.userData.inner;
-    pi.add(family('chillers', cnt('chillers', 6), 5, 2.6, 2.4, function (i) { return [-14 + (i % 6) * 5.6, 0, -6 + Math.floor(i / 6) * 5]; }, { building: 'plant', label: 'chillers' }));
-    pi.add(family('fws', cnt('pumps', 8), 1.4, 1.4, 2.4, function (i) { return [-14 + (i % 8) * 3.6, 0, 7]; }, { building: 'plant', label: 'FWS pumps' }));
+    pi.add(family('chillers', CAP.chillers, 5, 2.6, 2.4, function (i) { return [-14 + (i % 6) * 5.6, 0, -6 + Math.floor(i / 6) * 5]; }, { building: 'plant', label: 'chillers' }));
+    pi.add(family('fws', CAP.fws, 1.4, 1.4, 2.4, function (i) { return [-14 + (i % 8) * 3.6, 0, 7]; }, { building: 'plant', label: 'FWS pumps' }));
     /* yards (no roof): equipment always visible */
     var dry = building(SITE.dry); dry.userData.inner.visible = true;
-    dry.userData.inner.add(family('dry_coolers', cnt('coolers', 14), 4, 2.4, 2.4, function (i) { return [-32 + (i % 14) * 4.8, 0, -3 + Math.floor(i / 14) * 5]; }, { building: 'dry', label: 'dry coolers' }));
+    dry.userData.inner.add(family('dry_coolers', CAP.dry_coolers, 4, 2.4, 2.4, function (i) { return [-32 + (i % 14) * 4.8, 0, -3]; }, { building: 'dry', label: 'dry coolers' }));
     var gens = building(SITE.gens); gens.userData.inner.visible = true;
-    gens.userData.inner.add(family('generators', cnt('generators', 8), 3, 3.2, 12, function (i) { return [-10 + (i % 4) * 6, 0, -8 + Math.floor(i / 4) * 16]; }, { building: 'gens', label: 'generators' }));
+    gens.userData.inner.add(family('generators', CAP.generators, 3, 3.2, 12, function (i) { return [-10 + (i % 4) * 6, 0, -8 + Math.floor(i / 4) * 16]; }, { building: 'gens', label: 'generators' }));
     var sub = building(SITE.sub); sub.userData.inner.visible = true;
-    sub.userData.inner.add(family('hv_intake', 4, 2, 7, 2, function (i) { return [-20 + i * 5, 0, 8]; }, { building: 'sub', label: '150 kV bays' }));
-    sub.userData.inner.add(family('main_tx', cnt('transformers', 2), 6, 4.5, 4, function (i) { return [-14 + i * 10, 0, 0]; }, { building: 'sub', label: '150/20 kV transformers' }));
-    sub.userData.inner.add(family('mv_board', 1, 20, 5, 8, function () { return [10, 0, -6]; }, { building: 'sub', label: '20 kV GIS hall' }));
+    sub.userData.inner.add(family('hv_intake', CAP.hv_intake, 2, 7, 2, function (i) { return [-22 + i * 5, 0, 9]; }, { building: 'sub', label: '150 kV bays' }));
+    sub.userData.inner.add(family('main_tx', CAP.main_tx, 6, 4.5, 4, function (i) { return [-18 + i * 9, 0, 2]; }, { building: 'sub', label: '150/20 kV transformers' }));
+    sub.userData.inner.add(family('mv_board', CAP.mv_board, 20, 5, 8, function () { return [10, 0, -8]; }, { building: 'sub', label: '20 kV GIS hall' }));
     /* roads */
     [[0, 22, 200, 4], [-40, 0, 4, 60], [40, 0, 4, 60]].forEach(function (r) { var m = box(r[2], 0.12, r[3], mat.road); m.position.set(r[0], 0.06, r[1]); scene.add(m); });
 
     /* ---- flows: polylines with particle streams. Speed ∝ design flow; labelled "design simulation" ---- */
-    var itKw = opts.itLoadKw || 2000, fwsLps = itKw / (4.18 * 10);   // ΔT 10 K on the FWS, water
-    var speedScale = Math.min(2.5, Math.max(0.6, Math.sqrt(itKw / 10000)));
-    function flow(id, color, pts, n, speed, lineOpts) {
+    /* Speeds scale with the basis: electrical with √(kW), the liquid loops with the FWS share, the air path with the CHW share.
+     * A loop the basis does not have (FWS/TCS on an air-cooled hall) stays a faint line with no stream. */
+    function speeds(l) {
+      var s = Math.min(2.5, Math.max(0.6, Math.sqrt(l.kw / 10000))), liq = l.liquid ? s : 0, air = l.liquidShare < 1 ? s * Math.max(0.4, 1 - l.liquidShare) : 0;
+      return { hv: 0.10, mv: 0.12, lv: 0.16, fws_s: 0.07 * liq, fws_r: 0.07 * liq, dry_s: 0.06 * s, dry_r: 0.06 * s, tcs: 0.09 * liq, chw: 0.05 * air, gen: 0 };
+    }
+    function flow(id, color, pts, n, lineOpts) {
       var v = pts.map(function (p) { return new T.Vector3(p[0], p[1], p[2]); });
       var curve = new T.CatmullRomCurve3(v, false, 'catmullrom', 0.0);
       var line = new T.Line(new T.BufferGeometry().setFromPoints(curve.getPoints(40)), new T.LineBasicMaterial({ color: color, transparent: true, opacity: lineOpts && lineOpts.faint ? 0.35 : 0.8 })); scene.add(line);
       var pos = new Float32Array(n * 3), geo = new T.BufferGeometry(); geo.setAttribute('position', new T.BufferAttribute(pos, 3));
       var pm = new T.PointsMaterial({ color: color, size: phone ? 1.4 : 2.2, sizeAttenuation: false }); var pts3 = new T.Points(geo, pm); scene.add(pts3);
-      var f = { id: id, curve: curve, n: n, pos: pos, geo: geo, speed: speed, t: 0, points: pts3, line: line }; flows.push(f); step(f, 0); return f;
+      var f = { id: id, curve: curve, n: n, pos: pos, geo: geo, speed: 0, t: 0, points: pts3, line: line, faint: !!(lineOpts && lineOpts.faint) }; flows.push(f); return f;
     }
     function step(f, dt) { f.t = (f.t + dt * f.speed) % 1; for (var i = 0; i < f.n; i++) { var p = f.curve.getPointAt((f.t + i / f.n) % 1); f.pos[i * 3] = p.x; f.pos[i * 3 + 1] = p.y; f.pos[i * 3 + 2] = p.z; } f.geo.attributes.position.needsUpdate = true; }
-    flow('hv', MED.hv, [[-30, 7, 70], [-30, 7, 50], [-28, 7, 50]], 10, 0.10);
-    flow('mv', MED.mv, [[-8, 5, 36], [-8, 5, 24], [24, 3, 24], [24, 3, 16]], 14, 0.12);
-    flow('lv', MED.lv, [[24, 2.5, 12], [24, 2.5, -6], [-20, 2.5, -6], [-20, 2.5, 12]], 20, 0.16);
-    flow('fws_s', MED.supply, [[-46, 1.2, -4], [-32, 1.2, -4], [-32, 1.2, 12]], 16, 0.07 * speedScale);
-    flow('fws_r', MED.ret, [[-32, 2.2, 12], [-32, 2.2, -8], [-46, 2.2, -8]], 16, 0.07 * speedScale);
-    flow('dry_s', MED.supply, [[-50, 1.2, -12], [-50, 1.2, -32], [10, 1.2, -32]], 16, 0.06 * speedScale);
-    flow('dry_r', MED.ret, [[10, 2.2, -34], [-52, 2.2, -34], [-52, 2.2, -12]], 16, 0.06 * speedScale);
-    flow('tcs', MED.supply, [[-26, 1, -13], [26, 1, -13], [26, 1, 14], [-26, 1, 14]], 24, 0.09 * speedScale);
-    flow('chw', MED.chw, [[-44, 1.2, 6], [-34, 1.2, 6], [-34, 1.2, 15.5], [26, 1.2, 15.5]], 12, 0.05 * speedScale, { faint: true });
-    flow('gen', MED.mv, [[44, 3, 0], [34, 3, 0], [34, 3, 10]], 1, 0.0, { faint: true });   // ATS normally open: a line, no stream
-    if (note) note.textContent = 'Design simulation · particle speed ∝ design flow · FWS ≈ ' + Math.round(fwsLps) + ' L/s at ΔT 10 K for ' + Math.round(itKw).toLocaleString('en-US') + ' kW IT · 150 kV red · 20 kV amber · 400 V green · supply cyan · return amber · Representative, conceptual site basis';
+    flow('hv', MED.hv, [[-30, 7, 70], [-30, 7, 50], [-28, 7, 50]], 10);
+    flow('mv', MED.mv, [[-8, 5, 36], [-8, 5, 24], [24, 3, 24], [24, 3, 16]], 14);
+    flow('lv', MED.lv, [[24, 2.5, 12], [24, 2.5, -6], [-20, 2.5, -6], [-20, 2.5, 12]], 20);
+    flow('fws_s', MED.supply, [[-46, 1.2, -4], [-32, 1.2, -4], [-32, 1.2, 12]], 16);
+    flow('fws_r', MED.ret, [[-32, 2.2, 12], [-32, 2.2, -8], [-46, 2.2, -8]], 16);
+    flow('dry_s', MED.supply, [[-50, 1.2, -12], [-50, 1.2, -32], [10, 1.2, -32]], 16);
+    flow('dry_r', MED.ret, [[10, 2.2, -34], [-52, 2.2, -34], [-52, 2.2, -12]], 16);
+    flow('tcs', MED.supply, [[-26, 1, -13], [26, 1, -13], [26, 1, 14], [-26, 1, 14]], 24);
+    flow('chw', MED.chw, [[-44, 1.2, 6], [-34, 1.2, 6], [-34, 1.2, 15.5], [26, 1.2, 15.5]], 12, { faint: true });
+    flow('gen', MED.mv, [[44, 3, 0], [34, 3, 0], [34, 3, 10]], 1, { faint: true });   // ATS normally open: a line, no stream
+    function applyBasis() {
+      var sp = speeds(L);
+      for (var i = 0; i < flows.length; i++) { var f = flows[i]; f.speed = sp[f.id] || 0; f.points.visible = f.speed > 0; f.line.material.opacity = f.speed > 0 && !f.faint ? 0.8 : 0.35; step(f, 0); }
+      for (var q = 0; q < equipment.length; q++) layoutFamily(equipment[q]);
+      if (note) note.textContent = 'Design simulation · particle speed ∝ design flow · ' + Math.round(L.kw).toLocaleString('en-US') + ' kW IT at ' + L.rackKw + ' kW per rack' +
+        (L.liquid ? ' · ' + Math.round(L.liquidShare * 100) + ' % liquid (' + L.coolingType.toUpperCase() + '): FWS ≈ ' + Math.round(L.fwsLps) + ' L/s at ΔT 10 K' : ' · air-cooled: FWS 0 L/s at ΔT 10 K') +
+        ' · CHW ≈ ' + Math.round(L.chwLps) + ' L/s at ΔT 6 K' + (L.halls > 1 ? ' · hall 1 of ' + L.halls + ' drawn' : '') +
+        ' · 150 kV red · 20 kV amber · 400 V green · supply cyan · return amber · Representative, conceptual site basis';
+    }
+    applyBasis();
 
     /* ---- status tint ---- */
     function applyStatus() {
@@ -205,7 +263,13 @@
         b.userData.edge.material.opacity = dim ? 0.3 : 1; b.userData.edge.material.transparent = true;
         if (b.userData.inner.visible && SITE[k].h) b.userData.inner.children.forEach(function (c) { c.visible = true; });
       }
-      for (var q = 0; q < equipment.length; q++) { var hq = equipment[q].userData.hull; if (hq) hq.visible = !!focused && equipment[q].userData.building === focused; }
+      for (var q = 0; q < equipment.length; q++) {
+        var eq = equipment[q], hq = eq.userData.hull, near = !!focused && eq.userData.building === focused;
+        if (hq) hq.visible = near && eq.count < 100;                                            /* K16: no outline hull on a dense family (racks) — 334 outlines at 0.9 m pitch read as one grey mass */
+        /* LOD: the focused building draws the high-detail twin of each family (K17); everything else the low one */
+        var want = near && eq.userData.geoHi ? eq.userData.geoHi : eq.userData.geoLo;
+        if (eq.geometry !== want) { eq.geometry = want; if (hq) hq.geometry = want; eq.userData.lod = near && eq.userData.geoHi ? 'hi' : 'lo'; eq.computeBoundingSphere(); }
+      }
       anim.target = focused && buildings[focused].userData.roof ? 1 : 0;
       if (crumb) crumb.innerHTML = '<button type="button" data-crumb="">Campus</button>' + (focused ? ' › <b>' + SITE[focused].name + '</b>' : '');
       host.setAttribute('data-cx-focus', focused || '');
@@ -261,13 +325,16 @@
     /* ---- callouts: one per equipment family of the focused building, stacked at the stage margin, a dashed leader to the unit ---- */
     var NS = 'http://www.w3.org/2000/svg', coHost = document.createElement('div'); coHost.className = 'cx-3d-callouts'; coHost.setAttribute('aria-hidden', 'true'); stage.appendChild(coHost);
     var coSvg = document.createElementNS(NS, 'svg'); coHost.appendChild(coSvg); var coEls = [], _m = new T.Matrix4(), _p = new T.Vector3();
+    var coRects = [];                                                                          /* callout boxes of the last placement, read by placeLabels() */
     function calloutTargets() {
       var out = []; if (!focused) return out;
       for (var i = 0; i < equipment.length; i++) {
         var im = equipment[i]; if (im.userData.building !== focused || !im.visible || !im.parent || !im.parent.visible) continue;
         im.getMatrixAt(0, _m); _p.setFromMatrixPosition(_m); var top = im.geometry.boundingBox ? im.geometry.boundingBox.max.y : 2; _p.y += top; _p.applyMatrix4(im.matrixWorld);
         var r = status.byId[im.userData.system];
-        out.push({ im: im, world: _p.clone(), text: (im.userData.label || im.userData.system) + ' · ' + im.count + (r && r.level ? ' · ' + r.level : ''), tag: (r && r.tag) || 'none' });
+        /* K18: the callout carries the count the basis implies, its one-line basis, and the system's state at the viewed month */
+        var state = r && r.level ? r.level + (r.inTest && r.next ? ' → ' + r.next + ' in test' : '') : (r && r.inTest && r.next ? r.next + ' in test' : 'not started');
+        out.push({ im: im, world: _p.clone(), text: (im.userData.label || im.userData.system) + ' · ' + (im.userData.all || im.count) + (im.userData.basis ? ' · ' + im.userData.basis : '') + ' · ' + state, tag: (r && r.tag) || 'none' });
       }
       return out;
     }
@@ -278,6 +345,7 @@
       var left = list.filter(function (a) { return a.ax < w / 2; }).sort(function (a, b) { return a.ay - b.ay; }), right = list.filter(function (a) { return a.ax >= w / 2; }).sort(function (a, b) { return a.ay - b.ay; });
       function column(col, side) { var y = 18; for (var i = 0; i < col.length; i++) { var a = col[i]; a.ly = Math.max(y, Math.min(h - 26, a.ay - 40)); y = a.ly + 26; a.lx = side < 0 ? 14 : w - 14 - a.wpx; } }
       column(left, -1); column(right, 1);
+      coRects = list.map(function (a) { return { left: a.lx - 4, right: a.lx + a.wpx + 4, top: a.ly - 2, bottom: a.ly + 24 }; });
       for (var k = 0; k < coEls.length; k++) {
         var c = coEls[k], a = list[k];
         if (!a) { if (!c.el.hidden) { c.el.hidden = true; c.ln.setAttribute('visibility', 'hidden'); c.dt.setAttribute('visibility', 'hidden'); } continue; }
@@ -298,7 +366,7 @@
         rows.push({ el: el, k: k, x: x, y: y, wpx: txt.length * 6.7 + 30, txt: txt });
       }
       rows.sort(function (a, b) { return a.y - b.y; });
-      var placed = [];
+      var placed = coRects.slice();                                                           /* building labels yield to the callout stack (previous frame's boxes) */
       for (var i = 0; i < rows.length; i++) {
         var r = rows[i]; r.x = Math.max(6, Math.min(w - r.wpx + 10, r.x)); var top = r.y - 28, bottom = top + 22, left = r.x - 4, right = left + r.wpx;
         for (var j = 0; j < placed.length; j++) { var q = placed[j]; if (left < q.right && right > q.left && top < q.bottom + 3 && bottom > q.top - 3) { var dy = q.bottom + 4 - top; top += dy; bottom += dy; r.y += dy; } }
@@ -334,18 +402,31 @@
       var libUrl = (opts.assetsUrl || ((opts.base || 'js/') + '../assets/cx/campus-equipment.glb')) + '?v=' + encodeURIComponent(root.RZ_VERSION || '');
       assets.loadLibrary(T, libUrl, function (lib) {
         if (!lib) { host.setAttribute('data-cx-assets', 'primitives'); return; }
-        var n = 0;
+        var n = 0, nHi = 0;
         for (var i = 0; i < equipment.length; i++) {
-          var im = equipment[i], g = lib[im.userData.system]; if (!g) continue;
-          var old = im.geometry; im.geometry = g; im.userData.hull.geometry = g; im.material.vertexColors = true; im.material.needsUpdate = true; im.userData.shaped = 'glb'; if (old !== g) old.dispose(); n++;
+          var im = equipment[i], g = lib[im.userData.system], gh = lib[im.userData.system + '_hi']; if (!g) continue;
+          var old = im.geometry; im.userData.geoLo = g; im.userData.geoHi = gh || null; if (gh) nHi++;
+          var near = !!focused && im.userData.building === focused, want = near && gh ? gh : g;
+          im.geometry = want; im.userData.hull.geometry = want; im.userData.lod = want === gh ? 'hi' : 'lo'; im.material.vertexColors = true; im.material.needsUpdate = true; im.userData.shaped = 'glb'; if (old !== g && old !== gh) old.dispose(); im.computeBoundingSphere(); n++;
         }
-        host.setAttribute('data-cx-assets', n ? 'glb' : 'primitives'); host.setAttribute('data-cx-assets-count', String(n)); draw();
+        host.setAttribute('data-cx-assets', n ? 'glb' : 'primitives'); host.setAttribute('data-cx-assets-count', String(n)); host.setAttribute('data-cx-assets-hi', String(nHi)); draw();
       });
+    }
+    /* probe(): what the viewer sees — renders one frame and reads five pixels (centre + quarter points) back from the GL
+     * buffer; the gate asserts the canvas is light in BOTH page themes (K16) from the render, not from the source. */
+    function probe() {
+      renderer.render(scene, cam);
+      var g = renderer.getContext(), w = g.drawingBufferWidth, h = g.drawingBufferHeight, px = new Uint8Array(4), out = [], pts = [[0.5, 0.5], [0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]];
+      for (var i = 0; i < pts.length; i++) { g.readPixels(Math.floor(w * pts[i][0]), Math.floor(h * pts[i][1]), 1, 1, g.RGBA, g.UNSIGNED_BYTE, px); out.push((0.2126 * px[0] + 0.7152 * px[1] + 0.0722 * px[2]) / 255); }
+      var min = Math.min.apply(null, out), avg = out.reduce(function (a, b) { return a + b; }, 0) / out.length;
+      return { lum: out, min: min, avg: avg };
     }
     var api = {
       setStatus: function (st) { status = indexStatus(st); applyStatus(); },
-      setPaused: setPaused, focus: focus, preset: preset,
-      stats: function () { return { fps: lastFps, quality: quality, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, equipment: equipment.length, shaped: shaped, assets: host.getAttribute('data-cx-assets') || 'primitives', glb: equipment.filter(function (e) { return e.userData.shaped === 'glb'; }).length, callouts: coEls.filter(function (c) { return !c.el.hidden; }).length, hulls: equipment.filter(function (e) { return e.userData.hull && e.userData.hull.visible; }).length, flows: flows.length, focused: focused, paused: paused }; },
+      setBasis: function (b) { L = layout(typeof b === 'function' ? b() : b); applyBasis(); applyStatus(); },
+      setPaused: setPaused, focus: focus, preset: preset, probe: probe,
+      layout: function () { return L; },
+      stats: function () { return { fps: lastFps, quality: quality, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, equipment: equipment.length, shaped: shaped, assets: host.getAttribute('data-cx-assets') || 'primitives', glb: equipment.filter(function (e) { return e.userData.shaped === 'glb'; }).length, hi: equipment.filter(function (e) { return e.userData.lod === 'hi'; }).length, callouts: coEls.filter(function (c) { return !c.el.hidden; }).length, hulls: equipment.filter(function (e) { return e.userData.hull && e.userData.hull.visible; }).length, flows: flows.length, streams: flows.filter(function (f) { return f.speed > 0; }).length, drawn: equipment.map(function (e) { return [e.userData.system, e.count]; }), focused: focused, paused: paused, canvas: PAL.canvas }; },
       select: function (systemId) { for (var k in SITE) if (SITE[k].systems.indexOf(systemId) !== -1) { focus(k); return k; } return null; }
     };
     host.__rzCampus = api; return api;
@@ -371,6 +452,6 @@
     }
     if (document.readyState === 'complete') arm(); else root.addEventListener('load', arm, { once: true });
   }
-  root.RZCxCampus = { SITE: SITE, TAG_HEX: TAG_HEX, mount: mount, boot: boot, worstTag: worstTag, version: '3.26.0' };
+  root.RZCxCampus = { SITE: SITE, TAG_HEX: TAG_HEX, PAL: PAL, CAP: CAP, layout: layout, mount: mount, boot: boot, worstTag: worstTag, version: '3.29.0' };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.RZCxCampus;
 })(typeof window !== 'undefined' ? window : this);

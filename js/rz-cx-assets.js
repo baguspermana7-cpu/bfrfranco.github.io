@@ -11,7 +11,7 @@
  *   RZCxAssets.TYPES → the family ids the campus draws · RZCxAssets.version */
 (function (root) {
   'use strict';
-  var BODY = 1.0, LIGHT = 0.88, DETAIL = 0.72, GLASS = 0.6, FRAME = 0.42, DARK = 0.3, VENT = 0.25;
+  var BODY = 1.0, LIGHT = 0.92, DETAIL = 0.78, GLASS = 0.68, FRAME = 0.62, DARK = 0.5, VENT = 0.42;   /* ≥ 0.40: the campus multiplies these by a mid-grey tint, so 0.25 read as black (K16) */
   var SEG = 14;
 
   function builder(T) {
