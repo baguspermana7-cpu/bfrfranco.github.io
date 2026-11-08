@@ -241,7 +241,8 @@
       else if (d) { store().remove(d); say('Deleted "' + d + '"'); renderScenarios(S.plan); }
     });
   }
-  function hook(plan) {
+  function hook(plan, monthOnly) {
+    if (monthOnly) return;   // impact and scenarios do not depend on the status month
     renderImpact(plan); renderScenarios(plan); record(); paintHist();
     if (W.focus) { var q = doc.querySelector('#cxAnTimeline [data-cx-bar="' + W.focus + '"]'); if (q && !W.drag) { q.focus(); W.focus = null; } }
   }

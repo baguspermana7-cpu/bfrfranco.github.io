@@ -106,9 +106,11 @@
     var plan = recompute();
     $('cxAnEngineNote').hidden = !!plan;
     renderKpis(plan); renderPlanTable(plan); renderTimeline(plan); renderSchematic(plan); renderStatus(plan); renderCharts(plan); renderInspector(plan); syncCampus();
-    for (var hk = 0; hk < S.hooks.length; hk++) { try { S.hooks[hk](plan); } catch (e) { /* an extension never breaks the tab */ } }
+    runHooks(plan, false);
     $('cxAnState').textContent = !plan ? '' : (S.dirty ? 'Unsaved scenario' : (hasOverrides() ? 'Saved scenario' : 'Approved baseline'));
   }
+  /* extensions (ext, workbench, issues) redraw after a full render, and with month=true after a month change only */
+  function runHooks(plan, month) { for (var hk = 0; hk < S.hooks.length; hk++) { try { S.hooks[hk](plan, month); } catch (e) { /* an extension never breaks the tab */ } } }
   function hasOverrides() { for (var k in S.overrides) if (S.overrides.hasOwnProperty(k)) return true; return false; }
 
   function kpi(label, value, sub, key) { return '<div class="cx-kpi-card' + (key ? ' is-key' : '') + '"><div class="cx-kpi-value">' + value + '</div><div class="cx-kpi-label">' + label + '</div><div class="cx-kpi-sub">' + (sub || '') + '</div></div>'; }
@@ -290,7 +292,7 @@
     $('cxAnRevert').addEventListener('click', function () { var p = store.load(); S.overrides = p.overrides; S.cap = p.siteCrewCap; S.extra = { calendar: p.calendar, lines: p.lines }; S.dirty = false; render(); });
     $('cxAnReset').addEventListener('click', function () { S.overrides = {}; S.cap = null; S.extra = { calendar: { anchor: null, slot: false }, lines: [] }; store.clear(); S.dirty = false; render(); });
     $('cxAnRetry').addEventListener('click', render);
-    $('cxAnMonth').addEventListener('input', function () { S.month = +this.value; renderTimeline(S.plan); renderSchematic(S.plan); renderStatus(S.plan); renderInspector(S.plan); syncCampus(); });
+    $('cxAnMonth').addEventListener('input', function () { S.month = +this.value; renderTimeline(S.plan); renderSchematic(S.plan); renderStatus(S.plan); renderInspector(S.plan); syncCampus(); runHooks(S.plan, true); });
     $('cxAnPrev').addEventListener('click', function () { step(-1); }); $('cxAnNext').addEventListener('click', function () { step(1); });
     $('cxAnPlay').addEventListener('click', function () { if (S.timer) stopPlay(); else { if (S.plan && S.month >= Math.ceil(S.plan.finishMonth)) S.month = 0; this.setAttribute('aria-pressed', 'true'); this.textContent = 'Pause'; S.timer = root.setInterval(function () { if (!S.plan || S.month >= Math.ceil(S.plan.finishMonth)) { stopPlay(); return; } step(1); }, 1200); } });
     $('cxTabAnalysis').addEventListener('click', function (e) {
@@ -308,7 +310,7 @@
     if (typeof root.cxCalculate === 'function') { var orig = root.cxCalculate; root.cxCalculate = function () { var r = orig.apply(this, arguments); if (S.tab === 'analysis') render(); return r; }; }
     if (typeof root.cxSetCurrency === 'function') { var oc = root.cxSetCurrency; root.cxSetCurrency = function (c) { var r = oc.apply(this, arguments); if (S.tab === 'analysis') render(); return r; }; }
   }
-  function step(d) { if (!S.plan) return; var max = Math.ceil(S.plan.finishMonth); S.month = Math.min(max, Math.max(0, S.month + d)); $('cxAnMonth').value = S.month; renderTimeline(S.plan); renderSchematic(S.plan); renderStatus(S.plan); renderInspector(S.plan); syncCampus(); }
+  function step(d) { if (!S.plan) return; var max = Math.ceil(S.plan.finishMonth); S.month = Math.min(max, Math.max(0, S.month + d)); $('cxAnMonth').value = S.month; renderTimeline(S.plan); renderSchematic(S.plan); renderStatus(S.plan); renderInspector(S.plan); syncCampus(); runHooks(S.plan, true); }
   function stopPlay() { if (S.timer) root.clearInterval(S.timer); S.timer = null; var b = $('cxAnPlay'); if (b) { b.setAttribute('aria-pressed', 'false'); b.textContent = 'Play'; } }
 
   /* The 3D plant's site basis (K18): the engine's own mapped input (kW, cooling type, rack density → kW per rack) and its

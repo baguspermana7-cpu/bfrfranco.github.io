@@ -295,6 +295,36 @@ try {
     if (SHOTS) { await page.evaluate(() => document.getElementById('cxWbImpact').scrollIntoView({ block: 'start', behavior: 'instant' })); await page.screenshot({ path: join(SHOTS, 'cx-workbench-1440.png') }); }
     await page.evaluate(() => { localStorage.removeItem('rz-cx-scenarios'); const c = document.getElementById('cxAnCap'); c.value = ''; c.dispatchEvent(new Event('change', { bubbles: true })); document.getElementById('cxAnReset').click(); });
   }
+  /* K22 journey 2 / T9: an issue A on the UPS blocks its next gate on the schematic, the status table and readiness */
+  await page.evaluate(() => { try { localStorage.removeItem('rz-cx-issues'); } catch (e) {} document.getElementById('cxAnReset').click(); });
+  const j2ready = await page.waitForFunction(() => window.RZCxIssuesUI && document.getElementById('cxIsForm'), { timeout: 15000 }).then(() => true).catch(() => false);
+  ok('J2 issue register panel present', j2ready);
+  if (j2ready) {
+    const m = await page.evaluate(() => { const S = window.RZCxAnalysis.state; for (let mo = 0; mo <= Math.ceil(S.plan.finishMonth); mo++) { const r = window.RZCxPlan.statusAt(S.plan, mo).systems.find((x) => x.id === 'ups'); if (r.next === 'L4') return mo; } return -1; });
+    await page.evaluate((m) => { const r = document.getElementById('cxAnMonth'); r.value = String(m); r.dispatchEvent(new Event('input', { bubbles: true })); document.querySelector('#cxAnStatusTable [data-sel="sys:ups"]').click(); }, m);
+    const pre = await page.evaluate(() => ({ verdict: (document.querySelector('.cx-is-verdict') || {}).textContent || '', items: document.querySelectorAll('.cx-is-items input').length }));
+    ok('J2 inspector: readiness for the L4 gate, 5 handbook items, not ready', m >= 0 && /Not ready for the L4 gate/.test(pre.verdict) && pre.items === 5, { m, pre });
+    await page.type('#cxIsTitle', 'UPS-A1 bypass breaker fails to close');
+    await page.select('#cxIsSev', 'A'); await page.select('#cxIsSys', 'ups'); await page.select('#cxIsGate', 'L4');
+    await page.click('#cxIsAdd');
+    const blk = await page.evaluate(() => ({ node: document.querySelectorAll('#cxAnSheets [data-rzd-node="ups"][data-cx-blocked]').length, mark: document.querySelectorAll('#cxAnSheets [data-cx-blocked-mark="ups"]').length, row: (document.querySelector('#cxAnStatusTable tr[data-cx-asset="ups"]') || {}).textContent || '', count: (document.querySelector('[data-cx-blocked-count] b') || {}).textContent, verdict: (document.querySelector('.cx-is-verdict') || {}).textContent || '' }));
+    ok('J2 add A on UPS/L4: node blocked + static marker, row "blocked ISS-01", count 1, readiness names ISS-01 (A)', blk.node >= 1 && blk.mark >= 1 && /blocked ISS-01/.test(blk.row) && blk.count === '1' && /ISS-01 \(A\) open/.test(blk.verdict), blk);
+    await page.evaluate(() => { const r = document.getElementById('cxAnMonth'); r.dispatchEvent(new Event('input', { bubbles: true })); });
+    ok('J2 marker survives a month redraw', await page.evaluate(() => document.querySelectorAll('#cxAnSheets [data-cx-blocked-mark="ups"]').length >= 1));
+    await page.type('#cxIsTitle', '<img src=x onerror=window.__xss=1>'); await page.select('#cxIsSev', 'C'); await page.click('#cxIsAdd');
+    ok('J2 issue title is text, never markup', await page.evaluate(() => !window.__xss && !document.querySelector('#cxIsList img') && /<img src=x/.test(document.getElementById('cxIsList').textContent)));
+    await page.reload({ waitUntil: 'load' }); await page.waitForFunction(() => window.RZCxIssuesUI && document.querySelectorAll('#cxIsList tr[data-is]').length === 2, { timeout: 30000 }).catch(() => {});
+    ok('J2 register survives a reload', await page.evaluate(() => document.querySelectorAll('#cxIsList tr[data-is]').length === 2));
+    await page.evaluate((m) => { const r = document.getElementById('cxAnMonth'); r.value = String(m); r.dispatchEvent(new Event('input', { bubbles: true })); document.querySelector('#cxAnStatusTable [data-sel="sys:ups"]').click(); }, m);
+    await page.click('#cxIsList [data-is-toggle="ISS-01"]');
+    const cl = await page.evaluate(() => ({ node: document.querySelectorAll('#cxAnSheets [data-cx-blocked]').length, count: (document.querySelector('[data-cx-blocked-count] b') || {}).textContent }));
+    ok('J2 close ISS-01 → marker gone, blocked 0', cl.node === 0 && cl.count === '0', cl);
+    for (let k = 0; k < 5; k++) { await page.evaluate((k) => document.querySelectorAll('.cx-is-items input')[k].click(), k); }
+    const rd = await page.evaluate(() => (document.querySelector('.cx-is-verdict') || {}).textContent || '');
+    ok('J2 all five items ticked, no blocker → "Ready for the L4 gate" with the C condition', /^Ready for the L4 gate with 1 condition \(ISS-02\)/.test(rd), rd);
+    if (SHOTS) { await page.evaluate(() => document.getElementById('cxIsPanel').scrollIntoView({ block: 'start', behavior: 'instant' })); await page.screenshot({ path: join(SHOTS, 'cx-issues-1440.png') }); }
+    await page.evaluate(() => { localStorage.removeItem('rz-cx-issues'); });
+  }
   // T12 phone
   await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
   await page.reload({ waitUntil: 'load' }); /* never networkidle on a page with a WebGL loop (feedback_webgl_headless_gate_traps) */ await page.waitForFunction(() => window.RZCxAnalysis && !document.getElementById('cxTabAnalysis').hidden, { timeout: 30000 });
