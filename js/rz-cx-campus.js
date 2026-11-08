@@ -222,7 +222,7 @@
       var pm = new T.PointsMaterial({ color: color, size: phone ? 1.4 : 2.2, sizeAttenuation: false }); var pts3 = new T.Points(geo, pm); scene.add(pts3);
       var f = { id: id, curve: curve, n: n, pos: pos, geo: geo, speed: 0, t: 0, points: pts3, line: line, faint: !!(lineOpts && lineOpts.faint) }; flows.push(f); return f;
     }
-    function step(f, dt) { f.t = (f.t + dt * f.speed) % 1; for (var i = 0; i < f.n; i++) { var p = f.curve.getPointAt((f.t + i / f.n) % 1); f.pos[i * 3] = p.x; f.pos[i * 3 + 1] = p.y; f.pos[i * 3 + 2] = p.z; } f.geo.attributes.position.needsUpdate = true; }
+    function step(f, dt) { f.t = (((f.t + dt * f.speed) % 1) + 1) % 1; for (var i = 0; i < f.n; i++) { var p = f.curve.getPointAt((f.t + i / f.n) % 1); f.pos[i * 3] = p.x; f.pos[i * 3 + 1] = p.y; f.pos[i * 3 + 2] = p.z; } f.geo.attributes.position.needsUpdate = true; }
     flow('hv', MED.hv, [[-30, 7, 70], [-30, 7, 50], [-28, 7, 50]], 10);
     flow('mv', MED.mv, [[-8, 5, 36], [-8, 5, 24], [24, 3, 24], [24, 3, 16]], 14);
     flow('lv', MED.lv, [[24, 2.5, 12], [24, 2.5, -6], [-20, 2.5, -6], [-20, 2.5, 12]], 20);
@@ -251,14 +251,39 @@
       placeLabels(); draw();
     }
     /* ---- focus: roof off, neighbours dim, interior on ---- */
-    var anim = { roof: 0, target: 0, explode: 0, exTarget: 0 };
+    var anim = { roof: 0, target: 0, explode: 0, exTarget: 0, cam: null, camMs: 0 };
+    /* K27: neighbours fade over FADE_MS instead of blinking (Video B: the building is pulled forward, the rest recede) */
+    var FADE_MS = 360, fades = [];
+    function fadeTo(m, to) {
+      m.transparent = true; if (REDUCE) { m.opacity = to; return; }
+      for (var i = 0; i < fades.length; i++) if (fades[i].m === m) { fades.splice(i, 1); break; }
+      if (Math.abs(m.opacity - to) > 0.001) fades.push({ m: m, from: m.opacity, to: to, t0: null });
+    }
+    function stepFades(now) {
+      for (var i = fades.length - 1; i >= 0; i--) { var f = fades[i]; if (f.t0 === null) f.t0 = now; var x = Math.max(0, Math.min(1, (now - f.t0) / FADE_MS)); f.m.opacity = f.from + (f.to - f.from) * ease(x); if (x >= 1) fades.splice(i, 1); }
+    }
+    /* K27: one picked equipment family in the focused building is lit; the rest of that building recede */
+    var picked = null, PICK_HEX = 0x2563eb;
+    function pick(sys) {
+      picked = sys || null;
+      for (var i = 0; i < equipment.length; i++) {
+        var im = equipment[i], mine = !!focused && im.userData.building === focused, on = mine && im.userData.system === picked;
+        im.material.emissive.setHex(on ? PICK_HEX : 0x000000); im.material.emissiveIntensity = on ? 0.9 : 1;
+        fadeTo(im.material, mine && picked && !on ? 0.3 : 1);
+      }
+      paintCrumb(); host.setAttribute('data-cx-pick', picked || ''); draw();
+    }
+    function famLabel(sys) { for (var i = 0; i < equipment.length; i++) if (equipment[i].userData.system === sys) return equipment[i].userData.label || sys; return sys; }
+    function paintCrumb() {
+      if (crumb) crumb.innerHTML = '<button type="button" data-crumb="">Campus</button>' + (focused ? ' › ' + (picked ? '<button type="button" data-crumb="' + focused + '">' + SITE[focused].name + '</button> › <b>' + famLabel(picked) + '</b>' : '<b>' + SITE[focused].name + '</b>') : '');
+    }
     function focus(id) {
-      focused = id || null;
+      focused = id || null; if (picked) pick(null);
       for (var k in buildings) if (buildings.hasOwnProperty(k)) {
         var b = buildings[k], on = !focused || k === focused, dim = focused && k !== focused;
-        if (b.userData.walls) { b.userData.walls.material.opacity = dim ? 0.18 : (k === focused ? 0.22 : 1); b.userData.walls.material.transparent = true; }
-        if (b.userData.roof) { b.userData.roof.material.opacity = dim ? 0.12 : 1; }
-        if (b.userData.detail) { b.userData.detail.opacity = dim ? 0.15 : (k === focused ? 0.22 : 1); }
+        if (b.userData.walls) { fadeTo(b.userData.walls.material, dim ? 0.18 : (k === focused ? 0.22 : 1)); }
+        if (b.userData.roof) { fadeTo(b.userData.roof.material, dim ? 0.12 : 1); }
+        if (b.userData.detail) { fadeTo(b.userData.detail, dim ? 0.15 : (k === focused ? 0.22 : 1)); }
         b.userData.inner.visible = SITE[k].h === 0 || k === focused;
         b.userData.edge.material.opacity = dim ? 0.3 : 1; b.userData.edge.material.transparent = true;
         if (b.userData.inner.visible && SITE[k].h) b.userData.inner.children.forEach(function (c) { c.visible = true; });
@@ -271,39 +296,55 @@
         if (eq.geometry !== want) { eq.geometry = want; if (hq) hq.geometry = want; eq.userData.lod = near && eq.userData.geoHi ? 'hi' : 'lo'; eq.computeBoundingSphere(); }
       }
       anim.target = focused && buildings[focused].userData.roof ? 1 : 0;
-      if (crumb) crumb.innerHTML = '<button type="button" data-crumb="">Campus</button>' + (focused ? ' › <b>' + SITE[focused].name + '</b>' : '');
+      paintCrumb();
       host.setAttribute('data-cx-focus', focused || '');
       if (fitSelBtn) fitSelBtn.disabled = !focused;
       if (!focused && exploded) setExplode(false);
-      fit(focused ? 'sel' : 'site');
+      fit(focused ? 'sel' : 'site', presetPos);
     }
     /* ---- K22: Fit site / Fit selection keep the selection and only move the camera ---- */
-    function fit(k) {
-      var sp = k === 'sel' && focused ? SITE[focused] : null;
-      if (sp) { ctl.target.set(sp.x, 2, sp.z); cam.zoom = Math.max(2.4, Math.min(5, 3.2 * 62 / Math.max(sp.w, sp.d))); } else { ctl.target.set(BOUNDS.cx, 0, BOUNDS.cz); cam.zoom = 1.3; }
-      cam.updateProjectionMatrix(); ctl.update(); placeLabels(); draw();
+    /* K27: ONE eased camera move (CAM_MS, ease-out, PRD §26 350-500 ms) carries target, zoom and orbit position together;
+     * reduced motion: the camera cuts. */
+    var CAM_MS = 450, booted = false;
+    function fit(k, pos) {
+      var sp = k === 'sel' && focused ? SITE[focused] : null, to = sp ? { x: sp.x, y: 2, z: sp.z, zoom: Math.max(2.0, Math.min(4, 2.5 * 62 / Math.max(sp.w, sp.d))) }   /* K27: the building fills the middle of the stage, the callout columns get the margins instead of covering the equipment they name */ : { x: BOUNDS.cx, y: 0, z: BOUNDS.cz, zoom: 1.3 };
+      var off = pos ? new T.Vector3(pos[0], pos[1], pos[2]) : cam.position.clone().sub(ctl.target);
+      if (REDUCE || !booted || !inView || document.hidden) {   /* nobody is watching: cut, an ease off-screen would stall with the paused loop */ ctl.target.set(to.x, to.y, to.z); cam.position.copy(ctl.target).add(off); cam.zoom = to.zoom; anim.cam = null; cam.updateProjectionMatrix(); ctl.update(); placeLabels(); draw(); return; }
+      var mv = anim.cam = { t0: null, fromT: ctl.target.clone(), toT: new T.Vector3(to.x, to.y, to.z), fromOff: cam.position.clone().sub(ctl.target), toOff: off, fromZ: cam.zoom, toZ: to.zoom };
+      /* rAF can be throttled or stopped (background tab, off-screen, a busy main thread): the camera must still land */
+      root.setTimeout(function () { if (anim.cam === mv) { ctl.target.copy(mv.toT); cam.position.copy(mv.toT).add(mv.toOff); cam.zoom = mv.toZ; cam.updateProjectionMatrix(); anim.camMs = CAM_MS * 2; anim.cam = null; ctl.update(); placeLabels(); draw(); } }, CAM_MS * 2);
+      draw();
     }
+    function stepCam(now) {
+      var c = anim.cam; if (!c) return; if (c.t0 === null) c.t0 = now;   /* the clock starts on the first drawn frame: a heavy first frame (LOD swap) must not eat the ease */
+      var x = Math.max(0, Math.min(1, (now - c.t0) / CAM_MS)), e = ease(x);
+      ctl.target.lerpVectors(c.fromT, c.toT, e); _off.lerpVectors(c.fromOff, c.toOff, e); cam.position.copy(ctl.target).add(_off); cam.zoom = c.fromZ + (c.toZ - c.fromZ) * e; cam.updateProjectionMatrix();
+      if (x >= 1) { anim.camMs = now - c.t0; anim.cam = null; }
+    }
+    var _off = new T.Vector3();
     /* ---- K22: explode = the focused building's families each lifted onto its own layer (4 m apart), roof clear above;
      * callouts read matrixWorld, so they stay on their unit. Reduced motion: instant. ---- */
-    var exploded = false, EX_STEP = 4;
+    var exploded = false, EX_STEP = 4, EX_MS = 520, EX_STAGGER = 0.22, presetPos = null;
     function setExplode(on) {
       exploded = !!on; if (exploded && !focused) focus('hall');
-      anim.exTarget = exploded ? 1 : 0; anim.exLast = root.performance ? root.performance.now() : 0; if (REDUCE) anim.explode = anim.exTarget;
+      anim.exTarget = exploded ? 1 : 0; anim.exLast = null;   /* the clock starts on the next drawn frame (rAF time), never on performance.now() */ if (REDUCE) anim.explode = anim.exTarget;
+      var exT = anim.exTarget; root.setTimeout(function () { if (anim.exTarget === exT && anim.explode !== exT) { anim.explode = exT; draw(); } }, EX_MS * 2);   /* lands even when rAF is throttled */
       if (exBtn) exBtn.setAttribute('aria-pressed', String(exploded));
       host.setAttribute('data-cx-explode', exploded ? '1' : '0'); draw();
     }
     function layerOf() { var out = [], n = 0; for (var i = 0; i < equipment.length; i++) { var im = equipment[i]; if (im.userData.building === focused && im.visible) out.push({ im: im, n: ++n }); } return out; }
     function ease(x) { return 1 - Math.pow(1 - x, 3); }
     function applyExplode() {
-      var lay = layerOf(), set = {};
-      for (var i = 0; i < lay.length; i++) { lay[i].im.position.y = ease(anim.explode) * EX_STEP * lay[i].n; set[lay[i].im.uuid] = 1; }
+      var lay = layerOf(), set = {}, N = lay.length, span = 1 + Math.max(0, N - 1) * EX_STAGGER;
+      /* K27: the layers fan out one after another (bottom first), each on its own ease-out — not one rigid lift */
+      for (var i = 0; i < N; i++) { var li = Math.max(0, Math.min(1, anim.explode * span - (lay[i].n - 1) * EX_STAGGER)); lay[i].im.position.y = ease(li) * EX_STEP * lay[i].n; set[lay[i].im.uuid] = 1; }
       for (var j = 0; j < equipment.length; j++) if (!set[equipment[j].uuid] && equipment[j].position.y) equipment[j].position.y = 0;
       return lay.length;
     }
     /* ---- camera presets ---- */
     function preset(k) {
       var d = 220, pos = { campus: [d, d, d], plant: [-d, d * 0.8, d * 0.6], hall: [d * 0.8, d, d * 0.8], sub: [d * 0.4, d, d * 1.2] }[k] || [d, d * 0.9, d];
-      cam.position.set(pos[0], pos[1], pos[2]); if (k === 'plant') focus('plant'); else if (k === 'hall') focus('hall'); else if (k === 'sub') focus('sub'); else focus(null);
+      presetPos = pos; if (k === 'plant') focus('plant'); else if (k === 'hall') focus('hall'); else if (k === 'sub') focus('sub'); else focus(null); presetPos = null;
     }
     /* ---- picking ---- */
     var ray = new T.Raycaster(), ndc = new T.Vector2(), down = null;
@@ -314,14 +355,14 @@
       var hits = ray.intersectObjects(scene.children, true);
       for (var i = 0; i < hits.length; i++) {
         var o = hits[i].object;
-        if (o.userData && o.userData.system) { if (opts.onSelect) opts.onSelect(o.userData.system); return; }
+        if (o.userData && o.userData.system) { if (focused && o.userData.building === focused) pick(picked === o.userData.system ? null : o.userData.system); if (opts.onSelect) opts.onSelect(o.userData.system); return; }
         var b = o.userData && o.userData.building; if (!b && o.parent && o.parent.userData && o.parent.userData.building) b = o.parent.userData.building;
         if (b) { if (focused === b) { if (o.userData.part === 'roof') return; } focus(b); return; }
         if (o === ground) { focus(null); return; }
       }
     });
     if (crumb) crumb.addEventListener('click', function (e) { var b = e.target.closest('[data-crumb]'); if (b) focus(b.getAttribute('data-crumb') || null); });
-    cv.addEventListener('keydown', function (e) { if (e.key === '0') { preset('campus'); e.preventDefault(); } else if (e.key >= '1' && e.key <= '4') { preset(['campus', 'plant', 'hall', 'sub'][+e.key - 1]); e.preventDefault(); } else if (e.key === 'Escape' && focused) { focus(null); e.preventDefault(); } });
+    cv.addEventListener('keydown', function (e) { if (e.key === '0') { preset('campus'); e.preventDefault(); } else if (e.key >= '1' && e.key <= '4') { preset(['campus', 'plant', 'hall', 'sub'][+e.key - 1]); e.preventDefault(); } else if (e.key === 'Escape' && picked) { pick(null); e.preventDefault(); } else if (e.key === 'Escape' && focused) { focus(null); e.preventDefault(); } });
     Array.prototype.forEach.call(host.querySelectorAll('[data-cam]'), function (b) { b.addEventListener('click', function () { preset(b.getAttribute('data-cam')); }); });
     var pauseBtn = host.querySelector('[data-pause]'); if (pauseBtn) pauseBtn.addEventListener('click', function () { setPaused(!paused); });
     var exBtn = host.querySelector('[data-explode]'), fitSelBtn = host.querySelector('[data-fit="sel"]');
@@ -361,24 +402,32 @@
         var r = status.byId[im.userData.system];
         /* K18: the callout carries the count the basis implies, its one-line basis, and the system's state at the viewed month */
         var state = r && r.level ? r.level + (r.inTest && r.next ? ' → ' + r.next + ' in test' : '') : (r && r.inTest && r.next ? r.next + ' in test' : 'not started');
-        out.push({ im: im, world: _p.clone(), text: (im.userData.label || im.userData.system) + ' · ' + (im.userData.all || im.count) + (im.userData.basis ? ' · ' + im.userData.basis : '') + ' · ' + state, tag: (r && r.tag) || 'none' });
+        out.push({ im: im, world: _p.clone(), short: (im.userData.label || im.userData.system) + ' · ' + (im.userData.all || im.count), text: (im.userData.label || im.userData.system) + ' · ' + (im.userData.all || im.count) + (im.userData.basis ? ' · ' + im.userData.basis : '') + ' · ' + state, tag: (r && r.tag) || 'none' });
       }
       return out;
     }
     function placeCallouts() {
       var w = stage.clientWidth, h = stage.clientHeight, list = calloutTargets();
       while (coEls.length < list.length) { var el = document.createElement('span'); el.className = 'cx-3d-co'; coHost.appendChild(el); var ln = document.createElementNS(NS, 'line'), dt = document.createElementNS(NS, 'circle'); dt.setAttribute('r', '2.5'); coSvg.appendChild(ln); coSvg.appendChild(dt); coEls.push({ el: el, ln: ln, dt: dt }); }
-      for (var i = 0; i < list.length; i++) { var a = list[i]; _v.copy(a.world).project(cam); a.ax = (_v.x * 0.5 + 0.5) * w; a.ay = (-_v.y * 0.5 + 0.5) * h; a.wpx = a.text.length * 7 + 26; }
-      var left = list.filter(function (a) { return a.ax < w / 2; }).sort(function (a, b) { return a.ay - b.ay; }), right = list.filter(function (a) { return a.ax >= w / 2; }).sort(function (a, b) { return a.ay - b.ay; });
-      function column(col, side) { var y = 18; for (var i = 0; i < col.length; i++) { var a = col[i]; a.ly = Math.max(y, Math.min(h - 26, a.ay - 40)); y = a.ly + 26; a.lx = side < 0 ? 14 : w - 14 - a.wpx; } }
+      /* K27: a narrow stage (phone) cannot hold two columns of full callouts: one column, label · count only, clamped
+       * inside the stage (the full sentence stays in the building panel and the schematic) */
+      var narrow = w < 640, cw = narrow ? 6.2 : 7;
+      for (var i = 0; i < list.length; i++) { var a = list[i]; if (narrow) a.text = a.short; _v.copy(a.world).project(cam); a.ax = (_v.x * 0.5 + 0.5) * w; a.ay = (-_v.y * 0.5 + 0.5) * h; a.wpx = Math.min(w - 20, a.text.length * cw + 26); }
+      var left = list.filter(function (a) { return narrow || a.ax < w / 2; }).sort(function (a, b) { return a.ay - b.ay; }), right = narrow ? [] : list.filter(function (a) { return a.ax >= w / 2; }).sort(function (a, b) { return a.ay - b.ay; });
+      var pitch = narrow ? 22 : 26;
+      /* K27: a column never sits on the equipment it names — try it near its anchors, stacked at the top and at the
+       * bottom, and keep the placement that covers the fewest anchor points (ties keep "near") */
+      function lay(col, side, mode) { var y = 8, room = h - 8 - col.length * pitch; for (var i = 0; i < col.length; i++) { var a = col[i]; a.ly = mode === 'top' ? 8 + i * pitch : mode === 'bottom' ? 8 + room + i * pitch : Math.max(y, Math.min(8 + room + i * pitch, a.ay - 40)); y = a.ly + pitch; a.lx = side < 0 ? 10 : w - 10 - a.wpx; } }
+      function covered(col) { var n = 0; for (var i = 0; i < col.length; i++) { var c = col[i]; for (var j = 0; j < list.length; j++) { var a = list[j]; if (a.ax > c.lx - 4 && a.ax < c.lx + c.wpx + 4 && a.ay > c.ly - 4 && a.ay < c.ly + pitch) n++; } } return n; }
+      function column(col, side) { var best = null, bn = 1e9; ['near', 'top', 'bottom'].forEach(function (m) { lay(col, side, m); var n = covered(col); if (n < bn) { bn = n; best = m; } }); lay(col, side, best); }
       column(left, -1); column(right, 1);
-      coRects = list.map(function (a) { return { left: a.lx - 4, right: a.lx + a.wpx + 4, top: a.ly - 2, bottom: a.ly + 24 }; });
+      coRects = list.map(function (a) { return { left: a.lx - 4, right: a.lx + a.wpx + 4, top: a.ly - 2, bottom: a.ly + pitch - 2 }; });
       for (var k = 0; k < coEls.length; k++) {
         var c = coEls[k], a = list[k];
         if (!a) { if (!c.el.hidden) { c.el.hidden = true; c.ln.setAttribute('visibility', 'hidden'); c.dt.setAttribute('visibility', 'hidden'); } continue; }
         var onLeft = a.ax < w / 2, ex = onLeft ? a.lx + a.wpx + 2 : a.lx - 2, ey = a.ly + 10, tr = 'translate(' + Math.round(a.lx) + 'px,' + Math.round(a.ly) + 'px)';
         if (c.el.hidden) { c.el.hidden = false; c.ln.setAttribute('visibility', 'visible'); c.dt.setAttribute('visibility', 'visible'); }
-        if (c.el.textContent !== a.text) c.el.textContent = a.text; if (c.el.__tr !== tr) { c.el.__tr = tr; c.el.style.transform = tr; } if (c.el.__tg !== a.tag) { c.el.__tg = a.tag; c.el.setAttribute('data-tag', a.tag); }
+        if (c.el.textContent !== a.text) c.el.textContent = a.text; var mw = Math.round(a.wpx) + 'px'; if (c.el.style.maxWidth !== mw) c.el.style.maxWidth = mw; if (c.el.__tr !== tr) { c.el.__tr = tr; c.el.style.transform = tr; } if (c.el.__tg !== a.tag) { c.el.__tg = a.tag; c.el.setAttribute('data-tag', a.tag); } var pk = a.im.userData.system === picked ? '1' : ''; if (c.el.__pk !== pk) { c.el.__pk = pk; if (pk) c.el.setAttribute('data-picked', '1'); else c.el.removeAttribute('data-picked'); }
         c.ln.setAttribute('x1', ex.toFixed(1)); c.ln.setAttribute('y1', ey.toFixed(1)); c.ln.setAttribute('x2', a.ax.toFixed(1)); c.ln.setAttribute('y2', a.ay.toFixed(1)); c.dt.setAttribute('cx', a.ax.toFixed(1)); c.dt.setAttribute('cy', a.ay.toFixed(1));
       }
     }
@@ -405,20 +454,22 @@
     }
     function frame(now) {
       raf = null;
+      if (lastDraw > now) lastDraw = now - 1000; if (last > now) last = now; if (anim.exLast > now) anim.exLast = now;   /* a clock ahead of rAF time (the step() seam) must not stall the loop */
       /* Ambient flows run at 30 fps; the full rate is spent only while the pointer orbits. */
-      if (!interacting && now - lastDraw < 30) { raf = requestAnimationFrame(frame); return; }
-      var dt = Math.min(0.05, (now - (last || now)) / 1000); last = now; var t0 = now;
+      if (!interacting && !anim.cam && now - lastDraw < 30) { raf = requestAnimationFrame(frame); return; }
+      var dt = Math.max(0, Math.min(0.05, (now - (last || now)) / 1000)); last = now; var t0 = now;
       if (!paused && !REDUCE) for (var i = 0; i < flows.length; i++) if (flows[i].speed) step(flows[i], dt);
       /* time-based (240 ms, ease-out applied in applyExplode) so a slow frame rate never stalls it mid-way */
-      if (anim.explode !== anim.exTarget) { var exd = REDUCE ? 1 : Math.min(0.25, (now - (anim.exLast || now)) / 1000) / 0.24 || 0.05; anim.explode = anim.exTarget > anim.explode ? Math.min(anim.exTarget, anim.explode + exd) : Math.max(anim.exTarget, anim.explode - exd); }
+      if (anim.explode !== anim.exTarget) { var exd = REDUCE ? 1 : Math.min(0.25, Math.max(0, now - (anim.exLast || now)) / 1000) / (EX_MS / 1000) || 0.05; anim.explode = anim.exTarget > anim.explode ? Math.min(anim.exTarget, anim.explode + exd) : Math.max(anim.exTarget, anim.explode - exd); }
       anim.exLast = now;
+      stepCam(now); stepFades(now);
       var exLayers = applyExplode();
       if (anim.roof !== anim.target) { anim.roof += (anim.target - anim.roof) * (REDUCE ? 1 : 0.18); if (Math.abs(anim.target - anim.roof) < 0.01) anim.roof = anim.target; }
       for (var k in buildings) if (buildings.hasOwnProperty(k)) { var b = buildings[k]; if (b.userData.roof) { var lift = (k === focused ? anim.roof : 0); b.userData.roof.position.y = SITE[k].h + 0.25 + lift * 9 + (k === focused ? ease(anim.explode) * EX_STEP * (exLayers + 1) : 0); b.userData.roof.material.opacity = Math.min(b.userData.roof.material.opacity, 1 - lift * 0.85); b.userData.roof.material.transparent = true; } }
       ctl.update(); renderer.render(scene, cam); placeLabels(); placeCallouts();
       lastDraw = now; frames++; fpsAcc += dt; busy += (root.performance ? root.performance.now() : now) - t0;
       if (fpsAcc >= 1) { fps = frames / fpsAcc; lastFps = fps; adapt(Math.max(busy / frames, 1000 / fps)); frames = 0; fpsAcc = 0; busy = 0; }
-      if (inView && (!(paused || REDUCE) || anim.roof !== anim.target || anim.explode !== anim.exTarget)) raf = requestAnimationFrame(frame);
+      if (inView && (!(paused || REDUCE) || anim.roof !== anim.target || anim.explode !== anim.exTarget || anim.cam || fades.length)) raf = requestAnimationFrame(frame);
     }
     function draw() { if (!raf) raf = requestAnimationFrame(frame); }
     ctl.addEventListener('change', draw); ctl.addEventListener('start', function () { interacting = true; }); ctl.addEventListener('end', function () { interacting = false; });
@@ -426,6 +477,7 @@
     if ('IntersectionObserver' in root) new IntersectionObserver(function (es) { inView = es[0].isIntersecting; if (inView) draw(); else if (raf) { cancelAnimationFrame(raf); raf = null; } }, { threshold: 0.05 }).observe(stage);
     document.addEventListener('visibilitychange', function () { if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = null; } } else if (inView) draw(); });
     resize(); preset('campus'); applyStatus();
+    booted = true;
     host.setAttribute('data-cx-3d', 'ready');
     /* the Blender library replaces the primitive shapes when it arrives; until then (or without it) the primitives stand */
     host.setAttribute('data-cx-assets', 'primitives');
@@ -455,10 +507,13 @@
     var api = {
       setStatus: function (st) { status = indexStatus(st); applyStatus(); },
       setBasis: function (b) { L = layout(typeof b === 'function' ? b() : b); applyBasis(); applyStatus(); },
-      setPaused: setPaused, focus: focus, preset: preset, probe: probe, explode: setExplode, fit: fit,
+      setPaused: setPaused, focus: focus, pick: pick, preset: preset, probe: probe, explode: setExplode, fit: fit,
       exploded: function () { return { factor: anim.explode, layers: layerOf().map(function (l) { return { system: l.im.userData.system, y: l.im.position.y }; }) }; },
       view: function () { var sp = focused ? SITE[focused] : null; return { zoom: cam.zoom, target: [ctl.target.x, ctl.target.z], atSite: Math.abs(ctl.target.x - BOUNDS.cx) < 0.01 && Math.abs(ctl.target.z - BOUNDS.cz) < 0.01, atFocus: !!sp && Math.abs(ctl.target.x - sp.x) < 0.01 && Math.abs(ctl.target.z - sp.z) < 0.01 }; },
       layout: function () { return L; },
+      /* test seam: draw one frame at a given timestamp, so a gate can read an ease frame by frame on any GPU */
+      step: function (t) { frame(t); return { zoom: cam.zoom, explode: anim.explode }; },
+      motion: function () { return { camMoving: !!anim.cam, lastCamMs: Math.round(anim.camMs), camMs: CAM_MS, fadeMs: FADE_MS, fading: fades.length, exMs: EX_MS, stagger: EX_STAGGER, picked: picked, reduce: !!REDUCE }; },
       stats: function () { return { fps: lastFps, quality: quality, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, equipment: equipment.length, shaped: shaped, assets: host.getAttribute('data-cx-assets') || 'primitives', glb: equipment.filter(function (e) { return e.userData.shaped === 'glb'; }).length, hi: equipment.filter(function (e) { return e.userData.lod === 'hi'; }).length, callouts: coEls.filter(function (c) { return !c.el.hidden; }).length, hulls: equipment.filter(function (e) { return e.userData.hull && e.userData.hull.visible; }).length, flows: flows.length, streams: flows.filter(function (f) { return f.speed > 0; }).length, drawn: equipment.map(function (e) { return [e.userData.system, e.count]; }), focused: focused, paused: paused, canvas: PAL.canvas }; },
       select: function (systemId) { for (var k in SITE) if (SITE[k].systems.indexOf(systemId) !== -1) { focus(k); return k; } return null; }
     };

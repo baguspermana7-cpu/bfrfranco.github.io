@@ -42,6 +42,21 @@ read the same row. Untagged = `none`. No colour is derived from a second source.
   pitch), dashed leader to the first instance, text `<label> · <count> · <basis> · <state>`. Building labels yield
   to callouts (a label that would sit under a callout moves below it).
 - No WebGL ⇒ one sentence and the schematic remains; page errors 0.
+- **Motion is the reference video's** (K27, owner 2026-11-09 "seperti melihat plant itu hidup", PRD §2 Video B, §26):
+  a focus is ONE eased camera move (`CAM_MS` 450, ease-out cubic) that carries target, zoom and orbit position
+  together — never a cut, never two moves; the neighbours fade over `FADE_MS` 360 instead of blinking; Explode fans
+  the layers out bottom-first (`EX_MS` 520, each layer its own ease, `EX_STAGGER` 0.22); a click on equipment inside
+  the focused building **picks** that family: it is lit (emissive `#2563eb`), the rest of the building recede to 0.3,
+  its callout is marked `data-picked`, the breadcrumb reads `Campus › building › family`, Esc un-picks then
+  un-focuses. The first mount cuts (nothing to ease from). `prefers-reduced-motion`: camera cuts, no fades, Explode
+  lands in one frame. No auto-orbit, no glow, no particles beyond the design flows. State: `api.motion()`.
+  Every clock starts on the first DRAWN frame (rAF time, never `performance.now()`), every ease has a landing timer
+  at 2× its duration (a throttled rAF must not leave the camera half-way), negative frame dt is clamped to 0, and
+  `api.step(t)` is the test seam that draws one frame at a given time (software GL frames run 150–400 ms, so
+  wall-clock polling cannot see an ease). Fit selection frames a building at `2.5 × 62 / max(w, d)` so the callout
+  columns sit in the margins. **Callouts never cover what they name**: each column tries near / top / bottom and keeps
+  the placement covering the fewest anchor points; under 640 px stage width one column, text `label · count`, clamped
+  inside the stage (both proven red first: 3 anchors covered at 1440, 8 callouts out of the stage at 390).
 
 ## 3b Records (Tier 3 slice)
 
@@ -82,6 +97,7 @@ compares each against the baseline and the editor.
 | `tools/test-cx-assets.mjs` | every family a shaped, bounded, deterministic geometry; campus wires `RZCxAssets.build` | v3.28.0 |
 | `tools/test-cx-glb.mjs --regen` | one low + one `_hi` mesh per family, footprints, budgets, shades ≥ 0.40, byte-identical regeneration | v3.28.0; v3.29.0 on the old glb (missing `_hi`, shades 0.25) |
 | `tools/test-cx-campus-basis.mjs` | counts, CDUs, flows, callout text follow the engine basis; light palette; capacity text | v3.29.0 (old module has no `layout()`) |
+| `tools/test-cx-campus-motion.mjs` | K27 motion: eased camera frame by frame (step seam, lands at 450 ms), fades, staggered fan-out, pick lights one callout + 3-level breadcrumb, M7 390 px callouts inside/no overlap, M8 1440 no anchor covered, reduced motion instant | v3.33.0 (HEAD: no `motion()`, M7 8 callouts out; near-only columns: M8 3 covered) |
 | `tools/test-cx-records.mjs` | Tier 3 record layer: PRD v1.0 invariants (R1–R13) on `data/cx/demo-records.json`, overlay on `statusAt`, register import reasons (R14) | v3.29.0 (one mutation per law) |
 | `tools/test-dcmoc-cx-plan.mjs` | DCMOC bridge returns the site module's plan and status (deep-equal), store clamps/persists/caps scenarios at 5; needs `dcmoc/node_modules` (symlink in a worktree, git-ignored) | v3.29.0 (site module swapped for a copy with one planning-day changed) |
 | `tools/test-cx-analysis.mjs` | browser: plan editor, schematic, 3D (glb 15/15, ≤ 300 draw calls, ≥ 24 fps, callouts, hulls, K16 probe both themes, K17 LOD, K18 re-layout), Tier 1.5 calendar, workbench W0–W8 (real pointer drag move/stretch, Esc, undo/redo, Ctrl+Z, keyboard, impact reasons, over-cap, Save as/Load/Delete, cap 5), 390 px, no errors | each release; W-laws v3.31.0 (absent on the old tree) |

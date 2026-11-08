@@ -270,6 +270,7 @@ gate "DCMOC Cx plan bridge — same plan and status as the site module, store cl
 gate "Cx Analysis — plan editor, schematic, 3D campus with the glb library and callouts, Tier 1.5 calendar, both themes" node tools/test-cx-analysis.mjs
 gate "Cx issues — register, gate readiness from the handbook items, overlay on the plan" node tools/test-cx-issues.mjs
 gate "Cx detail (K29) — every schematic block opens its own one-line / P&ID with the L1-L5 ladder; gates equal statusAt; 390 px fits" node tools/test-cx-detail.mjs
+gate "Cx campus motion (K27) — one eased camera move per focus, fading neighbours, staggered fan-out, picked family lit; reduced motion instant" node tools/test-cx-campus-motion.mjs
 gate "Explorable figures — hover lights the edges, tap opens the panel, keys walk; spacing law on fire pillar + article 30" node tools/test-figure-interact.mjs
 gate "Manuals (K26) — every manual link resolves, each manual links its tool, every manual has an index card; drift list monitored" python3 tools/audit-manuals.py --strict
 gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py
