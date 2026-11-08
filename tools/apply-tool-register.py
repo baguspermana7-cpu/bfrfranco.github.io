@@ -30,7 +30,7 @@ PAGES = [
     'capex-calculator.html', 'opex-calculator.html', 'pue-calculator.html', 'roi-calculator.html',
     'tco-calculator.html', 'tier-advisor.html', 'carbon-footprint.html', 'cx-calculator.html',
     'spares-readiness-calculator.html', 'rfs-readiness-workbench.html', 'fire-calculator.html',
-    'fire-checklist.html', 'tia-942-checklist.html', 'cdu-checklist.html', 'cdu-comparison.html', 'cdu-selection-guide.html', 'compare-diesel-vs-gas-generator.html', 'compare-ups-online-vs-offline.html', 'compare-wet-vs-preaction.html', 'compare-n1-vs-2n.html',
+    'fire-checklist.html', 'tia-942-checklist.html', 'cdu-checklist.html', 'cdu-comparison.html', 'cdu-selection-guide.html', 'compare-diesel-vs-gas-generator.html', 'compare-ups-online-vs-offline.html', 'compare-wet-vs-preaction.html', 'compare-n1-vs-2n.html', 'compare-pue-vs-dcie.html', 'compare-fm200-vs-novec.html', 'compare-ashrae-vs-uptime.html', 'compare-tier-3-vs-tier-4.html',
     # explorer pages (release R1 of the hub-tools refit: no inputs / toolbar / results; tools/refit_shell/explorer.py)
     'cdu-hub.html', 'compare-air-vs-liquid-cooling.html', 'compare-raised-floor-vs-slab.html',
     'pln-sumatra-grid.html', 'network-visualization-hub.html', 'ai-engineering-maintenance.html',

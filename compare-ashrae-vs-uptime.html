@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-rz-register="editorial">
+<html lang="en" data-theme="dark" data-rz-register="tool">
 <head>
     <!-- Google tag (gtag.js) -->
     <!-- Google tag (gtag.js) - deferred until user interaction + consent-aware -->
@@ -37,7 +37,7 @@
     <meta name="keywords" content="ASHRAE vs Uptime Institute, data center standards, thermal guidelines, tier certification, ASHRAE TC 9.9, data center design, cooling standards">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#0b0c0e">
     <link rel="canonical" href="https://resistancezero.com/compare-ashrae-vs-uptime.html">
 
     <link rel="alternate" hreflang="en" href="https://resistancezero.com/compare-ashrae-vs-uptime.html">
@@ -124,470 +124,185 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
-
-    <style>
-        :root { --cmp-primary: #2563eb; --cmp-primary-light: rgba(37,99,235,0.1); --cmp-a: #2563eb; --cmp-b: #f59e0b; }
-        [data-theme="dark"] { --cmp-bg: #0e0f12; --cmp-card: #16181d; --cmp-border: #2a2d34; --cmp-text: #f1f5f9; --cmp-muted: #94a3b8; }
-        :root:not([data-theme="dark"]) { --cmp-bg: #f8fafc; --cmp-card: #ffffff; --cmp-border: #e2e8f0; --cmp-text: #191B20; --cmp-muted: #64748b; }
-
-        .compare-hero { background: transparent; border-bottom: 1px solid rgba(128,128,128,0.18); padding: 8rem 2rem 4rem; color: inherit; text-align: center; position: relative; overflow: hidden; }
-        .compare-hero::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background: none; z-index:0; }
-        .compare-hero > * { position:relative; z-index:1; }
-        .compare-hero h1{font-family:'IBM Plex Sans',system-ui,sans-serif;font-weight:600; font-size: clamp(2rem, 4.5vw, 3rem); margin-bottom: 1rem; }
-        .compare-hero p { font-size: 1.15rem; color: inherit; opacity: 0.85; max-width: 700px; margin: 0 auto 1.5rem; }
-        .hero-badges { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-        .hero-badge { padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 600; font-size: 0.9rem; }
-        .hero-badge.a { background: rgba(37,99,235,0.3); border: 1px solid rgba(37,99,235,0.5); color: #93c5fd; }
-        .hero-badge.b { background: rgba(245,158,11,0.3); border: 1px solid rgba(245,158,11,0.5); color: #fde68a; } :root:not([data-theme="dark"]) .compare-hero .hero-badge { color: #1a1d23 !important; }
-
-        .compare-section { padding: 4rem 2rem; max-width: 960px; margin: 0 auto; }
-        .compare-section h2 { font-size: 1.75rem; color: var(--cmp-text); margin-bottom: 1.5rem; text-align: center; }
-        .compare-section h2::after { content:''; display:block; width:60px; height:3px; background:var(--cmp-primary); margin:0.75rem auto 0; border-radius:2px; }
-
-        .compare-table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 2rem; }
-        .compare-table thead th { padding: 1rem; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .compare-table thead th:first-child { background: var(--cmp-card); color: var(--cmp-muted); text-align: left; }
-        .compare-table thead th:nth-child(2) { background: var(--cmp-a); color: #fff; }
-        .compare-table thead th:nth-child(3) { background: var(--cmp-b); color: #fff; }
-        .compare-table thead th:last-child { background: var(--cmp-card); color: var(--cmp-muted); }
-        .compare-table td { padding: 0.875rem 1rem; border-bottom: 1px solid var(--cmp-border); background: var(--cmp-card); color: var(--cmp-text); font-size: 0.9rem; vertical-align: top; }
-        .compare-table td:first-child { font-weight: 600; color: var(--cmp-muted); white-space: nowrap; }
-        .compare-table tr:last-child td { border-bottom: none; }
-        .winner-cell { position: relative; }
-        .winner-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; font-size: 0.7rem; font-weight: 700; }
-        .winner-icon.a { background: rgba(37,99,235,0.15); color: var(--cmp-a); }
-        .winner-icon.b { background: rgba(245,158,11,0.15); color: var(--cmp-b); }
-        .winner-icon.tie { background: rgba(100,116,139,0.15); color: var(--cmp-muted); }
-
-        .accordion { margin-bottom: 1rem; border: 1px solid var(--cmp-border); border-radius: 12px; overflow: hidden; background: var(--cmp-card); }
-        .accordion-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; cursor: pointer; font-weight: 600; font-size: 1.05rem; color: var(--cmp-text); transition: background 0.2s; }
-        .accordion-header:hover { background: var(--cmp-primary-light); }
-        .accordion-chevron { width: 20px; height: 20px; transition: transform 0.3s ease; flex-shrink: 0; }
-        .accordion.active .accordion-chevron { transform: rotate(180deg); }
-        .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
-        .accordion-content { padding: 0 1.5rem 1.5rem; color: var(--cmp-text); font-size: 0.95rem; line-height: 1.7; }
-        .accordion-content p { margin-bottom: 0.75rem; }
-        .accordion-content strong { color: var(--cmp-primary); }
-
-        .decision-box { background: var(--cmp-card); border: 2px solid var(--cmp-primary); border-radius: 4px; padding: 2rem; margin-bottom: 2rem; }
-        .decision-box h3 { color: var(--cmp-primary); margin-bottom: 1rem; font-size: 1.2rem; }
-        .decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .decision-card { padding: 1.25rem; border-radius: 4px; }
-        .decision-card.a { background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2); }
-        .decision-card.b { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
-        .decision-card h4 { font-size: 1rem; margin-bottom: 0.75rem; }
-        .decision-card.a h4 { color: var(--cmp-a); }
-        .decision-card.b h4 { color: var(--cmp-b); }
-        .decision-card ul { list-style: none; padding: 0; margin: 0; }
-        .decision-card li { padding: 0.3rem 0; font-size: 0.9rem; color: var(--cmp-text); }
-        .decision-card li::before { content: '\2713'; margin-right: 0.5rem; font-weight: 700; }
-        .decision-card.a li::before { color: var(--cmp-a); }
-        .decision-card.b li::before { color: var(--cmp-b); }
-
-        .faq-item { margin-bottom: 1rem; }
-        .faq-item h3 { font-size: 1.05rem; color: var(--cmp-text); margin-bottom: 0.5rem; }
-        .faq-item p { color: var(--cmp-muted); font-size: 0.95rem; line-height: 1.7; }
-
-        .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-        .related-card { display: block; padding: 1.25rem; background: var(--cmp-card); border: 1px solid var(--cmp-border); border-radius: 4px; text-decoration: none; transition: border-color 0.2s, background-color 0.2s; }
-        .related-card:hover { border-color: var(--amber, #92400e); }
-        .related-card h4 { font-size: 0.95rem; color: var(--cmp-primary); margin-bottom: 0.25rem; }
-        .related-card p { font-size: 0.8rem; color: var(--cmp-muted); margin: 0; }
-
-        @media (max-width: 768px) {
-            .compare-table { font-size: 0.8rem; }
-            .compare-table td, .compare-table th { padding: 0.625rem 0.5rem; }
-            .decision-grid { grid-template-columns: 1fr; }
-            .related-grid { grid-template-columns: 1fr; }
-        }
-    
-/* v1.8.0 — mobile sweep responsive patch */
-@media (max-width: 768px) {
-    html, body { overflow-x: hidden; max-width: 100vw; }
-    img, picture, video, svg { max-width: 100%; height: auto; }
-
-    /* Hero / page header */
-    h1 { font-size: 1.6rem !important; line-height: 1.2 !important; }
-    .hero, .page-hero, .compare-hero, .pillar-hero, .infographic-hero, .city-hero { 
-        padding: 6.5rem 1rem 1.5rem !important;
-    }
-    .hero p, .hero-subtitle { font-size: 0.9rem !important; }
-
-    /* Compare pages — side-by-side becomes stacked */
-    .compare-grid, .compare-table, .vs-grid, .comparison-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1rem !important;
-    }
-    .compare-col, .vs-col, .comparison-col { padding: 1rem !important; }
-
-    /* Pillar pages — content sections */
-    .pillar-section, .pillar-card { padding: 1.25rem !important; }
-    .pillar-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
-
-    /* Infographic pages — chart cards */
-    .infographic-grid, .chart-grid, .stat-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1rem !important;
-    }
-    .chart-card, .infographic-card { padding: 1rem !important; }
-    canvas { max-width: 100% !important; height: auto !important; }
-
-    /* DC market city pages — sections */
-    .city-section, .city-card, .market-section { padding: 1.25rem !important; }
-    .market-stats, .city-stats { 
-        grid-template-columns: 1fr 1fr !important;
-        gap: 0.5rem !important;
-    }
-    .stat-tile, .market-stat-tile { padding: 0.75rem !important; }
-
-    /* Map containers (Leaflet/CARTO) */
-    [id*="leaflet" i], [id*="map" i], .map-container {
-        height: 60vh !important;
-        max-height: 480px !important;
-        width: 100% !important;
-    }
-
-    /* Insights / achievements grid */
-    .insights-grid, .achievements-grid {
-        grid-template-columns: 1fr !important;
-        gap: 0.75rem !important;
-    }
-
-    /* Tables horizontal-scroll */
-    table {
-        display: block !important;
-        overflow-x: auto !important;
-        white-space: nowrap;
-        font-size: 0.82rem !important;
-    }
-    th, td { padding: 8px 12px !important; }
-
-    /* Code blocks */
-    pre { overflow-x: auto !important; padding: 0.75rem !important; font-size: 0.78rem !important; max-width: 100%; }
-
-    /* Navbar */
-    .navbar, .nav-bar { padding: 0.5rem 0.75rem !important; }
-    .nav-menu, .nav-links { display: none !important; }
-    .nav-back { padding: 6px 10px !important; }
-
-    /* Footer 3-col collapses */
-    .footer-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1.25rem !important;
-        padding: 1rem !important;
-    }
-
-    /* CTA / button rows */
-    .btn-row, .cta-row, .actions {
-        flex-direction: column !important;
-        gap: 0.5rem !important;
-    }
-    .btn-row .btn, .cta-row .btn { width: 100% !important; }
-
-    /* Tap targets */
-    button, a.btn, [role="button"], .nav-link { min-height: 44px; }
-
-    /* Reading progress (article-style) */
-    .reading-progress, .reading-progress-bar { height: 3px !important; }
-}
-
-@media (max-width: 480px) {
-    .market-stats, .city-stats { grid-template-columns: 1fr !important; }
-    h1 { font-size: 1.4rem !important; }
-}
-
-    /* a11y (v1.51.13): compare accents split per theme */
-:root:not([data-theme="dark"]) { --cmp-a:#1d4ed8; --cmp-b:#92400e; --cmp-primary:#1d4ed8; }
-[data-theme="dark"] { --cmp-a:#93c5fd; --cmp-b:#fbbf24; --cmp-primary:#93c5fd; }
- /* th bgs follow the vars */
-[data-theme="dark"] #cookieBanner a, [data-theme="dark"] p > a[href$="privacy.html"] { color:#E8B563 !important; }
-/* a11y: dark pairs */
-[data-theme="dark"] .decision-card.a > h4 { color: var(--cmp-a) !important; }
-[data-theme="dark"] .decision-card.b > h4 { color: var(--cmp-b) !important; }
-[data-theme="dark"] .formula-card h4.pue { color:#34d399 !important; }
-[data-theme="dark"] .formula-card h4.dcie { color:#94a3b8 !important; }
-[data-theme="dark"] .compare-table thead th:nth-child(2) { background:#1d4ed8 !important; }
-[data-theme="dark"] .compare-table thead th:nth-child(3) { background:#b45309 !important; }
-</style>
-    <script src="js/rz-version.js?v=20261108-e2872eb2" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="js/rz-version.js?v=20261108-1316683e" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261107-7aaef8f4">
+    <link rel="stylesheet" href="css/rz-explorer.css?v=20261108-61cfdce7">
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
-<body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-                <img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high" width="400" height="400">
-            </a>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li class="nav-dropdown">
-                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions
-                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li role="menuitem"><a href="datacenter-solutions.html" style="font-weight: 600;">DC Solutions Hub</a></li>
-                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="datahallAI.html" style="color: #64748b;" title="Root & Educator access only">🔒 DC AI/HPC</a></li>
-                        <li role="menuitem"><a href="dc-conventional.html" title="Root & Educator access only">🔒 DC Conventional</a></li>
-                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="tco-calculator.html" style="color: #64748b; font-weight: 600;">TCO Calculator</a></li>
-                        <li role="menuitem"><a href="capex-calculator.html" style="color: #92400e;">CAPEX Calculator</a></li>
-                        <li role="menuitem"><a href="opex-calculator.html">OPEX Calculator</a></li>
-                        <li role="menuitem"><a href="roi-calculator.html">ROI Calculator</a></li>
-                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="dc-market-tracker.html" style="font-weight: 600;">DC Market</a></li>
-                        <li role="menuitem"><a href="dcmoc/" style="font-weight: 600;">DC MOC</a></li>
-                    </ul>
-                </li>
-                <li class="nav-dropdown">
-                    <a href="insights.html" class="nav-link">Insights
-                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="articles.html" style="font-weight:600;">Engineering Journal</a></li>
-                        <li><a href="geopolitics.html">Global Analysis</a></li>
-                        <li><a href="future-forward.html">Future Forward</a></li>
-                                <li><a href="glossary.html">Glossary</a></li>
-                        <li style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
-                        <li role="menuitem"><a href="Apps/second%20brain/index.html" style="color: var(--rz-restricted); font-weight: 600;" title="Root only — restricted access"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:4px" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Second Brain</a></li>
-                        <li><a href="insights.html" style="color:#64748b;font-size:0.85rem;">All Insights</a></li>
-                    </ul>
-                </li>
-                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-            </ul>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
-                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-            </button>
+<body class="hub tool" data-rz-page="compare-standards">
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="nav-icon theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i class="fas fa-sun"></i></button>
+  </div>
+</nav>
 
-    <main id="main-content">
-        <!-- Hero -->
-        <section class="compare-hero">
-            <h1>ASHRAE vs Uptime Institute</h1>
-            <p>Two foundational standards shaping data center design and operations. One defines the thermal envelope; the other defines reliability architecture.</p>
-            <div class="hero-badges">
-                <span class="hero-badge a">ASHRAE TC 9.9</span>
-                <span class="hero-badge b">Uptime Institute</span>
-            </div>
-        </section>
+<main id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow">Standards · <b>Compare</b> · frameworks</p>
+    <h1>ASHRAE vs Uptime Institute <span class="muted">thermal envelope against availability tiers</span></h1>
+    <p class="lede">ASHRAE TC 9.9 sets the thermal environment; the Uptime Tier Standard sets redundancy and certification. The two compared on scope and use.</p>
+    <p class="basis">basis ASHRAE TC 9.9 · Uptime Institute Tier Standard · published vendor, operator and standards figures · no engine runs on this page</p>
+    <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → ASHRAE vs Uptime</p>
+  </div>
+</header>
+<div class="wrap ck-body">
+<section class="ck-sec" id="side-by-side">
+  <h2><span class="n">01</span> Side by side</h2>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Category</th><th scope="col">ASHRAE</th><th scope="col">Uptime Institute</th><th scope="col">Edge</th></tr></thead>
+    <tbody>
+      <tr><td>Scope</td><td>Thermal environment, air quality, humidity for IT equipment</td><td>Site-level redundancy, availability tiers (I-IV)</td><td>even</td></tr>
+      <tr><td>Focus Area</td><td>Cooling efficiency, environmental control, energy optimization</td><td>Uptime, fault tolerance, concurrent maintainability</td><td>even</td></tr>
+      <tr><td>Certification</td><td>No formal certification; guidelines and recommended practices</td><td>Formal 3-stage certification: Design, Facility, Operations</td><td>Uptime Institute</td></tr>
+      <tr><td>Global Adoption</td><td>Referenced worldwide; incorporated into many local codes</td><td>3,000+ certifications across 114 countries</td><td>even</td></tr>
+      <tr><td>Cost Impact</td><td>Low direct cost; drives OPEX savings via efficiency</td><td>High certification fees ($50K-$150K+); drives CAPEX decisions</td><td>ASHRAE</td></tr>
+      <tr><td>Compliance</td><td>Voluntary; often contractually required in SLAs</td><td>Voluntary; widely required by enterprise clients</td><td>Uptime Institute</td></tr>
+      <tr><td>Update Frequency</td><td>Every 3-5 years (TC 9.9 whitepaper updates more frequently)</td><td>Topology standard stable; operational standards evolve</td><td>ASHRAE</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-        <!-- Quick Comparison Table -->
-        <section class="compare-section">
-            <h2>Side-by-Side Comparison</h2>
-            <table class="compare-table">
-                <thead>
-                    <tr><th scope="col">Category</th><th scope="col">ASHRAE</th><th scope="col">Uptime Institute</th><th scope="col">Edge</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>Scope</td><td>Thermal environment, air quality, humidity for IT equipment</td><td>Site-level redundancy, availability tiers (I-IV)</td><td class="winner-cell"><span class="winner-icon tie">=</span></td></tr>
-                    <tr><td>Focus Area</td><td>Cooling efficiency, environmental control, energy optimization</td><td>Uptime, fault tolerance, concurrent maintainability</td><td class="winner-cell"><span class="winner-icon tie">=</span></td></tr>
-                    <tr><td>Certification</td><td>No formal certification; guidelines and recommended practices</td><td>Formal 3-stage certification: Design, Facility, Operations</td><td class="winner-cell"><span class="winner-icon b">U</span></td></tr>
-                    <tr><td>Global Adoption</td><td>Referenced worldwide; incorporated into many local codes</td><td>3,000+ certifications across 114 countries</td><td class="winner-cell"><span class="winner-icon tie">=</span></td></tr>
-                    <tr><td>Cost Impact</td><td>Low direct cost; drives OPEX savings via efficiency</td><td>High certification fees ($50K-$150K+); drives CAPEX decisions</td><td class="winner-cell"><span class="winner-icon a">A</span></td></tr>
-                    <tr><td>Compliance</td><td>Voluntary; often contractually required in SLAs</td><td>Voluntary; widely required by enterprise clients</td><td class="winner-cell"><span class="winner-icon b">U</span></td></tr>
-                    <tr><td>Update Frequency</td><td>Every 3-5 years (TC 9.9 whitepaper updates more frequently)</td><td>Topology standard stable; operational standards evolve</td><td class="winner-cell"><span class="winner-icon a">A</span></td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Detailed Comparison Accordions -->
-        <section class="compare-section">
-            <h2>Detailed Analysis</h2>
-
-            <div class="accordion">
-                <div class="accordion-header">
-                    <span>Scope and Purpose</span>
-                    <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="accordion-body">
-                    <div class="accordion-content">
-                        <p><strong>ASHRAE TC 9.9</strong> focuses exclusively on the thermal and humidity environment for IT equipment. It defines Recommended (A1) and Allowable (A2-A4) operating envelopes with specific temperature and humidity ranges. The 2021 update expanded the A1 envelope to 18-27C (64.4-80.6F) dry-bulb, enabling more free cooling hours globally.</p>
+<section class="ck-sec" id="analysis">
+  <h2><span class="n">02</span> Analysis</h2>
+  <div class="ex-prose"><h3>Scope and Purpose</h3>
+<p><strong>ASHRAE TC 9.9</strong> focuses exclusively on the thermal and humidity environment for IT equipment. It defines Recommended (A1) and Allowable (A2-A4) operating envelopes with specific temperature and humidity ranges. The 2021 update expanded the A1 envelope to 18-27C (64.4-80.6F) dry-bulb, enabling more free cooling hours globally.</p>
                         <p><strong>Uptime Institute</strong> takes a holistic site-level view, defining four tiers of infrastructure redundancy. Tier I (basic) through Tier IV (fault tolerant) prescribe specific requirements for power, cooling, and network path redundancy. The focus is on preventing downtime through architectural decisions.</p>
                         <p>These standards are complementary, not competing. A Tier III facility will still need to comply with ASHRAE thermal ranges to protect equipment, while an ASHRAE-compliant cooling system needs the right redundancy to maintain those ranges continuously.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion">
-                <div class="accordion-header">
-                    <span>Certification and Validation</span>
-                    <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="accordion-body">
-                    <div class="accordion-content">
-                        <p><strong>ASHRAE</strong> does not offer certification. Compliance is self-assessed or verified through third-party audits. Organizations typically demonstrate compliance through continuous monitoring of temperature, humidity, and particulate levels against published envelopes.</p>
+  </div>
+  <div class="ex-prose"><h3>Certification and Validation</h3>
+<p><strong>ASHRAE</strong> does not offer certification. Compliance is self-assessed or verified through third-party audits. Organizations typically demonstrate compliance through continuous monitoring of temperature, humidity, and particulate levels against published envelopes.</p>
                         <p><strong>Uptime Institute</strong> provides a rigorous three-stage certification process: Tier Certification of Design Documents (TCDD), Tier Certification of Constructed Facility (TCCF), and Tier Certification of Operational Sustainability (TCOS). Each stage involves on-site assessment by Uptime consultants.</p>
                         <p>For organizations needing to demonstrate reliability to clients, investors, or regulators, Uptime Institute certification provides a recognized, third-party validated credential. ASHRAE compliance is typically verified through BMS data and audit trails.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion">
-                <div class="accordion-header">
-                    <span>Financial Impact</span>
-                    <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="accordion-body">
-                    <div class="accordion-content">
-                        <p><strong>ASHRAE</strong> compliance directly impacts OPEX through cooling energy consumption. Operating within the expanded A1 envelope (up to 27C) vs. traditional 20-22C setpoints can reduce cooling energy by 4-5% per degree raised, translating to PUE improvements of 0.02-0.10 depending on climate zone and cooling architecture.</p>
+  </div>
+  <div class="ex-prose"><h3>Financial Impact</h3>
+<p><strong>ASHRAE</strong> compliance directly impacts OPEX through cooling energy consumption. Operating within the expanded A1 envelope (up to 27C) vs. traditional 20-22C setpoints can reduce cooling energy by 4-5% per degree raised, translating to PUE improvements of 0.02-0.10 depending on climate zone and cooling architecture.</p>
                         <p><strong>Uptime Institute</strong> tier selection drives CAPEX decisions. A Tier III facility typically costs 20-30% more than Tier II per MW of IT load due to N+1 redundancy requirements. Tier IV adds another 15-25% over Tier III due to 2N distribution and fault-tolerant design. These costs must be weighed against the business value of higher availability.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion">
-                <div class="accordion-header">
-                    <span>Regulatory and Contractual Requirements</span>
-                    <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="accordion-body">
-                    <div class="accordion-content">
-                        <p><strong>ASHRAE</strong> guidelines are referenced in many local building codes and mechanical engineering standards. Insurance providers may require demonstration of ASHRAE-compliant environmental control. Equipment manufacturers reference ASHRAE envelopes in warranty terms.</p>
+  </div>
+  <div class="ex-prose"><h3>Regulatory and Contractual Requirements</h3>
+<p><strong>ASHRAE</strong> guidelines are referenced in many local building codes and mechanical engineering standards. Insurance providers may require demonstration of ASHRAE-compliant environmental control. Equipment manufacturers reference ASHRAE envelopes in warranty terms.</p>
                         <p><strong>Uptime Institute</strong> tier certification is frequently required in enterprise colocation contracts, government procurement, and financial services compliance frameworks. Many RFPs for mission-critical hosting explicitly require Tier III or Tier IV certification.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion">
-                <div class="accordion-header">
-                    <span>Evolution and Future Direction</span>
-                    <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="accordion-body">
-                    <div class="accordion-content">
-                        <p><strong>ASHRAE</strong> continues to expand thermal envelopes as IT equipment becomes more resilient. The trend toward liquid cooling for AI/HPC workloads is driving new guidelines for direct-to-chip and immersion cooling environments. TC 9.9 is also addressing sustainability metrics and water usage effectiveness (WUE).</p>
+  </div>
+  <div class="ex-prose"><h3>Evolution and Future Direction</h3>
+<p><strong>ASHRAE</strong> continues to expand thermal envelopes as IT equipment becomes more resilient. The trend toward liquid cooling for AI/HPC workloads is driving new guidelines for direct-to-chip and immersion cooling environments. TC 9.9 is also addressing sustainability metrics and water usage effectiveness (WUE).</p>
                         <p><strong>Uptime Institute</strong> is evolving to address edge computing (micro data centers), hybrid cloud architectures, and sustainability. Their annual outage analysis provides valuable industry benchmarking data. The tier system remains stable, but operational sustainability standards continue to evolve.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+  </div>
+</section>
 
-        <!-- Decision Helper -->
-        <section class="compare-section">
-            <h2>Which Is Right for You?</h2>
-            <div class="decision-box">
-                <h3>Choose based on your primary objective</h3>
-                <div class="decision-grid">
-                    <div class="decision-card a">
-                        <h4>Prioritize ASHRAE When...</h4>
-                        <ul>
-                            <li>Optimizing cooling efficiency and energy costs</li>
-                            <li>Designing for specific climate zones</li>
-                            <li>Supporting equipment warranty compliance</li>
-                            <li>Implementing free cooling strategies</li>
-                            <li>Targeting PUE improvements below 1.3</li>
-                        </ul>
-                    </div>
-                    <div class="decision-card b">
-                        <h4>Prioritize Uptime Institute When...</h4>
-                        <ul>
-                            <li>Requiring third-party availability certification</li>
-                            <li>Hosting mission-critical enterprise workloads</li>
-                            <li>Meeting contractual SLA requirements (99.982%+)</li>
-                            <li>Attracting enterprise colocation clients</li>
-                            <li>Complying with financial/government regulations</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+<section class="ck-sec" id="which">
+  <h2><span class="n">03</span> Which one fits</h2>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Prioritize ASHRAE When</th><th scope="col">Prioritize Uptime Institute When</th></tr></thead>
+    <tbody>
+      <tr><td>Optimizing cooling efficiency and energy costs</td><td>Requiring third-party availability certification</td></tr>
+      <tr><td>Designing for specific climate zones</td><td>Hosting mission-critical enterprise workloads</td></tr>
+      <tr><td>Supporting equipment warranty compliance</td><td>Meeting contractual SLA requirements (99.982%+)</td></tr>
+      <tr><td>Implementing free cooling strategies</td><td>Attracting enterprise colocation clients</td></tr>
+      <tr><td>Targeting PUE improvements below 1.3</td><td>Complying with financial/government regulations</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-        <!-- FAQ -->
-        <section class="compare-section">
-            <h2>Frequently Asked Questions</h2>
-            <div class="faq-item">
-                <h3>Can I use both ASHRAE and Uptime Institute standards together?</h3>
-                <p>Yes, and most enterprise data centers do. ASHRAE TC 9.9 defines the thermal envelope (temperature and humidity ranges), while Uptime Institute defines the redundancy and availability tier. They address different aspects of data center design and are highly complementary.</p>
-            </div>
-            <div class="faq-item">
-                <h3>Which standard should I prioritize for a new data center build?</h3>
-                <p>Start with Uptime Institute tier classification to establish your redundancy and availability architecture, then apply ASHRAE thermal guidelines to optimize your cooling design within that tier framework. The tier decision drives CAPEX and topology; ASHRAE drives operational efficiency.</p>
-            </div>
-            <div class="faq-item">
-                <h3>Is ASHRAE certification mandatory for data centers?</h3>
-                <p>No. ASHRAE publishes voluntary guidelines and recommended practices. However, many contracts, SLAs, and insurance policies reference ASHRAE A1 or A2 thermal envelopes as compliance requirements. Some jurisdictions incorporate ASHRAE standards into building codes.</p>
-            </div>
-            <div class="faq-item">
-                <h3>How much does Uptime Institute certification cost compared to ASHRAE compliance?</h3>
-                <p>Uptime Institute certification involves direct fees ($50K-$150K+ depending on tier and facility size) plus consultant costs. ASHRAE compliance has no direct certification fee since it is a guidelines framework, but implementing monitoring systems and maintaining thermal envelopes requires ongoing OPEX investment in sensors, BMS integration, and staff training.</p>
-            </div>
-        </section>
+<section class="ck-sec" id="faq">
+  <h2><span class="n">04</span> Questions</h2>
+  <div class="ex-prose"><h3>Can I use both ASHRAE and Uptime Institute standards together?</h3>
+    <p>Yes, and most enterprise data centers do. ASHRAE TC 9.9 defines the thermal envelope (temperature and humidity ranges), while Uptime Institute defines the redundancy and availability tier. They address different aspects of data center design and are highly complementary.</p>
+  </div>
+  <div class="ex-prose"><h3>Which standard should I prioritize for a new data center build?</h3>
+    <p>Start with Uptime Institute tier classification to establish your redundancy and availability architecture, then apply ASHRAE thermal guidelines to optimize your cooling design within that tier framework. The tier decision drives CAPEX and topology; ASHRAE drives operational efficiency.</p>
+  </div>
+  <div class="ex-prose"><h3>Is ASHRAE certification mandatory for data centers?</h3>
+    <p>No. ASHRAE publishes voluntary guidelines and recommended practices. However, many contracts, SLAs, and insurance policies reference ASHRAE A1 or A2 thermal envelopes as compliance requirements. Some jurisdictions incorporate ASHRAE standards into building codes.</p>
+  </div>
+  <div class="ex-prose"><h3>How much does Uptime Institute certification cost compared to ASHRAE compliance?</h3>
+    <p>Uptime Institute certification involves direct fees ($50K-$150K+ depending on tier and facility size) plus consultant costs. ASHRAE compliance has no direct certification fee since it is a guidelines framework, but implementing monitoring systems and maintaining thermal envelopes requires ongoing OPEX investment in sensors, BMS integration, and staff training.</p>
+  </div>
+</section>
 
-        <!-- Related Content -->
-        <section class="compare-section">
-            <h2>Related Resources</h2>
-            <div class="related-grid">
-                <a href="ltc-ashrae-thermal-control.html" class="related-card">
-                    <h4>ASHRAE Thermal Control Lab</h4>
-                    <p>Interactive thermal envelope simulator with real-time compliance checking.</p>
-                </a>
-                <a href="ltc-uptime-tier-alignment.html" class="related-card">
-                    <h4>Uptime Tier Alignment Tool</h4>
-                    <p>Assess your facility against Uptime Institute tier requirements.</p>
-                </a>
-                <a href="pue-calculator.html" class="related-card">
-                    <h4>PUE Calculator</h4>
-                    <p>Calculate and benchmark your Power Usage Effectiveness.</p>
-                </a>
-            </div>
-        </section>
-    </main>
+<section class="ck-sec" id="related">
+  <h2><span class="n">05</span> Related tools</h2>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Tool</th><th scope="col">What it does</th></tr></thead>
+    <tbody>
+      <tr><td><a href="ltc-ashrae-thermal-control.html">ASHRAE Thermal Control Lab</a></td><td>Interactive thermal envelope simulator with real-time compliance checking.</td></tr>
+      <tr><td><a href="ltc-uptime-tier-alignment.html">Uptime Tier Alignment Tool</a></td><td>Assess your facility against Uptime Institute tier requirements.</td></tr>
+      <tr><td><a href="pue-calculator.html">PUE Calculator</a></td><td>Calculate and benchmark your Power Usage Effectiveness.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+</div>
 
-    <!-- Independence Disclaimer + Footer -->
-    <div style="max-width:900px;margin:2rem auto 0;padding:1rem 1.5rem;text-align:center;">
-        <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color: #64748b;">Terms &amp; Disclaimer</a> | <a href="privacy.html" style="color: #64748b;">Privacy Policy</a></p>
+<section class="tool-ref" aria-labelledby="ref-h">
+  <div class="wrap">
+    <p class="eyebrow" id="ref-h">06 / Reference</p>
+    <h3>Read further</h3>
+    <p class="links"><a href="pillar-standards.html">Standards</a><a href="compare-tier-3-vs-tier-4.html">Tier III vs Tier IV</a><a href="tier-advisor.html">Tier advisor</a></p>
+    <p class="notice">Independent personal research from public sources; it does not represent any current or former employer. <a href="terms.html">Terms and disclaimer</a>.</p>
+  </div>
+</section>
+</main>
+
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
     </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
 
-    <footer class="footer footer-enhanced">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
-                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
-                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
-                </div>
-                <div class="footer-nav">
-                    <h4 class="footer-heading">NAVIGATION</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">Home Dashboard</a></li>
-                        <li><a href="articles.html">Technical Journal</a></li>
-                        <li><a href="index.html#case-studies">Case Studies</a></li>
-                        <li><a href="datacenter-solutions.html">DC Solutions</a></li>
-                        <li><a href="glossary.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Glossary</a></li>
-                    </ul>
-                </div>
-                <div class="footer-connect">
-                    <h4 class="footer-heading">CONNECT</h4>
-                    <ul class="footer-links">
-                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
-                        <li><a href="articles.html">Technical Journal</a></li>
-                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
-                        <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <script>
-        // Dark mode (the toggle in the nav had no handler on this page)
-        (function(){ var toggle=document.getElementById('themeToggle'); var theme='light'; try{ theme=localStorage.getItem('theme')||'light'; }catch(e){}
-        document.documentElement.setAttribute('data-theme',theme);
-        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); try{ localStorage.setItem('theme',n); }catch(e){} }); })();
-    </script>
-
-    
-
-    
-    <script src="auth.js?v=20261031-f01cb5a3" defer></script>
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  function paint(){var d=document.documentElement.getAttribute('data-theme')==='dark';var i=t&&t.querySelector('i');if(i)i.className=d?'fas fa-sun':'fas fa-moon';var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'#0b0c0e':'#F5F7FA');}
+  if(t){t.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';var n=d?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(e){}paint();});paint();}
+  var s=document.getElementById('navSearchBtn');if(s)s.addEventListener('click',function(){if(window.__rzPalette&&window.__rzPalette.open)window.__rzPalette.open();});
+})();
+</script>
+<script src="auth.js?v=20261031-f01cb5a3" defer></script>
 </body>
 </html>
