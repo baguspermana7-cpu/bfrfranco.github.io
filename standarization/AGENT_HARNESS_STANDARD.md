@@ -291,3 +291,11 @@ of the evidence history and must remain distinguishable from the final PASS.
 Result: the daemon verifies WI-HARNESS-002 through its own machinery. The last criterion, A15, is this
 standard, the changelog and the site version shipping together, in site release v3.24.36.
 
+### 2026-11-08 — release environment traps (v3.27.0 – v3.28.1)
+
+| # | Symptom (measured) | Root cause | Fix | Kept by |
+|---|---|---|---|---|
+| E1 | 50 browser gates failed with `ERR_MODULE_NOT_FOUND puppeteer` on good code | A fresh worktree has no `node_modules` | Symlink `node_modules` to a checkout that has it; `.gitignore` line `node_modules` (no slash) covers the symlink | `git check-ignore -v node_modules` before the gate |
+| E2 | The full ship gate exited 124 mid-run | `rz-lane` default timeout is 1800 s; the gate takes ~65 min | `rz-lane -l <n> -t 7200 -- bash tools/ship-gate.sh` | release recipe in the work-item handoff |
+| E3 | Four gates existed and ran by hand only (glossary, LTC golden, LTC steps, slop-render) | Gate exists but is not wired | Wired into `tools/ship-gate.sh`; the LTC browser gates serve their own tree on 8166 and stop it by PID | `tools/ship-gate.sh` |
+| E4 | A strip showed the previous model under load | A debounce starved by continuous mutations, and a fixed 1.5 s wait in the gate | Throttle (fires during a burst) and a poll up to 6 s; a no-op refresh still fails the law | S2 / S10 |

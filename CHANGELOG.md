@@ -26,6 +26,9 @@ release sections rather than semver.
 ### Gates
 - `tools/test-ltc-lab-steps.mjs` laws S29–S35 (distinct ticks, compare verdicts, nav hue, settings under their step, readable legend, scatter fits a phone, legacy report register), each proven red on the previous tree.
 
+### Docs
+- Standards brought in line with v3.27.0 – v3.28.1 (owner: every standardization change recorded in `standarization/`): `ANTI_VIBECODE_STANDARD.md` (LTC render gate and chart rules, `audit-slop-render.mjs`, the gradient-hides-contrast lesson), `KNOWLEDGE_LABS_STANDARD.md` v2 (per-card accents withdrawn, LTC lab workflow contract), `ACCURACY_VALIDATION.md` (Rule 1 on the LTC lab, golden fixture), `AGENT_HARNESS_STANDARD.md` (release-environment ledger E1–E4), `UIUX_AUDIT_LEDGER.md` CLOSED rows 21–23. The four gates added in v3.27.0 had appeared in no standard.
+
 ## v3.28.0 — 2026-11-08 — "Cx Analysis 3D: machines with shapes, drawn like an isometric"
 
 ### Added

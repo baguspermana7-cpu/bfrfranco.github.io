@@ -48,6 +48,10 @@ Network Hub = instrument-cyan `#00DDFF`).
 
 NO Anthropic-purple. NO glassmorphism. NO neon-glow. NO Material ripple.
 
+> **Superseded (v3.24.0 hub refit, v3.27.0 LTC lab):** the per-card accents above (cyan, blue-400,
+> oscilloscope-green) are withdrawn. The hub and every lab page carry ONE accent, signal amber, on a neutral
+> register; see `ANTI_VIBECODE_STANDARD.md` and `UIUX_AUDIT_LEDGER.md` rows 16, 20 and 21.
+
 ## Cards currently in scope
 
 | # | Card | Topic page | Tier | Status |
@@ -57,6 +61,23 @@ NO Anthropic-purple. NO glassmorphism. NO neon-glow. NO Material ripple.
 | 3 | Network Visualization Hub | `network-visualization-hub.html` | FREE | ⏳ Phase 0 pending |
 
 Future additions follow the same anatomy.
+
+## LTC System Modelling Lab — workflow contract (v3.27.0 – v3.28.1)
+
+`ltc-system-modelling-lab.html` is the working lab (the Standards Hub card above links the reference page).
+Its contract, each line held by a law in `tools/test-ltc-lab-steps.mjs`:
+
+- **Seven steps** in the left rail: Load, Capture, Loop, Rejection, Cost · carbon, Check, Review. Each step
+  shows its result line, outlines its equipment on the system overview, and opens an arithmetic strip that
+  substitutes the engine's numbers into each equation (`holds` only when the substitution reproduces it).
+- **Settings sit under the step they shape** (Load 8, Capture 6, Loop 7, Rejection 9, Cost 5, Check 2):
+  design settings in view, preset and tuning settings behind "More · n". Inputs are moved, never cloned.
+- **One engine**: every figure comes from the plant (`LTCLabPlant.compute` on `RZEngine.models.ltc`).
+  Settings the plant does not read are marked `screening only`; a compare refuses plant against screening.
+- **Write-back**: Optimize, Calibration and Pareto apply only changes that improve their objective, at the
+  precision the form shows, then recompute; the figures shown are reproduced from the form.
+- **Review** compares the design with the last saved scenario recomputed from its saved inputs and states a
+  verdict per row (better / worse / same, `scale` for extensive figures when the IT load differs).
 
 ## Topic page anatomy (required)
 
@@ -137,3 +158,6 @@ For every new Knowledge Labs topic page:
 - **v1 — 2026-05-24** — Section established to host AI Maintenance,
   LTC Labs, and the upcoming Network Visualization Hub. Replaces the
   earlier (incorrect) plan to add a 7th card to Cost Calculators.
+- **v2 — 2026-11-08** — Per-card accents withdrawn (one amber accent). LTC System Modelling Lab workflow
+  contract recorded (v3.27.0 – v3.28.1); gates `tools/test-ltc-lab-steps.mjs` and
+  `tools/test-ltc-lab-golden.mjs`, both in `tools/ship-gate.sh`.

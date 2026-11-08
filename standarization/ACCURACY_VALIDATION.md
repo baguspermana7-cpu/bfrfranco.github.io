@@ -372,3 +372,11 @@ alongside the four audit scripts (`audit-script-tags`,
   The Basis-of-Design PDF builder (`buildBodPdfHtml()`) is fully rewritten: BoD-AI-3/4/5/7
   re-pinned to the GB300 snapshot, and BoD-AI-6 was INVERTED (it no longer cites "Scenario A" —
   confirmed absent from the rewritten BoD PDF source) rather than left asserting retired wording.
+- **v3.27.0 – v3.28.1** (2026-11-08): **LTC System Modelling Lab: Rule 1 (one source of truth)** applied
+  to every figure. The Results card, fx traces, Equation Inspector, PDF equation lines, tornado, impact
+  matrix, Sankey and scenario deltas read or perturb the plant (`LTCLabPlant.traceOf / equationLines /
+  stepInput / computeLike`). Found on the way: the Sankey invented aux = 3 % of IT and dropped the TCS pumps
+  (131,039 kW drawn for a 129,750 kW plant); Calibration rewrote 12 inputs of which 10 had no effect; Pareto
+  "apply" compared a point with itself. Kept by `tools/test-ltc-lab-golden.mjs` (12 scenarios × 28 rendered
+  outputs against a fixture) and the reproduction laws of `tools/test-ltc-lab-steps.mjs` (a figure shown
+  after an apply must equal the figure the form computes).
