@@ -250,7 +250,8 @@ function gridFigure(spec) {
     ctx.node(b.x, b.y, {
       id: n.id, tag: n.tag, name: n.name, sublabel: n.sub, w: b.w, h: b.h,
       stroke: n.stroke || 'rule-solid', fill: n.fill || 'paper', tier: n.tier || 2,
-      dashed: n.dashed, symbol: n.symbol, legend: n.legend, vAlign: n.symbol ? undefined : 'middle'
+      dashed: n.dashed, symbol: n.symbol, legend: n.legend, vAlign: n.symbol ? undefined : 'middle',
+      interactive: spec.interactive || undefined
     });
   });
 
@@ -285,7 +286,8 @@ function gridFigure(spec) {
     if (e.legend) anyLegend = true;
     ctx.edge({ x: e.pf.x, y: e.pf.y }, { x: e.pt.x, y: e.pt.y }, {
       fromId: e.a, toId: e.b, stroke: e.stroke || 'ink', tier: e.tier || 2,
-      pattern: e.pattern || 'solid', label: e.label, legend: e.legend
+      pattern: e.pattern || 'solid', label: e.label, legend: e.legend,
+      id: spec.interactive ? e.a + '>' + e.b : undefined
     });
   });
   if (anyLegend) ctx.legend();
@@ -1012,6 +1014,7 @@ const AGENTIC_FIGURES = [
 const PILLAR_FIRE_FIGURES = [
   {
     id: 'fire-d1', page: 'pillar-fire-safety.html',
+    detail: {"asd": {"text": "Draws air from the room through a pipe network to a central laser chamber. Class A, B or C sensitivity; the site's engine uses a pre-alarm at 0.005 % obscuration per metre.", "see": "#aspirating"}, "spot": {"text": "Point-type smoke detector on the ceiling and in voids. NFPA 72 spacing 9.1 m (30 ft), about 84 m² per detector, reduced where air changes are high.", "see": "#spot"}, "facp": {"text": "Counts zones. One zone in alarm only raises an alarm; release logic needs two independent zones (cross-zoned release).", "see": "#crosszone"}, "pre": {"text": "Second zone confirmed: the pre-discharge alarm sounds, the air handlers stop and the dampers close so the room can hold the agent.", "see": "#crosszone"}, "abort": {"text": "Held by a person: pauses the time delay while it is pressed. It does not cancel a manual release.", "see": "#crosszone"}, "dly": {"text": "Typically 30 s, so occupants can leave before the agent is released.", "see": "#crosszone"}, "man": {"text": "Station at the exit. Releases the agent directly, bypassing the zone logic and the abort switch.", "see": "#crosszone"}, "rel": {"text": "Opens the agent cylinders when the delay ends or the manual station is operated.", "see": "#suppression"}, "dis": {"text": "Halocarbon discharge in 10 s or less; the room must hold the design concentration for at least 10 min.", "see": "#clean-agent"}},
     caption:
       'From first smoke to agent release. One zone in alarm only alarms; two independent zones start the ' +
       'pre-discharge sequence, which shuts the air handlers and dampers and runs a time delay (typ. 30 s [S5]) that the ' +
@@ -1023,7 +1026,7 @@ const PILLAR_FIRE_FIGURES = [
     build: () => gridFigure({
       phone: { order: ['asd', 'spot', 'facp', 'pre', 'abort', 'dly', 'man', 'rel', 'dis'], gapY: 34,
         edges: { 0: { fs: 'r', ts: 'r' }, 3: { fs: 'l', ts: 'l' }, 5: { fs: 'r', ts: 'r' } } },
-      slug: 'fire1', title: 'From first smoke to agent release',
+      slug: 'fire1', interactive: true, title: 'From first smoke to agent release',
       desc: 'Two detection zones feed the fire alarm panel; release needs both, then a pre-discharge delay that an abort switch can hold.',
       gaps: [64, 64], gapY: 30,
       nodes: [
@@ -1049,6 +1052,7 @@ const PILLAR_FIRE_FIGURES = [
   },
   {
     id: 'fire-d2', page: 'pillar-fire-safety.html',
+    detail: {"cyl": {"text": "Agent mass from NFPA 2001: W = (V/s) · C/(100 − C), sized to the whole protected volume V at the design concentration C.", "see": "#clean-agent"}, "noz": {"text": "Discharge completes in 10 s or less for halocarbons, 60 s or less for the inert gases.", "see": "#clean-agent"}, "mix": {"text": "The room reaches the design concentration. In a normally occupied room it must be at or below the NOAEL.", "see": "#clean-agent"}, "damp": {"text": "Closed on release so the HVAC does not carry the agent out of the room.", "see": "#clean-agent"}, "vent": {"text": "Discharge changes the room pressure, so NFPA 2001 requires the enclosure pressure to be checked; most inert-gas systems need this vent.", "see": "#clean-agent"}, "leak": {"text": "Cables, doors and floor voids: the paths through which the agent drains out during the hold time.", "see": "#clean-agent"}, "fan": {"text": "Door-fan test (NFPA 2001 Annex C). Measures the leakage area before any agent is used.", "see": "#clean-agent"}, "hold": {"text": "Predicted from the measured leakage. At least 10 min, or the room is sealed and re-tested until it passes.", "see": "#clean-agent"}},
     caption:
       'A clean-agent room is a sealed volume. The agent mass is sized to the whole protected volume, discharged in ' +
       '10 s or less, and must stay at concentration for at least 10 min while it leaks out through penetrations [S1][S4]. ' +
@@ -1060,7 +1064,7 @@ const PILLAR_FIRE_FIGURES = [
       phone: { order: ['cyl', 'noz', 'mix', 'damp', 'vent', 'leak', 'fan', 'hold'], gapY: 30,
         zones: [{ ids: ['noz', 'mix', 'damp', 'vent', 'leak'], label: 'Protected volume V' }],
         edges: { 4: { fs: 'r', ts: 'r' }, 6: { fs: 'l', ts: 'l' } } },
-      slug: 'fire2', title: 'Clean-agent room: volume, discharge, hold',
+      slug: 'fire2', interactive: true, title: 'Clean-agent room: volume, discharge, hold',
       desc: 'Cylinders discharge through nozzles into the sealed room; agent leaks out through penetrations; a door-fan test measures the leakage and predicts the hold time.',
       gaps: [72, 64], gapY: 30,
       nodes: [
@@ -1086,6 +1090,7 @@ const PILLAR_FIRE_FIGURES = [
   },
   {
     id: 'fire-d3', page: 'pillar-fire-safety.html',
+    detail: {"cell": {"text": "Thermal runaway starts at the cell's onset temperature: 150 °C for NMC and 166.8 °C for LFP in the chemistry table below.", "see": "#liion"}, "bms": {"text": "Battery management system alarm (IEC 62619): isolate the string before the cell vents.", "see": "#liion"}, "vent": {"text": "The cell vents a flammable mix of hydrogen, carbon monoxide, carbon dioxide and electrolyte vapour.", "see": "#liion"}, "lfl25": {"text": "Action threshold: 25 % of the lower flammable limit, which for hydrogen is 1.0 % by volume.", "see": "#liion"}, "exh": {"text": "Hydrogen and carbon-monoxide sensors trip the gas alarm and start exhaust (NFPA 855).", "see": "#liion"}, "lfl100": {"text": "100 % of the LFL, 4.0 % hydrogen by volume: a deflagration becomes possible.", "see": "#liion"}, "exp": {"text": "Explosion control: vent the deflagration (NFPA 68) or prevent it (NFPA 69).", "see": "#liion"}, "tr": {"text": "Runaway spreads from cell to cell; a gaseous agent cannot stop it.", "see": "#liion"}, "cool": {"text": "Water cools the neighbouring cells and stops the spread; this is why battery rooms carry sprinklers or water mist.", "see": "#liion"}},
     caption:
       'Lithium-ion off-gas against the lower flammable limit (LFL). Detection and exhaust must act at 25 % of the LFL, ' +
       'which for hydrogen is 1.0 % by volume [S2][S3]. One 1,333 kWh NMC pack can vent 5,332 m³ of gas, enough to bring ' +
@@ -1096,7 +1101,7 @@ const PILLAR_FIRE_FIGURES = [
     build: () => gridFigure({
       phone: { order: ['cell', 'bms', 'vent', 'lfl25', 'exh', 'lfl100', 'exp', 'tr', 'cool'], gapY: 30,
         edges: { 1: { fs: 'r', ts: 'r' }, 4: { fs: 'l', ts: 'l', label: undefined }, 6: { fs: 'l', ts: 'l' } } },
-      slug: 'fire3', title: 'Li-ion off-gas against the LFL',
+      slug: 'fire3', interactive: true, title: 'Li-ion off-gas against the LFL',
       desc: 'Concentration rises from cell venting to 25 % of the LFL, where gas detection starts exhaust, and to 100 % of the LFL, where a deflagration becomes possible.',
       gaps: [64], gapY: 26,
       nodes: [
@@ -2034,10 +2039,15 @@ function figureMarkup(fig, ctx, narrow) {
    * js/rz-article-diagram.js looks for it. It is emitted from the definition, so
    * the scenarios cannot drift from the drawing they animate. `<` is escaped so
    * no string in it can close the script element. */
-  const live = fig.live
+  const live = (fig.live
     ? '<script type="application/json" class="rz-diagram-cfg">' +
       JSON.stringify(fig.live).replace(/</g, '\\u003c') + '</script>\n'
-    : '';
+    : '') + (fig.detail
+    /* K24: an explorable figure carries, per node, what it does and where the page explains it;
+     * js/rz-figure-interact.js reads this and the data-rzd-node / data-rzd-edge hooks. */
+    ? '<script type="application/json" class="rz-figure-detail">' +
+      JSON.stringify(fig.detail).replace(/</g, '\\u003c') + '</script>\n'
+    : '');
   /* caption: null — the figure sits in a container that already titles it (a
    * scrollytelling canvas), and a second caption would repeat that title. */
   const cap = fig.caption === null ? ''

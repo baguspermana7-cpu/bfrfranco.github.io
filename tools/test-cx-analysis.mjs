@@ -165,6 +165,28 @@ try {
     ok('K17 with the hall focused, every hall family with a _hi twin draws it (LOD)', hiStats.hiAvail === 0 || hiStats.hiDrawn >= 6, hiStats);
     await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.focus(null)); await new Promise((r) => setTimeout(r, 300));
     ok('K17 back on the campus no family draws its hi twin', (await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.stats().hi)) === 0);
+    // K22 item 6: explode + Fit site / Fit selection
+    const X0 = await page.evaluate(() => { const h = document.getElementById('cxAnCampus'), b = h.querySelector('[data-explode]'), fs = h.querySelector('[data-fit="site"]'), fl = h.querySelector('[data-fit="sel"]'); return { has: !!(b && fs && fl), pressed: b && b.getAttribute('aria-pressed'), selDisabled: fl && fl.disabled }; });
+    ok('X0 the campus bar has Explode (aria-pressed false), Fit site and Fit selection (disabled with nothing focused)', X0.has && X0.pressed === 'false' && X0.selDisabled === true, X0);
+    if (X0.has) {
+      const dots0 = await page.evaluate(() => { const h = document.getElementById('cxAnCampus'); h.__rzCampus.focus('hall'); return null; });
+      await new Promise((r) => setTimeout(r, 500));
+      const cy0 = await page.evaluate(() => [...document.querySelectorAll('#cxAnCampus svg circle')].filter((c) => c.getAttribute('visibility') !== 'hidden').map((c) => +c.getAttribute('cy')));
+      await page.evaluate(() => document.querySelector('#cxAnCampus [data-explode]').click());
+      await new Promise((r) => setTimeout(r, 900));
+      const X1 = await page.evaluate(() => { const h = document.getElementById('cxAnCampus'); return { pressed: h.querySelector('[data-explode]').getAttribute('aria-pressed'), ex: h.__rzCampus.exploded(), cy: [...h.querySelectorAll('svg circle')].filter((c) => c.getAttribute('visibility') !== 'hidden').map((c) => +c.getAttribute('cy')) }; });
+      const ys = X1.ex.layers.map((l) => l.y), distinct = new Set(ys.map((y) => y.toFixed(2))).size;
+      ok('X1 Explode on the hall: pressed, factor 1, every hall family lifted to its own layer (all > 0, all distinct, >= 2)', X1.pressed === 'true' && X1.ex.factor === 1 && ys.length >= 2 && ys.every((y) => y > 0) && distinct === ys.length, X1.ex);
+      ok('X1 the callout anchors follow the lifted layers (same count, and the anchor dots moved up on screen)', cy0.length > 0 && X1.cy.length === cy0.length && X1.cy.reduce((a, b) => a + b, 0) < cy0.reduce((a, b) => a + b, 0), { before: cy0, after: X1.cy });
+      const X2 = await page.evaluate(() => { const h = document.getElementById('cxAnCampus'), a = h.__rzCampus; h.querySelector('[data-fit="site"]').click(); const site = a.view(); const selDisabled = h.querySelector('[data-fit="sel"]').disabled; h.querySelector('[data-fit="sel"]').click(); const sel = a.view(); return { site, sel, selDisabled, focus: h.getAttribute('data-cx-focus') }; });
+      ok('X2 Fit site frames the whole site (zoom <= 1.3, target = site centre) and keeps the hall selected', X2.site.zoom <= 1.3 && X2.site.atSite && X2.focus === 'hall', X2);
+      ok('X2 Fit selection is enabled with the hall focused and frames it (target = hall centre, zoom > site zoom)', !X2.selDisabled && X2.sel.atFocus && X2.sel.zoom > X2.site.zoom, X2);
+      await page.evaluate(() => document.querySelector('#cxAnCampus [data-explode]').click());
+      await new Promise((r) => setTimeout(r, 900));
+      const X3 = await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.exploded());
+      ok('X3 Explode off returns every layer to 0', X3.factor === 0 && X3.layers.every((l) => Math.abs(l.y) < 1e-6), X3);
+      await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.focus(null)); await new Promise((r) => setTimeout(r, 300));
+    }
     // the IT load changes → the plant re-lays itself (setBasis), the note and the counts follow
     const before = await page.evaluate(() => document.querySelector('#cxAnCampus .cx-3d-note').textContent);
     const relaid = await page.evaluate(() => { const el = document.getElementById('cxItLoadNum') || document.getElementById('cxItLoad'); const v0 = +el.value; el.value = String(Math.round(v0 * 2)); el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); if (typeof window.cxCalculate === 'function') window.cxCalculate(); return new Promise((res) => setTimeout(() => { const h = document.getElementById('cxAnCampus'), L = h.__rzCampus.layout(); res({ v0, kw: L.kw, racks: L.families.racks.count, drawn: Object.fromEntries(h.__rzCampus.stats().drawn).racks, note: document.querySelector('#cxAnCampus .cx-3d-note').textContent }); el.value = String(v0); el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); if (typeof window.cxCalculate === 'function') window.cxCalculate(); }, 600)); });

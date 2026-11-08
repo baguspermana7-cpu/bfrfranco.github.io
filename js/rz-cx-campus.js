@@ -251,7 +251,7 @@
       placeLabels(); draw();
     }
     /* ---- focus: roof off, neighbours dim, interior on ---- */
-    var anim = { roof: 0, target: 0 };
+    var anim = { roof: 0, target: 0, explode: 0, exTarget: 0 };
     function focus(id) {
       focused = id || null;
       for (var k in buildings) if (buildings.hasOwnProperty(k)) {
@@ -273,8 +273,32 @@
       anim.target = focused && buildings[focused].userData.roof ? 1 : 0;
       if (crumb) crumb.innerHTML = '<button type="button" data-crumb="">Campus</button>' + (focused ? ' › <b>' + SITE[focused].name + '</b>' : '');
       host.setAttribute('data-cx-focus', focused || '');
-      var sp = focused ? SITE[focused] : null; if (sp) { ctl.target.set(sp.x, 2, sp.z); cam.zoom = Math.max(2.4, Math.min(5, 3.2 * 62 / Math.max(sp.w, sp.d))); } else { ctl.target.set(BOUNDS.cx, 0, BOUNDS.cz); cam.zoom = 1.3; }
+      if (fitSelBtn) fitSelBtn.disabled = !focused;
+      if (!focused && exploded) setExplode(false);
+      fit(focused ? 'sel' : 'site');
+    }
+    /* ---- K22: Fit site / Fit selection keep the selection and only move the camera ---- */
+    function fit(k) {
+      var sp = k === 'sel' && focused ? SITE[focused] : null;
+      if (sp) { ctl.target.set(sp.x, 2, sp.z); cam.zoom = Math.max(2.4, Math.min(5, 3.2 * 62 / Math.max(sp.w, sp.d))); } else { ctl.target.set(BOUNDS.cx, 0, BOUNDS.cz); cam.zoom = 1.3; }
       cam.updateProjectionMatrix(); ctl.update(); placeLabels(); draw();
+    }
+    /* ---- K22: explode = the focused building's families each lifted onto its own layer (4 m apart), roof clear above;
+     * callouts read matrixWorld, so they stay on their unit. Reduced motion: instant. ---- */
+    var exploded = false, EX_STEP = 4;
+    function setExplode(on) {
+      exploded = !!on; if (exploded && !focused) focus('hall');
+      anim.exTarget = exploded ? 1 : 0; anim.exLast = root.performance ? root.performance.now() : 0; if (REDUCE) anim.explode = anim.exTarget;
+      if (exBtn) exBtn.setAttribute('aria-pressed', String(exploded));
+      host.setAttribute('data-cx-explode', exploded ? '1' : '0'); draw();
+    }
+    function layerOf() { var out = [], n = 0; for (var i = 0; i < equipment.length; i++) { var im = equipment[i]; if (im.userData.building === focused && im.visible) out.push({ im: im, n: ++n }); } return out; }
+    function ease(x) { return 1 - Math.pow(1 - x, 3); }
+    function applyExplode() {
+      var lay = layerOf(), set = {};
+      for (var i = 0; i < lay.length; i++) { lay[i].im.position.y = ease(anim.explode) * EX_STEP * lay[i].n; set[lay[i].im.uuid] = 1; }
+      for (var j = 0; j < equipment.length; j++) if (!set[equipment[j].uuid] && equipment[j].position.y) equipment[j].position.y = 0;
+      return lay.length;
     }
     /* ---- camera presets ---- */
     function preset(k) {
@@ -300,6 +324,9 @@
     cv.addEventListener('keydown', function (e) { if (e.key === '0') { preset('campus'); e.preventDefault(); } else if (e.key >= '1' && e.key <= '4') { preset(['campus', 'plant', 'hall', 'sub'][+e.key - 1]); e.preventDefault(); } else if (e.key === 'Escape' && focused) { focus(null); e.preventDefault(); } });
     Array.prototype.forEach.call(host.querySelectorAll('[data-cam]'), function (b) { b.addEventListener('click', function () { preset(b.getAttribute('data-cam')); }); });
     var pauseBtn = host.querySelector('[data-pause]'); if (pauseBtn) pauseBtn.addEventListener('click', function () { setPaused(!paused); });
+    var exBtn = host.querySelector('[data-explode]'), fitSelBtn = host.querySelector('[data-fit="sel"]');
+    if (exBtn) exBtn.addEventListener('click', function () { setExplode(!exploded); });
+    Array.prototype.forEach.call(host.querySelectorAll('[data-fit]'), function (b) { b.addEventListener('click', function () { fit(b.getAttribute('data-fit')); }); });
     var roofBtn = host.querySelector('[data-roof]'); if (roofBtn) roofBtn.addEventListener('click', function () { focus(focused ? null : 'hall'); });
     function setPaused(v) { paused = !!v; if (pauseBtn) { pauseBtn.setAttribute('aria-pressed', String(paused)); pauseBtn.textContent = paused ? 'Resume flows' : 'Pause flows'; } draw(); }
 
@@ -382,12 +409,16 @@
       if (!interacting && now - lastDraw < 30) { raf = requestAnimationFrame(frame); return; }
       var dt = Math.min(0.05, (now - (last || now)) / 1000); last = now; var t0 = now;
       if (!paused && !REDUCE) for (var i = 0; i < flows.length; i++) if (flows[i].speed) step(flows[i], dt);
+      /* time-based (240 ms, ease-out applied in applyExplode) so a slow frame rate never stalls it mid-way */
+      if (anim.explode !== anim.exTarget) { var exd = REDUCE ? 1 : Math.min(0.25, (now - (anim.exLast || now)) / 1000) / 0.24 || 0.05; anim.explode = anim.exTarget > anim.explode ? Math.min(anim.exTarget, anim.explode + exd) : Math.max(anim.exTarget, anim.explode - exd); }
+      anim.exLast = now;
+      var exLayers = applyExplode();
       if (anim.roof !== anim.target) { anim.roof += (anim.target - anim.roof) * (REDUCE ? 1 : 0.18); if (Math.abs(anim.target - anim.roof) < 0.01) anim.roof = anim.target; }
-      for (var k in buildings) if (buildings.hasOwnProperty(k)) { var b = buildings[k]; if (b.userData.roof) { var lift = (k === focused ? anim.roof : 0); b.userData.roof.position.y = SITE[k].h + 0.25 + lift * 9; b.userData.roof.material.opacity = Math.min(b.userData.roof.material.opacity, 1 - lift * 0.85); b.userData.roof.material.transparent = true; } }
+      for (var k in buildings) if (buildings.hasOwnProperty(k)) { var b = buildings[k]; if (b.userData.roof) { var lift = (k === focused ? anim.roof : 0); b.userData.roof.position.y = SITE[k].h + 0.25 + lift * 9 + (k === focused ? ease(anim.explode) * EX_STEP * (exLayers + 1) : 0); b.userData.roof.material.opacity = Math.min(b.userData.roof.material.opacity, 1 - lift * 0.85); b.userData.roof.material.transparent = true; } }
       ctl.update(); renderer.render(scene, cam); placeLabels(); placeCallouts();
       lastDraw = now; frames++; fpsAcc += dt; busy += (root.performance ? root.performance.now() : now) - t0;
       if (fpsAcc >= 1) { fps = frames / fpsAcc; lastFps = fps; adapt(Math.max(busy / frames, 1000 / fps)); frames = 0; fpsAcc = 0; busy = 0; }
-      if (inView && (!(paused || REDUCE) || anim.roof !== anim.target)) raf = requestAnimationFrame(frame);
+      if (inView && (!(paused || REDUCE) || anim.roof !== anim.target || anim.explode !== anim.exTarget)) raf = requestAnimationFrame(frame);
     }
     function draw() { if (!raf) raf = requestAnimationFrame(frame); }
     ctl.addEventListener('change', draw); ctl.addEventListener('start', function () { interacting = true; }); ctl.addEventListener('end', function () { interacting = false; });
@@ -424,7 +455,9 @@
     var api = {
       setStatus: function (st) { status = indexStatus(st); applyStatus(); },
       setBasis: function (b) { L = layout(typeof b === 'function' ? b() : b); applyBasis(); applyStatus(); },
-      setPaused: setPaused, focus: focus, preset: preset, probe: probe,
+      setPaused: setPaused, focus: focus, preset: preset, probe: probe, explode: setExplode, fit: fit,
+      exploded: function () { return { factor: anim.explode, layers: layerOf().map(function (l) { return { system: l.im.userData.system, y: l.im.position.y }; }) }; },
+      view: function () { var sp = focused ? SITE[focused] : null; return { zoom: cam.zoom, target: [ctl.target.x, ctl.target.z], atSite: Math.abs(ctl.target.x - BOUNDS.cx) < 0.01 && Math.abs(ctl.target.z - BOUNDS.cz) < 0.01, atFocus: !!sp && Math.abs(ctl.target.x - sp.x) < 0.01 && Math.abs(ctl.target.z - sp.z) < 0.01 }; },
       layout: function () { return L; },
       stats: function () { return { fps: lastFps, quality: quality, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, equipment: equipment.length, shaped: shaped, assets: host.getAttribute('data-cx-assets') || 'primitives', glb: equipment.filter(function (e) { return e.userData.shaped === 'glb'; }).length, hi: equipment.filter(function (e) { return e.userData.lod === 'hi'; }).length, callouts: coEls.filter(function (c) { return !c.el.hidden; }).length, hulls: equipment.filter(function (e) { return e.userData.hull && e.userData.hull.visible; }).length, flows: flows.length, streams: flows.filter(function (f) { return f.speed > 0; }).length, drawn: equipment.map(function (e) { return [e.userData.system, e.count]; }), focused: focused, paused: paused, canvas: PAL.canvas }; },
       select: function (systemId) { for (var k in SITE) if (SITE[k].systems.indexOf(systemId) !== -1) { focus(k); return k; } return null; }
