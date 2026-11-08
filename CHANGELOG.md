@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v3.30.2 — 2026-11-08 — "Tools page: the separator dot, and no empty band under the head"
+
+### Fixed
+- `tools.html`: the dot between the three hero facts rendered as "�b7". The v3.30.1 rewrite passed the CSS escape
+  `\00b7` through a regular-expression replacement, which turned `\0` into a NUL byte. The file now carries the escape
+  again; every file changed since v3.28.1 was checked for NUL bytes (none left).
+- `tools.html`: a 108 px empty band above each category came from the site-wide `section` padding; the category blocks
+  set their own spacing.
+
 ## v3.30.1 — 2026-11-08 — "Tools page on one accent, cockpit transitions named, Tier IV shows its nines"
 
 ### Changed
