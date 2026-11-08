@@ -232,17 +232,20 @@ TIER_SCRIPT = '''<script>
 /* Tier III / IV availability from MTBF and MTTR (ids and model carried over from the old page; recomputed on input).
    A = MTBF / (MTBF + MTTR); Tier III = 1 - (1 - A)^2; Tier IV = A3 + (1 - A3) * A. Illustration only.
    The old page printed 4 decimals (every realistic input read "100.0000 %") and capped Tier IV at 99.9999 %, which put
-   it BELOW Tier III for a good component; now 6 decimals, no cap, and the expected downtime per year. */
+   it BELOW Tier III for a good component; now as many decimals as the shortfall needs, no cap, and the downtime a year. */
 (function(){
   var f=document.getElementById('mtbf'), r=document.getElementById('mttr'), o3=document.getElementById('t3result'), o4=document.getElementById('t4result');
   var d3=document.getElementById('t3down'), d4=document.getElementById('t4down');
   if(!f||!r||!o3||!o4) return;
-  function down(a){ var m=(1-a)*525600; return m>=60 ? (m/60).toFixed(2)+' h of downtime a year' : m>=1 ? m.toFixed(2)+' min of downtime a year' : m*60>=1 ? (m*60).toFixed(2)+' s of downtime a year' : (m*6e4).toPrecision(2)+' ms of downtime a year'; }
+  function down(a){ var m=(1-a)*525600, u=' of downtime a year'; return m>=60 ? (m/60).toFixed(2)+' h'+u : m>=1 ? m.toFixed(2)+' min'+u : m*60>=1 ? (m*60).toFixed(2)+' s'+u : m*6e4>=1 ? (m*6e4).toPrecision(2)+' ms'+u : m*6e7>=1 ? (m*6e7).toPrecision(2)+' \u00b5s'+u : 'under 1 \u00b5s'+u; }
+  /* As many decimals as it takes to show two significant digits of the shortfall, so a good plant reads its nines
+     (99.99999943 %) instead of rounding to 100 %. */
+  function pct(a){ var s=(1-a)*100; if(!(s>0)) return '> 99.99999999999\\u00a0%'; var d=Math.min(13, Math.max(4, Math.ceil(-Math.log10(s))+1)); return (100-s).toFixed(d)+'\\u00a0%'; }
   function calc(){
     var mtbf=parseFloat(f.value), mttr=parseFloat(r.value);
     if(!(mtbf>0)||!(mttr>0)){ o3.textContent=o4.textContent='--'; return; }
     var a=mtbf/(mtbf+mttr), t3=1-Math.pow(1-a,2), t4=t3+(1-t3)*a;
-    o3.textContent=(t3*100).toFixed(6)+' %'; o4.textContent=(t4*100).toFixed(6)+' %';
+    o3.textContent=pct(t3); o4.textContent=pct(t4);
     if(d3) d3.textContent=down(t3); if(d4) d4.textContent=down(t4);
   }
   f.addEventListener('input',calc); r.addEventListener('input',calc); calc();

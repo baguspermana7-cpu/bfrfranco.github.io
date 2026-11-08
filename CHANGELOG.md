@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v3.30.1 — 2026-11-08 — "Tools page on one accent, cockpit transitions named, Tier IV shows its nines"
+
+### Changed
+- `tools.html`: one amber accent instead of 23 per-card colours (mint, green, blue, cyan); no aurora behind the head, no
+  shine sweep or glow on hover, icons without tinted tiles (the two emoji icons are Font Awesome glyphs), the hero
+  badges are one plain line, category titles are grey with a hairline.
+- Cockpits (`ict`, `EPMS_Telemetry`, `water-system`, `fire-system`, `dc-conventional`, `fuel-system`): 24
+  `transition: all` rules name their properties; `datahallAI` loses two hover transforms; the locked `dc-conventional`
+  content is no longer blurred under its (solid) overlay.
+- Tables on the tool shell fit a 360 px phone when they have four columns or fewer: tighter cells, long words and
+  source tags wrap, the infographic minimum widths are lifted on phones (clipped tables 31 → 3; the last three are
+  wide CDU matrices, fixed page-locally in v3.30.0).
+
+### Fixed
+- Tier III vs IV availability printed "100.000000 %" for Tier IV on every realistic input. It now prints as many
+  decimals as it takes to show two significant digits of the shortfall (8760 h / 4 h: 99.9999999905 %), downtime
+  under a millisecond in µs, and the value wraps rather than widening the page on a phone.
+- "--" in the copy of three comparison pages (Tier III vs IV, FM-200 vs Novec, PUE vs DCiE).
+
 ## v3.30.0 — 2026-11-08 — "The homepage and the journal on the register; the render scan reads both themes"
 
 Owner, 2026-11-08 (PRD §41 K19): *"pasti ada, saya nggak mau, sempurnakan, saya tidak mau ada yang miss"* — a slop claim

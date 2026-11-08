@@ -18,7 +18,7 @@ body.tool .ex-prose p strong, body.tool .ex-prose p b { color: var(--rzt-text); 
 body.tool .ck-tbl td a { color: var(--rzt-text); font-weight: 500; text-decoration: underline; text-decoration-color: var(--rzt-accent); text-underline-offset: 3px; }
 body.tool .ck-tbl td a:hover { text-decoration-color: var(--rzt-text); }
 body.tool .ck-tbl td:first-child { width: 14rem; }
-@media (max-width: 600px) { body.tool .ck-tbl td:first-child { width: auto; min-width: 6.5rem; } body.tool .ck-tbl td, body.tool .ck-tbl th { padding: 8px 10px; font-size: 13px; } }
+@media (max-width: 600px) { body.tool .ck-tbl td:first-child { width: auto; min-width: 0; } body.tool .ck-tbl td, body.tool .ck-tbl th { padding: 8px 7px; font-size: 13px; overflow-wrap: anywhere; hyphens: auto; } body.tool .ck-tbl th { letter-spacing: .02em; font-size: 10px; } body.tool .ck-tbl .num { white-space: normal; } }
 body.tool .ck-tbl td { font-size: 14px; line-height: 1.5; }
 body.tool .ck-tbl td + td { color: var(--rzt-text-2); }
 body.tool .ck-tbl .num { font-family: var(--rzt-mono); text-align: right; white-space: nowrap; }
@@ -48,7 +48,7 @@ body.tool .ig-refs { margin: 0; padding-left: 0; list-style: none; max-width: 74
 body.tool .ig-refs li { padding: 8px 0; border-bottom: 1px solid var(--rzt-line-soft); font-size: 14px; line-height: 1.55; color: var(--rzt-text-2); }
 body.tool .ig-refs .ref-n { font: 500 12px var(--rzt-mono); color: var(--rzt-muted); margin-right: 4px; }
 body.tool .ck-calc [data-rz-fact-list] > * > .calc-value { white-space: nowrap; }
-@media (max-width: 600px) { body.tool .ck-calc [data-rz-fact-list] > * > .calc-value { font-size: 15px; } }
+@media (max-width: 600px) { body.tool .ck-calc [data-rz-fact-list] > * > .calc-value { font-size: 14px; white-space: normal; overflow-wrap: anywhere; } body.tool .ck-calc [data-rz-fact-list] > * { min-width: 0; } }
 body.tool .ck-tbl code { font: 400 13px var(--rzt-mono); color: var(--rzt-text); }
 body.tool .tool-ref .against span { display: inline; }
 
@@ -194,3 +194,5 @@ body.tool .leaflet-control-zoom a { text-decoration: none; color: #1a1d23; backg
 body.tool .leaflet-control-zoom a:hover { background: #eef2f7; }
 body.tool .leaflet-control-zoom { border: 1px solid rgba(40,44,52,.24); border-radius: 4px; box-shadow: none; overflow: hidden; }
 body.tool .leaflet-control-zoom a:focus-visible { outline: 2px solid #B07600; outline-offset: -2px; }
+/* phones: a table of four columns or fewer fits 360 px (no clipped Edge column); after the ig-* widths so it wins */
+@media (max-width: 600px) { body.tool .ck-tbl .src { white-space: normal; } body.tool .ig-cost { min-width: 0; } body.tool .ig-cost td:nth-child(4) { min-width: 3rem; } body.tool .ig-tiers td:last-child { min-width: 0; } }

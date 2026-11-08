@@ -108,13 +108,13 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="js/rz-version.js?v=20261108-7c777ff3" defer></script>
+    <script src="js/rz-version.js?v=20261108-fe98e27e" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
     <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261107-7aaef8f4">
-    <link rel="stylesheet" href="css/rz-explorer.css?v=20261108-105384dd">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261108-2a08b174">
+    <link rel="stylesheet" href="css/rz-explorer.css?v=20261108-7465d501">
     <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body class="hub tool" data-rz-page="compare-tier">
@@ -194,8 +194,8 @@
     <tbody>
       <tr><td>Availability</td><td>99.982% (1.6 hrs/yr)</td><td>99.995% (26.3 min/yr)</td><td>Tier IV</td></tr>
       <tr><td>Redundancy</td><td>N+1 (single redundant component)</td><td>2N (fully duplicated systems)</td><td>Tier IV</td></tr>
-      <tr><td>Concurrent Maintainability</td><td>Yes -- any component serviceable without IT impact</td><td>Yes -- inherent via 2N paths</td><td>even</td></tr>
-      <tr><td>Fault Tolerance</td><td>No -- single fault may cause transfer</td><td>Yes -- any single fault has zero IT impact</td><td>Tier IV</td></tr>
+      <tr><td>Concurrent Maintainability</td><td>Yes, any component serviceable without IT impact</td><td>Yes, inherent via 2N paths</td><td>even</td></tr>
+      <tr><td>Fault Tolerance</td><td>No, single fault may cause transfer</td><td>Yes, any single fault has zero IT impact</td><td>Tier IV</td></tr>
       <tr><td>Cost per MW</td><td>$8-12M (build cost per MW IT)</td><td>$12-18M (build cost per MW IT)</td><td>Tier III</td></tr>
       <tr><td>Construction Time</td><td>15-20 months typical</td><td>20-30 months typical</td><td>Tier III</td></tr>
       <tr><td>Target Use Case</td><td>Enterprise IT, colocation, SaaS</td><td>Financial trading, healthcare, government</td><td>even</td></tr>
@@ -306,17 +306,20 @@
 /* Tier III / IV availability from MTBF and MTTR (ids and model carried over from the old page; recomputed on input).
    A = MTBF / (MTBF + MTTR); Tier III = 1 - (1 - A)^2; Tier IV = A3 + (1 - A3) * A. Illustration only.
    The old page printed 4 decimals (every realistic input read "100.0000 %") and capped Tier IV at 99.9999 %, which put
-   it BELOW Tier III for a good component; now 6 decimals, no cap, and the expected downtime per year. */
+   it BELOW Tier III for a good component; now as many decimals as the shortfall needs, no cap, and the downtime a year. */
 (function(){
   var f=document.getElementById('mtbf'), r=document.getElementById('mttr'), o3=document.getElementById('t3result'), o4=document.getElementById('t4result');
   var d3=document.getElementById('t3down'), d4=document.getElementById('t4down');
   if(!f||!r||!o3||!o4) return;
-  function down(a){ var m=(1-a)*525600; return m>=60 ? (m/60).toFixed(2)+' h of downtime a year' : m>=1 ? m.toFixed(2)+' min of downtime a year' : m*60>=1 ? (m*60).toFixed(2)+' s of downtime a year' : (m*6e4).toPrecision(2)+' ms of downtime a year'; }
+  function down(a){ var m=(1-a)*525600, u=' of downtime a year'; return m>=60 ? (m/60).toFixed(2)+' h'+u : m>=1 ? m.toFixed(2)+' min'+u : m*60>=1 ? (m*60).toFixed(2)+' s'+u : m*6e4>=1 ? (m*6e4).toPrecision(2)+' ms'+u : m*6e7>=1 ? (m*6e7).toPrecision(2)+' \u00b5s'+u : 'under 1 \u00b5s'+u; }
+  /* As many decimals as it takes to show two significant digits of the shortfall, so a good plant reads its nines
+     (99.99999943 %) instead of rounding to 100 %. */
+  function pct(a){ var s=(1-a)*100; if(!(s>0)) return '> 99.99999999999\u00a0%'; var d=Math.min(13, Math.max(4, Math.ceil(-Math.log10(s))+1)); return (100-s).toFixed(d)+'\u00a0%'; }
   function calc(){
     var mtbf=parseFloat(f.value), mttr=parseFloat(r.value);
     if(!(mtbf>0)||!(mttr>0)){ o3.textContent=o4.textContent='--'; return; }
     var a=mtbf/(mtbf+mttr), t3=1-Math.pow(1-a,2), t4=t3+(1-t3)*a;
-    o3.textContent=(t3*100).toFixed(6)+' %'; o4.textContent=(t4*100).toFixed(6)+' %';
+    o3.textContent=pct(t3); o4.textContent=pct(t4);
     if(d3) d3.textContent=down(t3); if(d4) d4.textContent=down(t4);
   }
   f.addEventListener('input',calc); r.addEventListener('input',calc); calc();
