@@ -34,14 +34,15 @@
     var h = $('cxIsList'); if (!h) return;
     var reg = R.load(), open = reg.items.filter(function (x) { return x.status === 'open'; }).length;
     if (!reg.items.length) { h.innerHTML = '<p class="cx-an-sub">No issues logged. An issue added here marks its system blocked on the schematic and the status table until it is closed.</p>'; return; }
-    var t = '<div class="cx-an-tablewrap"><table class="cx-an-table cx-is-table"><caption class="cx-an-sub">' + reg.items.length + ' logged · ' + open + ' open' + (R.persisted() ? '' : ' · storage blocked: kept in this tab only') + '</caption><thead><tr><th>ID</th><th>Cat</th><th>Title</th><th>System</th><th>Gate</th><th>Owner</th><th class="num">Due</th><th>Status</th><th></th></tr></thead><tbody>';
+    var t = '<div class="cx-an-tablewrap"><table class="cx-an-table cx-is-table"><caption class="cx-an-sub">' + reg.items.length + ' logged · ' + open + ' open' + (R.persisted() ? '' : ' · storage blocked: kept in this tab only') + '</caption><thead><tr><th>ID</th><th>Cat</th><th>Issue</th><th>System</th><th>Gate</th><th>Status</th></tr></thead><tbody>';
     for (var i = 0; i < reg.items.length; i++) {
       var x = reg.items[i], blocks = x.status === 'open' && (x.severity === 'A' || (x.severity === 'B' && !x.waiver));
-      t += '<tr data-is="' + x.id + '"' + (x.status === 'closed' ? ' class="is-closed"' : '') + '><th scope="row">' + x.id + '</th><td><span class="cx-is-cat" data-cat="' + x.severity + '">' + x.severity + '</span></td><td>' + esc(x.title) + '</td>' +
-        '<td><button type="button" class="cx-an-link" data-sel="sys:' + x.system + '">' + esc(sysLabel(x.system)) + '</button></td><td>' + x.gate + '</td><td>' + (x.owner || '—') + '</td><td class="num">' + (x.due == null ? '—' : 'M' + x.due.toFixed(1)) + '</td>' +
-        '<td>' + (x.status === 'closed' ? 'closed' : (blocks ? '<b class="cx-is-blocks">open · blocks ' + x.gate + '</b>' : 'open · condition')) + '</td><td class="cx-is-acts">' +
-        (x.severity === 'B' && x.status === 'open' ? '<label class="cx-is-waive"><input type="checkbox" data-is-waive="' + x.id + '"' + (x.waiver ? ' checked' : '') + '> CxM + EoR: next level not affected</label> ' : '') +
-        '<button type="button" class="tool-btn" data-is-toggle="' + x.id + '">' + (x.status === 'closed' ? 'Reopen' : 'Close') + '</button> <button type="button" class="tool-btn" data-is-del="' + x.id + '" aria-label="Delete ' + x.id + '">Delete</button></td></tr>';
+      t += '<tr data-is="' + x.id + '"' + (x.status === 'closed' ? ' class="is-closed"' : '') + '><th scope="row">' + x.id + '</th><td><span class="cx-is-cat" data-cat="' + x.severity + '">' + x.severity + '</span></td>' +
+        '<td><span class="cx-is-title">' + esc(x.title) + '</span><span class="cx-an-sub cx-is-meta">owner ' + (x.owner || '—') + ' · due ' + (x.due == null ? '—' : 'M' + x.due.toFixed(1)) + '</span></td>' +
+        '<td><button type="button" class="cx-an-link" data-sel="sys:' + x.system + '">' + esc(sysLabel(x.system)) + '</button></td><td>' + x.gate + '</td>' +
+        '<td class="cx-is-acts">' + (x.status === 'closed' ? 'closed' : (blocks ? '<b class="cx-is-blocks">open · blocks ' + x.gate + '</b>' : 'open · condition')) +
+        (x.severity === 'B' && x.status === 'open' ? '<label class="cx-is-waive"><input type="checkbox" data-is-waive="' + x.id + '"' + (x.waiver ? ' checked' : '') + '> CxM + EoR: next level not affected</label>' : '') +
+        '<span class="cx-is-btns"><button type="button" class="tool-btn" data-is-toggle="' + x.id + '">' + (x.status === 'closed' ? 'Reopen' : 'Close') + '</button> <button type="button" class="tool-btn" data-is-del="' + x.id + '" aria-label="Delete ' + x.id + '">Delete</button></span></td></tr>';
     }
     h.innerHTML = t + '</tbody></table></div>';
   }

@@ -189,7 +189,12 @@
 .cx-is-cat { display: inline-block; min-width: 1.4em; text-align: center; font: 600 11px var(--rzt-mono); border: 1px solid var(--rzt-line-strong); border-radius: 2px; }
 .cx-is-cat[data-cat="A"] { color: var(--rzt-fault); border-color: var(--rzt-fault); }
 .cx-is-blocks { color: var(--rzt-fault); font-weight: 600; }
-.cx-is-acts { white-space: nowrap; }
+.cx-is-acts { min-width: 9rem; }
+.cx-is-btns { display: flex; gap: 6px; margin-top: 4px; }
+.cx-is-title { display: block; }
+.cx-is-meta { display: block; font-size: 11px; }
+.cx-is-table td:nth-child(3) { min-width: 11rem; }
+.cx-is-waive { display: block; margin: 4px 0 0; }
 .cx-is-acts .tool-btn { min-height: 28px; padding: 0 8px; font: 500 12px var(--rzt-mono); color: var(--rzt-text-2); background: transparent; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); cursor: pointer; }
 .cx-is-acts .tool-btn:hover { border-color: var(--rzt-line-strong); color: var(--rzt-text); }
 .cx-is-waive { font: 400 12px var(--rzt-sans); color: var(--rzt-text-2); margin-right: 6px; }
@@ -202,4 +207,19 @@
 .cx-is-mark rect { fill: var(--rzt-panel); stroke: var(--rzt-fault); stroke-width: 1.5; }
 .cx-is-mark path { stroke: var(--rzt-fault); stroke-width: 1.8; fill: none; }
 #cxAnStatusTable tr.is-blocked th .cx-an-link { color: var(--rzt-fault); }
-@media (max-width: 600px) { .cx-is-form label, .cx-is-form #cxIsTitle { width: 100%; } }
+.cx-is-form .input-field { box-sizing: border-box; max-width: 100%; }
+@media (max-width: 600px) {
+  .cx-is-form label, .cx-is-form #cxIsTitle { width: 100%; }
+  .cx-is-table, .cx-is-table tbody, .cx-is-table tr { display: block; }
+  .cx-is-table thead { display: none; }
+  .cx-is-table caption { display: block; width: auto; }
+  .cx-is-table tr { padding: 8px 0; border-bottom: 1px solid var(--rzt-line); }
+  .cx-is-table th, .cx-is-table td { display: inline-block; border: 0; padding: 2px 8px 2px 0; min-width: 0; }
+  .cx-is-table td:nth-child(3), .cx-is-acts { display: block; min-width: 0; }
+}
+.cx-is-form .input-field { min-height: 32px; padding: 2px 8px; font: 400 13px var(--rzt-sans); background: var(--rzt-inset); color: var(--rzt-text); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); }
+.cx-is-form .input-field:focus-visible { outline: 2px solid var(--rzt-accent); outline-offset: 1px; }
+.cx-is-form select.input-field option { background: var(--rzt-panel); color: var(--rzt-text); }
+.cx-an-inspector .tool-btn { min-height: 30px; padding: 0 10px; font: 500 12px var(--rzt-mono); color: var(--rzt-text-2); background: transparent; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); cursor: pointer; }
+.cx-an-inspector .tool-btn:hover { border-color: var(--rzt-line-strong); color: var(--rzt-text); }
+@media (max-width: 720px) { .cx-is-form .input-field { font-size: 16px; } }
