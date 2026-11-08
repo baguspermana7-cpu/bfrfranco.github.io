@@ -55,6 +55,7 @@
  * S26 Charts tab chrome: no text with a hue cast except the amber accent and a fault-red state pill; no dashed borders
  * S27 Accordion titles are the block heading only (no tooltip text glued on)
  * S28 Charts-tab series are amber and greys (red only for a high-risk state)
+ * S29 The Pareto scatter's axis ticks are distinct, also for a one-point frontier
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -552,6 +553,16 @@ try {
             if (h === null || (h >= 25 && h <= 50) || h < 12 || h > 350) continue; out.add(((e.closest('svg') || {}).id || 'hist') + ' ' + v); } });
         return [...out].slice(0, 6); });
       ok(s28.length === 0, `${w} S28 Charts-tab series in a second hue: ${s28.join(' | ')}`);
+      // S29 the Pareto scatter's axis ticks are distinct, also for a frontier of one point
+      const s29 = await p.evaluate(() => { if (!window.__ltcRenderParetoFor) return ['no test seam'];
+        const m = Object.assign({}, window.__ltcLastModel, { _feasible: true }); window.__ltcRenderParetoFor([m]);
+        const t = [...document.querySelectorAll('#paretoScatterSvg text')].map((x) => x.textContent.trim());
+        const y = t.filter((x) => /^\$[\d.]+M$/.test(x)), xs = t.filter((x) => /^1\.\d+$/.test(x));
+        const dup = (a) => a.length !== new Set(a).size; const out = [];
+        if (y.length < 3 || dup(y)) out.push('y ticks ' + y.join(' '));
+        if (xs.length < 3 || dup(xs)) out.push('x ticks ' + xs.join(' '));
+        window.__ltcRenderParetoFor([]); return out; });
+      ok(s29.length === 0, `${w} S29 Pareto scatter with one point repeats its axis ticks: ${s29.join(' | ')}`);
       // S24 Pareto "apply best": the baseline row is the design before the apply, the figures shown are reproduced from
       // the form, and the form shows plain numbers (no float noise such as 1.2300000000000002)
       if (await p.$('#runPareto')) {
@@ -593,4 +604,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, 0 errors');

@@ -5029,8 +5029,10 @@
                 var maxPue = Math.max.apply(null, pueVals);
                 var minOpex = Math.min.apply(null, opexVals);
                 var maxOpex = Math.max.apply(null, opexVals);
-                if (maxPue === minPue) maxPue = minPue + 0.001;
-                if (maxOpex === minOpex) maxOpex = minOpex + 1;
+                /* a frontier of one point (or points that share a value) has no span: centre it in ±1 % of its value,
+                 * or the six axis ticks all read the same ($85.42M ×6) */
+                if (maxPue - minPue < 0.002) { var cp = (maxPue + minPue) / 2; minPue = cp - Math.max(0.005, cp * 0.01); maxPue = cp + Math.max(0.005, cp * 0.01); }
+                if (maxOpex - minOpex < Math.max(1, Math.abs(maxOpex) * 0.002)) { var co = (maxOpex + minOpex) / 2; minOpex = co - Math.max(1, Math.abs(co) * 0.01); maxOpex = co + Math.max(1, Math.abs(co) * 0.01); }
                 var puePad = (maxPue - minPue) * 0.08;
                 var opexPad = (maxOpex - minOpex) * 0.08;
                 minPue -= puePad; maxPue += puePad;
@@ -7878,6 +7880,9 @@
                 return '#d1453b';
             }
 
+            /* test seam (tools/test-ltc-lab-steps.mjs S29): draw the scatter for a given frontier, e.g. one point */
+            window.__ltcRenderParetoFor = function(models) { latestPareto = models || []; selectedParetoIdx = latestPareto.length ? 0 : -1; renderParetoScatter(); };
+
             function syncParetoRowSelection() {
                 var rows = document.querySelectorAll('#paretoRows tr[data-pareto-idx]');
                 rows.forEach(function(row) {
@@ -7924,8 +7929,10 @@
                 var maxPue = Math.max.apply(null, pueVals);
                 var minOpex = Math.min.apply(null, opexVals);
                 var maxOpex = Math.max.apply(null, opexVals);
-                if (maxPue === minPue) maxPue = minPue + 0.001;
-                if (maxOpex === minOpex) maxOpex = minOpex + 1;
+                /* a frontier of one point (or points that share a value) has no span: centre it in ±1 % of its value,
+                 * or the six axis ticks all read the same ($85.42M ×6) */
+                if (maxPue - minPue < 0.002) { var cp = (maxPue + minPue) / 2; minPue = cp - Math.max(0.005, cp * 0.01); maxPue = cp + Math.max(0.005, cp * 0.01); }
+                if (maxOpex - minOpex < Math.max(1, Math.abs(maxOpex) * 0.002)) { var co = (maxOpex + minOpex) / 2; minOpex = co - Math.max(1, Math.abs(co) * 0.01); maxOpex = co + Math.max(1, Math.abs(co) * 0.01); }
                 var puePad = (maxPue - minPue) * 0.08;
                 var opexPad = (maxOpex - minOpex) * 0.08;
                 minPue -= puePad;
