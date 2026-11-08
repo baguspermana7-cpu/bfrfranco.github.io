@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-rz-register="editorial">
+<html lang="en" data-theme="dark" data-rz-register="tool">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,8 +30,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
-    <script src="js/rz-version.js?v=20261108-e2872eb2" defer></script>
+    <script src="js/rz-version.js?v=20261108-1316683e" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <script type="application/ld+json">
@@ -41,133 +40,112 @@
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},{"@type":"ListItem","position":3,"name":"CDU Guide","item":"https://resistancezero.com/cdu-selection-guide.html"},{"@type":"ListItem","position":4,"name":"CDU Deep Comparison"}]}
     </script>
     <style>
-        :root{ --cp-bg:#f8fafc; --cp-card:#ffffff; --cp-border:#e2e8f0; --cp-text:#191B20; --cp-muted:#475569; --cp-inset:#f1f5f9; --cp-accent:#0e7490;
-            --cp-serif:'IBM Plex Sans',system-ui,sans-serif; --cp-sans:'IBM Plex Sans',system-ui,sans-serif; --cp-mono:'IBM Plex Mono',ui-monospace,monospace; }
-        [data-theme="dark"]{ --cp-bg:#0E0F12; --cp-card:#16181D; --cp-border:rgba(160,168,180,.16); --cp-text:#F6F7F9; --cp-muted:#9AA3AF; --cp-inset:#1c1f25; --cp-accent:#E8B563; }
-        body{ background:var(--cp-bg); color:var(--cp-text); font-family:var(--cp-sans); }
-        .cp-hero{ position:relative; padding:7rem 1.5rem 2.4rem; overflow:hidden; border-bottom:1px solid var(--cp-border); }
-        [data-theme="dark"] .cp-hero::before{ content:''; position:absolute; inset:0; background:radial-gradient(640px 300px at 84% -16%,rgba(232,181,99,.10),transparent 64%); pointer-events:none; }
-        .cp-hero>*{ position:relative; }
-        .cp-kick{ font-family:var(--cp-mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase; color:var(--cp-accent); font-weight:600; }
-        .cp-hero h1{ font-family:var(--cp-serif); font-weight:600; font-size:clamp(1.9rem,4vw,2.9rem); letter-spacing:-.015em; margin:.5rem 0 .6rem; line-height:1.05; max-width:22ch; }
-        .cp-hero p{ color:var(--cp-muted); max-width:74ch; font-size:1.02rem; line-height:1.6; }
-        .cp-hero .crumb{ font-family:var(--cp-mono); font-size:.72rem; color:var(--cp-muted); margin-top:1rem; }
-        .cp-hero .crumb a{ color:var(--cp-accent); }
-        .toc{ display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1rem; }
-        .toc a{ font-family:var(--cp-mono); font-size:.68rem; padding:.3rem .6rem; border:1px solid var(--cp-border); border-radius:6px; color:var(--cp-muted); text-decoration:none; }
-        .toc a:hover{ color:var(--cp-accent); border-color:var(--cp-accent); }
-
-        .cp-wrap{ max-width:1140px; margin:0 auto; padding:0 1.4rem; }
-        .cp-sec{ padding:2.6rem 0; border-top:1px solid var(--cp-border); }
-        .cp-sec h2{ font-family:var(--cp-serif); font-weight:500; font-size:clamp(1.4rem,2.6vw,2rem); margin:0 0 .3rem; display:flex; align-items:baseline; gap:.6rem; }
-        .cp-sec h2 .n{ font-family:var(--cp-mono); font-size:.74rem; color:var(--cp-accent); font-weight:600; }
-        .cp-sec h3{ font-family:var(--cp-serif); font-weight:500; font-size:1.16rem; margin:1.5rem 0 .5rem; }
-        .cp-sec .lead{ color:var(--cp-muted); max-width:70ch; margin:.2rem 0 1.1rem; line-height:1.6; }
-
-        .src{ font-family:var(--cp-mono); font-size:.54rem; font-weight:700; letter-spacing:.03em; padding:1px 5px; border-radius:4px; white-space:nowrap; text-transform:uppercase; vertical-align:middle; }
-        .src.std{ background:rgba(16,185,129,.14); color:#065f46; border:1px solid rgba(16,185,129,.4); }
-        .src.ven{ background:rgba(245,158,11,.14); color:#92400e; border:1px solid rgba(245,158,11,.4); }
-        .src.rep{ background:rgba(59,130,246,.14); color:#1d4ed8; border:1px solid rgba(59,130,246,.4); }
-        [data-theme="dark"] .src.rep{ color:#60a5fa; } [data-theme="dark"] .src.std{ color:#34d399; } [data-theme="dark"] .src.ven{ color:#fbbf24; }
-        .legend{ display:flex; gap:.8rem; flex-wrap:wrap; margin:.2rem 0 1rem; font-size:.74rem; color:var(--cp-muted); align-items:center; }
-
-        .tbl-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--cp-border); border-radius:8px;
-            background:
-              linear-gradient(to right, var(--cp-card) 30%, rgba(255,255,255,0)) 0 0/36px 100% no-repeat local,
-              linear-gradient(to left, var(--cp-card) 30%, rgba(255,255,255,0)) 100% 0/36px 100% no-repeat local,
-              radial-gradient(farthest-side at 0 50%, rgba(120,130,145,.28), rgba(0,0,0,0)) 0 0/14px 100% no-repeat scroll,
-              radial-gradient(farthest-side at 100% 50%, rgba(120,130,145,.28), rgba(0,0,0,0)) 100% 0/14px 100% no-repeat scroll;
-            background-color:var(--cp-card); }
-        table.cp-tbl td:first-child, table.cp-tbl td.sym { min-width:150px; }
-        /* capability matrix — center the ✓/—/~ glyph columns */
-        table.cp-matrix th:nth-child(n+2):nth-child(-n+6), table.cp-matrix td:nth-child(n+2):nth-child(-n+6){ text-align:center; }
-        table.cp-matrix td:nth-child(n+2):nth-child(-n+6){ font-family:var(--cp-mono); font-size:.82rem; }
-        table.cp-tbl{ width:100%; border-collapse:collapse; font-size:.83rem; min-width:880px; }
-        table.cp-tbl th{ background:var(--cp-inset); text-align:left; padding:.6rem .8rem; font-family:var(--cp-mono); font-size:.6rem; letter-spacing:.05em; text-transform:uppercase; color:var(--cp-muted); border-bottom:2px solid var(--cp-border); white-space:nowrap; }
-        table.cp-tbl td{ padding:.6rem .75rem; border-bottom:1px solid rgba(160,168,180,.09); vertical-align:top; line-height:1.5; }
-        table.cp-tbl tr:last-child td{ border-bottom:0; }
-        table.cp-tbl td.sym{ font-weight:600; color:var(--cp-text); white-space:nowrap; }
-        table.cp-tbl .mono{ font-family:var(--cp-mono); font-size:.76rem; color:var(--cp-accent); font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
-        .win{ color:#0a8a5a; font-weight:700; } .mid{ color:#b45309; font-weight:700; } .lose{ color:#dc2626; font-weight:700; }
-        [data-theme="dark"] .win{ color:#6aa588; } [data-theme="dark"] .mid{ color:#FFAA00; } [data-theme="dark"] .lose{ color:#FF3030; }
-
-        .cp-note{ border:1px dashed var(--cp-border); border-radius:4px; background:var(--cp-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--cp-muted); line-height:1.6; margin-top:1.3rem; }
-        .cp-note b{ color:var(--cp-text); }
-        .cp-links{ display:flex; gap:.6rem; flex-wrap:wrap; margin:.3rem 0 0; }
-        .cp-links a{ font-family:var(--cp-mono); font-size:.72rem; padding:.45rem .8rem; border:1px solid var(--cp-border); border-radius:7px; color:var(--cp-accent); text-decoration:none; }
-        .cp-links a:hover{ border-color:var(--cp-accent); }
-
-        /* v1.8.0 — mobile responsive patch */
-        @media (max-width:768px){
-            html, body{ overflow-x:hidden; max-width:100vw; }
-            img, picture, video, svg{ max-width:100%; height:auto; }
-            .cp-hero{ padding:5.5rem 1rem 2rem; }
-            .nav-menu, .nav-links{ display:none; }
-            .footer-grid{ grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
-            button, a.btn, [role="button"]{ min-height:44px; }
-        }
-        .rz-chart{ margin:1.6rem 0; }
-        .rz-chart-title{ font-family:var(--cp-mono); font-size:.82rem; font-weight:600; color:var(--cp-text); margin-bottom:.7rem; line-height:1.45; }
-        .rz-chart-canvas{ position:relative; height:300px; }
-        .rz-chart-src{ font-family:var(--cp-mono); font-size:.64rem; color:var(--cp-muted); margin-top:.7rem; line-height:1.5; }
-        .rz-chart-chip{ display:inline-block; font-weight:700; font-size:.58rem; letter-spacing:.04em; padding:1px 6px; border-radius:4px; margin-right:6px; background:rgba(120,130,145,.16); color:var(--cp-muted); }
-        .rz-chart-chip.derived{ background:rgba(16,185,129,.14); color:#10b981; }
-        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#92400e; }
-        [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(16,185,129,.18); color:#34d399; }
-        [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
+        /* cdu-comparison on the tool register (v3.28.2). rz-tool.css owns .ck-sec/.ck-tbl/.ck-tbl-wrap/.src and the
+           shell; this block keeps what is particular to this page, on the register's tokens. */
+        body.tool { --ck-card: var(--rzt-panel); --ck-border: var(--rzt-line); --ck-text: var(--rzt-text);
+            --ck-muted: var(--rzt-muted); --ck-accent: var(--rzt-accent-text); --ck-mono: var(--rzt-mono); --ck-sans: var(--rzt-sans); }
+        body.tool .ck-sec h3 { font: 600 16px/1.35 var(--ck-sans); color: var(--ck-text); margin: 1.4rem 0 .5rem; }
+        body.tool table.ck-tbl { min-width: 880px; }
+        body.tool table.ck-tbl td:first-child, body.tool table.ck-tbl td.sym { min-width: 150px; }
+        body.tool table.ck-tbl td.sym { font-weight: 600; white-space: nowrap; }
+        body.tool table.ck-tbl .mono { font: 400 13px var(--ck-mono); color: var(--ck-text); font-variant-numeric: tabular-nums slashed-zero; }
+        /* capability matrix: centre the glyph columns */
+        body.tool table.cp-matrix th:nth-child(n+2):nth-child(-n+6), body.tool table.cp-matrix td:nth-child(n+2):nth-child(-n+6) { text-align: center; font-family: var(--ck-mono); }
+        /* trade-off words: the drawback is the one that asks for attention (amber); the mark is a word, not an emoji */
+        body.tool .win, body.tool .mid { color: var(--ck-text); }
+        body.tool .lose { color: var(--ck-accent); }
+        body.tool .mk { font: 600 12px var(--ck-mono); color: var(--ck-muted); margin-right: 4px; }
+        body.tool .lose .mk { color: var(--ck-accent); }
+        body.tool .legend { margin: .4rem 0 .8rem; font-size: 13px; line-height: 1.9; color: var(--ck-muted); }  /* a sentence: each tag stays beside its meaning when it wraps */
+        body.tool .ck-note { border: 1px solid var(--ck-border); border-radius: 4px; background: var(--ck-card); padding: 1rem 1.2rem; font-size: 14px; color: var(--rzt-text-2); line-height: 1.6; margin-top: 1.2rem; }
+        body.tool .ck-note b { color: var(--ck-text); }
+        body.tool .ck-sec p.lead.after { margin-top: 1rem; }
+        body.tool .ck-note .src, body.tool .ck-sec p .src { white-space: normal; }  /* long tags wrap inside a sentence (360 px) */
+        body.tool .ck-sec p.lead.tight { margin-bottom: .6rem; }
+        /* sourced chart (rz-article-chart.js) */
+        body.tool .rz-chart { margin: 1.6rem 0; }
+        body.tool .rz-chart-title { font: 600 14px/1.45 var(--ck-sans); color: var(--ck-text); margin-bottom: .7rem; }
+        body.tool .rz-chart-canvas { position: relative; height: 300px; }
+        body.tool .rz-chart-src { font: 400 12px/1.5 var(--ck-mono); color: var(--ck-muted); margin-top: .7rem; }
+        body.tool .rz-chart-chip { display: inline-block; font: 600 11px var(--ck-mono); letter-spacing: .04em; padding: 1px 6px; margin-right: 6px; border: 1px solid var(--ck-border); border-radius: 2px; color: var(--ck-muted); background: none; }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261107-7aaef8f4">
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="hub tool">
     <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li class="nav-dropdown">
-                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li role="menuitem"><a href="datacenter-solutions.html" style="font-weight:600;">DC Solutions Hub</a></li>
-                        <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
-                        <li role="menuitem"><a href="cdu-selection-guide.html">CDU Selection Guide</a></li>
-                        <li role="menuitem"><a href="cdu-checklist.html">CDU Checklist</a></li>
-                        <li role="menuitem"><a href="cdu-mini-bms.html">CDU Mini-BMS</a></li>
-                    </ul>
-                </li>
-                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-            </ul>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
-
-    <header class="cp-hero">
-        <div class="cp-wrap">
-            <span class="cp-kick">CDU Deep Comparison</span>
-            <h1>Every aspect — issues, controls, support &amp; TCO</h1>
-            <p>The CDU Selection Guide compares capacity and links. This companion goes deeper across the aspects that actually decide a deployment: the <b>field failure modes</b> that bite worldwide, how the <b>control system</b> regulates the loop and talks to the BMS/DCIM, the <b>after-sales</b> reality per vendor, and the <b>TCO &amp; maintenance burden</b> by type. Every figure is tagged by source so a vendor claim is never mistaken for a published standard.</p>
-            <div class="legend"><span class="src std">STANDARD</span> ASHRAE / OCP / DMTF Redfish &nbsp;·&nbsp; <span class="src ven">VENDOR</span> vendor datasheet/claim &nbsp;·&nbsp; <span class="src rep">REPORTED</span> widely reported, not quantified to a named standard</div>
-            <div class="toc">
-                <a href="#issues">01 · Field issues</a>
-                <a href="#control">02 · Control systems</a>
-                <a href="#aftersales">03 · After-sales</a>
-                <a href="#tco">04 · TCO &amp; maintenance</a>
-            </div>
-            <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-selection-guide.html">CDU Guide</a> → Deep Comparison</div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
         </div>
-    </header>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="nav-icon theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i class="fas fa-sun"></i></button>
+  </div>
+</nav>
 
-    <main id="main-content">
+<main id="main-content">
+
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow">CDU · <b>Comparison</b> · ASHRAE TC 9.9</p>
+    <h1>CDU deep comparison <span class="muted">field issues, controls, after-sales and TCO</span></h1>
+    <p class="lede">The CDU Selection Guide compares capacity and links. This companion goes deeper across the aspects that decide a deployment: the <b>field failure modes</b> that bite worldwide, how the <b>control system</b> regulates the loop and talks to the BMS/DCIM, the <b>after-sales</b> reality per vendor, and the <b>TCO &amp; maintenance burden</b> by type. Every figure is tagged by source so a vendor claim is never mistaken for a published standard.</p>
+    <p class="basis">basis ASHRAE TC 9.9 · OCP · DMTF Redfish DSP2064 · vendor datasheets as published · no engine, reference only · updated 2026-06</p>
+    <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-selection-guide.html">CDU Guide</a> → Deep comparison</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="tool-bar ck-jump" aria-label="On this page">
+    <span class="lbl">Jump to</span>
+    <a class="chip" href="#issues">Field issues</a><a class="chip" href="#control">Control systems</a><a class="chip" href="#aftersales">After-sales</a><a class="chip" href="#tco">TCO and maintenance</a>
+  </nav>
+</div>
+
+<div class="wrap ck-body">
+
 
     <!-- ───────── 1. Field issues ───────── -->
-    <section class="cp-sec" id="issues"><div class="cp-wrap">
+    <section class="ck-sec" id="issues">
         <h2><span class="n">01</span> Worldwide common field issues &amp; failure modes</h2>
-        <p class="lead">The three universal enemies of any cooling loop are <b>corrosion, mineral scale and microbiological fouling</b> <span class="src std">ASHRAE TC 9.9 5th ed.</span>. The CDU's core job is to hydraulically decouple the chip-side TCS loop from the facility FWS loop. Below are the failure modes operators actually report, with the prevention that addresses each. To size a loop and model its lifecycle cost (TCO/NPV, pump energy), use the <a href="cdu-calculator.html" style="color:var(--cdu-primary);font-weight:600;">CDU Calculator</a>.</p>
-        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl">
+        <p class="legend">Source tags: <span class="src std">STANDARD</span> ASHRAE / OCP / DMTF Redfish &nbsp;·&nbsp; <span class="src ven">VENDOR</span> vendor datasheet/claim &nbsp;·&nbsp; <span class="src rep">REPORTED</span> widely reported, not quantified to a named standard</p>
+        <p class="lead">The three universal enemies of any cooling loop are <b>corrosion, mineral scale and microbiological fouling</b> <span class="src std">ASHRAE TC 9.9 5th ed.</span>. The CDU's core job is to hydraulically decouple the chip-side TCS loop from the facility FWS loop. Below are the failure modes operators report, with the prevention that addresses each. To size a loop and model its lifecycle cost (TCO/NPV, pump energy), use the <a href="cdu-calculator.html">CDU Calculator</a>.</p>
+        <div class="ck-tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl">
             <thead><tr><th>Issue</th><th>Symptom</th><th>Root cause</th><th>Prevention</th></tr></thead>
             <tbody>
                 <tr><td class="sym">Leaks <span class="src rep">REP</span></td><td>Slow seepage / droplets at QDs, gaskets, plate-HX joints; most start small.</td><td>QD not fully seated, bypassed interlocks, debris in coupling, rushed swaps, pump-seal failure; unclear who owns wet connections.</td><td>Dry-break / dripless blind-mate couplers; drip trays + secondary containment; leak sensors at QDs/hoses/manifolds/low points; clear IT-vs-facilities boundary. <span class="src std">ASHRAE 5th ed. formalises dry-break QDs + segmented shutoff valves</span></td></tr>
@@ -184,15 +162,15 @@
                 <tr><td class="sym">Fluid / standardization gaps <span class="src std">STD</span></td><td>Proprietary coolants/connectors with poor cross-vendor interoperability across refresh cycles.</td><td>Historically vendor-specific connectors, hoses, manifolds and fluids.</td><td><b>OCP Cooling Environments</b> standardises interfaces/operating params; OCP <b>PG-25</b> guideline specifies wetted-material compatibility, tubing, temp/pressure, filtration + safety for multi-vendor supply.</td></tr>
             </tbody>
         </table></div>
-        <div class="cp-note"><b>Reported context (attribute carefully).</b> Uptime Institute 2024: ~1 in 3 outages cost &gt;$250k and cooling ≈19% of outages, rising as halls shift air→liquid <span class="src rep">REPORTED</span>. Integrated leak detection cuts response to ~8–12 min vs 2–4 hr for visual <span class="src rep">REPORTED</span>. ASHRAE TC 9.9 "Liquid Cooling: Resiliency Guidance for Cold-Plate Deployments" (Sept 2024) governs ride-through within the server's minimum time-to-throttle <span class="src std">STANDARD (paywalled — verify before quoting numbers)</span>.</div>
-    </div></section>
+        <div class="ck-note"><b>Reported context (attribute carefully).</b> Uptime Institute 2024: ~1 in 3 outages cost &gt;$250k and cooling ≈19% of outages, rising as halls shift air→liquid <span class="src rep">REPORTED</span>. Integrated leak detection cuts response to ~8–12 min vs 2–4 hr for visual <span class="src rep">REPORTED</span>. ASHRAE TC 9.9 "Liquid Cooling: Resiliency Guidance for Cold-Plate Deployments" (Sept 2024) governs ride-through within the server's minimum time-to-throttle <span class="src std">STANDARD (paywalled — verify before quoting numbers)</span>.</div>
+    </section>
 
     <!-- ───────── 2. Control systems ───────── -->
-    <section class="cp-sec" id="control"><div class="cp-wrap">
+    <section class="ck-sec" id="control">
         <h2><span class="n">02</span> Control systems &amp; BMS / DCIM integration</h2>
         <p class="lead">A CDU runs <b>two loops at once</b>: a <b>VFD pump loop</b> for hydraulic delivery and a <b>temperature loop</b> that modulates the primary control valve to hold secondary supply temp. The fullest public description of the actual algorithms is the Lenovo Neptune RM100 O&amp;M guide (built by Cooltera); DMTF Redfish + OCP anchor the standards layer.</p>
         <h3>How the loops are regulated <span class="src ven">VENDOR — Lenovo RM100</span></h3>
-        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl">
+        <div class="ck-tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl">
             <thead><tr><th>Loop</th><th>Controls</th><th>Strategy / detail</th></tr></thead>
             <tbody>
                 <tr><td class="sym">Pump (VFD)</td><td><span class="mono">Flow</span> or <span class="mono">ΔP</span> control</td><td>Ramp pump speed until measured flow = setpoint, or until supply-return ΔP = setpoint (10 s scan to avoid oscillation). <b>ΔP control</b> is the common default for direct-to-chip with many parallel server branches (holds head as node valves open/close); flow control where a fixed total delivery is the target. Supply temp is <i>not</i> a pump-loop variable.</td></tr>
@@ -204,8 +182,8 @@
             </tbody>
         </table></div>
 
-        <h3>BMS / DCIM protocols actually supported (per vendor)</h3>
-        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl">
+        <h3>BMS / DCIM protocols supported (per vendor)</h3>
+        <div class="ck-tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl">
             <thead><tr><th>Vendor / product</th><th>Modbus</th><th>BACnet</th><th>SNMP</th><th>Redfish</th><th>Notes</th></tr></thead>
             <tbody>
                 <tr><td class="sym">Vertiv XDU1350</td><td>RTU+TCP</td><td>—</td><td>Yes</td><td>—</td><td>CLI, web server, 7″ HMI</td></tr>
@@ -216,14 +194,14 @@
                 <tr><td class="sym">OCP requirement</td><td>legacy</td><td>legacy</td><td>legacy</td><td><b>REQUIRED</b></td><td>Prometheus telemetry; pump-RPM + valve-aperture commands</td></tr>
             </tbody>
         </table></div>
-        <div class="cp-note"><b>Standards layer <span class="src std">STANDARD</span>.</b> DMTF Redfish "Liquid Cooling Equipment" (DSP2064 v1.1.0) defines <span class="mono">CoolingUnit / CoolingLoop / CoolantConnector / Pump / LeakDetection / Filters / Reservoirs</span>; CDU controls landed in Redfish 2024.4 (Dec 2024). Settable on <span class="mono">CoolantConnector</span>: FlowControlLitersPerMinute, SupplyTemperatureControlCelsius, ReturnTemperatureControlCelsius, DeltaPressureControlkPa, DeltaTemperatureControlCelsius — the standardised encoding of the "which control variable" choice. OCP design flow 1.25–2.0 L/min/kW (1.5 typical) for ≤10 °C rise; Project Deschutes (Google→OCP, 2 MW) uses N+1 seal-less pumps, low-harmonic VFD, 3 °C approach, built-in leak/quality monitoring. <b>Telemetry exposed</b> (RM100, fullest public set): supply/return temps (secondary triple-redundant), ambient + RH + dew point, primary/secondary flow, static/supply pressures + unit ΔP + filter ΔP, per-pump speed/V/A/run-hours, valve demand/feedback, primary &amp; secondary duty (kW), level/leak/filter-dirty.</div>
-    </div></section>
+        <div class="ck-note"><b>Standards layer <span class="src std">STANDARD</span>.</b> DMTF Redfish "Liquid Cooling Equipment" (DSP2064 v1.1.0) defines <span class="mono">CoolingUnit / CoolingLoop / CoolantConnector / Pump / LeakDetection / Filters / Reservoirs</span>; CDU controls landed in Redfish 2024.4 (Dec 2024). Settable on <span class="mono">CoolantConnector</span>: FlowControlLitersPerMinute, SupplyTemperatureControlCelsius, ReturnTemperatureControlCelsius, DeltaPressureControlkPa, DeltaTemperatureControlCelsius — the standardised encoding of the "which control variable" choice. OCP design flow 1.25–2.0 L/min/kW (1.5 typical) for ≤10 °C rise; Project Deschutes (Google→OCP, 2 MW) uses N+1 seal-less pumps, low-harmonic VFD, 3 °C approach, built-in leak/quality monitoring. <b>Telemetry exposed</b> (RM100, fullest public set): supply/return temps (secondary triple-redundant), ambient + RH + dew point, primary/secondary flow, static/supply pressures + unit ΔP + filter ΔP, per-pump speed/V/A/run-hours, valve demand/feedback, primary &amp; secondary duty (kW), level/leak/filter-dirty.</div>
+    </section>
 
     <!-- ───────── 3. After-sales ───────── -->
-    <section class="cp-sec" id="aftersales"><div class="cp-wrap">
+    <section class="ck-sec" id="aftersales">
         <h2><span class="n">03</span> After-sales, support &amp; warranty</h2>
         <p class="lead">Serviceability and support are where deployments live or die over a 5–10 year life. Note two recent ownership moves that change the after-sales entity: <b>Boyd Thermal → Eaton</b> (CDU service is now Eaton's) and <b>Motivair → Schneider Electric</b> (75%). Published warranty <i>lengths</i> are rare — most vendors don't disclose them, so the table marks "n/d" honestly rather than guessing.</p>
-        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl">
+        <div class="ck-tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl">
             <thead><tr><th>Vendor</th><th>Warranty (published only)</th><th>SLA / response</th><th>Serviceability</th><th>Remote monitoring</th></tr></thead>
             <tbody>
                 <tr><td class="sym">Vertiv</td><td>n/d (optional Prime Labor Warranty; length n/d)</td><td>Guaranteed Emergency Response tiers (hours n/d); agreements 1→5 yr</td><td>Redundant pumps, dual feeds, 50 µm filter, 7″ HMI</td><td>Proactive remote monitoring + leak algorithms</td></tr>
@@ -238,11 +216,11 @@
                 <tr><td class="sym">Lenovo</td><td>Premier Support tiers (base n/d; record-retention condition)</td><td>Scalable 24×7; quarterly health checks</td><td>RM100 4U ~100 kW; <b>drip-free blind-mate</b> couplers; Commissioning Kit included</td><td><b>XClarity</b> suite + auto Call-Home + Energy Manager (most mature)</td></tr>
             </tbody>
         </table></div>
-        <div class="cp-note"><b>Honesty flags.</b> Only <b>Motivair</b> (12-mo parts / 4-yr compressor / 2–5 yr extended) and <b>nVent</b> (up to 5 yr via PM) publish clean warranty figures; CoolIT implies 2–5 yr; Accelsius is "multi-year" custom. Published SLA response hours exist for only <b>Motivair (6-hr onsite)</b> and <b>Stulz (8-hr)</b>. Everything marked n/d is genuinely not publicly disclosed — confirm with the vendor.</div>
+        <div class="ck-note"><b>Honesty flags.</b> Only <b>Motivair</b> (12-mo parts / 4-yr compressor / 2–5 yr extended) and <b>nVent</b> (up to 5 yr via PM) publish clean warranty figures; CoolIT implies 2–5 yr; Accelsius is "multi-year" custom. Published SLA response hours exist for only <b>Motivair (6-hr onsite)</b> and <b>Stulz (8-hr)</b>. Everything marked n/d is genuinely not publicly disclosed — confirm with the vendor.</div>
 
         <h3>Per-vendor published-spec &amp; capability matrix</h3>
-        <p class="lead" style="margin-bottom:.6rem;">What each vendor actually publishes and supports — distilled from datasheet research. <span class="src ven">VENDOR</span> figures; ✓ = published/supported, — = not published, ~ = partial/implied. Differential pressure and ASHRAE water class are the most-suppressed specs industry-wide.</p>
-        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl cp-matrix">
+        <p class="lead tight">What each vendor publishes and supports — distilled from datasheet research. <span class="src ven">VENDOR</span> figures; ✓ = published/supported, — = not published, ~ = partial/implied. Differential pressure and ASHRAE water class are the most-suppressed specs industry-wide.</p>
+        <div class="ck-tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl cp-matrix">
             <thead><tr><th>Vendor</th><th>Redfish</th><th>dP / head published</th><th>ASHRAE class</th><th>Hot-swap service</th><th>Secondary filtration</th><th>Notable</th></tr></thead>
             <tbody>
                 <tr><td class="sym">Vertiv</td><td>—</td><td>✓ (XDU1350: 2.44 bar)</td><td>✓ W3 / W45</td><td>~ (XDU070 pumps)</td><td>25–50 µm</td><td>Modbus/SNMP/CLI; 7″ HMI</td></tr>
@@ -257,62 +235,82 @@
                 <tr><td class="sym">Lenovo</td><td><span class="win">✓ (XCC)</span></td><td>~ (relief 3.5 bar)</td><td>—</td><td>~ blind-mate</td><td>50 µm</td><td>XClarity + Call-Home (most mature)</td></tr>
             </tbody>
         </table></div>
-        <div class="cp-note"><b>Reading the matrix.</b> <b>Redfish</b> (the OCP-mandated management interface) is published only by CoolIT, Accelsius and Lenovo — everyone else tops out at Modbus/BACnet/SNMP. <b>Published ASHRAE water class</b> is rare for facility-scale L2L (most publish only a rated approach temperature). Serviceability leaders for online maintenance: nVent (cartridge swap), CoolIT (N+N hot-swap), Boyd (hot-swap plates+pumps). Corporate notes: Boyd→Eaton, Motivair→Schneider (75%).</div>
-    </div></section>
+        <div class="ck-note"><b>Reading the matrix.</b> <b>Redfish</b> (the OCP-mandated management interface) is published only by CoolIT, Accelsius and Lenovo — everyone else tops out at Modbus/BACnet/SNMP. <b>Published ASHRAE water class</b> is rare for facility-scale L2L (most publish only a rated approach temperature). Serviceability leaders for online maintenance: nVent (cartridge swap), CoolIT (N+N hot-swap), Boyd (hot-swap plates+pumps). Corporate notes: Boyd→Eaton, Motivair→Schneider (75%).</div>
+    </section>
 
     <!-- ───────── 4. TCO ───────── -->
-    <section class="cp-sec" id="tco"><div class="cp-wrap">
+    <section class="ck-sec" id="tco">
         <h2><span class="n">04</span> TCO &amp; maintenance burden by type</h2>
         <p class="lead">No neutral $/kW CDU price is publicly sourceable — so this is a <b>relative</b> trade-off read, not a quote. The biggest single capex fork is whether the type needs a <b>facility-water plant</b> (L2L) or not (L2A / 2-phase). The biggest maintenance fork is <b>many small units vs few large ones</b>. High-temp water (W40/W45) is what turns direct-to-chip into near-free cooling — the facility loop can reject through a dry cooler / tower most or all hours, eliminating the mechanical chiller.</p>
-        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cp-tbl">
+        <div class="ck-tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl">
             <thead><tr><th>Type</th><th>CapEx</th><th>OpEx / efficiency</th><th>Density</th><th>Water (WUE)</th><th>Retrofit</th><th>Maint. burden</th><th>Redundancy / SPOF</th></tr></thead>
             <tbody>
-                <tr><td class="sym">In-rack</td><td class="mid">⚠ many units</td><td class="mid">⚠ good</td><td class="win">✅ 100–300 kW</td><td>depends</td><td class="win">✅ easy</td><td class="lose">❌ many small, high PM</td><td>✅ small domain / ❌ N+1 per rack costly</td></tr>
-                <tr><td class="sym">In-row</td><td class="mid">⚠ plumbing</td><td class="win">✅ good</td><td class="win">✅ 0.6–2.3 MW</td><td>depends</td><td class="mid">⚠ row piping</td><td class="win">✅ few large, easy service</td><td class="lose">❌ central SPOF → N+1</td></tr>
-                <tr><td class="sym">Sidecar</td><td class="mid">⚠ moderate</td><td class="mid">⚠ good</td><td class="win">✅ ~200 kW</td><td class="win">✅ if L2A</td><td class="win">✅ strong</td><td class="mid">⚠ per-rack + airside</td><td class="win">✅ contained</td></tr>
-                <tr><td class="sym">L2L</td><td class="lose">❌ water plant</td><td class="win">✅ best (PUE&lt;1.1, free-cool)</td><td class="win">✅ multi-MW</td><td class="lose">❌ high if evaporative</td><td class="lose">❌ needs water infra</td><td class="win">✅ pump/filter/HX focus</td><td class="lose">❌ large central SPOF</td></tr>
-                <tr><td class="sym">L2A</td><td class="win">✅ no water plant</td><td class="lose">❌ PUE&lt;1.2, summer-sensitive</td><td class="mid">⚠ 16–200 kW</td><td class="win">✅ ~zero</td><td class="win">✅ best</td><td class="mid">⚠ fan/filter/finned-tube</td><td class="mid">⚠ many small units</td></tr>
-                <tr><td class="sym">2-phase D2C</td><td class="mid">⚠ costly fluid, no water plant</td><td class="win">✅ ~35% OpEx*, low pump power</td><td class="win">✅ &gt;100 kW/rack</td><td class="win">✅ waterless</td><td class="win">✅ good</td><td class="win">✅ no fluid replacement, ITE-safe</td><td class="mid">✅ low-flow/low-leak; ⚠ newer</td></tr>
+                <tr><td class="sym">In-rack</td><td class="mid"><span class="mk">~</span>many units</td><td class="mid"><span class="mk">~</span>good</td><td class="win"><span class="mk">+</span>100–300 kW</td><td>depends</td><td class="win"><span class="mk">+</span>easy</td><td class="lose"><span class="mk">−</span>many small, high PM</td><td><span class="mk">+</span>small domain / <span class="mk">−</span>N+1 per rack costly</td></tr>
+                <tr><td class="sym">In-row</td><td class="mid"><span class="mk">~</span>plumbing</td><td class="win"><span class="mk">+</span>good</td><td class="win"><span class="mk">+</span>0.6–2.3 MW</td><td>depends</td><td class="mid"><span class="mk">~</span>row piping</td><td class="win"><span class="mk">+</span>few large, easy service</td><td class="lose"><span class="mk">−</span>central SPOF → N+1</td></tr>
+                <tr><td class="sym">Sidecar</td><td class="mid"><span class="mk">~</span>moderate</td><td class="mid"><span class="mk">~</span>good</td><td class="win"><span class="mk">+</span>~200 kW</td><td class="win"><span class="mk">+</span>if L2A</td><td class="win"><span class="mk">+</span>strong</td><td class="mid"><span class="mk">~</span>per-rack + airside</td><td class="win"><span class="mk">+</span>contained</td></tr>
+                <tr><td class="sym">L2L</td><td class="lose"><span class="mk">−</span>water plant</td><td class="win"><span class="mk">+</span>best (PUE&lt;1.1, free-cool)</td><td class="win"><span class="mk">+</span>multi-MW</td><td class="lose"><span class="mk">−</span>high if evaporative</td><td class="lose"><span class="mk">−</span>needs water infra</td><td class="win"><span class="mk">+</span>pump/filter/HX focus</td><td class="lose"><span class="mk">−</span>large central SPOF</td></tr>
+                <tr><td class="sym">L2A</td><td class="win"><span class="mk">+</span>no water plant</td><td class="lose"><span class="mk">−</span>PUE&lt;1.2, summer-sensitive</td><td class="mid"><span class="mk">~</span>16–200 kW</td><td class="win"><span class="mk">+</span>~zero</td><td class="win"><span class="mk">+</span>best</td><td class="mid"><span class="mk">~</span>fan/filter/finned-tube</td><td class="mid"><span class="mk">~</span>many small units</td></tr>
+                <tr><td class="sym">2-phase D2C</td><td class="mid"><span class="mk">~</span>costly fluid, no water plant</td><td class="win"><span class="mk">+</span>~35% OpEx*, low pump power</td><td class="win"><span class="mk">+</span>&gt;100 kW/rack</td><td class="win"><span class="mk">+</span>waterless</td><td class="win"><span class="mk">+</span>good</td><td class="win"><span class="mk">+</span>no fluid replacement, ITE-safe</td><td class="mid"><span class="mk">+</span>low-flow/low-leak; <span class="mk">~</span>newer</td></tr>
             </tbody>
         </table></div>
-        <p class="lead" style="margin-top:1rem;"><b>The read.</b> Lowest capex / best retrofit / zero water = <b>L2A</b> (and waterless two-phase). Best efficiency at scale = <b>L2L with warm-water free cooling</b> — at the cost of a water plant, WUE, and a large central single-point-of-failure that makes N+1 mandatory. Maintenance burden is the <b>many-small-vs-few-large</b> axis: in-rack and L2A multiply units and leak surface area; in-row and L2L concentrate into fewer serviceable units but raise SPOF. <b>Two-phase</b> is the emerging density play (≈1/10 the flow → smaller pumps, waterless), tempered by expensive dielectric fluid (two-phase fluids can exceed $50/L) and lower maturity.</p>
+        <p class="lead after"><b>The read.</b> Lowest capex / best retrofit / zero water = <b>L2A</b> (and waterless two-phase). Best efficiency at scale = <b>L2L with warm-water free cooling</b> — at the cost of a water plant, WUE, and a large central single-point-of-failure that makes N+1 mandatory. Maintenance burden is the <b>many-small-vs-few-large</b> axis: in-rack and L2A multiply units and leak surface area; in-row and L2L concentrate into fewer serviceable units but raise SPOF. <b>Two-phase</b> is the emerging density play (≈1/10 the flow → smaller pumps, waterless), tempered by expensive dielectric fluid (two-phase fluids can exceed $50/L) and lower maturity.</p>
         <figure class="rz-chart" data-rz-chart>
             <div class="rz-chart-canvas"><canvas></canvas></div>
             <script type="application/json" class="rz-chart-cfg">
-{"type":"bar","title":"The many-small-vs-few-large axis: facility L2L CDUs reach ~4 MW; in-rack units stay ≤100 kW","x":"CDU type","labels":["In-rack","In-row","Facility (L2L)"],"series":[{"label":"Max single-unit capacity","data":[100,2400,4000],"accent":"info","unit":"kW"}],"y":"Capacity (kW)","source":"data/cdu/cdu-models.csv (15 verified vendor models) · data/cdu/chart-capacity-by-type.csv — max per architecture (Lenovo RM100 / Delta In-Row 2.4 MW / Boyd ROL4000)","basisTag":"vendor"}
+{"type":"bar","title":"The many-small-vs-few-large axis: facility L2L CDUs reach ~4 MW; in-rack units stay ≤100 kW","x":"CDU type","labels":["In-rack","In-row","Facility (L2L)"],"series":[{"label":"Max single-unit capacity","data":[100,2400,4000],"colors":["#8a8f98","#8a8f98","#8a8f98"],"unit":"kW"}],"y":"Capacity (kW)","source":"data/cdu/cdu-models.csv (15 verified vendor models) · data/cdu/chart-capacity-by-type.csv — max per architecture (Lenovo RM100 / Delta In-Row 2.4 MW / Boyd ROL4000)","basisTag":"vendor"}
             </script>
         </figure>
-        <div class="cp-note"><b>Publishing caveats.</b> *The "~35% lower OpEx" and "8–17% lower 5-yr TCO" (Accelsius/Jacobs) and "six-nines" (CoolIT) figures are <b>vendor/sponsored</b> — attribute by name <span class="src ven">VENDOR</span>. The 25 ppm chloride, pH band, and 2–3→8–10 yr fluid-life figures are industry consensus, <i>not</i> a single named standard <span class="src rep">REPORTED</span>. The most consistently corroborated numeric practices are 50 µm/25 µm filtration and the 2–3 °C-above-dew-point rule.</div>
+        <div class="ck-note"><b>Publishing caveats.</b> *The "~35% lower OpEx" and "8–17% lower 5-yr TCO" (Accelsius/Jacobs) and "six-nines" (CoolIT) figures are <b>vendor/sponsored</b> — attribute by name <span class="src ven">VENDOR</span>. The 25 ppm chloride, pH band, and 2–3→8–10 yr fluid-life figures are industry consensus, <i>not</i> a single named standard <span class="src rep">REPORTED</span>. The most consistently corroborated numeric practices are 50 µm/25 µm filtration and the 2–3 °C-above-dew-point rule.</div>
 
-        <div class="cp-links">
-            <a href="cdu-selection-guide.html">↗ CDU Selection &amp; Deployment Guide</a>
-            <a href="cdu-checklist.html">↗ Parameters, water-quality &amp; PM checklist</a>
-            <a href="cdu-mini-bms.html">↗ CDU Mini-BMS — layout, P&amp;ID &amp; live params</a>
-        </div>
-        <div class="cp-note"><b>Disclaimer.</b> Independent educational reference built from publicly available vendor pages, ASHRAE TC 9.9, OCP and DMTF Redfish material. Source tags distinguish published standards from vendor claims and widely-reported-but-unquantified practice. Several primary PDFs (ASHRAE Sept-2024 resiliency bulletin, DMTF DSP2064, some vendor datasheets) are paywalled/bot-blocked — verify load-bearing numbers against the live source before using them in a design package. Not procurement, safety, or engineering advice.</div>
-    </div></section>
+        <div class="ck-note"><b>Disclaimer.</b> Independent educational reference built from publicly available vendor pages, ASHRAE TC 9.9, OCP and DMTF Redfish material. Source tags distinguish published standards from vendor claims and widely-reported-but-unquantified practice. Several primary PDFs (ASHRAE Sept-2024 resiliency bulletin, DMTF DSP2064, some vendor datasheets) are paywalled/bot-blocked — verify load-bearing numbers against the live source before using them in a design package. Not procurement, safety, or engineering advice.</div>
+    </section>
 
-    </main>
+</div>
 
-    <footer class="footer footer-enhanced">
-        <div class="container"><div class="footer-grid">
-            <div class="footer-brand"><p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p><p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p><p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p></div>
-            <div class="footer-nav"><h4 class="footer-heading">NAVIGATION</h4><ul class="footer-links"><li><a href="datacenter-solutions.html">DC Solutions</a></li><li><a href="cdu-selection-guide.html">CDU Selection Guide</a></li><li><a href="cdu-checklist.html">CDU Checklist</a></li><li><a href="cdu-mini-bms.html">CDU Mini-BMS</a></li></ul></div>
-            <div class="footer-connect"><h4 class="footer-heading">CONNECT</h4><ul class="footer-links"><li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li><li><a href="articles.html">Technical Journal</a></li><li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li></ul></div>
-        </div></div>
-    </footer>
+<section class="tool-ref" aria-labelledby="ref-h">
+  <div class="wrap">
+    <p class="eyebrow" id="ref-h">05 / Reference</p>
+    <div class="ref-grid">
+      <div>
+        <h3>Method</h3>
+        <ul class="formulas">
+          <li><span>Source tag</span><code>STANDARD · VENDOR · REPORTED</code></li>
+          <li><span>Matrix</span><code>✓ published · — not published · ~ partial</code></li>
+          <li><span>Trade-off</span><code>+ strength · ~ depends · − drawback</code></li>
+          <li><span>Prices</span><code>relative only; no neutral $/kW is sourceable</code></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Computed against</h3>
+        <p class="against"><span>ASHRAE TC 9.9</span><span>OCP</span><span>DMTF Redfish</span><span>Uptime Institute</span></p>
+        <h3>Read further</h3>
+        <p class="links"><a href="manual/cdu-hub.html">Technical manual and methodology</a><a href="cdu-hub.html">CDU toolkit</a><a href="cdu-selection-guide.html">CDU selection guide</a><a href="cdu-checklist.html">CDU checklist</a><a href="cdu-calculator.html">CDU calculator</a><a href="cdu-mini-bms.html">CDU mini-BMS</a></p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <script>
-    (function(){
-        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('theme')||'light';
-        document.documentElement.setAttribute('data-theme',theme);
-        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('theme',n); });
-        var hb=document.querySelector('.hamburger'), nm=document.querySelector('.nav-menu');
-        if(hb&&nm) hb.addEventListener('click',function(){ hb.classList.toggle('active'); nm.classList.toggle('active'); });
-        var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
-        document.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener('click',function(e){ var t=document.querySelector(this.getAttribute('href')); if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});} }); });
-    })();
-    </script>
+</main>
+
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  function paint(){var d=document.documentElement.getAttribute('data-theme')==='dark';var i=t&&t.querySelector('i');if(i)i.className=d?'fas fa-sun':'fas fa-moon';var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'#0b0c0e':'#F5F7FA');}
+  if(t){t.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';var n=d?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(e){}paint();});paint();}
+  var s=document.getElementById('navSearchBtn');if(s)s.addEventListener('click',function(){if(window.__rzPalette&&window.__rzPalette.open)window.__rzPalette.open();});
+})();
+</script>
     <script src="auth.js?v=20261031-f01cb5a3" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
     <script src="js/rz-article-chart.js?v=20261031-ce40639f" defer></script>
