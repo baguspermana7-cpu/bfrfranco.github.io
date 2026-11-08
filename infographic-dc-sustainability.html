@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-rz-register="editorial">
+<html lang="en" data-theme="dark" data-rz-register="tool">
 <head>
     <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
 <script>
@@ -32,7 +32,7 @@
     <meta name="keywords" content="Data Center Sustainability, Renewable Energy, WUE, Water Usage Effectiveness, Carbon Emissions, Green Data Center, SDG, Sustainability Scorecard">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
-    <meta name="theme-color" content="#06b6d4">
+    <meta name="theme-color" content="#0b0c0e">
     <link rel="canonical" href="https://resistancezero.com/infographic-dc-sustainability.html">
 
     <link rel="alternate" hreflang="en" href="https://resistancezero.com/infographic-dc-sustainability.html">
@@ -109,1088 +109,228 @@
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
-
-    <style>
-        :root { --ig-color: var(--rz-accent-ui); --ig-light: var(--rz-accent-ui); --ig-dark: var(--rz-accent-ui); --ig-bg: rgba(232,181,99,0.08); --ig-border: rgba(232,181,99,0.25); }
-
-        /* Hero */
-        .ig-hero {
-            background: rgb(22,24,29);
-            padding: 7rem 2rem 4rem;
-            position: relative;
-            overflow: hidden;
-        }
-        .ig-hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 600px;
-            height: 600px;
-            background: none;
-            border-radius: 50%;
-        }
-        .ig-hero-content {
-            max-width: 900px;
-            margin: 0 auto;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-        .ig-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--ig-bg);
-            color: var(--ig-color);
-            padding: 0.5rem 1.2rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--ig-border);
-        }
-        .ig-hero h1{font-family:'IBM Plex Sans',system-ui,sans-serif;
-            font-size: clamp(2rem, 5vw, 3.2rem);
-            font-weight:600;
-            color: #fff;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-        .ig-hero h1 span { color: var(--ig-color); }
-        .ig-hero p {
-            font-size: 1.1rem;
-            color: #94a3b8;
-            max-width: 700px;
-            margin: 0 auto 2rem;
-            line-height: 1.7;
-        }
-        .ig-hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-        }
-        .ig-hero-stat {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 4px;
-            padding: 1.5rem 2rem;
-            text-align: center;
-            min-width: 160px;
-        }
-        .ig-hero-stat .num {
-            font-size: 2.5rem;
-            font-weight: 800;
-            display: block;
-            font-variant-numeric: tabular-nums;
-        }
-        .ig-hero-stat .num.cyan { color: var(--ig-color); }
-        .ig-hero-stat .num.amber { color: #f59e0b; }
-        .ig-hero-stat .label {
-            font-size: 0.78rem;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 0.3rem;
-        }
-
-        /* Sections */
-        .ig-section {
-            padding: 4rem 2rem;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        .ig-section-title {
-            font-size: clamp(1.5rem, 3vw, 2rem);
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            text-align: center;
-        }
-        .ig-section-sub {
-            font-size: 1rem;
-            color: var(--text-secondary, #64748b);
-            text-align: center;
-            margin-bottom: 3rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Gauge Charts */
-        .ig-gauge-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .ig-gauge-card {
-            background: var(--bg-secondary, rgba(255,255,255,0.05));
-            border: 1px solid var(--ig-border);
-            border-radius: 4px;
-            padding: 2rem 1.5rem;
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        .ig-gauge-card:hover { border-color: var(--amber, #92400e); }
-        .ig-gauge-svg {
-            width: 140px;
-            height: 80px;
-            margin: 0 auto 1rem;
-        }
-        .ig-gauge-track {
-            fill: none;
-            stroke: rgba(255,255,255,0.08);
-            stroke-width: 12;
-            stroke-linecap: round;
-        }
-        .ig-gauge-fill {
-            fill: none;
-            stroke-width: 12;
-            stroke-linecap: round;
-            transition: stroke-dasharray 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .ig-gauge-val {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--ig-color);
-            margin-bottom: 0.2rem;
-        }
-        .ig-gauge-name {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        .ig-gauge-sub {
-            font-size: 0.75rem;
-            color: var(--text-secondary, #64748b);
-            margin-top: 0.2rem;
-        }
-
-        /* WUE Comparison */
-        .ig-wue-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        @media (max-width: 700px) { .ig-wue-grid { grid-template-columns: 1fr; } }
-        .ig-wue-card {
-            background: var(--bg-secondary, rgba(255,255,255,0.05));
-            border: 1px solid var(--ig-border);
-            border-radius: 4px;
-            padding: 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s;
-        }
-        .ig-wue-card:hover { border-color: var(--amber, #92400e); }
-        .ig-wue-card.best { border-color: var(--ig-color); box-shadow: 0 0 30px rgba(6,182,212,0.1); }
-        .ig-wue-card.best::after {
-            content: 'Recommended';
-            position: absolute;
-            top: 8px;
-            right: -28px;
-            background: var(--ig-color);
-            color: #000;
-            font-size: 0.6rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 0.2rem 2rem;
-            transform: rotate(45deg);
-        }
-        .ig-wue-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-        }
-        .ig-wue-icon svg { width: 28px; height: 28px; }
-        .ig-wue-type {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-        .ig-wue-val {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--ig-color);
-            margin-bottom: 0.3rem;
-        }
-        .ig-wue-unit {
-            font-size: 0.78rem;
-            color: var(--text-secondary, #64748b);
-        }
-        .ig-wue-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 4px;
-            margin-top: 1rem;
-            overflow: hidden;
-        }
-        .ig-wue-bar-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 1s;
-        }
-
-        /* Carbon Intensity Map */
-        .ig-carbon-grid {
-            list-style: none;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0;
-            border-top: 1px solid rgba(127,127,127,0.2);
-        }
-        .ig-carbon-row {
-            display: grid;
-            grid-template-columns: 9rem 1fr 11rem;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid rgba(127,127,127,0.2);
-        }
-        .ig-carbon-region {
-            font-size: 0.9rem;
-            color: var(--text-primary);
-        }
-        .ig-carbon-val {
-            font-family: 'JetBrains Mono', ui-monospace, monospace;
-            font-size: 0.95rem;
-            text-align: right;
-            white-space: nowrap;
-            color: var(--text-primary);
-        }
-        .ig-carbon-unit {
-            font-size: 0.72rem;
-            color: var(--text-secondary, #64748b);
-        }
-        .ig-carbon-bar {
-            display: block;
-            height: 6px;
-            background: rgba(127,127,127,0.14);
-        }
-        .ig-carbon-bar-fill {
-            display: block;
-            height: 100%;
-            background: var(--amber, #FFAA00);
-        }
-        @media (max-width: 560px) {
-            .ig-carbon-row { grid-template-columns: 1fr auto; row-gap: 0.35rem; }
-            .ig-carbon-bar { grid-column: 1 / -1; grid-row: 2; }
-        }
-
-        /* Green Score Calculator */
-        .ig-calc-section {
-            background: var(--bg-secondary, rgba(255,255,255,0.05));
-            border: 1px solid var(--ig-border);
-            border-radius: 4px;
-            padding: 3rem 2.5rem;
-            max-width: 650px;
-            margin: 0 auto;
-        }
-        .ig-calc-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            text-align: center;
-        }
-        .ig-calc-desc {
-            font-size: 0.9rem;
-            color: var(--text-secondary, #64748b);
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        .ig-calc-field {
-            margin-bottom: 1.5rem;
-        }
-        .ig-calc-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-        }
-        .ig-calc-label span {
-            color: var(--ig-color);
-            font-weight: 700;
-        }
-        .ig-calc-slider {
-            width: 100%;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255,255,255,0.1);
-            outline: none;
-            cursor: pointer;
-        }
-        .ig-calc-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--ig-color);
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        .ig-calc-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--ig-color);
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        .ig-score-display {
-            text-align: center;
-            margin-top: 2rem;
-            padding: 2rem;
-            background: var(--ig-bg);
-            border-radius: 4px;
-            border: 1px solid var(--ig-border);
-        }
-        .ig-score-num {
-            font-size: 4rem;
-            font-weight: 800;
-            color: var(--ig-color);
-            transition: color 0.3s;
-        }
-        .ig-score-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary, #64748b);
-            margin-bottom: 0.5rem;
-        }
-        .ig-score-grade {
-            font-size: 1.1rem;
-            font-weight: 700;
-            padding: 0.4rem 1.2rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 0.5rem;
-        }
-        .ig-score-grade.excellent { background: rgba(6,182,212,0.15); color: #06b6d4; }
-        .ig-score-grade.good { background: rgba(16,185,129,0.15); color: #10b981; }
-        .ig-score-grade.average { background: rgba(245,158,11,0.15); color: #f59e0b; }
-        .ig-score-grade.poor { background: rgba(239,68,68,0.15); color: #ef4444; }
-        .ig-score-recs {
-            margin-top: 1.5rem;
-            text-align: left;
-        }
-        .ig-score-recs h4 {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-        .ig-score-recs ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .ig-score-recs li {
-            font-size: 0.82rem;
-            color: var(--text-secondary, #94a3b8);
-            padding: 0.35rem 0;
-            display: flex;
-            gap: 0.5rem;
-            align-items: flex-start;
-        }
-        .ig-score-recs li::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--ig-color);
-            margin-top: 0.4rem;
-            flex-shrink: 0;
-        }
-
-        /* SDG Section */
-        .ig-sdg-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .ig-sdg-card {
-            background: var(--bg-secondary, rgba(255,255,255,0.05));
-            border: 1px solid rgba(127,127,127,0.2);
-            border-radius: 4px;
-            padding: 2rem;
-            transition: border-color 0.2s;
-        }
-        .ig-sdg-card:hover { border-color: var(--amber, #92400e); }
-        .ig-sdg-num {
-            font-family: 'JetBrains Mono', ui-monospace, monospace;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary, #94a3b8);
-            margin-bottom: 0.3rem;
-        }
-        .ig-sdg-name {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-        .ig-sdg-text {
-            font-size: 0.82rem;
-            color: var(--text-secondary, #94a3b8);
-            line-height: 1.5;
-        }
-
-        /* Share Buttons */
-        .ig-share-section { text-align: center; padding: 3rem 2rem; max-width: 600px; margin: 0 auto; }
-        .ig-share-title { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; }
-        .ig-share-btns { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
-        .ig-share-btn {
-            display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem;
-            border-radius: 10px; font-size: 0.85rem; font-weight: 600; text-decoration: none;
-            border: none; cursor: pointer; transition: transform 0.2s, opacity 0.2s; color: #fff;
-        }
-        .ig-share-btn:hover { opacity: 0.9; }
-        .ig-share-btn svg { width: 18px; height: 18px; fill: currentColor; }
-        .ig-share-btn.x-btn { background: #000; }
-        .ig-share-btn.li-btn { background: #0077b5; }
-        .ig-share-btn.fb-btn { background: #0f52ba; }
-        .ig-share-btn.copy-btn { background: var(--ig-dark); }
-        .ig-copy-toast {
-            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: var(--ig-color); color: #fff; padding: 0.7rem 1.5rem; border-radius: 4px;
-            font-size: 0.85rem; font-weight: 600; z-index: 1000; transition: transform 0.3s; pointer-events: none;
-        }
-        .ig-copy-toast.show { transform: translateX(-50%) translateY(0); }
-    
-/* v1.8.0 — mobile sweep responsive patch */
-@media (max-width: 768px) {
-    html, body { overflow-x: hidden; max-width: 100vw; }
-    img, picture, video, svg { max-width: 100%; height: auto; }
-
-    /* Hero / page header */
-    h1 { font-size: 1.6rem !important; line-height: 1.2 !important; }
-    .hero, .page-hero, .compare-hero, .pillar-hero, .infographic-hero, .city-hero { 
-        padding: 1.5rem 1rem !important;
-    }
-    .hero p, .hero-subtitle { font-size: 0.9rem !important; }
-
-    /* Compare pages — side-by-side becomes stacked */
-    .compare-grid, .compare-table, .vs-grid, .comparison-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1rem !important;
-    }
-    .compare-col, .vs-col, .comparison-col { padding: 1rem !important; }
-
-    /* Pillar pages — content sections */
-    .pillar-section, .pillar-card { padding: 1.25rem !important; }
-    .pillar-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
-
-    /* Infographic pages — chart cards */
-    .infographic-grid, .chart-grid, .stat-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1rem !important;
-    }
-    .chart-card, .infographic-card { padding: 1rem !important; }
-    canvas { max-width: 100% !important; height: auto !important; }
-
-    /* DC market city pages — sections */
-    .city-section, .city-card, .market-section { padding: 1.25rem !important; }
-    .market-stats, .city-stats { 
-        grid-template-columns: 1fr 1fr !important;
-        gap: 0.5rem !important;
-    }
-    .stat-tile, .market-stat-tile { padding: 0.75rem !important; }
-
-    /* Map containers (Leaflet/CARTO) */
-    [id*="leaflet" i], [id*="map" i], .map-container {
-        height: 60vh !important;
-        max-height: 480px !important;
-        width: 100% !important;
-    }
-
-    /* Insights / achievements grid */
-    .insights-grid, .achievements-grid {
-        grid-template-columns: 1fr !important;
-        gap: 0.75rem !important;
-    }
-
-    /* Tables horizontal-scroll */
-    table {
-        display: block !important;
-        overflow-x: auto !important;
-        white-space: nowrap;
-        font-size: 0.82rem !important;
-    }
-    th, td { padding: 8px 12px !important; }
-
-    /* Code blocks */
-    pre { overflow-x: auto !important; padding: 0.75rem !important; font-size: 0.78rem !important; max-width: 100%; }
-
-    /* Navbar */
-    .navbar, .nav-bar { padding: 0.5rem 0.75rem !important; }
-    .nav-menu, .nav-links { display: none !important; }
-    .nav-back { padding: 6px 10px !important; }
-
-    /* Footer 3-col collapses */
-    .footer-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1.25rem !important;
-        padding: 1rem !important;
-    }
-
-    /* CTA / button rows */
-    .btn-row, .cta-row, .actions {
-        flex-direction: column !important;
-        gap: 0.5rem !important;
-    }
-    .btn-row .btn, .cta-row .btn { width: 100% !important; }
-
-    /* Tap targets */
-    button, a.btn, [role="button"], .nav-link { min-height: 44px; }
-
-    /* Reading progress (article-style) */
-    .reading-progress, .reading-progress-bar { height: 3px !important; }
-}
-
-@media (max-width: 480px) {
-    .market-stats, .city-stats { grid-template-columns: 1fr !important; }
-    h1 { font-size: 1.4rem !important; }
-}
-
-/* v2026-07-10 — a11y color-contrast fixes (axe critical/serious). COLOR ONLY. */
-/* Light theme: darken too-light foregrounds on white/tinted backgrounds */
-html:not([data-theme="dark"]) .ig-gauge-val,
-html:not([data-theme="dark"]) .ig-calc-label span { color: var(--rz-accent-ui); }
-html:not([data-theme="dark"]) .ig-section-sub,
-html:not([data-theme="dark"]) .ig-gauge-sub,
-html:not([data-theme="dark"]) .ig-wue-unit,
-html:not([data-theme="dark"]) .ig-carbon-unit,
-html:not([data-theme="dark"]) .ig-calc-desc,
-html:not([data-theme="dark"]) .ig-score-label,
-html:not([data-theme="dark"]) .ig-score-recs li,
-html:not([data-theme="dark"]) .ig-sdg-text { color: #475569; }
-html:not([data-theme="dark"]) .ig-score-grade.excellent { color: #0e7490; }
-html:not([data-theme="dark"]) .ig-score-grade.good { color: #047857; }
-html:not([data-theme="dark"]) .ig-score-grade.average { color: #92400e; }
-html:not([data-theme="dark"]) .ig-score-grade.poor { color: #b91c1c; }
-/* Light: inline style="color:#hex" overrides (both spacing variants) */
-html:not([data-theme="dark"]) [style*="color: #10b981"], html:not([data-theme="dark"]) [style*="color:#10b981"] { color: #047857 !important; }
-html:not([data-theme="dark"]) [style*="color: #22d3ee"], html:not([data-theme="dark"]) [style*="color:#22d3ee"] { color: #0e7490 !important; }
-html:not([data-theme="dark"]) [style*="color: #06b6d4"], html:not([data-theme="dark"]) [style*="color:#06b6d4"] { color: #0e7490 !important; }
-html:not([data-theme="dark"]) [style*="color: #f59e0b"], html:not([data-theme="dark"]) [style*="color:#f59e0b"] { color: #92400e !important; }
-html:not([data-theme="dark"]) [style*="color: #d97706"], html:not([data-theme="dark"]) [style*="color:#d97706"] { color: #92400e !important; }
-html:not([data-theme="dark"]) [style*="color: #16a34a"], html:not([data-theme="dark"]) [style*="color:#16a34a"] { color: #166534 !important; }
-/* Light: JS-set score color serializes as rgb() */
-html:not([data-theme="dark"]) #scoreNum[style*="rgb(245, 158, 11)"] { color: #92400e !important; }
-html:not([data-theme="dark"]) #scoreNum[style*="rgb(6, 182, 212)"] { color: #0e7490 !important; }
-html:not([data-theme="dark"]) #scoreNum[style*="rgb(16, 185, 129)"] { color: #047857 !important; }
-html:not([data-theme="dark"]) #scoreNum[style*="rgb(239, 68, 68)"] { color: #b91c1c !important; }
-/* Dark theme: brighten too-dim grays / too-dark reds on dark backgrounds */
-[data-theme="dark"] .ig-section-sub,
-[data-theme="dark"] .ig-gauge-sub,
-[data-theme="dark"] .ig-wue-unit,
-[data-theme="dark"] .ig-carbon-unit,
-[data-theme="dark"] .ig-calc-desc,
-[data-theme="dark"] .ig-score-label,
-[data-theme="dark"] .ig-score-recs li,
-[data-theme="dark"] .ig-sdg-text { color: #94a3b8; }
-[data-theme="dark"] [style*="color: #b91c1c"], [data-theme="dark"] [style*="color:#b91c1c"] { color: #f87171 !important; }
-[data-theme="dark"] [style*="color: #334155"], [data-theme="dark"] [style*="color:#334155"] { color: #94a3b8 !important; }
-[data-theme="dark"] [style*="color: #64748b"], [data-theme="dark"] [style*="color:#64748b"] { color: #94a3b8 !important; }
-
-    /* a11y (v1.51.10) */
-#copyToast{background:var(--rz-accent-ui) !important}
-p > a[href$="glossary.html"]{text-decoration:underline !important;text-underline-offset:2px}
-
-/* sweep-cyan-register: the page accent, per theme */
-:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
-[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
-:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
-/* sweep-cyan-register: page tokens re-resolve inside dark panels */
-:root:not([data-theme="dark"]) [data-rz-dark-panel]{--ig-color:var(--rz-accent-ui);--ig-dark:var(--rz-accent-ui);--ig-light:var(--rz-accent-ui)}
-</style>
-    <script src="js/rz-version.js?v=20261108-e2872eb2" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="js/rz-version.js?v=20261108-1316683e" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261107-7aaef8f4">
+    <link rel="stylesheet" href="css/rz-explorer.css?v=20261108-cbc470dc">
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
-<body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-                <img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high" width="400" height="400">
-            </a>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li class="nav-dropdown">
-                    <a href="datacenter-solutions.html" class="nav-link">
-                        DC Solutions
-                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li role="menuitem"><a href="datacenter-solutions.html" style="font-weight: 600;">DC Solutions Hub</a></li>
-                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="datahallAI.html" style="color: #64748b;" title="Root & Educator access only">🔒 DC AI/HPC</a></li>
-                        <li role="menuitem"><a href="dc-conventional.html" title="Root & Educator access only">🔒 DC Conventional</a></li>
-                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="tco-calculator.html" style="color: #64748b; font-weight: 600;">TCO Calculator</a></li>
-                        <li role="menuitem"><a href="capex-calculator.html">CAPEX Calculator</a></li>
-                        <li role="menuitem"><a href="opex-calculator.html">OPEX Calculator</a></li>
-                        <li role="menuitem"><a href="roi-calculator.html">ROI Calculator</a></li>
-                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="dc-market-tracker.html" style="font-weight: 600;">DC Market</a></li>
-                        <li role="menuitem"><a href="dcmoc/" style="font-weight: 600;">DC MOC</a></li>
-                    </ul>
-                </li>
-                <li><a href="index.html#metrics" class="nav-link">Results</a></li>
-                <li><a href="index.html#case-studies" class="nav-link">Case Studies</a></li>
-                <li class="nav-dropdown">
-                    <a href="articles.html" class="nav-link">
-                        Insights
-                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="articles.html" style="font-weight: 600;">Engineering Journal</a></li>
-                        <li><a href="geopolitics.html">Global Analysis</a></li>
-                        <li><a href="future-forward.html" style="color: #64748b;">Future Forward</a></li>
-                                <li><a href="glossary.html">Glossary</a></li>
-                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="Apps/second%20brain/index.html" style="color: var(--rz-restricted); font-weight: 600;" title="Root only — restricted access"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:4px" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Second Brain</a></li>
-                        <li><a href="insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
-                    </ul>
-                </li>
-                <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
-                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-            </ul>
-            <button class="nav-search-btn" id="navSearchBtn" aria-label="Search" title="Search (Ctrl+K)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            </button>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
+<body class="hub tool" data-rz-page="ig-sus">
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
-
-    <main id="main-content">
-    <!-- Hero -->
-    <section data-rz-dark-panel class="ig-hero">
-        <div class="ig-hero-content">
-            <span class="ig-badge">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                Interactive Infographic
-            </span>
-            <h1>Data Center <span>Sustainability</span> Scorecard 2026</h1>
-            <p>Tracking the environmental footprint of the world's digital infrastructure. Energy consumption, renewable adoption, water usage, and carbon intensity — all in one view.</p>
-            <div class="ig-hero-stats">
-                <div class="ig-hero-stat">
-                    <span class="num cyan" id="statEnergy">1.5%</span>
-                    <span class="label">of Global Electricity</span>
-                </div>
-                <div class="ig-hero-stat">
-                    <span class="num amber" id="statCarbon">0.5%</span>
-                    <span class="label">of Carbon Emissions</span>
-                </div>
-                <div class="ig-hero-stat">
-                    <span class="num cyan">620</span>
-                    <span class="label">TWh / Year</span>
-                </div>
-            </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
         </div>
-    </section>
-
-    <!-- Renewable Energy Gauges -->
-    <section class="ig-section">
-        <h2 class="ig-section-title">Renewable Energy Adoption</h2>
-        <p class="ig-section-sub">Percentage of operations matched with renewable energy by major hyperscalers</p>
-        <div class="ig-gauge-grid" id="gaugeGrid">
-            <div class="ig-gauge-card" data-pct="100">
-                <svg class="ig-gauge-svg" viewBox="0 0 140 80">
-                    <path class="ig-gauge-track" d="M 15 70 A 55 55 0 0 1 125 70" />
-                    <path class="ig-gauge-fill" d="M 15 70 A 55 55 0 0 1 125 70" stroke="#10b981" stroke-dasharray="0 173" />
-                </svg>
-                <div class="ig-gauge-val">100%</div>
-                <div class="ig-gauge-name">Google</div>
-                <div class="ig-gauge-sub">24/7 carbon-free by 2030</div>
-            </div>
-            <div class="ig-gauge-card" data-pct="100">
-                <svg class="ig-gauge-svg" viewBox="0 0 140 80">
-                    <path class="ig-gauge-track" d="M 15 70 A 55 55 0 0 1 125 70" />
-                    <path class="ig-gauge-fill" d="M 15 70 A 55 55 0 0 1 125 70" stroke="#06b6d4" stroke-dasharray="0 173" />
-                </svg>
-                <div class="ig-gauge-val">100%</div>
-                <div class="ig-gauge-name">Microsoft</div>
-                <div class="ig-gauge-sub">Carbon negative by 2030</div>
-            </div>
-            <div class="ig-gauge-card" data-pct="100">
-                <svg class="ig-gauge-svg" viewBox="0 0 140 80">
-                    <path class="ig-gauge-track" d="M 15 70 A 55 55 0 0 1 125 70" />
-                    <path class="ig-gauge-fill" d="M 15 70 A 55 55 0 0 1 125 70" stroke="#f59e0b" stroke-dasharray="0 173" />
-                </svg>
-                <div class="ig-gauge-val">100%</div>
-                <div class="ig-gauge-name">AWS</div>
-                <div class="ig-gauge-sub">Achieved 100% in 2023</div>
-            </div>
-            <div class="ig-gauge-card" data-pct="100">
-                <svg class="ig-gauge-svg" viewBox="0 0 140 80">
-                    <path class="ig-gauge-track" d="M 15 70 A 55 55 0 0 1 125 70" />
-                    <path class="ig-gauge-fill" d="M 15 70 A 55 55 0 0 1 125 70" stroke="#64748b" stroke-dasharray="0 173" />
-                </svg>
-                <div class="ig-gauge-val">100%</div>
-                <div class="ig-gauge-name">Meta</div>
-                <div class="ig-gauge-sub">Net zero by 2030</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- WUE Comparison -->
-    <section class="ig-section" style="background: var(--bg-secondary, rgba(255,255,255,0.02)); border-radius: 0; max-width: 100%; padding: 4rem 2rem;">
-        <h2 class="ig-section-title">Water Usage by Cooling Type</h2>
-        <p class="ig-section-sub">WUE (Water Usage Effectiveness) comparison across cooling technologies</p>
-        <div class="ig-wue-grid">
-            <div class="ig-wue-card">
-                <div class="ig-wue-icon" style="background: rgba(16,185,129,0.12);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
-                </div>
-                <div class="ig-wue-type">Air Cooling</div>
-                <div class="ig-wue-val" style="color: #10b981;">0 L</div>
-                <div class="ig-wue-unit">per kWh IT load</div>
-                <div class="ig-wue-bar"><div class="ig-wue-bar-fill" style="width: 0%; background: #10b981;"></div></div>
-            </div>
-            <div class="ig-wue-card">
-                <div class="ig-wue-icon" style="background: rgba(239,68,68,0.12);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-                </div>
-                <div class="ig-wue-type">Evaporative</div>
-                <div class="ig-wue-val" style="color: #ef4444;">1.8 L</div>
-                <div class="ig-wue-unit">per kWh IT load</div>
-                <div class="ig-wue-bar"><div class="ig-wue-bar-fill" style="width: 100%; background: #ef4444;"></div></div>
-            </div>
-            <div class="ig-wue-card best">
-                <div class="ig-wue-icon" style="background: rgba(6,182,212,0.12);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/><path d="M9.59 4.59A2 2 0 1 1 11 8H6"/></svg>
-                </div>
-                <div class="ig-wue-type">Hybrid</div>
-                <div class="ig-wue-val" style="color: #06b6d4;">0.5 L</div>
-                <div class="ig-wue-unit">per kWh IT load</div>
-                <div class="ig-wue-bar"><div class="ig-wue-bar-fill" style="width: 28%; background: #06b6d4;"></div></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Carbon Intensity -->
-    <section class="ig-section">
-        <h2 class="ig-section-title">Carbon Intensity by Region</h2>
-        <p class="ig-section-sub">Grams of CO2 per kilowatt-hour of grid electricity — determines your data center's carbon footprint</p>
-        <ol class="ig-carbon-grid" id="carbonGrid" aria-label="Grid carbon intensity by region, lowest first">
-            <li class="ig-carbon-row"><span class="ig-carbon-region">Nordics</span><span class="ig-carbon-bar"><span class="ig-carbon-bar-fill" style="width: 4%"></span></span><span class="ig-carbon-val">30 <span class="ig-carbon-unit">gCO2/kWh</span></span></li>
-            <li class="ig-carbon-row"><span class="ig-carbon-region">France</span><span class="ig-carbon-bar"><span class="ig-carbon-bar-fill" style="width: 7%"></span></span><span class="ig-carbon-val">55 <span class="ig-carbon-unit">gCO2/kWh</span></span></li>
-            <li class="ig-carbon-row"><span class="ig-carbon-region">Canada</span><span class="ig-carbon-bar"><span class="ig-carbon-bar-fill" style="width: 16%"></span></span><span class="ig-carbon-val">120 <span class="ig-carbon-unit">gCO2/kWh</span></span></li>
-            <li class="ig-carbon-row"><span class="ig-carbon-region">Germany</span><span class="ig-carbon-bar"><span class="ig-carbon-bar-fill" style="width: 42%"></span></span><span class="ig-carbon-val">320 <span class="ig-carbon-unit">gCO2/kWh</span></span></li>
-            <li class="ig-carbon-row"><span class="ig-carbon-region">USA (Avg)</span><span class="ig-carbon-bar"><span class="ig-carbon-bar-fill" style="width: 50%"></span></span><span class="ig-carbon-val">380 <span class="ig-carbon-unit">gCO2/kWh</span></span></li>
-            <li class="ig-carbon-row"><span class="ig-carbon-region">APAC (Avg)</span><span class="ig-carbon-bar"><span class="ig-carbon-bar-fill" style="width: 66%"></span></span><span class="ig-carbon-val">500 <span class="ig-carbon-unit">gCO2/kWh</span></span></li>
-            <li class="ig-carbon-row"><span class="ig-carbon-region">India</span><span class="ig-carbon-bar"><span class="ig-carbon-bar-fill" style="width: 87%"></span></span><span class="ig-carbon-val">660 <span class="ig-carbon-unit">gCO2/kWh</span></span></li>
-            <li class="ig-carbon-row"><span class="ig-carbon-region">Middle East</span><span class="ig-carbon-bar"><span class="ig-carbon-bar-fill" style="width: 100%"></span></span><span class="ig-carbon-val">760 <span class="ig-carbon-unit">gCO2/kWh</span></span></li>
-        </ol>
-    </section>
-
-    <!-- Green Score Calculator -->
-    <section class="ig-section" style="background: var(--bg-secondary, rgba(255,255,255,0.02)); border-radius: 0; max-width: 100%; padding: 4rem 2rem;">
-        <h2 class="ig-section-title">Green Score Calculator</h2>
-        <p class="ig-section-sub">Rate your data center's sustainability with four key inputs</p>
-        <div class="ig-calc-section">
-            <div class="ig-calc-field">
-                <div class="ig-calc-label">Renewable Energy <span id="renewVal">50%</span></div>
-                <input type="range" class="ig-calc-slider" id="renewSlider" min="0" max="100" step="5" value="50" aria-label="Renew Slider">
-            </div>
-            <div class="ig-calc-field">
-                <div class="ig-calc-label">PUE <span id="pueVal">1.50</span></div>
-                <input type="range" class="ig-calc-slider" id="pueSlider" min="1.0" max="3.0" step="0.05" value="1.50" aria-label="PUE Slider">
-            </div>
-            <div class="ig-calc-field">
-                <div class="ig-calc-label">WUE (L/kWh) <span id="wueVal">1.0</span></div>
-                <input type="range" class="ig-calc-slider" id="wueSlider" min="0" max="2.0" step="0.1" value="1.0" aria-label="Wue Slider">
-            </div>
-            <div class="ig-calc-field">
-                <div class="ig-calc-label">Waste Heat Recovery <span id="heatVal">No</span></div>
-                <input type="range" class="ig-calc-slider" id="heatSlider" min="0" max="1" step="1" value="0" aria-label="Heat Slider">
-            </div>
-
-            <div class="ig-score-display">
-                <div class="ig-score-label">Your Green Score</div>
-                <div class="ig-score-num" id="scoreNum">50</div>
-                <div class="ig-score-grade average" id="scoreGrade">Average</div>
-                <div class="ig-score-recs" id="scoreRecs">
-                    <h4>Recommendations</h4>
-                    <ul id="recsList"></ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- UN SDG Alignment -->
-    <section class="ig-section">
-        <h2 class="ig-section-title">UN Sustainable Development Goals Alignment</h2>
-        <p class="ig-section-sub">How sustainable data center practices contribute to global development targets</p>
-        <div class="ig-sdg-grid">
-            <div class="ig-sdg-card">
-                <div class="ig-sdg-num">SDG 7</div>
-                <div class="ig-sdg-name">Affordable & Clean Energy</div>
-                <div class="ig-sdg-text">Data centers drive renewable energy demand. Hyperscaler PPAs have funded 40+ GW of new solar and wind capacity globally, making clean energy more affordable for all.</div>
-            </div>
-            <div class="ig-sdg-card">
-                <div class="ig-sdg-num">SDG 9</div>
-                <div class="ig-sdg-name">Industry, Innovation & Infrastructure</div>
-                <div class="ig-sdg-text">Efficient data center design pushes engineering innovation: liquid cooling, AI-driven optimization, modular construction, and grid-interactive UPS systems.</div>
-            </div>
-            <div class="ig-sdg-card">
-                <div class="ig-sdg-num">SDG 12</div>
-                <div class="ig-sdg-name">Responsible Consumption</div>
-                <div class="ig-sdg-text">Circular economy practices: server refurbishment, hardware recycling, waste heat recovery for district heating, and water-free cooling technologies.</div>
-            </div>
-            <div class="ig-sdg-card">
-                <div class="ig-sdg-num">SDG 13</div>
-                <div class="ig-sdg-name">Climate Action</div>
-                <div class="ig-sdg-text">Science-based targets, carbon-free energy matching, and embodied carbon reduction in construction materials. Leading operators target net-zero by 2030.</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Share -->
-    <section class="ig-share-section">
-        <h2 class="ig-share-title">Share This Infographic</h2>
-        <div class="ig-share-btns">
-            <a class="ig-share-btn x-btn" href="https://twitter.com/intent/tweet?text=Data%20centers%20use%201.5%25%20of%20global%20electricity%20but%20only%200.5%25%20of%20carbon%20emissions.%20Google%2C%20Microsoft%2C%20Meta%20at%20100%25%20renewable.%20Interactive%20scorecard%3A&url=https%3A%2F%2Fresistancezero.com%2Finfographic-dc-sustainability.html" target="_blank" rel="noopener noreferrer" aria-label="Share on X">
-                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                Share on X
-            </a>
-            <a class="ig-share-btn li-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fresistancezero.com%2Finfographic-dc-sustainability.html" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn">
-                <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                LinkedIn
-            </a>
-            <a class="ig-share-btn fb-btn" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fresistancezero.com%2Finfographic-dc-sustainability.html" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
-                <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                Facebook
-            </a>
-            <button class="ig-share-btn copy-btn" id="copyLinkBtn" aria-label="Copy link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                Copy Link
-            </button>
-        </div>
-    </section>
-
-        <!-- References (added 2026-04-28 discoverability audit) -->
-        <section class="references-section" style="background:#f8fafc; padding:2rem; border-radius:4px; margin:3rem auto; max-width:1100px;">
-            <h3 style="font-size:1.25rem; font-weight:700; color:#16a34a; margin-bottom:1.5rem;">References</h3>
-            <div style="display:grid; gap:0.75rem;">
-                <div id="ref-1" style="display:flex; gap:0.75rem; font-size:0.85rem; color:#334155; line-height:1.6;"><span style="color:#16a34a; font-weight:700; min-width:1.75rem;">[1]</span><div>IEA. <a href="https://www.iea.org/reports/electricity-2024" target="_blank" rel="noopener noreferrer" style="color:#16a34a;"><em>Source.</em></a><div style="color:#64748b; font-size:0.78rem; margin-top:0.15rem;">Global DC electricity demand 350→620 TWh trajectory.</div></div></div>
-                <div id="ref-2" style="display:flex; gap:0.75rem; font-size:0.85rem; color:#334155; line-height:1.6;"><span style="color:#16a34a; font-weight:700; min-width:1.75rem;">[2]</span><div>AWS Sustainability. <a href="https://sustainability.aboutamazon.com/products-services/aws-cloud" target="_blank" rel="noopener noreferrer" style="color:#16a34a;"><em>Source.</em></a><div style="color:#64748b; font-size:0.78rem; margin-top:0.15rem;">AWS 100% renewable energy commitment and progress.</div></div></div>
-                <div id="ref-3" style="display:flex; gap:0.75rem; font-size:0.85rem; color:#334155; line-height:1.6;"><span style="color:#16a34a; font-weight:700; min-width:1.75rem;">[3]</span><div>Google Sustainability. <a href="https://sustainability.google/reports/" target="_blank" rel="noopener noreferrer" style="color:#16a34a;"><em>Source.</em></a><div style="color:#64748b; font-size:0.78rem; margin-top:0.15rem;">Google 24/7 carbon-free energy reporting.</div></div></div>
-                <div id="ref-4" style="display:flex; gap:0.75rem; font-size:0.85rem; color:#334155; line-height:1.6;"><span style="color:#16a34a; font-weight:700; min-width:1.75rem;">[4]</span><div>Microsoft Sustainability. <a href="https://www.microsoft.com/en-us/corporate-responsibility/sustainability" target="_blank" rel="noopener noreferrer" style="color:#16a34a;"><em>Source.</em></a><div style="color:#64748b; font-size:0.78rem; margin-top:0.15rem;">Microsoft carbon negative target and DC operations data.</div></div></div>
-                <div id="ref-5" style="display:flex; gap:0.75rem; font-size:0.85rem; color:#334155; line-height:1.6;"><span style="color:#16a34a; font-weight:700; min-width:1.75rem;">[5]</span><div>Greenpeace Clicking Clean. <a href="https://www.greenpeace.org/usa/reports/click-clean/" target="_blank" rel="noopener noreferrer" style="color:#16a34a;"><em>Source.</em></a><div style="color:#64748b; font-size:0.78rem; margin-top:0.15rem;">Independent assessment of DC operator sustainability.</div></div></div>
-                <div id="ref-6" style="display:flex; gap:0.75rem; font-size:0.85rem; color:#334155; line-height:1.6;"><span style="color:#16a34a; font-weight:700; min-width:1.75rem;">[6]</span><div>CDP. <a href="https://www.cdp.net/" target="_blank" rel="noopener noreferrer" style="color:#16a34a;"><em>Source.</em></a><div style="color:#64748b; font-size:0.78rem; margin-top:0.15rem;">Carbon Disclosure Project — DC operator reporting standard.</div></div></div>
-            </div>
-            <p style="font-size:0.72rem; color:#64748b; font-style:italic; margin-top:1rem;">For educational and research purposes only. <a href="terms.html" style="color:#16a34a;">Terms</a> &middot; <a href="glossary.html" style="color:#16a34a;">Glossary</a></p>
-        </section>
-    </main>
-
-    <!-- Independence Disclaimer -->
-    <div style="max-width:900px;margin:2rem auto 0;padding:1rem 1.5rem;text-align:center;">
-        <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#06b6d4;">Terms &amp; Disclaimer</a></p>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
     </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="nav-icon theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i class="fas fa-sun"></i></button>
+  </div>
+</nav>
 
-    <!-- Footer -->
-    <footer class="footer footer-enhanced">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
-                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
-                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
-                </div>
-                <div class="footer-nav">
-                    <h4 class="footer-heading">NAVIGATION</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">Home Dashboard</a></li>
-                        <li><a href="articles.html">Technical Journal</a></li>
-                        <li><a href="index.html#case-studies">Case Studies</a></li>
-                        <li><a href="datacenter-solutions.html">DC Solutions</a></li>
-                        <li><a href="glossary.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Glossary</a></li>
-                    </ul>
-                </div>
-                <div class="footer-connect">
-                    <h4 class="footer-heading">CONNECT</h4>
-                    <ul class="footer-links">
-                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
-                        <li><a href="articles.html">Technical Journal</a></li>
-                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
-                        <li><a href="https://github.com/baguspermana7-cpu" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
+<main id="main-content">
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow">Sustainability · <b>Infographic</b> · scorecard</p>
+    <h1>Data-centre sustainability 2026 <span class="muted">energy, water, carbon and a score for your site</span></h1>
+    <p class="lede">Data centres use about 1.5 % of global electricity. Renewable matching by operator, water by cooling type, grid carbon by region, and a four-input score.</p>
+    <p class="basis">basis published operator, IEA and grid-intensity figures (references below) · score weights: renewables 35, PUE 30, WUE 20, heat recovery 15</p>
+    <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → Sustainability scorecard</p>
+  </div>
+</header>
+<div class="wrap ck-body">
+<section class="ck-sec" id="footprint">
+  <h2><span class="n">01</span> Global footprint</h2>
+  <div data-rz-fact-list>
+    <div><span class="f-label">Share of global electricity</span><span class="f-value">1.5%</span><span class="f-note"></span></div>
+    <div><span class="f-label">Share of global carbon emissions</span><span class="f-value">0.5%</span><span class="f-note"></span></div>
+    <div><span class="f-label">Electricity a year</span><span class="f-value">620 TWh</span><span class="f-note"></span></div>
+  </div>
+</section>
 
-    <script src="script.min.js?v=20261101-0e062c54"></script>
-    <script src="auth.js?v=20261031-f01cb5a3" defer></script>
-    <script src="rz-tracker.js" defer></script>
+<section class="ck-sec" id="renewables">
+  <h2><span class="n">02</span> Renewable matching by operator</h2>
+  <p class="lead">Share of operations matched with renewable energy, as each operator reports it.</p>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Operator</th><th scope="col">Matched</th><th scope="col">Target</th></tr></thead>
+    <tbody>
+      <tr><td>Google</td><td><span class="num">100%</span></td><td>24/7 carbon-free by 2030</td></tr>
+      <tr><td>Microsoft</td><td><span class="num">100%</span></td><td>Carbon negative by 2030</td></tr>
+      <tr><td>AWS</td><td><span class="num">100%</span></td><td>Achieved 100% in 2023</td></tr>
+      <tr><td>Meta</td><td><span class="num">100%</span></td><td>Net zero by 2030</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-    
+<section class="ck-sec" id="water">
+  <h2><span class="n">03</span> Water by cooling type</h2>
+  <div class="ck-tbl-wrap"><table class="ck-tbl ig-regions">
+    <thead><tr><th scope="col">Cooling</th><th scope="col">WUE (L/kWh IT)</th><th scope="col">Relative to evaporative</th></tr></thead>
+    <tbody>
+      <tr><td>Air Cooling</td><td><span class="num">0 L</span></td><td><span class="ig-bar" style="--w:0%" aria-hidden="true"></span></td></tr>
+      <tr><td>Evaporative</td><td><span class="num">1.8 L</span></td><td><span class="ig-bar" style="--w:100%" aria-hidden="true"></span></td></tr>
+      <tr><td>Hybrid</td><td><span class="num">0.5 L</span></td><td><span class="ig-bar" style="--w:28%" aria-hidden="true"></span></td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-    <!-- Scroll to Top -->
-    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-    </button>
+<section class="ck-sec" id="carbon">
+  <h2><span class="n">04</span> Grid carbon intensity by region</h2>
+  <p class="lead">Grams of CO₂ per kWh of grid electricity, lowest first; it sets the footprint of a site on that grid.</p>
+  <div class="ck-tbl-wrap"><table class="ck-tbl ig-regions">
+    <thead><tr><th scope="col">Region</th><th scope="col">gCO₂/kWh</th><th scope="col">Relative to the highest</th></tr></thead>
+    <tbody>
+      <tr><td>Nordics</td><td><span class="num">30</span></td><td><span class="ig-bar" style="--w:4%" aria-hidden="true"></span></td></tr>
+      <tr><td>France</td><td><span class="num">55</span></td><td><span class="ig-bar" style="--w:7%" aria-hidden="true"></span></td></tr>
+      <tr><td>Canada</td><td><span class="num">120</span></td><td><span class="ig-bar" style="--w:16%" aria-hidden="true"></span></td></tr>
+      <tr><td>Germany</td><td><span class="num">320</span></td><td><span class="ig-bar" style="--w:42%" aria-hidden="true"></span></td></tr>
+      <tr><td>USA (Avg)</td><td><span class="num">380</span></td><td><span class="ig-bar" style="--w:50%" aria-hidden="true"></span></td></tr>
+      <tr><td>APAC (Avg)</td><td><span class="num">500</span></td><td><span class="ig-bar" style="--w:66%" aria-hidden="true"></span></td></tr>
+      <tr><td>India</td><td><span class="num">660</span></td><td><span class="ig-bar" style="--w:87%" aria-hidden="true"></span></td></tr>
+      <tr><td>Middle East</td><td><span class="num">760</span></td><td><span class="ig-bar" style="--w:100%" aria-hidden="true"></span></td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-    <!-- Toast -->
-    <div class="ig-copy-toast" id="copyToast">Link copied to clipboard!</div>
+<section class="ck-sec" id="score">
+  <h2><span class="n">05</span> Green score</h2>
+  <p class="lead">Four inputs, one score out of 100; the weights are in the basis line above.</p>
+  <div class="ig-slider">
+    <label class="ck-calc-in ig-range" for="renewSlider"><span>Renewable energy <b id="renewVal">50%</b></span>
+      <input type="range" id="renewSlider" min="0" max="100" step="5" value="50"></label>
+    <label class="ck-calc-in ig-range" for="pueSlider"><span>PUE <b id="pueVal">1.50</b></span>
+      <input type="range" id="pueSlider" min="1.0" max="3.0" step="0.05" value="1.50"></label>
+    <label class="ck-calc-in ig-range" for="wueSlider"><span>WUE (L/kWh) <b id="wueVal">1.0</b></span>
+      <input type="range" id="wueSlider" min="0" max="2.0" step="0.1" value="1.0"></label>
+    <label class="ck-calc-in ig-range" for="heatSlider"><span>Waste heat recovery <b id="heatVal">No</b></span>
+      <input type="range" id="heatSlider" min="0" max="1" step="1" value="0"></label>
+    <div data-rz-fact-list>
+      <div><span class="f-label">Green score</span><span class="f-value" id="scoreNum">50</span><span class="f-note" id="scoreGrade">Average</span></div>
+    </div>
+    <h3 class="ig-recs-h">Recommendations</h3>
+    <ul class="ig-recs" id="recsList"></ul>
+  </div>
+</section>
 
-    <script>
-    (function(){
-        // Cookie Banner
-        var cb = document.getElementById('cookieBanner');
-        var consent = localStorage.getItem('rz_cookie_consent');
-        if (!consent && cb) { cb.classList.remove('hidden'); }
-        var acceptBtn = document.getElementById('cookieAccept');
-        var declineBtn = document.getElementById('cookieDecline');
-        if (acceptBtn) acceptBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent', 'accepted'); cb.classList.add('hidden'); });
-        if (declineBtn) declineBtn.addEventListener('click', function(){ localStorage.setItem('rz_cookie_consent', 'declined'); cb.classList.add('hidden'); window['ga-disable-G-GED7FX8RTV'] = true; });
+<section class="ck-sec" id="sdg">
+  <h2><span class="n">06</span> UN Sustainable Development Goals</h2>
+  <div class="ck-tbl-wrap"><table class="ck-tbl">
+    <thead><tr><th scope="col">Goal</th><th scope="col">Name</th><th scope="col">How data centres contribute</th></tr></thead>
+    <tbody>
+      <tr><td>SDG 7</td><td>Affordable & Clean Energy</td><td>Data centers drive renewable energy demand. Hyperscaler PPAs have funded 40+ GW of new solar and wind capacity globally, making clean energy more affordable for all.</td></tr>
+      <tr><td>SDG 9</td><td>Industry, Innovation & Infrastructure</td><td>Efficient data center design pushes engineering innovation: liquid cooling, AI-driven optimization, modular construction, and grid-interactive UPS systems.</td></tr>
+      <tr><td>SDG 12</td><td>Responsible Consumption</td><td>Circular economy practices: server refurbishment, hardware recycling, waste heat recovery for district heating, and water-free cooling technologies.</td></tr>
+      <tr><td>SDG 13</td><td>Climate Action</td><td>Science-based targets, carbon-free energy matching, and embodied carbon reduction in construction materials. Leading operators target net-zero by 2030.</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
-        // Scroll to Top
-        var sBtn = document.getElementById('scrollTopBtn');
-        if (sBtn) {
-            var ticking = false;
-            window.addEventListener('scroll', function(){
-                if (!ticking) {
-                    window.requestAnimationFrame(function(){
-                        sBtn.classList[window.scrollY > 500 ? 'add' : 'remove']('visible');
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            });
-            sBtn.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
-        }
+<section class="ck-sec" id="references">
+  <h2><span class="n">07</span> References</h2>
+  <ol class="ig-refs">
+    <li id="ref-1"><span class="ref-n">[1]</span> IEA. <a href="https://www.iea.org/reports/electricity-2024" target="_blank" rel="noopener noreferrer"><em>Source.</em></a><div>Global DC electricity demand 350→620 TWh trajectory.</li>
+    <li id="ref-2"><span class="ref-n">[2]</span> AWS Sustainability. <a href="https://sustainability.aboutamazon.com/products-services/aws-cloud" target="_blank" rel="noopener noreferrer"><em>Source.</em></a><div>AWS 100% renewable energy commitment and progress.</li>
+    <li id="ref-3"><span class="ref-n">[3]</span> Google Sustainability. <a href="https://sustainability.google/reports/" target="_blank" rel="noopener noreferrer"><em>Source.</em></a><div>Google 24/7 carbon-free energy reporting.</li>
+    <li id="ref-4"><span class="ref-n">[4]</span> Microsoft Sustainability. <a href="https://www.microsoft.com/en-us/corporate-responsibility/sustainability" target="_blank" rel="noopener noreferrer"><em>Source.</em></a><div>Microsoft carbon negative target and DC operations data.</li>
+    <li id="ref-5"><span class="ref-n">[5]</span> Greenpeace Clicking Clean. <a href="https://www.greenpeace.org/usa/reports/click-clean/" target="_blank" rel="noopener noreferrer"><em>Source.</em></a><div>Independent assessment of DC operator sustainability.</li>
+    <li id="ref-6"><span class="ref-n">[6]</span> CDP. <a href="https://www.cdp.net/" target="_blank" rel="noopener noreferrer"><em>Source.</em></a><div>Carbon Disclosure Project — DC operator reporting standard.</li>
+  </ol>
+</section>
+</div>
 
-        // Gauge Animation
-        var gaugeArcLength = 173; // approximate arc length for the semicircle
-        var gaugeObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(e) {
-                if (e.isIntersecting) {
-                    var cards = document.querySelectorAll('.ig-gauge-card');
-                    cards.forEach(function(card, i) {
-                        setTimeout(function() {
-                            var pct = parseInt(card.getAttribute('data-pct'));
-                            var fill = card.querySelector('.ig-gauge-fill');
-                            var dashLen = (pct / 100) * gaugeArcLength;
-                            fill.setAttribute('stroke-dasharray', dashLen + ' ' + gaugeArcLength);
-                        }, i * 200);
-                    });
-                    gaugeObserver.disconnect();
-                }
-            });
-        }, { threshold: 0.2 });
-        gaugeObserver.observe(document.getElementById('gaugeGrid'));
+<section class="tool-ref" aria-labelledby="ref-h">
+  <div class="wrap">
+    <p class="eyebrow" id="ref-h">08 / Reference</p>
+    <h3>Read further</h3>
+    <p class="links"><a href="carbon-footprint.html">Carbon footprint calculator</a><a href="infographic-pue-global.html">Global PUE</a><a href="pillar-sustainability.html">Sustainability</a></p>
+    <p class="notice">Independent personal research from public sources; it does not represent any current or former employer. <a href="terms.html">Terms and disclaimer</a>.</p>
+  </div>
+</section>
+</main>
 
-        // Green Score Calculator
-        var renewSlider = document.getElementById('renewSlider');
-        var pueSlider = document.getElementById('pueSlider');
-        var wueSlider = document.getElementById('wueSlider');
-        var heatSlider = document.getElementById('heatSlider');
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
 
-        function calculateScore() {
-            var renew = parseInt(renewSlider.value);
-            var pue = parseFloat(pueSlider.value);
-            var wue = parseFloat(wueSlider.value);
-            var heat = parseInt(heatSlider.value);
-
-            // Update displays
-            document.getElementById('renewVal').textContent = renew + '%';
-            document.getElementById('pueVal').textContent = pue.toFixed(2);
-            document.getElementById('wueVal').textContent = wue.toFixed(1);
-            document.getElementById('heatVal').textContent = heat ? 'Yes' : 'No';
-
-            // Score calculation (0-100)
-            var renewScore = renew * 0.35; // max 35
-            var pueScore = Math.max(0, (3.0 - pue) / 2.0) * 30; // max 30
-            var wueScore = Math.max(0, (2.0 - wue) / 2.0) * 20; // max 20
-            var heatScore = heat * 15; // max 15
-
-            var total = Math.round(renewScore + pueScore + wueScore + heatScore);
-            total = Math.min(100, Math.max(0, total));
-
-            var scoreNum = document.getElementById('scoreNum');
-            var scoreGrade = document.getElementById('scoreGrade');
-            scoreNum.textContent = total;
-
-            var grade, gradeClass, scoreColor;
-            if (total >= 80) { grade = 'Excellent'; gradeClass = 'excellent'; scoreColor = '#06b6d4'; }
-            else if (total >= 60) { grade = 'Good'; gradeClass = 'good'; scoreColor = '#10b981'; }
-            else if (total >= 40) { grade = 'Average'; gradeClass = 'average'; scoreColor = '#f59e0b'; }
-            else { grade = 'Needs Improvement'; gradeClass = 'poor'; scoreColor = '#ef4444'; }
-
-            scoreGrade.textContent = grade;
-            scoreGrade.className = 'ig-score-grade ' + gradeClass;
-            scoreNum.style.color = scoreColor;
-
-            // Recommendations
-            var recs = [];
-            if (renew < 50) recs.push('Increase renewable energy procurement through PPAs or RECs to reduce Scope 2 emissions.');
-            if (renew >= 50 && renew < 100) recs.push('Target 100% renewable matching and explore 24/7 carbon-free energy agreements.');
-            if (pue > 1.4) recs.push('Implement hot/cold aisle containment and optimize airflow management to lower PUE.');
-            if (pue > 1.6) recs.push('Consider liquid cooling for high-density zones — direct-to-chip cooling can achieve PUE below 1.1.');
-            if (wue > 1.0) recs.push('Evaluate hybrid or air-cooled alternatives to reduce water consumption in cooling systems.');
-            if (wue > 0.5 && wue <= 1.0) recs.push('Explore closed-loop cooling or direct liquid cooling to minimize water dependency.');
-            if (!heat) recs.push('Investigate waste heat recovery for district heating or adjacent facility use — up to 15% energy value recapture.');
-            if (total >= 80) recs.push('Excellent sustainability profile. Consider pursuing ISO 50001 certification and science-based targets.');
-
-            var recsList = document.getElementById('recsList');
-            recsList.innerHTML = '';
-            recs.forEach(function(r) {
-                var li = document.createElement('li');
-                li.textContent = r;
-                recsList.appendChild(li);
-            });
-        }
-
-        renewSlider.addEventListener('input', calculateScore);
-        pueSlider.addEventListener('input', calculateScore);
-        wueSlider.addEventListener('input', calculateScore);
-        heatSlider.addEventListener('input', calculateScore);
-        calculateScore();
-
-        // Copy Link
-        document.getElementById('copyLinkBtn').addEventListener('click', function() {
-            navigator.clipboard.writeText('https://resistancezero.com/infographic-dc-sustainability.html').then(function() {
-                var toast = document.getElementById('copyToast');
-                toast.classList.add('show');
-                setTimeout(function() { toast.classList.remove('show'); }, 2000);
-            });
-        });
-    })();
-    </script>
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  function paint(){var d=document.documentElement.getAttribute('data-theme')==='dark';var i=t&&t.querySelector('i');if(i)i.className=d?'fas fa-sun':'fas fa-moon';var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'#0b0c0e':'#F5F7FA');}
+  if(t){t.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';var n=d?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(e){}paint();});paint();}
+  var s=document.getElementById('navSearchBtn');if(s)s.addEventListener('click',function(){if(window.__rzPalette&&window.__rzPalette.open)window.__rzPalette.open();});
+})();
+</script>
+<script>
+/* Green score (ids and weights carried over): renewable x0.35 (max 35) + PUE (3-p)/2 x30 + WUE (2-w)/2 x20 + heat 15.
+   The grade is a word; the old page also coloured the number cyan / green / amber / red. */
+(function(){
+  var g=function(i){return document.getElementById(i);};
+  var rs=g('renewSlider'), ps=g('pueSlider'), ws=g('wueSlider'), hs=g('heatSlider'), list=g('recsList');
+  if(!rs||!ps||!ws||!hs||!list) return;
+  function calc(){
+    var renew=parseInt(rs.value,10), pue=parseFloat(ps.value), wue=parseFloat(ws.value), heat=parseInt(hs.value,10);
+    g('renewVal').textContent=renew+'%'; g('pueVal').textContent=pue.toFixed(2); g('wueVal').textContent=wue.toFixed(1); g('heatVal').textContent=heat?'Yes':'No';
+    var total=Math.round(renew*0.35 + Math.max(0,(3-pue)/2)*30 + Math.max(0,(2-wue)/2)*20 + heat*15);
+    total=Math.min(100,Math.max(0,total));
+    g('scoreNum').textContent=total;
+    g('scoreGrade').textContent = total>=80 ? 'Excellent' : total>=60 ? 'Good' : total>=40 ? 'Average' : 'Needs improvement';
+    var recs=[];
+    if(renew<50) recs.push('Increase renewable energy procurement through PPAs or RECs to reduce Scope 2 emissions.');
+    if(renew>=50&&renew<100) recs.push('Target 100% renewable matching and explore 24/7 carbon-free energy agreements.');
+    if(pue>1.4) recs.push('Implement hot/cold aisle containment and optimize airflow management to lower PUE.');
+    if(pue>1.6) recs.push('Consider liquid cooling for high-density zones; direct-to-chip cooling can reach a PUE below 1.1.');
+    if(wue>1.0) recs.push('Evaluate hybrid or air-cooled alternatives to reduce water consumption in cooling systems.');
+    if(wue>0.5&&wue<=1.0) recs.push('Explore closed-loop cooling or direct liquid cooling to reduce water dependency.');
+    if(!heat) recs.push('Investigate waste heat recovery for district heating or adjacent facility use, up to 15% energy value recaptured.');
+    if(total>=80) recs.push('Consider ISO 50001 certification and science-based targets.');
+    list.innerHTML='';
+    recs.forEach(function(r){ var li=document.createElement('li'); li.textContent=r; list.appendChild(li); });
+  }
+  [rs,ps,ws,hs].forEach(function(e){ e.addEventListener('input',calc); }); calc();
+})();
+</script>
+<script src="auth.js?v=20261031-f01cb5a3" defer></script>
 </body>
 </html>

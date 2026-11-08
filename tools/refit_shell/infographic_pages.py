@@ -141,3 +141,103 @@ def cost_main(src):
 
 
 CONFIG['infographic-dc-cost-breakdown.html'] = {'key': 'ig-cost', 'main': cost_main, 'scripts': auth_only}
+
+
+# ---------------------------------------------------------------- infographic-dc-sustainability
+
+SLIDER_DEFAULT = {'renewVal': '50', 'pueVal': '1.50', 'wueVal': '1.0', 'heatVal': '0'}
+
+
+def _slider(sid, label, vid, shown, mn, mx, step):
+    return ('    <label class="ck-calc-in ig-range" for="%s"><span>%s <b id="%s">%s</b></span>\n'
+            '      <input type="range" id="%s" min="%s" max="%s" step="%s" value="%s"></label>') % (
+        sid, label, vid, shown, sid, mn, mx, step, SLIDER_DEFAULT[vid])
+
+
+GREEN_CALC = '\n'.join([
+    '  <div class="ig-slider">',
+    _slider('renewSlider', 'Renewable energy', 'renewVal', '50%', 0, 100, 5),
+    _slider('pueSlider', 'PUE', 'pueVal', '1.50', '1.0', '3.0', '0.05'),
+    _slider('wueSlider', 'WUE (L/kWh)', 'wueVal', '1.0', 0, '2.0', '0.1'),
+    _slider('heatSlider', 'Waste heat recovery', 'heatVal', 'No', 0, 1, 1),
+    '    <div data-rz-fact-list>',
+    '      <div><span class="f-label">Green score</span><span class="f-value" id="scoreNum">50</span><span class="f-note" id="scoreGrade">Average</span></div>',
+    '    </div>',
+    '    <h3 class="ig-recs-h">Recommendations</h3>',
+    '    <ul class="ig-recs" id="recsList"></ul>',
+    '  </div>'])
+
+GREEN_SCRIPT = r"""<script>
+/* Green score (ids and weights carried over): renewable x0.35 (max 35) + PUE (3-p)/2 x30 + WUE (2-w)/2 x20 + heat 15.
+   The grade is a word; the old page also coloured the number cyan / green / amber / red. */
+(function(){
+  var g=function(i){return document.getElementById(i);};
+  var rs=g('renewSlider'), ps=g('pueSlider'), ws=g('wueSlider'), hs=g('heatSlider'), list=g('recsList');
+  if(!rs||!ps||!ws||!hs||!list) return;
+  function calc(){
+    var renew=parseInt(rs.value,10), pue=parseFloat(ps.value), wue=parseFloat(ws.value), heat=parseInt(hs.value,10);
+    g('renewVal').textContent=renew+'%'; g('pueVal').textContent=pue.toFixed(2); g('wueVal').textContent=wue.toFixed(1); g('heatVal').textContent=heat?'Yes':'No';
+    var total=Math.round(renew*0.35 + Math.max(0,(3-pue)/2)*30 + Math.max(0,(2-wue)/2)*20 + heat*15);
+    total=Math.min(100,Math.max(0,total));
+    g('scoreNum').textContent=total;
+    g('scoreGrade').textContent = total>=80 ? 'Excellent' : total>=60 ? 'Good' : total>=40 ? 'Average' : 'Needs improvement';
+    var recs=[];
+    if(renew<50) recs.push('Increase renewable energy procurement through PPAs or RECs to reduce Scope 2 emissions.');
+    if(renew>=50&&renew<100) recs.push('Target 100% renewable matching and explore 24/7 carbon-free energy agreements.');
+    if(pue>1.4) recs.push('Implement hot/cold aisle containment and optimize airflow management to lower PUE.');
+    if(pue>1.6) recs.push('Consider liquid cooling for high-density zones; direct-to-chip cooling can reach a PUE below 1.1.');
+    if(wue>1.0) recs.push('Evaluate hybrid or air-cooled alternatives to reduce water consumption in cooling systems.');
+    if(wue>0.5&&wue<=1.0) recs.push('Explore closed-loop cooling or direct liquid cooling to reduce water dependency.');
+    if(!heat) recs.push('Investigate waste heat recovery for district heating or adjacent facility use, up to 15% energy value recaptured.');
+    if(total>=80) recs.push('Consider ISO 50001 certification and science-based targets.');
+    list.innerHTML='';
+    recs.forEach(function(r){ var li=document.createElement('li'); li.textContent=r; list.appendChild(li); });
+  }
+  [rs,ps,ws,hs].forEach(function(e){ e.addEventListener('input',calc); }); calc();
+})();
+</script>"""
+
+
+def sus_main(src):
+    stats = re.findall(r'<span class="num[^"]*"(?: id="\w+")?>(.*?)</span>\s*<span class="label">(.*?)</span>', src)
+    assert len(stats) == 3, stats
+    gauges = re.findall(r'<div class="ig-gauge-val">(.*?)</div>\s*<div class="ig-gauge-name">(.*?)</div>\s*<div class="ig-gauge-sub">(.*?)</div>', src)
+    assert len(gauges) == 4, gauges
+    wue = re.findall(r'<div class="ig-wue-type">(.*?)</div>\s*<div class="ig-wue-val"[^>]*>(.*?)</div>\s*<div class="ig-wue-unit">.*?</div>\s*<div class="ig-wue-bar"><div class="ig-wue-bar-fill" style="width: (\d+)%', src, flags=re.S)
+    assert len(wue) == 3, wue
+    carbon = re.findall(r'<span class="ig-carbon-region">(.*?)</span><span class="ig-carbon-bar"><span class="ig-carbon-bar-fill" style="width: (\d+)%"></span></span><span class="ig-carbon-val">(\d+) ', src)
+    assert len(carbon) == 8, carbon
+    sdg = re.findall(r'<div class="ig-sdg-num">(.*?)</div>\s*<div class="ig-sdg-name">(.*?)</div>\s*<div class="ig-sdg-text">(.*?)</div>', src, flags=re.S)
+    assert len(sdg) == 4, sdg
+
+    def bar(w):
+        return '<span class="ig-bar" style="--w:%s%%" aria-hidden="true"></span>' % w
+
+    def num(v):
+        return '<span class="num">%s</span>' % v
+
+    stat_label = {'of Global Electricity': 'Share of global electricity', 'of Carbon Emissions': 'Share of global carbon emissions', 'TWh / Year': 'Electricity a year'}
+    body = '\n'.join([
+        ex.section(1, 'footprint', 'Global footprint', facts([(stat_label.get(l, l), v + (' TWh' if l == 'TWh / Year' else ''), '') for v, l in stats])),
+        ex.section(2, 'renewables', 'Renewable matching by operator', ex.table(['Operator', 'Matched', 'Target'], [(n, num(v), sub) for v, n, sub in gauges]),
+                   lead='Share of operations matched with renewable energy, as each operator reports it.'),
+        ex.section(3, 'water', 'Water by cooling type', ex.table(['Cooling', 'WUE (L/kWh IT)', 'Relative to evaporative'], [(t, num(v), bar(w)) for t, v, w in wue], cls='ig-regions')),
+        ex.section(4, 'carbon', 'Grid carbon intensity by region', ex.table(['Region', 'gCO₂/kWh', 'Relative to the highest'], [(r, num(v), bar(w)) for r, w, v in carbon], cls='ig-regions'),
+                   lead='Grams of CO₂ per kWh of grid electricity, lowest first; it sets the footprint of a site on that grid.'),
+        ex.section(5, 'score', 'Green score', GREEN_CALC, lead='Four inputs, one score out of 100; the weights are in the basis line above.'),
+        ex.section(6, 'sdg', 'UN Sustainable Development Goals', ex.table(['Goal', 'Name', 'How data centres contribute'], sdg)),
+        ex.section(7, 'references', 'References', refs(src)),
+    ])
+    return '<main id="main-content">\n' + ex.tool_head(
+        'Sustainability · <b>Infographic</b> · scorecard',
+        'Data-centre sustainability 2026 <span class="muted">energy, water, carbon and a score for your site</span>',
+        'Data centres use about 1.5 % of global electricity. Renewable matching by operator, water by cooling type, grid carbon by region, and a four-input score.',
+        'basis published operator, IEA and grid-intensity figures (references below) · score weights: renewables 35, PUE 30, WUE 20, heat recovery 15',
+        CRUMB + 'Sustainability scorecard') + '\n<div class="wrap ck-body">' + body + '\n</div>\n' + ex.reference(
+            8, [('carbon-footprint.html', 'Carbon footprint calculator'), ('infographic-pue-global.html', 'Global PUE'), ('pillar-sustainability.html', 'Sustainability')],
+            notice='Independent personal research from public sources; it does not represent any current or former employer. '
+                   '<a href="terms.html">Terms and disclaimer</a>.') + '\n</main>'
+
+
+CONFIG['infographic-dc-sustainability.html'] = {'key': 'ig-sus', 'main': sus_main,
+                                                'scripts': lambda src: GREEN_SCRIPT + '\n' + auth_only(src)}
