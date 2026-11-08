@@ -1,6 +1,6 @@
 # X / Twitter — Article 30 (thread)
 
-1/ A video says "agentic AI is fraud". Instead of arguing about the word, I graded its 14 claims against the evidence. 🧵
+1/ "Agentic AI is fraud" is a common claim. Instead of arguing about the word, I split it into 14 checkable claims and graded each against the evidence. 🧵
 
 2/ Right: an agent acts only through code someone wrote. The model emits a structured call; the app executes it and feeds the result back. Vendors document exactly that.
 
@@ -12,7 +12,7 @@
 
 6/ Compounding: 20 steps at 95% each = 0.95^20 = 36% end-to-end. That one number explains most agent disappointment.
 
-7/ Money: big-four 2026 capex guidance ≈ $0.7T. The video's "$3T" has no source.
+7/ Money: big-four 2026 capex guidance ≈ $0.7T. The often-quoted "$3T" has no source.
 
 8/ The stance for operations: probabilistic planner, deterministic executors, verifiers, a human gate. Nothing writes to a BMS without an interlock.
 

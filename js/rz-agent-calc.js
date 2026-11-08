@@ -25,7 +25,7 @@
   function K(key, value, unit, source, note) {
     constants[key] = { value: value, unit: unit, source: source, asOf: ASOF, note: note || "" };
   }
-  var LIST = "A29 [S27] via [S59]";
+  var LIST = "A29 [S27] via [S57]";
   K("price.in", 2.0, "$ per 1M input tokens", LIST, "Sonnet-class list price, 2026-10-16");
   K("price.out", 10.0, "$ per 1M output tokens", LIST, "Sonnet-class list price, 2026-10-16");
   K("price.cacheReadFrac", 0.1, "fraction of input price", LIST, "cache reads are 2.5-10% across vendors; 10% used");
@@ -46,7 +46,7 @@
     g3_name: "type check", g3_d: 0.15, g3_hard: "hard", g4_name: "LLM code review", g4_d: 0.5, g4_hard: "advisory",
     g5_name: "human gate", g5_d: 0.5, g5_hard: "hard", g6_name: "", g6_d: 0, g6_hard: "advisory", g7_name: "", g7_d: 0, g7_hard: "advisory"
   };
-  presets.ladders["Factory-shaped ladder (mirrors gate order [S60]; values not measured)"] = {
+  presets.ladders["Factory-shaped ladder (mirrors gate order [S58]; values not measured)"] = {
     g1_name: "tests", g1_d: 0.6, g1_hard: "hard", g2_name: "lint", g2_d: 0.1, g2_hard: "hard",
     g3_name: "tests_added", g3_d: 0, g3_hard: "hard", g4_name: "security review", g4_d: 0.4, g4_hard: "advisory",
     g5_name: "code review", g5_d: 0.4, g5_hard: "advisory", g6_name: "ux", g6_d: 0.2, g6_hard: "advisory", g7_name: "ui", g7_d: 0.2, g7_hard: "advisory"
@@ -191,7 +191,7 @@
       var score = 100 * N * (1 - Risk) * (1 - cv("decide.lat_weight") * Lp);
       var band = score < cv("decide.band_hybrid") ? SCRIPT : (score < cv("decide.band_agent") ? HYBRID : AGENT);
       var decision = band, flags = [], why, a = 1 - N, b = Risk, c = cv("decide.lat_weight") * Lp;
-      if (v.E === 5 && v.Vf <= 2) flags.push("No autonomous action. LLM may propose; a human executes through the existing control system (CISA AI-in-OT HITL principle [S33]).");
+      if (v.E === 5 && v.Vf <= 2) flags.push("No autonomous action. LLM may propose; a human executes through the existing control system (CISA AI-in-OT HITL principle [S31]).");
       if (v.L === 1) { flags.push("Real-time path: not an LLM (decode latency, A29 section 6)."); decision = SCRIPT; }
       if (v.V <= 2) decision = SCRIPT;
       if (v.F >= 4 && v.V <= 3) flags.push("Codify: once the agent's path is stable, replace it with a script.");
@@ -243,7 +243,7 @@
       return ["With your inputs a run succeeds " + (o.P_run * 100).toFixed(1) + "% of the time, against " + (base * 100).toFixed(1) +
         "% with no verifier and no retries, for " + (extra * 100).toFixed(1) + "% more tokens.",
         "At the defaults (20 steps, p = 0.95, d = 0.9, k = 2): a verifier that catches 90% of bad steps raises a 20-step run from 36% to 90% for 5% more tokens. The cheapest reliability is a deterministic check, not a bigger model.",
-        "Caveats: independence is optimistic (errors correlate); a model-based verifier may share the generator's blind spots; METR's 50%-vs-80% time-horizon gap (Mythos 1,045 vs 186 min; Opus 4.6 719 vs 70 min) is the empirical version of this curve [S27].",
+        "Caveats: independence is optimistic (errors correlate); a model-based verifier may share the generator's blind spots; METR's 50%-vs-80% time-horizon gap (Mythos 1,045 vs 186 min; Opus 4.6 719 vs 70 min) is the empirical version of this curve [S25].",
         "Silent failure (Pu) and detected failure (Px) mean different things: Px stops the run and can be escalated; Pu ships a wrong result."];
     }
   };
@@ -322,7 +322,7 @@
   }
   var LADDER = {
     id: "ladder", fields: LADDER_FIELDS,
-    basis: "assumption — user-set catch rates (no measured per-gate catch rates were found for LLM pipelines [S61]); the structure is the model",
+    basis: "assumption — user-set catch rates (no measured per-gate catch rates were found for LLM pipelines [S59]); the structure is the model",
     out: (function () {
       var o = [
         O("P_escape", "Probability a defect escapes every gate", "probability", "P_escape = Π (1 − d_eff,i)", ["rho"]),
@@ -351,7 +351,7 @@
     },
     notes: function () {
       return ["These numbers are what-ifs. The structural lesson holds regardless of the values: an escaped defect has to get past every rung, so add rungs that fail for different reasons.",
-        "Catch rates are user assumptions. The factory has run one demo job only [S61]; the factory-shaped preset mirrors its gate order [S60], and its values are not measured."];
+        "Catch rates are user assumptions. The factory has run one demo job only [S59]; the factory-shaped preset mirrors its gate order [S58], and its values are not measured."];
     }
   };
 

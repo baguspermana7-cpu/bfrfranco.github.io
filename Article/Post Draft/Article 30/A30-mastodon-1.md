@@ -1,6 +1,6 @@
 # Mastodon — Article 30
 
-Is "agentic AI" a fraud? I graded a viral video's 14 claims against the record.
+Is "agentic AI" a fraud? I graded the critique's 14 claims against the record.
 
 The mechanism it describes is right; its showcase example and its absolutes are not. Reliability is the real limit: 20 steps at 95% each succeed 36% of the time.
 

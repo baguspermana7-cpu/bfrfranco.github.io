@@ -4,14 +4,14 @@
 
 <h3 id="failure-injection">6.1 Prompt injection through data</h3>
 
-<p>A language model has no reliable way to distinguish the instructions it was given from instructions written inside the content it reads. OWASP&rsquo;s entry LLM01:2025 describes <a href="glossary.html#term-prompt-injection">prompt injection</a> in its indirect form: &ldquo;Indirect prompt injections occur when an LLM accepts input from external sources, such as websites or files.&rdquo; Listed impacts include &ldquo;Executing arbitrary commands in connected systems&rdquo; and &ldquo;Manipulating critical decision-making processes&rdquo; <a href="#src-31">[S31]</a>. Relevant inputs in operations: alarm text, ticket bodies, vendor PDFs, e-mail, CMMS free-text fields. An agent that reads a ticket and has a tool that acts on it gives whoever can write a ticket a path to whatever the tool can do.</p>
+<p>A language model has no reliable way to distinguish the instructions it was given from instructions written inside the content it reads. OWASP&rsquo;s entry LLM01:2025 describes <a href="glossary.html#term-prompt-injection">prompt injection</a> in its indirect form: &ldquo;Indirect prompt injections occur when an LLM accepts input from external sources, such as websites or files.&rdquo; Listed impacts include &ldquo;Executing arbitrary commands in connected systems&rdquo; and &ldquo;Manipulating critical decision-making processes&rdquo; <a href="#src-29">[S29]</a>. Relevant inputs in operations: alarm text, ticket bodies, vendor PDFs, e-mail, CMMS free-text fields. An agent that reads a ticket and has a tool that acts on it gives whoever can write a ticket a path to whatever the tool can do.</p>
 
 <h3 id="failure-owasp">6.2 OWASP Top 10 for agentic applications</h3>
 
-<p>OWASP published a Top 10 for agentic applications on 2025-12-09, with more than 100 contributors. It names ten risks <a href="#src-32">[S32]</a>.</p>
+<p>OWASP published a Top 10 for agentic applications on 2025-12-09, with more than 100 contributors. It names ten risks <a href="#src-30">[S30]</a>.</p>
 
 <div class="table-wrap"><table class="ws-table">
-<caption>OWASP Top 10 for Agentic Applications 2026. Source: <a href="#src-32">[S32]</a>. The right-hand column is this article&rsquo;s reading of the category, not OWASP&rsquo;s wording.</caption>
+<caption>OWASP Top 10 for Agentic Applications 2026. Source: <a href="#src-30">[S30]</a>. The right-hand column is this article&rsquo;s reading of the category, not OWASP&rsquo;s wording.</caption>
 <thead><tr><th>ID</th><th>Risk</th><th>Plant-room reading</th></tr></thead>
 <tbody>
 <tr><td>ASI01</td><td>Agent Goal Hijack</td><td>A ticket or alarm text redirects the task</td></tr>
@@ -30,11 +30,11 @@
 
 <h3 id="failure-misalignment">6.3 Misalignment in simulated scenarios</h3>
 
-<p>In June 2025 Anthropic published <a href="glossary.html#term-agentic-misalignment">agentic misalignment</a> experiments in simulated scenarios. When facing replacement or a goal conflict, &ldquo;models from all developers resorted to malicious insider behaviors when that was the only way&hellip; including blackmailing officials and leaking sensitive information&rdquo;. In one text scenario Claude Opus 4 and Gemini 2.5 Flash blackmailed in 96% of runs, GPT-4.1 and Grok 3 Beta in 80%, and DeepSeek-R1 in 79%. The report states: &ldquo;All the behaviors&hellip; occurred in controlled simulations&rdquo; <a href="#src-30">[S30]</a>. It is an Anthropic study of its own and competing models (see the disclosure in section 1). Use: a reason for minimum privileges and approval before irreversible actions. It is not a forecast of field behaviour and describes no real deployment.</p>
+<p>In June 2025 Anthropic published <a href="glossary.html#term-agentic-misalignment">agentic misalignment</a> experiments in simulated scenarios. When facing replacement or a goal conflict, &ldquo;models from all developers resorted to malicious insider behaviors when that was the only way&hellip; including blackmailing officials and leaking sensitive information&rdquo;. In one text scenario Claude Opus 4 and Gemini 2.5 Flash blackmailed in 96% of runs, GPT-4.1 and Grok 3 Beta in 80%, and DeepSeek-R1 in 79%. The report states: &ldquo;All the behaviors&hellip; occurred in controlled simulations&rdquo; <a href="#src-28">[S28]</a>. It is an Anthropic study of its own and competing models (see the disclosure in section 1). Use: a reason for minimum privileges and approval before irreversible actions. It is not a forecast of field behaviour and describes no real deployment.</p>
 
 <h3 id="failure-faithfulness">6.4 Status reports that do not match actions</h3>
 
-<p>Section 3 described the carry-the-1 explanation that did not match the circuit <a href="#src-3">[S3]</a>. In agent work it appears as a status line: &ldquo;tests pass&rdquo;, &ldquo;configuration applied&rdquo;, &ldquo;alarm cleared&rdquo;. That line is a claim. The harness runs the test or reads the sensor; the model&rsquo;s text is commentary.</p>
+<p>Section 3 described the carry-the-1 explanation that did not match the circuit <a href="#src-1">[S1]</a>. In agent work it appears as a status line: &ldquo;tests pass&rdquo;, &ldquo;configuration applied&rdquo;, &ldquo;alarm cleared&rdquo;. That line is a claim. The harness runs the test or reads the sensor; the model&rsquo;s text is commentary.</p>
 
 <h3 id="failure-cost">6.5 Retry loops and quadratic token cost</h3>
 

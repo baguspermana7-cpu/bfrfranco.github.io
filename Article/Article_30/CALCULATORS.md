@@ -10,13 +10,13 @@ Shared constants (one JS object, each entry with `source` + `asOf`):
 
 | Key | Value | Unit | Source |
 |---|---|---|---|
-| `price.in` | 2.00 | $ per 1M input tokens | A29 [S27] via [S59] (Sonnet-class list price, 2026-10-16) |
+| `price.in` | 2.00 | $ per 1M input tokens | A29 [S27] via [S57] (Sonnet-class list price, 2026-10-16) |
 | `price.out` | 10.00 | $ per 1M output tokens | same |
-| `price.cacheReadFrac` | 0.10 | fraction of input price | A29 [S27] via [S59] (cache reads 2.5–10% across vendors; 10% used) |
+| `price.cacheReadFrac` | 0.10 | fraction of input price | A29 [S27] via [S57] (cache reads 2.5–10% across vendors; 10% used) |
 | `ttft` | 0.5 | s | assumption (A29 §8.2) |
 | `tpot` | 0.020 | s per output token | assumption (A29 §8.2) |
 | `ctxWindow` | 200,000 | tokens | assumption (common default; 1M windows exist, A29 §8.5) |
-| `metr.p50_vs_p80` | Mythos 1,045 vs 186 min; Opus 4.6 719 vs 70 min | min | [S27] — used as a caption, not a constant |
+| `metr.p50_vs_p80` | Mythos 1,045 vs 186 min; Opus 4.6 719 vs 70 min | min | [S25] — used as a caption, not a constant |
 
 ---
 
@@ -48,7 +48,7 @@ Score = 100 · N · (1 − Risk) · (1 − 0.5·Lp)
 
 **Hard overrides (applied after the score, shown as red flags):**
 1. `E = 5` and `Vf ≤ 2` → "No autonomous action. LLM may propose; a human executes through the existing control system"
-   (CISA AI-in-OT HITL principle [S33]).
+   (CISA AI-in-OT HITL principle [S31]).
 2. `L = 1` → "Real-time path: not an LLM" (decode latency, A29 §6).
 3. `V ≤ 2` → "Script" regardless of score.
 4. `F ≥ 4` and `V ≤ 3` → note "Codify: once the agent's path is stable, replace it with a script."
@@ -116,7 +116,7 @@ Required per-step success for a 90% run: n = 10 → 0.98952; 20 → 0.99475; 50 
 **Lesson printed under the output:** "A verifier that catches 90% of bad steps raises a 20-step run from 36% to 90% for 5%
 more tokens. The cheapest reliability is a deterministic check, not a bigger model."
 **Caveats shown:** independence is optimistic (errors correlate); a model-based verifier may share the generator's blind
-spots; METR's 50%-vs-80% horizon gap is the empirical version of this curve [S27].
+spots; METR's 50%-vs-80% horizon gap is the empirical version of this curve [S25].
 
 ---
 
@@ -157,7 +157,7 @@ slope, not the shape."
 
 **Purpose.** Let a reader see how much each gate in a pipeline contributes, and why stacking *independent* gates beats one
 strong one. Catch rates are **user assumptions**; no measured per-gate catch rates were found for LLM pipelines, and the
-factory has run one demo job only [S61].
+factory has run one demo job only [S59].
 
 **Inputs:** a list of gates, each with a catch rate `dᵢ` (0–1) and a toggle "same model family as the generator" with a
 correlation factor `ρ` (default 0.5). Default ladder (illustrative, labelled ASSUMPTION): tests 0.60, lint 0.10, type check
@@ -176,7 +176,7 @@ Hard gates (cannot be overridden) are drawn as solid rungs; advisory gates as da
 - Default ladder, independent: P_escape = 0.4 × 0.9 × 0.85 × 0.5 × 0.5 = 0.0765 → coverage 92.35%.
 - Same, LLM review correlated (ρ = 0.5 → d_eff = 0.25): P_escape = 0.4 × 0.9 × 0.85 × 0.75 × 0.5 = 0.11475 → coverage 88.5%.
 - Factory-shaped ladder (tests 0.6, lint 0.1, tests_added 0, security review 0.4, code review 0.4, ux 0.2, ui 0.2):
-  P_escape = 0.082944 → coverage 91.7%. Preset mirrors the factory's gate order [S60]; values are not measured.
+  P_escape = 0.082944 → coverage 91.7%. Preset mirrors the factory's gate order [S58]; values are not measured.
 
 **Caption:** "These numbers are what-ifs. The structural lesson holds regardless of the values: an escaped defect has to get
 past every rung, so add rungs that fail for *different* reasons."

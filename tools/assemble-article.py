@@ -10,11 +10,12 @@ everything specific comes from `Article/Article_<N>/build/article.json` plus the
   build/facts.json                  hero fact list   [{value,label,sub}]
   build/key-numbers.json            key numbers      [{k,v,s}]
   build/faq.json                    visible FAQ + FAQPage JSON-LD [{q,a}]
+  build/page.css                    optional rules for this article only, appended last in <head>
   RESEARCH.md §Sources table        `| S1 | title | url | date | taken |` → #src-N list
 
 article.json keys: n, prev, title, short, desc (<=160, a full sentence), keywords, tags[], date (YYYY-MM-DD),
 dateLabel, category, section, highlightTitle, highlightClause, subtitle, ogAlt, cover (optional {src, alt,
-caption}), calcScripts[], calcClass, calcAttr, related[[n, title, blurb]], keyAnswer, crossLinks[[text, href]].
+caption}), calcScripts[] (also any page script, e.g. rz-figure-interact.js), calcClass, calcAttr, related[[n, title, blurb]], keyAnswer, crossLinks[[text, href]].
 
 Writes article-N.html and its search-index.json entry (idempotent), then restamps the cache tokens of the
 scripts it loads. It does not run the figure builder or the series sync — the standard's §6 does.
@@ -120,6 +121,12 @@ def main(n):
     head = re.sub(r'\s*<script type="application/ld\+json">[\s\S]*?</script>', '', head)
     head = head.replace('<link rel="preconnect" href="https://fonts.googleapis.com">',
                         blocks + '    <link rel="preconnect" href="https://fonts.googleapis.com">', 1)
+
+    # build/page.css (optional): rules for this article only, appended last in <head> so they win over the shell's
+    # inline register styles (K30: article 30 read too loose; the fire pillar got the same treatment by hand).
+    pcss = f'{B}/page.css'
+    if os.path.exists(pcss):
+        head = head.replace('</head>', '    <style data-rz-page-css>\n' + open(pcss, encoding='utf-8').read().strip() + '\n    </style>\n</head>', 1)
 
     # shell pieces
     body_open = src[src.index('<body'):src.index('<header class="article-hero">')]

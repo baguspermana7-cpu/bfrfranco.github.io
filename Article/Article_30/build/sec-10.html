@@ -5,24 +5,24 @@
 <h3 id="bms-anchors">10.1 Guidance used</h3>
 
 <ul>
-<li><strong>CISA, ASD&rsquo;s ACSC, NSA&rsquo;s AI Security Center, the FBI and five partner agencies</strong>, <em>Principles for the Secure Integration of Artificial Intelligence in Operational Technology</em> (published 2025-12-03; PDF revision January 2026). Four principles: understand AI; consider AI use in the OT domain; establish AI governance and assurance frameworks; embed oversight and failsafe practices. It advises to &ldquo;limit active control of OT infrastructure by AI without a human in the loop to account for safety concerns and latency limitations&rdquo; and to &ldquo;regularly update and validate AI models&rdquo; <a href="#src-33">[S33]</a>. The phrase is <a href="glossary.html#term-human-in-the-loop">human in the loop</a>.</li>
-<li><strong>NIST AI Risk Management Framework 1.0</strong>, released 2023-01-26 <a href="#src-34">[S34]</a>. Its four functions are commonly given as Govern, Map, Measure and Manage; the document was not re-read for this article.</li>
-<li><strong>ISO/IEC 42001:2023</strong>, a management-system standard for AI (<a href="glossary.html#term-iso-42001">ISO/IEC 42001</a>); its scope was not re-read for this article <a href="#src-35">[S35]</a>.</li>
-<li><strong>IEC 62443</strong> for security zones and conduits in industrial systems and <strong>IEC 61511</strong> for safety instrumented systems (<a href="glossary.html#term-iec-62443">IEC 62443</a>, <a href="glossary.html#term-sis">SIS</a>); cited as background, not read for this article <a href="#src-36">[S36]</a>. NIST&rsquo;s framework is covered in the glossary under <a href="glossary.html#term-nist-ai-rmf">NIST AI RMF</a>.</li>
-<li><strong>OWASP</strong> LLM01 and the agentic Top 10 for injection and tool risks <a href="#src-31">[S31]</a> <a href="#src-32">[S32]</a>.</li>
+<li><strong>CISA, ASD&rsquo;s ACSC, NSA&rsquo;s AI Security Center, the FBI and five partner agencies</strong>, <em>Principles for the Secure Integration of Artificial Intelligence in Operational Technology</em> (published 2025-12-03; PDF revision January 2026). Four principles: understand AI; consider AI use in the OT domain; establish AI governance and assurance frameworks; embed oversight and failsafe practices. It advises to &ldquo;limit active control of OT infrastructure by AI without a human in the loop to account for safety concerns and latency limitations&rdquo; and to &ldquo;regularly update and validate AI models&rdquo; <a href="#src-31">[S31]</a>. The phrase is <a href="glossary.html#term-human-in-the-loop">human in the loop</a>.</li>
+<li><strong>NIST AI Risk Management Framework 1.0</strong>, released 2023-01-26 <a href="#src-32">[S32]</a>. Its four functions are commonly given as Govern, Map, Measure and Manage; the document was not re-read for this article.</li>
+<li><strong>ISO/IEC 42001:2023</strong>, a management-system standard for AI (<a href="glossary.html#term-iso-42001">ISO/IEC 42001</a>); its scope was not re-read for this article <a href="#src-33">[S33]</a>.</li>
+<li><strong>IEC 62443</strong> for security zones and conduits in industrial systems and <strong>IEC 61511</strong> for safety instrumented systems (<a href="glossary.html#term-iec-62443">IEC 62443</a>, <a href="glossary.html#term-sis">SIS</a>); cited as background, not read for this article <a href="#src-34">[S34]</a>. NIST&rsquo;s framework is covered in the glossary under <a href="glossary.html#term-nist-ai-rmf">NIST AI RMF</a>.</li>
+<li><strong>OWASP</strong> LLM01 and the agentic Top 10 for injection and tool risks <a href="#src-29">[S29]</a> <a href="#src-30">[S30]</a>.</li>
 </ul>
 
 <h3 id="bms-list">10.2 Ten-point checklist</h3>
 
 <ol>
 <li><strong>Read-only first.</strong> The agent reads BMS, EPMS and DCIM trends, alarms and CMMS history. It writes only to a ticket, a draft MOP or a chat message.</li>
-<li><strong>No autonomous write to OT, BMS or EPMS.</strong> A setpoint, mode or breaker change goes through the existing control system with its interlocks, a human approval and a change record <a href="#src-33">[S33]</a>. Safety functions (SIS, fire, EPO, leak-detection trips) stay out of scope entirely <a href="#src-36">[S36]</a>.</li>
-<li><strong>One-way data path.</strong> The agent sits on the IT side of the DMZ. OT data flows out through a historian replica, and no inbound conduit leads from the agent&rsquo;s zone to the control zone <a href="#src-33">[S33]</a> <a href="#src-36">[S36]</a>.</li>
+<li><strong>No autonomous write to OT, BMS or EPMS.</strong> A setpoint, mode or breaker change goes through the existing control system with its interlocks, a human approval and a change record <a href="#src-31">[S31]</a>. Safety functions (SIS, fire, EPO, leak-detection trips) stay out of scope entirely <a href="#src-34">[S34]</a>.</li>
+<li><strong>One-way data path.</strong> The agent sits on the IT side of the DMZ. OT data flows out through a historian replica, and no inbound conduit leads from the agent&rsquo;s zone to the control zone <a href="#src-31">[S31]</a> <a href="#src-34">[S34]</a>.</li>
 <li><strong>Typed, allow-listed tools with range checks.</strong> A supply-air setpoint limit of, say, 18 to 27 &deg;C is enforced in code, not in the prompt. (The numbers are an illustration, not a recommendation.)</li>
 <li><strong>A deterministic verifier per action.</strong> A simulator, a rule check or a second data source. For example, confirm a CRAH fault from two independent sensors before raising a priority-one alarm.</li>
-<li><strong>Every document, ticket and alarm text is untrusted input.</strong> It can carry instructions the agent should not follow <a href="#src-31">[S31]</a> <a href="#src-32">[S32]</a>.</li>
+<li><strong>Every document, ticket and alarm text is untrusted input.</strong> It can carry instructions the agent should not follow <a href="#src-29">[S29]</a> <a href="#src-30">[S30]</a>.</li>
 <li><strong>Budgets and a kill switch.</strong> Limits on steps, cost and wall-clock time, and a manual disable that does not depend on the agent.</li>
-<li><strong>Logging and replay.</strong> Keep prompts, tool calls and results for incident review, which supports the measure and manage functions in NIST&rsquo;s framework <a href="#src-34">[S34]</a>.</li>
+<li><strong>Logging and replay.</strong> Keep prompts, tool calls and results for incident review, which supports the measure and manage functions in NIST&rsquo;s framework <a href="#src-32">[S32]</a>.</li>
 <li><strong>Evaluate before rollout.</strong> Use a fixed set of historical incidents with a known correct triage; track precision and recall for each release, and rerun the set when the model or prompt changes.</li>
 <li><strong>Codify what repeats.</strong> When the agent&rsquo;s procedure for an alarm class is stable, turn it into a deterministic rule and retire the agent for that class.</li>
 </ol>
@@ -50,5 +50,5 @@
 
 <div class="ws-insight-box">
 <h4>Summary</h4>
-<p>&ldquo;Put an agent on the BMS&rdquo; becomes &ldquo;put an agent next to the BMS, with read-only access, a draft-only output, and a person between its suggestion and the setpoint.&rdquo; Anything beyond that needs its own risk assessment against the guidance <a href="#src-33">[S33]</a>.</p>
+<p>&ldquo;Put an agent on the BMS&rdquo; becomes &ldquo;put an agent next to the BMS, with read-only access, a draft-only output, and a person between its suggestion and the setpoint.&rdquo; Anything beyond that needs its own risk assessment against the guidance <a href="#src-31">[S31]</a>.</p>
 </div>

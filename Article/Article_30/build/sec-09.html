@@ -5,7 +5,7 @@
 <h3 id="stance-decide">9.1 Agent, hybrid or script: decision table and scorer</h3>
 
 <div class="table-wrap"><table class="ws-table">
-<caption>Decision table. Source: dossier synthesis of <a href="#src-14">[S14]</a> <a href="#src-33">[S33]</a>; an engineering judgement and not a standard.</caption>
+<caption>Decision table. Source: dossier synthesis of <a href="#src-12">[S12]</a> <a href="#src-31">[S31]</a>; an engineering judgement and not a standard.</caption>
 <thead><tr><th>Condition</th><th>Prefer</th></tr></thead>
 <tbody>
 <tr><td>Input is structured, the rule fits on a page, it runs often</td><td>Script or workflow engine</td></tr>
@@ -23,28 +23,26 @@ Risk  = ((E &minus; 1) / 4) &times; (1 &minus; (Vf &minus; 1) / 4)
 Lp    = (5 &minus; L) / 4
 Score = 100 &times; N &times; (1 &minus; Risk) &times; (1 &minus; 0.5 &times; Lp)</pre>
 
-<p>A score below 35 means script or workflow; 35 to 65 means hybrid (the model classifies, extracts or drafts, code validates and executes, a person approves side effects); 65 or above means an agent loop with verifiers. Hard overrides apply afterwards: with <code>E = 5</code> and <code>Vf &le; 2</code> no autonomous action is allowed, in line with the CISA principle on human oversight <a href="#src-33">[S33]</a>; with <code>L = 1</code> the path is real-time and not an LLM; with <code>V &le; 2</code> the answer is a script. Worked check for a BMS alarm-triage summary (4, 4, 3, 5, 3): <code>N = 0.75</code>, <code>Risk = 0.75 &times; 0.5 = 0.375</code>, <code>Lp = 0.5</code>, so <code>Score = 100 &times; 0.75 &times; 0.625 &times; 0.75 = 35.2</code>, a hybrid, just. A chiller setpoint write (3, 5, 2, 4, 2) scores 7.8 and trips the first override.</p>
+<p>A score below 35 means script or workflow; 35 to 65 means hybrid (the model classifies, extracts or drafts, code validates and executes, a person approves side effects); 65 or above means an agent loop with verifiers. Hard overrides apply afterwards: with <code>E = 5</code> and <code>Vf &le; 2</code> no autonomous action is allowed, in line with the CISA principle on human oversight <a href="#src-31">[S31]</a>; with <code>L = 1</code> the path is real-time and not an LLM; with <code>V &le; 2</code> the answer is a script. Worked check for a BMS alarm-triage summary (4, 4, 3, 5, 3): <code>N = 0.75</code>, <code>Risk = 0.75 &times; 0.5 = 0.375</code>, <code>Lp = 0.5</code>, so <code>Score = 100 &times; 0.75 &times; 0.625 &times; 0.75 = 35.2</code>, a hybrid, just. A chiller setpoint write (3, 5, 2, 4, 2) scores 7.8 and trips the first override.</p>
 
 <div class="agent-calc" data-agent-calc="decide"></div>
 
 <h3 id="stance-architecture">9.2 Reference architecture: probabilistic planner, deterministic executor</h3>
 
-<p>Six parts in a line: A probabilistic planner (the LLM) proposes an action. A typed tool interface validates it against a schema and an allow-list. Deterministic executors (scripts, APIs, compilers) carry it out. Verifiers (tests, linters, type checkers, simulators, policy checks) judge the result. A human gate stands in front of irreversible actions. An audit log records everything. Budgets on steps, tokens, time and cost are enforced outside the model. The model never holds credentials directly and never writes to safety-rated systems <a href="#src-14">[S14]</a> <a href="#src-31">[S31]</a> <a href="#src-32">[S32]</a> <a href="#src-33">[S33]</a>. Anthropic on the verifier: the agent should get &ldquo;ground truth from the environment at each step&rdquo; <a href="#src-14">[S14]</a>.</p>
+<p>The planner proposes; a typed interface validates against a schema and an allow-list; deterministic executors act; verifiers judge; a human gate stands in front of irreversible actions; an audit log records everything; budgets sit outside the model. The model never holds credentials and never writes to safety-rated systems <a href="#src-12">[S12]</a> <a href="#src-29">[S29]</a> <a href="#src-30">[S30]</a> <a href="#src-31">[S31]</a>.</p>
 
 <figure class="rz-figure" data-rz-figure="agentic-d2"></figure>
-
-<p>The seam between the halves: the model sees and produces text; the interface turns that text into a typed call or rejects it with a reason that goes back to the model; the executor and verifier produce facts. The model&rsquo;s explanations of what it did are kept out of the chain of evidence.</p>
 
 <figure class="rz-figure" data-rz-figure="agentic-d5"></figure>
 
 <h3 id="stance-factory">9.3 Worked example: a software factory pipeline</h3>
 
-<p>The author runs a local (unpublished) pipeline for software changes that applies these rules; facts below were read from its skill file and command-line source on 2026-10-16 <a href="#src-60">[S60]</a>. The roles are an orchestrator on a frontier model; a <code>spec-writer</code>; a <code>builder</code>; four reviewers working in parallel (security, code, UX, UI), where the UX and UI reviewers may answer SKIP only if no user-interface file changed; and an <code>approver</code>. The sub-agents run on a mid-tier model and the approver on a small one <a href="#src-60">[S60]</a>.</p>
+<p>The author runs a local (unpublished) pipeline for software changes that applies these rules; facts below were read from its skill file and command-line source on 2026-10-16 <a href="#src-58">[S58]</a>. The roles are an orchestrator on a frontier model; a <code>spec-writer</code>; a <code>builder</code>; four reviewers working in parallel (security, code, UX, UI), where the UX and UI reviewers may answer SKIP only if no user-interface file changed; and an <code>approver</code>. The sub-agents run on a mid-tier model and the approver on a small one <a href="#src-58">[S58]</a>.</p>
 
-<p>Every transition is written by a command-line tool into a state file, <code>factory/board.json</code>. The orchestrator is told never to move a job forward on its own reading of a result, but to run the tool and act on its status line. Language models write and judge; exit codes decide <a href="#src-60">[S60]</a>.</p>
+<p>Every transition is written by a command-line tool into a state file, <code>factory/board.json</code>. The orchestrator is told never to move a job forward on its own reading of a result, but to run the tool and act on its status line. Language models write and judge; exit codes decide <a href="#src-58">[S58]</a>.</p>
 
 <div class="table-wrap"><table class="ws-table">
-<caption>Deterministic gates in the factory. Source: <a href="#src-60">[S60]</a>. The last column is what each gate catches by construction.</caption>
+<caption>Deterministic gates in the factory. Source: <a href="#src-58">[S58]</a>. The last column is what each gate catches by construction.</caption>
 <thead><tr><th>Gate</th><th>Mechanism</th><th>Catches</th><th>Hard?</th></tr></thead>
 <tbody>
 <tr><td>lint, test, build</td><td>Shell exit codes, 900 s timeout</td><td>Style, type, build errors and regressions covered by tests</td><td>Yes</td></tr>
@@ -54,13 +52,13 @@ Score = 100 &times; N &times; (1 &minus; Risk) &times; (1 &minus; 0.5 &times; Lp
 <tr><td>tests_added</td><td>Fails when source changed but no test file did</td><td>Untested code</td><td>No</td></tr>
 </tbody></table></div>
 
-<p>Review verdicts are parsed by the pattern <code>VERDICT: PASS|FAIL|SKIP</code>; a missing or unparseable verdict is a problem, an invalid SKIP is rejected, and if the code changed after gating the verdicts are stale. The fix loop is capped: <code>max_fix_rounds</code> is 3, at most two <code>fix</code> decisions are allowed per job, and overrides are refused while a hard gate fails. Delivery merges with <code>--no-ff</code> in the job&rsquo;s worktree, re-runs lint, test and build on the merge result, and pushes fast-forward only, and only if the repository has opted in with <code>&quot;push&quot;: true</code>. The human operator&rsquo;s switches for delivery, push and human review are declared off-limits to the agent <a href="#src-60">[S60]</a>.</p>
+<p>Review verdicts are parsed by the pattern <code>VERDICT: PASS|FAIL|SKIP</code>; a missing or unparseable verdict is a problem, an invalid SKIP is rejected, and if the code changed after gating the verdicts are stale. The fix loop is capped: <code>max_fix_rounds</code> is 3, at most two <code>fix</code> decisions are allowed per job, and overrides are refused while a hard gate fails. Delivery merges with <code>--no-ff</code> in the job&rsquo;s worktree, re-runs lint, test and build on the merge result, and pushes fast-forward only, and only if the repository has opted in with <code>&quot;push&quot;: true</code>. The human operator&rsquo;s switches for delivery, push and human review are declared off-limits to the agent <a href="#src-58">[S58]</a>.</p>
 
 <figure class="rz-figure" data-rz-figure="agentic-d4"></figure>
 
-<p>Demonstrated so far: one job (2026-10-16, a <code>readingTime</code> helper) changed two files; lint and test passed, the build was skipped because none is configured, the other four gates passed, the security and code reviews passed, and the UX and UI reviews were skipped as designed <a href="#src-61">[S61]</a>. No multi-job statistics exist, so per-gate catch rates are unmeasured; the calculator takes them as inputs, and its presets are labelled assumptions.</p>
+<p>Demonstrated so far: one job (2026-10-16, a <code>readingTime</code> helper) changed two files; lint and test passed, the build was skipped because none is configured, the other four gates passed, the security and code reviews passed, and the UX and UI reviews were skipped as designed <a href="#src-59">[S59]</a>. No multi-job statistics exist, so per-gate catch rates are unmeasured; the calculator takes them as inputs, and its presets are labelled assumptions.</p>
 
-<p>Not caught by any gate: a wrong specification; tests that encode the same misunderstanding as the code; and blind spots shared by reviewer models from the same family as the generator <a href="#src-60">[S60]</a>. The ladder calculator makes the last point numerically. With five independent gates at 0.60, 0.10, 0.15, 0.50 and 0.50 catch rates, the chance a defect escapes is <code>0.4 &times; 0.9 &times; 0.85 &times; 0.5 &times; 0.5 = 0.0765</code>, a coverage of 92.35%. If the LLM review (0.50) shares the generator&rsquo;s family and its effective catch rate is halved to 0.25, the escape chance becomes <code>0.4 &times; 0.9 &times; 0.85 &times; 0.75 &times; 0.5 = 0.11475</code>, a coverage of 88.5%. These values are what-ifs; the structure holds regardless: a defect must pass every rung, so add rungs that fail for different reasons.</p>
+<p>Not caught by any gate: a wrong specification; tests that encode the same misunderstanding as the code; and blind spots shared by reviewer models from the same family as the generator <a href="#src-58">[S58]</a>. The ladder calculator makes the last point numerically. With five independent gates at 0.60, 0.10, 0.15, 0.50 and 0.50 catch rates, the chance a defect escapes is <code>0.4 &times; 0.9 &times; 0.85 &times; 0.5 &times; 0.5 = 0.0765</code>, a coverage of 92.35%. If the LLM review (0.50) shares the generator&rsquo;s family and its effective catch rate is halved to 0.25, the escape chance becomes <code>0.4 &times; 0.9 &times; 0.85 &times; 0.75 &times; 0.5 = 0.11475</code>, a coverage of 88.5%. These values are what-ifs; the structure holds regardless: a defect must pass every rung, so add rungs that fail for different reasons.</p>
 
 <div class="agent-calc" data-agent-calc="ladder"></div>
 
@@ -74,13 +72,6 @@ t_step  = TTFT + o &times; TPOT + t_tool
 max_steps = min(S_cost, S_time, S_context)</pre>
 
 <p>With defaults of 20,000 starting tokens, 3,000 tokens added per step, 800 output tokens per step, a $5 cap, a 600 s wall clock and 5 s per tool call, at $2 and $10 per million tokens: <code>Cost(10) = $0.75</code>, <code>Cost(20) = $2.10</code>, <code>Cost(30) = $4.05</code>, <code>Cost(40) = $6.60</code>. The cost cap allows 34 steps. One step takes <code>0.5 + 800 &times; 0.02 + 5 = 21.5 s</code> (the latency constants are assumptions from <a href="article-29.html#agents">Article&nbsp;29</a>), so the wall clock allows <code>floor(600 / 21.5) = 27</code> steps. The context limit, compaction at 80% of a 200,000-token window, allows <code>floor((160,000 &minus; 20,000) / 3,000) + 1 = 47</code>. The binding limit is the wall clock, at 27 steps, and a per-step timeout near 65 s (three times the step time) is suggested. Caching changes the slope of the cost curve, not its shape.</p>
-
-<figure class="rz-chart" data-rz-chart>
-<div class="rz-chart-canvas"><canvas></canvas></div>
-<script type="application/json" class="rz-chart-cfg">
-{"type": "line", "title": "Cost of one agent run by step count", "labels": ["5", "10", "15", "20", "25", "30", "35", "40"], "series": [{"label": "Cumulative cost", "data": [0.3, 0.75, 1.35, 2.1, 3.0, 4.05, 5.25, 6.6], "unit": "$"}], "x": "Steps", "yLabel": "Cost per run ($)", "source": "Derived from Cost(S) above: 20,000-token start, +3,000 tokens and 800 output tokens per step, $2 / $10 per million tokens (section 9.4)", "basisTag": "derived"}
-</script>
-</figure>
 
 <div class="agent-calc" data-agent-calc="budget"></div>
 

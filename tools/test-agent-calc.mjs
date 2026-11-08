@@ -106,7 +106,7 @@ near('C-ii perfect verifier: Pu = 0', v(R(20, 0.95, 1, 2), 'Pu'), 0, 1e-15);
 const lesson = (v(R(20, 0.95, 0.9, 2), 'cost_run') / v(R(20, 0.95, 0, 0), 'cost_run') - 1) * 100;
 near('C-ii lesson: 5% more tokens (4.7%)', lesson, 4.7, 0.1);
 ok('C-ii lesson text printed', R(20, 0.95, 0.9, 2).notes.join(' ').indexOf('raises a 20-step run from 36% to 90% for 5% more tokens') >= 0);
-ok('C-ii caveats printed', /independence is optimistic/.test(r.notes.join(' ')) && /\[S27\]/.test(r.notes.join(' ')));
+ok('C-ii caveats printed', /independence is optimistic/.test(r.notes.join(' ')) && /\[S25\]/.test(r.notes.join(' ')));
 near('C-ii cached share lowers cost: c=0.9 cost_att', v(R(20, 0.95, 0.9, 2, { c: 0.9 }), 'cost_att'), 40000 * (0.1 * 2 + 0.9 * 0.2) / 1e6 + 0.008, 1e-12);
 [['n', 0], ['n', 201], ['n', 2.5], ['p', 0.49], ['p', 1], ['d', -0.1], ['d', 1.1], ['k', 6], ['k', -1], ['Tin', -1], ['Tout', 'x'], ['c', 0.96], ['target', 1], ['p', NaN], ['p', null]].forEach(([k, bad]) => {
   const q = {}; q[k] = bad; const x = A.reliability(q);
@@ -171,7 +171,7 @@ near('C-iv default P_escape = 0.0765', v(r, 'P_escape'), 0.0765, 1e-12); near('C
 r = L({ g4_shared: 'yes' });
 near('C-iv correlated d_eff = 0.25', v(r, 'deff_4'), 0.25, 1e-12);
 near('C-iv correlated P_escape = 0.11475', v(r, 'P_escape'), 0.11475, 1e-12); near('C-iv correlated coverage 88.5%', v(r, 'coverage'), 88.525, 1e-9);
-const fac = Object.assign({}, A.presets.ladders['Factory-shaped ladder (mirrors gate order [S60]; values not measured)']);
+const fac = Object.assign({}, A.presets.ladders['Factory-shaped ladder (mirrors gate order [S58]; values not measured)']);
 r = L(fac);
 near('C-iv factory P_escape = 0.082944', v(r, 'P_escape'), 0.082944, 1e-12); near('C-iv factory coverage 91.7%', v(r, 'coverage'), 91.7056, 1e-9);
 ok('C-iv factory preset has 7 named gates in factory order', fac.g3_name === 'tests_added' && fac.g7_name === 'ui');
@@ -202,7 +202,7 @@ Object.keys(A.constants).forEach((k) => {
   ok(`K ${k} has a source`, typeof c.source === 'string' && c.source.length > 3);
   ok(`K ${k} has unit and asOf`, typeof c.unit === 'string' && c.asOf === '2026-10-16');
 });
-ok('K price constants cite A29 [S27] via [S59]', /\[S27\]/.test(A.constants['price.in'].source) && /\[S59\]/.test(A.constants['price.out'].source));
+ok('K price constants cite A29 [S27] via [S57]', /\[S27\]/.test(A.constants['price.in'].source) && /\[S57\]/.test(A.constants['price.out'].source));
 
 // ---- every explain key used has an entry in explain-extra-agent.json
 const ex = JSON.parse(fs.readFileSync(path.join(root, 'Article/Article_30/build/explain-extra-agent.json'), 'utf8'));

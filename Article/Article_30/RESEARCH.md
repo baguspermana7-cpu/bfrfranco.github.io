@@ -495,66 +495,64 @@ Accessed 2026-10-16 unless noted. "Taken" = what was used.
 
 | ID | Title / publisher | URL | Date of source | Taken |
 |---|---|---|---|---|
-| S1 | John Elder, "Agentic AI Is Fraud! We Need To Talk About It…" (YouTube; transcript via youtube-transcript-api, metadata via yt-dlp) | https://www.youtube.com/watch?v=eclfVFoDvlQ | 2026-08-27 | All quotes/timestamps, description, views |
-| S2 | SectionZero, AI Operating System book page | https://sectionzero.ai/book | n.d. | Book claims |
-| S3 | Anthropic, "Tracing the thoughts of a large language model" | https://www.anthropic.com/research/tracing-thoughts-language-model | 2025-03-27 | Mental maths, carry-the-1, faithfulness, Dallas, rhymes |
-| S4 | Lindsey et al., "On the Biology of a Large Language Model" (Transformer Circuits) | https://transformer-circuits.pub/2025/attribution-graphs/biology.html | 2025-03 | 36+59 circuit, lookup features, planning, caveats |
-| S5 | Shojaee et al., "The Illusion of Thinking" (Apple) | https://arxiv.org/abs/2506.06941 | 2025-06 | Collapse, effort decline, 3 regimes |
-| S6 | A. Lawsen, "Comment on The Illusion of Thinking" | https://arxiv.org/abs/2506.09250 | 2025-06 | Token limits, impossible instances, generating functions |
-| S7 | Mirzadeh et al., "GSM-Symbolic" (ICLR 2025) | https://arxiv.org/abs/2410.05229 | 2024-10 | "up to 65%", hypothesis quote |
-| S8 | DeepSeek-AI, "DeepSeek-R1" | https://arxiv.org/abs/2501.12948 | 2025-01 (Nature version 2025) | Emergent reflection; R1 79.8% AIME (re-read); R1-Zero 15.6→71.0% (reported) |
-| S9 | Bender et al., "On the Dangers of Stochastic Parrots" (FAccT '21) | https://dl.acm.org/doi/10.1145/3442188.3445922 | 2021-03 | Definition quote (not re-read; 403) |
-| S10 | F. Chollet, "On the Measure of Intelligence" | https://arxiv.org/abs/1911.01547 | 2019-11 | Skill-acquisition efficiency |
-| S11 | ARC Prize, ARC-AGI-2 page | https://arcprize.org/arc-agi/2/ | 2025 | Human calibration, dataset sizes |
-| S12 | ARC Prize, "ARC Prize 2025 results & analysis" | https://arcprize.org/blog/arc-prize-2025-results-analysis | 2025-12 | 24%, 37.6%, 54%, costs |
-| S13 | Kaggle ARC Prize 2026 leaderboard; benchlm.ai (search snippets only) | https://www.kaggle.com/competitions/arc-prize-2026-arc-agi-2/leaderboard | 2026-10 | UNVERIFIED 2026 scores |
-| S14 | Anthropic, "Building effective agents" | https://www.anthropic.com/engineering/building-effective-agents | 2024-12-19 | Definitions, simplest-solution, compounding errors, sandbox |
-| S15 | Anthropic docs, Tool use overview | https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview | 2026 | Client vs server tools, tool_result |
-| S16 | OpenAI docs, Function calling guide | https://platform.openai.com/docs/guides/function-calling | 2026 | Five-step flow |
-| S17 | Schick et al., "Toolformer" | https://arxiv.org/abs/2302.04761 | 2023-02 | Self-taught API calls |
-| S18 | Yao et al., "ReAct" (A29 [S42]) | https://arxiv.org/abs/2210.03629 | 2022-10 | Reason-act-observe |
-| S19 | Model Context Protocol specification (A29 [S61]) | https://modelcontextprotocol.io/specification | rev. 2026-07-28 | Tools = arbitrary code execution |
-| S20 | LangChain (J. Ou), "What is an AI agent?" | https://blog.langchain.com/what-is-an-agent/ | 2026-07-31 | Autonomy spectrum, loop components |
-| S21 | Russell & Norvig, *Artificial Intelligence: A Modern Approach*, 4th ed., ch. 2 | https://aima.cs.berkeley.edu/ | 2020 | Agent definition (not re-read) |
-| S22 | SWE-bench leaderboards.json | https://raw.githubusercontent.com/SWE-bench/swe-bench.github.io/master/data/leaderboards.json | read 2026-10-16 | Verified top entries |
-| S23 | OpenAI, "Why we no longer evaluate SWE-bench Verified" | https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/ | 2026-02 | 59.4% of 138 audited problems flawed; contamination; use Pro (re-read 2026-10-25) |
-| S24 | Decrypt, "OpenAI Says Benchmark… Is 'Contaminated'" | https://decrypt.co/359012/openai-benchmark-measure-ai-coding-supremacy-contaminated | 2026-02-24 | ~70%→~23% on Pro |
-| S25 | Terminal-Bench 2.0 leaderboard (Snorkel mirror; tbench.ai) | https://snorkel.ai/leaderboard/terminal-bench-2-0/ | 2026-10 | Top entries, 89 tasks |
-| S26 | METR, "Time Horizon 1.1" | https://metr.org/blog/2026-1-29-time-horizon-1-1/ | 2026-01-29 | Suite size, 131-day doubling |
-| S27 | METR, Task-Completion Time Horizons page + benchmark_results_1_1.yaml | https://metr.org/time-horizons/ ; https://metr.org/assets/benchmark_results_1_1.yaml | last updated 2026-09-08 | Model p50/p80, 128.7-day doubling, >16 h caveat |
-| S28 | METR, early-2025 developer RCT | https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/ | 2025-07-10 | 19% slowdown (via S29 text) |
-| S29 | METR, "We are Changing our Developer Productivity Experiment Design" | https://metr.org/blog/2026-02-24-uplift-update/ | 2026-02-24 | Follow-up estimates, selection effects |
-| S30 | Anthropic, "Agentic Misalignment" | https://www.anthropic.com/research/agentic-misalignment | 2025-06 | Blackmail rates, simulation caveat |
-| S31 | OWASP, LLM01:2025 Prompt Injection | https://genai.owasp.org/llmrisk/llm01-prompt-injection/ | 2025 | Indirect injection, impacts |
-| S32 | OWASP, Top 10 for Agentic Applications 2026 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | 2025-12-09 | ASI01–ASI10 |
-| S33 | CISA, ASD ACSC et al., Principles for the Secure Integration of AI in OT (page + PDF v2) | https://www.cisa.gov/resources-tools/resources/principles-secure-integration-artificial-intelligence-operational-technology | 2025-12-03 (PDF 2026-01) | Four principles, HITL quote |
-| S34 | NIST, AI Risk Management Framework | https://www.nist.gov/itl/ai-risk-management-framework | 2023-01-26 | Release date; functions (not re-read) |
-| S35 | ISO/IEC 42001:2023 | https://www.iso.org/standard/42001 | 2023 | AI management system (not re-read; 403) |
-| S36 | IEC 62443 series; IEC 61511 (background) | https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards | — | Zones/conduits, SIS (not read) |
-| S37 | MIT NANDA, *The GenAI Divide: State of AI in Business 2025* (PDF) | https://mlq.ai/media/quarterly_decks/v0.1_State_of_AI_in_Business_2025_Report.pdf | 2025-07/08 | 95%, 60/20/5, methods, learning gap |
-| S38 | Fortune, "95% of generative AI pilots at companies are failing" | https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/ | 2025-08-18 | Popular framing |
-| S39 | Gartner press release (403; headline via HN listing) | https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027 | 2025-06-25 | 40% headline; rest UNVERIFIED |
-| S40 | CNBC, "Amazon, Meta, Microsoft face skeptical investors…" | https://www.cnbc.com/2026/07/28/hyperscalers-face-higher-capex-scrutiny-after-alphabet-report-panned.html | 2026-07-28 | MSFT $190B, AMZN $200B, debt figures |
-| S41 | Business Insider, "Microsoft keeps capex unchanged" | https://www.businessinsider.com/microsoft-ai-capex-unchanged-data-centers-spending-tech-giants-2026-7 | 2026-07-29 | $190B held, $175B restated |
-| S42 | CNBC, Alphabet Q2 2026 live updates | https://www.cnbc.com/2026/07/22/google-earnings-q2-goog-live-updates.html | 2026-07-22 | $195–205B |
-| S43 | Meta Platforms Q2 2026 results, 8-K Ex. 99.1 (SEC) | https://www.sec.gov/Archives/edgar/data/1326801/000162828026050596/meta-06302026xexhibit991.htm | 2026-07-29 | $130–145B |
-| S44 | Amazon.com Q2 2026 earnings release | https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q2/earnings-result/AMZN-Q2-2026-Earnings-Release.pdf | 2026-07-30 | P&E $54.2B Q2, $98.4B H1, FCF −$7.6B TTM |
-| S45 | Fortune, Meta raises 2026 capex to $125–145B | https://fortune.com/2026/04/29/meta-zuckerberg-145-billion-ai-spending-roi/ | 2026-04-29 | Prior range |
-| S46 | CNBC, Anthropic run-rate $65B | https://www.cnbc.com/2026/08/17/anthropic-says-annualized-revenue-climbed-to-65-billion-in-july.html | 2026-08-17 | $65B, ~7× |
-| S47 | CNBC, OpenAI revenue $20B lower than signalled | https://www.cnbc.com/2026/10/08/open-ai-revenue-nvidia-oracle-coreweave.html | 2026-10-08 | ~$50B vs $68B |
-| S48 | Anthropic, Series H | https://www.anthropic.com/news/series-h | 2026-05-28 | $65B at $965B |
-| S49 | Anthropic, confidential draft S-1 | https://www.anthropic.com/news/confidential-draft-s1-sec | 2026-06-01 | Filing |
-| S50 | CNBC, New Constructs on Anthropic IPO (cites Reuters leaked prospectus) | https://www.cnbc.com/2026/10/07/anthropic-will-be-most-ridiculous-ipo-of-year-analyst-says.html | 2026-10-07 | $4.6B / −$42B (UNVERIFIED), $150B view |
-| S51 | CNBC, OpenAI closes $122B round at $852B | https://www.cnbc.com/2026/03/31/openai-funding-round-ipo.html | 2026-03-31 | Round size |
-| S52 | PYMNTS (citing Fortune interview), OpenAI IPO not in 2026 | https://www.pymnts.com/news/2026/openai-pauses-ipo-plans-amid-ai-safety-worries/ | 2026-09-13 | Altman quote |
-| S53 | The Verge, Sutskever at NeurIPS 2024 | https://www.theverge.com/2024/12/13/24320811/what-ilya-sutskever-sees-openai-model-data-training | 2024-12-13 | Pre-training end, peak data |
-| S54 | Dwarkesh Podcast, Ilya Sutskever | https://www.dwarkesh.com/p/ilya-sutskever-2 | 2025-11-25 | Age of research; generalisation quote |
-| S55 | Observer, LeCun to leave Meta | https://observer.com/2025/11/yann-lecun-leave-meta-launch-world-models-startup/ | 2025-11-11 | Dead-end quote, Harvard quote |
-| S56 | NBC News, researchers leave Anthropic and Google over safety | https://www.nbcnews.com/tech/security/two-ai-researchers-leave-anthropic-google-safety-concerns-rcna597086 | 2026-09-10 | Benton, Engels, Coxon |
-| S57 | Business Insider, John Jumper leaves DeepMind for Anthropic | https://www.businessinsider.com/alphafold-john-jumper-leaves-google-deepmind-anthropic-demis-hassabis-nobel-2026-6 | 2026-06-19 | Move |
-| S58 | TechCrunch, "OpenAI launches Operator" | https://techcrunch.com/2025/01/23/openai-launches-operator-an-ai-agent-that-performs-tasks-autonomously/ | 2025-01-23 | CUA, no APIs, confirmation, partners |
-| S59 | Article 29 dossier (internal) | Article/Article_29/RESEARCH.md | 2026-10-16 | Prices $2/$10 per M, cache 10%, mechanism sections |
-| S60 | Factory skill and CLI (local) | ~/.claude/skills/factory/SKILL.md ; ~/.claude/skills/factory/bin/factory | read 2026-10-16 | Roles, gates, limits, delivery |
-| S61 | Factory demo job board (local) | scratchpad demo/app/factory/jobs/20261016-2114-reading-time/board.json | 2026-10-16 | Gate and review results |
-| S62 | Epoch AI data (A29 [S41][S64]) | https://epoch.ai/data | 2026 | Data wall, compute trend |
-| S63 | OpenAI, "Built to benefit everyone: our plan" by Sam Altman and Jakub Pachocki (title via listing; page 403) | https://openai.com/index/built-to-benefit-everyone-our-plan/ | 2026-06-09 | Pachocki still at OpenAI |
+| S1 | Anthropic, "Tracing the thoughts of a large language model" | https://www.anthropic.com/research/tracing-thoughts-language-model | 2025-03-27 | Mental maths, carry-the-1, faithfulness, Dallas, rhymes |
+| S2 | Lindsey et al., "On the Biology of a Large Language Model" (Transformer Circuits) | https://transformer-circuits.pub/2025/attribution-graphs/biology.html | 2025-03 | 36+59 circuit, lookup features, planning, caveats |
+| S3 | Shojaee et al., "The Illusion of Thinking" (Apple) | https://arxiv.org/abs/2506.06941 | 2025-06 | Collapse, effort decline, 3 regimes |
+| S4 | A. Lawsen, "Comment on The Illusion of Thinking" | https://arxiv.org/abs/2506.09250 | 2025-06 | Token limits, impossible instances, generating functions |
+| S5 | Mirzadeh et al., "GSM-Symbolic" (ICLR 2025) | https://arxiv.org/abs/2410.05229 | 2024-10 | "up to 65%", hypothesis quote |
+| S6 | DeepSeek-AI, "DeepSeek-R1" | https://arxiv.org/abs/2501.12948 | 2025-01 (Nature version 2025) | Emergent reflection; R1 79.8% AIME (re-read); R1-Zero 15.6→71.0% (reported) |
+| S7 | Bender et al., "On the Dangers of Stochastic Parrots" (FAccT '21) | https://dl.acm.org/doi/10.1145/3442188.3445922 | 2021-03 | Definition quote (not re-read; 403) |
+| S8 | F. Chollet, "On the Measure of Intelligence" | https://arxiv.org/abs/1911.01547 | 2019-11 | Skill-acquisition efficiency |
+| S9 | ARC Prize, ARC-AGI-2 page | https://arcprize.org/arc-agi/2/ | 2025 | Human calibration, dataset sizes |
+| S10 | ARC Prize, "ARC Prize 2025 results & analysis" | https://arcprize.org/blog/arc-prize-2025-results-analysis | 2025-12 | 24%, 37.6%, 54%, costs |
+| S11 | Kaggle ARC Prize 2026 leaderboard; benchlm.ai (search snippets only) | https://www.kaggle.com/competitions/arc-prize-2026-arc-agi-2/leaderboard | 2026-10 | UNVERIFIED 2026 scores |
+| S12 | Anthropic, "Building effective agents" | https://www.anthropic.com/engineering/building-effective-agents | 2024-12-19 | Definitions, simplest-solution, compounding errors, sandbox |
+| S13 | Anthropic docs, Tool use overview | https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview | 2026 | Client vs server tools, tool_result |
+| S14 | OpenAI docs, Function calling guide | https://platform.openai.com/docs/guides/function-calling | 2026 | Five-step flow |
+| S15 | Schick et al., "Toolformer" | https://arxiv.org/abs/2302.04761 | 2023-02 | Self-taught API calls |
+| S16 | Yao et al., "ReAct" (A29 [S42]) | https://arxiv.org/abs/2210.03629 | 2022-10 | Reason-act-observe |
+| S17 | Model Context Protocol specification (A29 [S61]) | https://modelcontextprotocol.io/specification | rev. 2026-07-28 | Tools = arbitrary code execution |
+| S18 | LangChain (J. Ou), "What is an AI agent?" | https://blog.langchain.com/what-is-an-agent/ | 2026-07-31 | Autonomy spectrum, loop components |
+| S19 | Russell & Norvig, *Artificial Intelligence: A Modern Approach*, 4th ed., ch. 2 | https://aima.cs.berkeley.edu/ | 2020 | Agent definition (not re-read) |
+| S20 | SWE-bench leaderboards.json | https://raw.githubusercontent.com/SWE-bench/swe-bench.github.io/master/data/leaderboards.json | read 2026-10-16 | Verified top entries |
+| S21 | OpenAI, "Why we no longer evaluate SWE-bench Verified" | https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/ | 2026-02 | 59.4% of 138 audited problems flawed; contamination; use Pro (re-read 2026-10-25) |
+| S22 | Decrypt, "OpenAI Says Benchmark… Is 'Contaminated'" | https://decrypt.co/359012/openai-benchmark-measure-ai-coding-supremacy-contaminated | 2026-02-24 | ~70%→~23% on Pro |
+| S23 | Terminal-Bench 2.0 leaderboard (Snorkel mirror; tbench.ai) | https://snorkel.ai/leaderboard/terminal-bench-2-0/ | 2026-10 | Top entries, 89 tasks |
+| S24 | METR, "Time Horizon 1.1" | https://metr.org/blog/2026-1-29-time-horizon-1-1/ | 2026-01-29 | Suite size, 131-day doubling |
+| S25 | METR, Task-Completion Time Horizons page + benchmark_results_1_1.yaml | https://metr.org/time-horizons/ ; https://metr.org/assets/benchmark_results_1_1.yaml | last updated 2026-09-08 | Model p50/p80, 128.7-day doubling, >16 h caveat |
+| S26 | METR, early-2025 developer RCT | https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/ | 2025-07-10 | 19% slowdown (via S29 text) |
+| S27 | METR, "We are Changing our Developer Productivity Experiment Design" | https://metr.org/blog/2026-02-24-uplift-update/ | 2026-02-24 | Follow-up estimates, selection effects |
+| S28 | Anthropic, "Agentic Misalignment" | https://www.anthropic.com/research/agentic-misalignment | 2025-06 | Blackmail rates, simulation caveat |
+| S29 | OWASP, LLM01:2025 Prompt Injection | https://genai.owasp.org/llmrisk/llm01-prompt-injection/ | 2025 | Indirect injection, impacts |
+| S30 | OWASP, Top 10 for Agentic Applications 2026 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | 2025-12-09 | ASI01–ASI10 |
+| S31 | CISA, ASD ACSC et al., Principles for the Secure Integration of AI in OT (page + PDF v2) | https://www.cisa.gov/resources-tools/resources/principles-secure-integration-artificial-intelligence-operational-technology | 2025-12-03 (PDF 2026-01) | Four principles, HITL quote |
+| S32 | NIST, AI Risk Management Framework | https://www.nist.gov/itl/ai-risk-management-framework | 2023-01-26 | Release date; functions (not re-read) |
+| S33 | ISO/IEC 42001:2023 | https://www.iso.org/standard/42001 | 2023 | AI management system (not re-read; 403) |
+| S34 | IEC 62443 series; IEC 61511 (background) | https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards | — | Zones/conduits, SIS (not read) |
+| S35 | MIT NANDA, *The GenAI Divide: State of AI in Business 2025* (PDF) | https://mlq.ai/media/quarterly_decks/v0.1_State_of_AI_in_Business_2025_Report.pdf | 2025-07/08 | 95%, 60/20/5, methods, learning gap |
+| S36 | Fortune, "95% of generative AI pilots at companies are failing" | https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/ | 2025-08-18 | Popular framing |
+| S37 | Gartner press release (403; headline via HN listing) | https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027 | 2025-06-25 | 40% headline; rest UNVERIFIED |
+| S38 | CNBC, "Amazon, Meta, Microsoft face skeptical investors…" | https://www.cnbc.com/2026/07/28/hyperscalers-face-higher-capex-scrutiny-after-alphabet-report-panned.html | 2026-07-28 | MSFT $190B, AMZN $200B, debt figures |
+| S39 | Business Insider, "Microsoft keeps capex unchanged" | https://www.businessinsider.com/microsoft-ai-capex-unchanged-data-centers-spending-tech-giants-2026-7 | 2026-07-29 | $190B held, $175B restated |
+| S40 | CNBC, Alphabet Q2 2026 live updates | https://www.cnbc.com/2026/07/22/google-earnings-q2-goog-live-updates.html | 2026-07-22 | $195–205B |
+| S41 | Meta Platforms Q2 2026 results, 8-K Ex. 99.1 (SEC) | https://www.sec.gov/Archives/edgar/data/1326801/000162828026050596/meta-06302026xexhibit991.htm | 2026-07-29 | $130–145B |
+| S42 | Amazon.com Q2 2026 earnings release | https://s2.q4cdn.com/299287126/files/doc_earnings/2026/q2/earnings-result/AMZN-Q2-2026-Earnings-Release.pdf | 2026-07-30 | P&E $54.2B Q2, $98.4B H1, FCF −$7.6B TTM |
+| S43 | Fortune, Meta raises 2026 capex to $125–145B | https://fortune.com/2026/04/29/meta-zuckerberg-145-billion-ai-spending-roi/ | 2026-04-29 | Prior range |
+| S44 | CNBC, Anthropic run-rate $65B | https://www.cnbc.com/2026/08/17/anthropic-says-annualized-revenue-climbed-to-65-billion-in-july.html | 2026-08-17 | $65B, ~7× |
+| S45 | CNBC, OpenAI revenue $20B lower than signalled | https://www.cnbc.com/2026/10/08/open-ai-revenue-nvidia-oracle-coreweave.html | 2026-10-08 | ~$50B vs $68B |
+| S46 | Anthropic, Series H | https://www.anthropic.com/news/series-h | 2026-05-28 | $65B at $965B |
+| S47 | Anthropic, confidential draft S-1 | https://www.anthropic.com/news/confidential-draft-s1-sec | 2026-06-01 | Filing |
+| S48 | CNBC, New Constructs on Anthropic IPO (cites Reuters leaked prospectus) | https://www.cnbc.com/2026/10/07/anthropic-will-be-most-ridiculous-ipo-of-year-analyst-says.html | 2026-10-07 | $4.6B / −$42B (UNVERIFIED), $150B view |
+| S49 | CNBC, OpenAI closes $122B round at $852B | https://www.cnbc.com/2026/03/31/openai-funding-round-ipo.html | 2026-03-31 | Round size |
+| S50 | PYMNTS (citing Fortune interview), OpenAI IPO not in 2026 | https://www.pymnts.com/news/2026/openai-pauses-ipo-plans-amid-ai-safety-worries/ | 2026-09-13 | Altman quote |
+| S51 | The Verge, Sutskever at NeurIPS 2024 | https://www.theverge.com/2024/12/13/24320811/what-ilya-sutskever-sees-openai-model-data-training | 2024-12-13 | Pre-training end, peak data |
+| S52 | Dwarkesh Podcast, Ilya Sutskever | https://www.dwarkesh.com/p/ilya-sutskever-2 | 2025-11-25 | Age of research; generalisation quote |
+| S53 | Observer, LeCun to leave Meta | https://observer.com/2025/11/yann-lecun-leave-meta-launch-world-models-startup/ | 2025-11-11 | Dead-end quote, Harvard quote |
+| S54 | NBC News, researchers leave Anthropic and Google over safety | https://www.nbcnews.com/tech/security/two-ai-researchers-leave-anthropic-google-safety-concerns-rcna597086 | 2026-09-10 | Benton, Engels, Coxon |
+| S55 | Business Insider, John Jumper leaves DeepMind for Anthropic | https://www.businessinsider.com/alphafold-john-jumper-leaves-google-deepmind-anthropic-demis-hassabis-nobel-2026-6 | 2026-06-19 | Move |
+| S56 | TechCrunch, "OpenAI launches Operator" | https://techcrunch.com/2025/01/23/openai-launches-operator-an-ai-agent-that-performs-tasks-autonomously/ | 2025-01-23 | CUA, no APIs, confirmation, partners |
+| S57 | Article 29 dossier (internal) | Article/Article_29/RESEARCH.md | 2026-10-16 | Prices $2/$10 per M, cache 10%, mechanism sections |
+| S58 | Factory skill and CLI (local) | ~/.claude/skills/factory/SKILL.md ; ~/.claude/skills/factory/bin/factory | read 2026-10-16 | Roles, gates, limits, delivery |
+| S59 | Factory demo job board (local) | scratchpad demo/app/factory/jobs/20261016-2114-reading-time/board.json | 2026-10-16 | Gate and review results |
+| S60 | Epoch AI data (A29 [S41][S64]) | https://epoch.ai/data | 2026 | Data wall, compute trend |
+| S61 | OpenAI, "Built to benefit everyone: our plan" by Sam Altman and Jakub Pachocki (title via listing; page 403) | https://openai.com/index/built-to-benefit-everyone-our-plan/ | 2026-06-09 | Pachocki still at OpenAI |

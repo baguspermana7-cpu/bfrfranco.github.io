@@ -699,25 +699,26 @@ const AGENTIC_FIGURES = [
   /* ---------------------------------------------------------------- D1 */
   {
     id: 'agentic-d1', page: 'article-30.html',
+    detail: {"u1": {"text": "The request enters as text. The model receives the goal in its context; it has no other channel to the world.", "see": "#right-never-runs"}, "l1": {"text": "In the script-only account the model only guesses the command line for a script someone wrote.", "see": "#agent-demo"}, "py": {"text": "The script-only account: a program calls a booking API. Operator, the demo usually cited, did not work this way.", "see": "#agent-demo"}, "l1b": {"text": "The model reports success. A status line is a claim; only the harness's own check of the result makes it a fact.", "see": "#failure-faithfulness"}, "l2": {"text": "The model plans: it picks a tool and fills the arguments as a structured call (stop_reason \"tool_use\"). Choosing the step is the model's work.", "see": "#right-never-runs"}, "h": {"text": "The harness validates the call against the tool's schema and its permissions. Everything the agent can do is what this code allows.", "see": "#agent-labour"}, "g": {"text": "Operator was trained to ask the user to confirm before tasks with external side effects. The gate sits before execution, not after.", "see": "#agent-demo"}, "x": {"text": "Code executes: an API call or, for Operator, clicks in a browser chosen from screenshots by a vision model.", "see": "#agent-demo"}, "o": {"text": "The result or error goes back into the context. The model then chooses the next step or stops; this return path is what makes it a loop.", "see": "#agent-labour"}},
     caption:
-      'One tool call, two descriptions. Operator drove a browser from screenshots, not an API script [S58]. ' +
-      'The mechanism in the video is right [S1]; “the LLM did nothing” is not: the model plans, the harness checks, ' +
-      'and code executes and reports back [S15][S16].',
+      'One tool call, two descriptions. Operator drove a browser from screenshots, not an API script [S56]. ' +
+      'The script-only account is right about the mechanism; “the LLM did nothing” is not: the model plans, the harness checks, ' +
+      'and code executes and reports back [S13][S14].',
     because:
-      'the prose can say the video is half right; only the drawing shows which arrows the model decides and which ' +
+      'the prose can say the script-only account is half right; only the drawing shows which arrows the model decides and which ' +
       'code executes, and that the second description has a return path and a confirm gate the first one lacks.',
     build: () => gridFigure({
       phone: { order: ['u1', 'l1', 'py', 'l1b', 'l2', 'h', 'g', 'x', 'o'], gapY: 44,
-        zones: [{ ids: ['u1', 'l1', 'py', 'l1b'], label: 'The video [S1]' }, { ids: ['l2', 'h', 'g', 'x', 'o'], label: 'Documented [S15][S16]' }], edges: { 7: { fs: 'r', ts: 'r' } } },
-      slug: 'agentic1', title: 'One tool call, two descriptions',
-      desc: 'Top: the video’s account. Bottom: the same call with the decisions the model makes marked.',
+        zones: [{ ids: ['u1', 'l1', 'py', 'l1b'], label: 'Script only (C5)' }, { ids: ['l2', 'h', 'g', 'x', 'o'], label: 'Documented [S13][S14]' }], edges: { 7: { fs: 'r', ts: 'r' } } },
+      slug: 'agentic1', interactive: true, title: 'One tool call, two descriptions',
+      desc: 'Top: the script-only account. Bottom: the same call with the decisions the model makes marked.',
       gaps: [28, 28, 28], gapY: 58,
       nodes: [
         { id: 'u1', col: 0, row: 0, name: 'User', sub: '“book me a table”' },
         { id: 'l1', col: 1, row: 0, name: 'LLM', sub: 'guesses a command', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic: the model decides' },
         { id: 'py', col: 2, row: 0, name: 'python opentable.py', sub: '→ OpenTable API', stroke: 'ink', legend: 'Deterministic: code executes' },
         { id: 'l1b', col: 3, row: 0, name: 'LLM', sub: '“I booked you a table!”', stroke: 'accent', fill: 'paper-2', tier: 1 },
-        { id: 'l2', col: 0, row: 1, tag: 'plan [S15]', name: 'LLM', sub: 'pick tool, fill args', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'l2', col: 0, row: 1, tag: 'plan [S13]', name: 'LLM', sub: 'pick tool, fill args', stroke: 'accent', fill: 'paper-2', tier: 1 },
         { id: 'h', col: 1, row: 1, name: 'Harness', sub: 'schema · permissions', stroke: 'ink' },
         { id: 'g', col: 2, row: 1, name: 'Confirm gate', sub: 'before side effects', stroke: 'alarm-caution', dashed: true, legend: 'Human gate' },
         { id: 'x', col: 3, row: 1, name: 'Executor', sub: 'API call or browser', stroke: 'ink' },
@@ -732,24 +733,25 @@ const AGENTIC_FIGURES = [
         { a: 'o', b: 'l2', stroke: 'accent', fs: 'l', ts: 'b', label: 'next step or stop' }
       ],
       zones: [
-        { ids: ['u1', 'l1', 'py', 'l1b'], label: 'As described in the video [S1]' },
-        { ids: ['l2', 'h', 'g', 'x', 'o'], label: 'As documented [S15][S16][S58]' }
+        { ids: ['u1', 'l1', 'py', 'l1b'], label: 'Script-only account (C5)' },
+        { ids: ['l2', 'h', 'g', 'x', 'o'], label: 'As documented [S13][S14][S56]' }
       ]
     })
   },
   /* ---------------------------------------------------------------- D2 */
   {
     id: 'agentic-d2', page: 'article-30.html',
+    detail: {"bud": {"text": "Limits steps, tokens, wall-clock time and money from outside the model, so a retry loop cannot run up cost.", "see": "#stance-budget"}, "hum": {"text": "Irreversible actions wait for a person. On a plant, the agent proposes and the existing control system acts.", "see": "#stance-architecture"}, "ctx": {"text": "Goal, history and every tool result. The model only knows what is in here; memory across runs is text a program stored and pasted back.", "see": "#right-no-calculator"}, "llm": {"text": "Proposes the next action. It is probabilistic: the same context can give a different proposal on the next run.", "see": "#right-token"}, "val": {"text": "A deterministic check of the proposal against the schema and the policy. A rejection goes back to the model with the reason.", "see": "#stance-architecture"}, "exe": {"text": "Runs the tool with the agent's credentials. Its reach and blast radius are those credentials.", "see": "#right-never-runs"}, "ver": {"text": "Tests, lint, types or rules decide whether the step counts. The verifier, not the model's status line, closes the step.", "see": "#stance-architecture"}, "done": {"text": "The run ends on success or escalates to a person when the budget or the verifier says stop.", "see": "#stance-budget"}},
     caption:
       'Observe, act, verify. The model proposes; deterministic checks decide whether the step counts. Anthropic: ' +
-      'the agent gets ground truth from the environment at each step [S14].',
+      'the agent gets ground truth from the environment at each step [S12].',
     because:
       'a list of “schema check, verifier, budget, human gate” hides that the verifier feeds the context and that the ' +
       'budget guard can halt the model from outside it; the loop shape shows who can stop what.',
     build: () => gridFigure({
       phone: { order: ['bud', 'ctx', 'llm', 'val', 'hum', 'exe', 'ver', 'done'], gapY: 32, left: 54, fitPad: 14,
         edges: { 2: { fs: 'r', ts: 'r' }, 3: { fs: 'l', ts: 'l' }, 5: { fs: 'l', ts: 'l' }, 6: { fs: 'l', ts: 'l' }, 7: { fs: 'r', ts: 'r' } } },
-      slug: 'agentic2', title: 'Observe, act, verify',
+      slug: 'agentic2', interactive: true, title: 'Observe, act, verify',
       desc: 'The model proposes; deterministic checks decide whether the step counts.',
       gaps: [48, 76], gapY: 40,
       nodes: [
@@ -778,7 +780,7 @@ const AGENTIC_FIGURES = [
   {
     id: 'agentic-d3', page: 'article-30.html',
     caption:
-      'Who decides the next step? Six levels from hand-written logic to an autonomous agent [S14][S20]. Only the last ' +
+      'Who decides the next step? Six levels from hand-written logic to an autonomous agent [S12][S18]. Only the last ' +
       'level lets the model choose steps and tools; everything left of it is a workflow with predefined code paths, ' +
       'and the first three are decades old (cron, RPA, expert systems).',
     because:
@@ -803,7 +805,7 @@ const AGENTIC_FIGURES = [
         { a: 'c3', b: 'c4', stroke: 'muted', pattern: 'dashed' }, { a: 'c4', b: 'c5', stroke: 'muted', pattern: 'dashed' }
       ],
       zones: [
-        { ids: ['c1', 'c2', 'c3', 'c4'], label: 'Workflow: predefined code paths [S14]' },
+        { ids: ['c1', 'c2', 'c3', 'c4'], label: 'Workflow: predefined code paths [S12]' },
         { ids: ['c5'], label: 'Agent' }
       ]
     })
@@ -813,7 +815,7 @@ const AGENTIC_FIGURES = [
     id: 'agentic-d4', page: 'article-30.html',
     caption:
       'Factory: LLMs write, exit codes decide. Hard gates are lint, test, build, nonempty and secrets, and no job can ' +
-      'override them [S60]. One demo job passed every gate: security and code PASS, UX and UI SKIP [S61].',
+      'override them [S58]. One demo job passed every gate: security and code PASS, UX and UI SKIP [S59].',
     because:
       'a list of roles and gates does not show the three ways back to the builder or that state is written to ' +
       'board.json at every transition; the loop structure is the point.',
@@ -852,7 +854,7 @@ const AGENTIC_FIGURES = [
     id: 'agentic-d5', page: 'article-30.html',
     caption:
       'Drafter and checker. The probabilistic half reads and drafts; the deterministic half validates, executes and ' +
-      'tests. Self-explanations from the model can be unfaithful [S3], so nothing downstream trusts them. The seam is ' +
+      'tests. Self-explanations from the model can be unfaithful [S1], so nothing downstream trusts them. The seam is ' +
       'where the engineering lives.',
     because:
       'a two-column table says which half does what; it cannot show that every path from the model passes through one ' +
@@ -868,7 +870,7 @@ const AGENTIC_FIGURES = [
       nodes: [
         { id: 'p3', col: 0, row: 0, name: 'Draft code, MOP, ticket', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Probabilistic (LLM)' },
         { id: 'p1', col: 0, row: 1, name: 'Read text, logs, screens', sub: 'and choose among options', stroke: 'accent', fill: 'paper-2', tier: 1 },
-        { id: 'p4', col: 0, row: 2, tag: 'may be unfaithful [S3]', name: 'Explain', stroke: 'accent', fill: 'paper-2', tier: 1, dashed: true },
+        { id: 'p4', col: 0, row: 2, tag: 'may be unfaithful [S1]', name: 'Explain', stroke: 'accent', fill: 'paper-2', tier: 1, dashed: true },
         { id: 'iface', col: 1, row: 1, name: 'Typed tool interface', sub: 'schema · allow-list · ranges', stroke: 'ink', tier: 1, legend: 'Deterministic (code)' },
         { id: 'd3', col: 2, row: 0, name: 'Test, lint, type-check', stroke: 'ink' },
         { id: 'dv', col: 2, row: 1, name: 'Validate + enforce', sub: 'schema · limits · permissions', stroke: 'ink' },
@@ -894,7 +896,7 @@ const AGENTIC_FIGURES = [
     caption:
       '0.95 twenty times. At 95 % per step a 20-step run succeeds 35.8 % of the time (0.95^20, derived). With a ' +
       'verifier that detects 90 % of bad steps and two retries, a step succeeds 99.47 % of the time and the run ' +
-      '89.9 % (derived, CALCULATORS C-ii). METR’s 50 % versus 80 % horizon gap is the field version [S27].',
+      '89.9 % (derived, CALCULATORS C-ii). METR’s 50 % versus 80 % horizon gap is the field version [S25].',
     because:
       'the multiplication is one line in the prose; the drawing shows where the verifier sits (inside the step, ' +
       'looping back) and why detection, not model quality, moves the run from 0.358 to 0.899.',
@@ -927,8 +929,8 @@ const AGENTIC_FIGURES = [
     id: 'agentic-d7', page: 'article-30.html',
     caption:
       'Money, models and narratives, 2024–2026. Time runs down; each lane is one kind of event. Capital moved first and ' +
-      'fastest (OpenAI $122B at $852B [S51]; Anthropic $65B at $965B [S48]), measured capability moved on a ~131-day ' +
-      'doubling [S26], and the critiques [S39][S37] arrived while both kept rising.',
+      'fastest (OpenAI $122B at $852B [S49]; Anthropic $65B at $965B [S46]), measured capability moved on a ~131-day ' +
+      'doubling [S24], and the critiques [S37][S35] arrived while both kept rising.',
     because:
       'sixteen dated events across three kinds do not survive as prose; read side by side on one time axis they show ' +
       'that the critique lane is dense in 2025 and the capital lane in 2026.',
@@ -938,14 +940,14 @@ const AGENTIC_FIGURES = [
       desc: 'Events on one time axis: capability, capital, critiques.',
       gaps: [24, 24], gapY: 28,
       nodes: [
-        { id: 'k1', col: 2, row: 0, tag: 'Jun–Aug 2025', name: 'Gartner: >40% cancelled', sub: 'by 2027 [S39] · MIT “95%” [S37]', stroke: 'soft', dashed: true, legend: 'Critique' },
-        { id: 'c1', col: 0, row: 0, tag: 'Dec 2024–Jun 2025', name: 'Limits found', sub: 'pretraining ends [S53][S3][S5][S6]', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Capability' },
-        { id: 'c2', col: 0, row: 1, tag: 'Jan–Apr 2026', name: 'METR: 50% horizon ≈17 h', sub: '80% horizon ≈3 h [S27]', stroke: 'accent', fill: 'paper-2', tier: 1 },
-        { id: 'm1', col: 1, row: 1, tag: 'Feb 2026', name: 'OpenAI $122B at $852B', sub: 'raised from $110B [S51]', stroke: 'ink', legend: 'Capital' },
-        { id: 'k2', col: 2, row: 1, tag: 'Nov 2025–Feb 2026', name: 'LeCun leaves Meta [S55]', sub: 'SWE-bench Verified retired [S23]', stroke: 'soft', dashed: true },
-        { id: 'm2', col: 1, row: 2, tag: 'May–Jun 2026', name: 'Anthropic $65B at $965B', sub: 'draft S-1 [S48][S49]', stroke: 'ink' },
-        { id: 'm3', col: 1, row: 3, tag: 'Jul–Sep 2026', name: 'Big-four capex ≈$0.7T', sub: 'no OpenAI IPO 2026 [S40][S52]', stroke: 'ink' },
-        { id: 'k3', col: 2, row: 3, tag: 'Aug–Sep 2026', name: 'Elder video [S1]', sub: 'safety departures [S56]', stroke: 'soft', dashed: true }
+        { id: 'k1', col: 2, row: 0, tag: 'Jun–Aug 2025', name: 'Gartner: >40% cancelled', sub: 'by 2027 [S37] · MIT “95%” [S35]', stroke: 'soft', dashed: true, legend: 'Critique' },
+        { id: 'c1', col: 0, row: 0, tag: 'Dec 2024–Jun 2025', name: 'Limits found', sub: 'pretraining ends [S51][S1][S3][S4]', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Capability' },
+        { id: 'c2', col: 0, row: 1, tag: 'Jan–Apr 2026', name: 'METR: 50% horizon ≈17 h', sub: '80% horizon ≈3 h [S25]', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'm1', col: 1, row: 1, tag: 'Feb 2026', name: 'OpenAI $122B at $852B', sub: 'raised from $110B [S49]', stroke: 'ink', legend: 'Capital' },
+        { id: 'k2', col: 2, row: 1, tag: 'Nov 2025–Feb 2026', name: 'LeCun leaves Meta [S53]', sub: 'SWE-bench Verified retired [S21]', stroke: 'soft', dashed: true },
+        { id: 'm2', col: 1, row: 2, tag: 'May–Jun 2026', name: 'Anthropic $65B at $965B', sub: 'draft S-1 [S46][S47]', stroke: 'ink' },
+        { id: 'm3', col: 1, row: 3, tag: 'Jul–Sep 2026', name: 'Big-four capex ≈$0.7T', sub: 'no OpenAI IPO 2026 [S38][S50]', stroke: 'ink' },
+        { id: 'k3', col: 2, row: 3, tag: 'Sep 2026', name: 'Safety departures', sub: 'two researchers leave [S54]', stroke: 'soft', dashed: true }
       ],
       edges: [],
       zones: [
@@ -959,7 +961,7 @@ const AGENTIC_FIGURES = [
     caption:
       'An agent next to a chiller plant. The agent can read and propose; only the control system, with its interlocks ' +
       'and a human, can act. There is no connector from the agent to the BMS, the PLC or the safety system. ' +
-      '“Limit active control of OT infrastructure by AI without a human in the loop” (CISA, ASD ACSC et al. [S33]).',
+      '“Limit active control of OT infrastructure by AI without a human in the loop” (CISA, ASD ACSC et al. [S31]).',
     because:
       'the rule “no autonomous control of OT” is a sentence; the drawing makes its form checkable, by showing the one ' +
       'path from the agent to the plant runs through an operator and a range-checking gateway, and that data flows back ' +
