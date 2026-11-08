@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-rz-register="editorial">
+<html lang="en" data-theme="dark" data-rz-register="tool">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +28,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
     <link rel="stylesheet" href="css/rz-design-studio.css?v=20260920-972eff8b">
     <script src="js/rz-version.js?v=20261108-e2872eb2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
@@ -40,213 +39,150 @@
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"DC Solutions","item":"https://resistancezero.com/datacenter-solutions.html"},{"@type":"ListItem","position":3,"name":"CDU Guide","item":"https://resistancezero.com/cdu-selection-guide.html"},{"@type":"ListItem","position":4,"name":"CDU Checklist"}]}
     </script>
     <style>
-        /* ===== RZ Dark System — editorial register (this is a document/reference page) ===== */
-        :root { --ck-bg:#f8fafc; --ck-card:#ffffff; --ck-border:#e2e8f0; --ck-text:#191B20; --ck-muted:#475569; --ck-inset:#f1f5f9; --ck-accent:var(--rz-accent-ui); --ck-serif:'IBM Plex Sans',system-ui,sans-serif; --ck-sans:'IBM Plex Sans',system-ui,sans-serif; --ck-mono:'IBM Plex Mono',ui-monospace,monospace; }
-        [data-theme="dark"] { --ck-bg:#0E0F12; --ck-card:#16181D; --ck-border:rgba(160,168,180,.16); --ck-text:#F6F7F9; --ck-muted:#9AA3AF; --ck-inset:#1c1f25; --ck-accent:#E8B563; }
-
-        body { background:var(--ck-bg); color:var(--ck-text); font-family:var(--ck-sans); }
-        .ck-hero { position:relative; padding:7rem 1.5rem 3rem; overflow:hidden; border-bottom:1px solid var(--ck-border); }
-        [data-theme="dark"] .ck-hero::before { content:''; position:absolute; inset:0; background: none; pointer-events:none; }
-        .ck-hero > * { position:relative; }
-        .ck-kick { font-family:var(--ck-mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ck-accent); font-weight:600; }
-        .ck-hero h1 { font-family:var(--ck-serif); font-weight:600; font-size:clamp(1.9rem,4vw,2.9rem); letter-spacing:-.015em; margin:.5rem 0 .6rem; line-height:1.05; max-width:20ch; }
-        .ck-hero p { color:var(--ck-muted); max-width:70ch; font-size:1.02rem; line-height:1.6; }
-        .ck-hero .crumb { font-family:var(--ck-mono); font-size:.72rem; color:var(--ck-muted); margin-top:1rem; }
-        .ck-hero .crumb a { color:var(--ck-accent); }
-
-        .ck-wrap { max-width:1120px; margin:0 auto; padding:0 1.4rem; }
-        .ck-sec { padding:2.6rem 0; border-top:1px solid var(--ck-border); }
-        .ck-sec h2 { font-family:var(--ck-serif); font-weight:500; font-size:clamp(1.4rem,2.6vw,2rem); margin:0 0 .3rem; display:flex; align-items:baseline; gap:.6rem; }
-        .ck-sec h2 .n { font-family:var(--ck-mono); font-size:.74rem; color:var(--ck-accent); font-weight:600; }
-        .ck-sec h3 { font-family:var(--ck-serif); font-weight:500; font-size:1.16rem; margin:1.4rem 0 .5rem; }
-        .ck-sec .lead { color:var(--ck-muted); max-width:70ch; margin:.2rem 0 1.2rem; line-height:1.6; }
-
-        /* checklist items */
-        .ck-list { list-style:none; margin:0; padding:0; display:grid; gap:2px; border:1px solid var(--ck-border); border-radius:8px; overflow:hidden; }
-        .ck-item { display:flex; gap:.7rem; align-items:flex-start; padding:.7rem .9rem; background:var(--ck-card); }
-        .ck-item:nth-child(even){ background:var(--ck-inset); }
-        .ck-item input[type=checkbox]{ margin-top:3px; width:18px; height:18px; accent-color:var(--ck-accent); flex-shrink:0; cursor:pointer; }
-        .ck-item .txt{ font-size:.9rem; line-height:1.5; }
-        .ck-item .txt b{ color:var(--ck-text); }
-        .ck-item .spec{ font-family:var(--ck-mono); font-size:.74rem; color:var(--ck-accent); display:block; margin-top:2px; }
-
-        /* parameter table */
-        .tbl-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--ck-border); border-radius:4px;
-            background:
-              linear-gradient(to right, var(--ck-card) 30%, rgba(255,255,255,0)) 0 0/36px 100% no-repeat local,
-              linear-gradient(to left, var(--ck-card) 30%, rgba(255,255,255,0)) 100% 0/36px 100% no-repeat local,
-              radial-gradient(farthest-side at 0 50%, rgba(120,130,145,.28), rgba(0,0,0,0)) 0 0/14px 100% no-repeat scroll,
-              radial-gradient(farthest-side at 100% 50%, rgba(120,130,145,.28), rgba(0,0,0,0)) 100% 0/14px 100% no-repeat scroll;
-            background-color:var(--ck-card); }
-        table.ck-tbl td.sym{ min-width:150px; }
-        table.ck-tbl{ width:100%; border-collapse:collapse; font-size:.85rem; min-width:680px; }
-        table.ck-tbl th{ background:var(--ck-inset); text-align:left; padding:.65rem .8rem; font-family:var(--ck-mono); font-size:.62rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ck-muted); border-bottom:2px solid var(--ck-border); white-space:nowrap; }
-        table.ck-tbl td{ padding:.65rem .8rem; border-bottom:1px solid rgba(160,168,180,.09); vertical-align:top; }
-        table.ck-tbl tr:last-child td{ border-bottom:0; }
-        table.ck-tbl .p{ font-family:var(--ck-mono); font-weight:600; color:var(--ck-accent); white-space:nowrap; font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
-        table.ck-tbl .sym{ font-weight:600; }
-
-        /* PM cadence pills */
-        .cad{ font-family:var(--ck-mono); font-size:.6rem; font-weight:700; padding:1px 6px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
-        .cad.d{ background:rgba(16,185,129,.14); color:#047857; }
-        .cad.w{ background:rgba(6,182,212,.14); color:#155e75; }
-        .cad.m{ background:rgba(245,158,11,.14); color:#92400e; }
-        .cad.q{ background:rgba(14,116,144,.14); color:#64748b; }
-        .cad.a{ background:rgba(239,68,68,.14); color:#b91c1c; }
-
-        /* printable form */
-        .form-card{ border:1px solid var(--ck-border); border-radius:8px; background:var(--ck-card); padding:1.2rem 1.3rem; }
-        .form-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.8rem; margin-bottom:1rem; }
-        .form-row label{ font-family:var(--ck-mono); font-size:.66rem; letter-spacing:.04em; text-transform:uppercase; color:var(--ck-muted); display:block; margin-bottom:3px; }
-        .form-row input, .form-row select{ width:100%; padding:.45rem .6rem; border:1px solid var(--ck-border); border-radius:6px; background:var(--ck-inset); color:var(--ck-text); font-family:var(--ck-sans); font-size:.88rem; }
-        .form-readings table{ width:100%; border-collapse:collapse; font-size:.84rem; }
-        .form-readings th, .form-readings td{ padding:.5rem .6rem; border:1px solid var(--ck-border); text-align:left; }
-        .form-readings th{ font-family:var(--ck-mono); font-size:.62rem; text-transform:uppercase; color:var(--ck-muted); background:var(--ck-inset); }
-        .form-readings input{ width:100%; border:0; background:transparent; color:var(--ck-text); font-family:var(--ck-mono); font-size:.84rem; font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
-        .form-actions{ display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1rem; }
-        .btn-print{ font-family:var(--ck-mono); font-size:.74rem; padding:.6rem 1.1rem; border-radius:8px; border:1px solid var(--ck-accent); background:var(--ck-accent); color:#191512; font-weight:600; cursor:pointer; }
-        .btn-print.ghost{ background:transparent; color:var(--ck-accent); }
-
-        /* source tags — distinguish published standards from typical/vendor figures */
-        .src{ font-family:var(--ck-mono); font-size:.56rem; font-weight:700; letter-spacing:.04em; padding:1px 5px; border-radius:4px; white-space:nowrap; text-transform:uppercase; vertical-align:middle; }
-        .src.std{ background:rgba(16,185,129,.14); color:#065f46; border:1px solid rgba(16,185,129,.4); }
-        .src.typ{ background:rgba(245,158,11,.14); color:#92400e; border:1px solid rgba(245,158,11,.4); }
-        .src.ill{ background:rgba(6,182,212,.12); color:#155e75; border:1px solid rgba(6,182,212,.38); }
-        .ck-sec h2 .src{ font-size:.5rem; }
-        /* critical-spare class pill */
-        .crit{ font-family:var(--ck-mono); font-size:.58rem; font-weight:700; padding:1px 6px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
-        .crit.y{ background:rgba(239,68,68,.14); color:#b91c1c; border:1px solid rgba(239,68,68,.4); }
-        .crit.m{ background:rgba(245,158,11,.14); color:#92400e; border:1px solid rgba(245,158,11,.4); }
-        .crit.n{ background:rgba(120,130,145,.14); color:#4b5563; border:1px solid rgba(120,130,145,.4); }
-        table.ck-tbl td .cost{ font-family:var(--ck-mono); font-weight:600; color:var(--ck-text); white-space:nowrap; font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
-        table.ck-tbl td .pn{ font-family:var(--ck-mono); font-size:.72rem; color:var(--ck-accent); }
-        table.ck-tbl td small{ color:var(--ck-muted); font-size:.72rem; }
-        /* exploded-view resource cards */
-        .xv-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:.9rem; margin-top:.4rem; }
-        .xv-card{ border:1px solid var(--ck-border); border-radius:4px; background:var(--ck-card); padding:1rem 1.1rem; }
-        .xv-card h4{ font-family:var(--ck-mono); font-size:.74rem; letter-spacing:.03em; text-transform:uppercase; color:var(--ck-accent); margin:0 0 .2rem; }
-        .xv-card .arch{ font-family:var(--ck-mono); font-size:.6rem; color:var(--ck-muted); }
-        .xv-card p{ font-size:.82rem; color:var(--ck-muted); line-height:1.55; margin:.5rem 0 .6rem; }
-        .xv-card .lnk{ display:flex; flex-wrap:wrap; gap:.4rem; }
-        .xv-card .lnk a{ font-family:var(--ck-mono); font-size:.68rem; padding:.28rem .55rem; border:1px solid var(--ck-border); border-radius:6px; color:var(--ck-muted); text-decoration:none; }
-        .xv-card .lnk a:hover{ color:var(--ck-accent); border-color:var(--ck-accent); }
-        /* FMECA fault-reference cards */
-        .fm-grid{ display:grid; gap:.6rem; margin-top:.4rem; }
-        .fm-card{ border:1px solid var(--ck-border); border-radius:4px; background:var(--ck-card); overflow:hidden; }
-        /* risk is the RPN word's colour, not a rail on the card */
-        .fm-card summary{ list-style:none; cursor:pointer; display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; padding:.7rem .95rem; font-size:.86rem; }
-        .fm-card summary::-webkit-details-marker{ display:none; }
-        .fm-card summary::before{ content:'▸'; color:var(--ck-muted); font-size:.7rem; transition:transform .15s; }
-        .fm-card[open] summary::before{ transform:rotate(90deg); }
-        .fm-id{ font-family:var(--ck-mono); font-weight:700; color:var(--ck-accent); }
-        .fm-name{ font-weight:600; color:var(--ck-text); flex:1; min-width:140px; }
-        .fm-rpn{ font-family:var(--ck-mono); font-size:.62rem; font-weight:700; padding:1px 7px; border-radius:4px; white-space:nowrap; background:none; color:var(--ck-muted); }
-        .fm-card.r-hi .fm-rpn{ background:none; color:#b91c1c; } .fm-card.r-md .fm-rpn{ background:none; color:#92400e; }
-        .fm-body{ padding:.2rem .95rem 1rem; border-top:1px solid var(--ck-border); font-size:.82rem; }
-        .fm-row{ display:grid; grid-template-columns:96px 1fr; gap:.5rem; padding:.3rem 0; border-bottom:1px solid rgba(160,168,180,.09); }
-        .fm-row:last-of-type{ border-bottom:0; }
-        .fm-k{ font-family:var(--ck-mono); font-size:.64rem; text-transform:uppercase; letter-spacing:.04em; color:var(--ck-muted); padding-top:2px; }
-        .fm-sod{ display:flex; gap:.8rem; margin-top:.6rem; font-family:var(--ck-mono); font-size:.72rem; color:var(--ck-muted); }
-        .fm-sod b{ color:var(--ck-text); font-variant-numeric:tabular-nums slashed-zero; }
-        .fm-sod .fm-rpn-val{ margin-left:auto; }
-        /* interactive sourced charts (rz-article-chart.js) — un-scoped, theme-aware */
-        .rz-chart{ margin:1.6rem 0; }
-        .rz-chart-title{ font-family:var(--ck-mono); font-size:.82rem; font-weight:600; color:var(--ck-text); margin-bottom:.7rem; line-height:1.45; }
-        .rz-chart-canvas{ position:relative; height:300px; }
-        .rz-chart-src{ font-family:var(--ck-mono); font-size:.64rem; color:var(--ck-muted); margin-top:.7rem; line-height:1.5; }
-        .rz-chart-chip{ display:inline-block; font-weight:700; font-size:.58rem; letter-spacing:.04em; padding:1px 6px; border-radius:4px; margin-right:6px; background:rgba(120,130,145,.16); color:var(--ck-muted); }
-        .rz-chart-chip.derived{ background:rgba(16,185,129,.14); color:#10b981; }
-        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#92400e; }
-        [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(16,185,129,.18); color:#34d399; }
-        [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
-        .legend{ display:flex; gap:.8rem; flex-wrap:wrap; margin:.2rem 0 1rem; font-size:.74rem; color:var(--ck-muted); align-items:center; }
-        table.ck-tbl td .ref{ font-family:var(--ck-mono); font-size:.66rem; color:var(--ck-muted); }
-        .ck-note{ border:1px solid var(--ck-border); border-radius:4px; background:var(--ck-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--ck-muted); line-height:1.6; margin-top:1.2rem; }
-        .ck-note b{ color:var(--ck-text); }
-        .toc{ display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1rem; }
-        .toc a{ font-family:var(--ck-mono); font-size:.68rem; padding:.3rem .6rem; border:1px solid var(--ck-border); border-radius:6px; color:var(--ck-muted); text-decoration:none; }
-        .toc a:hover{ color:var(--ck-accent); border-color:var(--ck-accent); }
-
-        /* v1.8.0 — mobile responsive patch */
-        @media (max-width:768px){
-            html, body { overflow-x:hidden; max-width:100vw; }
-            img, picture, video, svg { max-width:100%; height:auto; }
-            .ck-hero{padding:5.5rem 1rem 2.2rem;}
-            .nav-menu, .nav-links { display:none; }
-            .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
-            button, a.btn, [role="button"], .theme-toggle, .hamburger, .btn-print { min-height:44px; }
-        }
-        /* print stylesheet — the fill-in form prints clean */
+        /* cdu-checklist on the tool register (v3.28.2). rz-tool.css owns .ck-sec/.ck-list/.ck-item/.ck-label/
+           .ck-tbl-wrap/.src/.cad/.form-card/.tool-btn; this block keeps only what is particular to this page, on the
+           register's own tokens. */
+        body.tool { --ck-card: var(--rzt-panel); --ck-border: var(--rzt-line); --ck-text: var(--rzt-text);
+            --ck-muted: var(--rzt-muted); --ck-inset: var(--rzt-inset); --ck-accent: var(--rzt-accent-text);
+            --ck-mono: var(--rzt-mono); --ck-sans: var(--rzt-sans); }
+        body.tool .ck-sec h3 { font: 600 16px/1.35 var(--ck-sans); color: var(--ck-text); margin: 1.4rem 0 .5rem; }
+        body.tool .ck-sec .lead { color: var(--rzt-text-2); max-width: 74ch; margin: .2rem 0 1rem; font-size: 14px; line-height: 1.6; }
+        body.tool .ck-item .txt { font-size: 14px; line-height: 1.55; }
+        body.tool .ck-item .spec { display: block; margin-top: 2px; font: 400 12px var(--ck-mono); color: var(--ck-muted); }
+        body.tool table.ck-tbl { min-width: 680px; }
+        body.tool table.ck-tbl td.sym { min-width: 150px; font-weight: 600; }
+        body.tool table.ck-tbl .p { font-family: var(--ck-mono); font-weight: 600; color: var(--ck-text); white-space: nowrap; font-variant-numeric: tabular-nums slashed-zero; }
+        body.tool table.ck-tbl td .cost { font-family: var(--ck-mono); font-weight: 600; color: var(--ck-text); white-space: nowrap; }
+        body.tool table.ck-tbl td .pn, body.tool table.ck-tbl td .ref { font: 400 12px var(--ck-mono); color: var(--ck-muted); }
+        body.tool table.ck-tbl td small { color: var(--ck-muted); font-size: 12px; }
+        /* critical-spare class: a word, coloured only when it asks for action */
+        body.tool .crit { font: 600 11px var(--ck-mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; color: var(--ck-muted); }
+        body.tool .crit.y { color: var(--ck-accent); }
+        body.tool .crit.m { color: var(--ck-text); }
+        body.tool .legend { display: flex; gap: .8rem; flex-wrap: wrap; margin: .2rem 0 1rem; font-size: 13px; color: var(--ck-muted); align-items: center; }
+        /* service record */
+        body.tool .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .8rem; margin-bottom: 1rem; }
+        body.tool .form-row label { display: block; margin-bottom: 4px; font-size: 13px; font-weight: 500; color: var(--ck-text); }
+        body.tool .form-row input, body.tool .form-row select { width: 100%; min-height: 40px; padding: .45rem .6rem; border: 1px solid var(--ck-border); border-radius: 4px; background: var(--ck-inset); color: var(--ck-text); font: 400 14px var(--ck-sans); }
+        body.tool .form-readings table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        body.tool .form-readings th, body.tool .form-readings td { padding: .5rem .6rem; border: 1px solid var(--ck-border); text-align: left; }
+        body.tool .form-readings th { font: 500 11px var(--ck-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--rzt-text-2); background: var(--ck-inset); }
+        body.tool .form-readings input { width: 100%; border: 0; background: transparent; color: var(--ck-text); font: 400 14px var(--ck-mono); }
+        /* exploded-view references */
+        body.tool .xv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .9rem; margin-top: .4rem; }
+        body.tool .xv-card { border: 1px solid var(--ck-border); border-radius: 4px; background: var(--ck-card); padding: 1rem 1.1rem; }
+        body.tool .xv-card h4 { font: 600 14px var(--ck-sans); color: var(--ck-text); margin: 0 0 .2rem; }
+        body.tool .xv-card .arch { font: 400 12px var(--ck-mono); color: var(--ck-muted); }
+        body.tool .xv-card p { font-size: 13px; color: var(--rzt-text-2); line-height: 1.55; margin: .5rem 0 .6rem; }
+        body.tool .xv-card .lnk { display: flex; flex-wrap: wrap; gap: .4rem; }
+        body.tool .xv-card .lnk a { font: 400 12px var(--ck-mono); padding: .28rem .55rem; border: 1px solid var(--ck-border); border-radius: 4px; color: var(--ck-muted); text-decoration: none; }
+        body.tool .xv-card .lnk a:hover { color: var(--ck-text); border-color: var(--rzt-line-strong); }
+        /* FMECA fault reference: risk is the RPN word's colour, never a rail */
+        body.tool .fm-grid { display: grid; gap: .6rem; margin-top: .4rem; }
+        body.tool .fm-card { border: 1px solid var(--ck-border); border-radius: 4px; background: var(--ck-card); overflow: hidden; }
+        body.tool .fm-card summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; padding: .7rem .95rem; font-size: 14px; }
+        body.tool .fm-card summary::-webkit-details-marker { display: none; }
+        body.tool .fm-card summary::before { content: '\25B8'; color: var(--ck-muted); font-size: .7rem; transition: transform var(--rz-dur-fast, .15s) var(--rz-ease-out, ease-out); }
+        body.tool .fm-card[open] summary::before { transform: rotate(90deg); }
+        body.tool .fm-id { font-family: var(--ck-mono); font-weight: 600; color: var(--ck-text); }
+        body.tool .fm-name { font-weight: 600; color: var(--ck-text); flex: 1; min-width: 140px; }
+        body.tool .fm-rpn { font: 600 12px var(--ck-mono); white-space: nowrap; color: var(--ck-muted); }
+        body.tool .fm-card.r-hi .fm-rpn { color: var(--ck-accent); }
+        body.tool .fm-card.r-md .fm-rpn { color: var(--ck-text); }
+        body.tool .fm-body { padding: .2rem .95rem 1rem; border-top: 1px solid var(--ck-border); font-size: 14px; }
+        body.tool .fm-row { display: grid; grid-template-columns: 110px 1fr; gap: .5rem; padding: .35rem 0; border-bottom: 1px solid var(--rzt-line-soft, var(--ck-border)); }
+        body.tool .fm-row:last-of-type { border-bottom: 0; }
+        body.tool .fm-k { font: 500 11px var(--ck-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--ck-muted); padding-top: 3px; }
+        body.tool .fm-sod { display: flex; gap: .8rem; margin-top: .6rem; font: 400 12px var(--ck-mono); color: var(--ck-muted); }
+        body.tool .fm-sod b { color: var(--ck-text); font-variant-numeric: tabular-nums slashed-zero; }
+        body.tool .fm-sod .fm-rpn-val { margin-left: auto; }
+        /* sourced charts (rz-article-chart.js) */
+        body.tool .rz-chart { margin: 1.6rem 0; }
+        body.tool .rz-chart-title { font: 600 14px/1.45 var(--ck-sans); color: var(--ck-text); margin-bottom: .7rem; }
+        body.tool .rz-chart-canvas { position: relative; height: 300px; }
+        body.tool .rz-chart-src { font: 400 12px/1.5 var(--ck-mono); color: var(--ck-muted); margin-top: .7rem; }
+        body.tool .rz-chart-chip { display: inline-block; font: 600 11px var(--ck-mono); letter-spacing: .04em; padding: 1px 6px; margin-right: 6px; border: 1px solid var(--ck-border); border-radius: 2px; color: var(--ck-muted); background: none; }
+        body.tool .ck-note { border: 1px solid var(--ck-border); border-radius: 4px; background: var(--ck-card); padding: 1rem 1.2rem; font-size: 14px; color: var(--rzt-text-2); line-height: 1.6; margin-top: 1.2rem; }
+        body.tool .ck-note b { color: var(--ck-text); }
+        @media (max-width: 600px) { body.tool .fm-row { grid-template-columns: 1fr; gap: .1rem; } }
         @media print {
-            body { background:#fff; color:#000; }
-            .ck-sec { padding:.8rem 0; border-color:#ccc; }
-            .form-card, .ck-list, .tbl-wrap { border-color:#999; }
-            a { color:#000; text-decoration:none; }
-            .ck-item input[type=checkbox]{ -webkit-appearance:none; appearance:none; border:1.5px solid #000; }
+            body.tool .form-card, body.tool .ck-list, body.tool .ck-tbl-wrap { border-color: #999; }
+            body.tool .ck-item input[type=checkbox] { -webkit-appearance: none; appearance: none; border: 1.5px solid #000; }
         }
-    /* dark counterparts for the darkened chip colors */
-[data-theme="dark"] .src.std{ color:#34d399; } [data-theme="dark"] .src.typ{ color:#fbbf24; } [data-theme="dark"] .src.ill{ color:#67e8f9; }
-[data-theme="dark"] .fm-card.r-hi .fm-rpn{ color:#f87171; } [data-theme="dark"] .fm-card.r-md .fm-rpn{ color:#fbbf24; }
-[data-theme="dark"] .cad.d{ color:#34d399; } [data-theme="dark"] .cad.w{ color:#67e8f9; } [data-theme="dark"] .cad.m{ color:#fbbf24; }
-[data-theme="dark"] .cad.q{ color:#67e8f9; } [data-theme="dark"] .cad.a{ color:#f87171; }
-[data-theme="dark"] .crit.y{ color:#f87171; } [data-theme="dark"] .crit.m{ color:#fbbf24; } [data-theme="dark"] .crit.n{ color:#9aa3af; }
-.ck-wrap p a, .lead a { text-decoration:underline; text-underline-offset:2px; }
-[data-theme="dark"] .btn-print{ color:#131418; }
-[data-theme="dark"] .btn-print.ghost{ color:var(--ck-accent); }
-:root:not([data-theme="dark"]) .btn-print{ background:var(--rz-accent-ui); color: var(--rz-on-accent-ui) !important; }
-
-/* sweep-cyan-register: the page accent, per theme */
-:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
-[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
-:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
-/* sweep-cyan-register: page tokens re-resolve inside dark panels */
-:root:not([data-theme="dark"]) [data-rz-dark-panel]{--ck-accent:var(--rz-accent-ui)}
 </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261107-7aaef8f4">
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="hub tool">
     <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
-                <li><a href="cdu-selection-guide.html" class="nav-link">CDU Guide</a></li>
-                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-            </ul>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
-
-    <header class="ck-hero"><div class="ck-wrap">
-        <span class="ck-kick">CDU Operations · Reference Document</span>
-        <h1>CDU Installation, Inspection &amp; Maintenance Checklist</h1>
-        <p>The companion document to the <a href="cdu-selection-guide.html" style="color:var(--ck-accent)">CDU Selection Guide</a>. Every operational parameter — flow, differential pressure, supply/return temperatures, system pressure, coolant chemistry, leak limits, dimensions and clearances — with installation and PM checklists, a symptom→action troubleshooting table, and printable fill-in forms for site sign-off.</p>
-        <div class="toc">
-            <a href="#params">Operational parameters</a>
-            <a href="#water">Water quality</a>
-            <a href="#commission">Commissioning (numeric)</a>
-            <a href="#install">Installation checklist</a>
-            <a href="#inspect">Inspection checklist</a>
-            <a href="#maint">Maintenance (PM)</a>
-            <a href="#spares">Spare-parts register</a>
-            <a href="#exploded">Exploded views (per type)</a>
-            <a href="#symptom">Symptom → action</a>
-            <a href="#fmeca">FMECA fault reference</a>
-            <a href="#form">Printable form</a>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
         </div>
-        <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-selection-guide.html">CDU Guide</a> → Checklist</div>
-    </div></header>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="nav-icon theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i class="fas fa-sun"></i></button>
+  </div>
+</nav>
 
-    <main id="main-content">
+<main id="main-content">
+
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow">CDU · <b>Checklist</b> · ASHRAE TC 9.9</p>
+    <h1>CDU installation, inspection and maintenance checklist <span class="muted">parameters, PM and fault reference</span></h1>
+    <p class="lede">The companion document to the <a href="cdu-selection-guide.html">CDU Selection Guide</a>. The operating parameters (flow, differential pressure, supply/return temperatures, system pressure, coolant chemistry, leak limits, dimensions and clearances), installation and PM checklists, a symptom→action troubleshooting table, and printable fill-in forms for site sign-off.</p>
+    <p class="basis">basis ASHRAE TC 9.9 W-classes · OCP cold-plate and quick-disconnect limits · IEC 60812 FMECA · reference limits, no engine · updated 2026-06</p>
+    <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-selection-guide.html">CDU Guide</a> → Checklist</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="tool-bar ck-jump" aria-label="On this page">
+    <span class="lbl">Jump to</span>
+    <a class="chip" href="#params">Parameters</a><a class="chip" href="#water">Water quality</a><a class="chip" href="#commission">Commissioning</a><a class="chip" href="#install">Installation</a><a class="chip" href="#inspect">Inspection</a><a class="chip" href="#maint">PM cadence</a><a class="chip" href="#spares">Spares</a><a class="chip" href="#exploded">Exploded views</a><a class="chip" href="#symptom">Troubleshooting</a><a class="chip" href="#fmeca">FMECA</a><a class="chip" href="#form">Service record</a>
+  </nav>
+</div>
+
+<div class="wrap ck-body">
+
 
     <!-- ───────── operational parameters ───────── -->
-    <section class="ck-sec" id="params"><div class="ck-wrap">
+    <section class="ck-sec" id="params">
         <h2><span class="n">01</span> Operational parameters &amp; standard limits</h2>
         <p class="lead">Target operating windows for a direct-to-chip CDU secondary (technology) loop. Use these as the acceptance band during commissioning and the alarm band during operation. Site values may differ per vendor data sheet and chip TDP — always confirm against the unit's manual and the IT hardware spec. To compute these targets (flow, ΔT, velocity, dP, approach, NPSH, dew-point) for your own load, use the <a href="cdu-calculator.html" style="color:var(--cdu-primary);font-weight:600;">CDU Calculator</a>.</p>
         <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl">
@@ -270,10 +206,10 @@
                 <tr><td>Footprint / clearance / weight</td><td class="p">per model (e.g. 2400×1200×1200 mm · ~1793 kg wet)</td><td>Service clearance front/rear per manual; floor loading checked for filled weight.</td></tr>
             </tbody>
         </table></div>
-    </div></section>
+    </section>
 
     <!-- ───────── water quality: acceptance criteria ───────── -->
-    <section class="ck-sec" id="water"><div class="ck-wrap">
+    <section class="ck-sec" id="water">
         <h2><span class="n">02</span> Water quality — acceptance criteria &amp; standard limits</h2>
         <p class="lead">The single biggest driver of cold-plate reliability is fluid chemistry. Two loops have <b>different</b> limits — the secondary <b>Technology Cooling System (TCS)</b> that touches the chips, and the primary <b>Facility Water System (FWS)</b> — because the fluids differ (inhibited PG25 glycol vs treated facility water). Use the table that matches your loop as the commissioning <b>acceptance criteria</b> and the operational monitoring band.</p>
         <div class="legend"><span class="src std">STANDARD</span> published code / spec figure &nbsp;·&nbsp; <span class="src typ">TYPICAL/VENDOR</span> typical or vendor range, not a fixed standard</div>
@@ -327,25 +263,25 @@
         <div class="ck-note">
             <b>Make-up / top-off water (OCP sub-spec).</b> <span class="src std">STANDARD</span> chloride &lt; 25 ppm · sulfate &lt; 25 ppm · Ca &lt; 25 ppm · Mg &lt; 25 ppm · total hardness &lt; 50 ppm CaCO₃ · &lt; 1 CFU/mL. Blend/dilution water benchmark: <b>ASTM D1193 Type II</b> (resistivity &gt; 1 MΩ·cm, ≈ &lt; 1 µS/cm). <b>Not over-stated:</b> TOC has <i>no</i> published numeric cold-plate limit (treat as <span class="src typ">TYPICAL/VENDOR</span>); the biostatic glycol % is a freeze/viscosity choice, not a fixed biocide standard.
         </div>
-    </div></section>
+    </section>
 
     <!-- ───────── installation & commissioning deep-dive ───────── -->
-    <section class="ck-sec" id="commission"><div class="ck-wrap">
+    <section class="ck-sec" id="commission">
         <h2><span class="n">03</span> Installation &amp; commissioning — numeric procedure</h2>
         <p class="lead">The numbers behind the §04 checklist ticks. Where a value is a published code/spec it is tagged <span class="src std">STANDARD</span>; where it is common engineering practice it is tagged <span class="src typ">TYPICAL/VENDOR</span> so you don't over-cite it in a design package.</p>
 
         <h3>Pressure test (hydrostatic)</h3>
         <ul class="ck-list">
-            <li class="ck-item"><input type="checkbox"><span class="txt">Hydrostatic test pressure = <b>1.5 × design pressure</b>, temperature-corrected P<sub>T</sub> = 1.5 × P<sub>D</sub> × (S<sub>T</sub>/S<sub>D</sub>).<span class="spec">STANDARD — ASME B31.3 / B31.1</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Hold ≥ 10 min</b> at test pressure before/while examining joints, then for the full inspection duration.<span class="spec">STANDARD — ASME B31.x minimum (a 4-hr hold is a TYPICAL/VENDOR DC practice)</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Acceptance = no leakage / no visible decay.</b> ASME does <i>not</i> set a "% drop over N hours" — any such figure is project/vendor.<span class="spec">pneumatic alt: B31.3 1.1× · B31.1 1.2×</span></span></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt">Hydrostatic test pressure = <b>1.5 × design pressure</b>, temperature-corrected P<sub>T</sub> = 1.5 × P<sub>D</sub> × (S<sub>T</sub>/S<sub>D</sub>).<span class="spec">STANDARD — ASME B31.3 / B31.1</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Hold ≥ 10 min</b> at test pressure before/while examining joints, then for the full inspection duration.<span class="spec">STANDARD — ASME B31.x minimum (a 4-hr hold is a TYPICAL/VENDOR DC practice)</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Acceptance = no leakage / no visible decay.</b> ASME does <i>not</i> set a "% drop over N hours" — any such figure is project/vendor.<span class="spec">pneumatic alt: B31.3 1.1× · B31.1 1.2×</span></span></label></li>
         </ul>
 
         <h3>Flush &amp; cleanliness</h3>
         <ul class="ck-list">
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Turbulent flush</b> — sustain <b>Re &gt; 4,000</b> (≈ 2–3 m/s) to scour debris before connecting cold plates.<span class="spec">STANDARD flushing convention · velocity TYPICAL</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Cleanliness target</b> by <b>ISO 4406</b> (&gt;4/&gt;6/&gt;14 µm code) or <b>NAS 1638</b>; sensitive loops aim ~<b>16/14/11</b> or better.<span class="spec">STANDARD frameworks · target TYPICAL</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Flush until clean</b> — common gate: conductivity stabilises &lt; ~5 µS/cm (DI loops); TCS in-loop turbidity &lt; 5 NTU (OCP fluid spec).<span class="spec">VENDOR gate · OCP turbidity STANDARD</span></span></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Turbulent flush</b> — sustain <b>Re &gt; 4,000</b> (≈ 2–3 m/s) to scour debris before connecting cold plates.<span class="spec">STANDARD flushing convention · velocity TYPICAL</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Cleanliness target</b> by <b>ISO 4406</b> (&gt;4/&gt;6/&gt;14 µm code) or <b>NAS 1638</b>; sensitive loops aim ~<b>16/14/11</b> or better.<span class="spec">STANDARD frameworks · target TYPICAL</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Flush until clean</b> — common gate: conductivity stabilises &lt; ~5 µS/cm (DI loops); TCS in-loop turbidity &lt; 5 NTU (OCP fluid spec).<span class="spec">VENDOR gate · OCP turbidity STANDARD</span></span></label></li>
         </ul>
 
         <h3>Filtration sizing</h3>
@@ -361,75 +297,75 @@
 
         <h3>Coolant &amp; flow</h3>
         <ul class="ck-list">
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>PG25 (25 vol% propylene glycol)</b> is the de-facto DTC grade (freeze ≈ −10 °C); practical band 20–35%.<span class="spec">PG25 STANDARD (OCP-listed) · band TYPICAL</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Design flow ≈ 1.5 LPM/kW at ~10 °C rise</b>; published band 1.25–2.0 LPM/kW (7.5–12 °C ΔT). Physics: Q = ṁ·c<sub>p</sub>·ΔT, c<sub>p</sub>(PG25) ≈ 3.9–4.0 kJ/kg·K.<span class="spec">STANDARD — OCP cold-plate design point</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>2-phase / refrigerant DLC fluids:</b> R-1233zd(E) (GWP 1, A1, boil ≈ 18 °C) · R-515B (GWP ≈ 293, A1) · R-1336mzz(Z).<span class="spec">vendor datasheet figures</span></span></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>PG25 (25 vol% propylene glycol)</b> is the de-facto DTC grade (freeze ≈ −10 °C); practical band 20–35%.<span class="spec">PG25 STANDARD (OCP-listed) · band TYPICAL</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Design flow ≈ 1.5 LPM/kW at ~10 °C rise</b>; published band 1.25–2.0 LPM/kW (7.5–12 °C ΔT). Physics: Q = ṁ·c<sub>p</sub>·ΔT, c<sub>p</sub>(PG25) ≈ 3.9–4.0 kJ/kg·K.<span class="spec">STANDARD — OCP cold-plate design point</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>2-phase / refrigerant DLC fluids:</b> R-1233zd(E) (GWP 1, A1, boil ≈ 18 °C) · R-515B (GWP ≈ 293, A1) · R-1336mzz(Z).<span class="spec">vendor datasheet figures</span></span></label></li>
         </ul>
 
         <h3>Quick-disconnects (QD) — OCP UQD / UQDB</h3>
         <ul class="ck-list">
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Match the QD standard</b> across the loop — no mixed couplers. UQD = hand-mate, drip-free, hot-pluggable; <b>UQDB = blind-mate</b> with ±1 mm radial tolerance for rack/manifold insertion.<span class="spec">STANDARD — OCP UQD/UQDB</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt">Sizes UQD02/04/06/08 · max working <b>100 psi (6.9 bar)</b> · min burst <b>300 psi (20.7 bar)</b> · op 17–65 °C · ≥ 5,000 mating cycles · dripless spillage ~0.02–0.07 mL/connect.<span class="spec">cross-checked vs Parker/CPC datasheets</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>No standardised coupler torque</b> (push-to-connect). Torque applies only to threaded fitting/manifold ports — per vendor.<span class="spec">TYPICAL/VENDOR</span></span></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Match the QD standard</b> across the loop — no mixed couplers. UQD = hand-mate, drip-free, hot-pluggable; <b>UQDB = blind-mate</b> with ±1 mm radial tolerance for rack/manifold insertion.<span class="spec">STANDARD — OCP UQD/UQDB</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt">Sizes UQD02/04/06/08 · max working <b>100 psi (6.9 bar)</b> · min burst <b>300 psi (20.7 bar)</b> · op 17–65 °C · ≥ 5,000 mating cycles · dripless spillage ~0.02–0.07 mL/connect.<span class="spec">cross-checked vs Parker/CPC datasheets</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>No standardised coupler torque</b> (push-to-connect). Torque applies only to threaded fitting/manifold ports — per vendor.<span class="spec">TYPICAL/VENDOR</span></span></label></li>
         </ul>
 
         <h3>Leak detection &amp; response</h3>
         <ul class="ck-list">
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Two sensing types:</b> rope/cable zone sensing (area coverage under floor / along runs) + point/spot sensors (CDU drains, QD manifolds, headers).<span class="spec">industry practice</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Response sequence:</b> detect → alarm to BMS/DCIM → isolate / auto-shutoff valves → contain. Guidance: OCP OAI Liquid Cooling Guidelines + ASHRAE TC 9.9 5th ed.<span class="spec">STANDARD guidance · timing figures TYPICAL</span></span></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Two sensing types:</b> rope/cable zone sensing (area coverage under floor / along runs) + point/spot sensors (CDU drains, QD manifolds, headers).<span class="spec">industry practice</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Response sequence:</b> detect → alarm to BMS/DCIM → isolate / auto-shutoff valves → contain. Guidance: OCP OAI Liquid Cooling Guidelines + ASHRAE TC 9.9 5th ed.<span class="spec">STANDARD guidance · timing figures TYPICAL</span></span></label></li>
         </ul>
-    </div></section>
+    </section>
 
     <!-- ───────── installation checklist ───────── -->
-    <section class="ck-sec" id="install"><div class="ck-wrap">
+    <section class="ck-sec" id="install">
         <h2><span class="n">04</span> Installation checklist</h2>
         <p class="lead">Phased from delivery to handover. Tick each item; the printable form (§06) captures readings + sign-off.</p>
         <h3>Site preparation</h3>
         <ul class="ck-list">
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Floor loading verified</b> for the CDU's <i>filled, operating</i> weight + service access.<span class="spec">confirm point load vs raised-floor / slab rating</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Service clearances</b> front/rear/sides per the unit manual.<span class="spec">e.g. ≥1 m service aisle; door swing + tube routing</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Facility water available</b> (L2L) with isolation valves, strainer, flow/temp at design point — or confirm <b>L2A</b> room-air budget.<span class="spec">CDW supply/return temp + flow per data sheet</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Dual power feeds</b> available (A/B), correct breaker rating + earthing.<span class="spec">N+1 PSU; verify voltage/phase</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>BMS / leak-detection</b> integration points identified (Modbus/BACnet/SNMP).</span></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Floor loading verified</b> for the CDU's <i>filled, operating</i> weight + service access.<span class="spec">confirm point load vs raised-floor / slab rating</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Service clearances</b> front/rear/sides per the unit manual.<span class="spec">e.g. ≥1 m service aisle; door swing + tube routing</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Facility water available</b> (L2L) with isolation valves, strainer, flow/temp at design point — or confirm <b>L2A</b> room-air budget.<span class="spec">CDW supply/return temp + flow per data sheet</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Dual power feeds</b> available (A/B), correct breaker rating + earthing.<span class="spec">N+1 PSU; verify voltage/phase</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>BMS / leak-detection</b> integration points identified (Modbus/BACnet/SNMP).</span></label></li>
         </ul>
         <h3>Mechanical install</h3>
         <ul class="ck-list">
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>CDU set + levelled</b>, anti-vibration mounts seated.</span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Primary &amp; secondary piping</b> connected; pipe spec/insulation per design; supports fitted.<span class="spec">no strain on CDU ports; correct DN size</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Manifolds + quick-disconnects</b> installed; QD standard matched (no mixed couplers).<span class="spec">verify drip-less QD type per vendor</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Leak-detection rope/sensors</b> routed at base, manifolds, QDs.</span></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>CDU set + levelled</b>, anti-vibration mounts seated.</span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Primary &amp; secondary piping</b> connected; pipe spec/insulation per design; supports fitted.<span class="spec">no strain on CDU ports; correct DN size</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Manifolds + quick-disconnects</b> installed; QD standard matched (no mixed couplers).<span class="spec">verify drip-less QD type per vendor</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Leak-detection rope/sensors</b> routed at base, manifolds, QDs.</span></label></li>
         </ul>
         <h3>Fill, flush &amp; commission</h3>
         <ul class="ck-list">
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Pressure test</b> primary + secondary to spec; hold + record (no decay).<span class="spec">test pressure + hold time per manual</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Flush</b> secondary loop to remove debris before connecting cold plates.<span class="spec">flush until clean / target turbidity</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Fill with correct coolant</b> (PG% / DI / dielectric) and de-air the loop.<span class="spec">record fluid type + concentration</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Set flow + dP + supply temp</b> to design; verify against rack heat load.</span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Leak-detection + alarm test</b>; confirm auto-isolation behaviour.</span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Redundancy test</b> — fail one pump / one PSU, confirm N+1 hold.</span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>BMS points verified</b> (flow, temps, dP, pressure, alarms reading correctly).</span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Handover pack</b> — as-built, fill record, commissioning sheet, O&amp;M manual filed.</span></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Pressure test</b> primary + secondary to spec; hold + record (no decay).<span class="spec">test pressure + hold time per manual</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Flush</b> secondary loop to remove debris before connecting cold plates.<span class="spec">flush until clean / target turbidity</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Fill with correct coolant</b> (PG% / DI / dielectric) and de-air the loop.<span class="spec">record fluid type + concentration</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Set flow + dP + supply temp</b> to design; verify against rack heat load.</span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Leak-detection + alarm test</b>; confirm auto-isolation behaviour.</span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Redundancy test</b> — fail one pump / one PSU, confirm N+1 hold.</span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>BMS points verified</b> (flow, temps, dP, pressure, alarms reading correctly).</span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Handover pack</b> — as-built, fill record, commissioning sheet, O&amp;M manual filed.</span></label></li>
         </ul>
-    </div></section>
+    </section>
 
     <!-- ───────── inspection checklist ───────── -->
-    <section class="ck-sec" id="inspect"><div class="ck-wrap">
+    <section class="ck-sec" id="inspect">
         <h2><span class="n">05</span> Routine inspection checklist</h2>
         <p class="lead">Walk-down checks. Anything outside the §01 band → log + see the symptom table (§05).</p>
         <ul class="ck-list">
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>No leak alarm</b>; visually dry at base, manifolds, QDs, HX, pump seals.<span class="spec">0 leaks · check for glycol residue / drips</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Flow</b> within band.<span class="spec">~1.0–1.5 LPM/kW</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Differential pressure</b> stable (no clog rise).<span class="spec">~0.5–3.0 bar</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Supply / return temps</b> + ΔT at target.<span class="spec">supply ~17–45 °C · ΔT ~8–12 °C</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>System pressure</b> in band; expansion / make-up healthy.<span class="spec">~2–6 bar</span></span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Pump status</b> — duty running, standby ready (N+1); no noise/vibration.</span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>Filter dP</b> within clean range; no clog warning.</span></li>
-            <li class="ck-item"><input type="checkbox"><span class="txt"><b>No alarms</b> on HMI; data quality live (not stale).</span></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>No leak alarm</b>; visually dry at base, manifolds, QDs, HX, pump seals.<span class="spec">0 leaks · check for glycol residue / drips</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Flow</b> within band.<span class="spec">~1.0–1.5 LPM/kW</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Differential pressure</b> stable (no clog rise).<span class="spec">~0.5–3.0 bar</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Supply / return temps</b> + ΔT at target.<span class="spec">supply ~17–45 °C · ΔT ~8–12 °C</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>System pressure</b> in band; expansion / make-up healthy.<span class="spec">~2–6 bar</span></span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Pump status</b> — duty running, standby ready (N+1); no noise/vibration.</span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>Filter dP</b> within clean range; no clog warning.</span></label></li>
+            <li class="ck-item"><label class="ck-label"><input type="checkbox"><span class="txt"><b>No alarms</b> on HMI; data quality live (not stale).</span></label></li>
         </ul>
-    </div></section>
+    </section>
 
     <!-- ───────── maintenance PM ───────── -->
-    <section class="ck-sec" id="maint"><div class="ck-wrap">
+    <section class="ck-sec" id="maint">
         <h2><span class="n">06</span> Preventive-maintenance (PM) checklist</h2>
         <p class="lead">PM tasks by cadence. <span class="cad d">DAILY</span> <span class="cad w">WEEKLY</span> <span class="cad m">MONTHLY</span> <span class="cad q">QUARTERLY</span> <span class="cad a">ANNUAL</span>. Intervals are a baseline — follow the vendor PM schedule and adjust to fluid-sample results. The <b>Parts / consumable</b> column points to the line in <a href="#spares" style="color:var(--cdu-primary);font-weight:600;">§07 — Spare-parts register</a> with part reference, critical-spare class and cost band.</p>
         <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl">
@@ -459,13 +395,13 @@
         <figure class="rz-chart" data-rz-chart>
             <div class="rz-chart-canvas"><canvas></canvas></div>
             <script type="application/json" class="rz-chart-cfg">
-{"type":"bar","title":"Most CDU preventive-maintenance load sits at the quarterly interval","x":"Cadence","labels":["Daily","Weekly","Monthly","Quarterly","Annual"],"series":[{"label":"PM tasks","data":[3,4,5,17,9],"accent":"info"}],"y":"Tasks","source":"cdu-checklist.html §06 PM checklist (38 tasks) · data/cdu/chart-pm-cadence.csv","basisTag":"derived"}
+{"type":"bar","title":"Most CDU preventive-maintenance load sits at the quarterly interval","x":"Cadence","labels":["Daily","Weekly","Monthly","Quarterly","Annual"],"series":[{"label":"PM tasks","data":[3,4,5,17,9],"colors":["#c98a00","#c98a00","#c98a00","#c98a00","#c98a00"]}],"y":"Tasks","source":"cdu-checklist.html §06 PM checklist (38 tasks) · data/cdu/chart-pm-cadence.csv","basisTag":"derived"}
             </script>
         </figure>
-    </div></section>
+    </section>
 
     <!-- ───────── spare-parts & consumables register ───────── -->
-    <section class="ck-sec" id="spares"><div class="ck-wrap">
+    <section class="ck-sec" id="spares">
         <h2><span class="n">07</span> Spare-parts &amp; consumables register</h2>
         <p class="lead">Every PM line that consumes a part maps to a row here: <b>what to replace</b>, the <b>acceptance / replace-when trigger</b>, the <b>interval</b>, a <b>part reference / spec</b> (commodity manufacturer family or OEM service-part class — exact OEM part numbers are proprietary and obtained from the unit's IPB, see <a href="#exploded" style="color:var(--cdu-primary);font-weight:600;">§08</a>), a <b>critical-spare class</b>, and an <b>estimated unit-cost band</b>. <span class="crit y">CRITICAL</span> = hold on site (failure stops cooling). <span class="crit m">RECOMMENDED</span> = short-lead consumable. <span class="crit n">ON-DEMAND</span> = order when condition-flagged.</p>
         <div class="legend">
@@ -496,7 +432,7 @@
         <div class="ck-note"><b>Stocking logic.</b> Hold every <span class="crit y">CRITICAL</span> item on site (a clogged filter, failed QD, weeping seal or dead leak-rope can stop cooling or trip the rack). Keep a charge-fraction of <b>PG25</b>, one <b>seal kit</b> and one <b>spare pump</b> per fleet as <span class="crit m">RECOMMENDED</span>. Cost bands are <span class="src ill">EST</span> illustrative market ranges for budgeting — confirm against your OEM service-parts quote and the unit's IPB before purchase.</div>
 
         <h3>Spares planning — stock levels, service life &amp; annual budget</h3>
-        <p class="lead">The register turned into a stocking plan: <b>min stock to hold on site</b>, <b>typical service life</b> (how often the part actually needs replacing, not just inspecting), <b>lead time</b> (which is what really forces you to stock a critical item), and an <b>estimated annual spend per CDU</b>. Quantities assume one CDU; <span class="crit m">RECOMMENDED</span>/fleet items are shared across the fleet.</p>
+        <p class="lead">The register turned into a stocking plan: <b>min stock to hold on site</b>, <b>typical service life</b> (how often the part is replaced, as opposed to inspected), <b>lead time</b> (which is what really forces you to stock a critical item), and an <b>estimated annual spend per CDU</b>. Quantities assume one CDU; <span class="crit m">RECOMMENDED</span>/fleet items are shared across the fleet.</p>
         <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl">
             <thead><tr><th>Item</th><th>Min stock (per CDU)</th><th>Typical service life</th><th>Lead time</th><th>Annual spend / CDU (EST)</th></tr></thead>
             <tbody>
@@ -516,13 +452,13 @@
         <figure class="rz-chart" data-rz-chart>
             <div class="rz-chart-canvas"><canvas></canvas></div>
             <script type="application/json" class="rz-chart-cfg">
-{"type":"bar","title":"The leak-detection controller is the costliest critical spare to stock on-site","x":"Spare item","labels":["Filter element","Dry-break QD","EPDM gasket kit","Leak-rope controller","Pump seal kit","Flow sensor","dP transmitter"],"series":[{"label":"Est. unit cost (USD, band midpoint)","data":[72,110,95,600,240,375,285],"colors":["#ef4444","#ef4444","#ef4444","#ef4444","#f59e0b","#f59e0b","#f59e0b"]}],"y":"USD (band midpoint)","source":"cdu-checklist.html §07 spare-parts register EST cost bands · data/cdu/chart-spares-cost-criticality.csv. Red = CRITICAL (hold on site), amber = RECOMMENDED.","basisTag":"illustrative"}
+{"type":"bar","title":"The leak-detection controller is the costliest critical spare to stock on-site","x":"Spare item","labels":["Filter element","Dry-break QD","EPDM gasket kit","Leak-rope controller","Pump seal kit","Flow sensor","dP transmitter"],"series":[{"label":"Est. unit cost (USD, band midpoint)","data":[72,110,95,600,240,375,285],"colors":["#c98a00","#c98a00","#c98a00","#c98a00","#8a8f98","#8a8f98","#8a8f98"]}],"y":"USD (band midpoint)","source":"cdu-checklist.html §07 spare-parts register EST cost bands · data/cdu/chart-spares-cost-criticality.csv. Amber = CRITICAL (hold on site), grey = RECOMMENDED.","basisTag":"illustrative"}
             </script>
         </figure>
-    </div></section>
+    </section>
 
     <!-- ───────── exploded-view / IPB resources per type ───────── -->
-    <section class="ck-sec" id="exploded"><div class="ck-wrap">
+    <section class="ck-sec" id="exploded">
         <h2><span class="n">08</span> Exploded-view &amp; IPB resources — per CDU type</h2>
         <p class="lead">Exact service-part numbers live in each unit's <b>Illustrated Parts Breakdown (IPB)</b> / service manual — request it from the OEM for your model (it is not public for most CDUs). Below, per CDU type, are the representative manufacturers and where to obtain the exploded-view / parts documentation. Match your unit to a row in the <a href="cdu-comparison.html" style="color:var(--cdu-primary);font-weight:600;">CDU comparison</a> to find its OEM, then pull that OEM's manual.</p>
         <div class="xv-grid">
@@ -533,10 +469,10 @@
             <div class="xv-card"><h4>L2A · Air-cooled</h4><span class="arch">L2A · room-air reject</span><p>Liquid-to-air unit — no facility water. Exploded views add the air-side reject coil, fans &amp; air filter to the standard liquid pack.</p><div class="lnk"><a href="https://www.zutacore.com/" target="_blank" rel="noopener">ZutaCore</a><a href="https://www.nvent.com/" target="_blank" rel="noopener">nVent</a><a href="cdu-comparison.html">compare models →</a></div></div>
         </div>
         <div class="ck-note">External links open the manufacturer's site — navigate to <b>Support / Documentation</b> and request the service manual or IPB for your exact model. These pages may block automated access but open normally in a browser.</div>
-    </div></section>
+    </section>
 
     <!-- ───────── symptom table ───────── -->
-    <section class="ck-sec" id="symptom"><div class="ck-wrap">
+    <section class="ck-sec" id="symptom">
         <h2><span class="n">09</span> Symptom → cause → action</h2>
         <p class="lead">Troubleshooting reference. On any active symptom: protect the IT load first (the CDU's N+1 / isolation logic), then diagnose.</p>
         <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl">
@@ -560,11 +496,11 @@
                 <tr><td class="sym">System over-pressure</td><td>Thermal expansion with closed expansion path; PSV not relieving</td><td>Verify expansion/relief path open; check PT vs component PN</td><td>Restore expansion control; test/replace PSV; re-set fill pressure</td></tr>
             </tbody>
         </table></div>
-    </div></section>
+    </section>
 
     <!-- ───────── printable form ───────── -->
     <!-- ───────── FMECA fault reference ───────── -->
-    <section class="ck-sec" id="fmeca"><div class="ck-wrap">
+    <section class="ck-sec" id="fmeca">
         <h2><span class="n">10</span> FMECA fault reference — liquid cooling (F11.x)</h2>
         <p class="lead">The five direct-to-chip liquid-cooling fault modes from the site's
             <a href="ai-engineering-maintenance.html#sec-knowledge-base" style="color:var(--cdu-primary);font-weight:600;">FMECA knowledge graph</a>,
@@ -642,13 +578,13 @@
         <figure class="rz-chart" data-rz-chart>
             <div class="rz-chart-canvas"><canvas></canvas></div>
             <script type="application/json" class="rz-chart-cfg">
-{"type":"bar","title":"By RPN, coolant chemistry drift (F11.1) is the top liquid-cooling risk — but pump failure (F11.2) is the most severe","x":"FMECA fault mode","labels":["F11.1 chemistry","F11.4 fluid","F11.3 leak","F11.2 pump","F11.5 filter"],"series":[{"label":"RPN (Severity × Occurrence × Detectability)","data":[140,120,108,60,60],"colors":["#ef4444","#ef4444","#f59e0b","#10b981","#10b981"]}],"y":"RPN","source":"FMECA-KG docs/research/csv/sod_rpn.csv (Lin & Ompusunggu 2026; ASME/Vertiv/OCP/3M) · data/cdu/chart-fmeca-rpn.csv. RPN per IEC 60812; note F11.2 severity=10 (catastrophic) is understated by RPN.","basisTag":"derived"}
+{"type":"bar","title":"By RPN, coolant chemistry drift (F11.1) is the top liquid-cooling risk — but pump failure (F11.2) is the most severe","x":"FMECA fault mode","labels":["F11.1 chemistry","F11.4 fluid","F11.3 leak","F11.2 pump","F11.5 filter"],"series":[{"label":"RPN (Severity × Occurrence × Detectability)","data":[140,120,108,60,60],"colors":["#c98a00","#c98a00","#8a8f98","#b3b7bd","#b3b7bd"]}],"y":"RPN","source":"FMECA-KG docs/research/csv/sod_rpn.csv (Lin & Ompusunggu 2026; ASME/Vertiv/OCP/3M) · data/cdu/chart-fmeca-rpn.csv. RPN per IEC 60812; note F11.2 severity=10 (catastrophic) is understated by RPN.","basisTag":"derived"}
             </script>
         </figure>
         <div class="ck-note"><b>Source.</b> FMECA-KG seed (Lin &amp; Ompusunggu 2026 synthesis; per-fault: ASME J.Electron.Packag. 140 020902 · Vertiv · OCP · 3M) at <code>docs/research/csv/</code>. S·O·D + RPN per IEC 60812; confidence tiers (HIGH / MEDIUM / THIN) reflect data provenance — vendor MTBF is often confidential. Full knowledge base + ML advisory concept: <a href="ai-engineering-maintenance.html#sec-knowledge-base" style="color:var(--cdu-primary);font-weight:600;">AI Engineering Maintenance</a>.</div>
-    </div></section>
+    </section>
 
-    <section class="ck-sec" id="form"><div class="ck-wrap">
+    <section class="ck-sec" id="form">
         <h2><span class="n">11</span> CDU service record — printable form</h2>
         <p class="lead">Fill on-screen and <b>Print / Save as PDF</b>. Captures site identity, readings against the §01 band, checklist pass/fail, and sign-off. Stored on the RZ site as the standard CDU service-record form.</p>
         <div class="form-card">
@@ -675,43 +611,68 @@
                     <tr><td>Pump N+1 (duty/standby)</td><td>both healthy</td><td><input type="text" aria-label="Service record entry"></td><td><input type="text" aria-label="Service record entry" placeholder="P/F"></td></tr>
                 </tbody>
             </table></div>
-            <div class="form-row" style="margin-top:1rem;">
+            <div class="form-row" style="margin-top:1rem">
                 <div><label>Faults found / actions taken</label><input type="text" aria-label="Service record entry" placeholder="free text"></div>
                 <div><label>Next service due</label><input type="date" aria-label="Service date"></div>
                 <div><label>Technician signature</label><input type="text" aria-label="Service record entry" placeholder="Sign"></div>
                 <div><label>Reviewed by</label><input type="text" aria-label="Service record entry" placeholder="Supervisor"></div>
             </div>
-            <div class="form-actions">
-                <button class="btn-print" id="ckExportTrig" type="button">Export PDF&nbsp;&mdash; choose sections</button>
-                <button class="btn-print ghost" onclick="document.querySelectorAll('.form-card input').forEach(function(i){if(i.type!=='date')i.value='';});">Clear form</button>
+            <div class="ck-actions">
+                <button class="tool-btn is-primary btn-print" id="ckExportTrig" type="button">Export PDF&nbsp;&mdash; choose sections</button>
+                <button class="tool-btn btn-print ghost" type="button" onclick="document.querySelectorAll('.form-card input').forEach(function(i){if(i.type!=='date')i.value='';});">Clear form</button>
             </div>
         </div>
         <div class="ck-note">
             <b>Disclaimer.</b> Independent educational reference built from publicly available vendor pages and ASHRAE TC 9.9 / OCP guidance. Parameter bands are generic baselines — confirm exact limits, fluid spec, torque/pressure values and PM intervals against the specific CDU's manufacturer manual and your IT hardware spec. Not procurement, safety, or engineering advice; validate with the vendor and a qualified mechanical engineer.
         </div>
-    </div></section>
+    </section>
 
-    </main>
+</div>
 
-    <footer class="footer footer-enhanced">
-        <div class="container"><div class="footer-grid">
-            <div class="footer-brand"><p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p><p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p><p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p></div>
-            <div class="footer-nav"><h4 class="footer-heading">NAVIGATION</h4><ul class="footer-links"><li><a href="datacenter-solutions.html">DC Solutions</a></li><li><a href="cdu-selection-guide.html">CDU Selection Guide</a></li><li><a href="cdu-mini-bms.html">CDU Mini-BMS</a></li><li><a href="cdu-comparison.html">CDU Deep Comparison</a></li></ul></div>
-            <div class="footer-connect"><h4 class="footer-heading">CONNECT</h4><ul class="footer-links"><li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li><li><a href="articles.html">Technical Journal</a></li><li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li></ul></div>
-        </div></div>
-    </footer>
+<section class="tool-ref" aria-labelledby="ref-h">
+  <div class="wrap">
+    <p class="eyebrow" id="ref-h">12 / Reference</p>
+    <div class="ref-grid">
+      <div>
+        <h3>Method</h3>
+        <ul class="formulas">
+          <li><span>Hydrostatic test</span><code>P_T = 1.5 · P_D · (S_T / S_D)</code></li>
+          <li><span>Risk priority</span><code>RPN = S · O · D (IEC 60812)</code></li>
+          <li><span>W-class</span><code>class number = max facility supply °C</code></li>
+          <li><span>Ticks</span><code>on screen only; not carried into the export</code></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Computed against</h3>
+        <p class="against"><span>ASHRAE TC 9.9</span><span>OCP</span><span>ASME B31</span><span>IEC 60812</span></p>
+        <h3>Read further</h3>
+        <p class="links"><a href="manual/cdu-hub.html">CDU toolkit manual and methodology</a><a href="cdu-hub.html">CDU toolkit</a><a href="cdu-selection-guide.html">CDU selection guide</a><a href="cdu-calculator.html">CDU calculator</a><a href="cdu-mini-bms.html">CDU mini-BMS</a></p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <script>
-    (function(){
-        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('theme')||'light';
-        document.documentElement.setAttribute('data-theme',theme);
-        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('theme',n); });
-        var hamburger=document.querySelector('.hamburger'), navMenu=document.querySelector('.nav-menu');
-        if(hamburger&&navMenu) hamburger.addEventListener('click',function(){ hamburger.classList.toggle('active'); navMenu.classList.toggle('active'); hamburger.setAttribute('aria-expanded',navMenu.classList.contains('active')); });
-        var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
-        document.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener('click',function(e){ var t=document.querySelector(this.getAttribute('href')); if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});} }); });
-    })();
-    </script>
+</main>
+
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  function paint(){var d=document.documentElement.getAttribute('data-theme')==='dark';var i=t&&t.querySelector('i');if(i)i.className=d?'fas fa-sun':'fas fa-moon';var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'#0b0c0e':'#F5F7FA');}
+  if(t){t.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';var n=d?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(e){}paint();});paint();}
+  var s=document.getElementById('navSearchBtn');if(s)s.addEventListener('click',function(){if(window.__rzPalette&&window.__rzPalette.open)window.__rzPalette.open();});
+})();
+</script>
     <script src="auth.js?v=20261031-f01cb5a3" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
     <script src="js/rz-article-chart.js?v=20261031-ce40639f" defer></script>
@@ -724,7 +685,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
     <script src="js/rz-pdf-export.js?v=20260920-c653942f" defer></script>
     <script src="js/rz-design-studio.js?v=20260920-6a4d3c17" defer></script>
-    <script src="js/rz-manual-fab.js?v=20261101-1ada3636" defer></script>
 
 <script>
 /* ============================================================================
@@ -744,7 +704,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       id:'cdu-checklist-export', triggerId:'ckExportTrig',
       title:'CDU Checklist',
       subtitle:'Installation, inspection and maintenance \u2014 liquid-cooling coolant distribution units',
-      accent:'#0ea5e9', sectionSelector:'section.ck-sec',
+      accent:'#b45309', sectionSelector:'section.ck-sec',
       provenance:'Sections are read from this page at export time. The checklist states reference limits from published standards; it performs no calculation, so no value here is engine-derived.',
       snapshot:function(){ return {
         'Basis':'ASHRAE facility-water classes, OCP UQD/UQDB quick-disconnect limits, and the page\u2019s own stated acceptance criteria',
