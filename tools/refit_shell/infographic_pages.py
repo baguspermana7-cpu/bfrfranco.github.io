@@ -105,3 +105,39 @@ CONFIG = {
     'infographic-pue-global.html': {'key': 'ig-pue', 'main': pue_main,
                                     'scripts': lambda src: PUE_SCRIPT + '\n' + auth_only(src)},
 }
+
+# ---------------------------------------------------------------- infographic-dc-cost-breakdown
+
+def cost_main(src):
+    src = copy(src, [('Code compliance varies significantly by jurisdiction', 'Code requirements vary by jurisdiction')])
+    segs = re.findall(r"\{ name: '([^']+)', pct: (\d+), cost: '([^']+)', color: '[^']+', detail: '((?:[^'\\]|\\.)*)' \}", src)
+    assert len(segs) == 8 and sum(int(x[1]) for x in segs) == 100, segs
+    mx = max(int(x[1]) for x in segs)
+    seg_rows = [(n, '<span class="num">%s %%</span>' % pc, '<span class="num">%s</span>' % c,
+                 '<span class="ig-bar" style="--w:%d%%" aria-hidden="true"></span>' % round(int(pc) * 100 / mx), d.replace("\\'", "'"))
+                for n, pc, c, d in segs]
+    tiers = re.findall(r'<div class="ig-tier-label">(.*?)</div>\s*<div class="ig-tier-multiplier">(.*?)</div>\s*<div class="ig-tier-cost">(.*?)</div>\s*<ul class="ig-tier-features">(.*?)</ul>', src, flags=re.S)
+    assert len(tiers) == 3, tiers
+    tier_rows = [(t, '<span class="num">%s</span>' % m, '<span class="num">%s</span>' % c, ' · '.join(re.findall(r'<li>(.*?)</li>', f))) for t, m, c, f in tiers]
+    fx = re.findall(r'<div class="ig-fact-title">(.*?)</div>\s*<div class="ig-fact-text">(.*?)</div>', src, flags=re.S)
+    assert len(fx) == 3, fx
+    body = '\n'.join([
+        ex.section(1, 'breakdown', 'Where the money goes', ex.table(['Category', 'Share', 'Of $10M', 'Relative to the largest', 'What it covers'], seg_rows, cls='ig-cost'),
+                   lead='A $10M reference build split by category; the shares add to 100 %.'),
+        ex.section(2, 'tiers', 'Tier cost multipliers', ex.table(['Tier', 'Multiplier', 'Build cost', 'What it buys'], tier_rows, cls='ig-tiers'),
+                   lead='Redundancy scales the same build: multipliers on a $10M Tier II build.'),
+        ex.section(3, 'facts', 'Cost facts', '\n'.join('  <div class="ex-prose"><h3>%s</h3>\n    <p>%s</p>\n  </div>' % (t, ex.clean(x)) for t, x in fx)),
+        ex.section(4, 'references', 'References', refs(src)),
+    ])
+    return '<main id="main-content">\n' + ex.tool_head(
+        'Cost · <b>Infographic</b> · CAPEX',
+        'Data-centre build cost by category <span class="muted">where $10M goes, and what each tier adds</span>',
+        'Mechanical and cooling is the largest share of a build, ahead of electrical. The split of a $10M reference build, the tier multipliers and the cost facts behind them.',
+        'basis published industry cost ranges (references below) · Uptime Institute tier availability · reference figures, no engine runs on this page',
+        CRUMB + 'Build cost by category') + '\n<div class="wrap ck-body">' + body + '\n</div>\n' + ex.reference(
+            5, [('capex-calculator.html', 'CAPEX calculator'), ('tco-calculator.html', 'TCO calculator'), ('compare-tier-3-vs-tier-4.html', 'Tier III vs Tier IV')],
+            notice='Independent personal research from public sources; it does not represent any current or former employer. '
+                   '<a href="terms.html">Terms and disclaimer</a>.') + '\n</main>'
+
+
+CONFIG['infographic-dc-cost-breakdown.html'] = {'key': 'ig-cost', 'main': cost_main, 'scripts': auth_only}
