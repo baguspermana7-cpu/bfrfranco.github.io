@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.28.1 — 2026-11-08 — "LTC lab: charts that fit a phone, reports on one register"
+
+### Changed
+- **ltc-system-modelling-lab.html — settings sit under the step they shape**: Load 8, Capture 6, Loop 7, Rejection 9, Cost 5, Check 2. Design settings are in view; preset and tuning settings sit behind "More · n". The inputs are moved, not cloned, so ids, listeners, tier chips and `screening only` marks keep working; the old "Advanced · auto" panel keeps only calibration, guardrails and run settings.
+- **Report compare card states its verdict per row** (better / worse / same; `scale` for extensive figures when the IT load differs) and refuses to compare a plant run with a screening run.
+- **Pareto scatter** is drawn at its panel's width (redrawn on resize), so on a phone it no longer scrolls sideways inside a 360 px min-width svg with 8 px text; its legend is an HTML row under the chart (it sat off-screen at 390 px); status lines read "1 point, 1 feasible · select a point or row" instead of `points=1 | feasible=1 | ...`.
+- **Legacy audit-table reports (single, compare) on the lab register**: 95 navy, slate, blue, teal, green and pink literals became greys of the same luminance; series take three distinct greys; the heatmap key reads "Grey >= 85".
+- The Glossary nav link is no longer inline teal.
+
+### Fixed
+- **Pareto scatter with one point** repeated its axis tick ($24.89M ×6); a degenerate span is centred in ±1 % of the value.
+
+### Gates
+- `tools/test-ltc-lab-steps.mjs` laws S29–S35 (distinct ticks, compare verdicts, nav hue, settings under their step, readable legend, scatter fits a phone, legacy report register), each proven red on the previous tree.
+
 ## v3.28.0 — 2026-11-08 — "Cx Analysis 3D: machines with shapes, drawn like an isometric"
 
 ### Added
