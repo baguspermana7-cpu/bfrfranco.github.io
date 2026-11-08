@@ -297,11 +297,11 @@
       div.style.cssText = [
         'background:rgba(25,27,32,0.88)',
         'border:1px solid rgba(96,165,250,0.25)',
-        'border-radius:8px',
+        'border-radius:4px',
         'padding:10px 12px',
         'color:#f1f5f9',
         'min-width:280px',
-        'box-shadow:0 4px 12px rgba(0,0,0,0.4)'
+        'box-shadow:none',
       ].join(';');
 
       var title = document.createElement('div');
@@ -389,14 +389,14 @@
         'align-items:center',
         'gap:6px',
         'padding:6px 12px',
-        'border-radius:6px',
+        'border-radius:4px',
         'border:1px solid rgba(96,165,250,0.3)',
         'background:rgba(25,27,32,0.85)',
         'color:#cbd5e1',
         'font:600 11px/1.1 Inter,system-ui,sans-serif',
         'letter-spacing:0.04em',
         'cursor:pointer',
-        'box-shadow:0 2px 6px rgba(0,0,0,0.4)',
+        'box-shadow:none',
         'user-select:none'
       ].join(';');
       btn.setAttribute('aria-label', 'Toggle carbon-intensity gradient overlay');
@@ -1253,7 +1253,7 @@
     barRow.style.cssText = [
       'display:flex',
       'height:' + barH + 'px',
-      'border-radius:6px',
+      'border-radius:4px',
       'overflow:hidden'
     ].join(';');
 

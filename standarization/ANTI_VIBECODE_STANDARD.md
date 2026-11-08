@@ -41,9 +41,15 @@ file/rule findings across 172 files despite exit 0**.
   one line; generated reports (the legacy audit tables) use the same register (S35 fails any colour with
   chroma > 0.12 outside the amber and red bands) and draw no tiles (S36: no SVG rect with rx > 4,
   no boxed element rounded > 4 px, no tinted wash; a state is a coloured word, not a coloured box).
-- **Render slop scan (v3.27.0):** `tools/audit-slop-render.mjs` computes the tells from the rendered DOM in
-  both themes (rails, pills, radii, blur, gradients) per page. It is wired into `tools/ship-gate.sh` and
-  reports only until a baseline is recorded; it does not replace this document's strict gate.
+- **Render slop scan (v3.27.0, widened v3.30.0):** `tools/audit-slop-render.mjs` computes the tells from the
+  rendered DOM per page, in light AND dark (`--themes light,dark` is the default): rail, pill, round, blur, lift,
+  grad, plus from v3.30.0 gtext (§A27), tall (`transition: all`, §A23), shadow (§A11), serif (§A34), navy (§A33),
+  marquee (§A30), tiles (§A28) and emoji (§A5). The v3.27.0 version read dark only and six tells, and passed
+  index.html while it carried 80 of them (PRD §41 K19) — a tell the instrument cannot see is a tell the owner
+  finds. It is wired into `tools/ship-gate.sh` (report only until the whole tree reads 0, then `--strict`, which
+  exits 1 on any tell in either theme); it does not replace this document's strict gate. Page-local sweeps:
+  `tools/sweep-journal-register.py` (R1–R18, the journal family) and `tools/sweep-page-register.py` (P1–P7, any
+  named page, by value not by token); both are idempotent and `--check`able.
 - **A gradient hides a contrast failure (v3.27.0):** axe cannot measure text over a gradient and files it
   as "incomplete", so the gate stays green. Flattening the glossary hero (a slop fix) exposed light-theme
   navbar links at 2.27:1. When a gradient or image background becomes a flat colour, run

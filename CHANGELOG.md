@@ -11,6 +11,59 @@ release sections rather than semver.
 
 ---
 
+## v3.30.0 — 2026-11-08 — "The homepage and the journal on the register; the render scan reads both themes"
+
+Owner, 2026-11-08 (PRD §41 K19): *"pasti ada, saya nggak mau, sempurnakan, saya tidak mau ada yang miss"* — a slop claim
+is checked on the rendered page, every page, both themes, not on the source of the pages someone complained about.
+
+### Changed
+- **`index.html` on the site register.** `styles-index.css` loses 98 decorative rules and 22 keyframe sets (aurora
+  orbs, floating shapes, particles, cursor spotlight/custom cursor/ripple/trail, glitch, keyword ticker, gradient
+  backdrop, gradient borders, hover lifts, flow-line dividers); gradients flat, resting shadows off, radius 4 px,
+  `transition: all` → named properties, navy → graphite, the blue/violet/emerald second hues → one amber accent
+  (`#92400e` light / `#E8B563` dark) with AA greys. Metric tiles and the operational-excellence cards render as
+  fact lists (`data-rz-fact-list`), one fact per row. Fraunces dropped from the identity block and the font preload.
+  Measured with the render scan: 165 (dark) / 155 (light) tells → 0 / 0.
+- **Journal family (41 pages, `tools/sweep-journal-register.py`)** gains four rules — R14 radius > 4 px, R15 gradient
+  surface → panel, R16 resting shadow / text-shadow, R17 side rail ≥ 2 px → 1 px hairline — 1,918 rewrites on 38
+  pages (incl. `pillar-fire-safety.html`, agreed with the LTC session). Callout, comparison, maturity, framework,
+  benchmark, priority, climate and score grids read as fact rows; emoji icons removed from eight articles.
+- **PLN Java-Bali monitors (6 pages), achievements, ASEAN report, `id/index.html`, `cdu-calculator`**: new
+  `tools/sweep-page-register.py` (P1–P7, rewrites by value, comment-safe) — 374 rewrites; KPI strips render as fact
+  rows; the circle close buttons are 4 px; the hero's second clause is muted, not amber; `js/pln-tooltip.js` and
+  `js/pln-energy-dashboard.js` panels on the register.
+- **`tools/audit-slop-render.mjs`** reads both themes and 14 computed tells (rail, pill, round, blur, lift, gradient,
+  gradient text, transition-all, resting shadow, serif display, navy surface, marquee, stat tiles, emoji), `--pages`,
+  `--json`, `--strict`; the ship-gate line runs it on light AND dark with a 2,400 s budget.
+- `standarization/ANTI_VIBECODE_STANDARD.md`: the render-scan paragraph rewritten for the 14 tells and the two sweep
+  tools.
+
+### Fixed
+- Five articles' PDF builders (`article-3/4/7/9/13`) were broken for one commit of this branch: a CSS block appended
+  "to the last `</style>`" had landed inside the print template's JS string (`Invalid or unexpected token`). Moved to
+  the page's last real `<style>`; `audit-js-syntax --strict` CLEAN, every inline script parses.
+- Index light-theme contrast: 35 axe `serious` findings exposed by flattening the gradients (tags, badges, the
+  disclaimer, footer headings and copyright, `.bento-more-desc`) → AA.
+- `pln-java-grid-historical`: a 14 px inline radius; `article-13`: `#64748b` body text → `#5c6470`.
+
+- Also in this release: journal R18 (hover lift → none, 47 rewrites on 25 pages); `id/artikel.html` swept (17);
+  the 27 network explainers and `network-compare` lose the "❚❚ Pause" / "▶ Play" glyphs; `rz-gamification.js`'s
+  toast drops its 2 px rail and ✨ icon; `article-13` company badges are one neutral chip (five brand colours were
+  also a light-theme contrast failure); `cdu-comparison` / `cdu-selection-guide` tables drop their min-widths and
+  nowrap under 600 px (LTC's phone-fit law). The scanner exempts a rail or pill ONLY when the element itself carries
+  a state class (`ok|warn|fault|alarm|trip|run|stop|state-*`) — proven on the unfixed tree (ict.html 10 → 0 state
+  rails exempt, water-system's plain `.pump-unit` rail still reported).
+
+### Proof
+- Render scan, both themes, on the rebased tree (41381effb + this work): whole sitemap 215 pages × 2 themes →
+  205 pages read 0 on all 14 tells; the 10 remaining (tools.html, manual/datahallai, ict, EPMS_Telemetry,
+  water/fire/fuel-system, dc-conventional, datahallAI, cdu-mini-bms) are the LTC session's and are in its next
+  release, so `--strict` stays off until then. Index 165/155 → 0/0.
+- Screenshots at 1440 and 390, both themes, six viewport stops with a slow scroll, looked at: index, article-1/3/4/5/
+  9-paper/13/16, ASEAN report, PLN Jabar and historical, cdu-calculator, id/artikel, the CDU tables at 390;
+  `pageerror` 0 on every page. `audit-a11y --strict` 8 pages × 2 themes: 0 critical/serious. `test-journal.mjs`
+  PASS (137 assertions, 40 pages).
+
 ## v3.29.1 — 2026-11-08 — "Hub pages on one shell: CDU, comparisons, infographics; no glass in the shared sheet"
 
 ### Changed

@@ -167,11 +167,10 @@
             --rz-text-muted: #94a3b8;
             --rz-card-bg: #ffffff;
             --rz-card-border: #e2e8f0;
-            --rz-card-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            --rz-card-shadow: none;
             --rz-footer-bg: #0e0f12;
-            --rz-glass-bg: rgba(255,255,255,0.85);
-            --rz-glass-border: rgba(0,0,0,0.08);
-        }
+            --rz-glass-bg: rgb(255, 255, 255);
+            --rz-glass-border: rgb(0, 0, 0);}
         [data-theme="dark"] {
             --rz-accent: #E8B563;
             --rz-accent-light: #f0c987;
@@ -183,11 +182,10 @@
             --rz-text-muted: #64748b;
             --rz-card-bg: #16181d;
             --rz-card-border: #2a2d34;
-            --rz-card-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            --rz-card-shadow: none;
             --rz-footer-bg: #0a0b0d;
-            --rz-glass-bg: rgba(18,19,22,0.9);
-            --rz-glass-border: rgba(255,255,255,0.08);
-        }
+            --rz-glass-bg: rgb(18, 19, 22);
+            --rz-glass-border: rgb(255, 255, 255);}
 
         /* ═══ Reset & Base ═══ */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -203,10 +201,8 @@
         .navbar {
             position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             background: var(--rz-glass-bg);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--rz-glass-border);
-            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
-        }
+            box-shadow: none;}
         .nav-container {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0.875rem 2rem; max-width: 1200px; margin: 0 auto;
@@ -218,18 +214,16 @@
         .nav-link:hover, .nav-link.active { color: var(--rz-accent); }
         .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
         .lang-toggle {
-            display: flex; border-radius: 8px; overflow: hidden;
-            border: 1px solid var(--rz-card-border); font-size: 0.75rem; font-weight: 600;
-        }
-        .lang-toggle a, .lang-toggle span { padding: 0.35rem 0.65rem; display: block; transition: all 0.2s; }
+            display: flex; border-radius: 4px; overflow: hidden;
+            border: 1px solid var(--rz-card-border); font-size: 0.75rem; font-weight: 600;}
+        .lang-toggle a, .lang-toggle span { padding: 0.35rem 0.65rem; display: block; transition: color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),background-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),border-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),opacity var(--rz-dur-fast,.2s) var(--rz-ease-out,ease);}
         .lang-toggle .lang-active { background: var(--rz-accent); color: var(--rz-on-accent); }
         .lang-toggle a:not(.lang-active) { color: var(--rz-text-muted); background: var(--rz-card-bg); }
         .lang-toggle a:not(.lang-active):hover { color: var(--rz-accent); }
         .theme-toggle {
             display: flex; align-items: center; justify-content: center;
             width: 40px; height: 40px; background: transparent;
-            border: 1px solid var(--rz-glass-border); border-radius: 10px; cursor: pointer;
-        }
+            border: 1px solid var(--rz-glass-border); border-radius: 4px; cursor: pointer;}
         .theme-toggle svg { width: 20px; height: 20px; }
         .theme-toggle .sun-icon { color: #f59e0b; display: none; }
         .theme-toggle .moon-icon { color: #64748b; display: block; }
@@ -240,10 +234,9 @@
 
         /* ═══ Hero ═══ */
         .hero {
-            background: linear-gradient(135deg, var(--rz-bg-hero-start) 0%, var(--rz-bg-hero-mid) 50%, var(--rz-bg-hero-end) 100%);
+            background: var(--rz-bg-hero-start);
             padding: 8rem 2rem 3rem; color: #fff; text-align: center;
-            position: relative; overflow: hidden;
-        }
+            position: relative; overflow: hidden;}
         .hero::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: none;
@@ -261,10 +254,9 @@
             border-bottom: 1px solid var(--rz-card-border);
         }
         .category-btn {
-            padding: 0.5rem 1.25rem; border-radius: 30px; font-size: 0.85rem;
+            padding: 0.5rem 1.25rem; border-radius: 4px; font-size: 0.85rem;
             font-weight: 600; border: 1px solid var(--rz-card-border); background: var(--rz-card-bg);
-            color: var(--rz-text); cursor: pointer; transition: all 0.2s; font-family: inherit;
-        }
+            color: var(--rz-text); cursor: pointer; transition: color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),background-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),border-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),opacity var(--rz-dur-fast,.2s) var(--rz-ease-out,ease); font-family: inherit;}
         .category-btn:hover, .category-btn.active {
             background: var(--rz-accent); color: var(--rz-on-accent); border-color: var(--rz-accent);
         }
@@ -280,8 +272,7 @@
         .article-card {
             display: flex; flex-direction: column;
             background: var(--rz-card-bg); border: 1px solid var(--rz-card-border);
-            border-radius: 4px; overflow: hidden; transition: all 0.3s;
-        }
+            border-radius: 4px; overflow: hidden; transition: color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),background-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),border-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),opacity var(--rz-dur-fast,.2s) var(--rz-ease-out,ease);}
         .article-card:hover {
             box-shadow: none;
             border-color: var(--rz-accent);
@@ -295,15 +286,10 @@
         }
         .article-card-number {
             position: absolute; top: 12px; left: 12px;
-            padding: 0.25rem 0.75rem; border-radius: 6px;
-            font-size: 0.75rem; font-weight: 700; color: #fff;
-        }
+            padding: 0.25rem 0.75rem; border-radius: 4px;
+            font-size: 0.75rem; font-weight: 700; color: #fff;}
         .article-card-content { padding: 1.25rem; flex-grow: 1; display: flex; flex-direction: column; }
-        .article-card-category {
-            display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px;
-            font-size: 0.72rem; font-weight: 600; margin-bottom: 0.5rem;
-            width: fit-content;
-        }
+        .article-card-category { display: inline-block; padding: .2rem .55rem; border-radius: 4px; font-size: .72rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; background: transparent; border: 1px solid var(--rz-card-border, rgba(128,128,128,.35)); color: var(--rz-text-muted, inherit); } /* v3.30.0 — one neutral chip, not a hue per card (ANTI_VIBECODE §A15/§A32) */
         .article-card-title {
             font-size: 1.05rem; margin-bottom: 0.5rem; line-height: 1.4;
         }
@@ -362,7 +348,7 @@
             .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
-    <script src="../js/rz-version.js?v=20261108-8f292860" defer></script>
+    <script src="../js/rz-version.js?v=20261108-7c777ff3" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script>window.RZ_COOKIE_TEXT={msg:"Kami menggunakan cookie untuk analitik guna meningkatkan pengalaman Anda.",more:"Pelajari lebih lanjut",accept:"Terima",decline:"Tolak",policyHref:"../privacy.html"};</script>
     <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
@@ -433,7 +419,7 @@
                     <span class="article-card-number" style="background: #2a2d34;">BARU</span>
                 </div>
                 <div class="article-card-content">
-                    <span class="article-card-category" style="background:rgba(8,145,178,0.1);color:#0891b2;">Jurnal Teknik</span>
+                    <span class="article-card-category">Jurnal Teknik</span>
                     <h3 class="article-card-title">Investasi Fotonik $4 Miliar NVIDIA: Mengapa Masa Depan AI Berjalan dengan Cahaya</h3>
                     <p class="article-card-desc">NVIDIA menginvestasikan $2M di Lumentum dan $2M di Coherent untuk silicon photonics. Analisis teknik CPO, ELS, dan mengapa pabrik AI membutuhkan interkoneksi optik.</p>
                     <div class="article-card-meta">
@@ -451,7 +437,7 @@
                     <span class="article-card-number" style="background: #2a2d34;">21</span>
                 </div>
                 <div class="article-card-content">
-                    <span class="article-card-category" style="background:rgba(5,150,105,0.1);color:#059669;">Jurnal Teknik</span>
+                    <span class="article-card-category">Jurnal Teknik</span>
                     <h3 class="article-card-title">SMR Nuklir untuk AI: Taruhan $10 Miliar pada Data Center Bertenaga Atom</h3>
                     <p class="article-card-desc">Microsoft, Amazon, Google, Meta, dan Oracle berlomba mengamankan tenaga nuklir untuk AI. Perbandingan teknologi, analisis biaya, dan timeline.</p>
                     <div class="article-card-meta">
@@ -469,7 +455,7 @@
                     <span class="article-card-number" style="background: #64748b;">18</span>
                 </div>
                 <div class="article-card-content">
-                    <span class="article-card-category" style="background:rgba(14,116,144,0.1);color:#0e7490;">Jurnal Teknik</span>
+                    <span class="article-card-category">Jurnal Teknik</span>
                     <h3 class="article-card-title">Pabrik AI: Mengapa Arsitektur Data Center Tradisional Menghadapi Kepunahan Teknis</h3>
                     <p class="article-card-desc">Analisis mendalam desain data center AI-native: kepadatan rack 130kW, revolusi liquid cooling, Ultra Ethernet vs InfiniBand, dan risiko stranded asset.</p>
                     <div class="article-card-meta">
@@ -487,7 +473,7 @@
                     <span class="article-card-number" style="background: #2a2d34;">13</span>
                 </div>
                 <div class="article-card-content">
-                    <span class="article-card-category" style="background:rgba(161,98,7,0.1);color:#a16207;">Jurnal Teknik</span>
+                    <span class="article-card-category">Jurnal Teknik</span>
                     <h3 class="article-card-title">Desain Distribusi Daya Data Center: Arsitektur Hyperscaler Deep Dive</h3>
                     <p class="article-card-desc">Analisis ultra-komprehensif sistem daya AWS, Google, Microsoft, xAI, dan Anthropic. Skenario kegagalan dan reliability engineering.</p>
                     <div class="article-card-meta">
@@ -505,7 +491,7 @@
                     <span class="article-card-number" style="background: #2a2d34;">20</span>
                 </div>
                 <div class="article-card-content">
-                    <span class="article-card-category" style="background:rgba(220,38,38,0.1);color:#dc2626;">Analisis Global</span>
+                    <span class="article-card-category">Analisis Global</span>
                     <h3 class="article-card-title">Sam Altman Bilang Kekhawatiran Air AI itu "Palsu" -- Data Berkata Sebaliknya</h3>
                     <p class="article-card-desc">Seorang insinyur data center memeriksa klaim Sam Altman. 17 miliar galon di 2023, proyeksi 68 miliar di 2028. Riset peer-reviewed vs klaim CEO.</p>
                     <div class="article-card-meta">
@@ -523,7 +509,7 @@
                     <span class="article-card-number" style="background: #2a2d34;">10</span>
                 </div>
                 <div class="article-card-content">
-                    <span class="article-card-category" style="background:rgba(14,165,233,0.1);color:#0ea5e9;">Analisis Global</span>
+                    <span class="article-card-category">Analisis Global</span>
                     <h3 class="article-card-title">Stres Air dan Data Center AI: Krisis Tersembunyi di Asia Tenggara</h3>
                     <p class="article-card-desc">58% data center berada di wilayah stres air. Analisis dampak konsumsi air data center AI terhadap sumber daya regional dengan visualisasi interaktif.</p>
                     <div class="article-card-meta">
@@ -541,7 +527,7 @@
                     <span class="article-card-number" style="background: #2a2d34;">14</span>
                 </div>
                 <div class="article-card-content">
-                    <span class="article-card-category" style="background:rgba(168,162,158,0.1);color:#78716c;">Analisis Global</span>
+                    <span class="article-card-category">Analisis Global</span>
                     <h3 class="article-card-title">Pemberontakan $64 Miliar: Mengapa Komunitas di Seluruh Dunia Melawan Data Center</h3>
                     <p class="article-card-desc">Analisis multi-perspektif oposisi komunitas global terhadap data center. $64M proyek dikontestasi, dengan kalkulator Community Impact Scorecard.</p>
                     <div class="article-card-meta">
@@ -559,7 +545,7 @@
                     <span class="article-card-number" style="background: #2a2d34;">19</span>
                 </div>
                 <div class="article-card-content">
-                    <span class="article-card-category" style="background:rgba(45,90,135,0.1);color:#2d5a87;">Analisis Global</span>
+                    <span class="article-card-category">Analisis Global</span>
                     <h3 class="article-card-title">Data Center Singapura vs Batam: Biaya Murah Saja Tidak Cukup untuk Menang</h3>
                     <p class="article-card-desc">Analisis objektif perbandingan Singapura dan Batam untuk pemilihan lokasi data center. Matriks keputusan, model koridor, dan outlook 2026-2030.</p>
                     <div class="article-card-meta">
@@ -576,7 +562,7 @@
                     <span class="article-card-number" style="background: #2a2d34;">4</span>
                 </div>
                 <div class="article-card-content">
-                    <span class="article-card-category" style="background:rgba(51,65,85,0.1);color:#475569;">Jurnal Teknik</span>
+                    <span class="article-card-category">Jurnal Teknik</span>
                     <h3 class="article-card-title">Alarm Fatigue: Pembunuh Senyap di Ruang Kontrol Data Center</h3>
                     <p class="article-card-desc">Bagaimana saya mengurangi 97% alarm noise di data center. Strategi manajemen alarm, prioritisasi, dan dampaknya pada keandalan operasi.</p>
                     <div class="article-card-meta">
@@ -593,7 +579,7 @@
                     <span class="article-card-number" style="background: #2a2d34;">1</span>
                 </div>
                 <div class="article-card-content">
-                    <span class="article-card-category" style="background:rgba(45,90,135,0.1);color:#2d5a87;">Jurnal Teknik</span>
+                    <span class="article-card-category">Jurnal Teknik</span>
                     <h3 class="article-card-title">Ketika Tidak Ada yang Terjadi, Artinya Engineering Bekerja</h3>
                     <p class="article-card-desc">Kemenangan senyap dari operations engineering. Mengapa infrastruktur yang berjalan tanpa insiden adalah pencapaian terbesar, bukan kekosongan prestasi.</p>
                     <div class="article-card-meta">

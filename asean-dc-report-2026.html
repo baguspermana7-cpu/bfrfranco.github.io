@@ -92,7 +92,7 @@
     .rpt-toc h3{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--rpt-toc-border)}
     .rpt-toc-list{list-style:none;padding:0;margin:0}
     .rpt-toc-list li{margin-bottom:2px}
-    .rpt-toc-list a{display:block;padding:.4rem .6rem;font-size:.8rem;color:var(--text-secondary);text-decoration:none;border-radius:6px;border-left:2px solid transparent;transition:all .15s;line-height:1.35}
+    .rpt-toc-list a{display:block;padding:.4rem .6rem;font-size:.8rem;color:var(--text-secondary);text-decoration:none;border-radius: 4px;border-left: 1px solid currentColor;transition: color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),background-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),border-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),opacity var(--rz-dur-fast,.2s) var(--rz-ease-out,ease);line-height:1.35}
     .rpt-toc-list a:hover{color:var(--rpt-accent-text);background:var(--rpt-accent-bg);border-left-color:var(--rpt-accent-text)}
     .rpt-toc-list a.active{color:var(--rpt-toc-active);background:var(--rpt-accent-bg);border-left-color:var(--rpt-toc-active);font-weight:600}
     .rpt-content{min-width:0}
@@ -103,7 +103,7 @@
     .rpt-section p,.rpt-section li{font-size:.93rem;color:var(--text-secondary);line-height:1.75}
     .rpt-section ul,.rpt-section ol{padding-left:1.5rem;margin:.75rem 0}
     .rpt-section li{margin-bottom:.4rem}
-    .rpt-tw{overflow-x:auto;margin:1.25rem 0;border-radius:10px;border:1px solid var(--border-color)}
+    .rpt-tw{overflow-x:auto;margin:1.25rem 0;border-radius: 4px;border:1px solid var(--border-color)}
     .rpt-t{width:100%;border-collapse:collapse;font-size:.86rem;min-width:580px}
     .rpt-t thead{background:var(--rpt-table-header);color:#fff}
     .rpt-t th{padding:.7rem .9rem;text-align:left;font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
@@ -120,8 +120,8 @@
     .rpt-chart-title{font-size:.93rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem}
     .bar-r{display:flex;align-items:center;margin-bottom:.55rem;gap:.7rem}
     .bar-l{width:90px;font-size:.8rem;font-weight:600;color:var(--text-primary);flex-shrink:0;text-align:right}
-    .bar-t{flex:1;height:26px;background:var(--rpt-bar-bg);border-radius:6px;overflow:hidden}
-    .bar-f{height:100%;background:linear-gradient(90deg,var(--rpt-accent),var(--rpt-accent-light));border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
+    .bar-t{flex:1;height:26px;background:var(--rpt-bar-bg);border-radius: 4px;overflow:hidden}
+    .bar-f{height:100%;background: var(--rpt-accent);border-radius: 4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
     .bar-v{font-size:.73rem;font-weight:700;color:#fff;white-space:nowrap}
     .bar-vo{font-size:.73rem;font-weight:600;color:var(--text-secondary);margin-left:8px;white-space:nowrap}
     /* The value is printed INSIDE the coloured fill. On a 390px screen the track is ~200px, so a
@@ -157,7 +157,7 @@
         .rpt-layout{grid-template-columns:1fr;padding:1.5rem 1rem 3rem}
         .rpt-toc{position:relative;top:auto;max-height:none}
         .rpt-toc-list{display:flex;flex-wrap:wrap;gap:4px}
-        .rpt-toc-list a{border-left:none;padding:.3rem .6rem;border-radius:20px;font-size:.76rem;background:var(--rpt-accent-bg)}
+        .rpt-toc-list a{border-left:none;padding:.3rem .6rem;border-radius: 4px;font-size:.76rem;background:var(--rpt-accent-bg)}
         .rpt-toc-list a.active{background:var(--rpt-accent);color:#fff}
     }
     @media(max-width:640px){
@@ -288,8 +288,17 @@
 :root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
 /* sweep-cyan-register: page tokens re-resolve inside dark panels */
 :root:not([data-theme="dark"]) [data-rz-dark-panel]{--rpt-accent:var(--rz-accent-ui);--rpt-accent-dark:var(--rz-accent-ui);--rpt-accent-light:var(--rz-accent-ui);--rpt-accent-text:var(--rz-accent-ui);--rpt-check:var(--rz-accent-ui);--rpt-table-header:var(--rz-accent-ui);--rpt-toc-active:var(--rz-accent-ui)}
+
+/* v3.30.0 — hero stats and highlight cards read as fact rows, not stat tiles (ANTI_VIBECODE §A28) */
+.rpt-hero-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:0;margin-top:1.5rem;border-top:1px solid var(--border-color,rgba(128,128,128,.25));border-bottom:1px solid var(--border-color,rgba(128,128,128,.25))}
+.rpt-hero-stat{background:transparent;border:0;border-left:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:0;padding:.6rem 1.25rem;text-align:left}
+.rpt-hero-stat:first-child{border-left:0}
+.rpt-hero-stat .num{font-size:1.15rem;font-weight:600;font-family:'IBM Plex Mono','JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.rpt-hl{display:block;margin:1.25rem 0;border-top:1px solid var(--border-color,rgba(128,128,128,.25))}
+.rpt-hl-card{display:grid;grid-template-columns:minmax(6rem,auto) 1fr;column-gap:1.25rem;align-items:baseline;background:transparent;border:0;border-bottom:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:0;padding:.7rem 0}
+.rpt-hl-card .num{font-size:1.15rem;margin:0;font-family:'IBM Plex Mono','JetBrains Mono',monospace}
 </style>
-    <script src="js/rz-version.js?v=20261108-8f292860" defer></script>
+    <script src="js/rz-version.js?v=20261108-7c777ff3" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 </head>
@@ -305,8 +314,8 @@
                     <ul class="dropdown-menu" role="menu">
                         <li role="menuitem"><a href="datacenter-solutions.html" style="font-weight: 600;">DC Solutions Hub</a></li>
                         <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="datahallAI.html" style="color: #64748b;" title="Root & Educator access only">🔒 DC AI/HPC</a></li>
-                        <li role="menuitem"><a href="dc-conventional.html" title="Root & Educator access only">🔒 DC Conventional</a></li>
+                        <li role="menuitem"><a href="datahallAI.html" style="color: #64748b;" title="Root & Educator access only"> DC AI/HPC</a></li>
+                        <li role="menuitem"><a href="dc-conventional.html" title="Root & Educator access only"> DC Conventional</a></li>
                         <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li role="menuitem"><a href="tco-calculator.html" style="color: #64748b; font-weight: 600;">TCO Calculator</a></li>
                         <li role="menuitem"><a href="capex-calculator.html">CAPEX Calculator</a></li>

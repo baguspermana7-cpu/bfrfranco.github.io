@@ -181,21 +181,18 @@
         }
 
         .article-hero {
-            background: linear-gradient(rgba(22,24,29,1),rgba(22,24,29,1));
+            background: #121316;
             padding: 7rem 2rem 3.5rem;
             color: #fff;
             text-align: center;
             position: relative;
-            overflow: hidden;
-        }
+            overflow: hidden;}
         .article-hero::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(ellipse at 30% 50%, rgba(16,185,129,0.15) 0%, transparent 70%),
-                        radial-gradient(ellipse at 70% 20%, rgba(52,211,153,0.1) 0%, transparent 60%);
-            pointer-events: none;
-        }
+            background: var(--rz-art-panel);
+            pointer-events: none;}
         .article-hero .highlight { color: #34d399; }
         .article-category {
             display: inline-block;
@@ -203,13 +200,12 @@
             border: 1px solid rgba(52,211,153,0.4);
             color: #a7f3d0;
             padding: 0.35rem 1rem;
-            border-radius: 9999px;
+            border-radius: 4px;
             font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 1.25rem;
-        }
+            margin-bottom: 1.25rem;}
         .article-title {
             font-size: clamp(2rem, 5vw, 3.2rem);
             font-weight: 800;
@@ -305,11 +301,10 @@
         /* Quote callout */
         .quote-callout {
             background: var(--a21-bg);
-            border-left: 2px solid var(--a21-green);
+            border-left: 1px solid var(--rz-art-line);
             padding: 1.5rem 2rem;
             margin: 2rem 0;
-            border-radius: 0 4px 4px 0;
-        }
+            border-radius: 0 4px 4px 0;}
         .quote-callout blockquote {
             font-size: 1.1rem;
             font-style: italic;
@@ -342,7 +337,7 @@
             font-size: 0.95rem;
         }
         .a21-insight-box p { font-size: 0.9rem; color: #374151; line-height: 1.6; margin: 0; }
-        [data-theme="dark"] .a21-insight-box { background: linear-gradient(135deg, rgba(5,150,105,0.1), rgba(16,185,129,0.08)); border-color: rgba(52,211,153,0.3); }
+        [data-theme="dark"] .a21-insight-box { background: var(--rz-art-panel); border-color: rgba(52,211,153,0.3);}
         [data-theme="dark"] .a21-insight-box h4 { color: #34d399; }
         [data-theme="dark"] .a21-insight-box p { color: #d1d5db; }
 
@@ -350,9 +345,8 @@
         .a21-table-container {
             overflow-x: auto;
             margin: 1.5rem 0;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-        }
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;}
         .a21-table-container table {
             width: 100%;
             border-collapse: collapse;
@@ -391,9 +385,8 @@
             left: 0.5rem;
             top: 0; bottom: 0;
             width: 3px;
-            background: linear-gradient(to bottom, #059669, #34d399);
-            border-radius: 2px;
-        }
+            background: var(--rz-art-panel);
+            border-radius: 2px;}
         .a21-timeline-item {
             position: relative;
             padding: 0.75rem 0 0.75rem 0.75rem;
@@ -474,11 +467,10 @@
         .a21-warning-box {
             background: rgba(245, 158, 11, 0.12);
             border: 1px solid #f59e0b;
-            border-left: 2px solid #d97706;
+            border-left: 1px solid var(--rz-art-line);
             border-radius: 0 4px 4px 0;
             padding: 1.25rem 1.5rem;
-            margin: 1.5rem 0;
-        }
+            margin: 1.5rem 0;}
         .a21-warning-box h4 { color: #92400e; margin-bottom: 0.5rem; font-size: 0.95rem; }
         .a21-warning-box p { font-size: 0.9rem; color: #78350f; line-height: 1.6; margin: 0; }
         [data-theme="dark"] .a21-warning-box { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.4); }
@@ -498,7 +490,7 @@
         }
 
         /* References Section (canonical pattern from articles 23-27) */
-        .references-section { background: rgba(16, 185, 129, 0.10); padding: 2rem; border-radius: 16px; margin: 3rem 0 0; }
+        .references-section { background: rgba(16, 185, 129, 0.10); padding: 2rem; border-radius: 4px; margin: 3rem 0 0;}
         [data-theme="dark"] .references-section { background: var(--rz-art-bg);}
         .references-title { font-size: 1.25rem; font-weight: 700; color: #059669; margin-bottom: 1.5rem; }
         [data-theme="dark"] .references-title { color: #34d399; }
@@ -559,25 +551,23 @@ article h2::before {
     top: 0.45em;
     width: 4px;
     height: 0.55em;
-    background: linear-gradient(180deg, #fbbf24, #10b981);
+    background: var(--rz-art-panel);
     border-radius: 2px;
     opacity: 0;
     transform: translateX(-8px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
+    transition: opacity 0.5s ease, transform 0.5s ease;}
 .article-body h2:hover::before,
 .article-content h2:hover::before,
-article h2:hover::before { opacity: 1; transform: translateX(0); }
+article h2:hover::before { opacity: 1; transform: none;}
 
 /* Better inline-link underline (resend.com style) */
 .article-body a:not(.btn):not([class*="card"]),
 .article-content a:not(.btn):not([class*="card"]) {
-    background-image: linear-gradient(120deg, currentColor 0%, currentColor 100%);
+    background: var(--rz-art-panel);
     background-repeat: no-repeat;
     background-size: 100% 1px;
     background-position: 0 100%;
-    transition: background-size 0.3s ease;
-}
+    transition: background-size 0.3s ease;}
 .article-body a:not(.btn):not([class*="card"]):hover,
 .article-content a:not(.btn):not([class*="card"]):hover {
     background-size: 100% 2px;
@@ -671,7 +661,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
             .article-body h1, article h1 { font-size: 1.4rem !important; }
         }
     </style>
-    <script src="js/rz-version.js?v=20261108-8f292860" defer></script>
+    <script src="js/rz-version.js?v=20261108-7c777ff3" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
@@ -680,7 +670,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <!-- Scroll Progress Bar -->
-<div class="scroll-progress-container"><div class="scroll-progress-bar" id="scrollProgress" style="background: linear-gradient(90deg, #059669, #34d399);"></div></div>
+<div class="scroll-progress-container"><div class="scroll-progress-bar" id="scrollProgress" style="background: var(--rz-art-panel);"></div></div>
 
 <!-- TOC Sidebar -->
 <aside class="toc-sidebar" id="tocSidebar"><ul class="toc-sidebar-list" id="tocSidebarList"></ul></aside>
@@ -858,7 +848,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
     <!-- Cover Image -->
     <figure style="margin: 0 0 2.5rem 0; text-align: center;">
-        <img src="assets/article-21-hero.webp" alt="Nuclear Small Modular Reactor concept for AI data center campus" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" loading="eager" width="1200" height="509">
+        <img src="assets/article-21-hero.webp" alt="Nuclear Small Modular Reactor concept for AI data center campus" style="max-width: 100%; height: auto; border-radius: 4px;" loading="eager" width="1200" height="509">
         <figcaption style="margin-top: 0.75rem; font-size: 0.875rem; color: #64748b; font-style: italic;">A nuclear SMR-powered data center campus &mdash; the vision driving billions in Big Tech investment.</figcaption>
     </figure>
 

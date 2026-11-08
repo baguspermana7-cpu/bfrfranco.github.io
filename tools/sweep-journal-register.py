@@ -170,6 +170,70 @@ def rewrite_rule(selector, body, log, page):
             note('R8 serif-face', raw, 'font-family: var(--rz-art-sans)')
             changed = True
             continue
+        # R14–R18 (v3.30.0, PRD §41 K19): the structural tells the two-theme render scan still found on 39
+        # journal pages after R1–R13 — radius > 4 px (pills, rounded panels), any gradient surface, a
+        # resting shadow, a coloured side rail. Register: radius <= 4 px, flat panels, 1 px hairlines.
+        if key.startswith('border') and key.endswith('radius'):
+            parts = v0.split('/')[0].split()
+            def clamp(tok):
+                m = re.match(r'^([\d.]+)(px|rem|em)$', tok)
+                if not m:
+                    return tok
+                px = float(m.group(1)) * (16 if m.group(2) != 'px' else 1)
+                return '4px' if px > 4 else tok
+            nparts = [clamp(t) for t in parts]
+            if nparts != parts and not any(t.endswith('%') for t in parts):
+                new = key + ': ' + ' '.join(nparts)
+                out.append(lead + new + imp)
+                note('R14 radius', raw, new)
+                changed = True
+                continue
+        if key in ('background', 'background-image') and 'gradient(' in v0 and not gradient_text:
+            gcols = colours(v0)
+            dark_both = gcols and all(darkbg(c[2]) for c in gcols) and '[data-theme' not in selector
+            if dark_both:
+                new = 'background: #121316'
+                if 'color' not in props:
+                    out.append(lead + 'color: #CFD3DA')
+            elif key == 'background-image' and ('background-color' in props or 'background' in props):
+                note('R15 gradient-surface', raw, '(removed; the flat colour stays)')
+                changed = True
+                continue
+            else:
+                new = 'background: var(--rz-art-panel)'
+            out.append(lead + new + imp)
+            note('R15 gradient-surface', raw, new)
+            changed = True
+            continue
+        if key == 'box-shadow' and v0 != 'none' and 'inset' not in v0 and ':focus' not in selector \
+                and not re.match(r'^0(?:px)?\s+0(?:px)?\s+0(?:px)?\s+\d', v0):
+            note('R16 resting-shadow', raw, '(removed)')
+            changed = True
+            continue
+        if key == 'text-shadow' and v0 != 'none':
+            note('R16 resting-shadow', raw, '(removed)')
+            changed = True
+            continue
+        if key in ('border-left', 'border-right'):
+            m = re.match(r'^([\d.]+)px\s+(solid|dashed|double)\b', v0)
+            if m and float(m.group(1)) >= 2:
+                new = key + ': 1px solid var(--rz-art-line)'
+                out.append(lead + new + imp)
+                note('R17 side-rail', raw, new)
+                changed = True
+                continue
+        if key in ('border-left-width', 'border-right-width') and re.match(r'^([\d.]+)px$', v0) and float(v0[:-2]) >= 2:
+            out.append(lead + key + ': 1px' + imp)
+            note('R17 side-rail', raw, key + ': 1px')
+            changed = True
+            continue
+        # R18 (v3.30.0): a hover lift — transform with translate/scale inside a :hover rule. The register moves
+        # border-colour on hover, never the box (UX law 14, ANTI_VIBECODE §A24).
+        if key == 'transform' and ':hover' in selector and v0 != 'none' and re.search(r'translate|scale\(\s*(?!1\))', v0):
+            out.append(lead + 'transform: none' + imp)
+            note('R18 hover-lift', raw, 'transform: none')
+            changed = True
+            continue
         cols = colours(v0)
         if cols and key in ('background', 'background-color') and '[data-theme' not in selector and 'color' not in props \
                 and 'gradient(' not in v0 and all(darkbg(c[2]) and not navy(c[2]) for c in cols) and not re.search(r'rgba?\(', v0):

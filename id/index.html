@@ -169,11 +169,10 @@
             --rz-text-muted: #94a3b8;
             --rz-card-bg: #ffffff;
             --rz-card-border: #e2e8f0;
-            --rz-card-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            --rz-card-shadow: none;
             --rz-footer-bg: #0e0f12;
-            --rz-glass-bg: rgba(255,255,255,0.85);
-            --rz-glass-border: rgba(0,0,0,0.08);
-        }
+            --rz-glass-bg: rgb(255, 255, 255);
+            --rz-glass-border: rgb(0, 0, 0);}
         [data-theme="dark"] {
             --rz-accent: #E8B563;
             --rz-accent-light: #f0c987;
@@ -185,11 +184,10 @@
             --rz-text-muted: #64748b;
             --rz-card-bg: #16181d;
             --rz-card-border: #2a2d34;
-            --rz-card-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            --rz-card-shadow: none;
             --rz-footer-bg: #0a0b0d;
-            --rz-glass-bg: rgba(18,19,22,0.9);
-            --rz-glass-border: rgba(255,255,255,0.08);
-        }
+            --rz-glass-bg: rgb(18, 19, 22);
+            --rz-glass-border: rgb(255, 255, 255);}
 
         /* ═══ Reset & Base ═══ */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -209,10 +207,8 @@
         .navbar {
             position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             background: var(--rz-glass-bg);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--rz-glass-border);
-            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
-        }
+            box-shadow: none;}
         .nav-container {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0.875rem 2rem; max-width: 1200px; margin: 0 auto;
@@ -232,11 +228,10 @@
         .dropdown-arrow { width: 10px; height: 10px; }
         .dropdown-menu {
             position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            background: var(--rz-card-bg); min-width: 180px; border-radius: 8px;
+            background: var(--rz-card-bg); min-width: 180px; border-radius: 4px;
             opacity: 0; visibility: hidden; padding: 0.5rem 0; z-index: 1001;
-            border: 1px solid var(--rz-card-border); box-shadow: var(--rz-card-shadow);
-            transition: opacity 0.2s, visibility 0.2s;
-        }
+            border: 1px solid var(--rz-card-border); box-shadow: none;
+            transition: opacity 0.2s, visibility 0.2s;}
         .nav-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; }
         .dropdown-menu li { list-style: none; }
         .dropdown-menu a {
@@ -246,12 +241,10 @@
         .dropdown-menu a:hover { background: rgba(232,181,99,0.08); }
         .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
         .lang-toggle {
-            display: flex; align-items: center; gap: 0; border-radius: 8px; overflow: hidden;
-            border: 1px solid var(--rz-card-border); font-size: 0.75rem; font-weight: 600;
-        }
+            display: flex; align-items: center; gap: 0; border-radius: 4px; overflow: hidden;
+            border: 1px solid var(--rz-card-border); font-size: 0.75rem; font-weight: 600;}
         .lang-toggle a, .lang-toggle span {
-            padding: 0.35rem 0.65rem; display: block; transition: all 0.2s;
-        }
+            padding: 0.35rem 0.65rem; display: block; transition: color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),background-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),border-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),opacity var(--rz-dur-fast,.2s) var(--rz-ease-out,ease);}
         .lang-toggle .lang-active {
             background: var(--rz-accent); color: var(--rz-on-accent);
         }
@@ -262,9 +255,8 @@
         .theme-toggle {
             display: flex; align-items: center; justify-content: center;
             width: 40px; height: 40px; background: transparent;
-            border: 1px solid var(--rz-glass-border); border-radius: 10px;
-            cursor: pointer;
-        }
+            border: 1px solid var(--rz-glass-border); border-radius: 4px;
+            cursor: pointer;}
         .theme-toggle svg { width: 20px; height: 20px; }
         .theme-toggle .sun-icon { color: #f59e0b; display: none; }
         .theme-toggle .moon-icon { color: #64748b; display: block; }
@@ -278,10 +270,9 @@
 
         /* ═══ Hero ═══ */
         .hero {
-            background: linear-gradient(135deg, var(--rz-bg-hero-start) 0%, var(--rz-bg-hero-mid) 50%, var(--rz-bg-hero-end) 100%);
+            background: var(--rz-bg-hero-start);
             padding: 8rem 2rem 4rem; color: #fff; text-align: center;
-            position: relative; overflow: hidden;
-        }
+            position: relative; overflow: hidden;}
         .hero::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: none;
@@ -305,16 +296,14 @@
         .btn-primary {
             display: inline-flex; align-items: center; gap: 0.5rem;
             background: var(--rz-accent); color: var(--rz-on-accent); padding: 0.75rem 1.75rem;
-            border-radius: 8px; font-weight: 700; font-size: 0.9rem;
-            transition: all 0.2s; border: none; cursor: pointer;
-        }
+            border-radius: 4px; font-weight: 700; font-size: 0.9rem;
+            transition: color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),background-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),border-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),opacity var(--rz-dur-fast,.2s) var(--rz-ease-out,ease); border: none; cursor: pointer;}
         .btn-primary:hover { background: var(--rz-accent-light); }
         .btn-secondary {
             display: inline-flex; align-items: center; gap: 0.5rem;
             background: transparent; color: #fff; padding: 0.75rem 1.75rem;
-            border-radius: 8px; font-weight: 600; font-size: 0.9rem;
-            border: 1px solid rgba(255,255,255,0.3); transition: all 0.2s;
-        }
+            border-radius: 4px; font-weight: 600; font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.3); transition: color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),background-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),border-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),opacity var(--rz-dur-fast,.2s) var(--rz-ease-out,ease);}
         .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
         .hero-stats {
             display: flex; justify-content: center; margin-top: 2.5rem; row-gap: 0.5rem;
@@ -344,9 +333,8 @@
         }
         .feature-card {
             background: var(--rz-card-bg); border: 1px solid var(--rz-card-border);
-            border-radius: 4px; padding: 1.75rem; transition: all 0.3s;
-            display: flex; flex-direction: column;
-        }
+            border-radius: 4px; padding: 1.75rem; transition: color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),background-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),border-color var(--rz-dur-fast,.2s) var(--rz-ease-out,ease),opacity var(--rz-dur-fast,.2s) var(--rz-ease-out,ease);
+            display: flex; flex-direction: column;}
         .feature-card:hover {
             box-shadow: none;
             border-color: var(--rz-accent);
@@ -415,11 +403,10 @@
         /* ═══ Scroll to Top ═══ */
         .scroll-top-btn {
             position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
-            width: 44px; height: 44px; border-radius: 12px;
+            width: 44px; height: 44px; border-radius: 4px;
             background: var(--rz-accent); color: var(--rz-on-accent); border: none;
             cursor: pointer; display: none; align-items: center; justify-content: center;
-            box-shadow: none; transition: transform 0.2s;
-        }
+            box-shadow: none; transition: transform 0.2s;}
         .scroll-top-btn:hover { opacity: 0.9; }
         .scroll-top-btn.visible { display: flex; }
 
@@ -444,7 +431,7 @@
             .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
-    <script src="../js/rz-version.js?v=20261108-8f292860" defer></script>
+    <script src="../js/rz-version.js?v=20261108-7c777ff3" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script>window.RZ_COOKIE_TEXT={msg:"Kami menggunakan cookie untuk analitik guna meningkatkan pengalaman Anda.",more:"Pelajari lebih lanjut",accept:"Terima",decline:"Tolak",policyHref:"../privacy.html"};</script>
     <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>

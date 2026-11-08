@@ -1,22 +1,34 @@
 #!/usr/bin/env node
 /**
- * audit-slop-render.mjs — every sitemap page, rendered, scanned for the structural slop tells.
+ * audit-slop-render.mjs — every sitemap page, rendered in BOTH themes, scanned for the structural slop tells.
  *
  * Owner 2026-11-07: "kamu kan sudah audit semua page saya via robot agar nggak ada yang terlewat, ini kenapa masih
  * ada yang ai design slop sekali" (glossary.html: rails, pills, hover slide, blur, aurora). The earlier sweeps
  * recoloured pages and the structural gates covered only the journal and calculator families, so a page could be
- * on-palette and still carry every structural tell. This scan reads COMPUTED style on every page in sitemap.xml:
+ * on-palette and still carry every structural tell. Owner 2026-11-08 (PRD §41 K19): "pasti ada, saya nggak mau,
+ * sempurnakan, saya tidak mau ada yang miss" — the dark-only, six-tell version passed index.html at 80 tells and the
+ * hover lift on 40+ pages, so this version reads COMPUTED style in light AND dark and knows the rest of
+ * standarization/ANTI_VIBECODE_STANDARD.md §A:
  *
  *   rail    coloured left/right stripe: one side border >= 2 px, the others <= 1 px, saturated colour, box >= 40 px tall
- *   pill    rounded chip: radius >= 12 px on a box < 44 px tall that has a fill or border (badge/tag/pill)
+ *           (exempt only when the element itself carries a state class: ok/warn/fault/alarm/trip/run/stop/state-*)
+ *   pill    rounded chip: radius >= 12 px on a box < 44 px tall that has a fill or border (badge/tag/pill); same state-class exemption
  *   round   rounded panel: radius > 8 px on a filled box >= 200 px wide
  *   blur    backdrop-filter other than none
- *   lift    a :hover rule that sets a transform (from the page's own stylesheets)
+ *   lift    a :hover rule that sets a transform (from the page's own stylesheets), on a selector the page matches
  *   grad    a gradient background on a box >= 120 x 40 (charts/canvas/img excluded)
+ *   gtext   gradient text (background-clip: text with a gradient image)                        §A27
+ *   tall    `transition: all` (computed transition-property "all" with a non-zero duration)     §A23
+ *   shadow  a resting box-shadow (not inset, not a focus ring) on a filled box >= 160 px wide   §A11
+ *   serif   a serif display face (Fraunces / Playfair / Georgia / …) on text >= 20 px           §A34
+ *   navy    a navy surface: blue-hued (205–250°) saturated dark background on a box >= 200 x 80 §A33
+ *   marquee a running keyword strip: animation named marquee/ticker/scroll on an overflow-hidden track §A30
+ *   tiles   a stat-tile strip: >= 3 sibling filled boxes each led by a big numeral             §A28
+ *   emoji   pictographic emoji in visible text outside code                                     §A5
  *
- *   node tools/audit-slop-render.mjs [--pages a.html,b.html] [--json out.json]
- * Env RZ_BASE (default http://127.0.0.1:8164). Report only (exit 0) until a baseline is recorded; run under the
- * shared browser lock.
+ *   node tools/audit-slop-render.mjs [--pages a.html,b.html] [--themes light,dark] [--json out.json] [--strict]
+ * Env RZ_BASE (default http://127.0.0.1:8164). Report only (exit 0) unless --strict, which exits 1 when any page
+ * carries a tell in either theme. Run under the shared browser lock (rz-lane).
  */
 import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -33,26 +45,58 @@ catch { puppeteer = createRequire('/home/baguspermana7/wt-journal/package.json')
 const pages = arg('--pages') ? arg('--pages').split(',')
   : [...readFileSync(resolve(ROOT, 'sitemap.xml'), 'utf8').matchAll(/<loc>https:\/\/resistancezero\.com\/([^<]*)<\/loc>/g)]
     .map((m) => m[1] || 'index.html').map((p) => (p.endsWith('/') ? p + 'index.html' : p));
+const themes = (arg('--themes') || 'light,dark').split(',');
+export const KEYS = ['rail', 'pill', 'round', 'blur', 'lift', 'grad', 'gtext', 'tall', 'shadow', 'serif', 'navy', 'marquee', 'tiles', 'emoji'];
 
-function scan() {
-  const sat = (c) => { const m = c.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?/); if (!m) return 0;
-    if (m[4] !== undefined && +m[4] < 0.25) return 0;
-    const [r, g, b] = [m[1], m[2], m[3]].map((v) => v / 255); const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
-    return mx === 0 ? 0 : (mx - mn) / mx; };
-  const out = { rail: [], pill: [], round: [], blur: [], lift: [], grad: [] };
+function scan(keys) {
+  const rgb = (c) => { const m = c.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?/); if (!m) return null;
+    return { r: +m[1] / 255, g: +m[2] / 255, b: +m[3] / 255, a: m[4] === undefined ? 1 : +m[4] }; };
+  const sat = (c) => { const p = rgb(c); if (!p || p.a < 0.25) return 0; const mx = Math.max(p.r, p.g, p.b), mn = Math.min(p.r, p.g, p.b); return mx === 0 ? 0 : (mx - mn) / mx; };
+  const hue = (c) => { const p = rgb(c); if (!p) return -1; const mx = Math.max(p.r, p.g, p.b), mn = Math.min(p.r, p.g, p.b), d = mx - mn; if (d < 1e-6) return -1;
+    let h = mx === p.r ? ((p.g - p.b) / d) % 6 : mx === p.g ? (p.b - p.r) / d + 2 : (p.r - p.g) / d + 4; h *= 60; return h < 0 ? h + 360 : h; };
+  const light = (c) => { const p = rgb(c); return p ? (Math.max(p.r, p.g, p.b) + Math.min(p.r, p.g, p.b)) / 2 : 1; };
+  const transparent = (c) => /rgba\(0, 0, 0, 0\)|transparent/.test(c);
+  const out = Object.fromEntries(keys.map((k) => [k, []]));
   const name = (e) => e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (e.classList.length ? '.' + [...e.classList].slice(0, 2).join('.') : '');
+  const inArt = (e) => e.closest('canvas,svg,figure,[data-rz-chart],.chart,.legend,code,pre,kbd,samp');
+  // A state rail or state chip is content, not decoration (IEC 62682 severity ramp): exempt ONLY when the element
+  // ITSELF carries a state class from this fixed list — never by register or page. Agreed with the LTC session
+  // 2026-11-08: `.cap-card.ok` and `#alarmStrip.state-warn` are exempt, a plain `.pump-unit` rail is still reported.
+  const STATE_CLASS = /^(ok|warn|fault|alarm|trip|run|stop|state-[a-z0-9-]+)$/;
+  const stateful = (e) => [...e.classList].some((k) => STATE_CLASS.test(k));
+  const tileParents = new Set();
   for (const e of document.querySelectorAll('body *')) {
     const r = e.getBoundingClientRect(); if (r.width < 8 || r.height < 8) continue;
     const c = getComputedStyle(e); if (c.display === 'none' || c.visibility === 'hidden') continue;
     const bl = parseFloat(c.borderLeftWidth), br = parseFloat(c.borderRightWidth), bt = parseFloat(c.borderTopWidth), bb = parseFloat(c.borderBottomWidth);
     const side = bl >= 2 && bt <= 1 && bb <= 1 && br <= 1 ? c.borderLeftColor : br >= 2 && bt <= 1 && bb <= 1 && bl <= 1 ? c.borderRightColor : null;
-    if (side && sat(side) > 0.25 && r.height >= 40 && c.borderLeftStyle !== 'none') out.rail.push(name(e));
+    if (side && sat(side) > 0.25 && r.height >= 40 && c.borderLeftStyle !== 'none' && !stateful(e)) out.rail.push(name(e));
     const rr = c.borderTopLeftRadius; const rad = /%/.test(rr) ? (parseFloat(rr) || 0) * Math.min(r.width, r.height) / 100 : (parseFloat(rr) || 0);
-    const filled = !/rgba\(0, 0, 0, 0\)|transparent/.test(c.backgroundColor) || bt >= 1;
-    if (rad >= 12 && r.height < 44 && filled && e.tagName !== 'INPUT' && !/toggle|switch|avatar|dot|knob|thumb/i.test(e.className)) out.pill.push(name(e));
-    if (rad > 8 && r.width >= 200 && !/rgba\(0, 0, 0, 0\)|transparent/.test(c.backgroundColor)) out.round.push(name(e));
+    const filled = !transparent(c.backgroundColor) || bt >= 1;
+    if (rad >= 12 && r.height < 44 && filled && e.tagName !== 'INPUT' && !/toggle|switch|avatar|dot|knob|thumb/i.test(e.className) && !stateful(e)) out.pill.push(name(e));
+    if (rad > 8 && r.width >= 200 && !transparent(c.backgroundColor)) out.round.push(name(e));
     if (c.backdropFilter && c.backdropFilter !== 'none') out.blur.push(name(e));
-    if (/gradient/.test(c.backgroundImage) && r.width >= 120 && r.height >= 40 && !e.closest('canvas,svg,figure,[data-rz-chart],.chart,.legend')) out.grad.push(name(e));
+    const grad = /gradient/.test(c.backgroundImage);
+    if (grad && r.width >= 120 && r.height >= 40 && !inArt(e)) out.grad.push(name(e));
+    if (grad && /text/.test(c.webkitBackgroundClip || c.backgroundClip)) out.gtext.push(name(e));
+    if (c.transitionProperty.split(',').some((p) => p.trim() === 'all') && c.transitionDuration.split(',').some((d) => parseFloat(d) > 0)) out.tall.push(name(e));
+    if (c.boxShadow !== 'none' && !/inset/.test(c.boxShadow) && r.width >= 160 && r.height >= 40 && !transparent(c.backgroundColor)
+      && !(document.activeElement === e) && c.position !== 'fixed' && !e.closest('[role="dialog"],dialog,.modal,[class*="modal"],[class*="overlay"],[class*="dropdown"],[class*="popover"],[class*="tooltip"],[class*="toast"],[class*="sheet"]')
+      && !/^(0px 0px 0px \d+(?:\.\d+)?px)/.test(c.boxShadow)) out.shadow.push(name(e));
+    const fam = c.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+    if (/fraunces|playfair|georgia|garamond|merriweather|lora|crimson|cormorant|libre baskerville|times/i.test(fam) && parseFloat(c.fontSize) >= 20 && e.textContent.trim()) out.serif.push(name(e));
+    if (!transparent(c.backgroundColor) && r.width >= 200 && r.height >= 80 && !inArt(e)) { const h = hue(c.backgroundColor), s = sat(c.backgroundColor), l = light(c.backgroundColor); if (h >= 205 && h <= 250 && s >= 0.35 && l <= 0.3) out.navy.push(name(e)); }
+    if (/marquee|ticker|scroll/i.test(c.animationName) && c.animationName !== 'none') { const t = e.parentElement; if (t && /hidden|clip/.test(getComputedStyle(t).overflowX)) out.marquee.push(name(e)); }
+    if (/[\u{1F000}-\u{1FAFF}\u{2600}-\u{2712}\u{2719}-\u{27BF}\u{2B50}\u{2B55}]/u.test([...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('')) && !inArt(e)) out.emoji.push(name(e));
+    // stat tiles: a parent whose >= 3 filled children each open with a big numeral
+    const par = e.parentElement;
+    if (par && !tileParents.has(par) && par.children.length >= 3 && par.children.length <= 8) {
+      const kids = [...par.children].filter((k) => { const kr = k.getBoundingClientRect(), kc = getComputedStyle(k); return kr.width >= 100 && kr.width <= 560 && kr.height >= 60 && kr.height <= 420 && (!transparent(kc.backgroundColor) || parseFloat(kc.borderTopWidth) >= 1); });
+      if (kids.length >= 3 && kids.length === par.children.length) {
+        const led = kids.filter((k) => { const big = [...k.querySelectorAll('*')].find((x) => parseFloat(getComputedStyle(x).fontSize) >= 22 && /^[\s$€£+±~<>≈]*[\d][\d.,]*\s*[%+xkKMBmhWs]?/.test(x.textContent.trim())); return !!big; });
+        if (led.length >= 3 && !par.closest('[data-rz-fact-list],table,[data-rz-register="cockpit"],.rz-metabar,[class*="result"],[id*="esult"]')) { tileParents.add(par); out.tiles.push(name(par)); }
+      }
+    }
   }
   for (const sh of document.styleSheets) {
     let rules; try { rules = sh.cssRules; } catch { continue; }
@@ -72,25 +116,30 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 900 });
   await page.goto(`${BASE}/robots.txt`);
-  await page.evaluate(() => { localStorage.setItem('rz_cookie_consent', 'declined'); localStorage.setItem('theme', 'dark'); });
-  for (const p of pages) {
-    try {
-      await page.goto(`${BASE}/${p}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
-      await new Promise((r) => setTimeout(r, 900));
-      const r = await page.evaluate(scan);
-      const score = Object.values(r).reduce((s, v) => s + v.n, 0);
-      report.push({ page: p, score, ...r });
-    } catch (err) { report.push({ page: p, error: String(err.message).slice(0, 80) }); }
+  for (const theme of themes) {
+    await page.evaluate((t) => { localStorage.setItem('rz_cookie_consent', 'declined'); localStorage.setItem('theme', t); }, theme);
+    for (const p of pages) {
+      try {
+        await page.goto(`${BASE}/${p}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
+        await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+        await new Promise((r) => setTimeout(r, 900));
+        const r = await page.evaluate(scan, KEYS);
+        const score = Object.values(r).reduce((s, v) => s + v.n, 0);
+        report.push({ page: p, theme, score, ...r });
+      } catch (err) { report.push({ page: p, theme, error: String(err.message).slice(0, 80) }); }
+    }
   }
 } finally { await browser.close(); }
 report.sort((a, b) => (b.score || 0) - (a.score || 0));
-const keys = ['rail', 'pill', 'round', 'blur', 'lift', 'grad'];
-console.log('page'.padEnd(52) + keys.map((k) => k.padStart(6)).join(''));
+console.log('page'.padEnd(44) + 'theme '.padEnd(6) + KEYS.map((k) => k.slice(0, 5).padStart(6)).join(''));
 for (const r of report) {
-  if (r.error) { console.log(r.page.padEnd(52) + '  ERROR ' + r.error); continue; }
+  if (r.error) { console.log(r.page.padEnd(44) + r.theme.padEnd(6) + '  ERROR ' + r.error); continue; }
   if (!r.score) continue;
-  console.log(r.page.slice(0, 51).padEnd(52) + keys.map((k) => String(r[k].n).padStart(6)).join(''));
+  console.log(r.page.slice(0, 43).padEnd(44) + r.theme.padEnd(6) + KEYS.map((k) => String(r[k].n).padStart(6)).join(''));
 }
-const clean = report.filter((r) => r.score === 0).length;
-console.log(`\n${report.length} pages scanned · ${clean} clean · ${report.length - clean} with at least one tell`);
+const totals = Object.fromEntries(KEYS.map((k) => [k, report.reduce((s, r) => s + (r[k] ? r[k].n : 0), 0)]));
+const dirty = new Set(report.filter((r) => r.score || r.error).map((r) => r.page));
+console.log(`\n${pages.length} pages × ${themes.length} theme(s) · ${pages.length - dirty.size} pages clean in every theme · ${dirty.size} with at least one tell or error`);
+console.log('totals: ' + KEYS.map((k) => `${k} ${totals[k]}`).join(' · '));
 if (arg('--json')) writeFileSync(arg('--json'), JSON.stringify(report, null, 1));
+if (process.argv.includes('--strict') && dirty.size) { console.log('FAIL — the owner judges the rendered page; every tell above is one he will find'); process.exit(1); }
