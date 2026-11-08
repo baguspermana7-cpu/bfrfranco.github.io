@@ -71,7 +71,7 @@
         .ck-item .spec{ font-family:var(--ck-mono); font-size:.74rem; color:var(--ck-accent); display:block; margin-top:2px; }
 
         /* parameter table */
-        .tbl-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--ck-border); border-radius:8px;
+        .tbl-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--ck-border); border-radius:4px;
             background:
               linear-gradient(to right, var(--ck-card) 30%, rgba(255,255,255,0)) 0 0/36px 100% no-repeat local,
               linear-gradient(to left, var(--ck-card) 30%, rgba(255,255,255,0)) 100% 0/36px 100% no-repeat local,
@@ -132,16 +132,16 @@
         .xv-card .lnk a:hover{ color:var(--ck-accent); border-color:var(--ck-accent); }
         /* FMECA fault-reference cards */
         .fm-grid{ display:grid; gap:.6rem; margin-top:.4rem; }
-        .fm-card{ border:1px solid var(--ck-border); border-left:2px solid var(--ck-muted); border-radius:4px; background:var(--ck-card); overflow:hidden; }
-        .fm-card.r-hi{ border-left-color:#ef4444; } .fm-card.r-md{ border-left-color:#d97706; } .fm-card.r-lo{ border-left-color:#10b981; }
+        .fm-card{ border:1px solid var(--ck-border); border-radius:4px; background:var(--ck-card); overflow:hidden; }
+        /* risk is the RPN word's colour, not a rail on the card */
         .fm-card summary{ list-style:none; cursor:pointer; display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; padding:.7rem .95rem; font-size:.86rem; }
         .fm-card summary::-webkit-details-marker{ display:none; }
         .fm-card summary::before{ content:'▸'; color:var(--ck-muted); font-size:.7rem; transition:transform .15s; }
         .fm-card[open] summary::before{ transform:rotate(90deg); }
         .fm-id{ font-family:var(--ck-mono); font-weight:700; color:var(--ck-accent); }
         .fm-name{ font-weight:600; color:var(--ck-text); flex:1; min-width:140px; }
-        .fm-rpn{ font-family:var(--ck-mono); font-size:.62rem; font-weight:700; padding:1px 7px; border-radius:4px; white-space:nowrap; background:rgba(120,130,145,.14); color:var(--ck-muted); }
-        .fm-card.r-hi .fm-rpn{ background:rgba(239,68,68,.14); color:#b91c1c; } .fm-card.r-md .fm-rpn{ background:rgba(245,158,11,.14); color:#92400e; }
+        .fm-rpn{ font-family:var(--ck-mono); font-size:.62rem; font-weight:700; padding:1px 7px; border-radius:4px; white-space:nowrap; background:none; color:var(--ck-muted); }
+        .fm-card.r-hi .fm-rpn{ background:none; color:#b91c1c; } .fm-card.r-md .fm-rpn{ background:none; color:#92400e; }
         .fm-body{ padding:.2rem .95rem 1rem; border-top:1px solid var(--ck-border); font-size:.82rem; }
         .fm-row{ display:grid; grid-template-columns:96px 1fr; gap:.5rem; padding:.3rem 0; border-bottom:1px solid rgba(160,168,180,.09); }
         .fm-row:last-of-type{ border-bottom:0; }
@@ -161,7 +161,7 @@
         [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
         .legend{ display:flex; gap:.8rem; flex-wrap:wrap; margin:.2rem 0 1rem; font-size:.74rem; color:var(--ck-muted); align-items:center; }
         table.ck-tbl td .ref{ font-family:var(--ck-mono); font-size:.66rem; color:var(--ck-muted); }
-        .ck-note{ border:1px dashed var(--ck-border); border-radius:4px; background:var(--ck-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--ck-muted); line-height:1.6; margin-top:1.2rem; }
+        .ck-note{ border:1px solid var(--ck-border); border-radius:4px; background:var(--ck-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--ck-muted); line-height:1.6; margin-top:1.2rem; }
         .ck-note b{ color:var(--ck-text); }
         .toc{ display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1rem; }
         .toc a{ font-family:var(--ck-mono); font-size:.68rem; padding:.3rem .6rem; border:1px solid var(--ck-border); border-radius:6px; color:var(--ck-muted); text-decoration:none; }
@@ -511,7 +511,7 @@
                 <tr><td><a href="#sp-leak">Leak rope + controller</a> <span class="crit y">CRIT</span></td><td>1 rope spare</td><td>7–10 yr / on failure</td><td>2–6 wk</td><td><span class="cost">on failure</span></td></tr>
             </tbody>
         </table></div>
-        <div class="ck-note" style="border-style:solid;border-left:3px solid var(--ck-accent);">
+        <div class="ck-note">
             <b>Budget roll-up (EST, per CDU)</b> — recurring consumables (filters, fluid top-up, dosing, amortised seals/sensors) sum to roughly <b class="cost" style="color:var(--ck-accent);">$1,000–4,000 / yr</b>. A one-time on-site <b>critical-spare kit</b> (2× filter, 2× QD, 1× gasket kit, 1× seal kit, 1× leak-rope spare) runs roughly <b class="cost" style="color:var(--ck-accent);">$1,500–6,000</b>, plus a shared <b>fleet spare pump</b> at <b class="cost" style="color:var(--ck-accent);">$600–3,500</b>. These are <span class="src ill">EST</span> planning bands rolled up from the register above — <b>not a quote</b>; size to your fleet count, runtime hours and OEM service-parts pricing. The dominant driver is usually <b>filter elements</b> (frequency) and <b>fluid</b> (charge volume × $/L).</div>
         <figure class="rz-chart" data-rz-chart>
             <div class="rz-chart-canvas"><canvas></canvas></div>
