@@ -19,7 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from refit_shell import shell, pue, capex, carbon, tia, tco  # noqa: E402
 from refit_shell import opex, roi, tier  # noqa: E402
-from refit_shell import explorer, explorer_pages, aiem, compare_pages  # noqa: E402
+from refit_shell import explorer, explorer_pages, aiem, compare_pages, infographic_pages  # noqa: E402
 
 ROOT = shell.ROOT
 CONFIG = {
@@ -33,7 +33,7 @@ CONFIG = {
     'tco-calculator.html': tco.CONFIG,
 }
 # explorer kind: hubs, comparisons, maps and briefs with no inputs, toolbar or results (tools/refit_shell/explorer.py)
-EXPLORER = dict(explorer_pages.CONFIG, **aiem.CONFIG, **compare_pages.CONFIG)
+EXPLORER = dict(explorer_pages.CONFIG, **aiem.CONFIG, **compare_pages.CONFIG, **infographic_pages.CONFIG)
 
 
 def main():
