@@ -7908,7 +7908,7 @@
                 var vb = (svg.viewBox && svg.viewBox.baseVal) ? svg.viewBox.baseVal : null;
                 var w = (vb && vb.width) ? vb.width : 560;
                 var h = (vb && vb.height) ? vb.height : 260;
-                var pad = { l: 124, r: 20, t: 66, b: 56 };
+                var pad = { l: 124, r: 20, t: 22, b: 56 }; /* legend is HTML under the chart (readable at 390) */
                 var pw = w - pad.l - pad.r;
                 var ph = h - pad.t - pad.b;
                 var isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -7917,8 +7917,6 @@
                 var chartTextFaint = isDarkTheme ? '#9a9ea6' : '#5f6368';
                 var accentStroke = isDarkTheme ? '#FFAA00' : '#B07600';
                 var gridStroke = isDarkTheme ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)';
-                var legendFill = isDarkTheme ? 'rgba(18,19,22,0.92)' : 'rgba(255,255,255,0.92)';
-                var legendStroke = isDarkTheme ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.16)';
 
                 var pueVals = latestPareto.map(function(m) { return m.pue; });
                 var opexVals = latestPareto.map(function(m) { return m.netOpex; });
@@ -8017,8 +8015,6 @@
                         '<line x1="' + fmtNum(gxSel, 2) + '" y1="' + pad.t + '" x2="' + fmtNum(gxSel, 2) + '" y2="' + (pad.t + ph) + '" stroke="' + accentStroke + '" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="2 3"></line>' +
                         '<line x1="' + pad.l + '" y1="' + fmtNum(gySel, 2) + '" x2="' + (pad.l + pw) + '" y2="' + fmtNum(gySel, 2) + '" stroke="' + accentStroke + '" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="2 3"></line>';
                 }
-                var legendX = w - 232;
-                var legendY = 10;
                 var xMid = pad.l + (pw / 2);
                 var yMid = pad.t + (ph / 2);
 
@@ -8029,13 +8025,7 @@
                     selectedGuides,
                     points,
                     '<text x="' + fmtNum(xMid, 2) + '" y="' + (h - 8) + '" fill="' + chartText + '" font-size="11" font-weight="700" text-anchor="middle">X-Axis: PUE (lower is better)</text>',
-                    '<text x="26" y="' + fmtNum(yMid, 2) + '" fill="' + chartTextSoft + '" font-size="11" font-weight="700" text-anchor="middle" transform="rotate(-90 26 ' + fmtNum(yMid, 2) + ')">Y-Axis: Net OPEX (lower is better)</text>',
-                    '<rect x="' + legendX + '" y="' + legendY + '" width="214" height="48" rx="8" fill="' + legendFill + '" stroke="' + legendStroke + '"></rect>',
-                    '<text x="' + (legendX + 10) + '" y="' + (legendY + 16) + '" fill="' + chartText + '" font-size="10" font-weight="700">Legend</text>',
-                    '<circle cx="' + (legendX + 12) + '" cy="' + (legendY + 30) + '" r="4.5" fill="' + riskColor(0) + '"></circle><text x="' + (legendX + 22) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk low</text>',
-                    '<circle cx="' + (legendX + 80) + '" cy="' + (legendY + 30) + '" r="4.5" fill="' + riskColor(30) + '"></circle><text x="' + (legendX + 90) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk medium</text>',
-                    '<circle cx="' + (legendX + 158) + '" cy="' + (legendY + 30) + '" r="4.5" fill="' + riskColor(99) + '"></circle><text x="' + (legendX + 168) + '" y="' + (legendY + 33) + '" fill="' + chartText + '" font-size="10">Risk high</text>',
-                    '<text x="' + (legendX + 10) + '" y="' + (legendY + 44) + '" fill="' + chartTextFaint + '" font-size="9">Soft-constraint: dashed stroke | circle size = carbon</text>'
+                    '<text x="26" y="' + fmtNum(yMid, 2) + '" fill="' + chartTextSoft + '" font-size="11" font-weight="700" text-anchor="middle" transform="rotate(-90 26 ' + fmtNum(yMid, 2) + ')">Y-Axis: Net OPEX (lower is better)</text>'
                 ].join('');
 
                 var feasibleCount = latestPareto.filter(function(m) { return m._feasible; }).length;
