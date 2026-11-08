@@ -160,4 +160,8 @@ Owner: *"page manual/ pastikan ini selalu diupdate dan align dengan toolsnya dan
   manual links the tool it documents (its `mn-toollink`, else the same-named page); M3 every manual has a card on
   `manual/index.html` and every card opens a manual. M4 lists manuals whose tool changed in git after the manual did:
   a MONITOR (git dates also move on token bumps), read it before a release and close the real ones.
+  M5 a hub manual's "What this hub links to" list names only links the hub page really carries — red on its first
+  run: the power manual listed the PLN Java grid monitor, the cooling manual the water-system calculator and its
+  manual, achievements the standards lab; none of the three hubs links them. The tool is the authority: the manual
+  lines went, the hubs were not changed to match the manual.
 - A manual names standards by their exact part and year, and never claims a calculation the page does not make.
