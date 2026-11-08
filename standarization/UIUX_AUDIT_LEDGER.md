@@ -124,11 +124,11 @@ Trigger: owner, "audit total dan perbaiki semuanya … lepas dari AI design slop
 
 | Finding | Pages | Status | Closed by / kept closed by |
 |---|---|---|---|
-| Hero photo, badge pill, quick-stat chips and an explainer panel inside the hero | 10 of 13 | CLOSED for 9 (v3.24.36); OPEN for cx, RFS, spares | `test-tool-register` T12 |
-| Toolbars of 6–18 buttons and mode pills (FREE MODE / FULL ACCESS) | 7 | CLOSED for 9; OPEN for cx, RFS, spares | T13 |
-| KPI tile strips with DERIVED/WATCH/HAZARD pills and coloured rails | 6 | CLOSED for 9; OPEN for cx, RFS, spares | T10, T14 |
+| Hero photo, badge pill, quick-stat chips and an explainer panel inside the hero | 10 of 13 | CLOSED for 9 (v3.24.36); cx, RFS, spares CLOSED v3.24.38 (`a60518554`) | `test-tool-register` T12 |
+| Toolbars of 6–18 buttons and mode pills (FREE MODE / FULL ACCESS) | 7 | CLOSED for 9; cx, RFS, spares CLOSED v3.24.38 — by render (≤ 6 controls in each bar, 2026-11-08 shots); T13 did not fire on their pre-refit pages, so it does not prove these three | T13 (9 pages), render (3) |
+| KPI tile strips with DERIVED/WATCH/HAZARD pills and coloured rails | 6 | CLOSED for 9; cx, RFS, spares CLOSED v3.24.38 | T10, T14 |
 | Pro gating drawn as blurred panels, a lock icon and an Unlock button | 10 | CLOSED for 9 (hidden, one Sign in row) | T13, T17 Free/Full |
-| Floating widgets: manual FAB, scroll-top, share rail, watermark, account pill | 11 | CLOSED for 9; OPEN for cx, RFS, spares | T4, T11, T17 pill |
+| Floating widgets: manual FAB, scroll-top, share rail, watermark, account pill | 11 | CLOSED for 9; cx, RFS, spares CLOSED v3.24.38 | T4, T11, T17 pill |
 | Page-owned gradient footers, own navbars | 12 | CLOSED for 9 | T16 |
 | Chart series in cyan, blue, green or navy | 9 | CLOSED for 9 (amber + greys, meaning opt-out) | T19 |
 | Explain panel covering its own trigger on short viewports (site-wide `js/rz-explain.js`) | all pages using it | CLOSED v3.24.36 | T17 600 px cover check, mutant red |
@@ -136,4 +136,6 @@ Trigger: owner, "audit total dan perbaiki semuanya … lepas dari AI design slop
 | `pillar-fire-safety.html`: filler copy, cards, no sources or figures | 1 | CLOSED v3.24.36 (rewrite) | `test-pillar-fire.mjs`, red on the old page (36 findings) |
 | Phone TOC numbered from 0 / skipping 1 | articles 28–30 | CLOSED v3.24.33 (LTC session) | render diff, 36 pages |
 
-The un-refit four (cx, RFS, spares, fire checklist): their computed style per element was compared under the old and the new `rz-tool.css`. There was no change. The PART 2 overrides now skip `body.tool` pages through a zero-specificity `:where()`.
+**Re-proof 2026-11-08 (R089 alignment):** the rows above said OPEN for cx, RFS and spares months after `a60518554` (v3.24.38) moved them to the tool shell. Today's `test-tool-register.mjs` run against the pre-refit tree (`a60518554^`) fails 64 checks on those three pages (rfs 22, spares 26, cx 16: T10, T11, T12, T15, T16, T17, T18, T22) and passes all of them on HEAD in both themes at 1440 and 390 px.
+
+The un-refit four (cx, RFS, spares, fire checklist), before v3.24.38: their computed style per element was compared under the old and the new `rz-tool.css`. There was no change. The PART 2 overrides now skip `body.tool` pages through a zero-specificity `:where()`.
