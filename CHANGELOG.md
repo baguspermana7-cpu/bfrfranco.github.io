@@ -11,6 +11,50 @@ release sections rather than semver.
 
 ---
 
+## v3.32.0 — 2026-11-08 — "Homepage: employer cards that flip, a capsule nav, a ResistanceZero footer"
+
+Owner request R079 (2026-11-07, again 2026-11-08): adopt three ideas from the reference shot without rebuilding the page.
+
+### Changed
+- **Career row → five employer cards.** Each card shows a large vector logo (56 px), the company name in condensed caps,
+  the years as the big figure, the role and three skills, and a full-width Details button. Hover or keyboard focus
+  inverts a card; the current employer stays inverted and carries the row's one amber word. Details flips the card to
+  facts from the CV (scope, work, results, awards): one card open at a time, Esc or Back flips it home, focus follows,
+  the card never changes height, and reduced motion crossfades instead of rotating. Cargill and Pure Data Centres use
+  vector marks (`assets/logos/`); no raster logo is enlarged.
+- **Navbar**: the links sit in one capsule, with a dark Contact pill on the right. No hairline, blur or shadow; the
+  sliding hover indicator and the DC Solutions jiggle are gone. The hero Correspondence button and the contact
+  section's email button use the same pill. Wording is unchanged.
+- **Footer**: Pages, Topics, Based in and Contact over a full-width "ResistanceZero" wordmark. The wordmark is drawn
+  from IBM Plex Sans outlines (width 75, weight 700) by `tools/build-wordmark.py`, so no font loads at runtime. Below
+  it, a legal row (independent personal project, copyright, Terms, Privacy, Changelog). The mono slogan is gone. There
+  is no phone number and no street address.
+- **Meta row** under the hero: `[hh:mm WIB] · Bekasi, Indonesia · Independent personal project`.
+- Dates follow the CV: Astra Agro Lestari 2014–2019, Cargill 2019–2020.
+
+### Added
+- `tools/test-index-r079.mjs` checks 28 laws on the rendered page:
+  - every pre-refit id is kept and every in-page anchor resolves;
+  - the flip works, including with reduced motion;
+  - phone width shows one column, no horizontal scroll and every logo at 56 px or more;
+  - the nav is flat at 64 px, and there is one pill each in the nav, hero and contact section;
+  - the meta row is present;
+  - the wordmark spans the footer, footer links resolve and the footer has no phone or address.
+
+  The gate is red on the pre-refit page (0 cards). It is wired into the ship gate together with
+  `build-wordmark.py --check`.
+
+### Docs
+- `ANTI_VIBECODE_STANDARD.md`: one owner-shape exemption. An element carrying `data-rz-owner-shape` is not counted as
+  `pill` or `round`, on `index.html` only. `tools/test-slop-precision.mjs` proves that the same attribute on any other
+  page still counts.
+- `UIUX_AUDIT_LEDGER.md`: R079 is CLOSED.
+
+### Removed
+- 77 `styles-index.css` rules left without a target by the refit: old career cards, footer and outline button.
+
+---
+
 ## v3.31.0 — 2026-11-08 — "The Cx plan behaves like an application: drag a level, see why, undo it, keep it"
 
 Owner, 2026-11-08 (PRD §41 K21, on K2): *"Continue, ingat comment 2 dan ekspectasi. Sempurnakan, better"* — K2 asked
