@@ -5007,7 +5007,7 @@
                     nodeSvg(source, total),
                     mids.map(function(n) { return nodeSvg(n, total); }).join(''),
                     rights.map(function(n) { return nodeSvg(n, total); }).join(''),
-                    '<rect x="432" y="88" width="230" height="126" fill="none" stroke="rgba(162, 162, 162,0.24)" stroke-dasharray="2 3" rx="8"/>',
+                    '<rect x="432" y="88" width="230" height="126" fill="none" stroke="rgba(162, 162, 162,0.24)" stroke-dasharray="2 3" rx="2"/>',
                     '<text x="28" y="228" fill="#6b7280" font-size="9">Flow width is proportional to kW contribution.</text>',
                     '</svg>'
                 ].join('');
@@ -5082,7 +5082,7 @@
                     '<svg class="r-chart" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">',
                     '<rect x="0" y="0" width="' + w + '" height="' + h + '" fill="white"/>',
                     '<text x="10" y="18" fill="#393939" font-size="11">' + escapeHtml(title || 'Pareto Scatter (PUE vs Net OPEX)') + '</text>',
-                    '<rect x="' + pad.l + '" y="' + pad.t + '" width="' + pw + '" height="' + ph + '" fill="rgba(133, 133, 133,0.04)" stroke="rgba(162, 162, 162,0.34)" rx="8" />',
+                    '<rect x="' + pad.l + '" y="' + pad.t + '" width="' + pw + '" height="' + ph + '" fill="rgba(133, 133, 133,0.04)" stroke="rgba(162, 162, 162,0.34)" rx="2" />',
                     grid.join(''),
                     frontier ? '<path d="' + frontier + '" fill="none" stroke="rgba(75, 75, 75,0.52)" stroke-width="1.4" stroke-dasharray="4 3"></path>' : '',
                     pointsSvg,
@@ -5125,7 +5125,7 @@
                     var by = py + 16;
                     var bw = panelW - 22;
                     var bh = panelH - 28;
-                    svg.push('<rect x="' + x + '" y="' + py + '" width="' + panelW + '" height="' + panelH + '" rx="8" fill="#f8fafc" stroke="#e5e7eb"/>');
+                    svg.push('<rect x="' + x + '" y="' + py + '" width="' + panelW + '" height="' + panelH + '" rx="2" fill="#f8fafc" stroke="#e5e7eb"/>');
                     svg.push('<text x="' + (x + 8) + '" y="' + (py + 12) + '" fill="#404040" font-size="9">' + escapeHtml(spec.label) + '</text>');
                     svg.push('<line x1="' + bx + '" y1="' + (by + bh) + '" x2="' + (bx + bw) + '" y2="' + (by + bh) + '" stroke="#a2a2a2" stroke-width="1"/>');
                     var barW = bw / hist.counts.length;
@@ -5271,29 +5271,28 @@
                     { k: 'Uptime', v: model.scores.uptime },
                     { k: 'Composite', v: model.scores.total }
                 ];
+                /* one fact row per standard (label · score · state word), not a grid of tinted tiles */
                 var w = 680;
-                var h = 180;
-                var x0 = 16;
-                var y0 = 38;
-                var cw = 212;
-                var ch = 54;
-                var gap = 8;
+                var rowH = 22;
+                var y0 = 34;
+                var h = y0 + cells.length * rowH + 24;
+                function stateWord(v) { return v >= 85 ? 'within band' : (v >= 75 ? 'watch' : 'below 75'); }
                 var svg = [
                     '<svg class="r-chart" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">',
                     '<rect x="0" y="0" width="' + w + '" height="' + h + '" fill="white"/>',
                     '<text x="10" y="18" fill="#393939" font-size="11">' + escapeHtml(title || 'Standards Heatmap') + '</text>'
                 ];
                 cells.forEach(function(c, idx) {
-                    var col = idx % 3;
-                    var row = Math.floor(idx / 3);
-                    var x = x0 + col * (cw + gap);
-                    var y = y0 + row * (ch + gap);
-                    var clr = standardsColorByScore(c.v);
-                    svg.push('<rect x="' + x + '" y="' + y + '" width="' + cw + '" height="' + ch + '" rx="8" fill="' + clr + '" fill-opacity="0.16" stroke="' + clr + '"/>');
-                    svg.push('<text x="' + (x + 10) + '" y="' + (y + 20) + '" fill="#404040" font-size="10">' + escapeHtml(c.k) + '</text>');
-                    svg.push('<text x="' + (x + 10) + '" y="' + (y + 40) + '" fill="' + clr + '" font-size="16" font-weight="700">' + fmtNum(c.v, 1) + '/100</text>');
+                    var y = y0 + idx * rowH;
+                    var clr = c.v >= 85 ? '#303030' : standardsColorByScore(c.v);
+                    var last = idx === cells.length - 1;
+                    svg.push('<line x1="10" y1="' + y + '" x2="' + (w - 10) + '" y2="' + y + '" stroke="#e2e2e2"/>');
+                    svg.push('<text x="16" y="' + (y + 15) + '" fill="#404040" font-size="11"' + (last ? ' font-weight="700"' : '') + '>' + escapeHtml(c.k) + '</text>');
+                    svg.push('<text x="300" y="' + (y + 15) + '" fill="' + clr + '" font-size="12" font-weight="700" text-anchor="end" font-family="IBM Plex Mono, monospace">' + fmtNum(c.v, 1) + ' / 100</text>');
+                    svg.push('<text x="320" y="' + (y + 15) + '" fill="' + (c.v >= 85 ? '#6b6b6b' : clr) + '" font-size="11">' + stateWord(c.v) + '</text>');
                 });
-                svg.push('<text x="10" y="' + (h - 8) + '" fill="#6b7280" font-size="9">Grey &gt;= 85 · amber 75-84.9 · red &lt; 75</text>');
+                svg.push('<line x1="10" y1="' + (y0 + cells.length * rowH) + '" x2="' + (w - 10) + '" y2="' + (y0 + cells.length * rowH) + '" stroke="#e2e2e2"/>');
+                svg.push('<text x="10" y="' + (h - 8) + '" fill="#6b7280" font-size="9">within band &gt;= 85 · watch 75-84.9 · below &lt; 75</text>');
                 svg.push('</svg>');
                 return svg.join('');
             }
@@ -5413,19 +5412,19 @@
                     '@page{size:A4;margin:15mm;}*{box-sizing:border-box;}body{margin:0;font-family:IBM Plex Sans,Segoe UI,Arial,sans-serif;color:#1f2937;background:#ffffff;line-height:1.42;}' +
                     '.r-wrap{padding:10px 14px 20px;} .r-head{display:flex;justify-content:space-between;gap:16px;border-bottom:2px solid #dbe5ef;padding-bottom:10px;margin-bottom:12px;}' +
                     '.r-head h1{font-size:20px;margin:0 0 4px;color:#393939;} .r-head p{margin:0;font-size:12px;color:#374151;} .r-brand{margin-top:5px;font-size:9px;color:#737373;letter-spacing:.09em;text-transform:uppercase;font-weight:700;} .r-head-meta{font-size:11px;line-height:1.55;text-align:right;color:#404040;}' +
-                    '.r-sec{margin-top:12px;border:1px solid #dbe5ef;border-radius:10px;overflow:visible;break-inside:auto;page-break-inside:auto;} .r-sec h2{margin:0;padding:8px 10px;font-size:13px;color:#393939;background:#f8fafc;border-bottom:1px solid #dbe5ef;break-after:avoid-page;page-break-after:avoid;}' +
+                    '.r-sec{margin-top:12px;border:1px solid #dbe5ef;border-radius:4px;overflow:visible;break-inside:auto;page-break-inside:auto;} .r-sec h2{margin:0;padding:8px 10px;font-size:13px;color:#393939;background:#f8fafc;border-bottom:1px solid #dbe5ef;break-after:avoid-page;page-break-after:avoid;}' +
                     '.r-sec .r-body{padding:9px 10px;} .r-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}' +
-                    '.r-card{border:1px solid #dbe5ef;border-radius:8px;padding:8px;background:#f8fafc;} .r-card .k{font-size:11px;color:#a2a2a2;text-transform:uppercase;letter-spacing:.06em;}' +
+                    '.r-card{border:1px solid #dbe5ef;border-radius:4px;padding:8px;background:#f8fafc;} .r-card .k{font-size:11px;color:#a2a2a2;text-transform:uppercase;letter-spacing:.06em;}' +
                     '.r-card .v{margin-top:3px;font-size:17px;font-weight:700;color:#393939;} .r-card .s{margin-top:3px;font-size:11px;color:#1f2937;line-height:1.4;}' +
-                    '.r-score-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;} .r-score-card{border:2px solid #dbe5ef;border-radius:10px;background:linear-gradient(135deg,#ecfeff,#f0f9ff);padding:10px;} .r-score-card .k{font-size:10px;color:#a2a2a2;text-transform:uppercase;letter-spacing:.07em;} .r-score-card .v{font-size:40px;line-height:1.0;color:#393939;font-weight:800;font-family:JetBrains Mono,Consolas,monospace;} .r-score-grade{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:rgba(109, 109, 109,0.12);color:#5c5c5c;} .r-score-note{margin-top:6px;font-size:11px;color:#374151;line-height:1.45;}' +
+                    '.r-score-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;} .r-score-card{border:1px solid #dbe5ef;border-radius:4px;background:#fafafa;padding:10px;} .r-score-card .k{font-size:10px;color:#a2a2a2;text-transform:uppercase;letter-spacing:.07em;} .r-score-card .v{font-size:40px;line-height:1.0;color:#393939;font-weight:800;font-family:JetBrains Mono,Consolas,monospace;} .r-score-grade{display:inline-block;margin-top:6px;padding:1px 6px;border:1px solid #c9c9c9;border-radius:2px;font-size:10px;font-weight:700;background:transparent;color:#4a4a4a;} .r-score-note{margin-top:6px;font-size:11px;color:#374151;line-height:1.45;}' +
                     '.r-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;} .r-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}' +
-                    '.r-chart-wrap{border:1px solid #dbe5ef;border-radius:8px;padding:6px;background:#ffffff;overflow:visible;} .r-chart{width:100%;height:auto;display:block;}' +
+                    '.r-chart-wrap{border:1px solid #dbe5ef;border-radius:4px;padding:6px;background:#ffffff;overflow:visible;} .r-chart{width:100%;height:auto;display:block;}' +
                     '.r-list{margin:0;padding-left:18px;} .r-list li{margin:0 0 4px;font-size:11px;color:#1f2937;} .r-note{font-size:11px;color:#a2a2a2;margin-top:6px;}' +
-                    '.r-conclusion{margin-top:8px;padding:8px 10px;border:1px solid #cbd5e1;border-left:4px solid #6d6d6d;border-radius:8px;background:#f8fbff;font-size:11px;color:#1f2937;line-height:1.5;}' +
-                    '.r-conclusion.ok{border-left-color:#838383;background: rgba(163, 163, 163, 0.08);} .r-conclusion.warn{border-left-color:#d97706;background:#fffaf0;} .r-conclusion.bad{border-left-color:#dc2626;background:#fff5f5;}' +
+                    '.r-conclusion{margin-top:8px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:4px;background:#fafafa;font-size:11px;color:#1f2937;line-height:1.5;}' +
+                    '.r-conclusion.ok,.r-conclusion.warn,.r-conclusion.bad{background:#fafafa;color:#1f2937;font-weight:400;} .r-conclusion.warn strong{color:#9a6a00;} .r-conclusion.bad strong{color:#b91c1c;}' +
                     'table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;break-inside:auto;page-break-inside:auto;} th,td{padding:6px 7px;border-bottom:1px solid #e5e7eb;vertical-align:top;word-break:break-word;overflow-wrap:anywhere;color:#1f2937;} th{background:#f8fafc;text-align:left;text-transform:uppercase;letter-spacing:.05em;font-size:10px;color:#374151;} tr{break-inside:avoid-page;page-break-inside:avoid;}' +
                     'tr:last-child td{border-bottom:none;} .ok{color:#696969;font-weight:700;} .warn{color:#b45309;font-weight:700;} .bad{color:#b91c1c;font-weight:700;}' +
-                    '.tag{display:inline-block;padding:2px 7px;border:1px solid #dbe5ef;border-radius:999px;font-size:10px;background:#fff;margin-right:4px;margin-bottom:4px;} .muted{color:#737373;font-size:11px;}' +
+                    '.tag{display:inline-block;padding:1px 6px;border:1px solid #dbe5ef;border-radius:2px;font-size:10px;background:#fff;margin-right:4px;margin-bottom:4px;} .muted{color:#737373;font-size:11px;}' +
                     '.mono{font-family:JetBrains Mono,Consolas,monospace;} .split{display:grid;grid-template-columns:1fr 1fr;gap:10px;} .page-break{page-break-before:always;}' +
                     '.r-json{font-size:9px;line-height:1.32;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;tab-size:2;}' +
                     '.r-json-chunk-label{font-size:10px;color:#545454;margin:0 0 4px;text-transform:uppercase;letter-spacing:.05em;}' +
@@ -6851,7 +6850,7 @@
 
                     '<section class="r-sec"><h2>Executive Scorecard</h2><div class="r-body">',
                     '<div class="r-score-grid">',
-                    '<div class="r-score-card"><div class="k">Composite Engineering Score</div><div class="v">' + fmtNum(model.scores.total, 1) + '</div><span class="r-score-grade">GRADE ' + grade(model.scores.total) + '</span><div class="r-score-note">PUE ' + fmtNum(model.pue, 3) + ' | COP ' + fmtNum(model.systemCop, 2) + ' | Risk ' + fmtNum(model.riskIndex, 1) + '/100.</div></div>',
+                    '<div class="r-score-card"><div class="k">Composite Engineering Score</div><div class="v">' + fmtNum(model.scores.total, 1) + '</div><span class="r-score-grade">' + grade(model.scores.total) + '</span><div class="r-score-note">PUE ' + fmtNum(model.pue, 3) + ' · COP ' + fmtNum(model.systemCop, 2) + ' · risk ' + fmtNum(model.riskIndex, 1) + ' / 100</div></div>',
                     '<div class="r-score-card"><div class="k">Constraint + Gate Readiness</div><div class="v">' + ((hard.feasible ? 1 : 0) + (gates.g1 ? 1 : 0) + (gates.g2 ? 1 : 0) + (gates.g3 ? 1 : 0)) + '/4</div><span class="r-score-grade">' + (hard.feasible ? 'HARD-PASS' : 'HARD-FAIL') + '</span><div class="r-score-note">Gate state: G1 ' + (gates.g1 ? 'OPEN' : 'BLOCKED') + ' | G2 ' + (gates.g2 ? 'OPEN' : 'BLOCKED') + ' | G3 ' + (gates.g3 ? 'OPEN' : 'BLOCKED') + '.</div></div>',
                     '</div>',
                     narrativeHtml(nExecutive),
@@ -7200,8 +7199,8 @@
                     '</div></section>',
 
                     '<section class="r-sec"><h2>Compare Executive Scorecards</h2><div class="r-body"><div class="r-score-grid">',
-                    '<div class="r-score-card"><div class="k">Left Composite Score</div><div class="v">' + fmtNum(lm.scores.total, 1) + '</div><span class="r-score-grade">GRADE ' + grade(lm.scores.total) + '</span><div class="r-score-note">PUE ' + fmtNum(lm.pue, 3) + ' | COP ' + fmtNum(lm.systemCop, 2) + ' | Risk ' + fmtNum(lm.riskIndex, 1) + '.</div></div>',
-                    '<div class="r-score-card"><div class="k">Right Composite Score</div><div class="v">' + fmtNum(rm.scores.total, 1) + '</div><span class="r-score-grade">GRADE ' + grade(rm.scores.total) + '</span><div class="r-score-note">PUE ' + fmtNum(rm.pue, 3) + ' | COP ' + fmtNum(rm.systemCop, 2) + ' | Risk ' + fmtNum(rm.riskIndex, 1) + '.</div></div>',
+                    '<div class="r-score-card"><div class="k">Left Composite Score</div><div class="v">' + fmtNum(lm.scores.total, 1) + '</div><span class="r-score-grade">' + grade(lm.scores.total) + '</span><div class="r-score-note">PUE ' + fmtNum(lm.pue, 3) + ' | COP ' + fmtNum(lm.systemCop, 2) + ' | Risk ' + fmtNum(lm.riskIndex, 1) + '.</div></div>',
+                    '<div class="r-score-card"><div class="k">Right Composite Score</div><div class="v">' + fmtNum(rm.scores.total, 1) + '</div><span class="r-score-grade">' + grade(rm.scores.total) + '</span><div class="r-score-note">PUE ' + fmtNum(rm.pue, 3) + ' | COP ' + fmtNum(rm.systemCop, 2) + ' | Risk ' + fmtNum(rm.riskIndex, 1) + '.</div></div>',
                     '</div>',
                     narrativeHtml(nCmpExecutive),
                     '</div></section>',

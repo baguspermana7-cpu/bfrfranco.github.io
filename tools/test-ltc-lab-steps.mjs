@@ -62,6 +62,7 @@
  * S33 The Pareto legend sits inside the visible chart panel and renders at >= 11 px at every width
  * S34 The Pareto scatter fits its panel without inner scroll, its text renders at >= 10 px, its status reads as words
  * S35 The legacy audit-table reports (single, compare) carry no colour outside grey, amber and fault red (chroma > 0.12)
+ * S36 Those reports draw no tiles: no SVG rect with rx > 4, no boxed HTML element rounded > 4 px, no tinted wash (chroma > 0.03)
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -684,6 +685,20 @@ try {
           return Object.entries(seen).sort((a, b) => b[1] - a[1]).slice(0, 14).map(([c, n]) => c + ' x' + n); });
         await q.close();
         if (bad.length) fails.push(`${w} S35 legacy report ${i ? 'compare' : 'single'} off-register colours: ${bad.join(', ')}`);
+        // S36 no tiles in those reports: no SVG rect with rx > 4 and no boxed HTML element (border or fill) rounded > 4 px
+        const q2 = await b.newPage(); await q2.setContent(html, { waitUntil: 'load' });
+        const tiles = await q2.evaluate(() => { const out = {};
+          for (const r of document.querySelectorAll('svg rect')) { const rx = +(r.getAttribute('rx') || 0); if (rx > 4) out['svg rect rx=' + rx] = (out['svg rect rx=' + rx] || 0) + 1; }
+          for (const e of document.querySelectorAll('body *')) { if (e instanceof SVGElement) continue; const cs = getComputedStyle(e); const rad = parseFloat(cs.borderTopLeftRadius) || 0;
+            if (rad <= 4) continue; const boxed = parseFloat(cs.borderTopWidth) > 0 || !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor);
+            if (boxed) { const k = e.tagName.toLowerCase() + '.' + String(e.className).split(' ')[0] + ' r=' + rad; out[k] = (out[k] || 0) + 1; } }
+          for (const e of document.querySelectorAll('body *')) { if (e instanceof SVGElement || !e.textContent.trim()) continue;
+            const m = getComputedStyle(e).backgroundColor.match(/[\d.]+/g); if (!m || (m[3] !== undefined && +m[3] === 0)) continue;
+            const c = (Math.max(+m[0], +m[1], +m[2]) - Math.min(+m[0], +m[1], +m[2])) / 255 * (m[3] !== undefined ? +m[3] : 1);
+            if (c > 0.03) { const k = 'tinted ' + e.tagName.toLowerCase() + '.' + String(e.className).split(' ').join('.') + ' ' + getComputedStyle(e).backgroundColor; out[k] = (out[k] || 0) + 1; } }
+          return Object.entries(out).slice(0, 8).map(([k, n]) => k + ' x' + n); });
+        await q2.close();
+        if (tiles.length) fails.push(`${w} S36 legacy report ${i ? 'compare' : 'single'} rounded tiles: ${tiles.join(', ')}`);
       }
     }
     // S32 settings live under their own step: selecting step k shows that step's settings (design ones in view, preset
@@ -725,4 +740,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, the compare card states its verdicts, settings sit under their step, the Pareto legend is readable, the scatter fits a phone, the legacy reports keep the register, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, the compare card states its verdicts, settings sit under their step, the Pareto legend is readable, the scatter fits a phone, the legacy reports keep the register and draw no tiles, 0 errors');
