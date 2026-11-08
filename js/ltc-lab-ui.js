@@ -1817,16 +1817,17 @@
     // REPORT scenario-compare — snapshots are pure engine KPIs; deltas are computed.
     function _snapKpis(m) {
         return { pue: m.pue, cop: m.systemCop, flow: m.flowLpm, pump: m.pumpPowerKw,
-                 risk: m.riskIndex, opex: m.netOpex, carbon: m.netCarbonTons };
+                 risk: m.riskIndex, opex: m.netOpex, carbon: m.netCarbonTons,
+                 it: m.itKw, engine: m.engine === 'ltc-plant' ? 'plant' : 'screening' };
     }
     var CMP_METRICS = [
         { k: 'pue',    lbl: 'PUE',              dec: 3, lowerBetter: true },
         { k: 'cop',    lbl: 'System COP',       dec: 2, lowerBetter: false },
-        { k: 'flow',   lbl: 'Total Flow (LPM)', dec: 0, neutral: true },
-        { k: 'pump',   lbl: 'Loop pumps (kW)',  dec: 1, lowerBetter: true },
+        { k: 'flow',   lbl: 'Total Flow (LPM)', dec: 0, neutral: true, extensive: true },
+        { k: 'pump',   lbl: 'Loop pumps (kW)',  dec: 1, lowerBetter: true, extensive: true },
         { k: 'risk',   lbl: 'Risk Index',       dec: 1, lowerBetter: true },
-        { k: 'opex',   lbl: 'Net OPEX ($/yr)',  dec: 0, lowerBetter: true, usd: true },
-        { k: 'carbon', lbl: 'Carbon (tCO2e/yr)', dec: 0, lowerBetter: true }
+        { k: 'opex',   lbl: 'Net OPEX ($/yr)',  dec: 0, lowerBetter: true, usd: true, extensive: true },
+        { k: 'carbon', lbl: 'Carbon (tCO2e/yr)', dec: 0, lowerBetter: true, extensive: true }
     ];
     function bindReportCompare() {
         var pin = document.getElementById('ltcPinA'), clr = document.getElementById('ltcClearA');
@@ -1840,15 +1841,26 @@
         if (!host || !model) return;
         var A = window.__ltcCompareA, B = _snapKpis(model);
         if (!A) { host.innerHTML = '<div class="ltc-muted" style="padding:10px">Pin a design as A, then adjust inputs — the delta vs current (B) appears here.</div>'; return; }
-        function f(v, m) { return m.usd ? fmtUsd(v) : fmt(v, m.dec); }
+        function f(v, m) { return m.usd ? fmtUsd(v) : (isFinite(v) ? Number(v).toLocaleString('en-US', { minimumFractionDigits: m.dec, maximumFractionDigits: m.dec }) : '—'); }
+        /* 3.27.x — the verdict is a word, not a colour; totals that grow with IT load read "scale" when A and B carry
+         * different IT loads (as in the Review step); a pin taken on the other model is not compared */
+        if (A.engine && A.engine !== B.engine) {
+            host.innerHTML = '<div class="ltc-muted" style="padding:10px">A was pinned on the ' + A.engine + ' model and the page now runs the ' +
+                B.engine + ' model. Pin again to compare like with like.</div>';
+            return;
+        }
+        var scaled = isFinite(A.it) && isFinite(B.it) && Math.abs(A.it - B.it) > Math.abs(B.it) * 1e-6;
         var rows = CMP_METRICS.map(function (m) {
             var a = A[m.k], b = B[m.k], d = b - a;
-            var cls = (m.neutral || Math.abs(d) < 1e-9) ? '' : ((m.lowerBetter ? d < 0 : d > 0) ? 'down' : 'up');
-            return '<div class="ltc-cmp-row"><span class="ltc-cmp-lbl">' + m.lbl + '</span>' +
+            var same = Math.abs(d) < 0.5 * Math.pow(10, -m.dec) || Math.abs(d) <= Math.abs(a) * 1e-6;
+            var word = same ? 'same' : (m.extensive && scaled) ? 'scale' : m.neutral ? 'changed' : ((m.lowerBetter ? d < 0 : d > 0) ? 'better' : 'worse');
+            return '<div class="ltc-cmp-row is-' + word + '" data-key="' + m.k + '"><span class="ltc-cmp-lbl">' + m.lbl + '</span>' +
                 '<span>' + f(a, m) + '</span><span>' + f(b, m) + '</span>' +
-                '<span class="ltc-cmp-d ' + cls + '">' + (d >= 0 ? '+' : '') + f(d, m) + '</span></div>';
+                '<span class="ltc-cmp-d">' + (same ? '' : (d >= 0 ? '+' : '') + f(d, m)) + '</span><span class="ltc-cmp-s">' + word + '</span></div>';
         }).join('');
-        host.innerHTML = '<div class="ltc-cmp-row ltc-cmp-head"><span>Metric</span><span>A (pinned)</span><span>B (current)</span><span>Δ</span></div>' + rows;
+        host.innerHTML = (scaled ? '<div class="ltc-muted" style="padding:6px 0 8px">IT load differs (' + fmt(A.it / 1000, 1) + ' → ' + fmt(B.it / 1000, 1) +
+            ' MW), so totals show scale, not better or worse.</div>' : '') +
+            '<div class="ltc-cmp-row ltc-cmp-head"><span>Metric</span><span>A (pinned)</span><span>B (current)</span><span>Δ</span><span></span></div>' + rows;
     }
 
     function renderScenarioInfo(model) {

@@ -56,6 +56,8 @@
  * S27 Accordion titles are the block heading only (no tooltip text glued on)
  * S28 Charts-tab series are amber and greys (red only for a high-risk state)
  * S29 The Pareto scatter's axis ticks are distinct, also for a one-point frontier
+ * S30 Report compare card: verdict words on every row; totals read "scale" across IT loads; pump efficiency up = better
+ * S31 The page's own nav links carry no second hue
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -563,6 +565,34 @@ try {
         if (xs.length < 3 || dup(xs)) out.push('x ticks ' + xs.join(' '));
         window.__ltcRenderParetoFor([]); return out; });
       ok(s29.length === 0, `${w} S29 Pareto scatter with one point repeats its axis ticks: ${s29.join(' | ')}`);
+      // S30 Report compare card: every row states its verdict as a word; with a different IT load the totals read
+      // "scale"; with the same IT load a better pump efficiency reads "better" on the pump row
+      if (await p.$('#ltcPinA')) {
+        const setIn = (id, v) => p.evaluate((id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, id, v);
+        const rows = () => p.evaluate(() => [...document.querySelectorAll('#ltcCompareTable .ltc-cmp-row:not(.ltc-cmp-head)')].map((r) => ({ k: r.dataset.key, w: (r.querySelector('.ltc-cmp-s') || {}).textContent || '' })));
+        const settle = async (key, want) => { let r = []; for (let i = 0; i < 24; i++) { await new Promise((x) => setTimeout(x, 250)); r = await rows(); const x = r.find((q) => q.k === key); if (x && want(x.w)) break; } return r; };
+        await setIt0('100'); await setIn('inPumpEff', '70');
+        for (let i = 0; i < 24 && await p.evaluate(() => Math.abs(window.__ltcLastModel.itKw - 100000) > 1); i++) await new Promise((x) => setTimeout(x, 250));
+        await p.evaluate(() => document.getElementById('ltcPinA').click());
+        await setIt0('60');
+        let r = await settle('opex', (x) => x === 'scale');
+        const noWord = r.filter((x) => !/^(same|better|worse|scale|changed)$/.test(x.w)).map((x) => x.k);
+        ok(r.length >= 6 && noWord.length === 0, `${w} S30 compare rows without a verdict word: ${noWord.join(', ') || 'rows ' + r.length}`);
+        const notScale = r.filter((x) => ['opex', 'carbon', 'pump', 'flow'].includes(x.k) && !/^(scale|same)$/.test(x.w)).map((x) => x.k + '=' + x.w);
+        ok(notScale.length === 0, `${w} S30 totals called better/worse across different IT loads: ${notScale.join(', ')}`);
+        await p.evaluate(() => document.getElementById('ltcPinA').click());
+        await setIn('inPumpEff', '90');
+        r = await settle('pump', (x) => x === 'better');
+        const pump = r.find((x) => x.k === 'pump');
+        ok(pump && pump.w === 'better', `${w} S30 higher pump efficiency at the same IT load reads "${pump && pump.w}" on the pump row`);
+        await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((x) => setTimeout(x, 2500));
+      }
+      // S31 the page's own nav links carry no second hue (the Glossary link was inline teal #14b8a6)
+      const s31 = await p.evaluate(() => [...document.querySelectorAll('.nav-links > a.nav-back, .nav-links > .theme-toggle')].filter((e) => e.getBoundingClientRect().width).map((e) => {
+        const m = getComputedStyle(e).color.match(/[\d.]+/g).map(Number), mx = Math.max(m[0], m[1], m[2]), mn = Math.min(m[0], m[1], m[2]);
+        if (mx - mn <= 25) return null; let h; if (mx === m[0]) h = 60 * (((m[1] - m[2]) / (mx - mn)) % 6); else if (mx === m[1]) h = 60 * ((m[2] - m[0]) / (mx - mn) + 2); else h = 60 * ((m[0] - m[1]) / (mx - mn) + 4);
+        h = (h + 360) % 360; return h >= 25 && h <= 50 ? null : e.textContent.trim() + ' ' + getComputedStyle(e).color; }).filter(Boolean));
+      ok(s31.length === 0, `${w} S31 nav links in a second hue: ${s31.join(' | ')}`);
       // S24 Pareto "apply best": the baseline row is the design before the apply, the figures shown are reproduced from
       // the form, and the form shows plain numbers (no float noise such as 1.2300000000000002)
       if (await p.$('#runPareto')) {
@@ -604,4 +634,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, the compare card states its verdicts, 0 errors');
