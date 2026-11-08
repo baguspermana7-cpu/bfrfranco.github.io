@@ -85,7 +85,6 @@ CATEGORY_MAP = {
     "pillar-cooling.html": "Pillar Pages",
     "pillar-fire-safety.html": "Pillar Pages",
     "pillar-power.html": "Pillar Pages",
-    "pillar-standards.html": "Pillar Pages",
     "pillar-sustainability.html": "Pillar Pages",
     "ict.html": "Pillar Pages",
     "fire-system.html": "Pillar Pages",

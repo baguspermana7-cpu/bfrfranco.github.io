@@ -841,7 +841,7 @@ def generate_city_page(city):
                     <a href="../tier-advisor.html" class="dcm-crosslink">Tier Advisor</a>
                     <a href="../pillar-cooling.html" class="dcm-crosslink">Cooling Guide</a>
                     <a href="../pillar-power.html" class="dcm-crosslink">Power Systems Guide</a>
-                    <a href="../pillar-standards.html" class="dcm-crosslink">Standards Guide</a>
+                    <a href="../tia-942-checklist.html" class="dcm-crosslink">TIA-942 checklist</a>
                     <a href="../compare-air-vs-liquid-cooling.html" class="dcm-crosslink">Air vs Liquid Cooling</a>
                     <a href="../glossary.html" class="dcm-crosslink">DC Glossary (300+ Terms)</a>
                 </div>

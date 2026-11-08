@@ -38,7 +38,6 @@ const DOCUMENTS = [
   "manual/pillar-cooling.html",
   "manual/pillar-fire-safety.html",
   "manual/pillar-power.html",
-  "manual/pillar-standards.html",
   "manual/pillar-sustainability.html",
   "manual/pln-java-grid.html",
   "manual/pln-sumatra-grid.html",

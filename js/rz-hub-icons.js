@@ -56,7 +56,6 @@
     /* P.03 power pillar — the bolt */
     'pillar-power.html': '<path d="M27 6L12 27h10l-2 15 15-21H25z"/>',
     /* P.04 standards pillar — the bound book */
-    'pillar-standards.html': '<path d="M10 10h22a4 4 0 0 1 4 4v26H14a4 4 0 0 1-4-4z"/><path d="M14 36h22M10 10v26M18 16h12M18 22h12"/>',
     /* P.06 sustainability — the leaf on its vein */
     'pillar-sustainability.html': '<path d="M38 10c-20 0-28 10-28 24 14 0 26-6 28-24z"/><path d="M10 40c6-10 14-16 22-20"/>',
     /* P.07 incidents — the warning plate */

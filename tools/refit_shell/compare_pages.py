@@ -275,7 +275,7 @@ ACC = {
         h1='ASHRAE vs Uptime Institute <span class="muted">thermal envelope against availability tiers</span>',
         lede='ASHRAE TC 9.9 sets the thermal environment; the Uptime Tier Standard sets redundancy and certification. The two compared on scope and use.',
         basis='basis ASHRAE TC 9.9 · Uptime Institute Tier Standard · ' + BASIS_NOTE, crumb='ASHRAE vs Uptime',
-        links=[('pillar-standards.html', 'Standards'), ('compare-tier-3-vs-tier-4.html', 'Tier III vs Tier IV'), ('tier-advisor.html', 'Tier advisor')]),
+        links=[('tia-942-checklist.html', 'TIA-942 checklist'), ('compare-tier-3-vs-tier-4.html', 'Tier III vs Tier IV'), ('tier-advisor.html', 'Tier advisor')]),
     'compare-tier-3-vs-tier-4.html': dict(
         key='compare-tier', acc=5, faq=4,
         eyebrow='Standards · <b>Compare</b> · tiers',
@@ -283,7 +283,7 @@ ACC = {
         lede='Tier III can be maintained without a shutdown; Tier IV also survives a fault. The two compared on topology, availability and cost, with an availability estimate.',
         basis='basis Uptime Institute Tier Standard: Topology · TIA-942 · ' + BASIS_NOTE, crumb='Tier III vs Tier IV',
         extra=[('Availability estimate', 'From one component\'s MTBF and MTTR; a simplified model for illustration.', TIER_CALC)],
-        links=[('tier-advisor.html', 'Tier advisor'), ('compare-n1-vs-2n.html', 'N+1 vs 2N'), ('pillar-standards.html', 'Standards')],
+        links=[('tier-advisor.html', 'Tier advisor'), ('compare-n1-vs-2n.html', 'N+1 vs 2N'), ('tia-942-checklist.html', 'TIA-942 checklist')],
         script=TIER_SCRIPT),
 }
 

@@ -304,7 +304,7 @@ _pillar_pairs += [
      "        .pillar-hero h1 span { color: var(--pillar-color); }"),
 ]
 FAMILIES["pillar"] = {
-    "globs": ["pillar-cooling.html", "pillar-power.html", "pillar-standards.html", "pillar-sustainability.html"],
+    "globs": ["pillar-cooling.html", "pillar-power.html", "pillar-sustainability.html"],
     "pairs": _pillar_pairs,
 }
 
