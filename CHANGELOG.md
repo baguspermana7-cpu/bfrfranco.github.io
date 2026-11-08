@@ -11,15 +11,37 @@ release sections rather than semver.
 
 ---
 
-## v3.32.1 — 2026-11-08 — "Homepage employer cards on a phone are as tall as the face shown"
+## v3.32.1 — 2026-11-08 — "Homepage career cards, redesigned calm: one logo height, no black card, no clock"
 
-### Fixed
-- On a phone each employer card sat as tall as its longer back face. That left an empty band of up to 163 px above
-  Details on the front (Pure Data Centres). From 640 px down, the card now follows the face that is shown, and that
-  face turns in from 90° (it fades under reduced motion). Wider screens keep the stacked flip, so cards in a row still
-  share a height.
-- `tools/test-index-r079.mjs` gains the law (empty band above Details ≤ 40 px at 390, both themes). It failed on the
-  live v3.32.0 page (163 px) and passes at 10 px.
+Owner 2026-11-08 on v3.32.0: the cards read black, big and odd, the "–" bullets looked wrong, and the Bekasi clock
+line was not wanted. The new card was designed first in FigCraft (`~/Documents/figcraft/index-cards/cards-v2.figcraft`).
+
+### Changed
+- **Career cards v2.** Every card has the same surface.
+  - Logos sit at one height (28 px).
+  - The name is in sentence case, with the period in mono in the corner.
+  - Skills are plain lines with a small square marker.
+  - "Details →" is a quiet text button under a hairline.
+  - The current employer is marked by a 3 px amber top rule and the word "Current", not by an inverted black card.
+  - Hover and focus darken the border only.
+- A visible section head ("Career · Five employers, 2011 to now") replaces the screen-reader-only heading.
+- **Details turns the card** to its CV facts. The shown face sets the card's height, so a front no longer carries an
+  empty band sized for its longer back (163 px on a phone in v3.32.0). Reduced motion fades instead.
+
+### Removed
+- The `[hh:mm WIB] · Bekasi, Indonesia · Independent personal project` meta row and its clock script.
+- The IBM Plex Sans Condensed font request.
+
+### Added
+- New laws in `tools/test-index-r079.mjs`:
+  - one card background, with the current card marked by a top rule;
+  - no dash bullets;
+  - names in sentence case;
+  - every logo 28 px tall;
+  - no clock row;
+  - no empty band above Details: up to 40 px on a phone, up to 80 px of row alignment on wider screens.
+
+  The gate shows 10 failures on live v3.32.0 and passes on this release.
 
 ---
 

@@ -3,11 +3,12 @@
  * test-index-r079.mjs — the laws of the R079 homepage refit (owner 2026-11-07), run on the rendered page.
  *  L1 every id of the pre-refit homepage (BASE commit) still exists, and every href="#x" resolves to an id.
  *  L2 employer cards: 5 cards, exactly 1 .is-current; Details flips (aria-expanded, back face not inert, rotateY 180),
- *     Esc flips home, opening card B closes card A, card height does not change on flip; reduced motion: no rotation.
- *  L3 phone 390: no horizontal scroll, cards one column, each card as tall as its shown face, every employer logo >= 56 px tall and a vector.
+ *     Esc flips home, opening card B closes card A, the shown face sets the height; reduced motion fades.
+ *  L3 phone 390: no horizontal scroll, cards one column, each card as tall as its shown face; every logo 28 px tall and a vector.
  *  L4 nav: no backdrop-filter, no box-shadow, 64 +/- 2 px at 1440; the Contact pill once in the nav, the
  *     pill CTA once in the hero and once in the contact section, each reaching #contact or mailto.
- *     The meta row reads [hh:mm WIB] · Bekasi, Indonesia · Independent personal project, above the cards, no email.
+ *     No clock row (owner 2026-11-08).
+ *  L2v2 (owner 2026-11-08) calm cards: one card background (current = 3 px amber top rule), square skill marker, sentence-case names.
  *  L5 footer: the wordmark spans the footer content box +/- 2 px at 390/1024/1440; every footer link resolves;
  *     no phone number, no street address, no availability/hire copy; the old mono slogan is gone.
  * Env RZ_BASE (default http://127.0.0.1:8177).   node tools/test-index-r079.mjs
@@ -62,9 +63,8 @@ try {
   await p.click('.emp-card:nth-child(2) .emp-open'); await sleep(800);
   let s = await st(1);
   check(s.exp === 'true' && !s.inert && (s.tf === 'none' || s.tf === 'matrix(1, 0, 0, 1, 0, 0)') && /emp-back-name/.test(s.focus), `L2 Details opens card 2 (expanded, back live, back face square to the reader, focus on its heading) — ${JSON.stringify(s)}`);
-  check(s.h === h0, `L2 card height unchanged by the flip — ${h0} -> ${s.h}`);
-  const frontTf = await p.evaluate(() => getComputedStyle(document.querySelectorAll('.emp-card')[1].querySelector('.emp-front')).transform);
-  check(/matrix3d\(-1/.test(frontTf), `L2 front face turned 180deg — ${frontTf.slice(0, 40)}`);
+  const shown = await p.evaluate(() => { const c = document.querySelectorAll('.emp-card')[1]; return [getComputedStyle(c.querySelector('.emp-front')).display, getComputedStyle(c.querySelector('.emp-back')).display, getComputedStyle(c.querySelector('.emp-back')).animationName]; });
+  check(shown[0] === 'none' && shown[1] === 'flex' && shown[2] === 'emp-turn-in', `L2 the back replaces the front and turns in — ${shown.join(' / ')}`);
   await p.click('.emp-card:nth-child(4) .emp-open'); await sleep(800);
   const a = await st(1), b = await st(3);
   check(a.exp === 'false' && a.inert && b.exp === 'true', `L2 opening card 4 flips card 2 home (one open at a time)`);
@@ -82,17 +82,22 @@ try {
   check(nav.blur === 'none' && nav.sh === 'none' && Math.abs(nav.h - 64) <= 2, `L4 nav flat, ${nav.h}px (blur ${nav.blur}, shadow ${nav.sh})`);
   const okHref = (l) => l.length === 1 && /^(#contact|mailto:)/.test(l[0]);
   check(okHref(nav.navPill) && nav.navPillShown === 1 && okHref(nav.hero) && okHref(nav.contact), `L4 pill CTA: nav ${nav.navPill}, hero ${nav.hero}, contact ${nav.contact}`);
-  const meta = await p.evaluate(() => { const m = document.querySelector('.rz-meta-row'); const r = m.getBoundingClientRect(), c = document.querySelector('#career').getBoundingClientRect();
-    return { t: m.textContent.trim(), above: r.bottom <= c.top + 1, w: Math.round(r.width) }; });
-  check(/^\[\d\d:\d\d WIB\]Time zone WIB, UTC\+7\. · Bekasi, Indonesia · Independent personal project$/.test(meta.t) && meta.above && !/@/.test(meta.t), `L4 meta row under the hero, clock live, no email — "${meta.t}"`);
+  const look = await p.evaluate(() => { const cs = (e) => getComputedStyle(e);
+    const fronts = [...document.querySelectorAll('.emp-front')], cur = document.querySelector('.emp-card.is-current .emp-front');
+    const li = document.querySelector('.emp-skills li'), marker = getComputedStyle(li, '::before').content;
+    return { bgs: new Set(fronts.map((f) => cs(f).backgroundColor)).size, curTop: cs(cur).borderTopWidth, marker, clock: !!document.querySelector('.rz-meta-row, .rz-meta-clock'),
+      names: [...document.querySelectorAll('.emp-name')].map((n) => cs(n).textTransform + '/' + cs(n).fontFamily.split(',')[0]) }; });
+  check(look.bgs === 1 && look.curTop === '3px', `L2v2 the current employer is a rule, not an inverted card (card backgrounds ${look.bgs}, top rule ${look.curTop})`);
+  check(look.marker !== '"–"' && look.marker !== '"-"', `L2v2 skills carry a square marker, not a dash (::before content ${look.marker})`);
+  check(look.names.every((n) => n.startsWith('none/') && !/Condensed/.test(n)), `L2v2 names in sentence case, Plex Sans (${look.names[0]})`);
+  check(!look.clock, 'L4 no clock row (owner 2026-11-08: "tulisan jam bekasi nggak usah")');
   await p.close();
 
   // L2 reduced motion: no rotation
   p = await open(1440, 'light', true);
   await p.click('.emp-card:nth-child(2) .emp-open'); await sleep(400);
-  const rm = await p.evaluate(() => { const c = document.querySelectorAll('.emp-card')[1];
-    return [getComputedStyle(c.querySelector('.emp-front')).transform, getComputedStyle(c.querySelector('.emp-back')).transform, getComputedStyle(c.querySelector('.emp-back')).opacity]; });
-  check(rm[0] === 'none' && rm[1] === 'none' && rm[2] === '1', `L2 reduced motion: crossfade, no rotation — ${rm.join(' / ')}`);
+  const rm = await p.evaluate(() => getComputedStyle(document.querySelectorAll('.emp-card')[1].querySelector('.emp-back')).animationName);
+  check(rm === 'emp-fade-in', `L2 reduced motion: the back fades in, no rotation — ${rm}`);
   await p.close();
 
   // L3 + L5 at three widths, both themes for 390
@@ -107,12 +112,13 @@ try {
       return { sw: document.documentElement.scrollWidth, cols, gap, logos, mark: m.getBoundingClientRect().width, box: f.clientWidth - parseFloat(fs.paddingLeft) - parseFloat(fs.paddingRight),
         links: [...document.querySelectorAll('.rz-foot a')].map((a) => a.getAttribute('href')), text, html: document.documentElement.outerHTML.includes('ALL OPERATIONAL DATASETS') || document.documentElement.outerHTML.includes('BUILT FOR MISSION CRITICAL') };
     }, w);
+    check(r.gap <= (w === 390 ? 40 : 80), `L3 ${theme} ${w}: no empty band above Details on the fronts beyond row alignment (largest ${r.gap} px, limit ${w === 390 ? 40 : 80})`);
     if (w === 390) {
       check(r.sw <= 390, `L3 ${theme} 390: no horizontal scroll (scrollWidth ${r.sw})`);
       check(r.cols === 1, `L3 ${theme} 390: cards in one column (${r.cols} column x-positions)`);
       check(r.gap <= 40, `L3 ${theme} 390: a card is as tall as its shown face (largest empty band above the Details button ${r.gap} px)`);
     }
-    check(r.logos.length === 5 && r.logos.every((l) => l.h >= 56 && /\.svg(\?|$)/.test(l.src)), `L3 ${theme} ${w}: 5 logos shown, each >= 56 px and a vector — ${r.logos.map((l) => l.h).join(',')}`);
+    check(r.logos.length === 5 && r.logos.every((l) => l.h === 28 && /\.svg(\?|$)/.test(l.src)), `L3 ${theme} ${w}: 5 logos shown, one height (28 px), each a vector — ${r.logos.map((l) => l.h).join(',')}`);
     check(Math.abs(r.mark - r.box) <= 2, `L5 ${w}: wordmark ${r.mark.toFixed(0)} px = footer box ${r.box.toFixed(0)} px`);
     if (w === 1440) {
       const bad = r.links.filter((h) => !(/^(mailto:|https:\/\/|#)/.test(h) || existsSync(resolve(ROOT, decodeURI(h.split('#')[0])))));
