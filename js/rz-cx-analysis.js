@@ -74,7 +74,7 @@
       '<div class="cx-an-actions"><label class="cx-an-cap">Site crew cap <input type="number" id="cxAnCap" min="1" max="1000" step="1" class="input-field" aria-label="Site crew cap"></label>' +
       '<span class="spacer"></span><span class="cx-an-state" id="cxAnState" aria-live="polite"></span>' +
       '<button type="button" class="tool-btn" id="cxAnRevert">Revert</button><button type="button" class="tool-btn" id="cxAnReset">Reset to baseline</button><button type="button" class="tool-btn is-primary" id="cxAnSave">Save scenario</button></div></div>' +
-      '<div class="cx-an-panel"><div class="cx-an-panel-head"><h3>Level timeline</h3><span class="cx-an-sub">grey = approved baseline · amber = scenario · month scrubber sets the status month</span></div><div id="cxAnTimeline" class="cx-an-timeline" aria-label="Level timeline"></div>' +
+      '<div class="cx-an-panel"><div class="cx-an-panel-head"><h3>Level timeline</h3><span class="cx-an-sub">grey = approved baseline · amber = scenario · drag a bar to move it, drag its right end to change the duration (0.1 month steps; Esc cancels) · month scrubber sets the status month</span></div><div id="cxAnTimeline" class="cx-an-timeline" aria-label="Level timeline"></div>' +
       '<div class="cx-an-scrub"><label for="cxAnMonth">Month</label><input type="range" id="cxAnMonth" min="0" max="20" step="1" value="0" aria-label="Status month"><output id="cxAnMonthOut" for="cxAnMonth">M0</output><button type="button" class="tool-btn" id="cxAnPrev" aria-label="Previous month">‹</button><button type="button" class="tool-btn" id="cxAnNext" aria-label="Next month">›</button><button type="button" class="tool-btn" id="cxAnPlay" aria-pressed="false">Play</button></div></div>' +
       '<div class="cx-an-panel"><div class="cx-an-panel-head"><h3>Status by system</h3><span class="cx-an-sub" id="cxAnStatusSub">tag = last level whose gate falls on or before the month (handbook <a href="' + P.CITES.tags + '">02.6</a>); order inside a window per <a href="' + P.CITES.durations + '">02.4.8</a></span></div>' +
       '<div class="cx-an-counts" id="cxAnCounts" data-rz-series-meaning="handbook tag colours"></div>' +
@@ -150,13 +150,18 @@
     if (!plan) { h.innerHTML = ''; return; }
     var W = 820, rowH = 22, pad = 196, n = plan.levels.length, maxM = Math.max(plan.finishMonth, plan.baselineFinish, 1), H = n * rowH + 30;
     var sx = function (m) { return pad + (m / maxM) * (W - pad - 10); };
-    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="Level windows, baseline and scenario" data-rz-series-meaning="baseline grey, scenario amber">';
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="group" aria-label="Level windows, baseline and scenario. Each scenario bar can be dragged, or focused and moved with the arrow keys" data-rz-series-meaning="baseline grey, scenario amber" data-cx-w="' + W + '" data-cx-pad="' + pad + '" data-cx-maxm="' + maxM + '">';
     for (var m = 0; m <= Math.ceil(maxM); m += (maxM > 30 ? 6 : 3)) s += '<line x1="' + sx(m) + '" y1="6" x2="' + sx(m) + '" y2="' + (H - 18) + '" stroke="' + GRID + '" stroke-width="1"/><text x="' + sx(m) + '" y="' + (H - 4) + '" font-size="10" text-anchor="middle" fill="currentColor" opacity=".7">M' + m + '</text>';
     for (var i = 0; i < n; i++) {
       var L = plan.levels[i], y = 8 + i * rowH, b = L.baseline;
       s += '<text x="0" y="' + (y + 14) + '" font-size="11" fill="currentColor">' + L.id + ' ' + esc(lvById(L.id).label.length > 24 ? lvById(L.id).label.slice(0, 23) + '…' : lvById(L.id).label) + '</text>';
       s += '<rect x="' + sx(b.start) + '" y="' + (y + 3) + '" width="' + Math.max(1, sx(b.end) - sx(b.start)) + '" height="6" fill="' + GREY + '" opacity=".6"/>';
       s += '<rect x="' + sx(L.start) + '" y="' + (y + 10) + '" width="' + Math.max(1, sx(L.end) - sx(L.start)) + '" height="8" fill="' + (L.edited ? AMBER : GREY2) + '"' + (L.edited ? '' : ' opacity=".9"') + '/>';
+      // K21 workbench: the hit area (drag = move) and the right-end grip (drag = stretch); keyboard on the hit area
+      var bw = Math.max(6, sx(L.end) - sx(L.start));
+      s += '<rect class="cx-wb-hit" data-cx-bar="' + L.id + '" x="' + sx(L.start) + '" y="' + (y + 1) + '" width="' + bw + '" height="' + (rowH - 2) + '" fill="transparent" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="120" aria-valuenow="' + one(L.start) + '" aria-valuetext="' + L.id + ' M' + one(L.start) + ' to M' + one(L.end) + ', ' + one(L.months) + ' months" aria-label="' + L.id + ' window: drag or arrow keys to move, right end or Shift plus arrows to change duration"/>';
+      s += '<rect class="cx-wb-grip" data-cx-edge="' + L.id + '" x="' + (sx(L.start) + bw - 5) + '" y="' + (y + 7) + '" width="8" height="14" fill="transparent" aria-hidden="true"/>';
+      s += '<line x1="' + (sx(L.start) + bw - 1) + '" y1="' + (y + 9) + '" x2="' + (sx(L.start) + bw - 1) + '" y2="' + (y + 19) + '" stroke="currentColor" stroke-width="1" opacity=".55" pointer-events="none"/>';
     }
     s += '<line x1="' + sx(S.month) + '" y1="4" x2="' + sx(S.month) + '" y2="' + (H - 16) + '" stroke="' + AMBER + '" stroke-width="1.5"/>';
     s += '</svg>';

@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v3.31.0 — 2026-11-08 — "The Cx plan behaves like an application: drag a level, see why, undo it, keep it"
+
+Owner, 2026-11-08 (PRD §41 K21, on K2): *"Continue, ingat comment 2 dan ekspectasi. Sempurnakan, better"* — K2 asked
+for an application, not a form: schedule, cost and man-hours per level that can be shifted, with the monthly cost
+moving and charted. The plan editor was a table of numbers; PRD v1.1 §17 / §22 / §23 promised more.
+
+### Added
+- **Drag on the level timeline** (`js/rz-cx-workbench.js`): drag a bar to move the level (start; effort and cost
+  unchanged), drag its right end to stretch it (duration; crew needed changes, L5 witness days move cost), 0.1-month
+  steps, Esc cancels. The same on the keyboard: a focused bar moves with the arrow keys, Shift+arrows change its
+  duration, Alt for 1.0-month steps. Every change goes through the editor's own override path, so the monthly cost,
+  cumulative curve, crew histogram, schematic and 3D plant follow it.
+- **Undo / redo**, 50 steps (buttons, Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z or Ctrl+Y); one drag is one step.
+- **Impact panel**: this scenario against the approved baseline, every figure a difference of two engine plans
+  (`RZCxPlan.impact`, nothing re-derived). Δ finish, cost, man-hours, peak crew, months that change. It says why each
+  level moved (edited, or carried from the level that moved first, because levels run in series). It warns when a
+  level is pulled in before its predecessor ends, and lists the months above the site crew cap. It also draws
+  scenario − baseline per month (amber = more cost that month, grey = less; "no change in any month" when nothing
+  moved), with a CSV of baseline / scenario / Δ.
+- **Named scenarios** (`RZCxPlan.scenarios`): Save as / Load / Delete, up to 5 per browser (the same cap as the
+  DCMOC store). Names are 1–40 characters, a repeated name replaces the old one, and a sixth new name is refused with
+  a reason. A table compares each scenario with the baseline and the editor.
+
+### Proof
+- `tools/test-cx-plan-core.mjs`: 37 → 66 laws. Red first: 2 failures (functions missing), then one mutation each for
+  carry attribution, the cap months and the 5-limit, each read red.
+- `tools/test-cx-analysis.mjs`: workbench laws W0–W9 with real pointer input (move +1 month = start +1.0, finish +1.0,
+  total unchanged; stretch L5 +0.5; Esc; undo/redo; Ctrl+Z; keyboard with focus kept; cap; Save as/Load/Delete;
+  cap 5; no-change chart). 88/88.
+- Render scan, strict, `cx-calculator.html?tab=analysis` in both themes: 0 tells; whole tree 215 × 2: 0.
+- Screenshots of the timeline, impact and scenario panels at 1440 and 390 px in both themes, looked at.
+
 ## v3.30.4 — 2026-11-08 — "The render scan is strict: every page reads zero tells in both themes"
 
 ### Changed

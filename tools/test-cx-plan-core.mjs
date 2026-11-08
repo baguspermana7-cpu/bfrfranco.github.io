@@ -86,5 +86,54 @@ const boom = P.store({ getItem: () => { throw new Error('x'); }, setItem: () => 
 ok('throwing storage fails soft', JSON.stringify(boom.load().overrides) === '{}' && boom.save({}, null) === false);
 ok('fmt', P.fmtUsd(5620000) === '$5.62M' && P.fmtUsd(205418) === '$205k' && P.fmtInt(91844) === '91,844' && P.fmtMo(20.04) === 'M20.0');
 
+// ── impact (K21: the workbench explains a change) — subtraction of two engine plans, nothing re-derived ──
+ok('impact is a function', typeof P.impact === 'function');
+if (typeof P.impact === 'function') {
+  const base = P.compute(inp, {}), l3 = base.levels[3];
+  const none = P.impact(base, base, null);
+  ok('baseline vs itself: no change, no reasons', none.dFinish === 0 && none.dCost === 0 && none.dManHours === 0 && none.reasons.length === 0 && none.changedMonths === 0);
+  const mv = P.compute(inp, { L3: { start: +(l3.start + 1).toFixed(2) } }), im = P.impact(mv, base, null);
+  ok('move L3 +1: finish +1.0, cost ±0, MH ±0', im.dFinish === 1 && im.dCost === 0 && im.dManHours === 0, JSON.stringify([im.dFinish, im.dCost, im.dManHours]));
+  ok('move L3 +1: L3 edited, L4–L6 carried from L3', im.levels[3].cause === 'edited' && ['L4', 'L5', 'L6'].every((id) => { const r = im.levels.find((x) => x.id === id); return r.cause === 'carried' && r.from === 'L3' && near(r.dStart, 1, 0.05); }), JSON.stringify(im.levels.map((x) => [x.id, x.cause, x.from])));
+  ok('move L3 +1: L0–L2 untouched', im.levels.slice(0, 3).every((x) => x.cause === null && x.dStart === 0));
+  ok('move L3 +1: a reason names the carry', im.reasons.some((r) => r.id === 'L4' && /carried from L3/.test(r.text)), JSON.stringify(im.reasons));
+  ok('move L3 +1: ≥ 6 months change, Σ monthly Δ = dCost (±$25)', im.changedMonths >= 6 && Math.abs(im.monthly.reduce((a, x) => a + x.d, 0) - im.dCost) <= 25, im.changedMonths);
+  ok('monthly rows cover both plans', im.monthly.length === Math.max(mv.monthly.cost.length, base.monthly.cost.length) && im.monthly.every((x, i) => x.m === i && x.d === x.scen - x.base));
+  const cr = P.compute(inp, { L3: { crew: l3.crew * 2 } }), ic = P.impact(cr, base, null);
+  ok('double L3 crew: cost up, finish same, reason says crew', ic.dCost > 0 && ic.dFinish === 0 && ic.reasons.some((r) => r.id === 'L3' && /crew/.test(r.text)), JSON.stringify(ic.reasons));
+  ok('dCost equals the engine totalDelta', ic.dCost === cr.totalDelta);
+  const ov = P.compute(inp, { L3: { start: 0.5 } }), io = P.impact(ov, base, null);
+  ok('L3 pulled before L2 ends → overlap warning on L3', io.warnings.some((w) => w.kind === 'overlap' && w.id === 'L3' && /L2/.test(w.text)), JSON.stringify(io.warnings));
+  ok('no overlap warning on the baseline', P.impact(base, base, null).warnings.every((w) => w.kind !== 'overlap'));
+  const capped = P.impact(base, base, 10);
+  ok('cap 10 → over-cap warning lists the months above it', capped.warnings.some((w) => w.kind === 'over-cap' && w.months.length > 0 && w.months.every((m) => base.monthly.crew[m] > 10)), JSON.stringify(capped.warnings));
+  ok('cap above peak → no over-cap warning', P.impact(base, base, 1000).warnings.every((w) => w.kind !== 'over-cap'));
+  ok('peak crew from the engine months', near(capped.peakCrew, Math.max(...base.monthly.crew), 1e-9) && capped.dPeakCrew === 0);
+  ok('impact(null) → null', P.impact(null, base, null) === null && P.impact(base, null, null) === null);
+}
+
+// ── named scenarios (PRD §22: Save as, max 5, localStorage) ──
+ok('scenarios is a function', typeof P.scenarios === 'function');
+if (typeof P.scenarios === 'function') {
+  const m2 = (() => { let m = {}; return { getItem: (k) => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: (k) => { delete m[k]; } }; })();
+  const SC = P.scenarios(m2);
+  ok('empty → []', SC.list().length === 0);
+  ok('save A', SC.save('  Late L3  ', { overrides: { L3: { start: 6.2 }, L9: { start: 1 } }, siteCrewCap: 18 }).ok === true);
+  const a = SC.get('Late L3');
+  ok('name trimmed, overrides sanitized, cap kept', !!a && JSON.stringify(a.overrides) === JSON.stringify({ L3: { start: 6.2 } }) && a.siteCrewCap === 18, JSON.stringify(a));
+  ok('same name overwrites', SC.save('Late L3', { overrides: { L3: { start: 7 } } }).ok && SC.list().length === 1 && SC.get('Late L3').overrides.L3.start === 7);
+  ok('blank / long name refused', SC.save('   ', {}).code === 'NAME' && SC.save('x'.repeat(41), {}).code === 'NAME');
+  for (const n of ['B', 'C', 'D', 'E']) SC.save(n, { overrides: {} });
+  ok('five kept, sixth refused FULL', SC.list().length === 5 && SC.save('F', {}).code === 'FULL' && SC.list().length === 5);
+  ok('overwrite still allowed when full', SC.save('B', { overrides: { L2: { crew: 3 } } }).ok === true);
+  ok('remove', SC.remove('C') === true && SC.list().length === 4 && SC.get('C') === null);
+  ok('persists across instances', P.scenarios(m2).list().map((x) => x.name).join() === SC.list().map((x) => x.name).join());
+  m2.setItem(P.SCEN_KEY, '{"version":9,"items":[{"name":"x"}]}');
+  ok('foreign version → []', P.scenarios(m2).list().length === 0);
+  m2.setItem(P.SCEN_KEY, 'nope');
+  ok('malformed → []', P.scenarios(m2).list().length === 0);
+  ok('no storage → list [] and save fails soft', P.scenarios(null).list().length === 0 && P.scenarios(null).save('A', {}).ok === false);
+}
+
 console.log(`CX PLAN CORE — ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -55,11 +55,28 @@ gate's; a pass result is not acceptance; an open blocking issue forces `blocked`
 (`js/rz-cx-records-ui.js`) renders the overlay, the findings and a CSV register import whose rejected rows each carry
 a reason. The shipped set is `data/cx/demo-records.json` and says so on the panel.
 
+## 3c Workbench (K21, v3.31.0)
+
+`js/rz-cx-workbench.js` makes the plan editor an application, PRD v1.1 §17 / §22 / §23. Every level bar on the
+timeline is a slider: drag the body to MOVE (start; effort and cost unchanged), drag the right end to STRETCH
+(duration; crew needed changes, L5 witness days move cost), 0.1-month steps, Esc cancels a drag, the same on the
+keyboard (arrows move, Shift+arrows stretch, Alt for 1.0-month steps). Every change goes through the same
+`S.overrides` path as the table, so the monthly curve, crew histogram, schematic and 3D follow it. Undo/redo keeps 50
+states (buttons, Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z or Ctrl+Y); a drag is ONE history entry, not one per frame.
+
+The Impact panel is `RZCxPlan.impact(plan, base, cap)`: differences of two engine plans (with and without the
+overrides), never re-derived figures. It says WHY a level moved (`edited` or `carried from Lx — levels run in
+series`), warns when a level is pulled in before its predecessor ends (the handbook gate sequence) and when months sit
+above the site crew cap, and draws scenario − baseline per month (amber = more cost that month, grey = less), with a
+CSV of baseline / scenario / Δ. Named scenarios are `RZCxPlan.scenarios(storage)`: up to 5 per browser (same cap as
+the DCMOC store), name 1–40 characters, a repeated name replaces, a sixth new name is refused with a reason; the table
+compares each against the baseline and the editor.
+
 ## 4 Gates (all wired in `tools/ship-gate.sh`; a gate that exists but is not wired is the defect, see UIUX ledger)
 
 | Gate | Proves | Red proof recorded |
 |---|---|---|
-| `tools/test-cx-plan-core.mjs` | level math, gates, tags, totals pure functions of the plan | v3.26.0 |
+| `tools/test-cx-plan-core.mjs` | level math, gates, tags, totals pure functions of the plan; `impact()` (carry attribution, overlap, over-cap, Σ monthly Δ = Δ cost) and `scenarios()` (trim, sanitize, replace, cap 5, foreign/malformed store) | v3.26.0; v3.31.0 (missing functions, then one mutation each for carry, cap and the 5-limit) |
 | `tools/test-cx-calendar.mjs` | work-day shifts, baseline fields, witness slot float, clamped overrides | v3.26.1 |
 | `tools/test-cx-io.mjs` | CSV round-trip, cell hygiene, duplicate ids, release rows | v3.26.1 |
 | `tools/test-cx-assets.mjs` | every family a shaped, bounded, deterministic geometry; campus wires `RZCxAssets.build` | v3.28.0 |
@@ -67,13 +84,13 @@ a reason. The shipped set is `data/cx/demo-records.json` and says so on the pane
 | `tools/test-cx-campus-basis.mjs` | counts, CDUs, flows, callout text follow the engine basis; light palette; capacity text | v3.29.0 (old module has no `layout()`) |
 | `tools/test-cx-records.mjs` | Tier 3 record layer: PRD v1.0 invariants (R1–R13) on `data/cx/demo-records.json`, overlay on `statusAt`, register import reasons (R14) | v3.29.0 (one mutation per law) |
 | `tools/test-dcmoc-cx-plan.mjs` | DCMOC bridge returns the site module's plan and status (deep-equal), store clamps/persists/caps scenarios at 5; needs `dcmoc/node_modules` (symlink in a worktree, git-ignored) | v3.29.0 (site module swapped for a copy with one planning-day changed) |
-| `tools/test-cx-analysis.mjs` | browser: plan editor, schematic, 3D (glb 15/15, ≤ 300 draw calls, ≥ 24 fps, callouts, hulls, K16 probe both themes, K17 LOD, K18 re-layout), Tier 1.5 calendar, 390 px, no errors | each release |
+| `tools/test-cx-analysis.mjs` | browser: plan editor, schematic, 3D (glb 15/15, ≤ 300 draw calls, ≥ 24 fps, callouts, hulls, K16 probe both themes, K17 LOD, K18 re-layout), Tier 1.5 calendar, workbench W0–W8 (real pointer drag move/stretch, Esc, undo/redo, Ctrl+Z, keyboard, impact reasons, over-cap, Save as/Load/Delete, cap 5), 390 px, no errors | each release; W-laws v3.31.0 (absent on the old tree) |
 
 Run under `rz-lane -l 1` (lane 0 = LTC). A Navigation-timeout row under lane contention is UNMEASURED: re-run alone,
 never waive.
 
 ## 5 Ledger
 
-Owner comments K1–K18 and their state live in the harness PRD v1.1 §41
+Owner comments K1–K21 and their state live in the harness PRD v1.1 §41
 (`~/.local/state/rzharness/projects/PRJ-RZ-WEB/work-items/WI-CX-SUPERAPP-001/PRD_v1_1.md`); every new owner comment
 is a new K-row there before any code. Tier 3 discovery: `TIER3_DISCOVERY.md` in the same directory.

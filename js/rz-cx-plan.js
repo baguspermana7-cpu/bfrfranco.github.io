@@ -164,12 +164,95 @@
     };
   }
 
+  /* impact(plan, base, cap) — what a scenario changed against the approved baseline, for the workbench's impact
+   * panel (PRD §22). Every number is a difference of two engine plans (programPlan with and without the
+   * overrides); nothing is re-derived here. cause: 'edited' (the level carries an override), 'carried' (moved
+   * because an earlier level moved — levels run in series), or null. */
+  function r1(v) { return Math.round(v * 10) / 10; }
+  function impact(plan, base, cap) {
+    if (!plan || !base || !plan.levels || !base.levels) return null;
+    var levels = [], reasons = [], warnings = [], lastMoved = null, i;
+    for (i = 0; i < plan.levels.length; i++) {
+      var L = plan.levels[i], B = base.levels[i] || L.baseline;
+      var row = { id: L.id, dStart: r1(L.start - B.start), dEnd: r1(L.end - B.end), dMonths: r1(L.months - B.months),
+                  dCrew: r1(L.crew - B.crew), dCost: L.cost - B.cost, dManHours: L.manHours - B.manHours, shift: L.shift, cause: null, from: null };
+      if (L.edited) {
+        row.cause = 'edited';
+        var bits = [];
+        if (row.dStart) bits.push('start ' + fmtMo(B.start) + ' → ' + fmtMo(L.start) + ' (' + (row.dStart > 0 ? '+' : '−') + Math.abs(row.dStart).toFixed(1) + ' mo)');
+        if (row.dMonths) bits.push('duration ' + B.months.toFixed(1) + ' → ' + L.months.toFixed(1) + ' mo' + (row.dCrew ? '' : ', same effort'));
+        if (row.dCrew) bits.push('crew ' + B.crew + ' → ' + L.crew + ' (labour cost follows crew)');
+        if (L.shift !== '1x8') bits.push('shift ' + L.shift.replace('x', '×') + ' (engine shift table: rate and productivity)');
+        if (L.id === 'L5' && row.dMonths) bits.push('witness days follow the L5 duration');
+        reasons.push({ id: L.id, text: L.id + ' edited: ' + (bits.length ? bits.join('; ') : 'override equals the baseline') });
+      } else if (row.dStart && lastMoved) {
+        row.cause = 'carried'; row.from = lastMoved;
+        reasons.push({ id: L.id, text: L.id + ' moves ' + (row.dStart > 0 ? '+' : '−') + Math.abs(row.dStart).toFixed(1) + ' mo — carried from ' + lastMoved + ' (levels run in series)' });
+      }
+      if (row.dEnd) lastMoved = row.cause === 'carried' ? row.from : L.id;
+      if (i > 0) {
+        var prev = plan.levels[i - 1], lap = r1(prev.end - L.start);
+        if (lap > 0 && lap > r1(base.levels[i - 1].end - B.start)) warnings.push({ kind: 'overlap', id: L.id, months: [], text: L.id + ' starts ' + lap.toFixed(1) + ' mo before ' + prev.id + ' ends — the handbook gate sequence expects ' + prev.id + ' accepted first' });
+      }
+      levels.push(row);
+    }
+    var n = Math.max(plan.monthly.cost.length, base.monthly.cost.length), monthly = [], changed = 0, m;
+    for (m = 0; m < n; m++) {
+      var sc = plan.monthly.cost[m] || 0, bc = base.monthly.cost[m] || 0;
+      monthly.push({ m: m, base: bc, scen: sc, d: sc - bc }); if (Math.abs(sc - bc) >= 1) changed++;
+    }
+    var peak = Math.max.apply(null, plan.monthly.crew.concat([0])), basePeak = Math.max.apply(null, base.monthly.crew.concat([0]));
+    if (cap != null && isFinite(cap)) {
+      var over = []; for (m = 0; m < plan.monthly.crew.length; m++) if (plan.monthly.crew[m] > cap) over.push(m);
+      if (over.length) warnings.push({ kind: 'over-cap', id: null, months: over, text: over.length + ' month' + (over.length > 1 ? 's' : '') + ' above the site crew cap of ' + cap + ' (peak ' + peak.toFixed(1) + ' at M' + plan.monthly.crew.indexOf(peak) + ')' });
+    }
+    return { dFinish: r1(plan.finishMonth - base.finishMonth), dCost: plan.total - base.total, dManHours: plan.manHours - base.manHours,
+             peakCrew: peak, basePeakCrew: basePeak, dPeakCrew: r1(peak - basePeak),
+             levels: levels, reasons: reasons, warnings: warnings, monthly: monthly, changedMonths: changed };
+  }
+
+  /* scenarios(storage) — named copies of a plan state (PRD §22 "Save as", max 5, this browser only). */
+  var SCEN_KEY = 'rz-cx-scenarios', SCEN_MAX = 5;
+  function scenarios(storage) {
+    function read() {
+      if (!storage) return [];
+      try {
+        var p = JSON.parse(storage.getItem(SCEN_KEY) || 'null'); if (!p || p.version !== 1 || !p.items || typeof p.items.length !== 'number') return [];
+        var out = [];
+        for (var i = 0; i < p.items.length && out.length < SCEN_MAX; i++) { var it = p.items[i]; if (it && typeof it.name === 'string' && it.name.trim()) out.push(clean(it.name, it)); }
+        return out;
+      } catch (e) { return []; }
+    }
+    function clean(name, st) {
+      st = st || {};
+      var lines = st.lines && typeof st.lines.length === 'number' ? st.lines : [];
+      if (root.RZCxIo && typeof root.RZCxIo.sanitizeLines === 'function') lines = root.RZCxIo.sanitizeLines(lines);
+      return { name: String(name).trim(), overrides: sanitize(st.overrides), siteCrewCap: num(st.siteCrewCap, 1, 1000) === undefined ? null : st.siteCrewCap,
+               lines: lines, savedAt: typeof st.savedAt === 'string' ? st.savedAt : null };
+    }
+    function write(items) { if (!storage) return false; try { storage.setItem(SCEN_KEY, JSON.stringify({ version: 1, items: items })); return true; } catch (e) { return false; } }
+    function idx(items, name) { for (var i = 0; i < items.length; i++) if (items[i].name === name) return i; return -1; }
+    return {
+      list: read,
+      get: function (name) { var items = read(), k = idx(items, String(name || '').trim()); return k < 0 ? null : items[k]; },
+      save: function (name, st) {
+        var nm = String(name == null ? '' : name).trim(); if (!nm || nm.length > 40) return { ok: false, code: 'NAME' };
+        if (!storage) return { ok: false, code: 'STORAGE' };
+        var items = read(), k = idx(items, nm), rec = clean(nm, st); var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; }; rec.savedAt = d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes());   // local time: the viewer's own clock
+        if (k < 0 && items.length >= SCEN_MAX) return { ok: false, code: 'FULL' };
+        if (k < 0) items.push(rec); else items[k] = rec;
+        return write(items) ? { ok: true, code: k < 0 ? 'ADDED' : 'REPLACED' } : { ok: false, code: 'STORAGE' };
+      },
+      remove: function (name) { var items = read(), k = idx(items, String(name || '').trim()); if (k < 0) return false; items.splice(k, 1); return write(items); }
+    };
+  }
+
   function fmtUsd(v) { return v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : v >= 1e3 ? '$' + Math.round(v / 1e3) + 'k' : '$' + Math.round(v); }
   function fmtInt(v) { return Math.round(v).toLocaleString('en-US'); }
   function fmtMo(v) { return 'M' + (Math.round(v * 10) / 10).toFixed(1); }
 
   var API = { LEVELS: LEVELS, SYSTEMS: SYSTEMS, CITES: CITES, TAGS: TAGS, SHIFTS: SHIFTS, LIMITS: LIMITS, KEY: KEY,
-              sanitize: sanitize, compute: compute, gateMonths: gateMonths, statusAt: statusAt, store: store,
+              sanitize: sanitize, compute: compute, gateMonths: gateMonths, statusAt: statusAt, store: store, impact: impact, scenarios: scenarios, SCEN_KEY: SCEN_KEY, SCEN_MAX: SCEN_MAX,
               fmtUsd: fmtUsd, fmtInt: fmtInt, fmtMo: fmtMo };
   root.RZCxPlan = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;

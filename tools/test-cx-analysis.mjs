@@ -245,6 +245,56 @@ try {
     const txt2 = await p2.evaluate(() => (document.querySelector('#cxAnCampus .cx-3d-nogl') || {}).textContent || '');
     ok('T13 no WebGL: the 3D panel states it in one sentence and the schematic remains', nogl && /no WebGL/.test(txt2) && await p2.evaluate(() => document.querySelectorAll('#cxAnSheets [data-rzd-hit]').length >= 17), txt2.slice(0, 80));
     await p2.close(); }
+  /* K21 workbench (js/rz-cx-workbench.js): drag / keyboard / undo / impact / named scenarios — real pointer input */
+  await page.evaluate(() => { try { localStorage.removeItem('rz-cx-scenarios'); } catch (e) {} document.getElementById('cxAnReset').click(); });
+  const wbReady = await page.waitForFunction(() => window.RZCxWorkbench && document.querySelectorAll('#cxAnTimeline [data-cx-bar]').length === 7 && document.getElementById('cxWbImpactBody'), { timeout: 15000 }).then(() => true).catch(() => false);
+  ok('W0 workbench loaded: 7 draggable bars, impact and scenario panels', wbReady);
+  if (wbReady) {
+    const geo = async (id, edge) => page.evaluate((id, edge) => {
+      const r = document.querySelector('#cxAnTimeline [data-cx-' + (edge ? 'edge' : 'bar') + '="' + id + '"]'); r.scrollIntoView({ block: 'center', behavior: 'instant' });
+      const b = r.getBoundingClientRect(), svg = r.ownerSVGElement, w = +svg.dataset.cxW, pad = +svg.dataset.cxPad, maxM = +svg.dataset.cxMaxm;
+      return { x: b.left + (edge ? b.width / 2 : Math.min(20, b.width / 2)), y: b.top + b.height / 2, pxm: (svg.getBoundingClientRect().width * (w - pad - 10) / w) / maxM };
+    }, id, edge);
+    const st = () => page.evaluate(() => { const S = window.RZCxAnalysis.state, L = (id) => S.plan.levels.find((x) => x.id === id); return { ov: JSON.stringify(S.overrides), l2: L('L2'), l3: L('L3'), l5: L('L5'), total: S.plan.total, finish: S.plan.finishMonth, why: document.getElementById('cxWbImpactBody').textContent }; });
+    const drag = async (id, months, edge, esc) => { const g = await geo(id, edge); await page.mouse.move(g.x, g.y); await page.mouse.down(); for (let k = 1; k <= 8; k++) await page.mouse.move(g.x + g.pxm * months * k / 8, g.y); if (esc) await page.keyboard.press('Escape'); await page.mouse.up(); await new Promise((r) => setTimeout(r, 150)); };
+    const b0 = await st();
+    await drag('L3', 1.0);
+    const d1 = await st();
+    ok('W1 drag L3 bar +1 month: start +1.0 (±0.1), finish +1.0, total unchanged', Math.abs(d1.l3.start - b0.l3.start - 1) <= 0.11 && Math.abs(d1.finish - b0.finish - 1) <= 0.11 && d1.total === b0.total, { s0: b0.l3.start, s1: d1.l3.start, f: [b0.finish, d1.finish], t: [b0.total, d1.total] });
+    ok('W1 impact panel says why: L4 carried from L3', /L4 moves \+1\.0 mo — carried from L3/.test(d1.why) && /L3 edited: start/.test(d1.why), d1.why.slice(0, 300));
+    await page.click('#cxWbUndo'); const u1 = await st();
+    ok('W2 Undo restores the baseline (overrides {})', u1.ov === '{}' && u1.finish === b0.finish, u1.ov);
+    await page.click('#cxWbRedo'); const r1 = await st();
+    ok('W2 Redo re-applies the drag', r1.ov === d1.ov, [r1.ov, d1.ov]);
+    await page.evaluate(() => document.body.focus()); await page.keyboard.down('Control'); await page.keyboard.press('z'); await page.keyboard.up('Control'); const k1 = await st();
+    ok('W3 Ctrl+Z undoes outside a text field', k1.ov === '{}', k1.ov);
+    await drag('L3', 2.0, false, true); const e1 = await st();
+    ok('W4 Esc mid-drag cancels: plan unchanged', e1.ov === '{}' && e1.finish === b0.finish, e1.ov);
+    await drag('L5', 0.5, true); const s1 = await st();
+    ok('W5 drag L5 right end +0.5 mo: duration +0.5 (±0.1), start kept, cost moves (witness days)', Math.abs(s1.l5.months - b0.l5.months - 0.5) <= 0.11 && Math.abs(s1.l5.start - b0.l5.start) < 0.01 && s1.total > b0.total, { m: [b0.l5.months, s1.l5.months], t: [b0.total, s1.total] });
+    await page.click('#cxWbUndo');
+    await page.evaluate(() => document.querySelector('#cxAnTimeline [data-cx-bar="L2"]').focus()); for (let k = 0; k < 3; k++) await page.keyboard.press('ArrowRight');
+    await page.keyboard.down('Shift'); await page.keyboard.press('ArrowRight'); await page.keyboard.up('Shift'); const kb = await st();
+    const focusKept = await page.evaluate(() => document.activeElement && document.activeElement.getAttribute('data-cx-bar'));
+    ok('W6 keyboard: 3× ArrowRight = start +0.3, Shift+ArrowRight = duration +0.1, focus stays on the bar', Math.abs(kb.l2.start - b0.l2.start - 0.3) < 0.01 && Math.abs(kb.l2.months - b0.l2.months - 0.1) < 0.01 && focusKept === 'L2', { s: [b0.l2.start, kb.l2.start], m: [b0.l2.months, kb.l2.months], focusKept });
+    await page.evaluate(() => { const c = document.getElementById('cxAnCap'); c.value = '1'; c.dispatchEvent(new Event('change', { bubbles: true })); });
+    ok('W7 cap 1 → impact lists the months over the cap', await page.evaluate(() => /above the site crew cap of 1 /.test(document.getElementById('cxWbImpactBody').textContent)));
+    await page.type('#cxWbName', 'Slip L2'); await page.click('#cxWbSaveAs');
+    const saved = await page.evaluate(() => [...document.querySelectorAll('#cxWbScenBody tbody th')].map((x) => x.textContent));
+    ok('W8 Save as adds a named row between baseline and current', saved.length === 3 && /^Slip L2/.test(saved[1]), saved);
+    await page.click('#cxAnReset'); const rs = await st();
+    await page.click('#cxWbScenBody [data-wb-load="Slip L2"]'); const ld = await st();
+    ok('W8 Reset then Load restores the saved overrides', rs.ov === '{}' && ld.ov === kb.ov, [rs.ov, ld.ov, kb.ov]);
+    for (const n of ['B', 'C', 'D', 'E', 'F']) { await page.evaluate(() => { document.getElementById('cxWbName').value = ''; }); await page.type('#cxWbName', n); await page.click('#cxWbSaveAs'); }
+    const full = await page.evaluate(() => ({ rows: document.querySelectorAll('#cxWbScenBody [data-wb-load]').length, msg: document.getElementById('cxWbMsg').textContent }));
+    ok('W8 five kept; the sixth name is refused with a reason', full.rows === 5 && /5 scenarios saved already/.test(full.msg), full);
+    await page.click('#cxWbScenBody [data-wb-del="Slip L2"]');
+    ok('W8 Delete removes the row', await page.evaluate(() => !document.querySelector('#cxWbScenBody [data-wb-load="Slip L2"]')));
+    ok('W9 no change → the Δ chart says so instead of printing a ±$1 scale', await page.evaluate(() => { document.getElementById('cxAnReset').click(); const t = document.getElementById('cxWbImpactBody').textContent; return /no change in any month/.test(t) && !/\+\$1\b/.test(t); }));
+    await page.click('#cxWbScenBody [data-wb-load="B"]').catch(() => {}); await drag('L3', 1.0);
+    if (SHOTS) { await page.evaluate(() => document.getElementById('cxWbImpact').scrollIntoView({ block: 'start', behavior: 'instant' })); await page.screenshot({ path: join(SHOTS, 'cx-workbench-1440.png') }); }
+    await page.evaluate(() => { localStorage.removeItem('rz-cx-scenarios'); const c = document.getElementById('cxAnCap'); c.value = ''; c.dispatchEvent(new Event('change', { bubbles: true })); document.getElementById('cxAnReset').click(); });
+  }
   // T12 phone
   await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
   await page.reload({ waitUntil: 'load' }); /* never networkidle on a page with a WebGL loop (feedback_webgl_headless_gate_traps) */ await page.waitForFunction(() => window.RZCxAnalysis && !document.getElementById('cxTabAnalysis').hidden, { timeout: 30000 });
