@@ -61,6 +61,7 @@
  * S32 Settings live under their own step (design in view, preset/tuning behind "More · n"); edits still reach the model
  * S33 The Pareto legend sits inside the visible chart panel and renders at >= 11 px at every width
  * S34 The Pareto scatter fits its panel without inner scroll, its text renders at >= 10 px, its status reads as words
+ * S35 The legacy audit-table reports (single, compare) carry no colour outside grey, amber and fault red (chroma > 0.12)
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -652,6 +653,39 @@ try {
         await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
       }
     }
+    // S35 the legacy audit-table reports (single + compare) use the lab's register: no colour outside grey, amber and
+    // fault red (hue band check on chroma > 0.12) in any rendered element or chart mark
+    {
+      const docs = await p.evaluate(async () => {
+        const got = []; const real = window.open;
+        window.open = () => { let buf = ''; const d = { open() { buf = ''; }, write(h) { buf += h; }, close() { got.push(buf); } }; return { closed: false, document: d, focus() {}, print() {} }; };
+        try {
+          document.getElementById('exportPdfSingle').click(); await new Promise((r) => setTimeout(r, 1500));
+          const l = document.getElementById('pdfCompareLeft'), r = document.getElementById('pdfCompareRight');
+          if (l && r && l.options.length > 1) { l.selectedIndex = 0; r.selectedIndex = 1; l.dispatchEvent(new Event('change')); r.dispatchEvent(new Event('change')); }
+          document.getElementById('exportPdfCompare').click(); await new Promise((r) => setTimeout(r, 2500));
+        } finally { window.open = real; }
+        return got.filter((h) => h.length > 20000); });
+      if (docs.length < 2) fails.push(`${w} S35 legacy reports not produced (${docs.length}/2)`);
+      for (const [i, html] of docs.entries()) {
+        const q = await b.newPage(); await q.setContent(html, { waitUntil: 'load' });
+        const bad = await q.evaluate(() => {
+          const hue = (c) => { const m = String(c).match(/rgba?\(([\d.]+)[, ]+([\d.]+)[, ]+([\d.]+)(?:[, /]+([\d.]+))?/); if (!m) return null;
+            if (m[4] !== undefined && +m[4] === 0) return null; const [r, g, bl] = [m[1], m[2], m[3]].map((v) => v / 255);
+            const mx = Math.max(r, g, bl), mn = Math.min(r, g, bl), d = mx - mn; if (!d) return null;
+            if (d <= 0.12) return null; /* chroma, not HSL saturation: near-white/near-black slate stays neutral */
+            let h = mx === r ? ((g - bl) / d) % 6 : mx === g ? (bl - r) / d + 2 : (r - g) / d + 4; h = (h * 60 + 360) % 360;
+            return (h <= 15 || h >= 345 || (h >= 20 && h <= 52)) ? null : Math.round(h); };
+          const seen = {};
+          for (const e of document.querySelectorAll('body *')) { const cs = getComputedStyle(e);
+            const vals = [cs.color, cs.backgroundColor, cs.borderTopColor, cs.borderLeftColor];
+            if (e instanceof SVGElement) vals.push(cs.fill, cs.stroke);
+            for (const v of vals) { if (hue(v) !== null) seen[v] = (seen[v] || 0) + 1; } }
+          return Object.entries(seen).sort((a, b) => b[1] - a[1]).slice(0, 14).map(([c, n]) => c + ' x' + n); });
+        await q.close();
+        if (bad.length) fails.push(`${w} S35 legacy report ${i ? 'compare' : 'single'} off-register colours: ${bad.join(', ')}`);
+      }
+    }
     // S32 settings live under their own step: selecting step k shows that step's settings (design ones in view, preset
     // and tuning ones behind "More · n"), and only those; an edited setting still reaches the model
     {
@@ -691,4 +725,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, the compare card states its verdicts, settings sit under their step, the Pareto legend is readable, the scatter fits a phone, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, the compare card states its verdicts, settings sit under their step, the Pareto legend is readable, the scatter fits a phone, the legacy reports keep the register, 0 errors');
