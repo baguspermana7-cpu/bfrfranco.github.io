@@ -54,16 +54,15 @@
             --bm-cyan:#2BE8FF; --bm-green:#6aa588; --bm-amber:#F5C84B; --bm-red:#FF5C5C; --bm-blue:#5BA8FF;
         }
         body{ background:var(--bm-bg); color:var(--bm-text); font-family:var(--bm-sans); }
-        .bm-hero{ position:relative; padding:6.5rem 1.5rem 1.6rem; border-bottom:1px solid var(--bm-border);
-            background:
-              linear-gradient(var(--bm-grid) 1px,transparent 1px) 0 0/34px 34px,
-              linear-gradient(90deg,var(--bm-grid) 1px,transparent 1px) 0 0/34px 34px; }
+        /* chrome on the site register (v3.28.2): one accent, flat head; cyan stays inside the instruments */
+        :root:not([data-theme="dark"]){ --bm-ui:#92400e; } [data-theme="dark"]{ --bm-ui:#E8B563; }
+        .bm-hero{ position:relative; padding:6.5rem 1.5rem 1.6rem; border-bottom:1px solid var(--bm-border); }
         .bm-hero>*{ position:relative; }
-        .bm-kick{ font-family:var(--bm-mono); font-size:.66rem; letter-spacing:.2em; text-transform:uppercase; color:var(--bm-cyan); font-weight:700; }
-        .bm-hero h1{ font-family:var(--bm-mono); font-weight:700; font-size:clamp(1.5rem,3.4vw,2.3rem); letter-spacing:-.01em; margin:.45rem 0 .5rem; }
+        .bm-kick{ font-family:var(--bm-mono); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:var(--bm-muted); font-weight:500; }
+        .bm-hero h1{ font-family:var(--bm-sans); font-weight:600; font-size:clamp(1.5rem,3.4vw,2.3rem); letter-spacing:-.01em; margin:.45rem 0 .5rem; }
         .bm-hero p{ color:var(--bm-muted); max-width:80ch; line-height:1.6; font-size:.98rem; }
         .bm-hero .crumb{ font-family:var(--bm-mono); font-size:.72rem; color:var(--bm-muted); margin-top:.9rem; }
-        .bm-hero .crumb a{ color:var(--bm-cyan); }
+        .bm-hero .crumb a{ color:var(--bm-ui); }
 
         .bm-wrap{ max-width:1280px; margin:0 auto; padding:0 1.2rem; }
 
@@ -74,10 +73,10 @@
         .ctl-label{ font-family:var(--bm-mono); font-size:.56rem; letter-spacing:.12em; text-transform:uppercase; color:var(--bm-muted); }
         .seg{ display:flex; flex-wrap:wrap; gap:4px; }
         .seg button{ font-family:var(--bm-mono); font-size:.7rem; font-weight:600; padding:.4rem .7rem; border-radius:6px;
-            border:1px solid var(--bm-border); background:var(--bm-inset); color:var(--bm-muted); cursor:pointer; transition:all .15s; min-height:34px; }
-        .seg button:hover{ color:var(--bm-text); border-color:var(--bm-cyan); }
-        .seg button[aria-pressed="true"]{ background:var(--bm-cyan); border-color:var(--bm-cyan); color:#fff; }
-        [data-theme="dark"] .seg button[aria-pressed="true"]{ color:#05222b; }
+            border:1px solid var(--bm-border); background:var(--bm-inset); color:var(--bm-muted); cursor:pointer; transition:color .15s, border-color .15s, background-color .15s; min-height:34px; }
+        .seg button:hover{ color:var(--bm-text); border-color:var(--bm-ui); }
+        .seg button[aria-pressed="true"]{ background:var(--bm-ui); border-color:var(--bm-ui); color:#fff; }
+        [data-theme="dark"] .seg button[aria-pressed="true"]{ color:#121316; }
         [data-theme="dark"] .seg.scen button[data-scen="normal"][aria-pressed="true"]{ color:#04241a; }
         .seg.scen button[aria-pressed="true"]{ background:var(--bm-amber); border-color:var(--bm-amber); color:#1c1407; }
 
@@ -98,7 +97,7 @@
         .st-alarm{ background:rgba(220,38,38,.16); color:var(--bm-red); }
 
         /* parameter tiles */
-        .tile-guide{ font-size:.72rem; line-height:1.5; color:var(--bm-muted); margin:0 0 .7rem; padding:.5rem .65rem; border:1px dashed var(--bm-border); border-radius:6px; background:var(--bm-inset); }
+        .tile-guide{ font-size:.72rem; line-height:1.5; color:var(--bm-muted); margin:0 0 .7rem; padding:.5rem .65rem; border:1px solid var(--bm-border); border-radius:4px; background:var(--bm-inset); }
         .tile-guide b{ color:var(--bm-text); }
         .tile-guide .tg-tag{ font-family:var(--bm-mono); font-size:.58rem; font-weight:700; color:var(--bm-cyan); background:rgba(6,182,212,.1); border:1px solid rgba(6,182,212,.28); border-radius:3px; padding:0 3px; }
         .tiles{ display:grid; grid-template-columns:repeat(auto-fill,minmax(132px,1fr)); gap:8px; }
@@ -169,13 +168,13 @@
         /* Phase 2 — simulation controls */
         .sim-speed{ display:inline-flex; gap:2px; margin-left:4px; }
         .seg .spd{ min-width:36px; padding:.4rem .5rem; }
-        .seg .spd[aria-pressed="true"]{ background:var(--bm-cyan); border-color:var(--bm-cyan); color:#fff; }
+        .seg .spd[aria-pressed="true"]{ background:var(--bm-ui); border-color:var(--bm-ui); color:#fff; }
         #simState{ font-size:.58rem; }
         #simState.st-paused{ background:rgba(180,83,9,.16); color:var(--bm-amber); }
         #simStep[disabled]{ opacity:.4; cursor:not-allowed; }
         /* play/pause is a toggle (not a radio) — keep it neutral; the LIVE/PAUSED pill shows state */
         .seg #simPlay[aria-pressed="true"], .seg #simPlay[aria-pressed="false"]{ background:var(--bm-inset); border-color:var(--bm-border); color:var(--bm-text); }
-        .seg #simPlay:hover{ border-color:var(--bm-cyan); color:var(--bm-cyan); }
+        .seg #simPlay:hover{ border-color:var(--bm-ui); color:var(--bm-text); }
         /* paused → freeze the data-driven motion (flow + pump + sparkline-feed visuals) */
         body.sim-paused .flow.on, body.sim-paused .flow.slow,
         body.sim-paused .pump-rot.on, body.sim-paused .pump-rot.slow,
@@ -193,7 +192,7 @@
         .td-hd{ display:flex; align-items:center; justify-content:space-between; padding:.9rem 1.1rem; border-bottom:1px solid var(--bm-border); background:var(--bm-inset); }
         .td-hd h3{ font-family:var(--bm-mono); font-size:.82rem; letter-spacing:.04em; margin:0; color:var(--bm-text); }
         #tdClose{ background:none; border:1px solid var(--bm-border); color:var(--bm-muted); width:30px; height:30px; border-radius:6px; cursor:pointer; font-size:1rem; line-height:1; }
-        #tdClose:hover{ border-color:var(--bm-cyan); color:var(--bm-cyan); }
+        #tdClose:hover{ border-color:var(--bm-ui); color:var(--bm-text); }
         .td-bd{ padding:1.1rem; overflow-y:auto; }
         .td-now{ display:flex; align-items:baseline; gap:.6rem; margin-bottom:.9rem; }
         .td-nowlbl{ font-family:var(--bm-mono); font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; color:var(--bm-muted); }
@@ -262,12 +261,12 @@
         .leak-x{ stroke:var(--bm-red); stroke-width:2.4; opacity:0; }
         .leak-x.on{ opacity:1; animation:blink 1s steps(2) infinite; }
 
-        .bm-note{ border:1px dashed var(--bm-border); border-radius:4px; background:var(--bm-inset); padding:1rem 1.2rem; font-size:.8rem; color:var(--bm-muted); line-height:1.6; margin:1.4rem 0; }
+        .bm-note{ border:1px solid var(--bm-border); border-radius:4px; background:var(--bm-inset); padding:1rem 1.2rem; font-size:.8rem; color:var(--bm-muted); line-height:1.6; margin:1.4rem 0; }
         .bm-note b{ color:var(--bm-text); }
-        .bm-note a, .bm-foot a{ color:var(--bm-cyan); text-decoration:underline; text-underline-offset:2px; }
+        .bm-note a, .bm-foot a{ color:var(--bm-text); text-decoration-color:var(--bm-ui); text-decoration:underline; text-underline-offset:2px; }
         .bm-links{ display:flex; gap:.6rem; flex-wrap:wrap; margin:.4rem 0 1.4rem; }
-        .bm-links a{ font-family:var(--bm-mono); font-size:.72rem; padding:.45rem .8rem; border:1px solid var(--bm-border); border-radius:7px; color:var(--bm-cyan); text-decoration:none; }
-        .bm-links a:hover{ border-color:var(--bm-cyan); }
+        .bm-links a{ font-family:var(--bm-mono); font-size:.72rem; padding:.45rem .8rem; border:1px solid var(--bm-border); border-radius:4px; color:var(--bm-text); text-decoration:none; }
+        .bm-links a:hover{ border-color:var(--bm-ui); }
         .typedesc{ font-family:var(--bm-sans); font-size:.9rem; color:var(--bm-muted); line-height:1.6; margin:.2rem 0 0; }
         .typedesc b{ color:var(--bm-text); }
 
@@ -397,7 +396,7 @@
         </div>
 
         <div class="bm-note">
-            <b>Educational simulation — not a live feed.</b> Values are generated on-device from typical operating bands (see the <a href="cdu-checklist.html" style="color:var(--bm-cyan)">CDU Checklist §01–§03</a> for the sourced parameter ranges, ASHRAE TC 9.9 W-classes and OCP cold-plate guidance). Parameter targets: secondary supply ~17–45 °C · ΔT ~8–12 °C · flow ~1.0–1.5 LPM/kW · dP ~0.5–3.0 bar · system pressure ~2–6 bar · pumps N+1 · leaks 0. Each injected fault maps to an <b>FMECA liquid-cooling fault mode</b> — leak → <b>F11.3</b> (manifold/hose leak), pump-fail → <b>F11.2</b> (CDU-pump failure), filter clog → <b>F11.5</b> (filter clogging) — catalogued with mechanisms, effects, corrective actions and RPN risk in the <a href="ai-engineering-maintenance.html#sec-knowledge-base" style="color:var(--bm-cyan)">AI Engineering Maintenance FMECA knowledge base</a>. Confirm exact set-points and alarm limits against the specific CDU's manufacturer manual. Not procurement, safety, or engineering advice.
+            <b>Educational simulation — not a live feed.</b> Values are generated on-device from typical operating bands (see the <a href="cdu-checklist.html">CDU Checklist §01–§03</a> for the sourced parameter ranges, ASHRAE TC 9.9 W-classes and OCP cold-plate guidance). Parameter targets: secondary supply ~17–45 °C · ΔT ~8–12 °C · flow ~1.0–1.5 LPM/kW · dP ~0.5–3.0 bar · system pressure ~2–6 bar · pumps N+1 · leaks 0. Each injected fault maps to an <b>FMECA liquid-cooling fault mode</b> — leak → <b>F11.3</b> (manifold/hose leak), pump-fail → <b>F11.2</b> (CDU-pump failure), filter clog → <b>F11.5</b> (filter clogging) — catalogued with mechanisms, effects, corrective actions and RPN risk in the <a href="ai-engineering-maintenance.html#sec-knowledge-base">AI Engineering Maintenance FMECA knowledge base</a>. Confirm exact set-points and alarm limits against the specific CDU's manufacturer manual. Not procurement, safety, or engineering advice.
         </div>
     </div></main>
 
