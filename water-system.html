@@ -449,7 +449,7 @@
         }
     #cookieAccept { background:#E8B563 !important; color:#16181d !important; }
 </style>
-    <script src="js/rz-version.js?v=20261108-9e04ea4f" defer></script>
+    <script src="js/rz-version.js?v=20261108-73f2dab8" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 <style id="rz-skiplink-v1">
@@ -498,7 +498,7 @@
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
     <!-- Alarm / safety state FIRST (doc-10 information hierarchy) -->
-    <div class="alarm-strip" id="alarmStrip">
+    <div class="alarm-strip state-unavailable" id="alarmStrip">
         <span class="alarm-state unavailable" id="alarmState">UNAVAILABLE</span>
         <span class="alarm-chip"><b class="crit" id="cntCrit">&mdash;</b> Critical</span>
         <span class="alarm-chip"><b class="warnv" id="cntWarn">&mdash;</b> Warning</span>
@@ -748,12 +748,12 @@
                 <section class="plant-summary">
                     <div class="summary-title">Booster Station · Automatic Lead/Lag</div>
                     <div class="pump-pair">
-                        <div class="pump-unit" data-pump-id="P-301A" data-role="duty" data-state="unavailable">
+                        <div class="pump-unit state-unavailable" data-pump-id="P-301A" data-role="duty" data-state="unavailable">
                             <span class="pump-icon pump-symbol" aria-hidden="true"></span>
                             <div><div class="pump-name">P-301A · Duty</div><div class="pump-meta">No current point authority</div></div>
                             <div class="pump-state">UNAVAILABLE</div>
                         </div>
-                        <div class="pump-unit" data-pump-id="P-301B" data-role="standby" data-state="unavailable">
+                        <div class="pump-unit state-unavailable" data-pump-id="P-301B" data-role="standby" data-state="unavailable">
                             <span class="pump-icon pump-symbol" aria-hidden="true"></span>
                             <div><div class="pump-name">P-301B · Standby</div><div class="pump-meta">No current point authority</div></div>
                             <div class="pump-state">UNAVAILABLE</div>
@@ -1209,8 +1209,9 @@
                 set('dataQuality', siteBalanceAvailable && S.meta.data_quality ? S.meta.data_quality : 'UNAVAILABLE');
                 var strip = document.getElementById('alarmStrip');
                 var st = document.getElementById('alarmState');
-                strip.className = 'alarm-strip' + (th.unavailable ? ' is-unavailable'
-                    : (th.crit ? ' has-alarm' : (th.warn ? ' has-warn' : '')));
+                /* state-* classes name the plant state the rail shows (render scan: a rail is legal only on a state) */
+                strip.className = 'alarm-strip' + (th.unavailable ? ' is-unavailable state-unavailable'
+                    : (th.crit ? ' has-alarm state-alarm' : (th.warn ? ' has-warn state-warn' : ' state-ok')));
                 st.className = 'alarm-state' + (th.unavailable ? ' unavailable'
                     : (th.crit ? ' bad' : (th.warn ? ' warn' : '')));
 
@@ -1333,7 +1334,9 @@
                 });
                 document.querySelectorAll('[data-pump-id]').forEach(function (pump) {
                     var isDuty = pump.getAttribute('data-pump-id') === 'P-301A';
-                    pump.setAttribute('data-state', siteBalanceAvailable ? (isDuty ? 'running' : 'available') : 'unavailable');
+                    var pumpState = siteBalanceAvailable ? (isDuty ? 'running' : 'available') : 'unavailable';
+                    pump.setAttribute('data-state', pumpState);
+                    pump.className = 'pump-unit state-' + pumpState;
                     var stateLabel = pump.querySelector('.pump-state');
                     if (stateLabel) stateLabel.textContent = siteBalanceAvailable ? (isDuty ? 'RUNNING' : 'AVAILABLE') : 'UNAVAILABLE';
                     var meta = pump.querySelector('.pump-meta');

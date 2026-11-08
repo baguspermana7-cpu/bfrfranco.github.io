@@ -462,7 +462,7 @@
     font-variant-numeric: tabular-nums slashed-zero;
 }
 </style>
-    <script src="js/rz-version.js?v=20261108-9e04ea4f" defer></script>
+    <script src="js/rz-version.js?v=20261108-73f2dab8" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
@@ -1760,12 +1760,12 @@ function updateStatusBar() {
     var sysLed = document.getElementById('ind-system');
     var sysValue = document.getElementById('val-system');
     if (!SIM.sources.A && !SIM.sources.B) {
-        sysBox.className = 'status-box warning';
+        sysBox.className = 'status-box warning state-warn';
         sysLed.className = 'status-led warning';
         sysValue.textContent = 'GEN MODE';
         sysValue.className = 'status-value warning';
     } else {
-        sysBox.className = 'status-box active';
+        sysBox.className = 'status-box active state-ok';
         sysLed.className = 'status-led';
         sysValue.textContent = 'ONLINE';
         sysValue.className = 'status-value ok';
@@ -1779,7 +1779,7 @@ function updateStatusBar() {
     var alarmEl = document.getElementById('val-alarms');
     alarmEl.textContent = alarmCount;
     if (alarmCount > 0) {
-        alarmBox.className = 'status-box error';
+        alarmBox.className = 'status-box error state-alarm';
         alarmEl.className = 'status-value error';
     } else {
         alarmBox.className = 'status-box';

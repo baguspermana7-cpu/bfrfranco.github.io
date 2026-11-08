@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v3.30.3 — 2026-11-08 — "Cockpits: named transitions, state rails that say which state"
+
+### Changed
+- `datahallAI`: 21 time-only `transition: .15s`-style rules (which animate every property) name their properties; the
+  theme toggle draws a moon or sun in SVG instead of the ☾/☀ glyphs. `chiller-plant`'s switch thumb keeps `left` and
+  `transform` in its transition so it still slides.
+- `dc-conventional`: SVG theme toggle, no ⚠ glyph before "Legal Notice", no resting shadow on the light alarm strip.
+- `fire-system`: the gauge pin transitions `transform` only.
+- `water-system` alarm strip and pump units, `EPMS_Telemetry` status boxes: the coloured left rail stays, because it
+  is a plant state, and the element now carries a `state-*` class (`state-ok`, `-warn`, `-alarm`, `-unavailable`,
+  `-running`, `-available`) set by the same code that sets the state.
+
 ## v3.30.2 — 2026-11-08 — "Tools page: the separator dot, and no empty band under the head"
 
 ### Fixed

@@ -730,7 +730,7 @@ body[data-conv-authority="unavailable"] .stats-panel .stat-value {
 [data-theme="light"] .kpi-unit { color: var(--text-muted); }
 
 /* Alarm Strip */
-[data-theme="light"] .alarm-strip { background: var(--border); border-color: var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+[data-theme="light"] .alarm-strip { background: var(--border); border-color: var(--border); box-shadow: none; }
 [data-theme="light"] .as-state,
 [data-theme="light"] .as-cell,
 [data-theme="light"] .as-spacer,
@@ -918,7 +918,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261108-9e04ea4f" defer></script>
+    <script src="js/rz-version.js?v=20261108-73f2dab8" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for
@@ -990,7 +990,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
         </nav>
     </div>
     <div class="header-right">
-        <button class="theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button>
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
         <span class="status-dot"></span>
         <span id="clock">--:--:--</span> WIB
     </div>
@@ -1090,7 +1090,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 
         <div class="legal-disclaimer-wrap" aria-label="Legal Disclaimer">
             <div class="calc-disclaimer">
-                <p class="disc-title"><span aria-hidden="true">&#9888;</span> Legal Notice</p>
+                <p class="disc-title">Legal Notice</p>
                 <p class="disc-text">This conventional data center dashboard is independent personal research using publicly available standards and reference datasets. It does not represent any current or former employer.</p>
                 <p class="disc-text">All metrics and calculations are for educational and estimation purposes only, not legal, financial, investment, procurement, safety, or engineering advice. Validate final decisions with qualified professionals and local regulations.</p>
                 <p class="disc-text">Use of this website is subject to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>. All rendering runs in-browser.</p>
@@ -1700,7 +1700,7 @@ function getTheme(){const s=localStorage.getItem('theme');return s||'light';}
 function applyTheme(t){
 document.documentElement.setAttribute('data-theme',t);
 localStorage.setItem('theme',t);
-if(toggle)toggle.innerHTML=t==='dark'?'&#9790;':'&#9728;';
+if(toggle)toggle.innerHTML=t==='dark'?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
 }
 applyTheme(getTheme());
 if(toggle)toggle.addEventListener('click',function(){
