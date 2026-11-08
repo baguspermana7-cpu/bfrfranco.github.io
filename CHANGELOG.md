@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v3.32.1 — 2026-11-08 — "Homepage employer cards on a phone are as tall as the face shown"
+
+### Fixed
+- On a phone each employer card sat as tall as its longer back face. That left an empty band of up to 163 px above
+  Details on the front (Pure Data Centres). From 640 px down, the card now follows the face that is shown, and that
+  face turns in from 90° (it fades under reduced motion). Wider screens keep the stacked flip, so cards in a row still
+  share a height.
+- `tools/test-index-r079.mjs` gains the law (empty band above Details ≤ 40 px at 390, both themes). It failed on the
+  live v3.32.0 page (163 px) and passes at 10 px.
+
+---
+
 ## v3.32.0 — 2026-11-08 — "Homepage: employer cards that flip, a capsule nav, a ResistanceZero footer"
 
 Owner request R079 (2026-11-07, again 2026-11-08): adopt three ideas from the reference shot without rebuilding the page.

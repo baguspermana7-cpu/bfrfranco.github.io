@@ -4,7 +4,7 @@
  *  L1 every id of the pre-refit homepage (BASE commit) still exists, and every href="#x" resolves to an id.
  *  L2 employer cards: 5 cards, exactly 1 .is-current; Details flips (aria-expanded, back face not inert, rotateY 180),
  *     Esc flips home, opening card B closes card A, card height does not change on flip; reduced motion: no rotation.
- *  L3 phone 390: no horizontal scroll, cards one column, every employer logo >= 56 px tall and a vector.
+ *  L3 phone 390: no horizontal scroll, cards one column, each card as tall as its shown face, every employer logo >= 56 px tall and a vector.
  *  L4 nav: no backdrop-filter, no box-shadow, 64 +/- 2 px at 1440; the Contact pill once in the nav, the
  *     pill CTA once in the hero and once in the contact section, each reaching #contact or mailto.
  *     The meta row reads [hh:mm WIB] · Bekasi, Indonesia · Independent personal project, above the cards, no email.
@@ -103,12 +103,14 @@ try {
       const cols = new Set([...document.querySelectorAll('.emp-card')].map((c) => Math.round(c.getBoundingClientRect().left))).size;
       const logos = [...document.querySelectorAll('.emp-logo')].filter((i) => i.offsetParent).map((i) => ({ h: Math.round(i.getBoundingClientRect().height), src: i.getAttribute('src') }));
       const text = document.querySelector('.rz-foot').innerText;
-      return { sw: document.documentElement.scrollWidth, cols, logos, mark: m.getBoundingClientRect().width, box: f.clientWidth - parseFloat(fs.paddingLeft) - parseFloat(fs.paddingRight),
+      const gap = Math.max(...[...document.querySelectorAll('.emp-card')].map((c) => { const b = c.querySelector('.emp-front .emp-btn').getBoundingClientRect(), l = c.querySelector('.emp-front .emp-skills').getBoundingClientRect(); return Math.round(b.top - l.bottom); }));
+      return { sw: document.documentElement.scrollWidth, cols, gap, logos, mark: m.getBoundingClientRect().width, box: f.clientWidth - parseFloat(fs.paddingLeft) - parseFloat(fs.paddingRight),
         links: [...document.querySelectorAll('.rz-foot a')].map((a) => a.getAttribute('href')), text, html: document.documentElement.outerHTML.includes('ALL OPERATIONAL DATASETS') || document.documentElement.outerHTML.includes('BUILT FOR MISSION CRITICAL') };
     }, w);
     if (w === 390) {
       check(r.sw <= 390, `L3 ${theme} 390: no horizontal scroll (scrollWidth ${r.sw})`);
       check(r.cols === 1, `L3 ${theme} 390: cards in one column (${r.cols} column x-positions)`);
+      check(r.gap <= 40, `L3 ${theme} 390: a card is as tall as its shown face (largest empty band above the Details button ${r.gap} px)`);
     }
     check(r.logos.length === 5 && r.logos.every((l) => l.h >= 56 && /\.svg(\?|$)/.test(l.src)), `L3 ${theme} ${w}: 5 logos shown, each >= 56 px and a vector — ${r.logos.map((l) => l.h).join(',')}`);
     check(Math.abs(r.mark - r.box) <= 2, `L5 ${w}: wordmark ${r.mark.toFixed(0)} px = footer box ${r.box.toFixed(0)} px`);

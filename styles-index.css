@@ -5415,3 +5415,17 @@ p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoratio
 /* R079 meta row under the hero (owner decision 2026-11-07): mono, muted, one line; no email in it. */
 .rz-meta-row { width: 100%; margin: 4px 0 0; font: 400 0.78rem/1.4 'JetBrains Mono', ui-monospace, monospace; color: #5b6472; letter-spacing: 0.02em; }
 [data-theme="dark"] .rz-meta-row { color: #9aa3b0; }
+
+/* R079 v3.32.1 — phone: one card per row, so the card follows the face that is shown instead of the taller of the
+   two (a stacked grid cell left a 163 px empty band above Details). The shown face turns in from 90deg. */
+@media (max-width: 640px) {
+    .emp-back { display: none; transform: none; }
+    .emp-card.is-flipped .emp-front { display: none; transform: none; }
+    .emp-card.is-flipped .emp-back { display: flex; animation: emp-turn-in 420ms cubic-bezier(.2, .7, .2, 1); }
+    .emp-card.emp-armed:not(.is-flipped) .emp-front { animation: emp-turn-in 420ms cubic-bezier(.2, .7, .2, 1); }
+}
+@keyframes emp-turn-in { from { transform: rotateY(-90deg); } to { transform: rotateY(0deg); } }
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+    .emp-card.is-flipped .emp-back, .emp-card.emp-armed:not(.is-flipped) .emp-front { animation: emp-fade-in 150ms ease-out; opacity: 1; }
+}
+@keyframes emp-fade-in { from { opacity: 0; } to { opacity: 1; } }
