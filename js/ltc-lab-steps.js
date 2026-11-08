@@ -38,6 +38,66 @@
   ];
 
   function v(id) { var e = document.getElementById(id); return e ? String(e.value) : '–'; }
+
+  /* 3.28.x — the settings sit under the step they shape (plan ltc-lab-workflow.md §Step table): the design settings
+   * of the active step are in view, its preset and tuning settings behind "More · n". Groups are MOVED, never cloned
+   * (ids, listeners, chips and the screening-only marks travel with them). Calibration, guardrails and run controls
+   * stay in the "Advanced · auto" panel. */
+  var SETTINGS = {
+    load: ['inItLoad', 'inRackCount', 'inRackType', 'inRackDensityTarget', 'inHighDensityShare', 'inModelYear', 'inCountryProfile', 'inClimate'],
+    capture: ['inCoolingArchitecture', 'inLiquidCapture', 'inCoolant', 'inSupplyTemp', 'inReturnTemp', 'inCoefHeatTransfer'],
+    loop: ['inPumpHead', 'inPumpEff', 'inHydraulicMargin', 'inCduUnit', 'inRedundancy', 'inCoefCduLoss', 'inCoefPipeLoss'],
+    rejection: ['inAirCop', 'inEconomizerHours', 'inFanPower', 'inUpsEff', 'inDistLoss', 'inHeatReuse', 'inControlQuality', 'inPredictiveGain', 'inCoefFutureTech'],
+    cost: ['inElecPrice', 'inWaterTariff', 'inCarbonIntensity', 'inFireType', 'inMonitoring'],
+    check: ['inTargetPue', 'inTargetCop']
+  };
+  var setsBox = null;
+  function placeSettings() {
+    if (setsBox || !document.querySelector('.input-grid[data-tierized]')) return;
+    var nav = document.querySelector('nav.ltc-steps');
+    if (!nav) return;
+    setsBox = document.createElement('div');
+    setsBox.className = 'ltc-step-sets';
+    STEPS.forEach(function (st, i) {
+      var ids = SETTINGS[st.key];
+      if (!ids) return;
+      var sec = document.createElement('section');
+      sec.className = 'ltc-step-set';
+      sec.id = 'ltcSet-' + st.key;
+      sec.hidden = true;
+      sec.setAttribute('aria-label', 'Step ' + (i + 1) + ' settings');
+      var h = document.createElement('h3');
+      h.className = 'ltc-set-title';
+      h.textContent = (i + 1) + ' · ' + st.name + ' — settings';
+      var main = document.createElement('div'); main.className = 'ltc-set-grid';
+      var more = document.createElement('details'); more.className = 'ltc-more';
+      var sum = document.createElement('summary');
+      var moreGrid = document.createElement('div'); moreGrid.className = 'ltc-set-grid';
+      var n = 0;
+      ids.forEach(function (id) {
+        var f = document.getElementById(id), g = f && f.closest('.input-group');
+        if (!g) return;
+        g.classList.remove('hidden-by-mode');
+        if (g.querySelector('.ltc-chip-design')) main.appendChild(g); else { moreGrid.appendChild(g); n++; }
+      });
+      sum.textContent = 'More · ' + n + (n === 1 ? ' preset or tuning setting' : ' preset and tuning settings');
+      more.appendChild(sum); more.appendChild(moreGrid);
+      sec.appendChild(h); sec.appendChild(main);
+      if (n) sec.appendChild(more);
+      setsBox.appendChild(sec);
+    });
+    nav.parentNode.insertBefore(setsBox, nav.nextSibling);
+    /* tier blocks left empty by the move fold away; the panel's count says what is left in it */
+    document.querySelectorAll('#ltcOtherParamsBody .ltc-tier-sec').forEach(function (t) { t.hidden = !t.querySelector('.input-group'); });
+    var cnt = document.getElementById('ltcOtherParamsCount'), body = document.getElementById('ltcOtherParamsBody');
+    if (cnt && body) cnt.textContent = body.querySelectorAll('input, select').length + ' calibration and run settings';
+    showSettings();
+  }
+  function showSettings() {
+    if (!setsBox) return;
+    var key = STEPS[active].key;
+    Array.prototype.forEach.call(setsBox.children, function (sec) { sec.hidden = sec.id !== 'ltcSet-' + key; });
+  }
   function txt(id) { var e = document.getElementById(id); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; }
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var active = 0, items = [], lastText = [];
@@ -80,6 +140,8 @@
       b.classList.toggle('is-done', k < active);
     });
     document.body.setAttribute('data-ltc-step', s.key);
+    placeSettings();
+    showSettings();
     paintNodes();
     drawStrip();
     foldRail();
@@ -249,6 +311,7 @@
   }
 
   function refresh() {
+    placeSettings();
     paintNodes();
     drawStrip();
     STEPS.forEach(function (s, i) {

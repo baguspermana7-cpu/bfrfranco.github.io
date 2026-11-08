@@ -58,6 +58,7 @@
  * S29 The Pareto scatter's axis ticks are distinct, also for a one-point frontier
  * S30 Report compare card: verdict words on every row; totals read "scale" across IT loads; pump efficiency up = better
  * S31 The page's own nav links carry no second hue
+ * S32 Settings live under their own step (design in view, preset/tuning behind "More · n"); edits still reach the model
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -243,7 +244,7 @@ try {
         const snap = () => { const m = window.__ltcLastModel; return [m.pue, m.systemCop, m.wue, m.totalFacilityKw, m.netOpex, m.netCarbonTons, m.flowLpm,
           m.pumpPowerKw, m.cduCount, m.pueDesign, m.plant.it.racks]; };
         const skip = /^(inCoolingArchitecture|inCountryProfile|inTargetPue|inTargetCop|inFailureMode)$/;
-        const fields = [...document.querySelectorAll('#ltcOtherParamsBody .ltc-tier-sec input, #ltcOtherParamsBody .ltc-tier-sec select')]
+        const fields = [...document.querySelectorAll('#ltcOtherParamsBody .ltc-tier-sec input, #ltcOtherParamsBody .ltc-tier-sec select, .ltc-step-set input, .ltc-step-set select')]
           .filter((f) => f.id && !skip.test(f.id) && !/checkbox|file|button/.test(f.type));
         const out = [];
         for (const f of fields) {
@@ -627,6 +628,38 @@ try {
         await p.goto(p.url(), { waitUntil: 'networkidle2' }); await new Promise((r) => setTimeout(r, 2500));
       }
     }
+    // S32 settings live under their own step: selecting step k shows that step's settings (design ones in view, preset
+    // and tuning ones behind "More · n"), and only those; an edited setting still reaches the model
+    {
+      const MAP = { load: ['inItLoad', 'inRackCount', 'inRackType', 'inRackDensityTarget', 'inHighDensityShare', 'inModelYear', 'inCountryProfile', 'inClimate'],
+        capture: ['inCoolingArchitecture', 'inLiquidCapture', 'inCoolant', 'inSupplyTemp', 'inReturnTemp', 'inCoefHeatTransfer'],
+        loop: ['inPumpHead', 'inPumpEff', 'inHydraulicMargin', 'inCduUnit', 'inRedundancy', 'inCoefCduLoss', 'inCoefPipeLoss'],
+        rejection: ['inAirCop', 'inEconomizerHours', 'inFanPower', 'inUpsEff', 'inDistLoss', 'inHeatReuse', 'inControlQuality', 'inPredictiveGain', 'inCoefFutureTech'],
+        cost: ['inElecPrice', 'inWaterTariff', 'inCarbonIntensity', 'inFireType', 'inMonitoring'],
+        check: ['inTargetPue', 'inTargetCop'] };
+      for (const [key, ids] of Object.entries(MAP)) {
+        await p.evaluate((k) => document.getElementById('ltcStep-' + k).click(), key);
+        await new Promise((r) => setTimeout(r, 250));
+        const r = await p.evaluate((k, ids) => {
+          const sec = document.getElementById('ltcSet-' + k), out = [];
+          if (!sec || !sec.offsetParent) return ['no visible settings section for ' + k];
+          const others = [...document.querySelectorAll('.ltc-step-set')].filter((s) => s !== sec && s.offsetParent).map((s) => s.id);
+          if (others.length) out.push('other sections visible: ' + others.join(','));
+          const more = sec.querySelector('details.ltc-more');
+          for (const id of ids) { const e = document.getElementById(id); if (!e) { out.push(id + ' missing'); continue; }
+            if (!sec.contains(e)) { out.push(id + ' not in its step'); continue; }
+            const inMore = !!(more && more.contains(e));
+            if (!inMore && !e.closest('.input-group').offsetParent) out.push(id + ' hidden outside More'); }
+          if (more) { const n = more.querySelectorAll('.input-group').length; if (more.open) out.push('More open by default');
+            if (!new RegExp('\\b' + n + '\\b').test(more.querySelector('summary').textContent)) out.push('More summary does not count ' + n); }
+          return out; }, key, ids);
+        for (const f of r) fails.push(`${w} S32 ${key}: ${f}`);
+      }
+      await p.evaluate(() => document.getElementById('ltcStep-loop').click());
+      await p.evaluate(() => { const e = document.getElementById('inPumpEff'); e.value = '88'; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
+      let pe = 0; for (let i = 0; i < 24 && pe !== 88; i++) { await new Promise((r) => setTimeout(r, 250)); pe = await p.evaluate(() => +window.__ltcLastModel.input.pumpEff); }
+      ok(pe === 88, `${w} S32 pump efficiency edited in the Loop settings did not reach the model (${pe})`);
+    }
     const sw = await p.evaluate(() => document.documentElement.scrollWidth);
     ok(sw <= w, `${w} S5 scrollWidth ${sw}`);
     ok(!errs.length, `${w} S5 page error: ${errs[0]}`);
@@ -634,4 +667,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, the compare card states its verdicts, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, the compare card states its verdicts, settings sit under their step, 0 errors');
