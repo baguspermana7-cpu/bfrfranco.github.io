@@ -75,7 +75,7 @@
       '<span class="spacer"></span><span class="cx-an-state" id="cxAnState" aria-live="polite"></span>' +
       '<button type="button" class="tool-btn" id="cxAnRevert">Revert</button><button type="button" class="tool-btn" id="cxAnReset">Reset to baseline</button><button type="button" class="tool-btn is-primary" id="cxAnSave">Save scenario</button></div></div>' +
       '<div class="cx-an-panel"><div class="cx-an-panel-head"><h3>Level timeline</h3><span class="cx-an-sub">grey = approved baseline · amber = scenario · drag a bar to move it, drag its right end to change the duration (0.1 month steps; Esc cancels) · month scrubber sets the status month</span></div><div id="cxAnTimeline" class="cx-an-timeline" aria-label="Level timeline"></div>' +
-      '<div class="cx-an-scrub"><label for="cxAnMonth">Month</label><input type="range" id="cxAnMonth" min="0" max="20" step="1" value="0" aria-label="Status month"><output id="cxAnMonthOut" for="cxAnMonth">M0</output><button type="button" class="tool-btn" id="cxAnPrev" aria-label="Previous month">‹</button><button type="button" class="tool-btn" id="cxAnNext" aria-label="Next month">›</button><button type="button" class="tool-btn" id="cxAnPlay" aria-pressed="false">Play</button></div></div>' +
+      '<div class="cx-an-scrub"><label for="cxAnMonth">Month</label><input type="range" id="cxAnMonth" min="0" max="20" step="1" value="0" aria-label="Status month"><output id="cxAnMonthOut" for="cxAnMonth">M0</output><button type="button" class="tool-btn" id="cxAnPrev" aria-label="Previous month">‹</button><button type="button" class="tool-btn" id="cxAnNext" aria-label="Next month">›</button><button type="button" class="tool-btn" id="cxAnPlay" aria-pressed="false">Play</button><label class="cx-an-cap">Speed <select id="cxAnSpeed" class="input-field" aria-label="Play speed"><option value="2400">0.5×</option><option value="1200" selected>1×</option><option value="600">2×</option></select></label><button type="button" class="tool-btn" id="cxAnChangedOnly" aria-pressed="false" title="Show only the systems whose gate passes in the viewed month">Changed this month</button></div></div>' +
       '<div class="cx-an-panel"><div class="cx-an-panel-head"><h3>Status by system</h3><span class="cx-an-sub" id="cxAnStatusSub">tag = last level whose gate falls on or before the month (handbook <a href="' + P.CITES.tags + '">02.6</a>); order inside a window per <a href="' + P.CITES.durations + '">02.4.8</a></span></div>' +
       '<div class="cx-an-counts" id="cxAnCounts" data-rz-series-meaning="handbook tag colours"></div>' +
       '<div class="cx-an-tablewrap"><table class="cx-an-table cx-an-status" id="cxAnStatusTable" data-rz-series-meaning="handbook tag colours"><thead><tr><th>System</th><th>Block</th><th>Level</th><th>Tag</th><th>Next gate</th><th>State</th></tr></thead><tbody></tbody></table></div></div>' +
@@ -108,6 +108,7 @@
     renderKpis(plan); renderPlanTable(plan); renderTimeline(plan); renderSchematic(plan); renderStatus(plan); renderCharts(plan); renderInspector(plan); syncCampus();
     runHooks(plan, false);
     $('cxAnState').textContent = !plan ? '' : (S.dirty ? 'Unsaved scenario' : (hasOverrides() ? 'Saved scenario' : 'Approved baseline'));
+    $('cxTabAnalysis').setAttribute('data-cx-mode', plan && hasOverrides() ? 'scenario' : 'baseline');
   }
   /* extensions (ext, workbench, issues) redraw after a full render, and with month=true after a month change only */
   function runHooks(plan, month) { for (var hk = 0; hk < S.hooks.length; hk++) { try { S.hooks[hk](plan, month); } catch (e) { /* an extension never breaks the tab */ } } }
@@ -184,6 +185,15 @@
       if (x.inTest) rect.setAttribute('data-cx-intest', '1');
       if (S.sel === 'sys:' + x.id) rect.setAttribute('data-cx-selected', '1');
     }
+    if (S.changedOnly) {   // §12 filter: a veil over every system node that did not pass a gate this month (labels included)
+      var ns = 'http://www.w3.org/2000/svg', all = host.querySelectorAll('[data-rzd-node]');
+      for (var v = 0; v < all.length; v++) {
+        var n = all[v]; if (n.hasAttribute('data-cx-changed')) continue;
+        var veil = doc.createElementNS(ns, 'rect'); veil.setAttribute('class', 'cx-an-veil'); veil.setAttribute('data-cx-veil', n.getAttribute('data-rzd-node'));
+        ['x', 'y', 'width', 'height', 'rx'].forEach(function (a) { veil.setAttribute(a, n.getAttribute(a)); });
+        veil.setAttribute('pointer-events', 'none'); n.ownerSVGElement.appendChild(veil);
+      }
+    }
     var sub = $('cxAnSchematicSub'); if (sub) { var c = st.systems.filter(function (q) { return q.changed; }).length; sub.setAttribute('data-month', 'M' + S.month); }
   }
   function setSheet(block) {
@@ -193,6 +203,8 @@
     var figs = doc.querySelectorAll('#cxAnSheets .cx-an-sheet');
     for (var j = 0; j < figs.length; j++) figs[j].hidden = figs[j].getAttribute('data-block') !== block;
   }
+  /* §12 "Changed this month": only the systems whose gate passes in the viewed month; an empty month says so, with Clear */
+  function setChangedOnly(on) { S.changedOnly = !!on; var b = $('cxAnChangedOnly'); if (b) b.setAttribute('aria-pressed', String(S.changedOnly)); $('cxTabAnalysis').classList.toggle('cx-only-changed', S.changedOnly); renderSchematic(S.plan); renderStatus(S.plan); runHooks(S.plan, true); }
   function renderStatus(plan) {
     var tb = $('cxAnStatusTable').getElementsByTagName('tbody')[0], counts = $('cxAnCounts'); tb.innerHTML = '';
     if (!plan) { counts.innerHTML = ''; return; }
@@ -200,6 +212,8 @@
     var c = st.counts, order = ['none', 'L1', 'L2', 'L3', 'L4', 'L5'], tagOf = { L1: 'red', L2: 'yellow', L3: 'green', L4: 'blue', L5: 'white' }, ch = '';
     for (var k = 0; k < order.length; k++) { var key = order[k]; ch += '<span class="cx-an-count"><i class="cx-tag cx-tag-' + (tagOf[key] || 'none') + '"></i>' + (key === 'none' ? 'no tag' : key) + ' <b>' + (c[key] || 0) + '</b></span>'; }
     counts.innerHTML = ch + '<span class="cx-an-count">changed this month <b>' + st.systems.filter(function (x) { return x.changed; }).length + '</b></span>';
+    var nChanged = st.systems.filter(function (x) { return x.changed; }).length;
+    if (S.changedOnly && !nChanged) { var er = el('tr', 'cx-an-empty'); er.innerHTML = '<td colspan="6">No gate passes in M' + S.month + '. <button type="button" class="tool-btn" data-cx-clear-changed="1">Clear</button></td>'; tb.appendChild(er); }
     for (var i = 0; i < st.systems.length; i++) {
       var x = st.systems[i], tr = el('tr', (x.changed ? 'is-changed' : '') + (S.sel === 'sys:' + x.id ? ' is-selected' : ''));
       tr.setAttribute('data-cx-asset', x.id);
@@ -294,13 +308,16 @@
     $('cxAnRetry').addEventListener('click', render);
     $('cxAnMonth').addEventListener('input', function () { S.month = +this.value; renderTimeline(S.plan); renderSchematic(S.plan); renderStatus(S.plan); renderInspector(S.plan); syncCampus(); runHooks(S.plan, true); });
     $('cxAnPrev').addEventListener('click', function () { step(-1); }); $('cxAnNext').addEventListener('click', function () { step(1); });
-    $('cxAnPlay').addEventListener('click', function () { if (S.timer) stopPlay(); else { if (S.plan && S.month >= Math.ceil(S.plan.finishMonth)) S.month = 0; this.setAttribute('aria-pressed', 'true'); this.textContent = 'Pause'; S.timer = root.setInterval(function () { if (!S.plan || S.month >= Math.ceil(S.plan.finishMonth)) { stopPlay(); return; } step(1); }, 1200); } });
+    $('cxAnPlay').addEventListener('click', function () { if (S.timer) stopPlay(); else { if (S.plan && S.month >= Math.ceil(S.plan.finishMonth)) S.month = 0; this.setAttribute('aria-pressed', 'true'); this.textContent = 'Pause'; S.timer = root.setInterval(function () { if (!S.plan || S.month >= Math.ceil(S.plan.finishMonth)) { stopPlay(); return; } step(1); }, S.playMs || 1200); } });
+    $('cxAnSpeed').addEventListener('change', function () { S.playMs = +this.value || 1200; if (S.timer) { root.clearInterval(S.timer); S.timer = root.setInterval(function () { if (!S.plan || S.month >= Math.ceil(S.plan.finishMonth)) { stopPlay(); return; } step(1); }, S.playMs); } });
+    $('cxAnChangedOnly').addEventListener('click', function () { setChangedOnly(this.getAttribute('aria-pressed') !== 'true'); });
     $('cxTabAnalysis').addEventListener('click', function (e) {
       var tab = e.target.closest ? e.target.closest('[data-sheet]') : null; if (tab) { setSheet(tab.getAttribute('data-sheet')); return; }
       var z = e.target.closest ? e.target.closest('[data-zoom]') : null; if (z && z.tagName === 'BUTTON') { var zs = doc.querySelectorAll('.cx-an-sheet-zoom [data-zoom]'); for (var zi = 0; zi < zs.length; zi++) zs[zi].setAttribute('aria-pressed', String(zs[zi] === z)); $('cxAnSheets').setAttribute('data-zoom', z.getAttribute('data-zoom')); return; }
       var cb = e.target.closest ? e.target.closest('[data-campus]') : null; if (cb) { var ch = $('cxAnCampus'); if (ch && ch.__rzCampus) { ch.__rzCampus.select(cb.getAttribute('data-campus')); ch.scrollIntoView({ block: 'center', behavior: 'smooth' }); } return; }
       var hit = e.target.closest ? e.target.closest('[data-rzd-hit]') : null;
       if (hit) { var id = hit.getAttribute('data-rzd-hit'); if (sysById(id)) { S.sel = 'sys:' + id; render(); } return; }
+      if (e.target.closest && e.target.closest('[data-cx-clear-changed]')) { setChangedOnly(false); return; }
       var b = e.target.closest ? e.target.closest('[data-sel]') : null; if (!b) return;
       S.sel = b.getAttribute('data-sel'); var sys = S.sel.indexOf('sys:') === 0 ? sysById(S.sel.slice(4)) : null; if (sys && b.hasAttribute('data-show')) setSheet(sys.block);
       render();

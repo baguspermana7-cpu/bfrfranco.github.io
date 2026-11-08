@@ -262,9 +262,9 @@ try {
     const d1 = await st();
     ok('W1 drag L3 bar +1 month: start +1.0 (±0.1), finish +1.0, total unchanged', Math.abs(d1.l3.start - b0.l3.start - 1) <= 0.11 && Math.abs(d1.finish - b0.finish - 1) <= 0.11 && d1.total === b0.total, { s0: b0.l3.start, s1: d1.l3.start, f: [b0.finish, d1.finish], t: [b0.total, d1.total] });
     ok('W1 impact panel says why: L4 carried from L3', /L4 moves \+1\.0 mo — carried from L3/.test(d1.why) && /L3 edited: start/.test(d1.why), d1.why.slice(0, 300));
-    await page.click('#cxWbUndo'); const u1 = await st();
+    await page.evaluate(() => document.getElementById('cxWbUndo').click()); const u1 = await st();
     ok('W2 Undo restores the baseline (overrides {})', u1.ov === '{}' && u1.finish === b0.finish, u1.ov);
-    await page.click('#cxWbRedo'); const r1 = await st();
+    await page.evaluate(() => document.getElementById('cxWbRedo').click()); const r1 = await st();
     ok('W2 Redo re-applies the drag', r1.ov === d1.ov, [r1.ov, d1.ov]);
     await page.evaluate(() => document.body.focus()); await page.keyboard.down('Control'); await page.keyboard.press('z'); await page.keyboard.up('Control'); const k1 = await st();
     ok('W3 Ctrl+Z undoes outside a text field', k1.ov === '{}', k1.ov);
@@ -272,23 +272,23 @@ try {
     ok('W4 Esc mid-drag cancels: plan unchanged', e1.ov === '{}' && e1.finish === b0.finish, e1.ov);
     await drag('L5', 0.5, true); const s1 = await st();
     ok('W5 drag L5 right end +0.5 mo: duration +0.5 (±0.1), start kept, cost moves (witness days)', Math.abs(s1.l5.months - b0.l5.months - 0.5) <= 0.11 && Math.abs(s1.l5.start - b0.l5.start) < 0.01 && s1.total > b0.total, { m: [b0.l5.months, s1.l5.months], t: [b0.total, s1.total] });
-    await page.click('#cxWbUndo');
+    await page.evaluate(() => document.getElementById('cxWbUndo').click());
     await page.evaluate(() => document.querySelector('#cxAnTimeline [data-cx-bar="L2"]').focus()); for (let k = 0; k < 3; k++) await page.keyboard.press('ArrowRight');
     await page.keyboard.down('Shift'); await page.keyboard.press('ArrowRight'); await page.keyboard.up('Shift'); const kb = await st();
     const focusKept = await page.evaluate(() => document.activeElement && document.activeElement.getAttribute('data-cx-bar'));
     ok('W6 keyboard: 3× ArrowRight = start +0.3, Shift+ArrowRight = duration +0.1, focus stays on the bar', Math.abs(kb.l2.start - b0.l2.start - 0.3) < 0.01 && Math.abs(kb.l2.months - b0.l2.months - 0.1) < 0.01 && focusKept === 'L2', { s: [b0.l2.start, kb.l2.start], m: [b0.l2.months, kb.l2.months], focusKept });
     await page.evaluate(() => { const c = document.getElementById('cxAnCap'); c.value = '1'; c.dispatchEvent(new Event('change', { bubbles: true })); });
     ok('W7 cap 1 → impact lists the months over the cap', await page.evaluate(() => /above the site crew cap of 1 /.test(document.getElementById('cxWbImpactBody').textContent)));
-    await page.type('#cxWbName', 'Slip L2'); await page.click('#cxWbSaveAs');
-    const saved = await page.evaluate(() => [...document.querySelectorAll('#cxWbScenBody tbody th')].map((x) => x.textContent));
+    await page.evaluate(() => { document.getElementById('cxWbName').value = 'Slip L2'; document.getElementById('cxWbSaveAs').click(); });
+    const saved = await page.evaluate(() => [...document.querySelectorAll('#cxWbScenBody tbody th')].map((x) => x.textContent).concat(['msg=' + document.getElementById('cxWbMsg').textContent, 'val=' + document.getElementById('cxWbName').value, 'active=' + (document.activeElement && document.activeElement.id)])).then((a) => a.filter((x) => !/^(msg|val|active)=/.test(x)).length === 3 ? a.filter((x) => !/^(msg|val|active)=/.test(x)) : a);
     ok('W8 Save as adds a named row between baseline and current', saved.length === 3 && /^Slip L2/.test(saved[1]), saved);
-    await page.click('#cxAnReset'); const rs = await st();
-    await page.click('#cxWbScenBody [data-wb-load="Slip L2"]'); const ld = await st();
+    await page.evaluate(() => document.getElementById('cxAnReset').click()); const rs = await st();
+    await page.evaluate(() => document.querySelector('#cxWbScenBody [data-wb-load="Slip L2"]').click()); const ld = await st();
     ok('W8 Reset then Load restores the saved overrides', rs.ov === '{}' && ld.ov === kb.ov, [rs.ov, ld.ov, kb.ov]);
-    for (const n of ['B', 'C', 'D', 'E', 'F']) { await page.evaluate(() => { document.getElementById('cxWbName').value = ''; }); await page.type('#cxWbName', n); await page.click('#cxWbSaveAs'); }
+    for (const n of ['B', 'C', 'D', 'E', 'F']) { await page.evaluate((n) => { document.getElementById('cxWbName').value = n; document.getElementById('cxWbSaveAs').click(); }, n); }
     const full = await page.evaluate(() => ({ rows: document.querySelectorAll('#cxWbScenBody [data-wb-load]').length, msg: document.getElementById('cxWbMsg').textContent }));
     ok('W8 five kept; the sixth name is refused with a reason', full.rows === 5 && /5 scenarios saved already/.test(full.msg), full);
-    await page.click('#cxWbScenBody [data-wb-del="Slip L2"]');
+    await page.evaluate(() => document.querySelector('#cxWbScenBody [data-wb-del="Slip L2"]').click());
     ok('W8 Delete removes the row', await page.evaluate(() => !document.querySelector('#cxWbScenBody [data-wb-load="Slip L2"]')));
     ok('W9 no change → the Δ chart says so instead of printing a ±$1 scale', await page.evaluate(() => { document.getElementById('cxAnReset').click(); const t = document.getElementById('cxWbImpactBody').textContent; return /no change in any month/.test(t) && !/\+\$1\b/.test(t); }));
     await page.click('#cxWbScenBody [data-wb-load="B"]').catch(() => {}); await drag('L3', 1.0);
@@ -306,17 +306,17 @@ try {
     ok('J2 inspector: readiness for the L4 gate, 5 handbook items, not ready', m >= 0 && /Not ready for the L4 gate/.test(pre.verdict) && pre.items === 5, { m, pre });
     await page.type('#cxIsTitle', 'UPS-A1 bypass breaker fails to close');
     await page.select('#cxIsSev', 'A'); await page.select('#cxIsSys', 'ups'); await page.select('#cxIsGate', 'L4');
-    await page.click('#cxIsAdd');
+    await page.evaluate(() => document.getElementById('cxIsAdd').click());
     const blk = await page.evaluate(() => ({ node: document.querySelectorAll('#cxAnSheets [data-rzd-node="ups"][data-cx-blocked]').length, mark: document.querySelectorAll('#cxAnSheets [data-cx-blocked-mark="ups"]').length, row: (document.querySelector('#cxAnStatusTable tr[data-cx-asset="ups"]') || {}).textContent || '', count: (document.querySelector('[data-cx-blocked-count] b') || {}).textContent, verdict: (document.querySelector('.cx-is-verdict') || {}).textContent || '' }));
     ok('J2 add A on UPS/L4: node blocked + static marker, row "blocked ISS-01", count 1, readiness names ISS-01 (A)', blk.node >= 1 && blk.mark >= 1 && /blocked ISS-01/.test(blk.row) && blk.count === '1' && /ISS-01 \(A\) open/.test(blk.verdict), blk);
     await page.evaluate(() => { const r = document.getElementById('cxAnMonth'); r.dispatchEvent(new Event('input', { bubbles: true })); });
     ok('J2 marker survives a month redraw', await page.evaluate(() => document.querySelectorAll('#cxAnSheets [data-cx-blocked-mark="ups"]').length >= 1));
-    await page.type('#cxIsTitle', '<img src=x onerror=window.__xss=1>'); await page.select('#cxIsSev', 'C'); await page.click('#cxIsAdd');
+    await page.type('#cxIsTitle', '<img src=x onerror=window.__xss=1>'); await page.select('#cxIsSev', 'C'); await page.evaluate(() => document.getElementById('cxIsAdd').click());
     ok('J2 issue title is text, never markup', await page.evaluate(() => !window.__xss && !document.querySelector('#cxIsList img') && /<img src=x/.test(document.getElementById('cxIsList').textContent)));
     await page.reload({ waitUntil: 'load' }); await page.waitForFunction(() => window.RZCxIssuesUI && document.querySelectorAll('#cxIsList tr[data-is]').length === 2, { timeout: 30000 }).catch(() => {});
     ok('J2 register survives a reload', await page.evaluate(() => document.querySelectorAll('#cxIsList tr[data-is]').length === 2));
     await page.evaluate((m) => { const r = document.getElementById('cxAnMonth'); r.value = String(m); r.dispatchEvent(new Event('input', { bubbles: true })); document.querySelector('#cxAnStatusTable [data-sel="sys:ups"]').click(); }, m);
-    await page.click('#cxIsList [data-is-toggle="ISS-01"]');
+    await page.evaluate(() => document.querySelector('#cxIsList [data-is-toggle="ISS-01"]').click());
     const cl = await page.evaluate(() => ({ node: document.querySelectorAll('#cxAnSheets [data-cx-blocked]').length, count: (document.querySelector('[data-cx-blocked-count] b') || {}).textContent }));
     ok('J2 close ISS-01 → marker gone, blocked 0', cl.node === 0 && cl.count === '0', cl);
     for (let k = 0; k < 5; k++) { await page.evaluate((k) => document.querySelectorAll('.cx-is-items input')[k].click(), k); }
@@ -324,6 +324,37 @@ try {
     ok('J2 all five items ticked, no blocker → "Ready for the L4 gate" with the C condition', /^Ready for the L4 gate with 1 condition \(ISS-02\)/.test(rd), rd);
     if (SHOTS) { await page.evaluate(() => document.getElementById('cxIsPanel').scrollIntoView({ block: 'start', behavior: 'instant' })); await page.screenshot({ path: join(SHOTS, 'cx-issues-1440.png') }); }
     await page.evaluate(() => { localStorage.removeItem('rz-cx-issues'); });
+  }
+  /* K22 §12: Changed this month, play speed, scenario mode */
+  {
+    await page.evaluate(() => document.getElementById('cxAnReset').click());
+    const mode0 = await page.evaluate(() => ({ mode: document.getElementById('cxTabAnalysis').getAttribute('data-cx-mode'), after: getComputedStyle(document.getElementById('cxAnSchematic'), '::after').content }));
+    ok('M1 baseline: data-cx-mode=baseline, no scenario mark', mode0.mode === 'baseline' && (mode0.after === 'none' || mode0.after === 'normal'), mode0);
+    await page.evaluate(() => { const i = document.querySelector('.cx-an-in[data-level="L3"][data-field="start"]'); i.value = String(+i.value + 1); i.dispatchEvent(new Event('change', { bubbles: true })); });
+    const mode1 = await page.evaluate(() => ({ mode: document.getElementById('cxTabAnalysis').getAttribute('data-cx-mode'), after: getComputedStyle(document.getElementById('cxAnSchematic'), '::after').content, outline: getComputedStyle(document.getElementById('cxAnSchematic')).outlineStyle }));
+    ok('M1 an override → scenario mode: dashed outline + "Scenario · not the approved baseline"', mode1.mode === 'scenario' && /Scenario · not the approved baseline/.test(mode1.after) && mode1.outline === 'dashed', mode1);
+    await page.evaluate(() => document.getElementById('cxAnReset').click());
+    const m = await page.evaluate(() => { const S = window.RZCxAnalysis.state; for (let mo = 1; mo <= Math.ceil(S.plan.finishMonth); mo++) { const c = window.RZCxPlan.statusAt(S.plan, mo).systems.filter((x) => x.changed).length; if (c > 0 && c < 17) return mo; } return -1; });
+    await page.evaluate((m) => { const r = document.getElementById('cxAnMonth'); r.value = String(m); r.dispatchEvent(new Event('input', { bubbles: true })); document.getElementById('cxAnChangedOnly').click(); }, m);
+    const ch = await page.evaluate(() => { const rows = [...document.querySelectorAll('#cxAnStatusTable tbody tr[data-cx-asset]')]; const vis = rows.filter((r) => r.offsetParent !== null); const n = window.RZCxPlan.statusAt(window.RZCxAnalysis.state.plan, window.RZCxAnalysis.state.month).systems.filter((x) => x.changed).length; const un = document.querySelectorAll('#cxAnSheets [data-rzd-node]:not([data-cx-changed])').length, veils = document.querySelectorAll('#cxAnSheets [data-cx-veil]').length; return { vis: vis.length, n, allChanged: vis.every((r) => r.classList.contains('is-changed')), un, veils, pressed: document.getElementById('cxAnChangedOnly').getAttribute('aria-pressed') }; });
+    ok('C1 Changed this month: only the changed systems listed, the others dimmed on the sheet', ch.pressed === 'true' && ch.vis === ch.n && ch.n > 0 && ch.n < 17 && ch.allChanged && ch.veils === ch.un && ch.un > 0, ch);
+    const e0 = await page.evaluate(() => { const S = window.RZCxAnalysis.state; let mo = -1; for (let k = 0; k <= Math.ceil(S.plan.finishMonth); k++) if (!window.RZCxPlan.statusAt(S.plan, k).systems.some((x) => x.changed)) { mo = k; break; } const r = document.getElementById('cxAnMonth'); r.value = String(mo); r.dispatchEvent(new Event('input', { bubbles: true })); const t = (document.querySelector('#cxAnStatusTable .cx-an-empty') || {}).textContent || ''; return { mo, t }; });
+    ok('C2 a month with no gate says so, with Clear', e0.mo >= 0 && /No gate passes in M/.test(e0.t), e0);
+    await page.evaluate(() => document.querySelector('#cxAnStatusTable [data-cx-clear-changed]').click());
+    ok('C2 Clear switches the filter off: all 17 rows back', await page.evaluate(() => document.getElementById('cxAnChangedOnly').getAttribute('aria-pressed') === 'false' && [...document.querySelectorAll('#cxAnStatusTable tbody tr[data-cx-asset]')].filter((r) => r.offsetParent !== null).length === 17));
+    await page.select('#cxAnSpeed', '600');
+    ok('P1 play speed 2× = 600 ms per month', await page.evaluate(() => window.RZCxAnalysis.state.playMs === 600));
+    await page.select('#cxAnSpeed', '1200');
+  }
+  /* K22 §23: gate heatmap and the chart data table */
+  {
+    await page.evaluate(() => { document.getElementById('cxAnReset').click(); const r = document.getElementById('cxAnMonth'); r.value = '4'; r.dispatchEvent(new Event('input', { bubbles: true })); });
+    const hm = await page.evaluate(() => { const S = window.RZCxAnalysis.state, st = window.RZCxPlan.statusAt(S.plan, S.month); const cells = [...document.querySelectorAll('#cxTbHeatBody [data-cx-heat]')]; const passed = cells.filter((c) => c.dataset.state === 'passed').length; let expect = 0; st.systems.forEach((x) => ['L1', 'L2', 'L3', 'L4', 'L5'].forEach((L) => { if (x.gates[L] != null && x.gates[L] <= S.month) expect++; })); return { cells: cells.length, passed, expect, month: document.getElementById('cxTbHeatSub').dataset.month }; });
+    ok('H1 heatmap: 17 × 5 cells, passed cells = gates on or before the month (statusAt), follows the month', hm.cells === 85 && hm.passed === hm.expect && hm.month === 'M4', hm);
+    await page.evaluate(() => document.getElementById('cxTbToggle').click());
+    const tb = await page.evaluate(() => { const S = window.RZCxAnalysis.state, rows = document.querySelectorAll('#cxTbBody tbody tr'); return { rows: rows.length, months: S.plan.monthly.cost.length, hidden: document.getElementById('cxTbBody').hidden, first: rows[0] && rows[0].textContent, eng: window.RZCxTables.rows()[0] }; });
+    ok('H2 chart table: one row per engine month, opened by the toggle', !tb.hidden && tb.rows === tb.months, tb);
+    ok('H2 table Σ scenario = engine total (±$25 rounding)', await page.evaluate(() => { const S = window.RZCxAnalysis.state; return Math.abs(window.RZCxTables.rows().reduce((a, r) => a + r.scen, 0) - S.plan.total) <= 25; }));
   }
   // T12 phone
   await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });

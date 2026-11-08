@@ -223,3 +223,21 @@
 .cx-an-inspector .tool-btn { min-height: 30px; padding: 0 10px; font: 500 12px var(--rzt-mono); color: var(--rzt-text-2); background: transparent; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); cursor: pointer; }
 .cx-an-inspector .tool-btn:hover { border-color: var(--rzt-line-strong); color: var(--rzt-text); }
 @media (max-width: 720px) { .cx-is-form .input-field { font-size: 16px; } }
+
+/* K22 §12: "Changed this month" filter, play speed, scenario mode marked on the instruments */
+.cx-only-changed #cxAnStatusTable tbody tr:not(.is-changed):not(.cx-an-empty) { display: none; }
+.cx-an-veil { fill: var(--rzt-panel); opacity: .72; }
+#cxAnChangedOnly[aria-pressed="true"] { border-color: var(--rzt-accent); color: var(--rzt-accent-text); }
+.cx-an-scrub .cx-an-cap select.input-field { width: auto; min-height: 30px; padding: 2px 6px; font: 500 12px var(--rzt-mono); background: var(--rzt-inset); color: var(--rzt-text); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); }
+#cxTabAnalysis[data-cx-mode="scenario"] #cxAnSchematic,
+#cxTabAnalysis[data-cx-mode="scenario"] .cx-an-panel:has(#cxAnTimeline),
+#cxTabAnalysis[data-cx-mode="scenario"] #cxAnCampus { position: relative; outline: 1px dashed var(--rzt-accent); outline-offset: -1px; }
+#cxTabAnalysis[data-cx-mode="scenario"] #cxAnSchematic::after,
+#cxTabAnalysis[data-cx-mode="scenario"] .cx-an-panel:has(#cxAnTimeline)::after,
+#cxTabAnalysis[data-cx-mode="scenario"] #cxAnCampus::after { content: "Scenario · not the approved baseline"; display: block; margin-top: 8px; text-align: right; font: 600 10px var(--rzt-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--rzt-accent-text); pointer-events: none; }
+
+/* K22 §23: gate heatmap + chart data table (js/rz-cx-tables.js) */
+#cxTbHeatBody svg { display: block; color: var(--rzt-text); }
+.cx-tb-table td.is-over { color: var(--rzt-fault); }
+.cx-tb-table tr.is-selected th, .cx-tb-table tr.is-selected td { background: var(--rzt-hover); }
+.cx-tb-table tfoot th, .cx-tb-table tfoot td { font-weight: 600; border-top: 1px solid var(--rzt-line-strong); }
