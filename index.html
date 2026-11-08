@@ -104,8 +104,8 @@
     <!-- Preconnect to Google Fonts (already in resource hints above is for CDNs) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Sans+Condensed:wght@700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Sans+Condensed:wght@700&display=swap" rel="stylesheet"></noscript>
     <!-- §11 PLAN02: editorial hero (dark-only) — JetBrains Mono readout (Fraunces display withdrawn v3.30.0) -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet"></noscript></noscript>
@@ -131,7 +131,6 @@
         gap: 0.75rem !important;
         padding: 0 0.75rem !important;
     }
-    .bento-row-career { grid-template-columns: 1fr !important; }
     .bento-card { padding: 1.25rem !important; }
     .bento-name { font-size: 2rem !important; line-height: 1.1 !important; }
     .bento-desc { font-size: 0.9rem !important; }
@@ -160,13 +159,6 @@
         min-height: 44px;
     }
 
-    /* Footer 3-column collapses */
-    .footer-grid, .footer-enhanced .footer-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1.25rem !important;
-        padding: 1rem !important;
-        text-align: left !important;
-    }
 
     /* v1.18.15 — .rz-marquee + .rz-cred-band both removed; no credentials strip below hero */
 
@@ -302,10 +294,10 @@
             <a href="index.html" class="nav-logo">
                 <img src="assets/profile-photo-sm.webp?v=20260920" alt="Bagus Dwi Permana - Engineering Operations Manager and Ahli K3 Listrik Expert" class="nav-avatar" width="40" height="40" decoding="async">
             </a>
-            <ul class="nav-menu">
+            <ul class="nav-menu" data-rz-owner-shape="R079">
                 <li><a href="#home" class="nav-link">Home</a></li>
                 <li class="nav-dropdown">
-                    <a href="datacenter-solutions.html" class="nav-link nav-vibrate" aria-haspopup="true" aria-expanded="false">
+                    <a href="datacenter-solutions.html" class="nav-link" aria-haspopup="true" aria-expanded="false">
                         DC Solutions
                         <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="6 9 12 15 18 9"></polyline>
@@ -348,7 +340,7 @@
                     </ul>
                 </li>
                 <li><a href="#faq" class="nav-link">FAQ</a></li>
-                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li class="nav-li-contact"><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
             <button class="nav-search-btn" id="navSearchBtn" aria-label="Search" title="Search (Ctrl+K)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -375,12 +367,12 @@
                     <path d="M9 17a3 3 0 0 1 6 0" stroke="#22d3ee"></path>
                 </svg>
             </button>
+            <a href="#contact" class="rz-pill-cta nav-cta" data-rz-owner-shape="R079">Contact <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 6l8 7 8-7"/></svg></a>
             <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
             </button>
-            <span class="nav-indicator" aria-hidden="true"></span>
         </div>
     </nav>
 
@@ -409,7 +401,7 @@
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="margin-right:0.4rem;"><path d="M8 5v14l11-7z"/></svg>
                             Get Started
                         </a>
-                        <a href="#contact" class="btn-bento-outline">Correspondence</a>
+                        <a href="#contact" class="rz-pill-cta" data-rz-owner-shape="R079">Correspondence <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></a>
                     </div>
                     <!-- §11 PLAN02 — dark-only editorial readout (count-up on load) -->
                     <div class="bento-readout" aria-label="Portfolio at a glance">
@@ -456,90 +448,90 @@
                 </div>
             </div>
 
+            <p class="rz-meta-row"><span class="rz-meta-clock" aria-hidden="true">[--:-- WIB]</span><span class="sr-only">Time zone WIB, UTC+7.</span> · Bekasi, Indonesia · Independent personal project</p>
+
             <!-- ROW 2: CAREER TIMELINE -->
             <h2 class="sr-only">Career Timeline</h2>
-            <div class="bento-row bento-row-career">
-                <div class="bento-card bento-exp-card bento-card-1" style="--bexp-accent: rgba(59,130,246,0.55);">
-                    <div class="bento-exp-top">
-                        <span class="bento-tag">2011 – 2014</span>
-                        <img src="assets/zte.svg" alt="ZTE" class="bento-company-logo" width="32" height="32" loading="lazy">
+            <div class="bento-row emp-row" id="career">
+                <article class="emp-card" data-emp="zte">
+                    <div class="emp-face emp-front">
+                        <div class="emp-head"><img src="assets/zte.svg" alt="ZTE Corporation" class="emp-logo" width="1547" height="750" loading="lazy" decoding="async"></div>
+                        <h3 class="emp-name">ZTE Corporation</h3>
+                        <p class="emp-years"><span class="emp-fig">2011–2014</span> <span class="emp-unit">/ 3 yrs</span></p>
+                        <p class="emp-role">Senior Design Engineer · Industrial Power</p>
+                        <ul class="emp-skills"><li>Industrial power network design</li><li>Telecom site engineering</li><li>Power equipment and commissioning</li></ul>
+                        <button type="button" class="emp-btn emp-open" aria-expanded="false" aria-controls="emp-back-zte">Details <span aria-hidden="true">→</span></button>
                     </div>
-                    <div class="bento-exp-bottom">
-                        <h3 class="bento-exp-company">ZTE Corporation</h3>
-                        <p class="bento-exp-role">Senior Design Engineer · Industrial Power</p>
+                    <div class="emp-face emp-back" id="emp-back-zte" aria-hidden="true" inert>
+                        <h4 class="emp-back-name" tabindex="-1">ZTE Corporation <span class="emp-unit">2011–2014</span></h4>
+                        <dl class="emp-facts"><div><dt>Role</dt><dd>Senior Design Engineer, industrial power</dd></div><div><dt>Work</dt><dd>Power network design for telecom sites; equipment selection, installation and commissioning.</dd></div></dl>
+                        <button type="button" class="emp-btn emp-close">Back <span aria-hidden="true">←</span></button>
                     </div>
-                    <div class="bexp-skills">
-                        <div class="bexp-skill"><span class="bexp-dot"></span>Industrial Power Network Design</div>
-                        <div class="bexp-skill"><span class="bexp-dot"></span>Telecom Site Engineering</div>
-                        <div class="bexp-skill"><span class="bexp-dot"></span>Power Equipment & Commissioning</div>
+                </article>
+                <article class="emp-card" data-emp="aal">
+                    <div class="emp-face emp-front">
+                        <div class="emp-head"><img src="assets/aal.svg" alt="Astra Agro Lestari" class="emp-logo emp-logo-ink" width="1563" height="1347" loading="lazy" decoding="async"><img src="assets/logos/aal-light.svg" alt="" aria-hidden="true" class="emp-logo emp-logo-light" width="1563" height="1347" loading="lazy" decoding="async"></div>
+                        <h3 class="emp-name">Astra Agro Lestari</h3>
+                        <p class="emp-tag">ALEXA Excellence Award</p>
+                        <p class="emp-years"><span class="emp-fig">2014–2019</span> <span class="emp-unit">/ 4.5 yrs</span></p>
+                        <p class="emp-role">AEI / Power Generation / Maintenance Engineer</p>
+                        <ul class="emp-skills"><li>40+ sites to one HQ standard</li><li>Central workshop and taskforce</li><li>Steam-turbine generators, 2,000+ MW</li></ul>
+                        <button type="button" class="emp-btn emp-open" aria-expanded="false" aria-controls="emp-back-aal">Details <span aria-hidden="true">→</span></button>
                     </div>
-                </div>
-                <div class="bento-card bento-exp-card bento-exp-award bento-card-2" style="--bexp-accent: rgba(16,185,129,0.55);">
-                    <div class="bento-exp-top">
-                        <span class="bento-tag">2014 – 2018</span>
-                        <img src="assets/aal.svg" alt="Astra" class="bento-company-logo" width="32" height="32" loading="lazy">
+                    <div class="emp-face emp-back" id="emp-back-aal" aria-hidden="true" inert>
+                        <h4 class="emp-back-name" tabindex="-1">Astra Agro Lestari <span class="emp-unit">2014–2019</span></h4>
+                        <dl class="emp-facts"><div><dt>Scope</dt><dd>40+ sites: 33 mills, 3 refineries, 2 fertilizer plants, 5 ports.</dd></div><div><dt>Work</dt><dd>Held electrical maintenance, boiler, turbine and generator programs to one corporate standard.</dd></div><div><dt>Built</dt><dd>A central workshop and a cross-site taskforce of site engineers sent where a specialist was needed.</dd></div><div><dt>Plant</dt><dd>Recommissioning of steam-turbine generators across sites, 2,000+ MW combined; third-party vendors governed.</dd></div><div><dt>Award</dt><dd>ALEXA Excellence Award, Best Operational Support.</dd></div></dl>
+                        <button type="button" class="emp-btn emp-close">Back <span aria-hidden="true">←</span></button>
                     </div>
-                    <div class="bento-exp-bottom">
-                        <h3 class="bento-exp-company">Astra Agro Lestari</h3>
-                        <p class="bento-exp-badge">ALEXA Award Winner</p>
-                        <p class="bento-exp-role">Automation & Control Lead</p>
+                </article>
+                <article class="emp-card" data-emp="cargill">
+                    <div class="emp-face emp-front">
+                        <div class="emp-head"><img src="assets/logos/cargill.svg" alt="Cargill Indonesia" class="emp-logo emp-logo-ink" width="430" height="192" loading="lazy" decoding="async"><img src="assets/logos/cargill-light.svg" alt="" aria-hidden="true" class="emp-logo emp-logo-light" width="430" height="192" loading="lazy" decoding="async"></div>
+                        <h3 class="emp-name">Cargill Indonesia</h3>
+                        <p class="emp-years"><span class="emp-fig">2019–2020</span> <span class="emp-unit">/ 1.5 yrs</span></p>
+                        <p class="emp-role">AEI Engineer · Automation, Electrical, Instrumentation</p>
+                        <ul class="emp-skills"><li>8 process plants, one standard</li><li>CAPEX delivery, FAT/SAT</li><li>Electrical Maintenance Program</li></ul>
+                        <button type="button" class="emp-btn emp-open" aria-expanded="false" aria-controls="emp-back-cargill">Details <span aria-hidden="true">→</span></button>
                     </div>
-                    <div class="bexp-skills">
-                        <div class="bexp-skill"><span class="bexp-dot"></span>7-Mill Automation Scale-up</div>
-                        <div class="bexp-skill"><span class="bexp-dot"></span>SCADA & BMS Integration</div>
-                        <div class="bexp-skill"><span class="bexp-dot"></span>31 Mills Multi-site Ops</div>
+                    <div class="emp-face emp-back" id="emp-back-cargill" aria-hidden="true" inert>
+                        <h4 class="emp-back-name" tabindex="-1">Cargill Indonesia <span class="emp-unit">2019–2020</span></h4>
+                        <dl class="emp-facts"><div><dt>Scope</dt><dd>8 process plants: refinery, palm oil, fertilizer, food and beverage.</dd></div><div><dt>Work</dt><dd>Electrical, instrumentation and automation standards to the corporate bar and to PUIL and K3 Listrik.</dd></div><div><dt>Built</dt><dd>CAPEX projects end to end: scope, BOQ, vendor evaluation, supervision, FAT/SAT.</dd></div><div><dt>Program</dt><dd>Electrical Maintenance Program: procedures, schedules and compliance tracking at every site.</dd></div></dl>
+                        <button type="button" class="emp-btn emp-close">Back <span aria-hidden="true">←</span></button>
                     </div>
-                </div>
-                <div class="bento-card bento-exp-card bento-card-3" style="--bexp-accent: rgba(245,158,11,0.55);">
-                    <div class="bento-exp-top">
-                        <span class="bento-tag">2018 – 2020</span>
-                        <img src="assets/Cargill.webp" alt="Cargill" class="bento-company-logo bento-logo-lg exp-logo-cargill-day" width="76" height="49" loading="lazy">
-                        <img src="assets/Cargilldarkmode.webp" alt="Cargill" class="bento-company-logo bento-logo-lg exp-logo-cargill-dark" width="76" height="43" loading="lazy" decoding="async">
+                </article>
+                <article class="emp-card" data-emp="aws">
+                    <div class="emp-face emp-front">
+                        <div class="emp-head"><img src="assets/aws-day.svg" alt="Amazon Web Services" class="emp-logo emp-logo-ink" width="24" height="24" loading="lazy" decoding="async"><img src="assets/aws-dark.svg?v=20260620-white" alt="" aria-hidden="true" class="emp-logo emp-logo-light" width="24" height="24" loading="lazy" decoding="async"></div>
+                        <h3 class="emp-name">Amazon Web Services</h3>
+                        <p class="emp-tag">AWS Service Award 2021</p>
+                        <p class="emp-years"><span class="emp-fig">2020–2022</span> <span class="emp-unit">/ 1.5 yrs</span></p>
+                        <p class="emp-role">Senior Data Center Engineer (DCEO)</p>
+                        <ul class="emp-skills"><li>Hyperscale operations, CGK</li><li>Colocation and transit sites</li><li>L4–IST commissioning</li></ul>
+                        <button type="button" class="emp-btn emp-open" aria-expanded="false" aria-controls="emp-back-aws">Details <span aria-hidden="true">→</span></button>
                     </div>
-                    <div class="bento-exp-bottom">
-                        <h3 class="bento-exp-company">Cargill Indonesia</h3>
-                        <p class="bento-exp-role">AEI Engineer · End-to-End Delivery</p>
+                    <div class="emp-face emp-back" id="emp-back-aws" aria-hidden="true" inert>
+                        <h4 class="emp-back-name" tabindex="-1">Amazon Web Services <span class="emp-unit">2020–2022</span></h4>
+                        <dl class="emp-facts"><div><dt>Site</dt><dd>AWS hyperscale infrastructure at the CGK Jakarta leased site; 100 % work-order compliance and full SLA.</dd></div><div><dt>Reach</dt><dd>Carrier-neutral colocation and transit-center sites: remote monitoring, rack power-on, new racks to AWS standards.</dd></div><div><dt>Build</dt><dd>L4–IST commissioning and operational readiness for new clusters: vendor contracts, spares, SOP/MOP drafting.</dd></div><div><dt>Award</dt><dd>AWS Service Award 2021, cross-regional contribution.</dd></div></dl>
+                        <button type="button" class="emp-btn emp-close">Back <span aria-hidden="true">←</span></button>
                     </div>
-                    <div class="bexp-skills">
-                        <div class="bexp-skill"><span class="bexp-dot"></span>Electrical Maintenance Systems</div>
-                        <div class="bexp-skill"><span class="bexp-dot"></span>Project Design & Engineering</div>
-                        <div class="bexp-skill"><span class="bexp-dot"></span>E2E Commissioning & Handover</div>
+                </article>
+                <article class="emp-card is-current" data-emp="pure">
+                    <div class="emp-face emp-front">
+                        <div class="emp-head"><img src="assets/logos/puredc.svg" alt="Pure Data Centres" class="emp-logo emp-logo-ink" width="146" height="56" loading="lazy" decoding="async"><img src="assets/logos/puredc-light.svg" alt="" aria-hidden="true" class="emp-logo emp-logo-light" width="146" height="56" loading="lazy" decoding="async"><span class="emp-now">Current</span></div>
+                        <h3 class="emp-name">Pure Data Centres</h3>
+                        <p class="emp-years"><span class="emp-fig">2022–now</span> <span class="emp-unit">/ 4+ yrs</span></p>
+                        <p class="emp-role">Engineering Operations Manager & Senior Authorized Person</p>
+                        <ul class="emp-skills"><li>24/7 Tier III colocation</li><li>HV & LV Senior Authorized Person</li><li>Authorization-to-Work system</li></ul>
+                        <button type="button" class="emp-btn emp-open" aria-expanded="false" aria-controls="emp-back-pure">Details <span aria-hidden="true">→</span></button>
                     </div>
-                </div>
-                <div class="bento-card bento-exp-card bento-card-4" style="--bexp-accent: rgba(100, 116, 139,0.55);">
-                    <div class="bento-exp-top">
-                        <span class="bento-tag">2020 – 2022</span>
-                        <img src="assets/aws-day.svg" alt="AWS" class="bento-company-logo bento-logo-lg exp-logo-aws-day" width="38" height="38" loading="lazy">
-                        <img src="assets/aws-dark.svg?v=20260620-white" alt="AWS" class="bento-company-logo bento-logo-lg exp-logo-aws-dark" width="38" height="38" loading="lazy">
+                    <div class="emp-face emp-back" id="emp-back-pure" aria-hidden="true" inert>
+                        <h4 class="emp-back-name" tabindex="-1">Pure Data Centres <span class="emp-unit">2022–now</span></h4>
+                        <dl class="emp-facts"><div><dt>Path</dt><dd>Engineering Supervisor 2022–2024, Engineering Operations Manager since 2024.</dd></div><div><dt>Results</dt><dd>100 % SLA; major incidents down about 89 % over 2023–2025; work-order compliance 65 % to 99.9 %.</dd></div><div><dt>Team</dt><dd>13 people on 24/7 operations; retention from below 40 % to above 90 %.</dd></div><div><dt>Energy</dt><dd>Low-load program: PUE 1.83 to 1.4x. In-house maintenance 30 % to 70 % of critical equipment.</dd></div><div><dt>Control</dt><dd>Authorization-to-Work risk gate for live work; 500+ SOP, MOP and EOP for ISO 27001 and 50001 audits.</dd></div></dl>
+                        <button type="button" class="emp-btn emp-close">Back <span aria-hidden="true">←</span></button>
                     </div>
-                    <div class="bento-exp-bottom">
-                        <h3 class="bento-exp-company">Amazon Web Services</h3>
-                        <p class="bento-exp-badge bento-badge-orange">Service Award 2021</p>
-                        <p class="bento-exp-role">Senior DCEO · Hyperscale Operations</p>
-                    </div>
-                    <div class="bexp-skills">
-                        <div class="bexp-skill"><span class="bexp-dot"></span>Hyperscale DC Build (CGK)</div>
-                        <div class="bexp-skill"><span class="bexp-dot"></span>Critical Infrastructure Ops</div>
-                        <div class="bexp-skill"><span class="bexp-dot"></span>Global Standards Compliance</div>
-                    </div>
-                </div>
-                <div class="bento-card bento-exp-card bento-exp-current bento-card-5" style="--bexp-accent: rgba(244,114,182,0.52);">
-                    <div class="bento-exp-top">
-                        <span class="bento-tag">2022 — Present</span>
-                        <img src="assets/puredaytheme.webp" alt="Pure Data Centres" class="bento-company-logo bento-logo-xl bento-logo-round" width="259" height="105" loading="lazy">
-                    </div>
-                    <div class="bento-exp-bottom">
-                        <h3 class="bento-exp-company">Pure Data Centres</h3>
-                        <p class="bento-exp-badge">Engineering Operations Manager</p>
-                        <p class="bento-exp-role">Live Ops · SAP HV/LV Authority</p>
-                    </div>
-                    <div class="bexp-skills">
-                        <div class="bexp-skill"><span class="bexp-dot"></span>Engineering Operations Lead</div>
-                        <div class="bexp-skill"><span class="bexp-dot"></span>SAP HV &amp; LV Authorized Person</div>
-                        <div class="bexp-skill"><span class="bexp-dot"></span>Mission-Critical Live DC Ops</div>
-                    </div>
-                </div>
+                </article>
             </div>
+
 
             <!-- Independence Disclaimer -->
             <div style="width:100%;margin-top:0.5rem;padding:0.6rem 1rem;background:rgba(100,116,139,0.06);border:1px solid rgba(100,116,139,0.18);border-radius:4px;text-align:center;">
@@ -1164,7 +1156,7 @@
                 <div class="contact-info">
                     <!-- availability + primary email CTA -->
                     <div class="contact-lead">
-                        <a href="mailto:baguspermana7@gmail.com" class="contact-primary-cta">
+                        <a href="mailto:baguspermana7@gmail.com" class="rz-pill-cta" data-rz-owner-shape="R079">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                                 <polyline points="22,6 12,13 2,6"></polyline>
@@ -1275,34 +1267,48 @@
 
     </main>
     <!-- Footer -->
-    <footer class="footer footer-enhanced">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p>
-                    <p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p>
-                    <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
-                </div>
-                <div class="footer-nav">
-                    <h4 class="footer-heading">NAVIGATION</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">Home Dashboard</a></li>
-                        <li><a href="#case-studies">Case Studies</a></li>
-                        <li><a href="#operational-excellence">Operational Results</a></li>
+    <footer class="rz-foot" aria-label="Site footer">
+        <div class="rz-foot-in">
+            <div class="rz-foot-cols">
+                <nav class="rz-foot-col" aria-label="Pages">
+                    <p class="rz-foot-h">Pages</p>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
                         <li><a href="datacenter-solutions.html">DC Solutions</a></li>
-                        <li><a href="glossary.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Glossary</a></li>
-                        <li><a href="manual/index.html">Technical Manuals</a></li>
+                        <li><a href="articles.html">Articles</a></li>
+                        <li><a href="#case-studies">Case Studies</a></li>
+                        <li><a href="glossary.html">Glossary</a></li>
+                        <li><a href="manual/index.html">Manuals</a></li>
+                    </ul>
+                </nav>
+                <nav class="rz-foot-col" aria-label="Topics">
+                    <p class="rz-foot-h">Topics</p>
+                    <ul>
+                        <li><a href="pillar-standards.html">DC operations and standards</a></li>
+                        <li><a href="pillar-power.html">Critical power</a></li>
+                        <li><a href="pillar-cooling.html">Cooling</a></li>
+                        <li><a href="pillar-fire-safety.html">Fire safety</a></li>
+                        <li><a href="tools.html">Engineering calculators</a></li>
+                    </ul>
+                </nav>
+                <div class="rz-foot-col">
+                    <p class="rz-foot-h">Based in</p>
+                    <ul>
+                        <li>Bekasi, Indonesia</li>
+                        <li>WIB · UTC+7</li>
                     </ul>
                 </div>
-                <div class="footer-connect">
-                    <h4 class="footer-heading">CONNECT</h4>
-                    <ul class="footer-links">
-                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
-                        <li><a href="articles.html">Technical Journal</a></li>
-                        <li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li>
+                <div class="rz-foot-col">
+                    <p class="rz-foot-h">Contact</p>
+                    <ul>
+                        <li><a href="mailto:baguspermana7@gmail.com">Email</a></li>
+                        <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+                        <li><a href="Article/CV/CV_Bagus_Dwi_Permana_International.pdf" download="Bagus_Dwi_Permana_CV.pdf">Download CV</a></li>
                     </ul>
                 </div>
             </div>
+            <div class="rz-foot-mark"><img src="assets/logos/rz-wordmark.svg" alt="ResistanceZero" width="6593" height="706" loading="lazy" decoding="async"></div>
+            <p class="rz-foot-legal"><span>ResistanceZero — independent personal project</span><span>&copy; 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="changelog.html">Changelog</a></p>
         </div>
     </footer>
 
@@ -1800,5 +1806,52 @@ if ('serviceWorker' in navigator) {
 })();
 </script>
 
+<script>
+/* R079 employer cards: "Details" flips a card to its CV facts; Back or Esc flips it home.
+   One card open at a time; the hidden face is inert + aria-hidden; focus follows the flip. */
+(function () {
+  var cards = [].slice.call(document.querySelectorAll('.emp-card'));
+  if (!cards.length) return;
+  function set(card, open) {
+    var front = card.querySelector('.emp-front'), back = card.querySelector('.emp-back');
+    var btn = card.querySelector('.emp-open');
+    card.classList.toggle('is-flipped', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    [[front, !open], [back, open]].forEach(function (p) {
+      if (p[1]) { p[0].removeAttribute('inert'); p[0].removeAttribute('aria-hidden'); }
+      else { p[0].setAttribute('inert', ''); p[0].setAttribute('aria-hidden', 'true'); }
+    });
+  }
+  cards.forEach(function (card) {
+    card.querySelector('.emp-open').addEventListener('click', function () {
+      cards.forEach(function (c) { if (c !== card && c.classList.contains('is-flipped')) set(c, false); });
+      set(card, true);
+      card.querySelector('.emp-back-name').focus({ preventScroll: true });
+    });
+    card.querySelector('.emp-close').addEventListener('click', function () {
+      set(card, false);
+      card.querySelector('.emp-open').focus({ preventScroll: true });
+    });
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && card.classList.contains('is-flipped')) {
+        set(card, false);
+        card.querySelector('.emp-open').focus({ preventScroll: true });
+      }
+    });
+  });
+})();
+</script>
+<script>
+/* R079 meta row: the local time in Bekasi (WIB, UTC+7), updated each minute; decorative (aria-hidden). */
+(function () {
+  var el = document.querySelector('.rz-meta-clock'); if (!el) return;
+  function tick() {
+    var t = new Date(Date.now() + 7 * 3600 * 1000);
+    var hh = String(t.getUTCHours()).padStart(2, '0'), mm = String(t.getUTCMinutes()).padStart(2, '0');
+    el.textContent = '[' + hh + ':' + mm + ' WIB]';
+  }
+  tick(); setInterval(tick, 30000);
+})();
+</script>
 </body>
 </html>

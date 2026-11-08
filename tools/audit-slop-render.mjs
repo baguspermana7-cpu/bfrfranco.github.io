@@ -70,6 +70,10 @@ function scan(keys) {
   // 2026-11-08: `.cap-card.ok` and `#alarmStrip.state-warn` are exempt, a plain `.pump-unit` rail is still reported.
   const STATE_CLASS = /^(ok|warn|fault|alarm|trip|run|stop|state-[a-z0-9-]+)$/;
   const stateful = (e) => [...e.classList].some((k) => STATE_CLASS.test(k));
+  // R079 (owner 2026-11-07, explicit request with a reference shot): the homepage nav is a link capsule and its
+  // Contact/Correspondence buttons are pills. Exempt ONLY on the homepage and ONLY for the element that carries
+  // data-rz-owner-shape itself; the same attribute anywhere else is still reported (tools/test-slop-precision.mjs).
+  const ownerShape = (e) => e.hasAttribute('data-rz-owner-shape') && /\/(index\.html)?$/.test(location.pathname);
   const tileParents = new Set();
   for (const e of document.querySelectorAll('body *')) {
     const r = e.getBoundingClientRect(); if (r.width < 8 || r.height < 8) continue;
@@ -79,8 +83,8 @@ function scan(keys) {
     if (side && sat(side) > 0.25 && r.height >= 40 && c.borderLeftStyle !== 'none' && !stateful(e)) out.rail.push(name(e));
     const rr = c.borderTopLeftRadius; const rad = /%/.test(rr) ? (parseFloat(rr) || 0) * Math.min(r.width, r.height) / 100 : (parseFloat(rr) || 0);
     const filled = !transparent(c.backgroundColor) || bt >= 1;
-    if (rad >= 12 && r.height < 44 && filled && !(Math.abs(r.width - r.height) <= 2 && rad >= Math.min(r.width, r.height) / 2 - 0.5) && e.tagName !== 'INPUT' && !/toggle|switch|avatar|dot|knob|thumb/i.test(e.className) && !stateful(e)) out.pill.push(name(e));
-    if (rad > 8 && r.width >= 200 && !transparent(c.backgroundColor)) out.round.push(name(e));
+    if (rad >= 12 && r.height < 44 && filled && !(Math.abs(r.width - r.height) <= 2 && rad >= Math.min(r.width, r.height) / 2 - 0.5) && e.tagName !== 'INPUT' && !/toggle|switch|avatar|dot|knob|thumb/i.test(e.className) && !stateful(e) && !ownerShape(e)) out.pill.push(name(e));
+    if (rad > 8 && r.width >= 200 && !transparent(c.backgroundColor) && !ownerShape(e)) out.round.push(name(e));
     if (c.backdropFilter && c.backdropFilter !== 'none') out.blur.push(name(e));
     const grad = /gradient/.test(c.backgroundImage);
     if (grad && r.width >= 120 && r.height >= 40 && !inArt(e)) out.grad.push(name(e));

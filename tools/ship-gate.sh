@@ -310,6 +310,10 @@ gate "LTC lab step thread — S1-S36: every shown figure follows the plant model
 # v3.30.4: the whole tree read 0 in both themes (215 pages), so the scan is strict: one tell in either theme fails the
 # gate. tools/test-slop-precision.mjs serves its own fixture and proves the circle/hairline exemptions and that
 # --strict exits 1 on a dirty page (the fixture is not in the tree, so the source audits never read it).
+gate "R079 homepage — employer cards flip, capsule nav + Contact pill, footer wordmark, ids kept (27 laws)" \
+  env RZ_BASE=http://127.0.0.1:8166 timeout 300 node tools/test-index-r079.mjs
+gate "R079 footer wordmark — outlined glyphs match a fresh build" \
+  "$HOME/.venvs/pdfkit/bin/python" tools/build-wordmark.py --check
 gate "slop render scan precision — circle and hairline exempt, --strict fails a dirty page" \
   timeout 300 node tools/test-slop-precision.mjs
 gate "slop render scan — 14 computed tells per page, light AND dark, STRICT (any tell fails)" \

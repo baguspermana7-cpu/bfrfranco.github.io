@@ -56,6 +56,11 @@ file/rule findings across 172 files despite exit 0**.
   (|w−h| ≤ 2 px and radius ≥ half the side, e.g. an ISA pump symbol) is not a pill, while a 30×30 box at r12 and a
   99 px capsule still count; a box-shadow whose every layer has blur 0, spread 0 and |x|,|y| ≤ 1 px is a drawn
   hairline (a sticky table column keeps its rule this way), not a shadow (v3.30.4).
+  One owner-shape exemption (R079, v3.32.0): the owner asked for the homepage nav as one link capsule and for pill
+  Contact/Correspondence buttons, with a reference shot (2026-11-07). An element that carries `data-rz-owner-shape`
+  itself is not counted as `pill` or `round` — on `index.html` only; the same attribute on any other page still counts
+  (`tools/test-slop-precision.mjs` proves both). The attribute is not a general escape hatch: a new use needs an owner
+  request in `OWNER_REQUESTS.md` and its own line here. Hover movement on those pills is still a `lift`.
 - **A gradient hides a contrast failure (v3.27.0):** axe cannot measure text over a gradient and files it
   as "incomplete", so the gate stays green. Flattening the glossary hero (a slop fix) exposed light-theme
   navbar links at 2.27:1. When a gradient or image background becomes a flat colour, run

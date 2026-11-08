@@ -742,19 +742,6 @@ a {
     flex-wrap: wrap;
 }
 
-.exp-logo-link {
-    display: flex;
-    align-items: center;
-    opacity: 0.6;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    filter: grayscale(0.3);
-}
-
-.exp-logo-link:hover {
-    opacity: 1;
-    filter: grayscale(0);
-}
-
 .exp-logo {
     height: 24px;
     width: auto;
@@ -763,20 +750,6 @@ a {
 
 
 /* Theme-aware logos: day mode by default */
-.exp-logo-cargill-dark,
-.exp-logo-aws-dark {
-    display: none;
-}
-
-[data-theme="dark"] .exp-logo-cargill-day,
-[data-theme="dark"] .exp-logo-aws-day {
-    display: none;
-}
-
-[data-theme="dark"] .exp-logo-cargill-dark,
-[data-theme="dark"] .exp-logo-aws-dark {
-    display: block;
-}
 
 [data-theme="dark"] .hero-experience {
     background: rgba(255,255,255,0.03);
@@ -868,11 +841,6 @@ a {
     grid-template-columns: 3fr 1fr;
 }
 
-.bento-row-career {
-    grid-template-columns: repeat(5, 1fr);
-    grid-auto-rows: auto;
-}
-
 .bento-row-governance {
     grid-template-columns: 2fr 1fr 1fr;
 }
@@ -891,16 +859,7 @@ a {
 .bento-card:hover {
     border-color: var(--rz-line-tier-1, rgba(128,128,128,.45));
 }
-
-.bento-exp-card {
-    transition: border-color 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    border-radius: var(--rz-radius);
-}
-.bento-exp-card:hover::before { opacity: 0.62; }
 /* keep card content above the glow layer */
-.bento-exp-card > * { position: relative; z-index: 1; }
 
 /* Bottom feature cards — same bottom-rising colored glow, per-card accent
    (governance = teal, SAP = green, Explore = amber), reference-matched. */
@@ -910,15 +869,6 @@ a {
 .bento-sap        { --bfeat-accent: rgba(52,211,153,0.44); }
 .bento-more       { --bfeat-accent: rgba(245,158,11,0.48); }
 .bento-governance:hover::before, .bento-sap:hover::before, .bento-more:hover::before { opacity: 0.5; }
-
-.bento-exp-card:hover {
-    border-color: rgba(128,128,128,.22);
-    background: var(--card-bg) !important;
-}
-
-.bento-exp-card:hover .bento-company-logo {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
 
 [data-theme="dark"] .bento-card {
     background: #121316;
@@ -1033,30 +983,6 @@ a {
 }
 [data-theme="dark"] .bento-cta-row .btn-bento-primary:hover { color: #fff; }
 html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,255,0.70); }
-
-.btn-bento-outline {
-    display: inline-flex;
-    align-items: center;
-    background: transparent;
-    color: var(--heading-color);
-    padding: 0.625rem 1.5rem;
-    font-weight: 700;
-    font-size: 0.625rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    border-radius: var(--rz-radius);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    text-decoration: none;
-    transition: color var(--rz-dur-fast, .2s) var(--rz-ease-out, ease), background-color var(--rz-dur-fast, .2s) var(--rz-ease-out, ease), border-color var(--rz-dur-fast, .2s) var(--rz-ease-out, ease), opacity var(--rz-dur-fast, .2s) var(--rz-ease-out, ease);
-}
-
-[data-theme="dark"] .btn-bento-outline {
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.btn-bento-outline:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
 
 /* ROW 1: Photo Card */
 .bento-photo-card {
@@ -1174,146 +1100,8 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
 }
 
 /* ROW 2: Experience Cards */
-.bento-exp-card {
-    padding: 1.25rem;
-    justify-content: flex-start;
-    min-height: 10.5rem;
-    min-width: 0;
-    gap: 0;
-}
-
-.bento-exp-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    min-height: 2.5rem;
-    flex-shrink: 0;
-    margin-bottom: 0.75rem;
-}
-
-.bento-company-logo {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-    border-radius: 4px;
-    filter: grayscale(1) brightness(1.2);
-    opacity: 0.5;
-    transition: color var(--rz-dur-fast, .2s) var(--rz-ease-out, ease), background-color var(--rz-dur-fast, .2s) var(--rz-ease-out, ease), border-color var(--rz-dur-fast, .2s) var(--rz-ease-out, ease), opacity var(--rz-dur-fast, .2s) var(--rz-ease-out, ease);
-}
-
-.bento-card:hover .bento-company-logo {
-    filter: grayscale(0) brightness(1);
-    opacity: 1;
-}
-
-.bento-logo-lg {
-    width: 38px;
-    height: 38px;
-}
-
-.bento-logo-xl {
-    width: 48px;
-    height: 48px;
-}
-
-.bento-logo-round {
-    border-radius: 50%;
-}
-
-.bento-exp-bottom {
-    margin-top: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-}
-
-.bento-exp-company {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--heading-color);
-    letter-spacing: -0.01em;
-    line-height: 1.25;
-    margin-bottom: 0.3rem;
-}
-
-[data-theme="dark"] .bento-exp-company {
-    color: #f1f5f9;
-}
-
-.bento-exp-badge {
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.6rem;
-    font-weight: 600;
-    color: #7A4800;
-    background: rgba(122, 72, 0, 0.08);
-    border: 1px solid rgba(122, 72, 0, 0.25);
-    border-radius: var(--rz-radius);
-    padding: 1px 7px;
-    margin-bottom: 0.3rem;
-    letter-spacing: 0.01em;
-    width: fit-content;
-}
-[data-theme="dark"] .bento-exp-badge {
-    color: #E8B563;
-    background: rgba(232, 181, 99, 0.1);
-    border-color: rgba(232, 181, 99, 0.25);
-}
-
-.bento-badge-orange {
-    color: #7A4800;
-    background: rgba(122, 72, 0, 0.08);
-    border-color: rgba(122, 72, 0, 0.25);
-}
-[data-theme="dark"] .bento-badge-orange {
-    color: #E8B563;
-    background: rgba(232, 181, 99, 0.1);
-    border-color: rgba(232, 181, 99, 0.25);
-}
-
-.bento-exp-role {
-    font-size: 0.68rem;
-    font-weight: 500;
-    color: #64748b;
-    line-height: 1.4;
-    margin-bottom: 0;
-}
-
-[data-theme="dark"] .bento-exp-role {
-    color: #64748b;
-}
-
-.bento-exp-desc {
-    font-size: 0.65rem;
-    color: #94a3b8;
-    line-height: 1.5;
-}
-
-[data-theme="dark"] .bento-exp-desc {
-    color: #94a3b8;
-}
 
 /* Skill list */
-.bexp-skills {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    margin-top: 0.75rem;
-    padding-top: 0.6rem;
-    border-top: 1px solid rgba(0,0,0,0.06);
-}
-[data-theme="dark"] .bexp-skills {
-    border-top-color: rgba(255,255,255,0.06);
-}
-.bexp-skill {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 0.66rem;
-    color: #5b6b82; /* v3.30.0: AA on the flat white card */
-    padding: 2px 0;
-}
-[data-theme="dark"] .bexp-skill { color: #94a3b8; }
 /* v3.9.6 — the dot takes the card's own accent, not a framework swatch. Fifteen of these carried
    an inline hex from the default Tailwind ramp (#6ee7b7 #34d399 #10b981 #60a5fa #93c5fd #3b82f6
    #f59e0b #fbbf24 #fcd34d #f97316 #fb923c #fdba74 …) — one hue per skill, which is the rainbow §A9
@@ -1321,24 +1109,8 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
    article-27 ("kotak highlight biru, orange dll"). The v3.6.0 sweep could not reach them because
    they were inline attributes, not stylesheet rules. The card already declares --bexp-accent for
    its glow; the dot now reads the same token, so the grouping survives and the rainbow does not. */
-.bexp-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    background: var(--rz-line-tier-1); /* v3.30.0: one neutral dot — the per-card hue rotation was a second accent */
-    opacity: 1;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-.bento-exp-card:hover .bexp-dot { opacity: 1; }
 
 /* Experience Card Variants */
-.bento-exp-award {
-    border-bottom: 2px solid rgba(128,128,128,.25);
-}
-
-.bento-exp-current {
-    border-left: 1px solid var(--rz-line-tier-2, rgba(128,128,128,.25));
-}
 
 /* ROW 3: Governance */
 .bento-governance {
@@ -1459,26 +1231,15 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
     font-style: italic;
 }
 
-/* Nav Vibrate Animation */
-.nav-vibrate {
-}
 
 
 
 
 /* Bento Grid Responsive */
-@media (max-width: 1024px) {
-    .bento-row-career {
-        grid-template-columns: repeat(5, 1fr);
-    }
-}
 
 @media (max-width: 768px) {
     .bento-row-identity {
         grid-template-columns: 1fr;
-    }
-    .bento-row-career {
-        grid-template-columns: repeat(3, 1fr);
     }
     .bento-row-governance {
         grid-template-columns: 1fr;
@@ -1506,15 +1267,6 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
     }
     .bento-cta {
         flex-wrap: wrap;
-    }
-}
-
-@media (max-width: 480px) {
-    .bento-row-career {
-        grid-template-columns: 1fr;
-    }
-    .bento-exp-card {
-        min-height: auto;
     }
 }
 
@@ -2366,16 +2118,6 @@ section {
     border-radius: var(--rz-radius);
     background: var(--card-bg);
 }
-.contact-primary-cta {
-    display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem;
-    align-self: flex-start;
-    padding: 0.72rem 1.4rem; border-radius: var(--rz-radius);
-    font-weight: 600; font-size: 0.95rem; letter-spacing: 0.01em;
-    color: #fff; background: var(--card-bg);
-    transition: box-shadow 0.25s ease, filter 0.25s ease;
-}
-.contact-primary-cta svg { width: 18px; height: 18px; }
-.contact-primary-cta:hover { filter: brightness(1.05); }
 /* grouped + labelled methods */
 .contact-group { display: flex; flex-direction: column; gap: 0.4rem; }
 .contact-group-label {
@@ -2454,82 +2196,7 @@ section {
     opacity: 0.9;
 }
 
-.footer-tagline {
-    font-style: italic;
-    opacity: 0.7;
-}
-
 /* Enhanced Footer */
-.footer-enhanced {
-    padding: 3.5rem 0 2.5rem;
-}
-
-.footer-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
-}
-
-.footer-brand {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.footer-tagline-main {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    line-height: 1.6;
-    opacity: 0.9;
-}
-
-.footer-tagline-sub {
-    font-size: 0.7rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    opacity: 0.5;
-}
-
-.footer-copyright {
-    font-size: 0.75rem;
-    opacity: 0.4;
-    margin-top: 1rem;
-}
-
-.footer-heading {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.5;
-    margin-bottom: 1rem;
-}
-
-.footer-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-}
-
-.footer-links a {
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: color var(--rz-dur-fast, .2s) var(--rz-ease-out, ease), background-color var(--rz-dur-fast, .2s) var(--rz-ease-out, ease), border-color var(--rz-dur-fast, .2s) var(--rz-ease-out, ease), opacity var(--rz-dur-fast, .2s) var(--rz-ease-out, ease);
-    display: inline-block;
-}
-
-.footer-links a:hover {
-    color: var(--white);
-    opacity: 1;
-}
 
 /* ==========================================
    Animations
@@ -3086,18 +2753,6 @@ section {
     }
 
     /* Footer Grid - Mobile */
-    .footer-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        text-align: center;
-    }
-
-    .footer-heading {
-        margin-bottom: 0.75rem;
-    }
-
-    .footer-links a:hover {
-    }
 
     section {
         padding: 4rem 0;
@@ -4141,9 +3796,6 @@ section {
 }
 
 /* --- Career Card Spread (#33) — spread effect disabled, flat layout --- */
-.bento-row-career .bento-card {
-    transition: border-color 0.3s ease;
-}
 
 /* --- Hover Expand Preview (#30) --- */
 .oe-desc {
@@ -4326,7 +3978,6 @@ section {
     .word-reveal, .char-reveal { opacity: 1 !important; transform: none !important; }
     .glitch-active { animation: none !important; }
     .bento-name { animation: none !important; }
-    .bento-row-career:hover .bento-card { }
     html { scroll-snap-type: none !important; }
 }
 
@@ -4363,7 +4014,7 @@ section {
    Only border-color and box-shadow changes allowed.
    Added 2026-04-01 to fix micro-movement bugs.
    ========================================== */
-.bento-card:hover, .bento-exp-card:hover, .metric-card:hover, .oe-card:hover, .case-card:hover, .experience-card:hover, .card:hover, .cert-item:hover, .about-image:hover, .contact-item:hover {
+.bento-card:hover, .metric-card:hover, .oe-card:hover, .case-card:hover, .experience-card:hover, .card:hover, .cert-item:hover, .about-image:hover, .contact-item:hover {
     /* NOTE: do NOT re-add `animation: none !important` here — toggling it on hover
        re-applies the entrance keyframes (swingIn/bentoRise) on mouse-leave and replays
        them from opacity:0, which is the "card blinks/disappears on hover" bug. Cards are
@@ -4371,9 +4022,6 @@ section {
 }
 
 /* Company logos enlarge subtly on card hover — only logos, not cards */
-.bento-exp-card:hover .bento-company-logo {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
 
 .cert-item:hover img,
 .case-card:hover .case-image img {
@@ -5260,9 +4908,7 @@ html.rz-rainbow .case-card::after { opacity: .95; }
         padding: 2rem 1rem !important;
         box-sizing: border-box !important;
     }
-    .footer-grid,
-    .site-footer-grid,
-    footer .footer-grid {
+    .site-footer-grid {
         width: 100% !important;
         max-width: 100% !important;
         grid-template-columns: 1fr !important;
@@ -5271,7 +4917,6 @@ html.rz-rainbow .case-card::after { opacity: .95; }
         margin: 0 !important;
         box-sizing: border-box !important;
     }
-    .footer-grid > div,
     footer > div {
         width: 100% !important;
         box-sizing: border-box !important;
@@ -5320,9 +4965,6 @@ html.rz-rainbow .case-card::after { opacity: .95; }
   transition:border-color .3s ease,box-shadow .3s ease;
 }
 [data-theme="dark"] .bento-identity{background:var(--card-bg);}
-[data-theme="dark"] .bento-exp-card:hover::before{opacity:.85;}
-html.rz-rainbow .bento-exp-card:hover::before{opacity:1;}
-html.rz-rainbow .bento-exp-card{border-color:rgba(148,163,255,.22);}
 /* light surfaces */
 .bento-card{
   background:var(--card-bg);
@@ -5330,16 +4972,10 @@ html.rz-rainbow .bento-exp-card{border-color:rgba(148,163,255,.22);}
   transition:border-color .3s ease,box-shadow .3s ease;
 }
 .bento-identity{background:var(--card-bg);}
-.bento-exp-card:hover::before{opacity:.5;}
 /* staggered reveal on load — theme-agnostic (light + dark); no hover movement */
 @keyframes bentoRise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
 .bento-row .bento-card{animation:bentoRise .6s cubic-bezier(.2,.7,.2,1) backwards;}
 .bento-row-identity .bento-card:nth-child(2){animation-delay:.07s;}
-.bento-row-career .bento-card:nth-child(1){animation-delay:.10s;}
-.bento-row-career .bento-card:nth-child(2){animation-delay:.17s;}
-.bento-row-career .bento-card:nth-child(3){animation-delay:.24s;}
-.bento-row-career .bento-card:nth-child(4){animation-delay:.31s;}
-.bento-row-career .bento-card:nth-child(5){animation-delay:.38s;}
 .bento-row-governance .bento-card:nth-child(1){animation-delay:.45s;}
 .bento-row-governance .bento-card:nth-child(2){animation-delay:.52s;}
 .bento-row-governance .bento-card:nth-child(3){animation-delay:.59s;}
@@ -5440,9 +5076,6 @@ p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoratio
 /* These three carry no colour of their own and dim themselves with opacity, which was survivable
    on a light ground and is not on a dark one: at 0.5 and 0.4 the effective ink lands back in the
    middle. They take an explicit muted-light ink instead, and the dimming comes out. */
-[data-theme="dark"] .footer-tagline-main { color: #f0f4f8; opacity: 1; }
-[data-theme="dark"] .footer-tagline-sub,
-[data-theme="dark"] .footer-copyright { color: #cbd5e1; opacity: 1; }
 
 /* ============================================================================
    v3.9.0 — blur-letterbox portrait frame (.rz-photo-frame)
@@ -5510,8 +5143,6 @@ p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoratio
 
 /* v3.30.0 — a11y on the flat surfaces (axe, light theme): footer text was white at .5/.4 opacity over graphite,
    the Explore-More description gray-500 on white (2.07:1). */
-.footer .footer-heading { color: #fff; opacity: .78; }
-.footer .footer-copyright { color: #fff; opacity: .7; }
 .bento-card.bento-more .bento-more-desc { color: #5b6b82; }
 [data-theme="dark"] .bento-card.bento-more .bento-more-desc { color: #9aa3ad; }
 
@@ -5530,3 +5161,257 @@ p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoratio
 @media (max-width: 640px) {
   .oe-grid[data-rz-fact-list] .oe-card { grid-template-columns: minmax(5.5rem, auto) 1fr; column-gap: 1rem; }
 }
+
+/* ==========================================================================
+   R079 (owner 2026-11-07) — career row as five employer cards in the pricing-card layout.
+   Front: logo, condensed name, years as the big figure, role, three skills, "Details" button.
+   Hover / focus turns a card to the inverted state ("menghitam"); the current employer stays
+   inverted with the row's one amber word. "Details" flips the card (rotateY, both faces in one
+   grid cell so the height never jumps); the back holds CV facts. No lift, no shadow, radius 4.
+   ========================================================================== */
+.bento-row.emp-row {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 12px;
+    align-items: stretch;
+}
+.emp-card {
+    --emp-bg: var(--rz-surface-card);
+    --emp-ink: var(--heading-color);
+    --emp-muted: #5b6472;
+    --emp-line: var(--rz-line-tier-1);
+    --emp-inv-bg: #1a1d23;
+    --emp-inv-ink: #f1f2f4;
+    --emp-inv-muted: #a3aab5;
+    --emp-amber: #92400e;
+    --emp-inv-amber: #E8B563;
+    display: grid;
+    perspective: 1200px;
+    min-width: 0;
+}
+[data-theme="dark"] .emp-card {
+    --emp-muted: #9aa3b0;
+    --emp-inv-bg: #08090a;
+    --emp-inv-ink: #f1f2f4;
+    --emp-inv-muted: #9aa3b0;
+    --emp-amber: #E8B563;
+}
+.emp-face {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    padding: 20px 18px 18px;
+    background: var(--emp-bg);
+    color: var(--emp-ink);
+    border: 1px solid var(--emp-line);
+    border-radius: 4px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: transform 550ms cubic-bezier(.2, .7, .2, 1), background-color 200ms ease-out, color 200ms ease-out, border-color 200ms ease-out;
+}
+.emp-back { transform: rotateY(180deg); }
+.emp-card.is-flipped .emp-front { transform: rotateY(-180deg); }
+.emp-card.is-flipped .emp-back { transform: rotateY(0deg); }
+
+/* inverted state: the current employer always, any other card on hover or keyboard focus */
+.emp-card.is-current .emp-face,
+.emp-card:hover .emp-face,
+.emp-card:focus-within .emp-face {
+    --emp-ink: var(--emp-inv-ink);
+    --emp-muted: var(--emp-inv-muted);
+    background: var(--emp-inv-bg);
+    border-color: var(--emp-inv-bg);
+}
+[data-theme="dark"] .emp-card.is-current .emp-face,
+[data-theme="dark"] .emp-card:hover .emp-face,
+[data-theme="dark"] .emp-card:focus-within .emp-face { border-color: rgba(241, 242, 244, 0.55); }
+
+.emp-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; min-height: 56px; }
+.emp-logo { display: block; height: 56px; width: auto; max-width: 70%; object-fit: contain; object-position: left center; }
+.emp-logo-light { display: none; }
+.emp-card.is-current .emp-logo-ink, .emp-card:hover .emp-logo-ink, .emp-card:focus-within .emp-logo-ink { display: none; }
+.emp-card.is-current .emp-logo-light, .emp-card:hover .emp-logo-light, .emp-card:focus-within .emp-logo-light { display: block; }
+[data-theme="dark"] .emp-logo-ink { display: none; }
+[data-theme="dark"] .emp-logo-light { display: block; }
+
+.emp-now {
+    flex: none;
+    font: 600 0.72rem/1 'IBM Plex Sans', sans-serif;
+    letter-spacing: 0.02em;
+    padding: 5px 8px;
+    border: 1px solid var(--emp-inv-amber);
+    color: var(--emp-inv-amber);
+    border-radius: 4px;
+}
+.emp-name {
+    margin: 4px 0 0;
+    font: 700 1.3rem/1.1 'IBM Plex Sans Condensed', 'IBM Plex Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    color: var(--emp-ink);
+    overflow-wrap: anywhere;
+}
+.emp-tag {
+    margin: 0;
+    align-self: flex-start;
+    font: 500 0.75rem/1.2 'IBM Plex Sans', sans-serif;
+    color: var(--emp-muted);
+    padding: 3px 7px;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+}
+.emp-years { margin: 6px 0 0; line-height: 1; }
+.emp-fig { font: 700 1.55rem/1 'IBM Plex Sans Condensed', 'IBM Plex Sans', sans-serif; color: var(--emp-ink); font-variant-numeric: tabular-nums; }
+.emp-card.is-current .emp-fig { color: var(--emp-inv-amber); }
+.emp-unit { font: 400 0.85rem/1 'IBM Plex Sans', sans-serif; color: var(--emp-muted); }
+.emp-role { margin: 0; font: 400 0.9rem/1.4 'IBM Plex Sans', sans-serif; color: var(--emp-muted); }
+.emp-skills { list-style: none; margin: 4px 0 0; padding: 10px 0 0; border-top: 1px solid var(--emp-line); display: grid; gap: 7px; }
+.emp-card.is-current .emp-skills, .emp-card:hover .emp-skills, .emp-card:focus-within .emp-skills { border-top-color: rgba(241, 242, 244, 0.18); }
+.emp-skills li { font: 400 0.88rem/1.35 'IBM Plex Sans', sans-serif; color: var(--emp-ink); padding-left: 14px; position: relative; }
+.emp-skills li::before { content: '–'; position: absolute; left: 0; color: var(--emp-muted); }
+.emp-btn {
+    margin-top: auto;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; min-height: 44px;
+    font: 600 0.9rem/1 'IBM Plex Sans', sans-serif;
+    background: var(--emp-ink);
+    color: var(--emp-bg);
+    border: 1px solid var(--emp-ink);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 200ms ease-out, color 200ms ease-out;
+}
+.emp-card.is-current .emp-btn, .emp-card:hover .emp-btn, .emp-card:focus-within .emp-btn { background: var(--emp-inv-ink); color: var(--emp-inv-bg); border-color: var(--emp-inv-ink); }
+.emp-btn:focus-visible { outline: 2px solid var(--emp-inv-amber); outline-offset: 2px; }
+.emp-back-name { margin: 0; font: 700 1.1rem/1.15 'IBM Plex Sans Condensed', 'IBM Plex Sans', sans-serif; text-transform: uppercase; color: var(--emp-ink); }
+.emp-back-name:focus { outline: none; }
+.emp-back-name .emp-unit { display: block; margin-top: 4px; text-transform: none; }
+.emp-facts { margin: 0; display: grid; gap: 9px; }
+.emp-facts dt { font: 600 0.72rem/1.2 'JetBrains Mono', ui-monospace, monospace; color: var(--emp-muted); }
+.emp-facts dd { margin: 2px 0 0; font: 400 0.86rem/1.4 'IBM Plex Sans', sans-serif; color: var(--emp-ink); }
+
+@media (max-width: 1279px) {
+    .bento-row.emp-row { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+    .emp-row > .emp-card { grid-column: span 2; }
+    .emp-row > .emp-card:nth-child(4) { grid-column: 2 / span 2; }
+}
+@media (max-width: 1023px) {
+    .bento-row.emp-row { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    .emp-row > .emp-card, .emp-row > .emp-card:nth-child(4) { grid-column: auto; }
+}
+@media (max-width: 640px) {
+    .bento-row.emp-row { grid-template-columns: 1fr !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .emp-face { transition: opacity 150ms ease-out, background-color 150ms ease-out, color 150ms ease-out; }
+    .emp-back, .emp-card.is-flipped .emp-front, .emp-card.is-flipped .emp-back { transform: none; }
+    .emp-back { opacity: 0; }
+    .emp-card.is-flipped .emp-front { opacity: 0; }
+    .emp-card.is-flipped .emp-back { opacity: 1; }
+}
+
+/* ==========================================================================
+   R079 (owner 2026-11-07) — navbar in the reference style: brand left, every link inside ONE
+   tinted capsule in the middle, search + theme + a dark "Contact" pill on the right. The bar
+   is the page colour with no hairline, no blur and no shadow; scrolled, it stays solid.
+   Wording unchanged ("Contact", already K19-clean). Capsule + pill are the owner's explicit
+   shapes (ANTI_VIBECODE_STANDARD: index R079 exemption, `.nav-menu` and `.rz-pill-cta` only).
+   ========================================================================== */
+.navbar, .navbar.scrolled, [data-theme="dark"] .navbar.scrolled {
+    background: var(--body-bg);
+    border-bottom-color: transparent;
+}
+.navbar.scrolled { border-bottom-color: var(--rz-line-tier-3); }
+.nav-container { max-width: 1280px; min-height: 64px; padding: 0 2rem; gap: 12px; }
+.nav-indicator { display: none; }
+.nav-link::after { display: none; }
+@media (min-width: 769px) {
+    .navbar .nav-menu {
+        gap: 2px;
+        padding: 4px;
+        margin: 0 auto;
+        background: #f1efe9;
+        border-radius: 999px;
+    }
+    [data-theme="dark"] .navbar .nav-menu { background: #1b1d22; }
+    .navbar .nav-menu > li > .nav-link {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #4a515c;
+        transition: background-color 160ms ease-out, color 160ms ease-out;
+    }
+    [data-theme="dark"] .navbar .nav-menu > li > .nav-link { color: #a3aab5; }
+    .navbar .nav-menu > li > .nav-link:hover,
+    .navbar .nav-menu > li > .nav-link:focus-visible,
+    .navbar .nav-menu > li.nav-dropdown:hover > .nav-link { background: #e4e1d8; color: #1a1d23; }
+    [data-theme="dark"] .navbar .nav-menu > li > .nav-link:hover,
+    [data-theme="dark"] .navbar .nav-menu > li > .nav-link:focus-visible,
+    [data-theme="dark"] .navbar .nav-menu > li.nav-dropdown:hover > .nav-link { background: #2a2d34; color: #f1f2f4; }
+    .navbar .nav-menu .dropdown-arrow { width: 14px; height: 14px; }
+}
+/* the Contact pill (nav) — one component, also used by the hero and the contact section */
+.rz-pill-cta {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 40px; padding: 0 18px;
+    border-radius: 999px;
+    background: #1a1d23; color: #f1f2f4;
+    border: 1px solid #1a1d23;
+    font: 600 0.875rem/1 'IBM Plex Sans', sans-serif;
+    text-decoration: none; white-space: nowrap;
+    transition: background-color 160ms ease-out;
+}
+.rz-pill-cta svg { width: 14px; height: 14px; flex: none; }
+.rz-pill-cta:hover { background: #2e333c; color: #fff; }
+.rz-pill-cta:focus-visible { outline: 2px solid #92400e; outline-offset: 2px; }
+[data-theme="dark"] .rz-pill-cta { background: #f1f2f4; color: #1a1d23; border-color: #f1f2f4; }
+[data-theme="dark"] .rz-pill-cta:hover { background: #ffffff; color: #0b0c0e; }
+[data-theme="dark"] .rz-pill-cta:focus-visible { outline-color: #E8B563; }
+.nav-cta { display: none; }
+@media (min-width: 1101px) {
+    .nav-cta { display: inline-flex; }
+    .navbar .nav-menu > li.nav-li-contact { display: none; }
+}
+
+/* ==========================================================================
+   R079 (owner 2026-11-07) — footer in the reference style: a dark block in both themes, four
+   columns of small muted labels over larger light links, a full-width "ResistanceZero" wordmark
+   (outlined glyphs from tools/build-wordmark.py, no font at runtime) cropped by the bottom edge,
+   a thin legal row. No phone number, no street address, no availability line.
+   ========================================================================== */
+.rz-foot { background: #0b0c0e; color: #ece8e1; overflow: hidden; }
+.rz-foot-in { max-width: 1280px; margin: 0 auto; padding: 64px 2rem 0; }
+.rz-foot-cols { display: grid; grid-template-columns: 1fr 1.4fr 1fr 1fr; gap: 32px; }
+.rz-foot-h { margin: 0 0 14px; font: 500 0.78rem/1.2 'IBM Plex Sans', sans-serif; color: #9aa0a8; }
+.rz-foot-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.rz-foot-col li { font: 400 1.05rem/1.35 'IBM Plex Sans', sans-serif; color: #ece8e1; }
+.rz-foot a { color: #ece8e1; text-decoration: none; text-underline-offset: 3px; }
+.rz-foot a:hover, .rz-foot a:focus-visible { text-decoration: underline; }
+.rz-foot a:focus-visible { outline: 2px solid #E8B563; outline-offset: 2px; }
+.rz-foot-mark { margin: 56px 0 0; line-height: 0; }
+.rz-foot-mark img { display: block; width: 100%; height: auto; margin-bottom: -0.6%; }
+.rz-foot-legal {
+    display: flex; flex-wrap: wrap; gap: 6px 20px;
+    margin: 0; padding: 16px 0 20px;
+    border-top: 1px solid rgba(236, 232, 225, 0.14);
+    font: 400 0.8rem/1.4 'IBM Plex Sans', sans-serif; color: #9aa0a8;
+}
+.rz-foot .rz-foot-legal a { color: #9aa0a8; text-decoration: none; }
+.rz-foot .rz-foot-legal a:hover, .rz-foot .rz-foot-legal a:focus-visible { text-decoration: underline; }
+.rz-foot-legal span:first-child { margin-right: auto; }
+@media (max-width: 760px) {
+    .rz-foot-in { padding: 44px 16px 0; }
+    .rz-foot-cols { grid-template-columns: 1fr 1fr; gap: 28px 20px; }
+    .rz-foot-col li { font-size: 1rem; }
+    .rz-foot-col a { display: inline-block; padding: 6px 0; min-height: 32px; }
+    .rz-foot-mark { margin-top: 40px; }
+    .rz-foot-legal span:first-child { margin-right: 0; flex-basis: 100%; }
+}
+
+/* R079 meta row under the hero (owner decision 2026-11-07): mono, muted, one line; no email in it. */
+.rz-meta-row { width: 100%; margin: 4px 0 0; font: 400 0.78rem/1.4 'JetBrains Mono', ui-monospace, monospace; color: #5b6472; letter-spacing: 0.02em; }
+[data-theme="dark"] .rz-meta-row { color: #9aa3b0; }
