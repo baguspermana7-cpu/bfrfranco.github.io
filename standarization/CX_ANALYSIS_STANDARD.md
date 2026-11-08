@@ -152,6 +152,38 @@ Below the system level:
 - There is one dry cooler per chiller.
 - There are two DCIM servers per site.
 
+**On the page — Program breakdown panel (`js/rz-cx-tree-ui.js`, K28 UI).** A treegrid (`role="treegrid"`,
+`#cxTrGrid`) under the plan editor and its calendar panel (`#cxExPanel`, which gate P5 keeps directly under the
+editor). Rules:
+- Every row prints its node's numbers from `RZCxTree.programTree(cxReadInputs(), { plan, nodes })`, the same input
+  and plan the editor uses. The panel computes nothing. Each row carries `data-path`, `data-cost`, `data-mh` and
+  `data-finish` so a gate can compare it to the engine.
+- Levels are edited only in the plan editor ("set only the parent"); a level row has no weight box. Changing a level
+  re-renders the tree and every descendant moves with it.
+- A node below a level takes a weight (0–100, ×1 by default) and an "include" box. Both go to the engine as
+  `overrides.nodes[path]`; siblings re-share and the parent total holds.
+- The engine drops a node whose weight is 0 or that is excluded. The UI keeps it on screen as a ghost row
+  (`data-ghost`, dimmed, every number 0, its weight and include boxes live) in its baseline place, so an edit can
+  be undone in the row where it was made. A ghost row must never be a node the engine still carries. An edit under a
+  ghost parent stays stored but is out of reach until the parent is restored.
+- Keyboard: one tab stop for the whole grid (the focused row and its two boxes; every other row and box is -1).
+  An edit or any re-render (a plan hook) keeps focus where it was, in the same box. While Find is on, every match's
+  path is open and open/close keys do nothing.
+- Node overrides persist in `localStorage['rz-cx-tree']` = `{ version: 1, nodes }`. "Reset breakdown" clears
+  them, and so does the editor's "Reset to baseline".
+- Navigation: Level / System / Subsystem / Equipment / Activity open the tree to that depth; Find keeps the matching
+  rows and their ancestors. Keys: ↑/↓ move, → opens or goes to the first child, ← closes or goes to the parent,
+  Home/End, Enter/Space toggle. Only rows that are open render (1,269 nodes at 2 MW when fully open).
+- The whole grid fits its panel at every width: item names wrap, indent is a CSS step per level (16 px, 8 px on a
+  phone). At ≤ 640 px qty, share, window, crew and man-hours hide; item, cost, weight and include stay.
+
+Gate: `tools/test-cx-tree-ui.mjs` (K1–K12): seven level rows under the editor; every shown row equals the engine,
+collapsed and fully open (row count = engine node count); each parent = sum of its child rows; keyboard walk;
+a longer L3 carries every L3 system; weight 0 and exclude zero a system while L3 holds; persistence and reset;
+a zeroed system stays as a ghost row with a live weight box; find; no sideways scroll at 390 px; the grid
+fits its panel with the include box on screen at 1440 and 390 px (K10); focus stays in the edited box and one row is
+the grid's only tab stop (K11); Find on, the arrow keys walk without losing focus (K12); no page errors.
+
 **Edits.**
 - `overrides.plan` is the existing level contract. Setting only the level (start, months, crew, shift) moves every
   descendant.

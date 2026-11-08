@@ -46,6 +46,7 @@ const LIST = process.argv.includes('--list');
    quietly become the place descriptions go to avoid the rule. */
 const PENDING = new Map([
     /* empty — add [page, reason] only for a file another session is actively changing */
+    ['id/index.html', 'v3.34.0: the gate first saw directory URLs; this page runs 191 characters and two other agent worktrees hold uncommitted edits to it, so it is rewritten by the session that owns those edits'],
 ]);
 
 const MAX = 160;          /* the display cut this gate exists to fit inside */
@@ -56,8 +57,10 @@ const DANGLING_WORD = /\b(and|or|with|for|of|to|the|a|an|in|on|at|by|from|that|w
 
 const sitemap = readFileSync(join(ROOT, 'sitemap.xml'), 'utf8');
 const pages = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
-    .map((m) => m[1].replace(/^https?:\/\/[^/]+\//, ''))
-    .filter((p) => p && !p.endsWith('/'))
+    .map((m) => m[1].replace(/^https?:\/\/[^/]+\/?/, ''))
+    /* a directory URL (the site root, manual/, prd/ …) is served from its index.html; until v3.34.0 these five
+       were filtered out here, so the manual hub ran 206 characters with this gate green */
+    .map((p) => (p === '' || p.endsWith('/') ? p + 'index.html' : p))
     .filter((p) => existsSync(join(ROOT, p)));
 
 const findings = [];

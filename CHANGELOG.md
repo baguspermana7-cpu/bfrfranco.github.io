@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v3.34.0 — 2026-11-09 — "Set only the parent: the commissioning program opened five deep, and every row is the engine's"
+
+Owner comment K28 (PRD v1.1 §41 ledger): a tree editor for L0–L6, five levels deep, where only the parent is set,
+navigation is easy, and the engine does the arithmetic. The engine side shipped in v3.32.2 (`js/rz-cx-tree.js`); this
+release is the editor on the page.
+
+### Added
+- **Program breakdown panel (K28)** — `js/rz-cx-tree-ui.js`: a treegrid under the plan editor and its calendar. Each
+  level opens to system, subsystem, equipment and activity (1,269 nodes at the 2 MW default). Every row prints the
+  node's share, window, crew, man-hours and cost from `RZCxTree.programTree` with the same plan the editor uses; a
+  parent always equals the sum of its children. Levels are set only in the plan editor; below a level a node takes a
+  weight (×1 by default) or is left out, its siblings re-share and the parent total holds. Level / System / Subsystem
+  / Equipment / Activity open the tree to that depth, Find keeps matches and their path, arrow keys walk and open.
+  Node edits persist in this browser (`rz-cx-tree`, version 1); Reset breakdown and Reset to baseline clear them.
+  A node set to 0 or left out stays in its row at 0, greyed, with its boxes live, so it can be changed back there
+  (the engine drops it from the tree). Gate `tools/test-cx-tree-ui.mjs` K1–K12, 22/22 (red on v3.33.0: no treegrid;
+  the ghost-row law crashed on the first draft; the fit law K10 caught Weight and Include scrolled out of the panel at
+  1440 and 390 px, 913 px of grid in 746 px; a code review then found 213 tab stops in the grid and focus dropped to
+  the page after an edit or a re-render, now one tab stop and focus kept, K11–K12 red on the first commit).
+
+### Fixed
+- **Meta-description gate was blind to directory URLs** — `tools/test-meta-description-fit.mjs` dropped every sitemap
+  URL ending in `/`, so the root, `id/`, `cx-handbook/`, `manual/` and `prd/` were never measured; the manual hub ran
+  206 characters live. Directory URLs now map to `index.html` (red at 2). Manual hub rewritten to 149;
+  `id/index.html` (191) deferred by name while two other agent worktrees hold uncommitted edits to it.
+  Ledger: `standarization/Audit result/SEO_AUDIT_LEDGER.md` row 2.
+
+Standards: `standarization/CX_ANALYSIS_STANDARD.md` (Program breakdown panel), `manual/cx.html`.
+
 ## v3.33.0 — 2026-11-09 — "A plant that moves like the reference, a block that opens its inside, manuals that match their tools"
 
 Owner comments K23, K25, K26, K27, K29 and K30 (PRD v1.1 §41 ledger). Each item below carries the gate that keeps it true;

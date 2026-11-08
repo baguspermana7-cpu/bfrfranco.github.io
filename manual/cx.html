@@ -620,6 +620,7 @@
             <p class="mn-lead">The second tab turns the calculator's result into a commissioning programme you can scrub, edit and inspect. Every number on it comes from <code>RZEngine.models.commissioning.programPlan</code> (schedule, cost, man-hours) and <code>equipScale</code> (equipment counts); <code>js/rz-cx-plan.js</code> holds the level arithmetic and the views only draw what it returns. The grand total agrees with the calculator tab within 1 %.</p>
             <ul class="mn-linklist">
                 <li><b>Plan editor and timeline.</b> <span>L0–L6 per handbook chapter 02. Edit a level's start, months or crew in the table, or drag its bar (body = move, right end = stretch, 0.1-month steps; arrows and Shift+arrows on the keyboard). Undo/redo keeps 50 states; up to 5 named scenarios per browser. The Impact panel says why a level moved and where months exceed the site crew cap.</span></li>
+                <li><b>Program breakdown.</b> <span>Under the plan editor, each level opens to system, subsystem, equipment and activity (five deep). Every row shows the engine allocation of that level: share, window, crew, man-hours and cost. A parent always equals the sum of its children. Set a level in the editor and everything under it follows. Below a level, give a node a weight (×1 by default) or un-tick Include; its siblings re-share and the parent total stays the same. A node set to 0 or left out stays in its row at 0, greyed, so you can change it back there. Level / System / Subsystem / Equipment / Activity open the tree to that depth, and Find filters it. Keys: arrows walk and open, Home/End jump. Node edits are kept in this browser; Reset breakdown clears them.</span></li>
                 <li><b>Month scrubber.</b> <span>Every view below shows the programme at the viewed month: play, step, or drag the slider.</span></li>
                 <li><b>Giant schematic, three sheets.</b> <span>A electrical one-line (150 kV to the rack), B mechanical P&amp;ID, C controls and life safety. Each block is one of the 17 systems, coloured by its handbook 02.6 tag at the viewed month, with &times;n = the installed count for this site from <code>equipScale</code>.</span></li>
                 <li><b>Click a block: its inside.</b> <span>A modal draws that system's own one-line or P&amp;ID (for example the UPS: rectifier, DC bus and battery, inverter, static and maintenance bypass), its L1–L5 gate months at the viewed month, the L1–L5 test ladder with a handbook link per row, a card per component, and Fed by / Feeds buttons to walk to the neighbouring block. Escape closes it and returns focus to the block.</span></li>
@@ -684,7 +685,7 @@
         });
     })();
     </script>
-    <script src="../js/rz-version.js?v=20261108-19589a30" defer></script>
+    <script src="../js/rz-version.js?v=20261108-841e3100" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="../js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <script src="../js/rz-command-palette.js?v=20261012-5be94d8c" defer></script>
