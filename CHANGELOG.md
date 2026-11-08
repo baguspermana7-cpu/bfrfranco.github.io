@@ -11,6 +11,50 @@ release sections rather than semver.
 
 ---
 
+## v3.29.1 — 2026-11-08 — "Hub pages on one shell: CDU, comparisons, infographics; no glass in the shared sheet"
+
+### Changed
+- **Fourteen hub pages move onto the tool shell** (hub nav and footer, plain tool head, graphite and one amber
+  accent, tables and fact lists in place of tiles, cards and coloured bars). Each was added to the register gate
+  first and the gate proven red on the old page:
+  - CDU: `cdu-checklist` (37 failures → 0), `cdu-comparison` (30 → 0), `cdu-selection-guide` (34 → 0).
+  - Comparisons: diesel vs gas, online vs offline UPS, wet vs pre-action, N+1 vs 2N (152 → 0); PUE vs DCiE,
+    FM-200 vs Novec 1230, ASHRAE vs Uptime, Tier III vs IV (110 → 0). A winner is a word in an Edge column, not a
+    green fill with a rail.
+  - Infographics: global PUE (35 → 0), build cost by category (41 → 0), sustainability scorecard (39 → 0).
+- **cdu-mini-bms**: chrome on one accent (flat head, sans H1, amber controls); instrument cyan stays inside the
+  instruments. Navbar and footer stay the cockpit family's.
+- **LTC legacy reports** draw rows, not tiles (S36: no radius > 4, no gradients, pills or pink wash).
+- Decorative rails and washes off `water-system` (state rails kept) and `tools.html`.
+- `js/rz-article-chart.js`: a series may carry an explicit `color` (a line chart had no way to leave the light-theme
+  signal colour, which sits outside the amber band).
+- Shared `styles.css`: footer links, share buttons, the nav dropdown arrow and the mobile TOC toggle no longer move,
+  scale or rotate on hover (about 100 pages; the 40 `manual/` pages lose their only render tell). The author box is a
+  grey panel with a 1 px hairline instead of a gradient card with a blue rail.
+- `dc-market-tracker` (root-only): radii, blurs, gradients and the red PDF button gone; locked panels are solid, not
+  blurred. Render scan 35 tells → 0. Its teal accent stays until the owner decides on a deeper refit.
+- `dc-conventional`, `chiller-plant`, `fire-system`, `manual/research-roadmap`: hover transforms, large radii, a blurred
+  restricted overlay and decorative rails removed (alarm state strips kept).
+- `pillar-fire-safety` links underline with `text-decoration`; the `datacenter-solutions` 3D stage sits on a flat
+  background.
+- Shared `styles.css`: the 31 `transition: all` rules name their properties; no `backdrop-filter` glass on the
+  scrolled navbar, share buttons, gate overlays, cookie bar or open mobile nav (solid surfaces; the search scrim keeps
+  its 4 px dim blur); dark chart frames lose their resting shadow and sit at 4 px.
+
+### Fixed
+- Tier III vs IV availability estimate printed 4 decimals (every realistic MTBF/MTTR read "100.0000 %") and capped
+  Tier IV at 99.9999 %, below Tier III for a good component. Now 6 decimals, no cap, plus downtime a year
+  (8760 h / 4 h: Tier III 6.57 s, Tier IV 3.0 ms).
+- Global PUE slider said "Good" at load while its own bands said "Average", and compared the resting text with 2026
+  (1.55) but the moved slider with 2020 (1.58): one reference now.
+- Build-cost infographic called the $10M build "Baseline Tier III" while its tier table priced Tier II at 1.0× = $10M.
+- N+1 vs 2N quick table carried a stray "Full access" in a row label.
+
+### Docs
+- `UIUX_AUDIT_LEDGER.md`: a row per page or family, CLOSED with the gate that keeps it closed; cdu-mini-bms PARTIAL.
+- `ANTI_VIBECODE_STANDARD.md`: scope of the register gate beyond calculators and the explorer refit rules; the stale
+  "cx, RFS, spares pending" note updated.
+
 ## v3.29.0 — 2026-11-08 — "Cx Analysis 3D: a light canvas, the engine's plant, detail where the camera is"
 
 Owner comments K16–K18 (harness PRD v1.1 §41): *"Jangan gelap2, kan sudah saya kasih PRD-nya, theme warna dan accuracy
