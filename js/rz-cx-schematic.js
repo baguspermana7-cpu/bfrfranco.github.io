@@ -2,7 +2,8 @@
  * (A electrical one-line · B mechanical / P&ID · C controls and life safety) whose nodes ARE the
  * RZCxPlan.SYSTEMS, coloured by the handbook 02.6 tag each system carries at the viewed month.
  * Pure string rendering (works in Node for the gate); the page module injects the SVG and binds clicks.
- *   RZCxSchematic.sheets(status)          → [{block, title, svg, warnings}] for a RZCxPlan.statusAt() result
+ *   RZCxSchematic.sheets(status, scale?)  → [{block, title, svg, warnings}] for a RZCxPlan.statusAt() result;
+ *                                           scale = RZEngine commissioning.equipScale(input) → ×count on each block
  *   RZCxSchematic.trace(block, id, dir)   → ordered ids upstream/downstream along the sheet's edges
  * Colours are the page's tokens (var(--o/--c/--g/--r …)); the host sets them on .cx-an-sheet. ES5. */
 (function (root) {
@@ -12,6 +13,12 @@
   var L = D.layout;
   function mid(box, side) { return L.fanPoints(box, 1, side)[0]; }
   var EDGES = { electrical: [], mechanical: [], controls: [] };
+  /* K29: installed counts on the blocks, read from the engine's equipScale for THIS site (passed in by the page);
+   * no count is typed here, and a block without an engine count shows none. */
+  var COUNT = { mv_board: 'switchgear', generators: 'generators', unit_subs: 'transformers', ups: 'ups_modules', lv_busway: 'busway',
+    chillers: 'chillers', crah: 'cooling_units', fws: 'pumps', racks: 'racks', fire: 'fireZones', it_load: 'racks' };
+  var SCALE = null;
+  function countNote(ctx, y) { if (SCALE) ctx.text('× = installed count for this site from the engine (RZEngine commissioning.equipScale) · click a block for its inside', 24, y, { role: 'sublabel', fill: 'soft' }); }
 
   function sysLabel(id) { for (var i = 0; i < P.SYSTEMS.length; i++) if (P.SYSTEMS[i].id === id) return P.SYSTEMS[i].label; return id; }
   function rowOf(st, id) { if (!st) return null; for (var i = 0; i < st.systems.length; i++) if (st.systems[i].id === id) return st.systems[i]; return null; }
@@ -26,6 +33,8 @@
     var r = rowOf(st, o.id);
     o.interactive = true; o.tier = o.tier || 2; o.sublabel = o.sublabel || sub(st, o.id, 'planned');
     o.state = r && r.tag ? r.tag : 'none'; if (!o.name) o.name = sysLabel(o.id).toUpperCase();
+    var k = COUNT[o.id], n = SCALE && k ? SCALE[k] : null;
+    if (typeof n === 'number' && isFinite(n) && n > 0) o.tag = (o.tag ? o.tag + ' · ' : '') + '×' + Math.round(n).toLocaleString('en-US');
     var b = ctx.node(x, y, o); b.id = o.id; return b;
   }
   function edge(ctx, block, a, b, o) {
@@ -59,6 +68,7 @@
     edge(ctx, 'electrical', n.generators, n.mv_board, { from: { x: n.generators.x + n.generators.w / 2, y: n.generators.y + n.generators.h }, to: { x: n.mv_board.x + n.mv_board.w / 2, y: n.mv_board.y }, pattern: 'dotted', label: 'ATS · NO', tier: 2, legend: 'standby path (open), dotted' });
     ctx.zone(n.hv_intake.x - 12, Y - 26, (n.main_tx.x + n.main_tx.w + 12) - (n.hv_intake.x - 12), H + 52, { label: '150 kV switchyard', tier: 3 });
     ctx.zone(n.unit_subs.x - 12, Y - 26, (n.it_load.x + n.it_load.w + 12) - (n.unit_subs.x - 12), H + 52, { label: 'inside the building · 400 V', tier: 3 });
+    countNote(ctx, Y + H + 64);
     ctx.legend({}); ctx.fit(20); return ctx;
   }
 
@@ -87,6 +97,7 @@
     edge(ctx, 'mechanical', n.chillers, n.dry_coolers, { from: { x: n.chillers.x + n.chillers.w / 2, y: n.chillers.y }, to: { x: n.dry_coolers.x + n.dry_coolers.w / 2, y: n.dry_coolers.y + n.dry_coolers.h }, stroke: 'accent', pattern: 'dashed', label: 'CDW', tier: 2 });
     ctx.zone(n.racks.x - 12, Y - 26, (n.cdu.x + n.cdu.w + 12) - (n.racks.x - 12), H + 52, { label: 'TCS loop · white space', tier: 3 });
     ctx.zone(n.fws.x - 12, Y - 26, (n.dry_coolers.x + n.dry_coolers.w + 12) - (n.fws.x - 12), (n.chillers.y + n.chillers.h + 26) - (Y - 26), { label: 'FWS loop · plant', tier: 3 });
+    countNote(ctx, n.chillers.y + n.chillers.h + 52);
     ctx.legend({}); ctx.fit(20); return ctx;
   }
 
@@ -104,12 +115,14 @@
     edge(ctx, 'controls', n.ot_network, n.epms, { from: { x: n.epms.x + n.epms.w / 2, y: n.ot_network.y }, to: { x: n.epms.x + n.epms.w / 2, y: n.epms.y + n.epms.h }, pattern: 'dotted', tier: 2, label: 'Modbus/IEC 61850' });
     edge(ctx, 'controls', n.fire, n.bms, { pattern: 'dotted', tier: 2, label: 'C&E · shutdowns' });
     ctx.text('BMS supervises sheet B (chillers, dry coolers, FWS, CDU, CRAH) · EPMS supervises sheet A (150 kV to busway) · fire C&E trips both', 24, n.ot_network.y + n.ot_network.h + 40, { role: 'sublabel', fill: 'soft' });
+    countNote(ctx, n.ot_network.y + n.ot_network.h + 62);
     ctx.legend({}); ctx.fit(20); return ctx;
   }
 
   var BUILD = { electrical: sheetElectrical, mechanical: sheetMechanical, controls: sheetControls };
   var TITLES = { electrical: 'A · Electrical', mechanical: 'B · Mechanical / P&ID', controls: 'C · Controls & life safety' };
-  function sheets(st) {
+  function sheets(st, scale) {
+    SCALE = scale && typeof scale === 'object' ? scale : null;
     return ['electrical', 'mechanical', 'controls'].map(function (block) {
       var ctx = BUILD[block](st);
       return { block: block, title: TITLES[block], svg: ctx.render(), warnings: ctx.warnings.slice(), width: ctx.width, height: ctx.height };

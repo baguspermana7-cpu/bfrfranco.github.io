@@ -175,7 +175,7 @@
   function renderSchematic(plan) {
     var host = $('cxAnSheets'); if (!host) return;
     if (!plan || !root.RZCxSchematic) { host.innerHTML = '<p class="cx-an-sub">' + (plan ? 'Diagram engine not loaded.' : '—') + '</p>'; return; }
-    var st = P.statusAt(plan, S.month), sheets = root.RZCxSchematic.sheets(st), h = '';
+    var st = P.statusAt(plan, S.month), sheets = root.RZCxSchematic.sheets(st, campusBasis(plan).es), h = '';
     for (var i = 0; i < sheets.length; i++) h += '<figure class="cx-an-sheet" data-block="' + sheets[i].block + '"' + (sheets[i].block === S.sheet ? '' : ' hidden') + '>' + sheets[i].svg + '</figure>';
     host.innerHTML = h;
     for (var j = 0; j < st.systems.length; j++) {

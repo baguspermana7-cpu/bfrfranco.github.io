@@ -29,4 +29,13 @@ const mech = S.EDGES.mechanical.map((e) => e.join('>'));
 ok('T7 TCS edges touch racks and cdu only; FWS edges touch cdu, fws, dry_coolers — no racks↔fws edge', !mech.includes('racks>fws') && !mech.includes('fws>racks') && mech.includes('cdu>racks') && mech.includes('fws>cdu'));
 ok('legend derived on each sheet', sh.every((s) => /LEGEND/.test(s.svg)));
 ok('no literal hex in the sheets (tokens only)', !/#[0-9a-f]{6}/i.test(all.replace(/url\(#[^)]*\)/g, '').replace(/href="#/g, '')));
+// K29: the blocks carry the engine's installed counts for this site, and only when the page passes them
+{ const C = window.RZEngine.models.commissioning, es = C.equipScale(C.mapInput(plan.input || { itLoad: 40000, coolingType: 'liquid', redundancy: '2N', region: 'id_jakarta', rackDensity: 'ai_hpc' }));
+  const shc = S.sheets(stMid, es), svg = shc.map((x) => x.svg).join('');
+  const MAP = { electrical: ['switchgear', 'generators', 'transformers', 'ups_modules', 'busway', 'racks'], mechanical: ['racks', 'pumps', 'cooling_units', 'chillers'], controls: ['fireZones'] };
+  const got = shc.map((x) => (x.svg.match(/×[0-9,]+/g) || []).map((v) => +v.slice(1).replace(/,/g, '')).sort((p, q) => p - q).join());
+  const want = shc.map((x) => MAP[x.block].map((k) => es[k]).sort((p, q) => p - q).join());
+  ok('K29 counts: every × on each sheet is an equipScale value for a block on that sheet, and none is missing', got.join('|') === want.join('|'), { got, want });
+  ok('K29 counts: zero engine warnings with counts on, and the note says where × comes from', shc.every((x) => !x.warnings.length) && /equipScale/.test(svg), shc.map((x) => x.warnings.length));
+  ok('K29 counts: none without a scale (no typed numbers)', !/×\d/.test(all)); }
 console.log(`CX SCHEMATIC — ${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);
