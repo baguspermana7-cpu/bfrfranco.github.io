@@ -11,6 +11,48 @@ release sections rather than semver.
 
 ---
 
+## v3.32.2 — 2026-11-09 — "The commissioning program as a five-deep tree: an exact engine under the L0–L6 editor"
+
+Owner K28 (2026-11-08) asked for a "plan editor L0-L6 … breakdown … sampai 5 level kedalaman … atau bisa hanya set
+atasannya … perhitungan complex ada di engine … super accurate". This release ships the engine half. The editor UI is
+built on it in a later release.
+
+### Added
+- **`js/rz-cx-tree.js`** — `RZCxTree.programTree(input, overrides)`. It breaks each commissioning level into
+  **system → subsystem → equipment type → activity** (five deep; 1,269 nodes on a 10 MW colo).
+  - Every number is an allocation of `programPlan`. A level node equals its plan level exactly. Every parent's
+    cost and man-hours are exactly the sum of its children (largest-remainder split), and a parent's window spans its
+    children.
+  - Shares follow the handbook:
+    - L2–L4: planning days per system (02.4.8).
+    - L0: L2+L3+L4 days.
+    - L1: factory-tested unit count; only FAT equipment appears.
+    - L5: L4 days.
+    - L6: assets handed over.
+    - Below a system: unit counts from `equipScale`, with BMS points from `bmsComplexity`.
+  - Activities are the level's sub-activities for that discipline, on the handbook dependency chain. A chiller's
+    start-up begins when electrical start-up ends.
+  - Crew on any node uses the `programPlan` formula.
+  - Edits:
+    - A level-only edit (the existing plan overrides) moves every descendant.
+    - A node edit (`weight`, `exclude`) re-shares the node's siblings with the parent total fixed.
+    - Junk edits are ignored.
+  - Every equipment row names its source. Four screening rules are labelled as such: CDUs and manifolds for
+    liquid cooling only, CRAH terminals for air only, one dry cooler per chiller, two DCIM servers per site.
+- **`tools/test-cx-tree.mjs`**: 128 laws on the 8 engine scenarios plus an edited plan, wired into the ship gate.
+  It was proven red twice by mutation. Plain rounding instead of largest remainder leaves parents off by $1–2 (T2).
+  Ignoring `dep` starts mechanical start-up at the level start (T9).
+
+### Fixed
+- Homepage footer: "DC operations and standards" pointed at `pillar-standards.html`, which the next release deletes
+  at the owner's request. It now reads "TIA-942 standards checklist" and links `tia-942-checklist.html`.
+
+### Docs
+- `CX_ANALYSIS_STANDARD.md`: a new "Program tree" section covering the invariants, the share table, timing, site
+  rules, edits and proof.
+
+---
+
 ## v3.32.1 — 2026-11-08 — "Homepage career cards, redesigned calm: one logo height, no black card, no clock"
 
 Owner 2026-11-08 on v3.32.0: the cards read black, big and odd, the "–" bullets looked wrong, and the Bekasi clock

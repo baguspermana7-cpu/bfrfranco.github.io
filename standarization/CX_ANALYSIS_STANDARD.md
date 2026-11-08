@@ -94,3 +94,55 @@ never waive.
 Owner comments K1–K21 and their state live in the harness PRD v1.1 §41
 (`~/.local/state/rzharness/projects/PRJ-RZ-WEB/work-items/WI-CX-SUPERAPP-001/PRD_v1_1.md`); every new owner comment
 is a new K-row there before any code. Tier 3 discovery: `TIER3_DISCOVERY.md` in the same directory.
+
+## Program tree — five-deep breakdown of L0–L6 (`js/rz-cx-tree.js`, owner K28 2026-11-08)
+
+`RZCxTree.programTree(input, overrides)` breaks every commissioning level into
+**level → system → subsystem → equipment type → activity**, five deep. Every number is an allocation of
+`RZEngine.models.commissioning.programPlan(input, overrides.plan)`. The tree adds no cost of its own.
+
+**Invariants.** `tools/test-cx-tree.mjs` gates each of these, on the 8 engine scenarios plus one edited plan:
+- A level node equals its `programPlan` level exactly: cost, man-hours, start and finish.
+- Every parent's cost and man-hours are exactly the sum of its children. The split uses largest remainder on
+  integers, so it never drifts by a dollar. Labour days split the same way, to the hundredth of a day.
+- A parent's window runs from its earliest child start to its latest child finish. Nothing leaves its level window.
+- Every leaf is an activity at depth 4.
+
+**Shares.**
+
+| Level | System share | Source |
+|---|---|---|
+| L0 | handbook L2+L3+L4 planning days | 02.4.8: review effort follows system complexity |
+| L1 | units factory-tested; only FAT equipment appears | `subActivities.l1`: "per-unit FATs … unit-count-driven" |
+| L2–L4 | handbook planning days for that level | 02.4.8 (same table as `rz-cx-plan.js` SYSTEMS) |
+| L5 | handbook L4 days | integration depth |
+| L6 | assets handed over | `subActivities.l6`: "O&M, as-builts & CMMS load" |
+
+Below the system level:
+- Subsystems and equipment are shared by unit count. The counts come from `equipScale`; BMS points come from
+  `bms[bmsComplexity].pts`.
+- Activities are the level's `subActivities` that apply to the equipment's discipline, shared by their `w`.
+  Electrical start-up, for example, does not appear under a chiller.
+
+**Time.**
+- Systems and equipment work in parallel inside the level window.
+- Activities follow the handbook dependency chain (`dep`). The chain is stretched so its critical path fills the
+  window. A chiller's start-up therefore begins when electrical start-up ends.
+- Crew on any node = labour days ÷ (months × 22) ÷ shift productivity. This is the `programPlan` formula.
+
+**Site rules (screening, each named in `SOURCES`).**
+- CDUs and rack manifolds exist only for liquid cooling (dlc, immersion), counted as `cooling_units`.
+- CRAH terminals exist only for air, in-row and RDHx cooling.
+- There is one dry cooler per chiller.
+- There are two DCIM servers per site.
+
+**Edits.**
+- `overrides.plan` is the existing level contract. Setting only the level (start, months, crew, shift) moves every
+  descendant.
+- `overrides.nodes[path]` accepts `{ weight: 0…100 }` (a multiplier on that node's default share among its
+  siblings) and `{ exclude: true }`. The parent total holds either way.
+- Paths look like `L3/chillers/chillers/chiller/a1`. Junk paths and values are ignored.
+
+**Proof.** The gate passes 128/128. It was proven red twice:
+- Plain rounding instead of largest remainder: T2 fails, with parents off by $1–2.
+- Ignoring `dep`: T9 fails, because mechanical start-up began at the level start.
