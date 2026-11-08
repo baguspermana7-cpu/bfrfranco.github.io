@@ -110,6 +110,10 @@ try {
   try { await page.click('.cx-an-sheet-tabs [data-sheet="mechanical"]'); } catch (e) { console.log('  sheet-tab click failed:', e.message, JSON.stringify(tabInfo)); throw e; }
   ok('sheet tab switches to B', await page.evaluate(() => [...document.querySelectorAll('#cxAnSheets .cx-an-sheet')].filter((f) => !f.hidden).map((f) => f.getAttribute('data-block')).join() === 'mechanical'));
   await page.click('#cxAnSheets [data-rzd-hit="cdu"]'); await page.waitForFunction(() => /^CDUs/.test(document.getElementById('cxAnInsTitle').textContent));
+  // K29: the same click also opens the inside of the block; Escape returns to the page (tools/test-cx-detail.mjs owns the modal's laws)
+  const dt = await page.waitForFunction(() => { const d = document.getElementById('cxDetail'); return d && d.open && d.getAttribute('data-system') === 'cdu'; }, { timeout: 4000 }).then(() => true, () => false);
+  ok('K29 a block click selects AND opens its detail modal', dt);
+  await page.keyboard.press('Escape'); await page.waitForFunction(() => !document.getElementById('cxDetail').open, { timeout: 4000 });
   ok('click on the CDU node opens its inspector and marks the node selected', await page.evaluate(() => !!document.querySelector('#cxAnSheets [data-rzd-node="cdu"][data-cx-selected]')));
   await page.evaluate(() => { const r = document.getElementById('cxAnMonth'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); });
   // 3D plant: mounts (or says why not), tints by month, roof-off focus, breadcrumb, budget

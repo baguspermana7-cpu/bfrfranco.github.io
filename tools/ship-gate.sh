@@ -268,6 +268,9 @@ gate "Cx glb library — Blender export matches a regenerated build byte for byt
 gate "Cx records (Tier 3 slice) — PRD v1.0 invariants on the demo record set, overlay on the plan, register import reasons" node tools/test-cx-records.mjs
 gate "DCMOC Cx plan bridge — same plan and status as the site module, store clamps/persists/5 scenarios (needs dcmoc/node_modules)" node tools/test-dcmoc-cx-plan.mjs
 gate "Cx Analysis — plan editor, schematic, 3D campus with the glb library and callouts, Tier 1.5 calendar, both themes" node tools/test-cx-analysis.mjs
+gate "Cx issues — register, gate readiness from the handbook items, overlay on the plan" node tools/test-cx-issues.mjs
+gate "Cx detail (K29) — every schematic block opens its own one-line / P&ID with the L1-L5 ladder; gates equal statusAt; 390 px fits" node tools/test-cx-detail.mjs
+gate "Explorable figures — hover lights the edges, tap opens the panel, keys walk; spacing law on fire pillar + article 30" node tools/test-figure-interact.mjs
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs
 gate "deferred panels — the nine hidden panels do not paint before first paint" node tools/test-dcai-deferred-panels.mjs
