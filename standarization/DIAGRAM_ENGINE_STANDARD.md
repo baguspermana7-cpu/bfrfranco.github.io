@@ -384,6 +384,18 @@ its zone captions are the case the placement search was written for.
 
 ---
 
+## 7. Explorable figures (K24/K30/K25, 2026-11-09)
+
+A figure spec in `tools/build-article-diagrams.mjs` with `interactive: true` and a `detail` map
+(`{nodeId: {text, see: "#section"}}`) becomes explorable through `js/rz-figure-interact.js`: hover (mouse/pen only)
+lights the node's connectors and dims the rest; a click or tap (pointerdown→pointerup within 6 px, so a synthetic
+click on touch cannot land elsewhere) opens a panel with the drawn name, the detail text, Fed by / Leads to from the
+edges and a "Read:" link to the section; Enter/Space open, Escape closes. Every node must have a detail entry. The
+"Read:" text is the heading without the editorial runtime's "#" anchor. Pages that use it: pillar-fire-safety,
+pillar-sustainability, article-30. Gate: `node tools/test-figure-interact.mjs` (F1–F6 per page, incl. a phone tap and
+a page-height ratchet). Article pages add dense layout through an optional `build/page.css`
+(`tools/assemble-article.py` injects it as `<style data-rz-page-css>`).
+
 ## Related
 
 - `standarization/DATAHALL_AI_STANDARD.md` — spec tables live in cards, not in the SVG

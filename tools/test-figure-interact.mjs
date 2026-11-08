@@ -18,6 +18,7 @@ const puppeteer = require('puppeteer');
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CASES = {
   'pillar-fire-safety.html': { fig: 'fire-d1', hover: 'facp', edges: ['asd>facp', 'facp>pre', 'spot>facp'], name: 'Fire alarm panel', fed: /Fed by.*Aspirating detector.*Spot smoke detector/, leads: /Leads to.*Pre-discharge alarm/, walk: ['pre', 'Pre-discharge alarm'], key: ['dly', 'Time delay'], tap: ['rel', 'Release solenoid'], minFigs: 3, maxTable: 1264, maxH: 21170 },
+  'pillar-sustainability.html': { fig: 'sust-d1', hover: 'meter', edges: ['grid>meter', 'meter>chain', 'ren>meter'], name: 'Facility meter', fed: /Fed by.*Utility grid.*Renewables/, leads: /Leads to.*Power chain/, walk: ['chain', 'Power chain'], key: ['it', 'IT load'], tap: ['cool', 'Cooling plant'], minFigs: 2, maxTable: 400, maxH: 9620 },   /* K25 rebuild measured 383 / 9,342 px; a ratchet, not a target */
   'article-30.html': { fig: 'agentic-d1', hover: 'h', edges: ['h>g', 'l2>h'], name: 'Harness', fed: /Fed by.*LLM/, leads: /Leads to.*Confirm gate/, walk: ['g', 'Confirm gate'], key: ['x', 'Executor'], tap: ['o', 'Observation'], minFigs: 2, maxTable: 1240, maxH: 62100 }
 };
 const ARG = (process.argv.find((a) => a.startsWith('--page=')) || '').slice(7);
@@ -41,7 +42,7 @@ try {
         const nodes = [...f.querySelectorAll('[data-rzd-node]')];
         return { id: f.getAttribute('data-rz-figure'), ready: f.getAttribute('data-rz-fx'), ids: ids.length, missing: ids.filter((i) => !d[i] || !d[i].text), focusable: nodes.every((n) => n.getAttribute('tabindex') === '0' && n.getAttribute('role') === 'button' && /\S/.test(n.getAttribute('aria-label') || '')) }; });
     });
-    ok(PAGE + ' F1 every explorable figure is wired, all nodes focusable buttons with a name, every node has a detail', f1.length >= C.minFigs && f1.every((f) => f.ready === 'ready' && f.ids >= 6 && !f.missing.length && f.focusable), f1);
+    ok(PAGE + ' F1 every explorable figure is wired, all nodes focusable buttons with a name, every node has a detail', f1.length >= C.minFigs && f1.every((f) => f.ready === 'ready' && f.ids >= 5 && !f.missing.length && f.focusable), f1);
     const fig = '.rz-figure[data-rz-figure="' + C.fig + '"]';
     const box = await page.evaluate((fig, id) => { const f = document.querySelector(fig); f.scrollIntoView({ block: 'center', behavior: 'instant' }); const svg = [...f.querySelectorAll('svg')].find((s) => s.getBoundingClientRect().width > 0); const r = svg.querySelector('[data-rzd-node="' + id + '"]').getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }, fig, C.hover);
     await page.mouse.move(box.x, box.y); await new Promise((r) => setTimeout(r, 450));
@@ -49,8 +50,8 @@ try {
     ok(PAGE + ' F2 hover on ' + C.hover + ' lights exactly its connectors ' + C.edges.join(', ') + ' and dims the rest', JSON.stringify(f2.hot) === JSON.stringify(C.edges) && f2.on && f2.coldMax < 0.5, f2);
     await page.mouse.click(box.x, box.y); await new Promise((r) => setTimeout(r, 200));
     const f3 = await page.evaluate((fig, id) => { const f = document.querySelector(fig), p = f.querySelector('.rz-fx-panel'), see = p.querySelector('.rz-fx-see'); const d = JSON.parse(f.querySelector('script.rz-figure-detail').textContent)[id];
-      const rels = [...p.querySelectorAll('.rz-fx-rel')].map((r) => r.textContent); return { hidden: p.hidden, name: p.querySelector('.rz-fx-name').textContent, text: p.querySelector('.rz-fx-text').textContent === d.text, rels, see: see && see.getAttribute('href'), seeOk: !!(see && document.getElementById(see.getAttribute('href').slice(1))) }; }, fig, C.hover);
-    ok(PAGE + ' F3 click opens the panel with the drawn name, the detail text, fed by / leads to from the edges, and a resolving section link', !f3.hidden && f3.name === C.name && f3.text && f3.rels.length === 2 && C.fed.test(f3.rels[0]) && C.leads.test(f3.rels[1]) && f3.seeOk, f3);
+      const rels = [...p.querySelectorAll('.rz-fx-rel')].map((r) => r.textContent); return { hidden: p.hidden, name: p.querySelector('.rz-fx-name').textContent, text: p.querySelector('.rz-fx-text').textContent === d.text, rels, see: see && see.getAttribute('href'), seeOk: !!(see && document.getElementById(see.getAttribute('href').slice(1))), seeText: see ? see.textContent : '' }; }, fig, C.hover);
+    ok(PAGE + ' F3 click opens the panel with the drawn name, the detail text, fed by / leads to from the edges, and a resolving section link (heading text without its "#" anchor)', !f3.hidden && f3.name === C.name && f3.text && f3.rels.length === 2 && C.fed.test(f3.rels[0]) && C.leads.test(f3.rels[1]) && f3.seeOk && !/#\s*→$/.test(f3.seeText), f3);
     await page.evaluate((fig, id) => document.querySelector(fig + ' .rz-fx-panel [data-fx-go="' + id + '"]').click(), fig, C.walk[0]);
     const f4a = await page.evaluate((fig) => ({ name: document.querySelector(fig + ' .rz-fx-name').textContent, focus: document.activeElement && document.activeElement.getAttribute('data-fx-go') }), fig);
     await page.evaluate((fig) => document.querySelector(fig + ' .rz-fx-close').click(), fig);

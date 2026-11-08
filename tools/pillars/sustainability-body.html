@@ -1,0 +1,96 @@
+<p>A sustainability claim from a data center reduces to a few ratios, and each ratio is only as good as the meter behind it. This page draws the facility once, shows which meter each metric divides by, works the arithmetic for one site, and lists the measurement choices that make two published numbers incomparable. Every definition is the one in the ISO/IEC 30134 series <a href="#src-1">[S1]</a>&ndash;<a href="#src-5">[S5]</a>; every number in the worked example is recomputed by a test on this site.</p>
+
+<h2 id="metrics">1. One facility, five ratios</h2>
+<p>Energy enters at the facility meter, loses a share in the power chain, reaches the IT equipment and leaves as heat through the cooling plant. Water may be evaporated on the way, and some heat may be sold. Two meters carry almost everything: <strong>E_DC</strong>, all energy the facility takes, and <strong>E_IT</strong>, the energy delivered to IT equipment.</p>
+<figure class="rz-figure" data-rz-figure="sust-d1"></figure>
+<div class="table-wrap"><table class="ws-table">
+<caption>The five operational metrics. Source: ISO/IEC 30134 parts 2, 3, 6, 8 and 9 <a href="#src-1">[S1]</a>&ndash;<a href="#src-5">[S5]</a>; the Green Grid papers that preceded them <a href="#src-6">[S6]</a>&ndash;<a href="#src-8">[S8]</a>.</caption>
+<thead><tr><th>Metric</th><th>Formula</th><th>Unit</th><th>Better</th><th>Standard</th></tr></thead>
+<tbody>
+<tr><td>PUE, power usage effectiveness</td><td><code>E_DC / E_IT</code></td><td>ratio &ge; 1</td><td>lower</td><td>ISO/IEC 30134-2</td></tr>
+<tr><td>WUE, water usage effectiveness</td><td><code>site water (L) / E_IT (kWh)</code></td><td>L/kWh</td><td>lower</td><td>ISO/IEC 30134-9</td></tr>
+<tr><td>CUE, carbon usage effectiveness</td><td><code>CO&#8322; from facility energy (kg) / E_IT (kWh)</code></td><td>kg/kWh</td><td>lower</td><td>ISO/IEC 30134-8</td></tr>
+<tr><td>ERF, energy reuse factor</td><td><code>E_reused / E_DC</code></td><td>0 to 1</td><td>higher</td><td>ISO/IEC 30134-6</td></tr>
+<tr><td>REF, renewable energy factor</td><td><code>E_renewable / E_DC</code></td><td>0 to 1</td><td>higher</td><td>ISO/IEC 30134-3</td></tr>
+</tbody></table></div>
+<p>PUE, WUE and CUE divide by IT energy, so they say how much overhead, water or carbon one unit of computing carries. ERF and REF divide by all facility energy, so they say what share of the site&rsquo;s energy is reused or renewable. CUE ties two of them together: with a single grid supply, <code>CUE = emission factor &times; PUE</code> <a href="#src-8">[S8]</a>.</p>
+
+<h2 id="pue">2. PUE: what it measures and where</h2>
+<p>PUE is a ratio of annual energies, not of instantaneous power. ISO/IEC 30134-2 asks for a 12-month period, so that summer cooling and winter free cooling both count <a href="#src-1">[S1]</a>. A spot reading on a cool night can be several tenths lower than the annual value of the same site.</p>
+<h3 id="pue-points">2.1 The measurement point decides the category</h3>
+<figure class="rz-figure" data-rz-figure="sust-d2"></figure>
+<p>The IT energy can be read at the UPS output, at the PDU output or at the IT equipment input. Each step downstream moves another loss from &ldquo;IT&rdquo; to &ldquo;overhead&rdquo;, so the same building reports a higher PUE in category 3 than in category 1. A published PUE without its category and its period cannot be compared with another <a href="#src-1">[S1]</a> <a href="#src-6">[S6]</a>.</p>
+<p>What PUE does not measure: how efficiently the IT does useful work, the water the cooling uses, or the carbon in the electricity. A site can lower its PUE by switching from dry coolers to evaporative cooling and raise its WUE at the same time.</p>
+
+<h2 id="wue">3. WUE: site water per unit of IT energy</h2>
+<p>WUE counts water used on site for the facility, mainly evaporation, drift and blowdown of cooling towers and adiabatic coolers, divided by IT energy <a href="#src-5">[S5]</a>. A closed dry-cooler or air-cooled-chiller plant evaporates nothing and reports a WUE close to zero; an evaporative plant reports more than one litre per kWh in a hot climate. The Green Grid also defines a source WUE that adds the water used to generate the electricity <a href="#src-7">[S7]</a>; always state which one is meant.</p>
+
+<h2 id="carbon">4. CUE: carbon per unit of IT energy</h2>
+<p>CUE divides the CO&#8322; emitted for the facility&rsquo;s energy by IT energy <a href="#src-4">[S4]</a>. The emission factor of the electricity is the input that moves it most, and there are two ways to set it. The location-based method uses the average factor of the grid the site draws from; the market-based method uses the factor of the contracts the operator holds, so renewable purchases lower it <a href="#src-9">[S9]</a>. The same site can therefore publish two CUE values in the same year, and both are correct under their own method.</p>
+
+<h2 id="erf">5. ERF and REF: reuse and renewables</h2>
+<p>ERF is the share of facility energy that leaves as useful heat to someone else, a district heating network for example <a href="#src-3">[S3]</a>. It does not change PUE: the heat was already counted as facility energy. REF is the share of facility energy that is renewable, from on-site generation or contracts that meet the standard&rsquo;s conditions <a href="#src-2">[S2]</a>.</p>
+<p>In the European Union the Energy Efficiency Directive requires data centres with at least 500 kW of IT power to report these indicators to a European database every year; the delegated regulation lists the data points <a href="#src-11">[S11]</a>.</p>
+
+<h2 id="example">6. Worked example: one 10 MW site for a year</h2>
+<p>Illustrative inputs, not a real site: 10 MW average IT load for a full year, PUE 1.30, 157,680 m&sup3; of evaporated and blown-down water, a grid emission factor of 0.70 kg CO&#8322;/kWh, 25 % of facility energy from renewable contracts, and 5 % of facility energy exported as heat.</p>
+<pre class="formula" data-sust-example>E_IT  = 10,000 kW &times; 8,760 h        = 87,600,000 kWh
+E_DC  = 1.30 &times; 87,600,000             = 113,880,000 kWh
+WUE   = 157,680,000 L / 87,600,000 kWh  = 1.80 L/kWh
+CUE (location) = 0.70 &times; 113,880,000 / 87,600,000            = 0.91 kg/kWh
+CUE (market)   = 0.70 &times; 0.75 &times; 113,880,000 / 87,600,000   = 0.68 kg/kWh
+ERF   = 5,694,000 / 113,880,000         = 0.05
+REF   = 28,470,000 / 113,880,000        = 0.25</pre>
+<p>The site emits 79,716 t of CO&#8322; a year on the location basis and 59,787 t on the market basis. Lowering PUE from 1.30 to 1.20 saves 8,760,000 kWh a year, worth 6,132 t of CO&#8322; at the location factor. The <a href="pue-calculator.html">PUE calculator</a> and the <a href="carbon-footprint.html">carbon footprint calculator</a> run the same arithmetic on your own inputs.</p>
+
+<h2 id="tradeoffs">7. The trade-offs the ratios hide</h2>
+<ul>
+<li><strong>Energy against water.</strong> Evaporative cooling lowers PUE and raises WUE. In a water-stressed region the lower PUE can be the worse choice; the <a href="article-10.html">water stress article</a> maps where in Southeast Asia, and <a href="article-20.html">AI data center water use</a> checks the per-query claims.</li>
+<li><strong>Warm water against chillers.</strong> Liquid cooling at higher supply temperatures lets dry coolers do the work for more hours a year, which lowers PUE without water; the <a href="compare-air-vs-liquid-cooling.html">air versus liquid comparison</a> sets out the limits.</li>
+<li><strong>Market against location carbon.</strong> A contract lowers market-based CUE without changing the electrons the site draws; report both.</li>
+<li><strong>Efficiency against growth.</strong> Data centres used about 415 TWh in 2024, about 1.5 % of world electricity, and the IEA projects about 945 TWh by 2030 <a href="#src-10">[S10]</a>. A better ratio on a larger load can still mean more energy.</li>
+</ul>
+
+<h2 id="resources">8. On this site</h2>
+<ul>
+<li><a href="pue-calculator.html">PUE calculator</a>: PUE and DCiE from facility and IT power, with the loss breakdown.</li>
+<li><a href="carbon-footprint.html">Carbon footprint calculator</a>: scope 1, 2 and 3 with grid factors and renewable share.</li>
+<li><a href="compare-pue-vs-dcie.html">PUE versus DCiE</a>: the same ratio inverted, and when each is used.</li>
+<li><a href="ltc-iso-energy-governance.html">Energy KPI workbench</a>: ISO 50001 baselines, performance indicators and the audit cycle <a href="#src-12">[S12]</a>.</li>
+<li><a href="article-11.html">AI data centers and citizen bills</a> and <a href="article-12.html">grid modernization</a>: what the load growth does to the grid.</li>
+<li><a href="infographic-dc-sustainability.html">Sustainability infographic</a> and <a href="infographic-pue-global.html">global PUE infographic</a>.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="ws-insight-box">
+<h3>What is a good PUE for a data center?</h3>
+<p>It depends on climate, cooling and the measurement category. A new liquid-cooled site in a temperate climate can report an annual PUE near 1.1 to 1.2; an older air-cooled site in the tropics often reports 1.5 or more. Compare only annual values in the same ISO/IEC 30134-2 category.</p>
+</div>
+<div class="ws-insight-box">
+<h3>Why can a lower PUE be worse for the environment?</h3>
+<p>Because PUE ignores water and carbon. Switching to evaporative cooling cuts fan and compressor energy but evaporates water, so WUE rises. Check PUE, WUE and CUE together.</p>
+</div>
+<div class="ws-insight-box">
+<h3>How is CUE calculated?</h3>
+<p>CUE is the CO&#8322; emitted for the facility&rsquo;s energy divided by IT energy. With one grid supply it equals the emission factor times PUE: 0.70 kg/kWh &times; 1.30 = 0.91 kg/kWh in the worked example above.</p>
+</div>
+<div class="ws-insight-box">
+<h3>Does heat reuse lower PUE?</h3>
+<p>No. Exported heat is still facility energy, so PUE is unchanged. It is reported separately as the energy reuse factor, ERF.</p>
+</div>
+
+<h2 id="sources">Sources</h2>
+<ul class="ws-sources">
+<li id="src-1"><strong>[S1]</strong> ISO/IEC 30134-2:2016, Data centres &mdash; Key performance indicators &mdash; Part 2: Power usage effectiveness (PUE). <span class="src-taken">Taken: PUE definition, the 12-month period, the three measurement categories.</span></li>
+<li id="src-2"><strong>[S2]</strong> ISO/IEC 30134-3:2016, Part 3: Renewable energy factor (REF). <span class="src-taken">Taken: REF definition.</span></li>
+<li id="src-3"><strong>[S3]</strong> ISO/IEC 30134-6:2021, Part 6: Energy reuse factor (ERF). <span class="src-taken">Taken: ERF definition.</span></li>
+<li id="src-4"><strong>[S4]</strong> ISO/IEC 30134-8:2022, Part 8: Carbon usage effectiveness (CUE). <span class="src-taken">Taken: CUE definition.</span></li>
+<li id="src-5"><strong>[S5]</strong> ISO/IEC 30134-9:2022, Part 9: Water usage effectiveness (WUE). <span class="src-taken">Taken: WUE definition, site water.</span></li>
+<li id="src-6"><strong>[S6]</strong> The Green Grid, White Paper 49, <em>PUE: A comprehensive examination of the metric</em> (2012). <span class="src-taken">Taken: measurement categories and reporting.</span></li>
+<li id="src-7"><strong>[S7]</strong> The Green Grid, White Paper 35, <em>Water Usage Effectiveness (WUE)</em> (2011). <span class="src-taken">Taken: site and source WUE.</span></li>
+<li id="src-8"><strong>[S8]</strong> The Green Grid, White Paper 32, <em>Carbon Usage Effectiveness (CUE)</em> (2010). <span class="src-taken">Taken: CUE = emission factor &times; PUE for a single supply.</span></li>
+<li id="src-9"><strong>[S9]</strong> GHG Protocol, <em>Scope 2 Guidance</em> (2015) &mdash; <a href="https://ghgprotocol.org/scope-2-guidance" rel="noopener">ghgprotocol.org</a>. <span class="src-taken">Taken: location-based and market-based methods.</span></li>
+<li id="src-10"><strong>[S10]</strong> International Energy Agency, <em>Energy and AI</em> (2025) &mdash; <a href="https://www.iea.org/reports/energy-and-ai" rel="noopener">iea.org</a>. <span class="src-taken">Taken: about 415 TWh in 2024, about 1.5 % of world electricity, about 945 TWh projected for 2030.</span></li>
+<li id="src-11"><strong>[S11]</strong> Directive (EU) 2023/1791 on energy efficiency, Article 12, and Commission Delegated Regulation (EU) 2024/1364 on the data centre rating scheme. <span class="src-taken">Taken: the 500 kW reporting threshold and the annual reporting duty.</span></li>
+<li id="src-12"><strong>[S12]</strong> ISO 50001:2018, Energy management systems. <span class="src-taken">Taken: the management-system frame linked in section 8.</span></li>
+</ul>

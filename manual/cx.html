@@ -614,6 +614,24 @@
             </ul>
         </section>
 
+        <!-- 09 THE ANALYSIS TAB -->
+        <section class="mn-section" id="analysis">
+            <h2><span class="mn-num">09</span> The Analysis tab: the programme as an application</h2>
+            <p class="mn-lead">The second tab turns the calculator's result into a commissioning programme you can scrub, edit and inspect. Every number on it comes from <code>RZEngine.models.commissioning.programPlan</code> (schedule, cost, man-hours) and <code>equipScale</code> (equipment counts); <code>js/rz-cx-plan.js</code> holds the level arithmetic and the views only draw what it returns. The grand total agrees with the calculator tab within 1 %.</p>
+            <ul class="mn-linklist">
+                <li><b>Plan editor and timeline.</b> <span>L0–L6 per handbook chapter 02. Edit a level's start, months or crew in the table, or drag its bar (body = move, right end = stretch, 0.1-month steps; arrows and Shift+arrows on the keyboard). Undo/redo keeps 50 states; up to 5 named scenarios per browser. The Impact panel says why a level moved and where months exceed the site crew cap.</span></li>
+                <li><b>Month scrubber.</b> <span>Every view below shows the programme at the viewed month: play, step, or drag the slider.</span></li>
+                <li><b>Giant schematic, three sheets.</b> <span>A electrical one-line (150 kV to the rack), B mechanical P&amp;ID, C controls and life safety. Each block is one of the 17 systems, coloured by its handbook 02.6 tag at the viewed month, with &times;n = the installed count for this site from <code>equipScale</code>.</span></li>
+                <li><b>Click a block: its inside.</b> <span>A modal draws that system's own one-line or P&amp;ID (for example the UPS: rectifier, DC bus and battery, inverter, static and maintenance bypass), its L1–L5 gate months at the viewed month, the L1–L5 test ladder with a handbook link per row, a card per component, and Fed by / Feeds buttons to walk to the neighbouring block. Escape closes it and returns focus to the block.</span></li>
+                <li><b>Status table and inspector.</b> <span>Level, tag, in-test and changed-this-month per system (four fields, never merged); the inspector shows the gate table and the handbook ladder link.</span></li>
+                <li><b>Issues and gate readiness.</b> <span>An A/B/C issue register per system and gate: an open A blocks, an open B blocks unless the CxM and EoR record that the next level is not affected, a C never blocks. Readiness lists the handbook items of the next gate and says "ready" only when all are ticked and nothing blocks; ready is not a permit to energise.</span></li>
+                <li><b>Gate heatmap and chart data.</b> <span>System &times; L1–L5 at the viewed month (filled = passed, outline = ahead) and the table behind the cost and crew charts, with a CSV.</span></li>
+                <li><b>3D campus.</b> <span>The plant laid out from the engine's counts, tinted by the same tags. Explode separates the focused building's systems in layers; Fit site frames the campus, Fit selection the focused building. No WebGL: one sentence and the schematic remains.</span></li>
+                <li><b>Records (Tier 3 slice).</b> <span>Planned level beside the accepted level from a record set, with the denominator shown; the shipped set is a demo and says so.</span></li>
+            </ul>
+            <div class="mn-note"><strong>Kept correct by:</strong> <code>test-cx-plan-core</code>, <code>test-cx-schematic</code> (counts equal <code>equipScale</code>), <code>test-cx-detail</code> (every block opens its own sheet; gate months equal <code>statusAt</code>; 390 px fits), <code>test-cx-issues</code>, <code>test-cx-analysis</code>, all in the ship gate. Standard: <code>standarization/CX_ANALYSIS_STANDARD.md</code>.</div>
+        </section>
+
         <a class="mn-toollink" href="../cx-calculator.html">▶ Open the live Cx Calculator</a>
     </main>
 

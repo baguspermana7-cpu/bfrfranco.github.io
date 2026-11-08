@@ -1013,6 +1013,83 @@ const AGENTIC_FIGURES = [
  * or caption comes from data/fire/*.csv [S1]-[S3], js/fire-model.js [S4] or
  * fire-checklist.html [S5]; derived values say so.
  * ======================================================================== */
+/* K25 — pillar-sustainability.html: one facility, five ratios (ISO/IEC 30134). Explorable like the fire pillar. */
+const PILLAR_SUST_FIGURES = [
+  {
+    id: 'sust-d1', page: 'pillar-sustainability.html',
+    detail: {
+      grid: { text: 'Grid electricity carries an emission factor (kg CO2 per kWh). Multiplied by the energy the facility takes, it gives the operational carbon that CUE divides by IT energy.', see: '#carbon' },
+      ren: { text: 'On-site generation and contracted renewable supply. Renewable energy divided by all facility energy is REF; the standard sets the conditions a certificate or contract must meet to count.', see: '#metrics' },
+      meter: { text: 'Every kWh the facility takes, from all sources: E_DC. It is the numerator of PUE and the denominator of ERF and REF.', see: '#pue' },
+      chain: { text: 'Transformers, UPS and distribution turn part of the energy into heat before it reaches the IT. That loss sits inside PUE, not inside IT energy.', see: '#pue-points' },
+      it: { text: 'Energy delivered to IT equipment: E_IT, the denominator of PUE, WUE and CUE. Where it is measured (UPS output, PDU output or IT input) changes the PUE category.', see: '#pue-points' },
+      cool: { text: 'Chillers, dry coolers, pumps and fans. Usually the largest non-IT term, and the one that trades energy against water: evaporative cooling cuts energy and raises WUE.', see: '#tradeoffs' },
+      water: { text: 'Site water used for cooling: evaporation, drift and blowdown. Litres per kWh of IT energy is WUE; a dry-only plant has WUE close to zero.', see: '#wue' },
+      reuse: { text: 'Heat exported to a district network or a neighbour. Reused energy divided by all facility energy is ERF; it does not change PUE.', see: '#erf' }
+    },
+    caption:
+      'One facility, five ratios. Energy enters at the facility meter (E_DC) and reaches the IT (E_IT) after power-chain losses; ' +
+      'cooling removes the heat, sometimes with water, sometimes exporting it. PUE = E_DC/E_IT, WUE = water/E_IT, CUE = CO2/E_IT, ' +
+      'ERF = reused/E_DC, REF = renewable/E_DC (ISO/IEC 30134-2, -9, -8, -6, -3) [S1]-[S5].',
+    because:
+      'the five metrics share two denominators; the drawing shows which meter each one divides by, which a table of formulas leaves implicit.',
+    build: () => gridFigure({
+      phone: { order: ['grid', 'ren', 'meter', 'chain', 'it', 'water', 'cool', 'reuse'], gapY: 34,
+        edges: { 1: { fs: 'r', ts: 'r' }, 5: { fs: 'r', ts: 'r' } } },
+      slug: 'sust1', interactive: true, title: 'One facility, five ratios',
+      desc: 'Grid and renewable supply into the facility meter, through the power chain to the IT load; cooling with water in and reused heat out.',
+      gaps: [36, 36, 36], gapY: 34,
+      nodes: [
+        { id: 'grid', col: 0, row: 0, symbol: 'utility', name: 'Utility grid', sub: 'emission factor', tag: 'CUE' },
+        { id: 'ren', col: 0, row: 1, symbol: 'solarArray', name: 'Renewables', sub: 'on-site · contracted', tag: 'REF' },
+        { id: 'meter', col: 1, row: 0, symbol: 'meter', name: 'Facility meter', sub: 'E_DC · all energy in', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Metered energy' },
+        { id: 'chain', col: 2, row: 0, symbol: 'ups', name: 'Power chain', sub: 'TX · UPS · PDU losses' },
+        { id: 'it', col: 3, row: 0, symbol: 'itload', name: 'IT load', sub: 'E_IT · the denominator', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'water', col: 1, row: 1, symbol: 'valve', name: 'Make-up water', sub: 'evaporation · blowdown', tag: 'WUE' },
+        { id: 'cool', col: 2, row: 1, symbol: 'chiller', name: 'Cooling plant', sub: 'chillers · fans · pumps' },
+        { id: 'reuse', col: 3, row: 1, symbol: 'heatExchanger', name: 'Heat reuse', sub: 'exported heat', tag: 'ERF' }
+      ],
+      edges: [
+        { a: 'grid', b: 'meter' }, { a: 'ren', b: 'meter', fs: 'r', ts: 'b' },
+        { a: 'meter', b: 'chain' }, { a: 'chain', b: 'it' },
+        { a: 'water', b: 'cool', stroke: 'link', label: 'water' },
+        { a: 'it', b: 'cool', fs: 'b', ts: 'r', label: 'heat', stroke: 'muted', pattern: 'dashed', legend: 'Heat' },
+        { a: 'cool', b: 'reuse', stroke: 'muted', pattern: 'dashed' }
+      ]
+    })
+  },
+  {
+    id: 'sust-d2', page: 'pillar-sustainability.html',
+    detail: {
+      util: { text: 'The utility meter, or the sum of all supplies including generators on test: the numerator of every PUE category.', see: '#pue-points' },
+      tx: { text: 'Transformer and switchgear losses: counted as facility overhead in every category.', see: '#pue-points' },
+      ups: { text: 'Category 1 reads IT energy at the UPS output. Everything downstream (PDU and cable losses) is counted as IT, so PUE1 reads lowest.', see: '#pue-points' },
+      pdu: { text: 'Category 2 reads IT energy at the PDU output; PDU and transformer losses inside the PDU move to overhead.', see: '#pue-points' },
+      itin: { text: 'Category 3 reads IT energy at the IT equipment input (rack PDU or server). The most complete; requires metering at every rack.', see: '#pue-points' }
+    },
+    caption:
+      'Where IT energy is measured decides the PUE category. ISO/IEC 30134-2 names three points: UPS output (category 1), ' +
+      'PDU output (category 2) and IT equipment input (category 3); the further downstream, the more loss counts as overhead and the higher ' +
+      'and more honest the PUE. A published PUE without its category and its 12-month period is not comparable [S1].',
+    because:
+      'a PUE value is only meaningful with its measurement point; the chain shows what each category leaves inside the IT number.',
+    build: () => gridFigure({
+      phone: { order: ['util', 'tx', 'ups', 'pdu', 'itin'], gapY: 30 },
+      slug: 'sust2', interactive: true, title: 'Three places to measure IT energy',
+      desc: 'Utility meter, transformer, UPS output (category 1), PDU output (category 2), IT equipment input (category 3).',
+      gaps: [40, 40, 40, 40], gapY: 30,
+      nodes: [
+        { id: 'util', col: 0, row: 0, symbol: 'meter', name: 'Utility meter', sub: 'E_DC', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'tx', col: 1, row: 0, symbol: 'transformer', name: 'Transformer', sub: 'overhead' },
+        { id: 'ups', col: 2, row: 0, symbol: 'ups', name: 'UPS output', sub: 'category 1', tag: 'PUE1' },
+        { id: 'pdu', col: 3, row: 0, symbol: 'pdu', name: 'PDU output', sub: 'category 2', tag: 'PUE2' },
+        { id: 'itin', col: 4, row: 0, symbol: 'itload', name: 'IT input', sub: 'category 3', tag: 'PUE3', stroke: 'accent', fill: 'paper-2', tier: 1 }
+      ],
+      edges: [{ a: 'util', b: 'tx' }, { a: 'tx', b: 'ups' }, { a: 'ups', b: 'pdu' }, { a: 'pdu', b: 'itin' }]
+    })
+  }
+];
+
 const PILLAR_FIRE_FIGURES = [
   {
     id: 'fire-d1', page: 'pillar-fire-safety.html',
@@ -1966,7 +2043,8 @@ const FIGURES = [
   /* article 30 */
   ...AGENTIC_FIGURES,
   /* pillar-fire-safety.html */
-  ...PILLAR_FIRE_FIGURES
+  ...PILLAR_FIRE_FIGURES,
+  ...PILLAR_SUST_FIGURES
 ];
 
 /* ==========================================================================

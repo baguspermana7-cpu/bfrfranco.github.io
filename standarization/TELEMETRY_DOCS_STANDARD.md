@@ -146,3 +146,18 @@ unverified limitation into a completion claim.
 | Subsystem manuals were individually detailed but did not share the same campus assumptions or navigation depth. | Documentation evolved page by page without a master Conventional product contract. | Use `prd/dc-conventional.html` as the master contract, retain subsystem methodology manuals with accessible TOCs, and mirror the governed operating standard into Obsidian. | A multi-system cockpit needs one campus contract plus discipline-specific evidence, not duplicated prose. |
 | Alarm history could look like current active alarm state. | Lifecycle-at-capture and live KPI ownership were not explicit. | Label the deterministic dataset as a historian training snapshot, preserve run/source provenance and assert that filtering never mutates live strips. | Historical state is evidence about an event, not proof of current plant state. |
 | Adding subsystem operator contracts created a twelfth top-level PRD section and corrected legacy ASHRAE, ISO WUE and Uptime statements tripped the preservation gate. | Discipline detail was promoted to a new document level, while legitimate source corrections lacked explicit old-to-new evidence mappings. | Nest subsystem contracts under provenance so the canonical 11-section structure remains stable; enumerate each corrected protected fragment and its accepted replacement in the gate. | Expand depth inside the document contract, and make accuracy corrections explicit rather than weakening semantic preservation. |
+
+## Manual currency (K26, 2026-11-09)
+
+Owner: *"page manual/ pastikan ini selalu diupdate dan align dengan toolsnya dan bener2 intuitive dan menarik utk dibaca"*.
+
+- A change that alters what a tool page shows or how it is used updates its `manual/<slug>.html` **in the same
+  commit**: what the page shows, how to use it (hover/click/keys where it is interactive), which test keeps it correct.
+  Found when this rule was written: the Cx manual had no word on the Analysis tab (shipped since v3.26), the fire and
+  sustainability manuals still called their pages "navigation hubs", the sustainability manual cited WUE as ISO 30134
+  part 5 (it is part 9), and four manual links were dead (`../pue.html`, `../capex.html`, `../opex.html`, `../tco.html`).
+- Gate `python3 tools/audit-manuals.py --strict` (ship gate): M1 every internal link on every manual resolves; M2 every
+  manual links the tool it documents (its `mn-toollink`, else the same-named page); M3 every manual has a card on
+  `manual/index.html` and every card opens a manual. M4 lists manuals whose tool changed in git after the manual did:
+  a MONITOR (git dates also move on token bumps), read it before a release and close the real ones.
+- A manual names standards by their exact part and year, and never claims a calculation the page does not make.

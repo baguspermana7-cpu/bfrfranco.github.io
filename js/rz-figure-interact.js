@@ -38,6 +38,8 @@
   function num(el, a) { return parseFloat(el.getAttribute(a)) || 0; }
 
   /* the texts drawn inside a node box: name is the 600-weight line, the rest are tag / sublabel */
+  /* heading text without the anchor link the editorial runtime appends (it renders as a trailing "#") */
+  function headText(h) { var c = h.cloneNode(true), a = c.querySelectorAll('a, [class*="anchor"]'); for (var k = 0; k < a.length; k++) if (/^\s*[#¶§]?\s*$/.test(a[k].textContent) || /anchor/.test(a[k].className)) a[k].parentNode.removeChild(a[k]); return c.textContent.replace(/\s+/g, ' ').replace(/\s*#\s*$/, '').trim(); }
   function labelsOf(svg, rect) {
     var x = num(rect, 'x'), y = num(rect, 'y'), w = num(rect, 'width'), h = num(rect, 'height'), name = '', sub = [];
     var ts = svg.querySelectorAll('text');
@@ -105,7 +107,7 @@
       var bs = panel.querySelectorAll('[data-fx-go]');
       for (var b = 0; b < bs.length; b++) { var t = nodeEl(svg, bs[b].getAttribute('data-fx-go')); bs[b].textContent = t ? labelsOf(svg, t).name : bs[b].getAttribute('data-fx-go'); }
       var see = panel.querySelector('.rz-fx-see');
-      if (see) { see.href = d.see; var hd = doc.getElementById(d.see.slice(1)); see.textContent = 'Read: ' + (hd ? hd.textContent.replace(/\s+/g, ' ').trim() : 'the section') + ' →'; }
+      if (see) { see.href = d.see; var hd = doc.getElementById(d.see.slice(1)); see.textContent = 'Read: ' + (hd ? headText(hd) : 'the section') + ' →'; }
       panel.hidden = false;
       if (focusPanel) { var f = panel.querySelector('[data-fx-go]') || panel.querySelector('.rz-fx-close'); if (f) f.focus(); }
     }

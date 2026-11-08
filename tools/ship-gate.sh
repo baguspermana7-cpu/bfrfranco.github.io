@@ -271,6 +271,8 @@ gate "Cx Analysis — plan editor, schematic, 3D campus with the glb library and
 gate "Cx issues — register, gate readiness from the handbook items, overlay on the plan" node tools/test-cx-issues.mjs
 gate "Cx detail (K29) — every schematic block opens its own one-line / P&ID with the L1-L5 ladder; gates equal statusAt; 390 px fits" node tools/test-cx-detail.mjs
 gate "Explorable figures — hover lights the edges, tap opens the panel, keys walk; spacing law on fire pillar + article 30" node tools/test-figure-interact.mjs
+gate "Manuals (K26) — every manual link resolves, each manual links its tool, every manual has an index card; drift list monitored" python3 tools/audit-manuals.py --strict
+gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs
 gate "deferred panels — the nine hidden panels do not paint before first paint" node tools/test-dcai-deferred-panels.mjs

@@ -146,3 +146,16 @@ Below the system level:
 **Proof.** The gate passes 128/128. It was proven red twice:
 - Plain rounding instead of largest remainder: T2 fails, with parents off by $1–2.
 - Ignoring `dep`: T9 fails, because mechanical start-up began at the level start.
+
+## 3d The inside of a block (K29, 2026-11-09)
+
+Owner: *"per block itu klw di klik harusnya ada sesuatu misal modal schematic lain"*. A click (or Enter) on a block of
+the giant schematic selects it AND opens `#cxDetail` (`js/rz-cx-detail.js`, native `<dialog>`): the system's own sheet
+from `js/rz-cx-subsheets.js` (17 sheets, RZDiagram + RZEngSymbols, zero engine warnings, ≤ 9 components), its L1–L5
+gate months from `RZCxPlan.statusAt` at the viewed month, the L1–L5 test ladder (UPS, chiller, CRAH, BMS, EPMS and fire
+ladders are handbook 02.7.1–02.7.6; the rest condensed from the owning chapter, each row with its anchor), a component
+card, and one-hop Fed by / Feeds from `RZCxSchematic.EDGES` (a transitive trace lists half the plant around the closed
+liquid loops). Escape closes it and focus returns to the block. Sheet arrangements are typical for the MSC-1 basis and
+print no quantities. The main sheets carry `×n` per block from `equipScale(mapInput(input))` and a note naming that
+source; without a scale no count is drawn. Gates: `tools/test-cx-detail.mjs` (D1–D5, RED 2/5 on the pre-K29 tree),
+`tools/test-cx-schematic.mjs` K29 counts.
