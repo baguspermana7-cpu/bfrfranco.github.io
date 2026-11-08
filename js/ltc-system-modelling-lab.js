@@ -7881,6 +7881,14 @@
             }
 
             /* test seam (tools/test-ltc-lab-steps.mjs S29): draw the scatter for a given frontier, e.g. one point */
+            /* redraw when the panel changes width (accordion opened, phone rotated) so the drawing keeps its own size */
+            (function () {
+                var cv = document.getElementById('paretoScatterSvg'); cv = cv && cv.parentElement;
+                if (!cv || typeof ResizeObserver === 'undefined') return;
+                var lastW = 0;
+                new ResizeObserver(function () { var cw = Math.round(cv.clientWidth); if (cw && cw !== lastW) { lastW = cw; if (latestPareto.length) renderParetoScatter(); } }).observe(cv);
+            })();
+
             window.__ltcRenderParetoFor = function(models) { latestPareto = models || []; selectedParetoIdx = latestPareto.length ? 0 : -1; renderParetoScatter(); };
 
             function syncParetoRowSelection() {
@@ -7899,16 +7907,20 @@
                 if (!latestPareto.length) {
                     svg.innerHTML = '<text x="18" y="26" fill="currentColor" opacity="0.7" font-size="12">Generate Pareto frontier to render scatter chart.</text>';
                     meta.className = 'status-pill';
-                    meta.textContent = 'No Pareto Points';
+                    meta.textContent = 'No points yet';
                     syncParetoRowSelection();
                     renderParetoInsight();
                     return;
                 }
 
-                var vb = (svg.viewBox && svg.viewBox.baseVal) ? svg.viewBox.baseVal : null;
-                var w = (vb && vb.width) ? vb.width : 560;
-                var h = (vb && vb.height) ? vb.height : 260;
-                var pad = { l: 124, r: 20, t: 22, b: 56 }; /* legend is HTML under the chart (readable at 390) */
+                /* draw at the panel's own width (300-560 user units) so text stays at its set size on a phone instead of
+                 * scaling a 560-wide drawing into 290 px; the legend is HTML under the chart */
+                var cw = svg.parentElement ? Math.round(svg.parentElement.clientWidth) : 0;
+                var w = (cw > 0 && cw < 560) ? Math.max(300, cw) : 560;
+                var h = 260;
+                svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+                var narrow = w < 480;
+                var pad = { l: narrow ? 84 : 124, r: narrow ? 14 : 20, t: 22, b: 56 };
                 var pw = w - pad.l - pad.r;
                 var ph = h - pad.t - pad.b;
                 var isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -8024,13 +8036,13 @@
                     frontierPath ? '<path d="' + frontierPath + '" fill="none" stroke="' + chartTextFaint + '" stroke-width="1.6" stroke-dasharray="4 3"></path>' : '',
                     selectedGuides,
                     points,
-                    '<text x="' + fmtNum(xMid, 2) + '" y="' + (h - 8) + '" fill="' + chartText + '" font-size="11" font-weight="700" text-anchor="middle">X-Axis: PUE (lower is better)</text>',
-                    '<text x="26" y="' + fmtNum(yMid, 2) + '" fill="' + chartTextSoft + '" font-size="11" font-weight="700" text-anchor="middle" transform="rotate(-90 26 ' + fmtNum(yMid, 2) + ')">Y-Axis: Net OPEX (lower is better)</text>'
+                    '<text x="' + fmtNum(xMid, 2) + '" y="' + (h - 8) + '" fill="' + chartText + '" font-size="11" font-weight="700" text-anchor="middle">PUE, lower is better</text>',
+                    '<text x="' + (narrow ? 14 : 26) + '" y="' + fmtNum(yMid, 2) + '" fill="' + chartTextSoft + '" font-size="11" font-weight="700" text-anchor="middle" transform="rotate(-90 ' + (narrow ? 14 : 26) + ' ' + fmtNum(yMid, 2) + ')">Net OPEX, lower is better</text>'
                 ].join('');
 
                 var feasibleCount = latestPareto.filter(function(m) { return m._feasible; }).length;
                 meta.className = 'status-pill ok';
-                meta.textContent = 'points=' + latestPareto.length + ' | feasible=' + feasibleCount + ' | click point/row to select';
+                meta.textContent = latestPareto.length + (latestPareto.length === 1 ? ' point' : ' points') + ', ' + feasibleCount + ' feasible · select a point or row';
                 syncParetoRowSelection();
                 renderParetoInsight();
             }
@@ -8517,7 +8529,7 @@
                 var stat = document.getElementById('paretoStatus');
                 if (stat) {
                     stat.className = latestPareto.length ? 'status-pill ok' : 'status-pill warn';
-                    stat.textContent = latestPareto.length ? ('Frontier Ready | points=' + latestPareto.length + (seed == null ? '' : (' | seed ' + seed))) : 'Frontier Empty';
+                    stat.textContent = latestPareto.length ? ('Frontier ready · ' + latestPareto.length + (latestPareto.length === 1 ? ' point' : ' points') + (seed == null ? '' : (' · seed ' + seed))) : 'Frontier empty';
                 }
                 renderParetoScatter();
             }

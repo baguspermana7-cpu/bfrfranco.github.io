@@ -60,6 +60,7 @@
  * S31 The page's own nav links carry no second hue
  * S32 Settings live under their own step (design in view, preset/tuning behind "More · n"); edits still reach the model
  * S33 The Pareto legend sits inside the visible chart panel and renders at >= 11 px at every width
+ * S34 The Pareto scatter fits its panel without inner scroll, its text renders at >= 10 px, its status reads as words
  * Env RZ_BASE (default http://127.0.0.1:8165). Run under the shared browser lock.
  */
 import { createRequire } from 'node:module';
@@ -634,6 +635,16 @@ try {
             if (r.height < 11) out.push(want + ' renders ' + r.height.toFixed(1) + ' px'); }
           return out; });
         ok(s33.length === 0, `${w} S33 Pareto legend: ${s33.join(' | ')}`);
+        // S34 the Pareto scatter fits its panel at every width (no inner scroll), its text renders at >= 10 px, and the
+        // status line is words, not a debug string ("points=1 | feasible=1")
+        const s34 = await p.evaluate(() => { const s = document.getElementById('paretoScatterSvg'), out = [];
+          for (let el = s.parentElement; el && el !== document.body; el = el.parentElement)
+            if (el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).overflowX !== 'visible') { out.push('scrolls inside ' + String(el.className).split(' ')[0] + ' ' + el.clientWidth + '<' + el.scrollWidth); break; }
+          const small = [...s.querySelectorAll('text')].map((t) => t.getBoundingClientRect().height).filter((h) => h > 0 && h < 10);
+          if (small.length) out.push(small.length + ' labels under 10 px (' + Math.min(...small).toFixed(1) + ')');
+          for (const id of ['paretoScatterMeta', 'paretoStatus']) { const e = document.getElementById(id); if (e && /=|\|/.test(e.textContent)) out.push(id + ' reads "' + e.textContent.trim() + '"'); }
+          return out; });
+        ok(s34.length === 0, `${w} S34 Pareto scatter: ${s34.join(' | ')}`);
         await p.evaluate(() => { const e = document.getElementById('inPumpHead'); e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
         await new Promise((r) => setTimeout(r, 1500));
         const form = await p.evaluate(() => { const m = window.__ltcLastModel; return [m.pue, m.systemCop, m.netOpex]; });
@@ -680,4 +691,4 @@ try {
   }
 } finally { await b.close(); }
 if (fails.length) { console.log(`FAIL — ${fails.length}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }
-console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, the compare card states its verdicts, settings sit under their step, the Pareto legend is readable, 0 errors');
+console.log('PASS — step thread: 7 steps × 2 widths, every substituted equation recomputes, results follow the inputs, design status recomputes from its basis, run semantics hold, the rail follows the step, sensitivity recomputes on the plant, review compares against the saved scenario, the sliders show the model inputs, each pump figure names its loop, the Results card shows the plant, every trace reproduces from its inputs, every equation line evaluates to its result, tornado and impact matrix perturb the plant, scenario deltas compare like with like, screening-only settings are marked, the tab follows the step, the chrome has one accent and no tiles, the optimizer writes back only effective changes, table figures stay on one line, calibration figures reproduce from the form, a Pareto point applies against the prior design, the Sankey adds up to the plant, the Charts chrome is neutral, accordion titles are plain, chart series are amber and grey, scatter ticks are distinct, the compare card states its verdicts, settings sit under their step, the Pareto legend is readable, the scatter fits a phone, 0 errors');
