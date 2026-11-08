@@ -307,8 +307,10 @@ gate "LTC lab golden — 12 scenarios x 28 rendered outputs identical to the fix
   env RZ_BASE=http://127.0.0.1:8166 timeout 600 node tools/test-ltc-lab-golden.mjs
 gate "LTC lab step thread — S1-S36: every shown figure follows the plant model, chrome on the register" \
   env RZ_BASE=http://127.0.0.1:8166 timeout 900 node tools/test-ltc-lab-steps.mjs
-gate "slop render scan — 14 computed tells per page, light AND dark (report only until the whole tree reads 0; then --strict)" \
-  env RZ_BASE=http://127.0.0.1:8166 timeout 2400 node tools/audit-slop-render.mjs
+# v3.30.4: the whole tree read 0 in both themes (215 pages), so the scan is strict: one tell in either theme fails the
+# gate. Proven red on tools/fixtures/slop-precision.html (exit 1).
+gate "slop render scan — 14 computed tells per page, light AND dark, STRICT (any tell fails)" \
+  env RZ_BASE=http://127.0.0.1:8166 timeout 2400 node tools/audit-slop-render.mjs --strict
 [ -n "$ltc_srv_pid" ] && kill "$ltc_srv_pid" 2>/dev/null
 
 # Engine-files byte-identical guard (locked since v1.32.x accuracy review)

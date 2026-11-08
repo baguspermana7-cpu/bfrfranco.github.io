@@ -30,7 +30,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20261108-ff5c7268">
-    <script src="js/rz-version.js?v=20261108-73f2dab8" defer></script>
+    <script src="js/rz-version.js?v=20261108-e215cef3" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
     <script type="application/ld+json">
@@ -118,7 +118,7 @@
         .tile .bar .mark{ position:absolute; top:-1px; width:2px; height:7px; background:var(--bm-text); border-radius:1px; transition:left .4s ease; }
         .tile.warn .bar .mark{ background:var(--bm-amber); } .tile.alarm .bar .mark{ background:var(--bm-red); }
         /* active-alarm banner */
-        .alarmbar{ display:flex; align-items:flex-start; gap:.6rem; border:1px solid var(--bm-border); border-left:4px solid var(--bm-green); border-radius:8px; background:var(--bm-inset); padding:.6rem .85rem; margin-bottom:.9rem; font-size:.82rem; line-height:1.5; }
+        .alarmbar{ display:flex; align-items:flex-start; gap:.6rem; border:1px solid var(--bm-border); border-left:4px solid var(--bm-green); border-radius:4px; background:var(--bm-inset); padding:.6rem .85rem; margin-bottom:.9rem; font-size:.82rem; line-height:1.5; }
         .alarmbar.warn{ border-left-color:var(--bm-amber); background:rgba(180,83,9,.06); }
         .alarmbar.alarm{ border-left-color:var(--bm-red); background:rgba(220,38,38,.06); }
         .alarmbar .ab-ico{ font-family:var(--bm-mono); font-size:.6rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:2px 7px; border-radius:5px; white-space:nowrap; background:rgba(10,138,90,.16); color:var(--bm-green); flex-shrink:0; margin-top:1px; }
@@ -365,7 +365,7 @@
     <main id="main-content"><div class="bm-wrap">
         <p class="typedesc" id="typeDesc"></p>
 
-        <div class="alarmbar" id="alarmBar" role="status" aria-live="polite">
+        <div class="alarmbar ok" id="alarmBar" role="status" aria-live="polite">
             <span class="ab-ico" id="abIco">NORMAL</span>
             <div class="ab-body" id="abBody"></div>
         </div>
@@ -778,7 +778,7 @@
             if(!bar) return;
             var cause=SCEN_CAUSE[curScen];
             if(worst==='ok' || !cause){
-                bar.className='alarmbar'; ico.textContent='NORMAL';
+                bar.className='alarmbar ok'; ico.textContent='NORMAL';
                 body.innerHTML='<b>All parameters nominal.</b> N+1 pumps healthy, loop dry, chemistry in-spec — every reading sits inside its alarm band.';
                 return;
             }

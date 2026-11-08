@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.30.4 — 2026-11-08 — "The render scan is strict: every page reads zero tells in both themes"
+
+### Changed
+- `water-system`: the KPI band is one framed panel of rows (label, value, basis) instead of five stat tiles; ids,
+  basis-drawer hooks and state classes are unchanged.
+- `cdu-mini-bms`: the alarm bar carries `ok` / `warn` / `alarm` with its state (the green rail at rest is the normal
+  state), radius 4 px.
+- `tools/audit-slop-render.mjs`: a circle (an ISA pump symbol) is not a pill, and a 1 px offset with no blur (the rule
+  a sticky table column draws) is not a shadow. Red → green on `tools/fixtures/slop-precision.html`.
+- `tools/ship-gate.sh`: the render scan runs `--strict`. All 215 sitemap pages read 0 tells in light and dark, so any
+  new tell in either theme now fails a release (proven red on the fixture).
+
+### Docs
+- `ANTI_VIBECODE_STANDARD.md`: the scan is strict; each exemption is listed with its proof fixture.
+
 ## v3.30.3 — 2026-11-08 — "Cockpits: named transitions, state rails that say which state"
 
 ### Changed
