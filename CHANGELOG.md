@@ -38,6 +38,7 @@ every new gate was run red on the old tree first.
   manual links repointed; three hub-manual entries the hubs never linked removed.
 
 ### Fixed
+- Ship gate before release: the manual hub still counted 42 manuals after pillar-standards was removed (now 41); the sustainability drawing's IT glyph rendered its label at 7 px (the IT node now uses the rack symbol); the sustainability generator now applies the site nav register to the menu it inherits from the fire pillar; two manual descriptions rewritten to finish inside 160 characters.
 - Cx 3D: callouts overflowed and overlapped at 390 px (now one short column inside the stage); the right callout
   column covered the equipment it named at 1440 px (columns pick near / top / bottom by fewest anchors covered);
   the Explode factor could go negative (rAF time vs `performance.now()`); a throttled rAF could strand the camera

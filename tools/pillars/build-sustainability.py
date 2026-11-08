@@ -75,6 +75,18 @@ def build():
     s = sub1(r'<header class="article-hero">.*?</header>', hero, s, re.S)
     s = sub1(r'(<div class="article-body">\n).*?(\n</div>\n</div>\n</article>\n</main>)', None, s, re.S) if False else \
         re.sub(r'(<div class="article-body">\n).*?(\n</div>\n</div>\n</article>\n</main>)', lambda m: m.group(1) + body.strip() + '\n' + m.group(2), s, count=1, flags=re.S)
+    return nav_register(s)
+
+
+def nav_register(s):
+    # the fire pillar frame is skipped by the site register's nav family; this page is not, so its menu
+    # gets the same rewrite tools/sweep-site-register.py applies (one accent, no per-link hues)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('sweep_site_register', ROOT / 'tools' / 'sweep-site-register.py')
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    for pair in mod.FAMILIES['nav']['pairs']:
+        s = re.sub(pair[1], pair[2], s)
     return s
 
 

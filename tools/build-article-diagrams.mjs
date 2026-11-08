@@ -1044,7 +1044,7 @@ const PILLAR_SUST_FIGURES = [
         { id: 'ren', col: 0, row: 1, symbol: 'solarArray', name: 'Renewables', sub: 'on-site · contracted', tag: 'REF' },
         { id: 'meter', col: 1, row: 0, symbol: 'meter', name: 'Facility meter', sub: 'E_DC · all energy in', stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Metered energy' },
         { id: 'chain', col: 2, row: 0, symbol: 'ups', name: 'Power chain', sub: 'TX · UPS · PDU losses' },
-        { id: 'it', col: 3, row: 0, symbol: 'itload', name: 'IT load', sub: 'E_IT · the denominator', stroke: 'accent', fill: 'paper-2', tier: 1 },
+        { id: 'it', col: 3, row: 0, symbol: 'rack', name: 'IT load', sub: 'E_IT · the denominator', stroke: 'accent', fill: 'paper-2', tier: 1 },
         { id: 'water', col: 1, row: 1, symbol: 'valve', name: 'Make-up water', sub: 'evaporation · blowdown', tag: 'WUE' },
         { id: 'cool', col: 2, row: 1, symbol: 'chiller', name: 'Cooling plant', sub: 'chillers · fans · pumps' },
         { id: 'reuse', col: 3, row: 1, symbol: 'heatExchanger', name: 'Heat reuse', sub: 'exported heat', tag: 'ERF' }
@@ -1083,7 +1083,7 @@ const PILLAR_SUST_FIGURES = [
         { id: 'tx', col: 1, row: 0, symbol: 'transformer', name: 'Transformer', sub: 'overhead' },
         { id: 'ups', col: 2, row: 0, symbol: 'ups', name: 'UPS output', sub: 'category 1', tag: 'PUE1' },
         { id: 'pdu', col: 3, row: 0, symbol: 'pdu', name: 'PDU output', sub: 'category 2', tag: 'PUE2' },
-        { id: 'itin', col: 4, row: 0, symbol: 'itload', name: 'IT input', sub: 'category 3', tag: 'PUE3', stroke: 'accent', fill: 'paper-2', tier: 1 }
+        { id: 'itin', col: 4, row: 0, symbol: 'rack', name: 'IT input', sub: 'category 3', tag: 'PUE3', stroke: 'accent', fill: 'paper-2', tier: 1 }
       ],
       edges: [{ a: 'util', b: 'tx' }, { a: 'tx', b: 'ups' }, { a: 'ups', b: 'pdu' }, { a: 'pdu', b: 'itin' }]
     })
