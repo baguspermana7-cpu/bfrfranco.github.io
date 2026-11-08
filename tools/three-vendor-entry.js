@@ -1,5 +1,6 @@
-/* The three.js subset behind js/vendor/three-r170.min.js (DH01 3D + CFD view), as the global RZ3.
- * Rebuild:  npm pack three@0.170.0 && tar xzf three-0.170.0.tgz
+/* The three.js subset behind js/vendor/three-r170.min.js (DH01 3D + CFD view, Cx campus), as the global RZ3.
+ * 3.28.0: + GLTFLoader for the Cx campus equipment library (assets/cx/campus-equipment.glb).
+ * Rebuild:  npm pack three@0.170.0 && tar xzf three-0.170.0.tgz   (or npm i three@0.170.0 and import from 'three')
  *           (point examples/jsm/controls/OrbitControls.js at ../../../build/three.module.js)
  *           npx esbuild@0.24.0 tools/three-vendor-entry.js --bundle --minify --format=iife --global-name=RZ3 \
  *             --legal-comments=none --banner:js="/* three.js r170 (MIT) … *\/" --outfile=js/vendor/three-r170.min.js

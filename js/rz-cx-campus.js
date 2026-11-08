@@ -42,23 +42,28 @@
     var gl; try { gl = cv.getContext('webgl2') || cv.getContext('webgl'); } catch (e) { gl = null; }
     if (!gl) { stage.innerHTML = '<p class="cx-3d-nogl">This browser has no WebGL. The schematic above carries the same systems, the same months and the same tags; nothing here is missing from it.</p>'; host.setAttribute('data-cx-3d', 'nogl'); return null; }
     var renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'high-performance' });
-    var phone = root.innerWidth < 800, basePR = Math.min(root.devicePixelRatio || 1, phone ? 1 : 1.25), quality = 1; renderer.setPixelRatio(basePR);
+    var phone = root.innerWidth < 800, dpr0 = root.devicePixelRatio || 1, basePR = Math.min(dpr0, phone ? 1 : (dpr0 >= 1.5 ? 1.25 : 1))   /* oversample only on HiDPI; a 1× desktop pays 56 % more pixels for nothing visible */, quality = 1; renderer.setPixelRatio(basePR);
     var scene = new T.Scene();
     var cam = new T.OrthographicCamera(-1, 1, 1, -1, -500, 1000); cam.zoom = 1;
     var ctl = new T.OrbitControls(cam, cv); ctl.enableDamping = true; ctl.dampingFactor = 0.1; ctl.enablePan = true; ctl.autoRotate = false; ctl.minZoom = 0.5; ctl.maxZoom = 8;
     ctl.maxPolarAngle = Math.PI * 0.47; ctl.minPolarAngle = 0.2;
-    scene.add(new T.HemisphereLight(0xe8edf5, 0x1a1c22, 1.05));
-    var sun = new T.DirectionalLight(0xffffff, 0.9); sun.position.set(60, 120, 40); scene.add(sun);
+    scene.add(new T.HemisphereLight(0xe8edf5, 0x1a1c22, 0.75));
+    var sun = new T.DirectionalLight(0xffffff, 1.1); sun.position.set(-90, 75, 60); scene.add(sun);           /* key from front-left, low: tops bright, front faces mid, right faces shaded (3-tone iso) */
+    var fill = new T.DirectionalLight(0xffffff, 0.35); fill.position.set(120, 40, -20); scene.add(fill);       /* fill from the right: the shaded face still reads, never black */
     /* Palette = the tool register's own tokens (computed on the host), so the scene follows the theme like the rest of the page. */
     function isDark() { return (document.documentElement.getAttribute('data-theme') || 'dark') !== 'light'; }
     function tok(name, fallback) { var v = ''; try { v = getComputedStyle(host).getPropertyValue(name).trim(); } catch (e) { v = ''; } if (!v) return new T.Color(fallback); try { return new T.Color(v); } catch (e2) { return new T.Color(fallback); } }
     function palette() {
       var dark = isDark();
       return { dark: dark, ground: tok('--rzt-inset', dark ? 0x121316 : 0xe9ecf0), grid: tok('--rzt-line', dark ? 0x2a2d34 : 0xcfd4db), gridSoft: tok('--rzt-line-soft', dark ? 0x1d1f25 : 0xdfe3e8),
-        wall: dark ? 0x363a43 : 0xd9dde3, roof: dark ? 0x474c56 : 0xc4c9d0, floor: dark ? 0x1f2227 : 0xf2f4f6, yard: dark ? 0x1b1d23 : 0xe2e5ea, fence: dark ? 0x4b505a : 0x9aa0aa, road: dark ? 0x1e2026 : 0xd3d7dd, none: dark ? 0x8b919c : 0x9aa0aa };
+        wall: dark ? 0x363a43 : 0xcdd2d9, roof: dark ? 0x474c56 : 0xe3e6eb, edge: dark ? 0x7a808a : 0x2a2d34, floor: dark ? 0x1f2227 : 0xf2f4f6, yard: dark ? 0x1b1d23 : 0xe2e5ea, fence: dark ? 0x4b505a : 0x9aa0aa, road: dark ? 0x1e2026 : 0xd3d7dd, none: dark ? 0x8b919c : 0x9aa0aa };
     }
     var pal = palette(), dark = pal.dark;
-    var ground = new T.Mesh(new T.PlaneGeometry(600, 450), new T.MeshBasicMaterial({ color: pal.ground })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.05; ground.position.set(-5, -0.05, 6); scene.add(ground);
+    /* the site is a plate: a slab with a darker edge, the way an isometric figure sits on its base; the stage background shows around it */
+    function plateColors() { return { top: pal.ground, side: new T.Color(dark ? 0x08090b : 0xb4b9c1), outline: new T.Color(dark ? 0x07080a : 0x2a2d34) }; }
+    var pc = plateColors(), plateTop = new T.MeshBasicMaterial({ color: pc.top }), plateSide = new T.MeshBasicMaterial({ color: pc.side });   /* unlit: the slab is the biggest surface on screen and software GL pays per pixel for lights */
+    var ground = new T.Mesh(new T.BoxGeometry(300, 6, 230), [plateSide, plateSide, plateTop, plateSide, plateSide, plateSide]); ground.position.set(-5, -3.05, 6); scene.add(ground);
+    var outlineMat = new T.MeshBasicMaterial({ color: pc.outline, side: T.BackSide });                      /* inverted hull = the drawn outline of every machine */
     var grid = new T.GridHelper(200, 20, pal.gridSoft, pal.gridSoft); grid.position.set(-5, 0, 6); grid.material.transparent = true; grid.material.opacity = dark ? 0.35 : 0.4; scene.add(grid);
 
     /* ---- materials ---- */
@@ -68,20 +73,21 @@
       floor: new T.MeshStandardMaterial({ color: pal.floor }),
       yard: new T.MeshStandardMaterial({ color: pal.yard }),
       fence: new T.LineBasicMaterial({ color: pal.fence }),
-      road: new T.MeshStandardMaterial({ color: pal.road })
+      road: new T.MeshStandardMaterial({ color: pal.road }),
+      detail: new T.MeshStandardMaterial({ color: dark ? 0x2a2d34 : 0x8a9099, transparent: true, opacity: 1 })   /* louvres, doors, parapets, roof plant */
     };
     function retheme() {
       pal = palette(); dark = pal.dark; TAG_HEX.none = pal.none;
-      ground.material.color.copy(pal.ground); grid.material.color.copy(pal.gridSoft); grid.material.opacity = dark ? 0.35 : 0.4;
-      mat.wall.color.set(pal.wall); mat.roof.color.set(pal.roof); mat.floor.color.set(pal.floor); mat.yard.color.set(pal.yard); mat.fence.color.set(pal.fence); mat.road.color.set(pal.road);
-      for (var k in buildings) if (buildings.hasOwnProperty(k)) { var b = buildings[k]; if (b.userData.walls) b.userData.walls.material.color.set(pal.wall); if (b.userData.roof) b.userData.roof.material.color.set(pal.roof); }
+      pc = plateColors(); plateTop.color.copy(pc.top); plateSide.color.copy(pc.side); outlineMat.color.copy(pc.outline); grid.material.color.copy(pal.gridSoft); grid.material.opacity = dark ? 0.35 : 0.4;
+      mat.wall.color.set(pal.wall); mat.roof.color.set(pal.roof); mat.floor.color.set(pal.floor); mat.yard.color.set(pal.yard); mat.fence.color.set(pal.fence); mat.road.color.set(pal.road); mat.detail.color.set(dark ? 0x2a2d34 : 0x8a9099);
+      for (var k in buildings) if (buildings.hasOwnProperty(k)) { var b = buildings[k]; if (b.userData.walls) b.userData.walls.material.color.set(pal.wall); if (b.userData.roof) b.userData.roof.material.color.set(pal.roof); if (b.userData.detail) b.userData.detail.color.set(dark ? 0x2a2d34 : 0x8a9099); if (b.userData.edge) b.userData.edge.material.color.set(pal.edge); }
       applyStatus();
     }
     if ('MutationObserver' in root) new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     var buildings = {}, equipment = [], flows = [], focused = null, paused = false, status = indexStatus(opts.status && opts.status());
 
     function box(w, h, d, m) { var g = new T.Mesh(new T.BoxGeometry(w, h, d), m); return g; }
-    function edges(w, h, d, color) { var e = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(w, h, d)), new T.LineBasicMaterial({ color: color || 0x50545c })); return e; }
+    function edges(w, h, d, color) { var e = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(w, h, d)), new T.LineBasicMaterial({ color: color || pal.edge })); return e; }
     /* one InstancedMesh per equipment family (one draw call), coloured per instance by its system tag. The shape
      * comes from RZCxAssets — merged, vertex-shaded primitives at the family footprint, y from the floor — and
      * falls back to a plain box when that module is absent, so the campus never fails for a missing asset. */
@@ -89,10 +95,15 @@
     function family(systemId, count, w, h, d, place, meta) {
       var geo = assets && assets.build(T, systemId, w, h, d), isShape = !!(geo && geo.attributes.color);
       if (isShape) shaped++; else geo = new T.BoxGeometry(w, h, d).translate(0, h / 2, 0);
-      var im = new T.InstancedMesh(geo, new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, vertexColors: isShape }), count); im.instanceMatrix.setUsage(T.DynamicDrawUsage);
+      var im = new T.InstancedMesh(geo, new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, metalness: 0, flatShading: true, vertexColors: isShape }), count); im.instanceMatrix.setUsage(T.DynamicDrawUsage);
+      var hull = new T.InstancedMesh(geo, outlineMat, count);                                            /* same geometry, back faces, 4 % larger: a dark line around each unit */
       var o = new T.Object3D();
-      for (var i = 0; i < count; i++) { var p = place(i); o.position.set(p[0], p[3] || 0, p[2]); o.rotation.y = p[1] || 0; o.updateMatrix(); im.setMatrixAt(i, o.matrix); im.setColorAt(i, new T.Color(TAG_HEX.none)); }
-      im.userData = { system: systemId, label: meta && meta.label, building: meta && meta.building, shaped: isShape }; equipment.push(im); return im;
+      for (var i = 0; i < count; i++) {
+        var p = place(i); o.position.set(p[0], p[3] || 0, p[2]); o.rotation.y = p[1] || 0; o.scale.set(1, 1, 1); o.updateMatrix(); im.setMatrixAt(i, o.matrix); im.setColorAt(i, new T.Color(TAG_HEX.none));
+        o.scale.set(1.04, 1.04, 1.04); o.updateMatrix(); hull.setMatrixAt(i, o.matrix);
+      }
+      hull.visible = false; im.add(hull);                                                              /* outlines are sub-pixel at campus scale; focus() shows them for the focused building only */
+      im.userData = { system: systemId, label: meta && meta.label, building: meta && meta.building, shaped: isShape ? 'primitives' : 'box', hull: hull }; equipment.push(im); return im;
     }
     function tint(im) { var r = status.byId[im.userData.system], c = new T.Color(TAG_HEX[(r && r.tag) || 'none']); for (var i = 0; i < im.count; i++) im.setColorAt(i, c); im.instanceColor.needsUpdate = true; }
 
@@ -102,6 +113,17 @@
       if (spec.h) {
         var walls = box(spec.w, spec.h, spec.d, mat.wall.clone()); walls.position.y = spec.h / 2; walls.userData.part = 'walls'; walls.userData.building = spec.id; g.add(walls);
         var roof = box(spec.w + 0.6, 0.5, spec.d + 0.6, mat.roof.clone()); roof.position.y = spec.h + 0.25; roof.userData.part = 'roof'; g.add(roof); g.userData.roof = roof; g.userData.walls = walls;
+        /* architecture, so a building is not a lidded box: parapet and roof plant ride on the roof (they lift with it), louvre bands and a door sit on the walls */
+        var det = mat.detail.clone(); g.userData.detail = det;
+        var W = spec.w + 0.6, D = spec.d + 0.6, par = [[W, 0.35, 0, -D / 2 + 0.175], [W, 0.35, 0, D / 2 - 0.175], [0.35, D, -W / 2 + 0.175, 0], [0.35, D, W / 2 - 0.175, 0]];
+        for (var pi = 0; pi < 4; pi++) { var pr = box(par[pi][0], 0.7, par[pi][1], det); pr.position.set(par[pi][2], 0.6, par[pi][3]); pr.userData.part = 'roof'; roof.add(pr); }
+        var units = Math.max(2, Math.min(6, Math.round(spec.w / 11)));
+        for (var u = 0; u < units; u++) {
+          var ux = -spec.w / 2 + spec.w * (u + 0.5) / units, ru = box(2.6, 1.5, 2.0, roof.material); ru.position.set(ux, 1.0, -spec.d * 0.22); ru.userData.part = 'roof'; roof.add(ru);
+          var rf = box(2.8, 0.25, 2.2, det); rf.position.set(ux, 1.85, -spec.d * 0.22); rf.userData.part = 'roof'; roof.add(rf);
+        }
+        for (var s = -1; s <= 1; s += 2) for (var L = 0; L < 2; L++) { var lv = box(spec.w * 0.72, 0.5, 0.1, det); lv.position.set(0, spec.h * (0.38 + L * 0.3), s * (spec.d / 2 + 0.05)); lv.userData.building = spec.id; g.add(lv); }
+        var door = box(2.6, 2.9, 0.12, det); door.position.set(-spec.w * 0.36, 1.45, spec.d / 2 + 0.06); door.userData.building = spec.id; g.add(door);
         var e = edges(spec.w, spec.h, spec.d); e.position.y = spec.h / 2; g.add(e); g.userData.edge = e;
         var floor = box(spec.w, 0.2, spec.d, mat.floor); floor.position.y = 0.1; floor.userData.building = spec.id; g.add(floor);
       } else {
@@ -178,19 +200,21 @@
         var b = buildings[k], on = !focused || k === focused, dim = focused && k !== focused;
         if (b.userData.walls) { b.userData.walls.material.opacity = dim ? 0.18 : (k === focused ? 0.22 : 1); b.userData.walls.material.transparent = true; }
         if (b.userData.roof) { b.userData.roof.material.opacity = dim ? 0.12 : 1; }
+        if (b.userData.detail) { b.userData.detail.opacity = dim ? 0.15 : (k === focused ? 0.22 : 1); }
         b.userData.inner.visible = SITE[k].h === 0 || k === focused;
         b.userData.edge.material.opacity = dim ? 0.3 : 1; b.userData.edge.material.transparent = true;
         if (b.userData.inner.visible && SITE[k].h) b.userData.inner.children.forEach(function (c) { c.visible = true; });
       }
+      for (var q = 0; q < equipment.length; q++) { var hq = equipment[q].userData.hull; if (hq) hq.visible = !!focused && equipment[q].userData.building === focused; }
       anim.target = focused && buildings[focused].userData.roof ? 1 : 0;
       if (crumb) crumb.innerHTML = '<button type="button" data-crumb="">Campus</button>' + (focused ? ' › <b>' + SITE[focused].name + '</b>' : '');
       host.setAttribute('data-cx-focus', focused || '');
-      var sp = focused ? SITE[focused] : null; if (sp) { ctl.target.set(sp.x, 2, sp.z); cam.zoom = Math.max(2.4, Math.min(5, 3.2 * 62 / Math.max(sp.w, sp.d))); } else { ctl.target.set(BOUNDS.cx, 0, BOUNDS.cz); cam.zoom = 1; }
+      var sp = focused ? SITE[focused] : null; if (sp) { ctl.target.set(sp.x, 2, sp.z); cam.zoom = Math.max(2.4, Math.min(5, 3.2 * 62 / Math.max(sp.w, sp.d))); } else { ctl.target.set(BOUNDS.cx, 0, BOUNDS.cz); cam.zoom = 1.3; }
       cam.updateProjectionMatrix(); ctl.update(); placeLabels(); draw();
     }
     /* ---- camera presets ---- */
     function preset(k) {
-      var d = 220, pos = { campus: [d, d * 0.9, d], plant: [-d, d * 0.8, d * 0.6], hall: [d * 0.8, d, d * 0.8], sub: [d * 0.4, d, d * 1.2] }[k] || [d, d * 0.9, d];
+      var d = 220, pos = { campus: [d, d, d], plant: [-d, d * 0.8, d * 0.6], hall: [d * 0.8, d, d * 0.8], sub: [d * 0.4, d, d * 1.2] }[k] || [d, d * 0.9, d];
       cam.position.set(pos[0], pos[1], pos[2]); if (k === 'plant') focus('plant'); else if (k === 'hall') focus('hall'); else if (k === 'sub') focus('sub'); else focus(null);
     }
     /* ---- picking ---- */
@@ -234,6 +258,35 @@
     var labels = {}; for (var lk in SITE) if (SITE.hasOwnProperty(lk)) { var el = document.createElement('span'); el.className = 'cx-3d-lbl'; el.setAttribute('data-building', lk); labelHost.appendChild(el); labels[lk] = el; }
     var _v = new T.Vector3();
     function labelText(k) { var b = buildings[k], tg = b && b.userData.tag, lv = b && b.userData.level; return SITE[k].name + (lv ? ' · ' + lv + ' ' + tg : ' · not started'); }
+    /* ---- callouts: one per equipment family of the focused building, stacked at the stage margin, a dashed leader to the unit ---- */
+    var NS = 'http://www.w3.org/2000/svg', coHost = document.createElement('div'); coHost.className = 'cx-3d-callouts'; coHost.setAttribute('aria-hidden', 'true'); stage.appendChild(coHost);
+    var coSvg = document.createElementNS(NS, 'svg'); coHost.appendChild(coSvg); var coEls = [], _m = new T.Matrix4(), _p = new T.Vector3();
+    function calloutTargets() {
+      var out = []; if (!focused) return out;
+      for (var i = 0; i < equipment.length; i++) {
+        var im = equipment[i]; if (im.userData.building !== focused || !im.visible || !im.parent || !im.parent.visible) continue;
+        im.getMatrixAt(0, _m); _p.setFromMatrixPosition(_m); var top = im.geometry.boundingBox ? im.geometry.boundingBox.max.y : 2; _p.y += top; _p.applyMatrix4(im.matrixWorld);
+        var r = status.byId[im.userData.system];
+        out.push({ im: im, world: _p.clone(), text: (im.userData.label || im.userData.system) + ' · ' + im.count + (r && r.level ? ' · ' + r.level : ''), tag: (r && r.tag) || 'none' });
+      }
+      return out;
+    }
+    function placeCallouts() {
+      var w = stage.clientWidth, h = stage.clientHeight, list = calloutTargets();
+      while (coEls.length < list.length) { var el = document.createElement('span'); el.className = 'cx-3d-co'; coHost.appendChild(el); var ln = document.createElementNS(NS, 'line'), dt = document.createElementNS(NS, 'circle'); dt.setAttribute('r', '2.5'); coSvg.appendChild(ln); coSvg.appendChild(dt); coEls.push({ el: el, ln: ln, dt: dt }); }
+      for (var i = 0; i < list.length; i++) { var a = list[i]; _v.copy(a.world).project(cam); a.ax = (_v.x * 0.5 + 0.5) * w; a.ay = (-_v.y * 0.5 + 0.5) * h; a.wpx = a.text.length * 7 + 26; }
+      var left = list.filter(function (a) { return a.ax < w / 2; }).sort(function (a, b) { return a.ay - b.ay; }), right = list.filter(function (a) { return a.ax >= w / 2; }).sort(function (a, b) { return a.ay - b.ay; });
+      function column(col, side) { var y = 18; for (var i = 0; i < col.length; i++) { var a = col[i]; a.ly = Math.max(y, Math.min(h - 26, a.ay - 40)); y = a.ly + 26; a.lx = side < 0 ? 14 : w - 14 - a.wpx; } }
+      column(left, -1); column(right, 1);
+      for (var k = 0; k < coEls.length; k++) {
+        var c = coEls[k], a = list[k];
+        if (!a) { if (!c.el.hidden) { c.el.hidden = true; c.ln.setAttribute('visibility', 'hidden'); c.dt.setAttribute('visibility', 'hidden'); } continue; }
+        var onLeft = a.ax < w / 2, ex = onLeft ? a.lx + a.wpx + 2 : a.lx - 2, ey = a.ly + 10, tr = 'translate(' + Math.round(a.lx) + 'px,' + Math.round(a.ly) + 'px)';
+        if (c.el.hidden) { c.el.hidden = false; c.ln.setAttribute('visibility', 'visible'); c.dt.setAttribute('visibility', 'visible'); }
+        if (c.el.textContent !== a.text) c.el.textContent = a.text; if (c.el.__tr !== tr) { c.el.__tr = tr; c.el.style.transform = tr; } if (c.el.__tg !== a.tag) { c.el.__tg = a.tag; c.el.setAttribute('data-tag', a.tag); }
+        c.ln.setAttribute('x1', ex.toFixed(1)); c.ln.setAttribute('y1', ey.toFixed(1)); c.ln.setAttribute('x2', a.ax.toFixed(1)); c.ln.setAttribute('y2', a.ay.toFixed(1)); c.dt.setAttribute('cx', a.ax.toFixed(1)); c.dt.setAttribute('cy', a.ay.toFixed(1));
+      }
+    }
     function placeLabels() {
       var w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
       var rows = [];
@@ -263,7 +316,7 @@
       if (!paused && !REDUCE) for (var i = 0; i < flows.length; i++) if (flows[i].speed) step(flows[i], dt);
       if (anim.roof !== anim.target) { anim.roof += (anim.target - anim.roof) * (REDUCE ? 1 : 0.18); if (Math.abs(anim.target - anim.roof) < 0.01) anim.roof = anim.target; }
       for (var k in buildings) if (buildings.hasOwnProperty(k)) { var b = buildings[k]; if (b.userData.roof) { var lift = (k === focused ? anim.roof : 0); b.userData.roof.position.y = SITE[k].h + 0.25 + lift * 9; b.userData.roof.material.opacity = Math.min(b.userData.roof.material.opacity, 1 - lift * 0.85); b.userData.roof.material.transparent = true; } }
-      ctl.update(); renderer.render(scene, cam); placeLabels();
+      ctl.update(); renderer.render(scene, cam); placeLabels(); placeCallouts();
       lastDraw = now; frames++; fpsAcc += dt; busy += (root.performance ? root.performance.now() : now) - t0;
       if (fpsAcc >= 1) { fps = frames / fpsAcc; lastFps = fps; adapt(Math.max(busy / frames, 1000 / fps)); frames = 0; fpsAcc = 0; busy = 0; }
       if (inView && (!(paused || REDUCE) || anim.roof !== anim.target)) raf = requestAnimationFrame(frame);
@@ -275,10 +328,24 @@
     document.addEventListener('visibilitychange', function () { if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = null; } } else if (inView) draw(); });
     resize(); preset('campus'); applyStatus();
     host.setAttribute('data-cx-3d', 'ready');
+    /* the Blender library replaces the primitive shapes when it arrives; until then (or without it) the primitives stand */
+    host.setAttribute('data-cx-assets', 'primitives');
+    if (assets && typeof assets.loadLibrary === 'function') {
+      var libUrl = (opts.assetsUrl || ((opts.base || 'js/') + '../assets/cx/campus-equipment.glb')) + '?v=' + encodeURIComponent(root.RZ_VERSION || '');
+      assets.loadLibrary(T, libUrl, function (lib) {
+        if (!lib) { host.setAttribute('data-cx-assets', 'primitives'); return; }
+        var n = 0;
+        for (var i = 0; i < equipment.length; i++) {
+          var im = equipment[i], g = lib[im.userData.system]; if (!g) continue;
+          var old = im.geometry; im.geometry = g; im.userData.hull.geometry = g; im.material.vertexColors = true; im.material.needsUpdate = true; im.userData.shaped = 'glb'; if (old !== g) old.dispose(); n++;
+        }
+        host.setAttribute('data-cx-assets', n ? 'glb' : 'primitives'); host.setAttribute('data-cx-assets-count', String(n)); draw();
+      });
+    }
     var api = {
       setStatus: function (st) { status = indexStatus(st); applyStatus(); },
       setPaused: setPaused, focus: focus, preset: preset,
-      stats: function () { return { fps: lastFps, quality: quality, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, equipment: equipment.length, shaped: shaped, flows: flows.length, focused: focused, paused: paused }; },
+      stats: function () { return { fps: lastFps, quality: quality, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, equipment: equipment.length, shaped: shaped, assets: host.getAttribute('data-cx-assets') || 'primitives', glb: equipment.filter(function (e) { return e.userData.shaped === 'glb'; }).length, callouts: coEls.filter(function (c) { return !c.el.hidden; }).length, hulls: equipment.filter(function (e) { return e.userData.hull && e.userData.hull.visible; }).length, flows: flows.length, focused: focused, paused: paused }; },
       select: function (systemId) { for (var k in SITE) if (SITE[k].systems.indexOf(systemId) !== -1) { focus(k); return k; } return null; }
     };
     host.__rzCampus = api; return api;
@@ -288,8 +355,9 @@
   function boot(host, opts) {
     if (!host) return;
     function go() {
-      if (root.RZ3) return mount(host, opts);
       var me = document.querySelector('script[src*="rz-cx-campus.js"]'), base = me ? me.src.replace(/rz-cx-campus\.js.*$/, '') : 'js/';
+      opts = opts || {}; opts.base = base;
+      if (root.RZ3) return mount(host, opts);
       var sc = document.createElement('script'); sc.src = base + 'vendor/three-r170.min.js?v=' + encodeURIComponent(root.RZ_VERSION || ''); sc.onload = function () { mount(host, opts); };
       sc.onerror = function () { var s = host.querySelector('.cx-3d-stage'); if (s) s.innerHTML = '<p class="cx-3d-nogl">The 3D view could not load; the schematic above stands on its own.</p>'; host.setAttribute('data-cx-3d', 'failed'); };
       document.head.appendChild(sc);

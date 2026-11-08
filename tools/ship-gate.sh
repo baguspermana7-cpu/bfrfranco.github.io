@@ -259,6 +259,12 @@ gate "RZEngine — worked examples, data invariants, provenance; tracker + manua
 gate "TIA-942 manual — every count and the worked score follow the checklist items" node tools/test-tia942-manual.mjs
 gate "standards claims — no page prints a claim already proven wrong (IEEE 519 row, NFPA 2001 time, ASHRAE RH, Uptime Tier figures, GWP basis)" node tools/test-standard-claims.mjs
 gate "hub tools render — TIA checklist draws, every PLN plant on the map, fire checklist keeps ticks, tracker + PUE read the engine" node tools/test-hub-tools.mjs
+gate "Cx plan core — level math, gates, tags, totals are pure functions of the plan" node tools/test-cx-plan-core.mjs
+gate "Cx calendar — work-day shifts, baseline fields, witness slot float, clamped overrides" node tools/test-cx-calendar.mjs
+gate "Cx io — CSV round-trip, cell hygiene, duplicate ids, release rows" node tools/test-cx-io.mjs
+gate "Cx assets — every equipment family is a shaped, bounded, deterministic geometry" node tools/test-cx-assets.mjs
+gate "Cx glb library — Blender export matches a regenerated build byte for byte, footprints, shades" node tools/test-cx-glb.mjs --regen
+gate "Cx Analysis — plan editor, schematic, 3D campus with the glb library and callouts, Tier 1.5 calendar, both themes" node tools/test-cx-analysis.mjs
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs
 gate "deferred panels — the nine hidden panels do not paint before first paint" node tools/test-dcai-deferred-panels.mjs

@@ -7,6 +7,7 @@
  * that the per-instance status tint multiplies, so the handbook tag stays the hue. Proportions are representative
  * (typical catalogue shapes), not a vendor drawing. ES5; runs in Node under a vm-loaded RZ3 for the gate.
  *   RZCxAssets.build(T, type, w, h, d) → BufferGeometry (position · normal · color · index)
+ *   RZCxAssets.loadLibrary(T, url, done) → the Blender glb library (one geometry per family) or null
  *   RZCxAssets.TYPES → the family ids the campus draws · RZCxAssets.version */
 (function (root) {
   'use strict';
@@ -172,6 +173,33 @@
     var make = SHAPES[type]; if (!make || !T) return null;
     var B = builder(T); make(B, w, h, d); return B.merge();
   }
-  root.RZCxAssets = { build: build, TYPES: TYPES, version: '3.26.0' };
+  /* The Blender-built library (assets/cx/campus-equipment.glb, tools/cx-assets/build-cx-assets.py): one mesh per
+   * family, same footprints, COLOR_0 = the same grey factors. loadLibrary(T, url, done) → done(lib | null) where
+   * lib[type] is a BufferGeometry (position · normal · color); null when the loader or the file is unavailable,
+   * and the campus keeps the primitive shapes above. Never throws. */
+  function loadLibrary(T, url, done) {
+    if (!T || typeof T.GLTFLoader !== 'function') { done(null); return; }
+    var loader;
+    try { loader = new T.GLTFLoader(); } catch (e) { done(null); return; }
+    loader.load(url, function (gltf) {
+      var lib = {}, n = 0;
+      try {
+        gltf.scene.traverse(function (o) {
+          if (!o.isMesh || !o.geometry || !o.geometry.attributes.position) return;
+          var g = o.geometry, c = g.attributes.color;
+          if (c && c.itemSize === 4) { /* RGBA → RGB so the campus material path (vertexColors, vec3) stays one path */
+            var rgb = new Float32Array(c.count * 3);
+            for (var i = 0; i < c.count; i++) { rgb[i * 3] = c.getX(i); rgb[i * 3 + 1] = c.getY(i); rgb[i * 3 + 2] = c.getZ(i); }
+            g.setAttribute('color', new T.BufferAttribute(rgb, 3));
+          }
+          if (!g.attributes.color) return;
+          if (!g.boundingBox) g.computeBoundingBox();
+          lib[o.name] = g; n++;
+        });
+      } catch (e) { done(null); return; }
+      done(n ? lib : null);
+    }, undefined, function () { done(null); });
+  }
+  root.RZCxAssets = { build: build, loadLibrary: loadLibrary, TYPES: TYPES, version: '3.28.0' };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.RZCxAssets;
 })(typeof window !== 'undefined' ? window : this);

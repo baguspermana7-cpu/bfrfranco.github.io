@@ -121,11 +121,25 @@ try {
     const st3 = await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.stats());
     ok('3D: equipment families and flows drawn within the draw-call budget (<= 300)', st3.equipment >= 12 && st3.flows >= 8 && st3.drawCalls > 0 && st3.drawCalls <= 300, st3);
     ok('3D: every equipment family is a shaped asset (RZCxAssets), not a box', st3.shaped === st3.equipment && st3.equipment === 15, { shaped: st3.shaped, equipment: st3.equipment });
+    // P6 (3.28.0, §41 K15): the Blender library replaces the primitives, every unit has an outline hull, the site is a slab
+    const glb = await page.waitForFunction(() => document.getElementById('cxAnCampus').getAttribute('data-cx-assets') === 'glb', { timeout: 20000 }).then(() => true).catch(() => false);
+    const st6 = await page.evaluate(() => { const h = document.getElementById('cxAnCampus'); const s = h.__rzCampus.stats(); return { glb: s.glb, count: +h.getAttribute('data-cx-assets-count'), equipment: s.equipment, drawCalls: s.drawCalls }; });
+    ok('P6 the Blender glb library loads and replaces all 15 families (data-cx-assets=glb)', glb && st6.glb === 15 && st6.count === 15, st6);
+    ok('P6 draw calls stay <= 300 with the outline hulls', st6.drawCalls > 0 && st6.drawCalls <= 300, st6.drawCalls);
     await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.focus('hall'));
     await new Promise((r) => setTimeout(r, 700));
     const f3 = await page.evaluate(() => ({ focus: document.getElementById('cxAnCampus').getAttribute('data-cx-focus'), crumb: document.querySelector('#cxAnCampus .cx-3d-crumb').textContent }));
     ok('3D: focusing the hall lifts the roof and grows the breadcrumb', f3.focus === 'hall' && /Campus.*Data hall/.test(f3.crumb), f3);
-    if (SHOTS) await page.screenshot({ path: join(SHOTS, 'cx-campus-hall-1440-dark.png'), clip: { x: 0, y: 0, width: 1440, height: 1000 } });
+    const co = await page.evaluate(() => { const h = document.getElementById('cxAnCampus'); const els = [...h.querySelectorAll('.cx-3d-co')].filter((e) => !e.hidden); const lines = [...h.querySelectorAll('.cx-3d-callouts line')].filter((l) => l.getAttribute('visibility') !== 'hidden'); const w = h.querySelector('.cx-3d-stage').clientWidth; const inside = els.every((e) => { const r = e.getBoundingClientRect(), s = h.querySelector('.cx-3d-stage').getBoundingClientRect(); return r.left >= s.left - 1 && r.right <= s.right + 1 && r.top >= s.top - 1 && r.bottom <= s.bottom + 1; }); return { labels: els.length, lines: lines.length, texts: els.map((e) => e.textContent), inside, stats: h.__rzCampus.stats().callouts }; });
+    ok('P6 the focused hall shows >= 6 family callouts, one leader line each, all inside the stage', co.labels >= 6 && co.lines === co.labels && co.inside && co.stats === co.labels, co);
+    ok('P6 callouts name the family and its count (e.g. "rack rows · 220")', co.texts.some((s) => /^rack rows · \d+/.test(s)) && co.texts.some((s) => /CDU|cdu/.test(s)), co.texts);
+    if (SHOTS) { const stage = await page.$('#cxAnCampus'); await page.evaluate(() => document.getElementById('cxAnCampus').scrollIntoView({ block: 'center', behavior: 'instant' })); await new Promise((r) => setTimeout(r, 500)); await stage.screenshot({ path: join(SHOTS, 'cx-campus-hall-1440-dark.png') }); }   /* the stage itself, not the viewport top */
+    await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.focus(null)); await new Promise((r) => setTimeout(r, 400));
+    const coNone = await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.stats().callouts);
+    ok('P6 back on the campus the callouts are gone', coNone === 0, coNone);
+    const hulls = await page.evaluate(() => { const h = document.getElementById('cxAnCampus'); const a = h.__rzCampus.stats().hulls; h.__rzCampus.focus('hall'); return new Promise((r) => setTimeout(() => r({ campus: a, hall: h.__rzCampus.stats().hulls }), 300)); });
+    ok('P6 outline hulls are drawn only for the focused building (0 on the campus, >= 1 in the hall)', hulls.campus === 0 && hulls.hall >= 1, hulls);
+    await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.focus('hall')); await new Promise((r) => setTimeout(r, 400));
     await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.focus(null));
     const fpsSample = await page.evaluate(() => new Promise((res) => { let n = 0; const t0 = performance.now(); const tick = () => { n++; if (performance.now() - t0 < 3000) requestAnimationFrame(tick); else res(n / 3); }; requestAnimationFrame(tick); }));
     ok('3D: page keeps >= 24 fps over 3 s while the flows run (headless software GL)', fpsSample >= 24, { fps: Math.round(fpsSample) });
@@ -209,7 +223,7 @@ try {
     await p2.close(); }
   // T12 phone
   await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
-  await page.reload({ waitUntil: 'networkidle2' }); await page.waitForFunction(() => window.RZCxAnalysis && !document.getElementById('cxTabAnalysis').hidden, { timeout: 30000 });
+  await page.reload({ waitUntil: 'load' }); /* never networkidle on a page with a WebGL loop (feedback_webgl_headless_gate_traps) */ await page.waitForFunction(() => window.RZCxAnalysis && !document.getElementById('cxTabAnalysis').hidden, { timeout: 30000 });
   await new Promise((r) => setTimeout(r, 600));
   const phone = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, sx: window.scrollX, wide: [...document.querySelectorAll('#cxTabAnalysis *')].filter((e) => e.getBoundingClientRect().right > 391 && !e.closest('.cx-an-tablewrap') && !e.closest('.cx-an-sheet')).map((e) => e.tagName + '.' + e.className).slice(0, 5), small: [...document.querySelectorAll('#cxTabAnalysis input, #cxTabAnalysis select')].filter((e) => parseFloat(getComputedStyle(e).fontSize) < 16).length }));
   ok('T12 390 px: scrollWidth <= 390 and nothing outside the viewport (table wraps excepted)', phone.sw <= 390 && !phone.wide.length, phone);

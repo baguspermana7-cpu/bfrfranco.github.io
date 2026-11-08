@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v3.28.0 — 2026-11-08 — "Cx Analysis 3D: machines with shapes, drawn like an isometric"
+
+### Added
+- **`assets/cx/campus-equipment.glb` — a 15-family equipment library modelled in Blender 4.5 (headless, `tools/cx-assets/build-cx-assets.py`)**: racks, end-of-row CDUs, CRAH / fan walls, UPS, unit substations, LV switchboards, BMS racks, fire panel + agent, chillers, FWS pumps, dry coolers, generators, 150 kV bays, 150/20 kV transformers (radiators, bushings), 20 kV GIS hall. Y-up, metres, origin on the floor at the footprint centre; 5,812 triangles for the whole library; per-face shade written as a `FLOAT_COLOR` attribute so the exporter does not darken it. The build is deterministic — the gate regenerates the file and compares bytes.
+- **The 3D plant loads the library and swaps every family's geometry in place** (`js/rz-cx-assets.js` `loadLibrary` via `GLTFLoader`; the primitives stay as the fallback while it loads, `data-cx-assets="primitives|glb"` on the stage). Status tint, picking, dimming, roof lift and stats are unchanged.
+- **Isometric presentation**: true-iso campus preset (camera at [d, d, d], zoom 1.3), flat shading with a low front-left key light and a right fill so every box reads in three tones, an unlit slab plate (top + dark side) instead of a floor plane, theme-aware edge lines on every building, parapets, roof plant, louvre bands and doors on the halls, inverted-hull outlines on every unit of the focused building.
+- **Callouts**: focusing a building labels each equipment family in it (`family · count [· level]`, mono, tag square) in two columns at the stage edges with a dashed leader and a dot on the unit; they clear when the campus returns.
+- Gates: `tools/test-cx-glb.mjs` (110 laws: names, footprints inside the declared sizes, triangle budgets, unit normals, colour range, byte-for-byte regeneration with `--regen`) over a 60-line Node GLB reader `tools/lib/glb-read.mjs`; `tools/test-cx-analysis.mjs` +6 laws (library replaces 15/15 within 20 s, ≤ 300 draw calls, ≥ 6 callouts with equal leader lines inside the stage, callout texts, callouts gone on the campus, hulls only on the focused building).
+
+### Changed
+- `js/vendor/three-r170.min.js` (RZ3 bundle) rebuilt from `three@0.170.0` with `GLTFLoader` exported (61 → 62 exports, +69 KB; `tools/three-vendor-entry.js`). The hub 3D and DH01 pages load the same bundle and keep every export they used.
+- **The six Cx gates are now wired into `tools/ship-gate.sh`** (plan core, calendar, io, assets, glb, Cx Analysis browser). They existed since v3.26.0 and were run by hand only — the same "gate exists but is not wired" defect the gate-wiring test guards for CLAUDE.md audits.
+
 ## v3.27.0 — 2026-11-08 — "LTC lab: every figure from the plant, one step at a time"
 
 ### Added
