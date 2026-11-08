@@ -56,9 +56,15 @@ function scan(keys) {
     let h = mx === p.r ? ((p.g - p.b) / d) % 6 : mx === p.g ? (p.b - p.r) / d + 2 : (p.r - p.g) / d + 4; h *= 60; return h < 0 ? h + 360 : h; };
   const light = (c) => { const p = rgb(c); return p ? (Math.max(p.r, p.g, p.b) + Math.min(p.r, p.g, p.b)) / 2 : 1; };
   const transparent = (c) => /rgba\(0, 0, 0, 0\)|transparent/.test(c);
+  // A 1 px offset with no blur and no spread is a drawn hairline (a sticky table column keeps its rule this way, since
+  // collapsed borders scroll away with the cell), not a shadow. Every shadow in the list must be one.
+  const hairline = (bs) => bs.split(/,(?![^(]*\))/).every((p) => { const n = (p.match(/-?\d+(?:\.\d+)?px/g) || []).map(parseFloat);
+    return n.length >= 3 && Math.abs(n[0]) <= 1 && Math.abs(n[1]) <= 1 && n[2] === 0 && (n[3] || 0) === 0; });
   const out = Object.fromEntries(keys.map((k) => [k, []]));
   const name = (e) => e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (e.classList.length ? '.' + [...e.classList].slice(0, 2).join('.') : '');
   const inArt = (e) => e.closest('canvas,svg,figure,[data-rz-chart],.chart,.legend,code,pre,kbd,samp');
+  // A circle (|w - h| <= 2 px and radius >= half the side, e.g. an ISA pump symbol) is not a pill: a pill is a capsule;
+  // a 30x30 box with a 12 px radius is still counted.
   // A state rail or state chip is content, not decoration (IEC 62682 severity ramp): exempt ONLY when the element
   // ITSELF carries a state class from this fixed list — never by register or page. Agreed with the LTC session
   // 2026-11-08: `.cap-card.ok` and `#alarmStrip.state-warn` are exempt, a plain `.pump-unit` rail is still reported.
@@ -73,7 +79,7 @@ function scan(keys) {
     if (side && sat(side) > 0.25 && r.height >= 40 && c.borderLeftStyle !== 'none' && !stateful(e)) out.rail.push(name(e));
     const rr = c.borderTopLeftRadius; const rad = /%/.test(rr) ? (parseFloat(rr) || 0) * Math.min(r.width, r.height) / 100 : (parseFloat(rr) || 0);
     const filled = !transparent(c.backgroundColor) || bt >= 1;
-    if (rad >= 12 && r.height < 44 && filled && e.tagName !== 'INPUT' && !/toggle|switch|avatar|dot|knob|thumb/i.test(e.className) && !stateful(e)) out.pill.push(name(e));
+    if (rad >= 12 && r.height < 44 && filled && !(Math.abs(r.width - r.height) <= 2 && rad >= Math.min(r.width, r.height) / 2 - 0.5) && e.tagName !== 'INPUT' && !/toggle|switch|avatar|dot|knob|thumb/i.test(e.className) && !stateful(e)) out.pill.push(name(e));
     if (rad > 8 && r.width >= 200 && !transparent(c.backgroundColor)) out.round.push(name(e));
     if (c.backdropFilter && c.backdropFilter !== 'none') out.blur.push(name(e));
     const grad = /gradient/.test(c.backgroundImage);
@@ -82,7 +88,7 @@ function scan(keys) {
     if (c.transitionProperty.split(',').some((p) => p.trim() === 'all') && c.transitionDuration.split(',').some((d) => parseFloat(d) > 0)) out.tall.push(name(e));
     if (c.boxShadow !== 'none' && !/inset/.test(c.boxShadow) && r.width >= 160 && r.height >= 40 && !transparent(c.backgroundColor)
       && !(document.activeElement === e) && c.position !== 'fixed' && !e.closest('[role="dialog"],dialog,.modal,[class*="modal"],[class*="overlay"],[class*="dropdown"],[class*="popover"],[class*="tooltip"],[class*="toast"],[class*="sheet"]')
-      && !/^(0px 0px 0px \d+(?:\.\d+)?px)/.test(c.boxShadow)) out.shadow.push(name(e));
+      && !/^(0px 0px 0px \d+(?:\.\d+)?px)/.test(c.boxShadow) && !hairline(c.boxShadow)) out.shadow.push(name(e));
     const fam = c.fontFamily.split(',')[0].replace(/["']/g, '').trim();
     if (/fraunces|playfair|georgia|garamond|merriweather|lora|crimson|cormorant|libre baskerville|times/i.test(fam) && parseFloat(c.fontSize) >= 20 && e.textContent.trim()) out.serif.push(name(e));
     if (!transparent(c.backgroundColor) && r.width >= 200 && r.height >= 80 && !inArt(e)) { const h = hue(c.backgroundColor), s = sat(c.backgroundColor), l = light(c.backgroundColor); if (h >= 205 && h <= 250 && s >= 0.35 && l <= 0.3) out.navy.push(name(e)); }

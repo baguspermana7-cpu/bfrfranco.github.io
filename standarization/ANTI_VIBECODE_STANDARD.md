@@ -50,6 +50,12 @@ file/rule findings across 172 files despite exit 0**.
   exits 1 on any tell in either theme); it does not replace this document's strict gate. Page-local sweeps:
   `tools/sweep-journal-register.py` (R1–R18, the journal family) and `tools/sweep-page-register.py` (P1–P7, any
   named page, by value not by token); both are idempotent and `--check`able.
+  Exemptions are narrow and each is proven against the unfixed tree (fixture `tools/fixtures/slop-precision.html`):
+  a rail or pill is exempt only when the element itself carries a state class (`ok|warn|fault|alarm|trip|run|stop|
+  state-*`), so a cockpit rail must name its state in a class set by the code that sets the state (v3.30.3); a circle
+  (|w−h| ≤ 2 px and radius ≥ half the side, e.g. an ISA pump symbol) is not a pill, while a 30×30 box at r12 and a
+  99 px capsule still count; a box-shadow whose every layer has blur 0, spread 0 and |x|,|y| ≤ 1 px is a drawn
+  hairline (a sticky table column keeps its rule this way), not a shadow (v3.30.4).
 - **A gradient hides a contrast failure (v3.27.0):** axe cannot measure text over a gradient and files it
   as "incomplete", so the gate stays green. Flattening the glossary hero (a slop fix) exposed light-theme
   navbar links at 2.27:1. When a gradient or image background becomes a flat colour, run

@@ -448,6 +448,25 @@
             .kpi-grid { grid-template-columns: 1fr !important; }
         }
     #cookieAccept { background:#E8B563 !important; color:#16181d !important; }
+
+        /* v3.30.4: the KPI band is one framed panel of rows (label | value | basis), not five tiles (A29). The hero is
+           ranked by size; ids, basis hooks and state classes are unchanged. */
+        .kpi-grid { display: block !important; background: var(--panel-bg); border: 1px solid var(--panel-line); border-radius: 4px; }
+        .kpi-grid > .kpi { display: grid; grid-template-columns: minmax(9rem, 13rem) minmax(0, max-content) minmax(0, 1fr);
+            column-gap: 16px; row-gap: 2px; align-items: baseline; background: none; border: 0; border-radius: 0;
+            border-bottom: 1px solid var(--panel-line); padding: 10px 14px; grid-column: auto !important; }
+        .kpi-grid > .kpi:last-child { border-bottom: 0; }
+        .kpi-grid > .kpi h3, .kpi-grid > .kpi .th { margin: 0; }
+        .kpi-grid > .kpi .v { font-size: 20px; }
+        .kpi-grid > .kpi.hero .v { font-size: 28px; }
+        .kpi-grid > .kpi .th { font-size: 11px; }
+        @media (max-width: 640px) {
+            .kpi-grid > .kpi { grid-template-columns: minmax(0, 1fr) max-content; }
+            .kpi-grid > .kpi .th { grid-column: 1 / -1; }
+            .kpi-grid > .kpi .v, .kpi-grid > .kpi.hero .v { font-size: 20px; }
+            .kpi-grid > .kpi, .kpi-grid > .kpi.hero { padding: 10px 14px !important; }  /* beats the generic mobile .hero padding */
+            .kpi-grid > .kpi .th { display: flex; align-items: center; }
+        }
 </style>
     <script src="js/rz-version.js?v=20261108-73f2dab8" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
@@ -521,7 +540,7 @@
 
     <!-- KPI strip — value | unit | threshold (doc-07 §"KPI Cards")
          v1.23.4 doc-14 §7: WUE is the visual hero (page-purpose KPI). -->
-    <div class="kpi-grid" data-rz-doc-section="ws-kpi" data-rz-doc-label="Water KPI band — WUE, make-up, treatment flow, filter DP">
+    <div class="kpi-grid" data-rz-fact-list data-rz-doc-section="ws-kpi" data-rz-doc-label="Water KPI band — WUE, make-up, treatment flow, filter DP">
         <div class="kpi hero">
             <h3>Instant WUE</h3>
             <div class="v"><span id="kWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">&mdash;</span> <small>L/kWh</small></div>
