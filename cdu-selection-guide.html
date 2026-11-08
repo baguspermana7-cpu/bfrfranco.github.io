@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-rz-register="editorial">
+<html lang="en" data-theme="dark" data-rz-register="tool">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
     <title>CDU Selection &amp; Deployment Guide | ResistanceZero</title>
     <meta name="description" content="Compare in-row, in-rack, sidecar, L2L vs L2A and 2-phase CDUs with verified vendor specs, manual links, sizing math, installation requirements and maintenance.">
     <meta name="ai-content-declaration" content="human-authored">
-    <meta name="ai-content-declaration" content="human-curated, research-assisted">
+    <meta name="ai-content-declaration" content="human-written, research-assisted">
     <meta name="keywords" content="CDU comparison, coolant distribution unit, liquid cooling, in-row CDU, in-rack CDU, L2L, L2A, direct liquid cooling, Vertiv CoolChip, CoolIT CHx, Motivair, AI data center cooling, CDU deployment checklist, CDU maintenance">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
@@ -51,219 +51,159 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="styles.min.css?v=20261105-a05dc709">
 
     <style>
-        :root { --cdu-primary:var(--rz-accent-ui); --cdu-accent:var(--rz-accent-ui); --cdu-gold:#f59e0b; }
-        [data-theme="dark"] { --cdu-bg:#0e0f12; --cdu-card:#16181d; --cdu-border:#2a2d34; --cdu-text:#f1f5f9; --cdu-muted:#94a3b8; --cdu-inset:#121316; }
-        :root:not([data-theme="dark"]) { --cdu-primary:var(--rz-accent-ui); --cdu-bg:#f8fafc; --cdu-card:#ffffff; --cdu-border:#e2e8f0; --cdu-text:#191B20; --cdu-muted:#475569; --cdu-inset:#f1f5f9; }
-
-        .cdu-hero { background: transparent; border-bottom: 1px solid rgba(128,128,128,0.18); padding:7.5rem 1.5rem 3.5rem; color: inherit; text-align:center; position:relative; overflow:hidden; }
-        .cdu-hero::before { content:''; position:absolute; inset:0; background: none; z-index:0; }
-        .cdu-hero > * { position:relative; z-index:1; }
-        .cdu-hero h1 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:clamp(1.9rem,4.4vw,3rem); font-weight:600; margin:0 0 .8rem; letter-spacing:-.015em; }
-        .cdu-hero p { font-size:clamp(1rem,1.7vw,1.18rem); max-width:64ch; margin:0 auto; color: inherit; line-height:1.6; }
-        .cdu-badges { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; margin-top:1.4rem; }
-        .cdu-badge { font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.04em; text-transform:uppercase; font-weight:600; padding:.35rem .7rem; border-radius:6px; border:1px solid rgba(128,128,128,.35); background:rgba(128,128,128,.08); color: inherit; }
-
-        body { font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif; }
-        main { background:var(--cdu-bg); color:var(--cdu-text); }
-        .kw, .formula, table.cdu-tbl .kw { font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
-        .cdu-wrap { max-width:1180px; margin:0 auto; padding:0 1.4rem; }
-        .cdu-sec { padding:3rem 0; border-top:1px solid var(--cdu-border); }
-        .cdu-sec:first-of-type { border-top:0; }
-        .cdu-sec h2 { font-size:clamp(1.4rem,2.6vw,2rem); margin:0 0 .4rem; letter-spacing:-.01em; }
-        .cdu-sec .lead { color:var(--cdu-muted); max-width:70ch; margin:0 0 1.4rem; line-height:1.6; }
-        .cdu-kick { font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; color:var(--cdu-primary); font-weight:600; display:block; margin-bottom:.5rem; }
-
-        /* link-status legend + tags */
-        .lstag { font-family:'JetBrains Mono',monospace; font-size:.6rem; font-weight:700; letter-spacing:.03em; padding:1px 6px; border-radius:4px; white-space:nowrap; display:inline-block; }
-        .lstag.v { background:rgba(16,185,129,.14); color:#065f46; border:1px solid rgba(16,185,129,.4); }
-        .lstag.p { background:rgba(245,158,11,.14); color:#92400e; border:1px solid rgba(245,158,11,.4); }
-        [data-theme="dark"] .lstag.v { color:#34d399; }
-        [data-theme="dark"] .lstag.p { color:#fbbf24; }
-        .lstag[style*="color:#0891b2"], .lstag[style*="color: #0891b2"] { color:#64748b !important; }
-        [data-theme="dark"] .lstag[style*="color:#0891b2"], [data-theme="dark"] .lstag[style*="color: #0891b2"] { color:#67e8f9 !important; }
-        a[href$="cdu-checklist.html#water"] { text-decoration:underline; text-underline-offset:2px; }
-        .legend { display:flex; gap:1rem; flex-wrap:wrap; font-size:.78rem; color:var(--cdu-muted); margin:.4rem 0 1.2rem; align-items:center; }
-
-        /* type taxonomy cards */
-        .cdu-types { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:.9rem; }
-        .typecard { border:1px solid var(--cdu-border); border-radius:4px; background:var(--cdu-card); padding:1.1rem 1.2rem; border-top:2px solid var(--tc,var(--cdu-primary)); }
-        .typecard h3 { font-size:1.02rem; margin:0 0 .3rem; }
-        .typecard .cap { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--cdu-primary); margin-bottom:.5rem; }
-        .typecard p { font-size:.85rem; color:var(--cdu-muted); margin:0; line-height:1.55; }
-        /* type mini-diagram (layout + P&ID signature) */
-        .tc-svg{ width:100%; height:auto; display:block; margin:.1rem 0 .7rem; border:1px solid var(--cdu-border); border-radius:8px; background:var(--cdu-inset); }
-        .tc-svg .rk{ fill:var(--cdu-card); stroke:var(--cdu-border); stroke-width:1; }
-        .tc-svg .cd{ fill:var(--tc); fill-opacity:.18; stroke:var(--tc); stroke-width:1.4; }
-        .tc-svg .lb{ font-family:'JetBrains Mono',monospace; font-size:7px; fill:var(--cdu-muted); }
-        .tc-svg .lbc{ font-family:'JetBrains Mono',monospace; font-size:7px; fill:var(--tc); font-weight:700; }
-        .tc-svg .ps{ stroke:#3b82f6; stroke-width:1.6; fill:none; stroke-linecap:round; }
-        .tc-svg .pr{ stroke:#FF3030; stroke-width:1.2; fill:none; stroke-linecap:round; opacity:.85; }
-        .tc-svg .pa{ stroke:#f59e0b; stroke-width:1.4; fill:none; stroke-linecap:round; }
-        @media (prefers-reduced-motion:no-preference){ .tc-svg .fl{ stroke-dasharray:5 6; animation:tcdash 1.3s linear infinite; } }
-        @keyframes tcdash{ to{ stroke-dashoffset:-22; } }
-        /* sizing section */
-        .cdu-sec h3{ font-size:1.05rem; margin:1.5rem 0 .4rem; color:var(--cdu-text); }
-        .szlist{ list-style:none; margin:.4rem 0 0; padding:0; display:grid; gap:7px; }
-        .szlist li{ position:relative; padding-left:1.15rem; font-size:.88rem; color:var(--cdu-muted); line-height:1.55; }
-        .szlist li::before{ content:'▸'; position:absolute; left:0; color:var(--cdu-primary); }
-        .szlist li b{ color:var(--cdu-text); }
-        .formula{ font-family:'JetBrains Mono',monospace; font-size:.92rem; background:var(--cdu-inset); border:1px solid var(--cdu-border); border-left:3px solid var(--cdu-primary); border-radius:8px; padding:.75rem 1rem; margin:.6rem 0; color:var(--cdu-text); overflow-x:auto; }
-        .formula .c{ color:var(--cdu-muted); font-size:.76rem; }
+        /* cdu-selection-guide on the tool register (v3.28.2). rz-tool.css owns .ck-sec/.ck-tbl/.ck-tbl-wrap/.src and the
+           shell; this block keeps what is particular to this page, on the register's tokens. */
+        body.tool { --ck-card: var(--rzt-panel); --ck-border: var(--rzt-line); --ck-text: var(--rzt-text);
+            --ck-muted: var(--rzt-muted); --ck-inset: var(--rzt-inset); --ck-accent: var(--rzt-accent-text);
+            --ck-mono: var(--rzt-mono); --ck-sans: var(--rzt-sans); }
+        body.tool .ck-sec h3 { font: 600 16px/1.35 var(--ck-sans); color: var(--ck-text); margin: 1.4rem 0 .5rem; }
+        body.tool .ck-sec p.lead.tight { margin-bottom: .5rem; }
+        body.tool .mu { color: var(--ck-muted); }
+        body.tool .ck-note .src, body.tool .ck-sec p .src, body.tool .links .src { white-space: normal; }
+        body.tool .legend { margin: .4rem 0 .8rem; font-size: 13px; line-height: 1.9; color: var(--ck-muted); }
+        /* type taxonomy: one panel per type, the CDU drawn in amber, supply solid, return dashed (no colour code) */
+        body.tool .cdu-types { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .9rem; }
+        body.tool .typecard { border: 1px solid var(--ck-border); border-radius: 4px; background: var(--ck-card); padding: 1.1rem 1.2rem; }
+        body.tool .typecard h3 { font: 600 15px var(--ck-sans); margin: 0 0 .3rem; }
+        body.tool .typecard .cap { font: 400 12px var(--ck-mono); color: var(--ck-muted); margin-bottom: .5rem; }
+        body.tool .typecard p { font-size: 14px; color: var(--rzt-text-2); margin: 0; line-height: 1.55; }
+        body.tool .tc-svg { width: 100%; height: auto; display: block; margin: .1rem 0 .7rem; border: 1px solid var(--ck-border); border-radius: 4px; background: var(--ck-inset); }
+        body.tool .tc-svg .rk { fill: var(--ck-card); stroke: var(--ck-muted); stroke-opacity: .5; stroke-width: 1; }
+        body.tool .tc-svg .cd { fill: none; stroke: var(--rzt-accent); stroke-width: 1.4; }
+        body.tool .tc-svg .lb { font: 400 7px var(--ck-mono); fill: var(--ck-muted); }
+        body.tool .tc-svg .lbc { font: 700 7px var(--ck-mono); fill: var(--ck-accent); }
+        body.tool .tc-svg .ps { stroke: var(--rzt-text-2); stroke-width: 1.6; fill: none; stroke-linecap: round; }
+        body.tool .tc-svg .pr { stroke: var(--ck-muted); stroke-width: 1.2; fill: none; stroke-dasharray: 3 3; }
+        body.tool .tc-svg .pa { stroke: var(--ck-muted); stroke-width: 1.4; fill: none; stroke-dasharray: 1 3; stroke-linecap: round; }
+        /* sizing */
+        body.tool .szlist { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: 7px; }
+        body.tool .szlist li { position: relative; padding-left: 1.15rem; font-size: 14px; color: var(--rzt-text-2); line-height: 1.55; }
+        body.tool .szlist li::before { content: '\2013'; position: absolute; left: 0; color: var(--ck-muted); }
+        body.tool .szlist li b { color: var(--ck-text); }
+        body.tool .formula { font: 400 14px var(--ck-mono); color: var(--ck-text); background: var(--ck-inset); border: 1px solid var(--ck-border); border-radius: 4px; padding: .75rem 1rem; margin: .5rem 0 1rem; overflow-x: auto; font-variant-numeric: tabular-nums slashed-zero; }
+        body.tool .formula .c { color: var(--rzt-text-2); font-size: 12px; }
         /* FAQ */
-        .faq-item{ border:1px solid var(--cdu-border); border-radius:4px; background:var(--cdu-card); margin-bottom:8px; overflow:hidden; }
-        .faq-item summary{ cursor:pointer; padding:.85rem 1rem; font-weight:600; font-size:.94rem; color:var(--cdu-text); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:1rem; transition:color .15s; }
-        .faq-item summary:hover{ color:var(--cdu-primary); }
-        .faq-item summary:focus-visible{ outline:2px solid var(--cdu-primary); outline-offset:2px; border-radius:6px; }
-        .faq-item summary::-webkit-details-marker{ display:none; }
-        .faq-item summary::after{ content:'+'; font-family:'JetBrains Mono',monospace; color:var(--cdu-primary); font-size:1.2rem; line-height:1; }
-        .faq-item[open] summary::after{ content:'\2013'; }
-        .faq-item .faq-a{ padding:0 1rem 1rem; font-size:.87rem; color:var(--cdu-muted); line-height:1.6; }
-        .faq-item .faq-a b{ color:var(--cdu-text); }
-
-        /* comparison tables */
-        .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--cdu-border); border-radius:8px;
-            background:
-              linear-gradient(to right, var(--cdu-card) 30%, rgba(255,255,255,0)) 0 0/36px 100% no-repeat local,
-              linear-gradient(to left, var(--cdu-card) 30%, rgba(255,255,255,0)) 100% 0/36px 100% no-repeat local,
-              radial-gradient(farthest-side at 0 50%, rgba(232,181,99,.22), rgba(0,0,0,0)) 0 0/14px 100% no-repeat scroll,
-              radial-gradient(farthest-side at 100% 50%, rgba(232,181,99,.22), rgba(0,0,0,0)) 100% 0/14px 100% no-repeat scroll;
-            background-color:var(--cdu-card); }
-        table.cdu-tbl { width:100%; border-collapse:collapse; font-size:.85rem; min-width:1320px; }
-        table.cdu-tbl th { background:var(--cdu-inset); text-align:left; padding:.7rem .9rem; font-family:'JetBrains Mono',monospace; font-size:.62rem; letter-spacing:.04em; text-transform:uppercase; color:var(--cdu-muted); border-bottom:2px solid var(--cdu-border); white-space:nowrap; }
-        table.cdu-tbl td { padding:.75rem .9rem; border-bottom:1px solid rgba(148,163,184,.16); vertical-align:top; line-height:1.5; }
-        /* column widths — give the dense spec column room so it stops wrapping word-by-word */
-        table.cdu-tbl th:nth-child(1), table.cdu-tbl td:nth-child(1){ min-width:160px; }
-        table.cdu-tbl th:nth-child(7), table.cdu-tbl td:nth-child(7){ min-width:160px; }
-        table.cdu-tbl th:nth-child(8), table.cdu-tbl td:nth-child(8){ min-width:300px; max-width:340px; }
-        table.cdu-tbl th:nth-child(9), table.cdu-tbl td:nth-child(9){ min-width:130px; }
-        table.cdu-tbl tr:last-child td { border-bottom:0; }
-        table.cdu-tbl tbody tr:hover { background:var(--cdu-inset); }
-        table.cdu-tbl .model { font-weight:700; color:var(--cdu-text); }
-        table.cdu-tbl .vendor { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--cdu-muted); }
-        table.cdu-tbl .kw { font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--cdu-primary); white-space:nowrap; }
-        .links { display:flex; flex-direction:column; gap:3px; }
-        .links a { font-size:.74rem; color:var(--cdu-primary); text-decoration:none; display:inline-flex; align-items:center; gap:5px; }
-        .links a:hover { text-decoration:underline; }
-
-        .disclaimer { border:1px dashed var(--cdu-border); border-radius:10px; background:var(--cdu-inset); padding:1rem 1.2rem; font-size:.82rem; color:var(--cdu-muted); line-height:1.6; margin-top:1.4rem; }
-        .disclaimer b { color:var(--cdu-text); }
-        .next-strip { display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1rem; }
-        .next-pill { font-family:'JetBrains Mono',monospace; font-size:.66rem; padding:.3rem .6rem; border:1px solid var(--cdu-border); border-radius:6px; color:var(--cdu-muted); }
-        .next-pill.soon { color:var(--cdu-gold); border-color:rgba(245,158,11,.4); }
-
-        /* v1.8.0 — mobile responsive patch */
-        @media (max-width:768px){
-            html, body { overflow-x:hidden; max-width:100vw; }
-            img, picture, video, svg { max-width:100%; height:auto; }
-            .cdu-hero{padding:6rem 1rem 2.5rem;}
-            .nav-menu, .nav-links { display:none; }
-            .cdu-types { grid-template-columns:1fr; }
-            .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
-            button, a.btn, [role="button"], .theme-toggle, .hamburger { min-height:44px; min-width:44px; }
-            .tbl-wrap { max-width:100vw; }
-        }
-        @media (max-width:480px){ .legend{flex-direction:column;align-items:flex-start;gap:.4rem;} }
-        .rz-chart{ margin:1.6rem 0; }
-        .rz-chart-title{ font-family:'JetBrains Mono',monospace; font-size:.82rem; font-weight:600; color:var(--cdu-text); margin-bottom:.7rem; line-height:1.45; }
-        .rz-chart-canvas{ position:relative; height:300px; }
-        .rz-chart-src{ font-family:'JetBrains Mono',monospace; font-size:.64rem; color:var(--cdu-muted); margin-top:.7rem; line-height:1.5; }
-        .rz-chart-chip{ display:inline-block; font-weight:700; font-size:.58rem; letter-spacing:.04em; padding:1px 6px; border-radius:4px; margin-right:6px; background:rgba(120,130,145,.16); color:var(--cdu-muted); }
-        .rz-chart-chip.derived{ background:rgba(16,185,129,.14); color:#047857; }
-        .rz-chart-chip.warn{ background:rgba(245,158,11,.16); color:#92400e; }
-        [data-theme="dark"] .rz-chart-chip.derived{ background:rgba(16,185,129,.18); color:#34d399; }
-        [data-theme="dark"] .rz-chart-chip.warn{ background:rgba(245,158,11,.18); color:#fbbf24; }
-    
-/* sweep-cyan-register: the page accent, per theme */
-:root:not([data-theme="dark"]){--rz-accent-ui:#92400e;--rz-on-accent-ui:#ffffff}
-[data-theme="dark"]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
-:root:not([data-theme="dark"]) [data-rz-dark-panel]{--rz-accent-ui:#E8B563;--rz-on-accent-ui:#121316}
-/* sweep-cyan-register: page tokens re-resolve inside dark panels */
-:root:not([data-theme="dark"]) [data-rz-dark-panel]{--cdu-accent:var(--rz-accent-ui);--cdu-primary:var(--rz-accent-ui)}
+        body.tool .faq-item { border: 1px solid var(--ck-border); border-radius: 4px; background: var(--ck-card); margin-bottom: 8px; }
+        body.tool .faq-item summary { cursor: pointer; padding: .85rem 1rem; font-weight: 600; font-size: 15px; color: var(--ck-text); list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        body.tool .faq-item summary::-webkit-details-marker { display: none; }
+        body.tool .faq-item summary::after { content: '+'; font-family: var(--ck-mono); color: var(--ck-muted); }
+        body.tool .faq-item[open] summary::after { content: '\2013'; }
+        body.tool .faq-item .faq-a { padding: 0 1rem 1rem; font-size: 14px; color: var(--rzt-text-2); line-height: 1.6; }
+        body.tool .faq-item .faq-a b { color: var(--ck-text); }
+        /* comparison tables: column widths for the dense spec column */
+        body.tool table.cdu-tbl { min-width: 1320px; }
+        body.tool table.cdu-tbl th:nth-child(1), body.tool table.cdu-tbl td:nth-child(1) { min-width: 160px; }
+        body.tool table.cdu-tbl th:nth-child(7), body.tool table.cdu-tbl td:nth-child(7) { min-width: 160px; }
+        body.tool table.cdu-tbl th:nth-child(8), body.tool table.cdu-tbl td:nth-child(8) { min-width: 300px; max-width: 340px; }
+        body.tool table.cdu-tbl th:nth-child(9), body.tool table.cdu-tbl td:nth-child(9) { min-width: 130px; }
+        body.tool table.cdu-tbl .model { font-weight: 600; color: var(--ck-text); }
+        body.tool table.cdu-tbl .vendor { font: 400 12px var(--ck-mono); color: var(--ck-muted); }
+        body.tool table.cdu-tbl .kw { font-family: var(--ck-mono); font-weight: 500; color: var(--ck-text); white-space: nowrap; }
+        body.tool .links { display: flex; flex-direction: column; gap: 6px; }
+        body.tool .links a { font-size: 14px; color: var(--ck-text); text-decoration: underline; text-decoration-color: var(--rzt-line-strong); text-underline-offset: 3px; }
+        body.tool .links a:hover { text-decoration-color: var(--rzt-accent); }
+        body.tool table.cdu-tbl .links a { font-size: 13px; }
+        body.tool .ck-note { border: 1px solid var(--ck-border); border-radius: 4px; background: var(--ck-card); padding: 1rem 1.2rem; font-size: 14px; color: var(--rzt-text-2); line-height: 1.6; margin-top: 1.2rem; }
+        body.tool .ck-note b { color: var(--ck-text); }
+        /* sourced chart (rz-article-chart.js) */
+        body.tool .rz-chart { margin: 1.6rem 0; }
+        body.tool .rz-chart-title { font: 600 14px/1.45 var(--ck-sans); color: var(--ck-text); margin-bottom: .7rem; }
+        body.tool .rz-chart-canvas { position: relative; height: 300px; }
+        body.tool .rz-chart-src { font: 400 12px/1.5 var(--ck-mono); color: var(--ck-muted); margin-top: .7rem; }
+        body.tool .rz-chart-chip { display: inline-block; font: 600 11px var(--ck-mono); letter-spacing: .04em; padding: 1px 6px; margin-right: 6px; border: 1px solid var(--ck-border); border-radius: 2px; color: var(--ck-muted); background: none; }
 </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261107-7aaef8f4">
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 
     <script src="js/rz-version.js?v=20261108-e2872eb2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
 </head>
-<body>
+<body class="hub tool">
     <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" fetchpriority="high" width="400" height="400"></a>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li class="nav-dropdown">
-                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li role="menuitem"><a href="datacenter-solutions.html" style="font-weight: 600;">DC Solutions Hub</a></li>
-                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="datahallAI.html" style="color: #64748b;" title="Root & Educator access only">🔒 DC AI/HPC</a></li>
-                        <li role="menuitem"><a href="dc-conventional.html" title="Root & Educator access only">🔒 DC Conventional</a></li>
-                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="tco-calculator.html" style="color: #64748b; font-weight: 600;">TCO Calculator</a></li>
-                        <li role="menuitem"><a href="capex-calculator.html">CAPEX Calculator</a></li>
-                        <li role="menuitem"><a href="opex-calculator.html">OPEX Calculator</a></li>
-                        <li role="menuitem"><a href="roi-calculator.html">ROI Calculator</a></li>
-                        <li role="separator" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li role="menuitem"><a href="dc-market-tracker.html" style="font-weight: 600;">DC Market</a></li>
-                        <li role="menuitem"><a href="dcmoc/" style="font-weight: 600;">DC MOC</a></li>
-                    </ul>
-                </li>
-                <li class="nav-dropdown">
-                    <a href="insights.html" class="nav-link">Insights <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="articles.html" style="font-weight:600;">Engineering Journal</a></li>
-                        <li><a href="geopolitics.html">Global Analysis</a></li>
-                        <li><a href="future-forward.html">Future Forward</a></li>
-                        <li><a href="glossary.html">Glossary</a></li>
-                        <li style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
-                        <li><a href="insights.html" style="color:#64748b;font-size:0.85rem;">All Insights</a></li>
-                    </ul>
-                </li>
-                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-            </ul>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            </button>
-            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+<nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+  <div class="nav-container wrap">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/favicon-32.png" alt="" width="24" height="24">
+      <span class="nav-title">DC Solutions<small>Engineering &amp; Telemetry</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="glossary.html" class="nav-link">Glossary</a>
+      <a href="datahallAI.html" class="nav-link"><i class="fas fa-lock lock" aria-hidden="true"></i> DC AI/HPC</a>
+      <div class="nav-dropdown">
+        <a href="dc-conventional.html" class="nav-link" aria-haspopup="true"><i class="fas fa-lock lock" aria-hidden="true"></i> DC Conventional <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="dc-conventional.html" class="dropdown-item"><i class="fas fa-th-large"></i> Overview</a>
+          <a href="EPMS_Telemetry.html" class="dropdown-item"><i class="fas fa-bolt"></i> EPMS</a>
+          <a href="datahall.html" class="dropdown-item"><i class="fas fa-server"></i> Data Hall</a>
+          <a href="chiller-plant.html" class="dropdown-item"><i class="fas fa-snowflake"></i> Cooling</a>
+          <a href="fire-system.html" class="dropdown-item"><i class="fas fa-fire-extinguisher"></i> Fire</a>
+          <a href="fuel-system.html" class="dropdown-item"><i class="fas fa-gas-pump"></i> Fuel</a>
+          <a href="water-system.html" class="dropdown-item"><i class="fas fa-tint"></i> Water</a>
+          <a href="ict.html" class="dropdown-item"><i class="fas fa-network-wired"></i> ICT</a>
         </div>
-    </nav>
-
-    <header class="cdu-hero">
-        <h1>CDU Selection &amp; Deployment Guide</h1>
-        <p>The Coolant Distribution Unit is the heart of every direct-liquid-cooled AI/HPC hall — it isolates the facility water loop from the sensitive technology (cold-plate) loop, sets the flow and temperature the GPUs actually see, and carries the filtration, leak-detection and redundancy that keep a 100&nbsp;kW rack alive. This guide compares real CDUs by type, with verified vendor specs and links.</p>
-        <div class="cdu-badges">
-            <span class="cdu-badge">In-row · In-rack · Sidecar</span>
-            <span class="cdu-badge">L2L vs L2A</span>
-            <span class="cdu-badge">Verified vendor links</span>
-            <span class="cdu-badge">Deploy + maintain</span>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#calculators" class="nav-link" aria-haspopup="true">Calculators <i class="fas fa-chevron-down lock" aria-hidden="true"></i></a>
+        <div class="dropdown-menu">
+          <a href="capex-calculator.html" class="dropdown-item"><i class="fas fa-building"></i> CAPEX</a>
+          <a href="opex-calculator.html" class="dropdown-item"><i class="fas fa-coins"></i> OPEX</a>
+          <a href="pue-calculator.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> PUE</a>
+          <a href="tia-942-checklist.html" class="dropdown-item"><i class="fas fa-certificate"></i> TIA-942</a>
+          <a href="cx-calculator.html" class="dropdown-item"><i class="fas fa-clipboard-check"></i> Cx</a>
+          <a href="dcmoc/" class="dropdown-item"><i class="fas fa-chart-line"></i> DC MOC</a>
+          <a href="rfs-readiness-workbench.html" class="dropdown-item"><i class="fas fa-tasks"></i> RFS Workbench</a>
         </div>
-    </header>
+      </div>
+      <a href="index.html" class="nav-link">← Portfolio</a>
+    </div>
+    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="nav-icon theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i class="fas fa-sun"></i></button>
+  </div>
+</nav>
 
-    <main id="main-content">
+<main id="main-content">
+
+<header class="tool-head">
+  <div class="wrap">
+    <p class="eyebrow">CDU · <b>Selection guide</b> · ASHRAE TC 9.9</p>
+    <h1>CDU selection and deployment guide <span class="muted">types, vendor specs, sizing and documents</span></h1>
+    <p class="lede">The Coolant Distribution Unit is the heart of every direct-liquid-cooled AI/HPC hall — it isolates the facility water loop from the sensitive technology (cold-plate) loop, sets the flow and temperature the GPUs see, and carries the filtration, leak-detection and redundancy that keep a 100&nbsp;kW rack alive. This guide compares real CDUs by type, with verified vendor specs and links.</p>
+    <p class="basis">basis ASHRAE TC 9.9 W-classes · OCP cold-plate guidance · vendor datasheets, every link fetched and checked · no engine, reference only · updated 2026-06</p>
+    <p class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-hub.html">CDU Toolkit</a> → Selection guide</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="tool-bar ck-jump" aria-label="On this page">
+    <span class="lbl">Jump to</span>
+    <a class="chip" href="#primer">Primer</a><a class="chip" href="#types">Types</a><a class="chip" href="#inrow">In-row and facility</a><a class="chip" href="#inrack">In-rack</a><a class="chip" href="#sizing">Sizing</a><a class="chip" href="#docs">Manuals</a><a class="chip" href="#standards">Standards</a><a class="chip" href="#faq">Questions</a>
+  </nav>
+</div>
+
+<div class="wrap ck-body">
+
 
     <!-- ───────── 1. What a CDU does ───────── -->
-    <section class="cdu-sec"><div class="cdu-wrap">
-        <span class="cdu-kick">01 · Primer</span>
-        <h2>Where the CDU sits in the cooling chain</h2>
+    <section class="ck-sec" id="primer">
+        <h2><span class="n">01</span> Where the CDU sits in the cooling chain</h2>
         <p class="lead">In a direct-to-chip deployment the heat path is: <b>chip cold-plate → rack manifold → CDU → facility water</b>. The CDU's job is to keep two loops separate. The <b>primary (facility) loop</b> brings comparatively warm, lower-quality chilled or condenser water from the plant. The <b>secondary (technology / TCS) loop</b> is a clean, filtered, temperature- and flow-controlled circuit feeding the cold plates. The CDU's heat exchanger transfers the load between them while the CDU's pumps, filter and controls protect the IT side. Get the CDU wrong and the rack throttles or trips; get it right and a 132&nbsp;kW NVL72 stays in spec.</p>
-        <div class="disclaimer">
-            <b>How to read the links.</b> Every link below was fetched and checked. <span class="lstag v">VERIFIED</span> = the page/PDF loaded (HTTP&nbsp;200) and its content matched the model. <span class="lstag p">VENDOR PORTAL</span> = a working product/support page where the datasheet or manual lives, but the exact deep PDF could not be auto-verified (some vendor sites block automated checks) — use the on-page model search. Specs are sourced from the vendor pages cited; where a number is a family/approximate figure it is marked “approx.” Always confirm the exact configuration with the vendor before procurement.
+        <div class="ck-note">
+            <b>How to read the links.</b> Every link below was fetched and checked. <span class="src">VERIFIED</span> = the page/PDF loaded (HTTP&nbsp;200) and its content matched the model. <span class="src">VENDOR PORTAL</span> = a working product/support page where the datasheet or manual lives, but the exact deep PDF could not be auto-verified (some vendor sites block automated checks) — use the on-page model search. Specs are sourced from the vendor pages cited; where a number is a family/approximate figure it is marked “approx.” Always confirm the exact configuration with the vendor before procurement.
         </div>
-    </div></section>
+    </section>
 
     <!-- ───────── 2. Type taxonomy ───────── -->
-    <section class="cdu-sec"><div class="cdu-wrap">
-        <span class="cdu-kick">02 · Taxonomy</span>
-        <h2>CDU types — what each is for</h2>
+    <section class="ck-sec" id="types">
+        <h2><span class="n">02</span> CDU types — what each is for</h2>
         <p class="lead">CDUs differ mainly by where they reject heat (liquid-to-liquid vs liquid-to-air) and where they physically sit (in a rack, in a row, beside a rack, or at room scale).</p>
         <div class="cdu-types">
-            <div class="typecard" style="--tc:#06b6d4;">
+            <div class="typecard">
                 <h3>In-rack CDU</h3>
                 <div class="cap">~50–200 kW · 4U–8U in the rack</div>
                 <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="In-rack CDU: a CDU slice inside one rack, fed by facility water">
@@ -271,13 +211,13 @@
                     <rect class="rk" x="50" y="22" width="26" height="46" rx="2"/><rect class="cd" x="50" y="22" width="26" height="13" rx="2"/><text class="lbc" x="63" y="31" text-anchor="middle">CDU</text>
                     <rect class="rk" x="80" y="22" width="26" height="46" rx="2"/>
                     <rect class="rk" x="110" y="22" width="26" height="46" rx="2"/>
-                    <path class="ps fl" d="M18 76 H140"/><path class="pr fl" d="M18 88 H140"/><path class="ps fl" d="M63 76 V68"/>
-                    <path class="ps fl" d="M150 40 H180"/><path class="pr fl" d="M150 52 H180"/>
+                    <path class="ps" d="M18 76 H140"/><path class="pr" d="M18 88 H140"/><path class="ps" d="M63 76 V68"/>
+                    <path class="ps" d="M150 40 H180"/><path class="pr" d="M150 52 H180"/>
                     <text class="lb" x="150" y="36">facility CDW</text><text class="lb" x="184" y="44">supply</text><text class="lb" x="184" y="56">return</text>
                 </svg>
                 <p>Mounts inside the 19″ rack it serves. Fast to deploy, isolates one rack/pod, no separate floor space. Capacity capped by rack U-height and the facility-water tap available at the cabinet.</p>
             </div>
-            <div class="typecard" style="--tc:#0891b2;">
+            <div class="typecard">
                 <h3>In-row / row-based CDU</h3>
                 <div class="cap">~120 kW–2.3 MW · floor-standing in the row</div>
                 <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="In-row CDU: a CDU cabinet standing between racks in the row">
@@ -286,13 +226,13 @@
                     <rect class="cd" x="72" y="22" width="26" height="46" rx="2"/><text class="lbc" x="85" y="48" text-anchor="middle" transform="rotate(-90 85 48)">CDU</text>
                     <rect class="rk" x="102" y="22" width="22" height="46" rx="2"/>
                     <rect class="rk" x="128" y="22" width="22" height="46" rx="2"/>
-                    <path class="ps fl" d="M18 76 H152"/><path class="pr fl" d="M18 88 H152"/><path class="ps fl" d="M85 76 V68"/>
-                    <path class="ps fl" d="M162 40 H190"/><path class="pr fl" d="M162 52 H190"/>
+                    <path class="ps" d="M18 76 H152"/><path class="pr" d="M18 88 H152"/><path class="ps" d="M85 76 V68"/>
+                    <path class="ps" d="M162 40 H190"/><path class="pr" d="M162 52 H190"/>
                     <text class="lb" x="160" y="36">facility CDW</text><text class="lb" x="194" y="44">supply</text><text class="lb" x="194" y="56">return</text>
                 </svg>
                 <p>Stands in the row and feeds several racks via manifolds. The workhorse for dense AI halls — large heat exchanger, redundant pumps, big integrated filter. Needs facility chilled/condenser water piped to it.</p>
             </div>
-            <div class="typecard" style="--tc:#10b981;">
+            <div class="typecard">
                 <h3>Sidecar CDU</h3>
                 <div class="cap">~tens–150 kW · bolts to the rack side</div>
                 <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="Sidecar CDU: a slim unit bolted to the side of a rack">
@@ -300,13 +240,13 @@
                     <rect class="rk" x="54" y="22" width="26" height="46" rx="2"/><rect class="cd" x="80" y="22" width="11" height="46" rx="2"/><text class="lbc" x="86" y="80" text-anchor="middle">SC</text>
                     <rect class="rk" x="95" y="22" width="26" height="46" rx="2"/>
                     <rect class="rk" x="125" y="22" width="26" height="46" rx="2"/>
-                    <path class="ps fl" d="M18 76 H152"/><path class="pr fl" d="M18 88 H152"/><path class="ps fl" d="M86 76 V68"/>
-                    <path class="ps fl" d="M162 40 H190"/><path class="pr fl" d="M162 52 H190"/>
+                    <path class="ps" d="M18 76 H152"/><path class="pr" d="M18 88 H152"/><path class="ps" d="M86 76 V68"/>
+                    <path class="ps" d="M162 40 H190"/><path class="pr" d="M162 52 H190"/>
                     <text class="lb" x="160" y="36">facility CDW</text><text class="lb" x="194" y="44">supply</text><text class="lb" x="194" y="56">return</text>
                 </svg>
                 <p>A slim cabinet attached to the side of a rack — between in-rack and in-row. Useful when in-rack U-space is full but a full row CDU is overkill, or for rear-door / single-cabinet retrofits.</p>
             </div>
-            <div class="typecard" style="--tc:#f59e0b;">
+            <div class="typecard">
                 <h3>Liquid-to-Air (L2A) CDU</h3>
                 <div class="cap">~70–240 kW · no facility water needed</div>
                 <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="Liquid-to-air CDU: rejects heat to room air, no facility water">
@@ -315,12 +255,12 @@
                     <rect class="cd" x="72" y="22" width="26" height="46" rx="2"/><text class="lbc" x="85" y="48" text-anchor="middle" transform="rotate(-90 85 48)">CDU</text>
                     <rect class="rk" x="102" y="22" width="22" height="46" rx="2"/>
                     <rect class="rk" x="128" y="22" width="22" height="46" rx="2"/>
-                    <path class="ps fl" d="M18 76 H152"/><path class="pr fl" d="M18 88 H152"/><path class="ps fl" d="M85 76 V68"/>
-                    <path class="pa fl" d="M85 22 V8"/><text class="lb" x="92" y="13" fill="#f59e0b">→ room air (no facility water)</text>
+                    <path class="ps" d="M18 76 H152"/><path class="pr" d="M18 88 H152"/><path class="ps" d="M85 76 V68"/>
+                    <path class="pa" d="M85 22 V8"/><text class="lb" x="92" y="13" fill="#f59e0b">→ room air (no facility water)</text>
                 </svg>
                 <p>Rejects the secondary-loop heat straight to <b>room air</b> via an internal air coil. The key retrofit enabler: lets you run direct-to-chip in a hall that has <b>no chilled-water plumbing</b> — at the cost of lower capacity and adding heat to the room.</p>
             </div>
-            <div class="typecard" style="--tc:#64748b;">
+            <div class="typecard">
                 <h3>Liquid-to-Liquid (L2L) CDU</h3>
                 <div class="cap">~120 kW–2.3 MW · needs facility CDW</div>
                 <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="Liquid-to-liquid CDU: rejects to facility water through a plate heat exchanger">
@@ -329,46 +269,45 @@
                     <rect class="cd" x="72" y="22" width="26" height="46" rx="2"/><text class="lbc" x="85" y="48" text-anchor="middle" transform="rotate(-90 85 48)">CDU</text>
                     <rect class="rk" x="102" y="22" width="22" height="46" rx="2"/>
                     <rect class="rk" x="128" y="22" width="22" height="46" rx="2"/>
-                    <path class="ps fl" d="M18 76 H152"/><path class="pr fl" d="M18 88 H152"/><path class="ps fl" d="M85 76 V68"/>
+                    <path class="ps" d="M18 76 H152"/><path class="pr" d="M18 88 H152"/><path class="ps" d="M85 76 V68"/>
                     <rect class="cd" x="160" y="34" width="18" height="26" rx="2"/><text class="lb" x="169" y="50" text-anchor="middle">HX</text>
-                    <path class="ps fl" d="M98 40 H160"/><path class="pr fl" d="M178 52 H210"/>
+                    <path class="ps" d="M98 40 H160"/><path class="pr" d="M178 52 H210"/>
                     <text class="lb" x="150" y="30">facility plate HX</text>
                 </svg>
                 <p>Rejects to a <b>facility water loop</b> through a plate heat exchanger. Highest capacity and efficiency; the standard for purpose-built AI halls with a chilled- or condenser-water plant.</p>
             </div>
-            <div class="typecard" style="--tc:#ef4444;">
+            <div class="typecard">
                 <h3>Facility / room-scale CDU</h3>
                 <div class="cap">1 MW–2.3 MW+ · serves many rows</div>
                 <svg class="tc-svg" viewBox="0 0 230 96" role="img" aria-label="Facility-scale CDU: a central large unit distributing to multiple rows">
                     <rect class="rk" x="16" y="22" width="14" height="20" rx="1.5"/><rect class="rk" x="32" y="22" width="14" height="20" rx="1.5"/><rect class="rk" x="48" y="22" width="14" height="20" rx="1.5"/>
                     <rect class="rk" x="16" y="58" width="14" height="20" rx="1.5"/><rect class="rk" x="32" y="58" width="14" height="20" rx="1.5"/><rect class="rk" x="48" y="58" width="14" height="20" rx="1.5"/>
                     <rect class="cd" x="92" y="30" width="34" height="40" rx="3"/><text class="lbc" x="109" y="53" text-anchor="middle">CDU</text>
-                    <path class="ps fl" d="M62 32 H92"/><path class="pr fl" d="M62 68 H92"/><path class="ps fl" d="M62 50 H92"/>
+                    <path class="ps" d="M62 32 H92"/><path class="pr" d="M62 68 H92"/><path class="ps" d="M62 50 H92"/>
                     <rect class="cd" x="150" y="38" width="16" height="24" rx="2"/><text class="lb" x="158" y="53" text-anchor="middle">HX</text>
-                    <path class="ps fl" d="M126 44 H150"/><path class="pr fl" d="M166 56 H200"/>
+                    <path class="ps" d="M126 44 H150"/><path class="pr" d="M166 56 H200"/>
                     <text class="lb" x="150" y="34">facility</text><text class="lb" x="64" y="92">many rows → central unit</text>
                 </svg>
                 <p>Large L2L units (e.g. 1.35–2.3 MW) that distribute to multiple rows/pods from a central location. Fewer units, central maintenance, but a bigger single-point footprint to design for redundancy (N+1 at the unit level).</p>
             </div>
         </div>
-    </div></section>
+    </section>
 
     <!-- ───────── 3. In-row comparison ───────── -->
-    <section class="cdu-sec"><div class="cdu-wrap">
-        <span class="cdu-kick">03 · Compare</span>
-        <h2>In-row &amp; facility-scale CDUs</h2>
+    <section class="ck-sec" id="inrow">
+        <h2><span class="n">03</span> In-row &amp; facility-scale CDUs</h2>
         <p class="lead">Row-based and central L2L/L2A units, ordered by capacity. Specs cite the vendor product page; “approx.” marks family-level or rounded figures to confirm per configuration.</p>
         <figure class="rz-chart" data-rz-chart>
             <div class="rz-chart-canvas"><canvas></canvas></div>
             <script type="application/json" class="rz-chart-cfg">
-{"type":"line","title":"Secondary flow scales almost linearly with capacity — about 0.85–0.93 LPM per kW","x":"Rated capacity (kW)","labels":[600,1000,1200,1368,1500,1500,2000,2300,4000],"series":[{"label":"Secondary flow","data":[700,1100,1250,1200,1500,1600,2125,2125,3000],"accent":"info","unit":"LPM"}],"y":"Secondary flow (LPM)","source":"data/cdu/cdu-models.csv (9 verified vendor CDUs with full flow data) · data/cdu/chart-capacity-flow.csv — Vertiv, CoolIT, Boyd, Motivair, Delta, nVent, Stulz","basisTag":"vendor"}
+{"type":"line","title":"Secondary flow scales almost linearly with capacity — about 0.85–0.93 LPM per kW","x":"Rated capacity (kW)","labels":[600,1000,1200,1368,1500,1500,2000,2300,4000],"series":[{"label":"Secondary flow","data":[700,1100,1250,1200,1500,1600,2125,2125,3000],"color":"#8a8f98","unit":"LPM"}],"y":"Secondary flow (LPM)","source":"data/cdu/cdu-models.csv (9 verified vendor CDUs with full flow data) · data/cdu/chart-capacity-flow.csv — Vertiv, CoolIT, Boyd, Motivair, Delta, nVent, Stulz","basisTag":"vendor"}
             </script>
         </figure>
         <div class="legend">
-            <span><span class="lstag v">VERIFIED</span> page/PDF fetched, content matched</span>
-            <span><span class="lstag p">VENDOR PORTAL</span> working product/docs page; deep PDF not auto-verifiable</span>
+            <span><span class="src">VERIFIED</span> page/PDF fetched, content matched</span>
+            <span><span class="src">VENDOR PORTAL</span> working product/docs page; deep PDF not auto-verifiable</span>
         </div>
-        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cdu-tbl">
+        <div class="ck-tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl cdu-tbl">
             <thead><tr><th>Model</th><th>Capacity</th><th>Type</th><th>Secondary flow</th><th>dP / head</th><th>Approach</th><th>Footprint · weight</th><th>Fluid · filter · conn · BMS · class</th><th>Links</th></tr></thead>
             <tbody>
                 <tr>
@@ -378,18 +317,18 @@
                     <td>2400×1200×1200 mm<br>~1793 kg wet</td>
                     <td>water / PG-25 · 25–50 µm sec, 500 µm pri · 6″ sanitary · Modbus RTU+TCP · <b>W45</b></td>
                     <td><div class="links">
-                        <a href="https://www.vertiv.com/en-us/products-catalog/thermal-management/high-density-solutions/vertiv-coolchip-cdu/" target="_blank" rel="noopener">Product <span class="lstag v">VERIFIED</span></a>
-                        <a href="https://www.vertiv.com/4aca75/globalassets/shared/vertiv-coolchip-cdu-2300kw-data-sheet-sl-80005.pdf" target="_blank" rel="noopener">Datasheet <span class="lstag p">VENDOR PDF</span></a>
+                        <a href="https://www.vertiv.com/en-us/products-catalog/thermal-management/high-density-solutions/vertiv-coolchip-cdu/" target="_blank" rel="noopener">Product <span class="src">VERIFIED</span></a>
+                        <a href="https://www.vertiv.com/4aca75/globalassets/shared/vertiv-coolchip-cdu-2300kw-data-sheet-sl-80005.pdf" target="_blank" rel="noopener">Datasheet <span class="src">VENDOR PDF</span></a>
                     </div></td>
                 </tr>
                 <tr>
                     <td><span class="model">Liebert XDU1350</span><br><span class="vendor">Vertiv</span></td>
-                    <td class="kw">1368 kW <span style="color:var(--cdu-muted)">(2912 max @ 8 °C)</span></td><td>L2L · row</td>
+                    <td class="kw">1368 kW <span class="mu">(2912 max @ 8 °C)</span></td><td>L2L · row</td>
                     <td class="kw">1200 L/min (2-pump)<br>1800 L/min (3-pump)</td><td class="kw">2.44 bar</td><td class="kw">4 °C</td>
                     <td>2069×900×1243 mm<br>~650 kg</td>
                     <td>water / glycol · 50 µm sec (triple-redundant), 500 µm pri · 4″ hygienic · Modbus + SNMP + CLI/web · <b>W3 rated</b></td>
                     <td><div class="links">
-                        <a href="https://www.vertiv.com/48ee1d/globalassets/shared/liebert-xdu1350-coolant-distribution-unitcdu-ds-en-na-sl-70799-web.pdf" target="_blank" rel="noopener">Datasheet <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.vertiv.com/48ee1d/globalassets/shared/liebert-xdu1350-coolant-distribution-unitcdu-ds-en-na-sl-70799-web.pdf" target="_blank" rel="noopener">Datasheet <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
@@ -399,17 +338,17 @@
                     <td>750×1200 mm ftpt<br>n/p</td>
                     <td>PG-25 · 25 µm · 4″ tri-clamp · <b>Redfish</b> + SNMP/Modbus/BACnet · N+N hot-swap pumps</td>
                     <td><div class="links">
-                        <a href="https://www.coolitsystems.com/cdu-product/chx2000/" target="_blank" rel="noopener">Product <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.coolitsystems.com/cdu-product/chx2000/" target="_blank" rel="noopener">Product <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
                     <td><span class="model">CHx1500</span><br><span class="vendor">CoolIT Systems</span></td>
-                    <td class="kw">1500 kW <span style="color:var(--cdu-muted)">(1364 @ 4 °C)</span></td><td>L2L · rack-mt</td>
+                    <td class="kw">1500 kW <span class="mu">(1364 @ 4 °C)</span></td><td>L2L · rack-mt</td>
                     <td class="kw">1800 L/min sec<br>2100 L/min pri</td><td class="kw">~3.0 bar</td><td class="kw">5 °C</td>
                     <td>n/p</td>
                     <td>PG · 25 µm (50 opt) · 4″ Victaulic · <b>Redfish</b> + SNMP/Modbus/BACnet · N+N hot-swap</td>
                     <td><div class="links">
-                        <a href="https://www.coolitsystems.com/product/chx1500-cdu/" target="_blank" rel="noopener">Product <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.coolitsystems.com/product/chx1500-cdu/" target="_blank" rel="noopener">Product <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
@@ -417,9 +356,9 @@
                     <td class="kw">2000 kW</td><td>L2L · 48U row</td>
                     <td class="kw">1890 L/min (500 GPM)</td><td class="kw">up to 5.5 bar</td><td class="kw">3 °C</td>
                     <td>1651×1199×2364 mm<br>~3134 kg wet</td>
-                    <td>water / PG-25 · <b>0.2 µm side-stream</b> · OCP UQD <span style="color:var(--cdu-muted)">(est)</span> · seal-less N+1 · OCP Deschutes</td>
+                    <td>water / PG-25 · <b>0.2 µm side-stream</b> · OCP UQD <span class="mu">(est)</span> · seal-less N+1 · OCP Deschutes</td>
                     <td><div class="links">
-                        <a href="https://www.boydcorp.com/thermal/liquid-cooling-systems/coolant-distribution-unit-cdu.html" target="_blank" rel="noopener">CDU family <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.boydcorp.com/thermal/liquid-cooling-systems/coolant-distribution-unit-cdu.html" target="_blank" rel="noopener">CDU family <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
@@ -429,27 +368,27 @@
                     <td>2499×1600×1222 mm<br>n/p</td>
                     <td>25% PG · filter n/p · 6″ · BACnet/SNMP/Modbus · class n/p · 2 pumps (N+1)</td>
                     <td><div class="links">
-                        <a href="https://www.motivaircorp.com/uploads/files/brochures/CDU%202026%20Motivair%20by%20SE.pdf" target="_blank" rel="noopener">Brochure <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.motivaircorp.com/uploads/files/brochures/CDU%202026%20Motivair%20by%20SE.pdf" target="_blank" rel="noopener">Brochure <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
                     <td><span class="model">GoCool L2L 1500</span><br><span class="vendor">Delta</span></td>
-                    <td class="kw">1500 kW <span style="color:var(--cdu-muted)">(1016–1500)</span></td><td>L2L · floor</td>
+                    <td class="kw">1500 kW <span class="mu">(1016–1500)</span></td><td>L2L · floor</td>
                     <td class="kw">1500 L/min (1650 max)<br>1300 L/min pri</td><td class="kw">n/p</td><td class="kw">4–6 °C</td>
                     <td>1200×1200×2300 mm<br>1900 kg wet</td>
                     <td>fluid n/p · 50 µm · 4″ sanitary ferrule · SNMP/Modbus/BACnet · N+1 &amp; N modes</td>
                     <td><div class="links">
-                        <a href="https://www.deltapowersolutions.com/en/mcis/liquid-to-liquid-coolant-distribution-unit-1500kw-specifications.php" target="_blank" rel="noopener">Spec <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.deltapowersolutions.com/en/mcis/liquid-to-liquid-coolant-distribution-unit-1500kw-specifications.php" target="_blank" rel="noopener">Spec <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
                     <td><span class="model">In-Row 2.4 MW (800 VDC)</span><br><span class="vendor">Delta</span></td>
-                    <td class="kw">2400 kW <span style="color:var(--cdu-muted)">(2025 launch)</span></td><td>L2L · row</td>
+                    <td class="kw">2400 kW <span class="mu">(2025 launch)</span></td><td>L2L · row</td>
                     <td class="kw">~1.5 L/min/kW</td><td class="kw">n/p</td><td class="kw">~4 °C</td>
                     <td>1500×1200×2286 mm<br>n/p</td>
-                    <td><span style="color:var(--cdu-muted)">Press-release figures (no datasheet yet)</span> · 800 VDC pumps, N+1</td>
+                    <td><span class="mu">Press-release figures (no datasheet yet)</span> · 800 VDC pumps, N+1</td>
                     <td><div class="links">
-                        <a href="https://www.deltapowersolutions.com/en/mcis/liquid-to-liquid-coolant-distribution-unit-1500kw-specifications.php" target="_blank" rel="noopener">GoCool spec <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.deltapowersolutions.com/en/mcis/liquid-to-liquid-coolant-distribution-unit-1500kw-specifications.php" target="_blank" rel="noopener">GoCool spec <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
@@ -459,17 +398,17 @@
                     <td>800 (1200) ×2200 mm<br>1135 kg dry</td>
                     <td>≤20% PG pri / ≤30% PG sec · 250 µm pri, 50 µm (25 opt) sec · 3″ tri-clamp · SNMP v3/Modbus · N+N VSD</td>
                     <td><div class="links">
-                        <a href="https://www.nvent.com/en-us/data-solutions/resource-library" target="_blank" rel="noopener">Resource library <span class="lstag p">VENDOR PORTAL</span></a>
+                        <a href="https://www.nvent.com/en-us/data-solutions/resource-library" target="_blank" rel="noopener">Resource library <span class="src">VENDOR PORTAL</span></a>
                     </div></td>
                 </tr>
                 <tr>
                     <td><span class="model">CyberCool CDU</span><br><span class="vendor">Stulz</span></td>
                     <td class="kw">345–1380 kW</td><td>L2L · row</td>
-                    <td class="kw">n/p</td><td class="kw">n/p</td><td class="kw">~4 °C <span style="color:var(--cdu-muted)">(FWS 32/TCS 36)</span></td>
+                    <td class="kw">n/p</td><td class="kw">n/p</td><td class="kw">~4 °C <span class="mu">(FWS 32/TCS 36)</span></td>
                     <td>600/900×1200×2090 mm<br>n/p</td>
                     <td>flexible fluid · 50 µm · sanitary quick-release · Modbus/BACnet/SNMP/HTTP · <b>W32–W+</b></td>
                     <td><div class="links">
-                        <a href="https://www.stulz.com/products/detail/cybercool-cdu/" target="_blank" rel="noopener">Product <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.stulz.com/products/detail/cybercool-cdu/" target="_blank" rel="noopener">Product <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
@@ -479,17 +418,17 @@
                     <td>1200×2000×2200 mm<br>n/p</td>
                     <td>SoluKing PG25/EG25 · dual-pump backup</td>
                     <td><div class="links">
-                        <a href="https://en.envicool.com/" target="_blank" rel="noopener">Vendor site <span class="lstag p">VENDOR PORTAL</span></a>
+                        <a href="https://en.envicool.com/" target="_blank" rel="noopener">Vendor site <span class="src">VENDOR PORTAL</span></a>
                     </div></td>
                 </tr>
                 <tr>
-                    <td><span class="model">Waterless EoR CDU</span><br><span class="vendor">ZutaCore</span> <span class="lstag" style="background:rgba(8,145,178,.14);color:#0891b2;border:1px solid rgba(8,145,178,.4);">2-PHASE</span></td>
+                    <td><span class="model">Waterless EoR CDU</span><br><span class="vendor">ZutaCore</span> <span class="src">2-PHASE</span></td>
                     <td class="kw">1200 / 2000 kW</td><td>2-phase · EoR</td>
                     <td class="kw">&lt;0.35 L/min/kW</td><td class="kw">n/p</td><td class="kw">n/p</td>
                     <td>n/p</td>
                     <td>dielectric refrigerant (R-1233zd class) · active-standby hot-swap · <b>waterless / leak-safe in white space</b></td>
                     <td><div class="links">
-                        <a href="https://blog.zutacore.com/press-releases/zutacore-unveils-waterless-end-of-row-cdu-family" target="_blank" rel="noopener">Announcement <span class="lstag p">VENDOR PORTAL</span></a>
+                        <a href="https://blog.zutacore.com/press-releases/zutacore-unveils-waterless-end-of-row-cdu-family" target="_blank" rel="noopener">Announcement <span class="src">VENDOR PORTAL</span></a>
                     </div></td>
                 </tr>
                 <tr>
@@ -499,19 +438,18 @@
                     <td>2300×600×1200 mm<br>434 kg wet</td>
                     <td>water / PG-25 · 50/25 µm · 6-fan N+1 · Modbus RTU+TCP · <b>rejects to room air (no FWS)</b></td>
                     <td><div class="links">
-                        <a href="https://www.vertiv.com/4acad0/globalassets/shared/vertiv-coolchip-cdu-70-data-sheet-sl-71252.pdf" target="_blank" rel="noopener">Datasheet <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.vertiv.com/4acad0/globalassets/shared/vertiv-coolchip-cdu-70-data-sheet-sl-71252.pdf" target="_blank" rel="noopener">Datasheet <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
             </tbody>
         </table></div>
-    </div></section>
+    </section>
 
     <!-- ───────── 4. In-rack comparison ───────── -->
-    <section class="cdu-sec"><div class="cdu-wrap">
-        <span class="cdu-kick">04 · Compare</span>
-        <h2>In-rack CDUs</h2>
-        <p class="lead">Rack-integrated units (typically 3U–4U) for per-rack or small-pod deployments and faster retrofits. Includes single-phase water CDUs and <b>two-phase</b> (dielectric direct-to-chip / waterless) options — the <span class="lstag" style="background:rgba(8,145,178,.14);color:#0891b2;border:1px solid rgba(8,145,178,.4);">2-PHASE</span> tag marks the latter.</p>
-        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cdu-tbl">
+    <section class="ck-sec" id="inrack">
+        <h2><span class="n">04</span> In-rack CDUs</h2>
+        <p class="lead">Rack-integrated units (typically 3U–4U) for per-rack or small-pod deployments and faster retrofits. Includes single-phase water CDUs and <b>two-phase</b> (dielectric direct-to-chip / waterless) options — the <span class="src">2-PHASE</span> tag marks the latter.</p>
+        <div class="ck-tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl cdu-tbl">
             <thead><tr><th>Model</th><th>Capacity</th><th>Form</th><th>Secondary flow</th><th>dP / head</th><th>Approach</th><th>Dimensions · weight</th><th>Fluid · filter · conn · BMS · class</th><th>Links</th></tr></thead>
             <tbody>
                 <tr>
@@ -521,7 +459,7 @@
                     <td>4U · n/p</td>
                     <td>PG warm-water · N+1 pumps + N+1 PSU · 16 sensors / 4.3″ LCD · leak detect · <b>W17–W+</b></td>
                     <td><div class="links">
-                        <a href="https://www.coolitsystems.com/cdu-product/chx200/" target="_blank" rel="noopener">Product <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.coolitsystems.com/cdu-product/chx200/" target="_blank" rel="noopener">Product <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
@@ -531,28 +469,28 @@
                     <td>4U · n/p</td>
                     <td>PG warm-water · N+1 pumps + PSU · 4.3″ LCD + leak detect · ~100 servers / rack · <b>W17–W+</b></td>
                     <td><div class="links">
-                        <a href="https://www.coolitsystems.com/cdu-product/chx80/" target="_blank" rel="noopener">Product <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://www.coolitsystems.com/cdu-product/chx80/" target="_blank" rel="noopener">Product <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
                     <td><span class="model">RackChiller CHx CDU</span><br><span class="vendor">nVent Schroff</span></td>
-                    <td class="kw">200 kW+ <span style="color:var(--cdu-muted)">@ 4 °C</span></td><td>4U in-rack</td>
+                    <td class="kw">200 kW+ <span class="mu">@ 4 °C</span></td><td>4U in-rack</td>
                     <td class="kw">150 L/min</td><td class="kw">2.76 bar (40 psi) sec</td><td class="kw">4 °C</td>
                     <td>430×950×177 mm<br>35 kg dry / 41 kg filled</td>
                     <td>25% PG (OAT) sec, water pri · 100 µm · 1.5″ sanitary tri-clamp · dry-break QD · Webserver/Modbus/SNMP · <b>W4</b> · 2 pumps N+1 (24 h alt)</td>
                     <td><div class="links">
-                        <a href="https://schroff.nvent.com/en-us/products/liquid-cooling" target="_blank" rel="noopener">Liquid cooling <span class="lstag p">VENDOR PORTAL</span></a>
+                        <a href="https://schroff.nvent.com/en-us/products/liquid-cooling" target="_blank" rel="noopener">Liquid cooling <span class="src">VENDOR PORTAL</span></a>
                     </div></td>
                 </tr>
                 <tr>
                     <td><span class="model">Neptune RM100</span><br><span class="vendor">Lenovo</span></td>
                     <td class="kw">100 kW</td><td>4U L2L (bottom-of-rack)</td>
-                    <td class="kw">~87 L/min (HMI)</td><td class="kw">relief 3.5 bar</td><td class="kw">n/p <span style="color:var(--cdu-muted)">(pri 4–11 °C)</span></td>
+                    <td class="kw">~87 L/min (HMI)</td><td class="kw">relief 3.5 bar</td><td class="kw">n/p <span class="mu">(pri 4–11 °C)</span></td>
                     <td>4U · n/p</td>
                     <td>sec DI+inhibitor or OAT PG-25, pri water ≤20% glycol · 50 µm sec · Ethernet/RS485/CAN · 2× 48 VDC pumps N+1 (7-day) · SP 18 °C dew-point reset</td>
                     <td><div class="links">
-                        <a href="https://lenovopress.lenovo.com/lp1819-thinksystem-rm100-cdu" target="_blank" rel="noopener">Product guide <span class="lstag v">VERIFIED</span></a>
-                        <a href="https://pubs.lenovo.com/hdc_rackcabinet/rm100_user_guide.pdf" target="_blank" rel="noopener">O&amp;M manual <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://lenovopress.lenovo.com/lp1819-thinksystem-rm100-cdu" target="_blank" rel="noopener">Product guide <span class="src">VERIFIED</span></a>
+                        <a href="https://pubs.lenovo.com/hdc_rackcabinet/rm100_user_guide.pdf" target="_blank" rel="noopener">O&amp;M manual <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
                 <tr>
@@ -562,46 +500,45 @@
                     <td>483×178×813 mm<br>~38.6 kg</td>
                     <td>water-glycol or dielectric · filter n/p · Modbus/BACnet/SNMP · redundant pumps (N+1)</td>
                     <td><div class="links">
-                        <a href="https://www.motivaircorp.com/products/in-rack-cdu/" target="_blank" rel="noopener">Product <span class="lstag p">VENDOR PORTAL</span></a>
+                        <a href="https://www.motivaircorp.com/products/in-rack-cdu/" target="_blank" rel="noopener">Product <span class="src">VENDOR PORTAL</span></a>
                     </div></td>
                 </tr>
                 <tr>
-                    <td><span class="model">NeuCool IR150</span><br><span class="vendor">Accelsius</span> <span class="lstag" style="background:rgba(8,145,178,.14);color:#0891b2;border:1px solid rgba(8,145,178,.4);">2-PHASE</span></td>
+                    <td><span class="model">NeuCool IR150</span><br><span class="vendor">Accelsius</span> <span class="src">2-PHASE</span></td>
                     <td class="kw">150 kW</td><td>Rack-integrated (200 mm of an 800 mm enclosure, 42U IT)</td>
                     <td class="kw">n/p</td><td class="kw">n/p</td><td class="kw">n/p</td>
                     <td>800 mm wide · 42U IT · n/p</td>
                     <td>R-1233zd(E) dielectric (R-515B planned) · 20 µm + PRV · iCDU N+1 hot-swap · SNMP/IPMI/Redfish/DCIM · W27 rated / W45 derated</td>
                     <td><div class="links">
-                        <a href="https://accelsius.com/ir150/" target="_blank" rel="noopener">Product <span class="lstag v">VERIFIED</span></a>
-                        <a href="https://go.accelsius.com/discover-the-neucool-ir150" target="_blank" rel="noopener">Spec (gated) <span class="lstag p">VENDOR PORTAL</span></a>
+                        <a href="https://accelsius.com/ir150/" target="_blank" rel="noopener">Product <span class="src">VERIFIED</span></a>
+                        <a href="https://go.accelsius.com/discover-the-neucool-ir150" target="_blank" rel="noopener">Spec (gated) <span class="src">VENDOR PORTAL</span></a>
                     </div></td>
                 </tr>
                 <tr>
-                    <td><span class="model">HyperCool In-Rack</span><br><span class="vendor">ZutaCore</span> <span class="lstag" style="background:rgba(8,145,178,.14);color:#0891b2;border:1px solid rgba(8,145,178,.4);">2-PHASE</span></td>
-                    <td class="kw">20 – 120 kW <span style="color:var(--cdu-muted)">(6U up to 100)</span></td><td>19″ 3U / 6U</td>
+                    <td><span class="model">HyperCool In-Rack</span><br><span class="vendor">ZutaCore</span> <span class="src">2-PHASE</span></td>
+                    <td class="kw">20 – 120 kW <span class="mu">(6U up to 100)</span></td><td>19″ 3U / 6U</td>
                     <td class="kw">n/p</td><td class="kw">3 bar refr / 4.5 bar water</td><td class="kw">n/p</td>
                     <td>6U 440×1100×266 mm<br>90 kg dry (Water HRU)</td>
                     <td>dielectric refrigerant (zero ODP, low GWP) · 8 L buffer · 1″ tri-clamp · RJ45 TCP/IP · <b>W3</b> · N+1 pumps · 20 kW air variant = waterless</td>
                     <td><div class="links">
-                        <a href="https://zutacore.com/solutions" target="_blank" rel="noopener">Solutions <span class="lstag v">VERIFIED</span></a>
-                        <a href="https://22555817.fs1.hubspotusercontent-na1.net/hubfs/22555817/HyperCool-6U-Water-Datasheet.pdf" target="_blank" rel="noopener">6U datasheet <span class="lstag v">VERIFIED</span></a>
+                        <a href="https://zutacore.com/solutions" target="_blank" rel="noopener">Solutions <span class="src">VERIFIED</span></a>
+                        <a href="https://22555817.fs1.hubspotusercontent-na1.net/hubfs/22555817/HyperCool-6U-Water-Datasheet.pdf" target="_blank" rel="noopener">6U datasheet <span class="src">VERIFIED</span></a>
                     </div></td>
                 </tr>
             </tbody>
         </table></div>
-        <div class="disclaimer">
+        <div class="ck-note">
             <b>L2L vs L2A — the deciding question.</b> If the hall already has a chilled-/condenser-water plant, an <b>L2L</b> CDU gives the highest capacity and efficiency. If there is <b>no facility water</b> (a retrofit into an air-cooled room), an <b>L2A</b> CDU lets you run direct-to-chip today — it rejects to room air, so the room's existing CRAH/CRAC must absorb that heat, which caps practical density. Many sites stage L2A first, then move to L2L when the water plant is built.
         </div>
-    </div></section>
+    </section>
 
     <!-- ───────── 5. Sizing & installation requirements ───────── -->
-    <section class="cdu-sec"><div class="cdu-wrap">
-        <span class="cdu-kick">05 · Sizing</span>
-        <h2>Sizing &amp; installation requirements</h2>
-        <p class="lead">How to size a CDU to the rack heat load, the pipe it needs, and the physical install envelope. Figures marked <b>OCP/ASHRAE</b> are published; the rest are typical engineering values — confirm pressure drop and exact limits against the vendor data sheet and a qualified mechanical engineer. Full operating bands, water-quality acceptance criteria and the commissioning procedure live on the <a href="cdu-checklist.html" style="color:var(--cdu-primary);font-weight:600;">CDU Checklist</a>. To compute flow, pipe velocity, pressure drop, heat-exchanger approach and NPSH for your own load, use the interactive <a href="cdu-calculator.html" style="color:var(--cdu-primary);font-weight:600;">CDU Calculator</a>.</p>
+    <section class="ck-sec" id="sizing">
+        <h2><span class="n">05</span> Sizing &amp; installation requirements</h2>
+        <p class="lead">How to size a CDU to the rack heat load, the pipe it needs, and the physical install envelope. Figures marked <b>OCP/ASHRAE</b> are published; the rest are typical engineering values — confirm pressure drop and exact limits against the vendor data sheet and a qualified mechanical engineer. Full operating bands, water-quality acceptance criteria and the commissioning procedure live on the <a href="cdu-checklist.html">CDU Checklist</a>. To compute flow, pipe velocity, pressure drop, heat-exchanger approach and NPSH for your own load, use the interactive <a href="cdu-calculator.html">CDU Calculator</a>.</p>
 
         <h3>1 · Flow &amp; ΔT — the core sizing equation</h3>
-        <p class="lead" style="margin-bottom:.4rem;">A loop carries heat per the heat-balance <b>Q = ṁ · c<sub>p</sub> · ΔT</b>. Rearranged to volumetric flow for a 25% propylene-glycol secondary fluid (ρ ≈ 1.03 kg/L, c<sub>p</sub> ≈ 3.95 kJ/kg·K → c<sub>p,vol</sub> ≈ 4.07 kJ/L·K):</p>
+        <p class="lead tight">A loop carries heat per the heat-balance <b>Q = ṁ · c<sub>p</sub> · ΔT</b>. Rearranged to volumetric flow for a 25% propylene-glycol secondary fluid (ρ ≈ 1.03 kg/L, c<sub>p</sub> ≈ 3.95 kJ/kg·K → c<sub>p,vol</sub> ≈ 4.07 kJ/L·K):</p>
         <div class="formula">flow&nbsp;(L/min) ≈ 14.7 × Q(kW) / ΔT(°C)&nbsp;&nbsp;<span class="c">[PG25; use ≈14.3 for pure water]</span></div>
         <ul class="szlist">
             <li>At the <b>OCP design point</b> (ΔT ≈ 10 °C) this is ≈ <b>1.5 L/min per kW</b>. OCP's published acceptable band is <b>1.25–2.0 L/min/kW</b> for a 7.5–12 °C rise. <i>(OCP cold-plate guidance.)</i></li>
@@ -611,8 +548,8 @@
         </ul>
 
         <h3>2 · Pipe sizing (secondary)</h3>
-        <p class="lead" style="margin-bottom:.5rem;">Size pipe for a velocity of <b>~1.5–3 m/s</b> (too slow → fouling/air; too fast → erosion + high dP). Nominal diameters below are at ≈ 2 m/s — always re-check the actual pressure drop over the run.</p>
-        <div class="tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="cdu-tbl">
+        <p class="lead tight">Size pipe for a velocity of <b>~1.5–3 m/s</b> (too slow → fouling/air; too fast → erosion + high dP). Nominal diameters below are at ≈ 2 m/s — always re-check the actual pressure drop over the run.</p>
+        <div class="ck-tbl-wrap" tabindex="0" role="group" aria-label="Scrollable table"><table class="ck-tbl cdu-tbl">
             <thead><tr><th>Secondary flow</th><th>≈ Heat @ 1.5 LPM/kW</th><th>Bore @ ~2 m/s</th><th>Nominal</th></tr></thead>
             <tbody>
                 <tr><td class="kw">50 L/min</td><td>~33 kW</td><td>~23 mm</td><td>DN25 (1″)</td></tr>
@@ -627,7 +564,7 @@
         <h3>3 · Heat exchanger &amp; supply temperature (L2L)</h3>
         <ul class="szlist">
             <li><b>Approach (ATD)</b> across the plate HX is typically <b>~3–5 °C</b> — the secondary supply can't be colder than facility supply + ATD. Rising ATD over time = fouling.</li>
-            <li><b>Facility supply temperature</b> sets the achievable secondary temp and your free-cooling story — see the ASHRAE <b>W-class</b> table (W17/W27/W32/W40/W45/W+) on the <a href="cdu-checklist.html#water" style="color:var(--cdu-primary);">checklist</a>. Warmer classes (W40/W45) enable chiller-less / economiser operation.</li>
+            <li><b>Facility supply temperature</b> sets the achievable secondary temp and your free-cooling story — see the ASHRAE <b>W-class</b> table (W17/W27/W32/W40/W45/W+) on the <a href="cdu-checklist.html#water">checklist</a>. Warmer classes (W40/W45) enable chiller-less / economiser operation.</li>
             <li><b>Hold secondary supply ≥ 2–3 °C above room dew point</b> (the CDU's dew-point reset) to avoid condensation on cold plates and pipework.</li>
         </ul>
 
@@ -640,56 +577,53 @@
             <li><b>BMS / leak-detection</b> integration points (Modbus/BACnet/SNMP/Redfish) and leak-rope routing at base, manifolds and QDs.</li>
             <li><b>Redundancy</b> — N+1 pumps + dual feeds sized so one pump/PSU can carry the full load.</li>
         </ul>
-        <div class="disclaimer">
+        <div class="ck-note">
             <b>Note.</b> These are sizing first-passes for selection, not a hydraulic design. Confirm flow, pressure drop, NPSH, pipe schedule, fluid spec and structural loading with the vendor data sheet and a qualified mechanical engineer before procurement or installation.
         </div>
-    </div></section>
+    </section>
 
     <!-- ───────── 6. Manual & documentation hub ───────── -->
-    <section class="cdu-sec"><div class="cdu-wrap">
-        <span class="cdu-kick">06 · Manuals &amp; docs</span>
-        <h2>Installation, operation &amp; maintenance documentation hub</h2>
+    <section class="ck-sec" id="docs">
+        <h2><span class="n">06</span> Installation, operation &amp; maintenance documentation hub</h2>
         <p class="lead">Manufacturer install guides and O&amp;M manuals are usually delivered with the unit or through an authenticated support portal. Below are the publicly reachable vendor documentation entry points we could verify (HTTP&nbsp;200) — open the portal and search the exact model for its install / operation / service manual. Login-gated PDFs are intentionally not deep-linked.</p>
-        <div class="links" style="gap:8px;">
-            <a href="https://www.coolitsystems.com/resources/" target="_blank" rel="noopener">CoolIT — Resources &amp; datasheets (CHx family) <span class="lstag v">VERIFIED</span></a>
-            <a href="https://www.nvent.com/en-us/data-solutions/resource-library" target="_blank" rel="noopener">nVent — Data Solutions resource library <span class="lstag p">VENDOR PORTAL</span></a>
-            <a href="https://www.motivaircorp.com/uploads/files/brochures/CDU%202026%20Motivair%20by%20SE.pdf" target="_blank" rel="noopener">Motivair (by Schneider) — 2026 CDU brochure PDF <span class="lstag v">VERIFIED</span></a>
-            <a href="https://www.boydcorp.com/thermal/liquid-cooling-systems/coolant-distribution-unit-cdu.html" target="_blank" rel="noopener">Boyd — Liquid-cooling CDU family &amp; docs <span class="lstag v">VERIFIED</span></a>
-            <a href="https://lenovopress.lenovo.com/lp1819-thinksystem-rm100-cdu" target="_blank" rel="noopener">Lenovo — ThinkSystem RM100 CDU (L2A) product guide <span class="lstag v">VERIFIED</span></a>
-            <a href="https://www.stulz.com/products/detail/cybercool-cdu/" target="_blank" rel="noopener">Stulz — CyberCool CDU product &amp; docs <span class="lstag v">VERIFIED</span></a>
-            <a href="https://www.deltapowersolutions.com/en/mcis/liquid-to-liquid-coolant-distribution-unit-1500kw-specifications.php" target="_blank" rel="noopener">Delta — GoCool L2L 1500 kW specification <span class="lstag v">VERIFIED</span></a>
-            <a href="https://www.vertiv.com/en-us/products-catalog/thermal-management/high-density-solutions/vertiv-coolchip-cdu/" target="_blank" rel="noopener">Vertiv — CoolChip CDU catalog (request datasheet/manual) <span class="lstag v">VERIFIED</span></a>
+        <div class="links">
+            <a href="https://www.coolitsystems.com/resources/" target="_blank" rel="noopener">CoolIT — Resources &amp; datasheets (CHx family) <span class="src">VERIFIED</span></a>
+            <a href="https://www.nvent.com/en-us/data-solutions/resource-library" target="_blank" rel="noopener">nVent — Data Solutions resource library <span class="src">VENDOR PORTAL</span></a>
+            <a href="https://www.motivaircorp.com/uploads/files/brochures/CDU%202026%20Motivair%20by%20SE.pdf" target="_blank" rel="noopener">Motivair (by Schneider) — 2026 CDU brochure PDF <span class="src">VERIFIED</span></a>
+            <a href="https://www.boydcorp.com/thermal/liquid-cooling-systems/coolant-distribution-unit-cdu.html" target="_blank" rel="noopener">Boyd — Liquid-cooling CDU family &amp; docs <span class="src">VERIFIED</span></a>
+            <a href="https://lenovopress.lenovo.com/lp1819-thinksystem-rm100-cdu" target="_blank" rel="noopener">Lenovo — ThinkSystem RM100 CDU (L2A) product guide <span class="src">VERIFIED</span></a>
+            <a href="https://www.stulz.com/products/detail/cybercool-cdu/" target="_blank" rel="noopener">Stulz — CyberCool CDU product &amp; docs <span class="src">VERIFIED</span></a>
+            <a href="https://www.deltapowersolutions.com/en/mcis/liquid-to-liquid-coolant-distribution-unit-1500kw-specifications.php" target="_blank" rel="noopener">Delta — GoCool L2L 1500 kW specification <span class="src">VERIFIED</span></a>
+            <a href="https://www.vertiv.com/en-us/products-catalog/thermal-management/high-density-solutions/vertiv-coolchip-cdu/" target="_blank" rel="noopener">Vertiv — CoolChip CDU catalog (request datasheet/manual) <span class="src">VERIFIED</span></a>
         </div>
-        <div class="disclaimer" style="margin-top:1rem;">
-            <b>Operation &amp; maintenance forms.</b> The site-side companion — operational parameter bands, an installation/inspection/PM checklist, a symptom→cause→action troubleshooting table, and a printable service-record form — lives on the <a href="cdu-checklist.html" style="color:var(--cdu-primary);font-weight:600;">CDU Checklist page</a>.
+        <div class="ck-note">
+            <b>Operation &amp; maintenance forms.</b> The site-side companion — operational parameter bands, an installation/inspection/PM checklist, a symptom→cause→action troubleshooting table, and a printable service-record form — lives on the <a href="cdu-checklist.html">CDU Checklist page</a>.
         </div>
-    </div></section>
+    </section>
 
     <!-- ───────── 6. Standards + what's next ───────── -->
-    <section class="cdu-sec"><div class="cdu-wrap">
-        <span class="cdu-kick">07 · Standards &amp; next</span>
-        <h2>Governing standards &amp; what this guide adds next</h2>
-        <p class="lead">CDU selection, fluid spec and water quality follow published guidance. The deployment checklist and maintenance strategy (next ships) build on these.</p>
-        <div class="links" style="gap:8px;margin-bottom:1.2rem;">
-            <a href="https://www.vertiv.com/49db1c/globalassets/documents/white-papers/ashrae_tc0909_emergence_and_expansion_of_liquid_cooling_in_mainstream_data_centers_5_may_2021_332771_0.pdf" target="_blank" rel="noopener">ASHRAE TC 9.9 — Emergence &amp; Expansion of Liquid Cooling (white paper PDF) <span class="lstag v">VERIFIED</span></a>
-            <a href="https://www.opencompute.org/projects/cold-plate" target="_blank" rel="noopener">Open Compute Project — Cold Plate / Advanced Cooling <span class="lstag p">VENDOR PORTAL</span></a>
+    <section class="ck-sec" id="standards">
+        <h2><span class="n">07</span> Governing standards and the companion pages</h2>
+        <p class="lead">CDU selection, fluid spec and water quality follow published guidance. The checklist, mini-BMS and comparison pages build on these.</p>
+        <div class="links">
+            <a href="https://www.vertiv.com/49db1c/globalassets/documents/white-papers/ashrae_tc0909_emergence_and_expansion_of_liquid_cooling_in_mainstream_data_centers_5_may_2021_332771_0.pdf" target="_blank" rel="noopener">ASHRAE TC 9.9 — Emergence &amp; Expansion of Liquid Cooling (white paper PDF) <span class="src">VERIFIED</span></a>
+            <a href="https://www.opencompute.org/projects/cold-plate" target="_blank" rel="noopener">Open Compute Project — Cold Plate / Advanced Cooling <span class="src">VENDOR PORTAL</span></a>
         </div>
-        <p class="lead" style="margin-bottom:.6rem;">ASHRAE TC 9.9 defines liquid-cooling <b>water-temperature classes</b> (W17 / W27 / W32 / W40 / W45 / W+ — the number is the maximum supply temperature in °C, with a 2 °C lower limit) and <b>water-quality</b> guidance. OCP adds practical cold-plate guidance (PG25 coolant, ~1.5 LPM/kW at a 10 °C rise, filtration and wetted-material compatibility).</p>
-        <div class="next-strip">
-            <a class="next-pill" href="cdu-checklist.html" style="color:var(--cdu-primary);border-color:var(--cdu-primary);text-decoration:none;font-weight:600;">→ CDU Installation, Inspection &amp; Maintenance Checklist (with operational parameters + printable forms)</a>
-            <a class="next-pill" href="cdu-mini-bms.html" style="color:var(--cdu-primary);border-color:var(--cdu-primary);text-decoration:none;font-weight:600;">→ CDU Mini-BMS — datahall layout, P&amp;ID &amp; live parameters per type</a>
-            <a class="next-pill" href="cdu-comparison.html" style="color:var(--cdu-primary);border-color:var(--cdu-primary);text-decoration:none;font-weight:600;">→ CDU Deep Comparison — field issues, controls, after-sales &amp; TCO (all aspects)</a>
+        <p class="lead tight">ASHRAE TC 9.9 defines liquid-cooling <b>water-temperature classes</b> (W17 / W27 / W32 / W40 / W45 / W+ — the number is the maximum supply temperature in °C, with a 2 °C lower limit) and <b>water-quality</b> guidance. OCP adds practical cold-plate guidance (PG25 coolant, ~1.5 LPM/kW at a 10 °C rise, filtration and wetted-material compatibility).</p>
+        <div class="links">
+            <a href="cdu-checklist.html">CDU Installation, Inspection &amp; Maintenance Checklist (with operational parameters + printable forms)</a>
+            <a href="cdu-mini-bms.html">CDU Mini-BMS — datahall layout, P&amp;ID &amp; live parameters per type</a>
+            <a href="cdu-comparison.html">CDU Deep Comparison — field issues, controls, after-sales &amp; TCO (all aspects)</a>
         </div>
-        <div class="disclaimer">
+        <div class="ck-note">
             <b>Disclaimer.</b> This guide is an independent, educational reference built from publicly available vendor pages and published standards. Capacities and specs are vendor-stated and may change; figures marked “approx.” are family-level. It is not procurement, safety, or engineering advice — always validate the exact model configuration, fluid spec, and site requirements with the vendor and a qualified mechanical engineer before purchase or installation.
         </div>
-    </div></section>
+    </section>
 
     <!-- ───────── 8. FAQ ───────── -->
-    <section class="cdu-sec"><div class="cdu-wrap">
-        <span class="cdu-kick">08 · FAQ</span>
-        <h2>Frequently asked questions</h2>
-        <p class="lead">Short answers to the questions that come up most when choosing and deploying a CDU. Deeper detail and sources are on the <a href="cdu-checklist.html" style="color:var(--cdu-primary);font-weight:600;">checklist</a> and <a href="cdu-comparison.html" style="color:var(--cdu-primary);font-weight:600;">deep comparison</a>.</p>
+    <section class="ck-sec" id="faq">
+        <h2><span class="n">08</span> Frequently asked questions</h2>
+        <p class="lead">Short answers to the questions that come up most when choosing and deploying a CDU. Deeper detail and sources are on the <a href="cdu-checklist.html">checklist</a> and <a href="cdu-comparison.html">deep comparison</a>.</p>
 
         <details class="faq-item"><summary>What's the difference between an L2L and an L2A CDU?</summary><div class="faq-a">An <b>L2L (liquid-to-liquid)</b> CDU rejects the chip-side heat to a <b>facility water loop</b> through a plate heat exchanger — highest capacity and efficiency, but it needs a chilled- or condenser-water plant. An <b>L2A (liquid-to-air)</b> CDU rejects straight to <b>room air</b> via an internal coil — no facility water, so it's the retrofit enabler, but the room's CRAH/CRAC must absorb that heat, which caps density. Many sites stage L2A first, then move to L2L when the water plant exists.</div></details>
 
@@ -706,9 +640,34 @@
         <details class="faq-item"><summary>In-row vs in-rack vs facility-scale — which should I pick?</summary><div class="faq-a"><b>In-rack</b> is fastest to deploy and isolates one rack, but you buy many units (more PM + leak surface). <b>In-row</b> is the density workhorse — fewer larger units feeding several racks, easier to service, but a central single-point-of-failure that makes N+1 essential. <b>Facility/room-scale</b> L2L gives economy of scale across many rows with the biggest footprint to design for redundancy. The TCO trade-off matrix on the deep comparison breaks this down by capex / opex / density / water / retrofit / maintenance.</div></details>
 
         <details class="faq-item"><summary>Is direct-to-chip liquid cooling safe near electronics? What about leaks?</summary><div class="faq-a">It's mainstream for AI/HPC, but leaks are the most-reported field issue, so the safety case is built in: dripless/blind-mate quick-disconnects, drip trays + secondary containment, leak-detection rope/spot sensors at QDs, manifolds and low points, and an automatic response (alarm → isolate / pump-shutdown or bypass-standby). Two-phase dielectric systems add the advantage that any leak is non-conductive. Field issues, root causes and prevention are catalogued on the deep comparison §01.</div></details>
-    </div></section>
+    </section>
 
-    </main>
+</div>
+
+<section class="tool-ref" aria-labelledby="ref-h">
+  <div class="wrap">
+    <p class="eyebrow" id="ref-h">09 / Reference</p>
+    <div class="ref-grid">
+      <div>
+        <h3>Method</h3>
+        <ul class="formulas">
+          <li><span>Flow, PG25</span><code>L/min ≈ 14.7 · Q(kW) / ΔT(°C)</code></li>
+          <li><span>Heat balance</span><code>Q = ṁ · c_p · ΔT</code></li>
+          <li><span>Pipe</span><code>size for 1.5–3 m/s</code></li>
+          <li><span>Links</span><code>VERIFIED = HTTP 200 and content matched · VENDOR PORTAL = product page</code></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Computed against</h3>
+        <p class="against"><span>ASHRAE TC 9.9</span><span>OCP</span><span>vendor datasheets</span></p>
+        <h3>Read further</h3>
+        <p class="links"><a href="manual/cdu-hub.html">Technical manual and methodology</a><a href="cdu-hub.html">CDU toolkit</a><a href="cdu-calculator.html">CDU calculator</a><a href="cdu-checklist.html">CDU checklist</a><a href="cdu-comparison.html">CDU deep comparison</a><a href="cdu-mini-bms.html">CDU mini-BMS</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
         {"@type":"Question","name":"What's the difference between an L2L and an L2A CDU?","acceptedAnswer":{"@type":"Answer","text":"An L2L (liquid-to-liquid) CDU rejects chip-side heat to a facility water loop through a plate heat exchanger — highest capacity and efficiency, but needs a chilled/condenser-water plant. An L2A (liquid-to-air) CDU rejects to room air via an internal coil — no facility water, the retrofit enabler, but the room CRAH/CRAC must absorb the heat, capping density."}},
@@ -722,25 +681,25 @@
     ]}
     </script>
 
-    <footer class="footer footer-enhanced">
-        <div class="container"><div class="footer-grid">
-            <div class="footer-brand"><p class="footer-tagline-main">BUILT FOR MISSION CRITICAL INFRASTRUCTURE<br>MANAGEMENT // 2026</p><p class="footer-tagline-sub">ALL OPERATIONAL DATASETS PRESERVED.</p><p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p></div>
-            <div class="footer-nav"><h4 class="footer-heading">NAVIGATION</h4><ul class="footer-links"><li><a href="index.html">Home Dashboard</a></li><li><a href="datacenter-solutions.html">DC Solutions</a></li><li><a href="compare-air-vs-liquid-cooling.html">Air vs Liquid</a></li><li><a href="glossary.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Glossary</a></li></ul></div>
-            <div class="footer-connect"><h4 class="footer-heading">CONNECT</h4><ul class="footer-links"><li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li><li><a href="articles.html">Technical Journal</a></li><li><a href="mailto:baguspermana7@gmail.com">Direct Contact</a></li></ul></div>
-        </div></div>
-    </footer>
+<footer class="hub-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div><p class="eyebrow"><b>Resistance Zero</b></p><p>Data-center engineering tools and telemetry models.</p></div>
+      <ul><li><a href="index.html">Home</a></li><li><a href="articles.html">Technical journal</a></li><li><a href="dc-incidents.html">Incident library</a></li><li><a href="glossary.html">Glossary</a></li></ul>
+      <ul><li><a href="https://www.linkedin.com/in/bagusdpermana/" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="manual/">Technical manuals</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 Bagus Dwi Permana</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><span id="rz-version-stamp"></span></div>
+  </div>
+</footer>
 
-    <script>
-    (function(){
-        var toggle=document.getElementById('themeToggle'); var theme=localStorage.getItem('theme')||'light';
-        document.documentElement.setAttribute('data-theme',theme);
-        if(toggle) toggle.addEventListener('click',function(){ var c=document.documentElement.getAttribute('data-theme'); var n=c==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('theme',n); });
-        var hamburger=document.querySelector('.hamburger'), navMenu=document.querySelector('.nav-menu');
-        if(hamburger&&navMenu) hamburger.addEventListener('click',function(){ hamburger.classList.toggle('active'); navMenu.classList.toggle('active'); hamburger.setAttribute('aria-expanded',navMenu.classList.contains('active')); });
-        var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
-        document.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener('click',function(e){ var t=document.querySelector(this.getAttribute('href')); if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});} }); });
-    })();
-    </script>
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  function paint(){var d=document.documentElement.getAttribute('data-theme')==='dark';var i=t&&t.querySelector('i');if(i)i.className=d?'fas fa-sun':'fas fa-moon';var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'#0b0c0e':'#F5F7FA');}
+  if(t){t.addEventListener('click',function(){var d=document.documentElement.getAttribute('data-theme')==='dark';var n=d?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(e){}paint();});paint();}
+  var s=document.getElementById('navSearchBtn');if(s)s.addEventListener('click',function(){if(window.__rzPalette&&window.__rzPalette.open)window.__rzPalette.open();});
+})();
+</script>
     <script src="auth.js?v=20261031-f01cb5a3" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
     <script src="js/rz-article-chart.js?v=20261031-ce40639f" defer></script>

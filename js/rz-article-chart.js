@@ -136,7 +136,7 @@
     return {
       labels: cfg.labels,
       datasets: cfg.series.map(function(s, i){
-        var col = pal.accents[s.accent] || (pal.order ? pal.accents[pal.order[Math.min(i, pal.order.length - 1)]] : pal.accents.signal);
+        var col = s.color || pal.accents[s.accent] || (pal.order ? pal.accents[pal.order[Math.min(i, pal.order.length - 1)]] : pal.accents.signal);
         var base = { label: s.label, data: s.data, borderColor: col, backgroundColor: col, yAxisID: s.axis || 'y' };
         if(cfg.type === 'line'){ base.tension = 0.25; base.borderWidth = 2; base.pointRadius = 0; base.pointHoverRadius = 4; base.fill = false; }
         if(cfg.type === 'bar'){ var bar = s.colorAccents ? s.colorAccents.map(function(a){ return pal.accents[a] || col; }) : (s.colors ? s.colors : hexA(col, isDark() ? 0.8 : 0.85)); base.backgroundColor = bar; base.borderColor = bar; base.borderWidth = 1; base.borderRadius = 3; }

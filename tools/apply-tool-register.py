@@ -30,7 +30,7 @@ PAGES = [
     'capex-calculator.html', 'opex-calculator.html', 'pue-calculator.html', 'roi-calculator.html',
     'tco-calculator.html', 'tier-advisor.html', 'carbon-footprint.html', 'cx-calculator.html',
     'spares-readiness-calculator.html', 'rfs-readiness-workbench.html', 'fire-calculator.html',
-    'fire-checklist.html', 'tia-942-checklist.html', 'cdu-checklist.html', 'cdu-comparison.html',
+    'fire-checklist.html', 'tia-942-checklist.html', 'cdu-checklist.html', 'cdu-comparison.html', 'cdu-selection-guide.html',
     # explorer pages (release R1 of the hub-tools refit: no inputs / toolbar / results; tools/refit_shell/explorer.py)
     'cdu-hub.html', 'compare-air-vs-liquid-cooling.html', 'compare-raised-floor-vs-slab.html',
     'pln-sumatra-grid.html', 'network-visualization-hub.html', 'ai-engineering-maintenance.html',
