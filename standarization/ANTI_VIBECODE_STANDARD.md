@@ -50,7 +50,7 @@ file/rule findings across 172 files despite exit 0**.
   both themes: any tell in either theme fails the release. It does not replace this document's strict gate. Page-local sweeps:
   `tools/sweep-journal-register.py` (R1–R18, the journal family) and `tools/sweep-page-register.py` (P1–P7, any
   named page, by value not by token); both are idempotent and `--check`able.
-  Exemptions are narrow and each is proven against the unfixed tree (fixture `tools/fixtures/slop-precision.html`):
+  Exemptions are narrow and each is proven against the unfixed tree (`tools/test-slop-precision.mjs` serves its own fixture):
   a rail or pill is exempt only when the element itself carries a state class (`ok|warn|fault|alarm|trip|run|stop|
   state-*`), so a cockpit rail must name its state in a class set by the code that sets the state (v3.30.3); a circle
   (|w−h| ≤ 2 px and radius ≥ half the side, e.g. an ISA pump symbol) is not a pill, while a 30×30 box at r12 and a

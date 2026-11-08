@@ -308,7 +308,10 @@ gate "LTC lab golden — 12 scenarios x 28 rendered outputs identical to the fix
 gate "LTC lab step thread — S1-S36: every shown figure follows the plant model, chrome on the register" \
   env RZ_BASE=http://127.0.0.1:8166 timeout 900 node tools/test-ltc-lab-steps.mjs
 # v3.30.4: the whole tree read 0 in both themes (215 pages), so the scan is strict: one tell in either theme fails the
-# gate. Proven red on tools/fixtures/slop-precision.html (exit 1).
+# gate. tools/test-slop-precision.mjs serves its own fixture and proves the circle/hairline exemptions and that
+# --strict exits 1 on a dirty page (the fixture is not in the tree, so the source audits never read it).
+gate "slop render scan precision — circle and hairline exempt, --strict fails a dirty page" \
+  timeout 300 node tools/test-slop-precision.mjs
 gate "slop render scan — 14 computed tells per page, light AND dark, STRICT (any tell fails)" \
   env RZ_BASE=http://127.0.0.1:8166 timeout 2400 node tools/audit-slop-render.mjs --strict
 [ -n "$ltc_srv_pid" ] && kill "$ltc_srv_pid" 2>/dev/null

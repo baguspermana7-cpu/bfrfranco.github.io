@@ -19,7 +19,7 @@ release sections rather than semver.
 - `cdu-mini-bms`: the alarm bar carries `ok` / `warn` / `alarm` with its state (the green rail at rest is the normal
   state), radius 4 px.
 - `tools/audit-slop-render.mjs`: a circle (an ISA pump symbol) is not a pill, and a 1 px offset with no blur (the rule
-  a sticky table column draws) is not a shadow. Red → green on `tools/fixtures/slop-precision.html`.
+  a sticky table column draws) is not a shadow. Red → green on `tools/test-slop-precision.mjs` (serves its own fixture).
 - `tools/ship-gate.sh`: the render scan runs `--strict`. All 215 sitemap pages read 0 tells in light and dark, so any
   new tell in either theme now fails a release (proven red on the fixture).
 
