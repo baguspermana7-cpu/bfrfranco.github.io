@@ -177,12 +177,18 @@ editor). Rules:
 - The whole grid fits its panel at every width: item names wrap, indent is a CSS step per level (16 px, 8 px on a
   phone). At ≤ 640 px qty, share, window, crew and man-hours hide; item, cost, weight and include stay.
 
-Gate: `tools/test-cx-tree-ui.mjs` (K1–K12): seven level rows under the editor; every shown row equals the engine,
+Gate: `tools/test-cx-tree-ui.mjs` (K1–K14): seven level rows under the editor; every shown row equals the engine,
 collapsed and fully open (row count = engine node count); each parent = sum of its child rows; keyboard walk;
 a longer L3 carries every L3 system; weight 0 and exclude zero a system while L3 holds; persistence and reset;
 a zeroed system stays as a ghost row with a live weight box; find; no sideways scroll at 390 px; the grid
 fits its panel with the include box on screen at 1440 and 390 px (K10); focus stays in the edited box and one row is
 the grid's only tab stop (K11); Find on, the arrow keys walk without losing focus (K12); no page errors.
+Density (K13, v3.34.1): the tool bar stays one row at 1440 px; the weight box is 48 px wide and 26 px tall (16 px type
+on a phone, no iOS zoom); a row stays one line high (median ≤ 36 px over the first 60 rows) because the node kind is
+the name cell's tooltip, not inline text that wraps; vertical hairlines mark each indent level; include uses the page
+accent (`accent-color`), never the browser's default blue; Reset is disabled until a node carries an edit. Any
+label used as a button (the two "Import … CSV" file pickers) is an inline-flex box at the sibling button's height
+with its text centred (K14).
 
 **Edits.**
 - `overrides.plan` is the existing level contract. Setting only the level (start, months, crew, shift) moves every

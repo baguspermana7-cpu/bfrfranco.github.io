@@ -37,7 +37,7 @@
     p.innerHTML = '<div class="cx-an-panel-head"><h3>Program breakdown</h3><span class="cx-an-sub">Each level above, opened to system, subsystem, equipment and activity. Numbers are the engine\'s; set a level above and everything under it follows. A weight (×1 by default) or un-ticking "include" re-shares a node\'s siblings; the parent total holds.</span></div>' +
       '<div class="cx-an-actions cx-tr-bar"><div class="seg" role="group" aria-label="Open the breakdown to">' + seg + '</div>' +
       '<label class="cx-tr-find">Find <input type="search" id="cxTrFind" class="input-field" placeholder="e.g. chiller" aria-label="Find in the breakdown"></label>' +
-      '<span class="spacer"></span><span class="cx-an-sub" id="cxTrCount" aria-live="polite"></span><button type="button" class="tool-btn" id="cxTrReset">Reset breakdown</button></div>' +
+      '<span class="spacer"></span><span class="cx-an-sub" id="cxTrCount" aria-live="polite"></span><button type="button" class="tool-btn" id="cxTrReset" title="Reset breakdown: drop every weight and include edit" disabled>Reset</button></div>' +
       '<div class="cx-an-tablewrap"><table class="cx-an-table cx-tr-grid" id="cxTrGrid" role="treegrid" aria-label="Commissioning program breakdown"><thead><tr>' +
       '<th data-col="name">Item</th><th class="num cx-tr-opt">Qty</th><th class="num cx-tr-opt">Share</th><th class="cx-tr-opt">Window</th><th class="num cx-tr-opt">Crew</th><th class="num cx-tr-mh">Man-hours</th><th class="num">Cost</th><th class="num">Weight</th><th title="Include">Incl.</th></tr></thead><tbody></tbody></table></div>';
     /* plan editor, then its calendar (rz-cx-ext, gate P5 wants it right under the editor), then this breakdown */
@@ -81,7 +81,7 @@
   function row(v, money) {
     var n = v.n, o = NODES[n.path] || {}, lvl = n.kind === 'level', off = o.exclude === true;
     var h = '<tr role="row" aria-level="' + v.d + '"' + (v.k ? ' aria-expanded="' + v.open + '"' : '') + ' tabindex="' + (n.path === FOCUS ? 0 : -1) + '" data-path="' + esc(n.path) + '" data-parent="' + esc(parentOf(n.path)) + '" data-kind="' + esc(n.kind) + '" data-cost="' + n.cost + '" data-mh="' + n.manHours + '" data-finish="' + n.finish + '"' + (n.ghost ? ' data-ghost="1"' : '') + (o.weight != null || off ? ' class="is-edited' + (n.ghost ? ' is-off' : '') + '"' : '') + '>';
-    h += '<td role="gridcell" data-col="name" style="--d:' + (v.d - 1) + '">' + (v.k ? '<span class="cx-tr-caret" aria-hidden="true">' + (v.open ? '▾' : '▸') + '</span>' : '<span class="cx-tr-caret" aria-hidden="true"></span>') + '<span class="cx-tr-name">' + esc(n.label) + '</span>' + (lvl ? '' : ' <span class="cx-tr-kind">' + esc(n.kind) + '</span>') + '</td>';
+    h += '<td role="gridcell" data-col="name" style="--d:' + (v.d - 1) + '"' + (lvl ? '' : ' title="' + esc(n.kind) + '"') + '>' + (v.k ? '<span class="cx-tr-caret" aria-hidden="true">' + (v.open ? '▾' : '▸') + '</span>' : '<span class="cx-tr-caret" aria-hidden="true"></span>') + '<span class="cx-tr-name">' + esc(n.label) + '</span>' + '' + '</td>';
     h += '<td role="gridcell" class="num cx-tr-opt">' + (n.qty != null ? P.fmtInt(n.qty) : '') + '</td>';
     h += '<td role="gridcell" class="num cx-tr-opt">' + (lvl ? '' : (Math.round(n.share * 1000) / 10).toFixed(1) + '%') + '</td>';
     h += '<td role="gridcell" class="cx-tr-opt">' + (n.ghost ? '—' : P.fmtMo(n.start) + '–' + P.fmtMo(n.finish)) + '</td>';
@@ -105,6 +105,7 @@
     tb.innerHTML = h || '<tr><td colspan="9" class="cx-an-sub">No row matches.</td></tr>';
     if (had) refocus(hadField);
     var c = $('cxTrCount'); if (c) c.textContent = ROWS.length + ' rows' + (Object.keys(NODES).length ? ' · ' + Object.keys(NODES).length + ' node edits' : '');
+    var rb = $('cxTrReset'); if (rb) rb.disabled = !Object.keys(NODES).length;
   }
   /* look a row up by attribute value, never by building a selector from a path */
   function rowEl(path) { var g = $('cxTrGrid'), rs = g ? g.tBodies[0].rows : [], i; for (i = 0; i < rs.length; i++) if (rs[i].getAttribute('data-path') === path) return rs[i]; return null; }

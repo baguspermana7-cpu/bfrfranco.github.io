@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v3.35.1 — 2026-11-09 — "Polish more: the program breakdown reads as a table, not a column of black boxes"
+
+Owner comment K31 ("Polish more", PRD v1.1 §41 ledger), rebased onto v3.35.0. Measured on the live page at
+1440 px: every row carried a 78 × 36 px weight field for a one-digit number, so rows stood 49 px tall; the node kind
+(SYSTEM / SUBSYSTEM / …) wrapped to its own line on some rows, so row heights jumped; "Reset breakdown" fell to a
+second toolbar row; the include boxes were the browser's default blue; the two "Import … CSV" labels were 2 px taller
+than the buttons beside them, their text 8 px above centre.
+
+### Changed
+- Program breakdown (`js/rz-cx-tree-ui.js`, `.cx-tr-*` in `css/rz-cx-analysis.css`): weight box 48 × 26 px,
+  right-aligned; 4 px row padding; the node kind moves into the name cell's tooltip; a hairline marks each indent
+  level; row hover; include in the page accent; the toolbar fits one row (Reset is "Reset", disabled until a node
+  carries an edit, with the full meaning in its tooltip; Find 150 px).
+- The CSV import labels (`js/rz-cx-ext.js` markup, styled in `css/rz-cx-analysis.css`) are inline-flex at the sibling
+  button height with centred text.
+
+### Gates
+- `tools/test-cx-tree-ui.mjs` gains K13 (toolbar one row, weight ≤ 52 px, median row ≤ 36 px, include accent = page
+  accent, Reset disabled with no edits) and K14 (import labels = button height, text centred within 2 px).
+  Red on v3.34.0: K13 `{wW:78, medianH:49, incAccent:"auto", resetDisabled:false, toolbar on two rows}`, K14
+  `{h:34 vs 32, off:8}`. Green after: 24/24. Screenshots at 1440 and 390 px in both themes looked at.
+- Standard: `CX_ANALYSIS_STANDARD.md` program breakdown paragraph gains the density rules (K13/K14).
+
 ## v3.35.0 — 2026-11-09 — "The homepage stops being flat: tiers, measured results and a 60/30/10 palette"
 
 Owner comments (PRD ledger K32/K33, OWNER_REQUESTS R098/R099): "Indexnya terlalu flat design"; "Kasih kombinasi warna
