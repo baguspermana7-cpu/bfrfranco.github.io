@@ -8,8 +8,10 @@
  *  D3 the case-study figures read as results: amber, never struck through or greyed (they were class stat-before).
  *  D4 operations: one table panel; no coloured badge, icon tile or tag chips; no hue but amber in the section.
  *  D5 section heads 02–07 (owner "sync"): a numbered mono eyebrow over a left-aligned title in every section after the hero.
- *  D7 60/30/10 (owner K33): the three bands (results, cases, contact) are the 30 % colour (a saturated blue), together 22–40 % of the page's
- *     height at 1440; every text on a band reaches WCAG AA against it (4.5:1, 3:1 at 24 px+); the 10 % accent = --dp-amber.
+ *  D7 60/30/10, R101 (owner 2026-11-09 "aneh birunya kyk nggk nyambung dg theme"; "contoh2 kn sdah saya kasih"): as in the
+ *     owner's echo reference, blue is LIGHT, never a flat band — the results, cases and contact sections sit on the page base
+ *     (≤2), a blue radial halo layer sits behind each, every panel there carries a blue rim on its top edge, at least two
+ *     result bars and one title word are blue; every text there reaches WCAG AA (4.5:1, 3:1 at 24 px+); the 10 % = --dp-amber.
  *  D8 sync: no element on the page still paints the old amber (any colour, fill or drawn border) — the accent is one hue.
  *  D9 align (owner "yang paling align"): in every section the content block starts on the eyebrow's left edge (±2 px).
  *  D10 every text node in the three band sections, inside panels too, reaches WCAG AA against what it sits on.
@@ -17,8 +19,11 @@
  *     strong ease-out, 60 ms row stagger); with reduced motion the bars are full from the start; without JS, full.
  *  D12 rhythm (owner "sync", peer audit): blue / base / blue / base / tier / blue — About sits on the page base (≤2) and FAQ on a
  *     real neutral tier (≥8 off the base, no blue cast), in both themes; no painted box inside them is a fake step (1–4 off its parent).
- *  D13 palette: inside the three band sections every saturated colour (text, icon fill/stroke, background) is the band blue or the
- *     accent — no stray cyan/sky link or icon colour (dark contact panel painted 56,189,248 and 96,165,250).
+ *  D13 palette: inside the three band sections every saturated colour (text, icon fill/stroke, background) is the blue
+ *     family (hue 218–232°) or the accent — no stray cyan/sky link or icon colour (dark contact panel painted 56,189,248).
+ *  D14 entrance (owner R103 "animasi motionnya sangat2 kurang payah"): every section that starts below the fold is armed;
+ *     before it enters, its content is hidden; within 1.8 s of entering, every item is shown, the eyebrow rule is drawn
+ *     and the blue light is on; the title passes through a blur (a sharpen-in, not a plain fade); reduced motion arms nothing.
  *  D6 phone 390 (both themes): no sideways scroll; every bar inside its panel; no description clipped to an ellipsis. No page errors anywhere.
  * Env RZ_BASE (default http://127.0.0.1:8177).   node tools/test-index-depth.mjs
  */
@@ -58,7 +63,8 @@ const probe = ([SECS, BANDS]) => {
   out.band = Object.fromEntries(SECS.map((id) => [id, sec[id] ? bg(sec[id]) : null]));
   const panels = [['metrics', '.res-panel'], ['operational-excellence', '.oe-grid'], ['case-studies', '.case-card'], ['contact', '.contact-info, .contact-form']];
   out.panels = panels.map(([id, sel]) => { const els = [...(sec[id] ? sec[id].querySelectorAll(sel) : [])];
-    return { id, sel, n: els.length, step: els.length ? Math.min(...els.map((e) => step(bg(e), out.band[id]))) : 0, hair: els.length > 0 && els.every(hairline) }; });
+    return { id, sel, n: els.length, step: els.length ? Math.min(...els.map((e) => step(bg(e), out.band[id]))) : 0, hair: els.length > 0 && els.every(hairline),
+      rim: els.length > 0 && els.every((e) => { const c = rgb(getComputedStyle(e).borderTopColor); return c[2] - Math.max(c[0], c[1]) >= 60; }) }; });
   out.stepBand = { metrics: step(out.band.metrics, out.base), cases: step(out.band['case-studies'], out.base), ops: step(out.band['operational-excellence'], out.base) };
   // D2
   out.bars = [...document.querySelectorAll('#metrics .res-bar[data-v]')].map((b) => { const t = b.getBoundingClientRect(), f = b.querySelector('.res-fill'), r = b.querySelector('.res-ref');
@@ -85,6 +91,12 @@ const probe = ([SECS, BANDS]) => {
   out.accent = rgb(getComputedStyle(document.documentElement).getPropertyValue('--dp-amber').trim().replace(/^#(..)(..)(..)$/, (m, r, g, b) => `rgb(${parseInt(r, 16)},${parseInt(g, 16)},${parseInt(b, 16)})`));
   out.bandH = BANDS.reduce((a, id) => a + (sec[id] ? sec[id].offsetHeight : 0), 0) / document.documentElement.scrollHeight;
   out.bandHue = BANDS.map((id) => { const c = out.band[id]; return c[2] - Math.max(c[0], c[1]); });
+  out.halo = BANDS.map((id) => { const g = getComputedStyle(sec[id], '::before').backgroundImage; const m = g.match(/rgba?\(([^)]+)\)/); const c = m ? m[1].split(',').map(Number) : [0, 0, 0];
+    return /radial-gradient/.test(g) && c[2] - Math.max(c[0], c[1]) >= 120; });
+  const isBlue = (c) => c[2] - Math.max(c[0], c[1]) >= 80;
+  out.blueBars = [...document.querySelectorAll('#metrics .res-fill')].filter((f) => { const m = getComputedStyle(f).backgroundImage.match(/rgba?\(([^)]+)\)\)?$/) || getComputedStyle(f).backgroundImage.match(/rgba?\(([^)]+)\)/g);
+    const all = (getComputedStyle(f).backgroundImage.match(/rgba?\([^)]+\)/g) || [getComputedStyle(f).backgroundColor]).map(rgb); return all.some(isBlue); }).length;
+  out.blueWord = [...document.querySelectorAll('.dp-hl')].filter((e) => isBlue(rgb(getComputedStyle(e).color))).length;
   out.lowContrast = BANDS.flatMap((id) => [...sec[id].querySelectorAll('.sec-head *, .btn-explore-articles')].filter((e) => e.childNodes.length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()))
     .map((e) => { const cs = getComputedStyle(e), r = ratio(rgb(cs.color), bg(e)), big = parseFloat(cs.fontSize) >= 24; return { t: e.textContent.trim().slice(0, 24), r: +r.toFixed(2), need: big ? 3 : 4.5 }; }).filter((x) => x.r < x.need));
   const CONTENT = { metrics: '.res-panel', 'operational-excellence': '.oe-grid', 'case-studies': '.case-card', faq: '.faq-list', contact: '.contact-content' };
@@ -106,10 +118,11 @@ const probe = ([SECS, BANDS]) => {
     .filter((e) => e.getClientRects().length && own(e)).map((e) => ({ k: (e.className || e.tagName).toString().slice(0, 24), d: step(own(e), bg(e.parentElement)) }))
     .filter((x) => x.d > 0 && x.d < 5).map((x) => `${id} ${x.k} Δ${x.d}`));
   // D13
-  const blue = out.band.metrics;
+  const hue = (c) => { const [r, g, b] = c.map((v) => v / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (!d) return -1;
+    const h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return Math.round(((h * 60) + 360) % 360); };
   out.strayHue = [...new Set(BANDS.flatMap((id) => [...sec[id].querySelectorAll('*')].filter((e) => e.getClientRects().length).flatMap((e) => { const cs = getComputedStyle(e);
     return ['color', 'fill', 'stroke', 'backgroundColor'].map((k) => [k, rgb(cs[k] || '')]).filter(([, c]) => c.length >= 3 && (c.length === 3 || c[3] > 0.3))
-      .map(([k, c]) => [k, c.slice(0, 3)]).filter(([, c]) => Math.max(...c) - Math.min(...c) > 60 && step(c, out.accent) > 6 && step(c, blue) > 6)
+      .map(([k, c]) => [k, c.slice(0, 3)]).filter(([, c]) => Math.max(...c) - Math.min(...c) > 60 && step(c, out.accent) > 6 && !(hue(c) >= 218 && hue(c) <= 232))
       .map(([k, c]) => `${id} ${(e.className && e.className.baseVal !== undefined ? e.tagName : e.className || e.tagName).toString().slice(0, 20)} ${k} ${c.join(',')}`); })))];
   return out;
 };
@@ -119,9 +132,9 @@ try {
     const p = await open(1440, theme);
     const o = await p.evaluate(probe, [SECS, BANDS]);
     const T = `[${theme} 1440]`;
-    check(o.stepBand.metrics >= 5 && o.stepBand.cases >= 5 && o.stepBand.ops <= 2,
-      `D1 ${T} results + case bands one step off the base (≥5), operations on the base (≤2) — read ${o.stepBand.metrics}/${o.stepBand.cases}/${o.stepBand.ops}`);
-    for (const q of o.panels) check(q.n > 0 && q.step >= 5 && q.hair, `D1 ${T} ${q.sel} in #${q.id}: ${q.n} panel(s), one step off the band (≥5, read ${q.step}), 1 px hairline ${q.hair}`);
+    check(o.stepBand.metrics <= 2 && o.stepBand.cases <= 2 && o.stepBand.ops <= 2,
+      `D1 ${T} results, cases and operations on the page base (≤2) — read ${o.stepBand.metrics}/${o.stepBand.cases}/${o.stepBand.ops}`);
+    for (const q of o.panels) check(q.n > 0 && q.hair && (q.step >= 5 || q.rim), `D1 ${T} ${q.sel} in #${q.id}: ${q.n} panel(s), framed by a 1 px hairline and set off by a tier (${q.step}) or the blue rim (${q.rim})`);
     check(o.rows === 4, `D2 ${T} four result rows — read ${o.rows}`);
     const badBars = o.bars.filter((b) => Math.abs(b.fill - b.v) > 0.01 || (b.ref !== null && (b.at === null || Math.abs(b.at - b.ref) > 0.012 || !b.refLabel)));
     check(o.bars.length === 3 && badBars.length === 0, `D2 ${T} 3 measured bars: fill = value, tick = reference — ${o.bars.map((b) => `${b.v}:${b.fill.toFixed(3)}${b.ref !== null ? `@${b.ref}:${b.at === null ? '-' : b.at.toFixed(3)}` : ''}`).join(' ')}`);
@@ -132,7 +145,8 @@ try {
     const offHue = [...new Set(o.opsHues)].filter((c) => Math.max(...c.split(',').map((v, i) => Math.abs(+v - amber[i]))) > 6);
     check(offHue.length === 0, `D4 ${T} no hue but amber in operations${offHue.length ? ' — ' + offHue.slice(0, 4).join(' / ') : ''}`);
     for (const h of o.heads) check(/^0\d\b/.test(h.eb) && h.ebMono && h.align !== 'center' && h.dx <= 2, `D5 ${T} #${h.id}: eyebrow "${h.eb}" mono ${h.ebMono}, title ${h.align}, aligned Δ${Math.round(h.dx)}`);
-    check(o.bandHue.every((d) => d >= 120) && o.bandH >= 0.22 && o.bandH <= 0.40, `D7 ${T} bands are the 30 % blue (blue lead ${o.bandHue.join('/')}), ${(o.bandH * 100).toFixed(1)} % of the page height`);
+    check(o.bandHue.every((d) => d < 30) && o.halo.every(Boolean), `D7 ${T} blue is light, not a band: section grounds carry no blue (lead ${o.bandHue.join('/')}), a blue halo sits behind each (${o.halo.join('/')})`);
+    check(o.blueBars >= 2 && o.blueWord >= 1, `D7 ${T} blue on the data and one title word: ${o.blueBars} blue bar(s), ${o.blueWord} blue word(s)`);
     check(o.lowContrast.length === 0, `D7 ${T} text on the bands reaches AA${o.lowContrast.length ? ' — ' + o.lowContrast.map((x) => `${x.t} ${x.r}<${x.need}`).join(' | ') : ''}`);
     check(o.bandText.length === 0, `D10 ${T} every text in the band sections (panels included) reaches AA${o.bandText.length ? ' — ' + o.bandText.length + ': ' + o.bandText.slice(0, 5).map((x) => `${x.t} ${x.r}`).join(' | ') : ''}`);
     const mis = o.align.filter((a) => a.dx > 2);
@@ -141,7 +155,7 @@ try {
     check(o.tier.about.step <= 2 && o.tier.faq.step >= 8 && o.tier.faq.cast <= 8,
       `D12 ${T} About on the base (≤2, read ${o.tier.about.step}), FAQ on a real neutral tier (≥8, read ${o.tier.faq.step}, blue cast ${o.tier.faq.cast} ≤8)`);
     check(o.fakeStep.length === 0, `D12 ${T} no fake step (1–4) painted inside operations/About/FAQ${o.fakeStep.length ? ' — ' + o.fakeStep.slice(0, 5).join(' | ') : ''}`);
-    check(o.strayHue.length === 0, `D13 ${T} band sections use only the band blue and the accent${o.strayHue.length ? ' — ' + o.strayHue.length + ': ' + o.strayHue.slice(0, 5).join(' | ') : ''}`);
+    check(o.strayHue.length === 0, `D13 ${T} band sections use only the blue family and the accent${o.strayHue.length ? ' — ' + o.strayHue.length + ': ' + o.strayHue.slice(0, 5).join(' | ') : ''}`);
     check(p.errors.length === 0, `D6 ${T} no page errors${p.errors.length ? ' — ' + p.errors[0] : ''}`);
     await p.close();
     const q = await open(390, theme);
@@ -162,15 +176,44 @@ try {
     const before = await fills();
     await p.evaluate(() => document.querySelector('#metrics .res-panel').scrollIntoView({ block: 'center' }));
     if (!reduce) await p.waitForFunction(() => document.querySelector('#metrics .res-panel.res-in'), { timeout: 5000 }).catch(() => {});
-    await new Promise((r) => setTimeout(r, 140));
-    const mid = await fills();
+    // every frame for 900 ms (a fixed 140 ms sample flaked under a loaded gate): keep the most in-between frame
+    const mid = await p.evaluate(() => new Promise((done) => { const bars = [...document.querySelectorAll('#metrics .res-bar[data-v]')], t0 = performance.now(); let best = bars.map(() => 0), score = -1;
+      const tick = () => { const f = bars.map((b) => +(b.querySelector('.res-fill').getBoundingClientRect().width / b.getBoundingClientRect().width).toFixed(3));
+        const sc = f.filter((x, i) => x > 0.02 && x < +bars[i].dataset.v - 0.01).length; if (sc > score) { score = sc; best = f; }
+        if (performance.now() - t0 < 900) requestAnimationFrame(tick); else done(best); }; requestAnimationFrame(tick); }));
     await new Promise((r) => setTimeout(r, 1200));
     const after = await fills();
     const want = await p.evaluate(() => [...document.querySelectorAll('#metrics .res-bar[data-v]')].map((b) => +b.dataset.v));
     const atValue = after.every((f, i) => Math.abs(f - want[i]) <= 0.01);
     if (!reduce) check(before.every((f) => f <= 0.02) && mid.some((f, i) => f > 0.02 && f < want[i] - 0.01) && atValue,
-      `D11 bars grow on entering view: before ${before.join('/')} · 140 ms after entry ${mid.join('/')} · after ${after.join('/')}`);
+      `D11 bars grow on entering view: before ${before.join('/')} · in flight ${mid.join('/')} · after ${after.join('/')}`);
     else check(before.every((f, i) => Math.abs(f - want[i]) <= 0.01) && atValue, `D11 reduced motion: bars full from the start ${before.join('/')}`);
+    await p.close();
+  }
+  // D14 entrance choreography (R103): armed below the fold, hidden before entry, all shown within 1.8 s, title sharpens in.
+  for (const reduce of [false, true]) {
+    const p = await browser.newPage(); p.errors = []; p.on('pageerror', (e) => p.errors.push(String(e)));
+    await p.setViewport({ width: 1440, height: 900 });
+    if (reduce) await p.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    await p.goto(URL.replace('/index.html', '/robots.txt')); await p.evaluate(() => { localStorage.clear(); localStorage.setItem('rz_cookie_consent', 'declined'); });
+    await p.goto(URL, { waitUntil: 'networkidle2', timeout: 60000 }); await new Promise((r) => setTimeout(r, 400));
+    const armed = await p.evaluate((S) => S.filter((id) => document.getElementById(id).classList.contains('rv-armed')), SECS);
+    if (reduce) { check(armed.length === 0, `D14 reduced motion: no section is armed (read ${armed.join(',') || 'none'})`); await p.close(); continue; }
+    check(armed.length === SECS.length, `D14 every section below the fold is armed (${armed.length}/${SECS.length})`);
+    for (const id of ['metrics', 'case-studies', 'contact']) {
+      const pre = await p.evaluate((id) => { const items = [...document.getElementById(id).querySelectorAll('.rv')]; return { n: items.length, shown: items.filter((e) => +getComputedStyle(e).opacity > 0.05).length }; }, id);
+      await p.evaluate((id) => { document.documentElement.style.scrollBehavior = 'auto'; const e = document.getElementById(id); window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 80); }, id);
+      await p.waitForFunction((id) => document.getElementById(id).classList.contains('rv-in'), { timeout: 4000 }, id).catch(() => {});
+      await new Promise((r) => setTimeout(r, 120));
+      const blur = await p.evaluate((id) => { const t = document.querySelector('#' + id + ' .rv-title'); return t ? getComputedStyle(t).filter : 'none'; }, id);
+      await new Promise((r) => setTimeout(r, 1700));
+      const post = await p.evaluate((id) => { const s = document.getElementById(id), items = [...s.querySelectorAll('.rv, .rv-title')];
+        const eb = s.querySelector('.sec-eyebrow'); return { shown: items.filter((e) => +getComputedStyle(e).opacity > 0.99 && getComputedStyle(e).transform === 'none').length, n: items.length,
+          rule: eb ? getComputedStyle(eb, '::after').transform : 'none', light: +getComputedStyle(s, '::before').opacity }; }, id);
+      check(pre.n >= 2 && pre.shown === 0 && /blur\(/.test(blur) && post.shown === post.n && post.rule === 'none' && post.light > 0.99,
+        `D14 #${id}: hidden before entry (${pre.shown}/${pre.n} shown), title mid-sharpen 120 ms in (${blur}), all ${post.shown}/${post.n} shown after, rule drawn (${post.rule}), light on (${post.light})`);
+    }
+    check(p.errors.length === 0, `D14 no page errors${p.errors.length ? ' — ' + p.errors[0] : ''}`);
     await p.close();
   }
 } finally { await browser.close(); }

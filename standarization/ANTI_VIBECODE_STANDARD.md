@@ -136,17 +136,18 @@ An over-eager de-slop pass must not remove these; they are the site's identity, 
   register (`data-rz-register="editorial"`), IBM Plex Sans (headings AND body) + a mono face for numbers only.
   (Fraunces was withdrawn 2026-10-15, §A34; the oscilloscope tokens are state colours inside cockpits, never chrome.)
 - **Semantic category colors** (e.g. a policy/legal icon) via named tokens.
-- **Homepage 60/30/10 palette (owner K33 / R099, 2026-11-09, by the owner's own choice — "Yg terbaik yg paling bagus",
-  "yg paling align bener2 bagus, sync dan keren").** ON `index.html` ONLY: graphite (dark) / white (light) is the 60, electric
-  blue `#2456E6` the 30 as three full section bands (results, case studies, correspondence — 30 % of the page height),
-  orange the 10 (`#FF7A1A` dark, `#C2410C` light: figures, bars, the login pill, focus). It supersedes the one-amber rule
-  (§A32 "second accent hue in chrome") for the homepage; every other page keeps graphite + amber. Text on a band reaches
-  AA (`--dp-on-*` tokens); panels on a band are graphite/white with one 1 px hairline. Depth comes from tiers, hairlines
-  and measured figures, never from shadow, glow, blur or lift. Gate: `tools/test-index-depth.mjs` D1–D13 (D8: no element
-  on the homepage still paints the old amber; D12: rhythm blue / base / blue / base / tier / blue, every non-band section
-  either on the base (≤2) or a real neutral tier (≥8, blue cast ≤8), no fake 1–4 step inside; D13: inside a band section
-  every saturated colour is the band blue or the accent, no third hue on links or icons). A blue BAND is not the rejected navy CAST (§A33): navy was a surface tint
-  under everything; the band is a deliberate 30 % block with AA text.
+- **Homepage 60/30/10 palette (owner K33 / R099 → R101, 2026-11-09).** ON `index.html` ONLY. The owner's reference
+  (Midnight Black / Electric Blue / Sunset Orange, the "echo" page) never paints blue as a flat band, and the v3.35.0–3
+  full-width `#2456E6` bands were rejected ("aneh birunya kyk nggk nyambung dg theme"; "contoh2 kn sdah saya kasih").
+  So: graphite `#0B0C0E` (dark) / white (light) is the 60 and every section sits on it; blue is the 30 as LIGHT — a
+  radial halo layer behind the results, case-study and contact panels, a blue rim on each panel's top edge, the data bars
+  and one word of a title (`.dp-hl`); orange is the 10 (`#FF7A1A` dark, `#C2410C` light: the headline figure, its bar, the
+  case figures, the flat CTA; a resting shadow on the CTA is a §A11 tell and the slop scan fails it). This is the one place a glow is allowed: a light source behind a panel,
+  in the brand blue, never a coloured blob, aurora or neon edge (§A33 navy cast and the aurora ban stand everywhere else).
+  It supersedes the one-amber rule (§A32) for the homepage; every other page keeps graphite + amber. Gate:
+  `tools/test-index-depth.mjs` D1–D14 (D7 blue is light, not a band; D8 no old amber; D10 AA everywhere; D12 rhythm with
+  About on the base and FAQ on a real tier; D13 only the blue family (hue 218–232°) and the accent inside those sections;
+  D14 the entrance choreography).
 - **Skeleton loaders** where real async loads occur (their PRESENCE is good — their ABSENCE is a tell).
 
 ## C. REQUIRED (present = good; absence is itself a vibecode tell)

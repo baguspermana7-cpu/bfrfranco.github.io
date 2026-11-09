@@ -2,8 +2,11 @@
 /**
  * test-index-r079.mjs — the laws of the R079 homepage refit (owner 2026-11-07), run on the rendered page.
  *  L1 every id of the pre-refit homepage (BASE commit) still exists, and every href="#x" resolves to an id.
- *  L2 employer cards: 5 cards, exactly 1 .is-current; Details flips (aria-expanded, back face not inert, rotateY 180),
- *     Esc flips home, opening card B closes card A, the shown face sets the height; reduced motion fades.
+ *  L2 employer cards: 5 cards, exactly 1 .is-current. R102 (owner 2026-11-09 "klik cards lgsung flip … gak usah kasih
+ *     tombol tulisan detail … flipnya kaku"): a click on the card body flips it (aria-expanded, back live, back square to
+ *     the reader, front turned away); 150 ms in, the front is mid-turn (20°–170°, a real 3D turn, not a swap); the turn
+ *     button shows no text and is ≤ 40 px; keyboard Enter on it flips and moves focus to Back, Esc flips home and returns
+ *     focus; opening card B closes card A; the shown face sets the height; reduced motion fades, no rotation.
  *  L3 phone 390: no horizontal scroll, cards one column, each card as tall as its shown face; every logo 28 px tall and a vector.
  *  L4 nav: no backdrop-filter, no box-shadow, 64 +/- 2 px at 1440; the Contact pill once in the nav, the
  *     pill CTA once in the hero and once in the contact section, each reaching #contact or mailto.
@@ -59,18 +62,32 @@ try {
   const st = (i) => p.evaluate((i) => { const c = document.querySelectorAll('.emp-card')[i], b = c.querySelector('.emp-back');
     return { exp: c.querySelector('.emp-open').getAttribute('aria-expanded'), inert: b.hasAttribute('inert'), tf: getComputedStyle(b).transform, h: Math.round(c.getBoundingClientRect().height),
       focus: document.activeElement && document.activeElement.className }; }, i);
-  const h0 = (await st(1)).h;
-  await p.click('.emp-card:nth-child(2) .emp-open'); await sleep(800);
+  const ang = (tf) => { if (!/matrix3d/.test(tf)) return 0; const m = tf.slice(tf.indexOf('(') + 1).split(',').map(Number); return Math.round(Math.acos(Math.max(-1, Math.min(1, m[0]))) * 180 / Math.PI); };
+  const body = async (n) => { const el = await p.$(`.emp-card:nth-child(${n}) .emp-name`); await el.evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' })); await sleep(300); const bb = await el.boundingBox(); return { x: bb.x + 10, y: bb.y + bb.height / 2 }; };
+  let pt = await body(2);
+  await p.mouse.click(pt.x, pt.y); await sleep(150);
+  const mid = await p.evaluate(() => getComputedStyle(document.querySelectorAll('.emp-card')[1].querySelector('.emp-front')).transform);
+  await sleep(850);
   let s = await st(1);
-  check(s.exp === 'true' && !s.inert && (s.tf === 'none' || s.tf === 'matrix(1, 0, 0, 1, 0, 0)') && /emp-back-name/.test(s.focus), `L2 Details opens card 2 (expanded, back live, back face square to the reader, focus on its heading) — ${JSON.stringify(s)}`);
-  const shown = await p.evaluate(() => { const c = document.querySelectorAll('.emp-card')[1]; return [getComputedStyle(c.querySelector('.emp-front')).display, getComputedStyle(c.querySelector('.emp-back')).display, getComputedStyle(c.querySelector('.emp-back')).animationName]; });
-  check(shown[0] === 'none' && shown[1] === 'flex' && shown[2] === 'emp-turn-in', `L2 the back replaces the front and turns in — ${shown.join(' / ')}`);
-  await p.click('.emp-card:nth-child(4) .emp-open'); await sleep(800);
+  const front = await p.evaluate(() => getComputedStyle(document.querySelectorAll('.emp-card')[1].querySelector('.emp-front')).transform);
+  check(s.exp === 'true' && !s.inert && ang(s.tf) <= 2 && ang(front) >= 178, `L2 a click on the card body flips card 2 (expanded, back live and square ${ang(s.tf)}°, front turned away ${ang(front)}°)`);
+  check(ang(mid) >= 20 && ang(mid) <= 170, `L2 150 ms after the click the front is mid-turn (${ang(mid)}°, 20–170) — a 3D turn, not a swap`);
+  const btn = await p.evaluate(() => { const b = document.querySelector('.emp-card .emp-open'), r = b.getBoundingClientRect();
+    const shown = [...b.querySelectorAll('*')].filter((e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && e.getBoundingClientRect().width > 1).map((e) => e.textContent.trim());
+    const own = [...b.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim()).map((n) => n.textContent.trim());
+    return { txt: shown.concat(own).join(' '), w: Math.round(r.width), h: Math.round(r.height), label: b.textContent.trim() }; });
+  check(btn.txt === '' && btn.w <= 40 && btn.h <= 40 && /Details/.test(btn.label), `L2 the turn button is a small icon (no shown text "${btn.txt}", ${btn.w}×${btn.h} px), named "${btn.label}" for screen readers`);
+  pt = await body(4);
+  await p.mouse.click(pt.x, pt.y); await sleep(1000);
   const a = await st(1), b = await st(3);
   check(a.exp === 'false' && a.inert && b.exp === 'true', `L2 opening card 4 flips card 2 home (one open at a time)`);
-  await p.keyboard.press('Escape'); await sleep(800);
-  const c = await st(3);
-  check(c.exp === 'false' && c.inert && /emp-open/.test(c.focus), `L2 Esc flips card 4 home and returns focus to Details`);
+  await p.keyboard.press('Escape'); await sleep(900);
+  await p.focus('.emp-card:nth-child(3) .emp-open'); await p.keyboard.press('Enter'); await sleep(900);
+  const k = await st(2);
+  check(k.exp === 'true' && /emp-close/.test(k.focus), `L2 keyboard: Enter on the turn button flips card 3 and focus moves to Back (${k.focus})`);
+  await p.keyboard.press('Escape'); await sleep(900);
+  const c = await st(2);
+  check(c.exp === 'false' && c.inert && /emp-open/.test(c.focus), `L2 Esc flips card 3 home and returns focus to the turn button`);
   check(p.errors.length === 0, `L2 no page errors — ${p.errors.join(' | ')}`);
 
   // L4 (1440)
@@ -95,9 +112,10 @@ try {
 
   // L2 reduced motion: no rotation
   p = await open(1440, 'light', true);
-  await p.click('.emp-card:nth-child(2) .emp-open'); await sleep(400);
-  const rm = await p.evaluate(() => getComputedStyle(document.querySelectorAll('.emp-card')[1].querySelector('.emp-back')).animationName);
-  check(rm === 'emp-fade-in', `L2 reduced motion: the back fades in, no rotation — ${rm}`);
+  await p.click('.emp-card:nth-child(2) .emp-open'); await sleep(60);
+  const rm = await p.evaluate(() => { const c = document.querySelectorAll('.emp-card')[1], b = c.querySelector('.emp-back'), f = c.querySelector('.emp-front');
+    return getComputedStyle(f).transform + '|' + getComputedStyle(b).transform + '|' + getComputedStyle(b).transitionProperty; });
+  check(/^none\|none\|.*opacity/.test(rm), `L2 reduced motion: the back fades in, no rotation — ${rm}`);
   await p.close();
 
   // L3 + L5 at three widths, both themes for 390

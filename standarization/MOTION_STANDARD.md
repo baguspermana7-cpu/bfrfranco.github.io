@@ -195,3 +195,19 @@ Proven to fail before it was trusted: seeding `transition: all 500ms ease-in`,
 a `scale(0)` entrance, and removing the sheet's `rz-dragging` class produced 12
 failures naming each defect. A gate nobody has seen fail is a gate nobody should
 believe.
+
+## Homepage choreography (owner R102–R104, 2026-11-09, v3.35.5)
+
+"Animasi motionnya sangat2 kurang payah. Cari inspirasi" / "klik cards lgsung flip … flipnya kaku". Built after the
+owner's echo reference and Emil Kowalski's enter recipe; all on `index.html`, all once, all transform / opacity (and a
+blur on the section title only):
+
+| Moment | What moves | Timing |
+|---|---|---|
+| Section enters (below the fold only) | eyebrow rule draws from the left; title sharpens out of a 6 px blur; lede, then the content items on a 70 ms stagger; the blue light behind the section switches on | 600–900 ms, `cubic-bezier(0.23, 1, 0.32, 1)`; light 1400 ms |
+| Result bars | grow from 0 to their value | 600 ms, 60 ms row stagger |
+| Employer card click (anywhere on the card) | both faces turn in 3D (front 0→180°, back −180→0°), the card dips to 0.965 and a shade crosses each face mid-turn; the height follows the shown face | 800 ms damped spring as `linear()` (ζ 0.78, ~2 % settle, no bounce); height 500 ms |
+
+Reduced motion: no section is armed, the flip is a 180 ms opacity swap, bars render full. Without JS nothing is hidden.
+Gates: `tools/test-index-depth.mjs` D11 + D14, `tools/test-index-r079.mjs` L2 (mid-turn 20–170° at 150 ms, keyboard path,
+small icon button, reduced motion = no rotation). Both proven red on v3.35.3 (10 + 6 failures).

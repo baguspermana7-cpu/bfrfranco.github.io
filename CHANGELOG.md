@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v3.35.5 — 2026-11-09 — "Blue as light, a card that turns, sections that arrive"
+
+Owner on live v3.35.2 (R101–R104): "Jelek sekali ini, aneh birunya kyk nggk nyambung dg theme"; "contoh2 kn sdah saya
+kasih mlah kmu buat jelek sekali"; "card employeer … klik cards lgsung flip … flipnya animasi kurang smooth dan kaku";
+"animasi motionnya sangat2 kurang payah. Cari inspirasi"; "jangan sampai ai design slop".
+
+### Changed
+- **Blue is light, not a band.** The owner's 60/30/10 reference (Midnight Black / Electric Blue / Sunset Orange) never
+  paints blue as a flat block, and v3.35.0–3 did. Results, case studies and correspondence now sit on the graphite /
+  white base; behind each panel a blue halo, on each panel's top edge a blue rim, the data bars in blue (the headline
+  bar in orange), one word of the title in blue. Orange stays the 10: headline figure, case figures, a flat CTA (no
+  resting glow: the slop render scan [162] caught one in the first gate run, removed). The corner icon changes colour on
+  card hover and does not rotate (a `:hover` transform is a lift tell).
+- **Employer cards turn on a click anywhere on the card.** Both faces rotate in 3D (front 0→180°, back −180→0°) on a
+  damped spring written as `linear()` (ζ 0.78, ~2 % settle, no bounce), 800 ms; the card dips to 0.965 and a shade
+  crosses each face mid-turn; the card height follows the shown face (500 ms). The full-width "Details →" / "← Back"
+  text buttons are now a 36 px corner turn icon (still named for screen readers; Enter flips, Esc returns).
+- **Sections arrive.** Each section below the fold enters once: the eyebrow rule draws from the left, the title
+  sharpens out of a 6 px blur, the lede and content follow on a 70 ms stagger, the blue light behind switches on.
+  The generic 40 px whole-section fade from script.js (`.section-reveal`) is switched off for these six sections.
+  Reduced motion: nothing is hidden or moved; the flip is an opacity swap.
+
+### Fixed
+- **FAQ answers read 4.3:1 on the FAQ tier (live since v3.35.3).** Now `--dp-muted` (AA). The a11y gate never saw it:
+  `.section-reveal` kept every section below the fold at opacity 0 and axe skips hidden text.
+- `tools/audit-a11y.mjs` now passes through each page like a reader (instant steps of 0.6 viewport — a smooth
+  `scrollTo` never arrived) before settling animations, and fails a page whose scroll reveal never ran. Proven: a
+  seeded `#d4d4d4` FAQ answer was invisible to the old audit (0 nodes) and is caught now (22).
+
+### Gates
+- `tools/test-index-depth.mjs`: D1/D7/D13 rewritten for blue-as-light, D11 samples every frame (a single 140 ms
+  sample flaked), new D14 entrance choreography. `tools/test-index-r079.mjs` L2 rewritten (click-anywhere flip,
+  mid-turn 20–170° at 150 ms, icon button, keyboard, reduced motion). Red on v3.35.3: 10 + 6 failures; green after.
+  Standards: ANTI_VIBECODE_STANDARD §B, MOTION_STANDARD "Homepage choreography", AGENT_HARNESS_STANDARD E5;
+  ledger R101–R104.
+
 ## v3.35.4 — 2026-11-09 — "The one-line draws the power paths you asked for"
 
 Owner K29: "giant schematic … receh, kurang detail dan kurang comprehensive". The sub-system sheets and their modal

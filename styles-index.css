@@ -5570,3 +5570,93 @@ html[data-theme="light"] #rzModalForm .rz-demo-hint code, html[data-theme="light
 #contact .copy-btn { color: var(--dp-muted); }
 #contact .copy-btn:hover { border-color: var(--dp-line-2); }
 #contact .contact-icon { background: transparent !important; }
+/* R101 (owner 2026-11-09 "aneh birunya kyk nggk nyambung dg theme"; "contoh2 kn sdah saya kasih"): the owner's
+   60/30/10 example (Midnight Black / Electric Blue / Sunset Orange, "echo") never paints blue as a flat band — the
+   page stays midnight, blue is LIGHT: a soft halo behind the product panel, a blue rim on its edge, blue data bars,
+   one blue word in the title; orange is the CTA and the one highlighted figure. Same model here. */
+:root { --dp-blue: #2456e6; --dp-blue-text: #2456e6; --dp-glow: rgba(36, 86, 230, 0.17); --dp-glow-edge: rgba(36, 86, 230, 0.30); --dp-rim: rgba(36, 86, 230, 0.55); }
+[data-theme="dark"] { --dp-blue: #3b6bff; --dp-blue-text: #7a9cff; --dp-glow: rgba(47, 107, 255, 0.24); --dp-glow-edge: rgba(47, 107, 255, 0.55); --dp-rim: rgba(98, 140, 255, 0.45); }
+section.dp-band { --dp-on-ink: var(--dp-ink); --dp-on-muted: var(--dp-muted); --dp-on-line: var(--dp-line); }
+#metrics, #case-studies, #contact { background: transparent; position: relative; isolation: isolate; }
+[data-theme="dark"] #metrics, [data-theme="dark"] #case-studies, [data-theme="dark"] #contact { background: #0b0c0e; }
+#metrics::before, #case-studies::before, #contact::before {
+    content: ''; display: block; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(70% 60% at 50% 40%, var(--dp-glow), transparent 72%);
+}
+section.dp-band .sec-eyebrow span { color: var(--dp-blue-text); }
+section.dp-band .sec-eyebrow::after { background: linear-gradient(90deg, var(--dp-rim), transparent); }
+.dp-hl { color: var(--dp-blue-text); }
+#metrics .res-panel, #case-studies .case-card, #contact .contact-info, #contact .contact-form {
+    border-color: var(--dp-line);
+    border-top-color: var(--dp-rim);
+    box-shadow: inset 0 1px 0 0 var(--dp-glow-edge), 0 -30px 90px -40px var(--dp-glow-edge);
+}
+#metrics .res-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--dp-blue) 70%, transparent), var(--dp-blue)); }
+#metrics .res-row:first-child .res-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--dp-amber) 70%, transparent), var(--dp-amber)); }
+/* R102 employer cards (owner: "klik cards lgsung flip … flipnya animasi kurang smooth dan kaku"): both faces turn in
+   3D — front 0 → 180°, back -180° → 0 — on a damped spring (ζ 0.78, ~2 % settle, no bounce), with the card dipping
+   to 0.965 and a shade crossing each face mid-turn. The text "Details" button is now a small corner turn icon. */
+.emp-card { perspective: 1400px; cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; }
+.emp-face {
+    position: relative; overflow: hidden;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    transition: transform 800ms linear(0, 0.0249, 0.0878, 0.1741, 0.2724, 0.3744, 0.4742, 0.5677, 0.6526, 0.7275, 0.792, 0.8462, 0.8909, 0.9269, 0.9552, 0.9768, 0.9928, 1.0042, 1.0119, 1.0166, 1.0191, 1.0199, 1.0195, 1.0184, 1.0167, 1.0148, 1.0127, 1.0107, 1.0089, 1.0071, 1.0056, 1.0043, 1.0032, 1.0023, 1.0015, 1.001, 1.0005, 1.0002, 0.9999, 0.9998, 1), border-color 160ms ease-out;
+}
+.emp-back, .emp-card.is-flipped .emp-back { display: flex; animation: none; transform: rotateY(-180deg); }
+.emp-card.is-flipped .emp-front { display: flex; animation: none; transform: rotateY(180deg); }
+.emp-card.is-flipped .emp-back { transform: rotateY(0deg); }
+.emp-card.emp-armed:not(.is-flipped) .emp-front { animation: none; }
+/* the hidden face leaves the flow, so a card is as tall as the face it shows (R079 L3); JS animates the height change */
+.emp-card:not(.is-flipped) .emp-back, .emp-card.is-flipped .emp-front { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }
+.emp-face::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(90deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.04)); }
+.emp-card.emp-turning { animation: emp-dip 800ms cubic-bezier(0.45, 0, 0.25, 1); }
+.emp-card.emp-turning .emp-face::after { animation: emp-shade 800ms cubic-bezier(0.45, 0, 0.25, 1); }
+@keyframes emp-dip { 0%, 100% { transform: scale(1); } 45% { transform: scale(0.965); } }
+@keyframes emp-shade { 0%, 100% { opacity: 0; } 40% { opacity: 1; } }
+.emp-btn.emp-open, .emp-btn.emp-close {
+    position: absolute; right: 12px; bottom: 12px; z-index: 1;
+    width: 36px; min-height: 36px; height: 36px; padding: 0; margin: 0;
+    display: grid; place-items: center;
+    border: 1px solid var(--emp-line); border-radius: 4px; color: var(--emp-faint); background: var(--emp-bg);
+    transition: color 160ms ease-out, border-color 160ms ease-out;
+}
+.emp-btn .emp-ico { display: block; }
+@media (hover: hover) and (pointer: fine) {
+    .emp-card:hover .emp-btn { color: var(--emp-ink); border-color: var(--emp-ink); }
+}
+.emp-btn:hover { text-decoration: none; }
+.emp-front > .emp-skills, .emp-back > .emp-facts { margin-bottom: 44px; }
+@media (prefers-reduced-motion: reduce) {
+    .emp-face { transition: opacity 180ms ease-out, border-color 160ms ease-out; }
+    .emp-back, .emp-card.is-flipped .emp-front, .emp-card.is-flipped .emp-back { transform: none; }
+    .emp-back { opacity: 0; }
+    .emp-card.is-flipped .emp-front { opacity: 0; }
+    .emp-card.is-flipped .emp-back { opacity: 1; }
+    .emp-card.emp-turning, .emp-card.emp-turning .emp-face::after { animation: none; }
+}
+
+/* R103/R104 (owner "animasi motionnya sangat2 kurang payah. Cari inspirasi"; "bener2 keren effect2 motion"): one
+   entrance choreography per section, after the owner's echo reference and Emil Kowalski's enter recipe — the eyebrow
+   rule draws from the left, the title sharpens out of a 6 px blur, the content follows on a 70 ms stagger, and the blue
+   light behind a band switches on. Runs once per section, only for sections that start below the fold; transform,
+   opacity and the title's filter only; reduced motion shows everything at once. Gate: test-index-depth D14. */
+.rv-armed .sec-eyebrow::after { transform: scaleX(0); transform-origin: left center; }
+#metrics.rv-armed .rv, #operational-excellence.rv-armed .rv, #case-studies.rv-armed .rv, #about.rv-armed .rv, #faq.rv-armed .rv, #contact.rv-armed .rv { opacity: 0; transform: translateY(16px); }
+.rv-armed .rv-title { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+.rv-armed::before { opacity: 0; }
+.rv-armed.rv-in .sec-eyebrow::after { transform: none; transition: transform 900ms cubic-bezier(0.23, 1, 0.32, 1) 80ms; }
+#metrics.rv-armed.rv-in .rv, #operational-excellence.rv-armed.rv-in .rv, #case-studies.rv-armed.rv-in .rv, #about.rv-armed.rv-in .rv, #faq.rv-armed.rv-in .rv, #contact.rv-armed.rv-in .rv, .rv-armed.rv-in .rv-title {
+    opacity: 1; transform: none; filter: none;
+    transition: opacity 600ms cubic-bezier(0.23, 1, 0.32, 1) var(--rv-d, 0ms), transform 700ms cubic-bezier(0.23, 1, 0.32, 1) var(--rv-d, 0ms), filter 600ms cubic-bezier(0.23, 1, 0.32, 1) var(--rv-d, 0ms);
+}
+.rv-armed.rv-in::before { opacity: 1; transition: opacity 1400ms cubic-bezier(0.23, 1, 0.32, 1) 150ms; }
+#metrics .fade-in:not(.rv):not(.rv-title), #operational-excellence .fade-in:not(.rv):not(.rv-title), #case-studies .fade-in:not(.rv):not(.rv-title), #about .fade-in:not(.rv):not(.rv-title), #faq .fade-in:not(.rv):not(.rv-title), #contact .fade-in:not(.rv):not(.rv-title) { opacity: 1; transform: none; }
+/* script.js fades every whole section in by 40 px (.section-reveal) — the generic motion the owner called weak, and on top
+   of the choreography above it doubled every fade. The six choreographed sections opt out. */
+#metrics.section-reveal, #operational-excellence.section-reveal, #case-studies.section-reveal, #about.section-reveal, #faq.section-reveal, #contact.section-reveal { opacity: 1; transform: none; transition: none; }
+@media (prefers-reduced-motion: reduce) {
+    #metrics.rv-armed .rv, #operational-excellence.rv-armed .rv, #case-studies.rv-armed .rv, #about.rv-armed .rv, #faq.rv-armed .rv, #contact.rv-armed .rv, .rv-armed .rv-title, .rv-armed::before, .rv-armed .sec-eyebrow::after { opacity: 1; transform: none; filter: none; }
+}
+/* v3.35.5: on the FAQ tier (--dp-raised) the answers' #6c757d read 4.3:1 in light. axe never saw it: the legacy
+   section-reveal kept every section below the fold at opacity 0, and axe skips hidden text (audit-a11y now scrolls). */
+#faq .faq-a { color: var(--dp-muted); }

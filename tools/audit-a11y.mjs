@@ -84,6 +84,16 @@ for (const f of PAGES) {
       await pg.goto(`http://localhost:${PORT}/${f}`, { waitUntil: 'networkidle2', timeout: 60000 });
       await pg.evaluate(t => document.documentElement.setAttribute('data-theme', t), theme);
       await new Promise(r => setTimeout(r, 700)); // settle theme transitions
+      // 2026-11-09 (v3.35.5): the homepage reveals each section when it scrolls into view (IntersectionObserver), so
+      // below the fold its text sits at opacity 0 until a reader gets there — axe, which never scrolls, sampled 22
+      // FAQ answers at that opacity. Pass through the page like a reader first (steps of one viewport, then back to
+      // the top), so scroll-triggered reveals run; the settle below then jumps them to their end state. Colours are
+      // untouched, so a real low contrast still fails.
+      // scroll-behavior: smooth on <html> made a plain scrollTo glide, so the 60 ms steps never arrived and the FAQ stayed
+      // hidden — axe then SKIPS opacity-0 text, and a seeded #d4d4d4 answer passed. Instant steps, then a guard below.
+      await pg.evaluate(async () => { const h = innerHeight; for (let y = 0; y < document.documentElement.scrollHeight; y += Math.round(h * 0.6)) { window.scrollTo({ top: y, behavior: 'instant' }); await new Promise(r => setTimeout(r, 80)); } window.scrollTo({ top: 0, behavior: 'instant' }); }).catch(() => {});
+      const unrevealed = await pg.evaluate(() => [...document.querySelectorAll('.rv-armed:not(.rv-in)')].map(e => e.id || e.className)).catch(() => []);
+      if (unrevealed.length) gating.push({ page: f, theme, rule: 'reveal-never-ran', impact: 'serious', target: unrevealed.join(', '), msg: 'scroll-triggered reveal never ran, axe would skip its hidden text' });
       // settle one-shot entrance animations too: axe blends opacity into the sampled colour, and a staggered
       // fade-in (e.g. the hub's .keys li, 200 ms + i x 70 ms + 400 ms) outlives the 700 ms above — a mid-fade
       // sample read #6B7280 as #A6AAB2 (2.3:1) on 2026-11-07. Finite animations only; capped at 4 s.
