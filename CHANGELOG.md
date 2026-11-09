@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v3.35.0 — 2026-11-09 — "The homepage stops being flat: tiers, measured results and a 60/30/10 palette"
+
+Owner comments (PRD ledger K32/K33, OWNER_REQUESTS R098/R099): "Indexnya terlalu flat design"; "Kasih kombinasi warna
+dg style ini agar nggak flat … Lainnya kamu audit apa yg perlu di improve agar gak flat"; on the palette choice
+"Yg terbaik yg paling bagus" and "Yg paling align bener2 bagus, sync dan keren". Mock first:
+`~/Documents/figcraft/index-depth/` (depth, then two palettes).
+
+### Changed
+- **Homepage palette 60/30/10 (R099)** — graphite (dark) / white (light) stays the 60; electric blue `#2456E6` is the
+  30 as three full section bands (Results, Case studies, Correspondence — 30.3 % / 30.6 % of the page height); orange
+  is the 10 (`#FF7A1A` dark, `#C2410C` light): figures, bars, the login pill and its modal, focus rings, the current
+  employer rule. Every old amber literal in `styles-index.css` and the page's own style blocks moved to the orange
+  token, and the auth widget takes it on the homepage only. The one-amber rule still holds on every other page
+  (ANTI_VIBECODE_STANDARD §B records the owner's exception).
+- **Depth by tier, not effect (R098)** — page base < blue band < graphite/white panel < raised figure, each panel framed
+  by one 1 px hairline; no shadow, glow, blur or lift. Results are one panel of four rows, each with a measured bar:
+  fill = the value, a tick at its stated reference (industry ~82 % for retention, the 65 % start for work orders).
+  Operations are one ruled table (record · what · how) instead of eight cards with coloured badges, icon tiles and
+  tag chips. Every section after the hero opens with the same numbered mono eyebrow (02–07) over a left-aligned title.
+
+### Fixed
+- Case-study results (91 %, $40–50K, 97 %) rendered grey and struck through: they sat in `.stat-before`, the "before"
+  half of an old before→after pair. Now `.stat-value`, in the accent.
+- The FAQ list sat centred 214 px in from its own title; it now starts on the section edge like every other section.
+- `content-visibility: auto` on the homepage sections laid them out at a 600 px placeholder until scrolled to, then
+  jumped; it also made axe sample the last operations rows against the band below. The sections render whole.
+- Operations descriptions were clipped to an ellipsis on a phone (8 rows); they wrap in full.
+
+### Gates
+- New `tools/test-index-depth.mjs` D1–D9 (both themes, 1440 + 390), wired into the ship gate: 22 laws red on v3.34.0
+  live before the palette, 37 red on live with D7 (blue bands) and D8 (no old amber; 76 / 70 elements live); the clip,
+  band and alignment laws each proven red by mutation or on the old tree. Green: depth D1–D9, R079 28 laws,
+  render slop scan 0 (both themes), slop precision, a11y 8 pages × 2 themes 0, dark coverage 163 pages, CSS structure.
+
 ## v3.34.0 — 2026-11-09 — "Set only the parent: the commissioning program opened five deep, and every row is the engine's"
 
 Owner comment K28 (PRD v1.1 §41 ledger): a tree editor for L0–L6, five levels deep, where only the parent is set,

@@ -272,6 +272,8 @@ supersede what items 1, 3, 6 and 7 once recommended as the replacement; the full
 10. **Gradient text** on any heading (§A27); the headline's second clause is MUTED and upright, never amber italic.
 11. **Aurora / blurred radial mesh and the navy cast** (`#0a0e1a`, `#0f172a`, `#1e293b` as surfaces) (§A33).
 12. **Neon green `#00FF88`** and any second accent hue in chrome; cyan/blue floating buttons (§A32).
+    Exception, by the owner's choice (2026-11-09, K33): the HOMEPAGE runs 60/30/10 — graphite/white, electric-blue
+    section bands, orange accent — gated by `tools/test-index-depth.mjs`; see ANTI_VIBECODE_STANDARD §B. Other pages unchanged.
 13. **Serif display + mono-uppercase chrome** (Fraunces hero, tracked mono nav/buttons) (§A34).
 14. **Stat-tile strips, glass by token, hover lift, keyword marquee/ticker** (§A28–31). Facts render as a
     fact list (`data-rz-fact-list`), one per row.

@@ -319,6 +319,8 @@ gate "LTC lab step thread — S1-S36: every shown figure follows the plant model
 # --strict exits 1 on a dirty page (the fixture is not in the tree, so the source audits never read it).
 gate "Cx program tree — five deep, exact allocation of programPlan, handbook shares (128 laws)" \
   timeout 120 node tools/test-cx-tree.mjs
+gate "R098/R099 homepage depth + 60/30/10 — tiers, measured bars, blue bands 22-40 %, AA on bands, one accent, aligned (D1-D9)" \
+  env RZ_BASE=http://127.0.0.1:8166 timeout 300 node tools/test-index-depth.mjs
 gate "R079 homepage — employer cards flip, capsule nav + Contact pill, footer wordmark, ids kept (27 laws)" \
   env RZ_BASE=http://127.0.0.1:8166 timeout 300 node tools/test-index-r079.mjs
 gate "R079 footer wordmark — outlined glyphs match a fresh build" \
