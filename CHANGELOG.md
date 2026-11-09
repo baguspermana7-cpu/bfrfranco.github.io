@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v3.35.3 — 2026-11-09 — "Homepage rhythm: About on the base, FAQ on a real tier, two hues on the blue bands"
+
+Follow-up to v3.35.2 (owner K33 / R099 "sync"; peer audit; R100).
+
+### Fixed
+- **Section rhythm** — About sat on a 13-step tier in dark but on the base in light, and FAQ was only 7 steps off
+  white in light, so About and FAQ read as one long run. Now the page goes blue / base / blue / base (About) /
+  neutral tier (FAQ, `--dp-raised`: 28 steps in dark, 16 in light) / blue in both themes.
+- **Stray hue on the Contact band** — in dark the Contact panel painted its links `#60a5fa`, its icons and copy
+  buttons `#38bdf8`, and the Discord icon on a navy tile. Links and icons take the ink, copy buttons the muted grey,
+  icon tiles are transparent, as in light.
+
+### Added
+- `tools/test-index-depth.mjs` D12 (each non-band section on the base ≤2 or a real tier ≥8, blue cast ≤8, no fake
+  1–4 step inside) and D13 (inside a band section every saturated colour is the band blue or the accent). Proven red
+  on v3.35.2 (3 failures), green after. Standard: ANTI_VIBECODE_STANDARD §B; ledger row R100.
+- `tools/ship-gate.sh`: the served-tree gates (LTC lab, homepage depth, R079) used a fixed port 8166 that another
+  session's tree already served, so they silently tested that tree. The gate now takes a free port and first proves
+  the server returns this checkout's `js/rz-version.js` (AGENT_HARNESS_STANDARD E4).
+
 ## v3.35.2 — 2026-11-09 — "Every text on a blue band reads, and the result bars grow into place"
 
 Follow-up to v3.35.0 (owner K33 / R099: "agar nggak flat … animasi dan dll"; "yg paling align bener2 bagus, sync dan keren").

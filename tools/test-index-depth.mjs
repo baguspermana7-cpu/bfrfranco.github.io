@@ -15,6 +15,10 @@
  *  D10 every text node in the three band sections, inside panels too, reaches WCAG AA against what it sits on.
  *  D11 motion (owner "animasi"): each bar grows from 0 to its value once, as the results panel enters view (600 ms
  *     strong ease-out, 60 ms row stagger); with reduced motion the bars are full from the start; without JS, full.
+ *  D12 rhythm (owner "sync", peer audit): blue / base / blue / base / tier / blue — About sits on the page base (≤2) and FAQ on a
+ *     real neutral tier (≥8 off the base, no blue cast), in both themes; no painted box inside them is a fake step (1–4 off its parent).
+ *  D13 palette: inside the three band sections every saturated colour (text, icon fill/stroke, background) is the band blue or the
+ *     accent — no stray cyan/sky link or icon colour (dark contact panel painted 56,189,248 and 96,165,250).
  *  D6 phone 390 (both themes): no sideways scroll; every bar inside its panel; no description clipped to an ellipsis. No page errors anywhere.
  * Env RZ_BASE (default http://127.0.0.1:8177).   node tools/test-index-depth.mjs
  */
@@ -94,6 +98,19 @@ const probe = ([SECS, BANDS]) => {
     return ['color', 'backgroundColor', 'borderTopColor', 'borderLeftColor', 'outlineColor'].map((k) => [k, rgb(cs[k]).slice(0, 3).join(',')])
       .filter(([k, c]) => OLD.includes(c) && !(k !== 'color' && k !== 'backgroundColor' && parseFloat(cs[k.replace('Color', 'Width')] || '0') === 0))
       .map(([k]) => (e.id || e.className || e.tagName).toString().slice(0, 30) + ':' + k); });
+  // D12
+  const own = (e) => { const c = rgb(getComputedStyle(e).backgroundColor); return (c.length === 3 || c[3] > 0.5) ? c.slice(0, 3) : null; };
+  out.tier = Object.fromEntries(['about', 'faq'].map((id) => { const c = sec[id] ? bg(sec[id]) : [0, 0, 0];
+    return [id, { step: step(c, out.base), cast: c[2] - Math.max(c[0], c[1]) }]; }));
+  out.fakeStep = ['operational-excellence', 'about', 'faq'].flatMap((id) => [...(sec[id] ? sec[id].querySelectorAll('*') : [])]
+    .filter((e) => e.getClientRects().length && own(e)).map((e) => ({ k: (e.className || e.tagName).toString().slice(0, 24), d: step(own(e), bg(e.parentElement)) }))
+    .filter((x) => x.d > 0 && x.d < 5).map((x) => `${id} ${x.k} Δ${x.d}`));
+  // D13
+  const blue = out.band.metrics;
+  out.strayHue = [...new Set(BANDS.flatMap((id) => [...sec[id].querySelectorAll('*')].filter((e) => e.getClientRects().length).flatMap((e) => { const cs = getComputedStyle(e);
+    return ['color', 'fill', 'stroke', 'backgroundColor'].map((k) => [k, rgb(cs[k] || '')]).filter(([, c]) => c.length >= 3 && (c.length === 3 || c[3] > 0.3))
+      .map(([k, c]) => [k, c.slice(0, 3)]).filter(([, c]) => Math.max(...c) - Math.min(...c) > 60 && step(c, out.accent) > 6 && step(c, blue) > 6)
+      .map(([k, c]) => `${id} ${(e.className && e.className.baseVal !== undefined ? e.tagName : e.className || e.tagName).toString().slice(0, 20)} ${k} ${c.join(',')}`); })))];
   return out;
 };
 
@@ -121,6 +138,10 @@ try {
     const mis = o.align.filter((a) => a.dx > 2);
     check(mis.length === 0, `D9 ${T} every section's content starts on its eyebrow's left edge${mis.length ? ' — ' + mis.map((a) => `#${a.id} Δ${a.dx}`).join(' ') : ''}`);
     check(o.oldAmber.length === 0, `D8 ${T} one accent across the page: no element still paints the old amber${o.oldAmber.length ? ' — ' + o.oldAmber.length + ': ' + o.oldAmber.slice(0, 5).join(' | ') : ''}`);
+    check(o.tier.about.step <= 2 && o.tier.faq.step >= 8 && o.tier.faq.cast <= 8,
+      `D12 ${T} About on the base (≤2, read ${o.tier.about.step}), FAQ on a real neutral tier (≥8, read ${o.tier.faq.step}, blue cast ${o.tier.faq.cast} ≤8)`);
+    check(o.fakeStep.length === 0, `D12 ${T} no fake step (1–4) painted inside operations/About/FAQ${o.fakeStep.length ? ' — ' + o.fakeStep.slice(0, 5).join(' | ') : ''}`);
+    check(o.strayHue.length === 0, `D13 ${T} band sections use only the band blue and the accent${o.strayHue.length ? ' — ' + o.strayHue.length + ': ' + o.strayHue.slice(0, 5).join(' | ') : ''}`);
     check(p.errors.length === 0, `D6 ${T} no page errors${p.errors.length ? ' — ' + p.errors[0] : ''}`);
     await p.close();
     const q = await open(390, theme);

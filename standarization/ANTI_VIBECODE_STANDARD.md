@@ -142,8 +142,10 @@ An over-eager de-slop pass must not remove these; they are the site's identity, 
   orange the 10 (`#FF7A1A` dark, `#C2410C` light: figures, bars, the login pill, focus). It supersedes the one-amber rule
   (§A32 "second accent hue in chrome") for the homepage; every other page keeps graphite + amber. Text on a band reaches
   AA (`--dp-on-*` tokens); panels on a band are graphite/white with one 1 px hairline. Depth comes from tiers, hairlines
-  and measured figures, never from shadow, glow, blur or lift. Gate: `tools/test-index-depth.mjs` D1–D9 (D8: no element
-  on the homepage still paints the old amber). A blue BAND is not the rejected navy CAST (§A33): navy was a surface tint
+  and measured figures, never from shadow, glow, blur or lift. Gate: `tools/test-index-depth.mjs` D1–D13 (D8: no element
+  on the homepage still paints the old amber; D12: rhythm blue / base / blue / base / tier / blue, every non-band section
+  either on the base (≤2) or a real neutral tier (≥8, blue cast ≤8), no fake 1–4 step inside; D13: inside a band section
+  every saturated colour is the band blue or the accent, no third hue on links or icons). A blue BAND is not the rejected navy CAST (§A33): navy was a surface tint
   under everything; the band is a deliberate 30 % block with AA text.
 - **Skeleton loaders** where real async loads occur (their PRESENCE is good — their ABSENCE is a tell).
 

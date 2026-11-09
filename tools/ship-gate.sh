@@ -308,27 +308,38 @@ gate "data hall plan — equipment, counts and flow are on the drawing" node too
 # 3.27.0 — glossary register + LTC lab laws. The LTC browser gates read a served tree: start one on 8166 for them
 # and stop it by its own PID (never by pattern).
 gate "glossary — cards on the register, every term filed under its own letter" python3 tools/test-glossary.py
+# v3.35.3: a fixed 8166 was already served by another session's tree (~/.cache/rz-k28); the bind failed silently and
+# the homepage/LTC gates read THAT tree (v3.35.2 CSS) — they must read this one. Take a free port, then prove the
+# server answers with this tree's own rz-version.js before any gate uses it.
 ltc_srv_pid=""
-if python3 -m http.server 8166 --bind 127.0.0.1 >/dev/null 2>&1 & then ltc_srv_pid=$!; sleep 1; fi
+LTC_PORT=$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()')
+python3 -m http.server "$LTC_PORT" --bind 127.0.0.1 >/dev/null 2>&1 & ltc_srv_pid=$!
+LTC_BASE="http://127.0.0.1:$LTC_PORT"
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  if python3 -c 'import sys,urllib.request; sys.exit(0 if urllib.request.urlopen(sys.argv[1]+"/js/rz-version.js",timeout=2).read()==open("js/rz-version.js","rb").read() else 1)' "$LTC_BASE" 2>/dev/null; then break; fi
+  sleep 0.5
+done
+gate "served tree is this tree — $LTC_BASE answers with this checkout's js/rz-version.js" \
+  python3 -c 'import sys,urllib.request; sys.exit(0 if urllib.request.urlopen(sys.argv[1]+"/js/rz-version.js",timeout=5).read()==open("js/rz-version.js","rb").read() else 1)' "$LTC_BASE"
 gate "LTC lab golden — 12 scenarios x 28 rendered outputs identical to the fixture" \
-  env RZ_BASE=http://127.0.0.1:8166 timeout 600 node tools/test-ltc-lab-golden.mjs
+  env RZ_BASE=$LTC_BASE timeout 600 node tools/test-ltc-lab-golden.mjs
 gate "LTC lab step thread — S1-S36: every shown figure follows the plant model, chrome on the register" \
-  env RZ_BASE=http://127.0.0.1:8166 timeout 900 node tools/test-ltc-lab-steps.mjs
+  env RZ_BASE=$LTC_BASE timeout 900 node tools/test-ltc-lab-steps.mjs
 # v3.30.4: the whole tree read 0 in both themes (215 pages), so the scan is strict: one tell in either theme fails the
 # gate. tools/test-slop-precision.mjs serves its own fixture and proves the circle/hairline exemptions and that
 # --strict exits 1 on a dirty page (the fixture is not in the tree, so the source audits never read it).
 gate "Cx program tree — five deep, exact allocation of programPlan, handbook shares (128 laws)" \
   timeout 120 node tools/test-cx-tree.mjs
-gate "R098/R099 homepage depth + 60/30/10 — tiers, measured bars, blue bands 22-40 %, AA on bands, one accent, aligned (D1-D9)" \
-  env RZ_BASE=http://127.0.0.1:8166 timeout 300 node tools/test-index-depth.mjs
+gate "R098/R099 homepage depth + 60/30/10 — tiers, measured bars, blue bands 22-40 %, AA on bands, one accent, aligned, bar motion, tier rhythm, two hues on bands (D1-D13)" \
+  env RZ_BASE=$LTC_BASE timeout 300 node tools/test-index-depth.mjs
 gate "R079 homepage — employer cards flip, capsule nav + Contact pill, footer wordmark, ids kept (27 laws)" \
-  env RZ_BASE=http://127.0.0.1:8166 timeout 300 node tools/test-index-r079.mjs
+  env RZ_BASE=$LTC_BASE timeout 300 node tools/test-index-r079.mjs
 gate "R079 footer wordmark — outlined glyphs match a fresh build" \
   "$HOME/.venvs/pdfkit/bin/python" tools/build-wordmark.py --check
 gate "slop render scan precision — circle and hairline exempt, --strict fails a dirty page" \
   timeout 300 node tools/test-slop-precision.mjs
 gate "slop render scan — 14 computed tells per page, light AND dark, STRICT (any tell fails)" \
-  env RZ_BASE=http://127.0.0.1:8166 timeout 2400 node tools/audit-slop-render.mjs --strict
+  env RZ_BASE=$LTC_BASE timeout 2400 node tools/audit-slop-render.mjs --strict
 [ -n "$ltc_srv_pid" ] && kill "$ltc_srv_pid" 2>/dev/null
 
 # Engine-files byte-identical guard (locked since v1.32.x accuracy review)
