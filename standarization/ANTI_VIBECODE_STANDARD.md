@@ -64,11 +64,14 @@ file/rule findings across 172 files despite exit 0**.
   One owner-gradient exemption (K34, v3.35.6): the owner asked for gradients on the Cx page ("Mainkan gradien. Yg
   sangat cantik", 2026-11-09). A surface that carries `data-rz-owner-gradient` itself is not counted as `grad` — on
   `cx-calculator.html` only; the same attribute elsewhere still counts and gradient TEXT (`gtext`) is never exempt
-  (`tools/test-slop-precision.mjs` proves all three). The gradients are light, not paint: a blue halo + amber
-  counter-light on the hero, a 1 px blue→amber rim on the working panels, a sequential blue ramp on the schedule
-  bars (`css/rz-cx-gradient.css`). Because axe cannot read text over a gradient, `tools/test-cx-gradient.mjs`
-  measures every hero/tab text run against the worst background pixel under it (1440/390, both themes; red with
-  the muted tier put back, 11 runs below AA). The 3D canvas keeps the owner's light workspace (K16).
+  (`tools/test-slop-precision.mjs` proves all three; `tools/test-tool-register.mjs` T3/T12 apply the same rule and never
+  exempt a button, tab or logo). The gradients are light, not paint: a blue halo + amber
+  counter-light on the hero and the Full-analysis call, a 1 px blue→amber rim (a pseudo-element) on the working
+  panels, a sequential blue ramp on the schedule bars (`css/rz-cx-gradient.css`). **A panel that holds body text
+  keeps a flat fill:** a gradient fill makes axe file every node in it as "incomplete", so the contrast gate goes
+  blind — found in this release when a planted 1.7:1 line inside `#cxResults` passed; with flat fills it fails.
+  Where a gradient fill does carry text, `tools/test-cx-gradient.mjs` measures every run against the worst
+  background pixel under it (1440/390, both themes; red with the muted tier put back). 3D canvas unchanged (K16).
 - **A gradient hides a contrast failure (v3.27.0):** axe cannot measure text over a gradient and files it
   as "incomplete", so the gate stays green. Flattening the glossary hero (a slop fix) exposed light-theme
   navbar links at 2.27:1. When a gradient or image background becomes a flat colour, run

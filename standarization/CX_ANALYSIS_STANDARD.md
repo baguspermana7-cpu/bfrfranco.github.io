@@ -101,7 +101,7 @@ compares each against the baseline and the editor.
 | `tools/test-cx-records.mjs` | Tier 3 record layer: PRD v1.0 invariants (R1–R13) on `data/cx/demo-records.json`, overlay on `statusAt`, register import reasons (R14) | v3.29.0 (one mutation per law) |
 | `tools/test-dcmoc-cx-plan.mjs` | DCMOC bridge returns the site module's plan and status (deep-equal), store clamps/persists/caps scenarios at 5; needs `dcmoc/node_modules` (symlink in a worktree, git-ignored) | v3.29.0 (site module swapped for a copy with one planning-day changed) |
 | `tools/test-cx-analysis.mjs` | browser: plan editor, schematic, 3D (glb 15/15, ≤ 300 draw calls, ≥ 24 fps, callouts, hulls, K16 probe both themes, K17 LOD, K18 re-layout), Tier 1.5 calendar, workbench W0–W8 (real pointer drag move/stretch, Esc, undo/redo, Ctrl+Z, keyboard, impact reasons, over-cap, Save as/Load/Delete, cap 5), 390 px, no errors | each release; W-laws v3.31.0 (absent on the old tree) |
-| `tools/test-cx-gradient.mjs` | K34: the five owner-gradient surfaces render a gradient, no gradient text, every hero/tab text run meets AA against the worst background pixel under it (1440/390, light + dark) — axe skips gradients | v3.35.6 (`--mutate` restores the muted tier: 11 runs below AA) |
+| `tools/test-cx-gradient.mjs` | K34: the two owner-gradient fills (hero, Full-analysis call) render a gradient, panels keep flat fills, no gradient text, every hero/tab/Full-analysis text run meets AA against the worst background pixel under it (1440/390, light + dark) — axe skips gradients | v3.35.6 (`--mutate` restores the muted tier: 11 runs below AA) |
 
 Run under `rz-lane -l 1` (lane 0 = LTC). A Navigation-timeout row under lane contention is UNMEASURED: re-run alone,
 never waive.

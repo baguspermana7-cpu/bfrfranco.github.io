@@ -2,8 +2,9 @@
 /**
  * test-cx-gradient.mjs — K34 (owner 2026-11-09 "Mainkan gradien. Yg sangat cantik", for the Cx page).
  * axe cannot judge text over a gradient (it reports such nodes as incomplete), so this measures it directly:
- *   G1 every owner-gradient surface on cx-calculator.html renders a gradient and carries data-rz-owner-gradient
- *   G2 every text run in the hero and the tab strip meets AA (4.5:1, 3:1 large) against the BRIGHTEST/DARKEST
+ *   G1 the two owner-gradient fills (hero, Full-analysis call) render a gradient; panels carry only a 1 px rim, so
+ *      axe keeps judging their text (a gradient FILL makes axe skip every node in it — found v3.35.6)
+ *   G2 every text run in the hero, the tab strip and the Full-analysis call meets AA (4.5:1, 3:1 large) against the BRIGHTEST/DARKEST
  *      background pixel under it, with the text hidden — 1440 and 390 px, light and dark
  *   G3 no gradient text anywhere on the page
  * --mutate puts the hero's muted tier back to the page token; G2 must then fail (red proof: 11 runs below AA).
@@ -49,33 +50,42 @@ try {
     const tag = `${theme} ${vw}`;
     if (vw === 1440) {
       const surf = await p.evaluate(() => [...document.querySelectorAll('[data-rz-owner-gradient]')].map((e) => ({ id: e.id || e.className.split(' ')[0], grad: /gradient/.test(getComputedStyle(e).backgroundImage) })));
-      const want = ['tool-head', 'cxInputsGrid', 'cxResults', 'cxGanttSection', 'cxFullRow'];
+      const want = ['tool-head', 'cxFullRow'];
       check(want.every((w) => surf.some((s) => s.id === w && s.grad)), `G1 ${tag}: ${want.length} owner surfaces render a gradient (${surf.filter((s) => s.grad).length}/${surf.length} tagged surfaces lit)`);
       const gt = await p.evaluate(() => [...document.querySelectorAll('body *')].filter((e) => { const c = getComputedStyle(e); return /gradient/.test(c.backgroundImage) && /text/.test(c.webkitBackgroundClip || c.backgroundClip); }).length);
       check(gt === 0, `G3 ${tag}: no gradient text — read ${gt}`);
     }
-    const runs = await p.evaluate(() => {
-      const out = [];
-      for (const root of document.querySelectorAll('.tool-head, .tool-tabs')) for (const e of root.querySelectorAll('*')) {
-        const t = [...e.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim()); if (!t) continue;
-        const rg = document.createRange(); rg.selectNodeContents(t); const r = rg.getBoundingClientRect(); if (r.width < 4 || r.height < 4) continue;
-        const c = getComputedStyle(e); const fs = parseFloat(c.fontSize);
-        out.push({ text: t.textContent.trim().slice(0, 28), color: c.color, x: r.left, y: r.top + scrollY, w: r.width, h: r.height, need: fs >= 24 || (fs >= 18.66 && +c.fontWeight >= 700) ? 3 : 4.5 });
+    // each measured block is scrolled into the viewport and read in viewport coordinates (a full-page clip beyond the
+    // viewport reads back black, and resizing the viewport re-lays vh/sticky content)
+    let runs = [], low = [], worst = { k: 99 };
+    await p.addStyleTag({ content: '#cookieBanner{display:none!important}' });
+    for (const sel of ['.tool-head', '.tool-tabs', '.tool-full']) {
+      await p.evaluate((s) => { const e = document.querySelector(s); if (e) e.scrollIntoView({ block: 'start', behavior: 'instant' }); window.scrollBy(0, -70); }, sel);
+      await new Promise((r) => setTimeout(r, 500));
+      const part = await p.evaluate((s) => {
+        const out = []; const root = document.querySelector(s); if (!root) return out;
+        for (const e of [root, ...root.querySelectorAll('*')]) {
+          const t = [...e.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim()); if (!t) continue;
+          const rg = document.createRange(); rg.selectNodeContents(t); const r = rg.getBoundingClientRect(); if (r.width < 4 || r.height < 4 || r.bottom > innerHeight || r.top < 0) continue;
+          const c = getComputedStyle(e); const fs = parseFloat(c.fontSize);
+          out.push({ text: t.textContent.trim().slice(0, 28), color: c.color, x: r.left, y: r.top, w: r.width, h: r.height, need: fs >= 24 || (fs >= 18.66 && +c.fontWeight >= 700) ? 3 : 4.5 });
+        }
+        return out;
+      }, sel);
+      const hide = await p.addStyleTag({ content: sel + ' *, ' + sel + ' { -webkit-text-fill-color: transparent !important; color: transparent !important; text-shadow: none !important }' });
+      await new Promise((r) => setTimeout(r, 250));
+      const img = await decode(await p.screenshot());
+      await p.evaluate((h) => h.remove(), hide);
+      for (const r of part) {
+        const m = r.color.match(/[\d.]+/g).map(Number), lt = lum(m[0], m[1], m[2]); let min = 99;
+        for (let y = Math.floor(r.y); y < r.y + r.h; y += 2) for (let x = Math.floor(r.x); x < r.x + r.w; x += 2) {
+          if (x < 0 || x >= img.width || y < 0) continue; const i = (img.width * y + x) * 4; if (i + 2 >= img.data.length) continue;
+          min = Math.min(min, ratio(lt, lum(img.data[i], img.data[i + 1], img.data[i + 2])));
+        }
+        if (min / r.need < worst.k) worst = { k: min / r.need, s: `"${r.text}" ${min.toFixed(2)}:1` };
+        if (min < r.need) low.push(`"${r.text}" ${min.toFixed(2)} < ${r.need}`);
       }
-      return out;
-    });
-    await p.addStyleTag({ content: '.tool-head *, .tool-tabs * { -webkit-text-fill-color: transparent !important; color: transparent !important; text-shadow: none !important }' });
-    await new Promise((r) => setTimeout(r, 300));
-    const H = Math.ceil(Math.max(...runs.map((r) => r.y + r.h))) + 4;
-    const img = await decode(await p.screenshot({ clip: { x: 0, y: 0, width: vw, height: H }, captureBeyondViewport: true }));
-    let worst = { k: 99 }, low = [];
-    for (const r of runs) {
-      const m = r.color.match(/[\d.]+/g).map(Number), lt = lum(m[0], m[1], m[2]); let min = 99;
-      for (let y = Math.floor(r.y); y < r.y + r.h; y += 2) for (let x = Math.floor(r.x); x < r.x + r.w; x += 2) {
-        if (x < 0 || x >= vw || y >= H) continue; const i = (img.width * y + x) * 4; min = Math.min(min, ratio(lt, lum(img.data[i], img.data[i + 1], img.data[i + 2])));
-      }
-      if (min / r.need < worst.k) worst = { k: min / r.need, s: `"${r.text}" ${min.toFixed(2)}:1` };
-      if (min < r.need) low.push(`"${r.text}" ${min.toFixed(2)} < ${r.need}`);
+      runs = runs.concat(part);
     }
     check(runs.length >= 8 && !low.length, `G2 ${tag}: ${runs.length} text runs meet AA over the gradient, tightest ${worst.s}${low.length ? ' — ' + low.slice(0, 4).join('; ') : ''}`);
     await p.close();

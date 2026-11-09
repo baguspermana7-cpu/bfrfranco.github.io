@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v3.35.6 — 2026-11-09 — "The Cx page is lit, not painted: halo, rims and a blue schedule ramp"
+
+Owner K34: "Mainkan gradien. Yg sangat cantik" — asked for the Cx page (cx-calculator.html).
+
+### Changed
+- **Hero light.** A blue halo with a lit core in the top-right corner, a soft sheen across, an amber counter-light low on
+  the right, and a 1 px rim along the hero edge that runs blue into amber and throws light back up. Both themes.
+- **Panel rims.** The calculator inputs, results, schedule and Full-analysis panels, and every Cx Analysis panel and the
+  inspector, carry a 1 px blue→amber rim on top. The Full-analysis call also carries a blue + amber light fill. Panels
+  that hold body text keep a FLAT fill on purpose (see Gates).
+- **Schedule ramp.** L0–L4 bars are a sequential blue ramp, each bar lit from its leading edge; L5 IST stays amber and
+  L6 close-out graphite, so the legend still reads as before. Tabs and buttons stay solid amber: a gradient on a control is a second accent.
+- The hero's muted text tier moves one step toward the body text so every run keeps AA over the halo.
+- The schedule's sideways-scrolling area (`#cxGanttWrap`) is focusable with a label, so keyboard users can scroll it.
+- The 3D canvas keeps the owner's light workspace (K16) — unchanged.
+
+### Gates
+- `tools/audit-slop-render.mjs`: a surface carrying `data-rz-owner-gradient` is not a `grad` tell on cx-calculator.html
+  only; gradient text is never exempt. `tools/test-slop-precision.mjs` proves exempt-on-Cx, counted-elsewhere and
+  gtext-counted (red before the detector change: grad 2 on the Cx fixture).
+- **A gradient fill blinds axe.** The first build washed every panel with a gradient; with cx-calculator.html added to
+  `tools/audit-a11y.mjs` PAGES (now scroll-aware since v3.35.5), a planted 1.7:1 line inside `#cxResults` PASSED,
+  because axe files text over a gradient as "incomplete". Panels went back to flat fills with the rim as a 1 px
+  pseudo-element: the same plant then FAILED (color-contrast, `#k34plant`), and the run also found `#cxGanttWrap`
+  (scrollable-region-focusable) — fixed. Clean run: 9 pages × 2 themes, 0 critical/serious.
+- `tools/test-tool-register.mjs` T3/T12 take the same exemption: an owner-gradient SURFACE (never a button, tab or logo,
+  never an image) on cx-calculator.html only. Red: the first v3.35.6 ship-gate run failed 8 checks (hero, tab underline,
+  Full-analysis call, 2 themes × 2 widths); the tab and button gradients were removed and the two surfaces tagged.
+- New `tools/test-cx-gradient.mjs` (wired): the hero and Full-analysis fills render a gradient, no gradient text, and every
+  hero/tab/Full-analysis text run meets AA against the worst background pixel under it at 1440 and 390 px in both themes — axe skips
+  gradients, so this measures pixels. `--mutate` puts the old muted tier back and fails (11 runs below AA).
+- Standards: ANTI_VIBECODE_STANDARD (K34 exemption), CX_ANALYSIS_STANDARD §4 gate row, UIUX_AUDIT_LEDGER K34.
+
 ## v3.35.5 — 2026-11-09 — "Blue as light, a card that turns, sections that arrive"
 
 Owner on live v3.35.2 (R101–R104): "Jelek sekali ini, aneh birunya kyk nggk nyambung dg theme"; "contoh2 kn sdah saya

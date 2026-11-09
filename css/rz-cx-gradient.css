@@ -12,7 +12,7 @@ body.tool[data-rz-calc="cx"] {
   --cxg-head-top: #10131b;
   --cxg-core: 120, 156, 255;         /* the lit core, a lighter blue of the same hue */
   --cxg-rim-hot: rgba(200, 214, 255, .95);
-  --cxg-halo-a: .40; --cxg-halo-b: .12; --cxg-core-a: .34; --cxg-sheen-a: .05; --cxg-warm-a: .22; --cxg-spill-a: .10; --cxg-panel-a: .075;
+  --cxg-halo-a: .40; --cxg-halo-b: .12; --cxg-core-a: .34; --cxg-sheen-a: .05; --cxg-warm-a: .22; --cxg-spill-a: .10;
 }
 [data-theme="light"] body.tool[data-rz-calc="cx"] {
   --cxg-rim-a: rgba(36, 86, 230, .55);
@@ -20,7 +20,7 @@ body.tool[data-rz-calc="cx"] {
   --cxg-head-top: #E9EEF9;
   --cxg-core: 36, 86, 230;
   --cxg-rim-hot: rgba(36, 86, 230, .85);
-  --cxg-halo-a: .18; --cxg-halo-b: .05; --cxg-core-a: .14; --cxg-sheen-a: .05; --cxg-warm-a: .14; --cxg-spill-a: .06; --cxg-panel-a: .045;
+  --cxg-halo-a: .18; --cxg-halo-b: .05; --cxg-core-a: .14; --cxg-sheen-a: .05; --cxg-warm-a: .14; --cxg-spill-a: .06;
 }
 
 /* hero: a lit core top-right inside a wide blue halo, a soft sheen across, and a rim along the bottom edge that
@@ -41,30 +41,25 @@ body.tool[data-rz-calc="cx"] .tool-head::after {
   background: linear-gradient(90deg, transparent 0%, var(--cxg-rim-a) 42%, var(--cxg-rim-hot) 68%, var(--cxg-rim-b) 84%, transparent 100%);
 }
 
-/* working panels: a 1 px rim on top, a faint blue wash fading into the panel */
-body.tool[data-rz-calc="cx"] :is(.tool-inputs, .tool-results, .tool-full, .cx-gantt-section, .cx-an-panel, .cx-an-inspector) {
-  background:
-    linear-gradient(90deg, transparent 0%, var(--cxg-rim-a) 30%, var(--cxg-rim-b) 72%, transparent 100%) top / 100% 1px no-repeat,
-    linear-gradient(180deg, rgba(var(--cxg-halo), var(--cxg-panel-a)) 0%, transparent 220px),
-    var(--rzt-panel);
+/* working panels: a 1 px blue -> amber rim on top. The panel FILL stays flat on purpose: a gradient fill makes axe
+   file every text node in the panel as "incomplete" and the contrast gate goes blind (found v3.35.6 — a planted
+   low-contrast line inside #cxResults passed). The rim is a 1 px pseudo-element, far below axe's pseudo size threshold. */
+body.tool[data-rz-calc="cx"] :is(.tool-inputs, .tool-results, .tool-full, .cx-gantt-section, .cx-an-panel) { position: relative; }
+body.tool[data-rz-calc="cx"] :is(.tool-inputs, .tool-results, .tool-full, .cx-gantt-section, .cx-an-panel, .cx-an-inspector)::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, var(--cxg-rim-a) 30%, var(--cxg-rim-b) 72%, transparent 100%);
 }
+
+/* the Full-analysis call keeps a lit fill: two lines of text and a button, measured pixel by pixel in
+   tools/test-cx-gradient.mjs because axe cannot read text over a gradient */
 body.tool[data-rz-calc="cx"] .tool-full {
   background:
-    linear-gradient(90deg, transparent 0%, var(--cxg-rim-a) 30%, var(--cxg-rim-b) 72%, transparent 100%) top / 100% 1px no-repeat,
     radial-gradient(60% 160% at 0% 0%, rgba(var(--cxg-halo), calc(var(--cxg-halo-a) * .6)) 0%, transparent 70%),
     radial-gradient(40% 140% at 100% 100%, rgba(var(--cxg-warm), var(--cxg-warm-a)) 0%, transparent 70%),
     var(--rzt-panel);
 }
 
-/* tab underline and primary action take the same light */
-body.tool[data-rz-calc="cx"] .tool-tabs > button[aria-selected="true"] {
-  border-bottom-color: transparent;
-  background: linear-gradient(90deg, var(--cxg-rim-a), var(--cxg-rim-b)) bottom / 100% 2px no-repeat;
-}
-body.tool[data-rz-calc="cx"] .pro-overlay-btn {
-  background: linear-gradient(180deg, #FFC24A 0%, #FFAA00 100%); border-color: #FFAA00;
-}
-body.tool[data-rz-calc="cx"] .pro-overlay-btn:hover { background: linear-gradient(180deg, #FFB627 0%, #E89A00 100%); }
+/* buttons and tabs keep their solid amber: a gradient on a control is a second accent (tool register T3) */
 
 /* schedule bars: sequential blue ramp L0 → L4 (each bar lit from its leading edge), L5 IST amber, L6 close-out graphite */
 body.tool[data-rz-calc="cx"] [data-phase="L0"] { background: linear-gradient(90deg, #2A3C86, #3A55C4); }

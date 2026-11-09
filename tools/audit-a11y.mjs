@@ -42,6 +42,7 @@ const PAGES = [
   'cdu-calculator.html',
   'glossary.html',
   'datacenter-solutions.html',
+  'cx-calculator.html',   // K34 (v3.35.6): gradient surfaces + a reveal-armed #cxResults; axe judges flat-panel text, test-cx-gradient the hero
 ];
 const THEMES = ['light', 'dark'];
 const GATE_IMPACTS = new Set(['critical', 'serious']);

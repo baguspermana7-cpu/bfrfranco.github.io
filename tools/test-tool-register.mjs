@@ -108,7 +108,11 @@ function scan() {
     if (/gradient/.test(cs.backgroundImage) && (cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text')) o.gradText.push(name(e));
     const chrome = e.matches('button, a, [role=button], .btn, [class*="btn"], [class*="chip"], [class*="pill"], [class*="tag"], [class*="tab"], [class*="logo"], h1, h2, h3, h4, label');
     // a gradient fill on a button or logo is a second accent whatever its size (cx's teal Calculate button)
-    if (!o.gradText.includes(name(e)) && /gradient/.test(cs.backgroundImage) && (chrome || r.width * r.height > VA * 0.01)) o.gradSurf.push(name(e));
+    // K34 (owner 2026-11-09 "Mainkan gradien. Yg sangat cantik", for the Cx page): a SURFACE that carries
+    // data-rz-owner-gradient itself is exempt on /cx-calculator.html only; a button, tab or logo is never exempt (chrome),
+    // gradient text never. Same rule as tools/audit-slop-render.mjs ownerGradient().
+    const ownerGrad = !chrome && e.hasAttribute('data-rz-owner-gradient') && /\/cx-calculator\.html$/.test(location.pathname);
+    if (!o.gradText.includes(name(e)) && /gradient/.test(cs.backgroundImage) && (chrome || r.width * r.height > VA * 0.01) && !ownerGrad) o.gradSurf.push(name(e));
     if (chrome) for (const prop of ['color', 'backgroundColor', 'borderTopColor']) {
       const c = parse(cs[prop]); if (!c) continue; const [h, s, l] = c;
       if (s > .45 && l > .2 && l < .85 && !(h >= 20 && h <= 45) && !(h >= 350 || h <= 10)) { o.hue.push(name(e) + ':' + prop.slice(0, 2) + ':' + Math.round(h)); break; }
@@ -214,7 +218,7 @@ function scan2() {
     for (const e of [h, ...h.querySelectorAll('*')]) {
       if (!vis(e)) continue; const c = getComputedStyle(e);
       if (e.tagName === 'IMG' || e.tagName === 'PICTURE') { o.head.push('img ' + nm(e)); continue; }
-      if (c.backgroundImage !== 'none') o.head.push('bgimg ' + nm(e));
+      if (c.backgroundImage !== 'none' && !(e.hasAttribute('data-rz-owner-gradient') && /\/cx-calculator\.html$/.test(location.pathname) && /gradient/.test(c.backgroundImage) && !/url\(/.test(c.backgroundImage))) o.head.push('bgimg ' + nm(e));   // K34: an owner-gradient hero on the Cx page only; an image is never exempt
       const rads = ['TopLeft', 'TopRight', 'BottomLeft', 'BottomRight'].map((s) => c['border' + s + 'Radius']);
       if (rads.some((v) => parseFloat(v) > 4 || /%/.test(v))) o.head.push('radius ' + nm(e) + ' ' + rads[0]);
       const framed = col(c.backgroundColor) || ['Top', 'Right', 'Bottom', 'Left'].some((s) => parseFloat(c['border' + s + 'Width']) > 0 && !/none|hidden/.test(c['border' + s + 'Style']));
