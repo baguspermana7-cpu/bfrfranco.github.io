@@ -74,6 +74,10 @@ function scan(keys) {
   // Contact/Correspondence buttons are pills. Exempt ONLY on the homepage and ONLY for the element that carries
   // data-rz-owner-shape itself; the same attribute anywhere else is still reported (tools/test-slop-precision.mjs).
   const ownerShape = (e) => e.hasAttribute('data-rz-owner-shape') && /\/(index\.html)?$/.test(location.pathname);
+  // K34 (owner 2026-11-09, "Mainkan gradien. Yg sangat cantik", scoped to the Cx page when asked): a gradient SURFACE
+  // that carries data-rz-owner-gradient itself is not a `grad` tell on /cx-calculator.html only. Gradient text stays
+  // banned everywhere; the attribute anywhere else is still reported (tools/test-slop-precision.mjs).
+  const ownerGradient = (e) => e.hasAttribute('data-rz-owner-gradient') && /\/cx-calculator\.html$/.test(location.pathname);
   const tileParents = new Set();
   for (const e of document.querySelectorAll('body *')) {
     const r = e.getBoundingClientRect(); if (r.width < 8 || r.height < 8) continue;
@@ -87,7 +91,7 @@ function scan(keys) {
     if (rad > 8 && r.width >= 200 && !transparent(c.backgroundColor) && !ownerShape(e)) out.round.push(name(e));
     if (c.backdropFilter && c.backdropFilter !== 'none') out.blur.push(name(e));
     const grad = /gradient/.test(c.backgroundImage);
-    if (grad && r.width >= 120 && r.height >= 40 && !inArt(e)) out.grad.push(name(e));
+    if (grad && r.width >= 120 && r.height >= 40 && !inArt(e) && !ownerGradient(e)) out.grad.push(name(e));
     if (grad && /text/.test(c.webkitBackgroundClip || c.backgroundClip)) out.gtext.push(name(e));
     if (c.transitionProperty.split(',').some((p) => p.trim() === 'all') && c.transitionDuration.split(',').some((d) => parseFloat(d) > 0)) out.tall.push(name(e));
     if (c.boxShadow !== 'none' && !/inset/.test(c.boxShadow) && r.width >= 160 && r.height >= 40 && !transparent(c.backgroundColor)

@@ -1,0 +1,82 @@
+/* rz-cx-gradient.css — K34 (owner 2026-11-09: "Mainkan gradien. Yg sangat cantik", asked for the Cx page).
+   Gradient as LIGHT, not as paint: a blue halo with an amber counter-light behind the hero, a hairline rim
+   (blue → amber) on the working panels, and a sequential blue ramp on the schedule bars (L5 IST stays amber).
+   Scope: cx-calculator.html only (this file is linked by that page alone). Every gradient surface carries
+   data-rz-owner-gradient so tools/audit-slop-render.mjs exempts it there and nowhere else. No gradient text,
+   no blur, no motion. Standard: standarization/ANTI_VIBECODE_STANDARD.md (K34 exemption). */
+body.tool[data-rz-calc="cx"] {
+  --cxg-halo: 36, 86, 230;            /* #2456E6, the homepage 30 % blue */
+  --cxg-warm: 255, 150, 30;           /* warm counter-light, between signal amber and the homepage orange */
+  --cxg-rim-a: rgba(110, 139, 255, .70);
+  --cxg-rim-b: rgba(255, 170, 0, .70);
+  --cxg-head-top: #10131b;
+  --cxg-core: 120, 156, 255;         /* the lit core, a lighter blue of the same hue */
+  --cxg-rim-hot: rgba(200, 214, 255, .95);
+  --cxg-halo-a: .40; --cxg-halo-b: .12; --cxg-core-a: .34; --cxg-sheen-a: .05; --cxg-warm-a: .22; --cxg-spill-a: .10; --cxg-panel-a: .075;
+}
+[data-theme="light"] body.tool[data-rz-calc="cx"] {
+  --cxg-rim-a: rgba(36, 86, 230, .55);
+  --cxg-rim-b: rgba(204, 136, 0, .60);
+  --cxg-head-top: #E9EEF9;
+  --cxg-core: 36, 86, 230;
+  --cxg-rim-hot: rgba(36, 86, 230, .85);
+  --cxg-halo-a: .18; --cxg-halo-b: .05; --cxg-core-a: .14; --cxg-sheen-a: .05; --cxg-warm-a: .14; --cxg-spill-a: .06; --cxg-panel-a: .045;
+}
+
+/* hero: a lit core top-right inside a wide blue halo, a soft sheen across, and a rim along the bottom edge that
+   throws light back up into the hero (blue where it starts, amber where it ends) */
+body.tool[data-rz-calc="cx"] .tool-head {
+  position: relative;
+  border-bottom-color: transparent;
+  background:
+    radial-gradient(22% 70% at 92% 6%, rgba(var(--cxg-core), var(--cxg-core-a)) 0%, transparent 100%),
+    radial-gradient(62% 170% at 100% 0%, rgba(var(--cxg-halo), var(--cxg-halo-a)) 0%, rgba(var(--cxg-halo), var(--cxg-halo-b)) 45%, transparent 78%),
+    linear-gradient(112deg, transparent 52%, rgba(var(--cxg-core), var(--cxg-sheen-a)) 68%, transparent 84%),
+    radial-gradient(26% 60% at 82% 104%, rgba(var(--cxg-warm), var(--cxg-warm-a)) 0%, transparent 100%),
+    linear-gradient(0deg, rgba(var(--cxg-halo), var(--cxg-spill-a)) 0%, transparent 56px),
+    linear-gradient(180deg, var(--cxg-head-top) 0%, var(--rz-bg-base) 100%);
+}
+body.tool[data-rz-calc="cx"] .tool-head::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, var(--cxg-rim-a) 42%, var(--cxg-rim-hot) 68%, var(--cxg-rim-b) 84%, transparent 100%);
+}
+
+/* working panels: a 1 px rim on top, a faint blue wash fading into the panel */
+body.tool[data-rz-calc="cx"] :is(.tool-inputs, .tool-results, .tool-full, .cx-gantt-section, .cx-an-panel, .cx-an-inspector) {
+  background:
+    linear-gradient(90deg, transparent 0%, var(--cxg-rim-a) 30%, var(--cxg-rim-b) 72%, transparent 100%) top / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(var(--cxg-halo), var(--cxg-panel-a)) 0%, transparent 220px),
+    var(--rzt-panel);
+}
+body.tool[data-rz-calc="cx"] .tool-full {
+  background:
+    linear-gradient(90deg, transparent 0%, var(--cxg-rim-a) 30%, var(--cxg-rim-b) 72%, transparent 100%) top / 100% 1px no-repeat,
+    radial-gradient(60% 160% at 0% 0%, rgba(var(--cxg-halo), calc(var(--cxg-halo-a) * .6)) 0%, transparent 70%),
+    radial-gradient(40% 140% at 100% 100%, rgba(var(--cxg-warm), var(--cxg-warm-a)) 0%, transparent 70%),
+    var(--rzt-panel);
+}
+
+/* tab underline and primary action take the same light */
+body.tool[data-rz-calc="cx"] .tool-tabs > button[aria-selected="true"] {
+  border-bottom-color: transparent;
+  background: linear-gradient(90deg, var(--cxg-rim-a), var(--cxg-rim-b)) bottom / 100% 2px no-repeat;
+}
+body.tool[data-rz-calc="cx"] .pro-overlay-btn {
+  background: linear-gradient(180deg, #FFC24A 0%, #FFAA00 100%); border-color: #FFAA00;
+}
+body.tool[data-rz-calc="cx"] .pro-overlay-btn:hover { background: linear-gradient(180deg, #FFB627 0%, #E89A00 100%); }
+
+/* schedule bars: sequential blue ramp L0 → L4 (each bar lit from its leading edge), L5 IST amber, L6 close-out graphite */
+body.tool[data-rz-calc="cx"] [data-phase="L0"] { background: linear-gradient(90deg, #2A3C86, #3A55C4); }
+body.tool[data-rz-calc="cx"] [data-phase="L1"] { background: linear-gradient(90deg, #3049A8, #4467E0); }
+body.tool[data-rz-calc="cx"] [data-phase="L2"] { background: linear-gradient(90deg, #3A5ACB, #5B82F0); }
+body.tool[data-rz-calc="cx"] [data-phase="L3"] { background: linear-gradient(90deg, #4C74E4, #7398FA); }
+body.tool[data-rz-calc="cx"] [data-phase="L4"] { background: linear-gradient(90deg, #6D90F2, #A3BCFF); }
+body.tool[data-rz-calc="cx"] [data-phase="L5"] { background: linear-gradient(90deg, #E08A00, #FFC24A); }
+body.tool[data-rz-calc="cx"] [data-phase="L6"] { background: linear-gradient(90deg, #4A5160, #7D8899); }
+
+/* the halo lifts the hero background, so the hero's muted tier moves one step toward the text it sits beside
+   (AA measured against the brightest background pixel under each text run, 1440 + 390, both themes) */
+body.tool[data-rz-calc="cx"] .tool-head { --cxg-muted: #A7B0BD; }
+[data-theme="light"] body.tool[data-rz-calc="cx"] .tool-head { --cxg-muted: #4B5563; }
+body.tool[data-rz-calc="cx"] .tool-head :is(.eyebrow, .basis, .crumb, h1 .muted) { color: var(--cxg-muted); }

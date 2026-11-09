@@ -61,6 +61,14 @@ file/rule findings across 172 files despite exit 0**.
   itself is not counted as `pill` or `round` — on `index.html` only; the same attribute on any other page still counts
   (`tools/test-slop-precision.mjs` proves both). The attribute is not a general escape hatch: a new use needs an owner
   request in `OWNER_REQUESTS.md` and its own line here. Hover movement on those pills is still a `lift`.
+  One owner-gradient exemption (K34, v3.35.6): the owner asked for gradients on the Cx page ("Mainkan gradien. Yg
+  sangat cantik", 2026-11-09). A surface that carries `data-rz-owner-gradient` itself is not counted as `grad` — on
+  `cx-calculator.html` only; the same attribute elsewhere still counts and gradient TEXT (`gtext`) is never exempt
+  (`tools/test-slop-precision.mjs` proves all three). The gradients are light, not paint: a blue halo + amber
+  counter-light on the hero, a 1 px blue→amber rim on the working panels, a sequential blue ramp on the schedule
+  bars (`css/rz-cx-gradient.css`). Because axe cannot read text over a gradient, `tools/test-cx-gradient.mjs`
+  measures every hero/tab text run against the worst background pixel under it (1440/390, both themes; red with
+  the muted tier put back, 11 runs below AA). The 3D canvas keeps the owner's light workspace (K16).
 - **A gradient hides a contrast failure (v3.27.0):** axe cannot measure text over a gradient and files it
   as "incomplete", so the gate stays green. Flattening the glossary hero (a slop fix) exposed light-theme
   navbar links at 2.27:1. When a gradient or image background becomes a flat colour, run
