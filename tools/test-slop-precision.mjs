@@ -30,8 +30,12 @@ td.stick{position:sticky;left:0;background:#121316;box-shadow:1px 0 0 rgba(255,2
 const HOME = `<!doctype html><html><head><meta charset="utf-8"><title>home</title><style>body{background:#0b0c0e;color:#ddd;font:16px sans-serif;padding:20px}
 .cap{display:flex;gap:4px;padding:4px;width:600px;background:#1b1d22;border-radius:999px;list-style:none}
 .cta{display:inline-flex;padding:0 18px;min-height:40px;align-items:center;border-radius:999px;background:#f1f2f4;color:#111}
-.chip{display:inline-block;padding:4px 12px;border-radius:99px;background:#333}</style></head>
-<body><ul class="cap" data-rz-owner-shape="R079"><li>Home</li></ul><a class="cta" data-rz-owner-shape="R079">Contact</a> <span class="chip">plain</span></body></html>`;
+.chip{display:inline-block;padding:4px 12px;border-radius:99px;background:#333}
+.g{width:400px;height:80px;margin:8px 0;background:radial-gradient(40% 50% at 30% 40%,rgba(59,107,255,.4),transparent 70%)}
+.t{font-size:32px;background:linear-gradient(90deg,#2456e6,#f59e0b);-webkit-background-clip:text;background-clip:text;color:transparent}</style></head>
+<body><ul class="cap" data-rz-owner-shape="R079"><li>Home</li></ul><a class="cta" data-rz-owner-shape="R079">Contact</a> <span class="chip">plain</span>
+<div class="g" aria-hidden="true" data-rz-owner-gradient="R105"></div><div class="g" data-rz-owner-gradient="R105">a box with text</div><div class="g">plain</div>
+<div class="t" aria-hidden="true" data-rz-owner-gradient="R105">text</div></body></html>`;
 
 // the Cx exemption (K34, owner 2026-11-09 "Mainkan gradien. Yg sangat cantik"): a gradient surface that carries
 // data-rz-owner-gradient on /cx-calculator.html is not counted; a plain gradient box there still is, gradient TEXT is
@@ -76,6 +80,11 @@ try {
   const h = JSON.parse(readFileSync(hj, 'utf8'))[0];
   check(h.pill && h.pill.n === 1, `homepage: owner-shape capsule + pill exempt, plain chip counted (pill = 1) — read ${h.pill && h.pill.n}`);
   check(h.round && h.round.n === 0, `homepage: owner-shape capsule not a round panel (round = 0) — read ${h.round && h.round.n}`);
+  // R105 (owner 2026-11-09 "Mainkan gradien. Yg sangat cantik", sent to the homepage session; R101-R104 blue as light):
+  // on the homepage only an EMPTY, aria-hidden light layer that carries data-rz-owner-gradient is exempt; the same
+  // attribute on a box with content still counts, a plain gradient box still counts, gradient text never exempt.
+  check(h.grad && h.grad.n === 2, `homepage: owner light layer exempt, owner box with text + plain gradient box counted (grad = 2) — read ${h.grad && h.grad.n}`);
+  check(h.gtext && h.gtext.n === 1, `homepage: gradient text is never exempt (gtext = 1) — read ${h.gtext && h.gtext.n}`);
   const cj = join(dir, 'c.json');
   await run(['--json', cj], 'cx-calculator.html');
   const cx = JSON.parse(readFileSync(cj, 'utf8'))[0];

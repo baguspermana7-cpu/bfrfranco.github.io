@@ -77,7 +77,14 @@ function scan(keys) {
   // K34 (owner 2026-11-09, "Mainkan gradien. Yg sangat cantik", scoped to the Cx page when asked): a gradient SURFACE
   // that carries data-rz-owner-gradient itself is not a `grad` tell on /cx-calculator.html only. Gradient text stays
   // banned everywhere; the attribute anywhere else is still reported (tools/test-slop-precision.mjs).
-  const ownerGradient = (e) => e.hasAttribute('data-rz-owner-gradient') && /\/cx-calculator\.html$/.test(location.pathname);
+  // R105 (owner 2026-11-09, same words sent to the homepage session; R101-R104 blue as light): on the homepage ONLY an
+  // empty, aria-hidden light layer (.dp-light) is exempt — the attribute on a box with content still counts.
+  const OWNER_GRADIENT_PATHS = ['/cx-calculator.html', '/', '/index.html'];
+  const ownerGradient = (e) => {
+    if (!e.hasAttribute('data-rz-owner-gradient') || !OWNER_GRADIENT_PATHS.includes(location.pathname)) return false;
+    if (location.pathname === '/cx-calculator.html') return true;
+    return e.getAttribute('aria-hidden') === 'true' && !e.textContent.trim() && !e.children.length;
+  };
   const tileParents = new Set();
   for (const e of document.querySelectorAll('body *')) {
     const r = e.getBoundingClientRect(); if (r.width < 8 || r.height < 8) continue;

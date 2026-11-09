@@ -5448,11 +5448,11 @@ section.dp-band .sec-eyebrow::after { background: var(--dp-on-line); }
     min-height: 0; margin: 0; padding: 26px 4px; background: none; border: 0; border-top: 1px solid var(--dp-line); border-radius: 0;
     box-shadow: none; transform: none; animation: none; opacity: 1; text-align: left;
 }
-#metrics .res-row:first-child { border-top: 0; }
+#metrics .res-row:first-of-type { border-top: 0; }
 #metrics .res-row::before, #metrics .res-row::after { display: none; }
 #metrics .res-row:hover { transform: none; box-shadow: none; border-color: var(--dp-line); }
 #metrics .res-row .metric-value { margin: 0; font: 500 2.25rem/1 'JetBrains Mono', 'IBM Plex Mono', monospace; color: var(--dp-ink); letter-spacing: -0.01em; }
-#metrics .res-row:first-child .metric-value { color: var(--dp-amber); }
+#metrics .res-row:first-of-type .metric-value { color: var(--dp-amber); }
 #metrics .res-row .metric-label { margin: 0 0 4px; font: 600 1rem/1.35 'IBM Plex Sans', sans-serif; color: var(--dp-ink); text-transform: none; letter-spacing: 0; }
 #metrics .res-row .metric-comparison { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--dp-muted); text-align: left; }
 .res-bar { position: relative; height: 6px; margin: 0 0 18px; background: var(--dp-track); border-radius: 0; }
@@ -5494,7 +5494,7 @@ section.dp-band .sec-eyebrow::after { background: var(--dp-on-line); }
     background: transparent; color: var(--dp-on-ink); border: 1px solid var(--dp-on-line); opacity: 1; box-shadow: none; transform: none;
 }
 #case-studies .btn-explore-articles:hover { border-color: var(--dp-on-ink); background: transparent; color: var(--dp-on-ink); }
-#case-studies .case-number { font: 500 0.875rem/1 'JetBrains Mono', 'IBM Plex Mono', monospace; color: var(--dp-faint); }
+#case-studies .case-number { font: 500 0.875rem/1 'JetBrains Mono', 'IBM Plex Mono', monospace; color: var(--dp-faint); opacity: 1; }
 #case-studies .case-category {
     padding: 0; background: none; border: 0; border-radius: 0;
     font: 500 0.6875rem/1.3 'JetBrains Mono', 'IBM Plex Mono', monospace; letter-spacing: 0.06em; color: var(--dp-faint);
@@ -5579,20 +5579,41 @@ html[data-theme="light"] #rzModalForm .rz-demo-hint code, html[data-theme="light
 section.dp-band { --dp-on-ink: var(--dp-ink); --dp-on-muted: var(--dp-muted); --dp-on-line: var(--dp-line); }
 #metrics, #case-studies, #contact { background: transparent; position: relative; isolation: isolate; }
 [data-theme="dark"] #metrics, [data-theme="dark"] #case-studies, [data-theme="dark"] #contact { background: #0b0c0e; }
-#metrics::before, #case-studies::before, #contact::before {
-    content: ''; display: block; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background: radial-gradient(70% 60% at 50% 40%, var(--dp-glow), transparent 72%);
-}
 section.dp-band .sec-eyebrow span { color: var(--dp-blue-text); }
 section.dp-band .sec-eyebrow::after { background: linear-gradient(90deg, var(--dp-rim), transparent); }
 .dp-hl { color: var(--dp-blue-text); }
 #metrics .res-panel, #case-studies .case-card, #contact .contact-info, #contact .contact-form {
     border-color: var(--dp-line);
     border-top-color: var(--dp-rim);
-    box-shadow: inset 0 1px 0 0 var(--dp-glow-edge), 0 -30px 90px -40px var(--dp-glow-edge);
+    box-shadow: inset 0 1px 0 0 var(--dp-glow-edge), inset 0 110px 90px -90px var(--g-catch), 0 -30px 90px -40px var(--dp-glow-edge);
+}
+/* R105 (owner 2026-11-09: "Mainkan gradien. Yg sangat cantik") — the light becomes a scene: a blue key, a deep indigo
+   pool and a warm orange counter-light (the 10 % accent as light, never as fill) on a real element, .dp-light, with a fine
+   grain over it so the falloff never bands. Panels stay opaque and catch the light instead: a cool wash falling from
+   their top edge (inset) and a sheen line on that edge, brightest toward the middle. Why a real element and opaque
+   panels: axe gives up on contrast ("pseudoContent", filed incomplete, never failed) under any ancestor pseudo-element
+   larger than a quarter of the text box, and under a gradient behind the text; v3.35.5's ::before halo had made every
+   text in these three sections unmeasured. Gate: test-index-depth D15 (planted low contrast fails) + D16 (scene). */
+:root { --g-key: rgba(36, 86, 230, 0.20); --g-deep: rgba(70, 40, 220, 0.12); --g-warm: rgba(194, 65, 12, 0.11); --g-sheen: rgba(36, 86, 230, 0.95); --g-catch: rgba(36, 86, 230, 0.10); --g-grain: 0.07; }
+[data-theme="dark"] { --g-key: rgba(59, 107, 255, 0.42); --g-deep: rgba(70, 40, 220, 0.26); --g-warm: rgba(255, 122, 26, 0.17); --g-sheen: rgba(200, 216, 255, 0.85); --g-catch: rgba(59, 107, 255, 0.16); --g-grain: 0.10; }
+.dp-light {
+    position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+    background:
+        radial-gradient(42% 55% at 28% 42%, var(--g-key), transparent 70%),
+        radial-gradient(38% 50% at 72% 58%, var(--g-deep), transparent 70%),
+        radial-gradient(30% 36% at 92% 92%, var(--g-warm), transparent 70%);
+}
+.dp-light::after {
+    content: ''; position: absolute; inset: 0; opacity: var(--g-grain); mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+#metrics .res-panel, #case-studies .case-card, #contact .contact-info, #contact .contact-form { position: relative; }
+.dp-sheen {
+    position: absolute; left: 8%; right: 8%; top: -1px; height: 1px; pointer-events: none;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0), var(--dp-rim) 25%, var(--g-sheen) 50%, var(--dp-rim) 75%, rgba(0, 0, 0, 0));
 }
 #metrics .res-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--dp-blue) 70%, transparent), var(--dp-blue)); }
-#metrics .res-row:first-child .res-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--dp-amber) 70%, transparent), var(--dp-amber)); }
+#metrics .res-row:first-of-type .res-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--dp-amber) 70%, transparent), var(--dp-amber)); }
 /* R102 employer cards (owner: "klik cards lgsung flip … flipnya animasi kurang smooth dan kaku"): both faces turn in
    3D — front 0 → 180°, back -180° → 0 — on a damped spring (ζ 0.78, ~2 % settle, no bounce), with the card dipping
    to 0.965 and a shade crossing each face mid-turn. The text "Details" button is now a small corner turn icon. */
@@ -5643,19 +5664,19 @@ section.dp-band .sec-eyebrow::after { background: linear-gradient(90deg, var(--d
 .rv-armed .sec-eyebrow::after { transform: scaleX(0); transform-origin: left center; }
 #metrics.rv-armed .rv, #operational-excellence.rv-armed .rv, #case-studies.rv-armed .rv, #about.rv-armed .rv, #faq.rv-armed .rv, #contact.rv-armed .rv { opacity: 0; transform: translateY(16px); }
 .rv-armed .rv-title { opacity: 0; transform: translateY(10px); filter: blur(6px); }
-.rv-armed::before { opacity: 0; }
+.rv-armed > .dp-light { opacity: 0; }
 .rv-armed.rv-in .sec-eyebrow::after { transform: none; transition: transform 900ms cubic-bezier(0.23, 1, 0.32, 1) 80ms; }
 #metrics.rv-armed.rv-in .rv, #operational-excellence.rv-armed.rv-in .rv, #case-studies.rv-armed.rv-in .rv, #about.rv-armed.rv-in .rv, #faq.rv-armed.rv-in .rv, #contact.rv-armed.rv-in .rv, .rv-armed.rv-in .rv-title {
     opacity: 1; transform: none; filter: none;
     transition: opacity 600ms cubic-bezier(0.23, 1, 0.32, 1) var(--rv-d, 0ms), transform 700ms cubic-bezier(0.23, 1, 0.32, 1) var(--rv-d, 0ms), filter 600ms cubic-bezier(0.23, 1, 0.32, 1) var(--rv-d, 0ms);
 }
-.rv-armed.rv-in::before { opacity: 1; transition: opacity 1400ms cubic-bezier(0.23, 1, 0.32, 1) 150ms; }
+.rv-armed.rv-in > .dp-light { opacity: 1; transition: opacity 1400ms cubic-bezier(0.23, 1, 0.32, 1) 150ms; }
 #metrics .fade-in:not(.rv):not(.rv-title), #operational-excellence .fade-in:not(.rv):not(.rv-title), #case-studies .fade-in:not(.rv):not(.rv-title), #about .fade-in:not(.rv):not(.rv-title), #faq .fade-in:not(.rv):not(.rv-title), #contact .fade-in:not(.rv):not(.rv-title) { opacity: 1; transform: none; }
 /* script.js fades every whole section in by 40 px (.section-reveal) — the generic motion the owner called weak, and on top
    of the choreography above it doubled every fade. The six choreographed sections opt out. */
 #metrics.section-reveal, #operational-excellence.section-reveal, #case-studies.section-reveal, #about.section-reveal, #faq.section-reveal, #contact.section-reveal { opacity: 1; transform: none; transition: none; }
 @media (prefers-reduced-motion: reduce) {
-    #metrics.rv-armed .rv, #operational-excellence.rv-armed .rv, #case-studies.rv-armed .rv, #about.rv-armed .rv, #faq.rv-armed .rv, #contact.rv-armed .rv, .rv-armed .rv-title, .rv-armed::before, .rv-armed .sec-eyebrow::after { opacity: 1; transform: none; filter: none; }
+    #metrics.rv-armed .rv, #operational-excellence.rv-armed .rv, #case-studies.rv-armed .rv, #about.rv-armed .rv, #faq.rv-armed .rv, #contact.rv-armed .rv, .rv-armed .rv-title, .rv-armed > .dp-light, .rv-armed .sec-eyebrow::after { opacity: 1; transform: none; filter: none; }
 }
 /* v3.35.5: on the FAQ tier (--dp-raised) the answers' #6c757d read 4.3:1 in light. axe never saw it: the legacy
    section-reveal kept every section below the fold at opacity 0, and axe skips hidden text (audit-a11y now scrolls). */

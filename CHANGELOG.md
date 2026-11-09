@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v3.35.7 — 2026-11-10 — "The homepage light becomes a scene, and its text is measured again"
+
+Owner R105: "Mainkan gradien. Yg sangat cantik" (sent to the homepage session, building on R101–R104 blue as light).
+
+### Changed
+- **The light behind results, case studies and contact is a scene, not one halo.** Three sources on a real element
+  (`.dp-light`, `aria-hidden`): a blue key on the left, a deep indigo pool to its right and a warm orange counter-light
+  in the far corner (the 10 % accent as light, never as fill), with a fine grain over them so the falloff never bands.
+  Panels stay opaque and catch the light: a cool wash falling from their top edge and a sheen line on that edge,
+  brightest in the middle (`.dp-sheen`). Light and dark both; the section entrance fades the layer up as before.
+
+### Fixed
+- **Homepage contrast was unmeasured in three sections since v3.35.5.** axe files any text under an ancestor
+  pseudo-element larger than a quarter of the text box as "incomplete" (`pseudoContent`) and never fails it, so the
+  section `::before` halo hid the results, cases and contact text from the a11y gate: 0 of 6 planted low-contrast lines
+  were caught on live v3.35.5. With the light on a real element behind opaque panels, 6 of 6 fail as they should.
+- **The case numbers 01–03 read again.** Once axe could measure the case cards, the first gate run found them at 1.57:1
+  (light) and 1.72:1 (dark): an old `.case-number { opacity: 0.3 }` faded the AA `--dp-faint` colour. Hidden since
+  v3.35.5 by the blind spot above; opacity reset on the homepage rule, audit-a11y clean (6 violations → 0).
+- **The headline result kept its accent.** The sheen span as a panel's first child broke `.res-row:first-child`, and
+  81 % and its bar turned blue in the build; the rule now uses `:first-of-type` and a law guards it.
+
+### Gates
+- `tools/test-index-depth.mjs` D15 (a planted low-contrast line in every lit panel is an axe violation, both themes;
+  red 0/6 `pseudoContent` on live v3.35.5, green 6/6) and D16 (the light layer has >= 3 radial sources incl. a warm one,
+  a grain layer, a sheen on every lit panel brightest in the middle, and the headline figure + bar keep the accent;
+  red on the :first-child regression, green after).
+- `tools/audit-slop-render.mjs` owner-gradient exemption reused from v3.35.6 with an exact path list
+  (`/cx-calculator.html`, `/`, `/index.html`); on the homepage only an empty `aria-hidden` light layer is exempt;
+  `tools/test-slop-precision.mjs` proves an owner box with text and a plain gradient box still count and gradient text
+  never is exempt (red grad = 3, green grad = 2 on the fixture).
+- Docs: ANTI_VIBECODE_STANDARD homepage exemption line, MOTION_STANDARD choreography row, AGENT_HARNESS_STANDARD E6,
+  UIUX_AUDIT_LEDGER R105.
+
 ## v3.35.6 — 2026-11-09 — "The Cx page is lit, not painted: halo, rims and a blue schedule ramp"
 
 Owner K34: "Mainkan gradien. Yg sangat cantik" — asked for the Cx page (cx-calculator.html).

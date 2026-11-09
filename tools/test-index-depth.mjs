@@ -24,6 +24,12 @@
  *  D14 entrance (owner R103 "animasi motionnya sangat2 kurang payah"): every section that starts below the fold is armed;
  *     before it enters, its content is hidden; within 1.8 s of entering, every item is shown, the eyebrow rule is drawn
  *     and the blue light is on; the title passes through a blur (a sharpen-in, not a plain fade); reduced motion arms nothing.
+ *  D15 contrast stays measurable (R105; axe gives up — "pseudoContent", filed incomplete, never failed — when any ancestor's
+ *     ::before/::after covers > 25 % of a text box, and on a gradient behind the text): a planted low-contrast line in every
+ *     lit panel (results, each case, contact info, contact form) is a color-contrast VIOLATION in axe, both themes.
+ *  D16 the light is a scene (and the first result row keeps the accent figure and bar — a sheen first child once broke :first-child) (owner R105 "Mainkan gradien. Yg sangat cantik"): each band's light layer is a real element
+ *     (.dp-light, aria-hidden) with >= 3 radial sources — a blue key, a second deep source and a warm orange counter-light —
+ *     plus a grain layer; every lit panel catches it on a top-edge sheen (.dp-sheen) that is brightest toward the middle.
  *  D6 phone 390 (both themes): no sideways scroll; every bar inside its panel; no description clipped to an ellipsis. No page errors anywhere.
  * Env RZ_BASE (default http://127.0.0.1:8177).   node tools/test-index-depth.mjs
  */
@@ -91,7 +97,7 @@ const probe = ([SECS, BANDS]) => {
   out.accent = rgb(getComputedStyle(document.documentElement).getPropertyValue('--dp-amber').trim().replace(/^#(..)(..)(..)$/, (m, r, g, b) => `rgb(${parseInt(r, 16)},${parseInt(g, 16)},${parseInt(b, 16)})`));
   out.bandH = BANDS.reduce((a, id) => a + (sec[id] ? sec[id].offsetHeight : 0), 0) / document.documentElement.scrollHeight;
   out.bandHue = BANDS.map((id) => { const c = out.band[id]; return c[2] - Math.max(c[0], c[1]); });
-  out.halo = BANDS.map((id) => { const g = getComputedStyle(sec[id], '::before').backgroundImage; const m = g.match(/rgba?\(([^)]+)\)/); const c = m ? m[1].split(',').map(Number) : [0, 0, 0];
+  out.halo = BANDS.map((id) => { const L = sec[id].querySelector(':scope > .dp-light'); const g = L ? getComputedStyle(L).backgroundImage : 'none'; const m = g.match(/rgba?\(([^)]+)\)/); const c = m ? m[1].split(',').map(Number) : [0, 0, 0];
     return /radial-gradient/.test(g) && c[2] - Math.max(c[0], c[1]) >= 120; });
   const isBlue = (c) => c[2] - Math.max(c[0], c[1]) >= 80;
   out.blueBars = [...document.querySelectorAll('#metrics .res-fill')].filter((f) => { const m = getComputedStyle(f).backgroundImage.match(/rgba?\(([^)]+)\)\)?$/) || getComputedStyle(f).backgroundImage.match(/rgba?\(([^)]+)\)/g);
@@ -190,6 +196,36 @@ try {
     else check(before.every((f, i) => Math.abs(f - want[i]) <= 0.01) && atValue, `D11 reduced motion: bars full from the start ${before.join('/')}`);
     await p.close();
   }
+  // D15 + D16 (R105): contrast stays measurable under the light; the light is a three-source scene.
+  const AXE = (await import('node:fs')).readFileSync(resolve(ROOT, 'tools/vendor/axe.min.js'), 'utf8');
+  for (const theme of ['light', 'dark']) {
+    const p = await open(1440, theme);
+    const planted = await p.evaluate((t) => {
+      let n = 0; for (const sel of document.querySelectorAll('#metrics .res-panel, #case-studies .case-card, #contact .contact-info, #contact .contact-form')) {
+        const q = document.createElement('p'); q.className = 'd15-plant'; q.textContent = 'planted low contrast line'; q.style.cssText = 'font-size:14px;margin:8px 0'; q.style.setProperty('color', t === 'dark' ? '#33363c' : '#d8d8d8', 'important'); sel.appendChild(q); n++; }
+      return n; }, theme);
+    await p.addScriptTag({ content: AXE });
+    const r = await p.evaluate(async () => { const res = await axe.run(document, { runOnly: ['color-contrast'] });
+      const hit = (a) => a.flatMap((v) => v.nodes).filter((n) => n.html.includes('d15-plant'));
+      return { v: hit(res.violations).length, inc: hit(res.incomplete).map((n) => (n.any[0] || {}).data?.messageKey || '?') }; });
+    check(planted >= 4 && r.v === planted, `D15 ${theme}: ${r.v}/${planted} planted low-contrast lines fail in axe${r.inc.length ? ' — incomplete: ' + [...new Set(r.inc)].join(',') : ''}`);
+    const head = await p.evaluate(() => { const r = document.querySelector('#metrics .res-row'), acc = getComputedStyle(document.documentElement).getPropertyValue('--dp-amber').trim();
+      const hex = (h) => { const x = h.replace('#', ''); return [0, 2, 4].map((i) => parseInt(x.slice(i, i + 2), 16)).join(', '); };
+      return { acc: hex(acc), fig: getComputedStyle(r.querySelector('.metric-value')).color, bar: getComputedStyle(r.querySelector('.res-fill')).backgroundImage }; });
+    check(head.fig.includes(head.acc) && head.bar.includes(head.acc), `D16 ${theme}: the headline result keeps the 10 % accent — figure ${head.fig}, bar ${head.bar.includes(head.acc) ? 'accent' : 'NOT accent'} (accent ${head.acc})`);
+    const sc = await p.evaluate((B) => B.map((id) => { const s = document.getElementById(id), L = s.querySelector(':scope > .dp-light');
+      if (!L) return { id, src: 0, warm: false, grain: false, sheen: 0, panels: 0 };
+      const g = getComputedStyle(L).backgroundImage, src = (g.match(/radial-gradient/g) || []).length;
+      const cols = [...g.matchAll(/rgba?\(([^)]+)\)/g)].map((m) => m[1].split(',').map(Number));
+      const warm = cols.some((c) => c[0] - c[2] >= 120 && c[3] > 0), grain = /url\(/.test(getComputedStyle(L, '::after').backgroundImage);
+      const panels = [...s.querySelectorAll('.res-panel, .case-card, .contact-info, .contact-form')];
+      const sheen = panels.filter((pn) => { const e = pn.querySelector(':scope > .dp-sheen'); if (!e) return false; const bi = getComputedStyle(e).backgroundImage; const st = [...bi.matchAll(/rgba?\(([^)]+)\)/g)].map((m) => +((m[1].split(',')[3]) ?? 1));
+        return /linear-gradient/.test(bi) && st.length >= 3 && Math.max(...st) === st[Math.floor(st.length / 2)] && st[0] < st[Math.floor(st.length / 2)]; }).length;
+      return { id, src, warm, grain, sheen, panels: panels.length }; }), BANDS);
+    for (const x of sc) check(x.src >= 3 && x.warm && x.grain && x.sheen === x.panels && x.panels > 0,
+      `D16 ${theme} #${x.id}: light layer ${x.src} radial source(s), warm counter-light ${x.warm}, grain ${x.grain}, sheen on ${x.sheen}/${x.panels} panel(s)`);
+    await p.close();
+  }
   // D14 entrance choreography (R103): armed below the fold, hidden before entry, all shown within 1.8 s, title sharpens in.
   for (const reduce of [false, true]) {
     const p = await browser.newPage(); p.errors = []; p.on('pageerror', (e) => p.errors.push(String(e)));
@@ -209,7 +245,7 @@ try {
       await new Promise((r) => setTimeout(r, 1700));
       const post = await p.evaluate((id) => { const s = document.getElementById(id), items = [...s.querySelectorAll('.rv, .rv-title')];
         const eb = s.querySelector('.sec-eyebrow'); return { shown: items.filter((e) => +getComputedStyle(e).opacity > 0.99 && getComputedStyle(e).transform === 'none').length, n: items.length,
-          rule: eb ? getComputedStyle(eb, '::after').transform : 'none', light: +getComputedStyle(s, '::before').opacity }; }, id);
+          rule: eb ? getComputedStyle(eb, '::after').transform : 'none', light: +getComputedStyle(s.querySelector(':scope > .dp-light') || s, s.querySelector(':scope > .dp-light') ? null : '::before').opacity }; }, id);
       check(pre.n >= 2 && pre.shown === 0 && /blur\(/.test(blur) && post.shown === post.n && post.rule === 'none' && post.light > 0.99,
         `D14 #${id}: hidden before entry (${pre.shown}/${pre.n} shown), title mid-sharpen 120 ms in (${blur}), all ${post.shown}/${post.n} shown after, rule drawn (${post.rule}), light on (${post.light})`);
     }

@@ -204,7 +204,7 @@ blur on the section title only):
 
 | Moment | What moves | Timing |
 |---|---|---|
-| Section enters (below the fold only) | eyebrow rule draws from the left; title sharpens out of a 6 px blur; lede, then the content items on a 70 ms stagger; the blue light behind the section switches on | 600–900 ms, `cubic-bezier(0.23, 1, 0.32, 1)`; light 1400 ms |
+| Section enters (below the fold only) | eyebrow rule draws from the left; title sharpens out of a 6 px blur; lede, then the content items on a 70 ms stagger; the light layer behind the section (`.dp-light`, a real element since v3.35.7) fades up | 600–900 ms, `cubic-bezier(0.23, 1, 0.32, 1)`; light 1400 ms |
 | Result bars | grow from 0 to their value | 600 ms, 60 ms row stagger |
 | Employer card click (anywhere on the card) | both faces turn in 3D (front 0→180°, back −180→0°), the card dips to 0.965 and a shade crosses each face mid-turn; the height follows the shown face | 800 ms damped spring as `linear()` (ζ 0.78, ~2 % settle, no bounce); height 500 ms |
 

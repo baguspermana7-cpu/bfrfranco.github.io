@@ -70,6 +70,14 @@ file/rule findings across 172 files despite exit 0**.
   panels, a sequential blue ramp on the schedule bars (`css/rz-cx-gradient.css`). **A panel that holds body text
   keeps a flat fill:** a gradient fill makes axe file every node in it as "incomplete", so the contrast gate goes
   blind — found in this release when a planted 1.7:1 line inside `#cxResults` passed; with flat fills it fails.
+  Homepage owner-gradient exemption (R105, v3.35.7; owner "Mainkan gradien. Yg sangat cantik", 2026-11-09, sent to the
+  homepage session, building on R101–R104 blue-as-light): on `/` and `/index.html` ONLY an empty, `aria-hidden` light
+  layer carrying `data-rz-owner-gradient` (`.dp-light`) is exempt; the attribute on a box with content still counts, a
+  plain gradient box still counts, gradient text never (exact path list `OWNER_GRADIENT_PATHS` in
+  `tools/audit-slop-render.mjs`; `tools/test-slop-precision.mjs` proves all three on an index fixture). The light layer
+  must be a real element, not a `::before`: axe files every text under an ancestor pseudo-element larger than a quarter
+  of the text box as "incomplete" (`pseudoContent`), never as a failure — v3.35.5's section `::before` halo left the
+  results, cases and contact text unmeasured (0/6 planted lines caught; 6/6 after; `tools/test-index-depth.mjs` D15).
   Where a gradient fill does carry text, `tools/test-cx-gradient.mjs` measures every run against the worst
   background pixel under it (1440/390, both themes; red with the muted tier put back). 3D canvas unchanged (K16).
 - **A gradient hides a contrast failure (v3.27.0):** axe cannot measure text over a gradient and files it
