@@ -58,17 +58,24 @@ try {
       const fr = ex.layers.map((l, i) => l.y / (4 * (i + 1)));   // fraction of its own lift each layer has done
       ok('M3 mid fan-out the bottom layer is further along than the top one (staggered, not one rigid lift)', ex.factor > 0 && ex.factor < 1 && fr.length >= 3 && fr[0] > fr[fr.length - 1] + 0.1, { factor: ex.factor, fr });
       ok('M3 the explode factor never leaves 0..1', ex.factor >= 0 && ex.factor <= 1, ex.factor);
-      await sleep(1500);
+      /* settle = a condition with a deadline, not a fixed sleep: under a loaded gate the rAF loop runs slower (flake seen by LTC, v3.35.2) */
+      await page.waitForFunction(() => document.getElementById('cxAnCampus').__rzCampus.exploded().factor === 1, { timeout: 6000 }).catch(() => {});
       const ex2 = await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.exploded());
       ok('M3 when it settles every layer sits on its own level (n × 4 m)', ex2.factor === 1 && ex2.layers.every((l, i) => Math.abs(l.y - 4 * (i + 1)) < 1e-6), ex2);
       await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.explode(false)); await sleep(900);
       // M4 pick lights one family
-      const pk = await page.evaluate(() => new Promise((res) => { const h = document.getElementById('cxAnCampus'), a = h.__rzCampus; a.pick('ups'); setTimeout(() => { const cos = [...h.querySelectorAll('.cx-3d-co')].filter((e) => !e.hidden); res({ attr: h.getAttribute('data-cx-pick'), picked: cos.filter((e) => e.hasAttribute('data-picked')).map((e) => e.textContent), crumb: h.querySelector('.cx-3d-crumb').textContent.replace(/\s+/g, ' ').trim(), mo: a.motion() }); }, 600); }));
+      const pk = await page.evaluate(() => new Promise((res) => { const h = document.getElementById('cxAnCampus'), a = h.__rzCampus; a.pick('ups'); const t0 = performance.now(); (function poll() { const done = [...h.querySelectorAll('.cx-3d-co')].some((e) => !e.hidden && e.hasAttribute('data-picked')); if (!done && performance.now() - t0 < 4000) return setTimeout(poll, 100); const cos = [...h.querySelectorAll('.cx-3d-co')].filter((e) => !e.hidden); res({ attr: h.getAttribute('data-cx-pick'), picked: cos.filter((e) => e.hasAttribute('data-picked')).map((e) => e.textContent), crumb: h.querySelector('.cx-3d-crumb').textContent.replace(/\s+/g, ' ').trim(), mo: a.motion() }); })(); }));
       ok('M4 picking the UPS family marks it, lights exactly its callout, and the breadcrumb reads Campus › hall › UPS', pk.attr === 'ups' && pk.picked.length === 1 && /^UPS/i.test(pk.picked[0]) && /Campus.*›.*›\s*UPS/.test(pk.crumb), pk);
       const un = await page.evaluate(() => { const h = document.getElementById('cxAnCampus'), a = h.__rzCampus; a.pick(null); return { attr: h.getAttribute('data-cx-pick'), crumb: h.querySelector('.cx-3d-crumb').textContent.replace(/\s+/g, ' ').trim() }; });
       ok('M4 un-picking clears the mark and the breadcrumb goes back to Campus › building', un.attr === '' && (un.crumb.match(/›/g) || []).length === 1, un);
-      await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.focus(null)); await sleep(800);
+      /* the camera guarantees landing within CAM_MS × 2 (900 ms) by a timer even when rAF is starved; wait on the condition, not on 800 ms */
+      await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.focus(null));
+      await page.waitForFunction(() => document.getElementById('cxAnCampus').__rzCampus.view().atSite, { timeout: 3000 }).catch(() => {});
       ok('M5 back on the campus the camera has landed on the site', await page.evaluate(() => document.getElementById('cxAnCampus').__rzCampus.view().atSite));
+      // M9 rAF starved (busy main thread, background tab): explode still lands, layers included, by its EX_MS x 2 timer
+      const st9 = await page.evaluate(() => new Promise((res) => { const a = document.getElementById('cxAnCampus').__rzCampus, raf = window.requestAnimationFrame; window.requestAnimationFrame = () => 0; a.explode(true); setTimeout(() => { const e = a.exploded(); window.requestAnimationFrame = raf; a.explode(false); res(e); }, a.motion().exMs * 2 + 300); }));
+      ok('M9 with rAF starved the explode still lands: factor 1 and every layer on its own level', st9.factor === 1 && st9.layers.every((l, i) => Math.abs(l.y - 4 * (i + 1)) < 1e-6), st9);
+      await page.waitForFunction(() => document.getElementById('cxAnCampus').__rzCampus.exploded().factor === 0, { timeout: 6000 }).catch(() => {});
     }
   }
   ok('no page errors (normal motion)', errs.length === 0, errs);

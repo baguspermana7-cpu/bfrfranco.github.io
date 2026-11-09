@@ -242,6 +242,7 @@ and the only reliable detector has been a screenshot.
 | `node-overflow` (height) | Height was trusted where width was checked, so `h:52` on a node needing 72 drew its sublabel across its own bottom border. |
 | `unknown-option` | `sub` where `sublabel` was meant: the node quietly lost a line, nothing logged, nothing thrown. |
 | `over-budget` | The tenth node. Miller's 7±2, which the skill fixes at nine. |
+| `unknown-mirror` | `mirrorOf` naming a node not drawn before it (K29b, 2026-11-09). A `mirrorOf` node is a second drawing of one already-counted system (feed B of a 2N chain): it carries the same id and state, is not interactive, and does **not** count against the nine — the reader meets one system, drawn twice. A mirror of nothing is a new node in disguise, so it warns and counts. |
 | figure too wide *(builder)* | 1,672 units renders 8-unit type under 6 px in an article column — below the 8.5 px floor this site enforces everywhere else. Wide is a legibility failure with a different name. |
 | geometry self-audit *(builder)* | Compositions that overlap. The engine warns about what it was ASKED to do wrong; this catches what the composition did wrong. |
 

@@ -175,15 +175,18 @@
   function renderSchematic(plan) {
     var host = $('cxAnSheets'); if (!host) return;
     if (!plan || !root.RZCxSchematic) { host.innerHTML = '<p class="cx-an-sub">' + (plan ? 'Diagram engine not loaded.' : '—') + '</p>'; return; }
-    var st = P.statusAt(plan, S.month), sheets = root.RZCxSchematic.sheets(st, campusBasis(plan).es), h = '';
+    var st = P.statusAt(plan, S.month), sheets = root.RZCxSchematic.sheets(st, campusBasis(plan).es, { redundancy: plan.input && plan.input.redundancy }), h = '';
     for (var i = 0; i < sheets.length; i++) h += '<figure class="cx-an-sheet" data-block="' + sheets[i].block + '"' + (sheets[i].block === S.sheet ? '' : ' hidden') + '>' + sheets[i].svg + '</figure>';
     host.innerHTML = h;
     for (var j = 0; j < st.systems.length; j++) {
-      var x = st.systems[j], rect = host.querySelector('[data-rzd-node="' + x.id + '"]');
-      if (!rect) continue;
-      if (x.changed) rect.setAttribute('data-cx-changed', '1');
-      if (x.inTest) rect.setAttribute('data-cx-intest', '1');
-      if (S.sel === 'sys:' + x.id) rect.setAttribute('data-cx-selected', '1');
+      /* K29b: a system on a 2N sheet is drawn on feed A and feed B, so every copy carries its marks */
+      var x = st.systems[j], rects = host.querySelectorAll('[data-rzd-node="' + x.id + '"]');
+      for (var q = 0; q < rects.length; q++) {
+        var rect = rects[q];
+        if (x.changed) rect.setAttribute('data-cx-changed', '1');
+        if (x.inTest) rect.setAttribute('data-cx-intest', '1');
+        if (S.sel === 'sys:' + x.id) rect.setAttribute('data-cx-selected', '1');
+      }
     }
     if (S.changedOnly) {   // §12 filter: a veil over every system node that did not pass a gate this month (labels included)
       var ns = 'http://www.w3.org/2000/svg', all = host.querySelectorAll('[data-rzd-node]');

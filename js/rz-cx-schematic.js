@@ -2,7 +2,8 @@
  * (A electrical one-line · B mechanical / P&ID · C controls and life safety) whose nodes ARE the
  * RZCxPlan.SYSTEMS, coloured by the handbook 02.6 tag each system carries at the viewed month.
  * Pure string rendering (works in Node for the gate); the page module injects the SVG and binds clicks.
- *   RZCxSchematic.sheets(status, scale?)  → [{block, title, svg, warnings}] for a RZCxPlan.statusAt() result;
+ *   RZCxSchematic.sheets(status, scale?, opt?) → [{block, title, svg, warnings}] for a RZCxPlan.statusAt() result;
+ *                                           opt.redundancy '2N'/'2N+1' draws feed A + B on sheet A (K29b)
  *                                           scale = RZEngine commissioning.equipScale(input) → ×count on each block
  *   RZCxSchematic.trace(block, id, dir)   → ordered ids upstream/downstream along the sheet's edges
  * Colours are the page's tokens (var(--o/--c/--g/--r …)); the host sets them on .cx-an-sheet. ES5. */
@@ -45,30 +46,65 @@
     EDGES[block].push([a.id, b.id]);
   }
 
-  /* A — electrical one-line: 150 kV → 20 kV → 400 V, gensets on the 20 kV board */
-  function sheetElectrical(st) {
-    var ctx = D.create({ width: 1400, height: 420, slug: 'cxsldA', title: 'A · Electrical one-line, 150 kV to the rack', desc: 'Utility 150 kV intake, main transformers, 20 kV boards and feeders, unit substations to 400 V, UPS, LV switchboards and busway to the IT load; generators on the 20 kV board. Node colour = Cx tag at the viewed month.' });
+  /* A twin: the same Cx system on the other power path. Same state (colour), no hit target, no count: the system is
+   * clicked once and counted once; the twin only shows that the path exists. */
+  function twin(ctx, x, y, st, o) {
+    var r = rowOf(st, o.id);
+    var b = ctx.node(x, y, { id: o.id, mirrorOf: o.id, name: o.name || sysLabel(o.id).toUpperCase(), tag: o.tag, symbol: o.symbol, w: o.w, h: o.h, tier: 2,
+      sublabel: o.sublabel || sub(st, o.id, 'planned'), state: r && r.tag ? r.tag : 'none' });
+    b.id = o.id; return b;
+  }
+
+  /* A — electrical one-line: 150 kV → 20 kV → 400 V, gensets on the 20 kV board. K29b: a 2N / 2N+1 input draws
+   * feed A and feed B with a normally-open bus tie between the 20 kV sections; N / N+1 draws one feed. */
+  function sheetElectrical(st, opt) {
+    var two = /^2N/.test(String((opt && opt.redundancy) || ''));
+    var ctx = D.create({ width: 1400, height: two ? 640 : 420, slug: 'cxsldA', title: 'A · Electrical one-line, 150 kV to the rack', desc: 'Utility 150 kV intake, main transformers, 20 kV boards and feeders, unit substations to 400 V, UPS, busway to the racks; generators on the 20 kV board through an ATS that is normally open.' + (two ? ' Two independent paths, feed A and feed B, with a normally open bus tie.' : '') });
     EDGES.electrical = [];
-    var Y = 170, H = 108, GAP = 64, x = 24, n = {};
-    function step(o) { var b = node(ctx, 'electrical', x, Y, st, Object.assign({ h: H }, o)); x = b.x + b.w + GAP; return b; }
-    n.hv_intake = step({ id: 'hv_intake', tag: '150 kV', symbol: 'utility', legend: 'system (colour = Cx tag)' });
-    n.main_tx = step({ id: 'main_tx', tag: '150/20 kV', symbol: 'transformer' });
-    n.mv_board = step({ id: 'mv_board', tag: '20 kV', symbol: 'switchgear' });
-    n.unit_subs = step({ id: 'unit_subs', tag: '20/0.4 kV', symbol: 'transformer' });
-    n.ups = step({ id: 'ups', tag: '400 V', symbol: 'ups' });
-    n.lv_busway = step({ id: 'lv_busway', tag: '400 V', symbol: 'pdu' });
-    n.it_load = step({ id: 'it_load', tag: 'load', name: 'IT LOAD', symbol: 'itload', sublabel: 'racks · see sheet B', focal: true, tier: 1 });
-    n.generators = node(ctx, 'electrical', n.mv_board.x + (n.mv_board.w - 228) / 2, Y - 150, st, { id: 'generators', tag: 'standby', name: 'GENERATORS', symbol: 'genset', w: 228, h: 108 });
-    edge(ctx, 'electrical', n.hv_intake, n.main_tx, { stroke: 'alarm-fault', state: 'flow', tier: 1, label: '150 kV', legend: '150 kV' });
-    edge(ctx, 'electrical', n.main_tx, n.mv_board, { stroke: 'accent', pattern: 'dashed', state: 'flow', tier: 1, label: '20 kV', legend: '20 kV, dashed' });
-    edge(ctx, 'electrical', n.mv_board, n.unit_subs, { stroke: 'accent', pattern: 'dashed', state: 'flow', tier: 1 });
-    edge(ctx, 'electrical', n.unit_subs, n.ups, { stroke: 'alarm-normal', pattern: 'dash-dot', state: 'flow', tier: 1, label: '400 V', legend: '400 V, dash-dot' });
-    edge(ctx, 'electrical', n.ups, n.lv_busway, { stroke: 'alarm-normal', pattern: 'dash-dot', state: 'flow', tier: 1 });
-    edge(ctx, 'electrical', n.lv_busway, n.it_load, { stroke: 'alarm-normal', pattern: 'dash-dot', state: 'flow', tier: 1, label: 'A + B' });
-    edge(ctx, 'electrical', n.generators, n.mv_board, { from: { x: n.generators.x + n.generators.w / 2, y: n.generators.y + n.generators.h }, to: { x: n.mv_board.x + n.mv_board.w / 2, y: n.mv_board.y }, pattern: 'dotted', label: 'ATS · NO', tier: 2, legend: 'standby path (open), dotted' });
-    ctx.zone(n.hv_intake.x - 12, Y - 26, (n.main_tx.x + n.main_tx.w + 12) - (n.hv_intake.x - 12), H + 52, { label: '150 kV switchyard', tier: 3 });
-    ctx.zone(n.unit_subs.x - 12, Y - 26, (n.it_load.x + n.it_load.w + 12) - (n.unit_subs.x - 12), H + 52, { label: 'inside the building · 400 V', tier: 3 });
-    countNote(ctx, Y + H + 64);
+    var Y = 170, H = 108, GAP = 64, ROWGAP = 128, x = 24, n = {}, m = {};
+    var COLS = [
+      { id: 'hv_intake', tag: '150 kV', symbol: 'utility', legend: 'system (colour = Cx tag)' },
+      { id: 'main_tx', tag: '150/20 kV', symbol: 'transformer' },
+      { id: 'mv_board', tag: '20 kV', symbol: 'switchgear' },
+      { id: 'unit_subs', tag: '20/0.4 kV', symbol: 'transformer' },
+      { id: 'ups', tag: '400 V', symbol: 'ups' },
+      { id: 'lv_busway', tag: '400 V', symbol: 'pdu' }];
+    for (var c = 0; c < COLS.length; c++) {
+      var o = Object.assign({ h: H }, COLS[c]); if (two) o.tag = o.tag + ' · A';
+      n[o.id] = node(ctx, 'electrical', x, Y, st, o);
+      if (two) m[o.id] = twin(ctx, x, Y + H + ROWGAP, st, { id: o.id, tag: COLS[c].tag + ' · B', symbol: o.symbol, w: n[o.id].w, h: H });
+      x = n[o.id].x + n[o.id].w + GAP;
+    }
+    var loadH = two ? H * 2 + ROWGAP : H;
+    n.it_load = node(ctx, 'electrical', x, Y, st, { id: 'it_load', tag: 'load', name: 'IT LOAD', symbol: 'itload', sublabel: two ? 'racks · dual-corded A + B' : 'racks · see sheet B', focal: true, tier: 1, h: loadH, vAlign: 'middle' });
+    n.generators = node(ctx, 'electrical', n.mv_board.x + (n.mv_board.w - 228) / 2, Y - 150, st, { id: 'generators', tag: two ? 'standby · A' : 'standby', name: 'GENERATORS', symbol: 'genset', w: 228, h: 108 });
+    if (two) m.generators = twin(ctx, n.mv_board.x + (n.mv_board.w - 228) / 2, m.mv_board.y + H + 42, st, { id: 'generators', tag: 'standby · B', name: 'GENERATORS', symbol: 'genset', w: 228, h: 108 });
+    function chain(k, side) {
+      var g = side === 'B' ? m : n;
+      edge(ctx, 'electrical', g.hv_intake, g.main_tx, { stroke: 'alarm-fault', state: 'flow', tier: 1, label: side === 'B' ? null : '150 kV', legend: side === 'B' ? null : '150 kV' });
+      edge(ctx, 'electrical', g.main_tx, g.mv_board, { stroke: 'accent', pattern: 'dashed', state: 'flow', tier: 1, label: side === 'B' ? null : '20 kV', legend: side === 'B' ? null : '20 kV, dashed' });
+      edge(ctx, 'electrical', g.mv_board, g.unit_subs, { stroke: 'accent', pattern: 'dashed', state: 'flow', tier: 1 });
+      edge(ctx, 'electrical', g.unit_subs, g.ups, { stroke: 'alarm-normal', pattern: 'dash-dot', state: 'flow', tier: 1, label: side === 'B' ? null : '400 V', legend: side === 'B' ? null : '400 V, dash-dot' });
+      edge(ctx, 'electrical', g.ups, g.lv_busway, { stroke: 'alarm-normal', pattern: 'dash-dot', state: 'flow', tier: 1 });
+      var bw = g.lv_busway, ty = bw.y + bw.h / 2;
+      edge(ctx, 'electrical', bw, n.it_load, { to: { x: n.it_load.x, y: ty }, stroke: 'alarm-normal', pattern: 'dash-dot', state: 'flow', tier: 1, label: two ? 'feed ' + side : 'A + B' });
+      var gen = g.generators, mv = g.mv_board;
+      var genAbove = gen.y < mv.y;
+      edge(ctx, 'electrical', gen, mv, { from: { x: gen.x + gen.w / 2, y: genAbove ? gen.y + gen.h : gen.y }, to: { x: mv.x + mv.w / 2, y: genAbove ? mv.y : mv.y + mv.h }, pattern: 'dotted', tier: 2, label: 'ATS · normally open', legend: side === 'B' ? null : 'standby, dotted' });
+    }
+    chain(null, 'A');
+    if (two) {
+      chain(null, 'B');
+      /* bus tie: a breaker between the two 20 kV sections, drawn and labelled, never an edge the trace follows */
+      var tw = 112, tx = n.mv_board.x + (n.mv_board.w - tw) / 2, tyTop = n.mv_board.y + H + 18;
+      var tie = ctx.node(tx, tyTop, { name: 'BUS TIE', sublabel: 'normally open', symbol: 'breaker', w: tw, h: ROWGAP - 36, tier: 3, dashed: true });
+      ctx.edge({ x: n.mv_board.x + n.mv_board.w / 2 - 30, y: n.mv_board.y + H }, { x: tie.x + 26, y: tie.y }, { pattern: 'dotted', tier: 3 });
+      ctx.edge({ x: tie.x + 26, y: tie.y + tie.h }, { x: m.mv_board.x + m.mv_board.w / 2 - 30, y: m.mv_board.y }, { pattern: 'dotted', tier: 3 });
+    }
+    var botY = two ? m.hv_intake.y + H : Y + H;
+    ctx.zone(n.hv_intake.x - 12, Y - 26, (n.main_tx.x + n.main_tx.w + 12) - (n.hv_intake.x - 12), botY - Y + 52, { label: '150 kV switchyard', tier: 3 });
+    ctx.zone(n.unit_subs.x - 12, Y - 26, (n.it_load.x + n.it_load.w + 12) - (n.unit_subs.x - 12), botY - Y + 52, { label: 'inside the building · 400 V', tier: 3 });
+    countNote(ctx, (two ? m.generators.y + m.generators.h : botY) + 64);
     ctx.legend({}); ctx.fit(20); return ctx;
   }
 
@@ -121,10 +157,10 @@
 
   var BUILD = { electrical: sheetElectrical, mechanical: sheetMechanical, controls: sheetControls };
   var TITLES = { electrical: 'A · Electrical', mechanical: 'B · Mechanical / P&ID', controls: 'C · Controls & life safety' };
-  function sheets(st, scale) {
+  function sheets(st, scale, opt) {
     SCALE = scale && typeof scale === 'object' ? scale : null;
     return ['electrical', 'mechanical', 'controls'].map(function (block) {
-      var ctx = BUILD[block](st);
+      var ctx = BUILD[block](st, opt || {});
       return { block: block, title: TITLES[block], svg: ctx.render(), warnings: ctx.warnings.slice(), width: ctx.width, height: ctx.height };
     });
   }

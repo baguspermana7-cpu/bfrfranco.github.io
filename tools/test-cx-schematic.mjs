@@ -38,4 +38,30 @@ ok('no literal hex in the sheets (tokens only)', !/#[0-9a-f]{6}/i.test(all.repla
   ok('K29 counts: every × on each sheet is an equipScale value for a block on that sheet, and none is missing', got.join('|') === want.join('|'), { got, want });
   ok('K29 counts: zero engine warnings with counts on, and the note says where × comes from', shc.every((x) => !x.warnings.length) && /equipScale/.test(svg), shc.map((x) => x.warnings.length));
   ok('K29 counts: none without a scale (no typed numbers)', !/×\d/.test(all)); }
+// K29b: sheet A draws the power paths the input asks for — 2N/2N+1 = feed A and feed B (each system once clickable,
+// its feed-B twin carries the same Cx colour and no count), a normally-open bus tie the trace never crosses;
+// N/N+1 = one feed, nothing fabricated.
+{ const FEED = ['hv_intake', 'main_tx', 'mv_board', 'unit_subs', 'ups', 'lv_busway'];
+  const C = window.RZEngine.models.commissioning;
+  for (const red of ['N', 'N+1', '2N', '2N+1']) {
+    const two = /^2N/.test(red), shr = S.sheets(stMid, null, { redundancy: red }), A = shr[0].svg;
+    const cnt = (id) => (A.match(new RegExp('data-rzd-node="' + id + '"', 'g')) || []).length;
+    const bad = FEED.filter((id) => cnt(id) !== (two ? 2 : 1)).map((id) => id + ':' + cnt(id));
+    ok('K29b ' + red + ': every feed system drawn ' + (two ? 'twice (A + B)' : 'once'), !bad.length, bad);
+    ok('K29b ' + red + ': each system still one hit target on one sheet', P.SYSTEMS.every((x) => shr.map((q) => (q.svg.match(new RegExp('data-rzd-hit="' + x.id + '"', 'g')) || []).length).reduce((a, b) => a + b, 0) === 1));
+    if (two) {   // a twin is the same system: it must carry the same name as its feed-A copy, never a second label
+      const names = [...A.matchAll(/fill="var\(--t1\)"[^>]*font-weight="600"[^>]*>([^<]+)<\/text>/g)].map((q) => q[1]).filter((t) => t !== 'BUS TIE' && t !== 'IT LOAD');
+      const tally = {}; names.forEach((t) => { tally[t] = (tally[t] || 0) + 1; });
+      const odd = Object.keys(tally).filter((t) => tally[t] !== 2).map((t) => t + ':' + tally[t]);
+      ok('K29b ' + red + ': each twin carries its feed-A name (every system name drawn exactly twice)', names.length >= 14 && !odd.length, odd);
+    }
+    ok('K29b ' + red + ': bus tie ' + (two ? 'drawn normally open' : 'absent'), two ? /BUS TIE/.test(A) && /normally open/.test(A) : !/BUS TIE/.test(A));
+    ok('K29b ' + red + ': zero engine warnings', shr.every((q) => !q.warnings.length), shr.map((q) => q.warnings.map((w) => w.kind + ':' + w.id)));
+    const twin = [...A.matchAll(/data-rzd-node="([a-z_]+)"[^>]*data-rzd-state="([a-z]+)"/g)].map((m) => m[1] + '=' + m[2]);
+    ok('K29b ' + red + ': a twin wears its system\'s colour', FEED.every((id) => new Set(twin.filter((t) => t.startsWith(id + '=')).map((t) => t.split('=')[1])).size === 1));
+    const es = C.equipScale(C.mapInput(plan.input || { itLoad: 40000, coolingType: 'liquid', redundancy: '2N', region: 'id_jakarta', rackDensity: 'ai_hpc' }));
+    const A2 = S.sheets(stMid, es, { redundancy: red })[0].svg, xs = (A2.match(/×[0-9,]+/g) || []).length;
+    ok('K29b ' + red + ': counts appear once per system, never on a twin', xs === 6, xs);
+  }
+  ok('K29b trace never crosses the bus tie or reaches generators', !S.trace('electrical', 'hv_intake', 'down').includes('generators') && S.EDGES.electrical.every((e) => e[0] !== 'bus_tie' && e[1] !== 'bus_tie')); }
 console.log(`CX SCHEMATIC — ${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);

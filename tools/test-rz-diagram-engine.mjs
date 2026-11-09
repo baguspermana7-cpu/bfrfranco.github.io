@@ -740,6 +740,16 @@ const D = sandbox.RZDiagram;
     const over = c.warnings.filter(w => w.kind === 'over-budget');
     ok('U2b', over.length === 1, `the tenth node warns, once: got ${over.length}`);
   }
+  /* U2c (K29b): a mirrored path is one chunk. A node declared mirrorOf an existing node (feed B of a 2N one-line)
+   *     does not count against the budget, and an unknown target still warns, so the option cannot launder a list. */
+  {
+    const c = D.create({ slug: 'u2c', title: 'T', desc: 'D' });
+    for (let i = 0; i < 9; i++) c.node(i * 4, 0, { id: 'n' + i, name: 'N' + i });
+    for (let i = 0; i < 6; i++) c.node(i * 4, 40, { id: 'n' + i, name: 'N' + i, mirrorOf: 'n' + i });
+    ok('U2c', !c.warnings.length, 'six mirrors of drawn nodes stay within budget, no warning: ' + JSON.stringify(c.warnings.map(w => w.kind)));
+    c.node(99, 40, { id: 'x', name: 'X', mirrorOf: 'nope' });
+    ok('U2d', c.warnings.some(w => w.kind === 'unknown-mirror'), 'mirrorOf a node that was never drawn warns');
+  }
 
   /* U3: one label, one meaning. The demo shipped the same legend text on a node
    *     swatch and on a line, which reads as one entry drawn twice. */

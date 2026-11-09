@@ -213,3 +213,19 @@ liquid loops). Escape closes it and focus returns to the block. Sheet arrangemen
 print no quantities. The main sheets carry `×n` per block from `equipScale(mapInput(input))` and a note naming that
 source; without a scale no count is drawn. Gates: `tools/test-cx-detail.mjs` (D1–D5, RED 2/5 on the pre-K29 tree),
 `tools/test-cx-schematic.mjs` K29 counts.
+
+**K29b — the main electrical sheet follows the redundancy input (2026-11-09).** Owner: *"giant schematic … receh,
+kurang detail"*. Sheet A draws the feed chain HV intake → main TX → MV board → unit subs → UPS → LV busway once for
+N / N+1 and twice for 2N / 2N+1 (feed A on top, feed B below as `mirrorOf` twins), with a `BUS TIE · normally open`
+between the MV sections, the IT load spanning both rows as dual-corded A + B, and the generator ATS labelled normally
+open. Each system stays exactly one hit target; the twin carries the same state and every copy gets the
+changed / in-test / selected marks (`js/rz-cx-analysis.js` marks with `querySelectorAll`). `×n` counts print on feed A
+only. The trace never runs through the bus tie (it is not in `EDGES`). Gates: `tools/test-cx-schematic.mjs` K29b
+(RED 4 failures on the pre-K29b tree, then 41/41), `tools/test-rz-diagram-engine.mjs` U2c/U2d (`mirrorOf`).
+
+**Motion gates wait on conditions, not clocks (2026-11-09).** The campus camera and the explode each guarantee landing
+by a timer (`CAM_MS × 2`, `EX_MS × 2`) when rAF is starved; the explode timer now moves the layers with the factor
+(before, it set the factor to 1 and left the top layers mid-stagger until the next frame). Gates wait for the landed
+state with a deadline (`waitForFunction`) instead of a fixed sleep shorter than the guarantee — M5 slept 800 ms against
+a 900 ms guarantee and flaked under a loaded ship gate. Law M9 (rAF stubbed out, explode still lands, layers included)
+was RED on the old timer, GREEN after.

@@ -328,7 +328,7 @@
     function setExplode(on) {
       exploded = !!on; if (exploded && !focused) focus('hall');
       anim.exTarget = exploded ? 1 : 0; anim.exLast = null;   /* the clock starts on the next drawn frame (rAF time), never on performance.now() */ if (REDUCE) anim.explode = anim.exTarget;
-      var exT = anim.exTarget; root.setTimeout(function () { if (anim.exTarget === exT && anim.explode !== exT) { anim.explode = exT; draw(); } }, EX_MS * 2);   /* lands even when rAF is throttled */
+      var exT = anim.exTarget; root.setTimeout(function () { if (anim.exTarget === exT && anim.explode !== exT) { anim.explode = exT; applyExplode(); draw(); } }, EX_MS * 2);   /* lands even when rAF is throttled: the layers move with the factor, not on the next frame */
       if (exBtn) exBtn.setAttribute('aria-pressed', String(exploded));
       host.setAttribute('data-cx-explode', exploded ? '1' : '0'); draw();
     }

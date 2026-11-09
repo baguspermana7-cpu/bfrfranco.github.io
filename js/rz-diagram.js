@@ -84,7 +84,7 @@
   var NODE_OPTS = ['id', 'tag', 'name', 'sublabel', 'w', 'h', 'pad', 'stroke', 'fill',
                    'tier', 'dashed', 'focal', 'radius', 'legend', 'vAlign', 'nameFill',
                    'symbol', 'symbolFill', 'interactive', 'state', 'valueKey',
-                   'valuePrefix'];
+                   'valuePrefix', 'mirrorOf'];
 
   /* Symbol glyph size in diagram units, and the gap under it. The glyph is an
    * IEC 60617 / ISA-5.1 drawing from js/rz-eng-symbols.js — the same library
@@ -184,6 +184,7 @@
      * drawing writes the legend. */
     var drawn = { nodes: [], edges: [] };
     var nodeCount = 0;
+    var drawnIds = {};   /* ids already drawn, so mirrorOf can be checked against something real */
 
     function id(prefix) { return slug + '-' + prefix + (++seq); }
 
@@ -366,8 +367,17 @@
          * nine nodes: past that a reader stops seeing a structure and starts
          * reading a list, and the answer is two diagrams, not a bigger one.
          * Reported once, with the count, rather than on every node after. */
-        nodeCount++;
-        if (nodeCount === 10) {
+        /* A mirrored path (feed B of a 2N one-line) is one chunk with the path it repeats, so it does
+         * not count. It must name a node already drawn; anything else warns and counts like any node. */
+        var mirrored = false;
+        if (o.mirrorOf != null) {
+          if (drawnIds[o.mirrorOf]) mirrored = true;
+          else warnings.push({ kind: 'unknown-mirror', id: o.id || o.name,
+                               message: 'mirrorOf "' + o.mirrorOf + '" names no node drawn before it; counted against the budget' });
+        }
+        if (o.id && !mirrored) drawnIds[o.id] = true;
+        if (!mirrored) nodeCount++;
+        if (!mirrored && nodeCount === 10) {
           warnings.push({
             kind: 'over-budget',
             message: 'this diagram now has 10 nodes; the budget is 9. Past that the reader ' +
