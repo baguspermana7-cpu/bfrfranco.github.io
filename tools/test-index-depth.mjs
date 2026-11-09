@@ -12,6 +12,7 @@
  *     height at 1440; every text on a band reaches WCAG AA against it (4.5:1, 3:1 at 24 px+); the 10 % accent = --dp-amber.
  *  D8 sync: no element on the page still paints the old amber (any colour, fill or drawn border) — the accent is one hue.
  *  D9 align (owner "yang paling align"): in every section the content block starts on the eyebrow's left edge (±2 px).
+ *  D10 every text node in the three band sections, inside panels too, reaches WCAG AA against what it sits on.
  *  D6 phone 390 (both themes): no sideways scroll; every bar inside its panel; no description clipped to an ellipsis. No page errors anywhere.
  * Env RZ_BASE (default http://127.0.0.1:8177).   node tools/test-index-depth.mjs
  */
@@ -83,6 +84,9 @@ const probe = ([SECS, BANDS]) => {
   const CONTENT = { metrics: '.res-panel', 'operational-excellence': '.oe-grid', 'case-studies': '.case-card', faq: '.faq-list', contact: '.contact-content' };
   out.align = Object.entries(CONTENT).map(([id, q]) => { const eb = sec[id] && sec[id].querySelector('.sec-eyebrow'), c = sec[id] && sec[id].querySelector(q);
     return { id, dx: eb && c ? Math.round(Math.abs(eb.getBoundingClientRect().left - c.getBoundingClientRect().left)) : 99 }; });
+  out.bandText = BANDS.flatMap((id) => [...sec[id].querySelectorAll('*')].filter((e) => e.getClientRects().length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()))
+    .map((e) => { const cs = getComputedStyle(e), fs = parseFloat(cs.fontSize), big = fs >= 24 || (fs >= 18.66 && +cs.fontWeight >= 700);
+      return { t: e.textContent.trim().slice(0, 20), r: +ratio(rgb(cs.color).slice(0, 3), bg(e)).toFixed(2), need: big ? 3 : 4.5 }; }).filter((x) => x.r < x.need));
   const OLD = ['232,181,99', '146,64,14', '122,72,0', '245,158,11', '251,191,36', '255,170,0'];
   out.oldAmber = [...document.querySelectorAll('body *')].flatMap((e) => { const cs = getComputedStyle(e);
     return ['color', 'backgroundColor', 'borderTopColor', 'borderLeftColor', 'outlineColor'].map((k) => [k, rgb(cs[k]).slice(0, 3).join(',')])
@@ -111,6 +115,7 @@ try {
     for (const h of o.heads) check(/^0\d\b/.test(h.eb) && h.ebMono && h.align !== 'center' && h.dx <= 2, `D5 ${T} #${h.id}: eyebrow "${h.eb}" mono ${h.ebMono}, title ${h.align}, aligned Δ${Math.round(h.dx)}`);
     check(o.bandHue.every((d) => d >= 120) && o.bandH >= 0.22 && o.bandH <= 0.40, `D7 ${T} bands are the 30 % blue (blue lead ${o.bandHue.join('/')}), ${(o.bandH * 100).toFixed(1)} % of the page height`);
     check(o.lowContrast.length === 0, `D7 ${T} text on the bands reaches AA${o.lowContrast.length ? ' — ' + o.lowContrast.map((x) => `${x.t} ${x.r}<${x.need}`).join(' | ') : ''}`);
+    check(o.bandText.length === 0, `D10 ${T} every text in the band sections (panels included) reaches AA${o.bandText.length ? ' — ' + o.bandText.length + ': ' + o.bandText.slice(0, 5).map((x) => `${x.t} ${x.r}`).join(' | ') : ''}`);
     const mis = o.align.filter((a) => a.dx > 2);
     check(mis.length === 0, `D9 ${T} every section's content starts on its eyebrow's left edge${mis.length ? ' — ' + mis.map((a) => `#${a.id} Δ${a.dx}`).join(' ') : ''}`);
     check(o.oldAmber.length === 0, `D8 ${T} one accent across the page: no element still paints the old amber${o.oldAmber.length ? ' — ' + o.oldAmber.length + ': ' + o.oldAmber.slice(0, 5).join(' | ') : ''}`);
