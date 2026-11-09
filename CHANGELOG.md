@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v3.35.2 — 2026-11-09 — "Every text on a blue band reads, and the result bars grow into place"
+
+Follow-up to v3.35.0 (owner K33 / R099: "agar nggak flat … animasi dan dll"; "yg paling align bener2 bagus, sync dan keren").
+
+### Fixed
+- **Contrast inside the band sections** — the Contact panel labels (Direct contact, Find me elsewhere, Based in,
+  Technical Support) read 1.49:1 in light and 3.91:1 in dark, the form note 2.07:1, the dark Send button 1.18:1, and
+  the result-bar reference labels 4.29 / 4.49. axe passed them; a new law that measures every text node itself did
+  not. Labels take `--dp-faint` (raised to AA), inline greys in the Contact section moved to `--dp-muted`, and Send
+  takes the accent (dark text on orange in dark, white on `#C2410C` in light).
+
+### Added
+- **Result bars grow into place** — each bar scales from the left to its value once, as the results panel enters
+  view: 600 ms strong ease-out (`cubic-bezier(0.23, 1, 0.32, 1)`), 60 ms row stagger, the reference tick and its label
+  fade in as the fill arrives. Transform and opacity only. A script arms it only when the panel starts off-screen, so
+  without JavaScript, or with reduced motion, the bars are full at once.
+
+### Gates
+- `tools/test-index-depth.mjs` gains D10 (every text node in the three band sections, panels included, reaches AA;
+  red 6 dark / 8 light, now green) and D11 (bars at 0 off-screen, mid-growth 140 ms after entry, at value after;
+  reduced motion full from the start; red before the motion, now green). R079, render slop scan, a11y, motion
+  standard and CSS structure stay green.
+
 ## v3.35.1 — 2026-11-09 — "Polish more: the program breakdown reads as a table, not a column of black boxes"
 
 Owner comment K31 ("Polish more", PRD v1.1 §41 ledger), rebased onto v3.35.0. Measured on the live page at
