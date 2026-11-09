@@ -1733,5 +1733,23 @@ if ('serviceWorker' in navigator) {
   });
 })();
 </script>
+    <script>
+    /* R099 (owner "animasi"): the result bars grow to their value once, as the panel enters view. Arming is done
+       here, so without JS (or with reduced motion) the bars render full. Gate: tools/test-index-depth.mjs D11. */
+    (function () {
+        var panel = document.querySelector('#metrics .res-panel');
+        if (!panel || !('IntersectionObserver' in window)) return;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var r = panel.getBoundingClientRect();
+        if (r.top < window.innerHeight && r.bottom > 0) return;
+        panel.classList.add('res-armed');
+        var io = new IntersectionObserver(function (entries) {
+            if (!entries[0].isIntersecting) return;
+            panel.classList.add('res-in');
+            io.disconnect();
+        }, { threshold: 0.35 });
+        io.observe(panel);
+    })();
+    </script>
 </body>
 </html>

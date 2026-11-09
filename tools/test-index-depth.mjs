@@ -13,6 +13,8 @@
  *  D8 sync: no element on the page still paints the old amber (any colour, fill or drawn border) — the accent is one hue.
  *  D9 align (owner "yang paling align"): in every section the content block starts on the eyebrow's left edge (±2 px).
  *  D10 every text node in the three band sections, inside panels too, reaches WCAG AA against what it sits on.
+ *  D11 motion (owner "animasi"): each bar grows from 0 to its value once, as the results panel enters view (600 ms
+ *     strong ease-out, 60 ms row stagger); with reduced motion the bars are full from the start; without JS, full.
  *  D6 phone 390 (both themes): no sideways scroll; every bar inside its panel; no description clipped to an ellipsis. No page errors anywhere.
  * Env RZ_BASE (default http://127.0.0.1:8177).   node tools/test-index-depth.mjs
  */
@@ -126,6 +128,29 @@ try {
     check(m.sw <= m.vw && m.barsOut === 0 && m.clipped === 0, `D6 [${theme} 390] no sideways scroll (${m.sw}/${m.vw}), bars inside their panel (out ${m.barsOut}), no clipped text (${m.clipped})`);
     check(q.errors.length === 0, `D6 [${theme} 390] no page errors${q.errors.length ? ' — ' + q.errors[0] : ''}`);
     await q.close();
+  }
+
+  // D11 motion: a bar grows to its value once, as the results panel enters view; reduced motion shows it full at once.
+  for (const reduce of [false, true]) {
+    const p = await browser.newPage(); p.errors = []; p.on('pageerror', (e) => p.errors.push(String(e)));
+    await p.setViewport({ width: 1440, height: 900 });
+    if (reduce) await p.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    await p.goto(URL.replace('/index.html', '/robots.txt')); await p.evaluate(() => { localStorage.clear(); localStorage.setItem('rz_cookie_consent', 'declined'); });
+    await p.goto(URL, { waitUntil: 'networkidle2', timeout: 60000 }); await new Promise((r) => setTimeout(r, 600));
+    const fills = () => p.evaluate(() => [...document.querySelectorAll('#metrics .res-bar[data-v]')].map((b) => +(b.querySelector('.res-fill').getBoundingClientRect().width / b.getBoundingClientRect().width).toFixed(3)));
+    const before = await fills();
+    await p.evaluate(() => document.querySelector('#metrics .res-panel').scrollIntoView({ block: 'center' }));
+    if (!reduce) await p.waitForFunction(() => document.querySelector('#metrics .res-panel.res-in'), { timeout: 5000 }).catch(() => {});
+    await new Promise((r) => setTimeout(r, 140));
+    const mid = await fills();
+    await new Promise((r) => setTimeout(r, 1200));
+    const after = await fills();
+    const want = await p.evaluate(() => [...document.querySelectorAll('#metrics .res-bar[data-v]')].map((b) => +b.dataset.v));
+    const atValue = after.every((f, i) => Math.abs(f - want[i]) <= 0.01);
+    if (!reduce) check(before.every((f) => f <= 0.02) && mid.some((f, i) => f > 0.02 && f < want[i] - 0.01) && atValue,
+      `D11 bars grow on entering view: before ${before.join('/')} · 140 ms after entry ${mid.join('/')} · after ${after.join('/')}`);
+    else check(before.every((f, i) => Math.abs(f - want[i]) <= 0.01) && atValue, `D11 reduced motion: bars full from the start ${before.join('/')}`);
+    await p.close();
   }
 } finally { await browser.close(); }
 console.log(fail ? `FAIL — ${fail} law(s) broken` : 'PASS — the homepage has depth by tier, hairline and measured figure, not by effect');

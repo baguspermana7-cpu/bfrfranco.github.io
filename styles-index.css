@@ -5545,3 +5545,17 @@ html[data-theme="light"] #rzModalForm .rz-demo-hint code, html[data-theme="light
 #contact .contact-form .btn-primary { background: var(--dp-amber); color: #0b0c0e; border: 0; }
 [data-theme="light"] #contact .contact-form .btn-primary { color: #ffffff; }
 #contact .contact-form .btn-primary:hover { background: var(--dp-amber); filter: none; }
+/* R099 motion (D11): bars grow from the left once; transform only; 600 ms strong ease-out; 60 ms row stagger; the
+   reference tick and its label fade in as the fill arrives. Reduced motion: never armed (full bars). */
+#metrics .res-fill { transform-origin: left center; }
+#metrics .res-panel.res-armed .res-fill { transform: scaleX(0); }
+#metrics .res-panel.res-armed .res-ref, #metrics .res-panel.res-armed .res-ref-label { opacity: 0; }
+#metrics .res-panel.res-armed.res-in .res-fill { transform: none; transition: transform 600ms cubic-bezier(0.23, 1, 0.32, 1); }
+#metrics .res-panel.res-armed.res-in .res-ref, #metrics .res-panel.res-armed.res-in .res-ref-label { opacity: 1; transition: opacity 200ms ease-out 450ms; }
+#metrics .res-panel.res-armed.res-in .res-row:nth-child(2) .res-fill { transition-delay: 60ms; }
+#metrics .res-panel.res-armed.res-in .res-row:nth-child(3) .res-fill { transition-delay: 120ms; }
+#metrics .res-panel.res-armed.res-in .res-row:nth-child(2) .res-ref, #metrics .res-panel.res-armed.res-in .res-row:nth-child(2) .res-ref-label { transition-delay: 510ms; }
+@media (prefers-reduced-motion: reduce) {
+    #metrics .res-panel.res-armed .res-fill { transform: none; }
+    #metrics .res-panel.res-armed .res-ref, #metrics .res-panel.res-armed .res-ref-label { opacity: 1; }
+}
