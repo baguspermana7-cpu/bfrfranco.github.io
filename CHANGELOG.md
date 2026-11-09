@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v3.35.4 — 2026-11-09 — "The one-line draws the power paths you asked for"
+
+Owner K29: "giant schematic … receh, kurang detail dan kurang comprehensive". The sub-system sheets and their modal
+shipped earlier; this is the main sheet itself.
+
+### Added
+- **Sheet A follows the redundancy input** (`cx-calculator.html` → Analysis). 2N and 2N+1 draw the whole electrical
+  chain twice: utility 150 kV intake, 150/20 kV main transformers, 20 kV boards, 20/0.4 kV unit substations, UPS and
+  LV busway on feed A and on feed B, a normally-open bus tie between the two 20 kV sections, generators on each board
+  through a normally-open ATS, and the IT load drawn across both rows as dual-corded A + B. N and N+1 still draw one
+  feed — nothing is drawn that the input does not ask for. Each system stays one click target and one count; the
+  feed-B copy carries the same Cx colour and the same changed / in-test / selected marks. The trace never runs
+  through the bus tie.
+- **Diagram engine `mirrorOf`** — a second drawing of a system already on the sheet (feed B of a 2N chain) does not
+  count against the nine-node budget; a mirror of a node that was never drawn warns `unknown-mirror` and counts.
+
+### Fixed
+- **Campus explode under a busy main thread** — the landing timer set the explode factor to 1 but left the top layers
+  mid-stagger until the next frame. The layers now move with the factor.
+- **Flaky campus motion gate (M5)** — it slept 800 ms after "back to campus" against the camera's 900 ms landing
+  guarantee, so it failed under a loaded ship gate (reported by the parallel session on v3.35.2). Motion and
+  analysis gates now wait for the landed state with a deadline.
+
+### Gates
+- `tools/test-cx-schematic.mjs` K29b for N / N+1 / 2N / 2N+1: feed systems drawn once or twice, one hit target per
+  system, bus tie only on 2N, twin names equal the feed-A names, zero engine warnings (red 4, then 2, now 43/43).
+- `tools/test-rz-diagram-engine.mjs` U2c / U2d (`mirrorOf`), red first, 131/131.
+- `tools/test-cx-campus-motion.mjs` M9: rAF stubbed out, explode still lands with every layer on its level (red on
+  the old timer, green after; motion 18/18 three runs in a row).
+
 ## v3.35.3 — 2026-11-09 — "Homepage rhythm: About on the base, FAQ on a real tier, two hues on the blue bands"
 
 Follow-up to v3.35.2 (owner K33 / R099 "sync"; peer audit; R100).
